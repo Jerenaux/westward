@@ -1,0 +1,8 @@
+* {
+    font-family: arial;
+}
+
+#coordinates {
+    float: left;
+    width: 150px;
+}
