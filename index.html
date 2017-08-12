@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="client/pixi.js"></script>
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">-->
+    <link href="/client/style.css" rel="stylesheet">
+    <title>Westward</title>
+</head>
+<body>
+    <canvas id='game'></canvas>
+    <div id="coordinates">
+        Pixel: <span id="pxx">0</span>,<span id="pxy">0</span><br/>
+        Tile: <span id="tx">0</span>,<span id="ty">0</span><br/>
+        AOI: <span id="aoi">0</span><br/>
+        Zoom: <span id="zx">1</span>,<span id="zy">1</span><br/>
+        Action: <span id="action"></span>
+    </div>
+    <div id="buttons">
+        <a href="#" onclick="Engine.zoom(-1);"><img src="assets/images/zommout.png" title="Zoom out"/></a>
+        <a href="#" onclick="Engine.zoom(1);"><img src="assets/images/zoomin.png" title="Zoom in"/></a>
+        <a href="#" onclick="Engine.toggleGrid();"><img src="assets/images/grid.png" title="Toggle grid"/></a>
+        <a href="#" onclick="Engine.toggleHero();"><img src="assets/images/silhouette.png" title="Toggle hero"/></a>
+        <a href="#" onclick="Engine.toggleSelection();"><img src="assets/images/selection.png" title="Toggle selection"/></a>
+        <a href="#" onclick="Engine.setAction('move');"><img src="assets/images/steps.png" title="Set action: move"/></a>
+        <a href="#" onclick="Engine.setAction('addMound');"><img src="assets/images/terrain.png" title="Set action: addMound"/></a>
+    </div>
+    <div id="captures"></div>
+
+</body>
+<script src="client/Utils.js" type="text/javascript"></script>
+<script src="client/Geometry.js" type="text/javascript"></script>
+<script src="client/AOI.js" type="text/javascript"></script>
+<script src="client/Engine.js" type="text/javascript"></script>
+</html>
