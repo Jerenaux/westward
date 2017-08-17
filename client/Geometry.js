@@ -1,9 +1,14 @@
 /**
  * Created by Jerome on 03-08-17.
  */
-
 var Geometry = {
-    lastrectID : 0 // running id of generated rects
+    lastrectID : 0, // running id of generated rects
+    colors : {
+        0: 0xff0000,
+        1: 0x00ff00,
+        2: 0x0000ff,
+        3: 0xffff00
+    }
 };
 
 Geometry.makePoint = function(x,y){
@@ -86,15 +91,32 @@ Geometry.mergeRects = function(rects){
         for(var i = 0; i < rects.length; i++){
             var rect = rects[i];
             if(pt.rectID == rect.id) continue;
-            if(isInRect(pt,rect)){
+            if(rect.contains(pt)){
                 overlap = true;
-                queue = queue.concat(findIntersects(pt,rect));
+                queue = queue.concat(rect.findIntersects(rect));
                 break;
             }
         }
         if(!overlap) pts.push(pt);
     }
-    return removeDuplicates(pts);
+    return Geometry.removeDuplicates(pts);
+};
+
+// Remove duplicate vertices having arised from merging rectangles
+Geometry.removeDuplicates = function(pts){
+    return pts.reduce(function (p, c) {
+        // create an identifying id from the object values
+        var id = [c.x, c.y].join('|');
+        // if the id is not found in the temp array
+        // add the object to the output array
+        // and add the key to the temp array
+        if (p.temp.indexOf(id) === -1) {
+            p.out.push(c);
+            p.temp.push(id);
+        }
+        return p;
+        // return the deduped array
+    }, { temp: [], out: [] }).out;
 };
 
 Geometry.computeCentroid = function(pts){
@@ -114,11 +136,29 @@ Geometry.sortPoints = function(pts,centroid){
         pts[i].x -= centroid.x;
         pts[i].y -= centroid.y;
     }
-    pts.sort(sortAngle);
+    pts.sort(Geometry.sortAngle);
     for(var i = 0; i < pts.length;i++){
         pts[i].x += centroid.x;
         pts[i].y += centroid.y;
     }
+};
+
+// Sort points in anti-clockwise order
+Geometry.sortAngle = function(a,b){
+    var origin = {x:0,y:0};
+    var aa = Geometry.computeAngle(a, origin,true);
+    var bb = Geometry.computeAngle(b, origin,true);
+    if(aa > bb) return 1;
+    if(aa < bb) return -1;
+    // If ame angle, sort based on proxiity
+    var ea = Geometry.euclidean(a,origin);
+    var eb = Geometry.euclidean(b,origin);
+    var sign = aa/Math.abs(aa);
+    if(aa == -90) sign = 1;
+    if(aa == 0) sign = -1;
+    if(ea > eb) return 1*sign;
+    if(ea < eb) return -1*sign;
+    return 0;
 };
 
 Geometry.smoothShape = function(pts){
@@ -126,8 +166,8 @@ Geometry.smoothShape = function(pts){
         var b = (i+1 < pts.length ? i+1 : i+1-pts.length);
         var c = (i+2 < pts.length ? i+2 : i+2-pts.length);
         var d = (i+3 < pts.length ? i+3 : i+3-pts.length);
-        var angle = computeAngle(pts[i],pts[b],true);
-        var angle2 = computeAngle(pts[i],pts[c],true);
+        var angle = Geometry.computeAngle(pts[i],pts[b],true);
+        var angle2 = Geometry.computeAngle(pts[i],pts[c],true);
         if(angle == angle2){ // straight line, remove intermediate point
             pts.splice(b,1);
         }else if((angle%45 != 0 && angle2%45 == 0)) { // swap to points
@@ -152,15 +192,13 @@ Geometry.interpolatePoints = function(pts){
             var sign = Math.abs(dy)/dy;
             //console.log('vertical side of '+dy+' tiles');
             var skipFirst = (dy < 1);
-            //var skipLast = !skipFirst;
             skipLast = true;
             var start = (skipFirst ? 2 : 1);
             var end = Math.abs(dy);
             if(skipLast) end--;
             for(var j = start, k = 1; j < end; j++, k++){
                 var p = new PIXI.Point(pts[i].x,pts[i].y+(j*sign*Engine.tileWidth));
-                //console.log('adding point at index '+(i+j)+' : '+p.x+', '+p.y);
-                pts.splice(i+k,0,p);
+                pts.splice(i+k,0,p);// insert new point
             }
             i += k-1;
         }else if(dy == 0){
@@ -174,13 +212,26 @@ Geometry.interpolatePoints = function(pts){
             // j used for positioning new points, k for counting them and managing position in array
             for(var j = start, k = 1; j < end; j++, k++){
                 var p = new PIXI.Point(pts[i].x+(j*sign*Engine.tileHeight),pts[i].y);
-                //console.log('adding point at index '+(i+j)+' : '+p.x+', '+p.y);
                 pts.splice(i+k,0,p);
             }
             i += k-1;
         }
     }
+    return pts;
 };
+
+Geometry.euclidean = function(a,b){
+    return Math.pow(a.x-b.x,2)+Math.pow(a.y- b.y,2);
+};
+
+Geometry.computeAngle = function(a,b,degrees){ // return angle between points a and b
+    var angle = -(Math.atan2(b.y- a.y, b.x- a.x));
+    if(degrees) {
+        angle *= (180/Math.PI);
+        if(angle == -180) angle*= -1;
+    }
+    return angle;
+}
 
 /*
 // Compute and draw a random path from a starting point
@@ -247,4 +298,77 @@ Geometry.checkCandidates = function(candidates,current,directions,minx,maxx,miny
         if(c.x < minx || c.x > maxx || c.y < miny || c.y > maxy) candidates.splice(j,1);
     }
 };
+
+ function deform(pts){
+ for(var i = 0; i < pts.length; i++){
+ var a = pts[i];
+ var b = (i+1 < pts.length? pts[i+1] : pts[0]);
+ var dx = Math.abs(a.x- b.x)/Engine.tileWidth;
+ var dy = Math.abs(a.y- b.y)/Engine.tileHeight;
+ if(dx < 3 && dy < 3) continue;
+ if(dx == dy){
+ console.log('diagonal');
+ continue;
+ }
+ var newpts = makePath(a,b);
+ pts.splice(i+1,0,...newpts);
+ i += newpts.length;
+}
+}
+
+function makePath(a,b){
+    console.log('Finding path between ('+a.x+','+a.y+') and ('+b.x+','+b.y+')');
+    var newpts = [];
+    var vertical = (a.x == b.x);
+    console.log(vertical);
+    var start = new PIXI.Point(a.x, a.y);
+    var angle = -1;
+
+    var j = 0;
+    while(true) {
+        var dx = start.x - b.x;
+        var dy = start.y - b.y;
+        if(distToDest(vertical,dx,dy) == 1){
+            console.log('close enough');
+            break;
+        }
+        var candidates = [];
+        var xIncrement = -(dx / Math.abs(dx)) * Engine.tileWidth;
+        var yIncrement = -(dy / Math.abs(dy)) * Engine.tileWidth;
+        for (var i = -1; i <= 1; i++) {
+            var pt = new PIXI.Point(start.x + (vertical ? i * Engine.tileWidth : xIncrement), (start.y + (vertical ? yIncrement : i * Engine.tileWidth)));
+            var ndx = Math.abs(pt.x - b.x);
+            var ndy = Math.abs(pt.y - b.y);
+            console.log(JSON.stringify(pt));
+            var ng = computeAngle(start,pt,true);
+            var isFlat = (ng%90 == 0 || ng == angle);
+            var lim = (isFlat ? ndx : ndx-32);
+            /*if ((vertical && ndx >= ndy) || (!vertical && ndy > lim)){
+             console.log('going too far ('+ndx+', '+ndy+')');
+             continue; // don't go too far
+             }*/
+            /*if(ng == -1*angle){
+                console.log('angle');
+                continue;
+            }
+            candidates.push(pt);
+        }
+        var newpt = randomElement(candidates);
+        newpts.push(newpt);
+        angle = computeAngle(start,newpt,true);
+        start.x = newpt.x;
+        start.y = newpt.y;
+        console.log('angle = '+angle+', x = '+newpt.x+', y = '+newpt.y+', dx = '+(start.x- b.x)+', dy = '+(start.y- b.y));
+        console.log('-----');
+        if(j > 100) break;
+        j++;
+    }
+    printArray(newpts);
+    return newpts;
+}
+
+ function distToDest(vertical,dx,dy){
+ return (vertical ? Math.abs(dy)/Engine.tileHeight : Math.abs(dx)/Engine.tileWidth);
+ //if((vertical && Math.abs(dy) == Engine.tileHeight) || (!vertical && Math.abs(dx) == Engine.tileWidth)) break;
+ }
 */

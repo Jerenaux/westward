@@ -33,6 +33,20 @@ function randomInt (low, high) { // [low, high[
 function randomElement(arr){
     return arr[Math.floor(Math.random()*arr.length)];
 }
+function swapElements(arr,b,c){
+    var tmp = arr[b];
+    arr[b] = arr[c];
+    arr[c] = tmp;
+}
+
+function removeElement(v,arr){
+    var idx = arr.indexOf(v);
+    if(idx > -1) arr.splice(idx,1);
+}
+
+function insert(a1,a2,pos){
+    a1.splice.apply(a1, [pos, 0].concat(a2));
+}
 
 function clamp(x,min,max){ // restricts a value to a given interval (return the value unchanged if within the interval
     return Math.max(min, Math.min(x, max));

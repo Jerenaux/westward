@@ -22,13 +22,16 @@
         <a href="#" onclick="Engine.toggleGrid();"><img src="assets/images/grid.png" title="Toggle grid"/></a>
         <a href="#" onclick="Engine.toggleHero();"><img src="assets/images/silhouette.png" title="Toggle hero"/></a>
         <a href="#" onclick="Engine.toggleSelection();"><img src="assets/images/selection.png" title="Toggle selection"/></a>
+        <a href="#" onclick="Engine.toggleHulls();"><img src="assets/images/polygon.png" title="Toggle hulls"/></a>
         <a href="#" onclick="Engine.setAction('move');"><img src="assets/images/steps.png" title="Set action: move"/></a>
         <a href="#" onclick="Engine.setAction('addMound');"><img src="assets/images/terrain.png" title="Set action: addMound"/></a>
+        <a href="#" onclick="Engine.undo();"><img src="assets/images/undo.png" title="Undo"/></a>
     </div>
     <div id="captures"></div>
 
 </body>
 <script src="client/Utils.js" type="text/javascript"></script>
+<script src="client/Rect.js" type="text/javascript"></script>
 <script src="client/Geometry.js" type="text/javascript"></script>
 <script src="client/AOI.js" type="text/javascript"></script>
 <script src="client/Engine.js" type="text/javascript"></script>

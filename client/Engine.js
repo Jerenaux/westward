@@ -25,11 +25,9 @@ Engine.boot = function(){
      * Scatter trees and stuff
     *-----
     * Load more chunks upon zoom
-    * Clean code
     * Save to chunks
     * Edit chunks in tiled?
-    * Disable hulls
-    * Undo*/
+    * Redo*/
 
     Engine.renderer = PIXI.autoDetectRenderer(
         Engine.viewWidth*Engine.tileWidth,
@@ -44,6 +42,7 @@ Engine.boot = function(){
     Engine.setAction('move');
     Engine.showGrid = Utils.getPreference('showGrid',false);
     Engine.showHero = Utils.getPreference('showHero',true);
+    Engine.showHulls = Utils.getPreference('showHulls',false);
     Engine.selectionEnabled = Utils.getPreference('selectionEnabled',false);
     Engine.debug = true;
 
@@ -56,7 +55,9 @@ Engine.boot = function(){
     Engine.stage = new PIXI.Container();
     Engine.blackBoard = new PIXI.Container(); // Stores all the graphics objects used for debugging (hulls, points...)
     Engine.blackBoard.z = 999;
+    Engine.blackBoard.visible = Engine.showHulls;
     Engine.stage.addChild(Engine.blackBoard);
+    Engine.editHistory = [];
 
     Engine.drawSelection();
     Engine.renderer.view.addEventListener('mousedown', Engine.handleClick, false);
@@ -147,8 +148,8 @@ Engine.start = function(loader, resources){
 Engine.addHero = function(){
     var startx = randomInt(0,77);
     var starty = randomInt(0,Engine.worldHeight);
-    startx = 10;//35;
-    starty = 10;//30;
+    startx = 35;//35;
+    starty = 30;//30;
     Engine.player = Engine.addSprite('hero',startx,starty);
     Engine.player.visible = Engine.showHero;
     Engine.updateChunks();
@@ -207,6 +208,12 @@ Engine.toggleSelection = function(){
     }else{
         Engine.renderer.view.style.cursor = 'default';
     }
+};
+
+Engine.toggleHulls= function(){
+    Engine.showHulls = !Engine.showHulls;
+    Engine.blackBoard.visible = Engine.showHulls;
+    localStorage.setItem('showHulls',Engine.showHulls);
 };
 
 Engine.toggleGrid = function(){
@@ -268,9 +275,9 @@ Engine.getTilesetFromTile = function(tile){
     return Engine.tilesets.length-1;
 };
 
-Engine.addTile = function(x,y,tile){
+Engine.addTile = function(x,y,tile,chunk){
     if(x < 0 || y < 0) return;
-    var chunk = Engine.AOIs[Utils.tileToAOI({x:x,y:y})];
+    var chunk = chunk || Engine.AOIs[Utils.tileToAOI({x:x,y:y})];
     var tilesetID = Engine.getTilesetFromTile(tile);
     var tileset = Engine.tilesets[tilesetID];
     tile -= tileset.firstgid;
@@ -439,132 +446,15 @@ Engine.listAdjacentAOIs = function(current){
 
 Engine.boot();
 
+Engine.undo = function(){
+    if(Engine.editHistory.length > 0) Engine.editHistory.pop().destroy();
+};
+
 Engine.addMound = function(worldx,worldy){
-    Engine.drawCliff(Geometry.makePolyrect(worldx,worldy));
+    var cliff = Engine.drawCliff(Geometry.interpolatePoints(Geometry.makePolyrect(worldx,worldy)));
+    Engine.stage.addChild(cliff);
+    Engine.editHistory.push(cliff);
 };
-
-function deform(pts){
-    for(var i = 0; i < pts.length; i++){
-        var a = pts[i];
-        var b = (i+1 < pts.length? pts[i+1] : pts[0]);
-        var dx = Math.abs(a.x- b.x)/Engine.tileWidth;
-        var dy = Math.abs(a.y- b.y)/Engine.tileHeight;
-        if(dx < 3 && dy < 3) continue;
-        if(dx == dy){
-            console.log('diagonal');
-            continue;
-        }
-        /*var newpts = makePath(a,b);
-        pts.splice(i+1,0,...newpts);
-        i += newpts.length;*/
-    }
-}
-
-function makePath(a,b){
-    console.log('Finding path between ('+a.x+','+a.y+') and ('+b.x+','+b.y+')');
-    var newpts = [];
-    var vertical = (a.x == b.x);
-    console.log(vertical);
-    var start = new PIXI.Point(a.x, a.y);
-    var angle = -1;
-
-    var j = 0;
-    while(true) {
-        var dx = start.x - b.x;
-        var dy = start.y - b.y;
-        if(distToDest(vertical,dx,dy) == 1){
-            console.log('close enough');
-            break;
-        }
-        var candidates = [];
-        var xIncrement = -(dx / Math.abs(dx)) * Engine.tileWidth;
-        var yIncrement = -(dy / Math.abs(dy)) * Engine.tileWidth;
-        for (var i = -1; i <= 1; i++) {
-            var pt = new PIXI.Point(start.x + (vertical ? i * Engine.tileWidth : xIncrement), (start.y + (vertical ? yIncrement : i * Engine.tileWidth)));
-            var ndx = Math.abs(pt.x - b.x);
-            var ndy = Math.abs(pt.y - b.y);
-            console.log(JSON.stringify(pt));
-            var ng = computeAngle(start,pt,true);
-            var isFlat = (ng%90 == 0 || ng == angle);
-            var lim = (isFlat ? ndx : ndx-32);
-            /*if ((vertical && ndx >= ndy) || (!vertical && ndy > lim)){
-                console.log('going too far ('+ndx+', '+ndy+')');
-                continue; // don't go too far
-            }*/
-            if(ng == -1*angle){
-                console.log('angle');
-                continue;
-            }
-            candidates.push(pt);
-        }
-        var newpt = randomElement(candidates);
-        newpts.push(newpt);
-        angle = computeAngle(start,newpt,true);
-        start.x = newpt.x;
-        start.y = newpt.y;
-        console.log('angle = '+angle+', x = '+newpt.x+', y = '+newpt.y+', dx = '+(start.x- b.x)+', dy = '+(start.y- b.y));
-        console.log('-----');
-        if(j > 100) break;
-        j++;
-    }
-    printArray(newpts);
-    return newpts;
-}
-
-function distToDest(vertical,dx,dy){
-    return (vertical ? Math.abs(dy)/Engine.tileHeight : Math.abs(dx)/Engine.tileWidth);
-    //if((vertical && Math.abs(dy) == Engine.tileHeight) || (!vertical && Math.abs(dx) == Engine.tileWidth)) break;
-}
-
-function swapElements(pts,b,c){
-    var tmp = pts[b];
-    pts[b] = pts[c];
-    pts[c] = tmp;
-}
-
-Engine.colors = {
-    0: 0xff0000,
-    1: 0x00ff00,
-    2: 0x0000ff,
-    3: 0xffff00
-};
-
-function Rect(x,y,w,h){
-    this.id = Geometry.lastrectID++;
-    this.x = x;
-    this.y = y;
-    this.w = w;
-    this.h = h;
-    this.points = [];
-    this.points.push(new PIXI.Point(x,y));
-    this.points.push(new PIXI.Point(x+w,y));
-    this.points.push(new PIXI.Point(x+w,y+h));
-    this.points.push(new PIXI.Point(x,y+h));
-    for(var i = 0; i < this.points.length; i++){
-        this.points[i].i = i;
-        this.points[i].rectID = this.id;
-        Engine.drawCircle(this.points[i].x,this.points[i].y,5,Engine.colors[this.id]);
-    }
-}
-
-function removeDuplicates(pts){
-    return pts.reduce(function (p, c) {
-
-        // create an identifying id from the object values
-        var id = [c.x, c.y].join('|');
-
-        // if the id is not found in the temp array
-        // add the object to the output array
-        // and add the key to the temp array
-        if (p.temp.indexOf(id) === -1) {
-            p.out.push(c);
-            p.temp.push(id);
-        }
-        return p;
-
-        // return the deduped array
-    }, { temp: [], out: [] }).out;
-}
 
 Engine.drawHull = function(hull){
     var g = new PIXI.Graphics();
@@ -574,7 +464,7 @@ Engine.drawHull = function(hull){
         g.lineTo(hull[i].x,hull[i].y);
     }
     g.lineTo(hull[0].x,hull[0].y);
-    Engine.stage.addChild(g);
+    Engine.blackBoard.addChild(g);
 };
 
 Engine.drawCircle = function(x,y,radius,color){
@@ -584,122 +474,9 @@ Engine.drawCircle = function(x,y,radius,color){
     Engine.blackBoard.addChild(g);
 };
 
-
-function removeEntry(v,arr){
-    var idx = arr.indexOf(v);
-    if(idx > -1) arr.splice(idx,1);
-}
-
-function findIntersects(pt,rect){
-    var sect = [];
-    var k = pt.i;
-    if(k === undefined) return sect;
-    if(k == 0){ // top left corner
-        sect.push(projectRight(rect,pt)); // project on right side
-        sect.push(projectDown(rect,pt)); // project on bottom
-    }else if(k == 1){ // top right corner
-        sect.push(projectLeft(rect,pt)); // project on left side
-        sect.push(projectDown(rect,pt)); // project on bottom
-    }else if(k == 2){ // bottom right corner
-        sect.push(projectLeft(rect,pt)); // project on left side
-        sect.push(projectUp(rect,pt)); // project on left side
-    }else if(k == 3){ // bottom left corner
-        sect.push(projectRight(rect,pt)); // project on right side
-        sect.push(projectUp(rect,pt)); // project on left side
-    }
-    return sect;
-}
-
-function projectUp(ref,pt){
-    return new PIXI.Point(pt.x,ref.y);
-}
-
-function projectRight(ref,pt){
-    return new PIXI.Point(ref.x+ref.w,pt.y);
-}
-
-function projectDown(ref,pt){
-    return new PIXI.Point(pt.x,ref.y+ref.h);
-}
-
-function projectLeft(ref,pt){
-    return new PIXI.Point(ref.x,pt.y);
-}
-
-function isInRect(pt,rect){
-    //return (rect.x <= pt.x && pt.x <= rect.x+rect.w && rect.y <= pt.y && pt.y <= rect.y+rect.h);
-    return (rect.x < pt.x && pt.x < rect.x+rect.w && rect.y < pt.y && pt.y < rect.y+rect.h);
-}
-
-function sortAngle(a,b){
-    var origin = {x:0,y:0};
-    var aa = computeAngle(a, origin,true);
-    var bb = computeAngle(b, origin,true);
-    //return (aa >= bb);
-    if(aa > bb) return 1;
-    if(aa < bb) return -1;
-    var ea = euclidean(a,origin);
-    var eb = euclidean(b,origin);
-    var sign = aa/Math.abs(aa);
-    if(aa == -90) sign = 1;
-    if(aa == 0) sign = -1;
-    if(ea > eb) return 1*sign;
-    if(ea < eb) return -1*sign;
-    return 0;
-}
-// Leftward rect: 1, -1, -1, 1
-// rightward: 1, -1, 1, -1
-
-function euclidean(a,b){
-    return Math.pow(a.x-b.x,2)+Math.pow(a.y- b.y,2);
-}
-
-function computeAngle(a,b,degrees){ // return angle between points a and b
-    //console.log('('+a.x+','+ a.y+'), ('+ b.x+','+b.y+')');
-    var angle = -(Math.atan2(b.y- a.y, b.x- a.x));
-    /*if(a.x == b.x && a.y < b.y) angle = Math.PI/2;
-    if(a.x == b.x && a.y > b.y) angle = -Math.PI/2;
-    if(a.y == b.y && a.x > b.x) angle = -Math.PI;
-    if(a.y == b.y && a.x < b.x) angle = Math.PI;*/
-    if(degrees) {
-        angle *= (180/Math.PI);
-        if(angle == -180) angle*= -1;
-    }
-    return angle;
-}
-
-Engine.objToArr = function(pts){
-    var p = [];
-    for(var i = 0; i < pts.length; i++){
-        p.push([pts[i].x,pts[i].y]);
-    }
-    return p;
-};
-
-/*function vertslice(worldx,worldy,chunk){
-    for(var i = 0; i < 3; i++){ // bottom
-        Engine.addTile(worldx-1,worldy+(i+1),1343+(i*20),chunk);
-        Engine.addTile(worldx,worldy+(i+1),1344+(i*20),chunk);
-        Engine.addTile(worldx+1,worldy+(i+1),1345+(i*20),chunk);
-    }
-    for(var i = 0; i < 2; i++){ // up
-        Engine.addTile(worldx,worldy-(-i+2),1224+(i*20),chunk);
-        Engine.addTile(worldx+1,worldy-(-i+2),1227+(i*20),chunk);
-    }
-    Engine.addTile(worldx-2,worldy,1281,chunk);
-    Engine.addTile(worldx-1,worldy,1282,chunk);
-    Engine.addTile(worldx-1,worldy,1282,chunk);
-}*/
-
-function insert(a1,a2,pos){
-    a1.splice.apply(a1, [pos, 0].concat(a2));
-}
-
-
-
 Engine.drawCliff = function(pts){
     Engine.drawHull(pts);
-    Geometry.interpolatePoints(pts);
+    var cliff = new PIXI.Container();
 
     var last = null;
     for(var i = 0; i < pts.length; i++){
@@ -707,102 +484,100 @@ Engine.drawCliff = function(pts){
         var prev = (i == 0 ? pts.length-1 : i-1);
         var id = findTileID(pts[prev],pts[i],pts[next]);
         var tile = ptToTile(pts[i]);
+        var previousTile = ptToTile(pts[prev]);
 
         // Prevent issues with double corners
-        if((id == 1 && last == 3) && (ptToTile(pts[prev]).x - tile.x == 1)) id = 9; // top left after bottom right
-        if((id == 3 && last == 1) && (ptToTile(pts[prev]).y - tile.y == -1)){
+        if((id == 1 && last == 3) && (previousTile.x - tile.x == 1)) id = 9; // top left after bottom right
+        if((id == 3 && last == 1) && (previousTile.y - tile.y == -1)){
             id = 6;
             tile.x--;
         }
-        if((id == 0 && last == 2) && (ptToTile(pts[prev]).y - tile.y == 1)){ // top right after bottom left
+        if((id == 0 && last == 2) && (previousTile.y - tile.y == 1)){ // top right after bottom left
             id = 6;
             tile.x--;
         }
 
+        var ref = {
+            x: tile.x,
+            y: tile.y
+        };
         switch(id){
             case 0: // top right outer
-                var ref = {
+                /*var ref = {
                     x: tile.x-1,
                     y: tile.y
-                };
-                Engine.addTile(ref.x,ref.y-1,6);
-                Engine.addTile(ref.x,ref.y,21);
-                Engine.addTile(ref.x+1,ref.y,22);
-                //&&
-                if(last != 2 || (ptToTile(pts[prev]).y - tile.y > 2)) Engine.addTile(ref.x+1,ref.y+1,37);  // Prevent issues with double corners
-                //console.log(JSON.stringify(tile));
-                //console.log(JSON.stringify(ptToTile(pts[prev])));
+                };*/
+                ref.x -= 1;
+                Engine.addTile(ref.x,ref.y-1,6,cliff);
+                Engine.addTile(ref.x,ref.y,21,cliff);
+                Engine.addTile(ref.x+1,ref.y,22,cliff);
+                if(last != 2 || (previousTile.y - tile.y > 2)) Engine.addTile(ref.x+1,ref.y+1,37,cliff);  // Prevent issues with double corners
                 break;
             case 1: // top left outer
-                var ref = {
+                /*var ref = {
                     x: tile.x,
                     y: tile.y
-                };
-                Engine.addTile(ref.x,ref.y-1,3);
-                Engine.addTile(ref.x-1,ref.y,17);
-                Engine.addTile(ref.x,ref.y,18);
+                };*/
+                Engine.addTile(ref.x,ref.y-1,3,cliff);
+                Engine.addTile(ref.x-1,ref.y,17,cliff);
+                Engine.addTile(ref.x,ref.y,18,cliff);
                 break;
             case 2: // bottom left outer
-                Engine.addTile(tile.x,tile.y-2,6);
-                Engine.addTile(tile.x,tile.y-1,21);
+                Engine.addTile(ref.x,ref.y-2,6,cliff);
+                Engine.addTile(ref.x,ref.y-1,21,cliff);
                 break;
             case 3: // bottom right outer
-                Engine.addTile(tile.x-2,tile.y-1,17);
-                Engine.addTile(tile.x-1,tile.y-1,18);
+                Engine.addTile(ref.x-2,ref.y-1,17,cliff);
+                Engine.addTile(ref.x-1,ref.y-1,18,cliff);
                 break;
             case 4: // bottom left inner
-                var ref = {
+                /*var ref = {
                     x: tile.x-1,
                     y: tile.y
-                };
-                Engine.addTile(ref.x,ref.y-1,62);
-                Engine.addTile(ref.x+1,ref.y-1,63);
-                Engine.addTile(ref.x,ref.y,77);
-                Engine.addTile(ref.x+1,ref.y,78);
-                Engine.addTile(ref.x,ref.y+1,92);
-                Engine.addTile(ref.x+1,ref.y+1,93);
+                };*/
+                ref.x -= 1;
+                Engine.addTile(ref.x,ref.y-1,62,cliff);
+                Engine.addTile(ref.x+1,ref.y-1,63,cliff);
+                Engine.addTile(ref.x,ref.y,77,cliff);
+                Engine.addTile(ref.x+1,ref.y,78,cliff);
+                Engine.addTile(ref.x,ref.y+1,92,cliff);
+                Engine.addTile(ref.x+1,ref.y+1,93,cliff);
                 break;
             case 5: // bottom right inner
-                var ref = {
-                    x: tile.x,
-                    y: tile.y
-                };
-                Engine.addTile(ref.x-1,ref.y-1,66);
-                Engine.addTile(ref.x,ref.y-1,67);
-                Engine.addTile(ref.x-1,ref.y,81);
-                Engine.addTile(ref.x,ref.y,82);
-                Engine.addTile(ref.x-1,ref.y+1,96);
+                Engine.addTile(ref.x-1,ref.y-1,66,cliff);
+                Engine.addTile(ref.x,ref.y-1,67,cliff);
+                Engine.addTile(ref.x-1,ref.y,81,cliff);
+                Engine.addTile(ref.x,ref.y,82,cliff);
+                Engine.addTile(ref.x-1,ref.y+1,96,cliff);
                 break;
             case 6: // top
-                Engine.addTile(tile.x,tile.y-1,randomInt(4,6));
+                Engine.addTile(ref.x,ref.y-1,randomInt(4,6),cliff);
                 break;
             case 7: // right
-                Engine.addTile(tile.x,tile.y,52);
+                Engine.addTile(ref.x,ref.y,52,cliff);
                 break;
             case 8: // bottom
-                var actualID = randomInt(79,81);
-                Engine.addTile(tile.x,tile.y-1,actualID-15);
-                Engine.addTile(tile.x,tile.y,actualID);
-                Engine.addTile(tile.x,tile.y+1,actualID+15);
+                var actualID = randomInt(79,81,cliff);
+                Engine.addTile(tile.x,tile.y-1,actualID-15,cliff);
+                Engine.addTile(tile.x,tile.y,actualID,cliff);
+                Engine.addTile(tile.x,tile.y+1,actualID+15,cliff);
                 break;
             case 9: // left
-                Engine.addTile(tile.x-1,tile.y,randomElement([32,47]));
+                Engine.addTile(tile.x-1,tile.y,randomElement([32,47]),cliff);
                 break;
             case 10: // top right inner
-                Engine.addTile(tile.x-1,tile.y,69);
-                Engine.addTile(tile.x-1,tile.y+1,84);
+                Engine.addTile(tile.x-1,tile.y,69,cliff);
+                Engine.addTile(tile.x-1,tile.y+1,84,cliff);
                 break;
             case 11: // top left inner
-                var ref = {
-                    x: tile.x,
-                    y: tile.y+1
-                };
-                Engine.addTile(ref.x,ref.y,39);
-                Engine.addTile(ref.x,ref.y-1,24);
-                Engine.addTile(ref.x,ref.y+1,54);
+                ref.y += 1;
+                Engine.addTile(ref.x,ref.y,39,cliff);
+                Engine.addTile(ref.x,ref.y-1,24,cliff);
+                Engine.addTile(ref.x,ref.y+1,54,cliff);
         }
-        var last = id;
+        last = id;
     }
+    return cliff;
 };
 
 function ptToTile(pt){
@@ -813,8 +588,8 @@ function ptToTile(pt){
 }
 
 function findTileID(prev,pt,next){
-    var inAngle = computeAngle(prev,pt,true);
-    var outAngle = computeAngle(pt,next,true);
+    var inAngle = Geometry.computeAngle(prev,pt,true);
+    var outAngle = Geometry.computeAngle(pt,next,true);
     if(inAngle == 90 && outAngle == 180){
         //console.log('top right outer');
         return 0;
