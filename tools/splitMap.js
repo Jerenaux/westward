@@ -54,9 +54,9 @@ function splitMap(fileName,outputDirectory,AOIwidth,AOIheight){
             subMap.height = AOIheight;
             subMap.width = Math.min(AOIwidth,mapWidth-x);
             subMap.height = Math.min(AOIheight,mapHeight-y);
-            //console.log(aoi+' : '+subMap.width+', '+subMap.height);
             subMap.aoi = aoi;
             var liststart = mapWidth*y + x; // At which index in the list corresponds the top left tile of the submap
+
             for(var i= 0; i < subMap.layers.length; i++) { // Scan all layers one by one
                 var layer = subMap.layers[i];
                 layer.width = subMap.width;
@@ -73,6 +73,9 @@ function splitMap(fileName,outputDirectory,AOIwidth,AOIheight){
                 }
             }
 
+            // TODO here: remove tiles based on top-down visibility
+
+            // Remove empty layers
             for(var j = subMap.layers.length - 1; j >= 0; j--){
                 var layer = subMap.layers[j];
                 if(layer.type === "objectgroup") continue;
@@ -80,7 +83,12 @@ function splitMap(fileName,outputDirectory,AOIwidth,AOIheight){
                     subMap.layers.splice(j,1);
                 }
             }
-            //console.log('layer ins aoi '+aoi+' after : '+subMap.layers.length);
+
+            // Update tileset paths
+            for(var k = 0; k < subMap.tilesets.length; k++){
+                var tileset = subMap.tilesets[k];
+                tileset.image = "..\/"+tileset.image;
+            }
 
             fs.writeFile(__dirname+path+outputDirectory+'/chunk'+aoi+'.json',JSON.stringify(subMap),function(err){
                 if(err) throw err;

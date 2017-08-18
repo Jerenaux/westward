@@ -26,8 +26,8 @@ Engine.boot = function(){
     *-----
     * Load more chunks upon zoom
     * Save to chunks
-    * Edit chunks in tiled?
-    * Redo*/
+    * Top-down visibility optimization
+    */
 
     Engine.renderer = PIXI.autoDetectRenderer(
         Engine.viewWidth*Engine.tileWidth,
