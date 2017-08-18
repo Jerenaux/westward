@@ -73,17 +73,6 @@ function splitMap(fileName,outputDirectory,AOIwidth,AOIheight){
                 }
             }
 
-            // TODO here: remove tiles based on top-down visibility
-
-            // Remove empty layers
-            for(var j = subMap.layers.length - 1; j >= 0; j--){
-                var layer = subMap.layers[j];
-                if(layer.type === "objectgroup") continue;
-                if(layer.data.reduce(function(a,b){return a+b;},0) == 0){ // if layer entirely composed of '0' tiles
-                    subMap.layers.splice(j,1);
-                }
-            }
-
             // Update tileset paths
             for(var k = 0; k < subMap.tilesets.length; k++){
                 var tileset = subMap.tilesets[k];

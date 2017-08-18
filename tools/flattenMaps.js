@@ -17,21 +17,35 @@ function Layer(w,h,name) {
      this.opacity = 1;*/
 }
 
-function flatten(fileName,outputFilename){
-    if(!fileName){
-        console.log('ERROR : No file name specified! Arguments :');
-        console.log('-i = file name relative to assets/maps, with or without out json extension');
-        console.log('-o = (optional) file name relative toa ssets/maps, WITHOUT json extension');
+var path = '/../assets/maps/';
+
+function flatten(directory){
+    if(!directory){
+        console.log('ERROR : No directory specified! Arguments :');
+        console.log('-i = directory relative to assets/maps containing the chunks to flatten');
         return;
     }
-    if(fileName.substr(-5) == ".json") fileName = fileName.slice(0,-5);
-    if(!outputFilename){
-        outputFilename = 'mini'+fileName;
-    }
-    console.log('flattening');
-    var path = '/../assets/maps/';
 
-    fs.readFile(__dirname+path+fileName+".json", 'utf8', function (err, data) {
+    var outdir = __dirname+path+directory+'_flat';
+    if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);
+
+    var indir = __dirname+path+directory;
+    fs.readdir(indir,function(err,files){
+        for(var i = 0; i < files.length; i++){
+            var f = files[i];
+            if(f == 'master.json'){
+                fs.createReadStream(indir+'/'+f).pipe(fs.createWriteStream(outdir+'/'+f));
+            }else {
+                flattenChunk(indir, f, outdir);
+            }
+        }
+    });
+}
+
+function flattenChunk(indir,fileName,outdir){
+    console.log('flattening '+fileName);
+
+    fs.readFile(indir+'/'+fileName, 'utf8', function (err, data) {
         if (err) throw err;
         var map = JSON.parse(data);
         var newmap = clone(map);
@@ -62,14 +76,25 @@ function flatten(fileName,outputFilename){
             }
         }
 
+        /*
+         // TODO here: remove tiles based on top-down visibility
+
+         // Remove empty layers
+         for(var j = subMap.layers.length - 1; j >= 0; j--){
+         var layer = subMap.layers[j];
+         if(layer.type === "objectgroup") continue;
+         if(layer.data.reduce(function(a,b){return a+b;},0) == 0){ // if layer entirely composed of '0' tiles
+         subMap.layers.splice(j,1);
+         }
+         }*/
 
         newmap.layers = tilelayers.concat(objectlayers);
 
         console.log("Initial #layers = "+map.layers.length);
         console.log("New #layers = "+newmap.layers.length);
 
-        fs.writeFile(__dirname+path+outputFilename+'.json',JSON.stringify(newmap),function(err){
-            console.log('Newmap written to '+path+outputFilename+'.json');
+        fs.writeFile(outdir+'/'+fileName,JSON.stringify(newmap),function(err){
+            console.log('done');
         });
     });
 }
@@ -96,4 +121,4 @@ function fillLayer(layer,n){
 }
 
 var myArgs = require('optimist').argv;
-flatten(myArgs.i,myArgs.o);
+flatten(myArgs.i);
