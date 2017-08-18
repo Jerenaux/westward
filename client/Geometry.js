@@ -21,9 +21,9 @@ Geometry.makePolyrect = function(worldx,worldy){
     Geometry.randomRects(rects,worldx,worldy,N,true);
     var pts = Geometry.mergeRects(rects);
     var centroid = Geometry.computeCentroid(pts);
-    Engine.drawCircle(centroid.x,centroid.y,3,0x000000);
+    //Engine.drawCircle(centroid.x,centroid.y,3,0x000000);
     Geometry.sortPoints(pts,centroid);
-    Engine.drawCircle(pts[0].x,pts[0].y,4,0xff00ff);
+    //Engine.drawCircle(pts[0].x,pts[0].y,4,0xff00ff);
     Geometry.smoothShape(pts);
     Geometry.smoothShape(pts); // two passes
     return pts;
@@ -37,7 +37,7 @@ Geometry.randomRects = function(rects,worldx,worldy,N,randomRects){
             var w = randomInt(3, 10) * Engine.tileWidth;
             var h = randomInt(3, 10) * Engine.tileHeight;
             rects.push(new Rect(x, y, w, h));
-            console.log(JSON.stringify(rects[rects.length - 1]));
+            //console.log(JSON.stringify(rects[rects.length - 1]));
         }
     }else {
         var rectID = 3;

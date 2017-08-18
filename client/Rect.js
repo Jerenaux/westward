@@ -17,7 +17,7 @@ function Rect(x,y,w,h){
     for(var i = 0; i < this.points.length; i++){
         this.points[i].i = i;
         this.points[i].rectID = this.id;
-        if(Engine.debug) Engine.drawCircle(this.points[i].x,this.points[i].y,5,Geometry.colors[this.id]);
+        //if(Engine.debug) Engine.drawCircle(this.points[i].x,this.points[i].y,5,Geometry.colors[this.id]);
     }
 }
 

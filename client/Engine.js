@@ -424,6 +424,8 @@ Engine.handleClick = function(e){
     worldx = clamp(worldx,0,Engine.worldWidth);
     worldy = clamp(worldy,0,Engine.worldHeight);
     Engine[Engine.clickAction](worldx,worldy);
+    Engine.lastWorldX = worldx;
+    Engine.lastWorldY = worldy;
 };
 
 Engine.listAdjacentAOIs = function(current){
@@ -444,16 +446,24 @@ Engine.listAdjacentAOIs = function(current){
     return AOIs;
 };
 
-Engine.boot();
-
 Engine.undo = function(){
-    if(Engine.editHistory.length > 0) Engine.editHistory.pop().destroy();
+    if(Engine.editHistory.length == 0) return;
+    var last = Engine.editHistory.pop();
+    if(last.hull) last.hull.destroy();
+    last.destroy();
+};
+
+Engine.redo = function(){
+    Engine.undo();
+    Engine[Engine.clickAction](Engine.lastWorldX,Engine.lastWorldY);
 };
 
 Engine.addMound = function(worldx,worldy){
     var cliff = Engine.drawCliff(Geometry.interpolatePoints(Geometry.makePolyrect(worldx,worldy)));
-    Engine.stage.addChild(cliff);
+    //Engine.stage.addChild(cliff);
+    Engine.addToStage(cliff);
     Engine.editHistory.push(cliff);
+
 };
 
 Engine.drawHull = function(hull){
@@ -465,6 +475,7 @@ Engine.drawHull = function(hull){
     }
     g.lineTo(hull[0].x,hull[0].y);
     Engine.blackBoard.addChild(g);
+    return g;
 };
 
 Engine.drawCircle = function(x,y,radius,color){
@@ -475,9 +486,8 @@ Engine.drawCircle = function(x,y,radius,color){
 };
 
 Engine.drawCliff = function(pts){
-    Engine.drawHull(pts);
     var cliff = new PIXI.Container();
-
+    cliff.z = 3;
     var last = null;
     for(var i = 0; i < pts.length; i++){
         var next = (i == pts.length-1 ? 0 : i+1);
@@ -577,6 +587,8 @@ Engine.drawCliff = function(pts){
         }
         last = id;
     }
+
+    cliff.hull = Engine.drawHull(pts);
     return cliff;
 };
 
@@ -646,3 +658,5 @@ Engine.capture = function(x,y,w,h){
     capture.src = patternCanvas.toDataURL("image/png");
     document.getElementById("captures").appendChild(capture);
 };
+
+Engine.boot();
