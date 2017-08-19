@@ -21,12 +21,28 @@ Engine.camera = {
 
 Engine.boot = function(){
     /*TODO:
-     * Draw dirt
-     * Scatter trees and stuff
-    *-----
-    * Load more chunks upon zoom
-    * Save to chunks
-    * Top-down visibility optimization
+    * Procedural world:
+    - Dirt
+    - Water
+    - Forests
+    - Coronae
+    * Network
+    - Two repositories, for production and development, with node scripts taking care
+    of copying what is needed from one to the other (+ uglifying and compressing etc.)
+    -> Possible to programmatically push?  http://radek.io/2015/10/27/nodegit/
+    - Desktop app a simple terminal that gets everything from server (= exact same
+    appearance and behaviour, reduced code visibility, and possibly *no* node-modules)
+    - Scripts to group what is needed for the app, ugligy/compress and build
+    - In any case, migrate Geometry to server to hide it
+    * History & design document
+    -----
+    * Tools:
+    - Save to chunks (to appropriate layers)
+    - Blank slate, create chunks programmatically, start populating
+    - Load more chunks upon zoom
+    - Top-down visibility optimization (create a lookup table of transparency)
+    - Prune more map files
+    - Testing
     */
 
     Engine.renderer = PIXI.autoDetectRenderer(
