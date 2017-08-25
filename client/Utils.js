@@ -2,7 +2,9 @@
  * Created by Jerome on 11-08-17.
  */
 
-var Utils = {};
+var Utils = {
+    separator : '_'
+};
 
 Utils.getPreference = function(parameter,defaultValue){ // Retrieve sorting preferences for localStorage or return a default value
     var pref = localStorage.getItem(parameter);
@@ -13,17 +15,82 @@ Utils.getPreference = function(parameter,defaultValue){ // Retrieve sorting pref
     return parseInt(pref);
 };
 
+/*Utils.coordToChunk = function(x,y){
+    var horiz = Math.floor(x/Engine.chunkWidth);
+    var vert = Math.floor(y/Engine.chunkHeight);
+    return horiz+Utils.separator+vert;
+};
+
+Utils.chunkToCoord = function(chunk){
+    var coords = chunk.split(Utils.separator);
+    return {
+        x: coords[0]*Engine.chunkWidth,
+        y: coords[1]*Engine.chunkHeight
+    }
+};
+
+Utils.adjacentChunks = function(chunk){
+    var chunks = [];
+    var coords = chunk.split(Utils.separator);
+    var x = parseInt(coords[0]);
+    var y = parseInt(coords[1]);
+    var steps = [[0,0],[-1,0],[0,1],[1,0],[1,0],[0,-1],[0,-1],[-1,0],[-1,0]];
+    for(var i = 0; i < steps.length; i++){
+        x += steps[i][0];
+        y += steps[i][1];
+        chunks.push(x+Utils.separator+y);
+    }
+    return chunks;
+};*/
+
 Utils.tileToAOI = function(tile){ // input coords in Tiles
-    var top = Math.floor(tile.y/Engine.AOIheight);
-    var left = Math.floor(tile.x/Engine.AOIwidth);
-    return (top*Engine.nbAOIhorizontal)+left;
+    if(tile.x < 0 || tile.y < 0) console.log('ALERT: negative coordinates');
+    var top = Math.floor(tile.y/Engine.chunkHeight);
+    var left = Math.floor(tile.x/Engine.chunkWidth);
+    return (top*Engine.nbChunksHorizontal)+left;
 };
 
 Utils.AOItoTile = function(aoi){
     return {
-        x : (aoi%Engine.nbAOIhorizontal)*Engine.AOIwidth,
-        y : Math.floor(aoi/Engine.nbAOIhorizontal)*Engine.AOIheight
+        x : (aoi%Engine.nbChunksHorizontal)*Engine.chunkWidth,
+        y : Math.floor(aoi/Engine.nbChunksHorizontal)*Engine.chunkHeight
     };
+};
+
+// Returns the x and y offets of a chunk, in chunks, from the top left
+Utils.getMacroCoordinates = function(chunk){
+    return {
+        x: chunk%Engine.nbChunksHorizontal,
+        y: Math.floor(chunk/Engine.nbChunksHorizontal)
+    }
+};
+
+Utils.listAdjacentChunks = function(current){
+    var scope = Math.floor(1/Engine.zoomScale); // number of chunks to display along one axis based on zoom
+    var delta = Math.floor(scope/2)+1; // number of chunks to substract from current to get bounds of view area
+    var macro = Utils.getMacroCoordinates(current);
+    //console.log(macro.x+', '+macro.y);
+    var leftLimit = Math.max(macro.y*Engine.nbChunksHorizontal, current - delta); // id of the leftmost chunk of the view area
+    var topLeft = Math.max(leftLimit%Engine.nbChunksHorizontal, leftLimit - delta*Engine.nbChunksHorizontal);  // if of the top left chunk of the view area
+    console.log('Top corner for '+current+' : '+topLeft);
+};
+
+Utils.listAdjacentAOIs = function(current){
+    var AOIs = [];
+    var isAtTop = (current < Engine.nbChunksHorizontal);
+    var isAtBottom = (current > Engine.lastChunkID - Engine.nbChunksHorizontal);
+    var isAtLeft = (current%Engine.nbChunksHorizontal == 0);
+    var isAtRight = (current%Engine.nbChunksHorizontal == Engine.nbChunksHorizontal-1);
+    AOIs.push(current);
+    if(!isAtTop) AOIs.push(current - Engine.nbChunksHorizontal);
+    if(!isAtBottom) AOIs.push(current + Engine.nbChunksHorizontal);
+    if(!isAtLeft) AOIs.push(current-1);
+    if(!isAtRight) AOIs.push(current+1);
+    if(!isAtTop && !isAtLeft) AOIs.push(current-1-Engine.nbChunksHorizontal);
+    if(!isAtTop && !isAtRight) AOIs.push(current+1-Engine.nbChunksHorizontal);
+    if(!isAtBottom && !isAtLeft) AOIs.push(current-1+Engine.nbChunksHorizontal);
+    if(!isAtBottom && !isAtRight) AOIs.push(current+1+Engine.nbChunksHorizontal);
+    return AOIs;
 };
 
 function randomInt (low, high) { // [low, high[

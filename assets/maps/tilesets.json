@@ -1,0 +1,8 @@
+{
+  "tilesets":[
+    {"image":"../tilesets/Cliff_tileset(1).png","imageheight":518,"imagewidth":503,"name":"Cliff"},
+    {"image":"../tilesets/ground_tiles.png","imageheight":701,"imagewidth":672,"name":"ground_tiles"},
+    {"image":"../tilesets/trees.png","imageheight":192,"imagewidth":672,"name":"trees"},
+    {"image":"../tilesets/object- layer.png","imageheight":219,"imagewidth":477,"name":"object- layer"}
+  ]
+}

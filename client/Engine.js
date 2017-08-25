@@ -2,8 +2,8 @@
  * Created by Jerome on 26-06-17.
  */
 var Engine = {
-    viewWidth: 30,
-    viewHeight: 16,
+    viewWidth: 32,
+    viewHeight: 18,
     tileWidth: 32,
     tileHeight: 32
 };
@@ -22,14 +22,16 @@ Engine.camera = {
 Engine.boot = function(){
     /*TODO:
     * Procedural world:
-    - Dirt
     - Water
+    - Write to chunks
     - Forests
     - Coronae
+    - Dirt
     * Network
     - Two repositories, for production and development, with node scripts taking care
     of copying what is needed from one to the other (+ uglifying and compressing etc.)
     -> Possible to programmatically push?  http://radek.io/2015/10/27/nodegit/
+    - Somehow remove/disable debug components automatically
     - Desktop app a simple terminal that gets everything from server (= exact same
     appearance and behaviour, reduced code visibility, and possibly *no* node-modules)
     - Scripts to group what is needed for the app, ugligy/compress and build
@@ -37,12 +39,10 @@ Engine.boot = function(){
     * History & design document
     -----
     * Tools:
-    - Save to chunks (to appropriate layers)
-    - Blank slate, create chunks programmatically, start populating
     - Load more chunks upon zoom
     - Top-down visibility optimization (create a lookup table of transparency)
-    - Prune more map files
-    - Testing
+    - Prune map files more
+    - Testing (make part of the pipeline)
     */
 
     Engine.renderer = PIXI.autoDetectRenderer(
@@ -61,9 +61,10 @@ Engine.boot = function(){
     Engine.showHulls = Utils.getPreference('showHulls',false);
     Engine.selectionEnabled = Utils.getPreference('selectionEnabled',false);
     Engine.debug = true;
+    Engine.zoomScale = 1;
 
-    Engine.AOIs = {}; // holds references to the Containers containing the chunks
-    Engine.displayedAOIs = [];
+    Engine.chunks = {}; // holds references to the Containers containing the chunks
+    Engine.displayedChunks = [];
     Engine.mapDataCache = {};
 
     Engine.computeStageLocation();
@@ -82,8 +83,7 @@ Engine.boot = function(){
         Engine.renderer.view.addEventListener('mousemove', Engine.trackPosition, false);
     }
 
-    Engine.mapDataLocation = 'assets/maps/demochunks';
-    //Engine.mapDataLocation = 'assets/maps/chunks';
+    Engine.mapDataLocation = 'assets/maps/chunks';
     Engine.loadJSON(Engine.mapDataLocation+'/master.json',Engine.readMaster);
 };
 
@@ -119,14 +119,18 @@ Engine.computeStageLocation = function(){
 Engine.readMaster = function(masterData){
     Engine.tileWidth = masterData.tilesets[0].tilewidth;
     Engine.tileHeight = masterData.tilesets[0].tileheight;
-    Engine.AOIwidth = masterData.AOIwidth;
-    Engine.AOIheight = masterData.AOIheight;
-    Engine.nbAOIhorizontal = masterData.nbAOIhoriz;
-    Engine.nbAOIvertical = masterData.nbAOIvert;
-    Engine.worldWidth = Engine.nbAOIhorizontal*Engine.AOIwidth;
-    Engine.worldHeight = Engine.nbAOIvertical*Engine.AOIheight;
-    Engine.lastAOI = (Engine.nbAOIhorizontal*Engine.nbAOIvertical)-1;
-    //console.log('Master file read, setting up world of size '+Engine.worldWidth+' x '+Engine.worldHeight);
+    Engine.chunkWidth = masterData.chunkWidth;
+    Engine.chunkHeight = masterData.chunkHeight;
+    Engine.nbChunksHorizontal = masterData.nbChunksHoriz;
+    Engine.nbChunksVertical = masterData.nbChunksVert;
+    /*Engine.minChunkX = masterData.minX;
+    Engine.minChunkY = masterData.minY;
+    Engine.maxChunkX = masterData.maxX;
+    Engine.maxChunkY = masterData.maxY;*/
+    Engine.worldWidth = Engine.nbChunksHorizontal*Engine.chunkWidth;
+    Engine.worldHeight = Engine.nbChunksVertical*Engine.chunkHeight;
+    Engine.lastChunkID = (Engine.nbChunksHorizontal*Engine.nbChunksVertical)-1;
+    console.log('Master file read, setting up world of size '+Engine.worldWidth+' x '+Engine.worldHeight);
     Engine.tilesets = masterData.tilesets;
 
     PIXI.loader.add('hero','assets/sprites/hero.png');
@@ -162,13 +166,17 @@ Engine.start = function(loader, resources){
 };
 
 Engine.addHero = function(){
+    for(var i = 0; i <= Engine.lastChunkID; i++){
+        Utils.listAdjacentChunks(i);
+    }
     var startx = randomInt(0,77);
     var starty = randomInt(0,Engine.worldHeight);
-    startx = 35;//35;
-    starty = 30;//30;
+    startx = 12; //35
+    starty = 12;//30;
     Engine.player = Engine.addSprite('hero',startx,starty);
     Engine.player.visible = Engine.showHero;
-    Engine.updateChunks();
+    Engine.player.chunk = Utils.tileToAOI({x:startx,y:starty});
+    Engine.updateEnvironment();
     Engine.updateCamera();
 };
 
@@ -191,12 +199,14 @@ Engine.orderStage = function(){
     });
 };
 
-Engine.displayChunk = function(aoi){
-    if(Engine.mapDataCache[aoi]){
-        // Chunks are deletes and redrawn rather than having their visibility toggled on/off, to avoid accumulating in memory
-        Engine.makeChunk(Engine.mapDataCache[aoi]);
+Engine.displayChunk = function(id){
+    //var coords = id.split(Utils.separator);
+    //if(coords[0] < Engine.minChunkX || coords[1] < Engine.minChunkY || coords[0] > Engine.maxChunkX || coords[1] > Engine.maxChunkY) return;
+    if(Engine.mapDataCache[id]){
+        // Chunks are deleted and redrawn rather than having their visibility toggled on/off, to avoid accumulating in memory
+        Engine.drawChunk(Engine.mapDataCache[id]);
     }else {
-        Engine.loadJSON(Engine.mapDataLocation+'/chunk' + aoi + '.json', Engine.makeChunk);
+        Engine.loadJSON(Engine.mapDataLocation+'/chunk' + id + '.json', Engine.drawChunk);
     }
 };
 
@@ -204,15 +214,15 @@ Engine.displayMap = function(path){
     Engine.loadJSON(path,Engine.makeMap);
 };
 
-Engine.makeChunk = function(mapData){
-    var chunk = new AOI(mapData);
-    Engine.AOIs[chunk.id] = chunk;
+Engine.drawChunk = function(mapData){
+    var chunk = new Chunk(mapData);
+    Engine.chunks[chunk.id] = chunk;
     if(!Engine.mapDataCache[chunk.id]) Engine.mapDataCache[chunk.id] = mapData;
     for(var i = 0; i < mapData.layers.length; i++){
-        Engine.addLayer(mapData.layers[i].data,mapData.width,mapData.height,chunk.id,chunk);
+        Engine.drawLayer(mapData.layers[i].data,mapData.width,mapData.height,chunk.id,chunk);
     }
     chunk.z = 1;
-    Engine.displayedAOIs.push(chunk.id);
+    Engine.displayedChunks.push(chunk.id);
     if(Engine.showGrid) Engine.drawGrid(chunk);
     Engine.addToStage(chunk);
 };
@@ -235,12 +245,12 @@ Engine.toggleHulls= function(){
 Engine.toggleGrid = function(){
     Engine.showGrid = !Engine.showGrid;
     localStorage.setItem('showGrid',Engine.showGrid);
-    for(var i = 0; i < Engine.displayedAOIs.length; i++){
-        var AOI = Engine.AOIs[Engine.displayedAOIs[i]];
+    for(var i = 0; i < Engine.displayedChunks.length; i++){
+        var chunk = Engine.chunks[Engine.displayedChunks[i]];
         if(Engine.showGrid){
-            Engine.drawGrid(AOI);
+            Engine.drawGrid(chunk);
         }else{
-            Engine.removeGrid(AOI);
+            Engine.removeGrid(chunk);
         }
     }
 };
@@ -255,8 +265,8 @@ Engine.drawGrid = function(chunk){
     if(chunk.grid === undefined) {
         var gr = new PIXI.Graphics();
         var origin = Utils.AOItoTile(chunk.id);
-        gr.lineStyle(4, 0xffffff, 1);
-        gr.drawRect(origin.x * Engine.tileWidth, origin.y * Engine.tileHeight, Engine.AOIwidth * Engine.tileWidth, Engine.AOIheight * Engine.tileHeight);
+        gr.lineStyle(10, 0xffffff, 1);
+        gr.drawRect(origin.x * Engine.tileWidth, origin.y * Engine.tileHeight, Engine.chunkWidth * Engine.tileWidth, Engine.chunkHeight * Engine.tileHeight);
         gr.z = 999;
         chunk.addChild(gr);
         chunk.grid = gr;
@@ -269,8 +279,8 @@ Engine.removeGrid = function(chunk){
     chunk.grid.visible = false;
 };
 
-Engine.addLayer = function(data,width,height,aoi,chunk){
-    var origin = Utils.AOItoTile(aoi);
+Engine.drawLayer = function(data,width,height,chunkID,chunk){
+    var origin = Utils.AOItoTile(chunkID);
     for(var i = 0; i < data.length; i++){
         var tile = data[i];
         if(tile == 0) continue;
@@ -293,7 +303,7 @@ Engine.getTilesetFromTile = function(tile){
 
 Engine.addTile = function(x,y,tile,chunk){
     if(x < 0 || y < 0) return;
-    var chunk = chunk || Engine.AOIs[Utils.tileToAOI({x:x,y:y})];
+    var chunk = chunk || Engine.chunks[Utils.tileToAOI({x:x,y:y})];
     var tilesetID = Engine.getTilesetFromTile(tile);
     var tileset = Engine.tilesets[tilesetID];
     tile -= tileset.firstgid;
@@ -306,9 +316,9 @@ Engine.addTile = function(x,y,tile,chunk){
     chunk.addChild(sprite);
 };
 
-Engine.removeChunk = function(aoi){
-    Engine.stage.removeChild(Engine.AOIs[aoi]);
-    Engine.displayedAOIs.splice(Engine.displayedAOIs.indexOf(aoi),1);
+Engine.removeChunk = function(id){
+    Engine.stage.removeChild(Engine.chunks[id]);
+    Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
 };
 
 Engine.update = function(){
@@ -318,11 +328,27 @@ Engine.update = function(){
 };
 
 Engine.zoom = function(coef){
-    var increment = 0.25*coef;
-    Engine.stage.scale.x += increment;
-    Engine.stage.scale.y += increment;
+    var increment;
+    if(coef == -1){
+        if(Engine.zoomScale > 0.25) {
+            increment = 0.25;
+        }else{
+            increment = 0.15;
+        }
+    }else if (coef == 1){
+        if(Engine.zoomScale >= 0.25) {
+            increment = 0.25;
+        }else{
+            increment = 0.15;
+        }
+    }
+
+    Engine.zoomScale += increment * coef;
+    Engine.stage.scale.x = Engine.zoomScale;
+    Engine.stage.scale.y = Engine.zoomScale;
     document.getElementById('zx').innerHTML = Engine.stage.scale.x;
     document.getElementById('zy').innerHTML = Engine.stage.scale.y;
+    Utils.listAdjacentChunks(Engine.player.chunk);
 };
 
 Engine.updateSelection = function(x,y,wx,hy){
@@ -354,26 +380,27 @@ Engine.updateCamera = function(){
     Engine.stage.pivot.set(Engine.camera.x*Engine.tileWidth,Engine.camera.y*Engine.tileHeight);
 };
 
-Engine.updateChunks = function(){
-    Engine.player.previousAOI = Engine.player.AOI;
-    Engine.player.AOI = Utils.tileToAOI(Engine.player.tilePosition);
-    if(Engine.player.AOI == Engine.player.previousAOI) return;
-    var AOIs = Engine.listAdjacentAOIs(Engine.player.AOI);
-    var newAOIs = AOIs.diff(Engine.displayedAOIs);
-    var oldAOIs = Engine.displayedAOIs.diff(AOIs);
+Engine.updateEnvironment = function(){
+    Engine.player.chunk = Utils.tileToAOI(Engine.player.tilePosition);
+    if(Engine.player.chunk == Engine.player.previousChunk) return;
+    Engine.player.previousChunk = Engine.player.chunk;
+    var chunks = Utils.listAdjacentAOIs(Engine.player.chunk);
+    Utils.listAdjacentChunks(Engine.player.chunk);
+    var newChunks = chunks.diff(Engine.displayedChunks);
+    var oldChunks = Engine.displayedChunks.diff(chunks);
 
-    for(var i = 0; i < oldAOIs.length; i++){
-        Engine.removeChunk(oldAOIs[i]);
+    for(var i = 0; i < oldChunks.length; i++){
+        Engine.removeChunk(oldChunks[i]);
     }
 
-    for(var j = 0; j < newAOIs.length; j++){
-        Engine.displayChunk(newAOIs[j]);
+    for(var j = 0; j < newChunks.length; j++){
+        Engine.displayChunk(newChunks[j]);
     }
 };
 
 Engine.move = function(x,y){
     Engine.setPosition(Engine.player,x,y);
-    Engine.updateChunks();
+    Engine.updateEnvironment();
     Engine.updateCamera();
 };
 
@@ -442,24 +469,6 @@ Engine.handleClick = function(e){
     Engine[Engine.clickAction](worldx,worldy);
     Engine.lastWorldX = worldx;
     Engine.lastWorldY = worldy;
-};
-
-Engine.listAdjacentAOIs = function(current){
-    var AOIs = [];
-    var isAtTop = (current < Engine.nbAOIhorizontal);
-    var isAtBottom = (current > Engine.lastAOI - Engine.nbAOIhorizontal);
-    var isAtLeft = (current%Engine.nbAOIhorizontal == 0);
-    var isAtRight = (current%Engine.nbAOIhorizontal == Engine.nbAOIhorizontal-1);
-    AOIs.push(current);
-    if(!isAtTop) AOIs.push(current - Engine.nbAOIhorizontal);
-    if(!isAtBottom) AOIs.push(current + Engine.nbAOIhorizontal);
-    if(!isAtLeft) AOIs.push(current-1);
-    if(!isAtRight) AOIs.push(current+1);
-    if(!isAtTop && !isAtLeft) AOIs.push(current-1-Engine.nbAOIhorizontal);
-    if(!isAtTop && !isAtRight) AOIs.push(current+1-Engine.nbAOIhorizontal);
-    if(!isAtBottom && !isAtLeft) AOIs.push(current-1+Engine.nbAOIhorizontal);
-    if(!isAtBottom && !isAtRight) AOIs.push(current+1+Engine.nbAOIhorizontal);
-    return AOIs;
 };
 
 Engine.undo = function(){
@@ -657,7 +666,7 @@ function findTileID(prev,pt,next){
 }
 
 Engine.addShell = function(worldx,worldy){
-    var chunk = Engine.AOIs[Utils.tileToAOI({x:worldx,y:worldy})];
+    var chunk = Engine.chunks[Utils.tileToAOI({x:worldx,y:worldy})];
     Engine.addTile(worldx,worldy,1846);
 };
 
@@ -673,6 +682,12 @@ Engine.capture = function(x,y,w,h){
     var capture=document.createElement("img");
     capture.src = patternCanvas.toDataURL("image/png");
     document.getElementById("captures").appendChild(capture);
+};
+
+Engine.makeWorld = function(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight){
+    // write master file
+    // write chunks
+
 };
 
 Engine.boot();
