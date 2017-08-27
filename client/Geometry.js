@@ -11,6 +11,38 @@ var Geometry = {
     }
 };
 
+Geometry.shoreBox = {
+    flag: 0,
+    startx: 0,
+    starty: 0
+};
+
+Geometry.straightLine = function(start,end){
+    var step = 32;
+    var dist = Geometry.euclidean(start,end);
+    var speed = Geometry.computeSpeedVector(Geometry.computeAngle(start,end,false)); // false: not degrees
+    var tmp = {
+        x: start.x*Engine.tileWidth,
+        y: start.y*Engine.tileHeight
+    };
+    var tile = coordinatesPairToTile(tmp);
+    Engine.addTile(tile.x,tile.y,292);
+    var lastDist = Geometry.euclidean(tile,end);
+    /*console.log('start : '+printPt(start));
+    console.log('end : '+printPt(end));
+    console.log('speed : '+printPt(speed));
+    console.log('tile : '+printPt(tile));*/
+    while(tile.x != end.x || tile.y != end.y){
+        tmp.x += speed.x*step;
+        tmp.y += speed.y*step;
+        tile = coordinatesPairToTile(tmp);
+        var newDist = Geometry.euclidean(tile,end);
+        if(newDist > lastDist) break;
+        lastDist = newDist;
+        Engine.addTile(tile.x,tile.y,292);
+    }
+};
+
 Geometry.makePoint = function(x,y){
     return new PIXI.Point(x*Engine.tileWidth,y*Engine.tileHeight);
 };
@@ -228,14 +260,20 @@ Geometry.manhattan = function(a,b){
     return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 };
 
-
 Geometry.computeAngle = function(a,b,degrees){ // return angle between points a and b
     var angle = -(Math.atan2(b.y- a.y, b.x- a.x));
-    if(degrees) {
+    if(degrees) { // returns in degrees instead
         angle *= (180/Math.PI);
         if(angle == -180) angle*= -1;
     }
     return angle;
+};
+
+Geometry.computeSpeedVector = function(angle){ // return unit speed vector given an angle
+    return {
+        x: Math.cos(angle),
+        y: -Math.sin(angle)
+    }
 };
 
 /*

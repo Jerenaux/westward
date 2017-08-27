@@ -15,34 +15,6 @@ Utils.getPreference = function(parameter,defaultValue){ // Retrieve sorting pref
     return parseInt(pref);
 };
 
-/*Utils.coordToChunk = function(x,y){
-    var horiz = Math.floor(x/Engine.chunkWidth);
-    var vert = Math.floor(y/Engine.chunkHeight);
-    return horiz+Utils.separator+vert;
-};
-
-Utils.chunkToCoord = function(chunk){
-    var coords = chunk.split(Utils.separator);
-    return {
-        x: coords[0]*Engine.chunkWidth,
-        y: coords[1]*Engine.chunkHeight
-    }
-};
-
-Utils.adjacentChunks = function(chunk){
-    var chunks = [];
-    var coords = chunk.split(Utils.separator);
-    var x = parseInt(coords[0]);
-    var y = parseInt(coords[1]);
-    var steps = [[0,0],[-1,0],[0,1],[1,0],[1,0],[0,-1],[0,-1],[-1,0],[-1,0]];
-    for(var i = 0; i < steps.length; i++){
-        x += steps[i][0];
-        y += steps[i][1];
-        chunks.push(x+Utils.separator+y);
-    }
-    return chunks;
-};*/
-
 Utils.tileToAOI = function(tile){ // input coords in Tiles
     if(tile.x < 0 || tile.y < 0) console.log('ALERT: negative coordinates');
     var top = Math.floor(tile.y/Engine.chunkHeight);
@@ -64,16 +36,6 @@ Utils.getMacroCoordinates = function(chunk){
         y: Math.floor(chunk/Engine.nbChunksHorizontal)
     }
 };
-
-/*Utils.listAdjacentChunks = function(current){
-    var scope = Math.floor(1/Engine.zoomScale); // number of chunks to display along one axis based on zoom
-    var delta = Math.floor(scope/2)+1; // number of chunks to substract from current to get bounds of view area
-    var macro = Utils.getMacroCoordinates(current);
-    //console.log(macro.x+', '+macro.y);
-    var leftLimit = Math.max(macro.y*Engine.nbChunksHorizontal, current - delta); // id of the leftmost chunk of the view area
-    var topLeft = Math.max(leftLimit%Engine.nbChunksHorizontal, leftLimit - delta*Engine.nbChunksHorizontal);  // if of the top left chunk of the view area
-    console.log('Top corner for '+current+' : '+topLeft);
-};*/
 
 Utils.listVisibleAOIs = function(start){
     var limit;
@@ -144,6 +106,13 @@ function clamp(x,min,max){ // restricts a value to a given interval (return the 
     return Math.max(min, Math.min(x, max));
 }
 
+function coordinatesPairToTile(coords){
+    return {
+        x: Math.floor(coords.x/Engine.tileWidth),
+        y: Math.floor(coords.y/Engine.tileHeight)
+    }
+}
+
 function coordinatesToCell(v,grid){
     return Math.floor(v/grid);
 }
@@ -155,3 +124,18 @@ Array.prototype.diff = function(a) { // returns the elements in the array that a
 function printArray(arr){
     console.log(JSON.stringify(arr));
 }
+
+function printPt(pt){
+    return pt.x+', '+pt.y;
+}
+
+
+/*Utils.listAdjacentChunks = function(current){
+ var scope = Math.floor(1/Engine.zoomScale); // number of chunks to display along one axis based on zoom
+ var delta = Math.floor(scope/2)+1; // number of chunks to substract from current to get bounds of view area
+ var macro = Utils.getMacroCoordinates(current);
+ //console.log(macro.x+', '+macro.y);
+ var leftLimit = Math.max(macro.y*Engine.nbChunksHorizontal, current - delta); // id of the leftmost chunk of the view area
+ var topLeft = Math.max(leftLimit%Engine.nbChunksHorizontal, leftLimit - delta*Engine.nbChunksHorizontal);  // if of the top left chunk of the view area
+ console.log('Top corner for '+current+' : '+topLeft);
+ };*/

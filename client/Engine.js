@@ -22,7 +22,6 @@ Engine.camera = {
 Engine.boot = function(){
     /*TODO:
     * Procedural world:
-    - Fix zoom and zoomed movement
     - Water
     - Write to chunks
     - Forests
@@ -58,7 +57,8 @@ Engine.boot = function(){
     Engine.viewWidth = Engine.baseViewWidth;
     Engine.viewHeight = Engine.baseViewHeight;
 
-    Engine.setAction('move');
+    //Engine.setAction('move');
+    Engine.setAction('addShore');
     Engine.showGrid = Utils.getPreference('showGrid',false);
     Engine.showHero = Utils.getPreference('showHero',true);
     Engine.showHulls = Utils.getPreference('showHulls',false);
@@ -518,12 +518,29 @@ Engine.redo = function(){
     Engine[Engine.clickAction](Engine.lastWorldX,Engine.lastWorldY);
 };
 
-Engine.addMound = function(worldx,worldy){
-    var cliff = Engine.drawCliff(Geometry.interpolatePoints(Geometry.makePolyrect(worldx,worldy)));
+Engine.addShore = function(x,y){
+    if(Geometry.shoreBox.flag == 0){
+        Geometry.shoreBox.flag++;
+        Geometry.shoreBox.x = x;
+        Geometry.shoreBox.y = y;
+    }else if(Geometry.shoreBox.flag == 1){
+        Geometry.shoreBox.flag = 0;
+        Geometry.straightLine({
+            x: Geometry.shoreBox.x,
+            y: Geometry.shoreBox.y
+        },{
+            x: x,
+            y: y
+        });
+    }
+    Engine.drawCircle(x*Engine.tileWidth+16,y*Engine.tileHeight+16,10,0x0000ff);
+};
+
+Engine.addMound = function(x,y){
+    var cliff = Engine.drawCliff(Geometry.interpolatePoints(Geometry.makePolyrect(x,y)));
     //Engine.stage.addChild(cliff);
     Engine.addToStage(cliff);
     Engine.editHistory.push(cliff);
-
 };
 
 Engine.drawHull = function(hull){
@@ -573,10 +590,6 @@ Engine.drawCliff = function(pts){
         };
         switch(id){
             case 0: // top right outer
-                /*var ref = {
-                    x: tile.x-1,
-                    y: tile.y
-                };*/
                 ref.x -= 1;
                 Engine.addTile(ref.x,ref.y-1,6,cliff);
                 Engine.addTile(ref.x,ref.y,21,cliff);
@@ -584,10 +597,6 @@ Engine.drawCliff = function(pts){
                 if(last != 2 || (previousTile.y - tile.y > 2)) Engine.addTile(ref.x+1,ref.y+1,37,cliff);  // Prevent issues with double corners
                 break;
             case 1: // top left outer
-                /*var ref = {
-                    x: tile.x,
-                    y: tile.y
-                };*/
                 Engine.addTile(ref.x,ref.y-1,3,cliff);
                 Engine.addTile(ref.x-1,ref.y,17,cliff);
                 Engine.addTile(ref.x,ref.y,18,cliff);
