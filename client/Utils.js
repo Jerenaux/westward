@@ -65,7 +65,7 @@ Utils.getMacroCoordinates = function(chunk){
     }
 };
 
-Utils.listAdjacentChunks = function(current){
+/*Utils.listAdjacentChunks = function(current){
     var scope = Math.floor(1/Engine.zoomScale); // number of chunks to display along one axis based on zoom
     var delta = Math.floor(scope/2)+1; // number of chunks to substract from current to get bounds of view area
     var macro = Utils.getMacroCoordinates(current);
@@ -73,6 +73,31 @@ Utils.listAdjacentChunks = function(current){
     var leftLimit = Math.max(macro.y*Engine.nbChunksHorizontal, current - delta); // id of the leftmost chunk of the view area
     var topLeft = Math.max(leftLimit%Engine.nbChunksHorizontal, leftLimit - delta*Engine.nbChunksHorizontal);  // if of the top left chunk of the view area
     console.log('Top corner for '+current+' : '+topLeft);
+};*/
+
+Utils.listVisibleAOIs = function(start){
+    var limit;
+    switch(Engine.zoomScale){
+        case 0.25:
+            limit = 3;
+            break;
+        case 0.1:
+            limit = 9;
+            break;
+        default:
+            limit = 0;
+            break;
+    }
+    var current = start;
+    var AOIs= [start];
+    for(var i = 0; i < AOIs.length; i++){
+        var current = AOIs[i];
+        if(Geometry.manhattan(Utils.getMacroCoordinates(start),Utils.getMacroCoordinates(current)) > limit) continue;
+        var adjacent = Utils.listAdjacentAOIs(current);
+        var n = adjacent.diff(AOIs);
+        AOIs = AOIs.concat(n);
+    }
+    return AOIs;
 };
 
 Utils.listAdjacentAOIs = function(current){

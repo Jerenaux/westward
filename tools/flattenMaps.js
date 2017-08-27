@@ -78,6 +78,7 @@ function flattenChunk(indir,fileName,outdir){
 
         /*
          // TODO here: remove tiles based on top-down visibility
+         // TODO: in the end only keep "data" arrays, remove all the rest
 
          // Remove empty layers
          for(var j = subMap.layers.length - 1; j >= 0; j--){

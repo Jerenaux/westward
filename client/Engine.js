@@ -2,8 +2,8 @@
  * Created by Jerome on 26-06-17.
  */
 var Engine = {
-    viewWidth: 32,
-    viewHeight: 18,
+    baseViewWidth: 32,
+    baseViewHeight: 18,
     tileWidth: 32,
     tileHeight: 32
 };
@@ -22,6 +22,7 @@ Engine.camera = {
 Engine.boot = function(){
     /*TODO:
     * Procedural world:
+    - Fix zoom and zoomed movement
     - Water
     - Write to chunks
     - Forests
@@ -46,14 +47,16 @@ Engine.boot = function(){
     */
 
     Engine.renderer = PIXI.autoDetectRenderer(
-        Engine.viewWidth*Engine.tileWidth,
-        Engine.viewHeight*Engine.tileHeight,
+        Engine.baseViewWidth*Engine.tileWidth,
+        Engine.baseViewHeight*Engine.tileHeight,
         {
             antialias: false,
             view: document.getElementById('game'),
             preserveDrawingBuffer: true // to allow image captures from canvas
         }
     );
+    Engine.viewWidth = Engine.baseViewWidth;
+    Engine.viewHeight = Engine.baseViewHeight;
 
     Engine.setAction('move');
     Engine.showGrid = Utils.getPreference('showGrid',false);
@@ -166,11 +169,9 @@ Engine.start = function(loader, resources){
 };
 
 Engine.addHero = function(){
-    for(var i = 0; i <= Engine.lastChunkID; i++){
+    /*for(var i = 0; i <= Engine.lastChunkID; i++){
         Utils.listAdjacentChunks(i);
-    }
-    var startx = randomInt(0,77);
-    var starty = randomInt(0,Engine.worldHeight);
+    }*/
     startx = 12; //35
     starty = 12;//30;
     Engine.player = Engine.addSprite('hero',startx,starty);
@@ -324,6 +325,7 @@ Engine.removeChunk = function(id){
 Engine.update = function(){
     Engine.renderer.render(Engine.stage);
     requestAnimationFrame(Engine.update);
+    document.getElementById('visible').innerHTML = Engine.displayedChunks.length;
     //console.log(Engine.stage.children.length+' children');
 };
 
@@ -346,9 +348,12 @@ Engine.zoom = function(coef){
     Engine.zoomScale += increment * coef;
     Engine.stage.scale.x = Engine.zoomScale;
     Engine.stage.scale.y = Engine.zoomScale;
+    Engine.viewWidth = Math.floor(Engine.baseViewWidth*(1/Engine.zoomScale));
+    Engine.viewHeight = Math.floor(Engine.baseViewHeight*(1/Engine.zoomScale));
+    Engine.updateCamera();
+    Engine.updateEnvironment();
     document.getElementById('zx').innerHTML = Engine.stage.scale.x;
     document.getElementById('zy').innerHTML = Engine.stage.scale.y;
-    Utils.listAdjacentChunks(Engine.player.chunk);
 };
 
 Engine.updateSelection = function(x,y,wx,hy){
@@ -362,45 +367,62 @@ Engine.updateSelection = function(x,y,wx,hy){
 
 Engine.resetSelection = function(){
     Engine.capture(
-        Engine.selection.graphicsData[0].shape.x,
-        Engine.selection.graphicsData[0].shape.y,
-        Engine.selection.graphicsData[0].shape.width,
-        Engine.selection.graphicsData[0].shape.height
+        Engine.selection.graphicsData[0].shape.x*Engine.zoomScale,
+        Engine.selection.graphicsData[0].shape.y*Engine.zoomScale,
+        Engine.selection.graphicsData[0].shape.width*Engine.zoomScale,
+        Engine.selection.graphicsData[0].shape.height*Engine.zoomScale
     );
     Engine.selection.graphicsData[0].shape.width = 0;
     Engine.selection.graphicsData[0].shape.height = 0;
     Engine.selection.visible = false;
 };
 
+Engine.capture = function(x,y,w,h){
+    x -= Engine.camera.getPixelX();
+    y -= Engine.camera.getPixelY();
+    var patternCanvas=document.createElement("canvas");
+    patternCanvas.width = w;
+    patternCanvas.height = h;
+    var patternCtx = patternCanvas.getContext("2d");
+    patternCtx.drawImage(Engine.renderer.view,x,y,w,h,0,0,w,h);
+
+    var capture = document.createElement("img");
+    capture.src = patternCanvas.toDataURL("image/png");
+    document.getElementById("captures").appendChild(capture);
+};
+
 Engine.updateCamera = function(){
-    Engine.camera.x = coordinatesToCell(Engine.player.x,Engine.tileWidth) - Engine.viewWidth*0.5;
-    Engine.camera.y = coordinatesToCell(Engine.player.y,Engine.tileHeight) - Engine.viewHeight*0.5;
-    Engine.camera.x = clamp(Engine.camera.x,0,Engine.worldWidth*Engine.tileWidth);
-    Engine.camera.y = clamp(Engine.camera.y,0,Engine.worldHeight*Engine.tileHeight);
+    Engine.camera.x = Engine.player.tilePosition.x - Math.floor(Engine.viewWidth*0.5);
+    Engine.camera.y = Engine.player.tilePosition.y - Math.floor(Engine.viewHeight*0.5);
+    // Clamp in tile units
+    Engine.camera.x = clamp(Engine.camera.x,0,Engine.worldWidth-Engine.viewWidth);
+    Engine.camera.y = clamp(Engine.camera.y,0,Engine.worldHeight-Engine.viewHeight);
     Engine.stage.pivot.set(Engine.camera.x*Engine.tileWidth,Engine.camera.y*Engine.tileHeight);
+    document.getElementById('cx').innerHTML = Engine.camera.x;
+    document.getElementById('cy').innerHTML = Engine.camera.y;
 };
 
 Engine.updateEnvironment = function(){
-    Engine.player.chunk = Utils.tileToAOI(Engine.player.tilePosition);
-    if(Engine.player.chunk == Engine.player.previousChunk) return;
-    Engine.player.previousChunk = Engine.player.chunk;
-    var chunks = Utils.listAdjacentAOIs(Engine.player.chunk);
-    Utils.listAdjacentChunks(Engine.player.chunk);
+    var chunks = Utils.listVisibleAOIs(Engine.player.chunk);
     var newChunks = chunks.diff(Engine.displayedChunks);
     var oldChunks = Engine.displayedChunks.diff(chunks);
 
     for(var i = 0; i < oldChunks.length; i++){
+        //console.log('removing '+oldChunks[i]);
         Engine.removeChunk(oldChunks[i]);
     }
 
     for(var j = 0; j < newChunks.length; j++){
+        //console.log('adding '+newChunks[j]);
         Engine.displayChunk(newChunks[j]);
     }
 };
 
 Engine.move = function(x,y){
     Engine.setPosition(Engine.player,x,y);
-    Engine.updateEnvironment();
+    Engine.player.chunk = Utils.tileToAOI(Engine.player.tilePosition);
+    if(Engine.player.chunk != Engine.player.previousChunk) Engine.updateEnvironment();
+    Engine.player.previousChunk = Engine.player.chunk;
     Engine.updateCamera();
 };
 
@@ -425,17 +447,27 @@ Engine.getCanvasCoordinates = function(e){
     return {x:x,y:y};
 };
 
-Engine.trackPosition = function(e){
-    if(!Engine.debug && !Engine.selectionEnabled) return;
+Engine.getMouseCoordinates = function(e){
     var canvasPxCoord = Engine.getCanvasCoordinates(e);
     var gamePxCoord = {
-        x: canvasPxCoord.x + Engine.camera.getPixelX(),
-        y: canvasPxCoord.y + Engine.camera.getPixelY()
+        x: Math.round(canvasPxCoord.x*(1/Engine.zoomScale) + Engine.camera.getPixelX()),
+        y: Math.round(canvasPxCoord.y*(1/Engine.zoomScale) + Engine.camera.getPixelY())
     };
     var gameTileCoord = {
         x: coordinatesToCell(gamePxCoord.x,Engine.tileWidth),
         y: coordinatesToCell(gamePxCoord.y,Engine.tileHeight)
     };
+    return {
+        px: gamePxCoord,
+        tile: gameTileCoord
+    }
+};
+
+Engine.trackPosition = function(e){
+    if(!Engine.debug && !Engine.selectionEnabled) return;
+    var c = Engine.getMouseCoordinates(e);
+    var gamePxCoord = c.px;
+    var gameTileCoord = c.tile;
     if(Engine.debug) {
         document.getElementById('pxx').innerHTML = gamePxCoord.x;
         document.getElementById('pxy').innerHTML = gamePxCoord.y;
@@ -443,7 +475,6 @@ Engine.trackPosition = function(e){
         document.getElementById('ty').innerHTML = gameTileCoord.y;
         document.getElementById('aoi').innerHTML = Utils.tileToAOI(gameTileCoord);
     }
-
     if(Engine.selectionEnabled && Engine.selection.visible) Engine.updateSelection(null,null,gamePxCoord.x,gamePxCoord.y);
 };
 
@@ -452,18 +483,22 @@ Engine.handleMouseUp = function(e) {
 };
 
 Engine.handleClick = function(e){
-    var coordinates = Engine.getCanvasCoordinates(e);
+    //var coordinates = Engine.getCanvasCoordinates(e);
+    var c = Engine.getMouseCoordinates(e);
     if(Engine.selectionEnabled){
         Engine.updateSelection(
-            Engine.camera.x*Engine.tileWidth + coordinates.x,
-            Engine.camera.y*Engine.tileHeight + coordinates.y,
+            //Engine.camera.x*Engine.tileWidth + coordinates.x,
+            //Engine.camera.y*Engine.tileHeight + coordinates.y,
+            c.px.x,
+            c.px.y,
             null,null);
         Engine.selection.visible = true;
         return;
     }
     if(!Engine.clickAction) return;
-    var worldx = Engine.camera.x + coordinatesToCell(coordinates.x,Engine.tileWidth);
-    var worldy = Engine.camera.y + coordinatesToCell(coordinates.y,Engine.tileHeight);
+    var c = Engine.getMouseCoordinates(e);
+    var worldx = c.tile.x;
+    var worldy = c.tile.y;
     worldx = clamp(worldx,0,Engine.worldWidth);
     worldy = clamp(worldy,0,Engine.worldHeight);
     Engine[Engine.clickAction](worldx,worldy);
@@ -664,30 +699,5 @@ function findTileID(prev,pt,next){
         return 11;
     }
 }
-
-Engine.addShell = function(worldx,worldy){
-    var chunk = Engine.chunks[Utils.tileToAOI({x:worldx,y:worldy})];
-    Engine.addTile(worldx,worldy,1846);
-};
-
-Engine.capture = function(x,y,w,h){
-    x -= Engine.camera.getPixelX();
-    y -= Engine.camera.getPixelY();
-    var patternCanvas=document.createElement("canvas");
-    patternCanvas.width = w;
-    patternCanvas.height = h;
-    var patternCtx=patternCanvas.getContext("2d");
-    patternCtx.drawImage(Engine.renderer.view,x,y,w,h,0,0,w,h);
-
-    var capture=document.createElement("img");
-    capture.src = patternCanvas.toDataURL("image/png");
-    document.getElementById("captures").appendChild(capture);
-};
-
-Engine.makeWorld = function(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight){
-    // write master file
-    // write chunks
-
-};
 
 Engine.boot();

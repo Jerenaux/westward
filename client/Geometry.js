@@ -224,6 +224,11 @@ Geometry.euclidean = function(a,b){
     return Math.pow(a.x-b.x,2)+Math.pow(a.y- b.y,2);
 };
 
+Geometry.manhattan = function(a,b){
+    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+};
+
+
 Geometry.computeAngle = function(a,b,degrees){ // return angle between points a and b
     var angle = -(Math.atan2(b.y- a.y, b.x- a.x));
     if(degrees) {
@@ -231,7 +236,7 @@ Geometry.computeAngle = function(a,b,degrees){ // return angle between points a 
         if(angle == -180) angle*= -1;
     }
     return angle;
-}
+};
 
 /*
 // Compute and draw a random path from a starting point
