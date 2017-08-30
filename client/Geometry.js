@@ -11,36 +11,93 @@ var Geometry = {
     }
 };
 
-Geometry.shoreBox = {
-    flag: 0,
-    startx: 0,
-    starty: 0
+Geometry.shoreBox = { // Holds a few fields and data structures used to make water bodies
+    flag: 0, // 0 = beginning of shore, 1 = end
+    x: 0, // coordinates of beginning of shore
+    y: 0,
+    shoreType: 0,
+    north: {},
+    east: {},
+    south: {},
+    west: {},
+    getMap: function(shore){
+        switch(shore){
+            case 1:
+                return Geometry.shoreBox.north;
+            case 2:
+                return Geometry.shoreBox.west;
+            case 3:
+                return Geometry.shoreBox.south;
+            case 4:
+                return Geometry.shoreBox.east;
+        }
+    },
+    registerTile: function(tile){
+        switch(Geometry.shoreBox.shoreType){
+            case 1: //N,
+                Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.north,'x','y','max');
+                break;
+            case 2: //W,
+                Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.west,'y','x','max');
+                break;
+            case 3: //S
+                Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.south,'x','y','min');
+                break;
+            case 4: //E
+                Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.east,'y','x','min');
+                break;
+        }
+    },
+    addToMap: function(tile,map,keyCoordinate,valueCoordinate,operator){
+        // Add the x/y value of a tile to the map, with the other value as the key.
+        // Depending on the map, replace existing value with min() or max() of the existing one and the new one.
+        if(!map.hasOwnProperty(tile[keyCoordinate])){
+            map[tile[keyCoordinate]] = tile[valueCoordinate];
+        }else{
+            map[tile[keyCoordinate]] = Math[operator](map[tile[keyCoordinate]],tile[valueCoordinate]);
+        }
+    }
 };
 
 Geometry.straightLine = function(start,end){
     var step = 32;
-    var dist = Geometry.euclidean(start,end);
     var speed = Geometry.computeSpeedVector(Geometry.computeAngle(start,end,false)); // false: not degrees
     var tmp = {
         x: start.x*Engine.tileWidth,
         y: start.y*Engine.tileHeight
     };
     var tile = coordinatesPairToTile(tmp);
-    Engine.addTile(tile.x,tile.y,292);
     var lastDist = Geometry.euclidean(tile,end);
-    /*console.log('start : '+printPt(start));
-    console.log('end : '+printPt(end));
-    console.log('speed : '+printPt(speed));
-    console.log('tile : '+printPt(tile));*/
+    var tiles = [tile];
     while(tile.x != end.x || tile.y != end.y){
         tmp.x += speed.x*step;
         tmp.y += speed.y*step;
         tile = coordinatesPairToTile(tmp);
+        if(tile.x == tiles[tiles.length-1].x && tile.y == tiles[tiles.length-1].y) continue;
         var newDist = Geometry.euclidean(tile,end);
         if(newDist > lastDist) break;
+        tiles.push(tile);
         lastDist = newDist;
-        Engine.addTile(tile.x,tile.y,292);
     }
+    return tiles;
+};
+
+Geometry.addCorners = function(tiles){ // Add corners to a straight line to follow tiles grid
+    for(var i = 1; i < tiles.length; i++){
+        var prev = tiles[i-1];
+        var current = tiles[i];
+        var dx = current.x - prev.x;
+        var dy = current.y - prev.y;
+        if(Math.abs(dx) + Math.abs(dy) == 1) continue;
+        var newPt = {x:current.x,y:current.y};
+        if(dx == -1 && dy == 1) newPt.y--;
+        if(dx == -1 && dy == -1) newPt.y++;
+        if(dx == 1 && dy == 1) newPt.y--;
+        if(dx == 1 && dy == -1) newPt.y++;
+        tiles.splice(i,0,newPt);// insert new point
+        i++;
+    }
+    return tiles;
 };
 
 Geometry.makePoint = function(x,y){

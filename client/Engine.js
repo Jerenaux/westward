@@ -305,6 +305,7 @@ Engine.getTilesetFromTile = function(tile){
 Engine.addTile = function(x,y,tile,chunk){
     if(x < 0 || y < 0) return;
     var chunk = chunk || Engine.chunks[Utils.tileToAOI({x:x,y:y})];
+    if(chunk === undefined) return;
     var tilesetID = Engine.getTilesetFromTile(tile);
     var tileset = Engine.tilesets[tilesetID];
     tile -= tileset.firstgid;
@@ -525,20 +526,15 @@ Engine.addShore = function(x,y){
         Geometry.shoreBox.y = y;
     }else if(Geometry.shoreBox.flag == 1){
         Geometry.shoreBox.flag = 0;
-        Geometry.straightLine({
-            x: Geometry.shoreBox.x,
-            y: Geometry.shoreBox.y
-        },{
-            x: x,
-            y: y
-        });
+        var shore = Engine.drawShore(Geometry.addCorners(Geometry.straightLine(Geometry.shoreBox,{x: x,y: y})));
+        Engine.addToStage(shore);
+        Engine.editHistory.push(shore);
     }
     Engine.drawCircle(x*Engine.tileWidth+16,y*Engine.tileHeight+16,10,0x0000ff);
 };
 
 Engine.addMound = function(x,y){
     var cliff = Engine.drawCliff(Geometry.interpolatePoints(Geometry.makePolyrect(x,y)));
-    //Engine.stage.addChild(cliff);
     Engine.addToStage(cliff);
     Engine.editHistory.push(cliff);
 };
@@ -562,6 +558,160 @@ Engine.drawCircle = function(x,y,radius,color){
     Engine.blackBoard.addChild(g);
 };
 
+Engine.findTileID = function(prev,pt,next){
+    var inAngle = Geometry.computeAngle(prev,pt,true);
+    var outAngle = Geometry.computeAngle(pt,next,true);
+    //console.log(inAngle+', '+outAngle);
+    if(inAngle == 90 && outAngle == 180){
+        //console.log('top right outer');
+        return 0;
+    }else if(inAngle == 180 && outAngle == 90){
+        //console.log('bottom left outer');
+        return 2;
+    }else if(inAngle == -90 && outAngle == 0){
+        //console.log('bottom left inner');
+        return 4;
+    }else if(inAngle == 180 && outAngle == -90){
+        //console.log('top left outer');
+        return 1;
+    }else if(inAngle == -90 && outAngle == 180){
+        return 3;
+    }else if(inAngle == 0 && outAngle == 90){
+        //console.log('bottom right inner');
+        return 5;
+    }else if(inAngle == 180 && outAngle == 180){
+        //console.log('top');
+        return 6;
+    }else if(inAngle == 90 && outAngle == 90){
+        //console.log('right');
+        return 7;
+    }else if(inAngle == 0 && outAngle == 0){
+        //console.log('bottom');
+        return 8;
+    }else if(inAngle == -90 && outAngle == -90){
+        //console.log('left');
+        return 9;
+    }else if(inAngle == 0 && outAngle == -90) {
+        //console.log('top right inner');
+        return 10;
+    }else if(inAngle == 90 && outAngle == 0){
+        //console.log('top left inner');
+        return 11;
+    }
+};
+
+Engine.drawShore = function(tiles){
+    var shore = new PIXI.Container();
+    shore.z = 3;
+    var dx = tiles[0].x - tiles[tiles.length-1].x;
+    var dy = tiles[0].y - tiles[tiles.length-1].y;
+    var coastline; // 1 = N, 2 = W, 3 = S, 4 = E
+    if(Math.abs(dx) > Math.abs(dy)){ // N or S
+        coastline = (dx > 0 ? 1 : 3);
+    }else{ // E or W
+        coastline = (dy > 0 ? 4 : 2);
+    }
+    Geometry.shoreBox.shoreType = coastline;
+    for(var i = 0; i < tiles.length; i++){
+        var id;
+        if(i == 0 || i == tiles.length-1){
+            if(coastline == 1) id = 6;
+            if(coastline == 2) id = 9;
+            if(coastline == 3) id = 8;
+            if(coastline == 4) id = 7;
+        }else {
+            var prev = tiles[i - 1];
+            var next = tiles[i + 1];
+            id = Engine.findTileID(prev, tiles[i], next);
+        }
+        //console.log('id = '+id);
+        var ref = {
+            x: tiles[i].x,
+            y: tiles[i].y
+        };
+        Geometry.shoreBox.registerTile(ref);
+        switch(id){
+            case 0:
+                Engine.addTile(ref.x,ref.y,249,shore);
+                break;
+            case 1:
+                Engine.addTile(ref.x,ref.y,247,shore);
+                break;
+            case 2:
+                Engine.addTile(ref.x,ref.y,271,shore);
+                break;
+            case 3:
+                Engine.addTile(ref.x,ref.y,272,shore);
+                break;
+            case 4:
+                Engine.addTile(ref.x,ref.y,289,shore);
+                break;
+            case 5:
+                Engine.addTile(ref.x,ref.y,291,shore);
+                break;
+            case 6:
+                Engine.addTile(ref.x,ref.y,248,shore);
+                break;
+            case 7:
+                Engine.addTile(ref.x,ref.y,270,shore);
+                break;
+            case 8:
+                Engine.addTile(ref.x,ref.y,290,shore);
+                break;
+            case 9:
+                Engine.addTile(ref.x,ref.y,268,shore);
+                break;
+            case 10:
+                Engine.addTile(ref.x,ref.y,251,shore);
+                break;
+            case 11:
+                Engine.addTile(ref.x,ref.y,250,shore);
+                break;
+        }
+    }
+    //console.log(Geometry.shoreBox.north);
+    return shore;
+};
+
+Engine.fillWater = function(){
+    var type = Geometry.shoreBox.shoreType; // type of shore: north, east, south or west
+    var coef = (type > 2 ? -1 : 1);
+    var oppositeType = type + 2*coef; // maps 1 to 3, 2 to 4 and vice versa
+    var map = Geometry.shoreBox.getMap(type);
+    var oppositeMap = Geometry.shoreBox.getMap(oppositeType);
+    var limit = {
+        1: (Engine.nbChunksVertical*Engine.chunkHeight)-1,
+        2: (Engine.nbChunksHorizontal*Engine.chunkWidth)-1,
+        3: 0,
+        4: 0
+    };
+    for(var coord in map){
+        if(!map.hasOwnProperty(coord)) continue;
+        var start = map[coord];
+        var end = oppositeMap[coord] || limit[type];
+        var inc = (end-start)/Math.abs(end-start);
+        for(var coordBis = start; coordBis != end+inc; coordBis+=inc ){
+            var x = (type == 1 || type == 3 ? coord : coordBis);
+            var y = (type == 1 || type == 3 ? coordBis : coord);
+            Engine.addTile(x,y,292);
+        }
+    }
+
+    /*for(var x in Geometry.shoreBox.north) {
+        if(!Geometry.shoreBox.north.hasOwnProperty(x)) continue;
+        var start = Geometry.shoreBox.north[x];
+        var end = Geometry.shoreBox.south[x] || (Engine.nbChunksVertical*Engine.chunkHeight)-1;
+        for(var y = start; y < end; y++ ){
+            Engine.addTile(x,y,292);
+        }
+    }*/
+
+    Geometry.shoreBox.north = {};
+    Geometry.shoreBox.east = {};
+    Geometry.shoreBox.south = {};
+    Geometry.shoreBox.west = {};
+};
+
 Engine.drawCliff = function(pts){
     var cliff = new PIXI.Container();
     cliff.z = 3;
@@ -569,7 +719,7 @@ Engine.drawCliff = function(pts){
     for(var i = 0; i < pts.length; i++){
         var next = (i == pts.length-1 ? 0 : i+1);
         var prev = (i == 0 ? pts.length-1 : i-1);
-        var id = findTileID(pts[prev],pts[i],pts[next]);
+        var id = Engine.findTileID(pts[prev],pts[i],pts[next]);
         var tile = ptToTile(pts[i]);
         var previousTile = ptToTile(pts[prev]);
 
@@ -668,45 +818,29 @@ function ptToTile(pt){
     };
 }
 
-function findTileID(prev,pt,next){
-    var inAngle = Geometry.computeAngle(prev,pt,true);
-    var outAngle = Geometry.computeAngle(pt,next,true);
-    if(inAngle == 90 && outAngle == 180){
-        //console.log('top right outer');
+/*Engine.findShoreTileID = function(prev,pt,next){
+    if(!next) return 0;
+    var outDx = next.x - pt.x;
+    var outDy = next.y - pt.y;
+    var inDx = (prev ? pt.x - prev.x : outDx);
+    var inDy = (prev ? pt.y - prev.y : outDy);
+    if(inDx == -1 && outDx == -1){ // N
         return 0;
-    }else if(inAngle == 180 && outAngle == 90){
-        //console.log('bottom left outer');
-        return 2;
-    }else if(inAngle == -90 && outAngle == 0){
-        //console.log('bottom left inner');
-        return 4;
-    }else if(inAngle == 180 && outAngle == -90){
-        //console.log('top left outer');
+    }else if(inDx == -1 && outDy == 1){// NW
         return 1;
-    }else if(inAngle == -90 && outAngle == 180){
+    }else if(inDy == -1 && outDy == 1){ // W
+        return 2;
+    }else if(inDy == -1 && outDx == 1){ // SW
         return 3;
-    }else if(inAngle == 0 && outAngle == 90){
-        //console.log('bottom right inner');
+    }else if(inDx == 1 && outDx == 1){ // S
+        return 4;
+    }else if(inDx == 1 && outDy == -1){ // SE
         return 5;
-    }else if(inAngle == 180 && outAngle == 180){
-        //console.log('top');
+    }else if(inDy == -1 && outDy == 1){ // E
         return 6;
-    }else if(inAngle == 90 && outAngle == 90){
-        //console.log('right');
+    }else if(inDy == -1 && outDx == -1){ // NE
         return 7;
-    }else if(inAngle == 0 && outAngle == 0){
-        //console.log('bottom');
-        return 8;
-    }else if(inAngle == -90 && outAngle == -90){
-        //console.log('left');
-        return 9;
-    }else if(inAngle == 0 && outAngle == -90) {
-        //console.log('top right inner');
-        return 10;
-    }else if(inAngle == 90 && outAngle == 0){
-        //console.log('top left inner');
-        return 11;
     }
-}
+};*/
 
 Engine.boot();
