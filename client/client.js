@@ -6,10 +6,6 @@ Client = {};
 
 Client.socket = io.connect();
 
-Client.sendPoints = function(pts){
-    socket.emit('points',pts);
+Client.sendMapData = function(id,data){
+    Client.socket.emit('mapdata',{id:id,data:data});
 };
-
-Client.socket.on('hull',function(data){
-    Engine.drawHull(data);
-});

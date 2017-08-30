@@ -3,7 +3,7 @@
  */
 
 var fs = require('fs');
-var clone = require('clone');
+//var clone = require('clone');
 
 function Layer(w,h,name){
     this.data = [];
@@ -69,6 +69,13 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight){
     basis.tilesets = tilesetsData.tilesets;
     //console.log(JSON.stringify(tilesetsData));
     var ground = new Layer(chunkWidth,chunkHeight,'ground');
+    var terrain = new Layer(chunkWidth,chunkHeight,'terrain');
+    var groundstuff = new Layer(chunkWidth,chunkHeight,'groundstuff');
+    var canopy = new Layer(chunkWidth,chunkHeight,'canopy');
+    terrain.data = emptyLayer(chunkWidth*chunkHeight);
+    groundstuff.data = emptyLayer(chunkWidth*chunkHeight);
+    canopy.data = emptyLayer(chunkWidth*chunkHeight);
+
     for(var x = 0; x < chunkWidth*chunkHeight; x++){
         var id = 241;
         var row = Math.floor(x/chunkWidth);
@@ -89,7 +96,10 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight){
     }
 
     basis.layers.push(ground);
-    //console.log(JSON.stringify(basis));
+    basis.layers.push(terrain);
+    basis.layers.push(groundstuff);
+    basis.layers.push(canopy);
+
     var outdir = __dirname+'/../assets/maps/chunks/';
     if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);
 
@@ -133,6 +143,14 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight){
         if(err) throw err;
         console.log('Master written');
     });
+}
+
+function emptyLayer(nb){
+    var arr = [];
+    for(var x = 0; x < nb; x++){
+        arr.push(0);
+    }
+    return arr;
 }
 
 var myArgs = require('optimist').argv;
