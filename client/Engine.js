@@ -22,8 +22,6 @@ Engine.camera = {
 Engine.boot = function(){
     /*TODO:
     * Procedural world:
-    - Water
-    - Write to chunks
     - Forests
     - Coronae
     - Dirt
@@ -58,7 +56,7 @@ Engine.boot = function(){
     Engine.viewHeight = Engine.baseViewHeight;
 
     //Engine.setAction('move');
-    Engine.setAction('addShore');
+    Engine.setAction('addMound');
     Engine.showGrid = Utils.getPreference('showGrid',false);
     Engine.showHero = Utils.getPreference('showHero',true);
     Engine.showHulls = Utils.getPreference('showHulls',false);
@@ -169,11 +167,8 @@ Engine.start = function(loader, resources){
 };
 
 Engine.addHero = function(){
-    /*for(var i = 0; i <= Engine.lastChunkID; i++){
-        Utils.listAdjacentChunks(i);
-    }*/
-    startx = 12; //35
-    starty = 12;//30;
+    startx = 71; //35
+    starty = 7;//30;
     Engine.player = Engine.addSprite('hero',startx,starty);
     Engine.player.visible = Engine.showHero;
     Engine.player.chunk = Utils.tileToAOI({x:startx,y:starty});
@@ -541,14 +536,23 @@ Engine.addShore = function(x,y){
 };
 
 Engine.addMound = function(x,y){
-    Engine.addToLandscape(Engine.drawCliff(Geometry.interpolatePoints(Geometry.makePolyrect(x,y))));
+    //Engine.addToLandscape(Engine.drawCliff(Geometry.interpolatePoints(Geometry.makePolyrect(x,y))));
+    var test = '[{"x":73,"y":2},{"x":68,"y":2},{"x":68,"y":6},{"x":67,"y":6},{"x":67,"y":10},{"x":63,"y":10},{"x":63,"y":12},{"x":63,"y":14},{"x":66,"y":14},{"x":66,"y":22},{"x":73,"y":22},{"x":77,"y":22},{"x":77,"y":15},{"x":78,"y":15},{"x":78,"y":14},{"x":83,"y":14},{"x":83,"y":12},{"x":83,"y":4},{"x":76,"y":4},{"x":76,"y":2},{"x":73,"y":2}]';
+    console.log(test);
+    var arr = JSON.parse(test);
+    arr.pop();
+    Engine.addToLandscape(Engine.drawCliff(Geometry.interpolatePointsBis(arr)));
+};
+
+Engine.addCorona = function(x,y){
+    Geometry.makeCorona(x,y);
 };
 
 Engine.drawHull = function(hull){
     var g = new PIXI.Graphics();
     g.lineStyle(5,0xffffff);
     g.moveTo(hull[0].x,hull[0].y);
-    for(var i = 1; i < hull.length; i++){
+    for(var i = 0; i < hull.length; i++){
         g.lineTo(hull[i].x,hull[i].y);
     }
     g.lineTo(hull[0].x,hull[0].y);
@@ -720,8 +724,9 @@ Engine.drawCliff = function(pts){
         var next = (i == pts.length-1 ? 0 : i+1);
         var prev = (i == 0 ? pts.length-1 : i-1);
         var id = Engine.findTileID(pts[prev],pts[i],pts[next]);
-        var tile = ptToTile(pts[i]);
-        var previousTile = ptToTile(pts[prev]);
+        var tile = pts[i];
+        var previousTile = pts[prev];
+        console.log(id+' at '+tile.x+', '+tile.y);
 
         // Prevent issues with double corners
         if((id == 1 && last == 3) && (previousTile.x - tile.x == 1)) id = 9; // top left after bottom right
@@ -760,10 +765,6 @@ Engine.drawCliff = function(pts){
                 Engine.addTile(ref.x-1,ref.y-1,18,cliff,1);
                 break;
             case 4: // bottom left inner
-                /*var ref = {
-                    x: tile.x-1,
-                    y: tile.y
-                };*/
                 ref.x -= 1;
                 Engine.addTile(ref.x,ref.y-1,62,cliff,1);
                 Engine.addTile(ref.x+1,ref.y-1,63,cliff,1);
@@ -807,7 +808,7 @@ Engine.drawCliff = function(pts){
         last = id;
     }
 
-    cliff.hull = Engine.drawHull(pts);
+    cliff.hull = Engine.drawHull(pts.map(Geometry.makePxCoords));
     return cliff;
 };
 
@@ -828,7 +829,10 @@ Engine.save = function(){
             var mapData = Engine.mapDataCache[chunkID];
             dirtyFiles.add(chunkID);
             console.log('writing '+(tile.tile+1));
-            mapData.layers[tile.layer].data[(Engine.chunkWidth*tile.tileY)+tile.tileX] = tile.tile+1;
+            var origin = Utils.AOItoTile(chunkID);
+            var x = tile.tileX - origin.x;
+            var y = tile.tileY - origin.y;
+            mapData.layers[tile.layer].data[(Engine.chunkWidth*y)+x] = tile.tile+1;
         }
     }
     dirtyFiles.forEach(function(file){

@@ -59,6 +59,52 @@ Geometry.shoreBox = { // Holds a few fields and data structures used to make wat
     }
 };
 
+Geometry.makeCorona = function(x,y){
+    var height = 10;
+    var width = 10;
+    var start = {
+        x: x,
+        y: y-height
+    };
+    var pts = [start];
+    Geometry.coronaSide(pts,-1,1,pts[pts.length-1],width,height);
+    Geometry.coronaSide(pts,1,1,pts[pts.length-1],width,height);
+    Geometry.coronaSide(pts,1,-1,pts[pts.length-1],width,height);
+    Geometry.coronaSide(pts,-1,-1,pts[pts.length-1],width,height);
+    printArray(pts);
+    return pts;
+};
+
+Geometry.coronaSide = function(pts,xstep,ystep,pt,width,height){
+    var refDimension = (xstep == ystep ? height : width);
+    var nbSegments = randomInt(2,Math.ceil(Math.sqrt(refDimension))+1);
+    //var nbSegments = randomInt(2,Math.ceil(Math.sqrt(width))+1);
+    var alt = +(xstep != ystep);
+
+    for(var i = 0; i < nbSegments; i++){
+        var xlength = (i == nbSegments-1 ? width : randomInt(1,width-(nbSegments-i)+1));
+        var ylength = (i == nbSegments-1 ? height : randomInt(1,height-(nbSegments-i)+1));
+        width-=xlength;
+        height-=ylength;
+
+        pts.push({
+            x: pts[pts.length-1].x + xlength*xstep*alt,
+            y: pts[pts.length-1].y + ylength*ystep*(1-alt)
+        });
+        pts.push({
+            x: pts[pts.length-1].x + xlength*xstep*(1-alt),
+            y: pts[pts.length-1].y + ylength*ystep*alt
+        });
+    }
+};
+
+Geometry.makePxCoords = function(pt){
+    return {
+        x: pt.x * Engine.tileWidth,
+        y: pt.y * Engine.tileHeight
+    }
+};
+
 Geometry.straightLine = function(start,end){
     var step = 32;
     var speed = Geometry.computeSpeedVector(Geometry.computeAngle(start,end,false)); // false: not degrees
@@ -121,10 +167,14 @@ Geometry.makePolyrect = function(worldx,worldy){
 Geometry.randomRects = function(rects,worldx,worldy,N,randomRects){
     if(randomRects) {
         for (var i = 0; i < N; i++) {
-            var x = (worldx + randomInt(-5, 6)) * Engine.tileWidth;
+            /*var x = (worldx + randomInt(-5, 6)) * Engine.tileWidth;
             var y = (worldy + randomInt(-5, 6)) * Engine.tileHeight;
             var w = randomInt(3, 10) * Engine.tileWidth;
-            var h = randomInt(3, 10) * Engine.tileHeight;
+            var h = randomInt(3, 10) * Engine.tileHeight;*/
+            var x = (worldx + randomInt(-5, 6));
+            var y = (worldy + randomInt(-5, 6));
+            var w = randomInt(3, 10);
+            var h = randomInt(3, 10);
             rects.push(new Rect(x, y, w, h));
             //console.log(JSON.stringify(rects[rects.length - 1]));
         }
@@ -273,38 +323,18 @@ Geometry.smoothShape = function(pts){
 
 // Create the points corresponding to tiles between vertices of a shape
 Geometry.interpolatePoints = function(pts){
-    for(var i = 0; i < pts.length; i++){
-        var next = (i == pts.length-1 ? 0 : i+1);
-        var dx = (pts[next].x-pts[i].x)/Engine.tileWidth;
-        var dy = (pts[next].y-pts[i].y)/Engine.tileHeight;
-        if(dx == 0){
-            var sign = Math.abs(dy)/dy;
-            //console.log('vertical side of '+dy+' tiles');
-            var skipFirst = (dy < 1);
-            skipLast = true;
-            var start = (skipFirst ? 2 : 1);
-            var end = Math.abs(dy);
-            if(skipLast) end--;
-            for(var j = start, k = 1; j < end; j++, k++){
-                var p = new PIXI.Point(pts[i].x,pts[i].y+(j*sign*Engine.tileWidth));
-                pts.splice(i+k,0,p);// insert new point
-            }
-            i += k-1;
-        }else if(dy == 0){
-            var sign = Math.abs(dx)/dx;
-            //console.log('horizontal side of '+dx+' tiles');
-            var skipFirst = (dx < 1);
-            var skipLast = !skipFirst;
-            var start = (skipFirst ? 2 : 1);
-            var end = Math.abs(dx);
-            if(skipLast) end--;
-            // j used for positioning new points, k for counting them and managing position in array
-            for(var j = start, k = 1; j < end; j++, k++){
-                var p = new PIXI.Point(pts[i].x+(j*sign*Engine.tileHeight),pts[i].y);
-                pts.splice(i+k,0,p);
-            }
-            i += k-1;
+    for(var i = 0; i < pts.length; i++) {
+        var next = (i == pts.length - 1 ? 0 : i + 1);
+        var dx = (pts[next].x - pts[i].x);
+        var dy = (pts[next].y - pts[i].y);
+        // j used for positioning new points, k for counting them and managing position in array
+        for(var j = 1, k = 1; j < Math.max(Math.abs(dx),Math.abs(dy)); j++, k++){
+            pts.splice(i+k,0,{
+                x: pts[i].x + (j*(dx/Math.abs(dx)) || 0),
+                y: pts[i].y + (j*(dy/Math.abs(dy)) || 0)
+            });// insert new point
         }
+        i += k-1;
     }
     return pts;
 };
@@ -471,4 +501,47 @@ function makePath(a,b){
  return (vertical ? Math.abs(dy)/Engine.tileHeight : Math.abs(dx)/Engine.tileWidth);
  //if((vertical && Math.abs(dy) == Engine.tileHeight) || (!vertical && Math.abs(dx) == Engine.tileWidth)) break;
  }
+
+
+
+             Geometry.interpolatePointsOld = function(pts){
+             for(var i = 0; i < pts.length; i++){
+             var next = (i == pts.length-1 ? 0 : i+1);
+             /*var dx = (pts[next].x-pts[i].x)/Engine.tileWidth;
+             var dy = (pts[next].y-pts[i].y)/Engine.tileHeight;*/
+var dx = (pts[next].x-pts[i].x);
+var dy = (pts[next].y-pts[i].y);
+if(dx == 0){
+    var sign = Math.abs(dy)/dy;
+    //console.log('vertical side of '+dy+' tiles');
+    var skipFirst = (dy < 1);
+    skipLast = true;
+    var start = (skipFirst ? 2 : 1);
+    var end = Math.abs(dy);
+    if(skipLast) end--;
+    for(var j = start, k = 1; j < end; j++, k++){
+        //var p = new PIXI.Point(pts[i].x,pts[i].y+(j*sign*Engine.tileWidth));
+        var p = new PIXI.Point(pts[i].x,pts[i].y+(j*sign));
+        pts.splice(i+k,0,p);// insert new point
+    }
+    i += k-1;
+}else if(dy == 0){
+    var sign = Math.abs(dx)/dx;
+    //console.log('horizontal side of '+dx+' tiles');
+    var skipFirst = (dx < 1);
+    var skipLast = !skipFirst;
+    var start = (skipFirst ? 2 : 1);
+    var end = Math.abs(dx);
+    if(skipLast) end--;
+    // j used for positioning new points, k for counting them and managing position in array
+    for(var j = start, k = 1; j < end; j++, k++){
+        //var p = new PIXI.Point(pts[i].x+(j*sign*Engine.tileHeight),pts[i].y);
+        var p = new PIXI.Point(pts[i].x+(j*sign),pts[i].y);
+        pts.splice(i+k,0,p);
+    }
+    i += k-1;
+}
+}
+return pts;
+};
 */
