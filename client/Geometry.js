@@ -60,8 +60,8 @@ Geometry.shoreBox = { // Holds a few fields and data structures used to make wat
 };
 
 Geometry.makeCorona = function(x,y){
-    var height = 10;
-    var width = 10;
+    var height = document.getElementById('w').value;
+    var width = document.getElementById('h').value;
     var start = {
         x: x,
         y: y-height
@@ -71,14 +71,17 @@ Geometry.makeCorona = function(x,y){
     Geometry.coronaSide(pts,1,1,pts[pts.length-1],width,height);
     Geometry.coronaSide(pts,1,-1,pts[pts.length-1],width,height);
     Geometry.coronaSide(pts,-1,-1,pts[pts.length-1],width,height);
-    printArray(pts);
+    //printArray(pts);
+    pts.pop();
     return pts;
 };
 
 Geometry.coronaSide = function(pts,xstep,ystep,pt,width,height){
     var refDimension = (xstep == ystep ? height : width);
-    var nbSegments = randomInt(2,Math.ceil(Math.sqrt(refDimension))+1);
-    //var nbSegments = randomInt(2,Math.ceil(Math.sqrt(width))+1);
+    //var max = 2*(Math.ceil(Math.sqrt(refDimension)));
+    //var max = Math.ceil(Math.sqrt(refDimension))+1;
+    var max = Math.ceil(refDimension/2);
+    var nbSegments = randomInt(2,max);
     var alt = +(xstep != ystep);
 
     for(var i = 0; i < nbSegments; i++){
@@ -362,186 +365,3 @@ Geometry.computeSpeedVector = function(angle){ // return unit speed vector given
         y: -Math.sin(angle)
     }
 };
-
-/*
-// Compute and draw a random path from a starting point
-Geometry.drawPath = function(worldx,worldy,dir){
-    console.log('drawing path');
-    var width = 7;
-    var height = 3;
-
-    var pts = [];
-    var directions = [
-        [0,-1], // N
-        [1,-1], // NE
-        [1,0], // E
-        [1,1], // SE
-        [0,1] // S
-    ];
-    var current = new PIXI.Point(worldx,worldy);
-    pts.push(Geometry.makePoint(worldx,worldy));
-    var minx = worldx;
-    var miny = worldy-height;
-    var maxx = worldx+width;
-    var maxy = worldy+height;
-    while(true){
-        var tmp = new PIXI.Point();
-        console.log('dir = '+dir);
-        tmp.x = current.x + directions[dir][0];
-        tmp.y = current.y + directions[dir][1];
-        pts.push(Geometry.makePoint(tmp.x,tmp.y));
-        current.x = tmp.x;
-        current.y = tmp.y;
-        if(current.x == maxx) break;
-        var candidates = Geometry.findCandidates(dir,directions,false); // merge find and check
-        printArray(candidates);
-        Geometry.checkCandidates(candidates,current,directions,minx,maxx,miny,maxy);
-        dir = candidates[Math.floor(Math.random()*candidates.length)];
-    }
-    Engine.drawHull(pts);
-};
-
-// Find candidates for path expansion
-Geometry.findCandidates = function(dir,directions,hard){
-    var candidates = [];
-    var m = (hard ? -2 : -1);
-    var M = (hard ? 2 : 1);
-    var inc = (hard ? 4 : 1);
-    console.log(m+', '+M+', '+inc);
-    for(var k = m; k <= M; k+=inc){
-        console.log('@'+k);
-        var d = dir + k;
-        if(d < 0) continue;
-        if(d > directions.length-1) continue;
-        console.log('#'+d);
-        candidates.push(d);
-    }
-    console.log('----');
-    return candidates;
-};
-
-// Check all candidates tiles for a path expansion from the current tile, within specified bounds
-Geometry.checkCandidates = function(candidates,current,directions,minx,maxx,miny,maxy){
-    for(var j = candidates.length - 1; j >= 0; j--){
-        var d = candidates[j];
-        var c = new PIXI.Point(current.x+directions[d][0],current.y+directions[d][1]);
-        if(c.x < minx || c.x > maxx || c.y < miny || c.y > maxy) candidates.splice(j,1);
-    }
-};
-
- function deform(pts){
- for(var i = 0; i < pts.length; i++){
- var a = pts[i];
- var b = (i+1 < pts.length? pts[i+1] : pts[0]);
- var dx = Math.abs(a.x- b.x)/Engine.tileWidth;
- var dy = Math.abs(a.y- b.y)/Engine.tileHeight;
- if(dx < 3 && dy < 3) continue;
- if(dx == dy){
- console.log('diagonal');
- continue;
- }
- var newpts = makePath(a,b);
- pts.splice(i+1,0,...newpts);
- i += newpts.length;
-}
-}
-
-function makePath(a,b){
-    console.log('Finding path between ('+a.x+','+a.y+') and ('+b.x+','+b.y+')');
-    var newpts = [];
-    var vertical = (a.x == b.x);
-    console.log(vertical);
-    var start = new PIXI.Point(a.x, a.y);
-    var angle = -1;
-
-    var j = 0;
-    while(true) {
-        var dx = start.x - b.x;
-        var dy = start.y - b.y;
-        if(distToDest(vertical,dx,dy) == 1){
-            console.log('close enough');
-            break;
-        }
-        var candidates = [];
-        var xIncrement = -(dx / Math.abs(dx)) * Engine.tileWidth;
-        var yIncrement = -(dy / Math.abs(dy)) * Engine.tileWidth;
-        for (var i = -1; i <= 1; i++) {
-            var pt = new PIXI.Point(start.x + (vertical ? i * Engine.tileWidth : xIncrement), (start.y + (vertical ? yIncrement : i * Engine.tileWidth)));
-            var ndx = Math.abs(pt.x - b.x);
-            var ndy = Math.abs(pt.y - b.y);
-            console.log(JSON.stringify(pt));
-            var ng = computeAngle(start,pt,true);
-            var isFlat = (ng%90 == 0 || ng == angle);
-            var lim = (isFlat ? ndx : ndx-32);
-            /*if ((vertical && ndx >= ndy) || (!vertical && ndy > lim)){
-             console.log('going too far ('+ndx+', '+ndy+')');
-             continue; // don't go too far
-             }*/
-            /*if(ng == -1*angle){
-                console.log('angle');
-                continue;
-            }
-            candidates.push(pt);
-        }
-        var newpt = randomElement(candidates);
-        newpts.push(newpt);
-        angle = computeAngle(start,newpt,true);
-        start.x = newpt.x;
-        start.y = newpt.y;
-        console.log('angle = '+angle+', x = '+newpt.x+', y = '+newpt.y+', dx = '+(start.x- b.x)+', dy = '+(start.y- b.y));
-        console.log('-----');
-        if(j > 100) break;
-        j++;
-    }
-    printArray(newpts);
-    return newpts;
-}
-
- function distToDest(vertical,dx,dy){
- return (vertical ? Math.abs(dy)/Engine.tileHeight : Math.abs(dx)/Engine.tileWidth);
- //if((vertical && Math.abs(dy) == Engine.tileHeight) || (!vertical && Math.abs(dx) == Engine.tileWidth)) break;
- }
-
-
-
-             Geometry.interpolatePointsOld = function(pts){
-             for(var i = 0; i < pts.length; i++){
-             var next = (i == pts.length-1 ? 0 : i+1);
-             /*var dx = (pts[next].x-pts[i].x)/Engine.tileWidth;
-             var dy = (pts[next].y-pts[i].y)/Engine.tileHeight;*/
-var dx = (pts[next].x-pts[i].x);
-var dy = (pts[next].y-pts[i].y);
-if(dx == 0){
-    var sign = Math.abs(dy)/dy;
-    //console.log('vertical side of '+dy+' tiles');
-    var skipFirst = (dy < 1);
-    skipLast = true;
-    var start = (skipFirst ? 2 : 1);
-    var end = Math.abs(dy);
-    if(skipLast) end--;
-    for(var j = start, k = 1; j < end; j++, k++){
-        //var p = new PIXI.Point(pts[i].x,pts[i].y+(j*sign*Engine.tileWidth));
-        var p = new PIXI.Point(pts[i].x,pts[i].y+(j*sign));
-        pts.splice(i+k,0,p);// insert new point
-    }
-    i += k-1;
-}else if(dy == 0){
-    var sign = Math.abs(dx)/dx;
-    //console.log('horizontal side of '+dx+' tiles');
-    var skipFirst = (dx < 1);
-    var skipLast = !skipFirst;
-    var start = (skipFirst ? 2 : 1);
-    var end = Math.abs(dx);
-    if(skipLast) end--;
-    // j used for positioning new points, k for counting them and managing position in array
-    for(var j = start, k = 1; j < end; j++, k++){
-        //var p = new PIXI.Point(pts[i].x+(j*sign*Engine.tileHeight),pts[i].y);
-        var p = new PIXI.Point(pts[i].x+(j*sign),pts[i].y);
-        pts.splice(i+k,0,p);
-    }
-    i += k-1;
-}
-}
-return pts;
-};
-*/

@@ -70,7 +70,7 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight){
     //console.log(JSON.stringify(tilesetsData));
     var ground = new Layer(chunkWidth,chunkHeight,'ground');
     var terrain = new Layer(chunkWidth,chunkHeight,'terrain');
-    var groundstuff = new Layer(chunkWidth,chunkHeight,'groundstuff');
+    var groundstuff = new Layer(chunkWidth,chunkHeight,'stuff');
     var canopy = new Layer(chunkWidth,chunkHeight,'canopy');
     terrain.data = emptyLayer(chunkWidth*chunkHeight);
     groundstuff.data = emptyLayer(chunkWidth*chunkHeight);

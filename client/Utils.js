@@ -29,6 +29,10 @@ Utils.AOItoTile = function(aoi){
     };
 };
 
+Utils.gridToLine = function(x,y,w){
+    return (y*w)+x;
+};
+
 // Returns the x and y offets of a chunk, in chunks, from the top left
 Utils.getMacroCoordinates = function(chunk){
     return {

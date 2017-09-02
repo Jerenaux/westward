@@ -22,8 +22,12 @@ Engine.camera = {
 Engine.boot = function(){
     /*TODO:
     * Procedural world:
+    - Use Chunk.layers to improve drawing
+    - Use Chunk.layers to save results (update save)
+    - Make sure all addTile calls have a layer provided (fix rivers accordingly)
+    - Objectify addTile
+    - Test moutains (stacked mounds) and lakes
     - Forests
-    - Coronae
     - Dirt
     * Network
     - Two repositories, for production and development, with node scripts taking care
@@ -124,10 +128,6 @@ Engine.readMaster = function(masterData){
     Engine.chunkHeight = masterData.chunkHeight;
     Engine.nbChunksHorizontal = masterData.nbChunksHoriz;
     Engine.nbChunksVertical = masterData.nbChunksVert;
-    /*Engine.minChunkX = masterData.minX;
-    Engine.minChunkY = masterData.minY;
-    Engine.maxChunkX = masterData.maxX;
-    Engine.maxChunkY = masterData.maxY;*/
     Engine.worldWidth = Engine.nbChunksHorizontal*Engine.chunkWidth;
     Engine.worldHeight = Engine.nbChunksVertical*Engine.chunkHeight;
     Engine.lastChunkID = (Engine.nbChunksHorizontal*Engine.nbChunksVertical)-1;
@@ -209,13 +209,12 @@ Engine.displayMap = function(path){
 };
 
 Engine.drawChunk = function(mapData){
-    var chunk = new Chunk(mapData);
+    var chunk = new Chunk(mapData,1);
     Engine.chunks[chunk.id] = chunk;
     if(!Engine.mapDataCache[chunk.id]) Engine.mapDataCache[chunk.id] = mapData;
     for(var i = 0; i < mapData.layers.length; i++){
         Engine.drawLayer(mapData.layers[i].data,mapData.width,mapData.height,chunk.id,chunk);
     }
-    chunk.z = 1;
     Engine.displayedChunks.push(chunk.id);
     if(Engine.showGrid) Engine.drawGrid(chunk);
     Engine.addToStage(chunk);
@@ -308,6 +307,7 @@ Engine.addTile = function(x,y,tile,chunk,layer){
     var texture = new PIXI.Texture(Engine.resources[tileset.name].texture, new PIXI.Rectangle(tx*Engine.tileWidth, ty*Engine.tileHeight, Engine.tileWidth, Engine.tileHeight));
     var sprite = new PIXI.Sprite(texture);
     // save some properties inside the object:
+    if(layer) chunk.layers[layer].add(x,y,tile);
     sprite.tile = tile;
     sprite.layer = layer;
     sprite.tileX = x;
@@ -406,9 +406,11 @@ Engine.updateEnvironment = function(){
     var newChunks = chunks.diff(Engine.displayedChunks);
     var oldChunks = Engine.displayedChunks.diff(chunks);
 
-    for(var i = 0; i < oldChunks.length; i++){
-        //console.log('removing '+oldChunks[i]);
-        Engine.removeChunk(oldChunks[i]);
+    if(!Engine.debug) {
+        for (var i = 0; i < oldChunks.length; i++) {
+            //console.log('removing '+oldChunks[i]);
+            Engine.removeChunk(oldChunks[i]);
+        }
     }
 
     for(var j = 0; j < newChunks.length; j++){
@@ -536,16 +538,17 @@ Engine.addShore = function(x,y){
 };
 
 Engine.addMound = function(x,y){
-    //Engine.addToLandscape(Engine.drawCliff(Geometry.interpolatePoints(Geometry.makePolyrect(x,y))));
+    Engine.addToLandscape(Engine.drawCliff(Geometry.interpolatePoints(Geometry.makeCorona(x,y))));
+    return;
     var test = '[{"x":73,"y":2},{"x":68,"y":2},{"x":68,"y":6},{"x":67,"y":6},{"x":67,"y":10},{"x":63,"y":10},{"x":63,"y":12},{"x":63,"y":14},{"x":66,"y":14},{"x":66,"y":22},{"x":73,"y":22},{"x":77,"y":22},{"x":77,"y":15},{"x":78,"y":15},{"x":78,"y":14},{"x":83,"y":14},{"x":83,"y":12},{"x":83,"y":4},{"x":76,"y":4},{"x":76,"y":2},{"x":73,"y":2}]';
     console.log(test);
     var arr = JSON.parse(test);
     arr.pop();
-    Engine.addToLandscape(Engine.drawCliff(Geometry.interpolatePointsBis(arr)));
+    Engine.addToLandscape(Engine.rawCliff(Geometry.interpolatePoints(arr)));
 };
 
-Engine.addCorona = function(x,y){
-    Geometry.makeCorona(x,y);
+Engine.addLake = function(x,y){
+    Engine.addToLandscape(Engine.drawShore(Geometry.interpolatePoints(Geometry.makeCorona(x,y)),true)); // true = circular
 };
 
 Engine.drawHull = function(hull){
@@ -572,44 +575,33 @@ Engine.findTileID = function(prev,pt,next){
     var outAngle = Geometry.computeAngle(pt,next,true);
     //console.log(inAngle+', '+outAngle);
     if(inAngle == 90 && outAngle == 180){
-        //console.log('top right outer');
-        return 0;
-    }else if(inAngle == 180 && outAngle == 90){
-        //console.log('bottom left outer');
-        return 2;
-    }else if(inAngle == -90 && outAngle == 0){
-        //console.log('bottom left inner');
-        return 4;
+        return W.topRightOut;
     }else if(inAngle == 180 && outAngle == -90){
-        //console.log('top left outer');
-        return 1;
+        return W.topLeftOut;
+    }else if(inAngle == 180 && outAngle == 90){
+        return W.bottomLeftOut;
     }else if(inAngle == -90 && outAngle == 180){
-        return 3;
+        return W.bottomRightOut;
+    }else if(inAngle == -90 && outAngle == 0){
+        return W.bottomLeftIn;
     }else if(inAngle == 0 && outAngle == 90){
-        //console.log('bottom right inner');
-        return 5;
+        return W.bottomRightIn;
     }else if(inAngle == 180 && outAngle == 180){
-        //console.log('top');
-        return 6;
+        return W.top;
     }else if(inAngle == 90 && outAngle == 90){
-        //console.log('right');
-        return 7;
+        return W.right;
     }else if(inAngle == 0 && outAngle == 0){
-        //console.log('bottom');
-        return 8;
+        return W.bottom;
     }else if(inAngle == -90 && outAngle == -90){
-        //console.log('left');
-        return 9;
+        return W.left;
     }else if(inAngle == 0 && outAngle == -90) {
-        //console.log('top right inner');
-        return 10;
+        return W.topRightIn;
     }else if(inAngle == 90 && outAngle == 0){
-        //console.log('top left inner');
-        return 11;
+        return W.topLeftIn;
     }
 };
 
-Engine.drawShore = function(tiles){
+Engine.drawShore = function(tiles,circular){
     var shore = new PIXI.Container();
     shore.z = 3;
     var dx = tiles[0].x - tiles[tiles.length-1].x;
@@ -623,22 +615,30 @@ Engine.drawShore = function(tiles){
     Geometry.shoreBox.shoreType = coastline;
     for(var i = 0; i < tiles.length; i++){
         var id;
-        if(i == 0 || i == tiles.length-1){
-            if(coastline == 1) id = 6;
-            if(coastline == 2) id = 9;
-            if(coastline == 3) id = 8;
-            if(coastline == 4) id = 7;
-        }else {
-            var prev = tiles[i - 1];
-            var next = tiles[i + 1];
-            id = Engine.findTileID(prev, tiles[i], next);
+        if(circular){
+            var next = (i == tiles.length-1 ? 0 : i+1);
+            var prev = (i == 0 ? tiles.length-1 : i-1);
+            var id = Engine.findTileID(tiles[prev],tiles[i],tiles[next]);
+        }else{
+            if (i == 0 || i == tiles.length - 1) {
+                if (coastline == 1) id = 6;
+                if (coastline == 2) id = 9;
+                if (coastline == 3) id = 8;
+                if (coastline == 4) id = 7;
+            } else {
+                var prev = tiles[i - 1];
+                var next = tiles[i + 1];
+                id = Engine.findTileID(prev, tiles[i], next);
+            }
         }
-        //console.log('id = '+id);
+
         var ref = {
             x: tiles[i].x,
             y: tiles[i].y
         };
+        //console.log(id+' at '+ref.x+', '+ref.y);
         Geometry.shoreBox.registerTile(ref);
+
         switch(id){
             case 0:
                 Engine.addTile(ref.x,ref.y,249,shore);
@@ -716,9 +716,23 @@ Engine.fillWater = function(){
     Geometry.shoreBox.west = {};
 };
 
+var W = {
+    topRightOut: 0,
+    topLeftOut: 1,
+    bottomLeftOut: 2,
+    bottomRightOut: 3,
+    bottomLeftIn: 4,
+    bottomRightIn: 5,
+    top: 6,
+    right: 7,
+    bottom: 8,
+    left: 9,
+    topRightIn: 10,
+    topLeftIn: 11
+};
+
 Engine.drawCliff = function(pts){
-    var cliff = new PIXI.Container();
-    cliff.z = 3;
+    var cliff = new Chunk(null,3);
     var last = null;
     for(var i = 0; i < pts.length; i++){
         var next = (i == pts.length-1 ? 0 : i+1);
@@ -726,16 +740,16 @@ Engine.drawCliff = function(pts){
         var id = Engine.findTileID(pts[prev],pts[i],pts[next]);
         var tile = pts[i];
         var previousTile = pts[prev];
-        console.log(id+' at '+tile.x+', '+tile.y);
+        //console.log(id+' at '+tile.x+', '+tile.y);
 
         // Prevent issues with double corners
-        if((id == 1 && last == 3) && (previousTile.x - tile.x == 1)) id = 9; // top left after bottom right
-        if((id == 3 && last == 1) && (previousTile.y - tile.y == -1)){
-            id = 6;
+        if((id == W.topLeftOut && last == W.bottomRightOut) && (previousTile.x - tile.x == 1)) id = 9; // top left after bottom right
+        if((id == W.bottomRightOut && last == W.topLeftOut) && (previousTile.y - tile.y == -1)){
+            id = W.top;
             tile.x--;
         }
-        if((id == 0 && last == 2) && (previousTile.y - tile.y == 1)){ // top right after bottom left
-            id = 6;
+        if((id == W.topRightOut && last == W.bottomLeftOut) && (previousTile.y - tile.y == 1)){ // top right after bottom left
+            id = W.top;
             tile.x--;
         }
 
@@ -744,66 +758,66 @@ Engine.drawCliff = function(pts){
             y: tile.y
         };
         switch(id){
-            case 0: // top right outer
+            case W.topRightOut: // top right outer
                 ref.x -= 1;
-                Engine.addTile(ref.x,ref.y-1,6,cliff,1);
-                Engine.addTile(ref.x,ref.y,21,cliff,1);
-                Engine.addTile(ref.x+1,ref.y,22,cliff,1);
-                if(last != 2 || (previousTile.y - tile.y > 2)) Engine.addTile(ref.x+1,ref.y+1,37,cliff,1);  // Prevent issues with double corners
+                Engine.addTile(ref.x,ref.y-1,6,cliff,'terrain');
+                Engine.addTile(ref.x,ref.y,21,cliff,'terrain');
+                Engine.addTile(ref.x+1,ref.y,22,cliff,'terrain');
+                if(last != W.bottomLeftOut || (previousTile.y - tile.y > 2)) Engine.addTile(ref.x+1,ref.y+1,37,cliff,'terrain');  // Prevent issues with double corners
                 break;
-            case 1: // top left outer
-                Engine.addTile(ref.x,ref.y-1,3,cliff,1);
-                Engine.addTile(ref.x-1,ref.y,17,cliff,1);
-                Engine.addTile(ref.x,ref.y,18,cliff,1);
+            case W.topLeftOut: // top left outer
+                Engine.addTile(ref.x,ref.y-1,3,cliff,'terrain');
+                Engine.addTile(ref.x-1,ref.y,17,cliff,'terrain');
+                Engine.addTile(ref.x,ref.y,18,cliff,'terrain');
                 break;
-            case 2: // bottom left outer
-                Engine.addTile(ref.x,ref.y-2,6,cliff,1);
-                Engine.addTile(ref.x,ref.y-1,21,cliff,1);
+            case W.bottomLeftOut: // bottom left outer
+                Engine.addTile(ref.x,ref.y-2,6,cliff,'terrain');
+                Engine.addTile(ref.x,ref.y-1,21,cliff,'terrain');
                 break;
-            case 3: // bottom right outer
-                Engine.addTile(ref.x-2,ref.y-1,17,cliff,1);
-                Engine.addTile(ref.x-1,ref.y-1,18,cliff,1);
+            case W.bottomRightOut: // bottom right outer
+                Engine.addTile(ref.x-2,ref.y-1,17,cliff,'terrain');
+                Engine.addTile(ref.x-1,ref.y-1,18,cliff,'terrain');
                 break;
-            case 4: // bottom left inner
+            case W.bottomLeftIn: // bottom left inner
                 ref.x -= 1;
-                Engine.addTile(ref.x,ref.y-1,62,cliff,1);
-                Engine.addTile(ref.x+1,ref.y-1,63,cliff,1);
-                Engine.addTile(ref.x,ref.y,77,cliff,1);
-                Engine.addTile(ref.x+1,ref.y,78,cliff,1);
-                Engine.addTile(ref.x,ref.y+1,92,cliff,1);
-                Engine.addTile(ref.x+1,ref.y+1,93,cliff,1);
+                Engine.addTile(ref.x,ref.y-1,62,cliff,'terrain');
+                Engine.addTile(ref.x+1,ref.y-1,63,cliff,'terrain');
+                Engine.addTile(ref.x,ref.y,77,cliff,'terrain');
+                Engine.addTile(ref.x+1,ref.y,78,cliff,'terrain');
+                Engine.addTile(ref.x,ref.y+1,92,cliff,'terrain');
+                Engine.addTile(ref.x+1,ref.y+1,93,cliff,'terrain');
                 break;
-            case 5: // bottom right inner
-                Engine.addTile(ref.x-1,ref.y-1,66,cliff,1);
-                Engine.addTile(ref.x,ref.y-1,67,cliff,1);
-                Engine.addTile(ref.x-1,ref.y,81,cliff,1);
-                Engine.addTile(ref.x,ref.y,82,cliff,1);
-                Engine.addTile(ref.x-1,ref.y+1,96,cliff,1);
+            case W.bottomRightIn: // bottom right inner
+                Engine.addTile(ref.x-1,ref.y-1,66,cliff,'terrain');
+                Engine.addTile(ref.x,ref.y-1,67,cliff,'terrain');
+                Engine.addTile(ref.x-1,ref.y,81,cliff,'terrain');
+                Engine.addTile(ref.x,ref.y,82,cliff,'terrain');
+                Engine.addTile(ref.x-1,ref.y+1,96,cliff,'terrain');
                 break;
-            case 6: // top
-                Engine.addTile(ref.x,ref.y-1,randomInt(4,6),cliff,1);
+            case W.top: // top
+                Engine.addTile(ref.x,ref.y-1,randomInt(4,6),cliff,'terrain');
                 break;
-            case 7: // right
-                Engine.addTile(ref.x,ref.y,52,cliff,1);
+            case W.right: // right
+                Engine.addTile(ref.x,ref.y,52,cliff,'terrain');
                 break;
-            case 8: // bottom
-                var actualID = randomInt(79,81,cliff,1);
-                Engine.addTile(tile.x,tile.y-1,actualID-15,cliff,1);
-                Engine.addTile(tile.x,tile.y,actualID,cliff,1);
-                Engine.addTile(tile.x,tile.y+1,actualID+15,cliff,1);
+            case W.bottom: // bottom
+                var actualID = randomInt(79,81,cliff,'terrain');
+                Engine.addTile(tile.x,tile.y-1,actualID-15,cliff,'terrain');
+                Engine.addTile(tile.x,tile.y,actualID,cliff,'terrain');
+                Engine.addTile(tile.x,tile.y+1,actualID+15,cliff,'terrain');
                 break;
-            case 9: // left
-                Engine.addTile(tile.x-1,tile.y,randomElement([32,47]),cliff,1);
+            case W.left: // left
+                Engine.addTile(tile.x-1,tile.y,randomElement([32,47]),cliff,'terrain');
                 break;
-            case 10: // top right inner
-                Engine.addTile(tile.x-1,tile.y,69,cliff,1);
-                Engine.addTile(tile.x-1,tile.y+1,84,cliff,1);
+            case W.topRightIn: // top right inner
+                Engine.addTile(tile.x-1,tile.y,69,cliff,'terrain');
+                Engine.addTile(tile.x-1,tile.y+1,84,cliff,'terrain');
                 break;
-            case 11: // top left inner
+            case W.topLeftIn: // top left inner
                 ref.y += 1;
-                Engine.addTile(ref.x,ref.y,39,cliff,1);
-                Engine.addTile(ref.x,ref.y-1,24,cliff,1);
-                Engine.addTile(ref.x,ref.y+1,54,cliff,1);
+                Engine.addTile(ref.x,ref.y,39,cliff,'terrain');
+                Engine.addTile(ref.x,ref.y-1,24,cliff,'terrain');
+                Engine.addTile(ref.x,ref.y+1,54,cliff,'terrain');
         }
         last = id;
     }
@@ -811,13 +825,6 @@ Engine.drawCliff = function(pts){
     cliff.hull = Engine.drawHull(pts.map(Geometry.makePxCoords));
     return cliff;
 };
-
-function ptToTile(pt){
-    return {
-        x: pt.x/Engine.tileWidth,
-        y: pt.y/Engine.tileHeight
-    };
-}
 
 Engine.save = function(){
     var dirtyFiles = new Set();
