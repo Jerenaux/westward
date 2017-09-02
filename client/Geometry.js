@@ -32,8 +32,18 @@ Geometry.shoreBox = { // Holds a few fields and data structures used to make wat
                 return Geometry.shoreBox.east;
         }
     },
-    registerTile: function(tile){
-        switch(Geometry.shoreBox.shoreType){
+    registerTile: function(tile,id){
+        var northShore = [W.top, W.topLeftOut, W.topRightOut, W.bottomRightOut, W.bottomLeftOut];
+        var southShore = [W.bottom, W.topLeftIn, W.topRightIn, W.bottomLeftIn, W.bottomRightIn];
+        if(northShore.includes(id)){
+            Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.north,'x','y','max');
+            console.log('N');
+        }else if(southShore.includes(id)){
+            Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.south,'x','y','min');
+            console.log('S');
+        }
+
+        /*switch(Geometry.shoreBox.shoreType){
             case 1: //N,
                 Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.north,'x','y','max');
                 break;
@@ -46,7 +56,7 @@ Geometry.shoreBox = { // Holds a few fields and data structures used to make wat
             case 4: //E
                 Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.east,'y','x','min');
                 break;
-        }
+        }*/
     },
     addToMap: function(tile,map,keyCoordinate,valueCoordinate,operator){
         // Add the x/y value of a tile to the map, with the other value as the key.

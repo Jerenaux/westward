@@ -130,6 +130,7 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight){
 
     var master = {
         tilesets : tilesetsData.tilesets,
+        nbLayers: basis.layers.length,
         chunkWidth: chunkWidth,
         chunkHeight: chunkHeight,
         nbChunksHoriz: nbHoriz,

@@ -6,6 +6,36 @@ var Utils = {
     separator : '_'
 };
 
+var W = { // maps position to numerical ID
+    topRightOut: 0,
+    top: 1,
+    topLeftOut: 2,
+    left: 3,
+    right: 4,
+    bottomRightIn: 5,
+    bottomLeftOut: 6,
+    bottomLeftIn: 7,
+    bottom: 8,
+    bottomRightOut: 9,
+    topRightIn: 10,
+    topLeftIn: 11
+};
+
+var Shore = { // indexes of tiles in tilesets for shores
+    topRight: 249,
+    top: 248,
+    topLeft: 247,
+    left: 268,
+    bottomLeft: 289,
+    bottom: 290,
+    bottomRight: 291,
+    right: 270,
+    bottomRightOut: 250,
+    bottomLeftOut: 251,
+    topRightOut: 271,
+    topLeftOut: 272
+};
+
 Utils.getPreference = function(parameter,defaultValue){ // Retrieve sorting preferences for localStorage or return a default value
     var pref = localStorage.getItem(parameter);
     if(pref === null) return defaultValue;
