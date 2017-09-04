@@ -3,7 +3,6 @@ function Chunk(mapData,z){
     this.fromFile = (mapData !== null);
     this.id = mapData ? mapData.chunkID : 0;
     this.z = z;
-    this.layers = [];
 
     for(var i = 0; i < Engine.nbLayers; i++){
         var data = this.fromFile ? mapData.layers[i].data : null ;

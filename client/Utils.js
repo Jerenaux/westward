@@ -36,6 +36,41 @@ var Shore = { // indexes of tiles in tilesets for shores
     topLeftOut: 272
 };
 
+var Cliff = { // indexes of tiles in tilesets for shores
+    topRightOut: 21,
+    topRightOut_right: 22,
+    topRightOut_top: 6,
+    topRightOut_btmright: 37,
+    topLeftOut: 18,
+    topLeftOut_top: 3,
+    topLeftOut_left: 17,
+    bottomLeftIn: 77,
+    bottomLeftIn_right: 78,
+    bottomLeftIn_up: 62,
+    bottomLeftIn_upright: 63,
+    bottomLeftIn_btm: 92,
+    bottomLeftIn_btmright: 93,
+    bottomRightIn: 82,
+    bottomRIghtIn_left: 81,
+    bottomRightIn_top: 67,
+    bottomRightIn_topLeft: 66,
+    bottomRightIn_btmleft: 96,
+    top1: 4,
+    top2: 5,
+    right: 52,
+    bottom1: 79,
+    bottom2: 80,
+    left1: 32,
+    left2: 47,
+    topRightIn: 69,
+    topRightIn_btm: 84,
+    topLeftIn: 39,
+    topLeftIn_top: 24,
+    topLeftIn_btm: 54,
+    topLeftIn_alt: 68,
+    topLeftIn_altbtm: 83
+};
+
 Utils.getPreference = function(parameter,defaultValue){ // Retrieve sorting preferences for localStorage or return a default value
     var pref = localStorage.getItem(parameter);
     if(pref === null) return defaultValue;

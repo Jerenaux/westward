@@ -170,7 +170,7 @@ Engine.start = function(loader, resources){
 
 Engine.addHero = function(){
     startx = 71; //35
-    starty = 7;//30;
+    starty = 17;//30;
     Engine.player = Engine.addSprite('hero',startx,starty);
     Engine.player.visible = Engine.showHero;
     Engine.player.chunk = Utils.tileToAOI({x:startx,y:starty});
@@ -717,7 +717,6 @@ Engine.drawCliff = function(pts){
         var tile = pts[i];
         var previousTile = pts[prev];
         console.log(id+' at '+tile.x+', '+tile.y);
-        console.log(last);
 
         // Prevent issues with double corners
         if((id == W.topLeftOut && last == W.bottomRightOut) && (previousTile.x - tile.x == 1)) id = W.left;
@@ -734,74 +733,87 @@ Engine.drawCliff = function(pts){
             tile.x--;
         }
 
+        //if(id == W.topLeftIn && last == W.bottomRightIn)
+
         var ref = {
             x: tile.x,
             y: tile.y
         };
+
         switch(id){
             case W.topRightOut: // top right outer
                 ref.x -= 1;
-                cliff.addTile(ref.x,ref.y-1,6,0);
-                cliff.addTile(ref.x,ref.y,21,0);
-                cliff.addTile(ref.x+1,ref.y,22,0);
-                var t = (history[1] == W.bottomLeftOut ? 21 : 37); // Prevent issues with double corners
+                cliff.addTile(ref.x,ref.y-1,Cliff.topRightOut_top,0);
+                cliff.addTile(ref.x,ref.y,Cliff.topRightOut,0);
+                cliff.addTile(ref.x+1,ref.y,Cliff.topRightOut_right,0);
+                var t = (history[1] == W.bottomLeftOut ? Cliff.topRightOut : Cliff.topRightOut_btmright); // Prevent issues with double corners
                 cliff.addTile(ref.x+1,ref.y+1,t,0);
                 break;
             case W.topLeftOut: // top left outer
-                cliff.addTile(ref.x,ref.y-1,3,0);
-                cliff.addTile(ref.x-1,ref.y,17,0);
-                cliff.addTile(ref.x,ref.y,18,0);
+                cliff.addTile(ref.x,ref.y-1,Cliff.topLeftOut_top,0);
+                cliff.addTile(ref.x-1,ref.y,Cliff.topLeftOut_left,0);
+                cliff.addTile(ref.x,ref.y,Cliff.topLeftOut,0);
                 break;
             case W.bottomLeftOut: // bottom left outer
-                cliff.addTile(ref.x,ref.y-2,6,0);
-                cliff.addTile(ref.x,ref.y-1,21,0);
+                cliff.addTile(ref.x,ref.y-2,Cliff.topLeftOut_top,0);
+                cliff.addTile(ref.x,ref.y-1,Cliff.topLeftOut,0);
                 break;
             case W.bottomRightOut: // bottom right outer
-                cliff.addTile(ref.x-2,ref.y-1,17,0);
-                cliff.addTile(ref.x-1,ref.y-1,18,0);
+                cliff.addTile(ref.x-2,ref.y-1,Cliff.topLeftOut_left,0);
+                cliff.addTile(ref.x-1,ref.y-1,Cliff.topLeftOut,0);
                 break;
             case W.bottomLeftIn: // bottom left inner
                 ref.x -= 1;
-                cliff.addTile(ref.x,ref.y-1,62,0);
-                cliff.addTile(ref.x+1,ref.y-1,63,0);
-                cliff.addTile(ref.x,ref.y,77,0);
-                cliff.addTile(ref.x+1,ref.y,78,0);
-                cliff.addTile(ref.x,ref.y+1,92,0);
-                cliff.addTile(ref.x+1,ref.y+1,93,0);
+                cliff.addTile(ref.x,ref.y-1,Cliff.bottomLeftIn_up,0);
+                cliff.addTile(ref.x+1,ref.y-1,Cliff.bottomLeftIn_upright,0);
+                cliff.addTile(ref.x,ref.y,Cliff.bottomLeftIn,0);
+                cliff.addTile(ref.x+1,ref.y,Cliff.bottomLeftIn_right,0);
+                cliff.addTile(ref.x,ref.y+1,Cliff.bottomLeftIn_btm,0);
+                cliff.addTile(ref.x+1,ref.y+1,Cliff.bottomLeftIn_btmright,0);
                 break;
             case W.bottomRightIn: // bottom right inner
-                cliff.addTile(ref.x-1,ref.y-1,66,0);
-                cliff.addTile(ref.x,ref.y-1,67,0);
-                cliff.addTile(ref.x-1,ref.y,81,0);
-                cliff.addTile(ref.x,ref.y,82,0);
-                cliff.addTile(ref.x-1,ref.y+1,96,0);
+                cliff.addTile(ref.x-1,ref.y-1,Cliff.bottomRightIn_topLeft,0);
+                cliff.addTile(ref.x,ref.y-1,Cliff.bottomRightIn_top,0);
+                cliff.addTile(ref.x-1,ref.y,Cliff.bottomRIghtIn_left,0);
+                cliff.addTile(ref.x,ref.y,Cliff.bottomRightIn,0);
+                cliff.addTile(ref.x-1,ref.y+1,Cliff.bottomRightIn_btmleft,0);
                 break;
             case W.top: // top
-                cliff.addTile(ref.x,ref.y-1,randomInt(4,6),0);
+                cliff.addTile(ref.x,ref.y-1,randomInt(Cliff.top1,Cliff.top2+1),0);
                 break;
             case W.right: // right
-                cliff.addTile(ref.x,ref.y,52,0);
+                var l = 0;
+                if(!cliff.children[l].data.get(ref.x,ref.y)) cliff.addTile(ref.x,ref.y,Cliff.right,l);
                 break;
             case W.bottom: // bottom
-                var actualID = randomInt(79,81,0);
+                var actualID = randomInt(Cliff.bottom1,Cliff.bottom2);
                 cliff.addTile(tile.x,tile.y-1,actualID-15,0);
                 cliff.addTile(tile.x,tile.y,actualID,0);
                 cliff.addTile(tile.x,tile.y+1,actualID+15,0);
                 break;
             case W.left: // left
-                cliff.addTile(tile.x-1,tile.y,randomElement([32,47]),0);
+                cliff.addTile(tile.x-1,tile.y,randomElement([Cliff.left1,Cliff.left2]),0);
                 break;
             case W.topRightIn: // top right inner
-                cliff.addTile(tile.x-1,tile.y,69,0);
-                cliff.addTile(tile.x-1,tile.y+1,84,0);
+                cliff.addTile(tile.x-1,tile.y,Cliff.topRightIn,0);
+                cliff.addTile(tile.x-1,tile.y+1,Cliff.topRightIn_btm,1);
                 break;
             case W.topLeftIn: // top left inner
                 ref.y += 1;
-                cliff.addTile(ref.x,ref.y,39,0);
-                cliff.addTile(ref.x,ref.y-1,24,0);
-                cliff.addTile(ref.x,ref.y+1,54,0);
+                cliff.addTile(ref.x,ref.y,Cliff.topLeftIn,0);
+                cliff.addTile(ref.x,ref.y-1,Cliff.topLeftIn_top,0);
+                cliff.addTile(ref.x,ref.y+1,Cliff.topLeftIn_btm,0);
+                if(last == W.bottomRightIn && history[1] == W.topLeftIn){
+                    console.log('oops');
+                    cliff.children[l].data.delete(ref.x-1,ref.y);
+                    cliff.children[l].data.delete(ref.x-1,ref.y-1);
+                    cliff.children[l].data.delete(ref.x-1,ref.y+1);
+                    cliff.children[l].data.delete(ref.x-1,ref.y+2);
+                    cliff.addTile(ref.x-1,ref.y+2,Cliff.topLeftIn_alt,0);
+                    //cliff.addTile(ref.x-1,ref.y+1,Cliff.topLeftIn_altbtm,0);
+                    //cliff.addTile(ref.x-1,ref.y+2,Cliff.topLeftIn_btm,0);
+                }
         }
-        //last = id;
         history.unshift(id);
         last = history[0];
     }
