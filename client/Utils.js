@@ -64,8 +64,8 @@ var Cliff = { // indexes of tiles in tilesets for shores
     left2: 47,
     topRightIn: 69,
     topRightIn_btm: 84,
-    topLeftIn: 39,
     topLeftIn_top: 24,
+    topLeftIn: 39,
     topLeftIn_btm: 54,
     topLeftIn_alt: 68,
     topLeftIn_altbtm: 83
