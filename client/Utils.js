@@ -33,7 +33,8 @@ var Shore = { // indexes of tiles in tilesets for shores
     bottomRightOut: 250,
     bottomLeftOut: 251,
     topRightOut: 271,
-    topLeftOut: 272
+    topLeftOut: 272,
+    water: 292
 };
 
 var Cliff = { // indexes of tiles in tilesets for shores

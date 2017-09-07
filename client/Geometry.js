@@ -35,28 +35,18 @@ Geometry.shoreBox = { // Holds a few fields and data structures used to make wat
     registerTile: function(tile,id){
         var northShore = [W.top, W.topLeftOut, W.topRightOut, W.bottomRightOut, W.bottomLeftOut];
         var southShore = [W.bottom, W.topLeftIn, W.topRightIn, W.bottomLeftIn, W.bottomRightIn];
+        var eastShore = [W.right, W.topRightOut, W.bottomRightIn];
+        var westShore = [W.left];
         if(northShore.includes(id)){
-            Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.north,'x','y','max');
-            console.log('N');
+            Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.north,'x','y','min');
         }else if(southShore.includes(id)){
-            Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.south,'x','y','min');
-            console.log('S');
+            Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.south,'x','y','max');
         }
-
-        /*switch(Geometry.shoreBox.shoreType){
-            case 1: //N,
-                Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.north,'x','y','max');
-                break;
-            case 2: //W,
-                Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.west,'y','x','max');
-                break;
-            case 3: //S
-                Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.south,'x','y','min');
-                break;
-            case 4: //E
-                Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.east,'y','x','min');
-                break;
-        }*/
+        if(westShore.includes(id)){
+            Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.west,'y','x','max');
+        }else if(eastShore.includes(id)){
+            Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.east,'y','x','min');
+        }
     },
     addToMap: function(tile,map,keyCoordinate,valueCoordinate,operator){
         // Add the x/y value of a tile to the map, with the other value as the key.
@@ -81,7 +71,7 @@ Geometry.makeCorona = function(x,y){
     Geometry.coronaSide(pts,1,1,pts[pts.length-1],width,height);
     Geometry.coronaSide(pts,1,-1,pts[pts.length-1],width,height);
     Geometry.coronaSide(pts,-1,-1,pts[pts.length-1],width,height);
-    //printArray(pts);
+    printArray(pts);
     pts.pop();
     return pts;
 };
@@ -164,7 +154,7 @@ Geometry.makePoint = function(x,y){
 };
 
 Geometry.makePolyrect = function(worldx,worldy){
-    var N = 3; // test with n = 5;
+    var N = 1; // test with n = 5;
     var rects = [];
     Geometry.randomRects(rects,worldx,worldy,N,true);
     var pts = Geometry.mergeRects(rects);

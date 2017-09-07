@@ -15,6 +15,7 @@ Chunk.prototype.constructor = Chunk;
 
 Chunk.prototype.drawLayers = function(){
     var origin = Utils.AOItoTile(this.id);
+    console.log(this.id+':'+this.children.length);
     for(var l = 0; l < this.children.length; l++) {
         var layer = this.children[l];
         if(this.fromFile){
@@ -39,6 +40,7 @@ Chunk.prototype.drawLayers = function(){
 Chunk.prototype.addTile = function(x,y,tile,layer){
     if(this.fromFile) return; // original chunks cannot be tampered with
     this.children[layer].data.add(x,y,tile);
+    console.log('added '+tile+' at '+x+', '+y+' on layer '+layer);
 };
 
 Chunk.prototype.drawTile = function(x,y,tile,layer){
