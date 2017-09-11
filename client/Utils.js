@@ -154,6 +154,17 @@ function randomInt (low, high) { // [low, high[
     return Math.floor(Math.random() * (high - low) + low);
 }
 
+function randomNorm(mean,std){
+    return randomZ()*std+mean;
+}
+
+function randomZ() { // Box-Muller transform to return a random value from a reduced normal
+    var u = 0, v = 0;
+    while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+    while(v === 0) v = Math.random();
+    return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+}
+
 function randomElement(arr){
     return arr[Math.floor(Math.random()*arr.length)];
 }

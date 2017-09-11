@@ -56,7 +56,7 @@ Engine.boot = function(){
     Engine.viewHeight = Engine.baseViewHeight;
 
     //Engine.setAction('move');
-    Engine.setAction('addLake');
+    Engine.setAction('addForest');
     Engine.showGrid = Utils.getPreference('showGrid',false);
     Engine.showHero = Utils.getPreference('showHero',true);
     Engine.showHulls = Utils.getPreference('showHulls',false);
@@ -82,6 +82,8 @@ Engine.boot = function(){
     if(Engine.debug) {
         Engine.renderer.view.addEventListener('mouseup', Engine.handleMouseUp, false);
         Engine.renderer.view.addEventListener('mousemove', Engine.trackPosition, false);
+        document.getElementById('w').value = 20;
+        document.getElementById('h').value = 20;
     }
 
     Engine.mapDataLocation = 'assets/maps/chunks';
@@ -504,8 +506,9 @@ Engine.redo = function(){
     Engine[Engine.clickAction](Engine.lastWorldX,Engine.lastWorldY);
 };
 
-Engine.addToLandscape = function(element){
+Engine.addToLandscape = function(element,order){
     element.drawLayers();
+    if(order) element.orderTiles();
     Engine.addToStage(element);
     Engine.editHistory.push(element);
 };
@@ -531,8 +534,8 @@ Engine.addMound = function(x,y){
     //var test ='[{"x":70,"y":9},{"x":68,"y":9},{"x":68,"y":10},{"x":65,"y":10},{"x":65,"y":14},{"x":65,"y":17},{"x":66,"y":17},{"x":66,"y":19},{"x":70,"y":19},{"x":72,"y":19},{"x":72,"y":16},{"x":75,"y":16},{"x":75,"y":14},{"x":75,"y":11},{"x":74,"y":11},{"x":74,"y":9},{"x":70,"y":9}]';
     //var test = '[{"x":72,"y":9},{"x":70,"y":9},{"x":70,"y":10},{"x":67,"y":10},{"x":67,"y":14},{"x":67,"y":15},{"x":68,"y":15},{"x":68,"y":19},{"x":72,"y":19},{"x":73,"y":19},{"x":73,"y":16},{"x":77,"y":16},{"x":77,"y":14},{"x":77,"y":13},{"x":76,"y":13},{"x":76,"y":9},{"x":72,"y":9}]';
     //var test = '[{"x":69,"y":7},{"x":67,"y":7},{"x":67,"y":11},{"x":65,"y":11},{"x":65,"y":13},{"x":59,"y":13},{"x":59,"y":17},{"x":59,"y":20},{"x":61,"y":20},{"x":61,"y":23},{"x":62,"y":23},{"x":62,"y":27},{"x":69,"y":27},{"x":73,"y":27},{"x":73,"y":26},{"x":76,"y":26},{"x":76,"y":23},{"x":77,"y":23},{"x":77,"y":20},{"x":79,"y":20},{"x":79,"y":17},{"x":79,"y":16},{"x":78,"y":16},{"x":78,"y":13},{"x":73,"y":13},{"x":73,"y":7},{"x":69,"y":7}]';
-    //var test = '[{"x":66,"y":9},{"x":62,"y":9},{"x":62,"y":16},{"x":58,"y":16},{"x":58,"y":17},{"x":56,"y":17},{"x":56,"y":19},{"x":56,"y":26},{"x":61,"y":26},{"x":61,"y":27},{"x":64,"y":27},{"x":64,"y":29},{"x":66,"y":29},{"x":72,"y":29},{"x":72,"y":23},{"x":74,"y":23},{"x":74,"y":22},{"x":76,"y":22},{"x":76,"y":19},{"x":76,"y":12},{"x":70,"y":12},{"x":70,"y":11},{"x":68,"y":11},{"x":68,"y":9},{"x":66,"y":9}]';
-    var test = '[{"x":68,"y":5},{"x":64,"y":5},{"x":64,"y":8},{"x":58,"y":8},{"x":58,"y":15},{"x":58,"y":21},{"x":60,"y":21},{"x":60,"y":22},{"x":65,"y":22},{"x":65,"y":23},{"x":66,"y":23},{"x":66,"y":25},{"x":68,"y":25},{"x":73,"y":25},{"x":73,"y":19},{"x":75,"y":19},{"x":75,"y":18},{"x":76,"y":18},{"x":76,"y":17},{"x":78,"y":17},{"x":78,"y":15},{"x":78,"y":10},{"x":76,"y":10},{"x":76,"y":8},{"x":74,"y":8},{"x":74,"y":5},{"x":68,"y":5}]';
+    var test = '[{"x":66,"y":9},{"x":62,"y":9},{"x":62,"y":16},{"x":58,"y":16},{"x":58,"y":17},{"x":56,"y":17},{"x":56,"y":19},{"x":56,"y":26},{"x":61,"y":26},{"x":61,"y":27},{"x":64,"y":27},{"x":64,"y":29},{"x":66,"y":29},{"x":72,"y":29},{"x":72,"y":23},{"x":74,"y":23},{"x":74,"y":22},{"x":76,"y":22},{"x":76,"y":19},{"x":76,"y":12},{"x":70,"y":12},{"x":70,"y":11},{"x":68,"y":11},{"x":68,"y":9},{"x":66,"y":9}]';
+    //var test = '[{"x":68,"y":5},{"x":64,"y":5},{"x":64,"y":8},{"x":58,"y":8},{"x":58,"y":15},{"x":58,"y":21},{"x":60,"y":21},{"x":60,"y":22},{"x":65,"y":22},{"x":65,"y":23},{"x":66,"y":23},{"x":66,"y":25},{"x":68,"y":25},{"x":73,"y":25},{"x":73,"y":19},{"x":75,"y":19},{"x":75,"y":18},{"x":76,"y":18},{"x":76,"y":17},{"x":78,"y":17},{"x":78,"y":15},{"x":78,"y":10},{"x":76,"y":10},{"x":76,"y":8},{"x":74,"y":8},{"x":74,"y":5},{"x":68,"y":5}]';
     var arr = JSON.parse(test);
     arr.pop();
     Engine.addToLandscape(Engine.drawCliff(Geometry.interpolatePoints(arr)));
@@ -548,6 +551,17 @@ Engine.addLake = function(x,y){
     Engine.fillWaterWrapper(true,shore);
     //shore.drawLayers();
     Engine.addToLandscape(shore);
+};
+
+Engine.addForest = function(x,y){
+    //var test = '[{"x":68.01390481179726,"y":19.948466960020596},{"x":71.91202507370703,"y":12.256296129271043},{"x":52.131761041358004,"y":21.272900277948068},{"x":69.51354080859846,"y":22.550574825200318},{"x":70.11297203129236,"y":13.245548291570492},{"x":61.172075643955075,"y":15.412041161953091},{"x":67.83639049953894,"y":20.391081823878803},{"x":63.531982106547666,"y":12.4860516088347},{"x":66.84807290057185,"y":21.28774565046551},{"x":66.0920100901911,"y":22.04152850112851}]';
+    //var test = '[{"x":66.68058314482653,"y":14.891772600068588},{"x":70.42569598988571,"y":24.3963580855579},{"x":69.20695594910786,"y":20.55739490432663},{"x":61.74879064599066,"y":17.093771995184454},{"x":63.97843486834117,"y":10.794979697579834},{"x":57.23742978522096,"y":15.703197882475953},{"x":70.23597908555548,"y":13.073786401455083},{"x":60.209146984320064,"y":10.168956467258251},{"x":59.574302924811626,"y":10.219424746744432},{"x":69.38530111648203,"y":18.809501283087734}]';
+    //var test = '[{"x":74,"y":26},{"x":67,"y":25},{"x":60,"y":30},{"x":75,"y":17},{"x":66,"y":17},{"x":69,"y":26},{"x":80,"y":26},{"x":67,"y":18},{"x":64,"y":16},{"x":67,"y":21}]';
+    //var test = '[{"x":68,"y":21},{"x":65,"y":19},{"x":76,"y":27},{"x":69,"y":22},{"x":68,"y":25},{"x":57,"y":23},{"x":66,"y":24},{"x":71,"y":13},{"x":67,"y":17},{"x":72,"y":18}]';
+    //var test = '[{"x":66,"y":24},{"x":70,"y":20},{"x":64,"y":18},{"x":68,"y":19},{"x":62,"y":23},{"x":68,"y":13},{"x":69,"y":21},{"x":66,"y":27},{"x":73,"y":19},{"x":70,"y":27}]';
+    //var forest = Engine.drawForest(JSON.parse(test));
+    var forest = Engine.drawForest(Geometry.cluster(x,y));
+    Engine.addToLandscape(forest,false); // true/false : order tiles
 };
 
 Engine.drawHull = function(hull){
@@ -598,6 +612,32 @@ Engine.findTileID = function(prev,pt,next){
     }else if(inAngle == 90 && outAngle == 0){
         return W.topLeftIn;
     }
+};
+
+Engine.drawForest = function(pts){
+    var forest = new Chunk(null,3);
+    pts.sort(function(a,b){
+        return a.y > b.y;
+    });
+    for(var i = 0; i < pts.length; i++){
+        var ref = {
+            x: pts[i].x,
+            y: pts[i].y
+        };
+        //console.log(ref.x+', '+ref.y);
+        var v = 681;
+        for(var j = 0; j < 4; j++){
+            for(var k = 0; k < 5; k++){
+                var x = ref.x+j;
+                var y = ref.y+k;
+                //var layer = (k <= 2 ? 2: 1);
+                var layer = 1;
+                while(forest.children[layer].data.get(x,y)) layer++;
+                forest.addTile(x,y,v+22+j+(k*21),layer);
+            }
+        }
+    }
+    return forest;
 };
 
 Engine.drawShore = function(tiles,lake){
@@ -701,12 +741,11 @@ Engine.fillWater = function(lake,chunk,type){
         3: 0,
         4: 0
     };
-    console.log(map);
+
     for(var coord in map){
         if(!map.hasOwnProperty(coord)) continue;
         var start = map[coord];
         var end = oppositeMap[coord] || limit[type];
-        console.log('('+coord+','+start+') - ('+coord+','+end+')');
         var inc = (end-start)/Math.abs(end-start);
         for(var coordBis = start; coordBis != end+inc; coordBis+=inc ){
             var x = (type == 1 || type == 3 ? coord : coordBis);
@@ -781,9 +820,9 @@ Engine.drawCliff = function(pts){
                 break;
             case W.bottomLeftIn: // bottom left inner
                 ref.x -= 1;
-                cliff.addTile(ref.x,ref.y-1,Cliff.bottomLeftIn_up,0);
+                cliff.addTile(ref.x,ref.y-1,Cliff.bottomLeftIn_up,1);
                 cliff.addTile(ref.x+1,ref.y-1,Cliff.bottomLeftIn_upright,0);
-                cliff.addTile(ref.x,ref.y,Cliff.bottomLeftIn,0);
+                cliff.addTile(ref.x,ref.y,Cliff.bottomLeftIn,1);
                 cliff.addTile(ref.x+1,ref.y,Cliff.bottomLeftIn_right,0);
                 cliff.addTile(ref.x,ref.y+1,Cliff.bottomLeftIn_btm,0);
                 cliff.addTile(ref.x+1,ref.y+1,Cliff.bottomLeftIn_btmright,0);
@@ -816,7 +855,7 @@ Engine.drawCliff = function(pts){
                 break;
             case W.topRightIn: // top right inner
                 cliff.addTile(tile.x-1,tile.y,Cliff.topRightIn,0);
-                cliff.addTile(tile.x-1,tile.y+1,Cliff.topRightIn_btm,1);
+                cliff.addTile(tile.x-1,tile.y+1,Cliff.topRightIn_btm,0);
                 if(last == W.bottomLeftIn) cliff.children[0].data.delete(tile.x-1,tile.y-1);
                 break;
             case W.topLeftIn: // top left inner
@@ -849,9 +888,7 @@ Engine.save = function(){
             var tiles = layer.data.toList();
             for(var k = 0; k < tiles.length; k++){
                 var tile = tiles[k];
-                //console.log(tile);
                 var chunkID = Utils.tileToAOI({x:tile.x,y:tile.y});
-                console.log('chunk = '+chunkID);
                 var mapData = Engine.mapDataCache[chunkID];
                 dirtyFiles.add(chunkID);
                 var origin = Utils.AOItoTile(chunkID);
@@ -860,17 +897,6 @@ Engine.save = function(){
                 mapData.layers[j].data[(Engine.chunkWidth*y)+x] = tile.v;
             }
         }
-        /*for(var j = 0; j < element.children.length; j++){
-            var tile = element.children[j];
-            var chunkID = Utils.tileToAOI({x:tile.tileX,y:tile.tileY});
-            var mapData = Engine.mapDataCache[chunkID];
-            dirtyFiles.add(chunkID);
-            console.log('writing '+(tile.tile+1));
-            var origin = Utils.AOItoTile(chunkID);
-            var x = tile.tileX - origin.x;
-            var y = tile.tileY - origin.y;
-            mapData.layers[tile.layer].data[(Engine.chunkWidth*y)+x] = tile.tile+1;
-        }*/
     }
     dirtyFiles.forEach(function(file){
         Client.sendMapData(file,Engine.mapDataCache[file]);

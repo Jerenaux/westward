@@ -59,6 +59,38 @@ Geometry.shoreBox = { // Holds a few fields and data structures used to make wat
     }
 };
 
+Geometry.cluster = function(x,y){
+    var pts = [];
+    var stdX = 5;
+    var stdY = 5;
+    var n = 10;
+    var exclude = [];
+    for(var i = 0; i < n; i++){
+        var pt = {
+            x: Math.round(randomNorm(x,stdX)),
+            y: Math.round(randomNorm(y,stdY))
+        };
+        if(Geometry.containsPt(exclude,pt)){
+            i--;
+            console.log('conflict');
+            continue;
+        }
+        pts.push(pt);
+        for(var e = -3; e < 3; e++){
+            exclude.push({x:pt.x+e,y:pt.y});
+        }
+    }
+    printArray(pts);
+    return pts;
+};
+
+Geometry.containsPt = function(pts,pt){
+    for(var i = 0; i < pts.length; i++){
+        if(pts[i].x == pt.x && pts[i].y == pt.y) return true;
+    }
+    return false;
+};
+
 Geometry.makeCorona = function(x,y){
     var height = document.getElementById('w').value;
     var width = document.getElementById('h').value;
@@ -71,22 +103,24 @@ Geometry.makeCorona = function(x,y){
     Geometry.coronaSide(pts,1,1,pts[pts.length-1],width,height);
     Geometry.coronaSide(pts,1,-1,pts[pts.length-1],width,height);
     Geometry.coronaSide(pts,-1,-1,pts[pts.length-1],width,height);
-    printArray(pts);
+    //printArray(pts);
     pts.pop();
     return pts;
 };
 
 Geometry.coronaSide = function(pts,xstep,ystep,pt,width,height){
+    var initW = width;
+    var initH = height;
     var refDimension = (xstep == ystep ? height : width);
-    //var max = 2*(Math.ceil(Math.sqrt(refDimension)));
-    //var max = Math.ceil(Math.sqrt(refDimension))+1;
     var max = Math.ceil(refDimension/2);
     var nbSegments = randomInt(2,max);
     var alt = +(xstep != ystep);
 
     for(var i = 0; i < nbSegments; i++){
-        var xlength = (i == nbSegments-1 ? width : randomInt(1,width-(nbSegments-i)+1));
-        var ylength = (i == nbSegments-1 ? height : randomInt(1,height-(nbSegments-i)+1));
+        var upperLimitW = Math.min(width-(nbSegments-i),Math.ceil(initW/3));
+        var upperLimitH = Math.min(height-(nbSegments-i),Math.ceil(initH/3));
+        var xlength = (i == nbSegments-1 ? width : randomInt(1,upperLimitW+1));
+        var ylength = (i == nbSegments-1 ? height : randomInt(1,upperLimitH+1));
         width-=xlength;
         height-=ylength;
 
