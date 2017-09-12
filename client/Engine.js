@@ -84,6 +84,7 @@ Engine.boot = function(){
         Engine.renderer.view.addEventListener('mousemove', Engine.trackPosition, false);
         document.getElementById('w').value = 20;
         document.getElementById('h').value = 20;
+        document.getElementById('n').value = 10;
     }
 
     Engine.mapDataLocation = 'assets/maps/chunks';
@@ -616,24 +617,35 @@ Engine.findTileID = function(prev,pt,next){
 
 Engine.drawForest = function(pts){
     var forest = new Chunk(null,3);
+    var types = [1,1,1,2,2,3];
+    var start = {
+        1: 22,
+        2: 5,
+        3: 9
+    };
     pts.sort(function(a,b){
         return a.y > b.y;
     });
     for(var i = 0; i < pts.length; i++){
+        var type = randomElement(types);
+        //var type = 1;
         var ref = {
             x: pts[i].x,
             y: pts[i].y
         };
         //console.log(ref.x+', '+ref.y);
         var v = 681;
-        for(var j = 0; j < 4; j++){
-            for(var k = 0; k < 5; k++){
+        var width = (type <= 2 ? 4 : 5);
+        var height = (type == 1 ? 5 : 6);
+        for(var j = 0; j < width; j++){
+            for(var k = 0; k < height; k++){
                 var x = ref.x+j;
                 var y = ref.y+k;
                 //var layer = (k <= 2 ? 2: 1);
                 var layer = 1;
                 while(forest.children[layer].data.get(x,y)) layer++;
-                forest.addTile(x,y,v+22+j+(k*21),layer);
+                var tile = v+start[type]+j+(k*21);
+                forest.addTile(x,y,tile,layer);
             }
         }
     }

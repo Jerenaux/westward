@@ -61,9 +61,9 @@ Geometry.shoreBox = { // Holds a few fields and data structures used to make wat
 
 Geometry.cluster = function(x,y){
     var pts = [];
-    var stdX = 5;
-    var stdY = 5;
-    var n = 10;
+    var stdX = document.getElementById('w').value;
+    var stdY = document.getElementById('h').value;
+    var n = document.getElementById('n').value;;
     var exclude = [];
     for(var i = 0; i < n; i++){
         var pt = {
@@ -72,7 +72,6 @@ Geometry.cluster = function(x,y){
         };
         if(Geometry.containsPt(exclude,pt)){
             i--;
-            console.log('conflict');
             continue;
         }
         pts.push(pt);

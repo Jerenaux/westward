@@ -21,7 +21,6 @@ function splitMap(fileName,outputDirectory,AOIwidth,AOIheight){
 
     if(!AOIwidth) AOIwidth = 34;
     if(!AOIheight) AOIheight = 20;
-    console.log('splitting');
 
     fs.readFile(__dirname+path+fileName+".json", 'utf8', function (err, data) {
         if (err) throw err;
