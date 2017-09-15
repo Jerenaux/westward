@@ -10,7 +10,8 @@ app.use('/client',express.static(__dirname + '/client'));
 app.use('/server',express.static(__dirname + '/server'));
 
 app.get('/',function(req,res){
-    res.sendFile(__dirname+'/lab.html');
+    //res.sendFile(__dirname+'/lab.html');
+    res.sendFile(__dirname+'/index.html');
 });
 
 server.listen(process.env.PORT || 8081,function(){

@@ -1,29 +1,40 @@
-function Chunk(mapData,z){
-    PIXI.Container.call(this);
+function Chunk(mapData,id,z){
+    //Phaser.GameObjects.Sprite.call(this,Engine.scene);
     this.fromFile = (mapData !== null);
-    this.id = mapData ? mapData.chunkID : 0;
+    //this.id = mapData ? mapData.chunkID : 0;
+    this.id = id;
     this.z = z;
+    var origin = Utils.AOItoTile(this.id);
+    this.x = origin.x;
+    this.y = origin.y;
+    this.children = [];
+    this.layerData = [];
 
     for(var i = 0; i < Engine.nbLayers; i++){
         var data = this.fromFile ? mapData.layers[i].data : null ;
-        this.addChild(new Layer(data));
+        //this.addChild(new Layer(data));
+        this.children.push(Engine.scene.add.image(this.x*Engine.tileWidth,this.y*Engine.tileHeight));
+        this.layerData.push(data);
     }
 }
 
-Chunk.prototype = Object.create(PIXI.Container.prototype);
-Chunk.prototype.constructor = Chunk;
+//Chunk.prototype = Object.create(Phaser.GameObjects.Sprite);
+//Chunk.prototype.constructor = Chunk;
 
 Chunk.prototype.drawLayers = function(){
-    var origin = Utils.AOItoTile(this.id);
+    //var origin = Utils.AOItoTile(this.id);
     for(var l = 0; l < this.children.length; l++) {
         var layer = this.children[l];
         if(this.fromFile){
-            var data = layer.data;
+            //var data = layer.data;
+            var data = this.layerData[l];
             for (var i = 0; i < data.length; i++) {
                 var tile = data[i];
                 if (tile == 0) continue;
-                var x = origin.x + i % Engine.chunkWidth;
-                var y = origin.y + Math.floor(i / Engine.chunkWidth);
+                //var x = origin.x + i % Engine.chunkWidth;
+                //var y = origin.y + Math.floor(i / Engine.chunkWidth);
+                var x = i%Engine.chunkWidth;
+                var y = Math.floor(i / Engine.chunkWidth);
                 this.drawTile(x,y,tile,layer);
             }
         }else{
@@ -55,23 +66,25 @@ Chunk.prototype.drawTile = function(x,y,tile,layer){
     var tilesetID = Engine.getTilesetFromTile(tile);
     var tileset = Engine.tilesets[tilesetID];
     tile -= tileset.firstgid;
-    var wdth = Math.floor(tileset.imagewidth/Engine.tileWidth);
+    /*var wdth = Math.floor(tileset.imagewidth/Engine.tileWidth);
     var tx = tile%wdth;
     var ty = Math.floor(tile/wdth);
     var texture = new PIXI.Texture(Engine.resources[tileset.name].texture, new PIXI.Rectangle(tx*Engine.tileWidth, ty*Engine.tileHeight, Engine.tileWidth, Engine.tileHeight));
-    var sprite = new PIXI.Sprite(texture);
+    var sprite = new PIXI.Sprite(texture);*/
+    var sprite = Engine.scene.add.sprite(x*Engine.tileWidth,y*Engine.tileHeight,tileset.name);
     sprite.tileID = tile;
-    sprite.position.set(x*Engine.tileWidth,y*Engine.tileHeight);
+    //sprite.position.set(x*Engine.tileWidth,y*Engine.tileHeight);
     layer.addChild(sprite);
 };
 
 // ##############################
 
-function Layer(data){
-    PIXI.Container.call(this);
+/*function Layer(data){
+    Phaser.GameObjects.Image.call(this,Engine.scene);
     this.data = (data !== null ? data : new SpaceMap());
 }
 
-Layer.prototype = Object.create(PIXI.Container.prototype);
-Layer.prototype.constructor = Layer;
+//Layer.prototype = Object.create(PIXI.Container.prototype);
+Layer.prototype = Object.create(Phaser.GameObjects.Image);
+Layer.prototype.constructor = Layer;*/
 

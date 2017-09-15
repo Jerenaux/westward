@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script type="text/javascript" src="client/pixi.js"></script>
+    <!-- <script type="text/javascript" src="client/pixi.js"></script>-->
+    <script src="/client/phaser.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">-->
     <link href="/client/style.css" rel="stylesheet">
     <title>Westward</title>
 </head>
 <body>
-    <canvas id='game'></canvas>
+    <div id='game'></div>
     <div class="info">
         Pixel: <span id="pxx">0</span>,<span id="pxy">0</span><br/>
         Tile: <span id="tx">0</span>,<span id="ty">0</span><br/>
@@ -52,4 +53,6 @@
 <script src="client/Geometry.js" type="text/javascript"></script>
 <script src="client/Chunk.js" type="text/javascript"></script>
 <script src="client/Engine.js" type="text/javascript"></script>
+<script src="client/boot.js" type="text/javascript"></script>
+<script src="client/main.js" type="text/javascript"></script>
 </html>

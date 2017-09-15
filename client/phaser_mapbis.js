@@ -42,7 +42,7 @@ var Engine = {
 
 function create(){
     Game = game.scene.scenes[0];
-    var start = new Phaser.Geom.Point(10,10);
+    var start = new Phaser.Geom.Point(30,10);
     var aoi = getAOI(start.x,start.y);
     var adjacent = Utils.listAdjacentAOIs(aoi);
     adjacent.forEach(function(aoi){
@@ -51,6 +51,25 @@ function create(){
     //loadChunk(aoi,displayChunk);
     game.hero = this.add.sprite(start.x*32,start.y*32,'hero');
     game.hero.z = 1;
+    var cam = this.cameras.main;
+    console.log(cam);
+    cam.zoom = 0.25;
+    cam.setBounds(0,0,100*32,100*32);
+    cam.startFollow(game.hero);
+    Scene = this.scene.scene;
+    console.log(Scene);
+    this.input.events.on('MOUSE_DOWN_EVENT', function (event) {
+        //var x = Math.floor((cam.scrollX + event.x)/32);
+        game.hero.x = cam.scrollX+(event.x*cam.zoom);
+        game.hero.y = cam.scrollY+(event.y*cam.zoom);
+        var aoi = getAOI(Math.floor(game.hero.x/32),Math.floor(game.hero.y/32));
+        console.log('aoi : '+aoi);
+        var adjacent = Utils.listAdjacentAOIs(aoi);
+        adjacent.forEach(function(aoi){
+            loadChunk(aoi,displayChunk);
+        });
+    });
+
 }
 
 function update(){
@@ -80,6 +99,7 @@ function loadChunk(id,callback){
 }
 
 function displayChunk(data,chunkID){
+    console.log('displayin '+chunkID);
     var ox = (chunkID%6)*34;
     var oy = Math.floor(chunkID/6)*20;
     for (var l = 0; l < data.layers.length; l++) {
@@ -88,7 +108,7 @@ function displayChunk(data,chunkID){
             if(tile == -1) continue;
             var x = ox + i%34;
             var y = oy + Math.floor(i/34);
-            Game.add.image(x*32,y*32,'tileset',tile);
+            Scene.add.image(x*32,y*32,'tileset',tile);
         }
     }
     //storeChunk(data,chunkID);
