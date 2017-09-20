@@ -2,6 +2,8 @@
  * Created by Jerome on 11-08-17.
  */
 
+var onServer = (typeof window === 'undefined');
+
 var Utils = {
     separator : '_'
 };
@@ -150,9 +152,9 @@ Utils.listAdjacentAOIs = function(current){
     return AOIs;
 };
 
-function randomInt (low, high) { // [low, high[
+Utils.randomInt = function(low, high) { // [low, high[
     return Math.floor(Math.random() * (high - low) + low);
-}
+};
 
 function randomNorm(mean,std){
     return randomZ()*std+mean;
@@ -206,17 +208,4 @@ function printArray(arr){
     console.log(JSON.stringify(arr));
 }
 
-function printPt(pt){
-    return pt.x+', '+pt.y;
-}
-
-
-/*Utils.listAdjacentChunks = function(current){
- var scope = Math.floor(1/Engine.zoomScale); // number of chunks to display along one axis based on zoom
- var delta = Math.floor(scope/2)+1; // number of chunks to substract from current to get bounds of view area
- var macro = Utils.getMacroCoordinates(current);
- //console.log(macro.x+', '+macro.y);
- var leftLimit = Math.max(macro.y*Engine.nbChunksHorizontal, current - delta); // id of the leftmost chunk of the view area
- var topLeft = Math.max(leftLimit%Engine.nbChunksHorizontal, leftLimit - delta*Engine.nbChunksHorizontal);  // if of the top left chunk of the view area
- console.log('Top corner for '+current+' : '+topLeft);
- };*/
+if (onServer) module.exports.Utils = Utils;

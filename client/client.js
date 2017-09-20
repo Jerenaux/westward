@@ -55,6 +55,22 @@ Client.socket.on(Client.initEventName,function(data){ // This event triggers whe
     //Game.updateNbConnected(data.nbconnected);
 });
 
+Client.sendMove = function(x,y){
+    Client.socket.emit('move',{x:x,y:y});
+};
+
+Client.socket.on('newplayer',function(data){
+    Engine.addPlayer(data.id,data.x,data.y);
+});
+
+Client.socket.on('removeplayer',function(data){
+    Engine.removePlayer(data);
+});
+
+Client.socket.on('move',function(data){
+    Engine.moveSprite(data.id,data.x,data.y);
+});
+
 // ####################"
 
 Client.sendMapData = function(id,data){

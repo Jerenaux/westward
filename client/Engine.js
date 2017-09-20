@@ -22,32 +22,6 @@ Engine.camera = {
 };
 
 Engine.boot = function(){
-    /*TODO:
-    * Procedural world
-    * Network
-    - Display players
-    - Sync movement
-    - AOI
-    - Update packages
-     - Interact with db
-     - Latency estimation
-     - Load existing player
-
-    - Two repositories, for production and development, with node scripts taking care
-    of copying what is needed from one to the other (+ uglifying and compressing etc.)
-    -> Possible to programmatically push?  http://radek.io/2015/10/27/nodegit/
-    - Somehow remove/disable debug components automatically
-    - Desktop app a simple terminal that gets everything from server (= exact same
-    appearance and behaviour, reduced code visibility, and possibly *no* node-modules)
-    - Scripts to group what is needed for the app, uglify/compress and build
-    - Migrate Geometry to server to hide it?
-    -----
-    * Tools:
-    - Top-down visibility optimization (create a lookup table of transparency)
-    - Prune map files more
-    - Testing (make part of the pipeline)
-    */
-
    /* Engine.renderer = PIXI.autoDetectRenderer(
         Engine.baseViewWidth*Engine.tileWidth,
         Engine.baseViewHeight*Engine.tileHeight,
@@ -131,6 +105,35 @@ Engine.preload = function() {
 };
 
 Engine.create = function(masterData){
+    /*TODO:
+     * Cleaning:
+     - Restore "studio" capabilities
+     - Remove comment-out stuff
+     - Clean up Utils
+     - Move Geometry to studio?
+     * Procedural world
+     * Network
+     - AOI & Update packages
+     -- Get existing players on connect, sync movement using AOI/packages
+     - trim
+     - Interact with db
+     - Latency estimation
+     - Load existing player
+
+     - Two repositories, for production and development, with node scripts taking care
+     of copying what is needed from one to the other (+ uglifying and compressing etc.)
+     -> Possible to programmatically push?  http://radek.io/2015/10/27/nodegit/
+     - Somehow remove/disable debug components automatically
+     - Desktop app a simple terminal that gets everything from server (= exact same
+     appearance and behaviour, reduced code visibility, and possibly *no* node-modules)
+     - Scripts to group what is needed for the app, uglify/compress and build
+     - Migrate Geometry to server to hide it?
+     -----
+     * Tools:
+     - Top-down visibility optimization (create a lookup table of transparency)
+     - Prune map files more
+     - Testing (make part of the pipeline)
+     */
     Engine.tileWidth = masterData.tilesets[0].tilewidth;
     Engine.tileHeight = masterData.tilesets[0].tileheight;
     Engine.chunkWidth = masterData.chunkWidth;
@@ -151,6 +154,8 @@ Engine.create = function(masterData){
     Engine.displayedChunks = [];
     Engine.mapDataCache = {};
 
+    Engine.players = {}; // player.id -> player
+
     Engine.debug = true;
     Engine.showHero = Engine.debug ? Utils.getPreference('showHero',true) : true;
     //Engine.showGrid = Engine.debug ? Utils.getPreference('showGrid',false) : false;
@@ -165,22 +170,33 @@ Engine.create = function(masterData){
     Client.requestData();
 };
 
-Engine.initWorld = function(){
-    Engine.addHero();
+Engine.initWorld = function(data){
+    Engine.addHero(data.id,data.x,data.y);
     Engine.playerIsInitialized = true;
     // TODO: when all chunks loaded, fade-out Boot scene
 };
 
-Engine.addHero = function(){
-    var startx = 3; //35
-    var starty = 3;//30;
-    //Engine.player = Engine.addSprite('hero',startx,starty);
-    Engine.player = Engine.scene.add.sprite(startx*Engine.tileWidth,starty*Engine.tileHeight,'hero');
+Engine.addHero = function(id,x,y){
+    Engine.player = Engine.addPlayer(id,x,y);
     Engine.player.visible = Engine.showHero;
-    Engine.player.z = 1;
     Engine.camera.startFollow(Engine.player);
-    Engine.player.chunk = Utils.tileToAOI({x:startx,y:starty});
+    Engine.player.chunk = Utils.tileToAOI({x:x,y:y});
     Engine.updateEnvironment();
+};
+
+Engine.addPlayer = function(id,x,y){
+    if(Engine.playerIsInitialized && id == Engine.player.id) return;
+    var sprite = Engine.scene.add.sprite(x*Engine.tileWidth,y*Engine.tileHeight,'hero');
+    sprite.id = id;
+    sprite.z = 1;
+    Engine.players[id] = sprite;
+    return sprite;
+};
+
+Engine.removePlayer = function(id){
+    var sprite = Engine.players[id];
+    sprite.destroy();
+    delete Engine.players[id];
 };
 
 Engine.updateEnvironment = function(){
@@ -189,12 +205,12 @@ Engine.updateEnvironment = function(){
     var oldChunks = Engine.displayedChunks.diff(chunks);
 
     for (var i = 0; i < oldChunks.length; i++) {
-        console.log('removing '+oldChunks[i]);
-        //Engine.removeChunk(oldChunks[i]);
+        //console.log('removing '+oldChunks[i]);
+        Engine.removeChunk(oldChunks[i]);
     }
 
     for(var j = 0; j < newChunks.length; j++){
-        console.log('adding '+newChunks[j]);
+        //console.log('adding '+newChunks[j]);
         Engine.displayChunk(newChunks[j]);
     }
 };
@@ -240,11 +256,11 @@ Engine.removeChunk = function(id){
 Engine.move = function(event){
     var x = Math.floor((Engine.camera.scrollX + event.x)/Engine.tileWidth);
     var y = Math.floor((Engine.camera.scrollY + event.y)/Engine.tileHeight);
-    Engine.player.x = x*Engine.tileWidth;
-    Engine.player.y = y*Engine.tileHeight;
+    Engine.moveSprite(Engine.player.id,x,y);
     Engine.player.chunk = Utils.tileToAOI({x:x,y:y});
     if(Engine.player.chunk != Engine.player.previousChunk) Engine.updateEnvironment();
     Engine.player.previousChunk = Engine.player.chunk;
+    Client.sendMove(x,y);
     //Engine.updateCamera();
     /*function (event) {
      //var x = Math.floor((cam.scrollX + event.x)/32);
@@ -257,6 +273,12 @@ Engine.move = function(event){
      loadChunk(aoi,displayChunk);
      });
      }*/
+};
+
+Engine.moveSprite = function(id,x,y){
+    var player = Engine.players[id];
+    player.x = x*Engine.tileWidth;
+    player.y = y*Engine.tileHeight;
 };
 
 Engine.update = function(){

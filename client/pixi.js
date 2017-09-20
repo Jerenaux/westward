@@ -8098,7 +8098,7 @@ exports.default = Shader;
 exports.__esModule = true;
 exports.autoDetectRenderer = autoDetectRenderer;
 
-var _utils = require('./utils');
+var _utils = require('./../shared/Utils');
 
 var utils = _interopRequireWildcard(_utils);
 
@@ -13725,7 +13725,7 @@ Object.defineProperty(exports, 'autoDetectRenderer', {
   }
 });
 
-var _utils = require('./utils');
+var _utils = require('./../shared/Utils');
 
 var utils = _interopRequireWildcard(_utils);
 
