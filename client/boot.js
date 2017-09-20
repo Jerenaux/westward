@@ -5,7 +5,7 @@
 var Boot = {
     key: 'boot',
     preload: function(){
-        Boot.mapDataLocation = 'assets/maps/chunks';
+        Boot.mapDataLocation = 'assets/maps/pqchunks_flat'; // make Express route based on env variable
         Boot.masterKey = 'master';
         this.load.json(Boot.masterKey,Boot.mapDataLocation+'/master.json');
     },

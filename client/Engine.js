@@ -6,7 +6,8 @@ var Engine = {
     baseViewHeight: 18,
     tileWidth: 32,
     tileHeight: 32,
-    key: 'main'
+    key: 'main', // key of the scene, for Phaser
+    playerIsInitialized: false
 };
 
 Engine.camera = {
@@ -22,23 +23,26 @@ Engine.camera = {
 
 Engine.boot = function(){
     /*TODO:
-    * Procedural world:
-    - Fix rivers
-    - Forests
-    - Dirt
+    * Procedural world
     * Network
+    - Display players
+    - Sync movement
+    - AOI
+    - Update packages
+     - Interact with db
+     - Latency estimation
+     - Load existing player
+
     - Two repositories, for production and development, with node scripts taking care
     of copying what is needed from one to the other (+ uglifying and compressing etc.)
     -> Possible to programmatically push?  http://radek.io/2015/10/27/nodegit/
     - Somehow remove/disable debug components automatically
     - Desktop app a simple terminal that gets everything from server (= exact same
     appearance and behaviour, reduced code visibility, and possibly *no* node-modules)
-    - Scripts to group what is needed for the app, ugligy/compress and build
-    - In any case, migrate Geometry to server to hide it
-    * History & design document
+    - Scripts to group what is needed for the app, uglify/compress and build
+    - Migrate Geometry to server to hide it?
     -----
     * Tools:
-    - Load more chunks upon zoom
     - Top-down visibility optimization (create a lookup table of transparency)
     - Prune map files more
     - Testing (make part of the pipeline)
@@ -121,8 +125,9 @@ Engine.preload = function() {
     for(var i = 0; i < Boot.tilesets.length; i++){
         var tileset = Boot.tilesets[i];
         var path = 'assets/'+tileset.image.slice(2);// The paths in the master file are relative to the assets/maps directory
-        this.load.image('tileset.name', path,{frameWidth:tileset.tilewidth,frameHeight:tileset.tileheight});
+        this.load.spritesheet(tileset.name, path,{frameWidth:tileset.tilewidth,frameHeight:tileset.tileheight});
     }
+    console.log('Loading '+i+' tileset'+(i > 1 ? 's' : ''));
 };
 
 Engine.create = function(masterData){
@@ -153,13 +158,22 @@ Engine.create = function(masterData){
 
     Engine.scene = this.scene.scene;
     Engine.camera = Engine.scene.cameras.main;
-    Engine.camera.setBounds(0,0,Engine.worldWidth,Engine.worldHeight);
+    Engine.camera.setBounds(0,0,Engine.worldWidth*Engine.tileWidth,Engine.worldHeight*Engine.tileHeight);
+
+    Engine.scene.input.events.on('MOUSE_DOWN_EVENT', Engine.move);
+
+    Client.requestData();
+};
+
+Engine.initWorld = function(){
     Engine.addHero();
+    Engine.playerIsInitialized = true;
+    // TODO: when all chunks loaded, fade-out Boot scene
 };
 
 Engine.addHero = function(){
-    var startx = 5; //35
-    var starty = 5;//30;
+    var startx = 3; //35
+    var starty = 3;//30;
     //Engine.player = Engine.addSprite('hero',startx,starty);
     Engine.player = Engine.scene.add.sprite(startx*Engine.tileWidth,starty*Engine.tileHeight,'hero');
     Engine.player.visible = Engine.showHero;
@@ -174,11 +188,9 @@ Engine.updateEnvironment = function(){
     var newChunks = chunks.diff(Engine.displayedChunks);
     var oldChunks = Engine.displayedChunks.diff(chunks);
 
-    if(!Engine.debug) {
-        for (var i = 0; i < oldChunks.length; i++) {
-            console.log('removing '+oldChunks[i]);
-            //Engine.removeChunk(oldChunks[i]);
-        }
+    for (var i = 0; i < oldChunks.length; i++) {
+        console.log('removing '+oldChunks[i]);
+        //Engine.removeChunk(oldChunks[i]);
     }
 
     for(var j = 0; j < newChunks.length; j++){
@@ -217,6 +229,34 @@ Engine.drawChunk = function(mapData,id){
     chunk.drawLayers();
     Engine.displayedChunks.push(chunk.id);
     if(Engine.showGrid) Engine.drawGrid(chunk);
+};
+
+Engine.removeChunk = function(id){
+    Engine.chunks[id].removeLayers();
+    //Engine.stage.removeChild(Engine.chunks[id]);
+    Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
+};
+
+Engine.move = function(event){
+    var x = Math.floor((Engine.camera.scrollX + event.x)/Engine.tileWidth);
+    var y = Math.floor((Engine.camera.scrollY + event.y)/Engine.tileHeight);
+    Engine.player.x = x*Engine.tileWidth;
+    Engine.player.y = y*Engine.tileHeight;
+    Engine.player.chunk = Utils.tileToAOI({x:x,y:y});
+    if(Engine.player.chunk != Engine.player.previousChunk) Engine.updateEnvironment();
+    Engine.player.previousChunk = Engine.player.chunk;
+    //Engine.updateCamera();
+    /*function (event) {
+     //var x = Math.floor((cam.scrollX + event.x)/32);
+     game.hero.x = cam.scrollX+(event.x*cam.zoom);
+     game.hero.y = cam.scrollY+(event.y*cam.zoom);
+     var aoi = getAOI(Math.floor(game.hero.x/32),Math.floor(game.hero.y/32));
+     console.log('aoi : '+aoi);
+     var adjacent = Utils.listAdjacentAOIs(aoi);
+     adjacent.forEach(function(aoi){
+     loadChunk(aoi,displayChunk);
+     });
+     }*/
 };
 
 Engine.update = function(){
@@ -396,12 +436,6 @@ Engine.getTilesetFromTile = function(tile){
     chunk.addChild(sprite);
 };*/
 
-Engine.removeChunk = function(id){
-    Engine.stage.removeChild(Engine.chunks[id]);
-    Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
-};
-
-
 Engine.zoom = function(coef){
     var increment;
     if(coef == -1){
@@ -473,14 +507,6 @@ Engine.updateCamera = function(){
     Engine.stage.pivot.set(Engine.camera.x*Engine.tileWidth,Engine.camera.y*Engine.tileHeight);
     document.getElementById('cx').innerHTML = Engine.camera.x;
     document.getElementById('cy').innerHTML = Engine.camera.y;
-};
-
-Engine.move = function(x,y){
-    Engine.setPosition(Engine.player,x,y);
-    Engine.player.chunk = Utils.tileToAOI(Engine.player.tilePosition);
-    if(Engine.player.chunk != Engine.player.previousChunk) Engine.updateEnvironment();
-    Engine.player.previousChunk = Engine.player.chunk;
-    Engine.updateCamera();
 };
 
 Engine.setPosition = function(sprite,x,y){
