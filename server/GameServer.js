@@ -43,7 +43,7 @@ GameServer.move = function(socketID,x,y){
 };
 
 GameServer.updatePlayers = function(){ //Function responsible for setting up and sending update packets to clients
-    Object.keys(GameServer.players).forEach(function(key) {
+    /*Object.keys(GameServer.players).forEach(function(key) {
         var player = GameServer.players[key];
         var localPkg = player.getIndividualUpdatePackage(); // the local pkg is player-specific
         var globalPkg = GameServer.AOIs[player.aoi].getUpdatePacket(); // the global pkg is AOI-specific
@@ -63,7 +63,7 @@ GameServer.updatePlayers = function(){ //Function responsible for setting up and
         player.newAOIs = [];
     });
     GameServer.nbConnectedChanged = false;
-    GameServer.clearAOIs(); // erase the update content of all AOIs that had any
+    GameServer.clearAOIs(); // erase the update content of all AOIs that had any*/
 };
 
 module.exports.GameServer = GameServer;

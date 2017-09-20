@@ -9,6 +9,7 @@ app.use('/assets',express.static(__dirname + '/assets'));
 app.use('/client',express.static(__dirname + '/client'));
 app.use('/server',express.static(__dirname + '/server'));
 app.use('/shared',express.static(__dirname + '/shared'));
+if(process.env.DEV == 1) app.use('/studio',express.static(__dirname + '/studio'));
 
 app.get('/',function(req,res){
     res.sendFile(__dirname+'/index.html');
@@ -16,7 +17,10 @@ app.get('/',function(req,res){
 
 if(process.env.DEV == 1) {
     app.get('/studio', function (req, res) {
-        res.sendFile(__dirname + '/studio.html');
+        res.sendFile(__dirname + '/studio/studio.html');
+    });
+    app.get('/map', function (req, res) {
+        res.sendFile(__dirname + '/studio/map.html');
     });
 }
 

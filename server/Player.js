@@ -9,7 +9,7 @@ function Player(socketID,playerID){
     this.id = playerID;
     this.x = Utils.randomInt(1,21);
     this.y = Utils.randomInt(1,16);
-    this.updatePacket = new PersonalUpdatePacket();
+    //this.updatePacket = new PersonalUpdatePacket();
     console.log('['+this.id+'] Hi at '+this.x+', '+this.y);
 }
 
