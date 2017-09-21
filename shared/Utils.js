@@ -85,15 +85,15 @@ Utils.getPreference = function(parameter,defaultValue){ // Retrieve sorting pref
 
 Utils.tileToAOI = function(tile){ // input coords in Tiles
     if(tile.x < 0 || tile.y < 0) console.log('ALERT: negative coordinates');
-    var top = Math.floor(tile.y/Engine.chunkHeight);
-    var left = Math.floor(tile.x/Engine.chunkWidth);
-    return (top*Engine.nbChunksHorizontal)+left;
+    var top = Math.floor(tile.y/Utils.chunkHeight);
+    var left = Math.floor(tile.x/Utils.chunkWidth);
+    return (top*Utils.nbChunksHorizontal)+left;
 };
 
 Utils.AOItoTile = function(aoi){
     return {
-        x : (aoi%Engine.nbChunksHorizontal)*Engine.chunkWidth,
-        y : Math.floor(aoi/Engine.nbChunksHorizontal)*Engine.chunkHeight
+        x : (aoi%Utils.nbChunksHorizontal)*Utils.chunkWidth,
+        y : Math.floor(aoi/Utils.nbChunksHorizontal)*Utils.chunkHeight
     };
 };
 
@@ -109,7 +109,7 @@ Utils.getMacroCoordinates = function(chunk){
     }
 };
 
-Utils.listVisibleAOIs = function(start){
+Utils.listVisibleAOIs = function(start){ // List the visible chunks around the player based on zoom level
     var limit;
     switch(Engine.zoomScale){
         case 0.25:

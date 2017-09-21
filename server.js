@@ -4,11 +4,11 @@ var server = require('http').Server(app);
 var io = require('socket.io').listen(server);
 var fs = require('fs');
 
-//app.use('/css',express.static(__dirname + '/client/css'));
 app.use('/assets',express.static(__dirname + '/assets'));
 app.use('/client',express.static(__dirname + '/client'));
 app.use('/server',express.static(__dirname + '/server'));
 app.use('/shared',express.static(__dirname + '/shared'));
+app.use('/maps',express.static(process.env.MAPS_PATH));
 if(process.env.DEV == 1) app.use('/studio',express.static(__dirname + '/studio'));
 
 app.get('/',function(req,res){
@@ -22,10 +22,14 @@ if(process.env.DEV == 1) {
     app.get('/map', function (req, res) {
         res.sendFile(__dirname + '/studio/map.html');
     });
+    app.get('/bezier', function (req, res) {
+        res.sendFile(__dirname + '/studio/bezier.html');
+    });
 }
 
 server.listen(process.env.PORT || 8081,function(){
     console.log('Listening on '+server.address().port);
+    gs.readMap(process.env.MAPS_PATH);
     server.setUpdateLoop();
 });
 
@@ -63,6 +67,37 @@ io.on('connection',function(socket){
     }
 });
 
+server.setUpdateLoop = function(){
+    setInterval(gs.updatePlayers,server.clientUpdateRate);
+};
+
+server.sendUpdate = function(socketID,pkg){
+    pkg = server.addStamp(pkg);
+    /*try{
+        pkg.latency = Math.floor(server.getSocket(socketID).latency);
+    }catch(e){
+        console.log(e);
+        pkg.latency = 0;
+    }*/
+    //if(server.enableBinary) pkg = Encoder.encode(pkg,CoDec.finalUpdateSchema);
+    if(pkg) io.in(socketID).emit('update',pkg);
+};
+
+server.addStamp = function(pkg){
+    pkg.stamp = server.getShortStamp();
+    return pkg;
+};
+
+server.getShortStamp = function(){
+    return parseInt(Date.now().toString().substr(-9));
+};
+
+server.getNbConnected =function(){
+    return Object.keys(gs.players).length;
+};
+
+// ################""
+
 server.sendMsg = function(socket,msg,data){
     socket.emit(msg,data);
 };
@@ -70,13 +105,4 @@ server.sendMsg = function(socket,msg,data){
 server.emitMsg = function(msg,data){
     //console.log('msg = '+msg+', data = '+data);
     io.emit(msg,data);
-};
-
-server.setUpdateLoop = function(){
-    setInterval(gs.updatePlayers,server.clientUpdateRate);
-};
-
-
-server.getNbConnected =function(){
-    return Object.keys(gs.players).length;
 };

@@ -1,8 +1,12 @@
 /**
  * Created by Jerome on 20-09-17.
  */
+var fs = require('fs');
 var clone = require('clone'); // used to clone objects, essentially used for clonick update packets
 
+var Utils = require('../shared/Utils.js').Utils;
+//var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
+var AOI = require('./AOI.js').AOI;
 var Player = require('./Player.js').Player;
 
 var GameServer = {
@@ -10,6 +14,25 @@ var GameServer = {
     players: {}, // player.id -> player
     socketMap: {}, // socket.id -> player.id
     nbConnectedChanged: false
+};
+
+GameServer.readMap = function(mapsPath){
+    var masterData = JSON.parse(fs.readFileSync(mapsPath+'/master.json').toString());
+
+    Utils.chunkWidth = masterData.chunkWidth;
+    Utils.chunkHeight = masterData.chunkHeight;
+    Utils.nbChunksHorizontal = masterData.nbChunksHoriz;
+    Utils.nbChunksVertical = masterData.nbChunksVert;
+    Utils.lastChunkID = (Utils.nbChunksHorizontal*Utils.nbChunksVertical)-1;
+
+    GameServer.AOIs = []; // Maps AOI id to AOI object
+    GameServer.dirtyAOIs = new Set(); // Set of AOI's whose update package have changes since last update
+
+    for(var i = 0; i <= Utils.lastChunkID; i++){
+        GameServer.AOIs.push(new AOI(i));
+    }
+
+    console.log('[Master data read]');
 };
 
 GameServer.getPlayer = function(socketID){
@@ -43,7 +66,7 @@ GameServer.move = function(socketID,x,y){
 };
 
 GameServer.updatePlayers = function(){ //Function responsible for setting up and sending update packets to clients
-    /*Object.keys(GameServer.players).forEach(function(key) {
+    Object.keys(GameServer.players).forEach(function(key) {
         var player = GameServer.players[key];
         var localPkg = player.getIndividualUpdatePackage(); // the local pkg is player-specific
         var globalPkg = GameServer.AOIs[player.aoi].getUpdatePacket(); // the global pkg is AOI-specific
@@ -52,7 +75,7 @@ GameServer.updatePlayers = function(){ //Function responsible for setting up and
         for(var i = 0; i < player.newAOIs.length; i++){
             individualGlobalPkg.synchronize(GameServer.AOIs[player.newAOIs[i]]); // fetch updates from the new AOIs
         }
-        individualGlobalPkg.removeEcho(player.id); // remove redundant information from multiple update sources
+        //individualGlobalPkg.removeEcho(player.id); // remove redundant information from multiple update sources
         if(individualGlobalPkg.isEmpty()) individualGlobalPkg = null;
         if(individualGlobalPkg === null && localPkg === null && !GameServer.nbConnectedChanged) return;
         var finalPackage = {};
@@ -63,7 +86,14 @@ GameServer.updatePlayers = function(){ //Function responsible for setting up and
         player.newAOIs = [];
     });
     GameServer.nbConnectedChanged = false;
-    GameServer.clearAOIs(); // erase the update content of all AOIs that had any*/
+    GameServer.clearAOIs(); // erase the update content of all AOIs that had any
+};
+
+GameServer.clearAOIs = function(){
+    GameServer.dirtyAOIs.forEach(function(aoi){
+        GameServer.AOIs[aoi].clear();
+    });
+    GameServer.dirtyAOIs.clear();
 };
 
 module.exports.GameServer = GameServer;

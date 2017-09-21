@@ -105,44 +105,17 @@ Engine.preload = function() {
 };
 
 Engine.create = function(masterData){
-    /*TODO:
-     * Cleaning:
-     - Restore "studio" capabilities
-     - Remove comment-out stuff
-     - Clean up Utils
-     - Move Geometry to studio?
-     * Procedural world
-     * Network
-     - AOI & Update packages
-     -- Get existing players on connect, sync movement using AOI/packages
-     - trim
-     - Interact with db
-     - Latency estimation
-     - Load existing player
-
-     - Two repositories, for production and development, with node scripts taking care
-     of copying what is needed from one to the other (+ uglifying and compressing etc.)
-     -> Possible to programmatically push?  http://radek.io/2015/10/27/nodegit/
-     - Somehow remove/disable debug components automatically
-     - Desktop app a simple terminal that gets everything from server (= exact same
-     appearance and behaviour, reduced code visibility, and possibly *no* node-modules)
-     - Scripts to group what is needed for the app, uglify/compress and build
-     - Migrate Geometry to server to hide it?
-     -----
-     * Tools:
-     - Top-down visibility optimization (create a lookup table of transparency)
-     - Prune map files more
-     - Testing (make part of the pipeline)
-     */
     Engine.tileWidth = masterData.tilesets[0].tilewidth;
     Engine.tileHeight = masterData.tilesets[0].tileheight;
     Engine.chunkWidth = masterData.chunkWidth;
     Engine.chunkHeight = masterData.chunkHeight;
-    Engine.nbChunksHorizontal = masterData.nbChunksHoriz;
-    Engine.nbChunksVertical = masterData.nbChunksVert;
-    Engine.worldWidth = Engine.nbChunksHorizontal*Engine.chunkWidth;
-    Engine.worldHeight = Engine.nbChunksVertical*Engine.chunkHeight;
-    Engine.lastChunkID = (Engine.nbChunksHorizontal*Engine.nbChunksVertical)-1;
+    Utils.chunkWidth = Engine.chunkWidth;
+    Utils.chunkHeight = Engine.chunkHeight;
+    Utils.nbChunksHorizontal = masterData.nbChunksHoriz;
+    Utils.nbChunksVertical = masterData.nbChunksVert;
+    Engine.worldWidth = Utils.nbChunksHorizontal*Engine.chunkWidth;
+    Engine.worldHeight = Utils.nbChunksVertical*Engine.chunkHeight;
+    Utils.lastChunkID = (Utils.nbChunksHorizontal*Utils.nbChunksVertical)-1;
     Engine.nbLayers = masterData.nbLayers;
     Engine.mapDataLocation = Boot.mapDataLocation;
     console.log('Master file read, setting up world of size '+Engine.worldWidth+' x '+Engine.worldHeight+' with '+Engine.nbLayers+' layers');
@@ -181,7 +154,7 @@ Engine.addHero = function(id,x,y){
     Engine.player.visible = Engine.showHero;
     Engine.camera.startFollow(Engine.player);
     Engine.player.chunk = Utils.tileToAOI({x:x,y:y});
-    Engine.updateEnvironment();
+    //.updateEnvironment();
 };
 
 Engine.addPlayer = function(id,x,y){
@@ -321,11 +294,11 @@ Engine.readMaster = function(masterData){
     Engine.tileHeight = masterData.tilesets[0].tileheight;
     Engine.chunkWidth = masterData.chunkWidth;
     Engine.chunkHeight = masterData.chunkHeight;
-    Engine.nbChunksHorizontal = masterData.nbChunksHoriz;
-    Engine.nbChunksVertical = masterData.nbChunksVert;
-    Engine.worldWidth = Engine.nbChunksHorizontal*Engine.chunkWidth;
-    Engine.worldHeight = Engine.nbChunksVertical*Engine.chunkHeight;
-    Engine.lastChunkID = (Engine.nbChunksHorizontal*Engine.nbChunksVertical)-1;
+    Utils.nbChunksHorizontal = masterData.nbChunksHoriz;
+    Utils.nbChunksVertical = masterData.nbChunksVert;
+    Engine.worldWidth = Utils.nbChunksHorizontal*Engine.chunkWidth;
+    Engine.worldHeight = Utils.nbChunksVertical*Engine.chunkHeight;
+    Utils.lastChunkID = (Utils.nbChunksHorizontal*Utils.nbChunksVertical)-1;
     Engine.nbLayers = masterData.nbLayers;
     console.log('Master file read, setting up world of size '+Engine.worldWidth+' x '+Engine.worldHeight+' with '+Engine.nbLayers+' layers');
     Engine.tilesets = masterData.tilesets;
@@ -864,8 +837,8 @@ Engine.fillWater = function(lake,chunk,type){
     var map = Geometry.shoreBox.getMap(type);
     var oppositeMap = Geometry.shoreBox.getMap(oppositeType);
     var limit = {
-        1: (Engine.nbChunksVertical*Engine.chunkHeight)-1,
-        2: (Engine.nbChunksHorizontal*Engine.chunkWidth)-1,
+        1: (Utils.nbChunksVertical*Engine.chunkHeight)-1,
+        2: (Utils.nbChunksHorizontal*Engine.chunkWidth)-1,
         3: 0,
         4: 0
     };
