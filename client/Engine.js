@@ -146,6 +146,7 @@ Engine.create = function(masterData){
 Engine.initWorld = function(data){
     Engine.addHero(data.id,data.x,data.y);
     Engine.playerIsInitialized = true;
+    Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     // TODO: when all chunks loaded, fade-out Boot scene
 };
 
@@ -154,7 +155,7 @@ Engine.addHero = function(id,x,y){
     Engine.player.visible = Engine.showHero;
     Engine.camera.startFollow(Engine.player);
     Engine.player.chunk = Utils.tileToAOI({x:x,y:y});
-    //.updateEnvironment();
+    Engine.updateEnvironment();
 };
 
 Engine.addPlayer = function(id,x,y){
@@ -173,7 +174,8 @@ Engine.removePlayer = function(id){
 };
 
 Engine.updateEnvironment = function(){
-    var chunks = Utils.listVisibleAOIs(Engine.player.chunk);
+    //var chunks = Utils.listVisibleAOIs(Engine.player.chunk);
+    var chunks = Utils.listAdjacentAOIs(Engine.player.chunk);
     var newChunks = chunks.diff(Engine.displayedChunks);
     var oldChunks = Engine.displayedChunks.diff(chunks);
 
@@ -212,7 +214,6 @@ Engine.loadJSON = function(path,callback,data){
 
 Engine.drawChunk = function(mapData,id){
     var chunk = new Chunk(mapData,id,1);
-    //chunk.id = id;
     Engine.chunks[chunk.id] = chunk;
     if(!Engine.mapDataCache[chunk.id]) Engine.mapDataCache[chunk.id] = mapData;
     chunk.drawLayers();

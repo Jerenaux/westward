@@ -21,6 +21,8 @@ of copying what is needed from one to the other (+ uglifying and compressing etc
 appearance and behaviour, reduced code visibility, and possibly *no* node-modules)
 - Scripts to group what is needed for the app, uglify/compress and build
 - Migrate Geometry to server to hide it?
+
+- Secure chunk access? (check client position before serving)
 -----
 * Tools:
 - Top-down visibility optimization (create a lookup table of transparency)

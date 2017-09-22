@@ -49,11 +49,25 @@ Client.isNewPlayer = function(){
 };
 
 Client.socket.on(Client.initEventName,function(data){ // This event triggers when receiving the initialization packet from the server, to use in Game.initWorld()
-    /*if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.initializationSchema); // if in binary format, decode first
-    Client.socket.emit('ponq',data.stamp); // send back a pong stamp to compute latency*/
-    Engine.initWorld(data);
+    //if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.initializationSchema); // if in binary format, decode first
+    //Client.socket.emit('ponq',data.stamp); // send back a pong stamp to compute latency
+    Engine.initWorld(data.player);
     //Game.updateNbConnected(data.nbconnected);
 });
+
+Client.socket.on('update',function(data){ // This event triggers uppon receiving an update packet (data)
+    //if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.finalUpdateSchema); // if in binary format, decode first
+    //Client.socket.emit('ponq',data.stamp);  // send back a pong stamp to compute latency
+    //if(data.nbconnected !== undefined) Game.updateNbConnected(data.nbconnected);
+    //if(data.latency) Game.setLatency(data.latency);
+    console.log(data);
+    console.log(data.global);
+    /*if(data.global) Game.updateWorld(data.global);
+    if(data.local) Game.updateSelf(data.local);*/
+});
+
+
+/// ##### SENDERS ######
 
 Client.sendMove = function(x,y){
     Client.socket.emit('move',{x:x,y:y});

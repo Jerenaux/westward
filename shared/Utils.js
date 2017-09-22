@@ -136,19 +136,19 @@ Utils.listVisibleAOIs = function(start){ // List the visible chunks around the p
 
 Utils.listAdjacentAOIs = function(current){
     var AOIs = [];
-    var isAtTop = (current < Engine.nbChunksHorizontal);
-    var isAtBottom = (current > Engine.lastChunkID - Engine.nbChunksHorizontal);
-    var isAtLeft = (current%Engine.nbChunksHorizontal == 0);
-    var isAtRight = (current%Engine.nbChunksHorizontal == Engine.nbChunksHorizontal-1);
+    var isAtTop = (current < Utils.nbChunksHorizontal);
+    var isAtBottom = (current > Utils.lastChunkID - Utils.nbChunksHorizontal);
+    var isAtLeft = (current%Utils.nbChunksHorizontal == 0);
+    var isAtRight = (current%Utils.nbChunksHorizontal == Utils.nbChunksHorizontal-1);
     AOIs.push(current);
-    if(!isAtTop) AOIs.push(current - Engine.nbChunksHorizontal);
-    if(!isAtBottom) AOIs.push(current + Engine.nbChunksHorizontal);
+    if(!isAtTop) AOIs.push(current - Utils.nbChunksHorizontal);
+    if(!isAtBottom) AOIs.push(current + Utils.nbChunksHorizontal);
     if(!isAtLeft) AOIs.push(current-1);
     if(!isAtRight) AOIs.push(current+1);
-    if(!isAtTop && !isAtLeft) AOIs.push(current-1-Engine.nbChunksHorizontal);
-    if(!isAtTop && !isAtRight) AOIs.push(current+1-Engine.nbChunksHorizontal);
-    if(!isAtBottom && !isAtLeft) AOIs.push(current-1+Engine.nbChunksHorizontal);
-    if(!isAtBottom && !isAtRight) AOIs.push(current+1+Engine.nbChunksHorizontal);
+    if(!isAtTop && !isAtLeft) AOIs.push(current-1-Utils.nbChunksHorizontal);
+    if(!isAtTop && !isAtRight) AOIs.push(current+1-Utils.nbChunksHorizontal);
+    if(!isAtBottom && !isAtLeft) AOIs.push(current-1+Utils.nbChunksHorizontal);
+    if(!isAtBottom && !isAtRight) AOIs.push(current+1+Utils.nbChunksHorizontal);
     return AOIs;
 };
 

@@ -71,6 +71,13 @@ server.setUpdateLoop = function(){
     setInterval(gs.updatePlayers,server.clientUpdateRate);
 };
 
+server.sendInitializationPacket = function(socket,packet){
+    packet = server.addStamp(packet);
+    //if(server.enableBinary) packet = Encoder.encode(packet,CoDec.initializationSchema);
+    socket.emit('init',packet);
+};
+
+
 server.sendUpdate = function(socketID,pkg){
     pkg = server.addStamp(pkg);
     /*try{

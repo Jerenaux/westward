@@ -23,13 +23,13 @@ AOI.prototype.clear = function(){
     this.updatePacket = new UpdatePacket();
 };
 
-/*AOI.prototype.addEntity = function(entity,previous){
+AOI.prototype.addEntity = function(entity,previous){
     this.entities.push(entity);
-    if(entity.constructor.name == 'Player') GameServer.server.addToRoom(entity.socketID,'AOI'+this.id);
+    //if(entity.constructor.name == 'Player') GameServer.server.addToRoom(entity.socketID,'AOI'+this.id);
     GameServer.handleAOItransition(entity,previous);
 };
 
-AOI.prototype.deleteEntity = function(entity) {
+/*AOI.prototype.deleteEntity = function(entity) {
     var idx = this.entities.indexOf(entity);
     if (idx >= 0) this.entities.splice( idx, 1 );
     if(entity.constructor.name == 'Player') GameServer.server.leaveRoom(entity.socketID,'AOI'+this.id);

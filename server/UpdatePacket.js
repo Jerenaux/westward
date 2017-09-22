@@ -3,8 +3,8 @@
  */
 
 function UpdatePacket(){
-    /*this.newplayers = []; // new player objects to add to the world
-    this.newitems = [];
+    this.newplayers = []; // new player objects to add to the world
+    /*this.newitems = [];
     this.newmonsters = [];
     this.disconnected = []; // list of id's of disconnected players since last update
     this.players = {}; // list of player objects already existing for which properties have been update
@@ -14,16 +14,16 @@ function UpdatePacket(){
 
 UpdatePacket.prototype.addObject = function(object){
     var arr;
-    switch(object.category){
-        case 'player':
+    switch(object.constructor.name){
+        case 'Player':
             arr = this.newplayers;
             break;
-        case 'item':
+        /*case 'item':
             arr = this.newitems;
             break;
         case 'monster':
             arr = this.newmonsters;
-            break;
+            break;*/
     }
     // Check that the object to insert is not already present (possible since when pulling updates from neighboring AOIs)
     for(var i = 0; i < arr.length; i++){
@@ -92,10 +92,10 @@ UpdatePacket.prototype.isEmpty = function(){
     /*if(Object.keys(this.players).length > 0) return false;
     if(Object.keys(this.monsters).length > 0) return false;
     if(Object.keys(this.items).length > 0) return false;
-    if(this.newplayers.length > 0) return false;
     if(this.newitems.length > 0) return false;
     if(this.newmonsters.length > 0) return false;
     if(this.disconnected.length > 0) return false;*/
+    if(this.newplayers.length > 0) return false;
     return true;
 };
 

@@ -4,17 +4,19 @@
 var fs = require('fs');
 var clone = require('clone'); // used to clone objects, essentially used for clonick update packets
 
-var Utils = require('../shared/Utils.js').Utils;
-//var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
-var AOI = require('./AOI.js').AOI;
-var Player = require('./Player.js').Player;
-
 var GameServer = {
     lastPlayerID: 0,
     players: {}, // player.id -> player
     socketMap: {}, // socket.id -> player.id
     nbConnectedChanged: false
 };
+
+module.exports.GameServer = GameServer;
+
+var Utils = require('../shared/Utils.js').Utils;
+//var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
+var AOI = require('./AOI.js').AOI;
+var Player = require('./Player.js').Player;
 
 GameServer.readMap = function(mapsPath){
     var masterData = JSON.parse(fs.readFileSync(mapsPath+'/master.json').toString());
@@ -43,10 +45,19 @@ GameServer.addPlayer = function(socket){
     var player = new Player(socket.id,GameServer.lastPlayerID++);
     GameServer.players[player.id] = player;
     GameServer.socketMap[socket.id] = player.id;
-    GameServer.server.sendMsg(socket,'init',player);
-    GameServer.server.emitMsg('newplayer',player);
+    GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
+    //GameServer.server.emitMsg('newplayer',player);
     GameServer.nbConnectedChanged = true;
+    GameServer.addAtLocation(player);
     console.log(GameServer.server.getNbConnected()+' connected');
+};
+
+GameServer.createInitializationPacket = function(playerID){
+    // Create the packet that the client will receive from the server in order to initialize the game
+    return {
+        player: GameServer.players[playerID].trim(), // info about the player
+        nbconnected: GameServer.server.getNbConnected()
+    };
 };
 
 GameServer.removePlayer = function(socketID){
@@ -58,11 +69,37 @@ GameServer.removePlayer = function(socketID){
     console.log(GameServer.server.getNbConnected()+' connected');
 };
 
+GameServer.getAOIAt = function(x,y){
+    return GameServer.AOIs[Utils.tileToAOI({x:x,y:y})];
+};
+
+GameServer.addAtLocation = function(entity){
+    // Add some entity to all the data structures related to position (e.g. the AOI)
+    /*var map = GameServer.getSpaceMap(entity);
+    map.add(entity.x,entity.y,entity);¨*/
+    GameServer.AOIs[entity.aoi].addEntity(entity,null);
+};
+
 GameServer.move = function(socketID,x,y){
     var player = GameServer.getPlayer(socketID);
     player.x = x;
     player.y = y;
     GameServer.server.emitMsg('move',player);
+};
+
+GameServer.handleAOItransition = function(entity,previous){
+    // When something moves from one AOI to another, identify which AOIs should be notified and update them
+    var AOIs = Utils.listAdjacentAOIs(entity.aoi);
+    if(previous){
+        var previousAOIs = Utils.listAdjacentAOIs(previous);
+        // Array_A.diff(Array_B) returns the elements in A that are not in B
+        // This is used because only the AOIs that are now adjacent, but were not before, need an update. Those who where already adjacent are up-to-date
+        AOIs = AOIs.diff(previousAOIs);
+    }
+    AOIs.forEach(function(aoi){
+        if(entity.constructor.name == 'Player') entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
+        GameServer.addObjectToAOI(aoi,entity);
+    });
 };
 
 GameServer.updatePlayers = function(){ //Function responsible for setting up and sending update packets to clients
@@ -96,4 +133,7 @@ GameServer.clearAOIs = function(){
     GameServer.dirtyAOIs.clear();
 };
 
-module.exports.GameServer = GameServer;
+GameServer.addObjectToAOI = function(aoi,entity){
+    GameServer.AOIs[aoi].updatePacket.addObject(entity);
+    GameServer.dirtyAOIs.add(aoi);
+};
