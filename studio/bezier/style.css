@@ -34,7 +34,7 @@ figure {
   position: relative;
   margin-bottom: 50px;
 }
-figure canvas {
+figure canvas, canvas {
   border: 1px solid black;
   position: relative;
   background: white;

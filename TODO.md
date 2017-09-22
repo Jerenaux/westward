@@ -26,3 +26,9 @@ appearance and behaviour, reduced code visibility, and possibly *no* node-module
 - Top-down visibility optimization (create a lookup table of transparency)
 - Prune map files more
 - Testing (make part of the pipeline)
+-----
+* World editor:
+- Button to add bezier
+- Drag-drop points and update bezier
+- Button to append new bezier at existing point
+- Get path from bezier
