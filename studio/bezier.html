@@ -3,19 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Bezier editor</title>
-    <link rel="stylesheet" href="/studio/bezier/style.css">
     <script src="/studio/bezier/bezier.js"></script>
-    <!-- <script src="studio/bezier/draw.js"></script>
-    <script src="studio/bezier/interaction.js"></script>
-    <script src="studio/bezier/loader.js"></script>-->
+    <link href="/studio/style.css" rel="stylesheet">
 </head>
 <body>
-<canvas id="stage" width="800px" height="600px"></canvas>
+<canvas id="stage" width="1005px" height="1299px"></canvas>
+<div id="tools">
+    <a href="#" onclick="setActiveTool('pointer');"><img src="/studio/images/pointer.png" title="Pointer tool"/></a><br/>
+    <a href="#" onclick="setActiveTool('bezier');"><img src="/studio/images/bezier.png" title="Add Bézier"/></a><br/>
+    <a href="#" onclick="save();"><img src="/assets/images/save.png" title="Save"/></a><br/>
+</div>
+<div style="display:none;">
+    <img id="source" src="/studio/template.jpg" onload="drawBackdrop();">
+</div>
 </body>
 <script src="/studio/blueprint.js"></script>
 <script type="text/javascript">
     var curve = new Bezier(150,40 , 80,30 , 105,150);
     console.log(curve);
-    addCurve();
+    //randomCurve();
 </script>
 </html>

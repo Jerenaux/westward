@@ -30,7 +30,8 @@ appearance and behaviour, reduced code visibility, and possibly *no* node-module
 - Testing (make part of the pipeline)
 -----
 * World editor:
-- Button to add bezier
-- Drag-drop points and update bezier
-- Button to append new bezier at existing point
 - Get path from bezier
+Alt:
+- COnvert image to gray levels
+- Display mouse coordinates on the fly
+- Analyze coast automatically

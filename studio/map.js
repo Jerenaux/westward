@@ -46,7 +46,7 @@ function newRect(sw,ne,weight){
 
 function drawRects () {
     newRect(SW,NE,2);
-
+    return;
     for(var x = 0; x < nbHoriz; x++){
         for(var y = 0; y < nbVert; y++){
             var nw = google.maps.geometry.spherical.computeOffset(NW,x*AOIwidth*mPerTile,90);
