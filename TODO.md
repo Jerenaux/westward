@@ -32,6 +32,7 @@ appearance and behaviour, reduced code visibility, and possibly *no* node-module
 * World editor:
 - Get path from bezier
 Alt:
+- Check Google static maps
 - COnvert image to gray levels
 - Display mouse coordinates on the fly
 - Analyze coast automatically

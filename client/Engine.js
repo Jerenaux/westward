@@ -255,6 +255,23 @@ Engine.moveSprite = function(id,x,y){
     player.y = y*Engine.tileHeight;
 };
 
+// Processes the global update packages received from the server
+Engine.updateWorld = function(data){  // data is the update package from the server
+    if(data.newplayers) {
+        for (var n = 0; n < data.newplayers.length; n++) {
+            var p = data.newplayers[n];
+            Engine.addPlayer(p.id, p.x, p.y);
+        }
+        //if (data.newplayers.length > 0) Game.sortEntities(); // Sort entitites according to y coordinate to make them render properly above each other
+    }
+
+    if(data.disconnected) { // data.disconnected is an array of disconnected players
+        for (var i = 0; i < data.disconnected.length; i++) {
+            Engine.removePlayer(data.disconnected[i]);
+        }
+    }
+};
+
 Engine.update = function(){
     /*Engine.renderer.render(Engine.stage);
     requestAnimationFrame(Engine.update);

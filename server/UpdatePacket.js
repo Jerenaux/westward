@@ -4,15 +4,16 @@
 
 function UpdatePacket(){
     this.newplayers = []; // new player objects to add to the world
+    this.players = {}; // list of player objects already existing for which properties have been updated
+    this.disconnected = []; // list of id's of disconnected players since last update
     /*this.newitems = [];
     this.newmonsters = [];
-    this.disconnected = []; // list of id's of disconnected players since last update
-    this.players = {}; // list of player objects already existing for which properties have been update
     this.items = {};
     this.monsters = {};*/
 }
 
 UpdatePacket.prototype.addObject = function(object){
+    //console.log('[Updt] adding object '+object.id);
     var arr;
     switch(object.constructor.name){
         case 'Player':
@@ -46,15 +47,15 @@ UpdatePacket.prototype.updateProperty = function(type,id,property,value){
     //console.log('updating property type = '+type+', id = '+id+', prop = '+property+', val = '+value);
     var map;
     switch(type){
-        case 'item':
-            map = this.items;
-            break;
         case 'player':
             map = this.players;
             break;
+        /*case 'item':
+            map = this.items;
+            break;
         case 'monster':
             map = this.monsters;
-            break;
+            break;*/
     }
     if(!map.hasOwnProperty(id)) map[id] = {};
     if(map[id][property] != value) map[id][property] = value;
@@ -81,7 +82,7 @@ UpdatePacket.prototype.removeEcho = function(playerID){
         }
     }
 };
-// Get updates about all entities present in the list of AOIs
+// Get updates about all entities present in the list of neighboring AOIs
 UpdatePacket.prototype.synchronize = function(AOI){
     for(var i = 0; i < AOI.entities.length; i++){
         this.addObject(AOI.entities[i]); // don't send the trimmed version, the trim is done in adObject()
@@ -89,24 +90,24 @@ UpdatePacket.prototype.synchronize = function(AOI){
 };
 
 UpdatePacket.prototype.isEmpty = function(){
-    /*if(Object.keys(this.players).length > 0) return false;
-    if(Object.keys(this.monsters).length > 0) return false;
+    /*if(Object.keys(this.monsters).length > 0) return false;
     if(Object.keys(this.items).length > 0) return false;
     if(this.newitems.length > 0) return false;
-    if(this.newmonsters.length > 0) return false;
-    if(this.disconnected.length > 0) return false;*/
+    if(this.newmonsters.length > 0) return false;*/
+    if(this.disconnected.length > 0) return false;
     if(this.newplayers.length > 0) return false;
+    if(Object.keys(this.players).length > 0) return false;
     return true;
 };
 
 UpdatePacket.prototype.clean = function(){
-    /*if(!Object.keys(this.players).length) delete this.players;
-    if(!Object.keys(this.monsters).length) delete this.monsters;
+    /*if(!Object.keys(this.monsters).length) delete this.monsters;
     if(!Object.keys(this.items).length) delete this.items;
-    if(!this.newplayers.length) delete this.newplayers;
     if(!this.newitems.length) delete this.newitems;
-    if(!this.newmonsters.length) delete this.newmonsters;
-    if(!this.disconnected.length) delete this.disconnected;*/
+    if(!this.newmonsters.length) delete this.newmonsters;*/
+    if(!this.disconnected.length) delete this.disconnected;
+    if(!this.newplayers.length) delete this.newplayers;
+    if(!Object.keys(this.players).length) delete this.players;
     return this;
 };
 

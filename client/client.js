@@ -27,10 +27,6 @@ Client.emptyQueue = function(){ // Process the events that have been queued duri
     }
 };
 
-Client.requestData = function(){ // request the data to be used for initWorld()
-    Client.socket.emit('init-world',Client.getInitRequest());
-};
-
 Client.getInitRequest = function(){ // Returns the data object to send to request the initialization data
     // In case of a new player, set new to true and send the name of the player
     // Else, set new to false and send it's id instead to fetch the corresponding data in the database
@@ -48,6 +44,9 @@ Client.isNewPlayer = function(){
     return !(id !== undefined && name && armor && weapon);
 };
 
+
+// #### RECEIVERS ####
+
 Client.socket.on(Client.initEventName,function(data){ // This event triggers when receiving the initialization packet from the server, to use in Game.initWorld()
     //if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.initializationSchema); // if in binary format, decode first
     //Client.socket.emit('ponq',data.stamp); // send back a pong stamp to compute latency
@@ -60,30 +59,27 @@ Client.socket.on('update',function(data){ // This event triggers uppon receiving
     //Client.socket.emit('ponq',data.stamp);  // send back a pong stamp to compute latency
     //if(data.nbconnected !== undefined) Game.updateNbConnected(data.nbconnected);
     //if(data.latency) Game.setLatency(data.latency);
-    console.log(data);
+    console.log(data.local);
     console.log(data.global);
-    /*if(data.global) Game.updateWorld(data.global);
-    if(data.local) Game.updateSelf(data.local);*/
-});
-
-
-/// ##### SENDERS ######
-
-Client.sendMove = function(x,y){
-    Client.socket.emit('move',{x:x,y:y});
-};
-
-Client.socket.on('newplayer',function(data){
-    Engine.addPlayer(data.id,data.x,data.y);
-});
-
-Client.socket.on('removeplayer',function(data){
-    Engine.removePlayer(data);
+    if(data.global) Engine.updateWorld(data.global);
+    //if(data.local) Game.updateSelf(data.local);
 });
 
 Client.socket.on('move',function(data){
     Engine.moveSprite(data.id,data.x,data.y);
 });
+
+
+/// ##### SENDERS ######
+
+Client.requestData = function(){ // request the data to be used for initWorld()
+    Client.socket.emit('init-world',Client.getInitRequest());
+};
+
+
+Client.sendMove = function(x,y){
+    Client.socket.emit('move',{x:x,y:y});
+};
 
 // ####################"
 

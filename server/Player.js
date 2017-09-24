@@ -4,6 +4,7 @@
 
 var Utils = require('../shared/Utils.js').Utils;
 var PersonalUpdatePacket = require('./PersonalUpdatePacket.js').PersonalUpdatePacket;
+var GameObject = require('./GameObject.js').GameObject;
 
 function Player(socketID,playerID){
     this.socketID = socketID;
@@ -12,9 +13,12 @@ function Player(socketID,playerID){
     this.y = Utils.randomInt(1,16);
     this.aoi = Utils.tileToAOI({x:this.x,y:this.y});
     this.updatePacket = new PersonalUpdatePacket();
-    this.newAOIs = [];
-    console.log('['+this.id+'] Hi at '+this.x+', '+this.y+', aoi = '+this.aoi+')');
+    this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
+    console.log('['+this.id+'] Hi at '+this.x+', '+this.y+', aoi = '+this.aoi);
 }
+
+Player.prototype = Object.create(GameObject.prototype);
+Player.prototype.constructor = Player;
 
 Player.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
