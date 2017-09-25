@@ -5,9 +5,7 @@ var Engine = {
     baseViewWidth: 32,
     baseViewHeight: 18,
     tileWidth: 32,
-    tileHeight: 32,
-    key: 'main', // key of the scene, for Phaser
-    playerIsInitialized: false
+    tileHeight: 32
 };
 
 Engine.camera = {
@@ -22,7 +20,30 @@ Engine.camera = {
 };
 
 Engine.boot = function(){
-   /* Engine.renderer = PIXI.autoDetectRenderer(
+    /*TODO:
+    * Procedural world:
+    - Fix rivers
+    - Forests
+    - Dirt
+    * Network
+    - Two repositories, for production and development, with node scripts taking care
+    of copying what is needed from one to the other (+ uglifying and compressing etc.)
+    -> Possible to programmatically push?  http://radek.io/2015/10/27/nodegit/
+    - Somehow remove/disable debug components automatically
+    - Desktop app a simple terminal that gets everything from server (= exact same
+    appearance and behaviour, reduced code visibility, and possibly *no* node-modules)
+    - Scripts to group what is needed for the app, ugligy/compress and build
+    - In any case, migrate Geometry to server to hide it
+    * History & design document
+    -----
+    * Tools:
+    - Load more chunks upon zoom
+    - Top-down visibility optimization (create a lookup table of transparency)
+    - Prune map files more
+    - Testing (make part of the pipeline)
+    */
+
+    Engine.renderer = PIXI.autoDetectRenderer(
         Engine.baseViewWidth*Engine.tileWidth,
         Engine.baseViewHeight*Engine.tileHeight,
         {
@@ -30,268 +51,44 @@ Engine.boot = function(){
             view: document.getElementById('game'),
             preserveDrawingBuffer: true // to allow image captures from canvas
         }
-    );*/
-
-    /*var loadScene = {
-        key: 'load',
-        active: true,
-        preload: Engine.
-        create: Engine.,
-        files: [
-            { type: 'image', key: 'face', url: 'assets/pics/bw-face.png' }
-        ]
-    };*/
-
-    Engine.mapDataLocation = 'assets/maps/chunks';
-    /*var mainScene = {
-        key: 'main',
-        preload: Engine.preload,
-        create: Engine.create,
-        update: Engine.update,
-        /*files: [
-            { type: 'json', key: 'master', url: Engine.mapDataLocation+'/master.json' }
-        ]*/
-    /*};
-
-    var config = {
-        type: Phaser.AUTO,
-        width: Engine.baseViewWidth*Engine.tileWidth,
-        height: Engine.baseViewHeight*Engine.tileHeight,
-        parent: 'game',
-        scene: [Boot, mainScene]
-    };
-
-    Engine.game = new Phaser.Game(config);*/
-
+    );
     Engine.viewWidth = Engine.baseViewWidth;
     Engine.viewHeight = Engine.baseViewHeight;
 
     //Engine.setAction('move');
     Engine.setAction('addForest');
+    Engine.showGrid = Utils.getPreference('showGrid',false);
+    Engine.showHero = Utils.getPreference('showHero',true);
     Engine.showHulls = Utils.getPreference('showHulls',false);
     Engine.selectionEnabled = Utils.getPreference('selectionEnabled',false);
+    Engine.debug = true;
     Engine.zoomScale = 1;
-
-    //Engine.computeStageLocation();
-
-    /*Engine.stage = new PIXI.Container();
-    Engine.blackBoard = new PIXI.Container(); // Stores all the graphics objects used for debugging (hulls, points...)
-    Engine.blackBoard.z = 999;
-    Engine.blackBoard.visible = Engine.showHulls;
-    Engine.stage.addChild(Engine.blackBoard);
-    Engine.editHistory = [];*/
-
-    //Engine.drawSelection();
-    //Engine.renderer.view.addEventListener('mousedown', Engine.handleClick, false);
-    if(Engine.debug) {
-        //Engine.renderer.view.addEventListener('mouseup', Engine.handleMouseUp, false);
-        //Engine.renderer.view.addEventListener('mousemove', Engine.trackPosition, false);
-        document.getElementById('w').value = 20;
-        document.getElementById('h').value = 20;
-        document.getElementById('n').value = 10;
-    }
-
-    //Engine.loadJSON(Engine.mapDataLocation+'/master.json',Engine.readMaster);
-};
-
-Engine.preload = function() {
-    this.load.image('hero', 'assets/sprites/hero.png');
-    for(var i = 0; i < Boot.tilesets.length; i++){
-        var tileset = Boot.tilesets[i];
-        var path = 'assets/'+tileset.image.slice(2);// The paths in the master file are relative to the assets/maps directory
-        this.load.spritesheet(tileset.name, path,{frameWidth:tileset.tilewidth,frameHeight:tileset.tileheight});
-    }
-    console.log('Loading '+i+' tileset'+(i > 1 ? 's' : ''));
-};
-
-Engine.create = function(masterData){
-    Engine.tileWidth = masterData.tilesets[0].tilewidth;
-    Engine.tileHeight = masterData.tilesets[0].tileheight;
-    Engine.chunkWidth = masterData.chunkWidth;
-    Engine.chunkHeight = masterData.chunkHeight;
-    Utils.chunkWidth = Engine.chunkWidth;
-    Utils.chunkHeight = Engine.chunkHeight;
-    Utils.nbChunksHorizontal = masterData.nbChunksHoriz;
-    Utils.nbChunksVertical = masterData.nbChunksVert;
-    Engine.worldWidth = Utils.nbChunksHorizontal*Engine.chunkWidth;
-    Engine.worldHeight = Utils.nbChunksVertical*Engine.chunkHeight;
-    Utils.lastChunkID = (Utils.nbChunksHorizontal*Utils.nbChunksVertical)-1;
-    Engine.nbLayers = masterData.nbLayers;
-    Engine.mapDataLocation = Boot.mapDataLocation;
-    console.log('Master file read, setting up world of size '+Engine.worldWidth+' x '+Engine.worldHeight+' with '+Engine.nbLayers+' layers');
-
-    Engine.tilesets = masterData.tilesets;
-    Engine.tilesetMap = {}; // maps tiles to tilesets;
 
     Engine.chunks = {}; // holds references to the Containers containing the chunks
     Engine.displayedChunks = [];
     Engine.mapDataCache = {};
 
-    Engine.players = {}; // player.id -> player
+    Engine.computeStageLocation();
 
-    Engine.debug = true;
-    Engine.showHero = Engine.debug ? Utils.getPreference('showHero',true) : true;
-    //Engine.showGrid = Engine.debug ? Utils.getPreference('showGrid',false) : false;
-    Engine.showGrid = false;
+    Engine.stage = new PIXI.Container();
+    Engine.blackBoard = new PIXI.Container(); // Stores all the graphics objects used for debugging (hulls, points...)
+    Engine.blackBoard.z = 999;
+    Engine.blackBoard.visible = Engine.showHulls;
+    Engine.stage.addChild(Engine.blackBoard);
+    Engine.editHistory = [];
 
-    Engine.scene = this.scene.scene;
-    Engine.camera = Engine.scene.cameras.main;
-    Engine.camera.setBounds(0,0,Engine.worldWidth*Engine.tileWidth,Engine.worldHeight*Engine.tileHeight);
-
-    Engine.scene.input.events.on('MOUSE_DOWN_EVENT', Engine.move);
-
-    Client.requestData();
-};
-
-Engine.initWorld = function(data){
-    Engine.addHero(data.id,data.x,data.y);
-    Engine.playerIsInitialized = true;
-    Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
-    // TODO: when all chunks loaded, fade-out Boot scene
-};
-
-Engine.addHero = function(id,x,y){
-    Engine.player = Engine.addPlayer(id,x,y);
-    Engine.player.visible = Engine.showHero;
-    Engine.camera.startFollow(Engine.player);
-    Engine.player.chunk = Utils.tileToAOI({x:x,y:y});
-    Engine.updateEnvironment();
-};
-
-Engine.addPlayer = function(id,x,y){
-    if(Engine.playerIsInitialized && id == Engine.player.id) return;
-    var sprite = Engine.scene.add.sprite(x*Engine.tileWidth,y*Engine.tileHeight,'hero');
-    sprite.id = id;
-    sprite.z = 1;
-    Engine.players[id] = sprite;
-    return sprite;
-};
-
-Engine.removePlayer = function(id){
-    var sprite = Engine.players[id];
-    sprite.destroy();
-    delete Engine.players[id];
-};
-
-Engine.updateEnvironment = function(){
-    //var chunks = Utils.listVisibleAOIs(Engine.player.chunk);
-    var chunks = Utils.listAdjacentAOIs(Engine.player.chunk);
-    var newChunks = chunks.diff(Engine.displayedChunks);
-    var oldChunks = Engine.displayedChunks.diff(chunks);
-
-    for (var i = 0; i < oldChunks.length; i++) {
-        //console.log('removing '+oldChunks[i]);
-        Engine.removeChunk(oldChunks[i]);
+    Engine.drawSelection();
+    Engine.renderer.view.addEventListener('mousedown', Engine.handleClick, false);
+    if(Engine.debug) {
+        Engine.renderer.view.addEventListener('mouseup', Engine.handleMouseUp, false);
+        Engine.renderer.view.addEventListener('mousemove', Engine.trackPosition, false);
+        document.getElementById('w').value = 20;
+        document.getElementById('h').value = 20;
+        document.getElementById('n').value = 10;
     }
 
-    for(var j = 0; j < newChunks.length; j++){
-        //console.log('adding '+newChunks[j]);
-        Engine.displayChunk(newChunks[j]);
-    }
-};
-
-Engine.displayChunk = function(id){
-    if(Engine.mapDataCache[id]){
-        // Chunks are deleted and redrawn rather than having their visibility toggled on/off, to avoid accumulating in memory
-        Engine.drawChunk(Engine.mapDataCache[id],id);
-    }else {
-        Engine.loadJSON(Engine.mapDataLocation+'/chunk' + id + '.json', Engine.drawChunk, id);
-    }
-};
-
-Engine.loadJSON = function(path,callback,data){
-    var xobj = new XMLHttpRequest();
-    xobj.overrideMimeType("application/json");
-    xobj.open('GET', path, true);
-    xobj.onreadystatechange = function () {
-        if (xobj.readyState == 4 && xobj.status == "200") {
-            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-            callback(JSON.parse(xobj.responseText),data);
-        }
-    };
-    xobj.send(null);
-};
-
-Engine.drawChunk = function(mapData,id){
-    var chunk = new Chunk(mapData,id,1);
-    Engine.chunks[chunk.id] = chunk;
-    if(!Engine.mapDataCache[chunk.id]) Engine.mapDataCache[chunk.id] = mapData;
-    chunk.drawLayers();
-    Engine.displayedChunks.push(chunk.id);
-    if(Engine.showGrid) Engine.drawGrid(chunk);
-};
-
-Engine.removeChunk = function(id){
-    Engine.chunks[id].removeLayers();
-    //Engine.stage.removeChild(Engine.chunks[id]);
-    Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
-};
-
-Engine.move = function(event){
-    var x = Math.floor((Engine.camera.scrollX + event.x)/Engine.tileWidth);
-    var y = Math.floor((Engine.camera.scrollY + event.y)/Engine.tileHeight);
-    Engine.moveSprite(Engine.player.id,x,y);
-    Engine.player.chunk = Utils.tileToAOI({x:x,y:y});
-    if(Engine.player.chunk != Engine.player.previousChunk) Engine.updateEnvironment();
-    Engine.player.previousChunk = Engine.player.chunk;
-    Client.sendMove(x,y);
-    //Engine.updateCamera();
-    /*function (event) {
-     //var x = Math.floor((cam.scrollX + event.x)/32);
-     game.hero.x = cam.scrollX+(event.x*cam.zoom);
-     game.hero.y = cam.scrollY+(event.y*cam.zoom);
-     var aoi = getAOI(Math.floor(game.hero.x/32),Math.floor(game.hero.y/32));
-     console.log('aoi : '+aoi);
-     var adjacent = Utils.listAdjacentAOIs(aoi);
-     adjacent.forEach(function(aoi){
-     loadChunk(aoi,displayChunk);
-     });
-     }*/
-};
-
-Engine.moveSprite = function(id,x,y){
-    var player = Engine.players[id];
-    player.x = x*Engine.tileWidth;
-    player.y = y*Engine.tileHeight;
-};
-
-// Processes the global update packages received from the server
-Engine.updateWorld = function(data){  // data is the update package from the server
-    if(data.newplayers) {
-        for (var n = 0; n < data.newplayers.length; n++) {
-            var p = data.newplayers[n];
-            Engine.addPlayer(p.id, p.x, p.y);
-        }
-        //if (data.newplayers.length > 0) Game.sortEntities(); // Sort entitites according to y coordinate to make them render properly above each other
-    }
-
-    if(data.disconnected) { // data.disconnected is an array of disconnected players
-        for (var i = 0; i < data.disconnected.length; i++) {
-            Engine.removePlayer(data.disconnected[i]);
-        }
-    }
-
-    // data.players is an associative array mapping the id's of the entities
-    // to small object indicating which properties need to be updated. The following code iterate over
-    // these objects and call the relevant update functions.
-    if(data.players) Engine.traverseUpdateObject(data.players,Engine.players,Engine.updatePlayer);
-};
-
-// For each element in obj, call callback on it
-Engine.traverseUpdateObject = function(obj,table,callback){
-    Object.keys(obj).forEach(function (key) {
-        if(table[key]) callback(table[key],obj[key]);
-    });
-};
-
-Engine.updatePlayer = function(player,info){ // info contains the updated data from the server
-    if(info.x || info.y) Engine.moveSprite(player.id,info.x,info.y);
-};
-
-Engine.update = function(){
-    /*Engine.renderer.render(Engine.stage);
-    requestAnimationFrame(Engine.update);
-    document.getElementById('visible').innerHTML = Engine.displayedChunks.length;*/
+    Engine.mapDataLocation = 'assets/maps/chunks';
+    Engine.loadJSON(Engine.mapDataLocation+'/master.json',Engine.readMaster);
 };
 
 Engine.drawSelection = function(){
@@ -328,11 +125,11 @@ Engine.readMaster = function(masterData){
     Engine.tileHeight = masterData.tilesets[0].tileheight;
     Engine.chunkWidth = masterData.chunkWidth;
     Engine.chunkHeight = masterData.chunkHeight;
-    Utils.nbChunksHorizontal = masterData.nbChunksHoriz;
-    Utils.nbChunksVertical = masterData.nbChunksVert;
-    Engine.worldWidth = Utils.nbChunksHorizontal*Engine.chunkWidth;
-    Engine.worldHeight = Utils.nbChunksVertical*Engine.chunkHeight;
-    Utils.lastChunkID = (Utils.nbChunksHorizontal*Utils.nbChunksVertical)-1;
+    Engine.nbChunksHorizontal = masterData.nbChunksHoriz;
+    Engine.nbChunksVertical = masterData.nbChunksVert;
+    Engine.worldWidth = Engine.nbChunksHorizontal*Engine.chunkWidth;
+    Engine.worldHeight = Engine.nbChunksVertical*Engine.chunkHeight;
+    Engine.lastChunkID = (Engine.nbChunksHorizontal*Engine.nbChunksVertical)-1;
     Engine.nbLayers = masterData.nbLayers;
     console.log('Master file read, setting up world of size '+Engine.worldWidth+' x '+Engine.worldHeight+' with '+Engine.nbLayers+' layers');
     Engine.tilesets = masterData.tilesets;
@@ -350,11 +147,33 @@ Engine.readMaster = function(masterData){
     PIXI.loader.load(Engine.start);
 };
 
+Engine.loadJSON = function(path,callback,info){
+    var xobj = new XMLHttpRequest();
+    xobj.overrideMimeType("application/json");
+    xobj.open('GET', path, true);
+    xobj.onreadystatechange = function () {
+        if (xobj.readyState == 4 && xobj.status == "200") {
+            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+            callback(JSON.parse(xobj.responseText),info);
+        }
+    };
+    xobj.send(null);
+};
 
 Engine.start = function(loader, resources){
     Engine.resources = resources;
     Engine.addHero();
     requestAnimationFrame(Engine.update);
+};
+
+Engine.addHero = function(){
+    startx = 71; //35
+    starty = 22;//30;
+    Engine.player = Engine.addSprite('hero',startx,starty);
+    Engine.player.visible = Engine.showHero;
+    Engine.player.chunk = Utils.tileToAOI({x:startx,y:starty});
+    Engine.updateEnvironment();
+    Engine.updateCamera();
 };
 
 Engine.addSprite = function(key,x,y){
@@ -376,8 +195,28 @@ Engine.orderStage = function(){
     });
 };
 
+Engine.displayChunk = function(id){
+    if(Engine.mapDataCache[id]){
+        // Chunks are deleted and redrawn rather than having their visibility toggled on/off, to avoid accumulating in memory
+        Engine.drawChunk(Engine.mapDataCache[id],id);
+    }else {
+        Engine.loadJSON(Engine.mapDataLocation+'/chunk' + id + '.json', Engine.drawChunk, id);
+    }
+};
+
 Engine.displayMap = function(path){
     Engine.loadJSON(path,Engine.makeMap);
+};
+
+Engine.drawChunk = function(mapData,id){
+    var chunk = new Chunk(mapData,1);
+    chunk.id = id;
+    Engine.chunks[chunk.id] = chunk;
+    if(!Engine.mapDataCache[chunk.id]) Engine.mapDataCache[chunk.id] = mapData;
+    chunk.drawLayers();
+    Engine.displayedChunks.push(chunk.id);
+    if(Engine.showGrid) Engine.drawGrid(chunk);
+    Engine.addToStage(chunk);
 };
 
 Engine.toggleSelection = function(){
@@ -465,6 +304,18 @@ Engine.getTilesetFromTile = function(tile){
     chunk.addChild(sprite);
 };*/
 
+Engine.removeChunk = function(id){
+    Engine.stage.removeChild(Engine.chunks[id]);
+    Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
+};
+
+Engine.update = function(){
+    Engine.renderer.render(Engine.stage);
+    requestAnimationFrame(Engine.update);
+    document.getElementById('visible').innerHTML = Engine.displayedChunks.length;
+    //console.log(Engine.stage.children.length+' children');
+};
+
 Engine.zoom = function(coef){
     var increment;
     if(coef == -1){
@@ -536,6 +387,32 @@ Engine.updateCamera = function(){
     Engine.stage.pivot.set(Engine.camera.x*Engine.tileWidth,Engine.camera.y*Engine.tileHeight);
     document.getElementById('cx').innerHTML = Engine.camera.x;
     document.getElementById('cy').innerHTML = Engine.camera.y;
+};
+
+Engine.updateEnvironment = function(){
+    var chunks = Utils.listVisibleAOIs(Engine.player.chunk);
+    var newChunks = chunks.diff(Engine.displayedChunks);
+    var oldChunks = Engine.displayedChunks.diff(chunks);
+
+    if(!Engine.debug) {
+        for (var i = 0; i < oldChunks.length; i++) {
+            //console.log('removing '+oldChunks[i]);
+            Engine.removeChunk(oldChunks[i]);
+        }
+    }
+
+    for(var j = 0; j < newChunks.length; j++){
+        //console.log('adding '+newChunks[j]);
+        Engine.displayChunk(newChunks[j]);
+    }
+};
+
+Engine.move = function(x,y){
+    Engine.setPosition(Engine.player,x,y);
+    Engine.player.chunk = Utils.tileToAOI(Engine.player.tilePosition);
+    if(Engine.player.chunk != Engine.player.previousChunk) Engine.updateEnvironment();
+    Engine.player.previousChunk = Engine.player.chunk;
+    Engine.updateCamera();
 };
 
 Engine.setPosition = function(sprite,x,y){
@@ -871,8 +748,8 @@ Engine.fillWater = function(lake,chunk,type){
     var map = Geometry.shoreBox.getMap(type);
     var oppositeMap = Geometry.shoreBox.getMap(oppositeType);
     var limit = {
-        1: (Utils.nbChunksVertical*Engine.chunkHeight)-1,
-        2: (Utils.nbChunksHorizontal*Engine.chunkWidth)-1,
+        1: (Engine.nbChunksVertical*Engine.chunkHeight)-1,
+        2: (Engine.nbChunksHorizontal*Engine.chunkWidth)-1,
         3: 0,
         4: 0
     };
@@ -1039,4 +916,4 @@ Engine.save = function(){
     Engine.editHistory = [];
 };
 
-//Engine.boot();
+Engine.boot();

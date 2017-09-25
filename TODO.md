@@ -1,18 +1,21 @@
+World building
+Design document
+Clean code
+Networking
+
 * Cleaning:
 - Restore "studio" capabilities
 - Remove comment-out stuff
 - Clean up Utils
 - Move Geometry to studio?
+- Remove phaser_map and mapbis
 - Split server in two (game and dev server)
-* Procedural world
+-----
 * Network
-- AOI & Update packages
--- Get existing players on connect, sync movement using AOI/packages
-- trim
 - Interact with db
-- Latency estimation
 - Load existing player
-
+-----
+* Deployment
 - Two repositories, for production and development, with node scripts taking care
 of copying what is needed from one to the other (+ uglifying and compressing etc.)
 -> Possible to programmatically push?  http://radek.io/2015/10/27/nodegit/
@@ -21,7 +24,6 @@ of copying what is needed from one to the other (+ uglifying and compressing etc
 appearance and behaviour, reduced code visibility, and possibly *no* node-modules)
 - Scripts to group what is needed for the app, uglify/compress and build
 - Migrate Geometry to server to hide it?
-
 - Secure chunk access? (check client position before serving)
 -----
 * Tools:
@@ -36,3 +38,16 @@ Alt:
 - COnvert image to gray levels
 - Display mouse coordinates on the fly
 - Analyze coast automatically
+
+
+Axes of progress:
+- Battle system
+- Exploration
+- Trade
+- Crafting
+- Settlement defense
+- Settlement economy
+- Polish
+- Tutorial
+- Daily quests
+- Map

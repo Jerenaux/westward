@@ -1,6 +1,6 @@
 /*!
- * pixi.js - v4.5.3
- * Compiled Mon, 12 Jun 2017 14:48:16 UTC
+ * pixi.js - v4.5.6
+ * Compiled Wed, 20 Sep 2017 21:09:30 UTC
  *
  * pixi.js is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -1172,7 +1172,7 @@ if ('undefined' !== typeof module) {
 
 },{}],4:[function(require,module,exports){
 /**
- * isMobile.js v0.4.0
+ * isMobile.js v0.4.1
  *
  * A simple library to detect Apple phones and tablets,
  * Android phones and tablets, other mobile devices (like blackberry, mini-opera and windows phone),
@@ -1191,7 +1191,7 @@ if ('undefined' !== typeof module) {
         android_tablet      = /Android/i,
         amazon_phone        = /(?=.*\bAndroid\b)(?=.*\bSD4930UR\b)/i,
         amazon_tablet       = /(?=.*\bAndroid\b)(?=.*\b(?:KFOT|KFTT|KFJWI|KFJWA|KFSOWI|KFTHWI|KFTHWA|KFAPWI|KFAPWA|KFARWI|KFASWI|KFSAWI|KFSAWA)\b)/i,
-        windows_phone       = /IEMobile/i,
+        windows_phone       = /Windows Phone/i,
         windows_tablet      = /(?=.*\bWindows\b)(?=.*\bARM\b)/i, // Match 'Windows' AND 'ARM'
         other_blackberry    = /BlackBerry/i,
         other_blackberry_10 = /BB10/i,
@@ -1429,7 +1429,7 @@ var Buffer = function(gl, type, data, drawType)
      *
      * @member {WebGLBuffer}
      */
-	this.buffer = gl.createBuffer(); 
+	this.buffer = gl.createBuffer();
 
 	/**
      * The type of the buffer
@@ -1456,6 +1456,8 @@ var Buffer = function(gl, type, data, drawType)
 	{
 		this.upload(data);
 	}
+
+	this._updateID = 0;
 };
 
 /**
@@ -1612,6 +1614,8 @@ Framebuffer.prototype.enableStencil = function()
     // TODO.. this is depth AND stencil?
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, this.stencil);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_STENCIL,  this.width  , this.height );
+
+
 };
 
 /**
@@ -1628,7 +1632,7 @@ Framebuffer.prototype.clear = function( r, g, b, a )
     var gl = this.gl;
 
     gl.clearColor(r, g, b, a);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 };
 
 /**
@@ -1712,6 +1716,8 @@ Framebuffer.createRGBA = function(gl, width, height, data)
     var fbo = new Framebuffer(gl, width, height);
     fbo.enableTexture(texture);
 
+    //fbo.enableStencil(); // get this back on soon!
+
     fbo.unbind();
 
     return fbo;
@@ -1748,6 +1754,7 @@ module.exports = Framebuffer;
 var compileProgram = require('./shader/compileProgram'),
 	extractAttributes = require('./shader/extractAttributes'),
 	extractUniforms = require('./shader/extractUniforms'),
+	setPrecision = require('./shader/setPrecision'),
 	generateUniformAccessObject = require('./shader/generateUniformAccessObject');
 
 /**
@@ -1758,8 +1765,10 @@ var compileProgram = require('./shader/compileProgram'),
  * @param gl {WebGLRenderingContext}
  * @param vertexSrc {string|string[]} The vertex shader source as an array of strings.
  * @param fragmentSrc {string|string[]} The fragment shader source as an array of strings.
+ * @param precision {precision]} The float precision of the shader. Options are 'lowp', 'mediump' or 'highp'.
+ * @param attributeLocations {object} A key value pair showing which location eact attribute should sit eg {position:0, uvs:1}
  */
-var Shader = function(gl, vertexSrc, fragmentSrc)
+var Shader = function(gl, vertexSrc, fragmentSrc, precision, attributeLocations)
 {
 	/**
 	 * The current WebGL rendering context
@@ -1768,14 +1777,19 @@ var Shader = function(gl, vertexSrc, fragmentSrc)
 	 */
 	this.gl = gl;
 
+	if(precision)
+	{
+		vertexSrc = setPrecision(vertexSrc, precision);
+		fragmentSrc = setPrecision(fragmentSrc, precision);
+	}
+
 	/**
 	 * The shader program
 	 *
 	 * @member {WebGLProgram}
 	 */
 	// First compile the program..
-	this.program = compileProgram(gl, vertexSrc, fragmentSrc);
-
+	this.program = compileProgram(gl, vertexSrc, fragmentSrc, attributeLocations);
 
 	/**
 	 * The attributes of the shader as an object containing the following properties
@@ -1790,7 +1804,7 @@ var Shader = function(gl, vertexSrc, fragmentSrc)
 	// next extract the attributes
 	this.attributes = extractAttributes(gl, this.program);
 
-    var uniformData = extractUniforms(gl, this.program);
+    this.uniformData = extractUniforms(gl, this.program);
 
 	/**
 	 * The uniforms of the shader as an object containing the following properties
@@ -1800,7 +1814,8 @@ var Shader = function(gl, vertexSrc, fragmentSrc)
 	 * }
 	 * @member {Object}
 	 */
-    this.uniforms = generateUniformAccessObject( gl, uniformData );
+	this.uniforms = generateUniformAccessObject( gl, this.uniformData );
+
 };
 /**
  * Uses this shader
@@ -1816,12 +1831,18 @@ Shader.prototype.bind = function()
  */
 Shader.prototype.destroy = function()
 {
-	// var gl = this.gl;
+	this.attributes = null;
+	this.uniformData = null;
+	this.uniforms = null;
+
+	var gl = this.gl;
+	gl.deleteProgram(this.program);
 };
+
 
 module.exports = Shader;
 
-},{"./shader/compileProgram":14,"./shader/extractAttributes":16,"./shader/extractUniforms":17,"./shader/generateUniformAccessObject":18}],9:[function(require,module,exports){
+},{"./shader/compileProgram":14,"./shader/extractAttributes":16,"./shader/extractUniforms":17,"./shader/generateUniformAccessObject":18,"./shader/setPrecision":22}],9:[function(require,module,exports){
 
 /**
  * Helper class to create a WebGL Texture
@@ -1915,7 +1936,7 @@ Texture.prototype.upload = function(source)
 
 	if(newHeight !== this.height || newWidth !== this.width)
 	{
-    	gl.texImage2D(gl.TEXTURE_2D, 0, this.format, this.format, this.type, source);
+		gl.texImage2D(gl.TEXTURE_2D, 0, this.format, this.format, this.type, source);
 	}
 	else
 	{
@@ -1964,7 +1985,7 @@ Texture.prototype.uploadData = function(data, width, height)
 	else
 	{
 		// TODO support for other types
-		this.type = gl.UNSIGNED_BYTE;
+		this.type = this.type || gl.UNSIGNED_BYTE;
 	}
 
 	// what type of data?
@@ -2294,19 +2315,20 @@ VertexArrayObject.prototype.activate = function()
             lastBuffer = attrib.buffer;
         }
 
-        //attrib.attribute.pointer(attrib.type, attrib.normalized, attrib.stride, attrib.start);
         gl.vertexAttribPointer(attrib.attribute.location,
-                               attrib.attribute.size, attrib.type || gl.FLOAT,
+                               attrib.attribute.size,
+                               attrib.type || gl.FLOAT,
                                attrib.normalized || false,
                                attrib.stride || 0,
                                attrib.start || 0);
-
-
     }
 
     setVertexAttribArrays(gl, this.attributes, this.nativeState);
 
-    this.indexBuffer.bind();
+    if(this.indexBuffer)
+    {
+        this.indexBuffer.bind();
+    }
 
     return this;
 };
@@ -2379,7 +2401,16 @@ VertexArrayObject.prototype.clear = function()
 VertexArrayObject.prototype.draw = function(type, size, start)
 {
     var gl = this.gl;
-    gl.drawElements(type, size, gl.UNSIGNED_SHORT, start || 0);
+
+    if(this.indexBuffer)
+    {
+        gl.drawElements(type, size || this.indexBuffer.data.length, gl.UNSIGNED_SHORT, (start || 0) * 2 );
+    }
+    else
+    {
+        // TODO need a better way to calculate size..
+        gl.drawArrays(type, start, size || this.getSize());
+    }
 
     return this;
 };
@@ -2402,6 +2433,12 @@ VertexArrayObject.prototype.destroy = function()
 
     this.nativeVaoExtension = null;
     this.nativeVao = null;
+};
+
+VertexArrayObject.prototype.getSize = function()
+{
+    var attrib = this.attributes[0];
+    return attrib.buffer.data.length / (( attrib.stride/4 ) || attrib.attribute.size);
 };
 
 },{"./setVertexAttribArrays":13}],11:[function(require,module,exports){
@@ -2524,9 +2561,10 @@ module.exports = setVertexAttribArrays;
  * @param gl {WebGLRenderingContext} The current WebGL context {WebGLProgram}
  * @param vertexSrc {string|string[]} The vertex shader source as an array of strings.
  * @param fragmentSrc {string|string[]} The fragment shader source as an array of strings.
+ * @param attributeLocations {Object} An attribute location map that lets you manually set the attribute locations
  * @return {WebGLProgram} the shader program
  */
-var compileProgram = function(gl, vertexSrc, fragmentSrc)
+var compileProgram = function(gl, vertexSrc, fragmentSrc, attributeLocations)
 {
     var glVertShader = compileShader(gl, gl.VERTEX_SHADER, vertexSrc);
     var glFragShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentSrc);
@@ -2535,6 +2573,17 @@ var compileProgram = function(gl, vertexSrc, fragmentSrc)
 
     gl.attachShader(program, glVertShader);
     gl.attachShader(program, glFragShader);
+
+    // optionally, set the attributes manually for the program rather than letting WebGL decide..
+    if(attributeLocations)
+    {
+        for(var i in attributeLocations)
+        {
+            gl.bindAttribLocation(program, attributeLocations[i], i);
+        }
+    }
+
+
     gl.linkProgram(program);
 
     // if linking fails, then log and cleanup
@@ -2772,6 +2821,7 @@ var generateUniformAccessObject = function(gl, uniformData)
         var nameTokens = fullName.split('.');
         var name = nameTokens[nameTokens.length - 1];
 
+
         var uniformGroup = getUniformGroup(nameTokens, uniforms);
 
         var uniform =  uniformData[fullName];
@@ -2895,10 +2945,11 @@ module.exports = {
     extractAttributes: require('./extractAttributes'),
     extractUniforms: require('./extractUniforms'),
     generateUniformAccessObject: require('./generateUniformAccessObject'),
+    setPrecision: require('./setPrecision'),
     mapSize: require('./mapSize'),
-    mapType: require('./mapType')  
+    mapType: require('./mapType')
 };
-},{"./compileProgram":14,"./defaultValue":15,"./extractAttributes":16,"./extractUniforms":17,"./generateUniformAccessObject":18,"./mapSize":20,"./mapType":21}],20:[function(require,module,exports){
+},{"./compileProgram":14,"./defaultValue":15,"./extractAttributes":16,"./extractUniforms":17,"./generateUniformAccessObject":18,"./mapSize":20,"./mapType":21,"./setPrecision":22}],20:[function(require,module,exports){
 /**
  * @class
  * @memberof PIXI.glCore.shader
@@ -2985,6 +3036,26 @@ var GL_TO_GLSL_TYPES = {
 module.exports = mapSize;
 
 },{}],22:[function(require,module,exports){
+/**
+ * Sets the float precision on the shader. If the precision is already present this function will do nothing
+ * @param {string} src       the shader source
+ * @param {string} precision The float precision of the shader. Options are 'lowp', 'mediump' or 'highp'.
+ *
+ * @return {string} modified shader source
+ */
+var setPrecision = function(src, precision)
+{
+    if(src.substring(0, 9) !== 'precision')
+    {
+        return 'precision ' + precision + ' float;\n' + src;
+    }
+
+    return src;
+};
+
+module.exports = setPrecision;
+
+},{}],23:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -3213,7 +3284,7 @@ var substr = 'ab'.substr(-1) === 'b'
 
 }).call(this,require('_process'))
 
-},{"_process":23}],23:[function(require,module,exports){
+},{"_process":24}],24:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -3384,6 +3455,10 @@ process.off = noop;
 process.removeListener = noop;
 process.removeAllListeners = noop;
 process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
 
 process.binding = function (name) {
     throw new Error('process.binding is not supported');
@@ -3395,7 +3470,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 ;(function(root) {
@@ -3933,7 +4008,7 @@ process.umask = function() { return 0; };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -4019,7 +4094,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -4106,13 +4181,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":25,"./encode":26}],28:[function(require,module,exports){
+},{"./decode":26,"./encode":27}],29:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -4846,7 +4921,7 @@ Url.prototype.parseHost = function() {
   if (host) this.hostname = host;
 };
 
-},{"./util":29,"punycode":24,"querystring":27}],29:[function(require,module,exports){
+},{"./util":30,"punycode":25,"querystring":28}],30:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -4864,7 +4939,7 @@ module.exports = {
   }
 };
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict'
 
 /**
@@ -4894,7 +4969,7 @@ module.exports = function removeItems(arr, startIdx, removeCount)
   arr.length = len
 }
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -4975,8 +5050,6 @@ var Loader = function () {
          * [`encodeURIComponent`](https://mdn.io/encodeURIComponent) before assigning this property.
          *
          * @example
-         *
-         * ```js
          * const loader = new Loader();
          *
          * loader.defaultQueryString = 'user=me&password=secret';
@@ -4988,7 +5061,6 @@ var Loader = function () {
          *
          * // This will request 'image.png?v=1&user=me&password=secret'
          * loader.add('iamge.png?v=1').load();
-         * ```
          */
         this.defaultQueryString = '';
 
@@ -5452,7 +5524,7 @@ var Loader = function () {
                 resource._onLoadBinding = resource.onComplete.once(_this2._onLoad, _this2);
                 resource.load();
             }
-        });
+        }, true);
     };
 
     /**
@@ -5482,10 +5554,10 @@ var Loader = function () {
         resource._onLoadBinding = null;
 
         // remove this resource from the async queue, and add it to our list of resources that are being parsed
-        resource._dequeue();
         this._resourcesParsing.push(resource);
+        resource._dequeue();
 
-        // run middleware, this *must* happen before dequeue so sub-assets get added properly
+        // run all the after middleware for this resource
         async.eachSeries(this._afterMiddleware, function (fn, next) {
             fn.call(_this3, resource, next);
         }, function () {
@@ -5507,7 +5579,7 @@ var Loader = function () {
                 _this3.progress = MAX_PROGRESS;
                 _this3._onComplete();
             }
-        });
+        }, true);
     };
 
     return Loader;
@@ -5515,7 +5587,7 @@ var Loader = function () {
 
 exports.default = Loader;
 
-},{"./Resource":32,"./async":33,"mini-signals":37,"parse-uri":38}],32:[function(require,module,exports){
+},{"./Resource":33,"./async":34,"mini-signals":38,"parse-uri":39}],33:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -5542,6 +5614,8 @@ var tempAnchor = null;
 var STATUS_NONE = 0;
 var STATUS_OK = 200;
 var STATUS_EMPTY = 204;
+var STATUS_IE_BUG_EMPTY = 1223;
+var STATUS_TYPE_OK = 2;
 
 // noop
 function _noop() {} /* empty */
@@ -5593,6 +5667,9 @@ var Resource = function () {
      *      element to use for loading, instead of creating one.
      * @param {boolean} [options.metadata.skipSource=false] - Skips adding source(s) to the load element. This
      *      is useful if you want to pass in a `loadElement` that you already added load sources to.
+     * @param {string|string[]} [options.metadata.mimeType] - The mime type to use for the source element of a video/audio
+     *      elment. If the urls are an array, you can pass this as an array as well where each index is the mime type to
+     *      use for the corresponding url index.
      */
 
 
@@ -6069,11 +6146,15 @@ var Resource = function () {
             if (navigator.isCocoonJS) {
                 this.data.src = Array.isArray(this.url) ? this.url[0] : this.url;
             } else if (Array.isArray(this.url)) {
+                var mimeTypes = this.metadata.mimeType;
+
                 for (var i = 0; i < this.url.length; ++i) {
-                    this.data.appendChild(this._createSource(type, this.url[i]));
+                    this.data.appendChild(this._createSource(type, this.url[i], Array.isArray(mimeTypes) ? mimeTypes[i] : mimeTypes));
                 }
             } else {
-                this.data.appendChild(this._createSource(type, this.url));
+                var _mimeTypes = this.metadata.mimeType;
+
+                this.data.appendChild(this._createSource(type, this.url, Array.isArray(_mimeTypes) ? _mimeTypes[0] : _mimeTypes));
             }
         }
 
@@ -6168,7 +6249,7 @@ var Resource = function () {
 
     Resource.prototype._createSource = function _createSource(type, url, mime) {
         if (!mime) {
-            mime = type + '/' + url.substr(url.lastIndexOf('.') + 1);
+            mime = type + '/' + this._getExtension(url);
         }
 
         var source = document.createElement('source');
@@ -6253,19 +6334,36 @@ var Resource = function () {
 
     Resource.prototype._xhrOnLoad = function _xhrOnLoad() {
         var xhr = this.xhr;
-        var status = typeof xhr.status === 'undefined' ? xhr.status : STATUS_OK; // XDR has no `.status`, assume 200.
+        var text = '';
+        var status = typeof xhr.status === 'undefined' ? STATUS_OK : xhr.status; // XDR has no `.status`, assume 200.
 
-        // status can be 0 when using the `file://` protocol so we also check if a response is set
-        if (status === STATUS_OK || status === STATUS_EMPTY || status === STATUS_NONE && xhr.responseText.length > 0) {
+        // responseText is accessible only if responseType is '' or 'text' and on older browsers
+        if (xhr.responseType === '' || xhr.responseType === 'text' || typeof xhr.responseType === 'undefined') {
+            text = xhr.responseText;
+        }
+
+        // status can be 0 when using the `file://` protocol so we also check if a response is set.
+        // If it has a response, we assume 200; otherwise a 0 status code with no contents is an aborted request.
+        if (status === STATUS_NONE && text.length > 0) {
+            status = STATUS_OK;
+        }
+        // handle IE9 bug: http://stackoverflow.com/questions/10046972/msie-returns-status-code-of-1223-for-ajax-request
+        else if (status === STATUS_IE_BUG_EMPTY) {
+                status = STATUS_EMPTY;
+            }
+
+        var statusType = status / 100 | 0;
+
+        if (statusType === STATUS_TYPE_OK) {
             // if text, just return it
             if (this.xhrType === Resource.XHR_RESPONSE_TYPE.TEXT) {
-                this.data = xhr.responseText;
+                this.data = text;
                 this.type = Resource.TYPE.TEXT;
             }
             // if json, parse into json object
             else if (this.xhrType === Resource.XHR_RESPONSE_TYPE.JSON) {
                     try {
-                        this.data = JSON.parse(xhr.responseText);
+                        this.data = JSON.parse(text);
                         this.type = Resource.TYPE.JSON;
                     } catch (e) {
                         this.abort('Error trying to parse loaded json: ' + e);
@@ -6279,11 +6377,11 @@ var Resource = function () {
                             if (window.DOMParser) {
                                 var domparser = new DOMParser();
 
-                                this.data = domparser.parseFromString(xhr.responseText, 'text/xml');
+                                this.data = domparser.parseFromString(text, 'text/xml');
                             } else {
                                 var div = document.createElement('div');
 
-                                div.innerHTML = xhr.responseText;
+                                div.innerHTML = text;
 
                                 this.data = div;
                             }
@@ -6297,7 +6395,7 @@ var Resource = function () {
                     }
                     // other types just return the response
                     else {
-                            this.data = xhr.response || xhr.responseText;
+                            this.data = xhr.response || text;
                         }
         } else {
             this.abort('[' + xhr.status + '] ' + xhr.statusText + ': ' + xhr.responseURL);
@@ -6394,11 +6492,10 @@ var Resource = function () {
             ext = url.substring(slashIndex + 1, url.indexOf(';', slashIndex));
         } else {
             var queryStart = url.indexOf('?');
+            var hashStart = url.indexOf('#');
+            var index = Math.min(queryStart > -1 ? queryStart : url.length, hashStart > -1 ? hashStart : url.length);
 
-            if (queryStart !== -1) {
-                url = url.substring(0, queryStart);
-            }
-
+            url = url.substring(0, index);
             ext = url.substring(url.lastIndexOf('.') + 1);
         }
 
@@ -6646,7 +6743,7 @@ function reqType(xhr) {
     return xhr.toString().replace('object ', '');
 }
 
-},{"mini-signals":37,"parse-uri":38}],33:[function(require,module,exports){
+},{"mini-signals":38,"parse-uri":39}],34:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -6661,11 +6758,12 @@ function _noop() {} /* empty */
 /**
  * Iterates an array in series.
  *
- * @param {*[]} array - Array to iterate.
+ * @param {Array.<*>} array - Array to iterate.
  * @param {function} iterator - Function to call for each element.
  * @param {function} callback - Function to call when done, or on error.
+ * @param {boolean} [deferNext=false] - Break synchronous each loop by calling next with a setTimeout of 1.
  */
-function eachSeries(array, iterator, callback) {
+function eachSeries(array, iterator, callback, deferNext) {
     var i = 0;
     var len = array.length;
 
@@ -6678,7 +6776,13 @@ function eachSeries(array, iterator, callback) {
             return;
         }
 
-        iterator(array[i++], next);
+        if (deferNext) {
+            setTimeout(function () {
+                iterator(array[i++], next);
+            }, 1);
+        } else {
+            iterator(array[i++], next);
+        }
     })();
 }
 
@@ -6848,7 +6952,7 @@ function queue(worker, concurrency) {
     return q;
 }
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -6916,40 +7020,31 @@ function encodeBinary(input) {
     return output;
 }
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 'use strict';
 
-exports.__esModule = true;
+// import Loader from './Loader';
+// import Resource from './Resource';
+// import * as async from './async';
+// import * as b64 from './b64';
 
-var _Loader = require('./Loader');
+/* eslint-disable no-undef */
 
-var _Loader2 = _interopRequireDefault(_Loader);
+var Loader = require('./Loader').default;
+var Resource = require('./Resource').default;
+var async = require('./async');
+var b64 = require('./b64');
 
-var _Resource = require('./Resource');
-
-var _Resource2 = _interopRequireDefault(_Resource);
-
-var _async = require('./async');
-
-var async = _interopRequireWildcard(_async);
-
-var _b = require('./b64');
-
-var b64 = _interopRequireWildcard(_b);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-_Loader2.default.Resource = _Resource2.default;
-_Loader2.default.async = async;
-_Loader2.default.base64 = b64;
+Loader.Resource = Resource;
+Loader.async = async;
+Loader.base64 = b64;
 
 // export manually, and also as default
-module.exports = _Loader2.default; // eslint-disable-line no-undef
-exports.default = _Loader2.default;
+module.exports = Loader;
+// export default Loader;
+module.exports.default = Loader;
 
-},{"./Loader":31,"./Resource":32,"./async":33,"./b64":34}],36:[function(require,module,exports){
+},{"./Loader":32,"./Resource":33,"./async":34,"./b64":35}],37:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -7037,7 +7132,7 @@ function blobMiddlewareFactory() {
     };
 }
 
-},{"../../Resource":32,"../../b64":34}],37:[function(require,module,exports){
+},{"../../Resource":33,"../../b64":35}],38:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -7204,7 +7299,7 @@ MiniSignal.MiniSignalBinding = MiniSignalBinding;
 exports['default'] = MiniSignal;
 module.exports = exports['default'];
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict'
 
 module.exports = function parseURI (str, opts) {
@@ -7236,7 +7331,7 @@ module.exports = function parseURI (str, opts) {
   return uri
 }
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -7299,7 +7394,7 @@ var AccessibilityManager = function () {
             this.createTouchHook();
         }
 
-        // first we create a div that will sit over the pixi element. This is where the div overlays will go.
+        // first we create a div that will sit over the PixiJS element. This is where the div overlays will go.
         var div = document.createElement('div');
 
         div.style.width = DIV_TOUCH_SIZE + 'px';
@@ -7310,7 +7405,7 @@ var AccessibilityManager = function () {
         div.style.zIndex = DIV_TOUCH_ZINDEX;
 
         /**
-         * This is the dom element that will sit over the pixi element. This is where the div overlays will go.
+         * This is the dom element that will sit over the PixiJS element. This is where the div overlays will go.
          *
          * @type {HTMLElement}
          * @private
@@ -7730,7 +7825,7 @@ exports.default = AccessibilityManager;
 core.WebGLRenderer.registerPlugin('accessibility', AccessibilityManager);
 core.CanvasRenderer.registerPlugin('accessibility', AccessibilityManager);
 
-},{"../core":64,"./accessibleTarget":40,"ismobilejs":4}],40:[function(require,module,exports){
+},{"../core":65,"./accessibleTarget":41,"ismobilejs":4}],41:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -7788,7 +7883,7 @@ exports.default = {
   _accessibleDiv: false
 };
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -7813,7 +7908,7 @@ Object.defineProperty(exports, 'AccessibilityManager', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-},{"./AccessibilityManager":39,"./accessibleTarget":40}],42:[function(require,module,exports){
+},{"./AccessibilityManager":40,"./accessibleTarget":41}],43:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -7860,6 +7955,9 @@ var Application = function () {
     // eslint-disable-next-line valid-jsdoc
     /**
      * @param {object} [options] - The optional renderer parameters
+     * @param {boolean} [options.autoStart=true] - automatically starts the rendering after the construction.
+     *     Note that setting this parameter to false does NOT stop the shared ticker even if you set
+     *     options.sharedTicker to true in case that it is already started. Stop it by your own.
      * @param {number} [options.width=800] - the width of the renderers view
      * @param {number} [options.height=600] - the height of the renderers view
      * @param {HTMLCanvasElement} [options.view] - the canvas to use as a view, optional
@@ -7873,12 +7971,14 @@ var Application = function () {
      *  (shown if not transparent).
      * @param {boolean} [options.clearBeforeRender=true] - This sets if the renderer will clear the canvas or
      *   not before the new render pass.
-     * @param {boolean} [options.roundPixels=false] - If true Pixi will Math.floor() x/y values when rendering,
+     * @param {boolean} [options.roundPixels=false] - If true PixiJS will Math.floor() x/y values when rendering,
      *  stopping pixel interpolation.
      * @param {boolean} [options.forceFXAA=false] - forces FXAA antialiasing to be used over native.
      *  FXAA is faster, but may not always look as great **webgl only**
      * @param {boolean} [options.legacy=false] - `true` to ensure compatibility with older / less advanced devices.
      *  If you experience unexplained flickering try setting this to true. **webgl only**
+     * @param {string} [options.powerPreference] - Parameter passed to webgl context, set to "high-performance"
+     *  for devices with dual graphics card **webgl only**
      * @param {boolean} [options.sharedTicker=false] - `true` to use PIXI.ticker.shared, `false` to create new ticker.
      * @param {boolean} [options.sharedLoader=false] - `true` to use PIXI.loaders.shared, `false` to create new Loader.
      */
@@ -7901,6 +8001,7 @@ var Application = function () {
          * @protected
          */
         this._options = options = Object.assign({
+            autoStart: true,
             sharedTicker: false,
             forceCanvas: false,
             sharedLoader: false
@@ -7933,7 +8034,9 @@ var Application = function () {
         this.ticker = options.sharedTicker ? _ticker.shared : new _ticker.Ticker();
 
         // Start the rendering
-        this.start();
+        if (options.autoStart) {
+            this.start();
+        }
     }
 
     /**
@@ -8028,7 +8131,7 @@ var Application = function () {
 
 exports.default = Application;
 
-},{"./autoDetectRenderer":44,"./const":45,"./display/Container":47,"./settings":100,"./ticker":119}],43:[function(require,module,exports){
+},{"./autoDetectRenderer":45,"./const":46,"./display/Container":48,"./settings":101,"./ticker":120}],44:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -8092,13 +8195,13 @@ var Shader = function (_GLShader) {
 
 exports.default = Shader;
 
-},{"./settings":100,"pixi-gl-core":12}],44:[function(require,module,exports){
+},{"./settings":101,"pixi-gl-core":12}],45:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 exports.autoDetectRenderer = autoDetectRenderer;
 
-var _utils = require('./../shared/Utils');
+var _utils = require('./utils');
 
 var utils = _interopRequireWildcard(_utils);
 
@@ -8136,12 +8239,14 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
  *   not before the new render pass.
  * @param {number} [options.resolution=1] - The resolution / device pixel ratio of the renderer, retina would be 2
  * @param {boolean} [options.forceCanvas=false] - prevents selection of WebGL renderer, even if such is present
- * @param {boolean} [options.roundPixels=false] - If true Pixi will Math.floor() x/y values when rendering,
+ * @param {boolean} [options.roundPixels=false] - If true PixiJS will Math.floor() x/y values when rendering,
  *  stopping pixel interpolation.
  * @param {boolean} [options.forceFXAA=false] - forces FXAA antialiasing to be used over native.
  *  FXAA is faster, but may not always look as great **webgl only**
  * @param {boolean} [options.legacy=false] - `true` to ensure compatibility with older / less advanced devices.
  *  If you experience unexplained flickering try setting this to true. **webgl only**
+ * @param {string} [options.powerPreference] - Parameter passed to webgl context, set to "high-performance"
+ *  for devices with dual graphics card **webgl only**
  * @return {PIXI.WebGLRenderer|PIXI.CanvasRenderer} Returns WebGL renderer if available, otherwise CanvasRenderer
  */
 function autoDetectRenderer(options, arg1, arg2, arg3) {
@@ -8159,7 +8264,7 @@ function autoDetectRenderer(options, arg1, arg2, arg3) {
     return new _CanvasRenderer2.default(options, arg1, arg2);
 }
 
-},{"./renderers/canvas/CanvasRenderer":76,"./renderers/webgl/WebGLRenderer":83,"./utils":123}],45:[function(require,module,exports){
+},{"./renderers/canvas/CanvasRenderer":77,"./renderers/webgl/WebGLRenderer":84,"./utils":124}],46:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -8172,7 +8277,7 @@ exports.__esModule = true;
  * @name VERSION
  * @type {string}
  */
-var VERSION = exports.VERSION = '4.5.3';
+var VERSION = exports.VERSION = '4.5.6';
 
 /**
  * Two Pi.
@@ -8348,7 +8453,7 @@ var WRAP_MODES = exports.WRAP_MODES = {
 /**
  * The gc modes that are supported by pixi.
  *
- * The {@link PIXI.settings.GC_MODE} Garbage Collection mode for pixi textures is AUTO
+ * The {@link PIXI.settings.GC_MODE} Garbage Collection mode for PixiJS textures is AUTO
  * If set to GC_MODE, the renderer will occasionally check textures usage. If they are not
  * used for a specified period of time they will be removed from the GPU. They will of course
  * be uploaded again when they are required. This is a silent behind the scenes process that
@@ -8502,7 +8607,7 @@ var UPDATE_PRIORITY = exports.UPDATE_PRIORITY = {
   UTILITY: -50
 };
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -8845,7 +8950,7 @@ var Bounds = function () {
 
 exports.default = Bounds;
 
-},{"../math":69}],47:[function(require,module,exports){
+},{"../math":70}],48:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -8932,7 +9037,7 @@ var Container = function (_DisplayObject) {
                 this.addChild(arguments[i]);
             }
         } else {
-            // if the child has a parent then lets remove it as Pixi objects can only exist in one place
+            // if the child has a parent then lets remove it as PixiJS objects can only exist in one place
             if (child.parent) {
                 child.parent.removeChild(child);
             }
@@ -9463,7 +9568,7 @@ var Container = function (_DisplayObject) {
 exports.default = Container;
 Container.prototype.containerUpdateTransform = Container.prototype.updateTransform;
 
-},{"../utils":123,"./DisplayObject":48}],48:[function(require,module,exports){
+},{"../utils":124,"./DisplayObject":49}],49:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -10155,7 +10260,7 @@ var DisplayObject = function (_EventEmitter) {
 exports.default = DisplayObject;
 DisplayObject.prototype.displayObjectUpdateTransform = DisplayObject.prototype.updateTransform;
 
-},{"../const":45,"../math":69,"../settings":100,"./Bounds":46,"./Transform":49,"./TransformStatic":51,"eventemitter3":3}],49:[function(require,module,exports){
+},{"../const":46,"../math":70,"../settings":101,"./Bounds":47,"./Transform":50,"./TransformStatic":52,"eventemitter3":3}],50:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -10336,7 +10441,7 @@ var Transform = function (_TransformBase) {
 
 exports.default = Transform;
 
-},{"../math":69,"./TransformBase":50}],50:[function(require,module,exports){
+},{"../math":70,"./TransformBase":51}],51:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -10423,7 +10528,7 @@ TransformBase.prototype.updateWorldTransform = TransformBase.prototype.updateTra
 
 TransformBase.IDENTITY = new TransformBase();
 
-},{"../math":69}],51:[function(require,module,exports){
+},{"../math":70}],52:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -10633,7 +10738,7 @@ var TransformStatic = function (_TransformBase) {
 
 exports.default = TransformStatic;
 
-},{"../math":69,"./TransformBase":50}],52:[function(require,module,exports){
+},{"../math":70,"./TransformBase":51}],53:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -11315,7 +11420,7 @@ var Graphics = function (_Container) {
     /**
      * Draws a polygon using the given path.
      *
-     * @param {number[]|PIXI.Point[]} path - The path data used to construct the polygon.
+     * @param {number[]|PIXI.Point[]|PIXI.Polygon} path - The path data used to construct the polygon.
      * @return {PIXI.Graphics} This Graphics object. Good for chaining method calls
      */
 
@@ -11805,7 +11910,7 @@ exports.default = Graphics;
 
 Graphics._SPRITE_TEXTURE = null;
 
-},{"../const":45,"../display/Bounds":46,"../display/Container":47,"../math":69,"../renderers/canvas/CanvasRenderer":76,"../sprites/Sprite":101,"../textures/RenderTexture":112,"../textures/Texture":114,"../utils":123,"./GraphicsData":53,"./utils/bezierCurveTo":55}],53:[function(require,module,exports){
+},{"../const":46,"../display/Bounds":47,"../display/Container":48,"../math":70,"../renderers/canvas/CanvasRenderer":77,"../sprites/Sprite":102,"../textures/RenderTexture":113,"../textures/Texture":115,"../utils":124,"./GraphicsData":54,"./utils/bezierCurveTo":56}],54:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -11927,7 +12032,7 @@ var GraphicsData = function () {
 
 exports.default = GraphicsData;
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -11946,7 +12051,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @author Mat Groves
  *
  * Big thanks to the very clever Matt DesLauriers <mattdesl> https://github.com/mattdesl/
- * for creating the original pixi version!
+ * for creating the original PixiJS version!
  * Also a thanks to https://github.com/bchevalier for tweaking the tint and alpha so that they
  * now share 4 bytes on the vertex buffer
  *
@@ -12196,7 +12301,7 @@ exports.default = CanvasGraphicsRenderer;
 
 _CanvasRenderer2.default.registerPlugin('graphics', CanvasGraphicsRenderer);
 
-},{"../../const":45,"../../renderers/canvas/CanvasRenderer":76}],55:[function(require,module,exports){
+},{"../../const":46,"../../renderers/canvas/CanvasRenderer":77}],56:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -12246,7 +12351,7 @@ function bezierCurveTo(fromX, fromY, cpX, cpY, cpX2, cpY2, toX, toY) {
     return path;
 }
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -12511,7 +12616,7 @@ exports.default = GraphicsRenderer;
 
 _WebGLRenderer2.default.registerPlugin('graphics', GraphicsRenderer);
 
-},{"../../const":45,"../../renderers/webgl/WebGLRenderer":83,"../../renderers/webgl/utils/ObjectRenderer":93,"../../utils":123,"./WebGLGraphicsData":57,"./shaders/PrimitiveShader":58,"./utils/buildCircle":59,"./utils/buildPoly":61,"./utils/buildRectangle":62,"./utils/buildRoundedRectangle":63}],57:[function(require,module,exports){
+},{"../../const":46,"../../renderers/webgl/WebGLRenderer":84,"../../renderers/webgl/utils/ObjectRenderer":94,"../../utils":124,"./WebGLGraphicsData":58,"./shaders/PrimitiveShader":59,"./utils/buildCircle":60,"./utils/buildPoly":62,"./utils/buildRectangle":63,"./utils/buildRoundedRectangle":64}],58:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -12654,7 +12759,7 @@ var WebGLGraphicsData = function () {
 
 exports.default = WebGLGraphicsData;
 
-},{"pixi-gl-core":12}],58:[function(require,module,exports){
+},{"pixi-gl-core":12}],59:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -12699,7 +12804,7 @@ var PrimitiveShader = function (_Shader) {
 
 exports.default = PrimitiveShader;
 
-},{"../../../Shader":43}],59:[function(require,module,exports){
+},{"../../../Shader":44}],60:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -12792,7 +12897,7 @@ function buildCircle(graphicsData, webGLData, webGLDataNativeLines) {
     }
 }
 
-},{"../../../const":45,"../../../utils":123,"./buildLine":60}],60:[function(require,module,exports){
+},{"../../../const":46,"../../../utils":124,"./buildLine":61}],61:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -13062,7 +13167,7 @@ function buildNativeLine(graphicsData, webGLData) {
     }
 }
 
-},{"../../../math":69,"../../../utils":123}],61:[function(require,module,exports){
+},{"../../../math":70,"../../../utils":124}],62:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -13148,7 +13253,7 @@ function buildPoly(graphicsData, webGLData, webGLDataNativeLines) {
     }
 }
 
-},{"../../../utils":123,"./buildLine":60,"earcut":2}],62:[function(require,module,exports){
+},{"../../../utils":124,"./buildLine":61,"earcut":2}],63:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -13224,7 +13329,7 @@ function buildRectangle(graphicsData, webGLData, webGLDataNativeLines) {
     }
 }
 
-},{"../../../utils":123,"./buildLine":60}],63:[function(require,module,exports){
+},{"../../../utils":124,"./buildLine":61}],64:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -13380,7 +13485,7 @@ function quadraticBezierCurve(fromX, fromY, cpX, cpY, toX, toY) {
     return points;
 }
 
-},{"../../../utils":123,"./buildLine":60,"earcut":2}],64:[function(require,module,exports){
+},{"../../../utils":124,"./buildLine":61,"earcut":2}],65:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -13725,7 +13830,7 @@ Object.defineProperty(exports, 'autoDetectRenderer', {
   }
 });
 
-var _utils = require('./../shared/Utils');
+var _utils = require('./utils');
 
 var utils = _interopRequireWildcard(_utils);
 
@@ -13757,7 +13862,7 @@ exports.WebGLRenderer = _WebGLRenderer2.default; /**
                                                   * @namespace PIXI
                                                   */
 
-},{"./Application":42,"./Shader":43,"./autoDetectRenderer":44,"./const":45,"./display/Bounds":46,"./display/Container":47,"./display/DisplayObject":48,"./display/Transform":49,"./display/TransformBase":50,"./display/TransformStatic":51,"./graphics/Graphics":52,"./graphics/GraphicsData":53,"./graphics/canvas/CanvasGraphicsRenderer":54,"./graphics/webgl/GraphicsRenderer":56,"./math":69,"./renderers/canvas/CanvasRenderer":76,"./renderers/canvas/utils/CanvasRenderTarget":78,"./renderers/webgl/WebGLRenderer":83,"./renderers/webgl/filters/Filter":85,"./renderers/webgl/filters/spriteMask/SpriteMaskFilter":88,"./renderers/webgl/managers/WebGLManager":92,"./renderers/webgl/utils/ObjectRenderer":93,"./renderers/webgl/utils/Quad":94,"./renderers/webgl/utils/RenderTarget":95,"./settings":100,"./sprites/Sprite":101,"./sprites/canvas/CanvasSpriteRenderer":102,"./sprites/canvas/CanvasTinter":103,"./sprites/webgl/SpriteRenderer":105,"./text/Text":107,"./text/TextMetrics":108,"./text/TextStyle":109,"./textures/BaseRenderTexture":110,"./textures/BaseTexture":111,"./textures/RenderTexture":112,"./textures/Spritesheet":113,"./textures/Texture":114,"./textures/TextureUvs":115,"./textures/VideoBaseTexture":116,"./ticker":119,"./utils":123,"pixi-gl-core":12}],65:[function(require,module,exports){
+},{"./Application":43,"./Shader":44,"./autoDetectRenderer":45,"./const":46,"./display/Bounds":47,"./display/Container":48,"./display/DisplayObject":49,"./display/Transform":50,"./display/TransformBase":51,"./display/TransformStatic":52,"./graphics/Graphics":53,"./graphics/GraphicsData":54,"./graphics/canvas/CanvasGraphicsRenderer":55,"./graphics/webgl/GraphicsRenderer":57,"./math":70,"./renderers/canvas/CanvasRenderer":77,"./renderers/canvas/utils/CanvasRenderTarget":79,"./renderers/webgl/WebGLRenderer":84,"./renderers/webgl/filters/Filter":86,"./renderers/webgl/filters/spriteMask/SpriteMaskFilter":89,"./renderers/webgl/managers/WebGLManager":93,"./renderers/webgl/utils/ObjectRenderer":94,"./renderers/webgl/utils/Quad":95,"./renderers/webgl/utils/RenderTarget":96,"./settings":101,"./sprites/Sprite":102,"./sprites/canvas/CanvasSpriteRenderer":103,"./sprites/canvas/CanvasTinter":104,"./sprites/webgl/SpriteRenderer":106,"./text/Text":108,"./text/TextMetrics":109,"./text/TextStyle":110,"./textures/BaseRenderTexture":111,"./textures/BaseTexture":112,"./textures/RenderTexture":113,"./textures/Spritesheet":114,"./textures/Texture":115,"./textures/TextureUvs":116,"./textures/VideoBaseTexture":117,"./ticker":120,"./utils":124,"pixi-gl-core":12}],66:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -13949,7 +14054,7 @@ var GroupD8 = {
 
 exports.default = GroupD8;
 
-},{"./Matrix":66}],66:[function(require,module,exports){
+},{"./Matrix":67}],67:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -13965,7 +14070,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
- * The pixi Matrix class as an object, which makes it a lot faster,
+ * The PixiJS Matrix class as an object, which makes it a lot faster,
  * here is a representation of it :
  * | a | b | tx|
  * | c | d | ty|
@@ -14480,7 +14585,7 @@ var Matrix = function () {
 
 exports.default = Matrix;
 
-},{"./Point":68}],67:[function(require,module,exports){
+},{"./Point":69}],68:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -14597,7 +14702,7 @@ var ObservablePoint = function () {
 
 exports.default = ObservablePoint;
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -14688,7 +14793,7 @@ var Point = function () {
 
 exports.default = Point;
 
-},{}],69:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -14776,7 +14881,7 @@ Object.defineProperty(exports, 'RoundedRectangle', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-},{"./GroupD8":65,"./Matrix":66,"./ObservablePoint":67,"./Point":68,"./shapes/Circle":70,"./shapes/Ellipse":71,"./shapes/Polygon":72,"./shapes/Rectangle":73,"./shapes/RoundedRectangle":74}],70:[function(require,module,exports){
+},{"./GroupD8":66,"./Matrix":67,"./ObservablePoint":68,"./Point":69,"./shapes/Circle":71,"./shapes/Ellipse":72,"./shapes/Polygon":73,"./shapes/Rectangle":74,"./shapes/RoundedRectangle":75}],71:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -14890,7 +14995,7 @@ var Circle = function () {
 
 exports.default = Circle;
 
-},{"../../const":45,"./Rectangle":73}],71:[function(require,module,exports){
+},{"../../const":46,"./Rectangle":74}],72:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -15012,7 +15117,7 @@ var Ellipse = function () {
 
 exports.default = Ellipse;
 
-},{"../../const":45,"./Rectangle":73}],72:[function(require,module,exports){
+},{"../../const":46,"./Rectangle":74}],73:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -15143,7 +15248,7 @@ var Polygon = function () {
 
 exports.default = Polygon;
 
-},{"../../const":45,"../Point":68}],73:[function(require,module,exports){
+},{"../../const":46,"../Point":69}],74:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -15180,25 +15285,25 @@ var Rectangle = function () {
          * @member {number}
          * @default 0
          */
-        this.x = x;
+        this.x = Number(x);
 
         /**
          * @member {number}
          * @default 0
          */
-        this.y = y;
+        this.y = Number(y);
 
         /**
          * @member {number}
          * @default 0
          */
-        this.width = width;
+        this.width = Number(width);
 
         /**
          * @member {number}
          * @default 0
          */
-        this.height = height;
+        this.height = Number(height);
 
         /**
          * The type of the object, mainly used to avoid `instanceof` checks
@@ -15406,7 +15511,7 @@ var Rectangle = function () {
 
 exports.default = Rectangle;
 
-},{"../../const":45}],74:[function(require,module,exports){
+},{"../../const":46}],75:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -15539,7 +15644,7 @@ var RoundedRectangle = function () {
 
 exports.default = RoundedRectangle;
 
-},{"../../const":45}],75:[function(require,module,exports){
+},{"../../const":46}],76:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -15579,8 +15684,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var tempMatrix = new _math.Matrix();
 
 /**
- * The SystemRenderer is the base for a Pixi Renderer. It is extended by the {@link PIXI.CanvasRenderer}
- * and {@link PIXI.WebGLRenderer} which can be used for rendering a Pixi scene.
+ * The SystemRenderer is the base for a PixiJS Renderer. It is extended by the {@link PIXI.CanvasRenderer}
+ * and {@link PIXI.WebGLRenderer} which can be used for rendering a PixiJS scene.
  *
  * @abstract
  * @class
@@ -15609,7 +15714,7 @@ var SystemRenderer = function (_EventEmitter) {
    *      not before the new render pass.
    * @param {number} [options.backgroundColor=0x000000] - The background color of the rendered area
    *  (shown if not transparent).
-   * @param {boolean} [options.roundPixels=false] - If true Pixi will Math.floor() x/y values when rendering,
+   * @param {boolean} [options.roundPixels=false] - If true PixiJS will Math.floor() x/y values when rendering,
    *  stopping pixel interpolation.
    */
   function SystemRenderer(system, options, arg2, arg3) {
@@ -15702,8 +15807,8 @@ var SystemRenderer = function (_EventEmitter) {
 
     /**
      * This sets if the CanvasRenderer will clear the canvas or not before the new render pass.
-     * If the scene is NOT transparent Pixi will use a canvas sized fillRect operation every
-     * frame to set the canvas background color. If the scene is transparent Pixi will use clearRect
+     * If the scene is NOT transparent PixiJS will use a canvas sized fillRect operation every
+     * frame to set the canvas background color. If the scene is transparent PixiJS will use clearRect
      * to clear the canvas every frame. Disable this by setting this to false. For example if
      * your game has a canvas filling background image you often don't need this set.
      *
@@ -15713,7 +15818,7 @@ var SystemRenderer = function (_EventEmitter) {
     _this.clearBeforeRender = options.clearBeforeRender;
 
     /**
-     * If true Pixi will Math.floor() x/y values when rendering, stopping pixel interpolation.
+     * If true PixiJS will Math.floor() x/y values when rendering, stopping pixel interpolation.
      * Handy for crisp pixel art and speed on legacy devices.
      *
      * @member {boolean}
@@ -15902,7 +16007,7 @@ var SystemRenderer = function (_EventEmitter) {
 
 exports.default = SystemRenderer;
 
-},{"../const":45,"../display/Container":47,"../math":69,"../settings":100,"../textures/RenderTexture":112,"../utils":123,"eventemitter3":3}],76:[function(require,module,exports){
+},{"../const":46,"../display/Container":48,"../math":70,"../settings":101,"../textures/RenderTexture":113,"../utils":124,"eventemitter3":3}],77:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -15968,7 +16073,7 @@ var CanvasRenderer = function (_SystemRenderer) {
      *      not before the new render pass.
      * @param {number} [options.backgroundColor=0x000000] - The background color of the rendered area
      *  (shown if not transparent).
-     * @param {boolean} [options.roundPixels=false] - If true Pixi will Math.floor() x/y values when rendering,
+     * @param {boolean} [options.roundPixels=false] - If true PixiJS will Math.floor() x/y values when rendering,
      *  stopping pixel interpolation.
      */
     function CanvasRenderer(options, arg2, arg3) {
@@ -16116,6 +16221,7 @@ var CanvasRenderer = function (_SystemRenderer) {
 
         context.setTransform(1, 0, 0, 1, 0, 0);
         context.globalAlpha = 1;
+        this._activeBlendMode = _const.BLEND_MODES.NORMAL;
         context.globalCompositeOperation = this.blendModes[_const.BLEND_MODES.NORMAL];
 
         if (navigator.isCocoonJS && this.view.screencanvas) {
@@ -16221,10 +16327,19 @@ var CanvasRenderer = function (_SystemRenderer) {
         _SystemRenderer.prototype.resize.call(this, screenWidth, screenHeight);
 
         // reset the scale mode.. oddly this seems to be reset when the canvas is resized.
-        // surely a browser bug?? Let pixi fix that for you..
+        // surely a browser bug?? Let PixiJS fix that for you..
         if (this.smoothProperty) {
             this.rootContext[this.smoothProperty] = _settings2.default.SCALE_MODE === _const.SCALE_MODES.LINEAR;
         }
+    };
+
+    /**
+     * Checks if blend mode has changed.
+     */
+
+
+    CanvasRenderer.prototype.invalidateBlendMode = function invalidateBlendMode() {
+        this._activeBlendMode = this.blendModes.indexOf(this.context.globalCompositeOperation);
     };
 
     return CanvasRenderer;
@@ -16254,7 +16369,7 @@ var CanvasRenderer = function (_SystemRenderer) {
 exports.default = CanvasRenderer;
 _utils.pluginTarget.mixin(CanvasRenderer);
 
-},{"../../const":45,"../../settings":100,"../../utils":123,"../SystemRenderer":75,"./utils/CanvasMaskManager":77,"./utils/CanvasRenderTarget":78,"./utils/mapCanvasBlendModesToPixi":80}],77:[function(require,module,exports){
+},{"../../const":46,"../../settings":101,"../../utils":124,"../SystemRenderer":76,"./utils/CanvasMaskManager":78,"./utils/CanvasRenderTarget":79,"./utils/mapCanvasBlendModesToPixi":81}],78:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -16405,6 +16520,7 @@ var CanvasMaskManager = function () {
 
     CanvasMaskManager.prototype.popMask = function popMask(renderer) {
         renderer.context.restore();
+        renderer.invalidateBlendMode();
     };
 
     /**
@@ -16422,7 +16538,7 @@ var CanvasMaskManager = function () {
 
 exports.default = CanvasMaskManager;
 
-},{"../../../const":45}],78:[function(require,module,exports){
+},{"../../../const":46}],79:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -16546,7 +16662,7 @@ var CanvasRenderTarget = function () {
 
 exports.default = CanvasRenderTarget;
 
-},{"../../../settings":100}],79:[function(require,module,exports){
+},{"../../../settings":101}],80:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -16607,7 +16723,7 @@ function canUseNewCanvasBlendModes() {
     return data[0] === 255 && data[1] === 0 && data[2] === 0;
 }
 
-},{}],80:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -16679,7 +16795,7 @@ function mapCanvasBlendModesToPixi() {
     return array;
 }
 
-},{"../../../const":45,"./canUseNewCanvasBlendModes":79}],81:[function(require,module,exports){
+},{"../../../const":46,"./canUseNewCanvasBlendModes":80}],82:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -16799,7 +16915,7 @@ var TextureGarbageCollector = function () {
 
 exports.default = TextureGarbageCollector;
 
-},{"../../const":45,"../../settings":100}],82:[function(require,module,exports){
+},{"../../const":46,"../../settings":101}],83:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -16987,14 +17103,18 @@ var TextureManager = function () {
             return;
         }
 
-        if (texture._glTextures[this.renderer.CONTEXT_UID]) {
+        var uid = this.renderer.CONTEXT_UID;
+        var glTextures = texture._glTextures;
+        var glRenderTargets = texture._glRenderTargets;
+
+        if (glTextures[uid]) {
             this.renderer.unbindTexture(texture);
 
-            texture._glTextures[this.renderer.CONTEXT_UID].destroy();
+            glTextures[uid].destroy();
             texture.off('update', this.updateTexture, this);
             texture.off('dispose', this.destroyTexture, this);
 
-            delete texture._glTextures[this.renderer.CONTEXT_UID];
+            delete glTextures[uid];
 
             if (!skipRemove) {
                 var i = this._managedTextures.indexOf(texture);
@@ -17003,6 +17123,11 @@ var TextureManager = function () {
                     (0, _utils.removeItems)(this._managedTextures, i, 1);
                 }
             }
+        }
+
+        if (glRenderTargets && glRenderTargets[uid]) {
+            glRenderTargets[uid].destroy();
+            delete glRenderTargets[uid];
         }
     };
 
@@ -17046,7 +17171,7 @@ var TextureManager = function () {
 
 exports.default = TextureManager;
 
-},{"../../const":45,"../../utils":123,"./utils/RenderTarget":95,"pixi-gl-core":12}],83:[function(require,module,exports){
+},{"../../const":46,"../../utils":124,"./utils/RenderTarget":96,"pixi-gl-core":12}],84:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -17151,12 +17276,14 @@ var WebGLRenderer = function (_SystemRenderer) {
      *  preserveDrawingBuffer to `true`.
      * @param {boolean} [options.preserveDrawingBuffer=false] - enables drawing buffer preservation,
      *  enable this if you need to call toDataUrl on the webgl context.
-     * @param {boolean} [options.roundPixels=false] - If true Pixi will Math.floor() x/y values when
+     * @param {boolean} [options.roundPixels=false] - If true PixiJS will Math.floor() x/y values when
      *  rendering, stopping pixel interpolation.
      * @param {number} [options.backgroundColor=0x000000] - The background color of the rendered area
      *  (shown if not transparent).
-     * @param {boolean} [options.legacy=false] - If true Pixi will aim to ensure compatibility
-     * with older / less advanced devices. If you experiance unexplained flickering try setting this to true.
+     * @param {boolean} [options.legacy=false] - If true PixiJS will aim to ensure compatibility
+     *  with older / less advanced devices. If you experiance unexplained flickering try setting this to true.
+     * @param {string} [options.powerPreference] - Parameter passed to webgl context, set to "high-performance"
+     *  for devices with dual graphics card
      */
     function WebGLRenderer(options, arg2, arg3) {
         _classCallCheck(this, WebGLRenderer);
@@ -17194,7 +17321,8 @@ var WebGLRenderer = function (_SystemRenderer) {
             antialias: _this.options.antialias,
             premultipliedAlpha: _this.transparent && _this.transparent !== 'notMultiplied',
             stencil: true,
-            preserveDrawingBuffer: _this.options.preserveDrawingBuffer
+            preserveDrawingBuffer: _this.options.preserveDrawingBuffer,
+            powerPreference: _this.options.powerPreference
         };
 
         _this._backgroundColorRgba[3] = _this.transparent ? 0 : 1;
@@ -17226,6 +17354,19 @@ var WebGLRenderer = function (_SystemRenderer) {
          * @member {PIXI.ObjectRenderer}
          */
         _this.currentRenderer = _this.emptyRenderer;
+
+        /**
+         * Manages textures
+         * @member {PIXI.TextureManager}
+         */
+        _this.textureManager = null;
+
+        /**
+         * Manages the filters.
+         *
+         * @member {PIXI.FilterManager}
+         */
+        _this.filterManager = null;
 
         _this.initPlugins();
 
@@ -17277,12 +17418,6 @@ var WebGLRenderer = function (_SystemRenderer) {
 
         _this._initContext();
 
-        /**
-         * Manages the filters.
-         *
-         * @member {PIXI.FilterManager}
-         */
-        _this.filterManager = new _FilterManager2.default(_this);
         // map some webGL blend and drawmodes..
         _this.drawModes = (0, _mapWebGLDrawModesToPixi2.default)(_this.gl);
 
@@ -17336,6 +17471,7 @@ var WebGLRenderer = function (_SystemRenderer) {
 
         // create a texture manager...
         this.textureManager = new _TextureManager2.default(this);
+        this.filterManager = new _FilterManager2.default(this);
         this.textureGC = new _TextureGarbageCollector2.default(this);
 
         this.state.resetToDefault();
@@ -17769,6 +17905,7 @@ var WebGLRenderer = function (_SystemRenderer) {
 
     WebGLRenderer.prototype.handleContextRestored = function handleContextRestored() {
         this.textureManager.removeAll();
+        this.filterManager.destroy(true);
         this._initContext();
     };
 
@@ -17846,7 +17983,7 @@ var WebGLRenderer = function (_SystemRenderer) {
 exports.default = WebGLRenderer;
 _utils.pluginTarget.mixin(WebGLRenderer);
 
-},{"../../const":45,"../../textures/BaseTexture":111,"../../utils":123,"../SystemRenderer":75,"./TextureGarbageCollector":81,"./TextureManager":82,"./WebGLState":84,"./managers/FilterManager":89,"./managers/MaskManager":90,"./managers/StencilManager":91,"./utils/ObjectRenderer":93,"./utils/RenderTarget":95,"./utils/mapWebGLDrawModesToPixi":98,"./utils/validateContext":99,"pixi-gl-core":12}],84:[function(require,module,exports){
+},{"../../const":46,"../../textures/BaseTexture":112,"../../utils":124,"../SystemRenderer":76,"./TextureGarbageCollector":82,"./TextureManager":83,"./WebGLState":85,"./managers/FilterManager":90,"./managers/MaskManager":91,"./managers/StencilManager":92,"./utils/ObjectRenderer":94,"./utils/RenderTarget":96,"./utils/mapWebGLDrawModesToPixi":99,"./utils/validateContext":100,"pixi-gl-core":12}],85:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -18126,7 +18263,7 @@ var WebGLState = function () {
 
 exports.default = WebGLState;
 
-},{"./utils/mapWebGLBlendModesToPixi":97}],85:[function(require,module,exports){
+},{"./utils/mapWebGLBlendModesToPixi":98}],86:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -18181,7 +18318,7 @@ var Filter = function () {
      */
     this.fragmentSrc = fragmentSrc || Filter.defaultFragmentSrc;
 
-    this.blendMode = _const.BLEND_MODES.NORMAL;
+    this._blendMode = _const.BLEND_MODES.NORMAL;
 
     this.uniformData = uniforms || (0, _extractUniformsFromSrc2.default)(this.vertexSrc, this.fragmentSrc, 'projectionMatrix|uSampler');
 
@@ -18196,6 +18333,9 @@ var Filter = function () {
 
     for (var i in this.uniformData) {
       this.uniforms[i] = this.uniformData[i].value;
+      if (this.uniformData[i].type) {
+        this.uniformData[i].type = this.uniformData[i].type.toLowerCase();
+      }
     }
 
     // this is where we store shader references..
@@ -18234,7 +18374,7 @@ var Filter = function () {
     this.enabled = true;
 
     /**
-     * If enabled, pixi will fit the filter area into boundaries for better performance.
+     * If enabled, PixiJS will fit the filter area into boundaries for better performance.
      * Switch it off if it does not work for specific shader.
      *
      * @member {boolean}
@@ -18268,14 +18408,31 @@ var Filter = function () {
   };
 
   /**
-   * The default vertex shader source
+   * Sets the blendmode of the filter
    *
-   * @static
-   * @constant
+   * @member {number}
+   * @default PIXI.BLEND_MODES.NORMAL
    */
 
 
-  _createClass(Filter, null, [{
+  _createClass(Filter, [{
+    key: 'blendMode',
+    get: function get() {
+      return this._blendMode;
+    },
+    set: function set(value) // eslint-disable-line require-jsdoc
+    {
+      this._blendMode = value;
+    }
+
+    /**
+     * The default vertex shader source
+     *
+     * @static
+     * @constant
+     */
+
+  }], [{
     key: 'defaultVertexSrc',
     get: function get() {
       return ['attribute vec2 aVertexPosition;', 'attribute vec2 aTextureCoord;', 'uniform mat3 projectionMatrix;', 'uniform mat3 filterMatrix;', 'varying vec2 vTextureCoord;', 'varying vec2 vFilterCoord;', 'void main(void){', '   gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);', '   vFilterCoord = ( filterMatrix * vec3( aTextureCoord, 1.0)  ).xy;', '   vTextureCoord = aTextureCoord ;', '}'].join('\n');
@@ -18302,7 +18459,7 @@ var Filter = function () {
 
 exports.default = Filter;
 
-},{"../../../const":45,"../../../settings":100,"../../../utils":123,"./extractUniformsFromSrc":86}],86:[function(require,module,exports){
+},{"../../../const":46,"../../../settings":101,"../../../utils":124,"./extractUniformsFromSrc":87}],87:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -18364,7 +18521,7 @@ function extractUniformsFromString(string) {
     return uniforms;
 }
 
-},{"pixi-gl-core":12}],87:[function(require,module,exports){
+},{"pixi-gl-core":12}],88:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -18411,42 +18568,19 @@ function calculateNormalizedScreenSpaceMatrix(outputMatrix, filterArea, textureS
 
 // this will map the filter coord so that a texture can be used based on the transform of a sprite
 function calculateSpriteMatrix(outputMatrix, filterArea, textureSize, sprite) {
-    var worldTransform = sprite.worldTransform.copy(_math.Matrix.TEMP_MATRIX);
     var texture = sprite._texture.baseTexture;
-
-    // TODO unwrap?
-    var mappedMatrix = outputMatrix.identity();
-
-    // scale..
-    var ratio = textureSize.height / textureSize.width;
-
-    mappedMatrix.translate(filterArea.x / textureSize.width, filterArea.y / textureSize.height);
-
-    mappedMatrix.scale(1, ratio);
-
-    var translateScaleX = textureSize.width / texture.width;
-    var translateScaleY = textureSize.height / texture.height;
-
-    worldTransform.tx /= texture.width * translateScaleX;
-
-    // this...?  free beer for anyone who can explain why this makes sense!
-    worldTransform.ty /= texture.width * translateScaleX;
-    // worldTransform.ty /= texture.height * translateScaleY;
+    var mappedMatrix = outputMatrix.set(textureSize.width, 0, 0, textureSize.height, filterArea.x, filterArea.y);
+    var worldTransform = sprite.worldTransform.copy(_math.Matrix.TEMP_MATRIX);
 
     worldTransform.invert();
     mappedMatrix.prepend(worldTransform);
-
-    // apply inverse scale..
-    mappedMatrix.scale(1, 1 / ratio);
-
-    mappedMatrix.scale(translateScaleX, translateScaleY);
-
+    mappedMatrix.scale(1.0 / texture.width, 1.0 / texture.height);
     mappedMatrix.translate(sprite.anchor.x, sprite.anchor.y);
 
     return mappedMatrix;
 }
 
-},{"../../../math":69}],88:[function(require,module,exports){
+},{"../../../math":70}],89:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -18518,7 +18652,7 @@ var SpriteMaskFilter = function (_Filter) {
 
 exports.default = SpriteMaskFilter;
 
-},{"../../../../math":69,"../Filter":85,"path":22}],89:[function(require,module,exports){
+},{"../../../../math":70,"../Filter":86,"path":23}],90:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -18605,6 +18739,8 @@ var FilterManager = function (_WebGLManager) {
         _this.pool = {};
 
         _this.filterData = null;
+
+        _this.managedFilters = [];
         return _this;
     }
 
@@ -18772,6 +18908,8 @@ var FilterManager = function (_WebGLManager) {
                 shader = filter.glShaders[renderer.CONTEXT_UID] = new _Shader2.default(this.gl, filter.vertexSrc, filter.fragmentSrc);
             }
 
+            this.managedFilters.push(filter);
+
             // TODO - this only needs to be done once?
             renderer.bindVao(null);
 
@@ -18801,7 +18939,7 @@ var FilterManager = function (_WebGLManager) {
         var tex = this.renderer.emptyTextures[0];
 
         this.renderer.boundTextures[0] = tex;
-        // this syncs the pixi filters  uniforms with glsl uniforms
+        // this syncs the PixiJS filters  uniforms with glsl uniforms
         this.syncUniforms(shader, filter);
 
         renderer.state.setBlendMode(filter.blendMode);
@@ -18826,7 +18964,7 @@ var FilterManager = function (_WebGLManager) {
         var uniformData = filter.uniformData;
         var uniforms = filter.uniforms;
 
-        // 0 is reserved for the pixi texture so we start at 1!
+        // 0 is reserved for the PixiJS texture so we start at 1!
         var textureCount = 1;
         var currentState = void 0;
 
@@ -18863,7 +19001,9 @@ var FilterManager = function (_WebGLManager) {
 
         // TODO Cacheing layer..
         for (var i in uniformData) {
-            if (uniformData[i].type === 'sampler2D' && uniforms[i] !== 0) {
+            var type = uniformData[i].type;
+
+            if (type === 'sampler2d' && uniforms[i] !== 0) {
                 if (uniforms[i].baseTexture) {
                     shader.uniforms[i] = this.renderer.bindTexture(uniforms[i].baseTexture, textureCount);
                 } else {
@@ -18883,14 +19023,14 @@ var FilterManager = function (_WebGLManager) {
                 }
 
                 textureCount++;
-            } else if (uniformData[i].type === 'mat3') {
-                // check if its pixi matrix..
+            } else if (type === 'mat3') {
+                // check if its PixiJS matrix..
                 if (uniforms[i].a !== undefined) {
                     shader.uniforms[i] = uniforms[i].toArray(true);
                 } else {
                     shader.uniforms[i] = uniforms[i];
                 }
-            } else if (uniformData[i].type === 'vec2') {
+            } else if (type === 'vec2') {
                 // check if its a point..
                 if (uniforms[i].x !== undefined) {
                     var val = shader.uniforms[i] || new Float32Array(2);
@@ -18901,7 +19041,7 @@ var FilterManager = function (_WebGLManager) {
                 } else {
                     shader.uniforms[i] = uniforms[i];
                 }
-            } else if (uniformData[i].type === 'float') {
+            } else if (type === 'float') {
                 if (shader.uniforms.data[i].value !== uniformData[i]) {
                     shader.uniforms[i] = uniforms[i];
                 }
@@ -18989,12 +19129,30 @@ var FilterManager = function (_WebGLManager) {
     /**
      * Destroys this Filter Manager.
      *
+     * @param {boolean} [contextLost=false] context was lost, do not free shaders
+     *
      */
 
 
     FilterManager.prototype.destroy = function destroy() {
+        var contextLost = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+        var renderer = this.renderer;
+        var filters = this.managedFilters;
+
+        for (var i = 0; i < filters.length; i++) {
+            if (!contextLost) {
+                filters[i].glShaders[renderer.CONTEXT_UID].destroy();
+            }
+            delete filters[i].glShaders[renderer.CONTEXT_UID];
+        }
+
         this.shaderCache = {};
-        this.emptyPool();
+        if (!contextLost) {
+            this.emptyPool();
+        } else {
+            this.pool = {};
+        }
     };
 
     /**
@@ -19088,7 +19246,7 @@ var FilterManager = function (_WebGLManager) {
 
 exports.default = FilterManager;
 
-},{"../../../Shader":43,"../../../math":69,"../filters/filterTransforms":87,"../utils/Quad":94,"../utils/RenderTarget":95,"./WebGLManager":92,"bit-twiddle":1}],90:[function(require,module,exports){
+},{"../../../Shader":44,"../../../math":70,"../filters/filterTransforms":88,"../utils/Quad":95,"../utils/RenderTarget":96,"./WebGLManager":93,"bit-twiddle":1}],91:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -19298,7 +19456,7 @@ var MaskManager = function (_WebGLManager) {
 
 exports.default = MaskManager;
 
-},{"../filters/spriteMask/SpriteMaskFilter":88,"./WebGLManager":92}],91:[function(require,module,exports){
+},{"../filters/spriteMask/SpriteMaskFilter":89,"./WebGLManager":93}],92:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -19355,7 +19513,7 @@ var StencilManager = function (_WebGLManager) {
     };
 
     /**
-     * Applies the Mask and adds it to the current filter stack. @alvin
+     * Applies the Mask and adds it to the current stencil stack. @alvin
      *
      * @param {PIXI.Graphics} graphics - The mask
      */
@@ -19367,28 +19525,25 @@ var StencilManager = function (_WebGLManager) {
         this.renderer._activeRenderTarget.attachStencilBuffer();
 
         var gl = this.renderer.gl;
-        var sms = this.stencilMaskStack;
+        var prevMaskCount = this.stencilMaskStack.length;
 
-        if (sms.length === 0) {
+        if (prevMaskCount === 0) {
             gl.enable(gl.STENCIL_TEST);
-            gl.clear(gl.STENCIL_BUFFER_BIT);
-            gl.stencilFunc(gl.ALWAYS, 1, 1);
         }
 
-        sms.push(graphics);
+        this.stencilMaskStack.push(graphics);
 
+        // Increment the refference stencil value where the new mask overlaps with the old ones.
         gl.colorMask(false, false, false, false);
+        gl.stencilFunc(gl.EQUAL, prevMaskCount, this._getBitwiseMask());
         gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);
-
         this.renderer.plugins.graphics.render(graphics);
 
-        gl.colorMask(true, true, true, true);
-        gl.stencilFunc(gl.NOTEQUAL, 0, sms.length);
-        gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+        this._useCurrent();
     };
 
     /**
-     * TODO @alvin
+     * Removes the last mask from the stencil stack. @alvin
      */
 
 
@@ -19396,23 +19551,45 @@ var StencilManager = function (_WebGLManager) {
         this.renderer.setObjectRenderer(this.renderer.plugins.graphics);
 
         var gl = this.renderer.gl;
-        var sms = this.stencilMaskStack;
+        var graphics = this.stencilMaskStack.pop();
 
-        var graphics = sms.pop();
-
-        if (sms.length === 0) {
+        if (this.stencilMaskStack.length === 0) {
             // the stack is empty!
             gl.disable(gl.STENCIL_TEST);
+            gl.clear(gl.STENCIL_BUFFER_BIT);
+            gl.clearStencil(0);
         } else {
+            // Decrement the refference stencil value where the popped mask overlaps with the other ones
             gl.colorMask(false, false, false, false);
             gl.stencilOp(gl.KEEP, gl.KEEP, gl.DECR);
-
             this.renderer.plugins.graphics.render(graphics);
 
-            gl.colorMask(true, true, true, true);
-            gl.stencilFunc(gl.NOTEQUAL, 0, sms.length);
-            gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+            this._useCurrent();
         }
+    };
+
+    /**
+     * Setup renderer to use the current stencil data.
+     */
+
+
+    StencilManager.prototype._useCurrent = function _useCurrent() {
+        var gl = this.renderer.gl;
+
+        gl.colorMask(true, true, true, true);
+        gl.stencilFunc(gl.EQUAL, this.stencilMaskStack.length, this._getBitwiseMask());
+        gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+    };
+
+    /**
+     * Fill 1s equal to the number of acitve stencil masks.
+     *
+     * @return {number} The bitwise mask.
+     */
+
+
+    StencilManager.prototype._getBitwiseMask = function _getBitwiseMask() {
+        return (1 << this.stencilMaskStack.length) - 1;
     };
 
     /**
@@ -19432,7 +19609,7 @@ var StencilManager = function (_WebGLManager) {
 
 exports.default = StencilManager;
 
-},{"./WebGLManager":92}],92:[function(require,module,exports){
+},{"./WebGLManager":93}],93:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -19487,7 +19664,7 @@ var WebGLManager = function () {
 
 exports.default = WebGLManager;
 
-},{}],93:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -19565,7 +19742,7 @@ var ObjectRenderer = function (_WebGLManager) {
 
 exports.default = ObjectRenderer;
 
-},{"../managers/WebGLManager":92}],94:[function(require,module,exports){
+},{"../managers/WebGLManager":93}],95:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -19746,7 +19923,7 @@ var Quad = function () {
 
 exports.default = Quad;
 
-},{"../../../utils/createIndicesForQuads":121,"pixi-gl-core":12}],95:[function(require,module,exports){
+},{"../../../utils/createIndicesForQuads":122,"pixi-gl-core":12}],96:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -20073,7 +20250,7 @@ var RenderTarget = function () {
 
 exports.default = RenderTarget;
 
-},{"../../../const":45,"../../../math":69,"../../../settings":100,"pixi-gl-core":12}],96:[function(require,module,exports){
+},{"../../../const":46,"../../../math":70,"../../../settings":101,"pixi-gl-core":12}],97:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -20146,7 +20323,7 @@ function generateIfTestSrc(maxIfs) {
     return src;
 }
 
-},{"pixi-gl-core":12}],97:[function(require,module,exports){
+},{"pixi-gl-core":12}],98:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -20195,7 +20372,7 @@ function mapWebGLBlendModesToPixi(gl) {
     return array;
 }
 
-},{"../../../const":45}],98:[function(require,module,exports){
+},{"../../../const":46}],99:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -20227,7 +20404,7 @@ function mapWebGLDrawModesToPixi(gl) {
   return object;
 }
 
-},{"../../../const":45}],99:[function(require,module,exports){
+},{"../../../const":46}],100:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -20243,7 +20420,7 @@ function validateContext(gl) {
     }
 }
 
-},{}],100:[function(require,module,exports){
+},{}],101:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -20478,7 +20655,7 @@ exports.default = {
 
 };
 
-},{"./utils/canUploadSameBuffer":120,"./utils/maxRecommendedTextures":125}],101:[function(require,module,exports){
+},{"./utils/canUploadSameBuffer":121,"./utils/maxRecommendedTextures":126}],102:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -20651,6 +20828,7 @@ var Sprite = function (_Container) {
     Sprite.prototype._onTextureUpdate = function _onTextureUpdate() {
         this._textureID = -1;
         this._textureTrimmedID = -1;
+        this.cachedTint = 0xFFFFFF;
 
         // so if _width is 0 then width was not set..
         if (this._width) {
@@ -20859,7 +21037,7 @@ var Sprite = function (_Container) {
             this._bounds.minX = this._texture.orig.width * -this._anchor._x;
             this._bounds.minY = this._texture.orig.height * -this._anchor._y;
             this._bounds.maxX = this._texture.orig.width * (1 - this._anchor._x);
-            this._bounds.maxY = this._texture.orig.height * (1 - this._anchor._x);
+            this._bounds.maxY = this._texture.orig.height * (1 - this._anchor._y);
 
             if (!rect) {
                 if (!this._localBoundsRect) {
@@ -21100,7 +21278,7 @@ var Sprite = function (_Container) {
 
 exports.default = Sprite;
 
-},{"../const":45,"../display/Container":47,"../math":69,"../textures/Texture":114,"../utils":123}],102:[function(require,module,exports){
+},{"../const":46,"../display/Container":48,"../math":70,"../textures/Texture":115,"../utils":124}],103:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -21127,7 +21305,7 @@ var canvasRenderWorldTransform = new _math.Matrix();
  * @author Mat Groves
  *
  * Big thanks to the very clever Matt DesLauriers <mattdesl> https://github.com/mattdesl/
- * for creating the original pixi version!
+ * for creating the original PixiJS version!
  * Also a thanks to https://github.com/bchevalier for tweaking the tint and alpha so that they now
  * share 4 bytes on the vertex buffer
  *
@@ -21253,7 +21431,7 @@ exports.default = CanvasSpriteRenderer;
 
 _CanvasRenderer2.default.registerPlugin('sprite', CanvasSpriteRenderer);
 
-},{"../../const":45,"../../math":69,"../../renderers/canvas/CanvasRenderer":76,"./CanvasTinter":103}],103:[function(require,module,exports){
+},{"../../const":46,"../../math":70,"../../renderers/canvas/CanvasRenderer":77,"./CanvasTinter":104}],104:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -21345,6 +21523,7 @@ var CanvasTinter = {
         canvas.width = Math.ceil(crop.width);
         canvas.height = Math.ceil(crop.height);
 
+        context.save();
         context.fillStyle = '#' + ('00000' + (color | 0).toString(16)).substr(-6);
 
         context.fillRect(0, 0, crop.width, crop.height);
@@ -21356,6 +21535,7 @@ var CanvasTinter = {
         context.globalCompositeOperation = 'destination-atop';
 
         context.drawImage(texture.baseTexture.source, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
+        context.restore();
     },
 
     /**
@@ -21379,6 +21559,7 @@ var CanvasTinter = {
         canvas.width = Math.ceil(crop.width);
         canvas.height = Math.ceil(crop.height);
 
+        context.save();
         context.globalCompositeOperation = 'copy';
         context.fillStyle = '#' + ('00000' + (color | 0).toString(16)).substr(-6);
         context.fillRect(0, 0, crop.width, crop.height);
@@ -21387,6 +21568,7 @@ var CanvasTinter = {
         context.drawImage(texture.baseTexture.source, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
 
         // context.globalCompositeOperation = 'copy';
+        context.restore();
     },
 
 
@@ -21411,8 +21593,10 @@ var CanvasTinter = {
         canvas.width = Math.ceil(crop.width);
         canvas.height = Math.ceil(crop.height);
 
+        context.save();
         context.globalCompositeOperation = 'copy';
         context.drawImage(texture.baseTexture.source, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
+        context.restore();
 
         var rgbValues = (0, _utils.hex2rgb)(color);
         var r = rgbValues[0];
@@ -21498,7 +21682,7 @@ CanvasTinter.tintMethod = CanvasTinter.canUseMultiply ? CanvasTinter.tintWithMul
 
 exports.default = CanvasTinter;
 
-},{"../../renderers/canvas/utils/canUseNewCanvasBlendModes":79,"../../utils":123}],104:[function(require,module,exports){
+},{"../../renderers/canvas/utils/canUseNewCanvasBlendModes":80,"../../utils":124}],105:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -21551,7 +21735,7 @@ var Buffer = function () {
 
 exports.default = Buffer;
 
-},{}],105:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -22093,7 +22277,7 @@ exports.default = SpriteRenderer;
 
 _WebGLRenderer2.default.registerPlugin('sprite', SpriteRenderer);
 
-},{"../../renderers/webgl/WebGLRenderer":83,"../../renderers/webgl/utils/ObjectRenderer":93,"../../renderers/webgl/utils/checkMaxIfStatmentsInShader":96,"../../settings":100,"../../utils":123,"../../utils/createIndicesForQuads":121,"./BatchBuffer":104,"./generateMultiTextureShader":106,"bit-twiddle":1,"pixi-gl-core":12}],106:[function(require,module,exports){
+},{"../../renderers/webgl/WebGLRenderer":84,"../../renderers/webgl/utils/ObjectRenderer":94,"../../renderers/webgl/utils/checkMaxIfStatmentsInShader":97,"../../settings":101,"../../utils":124,"../../utils/createIndicesForQuads":122,"./BatchBuffer":105,"./generateMultiTextureShader":107,"bit-twiddle":1,"pixi-gl-core":12}],107:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -22156,7 +22340,7 @@ function generateSampleSrc(maxTextures) {
     return src;
 }
 
-},{"../../Shader":43,"path":22}],107:[function(require,module,exports){
+},{"../../Shader":44,"path":23}],108:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -22215,7 +22399,7 @@ var defaultDestroyOptions = {
  * A Text can be created directly from a string and a style object
  *
  * ```js
- * let text = new PIXI.Text('This is a pixi text',{fontFamily : 'Arial', fontSize: 24, fill : 0xff1010, align : 'center'});
+ * let text = new PIXI.Text('This is a PixiJS text',{fontFamily : 'Arial', fontSize: 24, fill : 0xff1010, align : 'center'});
  * ```
  *
  * @class
@@ -22811,7 +22995,7 @@ var Text = function (_Sprite) {
 
 exports.default = Text;
 
-},{"../const":45,"../math":69,"../settings":100,"../sprites/Sprite":101,"../textures/Texture":114,"../utils":123,"../utils/trimCanvas":128,"./TextMetrics":108,"./TextStyle":109}],108:[function(require,module,exports){
+},{"../const":46,"../math":70,"../settings":101,"../sprites/Sprite":102,"../textures/Texture":115,"../utils":124,"../utils/trimCanvas":129,"./TextMetrics":109,"./TextStyle":110}],109:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -22889,13 +23073,13 @@ var TextMetrics = function () {
         }
 
         var lineHeight = style.lineHeight || fontProperties.fontSize + style.strokeThickness;
-        var height = Math.max(lineHeight, fontProperties.fontSize + style.strokeThickness) + (lines.length - 1) * lineHeight;
+        var height = Math.max(lineHeight, fontProperties.fontSize + style.strokeThickness) + (lines.length - 1) * (lineHeight + style.leading);
 
         if (style.dropShadow) {
             height += style.dropShadowDistance;
         }
 
-        return new TextMetrics(text, style, width, height, lines, lineWidths, lineHeight, maxLineWidth, fontProperties);
+        return new TextMetrics(text, style, width, height, lines, lineWidths, lineHeight + style.leading, maxLineWidth, fontProperties);
     };
 
     /**
@@ -23113,7 +23297,7 @@ TextMetrics._context = canvas.getContext('2d');
  */
 TextMetrics._fonts = {};
 
-},{}],109:[function(require,module,exports){
+},{}],110:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -23154,7 +23338,8 @@ var defaultStyle = {
     textBaseline: 'alphabetic',
     trim: false,
     wordWrap: false,
-    wordWrapWidth: 100
+    wordWrapWidth: 100,
+    leading: 0
 };
 
 /**
@@ -23176,7 +23361,7 @@ var TextStyle = function () {
      * @param {number} [style.dropShadowAlpha=1] - Set alpha for the drop shadow
      * @param {number} [style.dropShadowAngle=Math.PI/6] - Set a angle of the drop shadow
      * @param {number} [style.dropShadowBlur=0] - Set a shadow blur radius
-     * @param {string} [style.dropShadowColor='black'] - A fill style to be used on the dropshadow e.g 'red', '#00FF00'
+     * @param {string|number} [style.dropShadowColor='black'] - A fill style to be used on the dropshadow e.g 'red', '#00FF00'
      * @param {number} [style.dropShadowDistance=5] - Set a distance of the drop shadow
      * @param {string|string[]|number|number[]|CanvasGradient|CanvasPattern} [style.fill='black'] - A canvas
      *  fillstyle that will be used on the text e.g 'red', '#00FF00'. Can be an array to create a gradient
@@ -23193,6 +23378,7 @@ var TextStyle = function () {
      * @param {string} [style.fontVariant='normal'] - The font variant ('normal' or 'small-caps')
      * @param {string} [style.fontWeight='normal'] - The font weight ('normal', 'bold', 'bolder', 'lighter' and '100',
      *  '200', '300', '400', '500', '600', '700', 800' or '900')
+     * @param {number} [style.leading=0] - The space between lines
      * @param {number} [style.letterSpacing=0] - The amount of spacing between letters, default is 0
      * @param {number} [style.lineHeight] - The line height, a number that represents the vertical space that a letter uses
      * @param {string} [style.lineJoin='miter'] - The lineJoin property sets the type of corner created, it can resolve
@@ -23246,6 +23432,13 @@ var TextStyle = function () {
     };
 
     /**
+     * Alignment for multiline text ('left', 'center' or 'right'), does not affect single line text
+     *
+     * @member {string}
+     */
+
+
+    /**
      * Generates a font style string to use for `TextMetrics.measureFont()`.
      *
      * @return {string} Font style string, for passing to `TextMetrics.measureFont()`
@@ -23281,296 +23474,537 @@ var TextStyle = function () {
         get: function get() {
             return this._align;
         },
-        set: function set(align) {
+        set: function set(align) // eslint-disable-line require-jsdoc
+        {
             if (this._align !== align) {
                 this._align = align;
                 this.styleID++;
             }
         }
+
+        /**
+         * Indicates if lines can be wrapped within words, it needs wordWrap to be set to true
+         *
+         * @member {boolean}
+         */
+
     }, {
         key: 'breakWords',
         get: function get() {
             return this._breakWords;
         },
-        set: function set(breakWords) {
+        set: function set(breakWords) // eslint-disable-line require-jsdoc
+        {
             if (this._breakWords !== breakWords) {
                 this._breakWords = breakWords;
                 this.styleID++;
             }
         }
+
+        /**
+         * Set a drop shadow for the text
+         *
+         * @member {boolean}
+         */
+
     }, {
         key: 'dropShadow',
         get: function get() {
             return this._dropShadow;
         },
-        set: function set(dropShadow) {
+        set: function set(dropShadow) // eslint-disable-line require-jsdoc
+        {
             if (this._dropShadow !== dropShadow) {
                 this._dropShadow = dropShadow;
                 this.styleID++;
             }
         }
+
+        /**
+         * Set alpha for the drop shadow
+         *
+         * @member {number}
+         */
+
     }, {
         key: 'dropShadowAlpha',
         get: function get() {
             return this._dropShadowAlpha;
         },
-        set: function set(dropShadowAlpha) {
+        set: function set(dropShadowAlpha) // eslint-disable-line require-jsdoc
+        {
             if (this._dropShadowAlpha !== dropShadowAlpha) {
                 this._dropShadowAlpha = dropShadowAlpha;
                 this.styleID++;
             }
         }
+
+        /**
+         * Set a angle of the drop shadow
+         *
+         * @member {number}
+         */
+
     }, {
         key: 'dropShadowAngle',
         get: function get() {
             return this._dropShadowAngle;
         },
-        set: function set(dropShadowAngle) {
+        set: function set(dropShadowAngle) // eslint-disable-line require-jsdoc
+        {
             if (this._dropShadowAngle !== dropShadowAngle) {
                 this._dropShadowAngle = dropShadowAngle;
                 this.styleID++;
             }
         }
+
+        /**
+         * Set a shadow blur radius
+         *
+         * @member {number}
+         */
+
     }, {
         key: 'dropShadowBlur',
         get: function get() {
             return this._dropShadowBlur;
         },
-        set: function set(dropShadowBlur) {
+        set: function set(dropShadowBlur) // eslint-disable-line require-jsdoc
+        {
             if (this._dropShadowBlur !== dropShadowBlur) {
                 this._dropShadowBlur = dropShadowBlur;
                 this.styleID++;
             }
         }
+
+        /**
+         * A fill style to be used on the dropshadow e.g 'red', '#00FF00'
+         *
+         * @member {string|number}
+         */
+
     }, {
         key: 'dropShadowColor',
         get: function get() {
             return this._dropShadowColor;
         },
-        set: function set(dropShadowColor) {
+        set: function set(dropShadowColor) // eslint-disable-line require-jsdoc
+        {
             var outputColor = getColor(dropShadowColor);
             if (this._dropShadowColor !== outputColor) {
                 this._dropShadowColor = outputColor;
                 this.styleID++;
             }
         }
+
+        /**
+         * Set a distance of the drop shadow
+         *
+         * @member {number}
+         */
+
     }, {
         key: 'dropShadowDistance',
         get: function get() {
             return this._dropShadowDistance;
         },
-        set: function set(dropShadowDistance) {
+        set: function set(dropShadowDistance) // eslint-disable-line require-jsdoc
+        {
             if (this._dropShadowDistance !== dropShadowDistance) {
                 this._dropShadowDistance = dropShadowDistance;
                 this.styleID++;
             }
         }
+
+        /**
+         * A canvas fillstyle that will be used on the text e.g 'red', '#00FF00'.
+         * Can be an array to create a gradient eg ['#000000','#FFFFFF']
+         * {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle|MDN}
+         *
+         * @member {string|string[]|number|number[]|CanvasGradient|CanvasPattern}
+         */
+
     }, {
         key: 'fill',
         get: function get() {
             return this._fill;
         },
-        set: function set(fill) {
+        set: function set(fill) // eslint-disable-line require-jsdoc
+        {
             var outputColor = getColor(fill);
             if (this._fill !== outputColor) {
                 this._fill = outputColor;
                 this.styleID++;
             }
         }
+
+        /**
+         * If fill is an array of colours to create a gradient, this can change the type/direction of the gradient.
+         * See {@link PIXI.TEXT_GRADIENT}
+         *
+         * @member {number}
+         */
+
     }, {
         key: 'fillGradientType',
         get: function get() {
             return this._fillGradientType;
         },
-        set: function set(fillGradientType) {
+        set: function set(fillGradientType) // eslint-disable-line require-jsdoc
+        {
             if (this._fillGradientType !== fillGradientType) {
                 this._fillGradientType = fillGradientType;
                 this.styleID++;
             }
         }
+
+        /**
+         * If fill is an array of colours to create a gradient, this array can set the stop points
+         * (numbers between 0 and 1) for the color, overriding the default behaviour of evenly spacing them.
+         *
+         * @member {number[]}
+         */
+
     }, {
         key: 'fillGradientStops',
         get: function get() {
             return this._fillGradientStops;
         },
-        set: function set(fillGradientStops) {
+        set: function set(fillGradientStops) // eslint-disable-line require-jsdoc
+        {
             if (!areArraysEqual(this._fillGradientStops, fillGradientStops)) {
                 this._fillGradientStops = fillGradientStops;
                 this.styleID++;
             }
         }
+
+        /**
+         * The font family
+         *
+         * @member {string|string[]}
+         */
+
     }, {
         key: 'fontFamily',
         get: function get() {
             return this._fontFamily;
         },
-        set: function set(fontFamily) {
+        set: function set(fontFamily) // eslint-disable-line require-jsdoc
+        {
             if (this.fontFamily !== fontFamily) {
                 this._fontFamily = fontFamily;
                 this.styleID++;
             }
         }
+
+        /**
+         * The font size
+         * (as a number it converts to px, but as a string, equivalents are '26px','20pt','160%' or '1.6em')
+         *
+         * @member {number|string}
+         */
+
     }, {
         key: 'fontSize',
         get: function get() {
             return this._fontSize;
         },
-        set: function set(fontSize) {
+        set: function set(fontSize) // eslint-disable-line require-jsdoc
+        {
             if (this._fontSize !== fontSize) {
                 this._fontSize = fontSize;
                 this.styleID++;
             }
         }
+
+        /**
+         * The font style
+         * ('normal', 'italic' or 'oblique')
+         *
+         * @member {string}
+         */
+
     }, {
         key: 'fontStyle',
         get: function get() {
             return this._fontStyle;
         },
-        set: function set(fontStyle) {
+        set: function set(fontStyle) // eslint-disable-line require-jsdoc
+        {
             if (this._fontStyle !== fontStyle) {
                 this._fontStyle = fontStyle;
                 this.styleID++;
             }
         }
+
+        /**
+         * The font variant
+         * ('normal' or 'small-caps')
+         *
+         * @member {string}
+         */
+
     }, {
         key: 'fontVariant',
         get: function get() {
             return this._fontVariant;
         },
-        set: function set(fontVariant) {
+        set: function set(fontVariant) // eslint-disable-line require-jsdoc
+        {
             if (this._fontVariant !== fontVariant) {
                 this._fontVariant = fontVariant;
                 this.styleID++;
             }
         }
+
+        /**
+         * The font weight
+         * ('normal', 'bold', 'bolder', 'lighter' and '100', '200', '300', '400', '500', '600', '700', 800' or '900')
+         *
+         * @member {string}
+         */
+
     }, {
         key: 'fontWeight',
         get: function get() {
             return this._fontWeight;
         },
-        set: function set(fontWeight) {
+        set: function set(fontWeight) // eslint-disable-line require-jsdoc
+        {
             if (this._fontWeight !== fontWeight) {
                 this._fontWeight = fontWeight;
                 this.styleID++;
             }
         }
+
+        /**
+         * The amount of spacing between letters, default is 0
+         *
+         * @member {number}
+         */
+
     }, {
         key: 'letterSpacing',
         get: function get() {
             return this._letterSpacing;
         },
-        set: function set(letterSpacing) {
+        set: function set(letterSpacing) // eslint-disable-line require-jsdoc
+        {
             if (this._letterSpacing !== letterSpacing) {
                 this._letterSpacing = letterSpacing;
                 this.styleID++;
             }
         }
+
+        /**
+         * The line height, a number that represents the vertical space that a letter uses
+         *
+         * @member {number}
+         */
+
     }, {
         key: 'lineHeight',
         get: function get() {
             return this._lineHeight;
         },
-        set: function set(lineHeight) {
+        set: function set(lineHeight) // eslint-disable-line require-jsdoc
+        {
             if (this._lineHeight !== lineHeight) {
                 this._lineHeight = lineHeight;
                 this.styleID++;
             }
         }
+
+        /**
+         * The space between lines
+         *
+         * @member {number}
+         */
+
+    }, {
+        key: 'leading',
+        get: function get() {
+            return this._leading;
+        },
+        set: function set(leading) // eslint-disable-line require-jsdoc
+        {
+            if (this._leading !== leading) {
+                this._leading = leading;
+                this.styleID++;
+            }
+        }
+
+        /**
+         * The lineJoin property sets the type of corner created, it can resolve spiked text issues.
+         * Default is 'miter' (creates a sharp corner).
+         *
+         * @member {string}
+         */
+
     }, {
         key: 'lineJoin',
         get: function get() {
             return this._lineJoin;
         },
-        set: function set(lineJoin) {
+        set: function set(lineJoin) // eslint-disable-line require-jsdoc
+        {
             if (this._lineJoin !== lineJoin) {
                 this._lineJoin = lineJoin;
                 this.styleID++;
             }
         }
+
+        /**
+         * The miter limit to use when using the 'miter' lineJoin mode
+         * This can reduce or increase the spikiness of rendered text.
+         *
+         * @member {number}
+         */
+
     }, {
         key: 'miterLimit',
         get: function get() {
             return this._miterLimit;
         },
-        set: function set(miterLimit) {
+        set: function set(miterLimit) // eslint-disable-line require-jsdoc
+        {
             if (this._miterLimit !== miterLimit) {
                 this._miterLimit = miterLimit;
                 this.styleID++;
             }
         }
+
+        /**
+         * Occasionally some fonts are cropped. Adding some padding will prevent this from happening
+         * by adding padding to all sides of the text.
+         *
+         * @member {number}
+         */
+
     }, {
         key: 'padding',
         get: function get() {
             return this._padding;
         },
-        set: function set(padding) {
+        set: function set(padding) // eslint-disable-line require-jsdoc
+        {
             if (this._padding !== padding) {
                 this._padding = padding;
                 this.styleID++;
             }
         }
+
+        /**
+         * A canvas fillstyle that will be used on the text stroke
+         * e.g 'blue', '#FCFF00'
+         *
+         * @member {string|number}
+         */
+
     }, {
         key: 'stroke',
         get: function get() {
             return this._stroke;
         },
-        set: function set(stroke) {
+        set: function set(stroke) // eslint-disable-line require-jsdoc
+        {
             var outputColor = getColor(stroke);
             if (this._stroke !== outputColor) {
                 this._stroke = outputColor;
                 this.styleID++;
             }
         }
+
+        /**
+         * A number that represents the thickness of the stroke.
+         * Default is 0 (no stroke)
+         *
+         * @member {number}
+         */
+
     }, {
         key: 'strokeThickness',
         get: function get() {
             return this._strokeThickness;
         },
-        set: function set(strokeThickness) {
+        set: function set(strokeThickness) // eslint-disable-line require-jsdoc
+        {
             if (this._strokeThickness !== strokeThickness) {
                 this._strokeThickness = strokeThickness;
                 this.styleID++;
             }
         }
+
+        /**
+         * The baseline of the text that is rendered.
+         *
+         * @member {string}
+         */
+
     }, {
         key: 'textBaseline',
         get: function get() {
             return this._textBaseline;
         },
-        set: function set(textBaseline) {
+        set: function set(textBaseline) // eslint-disable-line require-jsdoc
+        {
             if (this._textBaseline !== textBaseline) {
                 this._textBaseline = textBaseline;
                 this.styleID++;
             }
         }
+
+        /**
+         * Trim transparent borders
+         *
+         * @member {boolean}
+         */
+
     }, {
         key: 'trim',
         get: function get() {
             return this._trim;
         },
-        set: function set(trim) {
+        set: function set(trim) // eslint-disable-line require-jsdoc
+        {
             if (this._trim !== trim) {
                 this._trim = trim;
                 this.styleID++;
             }
         }
+
+        /**
+         * Indicates if word wrap should be used
+         *
+         * @member {boolean}
+         */
+
     }, {
         key: 'wordWrap',
         get: function get() {
             return this._wordWrap;
         },
-        set: function set(wordWrap) {
+        set: function set(wordWrap) // eslint-disable-line require-jsdoc
+        {
             if (this._wordWrap !== wordWrap) {
                 this._wordWrap = wordWrap;
                 this.styleID++;
             }
         }
+
+        /**
+         * The width at which text will wrap, it needs wordWrap to be set to true
+         *
+         * @member {number}
+         */
+
     }, {
         key: 'wordWrapWidth',
         get: function get() {
             return this._wordWrapWidth;
         },
-        set: function set(wordWrapWidth) {
+        set: function set(wordWrapWidth) // eslint-disable-line require-jsdoc
+        {
             if (this._wordWrapWidth !== wordWrapWidth) {
                 this._wordWrapWidth = wordWrapWidth;
                 this.styleID++;
@@ -23647,7 +24081,7 @@ function areArraysEqual(array1, array2) {
     return true;
 }
 
-},{"../const":45,"../utils":123}],110:[function(require,module,exports){
+},{"../const":46,"../utils":124}],111:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -23669,7 +24103,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 /**
- * A BaseRenderTexture is a special texture that allows any Pixi display object to be rendered to it.
+ * A BaseRenderTexture is a special texture that allows any PixiJS display object to be rendered to it.
  *
  * __Hint__: All DisplayObjects (i.e. Sprites) that render to a BaseRenderTexture should be preloaded
  * otherwise black rectangles will be drawn instead.
@@ -23806,12 +24240,10 @@ var BaseRenderTexture = function (_BaseTexture) {
 
 exports.default = BaseRenderTexture;
 
-},{"../settings":100,"./BaseTexture":111}],111:[function(require,module,exports){
+},{"../settings":101,"./BaseTexture":112}],112:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _utils = require('../utils');
 
@@ -24142,8 +24574,6 @@ var BaseTexture = function (_EventEmitter) {
 
 
     BaseTexture.prototype.loadSource = function loadSource(source) {
-        var _this2 = this;
-
         var wasLoading = this.isLoading;
 
         this.hasLoaded = false;
@@ -24173,80 +24603,74 @@ var BaseTexture = function (_EventEmitter) {
                 this.emit('loaded', this);
             }
         } else if (!source.getContext) {
-            var _ret = function () {
-                // Image fail / not ready
-                _this2.isLoading = true;
+            // Image fail / not ready
+            this.isLoading = true;
 
-                var scope = _this2;
+            var scope = this;
 
-                source.onload = function () {
-                    scope._updateImageType();
-                    source.onload = null;
-                    source.onerror = null;
+            source.onload = function () {
+                scope._updateImageType();
+                source.onload = null;
+                source.onerror = null;
 
-                    if (!scope.isLoading) {
-                        return;
-                    }
-
-                    scope.isLoading = false;
-                    scope._sourceLoaded();
-
-                    if (scope.imageType === 'svg') {
-                        scope._loadSvgSource();
-
-                        return;
-                    }
-
-                    scope.emit('loaded', scope);
-                };
-
-                source.onerror = function () {
-                    source.onload = null;
-                    source.onerror = null;
-
-                    if (!scope.isLoading) {
-                        return;
-                    }
-
-                    scope.isLoading = false;
-                    scope.emit('error', scope);
-                };
-
-                // Per http://www.w3.org/TR/html5/embedded-content-0.html#the-img-element
-                //   "The value of `complete` can thus change while a script is executing."
-                // So complete needs to be re-checked after the callbacks have been added..
-                // NOTE: complete will be true if the image has no src so best to check if the src is set.
-                if (source.complete && source.src) {
-                    // ..and if we're complete now, no need for callbacks
-                    source.onload = null;
-                    source.onerror = null;
-
-                    if (scope.imageType === 'svg') {
-                        scope._loadSvgSource();
-
-                        return {
-                            v: void 0
-                        };
-                    }
-
-                    _this2.isLoading = false;
-
-                    if (source.width && source.height) {
-                        _this2._sourceLoaded();
-
-                        // If any previous subscribers possible
-                        if (wasLoading) {
-                            _this2.emit('loaded', _this2);
-                        }
-                    }
-                    // If any previous subscribers possible
-                    else if (wasLoading) {
-                            _this2.emit('error', _this2);
-                        }
+                if (!scope.isLoading) {
+                    return;
                 }
-            }();
 
-            if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                scope.isLoading = false;
+                scope._sourceLoaded();
+
+                if (scope.imageType === 'svg') {
+                    scope._loadSvgSource();
+
+                    return;
+                }
+
+                scope.emit('loaded', scope);
+            };
+
+            source.onerror = function () {
+                source.onload = null;
+                source.onerror = null;
+
+                if (!scope.isLoading) {
+                    return;
+                }
+
+                scope.isLoading = false;
+                scope.emit('error', scope);
+            };
+
+            // Per http://www.w3.org/TR/html5/embedded-content-0.html#the-img-element
+            //   "The value of `complete` can thus change while a script is executing."
+            // So complete needs to be re-checked after the callbacks have been added..
+            // NOTE: complete will be true if the image has no src so best to check if the src is set.
+            if (source.complete && source.src) {
+                // ..and if we're complete now, no need for callbacks
+                source.onload = null;
+                source.onerror = null;
+
+                if (scope.imageType === 'svg') {
+                    scope._loadSvgSource();
+
+                    return;
+                }
+
+                this.isLoading = false;
+
+                if (source.width && source.height) {
+                    this._sourceLoaded();
+
+                    // If any previous subscribers possible
+                    if (wasLoading) {
+                        this.emit('loaded', this);
+                    }
+                }
+                // If any previous subscribers possible
+                else if (wasLoading) {
+                        this.emit('error', this);
+                    }
+            }
         }
     };
 
@@ -24333,7 +24757,7 @@ var BaseTexture = function (_EventEmitter) {
 
 
     BaseTexture.prototype._loadSvgSourceUsingXhr = function _loadSvgSourceUsingXhr() {
-        var _this3 = this;
+        var _this2 = this;
 
         var svgXhr = new XMLHttpRequest();
 
@@ -24349,11 +24773,11 @@ var BaseTexture = function (_EventEmitter) {
                 throw new Error('Failed to load SVG using XHR.');
             }
 
-            _this3._loadSvgSourceUsingString(svgXhr.response);
+            _this2._loadSvgSourceUsingString(svgXhr.response);
         };
 
         svgXhr.onerror = function () {
-            return _this3.emit('error', _this3);
+            return _this2.emit('error', _this2);
         };
 
         svgXhr.open('GET', this.imageUrl, true);
@@ -24658,7 +25082,7 @@ var BaseTexture = function (_EventEmitter) {
 
 exports.default = BaseTexture;
 
-},{"../settings":100,"../utils":123,"../utils/determineCrossOrigin":122,"bit-twiddle":1,"eventemitter3":3}],112:[function(require,module,exports){
+},{"../settings":101,"../utils":124,"../utils/determineCrossOrigin":123,"bit-twiddle":1,"eventemitter3":3}],113:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -24680,7 +25104,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 /**
- * A RenderTexture is a special texture that allows any Pixi display object to be rendered to it.
+ * A RenderTexture is a special texture that allows any PixiJS display object to be rendered to it.
  *
  * __Hint__: All DisplayObjects (i.e. Sprites) that render to a RenderTexture should be preloaded
  * otherwise black rectangles will be drawn instead.
@@ -24809,7 +25233,7 @@ var RenderTexture = function (_Texture) {
 
 exports.default = RenderTexture;
 
-},{"./BaseRenderTexture":110,"./Texture":114}],113:[function(require,module,exports){
+},{"./BaseRenderTexture":111,"./Texture":115}],114:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -24975,6 +25399,7 @@ var Spritesheet = function () {
     Spritesheet.prototype._processFrames = function _processFrames(initialFrameIndex) {
         var frameIndex = initialFrameIndex;
         var maxFrames = Spritesheet.BATCH_SIZE;
+        var sourceScale = this.baseTexture.sourceScale;
 
         while (frameIndex - initialFrameIndex < maxFrames && frameIndex < this._frameKeys.length) {
             var i = this._frameKeys[frameIndex];
@@ -24983,17 +25408,17 @@ var Spritesheet = function () {
             if (rect) {
                 var frame = null;
                 var trim = null;
-                var orig = new _.Rectangle(0, 0, this._frames[i].sourceSize.w / this.resolution, this._frames[i].sourceSize.h / this.resolution);
+                var orig = new _.Rectangle(0, 0, Math.floor(this._frames[i].sourceSize.w * sourceScale) / this.resolution, Math.floor(this._frames[i].sourceSize.h * sourceScale) / this.resolution);
 
                 if (this._frames[i].rotated) {
-                    frame = new _.Rectangle(rect.x / this.resolution, rect.y / this.resolution, rect.h / this.resolution, rect.w / this.resolution);
+                    frame = new _.Rectangle(Math.floor(rect.x * sourceScale) / this.resolution, Math.floor(rect.y * sourceScale) / this.resolution, Math.floor(rect.h * sourceScale) / this.resolution, Math.floor(rect.w * sourceScale) / this.resolution);
                 } else {
-                    frame = new _.Rectangle(rect.x / this.resolution, rect.y / this.resolution, rect.w / this.resolution, rect.h / this.resolution);
+                    frame = new _.Rectangle(Math.floor(rect.x * sourceScale) / this.resolution, Math.floor(rect.y * sourceScale) / this.resolution, Math.floor(rect.w * sourceScale) / this.resolution, Math.floor(rect.h * sourceScale) / this.resolution);
                 }
 
                 //  Check to see if the sprite is trimmed
                 if (this._frames[i].trimmed) {
-                    trim = new _.Rectangle(this._frames[i].spriteSourceSize.x / this.resolution, this._frames[i].spriteSourceSize.y / this.resolution, rect.w / this.resolution, rect.h / this.resolution);
+                    trim = new _.Rectangle(Math.floor(this._frames[i].spriteSourceSize.x * sourceScale) / this.resolution, Math.floor(this._frames[i].spriteSourceSize.y * sourceScale) / this.resolution, Math.floor(rect.w * sourceScale) / this.resolution, Math.floor(rect.h * sourceScale) / this.resolution);
                 }
 
                 this.textures[i] = new _.Texture(this.baseTexture, frame, orig, trim, this._frames[i].rotated ? 2 : 0);
@@ -25070,7 +25495,7 @@ var Spritesheet = function () {
 
 exports.default = Spritesheet;
 
-},{"../":64,"../utils":123}],114:[function(require,module,exports){
+},{"../":65,"../utils":124}],115:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -25601,7 +26026,10 @@ var Texture = function (_EventEmitter) {
             }
         } else if (texture && texture.textureCacheIds) {
             for (var i = 0; i < texture.textureCacheIds.length; ++i) {
-                delete _utils.TextureCache[texture.textureCacheIds[i]];
+                // Check that texture matches the one being passed in before deleting it from the cache.
+                if (_utils.TextureCache[texture.textureCacheIds[i]] === texture) {
+                    delete _utils.TextureCache[texture.textureCacheIds[i]];
+                }
             }
 
             texture.textureCacheIds.length = 0;
@@ -25630,12 +26058,24 @@ var Texture = function (_EventEmitter) {
 
             this.noFrame = false;
 
-            if (frame.x + frame.width > this.baseTexture.width || frame.y + frame.height > this.baseTexture.height) {
-                throw new Error('Texture Error: frame does not fit inside the base Texture dimensions: ' + ('X: ' + frame.x + ' + ' + frame.width + ' > ' + this.baseTexture.width + ' ') + ('Y: ' + frame.y + ' + ' + frame.height + ' > ' + this.baseTexture.height));
+            var x = frame.x,
+                y = frame.y,
+                width = frame.width,
+                height = frame.height;
+
+            var xNotFit = x + width > this.baseTexture.width;
+            var yNotFit = y + height > this.baseTexture.height;
+
+            if (xNotFit || yNotFit) {
+                var relationship = xNotFit && yNotFit ? 'and' : 'or';
+                var errorX = 'X: ' + x + ' + ' + width + ' = ' + (x + width) + ' > ' + this.baseTexture.width;
+                var errorY = 'Y: ' + y + ' + ' + height + ' = ' + (y + height) + ' > ' + this.baseTexture.height;
+
+                throw new Error('Texture Error: frame does not fit inside the base Texture dimensions: ' + (errorX + ' ' + relationship + ' ' + errorY));
             }
 
-            // this.valid = frame && frame.width && frame.height && this.baseTexture.source && this.baseTexture.hasLoaded;
-            this.valid = frame && frame.width && frame.height && this.baseTexture.hasLoaded;
+            // this.valid = width && height && this.baseTexture.source && this.baseTexture.hasLoaded;
+            this.valid = width && height && this.baseTexture.hasLoaded;
 
             if (!this.trim && !this.rotate) {
                 this.orig = frame;
@@ -25743,7 +26183,7 @@ Texture.WHITE = createWhiteTexture();
 removeAllHandlers(Texture.WHITE);
 removeAllHandlers(Texture.WHITE.baseTexture);
 
-},{"../math":69,"../settings":100,"../utils":123,"./BaseTexture":111,"./TextureUvs":115,"./VideoBaseTexture":116,"eventemitter3":3}],115:[function(require,module,exports){
+},{"../math":70,"../settings":101,"../utils":124,"./BaseTexture":112,"./TextureUvs":116,"./VideoBaseTexture":117,"eventemitter3":3}],116:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -25848,7 +26288,7 @@ var TextureUvs = function () {
 
 exports.default = TextureUvs;
 
-},{"../math/GroupD8":65}],116:[function(require,module,exports){
+},{"../math/GroupD8":66}],117:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -25876,7 +26316,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /**
  * A texture of a [playing] Video.
  *
- * Video base textures mimic Pixi BaseTexture.from.... method in their creation process.
+ * Video base textures mimic PixiJS BaseTexture.from.... method in their creation process.
  *
  * This can be used in several ways, such as:
  *
@@ -26064,7 +26504,7 @@ var VideoBaseTexture = function (_BaseTexture) {
     };
 
     /**
-     * Mimic Pixi BaseTexture.from.... method.
+     * Mimic PixiJS BaseTexture.from.... method.
      *
      * @static
      * @param {HTMLVideoElement} video - Video to create texture from
@@ -26173,7 +26613,7 @@ function createSource(path, type) {
     return source;
 }
 
-},{"../const":45,"../ticker":119,"../utils":123,"./BaseTexture":111}],117:[function(require,module,exports){
+},{"../const":46,"../ticker":120,"../utils":124,"./BaseTexture":112}],118:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -26275,9 +26715,9 @@ var Ticker = function () {
          * this value will have a precision of 1 µs.
          *
          * @member {number}
-         * @default 0
+         * @default -1
          */
-        this.lastTime = 0;
+        this.lastTime = -1;
 
         /**
          * Factor of current {@link PIXI.ticker.Ticker#deltaTime}.
@@ -26646,7 +27086,7 @@ var Ticker = function () {
 
 exports.default = Ticker;
 
-},{"../const":45,"../settings":100,"./TickerListener":118}],118:[function(require,module,exports){
+},{"../const":46,"../settings":101,"./TickerListener":119}],119:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -26820,7 +27260,7 @@ var TickerListener = function () {
 
 exports.default = TickerListener;
 
-},{}],119:[function(require,module,exports){
+},{}],120:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -26900,7 +27340,7 @@ shared.destroy = function () {
 exports.shared = shared;
 exports.Ticker = _Ticker2.default;
 
-},{"./Ticker":117}],120:[function(require,module,exports){
+},{"./Ticker":118}],121:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -26914,7 +27354,7 @@ function canUploadSameBuffer() {
 	return !ios;
 }
 
-},{}],121:[function(require,module,exports){
+},{}],122:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -26948,7 +27388,7 @@ function createIndicesForQuads(size) {
     return indices;
 }
 
-},{}],122:[function(require,module,exports){
+},{}],123:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -27004,7 +27444,7 @@ function determineCrossOrigin(url) {
     return '';
 }
 
-},{"url":28}],123:[function(require,module,exports){
+},{"url":29}],124:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -27273,11 +27713,11 @@ function sayHello(type) {
     }
 
     if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
-        var args = ['\n %c %c %c Pixi.js ' + _const.VERSION + ' - \u2730 ' + type + ' \u2730  %c  %c  http://www.pixijs.com/  %c %c \u2665%c\u2665%c\u2665 \n\n', 'background: #ff66a5; padding:5px 0;', 'background: #ff66a5; padding:5px 0;', 'color: #ff66a5; background: #030307; padding:5px 0;', 'background: #ff66a5; padding:5px 0;', 'background: #ffc3dc; padding:5px 0;', 'background: #ff66a5; padding:5px 0;', 'color: #ff2424; background: #fff; padding:5px 0;', 'color: #ff2424; background: #fff; padding:5px 0;', 'color: #ff2424; background: #fff; padding:5px 0;'];
+        var args = ['\n %c %c %c PixiJS ' + _const.VERSION + ' - \u2730 ' + type + ' \u2730  %c  %c  http://www.pixijs.com/  %c %c \u2665%c\u2665%c\u2665 \n\n', 'background: #ff66a5; padding:5px 0;', 'background: #ff66a5; padding:5px 0;', 'color: #ff66a5; background: #030307; padding:5px 0;', 'background: #ff66a5; padding:5px 0;', 'background: #ffc3dc; padding:5px 0;', 'background: #ff66a5; padding:5px 0;', 'color: #ff2424; background: #fff; padding:5px 0;', 'color: #ff2424; background: #fff; padding:5px 0;', 'color: #ff2424; background: #fff; padding:5px 0;'];
 
         window.console.log.apply(console, args);
     } else if (window.console) {
-        window.console.log('Pixi.js ' + _const.VERSION + ' - ' + type + ' - http://www.pixijs.com/');
+        window.console.log('PixiJS ' + _const.VERSION + ' - ' + type + ' - http://www.pixijs.com/');
     }
 
     saidHello = true;
@@ -27384,9 +27824,10 @@ function clearTextureCache() {
 }
 
 /**
+ * maps premultiply flag and blendMode to adjusted blendMode
  * @memberof PIXI.utils
  * @const premultiplyBlendMode
- * @type {Array<number[]>} maps premultiply flag and blendMode to adjusted blendMode
+ * @type {Array<number[]>}
  */
 var premultiplyBlendMode = exports.premultiplyBlendMode = (0, _mapPremultipliedBlendModes2.default)();
 
@@ -27477,7 +27918,7 @@ function premultiplyTintToRgba(tint, alpha, out, premultiply) {
     return out;
 }
 
-},{"../const":45,"../settings":100,"./mapPremultipliedBlendModes":124,"./mixin":126,"./pluginTarget":127,"eventemitter3":3,"ismobilejs":4,"remove-array-items":30}],124:[function(require,module,exports){
+},{"../const":46,"../settings":101,"./mapPremultipliedBlendModes":125,"./mixin":127,"./pluginTarget":128,"eventemitter3":3,"ismobilejs":4,"remove-array-items":31}],125:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -27486,7 +27927,7 @@ exports.default = mapPremultipliedBlendModes;
 var _const = require('../const');
 
 /**
- * Corrects pixi blend, takes premultiplied alpha into account
+ * Corrects PixiJS blend, takes premultiplied alpha into account
  *
  * @memberof PIXI
  * @function mapPremultipliedBlendModes
@@ -27520,7 +27961,7 @@ function mapPremultipliedBlendModes() {
     return array;
 }
 
-},{"../const":45}],125:[function(require,module,exports){
+},{"../const":46}],126:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -27542,7 +27983,7 @@ function maxRecommendedTextures(max) {
     return max;
 }
 
-},{"ismobilejs":4}],126:[function(require,module,exports){
+},{"ismobilejs":4}],127:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -27604,7 +28045,7 @@ function performMixins() {
     mixins.length = 0;
 }
 
-},{}],127:[function(require,module,exports){
+},{}],128:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -27670,7 +28111,7 @@ exports.default = {
     }
 };
 
-},{}],128:[function(require,module,exports){
+},{}],129:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -27746,7 +28187,7 @@ function trimCanvas(canvas) {
     };
 }
 
-},{}],129:[function(require,module,exports){
+},{}],130:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -27810,13 +28251,13 @@ function deprecation(core) {
          * @name AssetLoader
          * @memberof PIXI
          * @see PIXI.loaders.Loader
-         * @throws {ReferenceError} The loader system was overhauled in pixi v3,
+         * @throws {ReferenceError} The loader system was overhauled in PixiJS v3,
          * please see the new PIXI.loaders.Loader class.
          * @deprecated since version 3.0.0
          */
         AssetLoader: {
             get: function get() {
-                throw new ReferenceError('The loader system was overhauled in pixi v3, ' + 'please see the new PIXI.loaders.Loader class.');
+                throw new ReferenceError('The loader system was overhauled in PixiJS v3, ' + 'please see the new PIXI.loaders.Loader class.');
             }
         },
 
@@ -28719,65 +29160,63 @@ function deprecation(core) {
     }
 
     if (loaders.Loader) {
-        (function () {
-            var Resource = loaders.Resource;
-            var Loader = loaders.Loader;
+        var Resource = loaders.Resource;
+        var Loader = loaders.Loader;
 
-            Object.defineProperties(Resource.prototype, {
-                isJson: {
-                    get: function get() {
-                        warn('The isJson property is deprecated, please use `resource.type === Resource.TYPE.JSON`.');
+        Object.defineProperties(Resource.prototype, {
+            isJson: {
+                get: function get() {
+                    warn('The isJson property is deprecated, please use `resource.type === Resource.TYPE.JSON`.');
 
-                        return this.type === Resource.TYPE.JSON;
-                    }
-                },
-                isXml: {
-                    get: function get() {
-                        warn('The isXml property is deprecated, please use `resource.type === Resource.TYPE.XML`.');
-
-                        return this.type === Resource.TYPE.XML;
-                    }
-                },
-                isImage: {
-                    get: function get() {
-                        warn('The isImage property is deprecated, please use `resource.type === Resource.TYPE.IMAGE`.');
-
-                        return this.type === Resource.TYPE.IMAGE;
-                    }
-                },
-                isAudio: {
-                    get: function get() {
-                        warn('The isAudio property is deprecated, please use `resource.type === Resource.TYPE.AUDIO`.');
-
-                        return this.type === Resource.TYPE.AUDIO;
-                    }
-                },
-                isVideo: {
-                    get: function get() {
-                        warn('The isVideo property is deprecated, please use `resource.type === Resource.TYPE.VIDEO`.');
-
-                        return this.type === Resource.TYPE.VIDEO;
-                    }
+                    return this.type === Resource.TYPE.JSON;
                 }
-            });
+            },
+            isXml: {
+                get: function get() {
+                    warn('The isXml property is deprecated, please use `resource.type === Resource.TYPE.XML`.');
 
-            Object.defineProperties(Loader.prototype, {
-                before: {
-                    get: function get() {
-                        warn('The before() method is deprecated, please use pre().');
-
-                        return this.pre;
-                    }
-                },
-                after: {
-                    get: function get() {
-                        warn('The after() method is deprecated, please use use().');
-
-                        return this.use;
-                    }
+                    return this.type === Resource.TYPE.XML;
                 }
-            });
-        })();
+            },
+            isImage: {
+                get: function get() {
+                    warn('The isImage property is deprecated, please use `resource.type === Resource.TYPE.IMAGE`.');
+
+                    return this.type === Resource.TYPE.IMAGE;
+                }
+            },
+            isAudio: {
+                get: function get() {
+                    warn('The isAudio property is deprecated, please use `resource.type === Resource.TYPE.AUDIO`.');
+
+                    return this.type === Resource.TYPE.AUDIO;
+                }
+            },
+            isVideo: {
+                get: function get() {
+                    warn('The isVideo property is deprecated, please use `resource.type === Resource.TYPE.VIDEO`.');
+
+                    return this.type === Resource.TYPE.VIDEO;
+                }
+            }
+        });
+
+        Object.defineProperties(Loader.prototype, {
+            before: {
+                get: function get() {
+                    warn('The before() method is deprecated, please use pre().');
+
+                    return this.pre;
+                }
+            },
+            after: {
+                get: function get() {
+                    warn('The after() method is deprecated, please use use().');
+
+                    return this.use;
+                }
+            }
+        });
     }
 
     if (interaction.interactiveTarget) {
@@ -28842,7 +29281,7 @@ function deprecation(core) {
     }
 }
 
-},{}],130:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -29022,7 +29461,7 @@ exports.default = CanvasExtract;
 
 core.CanvasRenderer.registerPlugin('extract', CanvasExtract);
 
-},{"../../core":64}],131:[function(require,module,exports){
+},{"../../core":65}],132:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -29047,7 +29486,7 @@ Object.defineProperty(exports, 'canvas', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-},{"./canvas/CanvasExtract":130,"./webgl/WebGLExtract":132}],132:[function(require,module,exports){
+},{"./canvas/CanvasExtract":131,"./webgl/WebGLExtract":133}],133:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -29270,7 +29709,7 @@ exports.default = WebGLExtract;
 
 core.WebGLRenderer.registerPlugin('extract', WebGLExtract);
 
-},{"../../core":64}],133:[function(require,module,exports){
+},{"../../core":65}],134:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -29322,7 +29761,7 @@ var AnimatedSprite = function (_core$Sprite) {
     /**
      * @param {PIXI.Texture[]|FrameObject[]} textures - an array of {@link PIXI.Texture} or frame
      *  objects that make up the animation
-     * @param {boolean} [autoUpdate=true] - Whether use PIXI.ticker.shared to auto update animation time.
+     * @param {boolean} [autoUpdate=true] - Whether to use PIXI.ticker.shared to auto update animation time.
      */
     function AnimatedSprite(textures, autoUpdate) {
         _classCallCheck(this, AnimatedSprite);
@@ -29547,6 +29986,7 @@ var AnimatedSprite = function (_core$Sprite) {
     AnimatedSprite.prototype.updateTexture = function updateTexture() {
         this._texture = this._textures[this.currentFrame];
         this._textureID = -1;
+        this.cachedTint = 0xFFFFFF;
 
         if (this.onFrameChange) {
             this.onFrameChange(this.currentFrame);
@@ -29678,7 +30118,7 @@ var AnimatedSprite = function (_core$Sprite) {
 
 exports.default = AnimatedSprite;
 
-},{"../core":64}],134:[function(require,module,exports){
+},{"../core":65}],135:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -30266,7 +30706,7 @@ exports.default = BitmapText;
 
 BitmapText.fonts = {};
 
-},{"../core":64,"../core/math/ObservablePoint":67,"../core/settings":100}],135:[function(require,module,exports){
+},{"../core":65,"../core/math/ObservablePoint":68,"../core/settings":101}],136:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -30425,7 +30865,7 @@ var TextureTransform = function () {
 
 exports.default = TextureTransform;
 
-},{"../core/math/Matrix":66}],136:[function(require,module,exports){
+},{"../core/math/Matrix":67}],137:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -30554,6 +30994,7 @@ var TilingSprite = function (_core$Sprite) {
         if (this.uvTransform) {
             this.uvTransform.texture = this._texture;
         }
+        this.cachedTint = 0xFFFFFF;
     };
 
     /**
@@ -30603,22 +31044,19 @@ var TilingSprite = function (_core$Sprite) {
         var modY = this.tilePosition.y / this.tileScale.y % texture._frame.height * baseTextureResolution;
 
         // create a nice shiny pattern!
-        // TODO this needs to be refreshed if texture changes..
-        if (!this._canvasPattern) {
+        if (this._textureID !== this._texture._updateID || this.cachedTint !== this.tint) {
+            this._textureID = this._texture._updateID;
             // cut an object from a spritesheet..
             var tempCanvas = new core.CanvasRenderTarget(texture._frame.width, texture._frame.height, baseTextureResolution);
 
             // Tint the tiling sprite
             if (this.tint !== 0xFFFFFF) {
-                if (this.cachedTint !== this.tint) {
-                    this.cachedTint = this.tint;
-
-                    this.tintedTexture = _CanvasTinter2.default.getTintedTexture(this, this.tint);
-                }
+                this.tintedTexture = _CanvasTinter2.default.getTintedTexture(this, this.tint);
                 tempCanvas.context.drawImage(this.tintedTexture, 0, 0);
             } else {
                 tempCanvas.context.drawImage(baseTexture.source, -texture._frame.x * baseTextureResolution, -texture._frame.y * baseTextureResolution);
             }
+            this.cachedTint = this.tint;
             this._canvasPattern = tempCanvas.context.createPattern(tempCanvas.canvas, 'repeat');
         }
 
@@ -30877,7 +31315,7 @@ var TilingSprite = function (_core$Sprite) {
 
 exports.default = TilingSprite;
 
-},{"../core":64,"../core/sprites/canvas/CanvasTinter":103,"./TextureTransform":135}],137:[function(require,module,exports){
+},{"../core":65,"../core/sprites/canvas/CanvasTinter":104,"./TextureTransform":136}],138:[function(require,module,exports){
 'use strict';
 
 var _core = require('../core');
@@ -31281,7 +31719,7 @@ DisplayObject.prototype._cacheAsBitmapDestroy = function _cacheAsBitmapDestroy(o
     this.destroy(options);
 };
 
-},{"../core":64,"../core/textures/BaseTexture":111,"../core/textures/Texture":114,"../core/utils":123}],138:[function(require,module,exports){
+},{"../core":65,"../core/textures/BaseTexture":112,"../core/textures/Texture":115,"../core/utils":124}],139:[function(require,module,exports){
 'use strict';
 
 var _core = require('../core');
@@ -31315,7 +31753,7 @@ core.Container.prototype.getChildByName = function getChildByName(name) {
     return null;
 };
 
-},{"../core":64}],139:[function(require,module,exports){
+},{"../core":65}],140:[function(require,module,exports){
 'use strict';
 
 var _core = require('../core');
@@ -31348,7 +31786,7 @@ core.DisplayObject.prototype.getGlobalPosition = function getGlobalPosition() {
     return point;
 };
 
-},{"../core":64}],140:[function(require,module,exports){
+},{"../core":65}],141:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -31409,7 +31847,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // imported for side effect of extending the prototype only, contains no exports
 
-},{"./AnimatedSprite":133,"./BitmapText":134,"./TextureTransform":135,"./TilingSprite":136,"./cacheAsBitmap":137,"./getChildByName":138,"./getGlobalPosition":139,"./webgl/TilingSpriteRenderer":141}],141:[function(require,module,exports){
+},{"./AnimatedSprite":134,"./BitmapText":135,"./TextureTransform":136,"./TilingSprite":137,"./cacheAsBitmap":138,"./getChildByName":139,"./getGlobalPosition":140,"./webgl/TilingSpriteRenderer":142}],142:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -31469,8 +31907,8 @@ var TilingSpriteRenderer = function (_core$ObjectRenderer) {
     TilingSpriteRenderer.prototype.onContextChange = function onContextChange() {
         var gl = this.renderer.gl;
 
-        this.shader = new core.Shader(gl, 'attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\n\nuniform mat3 projectionMatrix;\nuniform mat3 translationMatrix;\nuniform mat3 uTransform;\n\nvarying vec2 vTextureCoord;\n\nvoid main(void)\n{\n    gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n\n    vTextureCoord = (uTransform * vec3(aTextureCoord, 1.0)).xy;\n}\n', 'varying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\nuniform vec4 uColor;\nuniform mat3 uMapCoord;\nuniform vec4 uClampFrame;\nuniform vec2 uClampOffset;\n\nvoid main(void)\n{\n    vec2 coord = mod(vTextureCoord - uClampOffset, vec2(1.0, 1.0)) + uClampOffset;\n    coord = (uMapCoord * vec3(coord, 1.0)).xy;\n    coord = clamp(coord, uClampFrame.xy, uClampFrame.zw);\n\n    vec4 sample = texture2D(uSampler, coord);\n    vec4 color = vec4(uColor.rgb * uColor.a, uColor.a);\n\n    gl_FragColor = sample * color ;\n}\n');
-        this.simpleShader = new core.Shader(gl, 'attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\n\nuniform mat3 projectionMatrix;\nuniform mat3 translationMatrix;\nuniform mat3 uTransform;\n\nvarying vec2 vTextureCoord;\n\nvoid main(void)\n{\n    gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n\n    vTextureCoord = (uTransform * vec3(aTextureCoord, 1.0)).xy;\n}\n', 'varying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\nuniform vec4 uColor;\n\nvoid main(void)\n{\n    vec4 sample = texture2D(uSampler, vTextureCoord);\n    vec4 color = vec4(uColor.rgb * uColor.a, uColor.a);\n    gl_FragColor = sample * color;\n}\n');
+        this.shader = new core.Shader(gl, 'attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\n\nuniform mat3 projectionMatrix;\nuniform mat3 translationMatrix;\nuniform mat3 uTransform;\n\nvarying vec2 vTextureCoord;\n\nvoid main(void)\n{\n    gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n\n    vTextureCoord = (uTransform * vec3(aTextureCoord, 1.0)).xy;\n}\n', 'varying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\nuniform vec4 uColor;\nuniform mat3 uMapCoord;\nuniform vec4 uClampFrame;\nuniform vec2 uClampOffset;\n\nvoid main(void)\n{\n    vec2 coord = mod(vTextureCoord - uClampOffset, vec2(1.0, 1.0)) + uClampOffset;\n    coord = (uMapCoord * vec3(coord, 1.0)).xy;\n    coord = clamp(coord, uClampFrame.xy, uClampFrame.zw);\n\n    vec4 sample = texture2D(uSampler, coord);\n    gl_FragColor = sample * uColor;\n}\n');
+        this.simpleShader = new core.Shader(gl, 'attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\n\nuniform mat3 projectionMatrix;\nuniform mat3 translationMatrix;\nuniform mat3 uTransform;\n\nvarying vec2 vTextureCoord;\n\nvoid main(void)\n{\n    gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n\n    vTextureCoord = (uTransform * vec3(aTextureCoord, 1.0)).xy;\n}\n', 'varying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\nuniform vec4 uColor;\n\nvoid main(void)\n{\n    vec4 sample = texture2D(uSampler, vTextureCoord);\n    gl_FragColor = sample * uColor;\n}\n');
 
         this.renderer.bindVao(null);
         this.quad = new core.Quad(gl, this.renderer.state.attribState);
@@ -31571,7 +32009,7 @@ exports.default = TilingSpriteRenderer;
 
 core.WebGLRenderer.registerPlugin('tilingSprite', TilingSpriteRenderer);
 
-},{"../../core":64,"../../core/const":45,"path":22}],142:[function(require,module,exports){
+},{"../../core":65,"../../core/const":46,"path":23}],143:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -31721,6 +32159,23 @@ var BlurFilter = function (_core$Filter) {
             this.blurYFilter.blur = value;
             this.padding = Math.max(Math.abs(this.blurXFilter.strength), Math.abs(this.blurYFilter.strength)) * 2;
         }
+
+        /**
+         * Sets the blendmode of the filter
+         *
+         * @member {number}
+         * @default PIXI.BLEND_MODES.NORMAL
+         */
+
+    }, {
+        key: 'blendMode',
+        get: function get() {
+            return this.blurYFilter._blendMode;
+        },
+        set: function set(value) // eslint-disable-line require-jsdoc
+        {
+            this.blurYFilter._blendMode = value;
+        }
     }]);
 
     return BlurFilter;
@@ -31728,7 +32183,7 @@ var BlurFilter = function (_core$Filter) {
 
 exports.default = BlurFilter;
 
-},{"../../core":64,"./BlurXFilter":143,"./BlurYFilter":144}],143:[function(require,module,exports){
+},{"../../core":65,"./BlurXFilter":144,"./BlurYFilter":145}],144:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -31894,7 +32349,7 @@ var BlurXFilter = function (_core$Filter) {
 
 exports.default = BlurXFilter;
 
-},{"../../core":64,"./generateBlurFragSource":145,"./generateBlurVertSource":146,"./getMaxBlurKernelSize":147}],144:[function(require,module,exports){
+},{"../../core":65,"./generateBlurFragSource":146,"./generateBlurVertSource":147,"./getMaxBlurKernelSize":148}],145:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -32059,7 +32514,7 @@ var BlurYFilter = function (_core$Filter) {
 
 exports.default = BlurYFilter;
 
-},{"../../core":64,"./generateBlurFragSource":145,"./generateBlurVertSource":146,"./getMaxBlurKernelSize":147}],145:[function(require,module,exports){
+},{"../../core":65,"./generateBlurFragSource":146,"./generateBlurVertSource":147,"./getMaxBlurKernelSize":148}],146:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -32106,7 +32561,7 @@ function generateFragBlurSource(kernelSize) {
     return fragSource;
 }
 
-},{}],146:[function(require,module,exports){
+},{}],147:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -32150,7 +32605,7 @@ function generateVertBlurSource(kernelSize, x) {
     return vertSource;
 }
 
-},{}],147:[function(require,module,exports){
+},{}],148:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -32166,7 +32621,7 @@ function getMaxKernelSize(gl) {
     return kernelSize;
 }
 
-},{}],148:[function(require,module,exports){
+},{}],149:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -32414,7 +32869,7 @@ var ColorMatrixFilter = function (_core$Filter) {
 
     ColorMatrixFilter.prototype.contrast = function contrast(amount, multiply) {
         var v = (amount || 0) + 1;
-        var o = -128 * (v - 1);
+        var o = -0.5 * (v - 1);
 
         var matrix = [v, 0, 0, 0, o, 0, v, 0, 0, o, 0, 0, v, 0, o, 0, 0, 0, 1, 0];
 
@@ -32717,7 +33172,7 @@ var ColorMatrixFilter = function (_core$Filter) {
 exports.default = ColorMatrixFilter;
 ColorMatrixFilter.prototype.grayscale = ColorMatrixFilter.prototype.greyscale;
 
-},{"../../core":64,"path":22}],149:[function(require,module,exports){
+},{"../../core":65,"path":23}],150:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -32827,7 +33282,7 @@ var DisplacementFilter = function (_core$Filter) {
 
 exports.default = DisplacementFilter;
 
-},{"../../core":64,"path":22}],150:[function(require,module,exports){
+},{"../../core":65,"path":23}],151:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -32881,7 +33336,7 @@ var FXAAFilter = function (_core$Filter) {
 
 exports.default = FXAAFilter;
 
-},{"../../core":64,"path":22}],151:[function(require,module,exports){
+},{"../../core":65,"path":23}],152:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -32960,7 +33415,7 @@ Object.defineProperty(exports, 'VoidFilter', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-},{"./blur/BlurFilter":142,"./blur/BlurXFilter":143,"./blur/BlurYFilter":144,"./colormatrix/ColorMatrixFilter":148,"./displacement/DisplacementFilter":149,"./fxaa/FXAAFilter":150,"./noise/NoiseFilter":152,"./void/VoidFilter":153}],152:[function(require,module,exports){
+},{"./blur/BlurFilter":143,"./blur/BlurXFilter":144,"./blur/BlurYFilter":145,"./colormatrix/ColorMatrixFilter":149,"./displacement/DisplacementFilter":150,"./fxaa/FXAAFilter":151,"./noise/NoiseFilter":153,"./void/VoidFilter":154}],153:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -33057,7 +33512,7 @@ var NoiseFilter = function (_core$Filter) {
 
 exports.default = NoiseFilter;
 
-},{"../../core":64,"path":22}],153:[function(require,module,exports){
+},{"../../core":65,"path":23}],154:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -33107,7 +33562,7 @@ var VoidFilter = function (_core$Filter) {
 
 exports.default = VoidFilter;
 
-},{"../../core":64,"path":22}],154:[function(require,module,exports){
+},{"../../core":65,"path":23}],155:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -33331,7 +33786,7 @@ var InteractionData = function () {
 
 exports.default = InteractionData;
 
-},{"../core":64}],155:[function(require,module,exports){
+},{"../core":65}],156:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -33416,7 +33871,7 @@ var InteractionEvent = function () {
 
 exports.default = InteractionEvent;
 
-},{}],156:[function(require,module,exports){
+},{}],157:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -33573,7 +34028,7 @@ var InteractionManager = function (_EventEmitter) {
          * is over the object.
          * Setting to true will make things work more in line with how the DOM verison works.
          * Setting to false can make things easier for things like dragging
-         * It is currently set to false as this is how pixi used to work. This will be set to true in
+         * It is currently set to false as this is how PixiJS used to work. This will be set to true in
          * future versions of pixi.
          *
          * @member {boolean}
@@ -34367,7 +34822,7 @@ var InteractionManager = function (_EventEmitter) {
     };
 
     /**
-     * Maps x and y coords from a DOM object and maps them correctly to the pixi view. The
+     * Maps x and y coords from a DOM object and maps them correctly to the PixiJS view. The
      * resulting value is stored in the point. This takes into account the fact that the DOM
      * element could be scaled and positioned anywhere on the screen.
      *
@@ -34449,7 +34904,7 @@ var InteractionManager = function (_EventEmitter) {
 
         // ** FREE TIP **! If an object is not interactive or has no buttons in it
         // (such as a game scene!) set interactiveChildren to false for that displayObject.
-        // This will allow pixi to completely ignore and bypass checking the displayObjects children.
+        // This will allow PixiJS to completely ignore and bypass checking the displayObjects children.
         if (displayObject.interactiveChildren && displayObject.children) {
             var children = displayObject.children;
 
@@ -35176,7 +35631,7 @@ exports.default = InteractionManager;
 core.WebGLRenderer.registerPlugin('interaction', InteractionManager);
 core.CanvasRenderer.registerPlugin('interaction', InteractionManager);
 
-},{"../core":64,"./InteractionData":154,"./InteractionEvent":155,"./InteractionTrackingData":157,"./interactiveTarget":159,"eventemitter3":3}],157:[function(require,module,exports){
+},{"../core":65,"./InteractionData":155,"./InteractionEvent":156,"./InteractionTrackingData":158,"./interactiveTarget":160,"eventemitter3":3}],158:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -35352,7 +35807,7 @@ InteractionTrackingData.FLAGS = Object.freeze({
     RIGHT_DOWN: 1 << 2
 });
 
-},{}],158:[function(require,module,exports){
+},{}],159:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -35384,9 +35839,27 @@ Object.defineProperty(exports, 'interactiveTarget', {
   }
 });
 
+var _InteractionTrackingData = require('./InteractionTrackingData');
+
+Object.defineProperty(exports, 'InteractionTrackingData', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_InteractionTrackingData).default;
+  }
+});
+
+var _InteractionEvent = require('./InteractionEvent');
+
+Object.defineProperty(exports, 'InteractionEvent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_InteractionEvent).default;
+  }
+});
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-},{"./InteractionData":154,"./InteractionManager":156,"./interactiveTarget":159}],159:[function(require,module,exports){
+},{"./InteractionData":155,"./InteractionEvent":156,"./InteractionManager":157,"./InteractionTrackingData":158,"./interactiveTarget":160}],160:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -35424,7 +35897,7 @@ exports.default = {
 
   /**
    * Determines if the children to the displayObject can be clicked/touched
-   * Setting this to false allows pixi to bypass a recursive `hitTest` function
+   * Setting this to false allows PixiJS to bypass a recursive `hitTest` function
    *
    * @member {boolean}
    * @memberof PIXI.Container#
@@ -35503,7 +35976,7 @@ exports.default = {
   _trackedPointers: undefined
 };
 
-},{}],160:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -35537,11 +36010,11 @@ exports.default = function () {
                 if (this.baseUrl.charAt(this.baseUrl.length - 1) === '/') {
                     xmlUrl += '/';
                 }
-
-                // remove baseUrl from xmlUrl
-                xmlUrl = xmlUrl.replace(this.baseUrl, '');
             }
         }
+
+        // remove baseUrl from xmlUrl
+        xmlUrl = xmlUrl.replace(this.baseUrl, '');
 
         // if there is an xmlUrl now, it needs a trailing slash. Ensure that it does if the string isn't empty.
         if (xmlUrl && xmlUrl.charAt(xmlUrl.length - 1) !== '/') {
@@ -35595,7 +36068,7 @@ function parse(resource, texture) {
     resource.bitmapFont = _extras.BitmapText.registerFont(resource.data, texture);
 }
 
-},{"../core":64,"../extras":140,"path":22,"resource-loader":35}],161:[function(require,module,exports){
+},{"../core":65,"../extras":141,"path":23,"resource-loader":36}],162:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -35723,7 +36196,7 @@ AppPrototype.destroy = function destroy(removeView) {
     this._parentDestroy(removeView);
 };
 
-},{"../core/Application":42,"./bitmapFontParser":160,"./loader":162,"./spritesheetParser":163,"./textureParser":164,"resource-loader":35}],162:[function(require,module,exports){
+},{"../core/Application":43,"./bitmapFontParser":161,"./loader":163,"./spritesheetParser":164,"./textureParser":165,"resource-loader":36}],163:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -35763,7 +36236,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * The new loader, extends Resource Loader by Chad Engler: https://github.com/englercj/resource-loader
  *
  * ```js
- * const loader = PIXI.loader; // pixi exposes a premade instance for you to use.
+ * const loader = PIXI.loader; // PixiJS exposes a premade instance for you to use.
  * //or
  * const loader = new PIXI.loaders.Loader(); // you can also create your own if you want
  *
@@ -35847,7 +36320,7 @@ var Loader = function (_ResourceLoader) {
     }
 
     /**
-     * Adds a default middleware to the pixi loader.
+     * Adds a default middleware to the PixiJS loader.
      *
      * @static
      * @param {Function} fn - The middleware to add.
@@ -35894,7 +36367,7 @@ var Resource = _resourceLoader2.default.Resource;
 
 Resource.setExtensionXhrType('fnt', Resource.XHR_RESPONSE_TYPE.DOCUMENT);
 
-},{"./bitmapFontParser":160,"./spritesheetParser":163,"./textureParser":164,"eventemitter3":3,"resource-loader":35,"resource-loader/lib/middlewares/parsing/blob":36}],163:[function(require,module,exports){
+},{"./bitmapFontParser":161,"./spritesheetParser":164,"./textureParser":165,"eventemitter3":3,"resource-loader":36,"resource-loader/lib/middlewares/parsing/blob":37}],164:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -35953,7 +36426,7 @@ function getResourcePath(resource, baseUrl) {
     return _url2.default.resolve(resource.url.replace(baseUrl, ''), resource.data.meta.image);
 }
 
-},{"../core":64,"resource-loader":35,"url":28}],164:[function(require,module,exports){
+},{"../core":65,"resource-loader":36,"url":29}],165:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -35976,7 +36449,7 @@ var _Texture2 = _interopRequireDefault(_Texture);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-},{"../core/textures/Texture":114,"resource-loader":35}],165:[function(require,module,exports){
+},{"../core/textures/Texture":115,"resource-loader":36}],166:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -36344,7 +36817,7 @@ Mesh.DRAW_MODES = {
   TRIANGLES: 1
 };
 
-},{"../core":64,"../extras/TextureTransform":135}],166:[function(require,module,exports){
+},{"../core":65,"../extras/TextureTransform":136}],167:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -36623,7 +37096,7 @@ var NineSlicePlane = function (_Plane) {
         this.updateHorizontalVertices();
         this.updateVerticalVertices();
 
-        this.dirty = true;
+        this.dirty++;
 
         this.multiplyUvs();
     };
@@ -36730,7 +37203,7 @@ var NineSlicePlane = function (_Plane) {
 
 exports.default = NineSlicePlane;
 
-},{"./Plane":167}],167:[function(require,module,exports){
+},{"./Plane":168}],168:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -36843,7 +37316,7 @@ var Plane = function (_Mesh) {
         this.uvs = new Float32Array(uvs);
         this.colors = new Float32Array(colors);
         this.indices = new Uint16Array(indices);
-        this.indexDirty = true;
+        this.indexDirty++;
 
         this.multiplyUvs();
     };
@@ -36869,7 +37342,7 @@ var Plane = function (_Mesh) {
 
 exports.default = Plane;
 
-},{"./Mesh":165}],168:[function(require,module,exports){
+},{"./Mesh":166}],169:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -37105,7 +37578,7 @@ var Rope = function (_Mesh) {
 
 exports.default = Rope;
 
-},{"./Mesh":165}],169:[function(require,module,exports){
+},{"./Mesh":166}],170:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -37327,6 +37800,7 @@ var MeshSpriteRenderer = function () {
         context.drawImage(textureSource, 0, 0, textureWidth * base.resolution, textureHeight * base.resolution, 0, 0, textureWidth, textureHeight);
 
         context.restore();
+        this.renderer.invalidateBlendMode();
     };
 
     /**
@@ -37387,7 +37861,7 @@ exports.default = MeshSpriteRenderer;
 
 core.CanvasRenderer.registerPlugin('mesh', MeshSpriteRenderer);
 
-},{"../../core":64,"../Mesh":165}],170:[function(require,module,exports){
+},{"../../core":65,"../Mesh":166}],171:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -37448,7 +37922,7 @@ Object.defineProperty(exports, 'Rope', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-},{"./Mesh":165,"./NineSlicePlane":166,"./Plane":167,"./Rope":168,"./canvas/CanvasMeshRenderer":169,"./webgl/MeshRenderer":171}],171:[function(require,module,exports){
+},{"./Mesh":166,"./NineSlicePlane":167,"./Plane":168,"./Rope":169,"./canvas/CanvasMeshRenderer":170,"./webgl/MeshRenderer":172}],172:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -37599,7 +38073,7 @@ exports.default = MeshRenderer;
 
 core.WebGLRenderer.registerPlugin('mesh', MeshRenderer);
 
-},{"../../core":64,"../Mesh":165,"path":22,"pixi-gl-core":12}],172:[function(require,module,exports){
+},{"../../core":65,"../Mesh":166,"path":23,"pixi-gl-core":12}],173:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -37638,7 +38112,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * }
  * ```
  *
- * And here you have a hundred sprites that will be renderer at the speed of light.
+ * And here you have a hundred sprites that will be rendered at the speed of light.
  *
  * @class
  * @extends PIXI.Container
@@ -37648,19 +38122,23 @@ var ParticleContainer = function (_core$Container) {
     _inherits(ParticleContainer, _core$Container);
 
     /**
-     * @param {number} [maxSize=15000] - The maximum number of particles that can be renderer by the container.
+     * @param {number} [maxSize=1500] - The maximum number of particles that can be rendered by the container.
+     *  Affects size of allocated buffers.
      * @param {object} [properties] - The properties of children that should be uploaded to the gpu and applied.
      * @param {boolean} [properties.scale=false] - When true, scale be uploaded and applied.
      * @param {boolean} [properties.position=true] - When true, position be uploaded and applied.
      * @param {boolean} [properties.rotation=false] - When true, rotation be uploaded and applied.
      * @param {boolean} [properties.uvs=false] - When true, uvs be uploaded and applied.
-     * @param {boolean} [properties.alpha=false] - When true, alpha be uploaded and applied.
-     * @param {number} [batchSize=15000] - Number of particles per batch.
+     * @param {boolean} [properties.tint=false] - When true, alpha and tint be uploaded and applied.
+     * @param {number} [batchSize=16384] - Number of particles per batch. If less than maxSize, it uses maxSize instead.
+     * @param {boolean} [autoResize=true] If true, container allocates more batches in case
+     *  there are more than `maxSize` particles.
      */
     function ParticleContainer() {
         var maxSize = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1500;
         var properties = arguments[1];
         var batchSize = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 16384;
+        var autoResize = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
         _classCallCheck(this, ParticleContainer);
 
@@ -37728,6 +38206,13 @@ var ParticleContainer = function (_core$Container) {
         _this.blendMode = core.BLEND_MODES.NORMAL;
 
         /**
+         * If true, container allocates more batches in case there are more than `maxSize` particles.
+         * @member {boolean}
+         * @default false
+         */
+        _this.autoResize = autoResize;
+
+        /**
          * Used for canvas renderering. If true then the elements will be positioned at the
          * nearest pixel. This provides a nice speed boost.
          *
@@ -37773,7 +38258,7 @@ var ParticleContainer = function (_core$Container) {
             this._properties[1] = 'position' in properties ? !!properties.position : this._properties[1];
             this._properties[2] = 'rotation' in properties ? !!properties.rotation : this._properties[2];
             this._properties[3] = 'uvs' in properties ? !!properties.uvs : this._properties[3];
-            this._properties[4] = 'alpha' in properties ? !!properties.alpha : this._properties[4];
+            this._properties[4] = 'alpha' in properties || 'tint' in properties ? !!properties.alpha || !!properties.tint : this._properties[4];
         }
     };
 
@@ -37864,11 +38349,7 @@ var ParticleContainer = function (_core$Container) {
         var finalWidth = 0;
         var finalHeight = 0;
 
-        var compositeOperation = renderer.blendModes[this.blendMode];
-
-        if (compositeOperation !== context.globalCompositeOperation) {
-            context.globalCompositeOperation = compositeOperation;
-        }
+        renderer.setBlendMode(this.blendMode);
 
         context.globalAlpha = this.worldAlpha;
 
@@ -37970,7 +38451,7 @@ var ParticleContainer = function (_core$Container) {
 
 exports.default = ParticleContainer;
 
-},{"../core":64,"../core/utils":123}],173:[function(require,module,exports){
+},{"../core":65,"../core/utils":124}],174:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -37995,7 +38476,7 @@ Object.defineProperty(exports, 'ParticleRenderer', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-},{"./ParticleContainer":172,"./webgl/ParticleRenderer":175}],174:[function(require,module,exports){
+},{"./ParticleContainer":173,"./webgl/ParticleRenderer":176}],175:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -38016,7 +38497,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @author Mat Groves
  *
  * Big thanks to the very clever Matt DesLauriers <mattdesl> https://github.com/mattdesl/
- * for creating the original pixi version!
+ * for creating the original PixiJS version!
  * Also a thanks to https://github.com/bchevalier for tweaking the tint and alpha so that
  * they now share 4 bytes on the vertex buffer
  *
@@ -38049,20 +38530,6 @@ var ParticleBuffer = function () {
         this.gl = gl;
 
         /**
-         * Size of a single vertex.
-         *
-         * @member {number}
-         */
-        this.vertSize = 2;
-
-        /**
-         * Size of a single vertex in bytes.
-         *
-         * @member {number}
-         */
-        this.vertByteSize = this.vertSize * 4;
-
-        /**
          * The number of particles the buffer can hold
          *
          * @member {number}
@@ -38092,6 +38559,7 @@ var ParticleBuffer = function () {
                 attribute: property.attribute,
                 size: property.size,
                 uploadFunction: property.uploadFunction,
+                unsignedByte: property.unsignedByte,
                 offset: property.offset
             };
 
@@ -38105,10 +38573,12 @@ var ParticleBuffer = function () {
         this.staticStride = 0;
         this.staticBuffer = null;
         this.staticData = null;
+        this.staticDataUint32 = null;
 
         this.dynamicStride = 0;
         this.dynamicBuffer = null;
         this.dynamicData = null;
+        this.dynamicDataUint32 = null;
 
         this.initBuffers();
     }
@@ -38142,8 +38612,11 @@ var ParticleBuffer = function () {
             this.dynamicStride += property.size;
         }
 
-        this.dynamicData = new Float32Array(this.size * this.dynamicStride * 4);
-        this.dynamicBuffer = _pixiGlCore2.default.GLBuffer.createVertexBuffer(gl, this.dynamicData, gl.STREAM_DRAW);
+        var dynBuffer = new ArrayBuffer(this.size * this.dynamicStride * 4 * 4);
+
+        this.dynamicData = new Float32Array(dynBuffer);
+        this.dynamicDataUint32 = new Uint32Array(dynBuffer);
+        this.dynamicBuffer = _pixiGlCore2.default.GLBuffer.createVertexBuffer(gl, dynBuffer, gl.STREAM_DRAW);
 
         // static //
         var staticOffset = 0;
@@ -38158,21 +38631,32 @@ var ParticleBuffer = function () {
             this.staticStride += _property.size;
         }
 
-        this.staticData = new Float32Array(this.size * this.staticStride * 4);
-        this.staticBuffer = _pixiGlCore2.default.GLBuffer.createVertexBuffer(gl, this.staticData, gl.STATIC_DRAW);
+        var statBuffer = new ArrayBuffer(this.size * this.staticStride * 4 * 4);
+
+        this.staticData = new Float32Array(statBuffer);
+        this.staticDataUint32 = new Uint32Array(statBuffer);
+        this.staticBuffer = _pixiGlCore2.default.GLBuffer.createVertexBuffer(gl, statBuffer, gl.STATIC_DRAW);
 
         this.vao = new _pixiGlCore2.default.VertexArrayObject(gl).addIndex(this.indexBuffer);
 
         for (var _i2 = 0; _i2 < this.dynamicProperties.length; ++_i2) {
             var _property2 = this.dynamicProperties[_i2];
 
-            this.vao.addAttribute(this.dynamicBuffer, _property2.attribute, gl.FLOAT, false, this.dynamicStride * 4, _property2.offset * 4);
+            if (_property2.unsignedByte) {
+                this.vao.addAttribute(this.dynamicBuffer, _property2.attribute, gl.UNSIGNED_BYTE, true, this.dynamicStride * 4, _property2.offset * 4);
+            } else {
+                this.vao.addAttribute(this.dynamicBuffer, _property2.attribute, gl.FLOAT, false, this.dynamicStride * 4, _property2.offset * 4);
+            }
         }
 
         for (var _i3 = 0; _i3 < this.staticProperties.length; ++_i3) {
             var _property3 = this.staticProperties[_i3];
 
-            this.vao.addAttribute(this.staticBuffer, _property3.attribute, gl.FLOAT, false, this.staticStride * 4, _property3.offset * 4);
+            if (_property3.unsignedByte) {
+                this.vao.addAttribute(this.staticBuffer, _property3.attribute, gl.UNSIGNED_BYTE, true, this.staticStride * 4, _property3.offset * 4);
+            } else {
+                this.vao.addAttribute(this.staticBuffer, _property3.attribute, gl.FLOAT, false, this.staticStride * 4, _property3.offset * 4);
+            }
         }
     };
 
@@ -38189,7 +38673,7 @@ var ParticleBuffer = function () {
         for (var i = 0; i < this.dynamicProperties.length; i++) {
             var property = this.dynamicProperties[i];
 
-            property.uploadFunction(children, startIndex, amount, this.dynamicData, this.dynamicStride, property.offset);
+            property.uploadFunction(children, startIndex, amount, property.unsignedByte ? this.dynamicDataUint32 : this.dynamicData, this.dynamicStride, property.offset);
         }
 
         this.dynamicBuffer.upload();
@@ -38208,7 +38692,7 @@ var ParticleBuffer = function () {
         for (var i = 0; i < this.staticProperties.length; i++) {
             var property = this.staticProperties[i];
 
-            property.uploadFunction(children, startIndex, amount, this.staticData, this.staticStride, property.offset);
+            property.uploadFunction(children, startIndex, amount, property.unsignedByte ? this.staticDataUint32 : this.staticData, this.staticStride, property.offset);
         }
 
         this.staticBuffer.upload();
@@ -38235,7 +38719,7 @@ var ParticleBuffer = function () {
 
 exports.default = ParticleBuffer;
 
-},{"../../core/utils/createIndicesForQuads":121,"pixi-gl-core":12}],175:[function(require,module,exports){
+},{"../../core/utils/createIndicesForQuads":122,"pixi-gl-core":12}],176:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -38252,6 +38736,8 @@ var _ParticleBuffer = require('./ParticleBuffer');
 
 var _ParticleBuffer2 = _interopRequireDefault(_ParticleBuffer);
 
+var _utils = require('../../core/utils');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -38266,7 +38752,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * @author Mat Groves
  *
  * Big thanks to the very clever Matt DesLauriers <mattdesl> https://github.com/mattdesl/
- * for creating the original pixi version!
+ * for creating the original PixiJS version!
  * Also a thanks to https://github.com/bchevalier for tweaking the tint and alpha so that they now
  * share 4 bytes on the vertex buffer
  *
@@ -38358,11 +38844,12 @@ var ParticleRenderer = function (_core$ObjectRenderer) {
             uploadFunction: this.uploadUvs,
             offset: 0
         },
-        // alphaData
+        // tintData
         {
             attribute: this.shader.attributes.aColor,
             size: 1,
-            uploadFunction: this.uploadAlpha,
+            unsignedByte: true,
+            uploadFunction: this.uploadTint,
             offset: 0
         }];
     };
@@ -38429,6 +38916,13 @@ var ParticleRenderer = function (_core$ObjectRenderer) {
                 amount = batchSize;
             }
 
+            if (j >= buffers.length) {
+                if (!container.autoResize) {
+                    break;
+                }
+                buffers.push(this._generateOneMoreBuffer(container));
+            }
+
             var buffer = buffers[j];
 
             // we always upload the dynamic
@@ -38466,6 +38960,23 @@ var ParticleRenderer = function (_core$ObjectRenderer) {
         }
 
         return buffers;
+    };
+
+    /**
+     * Creates one more particle buffer, because container has autoResize feature
+     *
+     * @param {PIXI.ParticleContainer} container - The container to render using this ParticleRenderer
+     * @return {PIXI.ParticleBuffer} generated buffer
+     * @private
+     */
+
+
+    ParticleRenderer.prototype._generateOneMoreBuffer = function _generateOneMoreBuffer(container) {
+        var gl = this.renderer.gl;
+        var batchSize = container._batchSize;
+        var dynamicPropertyFlags = container._properties;
+
+        return new _ParticleBuffer2.default(gl, this.properties, dynamicPropertyFlags, batchSize);
     };
 
     /**
@@ -38640,14 +39151,18 @@ var ParticleRenderer = function (_core$ObjectRenderer) {
      */
 
 
-    ParticleRenderer.prototype.uploadAlpha = function uploadAlpha(children, startIndex, amount, array, stride, offset) {
-        for (var i = 0; i < amount; i++) {
-            var spriteAlpha = children[startIndex + i].alpha;
+    ParticleRenderer.prototype.uploadTint = function uploadTint(children, startIndex, amount, array, stride, offset) {
+        for (var i = 0; i < amount; ++i) {
+            var sprite = children[startIndex + i];
+            var premultiplied = sprite._texture.baseTexture.premultipliedAlpha;
+            var alpha = sprite.alpha;
+            // we dont call extra function if alpha is 1.0, that's faster
+            var argb = alpha < 1.0 && premultiplied ? (0, _utils.premultiplyTint)(sprite._tintRGB, alpha) : sprite._tintRGB + (alpha * 255 << 24);
 
-            array[offset] = spriteAlpha;
-            array[offset + stride] = spriteAlpha;
-            array[offset + stride * 2] = spriteAlpha;
-            array[offset + stride * 3] = spriteAlpha;
+            array[offset] = argb;
+            array[offset + stride] = argb;
+            array[offset + stride * 2] = argb;
+            array[offset + stride * 3] = argb;
 
             offset += stride * 4;
         }
@@ -38680,7 +39195,7 @@ exports.default = ParticleRenderer;
 
 core.WebGLRenderer.registerPlugin('particle', ParticleRenderer);
 
-},{"../../core":64,"./ParticleBuffer":174,"./ParticleShader":176}],176:[function(require,module,exports){
+},{"../../core":65,"../../core/utils":124,"./ParticleBuffer":175,"./ParticleShader":177}],177:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -38713,9 +39228,9 @@ var ParticleShader = function (_Shader) {
 
         return _possibleConstructorReturn(this, _Shader.call(this, gl,
         // vertex shader
-        ['attribute vec2 aVertexPosition;', 'attribute vec2 aTextureCoord;', 'attribute float aColor;', 'attribute vec2 aPositionCoord;', 'attribute vec2 aScale;', 'attribute float aRotation;', 'uniform mat3 projectionMatrix;', 'varying vec2 vTextureCoord;', 'varying float vColor;', 'void main(void){', '   vec2 v = aVertexPosition;', '   v.x = (aVertexPosition.x) * cos(aRotation) - (aVertexPosition.y) * sin(aRotation);', '   v.y = (aVertexPosition.x) * sin(aRotation) + (aVertexPosition.y) * cos(aRotation);', '   v = v + aPositionCoord;', '   gl_Position = vec4((projectionMatrix * vec3(v, 1.0)).xy, 0.0, 1.0);', '   vTextureCoord = aTextureCoord;', '   vColor = aColor;', '}'].join('\n'),
+        ['attribute vec2 aVertexPosition;', 'attribute vec2 aTextureCoord;', 'attribute vec4 aColor;', 'attribute vec2 aPositionCoord;', 'attribute vec2 aScale;', 'attribute float aRotation;', 'uniform mat3 projectionMatrix;', 'uniform vec4 uColor;', 'varying vec2 vTextureCoord;', 'varying vec4 vColor;', 'void main(void){', '   vec2 v = aVertexPosition;', '   v.x = (aVertexPosition.x) * cos(aRotation) - (aVertexPosition.y) * sin(aRotation);', '   v.y = (aVertexPosition.x) * sin(aRotation) + (aVertexPosition.y) * cos(aRotation);', '   v = v + aPositionCoord;', '   gl_Position = vec4((projectionMatrix * vec3(v, 1.0)).xy, 0.0, 1.0);', '   vTextureCoord = aTextureCoord;', '   vColor = aColor * uColor;', '}'].join('\n'),
         // hello
-        ['varying vec2 vTextureCoord;', 'varying float vColor;', 'uniform sampler2D uSampler;', 'uniform vec4 uColor;', 'void main(void){', '  vec4 color = texture2D(uSampler, vTextureCoord) * vColor * uColor;', '  if (color.a == 0.0) discard;', '  gl_FragColor = color;', '}'].join('\n')));
+        ['varying vec2 vTextureCoord;', 'varying vec4 vColor;', 'uniform sampler2D uSampler;', 'void main(void){', '  vec4 color = texture2D(uSampler, vTextureCoord) * vColor;', '  if (color.a == 0.0) discard;', '  gl_FragColor = color;', '}'].join('\n')));
     }
 
     return ParticleShader;
@@ -38723,7 +39238,7 @@ var ParticleShader = function (_Shader) {
 
 exports.default = ParticleShader;
 
-},{"../../core/Shader":43}],177:[function(require,module,exports){
+},{"../../core/Shader":44}],178:[function(require,module,exports){
 "use strict";
 
 // References:
@@ -38741,7 +39256,7 @@ if (!Math.sign) {
     };
 }
 
-},{}],178:[function(require,module,exports){
+},{}],179:[function(require,module,exports){
 'use strict';
 
 var _objectAssign = require('object-assign');
@@ -38756,7 +39271,7 @@ if (!Object.assign) {
 // https://github.com/sindresorhus/object-assign
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
 
-},{"object-assign":5}],179:[function(require,module,exports){
+},{"object-assign":5}],180:[function(require,module,exports){
 'use strict';
 
 require('./Object.assign');
@@ -38781,7 +39296,7 @@ if (!window.Uint16Array) {
     window.Uint16Array = Array;
 }
 
-},{"./Math.sign":177,"./Object.assign":178,"./requestAnimationFrame":180}],180:[function(require,module,exports){
+},{"./Math.sign":178,"./Object.assign":179,"./requestAnimationFrame":181}],181:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -38807,17 +39322,15 @@ if (!(Date.now && Date.prototype.getTime)) {
 
 // performance.now
 if (!(global.performance && global.performance.now)) {
-    (function () {
-        var startTime = Date.now();
+    var startTime = Date.now();
 
-        if (!global.performance) {
-            global.performance = {};
-        }
+    if (!global.performance) {
+        global.performance = {};
+    }
 
-        global.performance.now = function () {
-            return Date.now() - startTime;
-        };
-    })();
+    global.performance.now = function () {
+        return Date.now() - startTime;
+    };
 }
 
 // requestAnimationFrame
@@ -38861,7 +39374,7 @@ if (!global.cancelAnimationFrame) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],181:[function(require,module,exports){
+},{}],182:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -39349,7 +39862,7 @@ function findTextStyle(item, queue) {
     return false;
 }
 
-},{"../core":64,"./limiters/CountLimiter":184}],182:[function(require,module,exports){
+},{"../core":65,"./limiters/CountLimiter":185}],183:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -39469,7 +39982,7 @@ function uploadBaseTextures(prepare, item) {
 
 core.CanvasRenderer.registerPlugin('prepare', CanvasPrepare);
 
-},{"../../core":64,"../BasePrepare":181}],183:[function(require,module,exports){
+},{"../../core":65,"../BasePrepare":182}],184:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -39521,7 +40034,7 @@ Object.defineProperty(exports, 'TimeLimiter', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-},{"./BasePrepare":181,"./canvas/CanvasPrepare":182,"./limiters/CountLimiter":184,"./limiters/TimeLimiter":185,"./webgl/WebGLPrepare":186}],184:[function(require,module,exports){
+},{"./BasePrepare":182,"./canvas/CanvasPrepare":183,"./limiters/CountLimiter":185,"./limiters/TimeLimiter":186,"./webgl/WebGLPrepare":187}],185:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -39579,7 +40092,7 @@ var CountLimiter = function () {
 
 exports.default = CountLimiter;
 
-},{}],185:[function(require,module,exports){
+},{}],186:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -39637,7 +40150,7 @@ var TimeLimiter = function () {
 
 exports.default = TimeLimiter;
 
-},{}],186:[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -39759,7 +40272,7 @@ function findGraphics(item, queue) {
 
 core.WebGLRenderer.registerPlugin('prepare', WebGLPrepare);
 
-},{"../../core":64,"../BasePrepare":181}],187:[function(require,module,exports){
+},{"../../core":65,"../BasePrepare":182}],188:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -39869,12 +40382,12 @@ if (typeof _deprecation2.default === 'function') {
     (0, _deprecation2.default)(exports);
 }
 
-// Always export pixi globally.
+// Always export PixiJS globally.
 global.PIXI = exports; // eslint-disable-line
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./accessibility":41,"./core":64,"./deprecation":129,"./extract":131,"./extras":140,"./filters":151,"./interaction":158,"./loaders":161,"./mesh":170,"./particles":173,"./polyfill":179,"./prepare":183}]},{},[187])(187)
+},{"./accessibility":42,"./core":65,"./deprecation":130,"./extract":132,"./extras":141,"./filters":152,"./interaction":159,"./loaders":162,"./mesh":171,"./particles":174,"./polyfill":180,"./prepare":184}]},{},[188])(188)
 });
 
 

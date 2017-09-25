@@ -103,20 +103,6 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight){
     var outdir = __dirname+'/../assets/maps/chunks/';
     if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);
 
-    /*var minX = -Math.floor(nbHoriz/2);
-    var minY = -Math.floor(nbVert/2);
-    var maxX = Math.ceil(nbHoriz/2);
-    var maxY = Math.ceil(nbVert/2);
-    for(var x = minX; x < maxX; x++){
-        for(var y = minY; y < maxY; y++) {
-            var name = x+'_'+ y;
-            basis.chunkID = name;
-            fs.writeFile(outdir+name+'.json',JSON.stringify(basis),function(err){
-                if(err) throw err;
-                console.log('.');
-            });
-        }
-    }*/
     var counter = 0;
     var number = nbHoriz*nbVert;
     for(var i = 0; i < number; i++){

@@ -47,7 +47,7 @@ UpdatePacket.prototype.updateProperty = function(type,id,property,value){
     //console.log('updating property type = '+type+', id = '+id+', prop = '+property+', val = '+value);
     var map;
     switch(type){
-        case 'player':
+        case 'Player':
             map = this.players;
             break;
         /*case 'item':

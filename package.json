@@ -11,5 +11,10 @@
   "license": "ISC",
   "devDependencies": {
     "optimist": "^0.6.1"
+  },
+  "dependencies": {
+    "clone": "^2.1.1",
+    "mongodb": "^2.2.31",
+    "quickselect": "^1.0.0"
   }
 }

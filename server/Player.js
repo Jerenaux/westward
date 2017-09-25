@@ -14,7 +14,7 @@ function Player(socketID,playerID){
     this.aoi = Utils.tileToAOI({x:this.x,y:this.y});
     this.updatePacket = new PersonalUpdatePacket();
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
-    console.log('['+this.id+'] Hi at '+this.x+', '+this.y+', aoi = '+this.aoi);
+    console.log('['+this.id+'] Hi at ('+this.x+', '+this.y+')');
 }
 
 Player.prototype = Object.create(GameObject.prototype);

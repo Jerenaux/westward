@@ -4,6 +4,10 @@ var server = require('http').Server(app);
 var io = require('socket.io').listen(server);
 var fs = require('fs');
 
+var quickselect = require('quickselect'); // Used to compute the median for latency
+var mongo = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectID;
+
 app.use('/assets',express.static(__dirname + '/assets'));
 app.use('/client',express.static(__dirname + '/client'));
 app.use('/server',express.static(__dirname + '/server'));
@@ -29,8 +33,13 @@ if(process.env.DEV == 1) {
 
 server.listen(process.env.PORT || 8081,function(){
     console.log('Listening on '+server.address().port);
-    gs.readMap(process.env.MAPS_PATH);
-    server.setUpdateLoop();
+    mongo.connect(process.env.MONGODB_URI,function(err,db){ //|| 'mongodb://localhost:27017/westward'
+        if(err) throw(err);
+        server.db = db;
+        console.log('Connection to db established');
+        gs.readMap(process.env.MAPS_PATH);
+        server.setUpdateLoop();
+    });
 });
 
 var gs = require('./server/GameServer.js').GameServer;
@@ -47,6 +56,19 @@ io.on('connection',function(socket){
         socket.on('move',function(data){
             gs.move(socket.id,data.x,data.y);
         });
+    });
+
+    socket.pings = [];
+
+    socket.on('ponq',function(sentStamp){
+        // Compute a running estimate of the latency of a client each time an interaction takes place between client and server
+        // The running estimate is the median of the last 20 sampled values
+        var ss = server.getShortStamp();
+        var delta = (ss - sentStamp)/2;
+        if(delta < 0) delta = 0;
+        socket.pings.push(delta); // socket.pings is the list of the 20 last latencies
+        if(socket.pings.length > 20) socket.pings.shift(); // keep the size down to 20
+        socket.latency = server.quickMedian(socket.pings.slice(0)); // quickMedian used the quickselect algorithm to compute the median of a list of values
     });
 
     socket.on('disconnect',function(){
@@ -80,6 +102,7 @@ server.sendInitializationPacket = function(socket,packet){
 
 server.sendUpdate = function(socketID,pkg){
     pkg = server.addStamp(pkg);
+    pkg.latency = Math.floor(server.getSocket(socketID).latency);
     /*try{
         pkg.latency = Math.floor(server.getSocket(socketID).latency);
     }catch(e){
@@ -99,17 +122,17 @@ server.getShortStamp = function(){
     return parseInt(Date.now().toString().substr(-9));
 };
 
+server.getSocket = function(id){
+    return io.sockets.connected[id]; // won't work if the socket is subscribed to a namespace, because the namsepace will be part of the id
+};
+
 server.getNbConnected =function(){
     return Object.keys(gs.players).length;
 };
 
-// ################""
-
-server.sendMsg = function(socket,msg,data){
-    socket.emit(msg,data);
-};
-
-server.emitMsg = function(msg,data){
-    //console.log('msg = '+msg+', data = '+data);
-    io.emit(msg,data);
+server.quickMedian = function(arr){ // Compute the median of an array using the quickselect algorithm
+    var  l = arr.length;
+    var n = (l%2 == 0 ? (l/2)-1 : (l-1)/2);
+    quickselect(arr,n);
+    return arr[n];
 };
