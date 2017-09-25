@@ -5,20 +5,28 @@
 var Utils = require('../shared/Utils.js').Utils;
 var PersonalUpdatePacket = require('./PersonalUpdatePacket.js').PersonalUpdatePacket;
 var GameObject = require('./GameObject.js').GameObject;
+var GameServer = require('./GameServer.js').GameServer;
 
-function Player(socketID,playerID){
-    this.socketID = socketID;
-    this.id = playerID;
-    this.x = Utils.randomInt(1,21);
-    this.y = Utils.randomInt(1,16);
-    this.aoi = Utils.tileToAOI({x:this.x,y:this.y});
+function Player(){
     this.updatePacket = new PersonalUpdatePacket();
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
-    console.log('['+this.id+'] Hi at ('+this.x+', '+this.y+')');
 }
 
 Player.prototype = Object.create(GameObject.prototype);
 Player.prototype.constructor = Player;
+
+Player.prototype.setIDs = function(dbID,socketID){
+    this.id = GameServer.lastPlayerID++;
+    this.dbID = dbID;
+    this.socketID = socketID;
+};
+
+Player.prototype.setStartingPosition = function(){
+    this.x = Utils.randomInt(1,21);
+    this.y = Utils.randomInt(1,16);
+    this.setOrUpdateAOI();
+    console.log('Hi at ('+this.x+', '+this.y+')');
+};
 
 Player.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
@@ -32,6 +40,34 @@ Player.prototype.trim = function(){
     //if(this.route) trimmed.route = this.route.trim(this.category);
     //if(this.target) trimmed.targetID = this.target.id;
     return trimmed;
+};
+
+Player.prototype.dbTrim = function(){
+    // Return a smaller object, containing a subset of the initial properties, to be stored in the database
+    var trimmed = {};
+    var dbProperties = ['x','y']; // list of properties relevant to store in the database
+    for(var p = 0; p < dbProperties.length; p++){
+        trimmed[dbProperties[p]] = this[dbProperties[p]];
+    }
+    //trimmed['weapon'] = GameServer.db.itemsIDmap[this.weapon];
+    //trimmed['armor'] = GameServer.db.itemsIDmap[this.armor];
+    return trimmed;
+};
+
+Player.prototype.getDataFromDb = function(document){
+    // Set up the player based on the data stored in the databse
+    // document is the mongodb document retrieved form the database
+    var dbProperties = ['x','y'];
+    for(var p = 0; p < dbProperties.length; p++){
+        this[dbProperties[p]] = document[dbProperties[p]];
+    }
+    this.setOrUpdateAOI();
+    //this.equip(1,document['weapon']);
+    //this.equip(2,document['armor']);
+};
+
+Player.prototype.setOrUpdateAOI = function(){
+    this.aoi = Utils.tileToAOI({x:this.x,y:this.y});
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){

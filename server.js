@@ -49,9 +49,18 @@ server.clientUpdateRate = 1000/5; // Rate at which update packets are sent
 
 io.on('connection',function(socket){
 
-    socket.on('init-world',function(){
+    socket.on('init-world',function(data){
         console.log('['+socket.id+'] Initialized');
-        gs.addPlayer(socket);
+        if(data.new){
+            console.log('New player');
+            //if(!gs.checkSocketID(socket.id)) return;
+            gs.addNewPlayer(socket);
+        }else{
+            console.log('Returning player');
+            //if(!gs.checkPlayerID(data.id)) return;
+            gs.loadPlayer(socket,data.id);
+        }
+        //gs.addPlayer(socket);
 
         socket.on('move',function(data){
             gs.move(socket.id,data.x,data.y);
@@ -135,4 +144,8 @@ server.quickMedian = function(arr){ // Compute the median of an array using the 
     var n = (l%2 == 0 ? (l/2)-1 : (l-1)/2);
     quickselect(arr,n);
     return arr[n];
+};
+
+server.sendID = function(socket,playerID){
+    socket.emit('pid',playerID);
 };

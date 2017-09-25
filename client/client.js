@@ -4,6 +4,7 @@
 
 Client = {
     initEventName: 'init', // name of the event that triggers the call to initWorld() and the initialization of the game
+    storageIDKey: 'playerID', // key in localStorage of player ID
     eventsQueue : [] // when events arrive before the flag playerIsInitialized is set to true, they are not processed
 };
 
@@ -33,21 +34,27 @@ Client.getInitRequest = function(){ // Returns the data object to send to reques
     /*if(Client.isNewPlayer()) return {new:true,name:Client.getName(),clientTime:Date.now()};
     var id = Client.getPlayerID();
     return {new:false,id:id,clientTime:Date.now()};*/
-    return {};
+    if(Client.isNewPlayer()) return {new:true};
+    return {new:false,id:Client.getPlayerID()};
 };
 
 Client.isNewPlayer = function(){
     var id = Client.getPlayerID();
-    var name = Client.getName();
+    /*var name = Client.getName();
     var armor = Client.getArmor();
-    var weapon = Client.getWeapon();
-    return !(id !== undefined && name && armor && weapon);
+    var weapon = Client.getWeapon();*/
+    //return !(id !== undefined && name && armor && weapon);
+    return (id === null);
 };
 
+Client.getPlayerID = function(){
+    return localStorage.getItem(Client.storageIDKey);
+};
 
 // #### RECEIVERS ####
 
 Client.socket.on(Client.initEventName,function(data){ // This event triggers when receiving the initialization packet from the server, to use in Game.initWorld()
+    console.log('Init packet received');
     //if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.initializationSchema); // if in binary format, decode first
     Client.socket.emit('ponq',data.stamp); // send back a pong stamp to compute latency
     Engine.initWorld(data.player);
@@ -65,6 +72,15 @@ Client.socket.on('update',function(data){ // This event triggers uppon receiving
     if(data.global) Engine.updateWorld(data.global);
     //if(data.local) Game.updateSelf(data.local);
 });
+
+Client.socket.on('pid',function(playerID){ // the 'pid' event is used for the server to tell the client what is the ID of the player
+    Client.setLocalData(playerID);
+});
+
+Client.setLocalData = function(id){ // store the player ID in localStorage
+    console.log('your ID : '+id);
+    localStorage.setItem(Client.storageIDKey,id);
+};
 
 /// ##### SENDERS ######
 

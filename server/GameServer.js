@@ -3,6 +3,7 @@
  */
 var fs = require('fs');
 var clone = require('clone'); // used to clone objects, essentially used for clonick update packets
+var ObjectId = require('mongodb').ObjectID;
 
 var GameServer = {
     lastPlayerID: 0,
@@ -41,8 +42,44 @@ GameServer.getPlayer = function(socketID){
     return GameServer.socketMap.hasOwnProperty(socketID) ? GameServer.players[GameServer.socketMap[socketID]] : null;
 };
 
-GameServer.addPlayer = function(socket){
-    var player = new Player(socket.id,GameServer.lastPlayerID++);
+/*GameServer.checkSocketID = function(id){ // check if no other player is using same socket ID
+    return (GameServer.getPlayerID(id) === undefined);
+};
+
+GameServer.checkPlayerID = function(id){ // check if no other player is using same player ID
+    return (GameServer.players[id] === undefined);
+};*/
+
+GameServer.addNewPlayer = function(socket){
+    var player = new Player();
+    player.setStartingPosition();
+    var document = player.dbTrim();
+    GameServer.server.db.collection('players').insertOne(document,function(err){
+        if(err) throw err;
+        var mongoID = document._id.toString(); // The Mongo driver for NodeJS appends the _id field to the original object reference
+        player.setIDs(mongoID,socket.id);
+        GameServer.finalizePlayer(socket,player);
+        GameServer.server.sendID(socket,mongoID);
+    });
+};
+
+GameServer.loadPlayer = function(socket,id){
+    GameServer.server.db.collection('players').findOne({_id: new ObjectId(id)},function(err,doc){
+        if(err) throw err;
+        if(!doc) {
+            //GameServer.server.sendError(socket);
+            console.log('ERROR : no matching document');
+            return;
+        }
+        var player = new Player();
+        var mongoID = doc._id.toString();
+        player.setIDs(mongoID,socket.id);
+        player.getDataFromDb(doc);
+        GameServer.finalizePlayer(socket,player);
+    });
+};
+
+GameServer.finalizePlayer = function(socket,player){
     GameServer.players[player.id] = player;
     GameServer.socketMap[socket.id] = player.id;
     GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
@@ -99,9 +136,8 @@ GameServer.move = function(socketID,x,y){
     var player = GameServer.getPlayer(socketID);
     player.setProperty('x',x);
     player.setProperty('y',y);
-    player.aoi = Utils.tileToAOI({x:x,y:y});
+    player.setOrUpdateAOI();
     console.log('['+player.id+'] Move to aoi '+player.aoi);
-    //GameServer.server.emitMsg('move',player);
 };
 
 GameServer.handleAOItransition = function(entity,previous){

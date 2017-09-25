@@ -1,7 +1,7 @@
 World building
 Design document
 Clean code
-Networking
+Movement
 
 * Cleaning:
 - Restore "studio" capabilities
@@ -10,10 +10,7 @@ Networking
 - Move Geometry to studio?
 - Remove phaser_map and mapbis
 - Split server in two (game and dev server)
------
-* Network
-- Interact with db
-- Load existing player
+
 -----
 * Deployment
 - Two repositories, for production and development, with node scripts taking care
