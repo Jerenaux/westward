@@ -7,12 +7,11 @@ Next dev log:
 Networking, pathfinding & splines
 
 * Cleaning:
-- Restore "studio" capabilities
-- Remove comment-out stuff
 - Clean up Utils
 - Move Geometry to studio?
 - Remove phaser_map and mapbis
 - Split server in two (game and dev server)
+- Order files in studio/
 -----
 *Moving:
 - Use of spaceMap

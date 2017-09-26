@@ -135,6 +135,11 @@ Utils.listVisibleAOIs = function(start){ // List the visible chunks around the p
 };
 
 Utils.listAdjacentAOIs = function(current){
+    if(!Utils.nbChunksHorizontal){
+        console.log('ERROR : Chunk data not initialized');
+        return [];
+    }
+
     var AOIs = [];
     var isAtTop = (current < Utils.nbChunksHorizontal);
     var isAtBottom = (current > Utils.lastChunkID - Utils.nbChunksHorizontal);

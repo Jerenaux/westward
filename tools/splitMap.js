@@ -38,7 +38,8 @@ function splitMap(fileName,outputDirectory,AOIwidth,AOIheight){
             chunkWidth: AOIwidth,
             chunkHeight: AOIheight,
             nbChunksHoriz: nbAOIhoriz,
-            nbChunksVert: nbAOIvert
+            nbChunksVert: nbAOIvert,
+            nbLayers: map.layers.length
         };
         fs.writeFile(__dirname+path+outputDirectory+'/master.json',JSON.stringify(master),function(err){
             if(err) throw err;

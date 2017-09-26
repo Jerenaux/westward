@@ -1,4 +1,4 @@
-/**
+    /**
  * Created by Jerome on 26-06-17.
  */
 var Engine = {
@@ -20,29 +20,6 @@ Engine.camera = {
 };
 
 Engine.boot = function(){
-    /*TODO:
-    * Procedural world:
-    - Fix rivers
-    - Forests
-    - Dirt
-    * Network
-    - Two repositories, for production and development, with node scripts taking care
-    of copying what is needed from one to the other (+ uglifying and compressing etc.)
-    -> Possible to programmatically push?  http://radek.io/2015/10/27/nodegit/
-    - Somehow remove/disable debug components automatically
-    - Desktop app a simple terminal that gets everything from server (= exact same
-    appearance and behaviour, reduced code visibility, and possibly *no* node-modules)
-    - Scripts to group what is needed for the app, ugligy/compress and build
-    - In any case, migrate Geometry to server to hide it
-    * History & design document
-    -----
-    * Tools:
-    - Load more chunks upon zoom
-    - Top-down visibility optimization (create a lookup table of transparency)
-    - Prune map files more
-    - Testing (make part of the pipeline)
-    */
-
     Engine.renderer = PIXI.autoDetectRenderer(
         Engine.baseViewWidth*Engine.tileWidth,
         Engine.baseViewHeight*Engine.tileHeight,
@@ -87,7 +64,8 @@ Engine.boot = function(){
         document.getElementById('n').value = 10;
     }
 
-    Engine.mapDataLocation = 'assets/maps/chunks';
+    //Engine.mapDataLocation = 'assets/maps/chunks';
+    Engine.mapDataLocation = '/maps';
     Engine.loadJSON(Engine.mapDataLocation+'/master.json',Engine.readMaster);
 };
 
@@ -131,14 +109,21 @@ Engine.readMaster = function(masterData){
     Engine.worldHeight = Engine.nbChunksVertical*Engine.chunkHeight;
     Engine.lastChunkID = (Engine.nbChunksHorizontal*Engine.nbChunksVertical)-1;
     Engine.nbLayers = masterData.nbLayers;
+
+    Utils.chunkWidth = Engine.chunkWidth;
+    Utils.chunkHeight = Engine.chunkHeight;
+    Utils.nbChunksHorizontal = Engine.nbChunksHorizontal;
+    Utils.nbChunksVertical = Engine.nbChunksVertical;
+    Utils.lastChunkID = Engine.lastChunkID;
+
     console.log('Master file read, setting up world of size '+Engine.worldWidth+' x '+Engine.worldHeight+' with '+Engine.nbLayers+' layers');
     Engine.tilesets = masterData.tilesets;
 
-    PIXI.loader.add('hero','assets/sprites/hero.png');
+    PIXI.loader.add('hero','../assets/sprites/hero.png');
 
     for(var i = 0; i < masterData.tilesets.length; i++){
         var tileset = masterData.tilesets[i];
-        var path = 'assets/'+tileset.image.slice(2);// The paths in the master file are relative to the assets/maps directory
+        var path = '../assets/'+tileset.image.slice(2);// The paths in the master file are relative to the assets/maps directory
         PIXI.loader.add(tileset.name,path);
     }
 
@@ -167,8 +152,8 @@ Engine.start = function(loader, resources){
 };
 
 Engine.addHero = function(){
-    startx = 71; //35
-    starty = 22;//30;
+    startx = 10;
+    starty = 10;
     Engine.player = Engine.addSprite('hero',startx,starty);
     Engine.player.visible = Engine.showHero;
     Engine.player.chunk = Utils.tileToAOI({x:startx,y:starty});
@@ -281,28 +266,6 @@ Engine.getTilesetFromTile = function(tile){
     }
     return Engine.tilesets.length-1;
 };
-
-/*Engine.addTile = function(x,y,tile,chunk,layer){
-    if(x < 0 || y < 0) return;
-    var chunk = chunk || Engine.chunks[Utils.tileToAOI({x:x,y:y})];
-    if(chunk === undefined) return;
-    var tilesetID = Engine.getTilesetFromTile(tile);
-    var tileset = Engine.tilesets[tilesetID];
-    tile -= tileset.firstgid;
-    var wdth = Math.floor(tileset.imagewidth/Engine.tileWidth);
-    var tx = tile%wdth;
-    var ty = Math.floor(tile/wdth);
-    var texture = new PIXI.Texture(Engine.resources[tileset.name].texture, new PIXI.Rectangle(tx*Engine.tileWidth, ty*Engine.tileHeight, Engine.tileWidth, Engine.tileHeight));
-    var sprite = new PIXI.Sprite(texture);
-    // save some properties inside the object:
-    if(layer) chunk.layers[layer].add(x,y,tile);
-    sprite.tile = tile;
-    sprite.layer = layer;
-    sprite.tileX = x;
-    sprite.tileY = y;
-    sprite.position.set(x*Engine.tileWidth,y*Engine.tileHeight);
-    chunk.addChild(sprite);
-};*/
 
 Engine.removeChunk = function(id){
     Engine.stage.removeChild(Engine.chunks[id]);
@@ -476,8 +439,6 @@ Engine.handleClick = function(e){
     var c = Engine.getMouseCoordinates(e);
     if(Engine.selectionEnabled){
         Engine.updateSelection(
-            //Engine.camera.x*Engine.tileWidth + coordinates.x,
-            //Engine.camera.y*Engine.tileHeight + coordinates.y,
             c.px.x,
             c.px.y,
             null,null);
@@ -485,7 +446,6 @@ Engine.handleClick = function(e){
         return;
     }
     if(!Engine.clickAction) return;
-    var c = Engine.getMouseCoordinates(e);
     var worldx = c.tile.x;
     var worldy = c.tile.y;
     worldx = clamp(worldx,0,Engine.worldWidth);

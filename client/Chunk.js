@@ -1,7 +1,6 @@
 function Chunk(mapData,id,z){
     //Phaser.GameObjects.Sprite.call(this,Engine.scene);
     this.fromFile = (mapData !== null);
-    //this.id = mapData ? mapData.chunkID : 0;
     this.id = id;
     this.z = z;
     var origin = Utils.AOItoTile(this.id);
@@ -33,8 +32,6 @@ Chunk.prototype.drawLayers = function(){
             for (var i = 0; i < data.length; i++) {
                 var tile = data[i];
                 if (tile == 0) continue;
-                //var x = origin.x + i % Engine.chunkWidth;
-                //var y = origin.y + Math.floor(i / Engine.chunkWidth);
                 var x = origin.x + i % this.width;
                 var y = origin.y + Math.floor(i / this.width);
                 this.drawTile(x,y,tile,layer);
@@ -77,15 +74,9 @@ Chunk.prototype.drawTile = function(x,y,tile,layer){
     var tilesetID = Engine.getTilesetFromTile(tile);
     var tileset = Engine.tilesets[tilesetID];
     tile -= tileset.firstgid;
-    /*var wdth = Math.floor(tileset.imagewidth/Engine.tileWidth);
-    var tx = tile%wdth;
-    var ty = Math.floor(tile/wdth);
-    var texture = new PIXI.Texture(Engine.resources[tileset.name].texture, new PIXI.Rectangle(tx*Engine.tileWidth, ty*Engine.tileHeight, Engine.tileWidth, Engine.tileHeight));
-    var sprite = new PIXI.Sprite(texture);*/
     var sprite = Engine.scene.add.image(x*Engine.tileWidth,y*Engine.tileHeight,tileset.name,tile);
     sprite.tileID = tile;
     layer.push(sprite);
-    //sprite.position.set(x*Engine.tileWidth,y*Engine.tileHeight);
     //layer.addChild(sprite);
 };
 
