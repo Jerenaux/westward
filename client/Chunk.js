@@ -7,6 +7,8 @@ function Chunk(mapData,id,z){
     var origin = Utils.AOItoTile(this.id);
     this.x = origin.x;
     this.y = origin.y;
+    this.width = mapData.width || Engine.chunkWidth;
+    this.height = mapData.height || Engine.chunkHeight;
     this.layers = [];
     this.layerData = [];
 
@@ -27,15 +29,14 @@ Chunk.prototype.drawLayers = function(){
     for(var l = 0; l < this.layers.length; l++) {
         var layer = this.layers[l];
         if(this.fromFile){
-            //var data = layer.data;
             var data = this.layerData[l];
             for (var i = 0; i < data.length; i++) {
                 var tile = data[i];
                 if (tile == 0) continue;
-                var x = origin.x + i % Engine.chunkWidth;
-                var y = origin.y + Math.floor(i / Engine.chunkWidth);
-                //var x = i%Engine.chunkWidth;
-                //var y = Math.floor(i / Engine.chunkWidth);
+                //var x = origin.x + i % Engine.chunkWidth;
+                //var y = origin.y + Math.floor(i / Engine.chunkWidth);
+                var x = origin.x + i % this.width;
+                var y = origin.y + Math.floor(i / this.width);
                 this.drawTile(x,y,tile,layer);
             }
         }else{

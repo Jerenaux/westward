@@ -3,6 +3,9 @@ Design document
 Clean code
 Movement
 
+Next dev log:
+Networking, pathfinding & splines
+
 * Cleaning:
 - Restore "studio" capabilities
 - Remove comment-out stuff
@@ -10,7 +13,12 @@ Movement
 - Move Geometry to studio?
 - Remove phaser_map and mapbis
 - Split server in two (game and dev server)
-
+-----
+*Moving:
+- Use of spaceMap
+- Modify getNode
+- Hold & click
+- Tool after createWorld to create spaceMap
 -----
 * Deployment
 - Two repositories, for production and development, with node scripts taking care

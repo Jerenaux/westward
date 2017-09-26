@@ -1,8 +1,8 @@
 {
   "tilesets":[
-    {"image":"../tilesets/Cliff_tileset(1).png","imageheight":518,"imagewidth":503,"name":"Cliff"},
-    {"image":"../tilesets/ground_tiles.png","imageheight":701,"imagewidth":672,"name":"ground_tiles"},
-    {"image":"../tilesets/trees.png","imageheight":192,"imagewidth":672,"name":"trees"},
-    {"image":"../tilesets/object- layer.png","imageheight":219,"imagewidth":477,"name":"object- layer"}
+    {"image":"../tilesets/Cliff_tileset(1).png","imageheight":518,"imagewidth":503,"name":"Cliff","collisions":[2,3,4,5,16,17,20,21,31,36,46,51,61,66,76,77,78,79,80,81,82,83,91,92,93,94,95]},
+    {"image":"../tilesets/ground_tiles.png","imageheight":701,"imagewidth":672,"name":"ground_tiles","collisions":[51]},
+    {"image":"../tilesets/trees.png","imageheight":192,"imagewidth":672,"name":"trees","collisions":[85,86,89,90,93,94,97,98,101,106,107,110,111,114,115,118,119,122]},
+    {"image":"../tilesets/object- layer.png","imageheight":219,"imagewidth":477,"name":"object- layer","collisions":[24,37,38,39,40]}
   ]
 }

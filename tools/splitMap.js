@@ -35,10 +35,10 @@ function splitMap(fileName,outputDirectory,AOIwidth,AOIheight){
 
         var master = {
             tilesets: map.tilesets,
-            AOIwidth: AOIwidth,
-            AOIheight: AOIheight,
-            nbAOIhoriz: nbAOIhoriz,
-            nbAOIvert: nbAOIvert
+            chunkWidth: AOIwidth,
+            chunkHeight: AOIheight,
+            nbChunksHoriz: nbAOIhoriz,
+            nbChunksVert: nbAOIvert
         };
         fs.writeFile(__dirname+path+outputDirectory+'/master.json',JSON.stringify(master),function(err){
             if(err) throw err;
@@ -49,8 +49,6 @@ function splitMap(fileName,outputDirectory,AOIwidth,AOIheight){
             //delete subMap.tilesets;
             var x = (aoi%nbAOIhoriz)*AOIwidth;
             var y = Math.floor(aoi/nbAOIhoriz)*AOIheight;
-            subMap.width = AOIwidth;
-            subMap.height = AOIheight;
             subMap.width = Math.min(AOIwidth,mapWidth-x);
             subMap.height = Math.min(AOIheight,mapHeight-y);
             subMap.aoi = aoi;

@@ -117,6 +117,7 @@ Engine.create = function(masterData){
     Engine.worldHeight = Utils.nbChunksVertical*Engine.chunkHeight;
     Utils.lastChunkID = (Utils.nbChunksHorizontal*Utils.nbChunksVertical)-1;
     Engine.nbLayers = masterData.nbLayers;
+    if(!Engine.nbLayers) console.log('WARNING : falsy number of layers : '+console.log(Engine.nbLayers));
     Engine.mapDataLocation = Boot.mapDataLocation;
     console.log('Master file read, setting up world of size '+Engine.worldWidth+' x '+Engine.worldHeight+' with '+Engine.nbLayers+' layers');
 
@@ -174,7 +175,7 @@ Engine.removePlayer = function(id){
 };
 
 Engine.updateEnvironment = function(){
-    //var chunks = Utils.listVisibleAOIs(Engine.player.chunk);
+    console.log('[AOI] '+Engine.player.chunk);
     var chunks = Utils.listAdjacentAOIs(Engine.player.chunk);
     var newChunks = chunks.diff(Engine.displayedChunks);
     var oldChunks = Engine.displayedChunks.diff(chunks);
@@ -218,7 +219,6 @@ Engine.drawChunk = function(mapData,id){
     if(!Engine.mapDataCache[chunk.id]) Engine.mapDataCache[chunk.id] = mapData;
     chunk.drawLayers();
     Engine.displayedChunks.push(chunk.id);
-    if(Engine.showGrid) Engine.drawGrid(chunk);
 };
 
 Engine.removeChunk = function(id){

@@ -35,7 +35,7 @@ GameServer.readMap = function(mapsPath){
         GameServer.AOIs.push(new AOI(i));
     }
 
-    console.log('[Master data read]');
+    console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
 };
 
 GameServer.getPlayer = function(socketID){

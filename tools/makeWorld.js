@@ -121,10 +121,6 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight){
         chunkHeight: chunkHeight,
         nbChunksHoriz: nbHoriz,
         nbChunksVert: nbVert
-        /*minX: minX,
-        maxX: maxX-1,
-        minY: minY,
-        maxY: maxY-1*/
     };
     fs.writeFile(outdir+'master.json',JSON.stringify(master),function(err){
         if(err) throw err;
