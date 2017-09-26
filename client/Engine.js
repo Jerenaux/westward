@@ -12,6 +12,8 @@ var Engine = {
 
 Engine.preload = function() {
     this.load.image('hero', 'assets/sprites/hero.png');
+    this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
+
     for(var i = 0; i < Boot.tilesets.length; i++){
         var tileset = Boot.tilesets[i];
         var path = 'assets/'+tileset.image.slice(2);// The paths in the master file are relative to the assets/maps directory
@@ -54,9 +56,21 @@ Engine.create = function(masterData){
     Engine.camera = Engine.scene.cameras.main;
     Engine.camera.setBounds(0,0,Engine.worldWidth*Engine.tileWidth,Engine.worldHeight*Engine.tileHeight);
 
+    Engine.createMarker();
+
     Engine.scene.input.events.on('MOUSE_DOWN_EVENT', Engine.move);
+    Engine.scene.input.events.on('POINTER_MOVE_EVENT', Engine.trackMouse);
 
     Client.requestData();
+};
+
+Engine.createMarker = function(){
+    Engine.marker = Engine.scene.add.sprite(0,0,'marker',0);
+    Engine.marker.alpha = 0.8;
+    Engine.marker.z = 1;
+    Engine.marker.displayOriginX = 0;
+    Engine.marker.displayOriginY = 0;
+    Engine.marker.previousTile = {x:0,y:0};
 };
 
 Engine.initWorld = function(data){
@@ -143,13 +157,23 @@ Engine.removeChunk = function(id){
 };
 
 Engine.move = function(event){
-    var x = Math.floor((Engine.camera.scrollX + event.x)/Engine.tileWidth);
-    var y = Math.floor((Engine.camera.scrollY + event.y)/Engine.tileHeight);
-    Engine.moveSprite(Engine.player.id,x,y);
-    Engine.player.chunk = Utils.tileToAOI({x:x,y:y});
+    var position = Engine.getMouseCoordinates(event);
+    Engine.moveSprite(Engine.player.id,position.tile.x,position.tile.y);
+    Engine.player.chunk = Utils.tileToAOI(position.tile);
     if(Engine.player.chunk != Engine.player.previousChunk) Engine.updateEnvironment();
     Engine.player.previousChunk = Engine.player.chunk;
-    Client.sendMove(x,y);
+    Client.sendMove(position.tile.x,position.tile.y);
+};
+
+Engine.getMouseCoordinates = function(event){
+    var pxX = Engine.camera.scrollX + event.x;
+    var pxY = Engine.camera.scrollY + event.y;
+    var tileX = Math.floor(pxX/Engine.tileWidth);
+    var tileY = Math.floor(pxY/Engine.tileHeight);
+    return {
+        tile:{x:tileX,y:tileY},
+        pixel:{x:pxX,y:pxY}
+    };
 };
 
 Engine.moveSprite = function(id,x,y){
@@ -157,6 +181,31 @@ Engine.moveSprite = function(id,x,y){
     player.x = x*Engine.tileWidth;
     player.y = y*Engine.tileHeight;
 };
+
+Engine.trackMouse = function(event){
+    var position = Engine.getMouseCoordinates(event);
+    Engine.updateMarker(position.tile);
+    if(Engine.debug){
+        document.getElementById('pxx').innerHTML = position.pixel.x;
+        document.getElementById('pxy').innerHTML = position.pixel.y;
+        document.getElementById('tx').innerHTML = position.tile.x;
+        document.getElementById('ty').innerHTML = position.tile.y;
+        document.getElementById('aoi').innerHTML = Utils.tileToAOI(position.tile);
+    }
+};
+
+Engine.updateMarker = function(tile){
+    Engine.marker.x = (tile.x*Engine.tileWidth);
+    Engine.marker.y = (tile.y*Engine.tileHeight);
+    if(tile.x != Engine.marker.previousTile.x || tile.y != Engine.marker.previousTile.y){
+        Engine.marker.previousTile = tile;
+        console.log('moved');
+    }
+};
+
+/*
+* #### UPDATE CODE #####
+* */
 
 // Processes the global update packages received from the server
 Engine.updateWorld = function(data){  // data is the update package from the server

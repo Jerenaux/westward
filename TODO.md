@@ -17,7 +17,6 @@ Networking, pathfinding & splines
 - Use of spaceMap
 - Modify getNode
 - Hold & click
-- Tool after createWorld to create spaceMap
 -----
 * Deployment
 - Two repositories, for production and development, with node scripts taking care
