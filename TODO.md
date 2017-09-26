@@ -52,7 +52,8 @@ Axes of progress:
 - Crafting
 - Settlement defense
 - Settlement economy
-- Polish
+- Polish (footsteps, sound and light effects, HUD...)
 - Tutorial
 - Daily quests
 - Map
++ World building, design document, clean code...

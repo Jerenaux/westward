@@ -47,7 +47,7 @@ SpaceMap.prototype.toList = function(){ // serialize to a list representation
 SpaceMap.prototype.fromList = function(list) { // unserialize from list representation
     for(var i = 0; i < list.length; i++){
         var item = list[i];
-        this.add(item.x,item.y,(item.value || {}));
+        this.add(item.x,item.y,(item.v || {}));
     }
 };
 
