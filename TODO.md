@@ -15,6 +15,7 @@ Networking, pathfinding & splines
 - Standardize the use of Utils methods for coordianes manipulations (gritoline, lientogrid, tiletoiAOI, AOItotile, tileRelativeToAOI...)
 - Have a universal ChunkEdit class used accross all tools for all types of modifications
 - Clean Chunk and ChunkEdit for obsolete methods
+- Sort-out shardness of Utils, and the need to have common properties such as tileWidth etc. readily available both in dev and prod
 -----
 *Moving:
 - Client-side networking stuff

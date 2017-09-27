@@ -20,8 +20,6 @@ Chunk.prototype.drawLayers = function(){
         var layer = this.children[l];
         if(this.fromFile){
             var data = layer.data;
-            //console.log(data.length+' tiles in chunk '+this.id);
-            //console.log('width = '+this.width);
             for (var i = 0; i < data.length; i++) {
                 var tile = data[i];
                 if (tile == 0) continue;

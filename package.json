@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "optimist": "^0.6.1"
+    "optimist": "^0.6.1",
+    "xml2js": "^0.4.19"
   },
   "dependencies": {
     "clone": "^2.1.1",

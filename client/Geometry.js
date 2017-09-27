@@ -1,6 +1,9 @@
 /**
  * Created by Jerome on 03-08-17.
  */
+
+var onServer = (typeof window === 'undefined');
+
 var Geometry = {
     lastrectID : 0, // running id of generated rects
     colors : {
@@ -142,19 +145,29 @@ Geometry.makePxCoords = function(pt){
 };
 
 Geometry.straightLine = function(start,end){
+    var tileWidth = 32;
+    var tileHeight = 32;
     var step = 32;
     var speed = Geometry.computeSpeedVector(Geometry.computeAngle(start,end,false)); // false: not degrees
-    var tmp = {
-        x: start.x*Engine.tileWidth,
-        y: start.y*Engine.tileHeight
+    var tile = {
+        x: start.x,
+        y: start.y
     };
-    var tile = coordinatesPairToTile(tmp);
+    var tmp = {
+        x: start.x*tileWidth,
+        y: start.y*tileHeight
+    };
     var lastDist = Geometry.euclidean(tile,end);
     var tiles = [tile];
     while(tile.x != end.x || tile.y != end.y){
         tmp.x += speed.x*step;
         tmp.y += speed.y*step;
-        tile = coordinatesPairToTile(tmp);
+        tile = {
+            x: Math.floor(tmp.x/tileWidth),
+            y: Math.floor(tmp.y/tileHeight)
+        };
+        //console.log(tile);
+        //console.log(tiles[tiles.length-1]);
         if(tile.x == tiles[tiles.length-1].x && tile.y == tiles[tiles.length-1].y) continue;
         var newDist = Geometry.euclidean(tile,end);
         if(newDist > lastDist) break;
@@ -398,3 +411,5 @@ Geometry.computeSpeedVector = function(angle){ // return unit speed vector given
         y: -Math.sin(angle)
     }
 };
+
+if (onServer) module.exports.Geometry = Geometry;
