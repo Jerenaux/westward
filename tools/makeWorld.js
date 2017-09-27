@@ -3,7 +3,9 @@
  */
 
 var fs = require('fs');
-//var clone = require('clone');
+var clone = require('clone');
+
+var Utils = require('../shared/Utils.js').Utils;
 
 function Layer(w,h,name){
     this.data = [];
@@ -18,8 +20,8 @@ function Layer(w,h,name){
 }
 
 function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight){
-    var defChunkW = 32;
-    var defChunkH = 18;
+    var defChunkW = 30;
+    var defChunkH = 20;
     var defTileW = 32;
     var defTileH = 32;
 
@@ -38,6 +40,12 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight){
     if(!tileWidth) tileWidth = defTileW;
     if(!tileHeight) tileHeight = defTileH;
 
+    Utils.nbChunksHorizontal = nbHoriz;
+    Utils.nbChunksVertical = nbVert;
+    Utils.chunkWidth = chunkWidth;
+    Utils.chunkHeight = chunkHeight;
+
+    // Create base grasst slate, with fields that Tiled will need
     var basis = {
         width: chunkWidth,
         height: chunkHeight,
@@ -52,6 +60,7 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight){
         vesion: 1
     };
 
+    // Fill tileset objects with required fields
     var tilesetsData = JSON.parse(fs.readFileSync(__dirname+'/../assets/maps/tilesets.json').toString());
     for(var i = 0, firstgid = 1; i < tilesetsData.tilesets.length; i++){
         var tileset = tilesetsData.tilesets[i];
@@ -76,6 +85,7 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight){
     groundstuff.data = emptyLayer(chunkWidth*chunkHeight);
     canopy.data = emptyLayer(chunkWidth*chunkHeight);
 
+    // Fill with grass
     for(var x = 0; x < chunkWidth*chunkHeight; x++){
         var id = 241;
         var row = Math.floor(x/chunkWidth);
@@ -100,20 +110,70 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight){
     basis.layers.push(groundstuff);
     basis.layers.push(canopy);
 
+    var chunks = [];
+    var number = nbHoriz*nbVert;
+    for(var i = 0; i < number; i++){
+        var chunk = clone(basis);
+        basis.chunkID = i;
+        chunks[basis.chunkID] = chunk;
+    }
+
+    var curve = "18.21,5.80 "+
+    "22.16,9.70 32.34,15.64 23.77,23.59 "+
+    "22.19,25.06 19.93,26.04 18.00,27.00 "+
+    "18.00,27.00 22.00,28.00 22.00,28.00 "+
+    "22.00,28.00 22.00,35.00 22.00,35.00 "+
+    "18.66,37.95 18.50,39.25 14.00,40.00 "+
+    "14.00,40.00 13.00,37.00 13.00,37.00 "+
+    "10.86,42.23 7.72,37.40 5.00,35.00 "+
+    "5.00,35.00 5.00,28.00 5.00,28.00 "+
+    "5.00,28.00 9.00,27.00 9.00,27.00 "+
+    "7.51,26.26 5.39,25.30 4.11,24.31 "+
+    "-6.42,16.22 5.77,8.84 8.79,5.79 "+
+    "10.51,4.07 11.72,2.04 13.00,0.00 "+
+    "13.00,0.00 18.21,5.80 18.21,5.80";
+    var curveW = 27;
+    var curveH = 40;
+    var arr = curve.split(" ");
+    var pts = arr.map(function(e){
+        var coords = e.split(",");
+        return {
+            x: parseInt(coords[0]),
+            y: parseInt(coords[1])
+        };
+    });
+
+
+
+    /*var maxX = chunkWidth*nbHoriz;
+    var maxY = chunkHeight*nbVert;
+    for(var i =0; i < 20; i++) {
+        var x = Utils.randomInt(0, maxX + 1);
+        var y = Utils.randomInt(0, maxY + 1);
+        console.log('water at ' + x + ', ' + y);
+        var id = Utils.tileToAOI({x: x, y: y});
+        var chunk = chunks[id];
+        var origin = Utils.AOItoTile(id);
+        var cx = x - origin.x;
+        var cy = y - origin.y;
+        var idx = Utils.gridToLine(cx, cy, chunkWidth);
+        chunk.layers[0].data[idx] = 52;
+    }*/
+
+    // Write files
     var outdir = __dirname+'/../assets/maps/chunks/';
     if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);
 
     var counter = 0;
-    var number = nbHoriz*nbVert;
-    for(var i = 0; i < number; i++){
-        basis.chunkID = i;
-        fs.writeFile(outdir+'chunk'+i+'.json',JSON.stringify(basis),function(err){
-            if(err) throw err;
-            counter++;
-            if(counter == number) console.log('All files written');
+    for(var i = 0; i < chunks.length; i++) {
+        fs.writeFile(outdir+'chunk'+i+'.json',JSON.stringify(chunks[i]),function(err){
+             if(err) throw err;
+             counter++;
+             if(counter == chunks.length) console.log('All files written');
         });
     }
 
+    // Write master file
     var master = {
         tilesets : tilesetsData.tilesets,
         nbLayers: basis.layers.length,

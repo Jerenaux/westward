@@ -11,12 +11,17 @@ Networking, pathfinding & splines
 - Move Geometry to studio?
 - Remove phaser_map and mapbis
 - Split server in two (game and dev server)
-- Order files in studio/
+- Order files in studio
+- Standardize the use of Utils methods for coordianes manipulations (gritoline, lientogrid, tiletoiAOI, AOItotile, tileRelativeToAOI...)
+- Have a universal ChunkEdit class used accross all tools for all types of modifications
+- Clean Chunk and ChunkEdit for obsolete methods
 -----
 *Moving:
+- Client-side networking stuff
 - Use of spaceMap
 - Modify getNode
 - Hold & click
+- Verticality stuff
 -----
 * Deployment
 - Two repositories, for production and development, with node scripts taking care
@@ -38,7 +43,7 @@ appearance and behaviour, reduced code visibility, and possibly *no* node-module
 - Get path from bezier
 Alt:
 - Check Google static maps
-- COnvert image to gray levels
+- Convert image to gray levels
 - Display mouse coordinates on the fly
 - Analyze coast automatically
 

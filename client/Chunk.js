@@ -23,8 +23,27 @@ function Chunk(mapData,id,z){
 //Chunk.prototype = Object.create(Phaser.GameObjects.Sprite);
 //Chunk.prototype.constructor = Chunk;
 
+Chunk.prototype.checkCollision = function(tile){
+    var cx = tile.x - this.x;
+    var cy = tile.y - this.y;
+    var idx = Utils.gridToLine(cx, cy, this.width);
+    for(var l = 0; l < this.layers.length; l++) {
+        var data = this.layerData[l];
+        if(Chunk.isColliding(data[idx])) return true;
+    }
+    return false;
+};
+
+Chunk.isColliding = function(tile){
+    for(var i = 0; i < Engine.collidingTiles.length; i++){
+        if(Engine.collidingTiles[i] > tile) return false;
+        if(Engine.collidingTiles[i] == tile) return true;
+    }
+    return false;
+};
+
 Chunk.prototype.drawLayers = function(){
-    var origin = Utils.AOItoTile(this.id);
+    //var origin = Utils.AOItoTile(this.id);
     for(var l = 0; l < this.layers.length; l++) {
         var layer = this.layers[l];
         if(this.fromFile){
@@ -32,8 +51,8 @@ Chunk.prototype.drawLayers = function(){
             for (var i = 0; i < data.length; i++) {
                 var tile = data[i];
                 if (tile == 0) continue;
-                var x = origin.x + i % this.width;
-                var y = origin.y + Math.floor(i / this.width);
+                var x = this.x + i % this.width;
+                var y = this.y + Math.floor(i / this.width);
                 this.drawTile(x,y,tile,layer);
             }
         }else{
@@ -75,6 +94,7 @@ Chunk.prototype.drawTile = function(x,y,tile,layer){
     var tileset = Engine.tilesets[tilesetID];
     tile -= tileset.firstgid;
     var sprite = Engine.scene.add.image(x*Engine.tileWidth,y*Engine.tileHeight,tileset.name,tile);
+    sprite.setDisplayOrigin(0,0);
     sprite.tileID = tile;
     layer.push(sprite);
     //layer.addChild(sprite);

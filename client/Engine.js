@@ -14,10 +14,18 @@ Engine.preload = function() {
     this.load.image('hero', 'assets/sprites/hero.png');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
 
-    for(var i = 0; i < Boot.tilesets.length; i++){
+    Engine.collidingTiles = [];
+    for(var i = 0, firstgid = 1; i < Boot.tilesets.length; i++){
         var tileset = Boot.tilesets[i];
         var path = 'assets/'+tileset.image.slice(2);// The paths in the master file are relative to the assets/maps directory
         this.load.spritesheet(tileset.name, path,{frameWidth:tileset.tilewidth,frameHeight:tileset.tileheight});
+
+        var columns = Math.floor(tileset.imagewidth/Engine.tileWidth);
+        var tilecount = columns * Math.floor(tileset.imageheight/Engine.tileHeight);
+        Engine.collidingTiles = Engine.collidingTiles.concat(tileset.collisions.map(function(tile){
+            return tile+firstgid;
+        }));
+        firstgid += tilecount;
     }
     console.log('Loading '+i+' tileset'+(i > 1 ? 's' : ''));
 };
@@ -47,6 +55,7 @@ Engine.create = function(masterData){
     Engine.mapDataCache = {};
 
     Engine.players = {}; // player.id -> player
+    Engine.displayedPlayers = new Set();
 
     Engine.debug = true;
     Engine.showHero = Engine.debug ? Utils.getPreference('showHero',true) : true;
@@ -71,6 +80,7 @@ Engine.createMarker = function(){
     Engine.marker.displayOriginX = 0;
     Engine.marker.displayOriginY = 0;
     Engine.marker.previousTile = {x:0,y:0};
+    console.log(Engine.marker);
 };
 
 Engine.initWorld = function(data){
@@ -84,7 +94,6 @@ Engine.addHero = function(id,x,y){
     Engine.player = Engine.addPlayer(id,x,y);
     Engine.player.visible = Engine.showHero;
     Engine.camera.startFollow(Engine.player);
-    Engine.player.chunk = Utils.tileToAOI({x:x,y:y});
     Engine.updateEnvironment();
 };
 
@@ -93,13 +102,16 @@ Engine.addPlayer = function(id,x,y){
     var sprite = Engine.scene.add.sprite(x*Engine.tileWidth,y*Engine.tileHeight,'hero');
     sprite.id = id;
     sprite.z = 1;
+    sprite.chunk = Utils.tileToAOI({x:x,y:y});
     Engine.players[id] = sprite;
+    Engine.displayedPlayers.add(id);
     return sprite;
 };
 
 Engine.removePlayer = function(id){
     var sprite = Engine.players[id];
     sprite.destroy();
+    Engine.displayedPlayers.delete(id);
     delete Engine.players[id];
 };
 
@@ -118,6 +130,20 @@ Engine.updateEnvironment = function(){
         //console.log('adding '+newChunks[j]);
         Engine.displayChunk(newChunks[j]);
     }
+
+    Engine.updateDisplayList();
+};
+
+Engine.updateDisplayList = function(){
+    // Whenever the player moves to a different AOI, for each player displayed in the game, check if it will still be
+    // visible from the new AOI; if not, remove it
+    if(!Engine.displayedPlayers) return;
+    var adjacent = Utils.listAdjacentAOIs(Engine.player.chunk);
+    Engine.displayedPlayers.forEach(function(pid){
+        var p = Engine.players[pid];
+        // check if the AOI of player p is in the list of the AOI's adjacent to the main player
+        if(p) if(adjacent.indexOf(p.chunk) == -1) Game.removePlayer(p.id);
+    });
 };
 
 Engine.displayChunk = function(id){
@@ -199,8 +225,17 @@ Engine.updateMarker = function(tile){
     Engine.marker.y = (tile.y*Engine.tileHeight);
     if(tile.x != Engine.marker.previousTile.x || tile.y != Engine.marker.previousTile.y){
         Engine.marker.previousTile = tile;
-        console.log('moved');
+        if(Engine.checkCollision(tile)){
+            Engine.marker.setFrame(1);
+        }else{
+            Engine.marker.setFrame(0);
+        }
     }
+};
+
+Engine.checkCollision = function(tile){
+    var chunk = Engine.chunks[Utils.tileToAOI(tile)];
+    if(chunk) return chunk.checkCollision(tile);
 };
 
 /*
