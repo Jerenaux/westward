@@ -18,6 +18,7 @@ var Utils = require('../shared/Utils.js').Utils;
 //var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var AOI = require('./AOI.js').AOI;
 var Player = require('./Player.js').Player;
+var PF = require('../shared/pathfinding.js');
 
 GameServer.readMap = function(mapsPath){
     var masterData = JSON.parse(fs.readFileSync(mapsPath+'/master.json').toString());

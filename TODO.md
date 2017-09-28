@@ -5,6 +5,11 @@ Movement
 
 Next dev log:
 Networking, pathfinding & splines
+or
+Netowrking, pathfinding & Australia
+Lots owned to Phaserquest, nice architecture
+Hacking pathfinding with arcane proxies
+Need to be able to scale world at will
 
 * Cleaning:
 - Clean up Utils
@@ -18,11 +23,13 @@ Networking, pathfinding & splines
 - Sort-out shardness of Utils, and the need to have common properties such as tileWidth etc. readily available both in dev and prod
 -----
 *Moving:
-- Client-side networking stuff
+https://www.npmjs.com/package/pathfinding
+- Investigate smoothenPath and compressPath, especially for networking
 - Use of spaceMap
 - Modify getNode
 - Hold & click
 - Verticality stuff
+- Remove collision methods from Chunk
 -----
 * Deployment
 - Two repositories, for production and development, with node scripts taking care
@@ -41,12 +48,10 @@ appearance and behaviour, reduced code visibility, and possibly *no* node-module
 - Testing (make part of the pipeline)
 -----
 * World editor:
-- Get path from bezier
-Alt:
-- Check Google static maps
-- Convert image to gray levels
-- Display mouse coordinates on the fly
-- Analyze coast automatically
+- Zoom-out even further
+- Make proper coast out of path
+- Remove anomalies
+- Make path parser a separate tool, to output a JSON object to which to add other blueprint components (forest zones, lakes...)
 
 
 Axes of progress:
@@ -57,7 +62,10 @@ Axes of progress:
 - Settlement defense
 - Settlement economy
 - Polish (footsteps, sound and light effects, HUD...)
+- Testing
+- Benchmark operations (divisions, creating objects vs reusing them, etc.)
+- Cleaning
 - Tutorial
 - Daily quests
 - Map
-+ World building, design document, clean code...
++ World building, design document, ...

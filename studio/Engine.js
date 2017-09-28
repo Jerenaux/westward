@@ -32,8 +32,8 @@ Engine.boot = function(){
     Engine.viewWidth = Engine.baseViewWidth;
     Engine.viewHeight = Engine.baseViewHeight;
 
-    //Engine.setAction('move');
-    Engine.setAction('addForest');
+    Engine.setAction('move');
+    //Engine.setAction('addForest');
     Engine.showGrid = Utils.getPreference('showGrid',false);
     Engine.showHero = Utils.getPreference('showHero',true);
     Engine.showHulls = Utils.getPreference('showHulls',false);

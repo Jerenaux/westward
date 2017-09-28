@@ -7,14 +7,24 @@ var onServer = (typeof window === 'undefined');
 // A space map is a custom data struture, similar to a sparse 2D array. Entities are stored according to their coordinates;
 // that is, two keys are needed to fetch entities, the x position and the y position. This allows fast look-up based on position,
 // e.g. var objectAtSomePosition = mySpaceMap.get(x,y);
-function SpaceMap(){}
+function SpaceMap(defaultValue){
+    /*if(defaultValue !== undefined) {
+        this.handler = {
+            get: function (target, name) {
+                return target.hasOwnProperty(name) ? target[name] : defaultValue;
+            }
+        };
+    }*/
+}
 
 SpaceMap.prototype.add = function(x,y,object){
     if(!this.hasOwnProperty(x))this[x] = {};
+    //if(!this.hasOwnProperty(x))this[x] = new Proxy({},this.handler);
     if(!this[x].hasOwnProperty(y))this[x][y] = [];
     this[x][y] = object; // replaces any existing object
 };
 
+// Works also by calling mySpaceMap[x][y]
 SpaceMap.prototype.get = function(x,y){
     if(!this.hasOwnProperty(x)) return null;
     if(!this[x].hasOwnProperty(y)) return null;

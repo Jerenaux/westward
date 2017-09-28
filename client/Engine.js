@@ -70,6 +70,36 @@ Engine.create = function(masterData){
     Engine.scene.input.events.on('MOUSE_DOWN_EVENT', Engine.move);
     Engine.scene.input.events.on('POINTER_MOVE_EVENT', Engine.trackMouse);
 
+
+    /* The handler captures all queries to the object, be it with [] or .
+     *  Since it captures queries with ., it also captures method calls.
+     *  All the queries are processed by get, which checks if the key corresponds
+     *  to a prototype method or not. If yes, the method is returned, and automatically
+     *  called, with the initial arguments provided. If not, it checks if the key belongs to
+     *  the object. If not, it returns the default value (here 0). If yes, it has to check the
+     *  value of that key. If it's another object, a recursive call is needed to fetch the value
+     *  in the second dimension of the array. If not (which is the outcome of that second-level call),
+     *  the result is a number which can be returned as is.
+     * */
+    var handler = {
+        get: function(target,key){
+            if(key in target.__proto__) {
+                return target.__proto__[key];
+            }else{
+                if(target.hasOwnProperty(key)){
+                    if(typeof target[key] === 'object') {
+                        return new Proxy(target[key], handler);
+                    }else{
+                        return target[key];
+                    }
+                }else{
+                    return 0;
+                }
+            }
+        }
+    };
+    Engine.collisions = new Proxy(new SpaceMap(),handler);
+
     Client.requestData();
 };
 
@@ -103,6 +133,9 @@ Engine.addPlayer = function(id,x,y){
     sprite.id = id;
     sprite.z = 1;
     sprite.chunk = Utils.tileToAOI({x:x,y:y});
+    sprite.tileX = x;
+    sprite.tileY = y;
+    sprite.setDisplayOrigin(0,0);
     Engine.players[id] = sprite;
     Engine.displayedPlayers.add(id);
     return sprite;
@@ -178,17 +211,60 @@ Engine.drawChunk = function(mapData,id){
 
 Engine.removeChunk = function(id){
     Engine.chunks[id].removeLayers();
-    //Engine.stage.removeChild(Engine.chunks[id]);
     Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
 };
 
 Engine.move = function(event){
     var position = Engine.getMouseCoordinates(event);
-    Engine.moveSprite(Engine.player.id,position.tile.x,position.tile.y);
+
+    /*var chunk =  Engine.chunks[Utils.tileToAOI({x:position.tile.x,y:position.tile.y})];
+    var coll = chunk.collisions;
+    console.log(coll);
+    //coll = new Proxy(coll,handler);
+    var cx = position.tile.x - chunk.x;
+    var cy = position.tile.y - chunk.y;
+    console.log(cx+', '+cy);
+    console.log(coll[cx][cy]);
+    console.log('#####');
+    console.log(coll[5][6]);
+    coll.add(5,6,1);
+    console.log(coll[5][6]);
+    return;*/
+
+    /*PF.Grid.prototype.getNodeAt = function(x,y){
+        var colliding = Engine.chunks[Utils.tileToAOI({x:x,y:y})].isColliding({x:x,y:y});
+        return {
+            x: x,
+            y: y,
+            walkable: !colliding
+        }
+    };*/
+
+    PF.Grid.prototype.isWalkableAt = function(x, y) {
+        //return this.isInside(x, y) && this.nodes[y][x].walkable;
+        //return !Engine.chunks[Utils.tileToAOI({x:x,y:y})].isColliding({x:x,y:y});
+        return this.nodes[y][x].walkable;
+    };
+    //PF.Grid.nodes = Engine.collisions;
+
+    // Overload [] on spacemap to replace grid.nodes, and overload iswalkable to get rid of dimension check
+
+    var grid = new PF.Grid(0,0);
+    grid.nodes = Engine.collisions;
+    var finder = new PF.AStarFinder({
+        allowDiagonal: true,
+        dontCrossCorners: true
+    });
+    console.log('path from '+Engine.player.tileX+', '+Engine.player.tileY+' to '+position.tile.x+', '+position.tile.y);
+    var path = finder.findPath(Engine.player.tileX, Engine.player.tileY, position.tile.x, position.tile.y, grid);
+    // TODO clone collisions after each call
+    console.log(path);
+    /*Engine.moveSprite(Engine.player.id,position.tile.x,position.tile.y);
     Engine.player.chunk = Utils.tileToAOI(position.tile);
     if(Engine.player.chunk != Engine.player.previousChunk) Engine.updateEnvironment();
     Engine.player.previousChunk = Engine.player.chunk;
-    Client.sendMove(position.tile.x,position.tile.y);
+    Client.sendMove(position.tile.x,position.tile.y);*/
+    // TODO: update chunk, tileX/Y and updateENvironmtn()
 };
 
 Engine.getMouseCoordinates = function(event){
@@ -233,9 +309,11 @@ Engine.updateMarker = function(tile){
     }
 };
 
-Engine.checkCollision = function(tile){
-    var chunk = Engine.chunks[Utils.tileToAOI(tile)];
-    if(chunk) return chunk.checkCollision(tile);
+Engine.checkCollision = function(tile){ // tile is x, y pair
+    //var chunk = Engine.chunks[Utils.tileToAOI(tile)];
+    //if(chunk) return chunk.checkCollision(tile);
+    //return Engine.collisions[tile.x][tile.y];
+    return Engine.collisions[tile.y][tile.x];
 };
 
 /*
