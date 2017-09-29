@@ -26,7 +26,8 @@ Need to be able to scale world at will
 https://www.npmjs.com/package/pathfinding
 - Investigate smoothenPath and compressPath, especially for networking
 - Hold & click
-- Verticality stuff
+- Verticality stuff (trees canopy, etc.)
+- Make a Uitls.getDuration method to return duration based on distance
 -----
 * Deployment
 - Two repositories, for production and development, with node scripts taking care

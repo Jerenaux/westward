@@ -64,12 +64,14 @@ Engine.create = function(masterData){
     Engine.scene = this.scene.scene;
     Engine.camera = Engine.scene.cameras.main;
     Engine.camera.setBounds(0,0,Engine.worldWidth*Engine.tileWidth,Engine.worldHeight*Engine.tileHeight);
+    Engine.camera.roundPixels = true; // Very important for the camera to scroll smoothly accross the map
 
     Engine.createMarker();
 
     Engine.scene.input.events.on('MOUSE_DOWN_EVENT', Engine.move);
     Engine.scene.input.events.on('POINTER_MOVE_EVENT', Engine.trackMouse);
-
+    //console.log(Engine.scene.input);
+    //Engine.scene.input.setpollAlways();
 
     Engine.collisions = new SpaceMap(); // contains 1 for the coordinates that are non-walkables
     Engine.PFgrid = new PF.Grid(0,0); // grid placeholder for the pathfinding
@@ -77,13 +79,15 @@ Engine.create = function(masterData){
     // Replaces the isWalkableAt method of the PF library
     PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
 
+    Engine.tileDuration = 200; // ms taken to walk a tile
+
     Client.requestData();
 };
 
 Engine.createMarker = function(){
     Engine.marker = Engine.scene.add.sprite(0,0,'marker',0);
     Engine.marker.alpha = 0.8;
-    Engine.marker.z = 1;
+    Engine.marker.depth = 1;
     Engine.marker.setDisplayOrigin(0,0);
     Engine.marker.previousTile = {x:0,y:0};
     console.log(Engine.marker);
@@ -108,11 +112,17 @@ Engine.addPlayer = function(id,x,y){
     if(Engine.playerIsInitialized && id == Engine.player.id) return;
     var sprite = Engine.scene.add.sprite(x*Engine.tileWidth,y*Engine.tileHeight,'hero');
     sprite.id = id;
-    sprite.z = 1;
+    sprite.depth = 1;
     sprite.chunk = Utils.tileToAOI({x:x,y:y});
     sprite.tileX = x;
     sprite.tileY = y;
+    sprite.previousPosition = {
+            x : sprite.x,
+            y : sprite.y
+    };
     sprite.displayOriginX = 16;
+    sprite.orientation = 'down';
+    sprite.movement = null;
     Engine.players[id] = sprite;
     Engine.displayedPlayers.add(id);
     return sprite;
@@ -205,25 +215,70 @@ Engine.isColliding = function(tile){ // tile is the index of the tile in the til
 
 Engine.move = function(event){
     var position = Engine.getMouseCoordinates(event);
+    if(Engine.collisions.get(position.tile.y,position.tile.x) == 1) return; // y, then x!
 
-    Engine.scene.tweens.add({
-        targets: Engine.player,
-        x: { value: [position.tile.x*32,(position.tile.x+3)*32], duration: 1000},
-        y: { value: [position.tile.y*32,(position.tile.y+3)*32], duration: 1000}
-    });
-
-    return;
-
+    //console.log('path from '+Engine.player.tileX+', '+Engine.player.tileY+' to '+position.tile.x+', '+position.tile.y);
     Engine.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(Engine.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
-    console.log('path from '+Engine.player.tileX+', '+Engine.player.tileY+' to '+position.tile.x+', '+position.tile.y);
+    //var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, position.tile.x, position.tile.y, Engine.PFgrid);
     var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, position.tile.x, position.tile.y, Engine.PFgrid);
-    console.log(path);
-    /*Engine.moveSprite(Engine.player.id,position.tile.x,position.tile.y);
-    Engine.player.chunk = Utils.tileToAOI(position.tile);
+    path.shift();
+
+    if(Engine.player.movement !== null) Engine.player.movement.stop();
+    Engine.player.lastUpdateStamp = Date.now();
+    Engine.player.movement = Engine.scene.tweens.timeline({
+        tweens: path.map(function(p){
+            return {
+                targets: Engine.player,
+                x: {value: p[0]*Engine.tileWidth, duration: Engine.tileDuration},
+                y: {value: p[1]*Engine.tileHeight, duration: Engine.tileDuration}
+            }
+        }),
+        onUpdate: function(){
+            if(Date.now() - Engine.player.lastUpdateStamp > Engine.tileDuration*0.5){
+                Engine.updatePosition();
+                Engine.player.lastUpdateStamp = Date.now();
+            }
+        },
+        onComplete: Engine.updatePosition
+    });
+};
+
+/*Engine.adjustStartPosition = function(start){
+    // Prevents small "hiccups" in the tween when changing direction while already moving
+    // start is a 2-tuple of the coordinates of the starting position to adjust
+    switch(Engine.player.orientation){
+        case 3: // right
+            if(this.x%32 != 0) start.x++;
+            break;
+        case 4: // down
+            if(this.y%32 != 0) start.y++;
+            break;
+
+    }
+    return start;
+};*/
+
+Engine.updatePosition = function(){
+    if(Engine.player.x > Engine.player.previousPosition.x){ // right
+        Engine.player.orientation = 'right';
+    }else if(Engine.player.x < Engine.player.previousPosition.x) { // left
+        Engine.player.orientation = 'left';
+    }else if(Engine.player.y > Engine.player.previousPosition.y) { // down
+        Engine.player.orientation = 'down';
+    }else if(Engine.player.y < Engine.player.previousPosition.y) { // up
+        Engine.player.orientation = 'up';
+    }
+    console.log(Engine.player.orientation);
+    Engine.player.previousPosition = {
+        x: Engine.player.x,
+        y: Engine.player.y
+    };
+    Engine.player.tileX = Math.floor(Engine.player.x/Engine.tileWidth);
+    Engine.player.tileY = Math.floor(Engine.player.y/Engine.tileHeight);
+    Engine.player.chunk = Utils.tileToAOI({x:Engine.player.tileX,y:Engine.player.tileY});
     if(Engine.player.chunk != Engine.player.previousChunk) Engine.updateEnvironment();
     Engine.player.previousChunk = Engine.player.chunk;
-    Client.sendMove(position.tile.x,position.tile.y);*/
-    // TODO: update player.chunk, tileX/Y and updateENvironmtn()
+    //Client.sendMove(position.tile.x,position.tile.y);
 };
 
 Engine.getMouseCoordinates = function(event){
