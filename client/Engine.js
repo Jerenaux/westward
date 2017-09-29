@@ -78,10 +78,10 @@ Engine.create = function(masterData){
      *  called, with the initial arguments provided. If not, it checks if the key belongs to
      *  the object. If not, it returns the default value (here 0). If yes, it has to check the
      *  value of that key. If it's another object, a recursive call is needed to fetch the value
-     *  in the second dimension of the array. If not (which is the outcome of that second-level call),
+     *  in the second dimension of the array.;If not (which is the outcome of that second-level call),
      *  the result is a number which can be returned as is.
      * */
-    var handler = {
+    /*var handler = {
         get: function(target,key){
             if(key in target.__proto__) {
                 return target.__proto__[key];
@@ -97,8 +97,19 @@ Engine.create = function(masterData){
                 }
             }
         }
+    };*/
+
+    Engine.collisions = new SpaceMap(); // contains 1 for the coordinates that are non-walkables
+    Engine.PFgrid = new PF.Grid(0,0); // grid placeholder for the pathfinding
+    Engine.PFfinder = new PF.AStarFinder({
+        allowDiagonal: true,
+        dontCrossCorners: true
+    });
+    // Replaces the isWalkableAt method of the PF library
+    PF.Grid.prototype.isWalkableAt = function(x, y) {
+        return this.nodes[y][x].walkable;
     };
-    Engine.collisions = new Proxy(new SpaceMap(),handler);
+
 
     Client.requestData();
 };
@@ -107,8 +118,7 @@ Engine.createMarker = function(){
     Engine.marker = Engine.scene.add.sprite(0,0,'marker',0);
     Engine.marker.alpha = 0.8;
     Engine.marker.z = 1;
-    Engine.marker.displayOriginX = 0;
-    Engine.marker.displayOriginY = 0;
+    Engine.marker.setDisplayOrigin(0,0);
     Engine.marker.previousTile = {x:0,y:0};
     console.log(Engine.marker);
 };
@@ -121,6 +131,7 @@ Engine.initWorld = function(data){
 };
 
 Engine.addHero = function(id,x,y){
+    console.log('adding at '+x+', '+y);
     Engine.player = Engine.addPlayer(id,x,y);
     Engine.player.visible = Engine.showHero;
     Engine.camera.startFollow(Engine.player);
@@ -135,7 +146,7 @@ Engine.addPlayer = function(id,x,y){
     sprite.chunk = Utils.tileToAOI({x:x,y:y});
     sprite.tileX = x;
     sprite.tileY = y;
-    sprite.setDisplayOrigin(0,0);
+    sprite.displayOriginX = 16;
     Engine.players[id] = sprite;
     Engine.displayedPlayers.add(id);
     return sprite;
@@ -214,57 +225,65 @@ Engine.removeChunk = function(id){
     Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
 };
 
+Engine.addCollision = function(x,y,tile){
+    if(Engine.isColliding(tile)) Engine.collisions.add(y,x,1);
+};
+
+Engine.isColliding = function(tile){ // tile is the index of the tile in the tileset
+    for(var i = 0; i < Engine.collidingTiles.length; i++){
+        if(Engine.collidingTiles[i] > tile) return false;
+        if(Engine.collidingTiles[i] == tile) return true;
+    }
+    return false;
+};
+
 Engine.move = function(event){
     var position = Engine.getMouseCoordinates(event);
 
-    /*var chunk =  Engine.chunks[Utils.tileToAOI({x:position.tile.x,y:position.tile.y})];
-    var coll = chunk.collisions;
-    console.log(coll);
-    //coll = new Proxy(coll,handler);
-    var cx = position.tile.x - chunk.x;
-    var cy = position.tile.y - chunk.y;
-    console.log(cx+', '+cy);
-    console.log(coll[cx][cy]);
-    console.log('#####');
-    console.log(coll[5][6]);
-    coll.add(5,6,1);
-    console.log(coll[5][6]);
-    return;*/
-
-    /*PF.Grid.prototype.getNodeAt = function(x,y){
-        var colliding = Engine.chunks[Utils.tileToAOI({x:x,y:y})].isColliding({x:x,y:y});
-        return {
-            x: x,
-            y: y,
-            walkable: !colliding
+    /* Handles accesses to spaceMap along the 2nd dimension, eg.g. map[x][y].
+    * No check for function calls is needed because those are applied on the initial map, not on what
+    * has been returned from the 1st dimension (eg. map.doSth(), not map[x].doSth()). If nothing is found, a walkable
+    * node is created on the fly. If a number is found, it'll be a 1, so a non-walkable node is created on the fly.
+    * Then whatever is there is returned.*/
+    var secondDimension = {
+        get: function(target,key){
+            if(target.hasOwnProperty(key)){
+                if(target[key] == 1){
+                    target[key] = new PF.Node(parseInt(key),parseInt(target.firstDim),false);
+                }
+            }else{
+                target[key] = new PF.Node(parseInt(key),parseInt(target.firstDim));
+            }
+            return target[key];
         }
-    };*/
-
-    PF.Grid.prototype.isWalkableAt = function(x, y) {
-        //return this.isInside(x, y) && this.nodes[y][x].walkable;
-        //return !Engine.chunks[Utils.tileToAOI({x:x,y:y})].isColliding({x:x,y:y});
-        return this.nodes[y][x].walkable;
     };
-    //PF.Grid.nodes = Engine.collisions;
+    /* Handles accesses to spaceMap along the firstDimension, e.g. map[x]
+    *  It first checks for function calls. If not, then it checks if there is something at the given
+     *  coordinate. If not, a enmpty object is placed there. In any case, whatever is found there is returned
+     *  as a proxy to be handled by the 2nd dimension handler.
+    * */
+    var firstDimension = {
+        get: function(target,key){ // target is the spacemap ; key is actually a coordinate, a x or a y value
+            if(key in target.__proto__) {
+                return target.__proto__[key];
+            }else{
+                if(!target.hasOwnProperty(key))target[key] = {};
+                target[key].firstDim = key; // trick to carry along what was the first dimension
+                return new Proxy(target[key], secondDimension);
+            }
+        }
+    };
 
-    // Overload [] on spacemap to replace grid.nodes, and overload iswalkable to get rid of dimension check
-
-    var grid = new PF.Grid(0,0);
-    grid.nodes = Engine.collisions;
-    var finder = new PF.AStarFinder({
-        allowDiagonal: true,
-        dontCrossCorners: true
-    });
+    Engine.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(Engine.collisions)),firstDimension); // Recreates a new grid each time
     console.log('path from '+Engine.player.tileX+', '+Engine.player.tileY+' to '+position.tile.x+', '+position.tile.y);
-    var path = finder.findPath(Engine.player.tileX, Engine.player.tileY, position.tile.x, position.tile.y, grid);
-    // TODO clone collisions after each call
+    var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, position.tile.x, position.tile.y, Engine.PFgrid);
     console.log(path);
     /*Engine.moveSprite(Engine.player.id,position.tile.x,position.tile.y);
     Engine.player.chunk = Utils.tileToAOI(position.tile);
     if(Engine.player.chunk != Engine.player.previousChunk) Engine.updateEnvironment();
     Engine.player.previousChunk = Engine.player.chunk;
     Client.sendMove(position.tile.x,position.tile.y);*/
-    // TODO: update chunk, tileX/Y and updateENvironmtn()
+    // TODO: update player.chunk, tileX/Y and updateENvironmtn()
 };
 
 Engine.getMouseCoordinates = function(event){
@@ -310,9 +329,7 @@ Engine.updateMarker = function(tile){
 };
 
 Engine.checkCollision = function(tile){ // tile is x, y pair
-    //var chunk = Engine.chunks[Utils.tileToAOI(tile)];
-    //if(chunk) return chunk.checkCollision(tile);
-    //return Engine.collisions[tile.x][tile.y];
+    if(Engine.displayedChunks.length < 4) return; // If less than 4, it means that wherever you are the chunks haven't finished displaying
     return Engine.collisions[tile.y][tile.x];
 };
 

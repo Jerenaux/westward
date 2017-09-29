@@ -10,11 +10,6 @@ function Chunk(mapData,id,z){
     this.height = mapData.height || Engine.chunkHeight;
     this.layers = [];
     this.layerData = [];
-    //this.collisions = new SpaceMap();
-
-
-    //this.collisions = new Proxy(new SpaceMap(),handler);
-
 
     for(var i = 0; i < Engine.nbLayers; i++){
         var data = this.fromFile ? mapData.layers[i].data : null ;
@@ -28,18 +23,6 @@ function Chunk(mapData,id,z){
 //Chunk.prototype = Object.create(Phaser.GameObjects.Sprite);
 //Chunk.prototype.constructor = Chunk;
 
-/*Chunk.prototype.checkCollision = function(tile){ // tile is a x,y pair
-    var cx = tile.x - this.x;
-    var cy = tile.y - this.y;
-    return !!(this.collisions.get(cx,cy));*/
-    /*var idx = Utils.gridToLine(cx, cy, this.width);
-    for(var l = 0; l < this.layers.length; l++) {
-        var data = this.layerData[l];
-        if(Chunk.isColliding(data[idx])) return true;
-    }
-    return false;*/
-//};
-
 Chunk.prototype.drawLayers = function(){
     for(var l = 0; l < this.layers.length; l++) {
         var layer = this.layers[l];
@@ -52,29 +35,9 @@ Chunk.prototype.drawLayers = function(){
             var x = this.x + cx;
             var y = this.y + cy;
             this.drawTile(x,y,tile,layer);
-            //this.addCollision(cx,cy,tile);
-            this.addCollision(x,y,tile);
+            Engine.addCollision(x,y,tile);
         }
     }
-};
-
-Chunk.prototype.addCollision = function(x,y,tile){
-    /*if(this.isColliding(tile)) this.collisions.add(cx,cy,{
-        x: cx,
-        y: cy,
-        walkable: false
-    });*/
-    //if(this.isColliding(tile)) this.collisions.add(cx,cy,1);
-    //if(this.isColliding(tile)) Engine.collisions.add(x,y,1);
-    if(this.isColliding(tile)) Engine.collisions.add(y,x,1);
-};
-
-Chunk.prototype.isColliding = function(tile){ // tile is the index of the tile in the tileset
-    for(var i = 0; i < Engine.collidingTiles.length; i++){
-        if(Engine.collidingTiles[i] > tile) return false;
-        if(Engine.collidingTiles[i] == tile) return true;
-    }
-    return false;
 };
 
 Chunk.prototype.removeLayers = function(){

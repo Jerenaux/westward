@@ -1073,8 +1073,6 @@ AStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
 
         // get neigbours of the current node
         neighbors = grid.getNeighbors(node, diagonalMovement);
-        console.log('neighbors :');
-        console.log(neighbors);
         for (i = 0, l = neighbors.length; i < l; ++i) {
             neighbor = neighbors[i];
 

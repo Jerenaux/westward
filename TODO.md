@@ -29,7 +29,6 @@ https://www.npmjs.com/package/pathfinding
 - Modify getNode
 - Hold & click
 - Verticality stuff
-- Remove collision methods from Chunk
 -----
 * Deployment
 - Two repositories, for production and development, with node scripts taking care
