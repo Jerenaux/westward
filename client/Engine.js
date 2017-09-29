@@ -71,45 +71,11 @@ Engine.create = function(masterData){
     Engine.scene.input.events.on('POINTER_MOVE_EVENT', Engine.trackMouse);
 
 
-    /* The handler captures all queries to the object, be it with [] or .
-     *  Since it captures queries with ., it also captures method calls.
-     *  All the queries are processed by get, which checks if the key corresponds
-     *  to a prototype method or not. If yes, the method is returned, and automatically
-     *  called, with the initial arguments provided. If not, it checks if the key belongs to
-     *  the object. If not, it returns the default value (here 0). If yes, it has to check the
-     *  value of that key. If it's another object, a recursive call is needed to fetch the value
-     *  in the second dimension of the array.;If not (which is the outcome of that second-level call),
-     *  the result is a number which can be returned as is.
-     * */
-    /*var handler = {
-        get: function(target,key){
-            if(key in target.__proto__) {
-                return target.__proto__[key];
-            }else{
-                if(target.hasOwnProperty(key)){
-                    if(typeof target[key] === 'object') {
-                        return new Proxy(target[key], handler);
-                    }else{
-                        return target[key];
-                    }
-                }else{
-                    return 0;
-                }
-            }
-        }
-    };*/
-
     Engine.collisions = new SpaceMap(); // contains 1 for the coordinates that are non-walkables
     Engine.PFgrid = new PF.Grid(0,0); // grid placeholder for the pathfinding
-    Engine.PFfinder = new PF.AStarFinder({
-        allowDiagonal: true,
-        dontCrossCorners: true
-    });
+    Engine.PFfinder = PFUtils.getFInder();
     // Replaces the isWalkableAt method of the PF library
-    PF.Grid.prototype.isWalkableAt = function(x, y) {
-        return this.nodes[y][x].walkable;
-    };
-
+    PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
 
     Client.requestData();
 };
@@ -240,41 +206,15 @@ Engine.isColliding = function(tile){ // tile is the index of the tile in the til
 Engine.move = function(event){
     var position = Engine.getMouseCoordinates(event);
 
-    /* Handles accesses to spaceMap along the 2nd dimension, eg.g. map[x][y].
-    * No check for function calls is needed because those are applied on the initial map, not on what
-    * has been returned from the 1st dimension (eg. map.doSth(), not map[x].doSth()). If nothing is found, a walkable
-    * node is created on the fly. If a number is found, it'll be a 1, so a non-walkable node is created on the fly.
-    * Then whatever is there is returned.*/
-    var secondDimension = {
-        get: function(target,key){
-            if(target.hasOwnProperty(key)){
-                if(target[key] == 1){
-                    target[key] = new PF.Node(parseInt(key),parseInt(target.firstDim),false);
-                }
-            }else{
-                target[key] = new PF.Node(parseInt(key),parseInt(target.firstDim));
-            }
-            return target[key];
-        }
-    };
-    /* Handles accesses to spaceMap along the firstDimension, e.g. map[x]
-    *  It first checks for function calls. If not, then it checks if there is something at the given
-     *  coordinate. If not, a enmpty object is placed there. In any case, whatever is found there is returned
-     *  as a proxy to be handled by the 2nd dimension handler.
-    * */
-    var firstDimension = {
-        get: function(target,key){ // target is the spacemap ; key is actually a coordinate, a x or a y value
-            if(key in target.__proto__) {
-                return target.__proto__[key];
-            }else{
-                if(!target.hasOwnProperty(key))target[key] = {};
-                target[key].firstDim = key; // trick to carry along what was the first dimension
-                return new Proxy(target[key], secondDimension);
-            }
-        }
-    };
+    Engine.scene.tweens.add({
+        targets: Engine.player,
+        x: { value: [position.tile.x*32,(position.tile.x+3)*32], duration: 1000},
+        y: { value: [position.tile.y*32,(position.tile.y+3)*32], duration: 1000}
+    });
 
-    Engine.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(Engine.collisions)),firstDimension); // Recreates a new grid each time
+    return;
+
+    Engine.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(Engine.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
     console.log('path from '+Engine.player.tileX+', '+Engine.player.tileY+' to '+position.tile.x+', '+position.tile.y);
     var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, position.tile.x, position.tile.y, Engine.PFgrid);
     console.log(path);

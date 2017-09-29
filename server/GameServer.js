@@ -15,10 +15,11 @@ var GameServer = {
 module.exports.GameServer = GameServer;
 
 var Utils = require('../shared/Utils.js').Utils;
-//var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
+var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var AOI = require('./AOI.js').AOI;
 var Player = require('./Player.js').Player;
 var PF = require('../shared/pathfinding.js');
+var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 GameServer.readMap = function(mapsPath){
     var masterData = JSON.parse(fs.readFileSync(mapsPath+'/master.json').toString());
@@ -36,7 +37,20 @@ GameServer.readMap = function(mapsPath){
         GameServer.AOIs.push(new AOI(i));
     }
 
+    // Read collisions file
+    GameServer.collisions = new SpaceMap();
+    GameServer.collisions.fromList(JSON.parse(fs.readFileSync(mapsPath+'/collisions.json').toString()));
+
+    GameServer.PFgrid = new PF.Grid(0,0); // grid placeholder for the pathfinding
+    GameServer.PFfinder = PFUtils.getFInder();
+    // Replaces the isWalkableAt method of the PF library
+    PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
+
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
+
+    /*GameServer.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(GameServer.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
+    var path = GameServer.PFfinder.findPath(468, 125, 476, 127, GameServer.PFgrid);
+    console.log(path);*/
 };
 
 GameServer.getPlayer = function(socketID){

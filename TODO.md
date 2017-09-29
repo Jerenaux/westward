@@ -25,8 +25,6 @@ Need to be able to scale world at will
 *Moving:
 https://www.npmjs.com/package/pathfinding
 - Investigate smoothenPath and compressPath, especially for networking
-- Use of spaceMap
-- Modify getNode
 - Hold & click
 - Verticality stuff
 -----
