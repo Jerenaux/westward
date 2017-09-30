@@ -7,7 +7,9 @@ var clone = require('clone');
 var xml2js = require('xml2js');
 
 var Utils = require('../shared/Utils.js').Utils;
+var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var Geometry = require('../client/Geometry.js').Geometry;
+var Gaia = require('../studio/Gaia.js').Gaia;
 
 function Layer(w,h,name){
     this.data = [];
@@ -41,6 +43,9 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,bluePrint,outdir,tileWi
     if(!chunkHeight) chunkHeight = defChunkH;
     if(!tileWidth) tileWidth = defTileW;
     if(!tileHeight) tileHeight = defTileH;
+
+    outdir = (outdir ? __dirname+'/../assets/maps/'+outdir : __dirname+'/../assets/maps/chunks');
+    if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);
 
     Utils.nbChunksHorizontal = nbHoriz;
     Utils.nbChunksVertical = nbVert;
@@ -115,9 +120,6 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,bluePrint,outdir,tileWi
     basis.layers.push(groundstuff);
     basis.layers.push(canopy);
 
-    if(!outdir) outdir = __dirname+'/../assets/maps/chunks/';
-    if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);
-
     // Write master file
     var master = {
         tilesets : tilesetsData.tilesets,
@@ -127,7 +129,7 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,bluePrint,outdir,tileWi
         nbChunksHoriz: nbHoriz,
         nbChunksVert: nbVert
     };
-    fs.writeFile(outdir+'master.json',JSON.stringify(master),function(err){
+    fs.writeFile(outdir+'/master.json',JSON.stringify(master),function(err){
         if(err) throw err;
         console.log('Master written');
     });
@@ -141,6 +143,7 @@ function makeWorld(nbHoriz,nbVert,chunkWidth,chunkHeight,bluePrint,outdir,tileWi
         basis.chunkID = i;
         chunks[basis.chunkID] = chunk;
     }
+    console.log(number+' chunks created ('+nbHoriz+' x '+nbVert+')');
 
     if(bluePrint){
         var worldData = {
@@ -170,7 +173,7 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
     var parser = new xml2js.Parser();
     var blueprint = fs.readFileSync(__dirname+'/blueprints/'+bluePrint).toString();
     parser.parseString(blueprint, function (err, result) {
-        //console.dir(result);
+        if(err) throw err;
         var viewbox = result.svg.$.viewBox.split(" ");
         var curveW = parseInt(viewbox[2]);
         var curveH = parseInt(viewbox[3]);
@@ -204,16 +207,12 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
         for(var i = 0; i < pts.length-1; i++){
             var s = pts[i];
             var e = pts[i+1];
-            //console.log(i+' : line from '+ s.x+', '+ s.y+' to '+ e.x+', '+ e.y);
             var addTiles= Geometry.addCorners(Geometry.straightLine(s,e));
             if(i > 0) addTiles.shift();
-            //console.log(addTiles.length+' tiles generated');
             tiles = tiles.concat(addTiles);
-            //console.log(tiles.length+' tiles total');
         }
 
-
-        for(var i = 0; i < tiles.length; i++){
+        /*for(var i = 0; i < tiles.length; i++){
             var tile = tiles[i];
             if(tile.x < 0 || tile.y < 0 || tile.x > worldWidth || tile.y > worldHeight) continue;
             var id = Utils.tileToAOI({x: tile.x, y: tile.y});
@@ -223,17 +222,108 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
             var cx = tile.x - origin.x;
             var cy = tile.y - origin.y;
             var idx = Utils.gridToLine(cx, cy, worldData.chunkWidth);
+            var tileID = Gaia.find
             chunk.layers[0].data[idx] = 292;
+        }*/
+
+        var north = new SpaceMap();
+        var south = new SpaceMap();
+        var northShore = [Gaia.W.top, Gaia.W.topLeftOut, Gaia.W.topRightOut, Gaia.W.bottomRightOut, Gaia.W.bottomLeftOut];
+        var southShore = [Gaia.W.bottom, Gaia.W.topLeftIn, Gaia.W.topRightIn, Gaia.W.bottomLeftIn, Gaia.W.bottomRightIn];
+
+        for(var i = 0; i < tiles.length; i++){
+            var tile = tiles[i];
+
+            if(tile.x < 0 || tile.y < 0 || tile.x > worldWidth || tile.y > worldHeight) continue;
+
+            var next = (i == tiles.length-1 ? 0 : i+1);
+            var prev = (i == 0 ? tiles.length-1 : i-1);
+            var id = Gaia.findTileID(tiles[prev],tile,tiles[next]);
+
+            if(northShore.includes(id)) addToMap(tile,north,'x','y','min');
+            if(southShore.includes(id)) addToMap(tile,south,'x','y','max');
+
+            //console.log(id+' at '+ref.x+', '+ref.y);
+
+            switch(id){
+                case Gaia.W.topRightOut:
+                    addTile(tile.x,tile.y,Gaia.Shore.topRight,chunks);
+                    break;
+                case Gaia.W.top:
+                    addTile(tile.x,tile.y,Gaia.Shore.top,chunks);
+                    break;
+                case Gaia.W.topLeftOut:
+                    addTile(tile.x,tile.y,Gaia.Shore.topLeft,chunks);
+                    break;
+                case Gaia.W.left:
+                    addTile(tile.x,tile.y,Gaia.Shore.left,chunks);
+                    break;
+                case Gaia.W.right:
+                    addTile(tile.x,tile.y,Gaia.Shore.right,chunks);
+                    break;
+                case Gaia.W.bottomRightIn:
+                    addTile(tile.x,tile.y,Gaia.Shore.bottomRight,chunks);
+                    break;
+                case Gaia.W.bottomLeftOut:
+                    addTile(tile.x,tile.y,Gaia.Shore.topRightOut,chunks);
+                    break;
+                case Gaia.W.bottomLeftIn:
+                    addTile(tile.x,tile.y,Gaia.Shore.bottomLeft,chunks);
+                    break;
+                case Gaia.W.bottom:
+                    addTile(tile.x,tile.y,Gaia.Shore.bottom,chunks);
+                    break;
+                case Gaia.W.bottomRightOut:
+                    addTile(tile.x,tile.y,Gaia.Shore.topLeftOut,chunks);
+                    break;
+                case Gaia.W.topRightIn:
+                    addTile(tile.x,tile.y,Gaia.Shore.bottomLeftOut,chunks);
+                    break;
+                case Gaia.W.topLeftIn:
+                    addTile(tile.x,tile.y,Gaia.Shore.bottomRightOut,chunks);
+                    break;
+            }
+        }
+
+        //console.log(north);
+
+        for(var x in north){
+            for(var y = north[x]+1; y < south[x]; y++){
+                /*console.log(x+', '+y);
+                var id = Utils.tileToAOI({x: x, y: y});
+                console.log(chunks[id]);*/
+                addTile(x,y,Gaia.Shore.water,chunks);
+            }
         }
 
         writeFiles(outdir,chunks);
     });
 }
 
+function addToMap(tile,map,keyCoordinate,valueCoordinate,operator){
+    // Add the x/y value of a tile to the map, with the other value as the key.
+    // Depending on the map, replace existing value with min() or max() of the existing one and the new one.
+    if(!map.hasOwnProperty(tile[keyCoordinate])){
+        map[tile[keyCoordinate]] = tile[valueCoordinate];
+    }else{
+        map[tile[keyCoordinate]] = Math[operator](map[tile[keyCoordinate]],tile[valueCoordinate]);
+    }
+}
+
+function addTile(x,y,tile,chunks){
+    var id = Utils.tileToAOI({x: x, y: y});
+    var chunk = chunks[id];
+    var origin = Utils.AOItoTile(id);
+    var cx = x - origin.x;
+    var cy = y - origin.y;
+    var idx = Utils.gridToLine(cx, cy, chunk.width);
+    chunk.layers[0].data[idx] = tile;
+}
+
 function writeFiles(outdir,chunks){
     var counter = 0;
     for(var i = 0; i < chunks.length; i++) {
-        fs.writeFile(outdir+'chunk'+i+'.json',JSON.stringify(chunks[i]),function(err){
+        fs.writeFile(outdir+'/chunk'+i+'.json',JSON.stringify(chunks[i]),function(err){
             if(err) throw err;
             counter++;
             if(counter == chunks.length) console.log('All files written');

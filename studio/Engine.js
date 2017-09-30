@@ -40,6 +40,8 @@ Engine.boot = function(){
     Engine.selectionEnabled = Utils.getPreference('selectionEnabled',false);
     Engine.debug = true;
     Engine.zoomScale = 1;
+    Engine.zoomScales= [0.01,0.1,0.25,0.5,0.75,1];
+    Engine.zoomIndex = Engine.zoomScales.length-1;
 
     Engine.chunks = {}; // holds references to the Containers containing the chunks
     Engine.displayedChunks = [];
@@ -272,6 +274,12 @@ Engine.removeChunk = function(id){
     Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
 };
 
+Engine.showAll = function(){
+    for(var i = 0; i < Engine.lastChunkID; i++){
+        Engine.displayChunk(i);
+    }
+};
+
 Engine.update = function(){
     Engine.renderer.render(Engine.stage);
     requestAnimationFrame(Engine.update);
@@ -279,23 +287,13 @@ Engine.update = function(){
     //console.log(Engine.stage.children.length+' children');
 };
 
-Engine.zoom = function(coef){
-    var increment;
-    if(coef == -1){
-        if(Engine.zoomScale > 0.25) {
-            increment = 0.25;
-        }else{
-            increment = 0.15;
-        }
-    }else if (coef == 1){
-        if(Engine.zoomScale >= 0.25) {
-            increment = 0.25;
-        }else{
-            increment = 0.15;
-        }
-    }
 
-    Engine.zoomScale += increment * coef;
+Engine.zoom = function(coef){
+    Engine.zoomIndex += coef;
+    if(Engine.zoomIndex < 0) Engine.zoomIndex = 0;
+    if(Engine.zoomIndex > Engine.zoomScales.length-1) Engine.zoomIndex = Engine.zoomScales.length-1;
+    Engine.zoomScale = Engine.zoomScales[Engine.zoomIndex];
+
     Engine.stage.scale.x = Engine.zoomScale;
     Engine.stage.scale.y = Engine.zoomScale;
     Engine.viewWidth = Math.floor(Engine.baseViewWidth*(1/Engine.zoomScale));
@@ -542,37 +540,6 @@ Engine.drawCircle = function(x,y,radius,color){
     g.lineStyle(2,color);
     g.drawCircle(x,y,radius);
     Engine.blackBoard.addChild(g);
-};
-
-Engine.findTileID = function(prev,pt,next){
-    var inAngle = Geometry.computeAngle(prev,pt,true);
-    var outAngle = Geometry.computeAngle(pt,next,true);
-    //console.log(inAngle+', '+outAngle);
-    if(inAngle == 90 && outAngle == 180){
-        return W.topRightOut;
-    }else if(inAngle == 180 && outAngle == -90){
-        return W.topLeftOut;
-    }else if(inAngle == 180 && outAngle == 90){
-        return W.bottomLeftOut;
-    }else if(inAngle == -90 && outAngle == 180){
-        return W.bottomRightOut;
-    }else if(inAngle == -90 && outAngle == 0){
-        return W.bottomLeftIn;
-    }else if(inAngle == 0 && outAngle == 90){
-        return W.bottomRightIn;
-    }else if(inAngle == 180 && outAngle == 180){
-        return W.top;
-    }else if(inAngle == 90 && outAngle == 90){
-        return W.right;
-    }else if(inAngle == 0 && outAngle == 0){
-        return W.bottom;
-    }else if(inAngle == -90 && outAngle == -90){
-        return W.left;
-    }else if(inAngle == 0 && outAngle == -90) {
-        return W.topRightIn;
-    }else if(inAngle == 90 && outAngle == 0){
-        return W.topLeftIn;
-    }
 };
 
 Engine.drawForest = function(pts){

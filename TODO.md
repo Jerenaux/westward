@@ -10,6 +10,8 @@ Netowrking, pathfinding & Australia
 Lots owned to Phaserquest, nice architecture
 Hacking pathfinding with arcane proxies
 Need to be able to scale world at will
+Explain steps of fetching image, exporting path, etc.
+Means that I can create my world with any image editor, or anyone else can draw maps for me
 
 * Cleaning:
 - Clean up Utils
