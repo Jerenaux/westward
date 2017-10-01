@@ -185,10 +185,13 @@ Geometry.addCorners = function(tiles){ // Add corners to a straight line to foll
         var dy = current.y - prev.y;
         if(Math.abs(dx) + Math.abs(dy) == 1) continue;
         var newPt = {x:current.x,y:current.y};
-        if(dx == -1 && dy == 1) newPt.y--;
-        if(dx == -1 && dy == -1) newPt.y++;
-        if(dx == 1 && dy == 1) newPt.y--;
-        if(dx == 1 && dy == -1) newPt.y++;
+        if(dx == -1 && dy == 1) newPt.y--; // next point is to the top right
+        if(dx == -1 && dy == -1){
+            //console.log('bottom right at '+current.x+', '+current.y);
+            newPt.y++;
+        } // next point is to the bottom right
+        if(dx == 1 && dy == 1) newPt.y--; // next point is to the top left
+        if(dx == 1 && dy == -1) newPt.y++; // next point is to the bottom left
         tiles.splice(i,0,newPt);// insert new point
         i++;
     }

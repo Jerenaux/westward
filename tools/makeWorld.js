@@ -207,24 +207,35 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
         for(var i = 0; i < pts.length-1; i++){
             var s = pts[i];
             var e = pts[i+1];
+            //var addTiles= Geometry.addCorners(Geometry.interpolatePoints(Geometry.straightLine(s,e)));
             var addTiles= Geometry.addCorners(Geometry.straightLine(s,e));
             if(i > 0) addTiles.shift();
             tiles = tiles.concat(addTiles);
         }
-
-        /*for(var i = 0; i < tiles.length; i++){
-            var tile = tiles[i];
-            if(tile.x < 0 || tile.y < 0 || tile.x > worldWidth || tile.y > worldHeight) continue;
-            var id = Utils.tileToAOI({x: tile.x, y: tile.y});
-            var chunk = chunks[id];
-            if(!chunk) continue; // probably because of out of world bounds
-            var origin = Utils.AOItoTile(id);
-            var cx = tile.x - origin.x;
-            var cy = tile.y - origin.y;
-            var idx = Utils.gridToLine(cx, cy, worldData.chunkWidth);
-            var tileID = Gaia.find
-            chunk.layers[0].data[idx] = 292;
-        }*/
+        // TODO: make this a smoothing function
+        for(var i = tiles.length-2; i >= 0; i--){
+            var t = tiles[i];
+            for(var j = 1; j < 5; j++){ // knots & duplicates
+                if(i+j > tiles.length-1) continue;
+                var old= tiles[i+j];
+                if(t.x == old.x && t.y == old.y) tiles.splice(i+1,j);
+            }
+        }
+        // TODO: integrate this with addCorners
+        for(var i = 0; i < tiles.length-1; i++){
+            var t = tiles[i];
+            var next = tiles[i+1];
+            var dx = next.x - t.x;
+            var dy = next.y - t.y;
+            if(dx == 1 && dy == 1){
+                tiles.splice(i+1,0,{
+                    x: t.x,
+                    y: t.y+1
+                });
+                i++;
+            }
+        }
+        //console.log(JSON.stringify(tiles));
 
         var north = new SpaceMap();
         var south = new SpaceMap();
@@ -243,7 +254,7 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
             if(northShore.includes(id)) addToMap(tile,north,'x','y','min');
             if(southShore.includes(id)) addToMap(tile,south,'x','y','max');
 
-            //console.log(id+' at '+ref.x+', '+ref.y);
+            console.log(id+' at '+tile.x+', '+tile.y);
 
             switch(id){
                 case Gaia.W.topRightOut:
@@ -282,19 +293,21 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
                 case Gaia.W.topLeftIn:
                     addTile(tile.x,tile.y,Gaia.Shore.bottomRightOut,chunks);
                     break;
+                default:
+                    //Gaia.findTileID(tiles[prev],tile,tiles[next],true);
+                    break;
             }
         }
 
         //console.log(north);
 
-        for(var x in north){
+        /*for(var x in north){
+            if(!north.hasOwnProperty(x)) continue;
+            //console.log(x+' to '+south[x]);
             for(var y = north[x]+1; y < south[x]; y++){
-                /*console.log(x+', '+y);
-                var id = Utils.tileToAOI({x: x, y: y});
-                console.log(chunks[id]);*/
                 addTile(x,y,Gaia.Shore.water,chunks);
             }
-        }
+        }*/
 
         writeFiles(outdir,chunks);
     });

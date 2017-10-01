@@ -76,9 +76,15 @@ var Cliff = { // indexes of tiles in tilesets for cliffs
     topLeftIn_altbtm: 83
 };
 
-Gaia.findTileID = function(prev,pt,next){
+Gaia.findTileID = function(prev,pt,next,verbose){
     var inAngle = Geometry.computeAngle(prev,pt,true);
     var outAngle = Geometry.computeAngle(pt,next,true);
+    if(verbose) {
+        console.log('in : '+inAngle+', out : '+outAngle);
+        console.log(prev);
+        console.log(next);
+    }
+
     //console.log(inAngle+', '+outAngle);
     if(inAngle == 90 && outAngle == 180){
         return Gaia.W.topRightOut;
