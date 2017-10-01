@@ -203,10 +203,11 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
         console.log(pts.length+' nodes in blueprint');
         //pts.forEach(item => console.log(item))
 
+        var nbPts = pts.length;
         var tiles = [];
-        for(var i = 0; i < pts.length-1; i++){
+        for(var i = 0; i <= nbPts-1; i++){
             var s = pts[i];
-            var e = pts[i+1];
+            var e = (i == nbPts-1 ? pts[0] : pts[i+1]);
             //var addTiles= Geometry.addCorners(Geometry.interpolatePoints(Geometry.straightLine(s,e)));
             var addTiles= Geometry.addCorners(Geometry.straightLine(s,e));
             if(i > 0) addTiles.shift();
@@ -234,13 +235,25 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
                 });
                 i++;
             }
+            if(dx == 1 && dy == -1){
+                tiles.splice(i+1,0,{
+                    x: t.x+1,
+                    y: t.y
+                });
+                i++;
+            }
         }
         //console.log(JSON.stringify(tiles));
 
-        var north = new SpaceMap();
-        var south = new SpaceMap();
-        var northShore = [Gaia.W.top, Gaia.W.topLeftOut, Gaia.W.topRightOut, Gaia.W.bottomRightOut, Gaia.W.bottomLeftOut];
-        var southShore = [Gaia.W.bottom, Gaia.W.topLeftIn, Gaia.W.topRightIn, Gaia.W.bottomLeftIn, Gaia.W.bottomRightIn];
+        //var north = new SpaceMap();
+        //var south = new SpaceMap();
+        var north = {};
+        var south = {};
+        var northShore = [Gaia.W.top, Gaia.W.topLeftOut, Gaia.W.topRightOut, Gaia.W.bottomRightOut, Gaia.W.bottomLeftOut]; //Gaia.W.bottomLeftOut,
+        var southShore = [Gaia.W.bottom, Gaia.W.topRightIn, Gaia.W.bottomRightIn, Gaia.W.bottomLeftIn, Gaia.W.topLeftIn]; // Gaia.W.bottomLeftIn, Gaia.W.topLeftIn
+        var minX = worldWidth;
+        var maxX = 0;
+        var pairs = [];
 
         for(var i = 0; i < tiles.length; i++){
             var tile = tiles[i];
@@ -251,10 +264,21 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
             var prev = (i == 0 ? tiles.length-1 : i-1);
             var id = Gaia.findTileID(tiles[prev],tile,tiles[next]);
 
-            if(northShore.includes(id)) addToMap(tile,north,'x','y','min');
-            if(southShore.includes(id)) addToMap(tile,south,'x','y','max');
-
             console.log(id+' at '+tile.x+', '+tile.y);
+
+            if(tile.x < minX) minX = tile.x;
+            if(tile.x > maxX) maxX = tile.x;
+            //if(northShore.includes(id)) addToMap(tile,north,'x','y','min');
+            //if(southShore.includes(id)) addToMap(tile,south,'x','y','max');
+            if(northShore.includes(id)) {
+                //north[tile.x] = tile.y;
+                if(!north.hasOwnProperty(tile.x)) north[tile.x] = [];
+                north[tile.x].push(tile.y);
+            }
+            if(southShore.includes(id)) {
+                if(!south.hasOwnProperty(tile.x)) south[tile.x] = [];
+                south[tile.x].push(tile.y);
+            }
 
             switch(id){
                 case Gaia.W.topRightOut:
@@ -299,7 +323,50 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
             }
         }
 
-        //console.log(north);
+        console.log('minX = '+minX);
+        console.log('maX = '+maxX);
+        var mismatches = 0;
+        for(var i = minX; i <= maxX; i++){
+            if((north[i] && !south[i]) || (!north[i] && south[i])) {
+                console.log('no reciprocal at x = '+i);
+                continue;
+            }
+            if(!north[i] && !south[i]) {
+                console.log('Nothing at '+i);
+                continue;
+            }
+            north[i].sort();
+            south[i].sort();
+            /*for(var j = north[i].length-2; j >= 0; j--){
+                var t = north[i][j];
+                var tp = north[i][j+1];
+                if(t == tp-1) north[i].splice(j+1,1);
+            }*/
+            /*for(var j = south[i].length-2; j >= 0; j--){
+                var t = south[i][j];
+                var tp = south[i][j+1];
+                if(t == tp+1) south[i].splice(j,1);
+            }*/
+            if(north[i].length != south[i].length) {
+                mismatches++;
+                console.log('mismatch at x = '+i);
+            }
+            /*
+            for(var j = 0; j < north[i].length; j++){
+                pairs.push({
+                    x: i,
+                    ys: north[i][j],
+                    ye: south[i][j]
+                });
+            }*/
+        }
+        console.log(mismatches+' mistmatches');
+        console.log(north[1153]);
+        console.log(south[1153]);
+        console.log(north[1154]);
+        console.log(south[1154]);
+        console.log(north[1143]);
+        console.log(south[1143]);
 
         /*for(var x in north){
             if(!north.hasOwnProperty(x)) continue;
@@ -309,7 +376,7 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
             }
         }*/
 
-        writeFiles(outdir,chunks);
+        //writeFiles(outdir,chunks);
     });
 }
 

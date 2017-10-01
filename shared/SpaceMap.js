@@ -11,7 +11,6 @@ function SpaceMap(){}
 
 SpaceMap.prototype.add = function(x,y,object){
     if(!this.hasOwnProperty(x))this[x] = {};
-    //if(!this.hasOwnProperty(x))this[x] = new Proxy({},this.handler);
     if(!this[x].hasOwnProperty(y))this[x][y] = [];
     this[x][y] = object; // replaces any existing object
 };
