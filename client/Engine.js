@@ -325,6 +325,8 @@ Engine.updateMarker = function(tile){
 
 Engine.checkCollision = function(tile){ // tile is x, y pair
     if(Engine.displayedChunks.length < 4) return; // If less than 4, it means that wherever you are the chunks haven't finished displaying
+    console.log(Engine.collisions);
+    console.log(tile.x+', '+tile.y);
     return Engine.collisions[tile.y][tile.x];
 };
 

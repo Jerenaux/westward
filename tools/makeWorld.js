@@ -242,23 +242,29 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
                 });
                 i++;
             }
+            if(dx == 2 && dy == 0){
+                tiles.splice(i+1,0,{
+                    x: t.x+1,
+                    y: t.y
+                });
+                i++;
+            }
         }
         //console.log(JSON.stringify(tiles));
 
-        //var north = new SpaceMap();
-        //var south = new SpaceMap();
-        var north = {};
-        var south = {};
-        var northShore = [Gaia.W.top, Gaia.W.topLeftOut, Gaia.W.topRightOut, Gaia.W.bottomRightOut, Gaia.W.bottomLeftOut]; //Gaia.W.bottomLeftOut,
-        var southShore = [Gaia.W.bottom, Gaia.W.topRightIn, Gaia.W.bottomRightIn, Gaia.W.bottomLeftIn, Gaia.W.topLeftIn]; // Gaia.W.bottomLeftIn, Gaia.W.topLeftIn
+        //var northShore = [Gaia.W.top, Gaia.W.topLeftOut, Gaia.W.topRightOut, Gaia.W.bottomRightOut, Gaia.W.bottomLeftOut]; //Gaia.W.bottomLeftOut,
+        //var southShore = [Gaia.W.bottom, Gaia.W.topRightIn, Gaia.W.bottomRightIn, Gaia.W.bottomLeftIn, Gaia.W.topLeftIn]; // Gaia.W.bottomLeftIn, Gaia.W.topLeftIn
         var minX = worldWidth;
         var maxX = 0;
-        var pairs = [];
+        var xSlices = {};
+        var busy = new SpaceMap();
 
+        console.log('perimeter : '+tiles.length);
         for(var i = 0; i < tiles.length; i++){
             var tile = tiles[i];
 
             if(tile.x < 0 || tile.y < 0 || tile.x > worldWidth || tile.y > worldHeight) continue;
+            busy.add(tile.x,tile.y,1);
 
             var next = (i == tiles.length-1 ? 0 : i+1);
             var prev = (i == 0 ? tiles.length-1 : i-1);
@@ -268,17 +274,8 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
 
             if(tile.x < minX) minX = tile.x;
             if(tile.x > maxX) maxX = tile.x;
-            //if(northShore.includes(id)) addToMap(tile,north,'x','y','min');
-            //if(southShore.includes(id)) addToMap(tile,south,'x','y','max');
-            if(northShore.includes(id)) {
-                //north[tile.x] = tile.y;
-                if(!north.hasOwnProperty(tile.x)) north[tile.x] = [];
-                north[tile.x].push(tile.y);
-            }
-            if(southShore.includes(id)) {
-                if(!south.hasOwnProperty(tile.x)) south[tile.x] = [];
-                south[tile.x].push(tile.y);
-            }
+            if(!xSlices.hasOwnProperty(tile.x)) xSlices[tile.x] = [];
+            xSlices[tile.x].push(tile.y);
 
             switch(id){
                 case Gaia.W.topRightOut:
@@ -323,61 +320,74 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
             }
         }
 
-        console.log('minX = '+minX);
-        console.log('maX = '+maxX);
-        var mismatches = 0;
-        for(var i = minX; i <= maxX; i++){
-            if((north[i] && !south[i]) || (!north[i] && south[i])) {
-                console.log('no reciprocal at x = '+i);
-                continue;
-            }
-            if(!north[i] && !south[i]) {
-                console.log('Nothing at '+i);
-                continue;
-            }
-            north[i].sort();
-            south[i].sort();
-            /*for(var j = north[i].length-2; j >= 0; j--){
-                var t = north[i][j];
-                var tp = north[i][j+1];
-                if(t == tp-1) north[i].splice(j+1,1);
-            }*/
-            /*for(var j = south[i].length-2; j >= 0; j--){
-                var t = south[i][j];
-                var tp = south[i][j+1];
-                if(t == tp+1) south[i].splice(j,1);
-            }*/
-            if(north[i].length != south[i].length) {
-                mismatches++;
-                console.log('mismatch at x = '+i);
-            }
-            /*
-            for(var j = 0; j < north[i].length; j++){
-                pairs.push({
-                    x: i,
-                    ys: north[i][j],
-                    ye: south[i][j]
-                });
-            }*/
-        }
-        console.log(mismatches+' mistmatches');
-        console.log(north[1153]);
-        console.log(south[1153]);
-        console.log(north[1154]);
-        console.log(south[1154]);
-        console.log(north[1143]);
-        console.log(south[1143]);
 
-        /*for(var x in north){
-            if(!north.hasOwnProperty(x)) continue;
-            //console.log(x+' to '+south[x]);
-            for(var y = north[x]+1; y < south[x]; y++){
-                addTile(x,y,Gaia.Shore.water,chunks);
+        busy.add(800,129,1); // TODO fix!
+        busy.add(383,436,1);
+        busy.add(365,443,1);
+        busy.add(341,450,1);
+        busy.add(294,471,1);
+
+        var fillNode = {
+            x: 753,
+            y: 240
+        };
+        var searched = new Set();
+        var queue = [];
+        queue.push(fillNode);
+        var fillTiles = [];
+        var counter = 0;
+        var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
+        while(queue.length > 0){
+            var node = queue.shift();
+            //console.log(node);
+            if(searched.has(hashNode(node))) continue;
+            if(isBusy(node,busy)) continue;
+            // put a tile at location
+            fillTiles.push(node);
+            busy.add(node.x,node.y,1);
+            // expand
+            for(var i = 0; i < contour.length; i++){
+                var candidate = {
+                    x: node.x + contour[i][0],
+                    y: node.y + contour[i][1]
+                };
+                if(candidate.x < 0 || candidate.y < 0 || candidate.x > worldWidth || candidate.y > worldHeight) continue;
+
+                if(!isBusy(candidate,busy)) queue.push(candidate);
             }
-        }*/
+            // add to searched
+            searched.add(hashNode(node));
+
+            counter++;
+            if(counter > 392000){
+                console.log('early stop');
+                break;
+            }
+        }
+        console.log('volume : '+fillTiles.length);
+
+        for(var i = 0; i < fillTiles.length; i++){
+            var tile = fillTiles[i];
+            addTile(tile.x, tile.y, Gaia.Shore.water, chunks);
+        }
 
         //writeFiles(outdir,chunks);
     });
+}
+
+function isBusy(node,busy){
+    return !!busy.get(node.x,node.y);
+    /*var id = Utils.tileToAOI({x: node.x, y: node.y});
+    var chunk = chunks[id];
+    var origin = Utils.AOItoTile(id);
+    var cx = node.x - origin.x;
+    var cy = node.y - origin.y;
+    var idx = Utils.gridToLine(cx, cy, chunk.width);
+    return (chunk.layers[0].data[idx] > 0);*/
+}
+
+function hashNode(node){
+    return node.x+'_'+node.y;
 }
 
 function addToMap(tile,map,keyCoordinate,valueCoordinate,operator){
@@ -393,6 +403,10 @@ function addToMap(tile,map,keyCoordinate,valueCoordinate,operator){
 function addTile(x,y,tile,chunks){
     var id = Utils.tileToAOI({x: x, y: y});
     var chunk = chunks[id];
+    if(!chunk){
+        console.log('error : '+x+', '+y);
+        return;
+    }
     var origin = Utils.AOItoTile(id);
     var cx = x - origin.x;
     var cy = y - origin.y;

@@ -40,7 +40,7 @@ Engine.boot = function(){
     Engine.selectionEnabled = Utils.getPreference('selectionEnabled',false);
     Engine.debug = true;
     Engine.zoomScale = 1;
-    Engine.zoomScales= [0.01,0.1,0.25,0.5,0.75,1];
+    Engine.zoomScales= [0.01,0.025,0.05,0.1,0.25,0.5,0.75,1];
     Engine.zoomIndex = Engine.zoomScales.length-1;
 
     Engine.chunks = {}; // holds references to the Containers containing the chunks
@@ -199,9 +199,13 @@ Engine.start = function(loader, resources){
             });
             i++;
         }
-        /*if(dx == -1 && dy == 1){
-            console.log('angle at '+ t.x+', '+ t.y);
-        }*/
+        if(dx == 2 && dy == 0){
+            tiles.splice(i+1,0,{
+                x: t.x+1,
+                y: t.y
+            });
+            i++;
+        }
     }
 
     tiles = tiles.map(function(t){
@@ -223,8 +227,12 @@ Engine.start = function(loader, resources){
 
 Engine.addHero = function(){
     // multiple knots at: 825, 37
-    startx = 1073;//744;
-    starty = 231;//130;
+    // knot at 294, 471
+    // anomaly at 673, 48 ; 563, 23; 370, 83 ; 361, 95; 347, 101 ; 327, 118 : 78, 477 ; 132, 496; 213, 476; 242, 473; 270,475
+    // 294, 475; 341, 453; 365, 445; 384, 442
+    // nice pic at 55, 312
+    var startx = 55;//744;
+    var starty = 312;//130;
     Engine.player = Engine.addSprite('hero',startx,starty);
     Engine.player.visible = Engine.showHero;
     Engine.player.chunk = Utils.tileToAOI({x:startx,y:starty});

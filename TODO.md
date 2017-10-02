@@ -3,33 +3,31 @@ Design document
 Clean code
 Movement
 
-Next dev log:
-Networking, pathfinding & splines
-or
-Netowrking, pathfinding & Australia
-Lots owned to Phaserquest, nice architecture
-Hacking pathfinding with arcane proxies
-Need to be able to scale world at will
-Explain steps of fetching image, exporting path, etc.
-Means that I can create my world with any image editor, or anyone else can draw maps for me
 
 * Cleaning:
 - Clean up Utils
 - Move Geometry to studio?
-- Remove phaser_map and mapbis
 - Split server in two (game and dev server)
 - Order files in studio
 - Standardize the use of Utils methods for coordianes manipulations (gritoline, lientogrid, tiletoiAOI, AOItotile, tileRelativeToAOI...)
 - Have a universal ChunkEdit class used accross all tools for all types of modifications
+-> Or a ChunkHolder class which stores chunks in some way and only expose a addTile method which is used by the editor/geometry classes as a callback
+-> Possibly the same chunk management both in live edit and with tools; remake the redo/switch function by getting rid
+of the awkward temporary chunks, and instead, when editing, make a backup copy of affected chunks, and when redo/switch,
+just restore it
 - Clean Chunk and ChunkEdit for obsolete methods
 - Sort-out shardness of Utils, and the need to have common properties such as tileWidth etc. readily available both in dev and prod
+- Clean makeWorld up and compartimentalize (makeLake, fillLake, makeCliff (fillCliff?), etc.
+- Remove unnecessary test code from client/Engine.js:start()
 -----
 *Moving:
 https://www.npmjs.com/package/pathfinding
+- Fix pathfinding bugs
 - Investigate smoothenPath and compressPath, especially for networking
 - Hold & click
 - Verticality stuff (trees canopy, etc.)
 - Make a Uitls.getDuration method to return duration based on distance
+- Animate
 -----
 * Deployment
 - Two repositories, for production and development, with node scripts taking care
@@ -48,10 +46,7 @@ appearance and behaviour, reduced code visibility, and possibly *no* node-module
 - Testing (make part of the pipeline)
 -----
 * World editor:
-- Zoom-out even further
-- Make proper coast out of path
-- Remove anomalies
-- Make path parser a separate tool, to output a JSON object to which to add other blueprint components (forest zones, lakes...)
+- Fix all anomalies
 
 
 Axes of progress:
