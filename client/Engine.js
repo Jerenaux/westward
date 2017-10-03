@@ -79,8 +79,6 @@ Engine.create = function(masterData){
     // Replaces the isWalkableAt method of the PF library
     PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
 
-    Engine.tileDuration = 200; // ms taken to walk a tile
-
     Client.requestData();
 };
 
@@ -219,22 +217,32 @@ Engine.move = function(event){
 
     //console.log('path from '+Engine.player.tileX+', '+Engine.player.tileY+' to '+position.tile.x+', '+position.tile.y);
     Engine.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(Engine.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
-    //var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, position.tile.x, position.tile.y, Engine.PFgrid);
     var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, position.tile.x, position.tile.y, Engine.PFgrid);
     path.shift();
 
-    if(Engine.player.movement !== null) Engine.player.movement.stop();
+    var tweens = [];
+    for(var i = 0; i < path.length; i++){
+        var sx = (i == 0 ? Engine.player.tileX : path[i-1][0]);
+        var sy = (i == 0 ? Engine.player.tileY : path[i-1][1]);
+        var ex = path[i][0];
+        var ey = path[i][1];
+        var time = PFUtils.getDuration(sx,sy,ex,ey); // in sec
+        tweens.push({
+            targets: Engine.player,
+            x: {value: ex*Engine.tileWidth, duration: time*1000},
+            y: {value: ey*Engine.tileHeight, duration: time*1000}
+        });
+    }
+
+    if(Engine.player.movement !== null) {
+        Engine.player.movement.stop();
+        Engine.updatePosition();
+    }
     Engine.player.lastUpdateStamp = Date.now();
     Engine.player.movement = Engine.scene.tweens.timeline({
-        tweens: path.map(function(p){
-            return {
-                targets: Engine.player,
-                x: {value: p[0]*Engine.tileWidth, duration: Engine.tileDuration},
-                y: {value: p[1]*Engine.tileHeight, duration: Engine.tileDuration}
-            }
-        }),
+        tweens: tweens,
         onUpdate: function(){
-            if(Date.now() - Engine.player.lastUpdateStamp > Engine.tileDuration*0.5){
+            if(Date.now() - Engine.player.lastUpdateStamp > 200){
                 Engine.updatePosition();
                 Engine.player.lastUpdateStamp = Date.now();
             }
@@ -242,21 +250,6 @@ Engine.move = function(event){
         onComplete: Engine.updatePosition
     });
 };
-
-/*Engine.adjustStartPosition = function(start){
-    // Prevents small "hiccups" in the tween when changing direction while already moving
-    // start is a 2-tuple of the coordinates of the starting position to adjust
-    switch(Engine.player.orientation){
-        case 3: // right
-            if(this.x%32 != 0) start.x++;
-            break;
-        case 4: // down
-            if(this.y%32 != 0) start.y++;
-            break;
-
-    }
-    return start;
-};*/
 
 Engine.updatePosition = function(){
     if(Engine.player.x > Engine.player.previousPosition.x){ // right
@@ -268,7 +261,6 @@ Engine.updatePosition = function(){
     }else if(Engine.player.y < Engine.player.previousPosition.y) { // up
         Engine.player.orientation = 'up';
     }
-    console.log(Engine.player.orientation);
     Engine.player.previousPosition = {
         x: Engine.player.x,
         y: Engine.player.y
@@ -325,9 +317,8 @@ Engine.updateMarker = function(tile){
 
 Engine.checkCollision = function(tile){ // tile is x, y pair
     if(Engine.displayedChunks.length < 4) return; // If less than 4, it means that wherever you are the chunks haven't finished displaying
-    console.log(Engine.collisions);
-    console.log(tile.x+', '+tile.y);
-    return Engine.collisions[tile.y][tile.x];
+    if(!Engine.collisions[tile.y]) return false;
+    return !!Engine.collisions[tile.y][tile.x];
 };
 
 /*

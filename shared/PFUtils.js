@@ -7,7 +7,10 @@ if(onServer){
     PF = require('./pathfinding.js');
 }
 
-var PFUtils = {};
+var PFUtils = {
+    //speed: 160 // 160px/sec
+    speed: 5 // tiles/sec
+};
 /* The handler captures all queries to the object, be it with [] or .
  *  Since it captures queries with ., it also captures method calls.
  *  All the queries are processed by get, which checks if the key corresponds
@@ -48,7 +51,7 @@ PFUtils.firstDimensionHandler = {
         if(key in target.__proto__) {
             return target.__proto__[key];
         }else{
-            if(!target.hasOwnProperty(key))target[key] = {};
+            if(!target.hasOwnProperty(key)) target[key] = {};
             target[key].firstDim = key; // trick to carry along what was the first dimension
             return new Proxy(target[key], PFUtils.secondDimensionHandler);
         }
@@ -64,6 +67,25 @@ PFUtils.getFInder = function(){
 
 PFUtils.isWalkable = function(x, y) {
     return this.nodes[y][x].walkable;
+};
+
+PFUtils.getDuration = function(sx,sy,ex,ey){ // Compute movement duration, units are tiles and seconds
+    // v = d/t <=> t = d/v
+    // v = 160px/sec
+    // px/(px/sec)
+    //console.log(sx+', '+sy+', '+ex+', '+ey);
+    var d = PFUtils.euclidean({
+        x: sx,
+        y: sy
+    },{
+        x: ex,
+        y: ey
+    });
+    return d/PFUtils.speed;
+};
+
+PFUtils.euclidean = function(a,b){
+    return Math.sqrt(Math.pow(a.x-b.x,2)+Math.pow(a.y- b.y,2));
 };
 
 if (onServer) module.exports.PFUtils = PFUtils;
