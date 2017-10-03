@@ -46,7 +46,8 @@ appearance and behaviour, reduced code visibility, and possibly *no* node-module
 - Testing (make part of the pipeline)
 -----
 * World editor:
-- Fix all anomalies
+- Do not create chunk files for chunks which contain only water (sum(data) = nbChunks*292)
+- Check usefulness of addCorners
 
 
 Axes of progress:

@@ -213,15 +213,8 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
             if(i > 0) addTiles.shift();
             tiles = tiles.concat(addTiles);
         }
-        // TODO: make this a smoothing function
-        for(var i = tiles.length-2; i >= 0; i--){
-            var t = tiles[i];
-            for(var j = 1; j < 5; j++){ // knots & duplicates
-                if(i+j > tiles.length-1) continue;
-                var old= tiles[i+j];
-                if(t.x == old.x && t.y == old.y) tiles.splice(i+1,j);
-            }
-        }
+
+        // Forward loop to add tiles
         // TODO: integrate this with addCorners
         for(var i = 0; i < tiles.length-1; i++){
             var t = tiles[i];
@@ -242,7 +235,14 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
                 });
                 i++;
             }
-            if(dx == 2 && dy == 0){
+            if(dx == -1 && dy == 1){ // angle bottom-left
+                tiles.splice(i+1,0,{
+                    x: t.x,
+                    y: t.y+1
+                });
+                i++;
+            }
+            if(dx == 2 && dy == 0){ // horizontal gap
                 tiles.splice(i+1,0,{
                     x: t.x+1,
                     y: t.y
@@ -250,7 +250,21 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
                 i++;
             }
         }
-        //console.log(JSON.stringify(tiles));
+        // Backward loop to remove tiles ; goes clockwise
+        // TODO: make this a smoothing function
+        for(var i = tiles.length-1; i >= 0; i--){
+            var t = tiles[i];
+            var bnf = false; // back and forth between tiles
+            for(var j = 1; j < 7; j++){ // knots & duplicates
+                var idx = i + j;
+                if(idx > tiles.length-1) idx -= tiles.length;
+                var old= tiles[idx];
+                if(t.x == old.x && t.y == old.y) tiles.splice(i+1,j); // remove j points corresponding to size of knot
+                if(Math.abs(t.y - old.y) > j) bnf = true;
+                if(Math.abs(t.x - old.x) > j) console.log('horizontal bnf at '+ t.x+', '+ t.y);
+            }
+            if(bnf) tiles.splice(i,1);
+        }
 
         //var northShore = [Gaia.W.top, Gaia.W.topLeftOut, Gaia.W.topRightOut, Gaia.W.bottomRightOut, Gaia.W.bottomLeftOut]; //Gaia.W.bottomLeftOut,
         //var southShore = [Gaia.W.bottom, Gaia.W.topRightIn, Gaia.W.bottomRightIn, Gaia.W.bottomLeftIn, Gaia.W.topLeftIn]; // Gaia.W.bottomLeftIn, Gaia.W.topLeftIn
@@ -320,18 +334,12 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
             }
         }
 
-
-        busy.add(800,129,1); // TODO fix!
-        busy.add(383,436,1);
-        busy.add(365,443,1);
-        busy.add(341,450,1);
-        busy.add(294,471,1);
-
+        //  Filling algorithm
         var fillNode = {
             x: 753,
             y: 240
         };
-        var searched = new Set();
+
         var queue = [];
         queue.push(fillNode);
         var fillTiles = [];
@@ -339,8 +347,6 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
         var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
         while(queue.length > 0){
             var node = queue.shift();
-            //console.log(node);
-            if(searched.has(hashNode(node))) continue;
             if(isBusy(node,busy)) continue;
             // put a tile at location
             fillTiles.push(node);
@@ -355,8 +361,6 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
 
                 if(!isBusy(candidate,busy)) queue.push(candidate);
             }
-            // add to searched
-            searched.add(hashNode(node));
 
             counter++;
             if(counter > 392000){
@@ -371,19 +375,12 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
             addTile(tile.x, tile.y, Gaia.Shore.water, chunks);
         }
 
-        //writeFiles(outdir,chunks);
+        writeFiles(outdir,chunks);
     });
 }
 
 function isBusy(node,busy){
     return !!busy.get(node.x,node.y);
-    /*var id = Utils.tileToAOI({x: node.x, y: node.y});
-    var chunk = chunks[id];
-    var origin = Utils.AOItoTile(id);
-    var cx = node.x - origin.x;
-    var cy = node.y - origin.y;
-    var idx = Utils.gridToLine(cx, cy, chunk.width);
-    return (chunk.layers[0].data[idx] > 0);*/
 }
 
 function hashNode(node){

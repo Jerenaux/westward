@@ -168,17 +168,6 @@ Engine.start = function(loader, resources){
         if(i > 0) addTiles.shift();
         tiles = tiles.concat(addTiles);
     }
-    for(var i = tiles.length-2; i >= 0; i--){
-        var t = tiles[i];
-        for(var j = 1; j < 5; j++){ // knots & duplicates
-            if(i+j > tiles.length-1) continue;
-            var old= tiles[i+j];
-            if(t.x == old.x && t.y == old.y){
-                //console.log('knot of size '+j+' at '+ t.x+', '+ t.y);
-                tiles.splice(i+1,j); // remove j points corresponding to size of knot
-            }
-        }
-    }
 
     for(var i = 0; i < tiles.length-1; i++){
         var t = tiles[i];
@@ -192,14 +181,21 @@ Engine.start = function(loader, resources){
             });
             i++;
         }
-        if(dx == 1 && dy == -1){
+        if(dx == 1 && dy == -1){ // angle top-right
             tiles.splice(i+1,0,{
                 x: t.x+1,
                 y: t.y
             });
             i++;
         }
-        if(dx == 2 && dy == 0){
+        if(dx == -1 && dy == 1){ // angle bottom-left
+            tiles.splice(i+1,0,{
+                x: t.x,
+                y: t.y+1
+            });
+            i++;
+        }
+        if(dx == 2 && dy == 0){ // horizontal gap
             tiles.splice(i+1,0,{
                 x: t.x+1,
                 y: t.y
@@ -208,31 +204,30 @@ Engine.start = function(loader, resources){
         }
     }
 
+    for(var i = tiles.length-1; i >= 0; i--){
+        var t = tiles[i];
+        var bnf = false; // back and forth between tiles
+        for(var j = 1; j < 7; j++){ // knots & duplicates
+            var idx = i + j;
+            if(idx > tiles.length-1) idx -= tiles.length;
+            var old= tiles[idx];
+            if(t.x == old.x && t.y == old.y) tiles.splice(i+1,j); // remove j points corresponding to size of knot
+            if(Math.abs(t.y - old.y) > j) bnf = true;
+            if(Math.abs(t.x - old.x) > j) console.log('horizontal bnf at '+ t.x+', '+ t.y);
+        }
+        if(bnf) tiles.splice(i,1);
+    }
+
     tiles = tiles.map(function(t){
             //console.log(t);
             return {x: t.x*32,y: t.y*32};
     });
     Engine.drawHull(tiles);
-    /*var tiles = [
-        {x:842,y:3},
-        {x:832,y:3},
-        {x:832,y:6},
-        {x:842,y:6}
-    ];
-    tiles = tiles.map(function(t){
-        return {x: t.x*32,y: t.y*32};
-    });
-    Engine.drawHull(tiles);*/
 };
 
 Engine.addHero = function(){
-    // multiple knots at: 825, 37
-    // knot at 294, 471
-    // anomaly at 673, 48 ; 563, 23; 370, 83 ; 361, 95; 347, 101 ; 327, 118 : 78, 477 ; 132, 496; 213, 476; 242, 473; 270,475
-    // 294, 475; 341, 453; 365, 445; 384, 442
-    // nice pic at 55, 312
-    var startx = 55;//744;
-    var starty = 312;//130;
+    var startx = 744;//744;
+    var starty = 130;//130;
     Engine.player = Engine.addSprite('hero',startx,starty);
     Engine.player.visible = Engine.showHero;
     Engine.player.chunk = Utils.tileToAOI({x:startx,y:starty});
