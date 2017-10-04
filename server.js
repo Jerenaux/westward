@@ -52,18 +52,15 @@ io.on('connection',function(socket){
     socket.on('init-world',function(data){
         console.log('['+socket.id+'] Initialized');
         if(data.new){
-            console.log('New player');
             //if(!gs.checkSocketID(socket.id)) return;
             gs.addNewPlayer(socket);
         }else{
-            console.log('Returning player');
             //if(!gs.checkPlayerID(data.id)) return;
             gs.loadPlayer(socket,data.id);
         }
-        //gs.addPlayer(socket);
 
-        socket.on('move',function(data){
-            gs.move(socket.id,data.x,data.y);
+        socket.on('path',function(data){
+            gs.handlePath(data,socket.id);
         });
     });
 

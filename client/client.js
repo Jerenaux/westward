@@ -88,8 +88,8 @@ Client.requestData = function(){ // request the data to be used for initWorld()
     Client.socket.emit('init-world',Client.getInitRequest());
 };
 
-Client.sendMove = function(x,y){
-    Client.socket.emit('move',{x:x,y:y});
+Client.sendPath = function(path){
+    Client.socket.emit('path',path);
 };
 
 // ####################"

@@ -1,18 +1,18 @@
-Content:
--------
+Cleaning
 * Battle system
 * Crafting
 * Exploration/travel
+* HUD
 * (Mini)map system
 * Equipment menu
 * Movement:
-* NPC
 * Player interactions
 * Settlement defense
 * Settlement economy
 * Skills menu
 * Trade
-* Tutorial
+Design document
+World building
 
 ###############
 Prototype level:
@@ -75,12 +75,20 @@ Content:
 - Settlements
 * (Mini)map system
 * Equipment menu
+* HUD/Menus:
+- Inventory
+- Skills
+- Crafting
+- Status
+- Chat
+- Notifications/News
+- Gold
+- Health
 * Movement:
-- Network (investigate smoothenPath and compressPath)
-- Hold & click
+- Broadcast paths
+- Update aoi server-side when ending path
 - Animate
 - Verticality stuff (trees canopy, etc.)
-* NPC
 * Player interactions
 - Chat
 - Give items/money
@@ -88,10 +96,10 @@ Content:
 * Settlement economy
 * Skills menu
 * Trade
-* Tutorial
 
 Design document:
 ---------------
+- Find nice to-do list system
 - Finish copying notes
 - Make Excel tables (inventory, bestiary, ...)
 - Make powerpoint
@@ -152,7 +160,17 @@ Content:
 - Increase range based on class and possible items
 * (Mini)map system
 * Equipment menu
-* Movement:
+* HUD/Menus
+- Fatigue meter
+- Minimap
+- Daily quests
+* Movement
+- Check paths and block if error
+- Keep track of player position along path on server
+- Adjust movement duration based on latency
+- Remove possible echo
+- Investigate smoothenPath and compressPath)
+- Hold & click
 * NPC
 * Settlement defense
 * Settlement economy

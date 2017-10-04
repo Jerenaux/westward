@@ -146,13 +146,10 @@ GameServer.removeFromLocation = function(entity){
     GameServer.AOIs[entity.aoi].deleteEntity(entity);
 };
 
-GameServer.move = function(socketID,x,y){
-    // TODO: update aoi field
+GameServer.handlePath = function(path,socketID){
     var player = GameServer.getPlayer(socketID);
-    player.setProperty('x',x);
-    player.setProperty('y',y);
-    player.setOrUpdateAOI();
-    console.log('['+player.id+'] Move to aoi '+player.aoi);
+    player.setProperty('path',path);
+    //player.setOrUpdateAOI();
 };
 
 GameServer.handleAOItransition = function(entity,previous){

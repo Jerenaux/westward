@@ -68,7 +68,7 @@ Engine.create = function(masterData){
 
     Engine.createMarker();
 
-    Engine.scene.input.events.on('MOUSE_DOWN_EVENT', Engine.move);
+    Engine.scene.input.events.on('MOUSE_DOWN_EVENT', Engine.computePath);
     Engine.scene.input.events.on('POINTER_MOVE_EVENT', Engine.trackMouse);
     //console.log(Engine.scene.input);
     //Engine.scene.input.setpollAlways();
@@ -108,19 +108,7 @@ Engine.addHero = function(id,x,y){
 
 Engine.addPlayer = function(id,x,y){
     if(Engine.playerIsInitialized && id == Engine.player.id) return;
-    var sprite = Engine.scene.add.sprite(x*Engine.tileWidth,y*Engine.tileHeight,'hero');
-    sprite.id = id;
-    sprite.depth = 1;
-    sprite.chunk = Utils.tileToAOI({x:x,y:y});
-    sprite.tileX = x;
-    sprite.tileY = y;
-    sprite.previousPosition = {
-            x : sprite.x,
-            y : sprite.y
-    };
-    sprite.displayOriginX = 16;
-    sprite.orientation = 'down';
-    sprite.movement = null;
+    var sprite = new Player(x,y,'hero',id);
     Engine.players[id] = sprite;
     Engine.displayedPlayers.add(id);
     return sprite;
@@ -134,18 +122,15 @@ Engine.removePlayer = function(id){
 };
 
 Engine.updateEnvironment = function(){
-    console.log('[AOI] '+Engine.player.chunk);
     var chunks = Utils.listAdjacentAOIs(Engine.player.chunk);
     var newChunks = chunks.diff(Engine.displayedChunks);
     var oldChunks = Engine.displayedChunks.diff(chunks);
 
     for (var i = 0; i < oldChunks.length; i++) {
-        //console.log('removing '+oldChunks[i]);
         Engine.removeChunk(oldChunks[i]);
     }
 
     for(var j = 0; j < newChunks.length; j++){
-        //console.log('adding '+newChunks[j]);
         Engine.displayChunk(newChunks[j]);
     }
 
@@ -160,7 +145,7 @@ Engine.updateDisplayList = function(){
     Engine.displayedPlayers.forEach(function(pid){
         var p = Engine.players[pid];
         // check if the AOI of player p is in the list of the AOI's adjacent to the main player
-        if(p) if(adjacent.indexOf(p.chunk) == -1) Game.removePlayer(p.id);
+        if(p) if(adjacent.indexOf(p.chunk) == -1) Engine.removePlayer(p.id);
     });
 };
 
@@ -211,66 +196,38 @@ Engine.isColliding = function(tile){ // tile is the index of the tile in the til
     return false;
 };
 
-Engine.move = function(event){
+Engine.computePath = function(event){
     var position = Engine.getMouseCoordinates(event);
     if(Engine.collisions.get(position.tile.y,position.tile.x) == 1) return; // y, then x!
 
     //console.log('path from '+Engine.player.tileX+', '+Engine.player.tileY+' to '+position.tile.x+', '+position.tile.y);
     Engine.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(Engine.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
     var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, position.tile.x, position.tile.y, Engine.PFgrid);
-    path.shift();
-
-    var tweens = [];
-    for(var i = 0; i < path.length; i++){
-        var sx = (i == 0 ? Engine.player.tileX : path[i-1][0]);
-        var sy = (i == 0 ? Engine.player.tileY : path[i-1][1]);
-        var ex = path[i][0];
-        var ey = path[i][1];
-        var time = PFUtils.getDuration(sx,sy,ex,ey); // in sec
-        tweens.push({
-            targets: Engine.player,
-            x: {value: ex*Engine.tileWidth, duration: time*1000},
-            y: {value: ey*Engine.tileHeight, duration: time*1000}
-        });
-    }
-
-    if(Engine.player.movement !== null) {
-        Engine.player.movement.stop();
-        Engine.updatePosition();
-    }
-    Engine.player.lastUpdateStamp = Date.now();
-    Engine.player.movement = Engine.scene.tweens.timeline({
-        tweens: tweens,
-        onUpdate: function(){
-            if(Date.now() - Engine.player.lastUpdateStamp > 200){
-                Engine.updatePosition();
-                Engine.player.lastUpdateStamp = Date.now();
-            }
-        },
-        onComplete: Engine.updatePosition
-    });
+    Client.sendPath(path);
+    Engine.player.move(path);
 };
 
-Engine.updatePosition = function(){
-    if(Engine.player.x > Engine.player.previousPosition.x){ // right
-        Engine.player.orientation = 'right';
-    }else if(Engine.player.x < Engine.player.previousPosition.x) { // left
-        Engine.player.orientation = 'left';
-    }else if(Engine.player.y > Engine.player.previousPosition.y) { // down
-        Engine.player.orientation = 'down';
-    }else if(Engine.player.y < Engine.player.previousPosition.y) { // up
-        Engine.player.orientation = 'up';
+Engine.updatePosition = function(player){
+    if(player.x > player.previousPosition.x){ // right
+        player.orientation = 'right';
+    }else if(player.x < player.previousPosition.x) { // left
+        player.orientation = 'left';
+    }else if(player.y > player.previousPosition.y) { // down
+        player.orientation = 'down';
+    }else if(player.y < player.previousPosition.y) { // up
+        player.orientation = 'up';
     }
-    Engine.player.previousPosition = {
-        x: Engine.player.x,
-        y: Engine.player.y
+    player.previousPosition = {
+        x: player.x,
+        y: player.y
     };
-    Engine.player.tileX = Math.floor(Engine.player.x/Engine.tileWidth);
-    Engine.player.tileY = Math.floor(Engine.player.y/Engine.tileHeight);
-    Engine.player.chunk = Utils.tileToAOI({x:Engine.player.tileX,y:Engine.player.tileY});
-    if(Engine.player.chunk != Engine.player.previousChunk) Engine.updateEnvironment();
-    Engine.player.previousChunk = Engine.player.chunk;
-    //Client.sendMove(position.tile.x,position.tile.y);
+    player.tileX = Math.floor(player.x/Engine.tileWidth);
+    player.tileY = Math.floor(player.y/Engine.tileHeight);
+    if(player.id == Engine.player.id) {
+        player.chunk = Utils.tileToAOI({x: player.tileX, y: player.tileY});
+        if (player.chunk != player.previousChunk) Engine.updateEnvironment();
+        player.previousChunk = player.chunk;
+    }
 };
 
 Engine.getMouseCoordinates = function(event){
@@ -282,12 +239,6 @@ Engine.getMouseCoordinates = function(event){
         tile:{x:tileX,y:tileY},
         pixel:{x:pxX,y:pxY}
     };
-};
-
-Engine.moveSprite = function(id,x,y){
-    var player = Engine.players[id];
-    player.x = x*Engine.tileWidth;
-    player.y = y*Engine.tileHeight;
 };
 
 Engine.trackMouse = function(event){
@@ -354,8 +305,9 @@ Engine.traverseUpdateObject = function(obj,table,callback){
     });
 };
 
-Engine.updatePlayer = function(player,info){ // info contains the updated data from the server
-    if(info.x || info.y) Engine.moveSprite(player.id,info.x,info.y);
+Engine.updatePlayer = function(player,data){ // data contains the updated data from the server
+    if(player.id == Engine.player.id) return;
+    if(data.path) player.move(data.path);
 };
 
 Engine.update = function(){
