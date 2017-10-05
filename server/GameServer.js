@@ -7,6 +7,7 @@ var ObjectId = require('mongodb').ObjectID;
 
 var GameServer = {
     lastPlayerID: 0,
+    lastBuildingID: 0,
     players: {}, // player.id -> player
     socketMap: {}, // socket.id -> player.id
     nbConnectedChanged: false
@@ -18,12 +19,15 @@ var Utils = require('../shared/Utils.js').Utils;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var AOI = require('./AOI.js').AOI;
 var Player = require('./Player.js').Player;
+var Building = require('./Building.js').Building;
 var PF = require('../shared/pathfinding.js');
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 GameServer.readMap = function(mapsPath){
     var masterData = JSON.parse(fs.readFileSync(mapsPath+'/master.json').toString());
 
+    //Utils.tileWidth = masterData.tileWidth;
+    //Utils.tileHeight = masterData.tileHeight;
     Utils.chunkWidth = masterData.chunkWidth;
     Utils.chunkHeight = masterData.chunkHeight;
     Utils.nbChunksHorizontal = masterData.nbChunksHoriz;
@@ -46,11 +50,15 @@ GameServer.readMap = function(mapsPath){
     // Replaces the isWalkableAt method of the PF library
     PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
 
-    console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
+    // Read buildings
+    var buildings = JSON.parse(fs.readFileSync('./assets/maps/buildings.json').toString());
+    for(var bid in buildings){
+        if(!buildings.hasOwnProperty(bid)) return;
+        var data = buildings[bid];
+        GameServer.addAtLocation(new Building(data.x,data.y,data.sprite));
+    }
 
-    /*GameServer.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(GameServer.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
-    var path = GameServer.PFfinder.findPath(468, 125, 476, 127, GameServer.PFgrid);
-    console.log(path);*/
+    console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
 };
 
 GameServer.getPlayer = function(socketID){
@@ -134,26 +142,28 @@ GameServer.getAOIAt = function(x,y){
 
 GameServer.addAtLocation = function(entity){
     // Add some entity to all the data structures related to position (e.g. the AOI)
-    /*var map = GameServer.getSpaceMap(entity);
-    map.add(entity.x,entity.y,entity);¨*/
     GameServer.AOIs[entity.aoi].addEntity(entity,null);
+    // the "entities" of an AOI list what things are present in it; it's distinct from adding and object to an AOI
+    // (GameServer.addObjectToAOI() which actually adds the object to the update packages so that it can be created by
+    // the clients)
 };
 
 GameServer.removeFromLocation = function(entity){
     // Remove an entity from all data structures related to position (spaceMap and AOI)
-    /*var map = GameServer.getSpaceMap(entity);
-    map.delete(entity.x,entity.y,entity);*/
     GameServer.AOIs[entity.aoi].deleteEntity(entity);
 };
 
 GameServer.handlePath = function(path,socketID){
     var player = GameServer.getPlayer(socketID);
     player.setProperty('path',path);
+    /*GameServer.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(GameServer.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
+     var path = GameServer.PFfinder.findPath(468, 125, 476, 127, GameServer.PFgrid);
+     console.log(path);*/
     //player.setOrUpdateAOI();
 };
 
 GameServer.handleAOItransition = function(entity,previous){
-    // When something moves from one AOI to another, identify which AOIs should be notified and update them
+    // When something moves from one AOI to another (or appears inside an AOI), identify which AOIs should be notified and update them
     var AOIs = Utils.listAdjacentAOIs(entity.aoi);
     if(previous){
         var previousAOIs = Utils.listAdjacentAOIs(previous);

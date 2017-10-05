@@ -12,6 +12,8 @@ var Engine = {
 
 Engine.preload = function() {
     this.load.image('hero', 'assets/sprites/hero.png');
+    this.load.image('fort', 'assets/sprites/buildings/fort.png');
+    this.load.atlas('UI', 'assets/sprites/megaset-0.png', 'assets/sprites/megaset-0.json');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
 
     Engine.collidingTiles = [];
@@ -55,7 +57,9 @@ Engine.create = function(masterData){
     Engine.mapDataCache = {};
 
     Engine.players = {}; // player.id -> player
+    Engine.buildings = {}; // building.id -> building
     Engine.displayedPlayers = new Set();
+    Engine.displayedBuildings = new Set();
 
     Engine.debug = true;
     Engine.showHero = Engine.debug ? Utils.getPreference('showHero',true) : true;
@@ -79,6 +83,7 @@ Engine.create = function(masterData){
     // Replaces the isWalkableAt method of the PF library
     PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
 
+    Engine.created = true;
     Client.requestData();
 };
 
@@ -99,11 +104,12 @@ Engine.initWorld = function(data){
 };
 
 Engine.addHero = function(id,x,y){
-    console.log('adding at '+x+', '+y);
     Engine.player = Engine.addPlayer(id,x,y);
     Engine.player.visible = Engine.showHero;
     Engine.camera.startFollow(Engine.player);
     Engine.updateEnvironment();
+    var img = Engine.scene.add.image(x*Engine.tileWidth,y*Engine.tileHeight,'UI','cactuar');
+    img.depth = 1;
 };
 
 Engine.addPlayer = function(id,x,y){
@@ -115,6 +121,7 @@ Engine.addPlayer = function(id,x,y){
 };
 
 Engine.removePlayer = function(id){
+    console.log('removing player '+id);
     var sprite = Engine.players[id];
     sprite.destroy();
     Engine.displayedPlayers.delete(id);
@@ -134,18 +141,29 @@ Engine.updateEnvironment = function(){
         Engine.displayChunk(newChunks[j]);
     }
 
-    Engine.updateDisplayList();
+    Engine.updateDisplayedEntities();
 };
 
-Engine.updateDisplayList = function(){
+Engine.updateDisplayedEntities = function(){
     // Whenever the player moves to a different AOI, for each player displayed in the game, check if it will still be
     // visible from the new AOI; if not, remove it
-    if(!Engine.displayedPlayers) return;
+    if(!Engine.created) return;
     var adjacent = Utils.listAdjacentAOIs(Engine.player.chunk);
-    Engine.displayedPlayers.forEach(function(pid){
+    Engine.updateDisplay(Engine.displayedPlayers,Engine.players,adjacent,Engine.removePlayer);
+    Engine.updateDisplay(Engine.displayedBuildings,Engine.buildings,adjacent,Engine.removeBuilding);
+    /*Engine.displayedPlayers.forEach(function(pid){
         var p = Engine.players[pid];
         // check if the AOI of player p is in the list of the AOI's adjacent to the main player
         if(p) if(adjacent.indexOf(p.chunk) == -1) Engine.removePlayer(p.id);
+    });*/
+};
+
+Engine.updateDisplay = function(list,map,adjacent,removalCallback){
+    list.forEach(function(id){
+        var p = map[id];
+        if(!p.chunk) console.log('WARNING: no chunk defined for '+p);
+        // check if the AOI of entity p is in the list of the AOI's adjacent to the main player
+        if(p) if(adjacent.indexOf(p.chunk) == -1) removalCallback(p.id);
     });
 };
 
@@ -272,6 +290,23 @@ Engine.checkCollision = function(tile){ // tile is x, y pair
     return !!Engine.collisions[tile.y][tile.x];
 };
 
+Engine.addBuilding = function(id,x,y,sprite){
+    var building = Engine.scene.add.sprite(x*Engine.tileWidth,y*Engine.tileHeight,sprite);
+    building.id = id;
+    building.chunk = Utils.tileToAOI({x:x,y:y});
+    Engine.buildings[id] = building;
+    Engine.displayedBuildings.add(id);
+    return building;
+};
+
+Engine.removeBuilding = function(id){
+    console.log('removing building '+id);
+    var sprite = Engine.buildings[id];
+    sprite.destroy();
+    Engine.displayedBuildings.delete(id);
+    delete Engine.buildings[id];
+};
+
 /*
 * #### UPDATE CODE #####
 * */
@@ -284,6 +319,13 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
             Engine.addPlayer(p.id, p.x, p.y);
         }
         //if (data.newplayers.length > 0) Game.sortEntities(); // Sort entitites according to y coordinate to make them render properly above each other
+    }
+
+    if(data.newbuildings) {
+        for (var n = 0; n < data.newbuildings.length; n++) {
+            var b = data.newbuildings[n];
+            Engine.addBuilding(b.id, b.x, b.y, b.sprite);
+        }
     }
 
     if(data.disconnected) { // data.disconnected is an array of disconnected players

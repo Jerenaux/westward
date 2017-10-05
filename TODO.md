@@ -3,7 +3,6 @@ Cleaning
 * Crafting
 * Exploration/travel
 * HUD
-* (Mini)map system
 * Equipment menu
 * Movement:
 * Player interactions
@@ -12,6 +11,7 @@ Cleaning
 * Skills menu
 * Trade
 Design document
+Polish
 World building
 
 ###############
@@ -73,7 +73,6 @@ Content:
 * Exploration/travel
 - Have a permanent presence of a few pickup items around settlements
 - Settlements
-* (Mini)map system
 * Equipment menu
 * HUD/Menus:
 - Inventory
@@ -85,14 +84,15 @@ Content:
 - Gold
 - Health
 * Movement:
-- Broadcast paths
 - Update aoi server-side when ending path
+- Create collision tiles at building locations
 - Animate
 - Verticality stuff (trees canopy, etc.)
 * Player interactions
 - Chat
 - Give items/money
 * Settlement defense
+
 * Settlement economy
 * Skills menu
 * Trade
@@ -104,6 +104,21 @@ Design document:
 - Make Excel tables (inventory, bestiary, ...)
 - Make powerpoint
 - Tidy up (charts, tables, Latex formulas...)
+
+Polish:
+------
+- Mouse cursor; changes over buttons and buildings (differently if possible)
+- Highlight buttons and buildings on hover
+- Custom movement marker
+- Sound effects when clicking (for moving, on buttons in menus, sounds of shuffling pages...)
+- Noise when walking
+- Noise when clicking on building (each building its noise)
+- Noise when clicking on non-walkable tile
+- Polish existing content
+- Footsteps, light effects, sound effects (on actions + environment: birds, water, ...)
+- HUD, title screen, animations ...
+- Animal noises when beasts in proximity, animal footsteps, player footsteps noise
+- Carcasses, traces of fight
 
 World building:
 --------------
@@ -164,6 +179,7 @@ Content:
 - Fatigue meter
 - Minimap
 - Daily quests
+* (Mini)map system
 * Movement
 - Check paths and block if error
 - Keep track of player position along path on server
@@ -190,13 +206,6 @@ Deployment:
 - Tool to automatically merge all graphic assets in atlases?
 - Secure chunk access? (check client position before serving)
 
-Polish:
-------
-- Polish existing content
-- Footsteps, light effects, sound effects (on actions + environment: birds, water, ...)
-- HUD, title screen, animations ...
-- Animal noises when beasts in proximity, animal footsteps, player footsteps noise
-- Carcasses, traces of fight
 
 Testing:
 -------

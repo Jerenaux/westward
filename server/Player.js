@@ -66,10 +66,6 @@ Player.prototype.getDataFromDb = function(document){
     //this.equip(2,document['armor']);
 };
 
-Player.prototype.setOrUpdateAOI = function(){
-    this.aoi = Utils.tileToAOI({x:this.x,y:this.y});
-};
-
 Player.prototype.getIndividualUpdatePackage = function(){
     if(this.updatePacket.isEmpty()) return null;
     var pkg = this.updatePacket;

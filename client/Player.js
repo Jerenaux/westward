@@ -1,13 +1,6 @@
 /**
  * Created by Jerome on 04-10-17.
  */
-/*function Player(x,y,sprite){
-    Phaser.GameObjects.Sprite.call(this,Engine.scene,x,y,sprite);
-}
-
-Player.prototype = Object.create(Phaser.GameObjects.Sprite);
-Player.prototype.constructor = Player;*/
-
 var Player = new Phaser.Class({
 
     Extends: Phaser.GameObjects.Sprite,

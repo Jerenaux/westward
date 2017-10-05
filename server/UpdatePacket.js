@@ -4,6 +4,7 @@
 
 function UpdatePacket(){
     this.newplayers = []; // new player objects to add to the world
+    this.newbuildings = [];
     this.players = {}; // list of player objects already existing for which properties have been updated
     this.disconnected = []; // list of id's of disconnected players since last update
     /*this.newitems = [];
@@ -18,6 +19,9 @@ UpdatePacket.prototype.addObject = function(object){
     switch(object.constructor.name){
         case 'Player':
             arr = this.newplayers;
+            break;
+        case 'Building':
+            arr = this.newbuildings;
             break;
         /*case 'item':
             arr = this.newitems;
@@ -96,6 +100,7 @@ UpdatePacket.prototype.isEmpty = function(){
     if(this.newmonsters.length > 0) return false;*/
     if(this.disconnected.length > 0) return false;
     if(this.newplayers.length > 0) return false;
+    if(this.newbuildings.length > 0) return false;
     if(Object.keys(this.players).length > 0) return false;
     return true;
 };
@@ -107,6 +112,7 @@ UpdatePacket.prototype.clean = function(){
     if(!this.newmonsters.length) delete this.newmonsters;*/
     if(!this.disconnected.length) delete this.disconnected;
     if(!this.newplayers.length) delete this.newplayers;
+    if(!this.newbuildings.length) delete this.newbuildings;
     if(!Object.keys(this.players).length) delete this.players;
     return this;
 };
