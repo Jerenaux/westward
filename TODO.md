@@ -85,6 +85,7 @@ Content:
 - Health
 * Movement:
 - Update aoi server-side when ending path
+- Make new players move if path
 - Create collision tiles at building locations
 - Animate
 - Verticality stuff (trees canopy, etc.)

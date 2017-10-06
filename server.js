@@ -38,7 +38,7 @@ server.listen(process.env.PORT || 8081,function(){
         server.db = db;
         console.log('Connection to db established');
         gs.readMap(process.env.MAPS_PATH);
-        server.setUpdateLoop();
+        server.setUpdateLoops();
     });
 });
 
@@ -46,6 +46,7 @@ var gs = require('./server/GameServer.js').GameServer;
 gs.server = server;
 
 server.clientUpdateRate = 1000/5; // Rate at which update packets are sent
+server.walkUpdateRate = 1000/20; // Rate at which positions are updated
 
 io.on('connection',function(socket){
 
@@ -95,8 +96,9 @@ io.on('connection',function(socket){
     }
 });
 
-server.setUpdateLoop = function(){
+server.setUpdateLoops = function(){
     setInterval(gs.updatePlayers,server.clientUpdateRate);
+    setInterval(gs.updateWalks,server.walkUpdateRate);
 };
 
 server.sendInitializationPacket = function(socket,packet){

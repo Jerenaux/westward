@@ -3,6 +3,7 @@
  */
 
 var Utils = require('../shared/Utils.js').Utils;
+var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var PersonalUpdatePacket = require('./PersonalUpdatePacket.js').PersonalUpdatePacket;
 var GameObject = require('./GameObject.js').GameObject;
 var GameServer = require('./GameServer.js').GameServer;
@@ -31,7 +32,7 @@ Player.prototype.setStartingPosition = function(){
 Player.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id']; // list of properties relevant for the client
+    var broadcastProperties = ['id','path']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -71,6 +72,40 @@ Player.prototype.getIndividualUpdatePackage = function(){
     var pkg = this.updatePacket;
     this.updatePacket = new PersonalUpdatePacket();
     return pkg;
+};
+
+Player.prototype.setPath = function(path){
+    this.setProperty('path',path);
+    this.updatePathTick();
+    this.moving = true;
+};
+
+Player.prototype.updatePathTick = function(){
+    this.nextPathTick = Date.now() + PFUtils.getDuration(
+            this.x,
+            this.y,
+            this.path[1][0],
+            this.path[1][1]
+        )*1000;
+};
+
+Player.prototype.updateWalk = function(){
+    if(Date.now() >= this.nextPathTick){
+        this.path.shift();
+        this.updatePosition(this.path[0][0],this.path[0][1]);
+        console.log('['+this.id+'] Now at '+this.x+', '+this.y);
+        if(this.path.length == 1){
+            this.moving = false;
+        }else{
+            this.updatePathTick();
+        }
+    }
+};
+
+Player.prototype.updatePosition = function(x,y){
+    this.x = x;
+    this.y = y;
+    this.setOrUpdateAOI();
 };
 
 module.exports.Player = Player;

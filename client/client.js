@@ -68,7 +68,7 @@ Client.socket.on('update',function(data){ // This event triggers uppon receiving
     //if(data.latency) Game.setLatency(data.latency);
     //if(data.latency) console.log('[lat] '+data.latency+' ms');
     //console.log(data.local);
-    //console.log(data.global);
+    console.log(data.global);
     if(data.global) Engine.updateWorld(data.global);
     //if(data.local) Game.updateSelf(data.local);
 });

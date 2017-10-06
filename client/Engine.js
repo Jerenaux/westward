@@ -12,6 +12,12 @@ var Engine = {
 
 Engine.preload = function() {
     this.load.image('hero', 'assets/sprites/hero.png');
+
+    this.load.image('scroll', 'assets/sprites/scroll.png');
+    this.load.image('tome', 'assets/sprites/tome.png');
+    this.load.image('tools', 'assets/sprites/tools.png');
+    this.load.image('backpack', 'assets/sprites/backpack.png');
+
     this.load.image('fort', 'assets/sprites/buildings/fort.png');
     this.load.atlas('megaset', 'assets/sprites/megaset-0.png', 'assets/sprites/megaset-0.json');
     this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
@@ -95,10 +101,23 @@ Engine.createMarker = function(){
 };
 
 Engine.initWorld = function(data){
+    Engine.makeUI();
     Engine.addHero(data.id,data.x,data.y);
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     // TODO: when all chunks loaded, fade-out Boot scene
+};
+
+Engine.makeUI = function(){
+    var UIelements = [];
+    UIelements.push(Engine.scene.add.sprite(800,550,'backpack'));
+    UIelements.push(Engine.scene.add.sprite(850,550,'tools'));
+    UIelements.push(Engine.scene.add.sprite(900,550,'tome'));
+    UIelements.push(Engine.scene.add.sprite(950,550,'scroll'));
+    UIelements.forEach(function(e){
+        e.depth = 1;
+        e.setScrollFactor(0);
+    });
 };
 
 Engine.addHero = function(id,x,y){
@@ -291,6 +310,7 @@ Engine.checkCollision = function(tile){ // tile is x, y pair
 Engine.addBuilding = function(id,x,y,sprite){
     var building = Engine.scene.add.sprite(x*Engine.tileWidth,y*Engine.tileHeight,sprite);
     building.id = id;
+    building.depth = 1;
     building.chunk = Utils.tileToAOI({x:x,y:y});
     building.setInteractive();
     Engine.buildings[id] = building;
@@ -299,7 +319,6 @@ Engine.addBuilding = function(id,x,y,sprite){
 };
 
 Engine.removeBuilding = function(id){
-    console.log('removing building '+id);
     var sprite = Engine.buildings[id];
     sprite.destroy();
     Engine.displayedBuildings.delete(id);

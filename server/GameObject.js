@@ -9,7 +9,13 @@ var GameServer = require('./GameServer.js').GameServer;
 function GameObject(){}
 
 GameObject.prototype.setOrUpdateAOI = function(){
-    this.aoi = Utils.tileToAOI({x:this.x,y:this.y});
+    var previousAOI = (this.aoi !== undefined ? this.aoi : null);
+    var newAOI = Utils.tileToAOI({x:this.x,y:this.y});
+    if(newAOI != previousAOI) {
+        this.aoi = newAOI;
+        console.log('['+this.id+'] moving to AOI '+this.aoi);
+        GameServer.handleAOItransition(this, previousAOI);
+    }
 };
 
 GameObject.prototype.setProperty = function(property,value){

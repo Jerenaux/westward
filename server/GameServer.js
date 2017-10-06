@@ -155,7 +155,8 @@ GameServer.removeFromLocation = function(entity){
 
 GameServer.handlePath = function(path,socketID){
     var player = GameServer.getPlayer(socketID);
-    player.setProperty('path',path);
+    //player.setProperty('path',path);
+    player.setPath(path);
     /*GameServer.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(GameServer.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
      var path = GameServer.PFfinder.findPath(468, 125, 476, 127, GameServer.PFgrid);
      console.log(path);*/
@@ -175,6 +176,7 @@ GameServer.handleAOItransition = function(entity,previous){
         if(entity.constructor.name == 'Player') entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
         GameServer.addObjectToAOI(aoi,entity);
     });
+    //if(entity.constructor.name == 'Player') console.log('new AOIS : ',entity.newAOIs);
 };
 
 GameServer.updatePlayers = function(){ //Function responsible for setting up and sending update packets to clients
@@ -221,4 +223,11 @@ GameServer.addDisconnectToAOI = function(aoi,playerID) {
 GameServer.updateAOIproperty = function(aoi,category,id,property,value) {
     GameServer.AOIs[aoi].updatePacket.updateProperty(category, id, property, value);
     GameServer.dirtyAOIs.add(aoi);
+};
+
+GameServer.updateWalks = function(){
+    Object.keys(GameServer.players).forEach(function(key) {
+        var p = GameServer.players[key];
+        if(p.moving) p.updateWalk();
+    });
 };
