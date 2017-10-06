@@ -88,11 +88,11 @@ Content:
 - Create collision tiles at building locations
 - Animate
 - Verticality stuff (trees canopy, etc.)
+- Hit areas to walk along buildings
 * Player interactions
 - Chat
 - Give items/money
 * Settlement defense
-
 * Settlement economy
 * Skills menu
 * Trade

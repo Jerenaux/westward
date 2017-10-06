@@ -1,0 +1,40 @@
+{
+  "frames":[
+    {
+      "filename": "panel-topleft",
+      "frame": {"x":16,"y":40,"w":32,"h":32}
+    },
+    {
+      "filename": "panel-top",
+      "frame": {"x":49,"y":40,"w":32,"h":32}
+    },
+    {
+      "filename": "panel-topright",
+      "frame": {"x":82,"y":40,"w ":32,"h":32}
+    },
+    {
+      "filename": "panel-left",
+      "frame": {"x":478,"y":24,"w":32,"h":32}
+    },
+    {
+      "filename": "panel-center",
+      "frame": {"x":511,"y":24,"w":32,"h":32}
+    },
+    {
+      "filename": "panel-right",
+      "frame": {"x":544,"y":24,"w":32,"h":32}
+    },
+    {
+      "filename": "panel-bottomleft",
+      "frame": {"x":478,"y":80,"w":32,"h":32}
+    },
+    {
+      "filename": "panel-bottom",
+      "frame": {"x":511,"y":80,"w":32,"h":32}
+    },
+    {
+      "filename": "panel-bottomright",
+      "frame": {"x":544,"y":80,"w":32,"h":32}
+    }
+  ]
+}

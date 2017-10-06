@@ -13,7 +13,8 @@ var Engine = {
 Engine.preload = function() {
     this.load.image('hero', 'assets/sprites/hero.png');
     this.load.image('fort', 'assets/sprites/buildings/fort.png');
-    this.load.atlas('UI', 'assets/sprites/megaset-0.png', 'assets/sprites/megaset-0.json');
+    this.load.atlas('megaset', 'assets/sprites/megaset-0.png', 'assets/sprites/megaset-0.json');
+    this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
 
     Engine.collidingTiles = [];
@@ -72,10 +73,8 @@ Engine.create = function(masterData){
 
     Engine.createMarker();
 
-    Engine.scene.input.events.on('MOUSE_DOWN_EVENT', Engine.computePath);
+    Engine.scene.input.events.on('POINTER_DOWN_EVENT', Engine.handleClick);
     Engine.scene.input.events.on('POINTER_MOVE_EVENT', Engine.trackMouse);
-    //console.log(Engine.scene.input);
-    //Engine.scene.input.setpollAlways();
 
     Engine.collisions = new SpaceMap(); // contains 1 for the coordinates that are non-walkables
     Engine.PFgrid = new PF.Grid(0,0); // grid placeholder for the pathfinding
@@ -93,7 +92,6 @@ Engine.createMarker = function(){
     Engine.marker.depth = 1;
     Engine.marker.setDisplayOrigin(0,0);
     Engine.marker.previousTile = {x:0,y:0};
-    console.log(Engine.marker);
 };
 
 Engine.initWorld = function(data){
@@ -108,8 +106,6 @@ Engine.addHero = function(id,x,y){
     Engine.player.visible = Engine.showHero;
     Engine.camera.startFollow(Engine.player);
     Engine.updateEnvironment();
-    var img = Engine.scene.add.image(x*Engine.tileWidth,y*Engine.tileHeight,'UI','cactuar');
-    img.depth = 1;
 };
 
 Engine.addPlayer = function(id,x,y){
@@ -151,17 +147,12 @@ Engine.updateDisplayedEntities = function(){
     var adjacent = Utils.listAdjacentAOIs(Engine.player.chunk);
     Engine.updateDisplay(Engine.displayedPlayers,Engine.players,adjacent,Engine.removePlayer);
     Engine.updateDisplay(Engine.displayedBuildings,Engine.buildings,adjacent,Engine.removeBuilding);
-    /*Engine.displayedPlayers.forEach(function(pid){
-        var p = Engine.players[pid];
-        // check if the AOI of player p is in the list of the AOI's adjacent to the main player
-        if(p) if(adjacent.indexOf(p.chunk) == -1) Engine.removePlayer(p.id);
-    });*/
 };
 
 Engine.updateDisplay = function(list,map,adjacent,removalCallback){
     list.forEach(function(id){
         var p = map[id];
-        if(!p.chunk) console.log('WARNING: no chunk defined for '+p);
+        if(p.chunk === undefined)console.log('WARNING: no chunk defined for ',p);
         // check if the AOI of entity p is in the list of the AOI's adjacent to the main player
         if(p) if(adjacent.indexOf(p.chunk) == -1) removalCallback(p.id);
     });
@@ -214,8 +205,15 @@ Engine.isColliding = function(tile){ // tile is the index of the tile in the til
     return false;
 };
 
-Engine.computePath = function(event){
-    var position = Engine.getMouseCoordinates(event);
+Engine.handleClick = function(event){
+    if(event.gameObject){
+
+    }else{
+        Engine.computePath(Engine.getMouseCoordinates(event));
+    }
+};
+
+Engine.computePath = function(position){
     if(Engine.collisions.get(position.tile.y,position.tile.x) == 1) return; // y, then x!
 
     //console.log('path from '+Engine.player.tileX+', '+Engine.player.tileY+' to '+position.tile.x+', '+position.tile.y);
@@ -294,6 +292,7 @@ Engine.addBuilding = function(id,x,y,sprite){
     var building = Engine.scene.add.sprite(x*Engine.tileWidth,y*Engine.tileHeight,sprite);
     building.id = id;
     building.chunk = Utils.tileToAOI({x:x,y:y});
+    building.setInteractive();
     Engine.buildings[id] = building;
     Engine.displayedBuildings.add(id);
     return building;
