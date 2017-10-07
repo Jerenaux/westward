@@ -2,17 +2,12 @@
  * Created by Jerome on 07-10-17.
  */
 
-/**
- * Created by Jerome on 04-10-17.
- */
 var Building = new Phaser.Class({
 
-    Extends: Phaser.GameObjects.Sprite,
+    Extends: CustomSprite,
 
     initialize: function Building (x, y, texture, id) {
-        Phaser.GameObjects.Sprite.call(this, Engine.scene, x*Engine.tileWidth, y*Engine.tileHeight, texture);
-        Engine.scene.add.displayList.add(this);
-        Engine.scene.add.updateList.add(this);
+        CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, texture);
 
         this.depth = Engine.buildingsDepth;
         this.id = id;

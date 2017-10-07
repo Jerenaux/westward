@@ -1,3 +1,12 @@
 * {
     font-family: arial;
 }
+@font-face {
+    font-family: 'belwe';
+    src: url('/assets/fonts/belwe.otf');
+}
+.fontPreload {
+    font-family: 'belwe';
+    position: absolute;
+    left: -100px;
+}

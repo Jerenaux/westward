@@ -3,13 +3,11 @@
  */
 var Player = new Phaser.Class({
 
-    Extends: Phaser.GameObjects.Sprite,
+    Extends: CustomSprite,
 
     initialize: function Player (x, y, texture, id) {
         // Using call(), the called method will be executed while having 'this' pointing to the first argumentof call()
-        Phaser.GameObjects.Sprite.call(this, Engine.scene, x*Engine.tileWidth, y*Engine.tileHeight, texture);
-        Engine.scene.add.displayList.add(this);
-        Engine.scene.add.updateList.add(this);
+        CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, texture);
 
         this.depth = Engine.playersDepth;
         this.id = id;
@@ -25,7 +23,7 @@ var Player = new Phaser.Class({
         this.movement = null;
     },
 
-    move: function(path){
+    move: function(path){ // TODO: ask Rich how to do so using the path stuff
         path.shift();
         var tweens = [];
         for(var i = 0; i < path.length; i++){

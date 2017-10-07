@@ -8,6 +8,7 @@ var Engine = {
     tileHeight: 32,
     buildingsDepth: 2,
     playersDepth: 2,
+    UIDepth: 20,
     key: 'main', // key of the scene, for Phaser
     playerIsInitialized: false
 };
@@ -90,6 +91,9 @@ Engine.create = function(masterData){
     // Replaces the isWalkableAt method of the PF library
     PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
 
+    Engine.craftingMenuCreated = false;
+    Engine.inMenu = false;
+
     Engine.created = true;
     Client.requestData();
 };
@@ -111,20 +115,15 @@ Engine.initWorld = function(data){
 };
 
 Engine.makeUI = function(){
-    var startx = 800;
+    var startx = 780;
     var starty = 500;
     var width = 165;
     var x;
 
     var UIholder = [];
-    x = startx-20;
-    UIholder.push(Engine.scene.add.sprite(x,starty,'UI','title-left'));
-    x += 32+(width/2);
-    UIholder.push(Engine.scene.add.tileSprite(x,starty+32,width,64,'UI','title-center'));
-    x = x+(width/2);
-    UIholder.push(Engine.scene.add.sprite(x,starty,'UI','title-right'));
+    Engine.makeTitle(startx,starty,width,UIholder);
     UIholder.forEach(function(e){
-        e.depth = 20;
+        e.depth = Engine.UIDepth;
         e.setScrollFactor(0);
         if(e.constructor.name == 'Sprite'){
             //e.setDisplayOrigin(0,0);
@@ -135,22 +134,40 @@ Engine.makeUI = function(){
     });
 
     var UIelements = [];
-    x = startx-10;
-    UIelements.push(Engine.scene.add.sprite(x,starty,'backpack'));
+    x = startx+10;
+    UIelements.push(new UIElement(x,starty,'backpack',function(){
+        console.log('backpack');
+    }));
     x += 50;
-    UIelements.push(Engine.scene.add.sprite(x,starty,'tools'));
+    UIelements.push(new UIElement(x,starty,'tools',Engine.displayCraftingMenu));
     x += 50;
-    UIelements.push(Engine.scene.add.sprite(x,starty,'tome'));
+    UIelements.push(new UIElement(x,starty,'tome',function(){
+        console.log('tome');
+    }));
     x += 50;
-    UIelements.push(Engine.scene.add.sprite(x,starty,'scroll'));
-    UIelements.forEach(function(e){
-        e.depth = 21;
-        e.setScrollFactor(0);
-        e.setInteractive();
-        //e.setDisplayOrigin(0,0);
-        e.displayOriginX = 0;
-        e.displayOriginY = 0;
-    });
+    UIelements.push(new UIElement(x,starty,'scroll',function(){
+        console.log('scroll');
+    }));
+};
+
+Engine.makeTitle = function(x,y,width,container){
+    container.push(Engine.scene.add.sprite(x,y,'UI','title-left'));
+    x += 32+(width/2);
+    container.push(Engine.scene.add.tileSprite(x,y+32,width,64,'UI','title-center'));
+    x = x+(width/2);
+    container.push(Engine.scene.add.sprite(x,y,'UI','title-right'));
+};
+
+Engine.createCraftingMenu = function(){
+    console.log('creating menu');
+    new Menu('Craftinggggg');
+    Engine.craftingMenuCreated = true;
+};
+
+Engine.displayCraftingMenu = function(){
+    console.log('crafting menu');
+    if(!Engine.craftingMenuCreated) Engine.createCraftingMenu();
+    Engine.inMenu = true;
 };
 
 Engine.addHero = function(id,x,y){
@@ -260,9 +277,9 @@ Engine.isColliding = function(tile){ // tile is the index of the tile in the til
 Engine.handleClick = function(event){
     if(event.gameObject){
         console.log(event.gameObject.texture.key);
-        //event.gameObject.handleClick();
+        event.gameObject.handleClick();
     }else{
-        Engine.computePath(Engine.getMouseCoordinates(event));
+        if(!Engine.inMenu) Engine.computePath(Engine.getMouseCoordinates(event));
     }
 };
 
