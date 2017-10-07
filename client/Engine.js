@@ -109,14 +109,39 @@ Engine.initWorld = function(data){
 };
 
 Engine.makeUI = function(){
-    var UIelements = [];
-    UIelements.push(Engine.scene.add.sprite(800,550,'backpack'));
-    UIelements.push(Engine.scene.add.sprite(850,550,'tools'));
-    UIelements.push(Engine.scene.add.sprite(900,550,'tome'));
-    UIelements.push(Engine.scene.add.sprite(950,550,'scroll'));
-    UIelements.forEach(function(e){
-        e.depth = 1;
+    var startx = 800;
+    var starty = 500;
+    var width = 165;
+    var x;
+
+    var UIholder = [];
+    x = startx-20;
+    UIholder.push(Engine.scene.add.sprite(x,starty,'UI','title-left'));
+    x += 32+(width/2);
+    UIholder.push(Engine.scene.add.tileSprite(x,starty+32,width,64,'UI','title-center'));
+    x = x+(width/2);
+    UIholder.push(Engine.scene.add.sprite(x,starty,'UI','title-right'));
+    UIholder.forEach(function(e){
+        e.depth = 20;
         e.setScrollFactor(0);
+        if(e.constructor.name == 'Sprite') e.setDisplayOrigin(0,0);
+       // e.setInteractive();
+    });
+
+    var UIelements = [];
+    x = startx-10;
+    UIelements.push(Engine.scene.add.sprite(x,starty,'backpack'));
+    x += 50;
+    UIelements.push(Engine.scene.add.sprite(x,starty,'tools'));
+    x += 50;
+    UIelements.push(Engine.scene.add.sprite(x,starty,'tome'));
+    x += 50;
+    UIelements.push(Engine.scene.add.sprite(x,starty,'scroll'));
+    UIelements.forEach(function(e){
+        e.depth = 21;
+        e.setScrollFactor(0);
+        e.setInteractive();
+        e.setDisplayOrigin(0,0);
     });
 };
 
@@ -226,7 +251,7 @@ Engine.isColliding = function(tile){ // tile is the index of the tile in the til
 
 Engine.handleClick = function(event){
     if(event.gameObject){
-
+        console.log(event.gameObject.texture.key);
     }else{
         Engine.computePath(Engine.getMouseCoordinates(event));
     }

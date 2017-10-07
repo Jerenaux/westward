@@ -25,7 +25,7 @@ Player.prototype.setIDs = function(dbID,socketID){
 Player.prototype.setStartingPosition = function(){
     this.x = Utils.randomInt(1,21);
     this.y = Utils.randomInt(1,16);
-    this.setOrUpdateAOI();
+    //this.setOrUpdateAOI();
     console.log('Hi at ('+this.x+', '+this.y+')');
 };
 
@@ -93,7 +93,7 @@ Player.prototype.updateWalk = function(){
     if(Date.now() >= this.nextPathTick){
         this.path.shift();
         this.updatePosition(this.path[0][0],this.path[0][1]);
-        console.log('['+this.id+'] Now at '+this.x+', '+this.y);
+        //console.log('['+this.id+'] Now at '+this.x+', '+this.y);
         if(this.path.length == 1){
             this.moving = false;
         }else{

@@ -55,7 +55,8 @@ GameServer.readMap = function(mapsPath){
     for(var bid in buildings){
         if(!buildings.hasOwnProperty(bid)) return;
         var data = buildings[bid];
-        GameServer.addAtLocation(new Building(data.x,data.y,data.sprite));
+        //GameServer.addAtLocation();
+        new Building(data.x,data.y,data.sprite);
     }
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
@@ -107,7 +108,8 @@ GameServer.finalizePlayer = function(socket,player){
     GameServer.socketMap[socket.id] = player.id;
     GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
     GameServer.nbConnectedChanged = true;
-    GameServer.addAtLocation(player);
+    //GameServer.addAtLocation(player);
+    player.setOrUpdateAOI();
     console.log(GameServer.server.getNbConnected()+' connected');
 };
 
@@ -125,7 +127,6 @@ GameServer.removePlayer = function(socketID){
     var player = GameServer.getPlayer(socketID);
     if(!player) return;
     GameServer.removeFromLocation(player);
-    //player.setProperty('connected',false);
     var AOIs = Utils.listAdjacentAOIs(player.aoi);
     AOIs.forEach(function(aoi){
         GameServer.addDisconnectToAOI(aoi,player.id);

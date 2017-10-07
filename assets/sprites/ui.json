@@ -35,6 +35,18 @@
     {
       "filename": "panel-bottomright",
       "frame": {"x":544,"y":80,"w":32,"h":32}
+    },
+    {
+      "filename": "title-left",
+      "frame": {"x":16,"y":184,"w":32,"h":64}
+    },
+    {
+      "filename": "title-center",
+      "frame": {"x":49,"y":184,"w":32,"h":64}
+    },
+    {
+      "filename": "title-right",
+      "frame": {"x":82,"y":184,"w":32,"h":64}
     }
   ]
 }

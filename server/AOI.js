@@ -31,6 +31,8 @@ AOI.prototype.addEntity = function(entity,previous){
 };
 
 AOI.prototype.deleteEntity = function(entity) {
+    //console.log('[AOI '+this.id+'] '+this.entities.length+' entities');
+    console.log('[AOI '+this.id+'] Removed '+entity.constructor.name+' '+entity.id);
     var idx = this.entities.indexOf(entity);
     if (idx >= 0) this.entities.splice( idx, 1 );
     //if(entity.constructor.name == 'Player') GameServer.server.leaveRoom(entity.socketID,'AOI'+this.id);
