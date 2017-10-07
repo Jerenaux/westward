@@ -6,6 +6,8 @@ var Engine = {
     baseViewHeight: 18,
     tileWidth: 32,
     tileHeight: 32,
+    buildingsDepth: 2,
+    playersDepth: 2,
     key: 'main', // key of the scene, for Phaser
     playerIsInitialized: false
 };
@@ -124,8 +126,12 @@ Engine.makeUI = function(){
     UIholder.forEach(function(e){
         e.depth = 20;
         e.setScrollFactor(0);
-        if(e.constructor.name == 'Sprite') e.setDisplayOrigin(0,0);
-       // e.setInteractive();
+        if(e.constructor.name == 'Sprite'){
+            //e.setDisplayOrigin(0,0);
+            e.displayOriginX = 0;
+            e.displayOriginY = 0;
+        }
+        e.setInteractive();
     });
 
     var UIelements = [];
@@ -141,7 +147,9 @@ Engine.makeUI = function(){
         e.depth = 21;
         e.setScrollFactor(0);
         e.setInteractive();
-        e.setDisplayOrigin(0,0);
+        //e.setDisplayOrigin(0,0);
+        e.displayOriginX = 0;
+        e.displayOriginY = 0;
     });
 };
 
@@ -252,6 +260,7 @@ Engine.isColliding = function(tile){ // tile is the index of the tile in the til
 Engine.handleClick = function(event){
     if(event.gameObject){
         console.log(event.gameObject.texture.key);
+        //event.gameObject.handleClick();
     }else{
         Engine.computePath(Engine.getMouseCoordinates(event));
     }
@@ -333,11 +342,12 @@ Engine.checkCollision = function(tile){ // tile is x, y pair
 };
 
 Engine.addBuilding = function(id,x,y,sprite){
-    var building = Engine.scene.add.sprite(x*Engine.tileWidth,y*Engine.tileHeight,sprite);
-    building.id = id;
+    var building = new Building(x,y,sprite,id);
+    //var building = Engine.scene.add.sprite(x*Engine.tileWidth,y*Engine.tileHeight,sprite);
+    /*building.id = id;
     building.depth = 1;
     building.chunk = Utils.tileToAOI({x:x,y:y});
-    building.setInteractive();
+    building.setInteractive();*/
     Engine.buildings[id] = building;
     Engine.displayedBuildings.add(id);
     return building;

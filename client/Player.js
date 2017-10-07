@@ -11,7 +11,7 @@ var Player = new Phaser.Class({
         Engine.scene.add.displayList.add(this);
         Engine.scene.add.updateList.add(this);
 
-        this.depth = 1;
+        this.depth = Engine.playersDepth;
         this.id = id;
         this.chunk = Utils.tileToAOI({x:x,y:y});
         this.tileX = x;
