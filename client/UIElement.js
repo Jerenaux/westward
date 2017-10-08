@@ -6,7 +6,7 @@ var UIElement = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function UIElement (x, y, texture,clickCallback) {
+    initialize: function UIElement (x, y, texture, menu) {
         CustomSprite.call(this, x, y, texture);
 
         this.depth = Engine.UIDepth+1;
@@ -15,7 +15,14 @@ var UIElement = new Phaser.Class({
         //this.setDisplayOrigin(0,0);
         this.displayOriginX = 0;
         this.displayOriginY = 0;
+        this.menu = menu;
+    },
 
-        this.handleClick = clickCallback;
+    handleClick: function(){
+        if(this.menu.displayed){
+            this.menu.hide();
+        }else {
+            this.menu.display();
+        }
     }
 });

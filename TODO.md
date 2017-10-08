@@ -1,15 +1,17 @@
 Cleaning
 * Battle system
+* Character menu
 * Crafting
 * Exploration/travel
 * HUD
-* Equipment menu
-* Movement:
+* Inns
+* Inventory
+* Movement
 * Player interactions
 * Settlement defense
 * Settlement economy
-* Skills menu
 * Trade
+* World map
 Design document
 Polish
 World building
@@ -63,6 +65,17 @@ Content:
 - Expand battle AI for savages
 - Improve roaming behavior of savages
 - Have a permanent presence of savages and animals around settlements
+* Character menu
+- Panel with name as title, then basic summary:
+- Lvl x of <class>
+- x XP until next level
+- Citizen/<official> of <settlement>
+- Civic level
+- x XP until next level
+- Gold
+- Health gauge
+- Fatigue gauge
+- Then: events log ; class bonuses ; buildings ; NPC
 * Crafting
 - Design crafting system
 - Crafting menu
@@ -73,16 +86,14 @@ Content:
 * Exploration/travel
 - Have a permanent presence of a few pickup items around settlements
 - Settlements
-* Equipment menu
+- Campfires
 * HUD/Menus:
-- Inventory
-- Skills
-- Crafting
-- Status
-- Chat
-- Notifications/News
-- Gold
-- Health
+- Finish all menus
+- Hover cards when hovering players
+* Inns
+* Inventory
+- Menu
+- Pick up items
 * Movement:
 - Make new players move if path
 - Create collision tiles at building locations
@@ -94,8 +105,12 @@ Content:
 - Give items/money
 * Settlement defense
 * Settlement economy
-* Skills menu
 * Trade
+* World map
+- Static image
+- Menu with static image
+- Minimap
+- Fog of war and exploration (chunks-based)
 
 Design document:
 ---------------
@@ -122,7 +137,7 @@ Polish:
 
 World building:
 --------------
-- Check usefulness of addCorners
+- Integrate all smoothing into Geometry functions
 - Do not create chunk files for chunks which contain only water (sum(data) = nbChunks*292)
 - Process multiple paths (test on Australia with its lakes?)
 - Remove points along the edges of the map from paths (clamp to map limits and then prune)

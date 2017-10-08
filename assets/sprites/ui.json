@@ -47,6 +47,10 @@
     {
       "filename": "title-right",
       "frame": {"x":82,"y":184,"w":32,"h":64}
+    },
+    {
+      "filename": "title-close",
+      "frame": {"x":185,"y":184,"w":69,"h":64}
     }
   ]
 }

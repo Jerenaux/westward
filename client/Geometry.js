@@ -178,22 +178,64 @@ Geometry.straightLine = function(start,end){
 };
 
 Geometry.addCorners = function(tiles){ // Add corners to a straight line to follow tiles grid
-    for(var i = 1; i < tiles.length; i++){
-        var prev = tiles[i-1];
-        var current = tiles[i];
-        var dx = current.x - prev.x;
-        var dy = current.y - prev.y;
+    for(var i = 0; i < tiles.length-1; i++){
+        var t = tiles[i];
+        var next = tiles[i+1];
+        var dx = next.x - t.x;
+        var dy = next.y - t.y;
         if(Math.abs(dx) + Math.abs(dy) == 1) continue;
-        var newPt = {x:current.x,y:current.y};
-        if(dx == -1 && dy == 1) newPt.y--; // next point is to the top right
-        if(dx == -1 && dy == -1){
-            //console.log('bottom right at '+current.x+', '+current.y);
-            newPt.y++;
-        } // next point is to the bottom right
-        if(dx == 1 && dy == 1) newPt.y--; // next point is to the top left
-        if(dx == 1 && dy == -1) newPt.y++; // next point is to the bottom left
-        tiles.splice(i,0,newPt);// insert new point
+        var p = {x:t.x,y:t.y};
+        if(dx == -1 && dy == 1) p.x--; // BL
+        if(dx == 1 && dy == 1) p.x++; // BR
+        if(dx == -1 && dy == -1) p.x--; // TL
+        if(dx == 1 && dy == -1) p.x++; // TR
+        tiles.splice(i+1,0,p);// insert new point
         i++;
+    }
+    return tiles;
+};
+
+Geometry.forwardSmoothPass = function(tiles){
+    for(var i = 0; i < tiles.length-1; i++){
+        var t = tiles[i];
+        var next = tiles[i+1];
+        var dx = next.x - t.x;
+        var dy = next.y - t.y;
+        if(dx == 1 && dy == 1){ // angle bottom-right
+            tiles.splice(i+1,0,{
+                x: t.x,
+                y: t.y+1
+            });
+            i++;
+        }
+        if(dx == 1 && dy == -1){ // angle top-right
+            tiles.splice(i+1,0,{
+                x: t.x+1,
+                y: t.y
+            });
+            i++;
+        }
+        if(dx == -1 && dy == 1){ // angle bottom-left
+            tiles.splice(i+1,0,{
+                x: t.x,
+                y: t.y+1
+            });
+            i++;
+        }
+        if(dx == -1 && dy == -1){ // angle top-left
+            tiles.splice(i+1,0,{
+                x: t.x-1,
+                y: t.y
+            });
+            i++;
+        }
+        if(dx == 2 && dy == 0){ // horizontal gap
+            tiles.splice(i+1,0,{
+                x: t.x+1,
+                y: t.y
+            });
+            i++;
+        }
     }
     return tiles;
 };

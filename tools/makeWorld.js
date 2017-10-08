@@ -187,6 +187,7 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
         arr.pop(); //remove Z and blank end
         arr.pop();
 
+        // Generate list of points from blueprint
         var pts = [];
         for(var i = 0; i < arr.length; i++){
             var e = arr[i];
@@ -208,48 +209,13 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
         for(var i = 0; i <= nbPts-1; i++){
             var s = pts[i];
             var e = (i == nbPts-1 ? pts[0] : pts[i+1]);
-            //var addTiles= Geometry.addCorners(Geometry.interpolatePoints(Geometry.straightLine(s,e)));
-            var addTiles= Geometry.addCorners(Geometry.straightLine(s,e));
+            var addTiles = Geometry.addCorners(Geometry.straightLine(s,e));
             if(i > 0) addTiles.shift();
             tiles = tiles.concat(addTiles);
         }
 
-        // Forward loop to add tiles
-        // TODO: integrate this with addCorners
-        for(var i = 0; i < tiles.length-1; i++){
-            var t = tiles[i];
-            var next = tiles[i+1];
-            var dx = next.x - t.x;
-            var dy = next.y - t.y;
-            if(dx == 1 && dy == 1){
-                tiles.splice(i+1,0,{
-                    x: t.x,
-                    y: t.y+1
-                });
-                i++;
-            }
-            if(dx == 1 && dy == -1){
-                tiles.splice(i+1,0,{
-                    x: t.x+1,
-                    y: t.y
-                });
-                i++;
-            }
-            if(dx == -1 && dy == 1){ // angle bottom-left
-                tiles.splice(i+1,0,{
-                    x: t.x,
-                    y: t.y+1
-                });
-                i++;
-            }
-            if(dx == 2 && dy == 0){ // horizontal gap
-                tiles.splice(i+1,0,{
-                    x: t.x+1,
-                    y: t.y
-                });
-                i++;
-            }
-        }
+        tiles = Geometry.forwardSmoothPass(tiles);
+
         // Backward loop to remove tiles ; goes clockwise
         // TODO: make this a smoothing function
         for(var i = tiles.length-1; i >= 0; i--){
@@ -261,15 +227,11 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
                 var old= tiles[idx];
                 if(t.x == old.x && t.y == old.y) tiles.splice(i+1,j); // remove j points corresponding to size of knot
                 if(Math.abs(t.y - old.y) > j) bnf = true;
-                if(Math.abs(t.x - old.x) > j) console.log('horizontal bnf at '+ t.x+', '+ t.y);
+                //if(Math.abs(t.x - old.x) > j) console.log('horizontal bnf at '+ t.x+', '+ t.y);
             }
             if(bnf) tiles.splice(i,1);
         }
 
-        //var northShore = [Gaia.W.top, Gaia.W.topLeftOut, Gaia.W.topRightOut, Gaia.W.bottomRightOut, Gaia.W.bottomLeftOut]; //Gaia.W.bottomLeftOut,
-        //var southShore = [Gaia.W.bottom, Gaia.W.topRightIn, Gaia.W.bottomRightIn, Gaia.W.bottomLeftIn, Gaia.W.topLeftIn]; // Gaia.W.bottomLeftIn, Gaia.W.topLeftIn
-        var minX = worldWidth;
-        var maxX = 0;
         var xSlices = {};
         var busy = new SpaceMap();
 
@@ -286,8 +248,6 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
 
             console.log(id+' at '+tile.x+', '+tile.y);
 
-            if(tile.x < minX) minX = tile.x;
-            if(tile.x > maxX) maxX = tile.x;
             if(!xSlices.hasOwnProperty(tile.x)) xSlices[tile.x] = [];
             xSlices[tile.x].push(tile.y);
 
@@ -375,7 +335,7 @@ function applyBlueprint(chunks,bluePrint,worldData,outdir){
             addTile(tile.x, tile.y, Gaia.Shore.water, chunks);
         }
 
-        writeFiles(outdir,chunks);
+        //writeFiles(outdir,chunks);
     });
 }
 
@@ -400,10 +360,7 @@ function addToMap(tile,map,keyCoordinate,valueCoordinate,operator){
 function addTile(x,y,tile,chunks){
     var id = Utils.tileToAOI({x: x, y: y});
     var chunk = chunks[id];
-    if(!chunk){
-        console.log('error : '+x+', '+y);
-        return;
-    }
+    if(!chunk) return;
     var origin = Utils.AOItoTile(id);
     var cx = x - origin.x;
     var cy = y - origin.y;

@@ -91,8 +91,8 @@ Engine.create = function(masterData){
     // Replaces the isWalkableAt method of the PF library
     PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
 
-    Engine.craftingMenuCreated = false;
     Engine.inMenu = false;
+    Engine.currentMenu = null;
 
     Engine.created = true;
     Client.requestData();
@@ -115,13 +115,13 @@ Engine.initWorld = function(data){
 };
 
 Engine.makeUI = function(){
-    var startx = 780;
+    var startx = 830;
     var starty = 500;
-    var width = 165;
+    var width = 115;
     var x;
 
     var UIholder = [];
-    Engine.makeTitle(startx,starty,width,UIholder);
+    Engine.makeTitle(startx,starty,width,false,UIholder);
     UIholder.forEach(function(e){
         e.depth = Engine.UIDepth;
         e.setScrollFactor(0);
@@ -139,36 +139,33 @@ Engine.makeUI = function(){
         console.log('backpack');
     }));
     x += 50;
-    UIelements.push(new UIElement(x,starty,'tools',Engine.displayCraftingMenu));
+    UIelements.push(new UIElement(x,starty,'tools',Engine.makeCraftingMenu()));
     x += 50;
-    UIelements.push(new UIElement(x,starty,'tome',function(){
-        console.log('tome');
-    }));
-    x += 50;
-    UIelements.push(new UIElement(x,starty,'scroll',function(){
-        console.log('scroll');
-    }));
+    //UIelements.push(new UIElement(x,starty,'tome',Engine.makeSkillsMenu()));
+    //x += 50;
+    UIelements.push(new UIElement(x,starty,'scroll',Engine.makeCharacterMenu()));
 };
 
-Engine.makeTitle = function(x,y,width,container){
+Engine.makeTitle = function(x,y,width,close,container){
     container.push(Engine.scene.add.sprite(x,y,'UI','title-left'));
     x += 32+(width/2);
     container.push(Engine.scene.add.tileSprite(x,y+32,width,64,'UI','title-center'));
     x = x+(width/2);
-    container.push(Engine.scene.add.sprite(x,y,'UI','title-right'));
+    var rightFrame = close ? 'title-close' : 'title-right';
+    container.push(Engine.scene.add.sprite(x,y,'UI',rightFrame));
 };
 
-Engine.createCraftingMenu = function(){
-    console.log('creating menu');
-    new Menu('Craftinggggg');
-    Engine.craftingMenuCreated = true;
+Engine.makeCraftingMenu = function(){
+    return new Menu('Crafting');
 };
 
-Engine.displayCraftingMenu = function(){
-    console.log('crafting menu');
-    if(!Engine.craftingMenuCreated) Engine.createCraftingMenu();
-    Engine.inMenu = true;
+Engine.makeCharacterMenu = function(){
+    return new Menu('Character');
 };
+
+/*Engine.makeSkillsMenu = function(){
+    return new Menu('Skills');
+};*/
 
 Engine.addHero = function(id,x,y){
     Engine.player = Engine.addPlayer(id,x,y);
@@ -277,7 +274,7 @@ Engine.isColliding = function(tile){ // tile is the index of the tile in the til
 Engine.handleClick = function(event){
     if(event.gameObject){
         console.log(event.gameObject.texture.key);
-        event.gameObject.handleClick();
+        if(event.gameObject.handleClick) event.gameObject.handleClick();
     }else{
         if(!Engine.inMenu) Engine.computePath(Engine.getMouseCoordinates(event));
     }
