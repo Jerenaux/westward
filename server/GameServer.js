@@ -8,6 +8,7 @@ var ObjectId = require('mongodb').ObjectID;
 var GameServer = {
     lastPlayerID: 0,
     lastBuildingID: 0,
+    lastAnimalID: 0,
     players: {}, // player.id -> player
     socketMap: {}, // socket.id -> player.id
     nbConnectedChanged: false
@@ -20,6 +21,7 @@ var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var AOI = require('./AOI.js').AOI;
 var Player = require('./Player.js').Player;
 var Building = require('./Building.js').Building;
+var Animal = require('./Animal.js').Animal;
 var PF = require('../shared/pathfinding.js');
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
@@ -55,8 +57,12 @@ GameServer.readMap = function(mapsPath){
     for(var bid in buildings){
         if(!buildings.hasOwnProperty(bid)) return;
         var data = buildings[bid];
-        //GameServer.addAtLocation();
         new Building(data.x,data.y,data.sprite);
+    }
+
+    // Spawn animals
+    for(var i = 0; i < 3; i++){
+        new Animal();
     }
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
@@ -156,7 +162,6 @@ GameServer.removeFromLocation = function(entity){
 
 GameServer.handlePath = function(path,socketID){
     var player = GameServer.getPlayer(socketID);
-    //player.setProperty('path',path);
     player.setPath(path);
     /*GameServer.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(GameServer.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
      var path = GameServer.PFfinder.findPath(468, 125, 476, 127, GameServer.PFgrid);

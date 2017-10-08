@@ -37,7 +37,7 @@ Cleaning:
 Content:
 -------
 * Battle system
-- Spawn a few monsters, have them roam about (movement, animation, sync...)
+- Display monsters, have them roam about (movement, animation, sync...)
 - Trigger battle when clicking on monster
 - Compute and display battle grid
 - Adjust camera
@@ -95,7 +95,7 @@ Content:
 - Menu
 - Pick up items
 * Movement:
-- Make new players move if path
+- Make new players/animals move if path
 - Create collision tiles at building locations
 - Animate
 - Verticality stuff (trees canopy, etc.)

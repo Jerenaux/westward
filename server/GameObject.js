@@ -37,8 +37,4 @@ GameObject.prototype.updateAOIs = function(property,value){
     });
 };
 
-/*GameObject.prototype.getAOIid = function(){
-    return GameServer.AOIfromTiles.getFirst(this.x,this.y).id;
-};*/
-
 module.exports.GameObject = GameObject;

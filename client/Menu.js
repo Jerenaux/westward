@@ -3,7 +3,6 @@
  */
 
 function Menu(title){
-    // TODO ask Rich what would be the best approach for container
     this.container = [];
     this.panels = [];
     this.displayed = false;

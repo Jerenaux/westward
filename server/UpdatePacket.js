@@ -5,12 +5,10 @@
 function UpdatePacket(){
     this.newplayers = []; // new player objects to add to the world
     this.newbuildings = [];
+    this.newanimals = [];
     this.players = {}; // list of player objects already existing for which properties have been updated
+    this.animals = {};
     this.disconnected = []; // list of id's of disconnected players since last update
-    /*this.newitems = [];
-    this.newmonsters = [];
-    this.items = {};
-    this.monsters = {};*/
 }
 
 UpdatePacket.prototype.addObject = function(object){
@@ -23,12 +21,9 @@ UpdatePacket.prototype.addObject = function(object){
         case 'Building':
             arr = this.newbuildings;
             break;
-        /*case 'item':
-            arr = this.newitems;
+        case 'Animal':
+            arr = this.newanimals;
             break;
-        case 'monster':
-            arr = this.newmonsters;
-            break;*/
     }
     // Check that the object to insert is not already present (possible since when pulling updates from neighboring AOIs)
     for(var i = 0; i < arr.length; i++){
@@ -41,11 +36,11 @@ UpdatePacket.prototype.addDisconnect = function(playerID){
     this.disconnected.push(playerID);
 };
 
-UpdatePacket.prototype.updateRoute = function(type,entityID,route){
+/*UpdatePacket.prototype.updateRoute = function(type,entityID,route){
     var map = (type == 'player' ? this.players : this.monsters);
     if(!map.hasOwnProperty(entityID)) map[entityID] = {};
     map[entityID].route = route;
-};
+};*/
 
 UpdatePacket.prototype.updateProperty = function(type,id,property,value){
     //console.log('updating property type = '+type+', id = '+id+', prop = '+property+', val = '+value);
@@ -54,12 +49,9 @@ UpdatePacket.prototype.updateProperty = function(type,id,property,value){
         case 'Player':
             map = this.players;
             break;
-        /*case 'item':
-            map = this.items;
+        case 'Animal':
+            map = this.animals;
             break;
-        case 'monster':
-            map = this.monsters;
-            break;*/
     }
     if(!map.hasOwnProperty(id)) map[id] = {};
     if(map[id][property] != value) map[id][property] = value;
@@ -94,26 +86,22 @@ UpdatePacket.prototype.synchronize = function(AOI){
 };
 
 UpdatePacket.prototype.isEmpty = function(){
-    /*if(Object.keys(this.monsters).length > 0) return false;
-    if(Object.keys(this.items).length > 0) return false;
-    if(this.newitems.length > 0) return false;
-    if(this.newmonsters.length > 0) return false;*/
     if(this.disconnected.length > 0) return false;
     if(this.newplayers.length > 0) return false;
     if(this.newbuildings.length > 0) return false;
+    if(this.newanimals.length > 0) return false;
     if(Object.keys(this.players).length > 0) return false;
+    if(Object.keys(this.animals).length > 0) return false;
     return true;
 };
 
 UpdatePacket.prototype.clean = function(){
-    /*if(!Object.keys(this.monsters).length) delete this.monsters;
-    if(!Object.keys(this.items).length) delete this.items;
-    if(!this.newitems.length) delete this.newitems;
-    if(!this.newmonsters.length) delete this.newmonsters;*/
     if(!this.disconnected.length) delete this.disconnected;
     if(!this.newplayers.length) delete this.newplayers;
+    if(!this.newanimals.length) delete this.newanimals;
     if(!this.newbuildings.length) delete this.newbuildings;
     if(!Object.keys(this.players).length) delete this.players;
+    if(!Object.keys(this.animals).length) delete this.animals;
     return this;
 };
 

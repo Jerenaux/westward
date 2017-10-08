@@ -3,9 +3,8 @@
  */
 
 var Utils = require('../shared/Utils.js').Utils;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var PersonalUpdatePacket = require('./PersonalUpdatePacket.js').PersonalUpdatePacket;
-var GameObject = require('./GameObject.js').GameObject;
+var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
 
 function Player(){
@@ -13,7 +12,7 @@ function Player(){
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
 }
 
-Player.prototype = Object.create(GameObject.prototype);
+Player.prototype = Object.create(MovingEntity.prototype);
 Player.prototype.constructor = Player;
 
 Player.prototype.setIDs = function(dbID,socketID){
@@ -25,7 +24,6 @@ Player.prototype.setIDs = function(dbID,socketID){
 Player.prototype.setStartingPosition = function(){
     this.x = Utils.randomInt(1,21);
     this.y = Utils.randomInt(1,16);
-    //this.setOrUpdateAOI();
     console.log('Hi at ('+this.x+', '+this.y+')');
 };
 
@@ -72,40 +70,6 @@ Player.prototype.getIndividualUpdatePackage = function(){
     var pkg = this.updatePacket;
     this.updatePacket = new PersonalUpdatePacket();
     return pkg;
-};
-
-Player.prototype.setPath = function(path){
-    this.setProperty('path',path);
-    this.updatePathTick();
-    this.moving = true;
-};
-
-Player.prototype.updatePathTick = function(){
-    this.nextPathTick = Date.now() + PFUtils.getDuration(
-            this.x,
-            this.y,
-            this.path[1][0],
-            this.path[1][1]
-        )*1000;
-};
-
-Player.prototype.updateWalk = function(){
-    if(Date.now() >= this.nextPathTick){
-        this.path.shift();
-        this.updatePosition(this.path[0][0],this.path[0][1]);
-        //console.log('['+this.id+'] Now at '+this.x+', '+this.y);
-        if(this.path.length == 1){
-            this.moving = false;
-        }else{
-            this.updatePathTick();
-        }
-    }
-};
-
-Player.prototype.updatePosition = function(x,y){
-    this.x = x;
-    this.y = y;
-    this.setOrUpdateAOI();
 };
 
 module.exports.Player = Player;
