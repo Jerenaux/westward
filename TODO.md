@@ -99,6 +99,7 @@ Content:
 - Create collision tiles at building locations
 - Animate
 - Verticality stuff (trees canopy, etc.)
+- Hide marker when in menu
 - Hit areas to walk along buildings
 * Player interactions
 - Chat
@@ -124,6 +125,7 @@ Polish:
 ------
 - Mouse cursor; changes over buttons and buildings (differently if possible)
 - Highlight buttons and buildings on hover
+- Button animation on big red closing cross in menus
 - Custom movement marker
 - Sound effects when clicking (for moving, on buttons in menus, sounds of shuffling pages...)
 - Noise when walking
@@ -236,3 +238,17 @@ V2 level:
 ###############
 - PvP
 - Naval exploration
+
+
+
+function create() {
+    this.input.events.on('POINTER_DOWN_EVENT', function (event) {
+        event.gameObject.setTint(0xff0000);
+    });
+
+    this.add.image(100, 400, 'atlas', 'supercars-parsec').setInteractive();
+    var mech = this.add.image(200, 100, 'atlas');
+    mech.setFrame('titan-mech');
+    mech.setInteractive();
+
+}

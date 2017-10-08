@@ -6,8 +6,9 @@ var UIElement = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function UIElement (x, y, texture, menu) {
+    initialize: function UIElement (x, y, texture, frame, menu) {
         CustomSprite.call(this, x, y, texture);
+        if(frame) this.setFrame(frame);
 
         this.depth = Engine.UIDepth+1;
         this.setScrollFactor(0);

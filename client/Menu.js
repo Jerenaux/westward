@@ -5,8 +5,12 @@
 function Menu(title){
     // TODO ask Rich what would be the best approach for container
     this.container = [];
+    this.panels = [];
     this.displayed = false;
+    this.makeTitle(title);
+}
 
+Menu.prototype.makeTitle = function(title){
     var textx = 945;
     var texty = 15;
 
@@ -18,7 +22,13 @@ function Menu(title){
 
     var titlex = textx - text.width - 32;
     var titley = 10;
-    Engine.makeTitle(titlex,titley,text.width,true,this.container);
+    var x = titlex;
+    this.container.push(Engine.scene.add.sprite(x,titley,'UI','title-left'));
+    x += 32+(text.width/2);
+    this.container.push(Engine.scene.add.tileSprite(x,titley+32,text.width,64,'UI','title-center'));
+    x = x+(text.width/2);
+    var closeBtn = new UIElement(x,titley,'UI','title-close',this);
+    this.container.push(closeBtn);
 
     this.container.forEach(function(e){
         e.depth = Engine.UIDepth;
@@ -33,12 +43,19 @@ function Menu(title){
     });
 
     text.depth = Engine.UIDepth+1;
-}
+};
+
+Menu.prototype.addPanel = function(panel){
+    this.panels.push(panel);
+};
 
 Menu.prototype.display = function(){
     if(Engine.inMenu) Engine.currentMenu.hide();
     for(var i = 0; i < this.container.length; i++){
         this.container[i].visible = true;
+    }
+    for(var j = 0; j < this.panels.length; j++){
+        this.panels[j].display();
     }
     Engine.inMenu = true;
     Engine.currentMenu = this;
@@ -48,6 +65,9 @@ Menu.prototype.display = function(){
 Menu.prototype.hide = function(){
     for(var i = 0; i < this.container.length; i++){
         this.container[i].visible = false;
+    }
+    for(var j = 0; j < this.panels.length; j++){
+        this.panels[j].hide();
     }
     Engine.inMenu = false;
     Engine.currentMenu = null;

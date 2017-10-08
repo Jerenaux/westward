@@ -118,10 +118,15 @@ Engine.makeUI = function(){
     var startx = 830;
     var starty = 500;
     var width = 115;
-    var x;
+    var x = startx;
+    var y = starty;
 
     var UIholder = [];
-    Engine.makeTitle(startx,starty,width,false,UIholder);
+    UIholder.push(Engine.scene.add.sprite(x,y,'UI','title-left'));
+    x += 32+(width/2);
+    UIholder.push(Engine.scene.add.tileSprite(x,y+32,width,64,'UI','title-center'));
+    x = x+(width/2);
+    UIholder.push(Engine.scene.add.sprite(x,y,'UI','title-right'));
     UIholder.forEach(function(e){
         e.depth = Engine.UIDepth;
         e.setScrollFactor(0);
@@ -135,24 +140,11 @@ Engine.makeUI = function(){
 
     var UIelements = [];
     x = startx+10;
-    UIelements.push(new UIElement(x,starty,'backpack',function(){
-        console.log('backpack');
-    }));
+    UIelements.push(new UIElement(x,starty,'backpack',null,Engine.makeInventory()));
     x += 50;
-    UIelements.push(new UIElement(x,starty,'tools',Engine.makeCraftingMenu()));
+    UIelements.push(new UIElement(x,starty,'tools',null,Engine.makeCraftingMenu()));
     x += 50;
-    //UIelements.push(new UIElement(x,starty,'tome',Engine.makeSkillsMenu()));
-    //x += 50;
-    UIelements.push(new UIElement(x,starty,'scroll',Engine.makeCharacterMenu()));
-};
-
-Engine.makeTitle = function(x,y,width,close,container){
-    container.push(Engine.scene.add.sprite(x,y,'UI','title-left'));
-    x += 32+(width/2);
-    container.push(Engine.scene.add.tileSprite(x,y+32,width,64,'UI','title-center'));
-    x = x+(width/2);
-    var rightFrame = close ? 'title-close' : 'title-right';
-    container.push(Engine.scene.add.sprite(x,y,'UI',rightFrame));
+    UIelements.push(new UIElement(x,starty,'scroll',null,Engine.makeCharacterMenu()));
 };
 
 Engine.makeCraftingMenu = function(){
@@ -163,9 +155,12 @@ Engine.makeCharacterMenu = function(){
     return new Menu('Character');
 };
 
-/*Engine.makeSkillsMenu = function(){
-    return new Menu('Skills');
-};*/
+Engine.makeInventory = function(){
+    var inventory = new Menu('Inventory');
+    inventory.addPanel(new Panel(765,100,240,380));
+    inventory.addPanel(new Panel(140,100,600,380));
+    return inventory;
+};
 
 Engine.addHero = function(id,x,y){
     Engine.player = Engine.addPlayer(id,x,y);
