@@ -51,6 +51,18 @@
     {
       "filename": "title-close",
       "frame": {"x":185,"y":184,"w":69,"h":64}
+    },
+    {
+      "filename": "capsule-left",
+      "frame": {"x":634,"y":118,"w":24,"h":24}
+    },
+    {
+      "filename": "capsule-middle",
+      "frame": {"x":660,"y":118,"w":22,"h":24}
+    },
+    {
+      "filename": "capsule-right",
+      "frame": {"x":683,"y":118,"w":25,"h":24}
     }
   ]
 }

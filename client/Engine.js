@@ -123,18 +123,14 @@ Engine.makeUI = function(){
 
     var UIholder = [];
     UIholder.push(Engine.scene.add.sprite(x,y,'UI','title-left'));
-    x += 32+(width/2);
-    UIholder.push(Engine.scene.add.tileSprite(x,y+32,width,64,'UI','title-center'));
-    x = x+(width/2);
+    x += 32;
+    UIholder.push(Engine.scene.add.tileSprite(x,y,width,64,'UI','title-center'));
+    x = x+width;
     UIholder.push(Engine.scene.add.sprite(x,y,'UI','title-right'));
     UIholder.forEach(function(e){
         e.depth = Engine.UIDepth;
         e.setScrollFactor(0);
-        if(e.constructor.name == 'Sprite'){
-            //e.setDisplayOrigin(0,0);
-            e.displayOriginX = 0;
-            e.displayOriginY = 0;
-        }
+        e.setDisplayOrigin(0,0);
         e.setInteractive();
     });
 
@@ -148,7 +144,11 @@ Engine.makeUI = function(){
 };
 
 Engine.makeCraftingMenu = function(){
-    return new Menu('Crafting');
+    var crafting = new Menu('Crafting');
+    crafting.addPanel(new Panel(765,100,240,380,'Recipes')); // recipes panel
+    crafting.addPanel(new Panel(450,100,290,380,'Combination')); // crafting panel
+    crafting.addPanel(new Panel(40,100,390,380,'Items')); // inventory panel
+    return crafting;
 };
 
 Engine.makeCharacterMenu = function(){
@@ -157,8 +157,8 @@ Engine.makeCharacterMenu = function(){
 
 Engine.makeInventory = function(){
     var inventory = new Menu('Inventory');
-    inventory.addPanel(new Panel(765,100,240,380));
-    inventory.addPanel(new Panel(140,100,600,380));
+    inventory.addPanel(new Panel(665,100,340,380,'Equipment')); // equipment panel
+    inventory.addPanel(new Panel(40,100,600,380,'Items')); // inventory panel
     return inventory;
 };
 

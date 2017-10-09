@@ -16,32 +16,28 @@ Menu.prototype.makeTitle = function(title){
     var text = Engine.scene.add.text(textx, texty, title,
         { font: '32px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
     );
-    text.setOrigin(1,0);
     this.container.push(text);
 
     var titlex = textx - text.width - 32;
     var titley = 10;
     var x = titlex;
     this.container.push(Engine.scene.add.sprite(x,titley,'UI','title-left'));
-    x += 32+(text.width/2);
-    this.container.push(Engine.scene.add.tileSprite(x,titley+32,text.width,64,'UI','title-center'));
-    x = x+(text.width/2);
+    x += 32;
+    this.container.push(Engine.scene.add.tileSprite(x,titley,text.width,64,'UI','title-center'));
+    x = x+text.width;
     var closeBtn = new UIElement(x,titley,'UI','title-close',this);
     this.container.push(closeBtn);
 
     this.container.forEach(function(e){
         e.depth = Engine.UIDepth;
         e.setScrollFactor(0);
-        if(e.constructor.name == 'Sprite'){
-            //e.setDisplayOrigin(0,0);
-            e.displayOriginX = 0;
-            e.displayOriginY = 0;
-        }
+        e.setDisplayOrigin(0,0);
         e.setInteractive();
         e.visible = false;
     });
 
     text.depth = Engine.UIDepth+1;
+    text.setOrigin(1,0);
 };
 
 Menu.prototype.addPanel = function(panel){

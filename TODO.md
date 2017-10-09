@@ -93,7 +93,10 @@ Content:
 * Inns
 * Inventory
 - Menu
+- Item slots, equipment blocks, capsule with inventory capacity
 - Pick up items
+- Display ammo amount next to weapon
+- Use items from menu (healing)
 * Movement:
 - Make new players/animals move if path
 - Create collision tiles at building locations
@@ -219,8 +222,9 @@ Deployment:
 - Tool to gather, uglify and compress all relevant source files and move them to production directory
 - Automate git upload to Heroku (http://radek.io/2015/10/27/nodegit/)
 - Full pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
-- Improve flattening by making transparency checks
 - Tool to automatically merge all graphic assets in atlases?
+- Way to interact with Node server online, without restarting (e.g. change variables, reload data...)
+- Improve flattening by making transparency checks
 - Secure chunk access? (check client position before serving)
 
 

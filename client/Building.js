@@ -14,8 +14,6 @@ var Building = new Phaser.Class({
         this.chunk = Utils.tileToAOI({x:x,y:y});
 
         this.setInteractive();
-        //this.setDisplayOrigin(0);
-        this.displayOriginX = 0;
-        this.displayOriginY = 0;
+        this.setDisplayOrigin(0);
     }
 });

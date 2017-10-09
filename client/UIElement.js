@@ -13,9 +13,7 @@ var UIElement = new Phaser.Class({
         this.depth = Engine.UIDepth+1;
         this.setScrollFactor(0);
         this.setInteractive();
-        //this.setDisplayOrigin(0,0);
-        this.displayOriginX = 0;
-        this.displayOriginY = 0;
+        this.setDisplayOrigin(0,0);
         this.menu = menu;
     },
 
