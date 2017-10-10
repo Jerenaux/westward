@@ -195,6 +195,7 @@ Geometry.addCorners = function(tiles){ // Add corners to a straight line to foll
     return tiles;
 };
 
+// Smoothes a shape obtained from a SVG path
 Geometry.forwardSmoothPass = function(tiles){
     for(var i = 0; i < tiles.length-1; i++){
         var t = tiles[i];
@@ -236,6 +237,23 @@ Geometry.forwardSmoothPass = function(tiles){
             });
             i++;
         }
+    }
+    return tiles;
+};
+
+Geometry.backwardSmoothPass = function(tiles){         // Backward loop to remove tiles ; goes clockwise
+    for(var i = tiles.length-1; i >= 0; i--){
+        var t = tiles[i];
+        var bnf = false; // back and forth between tiles
+        for(var j = 1; j < 7; j++){ // knots & duplicates
+            var idx = i + j;
+            if(idx > tiles.length-1) idx -= tiles.length;
+            var old= tiles[idx];
+            if(t.x == old.x && t.y == old.y) tiles.splice(i+1,j); // remove j points corresponding to size of knot
+            if(Math.abs(t.y - old.y) > j) bnf = true;
+            //if(Math.abs(t.x - old.x) > j) console.log('horizontal bnf at '+ t.x+', '+ t.y);
+        }
+        if(bnf) tiles.splice(i,1);
     }
     return tiles;
 };

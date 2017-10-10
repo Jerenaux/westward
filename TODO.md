@@ -22,8 +22,9 @@ Prototype level:
 
 Cleaning:
 --------
-- Clean makeWorld up and compartimentalize (makeLake, fillLake, makeCliff (fillCliff?), etc.
-- Remove unnecessary test code from client/Engine.js:start()
+- Create World object, may or may not replace Gaia, to store info about world (dimensions, busy tiles...) and world-building methods
+-> Move it t studio
+- Handle 404 errors when chunk file not found
 - Clean up Utils
 - Write Readme detailling structure of code: assets, client/server/shared code (-> for production), tools (command-line scripts) and studio
 - Move Geometry to studio
@@ -33,6 +34,7 @@ Cleaning:
 - Standardize the use of Utils methods for coordianes manipulations (gridtoline, lientogrid, tiletoiAOI, AOItotile, tileRelativeToAOI...)
 - Sort-out shardness issues of Utils, and the need to have common properties such as tileWidth etc. readily available both in dev and prod
 - Remove unnecessary map directories/files and assets
+- Remove unnecessary Geometry methods
 - Clean all files
 
 Content:
@@ -85,8 +87,8 @@ Content:
 - Block advanced formulas based on class and lvl
 - Enable a dozen craftable items (minimal necessities for all other aspects of the game)
 * Exploration/travel
+- Have a world to explore
 - Have a permanent presence of a few pickup items around settlements
-- Settlements
 - Campfires
 * HUD/Menus:
 - Finish all menus
@@ -145,8 +147,7 @@ Polish:
 
 World building:
 --------------
-- Integrate all smoothing into Geometry functions
-- Do not create chunk files for chunks which contain only water (sum(data) = nbChunks*292)
+- Put fillNode into path file and parse it
 - Process multiple paths (test on Australia with its lakes?)
 - Remove points along the edges of the map from paths (clamp to map limits and then prune)
 - Try and make east coast with rivers and lakes
