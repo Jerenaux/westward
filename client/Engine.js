@@ -22,9 +22,10 @@ Engine.preload = function() {
     this.load.image('backpack', 'assets/sprites/backpack.png');
 
     this.load.image('fort', 'assets/sprites/buildings/fort.png');
-    this.load.atlas('megaset', 'assets/sprites/megaset-0.png', 'assets/sprites/megaset-0.json');
     this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
+
+    this.load.json('buildings', 'assets/data/buildings.json');
 
     Engine.collidingTiles = [];
     for(var i = 0, firstgid = 1; i < Boot.tilesets.length; i++){
@@ -80,10 +81,15 @@ Engine.create = function(masterData){
     Engine.camera.setBounds(0,0,Engine.worldWidth*Engine.tileWidth,Engine.worldHeight*Engine.tileHeight);
     Engine.camera.roundPixels = true; // Very important for the camera to scroll smoothly accross the map
 
+    Engine.buildingsData = Engine.scene.cache.json.get('buildings');
+    console.log(Engine.buildingsData);
+
     Engine.createMarker();
 
     Engine.scene.input.events.on('POINTER_DOWN_EVENT', Engine.handleClick);
     Engine.scene.input.events.on('POINTER_MOVE_EVENT', Engine.trackMouse);
+    Engine.scene.input.events.on('POINTER_OVER_EVENT', Engine.handleOver);
+    Engine.scene.input.events.on('POINTER_OUT_EVENT', Engine.handleOut);
 
     Engine.collisions = new SpaceMap(); // contains 1 for the coordinates that are non-walkables
     Engine.PFgrid = new PF.Grid(0,0); // grid placeholder for the pathfinding
@@ -275,6 +281,18 @@ Engine.handleClick = function(event){
     }
 };
 
+Engine.handleOver = function(event){
+    if(event.gameObject){
+        if(event.gameObject.constructor.name == 'Building') Engine.hideMarker();
+    }
+};
+
+Engine.handleOut = function(event){
+    if(event.gameObject){
+        if(event.gameObject.constructor.name == 'Building' && !Engine.inMenu) Engine.showMarker();
+    }
+};
+
 Engine.computePath = function(position){
     if(Engine.collisions.get(position.tile.y,position.tile.x) == 1) return; // y, then x!
 
@@ -344,19 +362,22 @@ Engine.updateMarker = function(tile){
     }
 };
 
+Engine.hideMarker = function(){
+    Engine.marker.visible = false;
+};
+
+Engine.showMarker = function(){
+    Engine.marker.visible = true;
+};
+
 Engine.checkCollision = function(tile){ // tile is x, y pair
     if(Engine.displayedChunks.length < 4) return; // If less than 4, it means that wherever you are the chunks haven't finished displaying
     if(!Engine.collisions[tile.y]) return false;
     return !!Engine.collisions[tile.y][tile.x];
 };
 
-Engine.addBuilding = function(id,x,y,sprite){
-    var building = new Building(x,y,sprite,id);
-    //var building = Engine.scene.add.sprite(x*Engine.tileWidth,y*Engine.tileHeight,sprite);
-    /*building.id = id;
-    building.depth = 1;
-    building.chunk = Utils.tileToAOI({x:x,y:y});
-    building.setInteractive();*/
+Engine.addBuilding = function(id,x,y,type){
+    var building = new Building(x,y,type,id);
     Engine.buildings[id] = building;
     Engine.displayedBuildings.add(id);
     return building;
@@ -378,7 +399,8 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.newplayers) {
         for (var n = 0; n < data.newplayers.length; n++) {
             var p = data.newplayers[n];
-            Engine.addPlayer(p.id, p.x, p.y);
+            var player = Engine.addPlayer(p.id, p.x, p.y);
+            if(p.path) player.move(p.path);
         }
         //if (data.newplayers.length > 0) Game.sortEntities(); // Sort entitites according to y coordinate to make them render properly above each other
     }
@@ -386,7 +408,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.newbuildings) {
         for (var n = 0; n < data.newbuildings.length; n++) {
             var b = data.newbuildings[n];
-            Engine.addBuilding(b.id, b.x, b.y, b.sprite);
+            Engine.addBuilding(b.id, b.x, b.y, b.type);
         }
     }
 

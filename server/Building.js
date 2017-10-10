@@ -4,11 +4,11 @@
 var GameObject = require('./GameObject.js').GameObject;
 var GameServer = require('./GameServer.js').GameServer;
 
-function Building(x,y,sprite){
+function Building(x,y,type){
     this.id = GameServer.lastBuildingID++;
     this.x = x;
     this.y = y;
-    this.sprite = sprite;
+    this.type = type;
     this.setOrUpdateAOI();
 }
 
@@ -17,7 +17,7 @@ Building.prototype.constructor = Building;
 
 Building.prototype.trim = function(){
     var trimmed = {};
-    var broadcastProperties = ['id','sprite']; // list of properties relevant for the client
+    var broadcastProperties = ['id','type']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

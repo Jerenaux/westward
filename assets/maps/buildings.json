@@ -1,6 +1,6 @@
 {
   "0":{
-    "sprite":"fort",
+    "type":"fort",
     "x": 3,
     "y": 3,
     "settlement": 0

@@ -57,7 +57,7 @@ GameServer.readMap = function(mapsPath){
     for(var bid in buildings){
         if(!buildings.hasOwnProperty(bid)) return;
         var data = buildings[bid];
-        new Building(data.x,data.y,data.sprite);
+        new Building(data.x,data.y,data.type);
     }
 
     // Spawn animals
@@ -114,7 +114,6 @@ GameServer.finalizePlayer = function(socket,player){
     GameServer.socketMap[socket.id] = player.id;
     GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
     GameServer.nbConnectedChanged = true;
-    //GameServer.addAtLocation(player);
     player.setOrUpdateAOI();
     console.log(GameServer.server.getNbConnected()+' connected');
 };

@@ -23,7 +23,7 @@ var Player = new Phaser.Class({
         this.movement = null;
     },
 
-    move: function(path){ // TODO: ask Rich how to do so using the path stuff
+    move: function(path){
         path.shift();
         var tweens = [];
         for(var i = 0; i < path.length; i++){

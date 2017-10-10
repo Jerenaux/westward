@@ -1,5 +1,4 @@
 function Chunk(mapData,id,z){
-    //Phaser.GameObjects.Sprite.call(this,Engine.scene);
     this.fromFile = (mapData !== null);
     this.id = id;
     this.z = z;
@@ -13,15 +12,10 @@ function Chunk(mapData,id,z){
 
     for(var i = 0; i < Engine.nbLayers; i++){
         var data = this.fromFile ? mapData.layers[i].data : null ;
-        //this.addChild(new Layer(data));
-        //this.children.push(Engine.scene.add.image(this.x*Engine.tileWidth,this.y*Engine.tileHeight));
         this.layers.push([]);
         this.layerData.push(data);
     }
 }
-
-//Chunk.prototype = Object.create(Phaser.GameObjects.Sprite);
-//Chunk.prototype.constructor = Chunk;
 
 Chunk.prototype.drawLayers = function(){
     for(var l = 0; l < this.layers.length; l++) {
@@ -52,7 +46,6 @@ Chunk.prototype.removeLayers = function(){
 Chunk.prototype.addTile = function(x,y,tile,layer){
     if(this.fromFile) return; // original chunks cannot be tampered with
     this.children[layer].data.add(x,y,tile);
-    //console.log('added '+tile+' at '+x+', '+y+' on layer '+layer);
 };
 
 Chunk.prototype.orderTiles = function(){
@@ -72,17 +65,4 @@ Chunk.prototype.drawTile = function(x,y,tile,layer){
     sprite.setDisplayOrigin(0,0);
     sprite.tileID = tile;
     layer.push(sprite);
-    //layer.addChild(sprite);
 };
-
-// ##############################
-
-/*function Layer(data){
-    Phaser.GameObjects.Image.call(this,Engine.scene);
-    this.data = (data !== null ? data : new SpaceMap());
-}
-
-//Layer.prototype = Object.create(PIXI.Container.prototype);
-Layer.prototype = Object.create(Phaser.GameObjects.Image);
-Layer.prototype.constructor = Layer;*/
-

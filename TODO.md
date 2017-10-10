@@ -27,6 +27,7 @@ Cleaning:
 - Clean up Utils
 - Write Readme detailling structure of code: assets, client/server/shared code (-> for production), tools (command-line scripts) and studio
 - Move Geometry to studio
+- Replace delete calls in updatePkg.clean() by something else
 - Split server in two (game and dev server)
 - Order files in studio
 - Standardize the use of Utils methods for coordianes manipulations (gridtoline, lientogrid, tiletoiAOI, AOItotile, tileRelativeToAOI...)
@@ -98,12 +99,10 @@ Content:
 - Display ammo amount next to weapon
 - Use items from menu (healing)
 * Movement:
-- Make new players/animals move if path
-- Create collision tiles at building locations
-- Animate
+- Create collision tiles at building locations server-side
+- Depth-sorting of buildings based on y position (depth = fixed offset + y or sth)
 - Verticality stuff (trees canopy, etc.)
-- Hide marker when in menu
-- Hit areas to walk along buildings
+- Animate
 * Player interactions
 - Chat
 - Give items/money
@@ -119,10 +118,14 @@ Content:
 Design document:
 ---------------
 - Find nice to-do list system
+- Finish listing all steps
 - Finish copying notes
 - Make Excel tables (inventory, bestiary, ...)
 - Make powerpoint
+- Make feature matrix
+- Consequence graphs
 - Tidy up (charts, tables, Latex formulas...)
+- For v1 schedule: follow https://www.youtube.com/watch?v=moW8-MXjivs priorization method from (36:00)
 
 Polish:
 ------

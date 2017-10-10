@@ -54,6 +54,7 @@ Menu.prototype.display = function(){
     }
     Engine.inMenu = true;
     Engine.currentMenu = this;
+    Engine.hideMarker();
     this.displayed = true;
 };
 
@@ -66,5 +67,6 @@ Menu.prototype.hide = function(){
     }
     Engine.inMenu = false;
     Engine.currentMenu = null;
+    Engine.showMarker();
     this.displayed = false;
 };
