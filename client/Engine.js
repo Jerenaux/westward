@@ -115,6 +115,7 @@ Engine.createMarker = function(){
 Engine.initWorld = function(data){
     Engine.makeUI();
     Engine.addHero(data.id,data.x,data.y);
+    Engine.inventory = {};
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     // TODO: when all chunks loaded, fade-out Boot scene
@@ -153,7 +154,7 @@ Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
     crafting.addPanel(new Panel(765,100,240,380,'Recipes')); // recipes panel
     crafting.addPanel(new Panel(450,100,290,380,'Combination')); // crafting panel
-    crafting.addPanel(new Panel(40,100,390,380,'Items')); // inventory panel
+    crafting.addPanel(new Panel(40,100,390,380,'Items',[10,10])); // inventory panel
     return crafting;
 };
 
@@ -164,7 +165,7 @@ Engine.makeCharacterMenu = function(){
 Engine.makeInventory = function(){
     var inventory = new Menu('Inventory');
     inventory.addPanel(new Panel(665,100,340,380,'Equipment')); // equipment panel
-    inventory.addPanel(new Panel(40,100,600,380,'Items')); // inventory panel
+    inventory.addPanel(new Panel(40,100,600,380,'Items',[15,9])); // inventory panel
     return inventory;
 };
 
@@ -393,6 +394,11 @@ Engine.removeBuilding = function(id){
 /*
 * #### UPDATE CODE #####
 * */
+
+Engine.updateSelf = function(data){
+    if(data.items) Engine.inventory = Object.assign(Engine.inventory,data.items);
+    console.log(Engine.inventory);
+};
 
 // Processes the global update packages received from the server
 Engine.updateWorld = function(data){  // data is the update package from the server

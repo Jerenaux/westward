@@ -28,8 +28,6 @@ var PFUtils = require('../shared/PFUtils.js').PFUtils;
 GameServer.readMap = function(mapsPath){
     var masterData = JSON.parse(fs.readFileSync(mapsPath+'/master.json').toString());
 
-    //Utils.tileWidth = masterData.tileWidth;
-    //Utils.tileHeight = masterData.tileHeight;
     Utils.chunkWidth = masterData.chunkWidth;
     Utils.chunkHeight = masterData.chunkHeight;
     Utils.nbChunksHorizontal = masterData.nbChunksHoriz;
@@ -53,6 +51,7 @@ GameServer.readMap = function(mapsPath){
     PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
 
     // Read buildings
+    GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
     var buildings = JSON.parse(fs.readFileSync('./assets/maps/buildings.json').toString());
     for(var bid in buildings){
         if(!buildings.hasOwnProperty(bid)) return;

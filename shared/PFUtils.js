@@ -88,4 +88,39 @@ PFUtils.euclidean = function(a,b){
     return Math.sqrt(Math.pow(a.x-b.x,2)+Math.pow(a.y- b.y,2));
 };
 
+PFUtils.isInPolygon = function (polygon, x, y)  // polygon is array of points
+{
+    var inside = false;
+
+    for (var i = -1, j = polygon.length - 1; ++i < polygon.length; j = i)
+    {
+        var ix = polygon[i].x;
+        var iy = polygon[i].y;
+
+        var jx = polygon[j].x;
+        var jy = polygon[j].y;
+
+        if (((iy <= y && y < jy) || (jy <= y && y < iy)) && (x < (jx - ix) * (y - iy) / (jy - iy) + ix))
+        {
+            inside = !inside;
+        }
+    }
+
+    return inside;
+};
+
+PFUtils.collisionsFromShape = function(shape,tileX,tileY,width,height,map){ // shape is array of points
+    for(var x = 0; x < width; x += 32){
+        var px = x;// + 16;
+        for(var y = 0; y < height; y += 32) {
+            var py = y;// + 16;
+            if(PFUtils.isInPolygon(shape,px,py)){
+                var wx = tileX + x/32;
+                var wy = tileY + y/32;
+                map.add(wy,wx,1);
+            }
+        }
+    }
+};
+
 if (onServer) module.exports.PFUtils = PFUtils;

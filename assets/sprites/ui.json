@@ -63,6 +63,46 @@
     {
       "filename": "capsule-right",
       "frame": {"x":683,"y":118,"w":25,"h":24}
+    },
+    {
+      "filename": "capsule-right",
+      "frame": {"x":683,"y":118,"w":25,"h":24}
+    },
+    {
+      "filename": "slots-topleft",
+      "frame": {"x":442,"y":292,"w":38,"h":38}
+    },
+    {
+      "filename": "slots-top",
+      "frame": {"x":481,"y":292,"w":36,"h":38}
+    },
+    {
+      "filename": "slots-topright",
+      "frame": {"x":518,"y":292,"w":38,"h":38}
+    },
+    {
+      "filename": "slots-left",
+      "frame": {"x":442,"y":331,"w":38,"h":36}
+    },
+    {
+      "filename": "slots-middle",
+      "frame": {"x":481,"y":331,"w":36,"h":36}
+    },
+    {
+      "filename": "slots-right",
+      "frame": {"x":518,"y":331,"w":38,"h":36}
+    },
+    {
+      "filename": "slots-bottomleft",
+      "frame": {"x":442,"y":368,"w":38,"h":38}
+    },
+    {
+      "filename": "slots-bottom",
+      "frame": {"x":481,"y":368,"w":36,"h":38}
+    }  ,
+    {
+      "filename": "slots-bottomright",
+      "frame": {"x":518,"y":368,"w":38,"h":38}
     }
   ]
 }

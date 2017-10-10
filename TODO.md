@@ -101,8 +101,6 @@ Content:
 - Display ammo amount next to weapon
 - Use items from menu (healing)
 * Movement:
-- Create collision tiles at building locations server-side
-- Depth-sorting of buildings based on y position (depth = fixed offset + y or sth)
 - Verticality stuff (trees canopy, etc.)
 - Animate
 * Player interactions

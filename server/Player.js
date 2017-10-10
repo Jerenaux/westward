@@ -10,6 +10,7 @@ var GameServer = require('./GameServer.js').GameServer;
 function Player(){
     this.updatePacket = new PersonalUpdatePacket();
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
+    this.items = [];
 }
 
 Player.prototype = Object.create(MovingEntity.prototype);
@@ -61,6 +62,10 @@ Player.prototype.getDataFromDb = function(document){
         this[dbProperties[p]] = document[dbProperties[p]];
     }
     this.setOrUpdateAOI();
+    if(document.items) {
+        this.items = document.items;
+        this.updatePacket.addItems(this.items);
+    }
     //this.equip(1,document['weapon']);
     //this.equip(2,document['armor']);
 };

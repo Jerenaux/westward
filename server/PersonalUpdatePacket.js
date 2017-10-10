@@ -3,12 +3,11 @@
  */
 
 function PersonalUpdatePacket(){
-    //this.hp = []; // list of hp values to display as the result of fight actions between the player and enemies
-    //this.killed = []; // list of id's of monsters killed since last update
-    //this.used = []; // list of id's of items used/picked since last update
+    this.items = {};
 }
 
 PersonalUpdatePacket.prototype.isEmpty = function(){
+    if(Object.keys(this.items).length > 0) return false;
     /*if(this.life !== undefined) return false; // current value of the health of the player
     if(this.x !== undefined) return false;
     if(this.y !== undefined) return false;
@@ -23,12 +22,17 @@ PersonalUpdatePacket.prototype.clean = function() { // Remove empty arrays from 
     /*if(!this.hp.length) delete this.hp;
     if(!this.killed.length) delete this.killed;
     if(!this.used.length) delete this.used;*/
+    if(Object.keys(this.items).length == 0) this.items = undefined;
     return this;
 };
 
 PersonalUpdatePacket.prototype.updatePosition = function(x,y) {
     this.x = x;
     this.y = y;
+};
+
+PersonalUpdatePacket.prototype.addItems = function(items){
+    this.items = items;
 };
 
 /*PersonalUpdatePacket.prototype.updateLife = function(life){

@@ -9,7 +9,7 @@ var Player = new Phaser.Class({
         // Using call(), the called method will be executed while having 'this' pointing to the first argumentof call()
         CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, texture);
 
-        this.depth = Engine.playersDepth;
+        this.depth = Engine.playersDepth + y;
         this.id = id;
         this.chunk = Utils.tileToAOI({x:x,y:y});
         this.tileX = x;
@@ -75,6 +75,7 @@ var Player = new Phaser.Class({
         };
         this.tileX = Math.floor(this.x/Engine.tileWidth);
         this.tileY = Math.floor(this.y/Engine.tileHeight);
+        this.depth = Engine.playersDepth + this.tileY;
         this.chunk = Utils.tileToAOI({x: this.tileX, y: this.tileY});
 
         if(this.id == Engine.player.id) {
