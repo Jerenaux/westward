@@ -1,15 +1,17 @@
 /**
  * Created by Jerome on 06-10-17.
  */
-function Panel(x,y,width,height,title,slots){
+function Panel(x,y,width,height,title){
     this.container = [];
+    this.slots = []; // slot number -> coordinates
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
+    this.lastLineY = this.y + 20;
+    this.displayInventory = false;
     this.makeBody();
-    if(title) this.makeCapsule(title);
-    if(slots) this.addSlots(slots);
+    if(title) this.addCapsule(20,-9,title);
     this.finalize();
 }
 
@@ -40,37 +42,40 @@ Panel.prototype.makeBody = function(){
     this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-bottomright'));
 };
 
-Panel.prototype.makeCapsule = function(title){
-    var x = this.x + 20;
-    var y = this.y - 9;
+Panel.prototype.addCapsule = function(xOffset,yOffset,title,image){
+    var x = this.x + xOffset;
+    var y = this.y + yOffset;
 
-    var text = Engine.scene.add.text(x+10, y, title,
+    if(image) {
+        var img = Engine.scene.add.sprite(x+8,y+6,'UI',image);
+        img.depth = Engine.UIDepth+2;
+    }
+    var textX = (image ? x + img.width : x) + 10;
+    var textY = (image ? y - 1: y);
+
+    var text = Engine.scene.add.text(textX, textY, title,
         { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
     );
     var w = text.width -25;
+    if(image) w += img.width;
     this.container.push(text);
     this.container.push(Engine.scene.add.sprite(x,y,'UI','capsule-left'));
     x += 24;
     this.container.push(Engine.scene.add.tileSprite(x,y,w,24,'UI','capsule-middle'));
     x += w;
     this.container.push(Engine.scene.add.sprite(x,y,'UI','capsule-right'));
+
+    if(image) this.container.push(img);
 };
 
-Panel.prototype.addSlots = function(dimensions){
-    //var padding = 20;
-    /*var horizontalSpace = this.width - 2*padding;
-    var verticalSpace = this.height - 2*padding;
-    var nbHorizontal = Math.floor((horizontalSpace - 2*38)/36) + 2;
-    var nbVertical = Math.floor((verticalSpace - 2*38)/36) + 2;*/
-    var nbHorizontal = dimensions[0];
-    var nbVertical = dimensions[1];
+Panel.prototype.addSlots = function(nbHorizontal,nbVertical,total){
     var paddingX = (this.width - ((nbHorizontal-2)*36+(2*38)))/2;
     var paddingY = (this.height - ((nbVertical-2)*36+(2*38)))/2;
     var offsetx = 0;
     var offsety = 0;
 
     for(var x = 0; x < nbHorizontal; x++){
-        for(var y = 0; y < nbVertical; y++){
+        for(var y = 0; y < nbVertical, (y*nbHorizontal)+x < total; y++){
             var frame = 'slots-';
             var center = 0;
             switch(y){
@@ -98,15 +103,31 @@ Panel.prototype.addSlots = function(dimensions){
             if(center == 2) frame += 'middle';
             offsetx = (x > 0 ? 2 : 0);
             offsety = (y > 0 ? 2 : 0);
-            this.container.push(Engine.scene.add.sprite(this.x+paddingX+(x*36)+offsetx,this.y+paddingY+(y*36)+offsety,'UI',frame));
+            var slotx = this.x+paddingX+(x*36)+offsetx;
+            var sloty = this.y+paddingY+(y*36)+offsety;
+            this.slots.push({
+                x: slotx,
+                y: sloty
+            });
+            this.container.push(Engine.scene.add.sprite(slotx,sloty,'UI',frame));
         }
     }
+    this.finalize();
+};
+
+Panel.prototype.addLine = function(line){
+    var text = Engine.scene.add.text(this.x+15, this.lastLineY, line,
+        { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
+    );
+    this.container.push(text);
+    this.lastLineY += 20;
+    this.finalize();
 };
 
 Panel.prototype.finalize = function(){
     this.container.forEach(function(e){
         var isText = (e.constructor.name == 'Text');
-        e.depth = Engine.UIDepth;
+        if(e.depth == 1 || !e.depth) e.depth = Engine.UIDepth;
         if(isText) e.depth++;
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);

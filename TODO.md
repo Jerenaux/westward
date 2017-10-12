@@ -69,15 +69,7 @@ Content:
 - Improve roaming behavior of savages
 - Have a permanent presence of savages and animals around settlements
 * Character menu
-- Panel with name as title, then basic summary:
-- Lvl x of <class>
-- x XP until next level
-- Citizen/<official> of <settlement>
-- Civic level
-- x XP until next level
-- Gold
-- Health gauge
-- Fatigue gauge
+- Health gauge, fatigue gauge
 - Then: events log ; class bonuses ; buildings ; NPC
 * Crafting
 - Design crafting system
@@ -95,11 +87,13 @@ Content:
 - Hover cards when hovering players
 * Inns
 * Inventory
-- Menu
-- Item slots, equipment blocks, capsule with inventory capacity
+- Display inventory (in both inventory and crafting)
+- Display number of items for each slot
+- Equipment blocks
 - Pick up items
 - Display ammo amount next to weapon
 - Use items from menu (healing)
+- Equip items from menu
 * Movement:
 - Verticality stuff (trees canopy, etc.)
 - Animate
@@ -129,7 +123,6 @@ Design document:
 
 Polish:
 ------
-- Mouse cursor; changes over buttons and buildings (differently if possible)
 - Highlight buttons and buildings on hover
 - Button animation on big red closing cross in menus
 - Custom movement marker

@@ -10,7 +10,8 @@ var Engine = {
     playersDepth: 2,
     UIDepth: 20,
     key: 'main', // key of the scene, for Phaser
-    playerIsInitialized: false
+    playerIsInitialized: false,
+    cursor: 'url(/assets/sprites/cursor.png), auto', // image of the mouse cursor in normal circumstances
 };
 
 Engine.preload = function() {
@@ -85,6 +86,7 @@ Engine.create = function(masterData){
     console.log(Engine.buildingsData);
 
     Engine.createMarker();
+    Engine.scene.game.canvas.style.cursor = Engine.cursor; // Sets the pointer to hand sprite
 
     Engine.scene.input.events.on('POINTER_DOWN_EVENT', Engine.handleClick);
     Engine.scene.input.events.on('POINTER_MOVE_EVENT', Engine.trackMouse);
@@ -116,6 +118,7 @@ Engine.initWorld = function(data){
     Engine.makeUI();
     Engine.addHero(data.id,data.x,data.y);
     Engine.inventory = {};
+    Engine.inventorySprites = {};
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     // TODO: when all chunks loaded, fade-out Boot scene
@@ -159,13 +162,23 @@ Engine.makeCraftingMenu = function(){
 };
 
 Engine.makeCharacterMenu = function(){
-    return new Menu('Character');
+    var character = new Menu('Character');
+    var info = new Panel(665,100,340,380,"<Player name>");
+    info.addLine('Citizen of New Beginning');
+    info.addLine('Level 1 Merchant  -   0/100 Class XP');
+    info.addLine('Level 1 citizen   -   0/100 Civic XP');
+    character.addPanel(info); // equipment panel
+    return character;
 };
 
 Engine.makeInventory = function(){
     var inventory = new Menu('Inventory');
     inventory.addPanel(new Panel(665,100,340,380,'Equipment')); // equipment panel
-    inventory.addPanel(new Panel(40,100,600,380,'Items',[15,9])); // inventory panel
+    var items = new Panel(40,100,600,380,'Items');
+    items.displayInventory = true;
+    items.addCapsule(500,-9,'1299','gold');
+    items.addSlots(15,9,25);
+    inventory.addPanel(items); // inventory panel
     return inventory;
 };
 
@@ -396,8 +409,25 @@ Engine.removeBuilding = function(id){
 * */
 
 Engine.updateSelf = function(data){
-    if(data.items) Engine.inventory = Object.assign(Engine.inventory,data.items);
+    if(data.items) Engine.updateInventory(data.items);
+};
+
+Engine.updateInventory = function(newitems){
+    for(var item in newitems){
+        Engine.inventory[item] = newitems[item];
+    }
     console.log(Engine.inventory);
+    /*TODO
+    * Map of item id -> slot id
+    * Map of slot id -> sprite
+    * When getting object:
+    * - If new, find first empty slot, and map item id to slot id; create new sprite and map slot id to sprite
+    * When losing/using object:
+    * - If = 0, find slot based on item->slot map, then delete sprite in slot
+    -> In both cases, update Engine.inventory
+    * Display:
+    * Iterate over slot ids, if empty (= not mapping to a sprite) do nothing, if busy fetch sprite, then coordinates, and update coordinates of sprite
+    * */
 };
 
 // Processes the global update packages received from the server
