@@ -12,6 +12,7 @@
     ],
     "width": 550,
     "height": 427,
-    "sprite": "fort"
+    "sprite": "fort",
+    "name":"Fort"
   }
 }

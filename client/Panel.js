@@ -9,7 +9,7 @@ function Panel(x,y,width,height,title){
     this.width = width;
     this.height = height;
     this.lastLineY = this.y + 20;
-    this.displayInventory = false;
+    this.displayed = false;
     this.makeBody();
     if(title) this.addCapsule(20,-9,title);
     this.finalize();
@@ -66,6 +66,24 @@ Panel.prototype.addCapsule = function(xOffset,yOffset,title,image){
     this.container.push(Engine.scene.add.sprite(x,y,'UI','capsule-right'));
 
     if(image) this.container.push(img);
+};
+
+Panel.prototype.addRing = function(xs,ys,color,symbol){
+    var x = this.x + xs;
+    var y = this.y + ys;
+    this.container.push(Engine.scene.add.sprite(x,y,'UI','ring'));
+    x += 5;
+    y += 5;
+    var cs = Engine.scene.add.sprite(x,y,'UI',color);
+    this.container.push(cs);
+    x += 4;
+    y += 4;
+    var ss = Engine.scene.add.sprite(x,y,'UI',symbol);
+
+    this.container.push(ss);
+    cs.handleClick = Engine.closingFunction.bind(this);
+    ss.handleClick = Engine.closingFunction.bind(this);
+    this.finalize();
 };
 
 Panel.prototype.addSlots = function(nbHorizontal,nbVertical,total){
@@ -140,10 +158,12 @@ Panel.prototype.display = function(){
     for(var i = 0; i < this.container.length; i++){
         this.container[i].visible = true;
     }
+    this.displayed = true;
 };
 
 Panel.prototype.hide = function(){
     for(var i = 0; i < this.container.length; i++){
         this.container[i].visible = false;
     }
+    this.displayed = false;
 };

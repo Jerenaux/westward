@@ -107,6 +107,18 @@
     {
       "filename": "gold",
       "frame": {"x":818,"y":122,"w":12,"h":12}
+    },
+    {
+      "filename": "ring",
+      "frame": {"x":762,"y":86,"w":24,"h":24}
+    },
+    {
+      "filename": "red",
+      "frame": {"x":48,"y":121,"w":14,"h":14}
+    },
+    {
+      "filename": "close",
+      "frame": {"x":101,"y":141,"w":6,"h":6}
     }
   ]
 }

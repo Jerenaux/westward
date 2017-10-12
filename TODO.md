@@ -95,6 +95,7 @@ Content:
 - Use items from menu (healing)
 - Equip items from menu
 * Movement:
+- Better depth sorting (not relying on tileY)
 - Verticality stuff (trees canopy, etc.)
 - Animate
 * Player interactions

@@ -17,6 +17,8 @@ var Engine = {
 Engine.preload = function() {
     this.load.image('hero', 'assets/sprites/hero.png');
 
+    this.load.image('talk', 'assets/sprites/talk.png');
+
     this.load.image('scroll', 'assets/sprites/scroll.png');
     this.load.image('tome', 'assets/sprites/tome.png');
     this.load.image('tools', 'assets/sprites/tools.png');
@@ -100,7 +102,9 @@ Engine.create = function(masterData){
     PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
 
     Engine.inMenu = false;
+    Engine.inBuildingPanel = false;
     Engine.currentMenu = null;
+    Engine.currentBuildingPanel = null;
 
     Engine.created = true;
     Client.requestData();
@@ -116,12 +120,24 @@ Engine.createMarker = function(){
 
 Engine.initWorld = function(data){
     Engine.makeUI();
+    Engine.makeChatBar();
     Engine.addHero(data.id,data.x,data.y);
     Engine.inventory = {};
     Engine.inventorySprites = {};
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     // TODO: when all chunks loaded, fade-out Boot scene
+};
+
+Engine.makeChatBar = function(){
+    var chatw = 300;
+    var chatx = (32*16)-(chatw/2);
+    var chaty = 18*32-40;
+    var chat = new Panel(chatx,chaty,chatw,96);
+    chat.display();
+    var icon = Engine.scene.add.sprite(chatx+25,chaty+23,'talk');
+    icon.setScrollFactor(0);
+    icon.depth = Engine.UIDepth+1;
 };
 
 Engine.makeUI = function(){
@@ -291,7 +307,10 @@ Engine.handleClick = function(event){
         console.log(event.gameObject.texture.key);
         if(event.gameObject.handleClick) event.gameObject.handleClick();
     }else{
-        if(!Engine.inMenu) Engine.computePath(Engine.getMouseCoordinates(event));
+        if(!Engine.inMenu) {
+            if(Engine.inBuildingPanel) Engine.currentBuildingPanel.hide();
+            Engine.computePath(Engine.getMouseCoordinates(event));
+        }
     }
 };
 
@@ -486,3 +505,6 @@ Engine.getTilesetFromTile = function(tile){
     }
     return Engine.tilesets.length-1;
 };
+
+Engine.closingFunction = function(){this.hide();};
+Engine.closingFunction = function(){this.hide();};
