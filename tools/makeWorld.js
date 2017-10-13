@@ -176,25 +176,32 @@ function applyBlueprint(chunks,bluePrint,outdir){
     var blueprint = fs.readFileSync(__dirname+'/blueprints/'+bluePrint).toString();
     parser.parseString(blueprint, function (err, result) {
         if(err) throw err;
-        var pts = readPath(result);
+        var read = readPath(result);
+        var allPts = read.allPts;
+        var fillNode = read.fillNode;
+        var busy = new SpaceMap();
 
-        var nbPts = pts.length;
-        var tiles = [];
-        for(var i = 0; i <= nbPts-1; i++){
-            var s = pts[i];
-            var e = (i == nbPts-1 ? pts[0] : pts[i+1]);
-            var addTiles = Geometry.addCorners(Geometry.straightLine(s,e));
-            if(i > 0) addTiles.shift();
-            tiles = tiles.concat(addTiles);
+        for(var i = 0; i < allPts.length; i++) {
+            var pts = allPts[i];
+            var nbPts = pts.length;
+            //console.log('processing curve '+i+' of length '+nbPts);
+            var tiles = [];
+            for (var j = 0; j <= nbPts - 1; j++) {
+                var s = pts[j];
+                var e = (j == nbPts - 1 ? pts[0] : pts[j + 1]);
+                var addTiles = Geometry.addCorners(Geometry.straightLine(s, e));
+                if (j > 0) addTiles.shift();
+                tiles = tiles.concat(addTiles);
+            }
+
+            tiles = Geometry.forwardSmoothPass(tiles);
+            tiles = Geometry.backwardSmoothPass(tiles);
+            //console.log('perimeter : ' + tiles.length);
+
+            Gaia.drawShore(tiles, chunks, busy, worldWidth, worldHeight);
         }
 
-        tiles = Geometry.forwardSmoothPass(tiles);
-        tiles = Geometry.backwardSmoothPass(tiles);
-        console.log('perimeter : '+tiles.length);
-
-        var busy = new SpaceMap();
-        Gaia.drawShore(tiles,chunks,busy,worldWidth,worldHeight);
-        Gaia.deluge(chunks,busy,worldWidth,worldHeight);
+        if(fillNode) Gaia.deluge(chunks,busy,fillNode,worldWidth,worldHeight);
 
         var visible = new Set();
         for(var i = 0; i < chunks.length; i++){
@@ -209,7 +216,7 @@ function applyBlueprint(chunks,bluePrint,outdir){
             if(!visible.has(i)) chunks[i] = null;
         }
 
-        //writeFiles(outdir,chunks);
+        writeFiles(outdir,chunks);
     });
 }
 
@@ -217,20 +224,58 @@ function readPath(result){
     var viewbox = result.svg.$.viewBox.split(" ");
     var curveW = parseInt(viewbox[2]);
     var curveH = parseInt(viewbox[3]);
-    var curve = result.svg.path[0].$.d;
-    curve = curve.replace(/\s\s+/g, ' ');
+    var path = result.svg.path[0].$.d;
+    path = path.replace(/\s\s+/g, ' ');
+    var fillNode = null;
+    if(result.svg.hasOwnProperty('fill')) {
+        var fill = result.svg.fill[0].$.nodes.split(" ");
+        fillNode = {
+            x: parseInt(fill[0]),
+            y: parseInt(fill[1])
+        };
+    }else{
+        console.log('no fill node');
+    }
 
-    var fill = result.svg.fill[0].$.nodes;
-    console.log(fill);
-
-    var arr = curve.split(" ");
+    /*var arr = path.split(" ");
     arr.shift(); // remove M
     arr.splice(1,1); // remove C
     arr.pop(); //remove Z and blank end
-    arr.pop();
+    arr.pop();*/
+    var curves = path.split("M");
+    curves.shift(); // remove initial blank
+
+    var finalCurves = [];
+    for(var i = 0; i < curves.length; i++){
+        var c = curves[i].split("C");
+        finalCurves.push(c[1]);
+    }
+    console.log(finalCurves.length+' final curves');
 
     // Generate list of points from blueprint
-    var pts = [];
+    var tally = 0;
+    var allPts = [];
+    for(var i = 0; i < finalCurves.length; i++){
+        var pts = [];
+        var arr = finalCurves[i].split(" ");
+        arr.shift();
+        arr.pop();
+        arr.pop();
+        for(var j = 0; j < arr.length; j++){
+            var e = arr[j];
+            var coords = e.split(",");
+            var wX = Math.floor((parseInt(coords[0])/curveW)*worldWidth);
+            var wY = Math.floor((parseInt(coords[1])/curveH)*worldHeight);
+            if(pts.length > 0 && pts[pts.length-1].x == wX && pts[pts.length-1].y == wY) continue;
+            pts.push({
+                x: wX,
+                y: wY
+            });
+        }
+        tally += pts.length;
+        allPts.push(pts);
+    }
+    /*var pts = [];
     for(var i = 0; i < arr.length; i++){
         var e = arr[i];
         var coords = e.split(",");
@@ -241,11 +286,14 @@ function readPath(result){
             x: wX,
             y: wY
         });
-    }
+    }*/
 
-    console.log(pts.length+' nodes in blueprint');
+    console.log(allPts.length+' curves in blueprint, totalling '+tally+' nodes');
     //pts.forEach(item => console.log(item))
-    return pts;
+    return {
+        allPts: allPts,
+        fillNode: fillNode
+    };
 }
 
 function writeFiles(outdir,chunks){

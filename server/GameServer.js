@@ -26,6 +26,7 @@ var PF = require('../shared/pathfinding.js');
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 GameServer.readMap = function(mapsPath){
+    console.log('Loading map data from '+mapsPath);
     var masterData = JSON.parse(fs.readFileSync(mapsPath+'/master.json').toString());
 
     Utils.chunkWidth = masterData.chunkWidth;

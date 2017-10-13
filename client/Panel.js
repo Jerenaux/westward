@@ -4,12 +4,14 @@
 function Panel(x,y,width,height,title){
     this.container = [];
     this.slots = []; // slot number -> coordinates
+    this.test = [];
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.lastLineY = this.y + 20;
     this.displayed = false;
+    this.displayInventory = false;
     this.makeBody();
     if(title) this.addCapsule(20,-9,title);
     this.finalize();
@@ -87,13 +89,15 @@ Panel.prototype.addRing = function(xs,ys,color,symbol){
 };
 
 Panel.prototype.addSlots = function(nbHorizontal,nbVertical,total){
+    this.displayInventory = true;
     var paddingX = (this.width - ((nbHorizontal-2)*36+(2*38)))/2;
     var paddingY = (this.height - ((nbVertical-2)*36+(2*38)))/2;
     var offsetx = 0;
     var offsety = 0;
 
-    for(var x = 0; x < nbHorizontal; x++){
-        for(var y = 0; y < nbVertical, (y*nbHorizontal)+x < total; y++){
+    for(var y = 0; y < nbVertical; y++){
+        for(var x = 0; x < nbHorizontal; x++){
+            if((y*nbHorizontal)+x > total) break;
             var frame = 'slots-';
             var center = 0;
             switch(y){
@@ -158,12 +162,28 @@ Panel.prototype.display = function(){
     for(var i = 0; i < this.container.length; i++){
         this.container[i].visible = true;
     }
+    if(this.displayInventory) {
+        for(var j = 0; j < Engine.inventory.nbSlots; j++){
+             var sprite = Engine.inventory.getSprite(j);
+             if(!sprite) continue;
+             var pos = this.slots[j];
+             sprite.setPosition(pos.x,pos.y);
+             sprite.visible = true;
+        }
+    }
     this.displayed = true;
 };
 
 Panel.prototype.hide = function(){
     for(var i = 0; i < this.container.length; i++){
         this.container[i].visible = false;
+    }
+    if(this.displayInventory) {
+        for (var j = 0; j < Engine.inventory.nbSlots; j++) {
+            var sprite = Engine.inventory.getSprite(j);
+            if (!sprite) continue;
+            sprite.visible = false;
+        }
     }
     this.displayed = false;
 };

@@ -177,12 +177,7 @@ Gaia.findTileID = function(prev,pt,next,verbose){
     }
 };
 
-Gaia.deluge = function(chunks,busy,worldWidth,worldHeight){ // fills the world with water, but stops at coastlines
-    var fillNode = {
-        x: 753,
-        y: 240
-    };
-
+Gaia.deluge = function(chunks,busy,fillNode,worldWidth,worldHeight){ // fills the world with water, but stops at coastlines
     var queue = [];
     queue.push(fillNode);
     var fillTiles = [];

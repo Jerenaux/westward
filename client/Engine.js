@@ -75,6 +75,8 @@ Engine.create = function(masterData){
     Engine.displayedPlayers = new Set();
     Engine.displayedBuildings = new Set();
 
+    Engine.inventory = Inventory;
+
     Engine.debug = true;
     Engine.showHero = Engine.debug ? Utils.getPreference('showHero',true) : true;
     Engine.showGrid = false;
@@ -122,8 +124,6 @@ Engine.initWorld = function(data){
     Engine.makeUI();
     Engine.makeChatBar();
     Engine.addHero(data.id,data.x,data.y);
-    Engine.inventory = {};
-    Engine.inventorySprites = {};
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     // TODO: when all chunks loaded, fade-out Boot scene
@@ -134,8 +134,8 @@ Engine.makeChatBar = function(){
     var chatx = (32*16)-(chatw/2);
     var chaty = 18*32-40;
     var chat = new Panel(chatx,chaty,chatw,96);
-    chat.display();
     var icon = Engine.scene.add.sprite(chatx+25,chaty+23,'talk');
+    chat.display();
     icon.setScrollFactor(0);
     icon.depth = Engine.UIDepth+1;
 };
@@ -173,7 +173,9 @@ Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
     crafting.addPanel(new Panel(765,100,240,380,'Recipes')); // recipes panel
     crafting.addPanel(new Panel(450,100,290,380,'Combination')); // crafting panel
-    crafting.addPanel(new Panel(40,100,390,380,'Items',[10,10])); // inventory panel
+    var items = new Panel(40,100,390,380,'Items');
+    items.addSlots(10,9,25);
+    crafting.addPanel(items); // inventory panel
     return crafting;
 };
 
@@ -191,7 +193,6 @@ Engine.makeInventory = function(){
     var inventory = new Menu('Inventory');
     inventory.addPanel(new Panel(665,100,340,380,'Equipment')); // equipment panel
     var items = new Panel(40,100,600,380,'Items');
-    items.displayInventory = true;
     items.addCapsule(500,-9,'1299','gold');
     items.addSlots(15,9,25);
     inventory.addPanel(items); // inventory panel
@@ -433,19 +434,17 @@ Engine.updateSelf = function(data){
 
 Engine.updateInventory = function(newitems){
     for(var item in newitems){
-        Engine.inventory[item] = newitems[item];
+        //Engine.inventory[item] = newitems[item];
+        Engine.inventory.update(item,newitems[item]);
     }
-    console.log(Engine.inventory);
     /*TODO
-    * Map of item id -> slot id
-    * Map of slot id -> sprite
     * When getting object:
     * - If new, find first empty slot, and map item id to slot id; create new sprite and map slot id to sprite
     * When losing/using object:
     * - If = 0, find slot based on item->slot map, then delete sprite in slot
     -> In both cases, update Engine.inventory
     * Display:
-    * Iterate over slot ids, if empty (= not mapping to a sprite) do nothing, if busy fetch sprite, then coordinates, and update coordinates of sprite
+    * Iterate over slot ids, if empty  do nothing, if busy fetch sprite, then coordinates, and update coordinates of sprite
     * */
 };
 

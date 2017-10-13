@@ -139,8 +139,7 @@ Polish:
 
 World building:
 --------------
-- Put fillNode into path file and parse it
-- Process multiple paths (test on Australia with its lakes?)
+- Process multiple paths
 - Remove points along the edges of the map from paths (clamp to map limits and then prune)
 - Try and make east coast with rivers and lakes
 - Have a universal ChunkEdit class used accross all tools for all types of modifications

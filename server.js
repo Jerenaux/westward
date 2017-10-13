@@ -7,12 +7,14 @@ var fs = require('fs');
 var quickselect = require('quickselect'); // Used to compute the median for latency
 var mongo = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectID;
+var myArgs = require('optimist').argv;
 
 app.use('/assets',express.static(__dirname + '/assets'));
 app.use('/client',express.static(__dirname + '/client'));
 app.use('/server',express.static(__dirname + '/server'));
 app.use('/shared',express.static(__dirname + '/shared'));
-app.use('/maps',express.static(process.env.MAPS_PATH));
+//app.use('/maps',express.static(process.env.MAPS_PATH));
+app.use('/maps',express.static(myArgs.maps));
 if(process.env.DEV == 1) app.use('/studio',express.static(__dirname + '/studio'));
 
 app.get('/',function(req,res){
@@ -37,7 +39,8 @@ server.listen(process.env.PORT || 8081,function(){
         if(err) throw(err);
         server.db = db;
         console.log('Connection to db established');
-        gs.readMap(process.env.MAPS_PATH);
+        //gs.readMap(process.env.MAPS_PATH);
+        gs.readMap(myArgs.maps);
         server.setUpdateLoops();
     });
 });
