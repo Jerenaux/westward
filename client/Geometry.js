@@ -260,6 +260,18 @@ Geometry.backwardSmoothPass = function(tiles){         // Backward loop to remov
     return tiles;
 };
 
+Geometry.removeFringeTiles = function(tiles,worldWidth,worldHeight){
+    for(var i = 0; i < tiles.length; i++){
+        var tile = tiles[i];
+        //if(tile.x == 0 || tile.x == worldWidth || tile.y == 0 || tile.y == worldHeight) count++;
+        if(tile.x == 0) tile.x = -1;
+        if(tile.y == 0) tile.y = -1;
+        if(tile.x == worldWidth) tile.x++;
+        if(tile.y == worldHeight) tile.y++;
+    }
+    return tiles;
+};
+
 Geometry.makePoint = function(x,y){
     return new PIXI.Point(x*Engine.tileWidth,y*Engine.tileHeight);
 };

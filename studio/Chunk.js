@@ -53,6 +53,7 @@ Chunk.prototype.orderTiles = function(){
 
 Chunk.prototype.drawTile = function(x,y,tile,layer){
     if(x < 0 || y < 0) return;
+    if(!tile) return;
     var tilesetID = Engine.getTilesetFromTile(tile);
     var tileset = Engine.tilesets[tilesetID];
     tile -= tileset.firstgid;

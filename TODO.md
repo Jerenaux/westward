@@ -172,8 +172,6 @@ Polish:
 
 World building:
 --------------
-- Process multiple paths
-- Remove points along the edges of the map from paths (clamp to map limits and then prune)
 - Try and make east coast with rivers and lakes
 - Have a universal ChunkEdit class used accross all tools for all types of modifications
 -> Or a ChunkHolder class which stores chunks in some way and only expose a addTile method which is used by the editor/geometry classes as a callback

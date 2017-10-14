@@ -87,6 +87,7 @@ var Cliff = { // indexes of tiles in tilesets for cliffs
 Gaia.drawShore = function(tiles,chunks,busy,worldWidth,worldHeight){
     for(var i = 0; i < tiles.length; i++){
         var tile = tiles[i];
+        if(tile.x == 0 && tile.y == 0) continue;
 
         if(tile.x < 0 || tile.y < 0 || tile.x > worldWidth || tile.y > worldHeight) continue;
         busy.add(tile.x,tile.y,1);
@@ -99,19 +100,30 @@ Gaia.drawShore = function(tiles,chunks,busy,worldWidth,worldHeight){
 
         switch(id){
             case Gaia.W.topRightOut:
-                Gaia.addTile(tile.x,tile.y,Gaia.Shore.topRight,chunks);
+                var tileID = (tile.y == 0 ? Gaia.Shore.right : Gaia.Shore.topRight); // prevent corners on the fringes
+                Gaia.addTile(tile.x,tile.y,tileID,chunks);
                 break;
             case Gaia.W.top:
-                Gaia.addTile(tile.x,tile.y,Gaia.Shore.top,chunks);
+                if(tile.y > 0) Gaia.addTile(tile.x,tile.y,Gaia.Shore.top,chunks);
                 break;
             case Gaia.W.topLeftOut:
-                Gaia.addTile(tile.x,tile.y,Gaia.Shore.topLeft,chunks);
+                //console.log('tlo at ',tile.x,tile.y);
+                //var tileID = (tile.y == 0 ? Gaia.Shore.left : Gaia.Shore.topLeft); // prevent corners on the fringes
+                var tileID;
+                if(tile.y == 0){
+                    tileID = Gaia.Shore.left;
+                }else if(tile.x == 0){
+                    tileID = Gaia.Shore.top;
+                }else{
+                    tileID = Gaia.Shore.topLeft;
+                }
+                Gaia.addTile(tile.x,tile.y,tileID,chunks);
                 break;
             case Gaia.W.left:
-                Gaia.addTile(tile.x,tile.y,Gaia.Shore.left,chunks);
+                if(tile.x > 0) Gaia.addTile(tile.x,tile.y,Gaia.Shore.left,chunks);
                 break;
             case Gaia.W.right:
-                Gaia.addTile(tile.x,tile.y,Gaia.Shore.right,chunks);
+                if(tile.x > 0) Gaia.addTile(tile.x,tile.y,Gaia.Shore.right,chunks);
                 break;
             case Gaia.W.bottomRightIn:
                 Gaia.addTile(tile.x,tile.y,Gaia.Shore.bottomRight,chunks);
@@ -120,7 +132,8 @@ Gaia.drawShore = function(tiles,chunks,busy,worldWidth,worldHeight){
                 Gaia.addTile(tile.x,tile.y,Gaia.Shore.topRightOut,chunks);
                 break;
             case Gaia.W.bottomLeftIn:
-                Gaia.addTile(tile.x,tile.y,Gaia.Shore.bottomLeft,chunks);
+                var tileID = (tile.x == 0 ? Gaia.Shore.bottom : Gaia.Shore.bottomLeft); // prevent corners on the fringes
+                Gaia.addTile(tile.x,tile.y,tileID,chunks);
                 break;
             case Gaia.W.bottom:
                 Gaia.addTile(tile.x,tile.y,Gaia.Shore.bottom,chunks);
@@ -148,6 +161,10 @@ Gaia.findTileID = function(prev,pt,next,verbose){
         console.log(prev);
         console.log(next);
     }
+    /*90° = northward,
+    * 180° = westward
+    * -90° = southward,
+    * 0° = eastward */
 
     //console.log(inAngle+', '+outAngle);
     if(inAngle == 90 && outAngle == 180){

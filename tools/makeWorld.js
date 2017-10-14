@@ -11,7 +11,7 @@ var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var Geometry = require('../client/Geometry.js').Geometry;
 var Gaia = require('../studio/Gaia.js').Gaia;
 
-var nbHoriz, nbVert, chunkWidth, chunkHeight, tileWidth, tileHeight, worldWidth, worldHeight;
+var nbHoriz, nbVert, chunkWidth, chunkHeight, tileWidth, tileHeight, worldWidth, worldHeight, reverse;
 
 function Layer(w,h,name){
     this.data = [];
@@ -178,7 +178,7 @@ function applyBlueprint(chunks,bluePrint,outdir){
         if(err) throw err;
         var read = readPath(result);
         var allPts = read.allPts;
-        var fillNode = read.fillNode;
+        var fillNodes = read.fillNodes;
         var busy = new SpaceMap();
 
         for(var i = 0; i < allPts.length; i++) {
@@ -196,12 +196,15 @@ function applyBlueprint(chunks,bluePrint,outdir){
 
             tiles = Geometry.forwardSmoothPass(tiles);
             tiles = Geometry.backwardSmoothPass(tiles);
+            //tiles = Geometry.removeFringeTiles(tiles,worldWidth,worldHeight);
             //console.log('perimeter : ' + tiles.length);
-
-            Gaia.drawShore(tiles, chunks, busy, worldWidth, worldHeight);
+            if(reverse) tiles.reverse();
+            if(tiles.length > 1) Gaia.drawShore(tiles, chunks, busy, worldWidth, worldHeight);
         }
 
-        if(fillNode) Gaia.deluge(chunks,busy,fillNode,worldWidth,worldHeight);
+        for(var k = 0; k < fillNodes.length; k++){
+            Gaia.deluge(chunks,busy,fillNodes[k],worldWidth,worldHeight);
+        }
 
         var visible = new Set();
         for(var i = 0; i < chunks.length; i++){
@@ -226,22 +229,21 @@ function readPath(result){
     var curveH = parseInt(viewbox[3]);
     var path = result.svg.path[0].$.d;
     path = path.replace(/\s\s+/g, ' ');
-    var fillNode = null;
+    var fillNodes = [];
     if(result.svg.hasOwnProperty('fill')) {
-        var fill = result.svg.fill[0].$.nodes.split(" ");
-        fillNode = {
-            x: parseInt(fill[0]),
-            y: parseInt(fill[1])
-        };
+        var nodes = result.svg.fill[0].$.nodes.split(",");
+        for(var k = 0; k < nodes.length; k++) {
+            var coords = nodes[k].split(" ");
+            if(coords.length > 2) console.log('WARNING: fill nodes coordinates badly formatted');
+            fillNodes.push({
+                x: parseInt(coords[0]),
+                y: parseInt(coords[1])
+            });
+        }
     }else{
-        console.log('no fill node');
+        console.log('no fill nodes');
     }
 
-    /*var arr = path.split(" ");
-    arr.shift(); // remove M
-    arr.splice(1,1); // remove C
-    arr.pop(); //remove Z and blank end
-    arr.pop();*/
     var curves = path.split("M");
     curves.shift(); // remove initial blank
 
@@ -264,6 +266,7 @@ function readPath(result){
         for(var j = 0; j < arr.length; j++){
             var e = arr[j];
             var coords = e.split(",");
+            // wX and wY are *pixel* coordinates in new world
             var wX = Math.floor((parseInt(coords[0])/curveW)*worldWidth);
             var wY = Math.floor((parseInt(coords[1])/curveH)*worldHeight);
             if(pts.length > 0 && pts[pts.length-1].x == wX && pts[pts.length-1].y == wY) continue;
@@ -275,24 +278,12 @@ function readPath(result){
         tally += pts.length;
         allPts.push(pts);
     }
-    /*var pts = [];
-    for(var i = 0; i < arr.length; i++){
-        var e = arr[i];
-        var coords = e.split(",");
-        var wX = Math.floor((parseInt(coords[0])/curveW)*worldWidth);
-        var wY = Math.floor((parseInt(coords[1])/curveH)*worldHeight);
-        if(pts.length > 0 && pts[pts.length-1].x == wX && pts[pts.length-1].y == wY) continue;
-        pts.push({
-            x: wX,
-            y: wY
-        });
-    }*/
 
     console.log(allPts.length+' curves in blueprint, totalling '+tally+' nodes');
     //pts.forEach(item => console.log(item))
     return {
         allPts: allPts,
-        fillNode: fillNode
+        fillNodes: fillNodes
     };
 }
 
@@ -319,5 +310,6 @@ chunkWidth = myArgs.chunkw;
 chunkHeight = myArgs.chunkh;
 tileWidth = myArgs.tilew;
 tileHeight = myArgs.tileh;
+reverse = myArgs.reverse;
 
 makeWorld(myArgs.blueprint,myArgs.outdir);
