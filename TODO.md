@@ -35,6 +35,8 @@ Cleaning:
 - Sort-out shardness issues of Utils, and the need to have common properties such as tileWidth etc. readily available both in dev and prod
 - Remove unnecessary map directories/files and assets
 - Remove unnecessary Geometry methods
+- Restructure UI, maybe remove UIElement, only have a set of generic functions to bind to interactive sprites?
+- Think about a Container class or something to affect the transforms of all children
 - Clean all files
 
 Content:
@@ -86,6 +88,14 @@ Content:
 - Finish all menus
 - Hover cards when hovering players
 * Inns
+(- Enable players to buy timber from settlements)
+(- Enable players to put construction site)
+(- Enable players to commit to construction)
+- Shop system (custom stock, prices...)
+- Set respawn fee
+- Set respawn site
+- Chat
+- Gazette
 * Inventory
 - Display inventory (in both inventory and crafting)
 - Display number of items for each slot
@@ -99,11 +109,36 @@ Content:
 - Verticality stuff (trees canopy, etc.)
 - Animate
 * Player interactions
-- Chat
+- Toggle chat by pressing enter
+- Display speech bubble locally
+- Broadcats bubble
+- Display menu when click on players, display buttons (give item, give money)
 - Give items/money
 * Settlement defense
+- Enable governor to name the commander
+- Enable commander to build towers
+- Set up stats of towers and forts
+- Towers behave as animals and trigger fights
+- Same with forts
+- Enable commander to build barracks
+- Production of NPC troops
+- Set up stats of troops
+- Make troops engage enemies
 * Settlement economy
+- Salaries for officials
+- Let governor name chancellor
+- Ressource stockpile in fort
+- Let chancellor build each of every buildings
+- Resource loop from resource buildings
+- Impact of commitment on resource gathering
+- Move stock around buildings
+- Shop system in trade post
+- Automatic shop systemn in port for chancellor
+- Trade with overseas
 * Trade
+- Have monsters drop loot
+- Enable bonuses of merchants
+- Allow merchants and artisans to build their shops
 * World map
 - Static image
 - Menu with static image
@@ -112,8 +147,6 @@ Content:
 
 Design document:
 ---------------
-- Find nice to-do list system
-- Finish listing all steps
 - Finish copying notes
 - Make Excel tables (inventory, bestiary, ...)
 - Make powerpoint

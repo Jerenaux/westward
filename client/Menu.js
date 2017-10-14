@@ -46,7 +46,7 @@ Menu.prototype.addPanel = function(panel){
 
 Menu.prototype.display = function(){
     if(Engine.inMenu) Engine.currentMenu.hide();
-    if(Engine.inBuildingPanel) Engine.currentBuildingPanel.hide();
+    if(Engine.inPanel) Engine.currentPanel.hide();
     for(var i = 0; i < this.container.length; i++){
         this.container[i].visible = true;
     }

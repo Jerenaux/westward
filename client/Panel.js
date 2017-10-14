@@ -70,7 +70,7 @@ Panel.prototype.addCapsule = function(xOffset,yOffset,title,image){
     if(image) this.container.push(img);
 };
 
-Panel.prototype.addRing = function(xs,ys,color,symbol){
+Panel.prototype.addRing = function(xs,ys,color,symbol,callback){
     var x = this.x + xs;
     var y = this.y + ys;
     this.container.push(Engine.scene.add.sprite(x,y,'UI','ring'));
@@ -83,8 +83,8 @@ Panel.prototype.addRing = function(xs,ys,color,symbol){
     var ss = Engine.scene.add.sprite(x,y,'UI',symbol);
 
     this.container.push(ss);
-    cs.handleClick = Engine.closingFunction.bind(this);
-    ss.handleClick = Engine.closingFunction.bind(this);
+    cs.handleClick = callback.bind(this);
+    ss.handleClick = callback.bind(this);
     this.finalize();
 };
 

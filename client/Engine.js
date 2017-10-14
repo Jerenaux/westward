@@ -104,9 +104,9 @@ Engine.create = function(masterData){
     PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
 
     Engine.inMenu = false;
-    Engine.inBuildingPanel = false;
+    Engine.inPanel = false;
     Engine.currentMenu = null;
-    Engine.currentBuildingPanel = null;
+    Engine.currentPanel = null;
 
     Engine.created = true;
     Client.requestData();
@@ -309,7 +309,7 @@ Engine.handleClick = function(event){
         if(event.gameObject.handleClick) event.gameObject.handleClick();
     }else{
         if(!Engine.inMenu) {
-            if(Engine.inBuildingPanel) Engine.currentBuildingPanel.hide();
+            if(Engine.inPanel) Engine.currentPanel.hide();
             Engine.computePath(Engine.getMouseCoordinates(event));
         }
     }
@@ -505,5 +505,19 @@ Engine.getTilesetFromTile = function(tile){
     return Engine.tilesets.length-1;
 };
 
-Engine.closingFunction = function(){this.hide();};
-Engine.closingFunction = function(){this.hide();};
+// ## UI-related functions ##
+// this functions need to have a this bound to them
+Engine.closePanel = function(){this.hide();};
+Engine.togglePanel = function(){
+    if(Engine.inMenu) return;
+    if(this.panel.displayed){
+        this.panel.hide();
+        Engine.inPanel = false;
+        Engine.currentPanel = null;
+    }else {
+        if(Engine.inPanel) Engine.currentPanel.hide();
+        this.panel.display();
+        Engine.inPanel = true;
+        Engine.currentPanel = this.panel;
+    }
+};
