@@ -6,10 +6,10 @@ var fs = require('fs');
 var clone = require('clone');
 var xml2js = require('xml2js');
 
+var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
-var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var Geometry = require('../client/Geometry.js').Geometry;
-var Gaia = require('../studio/Gaia.js').Gaia;
+var WorldEditor = require('../studio/WorldEditor.js').WorldEditor;
 
 var nbHoriz, nbVert, chunkWidth, chunkHeight, tileWidth, tileHeight, worldWidth, worldHeight, reverse;
 
@@ -50,13 +50,7 @@ function makeWorld(bluePrint,outdir){
     outdir = (outdir ? __dirname+'/../assets/maps/'+outdir : __dirname+'/../assets/maps/chunks');
     if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);
 
-    Utils.nbChunksHorizontal = nbHoriz;
-    Utils.nbChunksVertical = nbVert;
-    Utils.chunkWidth = chunkWidth;
-    Utils.chunkHeight = chunkHeight;
-    var Engine = {};
-    Engine.tileWidth = tileWidth;
-    Engine.tileHeight = tileHeight;
+    World.setUp(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight);
 
     var basis = makeBasis(); // empty, grass-filled chunk, which can be duplicated all over the map
     writeMasterFile(basis,outdir);
@@ -107,15 +101,15 @@ function makeBasis(){
         var row = Math.floor(x/chunkWidth);
         if(row%2 == 0){
             if(x%2 == 0){ // top left
-                id = Gaia.grass.topLeft;
+                id = WorldEditor.grass.topLeft;
             }else{ // top right
-                id = Gaia.grass.topRight;
+                id = WorldEditor.grass.topRight;
             }
         }else{
             if(x%2 == 0){ //bottom left
-                id = Gaia.grass.bottomLeft;
+                id = WorldEditor.grass.bottomLeft;
             }else{ // bottom right
-                id = Gaia.grass.bottomRight;
+                id = WorldEditor.grass.bottomRight;
             }
         }
         ground.data.push(id);
@@ -169,8 +163,6 @@ function writeMasterFile(basis,outdir){
 }
 
 function applyBlueprint(chunks,bluePrint,outdir){
-    worldWidth = chunkWidth*nbHoriz;
-    worldHeight = chunkHeight*nbVert;
 
     var parser = new xml2js.Parser();
     var blueprint = fs.readFileSync(__dirname+'/blueprints/'+bluePrint).toString();
@@ -179,7 +171,6 @@ function applyBlueprint(chunks,bluePrint,outdir){
         var read = readPath(result);
         var allPts = read.allPts;
         var fillNodes = read.fillNodes;
-        var busy = new SpaceMap();
 
         for(var i = 0; i < allPts.length; i++) {
             var pts = allPts[i];
@@ -196,19 +187,18 @@ function applyBlueprint(chunks,bluePrint,outdir){
 
             tiles = Geometry.forwardSmoothPass(tiles);
             tiles = Geometry.backwardSmoothPass(tiles);
-            //tiles = Geometry.removeFringeTiles(tiles,worldWidth,worldHeight);
             //console.log('perimeter : ' + tiles.length);
             if(reverse) tiles.reverse();
-            if(tiles.length > 1) Gaia.drawShore(tiles, chunks, busy, worldWidth, worldHeight);
+            if(tiles.length > 1) WorldEditor.drawShore(tiles, chunks);
         }
 
         for(var k = 0; k < fillNodes.length; k++){
-            Gaia.deluge(chunks,busy,fillNodes[k],worldWidth,worldHeight);
+            WorldEditor.fill(chunks,fillNodes[k]);
         }
 
         var visible = new Set();
         for(var i = 0; i < chunks.length; i++){
-            if(!Gaia.isOnlyWater(chunks[i])) {
+            if(!WorldEditor.isOnlyWater(chunks[i])) {
                 var adjacent = Utils.listAdjacentAOIs(i);
                 for(var j = 0; j < adjacent.length; j++){
                     visible.add(adjacent[j]);
@@ -241,7 +231,7 @@ function readPath(result){
             });
         }
     }else{
-        console.log('no fill nodes');
+        console.log('NOTICE: No fill nodes');
     }
 
     var curves = path.split("M");
@@ -267,8 +257,8 @@ function readPath(result){
             var e = arr[j];
             var coords = e.split(",");
             // wX and wY are *pixel* coordinates in new world
-            var wX = Math.floor((parseInt(coords[0])/curveW)*worldWidth);
-            var wY = Math.floor((parseInt(coords[1])/curveH)*worldHeight);
+            var wX = Math.floor((parseInt(coords[0])/curveW)*World.worldWidth);
+            var wY = Math.floor((parseInt(coords[1])/curveH)*World.worldHeight);
             if(pts.length > 0 && pts[pts.length-1].x == wX && pts[pts.length-1].y == wY) continue;
             pts.push({
                 x: wX,

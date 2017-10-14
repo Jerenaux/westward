@@ -6,12 +6,16 @@ var onServer = (typeof window === 'undefined');
 
 if(onServer){
     var Geometry = require('../client/Geometry.js').Geometry;
+    var World = require('../shared/World.js').World;
     var Utils = require('../shared/Utils.js').Utils;
+    var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 }
 
-var Gaia = {};
+var WorldEditor = {
+    busyTiles : new SpaceMap()
+};
 
-Gaia.W = { // maps position to numerical ID
+WorldEditor.W = { // Enum-like structure that maps position to numerical ID
     topRightOut: 0,
     top: 1,
     topLeftOut: 2,
@@ -26,7 +30,7 @@ Gaia.W = { // maps position to numerical ID
     topLeftIn: 11
 };
 
-Gaia.Shore = { // indexes of tiles in tilesets for shores
+WorldEditor.shore = { // indexes of tiles in tilesets for shores
     topRight: 249,
     top: 248,
     topLeft: 247,
@@ -42,14 +46,14 @@ Gaia.Shore = { // indexes of tiles in tilesets for shores
     water: 292
 };
 
-Gaia.grass = {
+WorldEditor.grass = {
     topLeft: 284,
     topRight: 285,
     bottomLeft: 305,
     bottomRight: 306
 };
 
-var Cliff = { // indexes of tiles in tilesets for cliffs
+WorldEditor.cliff = { // indexes of tiles in tilesets for cliffs
     topRightOut: 21,
     topRightOut_right: 22,
     topRightOut_top: 6,
@@ -84,76 +88,78 @@ var Cliff = { // indexes of tiles in tilesets for cliffs
     topLeftIn_altbtm: 83
 };
 
-Gaia.drawShore = function(tiles,chunks,busy,worldWidth,worldHeight){
+WorldEditor.drawShore = function(tiles,chunks){
     for(var i = 0; i < tiles.length; i++){
         var tile = tiles[i];
         if(tile.x == 0 && tile.y == 0) continue;
 
-        if(tile.x < 0 || tile.y < 0 || tile.x > worldWidth || tile.y > worldHeight) continue;
-        busy.add(tile.x,tile.y,1);
+        if(tile.x < 0 || tile.y < 0 || tile.x > World.worldWidth || tile.y > World.worldHeight) continue;
 
         var next = (i == tiles.length-1 ? 0 : i+1);
         var prev = (i == 0 ? tiles.length-1 : i-1);
-        var id = Gaia.findTileID(tiles[prev],tile,tiles[next]);
+        var id = WorldEditor.findTileID(tiles[prev],tile,tiles[next]);
 
         //console.log(id+' at '+tile.x+', '+tile.y);
 
         switch(id){
-            case Gaia.W.topRightOut:
-                var tileID = (tile.y == 0 ? Gaia.Shore.right : Gaia.Shore.topRight); // prevent corners on the fringes
-                Gaia.addTile(tile.x,tile.y,tileID,chunks);
+            case WorldEditor.W.topRightOut:
+                var tileID = (tile.y == 0 ? WorldEditor.shore.right : WorldEditor.shore.topRight); // prevent corners on the fringes
+                WorldEditor.addTile(tile.x,tile.y,tileID,chunks);
                 break;
-            case Gaia.W.top:
-                if(tile.y > 0) Gaia.addTile(tile.x,tile.y,Gaia.Shore.top,chunks);
+            case WorldEditor.W.top:
+                if(tile.y > 0) WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.top,chunks);
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.top,chunks);
                 break;
-            case Gaia.W.topLeftOut:
-                //console.log('tlo at ',tile.x,tile.y);
-                //var tileID = (tile.y == 0 ? Gaia.Shore.left : Gaia.Shore.topLeft); // prevent corners on the fringes
+            case WorldEditor.W.topLeftOut:
                 var tileID;
                 if(tile.y == 0){
-                    tileID = Gaia.Shore.left;
+                    tileID = WorldEditor.shore.left;
                 }else if(tile.x == 0){
-                    tileID = Gaia.Shore.top;
+                    tileID = WorldEditor.shore.top;
                 }else{
-                    tileID = Gaia.Shore.topLeft;
+                    tileID = WorldEditor.shore.topLeft;
                 }
-                Gaia.addTile(tile.x,tile.y,tileID,chunks);
+                WorldEditor.addTile(tile.x,tile.y,tileID,chunks);
                 break;
-            case Gaia.W.left:
-                if(tile.x > 0) Gaia.addTile(tile.x,tile.y,Gaia.Shore.left,chunks);
+            case WorldEditor.W.left:
+                if(tile.x > 0) WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.left,chunks);
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.left,chunks);
                 break;
-            case Gaia.W.right:
-                if(tile.x > 0) Gaia.addTile(tile.x,tile.y,Gaia.Shore.right,chunks);
+            case WorldEditor.W.right:
+                if(tile.x > 0) WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.right,chunks);
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.right,chunks);
                 break;
-            case Gaia.W.bottomRightIn:
-                Gaia.addTile(tile.x,tile.y,Gaia.Shore.bottomRight,chunks);
+            case WorldEditor.W.bottomRightIn:
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.bottomRight,chunks);
                 break;
-            case Gaia.W.bottomLeftOut:
-                Gaia.addTile(tile.x,tile.y,Gaia.Shore.topRightOut,chunks);
+            case WorldEditor.W.bottomLeftOut:
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.topRightOut,chunks);
                 break;
-            case Gaia.W.bottomLeftIn:
-                var tileID = (tile.x == 0 ? Gaia.Shore.bottom : Gaia.Shore.bottomLeft); // prevent corners on the fringes
-                Gaia.addTile(tile.x,tile.y,tileID,chunks);
+            case WorldEditor.W.bottomLeftIn:
+                var tileID = (tile.x == 0 ? WorldEditor.shore.bottom : WorldEditor.shore.bottomLeft); // prevent corners on the fringes
+                WorldEditor.addTile(tile.x,tile.y,tileID,chunks);
                 break;
-            case Gaia.W.bottom:
-                Gaia.addTile(tile.x,tile.y,Gaia.Shore.bottom,chunks);
+            case WorldEditor.W.bottom:
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.bottom,chunks);
                 break;
-            case Gaia.W.bottomRightOut:
-                Gaia.addTile(tile.x,tile.y,Gaia.Shore.topLeftOut,chunks);
+            case WorldEditor.W.bottomRightOut:
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.topLeftOut,chunks);
                 break;
-            case Gaia.W.topRightIn:
-                Gaia.addTile(tile.x,tile.y,Gaia.Shore.bottomLeftOut,chunks);
+            case WorldEditor.W.topRightIn:
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.bottomLeftOut,chunks);
                 break;
-            case Gaia.W.topLeftIn:
-                Gaia.addTile(tile.x,tile.y,Gaia.Shore.bottomRightOut,chunks);
+            case WorldEditor.W.topLeftIn:
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.bottomRightOut,chunks);
                 break;
             default:
+                //console.log('nothing at ',tile.x,tile.y);
+                WorldEditor.occupy(tile.x,tile.y);
                 break;
         }
     }
 };
 
-Gaia.findTileID = function(prev,pt,next,verbose){
+WorldEditor.findTileID = function(prev,pt,next,verbose){
     var inAngle = Geometry.computeAngle(prev,pt,true);
     var outAngle = Geometry.computeAngle(pt,next,true);
     if(verbose) {
@@ -168,33 +174,33 @@ Gaia.findTileID = function(prev,pt,next,verbose){
 
     //console.log(inAngle+', '+outAngle);
     if(inAngle == 90 && outAngle == 180){
-        return Gaia.W.topRightOut;
+        return WorldEditor.W.topRightOut;
     }else if(inAngle == 180 && outAngle == -90){
-        return Gaia.W.topLeftOut;
+        return WorldEditor.W.topLeftOut;
     }else if(inAngle == 180 && outAngle == 90){
-        return Gaia.W.bottomLeftOut;
+        return WorldEditor.W.bottomLeftOut;
     }else if(inAngle == -90 && outAngle == 180){
-        return Gaia.W.bottomRightOut;
+        return WorldEditor.W.bottomRightOut;
     }else if(inAngle == -90 && outAngle == 0){
-        return Gaia.W.bottomLeftIn;
+        return WorldEditor.W.bottomLeftIn;
     }else if(inAngle == 0 && outAngle == 90){
-        return Gaia.W.bottomRightIn;
+        return WorldEditor.W.bottomRightIn;
     }else if(inAngle == 180 && outAngle == 180){
-        return Gaia.W.top;
+        return WorldEditor.W.top;
     }else if(inAngle == 90 && outAngle == 90){
-        return Gaia.W.right;
+        return WorldEditor.W.right;
     }else if(inAngle == 0 && outAngle == 0){
-        return Gaia.W.bottom;
+        return WorldEditor.W.bottom;
     }else if(inAngle == -90 && outAngle == -90){
-        return Gaia.W.left;
+        return WorldEditor.W.left;
     }else if(inAngle == 0 && outAngle == -90) {
-        return Gaia.W.topRightIn;
+        return WorldEditor.W.topRightIn;
     }else if(inAngle == 90 && outAngle == 0){
-        return Gaia.W.topLeftIn;
+        return WorldEditor.W.topLeftIn;
     }
 };
 
-Gaia.deluge = function(chunks,busy,fillNode,worldWidth,worldHeight){ // fills the world with water, but stops at coastlines
+WorldEditor.fill = function(chunks,fillNode){ // fills the world with water, but stops at coastlines
     var queue = [];
     queue.push(fillNode);
     var fillTiles = [];
@@ -202,19 +208,19 @@ Gaia.deluge = function(chunks,busy,fillNode,worldWidth,worldHeight){ // fills th
     var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
     while(queue.length > 0){
         var node = queue.shift();
-        if(Gaia.isBusy(node,busy)) continue;
+        if(WorldEditor.isBusy(node)) continue;
         // put a tile at location
         fillTiles.push(node);
-        busy.add(node.x,node.y,1);
+        WorldEditor.busyTiles.add(node.x,node.y,1);
         // expand
         for(var i = 0; i < contour.length; i++){
             var candidate = {
                 x: node.x + contour[i][0],
                 y: node.y + contour[i][1]
             };
-            if(candidate.x < 0 || candidate.y < 0 || candidate.x > worldWidth || candidate.y > worldHeight) continue;
+            if(candidate.x < 0 || candidate.y < 0 || candidate.x > World.worldWidth || candidate.y > World.worldHeight) continue;
 
-            if(!Gaia.isBusy(candidate,busy)) queue.push(candidate);
+            if(!WorldEditor.isBusy(candidate)) queue.push(candidate);
         }
 
         counter++;
@@ -227,15 +233,15 @@ Gaia.deluge = function(chunks,busy,fillNode,worldWidth,worldHeight){ // fills th
 
     for(var i = 0; i < fillTiles.length; i++){
         var tile = fillTiles[i];
-        Gaia.addTile(tile.x, tile.y, Gaia.Shore.water, chunks);
+        WorldEditor.addTile(tile.x, tile.y, WorldEditor.shore.water, chunks);
     }
 };
 
-Gaia.isBusy = function(node,busy){
-    return !!busy.get(node.x,node.y);
+WorldEditor.isBusy = function(node){
+    return !!WorldEditor.busyTiles.get(node.x,node.y);
 };
 
-Gaia.addTile = function(x,y,tile,chunks){
+WorldEditor.addTile = function(x,y,tile,chunks){
     var id = Utils.tileToAOI({x: x, y: y});
     var chunk = chunks[id];
     if(!chunk) return;
@@ -244,14 +250,19 @@ Gaia.addTile = function(x,y,tile,chunks){
     var cy = y - origin.y;
     var idx = Utils.gridToLine(cx, cy, chunk.width);
     chunk.layers[0].data[idx] = tile;
+    WorldEditor.occupy(x,y);
 };
 
-Gaia.isOnlyWater = function(chunk){
+WorldEditor.occupy = function(x,y){
+    WorldEditor.busyTiles.add(x,y,1);
+};
+
+WorldEditor.isOnlyWater = function(chunk){
     var sum = 0;
     for(var i = 0; i < chunk.layers[0].data.length; i++){
         sum += chunk.layers[0].data[i];
     }
-    return (sum == (chunk.width*chunk.height*Gaia.Shore.water));
+    return (sum == (chunk.width*chunk.height*WorldEditor.shore.water));
 };
 
-if (onServer) module.exports.Gaia = Gaia;
+if (onServer) module.exports.WorldEditor = WorldEditor;

@@ -4,9 +4,11 @@
 
 var onServer = (typeof window === 'undefined');
 
-var Utils = {
-    separator : '_'
-};
+if(onServer){
+    World = require('./World.js').World;
+}
+
+var Utils = {};
 
 Utils.getPreference = function(parameter,defaultValue){ // Retrieve sorting preferences for localStorage or return a default value
     var pref = localStorage.getItem(parameter);
@@ -18,16 +20,21 @@ Utils.getPreference = function(parameter,defaultValue){ // Retrieve sorting pref
 };
 
 Utils.tileToAOI = function(tile){ // input coords in Tiles
+    if(!World.nbChunksHorizontal){
+        console.log('ERROR : Chunk data not initialized');
+        return 0;
+    }
     if(tile.x < 0 || tile.y < 0) console.log('ALERT: negative coordinates');
-    var top = Math.floor(tile.y/Utils.chunkHeight);
-    var left = Math.floor(tile.x/Utils.chunkWidth);
-    return (top*Utils.nbChunksHorizontal)+left;
+    var top = Math.floor(tile.y/World.chunkHeight);
+    var left = Math.floor(tile.x/World.chunkWidth);
+    return (top*World.nbChunksHorizontal)+left;
 };
 
 Utils.AOItoTile = function(aoi){
+    if(!World.nbChunksHorizontal) console.log('ERROR : Chunk data not initialized');
     return {
-        x : (aoi%Utils.nbChunksHorizontal)*Utils.chunkWidth,
-        y : Math.floor(aoi/Utils.nbChunksHorizontal)*Utils.chunkHeight
+        x : (aoi%World.nbChunksHorizontal)*World.chunkWidth,
+        y : Math.floor(aoi/World.nbChunksHorizontal)*World.chunkHeight
     };
 };
 
@@ -38,8 +45,8 @@ Utils.gridToLine = function(x,y,w){
 // Returns the x and y offets of a chunk, in chunks, from the top left
 Utils.getMacroCoordinates = function(chunk){
     return {
-        x: chunk%Engine.nbChunksHorizontal,
-        y: Math.floor(chunk/Engine.nbChunksHorizontal)
+        x: chunk%World.nbChunksHorizontal,
+        y: Math.floor(chunk/World.nbChunksHorizontal)
     }
 };
 
@@ -69,25 +76,25 @@ Utils.listVisibleAOIs = function(start){ // List the visible chunks around the p
 };
 
 Utils.listAdjacentAOIs = function(current){
-    if(!Utils.nbChunksHorizontal){
+    if(!World.nbChunksHorizontal){
         console.log('ERROR : Chunk data not initialized');
         return [];
     }
 
     var AOIs = [];
-    var isAtTop = (current < Utils.nbChunksHorizontal);
-    var isAtBottom = (current > Utils.lastChunkID - Utils.nbChunksHorizontal);
-    var isAtLeft = (current%Utils.nbChunksHorizontal == 0);
-    var isAtRight = (current%Utils.nbChunksHorizontal == Utils.nbChunksHorizontal-1);
+    var isAtTop = (current < World.nbChunksHorizontal);
+    var isAtBottom = (current > World.lastChunkID - World.nbChunksHorizontal);
+    var isAtLeft = (current%World.nbChunksHorizontal == 0);
+    var isAtRight = (current%World.nbChunksHorizontal == World.nbChunksHorizontal-1);
     AOIs.push(current);
-    if(!isAtTop) AOIs.push(current - Utils.nbChunksHorizontal);
-    if(!isAtBottom) AOIs.push(current + Utils.nbChunksHorizontal);
+    if(!isAtTop) AOIs.push(current - World.nbChunksHorizontal);
+    if(!isAtBottom) AOIs.push(current + World.nbChunksHorizontal);
     if(!isAtLeft) AOIs.push(current-1);
     if(!isAtRight) AOIs.push(current+1);
-    if(!isAtTop && !isAtLeft) AOIs.push(current-1-Utils.nbChunksHorizontal);
-    if(!isAtTop && !isAtRight) AOIs.push(current+1-Utils.nbChunksHorizontal);
-    if(!isAtBottom && !isAtLeft) AOIs.push(current-1+Utils.nbChunksHorizontal);
-    if(!isAtBottom && !isAtRight) AOIs.push(current+1+Utils.nbChunksHorizontal);
+    if(!isAtTop && !isAtLeft) AOIs.push(current-1-World.nbChunksHorizontal);
+    if(!isAtTop && !isAtRight) AOIs.push(current+1-World.nbChunksHorizontal);
+    if(!isAtBottom && !isAtLeft) AOIs.push(current-1+World.nbChunksHorizontal);
+    if(!isAtBottom && !isAtRight) AOIs.push(current+1+World.nbChunksHorizontal);
     return AOIs;
 };
 
@@ -130,8 +137,8 @@ function clamp(x,min,max){ // restricts a value to a given interval (return the 
 
 function coordinatesPairToTile(coords){
     return {
-        x: Math.floor(coords.x/Engine.tileWidth),
-        y: Math.floor(coords.y/Engine.tileHeight)
+        x: Math.floor(coords.x/World.tileWidth),
+        y: Math.floor(coords.y/World.tileHeight)
     }
 }
 

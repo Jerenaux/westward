@@ -47,7 +47,7 @@ Engine.preload = function() {
 };
 
 Engine.create = function(masterData){
-    Engine.tileWidth = masterData.tilesets[0].tilewidth;
+    /*Engine.tileWidth = masterData.tilesets[0].tilewidth;
     Engine.tileHeight = masterData.tilesets[0].tileheight;
     Engine.chunkWidth = masterData.chunkWidth;
     Engine.chunkHeight = masterData.chunkHeight;
@@ -58,6 +58,8 @@ Engine.create = function(masterData){
     Engine.worldWidth = Utils.nbChunksHorizontal*Engine.chunkWidth;
     Engine.worldHeight = Utils.nbChunksVertical*Engine.chunkHeight;
     Utils.lastChunkID = (Utils.nbChunksHorizontal*Utils.nbChunksVertical)-1;
+    Engine.nbLayers = masterData.nbLayers;*/
+    World.readMasterData(masterData);
     Engine.nbLayers = masterData.nbLayers;
     if(!Engine.nbLayers) console.log('WARNING : falsy number of layers : '+console.log(Engine.nbLayers));
     Engine.mapDataLocation = Boot.mapDataLocation;

@@ -3,7 +3,7 @@ function Chunk(mapData,z){
     this.fromFile = (mapData !== null);
     this.id = mapData ? mapData.chunkID : 0;
     this.z = z;
-    this.tilesWidth = mapData.width || Engine.chunkWidth; // "width" is reserved by PIXI
+    this.tilesWidth = mapData.width || World.chunkWidth; // "width" is reserved by PIXI
 
     for(var i = 0; i < Engine.nbLayers; i++){
         var data = this.fromFile ? mapData.layers[i].data : null ;

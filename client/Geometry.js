@@ -14,54 +14,6 @@ var Geometry = {
     }
 };
 
-Geometry.shoreBox = { // Holds a few fields and data structures used to make water bodies
-    flag: 0, // 0 = beginning of shore, 1 = end
-    x: 0, // coordinates of beginning of shore
-    y: 0,
-    shoreType: 0,
-    north: {},
-    east: {},
-    south: {},
-    west: {},
-    getMap: function(shore){
-        switch(shore){
-            case 1:
-                return Geometry.shoreBox.north;
-            case 2:
-                return Geometry.shoreBox.west;
-            case 3:
-                return Geometry.shoreBox.south;
-            case 4:
-                return Geometry.shoreBox.east;
-        }
-    },
-    registerTile: function(tile,id){
-        var northShore = [W.top, W.topLeftOut, W.topRightOut, W.bottomRightOut, W.bottomLeftOut];
-        var southShore = [W.bottom, W.topLeftIn, W.topRightIn, W.bottomLeftIn, W.bottomRightIn];
-        var eastShore = [W.right, W.topRightOut, W.bottomRightIn];
-        var westShore = [W.left];
-        if(northShore.includes(id)){
-            Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.north,'x','y','min');
-        }else if(southShore.includes(id)){
-            Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.south,'x','y','max');
-        }
-        if(westShore.includes(id)){
-            Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.west,'y','x','max');
-        }else if(eastShore.includes(id)){
-            Geometry.shoreBox.addToMap(tile,Geometry.shoreBox.east,'y','x','min');
-        }
-    },
-    addToMap: function(tile,map,keyCoordinate,valueCoordinate,operator){
-        // Add the x/y value of a tile to the map, with the other value as the key.
-        // Depending on the map, replace existing value with min() or max() of the existing one and the new one.
-        if(!map.hasOwnProperty(tile[keyCoordinate])){
-            map[tile[keyCoordinate]] = tile[valueCoordinate];
-        }else{
-            map[tile[keyCoordinate]] = Math[operator](map[tile[keyCoordinate]],tile[valueCoordinate]);
-        }
-    }
-};
-
 Geometry.cluster = function(x,y){
     var pts = [];
     var stdX = document.getElementById('w').value;

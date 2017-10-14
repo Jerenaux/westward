@@ -22,17 +22,15 @@ Prototype level:
 
 Cleaning:
 --------
-- Create World object, may or may not replace Gaia, to store info about world (dimensions, busy tiles...) and world-building methods
--> Move it t studio
+- Use World server-side
+- Move Geometry to studio
 - Handle 404 errors when chunk file not found
 - Clean up Utils
-- Write Readme detailling structure of code: assets, client/server/shared code (-> for production), tools (command-line scripts) and studio
-- Move Geometry to studio
+- Write Readme detailing structure of code: assets, client/server/shared code (-> for production), tools (command-line scripts) and studio
 - Replace delete calls in updatePkg.clean() by something else
 - Split server in two (game and dev server)
 - Order files in studio
 - Standardize the use of Utils methods for coordianes manipulations (gridtoline, lientogrid, tiletoiAOI, AOItotile, tileRelativeToAOI...)
-- Sort-out shardness issues of Utils, and the need to have common properties such as tileWidth etc. readily available both in dev and prod
 - Remove unnecessary map directories/files and assets
 - Remove unnecessary Geometry methods
 - Restructure UI, maybe remove UIElement, only have a set of generic functions to bind to interactive sprites?
@@ -180,7 +178,7 @@ of the awkward temporary chunks, and instead, when editing, make a backup copy o
 just restore it
 - Fix saving tool
 - Investigate the possibility of making cliffs from terrain data of the east coast
-- Fix cliif outlines
+- Fix cliff outlines
 - Add forests
 - Add random elements
 

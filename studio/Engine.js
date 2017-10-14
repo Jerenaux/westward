@@ -12,10 +12,10 @@ Engine.camera = {
     x: 0,
     y: 0,
     getPixelX: function(){
-        return Engine.camera.x*Engine.tileWidth;
+        return Engine.camera.x*World.tileWidth;
     },
     getPixelY: function(){
-        return Engine.camera.y*Engine.tileHeight;
+        return Engine.camera.y*World.tileHeight;
     }
 };
 
@@ -101,24 +101,10 @@ Engine.computeStageLocation = function(){
 };
 
 Engine.readMaster = function(masterData){
-    Engine.tileWidth = masterData.tilesets[0].tilewidth;
-    Engine.tileHeight = masterData.tilesets[0].tileheight;
-    Engine.chunkWidth = masterData.chunkWidth;
-    Engine.chunkHeight = masterData.chunkHeight;
-    Engine.nbChunksHorizontal = masterData.nbChunksHoriz;
-    Engine.nbChunksVertical = masterData.nbChunksVert;
-    Engine.worldWidth = Engine.nbChunksHorizontal*Engine.chunkWidth;
-    Engine.worldHeight = Engine.nbChunksVertical*Engine.chunkHeight;
-    Engine.lastChunkID = (Engine.nbChunksHorizontal*Engine.nbChunksVertical)-1;
+    World.readMasterData(masterData);
     Engine.nbLayers = masterData.nbLayers;
 
-    Utils.chunkWidth = Engine.chunkWidth;
-    Utils.chunkHeight = Engine.chunkHeight;
-    Utils.nbChunksHorizontal = Engine.nbChunksHorizontal;
-    Utils.nbChunksVertical = Engine.nbChunksVertical;
-    Utils.lastChunkID = Engine.lastChunkID;
-
-    console.log('Master file read, setting up world of size '+Engine.worldWidth+' x '+Engine.worldHeight+' with '+Engine.nbLayers+' layers');
+    console.log('Master file read, setting up world of size '+World.worldWidth+' x '+World.worldHeight+' with '+Engine.nbLayers+' layers');
     Engine.tilesets = masterData.tilesets;
 
     PIXI.loader.add('hero','../assets/sprites/hero.png');
@@ -245,7 +231,7 @@ Engine.drawGrid = function(chunk){
         var gr = new PIXI.Graphics();
         var origin = Utils.AOItoTile(chunk.id);
         gr.lineStyle(10, 0xffffff, 1);
-        gr.drawRect(origin.x * Engine.tileWidth, origin.y * Engine.tileHeight, Engine.chunkWidth * Engine.tileWidth, Engine.chunkHeight * Engine.tileHeight);
+        gr.drawRect(origin.x * World.tileWidth, origin.y * World.tileHeight, World.chunkWidth * World.tileWidth, World.chunkHeight * World.tileHeight);
         gr.z = 999;
         chunk.addChild(gr);
         chunk.grid = gr;
@@ -275,7 +261,7 @@ Engine.removeChunk = function(id){
 };
 
 Engine.showAll = function(){
-    for(var i = 0; i < Engine.lastChunkID; i++){
+    for(var i = 0; i < World.lastChunkID; i++){
         Engine.displayChunk(i);
     }
 };
@@ -343,9 +329,9 @@ Engine.updateCamera = function(){
     Engine.camera.x = Engine.player.tilePosition.x - Math.floor(Engine.viewWidth*0.5);
     Engine.camera.y = Engine.player.tilePosition.y - Math.floor(Engine.viewHeight*0.5);
     // Clamp in tile units
-    Engine.camera.x = clamp(Engine.camera.x,0,Engine.worldWidth-Engine.viewWidth);
-    Engine.camera.y = clamp(Engine.camera.y,0,Engine.worldHeight-Engine.viewHeight);
-    Engine.stage.pivot.set(Engine.camera.x*Engine.tileWidth,Engine.camera.y*Engine.tileHeight);
+    Engine.camera.x = clamp(Engine.camera.x,0,World.worldWidth-Engine.viewWidth);
+    Engine.camera.y = clamp(Engine.camera.y,0,World.worldHeight-Engine.viewHeight);
+    Engine.stage.pivot.set(Engine.camera.x*World.tileWidth,Engine.camera.y*World.tileHeight);
     document.getElementById('cx').innerHTML = Engine.camera.x;
     document.getElementById('cy').innerHTML = Engine.camera.y;
 };
@@ -377,7 +363,7 @@ Engine.move = function(x,y){
 };
 
 Engine.setPosition = function(sprite,x,y){
-    sprite.position.set(x*Engine.tileWidth,y*Engine.tileHeight);
+    sprite.position.set(x*World.tileWidth,y*World.tileHeight);
     if(sprite.tilePosition){
         sprite.tilePosition.set(x,y);
     }else {
@@ -404,8 +390,8 @@ Engine.getMouseCoordinates = function(e){
         y: Math.round(canvasPxCoord.y*(1/Engine.zoomScale) + Engine.camera.getPixelY())
     };
     var gameTileCoord = {
-        x: coordinatesToCell(gamePxCoord.x,Engine.tileWidth),
-        y: coordinatesToCell(gamePxCoord.y,Engine.tileHeight)
+        x: coordinatesToCell(gamePxCoord.x,World.tileWidth),
+        y: coordinatesToCell(gamePxCoord.y,World.tileHeight)
     };
     return {
         px: gamePxCoord,
@@ -446,8 +432,8 @@ Engine.handleClick = function(e){
     if(!Engine.clickAction) return;
     var worldx = c.tile.x;
     var worldy = c.tile.y;
-    worldx = clamp(worldx,0,Engine.worldWidth);
-    worldy = clamp(worldy,0,Engine.worldHeight);
+    worldx = clamp(worldx,0,World.worldWidth);
+    worldy = clamp(worldy,0,World.worldHeight);
     Engine[Engine.clickAction](worldx,worldy);
     Engine.lastWorldX = worldx;
     Engine.lastWorldY = worldy;
@@ -470,20 +456,6 @@ Engine.addToLandscape = function(element,order){
     if(order) element.orderTiles();
     Engine.addToStage(element);
     Engine.editHistory.push(element);
-};
-
-Engine.addShore = function(x,y){
-    if(Geometry.shoreBox.flag == 0){
-        Geometry.shoreBox.flag++;
-        Geometry.shoreBox.x = x;
-        Geometry.shoreBox.y = y;
-    }else if(Geometry.shoreBox.flag == 1){
-        Geometry.shoreBox.flag = 0;
-        var shore = Engine.drawShore(Geometry.addCorners(Geometry.straightLine(Geometry.shoreBox,{x: x,y: y})),false);
-        //shore.drawLayers();
-        Engine.addToLandscape(shore);
-    }
-    Engine.drawCircle(x*Engine.tileWidth+16,y*Engine.tileHeight+16,10,0x0000ff);
 };
 
 Engine.addMound = function(x,y){
@@ -586,34 +558,6 @@ Engine.fillWaterWrapper = function(lake,chunk){
     Geometry.shoreBox.east = {};
     Geometry.shoreBox.south = {};
     Geometry.shoreBox.west = {};
-};
-
-Engine.fillWater = function(lake,chunk,type){
-    var water = chunk || new Chunk(null,2);
-    //var type = (lake ? 1 : Geometry.shoreBox.shoreType); // type of shore: north, east, south or west
-    var coef = (type > 2 ? -1 : 1);
-    var oppositeType = type + 2*coef; // maps 1 to 3, 2 to 4 and vice versa
-    var map = Geometry.shoreBox.getMap(type);
-    var oppositeMap = Geometry.shoreBox.getMap(oppositeType);
-    var limit = {
-        1: (Engine.nbChunksVertical*Engine.chunkHeight)-1,
-        2: (Engine.nbChunksHorizontal*Engine.chunkWidth)-1,
-        3: 0,
-        4: 0
-    };
-
-    for(var coord in map){
-        if(!map.hasOwnProperty(coord)) continue;
-        var s = map[coord];
-        var end = oppositeMap[coord] || limit[type];
-        var inc = (end-start)/Math.abs(end-start);
-        for(var coordBis = s; coordBis != end+inc; coordBis+=inc ){
-            var x = (type == 1 || type == 3 ? coord : coordBis);
-            var y = (type == 1 || type == 3 ? coordBis : coord);
-            water.addTile(x,y,Shore.water,0);
-        }
-    }
-    return water;
 };
 
 Engine.drawCliff = function(pts){
@@ -754,7 +698,7 @@ Engine.save = function(){
                 var origin = Utils.AOItoTile(chunkID);
                 var x = tile.x - origin.x;
                 var y = tile.y - origin.y;
-                mapData.layers[j].data[(Engine.chunkWidth*y)+x] = tile.v;
+                mapData.layers[j].data[(World.chunkWidth*y)+x] = tile.v;
             }
         }
     }
