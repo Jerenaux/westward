@@ -1,0 +1,16 @@
+{
+  "frames":[
+    {
+      "filename":"medicine",
+      "frame": {"x":448,"y":160,"w":32,"h":32}
+    },
+    {
+      "filename":"food",
+      "frame": {"x":224,"y":160,"w":32,"h":32}
+    },
+    {
+      "filename":"bow",
+      "frame": {"x":160,"y":32,"w":32,"h":32}
+    }
+  ]
+}

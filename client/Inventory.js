@@ -38,7 +38,8 @@ Inventory.findFreeSlot = function(){
 };
 
 Inventory.makeSprite = function(item){
-    var sprite = Engine.scene.add.sprite(0,0,'backpack');
+    var data = Engine.itemsData[item];
+    var sprite = Engine.scene.add.sprite(0,0,'items',data.name);
     sprite.setDisplayOrigin(0);
     sprite.setScrollFactor(0);
     sprite.visible = false;

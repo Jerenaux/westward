@@ -16,6 +16,7 @@ var GameServer = {
 
 module.exports.GameServer = GameServer;
 
+var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var AOI = require('./AOI.js').AOI;
@@ -28,17 +29,12 @@ var PFUtils = require('../shared/PFUtils.js').PFUtils;
 GameServer.readMap = function(mapsPath){
     console.log('Loading map data from '+mapsPath);
     var masterData = JSON.parse(fs.readFileSync(mapsPath+'/master.json').toString());
-
-    Utils.chunkWidth = masterData.chunkWidth;
-    Utils.chunkHeight = masterData.chunkHeight;
-    Utils.nbChunksHorizontal = masterData.nbChunksHoriz;
-    Utils.nbChunksVertical = masterData.nbChunksVert;
-    Utils.lastChunkID = (Utils.nbChunksHorizontal*Utils.nbChunksVertical)-1;
+    World.readMasterData(masterData);
 
     GameServer.AOIs = []; // Maps AOI id to AOI object
     GameServer.dirtyAOIs = new Set(); // Set of AOI's whose update package have changes since last update; used to avoid iterating through all AOIs when clearing them
 
-    for(var i = 0; i <= Utils.lastChunkID; i++){
+    for(var i = 0; i <= World.lastChunkID; i++){
         GameServer.AOIs.push(new AOI(i));
     }
 

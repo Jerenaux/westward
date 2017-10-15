@@ -29,7 +29,7 @@ if(process.env.DEV == 1) {
         res.sendFile(__dirname + '/studio/map.html');
     });
     app.get('/bezier', function (req, res) {
-        res.sendFile(__dirname + '/studio/bezier.html');
+        res.sendFile(__dirname + '/studio/bezier/bezier.html');
     });
 }
 

@@ -8,7 +8,7 @@ var xml2js = require('xml2js');
 
 var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
-var Geometry = require('../client/Geometry.js').Geometry;
+var Geometry = require('../studio/Geometry.js').Geometry;
 var WorldEditor = require('../studio/WorldEditor.js').WorldEditor;
 
 var nbHoriz, nbVert, chunkWidth, chunkHeight, tileWidth, tileHeight, worldWidth, worldHeight, reverse;

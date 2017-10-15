@@ -26,9 +26,11 @@ Engine.preload = function() {
 
     this.load.image('fort', 'assets/sprites/buildings/fort.png');
     this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
+    this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
 
     this.load.json('buildings', 'assets/data/buildings.json');
+    this.load.json('items', 'assets/data/items.json');
 
     Engine.collidingTiles = [];
     for(var i = 0, firstgid = 1; i < Boot.tilesets.length; i++){
@@ -47,18 +49,6 @@ Engine.preload = function() {
 };
 
 Engine.create = function(masterData){
-    /*Engine.tileWidth = masterData.tilesets[0].tilewidth;
-    Engine.tileHeight = masterData.tilesets[0].tileheight;
-    Engine.chunkWidth = masterData.chunkWidth;
-    Engine.chunkHeight = masterData.chunkHeight;
-    Utils.chunkWidth = Engine.chunkWidth;
-    Utils.chunkHeight = Engine.chunkHeight;
-    Utils.nbChunksHorizontal = masterData.nbChunksHoriz;
-    Utils.nbChunksVertical = masterData.nbChunksVert;
-    Engine.worldWidth = Utils.nbChunksHorizontal*Engine.chunkWidth;
-    Engine.worldHeight = Utils.nbChunksVertical*Engine.chunkHeight;
-    Utils.lastChunkID = (Utils.nbChunksHorizontal*Utils.nbChunksVertical)-1;
-    Engine.nbLayers = masterData.nbLayers;*/
     World.readMasterData(masterData);
     Engine.nbLayers = masterData.nbLayers;
     if(!Engine.nbLayers) console.log('WARNING : falsy number of layers : '+console.log(Engine.nbLayers));
@@ -89,7 +79,7 @@ Engine.create = function(masterData){
     Engine.camera.roundPixels = true; // Very important for the camera to scroll smoothly accross the map
 
     Engine.buildingsData = Engine.scene.cache.json.get('buildings');
-    console.log(Engine.buildingsData);
+    Engine.itemsData = Engine.scene.cache.json.get('items');
 
     Engine.createMarker();
     Engine.scene.game.canvas.style.cursor = Engine.cursor; // Sets the pointer to hand sprite

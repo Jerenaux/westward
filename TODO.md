@@ -22,14 +22,11 @@ Prototype level:
 
 Cleaning:
 --------
-- Use World server-side
-- Move Geometry to studio
+- Use sprite pools for inventory?
 - Handle 404 errors when chunk file not found
 - Clean up Utils
-- Write Readme detailing structure of code: assets, client/server/shared code (-> for production), tools (command-line scripts) and studio
 - Replace delete calls in updatePkg.clean() by something else
 - Split server in two (game and dev server)
-- Order files in studio
 - Standardize the use of Utils methods for coordianes manipulations (gridtoline, lientogrid, tiletoiAOI, AOItotile, tileRelativeToAOI...)
 - Remove unnecessary map directories/files and assets
 - Remove unnecessary Geometry methods

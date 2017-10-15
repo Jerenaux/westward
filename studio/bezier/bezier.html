@@ -9,15 +9,15 @@
 <body>
 <canvas id="stage" width="1005px" height="1299px"></canvas>
 <div id="tools">
-    <a href="#" onclick="setActiveTool('pointer');"><img src="/studio/images/pointer.png" title="Pointer tool"/></a><br/>
-    <a href="#" onclick="setActiveTool('bezier');"><img src="/studio/images/bezier.png" title="Add Bézier"/></a><br/>
+    <a href="#" onclick="setActiveTool('pointer');"><img src="/studio/bezier/images/pointer.png" title="Pointer tool"/></a><br/>
+    <a href="#" onclick="setActiveTool('bezier');"><img src="/studio/bezier/images/bezier.png" title="Add Bézier"/></a><br/>
     <a href="#" onclick="save();"><img src="/assets/images/save.png" title="Save"/></a><br/>
 </div>
 <div style="display:none;">
     <img id="source" src="/studio/template.jpg" onload="drawBackdrop();">
 </div>
 </body>
-<script src="/studio/blueprint.js"></script>
+<script src="/studio/bezier/blueprint.js"></script>
 <script type="text/javascript">
     var curve = new Bezier(150,40 , 80,30 , 105,150);
     console.log(curve);

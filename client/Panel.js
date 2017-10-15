@@ -167,7 +167,7 @@ Panel.prototype.display = function(){
              var sprite = Engine.inventory.getSprite(j);
              if(!sprite) continue;
              var pos = this.slots[j];
-             sprite.setPosition(pos.x,pos.y);
+             sprite.setPosition(pos.x+4,pos.y+4);
              sprite.visible = true;
         }
     }

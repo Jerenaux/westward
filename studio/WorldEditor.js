@@ -5,7 +5,7 @@
 var onServer = (typeof window === 'undefined');
 
 if(onServer){
-    var Geometry = require('../client/Geometry.js').Geometry;
+    var Geometry = require('Geometry.js').Geometry;
     var World = require('../shared/World.js').World;
     var Utils = require('../shared/Utils.js').Utils;
     var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
