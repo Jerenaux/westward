@@ -12,7 +12,7 @@ var Building = new Phaser.Class({
 
         this.tileX = x;
         this.tileY = y;
-        this.depth = Engine.buildingsDepth + y;
+        this.depth = Engine.buildingsDepth;
         this.id = id;
         this.chunk = Utils.tileToAOI({x:x,y:y});
 
@@ -25,10 +25,17 @@ var Building = new Phaser.Class({
 
         var shape = new Phaser.Geom.Polygon(data.shape);
         this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
-        //this.setDisplayOrigin(0);  //disabled so that the y coordinate is usable for depth sorting
 
-        var realx = Math.floor((this.tileX*Engine.tileWidth - data.width/2)/Engine.tileWidth);
-        var realy = Math.floor((this.tileY*Engine.tileHeight - data.height/2)/Engine.tileHeight);
-        PFUtils.collisionsFromShape(shape.points,realx,realy,data.width,data.height,Engine.collisions);
+        var center = false;
+        var spriteX, spriteY;
+        if(center){
+            spriteX = Math.floor((this.tileX*Engine.tileWidth - data.width/2)/Engine.tileWidth);
+            spriteY = Math.floor((this.tileY*Engine.tileHeight - data.height/2)/Engine.tileHeight);
+        }else{
+            this.setDisplayOrigin(0);  //disabled so that the y coordinate is usable for depth sorting
+            spriteX = this.tileX;
+            spriteY = this.tileY;
+        }
+        PFUtils.collisionsFromShape(shape.points,spriteX,spriteY,data.width,data.height,Engine.collisions);
     }
 });

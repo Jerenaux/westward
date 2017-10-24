@@ -60,7 +60,8 @@ PFUtils.firstDimensionHandler = {
 
 PFUtils.getFInder = function(){
     return new PF.AStarFinder({
-        allowDiagonal: true,
+        //allowDiagonal: true,  // Turn back on when approprate sprites are available
+        allowDiagonal: false,
         dontCrossCorners: true
     });
 };

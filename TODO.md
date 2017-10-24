@@ -22,22 +22,20 @@ Prototype level:
 
 Cleaning:
 --------
-- Use sprite pools for inventory?
-- Handle 404 errors when chunk file not found
+- Merge all the addXXX and removeXXX methods (but keepl separate lists) + merge addXXX loops in updateWorld()
 - Clean up Utils
-- Replace delete calls in updatePkg.clean() by something else
 - Split server in two (game and dev server)
-- Standardize the use of Utils methods for coordianes manipulations (gridtoline, lientogrid, tiletoiAOI, AOItotile, tileRelativeToAOI...)
-- Remove unnecessary map directories/files and assets
+- Standardize the use of Utils methods for coordianes manipulations (gridtoline, linetogrid, tiletoiAOI, AOItotile, tileRelativeToAOI...)
 - Remove unnecessary Geometry methods
 - Restructure UI, maybe remove UIElement, only have a set of generic functions to bind to interactive sprites?
 - Think about a Container class or something to affect the transforms of all children
 - Clean all files
+- Add ES6 syntax to PHPStorm (for ... of)
 
 Content:
 -------
 * Battle system
-- Display monsters, have them roam about (movement, animation, sync...)
+- Have monsters roam about
 - Trigger battle when clicking on monster
 - Compute and display battle grid
 - Adjust camera
@@ -102,7 +100,7 @@ Content:
 * Movement:
 - Better depth sorting (not relying on tileY)
 - Verticality stuff (trees canopy, etc.)
-- Animate
+- Animate (animals as well)
 * Player interactions
 - Toggle chat by pressing enter
 - Display speech bubble locally
@@ -167,7 +165,7 @@ Polish:
 
 World building:
 --------------
-- Try and make east coast with rivers and lakes
+- Try and make east coast with rivers and lakes; use static map from http://staticmapmaker.com/google/  & https://stackoverflow.com/questions/9444790/how-to-get-a-map-without-labels
 - Have a universal ChunkEdit class used accross all tools for all types of modifications
 -> Or a ChunkHolder class which stores chunks in some way and only expose a addTile method which is used by the editor/geometry classes as a callback
 -> Possibly the same chunk management both in live edit and with tools; remake the redo/switch function by getting rid

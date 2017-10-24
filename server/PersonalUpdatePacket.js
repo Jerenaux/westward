@@ -19,9 +19,6 @@ PersonalUpdatePacket.prototype.isEmpty = function(){
 };
 
 PersonalUpdatePacket.prototype.clean = function() { // Remove empty arrays from the package
-    /*if(!this.hp.length) delete this.hp;
-    if(!this.killed.length) delete this.killed;
-    if(!this.used.length) delete this.used;*/
     if(Object.keys(this.items).length == 0) this.items = undefined;
     return this;
 };

@@ -96,12 +96,18 @@ UpdatePacket.prototype.isEmpty = function(){
 };
 
 UpdatePacket.prototype.clean = function(){
-    if(!this.disconnected.length) delete this.disconnected;
+    if(!this.disconnected.length) this.disconnected = undefined;
+    if(!this.newplayers.length) this.newplayers = undefined;
+    if(!this.newanimals.length) this.newanimals = undefined;
+    if(!this.newbuildings.length) this.newbuildings = undefined;
+    if(!Object.keys(this.players).length) this.players = undefined;
+    if(!Object.keys(this.animals).length) this.animals = undefined;
+    /*if(!this.disconnected.length) delete this.disconnected;
     if(!this.newplayers.length) delete this.newplayers;
     if(!this.newanimals.length) delete this.newanimals;
     if(!this.newbuildings.length) delete this.newbuildings;
     if(!Object.keys(this.players).length) delete this.players;
-    if(!Object.keys(this.animals).length) delete this.animals;
+    if(!Object.keys(this.animals).length) delete this.animals;*/
     return this;
 };
 

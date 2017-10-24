@@ -23,6 +23,8 @@ Engine.preload = function() {
     this.load.image('tome', 'assets/sprites/tome.png');
     this.load.image('tools', 'assets/sprites/tools.png');
     this.load.image('backpack', 'assets/sprites/backpack.png');
+    this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
+
 
     this.load.image('fort', 'assets/sprites/buildings/fort.png');
     this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
@@ -31,6 +33,7 @@ Engine.preload = function() {
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
+    this.load.json('animals', 'assets/data/animals.json');
 
     Engine.collidingTiles = [];
     for(var i = 0, firstgid = 1; i < Boot.tilesets.length; i++){
@@ -62,10 +65,12 @@ Engine.create = function(masterData){
     Engine.displayedChunks = [];
     Engine.mapDataCache = {};
 
-    Engine.players = {}; // player.id -> player
-    Engine.buildings = {}; // building.id -> building
+    Engine.players = {}; // player.id -> player object
+    Engine.animals = {}; // animal.id -> building object
+    Engine.buildings = {}; // building.id -> building object
     Engine.displayedPlayers = new Set();
     Engine.displayedBuildings = new Set();
+    Engine.displayedAnimals = new Set();
 
     Engine.inventory = Inventory;
 
@@ -79,6 +84,7 @@ Engine.create = function(masterData){
     Engine.camera.roundPixels = true; // Very important for the camera to scroll smoothly accross the map
 
     Engine.buildingsData = Engine.scene.cache.json.get('buildings');
+    Engine.animalsData = Engine.scene.cache.json.get('animals');
     Engine.itemsData = Engine.scene.cache.json.get('items');
 
     Engine.createMarker();
@@ -198,22 +204,6 @@ Engine.addHero = function(id,x,y){
     Engine.updateEnvironment();
 };
 
-Engine.addPlayer = function(id,x,y){
-    if(Engine.playerIsInitialized && id == Engine.player.id) return;
-    var sprite = new Player(x,y,'hero',id);
-    Engine.players[id] = sprite;
-    Engine.displayedPlayers.add(id);
-    return sprite;
-};
-
-Engine.removePlayer = function(id){
-    console.log('removing player '+id);
-    var sprite = Engine.players[id];
-    sprite.destroy();
-    Engine.displayedPlayers.delete(id);
-    delete Engine.players[id];
-};
-
 Engine.updateEnvironment = function(){
     var chunks = Utils.listAdjacentAOIs(Engine.player.chunk);
     var newChunks = chunks.diff(Engine.displayedChunks);
@@ -237,6 +227,7 @@ Engine.updateDisplayedEntities = function(){
     var adjacent = Utils.listAdjacentAOIs(Engine.player.chunk);
     Engine.updateDisplay(Engine.displayedPlayers,Engine.players,adjacent,Engine.removePlayer);
     Engine.updateDisplay(Engine.displayedBuildings,Engine.buildings,adjacent,Engine.removeBuilding);
+    Engine.updateDisplay(Engine.displayedAnimals,Engine.animals,adjacent,Engine.removeAnimal);
 };
 
 Engine.updateDisplay = function(list,map,adjacent,removalCallback){
@@ -402,20 +393,6 @@ Engine.checkCollision = function(tile){ // tile is x, y pair
     return !!Engine.collisions[tile.y][tile.x];
 };
 
-Engine.addBuilding = function(id,x,y,type){
-    var building = new Building(x,y,type,id);
-    Engine.buildings[id] = building;
-    Engine.displayedBuildings.add(id);
-    return building;
-};
-
-Engine.removeBuilding = function(id){
-    var sprite = Engine.buildings[id];
-    sprite.destroy();
-    Engine.displayedBuildings.delete(id);
-    delete Engine.buildings[id];
-};
-
 /*
 * #### UPDATE CODE #####
 * */
@@ -458,6 +435,13 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
         }
     }
 
+    if(data.newanimals) {
+        for (var n = 0; n < data.newanimals.length; n++) {
+            var b = data.newanimals[n];
+            Engine.addAnimal(b.id, b.x, b.y, b.type);
+        }
+    }
+
     if(data.disconnected) { // data.disconnected is an array of disconnected players
         for (var i = 0; i < data.disconnected.length; i++) {
             Engine.removePlayer(data.disconnected[i]);
@@ -480,6 +464,49 @@ Engine.traverseUpdateObject = function(obj,table,callback){
 Engine.updatePlayer = function(player,data){ // data contains the updated data from the server
     if(player.id == Engine.player.id) return;
     if(data.path) player.move(data.path);
+};
+
+Engine.addPlayer = function(id,x,y){
+    if(Engine.playerIsInitialized && id == Engine.player.id) return;
+    var sprite = new Player(x,y,'hero',id);
+    Engine.players[id] = sprite;
+    Engine.displayedPlayers.add(id);
+    return sprite;
+};
+
+Engine.addBuilding = function(id,x,y,type){
+    var building = new Building(x,y,type,id);
+    Engine.buildings[id] = building;
+    Engine.displayedBuildings.add(id);
+    return building;
+};
+
+Engine.addAnimal = function(id,x,y,type){
+    var animal = new Animal(x,y,type,id);
+    Engine.animals[id] = animal;
+    Engine.displayedAnimals.add(id);
+    return animal;
+};
+
+Engine.removeBuilding = function(id){
+    var sprite = Engine.buildings[id];
+    sprite.destroy();
+    Engine.displayedBuildings.delete(id);
+    delete Engine.buildings[id];
+};
+
+Engine.removePlayer = function(id){
+    var sprite = Engine.players[id];
+    sprite.destroy();
+    Engine.displayedPlayers.delete(id);
+    delete Engine.players[id];
+};
+
+Engine.removeAnimal = function(id){
+    var sprite = Engine.animals[id];
+    sprite.destroy();
+    Engine.displayedAnimals.delete(id);
+    delete Engine.animals[id];
 };
 
 Engine.update = function(){

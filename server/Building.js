@@ -39,9 +39,17 @@ Building.prototype.addCollisions = function(){
             y: shape[i+1]
         });
     }
-    var realx = Math.floor((this.x*32 - data.width/2)/32);
-    var realy = Math.floor((this.y*32 - data.height/2)/32);
-    PFUtils.collisionsFromShape(this.shape,realx,realy,data.width,data.height,GameServer.collisions);
+
+    var center = false;
+    var spriteX, spriteY;
+    if(center){
+        spriteX = Math.floor((this.x*32 - data.width/2)/32);
+        spriteY = Math.floor((this.y*32 - data.height/2)/32);
+    }else{
+        spriteX = this.x;
+        spriteY = this.y;
+    }
+    PFUtils.collisionsFromShape(this.shape,spriteX,spriteY,data.width,data.height,GameServer.collisions);
 };
 
 module.exports.Building = Building;

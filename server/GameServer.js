@@ -57,8 +57,10 @@ GameServer.readMap = function(mapsPath){
     }
 
     // Spawn animals
-    for(var i = 0; i < 3; i++){
-        new Animal();
+    var animals = JSON.parse(fs.readFileSync('./assets/maps/animals.json').toString());
+    for(var aid in animals){
+        var data = animals[aid];
+        new Animal(data.x,data.y,data.type);
     }
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
@@ -188,7 +190,7 @@ GameServer.updatePlayers = function(){ //Function responsible for setting up and
         var individualGlobalPkg = clone(globalPkg,false); // clone the global pkg to be able to modify it without affecting the original
         // player.newAOIs is the list of AOIs about which the player hasn't checked for updates yet
         for(var i = 0; i < player.newAOIs.length; i++){
-            individualGlobalPkg.synchronize(GameServer.AOIs[player.newAOIs[i]]); // fetch entities from the new AOIs
+         individualGlobalPkg.synchronize(GameServer.AOIs[player.newAOIs[i]]); // fetch entities from the new AOIs
         }
         individualGlobalPkg.removeEcho(player.id); // remove redundant information from multiple update sources
         if(individualGlobalPkg.isEmpty()) individualGlobalPkg = null;

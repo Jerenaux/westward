@@ -119,6 +119,34 @@
     {
       "filename": "close",
       "frame": {"x":101,"y":141,"w":6,"h":6}
+    },
+    {
+      "filename": "longslot_1",
+      "frame": {"x":16,"y":424,"w":16,"h":40}
+    },
+    {
+      "filename": "longslot_2",
+      "frame": {"x":33,"y":424,"w":16,"h":40}
+    },
+    {
+      "filename": "longslot_3",
+      "frame": {"x":50,"y":424,"w":33,"h":40}
+    },
+    {
+      "filename": "longslot_4",
+      "frame": {"x":84,"y":424,"w":16,"h":40}
+    },
+    {
+      "filename": "longslot_5",
+      "frame": {"x":101,"y":424,"w":33,"h":40}
+    },
+    {
+      "filename": "longslot_6",
+      "frame": {"x":135,"y":424,"w":16,"h":40}
+    },
+    {
+      "filename": "longslot_7",
+      "frame": {"x":152,"y":424,"w":18,"h":40}
     }
   ]
 }
