@@ -6,11 +6,13 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
-function Building(x,y,type){
+function Building(x,y,type,settlement){
     this.id = GameServer.lastBuildingID++;
     this.x = x;
     this.y = y;
     this.type = type;
+    this.settlement = settlement;
+    this.resources = {3:50};
     this.setOrUpdateAOI();
     this.addCollisions();
 }
@@ -20,7 +22,7 @@ Building.prototype.constructor = Building;
 
 Building.prototype.trim = function(){
     var trimmed = {};
-    var broadcastProperties = ['id','type']; // list of properties relevant for the client
+    var broadcastProperties = ['id','type','settlement','resources']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

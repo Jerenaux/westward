@@ -1,56 +1,44 @@
 /**
  * Created by Jerome on 13-10-17.
  */
-var Inventory = {
-    inventory: {}, // item id -> nb
-    slots: {}, // item id -> slot id
-    sprites: {}, // slot id -> sprite
-    nbSlots: 25
-};
+function Inventory(size){
+    this.items = {}; // item.id -> nb
+    this.sprites = {}; // item.id -> sprite
+    this.maxSize = size;
+    this.size = 0;
+}
 
-Inventory.update = function(item,nb){
-    var previousAmount = Inventory.getNb(item);
-    if(previousAmount == 0 && nb > 0){ // gaining new item
-        console.log('getting new item');
-        var slot = Inventory.findFreeSlot();
-        if(slot == null) return;
-        Inventory.slots[item] = slot;
-        Inventory.sprites[item] = Inventory.makeSprite(item);
-    }else if(previousAmount > 0 && nb == 0){ // losing item
-        console.log('losing item');
-        var sprite = Inventory.sprites[item];
-        sprite.destroy();
-        Inventory.sprites[item] = null;
+Inventory.prototype.update = function(item,nb){
+    var previousAmount = this.getNb(item);
+    if(previousAmount == 0 && nb > 0) { // gaining new item
+        if(this.size == this.maxSize) return;
+        this.size++;
+    }else{
+        this.size--;
     }
-    Inventory.updateNb(item,nb);
+    this.updateNb(item,nb);
 };
 
-Inventory.getNb = function(item){
-    if(!Inventory.inventory.hasOwnProperty(item)) return 0;
-    return Inventory.inventory[item];
+Inventory.prototype.getNb = function(item){
+    if(!this.items.hasOwnProperty(item)) return 0;
+    return this.items[item];
 };
 
-Inventory.findFreeSlot = function(){
-    for(var i = 0; i < Inventory.nbSlots; i++){
-        if(!Inventory.sprites[i]) return i;
-    }
-    return null;
+Inventory.prototype.updateNb = function(item,nb){
+    this.items[item] = nb;
 };
 
-Inventory.makeSprite = function(item){
+Inventory.prototype.getSprite = function(item){
+    if(this.sprites.hasOwnProperty(item)) return this.sprites[item];
+    return this.makeSprite(item);
+};
+
+Inventory.prototype.makeSprite = function(item){
     var data = Engine.itemsData[item];
-    var sprite = Engine.scene.add.sprite(0,0,'items',data.name);
-    sprite.setDisplayOrigin(0);
+    var sprite = Engine.scene.add.sprite(0,0,data.atlas,data.frame);
     sprite.setScrollFactor(0);
     sprite.visible = false;
     sprite.depth = Engine.UIDepth+3;
+    this.sprites[item] = sprite;
     return sprite;
-};
-
-Inventory.updateNb = function(item,nb){
-    Inventory.inventory[item] = nb;
-};
-
-Inventory.getSprite = function(slot){
-    return Inventory.sprites[slot];
 };

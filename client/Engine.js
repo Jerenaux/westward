@@ -29,11 +29,13 @@ Engine.preload = function() {
     this.load.image('fort', 'assets/sprites/buildings/fort.png');
     this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
+    this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
     this.load.json('animals', 'assets/data/animals.json');
+    this.load.json('settlements', 'assets/data/settlements.json');
 
     Engine.collidingTiles = [];
     for(var i = 0, firstgid = 1; i < Boot.tilesets.length; i++){
@@ -86,6 +88,7 @@ Engine.create = function(masterData){
     Engine.buildingsData = Engine.scene.cache.json.get('buildings');
     Engine.animalsData = Engine.scene.cache.json.get('animals');
     Engine.itemsData = Engine.scene.cache.json.get('items');
+    Engine.settlementsData = Engine.scene.cache.json.get('settlements');
 
     Engine.createMarker();
     Engine.scene.game.canvas.style.cursor = Engine.cursor; // Sets the pointer to hand sprite
@@ -119,9 +122,9 @@ Engine.createMarker = function(){
 };
 
 Engine.initWorld = function(data){
+    Engine.addHero(data.id,data.x,data.y);
     Engine.makeUI();
     Engine.makeChatBar();
-    Engine.addHero(data.id,data.x,data.y);
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     // TODO: when all chunks loaded, fade-out Boot scene
@@ -172,9 +175,21 @@ Engine.makeCraftingMenu = function(){
     crafting.addPanel(new Panel(765,100,240,380,'Recipes')); // recipes panel
     crafting.addPanel(new Panel(450,100,290,380,'Combination')); // crafting panel
     var items = new Panel(40,100,390,380,'Items');
-    items.addSlots(10,9,25);
+    items.addSlots(10,9,Engine.player.inventory.maxSize);
+    items.setInventory(Engine.player.inventory);
     crafting.addPanel(items); // inventory panel
     return crafting;
+};
+
+Engine.makeInventory = function(){
+    var inventory = new Menu('Inventory');
+    inventory.addPanel(new Panel(665,100,340,380,'Equipment')); // equipment panel
+    var items = new Panel(40,100,600,380,'Items');
+    items.addCapsule(500,-9,'1299','gold');
+    items.addSlots(15,9,Engine.player.inventory.maxSize);
+    items.setInventory(Engine.player.inventory);
+    inventory.addPanel(items); // inventory panel
+    return inventory;
 };
 
 Engine.makeCharacterMenu = function(){
@@ -187,20 +202,11 @@ Engine.makeCharacterMenu = function(){
     return character;
 };
 
-Engine.makeInventory = function(){
-    var inventory = new Menu('Inventory');
-    inventory.addPanel(new Panel(665,100,340,380,'Equipment')); // equipment panel
-    var items = new Panel(40,100,600,380,'Items');
-    items.addCapsule(500,-9,'1299','gold');
-    items.addSlots(15,9,25);
-    inventory.addPanel(items); // inventory panel
-    return inventory;
-};
-
 Engine.addHero = function(id,x,y){
     Engine.player = Engine.addPlayer(id,x,y);
     Engine.player.visible = Engine.showHero;
     Engine.camera.startFollow(Engine.player);
+    Engine.player.inventory = new Inventory(25);
     Engine.updateEnvironment();
 };
 
@@ -398,23 +404,13 @@ Engine.checkCollision = function(tile){ // tile is x, y pair
 * */
 
 Engine.updateSelf = function(data){
-    if(data.items) Engine.updateInventory(data.items);
+    if(data.items) Engine.updateInventory(Engine.player.inventory,data.items);
 };
 
-Engine.updateInventory = function(newitems){
-    for(var item in newitems){
-        //Engine.inventory[item] = newitems[item];
-        Engine.inventory.update(item,newitems[item]);
+Engine.updateInventory = function(inventory,items){
+    for(var item in items){
+        inventory.update(item,items[item]);
     }
-    /*TODO
-    * When getting object:
-    * - If new, find first empty slot, and map item id to slot id; create new sprite and map slot id to sprite
-    * When losing/using object:
-    * - If = 0, find slot based on item->slot map, then delete sprite in slot
-    -> In both cases, update Engine.inventory
-    * Display:
-    * Iterate over slot ids, if empty  do nothing, if busy fetch sprite, then coordinates, and update coordinates of sprite
-    * */
 };
 
 // Processes the global update packages received from the server
@@ -431,7 +427,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.newbuildings) {
         for (var n = 0; n < data.newbuildings.length; n++) {
             var b = data.newbuildings[n];
-            Engine.addBuilding(b.id, b.x, b.y, b.type);
+            Engine.addBuilding(b.id, b.x, b.y, b.type, b.settlement, b.resources);
         }
     }
 
@@ -474,8 +470,9 @@ Engine.addPlayer = function(id,x,y){
     return sprite;
 };
 
-Engine.addBuilding = function(id,x,y,type){
-    var building = new Building(x,y,type,id);
+Engine.addBuilding = function(id,x,y,type,settlement,resources){
+    var building = new Building(x,y,type,settlement,id);
+    Engine.updateInventory(building.inventory,resources);
     Engine.buildings[id] = building;
     Engine.displayedBuildings.add(id);
     return building;

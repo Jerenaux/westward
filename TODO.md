@@ -22,6 +22,7 @@ Prototype level:
 
 Cleaning:
 --------
+- Clena up json: those in maps should be arrays; those in data should have numeric keys
 - Merge all the addXXX and removeXXX methods (but keepl separate lists) + merge addXXX loops in updateWorld()
 - Clean up Utils
 - Split server in two (game and dev server)
@@ -98,7 +99,7 @@ Content:
 - Use items from menu (healing)
 - Equip items from menu
 * Movement:
-- Better depth sorting (not relying on tileY)
+- Better depth sorting (not relying on tileY; use decimal depth instead)
 - Verticality stuff (trees canopy, etc.)
 - Animate (animals as well)
 * Player interactions
@@ -108,7 +109,6 @@ Content:
 - Display menu when click on players, display buttons (give item, give money)
 - Give items/money
 * Settlement defense
-- Enable governor to name the commander
 - Enable commander to build towers
 - Set up stats of towers and forts
 - Towers behave as animals and trigger fights
@@ -117,9 +117,9 @@ Content:
 - Production of NPC troops
 - Set up stats of troops
 - Make troops engage enemies
+- Restrict prerogatives based on official position
+- Enable governor to name the commander
 * Settlement economy
-- Salaries for officials
-- Let governor name chancellor
 - Ressource stockpile in fort
 - Let chancellor build each of every buildings
 - Resource loop from resource buildings
@@ -128,6 +128,9 @@ Content:
 - Shop system in trade post
 - Automatic shop systemn in port for chancellor
 - Trade with overseas
+- Restrict prerogatives based on official position
+- Let governor name chancellor
+- Salaries for officials
 * Trade
 - Have monsters drop loot
 - Enable bonuses of merchants

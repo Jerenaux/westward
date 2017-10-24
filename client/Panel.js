@@ -12,6 +12,7 @@ function Panel(x,y,width,height,title){
     this.lastLineY = this.y + 20;
     this.displayed = false;
     this.displayInventory = false;
+    this.inventory = null;
     this.makeBody();
     if(title) this.addCapsule(20,-9,title);
     this.finalize();
@@ -88,8 +89,12 @@ Panel.prototype.addRing = function(xs,ys,color,symbol,callback){
     this.finalize();
 };
 
-Panel.prototype.addSlots = function(nbHorizontal,nbVertical,total){
+Panel.prototype.setInventory = function(inventory){
     this.displayInventory = true;
+    this.inventory = inventory;
+};
+
+Panel.prototype.addSlots = function(nbHorizontal,nbVertical,total){
     var paddingX = (this.width - ((nbHorizontal-2)*36+(2*38)))/2;
     var paddingY = (this.height - ((nbVertical-2)*36+(2*38)))/2;
     var offsetx = 0;
@@ -97,7 +102,7 @@ Panel.prototype.addSlots = function(nbHorizontal,nbVertical,total){
 
     for(var y = 0; y < nbVertical; y++){
         for(var x = 0; x < nbHorizontal; x++){
-            if((y*nbHorizontal)+x > total) break;
+            if((y*nbHorizontal)+x >= total) break;
             var frame = 'slots-';
             var center = 0;
             switch(y){
@@ -163,12 +168,13 @@ Panel.prototype.display = function(){
         this.container[i].visible = true;
     }
     if(this.displayInventory) {
-        for(var j = 0; j < Engine.inventory.nbSlots; j++){
-             var sprite = Engine.inventory.getSprite(j);
-             if(!sprite) continue;
-             var pos = this.slots[j];
-             sprite.setPosition(pos.x+4,pos.y+4);
-             sprite.visible = true;
+        var j = 0;
+        for(var item in this.inventory.items){
+            var sprite = this.inventory.getSprite(item);
+            var pos = this.slots[j];
+            sprite.setPosition(pos.x+4+16,pos.y+4+16);
+            sprite.visible = true;
+            j++;
         }
     }
     this.displayed = true;
@@ -179,9 +185,8 @@ Panel.prototype.hide = function(){
         this.container[i].visible = false;
     }
     if(this.displayInventory) {
-        for (var j = 0; j < Engine.inventory.nbSlots; j++) {
-            var sprite = Engine.inventory.getSprite(j);
-            if (!sprite) continue;
+        for(var item in this.inventory.items){
+            var sprite = this.inventory.getSprite(item);
             sprite.visible = false;
         }
     }

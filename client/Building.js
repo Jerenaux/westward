@@ -6,21 +6,28 @@ var Building = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function Building (x, y, type, id) {
+    initialize: function Building (x, y, type, settlement, id) {
         var data = Engine.buildingsData[type];
+        var settlementData = Engine.settlementsData[settlement];
         CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, data.sprite);
 
         this.tileX = x;
         this.tileY = y;
         this.depth = Engine.buildingsDepth;
         this.id = id;
+        this.settlement = settlement;
+        this.inventory = new Inventory(100);
         this.chunk = Utils.tileToAOI({x:x,y:y});
+
 
         var height = 200;
         var width = 300;
         var py = Engine.baseViewHeight*Engine.tileHeight - height;
-        this.panel = new Panel(0,py,width,height,data.name);
+        var panelName = data.name+' of '+settlementData.name;
+        this.panel = new Panel(0,py,width,height,panelName);
         this.panel.addRing(260,-10,'red','close',Engine.closePanel  );
+        this.panel.addSlots(3,3,5);
+        this.panel.setInventory(this.inventory);
         this.handleClick = Engine.togglePanel.bind(this);
 
         var shape = new Phaser.Geom.Polygon(data.shape);

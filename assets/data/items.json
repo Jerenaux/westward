@@ -1,11 +1,18 @@
 {
   "0":{
-    "name":"medicine"
+    "atlas": "items",
+    "frame":"medicine"
   },
   "1":{
-    "name":"food"
+    "atlas": "items",
+    "frame":"food"
   },
   "2":{
-    "name":"bow"
+    "atlas": "items",
+    "frame":"bow"
+  },
+  "3":{
+    "atlas": "items2",
+    "frame":"timber"
   }
 }

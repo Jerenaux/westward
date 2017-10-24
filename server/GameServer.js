@@ -53,7 +53,7 @@ GameServer.readMap = function(mapsPath){
     for(var bid in buildings){
         if(!buildings.hasOwnProperty(bid)) return;
         var data = buildings[bid];
-        new Building(data.x,data.y,data.type);
+        new Building(data.x,data.y,data.type,data.settlement);
     }
 
     // Spawn animals
