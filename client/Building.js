@@ -13,7 +13,7 @@ var Building = new Phaser.Class({
 
         this.tileX = x;
         this.tileY = y;
-        this.depth = Engine.buildingsDepth;
+        this.depth = Engine.buildingsDepth + (this.tileY+((data.height/2)/32))/1000;
         this.id = id;
         this.settlement = settlement;
         this.inventory = new Inventory(100);

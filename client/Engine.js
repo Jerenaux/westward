@@ -15,7 +15,8 @@ var Engine = {
 };
 
 Engine.preload = function() {
-    this.load.image('hero', 'assets/sprites/hero.png');
+    //this.load.image('hero', 'assets/sprites/hero.png');
+    this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
 
     this.load.image('talk', 'assets/sprites/talk.png');
 
@@ -125,9 +126,37 @@ Engine.initWorld = function(data){
     Engine.addHero(data.id,data.x,data.y,data.settlement);
     Engine.makeUI();
     Engine.makeChatBar();
+    Engine.createAnimations();
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     // TODO: when all chunks loaded, fade-out Boot scene
+};
+
+Engine.createAnimations = function(){
+    Engine.scene.anims.create(config = {
+        key: 'player_move_down',
+        frames: Engine.scene.anims.generateFrameNumbers('hero', { start: 35, end: 38}),
+        frameRate: 10,
+        repeat: -1
+    });
+    Engine.scene.anims.create(config = {
+        key: 'player_move_right',
+        frames: Engine.scene.anims.generateFrameNumbers('hero', { start: 5, end: 8}),
+        frameRate: 10,
+        repeat: -1
+    });
+    Engine.scene.anims.create(config = {
+        key: 'player_move_left',
+        frames: Engine.scene.anims.generateFrameNumbers('hero', { start: 51, end: 54}),
+        frameRate: 10,
+        repeat: -1
+    });
+    Engine.scene.anims.create(config = {
+        key: 'player_move_up',
+        frames: Engine.scene.anims.generateFrameNumbers('hero', { start: 20, end: 23}),
+        frameRate: 10,
+        repeat: -1
+    });
 };
 
 Engine.makeChatBar = function(){

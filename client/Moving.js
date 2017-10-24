@@ -9,19 +9,24 @@ var Moving = new Phaser.Class({
         // Using call(), the called method will be executed while having 'this' pointing to the first argumentof call()
         CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, texture);
 
-        this.depth = Engine.playersDepth; // todo: update with method (also called form move)
         this.id = id;
         this.chunk = Utils.tileToAOI({x:x,y:y});
         this.tileX = x;
         this.tileY = y;
+        this.updateDepth();
         this.previousPosition = {
-            x : x,
-            y : y
+            x : x*Engine.tileWidth,
+            y : y*Engine.tileHeight
         };
         this.orientation = 'down';
+        this.previousOrientation = this.orientation;
         this.movement = null;
 
         this.setInteractive();
+    },
+
+    updateDepth: function(){
+        this.depth = Engine.playersDepth + this.tileY/1000;
     },
 
     move: function(path){
@@ -56,8 +61,10 @@ var Moving = new Phaser.Class({
             },
             onComplete: function(){
                 player.updatePosition();
+                player.anims.stop();
             }
         });
+        this.anims.play('player_move_down');
     },
     
     updatePosition: function(){
@@ -70,13 +77,17 @@ var Moving = new Phaser.Class({
         }else if(this.y < this.previousPosition.y) { // up
             this.orientation = 'up';
         }
+        if(this.orientation != this.previousOrientation){
+            console.log('change from '+this.previousOrientation+' to '+this.orientation);
+            this.previousOrientation = this.orientation;
+        }
         this.previousPosition = {
             x: this.x,
             y: this.y
         };
         this.tileX = Math.floor(this.x/Engine.tileWidth);
         this.tileY = Math.floor(this.y/Engine.tileHeight);
-        this.depth = Engine.playersDepth; // todo: update with method
+        this.updateDepth();
         this.chunk = Utils.tileToAOI({x: this.tileX, y: this.tileY});
 
         if(this.constructor.name == 'Player' && this.id == Engine.player.id) {

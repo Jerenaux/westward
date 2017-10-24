@@ -108,7 +108,6 @@ WorldEditor.drawShore = function(tiles,chunks){
                 break;
             case WorldEditor.W.top:
                 if(tile.y > 0) WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.top,chunks);
-                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.top,chunks);
                 break;
             case WorldEditor.W.topLeftOut:
                 var tileID;
@@ -123,10 +122,8 @@ WorldEditor.drawShore = function(tiles,chunks){
                 break;
             case WorldEditor.W.left:
                 if(tile.x > 0) WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.left,chunks);
-                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.left,chunks);
                 break;
             case WorldEditor.W.right:
-                if(tile.x > 0) WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.right,chunks);
                 WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.right,chunks);
                 break;
             case WorldEditor.W.bottomRightIn:

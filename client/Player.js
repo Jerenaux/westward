@@ -9,6 +9,7 @@ var Player = new Phaser.Class({
         // Using call(), the called method will be executed while having 'this' pointing to the first argumentof call()
         //CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, texture);
         Moving.call(this,x,y,texture,id);
+        this.setFrame(33);
         this.displayOriginX = 16;
 
         var height = 100;

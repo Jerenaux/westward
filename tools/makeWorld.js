@@ -52,8 +52,9 @@ function makeWorld(bluePrint,outdir){
 
     World.setUp(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight);
 
-    var basis = makeBasis(); // empty, grass-filled chunk, which can be duplicated all over the map
-    writeMasterFile(basis,outdir);
+    var tilesetsData = makeTilesetsData();
+    var basis = makeBasis(tilesetsData); // empty, grass-filled chunk, which can be duplicated all over the map
+    writeMasterFile(basis,tilesetsData,outdir);
 
     var chunks = [];
     var number = nbHoriz*nbVert;
@@ -71,7 +72,27 @@ function makeWorld(bluePrint,outdir){
     }
 }
 
-function makeBasis(){
+function makeTilesetsData(){
+    // Fill tileset objects with required fields
+    var tilesetsData = JSON.parse(fs.readFileSync(__dirname+'/../assets/maps/tilesets.json').toString());
+    for(var i = 0, firstgid = 1; i < tilesetsData.tilesets.length; i++){
+        var tileset = tilesetsData.tilesets[i];
+        tileset.image = '../'+tileset.image;
+        tileset.columns = Math.floor(tileset.imagewidth/tileWidth);
+        tileset.firstgid = firstgid;
+        tileset.tilecount = tileset.columns * Math.floor(tileset.imageheight/tileHeight);
+        tileset.margin = 0;
+        tileset.spacing = 0;
+        tileset.tilewidth = tileWidth;
+        tileset.tileheight = tileHeight;
+        tileset.properties = {};
+        firstgid += tileset.tilecount;
+    }
+    return tilesetsData;
+}
+
+function makeBasis(tilesetsData){
+    // tilesetsData is only needed so that the chunks can be edited in Tiled; must be removed for production
     // Create base grasst slate, with fields that Tiled will need
     var basis = {
         width: chunkWidth,
@@ -86,6 +107,7 @@ function makeBasis(){
         renderorder:"right-down",
         vesion: 1
     };
+    basis.tilesets = tilesetsData.tilesets; // TODO remove un production
 
     var ground = new Layer(chunkWidth,chunkHeight,'ground');
     var terrain = new Layer(chunkWidth,chunkHeight,'terrain');
@@ -131,22 +153,7 @@ function emptyLayer(nb){
     return arr;
 }
 
-function writeMasterFile(basis,outdir){
-    // Fill tileset objects with required fields
-    var tilesetsData = JSON.parse(fs.readFileSync(__dirname+'/../assets/maps/tilesets.json').toString());
-    for(var i = 0, firstgid = 1; i < tilesetsData.tilesets.length; i++){
-        var tileset = tilesetsData.tilesets[i];
-        tileset.image = '../'+tileset.image;
-        tileset.columns = Math.floor(tileset.imagewidth/tileWidth);
-        tileset.firstgid = firstgid;
-        tileset.tilecount = tileset.columns * Math.floor(tileset.imageheight/tileHeight);
-        tileset.margin = 0;
-        tileset.spacing = 0;
-        tileset.tilewidth = tileWidth;
-        tileset.tileheight = tileHeight;
-        tileset.properties = {};
-        firstgid += tileset.tilecount;
-    }
+function writeMasterFile(basis,tilesetsData,outdir){
     // Write master file
     var master = {
         tilesets : tilesetsData.tilesets,

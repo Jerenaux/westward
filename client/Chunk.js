@@ -1,3 +1,10 @@
+var layerDepth = {
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 5
+}
+
 function Chunk(mapData,id,z){
     this.fromFile = (mapData !== null);
     this.id = id;
@@ -28,7 +35,7 @@ Chunk.prototype.drawLayers = function(){
             var cy = Math.floor(i / this.width);
             var x = this.x + cx;
             var y = this.y + cy;
-            this.drawTile(x,y,tile,layer);
+            layer.push(this.drawTile(x,y,tile,l));
             Engine.addCollision(x,y,tile);
         }
     }
@@ -66,5 +73,6 @@ Chunk.prototype.drawTile = function(x,y,tile,layer){
     var sprite = Engine.scene.add.image(x*Engine.tileWidth,y*Engine.tileHeight,tileset.name,tile);
     sprite.setDisplayOrigin(0,0);
     sprite.tileID = tile;
-    layer.push(sprite);
+    sprite.depth = layerDepth[layer];
+    return sprite;
 };

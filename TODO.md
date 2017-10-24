@@ -99,9 +99,7 @@ Content:
 - Use items from menu (healing)
 - Equip items from menu
 * Movement:
-- Better depth sorting (not relying on tileY; use decimal depth instead)
-- Verticality stuff (trees canopy, etc.)
-- Animate (animals as well)
+- Animate; investigate path followers to take care of orientation and animation
 * Player interactions
 - Toggle chat by pressing enter
 - Display speech bubble locally

@@ -17,6 +17,7 @@ World.setUp = function(nbHoriz,nbVert,chunkW,chunkH,tileW,tileH){
 };
 
 World.readMasterData = function(data){
+    console.log(data);
     World.setUp(
         data.nbChunksHoriz,data.nbChunksVert,
         data.chunkWidth,data.chunkHeight,
