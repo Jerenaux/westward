@@ -4,6 +4,9 @@
 function Panel(x,y,width,height,title){
     this.container = [];
     this.slots = []; // slot number -> coordinates
+    this.sprites = []; // pool of sprites to display items
+    this.texts = []; // pool of texts for items
+    this.nextItemSprite = 0;
     this.test = [];
     this.x = x;
     this.y = y;
@@ -163,6 +166,39 @@ Panel.prototype.finalize = function(){
     });
 };
 
+Panel.prototype.getNextItemSprite = function(item){
+    if(this.sprites.length <= this.nextItemSprite){
+        var empty = Engine.scene.add.sprite(0,0,'');
+        empty.setScrollFactor(0);
+        empty.depth = Engine.UIDepth+3;
+        this.sprites.push(empty);
+    }
+    var data = Engine.itemsData[item];
+    var sprite = this.sprites[this.nextItemSprite];
+    sprite.setTexture(data.atlas);
+    sprite.setFrame(data.frame);
+    sprite.visible = true;
+    return sprite;
+};
+
+Panel.prototype.getNextText = function(item){
+    if(this.texts.length <= this.nextItemSprite){
+        var empty = Engine.scene.add.text(100,10, 'lorem ipsum',
+            { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
+        );
+        empty.setScrollFactor(0);
+        //empty.setDisplayOrigin(0);
+        empty.setOrigin(1,0);
+        empty.depth = Engine.UIDepth+4;
+        this.texts.push(empty);
+    }
+    var text = this.texts[this.nextItemSprite];
+    text.setText(this.inventory.getNb(item));
+    //text.setText(99);
+    text.visible = true;
+    return text;
+};
+
 Panel.prototype.display = function(){
     for(var i = 0; i < this.container.length; i++){
         this.container[i].visible = true;
@@ -170,11 +206,14 @@ Panel.prototype.display = function(){
     if(this.displayInventory) {
         var j = 0;
         for(var item in this.inventory.items){
-            var sprite = this.inventory.getSprite(item);
+            var sprite = this.getNextItemSprite(item);
+            var text = this.getNextText(item);
             var pos = this.slots[j];
             sprite.setPosition(pos.x+4+16,pos.y+4+16);
-            sprite.visible = true;
+            text.setPosition(pos.x+37,pos.y+18);
+            if(sprite.texture.key == "items2") sprite.setPosition(sprite.x+3,sprite.y+3); // TODO ugly hack, improve
             j++;
+            this.nextItemSprite++;
         }
     }
     this.displayed = true;
@@ -185,10 +224,11 @@ Panel.prototype.hide = function(){
         this.container[i].visible = false;
     }
     if(this.displayInventory) {
-        for(var item in this.inventory.items){
-            var sprite = this.inventory.getSprite(item);
-            sprite.visible = false;
+        for(var j = 0; j < this.sprites.length; j++){
+            this.sprites[j].visible = false;
+            this.texts[j].visible = false;
         }
+        this.nextItemSprite = 0;
     }
     this.displayed = false;
 };

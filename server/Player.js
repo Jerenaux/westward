@@ -11,6 +11,7 @@ function Player(){
     this.updatePacket = new PersonalUpdatePacket();
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.items = [];
+    this.settlement = 0;
 }
 
 Player.prototype = Object.create(MovingEntity.prototype);
@@ -31,7 +32,7 @@ Player.prototype.setStartingPosition = function(){
 Player.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','path']; // list of properties relevant for the client
+    var broadcastProperties = ['id','path','settlement']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

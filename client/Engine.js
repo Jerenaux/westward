@@ -122,7 +122,7 @@ Engine.createMarker = function(){
 };
 
 Engine.initWorld = function(data){
-    Engine.addHero(data.id,data.x,data.y);
+    Engine.addHero(data.id,data.x,data.y,data.settlement);
     Engine.makeUI();
     Engine.makeChatBar();
     Engine.playerIsInitialized = true;
@@ -195,15 +195,15 @@ Engine.makeInventory = function(){
 Engine.makeCharacterMenu = function(){
     var character = new Menu('Character');
     var info = new Panel(665,100,340,380,"<Player name>");
-    info.addLine('Citizen of New Beginning');
+    info.addLine('Citizen of '+Engine.settlementsData[Engine.player.settlement].name);
     info.addLine('Level 1 Merchant  -   0/100 Class XP');
     info.addLine('Level 1 citizen   -   0/100 Civic XP');
     character.addPanel(info); // equipment panel
     return character;
 };
 
-Engine.addHero = function(id,x,y){
-    Engine.player = Engine.addPlayer(id,x,y);
+Engine.addHero = function(id,x,y,settlement){
+    Engine.player = Engine.addPlayer(id,x,y,settlement);
     Engine.player.visible = Engine.showHero;
     Engine.camera.startFollow(Engine.player);
     Engine.player.inventory = new Inventory(25);
@@ -294,7 +294,7 @@ Engine.isColliding = function(tile){ // tile is the index of the tile in the til
 
 Engine.handleClick = function(event){
     if(event.gameObject){
-        console.log(event.gameObject.texture.key);
+        //console.log(event.gameObject.texture.key);
         if(event.gameObject.handleClick) event.gameObject.handleClick();
     }else{
         if(!Engine.inMenu) {
@@ -418,7 +418,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.newplayers) {
         for (var n = 0; n < data.newplayers.length; n++) {
             var p = data.newplayers[n];
-            var player = Engine.addPlayer(p.id, p.x, p.y);
+            var player = Engine.addPlayer(p.id, p.x, p.y, p.settlement);
             if(p.path) player.move(p.path);
         }
         //if (data.newplayers.length > 0) Game.sortEntities(); // Sort entitites according to y coordinate to make them render properly above each other
@@ -462,9 +462,10 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
     if(data.path) player.move(data.path);
 };
 
-Engine.addPlayer = function(id,x,y){
+Engine.addPlayer = function(id,x,y,settlement){
     if(Engine.playerIsInitialized && id == Engine.player.id) return;
     var sprite = new Player(x,y,'hero',id);
+    sprite.settlement = settlement;
     Engine.players[id] = sprite;
     Engine.displayedPlayers.add(id);
     return sprite;
