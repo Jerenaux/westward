@@ -13,7 +13,7 @@ var collisions = new SpaceMap();
 function listCollisions(directory){
     if(!directory){
         console.log('ERROR : No directory specified! Arguments :');
-        console.log('-i = directory relative to assets/maps containing the chunks to flatten');
+        console.log('-i = directory relative to assets/maps containing the chunks to parse');
         return;
     }
 

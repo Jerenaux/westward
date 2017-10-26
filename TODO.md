@@ -91,8 +91,6 @@ Content:
 - Chat
 - Gazette
 * Inventory
-- Display inventory (in both inventory and crafting)
-- Display number of items for each slot
 - Equipment blocks
 - Pick up items
 - Display ammo amount next to weapon
@@ -130,6 +128,8 @@ Content:
 - Let governor name chancellor
 - Salaries for officials
 * Trade
+(- Have a trade post built)
+- Shop system, test with pre-filled inventories
 - Have monsters drop loot
 - Enable bonuses of merchants
 - Allow merchants and artisans to build their shops

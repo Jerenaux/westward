@@ -31,6 +31,7 @@ Engine.preload = function() {
     this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
+    this.load.atlas('buildings', 'assets/sprites/buildings.png', 'assets/sprites/buildings.json');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
 
     this.load.json('buildings', 'assets/data/buildings.json');
@@ -59,7 +60,7 @@ Engine.create = function(masterData){
     Engine.nbLayers = masterData.nbLayers;
     if(!Engine.nbLayers) console.log('WARNING : falsy number of layers : '+console.log(Engine.nbLayers));
     Engine.mapDataLocation = Boot.mapDataLocation;
-    console.log('Master file read, setting up world of size '+Engine.worldWidth+' x '+Engine.worldHeight+' with '+Engine.nbLayers+' layers');
+    console.log('Master file read, setting up world of size '+World.worldWidth+' x '+World.worldHeight+' with '+Engine.nbLayers+' layers');
 
     Engine.tilesets = masterData.tilesets;
     Engine.tilesetMap = {}; // maps tiles to tilesets;
@@ -201,11 +202,20 @@ Engine.makeUI = function(){
 
 Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
-    crafting.addPanel(new Panel(765,100,240,380,'Recipes')); // recipes panel
-    crafting.addPanel(new Panel(450,100,290,380,'Combination')); // crafting panel
+    var recipes = new Panel(765,100,240,380,'Recipes');
+    recipes.addLine('Buildings:');
+    recipes.addSlots(5, 1, 8);
+    recipes.addLine('Items:');
+    recipes.addSlots(5, 2, 30);
+    recipes.setInventory(Engine.player.recipes,false);
+    crafting.addPanel(recipes); // recipes panel
+    var combi = new Panel(450,100,290,380,'Combination');
+    combi.addLine('test');
+    combi.addSprite('UI','craftring',-10,-50);
+    crafting.addPanel(combi); // crafting panel
     var items = new Panel(40,100,390,380,'Items');
     items.addSlots(10,9,Engine.player.inventory.maxSize);
-    items.setInventory(Engine.player.inventory);
+    items.setInventory(Engine.player.inventory,true);
     crafting.addPanel(items); // inventory panel
     return crafting;
 };
@@ -216,7 +226,7 @@ Engine.makeInventory = function(){
     var items = new Panel(40,100,600,380,'Items');
     items.addCapsule(500,-9,'1299','gold');
     items.addSlots(15,9,Engine.player.inventory.maxSize);
-    items.setInventory(Engine.player.inventory);
+    items.setInventory(Engine.player.inventory,true);
     inventory.addPanel(items); // inventory panel
     return inventory;
 };
@@ -236,6 +246,8 @@ Engine.addHero = function(id,x,y,settlement){
     Engine.player.visible = Engine.showHero;
     Engine.camera.startFollow(Engine.player);
     Engine.player.inventory = new Inventory(25);
+    Engine.player.recipes = new Inventory(10);
+    Engine.updateInventory(Engine.player.recipes,{4:1});
     Engine.updateEnvironment();
 };
 

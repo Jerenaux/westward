@@ -12,7 +12,7 @@ function Panel(x,y,width,height,title){
     this.y = y;
     this.width = width;
     this.height = height;
-    this.lastLineY = this.y + 20;
+    this.verticalOffset = 20;
     this.displayed = false;
     this.displayInventory = false;
     this.inventory = null;
@@ -92,16 +92,17 @@ Panel.prototype.addRing = function(xs,ys,color,symbol,callback){
     this.finalize();
 };
 
-Panel.prototype.setInventory = function(inventory){
+Panel.prototype.setInventory = function(inventory,displayNumbers){
     this.displayInventory = true;
+    this.displayNumbers = displayNumbers;
     this.inventory = inventory;
 };
 
 Panel.prototype.addSlots = function(nbHorizontal,nbVertical,total){
-    var paddingX = (this.width - ((nbHorizontal-2)*36+(2*38)))/2;
-    var paddingY = (this.height - ((nbVertical-2)*36+(2*38)))/2;
+    var paddingX = 15;
     var offsetx = 0;
     var offsety = 0;
+    this.verticalOffset += 5;
 
     for(var y = 0; y < nbVertical; y++){
         for(var x = 0; x < nbHorizontal; x++){
@@ -133,8 +134,10 @@ Panel.prototype.addSlots = function(nbHorizontal,nbVertical,total){
             if(center == 2) frame += 'middle';
             offsetx = (x > 0 ? 2 : 0);
             offsety = (y > 0 ? 2 : 0);
+            //var slotx = this.x+paddingX+(x*36)+offsetx;
+            //var sloty = this.y+paddingY+(y*36)+offsety;
             var slotx = this.x+paddingX+(x*36)+offsetx;
-            var sloty = this.y+paddingY+(y*36)+offsety;
+            var sloty = this.y+this.verticalOffset+(y*36)+offsety;
             this.slots.push({
                 x: slotx,
                 y: sloty
@@ -142,16 +145,24 @@ Panel.prototype.addSlots = function(nbHorizontal,nbVertical,total){
             this.container.push(Engine.scene.add.sprite(slotx,sloty,'UI',frame));
         }
     }
+    this.verticalOffset += nbVertical*36 + 5;
     this.finalize();
 };
 
 Panel.prototype.addLine = function(line){
-    var text = Engine.scene.add.text(this.x+15, this.lastLineY, line,
+    var text = Engine.scene.add.text(this.x+15, this.y+this.verticalOffset, line,
         { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
     );
     this.container.push(text);
-    this.lastLineY += 20;
+    this.verticalOffset += 20;
     this.finalize();
+};
+
+Panel.prototype.addSprite = function(atlas,frame,x,y){
+    console.log(this.x+x,this.y+y);
+    var sprite = Engine.scene.add.sprite(this.x+x,this.y+y,atlas,frame);
+    this.container.push(sprite);
+    this.finalize;
 };
 
 Panel.prototype.finalize = function(){
@@ -163,6 +174,10 @@ Panel.prototype.finalize = function(){
         e.setDisplayOrigin(0,0);
         e.setInteractive();
         e.visible = false;
+        if(e.frame) console.log(e.frame.name);
+        if(e.frame && e.frame.name == 'ring'){
+            console.log(e);
+        }
     });
 };
 
@@ -177,6 +192,7 @@ Panel.prototype.getNextItemSprite = function(item){
     var sprite = this.sprites[this.nextItemSprite];
     sprite.setTexture(data.atlas);
     sprite.setFrame(data.frame);
+    sprite.setDisplayOrigin(Math.floor(sprite.frame.width/2),Math.floor(sprite.frame.height/2));
     sprite.visible = true;
     return sprite;
 };
@@ -187,14 +203,12 @@ Panel.prototype.getNextText = function(item){
             { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
         );
         empty.setScrollFactor(0);
-        //empty.setDisplayOrigin(0);
         empty.setOrigin(1,0);
         empty.depth = Engine.UIDepth+4;
         this.texts.push(empty);
     }
     var text = this.texts[this.nextItemSprite];
     text.setText(this.inventory.getNb(item));
-    //text.setText(99);
     text.visible = true;
     return text;
 };
@@ -207,11 +221,12 @@ Panel.prototype.display = function(){
         var j = 0;
         for(var item in this.inventory.items){
             var sprite = this.getNextItemSprite(item);
-            var text = this.getNextText(item);
             var pos = this.slots[j];
-            sprite.setPosition(pos.x+4+16,pos.y+4+16);
-            text.setPosition(pos.x+37,pos.y+18);
-            if(sprite.texture.key == "items2") sprite.setPosition(sprite.x+3,sprite.y+3); // TODO ugly hack, improve
+            sprite.setPosition(pos.x+2+16,pos.y+4+16);
+            if(this.displayNumbers) {
+                var text = this.getNextText(item);
+                text.setPosition(pos.x + 37, pos.y + 18);
+            }
             j++;
             this.nextItemSprite++;
         }
@@ -226,7 +241,7 @@ Panel.prototype.hide = function(){
     if(this.displayInventory) {
         for(var j = 0; j < this.sprites.length; j++){
             this.sprites[j].visible = false;
-            this.texts[j].visible = false;
+            if(this.texts[j]) this.texts[j].visible = false;
         }
         this.nextItemSprite = 0;
     }

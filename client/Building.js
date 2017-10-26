@@ -27,7 +27,7 @@ var Building = new Phaser.Class({
         this.panel = new Panel(0,py,width,height,panelName);
         this.panel.addRing(260,-10,'red','close',Engine.closePanel  );
         this.panel.addSlots(3,3,5);
-        this.panel.setInventory(this.inventory);
+        this.panel.setInventory(this.inventory,true);
         this.handleClick = Engine.togglePanel.bind(this);
 
         var shape = new Phaser.Geom.Polygon(data.shape);

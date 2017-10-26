@@ -147,6 +147,10 @@
     {
       "filename": "longslot_7",
       "frame": {"x":152,"y":424,"w":18,"h":40}
+    },
+    {
+      "filename": "craftring",
+      "frame": {"x":719,"y":290,"w":128,"h":128}
     }
   ]
 }

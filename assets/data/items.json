@@ -14,5 +14,9 @@
   "3":{
     "atlas": "items2",
     "frame":"timber"
+  },
+  "4":{
+    "atlas": "buildings",
+    "frame":"miniWarehouse"
   }
 }
