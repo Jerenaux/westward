@@ -92,6 +92,10 @@ Client.sendPath = function(path){
     Client.socket.emit('path',path);
 };
 
+Client.startBattle = function(targetID){
+    Client.socket.emit('battle',targetID);
+};
+
 // ####################"
 
 Client.sendMapData = function(id,data){

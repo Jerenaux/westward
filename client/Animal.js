@@ -10,5 +10,9 @@ var Animal = new Phaser.Class({
         Moving.call(this,x,y,data.sprite,id);
         this.setFrame(data.frame);
         this.setDisplayOrigin(0);
+    },
+
+    handleClick: function(){
+        Client.startBattle(this.id);
     }
 });

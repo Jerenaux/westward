@@ -9,6 +9,7 @@ var GameServer = {
     lastPlayerID: 0,
     lastBuildingID: 0,
     lastAnimalID: 0,
+    lastBattleID: 0,
     players: {}, // player.id -> player
     socketMap: {}, // socket.id -> player.id
     nbConnectedChanged: false

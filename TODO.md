@@ -36,11 +36,11 @@ Cleaning:
 Content:
 -------
 * Battle system
-- Have monsters roam about
-- Trigger battle when clicking on monster
-- Compute and display battle grid
-- Adjust camera
+- Trigger battle when clicking on monster (process 'battle' event)
 - Set up turns, and timers
+- End battle if disconnect
+- Visual cue to indicate that in battle (based on inFight flag)
+- Visual cue to indicate who's turn it is
 - Menus to decide which action to take, on which target
 - Movement on the battlefield
 - Set up basic stats and formulas for melee attacks
@@ -53,6 +53,7 @@ Content:
 - Monster AI
 - Manage end of fight
 - Respawn
+- Respawn if disconnect
 - Battle experience
 - Spawn loot
 - Readjust camera
@@ -63,6 +64,8 @@ Content:
 - Add a few savages with roaming behaviour
 - Expand battle AI for savages
 - Improve roaming behavior of savages
+- Compute and display battle grid
+- Adjust camera
 - Have a permanent presence of savages and animals around settlements
 * Character menu
 - Health gauge, fatigue gauge
@@ -98,6 +101,7 @@ Content:
 - Equip items from menu
 * Movement:
 - Animate; investigate path followers to take care of orientation and animation
+- Have monsters roam about and animate them as well
 * Player interactions
 - Display speech bubble locally
 - Broadcats bubble
@@ -150,7 +154,7 @@ Design document:
 
 Polish:
 ------
-- Add tweens to player/building panels
+- Add tweens to player/building panels (if the 9-slice breaks, make the tileSprites slightly bigger so that they overlap with the corners?)
 - Sound effects when clicking (for moving, on buttons in menus, sounds of shuffling pages...)
 - Noise when walking
 - Noise when clicking on building (each building its noise)

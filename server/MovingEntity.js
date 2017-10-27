@@ -13,6 +13,7 @@ MovingEntity.prototype.setPath = function(path){
     this.setProperty('path',path);
     this.updatePathTick();
     this.moving = true;
+    this.inFight = false;
 };
 
 MovingEntity.prototype.updatePathTick = function(){
