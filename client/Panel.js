@@ -10,6 +10,8 @@ function Panel(x,y,width,height,title){
     this.test = [];
     this.x = x;
     this.y = y;
+    this.previousX = this.x;
+    this.previousY = this.y;
     this.width = width;
     this.height = height;
     this.verticalOffset = 20;
@@ -81,14 +83,22 @@ Panel.prototype.addRing = function(xs,ys,color,symbol,callback){
     x += 5;
     y += 5;
     var cs = Engine.scene.add.sprite(x,y,'UI',color);
+    cs.upFrame = cs.frame.name;
     this.container.push(cs);
     x += 4;
     y += 4;
     var ss = Engine.scene.add.sprite(x,y,'UI',symbol);
 
     this.container.push(ss);
+
+    var downCallback = function(){
+        this.setFrame(color+'-pressed');
+    };
+
     cs.handleClick = callback.bind(this);
     ss.handleClick = callback.bind(this);
+    cs.handleDown = downCallback.bind(cs);
+    ss.handleDown = downCallback.bind(cs);
     this.finalize();
 };
 
@@ -159,10 +169,56 @@ Panel.prototype.addLine = function(line){
 };
 
 Panel.prototype.addSprite = function(atlas,frame,x,y){
-    console.log(this.x+x,this.y+y);
     var sprite = Engine.scene.add.sprite(this.x+x,this.y+y,atlas,frame);
     this.container.push(sprite);
-    this.finalize;
+    this.finalize();
+};
+
+Panel.prototype.updatePosition = function(){
+    var dx = this.x - this.previousX;
+    var dy = this.y - this.previousY;
+    if(dx == 0 && dy == 0) return;
+    this.container.forEach(function(e){
+        e.x += dx;
+        e.y += dy;
+    });
+    this.previousX = this.x;
+    this.previousY = this.y;
+};
+
+Panel.prototype.setTweens = function(sx,sy,ex,ey){
+    var _this = this;
+    this.showTween = Engine.scene.tweens.add({
+        targets: this,
+        x: ex,
+        y: ey,
+        ease: 'Bounce.easeOut',
+        paused: true,
+        onStart: function(){
+            //console.log('show start');
+        },
+        onUpdate: function(){
+            _this.updatePosition();
+        },
+        duration: 200
+    });
+    this.hideTween = Engine.scene.tweens.add({
+        targets: this,
+        x: sx,
+        y: sy,
+        //ease: 'Bounce.easeOut',
+        paused: true,
+        onStart: function(){
+            //console.log('hide start');
+        },
+        onUpdate: function(){
+            _this.updatePosition();
+        },
+        onComplete: function(){
+            _this.hidePanel();
+        },
+        duration: 200
+    });
 };
 
 Panel.prototype.finalize = function(){
@@ -174,10 +230,6 @@ Panel.prototype.finalize = function(){
         e.setDisplayOrigin(0,0);
         e.setInteractive();
         e.visible = false;
-        if(e.frame) console.log(e.frame.name);
-        if(e.frame && e.frame.name == 'ring'){
-            console.log(e);
-        }
     });
 };
 
@@ -213,9 +265,18 @@ Panel.prototype.getNextText = function(item){
     return text;
 };
 
+Panel.prototype.toggle = function(){
+    if(this.displayed){
+        this.hide();
+    }else{
+        this.display();
+    }
+};
+
 Panel.prototype.display = function(){
     for(var i = 0; i < this.container.length; i++){
         this.container[i].visible = true;
+        if(this.container[i].upFrame) this.container[i].setFrame(this.container[i].upFrame);
     }
     if(this.displayInventory) {
         var j = 0;
@@ -231,10 +292,19 @@ Panel.prototype.display = function(){
             this.nextItemSprite++;
         }
     }
+    if(this.showTween) this.showTween.play();
     this.displayed = true;
 };
 
 Panel.prototype.hide = function(){
+    if(this.hideTween){
+        this.hideTween.play();
+    }else{
+        this.hidePanel();
+    }
+};
+
+Panel.prototype.hidePanel = function(){
     for(var i = 0; i < this.container.length; i++){
         this.container[i].visible = false;
     }

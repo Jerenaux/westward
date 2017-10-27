@@ -53,6 +53,10 @@
       "frame": {"x":185,"y":184,"w":69,"h":64}
     },
     {
+      "filename": "title-close-pressed",
+      "frame": {"x":255,"y":184,"w":69,"h":64}
+    },
+    {
       "filename": "capsule-left",
       "frame": {"x":634,"y":118,"w":24,"h":24}
     },
@@ -115,6 +119,10 @@
     {
       "filename": "red",
       "frame": {"x":48,"y":121,"w":14,"h":14}
+    },
+    {
+      "filename": "red-pressed",
+      "frame": {"x":48,"y":137,"w":14,"h":14}
     },
     {
       "filename": "close",

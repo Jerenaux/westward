@@ -26,6 +26,7 @@ Menu.prototype.makeTitle = function(title){
     this.container.push(Engine.scene.add.tileSprite(x,titley,text.width,64,'UI','title-center'));
     x = x+text.width;
     var closeBtn = new UIElement(x,titley,'UI','title-close',this);
+    closeBtn.setDownFrame('title-close-pressed');
     this.container.push(closeBtn);
 
     this.container.forEach(function(e){

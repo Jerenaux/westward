@@ -95,10 +95,12 @@ Engine.create = function(masterData){
     Engine.createMarker();
     Engine.scene.game.canvas.style.cursor = Engine.cursor; // Sets the pointer to hand sprite
 
-    Engine.scene.input.events.on('POINTER_DOWN_EVENT', Engine.handleClick);
+    Engine.scene.input.events.on('POINTER_DOWN_EVENT', Engine.handleDown);
+    Engine.scene.input.events.on('POINTER_UP_EVENT', Engine.handleClick);
     Engine.scene.input.events.on('POINTER_MOVE_EVENT', Engine.trackMouse);
     Engine.scene.input.events.on('POINTER_OVER_EVENT', Engine.handleOver);
     Engine.scene.input.events.on('POINTER_OUT_EVENT', Engine.handleOut);
+    Engine.scene.input.keyboard.events.on('KEY_DOWN_ENTER', Engine.toggleChatBar);
 
     Engine.collisions = new SpaceMap(); // contains 1 for the coordinates that are non-walkables
     Engine.PFgrid = new PF.Grid(0,0); // grid placeholder for the pathfinding
@@ -163,12 +165,15 @@ Engine.createAnimations = function(){
 Engine.makeChatBar = function(){
     var chatw = 300;
     var chatx = (32*16)-(chatw/2);
-    var chaty = 18*32-40;
-    var chat = new Panel(chatx,chaty,chatw,96);
-    var icon = Engine.scene.add.sprite(chatx+25,chaty+23,'talk');
-    chat.display();
-    icon.setScrollFactor(0);
-    icon.depth = Engine.UIDepth+1;
+    //var chaty = 18*32-40;
+    var chaty = Engine.scene.game.config.height;
+    Engine.chat = new Panel(chatx,chaty,chatw,96);
+    Engine.chat.addSprite('talk',null,12,8);
+    Engine.chat.setTweens(chatx,chaty,chatx,chaty - 40);
+};
+
+Engine.toggleChatBar = function(){
+    Engine.chat.toggle();
 };
 
 Engine.makeUI = function(){
@@ -210,8 +215,7 @@ Engine.makeCraftingMenu = function(){
     recipes.setInventory(Engine.player.recipes,false);
     crafting.addPanel(recipes); // recipes panel
     var combi = new Panel(450,100,290,380,'Combination');
-    combi.addLine('test');
-    combi.addSprite('UI','craftring',-10,-50);
+    combi.addSprite('UI','craftring',80,50);
     crafting.addPanel(combi); // crafting panel
     var items = new Panel(40,100,390,380,'Items');
     items.addSlots(10,9,Engine.player.inventory.maxSize);
@@ -331,6 +335,12 @@ Engine.isColliding = function(tile){ // tile is the index of the tile in the til
         if(Engine.collidingTiles[i] == tile) return true;
     }
     return false;
+};
+
+Engine.handleDown = function(event){
+    if(event.gameObject && event.gameObject.handleDown){
+        event.gameObject.handleDown();
+    }
 };
 
 Engine.handleClick = function(event){

@@ -99,7 +99,6 @@ Content:
 * Movement:
 - Animate; investigate path followers to take care of orientation and animation
 * Player interactions
-- Toggle chat by pressing enter
 - Display speech bubble locally
 - Broadcats bubble
 - Display menu when click on players, display buttons (give item, give money)
@@ -151,13 +150,13 @@ Design document:
 
 Polish:
 ------
-- Highlight buttons and buildings on hover
-- Button animation on big red closing cross in menus
-- Custom movement marker
+- Add tweens to player/building panels
 - Sound effects when clicking (for moving, on buttons in menus, sounds of shuffling pages...)
 - Noise when walking
 - Noise when clicking on building (each building its noise)
 - Noise when clicking on non-walkable tile
+- Highlight buttons and buildings on hover
+- Custom movement marker
 - Polish existing content
 - Footsteps, light effects, sound effects (on actions + environment: birds, water, ...)
 - HUD, title screen, animations ...

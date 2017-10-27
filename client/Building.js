@@ -19,7 +19,6 @@ var Building = new Phaser.Class({
         this.inventory = new Inventory(100);
         this.chunk = Utils.tileToAOI({x:x,y:y});
 
-
         var height = 200;
         var width = 300;
         var py = Engine.baseViewHeight*Engine.tileHeight - height;
@@ -28,6 +27,7 @@ var Building = new Phaser.Class({
         this.panel.addRing(260,-10,'red','close',Engine.closePanel  );
         this.panel.addSlots(3,3,5);
         this.panel.setInventory(this.inventory,true);
+        //this.panel.setTweens(0,py+height,0,py);
         this.handleClick = Engine.togglePanel.bind(this);
 
         var shape = new Phaser.Geom.Polygon(data.shape);
