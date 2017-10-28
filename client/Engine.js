@@ -226,7 +226,9 @@ Engine.makeCraftingMenu = function(){
 
 Engine.makeInventory = function(){
     var inventory = new Menu('Inventory');
-    inventory.addPanel(new Panel(665,100,340,380,'Equipment')); // equipment panel
+    var equip = new Panel(665,100,340,380,'Equipment');
+    equip.addEquip();
+    inventory.addPanel(equip); // equipment panel
     var items = new Panel(40,100,600,380,'Items');
     items.addCapsule(500,-9,'1299','gold');
     items.addSlots(15,9,Engine.player.inventory.maxSize);

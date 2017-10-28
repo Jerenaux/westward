@@ -159,6 +159,32 @@ Panel.prototype.addSlots = function(nbHorizontal,nbVertical,total){
     this.finalize();
 };
 
+Panel.prototype.addEquip = function(){
+    this.container.push(Engine.scene.add.sprite(this.x+150,this.y+50,'UI','equipment-slot'));
+    this.container.push(Engine.scene.add.sprite(this.x+155,this.y+60,'UI','armor-shade'));
+    this.container.push(Engine.scene.add.sprite(this.x+100,this.y+65,'UI','equipment-slot'));
+    this.container.push(Engine.scene.add.sprite(this.x+108,this.y+75,'UI','gun-shade'));
+    this.container.push(Engine.scene.add.sprite(this.x+100,this.y+115,'UI','equipment-slot'));
+    this.container.push(Engine.scene.add.sprite(this.x+108,this.y+122,'UI','sword-shade'));
+    this.container.push(Engine.scene.add.sprite(this.x+200,this.y+65,'UI','equipment-slot'));
+    this.container.push(Engine.scene.add.sprite(this.x+208,this.y+75,'UI','shield-shade'));
+    this.container.push(Engine.scene.add.sprite(this.x+200,this.y+15,'UI','equipment-slot'));
+    this.container.push(Engine.scene.add.sprite(this.x+210,this.y+25,'UI','necklace-shade'));
+    this.container.push(Engine.scene.add.sprite(this.x+150,this.y+100,'UI','equipment-slot'));
+    this.container.push(Engine.scene.add.sprite(this.x+158,this.y+115,'UI','belt-shade'));
+    this.container.push(Engine.scene.add.sprite(this.x+150,this.y+150,'UI','equipment-slot'));
+    this.container.push(Engine.scene.add.sprite(this.x+155,this.y+165,'UI','boots-shade'));
+
+    this.container.push(Engine.scene.add.sprite(this.x+100,this.y+220,'UI','equipment-slot'));
+    this.container.push(Engine.scene.add.sprite(this.x+110,this.y+230,'UI','ring-shade'));
+    this.container.push(Engine.scene.add.sprite(this.x+150,this.y+220,'UI','equipment-slot'));
+    this.container.push(Engine.scene.add.sprite(this.x+160,this.y+230,'UI','ring-shade'));
+    this.container.push(Engine.scene.add.sprite(this.x+200,this.y+220,'UI','equipment-slot'));
+    this.container.push(Engine.scene.add.sprite(this.x+210,this.y+230,'UI','ring-shade'));
+
+    this.finalize();
+};
+
 Panel.prototype.addLine = function(line){
     var text = Engine.scene.add.text(this.x+15, this.y+this.verticalOffset, line,
         { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
@@ -278,22 +304,24 @@ Panel.prototype.display = function(){
         this.container[i].visible = true;
         if(this.container[i].upFrame) this.container[i].setFrame(this.container[i].upFrame);
     }
-    if(this.displayInventory) {
-        var j = 0;
-        for(var item in this.inventory.items){
-            var sprite = this.getNextItemSprite(item);
-            var pos = this.slots[j];
-            sprite.setPosition(pos.x+2+16,pos.y+4+16);
-            if(this.displayNumbers) {
-                var text = this.getNextText(item);
-                text.setPosition(pos.x + 37, pos.y + 18);
-            }
-            j++;
-            this.nextItemSprite++;
-        }
-    }
+    if(this.displayInventory) this.displayTheInventory();
     if(this.showTween) this.showTween.play();
     this.displayed = true;
+};
+
+Panel.prototype.displayTheInventory = function(){
+    var j = 0;
+    for(var item in this.inventory.items){
+        var sprite = this.getNextItemSprite(item);
+        var pos = this.slots[j];
+        sprite.setPosition(pos.x+2+16,pos.y+4+16);
+        if(this.displayNumbers) {
+            var text = this.getNextText(item);
+            text.setPosition(pos.x + 37, pos.y + 18);
+        }
+        j++;
+        this.nextItemSprite++;
+    }
 };
 
 Panel.prototype.hide = function(){
@@ -308,12 +336,14 @@ Panel.prototype.hidePanel = function(){
     for(var i = 0; i < this.container.length; i++){
         this.container[i].visible = false;
     }
-    if(this.displayInventory) {
-        for(var j = 0; j < this.sprites.length; j++){
-            this.sprites[j].visible = false;
-            if(this.texts[j]) this.texts[j].visible = false;
-        }
-        this.nextItemSprite = 0;
-    }
+    if(this.displayInventory) this.hideInventory();
     this.displayed = false;
+};
+
+Panel.prototype.hideInventory = function(){
+    for(var j = 0; j < this.sprites.length; j++){
+        this.sprites[j].visible = false;
+        if(this.texts[j]) this.texts[j].visible = false;
+    }
+    this.nextItemSprite = 0;
 };

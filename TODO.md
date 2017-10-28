@@ -29,7 +29,8 @@ Cleaning:
 - Standardize the use of Utils methods for coordianes manipulations (gridtoline, linetogrid, tiletoiAOI, AOItotile, tileRelativeToAOI...)
 - Remove unnecessary Geometry methods
 - Restructure UI, maybe remove UIElement, only have a set of generic functions to bind to interactive sprites?
-- Think about a Container class or something to affect the transforms of all children
+- Think about a Container class or something to affect the transforms of all children, get rid of repeated finalize() calls
+- Anchor panel elements at center, not top-left
 - Clean all files
 - Add ES6 syntax to PHPStorm (for ... of)
 
@@ -94,11 +95,12 @@ Content:
 - Chat
 - Gazette
 * Inventory
-- Equipment blocks
-- Pick up items
-- Display ammo amount next to weapon
+- Hover cards over items
+- Usage block when clicking on item
 - Use items from menu (healing)
 - Equip items from menu
+- Display ammo amount next to weapon (melee weapons have a ref to the id of the corresponding ammo item; fetch the nb of that item in the player.inventory (refactor when multiple ammo types)
+- Pick up items
 * Movement:
 - Animate; investigate path followers to take care of orientation and animation
 - Have monsters roam about and animate them as well
@@ -155,10 +157,15 @@ Design document:
 Polish:
 ------
 - Add tweens to player/building panels (if the 9-slice breaks, make the tileSprites slightly bigger so that they overlap with the corners?)
+- Menu sprites change size when hovered / clicked
+- Hover cards over empty equipment slots
+- Hover cards over craftring buttons
 - Sound effects when clicking (for moving, on buttons in menus, sounds of shuffling pages...)
 - Noise when walking
 - Noise when clicking on building (each building its noise)
 - Noise when clicking on non-walkable tile
+- Unique noise for items
+- Crafting SFX
 - Highlight buttons and buildings on hover
 - Custom movement marker
 - Polish existing content

@@ -159,6 +159,42 @@
     {
       "filename": "craftring",
       "frame": {"x":719,"y":290,"w":128,"h":128}
+    },
+    {
+      "filename": "equipment-slot",
+      "frame": {"x":75,"y":288,"w":40,"h":40}
+    },
+    {
+      "filename": "armor-shade",
+      "frame": {"x":241,"y":429,"w":29,"h":21}
+    },
+    {
+      "filename": "necklace-shade",
+      "frame": {"x":280,"y":429,"w":16,"h":23}
+    },
+    {
+      "filename": "shield-shade",
+      "frame": {"x":308,"y":429,"w":24,"h":23}
+    },
+    {
+      "filename": "gun-shade",
+      "frame": {"x":345,"y":431,"w":24,"h":19}
+    },
+    {
+      "filename": "sword-shade",
+      "frame": {"x":212,"y":460,"w":24,"h":24}
+    },
+    {
+      "filename": "belt-shade",
+      "frame": {"x":245,"y":467,"w":22,"h":10}
+    },
+    {
+      "filename": "boots-shade",
+      "frame": {"x":274,"y":463,"w":28,"h":17}
+    },
+    {
+      "filename": "ring-shade",
+      "frame": {"x":311,"y":463,"w":18,"h":18}
     }
   ]
 }
