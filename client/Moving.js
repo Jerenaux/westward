@@ -50,21 +50,24 @@ var Moving = new Phaser.Class({
             this.updatePosition();
         }
         this.lastUpdateStamp = Date.now();
-        var player = this;
+        var mover = this;
         this.movement = Engine.scene.tweens.timeline({
             tweens: tweens,
+            onStart: function(){
+                mover.previousOrientation = null;
+            },
             onUpdate: function(){
-                if(Date.now() - player.lastUpdateStamp > 200){
-                    player.updatePosition();
-                    player.lastUpdateStamp = Date.now();
+                if(Date.now() - mover.lastUpdateStamp > 5){
+                    mover.updatePosition();
+                    mover.lastUpdateStamp = Date.now();
                 }
             },
             onComplete: function(){
-                player.updatePosition();
-                player.anims.stop();
+                mover.updatePosition();
+                mover.anims.stop();
+                mover.setFrame(mover.restingFrames[mover.orientation]);
             }
         });
-        this.anims.play('player_move_down');
     },
     
     updatePosition: function(){
@@ -78,8 +81,8 @@ var Moving = new Phaser.Class({
             this.orientation = 'up';
         }
         if(this.orientation != this.previousOrientation){
-            console.log('change from '+this.previousOrientation+' to '+this.orientation);
             this.previousOrientation = this.orientation;
+            this.anims.play(this.animsKeys['move_'+this.orientation]);
         }
         this.previousPosition = {
             x: this.x,

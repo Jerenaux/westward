@@ -18,5 +18,19 @@ var Player = new Phaser.Class({
         this.panel = new Panel(0,py,width,height,'Player name');
         this.panel.addRing(260,-10,'red','close',Engine.closePanel);
         this.handleClick = Engine.togglePanel.bind(this);
+
+        this.animsKeys = {
+            move_down: 'player_move_down',
+            move_up: 'player_move_up',
+            move_right: 'player_move_right',
+            move_left: 'player_move_left'
+        };
+
+        this.restingFrames = {
+            up: 20,
+            down: 33,
+            left: 52,
+            right: 7
+        };
     }
 });
