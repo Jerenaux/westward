@@ -15,12 +15,25 @@
             margin: 0;
             padding: 0;
         }
+        .map {
+            //border: 1px solid black;
+            padding: 0;
+            margin: 0;
+            margin-bottom: -4px;
+            float: left;
+        }
+        .row {
+            padding: 0;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
-    <div id="map"></div>
+    <div id='container' class="row">
+    </div>
+    <div id="dummy" style="display: none;"></div>
 </body>
 </html>
-<script src="studio/map.js" type="text/javascript"></script>
+<script src="studio/gmaps/map.js" type="text/javascript"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAZPGBxheXKW7DLN6ua68jA14FeUzqiEE4&libraries=geometry&&callback=initMap"></script>
 

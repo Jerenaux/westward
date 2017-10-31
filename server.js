@@ -26,7 +26,7 @@ if(process.env.DEV == 1) {
         res.sendFile(__dirname + '/studio/studio.html');
     });
     app.get('/map', function (req, res) {
-        res.sendFile(__dirname + '/studio/map.html');
+        res.sendFile(__dirname + '/studio/gmaps/map.html');
     });
     app.get('/bezier', function (req, res) {
         res.sendFile(__dirname + '/studio/bezier/bezier.html');

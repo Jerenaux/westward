@@ -102,7 +102,7 @@ Content:
 - Display ammo amount next to weapon (melee weapons have a ref to the id of the corresponding ammo item; fetch the nb of that item in the player.inventory (refactor when multiple ammo types)
 - Pick up items
 * Movement:
-- Animate; investigate path followers to take care of orientation and animation
+- Investigate path followers to take care of orientation and animation
 - Have monsters roam about and animate them as well
 * Player interactions
 - Display speech bubble locally
@@ -165,6 +165,7 @@ Polish:
 - Noise when clicking on building (each building its noise)
 - Noise when clicking on non-walkable tile
 - Unique noise for items
+- Use particle emitters for several cool effects, like cloud puffs, dust, lights, etc.
 - Crafting SFX
 - Highlight buttons and buildings on hover
 - Custom movement marker
