@@ -42,6 +42,13 @@ Utils.gridToLine = function(x,y,w){
     return (y*w)+x;
 };
 
+Utils.lineToGrid = function(i,w){
+    return {
+        x: i%w,
+        y: Math.floor(i/w)
+    }
+};
+
 // Returns the x and y offets of a chunk, in chunks, from the top left
 Utils.getMacroCoordinates = function(chunk){
     return {

@@ -3,6 +3,7 @@
  */
 
 var fs = require('fs');
+var path = require('path');
 var clone = require('clone');
 var xml2js = require('xml2js');
 
@@ -11,7 +12,7 @@ var Utils = require('../shared/Utils.js').Utils;
 var Geometry = require('../studio/Geometry.js').Geometry;
 var WorldEditor = require('../studio/WorldEditor.js').WorldEditor;
 
-var nbHoriz, nbVert, chunkWidth, chunkHeight, tileWidth, tileHeight, worldWidth, worldHeight, reverse;
+var nbHoriz, nbVert, chunkWidth, chunkHeight, tileWidth, tileHeight, reverse;
 
 function Layer(w,h,name){
     this.data = [];
@@ -47,8 +48,17 @@ function makeWorld(bluePrint,outdir){
     if(!tileWidth) tileWidth = defTileW;
     if(!tileHeight) tileHeight = defTileH;
 
-    outdir = (outdir ? __dirname+'/../assets/maps/'+outdir : __dirname+'/../assets/maps/chunks');
+    //outdir = (outdir ? __dirname+'/../assets/maps/'+outdir : __dirname+'/../assets/maps/chunks');
+    outdir = (outdir ? __dirname+WorldEditor.mapsPath+'/'+outdir : __dirname+WorldEditor.mapsPath+'/chunks/');
     if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);
+
+    var existing = fs.readdirSync(outdir);
+    if (existing.length > 0 ){
+        console.log('Deleting existing world');
+        for(var i = 0; i < existing.length; i++){
+            fs.unlink(path.join(outdir,existing[i]),function(err){if(err) throw err;});
+        }
+    }
 
     World.setUp(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight);
 
@@ -170,37 +180,46 @@ function writeMasterFile(basis,tilesetsData,outdir){
 }
 
 function applyBlueprint(chunks,bluePrint,outdir){
-
     var parser = new xml2js.Parser();
     var blueprint = fs.readFileSync(__dirname+'/blueprints/'+bluePrint).toString();
     parser.parseString(blueprint, function (err, result) {
         if(err) throw err;
         var read = readPath(result);
-        var allPts = read.allPts;
+        var allPts = read.allPts; // array of arrays ; list of curves in the blueprint
         var fillNodes = read.fillNodes;
+
+        allPts.sort(function(a,b){
+            if(a.length >= b.length) return -1;
+            return 1;
+        });
 
         for(var i = 0; i < allPts.length; i++) {
             var pts = allPts[i];
             var nbPts = pts.length;
-            //console.log('processing curve '+i+' of length '+nbPts);
+            console.log('processing curve '+i+' of length '+nbPts);
             var tiles = [];
             for (var j = 0; j <= nbPts - 1; j++) {
                 var s = pts[j];
                 var e = (j == nbPts - 1 ? pts[0] : pts[j + 1]);
+                //console.log(s,e);
                 var addTiles = Geometry.addCorners(Geometry.straightLine(s, e));
                 if (j > 0) addTiles.shift();
                 tiles = tiles.concat(addTiles);
             }
 
+            console.log('perimeter : ' + tiles.length);
             tiles = Geometry.forwardSmoothPass(tiles);
             tiles = Geometry.backwardSmoothPass(tiles);
-            //console.log('perimeter : ' + tiles.length);
+            console.log('perimeter : ' + tiles.length);
             if(reverse) tiles.reverse();
             if(tiles.length > 1) WorldEditor.drawShore(tiles, chunks);
+            break;
         }
 
-        for(var k = 0; k < fillNodes.length; k++){
-            WorldEditor.fill(chunks,fillNodes[k]);
+        if(fill) {
+            for (var k = 0; k < fillNodes.length; k++) {
+                WorldEditor.fill(chunks, fillNodes[k]);
+            }
         }
 
         var visible = new Set();
@@ -285,6 +304,7 @@ function readPath(result){
 }
 
 function writeFiles(outdir,chunks){
+    if(!write) return;
     var counter = 0;
     var total = chunks.length;
     for(var i = 0; i < chunks.length; i++) {
@@ -308,5 +328,7 @@ chunkHeight = myArgs.chunkh;
 tileWidth = myArgs.tilew;
 tileHeight = myArgs.tileh;
 reverse = myArgs.reverse;
+fill = myArgs.fill;
+write = myArgs.write;
 
 makeWorld(myArgs.blueprint,myArgs.outdir);

@@ -22,7 +22,8 @@ Prototype level:
 
 Cleaning:
 --------
-- Clena up json: those in maps should be arrays; those in data should have numeric keys
+- Clean up json: those in maps should be arrays; those in data should have numeric keys
+- Decide what to do with assets/maps folder, both for dev and prod
 - Merge all the addXXX and removeXXX methods (but keepl separate lists) + merge addXXX loops in updateWorld()
 - Clean up Utils
 - Split server in two (game and dev server)
@@ -32,6 +33,7 @@ Cleaning:
 - Think about a Container class or something to affect the transforms of all children, get rid of repeated finalize() calls
 - Anchor panel elements at center, not top-left
 - Clean all files
+- Do not rely on constructor.name, instead use custom field (like the old "category")
 - Add ES6 syntax to PHPStorm (for ... of)
 
 Content:

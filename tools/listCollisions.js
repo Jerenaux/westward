@@ -3,10 +3,13 @@
  */
 
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
+var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
+var WorldEditor = require('../studio/WorldEditor.js').WorldEditor;
 
-var path = '/../assets/maps/';
+//var path = '/../assets/maps/';
 var fs = require('fs');
+var path = require('path');
 var colliding = [];
 var collisions = new SpaceMap();
 
@@ -17,14 +20,11 @@ function listCollisions(directory){
         return;
     }
 
-    var indir = __dirname+path+directory;
+    var indir = path.join(__dirname,WorldEditor.mapsPath,directory);
     var masterData = JSON.parse(fs.readFileSync(indir+'/master.json').toString());
-    Utils.nbChunksHorizontal = masterData.nbChunksHoriz;
-    Utils.nbChunksVertical = masterData.nbChunksVert;
-    Utils.chunkWidth = masterData.chunkWidth;
-    Utils.chunkHeight = masterData.chunkHeight;
+    World.readMasterData(masterData);
 
-    var tilesetsData = JSON.parse(fs.readFileSync(__dirname+path+'tilesets.json').toString());
+    var tilesetsData = JSON.parse(fs.readFileSync(__dirname+'/../assets/maps/tilesets.json').toString()); // tilesets.json is a "static" file in assets/maps
     for(var i = 0, firstgid = 1; i < tilesetsData.tilesets.length; i++) {
         var tileset = tilesetsData.tilesets[i];
         for(var j = 0; j < tileset.collisions.length; j++){
@@ -38,7 +38,7 @@ function listCollisions(directory){
     }
     //console.log(colliding);
 
-    var nbChunks = Utils.nbChunksHorizontal*Utils.nbChunksVertical;
+    var nbChunks = World.nbChunksHorizontal*World.nbChunksVertical;
     console.log(nbChunks+' chunks to process');
     for(var i = 0; i < nbChunks; i++){
         findCollisions(indir,'chunk'+i+'.json',i);
@@ -55,8 +55,8 @@ function listCollisions(directory){
 function findCollisions(indir,fileName,chunkID){
     //console.log('Processing chunk '+chunkID+' at '+(indir+'/'+fileName));
     var map = JSON.parse(fs.readFileSync(indir+'/'+fileName).toString());
-    if(!map.width) map.width = Utils.chunkWidth;
-    if(!map.height) map.height = Utils.chunkHeight;
+    if(!map.width) map.width = World.chunkWidth;
+    if(!map.height) map.height = World.chunkHeight;
     var nbtiles = map.layers[0].data.length;
     var origin = Utils.AOItoTile(chunkID);
     for (var i = 0; i < nbtiles; i++) {

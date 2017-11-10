@@ -197,17 +197,15 @@ Geometry.forwardSmoothPass = function(tiles){
 Geometry.backwardSmoothPass = function(tiles){         // Backward loop to remove tiles ; goes clockwise
     for(var i = tiles.length-1; i >= 0; i--){
         var t = tiles[i];
-        var bnf = false; // back and forth between tiles
+        //var bnf = false; // back and forth between tiles
         for(var j = 1; j < Math.min(7,tiles.length+1); j++){ // knots & duplicates
             var idx = i + j;
             if(idx > tiles.length-1) idx -= tiles.length;
-            //console.log(i,j,idx,tiles.length);
             var old= tiles[idx];
             if(t.x == old.x && t.y == old.y) tiles.splice(i+1,j); // remove j points corresponding to size of knot
-            if(Math.abs(t.y - old.y) > j) bnf = true;
-            //if(Math.abs(t.x - old.x) > j) console.log('horizontal bnf at '+ t.x+', '+ t.y);
+            //if(Math.abs(t.y - old.y) > j) bnf = true;
         }
-        if(bnf) tiles.splice(i,1);
+        //if(bnf) tiles.splice(i,1);
     }
     return tiles;
 };

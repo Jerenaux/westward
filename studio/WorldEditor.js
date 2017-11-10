@@ -12,7 +12,11 @@ if(onServer){
 }
 
 var WorldEditor = {
-    busyTiles : new SpaceMap()
+    chunks: {},
+    busyTiles : new SpaceMap(),
+    dirtyChunks : new Set(),
+    earlyFillStop: 40000,//1100000
+    mapsPath: '/../../maps' // relative to tools directory
 };
 
 WorldEditor.W = { // Enum-like structure that maps position to numerical ID
@@ -88,6 +92,24 @@ WorldEditor.cliff = { // indexes of tiles in tilesets for cliffs
     topLeftIn_altbtm: 83
 };
 
+WorldEditor.readChunk = function(id,data,doOccupy){
+    WorldEditor.chunks[id] = data;
+    if(doOccupy) {
+        var grass = [WorldEditor.grass.topLeft,WorldEditor.grass.topRight,WorldEditor.grass.bottomLeft,WorldEditor.grass.bottomRight];
+        var origin = Utils.AOItoTile(id);
+        for (var i = 0; i < data.layers.length; i++) {
+            var l = data.layers[i];
+            for (var j = 0; j < l.data.length; j++) {
+                var t = l.data[j];
+                if (t > 0 && !grass.includes(t)) {
+                    var coords = Utils.lineToGrid(j, data.width);
+                    WorldEditor.occupy(origin.x + coords.x, origin.y + coords.y);
+                }
+            }
+        }
+    }
+};
+
 WorldEditor.drawShore = function(tiles,chunks){
     for(var i = 0; i < tiles.length; i++){
         var tile = tiles[i];
@@ -99,9 +121,13 @@ WorldEditor.drawShore = function(tiles,chunks){
         var prev = (i == 0 ? tiles.length-1 : i-1);
         var id = WorldEditor.findTileID(tiles[prev],tile,tiles[next]);
 
+        //if(id === undefined) console.log(id,tile.x,tile.y);
         //console.log(id+' at '+tile.x+', '+tile.y);
 
         switch(id){
+            case undefined:
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.top,chunks);
+                break;
             case WorldEditor.W.topRightOut:
                 var tileID = (tile.y == 0 ? WorldEditor.shore.right : WorldEditor.shore.topRight); // prevent corners on the fringes
                 WorldEditor.addTile(tile.x,tile.y,tileID,chunks);
@@ -197,7 +223,8 @@ WorldEditor.findTileID = function(prev,pt,next,verbose){
     }
 };
 
-WorldEditor.fill = function(chunks,fillNode){ // fills the world with water, but stops at coastlines
+WorldEditor.fill = function(fillNode,stop){ // fills the world with water, but stops at coastlines
+    var stoppingCritetion = stop || WorldEditor.earlyFillStop;
     var queue = [];
     queue.push(fillNode);
     var fillTiles = [];
@@ -205,6 +232,7 @@ WorldEditor.fill = function(chunks,fillNode){ // fills the world with water, but
     var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
     while(queue.length > 0){
         var node = queue.shift();
+        //console.log('filling at ',node.x,node.y,WorldEditor.isBusy(node));
         if(WorldEditor.isBusy(node)) continue;
         // put a tile at location
         fillTiles.push(node);
@@ -221,7 +249,7 @@ WorldEditor.fill = function(chunks,fillNode){ // fills the world with water, but
         }
 
         counter++;
-        if(counter > 392000){
+        if(counter >= stoppingCritetion){
             console.log('early stop');
             break;
         }
@@ -230,7 +258,7 @@ WorldEditor.fill = function(chunks,fillNode){ // fills the world with water, but
 
     for(var i = 0; i < fillTiles.length; i++){
         var tile = fillTiles[i];
-        WorldEditor.addTile(tile.x, tile.y, WorldEditor.shore.water, chunks);
+        WorldEditor.addTile(tile.x, tile.y, WorldEditor.shore.water);
     }
 };
 
@@ -238,9 +266,9 @@ WorldEditor.isBusy = function(node){
     return !!WorldEditor.busyTiles.get(node.x,node.y);
 };
 
-WorldEditor.addTile = function(x,y,tile,chunks){
+WorldEditor.addTile = function(x,y,tile){
     var id = Utils.tileToAOI({x: x, y: y});
-    var chunk = chunks[id];
+    var chunk = WorldEditor.chunks[id];
     if(!chunk) return;
     var origin = Utils.AOItoTile(id);
     var cx = x - origin.x;
@@ -248,10 +276,15 @@ WorldEditor.addTile = function(x,y,tile,chunks){
     var idx = Utils.gridToLine(cx, cy, chunk.width);
     chunk.layers[0].data[idx] = tile;
     WorldEditor.occupy(x,y);
+    WorldEditor.dirty(id);
 };
 
 WorldEditor.occupy = function(x,y){
     WorldEditor.busyTiles.add(x,y,1);
+};
+
+WorldEditor.dirty = function(id){
+    WorldEditor.dirtyChunks.add(id);
 };
 
 WorldEditor.isOnlyWater = function(chunk){

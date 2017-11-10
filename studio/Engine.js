@@ -140,8 +140,8 @@ Engine.start = function(loader, resources){
 };
 
 Engine.addHero = function(){
-    var startx = 1;//744;
-    var starty = 398;//130;
+    var startx = 550;//744;
+    var starty = 630;//130;
     Engine.player = Engine.addSprite('hero',startx,starty);
     Engine.player.visible = Engine.showHero;
     Engine.player.chunk = Utils.tileToAOI({x:startx,y:starty});
