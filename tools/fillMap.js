@@ -30,14 +30,17 @@ function fillMap(directory){
         y: 1070
     }];
 
-    WorldEditor.fill(fillNodes[0],100);
-    console.log(WorldEditor.dirtyChunks);
+    WorldEditor.fill(fillNodes[0],40000);
 
     var arr = Array.from(WorldEditor.dirtyChunks);
     var counter = 0;
     for(var i = 0; i < arr.length; i++){
         var fileName = 'chunk'+arr[i]+'.json';
-        fs.writeFile(path.join(indir,fileName),JSON.stringify(WorldEditor.chunks[arr[i]]),function(err) {
+        var bkp = '_'+fileName;
+        var filePath = path.join(indir,fileName);
+        var bkpPath = path.join(indir,bkp);
+        fs.renameSync(filePath,bkpPath);
+        fs.writeFile(filePath,JSON.stringify(WorldEditor.chunks[arr[i]]),function(err) {
             if(err) throw err;
             counter++;
             if(counter == arr.length) console.log('All files written');

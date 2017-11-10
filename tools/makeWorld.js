@@ -48,7 +48,6 @@ function makeWorld(bluePrint,outdir){
     if(!tileWidth) tileWidth = defTileW;
     if(!tileHeight) tileHeight = defTileH;
 
-    //outdir = (outdir ? __dirname+'/../assets/maps/'+outdir : __dirname+'/../assets/maps/chunks');
     outdir = (outdir ? __dirname+WorldEditor.mapsPath+'/'+outdir : __dirname+WorldEditor.mapsPath+'/chunks/');
     if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);
 
@@ -56,7 +55,8 @@ function makeWorld(bluePrint,outdir){
     if (existing.length > 0 ){
         console.log('Deleting existing world');
         for(var i = 0; i < existing.length; i++){
-            fs.unlink(path.join(outdir,existing[i]),function(err){if(err) throw err;});
+            //fs.unlink(path.join(outdir,existing[i]),function(err){if(err) throw err;});
+            fs.unlinkSync(path.join(outdir,existing[i]));
         }
     }
 
@@ -66,19 +66,18 @@ function makeWorld(bluePrint,outdir){
     var basis = makeBasis(tilesetsData); // empty, grass-filled chunk, which can be duplicated all over the map
     writeMasterFile(basis,tilesetsData,outdir);
 
-    var chunks = [];
     var number = nbHoriz*nbVert;
     for(var i = 0; i < number; i++){
         var chunk = clone(basis);
         basis.chunkID = i;
-        chunks[basis.chunkID] = chunk;
+        WorldEditor.chunks[basis.chunkID] = chunk;
     }
     console.log(number+' chunks created ('+nbHoriz+' x '+nbVert+')');
 
     if(bluePrint){
-        applyBlueprint(chunks,bluePrint,outdir);
+        applyBlueprint(bluePrint,outdir);
     }else{
-        writeFiles(outdir,chunks);
+        writeFiles(outdir);
     }
 }
 
@@ -87,7 +86,7 @@ function makeTilesetsData(){
     var tilesetsData = JSON.parse(fs.readFileSync(__dirname+'/../assets/maps/tilesets.json').toString());
     for(var i = 0, firstgid = 1; i < tilesetsData.tilesets.length; i++){
         var tileset = tilesetsData.tilesets[i];
-        tileset.image = '../'+tileset.image;
+        tileset.image = path.join(WorldEditor.tilesetsPath,tileset.image);
         tileset.columns = Math.floor(tileset.imagewidth/tileWidth);
         tileset.firstgid = firstgid;
         tileset.tilecount = tileset.columns * Math.floor(tileset.imageheight/tileHeight);
@@ -173,13 +172,13 @@ function writeMasterFile(basis,tilesetsData,outdir){
         nbChunksHoriz: nbHoriz,
         nbChunksVert: nbVert
     };
-    fs.writeFile(outdir+'/master.json',JSON.stringify(master),function(err){
+    fs.writeFile(path.join(outdir,'/master.json'),JSON.stringify(master),function(err){
         if(err) throw err;
         console.log('Master written');
     });
 }
 
-function applyBlueprint(chunks,bluePrint,outdir){
+function applyBlueprint(bluePrint,outdir){
     var parser = new xml2js.Parser();
     var blueprint = fs.readFileSync(__dirname+'/blueprints/'+bluePrint).toString();
     parser.parseString(blueprint, function (err, result) {
@@ -212,30 +211,33 @@ function applyBlueprint(chunks,bluePrint,outdir){
             tiles = Geometry.backwardSmoothPass(tiles);
             console.log('perimeter : ' + tiles.length);
             if(reverse) tiles.reverse();
-            if(tiles.length > 1) WorldEditor.drawShore(tiles, chunks);
+            if(tiles.length > 1) WorldEditor.drawShore(tiles);
             break;
         }
 
         if(fill) {
             for (var k = 0; k < fillNodes.length; k++) {
-                WorldEditor.fill(chunks, fillNodes[k]);
+                WorldEditor.fill(fillNodes[k]);
             }
         }
 
         var visible = new Set();
-        for(var i = 0; i < chunks.length; i++){
-            if(!WorldEditor.isOnlyWater(chunks[i])) {
-                var adjacent = Utils.listAdjacentAOIs(i);
+        var ids = Object.keys(WorldEditor.chunks);
+        for(var i = 0; i < ids.length; i++){
+            var id = ids[i];
+            if(!WorldEditor.isOnlyWater(WorldEditor.chunks[id])) {
+                var adjacent = Utils.listAdjacentAOIs(id);
                 for(var j = 0; j < adjacent.length; j++){
                     visible.add(adjacent[j]);
                 }
             }
         }
-        for(var i = 0; i < chunks.length; i++) {
-            if(!visible.has(i)) chunks[i] = null;
+        for(var i = 0; i < ids.length; i++) {
+            var id = ids[i];
+            if(!visible.has(id)) WorldEditor.chunks[id] = null;
         }
 
-        writeFiles(outdir,chunks);
+        writeFiles(outdir);
     });
 }
 
@@ -303,16 +305,18 @@ function readPath(result){
     };
 }
 
-function writeFiles(outdir,chunks){
+function writeFiles(outdir){
     if(!write) return;
     var counter = 0;
-    var total = chunks.length;
-    for(var i = 0; i < chunks.length; i++) {
-        if(chunks[i] == null) { // has been pruned
+    var total = Object.keys(WorldEditor.chunks).length;
+    var ids = Object.keys(WorldEditor.chunks);
+    for(var i = 0; i < ids.length; i++) {
+        var id = ids[i];
+        if(WorldEditor.chunks[id] == null) { // has been pruned
             total--;
             continue;
         }
-        fs.writeFile(outdir+'/chunk'+i+'.json',JSON.stringify(chunks[i]),function(err){
+        fs.writeFile(path.join(outdir,'chunk'+id+'.json'),JSON.stringify(WorldEditor.chunks[id]),function(err){
             if(err) throw err;
             counter++;
             if(counter == total) console.log(counter+' files written');

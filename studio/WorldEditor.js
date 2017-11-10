@@ -16,7 +16,8 @@ var WorldEditor = {
     busyTiles : new SpaceMap(),
     dirtyChunks : new Set(),
     earlyFillStop: 40000,//1100000
-    mapsPath: '/../../maps' // relative to tools directory
+    mapsPath: '/../../maps', // relative to tools directory
+    tilesetsPath: 'C:\\Users\\Jerome\\Git\\Westward\\assets\\tilesets\\'
 };
 
 WorldEditor.W = { // Enum-like structure that maps position to numerical ID
@@ -110,7 +111,7 @@ WorldEditor.readChunk = function(id,data,doOccupy){
     }
 };
 
-WorldEditor.drawShore = function(tiles,chunks){
+WorldEditor.drawShore = function(tiles){
     for(var i = 0; i < tiles.length; i++){
         var tile = tiles[i];
         if(tile.x == 0 && tile.y == 0) continue;
@@ -126,14 +127,14 @@ WorldEditor.drawShore = function(tiles,chunks){
 
         switch(id){
             case undefined:
-                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.top,chunks);
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.top);
                 break;
             case WorldEditor.W.topRightOut:
                 var tileID = (tile.y == 0 ? WorldEditor.shore.right : WorldEditor.shore.topRight); // prevent corners on the fringes
-                WorldEditor.addTile(tile.x,tile.y,tileID,chunks);
+                WorldEditor.addTile(tile.x,tile.y,tileID);
                 break;
             case WorldEditor.W.top:
-                if(tile.y > 0) WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.top,chunks);
+                if(tile.y > 0) WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.top);
                 break;
             case WorldEditor.W.topLeftOut:
                 var tileID;
@@ -144,35 +145,35 @@ WorldEditor.drawShore = function(tiles,chunks){
                 }else{
                     tileID = WorldEditor.shore.topLeft;
                 }
-                WorldEditor.addTile(tile.x,tile.y,tileID,chunks);
+                WorldEditor.addTile(tile.x,tile.y,tileID);
                 break;
             case WorldEditor.W.left:
-                if(tile.x > 0) WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.left,chunks);
+                if(tile.x > 0) WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.left);
                 break;
             case WorldEditor.W.right:
-                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.right,chunks);
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.right);
                 break;
             case WorldEditor.W.bottomRightIn:
-                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.bottomRight,chunks);
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.bottomRight);
                 break;
             case WorldEditor.W.bottomLeftOut:
-                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.topRightOut,chunks);
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.topRightOut);
                 break;
             case WorldEditor.W.bottomLeftIn:
                 var tileID = (tile.x == 0 ? WorldEditor.shore.bottom : WorldEditor.shore.bottomLeft); // prevent corners on the fringes
-                WorldEditor.addTile(tile.x,tile.y,tileID,chunks);
+                WorldEditor.addTile(tile.x,tile.y,tileID);
                 break;
             case WorldEditor.W.bottom:
-                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.bottom,chunks);
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.bottom);
                 break;
             case WorldEditor.W.bottomRightOut:
-                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.topLeftOut,chunks);
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.topLeftOut);
                 break;
             case WorldEditor.W.topRightIn:
-                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.bottomLeftOut,chunks);
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.bottomLeftOut);
                 break;
             case WorldEditor.W.topLeftIn:
-                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.bottomRightOut,chunks);
+                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.bottomRightOut);
                 break;
             default:
                 //console.log('nothing at ',tile.x,tile.y);

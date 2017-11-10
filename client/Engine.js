@@ -42,7 +42,11 @@ Engine.preload = function() {
     Engine.collidingTiles = [];
     for(var i = 0, firstgid = 1; i < Boot.tilesets.length; i++){
         var tileset = Boot.tilesets[i];
-        var path = 'assets/'+tileset.image.slice(2);// The paths in the master file are relative to the assets/maps directory
+        var absolutePath = tileset.image;
+        var tokens = absolutePath.split('\\');
+        var img = tokens[tokens.length-1];
+        var path = 'assets/tilesets/'+img;
+        //var path = 'assets/'+tileset.image.slice(2);// The paths in the master file are relative to the assets/maps directory
         this.load.spritesheet(tileset.name, path,{frameWidth:tileset.tilewidth,frameHeight:tileset.tileheight});
 
         var columns = Math.floor(tileset.imagewidth/Engine.tileWidth);
