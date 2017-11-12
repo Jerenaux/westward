@@ -206,13 +206,10 @@ function applyBlueprint(bluePrint,outdir){
                 tiles = tiles.concat(addTiles);
             }
 
-            console.log('perimeter : ' + tiles.length);
             tiles = Geometry.forwardSmoothPass(tiles);
             tiles = Geometry.backwardSmoothPass(tiles);
-            console.log('perimeter : ' + tiles.length);
             if(reverse) tiles.reverse();
             if(tiles.length > 1) WorldEditor.drawShore(tiles);
-            break;
         }
 
         if(fill) {

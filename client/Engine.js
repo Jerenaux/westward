@@ -253,7 +253,7 @@ Engine.makeCharacterMenu = function(){
 
 Engine.addHero = function(id,x,y,settlement){
     Engine.player = Engine.addPlayer(id,x,y,settlement);
-    Engine.player.visible = Engine.showHero;
+    //Engine.player.visible = Engine.showHero;
     Engine.camera.startFollow(Engine.player);
     Engine.player.inventory = new Inventory(25);
     Engine.player.recipes = new Inventory(10);
@@ -465,8 +465,9 @@ Engine.updateSelf = function(data){
 };
 
 Engine.updateInventory = function(inventory,items){
-    for(var item in items){
-        inventory.update(item,items[item]);
+    for(var i = 0; i < items.length; i++){
+        var item = items[i];
+        inventory.update(item[0],item[1]);
     }
 };
 

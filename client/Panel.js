@@ -312,6 +312,7 @@ Panel.prototype.display = function(){
 Panel.prototype.displayTheInventory = function(){
     var j = 0;
     for(var item in this.inventory.items){
+        if(!this.inventory.items.hasOwnProperty(item)) continue;
         var sprite = this.getNextItemSprite(item);
         var pos = this.slots[j];
         sprite.setPosition(pos.x+2+16,pos.y+4+16);

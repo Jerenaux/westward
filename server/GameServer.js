@@ -82,6 +82,7 @@ GameServer.checkPlayerID = function(id){ // check if no other player is using sa
 GameServer.addNewPlayer = function(socket){
     var player = new Player();
     player.setStartingPosition();
+    player.setStartingInventory();
     var document = player.dbTrim();
     GameServer.server.db.collection('players').insertOne(document,function(err){
         if(err) throw err;

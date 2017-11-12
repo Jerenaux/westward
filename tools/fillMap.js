@@ -25,12 +25,26 @@ function fillMap(directory){
         if(fs.existsSync(p)) WorldEditor.readChunk(i,JSON.parse(fs.readFileSync(p).toString()),true);
     }
 
-    var fillNodes = [{
-        x: 233,
-        y: 1070
-    }];
+    var fillNodes = [
+        /*{x: 99,y: 1083},
+        {x: 78,y: 1068},
+        {x: 46,y: 1054},
+        {x: 39,y: 1045}*/
+        /*{x: 526,y: 708},
+        {x: 517,y: 677},
+        {x: 538,y: 718},
+        {x: 551,y: 716},
+        {x: 527,y: 644}*/
+        /*{x: 490,y: 688},
+        {x: 515,y: 694},
+        {x: 526,y: 683}*/
+        {x: 677,y: 604}
+    ];
+    // 193, 28 ; 135, 109
 
-    WorldEditor.fill(fillNodes[0],40000);
+    for(var i = 0; i < fillNodes.length; i++){
+        WorldEditor.fill(fillNodes[i],10000);
+    }
 
     var arr = Array.from(WorldEditor.dirtyChunks);
     var counter = 0;

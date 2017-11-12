@@ -3,7 +3,7 @@ var layerDepth = {
     1: 1,
     2: 2,
     3: 5
-}
+};
 
 function Chunk(mapData,id,z){
     this.fromFile = (mapData !== null);
@@ -19,8 +19,8 @@ function Chunk(mapData,id,z){
 
     for(var i = 0; i < Engine.nbLayers; i++){
         var data = this.fromFile ? mapData.layers[i].data : null ;
-        this.layers.push([]);
-        this.layerData.push(data);
+        this.layers.push([]); // will contain the tile sprites
+        this.layerData.push(data); // contains the tiles ID
     }
 }
 
@@ -30,12 +30,14 @@ Chunk.prototype.drawLayers = function(){
         var data = this.layerData[l];
         for (var i = 0; i < data.length; i++) {
             var tile = data[i];
-            if (tile == 0) continue;
+            if (tile == 0 || tile == null) continue;
             var cx = i % this.width;
             var cy = Math.floor(i / this.width);
             var x = this.x + cx;
             var y = this.y + cy;
-            layer.push(this.drawTile(x,y,tile,l));
+            var sprite = this.drawTile(x,y,tile,l);
+            //if(sprite == undefined) console.log(sprite,x,y,tile);
+            layer.push(sprite);
             Engine.addCollision(x,y,tile);
         }
     }

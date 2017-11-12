@@ -54,7 +54,9 @@ function listCollisions(directory){
 
 function findCollisions(indir,fileName,chunkID){
     //console.log('Processing chunk '+chunkID+' at '+(indir+'/'+fileName));
-    var map = JSON.parse(fs.readFileSync(indir+'/'+fileName).toString());
+    var p = path.join(indir,fileName);
+    if(!fs.existsSync(p)) return;
+    var map = JSON.parse(fs.readFileSync(p).toString());
     if(!map.width) map.width = World.chunkWidth;
     if(!map.height) map.height = World.chunkHeight;
     var nbtiles = map.layers[0].data.length;

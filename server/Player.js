@@ -10,7 +10,7 @@ var GameServer = require('./GameServer.js').GameServer;
 function Player(){
     this.updatePacket = new PersonalUpdatePacket();
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
-    this.items = [];
+    this.inventory = {}; // permanent inventory
     this.settlement = 0;
 }
 
@@ -24,9 +24,14 @@ Player.prototype.setIDs = function(dbID,socketID){
 };
 
 Player.prototype.setStartingPosition = function(){
-    this.x = Utils.randomInt(1,21);
-    this.y = Utils.randomInt(1,16);
+    this.x = Utils.randomInt(523,542);
+    this.y = Utils.randomInt(690,700);
     console.log('Hi at ('+this.x+', '+this.y+')');
+};
+
+Player.prototype.setStartingInventory = function(){
+    this.inventory = { "0" : 2 , "1" : 1 , "2" : 1 , "3" : 1};
+    this.updateInventory();
 };
 
 Player.prototype.trim = function(){
@@ -46,29 +51,31 @@ Player.prototype.trim = function(){
 Player.prototype.dbTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be stored in the database
     var trimmed = {};
-    var dbProperties = ['x','y']; // list of properties relevant to store in the database
+    var dbProperties = ['x','y','inventory']; // list of properties relevant to store in the database
     for(var p = 0; p < dbProperties.length; p++){
         trimmed[dbProperties[p]] = this[dbProperties[p]];
     }
-    //trimmed['weapon'] = GameServer.db.itemsIDmap[this.weapon];
-    //trimmed['armor'] = GameServer.db.itemsIDmap[this.armor];
     return trimmed;
 };
 
 Player.prototype.getDataFromDb = function(document){
     // Set up the player based on the data stored in the databse
     // document is the mongodb document retrieved form the database
-    var dbProperties = ['x','y'];
+    var dbProperties = ['x','y','inventory'];
     for(var p = 0; p < dbProperties.length; p++){
         this[dbProperties[p]] = document[dbProperties[p]];
     }
     this.setOrUpdateAOI();
-    if(document.items) {
-        this.items = document.items;
-        this.updatePacket.addItems(this.items);
+    this.updateInventory();
+};
+
+Player.prototype.updateInventory = function(){
+    var ids = Object.keys(this.inventory);
+    var items = [];
+    for(var i = 0; i < ids.length; i++){
+        items.push([ids[i],this.inventory[ids[i]]]);
     }
-    //this.equip(1,document['weapon']);
-    //this.equip(2,document['armor']);
+    this.updatePacket.addItems(items); // update personal update packet
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){
