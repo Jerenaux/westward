@@ -107,7 +107,7 @@ Engine.readMaster = function(masterData){
     console.log('Master file read, setting up world of size '+World.worldWidth+' x '+World.worldHeight+' with '+Engine.nbLayers+' layers');
     Engine.tilesets = masterData.tilesets;
 
-    PIXI.loader.add('hero','../assets/sprites/hero.png');
+    PIXI.loader.add('hero','../assets/sprites/hero_.png');
 
     for(var i = 0; i < masterData.tilesets.length; i++){
         var tileset = masterData.tilesets[i];

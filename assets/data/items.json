@@ -1,7 +1,7 @@
 {
   "0":{
     "atlas": "items",
-    "frame":"medicine"
+    "frame":"redpowder"
   },
   "1":{
     "atlas": "items",
@@ -18,5 +18,13 @@
   "4":{
     "atlas": "buildings",
     "frame":"miniWarehouse"
+  },
+  "5":{
+    "atlas": "items2",
+    "frame":"root"
+  },
+  "6":{
+    "atlas": "items2",
+    "frame":"redpotion"
   }
 }

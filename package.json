@@ -10,13 +10,16 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "optimist": "^0.6.1",
     "spritesmith": "^3.1.1",
+    "uglify-js": "^3.1.9",
     "xml2js": "^0.4.19"
   },
   "dependencies": {
     "clone": "^2.1.1",
+    "express": "^4.16.2",
     "mongodb": "^2.2.31",
-    "quickselect": "^1.0.0"
+    "optimist": "^0.6.1",
+    "quickselect": "^1.0.0",
+    "socket.io": "^2.0.4"
   }
 }

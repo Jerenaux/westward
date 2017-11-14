@@ -159,6 +159,7 @@ Design document:
 Polish:
 ------
 - Add tweens to player/building panels (if the 9-slice breaks, make the tileSprites slightly bigger so that they overlap with the corners?)
+- Feedback for rejected paths because too long (question mark, sound, ...)
 - Menu sprites change size when hovered / clicked
 - Hover cards over empty equipment slots
 - Hover cards over craftring buttons
@@ -179,15 +180,10 @@ Polish:
 
 World building:
 --------------
-- Try and make east coast with rivers and lakes; use static map from http://staticmapmaker.com/google/  & https://stackoverflow.com/questions/9444790/how-to-get-a-map-without-labels
-- Have a universal ChunkEdit class used accross all tools for all types of modifications
--> Or a ChunkHolder class which stores chunks in some way and only expose a addTile method which is used by the editor/geometry classes as a callback
--> Possibly the same chunk management both in live edit and with tools; remake the redo/switch function by getting rid
-of the awkward temporary chunks, and instead, when editing, make a backup copy of affected chunks, and when redo/switch,
-just restore it
 - Fix saving tool
 - Investigate the possibility of making cliffs from terrain data of the east coast
-- Fix cliff outlines
+- Rework cliffs
+- Investigate forests from google map
 - Add forests
 - Add random elements
 

@@ -11,9 +11,9 @@ var myArgs = require('optimist').argv;
 
 app.use('/assets',express.static(__dirname + '/assets'));
 app.use('/client',express.static(__dirname + '/client'));
+app.use('/lib',express.static(__dirname + '/lib'));
 app.use('/server',express.static(__dirname + '/server'));
 app.use('/shared',express.static(__dirname + '/shared'));
-//app.use('/maps',express.static(process.env.MAPS_PATH));
 app.use('/maps',express.static(myArgs.maps));
 if(process.env.DEV == 1) app.use('/studio',express.static(__dirname + '/studio'));
 

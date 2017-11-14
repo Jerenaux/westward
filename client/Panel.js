@@ -85,8 +85,8 @@ Panel.prototype.addRing = function(xs,ys,color,symbol,callback){
     var cs = Engine.scene.add.sprite(x,y,'UI',color);
     cs.upFrame = cs.frame.name;
     this.container.push(cs);
-    x += 4;
-    y += 4;
+    x += 3;
+    y += 3;
     var ss = Engine.scene.add.sprite(x,y,'UI',symbol);
 
     this.container.push(ss);

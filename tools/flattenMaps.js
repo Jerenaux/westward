@@ -3,21 +3,15 @@
  */
 
 var fs = require('fs');
-var clone = require('clone');
+var path = require('path');
+var WorldEditor = require('../studio/WorldEditor.js').WorldEditor;
 
-function Layer(w,h,name) {
-    this.width = w;
-    this.height = h;
-    this.name = name;
-    this.type = "tilelayer";
-    this.data = []; // Array of tiles
-    /*this.visible = true;
-     this.x = 0;
-     this.y = 0;
-     this.opacity = 1;*/
+var indir, outdir, total;
+var counter = 0;
+
+function Layer(){
+    this.data = [];
 }
-
-var path = '/../assets/maps/';
 
 function flatten(directory){
     if(!directory){
@@ -26,89 +20,86 @@ function flatten(directory){
         return;
     }
 
-    var outdir = __dirname+path+directory+'_flat';
+    indir = path.join(__dirname,WorldEditor.mapsPath,directory);
+    outdir = path.join(__dirname,WorldEditor.mapsPath,directory+'_flat');
     if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);
 
-    var indir = __dirname+path+directory;
     fs.readdir(indir,function(err,files){
+        total = files.length;
         for(var i = 0; i < files.length; i++){
             var f = files[i];
-            if(f == 'master.json'){
-                fs.createReadStream(indir+'/'+f).pipe(fs.createWriteStream(outdir+'/'+f));
+            //if(f == 'master.json') {
+            if(f.substr(0,5) != 'chunk'){
+                fs.createReadStream(path.join(indir, f)).pipe(fs.createWriteStream(path.join(outdir, f)));
             }else {
-                flattenChunk(indir, f, outdir);
+                flattenChunk(f);
             }
         }
     });
 }
 
-function flattenChunk(indir,fileName,outdir){
+function flattenChunk(fileName){
     console.log('flattening '+fileName);
 
-    fs.readFile(indir+'/'+fileName, 'utf8', function (err, data) {
+    fs.readFile(path.join(indir,fileName), 'utf8', function (err, data) {
         if (err) throw err;
         var map = JSON.parse(data);
-        var newmap = clone(map);
-        newmap.layers = [];
+        var newmap = {
+            height: map.height,
+            width: map.width,
+            tileheight: map.tileheight,
+            tilewidth: map.tilewidth,
+            layers: []
+        };
         var tilelayers = [];
-        var objectlayers = [];
 
-        var layer0 = new Layer(map.width,map.height,"layer0");
+        var layer0 = new Layer();
         fillLayer(layer0,map.width*map.height);
         tilelayers.push(layer0);
 
-        for (var i = 0; i < map.layers.length; i++) { // Scan all layers one by one
+        for (var i = 0; i <= WorldEditor.lowLayers; i++) { // Scan ground layers one by one
             var layer = map.layers[i];
             if (layer.type === "tilelayer") {
                 //console.log('processing ' + layer.name);
                 for (var j = 0; j < layer.data.length; j++) { // Scan all tiles one by one
-                    /*var tileProperties = map.tilesets[0].tileproperties[layer.data[j] - 1];
-                     if (tileProperties && tileProperties.hasOwnProperty('v')) {
-                     addTile(highLayers, true, j, layer.data[j], map.width, map.height);
-                     } else {
-                     addTile(newLayers, false, j, layer.data[j], map.width, map.height);
-                     }*/
-                    addTile(tilelayers,false,j,layer.data[j],map.width,map.height);
+                    addTile(tilelayers,j,layer.data[j],map.width,map.height);
                 }
                 //console.log('done with layer ' + layer.name);
-            } else if (layer.type === "objectgroup") {
-                //objectlayers.push(layer);
             }
         }
-
-        /*
+        newmap.layers = tilelayers;
+        // add high layers
+        for(var i = WorldEditor.lowLayers+1; i <= WorldEditor.maxLayer; i++){
+            newmap.layers.push(map.layers[i]);
+        }
          // TODO here: remove tiles based on top-down visibility
-         // TODO: in the end only keep "data" arrays, remove all the rest
 
          // Remove empty layers
-         for(var j = subMap.layers.length - 1; j >= 0; j--){
-         var layer = subMap.layers[j];
-         if(layer.type === "objectgroup") continue;
-         if(layer.data.reduce(function(a,b){return a+b;},0) == 0){ // if layer entirely composed of '0' tiles
-         subMap.layers.splice(j,1);
+         for(var j = newmap.layers.length - 1; j >= 0; j--){
+             var layer = newmap.layers[j];
+             if(layer.data.reduce(function(a,b){return a+b;},0) == 0){ // if layer entirely composed of '0' tiles
+                newmap.layers.splice(j,1);
+             }
          }
-         }*/
 
-        newmap.layers = tilelayers.concat(objectlayers);
+        //console.log("Initial #layers = "+map.layers.length);
+        //console.log("New #layers = "+newmap.layers.length);
 
-        console.log("Initial #layers = "+map.layers.length);
-        console.log("New #layers = "+newmap.layers.length);
-
-        fs.writeFile(outdir+'/'+fileName,JSON.stringify(newmap),function(err){
-            console.log('done');
+        fs.writeFile(path.join(outdir,fileName),JSON.stringify(newmap),function(err){
+            counter++;
+            if(counter == total) console.log('All files flattened');
         });
     });
 }
 
-function addTile(layerArray,high,index,tile,w,h){
+function addTile(layerArray,index,tile,w,h){
     if(tile == 0) return;
     var depth = 0;
     // Look for the first layer wih an empty tile at the corresponding position (=index)
     while (layerArray[depth].data[index] != 0 && layerArray[depth].data[index] !== undefined) {
         depth++; // If non-empty, increase depth = look one layer further
         if (depth >= layerArray.length) { // If reached max depth, create new layer
-            var name = (high ? "highlayer" : "layer") + depth;
-            layerArray.push(new Layer(w,h, name));//,(high ? "high" : "ground")));
+            layerArray.push(new Layer());
             fillLayer(layerArray[depth], w*h);
         }
     }

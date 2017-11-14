@@ -3,6 +3,14 @@
     {
       "filename": "timber",
       "frame": {"x":264,"y":480,"w":24,"h":24}
+    },
+    {
+      "filename": "root",
+      "frame": {"x":360,"y":288,"w":24,"h":24}
+    },
+    {
+      "filename": "redpotion",
+      "frame": {"x":96,"y":312,"w":24,"h":24}
     }
   ]
 }

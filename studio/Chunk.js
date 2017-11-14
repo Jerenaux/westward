@@ -5,7 +5,7 @@ function Chunk(mapData,z){
     this.z = z;
     this.tilesWidth = mapData.width || World.chunkWidth; // "width" is reserved by PIXI
 
-    for(var i = 0; i < Engine.nbLayers; i++){
+    for(var i = 0; i < mapData.layers.length; i++){
         var data = this.fromFile ? mapData.layers[i].data : null ;
         this.addChild(new Layer(data));
     }

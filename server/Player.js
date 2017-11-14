@@ -66,6 +66,7 @@ Player.prototype.getDataFromDb = function(document){
         this[dbProperties[p]] = document[dbProperties[p]];
     }
     this.setOrUpdateAOI();
+    this.inventory = { "0" : 20 , "1" : 1 , "2" : 1 , "3" : 1, "5": 14}; // DEBUG TODO remove
     this.updateInventory();
 };
 

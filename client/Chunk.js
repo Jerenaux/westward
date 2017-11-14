@@ -1,8 +1,8 @@
 var layerDepth = {
-    0: 0,
-    1: 1,
-    2: 2,
-    3: 5
+    0: 0, // ground
+    1: 1, // terrain
+    2: 2, // stuff
+    3: 5 // canopy
 };
 
 function Chunk(mapData,id,z){
@@ -17,7 +17,7 @@ function Chunk(mapData,id,z){
     this.layers = [];
     this.layerData = [];
 
-    for(var i = 0; i < Engine.nbLayers; i++){
+    for(var i = 0; i < mapData.layers.length; i++){
         var data = this.fromFile ? mapData.layers[i].data : null ;
         this.layers.push([]); // will contain the tile sprites
         this.layerData.push(data); // contains the tiles ID

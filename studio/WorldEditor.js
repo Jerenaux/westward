@@ -16,8 +16,10 @@ var WorldEditor = {
     busyTiles : new SpaceMap(),
     dirtyChunks : new Set(),
     earlyFillStop: 40000,//1100000
+    lowLayers: 2, // index of last layer that should appear at player level or below (vs high layers)
+    maxLayer: 3,
     mapsPath: '/../../maps', // relative to tools directory
-    tilesetsPath: 'C:\\Users\\Jerome\\Git\\Westward\\assets\\tilesets\\'
+    tilesetsPath: 'C:\\Users\\Jerome\\Git\\Westward\\assets\\tilesets\\' // used for Tiled, not for prod
 };
 
 WorldEditor.W = { // Enum-like structure that maps position to numerical ID

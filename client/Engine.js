@@ -219,11 +219,17 @@ Engine.makeCraftingMenu = function(){
     recipes.setInventory(Engine.player.recipes,false);
     crafting.addPanel(recipes); // recipes panel
     var combi = new Panel(450,100,290,380,'Combination');
-    combi.addSprite('UI','craftring',80,50);
+    var ringx = 80;
+    var ringy = 50;
+    combi.addSprite('UI','craftring',ringx,ringy);
+    combi.addRing(ringx+92,ringy+13,'green','ok',Engine.closePanel);
+    combi.addRing(ringx+5,ringy+82,'blue','plus',Engine.closePanel);
+    combi.addRing(ringx+22,ringy+99,'blue','minus',Engine.closePanel);
     crafting.addPanel(combi); // crafting panel
     var items = new Panel(40,100,390,380,'Items');
     items.addSlots(10,9,Engine.player.inventory.maxSize);
     items.setInventory(Engine.player.inventory,true);
+    // TODO method addInventory(x,y,title,maxwidth,total,inventory,showNumbers) to populate a collection of inventories
     crafting.addPanel(items); // inventory panel
     return crafting;
 };
@@ -257,7 +263,7 @@ Engine.addHero = function(id,x,y,settlement){
     Engine.camera.startFollow(Engine.player);
     Engine.player.inventory = new Inventory(25);
     Engine.player.recipes = new Inventory(10);
-    Engine.updateInventory(Engine.player.recipes,{4:1});
+    Engine.updateInventory(Engine.player.recipes,[[4,1],[6,1]]);
     Engine.updateEnvironment();
 };
 
@@ -379,6 +385,7 @@ Engine.computePath = function(position){
     //console.log('path from '+Engine.player.tileX+', '+Engine.player.tileY+' to '+position.tile.x+', '+position.tile.y);
     Engine.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(Engine.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
     var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, position.tile.x, position.tile.y, Engine.PFgrid);
+    if(path.length > 36) return;
     Client.sendPath(path);
     Engine.player.move(path);
 };
@@ -465,6 +472,7 @@ Engine.updateSelf = function(data){
 };
 
 Engine.updateInventory = function(inventory,items){
+    // items is an array of smaller arrays of format [item id, nb]
     for(var i = 0; i < items.length; i++){
         var item = items[i];
         inventory.update(item[0],item[1]);
