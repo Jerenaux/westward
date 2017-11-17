@@ -109,6 +109,10 @@ Utils.randomInt = function(low, high) { // [low, high[
     return Math.floor(Math.random() * (high - low) + low);
 };
 
+Utils.randomElement = function(arr){
+    return arr[Math.floor(Math.random()*arr.length)];
+};
+
 function randomNorm(mean,std){
     return randomZ()*std+mean;
 }
@@ -120,9 +124,7 @@ function randomZ() { // Box-Muller transform to return a random value from a red
     return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
 }
 
-function randomElement(arr){
-    return arr[Math.floor(Math.random()*arr.length)];
-}
+
 function swapElements(arr,b,c){
     var tmp = arr[b];
     arr[b] = arr[c];

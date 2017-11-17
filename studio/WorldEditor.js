@@ -95,6 +95,15 @@ WorldEditor.cliff = { // indexes of tiles in tilesets for cliffs
     topLeftIn_altbtm: 83
 };
 
+WorldEditor.Trees = [
+    {
+        tl: 682+21,
+        w: 4,
+        h: 5,
+        coll: [682+85,682+86,682+106,682+107]
+    }
+];
+
 WorldEditor.readChunk = function(id,data,doOccupy){
     WorldEditor.chunks[id] = data;
     if(doOccupy) {
@@ -113,12 +122,23 @@ WorldEditor.readChunk = function(id,data,doOccupy){
     }
 };
 
+WorldEditor.isInWorldBounds = function(x,y){
+    return !(x < 0 || y < 0 || x >= World.worldWidth || y >= World.worldHeight);
+};
+
+WorldEditor.drawTree = function(x,y){
+    if(!WorldEditor.isInWorldBounds(x,y)) return;
+    var type = Utils.randomElement(WorldEditor.Trees);
+    // TODO: check if all the colliding tiles (from type.coll) will correspond to free cells; if yes, paint tree
+};
+
 WorldEditor.drawShore = function(tiles){
     for(var i = 0; i < tiles.length; i++){
         var tile = tiles[i];
         if(tile.x == 0 && tile.y == 0) continue;
 
-        if(tile.x < 0 || tile.y < 0 || tile.x > World.worldWidth || tile.y > World.worldHeight) continue;
+        if(!WorldEditor.isInWorldBounds(tile.x,tile.y)) continue;
+        //if(tile.x < 0 || tile.y < 0 || tile.x > World.worldWidth || tile.y > World.worldHeight) continue;
 
         var next = (i == tiles.length-1 ? 0 : i+1);
         var prev = (i == 0 ? tiles.length-1 : i-1);
@@ -246,7 +266,8 @@ WorldEditor.fill = function(fillNode,stop){ // fills the world with water, but s
                 x: node.x + contour[i][0],
                 y: node.y + contour[i][1]
             };
-            if(candidate.x < 0 || candidate.y < 0 || candidate.x >= World.worldWidth || candidate.y >= World.worldHeight) continue;
+            //if(candidate.x < 0 || candidate.y < 0 || candidate.x >= World.worldWidth || candidate.y >= World.worldHeight) continue;
+            if(!WorldEditor.isInWorldBounds(candidate.x,candidate.y)) continue;
 
             if(!WorldEditor.isBusy(candidate)) {
                 //console.log('adding ',candidate.x,candidate.y);

@@ -269,16 +269,3 @@ V2 level:
 - PvP
 - Naval exploration
 
-
-
-function create() {
-    this.input.events.on('POINTER_DOWN_EVENT', function (event) {
-        event.gameObject.setTint(0xff0000);
-    });
-
-    this.add.image(100, 400, 'atlas', 'supercars-parsec').setInteractive();
-    var mech = this.add.image(200, 100, 'atlas');
-    mech.setFrame('titan-mech');
-    mech.setInteractive();
-
-}

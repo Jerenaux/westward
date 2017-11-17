@@ -111,6 +111,7 @@ Engine.readMaster = function(masterData){
 
     for(var i = 0; i < masterData.tilesets.length; i++){
         var tileset = masterData.tilesets[i];
+        console.log(tileset.name,tileset.firstgid);
         var absolutePath = tileset.image;
         var tokens = absolutePath.split('\\');
         var img = tokens[tokens.length-1];

@@ -28,6 +28,7 @@ World.computeProperties = function(){
     World.worldWidth = World.chunkWidth*World.nbChunksHorizontal;
     World.worldHeight = World.chunkHeight*World.nbChunksVertical;
     World.lastChunkID = World.nbChunksHorizontal*World.nbChunksVertical - 1;
+    console.log('Set up world of size '+World.worldWidth+' x '+World.worldHeight);
 };
 
 if (onServer) module.exports.World = World;

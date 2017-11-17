@@ -51,6 +51,7 @@ Engine.preload = function() {
 
         var columns = Math.floor(tileset.imagewidth/Engine.tileWidth);
         var tilecount = columns * Math.floor(tileset.imageheight/Engine.tileHeight);
+        // Add to the list of collidingTiles the colliding tiles in the tileset
         Engine.collidingTiles = Engine.collidingTiles.concat(tileset.collisions.map(function(tile){
             return tile+firstgid;
         }));

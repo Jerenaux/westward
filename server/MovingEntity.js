@@ -21,7 +21,7 @@ MovingEntity.prototype.setPath = function(path){
 
 MovingEntity.prototype.updatePathTick = function(){ // Compute in how many seconds will the entity have moved by one tile
     if(this.path[1] === undefined) console.log('alert',this.path,this.path.length);
-    if(this.path.length < 1) return;
+    if(this.path.length <= 1) return;
     var duration = PFUtils.getDuration(
             this.x,
             this.y,
