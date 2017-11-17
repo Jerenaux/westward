@@ -48,7 +48,7 @@ function listCollisions(directory){
 
     fs.writeFile(indir+'/collisions.json',JSON.stringify(collisions.toList()),function(err){
         if(err) throw err;
-        console.log('Collisions SpaceMap written');
+        console.log('Collisions SpaceMap written to '+indir);
     });
 }
 
@@ -66,7 +66,7 @@ function findCollisions(indir,fileName,chunkID){
             if(collides(map.layers[j].data[i])){
                 var x = origin.x + i % map.width;
                 var y = origin.y + Math.floor(i / map.width);
-                collisions.add(x,y,1);
+                collisions.add(y,x,1); // IMPORTANT, y before x!!
                 //console.log('collision at '+x+', '+y);
                 break;
             }

@@ -24,8 +24,10 @@ Player.prototype.setIDs = function(dbID,socketID){
 };
 
 Player.prototype.setStartingPosition = function(){
-    this.x = Utils.randomInt(523,542);
-    this.y = Utils.randomInt(690,700);
+    //this.x = Utils.randomInt(523,542);
+    //this.y = Utils.randomInt(690,700);
+    this.x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
+    this.y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
     console.log('Hi at ('+this.x+', '+this.y+')');
 };
 
@@ -77,6 +79,10 @@ Player.prototype.updateInventory = function(){
         items.push([ids[i],this.inventory[ids[i]]]);
     }
     this.updatePacket.addItems(items); // update personal update packet
+};
+
+Player.prototype.startIdle = function(){
+    console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){

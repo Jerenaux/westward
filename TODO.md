@@ -6,7 +6,6 @@ Cleaning
 * HUD
 * Inns
 * Inventory
-* Movement
 * Player interactions
 * Settlement defense
 * Settlement economy
@@ -35,6 +34,7 @@ Cleaning:
 - Clean all files
 - Do not rely on constructor.name, instead use custom field (like the old "category")
 - Add ES6 syntax to PHPStorm (for ... of)
+- Optimize copy of collision map in GameServer.findPath
 
 Content:
 -------
@@ -103,9 +103,6 @@ Content:
 - Equip items from menu
 - Display ammo amount next to weapon (melee weapons have a ref to the id of the corresponding ammo item; fetch the nb of that item in the player.inventory (refactor when multiple ammo types)
 - Pick up items
-* Movement:
-- Investigate path followers to take care of orientation and animation
-- Have monsters roam about and animate them as well
 * Player interactions
 - Display speech bubble locally
 - Broadcats bubble

@@ -10,3 +10,11 @@
     position: absolute;
     left: -100px;
 }
+
+.chat {
+    position: absolute;
+    width: 200px;
+    background: transparent;
+    border: none;
+    display: none;
+}

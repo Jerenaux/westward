@@ -106,11 +106,7 @@ Engine.create = function(masterData){
     Engine.scene.input.events.on('POINTER_OUT_EVENT', Engine.handleOut);
     Engine.scene.input.keyboard.events.on('KEY_DOWN_ENTER', Engine.toggleChatBar);
 
-    Engine.collisions = new SpaceMap(); // contains 1 for the coordinates that are non-walkables
-    Engine.PFgrid = new PF.Grid(0,0); // grid placeholder for the pathfinding
-    Engine.PFfinder = PFUtils.getFInder();
-    // Replaces the isWalkableAt method of the PF library
-    PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
+    PFUtils.setup(Engine);
 
     Engine.inMenu = false;
     Engine.inPanel = false;
@@ -164,20 +160,57 @@ Engine.createAnimations = function(){
         frameRate: 10,
         repeat: -1
     });
+
+    Engine.scene.anims.create(config = {
+        key: 'wolf_move_up',
+        frames: Engine.scene.anims.generateFrameNumbers('wolves', { start: 36, end: 38}),
+        frameRate: 10,
+        repeat: -1
+    });
+    Engine.scene.anims.create(config = {
+        key: 'wolf_move_right',
+        frames: Engine.scene.anims.generateFrameNumbers('wolves', { start: 24, end: 26}),
+        frameRate: 10,
+        repeat: -1
+    });
+    Engine.scene.anims.create(config = {
+        key: 'wolf_move_left',
+        frames: Engine.scene.anims.generateFrameNumbers('wolves', { start: 12, end: 14}),
+        frameRate: 10,
+        repeat: -1
+    });
+    Engine.scene.anims.create(config = {
+        key: 'wolf_move_down',
+        frames: Engine.scene.anims.generateFrameNumbers('wolves', { start: 0, end: 2}),
+        frameRate: 10,
+        repeat: -1
+    });
 };
 
 Engine.makeChatBar = function(){
     var chatw = 300;
     var chatx = (32*16)-(chatw/2);
-    //var chaty = 18*32-40;
     var chaty = Engine.scene.game.config.height;
     Engine.chat = new Panel(chatx,chaty,chatw,96);
     Engine.chat.addSprite('talk',null,12,8);
     Engine.chat.setTweens(chatx,chaty,chatx,chaty - 40);
+    Engine.chat.domElementID = "chat";
+    var dom = document.getElementById("chat");
+    var domx = (32*16) - 100 + 12;
+    dom.style.left = domx+"px";
+    dom.style.top = (chaty-17)+"px";
 };
 
 Engine.toggleChatBar = function(){
     Engine.chat.toggle();
+    /*var dom = document.getElementById("chat");
+    if(Engine.chat.displayed) {
+        dom.style.display = "inline";
+        dom.focus();
+    }else{
+        dom.style.display = "none";
+        dom.blur();
+    }*/
 };
 
 Engine.makeUI = function(){
@@ -499,8 +532,9 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
 
     if(data.newanimals) {
         for (var n = 0; n < data.newanimals.length; n++) {
-            var b = data.newanimals[n];
-            Engine.addAnimal(b.id, b.x, b.y, b.type);
+            var a = data.newanimals[n];
+            var animal = Engine.addAnimal(a.id, a.x, a.y, a.type);
+            if(a.path) animal.move(a.path);
         }
     }
 
@@ -514,6 +548,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     // to small object indicating which properties need to be updated. The following code iterate over
     // these objects and call the relevant update functions.
     if(data.players) Engine.traverseUpdateObject(data.players,Engine.players,Engine.updatePlayer);
+    if(data.animals) Engine.traverseUpdateObject(data.animals,Engine.animals,Engine.updateAnimal);
 };
 
 // For each element in obj, call callback on it
@@ -526,6 +561,10 @@ Engine.traverseUpdateObject = function(obj,table,callback){
 Engine.updatePlayer = function(player,data){ // data contains the updated data from the server
     if(player.id == Engine.player.id) return;
     if(data.path) player.move(data.path);
+};
+
+Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server
+    if(data.path) animal.move(data.path);
 };
 
 Engine.addPlayer = function(id,x,y,settlement){

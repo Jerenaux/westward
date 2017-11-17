@@ -18,6 +18,7 @@ function Panel(x,y,width,height,title){
     this.displayed = false;
     this.displayInventory = false;
     this.inventory = null;
+    this.domElementID = null,
     this.makeBody();
     if(title) this.addCapsule(20,-9,title);
     this.finalize();
@@ -306,6 +307,12 @@ Panel.prototype.display = function(){
     }
     if(this.displayInventory) this.displayTheInventory();
     if(this.showTween) this.showTween.play();
+    if(this.domElementID){
+        var domElement = document.getElementById(this.domElementID);
+        console.log(domElement);
+        domElement.style.display = "inline";
+        domElement.focus();
+    }
     this.displayed = true;
 };
 
@@ -326,6 +333,10 @@ Panel.prototype.displayTheInventory = function(){
 };
 
 Panel.prototype.hide = function(){
+    if(this.domElementID){
+        domElement = document.getElementById(this.domElementID);
+        domElement.style.display = "none";
+    }
     if(this.hideTween){
         this.hideTween.play();
     }else{

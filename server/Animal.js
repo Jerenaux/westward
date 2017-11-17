@@ -12,6 +12,8 @@ function Animal(x,y,type){
     this.x = x;
     this.y = y;
     this.type = type;
+    this.idle = true;
+    this.idleTime = 200;
     this.setOrUpdateAOI();
 }
 
@@ -34,6 +36,36 @@ Animal.prototype.trim = function(){
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     return trimmed;
+};
+
+Animal.prototype.startIdle = function(){
+    //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
+    this.idle = true;
+    this.idleTime = Utils.randomInt(500,2999); //ms
+};
+
+Animal.prototype.updateIdle = function(){
+    this.idleTime -= GameServer.server.npcUpdateRate;
+    //console.log('['+this.constructor.name+' '+this.id+']',this.idleTime);
+    if(this.idleTime <= 0){
+        //console.log('['+this.constructor.name+' '+this.id+'] ready to move');
+        var dest = this.findRandomDestination();
+        var path = GameServer.findPath({x:this.x,y:this.y},dest);
+        if(!path || path.length == 0){
+            //console.log('['+this.constructor.name+' '+this.id+'] no path');
+            this.idleTime = 200;
+            return;
+        }
+        this.idle = false;
+        this.setPath(path);
+    }
+};
+
+Animal.prototype.findRandomDestination = function(){
+    return {
+        x: this.x + Utils.randomInt(-10,10),
+        y: this.y + Utils.randomInt(-10,10)
+    };
 };
 
 module.exports.Animal = Animal;

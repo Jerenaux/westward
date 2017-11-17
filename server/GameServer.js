@@ -2,6 +2,7 @@
  * Created by Jerome on 20-09-17.
  */
 var fs = require('fs');
+var pathmodule = require('path');
 var clone = require('clone'); // used to clone objects, essentially used for clonick update packets
 var ObjectId = require('mongodb').ObjectID;
 
@@ -11,6 +12,7 @@ var GameServer = {
     lastAnimalID: 0,
     lastBattleID: 0,
     players: {}, // player.id -> player
+    animals: {}, // animal.id -> animal
     socketMap: {}, // socket.id -> player.id
     nbConnectedChanged: false
 };
@@ -28,6 +30,7 @@ var PF = require('../shared/pathfinding.js');
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 GameServer.readMap = function(mapsPath){
+    GameServer.mapsPath = mapsPath; // TODO remove, useless, debug
     console.log('Loading map data from '+mapsPath);
     var masterData = JSON.parse(fs.readFileSync(mapsPath+'/master.json').toString());
     World.readMasterData(masterData);
@@ -39,14 +42,15 @@ GameServer.readMap = function(mapsPath){
         GameServer.AOIs.push(new AOI(i));
     }
 
-    // Read collisions file
-    GameServer.collisions = new SpaceMap();
-    GameServer.collisions.fromList(JSON.parse(fs.readFileSync(mapsPath+'/collisions.json').toString()));
+    PFUtils.setup(GameServer);
+    GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()));
 
-    GameServer.PFgrid = new PF.Grid(0,0); // grid placeholder for the pathfinding
-    GameServer.PFfinder = PFUtils.getFInder();
-    // Replaces the isWalkableAt method of the PF library
-    PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
+    GameServer.startArea = {
+        minx: 523,
+        maxx: 541,
+        miny: 690,
+        maxy: 699
+    };
 
     // Read buildings
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
@@ -61,7 +65,10 @@ GameServer.readMap = function(mapsPath){
     var animals = JSON.parse(fs.readFileSync('./assets/maps/animals.json').toString());
     for(var aid in animals){
         var data = animals[aid];
-        new Animal(data.x,data.y,data.type);
+        var x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
+        var y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
+        var animal = new Animal(x,y,data.type);
+        GameServer.animals[animal.id] = animal;
     }
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
@@ -159,13 +166,17 @@ GameServer.removeFromLocation = function(entity){
     GameServer.AOIs[entity.aoi].deleteEntity(entity);
 };
 
+GameServer.findPath = function(from,to){
+    //console.log('looking for path : ',from,to);
+    if(GameServer.collisions.get(to.y,to.x)) return null;
+
+    GameServer.PFgrid.nodes = new Proxy(clone(GameServer.collisions),PFUtils.firstDimensionHandler); // Recreates a new grid each time
+    return GameServer.PFfinder.findPath(from.x, from.y, to.x, to.y, GameServer.PFgrid);
+};
+
 GameServer.handlePath = function(path,socketID){
     var player = GameServer.getPlayer(socketID);
     player.setPath(path);
-    /*GameServer.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(GameServer.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
-     var path = GameServer.PFfinder.findPath(468, 125, 476, 127, GameServer.PFgrid);
-     console.log(path);*/
-    //player.setOrUpdateAOI();
 };
 
 GameServer.handleAOItransition = function(entity,previous){
@@ -234,5 +245,16 @@ GameServer.updateWalks = function(){
     Object.keys(GameServer.players).forEach(function(key) {
         var p = GameServer.players[key];
         if(p.moving) p.updateWalk();
+    });
+    Object.keys(GameServer.animals).forEach(function(key) {
+        var a = GameServer.animals[key];
+        if(a.moving) a.updateWalk();
+    });
+};
+
+GameServer.updateNPC = function(){
+    Object.keys(GameServer.animals).forEach(function(key) {
+        var a = GameServer.animals[key];
+        if(a.idle) a.updateIdle();
     });
 };

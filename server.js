@@ -50,6 +50,7 @@ gs.server = server;
 
 server.clientUpdateRate = 1000/5; // Rate at which update packets are sent
 server.walkUpdateRate = 1000/20; // Rate at which positions are updated
+server.npcUpdateRate = 1000/5;
 
 io.on('connection',function(socket){
 
@@ -100,8 +101,9 @@ io.on('connection',function(socket){
 });
 
 server.setUpdateLoops = function(){
-    setInterval(gs.updatePlayers,server.clientUpdateRate);
+    setInterval(gs.updateNPC,server.npcUpdateRate);
     setInterval(gs.updateWalks,server.walkUpdateRate);
+    setInterval(gs.updatePlayers,server.clientUpdateRate);
 };
 
 server.sendInitializationPacket = function(socket,packet){

@@ -5,10 +5,10 @@ var onServer = (typeof window === 'undefined');
 
 if(onServer){
     PF = require('./pathfinding.js');
+    SpaceMap = require('./SpaceMap.js').SpaceMap;
 }
 
 var PFUtils = {
-    //speed: 160 // 160px/sec
     speed: 5 // tiles/sec
 };
 /* The handler captures all queries to the object, be it with [] or .
@@ -58,7 +58,16 @@ PFUtils.firstDimensionHandler = {
     }
 };
 
-PFUtils.getFInder = function(){
+PFUtils.setup = function(supervisor){
+    supervisor.collisions = new SpaceMap(); // contains 1 for the coordinates that are non-walkables
+    supervisor.PFgrid = new PF.Grid(0,0); // grid placeholder for the pathfinding
+    supervisor.PFfinder = PFUtils.getFinder();
+    // Replaces the isWalkableAt method of the PF library
+    PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
+    PF.consideredNodes = 0;
+};
+
+PFUtils.getFinder = function(){
     return new PF.AStarFinder({
         //allowDiagonal: true,  // Turn back on when approprate sprites are available
         allowDiagonal: false,

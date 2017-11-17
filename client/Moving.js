@@ -49,7 +49,7 @@ var Moving = new Phaser.Class({
             this.movement.stop();
             this.updatePosition();
         }
-        this.lastUpdateStamp = Date.now();
+        //this.lastUpdateStamp = Date.now();
         var mover = this;
         this.movement = Engine.scene.tweens.timeline({
             tweens: tweens,
@@ -57,10 +57,10 @@ var Moving = new Phaser.Class({
                 mover.previousOrientation = null;
             },
             onUpdate: function(){
-                if(Date.now() - mover.lastUpdateStamp > 5){
+                //if(Date.now() - mover.lastUpdateStamp > 5){
                     mover.updatePosition();
-                    mover.lastUpdateStamp = Date.now();
-                }
+                    //mover.lastUpdateStamp = Date.now();
+                //}
             },
             onComplete: function(){
                 mover.updatePosition();
