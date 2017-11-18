@@ -10,7 +10,7 @@ var WorldEditor = require('../studio/WorldEditor.js').WorldEditor;
 //var path = '/../assets/maps/';
 var fs = require('fs');
 var path = require('path');
-var colliding = [];
+var colliding = []; // contains all the ids of tiles that should collide (from tilesets.json)
 var collisions = new SpaceMap();
 
 function listCollisions(directory){

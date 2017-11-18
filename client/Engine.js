@@ -39,14 +39,13 @@ Engine.preload = function() {
     this.load.json('animals', 'assets/data/animals.json');
     this.load.json('settlements', 'assets/data/settlements.json');
 
-    Engine.collidingTiles = [];
+    Engine.collidingTiles = []; // list of tile ids that collide (from tilesets.json)
     for(var i = 0, firstgid = 1; i < Boot.tilesets.length; i++){
         var tileset = Boot.tilesets[i];
         var absolutePath = tileset.image;
         var tokens = absolutePath.split('\\');
         var img = tokens[tokens.length-1];
         var path = 'assets/tilesets/'+img;
-        //var path = 'assets/'+tileset.image.slice(2);// The paths in the master file are relative to the assets/maps directory
         this.load.spritesheet(tileset.name, path,{frameWidth:tileset.tilewidth,frameHeight:tileset.tileheight});
 
         var columns = Math.floor(tileset.imagewidth/Engine.tileWidth);
@@ -246,11 +245,13 @@ Engine.makeUI = function(){
 Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
     var recipes = new Panel(765,100,240,380,'Recipes');
-    recipes.addLine('Buildings:');
+    /*recipes.addLine('Buildings:');
     recipes.addSlots(5, 1, 8);
     recipes.addLine('Items:');
     recipes.addSlots(5, 2, 30);
-    recipes.setInventory(Engine.player.recipes,false);
+    recipes.setInventory(Engine.player.recipes,false);*/
+    recipes.addInventory('Buildings',5,5,Engine.player.buildingRecipes,false);
+    recipes.addInventory('Items',5,10,Engine.player.itemRecipes,false);
     crafting.addPanel(recipes); // recipes panel
     var combi = new Panel(450,100,290,380,'Combination');
     var ringx = 80;
@@ -261,9 +262,9 @@ Engine.makeCraftingMenu = function(){
     combi.addRing(ringx+22,ringy+99,'blue','minus',Engine.closePanel);
     crafting.addPanel(combi); // crafting panel
     var items = new Panel(40,100,390,380,'Items');
-    items.addSlots(10,9,Engine.player.inventory.maxSize);
-    items.setInventory(Engine.player.inventory,true);
-    // TODO method addInventory(x,y,title,maxwidth,total,inventory,showNumbers) to populate a collection of inventories
+    /*items.addSlots(10,9,Engine.player.inventory.maxSize);
+    items.setInventory(Engine.player.inventory,true);*/
+    items.addInventory(null,10,Engine.player.inventory.maxSize,Engine.player.inventory,true);
     crafting.addPanel(items); // inventory panel
     return crafting;
 };
@@ -275,8 +276,9 @@ Engine.makeInventory = function(){
     inventory.addPanel(equip); // equipment panel
     var items = new Panel(40,100,600,380,'Items');
     items.addCapsule(500,-9,'1299','gold');
-    items.addSlots(15,9,Engine.player.inventory.maxSize);
-    items.setInventory(Engine.player.inventory,true);
+    /*items.addSlots(15,9,Engine.player.inventory.maxSize);
+    items.setInventory(Engine.player.inventory,true);*/
+    items.addInventory(null,15,Engine.player.inventory.maxSize,Engine.player.inventory,true);
     inventory.addPanel(items); // inventory panel
     return inventory;
 };
@@ -296,8 +298,10 @@ Engine.addHero = function(id,x,y,settlement){
     //Engine.player.visible = Engine.showHero;
     Engine.camera.startFollow(Engine.player);
     Engine.player.inventory = new Inventory(25);
-    Engine.player.recipes = new Inventory(10);
-    Engine.updateInventory(Engine.player.recipes,[[4,1],[6,1]]);
+    Engine.player.buildingRecipes = new Inventory(10);
+    Engine.player.itemRecipes = new Inventory(10);
+    Engine.updateInventory(Engine.player.buildingRecipes,[[4,1]]);
+    Engine.updateInventory(Engine.player.itemRecipes,[[6,1]]);
     Engine.updateEnvironment();
 };
 

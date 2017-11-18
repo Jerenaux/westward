@@ -17,8 +17,9 @@ function Panel(x,y,width,height,title){
     this.verticalOffset = 20;
     this.displayed = false;
     this.displayInventory = false;
-    this.inventory = null;
-    this.domElementID = null,
+    this.inventories = [];
+    this.nextFirstSlot = 0;
+    this.domElementID = null;
     this.makeBody();
     if(title) this.addCapsule(20,-9,title);
     this.finalize();
@@ -103,16 +104,24 @@ Panel.prototype.addRing = function(xs,ys,color,symbol,callback){
     this.finalize();
 };
 
-Panel.prototype.setInventory = function(inventory,displayNumbers){
+Panel.prototype.addInventory = function(title,maxwidth,total,inventory,showNumbers){
     this.displayInventory = true;
-    this.displayNumbers = displayNumbers;
-    this.inventory = inventory;
+    var inv = {
+        inventory: inventory,
+        showNumbers: showNumbers,
+        firstSlot: this.nextFirstSlot
+    };
+    this.inventories.push(inv);
+    if(title) this.addLine(title);
+    this.addSlots(maxwidth,total);
 };
 
-Panel.prototype.addSlots = function(nbHorizontal,nbVertical,total){
+Panel.prototype.addSlots = function(nbHorizontal,total){
+    var nbVertical = Math.ceil(total/nbHorizontal);
     var paddingX = 15;
     var offsetx = 0;
     var offsety = 0;
+    var counter = 0;
     this.verticalOffset += 5;
 
     for(var y = 0; y < nbVertical; y++){
@@ -145,18 +154,18 @@ Panel.prototype.addSlots = function(nbHorizontal,nbVertical,total){
             if(center == 2) frame += 'middle';
             offsetx = (x > 0 ? 2 : 0);
             offsety = (y > 0 ? 2 : 0);
-            //var slotx = this.x+paddingX+(x*36)+offsetx;
-            //var sloty = this.y+paddingY+(y*36)+offsety;
             var slotx = this.x+paddingX+(x*36)+offsetx;
             var sloty = this.y+this.verticalOffset+(y*36)+offsety;
             this.slots.push({
                 x: slotx,
                 y: sloty
             });
+            counter++;
             this.container.push(Engine.scene.add.sprite(slotx,sloty,'UI',frame));
         }
     }
     this.verticalOffset += nbVertical*36 + 5;
+    this.nextFirstSlot += counter;
     this.finalize();
 };
 
@@ -260,7 +269,7 @@ Panel.prototype.finalize = function(){
     });
 };
 
-Panel.prototype.getNextItemSprite = function(item){
+Panel.prototype.getNextItemSprite = function(item){ // Pool of sprites common to all inventories of the panel
     if(this.sprites.length <= this.nextItemSprite){
         var empty = Engine.scene.add.sprite(0,0,'');
         empty.setScrollFactor(0);
@@ -276,7 +285,7 @@ Panel.prototype.getNextItemSprite = function(item){
     return sprite;
 };
 
-Panel.prototype.getNextText = function(item){
+Panel.prototype.getNextText = function(nb){
     if(this.texts.length <= this.nextItemSprite){
         var empty = Engine.scene.add.text(100,10, 'lorem ipsum',
             { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
@@ -287,7 +296,7 @@ Panel.prototype.getNextText = function(item){
         this.texts.push(empty);
     }
     var text = this.texts[this.nextItemSprite];
-    text.setText(this.inventory.getNb(item));
+    text.setText(nb);
     text.visible = true;
     return text;
 };
@@ -305,7 +314,11 @@ Panel.prototype.display = function(){
         this.container[i].visible = true;
         if(this.container[i].upFrame) this.container[i].setFrame(this.container[i].upFrame);
     }
-    if(this.displayInventory) this.displayTheInventory();
+    if(this.displayInventory) {
+        for(var i = 0; i < this.inventories.length; i++) {
+            this.displayTheInventory(this.inventories[i]);
+        }
+    }
     if(this.showTween) this.showTween.play();
     if(this.domElementID){
         var domElement = document.getElementById(this.domElementID);
@@ -316,15 +329,16 @@ Panel.prototype.display = function(){
     this.displayed = true;
 };
 
-Panel.prototype.displayTheInventory = function(){
-    var j = 0;
-    for(var item in this.inventory.items){
-        if(!this.inventory.items.hasOwnProperty(item)) continue;
+Panel.prototype.displayTheInventory = function(inv){
+    var inventory = inv.inventory;
+    var j = inv.firstSlot;
+    for(var item in inventory.items){
+        if(!inventory.items.hasOwnProperty(item)) continue;
         var sprite = this.getNextItemSprite(item);
         var pos = this.slots[j];
         sprite.setPosition(pos.x+2+16,pos.y+4+16);
-        if(this.displayNumbers) {
-            var text = this.getNextText(item);
+        if(inv.showNumbers) {
+            var text = this.getNextText(inventory.getNb(item));
             text.setPosition(pos.x + 37, pos.y + 18);
         }
         j++;
