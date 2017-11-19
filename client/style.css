@@ -17,4 +17,10 @@
     background: transparent;
     border: none;
     display: none;
+    color: white;
+}
+
+.chat:focus {
+    border: none;
+    outline: none;
 }

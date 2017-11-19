@@ -1,6 +1,10 @@
 {
   "frames":[
     {
+      "filename":"void",
+      "frame": {"x":0,"y":288,"w":32,"h":32}
+    },
+    {
       "filename":"redpowder",
       "frame": {"x":448,"y":160,"w":32,"h":32}
     },

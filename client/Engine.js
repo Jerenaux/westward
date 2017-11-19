@@ -8,6 +8,7 @@ var Engine = {
     tileHeight: 32,
     buildingsDepth: 2,
     playersDepth: 2,
+    craftInvSize: 5, // max number of ingredients for crafting
     UIDepth: 20,
     key: 'main', // key of the scene, for Phaser
     playerIsInitialized: false,
@@ -26,13 +27,14 @@ Engine.preload = function() {
     this.load.image('backpack', 'assets/sprites/backpack.png');
     this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
 
-
     this.load.image('fort', 'assets/sprites/buildings/fort.png');
     this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
     this.load.atlas('buildings', 'assets/sprites/buildings.png', 'assets/sprites/buildings.json');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
+    this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
+    this.load.image('tail', 'assets/sprites/tail.png');
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
@@ -129,6 +131,7 @@ Engine.initWorld = function(data){
     Engine.addHero(data.id,data.x,data.y,data.settlement);
     Engine.makeUI();
     Engine.makeChatBar();
+    new Bubble();
     Engine.createAnimations();
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
@@ -194,23 +197,16 @@ Engine.makeChatBar = function(){
     Engine.chat = new Panel(chatx,chaty,chatw,96);
     Engine.chat.addSprite('talk',null,12,8);
     Engine.chat.setTweens(chatx,chaty,chatx,chaty - 40);
-    Engine.chat.domElementID = "chat";
-    var dom = document.getElementById("chat");
+    Engine.chat.domElement = document.getElementById("chat");
     var domx = (32*16) - 100 + 12;
-    dom.style.left = domx+"px";
-    dom.style.top = (chaty-17)+"px";
+    Engine.chat.domElement.style.left = domx+"px";
+    Engine.chat.domElement.style.top = (chaty-17)+"px";
 };
 
 Engine.toggleChatBar = function(){
+    if(Engine.inMenu) return;
+    if(Engine.chat.domElement.value != "") console.log("I said : "+Engine.chat.domElement.value);
     Engine.chat.toggle();
-    /*var dom = document.getElementById("chat");
-    if(Engine.chat.displayed) {
-        dom.style.display = "inline";
-        dom.focus();
-    }else{
-        dom.style.display = "none";
-        dom.blur();
-    }*/
 };
 
 Engine.makeUI = function(){
@@ -244,26 +240,26 @@ Engine.makeUI = function(){
 
 Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
+
     var recipes = new Panel(765,100,240,380,'Recipes');
-    /*recipes.addLine('Buildings:');
-    recipes.addSlots(5, 1, 8);
-    recipes.addLine('Items:');
-    recipes.addSlots(5, 2, 30);
-    recipes.setInventory(Engine.player.recipes,false);*/
-    recipes.addInventory('Buildings',5,5,Engine.player.buildingRecipes,false);
-    recipes.addInventory('Items',5,10,Engine.player.itemRecipes,false);
+    recipes.addInventory('Buildings',5,5,Engine.player.buildingRecipes,false,Engine.recipeClick);
+    recipes.addInventory('Items',5,10,Engine.player.itemRecipes,false,Engine.recipeClick);
     crafting.addPanel(recipes); // recipes panel
+
     var combi = new Panel(450,100,290,380,'Combination');
     var ringx = 80;
     var ringy = 50;
     combi.addSprite('UI','craftring',ringx,ringy);
+    Engine.craftTarget = combi.addSprite('items','void',ringx+32+20,ringy+32+16);
+    Engine.craftTargetMaterials = new Inventory(Engine.craftInvSize);
     combi.addRing(ringx+92,ringy+13,'green','ok',Engine.closePanel);
     combi.addRing(ringx+5,ringy+82,'blue','plus',Engine.closePanel);
     combi.addRing(ringx+22,ringy+99,'blue','minus',Engine.closePanel);
+    combi.verticalOffset += 200;
+    combi.addInventory(null,5,5,Engine.craftTargetMaterials,true);
     crafting.addPanel(combi); // crafting panel
+
     var items = new Panel(40,100,390,380,'Items');
-    /*items.addSlots(10,9,Engine.player.inventory.maxSize);
-    items.setInventory(Engine.player.inventory,true);*/
     items.addInventory(null,10,Engine.player.inventory.maxSize,Engine.player.inventory,true);
     crafting.addPanel(items); // inventory panel
     return crafting;
@@ -635,7 +631,7 @@ Engine.getTilesetFromTile = function(tile){
 // ## UI-related functions ##
 // this functions need to have a this bound to them
 Engine.closePanel = function(){this.hide();};
-Engine.togglePanel = function(){
+Engine.togglePanel = function(){ // When clicking on a player/building/animal, toggle the corresponding panel visibility
     if(Engine.inMenu) return;
     if(this.panel.displayed){
         this.panel.hide();
@@ -647,4 +643,17 @@ Engine.togglePanel = function(){
         Engine.inPanel = true;
         Engine.currentPanel = this.panel;
     }
+};
+Engine.recipeClick = function(){
+    var data = Engine.itemsData[this.itemID];
+    Engine.craftTarget.setTexture(data.atlas);
+    Engine.craftTarget.setFrame(data.frame);
+    if(!data.recipe) return;
+    var materials = [];
+    var keys = Object.keys(data.recipe);
+    for(var i = 0; i < keys.length; i++){
+        materials.push([keys[i],data.recipe[keys[i]]]);
+    }
+    Engine.craftTargetMaterials = new Inventory(Engine.craftInvSize);
+    Engine.updateInventory(Engine.craftTargetMaterials,materials);
 };

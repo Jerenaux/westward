@@ -30,7 +30,12 @@ Cleaning:
 - Remove unnecessary Geometry methods
 - Restructure UI, maybe remove UIElement, only have a set of generic functions to bind to interactive sprites?
 - Think about a Container class or something to affect the transforms of all children, get rid of repeated finalize() calls
+-> Store sprites in multiple arrays simultaneously; one common displayList, to toggle the visible state, and possibly other logical containers to adjust depth
+-> Maybe position everything according to oirign
+-> One manual call to finalize() at the end, if any
 - Anchor panel elements at center, not top-left
+- Make chatbar panel a subclass of Panels, so as not to overload Panel with things used for only one feature (make this a
+general rule for code organization)
 - Clean all files
 - Do not rely on constructor.name, instead use custom field (like the old "category")
 - Add ES6 syntax to PHPStorm (for ... of)
@@ -174,6 +179,7 @@ Polish:
 - HUD, title screen, animations ...
 - Animal noises when beasts in proximity, animal footsteps, player footsteps noise
 - Carcasses, traces of fight
+- Varied and nice landmarks to give life to the world and act as waypoints
 
 World building:
 --------------

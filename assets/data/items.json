@@ -13,18 +13,23 @@
   },
   "3":{
     "atlas": "items2",
-    "frame":"timber"
+    "frame":"timber",
+    "name": "Timber"
   },
   "4":{
     "atlas": "buildings",
-    "frame":"miniWarehouse"
+    "frame":"miniWarehouse",
+    "name": "Tradepost",
+    "recipe": {"3":50}
   },
   "5":{
     "atlas": "items2",
-    "frame":"root"
+    "frame":"root",
+    "name": "Root"
   },
   "6":{
     "atlas": "items2",
-    "frame":"redpotion"
+    "frame":"redpotion",
+    "name": "Red potion"
   }
 }

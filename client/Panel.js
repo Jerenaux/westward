@@ -19,7 +19,7 @@ function Panel(x,y,width,height,title){
     this.displayInventory = false;
     this.inventories = [];
     this.nextFirstSlot = 0;
-    this.domElementID = null;
+    this.domElement = null;
     this.makeBody();
     if(title) this.addCapsule(20,-9,title);
     this.finalize();
@@ -104,12 +104,13 @@ Panel.prototype.addRing = function(xs,ys,color,symbol,callback){
     this.finalize();
 };
 
-Panel.prototype.addInventory = function(title,maxwidth,total,inventory,showNumbers){
+Panel.prototype.addInventory = function(title,maxwidth,total,inventory,showNumbers,callback){
     this.displayInventory = true;
     var inv = {
         inventory: inventory,
         showNumbers: showNumbers,
-        firstSlot: this.nextFirstSlot
+        firstSlot: this.nextFirstSlot,
+        callback: callback
     };
     this.inventories.push(inv);
     if(title) this.addLine(title);
@@ -118,8 +119,9 @@ Panel.prototype.addInventory = function(title,maxwidth,total,inventory,showNumbe
 
 Panel.prototype.addSlots = function(nbHorizontal,total){
     var nbVertical = Math.ceil(total/nbHorizontal);
-    var paddingX = 15;
-    var offsetx = 0;
+    //var paddingX = 15;
+    var paddingX = (this.width/2) - (nbHorizontal*36/2);
+    var offsetx = 0; // slight offset depending on whether the slot is on the fringes or not
     var offsety = 0;
     var counter = 0;
     this.verticalOffset += 5;
@@ -208,6 +210,7 @@ Panel.prototype.addSprite = function(atlas,frame,x,y){
     var sprite = Engine.scene.add.sprite(this.x+x,this.y+y,atlas,frame);
     this.container.push(sprite);
     this.finalize();
+    return sprite;
 };
 
 Panel.prototype.updatePosition = function(){
@@ -269,7 +272,7 @@ Panel.prototype.finalize = function(){
     });
 };
 
-Panel.prototype.getNextItemSprite = function(item){ // Pool of sprites common to all inventories of the panel
+Panel.prototype.getNextItemSprite = function(item, callback){ // Pool of sprites common to all inventories of the panel
     if(this.sprites.length <= this.nextItemSprite){
         var empty = Engine.scene.add.sprite(0,0,'');
         empty.setScrollFactor(0);
@@ -282,6 +285,11 @@ Panel.prototype.getNextItemSprite = function(item){ // Pool of sprites common to
     sprite.setFrame(data.frame);
     sprite.setDisplayOrigin(Math.floor(sprite.frame.width/2),Math.floor(sprite.frame.height/2));
     sprite.visible = true;
+    if(callback){
+        sprite.setInteractive();
+        sprite.handleClick = callback.bind(sprite);
+    }
+    sprite.itemID = item;
     return sprite;
 };
 
@@ -320,11 +328,9 @@ Panel.prototype.display = function(){
         }
     }
     if(this.showTween) this.showTween.play();
-    if(this.domElementID){
-        var domElement = document.getElementById(this.domElementID);
-        console.log(domElement);
-        domElement.style.display = "inline";
-        domElement.focus();
+    if(this.domElement){
+        this.domElement.style.display = "inline";
+        this.domElement.focus();
     }
     this.displayed = true;
 };
@@ -334,7 +340,7 @@ Panel.prototype.displayTheInventory = function(inv){
     var j = inv.firstSlot;
     for(var item in inventory.items){
         if(!inventory.items.hasOwnProperty(item)) continue;
-        var sprite = this.getNextItemSprite(item);
+        var sprite = this.getNextItemSprite(item,inv.callback);
         var pos = this.slots[j];
         sprite.setPosition(pos.x+2+16,pos.y+4+16);
         if(inv.showNumbers) {
@@ -347,9 +353,9 @@ Panel.prototype.displayTheInventory = function(inv){
 };
 
 Panel.prototype.hide = function(){
-    if(this.domElementID){
-        domElement = document.getElementById(this.domElementID);
-        domElement.style.display = "none";
+    if(this.domElement) {
+        this.domElement.style.display = "none";
+        this.domElement.value = "";
     }
     if(this.hideTween){
         this.hideTween.play();

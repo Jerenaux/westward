@@ -34,9 +34,7 @@ MovingEntity.prototype.updatePathTick = function(){ // Compute in how many secon
 MovingEntity.prototype.updateWalk = function(){
     if(Date.now() >= this.nextPathTick){
         this.path.shift();
-        if(this.path.length == 0) return;
-        this.updatePosition(this.path[0][0],this.path[0][1]);
-        //console.log('['+this.id+'] Now at '+this.x+', '+this.y);
+        if(this.path.length > 0) this.updatePosition(this.path[0][0],this.path[0][1]);
         if(this.path.length <= 1){
             this.moving = false;
             this.startIdle();

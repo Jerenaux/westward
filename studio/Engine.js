@@ -144,8 +144,8 @@ Engine.start = function(loader, resources){
 };
 
 Engine.addHero = function(){
-    var startx = 536;//744;
-    var starty = 694;//130;
+    var startx = localStorage.getItem('x') || 536; //536;//744;
+    var starty = localStorage.getItem('y') || 694;//694;//130;
     Engine.player = Engine.addSprite('hero',startx,starty);
     Engine.player.visible = Engine.showHero;
     Engine.player.chunk = Utils.tileToAOI({x:startx,y:starty});
@@ -360,6 +360,8 @@ Engine.updateEnvironment = function(){
 
 Engine.move = function(x,y){
     Engine.setPosition(Engine.player,x,y);
+    localStorage.setItem('x',x);
+    localStorage.setItem('y',y);
     Engine.player.chunk = Utils.tileToAOI(Engine.player.tilePosition);
     if(Engine.player.chunk != Engine.player.previousChunk) Engine.updateEnvironment();
     Engine.player.previousChunk = Engine.player.chunk;
