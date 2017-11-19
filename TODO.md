@@ -1,6 +1,5 @@
 Cleaning
 * Battle system
-* Character menu
 * Crafting
 * Exploration/travel
 * HUD
@@ -75,9 +74,6 @@ Content:
 - Compute and display battle grid
 - Adjust camera
 - Have a permanent presence of savages and animals around settlements
-* Character menu
-- Health gauge, fatigue gauge
-- Then: events log ; class bonuses ; buildings ; NPC
 * Crafting
 - Design crafting system
 - Crafting menu
@@ -102,10 +98,12 @@ Content:
 - Chat
 - Gazette
 * Inventory
-- Hover cards over items
-- Usage block when clicking on item
+- Make stats panel below equipment w/ icons
+- Hover cards over items, show name and effect
+- Usage block when clicking on item, two options: use or equip (show effect)
 - Use items from menu (healing)
 - Equip items from menu
+- Unequip items from menu
 - Display ammo amount next to weapon (melee weapons have a ref to the id of the corresponding ammo item; fetch the nb of that item in the player.inventory (refactor when multiple ammo types)
 - Pick up items
 * Player interactions
@@ -150,8 +148,8 @@ Content:
 
 Design document:
 ---------------
-- Finish copying notes
-- Make Excel tables (inventory, bestiary, ...)
+- Finish copying notes (currently: in ambiance, npc dialogues)
+- Make Excel tables (crafting, inventory, bestiary, ...)
 - Make powerpoint
 - Make feature matrix
 - Consequence graphs
@@ -172,6 +170,7 @@ Polish:
 - Unique noise for items
 - Use particle emitters for several cool effects, like cloud puffs, dust, lights, etc.
 - Crafting SFX
+- Hower card over gold indicator
 - Highlight buttons and buildings on hover
 - Custom movement marker
 - Polish existing content
@@ -208,6 +207,10 @@ Content:
 - Loss of equipment upon respawning
 - Compute probability of items breaking and discard them
 - Accommodate NPC
+* Character menu:
+- Make actions generate an entry in events log
+- Events log: what you did (and effects: xp gains, health gains, ...), the notifications you got, what you said and people around said
+- Daily quests
 * Crafting
 - Determine quality level based on artisan level
 - Design upgrade system
@@ -231,6 +234,9 @@ Content:
 - Fatigue meter
 - Minimap
 - Daily quests
+*Inventory:
+- Add possibility to throw item, (incl. number)
+- Allow to use multiple items in one action
 * (Mini)map system
 * Movement
 - Check paths and block if error

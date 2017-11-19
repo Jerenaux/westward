@@ -95,14 +95,51 @@ WorldEditor.cliff = { // indexes of tiles in tilesets for cliffs
     topLeftIn_altbtm: 83
 };
 
+WorldEditor.TreesInfo = {
+    tilesetWidth: 21 // width in tiles of the tilset containing the trees
+};
 WorldEditor.Trees = [
     {
-        tl: 682+21,
+        firstgid: 682, // first gid of the tileset
+        root: 106, // id of the tile used as root
+        rootOffset: {x:1,y:4}, // offset of the root tile with respect to top left of the tree
+        tl: 21, // id of the top left tile of the tree
         w: 4,
         h: 5,
-        coll: [682+85,682+86,682+106,682+107]
+        coll: [ // colliding tiles with respect to the root
+            {x:1,y:0},
+            {x:0,y:-1},
+            {x:1,y:-1}
+        ],
+        depth: { // depth of each y-level of the tree (top to bottom)
+            0: 3,
+            1: 3,
+            2: 3,
+            3: 1,
+            4: 1
+        }
     }
 ];
+
+WorldEditor.Layer = function(w,h,name){
+    this.data = [];
+    this.width = w;
+    this.height = h;
+    this.name = name;
+    this.opacity = 1;
+    this.type = "tilelayer";
+    this.visible = true;
+    this.x = 0;
+    this.y = 0;
+};
+
+WorldEditor.emptyLayer = function(nb){
+    var arr = [];
+    for(var x = 0; x < nb; x++){
+        arr.push(0);
+    }
+    return arr;
+};
 
 WorldEditor.readChunk = function(id,data,doOccupy){
     WorldEditor.chunks[id] = data;
@@ -127,9 +164,26 @@ WorldEditor.isInWorldBounds = function(x,y){
 };
 
 WorldEditor.drawTree = function(x,y){
-    if(!WorldEditor.isInWorldBounds(x,y)) return;
-    var type = Utils.randomElement(WorldEditor.Trees);
-    // TODO: check if all the colliding tiles (from type.coll) will correspond to free cells; if yes, paint tree
+    if(!WorldEditor.isInWorldBounds(x,y)) return false;
+    if(WorldEditor.isBusy({x:x,y:y})) return false;
+    var tree = Utils.randomElement(WorldEditor.Trees);
+    for(var i = 0; i < tree.coll.length; i++){
+        var c = tree.coll[i];
+        var tmpx = x + c.x;
+        var tmpy = y + c.y;
+        if(WorldEditor.isBusy({x:tmpx,y:tmpy})) return false;
+    }
+
+    // Paint the tree
+    var treex = x - tree.rootOffset.x;
+    var treey = y - tree.rootOffset.y;
+    for(var ty = 0; ty < tree.h; ty++){
+        for(var tx = 0; tx < tree.w; tx++){
+            var tile = tree.firstgid + tree.tl + ty*WorldEditor.TreesInfo.tilesetWidth + tx;
+            WorldEditor.addTile(treex+tx,treey+ty,tile,tree.depth[ty],true); // true = allow overlap using extra layer
+        }
+    }
+    return true;
 };
 
 WorldEditor.drawShore = function(tiles){
@@ -293,15 +347,24 @@ WorldEditor.isBusy = function(node){
     return !!WorldEditor.busyTiles.get(node.x,node.y);
 };
 
-WorldEditor.addTile = function(x,y,tile){
+WorldEditor.addTile = function(x,y,tile,l,overlap){
     var id = Utils.tileToAOI({x: x, y: y});
     var chunk = WorldEditor.chunks[id];
     if(!chunk) return;
+    var layer = (l === undefined ? 0 : l);
     var origin = Utils.AOItoTile(id);
     var cx = x - origin.x;
     var cy = y - origin.y;
     var idx = Utils.gridToLine(cx, cy, chunk.width);
-    chunk.layers[0].data[idx] = tile;
+    if(overlap){
+        if(chunk.layers[layer].data[idx]) layer++;
+        if(layer >= chunk.layers.length) {
+            var newlayer = new WorldEditor.Layer(chunk.width,chunk.height,"overlap");
+            newlayer.data = WorldEditor.emptyLayer(chunk.width*chunk.height);
+            chunk.layers.push(newlayer);
+        }
+    }
+    chunk.layers[layer].data[idx] = tile;
     WorldEditor.occupy(x,y);
     WorldEditor.dirty(id);
 };

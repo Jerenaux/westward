@@ -24,7 +24,7 @@ Utils.tileToAOI = function(tile){ // input coords in Tiles
         console.log('ERROR : Chunk data not initialized');
         return 0;
     }
-    if(tile.x < 0 || tile.y < 0) console.log('ALERT: negative coordinates');
+    //if(tile.x < 0 || tile.y < 0) console.log('ALERT: negative coordinates');
     var top = Math.floor(tile.y/World.chunkHeight);
     var left = Math.floor(tile.x/World.chunkWidth);
     return (top*World.nbChunksHorizontal)+left;

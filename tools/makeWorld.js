@@ -14,7 +14,7 @@ var WorldEditor = require('../studio/WorldEditor.js').WorldEditor;
 
 var nbHoriz, nbVert, chunkWidth, chunkHeight, tileWidth, tileHeight, reverse;
 
-function Layer(w,h,name){
+/*function Layer(w,h,name){
     this.data = [];
     this.width = w;
     this.height = h;
@@ -24,7 +24,7 @@ function Layer(w,h,name){
     this.visible = true;
     this.x = 0;
     this.y = 0;
-}
+}*/
 
 function makeWorld(bluePrint,outdir){
     // Default values
@@ -118,13 +118,13 @@ function makeBasis(tilesetsData){
     };
     basis.tilesets = tilesetsData.tilesets; // TODO remove un production
 
-    var ground = new Layer(chunkWidth,chunkHeight,'ground');
-    var terrain = new Layer(chunkWidth,chunkHeight,'terrain');
-    var groundstuff = new Layer(chunkWidth,chunkHeight,'stuff');
-    var canopy = new Layer(chunkWidth,chunkHeight,'canopy');
-    terrain.data = emptyLayer(chunkWidth*chunkHeight);
-    groundstuff.data = emptyLayer(chunkWidth*chunkHeight);
-    canopy.data = emptyLayer(chunkWidth*chunkHeight);
+    var ground = new WorldEditor.Layer(chunkWidth,chunkHeight,'ground');
+    var terrain = new WorldEditor.Layer(chunkWidth,chunkHeight,'terrain');
+    var groundstuff = new WorldEditor.Layer(chunkWidth,chunkHeight,'stuff');
+    var canopy = new WorldEditor.Layer(chunkWidth,chunkHeight,'canopy');
+    terrain.data = WorldEditor.emptyLayer(chunkWidth*chunkHeight);
+    groundstuff.data = WorldEditor.emptyLayer(chunkWidth*chunkHeight);
+    canopy.data = WorldEditor.emptyLayer(chunkWidth*chunkHeight);
 
     // Fill with grass
     for(var x = 0; x < chunkWidth*chunkHeight; x++){
@@ -154,13 +154,13 @@ function makeBasis(tilesetsData){
     return basis;
 }
 
-function emptyLayer(nb){
+/*function emptyLayer(nb){
     var arr = [];
     for(var x = 0; x < nb; x++){
         arr.push(0);
     }
     return arr;
-}
+}*/
 
 function writeMasterFile(basis,tilesetsData,outdir){
     // Write master file

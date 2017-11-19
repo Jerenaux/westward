@@ -1,8 +1,9 @@
-var layerDepth = {
+var layerDepth = { // maps layer id to depth
     0: 0, // ground
     1: 1, // terrain
     2: 2, // stuff
-    3: 5 // canopy
+    3: 5, // canopy
+    4: 5 // overlap
 };
 
 function Chunk(mapData,id,z){

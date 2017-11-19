@@ -131,7 +131,7 @@ Engine.initWorld = function(data){
     Engine.addHero(data.id,data.x,data.y,data.settlement);
     Engine.makeUI();
     Engine.makeChatBar();
-    new Bubble();
+    //new Bubble();
     Engine.createAnimations();
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
