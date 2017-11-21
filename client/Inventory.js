@@ -18,6 +18,10 @@ Inventory.prototype.update = function(item,nb){
     this.updateNb(item,nb);
 };
 
+Inventory.prototype.setItems = function(items){
+    this.items = items;
+};
+
 Inventory.prototype.getNb = function(item){
     if(!this.items.hasOwnProperty(item)) return 0;
     return this.items[item];

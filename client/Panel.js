@@ -86,6 +86,7 @@ Panel.prototype.addRing = function(xs,ys,color,symbol,callback){
     y += 5;
     var cs = Engine.scene.add.sprite(x,y,'UI',color);
     cs.upFrame = cs.frame.name;
+    cs.aliveFrame = cs.frame.name;
     this.container.push(cs);
     x += 3;
     y += 3;
@@ -94,7 +95,7 @@ Panel.prototype.addRing = function(xs,ys,color,symbol,callback){
     this.container.push(ss);
 
     var downCallback = function(){
-        this.setFrame(color+'-pressed');
+        this.setFrame(this.upFrame+'-pressed');
     };
 
     cs.handleClick = callback.bind(this);
@@ -102,6 +103,7 @@ Panel.prototype.addRing = function(xs,ys,color,symbol,callback){
     cs.handleDown = downCallback.bind(cs);
     ss.handleDown = downCallback.bind(cs);
     this.finalize();
+    return cs;
 };
 
 Panel.prototype.addInventory = function(title,maxwidth,total,inventory,showNumbers,callback){

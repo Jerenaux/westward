@@ -1,7 +1,8 @@
 {
   "0":{
     "atlas": "items",
-    "frame":"redpowder"
+    "frame":"redpowder",
+    "name":"Red powder"
   },
   "1":{
     "atlas": "items",
@@ -30,6 +31,7 @@
   "6":{
     "atlas": "items2",
     "frame":"redpotion",
-    "name": "Red potion"
+    "name": "Red potion",
+    "recipe": {"5":1,"0":2}
   }
 }

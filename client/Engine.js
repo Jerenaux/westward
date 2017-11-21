@@ -246,18 +246,9 @@ Engine.makeCraftingMenu = function(){
     recipes.addInventory('Items',5,10,Engine.player.itemRecipes,false,Engine.recipeClick);
     crafting.addPanel(recipes); // recipes panel
 
-    var combi = new Panel(450,100,290,380,'Combination');
-    var ringx = 80;
-    var ringy = 50;
-    combi.addSprite('UI','craftring',ringx,ringy);
-    Engine.craftTarget = combi.addSprite('items','void',ringx+32+20,ringy+32+16);
-    Engine.craftTargetMaterials = new Inventory(Engine.craftInvSize);
-    combi.addRing(ringx+92,ringy+13,'green','ok',Engine.closePanel);
-    combi.addRing(ringx+5,ringy+82,'blue','plus',Engine.closePanel);
-    combi.addRing(ringx+22,ringy+99,'blue','minus',Engine.closePanel);
-    combi.verticalOffset += 200;
-    combi.addInventory(null,5,5,Engine.craftTargetMaterials,true);
-    crafting.addPanel(combi); // crafting panel
+    Engine.craftingPanel = new CraftingPanel(450,100,290,380,'Combination');
+    Engine.craftingPanel.addInventory(null,5,5,Engine.craftingPanel.craftTargetMaterials,true);
+    crafting.addPanel(Engine.craftingPanel); // crafting panel
 
     var items = new Panel(40,100,390,380,'Items');
     items.addInventory(null,10,Engine.player.inventory.maxSize,Engine.player.inventory,true);
@@ -645,15 +636,5 @@ Engine.togglePanel = function(){ // When clicking on a player/building/animal, t
     }
 };
 Engine.recipeClick = function(){
-    var data = Engine.itemsData[this.itemID];
-    Engine.craftTarget.setTexture(data.atlas);
-    Engine.craftTarget.setFrame(data.frame);
-    if(!data.recipe) return;
-    var materials = [];
-    var keys = Object.keys(data.recipe);
-    for(var i = 0; i < keys.length; i++){
-        materials.push([keys[i],data.recipe[keys[i]]]);
-    }
-    Engine.craftTargetMaterials = new Inventory(Engine.craftInvSize);
-    Engine.updateInventory(Engine.craftTargetMaterials,materials);
+    Engine.craftingPanel.updateTarget(Engine.itemsData[this.itemID]);
 };

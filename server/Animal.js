@@ -5,6 +5,7 @@
 var Utils = require('../shared/Utils.js').Utils;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
+var World = require('../shared/World.js').World;
 
 function Animal(x,y,type){
     this.id = GameServer.lastAnimalID++;
@@ -63,8 +64,8 @@ Animal.prototype.updateIdle = function(){
 
 Animal.prototype.findRandomDestination = function(){
     return {
-        x: this.x + Utils.randomInt(-10,10),
-        y: this.y + Utils.randomInt(-10,10)
+        x: Utils.clamp(this.x + Utils.randomInt(-10,10),0,World.worldWidth),
+        y: Utils.clamp(this.y + Utils.randomInt(-10,10),0,World.worldHeight)
     };
 };
 

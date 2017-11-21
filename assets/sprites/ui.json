@@ -145,6 +145,10 @@
       "frame": {"x":64,"y":121,"w":14,"h":14}
     },
     {
+      "filename": "gray-pressed",
+      "frame": {"x":64,"y":137,"w":14,"h":14}
+    },
+    {
       "filename": "close",
       "frame": {"x":100,"y":140,"w":8,"h":8}
     },

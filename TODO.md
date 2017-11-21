@@ -182,12 +182,13 @@ Polish:
 
 World building:
 --------------
-- Fix saving tool
+- Store forests and trees separately (trees.json) during dev
+-> During flattening, read that file and draw trees tile by tile
+-> Test high-layers after flattening
+- Different tree distribution based on geographical sectors
+- Add random elements
 - Investigate the possibility of making cliffs from terrain data of the east coast
 - Rework cliffs
-- Investigate forests from google map
-- Add forests
-- Add random elements
 
 ###############
 V1 level:
@@ -265,7 +266,6 @@ Deployment:
 - Improve flattening by making transparency checks
 - Secure chunk access? (check client position before serving)
 
-
 Testing:
 -------
 - Figure out testing:
@@ -274,6 +274,13 @@ Testing:
 - Manually run it before deployment
 - Have the testing pipeline work with both development and production code (run it once, prodify, then check again, the upload)
 - Optimize: remove divisions, benchmark runtimes, etc.
+
+Tools:
+------
+Custom chunk editor:
+- Arrows on the fringes of the window allow to move quickly to adjacent chunks
+- Preserve whatever extra info is in the JSON file (vs Tiled who rewrites it)
+- Versioning of individual chunks (saved in separate folder), for unlimited undos
 
 ###############
 V2 level:

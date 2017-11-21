@@ -140,9 +140,9 @@ function insert(a1,a2,pos){
     a1.splice.apply(a1, [pos, 0].concat(a2));
 }
 
-function clamp(x,min,max){ // restricts a value to a given interval (return the value unchanged if within the interval
+Utils.clamp = function(x,min,max){ // restricts a value to a given interval (return the value unchanged if within the interval
     return Math.max(min, Math.min(x, max));
-}
+};
 
 function coordinatesPairToTile(coords){
     return {
