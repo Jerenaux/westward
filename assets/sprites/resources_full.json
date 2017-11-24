@@ -11,6 +11,14 @@
     {
       "filename": "redpotion",
       "frame": {"x":96,"y":312,"w":24,"h":24}
+    },
+    {
+      "filename": "hide",
+      "frame": {"x":312,"y":480,"w":24,"h":24}
+    },
+    {
+      "filename": "tunic",
+      "frame": {"x":264,"y":648,"w":24,"h":24}
     }
   ]
 }

@@ -12,7 +12,7 @@ MovingEntity.prototype = Object.create(GameObject.prototype);
 MovingEntity.prototype.constructor = MovingEntity;
 
 MovingEntity.prototype.setPath = function(path){
-    console.log('['+this.constructor.name+' '+this.id+'] moving to path');
+    //console.log('['+this.constructor.name+' '+this.id+'] moving to path');
     this.setProperty('path',path);
     this.updatePathTick();
     this.moving = true;

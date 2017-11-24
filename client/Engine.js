@@ -28,6 +28,7 @@ Engine.preload = function() {
     this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
 
     this.load.image('fort', 'assets/sprites/buildings/fort.png');
+    this.load.image('tradepost', 'assets/sprites/buildings/tradepost.png');
     this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
@@ -287,8 +288,8 @@ Engine.addHero = function(id,x,y,settlement){
     Engine.player.inventory = new Inventory();
     Engine.player.buildingRecipes = new Inventory(10);
     Engine.player.itemRecipes = new Inventory(10);
-    Engine.updateInventory(Engine.player.buildingRecipes,[[7,1]]);
-    Engine.updateInventory(Engine.player.itemRecipes,[[6,1]]);
+    Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
+    Engine.player.itemRecipes.fromList([[6,1],[10,1]]);
     Engine.updateEnvironment();
 };
 
@@ -520,7 +521,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.newbuildings) {
         for (var n = 0; n < data.newbuildings.length; n++) {
             var b = data.newbuildings[n];
-            Engine.addBuilding(b.id, b.x, b.y, b.type, b.settlement, b.resources);
+            Engine.addBuilding(b.id, b.x, b.y, b.type, b.settlement, b.inventory);
         }
     }
 
@@ -570,9 +571,10 @@ Engine.addPlayer = function(id,x,y,settlement){
     return sprite;
 };
 
-Engine.addBuilding = function(id,x,y,type,settlement,resources){
+Engine.addBuilding = function(id,x,y,type,settlement,inv){
     var building = new Building(x,y,type,settlement,id);
-    Engine.updateInventory(building.inventory,resources);
+    building.inventory.fromList(inv);
+    //Engine.updateInventory(building.inventory,resources);
     Engine.buildings[id] = building;
     Engine.displayedBuildings.add(id);
     return building;

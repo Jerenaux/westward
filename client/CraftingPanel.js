@@ -5,7 +5,7 @@
 function CraftingPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
     this.buttons = [];
-    this.buttonsEnabled = false;
+    this.targetIsBuilding = false;
     this.craftTarget = null;
     this.craftID = null;
     this.craftAmount = 0;
@@ -49,13 +49,20 @@ CraftingPanel.prototype.decreaseAmount = function(){
 };
 
 CraftingPanel.prototype.changeAmount = function(inc){
-    if(this.buttonsEnabled){
-        if(inc == -1 && this.craftAmount == 1) return;
-        if(inc == 1 && this.craftAmount == 9999) return;
-        this.craftAmount += inc;
-        this.craftAmountText.setText(this.craftAmount);
-        this.updateNumbers();
-    }
+    var plusbtn = this.buttons[1];
+    var minusbtn = this.buttons[2];
+    var button = (inc == 1 ? plusbtn : minusbtn);
+    if(!button.enabled) return;
+    if(inc == -1 && this.craftAmount == 1) return;
+    if(inc == 1 && (this.craftAmount == 9999 || this.targetIsBuilding)) return;
+    this.craftAmount += inc;
+    this.craftAmountText.setText(this.craftAmount);
+    this.updateNumbers();
+
+    if(this.craftAmount == 1 && minusbtn.enabled){minusbtn.disable();}
+    else if(this.craftAmount == 999 && plusbtn.enabled){plusbtn.disable();}
+    else if(this.craftAmount > 1 && !minusbtn.enabled){minusbtn.enable();}
+    else if(this.craftAmount < 999 && !plusbtn.enabled){plusbtn.enable();}
 };
 
 CraftingPanel.prototype.disableButtons = function(){
@@ -64,12 +71,11 @@ CraftingPanel.prototype.disableButtons = function(){
     }
 };
 
-CraftingPanel.prototype.enableButtons = function(){
+/*CraftingPanel.prototype.enableButtons = function(){
     for(var i = 1; i < this.buttons.length; i++){ // start at 1 to skip ok button
         this.buttons[i].enable();
     }
-    this.buttonsEnabled = true;
-};
+};*/
 
 CraftingPanel.prototype.updateOkButton = function(){
     var btn = this.buttons[0];
@@ -88,13 +94,15 @@ CraftingPanel.prototype.requestCraft = function(){
 
 CraftingPanel.prototype.updateTarget = function(id,data){
     this.craftID = id;
+    this.targetIsBuilding = (data.building >= 0);
     this.craftTarget.setTexture(data.atlas);
     this.craftTarget.setFrame(data.frame);
     this.craftTarget.setDisplayOrigin(Math.floor(this.craftTarget.frame.width/2),Math.floor(this.craftTarget.frame.height/2));
     this.craftAmount = 1;
     this.craftAmountText.setText(this.craftAmount);
     this.amounts = {};
-    this.enableButtons();
+    if(!this.targetIsBuilding) this.buttons[1].enable();
+    this.buttons[2].disable();
 
     if(!data.recipe) throw Error('No recipe for provided item');
     this.craftTargetMaterials.setItems(data.recipe);

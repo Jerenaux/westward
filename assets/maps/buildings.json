@@ -1,10 +1,11 @@
 {
   "buildings":[
     {
-    "type":0,
-    "x": 140,
-    "y": 427,
-    "settlement": 0
-  }
+      "type":1,
+      "x": 515,
+      "y": 660,
+      "settlement": 0,
+      "stock": {"3":999,"9":22}
+    }
   ]
 }

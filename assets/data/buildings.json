@@ -44,5 +44,19 @@
     "height": 465,
     "sprite": "inn",
     "name":"Inn"
+  },
+  "3":{
+    "shape":[
+      100, 80,
+      320, 0,
+      475, 105,
+      480, 390,
+      240, 500,
+      80, 400
+    ],
+    "width": 488,
+    "height": 500,
+    "sprite": "tower",
+    "name":"Tower"
   }
 }

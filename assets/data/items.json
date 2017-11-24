@@ -41,5 +41,23 @@
     "name": "Inn",
     "building":2,
     "recipe": {"3":50}
+  },
+  "8":{
+    "atlas": "buildings",
+    "frame":"smallTower",
+    "name": "Tower",
+    "building":3,
+    "recipe": {"3":50}
+  },
+  "9":{
+    "atlas": "items2",
+    "frame":"hide",
+    "name": "Hide"
+  },
+  "10":{
+    "atlas": "items2",
+    "frame":"tunic",
+    "name": "Tunic",
+    "recipe":{"9":2}
   }
 }

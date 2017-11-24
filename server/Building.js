@@ -7,13 +7,14 @@ var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
 
-function Building(x,y,type,settlement){
+function Building(x,y,type,settlement,stock){
     this.id = GameServer.lastBuildingID++;
     this.x = x;
     this.y = y;
     this.type = type;
     this.settlement = settlement;
-    this.resources = new Inventory(10);
+    this.inventory = new Inventory(100);
+    this.inventory.setItems(stock);
     this.setOrUpdateAOI();
     this.addCollisions();
 }
@@ -23,12 +24,13 @@ Building.prototype.constructor = Building;
 
 Building.prototype.trim = function(){
     var trimmed = {};
-    var broadcastProperties = ['id','type','settlement','resources']; // list of properties relevant for the client
+    var broadcastProperties = ['id','type','settlement']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
+    trimmed.inventory = this.inventory.toList();
     return trimmed;
 };
 

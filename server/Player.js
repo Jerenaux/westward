@@ -39,11 +39,11 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(2,1);
     this.giveItem(3,1);
     this.giveItem(5,14);
+    this.giveItem(9,3);
     this.updateInventory();
 };
 
 Player.prototype.hasItem = function(item,nb){
-    console.log(this.inventory.getNb(item),nb);
     return (this.inventory.getNb(item) >= nb);
 };
 

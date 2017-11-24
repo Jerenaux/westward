@@ -26,6 +26,7 @@ var Moving = new Phaser.Class({
     },
 
     updateDepth: function(){
+        //console.log(Engine.playersDepth + this.tileY/1000);
         this.depth = Engine.playersDepth + this.tileY/1000;
     },
 

@@ -24,10 +24,8 @@ var Building = new Phaser.Class({
         var py = Engine.baseViewHeight*Engine.tileHeight - height;
         var panelName = data.name+' of '+settlementData.name;
         this.panel = new Panel(0,py,width,height,panelName);
-        this.panel.addRing(260,-10,'red','close',Engine.closePanel  );
-        this.panel.addSlots(3,3,5);
-        this.panel.setInventory(this.inventory,true);
-        //this.panel.setTweens(0,py+height,0,py);
+        this.panel.addRing(260,-10,'red','close',Engine.closePanel.bind(this.panel));
+        this.panel.addInventory(null,5,5,this.inventory,true);
         this.handleClick = Engine.togglePanel.bind(this);
 
         var shape = new Phaser.Geom.Polygon(data.shape);

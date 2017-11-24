@@ -52,7 +52,7 @@ server.clientUpdateRate = 1000/5; // Rate at which update packets are sent
 server.walkUpdateRate = 1000/20; // Rate at which positions are updated
 server.npcUpdateRate = 1000/5;
 
-server.resetStamp = 1511554636794; // ignore returning players with stamps older than this and treat them as new
+server.resetStamp = 1511562427081; // ignore returning players with stamps older than this and treat them as new
 
 io.on('connection',function(socket){
 
@@ -73,6 +73,10 @@ io.on('connection',function(socket){
 
         socket.on('craft',function(data){
             gs.handleCraft(data,socket.id);
+        });
+
+        socket.on('battle',function(data){
+            gs.handleBattle(data,socket.id);
         });
     });
 

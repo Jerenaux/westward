@@ -2,7 +2,6 @@ Cleaning
 * Battle system
 * Crafting
 * Exploration/travel
-* HUD
 * Inns
 * Inventory
 * Player interactions
@@ -82,9 +81,6 @@ Content:
 - Have a world to explore
 - Have a permanent presence of a few pickup items around settlements
 - Campfires
-* HUD/Menus:
-- Finish all menus
-- Hover cards when hovering players
 * Inns
 (- Enable players to put construction site)
 (- Enable players to commit to construction)
@@ -105,8 +101,7 @@ Content:
 * Player interactions
 - Display speech bubble locally
 - Broadcats bubble
-- Display menu when click on players, display buttons (give item, give money)
-- Give items/money
+- Show player name
 * Settlement defense
 - Enable commander to build towers
 - Set up stats of towers and forts
@@ -131,8 +126,10 @@ Content:
 - Let governor name chancellor
 - Salaries for officials
 * Trade
-(- Have a trade post built)
 - Shop system, test with pre-filled inventories
+-> Display action slates in building panel; make "shop" action
+-> Make shopping menu (two tabs, normal slots, click on item to select, adjust quantity in tablet below)
+-> Display gold as item? Handle gold
 - Have monsters drop loot
 - Enable bonuses of merchants
 - Allow merchants and artisans to build their shops
@@ -244,6 +241,9 @@ Content:
 - Investigate smoothenPath and compressPath)
 - Hold & click
 * NPC
+* Player interactions:
+- Display menu when click on players, display buttons (give item, give money)
+- Give items/money
 * Settlement defense
 * Settlement economy
 * Skills menu

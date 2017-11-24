@@ -333,8 +333,8 @@ Engine.updateCamera = function(){
     Engine.camera.x = Engine.player.tilePosition.x - Math.floor(Engine.viewWidth*0.5);
     Engine.camera.y = Engine.player.tilePosition.y - Math.floor(Engine.viewHeight*0.5);
     // Clamp in tile units
-    Engine.camera.x = clamp(Engine.camera.x,0,World.worldWidth-Engine.viewWidth);
-    Engine.camera.y = clamp(Engine.camera.y,0,World.worldHeight-Engine.viewHeight);
+    Engine.camera.x = Utils.clamp(Engine.camera.x,0,World.worldWidth-Engine.viewWidth);
+    Engine.camera.y = Utils.clamp(Engine.camera.y,0,World.worldHeight-Engine.viewHeight);
     Engine.stage.pivot.set(Engine.camera.x*World.tileWidth,Engine.camera.y*World.tileHeight);
     document.getElementById('cx').innerHTML = Engine.camera.x;
     document.getElementById('cy').innerHTML = Engine.camera.y;
@@ -438,8 +438,8 @@ Engine.handleClick = function(e){
     if(!Engine.clickAction) return;
     var worldx = c.tile.x;
     var worldy = c.tile.y;
-    worldx = clamp(worldx,0,World.worldWidth);
-    worldy = clamp(worldy,0,World.worldHeight);
+    worldx = Utils.clamp(worldx,0,World.worldWidth);
+    worldy = Utils.clamp(worldy,0,World.worldHeight);
     Engine[Engine.clickAction](worldx,worldy);
     Engine.lastWorldX = worldx;
     Engine.lastWorldY = worldy;

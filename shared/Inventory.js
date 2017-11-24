@@ -32,6 +32,7 @@ Inventory.prototype.remove = function(item){
 };
 
 Inventory.prototype.setItems = function(items){
+    if(items == null) items = {};
     this.items = items;
     this.size = Object.keys(this.items).length;
 };

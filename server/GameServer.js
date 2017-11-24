@@ -26,6 +26,7 @@ var AOI = require('./AOI.js').AOI;
 var Player = require('./Player.js').Player;
 var Building = require('./Building.js').Building;
 var Animal = require('./Animal.js').Animal;
+var Battle = require('./Battle.js').Battle;
 var PF = require('../shared/pathfinding.js');
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
@@ -60,7 +61,7 @@ GameServer.readMap = function(mapsPath){
     //for(var bid in buildings.buildings){
     for(var i = 0; i < buildings.buildings.length; i++){
         var data = buildings.buildings[i];
-        new Building(data.x,data.y,data.type,data.settlement);
+        new Building(data.x,data.y,data.type,data.settlement,data.stock);
     }
 
     // Spawn animals
@@ -176,18 +177,36 @@ GameServer.findPath = function(from,to){
     return GameServer.PFfinder.findPath(from.x, from.y, to.x, to.y, GameServer.PFgrid);
 };
 
+GameServer.handleBattle = function(opponentID,socketID){
+    var player = GameServer.getPlayer(socketID);
+    var animal = GameServer.animals[opponentID];
+    // TODO: check for proximity
+    new Battle(animal,player);
+};
+
 GameServer.handleCraft = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var targetItem = data.id;
     var nb = data.nb;
     var recipe = GameServer.itemsData[targetItem].recipe;
+    if(!GameServer.allIngredientsOwned(player,recipe,nb)) return;
+    var building = GameServer.itemsData[targetItem].building;
+    if(building >= 0){
+        //console.log(GameServer.canBuild(player,building));
+    }else {
+        GameServer.operateCraft(player, recipe, targetItem, nb);
+    }
+};
+
+GameServer.allIngredientsOwned = function(player,recipe,nb){
     for(var item in recipe){
         if(!recipe.hasOwnProperty(item)) continue;
-        if(!player.hasItem(item,recipe[item]*nb)){
-            console.log('Missing ingredients!');
-            return false;
-        }
+        if(!player.hasItem(item,recipe[item]*nb)) return false;
     }
+    return true;
+};
+
+GameServer.operateCraft = function(player,recipe,targetItem,nb){
     for(var item in recipe) {
         if (!recipe.hasOwnProperty(item)) continue;
         player.takeItem(item,recipe[item]*nb);

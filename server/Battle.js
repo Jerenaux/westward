@@ -3,7 +3,7 @@
  */
 var GameServer = require('./GameServer.js').GameServer;
 
-var TURN_DURATION = 30;
+var TURN_DURATION = 3; // 30
 
 function Battle(f1,f2){
     this.id = GameServer.lastBattleID++;
@@ -18,7 +18,7 @@ Battle.prototype.start = function(){
         if(f.constructor.name == 'Player') f.setProperty('inFight',true);
         f.battle = _battle;
     });
-    this.loop = setInterval(this.update,1000);
+    this.loop = setInterval(this.update.bind(this),1000);
     this.newTurn();
 };
 
@@ -38,3 +38,5 @@ Battle.prototype.update = function(){
 Battle.prototype.end = function(){
     clearInterval(this.loop);
 };
+
+module.exports.Battle = Battle;
