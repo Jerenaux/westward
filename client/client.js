@@ -35,7 +35,7 @@ Client.getInitRequest = function(){ // Returns the data object to send to reques
     var id = Client.getPlayerID();
     return {new:false,id:id,clientTime:Date.now()};*/
     if(Client.isNewPlayer()) return {new:true};
-    return {new:false,id:Client.getPlayerID()};
+    return {new:false,stamp:localStorage.getItem('idStamp'),id:Client.getPlayerID()};
 };
 
 Client.isNewPlayer = function(){
@@ -80,6 +80,7 @@ Client.socket.on('pid',function(playerID){ // the 'pid' event is used for the se
 Client.setLocalData = function(id){ // store the player ID in localStorage
     console.log('your ID : '+id);
     localStorage.setItem(Client.storageIDKey,id);
+    localStorage.setItem('idStamp',Date.now());
 };
 
 /// ##### SENDERS ######
@@ -94,6 +95,10 @@ Client.sendPath = function(path){
 
 Client.startBattle = function(targetID){
     Client.socket.emit('battle',targetID);
+};
+
+Client.sendCraft = function(id,nb){
+    Client.socket.emit('craft',{id:id,nb:nb});
 };
 
 // ####################"

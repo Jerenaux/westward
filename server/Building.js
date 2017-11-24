@@ -5,6 +5,7 @@ var GameObject = require('./GameObject.js').GameObject;
 var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
+var Inventory = require('../shared/Inventory.js').Inventory;
 
 function Building(x,y,type,settlement){
     this.id = GameServer.lastBuildingID++;
@@ -12,7 +13,7 @@ function Building(x,y,type,settlement){
     this.y = y;
     this.type = type;
     this.settlement = settlement;
-    this.resources = {3:50};
+    this.resources = new Inventory(10);
     this.setOrUpdateAOI();
     this.addCollisions();
 }
@@ -51,7 +52,8 @@ Building.prototype.addCollisions = function(){
         spriteX = this.x;
         spriteY = this.y;
     }
-    PFUtils.collisionsFromShape(this.shape,spriteX,spriteY,data.width,data.height,GameServer.collisions);
+
+    this.collidingTiles = PFUtils.collisionsFromShape(this.shape,spriteX,spriteY,data.width,data.height,GameServer.collisions);
 };
 
 module.exports.Building = Building;

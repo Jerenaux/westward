@@ -27,14 +27,16 @@ Cleaning:
 - Split server in two (game and dev server)
 - Standardize the use of Utils methods for coordianes manipulations (gridtoline, linetogrid, tiletoiAOI, AOItotile, tileRelativeToAOI...)
 - Remove unnecessary Geometry methods
+- listCollisions: don't store ater tiles, only shore etc.
 - Restructure UI, maybe remove UIElement, only have a set of generic functions to bind to interactive sprites?
 - Think about a Container class or something to affect the transforms of all children, get rid of repeated finalize() calls
+=> Use container game object from Phaser
 -> Store sprites in multiple arrays simultaneously; one common displayList, to toggle the visible state, and possibly other logical containers to adjust depth
 -> Maybe position everything according to oirign
--> One manual call to finalize() at the end, if any
+-> One manual call to finalize() at the end, if any; or auto when adding to menu (the menu calls it in addPanel)
 - Anchor panel elements at center, not top-left
 - Make chatbar panel a subclass of Panels, so as not to overload Panel with things used for only one feature (make this a
-general rule for code organization)
+general rule for code organization: for equipment, stats...)
 - Clean all files
 - Do not rely on constructor.name, instead use custom field (like the old "category")
 - Add ES6 syntax to PHPStorm (for ... of)
@@ -75,12 +77,7 @@ Content:
 - Adjust camera
 - Have a permanent presence of savages and animals around settlements
 * Crafting
-- Design crafting system
-- Crafting menu
-- Crafting mechanic for health kits
-- Display known formulas
-- Block advanced formulas based on class and lvl
-- Enable a dozen craftable items (minimal necessities for all other aspects of the game)
+- Display advanced formulas based on class and lvl
 * Exploration/travel
 - Have a world to explore
 - Have a permanent presence of a few pickup items around settlements
@@ -89,7 +86,6 @@ Content:
 - Finish all menus
 - Hover cards when hovering players
 * Inns
-(- Enable players to buy timber from settlements)
 (- Enable players to put construction site)
 (- Enable players to commit to construction)
 - Shop system (custom stock, prices...)
@@ -186,6 +182,7 @@ World building:
 -> During flattening, read that file and draw trees tile by tile
 -> Test high-layers after flattening
 - Different tree distribution based on geographical sectors
+- Compute tree density and spread random trees around accordingly
 - Add random elements
 - Investigate the possibility of making cliffs from terrain data of the east coast
 - Rework cliffs

@@ -21,6 +21,7 @@
     "atlas": "buildings",
     "frame":"miniWarehouse",
     "name": "Tradepost",
+    "building":1,
     "recipe": {"3":50}
   },
   "5":{
@@ -33,5 +34,12 @@
     "frame":"redpotion",
     "name": "Red potion",
     "recipe": {"5":1,"0":2}
+  },
+  "7":{
+    "atlas": "buildings",
+    "frame":"miniInn",
+    "name": "Inn",
+    "building":2,
+    "recipe": {"3":50}
   }
 }

@@ -16,7 +16,7 @@ var Player = new Phaser.Class({
         var width = 300;
         var py = Engine.baseViewHeight*Engine.tileHeight - height;
         this.panel = new Panel(0,py,width,height,'Player name');
-        this.panel.addRing(260,-10,'red','close',Engine.closePanel);
+        this.panel.addRing(260,-10,'red','close',Engine.closePanel.bind(this.panel));
         this.handleClick = Engine.togglePanel.bind(this);
 
         this.animsKeys = {

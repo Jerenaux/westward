@@ -52,12 +52,14 @@ GameServer.readMap = function(mapsPath){
         maxy: 699
     };
 
+    GameServer.itemsData = JSON.parse(fs.readFileSync('./assets/data/items.json').toString());
+
     // Read buildings
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
     var buildings = JSON.parse(fs.readFileSync('./assets/maps/buildings.json').toString());
-    for(var bid in buildings){
-        if(!buildings.hasOwnProperty(bid)) return;
-        var data = buildings[bid];
+    //for(var bid in buildings.buildings){
+    for(var i = 0; i < buildings.buildings.length; i++){
+        var data = buildings.buildings[i];
         new Building(data.x,data.y,data.type,data.settlement);
     }
 
@@ -172,6 +174,26 @@ GameServer.findPath = function(from,to){
 
     GameServer.PFgrid.nodes = new Proxy(clone(GameServer.collisions),PFUtils.firstDimensionHandler); // Recreates a new grid each time
     return GameServer.PFfinder.findPath(from.x, from.y, to.x, to.y, GameServer.PFgrid);
+};
+
+GameServer.handleCraft = function(data,socketID){
+    var player = GameServer.getPlayer(socketID);
+    var targetItem = data.id;
+    var nb = data.nb;
+    var recipe = GameServer.itemsData[targetItem].recipe;
+    for(var item in recipe){
+        if(!recipe.hasOwnProperty(item)) continue;
+        if(!player.hasItem(item,recipe[item]*nb)){
+            console.log('Missing ingredients!');
+            return false;
+        }
+    }
+    for(var item in recipe) {
+        if (!recipe.hasOwnProperty(item)) continue;
+        player.takeItem(item,recipe[item]*nb);
+    }
+    player.giveItem(targetItem,nb);
+    player.updateInventory();
 };
 
 GameServer.handlePath = function(path,socketID){

@@ -6,11 +6,12 @@ var Utils = require('../shared/Utils.js').Utils;
 var PersonalUpdatePacket = require('./PersonalUpdatePacket.js').PersonalUpdatePacket;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
+var Inventory = require('../shared/Inventory.js').Inventory;
 
 function Player(){
     this.updatePacket = new PersonalUpdatePacket();
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
-    this.inventory = {}; // permanent inventory
+    this.inventory = new Inventory();
     this.settlement = 0;
 }
 
@@ -32,8 +33,28 @@ Player.prototype.setStartingPosition = function(){
 };
 
 Player.prototype.setStartingInventory = function(){
-    this.inventory = { "0" : 2 , "1" : 1 , "2" : 1 , "3" : 1};
+    //{ "0" : 20 , "1" : 1 , "2" : 1 , "3" : 1, "5": 14};
+    this.giveItem(0,20);
+    this.giveItem(1,1);
+    this.giveItem(2,1);
+    this.giveItem(3,1);
+    this.giveItem(5,14);
     this.updateInventory();
+};
+
+Player.prototype.hasItem = function(item,nb){
+    console.log(this.inventory.getNb(item),nb);
+    return (this.inventory.getNb(item) >= nb);
+};
+
+Player.prototype.giveItem = function(item,nb){
+    console.log('Giving ',GameServer.itemsData[item].name,'x',nb);
+    this.inventory.add(item,nb);
+};
+
+Player.prototype.takeItem = function(item,nb){
+    console.log('Taking ',GameServer.itemsData[item].name,'x',nb);
+    this.inventory.take(item,nb);
 };
 
 Player.prototype.trim = function(){
@@ -45,40 +66,34 @@ Player.prototype.trim = function(){
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    //if(this.route) trimmed.route = this.route.trim(this.category);
-    //if(this.target) trimmed.targetID = this.target.id;
     return trimmed;
 };
 
 Player.prototype.dbTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be stored in the database
     var trimmed = {};
-    var dbProperties = ['x','y','inventory']; // list of properties relevant to store in the database
+    var dbProperties = ['x','y']; // list of properties relevant to store in the database
     for(var p = 0; p < dbProperties.length; p++){
         trimmed[dbProperties[p]] = this[dbProperties[p]];
     }
+    trimmed.inventory = this.inventory.toList();
     return trimmed;
 };
 
 Player.prototype.getDataFromDb = function(document){
     // Set up the player based on the data stored in the databse
     // document is the mongodb document retrieved form the database
-    var dbProperties = ['x','y','inventory'];
+    var dbProperties = ['x','y'];
     for(var p = 0; p < dbProperties.length; p++){
         this[dbProperties[p]] = document[dbProperties[p]];
     }
     this.setOrUpdateAOI();
-    this.inventory = { "0" : 20 , "1" : 1 , "2" : 1 , "3" : 1, "5": 14}; // DEBUG TODO remove
+    this.inventory.fromList(document.inventory);
     this.updateInventory();
 };
 
 Player.prototype.updateInventory = function(){
-    var ids = Object.keys(this.inventory);
-    var items = [];
-    for(var i = 0; i < ids.length; i++){
-        items.push([ids[i],this.inventory[ids[i]]]);
-    }
-    this.updatePacket.addItems(items); // update personal update packet
+    this.updatePacket.addItems(this.inventory.toList()); // update personal update packet
 };
 
 Player.prototype.startIdle = function(){

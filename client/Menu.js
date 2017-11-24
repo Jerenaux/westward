@@ -72,3 +72,9 @@ Menu.prototype.hide = function(){
     Engine.showMarker();
     this.displayed = false;
 };
+
+Menu.prototype.refreshPanels = function(){
+    for(var i = 0; i < this.panels.length; i++){
+        this.panels[i].refreshInventory();
+    }
+};

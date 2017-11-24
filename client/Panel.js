@@ -26,28 +26,30 @@ function Panel(x,y,width,height,title){
 }
 
 Panel.prototype.makeBody = function(){
-    var w = this.width - 2*32;
-    var h = this.height - 2*32;
+    var sideWidth = 32;
+
+    var w = this.width - 2*sideWidth;
+    var h = this.height - 2*sideWidth;
 
     var x = this.x;
     var y = this.y;
     this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-topleft'));
-    x += 32;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,32,'UI','panel-top'));
+    x += sideWidth;
+    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth,'UI','panel-top'));
     x += w;
     this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-topright'));
     x = this.x;
-    y += 32;
-    this.container.push(Engine.scene.add.tileSprite(x,y,32,h,'UI','panel-left'));
-    x += 32;
+    y += sideWidth;
+    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-left'));
+    x += sideWidth;
     this.container.push(Engine.scene.add.tileSprite(x,y,w,h,'UI','panel-center'));
     x += w;
-    this.container.push(Engine.scene.add.tileSprite(x,y,32,h,'UI','panel-right'));
+    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-right'));
     x = this.x;
     y += h;
     this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-bottomleft'));
-    x += 32;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,32,'UI','panel-bottom'));
+    x += sideWidth;
+    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth,'UI','panel-bottom'));
     x += w;
     this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-bottomright'));
 };
@@ -84,24 +86,16 @@ Panel.prototype.addRing = function(xs,ys,color,symbol,callback){
     this.container.push(Engine.scene.add.sprite(x,y,'UI','ring'));
     x += 5;
     y += 5;
-    var cs = Engine.scene.add.sprite(x,y,'UI',color);
-    cs.upFrame = cs.frame.name;
-    cs.aliveFrame = cs.frame.name;
+
+    var cs = new Button(x,y,color,callback);
     this.container.push(cs);
     x += 3;
     y += 3;
-    var ss = Engine.scene.add.sprite(x,y,'UI',symbol);
 
+    var ss = Engine.scene.add.sprite(x,y,'UI',symbol);
+    ss.notInteractive = true;
     this.container.push(ss);
 
-    var downCallback = function(){
-        this.setFrame(this.upFrame+'-pressed');
-    };
-
-    cs.handleClick = callback.bind(this);
-    ss.handleClick = callback.bind(this);
-    cs.handleDown = downCallback.bind(cs);
-    ss.handleDown = downCallback.bind(cs);
     this.finalize();
     return cs;
 };
@@ -189,12 +183,13 @@ Panel.prototype.addEquip = function(){
     this.container.push(Engine.scene.add.sprite(this.x+150,this.y+150,'UI','equipment-slot'));
     this.container.push(Engine.scene.add.sprite(this.x+155,this.y+165,'UI','boots-shade'));
 
-    this.container.push(Engine.scene.add.sprite(this.x+100,this.y+220,'UI','equipment-slot'));
-    this.container.push(Engine.scene.add.sprite(this.x+110,this.y+230,'UI','ring-shade'));
-    this.container.push(Engine.scene.add.sprite(this.x+150,this.y+220,'UI','equipment-slot'));
-    this.container.push(Engine.scene.add.sprite(this.x+160,this.y+230,'UI','ring-shade'));
-    this.container.push(Engine.scene.add.sprite(this.x+200,this.y+220,'UI','equipment-slot'));
-    this.container.push(Engine.scene.add.sprite(this.x+210,this.y+230,'UI','ring-shade'));
+    var accessorY = 200;
+    this.container.push(Engine.scene.add.sprite(this.x+100,this.y+accessorY,'UI','equipment-slot'));
+    this.container.push(Engine.scene.add.sprite(this.x+110,this.y+accessorY+10,'UI','ring-shade'));
+    this.container.push(Engine.scene.add.sprite(this.x+150,this.y+accessorY,'UI','equipment-slot'));
+    this.container.push(Engine.scene.add.sprite(this.x+160,this.y+accessorY+10,'UI','ring-shade'));
+    this.container.push(Engine.scene.add.sprite(this.x+200,this.y+accessorY,'UI','equipment-slot'));
+    this.container.push(Engine.scene.add.sprite(this.x+210,this.y+accessorY+10,'UI','ring-shade'));
 
     this.finalize();
 };
@@ -268,8 +263,9 @@ Panel.prototype.finalize = function(){
         if(e.depth == 1 || !e.depth) e.depth = Engine.UIDepth;
         if(isText) e.depth++;
         e.setScrollFactor(0);
-        e.setDisplayOrigin(0,0);
-        e.setInteractive();
+        //if(e.constructor.name == 'TileSprite') e.setDisplayOrigin(0,0);
+        if(!e.centered) e.setDisplayOrigin(0,0);
+        if(!e.notInteractive) e.setInteractive();
         e.visible = false;
     });
 };
@@ -342,6 +338,7 @@ Panel.prototype.displayTheInventory = function(inv){
     var j = inv.firstSlot;
     for(var item in inventory.items){
         if(!inventory.items.hasOwnProperty(item)) continue;
+        if(inventory.getNb(item) == 0) continue;
         var sprite = this.getNextItemSprite(item,inv.callback);
         var pos = this.slots[j];
         sprite.setPosition(pos.x+2+16,pos.y+4+16);
@@ -374,10 +371,19 @@ Panel.prototype.hidePanel = function(){
     this.displayed = false;
 };
 
-Panel.prototype.hideInventory = function(){
+Panel.prototype.hideInventory = function(){ // Hide all items of all inventories of the panel at once
     for(var j = 0; j < this.sprites.length; j++){
         this.sprites[j].visible = false;
         if(this.texts[j]) this.texts[j].visible = false;
     }
     this.nextItemSprite = 0;
+};
+
+Panel.prototype.refreshInventory = function(){
+    if(this.displayInventory) {
+        this.hideInventory();
+        for(var i = 0; i < this.inventories.length; i++) {
+            this.displayTheInventory(this.inventories[i]);
+        }
+    }
 };

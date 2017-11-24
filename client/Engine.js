@@ -258,13 +258,13 @@ Engine.makeCraftingMenu = function(){
 
 Engine.makeInventory = function(){
     var inventory = new Menu('Inventory');
-    var equip = new Panel(665,100,340,380,'Equipment');
+    var equip = new Panel(665,100,340,250,'Equipment');
     equip.addEquip();
     inventory.addPanel(equip); // equipment panel
+    var stats = new Panel(665,360,340,120,'Stats');
+    inventory.addPanel(stats);
     var items = new Panel(40,100,600,380,'Items');
     items.addCapsule(500,-9,'1299','gold');
-    /*items.addSlots(15,9,Engine.player.inventory.maxSize);
-    items.setInventory(Engine.player.inventory,true);*/
     items.addInventory(null,15,Engine.player.inventory.maxSize,Engine.player.inventory,true);
     inventory.addPanel(items); // inventory panel
     return inventory;
@@ -284,10 +284,10 @@ Engine.addHero = function(id,x,y,settlement){
     Engine.player = Engine.addPlayer(id,x,y,settlement);
     //Engine.player.visible = Engine.showHero;
     Engine.camera.startFollow(Engine.player);
-    Engine.player.inventory = new Inventory(25);
+    Engine.player.inventory = new Inventory();
     Engine.player.buildingRecipes = new Inventory(10);
     Engine.player.itemRecipes = new Inventory(10);
-    Engine.updateInventory(Engine.player.buildingRecipes,[[4,1]]);
+    Engine.updateInventory(Engine.player.buildingRecipes,[[7,1]]);
     Engine.updateInventory(Engine.player.itemRecipes,[[6,1]]);
     Engine.updateEnvironment();
 };
@@ -375,9 +375,7 @@ Engine.isColliding = function(tile){ // tile is the index of the tile in the til
 };
 
 Engine.handleDown = function(event){
-    if(event.gameObject && event.gameObject.handleDown){
-        event.gameObject.handleDown();
-    }
+    if(event.gameObject && event.gameObject.handleDown) event.gameObject.handleDown();
 };
 
 Engine.handleClick = function(event){
@@ -395,6 +393,7 @@ Engine.handleClick = function(event){
 Engine.handleOver = function(event){
     if(event.gameObject){
         if(event.gameObject.constructor.name == 'Building') Engine.hideMarker();
+        if(event.gameObject.handleOver) event.gameObject.handleOver();
     }
 };
 
@@ -493,7 +492,10 @@ Engine.checkCollision = function(tile){ // tile is x, y pair
 * */
 
 Engine.updateSelf = function(data){
-    if(data.items) Engine.updateInventory(Engine.player.inventory,data.items);
+    if(data.items) {
+        Engine.updateInventory(Engine.player.inventory,data.items);
+        if(Engine.inMenu) Engine.currentMenu.refreshPanels();
+    }
 };
 
 Engine.updateInventory = function(inventory,items){
@@ -604,10 +606,6 @@ Engine.removeAnimal = function(id){
     delete Engine.animals[id];
 };
 
-Engine.update = function(){
-
-};
-
 Engine.getTilesetFromTile = function(tile){
     if(Engine.tilesetMap.hasOwnProperty(tile)) return Engine.tilesetMap[tile];
     for(var i = 0; i < Engine.tilesets.length; i++){
@@ -636,5 +634,5 @@ Engine.togglePanel = function(){ // When clicking on a player/building/animal, t
     }
 };
 Engine.recipeClick = function(){
-    Engine.craftingPanel.updateTarget(Engine.itemsData[this.itemID]);
+    Engine.craftingPanel.updateTarget(this.itemID,Engine.itemsData[this.itemID]);
 };

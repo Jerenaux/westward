@@ -1,8 +1,10 @@
 {
-  "0":{
-    "type":"fort",
+  "buildings":[
+    {
+    "type":0,
     "x": 140,
     "y": 427,
     "settlement": 0
   }
+  ]
 }

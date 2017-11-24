@@ -52,10 +52,13 @@ server.clientUpdateRate = 1000/5; // Rate at which update packets are sent
 server.walkUpdateRate = 1000/20; // Rate at which positions are updated
 server.npcUpdateRate = 1000/5;
 
+server.resetStamp = 1511554636794; // ignore returning players with stamps older than this and treat them as new
+
 io.on('connection',function(socket){
 
     socket.on('init-world',function(data){
         console.log('['+socket.id+'] Initialized');
+        if(!data.stamp || data.stamp < server.resetStamp) data.new = true; // TODO Remove eventually
         if(data.new){
             //if(!gs.checkSocketID(socket.id)) return;
             gs.addNewPlayer(socket);
@@ -66,6 +69,10 @@ io.on('connection',function(socket){
 
         socket.on('path',function(data){
             gs.handlePath(data,socket.id);
+        });
+
+        socket.on('craft',function(data){
+            gs.handleCraft(data,socket.id);
         });
     });
 
