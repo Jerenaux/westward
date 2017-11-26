@@ -203,7 +203,7 @@ WorldEditor.drawShore = function(tiles){
 
         switch(id){
             case undefined:
-                WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.top);
+                //WorldEditor.addTile(tile.x,tile.y,WorldEditor.shore.top);
                 break;
             case WorldEditor.W.topRightOut:
                 var tileID = (tile.y == 0 ? WorldEditor.shore.right : WorldEditor.shore.topRight); // prevent corners on the fringes

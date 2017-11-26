@@ -4,6 +4,8 @@
 var GameObject = require('./GameObject.js').GameObject;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
+var debug = true;
+
 function MovingEntity(){
     this.moving = false;
 }
@@ -20,7 +22,7 @@ MovingEntity.prototype.setPath = function(path){
 };
 
 MovingEntity.prototype.updatePathTick = function(){ // Compute in how many seconds will the entity have moved by one tile
-    if(this.path[1] === undefined) console.log('alert',this.path,this.path.length);
+    if(this.path.length <= 1) console.log('['+this.constructor.name+' '+this.id+'] ERROR: Path too short (length = '+this.path.length+')');
     if(this.path.length <= 1) return;
     var duration = PFUtils.getDuration(
             this.x,
@@ -28,18 +30,22 @@ MovingEntity.prototype.updatePathTick = function(){ // Compute in how many secon
             this.path[1][0],
             this.path[1][1]
         )*1000;
+    if(debug && duration < 200) console.log('['+this.constructor.name+' '+this.id+'] Next tick in '+duration+' ms');
     this.nextPathTick = Date.now() + duration;
 };
 
 MovingEntity.prototype.updateWalk = function(){
     if(Date.now() >= this.nextPathTick){
-        this.path.shift();
-        if(this.path.length > 0) this.updatePosition(this.path[0][0],this.path[0][1]);
-        if(this.path.length <= 1){
+        //if(debug) console.log('['+this.constructor.name+' '+this.id+'] Tick');
+        //if(debug) console.log('['+this.constructor.name+' '+this.id+'] Current path length : '+this.path.length);
+        this.path.shift(); // Position 0 after the shift is where the entity is supposed to be at this time
+        this.updatePosition(this.path[0][0],this.path[0][1]);
+        if(this.path.length > 1) {
+            this.updatePathTick();
+        }else{
+            if(debug) console.log('['+this.constructor.name+' '+this.id+'] Arrived at destination');
             this.moving = false;
             this.startIdle();
-        }else{
-            this.updatePathTick();
         }
     }
 };

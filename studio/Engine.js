@@ -2,8 +2,8 @@
  * Created by Jerome on 26-06-17.
  */
 var Engine = {
-    baseViewWidth: 32,
-    baseViewHeight: 18,
+    baseViewWidth: 32, //32,
+    baseViewHeight: 18, //18,
     tileWidth: 32,
     tileHeight: 32
 };
@@ -69,6 +69,11 @@ Engine.boot = function(){
     //Engine.mapDataLocation = 'assets/maps/chunks';
     Engine.mapDataLocation = '/maps';
     Engine.loadJSON(Engine.mapDataLocation+'/master.json',Engine.readMaster);
+
+    Engine.textureCache = {};
+
+    Engine.nbFilesToLoad = 0;
+    Engine.nbFilesLoaded = 0;
 };
 
 Engine.drawSelection = function(){
@@ -264,11 +269,31 @@ Engine.removeChunk = function(id){
     Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
 };
 
+
+
 Engine.showAll = function(){
-    for(var i = 0; i < World.lastChunkID; i++){
-        Engine.displayChunk(i);
+    /*var path = Engine.mapDataLocation+'/allData.json';
+    console.log('fetching '+path);
+    Engine.loadJSON(path,Engine.readAllData);*/
+};
+
+Engine.removeAll = function(){
+    var chunks = Utils.listVisibleAOIs(Engine.player.chunk);
+    for (var i = 0; i < chunks.length; i++) {
+        Engine.removeChunk(chunks[i]);
     }
 };
+
+/*Engine.readAllData = function(data){
+    console.log('All data successfully read');
+    var i = 0;
+    for(var chunk in data){
+        if(!data.hasOwnProperty(chunk)) continue;
+        Engine.drawChunk(data[chunk],i++);
+        if(i > 10) break;
+    }
+    console.log('done');
+};*/
 
 Engine.update = function(){
     Engine.renderer.render(Engine.stage);
@@ -323,7 +348,6 @@ Engine.capture = function(x,y,w,h){
     patternCanvas.height = h;
     var patternCtx = patternCanvas.getContext("2d");
     patternCtx.drawImage(Engine.renderer.view,x,y,w,h,0,0,w,h);
-
     var capture = document.createElement("img");
     capture.src = patternCanvas.toDataURL("image/png");
     document.getElementById("captures").appendChild(capture);
@@ -712,6 +736,27 @@ Engine.save = function(){
         Client.sendMapData(file,Engine.mapDataCache[file]);
     });
     Engine.editHistory = [];
+};
+
+Engine.displayQuadrant = function(quad){
+    Engine.removeAll();
+    for(var y = 0; y < 10; y++){
+        for(var x = 0; x < 10; x ++){
+            var c = quad + x + World.nbChunksHorizontal*y;
+            Engine.displayChunk(c);
+        }
+    }
+};
+
+Engine.captureMap = function(){
+    Engine.renderer.extract.canvas(Engine.stage).toBlob(function(b){
+        var a = document.createElement('a');
+        document.body.append(a);
+        a.download = 'fullMap';
+        a.href = URL.createObjectURL(b);
+        a.click();
+        a.remove();
+    }, 'image/png');
 };
 
 Engine.boot();

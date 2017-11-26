@@ -19,6 +19,10 @@ var Player = new Phaser.Class({
         this.panel.addRing(260,-10,'red','close',Engine.closePanel.bind(this.panel));
         this.handleClick = Engine.togglePanel.bind(this);
 
+        this.bubbleOffsetX = 55;
+        this.bubbleOffsetY = 75;
+        //this.bubble = new Bubble(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
+
         this.animsKeys = {
             move_down: 'player_move_down',
             move_up: 'player_move_up',

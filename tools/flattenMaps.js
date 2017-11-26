@@ -9,6 +9,8 @@ var WorldEditor = require('../studio/WorldEditor.js').WorldEditor;
 var indir, outdir, total;
 var counter = 0;
 
+var allData = {};
+
 function Layer(){
     this.data = [];
 }
@@ -26,6 +28,7 @@ function flatten(directory){
 
     fs.readdir(indir,function(err,files){
         total = files.length;
+        console.log(total+' files to flatten');
         for(var i = 0; i < files.length; i++){
             var f = files[i];
             //if(f == 'master.json') {
@@ -85,10 +88,21 @@ function flattenChunk(fileName){
         //console.log("Initial #layers = "+map.layers.length);
         //console.log("New #layers = "+newmap.layers.length);
 
+        allData[fileName] = newmap;
+
         fs.writeFile(path.join(outdir,fileName),JSON.stringify(newmap),function(err){
             counter++;
-            if(counter == total) console.log('All files flattened');
+            if(counter == total-2) {
+                console.log('All files flattened');
+                writeAllData();
+            }
         });
+    });
+}
+
+function writeAllData(){
+    fs.writeFile(path.join(outdir,'allData.json'),JSON.stringify(allData),function(err){
+        console.log('All-data written');
     });
 }
 

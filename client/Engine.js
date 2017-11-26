@@ -8,8 +8,9 @@ var Engine = {
     tileHeight: 32,
     buildingsDepth: 2,
     playersDepth: 2,
-    craftInvSize: 5, // max number of ingredients for crafting
+    bubbleDepth: 15,
     UIDepth: 20,
+    craftInvSize: 5, // max number of ingredients for crafting
     key: 'main', // key of the scene, for Phaser
     playerIsInitialized: false,
     cursor: 'url(/assets/sprites/cursor.png), auto', // image of the mouse cursor in normal circumstances
@@ -132,7 +133,6 @@ Engine.initWorld = function(data){
     Engine.addHero(data.id,data.x,data.y,data.settlement);
     Engine.makeUI();
     Engine.makeChatBar();
-    //new Bubble();
     Engine.createAnimations();
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing

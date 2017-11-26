@@ -134,7 +134,13 @@ Content:
 - Enable bonuses of merchants
 - Allow merchants and artisans to build their shops
 * World map
-- Static image
+- Static image:
+-> Fix null values in fringe chunks
+-> Split the map in k quadrants of l chunks
+-> List the corresponding chunk id's and display the chunks
+-> Save picture (with cartography())
+-> Remove all
+-> Next quadrant
 - Menu with static image
 - Minimap
 - Fog of war and exploration (chunks-based)
@@ -183,6 +189,8 @@ World building:
 - Add random elements
 - Investigate the possibility of making cliffs from terrain data of the east coast
 - Rework cliffs
+- Fix loops (lakes ...)
+- Fix null values in left-fringe chunks
 
 ###############
 V1 level:

@@ -7,6 +7,8 @@ var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
 var World = require('../shared/World.js').World;
 
+var debug = true;
+
 function Animal(x,y,type){
     this.id = GameServer.lastAnimalID++;
     //this.setStartingPosition();
@@ -47,16 +49,14 @@ Animal.prototype.startIdle = function(){
 
 Animal.prototype.updateIdle = function(){
     this.idleTime -= GameServer.server.npcUpdateRate;
-    //console.log('['+this.constructor.name+' '+this.id+']',this.idleTime);
     if(this.idleTime <= 0){
-        //console.log('['+this.constructor.name+' '+this.id+'] ready to move');
         var dest = this.findRandomDestination();
         var path = GameServer.findPath({x:this.x,y:this.y},dest);
-        if(!path || path.length == 0){
-            //console.log('['+this.constructor.name+' '+this.id+'] no path');
+        if(!path || path.length <= 1){
             this.idleTime = 200;
             return;
         }
+        if(debug) console.log('['+this.constructor.name+' '+this.id+'] Found path of length '+path.length);
         this.idle = false;
         this.setPath(path);
     }

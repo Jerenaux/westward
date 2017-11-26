@@ -97,7 +97,7 @@ Player.prototype.updateInventory = function(){
 };
 
 Player.prototype.startIdle = function(){
-    console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
+    //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){

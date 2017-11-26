@@ -50,7 +50,6 @@ var Moving = new Phaser.Class({
             this.movement.stop();
             this.updatePosition();
         }
-        //this.lastUpdateStamp = Date.now();
         var mover = this;
         this.movement = Engine.scene.tweens.timeline({
             tweens: tweens,
@@ -58,10 +57,7 @@ var Moving = new Phaser.Class({
                 mover.previousOrientation = null;
             },
             onUpdate: function(){
-                //if(Date.now() - mover.lastUpdateStamp > 5){
                     mover.updatePosition();
-                    //mover.lastUpdateStamp = Date.now();
-                //}
             },
             onComplete: function(){
                 mover.updatePosition();
@@ -93,6 +89,9 @@ var Moving = new Phaser.Class({
         this.tileY = Math.floor(this.y/Engine.tileHeight);
         this.updateDepth();
         this.chunk = Utils.tileToAOI({x: this.tileX, y: this.tileY});
+
+        if(this.bubble) this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
+
 
         if(this.constructor.name == 'Player' && this.id == Engine.player.id) {
             if(this.chunk != this.previousChunk) Engine.updateEnvironment();

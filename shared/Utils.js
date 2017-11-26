@@ -60,6 +60,9 @@ Utils.getMacroCoordinates = function(chunk){
 Utils.listVisibleAOIs = function(start){ // List the visible chunks around the player based on zoom level
     var limit;
     switch(Engine.zoomScale){
+        case 0.05:
+            limit = 20;
+            break;
         case 0.25:
             limit = 3;
             break;

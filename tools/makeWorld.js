@@ -154,14 +154,6 @@ function makeBasis(tilesetsData){
     return basis;
 }
 
-/*function emptyLayer(nb){
-    var arr = [];
-    for(var x = 0; x < nb; x++){
-        arr.push(0);
-    }
-    return arr;
-}*/
-
 function writeMasterFile(basis,tilesetsData,outdir){
     // Write master file
     var master = {
@@ -231,7 +223,17 @@ function applyBlueprint(bluePrint,outdir){
         }
         for(var i = 0; i < ids.length; i++) {
             var id = ids[i];
-            if(!visible.has(id)) WorldEditor.chunks[id] = null;
+            if(!visible.has(id)){
+                WorldEditor.chunks[id] = null;
+                continue;
+            }
+            for(var j = 0; j < WorldEditor.chunks[id].layers.length; j++){
+                var l = WorldEditor.chunks[id].layers[j];
+                for(var k = 0; l.data.length; k++){
+                    if(l.data[k] === null) console.log('ALERT: null values in layer'+id);
+                    continue;
+                }
+            }
         }
 
         writeFiles(outdir);
