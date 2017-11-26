@@ -81,6 +81,7 @@ Content:
 - Have a world to explore
 - Have a permanent presence of a few pickup items around settlements
 - Campfires
+- cf. Worldmap
 * Inns
 (- Enable players to put construction site)
 (- Enable players to commit to construction)
@@ -181,16 +182,19 @@ Polish:
 
 World building:
 --------------
-- Store forests and trees separately (trees.json) during dev
--> During flattening, read that file and draw trees tile by tile
--> Test high-layers after flattening
 - Different tree distribution based on geographical sectors
+-> Make weighted table based on distance to poles
+-> Randomly pick tree type from table
 - Compute tree density and spread random trees around accordingly
 - Add random elements
 - Investigate the possibility of making cliffs from terrain data of the east coast
 - Rework cliffs
+- Store forests and trees separately (trees.json) during dev
+-> During flattening, read that file and draw trees tile by tile
+-> Test high-layers after flattening
 - Fix loops (lakes ...)
 - Fix null values in left-fringe chunks
+- Plan for more layers in dev
 
 ###############
 V1 level:
@@ -284,6 +288,7 @@ Tools:
 ------
 Custom chunk editor:
 - Arrows on the fringes of the window allow to move quickly to adjacent chunks
+- See borders of adjacent chunks to match fringe tiles
 - Preserve whatever extra info is in the JSON file (vs Tiled who rewrites it)
 - Versioning of individual chunks (saved in separate folder), for unlimited undos
 

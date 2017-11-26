@@ -30,6 +30,45 @@ Utils.tileToAOI = function(tile){ // input coords in Tiles
     return (top*World.nbChunksHorizontal)+left;
 };
 
+Utils.tileToQuadrant = function(x,y,quadW,quadH){
+    if(!quadW) quadW = 10;
+    if(!quadH) quadH = 10;
+    var aoi = Utils.tileToAOI({x:x,y:y});
+    return Utils.aoiToQuadrant(aoi,quadW,quadH);
+};
+
+Utils.aoiToQuadrant = function(aoi,quadW,quadH){
+    var aoiCoords = Utils.lineToGrid(aoi,World.nbChunksHorizontal);
+    var nbQuadsHorizontal = Math.ceil(World.nbChunksHorizontal/quadW);
+    var top = Math.floor(aoiCoords.y/quadH);
+    var left = Math.floor(aoiCoords.x/quadW);
+    return (top*nbQuadsHorizontal)+left;
+};
+
+Utils.distanceToQuads = function(x,y,quads,quadW,quadH){
+    var q = Utils.tileToQuadrant(x,y,quadW,quadH);
+    var dists = [];
+    var qcoords = Utils.lineToGrid(q,quadW);
+    var sum = 0;
+    for(var i = 0; i < quads.length; i++){
+        var d = Utils.euclidean(
+            qcoords,
+            Utils.lineToGrid(quads[i],quadW)
+        );
+        sum += d;
+        dists.push(d);
+    }
+    console.log(dists);
+    console.log(sum)
+    return dists.map(function(d){
+        return d/sum;
+    });
+};
+
+Utils.euclidean = function(a,b){
+    return Math.sqrt(Math.pow(a.x-b.x,2)+Math.pow(a.y- b.y,2));
+};
+
 Utils.AOItoTile = function(aoi){
     if(!World.nbChunksHorizontal) console.log('ERROR : Chunk data not initialized');
     return {

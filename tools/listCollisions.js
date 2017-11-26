@@ -21,7 +21,7 @@ function listCollisions(directory){
     }
 
     var indir = path.join(__dirname,WorldEditor.mapsPath,directory);
-    var masterData = JSON.parse(fs.readFileSync(indir+'/master.json').toString());
+    var masterData = JSON.parse(fs.readFileSync(path.join(indir,'/master.json')).toString());
     World.readMasterData(masterData);
 
     var tilesetsData = JSON.parse(fs.readFileSync(__dirname+'/../assets/maps/tilesets.json').toString()); // tilesets.json is a "static" file in assets/maps

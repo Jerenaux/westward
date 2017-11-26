@@ -9,6 +9,7 @@ if(onServer){
     var World = require('../shared/World.js').World;
     var Utils = require('../shared/Utils.js').Utils;
     var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
+    var rwc = require('random-weighted-choice');
 }
 
 var WorldEditor = {
@@ -99,6 +100,29 @@ WorldEditor.TreesInfo = {
     tilesetWidth: 21 // width in tiles of the tilset containing the trees
 };
 WorldEditor.Trees = [
+    // south "summer" trees
+    {
+        firstgid: 682, // first gid of the tileset
+        root: 110, // id of the tile used as root
+        rootOffset: {x:1,y:5}, // offset of the root tile with respect to top left of the tree
+        tl: 4, // id of the top left tile of the tree
+        w: 4,
+        h: 6,
+        coll: [ // colliding tiles with respect to the root
+            {x:1,y:0},
+            {x:0,y:-1},
+            {x:1,y:-1}
+        ],
+        depth: { // depth of each y-level of the tree (top to bottom)
+            0: 3,
+            1: 3,
+            2: 3,
+            3: 3,
+            4: 1,
+            5: 1
+        }
+    },
+    // central trees
     {
         firstgid: 682, // first gid of the tileset
         root: 106, // id of the tile used as root
@@ -118,8 +142,83 @@ WorldEditor.Trees = [
             3: 1,
             4: 1
         }
+    },
+    // North "winter" trees
+    {
+        firstgid: 682, // first gid of the tileset
+        root: 114, // id of the tile used as root
+        rootOffset: {x:1,y:5}, // offset of the root tile with respect to top left of the tree
+        tl: 8, // id of the top left tile of the tree
+        w: 5,
+        h: 6,
+        coll: [ // colliding tiles with respect to the root
+            {x:1,y:0},
+            {x:0,y:-1},
+            {x:1,y:-1}
+        ],
+        depth: { // depth of each y-level of the tree (top to bottom)
+            0: 3,
+            1: 3,
+            2: 3,
+            3: 3,
+            4: 1,
+            5: 1
+        }
+    },
+    // dead trees
+    {
+        firstgid: 682, // first gid of the tileset
+        root: 121, // id of the tile used as root
+        rootOffset: {x:0,y:4}, // offset of the root tile with respect to top left of the tree
+        tl: 37, // id of the top left tile of the tree
+        w: 5,
+        h: 5,
+        coll: [ // colliding tiles with respect to the root
+            {x:1,y:0},
+            {x:0,y:-1},
+            {x:1,y:-1}
+        ],
+        depth: { // depth of each y-level of the tree (top to bottom)
+            0: 3,
+            1: 3,
+            2: 3,
+            3: 3,
+            4: 1,
+            5: 1
+        }
     }
 ];
+
+/*WorldEditor.Treetables = [
+    {weight:5, id: 0}, // summer
+    {weight:4, id: 1}, // central
+    {weight:1, id: 2} // winter
+];*/
+
+WorldEditor.setUpQuadrants = function(quadW,quadH){
+    // TL: 0,
+    // BL: 2800, Mid: 1371
+    WorldEditor.summerQuad = Utils.aoiToQuadrant(2800,quadW,quadH);
+    WorldEditor.centralQuad = Utils.aoiToQuadrant(1371,quadW,quadH);
+    WorldEditor.winterQuad = Utils.aoiToQuadrant(0,quadW,quadH);
+};
+
+/*GameServer.dropLoot = function(table,x,y){
+ // Weighted random selection of what item should be dropped by a monster
+ var defaultTable = [
+ {weight:5, id:'none'},
+ {weight:4, id:'item-flask'},
+ {weight:1, id:'item-burger'}
+ ];
+ var lootTable = table || defaultTable;
+ var itm = rwc(lootTable);
+ if(itm && itm != 'none'){
+ var item = new Item(x,y,itm,false,false,true);  // no respawn, not chest, loot
+ item.makeTemporary();
+ GameServer.addAtLocation(item);
+ }
+ };
+ */
 
 WorldEditor.Layer = function(w,h,name){
     this.data = [];
@@ -166,7 +265,9 @@ WorldEditor.isInWorldBounds = function(x,y){
 WorldEditor.drawTree = function(x,y){
     if(!WorldEditor.isInWorldBounds(x,y)) return false;
     if(WorldEditor.isBusy({x:x,y:y})) return false;
+
     var tree = Utils.randomElement(WorldEditor.Trees);
+
     for(var i = 0; i < tree.coll.length; i++){
         var c = tree.coll[i];
         var tmpx = x + c.x;

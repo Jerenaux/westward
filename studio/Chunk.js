@@ -61,7 +61,6 @@ Chunk.prototype.drawTile = function(x,y,tile,layer){
     if(!tile) return;
     var tileID = tile;
     var texture;
-    if(x == 0 && y == 200) console.log('alert! from '+this.id);
     if(Engine.textureCache.hasOwnProperty(tileID)){
         texture = Engine.textureCache[tileID];
     }else {
