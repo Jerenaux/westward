@@ -35,21 +35,21 @@ Panel.prototype.makeBody = function(){
     var y = this.y;
     this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-topleft'));
     x += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth,'UI','panel-top'));
+    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth+2,'UI','panel-top'));
     x += w;
     this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-topright'));
     x = this.x;
     y += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-left'));
+    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h+2,'UI','panel-left'));
     x += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,h,'UI','panel-center'));
+    this.container.push(Engine.scene.add.tileSprite(x,y,w,h+2,'UI','panel-center'));
     x += w;
-    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-right'));
+    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h+2,'UI','panel-right'));
     x = this.x;
     y += h;
     this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-bottomleft'));
     x += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth,'UI','panel-bottom'));
+    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth+2,'UI','panel-bottom'));
     x += w;
     this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-bottomright'));
 };
@@ -222,7 +222,7 @@ Panel.prototype.updatePosition = function(){
     this.previousY = this.y;
 };
 
-Panel.prototype.setTweens = function(sx,sy,ex,ey){
+Panel.prototype.setTweens = function(sx,sy,ex,ey,duration){
     var _this = this;
     this.showTween = Engine.scene.tweens.add({
         targets: this,
@@ -236,13 +236,12 @@ Panel.prototype.setTweens = function(sx,sy,ex,ey){
         onUpdate: function(){
             _this.updatePosition();
         },
-        duration: 200
+        duration: duration
     });
     this.hideTween = Engine.scene.tweens.add({
         targets: this,
         x: sx,
         y: sy,
-        //ease: 'Bounce.easeOut',
         paused: true,
         onStart: function(){
             //console.log('hide start');

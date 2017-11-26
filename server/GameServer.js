@@ -192,10 +192,29 @@ GameServer.handleCraft = function(data,socketID){
     if(!GameServer.allIngredientsOwned(player,recipe,nb)) return;
     var building = GameServer.itemsData[targetItem].building;
     if(building >= 0){
-        //console.log(GameServer.canBuild(player,building));
+        console.log(GameServer.canBuild(player,building));
     }else {
         GameServer.operateCraft(player, recipe, targetItem, nb);
     }
+};
+
+GameServer.canBuild = function(player,building){
+    var data = GameServer.buildingsData[building];
+    var w = Math.ceil(data.width/32);
+    var h = Math.ceil(data.height/32);
+    var x = player.x - Math.floor(w/2);
+    var y = player.y - Math.floor(h/2);
+    console.log('building at ',x,y);
+
+    // TODO: store somewhere
+    var shape = [];
+    for(var i = 0; i < data.shape.length; i+=2){
+        shape.push({
+            x: data.shape[i],
+            y: data.shape[i+1]
+        });
+    }
+    return PFUtils.collisionsFromShape(shape,x,y,data.width,data.height,GameServer.collisions,true);
 };
 
 GameServer.allIngredientsOwned = function(player,recipe,nb){

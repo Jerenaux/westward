@@ -18,16 +18,28 @@ var Moving = new Phaser.Class({
             x : x*Engine.tileWidth,
             y : y*Engine.tileHeight
         };
+        this.previousTile = {
+            x: this.tileX,
+            y: this.tileY
+        };
         this.orientation = 'down';
         this.previousOrientation = this.orientation;
         this.movement = null;
 
         this.setInteractive();
+        console.log('['+this.constructor.name+'] scene : ',this.scene);
     },
 
     updateDepth: function(){
         //console.log(Engine.playersDepth + this.tileY/1000);
-        this.depth = Engine.playersDepth + this.tileY/1000;
+        try {
+            this.depth = Engine.playersDepth + this.tileY / 1000;
+        }catch(e){
+            console.log('attempted value : ',Engine.playersDepth + this.tileY / 1000);
+            console.log(this.scene);
+            console.log(this);
+            throw e;
+        }
     },
 
     move: function(path){
@@ -87,15 +99,45 @@ var Moving = new Phaser.Class({
         };
         this.tileX = Math.floor(this.x/Engine.tileWidth);
         this.tileY = Math.floor(this.y/Engine.tileHeight);
+        if(this.constructor.name == 'Player') this.leaveFootprint();
+        this.previousTile.x = this.tileX;
+        this.previousTile.y = this.tileY;
         this.updateDepth();
         this.chunk = Utils.tileToAOI({x: this.tileX, y: this.tileY});
 
         if(this.bubble) this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
 
-
         if(this.constructor.name == 'Player' && this.id == Engine.player.id) {
             if(this.chunk != this.previousChunk) Engine.updateEnvironment();
             this.previousChunk = this.chunk;
+        }
+    },
+
+    leaveFootprint: function(){
+        if(this.tileX != this.previousTile.x || this.tileY != this.previousTile.y){
+            var dx = this.tileX - this.previousTile.x;
+            var dy = this.tileY - this.previousTile.y;
+            var angle = 0;
+            if(dx == 1 && dy == 0){
+                angle = 90;
+            }else if(dx == -1 && dy == 0){
+                angle = -90
+            }else if(dx == 0 && dy == 1){
+                angle = 180;
+            }
+            var sx = this.previousTile.x*Engine.tileWidth + Engine.tileWidth/2;
+            var sy = this.previousTile.y*Engine.tileHeight + Engine.tileHeight/2;
+            // TODO: use pool instead
+            var print = Engine.scene.add.image(sx,sy,'footsteps');
+            print.angle += angle;
+            print.alpha = 0.7;
+            print.depth = Engine.playersDepth;
+
+            Engine.scene.tweens.add({
+                targets: print,
+                alpha: 0,
+                duration: 1500
+            });
         }
     }
 });

@@ -7,7 +7,7 @@ var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
 var World = require('../shared/World.js').World;
 
-var debug = true;
+var debug = false;
 
 function Animal(x,y,type){
     this.id = GameServer.lastAnimalID++;

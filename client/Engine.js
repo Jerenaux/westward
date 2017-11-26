@@ -21,6 +21,7 @@ Engine.preload = function() {
     this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
 
     this.load.image('talk', 'assets/sprites/talk.png');
+    this.load.image('footsteps', 'assets/sprites/footsteps.png');
 
     this.load.image('scroll', 'assets/sprites/scroll.png');
     this.load.image('tome', 'assets/sprites/tome.png');
@@ -197,7 +198,7 @@ Engine.makeChatBar = function(){
     var chaty = Engine.scene.game.config.height;
     Engine.chat = new Panel(chatx,chaty,chatw,96);
     Engine.chat.addSprite('talk',null,12,8);
-    Engine.chat.setTweens(chatx,chaty,chatx,chaty - 40);
+    Engine.chat.setTweens(chatx,chaty,chatx,chaty - 40,200);
     Engine.chat.domElement = document.getElementById("chat");
     var domx = (32*16) - 100 + 12;
     Engine.chat.domElement.style.left = domx+"px";
@@ -243,8 +244,8 @@ Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
 
     var recipes = new Panel(765,100,240,380,'Recipes');
-    recipes.addInventory('Buildings',5,5,Engine.player.buildingRecipes,false,Engine.recipeClick);
     recipes.addInventory('Items',5,10,Engine.player.itemRecipes,false,Engine.recipeClick);
+    recipes.addInventory('Buildings',5,5,Engine.player.buildingRecipes,false,Engine.recipeClick);
     crafting.addPanel(recipes); // recipes panel
 
     Engine.craftingPanel = new CraftingPanel(450,100,290,380,'Combination');
@@ -625,15 +626,16 @@ Engine.closePanel = function(){this.hide();};
 Engine.togglePanel = function(){ // When clicking on a player/building/animal, toggle the corresponding panel visibility
     if(Engine.inMenu) return;
     if(this.panel.displayed){
-        this.panel.hide();
+        //this.panel.hide();
         Engine.inPanel = false;
         Engine.currentPanel = null;
     }else {
         if(Engine.inPanel) Engine.currentPanel.hide();
-        this.panel.display();
+        //this.panel.display();
         Engine.inPanel = true;
         Engine.currentPanel = this.panel;
     }
+    this.panel.toggle();
 };
 Engine.recipeClick = function(){
     Engine.craftingPanel.updateTarget(this.itemID,Engine.itemsData[this.itemID]);

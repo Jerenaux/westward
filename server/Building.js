@@ -55,7 +55,7 @@ Building.prototype.addCollisions = function(){
         spriteY = this.y;
     }
 
-    this.collidingTiles = PFUtils.collisionsFromShape(this.shape,spriteX,spriteY,data.width,data.height,GameServer.collisions);
+    PFUtils.collisionsFromShape(this.shape,spriteX,spriteY,data.width,data.height,GameServer.collisions);
 };
 
 module.exports.Building = Building;

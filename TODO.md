@@ -19,14 +19,18 @@ Prototype level:
 
 Cleaning:
 --------
+- Use pool for footsteps
+- Wherever possible, replace sprites by images
+- Investigate using blitters instead, for footsteps etc. (see https://phaser.io/phaser3/devlog/56)
+- listCollisions: don't store water tiles, only shore etc.
 - Clean up json: those in maps should be arrays; those in data should have numeric keys
 - Decide what to do with assets/maps folder, both for dev and prod
 - Merge all the addXXX and removeXXX methods (but keepl separate lists) + merge addXXX loops in updateWorld()
 - Clean up Utils
+- Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild)
 - Split server in two (game and dev server)
 - Standardize the use of Utils methods for coordianes manipulations (gridtoline, linetogrid, tiletoiAOI, AOItotile, tileRelativeToAOI...)
 - Remove unnecessary Geometry methods
-- listCollisions: don't store ater tiles, only shore etc.
 - Restructure UI, maybe remove UIElement, only have a set of generic functions to bind to interactive sprites?
 - Think about a Container class or something to affect the transforms of all children, get rid of repeated finalize() calls
 => Use container game object from Phaser
@@ -158,7 +162,6 @@ Design document:
 
 Polish:
 ------
-- Add tweens to player/building panels (if the 9-slice breaks, make the tileSprites slightly bigger so that they overlap with the corners?)
 - Feedback for rejected paths because too long (question mark, sound, ...)
 - Menu sprites change size when hovered / clicked
 - Hover cards over empty equipment slots
@@ -175,9 +178,11 @@ Polish:
 - Custom movement marker
 - Polish existing content
 - Footsteps, light effects, sound effects (on actions + environment: birds, water, ...)
+- Different footpritns for different animals
 - HUD, title screen, animations ...
 - Animal noises when beasts in proximity, animal footsteps, player footsteps noise
 - Carcasses, traces of fight
+- Fix panel tweens (positions not update often enough?)
 - Varied and nice landmarks to give life to the world and act as waypoints
 
 World building:
@@ -185,6 +190,7 @@ World building:
 - Different tree distribution based on geographical sectors
 -> Make weighted table based on distance to poles
 -> Randomly pick tree type from table
+-> 1/1000 chance of dead tree, regardless of type
 - Compute tree density and spread random trees around accordingly
 - Add random elements
 - Investigate the possibility of making cliffs from terrain data of the east coast

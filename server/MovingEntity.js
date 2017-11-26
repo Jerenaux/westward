@@ -4,7 +4,7 @@
 var GameObject = require('./GameObject.js').GameObject;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
-var debug = true;
+var debug = false;
 
 function MovingEntity(){
     this.moving = false;

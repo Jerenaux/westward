@@ -15,8 +15,10 @@ var Player = new Phaser.Class({
         var height = 100;
         var width = 300;
         var py = Engine.baseViewHeight*Engine.tileHeight - height;
-        this.panel = new Panel(0,py,width,height,'Player name');
-        this.panel.addRing(260,-10,'red','close',Engine.closePanel.bind(this.panel));
+        this.panel = new Panel(0,py+height,width,height,'Player name');
+        //this.panel.addRing(260,-10,'red','close',Engine.closePanel.bind(this.panel));
+        this.panel.addRing(260,-10,'red','close',Engine.togglePanel.bind(this));
+        this.panel.setTweens(0,py+height,0,py,300);
         this.handleClick = Engine.togglePanel.bind(this);
 
         this.bubbleOffsetX = 55;
