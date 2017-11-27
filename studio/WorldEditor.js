@@ -51,7 +51,8 @@ WorldEditor.shore = { // indexes of tiles in tilesets for shores
     bottomLeftOut: 251,
     topRightOut: 271,
     topLeftOut: 272,
-    water: 292
+    water: 292, // 241 + 51
+    water2: 269
 };
 
 WorldEditor.grass = {
@@ -136,8 +137,8 @@ WorldEditor.Trees = [
             {x:1,y:-1}
         ],
         depth: { // depth of each y-level of the tree (top to bottom)
-            0: 3,
-            1: 3,
+            0: 5,
+            1: 4,
             2: 3,
             3: 1,
             4: 1
@@ -266,7 +267,8 @@ WorldEditor.drawTree = function(x,y){
     if(!WorldEditor.isInWorldBounds(x,y)) return false;
     if(WorldEditor.isBusy({x:x,y:y})) return false;
 
-    var tree = Utils.randomElement(WorldEditor.Trees);
+    //var tree = Utils.randomElement(WorldEditor.Trees);
+    var tree = WorldEditor.Trees[1];
 
     for(var i = 0; i < tree.coll.length; i++){
         var c = tree.coll[i];
@@ -458,10 +460,13 @@ WorldEditor.addTile = function(x,y,tile,l,overlap){
     var cy = y - origin.y;
     var idx = Utils.gridToLine(cx, cy, chunk.width);
     if(overlap){
-        if(chunk.layers[layer].data[idx]) layer++;
-        if(layer >= chunk.layers.length) {
-            var newlayer = new WorldEditor.Layer(chunk.width,chunk.height,"overlap");
-            newlayer.data = WorldEditor.emptyLayer(chunk.width*chunk.height);
+        if(chunk.layers[layer] && chunk.layers[layer].data[idx]) layer++;
+    }
+    if(layer >= chunk.layers.length) {
+        var diff = layer - chunk.layers.length + 1;
+        for(var e = 0; e < diff; e++) {
+            var newlayer = new WorldEditor.Layer(chunk.width, chunk.height, "overlap"+e);
+            newlayer.data = WorldEditor.emptyLayer(chunk.width * chunk.height);
             chunk.layers.push(newlayer);
         }
     }

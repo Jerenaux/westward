@@ -59,7 +59,9 @@ Utils.distanceToQuads = function(x,y,quads,quadW,quadH){
         dists.push(d);
     }
     console.log(dists);
-    console.log(sum)
+    // revert: d' = sum/d
+    // normalize: z = d'/sum'
+    // e.g. (2,2,6) -> (5,5,1,667) -> (0,43,0,43,0,14)
     return dists.map(function(d){
         return d/sum;
     });

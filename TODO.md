@@ -22,8 +22,8 @@ Cleaning:
 - Use pool for footsteps
 - Wherever possible, replace sprites by images
 - Investigate using blitters instead, for footsteps etc. (see https://phaser.io/phaser3/devlog/56)
-- listCollisions: don't store water tiles, only shore etc.
 - Clean up json: those in maps should be arrays; those in data should have numeric keys
+- Give toString method to custom objects to replace [this.constructor.name this.id] ...
 - Decide what to do with assets/maps folder, both for dev and prod
 - Merge all the addXXX and removeXXX methods (but keepl separate lists) + merge addXXX loops in updateWorld()
 - Clean up Utils
@@ -48,11 +48,11 @@ general rule for code organization: for equipment, stats...)
 Content:
 -------
 * Battle system
-- Trigger battle when clicking on monster (process 'battle' event)
-- Set up turns, and timers
 - End battle if disconnect
 - Visual cue to indicate that in battle (based on inFight flag)
+- Test (dis)appearance of cues as seen from a third party, when a player attacks a wold the disconnects
 - Visual cue to indicate who's turn it is
+- Visual timer
 - Menus to decide which action to take, on which target
 - Movement on the battlefield
 - Set up basic stats and formulas for melee attacks
@@ -140,7 +140,6 @@ Content:
 - Allow merchants and artisans to build their shops
 * World map
 - Static image:
--> Fix null values in fringe chunks
 -> Split the map in k quadrants of l chunks
 -> List the corresponding chunk id's and display the chunks
 -> Save picture (with cartography())
@@ -187,6 +186,12 @@ Polish:
 
 World building:
 --------------
+- Test flattening of trees
+- listCollisions: don't store water tiles, only shore etc.
+- Flattening: second pass to delet water-only chunks based on visibility
+- Fix null values in left-fringe chunks
+->nulls in corrupted chunks likely arise from "undefined" values being converted to null by JSON.stringify
+-> Happens on the fringe -> because for these drawShore returns undefined?!
 - Different tree distribution based on geographical sectors
 -> Make weighted table based on distance to poles
 -> Randomly pick tree type from table
@@ -195,16 +200,25 @@ World building:
 - Add random elements
 - Investigate the possibility of making cliffs from terrain data of the east coast
 - Rework cliffs
-- Store forests and trees separately (trees.json) during dev
+- Fix loops (lakes ...)
+- Plan for more layers in dev
+- Store forests and trees separately (trees.json) during dev?
 -> During flattening, read that file and draw trees tile by tile
 -> Test high-layers after flattening
-- Fix loops (lakes ...)
-- Fix null values in left-fringe chunks
-- Plan for more layers in dev
 
 ###############
 V1 level:
 ###############
+
+Analytics:
+---------
+- Use gameanalytics?
+- Log as many things as possible: session duration, distance travelled per session, time spent in settlement per session, in nature per session,
+interactions with buildings, time spent in each individual menu, etc.
+- Cluster "heavy" players vs "small-time" players and look for differences between the two
+- Analyze sessions of one-time players who never come back
+- Find other meaningful clusters (maybe in unsupervized fashion)
+- Compare behaviors to how you expect the game to be played
 
 Content:
 -------

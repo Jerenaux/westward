@@ -88,13 +88,11 @@ function flattenChunk(fileName){
         //console.log("Initial #layers = "+map.layers.length);
         //console.log("New #layers = "+newmap.layers.length);
 
-        allData[fileName] = newmap;
-
         fs.writeFile(path.join(outdir,fileName),JSON.stringify(newmap),function(err){
             counter++;
             if(counter == total-2) {
                 console.log('All files flattened');
-                writeAllData();
+                //writeAllData();
             }
         });
     });

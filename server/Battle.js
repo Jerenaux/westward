@@ -37,6 +37,11 @@ Battle.prototype.update = function(){
 
 Battle.prototype.end = function(){
     clearInterval(this.loop);
+    this.fighters.forEach(function(f){
+        if(f.constructor.name == 'Player') f.setProperty('inFight',false);
+        f.battle = null;
+    });
+    // TODO: respawn if quitting battle by disconnecting
 };
 
 module.exports.Battle = Battle;

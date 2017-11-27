@@ -146,10 +146,11 @@ GameServer.removePlayer = function(socketID){
     AOIs.forEach(function(aoi){
         GameServer.addDisconnectToAOI(aoi,player.id);
     });
+    if(player.battle) player.battle.end();
     delete GameServer.socketMap[socketID];
     delete GameServer.players[player.id];
     GameServer.nbConnectedChanged = true;
-    console.log(GameServer.server.getNbConnected()+' connected');
+    //console.log(GameServer.server.getNbConnected()+' connected');
 };
 
 GameServer.getAOIAt = function(x,y){

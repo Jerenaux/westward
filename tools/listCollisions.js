@@ -21,10 +21,10 @@ function listCollisions(directory){
     }
 
     var indir = path.join(__dirname,WorldEditor.mapsPath,directory);
-    var masterData = JSON.parse(fs.readFileSync(path.join(indir,'/master.json')).toString());
+    var masterData = JSON.parse(fs.readFileSync(path.join(indir,'master.json')).toString());
     World.readMasterData(masterData);
 
-    var tilesetsData = JSON.parse(fs.readFileSync(__dirname+'/../assets/maps/tilesets.json').toString()); // tilesets.json is a "static" file in assets/maps
+    var tilesetsData = JSON.parse(fs.readFileSync(path.join(__dirname,'/../assets/maps/tilesets.json')).toString()); // tilesets.json is a "static" file in assets/maps
     for(var i = 0, firstgid = 1; i < tilesetsData.tilesets.length; i++) {
         var tileset = tilesetsData.tilesets[i];
         for(var j = 0; j < tileset.collisions.length; j++){

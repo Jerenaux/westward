@@ -32,6 +32,8 @@ Engine.boot = function(){
     Engine.viewWidth = Engine.baseViewWidth;
     Engine.viewHeight = Engine.baseViewHeight;
 
+    console.log(Engine.renderer); // Engine.renderer.getParameter(Engine.renderer.MAX_TEXTURE_SIZE
+
     Engine.setAction('move');
     //Engine.setAction('addForest');
     Engine.showGrid = Utils.getPreference('showGrid',false);
@@ -740,8 +742,10 @@ Engine.save = function(){
 
 Engine.displayQuadrant = function(quad){
     Engine.removeAll();
-    for(var y = 0; y < 10; y++){
-        for(var x = 0; x < 10; x ++){
+    var quadW = 40;
+    var quadH = 1;
+    for(var y = 0; y < quadH; y++){
+        for(var x = 0; x < quadW; x ++){
             var c = quad + x + World.nbChunksHorizontal*y;
             Engine.displayChunk(c);
         }
@@ -760,3 +764,11 @@ Engine.captureMap = function(){
 };
 
 Engine.boot();
+
+    function getMaxTextureSize() {
+        //var gl = document.getElementById( "my-canvas").getContext( "experimental-webgl" );
+        var gl = Engine.renderer.view.getContext( "experimental-webgl" );
+        if ( !gl )
+            return;
+        console.log(gl.getParameter(gl.MAX_TEXTURE_SIZE));
+    }
