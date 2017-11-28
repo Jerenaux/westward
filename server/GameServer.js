@@ -59,15 +59,15 @@ GameServer.readMap = function(mapsPath){
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
     var buildings = JSON.parse(fs.readFileSync('./assets/maps/buildings.json').toString());
     //for(var bid in buildings.buildings){
-    for(var i = 0; i < buildings.buildings.length; i++){
-        var data = buildings.buildings[i];
+    for(var i = 0; i < buildings.list.length; i++){
+        var data = buildings.list[i];
         new Building(data.x,data.y,data.type,data.settlement,data.stock);
     }
 
     // Spawn animals
     var animals = JSON.parse(fs.readFileSync('./assets/maps/animals.json').toString());
-    for(var aid in animals){
-        var data = animals[aid];
+    for(var i = 0; i < animals.list.length; i++){
+        var data = animals.list[i];
         var x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
         var y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
         var animal = new Animal(x,y,data.type);

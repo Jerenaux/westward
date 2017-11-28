@@ -1994,6 +1994,7 @@ Texture.prototype.uploadData = function(data, width, height)
 
 	if(width !== this.width || height !== this.height)
 	{
+        console.log(width,height);
 		gl.texImage2D(gl.TEXTURE_2D, 0, this.format,  width, height, 0, this.format, this.type, data || null);
 	}
 	else

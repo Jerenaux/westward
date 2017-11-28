@@ -28,8 +28,9 @@ Chunk.prototype.drawLayers = function(){
                     console.log('ALERT: null values in chunk '+this.id);
                     this.nullWarning = true;
                 }
-                var x = origin.x + i % this.tilesWidth;
-                var y = origin.y + Math.floor(i / this.tilesWidth);
+                var coord = Utils.lineToGrid(i,this.tilesWidth);
+                var x = origin.x + coord.x;
+                var y = origin.y + coord.y;
                 this.drawTile(x,y,tile,layer);
             }
         }else{
@@ -45,7 +46,6 @@ Chunk.prototype.drawLayers = function(){
 Chunk.prototype.addTile = function(x,y,tile,layer){
     if(this.fromFile) return; // original chunks cannot be tampered with
     this.children[layer].data.add(x,y,tile);
-    //console.log('added '+tile+' at '+x+', '+y+' on layer '+layer);
 };
 
 Chunk.prototype.orderTiles = function(){
@@ -68,9 +68,10 @@ Chunk.prototype.drawTile = function(x,y,tile,layer){
         var tileset = Engine.tilesets[tilesetID];
         tile -= tileset.firstgid;
         var wdth = Math.floor(tileset.imagewidth / Engine.tileWidth);
-        var tx = tile % wdth;
-        var ty = Math.floor(tile / wdth);
-        texture = new PIXI.Texture(Engine.resources[tileset.name].texture, new PIXI.Rectangle(tx * Engine.tileWidth, ty * Engine.tileHeight, Engine.tileWidth, Engine.tileHeight));
+        var coord = Utils.lineToGrid(tile,wdth);
+        //var tx = tile % wdth;
+        //var ty = Math.floor(tile / wdth);
+        texture = new PIXI.Texture(Engine.resources[tileset.name].texture, new PIXI.Rectangle(coord.x * Engine.tileWidth, coord.y * Engine.tileHeight, Engine.tileWidth, Engine.tileHeight));
         Engine.textureCache[tileID] = texture;
     }
     var sprite = new PIXI.Sprite(texture);

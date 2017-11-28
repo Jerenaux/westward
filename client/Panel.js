@@ -35,21 +35,21 @@ Panel.prototype.makeBody = function(){
     var y = this.y;
     this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-topleft'));
     x += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth+2,'UI','panel-top'));
+    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth,'UI','panel-top'));
     x += w;
     this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-topright'));
     x = this.x;
     y += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h+2,'UI','panel-left'));
+    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-left'));
     x += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,h+2,'UI','panel-center'));
+    this.container.push(Engine.scene.add.tileSprite(x,y,w,h,'UI','panel-center'));
     x += w;
-    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h+2,'UI','panel-right'));
+    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-right'));
     x = this.x;
     y += h;
     this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-bottomleft'));
     x += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth+2,'UI','panel-bottom'));
+    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth,'UI','panel-bottom'));
     x += w;
     this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-bottomright'));
 };
@@ -167,33 +167,6 @@ Panel.prototype.addSlots = function(nbHorizontal,total){
     this.finalize();
 };
 
-Panel.prototype.addEquip = function(){
-    this.container.push(Engine.scene.add.sprite(this.x+150,this.y+50,'UI','equipment-slot'));
-    this.container.push(Engine.scene.add.sprite(this.x+155,this.y+60,'UI','armor-shade'));
-    this.container.push(Engine.scene.add.sprite(this.x+100,this.y+65,'UI','equipment-slot'));
-    this.container.push(Engine.scene.add.sprite(this.x+108,this.y+75,'UI','gun-shade'));
-    this.container.push(Engine.scene.add.sprite(this.x+100,this.y+115,'UI','equipment-slot'));
-    this.container.push(Engine.scene.add.sprite(this.x+108,this.y+122,'UI','sword-shade'));
-    this.container.push(Engine.scene.add.sprite(this.x+200,this.y+65,'UI','equipment-slot'));
-    this.container.push(Engine.scene.add.sprite(this.x+208,this.y+75,'UI','shield-shade'));
-    this.container.push(Engine.scene.add.sprite(this.x+200,this.y+15,'UI','equipment-slot'));
-    this.container.push(Engine.scene.add.sprite(this.x+210,this.y+25,'UI','necklace-shade'));
-    this.container.push(Engine.scene.add.sprite(this.x+150,this.y+100,'UI','equipment-slot'));
-    this.container.push(Engine.scene.add.sprite(this.x+158,this.y+115,'UI','belt-shade'));
-    this.container.push(Engine.scene.add.sprite(this.x+150,this.y+150,'UI','equipment-slot'));
-    this.container.push(Engine.scene.add.sprite(this.x+155,this.y+165,'UI','boots-shade'));
-
-    var accessorY = 200;
-    this.container.push(Engine.scene.add.sprite(this.x+100,this.y+accessorY,'UI','equipment-slot'));
-    this.container.push(Engine.scene.add.sprite(this.x+110,this.y+accessorY+10,'UI','ring-shade'));
-    this.container.push(Engine.scene.add.sprite(this.x+150,this.y+accessorY,'UI','equipment-slot'));
-    this.container.push(Engine.scene.add.sprite(this.x+160,this.y+accessorY+10,'UI','ring-shade'));
-    this.container.push(Engine.scene.add.sprite(this.x+200,this.y+accessorY,'UI','equipment-slot'));
-    this.container.push(Engine.scene.add.sprite(this.x+210,this.y+accessorY+10,'UI','ring-shade'));
-
-    this.finalize();
-};
-
 Panel.prototype.addLine = function(line){
     var text = Engine.scene.add.text(this.x+15, this.y+this.verticalOffset, line,
         { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
@@ -215,6 +188,14 @@ Panel.prototype.updatePosition = function(){
     var dy = this.y - this.previousY;
     if(dx == 0 && dy == 0) return;
     this.container.forEach(function(e){
+        e.x += dx;
+        e.y += dy;
+    });
+    this.sprites.forEach(function(e){
+        e.x += dx;
+        e.y += dy;
+    });
+    this.texts.forEach(function(e){
         e.x += dx;
         e.y += dy;
     });
@@ -341,6 +322,7 @@ Panel.prototype.displayTheInventory = function(inv){
         var sprite = this.getNextItemSprite(item,inv.callback);
         var pos = this.slots[j];
         sprite.setPosition(pos.x+2+16,pos.y+4+16);
+        //this.container.push(sprite);
         if(inv.showNumbers) {
             var text = this.getNextText(inventory.getNb(item));
             text.setPosition(pos.x + 37, pos.y + 18);

@@ -3,7 +3,9 @@ var layerDepth = { // maps layer id to depth
     1: 1, // terrain
     2: 2, // stuff
     3: 5, // canopy
-    4: 5 // overlap
+    4: 6, // overlap
+    5: 7,
+    6: 8
 };
 
 function Chunk(mapData,id,z){
@@ -32,12 +34,10 @@ Chunk.prototype.drawLayers = function(){
         for (var i = 0; i < data.length; i++) {
             var tile = data[i];
             if (tile == 0 || tile == null) continue;
-            var cx = i % this.width;
-            var cy = Math.floor(i / this.width);
-            var x = this.x + cx;
-            var y = this.y + cy;
+            var coord = Utils.lineToGrid(i,this.width);
+            var x = this.x + coord.x;
+            var y = this.y + coord.y;
             var sprite = this.drawTile(x,y,tile,l);
-            //if(sprite == undefined) console.log(sprite,x,y,tile);
             layer.push(sprite);
             Engine.addCollision(x,y,tile);
         }

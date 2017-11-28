@@ -88,7 +88,8 @@ Engine.create = function(masterData){
     Engine.inventory = Inventory;
 
     Engine.debug = true;
-    Engine.showHero = Engine.debug ? Utils.getPreference('showHero',true) : true;
+    //Engine.showHero = Engine.debug ? Utils.getPreference('showHero',true) : true;
+    Engine.showHero = true;
     Engine.showGrid = false;
 
     Engine.scene = this.scene.scene;
@@ -260,9 +261,7 @@ Engine.makeCraftingMenu = function(){
 
 Engine.makeInventory = function(){
     var inventory = new Menu('Inventory');
-    var equip = new Panel(665,100,340,250,'Equipment');
-    equip.addEquip();
-    inventory.addPanel(equip); // equipment panel
+    inventory.addPanel(new EquipmentPanel(665,100,340,250,'Equipment'));
     var stats = new Panel(665,360,340,120,'Stats');
     inventory.addPanel(stats);
     var items = new Panel(40,100,600,380,'Items');
@@ -320,6 +319,7 @@ Engine.updateDisplayedEntities = function(){
     Engine.updateDisplay(Engine.displayedAnimals,Engine.animals,adjacent,Engine.removeAnimal);
 };
 
+// Check if the entities of some list are in a neighboring chunk or not
 Engine.updateDisplay = function(list,map,adjacent,removalCallback){
     list.forEach(function(id){
         var p = map[id];
@@ -407,11 +407,10 @@ Engine.handleOut = function(event){
 
 Engine.computePath = function(position){
     if(Engine.collisions.get(position.tile.y,position.tile.x) == 1) return; // y, then x!
-
     //console.log('path from '+Engine.player.tileX+', '+Engine.player.tileY+' to '+position.tile.x+', '+position.tile.y);
     Engine.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(Engine.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
     var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, position.tile.x, position.tile.y, Engine.PFgrid);
-    if(path.length > 36) return;
+    if(path.length > PFUtils.maxPathLength) return;
     Client.sendPath(path);
     Engine.player.move(path);
 };
@@ -573,9 +572,7 @@ Engine.addPlayer = function(id,x,y,settlement){
 };
 
 Engine.addBuilding = function(id,x,y,type,settlement,inv){
-    var building = new Building(x,y,type,settlement,id);
-    building.inventory.fromList(inv);
-    //Engine.updateInventory(building.inventory,resources);
+    var building = new Building(id,x,y,type,settlement,inv);
     Engine.buildings[id] = building;
     Engine.displayedBuildings.add(id);
     return building;

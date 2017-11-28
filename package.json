@@ -11,6 +11,7 @@
   "license": "ISC",
   "devDependencies": {
     "jimp": "^0.2.28",
+    "mongo-express": "^0.44.0",
     "spritesmith": "^3.1.1",
     "uglify-js": "^3.1.9",
     "xml2js": "^0.4.19"

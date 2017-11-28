@@ -1,6 +1,5 @@
 Cleaning
 * Battle system
-* Crafting
 * Exploration/travel
 * Inns
 * Inventory
@@ -19,18 +18,16 @@ Prototype level:
 
 Cleaning:
 --------
-- Use pool for footsteps
-- Wherever possible, replace sprites by images
+Performance:
 - Investigate using blitters instead, for footsteps etc. (see https://phaser.io/phaser3/devlog/56)
-- Clean up json: those in maps should be arrays; those in data should have numeric keys
+- Use pool for footsteps
+- Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
+Order:
 - Give toString method to custom objects to replace [this.constructor.name this.id] ...
 - Decide what to do with assets/maps folder, both for dev and prod
 - Merge all the addXXX and removeXXX methods (but keepl separate lists) + merge addXXX loops in updateWorld()
-- Clean up Utils
-- Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild)
 - Split server in two (game and dev server)
-- Standardize the use of Utils methods for coordianes manipulations (gridtoline, linetogrid, tiletoiAOI, AOItotile, tileRelativeToAOI...)
-- Remove unnecessary Geometry methods
+- Remove unnecessary Geometry methods (and world-building methods from studio/Engine)
 - Restructure UI, maybe remove UIElement, only have a set of generic functions to bind to interactive sprites?
 - Think about a Container class or something to affect the transforms of all children, get rid of repeated finalize() calls
 => Use container game object from Phaser
@@ -38,12 +35,8 @@ Cleaning:
 -> Maybe position everything according to oirign
 -> One manual call to finalize() at the end, if any; or auto when adding to menu (the menu calls it in addPanel)
 - Anchor panel elements at center, not top-left
-- Make chatbar panel a subclass of Panels, so as not to overload Panel with things used for only one feature (make this a
-general rule for code organization: for equipment, stats...)
-- Clean all files
-- Do not rely on constructor.name, instead use custom field (like the old "category")
-- Add ES6 syntax to PHPStorm (for ... of)
-- Optimize copy of collision map in GameServer.findPath
+- Make chatbar panel a subclass of Panels? Wait to see if other panels don't need DOM elements
+- Make subclass of Panels for stats, and maybe others
 
 Content:
 -------
@@ -79,8 +72,6 @@ Content:
 - Compute and display battle grid
 - Adjust camera
 - Have a permanent presence of savages and animals around settlements
-* Crafting
-- Display advanced formulas based on class and lvl
 * Exploration/travel
 - Have a world to explore
 - Have a permanent presence of a few pickup items around settlements
@@ -161,23 +152,26 @@ Design document:
 
 Polish:
 ------
-- Feedback for rejected paths because too long (question mark, sound, ...)
+Visual:
 - Menu sprites change size when hovered / clicked
 - Hover cards over empty equipment slots
 - Hover cards over craftring buttons
+- Hower card over gold indicator
+- Highlight buttons and buildings on hover
+- Use particle emitters for several cool effects, like cloud puffs, dust, lights, etc.
+- Custom movement marker
+- Different footpritns for different animals
+Sound:
 - Sound effects when clicking (for moving, on buttons in menus, sounds of shuffling pages...)
 - Noise when walking
 - Noise when clicking on building (each building its noise)
 - Noise when clicking on non-walkable tile
 - Unique noise for items
-- Use particle emitters for several cool effects, like cloud puffs, dust, lights, etc.
 - Crafting SFX
-- Hower card over gold indicator
-- Highlight buttons and buildings on hover
-- Custom movement marker
+General:
+- Feedback for rejected paths because too long (question mark, sound, ...)
 - Polish existing content
 - Footsteps, light effects, sound effects (on actions + environment: birds, water, ...)
-- Different footpritns for different animals
 - HUD, title screen, animations ...
 - Animal noises when beasts in proximity, animal footsteps, player footsteps noise
 - Carcasses, traces of fight
@@ -212,7 +206,7 @@ V1 level:
 
 Analytics:
 ---------
-- Use gameanalytics?
+- Use gameanalytics? http://phaser.io/tutorials/game-analytics
 - Log as many things as possible: session duration, distance travelled per session, time spent in settlement per session, in nature per session,
 interactions with buildings, time spent in each individual menu, etc.
 - Cluster "heavy" players vs "small-time" players and look for differences between the two

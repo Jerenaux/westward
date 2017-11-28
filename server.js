@@ -94,7 +94,7 @@ io.on('connection',function(socket){
     });
 
     socket.on('disconnect',function(){
-        console.log('['+socket.id+'] Disconnected');
+        //console.log('['+socket.id+'] Disconnected');
         gs.removePlayer(socket.id);
     });
 
