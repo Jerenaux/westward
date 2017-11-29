@@ -1,0 +1,36 @@
+/**
+ * Created by Jerome on 29-11-17.
+ */
+
+
+var ItemSprite = new Phaser.Class({
+
+    Extends: CustomSprite,
+
+    initialize: function ItemSprite () {
+        CustomSprite.call(this, 0, 0, '');
+
+        this.setScrollFactor(0);
+        this.setInteractive();
+        this.depth = Engine.UIDepth+3;
+    },
+
+    setUp: function(id,data,callback){
+        this.setTexture(data.atlas);
+        this.setFrame(data.frame);
+        this.setDisplayOrigin(Math.floor(this.frame.width/2),Math.floor(this.frame.height/2));
+
+        this.itemID = id;
+        this.name = data.name;
+        this.visible = true;
+        if(callback) this.handleClick = callback.bind(this);
+    },
+
+    handleOver: function(event){
+        Engine.tooltip.display(event.x+20, event.y+10,this.name);
+    },
+
+    handleOut: function(){
+        Engine.tooltip.hide();
+    }
+});

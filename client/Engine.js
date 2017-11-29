@@ -10,6 +10,7 @@ var Engine = {
     playersDepth: 2,
     bubbleDepth: 15,
     UIDepth: 20,
+    tooltipDepth: 50,
     craftInvSize: 5, // max number of ingredients for crafting
     key: 'main', // key of the scene, for Phaser
     playerIsInitialized: false,
@@ -239,6 +240,18 @@ Engine.makeUI = function(){
     UIelements.push(new UIElement(x,starty,'tools',null,Engine.makeCraftingMenu()));
     x += 50;
     UIelements.push(new UIElement(x,starty,'scroll',null,Engine.makeCharacterMenu()));
+
+    var tooltip = Engine.scene.textures.addSpriteSheetFromAtlas(
+        'tooltip',
+        {
+            atlas: 'UI',
+            frame: 'tooltip',
+            frameWidth: 13,
+            frameHeight: 13,
+            endFrame: 8
+        }
+    );
+    Engine.tooltip = new Tooltip();
 };
 
 Engine.makeCraftingMenu = function(){
@@ -395,13 +408,14 @@ Engine.handleClick = function(event){
 Engine.handleOver = function(event){
     if(event.gameObject){
         if(event.gameObject.constructor.name == 'Building') Engine.hideMarker();
-        if(event.gameObject.handleOver) event.gameObject.handleOver();
+        if(event.gameObject.handleOver) event.gameObject.handleOver(event);
     }
 };
 
 Engine.handleOut = function(event){
     if(event.gameObject){
         if(event.gameObject.constructor.name == 'Building' && !Engine.inMenu) Engine.showMarker();
+        if(event.gameObject.handleOut) event.gameObject.handleOut();
     }
 };
 
@@ -452,6 +466,7 @@ Engine.getMouseCoordinates = function(event){
 Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
     Engine.updateMarker(position.tile);
+    if(Engine.tooltip && Engine.tooltip.displayed) Engine.tooltip.updatePosition(event.event.movementX,event.event.movementY);
     if(Engine.debug){
         document.getElementById('pxx').innerHTML = position.pixel.x;
         document.getElementById('pxy').innerHTML = position.pixel.y;
@@ -636,4 +651,7 @@ Engine.togglePanel = function(){ // When clicking on a player/building/animal, t
 };
 Engine.recipeClick = function(){
     Engine.craftingPanel.updateTarget(this.itemID,Engine.itemsData[this.itemID]);
+};
+Engine.slotHover = function(event){
+    Engine.tooltip.display(event.x+20, event.y+10,this.name);
 };

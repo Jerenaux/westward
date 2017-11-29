@@ -154,12 +154,10 @@ Panel.prototype.addSlots = function(nbHorizontal,total){
             offsety = (y > 0 ? 2 : 0);
             var slotx = this.x+paddingX+(x*36)+offsetx;
             var sloty = this.y+this.verticalOffset+(y*36)+offsety;
-            this.slots.push({
-                x: slotx,
-                y: sloty
-            });
+            var slot = Engine.scene.add.sprite(slotx,sloty,'UI',frame);
+            this.slots.push(slot);
+            this.container.push(slot);
             counter++;
-            this.container.push(Engine.scene.add.sprite(slotx,sloty,'UI',frame));
         }
     }
     this.verticalOffset += nbVertical*36 + 5;
@@ -252,22 +250,10 @@ Panel.prototype.finalize = function(){
 
 Panel.prototype.getNextItemSprite = function(item, callback){ // Pool of sprites common to all inventories of the panel
     if(this.sprites.length <= this.nextItemSprite){
-        var empty = Engine.scene.add.sprite(0,0,'');
-        empty.setScrollFactor(0);
-        empty.depth = Engine.UIDepth+3;
-        this.sprites.push(empty);
+        this.sprites.push(new ItemSprite());
     }
-    var data = Engine.itemsData[item];
     var sprite = this.sprites[this.nextItemSprite];
-    sprite.setTexture(data.atlas);
-    sprite.setFrame(data.frame);
-    sprite.setDisplayOrigin(Math.floor(sprite.frame.width/2),Math.floor(sprite.frame.height/2));
-    sprite.visible = true;
-    if(callback){
-        sprite.setInteractive();
-        sprite.handleClick = callback.bind(sprite);
-    }
-    sprite.itemID = item;
+    sprite.setUp(item,Engine.itemsData[item],callback);
     return sprite;
 };
 
@@ -320,12 +306,12 @@ Panel.prototype.displayTheInventory = function(inv){
         if(!inventory.items.hasOwnProperty(item)) continue;
         if(inventory.getNb(item) == 0) continue;
         var sprite = this.getNextItemSprite(item,inv.callback);
-        var pos = this.slots[j];
-        sprite.setPosition(pos.x+2+16,pos.y+4+16);
-        //this.container.push(sprite);
+        var slot = this.slots[j];
+        //slot.handleOver = Engine.slotHover.bind(sprite);
+        sprite.setPosition(slot.x+2+16,slot.y+4+16);
         if(inv.showNumbers) {
             var text = this.getNextText(inventory.getNb(item));
-            text.setPosition(pos.x + 37, pos.y + 18);
+            text.setPosition(slot.x + 37, slot.y + 18);
         }
         j++;
         this.nextItemSprite++;

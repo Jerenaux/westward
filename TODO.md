@@ -20,7 +20,7 @@ Cleaning:
 --------
 Performance:
 - Investigate using blitters instead, for footsteps etc. (see https://phaser.io/phaser3/devlog/56)
-- Use pool for footsteps
+- Use pool for footsteps (see Groups, who now act as pools)
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
 - Give toString method to custom objects to replace [this.constructor.name this.id] ...
@@ -161,6 +161,7 @@ Visual:
 - Use particle emitters for several cool effects, like cloud puffs, dust, lights, etc.
 - Custom movement marker
 - Different footpritns for different animals
+- Use matter.js to simulate wind on leaves? (Dead/alive leaves flying on screen)
 Sound:
 - Sound effects when clicking (for moving, on buttons in menus, sounds of shuffling pages...)
 - Noise when walking

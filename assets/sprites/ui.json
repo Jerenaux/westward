@@ -231,6 +231,10 @@
     {
       "filename": "ring-shade",
       "frame": {"x":311,"y":463,"w":18,"h":18}
+    },
+    {
+      "filename": "tooltip",
+      "frame": {"x":213,"y":512,"w":39,"h":39}
     }
   ]
 }
