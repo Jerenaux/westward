@@ -42,7 +42,9 @@ Panel.prototype.makeBody = function(){
     y += sideWidth;
     this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-left'));
     x += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,h,'UI','panel-center'));
+
+    var center = Engine.scene.add.tileSprite(x,y,w,h,'UI','panel-center');
+    this.container.push(center);
     x += w;
     this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-right'));
     x = this.x;
@@ -104,13 +106,29 @@ Panel.prototype.addInventory = function(title,maxwidth,total,inventory,showNumbe
     this.displayInventory = true;
     var inv = {
         inventory: inventory,
+        maxWidth: maxwidth,
         showNumbers: showNumbers,
         firstSlot: this.nextFirstSlot,
-        callback: callback
+        callback: callback,
+        //zone: Engine.scene.add.zone(0,0,0,0)
+        zone: this.createZone()
     };
     this.inventories.push(inv);
     if(title) this.addLine(title);
     this.addSlots(maxwidth,total);
+};
+
+Panel.prototype.createZone = function(){
+    var zone = Engine.scene.add.zone(0,0,0,0);
+    zone.setDepth(Engine.UIDepth+10);
+    zone.setScrollFactor(0);
+    zone.handleOver = function(event){
+        Engine.tooltip.display(event.x+20, event.y+10);
+    };
+    zone.handleOut = function(){
+        Engine.tooltip.hide();
+    };
+    return zone;
 };
 
 Panel.prototype.addSlots = function(nbHorizontal,total){
@@ -302,12 +320,13 @@ Panel.prototype.display = function(){
 Panel.prototype.displayTheInventory = function(inv){
     var inventory = inv.inventory;
     var j = inv.firstSlot;
+    var nbDisplayed = 0;
     for(var item in inventory.items){
         if(!inventory.items.hasOwnProperty(item)) continue;
         if(inventory.getNb(item) == 0) continue;
+        nbDisplayed++;
         var sprite = this.getNextItemSprite(item,inv.callback);
         var slot = this.slots[j];
-        //slot.handleOver = Engine.slotHover.bind(sprite);
         sprite.setPosition(slot.x+2+16,slot.y+4+16);
         if(inv.showNumbers) {
             var text = this.getNextText(inventory.getNb(item));
@@ -316,6 +335,17 @@ Panel.prototype.displayTheInventory = function(inv){
         j++;
         this.nextItemSprite++;
     }
+
+    var zoneW = Math.min(nbDisplayed,inv.maxWidth)*36;
+    var zoneH = Math.ceil(nbDisplayed/inv.maxWidth)*36;
+    var zoneX = this.slots[inv.firstSlot].x;
+    var zoneY = this.slots[inv.firstSlot].y;
+    var zone = inv.zone;
+
+    zone.setVisible(true);
+    zone.setPosition(zoneX,zoneY);
+    zone.setSize(zoneW,zoneH);
+    zone.setInteractive(); // necessary after size change
 };
 
 Panel.prototype.hide = function(){
@@ -342,6 +372,9 @@ Panel.prototype.hideInventory = function(){ // Hide all items of all inventories
     for(var j = 0; j < this.sprites.length; j++){
         this.sprites[j].visible = false;
         if(this.texts[j]) this.texts[j].visible = false;
+    }
+    for(var i = 0; i < this.inventories.length; i++){
+        this.inventories[i].zone.setVisible(false);
     }
     this.nextItemSprite = 0;
 };

@@ -407,6 +407,7 @@ Engine.handleClick = function(event){
 
 Engine.handleOver = function(event){
     if(event.gameObject){
+        //if(event.gameObject.name) console.log(event.gameObject.name);
         if(event.gameObject.constructor.name == 'Building') Engine.hideMarker();
         if(event.gameObject.handleOver) event.gameObject.handleOver(event);
     }
@@ -520,6 +521,10 @@ Engine.updateInventory = function(inventory,items){
         var item = items[i];
         inventory.update(item[0],item[1]);
     }
+};
+
+Engine.update = function(){
+    //console.log(Engine.overSlot);
 };
 
 // Processes the global update packages received from the server
@@ -651,7 +656,4 @@ Engine.togglePanel = function(){ // When clicking on a player/building/animal, t
 };
 Engine.recipeClick = function(){
     Engine.craftingPanel.updateTarget(this.itemID,Engine.itemsData[this.itemID]);
-};
-Engine.slotHover = function(event){
-    Engine.tooltip.display(event.x+20, event.y+10,this.name);
 };

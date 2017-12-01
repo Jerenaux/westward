@@ -153,6 +153,7 @@ Design document:
 Polish:
 ------
 Visual:
+- Find better font
 - Menu sprites change size when hovered / clicked
 - Hover cards over empty equipment slots
 - Hover cards over craftring buttons

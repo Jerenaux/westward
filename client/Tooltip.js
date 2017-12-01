@@ -6,7 +6,7 @@ function Tooltip(){
     this.x = 100;
     this.y = 100;
     this.width = 50;
-    this.height = 50;
+    this.height = 10;
     this.container = [];
     this.displayed = false;
     this.text = Engine.scene.add.text(this.x+13,this.y+4, 'Lorem ipsum',
@@ -44,7 +44,7 @@ Tooltip.prototype.makeBody = function(){
     this.container.push(Engine.scene.add.sprite(x,y,'tooltip',8));
 };
 
-Tooltip.prototype.display = function(x,y,text){
+Tooltip.prototype.display = function(x,y){
     var dx = x - this.x;
     var dy = y - this.y;
     this.updatePosition(dx,dy);
@@ -53,12 +53,14 @@ Tooltip.prototype.display = function(x,y,text){
         e.visible = true;
     });
 
+    this.displayed = true;
+};
+
+Tooltip.prototype.updateInfo = function(text){
     if(text) {
         this.text.setText(text);
         this.updateSize();
     }
-
-    this.displayed = true;
 };
 
 Tooltip.prototype.updatePosition = function(dx,dy){
@@ -73,22 +75,25 @@ Tooltip.prototype.updatePosition = function(dx,dy){
 };
 
 Tooltip.prototype.updateSize = function(){
-    var dw = this.width - this.text.width;
-    var dh = this.height - (this.text.height);
-    this.width = this.text.width;
-    this.height = this.text.height;
-    //console.log(this.text.width,this.text.height);
+    var w = this.text.width;
+    var h = this.text.height - 15;
+    var dw = this.width - w;
+    var dh = this.height - h;
+    this.width = w;
+    this.height = h;
 
-    this.container[1].width = this.text.width;
+    this.container[1].width = w;
     this.container[2].x -= dw;
-    this.container[3].height = this.text.height;
-    this.container[4].width = this.text.width;
-    this.container[4].height = this.text.height;
+
+    this.container[3].height = h;
+    this.container[4].width = w;
+    this.container[4].height = h;
     this.container[5].x -= dw;
-    this.container[5].height = this.text.height;
+    this.container[5].height = h;
+
     this.container[6].y -= dh;
     this.container[7].y -= dh;
-    this.container[7].width = this.text.width;
+    this.container[7].width = w;
     this.container[8].x -= dw;
     this.container[8].y -= dh;
 };

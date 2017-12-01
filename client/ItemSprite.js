@@ -26,11 +26,7 @@ var ItemSprite = new Phaser.Class({
         if(callback) this.handleClick = callback.bind(this);
     },
 
-    handleOver: function(event){
-        Engine.tooltip.display(event.x+20, event.y+10,this.name);
-    },
-
-    handleOut: function(){
-        Engine.tooltip.hide();
+    handleOver: function(){
+        Engine.tooltip.updateInfo(this.name);
     }
 });
