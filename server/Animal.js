@@ -14,6 +14,7 @@ function Animal(x,y,type){
     //this.setStartingPosition();
     this.x = x;
     this.y = y;
+    this.inFight = false;
     this.type = type;
     this.idle = true;
     this.idleTime = 200;
@@ -32,7 +33,7 @@ Animal.prototype.constructor = Animal;
 Animal.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','path','type']; // list of properties relevant for the client
+    var broadcastProperties = ['id','path','type','inFight']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -48,6 +49,7 @@ Animal.prototype.startIdle = function(){
 };
 
 Animal.prototype.updateIdle = function(){
+    return;
     this.idleTime -= GameServer.server.npcUpdateRate;
     if(this.idleTime <= 0){
         var dest = this.findRandomDestination();

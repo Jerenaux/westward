@@ -15,7 +15,7 @@ function Battle(f1,f2){
 Battle.prototype.start = function(){
     var _battle = this;
     this.fighters.forEach(function(f){
-        if(f.constructor.name == 'Player') f.setProperty('inFight',true);
+        f.setProperty('inFight',true);
         f.battle = _battle;
     });
     this.loop = setInterval(this.update.bind(this),1000);
@@ -38,9 +38,10 @@ Battle.prototype.update = function(){
 Battle.prototype.end = function(){
     clearInterval(this.loop);
     this.fighters.forEach(function(f){
-        if(f.constructor.name == 'Player') f.setProperty('inFight',false);
+        f.setProperty('inFight',false);
         f.battle = null;
     });
+    console.log('[B'+this.id+'] Ended');
     // TODO: respawn if quitting battle by disconnecting
 };
 

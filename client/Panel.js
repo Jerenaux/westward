@@ -336,6 +336,7 @@ Panel.prototype.displayTheInventory = function(inv){
         this.nextItemSprite++;
     }
 
+    // TODO: when multiple lines of items, compute shape and pass it to setInteractive
     var zoneW = Math.min(nbDisplayed,inv.maxWidth)*36;
     var zoneH = Math.ceil(nbDisplayed/inv.maxWidth)*36;
     var zoneX = this.slots[inv.firstSlot].x;

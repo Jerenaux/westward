@@ -20,6 +20,7 @@ Cleaning:
 --------
 Performance:
 - Investigate using blitters instead, for footsteps etc. (see https://phaser.io/phaser3/devlog/56)
+-> Create 2x#tilesets blitters: for lower ground and for higher layers
 - Use pool for footsteps (see Groups, who now act as pools)
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
@@ -41,9 +42,6 @@ Order:
 Content:
 -------
 * Battle system
-- End battle if disconnect
-- Visual cue to indicate that in battle (based on inFight flag)
-- Test (dis)appearance of cues as seen from a third party, when a player attacks a wold the disconnects
 - Visual cue to indicate who's turn it is
 - Visual timer
 - Menus to decide which action to take, on which target
@@ -160,6 +158,8 @@ Visual:
 - Hower card over gold indicator
 - Highlight buttons and buildings on hover
 - Use particle emitters for several cool effects, like cloud puffs, dust, lights, etc.
+- Light effect layer
+- Add cloud silhouettes
 - Custom movement marker
 - Different footpritns for different animals
 - Use matter.js to simulate wind on leaves? (Dead/alive leaves flying on screen)

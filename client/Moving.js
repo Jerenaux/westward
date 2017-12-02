@@ -27,7 +27,39 @@ var Moving = new Phaser.Class({
         this.movement = null;
 
         this.setInteractive();
-        console.log('['+this.constructor.name+'] scene : ',this.scene);
+        //console.log('['+this.constructor.name+'] scene : ',this.scene);
+
+        this.halo = Engine.scene.add.image(0,0,'battlehalo');
+        this.halo.setDepth(2);
+        this.halo.setVisible(false);
+        this.displayedHalo = false;
+        this.updateHalo();
+        this.haloTween = Engine.scene.tweens.add({
+            targets: this.halo,
+            alpha: 0.2,
+            duration: 750,
+            yoyo: true,
+            repeat: -1,
+            paused: true
+        });
+    },
+
+    displayHalo: function(){
+        if(this.displayedHalo) return;
+        this.halo.setVisible(true);
+        this.haloTween.play();
+        this.displayedHalo = true;
+    },
+
+    hideHalo: function(){
+        if(!this.displayedHalo) return;
+        this.halo.setVisible(false);
+        this.haloTween.stop();
+        this.displayedHalo = false;
+    },
+
+    updateHalo: function(){
+        this.halo.setPosition(this.x+13,this.y+24);
     },
 
     updateDepth: function(){
@@ -93,6 +125,7 @@ var Moving = new Phaser.Class({
             this.previousOrientation = this.orientation;
             this.anims.play(this.animsKeys['move_'+this.orientation]);
         }
+
         this.previousPosition = {
             x: this.x,
             y: this.y
@@ -106,6 +139,7 @@ var Moving = new Phaser.Class({
         this.chunk = Utils.tileToAOI({x: this.tileX, y: this.tileY});
 
         if(this.bubble) this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
+        this.updateHalo();
 
         if(this.constructor.name == 'Player' && this.id == Engine.player.id) {
             if(this.chunk != this.previousChunk) Engine.updateEnvironment();

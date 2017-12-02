@@ -74,6 +74,7 @@ Chunk.prototype.drawTile = function(x,y,tile,layer){
     if(tileset === undefined) console.log('wrong',tile,tilesetID,x,y);
     tile -= tileset.firstgid;
     var sprite = Engine.scene.add.image(x*Engine.tileWidth,y*Engine.tileHeight,tileset.name,tile);
+    //var sprite = Engine.mapBlitters[tilesetID].create(x*Engine.tileWidth,y*Engine.tileHeight,tile);
     sprite.setDisplayOrigin(0,0);
     sprite.tileID = tile;
     sprite.depth = layerDepth[layer];

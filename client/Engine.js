@@ -23,6 +23,7 @@ Engine.preload = function() {
 
     this.load.image('talk', 'assets/sprites/talk.png');
     this.load.image('footsteps', 'assets/sprites/footsteps.png');
+    this.load.image('battlehalo', 'assets/sprites/battlehalo.png');
 
     this.load.image('scroll', 'assets/sprites/scroll.png');
     this.load.image('tome', 'assets/sprites/tome.png');
@@ -89,7 +90,6 @@ Engine.create = function(masterData){
     Engine.inventory = Inventory;
 
     Engine.debug = true;
-    //Engine.showHero = Engine.debug ? Utils.getPreference('showHero',true) : true;
     Engine.showHero = true;
     Engine.showGrid = false;
 
@@ -119,6 +119,11 @@ Engine.create = function(masterData){
     Engine.inPanel = false;
     Engine.currentMenu = null;
     Engine.currentPanel = null;
+
+    Engine.mapBlitters = {};
+    for(var i = 0; i < Engine.tilesets.length; i++){
+        Engine.mapBlitters[i] = Engine.scene.add.blitter(0,0,Engine.tilesets[i].name);
+    }
 
     Engine.created = true;
     Client.requestData();
@@ -296,7 +301,6 @@ Engine.makeCharacterMenu = function(){
 
 Engine.addHero = function(id,x,y,settlement){
     Engine.player = Engine.addPlayer(id,x,y,settlement);
-    //Engine.player.visible = Engine.showHero;
     Engine.camera.startFollow(Engine.player);
     Engine.player.inventory = new Inventory();
     Engine.player.buildingRecipes = new Inventory(10);
@@ -533,7 +537,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
         for (var n = 0; n < data.newplayers.length; n++) {
             var p = data.newplayers[n];
             var player = Engine.addPlayer(p.id, p.x, p.y, p.settlement);
-            if(p.path) player.move(p.path);
+            Engine.updatePlayer(player,p);
         }
         //if (data.newplayers.length > 0) Game.sortEntities(); // Sort entitites according to y coordinate to make them render properly above each other
     }
@@ -549,7 +553,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
         for (var n = 0; n < data.newanimals.length; n++) {
             var a = data.newanimals[n];
             var animal = Engine.addAnimal(a.id, a.x, a.y, a.type);
-            if(a.path) animal.move(a.path);
+            Engine.updateAnimal(animal,a);
         }
     }
 
@@ -574,12 +578,15 @@ Engine.traverseUpdateObject = function(obj,table,callback){
 };
 
 Engine.updatePlayer = function(player,data){ // data contains the updated data from the server
-    if(player.id == Engine.player.id) return;
-    if(data.path) player.move(data.path);
+    if(data.path && player.id != Engine.player.id) player.move(data.path);
+    if(data.inFight == true) player.displayHalo();
+    if(data.inFight == false) player.hideHalo();
 };
 
 Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server
     if(data.path) animal.move(data.path);
+    if(data.inFight == true) animal.displayHalo();
+    if(data.inFight == false) animal.hideHalo();
 };
 
 Engine.addPlayer = function(id,x,y,settlement){
@@ -614,6 +621,7 @@ Engine.removeBuilding = function(id){
 
 Engine.removePlayer = function(id){
     var sprite = Engine.players[id];
+    sprite.hideHalo();
     sprite.destroy();
     Engine.displayedPlayers.delete(id);
     delete Engine.players[id];
