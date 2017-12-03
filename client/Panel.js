@@ -282,7 +282,7 @@ Panel.prototype.getNextText = function(nb){
         );
         empty.setScrollFactor(0);
         empty.setOrigin(1,0);
-        empty.depth = Engine.UIDepth+4;
+        empty.setDepth(Engine.UIDepth);
         this.texts.push(empty);
     }
     var text = this.texts[this.nextItemSprite];

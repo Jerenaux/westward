@@ -9,7 +9,7 @@ function Tooltip(){
     this.height = 10;
     this.container = [];
     this.displayed = false;
-    this.text = Engine.scene.add.text(this.x+13,this.y+4, 'Lorem ipsum',
+    this.text = Engine.scene.add.text(this.x+13,this.y+4, '',
         { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
     );
     this.makeBody();

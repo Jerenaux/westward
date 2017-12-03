@@ -12,7 +12,7 @@ var ItemSprite = new Phaser.Class({
 
         this.setScrollFactor(0);
         this.setInteractive();
-        this.depth = Engine.UIDepth+3;
+        this.setDepth(Engine.UIDepth);
     },
 
     setUp: function(id,data,callback){

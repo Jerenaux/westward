@@ -71,8 +71,8 @@ function flattenChunk(fileName){
             }
         }
         newmap.layers = tilelayers;
-        // add high layers
-        for(var i = WorldEditor.lowLayers+1; i <= WorldEditor.maxLayer; i++){
+        // Add high layers
+        for(var i = WorldEditor.lowLayers+1; i <= Math.min(WorldEditor.maxLayer,map.layers.length-1); i++){
             newmap.layers.push(map.layers[i]);
         }
          // TODO here: remove tiles based on top-down visibility

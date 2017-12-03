@@ -19,11 +19,16 @@ Prototype level:
 Cleaning:
 --------
 Performance:
-- Investigate using blitters instead, for footsteps etc. (see https://phaser.io/phaser3/devlog/56)
--> Create 2x#tilesets blitters: for lower ground and for higher layers
 - Use pool for footsteps (see Groups, who now act as pools)
+- Fix null values in left-fringe chunks
+->nulls in corrupted chunks likely arise from "undefined" values being converted to null by JSON.stringify
+-> Happens on the fringe -> because for these drawShore returns undefined?!
+- listCollisions: don't store water tiles, only shore etc.
+- Flattening: second pass to delete water-only chunks based on visibility
+- Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- One clean, central way to manage tilesets, depth, blitters... (blitter selection in client/Chunk, "mawLayer" field in WorldEditor ...)
 - Give toString method to custom objects to replace [this.constructor.name this.id] ...
 - Decide what to do with assets/maps folder, both for dev and prod
 - Merge all the addXXX and removeXXX methods (but keepl separate lists) + merge addXXX loops in updateWorld()
@@ -182,14 +187,8 @@ General:
 
 World building:
 --------------
-- Test flattening of trees
-- listCollisions: don't store water tiles, only shore etc.
-- Flattening: second pass to delet water-only chunks based on visibility
-- Fix null values in left-fringe chunks
-->nulls in corrupted chunks likely arise from "undefined" values being converted to null by JSON.stringify
--> Happens on the fringe -> because for these drawShore returns undefined?!
 - Different tree distribution based on geographical sectors
--> Make weighted table based on distance to poles
+-> Make weighted table based on distance to poles (Utils.distanceToPoles)
 -> Randomly pick tree type from table
 -> 1/1000 chance of dead tree, regardless of type
 - Compute tree density and spread random trees around accordingly

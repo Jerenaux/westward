@@ -18,7 +18,7 @@ var WorldEditor = {
     dirtyChunks : new Set(),
     earlyFillStop: 40000,//1100000
     lowLayers: 2, // index of last layer that should appear at player level or below (vs high layers)
-    maxLayer: 3,
+    maxLayer: 7,
     mapsPath: '/../../maps', // relative to tools directory
     tilesetsPath: 'C:\\Users\\Jerome\\Git\\Westward\\assets\\tilesets\\' // used for Tiled, not for prod
 };
@@ -115,9 +115,9 @@ WorldEditor.Trees = [
             {x:1,y:-1}
         ],
         depth: { // depth of each y-level of the tree (top to bottom)
-            0: 3,
-            1: 3,
-            2: 3,
+            0: 6,
+            1: 5,
+            2: 4,
             3: 3,
             4: 1,
             5: 1
@@ -158,9 +158,9 @@ WorldEditor.Trees = [
             {x:1,y:-1}
         ],
         depth: { // depth of each y-level of the tree (top to bottom)
-            0: 3,
-            1: 3,
-            2: 3,
+            0: 6,
+            1: 5,
+            2: 4,
             3: 3,
             4: 1,
             5: 1
@@ -180,9 +180,9 @@ WorldEditor.Trees = [
             {x:1,y:-1}
         ],
         depth: { // depth of each y-level of the tree (top to bottom)
-            0: 3,
-            1: 3,
-            2: 3,
+            0: 6,
+            1: 5,
+            2: 4,
             3: 3,
             4: 1,
             5: 1
@@ -295,14 +295,10 @@ WorldEditor.drawShore = function(tiles){
         if(tile.x == 0 && tile.y == 0) continue;
 
         if(!WorldEditor.isInWorldBounds(tile.x,tile.y)) continue;
-        //if(tile.x < 0 || tile.y < 0 || tile.x > World.worldWidth || tile.y > World.worldHeight) continue;
 
         var next = (i == tiles.length-1 ? 0 : i+1);
         var prev = (i == 0 ? tiles.length-1 : i-1);
         var id = WorldEditor.findTileID(tiles[prev],tile,tiles[next]);
-
-        //if(id === undefined) console.log(id,tile.x,tile.y);
-        //console.log(id+' at '+tile.x+', '+tile.y);
 
         switch(id){
             case undefined:

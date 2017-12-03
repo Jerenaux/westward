@@ -55,27 +55,39 @@ Utils.aoiToQuadrant = function(aoi,quadW,quadH){
     return (top*nbQuadsHorizontal)+left;
 };
 
-Utils.distanceToQuads = function(x,y,quads,quadW,quadH){
-    var q = Utils.tileToQuadrant(x,y,quadW,quadH);
-    var dists = [];
-    var qcoords = Utils.lineToGrid(q,quadW);
+Utils.distanceToPoles = function(x,y,poles){
+    var aoi = Utils.tileToAOI({x:x,y:y});
+    var aoicoord = Utils.lineToGrid(aoi,World.nbChunksHorizontal);
+    var dists = []; // distances (in aoi) between tile and each pole
     var sum = 0;
-    for(var i = 0; i < quads.length; i++){
+    for(var i = 0; i < poles.length; i++){
         var d = Utils.euclidean(
-            qcoords,
-            Utils.lineToGrid(quads[i],quadW)
+            aoicoord,
+            Utils.lineToGrid(poles[i],World.nbChunksHorizontal)
         );
+        if(d == 0) d = 0.1;
         sum += d;
         dists.push(d);
     }
-    console.log(dists);
-    // revert: d' = sum/d
-    // normalize: z = d'/sum'
-    // e.g. (2,2,6) -> (5,5,1,667) -> (0,43,0,43,0,14)
-    return dists.map(function(d){
-        return d/sum;
+    console.log('distances :', dists, 'sum = ',sum);
+
+    // Revert: d' = sum/d
+    var sumweights = 0;
+    var weights = dists.map(function(d){
+        //var w = (d > 0 ? sum/d : 1);
+        var w = sum/d;
+        sumweights += w;
+        return w;
     });
+    console.log('weights :', weights);
+
+    // Normalize: z = d'/sum'
+    var normalized = weights.map(function(w){
+        return Math.round((w/sumweights)*10);
+    });
+    console.log('normalized :', normalized);
 };
+
 
 // ### General methods ###
 
@@ -103,6 +115,7 @@ Utils.listAdjacentAOIs = function(current){
 };
 
 Utils.euclidean = function(a,b){
+    //console.log('dist between',a,b);
     return Math.sqrt(Math.pow(a.x-b.x,2)+Math.pow(a.y- b.y,2));
 };
 

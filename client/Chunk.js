@@ -73,10 +73,19 @@ Chunk.prototype.drawTile = function(x,y,tile,layer){
     var tileset = Engine.tilesets[tilesetID];
     if(tileset === undefined) console.log('wrong',tile,tilesetID,x,y);
     tile -= tileset.firstgid;
-    var sprite = Engine.scene.add.image(x*Engine.tileWidth,y*Engine.tileHeight,tileset.name,tile);
-    //var sprite = Engine.mapBlitters[tilesetID].create(x*Engine.tileWidth,y*Engine.tileHeight,tile);
-    sprite.setDisplayOrigin(0,0);
-    sprite.tileID = tile;
-    sprite.depth = layerDepth[layer];
+    var sprite;
+
+    if(Engine.useBlitters) {
+        var blitter;
+        if (tilesetID == 1) blitter = Engine.blitters[0];
+        if (tilesetID == 2 && layer == 1) blitter = Engine.blitters[1];
+        if (tilesetID == 2 && layer > 1) blitter = Engine.blitters[2];
+        sprite = blitter.create(x * Engine.tileWidth, y * Engine.tileHeight, tile);
+    }else {
+        sprite = Engine.scene.add.image(x*Engine.tileWidth,y*Engine.tileHeight,tileset.name,tile);
+        sprite.setDisplayOrigin(0,0);
+        sprite.tileID = tile;
+        sprite.depth = layerDepth[layer];
+    }
     return sprite;
 };

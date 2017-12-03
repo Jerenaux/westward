@@ -6,11 +6,25 @@ var Engine = {
     baseViewHeight: 18,
     tileWidth: 32,
     tileHeight: 32,
+
+    /*
+    * - Ground: water and grass:                0
+    * - Marker:                                 1
+    * - Objects, tree stumps, players, build.   2.y
+    * - Tree canopies                           3-6
+    * - Speech bubbles & text                   11
+    * - UI & texts                              12
+    * - Tooltips & texts                        13
+    * => nbLayers (for map): 7
+    * */
+
+    markerDepth: 1,
     buildingsDepth: 2,
     playersDepth: 2,
-    bubbleDepth: 15,
-    UIDepth: 20,
-    tooltipDepth: 50,
+    bubbleDepth: 11,
+    UIDepth: 12,
+    tooltipDepth: 13,
+
     craftInvSize: 5, // max number of ingredients for crafting
     key: 'main', // key of the scene, for Phaser
     playerIsInitialized: false,
@@ -120,10 +134,15 @@ Engine.create = function(masterData){
     Engine.currentMenu = null;
     Engine.currentPanel = null;
 
-    Engine.mapBlitters = {};
-    for(var i = 0; i < Engine.tilesets.length; i++){
-        Engine.mapBlitters[i] = Engine.scene.add.blitter(0,0,Engine.tilesets[i].name);
-    }
+    /* * Blitters:
+     * - 1 for ground tileset, depth 0
+     * - 1 for trees tileset, depth 2
+     * - 1 for canopies, depth 6*/
+    Engine.blitters = [];
+    Engine.blitters.push(Engine.scene.add.blitter(0,0,'ground_tiles').setDepth(0));
+    Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(2));
+    Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(6));
+    Engine.useBlitters = true;
 
     Engine.created = true;
     Client.requestData();
@@ -132,7 +151,7 @@ Engine.create = function(masterData){
 Engine.createMarker = function(){
     Engine.marker = Engine.scene.add.sprite(0,0,'marker',0);
     Engine.marker.alpha = 0.8;
-    Engine.marker.depth = 1;
+    Engine.marker.depth = Engine.markerDepth;
     Engine.marker.setDisplayOrigin(0,0);
     Engine.marker.previousTile = {x:0,y:0};
 };
