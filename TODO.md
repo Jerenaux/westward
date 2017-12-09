@@ -187,11 +187,8 @@ General:
 
 World building:
 --------------
-- Different tree distribution based on geographical sectors
--> Make weighted table based on distance to poles (Utils.distanceToPoles)
--> Randomly pick tree type from table
--> 1/1000 chance of dead tree, regardless of type
-- Compute tree density and spread random trees around accordingly
+- Compute tree density and spread random trees around accordingly?
+- No tree if busy 3cells to the left? Or when planing tree, log width cells to right as no-go position
 - Add random elements
 - Investigate the possibility of making cliffs from terrain data of the east coast
 - Rework cliffs

@@ -190,36 +190,7 @@ WorldEditor.Trees = [
     }
 ];
 
-/*WorldEditor.Treetables = [
-    {weight:5, id: 0}, // summer
-    {weight:4, id: 1}, // central
-    {weight:1, id: 2} // winter
-];*/
-
-WorldEditor.setUpQuadrants = function(quadW,quadH){
-    // TL: 0,
-    // BL: 2800, Mid: 1371
-    WorldEditor.summerQuad = Utils.aoiToQuadrant(2800,quadW,quadH);
-    WorldEditor.centralQuad = Utils.aoiToQuadrant(1371,quadW,quadH);
-    WorldEditor.winterQuad = Utils.aoiToQuadrant(0,quadW,quadH);
-};
-
-/*GameServer.dropLoot = function(table,x,y){
- // Weighted random selection of what item should be dropped by a monster
- var defaultTable = [
- {weight:5, id:'none'},
- {weight:4, id:'item-flask'},
- {weight:1, id:'item-burger'}
- ];
- var lootTable = table || defaultTable;
- var itm = rwc(lootTable);
- if(itm && itm != 'none'){
- var item = new Item(x,y,itm,false,false,true);  // no respawn, not chest, loot
- item.makeTemporary();
- GameServer.addAtLocation(item);
- }
- };
- */
+WorldEditor.poles = [2800,1371,0]; // summer, central, winter
 
 WorldEditor.Layer = function(w,h,name){
     this.data = [];
@@ -267,8 +238,15 @@ WorldEditor.drawTree = function(x,y){
     if(!WorldEditor.isInWorldBounds(x,y)) return false;
     if(WorldEditor.isBusy({x:x,y:y})) return false;
 
+    var weights = Utils.distanceToPoles(x,y,WorldEditor.poles); // s, w, c
+    var table = [];
+    for(var i = 0; i < weights.length; i++){
+        table.push({weight: weights[i], id: i});
+    }
+    var type = Utils.randomInt(1,101) <= 1 ? 3 : rwc(table);
+    var tree = WorldEditor.Trees[type];
     //var tree = Utils.randomElement(WorldEditor.Trees);
-    var tree = WorldEditor.Trees[1];
+    //var tree = WorldEditor.Trees[1];
 
     for(var i = 0; i < tree.coll.length; i++){
         var c = tree.coll[i];

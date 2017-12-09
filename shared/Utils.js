@@ -66,10 +66,11 @@ Utils.distanceToPoles = function(x,y,poles){
             Utils.lineToGrid(poles[i],World.nbChunksHorizontal)
         );
         if(d == 0) d = 0.1;
+        d *= d; // polarizes more
         sum += d;
         dists.push(d);
     }
-    console.log('distances :', dists, 'sum = ',sum);
+    //console.log('distances :', dists, 'sum = ',sum);
 
     // Revert: d' = sum/d
     var sumweights = 0;
@@ -79,13 +80,16 @@ Utils.distanceToPoles = function(x,y,poles){
         sumweights += w;
         return w;
     });
-    console.log('weights :', weights);
+    //console.log('weights :', weights);
 
     // Normalize: z = d'/sum'
     var normalized = weights.map(function(w){
-        return Math.round((w/sumweights)*10);
+        var w = Math.round((w/sumweights)*10);
+        if(w <= 2) w = 0;
+        return w;
     });
-    console.log('normalized :', normalized);
+    //console.log('normalized :', normalized);
+    return normalized;
 };
 
 
