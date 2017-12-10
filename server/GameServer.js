@@ -93,6 +93,7 @@ GameServer.addNewPlayer = function(socket){
     var player = new Player();
     player.setStartingPosition();
     player.setStartingInventory();
+    playe.setStartingStats();
     var document = player.dbTrim();
     GameServer.server.db.collection('players').insertOne(document,function(err){
         if(err) throw err;

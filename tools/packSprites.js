@@ -7,13 +7,15 @@ var Spritesmith = require('spritesmith');
 
 var myArgs = require('optimist').argv;
 var indir = myArgs.i;
+//var outdir = myArgs.o;
+//var outName = myArgs.n;
 var sprites = [];
 
 fs.readdir(indir,function(err,files){
     if(err) throw err;
     // List sprites to pack
     for(var i = 0; i < files.length; i++){
-        if(files[i] != 'Thumbs.db') sprites.push(indir+files[i]);
+        if(files[i] != 'Thumbs.db') sprites.push(path.join(indir,files[i]));
     }
     console.log(sprites);
 

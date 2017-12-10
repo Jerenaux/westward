@@ -13,6 +13,15 @@ function Player(){
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.inventory = new Inventory();
     this.settlement = 0;
+    // todo: replace by objects with useful methods, min, max...
+    this.stats = {
+        'acc': 0,
+        'hp': 0,
+        'fat': 0,
+        'mdmg': 0,
+        'rdmg': 0,
+        'def': 0
+    }
 }
 
 Player.prototype = Object.create(MovingEntity.prototype);
@@ -41,6 +50,21 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(5,14);
     this.giveItem(9,3);
     this.updateInventory();
+};
+
+Player.prototype.setStartingStats = function(){
+    this.setStat('hp',100);
+    this.setStat('acc',50);
+    this.setStat('fat',0);
+    this.setStat('mdmg',10);
+    this.setStat('rdmg',10);
+    this.setStat('def',10);
+};
+
+Player.prototype.setStat = function(key,value){
+    var delta = value - this.stats[key];
+    this.updatePacket.addStatDelta(key,delta);
+    this.stats[key] = value;
 };
 
 Player.prototype.hasItem = function(item,nb){
