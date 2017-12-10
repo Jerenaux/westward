@@ -156,6 +156,7 @@ Design document:
 Polish:
 ------
 Visual:
+- Fix tooltip positioning
 - Find better font
 - Menu sprites change size when hovered / clicked
 - Hover cards over empty equipment slots

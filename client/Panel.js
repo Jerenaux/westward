@@ -110,7 +110,6 @@ Panel.prototype.addInventory = function(title,maxwidth,total,inventory,showNumbe
         showNumbers: showNumbers,
         firstSlot: this.nextFirstSlot,
         callback: callback,
-        //zone: Engine.scene.add.zone(0,0,0,0)
         zone: this.createZone()
     };
     this.inventories.push(inv);
@@ -122,8 +121,8 @@ Panel.prototype.createZone = function(){
     var zone = Engine.scene.add.zone(0,0,0,0);
     zone.setDepth(Engine.UIDepth+10);
     zone.setScrollFactor(0);
-    zone.handleOver = function(event){
-        Engine.tooltip.display(event.x+20, event.y+10);
+    zone.handleOver = function(){
+        Engine.tooltip.display();
     };
     zone.handleOut = function(){
         Engine.tooltip.hide();

@@ -5,6 +5,8 @@
 function Tooltip(){
     this.x = 100;
     this.y = 100;
+    this.xOffset = 20;
+    this.yOffset = 10;
     this.width = 50;
     this.height = 10;
     this.container = [];
@@ -44,10 +46,7 @@ Tooltip.prototype.makeBody = function(){
     this.container.push(Engine.scene.add.sprite(x,y,'tooltip',8));
 };
 
-Tooltip.prototype.display = function(x,y){
-    var dx = x - this.x;
-    var dy = y - this.y;
-    this.updatePosition(dx,dy);
+Tooltip.prototype.display = function(){
 
     this.container.forEach(function(e){
         e.visible = true;
@@ -56,14 +55,18 @@ Tooltip.prototype.display = function(x,y){
     this.displayed = true;
 };
 
-Tooltip.prototype.updateInfo = function(text){
-    if(text) {
-        this.text.setText(text);
+Tooltip.prototype.updateInfo = function(name, effects){
+    if(name) {
+        this.text.setText(name);
         this.updateSize();
     }
 };
 
-Tooltip.prototype.updatePosition = function(dx,dy){
+Tooltip.prototype.updatePosition = function(x,y){
+    x += this.xOffset;
+    y += this.yOffset;
+    var dx = x - this.x;
+    var dy = y - this.y;
     if(dx == 0 && dy == 0) return;
     this.container.forEach(function(e){
         e.x += dx;

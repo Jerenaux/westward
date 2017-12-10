@@ -51,9 +51,11 @@ Engine.preload = function() {
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
     this.load.atlas('buildings', 'assets/sprites/buildings.png', 'assets/sprites/buildings.json');
+    this.load.atlas('icons', 'assets/sprites/icons.png', 'assets/sprites/icons.json');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
     this.load.image('tail', 'assets/sprites/tail.png');
+    this.load.image('iconslot', 'assets/sprites/iconslot.png');
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
@@ -257,6 +259,7 @@ Engine.makeUI = function(){
         e.setInteractive();
     });
 
+    Engine.statsPanel = new StatsPanel(665,380,340,100,'Stats');
     var UIelements = [];
     x = startx+10;
     UIelements.push(new UIElement(x,starty,'backpack',null,Engine.makeInventory()));
@@ -298,9 +301,8 @@ Engine.makeCraftingMenu = function(){
 
 Engine.makeInventory = function(){
     var inventory = new Menu('Inventory');
-    inventory.addPanel(new EquipmentPanel(665,100,340,250,'Equipment'));
-    var stats = new Panel(665,360,340,120,'Stats');
-    inventory.addPanel(stats);
+    inventory.addPanel(new EquipmentPanel(665,100,340,260,'Equipment'));
+    inventory.addPanel(Engine.statsPanel);
     var items = new Panel(40,100,600,380,'Items');
     items.addCapsule(500,-9,'1299','gold');
     items.addInventory(null,15,Engine.player.inventory.maxSize,Engine.player.inventory,true);
@@ -310,11 +312,12 @@ Engine.makeInventory = function(){
 
 Engine.makeCharacterMenu = function(){
     var character = new Menu('Character');
-    var info = new Panel(665,100,340,380,"<Player name>");
+    var info = new Panel(665,100,340,260,"<Player name>");
     info.addLine('Citizen of '+Engine.settlementsData[Engine.player.settlement].name);
     info.addLine('Level 1 Merchant  -   0/100 Class XP');
     info.addLine('Level 1 citizen   -   0/100 Civic XP');
     character.addPanel(info); // equipment panel
+    character.addPanel(Engine.statsPanel);
     return character;
 };
 
@@ -326,6 +329,8 @@ Engine.addHero = function(id,x,y,settlement){
     Engine.player.itemRecipes = new Inventory(10);
     Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
     Engine.player.itemRecipes.fromList([[6,1],[10,1]]);
+    Engine.player.stats = Stats.getSkeleton();
+    Engine.statsTexts = Stats.getSkeleton();
     Engine.updateEnvironment();
 };
 
@@ -490,7 +495,8 @@ Engine.getMouseCoordinates = function(event){
 Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
     Engine.updateMarker(position.tile);
-    if(Engine.tooltip && Engine.tooltip.displayed) Engine.tooltip.updatePosition(event.event.movementX,event.event.movementY);
+    //if(Engine.tooltip && Engine.tooltip.displayed) Engine.tooltip.updatePosition(event.event.movementX,event.event.movementY);
+    if(Engine.tooltip && Engine.tooltip.displayed) Engine.tooltip.updatePosition(event.x,event.y);
     if(Engine.debug){
         document.getElementById('pxx').innerHTML = position.pixel.x;
         document.getElementById('pxy').innerHTML = position.pixel.y;
@@ -536,6 +542,16 @@ Engine.updateSelf = function(data){
         Engine.updateInventory(Engine.player.inventory,data.items);
         if(Engine.inMenu) Engine.currentMenu.refreshPanels();
     }
+    if(data.stats){
+        for(var i = 0; i < data.stats.length; i++){
+            Engine.updateStat(data.stats[i].k,data.stats[i].v);
+        }
+    }
+};
+
+Engine.updateStat = function(key,delta){
+    Engine.player.stats[key] += delta;
+    Engine.statsTexts[key].setText(Engine.player.stats[key]);
 };
 
 Engine.updateInventory = function(inventory,items){

@@ -7,6 +7,7 @@ var PersonalUpdatePacket = require('./PersonalUpdatePacket.js').PersonalUpdatePa
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
 var Inventory = require('../shared/Inventory.js').Inventory;
+var Stats = require('../shared/Stats.js').Stats;
 
 function Player(){
     this.updatePacket = new PersonalUpdatePacket();
@@ -14,14 +15,7 @@ function Player(){
     this.inventory = new Inventory();
     this.settlement = 0;
     // todo: replace by objects with useful methods, min, max...
-    this.stats = {
-        'acc': 0,
-        'hp': 0,
-        'fat': 0,
-        'mdmg': 0,
-        'rdmg': 0,
-        'def': 0
-    }
+    this.stats = Stats.getSkeleton();
 }
 
 Player.prototype = Object.create(MovingEntity.prototype);
@@ -53,12 +47,10 @@ Player.prototype.setStartingInventory = function(){
 };
 
 Player.prototype.setStartingStats = function(){
-    this.setStat('hp',100);
-    this.setStat('acc',50);
-    this.setStat('fat',0);
-    this.setStat('mdmg',10);
-    this.setStat('rdmg',10);
-    this.setStat('def',10);
+    for(var i = 0; i < Stats.list.length; i++) {
+        var s = Stats.list[i];
+        this.setStat(s.key,s.start);
+    }
 };
 
 Player.prototype.setStat = function(key,value){
@@ -96,7 +88,7 @@ Player.prototype.trim = function(){
 Player.prototype.dbTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be stored in the database
     var trimmed = {};
-    var dbProperties = ['x','y']; // list of properties relevant to store in the database
+    var dbProperties = ['x','y','stats']; // list of properties relevant to store in the database
     for(var p = 0; p < dbProperties.length; p++){
         trimmed[dbProperties[p]] = this[dbProperties[p]];
     }
@@ -110,6 +102,10 @@ Player.prototype.getDataFromDb = function(document){
     var dbProperties = ['x','y'];
     for(var p = 0; p < dbProperties.length; p++){
         this[dbProperties[p]] = document[dbProperties[p]];
+    }
+    for(var i = 0; i < Stats.list.length; i++) {
+        var s = Stats.list[i];
+        if(document['stats'][s.key] >= 0) this.setStat(s.key,document['stats'][s.key]);
     }
     this.setOrUpdateAOI();
     this.inventory.fromList(document.inventory);

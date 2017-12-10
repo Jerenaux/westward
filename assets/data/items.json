@@ -6,11 +6,13 @@
   },
   "1":{
     "atlas": "items",
-    "frame":"food"
+    "frame":"food",
+    "name": "Food"
   },
   "2":{
     "atlas": "items",
-    "frame":"bow"
+    "frame":"bow",
+    "name": "Bow"
   },
   "3":{
     "atlas": "items2",
@@ -33,7 +35,8 @@
     "atlas": "items2",
     "frame":"redpotion",
     "name": "Red potion",
-    "recipe": {"5":1,"0":2}
+    "recipe": {"5":1,"0":2},
+    "effects":{"hp":50}
   },
   "7":{
     "atlas": "buildings",
