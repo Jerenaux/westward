@@ -62,6 +62,6 @@
     "frame":"tunic",
     "name": "Tunic",
     "recipe":{"9":2},
-    "effects":{"fat":50,"def":50}
+    "effects":{"def":2}
   }
 }

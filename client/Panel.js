@@ -120,14 +120,14 @@ Panel.prototype.addInventory = function(title,maxwidth,total,inventory,showNumbe
 Panel.prototype.createZone = function(){
     var zone = Engine.scene.add.zone(0,0,0,0);
     zone.setDepth(Engine.UIDepth+10);
-    zone.setScrollFactor(0);
+    //zone.setScrollFactor(0);
     zone.handleOver = function(){
-        console.log('hover');
         Engine.tooltip.display();
     };
     zone.handleOut = function(){
         Engine.tooltip.hide();
     };
+    this.container.push(zone);
     return zone;
 };
 
@@ -374,9 +374,9 @@ Panel.prototype.hideInventory = function(){ // Hide all items of all inventories
         this.sprites[j].visible = false;
         if(this.texts[j]) this.texts[j].visible = false;
     }
-    for(var i = 0; i < this.inventories.length; i++){
+    /*for(var i = 0; i < this.inventories.length; i++){
         this.inventories[i].zone.setVisible(false);
-    }
+    }*/
     this.nextItemSprite = 0;
 };
 

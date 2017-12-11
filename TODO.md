@@ -89,8 +89,6 @@ Content:
 - Chat
 - Gazette
 * Inventory
-- Make stats panel below equipment w/ icons
-- Hover cards over items, show name and effect
 - Usage block when clicking on item, two options: use or equip (show effect)
 - Use items from menu (healing)
 - Equip items from menu
@@ -158,7 +156,6 @@ Polish:
 Visual:
 - Find better font
 - Menu sprites change size when hovered / clicked
-- Hover cards over empty equipment slots
 - Hover cards over craftring buttons
 - Hower card over gold indicator
 - Highlight buttons and buildings on hover

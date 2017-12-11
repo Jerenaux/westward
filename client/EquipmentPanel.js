@@ -31,7 +31,7 @@ EquipmentPanel.prototype.addEquipSlot = function(x,y,name){
     var slot = Engine.scene.add.sprite(this.x+x,this.y+y,'UI','equipment-slot');
     slot.setInteractive();
     slot.handleOver = function(){
-        Engine.tooltip.updateInfo(name.charAt(0).toUpperCase() + name.slice(1),{});
+        Engine.tooltip.updateInfo(name.charAt(0).toUpperCase() + name.slice(1));
         Engine.tooltip.display();
     };
     slot.handleOut = function(){

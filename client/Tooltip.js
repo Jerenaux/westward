@@ -55,7 +55,7 @@ Tooltip.prototype.makeStatsIcons = function(){
         var x = this.x+15;
         var y = this.y+(30*(i+1));
         var icon = Engine.scene.add.sprite(x,y,'icons2', s.frame);
-        var text = Engine.scene.add.text(x+30,y, '100',
+        var text = Engine.scene.add.text(x+30,y+2, '100',
             { font: '12px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
         );
         icon.dontDisplay = true;
@@ -75,6 +75,7 @@ Tooltip.prototype.display = function(){
 };
 
 Tooltip.prototype.updateInfo = function(name, effects){
+    effects = effects || {};
     if(name) {
         this.text.setText(name);
         var nbEffects = Object.keys(effects).length;
@@ -83,8 +84,12 @@ Tooltip.prototype.updateInfo = function(name, effects){
             this.icons[i].setVisible((i < nbEffects));
             this.iconsTexts[i].setVisible((i < nbEffects));
             if(i < nbEffects){
-                var s = Stats.dict[Object.keys(effects)[i]];
+                var key = Object.keys(effects)[i];
+                var val = effects[key];
+                if(val > 0) val = "+"+val;
+                var s = Stats.dict[key];
                 this.icons[i].setFrame(s.frame);
+                this.iconsTexts[i].setText(val);
             }
         }
     }
@@ -130,6 +135,7 @@ Tooltip.prototype.updateSize = function(nbEffects){
 };
 
 Tooltip.prototype.hide = function(){
+    this.text.setText("");
     this.container.forEach(function(e){
         e.setVisible(false);
     });

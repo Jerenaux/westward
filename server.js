@@ -75,6 +75,10 @@ io.on('connection',function(socket){
             gs.handleCraft(data,socket.id);
         });
 
+        socket.on('use',function(data){
+            gs.handleUse(data,socket.id);
+        });
+
         socket.on('battle',function(data){
             gs.handleBattle(data,socket.id);
         });
