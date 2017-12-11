@@ -28,8 +28,17 @@ EquipmentPanel.prototype.addEquip = function(){
 };
 
 EquipmentPanel.prototype.addEquipSlot = function(x,y,name){
-    this.container.push(Engine.scene.add.sprite(this.x+x,this.y+y,'UI','equipment-slot'));
+    var slot = Engine.scene.add.sprite(this.x+x,this.y+y,'UI','equipment-slot');
+    slot.setInteractive();
+    slot.handleOver = function(){
+        Engine.tooltip.updateInfo(name.charAt(0).toUpperCase() + name.slice(1),{});
+        Engine.tooltip.display();
+    };
+    slot.handleOut = function(){
+        Engine.tooltip.hide();
+    };
     var shade = Engine.scene.add.sprite(this.x+x+20,this.y+y+20,'UI',name+'-shade');
     shade.centered = true;
+    this.container.push(slot);
     this.container.push(shade);
 };
