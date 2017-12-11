@@ -39,6 +39,7 @@ fs.readdir(indir,function(err,files){
         var fileNames = Object.keys(result.coordinates);
         for(var i = 0; i < fileNames.length; i++){
             var data = result.coordinates[fileNames[i]];
+            // Returns only the file name from the path, remove the extension if it matches the second parameter
             var fileName = path.basename(fileNames[i],path.extname(fileNames[i]));
             atlas.frames.push({
                 filename: fileName,

@@ -14,18 +14,6 @@ var WorldEditor = require('../studio/WorldEditor.js').WorldEditor;
 
 var nbHoriz, nbVert, chunkWidth, chunkHeight, tileWidth, tileHeight, reverse;
 
-/*function Layer(w,h,name){
-    this.data = [];
-    this.width = w;
-    this.height = h;
-    this.name = name;
-    this.opacity = 1;
-    this.type = "tilelayer";
-    this.visible = true;
-    this.x = 0;
-    this.y = 0;
-}*/
-
 function makeWorld(bluePrint,outdir){
     // Default values
     var defChunkW = 30;
@@ -55,7 +43,6 @@ function makeWorld(bluePrint,outdir){
     if (existing.length > 0 ){
         console.log('Deleting existing world');
         for(var i = 0; i < existing.length; i++){
-            //fs.unlink(path.join(outdir,existing[i]),function(err){if(err) throw err;});
             fs.unlinkSync(path.join(outdir,existing[i]));
         }
     }
