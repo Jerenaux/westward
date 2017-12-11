@@ -36,7 +36,6 @@ Player.prototype.setStartingPosition = function(){
 };
 
 Player.prototype.setStartingInventory = function(){
-    //{ "0" : 20 , "1" : 1 , "2" : 1 , "3" : 1, "5": 14};
     this.giveItem(0,20);
     this.giveItem(1,1);
     this.giveItem(2,1);
@@ -48,8 +47,8 @@ Player.prototype.setStartingInventory = function(){
 
 Player.prototype.setStartingStats = function(){
     for(var i = 0; i < Stats.list.length; i++) {
-        var s = Stats.list[i];
-        this.setStat(s.key,s.start);
+        var key = Stats.list[i];
+        this.setStat(key,Stats.dict[key].start);
     }
 };
 
@@ -104,8 +103,8 @@ Player.prototype.getDataFromDb = function(document){
         this[dbProperties[p]] = document[dbProperties[p]];
     }
     for(var i = 0; i < Stats.list.length; i++) {
-        var s = Stats.list[i];
-        if(document['stats'][s.key] >= 0) this.setStat(s.key,document['stats'][s.key]);
+        var key = Stats.list[i];
+        if(document['stats'][key] >= 0) this.setStat(key,document['stats'][key]);
     }
     this.setOrUpdateAOI();
     this.inventory.fromList(document.inventory);

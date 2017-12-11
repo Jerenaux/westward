@@ -10,11 +10,14 @@ function Tooltip(){
     this.width = 50;
     this.height = 10;
     this.container = [];
+    this.icons = [];
+    this.iconsTexts = [];
     this.displayed = false;
     this.text = Engine.scene.add.text(this.x+13,this.y+4, '',
         { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
     );
     this.makeBody();
+    this.makeStatsIcons();
     this.container.push(this.text);
     this.finalize();
 }
@@ -46,19 +49,44 @@ Tooltip.prototype.makeBody = function(){
     this.container.push(Engine.scene.add.sprite(x,y,'tooltip',8));
 };
 
+Tooltip.prototype.makeStatsIcons = function(){
+    for(var i = 0; i < Stats.list.length; i++) {
+        var s = Stats.dict[Stats.list[i]];
+        var x = this.x+15;
+        var y = this.y+(30*(i+1));
+        var icon = Engine.scene.add.sprite(x,y,'icons2', s.frame);
+        var text = Engine.scene.add.text(x+30,y, '100',
+            { font: '12px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
+        );
+        icon.dontDisplay = true;
+        text.dontDisplay = true;
+        this.icons.push(icon);
+        this.iconsTexts.push(text);
+        this.container.push(icon);
+        this.container.push(text);
+    }
+};
+
 Tooltip.prototype.display = function(){
-
     this.container.forEach(function(e){
-        e.visible = true;
+        if(!e.dontDisplay) e.visible = true;
     });
-
     this.displayed = true;
 };
 
 Tooltip.prototype.updateInfo = function(name, effects){
     if(name) {
         this.text.setText(name);
-        this.updateSize();
+        var nbEffects = Object.keys(effects).length;
+        this.updateSize(nbEffects);
+        for(var i = 0; i < Stats.list.length; i++){
+            this.icons[i].setVisible((i < nbEffects));
+            this.iconsTexts[i].setVisible((i < nbEffects));
+            if(i < nbEffects){
+                var s = Stats.dict[Object.keys(effects)[i]];
+                this.icons[i].setFrame(s.frame);
+            }
+        }
     }
 };
 
@@ -77,9 +105,9 @@ Tooltip.prototype.updatePosition = function(x,y){
     this.y += dy;
 };
 
-Tooltip.prototype.updateSize = function(){
-    var w = this.text.width;
-    var h = this.text.height - 15;
+Tooltip.prototype.updateSize = function(nbEffects){
+    var w = Math.max(this.text.width,60);
+    var h = this.text.height - 15 + (nbEffects*30);
     var dw = this.width - w;
     var dh = this.height - h;
     this.width = w;
@@ -103,7 +131,10 @@ Tooltip.prototype.updateSize = function(){
 
 Tooltip.prototype.hide = function(){
     this.container.forEach(function(e){
-        e.visible = false;
+        e.setVisible(false);
+    });
+    this.icons.forEach(function(e){
+        e.setVisible(false);
     });
     this.displayed = false;
 };
@@ -111,13 +142,13 @@ Tooltip.prototype.hide = function(){
 Tooltip.prototype.finalize = function(){
     this.container.forEach(function(e){
         var isText = (e.constructor.name == 'Text');
-        if(e.depth == 1 || !e.depth) e.depth = Engine.tooltipDepth;
+        if(e.depth == 1 || !e.depth) e.setDepth(Engine.tooltipDepth);
         if(isText) e.depth++;
         e.setScrollFactor(0);
-        //if(e.constructor.name == 'TileSprite') e.setDisplayOrigin(0,0);
         if(!e.centered) e.setDisplayOrigin(0,0);
         if(!e.notInteractive) e.setInteractive();
-        e.visible = false;
+        e.setVisible(false);
+        if(e.lol) console.log(e);
     });
 };
 

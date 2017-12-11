@@ -14,7 +14,7 @@ var Engine = {
     * - Tree canopies                           3-6
     * - Speech bubbles & text                   11
     * - UI & texts                              12
-    * - Tooltips & texts                        13
+    * - Tooltips & texts                        14
     * => nbLayers (for map): 7
     * */
 
@@ -23,7 +23,7 @@ var Engine = {
     playersDepth: 2,
     bubbleDepth: 11,
     UIDepth: 12,
-    tooltipDepth: 13,
+    tooltipDepth: 14,
 
     craftInvSize: 5, // max number of ingredients for crafting
     key: 'main', // key of the scene, for Phaser
@@ -51,11 +51,12 @@ Engine.preload = function() {
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
     this.load.atlas('buildings', 'assets/sprites/buildings.png', 'assets/sprites/buildings.json');
-    this.load.atlas('icons', 'assets/sprites/icons.png', 'assets/sprites/icons.json');
+    this.load.atlas('icons', 'assets/sprites/icons.png', 'assets/sprites/icons.json'); // remove?
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
+    this.load.spritesheet('icons2', 'assets/sprites/icons2.png',{frameWidth:25,frameHeight:24});
     this.load.image('tail', 'assets/sprites/tail.png');
-    this.load.image('iconslot', 'assets/sprites/iconslot.png');
+    this.load.image('iconslot', 'assets/sprites/iconslot.png'); // remove?
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
@@ -422,9 +423,10 @@ Engine.handleDown = function(event){
 };
 
 Engine.handleClick = function(event){
-    if(event.gameObject){
-        //console.log(event.gameObject.texture.key);
-        if(event.gameObject.handleClick) event.gameObject.handleClick();
+    if(event.list.length > 0){
+        for(var i = 0; i < event.list.length; i++){
+            if(event.list[i].handleClick) event.list[i].handleClick();
+        }
     }else{
         if(!Engine.inMenu) {
             if(Engine.inPanel) Engine.currentPanel.hide();

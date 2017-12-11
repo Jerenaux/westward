@@ -122,6 +122,7 @@ Panel.prototype.createZone = function(){
     zone.setDepth(Engine.UIDepth+10);
     zone.setScrollFactor(0);
     zone.handleOver = function(){
+        console.log('hover');
         Engine.tooltip.display();
     };
     zone.handleOut = function(){

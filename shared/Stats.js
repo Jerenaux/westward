@@ -5,63 +5,62 @@
 var onServer = (typeof window === 'undefined');
 
 Stats = {
-    list: [
-        {
-            'key': 'hp',
+    list: ['hp','fat','acc','def','mdmg','rdmg'],
+    dict: {
+        'hp': {
             'name': 'Health',
             'min': 0,
             'max': 100,
             'start': 100,
-            'icon': 'heart-plus'
+            'frame': 1
         },
-        {
-            'key': 'fat',
+        'fat': {
             'name': 'Fatigue',
             'min': 0,
             'max': 100,
             'start': 0,
-            'icon': 'despair'
+            'frame': 0
         },
-        {
+        'acc': {
             'key': 'acc',
             'name': 'Accuracy',
             'min': 0,
             'max': 100,
             'start': 50,
-            'icon': 'bullseye'
+            'frame': 2
         },
-        {
+        'def': {
             'key': 'def',
             'name': 'Defense',
             'min': 0,
             'max': 100,
             'start': 10,
-            'icon': 'chest-armor'
+            'frame':4
         },
-        {
+        'mdmg': {
             'key': 'mdmg',
             'name': 'Melee Damage',
             'min': 0,
             'max': 100,
             'start': 10,
-            'icon': 'pointy-sword'
+            'frame': 3
         },
-        {
+        'rdmg': {
             'key': 'rdmg',
             'name': 'Ranged Damage',
             'min': 0,
             'max': 100,
             'start': 10,
-            'icon': 'pocket-bow'
+            'frame': 5
         }
-    ]
+    }
 };
 
 Stats.getSkeleton = function(){
     var skeleton = {};
     for(var i = 0; i < Stats.list.length; i++){
-        var s = Stats.list[i];
-        skeleton[s.key] = 0;
+        var key = Stats.list[i];
+        skeleton[key] = 0;
     }
     return skeleton;
 };
