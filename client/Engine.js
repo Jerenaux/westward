@@ -331,6 +331,7 @@ Engine.addHero = function(id,x,y,settlement){
     Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
     Engine.player.itemRecipes.fromList([[6,1],[10,1]]);
     Engine.player.stats = Stats.getSkeleton();
+    Engine.player.equipment = Equipment.getSkeleton();
     Engine.statsTexts = Stats.getSkeleton();
     Engine.updateEnvironment();
 };
@@ -551,8 +552,8 @@ Engine.updateSelf = function(data){
     }
 };
 
-Engine.updateStat = function(key,delta){
-    Engine.player.stats[key] += delta;
+Engine.updateStat = function(key,value){
+    Engine.player.stats[key] = value;
     Engine.statsTexts[key].setText(Engine.player.stats[key]);
 };
 

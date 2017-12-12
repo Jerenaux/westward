@@ -58,7 +58,6 @@ GameServer.readMap = function(mapsPath){
     // Read buildings
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
     var buildings = JSON.parse(fs.readFileSync('./assets/maps/buildings.json').toString());
-    //for(var bid in buildings.buildings){
     for(var i = 0; i < buildings.list.length; i++){
         var data = buildings.list[i];
         new Building(data.x,data.y,data.type,data.settlement,data.stock);
@@ -245,7 +244,13 @@ GameServer.handleUse = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var item = data.item;
     if(!player.hasItem(item,1)) return false;
-
+    var itemData = GameServer.itemsData[item];
+    if(itemData.equipment){
+        player.equip(itemData.equipment,item,true);
+        return;
+    }
+    if(itemData.effects) player.applyEffects(item);
+    player.takeItem(item,1);
 };
 
 GameServer.handleAOItransition = function(entity,previous){

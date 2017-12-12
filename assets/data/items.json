@@ -61,6 +61,7 @@
     "atlas": "items2",
     "frame":"tunic",
     "name": "Tunic",
+    "equipment": "armor",
     "recipe":{"9":2},
     "effects":{"def":2}
   }

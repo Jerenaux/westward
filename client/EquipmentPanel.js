@@ -12,16 +12,15 @@ EquipmentPanel.prototype = Object.create(Panel.prototype);
 EquipmentPanel.prototype.constructor = EquipmentPanel;
 
 EquipmentPanel.prototype.addEquip = function(){
-    this.addEquipSlot(150,50,'armor');
-    this.addEquipSlot(100,65,'gun');
-    this.addEquipSlot(100,115,'sword');
-    this.addEquipSlot(200,65,'shield');
-    this.addEquipSlot(200,15,'necklace');
-    this.addEquipSlot(150,100,'belt');
-    this.addEquipSlot(150,150,'boots');
+    for(var i = 0; i < Equipment.list.length; i++){
+        var equip = Equipment.list[i];
+        var eq = Equipment.dict[equip];
+        this.addEquipSlot(eq.x,eq.y,eq.shade);
+    }
 
-    for(var i = 0; i < this.nbAccessories; i++){
-        this.addEquipSlot(100+(50*i),200,'ring');
+    var eq = Equipment.dict['acc'];
+    for(var i = 0; i < Equipment.nbAccessories; i++){
+        this.addEquipSlot(eq.x+(50*i),eq.y,eq.shade);
     }
 
     this.finalize();

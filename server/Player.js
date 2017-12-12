@@ -8,14 +8,15 @@ var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
 var Inventory = require('../shared/Inventory.js').Inventory;
 var Stats = require('../shared/Stats.js').Stats;
+var Equipment = require('../shared/Equipment.js').Equipment;
 
 function Player(){
     this.updatePacket = new PersonalUpdatePacket();
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.inventory = new Inventory();
     this.settlement = 0;
-    // todo: replace by objects with useful methods, min, max...
     this.stats = Stats.getSkeleton();
+    this.equipment = Equipment.getSkeleton();
 }
 
 Player.prototype = Object.create(MovingEntity.prototype);
@@ -53,9 +54,8 @@ Player.prototype.setStartingStats = function(){
 };
 
 Player.prototype.setStat = function(key,value){
-    var delta = value - this.stats[key];
-    this.updatePacket.addStatDelta(key,delta);
     this.stats[key] = value;
+    this.updatePacket.addStat(key,this.stats[key]);
 };
 
 Player.prototype.hasItem = function(item,nb){
@@ -70,6 +70,58 @@ Player.prototype.giveItem = function(item,nb){
 Player.prototype.takeItem = function(item,nb){
     console.log('Taking ',GameServer.itemsData[item].name,'x',nb);
     this.inventory.take(item,nb);
+};
+
+Player.prototype.isSlotBusy = function(slot){
+    if(slot == 'acc'){
+        for(var i = 0; i < Equipment.nbAccessories; i++) {
+            if(this.equipment['acc'][i] == -1) return false;
+        }
+        return true;
+    }else{
+        return (this.equipment['slot'] > -1);
+    }
+};
+
+Player.prototype.getEquip = function(slot){
+    if(slot == 'acc'){
+
+    }else{
+        return this.equipment['slot'];
+    }
+};
+
+Player.prototype.equip = function(slot,item,applyEffects){
+    //if(this.equipment[slot] > -1) this.unequip(slot);
+    if(this.isSlotBusy(slot)) this.unequip(slot);
+    this.equipment[slot] = item;
+    if(applyEffects) {
+        this.applyEffects(item);
+        if (this.hasItem(item, 1)) this.takeItem(item, 1);
+    }
+    this.updatePacket.addEquip(slot,item);
+};
+
+Player.prototype.unequip = function(slot){
+    var item = this.equipment[slot];
+    this.applyEffects(item,-1);
+    this.equipment[slot] = -1;
+    this.giveItem(item,1);
+    this.updatePacket.addEquip(slot,-1);
+};
+
+Player.prototype.applyEffects = function(item,coef){
+    var coef = coef || 1;
+    var itemData = GameServer.itemsData[item];
+    for (var stat in itemData.effects) {
+        if (!itemData.effects.hasOwnProperty(stat)) continue;
+        this.applyEffect(stat, coef*itemData.effects[stat]);
+    }
+};
+
+Player.prototype.applyEffect = function(stat,delta){
+    var newvalue = Utils.clamp(this.stats[stat],Stats.dict[stat].min,Stats.dict[stat].max);
+    this.setStat(stat,newvalue);
 };
 
 Player.prototype.trim = function(){
@@ -87,7 +139,7 @@ Player.prototype.trim = function(){
 Player.prototype.dbTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be stored in the database
     var trimmed = {};
-    var dbProperties = ['x','y','stats']; // list of properties relevant to store in the database
+    var dbProperties = ['x','y','stats','equipment']; // list of properties relevant to store in the database
     for(var p = 0; p < dbProperties.length; p++){
         trimmed[dbProperties[p]] = this[dbProperties[p]];
     }
@@ -105,6 +157,13 @@ Player.prototype.getDataFromDb = function(document){
     for(var i = 0; i < Stats.list.length; i++) {
         var key = Stats.list[i];
         if(document['stats'][key] >= 0) this.setStat(key,document['stats'][key]);
+    }
+    for(var i = 0; i < Equipment.list.length; i++){
+        var equip = Equipment.list[i];
+        this.equip(equip,document['equipment'][equip],false); // false: don't apply effects
+    }
+    for(var i = 0; i < Equipment.nbAccessories; i++){
+        this.equip('acc',document['equipment']['acc'][i],false); // false: don't apply effects
     }
     this.setOrUpdateAOI();
     this.inventory.fromList(document.inventory);

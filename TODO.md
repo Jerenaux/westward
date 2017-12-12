@@ -159,6 +159,7 @@ Visual:
 - Hover cards over craftring buttons
 - Hower card over gold indicator
 - Highlight buttons and buildings on hover
+- When hovering equipment, highlight corresponding equip slot
 - Use particle emitters for several cool effects, like cloud puffs, dust, lights, etc.
 - Light effect layer
 - Add cloud silhouettes
