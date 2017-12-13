@@ -101,6 +101,10 @@ Client.sendCraft = function(id,nb){
     Client.socket.emit('craft',{id:id,nb:nb});
 };
 
+Client.sendUse = function(id){
+    Client.socket.emit('use',{item:id});
+};
+
 // ####################"
 
 Client.sendMapData = function(id,data){

@@ -12,7 +12,7 @@ EquipmentPanel.prototype = Object.create(Panel.prototype);
 EquipmentPanel.prototype.constructor = EquipmentPanel;
 
 EquipmentPanel.prototype.addEquip = function(){
-    for(var i = 0; i < Equipment.list.length; i++){
+    /*for(var i = 0; i < Equipment.list.length; i++){
         var equip = Equipment.list[i];
         var eq = Equipment.dict[equip];
         this.addEquipSlot(eq.x,eq.y,eq.shade);
@@ -21,6 +21,14 @@ EquipmentPanel.prototype.addEquip = function(){
     var eq = Equipment.dict['acc'];
     for(var i = 0; i < Equipment.nbAccessories; i++){
         this.addEquipSlot(eq.x+(50*i),eq.y,eq.shade);
+    }*/
+    for(var equip in Equipment.dict){
+        if(!Equipment.dict.hasOwnProperty(equip)) continue;
+        var eq = Equipment.dict[equip];
+        for(var i = 0; i < eq.nb; i++) {
+            var xinc = eq.xincrement || 0;
+            this.addEquipSlot(eq.x+(i*xinc),eq.y,eq.shade);
+        }
     }
 
     this.finalize();

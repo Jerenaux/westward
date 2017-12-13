@@ -306,7 +306,7 @@ Engine.makeInventory = function(){
     inventory.addPanel(Engine.statsPanel);
     var items = new Panel(40,100,600,380,'Items');
     items.addCapsule(500,-9,'1299','gold');
-    items.addInventory(null,15,Engine.player.inventory.maxSize,Engine.player.inventory,true);
+    items.addInventory(null,15,Engine.player.inventory.maxSize,Engine.player.inventory,true,Engine.inventoryClick);
     inventory.addPanel(items); // inventory panel
     return inventory;
 };
@@ -700,6 +700,11 @@ Engine.togglePanel = function(){ // When clicking on a player/building/animal, t
     }
     this.panel.toggle();
 };
+
 Engine.recipeClick = function(){
     Engine.craftingPanel.updateTarget(this.itemID,Engine.itemsData[this.itemID]);
+};
+
+Engine.inventoryClick = function(){
+    Client.sendUse(this.itemID);
 };

@@ -246,7 +246,7 @@ GameServer.handleUse = function(data,socketID){
     if(!player.hasItem(item,1)) return false;
     var itemData = GameServer.itemsData[item];
     if(itemData.equipment){
-        player.equip(itemData.equipment,item,true);
+        player.equip(itemData.equipment,item,true); // true: apply effects
         return;
     }
     if(itemData.effects) player.applyEffects(item);

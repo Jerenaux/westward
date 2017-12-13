@@ -83,31 +83,31 @@ Player.prototype.isSlotBusy = function(slot){
     }
 };
 
-Player.prototype.getEquip = function(slot){
-    if(slot == 'acc'){
-
-    }else{
-        return this.equipment['slot'];
+Player.prototype.getFreeSubslot = function(slot){
+    for(var i = 0; i < this.equipment[slot].length; i++){
+        if(this.equipment[slot][i] == -1) return i;
     }
+    return -1;
 };
 
 Player.prototype.equip = function(slot,item,applyEffects){
-    //if(this.equipment[slot] > -1) this.unequip(slot);
-    if(this.isSlotBusy(slot)) this.unequip(slot);
-    this.equipment[slot] = item;
+    //if(this.isSlotBusy(slot)) this.unequip(slot);
+    var subSlot = this.getFreeSubslot(slot);
+    if(subSlot == -1) this.unequip(slot,0);
+    this.equipment[slot][subSlot] = item;
     if(applyEffects) {
         this.applyEffects(item);
         if (this.hasItem(item, 1)) this.takeItem(item, 1);
     }
-    this.updatePacket.addEquip(slot,item);
+    this.updatePacket.addEquip(slot,subSlot,item);
 };
 
-Player.prototype.unequip = function(slot){
-    var item = this.equipment[slot];
+Player.prototype.unequip = function(slot,subSlot){
+    var item = this.equipment[slot][subSlot];
     this.applyEffects(item,-1);
-    this.equipment[slot] = -1;
+    this.equipment[slot][subSlot] = -1;
     this.giveItem(item,1);
-    this.updatePacket.addEquip(slot,-1);
+    this.updatePacket.addEquip(slot,subSlot,-1);
 };
 
 Player.prototype.applyEffects = function(item,coef){
@@ -158,12 +158,20 @@ Player.prototype.getDataFromDb = function(document){
         var key = Stats.list[i];
         if(document['stats'][key] >= 0) this.setStat(key,document['stats'][key]);
     }
-    for(var i = 0; i < Equipment.list.length; i++){
+    /*for(var i = 0; i < Equipment.list.length; i++){
         var equip = Equipment.list[i];
         this.equip(equip,document['equipment'][equip],false); // false: don't apply effects
     }
     for(var i = 0; i < Equipment.nbAccessories; i++){
         this.equip('acc',document['equipment']['acc'][i],false); // false: don't apply effects
+    }*/
+    for(var equip in Equipment.dict) {
+        if (!Equipment.dict.hasOwnProperty(equip)) continue;
+        var eq = Equipment.dict[equip];
+        for(var i = 0; i < eq.nb; i++) {
+            var dbvalue = document['equipment'][equip][i];
+            if(dbvalue > -1) this.equip(equip,dbvalue,false); // false: don't apply effects
+        }
     }
     this.setOrUpdateAOI();
     this.inventory.fromList(document.inventory);
