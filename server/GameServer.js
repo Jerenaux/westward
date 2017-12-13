@@ -109,6 +109,7 @@ GameServer.loadPlayer = function(socket,id){
         if(!doc) {
             //GameServer.server.sendError(socket);
             console.log('ERROR : no matching document');
+            GameServer.addNewPlayer(socket);
             return;
         }
         var player = new Player();
@@ -232,7 +233,7 @@ GameServer.operateCraft = function(player,recipe,targetItem,nb){
         player.takeItem(item,recipe[item]*nb);
     }
     player.giveItem(targetItem,nb);
-    player.updateInventory();
+    //player.updateInventory();
 };
 
 GameServer.handlePath = function(path,socketID){
@@ -245,12 +246,21 @@ GameServer.handleUse = function(data,socketID){
     var item = data.item;
     if(!player.hasItem(item,1)) return false;
     var itemData = GameServer.itemsData[item];
+    if(!itemData.effects) return;
     if(itemData.equipment){
         player.equip(itemData.equipment,item,true); // true: apply effects
         return;
     }
-    if(itemData.effects) player.applyEffects(item);
+    player.applyEffects(item);
     player.takeItem(item,1);
+};
+
+GameServer.handleUnequip = function(data,socketID) {
+    var player = GameServer.getPlayer(socketID);
+    var slot = data.slot;
+    var subSlot = data.subslot;
+    if(player.equipment[slot][subSlot] == -1) return;
+    player.unequip(slot,subSlot);
 };
 
 GameServer.handleAOItransition = function(entity,previous){

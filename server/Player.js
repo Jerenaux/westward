@@ -43,7 +43,7 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(3,1);
     this.giveItem(5,14);
     this.giveItem(9,3);
-    this.updateInventory();
+    //this.updateInventory();
 };
 
 Player.prototype.setStartingStats = function(){
@@ -65,11 +65,13 @@ Player.prototype.hasItem = function(item,nb){
 Player.prototype.giveItem = function(item,nb){
     console.log('Giving ',GameServer.itemsData[item].name,'x',nb);
     this.inventory.add(item,nb);
+    this.updatePacket.addItem(item,this.inventory.getNb(item));
 };
 
 Player.prototype.takeItem = function(item,nb){
     console.log('Taking ',GameServer.itemsData[item].name,'x',nb);
     this.inventory.take(item,nb);
+    this.updatePacket.addItem(item,this.inventory.getNb(item));
 };
 
 Player.prototype.isSlotBusy = function(slot){
@@ -91,7 +93,6 @@ Player.prototype.getFreeSubslot = function(slot){
 };
 
 Player.prototype.equip = function(slot,item,applyEffects){
-    //if(this.isSlotBusy(slot)) this.unequip(slot);
     var subSlot = this.getFreeSubslot(slot);
     if(subSlot == -1) this.unequip(slot,0);
     this.equipment[slot][subSlot] = item;
@@ -120,7 +121,7 @@ Player.prototype.applyEffects = function(item,coef){
 };
 
 Player.prototype.applyEffect = function(stat,delta){
-    var newvalue = Utils.clamp(this.stats[stat],Stats.dict[stat].min,Stats.dict[stat].max);
+    var newvalue = Utils.clamp(this.stats[stat]+delta,Stats.dict[stat].min,Stats.dict[stat].max);
     this.setStat(stat,newvalue);
 };
 
@@ -158,13 +159,6 @@ Player.prototype.getDataFromDb = function(document){
         var key = Stats.list[i];
         if(document['stats'][key] >= 0) this.setStat(key,document['stats'][key]);
     }
-    /*for(var i = 0; i < Equipment.list.length; i++){
-        var equip = Equipment.list[i];
-        this.equip(equip,document['equipment'][equip],false); // false: don't apply effects
-    }
-    for(var i = 0; i < Equipment.nbAccessories; i++){
-        this.equip('acc',document['equipment']['acc'][i],false); // false: don't apply effects
-    }*/
     for(var equip in Equipment.dict) {
         if (!Equipment.dict.hasOwnProperty(equip)) continue;
         var eq = Equipment.dict[equip];
@@ -174,13 +168,17 @@ Player.prototype.getDataFromDb = function(document){
         }
     }
     this.setOrUpdateAOI();
-    this.inventory.fromList(document.inventory);
-    this.updateInventory();
+    //this.inventory.fromList(document.inventory);
+    for(var i = 0; i < document.inventory.length; i++){
+        var item = document.inventory[i];
+        this.giveItem(item[0],item[1]);
+    }
+    //this.updateInventory();
 };
 
-Player.prototype.updateInventory = function(){
+/*Player.prototype.updateInventory = function(){
     this.updatePacket.addItems(this.inventory.toList()); // update personal update packet
-};
+};*/
 
 Player.prototype.startIdle = function(){
     //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');

@@ -12,50 +12,58 @@ var Equipment = {
             nb: 1,
             x: 100,
             y: 115,
-            shade: 'sword'
+            shade: 'sword',
+            name: 'Melee weapon'
         },
         rangedw:{
             nb: 1,
             x: 100,
             y: 65,
-            shade: 'gun'
+            shade: 'gun',
+            name: 'Ranged weapon'
         },
         shield:{
             nb: 1,
             x: 200,
             y: 65,
-            shade: 'shield'
+            shade: 'shield',
+            name: 'Shield'
         },
         armor:{
             nb: 1,
             x: 150,
             y: 50,
-            shade: 'armor'
+            shade: 'armor',
+            name: 'Armor'
         },
         belt:{
             nb: 1,
             x: 150,
             y: 100,
-            shade: 'belt'
+            shade: 'belt',
+            name: 'Belt'
         },
         boots:{
             nb: 1,
             x: 150,
             y: 150,
-            shade: 'boots'
+            shade: 'boots',
+            name: 'Boots'
         },
         necklace:{
             nb: 1,
             x: 200,
             y: 15,
-            shade: 'necklace'
+            shade: 'necklace',
+            name: 'Necklace'
         },
         acc:{
             nb: 3,
             x: 100,
             y: 200,
             shade: 'ring',
-            xincrement: 50
+            xincrement: 50,
+            name: 'Accessory'
         }
 
     }

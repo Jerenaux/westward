@@ -302,7 +302,8 @@ Engine.makeCraftingMenu = function(){
 
 Engine.makeInventory = function(){
     var inventory = new Menu('Inventory');
-    inventory.addPanel(new EquipmentPanel(665,100,340,260,'Equipment'));
+    Engine.equipmentPanel = new EquipmentPanel(665,100,340,260,'Equipment');
+    inventory.addPanel(Engine.equipmentPanel);
     inventory.addPanel(Engine.statsPanel);
     var items = new Panel(40,100,600,380,'Items');
     items.addCapsule(500,-9,'1299','gold');
@@ -425,7 +426,7 @@ Engine.handleDown = function(event){
 
 Engine.handleClick = function(event){
     if(event.list.length > 0){
-        for(var i = 0; i < event.list.length; i++){
+        for(var i = 0; i < Math.min(event.list.length,2); i++){ // disallow bubbling too deep, only useful in menus (i.e. shallow)
             if(event.list[i].handleClick) event.list[i].handleClick();
         }
     }else{
@@ -550,6 +551,27 @@ Engine.updateSelf = function(data){
             Engine.updateStat(data.stats[i].k,data.stats[i].v);
         }
     }
+    if(data.equipment){
+        for(var i = 0; i < data.equipment.length; i++){
+            var eq = data.equipment[i];
+            Engine.updateEquipment(eq.slot,eq.subSlot,eq.item);
+        }
+    }
+};
+
+Engine.updateEquipment = function(slot,subSlot,item){
+    Engine.player.equipment[slot][subSlot] = item;
+    var data = Engine.itemsData[item];
+    var shade = Engine.equipmentPanel.shadeSprites[slot][subSlot];
+    var sprite = Engine.equipmentPanel.itemSprites[slot][subSlot];
+    if(item == -1){
+        shade.setVisible(true);
+        sprite.setVisible(false);
+    }else{
+        sprite.setUp(item,data,Engine.equipClick);
+        shade.setVisible(false);
+        sprite.setVisible(true);
+    }
 };
 
 Engine.updateStat = function(key,value){
@@ -561,7 +583,8 @@ Engine.updateInventory = function(inventory,items){
     // items is an array of smaller arrays of format [item id, nb]
     for(var i = 0; i < items.length; i++){
         var item = items[i];
-        inventory.update(item[0],item[1]);
+        //inventory.update(item[0],item[1]);
+        inventory.update(item.item,item.nb);
     }
 };
 
@@ -707,4 +730,9 @@ Engine.recipeClick = function(){
 
 Engine.inventoryClick = function(){
     Client.sendUse(this.itemID);
+};
+
+Engine.equipClick = function(){
+    console.log(this.slot,this.subSlot);
+    Client.sendUnequip(this.slot,this.subSlot);
 };

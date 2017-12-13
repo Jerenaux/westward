@@ -7,12 +7,16 @@ var ItemSprite = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function ItemSprite () {
-        CustomSprite.call(this, 0, 0, '');
+    initialize: function ItemSprite (x,y) {
+        x = x || 0;
+        y = y || 0;
+        CustomSprite.call(this, x, y, '');
 
         this.setScrollFactor(0);
         this.setInteractive();
+        this.setVisible(false);
         this.setDepth(Engine.UIDepth);
+        this.isItemSprite = true;
     },
 
     setUp: function(id,data,callback){

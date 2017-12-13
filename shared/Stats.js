@@ -11,7 +11,7 @@ var Stats = {
             name: 'Health',
             min: 0,
             max: 100,
-            start: 100,
+            start: 50,
             frame: 1
         },
         fat: {

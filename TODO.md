@@ -27,6 +27,7 @@ Performance:
 - Flattening: second pass to delete water-only chunks based on visibility
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
+- To check if update packets are empty: iterate over keys and check for emptyness using typeof (if array and length 0 ...)
 Order:
 - One clean, central way to manage tilesets, depth, blitters... (blitter selection in client/Chunk, "mawLayer" field in WorldEditor ...)
 - Give toString method to custom objects to replace [this.constructor.name this.id] ...
@@ -89,10 +90,7 @@ Content:
 - Chat
 - Gazette
 * Inventory
-- Usage block when clicking on item, two options: use or equip (show effect)
-- Use items from menu (healing)
-- Equip items from menu
-- Unequip items from menu
+- Usage block when clicking on item, use/equip (show effect)
 - Display ammo amount next to weapon (melee weapons have a ref to the id of the corresponding ammo item; fetch the nb of that item in the player.inventory (refactor when multiple ammo types)
 - Pick up items
 * Player interactions

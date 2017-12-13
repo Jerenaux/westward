@@ -105,6 +105,10 @@ Client.sendUse = function(id){
     Client.socket.emit('use',{item:id});
 };
 
+Client.sendUnequip = function(slot,subslot){
+    Client.socket.emit('unequip',{slot:slot,subslot:subslot});
+};
+
 // ####################"
 
 Client.sendMapData = function(id,data){

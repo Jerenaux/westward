@@ -3,13 +3,13 @@
  */
 
 function PersonalUpdatePacket(){
-    this.items = {};
+    this.items = [];
     this.stats = [];
     this.equipment = [];
 }
 
 PersonalUpdatePacket.prototype.isEmpty = function(){
-    if(Object.keys(this.items).length > 0) return false;
+    if(this.items.length > 0) return false;
     if(this.stats.length > 0) return false;
     if(this.equipment.length > 0) return false;
     return true;
@@ -27,16 +27,16 @@ PersonalUpdatePacket.prototype.updatePosition = function(x,y) {
     this.y = y;
 };
 
-PersonalUpdatePacket.prototype.addItems = function(items){
-    this.items = items;
+PersonalUpdatePacket.prototype.addItem = function(item,nb){
+    this.items.push({item:item,nb:nb});
 };
 
 PersonalUpdatePacket.prototype.addStat = function(key,value){
     this.stats.push({k:key,v:value});
 };
 
-PersonalUpdatePacket.prototype.addEquip = function(slot,item){
-    this.equipment.push({slot:slot,item:item});
+PersonalUpdatePacket.prototype.addEquip = function(slot,subSlot,item){
+    this.equipment.push({slot:slot,subSlot:subSlot,item:item});
 };
 
 module.exports.PersonalUpdatePacket = PersonalUpdatePacket;

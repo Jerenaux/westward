@@ -120,14 +120,13 @@ Panel.prototype.addInventory = function(title,maxwidth,total,inventory,showNumbe
 Panel.prototype.createZone = function(){
     var zone = Engine.scene.add.zone(0,0,0,0);
     zone.setDepth(Engine.UIDepth+10);
-    //zone.setScrollFactor(0);
+    zone.setScrollFactor(0);
     zone.handleOver = function(){
         Engine.tooltip.display();
     };
     zone.handleOut = function(){
         Engine.tooltip.hide();
     };
-    this.container.push(zone);
     return zone;
 };
 
