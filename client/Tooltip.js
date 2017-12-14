@@ -70,7 +70,6 @@ Tooltip.prototype.makeStatsIcons = function(){
 };
 
 Tooltip.prototype.updateInfo = function(name, effects){
-    console.log('updating info');
     effects = effects || {};
     if(name) {
         this.text.setText(name);
@@ -140,7 +139,6 @@ Tooltip.prototype.updateSize = function(nbEffects){
 };
 
 Tooltip.prototype.display = function(){
-    console.log('displaying');
     //if(!this.hasContent) return;
     this.container.forEach(function(e){
         if(!e.dontDisplay) e.visible = true;
@@ -149,7 +147,6 @@ Tooltip.prototype.display = function(){
 };
 
 Tooltip.prototype.hide = function(){
-    console.log('hiding');
     this.text.setText("");
     this.container.forEach(function(e){
         e.setVisible(false);

@@ -129,6 +129,7 @@
     "atlas": "items",
     "frame":"arrow",
     "name": "Arrow",
+    "equipment": "arrows",
     "ammo": "quiver"
   }
 }

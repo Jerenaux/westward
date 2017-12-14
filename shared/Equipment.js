@@ -71,7 +71,8 @@ var Equipment = {
             y: 50,
             shade: 'quiver',
             name: 'Quiver',
-            container: true
+            container: true,
+            contains: 'arrows'
         },
         ammo_pouch:{
             nb: 1,
@@ -80,8 +81,15 @@ var Equipment = {
             shade: 'ammo-pouch',
             name: 'Bullets pouch',
             container: true
+        },
+        arrows:{
+            nb: 1,
+            x: 310,
+            y: 50,
+            shade: 'arrow',
+            name: 'Arrows',
+            containedIn: 'quiver'
         }
-
     }
 };
 
@@ -97,8 +105,8 @@ Equipment.getSkeleton = function(){
             sl.push(-1);
         }
         skeleton[equip] = sl;
-        if(Equipment.dict[equip].containers){
-            skeleton.containers[equip] = {item:-1,nb:0};
+        if(Equipment.dict[equip].container){
+            skeleton.containers[equip] = 0;
         }
     }
     return skeleton;

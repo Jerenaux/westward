@@ -246,11 +246,8 @@ GameServer.handleUse = function(data,socketID){
     var item = data.item;
     if(!player.hasItem(item,1)) return false;
     var itemData = GameServer.itemsData[item];
-    if(itemData.equipment){
-        player.equip(itemData.equipment,item,true); // true: apply effects
-        return;
-    }else if(itemData.ammo){
-        player.reload(itemData.ammo,item);
+    if(itemData.equipment) {
+        player.equip(itemData.equipment, item, false); // false: not from DB
         return;
     }
     if(itemData.effects) player.applyEffects(item);

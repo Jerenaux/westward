@@ -44,7 +44,7 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(5,14);
     this.giveItem(9,3);
     this.giveItem(9,3);
-    this.giveItem(11,1);
+    this.giveItem(11,2);
     this.giveItem(12,1);
     this.giveItem(13,1);
     this.giveItem(14,1);
@@ -93,43 +93,75 @@ Player.prototype.getFreeSubslot = function(slot){
     return -1;
 };
 
-Player.prototype.equip = function(slot,item,applyEffects){
-    var conflictSlot = Equipment.dict[slot].conflict;
-    var subSlot = this.getFreeSubslot(slot);
-    if(subSlot == -1) {
+Player.prototype.canEquip = function(slot,item,fromDB){
+    if(fromDB) return true;
+    if(!this.hasItem(item, 1)) return false;
+    var containerSlot = Equipment.dict[slot].containedIn;
+    if(containerSlot && this.equipment[containerSlot][0] == -1) return false;
+    return true;
+};
+
+Player.prototype.equip = function(slot,item,fromDB){
+    if(!this.canEquip(slot,item,fromDB)) {
+        console.log('cant equip');
+        return;
+    }
+    var conflictSlot = Equipment.dict[slot].conflict; // Name of the slot with which the new object could conflict
+    var subSlot = this.getFreeSubslot(slot); // index of the first free subslot
+    if(subSlot == -1) { // no free subslot found
         subSlot = 0;
-        this.unequip(slot,subSlot);
+        this.unequip(slot,subSlot); // free up the first subslot
     }
     if(conflictSlot && this.isEquipped(conflictSlot,0)) this.unequip(conflictSlot,0); // todo handle multiple subslots
+
+    // equip item
     this.equipment[slot][subSlot] = item;
-    if(applyEffects) {
-        this.applyEffects(item);
-        if (this.hasItem(item, 1)) this.takeItem(item, 1);
-    }
     this.updatePacket.addEquip(slot,subSlot,item);
+
+    if(!fromDB) { // when loading from db, simply update fields, don't compute consequences
+        this.applyEffects(item);
+        var nb = 1;
+
+        // Manage related container, if any
+        var containerSlot = Equipment.dict[slot].containedIn;
+        if(containerSlot) {
+            nb = this.computeLoad(containerSlot,item); // compute how much will be added to the container
+            this.load(containerSlot, nb);
+        }
+
+        this.takeItem(item, nb);
+    }
 };
 
 Player.prototype.unequip = function(slot,subSlot){
     var item = this.equipment[slot][subSlot];
+    var containerSlot = Equipment.dict[slot].containedIn;
+    var containedSlot = Equipment.dict[slot].contains;
+    var nb = containerSlot ? this.equipment.containers[containerSlot] : 1;
+    if(containerSlot) this.unload(containerSlot);
+    if(containedSlot) this.unequip(containedSlot,0);
     this.applyEffects(item,-1);
     this.equipment[slot][subSlot] = -1;
-    this.giveItem(item,1);
+    this.giveItem(item,nb);
     this.updatePacket.addEquip(slot,subSlot,-1);
 };
 
-Player.prototype.reload = function(container,item){
-    var currentItem = this.equipment.containers[container].item;
-    var currentNb = this.equipment.containers[container].nb;
-    var containerItem = this.equipment[container][0];
+// Compute how much of item `item` can be added to container `containerSlot`
+Player.prototype.computeLoad = function(containerSlot,item){
+    var currentNb = this.equipment.containers[containerSlot];
+    var containerItem = this.equipment[containerSlot][0];
     var capacity = GameServer.itemsData[containerItem].capacity;
-    if(currentItem > -1 && currentItem != item){
-        this.giveItem(currentItem,currentNb);
-        this.equipment.containers[container].item = -1;
-        this.equipment.containers[container].nb = 0;
-        currentNb = 0;
-    }
-    var load = Math.min(this.inventory.getNb(item),capacity-currentNb);
-    this.equipment.containers[container] += load;
+    return Math.min(this.inventory.getNb(item), capacity - currentNb);
+};
+
+Player.prototype.load = function(containerSlot,nb){
+    this.equipment.containers[containerSlot] += nb;
+    this.updatePacket.addAmmo(containerSlot,this.equipment.containers[containerSlot]);
+};
+
+Player.prototype.unload = function(containerSlot){
+    this.equipment.containers[containerSlot] = 0;
+    this.updatePacket.addAmmo(containerSlot,0);
 };
 
 Player.prototype.applyEffects = function(item,coef){
@@ -185,21 +217,16 @@ Player.prototype.getDataFromDb = function(document){
         var eq = Equipment.dict[equip];
         for(var i = 0; i < eq.nb; i++) {
             var dbvalue = document['equipment'][equip][i];
-            if(dbvalue > -1) this.equip(equip,dbvalue,false); // false: don't apply effects
+            if(dbvalue > -1) this.equip(equip,dbvalue,true); // true: data from DB
         }
+        if(eq.ammo) this.load(equip,document['equipment']['containers'][equip]);
     }
     this.setOrUpdateAOI();
-    //this.inventory.fromList(document.inventory);
     for(var i = 0; i < document.inventory.length; i++){
         var item = document.inventory[i];
         this.giveItem(item[0],item[1]);
     }
-    //this.updateInventory();
 };
-
-/*Player.prototype.updateInventory = function(){
-    this.updatePacket.addItems(this.inventory.toList()); // update personal update packet
-};*/
 
 Player.prototype.startIdle = function(){
     //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');

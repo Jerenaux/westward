@@ -92,7 +92,8 @@ Content:
 * Inventory
 - Fix tooltips
 - Usage block when clicking on item, use/equip (show effect)
-- Display ammo amount next to weapon 
+- Zones don't work after switchign menus?!
+- Ammo system
 - Pick up items
 * Player interactions
 - Display speech bubble locally

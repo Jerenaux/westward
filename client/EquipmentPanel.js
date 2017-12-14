@@ -13,13 +13,14 @@ EquipmentPanel.prototype = Object.create(Panel.prototype);
 EquipmentPanel.prototype.constructor = EquipmentPanel;
 
 EquipmentPanel.prototype.addEquip = function(){
+    var xoffset = -30;
     for(var equip in Equipment.dict){
         if(!Equipment.dict.hasOwnProperty(equip)) continue;
         var eq = Equipment.dict[equip];
         for(var i = 0; i < eq.nb; i++) {
             var xinc = eq.xincrement || 0;
             var displayName = eq.nb > 1 ? eq.name+' '+(i+1) : eq.name;
-            this.addEquipSlot(eq.x+(i*xinc),eq.y,eq.shade,displayName,equip,i);
+            this.addEquipSlot(eq.x+(i*xinc)+xoffset,eq.y,eq.shade,displayName,equip,i);
         }
     }
 
