@@ -50,6 +50,8 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(14,1);
     this.giveItem(17,3);
     this.giveItem(18,1);
+    this.giveItem(19,1);
+    this.giveItem(20,6);
 };
 
 Player.prototype.setStartingStats = function(){
@@ -113,6 +115,21 @@ Player.prototype.unequip = function(slot,subSlot){
     this.equipment[slot][subSlot] = -1;
     this.giveItem(item,1);
     this.updatePacket.addEquip(slot,subSlot,-1);
+};
+
+Player.prototype.reload = function(container,item){
+    var currentItem = this.equipment.containers[container].item;
+    var currentNb = this.equipment.containers[container].nb;
+    var containerItem = this.equipment[container][0];
+    var capacity = GameServer.itemsData[containerItem].capacity;
+    if(currentItem > -1 && currentItem != item){
+        this.giveItem(currentItem,currentNb);
+        this.equipment.containers[container].item = -1;
+        this.equipment.containers[container].nb = 0;
+        currentNb = 0;
+    }
+    var load = Math.min(this.inventory.getNb(item),capacity-currentNb);
+    this.equipment.containers[container] += load;
 };
 
 Player.prototype.applyEffects = function(item,coef){

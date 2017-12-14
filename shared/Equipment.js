@@ -64,13 +64,32 @@ var Equipment = {
             shade: 'ring',
             xincrement: 50,
             name: 'Accessory'
+        },
+        quiver:{
+            nb: 1,
+            x: 270,
+            y: 50,
+            shade: 'quiver',
+            name: 'Quiver',
+            container: true
+        },
+        ammo_pouch:{
+            nb: 1,
+            x: 270,
+            y: 100,
+            shade: 'ammo-pouch',
+            name: 'Bullets pouch',
+            container: true
         }
 
     }
 };
 
+// Returns a data structure to store data releted to equipment
 Equipment.getSkeleton = function(){
-    var skeleton = {};
+    var skeleton = {
+        containers: {}
+    };
     for(var equip in Equipment.dict){
         if(!Equipment.dict.hasOwnProperty(equip)) continue;
         var sl = [];
@@ -78,6 +97,9 @@ Equipment.getSkeleton = function(){
             sl.push(-1);
         }
         skeleton[equip] = sl;
+        if(Equipment.dict[equip].containers){
+            skeleton.containers[equip] = {item:-1,nb:0};
+        }
     }
     return skeleton;
 };

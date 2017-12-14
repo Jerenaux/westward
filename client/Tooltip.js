@@ -99,7 +99,10 @@ Tooltip.prototype.updatePosition = function(x,y){
     //console.log(x,this.width);
     x += this.xOffset;
     y += this.yOffset;
-    if(x > Engine.scene.game.config.width - this.width) x -= this.width;
+    if(x > Engine.scene.game.config.width - this.width - 20) {
+        x -= this.width;
+        y += 20;
+    }
     var dx = x - this.x;
     var dy = y - this.y;
     if(dx == 0 && dy == 0) return;

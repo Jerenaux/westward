@@ -15,6 +15,14 @@
     {
       "filename":"bow",
       "frame": {"x":160,"y":32,"w":32,"h":32}
+    },
+    {
+      "filename":"quiver",
+      "frame": {"x":192,"y":64,"w":32,"h":32}
+    },
+    {
+      "filename":"arrow",
+      "frame": {"x":160,"y":64,"w":32,"h":32}
     }
   ]
 }

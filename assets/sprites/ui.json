@@ -217,6 +217,18 @@
       "frame": {"x":345,"y":431,"w":24,"h":19}
     },
     {
+      "filename": "quiver-shade",
+      "frame": {"x":342,"y":456,"w":29,"h":29}
+    },
+    {
+      "filename": "bomb-pouch-shade",
+      "frame": {"x":391,"y":430,"w":20,"h":23}
+    },
+    {
+      "filename": "ammo-pouch-shade",
+      "frame": {"x":388,"y":459,"w":26,"h":25}
+    },
+    {
       "filename": "sword-shade",
       "frame": {"x":212,"y":460,"w":24,"h":24}
     },

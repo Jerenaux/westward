@@ -117,5 +117,18 @@
     "frame":"golden-ring",
     "name": "Golden ring",
     "equipment": "acc"
+  },
+  "19":{
+    "atlas": "items",
+    "frame":"quiver",
+    "name": "Small quiver",
+    "equipment": "quiver",
+    "capacity": 10
+  },
+  "20":{
+    "atlas": "items",
+    "frame":"arrow",
+    "name": "Arrow",
+    "ammo": "quiver"
   }
 }

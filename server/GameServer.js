@@ -249,6 +249,9 @@ GameServer.handleUse = function(data,socketID){
     if(itemData.equipment){
         player.equip(itemData.equipment,item,true); // true: apply effects
         return;
+    }else if(itemData.ammo){
+        player.reload(itemData.ammo,item);
+        return;
     }
     if(itemData.effects) player.applyEffects(item);
     player.takeItem(item,1);

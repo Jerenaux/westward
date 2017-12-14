@@ -92,7 +92,7 @@ Content:
 * Inventory
 - Fix tooltips
 - Usage block when clicking on item, use/equip (show effect)
-- Display ammo amount next to weapon (melee weapons have a ref to the id of the corresponding ammo item; fetch the nb of that item in the player.inventory (refactor when multiple ammo types)
+- Display ammo amount next to weapon 
 - Pick up items
 * Player interactions
 - Display speech bubble locally
@@ -173,6 +173,8 @@ Sound:
 - Unique noise for items
 - Crafting SFX
 General:
+- Keyboard shortcuts for menus?
+- Categories of items? (How to concile with various backpack sizes)? Sorting of items?
 - Feedback for rejected paths because too long (question mark, sound, ...)
 - Polish existing content
 - Footsteps, light effects, sound effects (on actions + environment: birds, water, ...)
