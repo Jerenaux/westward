@@ -330,7 +330,7 @@ Engine.addHero = function(id,x,y,settlement){
     Engine.player.buildingRecipes = new Inventory(10);
     Engine.player.itemRecipes = new Inventory(10);
     Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
-    Engine.player.itemRecipes.fromList([[6,1],[10,1]]);
+    Engine.player.itemRecipes.fromList([[6,1],[10,1],[15,1],[16,1]]);
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = Equipment.getSkeleton();
     Engine.statsTexts = Stats.getSkeleton();
@@ -499,7 +499,6 @@ Engine.getMouseCoordinates = function(event){
 Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
     Engine.updateMarker(position.tile);
-    //if(Engine.tooltip && Engine.tooltip.displayed) Engine.tooltip.updatePosition(event.event.movementX,event.event.movementY);
     if(Engine.tooltip && Engine.tooltip.displayed) Engine.tooltip.updatePosition(event.x,event.y);
     if(Engine.debug){
         document.getElementById('pxx').innerHTML = position.pixel.x;
@@ -576,7 +575,9 @@ Engine.updateEquipment = function(slot,subSlot,item){
 
 Engine.updateStat = function(key,value){
     Engine.player.stats[key] = value;
-    Engine.statsTexts[key].setText(Engine.player.stats[key]);
+    var suffix = Stats.dict[key].suffix;
+    if(suffix) value = value+suffix;
+    Engine.statsTexts[key].setText(value);
 };
 
 Engine.updateInventory = function(inventory,items){
@@ -590,6 +591,7 @@ Engine.updateInventory = function(inventory,items){
 
 Engine.update = function(){
     //console.log(Engine.overSlot);
+    //if(Engine.tooltip) console.log(Engine.tooltip.hasContent,Engine.tooltip.displayed);
 };
 
 // Processes the global update packages received from the server

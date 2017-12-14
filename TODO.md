@@ -90,6 +90,7 @@ Content:
 - Chat
 - Gazette
 * Inventory
+- Fix tooltips
 - Usage block when clicking on item, use/equip (show effect)
 - Display ammo amount next to weapon (melee weapons have a ref to the id of the corresponding ammo item; fetch the nb of that item in the player.inventory (refactor when multiple ammo types)
 - Pick up items

@@ -5,22 +5,22 @@
 var onServer = (typeof window === 'undefined');
 
 var Equipment = {
-    //nbAccessories: 3,
-    //list: ['rangedw','meleew','shield','armor','belt','boots','necklace'],
     dict: {
         meleew:{
             nb: 1,
             x: 100,
             y: 115,
             shade: 'sword',
-            name: 'Melee weapon'
+            name: 'Melee weapon',
+            conflict: 'rangedw'
         },
         rangedw:{
             nb: 1,
             x: 100,
             y: 65,
             shade: 'gun',
-            name: 'Ranged weapon'
+            name: 'Ranged weapon',
+            conflict: 'meleew'
         },
         shield:{
             nb: 1,

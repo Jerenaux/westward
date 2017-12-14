@@ -19,7 +19,8 @@ var Stats = {
             min: 0,
             max: 100,
             start: 0,
-            frame: 0
+            frame: 0,
+            suffix: '%'
         },
         acc: {
             'key': 'acc',
@@ -27,7 +28,8 @@ var Stats = {
             min: 0,
             max: 100,
             start: 50,
-            frame: 2
+            frame: 2,
+            suffix: '%'
         },
         def: {
             'key': 'def',

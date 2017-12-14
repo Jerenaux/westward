@@ -21,7 +21,8 @@ StatsPanel.prototype.addStats = function(){
         var s = Stats.dict[key];
         var x = tlx + (i%3)*horizMargin;
         var y = tly + Math.floor(i/3)*vertMargin;
-        this.addStat(x,y,key,Engine.player.stats[key],s.frame,s.name);
+        var val = Engine.player.stats[key];
+        this.addStat(x,y,key,val,s.frame,s.name);
     }
     this.finalize();
 };

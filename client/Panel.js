@@ -335,17 +335,35 @@ Panel.prototype.displayTheInventory = function(inv){
         this.nextItemSprite++;
     }
 
-    // TODO: when multiple lines of items, compute shape and pass it to setInteractive
-    var zoneW = Math.min(nbDisplayed,inv.maxWidth)*36;
-    var zoneH = Math.ceil(nbDisplayed/inv.maxWidth)*36;
+    var slotSize = 36;
     var zoneX = this.slots[inv.firstSlot].x;
     var zoneY = this.slots[inv.firstSlot].y;
-    var zone = inv.zone;
+    var zoneW = Math.min(nbDisplayed,inv.maxWidth)*slotSize;
+    var zoneH = Math.ceil(nbDisplayed/inv.maxWidth)*slotSize;
+    var shape = [0,0,zoneW,0];
+    var diff = inv.maxWidth - Math.ceil(nbDisplayed%inv.maxWidth);
+    if(diff > 0 && nbDisplayed > inv.maxWidth){
+        shape.push(zoneW);
+        shape.push(zoneH-slotSize);
 
+        shape.push(zoneW-(diff*slotSize));
+        shape.push(zoneH-slotSize);
+
+        shape.push(zoneW-(diff*slotSize));
+        shape.push(zoneH);
+    }else{
+        shape.push(zoneW);
+        shape.push(zoneH);
+    }
+    shape.push(0);
+    shape.push(zoneH);
+    var polygon = new Phaser.Geom.Polygon(shape);
+
+    var zone = inv.zone;
     zone.setVisible(true);
     zone.setPosition(zoneX,zoneY);
     zone.setSize(zoneW,zoneH);
-    zone.setInteractive(); // necessary after size change
+    zone.setInteractive(polygon,Phaser.Geom.Polygon.Contains);
 };
 
 Panel.prototype.hide = function(){

@@ -43,7 +43,13 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(3,1);
     this.giveItem(5,14);
     this.giveItem(9,3);
-    //this.updateInventory();
+    this.giveItem(9,3);
+    this.giveItem(11,1);
+    this.giveItem(12,1);
+    this.giveItem(13,1);
+    this.giveItem(14,1);
+    this.giveItem(17,3);
+    this.giveItem(18,1);
 };
 
 Player.prototype.setStartingStats = function(){
@@ -74,15 +80,8 @@ Player.prototype.takeItem = function(item,nb){
     this.updatePacket.addItem(item,this.inventory.getNb(item));
 };
 
-Player.prototype.isSlotBusy = function(slot){
-    if(slot == 'acc'){
-        for(var i = 0; i < Equipment.nbAccessories; i++) {
-            if(this.equipment['acc'][i] == -1) return false;
-        }
-        return true;
-    }else{
-        return (this.equipment['slot'] > -1);
-    }
+Player.prototype.isEquipped = function(slot,subSlot){
+    return this.equipment[slot][subSlot] > -1;
 };
 
 Player.prototype.getFreeSubslot = function(slot){
@@ -93,8 +92,13 @@ Player.prototype.getFreeSubslot = function(slot){
 };
 
 Player.prototype.equip = function(slot,item,applyEffects){
+    var conflictSlot = Equipment.dict[slot].conflict;
     var subSlot = this.getFreeSubslot(slot);
-    if(subSlot == -1) this.unequip(slot,0);
+    if(subSlot == -1) {
+        subSlot = 0;
+        this.unequip(slot,subSlot);
+    }
+    if(conflictSlot && this.isEquipped(conflictSlot,0)) this.unequip(conflictSlot,0); // todo handle multiple subslots
     this.equipment[slot][subSlot] = item;
     if(applyEffects) {
         this.applyEffects(item);

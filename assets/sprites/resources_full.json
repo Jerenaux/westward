@@ -19,6 +19,38 @@
     {
       "filename": "tunic",
       "frame": {"x":264,"y":648,"w":24,"h":24}
+    },
+    {
+      "filename": "pirate-sword",
+      "frame": {"x":72,"y":576,"w":24,"h":24}
+    },
+    {
+      "filename": "gun",
+      "frame": {"x":216,"y":216,"w":24,"h":24}
+    },
+    {
+      "filename": "shield1",
+      "frame": {"x":144,"y":744,"w":24,"h":24}
+    },
+    {
+      "filename": "green-necklace",
+      "frame": {"x":288,"y":768,"w":24,"h":24}
+    },
+    {
+      "filename": "boots",
+      "frame": {"x":288,"y":240,"w":24,"h":24}
+    },
+    {
+      "filename": "belt",
+      "frame": {"x":120,"y":264,"w":24,"h":24}
+    },
+    {
+      "filename": "ruby-ring",
+      "frame": {"x":24,"y":768,"w":24,"h":24}
+    },
+    {
+      "filename": "golden-ring",
+      "frame": {"x":0,"y":768,"w":24,"h":24}
     }
   ]
 }

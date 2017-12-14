@@ -64,5 +64,58 @@
     "equipment": "armor",
     "recipe":{"9":2},
     "effects":{"def":2}
+  },
+  "11":{
+    "atlas": "items2",
+    "frame":"pirate-sword",
+    "name": "Sword",
+    "equipment": "meleew",
+    "effects":{"mdmg":2}
+  },
+  "12":{
+    "atlas": "items2",
+    "frame":"gun",
+    "name": "Gun",
+    "equipment": "rangedw",
+    "effects":{"rdmg":2,"acc":20}
+  },
+  "13":{
+    "atlas": "items2",
+    "frame":"shield1",
+    "name": "Wooden shield",
+    "equipment": "shield",
+    "effects":{"def":1}
+  },
+  "14":{
+    "atlas": "items2",
+    "frame":"green-necklace",
+    "name": "Emerald necklace",
+    "equipment": "necklace"
+  },
+  "15":{
+    "atlas": "items2",
+    "frame":"boots",
+    "name": "Leather boots",
+    "equipment": "boots",
+    "recipe":{"9":1}
+  },
+  "16":{
+    "atlas": "items2",
+    "frame":"belt",
+    "name": "Leather belt",
+    "equipment": "belt",
+    "recipe":{"9":1}
+  },
+  "17":{
+    "atlas": "items2",
+    "frame":"ruby-ring",
+    "name": "Ruby ring",
+    "equipment": "acc"
+  },
+  "18":{
+    "atlas": "items2",
+    "frame":"golden-ring",
+    "name": "Golden ring",
+    "equipment": "acc"
   }
 }

@@ -246,12 +246,11 @@ GameServer.handleUse = function(data,socketID){
     var item = data.item;
     if(!player.hasItem(item,1)) return false;
     var itemData = GameServer.itemsData[item];
-    if(!itemData.effects) return;
     if(itemData.equipment){
         player.equip(itemData.equipment,item,true); // true: apply effects
         return;
     }
-    player.applyEffects(item);
+    if(itemData.effects) player.applyEffects(item);
     player.takeItem(item,1);
 };
 

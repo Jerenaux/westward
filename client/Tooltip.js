@@ -9,10 +9,12 @@ function Tooltip(){
     this.yOffset = 10;
     this.width = 50;
     this.height = 10;
+    this.MIN_WIDTH = 65;
     this.container = [];
     this.icons = [];
     this.iconsTexts = [];
     this.displayed = false;
+    this.hasContent = true;
     this.text = Engine.scene.add.text(this.x+13,this.y+4, '',
         { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
     );
@@ -67,14 +69,8 @@ Tooltip.prototype.makeStatsIcons = function(){
     }
 };
 
-Tooltip.prototype.display = function(){
-    this.container.forEach(function(e){
-        if(!e.dontDisplay) e.visible = true;
-    });
-    this.displayed = true;
-};
-
 Tooltip.prototype.updateInfo = function(name, effects){
+    console.log('updating info');
     effects = effects || {};
     if(name) {
         this.text.setText(name);
@@ -86,18 +82,24 @@ Tooltip.prototype.updateInfo = function(name, effects){
             if(i < nbEffects){
                 var key = Object.keys(effects)[i];
                 var val = effects[key];
-                if(val > 0) val = "+"+val;
                 var s = Stats.dict[key];
+                if(val > 0) val = "+"+val;
+                if(s.suffix) val = val+s.suffix;
                 this.icons[i].setFrame(s.frame);
                 this.iconsTexts[i].setText(val);
             }
         }
+        this.hasContent = true;
+        //if(!this.displayed) this.display();
     }
 };
 
+// Called from Engine.trackMouse()
 Tooltip.prototype.updatePosition = function(x,y){
+    //console.log(x,this.width);
     x += this.xOffset;
     y += this.yOffset;
+    if(x > Engine.scene.game.config.width - this.width) x -= this.width;
     var dx = x - this.x;
     var dy = y - this.y;
     if(dx == 0 && dy == 0) return;
@@ -111,7 +113,7 @@ Tooltip.prototype.updatePosition = function(x,y){
 };
 
 Tooltip.prototype.updateSize = function(nbEffects){
-    var w = Math.max(this.text.width,60);
+    var w = Math.max(this.text.width,this.MIN_WIDTH);
     var h = this.text.height - 15 + (nbEffects*30);
     var dw = this.width - w;
     var dh = this.height - h;
@@ -134,7 +136,17 @@ Tooltip.prototype.updateSize = function(nbEffects){
     this.container[8].y -= dh;
 };
 
+Tooltip.prototype.display = function(){
+    console.log('displaying');
+    //if(!this.hasContent) return;
+    this.container.forEach(function(e){
+        if(!e.dontDisplay) e.visible = true;
+    });
+    this.displayed = true;
+};
+
 Tooltip.prototype.hide = function(){
+    console.log('hiding');
     this.text.setText("");
     this.container.forEach(function(e){
         e.setVisible(false);
@@ -143,6 +155,7 @@ Tooltip.prototype.hide = function(){
         e.setVisible(false);
     });
     this.displayed = false;
+    this.hasContent = false;
 };
 
 Tooltip.prototype.finalize = function(){
