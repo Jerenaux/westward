@@ -550,6 +550,12 @@ Engine.updateSelf = function(data){
             Engine.updateStat(data.stats[i].k,data.stats[i].v);
         }
     }
+    if(data.ammo){
+        for(var i = 0; i < data.ammo.length; i++){
+            var am = data.ammo[i];
+            Engine.updateAmmo(am.slot,am.nb);
+        }
+    }
     if(data.equipment){
         for(var i = 0; i < data.equipment.length; i++){
             var eq = data.equipment[i];
@@ -558,18 +564,31 @@ Engine.updateSelf = function(data){
     }
 };
 
+Engine.updateAmmo = function(slot,nb){
+    Engine.player.equipment.containers[slot] = nb;
+    var ammoSlot = Equipment.dict[slot].contains;
+    var countText = Engine.equipmentPanel.countTexts[ammoSlot];
+    var item = Engine.player.equipment[slot][0];
+    var capacity = Engine.itemsData[item].capacity;
+    countText.setText(nb);
+    if(nb == capacity) countText.setFill('#ffd700');
+};
+
 Engine.updateEquipment = function(slot,subSlot,item){
     Engine.player.equipment[slot][subSlot] = item;
     var data = Engine.itemsData[item];
     var shade = Engine.equipmentPanel.shadeSprites[slot][subSlot];
     var sprite = Engine.equipmentPanel.itemSprites[slot][subSlot];
+    var countText = Engine.equipmentPanel.countTexts[slot];
     if(item == -1){
         shade.setVisible(true);
         sprite.setVisible(false);
+        if(countText) countText.setVisible(false);
     }else{
         sprite.setUp(item,data,Engine.equipClick);
         shade.setVisible(false);
         sprite.setVisible(true);
+        if(countText) countText.setVisible(true);
     }
 };
 
@@ -735,6 +754,5 @@ Engine.inventoryClick = function(){
 };
 
 Engine.equipClick = function(){
-    console.log(this.slot,this.subSlot);
     Client.sendUnequip(this.slot,this.subSlot);
 };

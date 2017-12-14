@@ -51,7 +51,7 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(17,3);
     this.giveItem(18,1);
     this.giveItem(19,1);
-    this.giveItem(20,6);
+    this.giveItem(20,9);
 };
 
 Player.prototype.setStartingStats = function(){

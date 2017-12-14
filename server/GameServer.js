@@ -250,8 +250,10 @@ GameServer.handleUse = function(data,socketID){
         player.equip(itemData.equipment, item, false); // false: not from DB
         return;
     }
-    if(itemData.effects) player.applyEffects(item);
-    player.takeItem(item,1);
+    if(itemData.effects){
+        player.applyEffects(item);
+        player.takeItem(item,1);
+    }
 };
 
 GameServer.handleUnequip = function(data,socketID) {

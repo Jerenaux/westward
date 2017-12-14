@@ -77,7 +77,7 @@
     "frame":"gun",
     "name": "Gun",
     "equipment": "rangedw",
-    "effects":{"rdmg":2,"acc":20}
+    "effects":{"acc":20}
   },
   "13":{
     "atlas": "items2",
@@ -130,6 +130,7 @@
     "frame":"arrow",
     "name": "Arrow",
     "equipment": "arrows",
+    "effects":{"rdmg":2},
     "ammo": "quiver"
   }
 }

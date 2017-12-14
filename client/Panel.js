@@ -391,9 +391,9 @@ Panel.prototype.hideInventory = function(){ // Hide all items of all inventories
         this.sprites[j].visible = false;
         if(this.texts[j]) this.texts[j].visible = false;
     }
-    /*for(var i = 0; i < this.inventories.length; i++){
+    for(var i = 0; i < this.inventories.length; i++){
         this.inventories[i].zone.setVisible(false);
-    }*/
+    }
     this.nextItemSprite = 0;
 };
 
