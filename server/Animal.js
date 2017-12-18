@@ -49,7 +49,6 @@ Animal.prototype.startIdle = function(){
 };
 
 Animal.prototype.updateIdle = function(){
-    return;
     this.idleTime -= GameServer.server.npcUpdateRate;
     if(this.idleTime <= 0){
         var dest = this.findRandomDestination();

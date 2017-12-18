@@ -47,10 +47,10 @@ GameServer.readMap = function(mapsPath){
     GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()));
 
     GameServer.startArea = {
-        minx: 523,
-        maxx: 541,
+        minx: 537,
+        maxx: 543,
         miny: 690,
-        maxy: 699
+        maxy: 694
     };
 
     GameServer.itemsData = JSON.parse(fs.readFileSync('./assets/data/items.json').toString());

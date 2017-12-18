@@ -225,6 +225,10 @@
       "frame": {"x":436,"y":457,"w":30,"h":29}
     },
     {
+      "filename": "bullets-shade",
+      "frame": {"x":443,"y":421,"w":27,"h":27}
+    },
+    {
       "filename": "bomb-pouch-shade",
       "frame": {"x":391,"y":430,"w":20,"h":23}
     },

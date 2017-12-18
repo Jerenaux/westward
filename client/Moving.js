@@ -63,14 +63,13 @@ var Moving = new Phaser.Class({
     },
 
     updateDepth: function(){
-        //console.log(Engine.playersDepth + this.tileY/1000);
         try {
-            this.depth = Engine.playersDepth + this.tileY / 1000;
+            this.setDepth(Engine.playersDepth + this.tileY / 1000);
         }catch(e){
-            console.log('attempted value : ',Engine.playersDepth + this.tileY / 1000);
+            /*console.log('attempted value : ',Engine.playersDepth + this.tileY / 1000);
             console.log(this.scene);
             console.log(this);
-            throw e;
+            throw e;*/
         }
     },
 

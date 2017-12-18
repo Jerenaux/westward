@@ -216,6 +216,7 @@ Player.prototype.getDataFromDb = function(document){
         if (!Equipment.dict.hasOwnProperty(equip)) continue;
         var eq = Equipment.dict[equip];
         for(var i = 0; i < eq.nb; i++) {
+            if(!document['equipment'].hasOwnProperty(equip)) continue;
             var dbvalue = document['equipment'][equip][i];
             if(dbvalue > -1) this.equip(equip,dbvalue,true); // true: data from DB
         }

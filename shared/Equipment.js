@@ -80,7 +80,8 @@ var Equipment = {
             y: 100,
             shade: 'ammo-pouch',
             name: 'Bullets pouch',
-            container: true
+            container: true,
+            contains: 'bullets'
         },
         arrows:{
             nb: 1,
@@ -89,6 +90,14 @@ var Equipment = {
             shade: 'arrow',
             name: 'Arrows',
             containedIn: 'quiver'
+        },
+        bullets:{
+            nb: 1,
+            x: 310,
+            y: 100,
+            shade: 'bullets',
+            name: 'Bullets',
+            containedIn: 'ammo_pouch'
         }
     }
 };

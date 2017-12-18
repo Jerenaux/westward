@@ -11,8 +11,6 @@ var WorldEditor = require('../studio/WorldEditor.js').WorldEditor;
 var path = require('path');
 var fs = require('fs');
 
-var chunks = {};
-
 function fillMap(directory){
     var indir = path.join(__dirname,WorldEditor.mapsPath,directory);
     var masterData = JSON.parse(fs.readFileSync(path.join(indir,'master.json')).toString());
@@ -49,8 +47,10 @@ function fillMap(directory){
         //{x:553,y:492}
         //{x:436,y:563}
         //{x:445,y:546}
-        {x:579,y:863},
-        {x:563,y:865}
+        /*{x:579,y:863},
+        {x:563,y:865}*/
+        //{x:288,y:984}
+        {x:534,y:397}
     ];
     // 193, 28 ; 135, 109
 

@@ -14,7 +14,6 @@ function Tooltip(){
     this.icons = [];
     this.iconsTexts = [];
     this.displayed = false;
-    this.hasContent = true;
     this.text = Engine.scene.add.text(this.x+13,this.y+4, '',
         { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
     );
@@ -88,14 +87,11 @@ Tooltip.prototype.updateInfo = function(name, effects){
                 this.iconsTexts[i].setText(val);
             }
         }
-        this.hasContent = true;
-        //if(!this.displayed) this.display();
     }
 };
 
 // Called from Engine.trackMouse()
 Tooltip.prototype.updatePosition = function(x,y){
-    //console.log(x,this.width);
     x += this.xOffset;
     y += this.yOffset;
     if(x > Engine.scene.game.config.width - this.width - 20) {
@@ -139,7 +135,6 @@ Tooltip.prototype.updateSize = function(nbEffects){
 };
 
 Tooltip.prototype.display = function(){
-    //if(!this.hasContent) return;
     this.container.forEach(function(e){
         if(!e.dontDisplay) e.visible = true;
     });
@@ -155,7 +150,6 @@ Tooltip.prototype.hide = function(){
         e.setVisible(false);
     });
     this.displayed = false;
-    this.hasContent = false;
 };
 
 Tooltip.prototype.finalize = function(){

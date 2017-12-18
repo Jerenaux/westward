@@ -13,7 +13,7 @@ StatsPanel.prototype.constructor = StatsPanel;
 StatsPanel.prototype.addStats = function(){
     var tlx = 20;
     var tly = 25;
-    var horizMargin = 90;
+    var horizMargin = 100;
     var vertMargin = 30;
 
     for(var i = 0; i < Stats.list.length; i++) {
@@ -22,6 +22,7 @@ StatsPanel.prototype.addStats = function(){
         var x = tlx + (i%3)*horizMargin;
         var y = tly + Math.floor(i/3)*vertMargin;
         var val = Engine.player.stats[key];
+        // To add stuff to values (suffix, etc.), do it in Engine.updateStat()
         this.addStat(x,y,key,val,s.frame,s.name);
     }
     this.finalize();

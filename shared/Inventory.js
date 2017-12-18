@@ -5,7 +5,7 @@ var onServer = (typeof window === 'undefined');
 
 function Inventory(size){
     this.items = {}; // item.id -> nb
-    this.maxSize = size || 25;
+    this.maxSize = size || 20;
     this.size = 0;
 }
 

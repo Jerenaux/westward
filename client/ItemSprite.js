@@ -32,6 +32,6 @@ var ItemSprite = new Phaser.Class({
     },
 
     handleOver: function(){
-        Engine.tooltip.updateInfo(this.name,this.effects || {});
+        Engine.tooltip.updateInfo(this.name,this.effects);
     }
 });

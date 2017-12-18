@@ -12,7 +12,8 @@ var Stats = {
             min: 0,
             max: 100,
             start: 50,
-            frame: 1
+            frame: 1,
+            showMax: true
         },
         fat: {
             name: 'Fatigue',

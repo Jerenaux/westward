@@ -438,10 +438,12 @@ Engine.handleClick = function(event){
 };
 
 Engine.handleOver = function(event){
-    if(event.gameObject){
-        //if(event.gameObject.name) console.log(event.gameObject.name);
-        if(event.gameObject.constructor.name == 'Building') Engine.hideMarker();
-        if(event.gameObject.handleOver) event.gameObject.handleOver(event);
+    if(event.list.length > 0){
+        for(var i = 0; i < Math.min(event.list.length,2); i++) { // disallow bubbling too deep, only useful in menus (i.e. shallow)
+            var obj = event.list[i];
+            if(obj.constructor.name == 'Building') Engine.hideMarker();
+            if(obj.handleOver) obj.handleOver();
+        }
     }
 };
 
@@ -596,6 +598,7 @@ Engine.updateStat = function(key,value){
     Engine.player.stats[key] = value;
     var suffix = Stats.dict[key].suffix;
     if(suffix) value = value+suffix;
+    if(Stats.dict[key].showMax) value = value+"/"+Stats.dict[key].max;
     Engine.statsTexts[key].setText(value);
 };
 

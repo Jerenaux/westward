@@ -34,7 +34,9 @@ for(var i = 0; i < nbChunks; i+=World.nbChunksHorizontal){
             var datum = map.layers[l].data[d];
             if(datum !== null) goodData.push(datum);
         }
-        //console.log(goodData.length);
+        if(goodData.length == 620) {
+            goodData.splice(-20);
+        }
         map.layers[l].data = goodData;
     }
 

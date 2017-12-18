@@ -18,8 +18,8 @@ World.readMasterData(masterData);
 var nbChunks = World.nbChunksHorizontal*World.nbChunksVertical;
 console.log(nbChunks+' chunks to process');
 
-var terrain = Object.values(WorldEditor.shore).concat(Object.values(WorldEditor.grass));
-console.log(terrain);
+//var terrain = Object.values(WorldEditor.shore).concat(Object.values(WorldEditor.grass));
+//console.log(terrain);
 
 for(var i = 0; i < nbChunks; i++){
     var filename = 'chunk'+i+'.json';
@@ -31,7 +31,9 @@ for(var i = 0; i < nbChunks; i++){
     for(var l = 0; l < map.layers.length; l++){
         for(var d = 0; d < map.layers[l].data.length; d++){
             var t = map.layers[l].data[d];
-            if(t > 0 && !terrain.includes(t)) {
+            // OR: remove ID's in range [trees.firstgid, trees.firstgid+nbtiles]
+            //if(t > 0 && !terrain.includes(t)) {
+            if(t > 682 && t < 808){
                 map.layers[l].data[d] = 0;
                 dirty = true;
             }

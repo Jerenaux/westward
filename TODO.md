@@ -9,6 +9,7 @@ Cleaning
 * Trade
 * World map
 Design document
+Legal
 Polish
 World building
 
@@ -90,8 +91,10 @@ Content:
 - Chat
 - Gazette
 * Inventory
-- Fix tooltips
+- Fix tooltips displaying too long on equipped equipment slots
 - Usage block when clicking on item, use/equip (show effect)
+- Drag/drop mechanics (for use, throw, equip, slots...)
+- Quick-use slots
 - Pick up items
 * Player interactions
 - Display speech bubble locally
@@ -149,10 +152,20 @@ Design document:
 - Tidy up (charts, tables, Latex formulas...)
 - For v1 schedule: follow https://www.youtube.com/watch?v=moW8-MXjivs priorization method from (36:00)
 
+Legal:
+------
+- Look up IFAPME
+- "how to make a company in Belgium"
+- Détails fiscaux et autre d'être indépendant, différnts types de companies...
+- Comptable, avocat spécialisé
+- Contrats
+- What about donations, how is it taxed, what formats allow it..
+
 Polish:
 ------
 Visual:
 - Find better font
+- Animation when using item, throwing item, equipping... (reactive, before getting network response)
 - Menu sprites change size when hovered / clicked
 - Hover cards over craftring buttons
 - Hower card over gold indicator
@@ -185,11 +198,13 @@ General:
 
 World building:
 --------------
+- Add random elements (w/ scripts to remove them):
+-> Patches of dirt
+-> Tree decorations: flowers, stones, bushes
+- Add cliffs in empty areas
+-> Add random decorations to cliffs (stones in bends, ...)
 - Compute tree density and spread random trees around accordingly?
 - No tree if busy 3cells to the left? Or when planing tree, log width cells to right as no-go position
-- Add random elements
-- Investigate the possibility of making cliffs from terrain data of the east coast
-- Rework cliffs
 - Fix loops (lakes ...)
 - Plan for more layers in dev
 - Store forests and trees separately (trees.json) during dev?
