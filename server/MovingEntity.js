@@ -45,7 +45,7 @@ MovingEntity.prototype.updateWalk = function(){
         }else{
             if(debug) console.log('['+this.constructor.name+' '+this.id+'] Arrived at destination');
             this.moving = false;
-            this.startIdle();
+            this.onArrival();
         }
     }
 };

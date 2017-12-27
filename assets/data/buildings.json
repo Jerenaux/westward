@@ -28,7 +28,11 @@
     "width": 590,
     "height": 425,
     "sprite": "tradepost",
-    "name":"Trade Post"
+    "name":"Trade Post",
+    "entry": {
+      "x": 14,
+      "y": 11
+    }
   },
   "2":{
     "shape":[

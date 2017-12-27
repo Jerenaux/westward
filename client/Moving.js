@@ -106,6 +106,7 @@ var Moving = new Phaser.Class({
                 mover.updatePosition();
                 mover.anims.stop();
                 mover.setFrame(mover.restingFrames[mover.orientation]);
+                if(mover.onArrival) mover.onArrival();
             }
         });
     },

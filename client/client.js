@@ -89,8 +89,8 @@ Client.requestData = function(){ // request the data to be used for initWorld()
     Client.socket.emit('init-world',Client.getInitRequest());
 };
 
-Client.sendPath = function(path){
-    Client.socket.emit('path',path);
+Client.sendPath = function(path,action){
+    Client.socket.emit('path',{path:path,action:action});
 };
 
 Client.startBattle = function(targetID){

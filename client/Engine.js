@@ -28,11 +28,10 @@ var Engine = {
     craftInvSize: 5, // max number of ingredients for crafting
     key: 'main', // key of the scene, for Phaser
     playerIsInitialized: false,
-    cursor: 'url(/assets/sprites/cursor.png), auto', // image of the mouse cursor in normal circumstances
+    cursor: 'url(/assets/sprites/cursor.png), auto' // image of the mouse cursor in normal circumstances
 };
 
 Engine.preload = function() {
-    //this.load.image('hero', 'assets/sprites/hero.png');
     this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
 
     this.load.image('talk', 'assets/sprites/talk.png');
@@ -325,6 +324,7 @@ Engine.makeCharacterMenu = function(){
 
 Engine.addHero = function(id,x,y,settlement){
     Engine.player = Engine.addPlayer(id,x,y,settlement);
+    Engine.player.isHero = true;
     Engine.camera.startFollow(Engine.player);
     Engine.player.inventory = new Inventory();
     Engine.player.buildingRecipes = new Inventory(10);
@@ -432,7 +432,7 @@ Engine.handleClick = function(event){
     }else{
         if(!Engine.inMenu) {
             if(Engine.inPanel) Engine.currentPanel.hide();
-            Engine.computePath(Engine.getMouseCoordinates(event));
+            Engine.moveToClick(event);
         }
     }
 };
@@ -454,13 +454,18 @@ Engine.handleOut = function(event){
     }
 };
 
+Engine.moveToClick = function(event){
+    Engine.player.setDestinationAction(0);
+    Engine.computePath(Engine.getMouseCoordinates(event).tile);
+};
+
 Engine.computePath = function(position){
-    if(Engine.collisions.get(position.tile.y,position.tile.x) == 1) return; // y, then x!
-    //console.log('path from '+Engine.player.tileX+', '+Engine.player.tileY+' to '+position.tile.x+', '+position.tile.y);
+    var x = position.x;
+    var y = position.y;
+    if(Engine.collisions.get(y,x) == 1) return; // y, then x!
     Engine.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(Engine.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
-    var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, position.tile.x, position.tile.y, Engine.PFgrid);
+    var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, x, y, Engine.PFgrid);
     if(path.length > PFUtils.maxPathLength) return;
-    Client.sendPath(path);
     Engine.player.move(path);
 };
 
@@ -666,6 +671,8 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
     if(data.path && player.id != Engine.player.id) player.move(data.path);
     if(data.inFight == true) player.displayHalo();
     if(data.inFight == false) player.hideHalo();
+    if(data.inBuilding > -1) player.setVisible(false);
+    if(data.inBuilding == -1) player.setVisible(true);
 };
 
 Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server

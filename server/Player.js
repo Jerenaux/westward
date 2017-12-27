@@ -13,8 +13,10 @@ var Equipment = require('../shared/Equipment.js').Equipment;
 function Player(){
     this.updatePacket = new PersonalUpdatePacket();
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
+    this.action = null;
     this.inventory = new Inventory();
     this.settlement = 0;
+    this.inBuilding = -1;
     this.stats = Stats.getSkeleton();
     this.equipment = Equipment.getSkeleton();
 }
@@ -181,7 +183,7 @@ Player.prototype.applyEffect = function(stat,delta){
 Player.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','path','settlement','inFight']; // list of properties relevant for the client
+    var broadcastProperties = ['id','path','settlement','inFight','inBuilding']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -193,7 +195,7 @@ Player.prototype.trim = function(){
 Player.prototype.dbTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be stored in the database
     var trimmed = {};
-    var dbProperties = ['x','y','stats','equipment']; // list of properties relevant to store in the database
+    var dbProperties = ['x','y','stats','equipment','inBuilding']; // list of properties relevant to store in the database
     for(var p = 0; p < dbProperties.length; p++){
         trimmed[dbProperties[p]] = this[dbProperties[p]];
     }
@@ -229,8 +231,16 @@ Player.prototype.getDataFromDb = function(document){
     }
 };
 
-Player.prototype.startIdle = function(){
+Player.prototype.setAction = function(action){
+    this.action = action;
+};
+
+Player.prototype.onArrival = function(){
     //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
+    if(!this.action) return;
+    if(this.action.type == 1) {
+        this.setProperty('inBuilding', this.action.id);
+    }
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){

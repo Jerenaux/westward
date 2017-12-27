@@ -8,7 +8,7 @@ var Building = new Phaser.Class({
 
     initialize: function Building (id, x, y, type, settlement, inv) {
         var data = Engine.buildingsData[type];
-        var settlementData = Engine.settlementsData[settlement];
+        //var settlementData = Engine.settlementsData[settlement];
         CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, data.sprite);
 
         this.tileX = x;
@@ -20,7 +20,7 @@ var Building = new Phaser.Class({
         this.inventory.fromList(inv);
         this.chunk = Utils.tileToAOI({x:x,y:y});
 
-        var height = 200;
+        /*var height = 200;
         var width = 300;
         var py = Engine.baseViewHeight*Engine.tileHeight - height;
         var panelName = data.name+' of '+settlementData.name;
@@ -28,7 +28,16 @@ var Building = new Phaser.Class({
         this.panel.addRing(260,-10,'red','close',Engine.togglePanel.bind(this));
         this.panel.addInventory(null,5,5,this.inventory,true);
         this.panel.setTweens(0,py+height,0,py,500);
-        this.handleClick = Engine.togglePanel.bind(this);
+        this.handleClick = Engine.togglePanel.bind(this);*/
+        this.handleClick = function(){
+            if(!data.entry) return;
+            var pos = {
+                x: x + data.entry.x,
+                y: y + data.entry.y
+            };
+            Engine.player.setDestinationAction(1,id); // 1 for building
+            Engine.computePath(pos);
+        };
 
         var shape = new Phaser.Geom.Polygon(data.shape);
         this.setInteractive(shape, Phaser.Geom.Polygon.Contains);

@@ -236,9 +236,10 @@ GameServer.operateCraft = function(player,recipe,targetItem,nb){
     //player.updateInventory();
 };
 
-GameServer.handlePath = function(path,socketID){
+GameServer.handlePath = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
-    player.setPath(path);
+    player.setAction(data.action);
+    player.setPath(data.path);
 };
 
 GameServer.handleUse = function(data,socketID){

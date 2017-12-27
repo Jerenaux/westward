@@ -6,6 +6,7 @@ Cleaning
 * Player interactions
 * Settlement defense
 * Settlement economy
+* Settlement management
 * Trade
 * World map
 Design document
@@ -49,9 +50,10 @@ Order:
 Content:
 -------
 * Battle system
-- Visual cue to indicate who's turn it is
+- Visual cue to indicate whose turn it is
 - Visual timer
-- Menus to decide which action to take, on which target
+- Display grid
+- Display quick slots
 - Movement on the battlefield
 - Set up basic stats and formulas for melee attacks
 - Mechanic for melee attacks
@@ -67,6 +69,7 @@ Content:
 - Battle experience
 - Spawn loot
 - Readjust camera
+- Mouse hover icons (melee attack, ranged...)
 - Sync battles with other players
 - Allow players to jump in
 - Animal can spot players
@@ -78,10 +81,10 @@ Content:
 - Adjust camera
 - Have a permanent presence of savages and animals around settlements
 * Exploration/travel
-- Have a world to explore
+- Have a world to explore -> World building
 - Have a permanent presence of a few pickup items around settlements
 - Campfires
-- cf. Worldmap
+- cf. Worldmap  
 * Inns
 (- Enable players to put construction site)
 (- Enable players to commit to construction)
@@ -123,6 +126,8 @@ Content:
 - Restrict prerogatives based on official position
 - Let governor name chancellor
 - Salaries for officials
+* Settlement management
+- ...
 * Trade
 - Shop system, test with pre-filled inventories
 -> Display action slates in building panel; make "shop" action
@@ -154,9 +159,7 @@ Design document:
 
 Legal:
 ------
-- Look up IFAPME
-- "how to make a company in Belgium"
-- Détails fiscaux et autre d'être indépendant, différnts types de companies...
+- Look up IFAPME, UCM, Forem
 - Comptable, avocat spécialisé
 - Contrats
 - What about donations, how is it taxed, what formats allow it..
@@ -165,6 +168,7 @@ Polish:
 ------
 Visual:
 - Find better font
+- Help buttons everywhere
 - Animation when using item, throwing item, equipping... (reactive, before getting network response)
 - Menu sprites change size when hovered / clicked
 - Hover cards over craftring buttons

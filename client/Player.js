@@ -16,7 +16,6 @@ var Player = new Phaser.Class({
         var width = 300;
         var py = Engine.baseViewHeight*Engine.tileHeight - height;
         this.panel = new Panel(0,py+height,width,height,'Player name');
-        //this.panel.addRing(260,-10,'red','close',Engine.closePanel.bind(this.panel));
         this.panel.addRing(260,-10,'red','close',Engine.togglePanel.bind(this));
         this.panel.setTweens(0,py+height,0,py,300);
         this.handleClick = Engine.togglePanel.bind(this);
@@ -38,5 +37,32 @@ var Player = new Phaser.Class({
             left: 52,
             right: 7
         };
+
+        this.destinationAction = null;
+    },
+
+    setDestinationAction: function(type,id){
+        if(type == 0){
+            this.destinationAction = null;
+            return;
+        }
+        this.destinationAction = {
+            type: type,
+            id: id
+        }
+    },
+
+    move: function(path){
+        console.log('Client moving : ',path);
+        if(this.isHero) Client.sendPath(path,this.destinationAction);
+        Moving.prototype.move.call(this,path);
+    },
+
+    onArrival: function(){
+        console.log('arrived');
+        if(!this.destinationAction) return;
+        if(this.destinationAction.type == 1){
+            console.log('Entering building ',this.destinationAction.id);
+        }
     }
 });
