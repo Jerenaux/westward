@@ -14,6 +14,7 @@ PersonalUpdatePacket.prototype.isEmpty = function(){
     if(this.stats.length > 0) return false;
     if(this.equipment.length > 0) return false;
     if(this.ammo.length > 0) return false;
+    if(this.gold !== undefined) return false;
     return true;
 };
 
@@ -28,6 +29,11 @@ PersonalUpdatePacket.prototype.clean = function() { // Remove empty arrays from 
 PersonalUpdatePacket.prototype.updatePosition = function(x,y) {
     this.x = x;
     this.y = y;
+};
+
+PersonalUpdatePacket.prototype.updateGold = function(nb) {
+    this.gold = nb;
+    console.log('gold set to',this.gold);
 };
 
 PersonalUpdatePacket.prototype.addItem = function(item,nb){

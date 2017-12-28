@@ -56,6 +56,10 @@ server.resetStamp = 1513286792402; // ignore returning players with stamps older
 io.on('connection',function(socket){
 
     socket.on('init-world',function(data){
+        if(!gs.initialized){
+            socket.emit('wait');
+            return;
+        }
         console.log('['+socket.id+'] Initialized');
         if(!data.stamp || data.stamp < server.resetStamp) data.new = true; // TODO Remove eventually
         if(data.new){

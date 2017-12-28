@@ -6,9 +6,8 @@ var Building = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function Building (id, x, y, type, settlement, inv) {
+    initialize: function Building (id, x, y, type, settlement, inv, gold) {
         var data = Engine.buildingsData[type];
-        //var settlementData = Engine.settlementsData[settlement];
         CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, data.sprite);
 
         this.tileX = x;
@@ -19,9 +18,12 @@ var Building = new Phaser.Class({
         this.settlement = settlement;
         this.inventory = new Inventory(100);
         this.inventory.fromList(inv);
+        this.gold = gold;
         this.chunk = Utils.tileToAOI({x:x,y:y});
 
-        /*var height = 200;
+        /*
+         //var settlementData = Engine.settlementsData[settlement];
+        var height = 200;
         var width = 300;
         var py = Engine.baseViewHeight*Engine.tileHeight - height;
         var panelName = data.name+' of '+settlementData.name;

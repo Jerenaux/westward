@@ -62,7 +62,7 @@ Panel.prototype.addCapsule = function(xOffset,yOffset,title,image){
 
     if(image) {
         var img = currentScene.scene.add.sprite(x+8,y+6,'UI',image);
-        img.depth = Engine.UIDepth+2;
+        img.setDepth(Engine.UIDepth+2);
     }
     var textX = (image ? x + img.width : x) + 10;
     var textY = (image ? y - 1: y);
@@ -80,6 +80,7 @@ Panel.prototype.addCapsule = function(xOffset,yOffset,title,image){
     this.container.push(currentScene.scene.add.sprite(x,y,'UI','capsule-right'));
 
     if(image) this.container.push(img);
+    return text;
 };
 
 Panel.prototype.addRing = function(xs,ys,color,symbol,callback){
@@ -122,10 +123,10 @@ Panel.prototype.createZone = function(){
     zone.setDepth(Engine.UIDepth+10);
     zone.setScrollFactor(0);
     zone.handleOver = function(){
-        Engine.tooltip.display();
+        currentScene.tooltip.display();
     };
     zone.handleOut = function(){
-        Engine.tooltip.hide();
+        currentScene.tooltip.hide();
     };
     return zone;
 };
@@ -341,7 +342,9 @@ Panel.prototype.displayTheInventory = function(inv){
     var zoneW = Math.min(nbDisplayed,inv.maxWidth)*slotSize;
     var zoneH = Math.ceil(nbDisplayed/inv.maxWidth)*slotSize;
     var shape = [0,0,zoneW,0];
+    // Diff = how many empty slots in the last inventory row
     var diff = inv.maxWidth - Math.ceil(nbDisplayed%inv.maxWidth);
+    if(diff == inv.maxWidth) diff = 0;
     if(diff > 0 && nbDisplayed > inv.maxWidth){
         shape.push(zoneW);
         shape.push(zoneH-slotSize);

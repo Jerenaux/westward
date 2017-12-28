@@ -16,6 +16,7 @@ function Player(){
     this.action = null;
     this.inventory = new Inventory();
     this.settlement = 0;
+    this.gold = 0;
     this.inBuilding = -1;
     this.stats = Stats.getSkeleton();
     this.equipment = Equipment.getSkeleton();
@@ -54,6 +55,7 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(18,1);
     this.giveItem(19,1);
     this.giveItem(20,9);
+    this.giveGold(500);
 };
 
 Player.prototype.setStartingStats = function(){
@@ -66,6 +68,11 @@ Player.prototype.setStartingStats = function(){
 Player.prototype.setStat = function(key,value){
     this.stats[key] = value;
     this.updatePacket.addStat(key,this.stats[key]);
+};
+
+Player.prototype.giveGold = function(nb){
+    this.gold += nb;
+    this.updatePacket.updateGold(this.gold);
 };
 
 Player.prototype.hasItem = function(item,nb){
@@ -195,7 +202,7 @@ Player.prototype.trim = function(){
 Player.prototype.dbTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be stored in the database
     var trimmed = {};
-    var dbProperties = ['x','y','stats','equipment','inBuilding']; // list of properties relevant to store in the database
+    var dbProperties = ['x','y','stats','equipment','gold']; // list of properties relevant to store in the database
     for(var p = 0; p < dbProperties.length; p++){
         trimmed[dbProperties[p]] = this[dbProperties[p]];
     }
@@ -206,7 +213,7 @@ Player.prototype.dbTrim = function(){
 Player.prototype.getDataFromDb = function(document){
     // Set up the player based on the data stored in the databse
     // document is the mongodb document retrieved form the database
-    var dbProperties = ['x','y','inBuilding'];
+    var dbProperties = ['x','y'];
     for(var p = 0; p < dbProperties.length; p++){
         this[dbProperties[p]] = document[dbProperties[p]];
     }
@@ -224,11 +231,13 @@ Player.prototype.getDataFromDb = function(document){
         }
         if(eq.ammo) this.load(equip,document['equipment']['containers'][equip]);
     }
-    this.setOrUpdateAOI();
     for(var i = 0; i < document.inventory.length; i++){
         var item = document.inventory[i];
         this.giveItem(item[0],item[1]);
     }
+    if(!document.gold) document.gold = 0;
+    this.giveGold(document.gold);
+    this.setOrUpdateAOI();
 };
 
 Player.prototype.setAction = function(action){

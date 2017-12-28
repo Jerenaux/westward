@@ -31,6 +31,7 @@ Performance:
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 - To check if update packets are empty: iterate over keys and check for emptyness using typeof (if array and length 0 ...)
 Order:
+- Use classes for scenes? Would allow using 'this' as well as inheritance to avoid code duplication (e.g. handleOver ...)
 - One clean, central way to manage tilesets, depth, blitters... (blitter selection in client/Chunk, "mawLayer" field in WorldEditor ...)
 - Give toString method to custom objects to replace [this.constructor.name this.id] ...
 - Decide what to do with assets/maps folder, both for dev and prod
@@ -132,6 +133,7 @@ Content:
 - Shop system, test with pre-filled inventories
 -> Make shopping menu (two tabs, normal slots, click on item to select, adjust quantity in tablet below)
 -> Display gold as item? Handle gold
+- Display stats effects relative to current equipment?
 - Have monsters drop loot
 - Enable bonuses of merchants
 - Allow merchants and artisans to build their shops
@@ -188,6 +190,7 @@ Sound:
 - Unique noise for items
 - Crafting SFX
 General:
+- Item descriptions
 - Keyboard shortcuts for menus?
 - Categories of items? (How to concile with various backpack sizes)? Sorting of items?
 - Feedback for rejected paths because too long (question mark, sound, ...)

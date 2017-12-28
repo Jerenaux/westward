@@ -28,7 +28,6 @@ var Engine = {
     craftInvSize: 5, // max number of ingredients for crafting
     key: 'main', // key of the scene, for Phaser
     playerIsInitialized: false,
-    intialized: false,
     cursor: 'url(/assets/sprites/cursor.png), auto' // image of the mouse cursor in normal circumstances
 };
 
@@ -166,9 +165,8 @@ Engine.initWorld = function(data){
     Engine.makeUI();
     Engine.makeChatBar();
     Engine.createAnimations();
-    if(data.inBuilding > -1) Engine.enterBuilding(data.inBuilding);
+    //if(data.inBuilding > -1) Engine.enterBuilding(data.inBuilding);
     Engine.playerIsInitialized = true;
-    Engine.initialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     // TODO: when all chunks loaded, fade-out Boot scene
 };
@@ -310,7 +308,7 @@ Engine.makeInventory = function(){
     inventory.addPanel(Engine.equipmentPanel);
     inventory.addPanel(Engine.statsPanel);
     var items = new Panel(40,100,600,380,'Items');
-    items.addCapsule(500,-9,'1299','gold');
+    Engine.goldTexts.push(items.addCapsule(500,-9,Engine.player.gold,'gold'));
     items.addInventory(null,15,Engine.player.inventory.maxSize,Engine.player.inventory,true,Engine.inventoryClick);
     inventory.addPanel(items); // inventory panel
     return inventory;
@@ -332,6 +330,7 @@ Engine.addHero = function(id,x,y,settlement){
     Engine.player.isHero = true;
     Engine.camera.startFollow(Engine.player);
     Engine.player.inventory = new Inventory();
+    Engine.player.gold = 0;
     Engine.player.buildingRecipes = new Inventory(10);
     Engine.player.itemRecipes = new Inventory(10);
     Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
@@ -339,6 +338,7 @@ Engine.addHero = function(id,x,y,settlement){
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = Equipment.getSkeleton();
     Engine.statsTexts = Stats.getSkeleton();
+    Engine.goldTexts = [];
     Engine.updateEnvironment();
 };
 
@@ -574,6 +574,12 @@ Engine.updateSelf = function(data){
             Engine.updateEquipment(eq.slot,eq.subSlot,eq.item);
         }
     }
+    if(data.gold){
+        Engine.player.gold = data.gold;
+        Engine.goldTexts.forEach(function(t){
+            t.setText(Engine.player.gold);
+        });
+    }
 };
 
 Engine.updateAmmo = function(slot,nb){
@@ -640,7 +646,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.newbuildings) {
         for (var n = 0; n < data.newbuildings.length; n++) {
             var b = data.newbuildings[n];
-            Engine.addBuilding(b.id, b.x, b.y, b.type, b.settlement, b.inventory);
+            Engine.addBuilding(b.id, b.x, b.y, b.type, b.settlement, b.inventory, b.gold);
         }
     }
 
@@ -701,8 +707,8 @@ Engine.addPlayer = function(id,x,y,settlement){
     return sprite;
 };
 
-Engine.addBuilding = function(id,x,y,type,settlement,inv){
-    var building = new Building(id,x,y,type,settlement,inv);
+Engine.addBuilding = function(id,x,y,type,settlement,inv,gold){
+    var building = new Building(id,x,y,type,settlement,inv,gold);
     Engine.buildings[id] = building;
     Engine.displayedBuildings.add(id);
     return building;

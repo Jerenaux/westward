@@ -15,8 +15,7 @@ Client.socket = io.connect();
 // whereas socket.onevent can be modified for our purpose!
 var onevent = Client.socket.onevent;
 Client.socket.onevent = function (packet) {
-    //if(!Engine.playerIsInitialized && packet.data[0] != Client.initEventName && packet.data[0] != 'dbError'){
-    if(!currentScene.initialized && packet.data[0] != Client.initEventName && packet.data[0] != 'dbError'){
+    if(!Engine.playerIsInitialized && packet.data[0] != Client.initEventName && packet.data[0] != 'dbError'){
         Client.eventsQueue.push(packet);
     }else{
         onevent.call(this, packet);    // original call
@@ -60,6 +59,12 @@ Client.socket.on(Client.initEventName,function(data){ // This event triggers whe
     Client.socket.emit('ponq',data.stamp); // send back a pong stamp to compute latency
     Engine.initWorld(data.player);
     //Game.updateNbConnected(data.nbconnected);
+});
+
+Client.socket.on('wait',function(){
+    // wait is sent back from the server when the client attempts to connect before the server is done initializing and reading the map
+    console.log('Server not ready, re-attempting...');
+    setTimeout(Client.requestData, 500); // Just try again in 500ms
 });
 
 Client.socket.on('update',function(data){ // This event triggers uppon receiving an update packet (data)

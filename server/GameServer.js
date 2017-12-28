@@ -14,7 +14,10 @@ var GameServer = {
     players: {}, // player.id -> player
     animals: {}, // animal.id -> animal
     socketMap: {}, // socket.id -> player.id
-    nbConnectedChanged: false
+    nbConnectedChanged: false,
+    initializationTicks: 0,
+    requiredTicks: 2,
+    initialized: false
 };
 
 module.exports.GameServer = GameServer;
@@ -29,6 +32,11 @@ var Animal = require('./Animal.js').Animal;
 var Battle = require('./Battle.js').Battle;
 var PF = require('../shared/pathfinding.js');
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
+
+GameServer.updateStatus = function(){
+    GameServer.initializationTicks++;
+    if(GameServer.initializationTicks == GameServer.requiredTicks) GameServer.initialized = true;
+};
 
 GameServer.readMap = function(mapsPath){
     GameServer.mapsPath = mapsPath; // TODO remove, useless, debug
@@ -57,11 +65,14 @@ GameServer.readMap = function(mapsPath){
 
     // Read buildings
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
-    var buildings = JSON.parse(fs.readFileSync('./assets/maps/buildings.json').toString());
-    for(var i = 0; i < buildings.list.length; i++){
-        var data = buildings.list[i];
-        new Building(data.x,data.y,data.type,data.settlement,data.stock);
-    }
+    GameServer.server.db.collection('buildings').find({}).toArray(function(err,buildings){
+        if(err) throw err;
+        for(var i = 0; i < buildings.length; i++){
+            var data = buildings[i];
+            new Building(data.x,data.y,data.type,data.settlement,data.stock,data.gold);
+        }
+        GameServer.updateStatus();
+    });
 
     // Spawn animals
     var animals = JSON.parse(fs.readFileSync('./assets/maps/animals.json').toString());
@@ -73,6 +84,7 @@ GameServer.readMap = function(mapsPath){
         GameServer.animals[animal.id] = animal;
     }
 
+    GameServer.updateStatus();
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
 };
 
