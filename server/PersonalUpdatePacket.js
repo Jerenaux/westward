@@ -33,7 +33,6 @@ PersonalUpdatePacket.prototype.updatePosition = function(x,y) {
 
 PersonalUpdatePacket.prototype.updateGold = function(nb) {
     this.gold = nb;
-    console.log('gold set to',this.gold);
 };
 
 PersonalUpdatePacket.prototype.addItem = function(item,nb){

@@ -308,7 +308,7 @@ Engine.makeInventory = function(){
     inventory.addPanel(Engine.equipmentPanel);
     inventory.addPanel(Engine.statsPanel);
     var items = new Panel(40,100,600,380,'Items');
-    Engine.goldTexts.push(items.addCapsule(500,-9,Engine.player.gold,'gold'));
+    Engine.goldTexts.push(items.addCapsule(500,-9,9999,'gold'));
     items.addInventory(null,15,Engine.player.inventory.maxSize,Engine.player.inventory,true,Engine.inventoryClick);
     inventory.addPanel(items); // inventory panel
     return inventory;
@@ -646,7 +646,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.newbuildings) {
         for (var n = 0; n < data.newbuildings.length; n++) {
             var b = data.newbuildings[n];
-            Engine.addBuilding(b.id, b.x, b.y, b.type, b.settlement, b.inventory, b.gold);
+            Engine.addBuilding(b.id, b.x, b.y, b.type, b.settlement, b.inventory, b.gold,b.prices);
         }
     }
 
@@ -707,8 +707,8 @@ Engine.addPlayer = function(id,x,y,settlement){
     return sprite;
 };
 
-Engine.addBuilding = function(id,x,y,type,settlement,inv,gold){
-    var building = new Building(id,x,y,type,settlement,inv,gold);
+Engine.addBuilding = function(id,x,y,type,settlement,inv,gold,prices){
+    var building = new Building(id,x,y,type,settlement,inv,gold,prices);
     Engine.buildings[id] = building;
     Engine.displayedBuildings.add(id);
     return building;

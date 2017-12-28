@@ -39,7 +39,7 @@ MovingEntity.prototype.updatePathTick = function(){ // Compute in how many secon
 
 MovingEntity.prototype.updateWalk = function(){
     if(this.moving && Date.now() >= this.nextPathTick){
-        if(this.path.length == 1) return;
+        if(this.path.length <= 1) return;
         //if(debug) console.log('['+this.constructor.name+' '+this.id+'] Tick');
         //if(debug) console.log('['+this.constructor.name+' '+this.id+'] Current path length : '+this.path.length);
         this.path.shift(); // Position 0 after the shift is where the entity is supposed to be at this time

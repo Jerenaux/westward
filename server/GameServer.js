@@ -69,7 +69,7 @@ GameServer.readMap = function(mapsPath){
         if(err) throw err;
         for(var i = 0; i < buildings.length; i++){
             var data = buildings[i];
-            new Building(data.x,data.y,data.type,data.settlement,data.stock,data.gold);
+            new Building(data.x,data.y,data.type,data.settlement,data.stock,data.gold,data.prices);
         }
         GameServer.updateStatus();
     });

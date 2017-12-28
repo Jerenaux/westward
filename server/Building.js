@@ -7,7 +7,7 @@ var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
 
-function Building(x,y,type,settlement,stock,gold){
+function Building(x,y,type,settlement,stock,gold,prices){
     this.id = GameServer.lastBuildingID++;
     this.x = x;
     this.y = y;
@@ -15,6 +15,7 @@ function Building(x,y,type,settlement,stock,gold){
     this.settlement = settlement;
     this.inventory = new Inventory(100);
     this.inventory.setItems(stock);
+    this.prices = prices;
     this.gold = gold;
     this.setOrUpdateAOI();
     this.addCollisions();
@@ -25,7 +26,7 @@ Building.prototype.constructor = Building;
 
 Building.prototype.trim = function(){
     var trimmed = {};
-    var broadcastProperties = ['id','type','settlement','gold']; // list of properties relevant for the client
+    var broadcastProperties = ['id','type','settlement','gold','prices']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

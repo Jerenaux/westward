@@ -95,8 +95,6 @@ Content:
 - Chat
 - Gazette
 * Inventory
-- Fix tooltips displaying too long on equipped equipment slots
-- Usage block when clicking on item, use/equip (show effect)
 - Drag/drop mechanics (for use, throw, equip, slots...)
 - Quick-use slots
 - Pick up items
@@ -121,7 +119,7 @@ Content:
 - Resource loop from resource buildings
 - Impact of commitment on resource gathering
 - Move stock around buildings
-- Shop system in trade post
+- Let chancellor set prices in trade post
 - Automatic shop systemn in port for chancellor
 - Trade with overseas
 - Restrict prerogatives based on official position
@@ -131,9 +129,6 @@ Content:
 - ...
 * Trade
 - Shop system, test with pre-filled inventories
--> Make shopping menu (two tabs, normal slots, click on item to select, adjust quantity in tablet below)
--> Display gold as item? Handle gold
-- Display stats effects relative to current equipment?
 - Have monsters drop loot
 - Enable bonuses of merchants
 - Allow merchants and artisans to build their shops
@@ -169,6 +164,8 @@ Polish:
 ------
 Visual:
 - Find better font
+- Fix tooltips displaying too long on equipped equipment slots
+- Display stats effects relative to current equipment
 - Help buttons everywhere
 - Animation when using item, throwing item, equipping... (reactive, before getting network response)
 - Menu sprites change size when hovered / clicked
