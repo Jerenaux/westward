@@ -13,6 +13,7 @@ var GameServer = {
     lastBattleID: 0,
     players: {}, // player.id -> player
     animals: {}, // animal.id -> animal
+    buildings: {}, // building.id -> building
     socketMap: {}, // socket.id -> player.id
     nbConnectedChanged: false,
     initializationTicks: 0,
@@ -69,7 +70,8 @@ GameServer.readMap = function(mapsPath){
         if(err) throw err;
         for(var i = 0; i < buildings.length; i++){
             var data = buildings[i];
-            new Building(data.x,data.y,data.type,data.settlement,data.stock,data.gold,data.prices);
+            var building = new Building(data.x,data.y,data.type,data.settlement,data.stock,data.gold,data.prices);
+            GameServer.buildings[building.id] = building;
         }
         GameServer.updateStatus();
     });
@@ -196,6 +198,32 @@ GameServer.handleBattle = function(opponentID,socketID){
     var animal = GameServer.animals[opponentID];
     // TODO: check for proximity
     new Battle(animal,player);
+};
+
+GameServer.handleShop = function(data,socketID) {
+    var player = GameServer.getPlayer(socketID);
+    var item = data.id;
+    var nb = data.nb;
+    var action = data.action;
+    if(!player.isInBuilding()) return;
+    var building = GameServer.buildings[player.inBuilding];
+    if(action == 'buy'){
+        if(!building.canSell(item,nb)) return;
+        var price = building.getPrice(item,nb,'buy');
+        if(!player.canBuy(price)) return;
+        player.takeGold(price);
+        player.giveItem(item,nb);
+        building.takeItem(item,nb);
+        building.giveGold(price);
+    }else{
+        if(!player.hasItem(item,nb)) return;
+        if(!building.canBuy(item,nb)) return;
+        var price = building.getPrice(item,nb,'sell');
+        player.giveGold(price);
+        player.takeItem(item,nb);
+        building.takeGold(price);
+        building.giveItem(item,nb);
+    }
 };
 
 GameServer.handleCraft = function(data,socketID){

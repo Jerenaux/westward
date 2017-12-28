@@ -75,6 +75,24 @@ Player.prototype.giveGold = function(nb){
     this.updatePacket.updateGold(this.gold);
 };
 
+Player.prototype.takeGold = function(nb){
+    this.gold -= nb;
+    this.updatePacket.updateGold(this.gold);
+};
+
+Player.prototype.canBuy = function(price){ // check if building has gold and room
+    if(this.inventory.isFull()) {
+        console.log('Error: player inventory full');
+        return false;
+    }
+    if(price > this.gold){
+        console.log('Error: not enough gold for player');
+        return false;
+    }
+    return true;
+};
+
+
 Player.prototype.hasItem = function(item,nb){
     return (this.inventory.getNb(item) >= nb);
 };
@@ -185,6 +203,10 @@ Player.prototype.applyEffects = function(item,coef){
 Player.prototype.applyEffect = function(stat,delta){
     var newvalue = Utils.clamp(this.stats[stat]+delta,Stats.dict[stat].min,Stats.dict[stat].max);
     this.setStat(stat,newvalue);
+};
+
+Player.prototype.isInBuilding = function(){
+    return this.inBuilding > -1;
 };
 
 Player.prototype.trim = function(){

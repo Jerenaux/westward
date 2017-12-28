@@ -4,7 +4,7 @@
 function ShopPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
     this.buttons = [];
-    this.currentAmount = 1;
+    this.lastPurchase = Date.now();
     this.build();
 }
 
@@ -35,20 +35,19 @@ ShopPanel.prototype.build = function(){
     var ringy = 50;
     this.buttons.push(this.addRing(ringx,ringy,'blue','minus',this.decreaseAmount.bind(this)));
     this.buttons.push(this.addRing(ringx+25,ringy,'blue','plus',this.increaseAmount.bind(this)));
-    this.buttons.push(this.addRing(ringx+60,ringy,'green','ok'));
+    this.buttons.push(this.addRing(ringx+60,ringy,'green','ok',this.requestPurchase.bind(this)));
 };
 
 ShopPanel.prototype.updatePurchase = function(id,data,action){
     if(!this.displayed) this.display();
-    var key = (action == 0 ? 0 : 1);
-    var title = (action == 0 ? 'Sell' : 'Buy');
+    var key = (action == 'sell' ? 0 : 1);
+    var title = (action == 'sell' ? 'Sell' : 'Buy');
 
     this.currentAction = action;
     this.currentAmount = 1;
     this.currentPrice = BScene.prices[id][key];
     this.currentItem = id;
     this.computeMaxAmount();
-    console.log(this.currentMaxAmount);
 
     this.titleText.setText(title);
     this.countText.setText(this.currentAmount);
@@ -62,16 +61,24 @@ ShopPanel.prototype.updatePurchase = function(id,data,action){
 ShopPanel.prototype.updateButtons = function(){
     var minusbtn = this.buttons[0];
     var plusbtn = this.buttons[1];
+    var okbtn = this.buttons[2];
     minusbtn.disable();
     if(this.currentAmount < this.currentMaxAmount){
         plusbtn.enable();
     }else{
         plusbtn.disable();
     }
+    if(this.currentMaxAmount > 0) {
+        okbtn.enable();
+    }else{
+        okbtn.disable();
+    }
+    if(this.currentAction == 'buy' && Engine.player.inventory.isFull()) okbtn.disable();
+    if(this.currentAction == 'sell' && BScene.inventory.isFull()) okbtn.disable();
 };
 
 ShopPanel.prototype.computeMaxAmount = function(){
-    if(this.currentAction == 0){ // player sells
+    if(this.currentAction == 'sell'){
         var owned = Engine.player.inventory.getNb(this.currentItem);
         var canSell = Math.floor(BScene.gold/this.currentPrice);
         this.currentMaxAmount = Math.min(9999,owned,canSell);
@@ -91,7 +98,6 @@ ShopPanel.prototype.decreaseAmount = function(){
 };
 
 ShopPanel.prototype.changeAmount = function(inc){
-    console.log('changing amount');
     var minusbtn = this.buttons[0];
     var plusbtn = this.buttons[1];
     var button = (inc == 1 ? plusbtn : minusbtn);
@@ -100,10 +106,16 @@ ShopPanel.prototype.changeAmount = function(inc){
     if(inc == 1 && this.currentAmount == this.currentMaxAmount) return;
     this.currentAmount += inc;
     this.countText.setText(this.currentAmount);
-    // TODO: change displayed price
+    this.priceText.setText(this.currentPrice*this.currentAmount);
 
     if(this.currentAmount == 1 && minusbtn.enabled){minusbtn.disable();}
     else if(this.currentAmount == this.currentMaxAmount && plusbtn.enabled){plusbtn.disable();}
     else if(this.currentAmount > 1 && !minusbtn.enabled){minusbtn.enable();}
     else if(this.currentAmount < this.currentMaxAmount && !plusbtn.enabled){plusbtn.enable();}
+};
+
+ShopPanel.prototype.requestPurchase = function(){
+    if(Date.now() - this.lastPurchase < 200) return;
+    Client.sendPurchase(this.currentItem,this.currentAmount,this.currentAction);
+    this.lastPurchase = Date.now();
 };

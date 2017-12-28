@@ -8,6 +8,7 @@ function UpdatePacket(){
     this.newanimals = [];
     this.players = {}; // list of player objects already existing for which properties have been updated
     this.animals = {};
+    this.buildings = {};
     this.disconnected = []; // list of id's of disconnected players since last update
 }
 
@@ -36,12 +37,6 @@ UpdatePacket.prototype.addDisconnect = function(playerID){
     this.disconnected.push(playerID);
 };
 
-/*UpdatePacket.prototype.updateRoute = function(type,entityID,route){
-    var map = (type == 'player' ? this.players : this.monsters);
-    if(!map.hasOwnProperty(entityID)) map[entityID] = {};
-    map[entityID].route = route;
-};*/
-
 UpdatePacket.prototype.updateProperty = function(type,id,property,value){
     //console.log('updating property type = '+type+', id = '+id+', prop = '+property+', val = '+value);
     var map;
@@ -51,6 +46,9 @@ UpdatePacket.prototype.updateProperty = function(type,id,property,value){
             break;
         case 'Animal':
             map = this.animals;
+            break;
+        case 'Building':
+            map = this.buildings;
             break;
     }
     if(!map.hasOwnProperty(id)) map[id] = {};
@@ -92,6 +90,7 @@ UpdatePacket.prototype.isEmpty = function(){
     if(this.newanimals.length > 0) return false;
     if(Object.keys(this.players).length > 0) return false;
     if(Object.keys(this.animals).length > 0) return false;
+    if(Object.keys(this.buildings).length > 0) return false;
     return true;
 };
 
@@ -102,12 +101,7 @@ UpdatePacket.prototype.clean = function(){
     if(!this.newbuildings.length) this.newbuildings = undefined;
     if(!Object.keys(this.players).length) this.players = undefined;
     if(!Object.keys(this.animals).length) this.animals = undefined;
-    /*if(!this.disconnected.length) delete this.disconnected;
-    if(!this.newplayers.length) delete this.newplayers;
-    if(!this.newanimals.length) delete this.newanimals;
-    if(!this.newbuildings.length) delete this.newbuildings;
-    if(!Object.keys(this.players).length) delete this.players;
-    if(!Object.keys(this.animals).length) delete this.animals;*/
+    if(!Object.keys(this.buildings).length) this.buildings = undefined;
     return this;
 };
 

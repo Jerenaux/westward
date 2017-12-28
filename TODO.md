@@ -129,6 +129,7 @@ Content:
 - ...
 * Trade
 - Shop system, test with pre-filled inventories
+- Test back and forth between two different buildings
 - Have monsters drop loot
 - Enable bonuses of merchants
 - Allow merchants and artisans to build their shops

@@ -85,7 +85,7 @@ BScene.makeShop = function(inventory,prices,gold){
     playerStock.addInventory(null,slotsw,playerInventory.size,playerInventory,true,BScene.sellClick);
     shopStock.addInventory(null,slotsw,inventory.size,inventory,true,BScene.buyClick);
     Engine.goldTexts.push(playerStock.addCapsule(200,-9,Engine.player.gold,'gold'));
-    shopStock.addCapsule(200,-9,gold,'gold');
+    BScene.shopGoldText = shopStock.addCapsule(200,-9,gold,'gold');
     BScene.shopPanel = new ShopPanel(x,y+h+20,w,100,'Buy');
 
     playerStock.finalize();
@@ -93,9 +93,10 @@ BScene.makeShop = function(inventory,prices,gold){
     playerStock.display();
     shopStock.display();
     //BScene.shopPanel.display();
+};
 
-    //BScene.panels.push(playerStock);
-    //BScene.panels.push(shopStock);
+BScene.updateGoldText = function(gold){
+    BScene.shopGoldText.setText(gold);
 };
 
 BScene.makeTitle = function(name,setl){
@@ -159,9 +160,9 @@ BScene.close = function(){
 };
 
 BScene.sellClick = function(){
-    BScene.shopPanel.updatePurchase(this.itemID,Engine.itemsData[this.itemID],0); // 0 = player sells
+    BScene.shopPanel.updatePurchase(this.itemID,Engine.itemsData[this.itemID],'sell');
 };
 
 BScene.buyClick = function(){
-    BScene.shopPanel.updatePurchase(this.itemID,Engine.itemsData[this.itemID],1); // 1 = player buys
+    BScene.shopPanel.updatePurchase(this.itemID,Engine.itemsData[this.itemID],'buy');
 };

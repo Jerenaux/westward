@@ -669,6 +669,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     // these objects and call the relevant update functions.
     if(data.players) Engine.traverseUpdateObject(data.players,Engine.players,Engine.updatePlayer);
     if(data.animals) Engine.traverseUpdateObject(data.animals,Engine.animals,Engine.updateAnimal);
+    if(data.buildings) Engine.traverseUpdateObject(data.buildings,Engine.buildings,Engine.updateBuilding);
 };
 
 // For each element in obj, call callback on it
@@ -684,10 +685,12 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
     if(data.inFight == false) player.hideHalo();
     if(data.inBuilding > -1) {
         player.setVisible(false);
+        player.inBuilding = data.inBuilding;
         if(player.id == Engine.player.id) Engine.enterBuilding(data.inBuilding);
     }
     if(data.inBuilding == -1){
         player.setVisible(true);
+        player.inBuilding = data.inBuilding;
         if(player.id == Engine.player.id) Engine.exitBuilding();
     }
 };
@@ -696,6 +699,15 @@ Engine.updateAnimal = function(animal,data){ // data contains the updated data f
     if(data.path) animal.move(data.path);
     if(data.inFight == true) animal.displayHalo();
     if(data.inFight == false) animal.hideHalo();
+};
+
+Engine.updateBuilding = function(building,data){ // data contains the updated data from the server
+    if(data.gold) {
+        building.gold = data.gold;
+        if(Engine.player.inBuilding == building.id){
+            BScene.updateGoldText(data.gold);
+        }
+    }
 };
 
 Engine.addPlayer = function(id,x,y,settlement){

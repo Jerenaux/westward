@@ -78,6 +78,10 @@ io.on('connection',function(socket){
             gs.handleCraft(data,socket.id);
         });
 
+        socket.on('shop',function(data){
+            gs.handleShop(data,socket.id);
+        });
+
         socket.on('use',function(data){
             gs.handleUse(data,socket.id);
         });

@@ -107,6 +107,10 @@ Client.sendCraft = function(id,nb){
     Client.socket.emit('craft',{id:id,nb:nb});
 };
 
+Client.sendPurchase = function(id,nb, action){
+    Client.socket.emit('shop',{id:id,nb:nb,action:action});
+};
+
 Client.sendUse = function(id){
     Client.socket.emit('use',{item:id});
 };
