@@ -21,7 +21,7 @@ function Panel(x,y,width,height,title){
     this.nextFirstSlot = 0;
     this.domElement = null;
     this.makeBody();
-    if(title) this.addCapsule(20,-9,title);
+    if(title) this.titleText = this.addCapsule(20,-9,title);
     this.finalize();
 }
 

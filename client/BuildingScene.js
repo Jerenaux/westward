@@ -68,7 +68,9 @@ BScene.trackMouse = function(event){
 };
 
 BScene.makeShop = function(inventory,prices,gold){
-    console.log('creatin shop');
+    BScene.inventory = inventory;
+    BScene.prices = prices;
+    BScene.gold = gold;
     var x = 212;
     var y = 100;
     var w = 300;
@@ -80,18 +82,17 @@ BScene.makeShop = function(inventory,prices,gold){
     var shopStock = new Panel(x+w+gap,y,w,h,'Stockpile');
 
     var playerInventory = Engine.player.inventory.filter(prices,0);
-    playerStock.addInventory(null,slotsw,playerInventory.size,playerInventory,true);
-    shopStock.addInventory(null,slotsw,inventory.size,inventory,true);
+    playerStock.addInventory(null,slotsw,playerInventory.size,playerInventory,true,BScene.sellClick);
+    shopStock.addInventory(null,slotsw,inventory.size,inventory,true,BScene.buyClick);
     Engine.goldTexts.push(playerStock.addCapsule(200,-9,Engine.player.gold,'gold'));
     shopStock.addCapsule(200,-9,gold,'gold');
-    var shopPanel = new ShopPanel(x,y+h+20,w,100,'Buy');
+    BScene.shopPanel = new ShopPanel(x,y+h+20,w,100,'Buy');
 
     playerStock.finalize();
     shopStock.finalize();
-    shopPanel.finalize();
     playerStock.display();
     shopStock.display();
-    shopPanel.display();
+    //BScene.shopPanel.display();
 
     //BScene.panels.push(playerStock);
     //BScene.panels.push(shopStock);
@@ -155,4 +156,12 @@ BScene.close = function(){
     /*BScene.panels.forEach(function(p){
         p.hide();
     });*/
+};
+
+BScene.sellClick = function(){
+    BScene.shopPanel.updatePurchase(this.itemID,Engine.itemsData[this.itemID],0); // 0 = player sells
+};
+
+BScene.buyClick = function(){
+    BScene.shopPanel.updatePurchase(this.itemID,Engine.itemsData[this.itemID],1); // 1 = player buys
 };

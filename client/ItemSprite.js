@@ -27,7 +27,7 @@ var ItemSprite = new Phaser.Class({
         this.itemID = id;
         this.name = data.name;
         this.effects = data.effects;
-        this.visible = true;
+        this.setVisible(true);
         if(callback) this.handleClick = callback.bind(this);
     },
 
