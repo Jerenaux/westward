@@ -15,6 +15,7 @@ var Building = new Phaser.Class({
         this.tileY = y;
         this.depth = Engine.buildingsDepth + (this.tileY+((data.height/2)/32))/1000;
         this.id = id;
+        this.buildingType = type;
         this.settlement = settlement;
         this.inventory = new Inventory(100);
         this.inventory.fromList(inv);
@@ -30,6 +31,7 @@ var Building = new Phaser.Class({
         this.panel.setTweens(0,py+height,0,py,500);
         this.handleClick = Engine.togglePanel.bind(this);*/
         this.handleClick = function(){
+            if(Engine.inMenu) return;
             if(!data.entry) return;
             var pos = {
                 x: x + data.entry.x,

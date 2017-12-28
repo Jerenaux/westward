@@ -265,6 +265,11 @@ GameServer.handleUnequip = function(data,socketID) {
     player.unequip(slot,subSlot);
 };
 
+GameServer.handleExit = function(socketID){
+    var player = GameServer.getPlayer(socketID);
+    player.exitBuilding();
+};
+
 GameServer.handleAOItransition = function(entity,previous){
     // When something moves from one AOI to another (or appears inside an AOI), identify which AOIs should be notified and update them
     var AOIs = Utils.listAdjacentAOIs(entity.aoi);

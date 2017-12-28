@@ -22,8 +22,11 @@ MovingEntity.prototype.setPath = function(path){
 };
 
 MovingEntity.prototype.updatePathTick = function(){ // Compute in how many seconds will the entity have moved by one tile
-    if(this.path.length <= 1) console.log('['+this.constructor.name+' '+this.id+'] ERROR: Path too short (length = '+this.path.length+')');
-    if(this.path.length <= 1) return;
+    if(this.path.length <= 1){
+        console.log('['+this.constructor.name+' '+this.id+'] ERROR: Path too short (length = '+this.path.length+')');
+        this.endPath();
+        return;
+    }
     var duration = PFUtils.getDuration(
             this.x,
             this.y,
@@ -35,7 +38,8 @@ MovingEntity.prototype.updatePathTick = function(){ // Compute in how many secon
 };
 
 MovingEntity.prototype.updateWalk = function(){
-    if(Date.now() >= this.nextPathTick){
+    if(this.moving && Date.now() >= this.nextPathTick){
+        if(this.path.length == 1) return;
         //if(debug) console.log('['+this.constructor.name+' '+this.id+'] Tick');
         //if(debug) console.log('['+this.constructor.name+' '+this.id+'] Current path length : '+this.path.length);
         this.path.shift(); // Position 0 after the shift is where the entity is supposed to be at this time
@@ -43,9 +47,7 @@ MovingEntity.prototype.updateWalk = function(){
         if(this.path.length > 1) {
             this.updatePathTick();
         }else{
-            if(debug) console.log('['+this.constructor.name+' '+this.id+'] Arrived at destination');
-            this.moving = false;
-            this.onArrival();
+            this.endPath();
         }
     }
 };
@@ -54,6 +56,12 @@ MovingEntity.prototype.updatePosition = function(x,y){
     this.x = x;
     this.y = y;
     this.setOrUpdateAOI();
+};
+
+MovingEntity.prototype.endPath = function(){
+    if(debug) console.log('['+this.constructor.name+' '+this.id+'] Arrived at destination');
+    this.moving = false;
+    this.onArrival();
 };
 
 module.exports.MovingEntity = MovingEntity;

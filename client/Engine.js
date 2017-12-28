@@ -28,6 +28,7 @@ var Engine = {
     craftInvSize: 5, // max number of ingredients for crafting
     key: 'main', // key of the scene, for Phaser
     playerIsInitialized: false,
+    intialized: false,
     cursor: 'url(/assets/sprites/cursor.png), auto' // image of the mouse cursor in normal circumstances
 };
 
@@ -147,6 +148,7 @@ Engine.create = function(masterData){
     Engine.useBlitters = true;
 
     Engine.created = true;
+    currentScene = Engine;
     Client.requestData();
 };
 
@@ -159,11 +161,14 @@ Engine.createMarker = function(){
 };
 
 Engine.initWorld = function(data){
+    console.log(data);
     Engine.addHero(data.id,data.x,data.y,data.settlement);
     Engine.makeUI();
     Engine.makeChatBar();
     Engine.createAnimations();
+    if(data.inBuilding > -1) Engine.enterBuilding(data.inBuilding);
     Engine.playerIsInitialized = true;
+    Engine.initialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     // TODO: when all chunks loaded, fade-out Boot scene
 };
@@ -671,8 +676,14 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
     if(data.path && player.id != Engine.player.id) player.move(data.path);
     if(data.inFight == true) player.displayHalo();
     if(data.inFight == false) player.hideHalo();
-    if(data.inBuilding > -1) player.setVisible(false);
-    if(data.inBuilding == -1) player.setVisible(true);
+    if(data.inBuilding > -1) {
+        player.setVisible(false);
+        if(player.id == Engine.player.id) Engine.enterBuilding(data.inBuilding);
+    }
+    if(data.inBuilding == -1){
+        player.setVisible(true);
+        if(player.id == Engine.player.id) Engine.exitBuilding();
+    }
 };
 
 Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server
@@ -735,6 +746,18 @@ Engine.getTilesetFromTile = function(tile){
         }
     }
     return Engine.tilesets.length-1;
+};
+
+Engine.enterBuilding = function(id){
+    BScene.buildingID = id;
+    Engine.scene.scene.swap('BuildingScene');
+    currentScene = BScene;
+};
+
+Engine.exitBuilding = function(){
+    BScene.close();
+    BScene.scene.scene.swap('main');
+    currentScene = Engine;
 };
 
 // ## UI-related functions ##

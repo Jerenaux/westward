@@ -53,16 +53,15 @@ var Player = new Phaser.Class({
     },
 
     move: function(path){
-        console.log('Client moving : ',path);
         if(this.isHero) Client.sendPath(path,this.destinationAction);
         Moving.prototype.move.call(this,path);
     },
 
-    onArrival: function(){
+    /*onArrival: function(){
         console.log('arrived');
         if(!this.destinationAction) return;
         if(this.destinationAction.type == 1){
             console.log('Entering building ',this.destinationAction.id);
         }
-    }
+    }*/
 });

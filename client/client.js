@@ -15,7 +15,8 @@ Client.socket = io.connect();
 // whereas socket.onevent can be modified for our purpose!
 var onevent = Client.socket.onevent;
 Client.socket.onevent = function (packet) {
-    if(!Engine.playerIsInitialized && packet.data[0] != Client.initEventName && packet.data[0] != 'dbError'){
+    //if(!Engine.playerIsInitialized && packet.data[0] != Client.initEventName && packet.data[0] != 'dbError'){
+    if(!currentScene.initialized && packet.data[0] != Client.initEventName && packet.data[0] != 'dbError'){
         Client.eventsQueue.push(packet);
     }else{
         onevent.call(this, packet);    // original call
@@ -108,6 +109,11 @@ Client.sendUse = function(id){
 Client.sendUnequip = function(slot,subslot){
     Client.socket.emit('unequip',{slot:slot,subslot:subslot});
 };
+
+Client.sendExit = function(){
+    Client.socket.emit('exit');
+};
+
 
 // ####################"
 

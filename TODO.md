@@ -130,7 +130,6 @@ Content:
 - ...
 * Trade
 - Shop system, test with pre-filled inventories
--> Display action slates in building panel; make "shop" action
 -> Make shopping menu (two tabs, normal slots, click on item to select, adjust quantity in tablet below)
 -> Display gold as item? Handle gold
 - Have monsters drop loot

@@ -85,6 +85,10 @@ io.on('connection',function(socket){
         socket.on('battle',function(data){
             gs.handleBattle(data,socket.id);
         });
+
+        socket.on('exit',function(){
+            gs.handleExit(socket.id);
+        });
     });
 
     socket.pings = [];

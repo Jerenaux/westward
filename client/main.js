@@ -14,3 +14,4 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
+var currentScene = null;

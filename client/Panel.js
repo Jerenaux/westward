@@ -33,27 +33,27 @@ Panel.prototype.makeBody = function(){
 
     var x = this.x;
     var y = this.y;
-    this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-topleft'));
+    this.container.push(currentScene.scene.add.sprite(x,y,'UI','panel-topleft'));
     x += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth,'UI','panel-top'));
+    this.container.push(currentScene.scene.add.tileSprite(x,y,w,sideWidth,'UI','panel-top'));
     x += w;
-    this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-topright'));
+    this.container.push(currentScene.scene.add.sprite(x,y,'UI','panel-topright'));
     x = this.x;
     y += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-left'));
+    this.container.push(currentScene.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-left'));
     x += sideWidth;
 
-    var center = Engine.scene.add.tileSprite(x,y,w,h,'UI','panel-center');
+    var center = currentScene.scene.add.tileSprite(x,y,w,h,'UI','panel-center');
     this.container.push(center);
     x += w;
-    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-right'));
+    this.container.push(currentScene.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-right'));
     x = this.x;
     y += h;
-    this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-bottomleft'));
+    this.container.push(currentScene.scene.add.sprite(x,y,'UI','panel-bottomleft'));
     x += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth,'UI','panel-bottom'));
+    this.container.push(currentScene.scene.add.tileSprite(x,y,w,sideWidth,'UI','panel-bottom'));
     x += w;
-    this.container.push(Engine.scene.add.sprite(x,y,'UI','panel-bottomright'));
+    this.container.push(currentScene.scene.add.sprite(x,y,'UI','panel-bottomright'));
 };
 
 Panel.prototype.addCapsule = function(xOffset,yOffset,title,image){
@@ -61,23 +61,23 @@ Panel.prototype.addCapsule = function(xOffset,yOffset,title,image){
     var y = this.y + yOffset;
 
     if(image) {
-        var img = Engine.scene.add.sprite(x+8,y+6,'UI',image);
+        var img = currentScene.scene.add.sprite(x+8,y+6,'UI',image);
         img.depth = Engine.UIDepth+2;
     }
     var textX = (image ? x + img.width : x) + 10;
     var textY = (image ? y - 1: y);
 
-    var text = Engine.scene.add.text(textX, textY, title,
+    var text = currentScene.scene.add.text(textX, textY, title,
         { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
     );
     var w = text.width -25;
     if(image) w += img.width;
     this.container.push(text);
-    this.container.push(Engine.scene.add.sprite(x,y,'UI','capsule-left'));
+    this.container.push(currentScene.scene.add.sprite(x,y,'UI','capsule-left'));
     x += 24;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,24,'UI','capsule-middle'));
+    this.container.push(currentScene.scene.add.tileSprite(x,y,w,24,'UI','capsule-middle'));
     x += w;
-    this.container.push(Engine.scene.add.sprite(x,y,'UI','capsule-right'));
+    this.container.push(currentScene.scene.add.sprite(x,y,'UI','capsule-right'));
 
     if(image) this.container.push(img);
 };
@@ -85,7 +85,7 @@ Panel.prototype.addCapsule = function(xOffset,yOffset,title,image){
 Panel.prototype.addRing = function(xs,ys,color,symbol,callback){
     var x = this.x + xs;
     var y = this.y + ys;
-    this.container.push(Engine.scene.add.sprite(x,y,'UI','ring'));
+    this.container.push(currentScene.scene.add.sprite(x,y,'UI','ring'));
     x += 5;
     y += 5;
 
@@ -94,7 +94,7 @@ Panel.prototype.addRing = function(xs,ys,color,symbol,callback){
     x += 3;
     y += 3;
 
-    var ss = Engine.scene.add.sprite(x,y,'UI',symbol);
+    var ss = currentScene.scene.add.sprite(x,y,'UI',symbol);
     ss.notInteractive = true;
     this.container.push(ss);
 
@@ -118,7 +118,7 @@ Panel.prototype.addInventory = function(title,maxwidth,total,inventory,showNumbe
 };
 
 Panel.prototype.createZone = function(){
-    var zone = Engine.scene.add.zone(0,0,0,0);
+    var zone = currentScene.scene.add.zone(0,0,0,0);
     zone.setDepth(Engine.UIDepth+10);
     zone.setScrollFactor(0);
     zone.handleOver = function(){
@@ -171,7 +171,7 @@ Panel.prototype.addSlots = function(nbHorizontal,total){
             offsety = (y > 0 ? 2 : 0);
             var slotx = this.x+paddingX+(x*36)+offsetx;
             var sloty = this.y+this.verticalOffset+(y*36)+offsety;
-            var slot = Engine.scene.add.sprite(slotx,sloty,'UI',frame);
+            var slot = currentScene.scene.add.sprite(slotx,sloty,'UI',frame);
             this.slots.push(slot);
             this.container.push(slot);
             counter++;
@@ -183,7 +183,7 @@ Panel.prototype.addSlots = function(nbHorizontal,total){
 };
 
 Panel.prototype.addLine = function(line){
-    var text = Engine.scene.add.text(this.x+15, this.y+this.verticalOffset, line,
+    var text = currentScene.scene.add.text(this.x+15, this.y+this.verticalOffset, line,
         { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
     );
     this.container.push(text);
@@ -192,7 +192,7 @@ Panel.prototype.addLine = function(line){
 };
 
 Panel.prototype.addSprite = function(atlas,frame,x,y){
-    var sprite = Engine.scene.add.sprite(this.x+x,this.y+y,atlas,frame);
+    var sprite = currentScene.scene.add.sprite(this.x+x,this.y+y,atlas,frame);
     this.container.push(sprite);
     this.finalize();
     return sprite;
@@ -220,7 +220,7 @@ Panel.prototype.updatePosition = function(){
 
 Panel.prototype.setTweens = function(sx,sy,ex,ey,duration){
     var _this = this;
-    this.showTween = Engine.scene.tweens.add({
+    this.showTween = currentScene.scene.tweens.add({
         targets: this,
         x: ex,
         y: ey,
@@ -234,7 +234,7 @@ Panel.prototype.setTweens = function(sx,sy,ex,ey,duration){
         },
         duration: duration
     });
-    this.hideTween = Engine.scene.tweens.add({
+    this.hideTween = currentScene.scene.tweens.add({
         targets: this,
         x: sx,
         y: sy,
@@ -276,7 +276,7 @@ Panel.prototype.getNextItemSprite = function(item, callback){ // Pool of sprites
 
 Panel.prototype.getNextText = function(nb){
     if(this.texts.length <= this.nextItemSprite){
-        var empty = Engine.scene.add.text(100,10, 'lorem ipsum',
+        var empty = currentScene.scene.add.text(100,10, 'lorem ipsum',
             { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
         );
         empty.setScrollFactor(0);
@@ -300,7 +300,7 @@ Panel.prototype.toggle = function(){
 
 Panel.prototype.display = function(){
     for(var i = 0; i < this.container.length; i++){
-        this.container[i].visible = true;
+        this.container[i].setVisible(true);
         if(this.container[i].upFrame) this.container[i].setFrame(this.container[i].upFrame);
     }
     if(this.displayInventory) {

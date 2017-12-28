@@ -206,7 +206,7 @@ Player.prototype.dbTrim = function(){
 Player.prototype.getDataFromDb = function(document){
     // Set up the player based on the data stored in the databse
     // document is the mongodb document retrieved form the database
-    var dbProperties = ['x','y'];
+    var dbProperties = ['x','y','inBuilding'];
     for(var p = 0; p < dbProperties.length; p++){
         this[dbProperties[p]] = document[dbProperties[p]];
     }
@@ -239,8 +239,16 @@ Player.prototype.onArrival = function(){
     //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
     if(!this.action) return;
     if(this.action.type == 1) {
-        this.setProperty('inBuilding', this.action.id);
+        this.enterBuilding(this.action.id);
     }
+};
+
+Player.prototype.enterBuilding = function(id){
+    this.setProperty('inBuilding', id);
+};
+
+Player.prototype.exitBuilding = function(){
+    this.setProperty('inBuilding', -1);
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){
