@@ -6,7 +6,7 @@ function Menu(title){
     this.container = [];
     this.panels = [];
     this.displayed = false;
-    this.makeTitle(title);
+    if(title) this.makeTitle(title);
 }
 
 Menu.prototype.makeTitle = function(title){

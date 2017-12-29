@@ -55,7 +55,7 @@ var Player = new Phaser.Class({
     move: function(path){
         if(this.isHero) Client.sendPath(path,this.destinationAction);
         Moving.prototype.move.call(this,path);
-    },
+    }
 
     /*onArrival: function(){
         console.log('arrived');

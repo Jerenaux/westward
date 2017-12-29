@@ -90,14 +90,4 @@ Inventory.prototype.fromList = function(list){
     }
 };
 
-Inventory.prototype.filter = function(prices,key){
-    var inv = new Inventory(this.maxSize);
-    for(var item in this.items) {
-        if (!this.items.hasOwnProperty(item)) continue;
-        if(!prices.hasOwnProperty(item)) continue;
-        if(prices[item][key] > 0) inv.add(item,this.getNb(item));
-    }
-    return inv;
-};
-
 if (onServer) module.exports.Inventory = Inventory;

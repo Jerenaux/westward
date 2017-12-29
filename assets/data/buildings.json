@@ -13,7 +13,12 @@
     "width": 550,
     "height": 427,
     "sprite": "fort",
-    "name":"Fort"
+    "name":"Fort",
+    "shop": true,
+    "entry": {
+      "x": 14,
+      "y": 12
+    }
   },
   "1":{
     "shape":[

@@ -14,16 +14,11 @@ BScene.preload = function(){
 BScene.create = function(){
     BScene.scene = this.scene.scene;
     BScene.sprites = [];
-    //BScene.panels = [];
-    var building = Engine.buildings[BScene.buildingID];
-    if(!building){
-        setTimeout(BScene.create.bind(this),100);
-        return;
-    }
-    var buildingData = Engine.buildingsData[building.buildingType];
-    var settlementData = Engine.settlementsData[building.settlement];
-    BScene.makeTitle(buildingData.name,settlementData.name);
-    if(buildingData.shop) BScene.makeShop(building.inventory,building.prices,building.gold);
+
+    //BScene.makeTitle(buildingData.name,settlementData.name);
+    BScene.makeTitle('Lorem ipsum','Lorem ipsum');
+    //if(buildingData.shop) BScene.makeShop(building.inventory,building.prices,building.gold);
+    BScene.makeShop();
 
     BScene.finalize();
     BScene.tooltip = new Tooltip();
@@ -33,6 +28,7 @@ BScene.create = function(){
     BScene.scene.input.events.on('POINTER_OVER_EVENT', BScene.handleOver);
     BScene.scene.input.events.on('POINTER_OUT_EVENT', BScene.handleOut);
     BScene.scene.input.events.on('POINTER_MOVE_EVENT', BScene.trackMouse);
+    BScene.initialized = true;
 };
 
 BScene.handleClick = function(event){
@@ -67,36 +63,63 @@ BScene.trackMouse = function(event){
     if(BScene.tooltip && BScene.tooltip.displayed) BScene.tooltip.updatePosition(event.x,event.y);
 };
 
-BScene.makeShop = function(inventory,prices,gold){
-    BScene.inventory = inventory;
-    BScene.prices = prices;
-    BScene.gold = gold;
+BScene.makeShop = function(){
+    BScene.shop = new Menu();
     var x = 212;
     var y = 100;
     var w = 300;
     var h = 300;
-    var slotsw = 7;
     var gap = 30;
 
-    var playerStock = new Panel(x,y,w,h,'Your items');
-    var shopStock = new Panel(x+w+gap,y,w,h,'Stockpile');
+    BScene.shop.playerStock = new Panel(x,y,w,h,'Your items');
+    BScene.shop.shopStock = new Panel(x+w+gap,y,w,h,'Stockpile');
+    BScene.shop.addPanel(BScene.shop.playerStock);
+    BScene.shop.addPanel(BScene.shop.shopStock);
 
-    var playerInventory = Engine.player.inventory.filter(prices,0);
-    playerStock.addInventory(null,slotsw,playerInventory.size,playerInventory,true,BScene.sellClick);
-    shopStock.addInventory(null,slotsw,inventory.size,inventory,true,BScene.buyClick);
-    Engine.goldTexts.push(playerStock.addCapsule(200,-9,Engine.player.gold,'gold'));
-    BScene.shopGoldText = shopStock.addCapsule(200,-9,gold,'gold');
-    BScene.shopPanel = new ShopPanel(x,y+h+20,w,100,'Buy');
+    BScene.shop.playerStock.addInventory(null,7,Engine.player.inventory.size,Engine.player.inventory,true,BScene.sellClick);
 
-    playerStock.finalize();
-    shopStock.finalize();
-    playerStock.display();
-    shopStock.display();
-    //BScene.shopPanel.display();
+    Engine.goldTexts.push(BScene.shop.playerStock.addCapsule(200,-9,Engine.player.gold,'gold'));
+    BScene.shop.goldText = BScene.shop.shopStock.addCapsule(200,-9,9999,'gold');
+    BScene.shop.playerStock.finalize();
+    BScene.shop.shopStock.finalize();
+
+    BScene.shop.shopPanel = new ShopPanel(x,y+h+20,w,100,'Buy');
+    BScene.shop.addPanel(BScene.shop.shopPanel);
 };
 
-BScene.updateGoldText = function(gold){
-    BScene.shopGoldText.setText(gold);
+BScene.setUp = function(buildingID){
+    if(!BScene.initialized){
+        setTimeout(BScene.setUp,50,buildingID);
+        return;
+    }
+    var building = Engine.buildings[buildingID];
+    var buildingData = Engine.buildingsData[building.buildingType];
+    var settlementData = Engine.settlementsData[building.settlement];
+    BScene.buildingTypeText.setText(buildingData.name);
+    BScene.settlementText.setText(settlementData.name);
+
+    if(buildingData.shop){
+        BScene.shop.prices = building.prices;
+        BScene.shop.inventory = building.inventory;
+        BScene.shop.gold = building.gold;
+        BScene.shop.playerStock.setInventoryFilter(building.prices,0);
+        BScene.shop.shopStock.clearInventories();
+        BScene.shop.shopStock.addInventory(null,7,building.inventory.size,building.inventory,true,BScene.buyClick);
+        BScene.shop.shopStock.setInventoryFilter(building.prices,1);
+        BScene.shop.goldText.setText(building.gold);
+
+        BScene.shop.display();
+        BScene.shop.shopPanel.hide();
+    }
+};
+
+BScene.close = function(){
+    BScene.shop.hide();
+};
+
+BScene.updateGold = function(gold){
+    BScene.shop.goldText.setText(gold);
+    BScene.shop.gold = gold;
 };
 
 BScene.makeTitle = function(name,setl){
@@ -141,6 +164,9 @@ BScene.makeTitle = function(name,setl){
     BScene.sprites.push(BScene.scene.add.tileSprite(x,y,w,24,'UI','capsule-middle'));
     x += w;
     BScene.sprites.push(BScene.scene.add.sprite(x,y,'UI','capsule-right'));
+
+    this.buildingTypeText = typeText;
+    this.settlementText = setlText;
 };
 
 BScene.finalize = function(){
@@ -153,16 +179,10 @@ BScene.leave = function(){
     Client.sendExit();
 };
 
-BScene.close = function(){
-    /*BScene.panels.forEach(function(p){
-        p.hide();
-    });*/
-};
-
 BScene.sellClick = function(){
-    BScene.shopPanel.updatePurchase(this.itemID,Engine.itemsData[this.itemID],'sell');
+    BScene.shop.shopPanel.updatePurchase(this.itemID,Engine.itemsData[this.itemID],'sell');
 };
 
 BScene.buyClick = function(){
-    BScene.shopPanel.updatePurchase(this.itemID,Engine.itemsData[this.itemID],'buy');
+    BScene.shop.shopPanel.updatePurchase(this.itemID,Engine.itemsData[this.itemID],'buy');
 };

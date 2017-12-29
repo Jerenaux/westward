@@ -63,12 +63,12 @@ Building.prototype.hasItem = function(item,nb){
 
 Building.prototype.giveItem = function(item,nb){
     this.inventory.add(item,nb);
-    // TODO: broadcast
+    this.setProperty('items',this.inventory.toList());
 };
 
 Building.prototype.takeItem = function(item,nb){
     this.inventory.take(item,nb);
-    // TODO: broadcast
+    this.setProperty('items',this.inventory.toList());
 };
 
 Building.prototype.giveGold = function(nb){

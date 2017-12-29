@@ -36,7 +36,8 @@ PersonalUpdatePacket.prototype.updateGold = function(nb) {
 };
 
 PersonalUpdatePacket.prototype.addItem = function(item,nb){
-    this.items.push({item:item,nb:nb});
+    //this.items.push({item:item,nb:nb});
+    this.items.push([item,nb]);
 };
 
 PersonalUpdatePacket.prototype.addStat = function(key,value){

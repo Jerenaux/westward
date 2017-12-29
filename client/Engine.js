@@ -556,6 +556,7 @@ Engine.updateSelf = function(data){
     if(data.items) {
         Engine.updateInventory(Engine.player.inventory,data.items);
         if(Engine.inMenu) Engine.currentMenu.refreshPanels();
+        if(Engine.player.inBuilding) BScene.shop.playerStock.refreshInventory();
     }
     if(data.stats){
         for(var i = 0; i < data.stats.length; i++){
@@ -622,8 +623,8 @@ Engine.updateInventory = function(inventory,items){
     // items is an array of smaller arrays of format [item id, nb]
     for(var i = 0; i < items.length; i++){
         var item = items[i];
-        //inventory.update(item[0],item[1]);
-        inventory.update(item.item,item.nb);
+        inventory.update(item[0],item[1]);
+        //inventory.update(item.item,item.nb);
     }
 };
 
@@ -705,8 +706,12 @@ Engine.updateBuilding = function(building,data){ // data contains the updated da
     if(data.gold) {
         building.gold = data.gold;
         if(Engine.player.inBuilding == building.id){
-            BScene.updateGoldText(data.gold);
+            BScene.updateGold(data.gold);
         }
+    }
+    if(data.items){
+        Engine.updateInventory(building.inventory,data.items);
+        if(Engine.player.inBuilding == building.id) BScene.shop.shopStock.refreshInventory();
     }
 };
 
@@ -767,7 +772,7 @@ Engine.getTilesetFromTile = function(tile){
 };
 
 Engine.enterBuilding = function(id){
-    BScene.buildingID = id;
+    BScene.setUp(id);
     Engine.scene.scene.swap('BuildingScene');
     currentScene = BScene;
 };

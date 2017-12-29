@@ -14,7 +14,8 @@ function Panel(x,y,width,height,title){
     this.previousY = this.y;
     this.width = width;
     this.height = height;
-    this.verticalOffset = 20;
+    this.startingVerticalOffset = 20;
+    this.verticalOffset = this.startingVerticalOffset;
     this.displayed = false;
     this.displayInventory = false;
     this.inventories = [];
@@ -118,6 +119,19 @@ Panel.prototype.addInventory = function(title,maxwidth,total,inventory,showNumbe
     this.addSlots(maxwidth,total);
 };
 
+Panel.prototype.clearInventories = function(){
+    this.displayInventory = false;
+    this.inventories = [];
+    this.slots = [];
+    this.nextFirstSlot = 0;
+    this.verticalOffset = this.startingVerticalOffset;
+};
+
+Panel.prototype.setInventoryFilter = function(prices,key){
+    this.inventoryFilter = prices;
+    this.inventoryFilterKey = key;
+};
+
 Panel.prototype.createZone = function(){
     var zone = currentScene.scene.add.zone(0,0,0,0);
     zone.setDepth(Engine.UIDepth+10);
@@ -173,8 +187,10 @@ Panel.prototype.addSlots = function(nbHorizontal,total){
             var slotx = this.x+paddingX+(x*36)+offsetx;
             var sloty = this.y+this.verticalOffset+(y*36)+offsety;
             var slot = currentScene.scene.add.sprite(slotx,sloty,'UI',frame);
+            slot.setDepth(Engine.UIDepth);
+            slot.setDisplayOrigin(0,0);
             this.slots.push(slot);
-            this.container.push(slot);
+            //this.container.push(slot);
             counter++;
         }
     }
@@ -324,6 +340,10 @@ Panel.prototype.displayTheInventory = function(inv){
     for(var item in inventory.items){
         if(!inventory.items.hasOwnProperty(item)) continue;
         if(inventory.getNb(item) == 0) continue;
+        if(this.inventoryFilter){
+            if(!this.inventoryFilter.hasOwnProperty(item)) continue;
+            if(!this.inventoryFilter[item][this.inventoryFilterKey] > 0) continue;
+        }
         nbDisplayed++;
         var sprite = this.getNextItemSprite(item,inv.callback);
         var slot = this.slots[j];
