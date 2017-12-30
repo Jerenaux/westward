@@ -109,6 +109,22 @@
       "frame": {"x":518,"y":368,"w":38,"h":38}
     },
     {
+      "filename": "slots-topbottomleft",
+      "frame": {"x":574,"y":372,"w":38,"h":40}
+    },
+    {
+      "filename": "slots-topbottom",
+      "frame": {"x":613,"y":372,"w":36,"h":40}
+    },
+    {
+      "filename": "slots-topbottomright",
+      "frame": {"x":650,"y":372,"w":38,"h":40}
+    },
+    {
+      "filename": "slots-topbottomleftright",
+      "frame": {"x":120,"y":370,"w":40,"h":40}
+    },
+    {
       "filename": "gold",
       "frame": {"x":818,"y":122,"w":12,"h":12}
     },

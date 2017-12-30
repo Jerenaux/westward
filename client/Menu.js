@@ -4,7 +4,7 @@
 
 function Menu(title){
     this.container = [];
-    this.panels = [];
+    this.panels = {};
     this.displayed = false;
     if(title) this.makeTitle(title);
 }
@@ -30,30 +30,35 @@ Menu.prototype.makeTitle = function(title){
     this.container.push(closeBtn);
 
     this.container.forEach(function(e){
-        e.depth = Engine.UIDepth;
+        e.setDepth(Engine.UIDepth);
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setInteractive();
-        e.visible = false;
+        e.setVisible(false);
     });
 
-    text.depth = Engine.UIDepth+1;
+    text.setDepth(Engine.UIDepth+1);
     text.setOrigin(1,0);
 };
 
-Menu.prototype.addPanel = function(panel){
-    this.panels.push(panel);
+Menu.prototype.addPanel = function(name,panel){
+    this.panels[name] = panel;
 };
 
 Menu.prototype.display = function(){
     if(Engine.inMenu) Engine.currentMenu.hide();
     if(Engine.inPanel) Engine.currentPanel.hide();
-    for(var i = 0; i < this.container.length; i++){
-        this.container[i].visible = true;
+
+    this.container.forEach(function(e) {
+        e.setVisible(true);
+    });
+
+    for(var p in this.panels){
+        if(!this.panels.hasOwnProperty(p)) continue;
+        var panel = this.panels[p];
+        panel.display();
     }
-    for(var j = 0; j < this.panels.length; j++){
-        this.panels[j].display();
-    }
+
     Engine.inMenu = true;
     Engine.currentMenu = this;
     Engine.hideMarker();
@@ -61,20 +66,25 @@ Menu.prototype.display = function(){
 };
 
 Menu.prototype.hide = function(){
-    for(var i = 0; i < this.container.length; i++){
-        this.container[i].visible = false;
+    this.container.forEach(function(e) {
+        e.setVisible(false);
+    });
+
+    for(var panel in this.panels){
+        if(!this.panels.hasOwnProperty(panel)) continue;
+        this.panels[panel].hide();
     }
-    for(var j = 0; j < this.panels.length; j++){
-        this.panels[j].hide();
-    }
+
     Engine.inMenu = false;
     Engine.currentMenu = null;
     Engine.showMarker();
     this.displayed = false;
 };
 
-Menu.prototype.refreshPanels = function(){
+
+
+/*Menu.prototype.refreshPanels = function(){
     for(var i = 0; i < this.panels.length; i++){
         this.panels[i].refreshInventory();
     }
-};
+};*/

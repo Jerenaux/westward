@@ -15,7 +15,7 @@ var ItemSprite = new Phaser.Class({
         this.setScrollFactor(0);
         this.setInteractive();
         this.setVisible(false);
-        this.setDepth(Engine.UIDepth);
+        this.setDepth(Engine.UIDepth+1);
         this.isItemSprite = true;
     },
 

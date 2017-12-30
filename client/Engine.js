@@ -7,23 +7,19 @@ var Engine = {
     tileWidth: 32,
     tileHeight: 32,
 
-    /*
-    * - Ground: water and grass:                0
-    * - Marker:                                 1
-    * - Objects, tree stumps, players, build.   2.y
-    * - Tree canopies                           3-6
-    * - Speech bubbles & text                   11
-    * - UI & texts                              12
-    * - Tooltips & texts                        14
-    * => nbLayers (for map): 7
-    * */
-
     markerDepth: 1,
     buildingsDepth: 2,
     playersDepth: 2,
     bubbleDepth: 11,
+
     UIDepth: 12,
-    tooltipDepth: 14,
+    UIElementsDepth: 13,
+    UIContentDepth: 14,
+    UITextDepth: 15,
+
+    tooltipDepth: 16,
+    tooltipElementsDepth: 17,
+    tooltipTextDepth: 18,
 
     craftInvSize: 5, // max number of ingredients for crafting
     key: 'main', // key of the scene, for Phaser
@@ -224,7 +220,7 @@ Engine.createAnimations = function(){
 };
 
 Engine.makeChatBar = function(){
-    var chatw = 300;
+    /*var chatw = 300;
     var chatx = (32*16)-(chatw/2);
     var chaty = Engine.scene.game.config.height;
     Engine.chat = new Panel(chatx,chaty,chatw,96);
@@ -233,13 +229,13 @@ Engine.makeChatBar = function(){
     Engine.chat.domElement = document.getElementById("chat");
     var domx = (32*16) - 100 + 12;
     Engine.chat.domElement.style.left = domx+"px";
-    Engine.chat.domElement.style.top = (chaty-17)+"px";
+    Engine.chat.domElement.style.top = (chaty-17)+"px";*/
 };
 
 Engine.toggleChatBar = function(){
-    if(Engine.inMenu) return;
+    /*if(Engine.inMenu) return;
     if(Engine.chat.domElement.value != "") console.log("I said : "+Engine.chat.domElement.value);
-    Engine.chat.toggle();
+    Engine.chat.toggle();*/
 };
 
 Engine.makeUI = function(){
@@ -256,20 +252,22 @@ Engine.makeUI = function(){
     x = x+width;
     UIholder.push(Engine.scene.add.sprite(x,y,'UI','title-right'));
     UIholder.forEach(function(e){
-        e.depth = Engine.UIDepth;
+        e.setDepth(Engine.UIDepth);
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setInteractive();
     });
 
-    Engine.statsPanel = new StatsPanel(665,380,340,100,'Stats');
+    //var statsPanel = new StatsPanel(665,380,340,100,'Stats');
+    var statsPanel = new Panel(665,380,340,100,'Stats');
+
     var UIelements = [];
     x = startx+10;
-    UIelements.push(new UIElement(x,starty,'backpack',null,Engine.makeInventory()));
+    UIelements.push(new UIElement(x,starty,'backpack',null,Engine.makeInventory(statsPanel)));
     x += 50;
     UIelements.push(new UIElement(x,starty,'tools',null,Engine.makeCraftingMenu()));
     x += 50;
-    UIelements.push(new UIElement(x,starty,'scroll',null,Engine.makeCharacterMenu()));
+    UIelements.push(new UIElement(x,starty,'scroll',null,Engine.makeCharacterMenu(statsPanel)));
 
     var tooltip = Engine.scene.textures.addSpriteSheetFromAtlas(
         'tooltip',
@@ -282,12 +280,38 @@ Engine.makeUI = function(){
         }
     );
     Engine.tooltip = new Tooltip();
+
+    Engine.buildingMenusMap = {
+        0: Engine.makeTradeMenu(), // fort
+        1: Engine.makeTradeMenu() //trade post
+    };
+};
+
+Engine.makeTradeMenu = function(){
+    var trade = new Menu('Trade');
+    var client = new InventoryPanel(212,100,300,300,'Your items');
+    client.setInventory(Engine.player.inventory,7,true);
+    trade.addPanel('client',client);
+    var shop = new InventoryPanel(542,100,300,300,'Shop');
+    shop.setInventory(new Inventory(20),7,true);
+    trade.addPanel('shop',shop);
+    trade.addPanel('action',new Panel(212,420,300,100,'Buy/Sell'));
+    return trade;
 };
 
 Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
-
-    var recipes = new Panel(765,100,240,380,'Recipes');
+    var recipes = new InventoryPanel(765,100,235,380,'Recipes');
+    recipes.setInventory(Engine.player.itemRecipes,4,false,Engine.recipeClick);
+    crafting.addPanel('recipes',recipes);
+    crafting.addPanel('combi',new Panel(450,100,290,380,'Combination'));
+    var ingredients = new InventoryPanel(450,300,290,380,'',true); // true = invisible
+    ingredients.setInventory(new Inventory(5),5,true); // TODO: add mins
+    crafting.addPanel('ingredients',ingredients);
+    var items = new InventoryPanel(40,100,390,380,'Items');
+    items.setInventory(Engine.player.inventory,10,true);
+    crafting.addPanel('items',items);
+    /*var recipes = new Panel(765,100,240,380,'Recipes');
     recipes.addInventory('Items',5,10,Engine.player.itemRecipes,false,Engine.recipeClick);
     recipes.addInventory('Buildings',5,5,Engine.player.buildingRecipes,false,Engine.recipeClick);
     crafting.addPanel(recipes); // recipes panel
@@ -298,30 +322,37 @@ Engine.makeCraftingMenu = function(){
 
     var items = new Panel(40,100,390,380,'Items');
     items.addInventory(null,10,Engine.player.inventory.maxSize,Engine.player.inventory,true);
-    crafting.addPanel(items); // inventory panel
+    crafting.addPanel(items); // inventory panel*/
     return crafting;
 };
 
-Engine.makeInventory = function(){
+Engine.makeInventory = function(statsPanel){
     var inventory = new Menu('Inventory');
-    Engine.equipmentPanel = new EquipmentPanel(665,100,340,260,'Equipment');
+    var items = new InventoryPanel(40,100,600,380,'Items');
+    items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
+    inventory.addPanel('items',items);
+    inventory.addPanel('equipment',new Panel(665,100,340,260,'Equipment'));
+    inventory.addPanel('stats',statsPanel);
+    /*Engine.equipmentPanel = new EquipmentPanel(665,100,340,260,'Equipment');
     inventory.addPanel(Engine.equipmentPanel);
     inventory.addPanel(Engine.statsPanel);
     var items = new Panel(40,100,600,380,'Items');
     Engine.goldTexts.push(items.addCapsule(500,-9,9999,'gold'));
     items.addInventory(null,15,Engine.player.inventory.maxSize,Engine.player.inventory,true,Engine.inventoryClick);
-    inventory.addPanel(items); // inventory panel
+    inventory.addPanel(items); // inventory panel*/
     return inventory;
 };
 
-Engine.makeCharacterMenu = function(){
+Engine.makeCharacterMenu = function(statsPanel){
     var character = new Menu('Character');
-    var info = new Panel(665,100,340,260,"<Player name>");
+    character.addPanel('info',new Panel(665,100,340,260,'<Player name>'));
+    character.addPanel('stats',statsPanel);
+    /*var info = new Panel(665,100,340,260,"<Player name>");
     info.addLine('Citizen of '+Engine.settlementsData[Engine.player.settlement].name);
     info.addLine('Level 1 Merchant  -   0/100 Class XP');
     info.addLine('Level 1 citizen   -   0/100 Civic XP');
     character.addPanel(info); // equipment panel
-    character.addPanel(Engine.statsPanel);
+    character.addPanel(Engine.statsPanel);*/
     return character;
 };
 
@@ -680,6 +711,10 @@ Engine.traverseUpdateObject = function(obj,table,callback){
     });
 };
 
+Engine.isHero = function(player){
+    return player.id == Engine.player.id;
+};
+
 Engine.updatePlayer = function(player,data){ // data contains the updated data from the server
     if(data.path && player.id != Engine.player.id) player.move(data.path);
     if(data.inFight == true) player.displayHalo();
@@ -687,12 +722,12 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
     if(data.inBuilding > -1) {
         player.setVisible(false);
         player.inBuilding = data.inBuilding;
-        if(player.id == Engine.player.id) Engine.enterBuilding(data.inBuilding);
+        if(Engine.isHero(player)) Engine.enterBuilding(data.inBuilding);
     }
     if(data.inBuilding == -1){
         player.setVisible(true);
         player.inBuilding = data.inBuilding;
-        if(player.id == Engine.player.id) Engine.exitBuilding();
+        if(Engine.isHero(player)) Engine.exitBuilding();
     }
 };
 
@@ -772,15 +807,20 @@ Engine.getTilesetFromTile = function(tile){
 };
 
 Engine.enterBuilding = function(id){
-    BScene.setUp(id);
+    var building = Engine.buildings[id];
+    var buildingData = Engine.buildingsData[building.buildingType];
+    var settlementData = Engine.settlementsData[building.settlement];
+    Engine.buildingMenusMap[building.buildingType].display();
+    /*BScene.setUp(id);
     Engine.scene.scene.swap('BuildingScene');
-    currentScene = BScene;
+    currentScene = BScene;*/
 };
 
 Engine.exitBuilding = function(){
-    BScene.close();
+    /*BScene.close();
     BScene.scene.scene.swap('main');
-    currentScene = Engine;
+    currentScene = Engine;*/
+    Engine.currentMenu.hide();
 };
 
 // ## UI-related functions ##

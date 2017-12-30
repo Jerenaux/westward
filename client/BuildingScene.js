@@ -102,8 +102,8 @@ BScene.setUp = function(buildingID){
         BScene.shop.prices = building.prices;
         BScene.shop.inventory = building.inventory;
         BScene.shop.gold = building.gold;
+
         BScene.shop.playerStock.setInventoryFilter(building.prices,0);
-        BScene.shop.shopStock.clearInventories();
         BScene.shop.shopStock.addInventory(null,7,building.inventory.size,building.inventory,true,BScene.buyClick);
         BScene.shop.shopStock.setInventoryFilter(building.prices,1);
         BScene.shop.goldText.setText(building.gold);
@@ -115,6 +115,7 @@ BScene.setUp = function(buildingID){
 
 BScene.close = function(){
     BScene.shop.hide();
+    BScene.shop.shopStock.clearInventories();
 };
 
 BScene.updateGold = function(gold){

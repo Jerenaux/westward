@@ -1,13 +1,102 @@
 /**
  * Created by Jerome on 06-10-17.
  */
-function Panel(x,y,width,height,title){
+
+function Panel(x,y,width,height,title,invisible){
+    Frame.call(this,x,y,width,height,invisible);
+    this.capsules = {};
+    if(title) this.addCapsule('title',20,-9,title);
+}
+
+Panel.prototype = Object.create(Frame.prototype);
+Panel.prototype.constructor = Panel;
+
+Panel.prototype.addCapsule = function(name,x,y,text,icon){
+    var capsule = new Capsule(this.x+x,this.y+y,icon,this.content);
+    capsule.setText(text);
+    this.capsules[name] = capsule;
+};
+
+Panel.prototype.display = function(){
+    Frame.prototype.display.call(this);
+    this.content.forEach(function(e){
+        e.setVisible(true);
+    });
+    for(var capsule in this.capsules){
+        this.capsules[capsule].display();
+    }
+};
+
+function Capsule(x,y,icon,container){
+    this.slices = [];
+    this.icon = null;
+    this.width = 1;
+    this.width_ = this.width; // previous width
+    
+    if(icon) {
+        this.icon = Engine.scene.add.sprite(x+8,y+6,'UI',icon);
+        this.icon.setDepth(Engine.UIDepth+2);
+        this.icon.setScrollFactor(0);
+        this.icon.setDisplayOrigin(0,0);
+        this.icon.setVisible(false);
+    }
+    var textX = (this.icon ? x + this.icon.width : x) + 10;
+    var textY = (this.icon ? y - 1: y);
+
+    this.text = Engine.scene.add.text(textX, textY, '',
+        { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
+    );
+
+    this.slices.push(Engine.scene.add.sprite(x,y,'UI','capsule-left'));
+    x += 24;
+    this.slices.push(Engine.scene.add.tileSprite(x,y,this.width,24,'UI','capsule-middle'));
+    x += this.width;
+    this.slices.push(Engine.scene.add.sprite(x,y,'UI','capsule-right'));
+
+    this.slices.forEach(function(e){
+        e.setDepth(Engine.UIDepth+1);
+        e.setScrollFactor(0);
+        e.setDisplayOrigin(0,0);
+        e.setVisible(false);
+        container.push(e); // don't use concat
+    });
+
+    this.text.setDepth(Engine.UIDepth+2);
+    this.text.setScrollFactor(0);
+    this.text.setDisplayOrigin(0,0);
+    this.text.setVisible(false);
+
+    container.push(this.text);
+    if(this.icon) container.push(this.icon);
+}
+
+Capsule.prototype.setText = function(text){
+    this.text.setText(text);
+    this.width = this.text.width -25;
+    if(this.icon) this.width += this.icon.width;
+
+    this.slices[1].width = this.width;
+    this.slices[2].x += (this.width-this.width_);
+
+    this.width_ = this.width;
+};
+
+Capsule.prototype.display = function(){
+    this.slices.forEach(function(e){
+        e.setVisible(true);
+    });
+    this.text.setVisible(true);
+    if(this.icon) this.icon.setVisible(true);
+};
+
+/*function Panel(x,y,width,height,title){
     this.container = [];
     this.slots = []; // slot number -> coordinates
     this.sprites = []; // pool of sprites to display items
+    this.zones = [];
     this.texts = []; // pool of texts for items
     this.nextItemSprite = 0;
-    this.test = [];
+    this.nextZone = 0;
     this.x = x;
     this.y = y;
     this.previousX = this.x;
@@ -111,25 +200,11 @@ Panel.prototype.addInventory = function(title,maxwidth,total,inventory,showNumbe
         maxWidth: maxwidth,
         showNumbers: showNumbers,
         firstSlot: this.nextFirstSlot,
-        callback: callback,
-        zone: this.createZone()
+        callback: callback
     };
     this.inventories.push(inv);
     if(title) this.addLine(title);
     this.addSlots(maxwidth,total);
-};
-
-Panel.prototype.clearInventories = function(){
-    this.displayInventory = false;
-    this.inventories = [];
-    this.slots = [];
-    this.nextFirstSlot = 0;
-    this.verticalOffset = this.startingVerticalOffset;
-};
-
-Panel.prototype.setInventoryFilter = function(prices,key){
-    this.inventoryFilter = prices;
-    this.inventoryFilterKey = key;
 };
 
 Panel.prototype.createZone = function(){
@@ -143,6 +218,21 @@ Panel.prototype.createZone = function(){
         currentScene.tooltip.hide();
     };
     return zone;
+};
+
+Panel.prototype.clearInventories = function(){
+    //console.log(BScene.scene.children);
+    this.displayInventory = false;
+    this.inventories = [];
+    //this.slots = [];
+    this.nextFirstSlot = 0;
+    this.verticalOffset = this.startingVerticalOffset;
+    //console.log(BScene.scene.children);
+};
+
+Panel.prototype.setInventoryFilter = function(prices,key){
+    this.inventoryFilter = prices;
+    this.inventoryFilterKey = key;
 };
 
 Panel.prototype.addSlots = function(nbHorizontal,total){
@@ -186,11 +276,19 @@ Panel.prototype.addSlots = function(nbHorizontal,total){
             offsety = (y > 0 ? 2 : 0);
             var slotx = this.x+paddingX+(x*36)+offsetx;
             var sloty = this.y+this.verticalOffset+(y*36)+offsety;
-            var slot = currentScene.scene.add.sprite(slotx,sloty,'UI',frame);
-            slot.setDepth(Engine.UIDepth);
-            slot.setDisplayOrigin(0,0);
-            this.slots.push(slot);
-            //this.container.push(slot);
+
+            if(this.slots.length > counter){
+                this.slots[counter].setFrame(frame);
+                this.slots[counter].setPosition(slotx,sloty);
+            }else{
+                var slot = currentScene.scene.add.sprite(slotx,sloty,'UI',frame);
+                slot.setDepth(Engine.UIDepth);
+                slot.setDisplayOrigin(0,0);
+                slot.setScrollFactor(0,0);
+                slot.setVisible(false);
+                this.slots.push(slot);
+            }
+
             counter++;
         }
     }
@@ -275,11 +373,18 @@ Panel.prototype.finalize = function(){
         if(e.depth == 1 || !e.depth) e.depth = Engine.UIDepth;
         if(isText) e.depth++;
         e.setScrollFactor(0);
-        //if(e.constructor.name == 'TileSprite') e.setDisplayOrigin(0,0);
         if(!e.centered) e.setDisplayOrigin(0,0);
         if(!e.notInteractive) e.setInteractive();
         e.visible = false;
     });
+};
+
+Panel.prototype.getNextZone = function(){
+    if(this.zones.length <= this.nextZone){
+        this.zones.push(this.createZone());
+    }
+    var zone = this.zones[this.nextZone];
+    return zone;
 };
 
 Panel.prototype.getNextItemSprite = function(item, callback){ // Pool of sprites common to all inventories of the panel
@@ -337,6 +442,10 @@ Panel.prototype.displayTheInventory = function(inv){
     var inventory = inv.inventory;
     var j = inv.firstSlot;
     var nbDisplayed = 0;
+    for(var i = 0; i < inventory.maxSize; i++){
+        console.log('showing',i);
+        this.slots[i].setVisible(true);
+    }
     for(var item in inventory.items){
         if(!inventory.items.hasOwnProperty(item)) continue;
         if(inventory.getNb(item) == 0) continue;
@@ -382,7 +491,7 @@ Panel.prototype.displayTheInventory = function(inv){
     shape.push(zoneH);
     var polygon = new Phaser.Geom.Polygon(shape);
 
-    var zone = inv.zone;
+    var zone = this.getNextZone();
     zone.setVisible(true);
     zone.setPosition(zoneX,zoneY);
     zone.setSize(zoneW,zoneH);
@@ -414,10 +523,15 @@ Panel.prototype.hideInventory = function(){ // Hide all items of all inventories
         this.sprites[j].visible = false;
         if(this.texts[j]) this.texts[j].visible = false;
     }
-    for(var i = 0; i < this.inventories.length; i++){
-        this.inventories[i].zone.setVisible(false);
+    for(var i = 0; i < this.slots.length; i++){
+        console.log('hiding ',i);
+        this.slots[i].setVisible(false);
+    }
+    for(var i = 0; i < this.zones.length; i++){
+        this.zones[i].setVisible(false);
     }
     this.nextItemSprite = 0;
+    this.nextZone = 0;
 };
 
 Panel.prototype.refreshInventory = function(){
@@ -427,4 +541,4 @@ Panel.prototype.refreshInventory = function(){
             this.displayTheInventory(this.inventories[i]);
         }
     }
-};
+};*/

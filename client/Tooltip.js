@@ -161,7 +161,6 @@ Tooltip.prototype.finalize = function(){
         if(!e.centered) e.setDisplayOrigin(0,0);
         if(!e.notInteractive) e.setInteractive();
         e.setVisible(false);
-        if(e.lol) console.log(e);
     });
 };
 

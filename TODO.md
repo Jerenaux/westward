@@ -160,13 +160,14 @@ Legal:
 ------
 - Look up IFAPME, UCM, Forem
 - Comptable, avocat spécialisé
-- Contrats
+- Contrats, template, sharing IP...
 - What about donations, how is it taxed, what formats allow it..
 
 Polish:
 ------
 Visual:
 - Find better font
+- Pop-up notifications after actions
 - Fix tooltips displaying too long on equipped equipment slots
 - Display stats effects relative to current equipment
 - Help buttons everywhere
@@ -275,6 +276,7 @@ Content:
 *Inventory:
 - Add possibility to throw item, (incl. number)
 - Allow to use multiple items in one action
+* Mail system (using birds)
 * (Mini)map system
 * Movement
 - Check paths and block if error
@@ -284,6 +286,7 @@ Content:
 - Investigate smoothenPath and compressPath)
 - Hold & click
 * NPC
+* Pop-up fade-out notifications to everything in corners (+ log in character menu)
 * Player interactions:
 - Display menu when click on players, display buttons (give item, give money)
 - Give items/money
