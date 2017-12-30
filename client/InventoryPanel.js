@@ -42,6 +42,7 @@ InventoryPanel.prototype.setInventory = function(inventory,maxwidth,showNumbers,
         this.config.filter = filter.items;
         this.config.filterKey = filter.key;
     }
+    this.addSlots();
 };
 
 InventoryPanel.prototype.getNextSlot = function(){
@@ -55,6 +56,39 @@ InventoryPanel.prototype.getNextSlot = function(){
     }
 
     return this.slots[this.slotsCounter++];
+};
+
+InventoryPanel.prototype.addSlots = function(){
+    var padx = Math.floor((this.width - this.config.maxwidth*36)/2);
+    var pady = 30;
+    for(var i = 0; i < this.inventory.maxSize; i++){
+        var slot = this.getNextSlot();
+        var row = Math.floor(i/this.config.maxwidth);
+        var col = i%this.config.maxwidth;
+        this.positionSlot(slot,row,col,padx,pady);
+        this.setSlotFrame(slot,row,col,i);
+        slot.setVisible(false);
+    }
+};
+
+InventoryPanel.prototype.positionSlot = function(slot,row,col,paddingX,paddingY){
+    var slotSize = 36;
+    var offsetx = (col > 0 ? 2 : 0);
+    var offsety = (row > 0 ? 2 : 0);
+    var x = paddingX+offsetx+(col*slotSize);
+    var y = paddingY+offsety+(row*slotSize);
+    slot.setPosition(this.x+x,this.y+y);
+};
+
+InventoryPanel.prototype.setSlotFrame = function(slot,row,col,i){
+    var initialName = 'slots-';
+    var frame = initialName;
+    if(i < this.config.maxwidth) frame += 'top';
+    if(i + this.config.maxwidth >= this.inventory.maxSize) frame += 'bottom';
+    if(col == 0) frame += 'left';
+    if(col == this.config.maxwidth-1 || i == this.inventory.maxSize-1) frame += 'right';
+    if(frame == initialName) frame += 'middle';
+    slot.setFrame(frame);
 };
 
 InventoryPanel.prototype.getNextSprite = function(){
@@ -79,37 +113,10 @@ InventoryPanel.prototype.getNextSprite = function(){
     return this.sprites[this.spritesCounter++];
 };
 
-InventoryPanel.prototype.positionSlot = function(slot,row,col,paddingX,paddingY){
-    var slotSize = 36;
-    var offsetx = (col > 0 ? 2 : 0);
-    var offsety = (row > 0 ? 2 : 0);
-    var x = paddingX+offsetx+(col*slotSize);
-    var y = paddingY+offsety+(row*slotSize);
-    slot.setPosition(this.x+x,this.y+y);
-};
-
-InventoryPanel.prototype.setSlotFrame = function(slot,row,col,i){
-    var initialName = 'slots-';
-    var frame = initialName;
-    if(i < this.config.maxwidth) frame += 'top';
-    if(i + this.config.maxwidth >= this.inventory.maxSize) frame += 'bottom';
-    if(col == 0) frame += 'left';
-    if(col == this.config.maxwidth-1 || i == this.inventory.maxSize-1) frame += 'right';
-    if(frame == initialName) frame += 'middle';
-    slot.setFrame(frame);
-};
-
 InventoryPanel.prototype.displayInventory = function(){
-    var padx = Math.floor((this.width - this.config.maxwidth*36)/2);
-    var pady = 30;
-    for(var i = 0; i < this.inventory.maxSize; i++){
-        var slot = this.getNextSlot();
-        var row = Math.floor(i/this.config.maxwidth);
-        var col = i%this.config.maxwidth;
-        this.positionSlot(slot,row,col,padx,pady);
-        this.setSlotFrame(slot,row,col,i);
-        slot.setVisible(true);
-    }
+    this.slots.forEach(function(s){
+        s.setVisible(true);
+    });
 
     var filter = this.config.filter;
     var filterKey = this.config.filterKey;
@@ -132,7 +139,7 @@ InventoryPanel.prototype.displayInventory = function(){
         }
         nbDisplayed++;
     }
-
+    this.nbDisplayed = nbDisplayed;
     this.setUpZone(nbDisplayed);
 };
 
@@ -169,6 +176,22 @@ InventoryPanel.prototype.setUpZone = function(nbDisplayed){
     this.zone.setInteractive(polygon,Phaser.Geom.Polygon.Contains);
 };
 
+InventoryPanel.prototype.refreshInventory = function(){
+    this.resetCounters();
+    for(var i = 0; i < this.nbDisplayed; i++){
+        var s = this.sprites[i];
+        s.item.setVisible(false);
+        s.text.setVisible(false);
+    }
+    this.displayInventory();
+    // TODO: deal with change in inventory size (add/remove slots)
+};
+
+InventoryPanel.prototype.resetCounters = function(){
+    this.slotsCounter = 0;
+    this.spritesCounter = 0;
+};
+
 InventoryPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
     this.displayInventory();
@@ -176,6 +199,5 @@ InventoryPanel.prototype.display = function(){
 
 InventoryPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
-    this.slotsCounter = 0;
-    this.spritesCounter = 0;
+    this.resetCounters();
 };

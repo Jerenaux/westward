@@ -102,7 +102,7 @@ var Equipment = {
     }
 };
 
-// Returns a data structure to store data releted to equipment
+// Returns a data structure to store data related to equipment
 Equipment.getSkeleton = function(){
     var skeleton = {
         containers: {}

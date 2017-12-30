@@ -4,6 +4,31 @@
 
 function EquipmentPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
+    this.slots = Equipment.getSkeleton();
+    this.addEquip();
+}
+
+EquipmentPanel.prototype = Object.create(Panel.prototype);
+EquipmentPanel.prototype.constructor = EquipmentPanel;
+
+EquipmentPanel.prototype.addEquip = function(){
+    var xoffset = -30;
+    for(var equip in Equipment.dict){
+        if(!Equipment.dict.hasOwnProperty(equip)) continue;
+        var eq = Equipment.dict[equip];
+        for(var i = 0; i < eq.nb; i++) {
+            var xinc = eq.xincrement || 0;
+            var displayName = eq.nb > 1 ? eq.name+' '+(i+1) : eq.name;
+            var x = eq.x+(i*xinc)+xoffset;
+            this.addEquipSlot(,eq.y,eq.shade,displayName,equip,i,eq.containedIn);
+        }
+    }
+
+    this.finalize();
+};
+
+/*function EquipmentPanel(x,y,width,height,title){
+    Panel.call(this,x,y,width,height,title);
     this.shadeSprites = Equipment.getSkeleton();
     this.itemSprites = Equipment.getSkeleton();
     this.countTexts = this.itemSprites.containers;
@@ -88,4 +113,4 @@ EquipmentPanel.prototype.canDisplay = function(element){
     if(element.isCountText && Engine.player.equipment[slot][subSlot] > -1) return true;
     return false;
     //return ( (!element.isShade && !element.isItemSprite) || (element.isShade && Engine.player.equipment[slot][subSlot] == -1) || (element.isItemSprite && Engine.player.equipment[slot][subSlot] > -1));
-};
+};*/
