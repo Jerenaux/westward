@@ -161,7 +161,6 @@ Engine.initWorld = function(data){
     Engine.makeUI();
     Engine.makeChatBar();
     Engine.createAnimations();
-    //if(data.inBuilding > -1) Engine.enterBuilding(data.inBuilding);
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     // TODO: when all chunks loaded, fade-out Boot scene
@@ -261,13 +260,24 @@ Engine.makeUI = function(){
     //var statsPanel = new StatsPanel(665,380,340,100,'Stats');
     var statsPanel = new Panel(665,380,340,100,'Stats');
 
+    Engine.menus = {
+        'inventory': Engine.makeInventory(statsPanel),
+        'crafting': Engine.makeCraftingMenu(),
+        'character': Engine.makeCharacterMenu(statsPanel)
+    };
+
+    Engine.buildingMenusMap = {
+        0: Engine.makeTradeMenu(), // fort
+        1: Engine.makeTradeMenu() //trade post
+    };
+
     var UIelements = [];
     x = startx+10;
-    UIelements.push(new UIElement(x,starty,'backpack',null,Engine.makeInventory(statsPanel)));
+    UIelements.push(new UIElement(x,starty,'backpack',null,Engine.menus.inventory));
     x += 50;
-    UIelements.push(new UIElement(x,starty,'tools',null,Engine.makeCraftingMenu()));
+    UIelements.push(new UIElement(x,starty,'tools',null,Engine.menus.crafting));
     x += 50;
-    UIelements.push(new UIElement(x,starty,'scroll',null,Engine.makeCharacterMenu(statsPanel)));
+    UIelements.push(new UIElement(x,starty,'scroll',null,Engine.menus.character));
 
     var tooltip = Engine.scene.textures.addSpriteSheetFromAtlas(
         'tooltip',
@@ -280,11 +290,6 @@ Engine.makeUI = function(){
         }
     );
     Engine.tooltip = new Tooltip();
-
-    Engine.buildingMenusMap = {
-        0: Engine.makeTradeMenu(), // fort
-        1: Engine.makeTradeMenu() //trade post
-    };
 };
 
 Engine.makeTradeMenu = function(){
@@ -331,8 +336,10 @@ Engine.makeInventory = function(statsPanel){
     var items = new InventoryPanel(40,100,600,380,'Items');
     items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
     inventory.addPanel('items',items);
-    inventory.addPanel('equipment',new Panel(665,100,340,260,'Equipment'));
+    var equipment = new EquipmentPanel(665,100,340,260,'Equipment');
+    inventory.addPanel('equipment',equipment);
     inventory.addPanel('stats',statsPanel);
+    inventory.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
     /*Engine.equipmentPanel = new EquipmentPanel(665,100,340,260,'Equipment');
     inventory.addPanel(Engine.equipmentPanel);
     inventory.addPanel(Engine.statsPanel);
@@ -586,8 +593,7 @@ Engine.checkCollision = function(tile){ // tile is x, y pair
 Engine.updateSelf = function(data){
     if(data.items) {
         Engine.updateInventory(Engine.player.inventory,data.items);
-        if(Engine.inMenu) Engine.currentMenu.refreshPanels();
-        if(Engine.player.inBuilding) BScene.shop.playerStock.refreshInventory();
+        //if(Engine.inMenu) Engine.currentMenu.refreshPanels();
     }
     if(data.stats){
         for(var i = 0; i < data.stats.length; i++){
@@ -626,7 +632,12 @@ Engine.updateAmmo = function(slot,nb){
 
 Engine.updateEquipment = function(slot,subSlot,item){
     Engine.player.equipment[slot][subSlot] = item;
-    var data = Engine.itemsData[item];
+    for(var m in Engine.menus){
+        if(!Engine.menus.hasOwnProperty(m)) continue;
+        var menu = Engine.menus[m];
+        if(menu.onUpdateEquipment) menu.onUpdateEquipment();
+    }
+    /*var data = Engine.itemsData[item];
     var shade = Engine.equipmentPanel.shadeSprites[slot][subSlot];
     var sprite = Engine.equipmentPanel.itemSprites[slot][subSlot];
     var countText = Engine.equipmentPanel.countTexts[slot];
@@ -639,7 +650,7 @@ Engine.updateEquipment = function(slot,subSlot,item){
         shade.setVisible(false);
         sprite.setVisible(true);
         if(countText) countText.setVisible(true);
-    }
+    }*/
 };
 
 Engine.updateStat = function(key,value){
@@ -849,6 +860,6 @@ Engine.inventoryClick = function(){
     Client.sendUse(this.itemID);
 };
 
-Engine.equipClick = function(){
-    Client.sendUnequip(this.slot,this.subSlot);
+Engine.unequipClick = function(){ // Sent when unequipping something
+    Client.sendUnequip(this.slotName,this.subSlot);
 };

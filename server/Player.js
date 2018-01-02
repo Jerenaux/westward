@@ -129,8 +129,9 @@ Player.prototype.canEquip = function(slot,item,fromDB){
 };
 
 Player.prototype.equip = function(slot,item,fromDB){
+    if(!this.equipment.hasOwnProperty(slot)) return;
     if(!this.canEquip(slot,item,fromDB)) {
-        console.log('cant equip');
+        console.log('Error: cant equip');
         return;
     }
     var conflictSlot = Equipment.dict[slot].conflict; // Name of the slot with which the new object could conflict
@@ -162,6 +163,7 @@ Player.prototype.equip = function(slot,item,fromDB){
 
 Player.prototype.unequip = function(slot,subSlot){
     var item = this.equipment[slot][subSlot];
+    if(item == -1) return;
     var containerSlot = Equipment.dict[slot].containedIn;
     var containedSlot = Equipment.dict[slot].contains;
     var nb = containerSlot ? this.equipment.containers[containerSlot] : 1;
@@ -194,6 +196,7 @@ Player.prototype.unload = function(containerSlot){
 Player.prototype.applyEffects = function(item,coef){
     var coef = coef || 1;
     var itemData = GameServer.itemsData[item];
+    if(!itemData.effects) return;
     for (var stat in itemData.effects) {
         if (!itemData.effects.hasOwnProperty(stat)) continue;
         this.applyEffect(stat, coef*itemData.effects[stat]);
