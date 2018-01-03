@@ -55,6 +55,22 @@ var Player = new Phaser.Class({
     move: function(path){
         if(this.isHero) Client.sendPath(path,this.destinationAction);
         Moving.prototype.move.call(this,path);
+    },
+
+    getEquipped: function(slot,subSlot){
+        return this.equipment[slot][subSlot];
+    },
+
+    isAmmoEquipped: function(slot){
+        return this.equipment[slot][0] > -1;
+    },
+
+    getContainerID: function(slot){
+        return this.equipment[slot][0];
+    },
+
+    getNbInContainer: function(slot){
+        return this.equipment.containers[slot];
     }
 
     /*onArrival: function(){

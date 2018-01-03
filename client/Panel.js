@@ -19,9 +19,6 @@ Panel.prototype.addCapsule = function(name,x,y,text,icon){
 
 Panel.prototype.display = function(){
     Frame.prototype.display.call(this);
-    this.content.forEach(function(e){
-        e.setVisible(true);
-    });
     for(var capsule in this.capsules){
         this.capsules[capsule].display();
     }

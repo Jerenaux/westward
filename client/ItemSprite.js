@@ -27,12 +27,10 @@ var ItemSprite = new Phaser.Class({
         this.itemID = id;
         this.name = data.name;
         this.effects = data.effects;
-        //this.setVisible(true);
         if(callback) this.handleClick = callback.bind(this);
     },
 
     handleOver: function(){
-        //Engine.tooltip.updateInfo(this.name,this.effects);
-        currentScene.tooltip.updateInfo(this.name,this.effects);
+        Engine.tooltip.updateInfo(this.name,this.effects);
     }
 });

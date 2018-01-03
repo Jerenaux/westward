@@ -176,7 +176,8 @@ InventoryPanel.prototype.setUpZone = function(nbDisplayed){
     this.zone.setInteractive(polygon,Phaser.Geom.Polygon.Contains);
 };
 
-InventoryPanel.prototype.refreshInventory = function(){
+InventoryPanel.prototype.updateInventory = function(){
+    if(!this.displayed) return;
     this.resetCounters();
     for(var i = 0; i < this.nbDisplayed; i++){
         var s = this.sprites[i];

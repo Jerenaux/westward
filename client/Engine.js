@@ -257,7 +257,6 @@ Engine.makeUI = function(){
         e.setInteractive();
     });
 
-    //var statsPanel = new StatsPanel(665,380,340,100,'Stats');
     var statsPanel = new Panel(665,380,340,100,'Stats');
 
     Engine.menus = {
@@ -301,6 +300,7 @@ Engine.makeTradeMenu = function(){
     shop.setInventory(new Inventory(20),7,true);
     trade.addPanel('shop',shop);
     trade.addPanel('action',new Panel(212,420,300,100,'Buy/Sell'));
+    trade.onUpdateInventory = client.updateInventory.bind(client);
     return trade;
 };
 
@@ -316,18 +316,7 @@ Engine.makeCraftingMenu = function(){
     var items = new InventoryPanel(40,100,390,380,'Items');
     items.setInventory(Engine.player.inventory,10,true);
     crafting.addPanel('items',items);
-    /*var recipes = new Panel(765,100,240,380,'Recipes');
-    recipes.addInventory('Items',5,10,Engine.player.itemRecipes,false,Engine.recipeClick);
-    recipes.addInventory('Buildings',5,5,Engine.player.buildingRecipes,false,Engine.recipeClick);
-    crafting.addPanel(recipes); // recipes panel
-
-    Engine.craftingPanel = new CraftingPanel(450,100,290,380,'Combination');
-    Engine.craftingPanel.addInventory(null,5,5,Engine.craftingPanel.craftTargetMaterials,true);
-    crafting.addPanel(Engine.craftingPanel); // crafting panel
-
-    var items = new Panel(40,100,390,380,'Items');
-    items.addInventory(null,10,Engine.player.inventory.maxSize,Engine.player.inventory,true);
-    crafting.addPanel(items); // inventory panel*/
+    crafting.onUpdateInventory = items.updateInventory.bind(items);
     return crafting;
 };
 
@@ -340,13 +329,7 @@ Engine.makeInventory = function(statsPanel){
     inventory.addPanel('equipment',equipment);
     inventory.addPanel('stats',statsPanel);
     inventory.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
-    /*Engine.equipmentPanel = new EquipmentPanel(665,100,340,260,'Equipment');
-    inventory.addPanel(Engine.equipmentPanel);
-    inventory.addPanel(Engine.statsPanel);
-    var items = new Panel(40,100,600,380,'Items');
-    Engine.goldTexts.push(items.addCapsule(500,-9,9999,'gold'));
-    items.addInventory(null,15,Engine.player.inventory.maxSize,Engine.player.inventory,true,Engine.inventoryClick);
-    inventory.addPanel(items); // inventory panel*/
+    inventory.onUpdateInventory = items.updateInventory.bind(items);
     return inventory;
 };
 
@@ -369,9 +352,9 @@ Engine.addHero = function(id,x,y,settlement){
     Engine.camera.startFollow(Engine.player);
     Engine.player.inventory = new Inventory();
     Engine.player.gold = 0;
-    Engine.player.buildingRecipes = new Inventory(10);
+    //Engine.player.buildingRecipes = new Inventory(10);
+    //Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
     Engine.player.itemRecipes = new Inventory(10);
-    Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
     Engine.player.itemRecipes.fromList([[6,1],[10,1],[15,1],[16,1]]);
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = Equipment.getSkeleton();
@@ -491,9 +474,12 @@ Engine.handleOver = function(event){
 };
 
 Engine.handleOut = function(event){
-    if(event.gameObject){
-        if(event.gameObject.constructor.name == 'Building' && !Engine.inMenu) Engine.showMarker();
-        if(event.gameObject.handleOut) event.gameObject.handleOut();
+    if(event.list.length > 0) {
+        for(var i = 0; i < Math.min(event.list.length,2); i++) { // disallow bubbling too deep, only useful in menus (i.e. shallow)
+            var obj = event.list[i];
+            if(obj.constructor.name == 'Building' && !Engine.inMenu) Engine.showMarker();
+            if(obj.handleOut) obj.handleOut();
+        }
     }
 };
 
@@ -593,7 +579,7 @@ Engine.checkCollision = function(tile){ // tile is x, y pair
 Engine.updateSelf = function(data){
     if(data.items) {
         Engine.updateInventory(Engine.player.inventory,data.items);
-        //if(Engine.inMenu) Engine.currentMenu.refreshPanels();
+        Engine.updateInventoryMenus();
     }
     if(data.stats){
         for(var i = 0; i < data.stats.length; i++){
@@ -622,35 +608,11 @@ Engine.updateSelf = function(data){
 
 Engine.updateAmmo = function(slot,nb){
     Engine.player.equipment.containers[slot] = nb;
-    var ammoSlot = Equipment.dict[slot].contains;
-    var countText = Engine.equipmentPanel.countTexts[ammoSlot];
-    var item = Engine.player.equipment[slot][0];
-    var capacity = Engine.itemsData[item].capacity;
-    countText.setText(nb);
-    if(nb == capacity) countText.setFill('#ffd700');
+    Engine.updateEquipmentMenus();
 };
 
 Engine.updateEquipment = function(slot,subSlot,item){
     Engine.player.equipment[slot][subSlot] = item;
-    for(var m in Engine.menus){
-        if(!Engine.menus.hasOwnProperty(m)) continue;
-        var menu = Engine.menus[m];
-        if(menu.onUpdateEquipment) menu.onUpdateEquipment();
-    }
-    /*var data = Engine.itemsData[item];
-    var shade = Engine.equipmentPanel.shadeSprites[slot][subSlot];
-    var sprite = Engine.equipmentPanel.itemSprites[slot][subSlot];
-    var countText = Engine.equipmentPanel.countTexts[slot];
-    if(item == -1){
-        shade.setVisible(true);
-        sprite.setVisible(false);
-        if(countText) countText.setVisible(false);
-    }else{
-        sprite.setUp(item,data,Engine.equipClick);
-        shade.setVisible(false);
-        sprite.setVisible(true);
-        if(countText) countText.setVisible(true);
-    }*/
 };
 
 Engine.updateStat = function(key,value){
@@ -658,7 +620,7 @@ Engine.updateStat = function(key,value){
     var suffix = Stats.dict[key].suffix;
     if(suffix) value = value+suffix;
     if(Stats.dict[key].showMax) value = value+"/"+Stats.dict[key].max;
-    Engine.statsTexts[key].setText(value);
+    //Engine.statsTexts[key].setText(value);
 };
 
 Engine.updateInventory = function(inventory,items){
@@ -666,7 +628,22 @@ Engine.updateInventory = function(inventory,items){
     for(var i = 0; i < items.length; i++){
         var item = items[i];
         inventory.update(item[0],item[1]);
-        //inventory.update(item.item,item.nb);
+    }
+};
+
+Engine.updateEquipmentMenus = function(){
+    for(var m in Engine.menus){
+        if(!Engine.menus.hasOwnProperty(m)) continue;
+        var menu = Engine.menus[m];
+        if(menu.onUpdateEquipment) menu.onUpdateEquipment();
+    }
+};
+
+Engine.updateInventoryMenus = function(){
+    for(var m in Engine.menus){
+        if(!Engine.menus.hasOwnProperty(m)) continue;
+        var menu = Engine.menus[m];
+        if(menu.onUpdateInventory) menu.onUpdateInventory();
     }
 };
 
@@ -822,15 +799,8 @@ Engine.enterBuilding = function(id){
     var buildingData = Engine.buildingsData[building.buildingType];
     var settlementData = Engine.settlementsData[building.settlement];
     Engine.buildingMenusMap[building.buildingType].display();
-    /*BScene.setUp(id);
-    Engine.scene.scene.swap('BuildingScene');
-    currentScene = BScene;*/
 };
-
 Engine.exitBuilding = function(){
-    /*BScene.close();
-    BScene.scene.scene.swap('main');
-    currentScene = Engine;*/
     Engine.currentMenu.hide();
 };
 
@@ -840,12 +810,10 @@ Engine.closePanel = function(){this.hide();};
 Engine.togglePanel = function(){ // When clicking on a player/building/animal, toggle the corresponding panel visibility
     if(Engine.inMenu) return;
     if(this.panel.displayed){
-        //this.panel.hide();
         Engine.inPanel = false;
         Engine.currentPanel = null;
     }else {
         if(Engine.inPanel) Engine.currentPanel.hide();
-        //this.panel.display();
         Engine.inPanel = true;
         Engine.currentPanel = this.panel;
     }
@@ -853,7 +821,7 @@ Engine.togglePanel = function(){ // When clicking on a player/building/animal, t
 };
 
 Engine.recipeClick = function(){
-    Engine.craftingPanel.updateTarget(this.itemID,Engine.itemsData[this.itemID]);
+    //Engine.craftingPanel.updateTarget(this.itemID,Engine.itemsData[this.itemID]);
 };
 
 Engine.inventoryClick = function(){
