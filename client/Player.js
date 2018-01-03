@@ -71,6 +71,10 @@ var Player = new Phaser.Class({
 
     getNbInContainer: function(slot){
         return this.equipment.containers[slot];
+    },
+
+    getStat: function(stat){
+        return this.stats[stat];
     }
 
     /*onArrival: function(){

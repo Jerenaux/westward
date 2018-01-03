@@ -257,7 +257,7 @@ Engine.makeUI = function(){
         e.setInteractive();
     });
 
-    var statsPanel = new Panel(665,380,340,100,'Stats');
+    var statsPanel = new StatsPanel(665,380,340,100,'Stats');
 
     Engine.menus = {
         'inventory': Engine.makeInventory(statsPanel),
@@ -330,6 +330,7 @@ Engine.makeInventory = function(statsPanel){
     inventory.addPanel('stats',statsPanel);
     inventory.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
     inventory.onUpdateInventory = items.updateInventory.bind(items);
+    inventory.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
     return inventory;
 };
 
@@ -337,6 +338,7 @@ Engine.makeCharacterMenu = function(statsPanel){
     var character = new Menu('Character');
     character.addPanel('info',new Panel(665,100,340,260,'<Player name>'));
     character.addPanel('stats',statsPanel);
+    character.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
     /*var info = new Panel(665,100,340,260,"<Player name>");
     info.addLine('Citizen of '+Engine.settlementsData[Engine.player.settlement].name);
     info.addLine('Level 1 Merchant  -   0/100 Class XP');
@@ -579,7 +581,8 @@ Engine.checkCollision = function(tile){ // tile is x, y pair
 Engine.updateSelf = function(data){
     if(data.items) {
         Engine.updateInventory(Engine.player.inventory,data.items);
-        Engine.updateInventoryMenus();
+        //Engine.updateInventoryMenus();
+        Engine.updateMenus('inv');
     }
     if(data.stats){
         for(var i = 0; i < data.stats.length; i++){
@@ -608,18 +611,23 @@ Engine.updateSelf = function(data){
 
 Engine.updateAmmo = function(slot,nb){
     Engine.player.equipment.containers[slot] = nb;
-    Engine.updateEquipmentMenus();
+    Engine.updateMenus('equip');
+    //Engine.updateEquipmentMenus();
 };
 
 Engine.updateEquipment = function(slot,subSlot,item){
     Engine.player.equipment[slot][subSlot] = item;
+    Engine.updateMenus('equip');
+    //Engine.updateEquipmentMenus();
 };
 
 Engine.updateStat = function(key,value){
     Engine.player.stats[key] = value;
-    var suffix = Stats.dict[key].suffix;
+    Engine.updateMenus('stats');
+    //Engine.updatStatsMenus();
+    /*var suffix = Stats.dict[key].suffix;
     if(suffix) value = value+suffix;
-    if(Stats.dict[key].showMax) value = value+"/"+Stats.dict[key].max;
+    if(Stats.dict[key].showMax) value = value+"/"+Stats.dict[key].max;*/
     //Engine.statsTexts[key].setText(value);
 };
 
@@ -631,7 +639,22 @@ Engine.updateInventory = function(inventory,items){
     }
 };
 
-Engine.updateEquipmentMenus = function(){
+Engine.updateMenus = function(category){
+    var callbackMap = {
+        'stats': 'onUpdateStats',
+        'equip': 'onUpdateEquipment',
+        'inv': 'onUpdateInventory'
+    };
+
+    for(var m in Engine.menus){
+        if(!Engine.menus.hasOwnProperty(m)) continue;
+        var menu = Engine.menus[m];
+        var callback = callbackMap[category];
+        if(menu[callback]) menu[callback]();
+    }
+};
+
+/*Engine.updateEquipmentMenus = function(){
     for(var m in Engine.menus){
         if(!Engine.menus.hasOwnProperty(m)) continue;
         var menu = Engine.menus[m];
@@ -645,7 +668,7 @@ Engine.updateInventoryMenus = function(){
         var menu = Engine.menus[m];
         if(menu.onUpdateInventory) menu.onUpdateInventory();
     }
-};
+};*/
 
 Engine.update = function(){
     //console.log(Engine.overSlot);
