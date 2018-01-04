@@ -315,7 +315,11 @@ Engine.makeCraftingMenu = function(){
     var items = new InventoryPanel(40,100,390,380,'Items');
     items.setInventory(Engine.player.inventory,10,true);
     crafting.addPanel('items',items);
-    crafting.onUpdateInventory = items.updateInventory.bind(items);
+    crafting.onUpdateInventory = function(){
+        //items.updateInventory.bind(items);
+        items.updateInventory();
+        ingredients.updateInventory();
+    };
     return crafting;
 };
 
@@ -345,6 +349,10 @@ Engine.makeCharacterMenu = function(statsPanel){
     character.addPanel(info); // equipment panel
     character.addPanel(Engine.statsPanel);*/
     return character;
+};
+
+Engine.getIngredientsPanel = function(){
+    return Engine.menus['crafting'].panels['ingredients'];
 };
 
 Engine.addHero = function(id,x,y,settlement){
