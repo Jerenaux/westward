@@ -143,7 +143,6 @@ Engine.create = function(masterData){
     Engine.useBlitters = true;
 
     Engine.created = true;
-    currentScene = Engine;
     Client.requestData();
 };
 
@@ -309,9 +308,9 @@ Engine.makeCraftingMenu = function(){
     var recipes = new InventoryPanel(765,100,235,380,'Recipes');
     recipes.setInventory(Engine.player.itemRecipes,4,false,Engine.recipeClick);
     crafting.addPanel('recipes',recipes);
-    crafting.addPanel('combi',new Panel(450,100,290,380,'Combination'));
+    crafting.addPanel('combi',new CraftingPanel(450,100,290,380,'Combination'));
     var ingredients = new InventoryPanel(450,300,290,380,'',true); // true = invisible
-    ingredients.setInventory(new Inventory(5),5,true); // TODO: add mins
+    ingredients.setInventory(new Inventory(5),5,true,null,null,Engine.player.inventory);
     crafting.addPanel('ingredients',ingredients);
     var items = new InventoryPanel(40,100,390,380,'Items');
     items.setInventory(Engine.player.inventory,10,true);
@@ -581,7 +580,6 @@ Engine.checkCollision = function(tile){ // tile is x, y pair
 Engine.updateSelf = function(data){
     if(data.items) {
         Engine.updateInventory(Engine.player.inventory,data.items);
-        //Engine.updateInventoryMenus();
         Engine.updateMenus('inv');
     }
     if(data.stats){
@@ -612,23 +610,16 @@ Engine.updateSelf = function(data){
 Engine.updateAmmo = function(slot,nb){
     Engine.player.equipment.containers[slot] = nb;
     Engine.updateMenus('equip');
-    //Engine.updateEquipmentMenus();
 };
 
 Engine.updateEquipment = function(slot,subSlot,item){
     Engine.player.equipment[slot][subSlot] = item;
     Engine.updateMenus('equip');
-    //Engine.updateEquipmentMenus();
 };
 
 Engine.updateStat = function(key,value){
     Engine.player.stats[key] = value;
     Engine.updateMenus('stats');
-    //Engine.updatStatsMenus();
-    /*var suffix = Stats.dict[key].suffix;
-    if(suffix) value = value+suffix;
-    if(Stats.dict[key].showMax) value = value+"/"+Stats.dict[key].max;*/
-    //Engine.statsTexts[key].setText(value);
 };
 
 Engine.updateInventory = function(inventory,items){
@@ -653,22 +644,6 @@ Engine.updateMenus = function(category){
         if(menu[callback]) menu[callback]();
     }
 };
-
-/*Engine.updateEquipmentMenus = function(){
-    for(var m in Engine.menus){
-        if(!Engine.menus.hasOwnProperty(m)) continue;
-        var menu = Engine.menus[m];
-        if(menu.onUpdateEquipment) menu.onUpdateEquipment();
-    }
-};
-
-Engine.updateInventoryMenus = function(){
-    for(var m in Engine.menus){
-        if(!Engine.menus.hasOwnProperty(m)) continue;
-        var menu = Engine.menus[m];
-        if(menu.onUpdateInventory) menu.onUpdateInventory();
-    }
-};*/
 
 Engine.update = function(){
     //console.log(Engine.overSlot);
@@ -844,6 +819,7 @@ Engine.togglePanel = function(){ // When clicking on a player/building/animal, t
 };
 
 Engine.recipeClick = function(){
+    Engine.menus['crafting'].panels['combi'].setUp(this.itemID);
     //Engine.craftingPanel.updateTarget(this.itemID,Engine.itemsData[this.itemID]);
 };
 

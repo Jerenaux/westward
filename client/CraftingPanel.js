@@ -5,6 +5,8 @@
 function CraftingPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
     this.buttons = [];
+    this.addInterface();
+    /*this.buttons = [];
     this.targetIsBuilding = false;
     this.craftTarget = null;
     this.craftID = null;
@@ -15,13 +17,105 @@ function CraftingPanel(x,y,width,height,title){
     this.canCraft = false;
     this.lastCraft = Date.now();
     this.makeRing();
-    this.disableButtons();
+    this.disableButtons();*/
 }
 
 CraftingPanel.prototype = Object.create(Panel.prototype);
 CraftingPanel.prototype.constructor = CraftingPanel;
 
-CraftingPanel.prototype.makeRing = function(){
+CraftingPanel.prototype.addInterface = function(){
+    var ringx = 80;
+    var ringy = 50;
+    var ring = Engine.scene.add.image(this.x+ringx,this.y+ringy,'UI','craftring');
+    ring.setScrollFactor(0);
+    ring.setDisplayOrigin(0,0);
+    ring.setDepth(Engine.UIDepth+1);
+    ring.setVisible(false);
+    this.content.push(ring);
+    this.ring = ring;
+
+    this.buttons.push(this.addButton(ringx+92,ringy+13,'green','ok',function(){
+        console.log('ok');
+    })); // this.requestCraft.bind(this)
+    this.buttons.push(this.addButton(ringx+5,ringy+82,'blue','plus')); // this.increaseAmount.bind(this)
+    this.buttons.push(this.addButton(ringx+22,ringy+99,'blue','minus')); // this.decreaseAmount.bind(this)
+
+    var item = new ItemSprite();
+    item.setPosition(this.x+ringx+(ring.frame.width/2),this.y+ringy+(ring.frame.height/2));
+    this.content.push(item);
+
+    var count = Engine.scene.add.text(this.x+ringx+(ring.frame.width/2),this.y+ringy+85, '0',  { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    count.setOrigin(0.5,0.5);
+    count.setVisible(false);
+    count.setDepth(Engine.UIDepth+2);
+    count.setScrollFactor(0);
+    this.content.push(count);
+
+    this.craftItem = {
+        id: -1,
+        count: 0,
+        item: item,
+        countText: count
+    }
+};
+
+CraftingPanel.prototype.display = function(){
+    Panel.prototype.display.call(this);
+    this.displayInterface();
+};
+
+CraftingPanel.prototype.displayInterface = function(){
+     this.ring.setVisible(true);
+     this.buttons.forEach(function(b){
+         b.btn.disable();
+         b.btn.setVisible(true);
+         b.symbol.setVisible(true);
+         b.ring.setVisible(true);
+     });
+};
+
+CraftingPanel.prototype.setUp = function(itemID){
+    var data = Engine.itemsData[itemID];
+    this.craftItem.id = itemID;
+    this.craftItem.item.setUp(itemID,data);
+    this.craftItem.count = 1;
+    this.craftItem.countText.setText(1);
+    this.craftItem.item.setVisible(true);
+    this.craftItem.countText.setVisible(true);
+
+    Engine.menus['crafting'].panels['ingredients'].modifyInventory(data.recipe);
+    this.manageButtons();
+};
+
+CraftingPanel.prototype.manageButtons = function(){
+    var plusBtn = this.buttons[1].btn;
+    var minusBtn = this.buttons[2].btn;
+
+    if(this.craftItem.count == 1){
+        minusBtn.disable();
+    }else{
+        minusBtn.enable();
+    }
+
+    if(this.craftItem.count == 999){
+        plusBtn.disable();
+    }else{
+        plusBtn.enable();
+    }
+};
+
+CraftingPanel.prototype.hide = function(){
+    Panel.prototype.hide.call(this);
+    this.reset();
+};
+
+CraftingPanel.prototype.reset = function(){
+    this.craftItem.id = -1;
+    this.craftItem.count = 0;
+    Engine.menus['crafting'].panels['ingredients'].modifyInventory([]);
+};
+
+/*CraftingPanel.prototype.makeRing = function(){
     var ringx = 80;
     var ringy = 50;
     var ring = this.addSprite('UI','craftring',ringx,ringy);
@@ -70,12 +164,6 @@ CraftingPanel.prototype.disableButtons = function(){
         this.buttons[i].disable();
     }
 };
-
-/*CraftingPanel.prototype.enableButtons = function(){
-    for(var i = 1; i < this.buttons.length; i++){ // start at 1 to skip ok button
-        this.buttons[i].enable();
-    }
-};*/
 
 CraftingPanel.prototype.updateOkButton = function(){
     var btn = this.buttons[0];
@@ -148,4 +236,4 @@ CraftingPanel.prototype.updateNumbers = function(){
         }
     }
     this.updateOkButton();
-};
+};*/

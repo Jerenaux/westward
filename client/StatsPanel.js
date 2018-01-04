@@ -28,7 +28,6 @@ StatsPanel.prototype.addStats = function(){
 };
 
 StatsPanel.prototype.addStat = function(x,y,s){
-    console.log(x,y);
     var stat = Stats.dict[s];
     var statObj = {};
     var icon = Engine.scene.add.sprite(x,y,'icons2',stat.frame);

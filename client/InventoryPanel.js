@@ -8,6 +8,7 @@ function InventoryPanel(x,y,width,height,title,invisible){
     this.slots = [];
     this.spritesCounter = 0;
     this.slotsCounter = 0;
+    this.slotsAdded = false;
     this.zone = this.createZone();
 }
 
@@ -30,19 +31,19 @@ InventoryPanel.prototype.createZone = function(){
     return zone;
 };
 
-InventoryPanel.prototype.setInventory = function(inventory,maxwidth,showNumbers,callback,filter,mins){
+InventoryPanel.prototype.setInventory = function(inventory,maxwidth,showNumbers,callback,filter,compare){
     this.inventory = inventory;
     this.itemCallback = callback;
-    this.mins = mins;
     this.config = {
         maxwidth: maxwidth,
-        showNumbers: showNumbers
+        showNumbers: showNumbers,
+        compareTo: compare
     };
     if(filter){
         this.config.filter = filter.items;
         this.config.filterKey = filter.key;
     }
-    this.addSlots();
+    if(!this.slotsAdded) this.addSlots();
 };
 
 InventoryPanel.prototype.getNextSlot = function(){
@@ -69,6 +70,7 @@ InventoryPanel.prototype.addSlots = function(){
         this.setSlotFrame(slot,row,col,i);
         slot.setVisible(false);
     }
+    this.slotsAdded = true;
 };
 
 InventoryPanel.prototype.positionSlot = function(slot,row,col,paddingX,paddingY){
@@ -134,7 +136,11 @@ InventoryPanel.prototype.displayInventory = function(){
         sprite.item.setVisible(true);
         if(this.config.showNumbers){
             sprite.text.setText(amount);
-            // TODO: change color based on mins
+            if(this.config.compareTo){
+                var ref = this.config.compareTo.getNb(item);
+                var fill = (amount > ref ? '#ee1111' : '#ffffff');
+                sprite.text.setFill(fill);
+            }
             sprite.text.setVisible(true);
         }
         nbDisplayed++;
@@ -176,6 +182,12 @@ InventoryPanel.prototype.setUpZone = function(nbDisplayed){
     this.zone.setInteractive(polygon,Phaser.Geom.Polygon.Contains);
 };
 
+InventoryPanel.prototype.modifyInventory = function(items){
+    this.inventory.setItems(items);
+    this.updateInventory();
+};
+
+// Refresh the content of a displayed inventory
 InventoryPanel.prototype.updateInventory = function(){
     if(!this.displayed) return;
     this.resetCounters();

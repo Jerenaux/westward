@@ -14,7 +14,7 @@ function Tooltip(){
     this.icons = [];
     this.iconsTexts = [];
     this.displayed = false;
-    this.text = currentScene.scene.add.text(this.x+13,this.y+4, '',
+    this.text = Engine.scene.add.text(this.x+13,this.y+4, '',
         { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
     );
     this.makeBody();
@@ -29,25 +29,25 @@ Tooltip.prototype.makeBody = function(){
     var y = this.y;
     var w = this.width;
     var h = this.height;
-    this.container.push(currentScene.scene.add.sprite(x,y,'tooltip',0));
+    this.container.push(Engine.scene.add.sprite(x,y,'tooltip',0));
     x += sideWidth;
-    this.container.push(currentScene.scene.add.tileSprite(x,y,w,sideWidth,'tooltip',1));
+    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth,'tooltip',1));
     x += w;
-    this.container.push(currentScene.scene.add.sprite(x,y,'tooltip',2));
+    this.container.push(Engine.scene.add.sprite(x,y,'tooltip',2));
     x = this.x;
     y += sideWidth;
-    this.container.push(currentScene.scene.add.tileSprite(x,y,sideWidth,h,'tooltip',3));
+    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'tooltip',3));
     x += sideWidth;
-    this.container.push(currentScene.scene.add.tileSprite(x,y,w,h,'tooltip',4));
+    this.container.push(Engine.scene.add.tileSprite(x,y,w,h,'tooltip',4));
     x += w;
-    this.container.push(currentScene.scene.add.tileSprite(x,y,sideWidth,h,'tooltip',5));
+    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'tooltip',5));
     x = this.x;
     y += h;
-    this.container.push(currentScene.scene.add.sprite(x,y,'tooltip',6));
+    this.container.push(Engine.scene.add.sprite(x,y,'tooltip',6));
     x += sideWidth;
-    this.container.push(currentScene.scene.add.tileSprite(x,y,w,sideWidth,'tooltip',7));
+    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth,'tooltip',7));
     x += w;
-    this.container.push(currentScene.scene.add.sprite(x,y,'tooltip',8));
+    this.container.push(Engine.scene.add.sprite(x,y,'tooltip',8));
 };
 
 Tooltip.prototype.makeStatsIcons = function(){
@@ -55,8 +55,8 @@ Tooltip.prototype.makeStatsIcons = function(){
         var s = Stats.dict[Stats.list[i]];
         var x = this.x+15;
         var y = this.y+(30*(i+1));
-        var icon = currentScene.scene.add.sprite(x,y,'icons2', s.frame);
-        var text = currentScene.scene.add.text(x+30,y+2, '100',
+        var icon = Engine.scene.add.sprite(x,y,'icons2', s.frame);
+        var text = Engine.scene.add.text(x+30,y+2, '100',
             { font: '12px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
         );
         icon.dontDisplay = true;
@@ -94,7 +94,7 @@ Tooltip.prototype.updateInfo = function(name, effects){
 Tooltip.prototype.updatePosition = function(x,y){
     x += this.xOffset;
     y += this.yOffset;
-    if(x > currentScene.scene.game.config.width - this.width - 20) {
+    if(x > Engine.scene.game.config.width - this.width - 20) {
         x -= this.width;
         y += 20;
     }

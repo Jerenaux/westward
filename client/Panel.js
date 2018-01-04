@@ -17,6 +17,38 @@ Panel.prototype.addCapsule = function(name,x,y,text,icon){
     this.capsules[name] = capsule;
 };
 
+Panel.prototype.addButton = function(x,y,color,symbol,callback){
+    x += this.x;
+    y += this.y;
+    var ring = Engine.scene.add.sprite(x,y,'UI','ring');
+    ring.setDepth(Engine.UIDepth+2);
+    ring.setScrollFactor(0);
+    ring.setDisplayOrigin(0,0);
+    ring.setVisible(false);
+    this.content.push(ring);
+
+    x += 5;
+    y += 5;
+
+    var btn = new Button(x,y,color,callback);
+    this.content.push(btn);
+    x += 3;
+    y += 3;
+
+    var s = Engine.scene.add.sprite(x,y,'UI',symbol);
+    s.setDepth(Engine.UIDepth+3);
+    s.setScrollFactor(0);
+    s.setDisplayOrigin(0,0);
+    s.setVisible(false);
+    this.content.push(s);
+
+    return {
+        btn: btn,
+        symbol: s,
+        ring: ring
+    };
+};
+
 Panel.prototype.display = function(){
     Frame.prototype.display.call(this);
     for(var capsule in this.capsules){

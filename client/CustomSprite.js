@@ -8,8 +8,8 @@ var CustomSprite = new Phaser.Class({
 
     initialize: function CustomSprite (x, y, texture) {
         //console.log(currentScene.scene, texture);
-        Phaser.GameObjects.Sprite.call(this, currentScene.scene, x, y, texture);
-        currentScene.scene.add.displayList.add(this);
-        currentScene.scene.add.updateList.add(this);
+        Phaser.GameObjects.Sprite.call(this, Engine.scene, x, y, texture);
+        Engine.scene.add.displayList.add(this);
+        Engine.scene.add.updateList.add(this);
     }
 });

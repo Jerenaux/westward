@@ -14,7 +14,10 @@ var Button = new Phaser.Class({
         this.currentFrame = frame;
         this.callback = callback;
         this.enabled = true;
-
+        this.setDisplayOrigin(0,0);
+        this.setScrollFactor(0);
+        this.setDepth(Engine.UIDepth+2);
+        this.setVisible(false);
         this.setInteractive();
     },
 
