@@ -99,8 +99,6 @@ Engine.create = function(masterData){
     Engine.displayedBuildings = new Set();
     Engine.displayedAnimals = new Set();
 
-    Engine.inventory = Inventory;
-
     Engine.debug = true;
     Engine.showHero = true;
     Engine.showGrid = false;
@@ -293,13 +291,31 @@ Engine.makeUI = function(){
 Engine.makeTradeMenu = function(){
     var trade = new Menu('Trade');
     var client = new InventoryPanel(212,100,300,300,'Your items');
-    client.setInventory(Engine.player.inventory,7,true);
+    client.setInventory(Engine.player.inventory,7,true,Engine.sellClick);
+    client.addCapsule('gold',150,-9,'999','gold');
     trade.addPanel('client',client);
     var shop = new InventoryPanel(542,100,300,300,'Shop');
-    shop.setInventory(new Inventory(20),7,true);
+    shop.setInventory(new Inventory(20),7,true,Engine.buyClick);
+    shop.addCapsule('gold',100,-9,'999','gold');
     trade.addPanel('shop',shop);
-    trade.addPanel('action',new Panel(212,420,300,100,'Buy/Sell'));
-    trade.onUpdateInventory = client.updateInventory.bind(client);
+    var action = new ShopPanel(212,420,300,100,'Buy/Sell');
+    trade.addPanel('action',action);
+    trade.onUpdateInventory = function(){
+        client.updateInventory();
+        action.update();
+    };
+    trade.onUpdateShop = function(){
+        shop.updateInventory();
+        action.update();
+    };
+    trade.onUpdateGold = function(){
+        client.updateCapsule('gold',Engine.player.gold);
+        action.update();
+    };
+    trade.onUpdateShopGold = function(){
+        shop.updateCapsule('gold',Engine.currentBuiling.gold);
+        action.update();
+    };
     return trade;
 };
 
@@ -316,7 +332,6 @@ Engine.makeCraftingMenu = function(){
     items.setInventory(Engine.player.inventory,10,true);
     crafting.addPanel('items',items);
     crafting.onUpdateInventory = function(){
-        //items.updateInventory.bind(items);
         items.updateInventory();
         ingredients.updateInventory();
     };
@@ -327,6 +342,7 @@ Engine.makeInventory = function(statsPanel){
     var inventory = new Menu('Inventory');
     var items = new InventoryPanel(40,100,600,380,'Items');
     items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
+    items.addCapsule('gold',100,-9,'999','gold');
     inventory.addPanel('items',items);
     var equipment = new EquipmentPanel(665,100,340,260,'Equipment');
     inventory.addPanel('equipment',equipment);
@@ -334,6 +350,9 @@ Engine.makeInventory = function(statsPanel){
     inventory.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
     inventory.onUpdateInventory = items.updateInventory.bind(items);
     inventory.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
+    inventory.onUpdateGold = function(){
+        items.updateCapsule('gold',Engine.player.gold);
+    };
     return inventory;
 };
 
@@ -609,9 +628,10 @@ Engine.updateSelf = function(data){
     }
     if(data.gold){
         Engine.player.gold = data.gold;
-        Engine.goldTexts.forEach(function(t){
+        /*Engine.goldTexts.forEach(function(t){
             t.setText(Engine.player.gold);
-        });
+        });*/
+        Engine.updateMenus('gold');
     }
 };
 
@@ -642,12 +662,20 @@ Engine.updateMenus = function(category){
     var callbackMap = {
         'stats': 'onUpdateStats',
         'equip': 'onUpdateEquipment',
-        'inv': 'onUpdateInventory'
+        'inv': 'onUpdateInventory',
+        'gold': 'onUpdateGold'
     };
 
     for(var m in Engine.menus){
         if(!Engine.menus.hasOwnProperty(m)) continue;
         var menu = Engine.menus[m];
+        var callback = callbackMap[category];
+        if(menu[callback]) menu[callback]();
+    }
+
+    for(var m in Engine.buildingMenusMap){
+        if(!Engine.buildingMenusMap.hasOwnProperty(m)) continue;
+        var menu = Engine.buildingMenusMap[m];
         var callback = callbackMap[category];
         if(menu[callback]) menu[callback]();
     }
@@ -734,13 +762,11 @@ Engine.updateAnimal = function(animal,data){ // data contains the updated data f
 Engine.updateBuilding = function(building,data){ // data contains the updated data from the server
     if(data.gold) {
         building.gold = data.gold;
-        if(Engine.player.inBuilding == building.id){
-            BScene.updateGold(data.gold);
-        }
+        if(Engine.currentBuiling.id == building.id) Engine.currentMenu.onUpdateShopGold();
     }
     if(data.items){
         Engine.updateInventory(building.inventory,data.items);
-        if(Engine.player.inBuilding == building.id) BScene.shop.shopStock.refreshInventory();
+        if(Engine.currentBuiling.id == building.id) Engine.currentMenu.onUpdateShop();
     }
 };
 
@@ -802,10 +828,19 @@ Engine.getTilesetFromTile = function(tile){
 
 Engine.enterBuilding = function(id){
     var building = Engine.buildings[id];
+    Engine.currentBuiling = building;
     var buildingData = Engine.buildingsData[building.buildingType];
     var settlementData = Engine.settlementsData[building.settlement];
-    Engine.buildingMenusMap[building.buildingType].display();
+    var menu = Engine.buildingMenusMap[building.buildingType];
+    menu.panels['shop'].updateCapsule('gold',building.gold);
+    menu.panels['shop'].modifyInventory(building.inventory.items);
+    menu.panels['client'].modifyFilter({
+        items: building.prices,
+        key: 0
+    });
+    menu.display();
 };
+
 Engine.exitBuilding = function(){
     Engine.currentMenu.hide();
 };
@@ -828,7 +863,6 @@ Engine.togglePanel = function(){ // When clicking on a player/building/animal, t
 
 Engine.recipeClick = function(){
     Engine.menus['crafting'].panels['combi'].setUp(this.itemID);
-    //Engine.craftingPanel.updateTarget(this.itemID,Engine.itemsData[this.itemID]);
 };
 
 Engine.inventoryClick = function(){
@@ -837,4 +871,14 @@ Engine.inventoryClick = function(){
 
 Engine.unequipClick = function(){ // Sent when unequipping something
     Client.sendUnequip(this.slotName,this.subSlot);
+};
+
+Engine.sellClick = function(){
+    Engine.currentMenu.panels['action'].setUp(this.itemID,'sell');
+    //BScene.shop.shopPanel.updatePurchase(this.itemID,Engine.itemsData[this.itemID],'sell');
+};
+
+Engine.buyClick = function(){
+    Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
+    //BScene.shop.shopPanel.updatePurchase(this.itemID,Engine.itemsData[this.itemID],'buy');
 };

@@ -39,10 +39,7 @@ InventoryPanel.prototype.setInventory = function(inventory,maxwidth,showNumbers,
         showNumbers: showNumbers,
         compareTo: compare
     };
-    if(filter){
-        this.config.filter = filter.items;
-        this.config.filterKey = filter.key;
-    }
+    if(filter) this.setFilter(filter);
     if(!this.slotsAdded) this.addSlots();
 };
 
@@ -184,6 +181,16 @@ InventoryPanel.prototype.setUpZone = function(nbDisplayed){
 
 InventoryPanel.prototype.modifyInventory = function(items){
     this.inventory.setItems(items);
+    this.updateInventory();
+};
+
+InventoryPanel.prototype.setFilter = function(filter){
+    this.config.filter = filter.items;
+    this.config.filterKey = filter.key;
+};
+
+InventoryPanel.prototype.modifyFilter = function(filter){
+    this.setFilter(filter);
     this.updateInventory();
 };
 

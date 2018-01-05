@@ -58,5 +58,10 @@ var Building = new Phaser.Class({
             spriteY = this.tileY;
         }
         PFUtils.collisionsFromShape(shape.points,spriteX,spriteY,data.width,data.height,Engine.collisions);
+    },
+
+    getPrice: function(id,action){
+        var key = (action == 'sell' ? 0 : 1);
+        return this.prices[id][key];
     }
 });

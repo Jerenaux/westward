@@ -5,89 +5,143 @@ function ShopPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
     this.buttons = [];
     this.lastPurchase = Date.now();
-    this.build();
+    this.addInterface();
 }
 
 ShopPanel.prototype = Object.create(Panel.prototype);
 ShopPanel.prototype.constructor = ShopPanel;
 
-ShopPanel.prototype.build = function(){
-    var slot = currentScene.scene.add.sprite(this.x+20,this.y+30,'UI','equipment-slot');
-    //this.purchase = this.addSprite('items','void',10+15,15+20);
-    this.purchase = new ItemSprite(this.x+20+18,this.y+30+18);
-    var gold = currentScene.scene.add.sprite(this.x+240,this.y+35,'items2','gold-pile').setScale(1.5);
-    this.nameText = currentScene.scene.add.text(this.x+65, this.y+25, 'Item name',
-        { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
-    );
-    this.countText = currentScene.scene.add.text(this.x+47, this.y+50, 1,
-        { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
-    );
-    this.priceText = currentScene.scene.add.text(this.x+240, this.y+50, 0,
-        { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
-    );
-    this.container.push(this.nameText);
-    this.container.push(this.countText);
-    this.container.push(this.priceText);
-    this.container.push(slot);
-    this.container.push(gold);
+ShopPanel.prototype.addInterface = function(){
+    var slot = Engine.scene.add.sprite(this.x+20,this.y+30,'UI','equipment-slot');
+    slot.setDepth(Engine.UIDepth+1);
+    slot.setScrollFactor(0);
+    slot.setDisplayOrigin(0,0);
+    slot.setVisible(false);
+    this.content.push(slot);
+    this.slot = slot;
 
-    var ringx = 65;
-    var ringy = 50;
-    this.buttons.push(this.addRing(ringx,ringy,'blue','minus',this.decreaseAmount.bind(this)));
-    this.buttons.push(this.addRing(ringx+25,ringy,'blue','plus',this.increaseAmount.bind(this)));
-    this.buttons.push(this.addRing(ringx+60,ringy,'green','ok',this.requestPurchase.bind(this)));
+    var gold = Engine.scene.add.sprite(this.x+240,this.y+35,'items2','gold-pile');
+    gold.setScale(1.5);
+    gold.setDepth(Engine.UIDepth+1);
+    gold.setScrollFactor(0);
+    gold.setDisplayOrigin(0,0);
+    gold.setVisible(false);
+    this.content.push(gold);
+    this.gold = gold;
+
+    var item = new ItemSprite();
+    item.setPosition(this.x+20+18,this.y+30+18);
+    this.content.push(item);
+
+    var count = Engine.scene.add.text(this.x+47,this.y+50, '0',  { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    count.setVisible(false);
+    count.setDepth(Engine.UIDepth+2);
+    count.setScrollFactor(0);
+    this.content.push(count);
+
+    var price = Engine.scene.add.text(this.x+240,this.y+50, '0',  { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    price.setVisible(false);
+    price.setDepth(Engine.UIDepth+2);
+    price.setScrollFactor(0);
+    this.content.push(price);
+
+    var name = Engine.scene.add.text(this.x+65,this.y+25, '0',  { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    name.setVisible(false);
+    name.setDepth(Engine.UIDepth+2);
+    name.setScrollFactor(0);
+    this.content.push(name);
+
+    this.buttons.push(this.addButton(125,50,'green','ok',this.requestPurchase.bind(this)));
+    this.buttons.push(this.addButton(90,50,'blue','plus',this.increaseAmount.bind(this)));
+    this.buttons.push(this.addButton(65,50,'blue','minus',this.decreaseAmount.bind(this)));
+
+    this.shopItem = {
+        id: -1,
+        count: 0,
+        price: 0,
+        priceText: price,
+        item: item,
+        countText: count,
+        nameText: name,
+        action: null
+    };
 };
 
-ShopPanel.prototype.updatePurchase = function(id,data,action){
-    if(!this.displayed) this.display();
-    var key = (action == 'sell' ? 0 : 1);
-    var title = (action == 'sell' ? 'Sell' : 'Buy');
-
-    this.currentAction = action;
-    this.currentAmount = 1;
-    this.currentPrice = BScene.shop.prices[id][key];
-    this.currentItem = id;
-    this.computeMaxAmount();
-
-    this.titleText.setText(title);
-    this.countText.setText(this.currentAmount);
-    this.nameText.setText(data.name);
-    this.priceText.setText(this.currentPrice);
-
-    this.purchase.setUp(id,data);
-    this.updateButtons();
+ShopPanel.prototype.setUp = function(id,action){
+    var data = Engine.itemsData[id];
+    this.shopItem.id = id;
+    this.shopItem.count = 1;
+    this.shopItem.action = action;
+    this.shopItem.price = this.getPrice(id);
+    this.shopItem.item.setUp(id,data);
+    this.shopItem.item.setVisible(true);
+    this.shopItem.nameText.setText(data.name);
+    this.shopItem.nameText.setVisible(true);
+    this.shopItem.countText.setText(1);
+    this.shopItem.countText.setVisible(true);
+    this.displayPrice();
+    var title = (action == 'buy' ? 'Buy' : 'Sell');
+    this.capsules['title'].setText(title);
+    this.manageButtons();
 };
 
-ShopPanel.prototype.updateButtons = function(){
-    var minusbtn = this.buttons[0];
-    var plusbtn = this.buttons[1];
-    var okbtn = this.buttons[2];
-    minusbtn.disable();
-    if(this.currentAmount < this.currentMaxAmount){
-        plusbtn.enable();
+ShopPanel.prototype.update = function(){
+    if(!this.displayed) return;
+    this.displayPrice();
+    this.manageButtons();
+};
+
+ShopPanel.prototype.displayPrice = function(){
+    this.shopItem.priceText.setText(this.shopItem.price*this.shopItem.count);
+    this.shopItem.priceText.setVisible(true);
+
+    var fill = (this.canBuy() ? '#ffffff' : '#ee1111');
+    this.shopItem.priceText.setFill(fill);
+};
+
+ShopPanel.prototype.canBuy = function(){
+    if(this.shopItem.action == 'buy'){
+        if(this.shopItem.price*this.shopItem.count > Engine.player.gold) return false;
     }else{
-        plusbtn.disable();
+        if(this.shopItem.price*this.shopItem.count > Engine.currentBuiling.gold) return false;
     }
-    if(this.currentMaxAmount > 0) {
-        okbtn.enable();
-    }else{
-        okbtn.disable();
-    }
-    if(this.currentAction == 'buy' && Engine.player.inventory.isFull()) okbtn.disable();
-    if(this.currentAction == 'sell' && BScene.shop.inventory.isFull()) okbtn.disable();
+    return true;
 };
 
-ShopPanel.prototype.computeMaxAmount = function(){
-    if(this.currentAction == 'sell'){
-        var owned = Engine.player.inventory.getNb(this.currentItem);
-        var canSell = Math.floor(BScene.shop.gold/this.currentPrice);
-        //console.log(owned,canSell);
-        this.currentMaxAmount = Math.min(9999,owned,canSell);
-    }else{ // player buys
-        var owned = BScene.shop.inventory.getNb(this.currentItem);
-        var canBuy = Math.floor(Engine.player.gold/this.currentPrice);
-        //console.log(owned,canBuy);
-        this.currentMaxAmount = Math.min(9999,owned,canBuy);
+ShopPanel.prototype.isAtMax = function(){
+    if(this.shopItem.action == 'buy'){
+        if(this.shopItem.count >= Engine.currentBuiling.inventory.getNb(this.shopItem.id)) return true;
+    }else{
+        if(this.shopItem.count >= Engine.player.inventory.getNb(this.shopItem.id)) return true;
+    }
+    return false;
+};
+
+ShopPanel.prototype.getPrice = function(id){
+    return Engine.currentBuiling.getPrice(id,this.shopItem.action);
+};
+
+ShopPanel.prototype.manageButtons = function(){
+    var okBtn = this.buttons[0].btn;
+    var plusBtn = this.buttons[1].btn;
+    var minusBtn = this.buttons[2].btn;
+
+    if(this.shopItem.count == 1){
+        minusBtn.disable();
+    }else{
+        minusBtn.enable();
+    }
+
+    if(this.shopItem.count == 999 || this.isAtMax()){
+        plusBtn.disable();
+    }else{
+        plusBtn.enable();
+    }
+
+    if(this.canBuy()){
+        okBtn.enable();
+    }else{
+        okBtn.disable();
     }
 };
 
@@ -100,29 +154,43 @@ ShopPanel.prototype.decreaseAmount = function(){
 };
 
 ShopPanel.prototype.changeAmount = function(inc){
-    var minusbtn = this.buttons[0];
-    var plusbtn = this.buttons[1];
-    var button = (inc == 1 ? plusbtn : minusbtn);
-    if(!button.enabled) return;
-    if(inc == -1 && this.currentAmount == 1) return;
-    if(inc == 1 && this.currentAmount == this.currentMaxAmount) return;
-    this.currentAmount += inc;
-    this.countText.setText(this.currentAmount);
-    this.priceText.setText(this.currentPrice*this.currentAmount);
+    this.shopItem.count = Utils.clamp(this.shopItem.count+inc,1,999);
+    this.shopItem.countText.setText(this.shopItem.count);
+    this.displayPrice();
+    this.manageButtons();
+};
 
-    if(this.currentAmount == 1 && minusbtn.enabled){minusbtn.disable();}
-    else if(this.currentAmount == this.currentMaxAmount && plusbtn.enabled){plusbtn.disable();}
-    else if(this.currentAmount > 1 && !minusbtn.enabled){minusbtn.enable();}
-    else if(this.currentAmount < this.currentMaxAmount && !plusbtn.enabled){plusbtn.enable();}
+ShopPanel.prototype.displayInterface = function(){
+    this.slot.setVisible(true);
+    this.gold.setVisible(true);
+    this.buttons.forEach(function(b){
+        b.btn.disable();
+        b.btn.setVisible(true);
+        b.symbol.setVisible(true);
+        b.ring.setVisible(true);
+    });
+};
+
+ShopPanel.prototype.display = function(){
+    Panel.prototype.display.call(this);
+    this.displayInterface();
+};
+
+ShopPanel.prototype.hide = function(){
+    Panel.prototype.hide.call(this);
+    // No need to manually hide the buttons, addButton() adds them to content so the Panel hides them
+    this.reset();
+};
+
+ShopPanel.prototype.reset = function(){
+    this.shopItem.id = -1;
+    this.shopItem.count = 0;
+    this.shopItem.price = 0;
+    this.capsules['title'].setText('Buy/Sell');
 };
 
 ShopPanel.prototype.requestPurchase = function(){
     if(Date.now() - this.lastPurchase < 200) return;
-    Client.sendPurchase(this.currentItem,this.currentAmount,this.currentAction);
+    Client.sendPurchase(this.shopItem.id,this.shopItem.count,this.shopItem.action);
     this.lastPurchase = Date.now();
-};
-
-ShopPanel.prototype.hide = function(){
-    this.purchase.setVisible(false);
-    Panel.prototype.hide.call(this);
 };
