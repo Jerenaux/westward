@@ -29,6 +29,7 @@ CraftingPanel.prototype.addInterface = function(){
 
     var item = new ItemSprite();
     item.setPosition(this.x+ringx+(ring.frame.width/2),this.y+ringy+(ring.frame.height/2));
+    item.showTooltip = false;
     this.content.push(item);
 
     var count = Engine.scene.add.text(this.x+ringx+(ring.frame.width/2),this.y+ringy+85, '0',  { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });

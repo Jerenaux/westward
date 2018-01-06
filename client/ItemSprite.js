@@ -16,7 +16,7 @@ var ItemSprite = new Phaser.Class({
         this.setInteractive();
         this.setVisible(false);
         this.setDepth(Engine.UIDepth+1);
-        this.isItemSprite = true;
+        this.showTooltip = true;
     },
 
     setUp: function(id,data,callback){
@@ -31,6 +31,6 @@ var ItemSprite = new Phaser.Class({
     },
 
     handleOver: function(){
-        Engine.tooltip.updateInfo(this.name,this.effects);
+        if(this.showTooltip) Engine.tooltip.updateInfo(this.name,this.effects);
     }
 });

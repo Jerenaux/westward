@@ -10,7 +10,7 @@ var config = {
     width: VIEW_WIDTH*TILE_WIDTH,
     height: VIEW_HEIGHT*TILE_HEIGHT,
     parent: 'game',
-    scene: [Boot, Engine, BScene]
+    scene: [Boot, Engine]
 };
 
 var game = new Phaser.Game(config);

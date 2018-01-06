@@ -12,7 +12,7 @@ EquipmentPanel.prototype = Object.create(Panel.prototype);
 EquipmentPanel.prototype.constructor = EquipmentPanel;
 
 EquipmentPanel.prototype.addEquip = function(){
-    var xoffset = -30;
+    var xoffset = -40;
     for(var equip in Equipment.dict){
         if(!Equipment.dict.hasOwnProperty(equip)) continue;
         var eq = Equipment.dict[equip];

@@ -69,7 +69,7 @@ Tooltip.prototype.makeStatsIcons = function(){
 };
 
 Tooltip.prototype.updateInfo = function(name, effects){
-    if(!this.displayed) return;
+    //if(!this.displayed) return;
     effects = effects || {};
     if(name) {
         this.text.setText(name);

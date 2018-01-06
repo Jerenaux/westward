@@ -27,10 +27,18 @@ var UIElement = new Phaser.Class({
 
     handleClick: function(){
         if(this.downFrame) this.setFrame(this.upFrame);
-        if(this.menu.displayed){
+        if(this.menu.displayed && !Engine.inBuilding){
             this.menu.hide();
         }else {
             this.menu.display();
         }
+    },
+
+    display: function(){
+        this.setVisible(true);
+    },
+
+    hide: function(){
+        this.setVisible(false);
     }
 });

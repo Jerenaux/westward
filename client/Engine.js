@@ -38,6 +38,7 @@ Engine.preload = function() {
     this.load.image('tome', 'assets/sprites/tome.png');
     this.load.image('tools', 'assets/sprites/tools.png');
     this.load.image('backpack', 'assets/sprites/backpack.png');
+    this.load.image('coin', 'assets/sprites/coin.png');
     this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
 
     this.load.image('fort', 'assets/sprites/buildings/fort.png');
@@ -51,7 +52,7 @@ Engine.preload = function() {
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
     this.load.spritesheet('icons2', 'assets/sprites/icons2.png',{frameWidth:25,frameHeight:24});
     this.load.image('tail', 'assets/sprites/tail.png');
-    this.load.image('iconslot', 'assets/sprites/iconslot.png'); // remove?
+    this.load.image('door', 'assets/sprites/exitdoor.png');
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
@@ -234,46 +235,43 @@ Engine.toggleChatBar = function(){
     Engine.chat.toggle();*/
 };
 
+Engine.makeBuildingTitle = function(){
+    Engine.buildingTitle = new UIHolder(512,10,'center');
+    Engine.buildingTitle.setButton(Engine.leaveBuilding);
+    Engine.settlementTitle = new UIHolder(512,55,'center','small');
+};
+
 Engine.makeUI = function(){
-    var startx = 830;
-    var starty = 500;
-    var width = 115;
-    var x = startx;
-    var y = starty;
+    Engine.UIHolder = new UIHolder(1000,500,'right');
+    Engine.UIHolder.resize(115);
+    Engine.UIHolder.display();
 
-    var UIholder = [];
-    UIholder.push(Engine.scene.add.sprite(x,y,'UI','title-left'));
-    x += 32;
-    UIholder.push(Engine.scene.add.tileSprite(x,y,width,64,'UI','title-center'));
-    x = x+width;
-    UIholder.push(Engine.scene.add.sprite(x,y,'UI','title-right'));
-    UIholder.forEach(function(e){
-        e.setDepth(Engine.UIDepth);
-        e.setScrollFactor(0);
-        e.setDisplayOrigin(0,0);
-        e.setInteractive();
-    });
+    Engine.makeBuildingTitle();
 
-    var statsPanel = new StatsPanel(665,380,340,100,'Stats');
+    var statsPanel = new StatsPanel(665,380,330,100,'Stats');
 
     Engine.menus = {
         'inventory': Engine.makeInventory(statsPanel),
         'crafting': Engine.makeCraftingMenu(),
-        'character': Engine.makeCharacterMenu(statsPanel)
-    };
-
-    Engine.buildingMenusMap = {
-        0: Engine.makeTradeMenu(), // fort
-        1: Engine.makeTradeMenu() //trade post
+        'character': Engine.makeCharacterMenu(statsPanel),
+        'trade': Engine.makeTradeMenu()
     };
 
     var UIelements = [];
-    x = startx+10;
-    UIelements.push(new UIElement(x,starty,'backpack',null,Engine.menus.inventory));
-    x += 50;
-    UIelements.push(new UIElement(x,starty,'tools',null,Engine.menus.crafting));
-    x += 50;
-    UIelements.push(new UIElement(x,starty,'scroll',null,Engine.menus.character));
+    var gap = 50;
+    var x = 930;
+    var y = 500;
+    UIelements.push(new UIElement(x,y,'scroll',null,Engine.menus.character));
+    x -= gap;
+    UIelements.push(new UIElement(x,y,'tools',null,Engine.menus.crafting));
+    x -= gap;
+    UIelements.push(new UIElement(x,y,'backpack',null,Engine.menus.inventory));
+    x -= gap;
+    var coin = new UIElement(x,y,'coin',null,Engine.menus.trade);
+    coin.setVisible(false);
+    UIelements.push(coin);
+
+    Engine.menus['trade'].setIcon(coin);
 
     var tooltip = Engine.scene.textures.addSpriteSheetFromAtlas(
         'tooltip',
@@ -344,7 +342,7 @@ Engine.makeInventory = function(statsPanel){
     items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
     items.addCapsule('gold',100,-9,'999','gold');
     inventory.addPanel('items',items);
-    var equipment = new EquipmentPanel(665,100,340,260,'Equipment');
+    var equipment = new EquipmentPanel(665,100,330,260,'Equipment');
     inventory.addPanel('equipment',equipment);
     inventory.addPanel('stats',statsPanel);
     inventory.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
@@ -358,7 +356,7 @@ Engine.makeInventory = function(statsPanel){
 
 Engine.makeCharacterMenu = function(statsPanel){
     var character = new Menu('Character');
-    character.addPanel('info',new Panel(665,100,340,260,'<Player name>'));
+    character.addPanel('info',new Panel(665,100,330,260,'<Player name>'));
     character.addPanel('stats',statsPanel);
     character.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
     /*var info = new Panel(665,100,340,260,"<Player name>");
@@ -672,13 +670,6 @@ Engine.updateMenus = function(category){
         var callback = callbackMap[category];
         if(menu[callback]) menu[callback]();
     }
-
-    for(var m in Engine.buildingMenusMap){
-        if(!Engine.buildingMenusMap.hasOwnProperty(m)) continue;
-        var menu = Engine.buildingMenusMap[m];
-        var callback = callbackMap[category];
-        if(menu[callback]) menu[callback]();
-    }
 };
 
 Engine.update = function(){
@@ -828,21 +819,41 @@ Engine.getTilesetFromTile = function(tile){
 
 Engine.enterBuilding = function(id){
     var building = Engine.buildings[id];
-    Engine.currentBuiling = building;
+    Engine.inBuilding = true;
+    Engine.currentBuiling = building; // used to keep track of which building is displayed in menus
     var buildingData = Engine.buildingsData[building.buildingType];
     var settlementData = Engine.settlementsData[building.settlement];
-    var menu = Engine.buildingMenusMap[building.buildingType];
+    var menu = Engine.menus[buildingData.mainMenu];
     menu.panels['shop'].updateCapsule('gold',building.gold);
     menu.panels['shop'].modifyInventory(building.inventory.items);
     menu.panels['client'].modifyFilter({
         items: building.prices,
         key: 0
     });
+    menu.panels['shop'].modifyFilter({
+        items: building.prices,
+        key: 1
+    });
+    menu.displayIcon();
     menu.display();
+    Engine.buildingTitle.setText(buildingData.name);
+    Engine.settlementTitle.setText(settlementData.name);
+    if(Engine.buildingTitle.width < Engine.settlementTitle.width) Engine.buildingTitle.resize(Engine.settlementTitle.width);
+    Engine.buildingTitle.display();
+    Engine.settlementTitle.display();
+    Engine.UIHolder.resize(165);
 };
 
 Engine.exitBuilding = function(){
+    Engine.inBuilding = false;
     Engine.currentMenu.hide();
+    Engine.buildingTitle.hide();
+    Engine.settlementTitle.hide();
+    for(var m in Engine.menus){
+        if(!Engine.menus.hasOwnProperty(m)) continue;
+        Engine.menus[m].hideIcon();
+    }
+    Engine.UIHolder.resize(115);
 };
 
 // ## UI-related functions ##
@@ -875,10 +886,12 @@ Engine.unequipClick = function(){ // Sent when unequipping something
 
 Engine.sellClick = function(){
     Engine.currentMenu.panels['action'].setUp(this.itemID,'sell');
-    //BScene.shop.shopPanel.updatePurchase(this.itemID,Engine.itemsData[this.itemID],'sell');
 };
 
 Engine.buyClick = function(){
     Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
-    //BScene.shop.shopPanel.updatePurchase(this.itemID,Engine.itemsData[this.itemID],'buy');
+};
+
+Engine.leaveBuilding = function(){
+    Client.sendExit();
 };

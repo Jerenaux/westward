@@ -31,6 +31,7 @@ ShopPanel.prototype.addInterface = function(){
 
     var item = new ItemSprite();
     item.setPosition(this.x+20+18,this.y+30+18);
+    item.showTooltip = false;
     this.content.push(item);
 
     var count = Engine.scene.add.text(this.x+47,this.y+50, '0',  { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
@@ -108,6 +109,15 @@ ShopPanel.prototype.canBuy = function(){
     return true;
 };
 
+ShopPanel.prototype.isAtZero = function(){
+    if(this.shopItem.action == 'buy'){
+        if(Engine.currentBuiling.inventory.getNb(this.shopItem.id) == 0) return true;
+    }else{
+        if(Engine.player.inventory.getNb(this.shopItem.id) == 0) return true;
+    }
+    return false;
+};
+
 ShopPanel.prototype.isAtMax = function(){
     if(this.shopItem.action == 'buy'){
         if(this.shopItem.count >= Engine.currentBuiling.inventory.getNb(this.shopItem.id)) return true;
@@ -138,7 +148,7 @@ ShopPanel.prototype.manageButtons = function(){
         plusBtn.enable();
     }
 
-    if(this.canBuy()){
+    if(this.canBuy() && !this.isAtZero()){
         okBtn.enable();
     }else{
         okBtn.disable();
