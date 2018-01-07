@@ -356,7 +356,7 @@ Engine.makeInventory = function(statsPanel){
 
 Engine.makeCharacterMenu = function(statsPanel){
     var character = new Menu('Character');
-    character.addPanel('info',new Panel(665,100,330,260,'<Player name>'));
+    character.addPanel('info',new CharacterPanel(665,100,330,260,'<Player name>'));
     character.addPanel('stats',statsPanel);
     character.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
     /*var info = new Panel(665,100,340,260,"<Player name>");
