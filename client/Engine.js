@@ -117,6 +117,7 @@ Engine.create = function(masterData){
     Engine.createMarker();
     Engine.scene.game.canvas.style.cursor = Engine.cursor; // Sets the pointer to hand sprite
 
+    Engine.scene.input.setTopOnly(false);
     Engine.scene.input.events.on('POINTER_DOWN_EVENT', Engine.handleDown);
     Engine.scene.input.events.on('POINTER_UP_EVENT', Engine.handleClick);
     Engine.scene.input.events.on('POINTER_MOVE_EVENT', Engine.trackMouse);
@@ -359,12 +360,6 @@ Engine.makeCharacterMenu = function(statsPanel){
     character.addPanel('info',new CharacterPanel(665,100,330,260,'<Player name>'));
     character.addPanel('stats',statsPanel);
     character.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
-    /*var info = new Panel(665,100,340,260,"<Player name>");
-    info.addLine('Citizen of '+Engine.settlementsData[Engine.player.settlement].name);
-    info.addLine('Level 1 Merchant  -   0/100 Class XP');
-    info.addLine('Level 1 citizen   -   0/100 Civic XP');
-    character.addPanel(info); // equipment panel
-    character.addPanel(Engine.statsPanel);*/
     return character;
 };
 

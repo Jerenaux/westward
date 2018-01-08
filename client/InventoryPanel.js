@@ -175,8 +175,9 @@ InventoryPanel.prototype.setUpZone = function(nbDisplayed){
 
     this.zone.setVisible(true);
     this.zone.setPosition(zoneX,zoneY);
-    this.zone.setSize(zoneW,zoneH);
+    this.zone.setSize(zoneW,zoneH,true);
     this.zone.setInteractive(polygon,Phaser.Geom.Polygon.Contains);
+    this.zone.input.hitArea = polygon;
 };
 
 InventoryPanel.prototype.modifyInventory = function(items){
