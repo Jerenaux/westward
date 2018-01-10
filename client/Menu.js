@@ -24,7 +24,7 @@ Menu.prototype.setIcon = function(icon){
 };
 
 Menu.prototype.displayIcon = function(){
-    this.icon.display();
+    if(this.icon) this.icon.display();
 };
 
 Menu.prototype.hideIcon = function(){

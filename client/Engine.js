@@ -52,7 +52,14 @@ Engine.preload = function() {
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
     this.load.spritesheet('icons2', 'assets/sprites/icons2.png',{frameWidth:25,frameHeight:24});
     this.load.image('tail', 'assets/sprites/tail.png');
-    this.load.image('door', 'assets/sprites/exitdoor.png');
+    this.load.image('scrollbg', 'assets/sprites/scroll400.png');
+    this.load.image('scrollbgh', 'assets/sprites/scroll_horiz.png');
+    this.load.image('radial', 'assets/sprites/radial.png');
+    this.load.image('radial1', 'assets/sprites/radial1.png');
+    this.load.image('radial2', 'assets/sprites/radial2.png');
+    this.load.image('radial3', 'assets/sprites/radial3.png');
+    this.load.image('radial4', 'assets/sprites/radial4.png');
+    this.load.image('fullmap', 'assets/sprites/fullmap_005_tr.png');
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
@@ -255,7 +262,8 @@ Engine.makeUI = function(){
         'inventory': Engine.makeInventory(statsPanel),
         'crafting': Engine.makeCraftingMenu(),
         'character': Engine.makeCharacterMenu(statsPanel),
-        'trade': Engine.makeTradeMenu()
+        'trade': Engine.makeTradeMenu(),
+        'fortMap': Engine.makeFortMenu()
     };
 
     var UIelements = [];
@@ -285,6 +293,13 @@ Engine.makeUI = function(){
         }
     );
     Engine.tooltip = new Tooltip();
+};
+
+Engine.makeFortMenu = function(){
+    var map = new Menu('Map');
+    var mapPanel = new FortmapPanel(312,100,400,300,'',true);
+    map.addPanel('map',mapPanel);
+    return map;
 };
 
 Engine.makeTradeMenu = function(){
@@ -819,16 +834,20 @@ Engine.enterBuilding = function(id){
     var buildingData = Engine.buildingsData[building.buildingType];
     var settlementData = Engine.settlementsData[building.settlement];
     var menu = Engine.menus[buildingData.mainMenu];
-    menu.panels['shop'].updateCapsule('gold',building.gold);
-    menu.panels['shop'].modifyInventory(building.inventory.items);
-    menu.panels['client'].modifyFilter({
-        items: building.prices,
-        key: 0
-    });
-    menu.panels['shop'].modifyFilter({
-        items: building.prices,
-        key: 1
-    });
+
+    if(menu.panels['shop']) {
+        menu.panels['shop'].updateCapsule('gold', building.gold);
+        menu.panels['shop'].modifyInventory(building.inventory.items);
+        menu.panels['client'].modifyFilter({
+            items: building.prices,
+            key: 0
+        });
+        menu.panels['shop'].modifyFilter({
+            items: building.prices,
+            key: 1
+        });
+    }
+
     menu.displayIcon();
     menu.display();
     Engine.buildingTitle.setText(buildingData.name);
@@ -836,7 +855,7 @@ Engine.enterBuilding = function(id){
     if(Engine.buildingTitle.width < Engine.settlementTitle.width) Engine.buildingTitle.resize(Engine.settlementTitle.width);
     Engine.buildingTitle.display();
     Engine.settlementTitle.display();
-    Engine.UIHolder.resize(165);
+    Engine.UIHolder.resize(115+50);
 };
 
 Engine.exitBuilding = function(){

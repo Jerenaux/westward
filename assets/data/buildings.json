@@ -14,8 +14,7 @@
     "height": 427,
     "sprite": "fort",
     "name":"Fort",
-    "shop": true,
-    "mainMenu": "trade",
+    "mainMenu": "fortMap",
     "entry": {
       "x": 14,
       "y": 12
@@ -39,7 +38,6 @@
       "x": 14,
       "y": 11
     },
-    "shop": true,
     "mainMenu": "trade"
   },
   "2":{

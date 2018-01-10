@@ -26,6 +26,7 @@ Engine.boot = function(){
         {
             antialias: false,
             view: document.getElementById('game'),
+            //resolution: 0.5,
             preserveDrawingBuffer: true // to allow image captures from canvas
         }
     );
@@ -131,14 +132,16 @@ Engine.readMaster = function(masterData){
     PIXI.loader.load(Engine.start);
 };
 
-Engine.loadJSON = function(path,callback,info){
+Engine.loadJSON = function(path,callback,id,callBack){
     var xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
     xobj.open('GET', path, true);
     xobj.onreadystatechange = function () {
         if (xobj.readyState == 4 && xobj.status == "200") {
             // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-            callback(JSON.parse(xobj.responseText),info);
+            callback(JSON.parse(xobj.responseText),id,callBack);
+        }else{
+            //console.log('ERROR for chunk '+id);
         }
     };
     xobj.send(null);
@@ -169,8 +172,13 @@ Engine.addSprite = function(key,x,y){
 };
 
 Engine.addToStage = function(sprite){
-    Engine.stage.addChild(sprite);
-    Engine.orderStage();
+    if(Engine.captureStage){
+        sprite.scale.set(Engine.captureScale);
+        Engine.captureStage.addChild(sprite);
+    }else{
+        Engine.stage.addChild(sprite);
+        Engine.orderStage();
+    }
 };
 
 Engine.orderStage = function(){
@@ -179,12 +187,13 @@ Engine.orderStage = function(){
     });
 };
 
-Engine.displayChunk = function(id){
+Engine.displayChunk = function(id,callBack){
+    //console.log('Displaying '+id);
     if(Engine.mapDataCache[id]){
         // Chunks are deleted and redrawn rather than having their visibility toggled on/off, to avoid accumulating in memory
-        Engine.drawChunk(Engine.mapDataCache[id],id);
+        Engine.drawChunk(Engine.mapDataCache[id],id,callBack);
     }else {
-        Engine.loadJSON(Engine.mapDataLocation+'/chunk' + id + '.json', Engine.drawChunk, id);
+        Engine.loadJSON(Engine.mapDataLocation+'/chunk' + id + '.json', Engine.drawChunk, id, callBack);
     }
 };
 
@@ -192,7 +201,9 @@ Engine.displayMap = function(path){
     Engine.loadJSON(path,Engine.makeMap);
 };
 
-Engine.drawChunk = function(mapData,id){
+Engine.drawChunk = function(mapData,id,callBack){
+    if(callBack) Engine.chunkCallback();
+    if(Engine.displayedChunks.includes(id)) return;
     var chunk = new Chunk(mapData,1);
     chunk.id = id;
     Engine.chunks[chunk.id] = chunk;
@@ -267,6 +278,11 @@ Engine.getTilesetFromTile = function(tile){
 };
 
 Engine.removeChunk = function(id){
+    Engine.chunks[id].destroy({
+        children: true,
+        texture: false,
+        baseTexture: false
+    });
     Engine.stage.removeChild(Engine.chunks[id]);
     Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
 };
@@ -279,9 +295,10 @@ Engine.showAll = function(){
 };
 
 Engine.removeAll = function(){
-    //var chunks = Engine.listVisibleAOIs(Engine.player.chunk);
     var chunks = Engine.displayedChunks;
-    for (var i = 0; i < chunks.length; i++) {
+    //console.log(chunks.sort(function(a,b){return a-b}));
+    // Needs to go backwards because removeChunk remove elements from the Engine.displayedChunks array!
+    for (var i = chunks.length-1; i >= 0; i--) {
         Engine.removeChunk(chunks[i]);
     }
 };
@@ -356,6 +373,7 @@ Engine.updateCamera = function(){
 
 Engine.updateEnvironment = function(){
     var chunks = Engine.listVisibleAOIs(Engine.player.chunk);
+    //console.log(chunks.sort(function(a,b){return a-b}));
     var newChunks = chunks.diff(Engine.displayedChunks);
     var oldChunks = Engine.displayedChunks.diff(chunks);
 
@@ -737,18 +755,6 @@ Engine.save = function(){
     Engine.editHistory = [];
 };
 
-Engine.displayQuadrant = function(quad){
-    Engine.removeAll();
-    var quadW = 5;
-    var quadH = 5;
-    for(var y = 0; y < quadH; y++){
-        for(var x = 0; x < quadW; x ++){
-            var c = quad + x + World.nbChunksHorizontal*y;
-            Engine.displayChunk(c);
-        }
-    }
-};
-
 Engine.captureMap = function(){
     Engine.renderer.extract.canvas(Engine.stage).toBlob(function(b){
         var a = document.createElement('a');
@@ -759,6 +765,101 @@ Engine.captureMap = function(){
         a.remove();
     }, 'image/png');
 };
+
+Engine.displayQuadrant = function(quad){
+    Engine.removeAll();
+    var quadW = 15;
+    var quadH = 15;
+    // Displays a quadrant of dimensions quadW, quadH with quad as top-left chunk
+    for(var y = 0; y < quadH; y++){
+        for(var x = 0; x < quadW; x ++){
+            var c = quad + x + World.nbChunksHorizontal*y;
+            Engine.displayChunk(c);
+        }
+    }
+};
+
+Engine.captureAll = function(){
+    Engine.performCapture = true;
+    Engine.captureStage = new PIXI.Container();
+    Engine.captureScale = 0.05;
+    Engine.player.visible = false;
+    Engine.captureCount = 0;
+    Engine.quadW = 50;
+    Engine.quadH = 57;
+    Engine.firstCapture = true;
+    Engine.quadSnapshot = {
+        x: 0,
+        y: 0
+    };
+    Engine.captureWrap();
+};
+
+Engine.captureWrap = function(){
+    if(Engine.firstCapture) {
+        Engine.firstCapture = false;
+    }else{
+        Engine.quadSnapshot.x += Engine.quadW;
+        if(Engine.quadSnapshot.x > World.nbChunksHorizontal){
+            Engine.quadSnapshot.x = 0;
+            Engine.quadSnapshot.y += Engine.quadH;
+            if(Engine.quadSnapshot.y > World.nbChunksVertical){
+                console.log('Full capture done');
+                return;
+            }
+        }
+    }
+    Engine.removeAll();
+    Engine.displayQuadrantAndCapture();
+};
+
+Engine.displayQuadrantAndCapture = function(){
+    console.log('Displaying next Q');
+    Engine.chunkCounter = 0;
+    var tl = Utils.gridToLine(Engine.quadSnapshot.x,Engine.quadSnapshot.y,World.nbChunksHorizontal);
+    var right = World.nbChunksHorizontal - (tl%World.nbChunksHorizontal);
+    var down = World.nbChunksVertical - Math.floor(tl/World.nbChunksHorizontal);
+    console.log(tl,right,down);
+    var horizLimit = Math.min(Engine.quadW,right);
+    var vertLimit = Math.min(Engine.quadH,down);
+    Engine.chunkTotal = (horizLimit*vertLimit);
+    var cs = [];
+    for(var y = 0; y < vertLimit; y++){
+        for(var x = 0; x < horizLimit; x++){
+            var c = Utils.gridToLine(Engine.quadSnapshot.x+x,Engine.quadSnapshot.y+y,World.nbChunksHorizontal);
+            cs.push(c);
+            //console.log('req '+c);
+            Engine.displayChunk(c,true);
+        }
+    }
+    console.log(cs);
+};
+
+Engine.chunkCallback = function(){
+    Engine.chunkCounter++;
+    //console.log('+');
+    if(Engine.chunkCounter == Engine.chunkTotal) {
+        console.log('All displayed');
+        //Engine.captureAndNext();
+        setTimeout(Engine.captureAndNext,100);
+        //Engine.captureWrap();
+    }
+    //console.log(Engine.chunkCounter,Engine.chunkTotal);
+};
+
+Engine.captureAndNext = function(){
+    Engine.renderer.extract.canvas(Engine.captureStage).toBlob(function(b){
+    //Engine.renderer.extract.canvas(Engine.stage).toBlob(function(b){
+        var a = document.createElement('a');
+        document.body.append(a);
+        a.download = 'map_'+(Engine.captureCount++)+'.png';
+        a.href = URL.createObjectURL(b);
+        a.click();
+        a.remove();
+        //Engine.captureWrap();
+    }, 'image/png');
+};
+
 
 Engine.getPreference = function(parameter,defaultValue){ // Retrieve sorting preferences for localStorage or return a default value
     var pref = localStorage.getItem(parameter);

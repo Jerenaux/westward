@@ -99,6 +99,12 @@ UIHolder.prototype.setButton = function(callback){
     right.destroy();
     this.slices[2] = btn;
     if(this.align == 'right') this.text.x -= 30;
+    if(this.align == 'center') {
+        this.slices.forEach(function (s) {
+            s.x -= 15;
+        });
+        this.text.x -= 15;
+    }
 };
 
 UIHolder.prototype.display = function(){

@@ -59,6 +59,8 @@ Chunk.prototype.orderTiles = function(){
 Chunk.prototype.drawTile = function(x,y,tile,layer){
     if(x < 0 || y < 0) return;
     if(!tile) return;
+    //if(tile > 682 && tile < 808) return; // Experimental, don't draw grass
+    if(Engine.performCapture && Object.values(WorldEditor.grass).includes(tile)) return;
     var tileID = tile;
     var texture;
     if(Engine.textureCache.hasOwnProperty(tileID)){
