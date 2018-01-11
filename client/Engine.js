@@ -60,6 +60,7 @@ Engine.preload = function() {
     this.load.image('radial3', 'assets/sprites/radial3.png');
     this.load.image('radial4', 'assets/sprites/radial4.png');
     this.load.image('fullmap', 'assets/sprites/fullmap_005_tr.png');
+    // pin: https://www.iconfinder.com/icons/173052/map_marker_icon
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');

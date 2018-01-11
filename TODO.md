@@ -91,13 +91,13 @@ Content:
 * Inns
 (- Enable players to put construction site)
 (- Enable players to commit to construction)
-- Shop system (custom stock, prices...)
+- Shop management (custom stock, prices...)
 - Set respawn fee
 - Set respawn site
 - Chat
 - Gazette
 * Inventory
-- Drag/drop mechanics (for use, throw, equip, slots...)
+- Drag/drop mechanics (for use, throw, equip, slots...)?
 - Quick-use slots
 - Pick up items
 * Player interactions
@@ -130,18 +130,10 @@ Content:
 * Settlement management
 - ...
 * Trade
-- Shop system, test with pre-filled inventories
-- Test back and forth between two different buildings
 - Have monsters drop loot
 - Enable bonuses of merchants
 - Allow merchants and artisans to build their shops
 * World map
-- Static image:
--> Split the map in k quadrants of l chunks
--> List the corresponding chunk id's and display the chunks
--> Save picture (with cartography())
--> Remove all
--> Next quadrant
 - Menu with static image
 - Minimap
 - Fog of war and exploration (chunks-based)

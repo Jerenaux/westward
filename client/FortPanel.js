@@ -19,9 +19,8 @@ FortmapPanel.prototype.addInterface = function(){
     this.bg.setScrollFactor(0);
     this.bg.setVisible(false);
 
-    this.map = Engine.scene.add.sprite(scrollx/2,scrolly/2-100,'fullmap');
+    this.map = Engine.scene.add.sprite(scrollx,scrolly,'fullmap');
     this.map.setDepth(Engine.UIDepth+2);
-    this.map.setDisplayOrigin(0,0);
     this.map.setScrollFactor(0);
     this.map.setVisible(false);
 
@@ -40,6 +39,13 @@ FortmapPanel.prototype.addInterface = function(){
 
 FortmapPanel.prototype.displayInterface = function(){
     this.bg.setVisible(true);
+
+    var originX = Engine.currentBuiling.tileX/World.worldWidth;
+    var originY = Engine.currentBuiling.tileY/World.worldHeight;
+    console.log(Engine.currentBuiling.tileX,Engine.currentBuiling.tileY);
+    console.log(originX,originY);
+    this.map.setDisplayOrigin(originX,originY);
+
     this.map.setVisible(true);
 };
 
