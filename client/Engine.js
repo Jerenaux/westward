@@ -131,6 +131,7 @@ Engine.create = function(masterData){
     Engine.scene.input.events.on('POINTER_MOVE_EVENT', Engine.trackMouse);
     Engine.scene.input.events.on('POINTER_OVER_EVENT', Engine.handleOver);
     Engine.scene.input.events.on('POINTER_OUT_EVENT', Engine.handleOut);
+    Engine.scene.input.events.on('DRAG_EVENT', Engine.handleDrag);
     Engine.scene.input.keyboard.events.on('KEY_DOWN_ENTER', Engine.toggleChatBar);
 
     PFUtils.setup(Engine);
@@ -518,6 +519,10 @@ Engine.handleOut = function(event){
             if(obj.handleOut) obj.handleOut();
         }
     }
+};
+
+Engine.handleDrag = function(event){
+    if(event.gameObject && event.gameObject.handleDrag) event.gameObject.handleDrag(event.dragX,event.dragY);
 };
 
 Engine.moveToClick = function(event){
