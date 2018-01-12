@@ -79,6 +79,7 @@ Building.prototype.takeGold = function(nb){
     this.setProperty('gold',this.gold-nb);
 };
 
+// Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){
     var trimmed = {};
     var broadcastProperties = ['id','type','settlement','gold','prices']; // list of properties relevant for the client
@@ -88,6 +89,18 @@ Building.prototype.trim = function(){
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     trimmed.inventory = this.inventory.toList();
+    return trimmed;
+};
+
+// Returns an object containing only the fields relevant to display on the map
+Building.prototype.superTrim = function(){
+    var trimmed = {};
+    var broadcastProperties = ['type'];
+    for(var p = 0; p < broadcastProperties.length; p++){
+        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
+    }
+    trimmed.x = parseInt(this.x);
+    trimmed.y = parseInt(this.y);
     return trimmed;
 };
 

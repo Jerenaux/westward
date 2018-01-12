@@ -22,17 +22,6 @@ var Building = new Phaser.Class({
         this.prices = prices || {};
         this.chunk = Utils.tileToAOI({x:x,y:y});
 
-        /*
-         //var settlementData = Engine.settlementsData[settlement];
-        var height = 200;
-        var width = 300;
-        var py = Engine.baseViewHeight*Engine.tileHeight - height;
-        var panelName = data.name+' of '+settlementData.name;
-        this.panel = new Panel(0,py+height,width,height,panelName);
-        this.panel.addRing(260,-10,'red','close',Engine.togglePanel.bind(this));
-        this.panel.addInventory(null,5,5,this.inventory,true);
-        this.panel.setTweens(0,py+height,0,py,500);
-        this.handleClick = Engine.togglePanel.bind(this);*/
         this.handleClick = function(){
             if(Engine.inMenu) return;
             if(!data.entry) return;

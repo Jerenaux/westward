@@ -38,6 +38,13 @@ Utils.lineToGrid = function(i,w){
     }
 };
 
+Utils.tileToPct = function(x,y){
+    return {
+        x : x / World.worldWidth,
+        y : y / World.worldHeight
+    }
+};
+
 // ### Quadrant-related methods ###
 
 Utils.tileToQuadrant = function(x,y,quadW,quadH){

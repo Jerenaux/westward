@@ -61,6 +61,7 @@ Engine.preload = function() {
     this.load.image('radial4', 'assets/sprites/radial4.png');
     this.load.image('fullmap', 'assets/sprites/fullmap_005_tr.png');
     // pin: https://www.iconfinder.com/icons/173052/map_marker_icon
+    this.load.image('pin', 'assets/sprites/pin.png');
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
@@ -163,9 +164,10 @@ Engine.createMarker = function(){
     Engine.marker.previousTile = {x:0,y:0};
 };
 
-Engine.initWorld = function(data){
-    console.log(data);
-    Engine.addHero(data.id,data.x,data.y,data.settlement);
+Engine.initWorld = function(player,buildings){
+    console.log(player);
+    Engine.addHero(player.id,player.x,player.y,player.settlement);
+    Engine.buildingsList = buildings;
     Engine.makeUI();
     Engine.makeChatBar();
     Engine.createAnimations();

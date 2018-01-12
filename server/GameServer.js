@@ -66,12 +66,14 @@ GameServer.readMap = function(mapsPath){
 
     // Read buildings
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
+    GameServer.buildingsList = {}; // active list of the locations of all buildings
     GameServer.server.db.collection('buildings').find({}).toArray(function(err,buildings){
         if(err) throw err;
         for(var i = 0; i < buildings.length; i++){
             var data = buildings[i];
             var building = new Building(data.x,data.y,data.type,data.settlement,data.stock,data.gold,data.prices);
             GameServer.buildings[building.id] = building;
+            GameServer.buildingsList[building.id] = building.superTrim();
         }
         GameServer.updateStatus();
     });
@@ -147,7 +149,8 @@ GameServer.createInitializationPacket = function(playerID){
     // Create the packet that the client will receive from the server in order to initialize the game
     return {
         player: GameServer.players[playerID].trim(), // info about the player
-        nbconnected: GameServer.server.getNbConnected()
+        nbconnected: GameServer.server.getNbConnected(),
+        buildings: GameServer.buildingsList
     };
     // No need to send list of existing players, GameServer.handleAOItransition() will look for players in adjacent AOIs
     // and add them to the "newplayers" array of the next update packet
