@@ -70,6 +70,7 @@ var Map = new Phaser.Class({
 
     display: function(x,y){
         var origin = Utils.tileToPct(Engine.currentBuiling.tileX,Engine.currentBuiling.tileY);
+        console.log(origin);
         this.setOrigin(origin.x,origin.y);
         this.setPosition(x,y);
         this.initialX = this.x;
@@ -127,7 +128,6 @@ var Pin = new Phaser.Class({
         this.setVisible(false);
         this.setInteractive();
         this.mask = new Phaser.Display.Masks.BitmapMask(Engine.scene,mask);
-        console.log(this.mask);
     },
 
     setUp: function(x,y,name){
