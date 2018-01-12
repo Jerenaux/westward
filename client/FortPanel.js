@@ -36,8 +36,8 @@ FortmapPanel.prototype.addInterface = function(){
     Engine.scene.input.setDraggable(this.map);
     var _map = this.map;
     this.map.handleDrag = function(x,y){
-        if(Math.abs(x-_map.initialX) > 500) return;
-        if(Math.abs(y-_map.initialY) > 500) return;
+        //if(Math.abs(x-_map.initialX) > 500) return;
+        //if(Math.abs(y-_map.initialY) > 500) return;
         console.log(x-_map.initialX);
         var dx = _map.x - x;
         var dy = _map.y - y;
