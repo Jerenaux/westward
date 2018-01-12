@@ -58,9 +58,9 @@ var Map = new Phaser.Class({
         });
     },
 
-    handleClick: function(){
+    /*handleClick: function(){
         console.log('click');
-    },
+    },*/
 
     addPins: function(nb){
         for(var i = 0; i < nb; i++){
