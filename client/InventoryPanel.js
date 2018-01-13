@@ -214,6 +214,7 @@ InventoryPanel.prototype.resetCounters = function(){
 };
 
 InventoryPanel.prototype.display = function(){
+    if(this.displayed) return;
     Panel.prototype.display.call(this);
     this.displayInventory();
 };

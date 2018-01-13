@@ -19,7 +19,7 @@ FortmapPanel.prototype.addInterface = function(){
     this.bg.setVisible(false);
 
     this.map = new Map(scrollx,scrolly);
-    this.map.addPins(Object.keys(Engine.buildingsList).length);
+    this.map.addPins(Object.keys(Engine.buildingsList).length+1); // +1 for new building pin
 
     this.content.push(this.bg);
     this.content.push(this.map);
@@ -34,4 +34,9 @@ FortmapPanel.prototype.displayInterface = function(){
 FortmapPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
     this.displayInterface();
+};
+
+FortmapPanel.prototype.hide = function(){
+    Panel.prototype.hide.call(this);
+    this.map.hide();
 };

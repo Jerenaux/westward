@@ -5,7 +5,7 @@ var Map = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function Map (x, y) {
+    initialize: function Map(x, y) {
         CustomSprite.call(this, x, y, 'fullmap');
 
         this.setDepth(Engine.UIDepth+2);
@@ -20,7 +20,7 @@ var Map = new Phaser.Class({
         this.mask = new Phaser.Display.Masks.BitmapMask(Engine.scene,mask);
         this.maskPicture = mask;
 
-        this.text = Engine.scene.add.text(0, 0, 'New Beginning',{font: '40px belwe', fill: '#966f33', stroke: '#000000', strokeThickness: 3});
+        this.text = Engine.scene.add.text(0, 0, 'New Beginning',{font: '60px treamd', fill: '#966f33', stroke: '#000000', strokeThickness: 3});
         this.text.setDepth(Engine.UIDepth+3);
         this.text.setVisible(false);
         this.text.setScrollFactor(0,0);
@@ -31,10 +31,8 @@ var Map = new Phaser.Class({
         this.setInteractive(new Phaser.Geom.Rectangle(0,0,this.width,this.height),Phaser.Geom.Rectangle.Contains);
         Engine.scene.input.setDraggable(this);
 
-        //Engine.maskArea = new Phaser.Geom.Rectangle(mask.x,mask.y,mask.width,mask.height);
-
         this.pins = [];
-        this.nextPin = 0;
+        this.nextPin = 1; // the 0th pin is used for clicks
     },
 
     handleDrag: function(x,y){
@@ -58,9 +56,15 @@ var Map = new Phaser.Class({
         });
     },
 
-    /*handleClick: function(){
-        console.log('click');
-    },*/
+    handleClick: function(evt){
+        if(evt.pointer.downX != evt.pointer.upX || evt.pointer.downY != evt.pointer.upY) return; // drag
+        this.pins[0].setUp(evt.x,evt.y,'New building?','redpin');
+        Engine.currentMenu.panels['buildings'].display();
+
+        var dx = evt.x - this.x;
+        var dy = evt.y - this.y;
+        console.log(dx,dy);
+    },
 
     addPins: function(nb){
         for(var i = 0; i < nb; i++){
@@ -70,7 +74,6 @@ var Map = new Phaser.Class({
 
     display: function(x,y){
         var origin = Utils.tileToPct(Engine.currentBuiling.tileX,Engine.currentBuiling.tileY);
-        console.log(origin);
         this.setOrigin(origin.x,origin.y);
         this.setPosition(x,y);
         this.initialX = this.x;
@@ -93,11 +96,15 @@ var Map = new Phaser.Class({
         for(var b in Engine.buildingsList) {
             if(!Engine.buildingsList.hasOwnProperty(b)) continue;
             var data = Engine.buildingsList[b];
-            data.x += 6;
-            data.y += 8;
+            //data.x += 6;
+            //data.y += 8;
             var pct = Utils.tileToPct(data.x,data.y);
             var dx = (pct.x - origin.x)*this.width;
             var dy = (pct.y - origin.y)*this.height;
+            console.log(data.x,data.y);
+            console.log(Math.ceil(Engine.buildingsData[data.type].width/World.tileWidth));
+            console.log(pct.x,pct.y);
+            console.log(dx,dy);
             var pin = this.pins[this.nextPin++];
             pin.setUp(this.x+dx,this.y+dy,Engine.buildingsData[data.type].name);
         }
@@ -109,7 +116,7 @@ var Map = new Phaser.Class({
     },
 
     hidePins: function(){
-        this.nextPin = 0;
+        this.nextPin = 1;
         this.pins.forEach(function(p){
             p.setVisible(false);
         });
@@ -130,7 +137,8 @@ var Pin = new Phaser.Class({
         this.mask = new Phaser.Display.Masks.BitmapMask(Engine.scene,mask);
     },
 
-    setUp: function(x,y,name){
+    setUp: function(x,y,name,texture){
+        if(texture) this.setTexture(texture);
         this.setPosition(x,y);
         this.initialX = x;
         this.initialY = y;

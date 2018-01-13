@@ -10,9 +10,9 @@ var Building = new Phaser.Class({
         var data = Engine.buildingsData[type];
         CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, data.sprite);
 
+        console.log(x,y);
         this.tileX = x;
         this.tileY = y;
-        this.depth = Engine.buildingsDepth + (this.tileY+((data.height/2)/32))/1000;
         this.id = id;
         this.buildingType = type;
         this.settlement = settlement;
@@ -36,13 +36,15 @@ var Building = new Phaser.Class({
         var shape = new Phaser.Geom.Polygon(data.shape);
         this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
 
-        var center = false;
+        var center = true;
         var spriteX, spriteY;
         if(center){
-            spriteX = Math.floor((this.tileX*Engine.tileWidth - data.width/2)/Engine.tileWidth);
-            spriteY = Math.floor((this.tileY*Engine.tileHeight - data.height/2)/Engine.tileHeight);
+            spriteX = this.tileX - Math.ceil((data.width/2)/World.tileWidth);
+            spriteY = this.tileY - Math.ceil((data.height/2)/World.tileHeight);
+            this.depth = Engine.buildingsDepth + this.tileY/1000;
         }else{
-            this.setDisplayOrigin(0);  //disabled so that the y coordinate is usable for depth sorting
+            this.setDisplayOrigin(0);
+            this.depth = Engine.buildingsDepth + (this.tileY+((data.height/2)/32))/1000;
             spriteX = this.tileX;
             spriteY = this.tileY;
         }

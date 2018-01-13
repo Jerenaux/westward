@@ -5,6 +5,7 @@
 function Menu(title){
     this.container = [];
     this.panels = {};
+    this.hideOnOpen = {};
     this.displayed = false;
     this.makeTitle(title);
 }
@@ -15,8 +16,9 @@ Menu.prototype.makeTitle = function(title){
     this.title.setButton(this.hide.bind(this));
 };
 
-Menu.prototype.addPanel = function(name,panel){
+Menu.prototype.addPanel = function(name,panel,hideOnOpen){
     this.panels[name] = panel;
+    this.hideOnOpen[name] = !!hideOnOpen;
 };
 
 Menu.prototype.setIcon = function(icon){
@@ -39,8 +41,7 @@ Menu.prototype.display = function(){
 
     for(var p in this.panels){
         if(!this.panels.hasOwnProperty(p)) continue;
-        var panel = this.panels[p];
-        panel.display();
+        if(!this.hideOnOpen[p]) this.panels[p].display();
     }
 
     Engine.inMenu = true;

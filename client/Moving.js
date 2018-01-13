@@ -165,7 +165,7 @@ var Moving = new Phaser.Class({
             var print = Engine.scene.add.image(sx,sy,'footsteps');
             print.angle += angle;
             print.alpha = 0.7;
-            print.depth = Engine.playersDepth;
+            print.depth = Engine.markerDepth;
 
             Engine.scene.tweens.add({
                 targets: print,

@@ -5,8 +5,17 @@
     font-family: 'belwe';
     src: url('/assets/fonts/belwe.otf');
 }
+@font-face {
+    font-family: 'treamd';
+    src: url('/assets/fonts/Treamd.ttf');
+}
 .fontPreload {
     font-family: 'belwe';
+    position: absolute;
+    left: -100px;
+}
+.fontPreloadTreamd {
+    font-family: 'treamd';
     position: absolute;
     left: -100px;
 }

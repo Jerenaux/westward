@@ -39,6 +39,7 @@ Engine.preload = function() {
     this.load.image('tools', 'assets/sprites/tools.png');
     this.load.image('backpack', 'assets/sprites/backpack.png');
     this.load.image('coin', 'assets/sprites/coin.png');
+    this.load.image('map', 'assets/sprites/map.png');
     this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
 
     this.load.image('fort', 'assets/sprites/buildings/fort.png');
@@ -62,6 +63,7 @@ Engine.preload = function() {
     this.load.image('fullmap', 'assets/sprites/fullmap_005_tr.png');
     // pin: https://www.iconfinder.com/icons/173052/map_marker_icon
     this.load.image('pin', 'assets/sprites/pin.png');
+    this.load.image('redpin', 'assets/sprites/redpin.png');
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
@@ -126,6 +128,7 @@ Engine.create = function(masterData){
     Engine.createMarker();
     Engine.scene.game.canvas.style.cursor = Engine.cursor; // Sets the pointer to hand sprite
 
+    Engine.dragging = false;
     Engine.scene.input.setTopOnly(false);
     Engine.scene.input.events.on('POINTER_DOWN_EVENT', Engine.handleDown);
     Engine.scene.input.events.on('POINTER_UP_EVENT', Engine.handleClick);
@@ -267,7 +270,7 @@ Engine.makeUI = function(){
         'crafting': Engine.makeCraftingMenu(),
         'character': Engine.makeCharacterMenu(statsPanel),
         'trade': Engine.makeTradeMenu(),
-        'fortMap': Engine.makeFortMenu()
+        'fort': Engine.makeFortMenu()
     };
 
     var UIelements = [];
@@ -281,10 +284,14 @@ Engine.makeUI = function(){
     UIelements.push(new UIElement(x,y,'backpack',null,Engine.menus.inventory));
     x -= gap;
     var coin = new UIElement(x,y,'coin',null,Engine.menus.trade);
+    var map = new UIElement(x,y,'map',null,Engine.menus.fort);
     coin.setVisible(false);
+    map.setVisible(false);
     UIelements.push(coin);
+    UIelements.push(map);
 
     Engine.menus['trade'].setIcon(coin);
+    Engine.menus['fort'].setIcon(map);
 
     var tooltip = Engine.scene.textures.addSpriteSheetFromAtlas(
         'tooltip',
@@ -300,10 +307,15 @@ Engine.makeUI = function(){
 };
 
 Engine.makeFortMenu = function(){
-    var map = new Menu('Map');
+    var fort = new Menu('Fort');
     var mapPanel = new FortmapPanel(312,100,400,300,'',true);
-    map.addPanel('map',mapPanel);
-    return map;
+    fort.addPanel('map',mapPanel);
+    var buildings = new InventoryPanel(100,100,180,200,'Buildings');
+    buildings.setInventory(Engine.player.buildingRecipes,3,false,Engine.newbuildingClick);
+    fort.addPanel('buildings',buildings,true);
+    var confirm = new NewbuildingPanel(100, 300, 180, 100);
+    fort.addPanel('confirm',confirm,true); // true = hide on menu open
+    return fort;
 };
 
 Engine.makeTradeMenu = function(){
@@ -392,8 +404,8 @@ Engine.addHero = function(id,x,y,settlement){
     Engine.camera.startFollow(Engine.player);
     Engine.player.inventory = new Inventory();
     Engine.player.gold = 0;
-    //Engine.player.buildingRecipes = new Inventory(10);
-    //Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
+    Engine.player.buildingRecipes = new Inventory(9);
+    Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
     Engine.player.itemRecipes = new Inventory(10);
     Engine.player.itemRecipes.fromList([[6,1],[10,1],[15,1],[16,1]]);
     Engine.player.stats = Stats.getSkeleton();
@@ -493,7 +505,7 @@ Engine.handleDown = function(event){
 Engine.handleClick = function(event){
     if(event.list.length > 0){
         for(var i = 0; i < Math.min(event.list.length,2); i++){ // disallow bubbling too deep, only useful in menus (i.e. shallow)
-            if(event.list[i].handleClick) event.list[i].handleClick();
+            if(event.list[i].handleClick) event.list[i].handleClick(event);
         }
     }else{
         if(!Engine.inMenu) {
@@ -896,6 +908,10 @@ Engine.togglePanel = function(){ // When clicking on a player/building/animal, t
 
 Engine.recipeClick = function(){
     Engine.menus['crafting'].panels['combi'].setUp(this.itemID);
+};
+
+Engine.newbuildingClick = function(){
+    Engine.currentMenu.panels['confirm'].setUp(this.itemID);
 };
 
 Engine.inventoryClick = function(){

@@ -14,7 +14,7 @@
     "height": 427,
     "sprite": "fort",
     "name":"Fort",
-    "mainMenu": "fortMap",
+    "mainMenu": "fort",
     "entry": {
       "x": 14,
       "y": 12
