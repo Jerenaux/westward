@@ -45,6 +45,13 @@ Utils.tileToPct = function(x,y){
     }
 };
 
+Utils.pctToTile = function(x,y){
+    return {
+        x : x * World.worldWidth,
+        y : y * World.worldHeight
+    }
+};
+
 // ### Quadrant-related methods ###
 
 Utils.tileToQuadrant = function(x,y,quadW,quadH){

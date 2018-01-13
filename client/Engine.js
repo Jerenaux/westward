@@ -152,7 +152,7 @@ Engine.create = function(masterData){
     Engine.blitters = [];
     Engine.blitters.push(Engine.scene.add.blitter(0,0,'ground_tiles').setDepth(0));
     Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(2));
-    Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(6));
+    Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
     Engine.useBlitters = true;
 
     Engine.created = true;

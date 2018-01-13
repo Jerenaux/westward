@@ -10,7 +10,6 @@ var Building = new Phaser.Class({
         var data = Engine.buildingsData[type];
         CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, data.sprite);
 
-        console.log(x,y);
         this.tileX = x;
         this.tileY = y;
         this.id = id;
@@ -41,10 +40,11 @@ var Building = new Phaser.Class({
         if(center){
             spriteX = this.tileX - Math.ceil((data.width/2)/World.tileWidth);
             spriteY = this.tileY - Math.ceil((data.height/2)/World.tileHeight);
-            this.depth = Engine.buildingsDepth + this.tileY/1000;
+            this.setDepth(Engine.buildingsDepth + this.tileY/1000);
+            console.log(this.depth);
         }else{
             this.setDisplayOrigin(0);
-            this.depth = Engine.buildingsDepth + (this.tileY+((data.height/2)/32))/1000;
+            this.setDepth(Engine.buildingsDepth + (this.tileY+((data.height/2)/32))/1000);
             spriteX = this.tileX;
             spriteY = this.tileY;
         }

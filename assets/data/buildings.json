@@ -16,8 +16,8 @@
     "name":"Fort",
     "mainMenu": "fort",
     "entry": {
-      "x": 14,
-      "y": 12
+      "x": 6,
+      "y": 5
     }
   },
   "1":{
@@ -35,8 +35,8 @@
     "sprite": "tradepost",
     "name":"Trade Post",
     "entry": {
-      "x": 14,
-      "y": 11
+      "x": 4,
+      "y": 4
     },
     "mainMenu": "trade"
   },

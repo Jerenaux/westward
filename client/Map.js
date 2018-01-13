@@ -58,12 +58,18 @@ var Map = new Phaser.Class({
 
     handleClick: function(evt){
         if(evt.pointer.downX != evt.pointer.upX || evt.pointer.downY != evt.pointer.upY) return; // drag
-        this.pins[0].setUp(evt.x,evt.y,'New building?','redpin');
+        this.addRedPin(evt.x,evt.y);
+    },
+
+    addRedPin: function(x,y){
+        this.pins[0].setUp(x,y,'New building?','redpin');
         Engine.currentMenu.panels['buildings'].display();
 
-        var dx = evt.x - this.x;
-        var dy = evt.y - this.y;
-        console.log(dx,dy);
+        var dx = x - this.x;
+        var dy = y - this.y;
+        var pct = Utils.tileToPct(this.x+dx,this.y+dy);
+        var tile = Utils.pctToTile(pct.x,pct.y);
+        console.log(tile);
     },
 
     addPins: function(nb){
@@ -96,15 +102,9 @@ var Map = new Phaser.Class({
         for(var b in Engine.buildingsList) {
             if(!Engine.buildingsList.hasOwnProperty(b)) continue;
             var data = Engine.buildingsList[b];
-            //data.x += 6;
-            //data.y += 8;
             var pct = Utils.tileToPct(data.x,data.y);
             var dx = (pct.x - origin.x)*this.width;
             var dy = (pct.y - origin.y)*this.height;
-            console.log(data.x,data.y);
-            console.log(Math.ceil(Engine.buildingsData[data.type].width/World.tileWidth));
-            console.log(pct.x,pct.y);
-            console.log(dx,dy);
             var pin = this.pins[this.nextPin++];
             pin.setUp(this.x+dx,this.y+dy,Engine.buildingsData[data.type].name);
         }
