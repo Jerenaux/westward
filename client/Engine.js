@@ -318,6 +318,9 @@ Engine.makeFortMenu = function(){
     var ingredients = new InventoryPanel(130,385,50,50,'',true); // true = invisible
     ingredients.setInventory(new Inventory(2),2,true);
     fort.addPanel('ingredients',ingredients,true);
+    fort.onUpdatePins = function(){
+        mapPanel.map.updatePins();
+    };
     return fort;
 };
 
@@ -659,10 +662,13 @@ Engine.updateSelf = function(data){
     }
     if(data.gold){
         Engine.player.gold = data.gold;
-        /*Engine.goldTexts.forEach(function(t){
-            t.setText(Engine.player.gold);
-        });*/
         Engine.updateMenus('gold');
+    }
+    if(data.pins){
+        for(var i = 0; i < data.pins.length; i++){
+            Engine.buildingsList[data.pins[i].id] = data.pins[i];
+        }
+        Engine.updateMenus('pins');
     }
 };
 
@@ -694,7 +700,8 @@ Engine.updateMenus = function(category){
         'stats': 'onUpdateStats',
         'equip': 'onUpdateEquipment',
         'inv': 'onUpdateInventory',
-        'gold': 'onUpdateGold'
+        'gold': 'onUpdateGold',
+        'pins': 'onUpdatePins'
     };
 
     for(var m in Engine.menus){

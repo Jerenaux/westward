@@ -7,6 +7,7 @@ function PersonalUpdatePacket(){
     this.stats = [];
     this.equipment = [];
     this.ammo = [];
+    this.pins = [];
 }
 
 PersonalUpdatePacket.prototype.isEmpty = function(){
@@ -14,6 +15,7 @@ PersonalUpdatePacket.prototype.isEmpty = function(){
     if(this.stats.length > 0) return false;
     if(this.equipment.length > 0) return false;
     if(this.ammo.length > 0) return false;
+    if(this.pins.length > 0) return false;
     if(this.gold !== undefined) return false;
     return true;
 };
@@ -23,6 +25,7 @@ PersonalUpdatePacket.prototype.clean = function() { // Remove empty arrays from 
     if(this.stats.length == 0) this.stats = undefined;
     if(this.equipment.length == 0) this.equipment = undefined;
     if(this.ammo.length == 0) this.ammo = undefined;
+    if(this.pins.length == 0) this.pins = undefined;
     return this;
 };
 
@@ -51,5 +54,10 @@ PersonalUpdatePacket.prototype.addEquip = function(slot,subSlot,item){
 PersonalUpdatePacket.prototype.addAmmo = function(slot,nb){
     this.ammo.push({slot:slot,nb:nb});
 };
+
+PersonalUpdatePacket.prototype.addBuildingPin = function(data){
+    this.pins.push(data);
+};
+
 
 module.exports.PersonalUpdatePacket = PersonalUpdatePacket;

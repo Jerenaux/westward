@@ -181,6 +181,18 @@ server.sendID = function(socket,playerID){
     socket.emit('pid',playerID);
 };
 
-server.sendError = function(socketID){
+/*server.sendError = function(socketID){
     io.in(socketID).emit('error');
+};*/
+
+server.sendMsg = function(player,msg){
+    player.updatePacket.addMsg(msg);
+};
+
+server.sendAll = function(callback,data){
+    for(var p in gs.players){
+        if(!gs.players.hasOwnProperty(p)) continue;
+        var player = gs.players[p];
+        player.updatePacket[callback](data);
+    }
 };

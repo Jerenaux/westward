@@ -62,8 +62,6 @@ NewbuildingPanel.prototype.setUp = function(id){
     this.buildingInfo.sprite.setVisible(true);
     this.buildingInfo.nameText.setText(data.name);
     this.buildingInfo.nameText.setVisible(true);
-
-    console.log(buildingData.recipe);
     ingredientsPanel.modifyInventory(buildingData.recipe);
 };
 

@@ -243,11 +243,12 @@ GameServer.handleCraft = function(data,socketID){
 GameServer.handleBuild = function(data,socketID){
     var bid = data.id;
     var tile = data.tile;
+    var player = GameServer.getPlayer(socketID);
     console.log('builing request',bid,tile);
     if(GameServer.canBuild(bid,tile)){
-
+        GameServer.build(bid,tile,player.settlement);
     }else{
-        GameServer.server.sendError(socketID);
+        GameServer.server.sendMsg(player,'nobuild');
     }
 };
 
@@ -262,6 +263,21 @@ GameServer.canBuild = function(bid,tile){
         });
     }
     return PFUtils.collisionsFromShape(shape,tile.x,tile.y,data.width,data.height,GameServer.collisions,true);
+};
+
+GameServer.build = function(bid,tile,settlement){
+    var building = new Building(tile.x,tile.y,bid,settlement,{},0,{});
+    GameServer.buildings[building.id] = building;
+    GameServer.buildingsList[building.id] = building.superTrim();
+    GameServer.server.db.collection('buildings').insertOne(building,function(err){
+        if(err) throw err;
+        console.log('build successfull');
+        /*var mongoID = document._id.toString(); // The Mongo driver for NodeJS appends the _id field to the original object reference
+        player.setIDs(mongoID,socket.id);
+        GameServer.finalizePlayer(socket,player);
+        GameServer.server.sendID(socket,mongoID);*/
+    });
+    GameServer.server.sendAll('addBuildingPin',building.superTrim());
 };
 
 /*GameServer.canBuild = function(player,building){

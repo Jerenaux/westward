@@ -93,6 +93,7 @@ Client.socket.on('error',function(){
     Engine.buildError();
 });
 
+
 /// ##### SENDERS ######
 
 Client.requestData = function(){ // request the data to be used for initWorld()

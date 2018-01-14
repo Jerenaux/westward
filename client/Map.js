@@ -32,7 +32,7 @@ var Map = new Phaser.Class({
         Engine.scene.input.setDraggable(this);
 
         this.pins = [];
-        this.nextPin = 1; // the 0th pin is used for clicks
+        this.resetCounter();
         this.clickedTile = null;
     },
 
@@ -75,6 +75,17 @@ var Map = new Phaser.Class({
         }
     },
 
+    updatePins: function(){
+        var diff = Object.keys(Engine.buildingsList).length - (this.pins.length-1);
+        if(diff > 0) this.addPins(diff);
+        this.hidePins();
+        this.displayPins();
+    },
+
+    resetCounter: function(){
+        this.nextPin = 1;  // the 0th pin is used for clicks
+    },
+
     display: function(x,y){
         var origin = Utils.tileToPct(Engine.currentBuiling.tileX,Engine.currentBuiling.tileY);
         this.setOrigin(origin.x,origin.y);
@@ -92,16 +103,16 @@ var Map = new Phaser.Class({
         this.input.hitArea = new Phaser.Geom.Rectangle(rectx,recty,dragw,dragh);
 
         this.setVisible(true);
-        this.displayPins(origin);
+        this.displayPins();
     },
 
-    displayPins: function(origin) {
+    displayPins: function() {
         for(var b in Engine.buildingsList) {
             if(!Engine.buildingsList.hasOwnProperty(b)) continue;
             var data = Engine.buildingsList[b];
             var pct = Utils.tileToPct(data.x,data.y);
-            var dx = (pct.x - origin.x)*this.width;
-            var dy = (pct.y - origin.y)*this.height;
+            var dx = (pct.x - this.originX)*this.width;
+            var dy = (pct.y - this.originY)*this.height;
             var pin = this.pins[this.nextPin++];
             pin.setUp(this.x+dx,this.y+dy,Engine.buildingsData[data.type].name);
         }
@@ -113,7 +124,7 @@ var Map = new Phaser.Class({
     },
 
     hidePins: function(){
-        this.nextPin = 1;
+        this.resetCounter();
         this.pins.forEach(function(p){
             p.setVisible(false);
         });
@@ -137,15 +148,13 @@ var Pin = new Phaser.Class({
     setUp: function(x,y,name,texture){
         if(texture) this.setTexture(texture);
         this.setPosition(x,y);
-        this.initialX = x;
-        this.initialY = y;
         this.name = name;
         this.setVisible(true);
     },
 
     handleOver: function(){
-        if(Math.abs(this.x - this.initialX) > this.mask.bitmapMask.width/2) return;
-        if(Math.abs(this.y - this.initialY) > this.mask.bitmapMask.height/2) return;
+        if(Math.abs(this.x - this.mask.bitmapMask.x) > this.mask.bitmapMask.width/2) return;
+        if(Math.abs(this.y - this.mask.bitmapMask.y) > this.mask.bitmapMask.height/2) return;
         Engine.tooltip.updateInfo(this.name);
         Engine.tooltip.display();
     },
