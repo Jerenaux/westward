@@ -41,7 +41,6 @@ var Building = new Phaser.Class({
             spriteX = this.tileX - Math.ceil((data.width/2)/World.tileWidth);
             spriteY = this.tileY - Math.ceil((data.height/2)/World.tileHeight);
             this.setDepth(Engine.buildingsDepth + this.tileY/1000);
-            console.log(this.depth);
         }else{
             this.setDisplayOrigin(0);
             this.setDepth(Engine.buildingsDepth + (this.tileY+((data.height/2)/32))/1000);

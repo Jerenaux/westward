@@ -33,6 +33,7 @@ var Map = new Phaser.Class({
 
         this.pins = [];
         this.nextPin = 1; // the 0th pin is used for clicks
+        this.clickedTile = null;
     },
 
     handleDrag: function(x,y){
@@ -64,12 +65,8 @@ var Map = new Phaser.Class({
     addRedPin: function(x,y){
         this.pins[0].setUp(x,y,'New building?','redpin');
         Engine.currentMenu.panels['buildings'].display();
-
-        var dx = x - this.x;
-        var dy = y - this.y;
-        var pct = Utils.tileToPct(this.x+dx,this.y+dy);
-        var tile = Utils.pctToTile(pct.x,pct.y);
-        console.log(tile);
+        this.clickedTile = Utils.screenToMap(x,y,this);
+        //if(Engine.collisions.get(tile.y,tile.x) == 1) console.log('collision');
     },
 
     addPins: function(nb){

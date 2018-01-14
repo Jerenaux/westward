@@ -15,6 +15,7 @@
     "sprite": "fort",
     "name":"Fort",
     "mainMenu": "fort",
+    "recipe": {"3":50},
     "entry": {
       "x": 6,
       "y": 5
@@ -34,6 +35,7 @@
     "height": 425,
     "sprite": "tradepost",
     "name":"Trade Post",
+    "recipe": {"3":40},
     "entry": {
       "x": 4,
       "y": 4
@@ -53,6 +55,7 @@
     "width": 535,
     "height": 465,
     "sprite": "inn",
+    "recipe": {"3":60},
     "name":"Inn"
   },
   "3":{
@@ -67,6 +70,7 @@
     "width": 488,
     "height": 500,
     "sprite": "tower",
+    "recipe": {"3":60},
     "name":"Tower"
   }
 }

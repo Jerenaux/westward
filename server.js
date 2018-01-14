@@ -86,6 +86,10 @@ io.on('connection',function(socket){
             gs.handleUse(data,socket.id);
         });
 
+        socket.on('build',function(data){
+            gs.handleBuild(data,socket.id);
+        });
+
         socket.on('unequip',function(data){
             gs.handleUnequip(data,socket.id);
         });
@@ -142,16 +146,9 @@ server.sendInitializationPacket = function(socket,packet){
     socket.emit('init',packet);
 };
 
-
 server.sendUpdate = function(socketID,pkg){
     pkg = server.addStamp(pkg);
     pkg.latency = Math.floor(server.getSocket(socketID).latency);
-    /*try{
-        pkg.latency = Math.floor(server.getSocket(socketID).latency);
-    }catch(e){
-        console.log(e);
-        pkg.latency = 0;
-    }*/
     //if(server.enableBinary) pkg = Encoder.encode(pkg,CoDec.finalUpdateSchema);
     if(pkg) io.in(socketID).emit('update',pkg);
 };
@@ -182,4 +179,8 @@ server.quickMedian = function(arr){ // Compute the median of an array using the 
 
 server.sendID = function(socket,playerID){
     socket.emit('pid',playerID);
+};
+
+server.sendError = function(socketID){
+    io.in(socketID).emit('error');
 };

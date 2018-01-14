@@ -233,17 +233,38 @@ GameServer.handleCraft = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var targetItem = data.id;
     var nb = data.nb;
+    var building = GameServer.itemsData[targetItem].building;
+    if(building) return;
     var recipe = GameServer.itemsData[targetItem].recipe;
     if(!GameServer.allIngredientsOwned(player,recipe,nb)) return;
-    var building = GameServer.itemsData[targetItem].building;
-    if(building >= 0){
-        console.log(GameServer.canBuild(player,building));
-    }else {
-        GameServer.operateCraft(player, recipe, targetItem, nb);
+    GameServer.operateCraft(player, recipe, targetItem, nb);
+};
+
+GameServer.handleBuild = function(data,socketID){
+    var bid = data.id;
+    var tile = data.tile;
+    console.log('builing request',bid,tile);
+    if(GameServer.canBuild(bid,tile)){
+
+    }else{
+        GameServer.server.sendError(socketID);
     }
 };
 
-GameServer.canBuild = function(player,building){
+GameServer.canBuild = function(bid,tile){
+    var data = GameServer.buildingsData[bid];
+    // TODO: store somewhere
+    var shape = [];
+    for(var i = 0; i < data.shape.length; i+=2){
+        shape.push({
+            x: data.shape[i],
+            y: data.shape[i+1]
+        });
+    }
+    return PFUtils.collisionsFromShape(shape,tile.x,tile.y,data.width,data.height,GameServer.collisions,true);
+};
+
+/*GameServer.canBuild = function(player,building){
     var data = GameServer.buildingsData[building];
     var w = Math.ceil(data.width/32);
     var h = Math.ceil(data.height/32);
@@ -260,7 +281,7 @@ GameServer.canBuild = function(player,building){
         });
     }
     return PFUtils.collisionsFromShape(shape,x,y,data.width,data.height,GameServer.collisions,true);
-};
+};*/
 
 GameServer.allIngredientsOwned = function(player,recipe,nb){
     for(var item in recipe){

@@ -313,8 +313,11 @@ Engine.makeFortMenu = function(){
     var buildings = new InventoryPanel(100,100,180,200,'Buildings');
     buildings.setInventory(Engine.player.buildingRecipes,3,false,Engine.newbuildingClick);
     fort.addPanel('buildings',buildings,true);
-    var confirm = new NewbuildingPanel(100, 300, 180, 100);
+    var confirm = new NewbuildingPanel(100, 300, 180, 170);
     fort.addPanel('confirm',confirm,true); // true = hide on menu open
+    var ingredients = new InventoryPanel(130,385,50,50,'',true); // true = invisible
+    ingredients.setInventory(new Inventory(2),2,true);
+    fort.addPanel('ingredients',ingredients,true);
     return fort;
 };
 
@@ -928,6 +931,10 @@ Engine.sellClick = function(){
 
 Engine.buyClick = function(){
     Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
+};
+
+Engine.buildError = function(){
+    Engine.currentMenu.panels['confirm'].displayError();
 };
 
 Engine.leaveBuilding = function(){

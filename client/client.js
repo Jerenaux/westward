@@ -89,6 +89,10 @@ Client.setLocalData = function(id){ // store the player ID in localStorage
     localStorage.setItem('idStamp',Date.now());
 };
 
+Client.socket.on('error',function(){
+    Engine.buildError();
+});
+
 /// ##### SENDERS ######
 
 Client.requestData = function(){ // request the data to be used for initWorld()
@@ -121,6 +125,10 @@ Client.sendUnequip = function(slot,subslot){
 
 Client.sendExit = function(){
     Client.socket.emit('exit');
+};
+
+Client.sendBuild = function(id,tile){
+    Client.socket.emit('build',{id:id,tile:tile});
 };
 
 

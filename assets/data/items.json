@@ -23,8 +23,7 @@
     "atlas": "buildings",
     "frame":"miniWarehouse",
     "name": "Tradepost",
-    "building":1,
-    "recipe": {"3":50}
+    "building":1
   },
   "5":{
     "atlas": "items2",
@@ -42,15 +41,13 @@
     "atlas": "buildings",
     "frame":"miniInn",
     "name": "Inn",
-    "building":2,
-    "recipe": {"3":50}
+    "building":2
   },
   "8":{
     "atlas": "buildings",
     "frame":"smallTower",
     "name": "Tower",
-    "building":3,
-    "recipe": {"3":50}
+    "building":3
   },
   "9":{
     "atlas": "items2",
