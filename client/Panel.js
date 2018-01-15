@@ -18,6 +18,7 @@ Panel.prototype.addCapsule = function(name,x,y,text,icon){
 };
 
 Panel.prototype.updateCapsule = function(name,text){
+    if(text === undefined) text = 'undefined';
     this.capsules[name].setText(text);
 };
 

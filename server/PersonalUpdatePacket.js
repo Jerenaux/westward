@@ -11,12 +11,21 @@ function PersonalUpdatePacket(){
 }
 
 PersonalUpdatePacket.prototype.isEmpty = function(){
-    if(this.items.length > 0) return false;
+    /*if(this.items.length > 0) return false;
     if(this.stats.length > 0) return false;
     if(this.equipment.length > 0) return false;
     if(this.ammo.length > 0) return false;
     if(this.pins.length > 0) return false;
     if(this.gold !== undefined) return false;
+    return true;*/
+    for(var field in this){
+        if(!this.hasOwnProperty(field)) continue;
+        if(this[field].constructor.name == 'Array'){
+            if(this[field].length > 0) return false;
+        }else if(this[field] !== undefined){
+            return false;
+        }
+    }
     return true;
 };
 

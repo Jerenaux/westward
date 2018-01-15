@@ -349,7 +349,8 @@ Engine.makeTradeMenu = function(){
         action.update();
     };
     trade.onUpdateShopGold = function(){
-        shop.updateCapsule('gold',Engine.currentBuiling.gold);
+        var gold = Engine.currentBuiling.gold || 0;
+        shop.updateCapsule('gold',gold);
         action.update();
     };
     return trade;

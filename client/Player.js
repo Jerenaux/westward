@@ -7,18 +7,9 @@ var Player = new Phaser.Class({
 
     initialize: function Player (x, y, texture, id) {
         // Using call(), the called method will be executed while having 'this' pointing to the first argumentof call()
-        //CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, texture);
         Moving.call(this,x,y,texture,id);
         this.setFrame(33);
         this.displayOriginX = 16;
-
-        /*var height = 100;
-        var width = 300;
-        var py = Engine.baseViewHeight*Engine.tileHeight - height;
-        this.panel = new Panel(0,py+height,width,height,'Player name');
-        this.panel.addRing(260,-10,'red','close',Engine.togglePanel.bind(this));
-        this.panel.setTweens(0,py+height,0,py,300);
-        this.handleClick = Engine.togglePanel.bind(this);*/
 
         this.bubbleOffsetX = 55;
         this.bubbleOffsetY = 75;
