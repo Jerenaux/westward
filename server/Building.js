@@ -8,6 +8,10 @@ var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
 
 function Building(x,y,type,settlement,stock,gold,prices){
+    stock = stock || {};
+    gold = gold || 0;
+    prices = prices || {};
+
     this.id = GameServer.lastBuildingID++;
     this.x = x;
     this.y = y;
@@ -115,11 +119,13 @@ Building.prototype.addCollisions = function(){
         });
     }
 
-    var center = false;
+    var center = true;
     var spriteX, spriteY;
     if(center){
-        spriteX = Math.floor((this.x*32 - data.width/2)/32);
-        spriteY = Math.floor((this.y*32 - data.height/2)/32);
+        //spriteX = Math.floor((this.x*32 - data.width/2)/32);
+        //spriteY = Math.floor((this.y*32 - data.height/2)/32);
+        spriteX = this.x - Math.ceil((data.width/2)/World.tileWidth);
+        spriteY = this.y - Math.ceil((data.height/2)/World.tileHeight);
     }else{
         spriteX = this.x;
         spriteY = this.y;

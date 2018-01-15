@@ -247,6 +247,7 @@ GameServer.handleBuild = function(data,socketID){
     console.log('builing request',bid,tile);
     if(GameServer.canBuild(bid,tile)){
         GameServer.build(bid,tile,player.settlement);
+        GameServer.server.sendMsg(player,'okbuild');
     }else{
         GameServer.server.sendMsg(player,'nobuild');
     }
@@ -266,7 +267,7 @@ GameServer.canBuild = function(bid,tile){
 };
 
 GameServer.build = function(bid,tile,settlement){
-    var building = new Building(tile.x,tile.y,bid,settlement,{},0,{});
+    var building = new Building(tile.x,tile.y,bid,settlement);
     GameServer.buildings[building.id] = building;
     GameServer.buildingsList[building.id] = building.superTrim();
     GameServer.server.db.collection('buildings').insertOne(building,function(err){

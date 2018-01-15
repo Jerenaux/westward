@@ -44,6 +44,9 @@ Engine.preload = function() {
 
     this.load.image('fort', 'assets/sprites/buildings/fort.png');
     this.load.image('tradepost', 'assets/sprites/buildings/tradepost.png');
+    this.load.image('inn', 'assets/sprites/buildings/inn.png');
+    this.load.image('tower', 'assets/sprites/buildings/tower.png');
+    //this.load.image('foundations', 'assets/sprites/buildings/foundations.png');
     this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
@@ -671,6 +674,21 @@ Engine.updateSelf = function(data){
         }
         Engine.updateMenus('pins');
     }
+    if(data.msgs){
+        for(var i = 0; i < data.msgs.length; i++){
+            Engine.handleMsg(data.msgs[i]);
+        }
+    }
+};
+
+Engine.handleMsg = function(msg){
+    switch(msg){
+        case 'nobuild':
+            Engine.buildError();
+            break;
+        case 'okbuild':
+            Engine.buildSuccess();
+    }
 };
 
 Engine.updateAmmo = function(slot,nb){
@@ -943,6 +961,13 @@ Engine.buyClick = function(){
 
 Engine.buildError = function(){
     Engine.currentMenu.panels['confirm'].displayError();
+};
+
+Engine.buildSuccess = function(){
+    Engine.currentMenu.panels['buildings'].hide();
+    Engine.currentMenu.panels['confirm'].hide();
+    Engine.currentMenu.panels['ingredients'].hide();
+    Engine.currentMenu.panels['map'].map.hideRedPin();
 };
 
 Engine.leaveBuilding = function(){

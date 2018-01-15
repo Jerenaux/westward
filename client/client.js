@@ -89,10 +89,6 @@ Client.setLocalData = function(id){ // store the player ID in localStorage
     localStorage.setItem('idStamp',Date.now());
 };
 
-Client.socket.on('error',function(){
-    Engine.buildError();
-});
-
 
 /// ##### SENDERS ######
 

@@ -8,16 +8,10 @@ function PersonalUpdatePacket(){
     this.equipment = [];
     this.ammo = [];
     this.pins = [];
+    this.msgs = [];
 }
 
 PersonalUpdatePacket.prototype.isEmpty = function(){
-    /*if(this.items.length > 0) return false;
-    if(this.stats.length > 0) return false;
-    if(this.equipment.length > 0) return false;
-    if(this.ammo.length > 0) return false;
-    if(this.pins.length > 0) return false;
-    if(this.gold !== undefined) return false;
-    return true;*/
     for(var field in this){
         if(!this.hasOwnProperty(field)) continue;
         if(this[field].constructor.name == 'Array'){
@@ -30,11 +24,18 @@ PersonalUpdatePacket.prototype.isEmpty = function(){
 };
 
 PersonalUpdatePacket.prototype.clean = function() { // Remove empty arrays from the package
-    if(Object.keys(this.items).length == 0) this.items = undefined;
+    /*if(Object.keys(this.items).length == 0) this.items = undefined;
     if(this.stats.length == 0) this.stats = undefined;
     if(this.equipment.length == 0) this.equipment = undefined;
     if(this.ammo.length == 0) this.ammo = undefined;
     if(this.pins.length == 0) this.pins = undefined;
+    return this;*/
+    for(var field in this){
+        if(!this.hasOwnProperty(field)) continue;
+        if(this[field].constructor.name == 'Array'){
+            if(this[field].length == 0) this[field] = undefined;
+        }
+    }
     return this;
 };
 
@@ -48,7 +49,6 @@ PersonalUpdatePacket.prototype.updateGold = function(nb) {
 };
 
 PersonalUpdatePacket.prototype.addItem = function(item,nb){
-    //this.items.push({item:item,nb:nb});
     this.items.push([item,nb]);
 };
 
@@ -68,5 +68,8 @@ PersonalUpdatePacket.prototype.addBuildingPin = function(data){
     this.pins.push(data);
 };
 
+PersonalUpdatePacket.prototype.addMsg = function(msg){
+    this.msgs.push(msg);
+};
 
 module.exports.PersonalUpdatePacket = PersonalUpdatePacket;

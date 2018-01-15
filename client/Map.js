@@ -128,6 +128,10 @@ var Map = new Phaser.Class({
         this.pins.forEach(function(p){
             p.setVisible(false);
         });
+    },
+
+    hideRedPin: function(){
+        this.pins[0].setVisible(false);
     }
 });
 

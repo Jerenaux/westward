@@ -181,10 +181,6 @@ server.sendID = function(socket,playerID){
     socket.emit('pid',playerID);
 };
 
-/*server.sendError = function(socketID){
-    io.in(socketID).emit('error');
-};*/
-
 server.sendMsg = function(player,msg){
     player.updatePacket.addMsg(msg);
 };
