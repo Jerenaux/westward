@@ -111,6 +111,8 @@ Engine.create = function(masterData){
     Engine.mapDataCache = {};
 
     Engine.battleZones = new SpaceMap();
+    Engine.availableGridCells = [];
+    Engine.displayedCells = [];
 
     Engine.players = {}; // player.id -> player object
     Engine.animals = {}; // animal.id -> building object
@@ -267,7 +269,6 @@ Engine.makeBuildingTitle = function(){
 Engine.makeUI = function(){
     Engine.UIHolder = new UIHolder(1000,500,'right');
     Engine.UIHolder.resize(115);
-    Engine.UIHolder.display();
 
     Engine.makeBuildingTitle();
 
@@ -297,6 +298,7 @@ Engine.makeUI = function(){
     map.setVisible(false);
     UIelements.push(coin);
     UIelements.push(map);
+    Engine.UIelements = UIelements;
 
     Engine.menus['trade'].setIcon(coin);
     Engine.menus['fort'].setIcon(map);
@@ -312,6 +314,48 @@ Engine.makeUI = function(){
         }
     );
     Engine.tooltip = new Tooltip();
+
+    Engine.fightText = Engine.scene.add.text(Engine.scene.game.config.width/2,50, 'Fight!',  { font: '45px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    Engine.fightText.setOrigin(0.5);
+    Engine.fightText.setScrollFactor(0);
+    Engine.fightText.setDepth(Engine.UIDepth+3);
+    Engine.fightText.setScale(10);
+    Engine.fightText.setVisible(false);
+
+    Engine.fightText.tween = Engine.scene.tweens.add(
+        {
+            targets: Engine.fightText,
+            scaleX: 1,
+            scaleY: 1,
+            duration: 100,
+            paused: true,
+            onStart: function(){
+                Engine.fightText.setVisible(true);
+            },
+            onComplete: function(){
+                setTimeout(function(){
+                    Engine.fightText.setVisible(false);
+                    Engine.fightText.setScale(10);
+                },1000);
+            }
+        }
+    );
+
+    Engine.displayUI();
+};
+
+Engine.displayUI = function(){
+    Engine.UIHolder.display();
+    for(var i = 0; i < 3; i++){
+        Engine.UIelements[i].setVisible(true);
+    }
+};
+
+Engine.hideUI = function(){
+    Engine.UIHolder.hide();
+    for(var i = 0; i < 3; i++){
+        Engine.UIelements[i].setVisible(false);
+    }
 };
 
 Engine.makeFortMenu = function(){
@@ -454,6 +498,10 @@ Engine.updateDisplayedEntities = function(){
     Engine.updateDisplay(Engine.displayedPlayers,Engine.players,adjacent,Engine.removePlayer);
     Engine.updateDisplay(Engine.displayedBuildings,Engine.buildings,adjacent,Engine.removeBuilding);
     Engine.updateDisplay(Engine.displayedAnimals,Engine.animals,adjacent,Engine.removeAnimal);
+
+    Engine.displayedCells.forEach(function(cell){
+        if(adjacent.indexOf(cell.v.chunk) == -1) Engine.removeCell(cell.v);
+    });
 };
 
 // Check if the entities of some list are in a neighboring chunk or not
@@ -685,6 +733,9 @@ Engine.updateSelf = function(data){
             Engine.handleMsg(data.msgs[i]);
         }
     }
+    if(data.remainingTime){
+        console.log('It is your turn and you have',data.remainingTime,'seconds left');
+    }
 };
 
 Engine.handleMsg = function(msg){
@@ -795,8 +846,8 @@ Engine.isHero = function(player){
 
 Engine.updatePlayer = function(player,data){ // data contains the updated data from the server
     if(data.path && player.id != Engine.player.id) player.move(data.path);
-    if(data.inFight == true) player.displayHalo();
-    if(data.inFight == false) player.hideHalo();
+    if(data.inFight == true) Engine.startFight(player);
+    if(data.inFight == false) Engine.endFight(player);
     if(data.inBuilding > -1) {
         player.setVisible(false);
         player.inBuilding = data.inBuilding;
@@ -814,8 +865,8 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
 
 Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server
     if(data.path) animal.move(data.path);
-    if(data.inFight == true) animal.displayHalo();
-    if(data.inFight == false) animal.hideHalo();
+    if(data.inFight == true) Engine.startFight(animal);
+    if(data.inFight == false) Engine.endFight(animal);
     if(data.battlezone){
         Engine.manageBattleZones(animal, data.battlezone);
     }
@@ -872,6 +923,7 @@ Engine.removePlayer = function(id){
 
 Engine.removeAnimal = function(id){
     var sprite = Engine.animals[id];
+    if(sprite.halo) sprite.halo.destroy();
     sprite.destroy();
     Engine.displayedAnimals.delete(id);
     delete Engine.animals[id];
@@ -934,35 +986,14 @@ Engine.exitBuilding = function(){
 Engine.startBattle = function(a,b) {
     // Assumes for now that a is the player (hero) and b an animal
     Client.startBattle(b.id);
-
-    /*var tl = {x: null, y: null};
-    if (a.tileX <= b.tileX && a.tileY <= b.tileY) {
-        tl.x = a.tileX;
-        tl.y = a.tileY;
-    } else if (a.tileX <= b.tileX && a.tileY > b.tileY) {
-        tl.x = a.tileX;
-        tl.y = b.tileY;
-    }else if(a.tileX > b.tileX && a.tileY <= b.tileY){
-        tl.x = b.tileX;
-        tl.y = a.tileY;
-    }else if(a.tileX > b.tileX && a.tileY > b.tileY){
-        tl.x = b.tileX;
-        tl.y = b.tileY;
-    }
-
-    if(a.tileX == b.tileX) tl.x -= 1;
-    if(a.tileY == b.tileY) tl.y -= 1;
-
-    var w = Math.max(Math.abs(a.tileX - b.tileX)+1,3);
-    var h = Math.max(Math.abs(a.tileY - b.tileY)+1,3);
-    Engine.drawGrid(tl,w,h);*/
 };
 
-Engine.getGridFrame = function(x,y,grid){
-    var hasleft = +grid.get(x-1,y);
-    var hasright = +grid.get(parseInt(x)+1,y);
-    var hastop = +grid.get(x,y-1);
-    var hasbottom = +grid.get(x,parseInt(y)+1);
+Engine.getGridFrame = function(x,y){
+    var grid = Engine.battleZones;
+    var hasleft = grid.has(x-1,y);
+    var hasright = grid.has(parseInt(x)+1,y);
+    var hastop = grid.has(x,y-1);
+    var hasbottom = grid.has(x,parseInt(y)+1);
     var row, col;
 
     if(hastop && !hasbottom){
@@ -989,43 +1020,82 @@ Engine.isBattlezone = function(x,y){
     return Engine.battleZones.get(x,y);
 };
 
+Engine.getNextCell = function(){
+    if(Engine.availableGridCells.length > 0) return Engine.availableGridCells.shift();
+    var cell = Engine.scene.add.sprite(0,0,'redgrid',0);
+    cell.setDepth(Engine.markerDepth);
+    cell.setDisplayOrigin(0,0);
+    return cell;
+};
+
 Engine.drawGrid = function(tl,w,h){
-    var grid = new SpaceMap();
     for(var x = tl.x; x < tl.x+w; x++){
         for(var y = tl.y; y < tl.y+h; y++){
             if(!Engine.checkCollision({x:x,y:y}) && !Engine.isBattlezone(x,y)) {
-                grid.add(x,y,true);
-                Engine.battleZones.add(x,y,true);
+                var cell = Engine.getNextCell();
+                cell.setPosition(x*32,y*32);
+                cell.chunk = Utils.tileToAOI({x:x,y:y});
+                cell.tx = x;
+                cell.ty = y;
+                cell.setVisible(true);
+                Engine.battleZones.add(x,y,cell);
             }
         }
     }
+};
 
-    var cells = grid.toList();
-    var tiles = [];
-    cells.forEach(function(c){
-        var frame = Engine.getGridFrame(c.x,c.y,grid);
-        tiles.push(Engine.scene.add.sprite(c.x*32,c.y*32,'redgrid',frame));
-    });
+Engine.removeGrid = function(tl,w,h) {
+    for(var x = tl.x; x < tl.x+w; x++){
+        for(var y = tl.y; y < tl.y+h; y++){
+            var cell = Engine.isBattlezone(x,y);
+            if(cell) Engine.removeCell(cell);
+        }
+    }
+};
 
-    tiles.forEach(function(t){
-        t.setDepth(Engine.markerDepth);
-        t.setDisplayOrigin(0,0);
-    });
+Engine.removeCell = function(cell){
+    cell.setVisible(false);
+    Engine.availableGridCells.push(cell);
+    Engine.battleZones.delete(cell.tx,cell.ty);
 };
 
 Engine.manageBattleZones = function(entity,zone){
-
-    if(zone.length == 0){ // remove
-        // TODO: remove grid
+    if(zone.length == 0 && entity.battlezone.length > 0){ // remove
+        for(var i = 0; i < entity.battlezone.length; i++) {
+            var rect = entity.battlezone[i];
+            Engine.removeGrid({x:rect.x,y:rect.y},rect.w,rect.h);
+        }
     }else{
         for(var i = 0; i < zone.length; i++){
             var rect = zone[i];
             Engine.drawGrid({x:rect.x,y:rect.y},rect.w,rect.h);
         }
-        // TODO: keep track of already displayed zones and adapt shapes
+    }
+    entity.battlezone = zone;
+
+    Engine.displayedCells = Engine.battleZones.toList();
+    Engine.displayedCells.forEach(function(cell){
+        var frame = Engine.getGridFrame(cell.x,cell.y);
+        //console.log(frame);
+        cell.v.setFrame(frame);
+    });
+};
+
+Engine.startFight = function(entity){
+    //entity.displayHalo();
+    entity.inFight = true;
+
+    if(entity.isHero) {
+        Engine.hideUI();
+        Engine.fightText.tween.play();
     }
 };
 
+Engine.endFight = function(entity){
+    //entity.hideHalo();
+    entity.inFight = false;
+    if(entity.isHero) Engine.displayUI();
+};
 
 // ## UI-related functions ##
 // this functions need to have a this bound to them

@@ -22,6 +22,12 @@ SpaceMap.prototype.get = function(x,y){
     return this[x][y];
 };
 
+SpaceMap.prototype.has = function(x,y){
+    if(!this.hasOwnProperty(x)) return false;
+    if(!this[x].hasOwnProperty(y)) return false;
+    return true;
+};
+
 SpaceMap.prototype.delete = function(x,y){
     if(!this.hasOwnProperty(x)) return;
     if(!this[x].hasOwnProperty(y)) return;

@@ -120,3 +120,7 @@ UIHolder.prototype.hide = function(){
     });
     this.text.setVisible(false);
 };
+
+UIHolder.prototype.getChildren = function(){
+    return [this.text].concat(this.slices);
+};

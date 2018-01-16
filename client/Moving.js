@@ -25,12 +25,13 @@ var Moving = new Phaser.Class({
         this.orientation = 'down';
         this.previousOrientation = this.orientation;
         this.movement = null;
+        this.battlezone = [];
 
         this.setInteractive();
         //console.log('['+this.constructor.name+'] scene : ',this.scene);
 
         this.halo = Engine.scene.add.image(0,0,'battlehalo');
-        this.halo.setDepth(2);
+        this.halo.setDepth(Engine.markerDepth+0.1);
         this.halo.setVisible(false);
         this.displayedHalo = false;
         this.updateHalo();

@@ -3,7 +3,7 @@
  */
 var GameServer = require('./GameServer.js').GameServer;
 
-var TURN_DURATION = 3; // 30
+var TURN_DURATION = 5 // 30
 
 function Battle(f1,f2){
     this.id = GameServer.lastBattleID++;
@@ -66,7 +66,11 @@ Battle.prototype.newTurn = function(){
     this.fighters.push(this.fighters.shift());
     this.countdown = TURN_DURATION;
     console.log('[B'+this.id+'] It is now '+(this.fighters[0].constructor.name)+'\'s turn');
-    // TODO notify client onf turn change
+
+    for(var i = 0; i < this.fighters.length; i++){
+        var f = this.fighters[i];
+        if(i == 0 && f.constructor.name == 'Player') f.updatePacket.remainingTime = this.countdown;
+    };
 };
 
 Battle.prototype.update = function(){

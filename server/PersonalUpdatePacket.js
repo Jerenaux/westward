@@ -14,7 +14,7 @@ function PersonalUpdatePacket(){
 PersonalUpdatePacket.prototype.isEmpty = function(){
     for(var field in this){
         if(!this.hasOwnProperty(field)) continue;
-        if(this[field].constructor.name == 'Array'){
+        if(this[field] && this[field].constructor.name == 'Array'){
             if(this[field].length > 0) return false;
         }else if(this[field] !== undefined){
             return false;
@@ -24,12 +24,6 @@ PersonalUpdatePacket.prototype.isEmpty = function(){
 };
 
 PersonalUpdatePacket.prototype.clean = function() { // Remove empty arrays from the package
-    /*if(Object.keys(this.items).length == 0) this.items = undefined;
-    if(this.stats.length == 0) this.stats = undefined;
-    if(this.equipment.length == 0) this.equipment = undefined;
-    if(this.ammo.length == 0) this.ammo = undefined;
-    if(this.pins.length == 0) this.pins = undefined;
-    return this;*/
     for(var field in this){
         if(!this.hasOwnProperty(field)) continue;
         if(this[field].constructor.name == 'Array'){

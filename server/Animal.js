@@ -49,7 +49,7 @@ Animal.prototype.onArrival = function(){
 };
 
 Animal.prototype.updateIdle = function(){
-    return;
+    if(this.inFight) return;
     this.idleTime -= GameServer.server.npcUpdateRate;
     if(this.idleTime <= 0){
         var dest = this.findRandomDestination();

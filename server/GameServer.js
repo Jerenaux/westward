@@ -56,10 +56,10 @@ GameServer.readMap = function(mapsPath){
     GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()));
 
     GameServer.startArea = {
-        minx: 524, //537,
-        maxx: 535, //543,
-        miny: 669, //690,
-        maxy: 677 //694
+        minx: 523, //537,
+        maxx: 537, //543,
+        miny: 655, //690,
+        maxy: 661 //694
     };
 
     GameServer.itemsData = JSON.parse(fs.readFileSync('./assets/data/items.json').toString());
@@ -199,6 +199,7 @@ GameServer.findPath = function(from,to){
 GameServer.handleBattle = function(opponentID,socketID){
     var player = GameServer.getPlayer(socketID);
     var animal = GameServer.animals[opponentID];
+    if(player.inFight) return;
     // TODO: check for proximity
     new Battle(animal,player);
 };
