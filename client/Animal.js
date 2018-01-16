@@ -27,6 +27,6 @@ var Animal = new Phaser.Class({
     },
 
     handleClick: function(){
-        Client.startBattle(this.id);
+        Engine.startBattle(Engine.player,this);
     }
 });

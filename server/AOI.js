@@ -19,7 +19,7 @@ AOI.prototype.clear = function(){
     this.updatePacket = new UpdatePacket();
 };
 
-AOI.prototype.addEntity = function(entity,previous){
+AOI.prototype.addEntity = function(entity){
     //console.log('[AOI '+this.id+'] Added '+entity.constructor.name+' '+entity.id);
     this.entities.push(entity);
     //if(entity.constructor.name == 'Player') GameServer.server.addToRoom(entity.socketID,'AOI'+this.id);

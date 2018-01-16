@@ -68,6 +68,7 @@ Engine.preload = function() {
     this.load.image('pin', 'assets/sprites/pin.png');
     this.load.image('redpin', 'assets/sprites/redpin.png');
     this.load.spritesheet('grid', 'assets/sprites/grid.png',{frameWidth:32,frameHeight:32});
+    this.load.spritesheet('redgrid', 'assets/sprites/redgrid.png',{frameWidth:32,frameHeight:32});
 
 
     this.load.json('buildings', 'assets/data/buildings.json');
@@ -108,6 +109,8 @@ Engine.create = function(masterData){
     Engine.chunks = {}; // holds references to the Containers containing the chunks
     Engine.displayedChunks = [];
     Engine.mapDataCache = {};
+
+    Engine.battleZones = new SpaceMap();
 
     Engine.players = {}; // player.id -> player object
     Engine.animals = {}; // animal.id -> building object
@@ -522,68 +525,9 @@ Engine.handleClick = function(event){
     }else{
         if(!Engine.inMenu) {
             if(Engine.inPanel) Engine.currentPanel.hide();
-            //Engine.moveToClick(event);
-            Engine.drawGrid(event);
+            Engine.moveToClick(event);
         }
     }
-};
-
-Engine.getGridFrame = function(x,y,grid){
-    var hasleft = +grid.get(x-1,y);
-    var hasright = +grid.get(x+1,y);
-    var hastop = +grid.get(x,y-1);
-    var hasbottom = +grid.get(x,y+1);
-    var row, col;
-
-    if(hastop && !hasbottom){
-        row = 2;
-    }else if(!hastop && hasbottom){
-        row = 0;
-    }else{
-        row = 1;
-    }
-
-    if(hasleft && !hasright){
-        col = 2
-    }else if(!hasleft && hasright){
-        col = 0;
-    }else{
-        col = 1;
-    }
-
-    console.log(x,y,col,row,hasleft,hasright,hastop,hasbottom);
-    return Utils.gridToLine(col,row,5);
-};
-
-Engine.drawGrid = function(event){
-    var tile = Engine.getMouseCoordinates(event).tile;
-    var tiles = [];
-    var w = 1;
-    var sx = tile.x - w;
-    var sy = tile.y - w;
-    var ex = tile.x + w;
-    var ey = tile.y + w;
-
-    var grid = new SpaceMap();
-    for(var x = sx; x < ex; x++){
-        for(var y = sy; y < ey; y++){
-            if(!Engine.checkCollision({x:x,y:y})) grid.add(x,y,true);
-        }
-    }
-    console.log(grid);
-
-    var cells = grid.toList();
-    cells.forEach(function(c){
-        var frame = Engine.getGridFrame(c.x,c.y,grid);
-        console.log(frame);
-        tiles.push(Engine.scene.add.sprite(c.x*32,c.y*32,'grid',frame));
-    });
-
-    tiles.forEach(function(t){
-        t.setDepth(Engine.markerDepth);
-        t.setDisplayOrigin(0,0);
-        t.setAlpha(0.4);
-    });
 };
 
 Engine.handleOver = function(event){
@@ -693,6 +637,7 @@ Engine.showMarker = function(){
     Engine.marker.visible = true;
 };
 
+// Return true if there is a collision on that tile
 Engine.checkCollision = function(tile){ // tile is x, y pair
     //if(Engine.displayedChunks.length < 4) return; // If less than 4, it means that wherever you are the chunks haven't finished displaying
     if(!Engine.collisions[tile.y]) return false;
@@ -862,12 +807,18 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
         player.inBuilding = data.inBuilding;
         if(Engine.isHero(player)) Engine.exitBuilding();
     }
+    if(data.battlezone){
+        Engine.manageBattleZones(player,data.battlezone);
+    }
 };
 
 Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server
     if(data.path) animal.move(data.path);
     if(data.inFight == true) animal.displayHalo();
     if(data.inFight == false) animal.hideHalo();
+    if(data.battlezone){
+        Engine.manageBattleZones(animal, data.battlezone);
+    }
 };
 
 Engine.updateBuilding = function(building,data){ // data contains the updated data from the server
@@ -979,6 +930,102 @@ Engine.exitBuilding = function(){
     }
     Engine.UIHolder.resize(115);
 };
+
+Engine.startBattle = function(a,b) {
+    // Assumes for now that a is the player (hero) and b an animal
+    Client.startBattle(b.id);
+
+    /*var tl = {x: null, y: null};
+    if (a.tileX <= b.tileX && a.tileY <= b.tileY) {
+        tl.x = a.tileX;
+        tl.y = a.tileY;
+    } else if (a.tileX <= b.tileX && a.tileY > b.tileY) {
+        tl.x = a.tileX;
+        tl.y = b.tileY;
+    }else if(a.tileX > b.tileX && a.tileY <= b.tileY){
+        tl.x = b.tileX;
+        tl.y = a.tileY;
+    }else if(a.tileX > b.tileX && a.tileY > b.tileY){
+        tl.x = b.tileX;
+        tl.y = b.tileY;
+    }
+
+    if(a.tileX == b.tileX) tl.x -= 1;
+    if(a.tileY == b.tileY) tl.y -= 1;
+
+    var w = Math.max(Math.abs(a.tileX - b.tileX)+1,3);
+    var h = Math.max(Math.abs(a.tileY - b.tileY)+1,3);
+    Engine.drawGrid(tl,w,h);*/
+};
+
+Engine.getGridFrame = function(x,y,grid){
+    var hasleft = +grid.get(x-1,y);
+    var hasright = +grid.get(parseInt(x)+1,y);
+    var hastop = +grid.get(x,y-1);
+    var hasbottom = +grid.get(x,parseInt(y)+1);
+    var row, col;
+
+    if(hastop && !hasbottom){
+        row = 2;
+    }else if(!hastop && hasbottom){
+        row = 0;
+    }else{
+        row = 1;
+    }
+
+    if(hasleft && !hasright){
+        col = 2
+    }else if(!hasleft && hasright){
+        col = 0;
+    }else{
+        col = 1;
+    }
+
+    //console.log(x,y,col,row,hasleft,hasright,hastop,hasbottom);
+    return Utils.gridToLine(col,row,3);
+};
+
+Engine.isBattlezone = function(x,y){
+    return Engine.battleZones.get(x,y);
+};
+
+Engine.drawGrid = function(tl,w,h){
+    var grid = new SpaceMap();
+    for(var x = tl.x; x < tl.x+w; x++){
+        for(var y = tl.y; y < tl.y+h; y++){
+            if(!Engine.checkCollision({x:x,y:y}) && !Engine.isBattlezone(x,y)) {
+                grid.add(x,y,true);
+                Engine.battleZones.add(x,y,true);
+            }
+        }
+    }
+
+    var cells = grid.toList();
+    var tiles = [];
+    cells.forEach(function(c){
+        var frame = Engine.getGridFrame(c.x,c.y,grid);
+        tiles.push(Engine.scene.add.sprite(c.x*32,c.y*32,'redgrid',frame));
+    });
+
+    tiles.forEach(function(t){
+        t.setDepth(Engine.markerDepth);
+        t.setDisplayOrigin(0,0);
+    });
+};
+
+Engine.manageBattleZones = function(entity,zone){
+
+    if(zone.length == 0){ // remove
+        // TODO: remove grid
+    }else{
+        for(var i = 0; i < zone.length; i++){
+            var rect = zone[i];
+            Engine.drawGrid({x:rect.x,y:rect.y},rect.w,rect.h);
+        }
+        // TODO: keep track of already displayed zones and adapt shapes
+    }
+};
+
 
 // ## UI-related functions ##
 // this functions need to have a this bound to them

@@ -33,7 +33,7 @@ Animal.prototype.constructor = Animal;
 Animal.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','path','type','inFight']; // list of properties relevant for the client
+    var broadcastProperties = ['id','path','type','inFight','battlezone']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -49,6 +49,7 @@ Animal.prototype.onArrival = function(){
 };
 
 Animal.prototype.updateIdle = function(){
+    return;
     this.idleTime -= GameServer.server.npcUpdateRate;
     if(this.idleTime <= 0){
         var dest = this.findRandomDestination();

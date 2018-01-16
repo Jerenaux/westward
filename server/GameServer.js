@@ -56,10 +56,10 @@ GameServer.readMap = function(mapsPath){
     GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()));
 
     GameServer.startArea = {
-        minx: 537,
-        maxx: 543,
-        miny: 690,
-        maxy: 694
+        minx: 524, //537,
+        maxx: 535, //543,
+        miny: 669, //690,
+        maxy: 677 //694
     };
 
     GameServer.itemsData = JSON.parse(fs.readFileSync('./assets/data/items.json').toString());
@@ -178,9 +178,9 @@ GameServer.getAOIAt = function(x,y){
 GameServer.addAtLocation = function(entity){
     // Add some entity to all the data structures related to position (e.g. the AOI)
     GameServer.AOIs[entity.aoi].addEntity(entity,null);
-    // the "entities" of an AOI list what things are present in it; it's distinct from adding and object to an AOI
-    // (GameServer.addObjectToAOI() which actually adds the object to the update packages so that it can be created by
-    // the clients)
+    // the "entities" of an AOI list what entities are present in it; it's distinct from adding and object to an AOI
+    // using GameServer.addObjectToAOI(), which actually adds the object to the update packages so that it can be created by
+    // the clients (addObjectToAOI is called by GameServer.handleAOItransition)
 };
 
 GameServer.removeFromLocation = function(entity){
@@ -353,6 +353,7 @@ GameServer.handleExit = function(socketID){
 
 GameServer.handleAOItransition = function(entity,previous){
     // When something moves from one AOI to another (or appears inside an AOI), identify which AOIs should be notified and update them
+    // Miodel: update many, fetch one
     var AOIs = Utils.listAdjacentAOIs(entity.aoi);
     if(previous){
         var previousAOIs = Utils.listAdjacentAOIs(previous);
@@ -364,7 +365,6 @@ GameServer.handleAOItransition = function(entity,previous){
         if(entity.constructor.name == 'Player') entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
         GameServer.addObjectToAOI(aoi,entity);
     });
-    //if(entity.constructor.name == 'Player') console.log('new AOIS : ',entity.newAOIs);
 };
 
 GameServer.updatePlayers = function(){ //Function responsible for setting up and sending update packets to clients
