@@ -32,8 +32,8 @@ Performance:
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 - To check if update packets are empty: iterate over keys and check for emptyness using typeof (if array and length 0 ...)
 Order:
-- Make new hierarchy of UI classes; first make a list of all requirements ; make InventoryPanel flexible to accomodate different layouts
-- Use classes for scenes? Would allow using 'this' as well as inheritance to avoid code duplication (e.g. handleOver ...) (read about scenes)
+- Find out how to generate graphics objects (grid tiles, gradients...) programmatically for various uses
+- Use events gameobject events for input + custom events for updating menus (https://phaser.io/phaser3/devlog/112)
 - One clean, central way to manage tilesets, depth, blitters... (blitter selection in client/Chunk, "mawLayer" field in WorldEditor ...)
 - Give toString method to custom objects to replace [this.constructor.name this.id] ...
 - Decide what to do with assets/maps folder, both for dev and prod

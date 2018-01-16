@@ -122,8 +122,6 @@ Building.prototype.addCollisions = function(){
     var center = true;
     var spriteX, spriteY;
     if(center){
-        //spriteX = Math.floor((this.x*32 - data.width/2)/32);
-        //spriteY = Math.floor((this.y*32 - data.height/2)/32);
         spriteX = this.x - Math.ceil((data.width/2)/World.tileWidth);
         spriteY = this.y - Math.ceil((data.height/2)/World.tileHeight);
     }else{

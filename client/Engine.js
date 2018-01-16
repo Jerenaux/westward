@@ -67,6 +67,8 @@ Engine.preload = function() {
     // pin: https://www.iconfinder.com/icons/173052/map_marker_icon
     this.load.image('pin', 'assets/sprites/pin.png');
     this.load.image('redpin', 'assets/sprites/redpin.png');
+    this.load.spritesheet('grid', 'assets/sprites/grid.png',{frameWidth:32,frameHeight:32});
+
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
@@ -520,9 +522,68 @@ Engine.handleClick = function(event){
     }else{
         if(!Engine.inMenu) {
             if(Engine.inPanel) Engine.currentPanel.hide();
-            Engine.moveToClick(event);
+            //Engine.moveToClick(event);
+            Engine.drawGrid(event);
         }
     }
+};
+
+Engine.getGridFrame = function(x,y,grid){
+    var hasleft = +grid.get(x-1,y);
+    var hasright = +grid.get(x+1,y);
+    var hastop = +grid.get(x,y-1);
+    var hasbottom = +grid.get(x,y+1);
+    var row, col;
+
+    if(hastop && !hasbottom){
+        row = 2;
+    }else if(!hastop && hasbottom){
+        row = 0;
+    }else{
+        row = 1;
+    }
+
+    if(hasleft && !hasright){
+        col = 2
+    }else if(!hasleft && hasright){
+        col = 0;
+    }else{
+        col = 1;
+    }
+
+    console.log(x,y,col,row,hasleft,hasright,hastop,hasbottom);
+    return Utils.gridToLine(col,row,5);
+};
+
+Engine.drawGrid = function(event){
+    var tile = Engine.getMouseCoordinates(event).tile;
+    var tiles = [];
+    var w = 1;
+    var sx = tile.x - w;
+    var sy = tile.y - w;
+    var ex = tile.x + w;
+    var ey = tile.y + w;
+
+    var grid = new SpaceMap();
+    for(var x = sx; x < ex; x++){
+        for(var y = sy; y < ey; y++){
+            if(!Engine.checkCollision({x:x,y:y})) grid.add(x,y,true);
+        }
+    }
+    console.log(grid);
+
+    var cells = grid.toList();
+    cells.forEach(function(c){
+        var frame = Engine.getGridFrame(c.x,c.y,grid);
+        console.log(frame);
+        tiles.push(Engine.scene.add.sprite(c.x*32,c.y*32,'grid',frame));
+    });
+
+    tiles.forEach(function(t){
+        t.setDepth(Engine.markerDepth);
+        t.setDisplayOrigin(0,0);
+        t.setAlpha(0.4);
+    });
 };
 
 Engine.handleOver = function(event){
@@ -633,7 +694,7 @@ Engine.showMarker = function(){
 };
 
 Engine.checkCollision = function(tile){ // tile is x, y pair
-    if(Engine.displayedChunks.length < 4) return; // If less than 4, it means that wherever you are the chunks haven't finished displaying
+    //if(Engine.displayedChunks.length < 4) return; // If less than 4, it means that wherever you are the chunks haven't finished displaying
     if(!Engine.collisions[tile.y]) return false;
     return !!Engine.collisions[tile.y][tile.x];
 };
