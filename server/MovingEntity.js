@@ -38,13 +38,17 @@ MovingEntity.prototype.updatePathTick = function(){ // Compute in how many secon
 };
 
 MovingEntity.prototype.updateWalk = function(){
+    // At any given time, entity is in the process of moving from the 0th index to the 1st in the path array
     if(this.moving && Date.now() >= this.nextPathTick){
         if(this.path.length <= 1) return;
         //if(debug) console.log('['+this.constructor.name+' '+this.id+'] Tick');
         //if(debug) console.log('['+this.constructor.name+' '+this.id+'] Current path length : '+this.path.length);
         this.path.shift(); // Position 0 after the shift is where the entity is supposed to be at this time
-        this.updatePosition(this.path[0][0],this.path[0][1]);
-        if(this.path.length > 1) {
+        var x = this.path[0][0];
+        var y = this.path[0][1];
+        this.updatePosition(x,y);
+
+        if(this.path.length > 1 && !this.flagToStop) {
             this.updatePathTick();
         }else{
             this.endPath();
@@ -61,7 +65,16 @@ MovingEntity.prototype.updatePosition = function(x,y){
 MovingEntity.prototype.endPath = function(){
     if(debug) console.log('['+this.constructor.name+' '+this.id+'] Arrived at destination');
     this.moving = false;
+    this.flagToStop = false;
     this.onArrival();
+    //console.log('path ended at',this.x,this.y);
+};
+
+MovingEntity.prototype.stopWalk = function(){
+    if(!this.moving) return;
+    //console.log('Entity is at ',this.x,this.y);
+    this.flagToStop = true;
+    this.setProperty('stop',true);
 };
 
 module.exports.MovingEntity = MovingEntity;

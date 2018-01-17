@@ -3,7 +3,7 @@
  */
 var GameServer = require('./GameServer.js').GameServer;
 
-var TURN_DURATION = 5 // 30
+var TURN_DURATION = 5; // 30
 
 function Battle(f1,f2){
     this.id = GameServer.lastBattleID++;
@@ -14,14 +14,47 @@ function Battle(f1,f2){
 }
 
 Battle.prototype.start = function(){
+    console.log('battle start');
     this.computeArea();
     var _battle = this;
     this.fighters.forEach(function(f){
         f.setProperty('inFight',true);
+        f.stopWalk();
         f.battle = _battle;
     });
     this.loop = setInterval(this.update.bind(this),1000);
     this.newTurn();
+};
+
+Battle.prototype.newTurn = function(){
+    this.fighters.push(this.fighters.shift());
+    this.countdown = TURN_DURATION;
+    //console.log('[B'+this.id+'] It is now '+(this.fighters[0].constructor.name)+'\'s turn');
+
+    for(var i = 0; i < this.fighters.length; i++){
+        var f = this.fighters[i];
+        if(f.constructor.name == 'Player') {
+            if(i == 0) f.updatePacket.remainingTime = this.countdown;
+            f.updatePacket.activeID = this.fighters[0].getShortID();
+        }
+    }
+};
+
+Battle.prototype.update = function(){
+    //console.log('[B'+this.id+'] Updating');
+    this.countdown--;
+    if(this.countdown == 0) this.newTurn();
+};
+
+Battle.prototype.end = function(){
+    clearInterval(this.loop);
+    this.fighters.forEach(function(f){
+        f.setProperty('inFight',false);
+        f.setProperty('battlezone',[]);
+        f.battle = null;
+    });
+    console.log('[B'+this.id+'] Ended');
+    // TODO: respawn if quitting battle by disconnecting
 };
 
 Battle.prototype.computeArea = function(){
@@ -46,8 +79,11 @@ Battle.prototype.computeArea = function(){
     if(f1.x == f2.x) tl.x -= 1;
     if(f1.y == f2.y) tl.y -= 1;
 
-    var w = Math.max(Math.abs(f1.x - f2.x)+1,3);
-    var h = Math.max(Math.abs(f1.y - f2.y)+1,3);
+    tl.x -= 1;
+    tl.y -= 1;
+
+    var w = Math.max(Math.abs(f1.x - f2.x)+3,3);
+    var h = Math.max(Math.abs(f1.y - f2.y)+3,3);
 
     this.area.push({
         x: tl.x,
@@ -60,34 +96,6 @@ Battle.prototype.computeArea = function(){
     this.fighters.forEach(function(f){
         f.setProperty('battlezone',area);
     });
-};
-
-Battle.prototype.newTurn = function(){
-    this.fighters.push(this.fighters.shift());
-    this.countdown = TURN_DURATION;
-    console.log('[B'+this.id+'] It is now '+(this.fighters[0].constructor.name)+'\'s turn');
-
-    for(var i = 0; i < this.fighters.length; i++){
-        var f = this.fighters[i];
-        if(i == 0 && f.constructor.name == 'Player') f.updatePacket.remainingTime = this.countdown;
-    };
-};
-
-Battle.prototype.update = function(){
-    console.log('[B'+this.id+'] Updating');
-    this.countdown--;
-    if(this.countdown == 0) this.newTurn();
-};
-
-Battle.prototype.end = function(){
-    clearInterval(this.loop);
-    this.fighters.forEach(function(f){
-        f.setProperty('inFight',false);
-        f.setProperty('battlezone',[]);
-        f.battle = null;
-    });
-    console.log('[B'+this.id+'] Ended');
-    // TODO: respawn if quitting battle by disconnecting
 };
 
 module.exports.Battle = Battle;

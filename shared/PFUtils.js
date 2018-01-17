@@ -9,7 +9,7 @@ if(onServer){
 }
 
 var PFUtils = {
-    speed: 5, // tiles/sec
+    speed: 5, // 5 tiles/sec
     maxPathLength: 36
 };
 /* The handler captures all queries to the object, be it with [] or .

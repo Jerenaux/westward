@@ -8,6 +8,10 @@ var GameServer = require('./GameServer.js').GameServer;
 // Parent class of all game objects : players, monsters and items (not NPC because they are not processed server-side)
 function GameObject(){}
 
+GameObject.prototype.getShortID = function(){
+    return this.constructor.name[0]+this.id;
+};
+
 GameObject.prototype.setOrUpdateAOI = function(){
     var previousAOI = (this.aoi !== undefined ? this.aoi : null);
     var newAOI = Utils.tileToAOI({x:this.x,y:this.y});

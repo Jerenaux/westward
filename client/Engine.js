@@ -69,7 +69,7 @@ Engine.preload = function() {
     this.load.image('redpin', 'assets/sprites/redpin.png');
     this.load.spritesheet('grid', 'assets/sprites/grid.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('redgrid', 'assets/sprites/redgrid.png',{frameWidth:32,frameHeight:32});
-
+    this.load.image('arrow', 'assets/sprites/arrow.png');
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
@@ -315,6 +315,11 @@ Engine.makeUI = function(){
     );
     Engine.tooltip = new Tooltip();
 
+    Engine.makeBattleUI();
+    Engine.displayUI();
+};
+
+Engine.makeBattleUI = function(){
     Engine.fightText = Engine.scene.add.text(Engine.scene.game.config.width/2,50, 'Fight!',  { font: '45px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     Engine.fightText.setOrigin(0.5);
     Engine.fightText.setScrollFactor(0);
@@ -341,7 +346,64 @@ Engine.makeUI = function(){
         }
     );
 
-    Engine.displayUI();
+    Engine.timerText = Engine.scene.add.text(Engine.scene.game.config.width-20,Engine.scene.game.config.height, '0',  { font: '45px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    Engine.timerText.setOrigin(1,1);
+    Engine.timerText.setScrollFactor(0);
+    Engine.timerText.setDepth(Engine.UIDepth+3);
+    Engine.timerText.setVisible(false);
+
+    Engine.battleArrow = Engine.scene.add.sprite(0,0,'arrow');
+    Engine.battleArrow.setVisible(false);
+    Engine.battleArrow.setDepth(Engine.UIDepth);
+    Engine.battleArrow.setOrigin(0,1);
+};
+
+Engine.displayCounter = function(seconds){
+    Engine.remainingTime = seconds;
+    Engine.timerText.setVisible(true);
+    Engine.timerText.setText(Engine.remainingTime--);
+    Engine.battleArrow.setVisible(true);
+    Engine.battleArrow.setPosition(Engine.player.x-2,Engine.player.y-20);
+
+    var timer = setInterval(function(){
+        if(Engine.remainingTime < 0) {
+            clearInterval(timer);
+            Engine.timerText.setVisible(false);
+        }
+        Engine.timerText.setText(Engine.remainingTime--);
+    },1000);
+
+
+};
+
+Engine.manageArrow = function(target){
+    //if(Engine.battleArrow.tween.paused) Engine.battleArrow.tween.play();
+    if(Engine.battleArrow.tween) Engine.battleArrow.tween.stop();
+    console.log(Engine.battleArrow.tween);
+    var map;
+    switch(target[0]){
+        case 'P':
+            map = Engine.players;
+            break;
+        case 'A':
+            map = Engine.animals;
+            break;
+    }
+    var entity = map[target.slice(1)];
+
+    Engine.battleArrow.anchor = entity;
+    Engine.battleArrow.setPosition(entity.x,entity.y);
+    Engine.battleArrow.tween = Engine.scene.tweens.add(
+        {
+            targets: Engine.battleArrow,
+            y: '-=20',
+            duration: 500,
+            yoyo: true,
+            repeat: 5,
+            onStart: function(){
+                Engine.battleArrow.setVisible(true);
+            }
+        });
 };
 
 Engine.displayUI = function(){
@@ -734,7 +796,11 @@ Engine.updateSelf = function(data){
         }
     }
     if(data.remainingTime){
-        console.log('It is your turn and you have',data.remainingTime,'seconds left');
+        //console.log('It is your turn and you have',data.remainingTime,'seconds left');
+        Engine.displayCounter(data.remainingTime);
+    }
+    if(data.activeID){
+        Engine.manageArrow(data.activeID);
     }
 };
 
@@ -865,6 +931,7 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
 
 Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server
     if(data.path) animal.move(data.path);
+    if(data.stop) animal.stop();
     if(data.inFight == true) Engine.startFight(animal);
     if(data.inFight == false) Engine.endFight(animal);
     if(data.battlezone){

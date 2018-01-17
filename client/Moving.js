@@ -103,13 +103,14 @@ var Moving = new Phaser.Class({
             onUpdate: function(){
                     mover.updatePosition();
             },
-            onComplete: function(){
-                mover.updatePosition();
-                mover.anims.stop();
-                mover.setFrame(mover.restingFrames[mover.orientation]);
-                //if(mover.onArrival) mover.onArrival();
-            }
+            onComplete: mover.endMovement.bind(mover)
         });
+    },
+
+    endMovement: function(){
+        this.flagForStop = false;
+        this.anims.stop();
+        this.setFrame(this.restingFrames[this.orientation]);
     },
     
     updatePosition: function(){
@@ -134,8 +135,8 @@ var Moving = new Phaser.Class({
         this.tileX = Math.floor(this.x/Engine.tileWidth);
         this.tileY = Math.floor(this.y/Engine.tileHeight);
         if(this.constructor.name == 'Player') this.leaveFootprint();
-        this.previousTile.x = this.tileX;
-        this.previousTile.y = this.tileY;
+
+
         this.updateDepth();
         this.chunk = Utils.tileToAOI({x: this.tileX, y: this.tileY});
 
@@ -146,6 +147,20 @@ var Moving = new Phaser.Class({
             if(this.chunk != this.previousChunk) Engine.updateEnvironment();
             this.previousChunk = this.chunk;
         }
+
+        if(this.flagForStop && (this.tileX != this.previousTile.x || this.tileY != this.previousTile.y)){
+            console.log(this.movement);
+            console.log('stopping');
+            this.movement.stop();
+            this.endMovement();
+        }
+
+        this.previousTile.x = this.tileX;
+        this.previousTile.y = this.tileY;
+    },
+
+    stop: function(){
+        this.flagForStop = true;
     },
 
     leaveFootprint: function(){

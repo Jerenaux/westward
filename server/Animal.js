@@ -66,8 +66,8 @@ Animal.prototype.updateIdle = function(){
 
 Animal.prototype.findRandomDestination = function(){
     return {
-        x: Utils.clamp(this.x + Utils.randomInt(-10,10),0,World.worldWidth),
-        y: Utils.clamp(this.y + Utils.randomInt(-10,10),0,World.worldHeight)
+        x: Utils.clamp(this.x + Utils.randomInt(-5,5),0,World.worldWidth),
+        y: Utils.clamp(this.y + Utils.randomInt(-5,5),0,World.worldHeight)
     };
 };
 

@@ -200,8 +200,9 @@ GameServer.handleBattle = function(opponentID,socketID){
     var player = GameServer.getPlayer(socketID);
     var animal = GameServer.animals[opponentID];
     if(player.inFight) return;
+    if(animal.moving) return;
     // TODO: check for proximity
-    new Battle(animal,player);
+    new Battle(player,animal);
 };
 
 GameServer.handleShop = function(data,socketID) {
