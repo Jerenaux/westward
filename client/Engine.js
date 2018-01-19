@@ -69,6 +69,7 @@ Engine.preload = function() {
     this.load.image('redpin', 'assets/sprites/redpin.png');
     this.load.spritesheet('grid', 'assets/sprites/grid.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('redgrid', 'assets/sprites/redgrid.png',{frameWidth:32,frameHeight:32});
+    this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
     this.load.image('arrow', 'assets/sprites/arrow.png');
 
     this.load.json('buildings', 'assets/data/buildings.json');
@@ -358,13 +359,9 @@ Engine.makeBattleUI = function(){
     Engine.battleArrow.setOrigin(0,1);
 };
 
-Engine.displayCounter = function(seconds){
+Engine.setCounter = function(seconds){
     Engine.remainingTime = seconds;
-    Engine.timerText.setVisible(true);
     Engine.timerText.setText(Engine.remainingTime--);
-    Engine.battleArrow.setVisible(true);
-    Engine.battleArrow.setPosition(Engine.player.x-2,Engine.player.y-20);
-
     var timer = setInterval(function(){
         if(Engine.remainingTime < 0) {
             clearInterval(timer);
@@ -372,16 +369,19 @@ Engine.displayCounter = function(seconds){
         }
         Engine.timerText.setText(Engine.remainingTime--);
     },1000);
-
-
 };
 
-Engine.manageArrow = function(target){
-    //if(Engine.battleArrow.tween.paused) Engine.battleArrow.tween.play();
-    if(Engine.battleArrow.tween) Engine.battleArrow.tween.stop();
-    console.log(Engine.battleArrow.tween);
+Engine.displayCounter = function(){
+    Engine.timerText.setVisible(true);
+};
+
+Engine.hideCounter = function(){
+    Engine.timerText.setVisible(false);
+};
+
+Engine.getActiveFighter = function(id){
     var map;
-    switch(target[0]){
+    switch(id[0]){
         case 'P':
             map = Engine.players;
             break;
@@ -389,9 +389,23 @@ Engine.manageArrow = function(target){
             map = Engine.animals;
             break;
     }
-    var entity = map[target.slice(1)];
+    return map[id.slice(1)];
+};
 
-    Engine.battleArrow.anchor = entity;
+Engine.manageTurn = function(shortID){
+    var active = Engine.getActiveFighter(shortID);
+    if(active.isHero){
+        Engine.displayCounter();
+    }else{
+        Engine.hideCounter();
+    }
+    Engine.manageArrow(active);
+};
+
+Engine.manageArrow = function(entity){
+    if(Engine.battleArrow.tween) Engine.battleArrow.tween.stop();
+    //Engine.battleArrow.anchor = entity;
+    Engine.battleArrow.setVisible(true);
     Engine.battleArrow.setPosition(entity.x,entity.y);
     Engine.battleArrow.tween = Engine.scene.tweens.add(
         {
@@ -537,6 +551,7 @@ Engine.addHero = function(id,x,y,settlement){
 };
 
 Engine.updateEnvironment = function(){
+    return;
     var chunks = Utils.listAdjacentAOIs(Engine.player.chunk);
     var newChunks = chunks.diff(Engine.displayedChunks);
     var oldChunks = Engine.displayedChunks.diff(chunks);
@@ -633,7 +648,7 @@ Engine.handleClick = function(event){
             if(event.list[i].handleClick) event.list[i].handleClick(event);
         }
     }else{
-        if(!Engine.inMenu) {
+        if(!Engine.inMenu && !Engine.player.inFight) {
             if(Engine.inPanel) Engine.currentPanel.hide();
             Engine.moveToClick(event);
         }
@@ -667,6 +682,10 @@ Engine.handleDrag = function(event){
 Engine.moveToClick = function(event){
     Engine.player.setDestinationAction(0);
     Engine.computePath(Engine.getMouseCoordinates(event).tile);
+};
+
+Engine.requestBattleMove = function(event){
+    Engine.requestBattleAction('move',Engine.getMouseCoordinates(event).tile);
 };
 
 Engine.computePath = function(position){
@@ -715,7 +734,7 @@ Engine.getMouseCoordinates = function(event){
 
 Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
-    Engine.updateMarker(position.tile);
+    if(Engine.player && !Engine.player.inFight) Engine.updateMarker(position.tile);
     if(Engine.tooltip && Engine.tooltip.displayed) Engine.tooltip.updatePosition(event.x,event.y);
     if(Engine.debug){
         document.getElementById('pxx').innerHTML = position.pixel.x;
@@ -797,10 +816,10 @@ Engine.updateSelf = function(data){
     }
     if(data.remainingTime){
         //console.log('It is your turn and you have',data.remainingTime,'seconds left');
-        Engine.displayCounter(data.remainingTime);
+        Engine.setCounter(data.remainingTime);
     }
     if(data.activeID){
-        Engine.manageArrow(data.activeID);
+        Engine.manageTurn(data.activeID);
     }
 };
 
@@ -911,7 +930,7 @@ Engine.isHero = function(player){
 };
 
 Engine.updatePlayer = function(player,data){ // data contains the updated data from the server
-    if(data.path && player.id != Engine.player.id) player.move(data.path);
+    if(data.path && (player.id != Engine.player.id || Engine.player.inFight)) player.move(data.path);
     if(data.inFight == true) Engine.startFight(player);
     if(data.inFight == false) Engine.endFight(player);
     if(data.inBuilding > -1) {
@@ -1050,9 +1069,14 @@ Engine.exitBuilding = function(){
     Engine.UIHolder.resize(115);
 };
 
-Engine.startBattle = function(a,b) {
+Engine.requestBattle = function(a,b) {
     // Assumes for now that a is the player (hero) and b an animal
     Client.startBattle(b.id);
+};
+
+Engine.requestBattleAction = function(action,data){
+    console.log('requesting battle action');
+    Client.battleAction(action,data);
 };
 
 Engine.getGridFrame = function(x,y){
@@ -1089,10 +1113,7 @@ Engine.isBattlezone = function(x,y){
 
 Engine.getNextCell = function(){
     if(Engine.availableGridCells.length > 0) return Engine.availableGridCells.shift();
-    var cell = Engine.scene.add.sprite(0,0,'redgrid',0);
-    cell.setDepth(Engine.markerDepth);
-    cell.setDisplayOrigin(0,0);
-    return cell;
+    return new BattleTile();
 };
 
 Engine.drawGrid = function(tl,w,h){
@@ -1100,11 +1121,7 @@ Engine.drawGrid = function(tl,w,h){
         for(var y = tl.y; y < tl.y+h; y++){
             if(!Engine.checkCollision({x:x,y:y}) && !Engine.isBattlezone(x,y)) {
                 var cell = Engine.getNextCell();
-                cell.setPosition(x*32,y*32);
-                cell.chunk = Utils.tileToAOI({x:x,y:y});
-                cell.tx = x;
-                cell.ty = y;
-                cell.setVisible(true);
+                cell.setUp(x,y);
                 Engine.battleZones.add(x,y,cell);
             }
         }
@@ -1140,12 +1157,12 @@ Engine.manageBattleZones = function(entity,zone){
     }
     entity.battlezone = zone;
 
-    Engine.displayedCells = Engine.battleZones.toList();
+    /*Engine.displayedCells = Engine.battleZones.toList();
     Engine.displayedCells.forEach(function(cell){
         var frame = Engine.getGridFrame(cell.x,cell.y);
         //console.log(frame);
         cell.v.setFrame(frame);
-    });
+    });*/
 };
 
 Engine.startFight = function(entity){
@@ -1154,6 +1171,7 @@ Engine.startFight = function(entity){
 
     if(entity.isHero) {
         Engine.hideUI();
+        Engine.hideMarker();
         Engine.fightText.tween.play();
     }
 };

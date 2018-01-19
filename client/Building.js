@@ -20,17 +20,7 @@ var Building = new Phaser.Class({
         this.gold = gold;
         this.prices = prices || {};
         this.chunk = Utils.tileToAOI({x:x,y:y});
-
-        this.handleClick = function(){
-            if(Engine.inMenu) return;
-            if(!data.entry) return;
-            var pos = {
-                x: x + data.entry.x,
-                y: y + data.entry.y
-            };
-            Engine.player.setDestinationAction(1,id); // 1 for building
-            Engine.computePath(pos);
-        };
+        this.entry = data.entry;
 
         var shape = new Phaser.Geom.Polygon(data.shape);
         this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
@@ -48,6 +38,17 @@ var Building = new Phaser.Class({
             spriteY = this.tileY;
         }
         PFUtils.collisionsFromShape(shape.points,spriteX,spriteY,data.width,data.height,Engine.collisions);
+    },
+
+    handleClick: function(){
+        if(Engine.inMenu || Engine.player.inFight) return;
+        if(!this.entry) return;
+        var pos = {
+            x: this.tileX + this.entry.x,
+            y: this.tileY + this.entry.y
+        };
+        Engine.player.setDestinationAction(1,this.id); // 1 for building
+        Engine.computePath(pos);
     },
 
     getPrice: function(id,action){

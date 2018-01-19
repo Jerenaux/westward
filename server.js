@@ -98,6 +98,10 @@ io.on('connection',function(socket){
             gs.handleBattle(data,socket.id);
         });
 
+        socket.on('battleAction',function(data){
+            gs.handleBattleAction(data,socket.id);
+        });
+
         socket.on('exit',function(){
             gs.handleExit(socket.id);
         });

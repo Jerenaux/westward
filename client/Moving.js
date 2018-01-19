@@ -136,7 +136,6 @@ var Moving = new Phaser.Class({
         this.tileY = Math.floor(this.y/Engine.tileHeight);
         if(this.constructor.name == 'Player') this.leaveFootprint();
 
-
         this.updateDepth();
         this.chunk = Utils.tileToAOI({x: this.tileX, y: this.tileY});
 

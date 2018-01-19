@@ -104,6 +104,11 @@ Client.startBattle = function(targetID){
     Client.socket.emit('battle',targetID);
 };
 
+Client.battleAction = function(action,data){
+    data.action = action;
+    Client.socket.emit('battleAction',data);
+};
+
 Client.sendCraft = function(id,nb){
     Client.socket.emit('craft',{id:id,nb:nb});
 };

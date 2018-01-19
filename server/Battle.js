@@ -10,6 +10,7 @@ function Battle(f1,f2){
     this.fighters = [f2,f1]; // the fighter at position 0 is the one currently in turn
     this.area = []; // array of rectangular areas
     this.countdown = null;
+    this.flagNextTurn = false;
     this.start();
 }
 
@@ -29,13 +30,14 @@ Battle.prototype.start = function(){
 Battle.prototype.newTurn = function(){
     this.fighters.push(this.fighters.shift());
     this.countdown = TURN_DURATION;
+    this.flagNextTurn = false;
     //console.log('[B'+this.id+'] It is now '+(this.fighters[0].constructor.name)+'\'s turn');
 
     for(var i = 0; i < this.fighters.length; i++){
         var f = this.fighters[i];
         if(f.constructor.name == 'Player') {
             if(i == 0) f.updatePacket.remainingTime = this.countdown;
-            f.updatePacket.activeID = this.fighters[0].getShortID();
+            f.updatePacket.activeID = this.getActiveFighter().getShortID();
         }
     }
 };
@@ -43,7 +45,30 @@ Battle.prototype.newTurn = function(){
 Battle.prototype.update = function(){
     //console.log('[B'+this.id+'] Updating');
     this.countdown--;
-    if(this.countdown == 0) this.newTurn();
+    if(this.flagNextTurn || this.countdown == 0) this.newTurn();
+};
+
+Battle.prototype.getActiveFighter = function(){
+    return this.fighters[0];
+};
+
+Battle.prototype.isTurnOf = function(f){
+    return (f.getShortID() == this.getActiveFighter().getShortID());
+};
+
+Battle.prototype.processAction = function(player,data){
+    if(this.flagNextTurn || !this.isTurnOf(player)) return;
+    console.log(data.action);
+    switch(data.action){
+        case 'move':
+            this.processMove(player,data.x,data.y);
+            break;
+    }
+    this.flagNextTurn = true;
+};
+
+Battle.prototype.processMove = function(f,x,y){
+    f.setPath(GameServer.findPath({x:f.x,y:f.y},{x:x,y:y}));
 };
 
 Battle.prototype.end = function(){

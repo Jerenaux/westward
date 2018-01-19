@@ -27,6 +27,6 @@ var Animal = new Phaser.Class({
     },
 
     handleClick: function(){
-        if(!Engine.player.inFight) Engine.startBattle(Engine.player,this);
+        if(!Engine.player.inFight) Engine.requestBattle(Engine.player,this);
     }
 });

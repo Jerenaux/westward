@@ -205,6 +205,11 @@ GameServer.handleBattle = function(opponentID,socketID){
     new Battle(player,animal);
 };
 
+GameServer.handleBattleAction = function(data,socketID){
+    var player = GameServer.getPlayer(socketID);
+    player.battle.processAction(player,data);
+};
+
 GameServer.handleShop = function(data,socketID) {
     var player = GameServer.getPlayer(socketID);
     var item = data.id;
