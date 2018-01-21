@@ -79,7 +79,7 @@ Battle.prototype.processAction = function(player,data){
             success = this.processMove(player,data.x,data.y);
             break;
         case 'attack':
-            var target = this.getFighterByID(data);
+            var target = this.getFighterByID(data.id);
             success = this.processAttack(player,target);
             break;
     }
@@ -101,8 +101,19 @@ Battle.prototype.processMove = function(f,x,y){
     return false;
 };
 
-Battle.prototype.processAttack = function(a,b){
+Battle.prototype.nextTo = function(a,b){
+    var dx = Math.abs(a.x - b.x);
+    var dy = Math.abs(a.y - b.y);
+    return (dx <= 1 && dy <= 1);
+};
 
+Battle.prototype.processAttack = function(a,b){
+    if(this.nextTo(a,b)){
+        console.log('melee attack');
+        b.setProperty('meleeHit',true);
+    }else{
+        console.log('ranged attack');
+    }
 };
 
 Battle.prototype.end = function(){

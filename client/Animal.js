@@ -28,9 +28,9 @@ var Animal = new Phaser.Class({
 
     handleClick: function(){
         if(Engine.player.inFight){
-            Engine.requestBattle(Engine.player,this);
-        }else{
             Engine.requestBattleAttack(this);
+        }else{
+            Engine.requestBattle(Engine.player,this);
         }
     }
 });

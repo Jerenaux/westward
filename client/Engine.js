@@ -71,6 +71,7 @@ Engine.preload = function() {
     this.load.spritesheet('redgrid', 'assets/sprites/redgrid.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
     this.load.image('arrow', 'assets/sprites/arrow.png');
+    this.load.spritesheet('sword_anim', 'assets/sprites/Sword1.png',{frameWidth:96,frameHeight:96});
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
@@ -114,6 +115,7 @@ Engine.create = function(masterData){
     Engine.battleZones = new SpaceMap();
     Engine.availableGridCells = [];
     Engine.displayedCells = [];
+    Engine.availableAnimSprites = [];
 
     Engine.players = {}; // player.id -> player object
     Engine.animals = {}; // animal.id -> building object
@@ -237,6 +239,12 @@ Engine.createAnimations = function(){
     Engine.scene.anims.create(config = {
         key: 'wolf_move_down',
         frames: Engine.scene.anims.generateFrameNumbers('wolves', { start: 0, end: 2}),
+        frameRate: 10,
+        repeat: -1
+    });
+    Engine.scene.anims.create(config = {
+        key: 'melee',
+        frames: Engine.scene.anims.generateFrameNumbers('sword_anim', { start: 0, end: 2}),
         frameRate: 10,
         repeat: -1
     });
@@ -392,10 +400,20 @@ Engine.getActiveFighter = function(id){
     return map[id.slice(1)];
 };
 
+Engine.handleBattleAnimation = function(animation,target){
+    var sprite = Engine.getNextAnim();
+    sprite.setPosition(target.x,target.y);
+    sprite.setVisible(true);
+    sprite.setDepth(target.depth+1);
+    console.log(sprite);
+    sprite.anims.play(animation);
+};
+
 Engine.manageTurn = function(shortID){
     var active = Engine.getActiveFighter(shortID);
     if(active.isHero){
         Engine.displayCounter();
+        Engine.player.actionTaken = false;
     }else{
         Engine.hideCounter();
     }
@@ -938,9 +956,8 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
         player.inBuilding = data.inBuilding;
         if(Engine.isHero(player)) Engine.exitBuilding();
     }
-    if(data.battlezone){
-        Engine.manageBattleZones(player,data.battlezone);
-    }
+    if(data.battlezone) Engine.manageBattleZones(player,data.battlezone);
+    if(data.meleeHit) Engine.handleBattleAnimation('melee',player);
 };
 
 Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server
@@ -948,9 +965,8 @@ Engine.updateAnimal = function(animal,data){ // data contains the updated data f
     if(data.stop) animal.stop();
     if(data.inFight == true) Engine.startFight(animal);
     if(data.inFight == false) Engine.endFight(animal);
-    if(data.battlezone){
-        Engine.manageBattleZones(animal, data.battlezone);
-    }
+    if(data.battlezone) Engine.manageBattleZones(animal, data.battlezone);
+    if(data.meleeHit) Engine.handleBattleAnimation('melee',animal);
 };
 
 Engine.updateBuilding = function(building,data){ // data contains the updated data from the server
@@ -1070,14 +1086,17 @@ Engine.requestBattle = function(a,b) {
 };
 
 Engine.requestBattleMove = function(event){
+    if(Engine.player.actionTaken) return;
     Engine.requestBattleAction('move',Engine.getMouseCoordinates(event).tile);
 };
 
 Engine.requestBattleAttack = function(target){
-    Engine.requestBattleAction('attack',target.getShortID());
+    if(Engine.player.actionTaken) return;
+    Engine.requestBattleAction('attack',{id:target.getShortID()});
 };
 
 Engine.requestBattleAction = function(action,data){
+    Engine.player.actionTaken = true;
     Client.battleAction(action,data);
 };
 
@@ -1116,6 +1135,14 @@ Engine.isBattlezone = function(x,y){
 Engine.getNextCell = function(){
     if(Engine.availableGridCells.length > 0) return Engine.availableGridCells.shift();
     return new BattleTile();
+};
+
+Engine.getNextAnim = function(){
+    if(Engine.availableAnimSprites.length > 0) return Engine.availableAnimSprites.shift();
+    var sprite = Engine.scene.add.sprite(0,0,'sword_anim',0);
+    sprite.setVisible(false);
+    sprite.setDisplayOrigin(0);
+    return sprite;
 };
 
 Engine.drawGrid = function(tl,w,h){
@@ -1172,8 +1199,8 @@ Engine.manageBattleZones = function(entity,zone){
     }
     entity.battlezone = zone;
 
-    /*Engine.displayedCells = Engine.battleZones.toList();
-    Engine.displayedCells.forEach(function(cell){
+    Engine.displayedCells = Engine.battleZones.toList(); // used to keep track of what cells to delete
+    /*Engine.displayedCells.forEach(function(cell){
         var frame = Engine.getGridFrame(cell.x,cell.y);
         //console.log(frame);
         cell.v.setFrame(frame);
