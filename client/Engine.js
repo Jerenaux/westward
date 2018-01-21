@@ -551,7 +551,6 @@ Engine.addHero = function(id,x,y,settlement){
 };
 
 Engine.updateEnvironment = function(){
-    return;
     var chunks = Utils.listAdjacentAOIs(Engine.player.chunk);
     var newChunks = chunks.diff(Engine.displayedChunks);
     var oldChunks = Engine.displayedChunks.diff(chunks);
@@ -682,10 +681,6 @@ Engine.handleDrag = function(event){
 Engine.moveToClick = function(event){
     Engine.player.setDestinationAction(0);
     Engine.computePath(Engine.getMouseCoordinates(event).tile);
-};
-
-Engine.requestBattleMove = function(event){
-    Engine.requestBattleAction('move',Engine.getMouseCoordinates(event).tile);
 };
 
 Engine.computePath = function(position){
@@ -1074,8 +1069,15 @@ Engine.requestBattle = function(a,b) {
     Client.startBattle(b.id);
 };
 
+Engine.requestBattleMove = function(event){
+    Engine.requestBattleAction('move',Engine.getMouseCoordinates(event).tile);
+};
+
+Engine.requestBattleAttack = function(target){
+    Engine.requestBattleAction('attack',target.getShortID());
+};
+
 Engine.requestBattleAction = function(action,data){
-    console.log('requesting battle action');
     Client.battleAction(action,data);
 };
 
@@ -1123,6 +1125,19 @@ Engine.drawGrid = function(tl,w,h){
                 var cell = Engine.getNextCell();
                 cell.setUp(x,y);
                 Engine.battleZones.add(x,y,cell);
+            }
+        }
+    }
+};
+
+Engine.updateGrid = function(){
+    for(var i = 0; i < Engine.player.battlezone.length; i++) {
+        var rect = Engine.player.battlezone[i];
+        var tl = {x:rect.x,y:rect.y};
+        for(var x = tl.x; x < tl.x+rect.w; x++){
+            for(var y = tl.y; y < tl.y+rect.h; y++){
+                var cell = Engine.isBattlezone(x,y);
+                if(cell) cell.manageFrame();
             }
         }
     }

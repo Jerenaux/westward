@@ -27,18 +27,20 @@ var BattleTile = new Phaser.Class({
         this.tx = x;
         this.ty = y;
         this.setVisible(true);
+        this.manageFrame();
+    },
+
+    manageFrame: function(){
         this.dist = Utils.euclidean({
-            x: x,
-            y: y
+            x: this.tx,
+            y: this.ty
         },{
             x: Engine.player.tileX,
             y: Engine.player.tileY
         });
 
-        if(this.dist <= 3){
-            this.baseFrame = 2;
-            this.setFrame(this.baseFrame);
-        }
+        this.baseFrame = (this.dist <= PFUtils.battleRange ? 2 : 0);
+        this.setFrame(this.baseFrame);
     },
 
     handleOver: function(){

@@ -45,6 +45,10 @@ var Moving = new Phaser.Class({
         });
     },
 
+    getShortID: function(){
+        return this.constructor.name[0]+this.id;
+    },
+
     displayHalo: function(){
         if(this.displayedHalo) return;
         this.halo.setVisible(true);

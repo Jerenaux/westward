@@ -2,6 +2,8 @@
  * Created by Jerome on 27-10-17.
  */
 var GameServer = require('./GameServer.js').GameServer;
+var Utils = require('../shared/Utils.js').Utils;
+var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 var TURN_DURATION = 5; // 30
 
@@ -52,23 +54,55 @@ Battle.prototype.getActiveFighter = function(){
     return this.fighters[0];
 };
 
+Battle.prototype.getFighterByID = function(id){
+    var map;
+    switch(id[0]){
+        case 'P':
+            map = GameServer.players;
+            break;
+        case 'A':
+            map = GameServer.animals;
+            break;
+    }
+    return map[id.slice(1)];
+};
+
 Battle.prototype.isTurnOf = function(f){
     return (f.getShortID() == this.getActiveFighter().getShortID());
 };
 
 Battle.prototype.processAction = function(player,data){
     if(this.flagNextTurn || !this.isTurnOf(player)) return;
-    console.log(data.action);
+    var success;
     switch(data.action){
         case 'move':
-            this.processMove(player,data.x,data.y);
+            success = this.processMove(player,data.x,data.y);
+            break;
+        case 'attack':
+            var target = this.getFighterByID(data);
+            success = this.processAttack(player,target);
             break;
     }
-    this.flagNextTurn = true;
+    if(success) this.flagNextTurn = true;
 };
 
 Battle.prototype.processMove = function(f,x,y){
-    f.setPath(GameServer.findPath({x:f.x,y:f.y},{x:x,y:y}));
+    var dist = Utils.euclidean({
+        x: f.x,
+        y: f.y
+    },{
+        x: x,
+        y: y
+    });
+    if(dist <= PFUtils.battleRange) {
+        f.setPath(GameServer.findPath({x:f.x,y:f.y},{x:x,y:y}));
+        return true;
+    }
+    return false;
+};
+
+Battle.prototype.processAttack = function(a,b){
+
 };
 
 Battle.prototype.end = function(){
