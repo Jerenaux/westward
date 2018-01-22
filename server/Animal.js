@@ -6,6 +6,7 @@ var Utils = require('../shared/Utils.js').Utils;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
 var World = require('../shared/World.js').World;
+//var Stats = require('../shared/Stats.js').Stats;
 
 var debug = false;
 
@@ -18,11 +19,26 @@ function Animal(x,y,type){
     this.type = type;
     this.idle = true;
     this.idleTime = 200;
+    this.stats = {}; //Stats.getSkeleton();
+    this.setStartingStats();
     this.setOrUpdateAOI();
 }
 
 Animal.prototype = Object.create(MovingEntity.prototype);
 Animal.prototype.constructor = Animal;
+
+Animal.prototype.setStartingStats = function(){
+    var stats = GameServer.animalsData[this.type].stats;
+    for(var s in stats){
+        if(!stats.hasOwnProperty(s)) return;
+        this.setStat(s,stats[s]);
+        //this.stats[s] = stats[s];
+    }
+};
+
+Animal.prototype.setStat = function(key,value){
+    this.stats[key] = value;
+};
 
 /*Animal.prototype.setStartingPosition = function(){
     this.x = Utils.randomInt(23,44);

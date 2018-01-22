@@ -116,6 +116,7 @@ Engine.create = function(masterData){
     Engine.availableGridCells = [];
     Engine.displayedCells = [];
     Engine.availableAnimSprites = [];
+    Engine.availableHP = [];
 
     Engine.players = {}; // player.id -> player object
     Engine.animals = {}; // animal.id -> building object
@@ -245,8 +246,9 @@ Engine.createAnimations = function(){
     Engine.scene.anims.create(config = {
         key: 'melee',
         frames: Engine.scene.anims.generateFrameNumbers('sword_anim', { start: 0, end: 2}),
-        frameRate: 10,
-        repeat: -1
+        frameRate: 15,
+        hideOnComplete: true,
+        onComplete: Engine.recycleAnim
     });
 };
 
@@ -384,7 +386,12 @@ Engine.displayCounter = function(){
 };
 
 Engine.hideCounter = function(){
+    console.log('hiding counter');
     Engine.timerText.setVisible(false);
+};
+
+Engine.hideBattleArrow = function(){
+    Engine.battleArrow.setVisible(false);
 };
 
 Engine.getActiveFighter = function(id){
@@ -400,13 +407,26 @@ Engine.getActiveFighter = function(id){
     return map[id.slice(1)];
 };
 
-Engine.handleBattleAnimation = function(animation,target){
+Engine.handleBattleAnimation = function(animation,target,dmg){
     var sprite = Engine.getNextAnim();
-    sprite.setPosition(target.x,target.y);
+    sprite.setPosition(target.x+16,target.y+16);
     sprite.setVisible(true);
     sprite.setDepth(target.depth+1);
-    console.log(sprite);
     sprite.anims.play(animation);
+
+    var text = Engine.getNextHP();
+    text.setPosition(target.x+16,target.y+16);
+    text.setDepth(target.depth+1);
+    text.setText('-'+dmg);
+    text.tween.play();
+};
+
+Engine.handleMissAnimation = function(target){
+    var text = Engine.getNextHP();
+    text.setPosition(target.x+16,target.y+16);
+    text.setDepth(target.depth+1);
+    text.setText('Miss');
+    text.tween.play();
 };
 
 Engine.manageTurn = function(shortID){
@@ -957,7 +977,8 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
         if(Engine.isHero(player)) Engine.exitBuilding();
     }
     if(data.battlezone) Engine.manageBattleZones(player,data.battlezone);
-    if(data.meleeHit) Engine.handleBattleAnimation('melee',player);
+    if(data.meleeHit !== undefined) Engine.handleBattleAnimation('melee',player,data.meleeHit);
+    if(data.rangedMiss !== undefined) Engine.handleMissAnimation(player);
 };
 
 Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server
@@ -966,7 +987,8 @@ Engine.updateAnimal = function(animal,data){ // data contains the updated data f
     if(data.inFight == true) Engine.startFight(animal);
     if(data.inFight == false) Engine.endFight(animal);
     if(data.battlezone) Engine.manageBattleZones(animal, data.battlezone);
-    if(data.meleeHit) Engine.handleBattleAnimation('melee',animal);
+    if(data.meleeHit !== undefined) Engine.handleBattleAnimation('melee',animal,data.meleeHit);
+    if(data.rangedMiss !== undefined) Engine.handleMissAnimation(animal);
 };
 
 Engine.updateBuilding = function(building,data){ // data contains the updated data from the server
@@ -1139,10 +1161,42 @@ Engine.getNextCell = function(){
 
 Engine.getNextAnim = function(){
     if(Engine.availableAnimSprites.length > 0) return Engine.availableAnimSprites.shift();
+    //console.log('creating new sprite');
     var sprite = Engine.scene.add.sprite(0,0,'sword_anim',0);
     sprite.setVisible(false);
-    sprite.setDisplayOrigin(0);
     return sprite;
+};
+
+Engine.recycleAnim = function(sprite){
+    Engine.availableAnimSprites.push(sprite);
+    //console.log(Engine.availableAnimSprites.length,' available sprites');
+};
+
+Engine.getNextHP = function(){
+    if(Engine.availableHP.length > 0) return Engine.availableHP.shift();
+    var text = Engine.scene.add.text(0,0, '0',  { font: '20px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    text.setVisible(false);
+    text.setOrigin(0.5,1);
+    text.tween = Engine.scene.tweens.add(
+        {
+            targets: text,
+            y: '-=20',
+            duration: 1000,
+            paused: true,
+            onStart: function(){
+                text.setVisible(true);
+            },
+            onComplete: function(){
+                text.setVisible(false);
+                Engine.recycleHP(text);
+            }
+        }
+    );
+    return text;
+};
+
+Engine.recycleHP = function(text){
+    Engine.availableHP.push(text);
 };
 
 Engine.drawGrid = function(tl,w,h){
@@ -1221,7 +1275,11 @@ Engine.startFight = function(entity){
 Engine.endFight = function(entity){
     //entity.hideHalo();
     entity.inFight = false;
-    if(entity.isHero) Engine.displayUI();
+    if(entity.isHero) {
+        Engine.displayUI();
+        Engine.hideCounter();
+        Engine.hideBattleArrow();
+    }
 };
 
 // ## UI-related functions ##

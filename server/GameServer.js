@@ -63,6 +63,7 @@ GameServer.readMap = function(mapsPath){
     };
 
     GameServer.itemsData = JSON.parse(fs.readFileSync('./assets/data/items.json').toString());
+    GameServer.animalsData = JSON.parse(fs.readFileSync('./assets/data/animals.json').toString());
 
     // Read buildings
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());

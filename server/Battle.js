@@ -10,6 +10,11 @@ var TURN_DURATION = 5; // 30
 function Battle(f1,f2){
     this.id = GameServer.lastBattleID++;
     this.fighters = [f2,f1]; // the fighter at position 0 is the one currently in turn
+    this.teams = {
+        'Animal': 1,
+        'Player': 1
+    };
+    this.fallen = [];
     this.area = []; // array of rectangular areas
     this.countdown = null;
     this.flagNextTurn = false;
@@ -44,10 +49,29 @@ Battle.prototype.newTurn = function(){
     }
 };
 
+Battle.prototype.endOfTurn = function(){
+    for(var j = 0; j < this.fallen.length; j++) {
+        for (var i = this.fighters.length - 1; i >= 0; i--) {
+            var fighter = this.fighters[i];
+            var fallen = this.fallen[j];
+            if(fighter.getShortID() == fallen.getShortID()){
+                console.log(fighter.getShortID()+' is dead');
+                this.fighters.splice(i,1);
+                this.teams[fighter.constructor.name]--;
+                if(this.teams[fighter.constructor.name] <= 0) this.end();
+            }
+        }
+    }
+    this.fallen = [];
+};
+
 Battle.prototype.update = function(){
     //console.log('[B'+this.id+'] Updating');
     this.countdown--;
-    if(this.flagNextTurn || this.countdown == 0) this.newTurn();
+    if(this.flagNextTurn || this.countdown == 0) {
+        this.endOfTurn();
+        this.newTurn();
+    }
 };
 
 Battle.prototype.getActiveFighter = function(){
@@ -107,13 +131,55 @@ Battle.prototype.nextTo = function(a,b){
     return (dx <= 1 && dy <= 1);
 };
 
+Battle.prototype.computeMeleeDamage = function(a,b){
+    return Math.max(a.stats['mdmg'] - b.stats['def'],0);
+};
+
+Battle.prototype.computeRangedDamage = function(a,b){
+    return Math.max(a.stats['rdmg'] - b.stats['def'],0);
+};
+
+Battle.prototype.computeRangedHit = function(a,b){
+    var dist = Utils.euclidean({
+        x: a.x,
+        y: a.y
+    },{
+        x: b.x,
+        y: b.y
+    });
+    var chance = a.stats['acc'] - (dist*5);
+    var rand = Utils.randomInt(0,101);
+    console.log('ranged hit : ',rand,chance);
+    return rand < chance;
+};
+
+Battle.prototype.applyDamage = function(f,dmg){
+    f.setStat('hp',Math.max(f.stats['hp'] - dmg,0));
+    if(f.stats['hp'] == 0) this.fallen.push(f);
+};
+
 Battle.prototype.processAttack = function(a,b){
     if(this.nextTo(a,b)){
         console.log('melee attack');
-        b.setProperty('meleeHit',true);
+        var dmg = this.computeMeleeDamage(a,b);
+        this.applyDamage(b,dmg);
+        b.setProperty('meleeHit',dmg);
+        return true;
     }else{
+        if(!a.canRange()) return false;
+        a.decreaseAmmo();
+        var hit = this.computeRangedHit(a,b);
+        if(hit){
+            dmg = this.computeRangedDamage(a,b);
+            this.applyDamage(b,dmg);
+            b.setProperty('meleeHit',dmg);
+        }else { // miss
+            b.setProperty('rangedMiss',true);
+        }
         console.log('ranged attack');
+        return true;
     }
+    return false;
 };
 
 Battle.prototype.end = function(){

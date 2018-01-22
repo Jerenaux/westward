@@ -12,7 +12,10 @@
   "2":{
     "atlas": "items",
     "frame":"bow",
-    "name": "Bow"
+    "name": "Bow",
+    "equipment": "rangedw",
+    "ammo": "quiver",
+    "effects":{"acc":40}
   },
   "3":{
     "atlas": "items2",
@@ -74,6 +77,7 @@
     "frame":"gun",
     "name": "Gun",
     "equipment": "rangedw",
+    "ammo": "ammo_pouch",
     "effects":{"acc":20}
   },
   "13":{

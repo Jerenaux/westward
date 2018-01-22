@@ -1,6 +1,11 @@
 {
   "0":{
     "sprite":"wolves",
-    "frame": 1
+    "frame": 1,
+    "stats": {
+      "hp": 5,
+      "def": 9,
+      "mdmg": 12
+    }
   }
 }

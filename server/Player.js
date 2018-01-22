@@ -92,7 +92,6 @@ Player.prototype.canBuy = function(price){ // check if building has gold and roo
     return true;
 };
 
-
 Player.prototype.hasItem = function(item,nb){
     return (this.inventory.getNb(item) >= nb);
 };
@@ -111,6 +110,10 @@ Player.prototype.takeItem = function(item,nb){
 
 Player.prototype.isEquipped = function(slot,subSlot){
     return this.equipment[slot][subSlot] > -1;
+};
+
+Player.prototype.getEquipped = function(slot,subSlot){
+    return this.equipment[slot][subSlot];
 };
 
 Player.prototype.getFreeSubslot = function(slot){
@@ -191,6 +194,30 @@ Player.prototype.load = function(containerSlot,nb){
 Player.prototype.unload = function(containerSlot){
     this.equipment.containers[containerSlot] = 0;
     this.updatePacket.addAmmo(containerSlot,0);
+};
+
+Player.prototype.decreaseAmmo = function(){
+    var container = this.getRangedContainer(this.getRangedWeapon());
+    this.equipment.containers[container] = Math.max(this.equipment.containers[container]-1,0);
+    this.updatePacket.addAmmo(container,this.equipment.containers[container]);
+};
+
+Player.prototype.getRangedWeapon = function(){
+    return this.getEquipped('rangedw',0);
+};
+
+Player.prototype.getRangedContainer = function(rangedWeapon){
+    return GameServer.itemsData[rangedWeapon].ammo;
+};
+
+Player.prototype.getAmmo = function(containerSlot){
+    return this.equipment.containers[containerSlot];
+};
+
+Player.prototype.canRange = function(){
+    var weapon = this.getRangedWeapon();
+    if(weapon == -1) return false;
+    return this.getAmmo(this.getRangedContainer(weapon)) > 0;
 };
 
 Player.prototype.applyEffects = function(item,coef){

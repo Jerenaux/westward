@@ -53,18 +53,9 @@ Order:
 Content:
 -------
 * Battle system
-- Visual cue to indicate whose turn it is
-- Visual timer
-- Display grid
-- Display quick slots
-- Movement on the battlefield
-- Set up basic stats and formulas for melee attacks
-- Mechanic for melee attacks
-- Animation for melee attacks
 - Stats and formulas for ranged attacks
 - Mechanic for ranged attacks
 - Identify characters in the way
-- Factor in defensive equipment
 - Monster AI
 - Manage end of fight
 - Respawn

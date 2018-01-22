@@ -45,7 +45,7 @@ var Stats = {
             name: 'Melee Damage',
             min: 0,
             max: 100,
-            start: 10,
+            start: 1,
             frame: 3
         },
         rdmg: {
