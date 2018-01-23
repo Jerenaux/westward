@@ -335,7 +335,6 @@ Engine.makeBattleUI = function(){
     Engine.fightText.setOrigin(0.5);
     Engine.fightText.setScrollFactor(0);
     Engine.fightText.setDepth(Engine.UIDepth+3);
-    Engine.fightText.setScale(10);
     Engine.fightText.setVisible(false);
 
     Engine.fightText.tween = Engine.scene.tweens.add(
@@ -346,12 +345,12 @@ Engine.makeBattleUI = function(){
             duration: 100,
             paused: true,
             onStart: function(){
+                Engine.fightText.setScale(10);
                 Engine.fightText.setVisible(true);
             },
             onComplete: function(){
                 setTimeout(function(){
                     Engine.fightText.setVisible(false);
-                    Engine.fightText.setScale(10);
                 },1000);
             }
         }
@@ -370,11 +369,13 @@ Engine.makeBattleUI = function(){
 };
 
 Engine.setCounter = function(seconds){
+    console.log('Setting counter');
     Engine.remainingTime = seconds;
     Engine.timerText.setText(Engine.remainingTime--);
-    var timer = setInterval(function(){
+    if(Engine.timer) clearInterval(Engine.timer);
+    Engine.timer = setInterval(function(){
         if(Engine.remainingTime < 0) {
-            clearInterval(timer);
+            clearInterval(Engine.timer);
             Engine.timerText.setVisible(false);
         }
         Engine.timerText.setText(Engine.remainingTime--);
@@ -388,6 +389,7 @@ Engine.displayCounter = function(){
 Engine.hideCounter = function(){
     console.log('hiding counter');
     Engine.timerText.setVisible(false);
+    clearInterval(Engine.timer);
 };
 
 Engine.hideBattleArrow = function(){
@@ -430,6 +432,7 @@ Engine.handleMissAnimation = function(target){
 };
 
 Engine.manageTurn = function(shortID){
+    if(!Engine.player.inFight) return;
     var active = Engine.getActiveFighter(shortID);
     if(active.isHero){
         Engine.displayCounter();
@@ -441,8 +444,8 @@ Engine.manageTurn = function(shortID){
 };
 
 Engine.manageArrow = function(entity){
+    if(!Engine.player.inFight) return;
     if(Engine.battleArrow.tween) Engine.battleArrow.tween.stop();
-    //Engine.battleArrow.anchor = entity;
     Engine.battleArrow.setVisible(true);
     Engine.battleArrow.setPosition(entity.x,entity.y);
     Engine.battleArrow.tween = Engine.scene.tweens.add(
@@ -847,13 +850,9 @@ Engine.updateSelf = function(data){
             Engine.handleMsg(data.msgs[i]);
         }
     }
-    if(data.remainingTime){
-        //console.log('It is your turn and you have',data.remainingTime,'seconds left');
-        Engine.setCounter(data.remainingTime);
-    }
-    if(data.activeID){
-        Engine.manageTurn(data.activeID);
-    }
+    if(data.fightStatus) BattleManager.handleFightStatus(data.fightStatus);
+    if(data.remainingTime) Engine.setCounter(data.remainingTime);
+    if(data.activeID) Engine.manageTurn(data.activeID);
 };
 
 Engine.handleMsg = function(msg){
@@ -964,8 +963,8 @@ Engine.isHero = function(player){
 
 Engine.updatePlayer = function(player,data){ // data contains the updated data from the server
     if(data.path && (player.id != Engine.player.id || Engine.player.inFight)) player.move(data.path);
-    if(data.inFight == true) Engine.startFight(player);
-    if(data.inFight == false) Engine.endFight(player);
+    //if(data.inFight == true) BattleManager.startFight(player);
+    //if(data.inFight == false) BattleManager.endFight(player);
     if(data.inBuilding > -1) {
         player.setVisible(false);
         player.inBuilding = data.inBuilding;
@@ -976,19 +975,28 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
         player.inBuilding = data.inBuilding;
         if(Engine.isHero(player)) Engine.exitBuilding();
     }
-    if(data.battlezone) Engine.manageBattleZones(player,data.battlezone);
+    /*if(data.battlezone) Engine.manageBattleZones(player,data.battlezone);
     if(data.meleeHit !== undefined) Engine.handleBattleAnimation('melee',player,data.meleeHit);
-    if(data.rangedMiss !== undefined) Engine.handleMissAnimation(player);
+    if(data.rangedMiss !== undefined) Engine.handleMissAnimation(player);*/
+    Engine.handleBattleUpdates(player,data);
 };
 
 Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server
     if(data.path) animal.move(data.path);
     if(data.stop) animal.stop();
-    if(data.inFight == true) Engine.startFight(animal);
+    /*if(data.inFight == true) Engine.startFight(animal);
     if(data.inFight == false) Engine.endFight(animal);
     if(data.battlezone) Engine.manageBattleZones(animal, data.battlezone);
     if(data.meleeHit !== undefined) Engine.handleBattleAnimation('melee',animal,data.meleeHit);
-    if(data.rangedMiss !== undefined) Engine.handleMissAnimation(animal);
+    if(data.rangedMiss !== undefined) Engine.handleMissAnimation(animal);*/
+    Engine.handleBattleUpdates(animal,data);
+};
+
+Engine.handleBattleUpdates = function(entity, data){
+    if(data.inFight !== undefined) entity.inFight = data.inFight;
+    if(data.battlezone) Engine.manageBattleZones(entity, data.battlezone);
+    if(data.meleeHit !== undefined) Engine.handleBattleAnimation('melee',entity,data.meleeHit);
+    if(data.rangedMiss !== undefined) Engine.handleMissAnimation(entity);
 };
 
 Engine.updateBuilding = function(building,data){ // data contains the updated data from the server
@@ -1259,27 +1267,6 @@ Engine.manageBattleZones = function(entity,zone){
         //console.log(frame);
         cell.v.setFrame(frame);
     });*/
-};
-
-Engine.startFight = function(entity){
-    //entity.displayHalo();
-    entity.inFight = true;
-
-    if(entity.isHero) {
-        Engine.hideUI();
-        Engine.hideMarker();
-        Engine.fightText.tween.play();
-    }
-};
-
-Engine.endFight = function(entity){
-    //entity.hideHalo();
-    entity.inFight = false;
-    if(entity.isHero) {
-        Engine.displayUI();
-        Engine.hideCounter();
-        Engine.hideBattleArrow();
-    }
 };
 
 // ## UI-related functions ##

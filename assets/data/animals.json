@@ -3,7 +3,7 @@
     "sprite":"wolves",
     "frame": 1,
     "stats": {
-      "hp": 5,
+      "hp": 1,
       "def": 9,
       "mdmg": 12
     }

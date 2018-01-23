@@ -12,6 +12,7 @@ var debug = false;
 
 function Animal(x,y,type){
     this.id = GameServer.lastAnimalID++;
+    this.isPlayer = false;
     //this.setStartingPosition();
     this.x = x;
     this.y = y;

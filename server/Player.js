@@ -12,6 +12,7 @@ var Equipment = require('../shared/Equipment.js').Equipment;
 
 function Player(){
     this.updatePacket = new PersonalUpdatePacket();
+    this.isPlayer = true;
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.action = null;
     this.inventory = new Inventory();
@@ -310,6 +311,10 @@ Player.prototype.enterBuilding = function(id){
 
 Player.prototype.exitBuilding = function(){
     this.setProperty('inBuilding', -1);
+};
+
+Player.prototype.notifyFight = function(){
+    this.updatePacket.fightNotification();
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){

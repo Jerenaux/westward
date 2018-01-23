@@ -30,7 +30,7 @@ var Moving = new Phaser.Class({
         this.setInteractive();
         //console.log('['+this.constructor.name+'] scene : ',this.scene);
 
-        this.halo = Engine.scene.add.image(0,0,'battlehalo');
+        /*this.halo = Engine.scene.add.image(0,0,'battlehalo');
         this.halo.setDepth(Engine.markerDepth+0.1);
         this.halo.setVisible(false);
         this.displayedHalo = false;
@@ -42,14 +42,14 @@ var Moving = new Phaser.Class({
             yoyo: true,
             repeat: -1,
             paused: true
-        });
+        });*/
     },
 
     getShortID: function(){
         return this.constructor.name[0]+this.id;
     },
 
-    displayHalo: function(){
+    /*displayHalo: function(){
         if(this.displayedHalo) return;
         this.halo.setVisible(true);
         this.haloTween.play();
@@ -65,7 +65,7 @@ var Moving = new Phaser.Class({
 
     updateHalo: function(){
         this.halo.setPosition(this.x+13,this.y+24);
-    },
+    },*/
 
     updateDepth: function(){
         try {
@@ -144,7 +144,7 @@ var Moving = new Phaser.Class({
         this.chunk = Utils.tileToAOI({x: this.tileX, y: this.tileY});
 
         if(this.bubble) this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
-        this.updateHalo();
+        //this.updateHalo();
 
         if(this.constructor.name == 'Player' && this.id == Engine.player.id) {
             if(this.chunk != this.previousChunk) Engine.updateEnvironment();
@@ -153,7 +153,6 @@ var Moving = new Phaser.Class({
 
         if(this.flagForStop && (this.tileX != this.previousTile.x || this.tileY != this.previousTile.y)){
             console.log(this.movement);
-            console.log('stopping');
             this.movement.stop();
             this.endMovement();
         }

@@ -10,7 +10,7 @@ var TURN_DURATION = 5; // 30
 function Battle(f1,f2){
     this.id = GameServer.lastBattleID++;
     this.fighters = [f2,f1]; // the fighter at position 0 is the one currently in turn
-    this.teams = {
+    this.teams = { // number of fighters of each 'team' involved in the fight
         'Animal': 1,
         'Player': 1
     };
@@ -28,6 +28,7 @@ Battle.prototype.start = function(){
     this.fighters.forEach(function(f){
         f.setProperty('inFight',true);
         f.stopWalk();
+        if(f.isPlayer) f.notifyFight(true);
         f.battle = _battle;
     });
     this.loop = setInterval(this.update.bind(this),1000);
@@ -42,7 +43,7 @@ Battle.prototype.newTurn = function(){
 
     for(var i = 0; i < this.fighters.length; i++){
         var f = this.fighters[i];
-        if(f.constructor.name == 'Player') {
+        if(f.isPlayer) {
             if(i == 0) f.updatePacket.remainingTime = this.countdown;
             f.updatePacket.activeID = this.getActiveFighter().getShortID();
         }
@@ -56,6 +57,7 @@ Battle.prototype.endOfTurn = function(){
             var fallen = this.fallen[j];
             if(fighter.getShortID() == fallen.getShortID()){
                 console.log(fighter.getShortID()+' is dead');
+                fighter.setProperty('inFight',false);
                 this.fighters.splice(i,1);
                 this.teams[fighter.constructor.name]--;
                 if(this.teams[fighter.constructor.name] <= 0) this.end();
@@ -187,6 +189,7 @@ Battle.prototype.end = function(){
     this.fighters.forEach(function(f){
         f.setProperty('inFight',false);
         f.setProperty('battlezone',[]);
+        if(f.isPlayer) f.notifyFight(false);
         f.battle = null;
     });
     console.log('[B'+this.id+'] Ended');
