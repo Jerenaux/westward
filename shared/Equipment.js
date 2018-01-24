@@ -12,7 +12,10 @@ var Equipment = {
             y: 115,
             shade: 'sword',
             name: 'Melee weapon',
-            conflict: 'rangedw'
+            conflict: 'rangedw',
+            showInBattle: true,
+            battlex: 10,
+            battley: 10
         },
         rangedw:{
             nb: 1,
@@ -20,7 +23,10 @@ var Equipment = {
             y: 65,
             shade: 'gun',
             name: 'Ranged weapon',
-            conflict: 'meleew'
+            conflict: 'meleew',
+            showInBattle: true,
+            battlex: 10,
+            battley: 50
         },
         shield:{
             nb: 1,
@@ -72,7 +78,10 @@ var Equipment = {
             shade: 'quiver',
             name: 'Quiver',
             container: true,
-            contains: 'arrows'
+            contains: 'arrows',
+            showInBattle: true,
+            battlex: 60,
+            battley: 10
         },
         ammo_pouch:{
             nb: 1,
@@ -81,7 +90,10 @@ var Equipment = {
             shade: 'ammo-pouch',
             name: 'Bullets pouch',
             container: true,
-            contains: 'bullets'
+            contains: 'bullets',
+            showInBattle: true,
+            battlex: 60,
+            battley: 50
         },
         arrows:{
             nb: 1,
@@ -89,7 +101,10 @@ var Equipment = {
             y: 50,
             shade: 'arrow',
             name: 'Arrows',
-            containedIn: 'quiver'
+            containedIn: 'quiver',
+            showInBattle: true,
+            battlex: 100,
+            battley: 10
         },
         bullets:{
             nb: 1,
@@ -97,7 +112,10 @@ var Equipment = {
             y: 100,
             shade: 'bullets',
             name: 'Bullets',
-            containedIn: 'ammo_pouch'
+            containedIn: 'ammo_pouch',
+            showInBattle: true,
+            battlex: 100,
+            battley: 50
         }
     }
 };

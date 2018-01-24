@@ -54,25 +54,21 @@ Order:
 Content:
 -------
 * Battle system
-- Stats and formulas for ranged attacks
-- Mechanic for ranged attacks
 - Identify characters in the way
-- Monster AI
-- Manage end of fight
 - Respawn
 - Respawn if disconnect
 - Battle experience
 - Spawn loot
 - Readjust camera
+- Death animation
 - Mouse hover icons (melee attack, ranged...)
-- Sync battles with other players
-- Allow players to jump in
-- Animal can spot players
-- Battle triggered upon being spotted
+- Multiplayer fights
+-> If step in zone -> involved in fight (modify arena shape, etc.)
+-> If someone in area when starting -> involve as well!
+- Animal can trigger fights
 - Add a few savages with roaming behaviour
 - Expand battle AI for savages
 - Improve roaming behavior of savages
-- Compute and display battle grid
 - Adjust camera
 - Have a permanent presence of savages and animals around settlements
 * Exploration/travel

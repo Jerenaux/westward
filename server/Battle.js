@@ -20,7 +20,6 @@ function Battle(f1,f2){
     this.area = []; // array of rectangular areas
     this.countdown = null;
     this.endTime = 0;
-    this.flagNextTurn = false;
     this.start();
 }
 
@@ -39,8 +38,6 @@ Battle.prototype.start = function(){
 };
 
 Battle.prototype.update = function(){
-    //this.countdown--;
-    //if(this.flagNextTurn || this.countdown == 0) {
     this.countdown -= TICK_RATE;
     if(this.countdown <= this.endTime) {
         this.endOfTurn();
@@ -84,7 +81,6 @@ Battle.prototype.newTurn = function(){
     this.fighters.push(this.fighters.shift());
     this.countdown = TURN_DURATION;
     this.endTime = 0;
-    this.flagNextTurn = false;
     console.log('[B'+this.id+'] New turn');
     //console.log('[B'+this.id+'] It is now '+(this.fighters[0].constructor.name)+'\'s turn');
 
@@ -122,7 +118,7 @@ Battle.prototype.isTurnOf = function(f){
 };
 
 Battle.prototype.processAction = function(f,data){
-    if(this.flagNextTurn || !this.isTurnOf(f)) return;
+    if(!this.isTurnOf(f)) return;
     var result;
     switch(data.action){
         case 'move':
@@ -133,10 +129,7 @@ Battle.prototype.processAction = function(f,data){
             result = this.processAttack(f,target);
             break;
     }
-    if(result && result.success) {
-        this.endTime = this.countdown - result.delay;
-        //this.flagNextTurn = true;
-    }
+    if(result && result.success) this.endTime = this.countdown - result.delay;
 };
 
 Battle.prototype.processMove = function(f,x,y){

@@ -2,9 +2,10 @@
  * Created by Jerome on 28-11-17.
  */
 
-function EquipmentPanel(x,y,width,height,title){
+function EquipmentPanel(x,y,width,height,title,battleMenu){
     Panel.call(this,x,y,width,height,title);
     this.slots = {};
+    this.battleMenu = battleMenu;
     this.addEquip();
 }
 
@@ -12,16 +13,20 @@ EquipmentPanel.prototype = Object.create(Panel.prototype);
 EquipmentPanel.prototype.constructor = EquipmentPanel;
 
 EquipmentPanel.prototype.addEquip = function(){
-    var xoffset = -40;
+    var xoffset = (this.battleMenu ? 10 : -40);
+    var yoffset = (this.battleMenu? 10 : 0);
     for(var equip in Equipment.dict){
         if(!Equipment.dict.hasOwnProperty(equip)) continue;
         var eq = Equipment.dict[equip];
+        if(this.battleMenu && !eq.showInBattle) continue;
         this.slots[equip] = [];
         for(var i = 0; i < eq.nb; i++) {
             var xinc = eq.xincrement || 0;
-            var x = eq.x+(i*xinc)+xoffset;
+            var xpos = (this.battleMenu ? eq.battlex : eq.x);
+            var x = xpos+(i*xinc)+xoffset;
+            var y = (this.battleMenu ? eq.battley : eq.y) + yoffset;
             var displayName = eq.nb > 1 ? eq.name+' '+(i+1) : eq.name;
-            this.slots[equip].push(this.addEquipSlot(x,eq.y,displayName,eq.shade,eq.containedIn,equip,i));
+            this.slots[equip].push(this.addEquipSlot(x,y,displayName,eq.shade,eq.containedIn,equip,i));
         }
     }
     this.updateEquipment();
@@ -71,6 +76,7 @@ EquipmentPanel.prototype.updateEquipment = function(){
     for(var equip in Equipment.dict) {
         if (!Equipment.dict.hasOwnProperty(equip)) continue;
         var eq = Equipment.dict[equip];
+        if(this.battleMenu && !eq.showInBattle) continue;
         for(var i = 0; i < eq.nb; i++) {
             var newItem = Engine.player.getEquipped(equip,i);
             var currentItem = this.slots[equip][i];
@@ -114,6 +120,7 @@ EquipmentPanel.prototype.displaySlots = function(){
     for(var equip in Equipment.dict){
         if(!Equipment.dict.hasOwnProperty(equip)) continue;
         var eq = Equipment.dict[equip];
+        if(this.battleMenu && !eq.showInBattle) continue;
         for(var i = 0; i < this.slots[equip].length; i++){
             var s = this.slots[equip][i];
             s.item.setVisible(true);

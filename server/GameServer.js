@@ -69,6 +69,7 @@ GameServer.readMap = function(mapsPath){
     // Read buildings
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
     GameServer.buildingsList = {}; // active list of the locations of all buildings
+    GameServer.forts = {}; // maps settlements to forts
     GameServer.server.db.collection('buildings').find({}).toArray(function(err,buildings){
         if(err) throw err;
         for(var i = 0; i < buildings.length; i++){
@@ -76,13 +77,16 @@ GameServer.readMap = function(mapsPath){
             var building = new Building(data.x,data.y,data.type,data.settlement,data.stock,data.gold,data.prices);
             GameServer.buildings[building.id] = building;
             GameServer.buildingsList[building.id] = building.superTrim();
+
+            if(data.type == 0) GameServer.forts[data.settlement] = building;
+
         }
         GameServer.updateStatus();
     });
 
     // Spawn animals
     var animals = JSON.parse(fs.readFileSync('./assets/maps/animals.json').toString());
-    for(var i = 0; i < 1; i++){ // animals.list.length
+    for(var i = 0; i < animals.list.length; i++){
         var data = animals.list[i];
         var x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
         var y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
@@ -143,7 +147,7 @@ GameServer.finalizePlayer = function(socket,player){
     GameServer.socketMap[socket.id] = player.id;
     GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
     GameServer.nbConnectedChanged = true;
-    player.setOrUpdateAOI();
+    player.setOrUpdateAOI(); // takes care of adding to the world as well
     console.log(GameServer.server.getNbConnected()+' connected');
 };
 
@@ -165,22 +169,6 @@ GameServer.handleDisconnect = function(socketID){
     delete GameServer.socketMap[socketID];
     GameServer.nbConnectedChanged = true;
 };
-
-/*GameServer.removePlayer = function(socketID){
-    var player = GameServer.getPlayer(socketID);
-    if(!player) return;
-    GameServer.removeFromLocation(player);
-    var AOIs = Utils.listAdjacentAOIs(player.aoi);
-    AOIs.forEach(function(aoi){
-        //GameServer.addDisconnectToAOI(aoi,player.id);
-        GameServer.removeObjectFromAOI(aoi,player);
-    });
-    if(player.battle) player.battle.end();
-    delete GameServer.socketMap[socketID];
-    delete GameServer.players[player.id];
-    GameServer.nbConnectedChanged = true;
-    //console.log(GameServer.server.getNbConnected()+' connected');
-};*/
 
 GameServer.removeEntity = function(entity){
     GameServer.removeFromLocation(entity);

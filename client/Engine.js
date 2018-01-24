@@ -156,6 +156,7 @@ Engine.create = function(masterData){
 
     Engine.inMenu = false;
     Engine.inPanel = false;
+    Engine.dead = false;
     Engine.currentMenu = null;
     Engine.currentPanel = null;
 
@@ -271,6 +272,12 @@ Engine.toggleChatBar = function(){
     Engine.chat.toggle();*/
 };
 
+Engine.manageDeath = function(){
+    Engine.dead = true;
+    Engine.hideUI();
+    Engine.hideMarker();
+};
+
 Engine.makeBuildingTitle = function(){
     Engine.buildingTitle = new UIHolder(512,10,'center');
     Engine.buildingTitle.setButton(Engine.leaveBuilding);
@@ -290,7 +297,8 @@ Engine.makeUI = function(){
         'crafting': Engine.makeCraftingMenu(),
         'character': Engine.makeCharacterMenu(statsPanel),
         'trade': Engine.makeTradeMenu(),
-        'fort': Engine.makeFortMenu()
+        'fort': Engine.makeFortMenu(),
+        'battle': Engine.makeBattleMenu()
     };
 
     var UIelements = [];
@@ -449,6 +457,23 @@ Engine.hideUI = function(){
     for(var i = 0; i < 3; i++){
         Engine.UIelements[i].setVisible(false);
     }
+};
+
+Engine.makeBattleMenu = function(){
+    var battle = new Menu();
+    // #####################
+    /*var items = new InventoryPanel(40,100,600,380,'Items');
+    items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
+    items.addCapsule('gold',100,-9,'999','gold');
+    inventory.addPanel('items',items);*/
+    var equipment = new EquipmentPanel(665,100,170,120,'Equipment',true); // true: battle menu
+    battle.addPanel('equipment',equipment);
+    //inventory.addPanel('stats',statsPanel); TODO replace by health bar
+    battle.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
+    /*inventory.onUpdateInventory = items.updateInventory.bind(items);
+    inventory.onUpdateStats = statsPanel.updateStats.bind(statsPanel);*/
+    // #####################
+    return battle;
 };
 
 Engine.makeFortMenu = function(){
@@ -664,7 +689,7 @@ Engine.handleClick = function(event){
             if(event.list[i].handleClick) event.list[i].handleClick(event);
         }
     }else{
-        if(!Engine.inMenu && !Engine.player.inFight) {
+        if(!Engine.inMenu && !Engine.player.inFight && !Engine.dead) {
             if(Engine.inPanel) Engine.currentPanel.hide();
             Engine.moveToClick(event);
         }
@@ -775,6 +800,7 @@ Engine.hideMarker = function(){
 };
 
 Engine.showMarker = function(){
+    console.log('Displaying marker');
     Engine.marker.visible = true;
 };
 
@@ -829,6 +855,7 @@ Engine.updateSelf = function(data){
     if(data.fightStatus !== undefined) BattleManager.handleFightStatus(data.fightStatus);
     if(data.remainingTime) BattleManager.setCounter(data.remainingTime);
     if(data.activeID) BattleManager.manageTurn(data.activeID);
+    if(data.dead) Engine.manageDeath();
 };
 
 Engine.handleMsg = function(msg){
@@ -913,12 +940,6 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
         }
     }
 
-    /*if(data.disconnected) { // data.disconnected is an array of disconnected players
-        for (var i = 0; i < data.disconnected.length; i++) {
-            Engine.removePlayer(data.disconnected[i]);
-        }
-    }*/
-
     if(data.removedplayers) Engine.traverseRemovalArrays(data.removedplayers,Engine.removePlayer);
     if(data.removedanimals) Engine.traverseRemovalArrays(data.removedanimals,Engine.removeAnimal);
 
@@ -960,6 +981,8 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
         if(Engine.isHero(player)) Engine.exitBuilding();
     }
     Engine.handleBattleUpdates(player,data);
+    if(data.dead == true) player.setVisible(false);
+    if(data.dead == false) player.setVisible(true);
 };
 
 Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server

@@ -21,6 +21,7 @@ BattleManager.startFight = function(){
     Engine.hideMarker();
     Engine.fightText.tween.play();
     BattleManager.inBattle = true;
+    Engine.menus.battle.display();
 };
 
 BattleManager.setCounter = function(seconds){
@@ -58,6 +59,7 @@ BattleManager.endFight = function(){
     Engine.hideCounter();
     Engine.hideBattleArrow();
     BattleManager.inBattle = false;
+    Engine.menus.battle.hide();
 };
 
 
