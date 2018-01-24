@@ -236,6 +236,10 @@ Player.prototype.applyEffect = function(stat,delta){
     this.setStat(stat,newvalue);
 };
 
+Player.prototype.getHealth = function(){
+    return this.stats['hp'];
+};
+
 Player.prototype.isInBuilding = function(){
     return this.inBuilding > -1;
 };
@@ -243,7 +247,7 @@ Player.prototype.isInBuilding = function(){
 Player.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','path','settlement','inFight','inBuilding','battlezone']; // list of properties relevant for the client
+    var broadcastProperties = ['id','path','settlement','inFight','inBuilding','battlezone','dead']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -313,8 +317,8 @@ Player.prototype.exitBuilding = function(){
     this.setProperty('inBuilding', -1);
 };
 
-Player.prototype.notifyFight = function(){
-    this.updatePacket.fightNotification();
+Player.prototype.notifyFight = function(flag){
+    this.updatePacket.fightNotification(flag);
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){

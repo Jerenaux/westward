@@ -5,10 +5,12 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
-var TURN_DURATION = 5; // 30
+var TURN_DURATION = 5*1000; // milliseconds
+var TICK_RATE = 100; // milliseconds
 
 function Battle(f1,f2){
     this.id = GameServer.lastBattleID++;
+    this.participants = [f1,f2];
     this.fighters = [f2,f1]; // the fighter at position 0 is the one currently in turn
     this.teams = { // number of fighters of each 'team' involved in the fight
         'Animal': 1,
@@ -17,6 +19,7 @@ function Battle(f1,f2){
     this.fallen = [];
     this.area = []; // array of rectangular areas
     this.countdown = null;
+    this.endTime = 0;
     this.flagNextTurn = false;
     this.start();
 }
@@ -31,22 +34,17 @@ Battle.prototype.start = function(){
         if(f.isPlayer) f.notifyFight(true);
         f.battle = _battle;
     });
-    this.loop = setInterval(this.update.bind(this),1000);
+    this.loop = setInterval(this.update.bind(this),TICK_RATE);
     this.newTurn();
 };
 
-Battle.prototype.newTurn = function(){
-    this.fighters.push(this.fighters.shift());
-    this.countdown = TURN_DURATION;
-    this.flagNextTurn = false;
-    //console.log('[B'+this.id+'] It is now '+(this.fighters[0].constructor.name)+'\'s turn');
-
-    for(var i = 0; i < this.fighters.length; i++){
-        var f = this.fighters[i];
-        if(f.isPlayer) {
-            if(i == 0) f.updatePacket.remainingTime = this.countdown;
-            f.updatePacket.activeID = this.getActiveFighter().getShortID();
-        }
+Battle.prototype.update = function(){
+    //this.countdown--;
+    //if(this.flagNextTurn || this.countdown == 0) {
+    this.countdown -= TICK_RATE;
+    if(this.countdown <= this.endTime) {
+        this.endOfTurn();
+        this.newTurn();
     }
 };
 
@@ -55,25 +53,51 @@ Battle.prototype.endOfTurn = function(){
         for (var i = this.fighters.length - 1; i >= 0; i--) {
             var fighter = this.fighters[i];
             var fallen = this.fallen[j];
-            if(fighter.getShortID() == fallen.getShortID()){
-                console.log(fighter.getShortID()+' is dead');
-                fighter.setProperty('inFight',false);
-                this.fighters.splice(i,1);
-                this.teams[fighter.constructor.name]--;
-                if(this.teams[fighter.constructor.name] <= 0) this.end();
-            }
+            if(fighter.getShortID() == fallen.getShortID()) this.removeFighter(fighter,i);
         }
     }
     this.fallen = [];
 };
 
-Battle.prototype.update = function(){
-    //console.log('[B'+this.id+'] Updating');
-    this.countdown--;
-    if(this.flagNextTurn || this.countdown == 0) {
-        this.endOfTurn();
-        this.newTurn();
+Battle.prototype.getFighterIndex = function(f){
+    for(var i = 0; i < this.fighters.length; i++){
+        if(this.fighters[i].getShortID() == f.getShortID()) return i;
     }
+    return -1;
+};
+
+Battle.prototype.removeFighter = function(f,idx){
+    if(idx == -1) idx = this.getFighterIndex(f);
+    if(idx == -1) return;
+    f.endFight();
+    f.die();
+    this.fighters.splice(idx,1);
+    this.updateTeams(f.constructor.name);
+};
+
+Battle.prototype.updateTeams = function(team){
+    this.teams[team]--;
+    if(this.teams[team] <= 0) this.end();
+};
+
+Battle.prototype.newTurn = function(){
+    this.fighters.push(this.fighters.shift());
+    this.countdown = TURN_DURATION;
+    this.endTime = 0;
+    this.flagNextTurn = false;
+    console.log('[B'+this.id+'] New turn');
+    //console.log('[B'+this.id+'] It is now '+(this.fighters[0].constructor.name)+'\'s turn');
+
+    var activeFighter = this.getActiveFighter();
+    for(var i = 0; i < this.fighters.length; i++){
+        var f = this.fighters[i];
+        if(f.isPlayer) {
+            if(i == 0) f.updatePacket.remainingTime = this.countdown/1000;
+            f.updatePacket.activeID = activeFighter.getShortID();
+        }
+    }
+
+    if(!activeFighter.isPlayer) activeFighter.decideBattleAction();
 };
 
 Battle.prototype.getActiveFighter = function(){
@@ -97,32 +121,31 @@ Battle.prototype.isTurnOf = function(f){
     return (f.getShortID() == this.getActiveFighter().getShortID());
 };
 
-Battle.prototype.processAction = function(player,data){
-    if(this.flagNextTurn || !this.isTurnOf(player)) return;
-    var success;
+Battle.prototype.processAction = function(f,data){
+    if(this.flagNextTurn || !this.isTurnOf(f)) return;
+    var result;
     switch(data.action){
         case 'move':
-            success = this.processMove(player,data.x,data.y);
+            result = this.processMove(f,data.x,data.y);
             break;
         case 'attack':
             var target = this.getFighterByID(data.id);
-            success = this.processAttack(player,target);
+            result = this.processAttack(f,target);
             break;
     }
-    if(success) this.flagNextTurn = true;
+    if(result && result.success) {
+        this.endTime = this.countdown - result.delay;
+        //this.flagNextTurn = true;
+    }
 };
 
 Battle.prototype.processMove = function(f,x,y){
-    var dist = Utils.euclidean({
-        x: f.x,
-        y: f.y
-    },{
-        x: x,
-        y: y
-    });
-    if(dist <= PFUtils.battleRange) {
+    if(f.inBattleRange(x,y)){
         f.setPath(GameServer.findPath({x:f.x,y:f.y},{x:x,y:y}));
-        return true;
+        return {
+            success: true,
+            delay: f.getPathDuration()
+        };
     }
     return false;
 };
@@ -166,7 +189,10 @@ Battle.prototype.processAttack = function(a,b){
         var dmg = this.computeMeleeDamage(a,b);
         this.applyDamage(b,dmg);
         b.setProperty('meleeHit',dmg);
-        return true;
+        return {
+            success: true,
+            delay: 100
+        };
     }else{
         if(!a.canRange()) return false;
         a.decreaseAmmo();
@@ -179,18 +205,22 @@ Battle.prototype.processAttack = function(a,b){
             b.setProperty('rangedMiss',true);
         }
         console.log('ranged attack');
-        return true;
+        return {
+            success: true,
+            delay: 100
+        };
     }
     return false;
 };
 
+// Entites are only removed when the battle is over ; battlezones are only cleared at that time
 Battle.prototype.end = function(){
     clearInterval(this.loop);
-    this.fighters.forEach(function(f){
-        f.setProperty('inFight',false);
+    this.participants.forEach(function(f){
+        f.endFight();
         f.setProperty('battlezone',[]);
         if(f.isPlayer) f.notifyFight(false);
-        f.battle = null;
+        if(f.dead) setTimeout(GameServer.removeEntity,500,f);
     });
     console.log('[B'+this.id+'] Ended');
     // TODO: respawn if quitting battle by disconnecting

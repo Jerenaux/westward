@@ -50,7 +50,7 @@ Animal.prototype.setStat = function(key,value){
 Animal.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','path','type','inFight','battlezone']; // list of properties relevant for the client
+    var broadcastProperties = ['id','path','type','inFight','battlezone','dead']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -86,6 +86,64 @@ Animal.prototype.findRandomDestination = function(){
         x: Utils.clamp(this.x + Utils.randomInt(-5,5),0,World.worldWidth),
         y: Utils.clamp(this.y + Utils.randomInt(-5,5),0,World.worldHeight)
     };
+};
+
+Animal.prototype.decideBattleAction = function(){
+    console.log('Deciding battle action');
+    var target = this.selectTarget();
+    var data = {};
+    if(this.battle.nextTo(this,target)){
+        data.action = 'attack';
+        data.id = target.getShortID();
+    }else{
+        data.action = 'move';
+        var dest = this.computeBattleDestination(target);
+        console.log('destination : ',dest.x,dest.y);
+        data.x = dest.x;
+        data.y = dest.y;
+    }
+    this.battle.processAction(this,data);
+};
+
+Animal.prototype.selectTarget = function(){
+    var fighters = this.battle.fighters;
+    var minHP = 9999;
+    var currentTarget = null;
+    for(var i = 0; i < fighters.length; i++){
+        var f = fighters[i];
+        if(!f.isPlayer) continue;
+        if(f.getHealth() < minHP){
+            minHP = f.getHealth();
+            currentTarget = f;
+        }
+    }
+    console.log('Selected target ',currentTarget.getShortID());
+    return currentTarget;
+};
+
+Animal.prototype.computeBattleDestination = function(target){
+    console.log('computing destination');
+    var dest = target.getEndOfPath();
+    var closest = null;
+    var minDist = 9999;
+    console.log(this.x,dest.x);
+    console.log(this.y,dest.y);
+    for(var x = Math.min(this.x,dest.x); x < Math.max(this.x,dest.x); x++){
+        for(var y = Math.min(this.y,dest.y); y < Math.max(this.y,dest.y); y++) {
+            console.log('considering ',x,y);
+            if(this.inBattleRange(x,y)){
+                if(this.battle.nextTo({x:x,y:y},dest)) return {x:x,y:y};
+                var dist = Utils.euclidean({x:x,y:y},{x:dest.x,y:dest.y});
+                if(dist < minDist){
+                    minDist = dist;
+                    closest = {x:x,y:y};
+                }
+            }
+        }
+    }
+    console.log('done');
+    if(closest == null) console.log('not found');
+    return closest;
 };
 
 module.exports.Animal = Animal;

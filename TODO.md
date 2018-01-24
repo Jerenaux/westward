@@ -23,6 +23,7 @@ Cleaning:
 Performance:
 - Dont send full building inventories when buying/selling (send arrays of deltas)
 - Use pool for footsteps (see Groups, who now act as pools)
+- Use pools for players, animals, ...
 - Fix null values in left-fringe chunks
 ->nulls in corrupted chunks likely arise from "undefined" values being converted to null by JSON.stringify
 -> Happens on the fringe -> because for these drawShore returns undefined?!

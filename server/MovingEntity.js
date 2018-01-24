@@ -2,6 +2,7 @@
  * Created by Jerome on 09-10-17.
  */
 var GameObject = require('./GameObject.js').GameObject;
+var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 var debug = false;
@@ -18,7 +19,6 @@ MovingEntity.prototype.setPath = function(path){
     this.setProperty('path',path);
     this.updatePathTick();
     this.moving = true;
-    this.inFight = false;
 };
 
 MovingEntity.prototype.updatePathTick = function(){ // Compute in how many seconds will the entity have moved by one tile
@@ -70,11 +70,49 @@ MovingEntity.prototype.endPath = function(){
     //console.log('path ended at',this.x,this.y);
 };
 
+MovingEntity.prototype.getEndOfPath = function(){
+    if(this.path) {
+        return {
+            x: this.path[this.path.length - 1][0],
+            y: this.path[this.path.length - 1][1]
+        };
+    }else{
+        return {
+            x: this.x,
+            y: this.y
+        }
+    }
+};
+
+MovingEntity.prototype.getPathDuration = function(){
+    return this.path.length*(1000/PFUtils.speed);
+};
+
 MovingEntity.prototype.stopWalk = function(){
     if(!this.moving) return;
     //console.log('Entity is at ',this.x,this.y);
     this.flagToStop = true;
     this.setProperty('stop',true);
+};
+
+MovingEntity.prototype.die = function(){
+    this.setProperty('dead',true);
+};
+
+MovingEntity.prototype.endFight = function(){
+    this.setProperty('inFight',false);
+    this.battle = null;
+};
+
+MovingEntity.prototype.inBattleRange = function(x,y){
+    var dist = Utils.euclidean({
+        x: this.x,
+        y: this.y
+    },{
+        x: x,
+        y: y
+    });
+    return dist <= PFUtils.battleRange;
 };
 
 module.exports.MovingEntity = MovingEntity;

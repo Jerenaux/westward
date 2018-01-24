@@ -15,9 +15,10 @@ var GameServer = {
     animals: {}, // animal.id -> animal
     buildings: {}, // building.id -> building
     socketMap: {}, // socket.id -> player.id
+    //garbage: [],
     nbConnectedChanged: false,
     initializationTicks: 0,
-    requiredTicks: 2,
+    requiredTicks: 2, // required number of initialization ticks
     initialized: false
 };
 
@@ -81,7 +82,7 @@ GameServer.readMap = function(mapsPath){
 
     // Spawn animals
     var animals = JSON.parse(fs.readFileSync('./assets/maps/animals.json').toString());
-    for(var i = 0; i < animals.list.length; i++){
+    for(var i = 0; i < 1; i++){ // animals.list.length
         var data = animals.list[i];
         var x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
         var y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
@@ -157,20 +158,55 @@ GameServer.createInitializationPacket = function(playerID){
     // and add them to the "newplayers" array of the next update packet
 };
 
-GameServer.removePlayer = function(socketID){
+GameServer.handleDisconnect = function(socketID){
+    var player = GameServer.getPlayer(socketID);
+    if(!player) return;
+    GameServer.removeEntity(player);
+    delete GameServer.socketMap[socketID];
+    GameServer.nbConnectedChanged = true;
+};
+
+/*GameServer.removePlayer = function(socketID){
     var player = GameServer.getPlayer(socketID);
     if(!player) return;
     GameServer.removeFromLocation(player);
     var AOIs = Utils.listAdjacentAOIs(player.aoi);
     AOIs.forEach(function(aoi){
-        GameServer.addDisconnectToAOI(aoi,player.id);
+        //GameServer.addDisconnectToAOI(aoi,player.id);
+        GameServer.removeObjectFromAOI(aoi,player);
     });
     if(player.battle) player.battle.end();
     delete GameServer.socketMap[socketID];
     delete GameServer.players[player.id];
     GameServer.nbConnectedChanged = true;
     //console.log(GameServer.server.getNbConnected()+' connected');
+};*/
+
+GameServer.removeEntity = function(entity){
+    GameServer.removeFromLocation(entity);
+    var AOIs = Utils.listAdjacentAOIs(entity.aoi);
+    AOIs.forEach(function(aoi){
+        GameServer.removeObjectFromAOI(aoi,entity);
+    });
+
+    var arr;
+    switch(entity.constructor.name){
+        case 'Player':
+            arr = GameServer.players;
+            break;
+        /*case 'Building':
+         arr = this.newbuildings;
+         break;*/
+        case 'Animal':
+            arr = GameServer.animals;
+            break;
+    }
+    delete arr[entity.id];
+
+    if(entity.battle) entity.battle.removeFighter(entity,-1);
+
 };
+
 
 GameServer.getAOIAt = function(x,y){
     return GameServer.AOIs[Utils.tileToAOI({x:x,y:y})];
@@ -411,10 +447,15 @@ GameServer.addObjectToAOI = function(aoi,entity){
     GameServer.dirtyAOIs.add(aoi);
 };
 
-GameServer.addDisconnectToAOI = function(aoi,playerID) {
-    GameServer.AOIs[aoi].updatePacket.addDisconnect(playerID);
+GameServer.removeObjectFromAOI = function(aoi,entity) {
+    GameServer.AOIs[aoi].updatePacket.removeObject(entity);
     GameServer.dirtyAOIs.add(aoi);
 };
+
+/*GameServer.addDisconnectToAOI = function(aoi,playerID) {
+    GameServer.AOIs[aoi].updatePacket.addDisconnect(playerID);
+    GameServer.dirtyAOIs.add(aoi);
+};*/
 
 GameServer.updateAOIproperty = function(aoi,category,id,property,value) {
     GameServer.AOIs[aoi].updatePacket.updateProperty(category, id, property, value);
@@ -435,6 +476,6 @@ GameServer.updateWalks = function(){
 GameServer.updateNPC = function(){
     Object.keys(GameServer.animals).forEach(function(key) {
         var a = GameServer.animals[key];
-        if(a.idle) a.updateIdle();
+        if(a.idle && !a.dead) a.updateIdle();
     });
 };

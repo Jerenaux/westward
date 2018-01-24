@@ -26,7 +26,7 @@ PersonalUpdatePacket.prototype.isEmpty = function(){
 PersonalUpdatePacket.prototype.clean = function() { // Remove empty arrays from the package
     for(var field in this){
         if(!this.hasOwnProperty(field)) continue;
-        if(this[field].constructor.name == 'Array'){
+        if(this[field] && this[field].constructor.name == 'Array'){
             if(this[field].length == 0) this[field] = undefined;
         }
     }

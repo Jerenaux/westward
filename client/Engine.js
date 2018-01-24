@@ -368,45 +368,34 @@ Engine.makeBattleUI = function(){
     Engine.battleArrow.setOrigin(0,1);
 };
 
-Engine.setCounter = function(seconds){
-    console.log('Setting counter');
-    Engine.remainingTime = seconds;
-    Engine.timerText.setText(Engine.remainingTime--);
+Engine.displayCounter = function(){
     if(Engine.timer) clearInterval(Engine.timer);
     Engine.timer = setInterval(function(){
-        if(Engine.remainingTime < 0) {
+        if(BattleManager.countdown < 0) {
             clearInterval(Engine.timer);
             Engine.timerText.setVisible(false);
         }
-        Engine.timerText.setText(Engine.remainingTime--);
+        Engine.updateCounter();
     },1000);
-};
-
-Engine.displayCounter = function(){
+    Engine.updateCounter();
     Engine.timerText.setVisible(true);
 };
 
+Engine.updateCounter = function(){
+    Engine.timerText.setText(BattleManager.countdown--);
+};
+
 Engine.hideCounter = function(){
-    console.log('hiding counter');
     Engine.timerText.setVisible(false);
     clearInterval(Engine.timer);
 };
 
-Engine.hideBattleArrow = function(){
-    Engine.battleArrow.setVisible(false);
+Engine.displayBattleArrow = function(){
+    Engine.battleArrow.setVisible(true);
 };
 
-Engine.getActiveFighter = function(id){
-    var map;
-    switch(id[0]){
-        case 'P':
-            map = Engine.players;
-            break;
-        case 'A':
-            map = Engine.animals;
-            break;
-    }
-    return map[id.slice(1)];
+Engine.hideBattleArrow = function(){
+    Engine.battleArrow.setVisible(false);
 };
 
 Engine.handleBattleAnimation = function(animation,target,dmg){
@@ -431,22 +420,9 @@ Engine.handleMissAnimation = function(target){
     text.tween.play();
 };
 
-Engine.manageTurn = function(shortID){
-    if(!Engine.player.inFight) return;
-    var active = Engine.getActiveFighter(shortID);
-    if(active.isHero){
-        Engine.displayCounter();
-        Engine.player.actionTaken = false;
-    }else{
-        Engine.hideCounter();
-    }
-    Engine.manageArrow(active);
-};
-
 Engine.manageArrow = function(entity){
-    if(!Engine.player.inFight) return;
+    if(!BattleManager.inBattle) return;
     if(Engine.battleArrow.tween) Engine.battleArrow.tween.stop();
-    Engine.battleArrow.setVisible(true);
     Engine.battleArrow.setPosition(entity.x,entity.y);
     Engine.battleArrow.tween = Engine.scene.tweens.add(
         {
@@ -850,9 +826,9 @@ Engine.updateSelf = function(data){
             Engine.handleMsg(data.msgs[i]);
         }
     }
-    if(data.fightStatus) BattleManager.handleFightStatus(data.fightStatus);
-    if(data.remainingTime) Engine.setCounter(data.remainingTime);
-    if(data.activeID) Engine.manageTurn(data.activeID);
+    if(data.fightStatus !== undefined) BattleManager.handleFightStatus(data.fightStatus);
+    if(data.remainingTime) BattleManager.setCounter(data.remainingTime);
+    if(data.activeID) BattleManager.manageTurn(data.activeID);
 };
 
 Engine.handleMsg = function(msg){
@@ -931,16 +907,20 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.newanimals) {
         for (var n = 0; n < data.newanimals.length; n++) {
             var a = data.newanimals[n];
+            if(a.dead) continue;
             var animal = Engine.addAnimal(a.id, a.x, a.y, a.type);
             Engine.updateAnimal(animal,a);
         }
     }
 
-    if(data.disconnected) { // data.disconnected is an array of disconnected players
+    /*if(data.disconnected) { // data.disconnected is an array of disconnected players
         for (var i = 0; i < data.disconnected.length; i++) {
             Engine.removePlayer(data.disconnected[i]);
         }
-    }
+    }*/
+
+    if(data.removedplayers) Engine.traverseRemovalArrays(data.removedplayers,Engine.removePlayer);
+    if(data.removedanimals) Engine.traverseRemovalArrays(data.removedanimals,Engine.removeAnimal);
 
     // data.players is an associative array mapping the id's of the entities
     // to small object indicating which properties need to be updated. The following code iterate over
@@ -948,6 +928,12 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.players) Engine.traverseUpdateObject(data.players,Engine.players,Engine.updatePlayer);
     if(data.animals) Engine.traverseUpdateObject(data.animals,Engine.animals,Engine.updateAnimal);
     if(data.buildings) Engine.traverseUpdateObject(data.buildings,Engine.buildings,Engine.updateBuilding);
+};
+
+Engine.traverseRemovalArrays = function(arr,callback){
+    for (var i = 0; i < arr.length; i++) {
+        callback(arr[i]);
+    }
 };
 
 // For each element in obj, call callback on it
@@ -963,8 +949,6 @@ Engine.isHero = function(player){
 
 Engine.updatePlayer = function(player,data){ // data contains the updated data from the server
     if(data.path && (player.id != Engine.player.id || Engine.player.inFight)) player.move(data.path);
-    //if(data.inFight == true) BattleManager.startFight(player);
-    //if(data.inFight == false) BattleManager.endFight(player);
     if(data.inBuilding > -1) {
         player.setVisible(false);
         player.inBuilding = data.inBuilding;
@@ -975,21 +959,14 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
         player.inBuilding = data.inBuilding;
         if(Engine.isHero(player)) Engine.exitBuilding();
     }
-    /*if(data.battlezone) Engine.manageBattleZones(player,data.battlezone);
-    if(data.meleeHit !== undefined) Engine.handleBattleAnimation('melee',player,data.meleeHit);
-    if(data.rangedMiss !== undefined) Engine.handleMissAnimation(player);*/
     Engine.handleBattleUpdates(player,data);
 };
 
 Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server
     if(data.path) animal.move(data.path);
     if(data.stop) animal.stop();
-    /*if(data.inFight == true) Engine.startFight(animal);
-    if(data.inFight == false) Engine.endFight(animal);
-    if(data.battlezone) Engine.manageBattleZones(animal, data.battlezone);
-    if(data.meleeHit !== undefined) Engine.handleBattleAnimation('melee',animal,data.meleeHit);
-    if(data.rangedMiss !== undefined) Engine.handleMissAnimation(animal);*/
     Engine.handleBattleUpdates(animal,data);
+    if(data.dead) setTimeout(Engine.removeAnimal,500,animal.id);
 };
 
 Engine.handleBattleUpdates = function(entity, data){
@@ -1041,16 +1018,17 @@ Engine.removeBuilding = function(id){
 };
 
 Engine.removePlayer = function(id){
+    // TODO: use pools
     var sprite = Engine.players[id];
-    sprite.hideHalo();
     sprite.destroy();
     Engine.displayedPlayers.delete(id);
     delete Engine.players[id];
 };
 
 Engine.removeAnimal = function(id){
+    // TODO: use pools
+    if(!Engine.animals.hasOwnProperty(id)) return;
     var sprite = Engine.animals[id];
-    if(sprite.halo) sprite.halo.destroy();
     sprite.destroy();
     Engine.displayedAnimals.delete(id);
     delete Engine.animals[id];
@@ -1116,17 +1094,17 @@ Engine.requestBattle = function(a,b) {
 };
 
 Engine.requestBattleMove = function(event){
-    if(Engine.player.actionTaken) return;
+    if(BattleManager.actionTaken) return;
     Engine.requestBattleAction('move',Engine.getMouseCoordinates(event).tile);
 };
 
 Engine.requestBattleAttack = function(target){
-    if(Engine.player.actionTaken) return;
+    if(BattleManager.actionTaken) return;
     Engine.requestBattleAction('attack',{id:target.getShortID()});
 };
 
 Engine.requestBattleAction = function(action,data){
-    Engine.player.actionTaken = true;
+    BattleManager.actionTaken = true;
     Client.battleAction(action,data);
 };
 

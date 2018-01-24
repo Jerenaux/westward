@@ -6,10 +6,12 @@ function UpdatePacket(){
     this.newplayers = []; // new player objects to add to the world
     this.newbuildings = [];
     this.newanimals = [];
+    this.removedplayers = [];
+    this.removedanimals = [];
     this.players = {}; // list of player objects already existing for which properties have been updated
     this.animals = {};
     this.buildings = {};
-    this.disconnected = []; // list of id's of disconnected players since last update
+    //this.disconnected = []; // list of id's of disconnected players since last update
 }
 
 UpdatePacket.prototype.addObject = function(object){
@@ -33,9 +35,29 @@ UpdatePacket.prototype.addObject = function(object){
     arr.push(object.trim());
 };
 
-UpdatePacket.prototype.addDisconnect = function(playerID){
-    this.disconnected.push(playerID);
+UpdatePacket.prototype.removeObject = function(object){
+    var arr;
+    switch(object.constructor.name){
+        case 'Player':
+            arr = this.removedplayers;
+            break;
+        /*case 'Building':
+            arr = this.newbuildings;
+            break;*/
+        case 'Animal':
+            arr = this.removedanimals;
+            break;
+    }
+    // Check that the object to remove is not already listed (possible since when pulling updates from neighboring AOIs)
+    for(var i = 0; i < arr.length; i++){
+        if(arr[i] == object.id) return;
+    }
+    arr.push(object.id);
 };
+
+/*UpdatePacket.prototype.addDisconnect = function(playerID){
+    this.disconnected.push(playerID);
+};*/
 
 UpdatePacket.prototype.updateProperty = function(type,id,property,value){
     //console.log('updating property type = '+type+', id = '+id+', prop = '+property+', val = '+value);
@@ -84,24 +106,44 @@ UpdatePacket.prototype.synchronize = function(AOI){
 };
 
 UpdatePacket.prototype.isEmpty = function(){
-    if(this.disconnected.length > 0) return false;
+    /*if(this.disconnected.length > 0) return false;
     if(this.newplayers.length > 0) return false;
     if(this.newbuildings.length > 0) return false;
     if(this.newanimals.length > 0) return false;
     if(Object.keys(this.players).length > 0) return false;
     if(Object.keys(this.animals).length > 0) return false;
     if(Object.keys(this.buildings).length > 0) return false;
+    return true;*/
+    for(var field in this){
+        if(!this.hasOwnProperty(field)) continue;
+        if(this[field] && this[field].constructor.name == 'Array') {
+            if (this[field].length > 0) return false;
+        }else if(this[field] && this[field].constructor.name == 'Object'){
+            if(Object.keys(this[field]).length > 0) return false;
+        }else if(this[field] !== undefined){
+            return false;
+        }
+    }
     return true;
 };
 
 UpdatePacket.prototype.clean = function(){
-    if(!this.disconnected.length) this.disconnected = undefined;
+    /*if(!this.disconnected.length) this.disconnected = undefined;
     if(!this.newplayers.length) this.newplayers = undefined;
     if(!this.newanimals.length) this.newanimals = undefined;
     if(!this.newbuildings.length) this.newbuildings = undefined;
     if(!Object.keys(this.players).length) this.players = undefined;
     if(!Object.keys(this.animals).length) this.animals = undefined;
     if(!Object.keys(this.buildings).length) this.buildings = undefined;
+    return this;*/
+    for(var field in this){
+        if(!this.hasOwnProperty(field)) continue;
+        if(this[field] && this[field].constructor.name == 'Array'){
+            if(this[field].length == 0) this[field] = undefined;
+        }else if(this[field] && this[field].constructor.name == 'Object'){
+            if(Object.keys(this[field]).length == 0) this[field] = undefined;
+        }
+    }
     return this;
 };
 
