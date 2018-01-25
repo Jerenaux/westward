@@ -278,19 +278,19 @@
     },
     {
       "filename": "healthbar_middle",
-      "frame": {"x":284,"y":42,"w":23,"h":16}
+      "frame": {"x":287,"y":40,"w":19,"h":20}
     },
     {
       "filename": "healthbar_right",
-      "frame": {"x":308,"y":40,"w":25,"h":20}
+      "frame": {"x":324,"y":40,"w":9,"h":20}
     },
     {
       "filename": "health_middle",
-      "frame": {"x":350,"y":40,"w":7,"h":14}
+      "frame": {"x":409,"y":40,"w":5,"h":14}
     },
     {
       "filename": "health_top",
-      "frame": {"x":358,"y":40,"w":8,"h":14}
+      "frame": {"x":416,"y":40,"w":8,"h":14}
     }
   ]
 }

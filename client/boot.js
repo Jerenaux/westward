@@ -12,6 +12,7 @@ var Boot = {
     create: function(){
         var masterData = this.cache.json.get(Boot.masterKey);
         Boot.tilesets = masterData.tilesets;
-        this.scene.start('main',masterData);
+        Boot.masterData = masterData;
+        this.scene.start('main');
     }
 };

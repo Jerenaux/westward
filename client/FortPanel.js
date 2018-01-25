@@ -11,8 +11,8 @@ FortmapPanel.prototype = Object.create(Panel.prototype);
 FortmapPanel.prototype.constructor = FortmapPanel;
 
 FortmapPanel.prototype.addInterface = function(){
-    var scrollx = Engine.scene.game.config.width/2;
-    var scrolly = Engine.scene.game.config.height/2;
+    var scrollx = Engine.getGameConfig().width/2;
+    var scrolly = Engine.getGameConfig().height/2;
     this.bg = Engine.scene.add.sprite(scrollx,scrolly,'scrollbgh');
     this.bg.setDepth(Engine.UIDepth+1);
     this.bg.setScrollFactor(0);

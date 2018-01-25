@@ -98,7 +98,8 @@ Engine.preload = function() {
     console.log('Loading '+i+' tileset'+(i > 1 ? 's' : ''));
 };
 
-Engine.create = function(masterData){
+Engine.create = function(){
+    var masterData = Boot.masterData;
     World.readMasterData(masterData);
     Engine.nbLayers = masterData.nbLayers;
     if(!Engine.nbLayers) console.log('WARNING : falsy number of layers : '+console.log(Engine.nbLayers));
@@ -140,7 +141,8 @@ Engine.create = function(masterData){
     Engine.settlementsData = Engine.scene.cache.json.get('settlements');
 
     Engine.createMarker();
-    Engine.scene.game.canvas.style.cursor = Engine.cursor; // Sets the pointer to hand sprite
+    console.log(Engine.scene);
+    Engine.getGameInstance().canvas.style.cursor = Engine.cursor; // Sets the pointer to hand sprite
 
     Engine.dragging = false;
     Engine.scene.input.setTopOnly(false);
@@ -150,7 +152,7 @@ Engine.create = function(masterData){
     Engine.scene.input.events.on('POINTER_OVER_EVENT', Engine.handleOver);
     Engine.scene.input.events.on('POINTER_OUT_EVENT', Engine.handleOut);
     Engine.scene.input.events.on('DRAG_EVENT', Engine.handleDrag);
-    Engine.scene.input.keyboard.events.on('KEY_DOWN_ENTER', Engine.toggleChatBar);
+    Engine.scene.input.events.on('KEY_DOWN_ENTER', Engine.toggleChatBar);
 
     PFUtils.setup(Engine);
 
@@ -172,6 +174,14 @@ Engine.create = function(masterData){
 
     Engine.created = true;
     Client.requestData();
+};
+
+Engine.getGameInstance = function(){
+    return Engine.scene.sys.game;
+};
+
+Engine.getGameConfig = function(){
+    return Engine.getGameInstance().config;
 };
 
 Engine.createMarker = function(){
@@ -339,7 +349,7 @@ Engine.makeUI = function(){
 };
 
 Engine.makeBattleUI = function(){
-    Engine.fightText = Engine.scene.add.text(Engine.scene.game.config.width/2,50, 'Fight!',  { font: '45px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    Engine.fightText = Engine.scene.add.text(Engine.getGameConfig().width/2,50, 'Fight!',  { font: '45px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     Engine.fightText.setOrigin(0.5);
     Engine.fightText.setScrollFactor(0);
     Engine.fightText.setDepth(Engine.UIDepth+3);
@@ -364,7 +374,10 @@ Engine.makeBattleUI = function(){
         }
     );
 
-    Engine.timerText = Engine.scene.add.text(Engine.scene.game.config.width-20,Engine.scene.game.config.height, '0',  { font: '45px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    Engine.timerText = Engine.scene.add.text(
+        Engine.getGameConfig().width-20,
+        Engine.getGameConfig().height, '0',
+        { font: '45px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     Engine.timerText.setOrigin(1,1);
     Engine.timerText.setScrollFactor(0);
     Engine.timerText.setDepth(Engine.UIDepth+3);
@@ -558,6 +571,11 @@ Engine.makeInventory = function(statsPanel){
     var equipment = new EquipmentPanel(665,100,330,260,'Equipment');
     inventory.addPanel('equipment',equipment);
     inventory.addPanel('stats',statsPanel);
+
+    var bar = new LiquidBar(665,480,330);
+    bar.setLevel(60,100);
+    inventory.addPanel('bar',bar);
+
     inventory.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
     inventory.onUpdateInventory = items.updateInventory.bind(items);
     inventory.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
