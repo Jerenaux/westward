@@ -15,7 +15,8 @@
     "name": "Bow",
     "equipment": "rangedw",
     "ammo": "quiver",
-    "effects":{"acc":40}
+    "effects":{"acc":40},
+    "useInBattle": true
   },
   "3":{
     "atlas": "items2",
@@ -38,7 +39,8 @@
     "frame":"redpotion",
     "name": "Red potion",
     "recipe": {"5":1,"0":2},
-    "effects":{"hp":50}
+    "effects":{"hp":50},
+    "useInBattle": true
   },
   "7":{
     "atlas": "buildings",
@@ -70,7 +72,8 @@
     "frame":"pirate-sword",
     "name": "Sword",
     "equipment": "meleew",
-    "effects":{"mdmg":2}
+    "effects":{"mdmg":2},
+    "useInBattle": true
   },
   "12":{
     "atlas": "items2",
@@ -78,7 +81,8 @@
     "name": "Gun",
     "equipment": "rangedw",
     "ammo": "ammo_pouch",
-    "effects":{"acc":20}
+    "effects":{"acc":20},
+    "useInBattle": true
   },
   "13":{
     "atlas": "items2",
@@ -124,7 +128,8 @@
     "frame":"quiver",
     "name": "Small quiver",
     "equipment": "quiver",
-    "capacity": 10
+    "capacity": 10,
+    "useInBattle": true
   },
   "20":{
     "atlas": "items",
@@ -132,6 +137,7 @@
     "name": "Arrow",
     "equipment": "arrows",
     "effects":{"rdmg":2},
-    "ammo": "quiver"
+    "ammo": "quiver",
+    "useInBattle": true
   }
 }

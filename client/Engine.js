@@ -417,6 +417,7 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
     text.setPosition(target.x+16,target.y+16);
     text.setDepth(target.depth+1);
     text.setText('-'+dmg);
+    text.tween.updateTo('y',text.y - 20,false);
     text.tween.play();
 };
 
@@ -462,16 +463,19 @@ Engine.hideUI = function(){
 Engine.makeBattleMenu = function(){
     var battle = new Menu();
     // #####################
-    /*var items = new InventoryPanel(40,100,600,380,'Items');
-    items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
-    items.addCapsule('gold',100,-9,'999','gold');
-    inventory.addPanel('items',items);*/
-    var equipment = new EquipmentPanel(665,100,170,120,'Equipment',true); // true: battle menu
+    var equipment = new EquipmentPanel(835,100,170,120,'Equipment',true); // true: battle menu
     battle.addPanel('equipment',equipment);
+    var items = new InventoryPanel(835,220,170,225,'Items');
+    items.setInventory(Engine.player.inventory,4,true,Engine.inventoryClick);
+    items.modifyFilter({
+        type: 'property',
+        property: 'useInBattle'
+    });
+    battle.addPanel('items',items);
     //inventory.addPanel('stats',statsPanel); TODO replace by health bar
     battle.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
-    /*inventory.onUpdateInventory = items.updateInventory.bind(items);
-    inventory.onUpdateStats = statsPanel.updateStats.bind(statsPanel);*/
+    battle.onUpdateInventory = items.updateInventory.bind(items);
+    //inventory.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
     // #####################
     return battle;
 };
@@ -533,7 +537,7 @@ Engine.makeCraftingMenu = function(){
     crafting.addPanel('recipes',recipes);
     crafting.addPanel('combi',new CraftingPanel(450,100,290,380,'Combination'));
     var ingredients = new InventoryPanel(450,300,290,380,'',true); // true = invisible
-    ingredients.setInventory(new Inventory(5),5,true,null,null,Engine.player.inventory);
+    ingredients.setInventory(new Inventory(5),5,true,null,Engine.player.inventory);
     crafting.addPanel('ingredients',ingredients);
     var items = new InventoryPanel(40,100,390,380,'Items');
     items.setInventory(Engine.player.inventory,10,true);
@@ -800,7 +804,6 @@ Engine.hideMarker = function(){
 };
 
 Engine.showMarker = function(){
-    console.log('Displaying marker');
     Engine.marker.visible = true;
 };
 
@@ -1080,10 +1083,12 @@ Engine.enterBuilding = function(id){
         menu.panels['shop'].updateCapsule('gold', building.gold);
         menu.panels['shop'].modifyInventory(building.inventory.items);
         menu.panels['client'].modifyFilter({
+            type: 'prices',
             items: building.prices,
             key: 0
         });
         menu.panels['shop'].modifyFilter({
+            type: 'prices',
             items: building.prices,
             key: 1
         });

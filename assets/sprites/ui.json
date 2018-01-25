@@ -271,6 +271,26 @@
     {
       "filename": "tooltip",
       "frame": {"x":213,"y":512,"w":39,"h":39}
+    },
+    {
+      "filename": "healthbar_left",
+      "frame": {"x":259,"y":40,"w":24,"h":20}
+    },
+    {
+      "filename": "healthbar_middle",
+      "frame": {"x":284,"y":42,"w":23,"h":16}
+    },
+    {
+      "filename": "healthbar_right",
+      "frame": {"x":308,"y":40,"w":25,"h":20}
+    },
+    {
+      "filename": "health_middle",
+      "frame": {"x":350,"y":40,"w":7,"h":14}
+    },
+    {
+      "filename": "health_top",
+      "frame": {"x":358,"y":40,"w":8,"h":14}
     }
   ]
 }

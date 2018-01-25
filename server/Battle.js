@@ -18,8 +18,7 @@ function Battle(f1,f2){
     };
     this.fallen = [];
     this.area = []; // array of rectangular areas
-    this.countdown = null;
-    this.endTime = 0;
+    this.reset();
     this.start();
 }
 
@@ -77,10 +76,15 @@ Battle.prototype.updateTeams = function(team){
     if(this.teams[team] <= 0) this.end();
 };
 
-Battle.prototype.newTurn = function(){
-    this.fighters.push(this.fighters.shift());
+Battle.prototype.reset = function(){
     this.countdown = TURN_DURATION;
     this.endTime = 0;
+    this.actionTaken = false;
+};
+
+Battle.prototype.newTurn = function(){
+    this.fighters.push(this.fighters.shift());
+    this.reset();
     console.log('[B'+this.id+'] New turn');
     //console.log('[B'+this.id+'] It is now '+(this.fighters[0].constructor.name)+'\'s turn');
 
@@ -118,7 +122,7 @@ Battle.prototype.isTurnOf = function(f){
 };
 
 Battle.prototype.processAction = function(f,data){
-    if(!this.isTurnOf(f)) return;
+    if(!this.isTurnOf(f) || this.actionTaken) return;
     var result;
     switch(data.action){
         case 'move':
@@ -129,7 +133,12 @@ Battle.prototype.processAction = function(f,data){
             result = this.processAttack(f,target);
             break;
     }
-    if(result && result.success) this.endTime = this.countdown - result.delay;
+    if(result && result.success) this.setEndOfTurn(result.delay);
+};
+
+Battle.prototype.setEndOfTurn = function(delay){
+    this.actionTaken = true;
+    this.endTime = this.countdown - delay;
 };
 
 Battle.prototype.processMove = function(f,x,y){
@@ -184,7 +193,7 @@ Battle.prototype.processAttack = function(a,b){
         b.setProperty('meleeHit',dmg);
         return {
             success: true,
-            delay: 100
+            delay: 500
         };
     }else{
         if(!a.canRange()) return false;
@@ -200,7 +209,7 @@ Battle.prototype.processAttack = function(a,b){
         console.log('ranged attack');
         return {
             success: true,
-            delay: 100
+            delay: 500
         };
     }
     return false;

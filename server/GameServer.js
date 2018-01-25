@@ -359,12 +359,14 @@ GameServer.handleUse = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var item = data.item;
     if(!player.hasItem(item,1)) return false;
+    if(player.inFight){
+        if(!player.battle.isTurnOf(player)) return false;
+        player.battle.setEndOfTurn(500);
+    }
     var itemData = GameServer.itemsData[item];
     if(itemData.equipment) {
         player.equip(itemData.equipment, item, false); // false: not from DB
-        return;
-    }
-    if(itemData.effects){
+    }else  if(itemData.effects){
         player.applyEffects(item);
         player.takeItem(item,1);
     }

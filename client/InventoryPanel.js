@@ -31,7 +31,7 @@ InventoryPanel.prototype.createZone = function(){
     return zone;
 };
 
-InventoryPanel.prototype.setInventory = function(inventory,maxwidth,showNumbers,callback,filter,compare){
+InventoryPanel.prototype.setInventory = function(inventory,maxwidth,showNumbers,callback,compare){
     this.inventory = inventory;
     this.itemCallback = callback;
     this.config = {
@@ -39,7 +39,7 @@ InventoryPanel.prototype.setInventory = function(inventory,maxwidth,showNumbers,
         showNumbers: showNumbers,
         compareTo: compare
     };
-    if(filter) this.setFilter(filter);
+    //if(filter) this.setFilter(filter);
     if(!this.slotsAdded) this.addSlots();
 };
 
@@ -125,8 +125,9 @@ InventoryPanel.prototype.displayInventory = function(){
         var amount = this.inventory.getNb(item);
         if(amount == 0) continue;
         if(this.config.filter){
-            if(!filter.hasOwnProperty(item)) continue;
-            if(!filter[item][filterKey] > 0) continue;
+            /*if(!filter.hasOwnProperty(item)) continue;
+            if(!filter[item][filterKey] > 0) continue;*/
+            if(!this.applyFilter(item)) continue;
         }
         var sprite = this.getNextSprite();
         sprite.item.setUp(item,Engine.itemsData[item],this.itemCallback);
@@ -186,8 +187,23 @@ InventoryPanel.prototype.modifyInventory = function(items){
 };
 
 InventoryPanel.prototype.setFilter = function(filter){
-    this.config.filter = filter.items;
+    this.config.filter = true;
+    this.config.filterType = filter.type;
+    this.config.filterItems = filter.items;
     this.config.filterKey = filter.key;
+    this.config.filterProperty = filter.property;
+};
+
+InventoryPanel.prototype.applyFilter = function(item){
+    if(this.config.filterType == 'prices'){
+        var filter = this.config.filterItems;
+        if(!filter.hasOwnProperty(item)) return false;
+        if(!filter[item][this.config.filterKey] > 0) return false;
+        return true;
+    }else if(this.config.filterType == 'property'){
+        var filter = this.config.filterProperty;
+        return !!(Engine.itemsData[item][filter]);
+    }
 };
 
 InventoryPanel.prototype.modifyFilter = function(filter){
