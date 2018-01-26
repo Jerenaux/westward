@@ -147,13 +147,13 @@ Engine.create = function(){
 
     Engine.dragging = false;
     Engine.scene.input.setTopOnly(false);
-    Engine.scene.input.events.on('POINTER_DOWN_EVENT', Engine.handleDown);
-    Engine.scene.input.events.on('POINTER_UP_EVENT', Engine.handleClick);
-    Engine.scene.input.events.on('POINTER_MOVE_EVENT', Engine.trackMouse);
-    Engine.scene.input.events.on('POINTER_OVER_EVENT', Engine.handleOver);
-    Engine.scene.input.events.on('POINTER_OUT_EVENT', Engine.handleOut);
-    Engine.scene.input.events.on('DRAG_EVENT', Engine.handleDrag);
-    Engine.scene.input.events.on('KEY_DOWN_ENTER', Engine.toggleChatBar);
+    Engine.scene.input.on('pointerdown', Engine.handleDown);
+    Engine.scene.input.on('pointerup', Engine.handleClick);
+    Engine.scene.input.on('pointermove', Engine.trackMouse);
+    Engine.scene.input.on('pointerover', Engine.handleOver);
+    Engine.scene.input.on('pointerout', Engine.handleOut);
+    Engine.scene.input.on('drag', Engine.handleDrag);
+    //Engine.scene.input.events.on('KEY_DOWN_ENTER', Engine.toggleChatBar);
 
     PFUtils.setup(Engine);
 
@@ -720,46 +720,46 @@ Engine.handleDown = function(event){
     if(event.gameObject && event.gameObject.handleDown) event.gameObject.handleDown();
 };
 
-Engine.handleClick = function(event){
-    if(event.list.length > 0){
-        for(var i = 0; i < Math.min(event.list.length,2); i++){ // disallow bubbling too deep, only useful in menus (i.e. shallow)
-            if(event.list[i].handleClick) event.list[i].handleClick(event);
+Engine.handleClick = function(pointer,objects){
+    if(objects.length > 0){
+        for(var i = 0; i < Math.min(objects.length,2); i++){ // disallow bubbling too deep, only useful in menus (i.e. shallow)
+            if(objects[i].handleClick) objects[i].handleClick(pointer);
         }
     }else{
         if(!Engine.inMenu && !Engine.player.inFight && !Engine.dead) {
             if(Engine.inPanel) Engine.currentPanel.hide();
-            Engine.moveToClick(event);
+            Engine.moveToClick(pointer);
         }
     }
 };
 
-Engine.handleOver = function(event){
-    if(event.list.length > 0){
-        for(var i = 0; i < Math.min(event.list.length,2); i++) { // disallow bubbling too deep, only useful in menus (i.e. shallow)
-            var obj = event.list[i];
+Engine.handleOver = function(pointer,objects){
+    if(objects.length > 0){
+        for(var i = 0; i < Math.min(objects.length,2); i++) { // disallow bubbling too deep, only useful in menus (i.e. shallow)
+            var obj = objects[i];
             if(obj.constructor.name == 'Building') Engine.hideMarker();
             if(obj.handleOver) obj.handleOver();
         }
     }
 };
 
-Engine.handleOut = function(event){
-    if(event.list.length > 0) {
-        for(var i = 0; i < Math.min(event.list.length,2); i++) { // disallow bubbling too deep, only useful in menus (i.e. shallow)
-            var obj = event.list[i];
+Engine.handleOut = function(pointer,objects){
+    if(objects.length > 0) {
+        for(var i = 0; i < Math.min(objects.length,2); i++) { // disallow bubbling too deep, only useful in menus (i.e. shallow)
+            var obj = objects[i];
             if(obj.constructor.name == 'Building' && !Engine.inMenu) Engine.showMarker();
             if(obj.handleOut) obj.handleOut();
         }
     }
 };
 
-Engine.handleDrag = function(event){
-    if(event.gameObject && event.gameObject.handleDrag) event.gameObject.handleDrag(event.dragX,event.dragY);
+Engine.handleDrag = function(pointer,object,dragX,dragY){
+    if(object && object.handleDrag) object.handleDrag(dragX,dragY);
 };
 
-Engine.moveToClick = function(event){
+Engine.moveToClick = function(pointer){
     Engine.player.setDestinationAction(0);
-    Engine.computePath(Engine.getMouseCoordinates(event).tile);
+    Engine.computePath(Engine.getMouseCoordinates(pointer).tile);
 };
 
 Engine.computePath = function(position){
@@ -795,9 +795,20 @@ Engine.updatePosition = function(player){
     }
 };
 
-Engine.getMouseCoordinates = function(event){
+/*Engine.getMouseCoordinates = function(event){
     var pxX = Engine.camera.scrollX + event.x;
     var pxY = Engine.camera.scrollY + event.y;
+    var tileX = Math.floor(pxX/Engine.tileWidth);
+    var tileY = Math.floor(pxY/Engine.tileHeight);
+    return {
+        tile:{x:tileX,y:tileY},
+        pixel:{x:pxX,y:pxY}
+    };
+};*/
+
+Engine.getMouseCoordinates = function(pointer){
+    var pxX = Engine.camera.scrollX + pointer.x;
+    var pxY = Engine.camera.scrollY + pointer.y;
     var tileX = Math.floor(pxX/Engine.tileWidth);
     var tileY = Math.floor(pxY/Engine.tileHeight);
     return {

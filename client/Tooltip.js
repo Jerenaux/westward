@@ -95,7 +95,7 @@ Tooltip.prototype.updateInfo = function(name, effects){
 Tooltip.prototype.updatePosition = function(x,y){
     x += this.xOffset;
     y += this.yOffset;
-    if(x > Engine.scene.game.config.width - this.width - 20) {
+    if(x > Engine.getGameConfig().width - this.width - 20) {
         x -= this.width;
         y += 20;
     }

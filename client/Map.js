@@ -57,9 +57,15 @@ var Map = new Phaser.Class({
         });
     },
 
-    handleClick: function(evt){
+    /*handleClick: function(evt){
         if(evt.pointer.downX != evt.pointer.upX || evt.pointer.downY != evt.pointer.upY) return; // drag
         this.addRedPin(evt.x,evt.y);
+    },*/
+
+    handleClick: function(pointer){
+        console.log(pointer);
+        if(pointer.downX != pointer.upX || pointer.downY != pointer.upY) return; // drag
+        this.addRedPin(pointer.x,pointer.y);
     },
 
     addRedPin: function(x,y){

@@ -130,6 +130,7 @@ Animal.prototype.computeBattleDestination = function(target){
         for(var y = Math.min(this.y,dest.y); y <= Math.max(this.y,dest.y); y++) {
             //console.log('considering ',x,y);
             if(this.inBattleRange(x,y) && !GameServer.collisions.get(y,x)){
+                if(x == dest.x && y == dest.y) continue;
                 if(this.battle.nextTo({x:x,y:y},dest)) return {x:x,y:y};
                 var dist = Utils.euclidean({x:x,y:y},{x:dest.x,y:dest.y});
                 if(dist < minDist){

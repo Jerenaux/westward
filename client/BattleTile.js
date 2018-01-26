@@ -12,7 +12,7 @@ var BattleTile = new Phaser.Class({
     initialize: function BattleTile (x,y) {
         x = x || 0;
         y = y || 0;
-        CustomSprite.call(this, x, y, '3grid');
+        CustomSprite.call(this, x, y, '3grid',0);
         
         this.setDepth(Engine.markerDepth);
         this.setDisplayOrigin(0,0);
@@ -31,6 +31,7 @@ var BattleTile = new Phaser.Class({
     },
 
     manageFrame: function(){
+        if(!Engine.player.inFight) return;
         this.dist = Utils.euclidean({
             x: this.tx,
             y: this.ty
