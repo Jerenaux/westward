@@ -18,12 +18,12 @@ function Battle(f1,f2){
     };
     this.fallen = [];
     this.area = []; // array of rectangular areas
+    this.ended = false;
     this.reset();
     this.start();
 }
 
 Battle.prototype.start = function(){
-    console.log('battle start');
     this.computeArea();
     var _battle = this;
     this.fighters.forEach(function(f){
@@ -83,6 +83,7 @@ Battle.prototype.reset = function(){
 };
 
 Battle.prototype.newTurn = function(){
+    if(this.ended) return;
     this.fighters.push(this.fighters.shift());
     this.reset();
     console.log('[B'+this.id+'] New turn');
@@ -174,7 +175,7 @@ Battle.prototype.computeRangedHit = function(a,b){
         x: b.x,
         y: b.y
     });
-    var chance = a.stats['acc'] - (dist*5);
+    var chance = Math.ceil(a.stats['acc'] - (dist*5));
     var rand = Utils.randomInt(0,101);
     console.log('ranged hit : ',rand,chance);
     return rand < chance;
@@ -217,6 +218,8 @@ Battle.prototype.processAttack = function(a,b){
 
 // Entites are only removed when the battle is over ; battlezones are only cleared at that time
 Battle.prototype.end = function(){
+    console.log('ending fight');
+    this.ended = true;
     clearInterval(this.loop);
     this.participants.forEach(function(f){
         f.endFight();

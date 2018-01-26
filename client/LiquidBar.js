@@ -34,38 +34,44 @@ function LiquidBar(x,y,w){
         e.setVisible(false);
     });
     this.body[2].setDepth(Engine.UIDepth+1);
-
-    this.bodyTween = Engine.scene.tweens.add(
-        {
-            targets: this.liquidBody,
-            width: 0,
-            x: 0,
-            duration: 1000,
-            paused: true
-        });
 };
 
 LiquidBar.prototype.setLevel = function(level,max){
     if(max) this.max = max;
+    var delta = Math.abs(this.level-level)/this.max;
     this.level = Utils.clamp(level,0,this.max);
     var pct = this.level/this.max;
     var newLength = Math.round(this.maxLength*pct);
 
     var dw = this.liquidBody.width - newLength;
 
+    if(dw == 0) return;
     if(this.displayed){
-        console.log('aiming ',newLength);
-        this.bodyTween.updateTo('width',newLength,true);
-        this.bodyTween.updateTo('x',500,true);
-        this.bodyTween.play();
+        var duration = delta * 2000;
+        var _head = this.liquidHead;
+        var _lvl = this.level;
+        Engine.scene.tweens.add(
+            {
+                targets: this.liquidBody,
+                width: newLength,
+                duration: duration,
+                onStart: function(){
+                    _head.setVisible(true);
+                },
+                onComplete: function(){
+                    _head.setVisible(!(_lvl == 0));
+                }
+            });
+        Engine.scene.tweens.add(
+            {
+                targets: this.liquidHead,
+                x: '-='+dw,
+                duration: duration
+            });
     }else {
         this.liquidBody.width = newLength;
         this.liquidHead.x -= dw;
     }
-
-    //this.currentLength = this.liquidBody.width;
-
-    if(this.displayed) this.liquidHead.setVisible(!(this.level == 0));
 };
 
 LiquidBar.prototype.display = function(){

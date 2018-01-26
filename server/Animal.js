@@ -89,7 +89,6 @@ Animal.prototype.findRandomDestination = function(){
 };
 
 Animal.prototype.decideBattleAction = function(){
-    console.log('Deciding battle action');
     var target = this.selectTarget();
     var data = {};
     if(this.battle.nextTo(this,target)){
@@ -98,7 +97,7 @@ Animal.prototype.decideBattleAction = function(){
     }else{
         data.action = 'move';
         var dest = this.computeBattleDestination(target);
-        console.log('destination : ',dest.x,dest.y);
+        //console.log('destination : ',dest.x,dest.y);
         data.x = dest.x;
         data.y = dest.y;
     }
@@ -117,12 +116,11 @@ Animal.prototype.selectTarget = function(){
             currentTarget = f;
         }
     }
-    console.log('Selected target ',currentTarget.getShortID());
+    //console.log('Selected target ',currentTarget.getShortID());
     return currentTarget;
 };
 
 Animal.prototype.computeBattleDestination = function(target){
-    console.log('computing destination');
     var dest = target.getEndOfPath();
     var closest = null;
     var minDist = 9999;
@@ -130,7 +128,7 @@ Animal.prototype.computeBattleDestination = function(target){
     console.log(this.y,dest.y);
     for(var x = Math.min(this.x,dest.x); x <= Math.max(this.x,dest.x); x++){
         for(var y = Math.min(this.y,dest.y); y <= Math.max(this.y,dest.y); y++) {
-            console.log('considering ',x,y);
+            //console.log('considering ',x,y);
             if(this.inBattleRange(x,y) && !GameServer.collisions.get(y,x)){
                 if(this.battle.nextTo({x:x,y:y},dest)) return {x:x,y:y};
                 var dist = Utils.euclidean({x:x,y:y},{x:dest.x,y:dest.y});
@@ -141,7 +139,6 @@ Animal.prototype.computeBattleDestination = function(target){
             }
         }
     }
-    console.log('done');
     if(closest == null) console.log('not found');
     return closest;
 };

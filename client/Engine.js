@@ -72,6 +72,7 @@ Engine.preload = function() {
     this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
     this.load.image('arrow', 'assets/sprites/arrow.png');
     this.load.spritesheet('sword_anim', 'assets/sprites/Sword1.png',{frameWidth:96,frameHeight:96});
+    this.load.spritesheet('death', 'assets/sprites/death.png',{frameWidth:48,frameHeight:48});
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
@@ -261,6 +262,13 @@ Engine.createAnimations = function(){
         hideOnComplete: true,
         onComplete: Engine.recycleAnim
     });
+    Engine.scene.anims.create(config = {
+        key: 'death',
+        frames: Engine.scene.anims.generateFrameNumbers('death', { start: 0, end: 5}),
+        frameRate: 15,
+        hideOnComplete: true,
+        onComplete: Engine.recycleAnim
+    });
 };
 
 Engine.makeChatBar = function(){
@@ -280,6 +288,16 @@ Engine.toggleChatBar = function(){
     /*if(Engine.inMenu) return;
     if(Engine.chat.domElement.value != "") console.log("I said : "+Engine.chat.domElement.value);
     Engine.chat.toggle();*/
+};
+
+Engine.deathAnimation = function(target){
+    var anim = Engine.getNextAnim();
+    anim.setPosition(target.x+48,target.y+48);
+    anim.setVisible(true);
+    anim.setTexture('death');
+    anim.setDepth(target.depth+1);
+    anim.anims.play('death');
+    target.setVisible(false);
 };
 
 Engine.manageDeath = function(){
@@ -475,7 +493,6 @@ Engine.hideUI = function(){
 
 Engine.makeBattleMenu = function(){
     var battle = new Menu();
-    // #####################
     var equipment = new EquipmentPanel(835,100,170,120,'Equipment',true); // true: battle menu
     battle.addPanel('equipment',equipment);
     var items = new InventoryPanel(835,220,170,225,'Items');
@@ -485,11 +502,14 @@ Engine.makeBattleMenu = function(){
         property: 'useInBattle'
     });
     battle.addPanel('items',items);
-    //inventory.addPanel('stats',statsPanel); TODO replace by health bar
+    var bar = new LiquidBar(835,445,170);
+    bar.setLevel(Engine.player.stats['hp'],Stats.dict['hp'].max);
+    battle.addPanel('bar',bar);
     battle.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
     battle.onUpdateInventory = items.updateInventory.bind(items);
-    //inventory.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
-    // #####################
+    battle.onUpdateStats = function(){
+        bar.setLevel(Engine.player.stats['hp']);
+    };
     return battle;
 };
 
@@ -571,11 +591,6 @@ Engine.makeInventory = function(statsPanel){
     var equipment = new EquipmentPanel(665,100,330,260,'Equipment');
     inventory.addPanel('equipment',equipment);
     inventory.addPanel('stats',statsPanel);
-
-    var bar = new LiquidBar(665,480,330);
-    bar.setLevel(60,100);
-    inventory.addPanel('bar',bar);
-
     inventory.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
     inventory.onUpdateInventory = items.updateInventory.bind(items);
     inventory.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
@@ -1002,7 +1017,10 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
         if(Engine.isHero(player)) Engine.exitBuilding();
     }
     Engine.handleBattleUpdates(player,data);
-    if(data.dead == true) player.setVisible(false);
+    if(data.dead == true) {
+        Engine.deathAnimation(player);
+        player.setVisible(false);
+    }
     if(data.dead == false) player.setVisible(true);
 };
 
@@ -1010,7 +1028,10 @@ Engine.updateAnimal = function(animal,data){ // data contains the updated data f
     if(data.path) animal.move(data.path);
     if(data.stop) animal.stop();
     Engine.handleBattleUpdates(animal,data);
-    if(data.dead) setTimeout(Engine.removeAnimal,500,animal.id);
+    if(data.dead) {
+        Engine.deathAnimation(animal);
+        setTimeout(Engine.removeAnimal,500,animal.id);
+    }
 };
 
 Engine.handleBattleUpdates = function(entity, data){
@@ -1193,7 +1214,6 @@ Engine.getNextCell = function(){
 
 Engine.getNextAnim = function(){
     if(Engine.availableAnimSprites.length > 0) return Engine.availableAnimSprites.shift();
-    //console.log('creating new sprite');
     var sprite = Engine.scene.add.sprite(0,0,'sword_anim',0);
     sprite.setVisible(false);
     return sprite;
@@ -1201,7 +1221,6 @@ Engine.getNextAnim = function(){
 
 Engine.recycleAnim = function(sprite){
     Engine.availableAnimSprites.push(sprite);
-    //console.log(Engine.availableAnimSprites.length,' available sprites');
 };
 
 Engine.getNextHP = function(){
