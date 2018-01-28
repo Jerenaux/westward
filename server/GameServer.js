@@ -189,10 +189,8 @@ GameServer.removeEntity = function(entity){
             arr = GameServer.animals;
             break;
     }
-    delete arr[entity.id];
-
+    if(arr) delete arr[entity.id];
     if(entity.battle) entity.battle.removeFighter(entity,-1);
-
 };
 
 
@@ -206,6 +204,7 @@ GameServer.addAtLocation = function(entity){
     // the "entities" of an AOI list what entities are present in it; it's distinct from adding and object to an AOI
     // using GameServer.addObjectToAOI(), which actually adds the object to the update packages so that it can be created by
     // the clients (addObjectToAOI is called by GameServer.handleAOItransition)
+    // Entities are needed when moving and new AOIs are added to neighborhood
 };
 
 GameServer.removeFromLocation = function(entity){
@@ -441,11 +440,6 @@ GameServer.removeObjectFromAOI = function(aoi,entity) {
     GameServer.AOIs[aoi].updatePacket.removeObject(entity);
     GameServer.dirtyAOIs.add(aoi);
 };
-
-/*GameServer.addDisconnectToAOI = function(aoi,playerID) {
-    GameServer.AOIs[aoi].updatePacket.addDisconnect(playerID);
-    GameServer.dirtyAOIs.add(aoi);
-};*/
 
 GameServer.updateAOIproperty = function(aoi,category,id,property,value) {
     GameServer.AOIs[aoi].updatePacket.updateProperty(category, id, property, value);

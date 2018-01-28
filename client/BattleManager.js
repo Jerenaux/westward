@@ -22,6 +22,7 @@ BattleManager.startFight = function(){
     Engine.fightText.tween.play();
     BattleManager.inBattle = true;
     Engine.menus.battle.display();
+    console.log('Battle status set to : ',BattleManager.inBattle);
 };
 
 BattleManager.setCounter = function(seconds){

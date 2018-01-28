@@ -75,8 +75,8 @@ Client.socket.on('update',function(data){ // This event triggers uppon receiving
     //if(data.latency) console.log('[lat] '+data.latency+' ms');
     if(data.local) console.log(data.local);
     //if(data.global) console.log(data.global);
+    if(data.local) Engine.updateSelf(data.local); // Should come first
     if(data.global) Engine.updateWorld(data.global);
-    if(data.local) Engine.updateSelf(data.local);
 });
 
 Client.socket.on('pid',function(playerID){ // the 'pid' event is used for the server to tell the client what is the ID of the player

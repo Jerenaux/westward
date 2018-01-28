@@ -25,6 +25,13 @@ function Battle(f1,f2){
 
 Battle.prototype.start = function(){
     this.computeArea();
+
+    this.x = this.fighters[0].x;
+    this.y = this.fighters[1].y;
+    this.aoi = Utils.tileToAOI({x:this.x,y:this.y});
+    GameServer.addAtLocation(this);
+    GameServer.handleAOItransition(this, null);
+
     var _battle = this;
     this.fighters.forEach(function(f){
         f.setProperty('inFight',true);
@@ -223,10 +230,11 @@ Battle.prototype.end = function(){
     clearInterval(this.loop);
     this.participants.forEach(function(f){
         f.endFight();
-        f.setProperty('battlezone',[]);
+        //f.setProperty('battlezone',[]);
         if(f.isPlayer) f.notifyFight(false);
         if(f.dead) setTimeout(GameServer.removeEntity,500,f);
     });
+    GameServer.removeEntity(this);
     console.log('[B'+this.id+'] Ended');
     // TODO: respawn if quitting battle by disconnecting
 };
@@ -267,9 +275,18 @@ Battle.prototype.computeArea = function(){
     });
 
     var area = this.area;
-    this.fighters.forEach(function(f){
+    /*this.fighters.forEach(function(f){
         f.setProperty('battlezone',area);
-    });
+    });*/
+};
+
+Battle.prototype.trim = function(){
+    var trimmed = {};
+    var broadcastProperties = ['id','area']; // list of properties relevant for the client
+    for(var p = 0; p < broadcastProperties.length; p++){
+        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
+    }
+    return trimmed;
 };
 
 module.exports.Battle = Battle;

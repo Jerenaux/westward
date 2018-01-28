@@ -31,7 +31,10 @@ var BattleTile = new Phaser.Class({
     },
 
     manageFrame: function(){
-        if(!Engine.player.inFight) return;
+        if(!BattleManager.inBattle) {
+            console.log('BattleManage status : ',BattleManager.inBattle);
+            return;
+        }
         this.dist = Utils.euclidean({
             x: this.tx,
             y: this.ty
@@ -39,7 +42,6 @@ var BattleTile = new Phaser.Class({
             x: Engine.player.tileX,
             y: Engine.player.tileY
         });
-
         this.baseFrame = (this.dist <= PFUtils.battleRange ? 2 : 0);
         this.setFrame(this.baseFrame);
     },
