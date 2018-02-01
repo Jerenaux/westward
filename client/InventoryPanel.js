@@ -125,8 +125,6 @@ InventoryPanel.prototype.displayInventory = function(){
         var amount = this.inventory.getNb(item);
         if(amount == 0) continue;
         if(this.config.filter){
-            /*if(!filter.hasOwnProperty(item)) continue;
-            if(!filter[item][filterKey] > 0) continue;*/
             if(!this.applyFilter(item)) continue;
         }
         var sprite = this.getNextSprite();

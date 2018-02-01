@@ -230,7 +230,6 @@ Battle.prototype.end = function(){
     clearInterval(this.loop);
     this.participants.forEach(function(f){
         f.endFight();
-        //f.setProperty('battlezone',[]);
         if(f.isPlayer) f.notifyFight(false);
         if(f.dead) setTimeout(GameServer.removeEntity,500,f);
     });

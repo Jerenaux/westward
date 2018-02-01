@@ -3,7 +3,6 @@ Cleaning
 * Exploration/travel
 * Inns
 * Inventory
-* Player interactions
 * Settlement defense
 * Settlement economy
 * Settlement management
@@ -58,22 +57,18 @@ Content:
 - Respawn
 - Respawn if disconnect
 - Battle experience
-- Spawn loot
-- Readjust camera
-- Death animation
 - Mouse hover icons (melee attack, ranged...)
 - Multiplayer fights
 -> If step in zone -> involved in fight (modify arena shape, etc.)
 -> If someone in area when starting -> involve as well!
 - Animal can trigger fights
-- Add a few savages with roaming behaviour
-- Expand battle AI for savages
-- Improve roaming behavior of savages
-- Adjust camera
-- Have a permanent presence of savages and animals around settlements
+* Ecosystem
+- Listing and distribution of pick-up resources
+- Listing and distribution (and yeild) of building resources
+- Listing and distribution of animals
+- Work out location and mechanics of enemy civ.
 * Exploration/travel
 - Have a world to explore -> World building
-- Have a permanent presence of a few pickup items around settlements
 - Campfires
 - cf. Worldmap  
 * Inns
@@ -85,13 +80,7 @@ Content:
 - Chat
 - Gazette
 * Inventory
-- Drag/drop mechanics (for use, throw, equip, slots...)?
-- Quick-use slots
 - Pick up items
-* Player interactions
-- Display speech bubble locally
-- Broadcats bubble
-- Show player name
 * Settlement defense
 - Enable commander to build towers
 - Set up stats of towers and forts
@@ -104,8 +93,9 @@ Content:
 - Restrict prerogatives based on official position
 - Enable governor to name the commander
 * Settlement economy
-- Ressource stockpile in fort
-- Let chancellor build each of every buildings
+- Yellow pins for unbuilt buildings
+- Mnenu for unbuilt buildings
+- Commitment mechanic for building
 - Resource loop from resource buildings
 - Impact of commitment on resource gathering
 - Move stock around buildings
@@ -113,10 +103,13 @@ Content:
 - Automatic shop systemn in port for chancellor
 - Trade with overseas
 - Restrict prerogatives based on official position
-- Let governor name chancellor
+- Let governor name chancellors
 - Salaries for officials
+- Work out settlement levels
+- Impact on player stats
 * Settlement management
-- ...
+- Display settlement stats (level, resources...)
+- More info on building hover
 * Trade
 - Have monsters drop loot
 - Enable bonuses of merchants

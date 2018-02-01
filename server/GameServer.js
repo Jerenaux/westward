@@ -15,7 +15,6 @@ var GameServer = {
     animals: {}, // animal.id -> animal
     buildings: {}, // building.id -> building
     socketMap: {}, // socket.id -> player.id
-    //garbage: [],
     nbConnectedChanged: false,
     initializationTicks: 0,
     requiredTicks: 2, // required number of initialization ticks
@@ -74,7 +73,7 @@ GameServer.readMap = function(mapsPath){
         if(err) throw err;
         for(var i = 0; i < buildings.length; i++){
             var data = buildings[i];
-            var building = new Building(data.x,data.y,data.type,data.settlement,data.stock,data.gold,data.prices);
+            var building = new Building(data.x,data.y,data.type,data.settlement,data.built,data.stock,data.gold,data.prices);
             GameServer.buildings[building.id] = building;
             GameServer.buildingsList[building.id] = building.superTrim();
 
@@ -298,38 +297,15 @@ GameServer.canBuild = function(bid,tile){
 };
 
 GameServer.build = function(bid,tile,settlement){
-    var building = new Building(tile.x,tile.y,bid,settlement);
+    var building = new Building(tile.x,tile.y,bid,settlement,false);
     GameServer.buildings[building.id] = building;
     GameServer.buildingsList[building.id] = building.superTrim();
     GameServer.server.db.collection('buildings').insertOne(building,function(err){
         if(err) throw err;
         console.log('build successfull');
-        /*var mongoID = document._id.toString(); // The Mongo driver for NodeJS appends the _id field to the original object reference
-        player.setIDs(mongoID,socket.id);
-        GameServer.finalizePlayer(socket,player);
-        GameServer.server.sendID(socket,mongoID);*/
     });
     GameServer.server.sendAll('addBuildingPin',building.superTrim());
 };
-
-/*GameServer.canBuild = function(player,building){
-    var data = GameServer.buildingsData[building];
-    var w = Math.ceil(data.width/32);
-    var h = Math.ceil(data.height/32);
-    var x = player.x - Math.floor(w/2);
-    var y = player.y - Math.floor(h/2);
-    console.log('building at ',x,y);
-
-    // TODO: store somewhere
-    var shape = [];
-    for(var i = 0; i < data.shape.length; i+=2){
-        shape.push({
-            x: data.shape[i],
-            y: data.shape[i+1]
-        });
-    }
-    return PFUtils.collisionsFromShape(shape,x,y,data.width,data.height,GameServer.collisions,true);
-};*/
 
 GameServer.allIngredientsOwned = function(player,recipe,nb){
     for(var item in recipe){
@@ -345,7 +321,6 @@ GameServer.operateCraft = function(player,recipe,targetItem,nb){
         player.takeItem(item,recipe[item]*nb);
     }
     player.giveItem(targetItem,nb);
-    //player.updateInventory();
 };
 
 GameServer.handlePath = function(data,socketID){

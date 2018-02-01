@@ -46,7 +46,8 @@ Engine.preload = function() {
     this.load.image('tradepost', 'assets/sprites/buildings/tradepost.png');
     this.load.image('inn', 'assets/sprites/buildings/inn.png');
     this.load.image('tower', 'assets/sprites/buildings/tower.png');
-    //this.load.image('foundations', 'assets/sprites/buildings/foundations.png');
+    this.load.image('foundations', 'assets/sprites/buildings/foundations.png');
+
     this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
@@ -975,7 +976,8 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.newbuildings) {
         for (var n = 0; n < data.newbuildings.length; n++) {
             var b = data.newbuildings[n];
-            Engine.addBuilding(b.id, b.x, b.y, b.type, b.settlement, b.inventory, b.gold,b.prices);
+            var building = Engine.addBuilding(b.id, b.x, b.y, b.type, b.settlement, b.built);//, b.inventory, b.gold,b.prices);
+            Engine.updateBuilding(building,b);
         }
     }
 
@@ -1062,14 +1064,29 @@ Engine.handleBattleUpdates = function(entity, data){
 };
 
 Engine.updateBuilding = function(building,data){ // data contains the updated data from the server
+    if(data.inventory){
+        building.inventory.fromList(data.inventory);
+        //if(Engine.currentBuiling.id == building.id) Engine.currentMenu.onUpdateShop();
+        Engine.checkForShopUpdate(building.id);
+    }
     if(data.gold) {
         building.gold = data.gold;
-        if(Engine.currentBuiling.id == building.id) Engine.currentMenu.onUpdateShopGold();
+        //if(Engine.currentBuiling.id == building.id) Engine.currentMenu.onUpdateShopGold();
+        Engine.checkForShopUpdate(building.id);
     }
     if(data.items){
         Engine.updateInventory(building.inventory,data.items);
-        if(Engine.currentBuiling.id == building.id) Engine.currentMenu.onUpdateShop();
+        //if(Engine.currentBuiling.id == building.id) Engine.currentMenu.onUpdateShop();
+        Engine.checkForShopUpdate(building.id);
     }
+    if(data.prices){
+        building.prices= data.prices;
+        Engine.checkForShopUpdate(building.id);
+    }
+};
+
+Engine.checkForShopUpdate= function(id){
+    if(Engine.currentBuiling && Engine.currentBuiling.id == id) Engine.currentMenu.onUpdateShop();
 };
 
 Engine.addPlayer = function(id,x,y,settlement){
@@ -1081,8 +1098,8 @@ Engine.addPlayer = function(id,x,y,settlement){
     return sprite;
 };
 
-Engine.addBuilding = function(id,x,y,type,settlement,inv,gold,prices){
-    var building = new Building(id,x,y,type,settlement,inv,gold,prices);
+Engine.addBuilding = function(id,x,y,type,settlement,built){//},inv,gold,prices){
+    var building = new Building(id,x,y,type,settlement,built);//,inv,gold,prices);
     Engine.buildings[id] = building;
     Engine.displayedBuildings.add(id);
     return building;

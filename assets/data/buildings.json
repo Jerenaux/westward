@@ -72,5 +72,21 @@
     "sprite": "tower",
     "recipe": {"3":60},
     "name":"Tower"
+  },
+  "4":{
+    "shape":[
+      5,180,
+      370,0,
+      737,183,
+      373,386
+    ],
+    "width": 739,
+    "height": 391,
+    "sprite": "foundations",
+    "name":"Foundations",
+    "entry": {
+      "x": 16,
+      "y": 8
+    }
   }
 }

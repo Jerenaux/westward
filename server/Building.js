@@ -7,7 +7,7 @@ var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
 
-function Building(x,y,type,settlement,stock,gold,prices){
+function Building(x,y,type,settlement,built,stock,gold,prices){
     stock = stock || {};
     gold = gold || 0;
     prices = prices || {};
@@ -21,6 +21,7 @@ function Building(x,y,type,settlement,stock,gold,prices){
     this.inventory.setItems(stock);
     this.prices = prices;
     this.gold = gold;
+    this.built = !!built;
     this.setOrUpdateAOI();
     this.addCollisions();
 }
@@ -86,7 +87,7 @@ Building.prototype.takeGold = function(nb){
 // Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){
     var trimmed = {};
-    var broadcastProperties = ['id','type','settlement','gold','prices']; // list of properties relevant for the client
+    var broadcastProperties = ['id','type','settlement','gold','prices','built']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -109,7 +110,8 @@ Building.prototype.superTrim = function(){
 };
 
 Building.prototype.addCollisions = function(){
-    var data = GameServer.buildingsData[this.type];
+    var type = (this.built ? this.type : 4);
+    var data = GameServer.buildingsData[type];
     var shape = data.shape;
     this.shape = [];
     for(var i = 0; i < shape.length; i+=2){

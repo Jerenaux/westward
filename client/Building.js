@@ -2,13 +2,16 @@
  * Created by Jerome on 07-10-17.
  */
 
+var FOUNDATIONS_ID = 4;
+
 var Building = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function Building (id, x, y, type, settlement, inv, gold,prices) {
+    initialize: function Building (id, x, y, type, settlement, built){//}, inv, gold,prices) {
         var data = Engine.buildingsData[type];
-        CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, data.sprite);
+        var sprite = (built ? data.sprite : Engine.buildingsData[FOUNDATIONS_ID].sprite);
+        CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, sprite);
 
         this.tileX = x;
         this.tileY = y;
@@ -16,12 +19,18 @@ var Building = new Phaser.Class({
         this.buildingType = type;
         this.settlement = settlement;
         this.inventory = new Inventory(100);
-        this.inventory.fromList(inv);
-        this.gold = gold;
-        this.prices = prices || {};
+        //this.inventory.fromList(inv);
+        //this.gold = gold;
+        this.prices = {};
         this.chunk = Utils.tileToAOI({x:x,y:y});
         this.entry = data.entry;
+        this.built = built;
 
+        var collisionData = (this.built ? data : Engine.buildingsData[FOUNDATIONS_ID]);
+        this.setCollisions(collisionData);
+    },
+
+    setCollisions: function(data){
         var shape = new Phaser.Geom.Polygon(data.shape);
         this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
 
@@ -42,6 +51,7 @@ var Building = new Phaser.Class({
 
     handleClick: function(){
         if(Engine.inMenu || Engine.player.inFight) return;
+        if(!this.built) return;
         if(!this.entry) return;
         var pos = {
             x: this.tileX + this.entry.x,
