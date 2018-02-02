@@ -234,6 +234,25 @@ WorldEditor.isInWorldBounds = function(x,y){
     return !(x < 0 || y < 0 || x >= World.worldWidth || y >= World.worldHeight);
 };
 
+WorldEditor.isWater = function(x,y){
+    var tiles = WorldEditor.getTilesAt(x,y);
+    var water = Object.values(WorldEditor.shore);
+    for(var i = 0; i < tiles.length; i++){
+        if(water.includes(tiles[i])) return true;
+    }
+    return false;
+};
+
+WorldEditor.getTilesAt = function(x,y){
+    var chunk = WorldEditor.chunks[Utils.tileToAOI({x:x,y:y})];
+    var tiles = [];
+    var idx = Utils.gridToLineWithOrigin(x,y,chunk.width);
+    for(var i = 0; i < chunk.layers.length; i++){
+        tiles.push(chunk.layers[i].data[idx]);
+    }
+    return tiles;
+};
+
 WorldEditor.drawTree = function(x,y){
     if(!WorldEditor.isInWorldBounds(x,y)) return false;
     if(WorldEditor.isBusy({x:x,y:y})) return false;

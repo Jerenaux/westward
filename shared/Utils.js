@@ -31,6 +31,12 @@ Utils.gridToLine = function(x,y,w){
     return (y*w)+x;
 };
 
+Utils.gridToLineWithOrigin = function(x,y,w){
+    var aoi = Utils.tileToAOI({x:x,y:y});
+    var origin = Utils.AOItoTile(aoi);
+    return Utils.gridToLine(x-origin.x,y-origin.y,w);
+};
+
 Utils.lineToGrid = function(i,w){
     return {
         x: i%w,

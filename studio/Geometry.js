@@ -4,6 +4,10 @@
 
 var onServer = (typeof window === 'undefined');
 
+if(onServer){
+    var Utils = require('../shared/Utils.js').Utils;
+}
+
 var Geometry = {
     lastrectID : 0, // running id of generated rects
     colors : {
@@ -14,11 +18,12 @@ var Geometry = {
     }
 };
 
+// Generates a Gaussian cluster of elements (e.g. trees)
 Geometry.cluster = function(x,y){
     var pts = [];
     var stdX = document.getElementById('w').value;
     var stdY = document.getElementById('h').value;
-    var n = document.getElementById('n').value;;
+    var n = document.getElementById('n').value;
     var exclude = [];
     for(var i = 0; i < n; i++){
         var pt = {
@@ -45,9 +50,11 @@ Geometry.containsPt = function(pts,pt){
     return false;
 };
 
-Geometry.makeCorona = function(x,y){
-    var height = document.getElementById('w').value;
-    var width = document.getElementById('h').value;
+Geometry.makeCorona = function(x,y,w,h){
+    //var height = document.getElementById('w').value;
+    //var width = document.getElementById('h').value;
+    var width = w;
+    var height = h;
     var start = {
         x: x,
         y: y-height
@@ -67,14 +74,14 @@ Geometry.coronaSide = function(pts,xstep,ystep,pt,width,height){
     var initH = height;
     var refDimension = (xstep == ystep ? height : width);
     var max = Math.ceil(refDimension/2);
-    var nbSegments = randomInt(2,max);
+    var nbSegments = Utils.randomInt(2,max);
     var alt = +(xstep != ystep);
 
     for(var i = 0; i < nbSegments; i++){
         var upperLimitW = Math.min(width-(nbSegments-i),Math.ceil(initW/3));
         var upperLimitH = Math.min(height-(nbSegments-i),Math.ceil(initH/3));
-        var xlength = (i == nbSegments-1 ? width : randomInt(1,upperLimitW+1));
-        var ylength = (i == nbSegments-1 ? height : randomInt(1,upperLimitH+1));
+        var xlength = (i == nbSegments-1 ? width : Utils.randomInt(1,upperLimitW+1));
+        var ylength = (i == nbSegments-1 ? height : Utils.randomInt(1,upperLimitH+1));
         width-=xlength;
         height-=ylength;
 

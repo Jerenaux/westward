@@ -23,7 +23,7 @@ Performance:
 - Dont send full building inventories when buying/selling (send arrays of deltas)
 - Use pool for footsteps (see Groups, who now act as pools)
 - Use pools for players, animals, ...
-- Fix null values in left-fringe chunks
+- Fix null values in left-fringe chunks (fixed?)
 ->nulls in corrupted chunks likely arise from "undefined" values being converted to null by JSON.stringify
 -> Happens on the fringe -> because for these drawShore returns undefined?!
 - listCollisions: don't store water tiles, only shore etc.
@@ -34,21 +34,15 @@ Performance:
 Order:
 - Find out how to generate graphics objects (grid tiles, gradients...) programmatically for various uses
 - Use events gameobject events for input + custom events for updating menus (https://phaser.io/phaser3/devlog/112)
-- One clean, central way to manage tilesets, depth, blitters... (blitter selection in client/Chunk, "mawLayer" field in WorldEditor ...)
+- One clean, central way to manage tilesets, config variables, depth, blitters... (blitter selection in client/Chunk, "mawLayer" field in WorldEditor ...)
 - Give toString method to custom objects to replace [this.constructor.name this.id] ...
 - Decide what to do with assets/maps folder, both for dev and prod
 - Merge all the addXXX and removeXXX methods (but keepl separate lists) + merge addXXX loops in updateWorld()
 - Split server in two (game and dev server)
 - Remove unnecessary Geometry methods (and world-building methods from studio/Engine)
 - Restructure UI, maybe remove UIElement, only have a set of generic functions to bind to interactive sprites?
-- Think about a Container class or something to affect the transforms of all children, get rid of repeated finalize() calls
-=> Use container game object from Phaser
--> Store sprites in multiple arrays simultaneously; one common displayList, to toggle the visible state, and possibly other logical containers to adjust depth
--> Maybe position everything according to oirign
--> One manual call to finalize() at the end, if any; or auto when adding to menu (the menu calls it in addPanel)
 - Anchor panel elements at center, not top-left
 - Make chatbar panel a subclass of Panels? Wait to see if other panels don't need DOM elements
-- Make subclass of Panels for stats, and maybe others
 
 Content:
 -------
@@ -139,6 +133,7 @@ Legal:
 Polish:
 ------
 Visual:
+- Add dirt below buildings
 - Find better font
 - Pop-up notifications after actions
 - Fix tooltips displaying too long on equipped equipment slots
