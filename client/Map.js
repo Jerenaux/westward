@@ -57,22 +57,15 @@ var Map = new Phaser.Class({
         });
     },
 
-    /*handleClick: function(evt){
-        if(evt.pointer.downX != evt.pointer.upX || evt.pointer.downY != evt.pointer.upY) return; // drag
-        this.addRedPin(evt.x,evt.y);
-    },*/
-
     handleClick: function(pointer){
-        console.log(pointer);
-        if(pointer.downX != pointer.upX || pointer.downY != pointer.upY) return; // drag
-        this.addRedPin(pointer.x,pointer.y);
+        /*if(pointer.downX != pointer.upX || pointer.downY != pointer.upY) return; // drag
+        this.addRedPin(pointer.x,pointer.y);*/
     },
 
     addRedPin: function(x,y){
         this.pins[0].setUp(x,y,'New building?','redpin');
         Engine.currentMenu.panels['buildings'].display();
         this.clickedTile = Utils.screenToMap(x,y,this);
-        //if(Engine.collisions.get(tile.y,tile.x) == 1) console.log('collision');
     },
 
     addPins: function(nb){

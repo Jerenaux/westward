@@ -16,7 +16,7 @@ CharacterPanel.prototype.addInterface = function(){
     var y = 20;
     this.addText(x,y,'Citizen of '+Engine.settlementsData[Engine.player.settlement].name);
     y += 20;
-    this.addText(x,y,"Level 1 Merchant\t  -   0/100 Class XP");
+    this.addText(x,y,"Level 1 Merchant -   0/100 Class XP");
     y += 20;
     this.addText(x,y,'Level 1 citizen   -   0/100 Civic XP');
     y += 20;

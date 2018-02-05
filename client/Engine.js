@@ -144,7 +144,6 @@ Engine.create = function(){
     Engine.settlementsData = Engine.scene.cache.json.get('settlements');
 
     Engine.createMarker();
-    console.log(Engine.scene);
     Engine.getGameInstance().canvas.style.cursor = Engine.cursor; // Sets the pointer to hand sprite
 
     Engine.dragging = false;
@@ -516,12 +515,44 @@ Engine.makeBattleMenu = function(){
 };
 
 Engine.makeFortMenu = function(){
+    var padding = 10;
+    var mapx = 10;
+    var mapy = 90;
+    var mapw = 443;
+    var maph = 420;
+
+    var buildx = mapx+mapw+padding;
+    var buildy = 100;
+    var buildw = 200;
+    var buildh = 390;
+
+    var resx = mapx+mapw+buildw+(padding*2);
+    var resy = buildy;
+    var resw = Engine.getGameConfig().width - padding - resx;
+    var resh = 90;
+
+    var statx = resx;
+    var staty = resy + resh;
+    var statw = resw;
+    var stath = buildh - resh;
+
     var fort = new Menu('Fort');
-    var mapPanel = new FortmapPanel(312,100,400,300,'',true);
+    var mapPanel = new FortPanel(mapx,mapy,mapw,maph,'',true); // true = invisible
     fort.addPanel('map',mapPanel);
-    var buildings = new InventoryPanel(100,100,180,200,'Buildings');
+
+    fort.addPanel('buildings',new BuildingsPanel(buildx,buildy,buildw,buildh,'Buildings'));
+    var resources = new InventoryPanel(resx,resy,resw,resh,'Resources');
+    resources.setInventory(new Inventory(8),8,true);
+    fort.addPanel('resources',resources);
+    fort.addPanel('status',new SettlementStatusPanel(statx,staty,statw,stath,'Status'));
+
+    fort.onUpdateShop = function(){
+        resources.updateInventory();
+    };
+
+    /*var buildings = new InventoryPanel(100,100,180,200,'Buildings');
     buildings.setInventory(Engine.player.buildingRecipes,3,false,Engine.newbuildingClick);
-    fort.addPanel('buildings',buildings,true);
+    fort.addPanel('newbuildings',buildings,true);
     var confirm = new NewbuildingPanel(100, 300, 180, 170);
     fort.addPanel('confirm',confirm,true); // true = hide on menu open
     var ingredients = new InventoryPanel(130,385,50,50,'',true); // true = invisible
@@ -529,7 +560,7 @@ Engine.makeFortMenu = function(){
     fort.addPanel('ingredients',ingredients,true);
     fort.onUpdatePins = function(){
         mapPanel.map.updatePins();
-    };
+    };*/
     return fort;
 };
 
@@ -1066,17 +1097,14 @@ Engine.handleBattleUpdates = function(entity, data){
 Engine.updateBuilding = function(building,data){ // data contains the updated data from the server
     if(data.inventory){
         building.inventory.fromList(data.inventory);
-        //if(Engine.currentBuiling.id == building.id) Engine.currentMenu.onUpdateShop();
         Engine.checkForShopUpdate(building.id);
     }
     if(data.gold) {
         building.gold = data.gold;
-        //if(Engine.currentBuiling.id == building.id) Engine.currentMenu.onUpdateShopGold();
         Engine.checkForShopUpdate(building.id);
     }
     if(data.items){
         Engine.updateInventory(building.inventory,data.items);
-        //if(Engine.currentBuiling.id == building.id) Engine.currentMenu.onUpdateShop();
         Engine.checkForShopUpdate(building.id);
     }
     if(data.prices){
@@ -1187,6 +1215,10 @@ Engine.enterBuilding = function(id){
             items: building.prices,
             key: 1
         });
+    }
+
+    if(menu.panels['resources']){
+        menu.panels['resources'].modifyInventory(building.inventory.items);
     }
 
     menu.displayIcon();

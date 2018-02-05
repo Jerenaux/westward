@@ -194,18 +194,26 @@
     },
     {
       "filename": "longslot_4",
-      "frame": {"x":84,"y":424,"w":16,"h":40}
+      "frame": {"x":67,"y":424,"w":16,"h":40}
     },
     {
       "filename": "longslot_5",
-      "frame": {"x":101,"y":424,"w":33,"h":40}
+      "frame": {"x":84,"y":424,"w":16,"h":40}
     },
     {
       "filename": "longslot_6",
-      "frame": {"x":135,"y":424,"w":16,"h":40}
+      "frame": {"x":101,"y":424,"w":16,"h":40}
     },
     {
       "filename": "longslot_7",
+      "frame": {"x":118,"y":424,"w":16,"h":40}
+    },
+    {
+      "filename": "longslot_8",
+      "frame": {"x":135,"y":424,"w":16,"h":40}
+    },
+    {
+      "filename": "longslot_9",
       "frame": {"x":152,"y":424,"w":18,"h":40}
     },
     {
