@@ -58,7 +58,7 @@ Content:
 - Animal can trigger fights
 * Ecosystem
 - Listing and distribution of pick-up resources
-- Listing and distribution (and yeild) of building resources
+- Listing and distribution (and yield) of building resources
 - Listing and distribution of animals
 - Work out location and mechanics of enemy civ.
 * Exploration/travel
