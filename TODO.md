@@ -1,21 +1,51 @@
 Cleaning
 * Battle system
-* Exploration/travel
-* Inns
 * Inventory
 * Settlement defense
 * Settlement economy
 * Settlement management
-* Trade
-* World map
 Design document
-Legal
 Polish
-World building
 
 ###############
 Prototype level:
 ###############
+
+- Think about typical gameplay scenarios and decide milestones accordingly
+- Profiles: new vs old player, focused on self vs setllement, x 4 classes
+
+Settlement-focused experience:
+- Checks out settlement status in fort
+-> Food surplus bonuses/maluses
+-> Development goals + "next level"
+-> Resource levels
+-> Buildings status
+-> Military threats
+-> Officials
+-> Taxes
+(-> Disable official prerogatives)
+- Based on that, determine mission: bring in resource, combat threat, build...
+- Lack of food: hunt and kill something
+- Lack of gold: give gold or sell furs
+- Other: go and commit to relevant buildings
+- Commit to buildings being built, until completion
+- Earn civic xp with commitment
+- Gray out some actions based on civic level
+- Show dev level impact in stats panel
+- Show committment slots in char panel
+
+Then:
+- Have 2 settlements, with important differences 
+- World map-based settlement selection menu (mention key aspects, display enemy civ threats)
+- Class selection menu (describe impact on settlements)
+- Help buttons *everywhere*
+- Add short descriptions to items
+- One-time single-panel combat tutorial when first combat
+- One-time single-panel intro text when first login
+- Orientation panel in char menu hinting at what to do and where to go (w/ map?)
+Goal: 1h of gameplay?
+
+
 
 Cleaning:
 --------
@@ -47,32 +77,16 @@ Order:
 Content:
 -------
 * Battle system
-- Identify characters in the way
 - Respawn
 - Respawn if disconnect
-- Battle experience
-- Mouse hover icons (melee attack, ranged...)
-- Multiplayer fights
--> If step in zone -> involved in fight (modify arena shape, etc.)
--> If someone in area when starting -> involve as well!
+- Multiplayer fights (deal with: 1) stepping in active battlezone and 2) being into an appearing battlezone)
 - Animal can trigger fights
+- Have monsters drop loot
 * Ecosystem
 - Listing and distribution of pick-up resources
 - Listing and distribution (and yeild) of building resources
 - Listing and distribution of animals
-- Work out location and mechanics of enemy civ.
-* Exploration/travel
-- Have a world to explore -> World building
-- Campfires
-- cf. Worldmap  
-* Inns
-(- Enable players to put construction site)
-(- Enable players to commit to construction)
-- Shop management (custom stock, prices...)
-- Set respawn fee
-- Set respawn site
-- Chat
-- Gazette
+- Work out location and mechanics of enemy civ.  
 * Inventory
 - Pick up items
 * Settlement defense
@@ -84,8 +98,6 @@ Content:
 - Production of NPC troops
 - Set up stats of troops
 - Make troops engage enemies
-- Restrict prerogatives based on official position
-- Enable governor to name the commander
 * Settlement economy
 - Yellow pins for unbuilt buildings
 - Mnenu for unbuilt buildings
@@ -104,14 +116,9 @@ Content:
 * Settlement management
 - Display settlement stats (level, resources...)
 - More info on building hover
-* Trade
-- Have monsters drop loot
-- Enable bonuses of merchants
-- Allow merchants and artisans to build their shops
-* World map
-- Menu with static image
-- Minimap
-- Fog of war and exploration (chunks-based)
+- Restrict prerogatives based on official position
+- Enable governor to name chancellors and commanders
+- Election of governors
 
 Design document:
 ---------------
@@ -123,16 +130,10 @@ Design document:
 - Tidy up (charts, tables, Latex formulas...)
 - For v1 schedule: follow https://www.youtube.com/watch?v=moW8-MXjivs priorization method from (36:00)
 
-Legal:
-------
-- Look up IFAPME, UCM, Forem
-- Comptable, avocat spécialisé
-- Contrats, template, sharing IP...
-- What about donations, how is it taxed, what formats allow it..
-
 Polish:
 ------
 Visual:
+- Different mouse cursors depending on battle situation
 - Add dirt below buildings
 - Find better font
 - Pop-up notifications after actions
@@ -171,20 +172,6 @@ General:
 - Fix panel tweens (positions not update often enough?)
 - Varied and nice landmarks to give life to the world and act as waypoints
 
-World building:
---------------
-- Add random elements (w/ scripts to remove them):
--> Patches of dirt
--> Tree decorations: flowers, stones, bushes
-- Add cliffs in empty areas
--> Add random decorations to cliffs (stones in bends, ...)
-- Compute tree density and spread random trees around accordingly?
-- No tree if busy 3cells to the left? Or when planing tree, log width cells to right as no-go position
-- Fix loops (lakes ...)
-- Plan for more layers in dev
-- Store forests and trees separately (trees.json) during dev?
--> During flattening, read that file and draw trees tile by tile
--> Test high-layers after flattening
 
 ###############
 V1 level:
@@ -203,6 +190,8 @@ interactions with buildings, time spent in each individual menu, etc.
 Content:
 -------
 * Battle system
+- Battle experience
+- Identify characters in the way of ranged attacks
 - Anti-friendly fire safety for ranged attacks
 - Stats and formulas for bombs
 - Mechanic for bombs
@@ -215,6 +204,7 @@ Content:
 - Compute probability of items breaking and discard them
 - Accommodate NPC
 * Character menu:
+- Lvl-up system
 - Make actions generate an entry in events log
 - Events log: what you did (and effects: xp gains, health gains, ...), the notifications you got, what you said and people around said
 - Daily quests
@@ -229,6 +219,7 @@ Content:
 - Have wildlife spawn accordingly
 * Daily quests
 * Exploration/travel:
+- Campfires
 - Travel increases fatigue
 - Spotting of settlements, with indicator
 - Spotting of inns, with indicator
@@ -244,6 +235,14 @@ Content:
 *Inventory:
 - Add possibility to throw item, (incl. number)
 - Allow to use multiple items in one action
+* Inns
+(- Enable players to put construction site)
+(- Enable players to commit to construction)
+- Shop management (custom stock, prices...)
+- Set respawn fee
+- Set respawn site
+- Chat
+- Gazette
 * Mail system (using birds)
 * (Mini)map system
 * Movement
@@ -262,7 +261,13 @@ Content:
 * Settlement economy
 * Skills menu
 * Trade
+- Enable bonuses of merchants
+- Allow merchants and artisans to build their shops
 * Tutorial
+* World map
+- Menu with static image
+- Minimap
+- Fog of war and exploration (chunks-based)
 
 Deployment:
 ----------
@@ -293,6 +298,22 @@ Custom chunk editor:
 - See borders of adjacent chunks to match fringe tiles
 - Preserve whatever extra info is in the JSON file (vs Tiled who rewrites it)
 - Versioning of individual chunks (saved in separate folder), for unlimited undos
+
+
+World building:
+--------------
+- Add random elements (w/ scripts to remove them):
+-> Patches of dirt
+-> Tree decorations: flowers, stones, bushes
+- Add cliffs in empty areas
+-> Add random decorations to cliffs (stones in bends, ...)
+- Compute tree density and spread random trees around accordingly?
+- No tree if busy 3cells to the left? Or when planing tree, log width cells to right as no-go position
+- Fix loops (lakes ...)
+- Plan for more layers in dev
+- Store forests and trees separately (trees.json) during dev?
+-> During flattening, read that file and draw trees tile by tile
+-> Test high-layers after flattening
 
 ###############
 V2 level:
