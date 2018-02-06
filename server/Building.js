@@ -7,27 +7,43 @@ var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
 
-function Building(x,y,type,settlement,built,stock,gold,prices){
-    stock = stock || {};
-    gold = gold || 0;
-    prices = prices || {};
-
+function Building(data){//x,y,type,settlement,built,stock,gold,prices){
     this.id = GameServer.lastBuildingID++;
-    this.x = x;
-    this.y = y;
-    this.type = type;
-    this.settlement = settlement;
+    this.x = data.x;
+    this.y = data.y;
+    this.type = data.type;
+    this.settlement = data.settlement;
+    stock = data.stock || null;
     this.inventory = new Inventory(100);
     this.inventory.setItems(stock);
-    this.prices = prices;
-    this.gold = gold;
-    this.built = !!built;
+    this.prices = data.prices || {};
+    this.gold = data.gold || 0;
+    this.built = !!data.built;
     this.setOrUpdateAOI();
     this.addCollisions();
+    this.manageBuildingType();
 }
 
 Building.prototype = Object.create(GameObject.prototype);
 Building.prototype.constructor = Building;
+
+Building.prototype.manageBuildingType = function(){
+    GameServer.registerBuilding(this,this.settlement);
+    if(this.type == 0){ // fort
+        GameServer.registerFort(this,this.settlement);
+        this.buildings = GameServer.getSettlementBuildings(this.settlement);
+        this.updateBuildings();
+    }
+};
+
+Building.prototype.addBuilding = function(building){
+    this.buildings.push(building.listingTrim());
+    this.updateBuildings();
+};
+
+Building.prototype.updateBuildings = function(){
+    this.setProperty('buildings',this.buildings)
+};
 
 Building.prototype.getPrice = function(item,nb,action){
     var key = (action == 'sell' ? 0 : 1);
@@ -87,7 +103,7 @@ Building.prototype.takeGold = function(nb){
 // Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){
     var trimmed = {};
-    var broadcastProperties = ['id','type','settlement','gold','prices','built']; // list of properties relevant for the client
+    var broadcastProperties = ['id','type','settlement','gold','prices','built','buildings']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -97,10 +113,10 @@ Building.prototype.trim = function(){
     return trimmed;
 };
 
-// Returns an object containing only the fields relevant to display on the map
-Building.prototype.superTrim = function(){
+// Returns an object containing only the fields relevant to list buildings
+Building.prototype.listingTrim = function(){
     var trimmed = {};
-    var broadcastProperties = ['id','type'];
+    var broadcastProperties = ['id','type','built'];
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

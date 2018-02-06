@@ -21,7 +21,8 @@ FortPanel.prototype.addInterface = function(){
     this.bg.setVisible(false);
 
     this.map = new Map(mapx,mapy);
-    this.map.addPins(Object.keys(Engine.buildingsList).length+1); // +1 for new building pin
+    //this.map.addPins(Object.keys(Engine.buildingsList).length+1); // +1 for new building pin
+    this.map.addPins(0);
 
     this.content.push(this.bg);
     this.content.push(this.map);

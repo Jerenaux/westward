@@ -7,7 +7,7 @@ function PersonalUpdatePacket(){
     this.stats = [];
     this.equipment = [];
     this.ammo = [];
-    this.pins = [];
+    //this.pins = [];
     this.msgs = [];
 }
 
@@ -58,9 +58,9 @@ PersonalUpdatePacket.prototype.addAmmo = function(slot,nb){
     this.ammo.push({slot:slot,nb:nb});
 };
 
-PersonalUpdatePacket.prototype.addBuildingPin = function(data){
+/*PersonalUpdatePacket.prototype.addBuildingPin = function(data){
     this.pins.push(data);
-};
+};*/
 
 PersonalUpdatePacket.prototype.addMsg = function(msg){
     this.msgs.push(msg);

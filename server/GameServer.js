@@ -26,6 +26,7 @@ module.exports.GameServer = GameServer;
 var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
+var ListMap = require('../shared/ListMap.js').ListMap;
 var AOI = require('./AOI.js').AOI;
 var Player = require('./Player.js').Player;
 var Building = require('./Building.js').Building;
@@ -67,18 +68,17 @@ GameServer.readMap = function(mapsPath){
 
     // Read buildings
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
-    GameServer.buildingsList = {}; // active list of the locations of all buildings
+    //GameServer.buildingsList = {}; // active list of the locations of all buildings
     GameServer.forts = {}; // maps settlements to forts
+    GameServer.settlementBuildings = new ListMap(); // maps settlements to lists of buildings
     GameServer.server.db.collection('buildings').find({}).toArray(function(err,buildings){
         if(err) throw err;
         for(var i = 0; i < buildings.length; i++){
             var data = buildings[i];
-            var building = new Building(data.x,data.y,data.type,data.settlement,data.built,data.stock,data.gold,data.prices);
+            //var building = new Building(data.x,data.y,data.type,data.settlement,data.built,data.stock,data.gold,data.prices);
+            var building = new Building(data);
             GameServer.buildings[building.id] = building;
-            GameServer.buildingsList[building.id] = building.superTrim();
-
-            if(data.type == 0) GameServer.forts[data.settlement] = building;
-
+            //GameServer.buildingsList[building.id] = building.superTrim();
         }
         GameServer.updateStatus();
     });
@@ -154,8 +154,8 @@ GameServer.createInitializationPacket = function(playerID){
     // Create the packet that the client will receive from the server in order to initialize the game
     return {
         player: GameServer.players[playerID].trim(), // info about the player
-        nbconnected: GameServer.server.getNbConnected(),
-        buildings: GameServer.buildingsList
+        nbconnected: GameServer.server.getNbConnected()
+        //buildings: GameServer.buildingsList
     };
     // No need to send list of existing players, GameServer.handleAOItransition() will look for players in adjacent AOIs
     // and add them to the "newplayers" array of the next update packet
@@ -297,14 +297,38 @@ GameServer.canBuild = function(bid,tile){
 };
 
 GameServer.build = function(bid,tile,settlement){
-    var building = new Building(tile.x,tile.y,bid,settlement,false);
+    var data = {
+        x: tile.x,
+        y: tile.y,
+        type: bid,
+        settlement: settlement,
+        built: false
+    };
+    var building = new Building(data);
     GameServer.buildings[building.id] = building;
-    GameServer.buildingsList[building.id] = building.superTrim();
+    //GameServer.buildingsList[building.id] = building.superTrim();
     GameServer.server.db.collection('buildings').insertOne(building,function(err){
         if(err) throw err;
         console.log('build successfull');
     });
     GameServer.server.sendAll('addBuildingPin',building.superTrim());
+};
+
+GameServer.registerBuilding = function(building,settlement){
+    GameServer.settlementBuildings.add(settlement,building);
+    var fort = GameServer.forts[settlement];
+    if(fort) fort.addBuilding(building);
+};
+
+GameServer.registerFort = function(fort,settlement){
+    GameServer.forts[settlement] = fort;
+};
+
+GameServer.getSettlementBuildings = function(settlement){
+    var list = GameServer.settlementBuildings.get(settlement);
+    return list.map(function(b){
+        return b.listingTrim();
+    });
 };
 
 GameServer.allIngredientsOwned = function(player,recipe,nb){

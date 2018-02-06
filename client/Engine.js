@@ -197,7 +197,7 @@ Engine.createMarker = function(){
 Engine.initWorld = function(player,buildings){
     console.log(player);
     Engine.addHero(player.id,player.x,player.y,player.settlement);
-    Engine.buildingsList = buildings;
+    //Engine.buildingsList = buildings;
     Engine.makeUI();
     Engine.makeChatBar();
     Engine.createAnimations();
@@ -921,12 +921,12 @@ Engine.updateSelf = function(data){
         Engine.player.gold = data.gold;
         Engine.updateMenus('gold');
     }
-    if(data.pins){
+    /*if(data.pins){
         for(var i = 0; i < data.pins.length; i++){
             Engine.buildingsList[data.pins[i].id] = data.pins[i];
         }
         Engine.updateMenus('pins');
-    }
+    }*/
     if(data.msgs){
         for(var i = 0; i < data.msgs.length; i++){
             Engine.handleMsg(data.msgs[i]);

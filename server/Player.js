@@ -304,9 +304,7 @@ Player.prototype.setAction = function(action){
 Player.prototype.onArrival = function(){
     //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
     if(!this.action) return;
-    if(this.action.type == 1) {
-        this.enterBuilding(this.action.id);
-    }
+    if(this.action.type == 1) this.enterBuilding(this.action.id);
 };
 
 Player.prototype.enterBuilding = function(id){
