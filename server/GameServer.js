@@ -224,6 +224,7 @@ GameServer.handleBattle = function(opponentID,socketID){
     var animal = GameServer.animals[opponentID];
     if(player.inFight) return;
     if(animal.moving) return;
+    if(animal.dead) return;
     // TODO: check for proximity
     new Battle(player,animal);
 };
@@ -307,7 +308,7 @@ GameServer.build = function(bid,tile,settlement){
     var building = new Building(data);
     GameServer.buildings[building.id] = building;
     //GameServer.buildingsList[building.id] = building.superTrim();
-    GameServer.server.db.collection('buildings').insertOne(building,function(err){
+    GameServer.server.db.collection('buildings').insertOne(building.dbTrim(),function(err){
         if(err) throw err;
         console.log('build successfull');
     });

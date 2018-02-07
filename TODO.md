@@ -21,12 +21,13 @@ Settlement-focused experience:
 -> Resource levels
 -> Buildings status
 -> Military threats
+-> Map legend
 -> Officials
 -> Taxes
 (-> Disable official prerogatives)
 - Based on that, determine mission: bring in resource, combat threat, build...
 - Lack of food: hunt and kill something
-- Lack of gold: give gold or sell furs
+- Lack of gold: sell furs
 - Other: go and commit to relevant buildings
 - Commit to buildings being built, until completion
 - Earn civic xp with commitment
@@ -45,6 +46,17 @@ Then:
 - Orientation panel in char menu hinting at what to do and where to go (w/ map?)
 Goal: 1h of gameplay?
 
+Random list:
+Fort UI
+Monster drops loot
+Monster xp
+Display stat effects in character panel + xp bars
+Being-built panel
+Resource building panel
+Commitment, then functional commitment slots in char panel
+Civic xp
+Help buttons
+Item descriptions
 
 
 Cleaning:

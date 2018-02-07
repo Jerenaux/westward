@@ -6,6 +6,7 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
+var clone = require('clone');
 
 function Building(data){//x,y,type,settlement,built,stock,gold,prices){
     this.id = GameServer.lastBuildingID++;
@@ -13,9 +14,8 @@ function Building(data){//x,y,type,settlement,built,stock,gold,prices){
     this.y = data.y;
     this.type = data.type;
     this.settlement = data.settlement;
-    stock = data.stock || null;
     this.inventory = new Inventory(100);
-    this.inventory.setItems(stock);
+    if(data.inventory) this.inventory.fromList(data.inventory);
     this.prices = data.prices || {};
     this.gold = data.gold || 0;
     this.built = !!data.built;
@@ -111,6 +111,11 @@ Building.prototype.trim = function(){
     trimmed.y = parseInt(this.y);
     trimmed.inventory = this.inventory.toList();
     return trimmed;
+};
+
+Building.prototype.dbTrim = function(){
+    var building = clone(this);
+    building.inventory = this.inventory.toList();
 };
 
 // Returns an object containing only the fields relevant to list buildings

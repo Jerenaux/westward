@@ -54,6 +54,19 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback){
     };
 };
 
+Panel.prototype.addText = function(x,y,text,color,size){
+    var color = color || '#ffffff';
+    var size = size || 14;
+    var t = Engine.scene.add.text(this.x+x, this.y+y, text, { font: size+'px belwe', fill: color, stroke: '#000000', strokeThickness: 3 });
+    t.setDisplayOrigin(0,0);
+    t.setScrollFactor(0);
+    t.setDepth(Engine.UIDepth+1);
+    t.setVisible(false);
+    this.texts.push(t);
+    this.content.push(t);
+    return t;
+};
+
 Panel.prototype.display = function(){
     Frame.prototype.display.call(this);
     for(var capsule in this.capsules){

@@ -8,7 +8,7 @@ var Building = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function Building (id, x, y, type, settlement, built){//}, inv, gold,prices) {
+    initialize: function Building (id, x, y, type, settlement, built){
         var data = Engine.buildingsData[type];
         var sprite = (built ? data.sprite : Engine.buildingsData[FOUNDATIONS_ID].sprite);
         CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, sprite);
@@ -19,8 +19,6 @@ var Building = new Phaser.Class({
         this.buildingType = type;
         this.settlement = settlement;
         this.inventory = new Inventory(100);
-        //this.inventory.fromList(inv);
-        //this.gold = gold;
         this.prices = {};
         this.chunk = Utils.tileToAOI({x:x,y:y});
         this.entry = data.entry;
@@ -51,7 +49,6 @@ var Building = new Phaser.Class({
 
     handleClick: function(){
         if(Engine.inMenu || Engine.player.inFight) return;
-        if(!this.built) return;
         if(!this.entry) return;
         var pos = {
             x: this.tileX + this.entry.x,

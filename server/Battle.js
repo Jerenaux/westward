@@ -220,7 +220,6 @@ Battle.prototype.processAttack = function(a,b){
             delay: 500
         };
     }
-    return false;
 };
 
 // Entites are only removed when the battle is over ; battlezones are only cleared at that time
@@ -231,7 +230,7 @@ Battle.prototype.end = function(){
     this.participants.forEach(function(f){
         f.endFight();
         if(f.isPlayer) f.notifyFight(false);
-        if(f.dead) setTimeout(GameServer.removeEntity,500,f);
+        //if(f.dead) setTimeout(GameServer.removeEntity,500,f);
     });
     GameServer.removeEntity(this);
     console.log('[B'+this.id+'] Ended');
@@ -272,11 +271,6 @@ Battle.prototype.computeArea = function(){
         w: w,
         h: h
     });
-
-    var area = this.area;
-    /*this.fighters.forEach(function(f){
-        f.setProperty('battlezone',area);
-    });*/
 };
 
 Battle.prototype.trim = function(){

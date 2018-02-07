@@ -10,6 +10,7 @@ var Animal = new Phaser.Class({
         Moving.call(this,x,y,data.sprite,id);
         this.setFrame(data.frame);
         this.setDisplayOrigin(0);
+        this.dead = false;
 
         // TODO: move to the .json storing animal properties
         this.animsKeys = {
@@ -26,7 +27,15 @@ var Animal = new Phaser.Class({
         };
     },
 
+    die: function(){
+        this.setFrame(49);
+        this.dead = true;
+        //Engine.deathAnimation(animal);
+        //setTimeout(Engine.removeAnimal,500,animal.id);
+    },
+
     handleClick: function(){
+        // TODO: replace request logic
         if(Engine.player.inFight){
             Engine.requestBattleAttack(this);
         }else{

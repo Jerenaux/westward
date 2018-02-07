@@ -327,7 +327,8 @@ Engine.makeUI = function(){
         'character': Engine.makeCharacterMenu(statsPanel),
         'trade': Engine.makeTradeMenu(),
         'fort': Engine.makeFortMenu(),
-        'battle': Engine.makeBattleMenu()
+        'battle': Engine.makeBattleMenu(),
+        'construction': Engine.makeConstructionMenu()
     };
 
     var UIelements = [];
@@ -514,6 +515,24 @@ Engine.makeBattleMenu = function(){
     return battle;
 };
 
+Engine.makeConstructionMenu = function(){
+    var w = 400;
+    var x = (Engine.getGameConfig().width-w)/2;
+    var padding = 10;
+    var progressh = 200;
+    var progressy = 100;
+    var invy = progressy+progressh+padding;
+    var constr = new Menu('Construction');
+    constr.addPanel('progress',new ConstructionPanel(x,progressy,w,progressh));
+    var inventory = new InventoryPanel(x,invy,w,150,'Inventory');
+    inventory.setInventory(new Inventory(16),8,true);
+    constr.addPanel('resources',inventory);
+    constr.onUpdateShop = function(){
+        inventory.updateInventory();
+    };
+    return constr;
+};
+
 Engine.makeFortMenu = function(){
     var padding = 10;
     var mapx = 10;
@@ -634,8 +653,17 @@ Engine.makeInventory = function(statsPanel){
 };
 
 Engine.makeCharacterMenu = function(statsPanel){
+    var padding = 10;
+    var infoh = 260;
+    var infox = 665;
+    var infoy = 100;
+    var commith = infoh;
+    var commitw = 300;
+    var commitx = infox - padding - commitw;
+    var commity = infoy;
     var character = new Menu('Character');
-    character.addPanel('info',new CharacterPanel(665,100,330,260,'<Player name>'));
+    character.addPanel('info',new CharacterPanel(infox,infoy,330,infoh,'<Player name>'));
+    character.addPanel('commit',new CommitmentPanel(commitx,commity,commitw,commith,'Commitment'));
     character.addPanel('stats',statsPanel);
     character.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
     return character;
@@ -1081,10 +1109,7 @@ Engine.updateAnimal = function(animal,data){ // data contains the updated data f
     if(data.path) animal.move(data.path);
     if(data.stop) animal.stop();
     Engine.handleBattleUpdates(animal,data);
-    if(data.dead) {
-        Engine.deathAnimation(animal);
-        setTimeout(Engine.removeAnimal,500,animal.id);
-    }
+    if(data.dead) animal.die();
 };
 
 Engine.handleBattleUpdates = function(entity, data){
@@ -1200,7 +1225,8 @@ Engine.enterBuilding = function(id){
     Engine.currentBuiling = building; // used to keep track of which building is displayed in menus
     var buildingData = Engine.buildingsData[building.buildingType];
     var settlementData = Engine.settlementsData[building.settlement];
-    var menu = Engine.menus[buildingData.mainMenu];
+    var menu = (building.built ? Engine.menus[buildingData.mainMenu] : Engine.menus['construction']);
+
 
     if(menu.panels['shop']) {
         menu.panels['shop'].updateCapsule('gold', building.gold);

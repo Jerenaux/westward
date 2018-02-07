@@ -22,7 +22,7 @@ CharacterPanel.prototype.addInterface = function(){
     y += 20;
 };
 
-CharacterPanel.prototype.addText = function(x,y,text){
+/*CharacterPanel.prototype.addText = function(x,y,text){
     var t = Engine.scene.add.text(this.x+x, this.y+y, text, { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     t.setDisplayOrigin(0,0);
     t.setScrollFactor(0);
@@ -30,7 +30,7 @@ CharacterPanel.prototype.addText = function(x,y,text){
     t.setVisible(false);
     this.texts.push(t);
     this.content.push(t);
-};
+};*/
 
 CharacterPanel.prototype.displayInterface = function(){
     this.texts.forEach(function(t){
