@@ -556,10 +556,11 @@ Engine.makeFortMenu = function(){
     var stath = buildh - resh;
 
     var fort = new Menu('Fort');
-    var mapPanel = new FortPanel(mapx,mapy,mapw,maph,'',true); // true = invisible
+    var mapPanel = new MapPanel(mapx,mapy,mapw,maph,'',true); // true = invisible
     fort.addPanel('map',mapPanel);
 
-    fort.addPanel('buildings',new BuildingsPanel(buildx,buildy,buildw,buildh,'Buildings'));
+    var buildings = new BuildingsPanel(buildx,buildy,buildw,buildh,'Buildings');
+    fort.addPanel('buildings',buildings);
     var resources = new InventoryPanel(resx,resy,resw,resh,'Resources');
     resources.setInventory(new Inventory(8),8,true);
     fort.addPanel('resources',resources);
@@ -567,6 +568,9 @@ Engine.makeFortMenu = function(){
 
     fort.onUpdateShop = function(){
         resources.updateInventory();
+    };
+    fort.onUpdateBuildings = function(){
+        buildings.updateListing();
     };
 
     /*var buildings = new InventoryPanel(100,100,180,200,'Buildings');
@@ -1136,6 +1140,10 @@ Engine.updateBuilding = function(building,data){ // data contains the updated da
         building.prices= data.prices;
         Engine.checkForShopUpdate(building.id);
     }
+    if(data.buildings){
+        building.buildings = data.buildings;
+        if(Engine.currentBuiling && Engine.currentBuiling.id == id) Engine.currentMenu.onUpdateBuildings();
+    }
 };
 
 Engine.checkForShopUpdate= function(id){
@@ -1226,7 +1234,8 @@ Engine.enterBuilding = function(id){
     var buildingData = Engine.buildingsData[building.buildingType];
     var settlementData = Engine.settlementsData[building.settlement];
     var menu = (building.built ? Engine.menus[buildingData.mainMenu] : Engine.menus['construction']);
-
+    menu.displayIcon();
+    menu.display();
 
     if(menu.panels['shop']) {
         menu.panels['shop'].updateCapsule('gold', building.gold);
@@ -1243,12 +1252,9 @@ Engine.enterBuilding = function(id){
         });
     }
 
-    if(menu.panels['resources']){
-        menu.panels['resources'].modifyInventory(building.inventory.items);
-    }
+    if(menu.panels['resources']) menu.panels['resources'].modifyInventory(building.inventory.items);
+    if(menu.panels['buildings']) menu.panels['buildings'].updateListing();
 
-    menu.displayIcon();
-    menu.display();
     Engine.buildingTitle.setText(buildingData.name);
     Engine.settlementTitle.setText(settlementData.name);
     if(Engine.buildingTitle.width < Engine.settlementTitle.width) Engine.buildingTitle.resize(Engine.settlementTitle.width);

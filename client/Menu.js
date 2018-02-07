@@ -39,13 +39,13 @@ Menu.prototype.display = function(){
 
     if(!Engine.inBuilding && this.title) this.title.display();
 
+    Engine.currentMenu = this;
     for(var p in this.panels){
         if(!this.panels.hasOwnProperty(p)) continue;
         if(!this.hideOnOpen[p]) this.panels[p].display();
     }
 
     Engine.inMenu = true;
-    Engine.currentMenu = this;
     Engine.hideMarker();
     this.displayed = true;
 };

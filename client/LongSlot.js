@@ -9,6 +9,7 @@ function LongSlot(){
     var y = 0;
     this.slices = [];
     this.texts = [];
+    this.textCounter = 0;
     var sw = 8;
     var bw = 100;
     this.slices.push(Engine.scene.add.sprite(x, y, 'UI', 'longslot_1'));
@@ -29,16 +30,27 @@ function LongSlot(){
         s.setDepth(Engine.UIDepth+1);
         s.setVisible(false);
     });
+}
 
-    for(var i = 0; i < 2; i++){
-        var t = Engine.scene.add.text(40,(i*15), 'Test', { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+LongSlot.prototype.getNextText = function(){
+    if(this.textCounter >= this.texts.length){
+        var t = Engine.scene.add.text(0,0, '', { font: '14px arial', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
         t.setDisplayOrigin(0,0);
         t.setScrollFactor(0);
-        t.setDepth(Engine.UIDepth+2);
-        t.setVisible(false);
+        t.setDepth(Engine.UIDepth+1);
         this.texts.push(t);
     }
-}
+    return this.texts[this.textCounter++];
+};
+
+LongSlot.prototype.addText = function(x,y,text,color,size){
+    var t = this.getNextText();
+    if(color) t.setFill(color);
+    if(size) t.setFont(size+'px arial');
+    t.setText(text);
+    t.setPosition(this.x+x,this.y+y);
+    return t;
+};
 
 LongSlot.prototype.setUp = function(x,y){
     var dx = this.x - x;
@@ -59,9 +71,9 @@ LongSlot.prototype.display = function(){
     this.slices.forEach(function(s){
         s.setVisible(true);
     });
-    this.texts.forEach(function(s){
+    /*this.texts.forEach(function(s){
         s.setVisible(true);
-    });
+    });*/
 };
 
 LongSlot.prototype.hide = function(){
@@ -71,4 +83,5 @@ LongSlot.prototype.hide = function(){
     this.texts.forEach(function(s){
         s.setVisible(false);
     });
+    this.textCounter = 0;
 };

@@ -19,13 +19,16 @@ BuildingsPanel.prototype.getNextSlot = function(){
     return this.slots[this.slotCounter++];
 };
 
-
-BuildingsPanel.prototype.displayInterface = function(){
-    var nb = 3;
-    for(var i = 0; i < nb; i++){
+BuildingsPanel.prototype.updateListing = function(){
+    var listing = Engine.currentBuiling.buildings;
+    for(var i = 0; i < listing.length; i++){
+        var data = listing[i];
         var slot = this.getNextSlot();
         slot.setUp(this.x+15,this.y + 30 + i*50);
+        slot.addText(40,0,Engine.buildingsData[data.type].name);
+        slot.addText(40,15,(data.built ? 'Completed' : 'Under construction'),(data.built ? '#11ee11' : '#ee1111'),12);
         slot.display();
+        if(Engine.currentMenu.panels['map']) slot.pin = Engine.currentMenu.panels['map'].map.addPin(listing[i]);
     }
 };
 
@@ -37,7 +40,7 @@ BuildingsPanel.prototype.hideInterface = function(){
 
 BuildingsPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
-    this.displayInterface();
+    //this.displayInterface();
 };
 
 BuildingsPanel.prototype.hide = function(){

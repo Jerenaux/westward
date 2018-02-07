@@ -62,27 +62,44 @@ var Map = new Phaser.Class({
         this.addRedPin(pointer.x,pointer.y);*/
     },
 
-    addRedPin: function(x,y){
+    getNextPin: function(){
+        if(this.pinsCounter >= this.pins.length){
+            this.pins.push(new Pin(this.maskPicture));
+        }
+        return this.pins[this.pinsCounter++];
+    },
+
+    addPin: function(data){
+        var pct = Utils.tileToPct(data.x,data.y);
+        var dx = (pct.x - this.originX)*this.width;
+        var dy = (pct.y - this.originY)*this.height;
+        var pin = this.getNextPin();
+        pin.setUp(this.x+dx,this.y+dy,Engine.buildingsData[data.type].name);
+        return pin;
+    },
+
+    /*addRedPin: function(x,y){
         this.pins[0].setUp(x,y,'New building?','redpin');
         Engine.currentMenu.panels['buildings'].display();
         this.clickedTile = Utils.screenToMap(x,y,this);
-    },
+    },*/
 
-    addPins: function(nb){
+    /*addPins: function(nb){
         for(var i = 0; i < nb; i++){
             this.pins.push(new Pin(this.maskPicture));
         }
-    },
+    },*/
 
-    updatePins: function(){
+    /*updatePins: function(){
         var diff = Object.keys(Engine.buildingsList).length - (this.pins.length-1);
         if(diff > 0) this.addPins(diff);
         this.hidePins();
         this.displayPins();
-    },
+    },*/
 
     resetCounter: function(){
-        this.nextPin = 1;  // the 0th pin is used for clicks
+        //this.nextPin = 1;  // the 0th pin is used for clicks
+        this.pinsCounter = 0;
     },
 
     display: function(x,y){
@@ -102,10 +119,10 @@ var Map = new Phaser.Class({
         this.input.hitArea = new Phaser.Geom.Rectangle(rectx,recty,dragw,dragh);
 
         this.setVisible(true);
-        this.displayPins();
+        //this.displayPins();
     },
 
-    displayPins: function() {
+    /*displayPins: function() {
         for(var b in Engine.buildingsList) {
             if(!Engine.buildingsList.hasOwnProperty(b)) continue;
             var data = Engine.buildingsList[b];
@@ -115,7 +132,7 @@ var Map = new Phaser.Class({
             var pin = this.pins[this.nextPin++];
             pin.setUp(this.x+dx,this.y+dy,Engine.buildingsData[data.type].name);
         }
-    },
+    },*/
 
     hide: function(){
         this.hidePins();

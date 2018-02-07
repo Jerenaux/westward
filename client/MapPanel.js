@@ -2,17 +2,15 @@
  * Created by jeren on 10-01-18.
  */
 
-function FortPanel(x,y,width,height,title,invisible){
+function MapPanel(x,y,width,height,title,invisible){
     Panel.call(this,x,y,width,height,title,invisible);
     this.addInterface();
 }
 
-FortPanel.prototype = Object.create(Panel.prototype);
-FortPanel.prototype.constructor = FortPanel;
+MapPanel.prototype = Object.create(Panel.prototype);
+MapPanel.prototype.constructor = MapPanel;
 
-FortPanel.prototype.addInterface = function(){
-    //var scrollx = Engine.getGameConfig().width/2;
-    //var scrolly = Engine.getGameConfig().height/2;
+MapPanel.prototype.addInterface = function(){
     var mapx = this.x + this.width/2;
     var mapy = this.y + this.height/2;
     this.bg = Engine.scene.add.sprite(mapx,mapy,'scrollbgh');
@@ -22,24 +20,23 @@ FortPanel.prototype.addInterface = function(){
 
     this.map = new Map(mapx,mapy);
     //this.map.addPins(Object.keys(Engine.buildingsList).length+1); // +1 for new building pin
-    this.map.addPins(0);
+    //this.map.addPins(0);
 
     this.content.push(this.bg);
     this.content.push(this.map);
 };
 
-
-FortPanel.prototype.displayInterface = function(){
+MapPanel.prototype.displayInterface = function(){
     this.bg.setVisible(true);
     this.map.display(this.bg.x,this.bg.y);
 };
 
-FortPanel.prototype.display = function(){
+MapPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
     this.displayInterface();
 };
 
-FortPanel.prototype.hide = function(){
+MapPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
     this.map.hide();
 };
