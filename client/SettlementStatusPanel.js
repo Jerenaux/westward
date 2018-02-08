@@ -24,18 +24,6 @@ SettlementStatusPanel.prototype.addInterface = function(){
     this.addText(x,y,"-20%",'#ee1111');
 };
 
-/*SettlementStatusPanel.prototype.addText = function(x,y,text,color){
-    var color = color || '#ffffff';
-    var t = Engine.scene.add.text(this.x+x, this.y+y, text, { font: '14px belwe', fill: color, stroke: '#000000', strokeThickness: 3 });
-    t.setDisplayOrigin(0,0);
-    t.setScrollFactor(0);
-    t.setDepth(Engine.UIDepth+1);
-    t.setVisible(false);
-    this.texts.push(t);
-    this.content.push(t);
-    return t;
-};*/
-
 SettlementStatusPanel.prototype.displayInterface = function(){
     this.texts.forEach(function(t){
         t.setVisible(true);

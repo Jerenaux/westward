@@ -2,14 +2,13 @@
  * Created by jeren on 25-01-18.
  */
 
-function LiquidBar(x,y,w){
+function LiquidBar(x,y,w,color){
     this.displayed = false;
     this.max = 100;
     this.level = 100;
 
     w -= 32;
     this.maxLength = w+9;
-    //this.currentLength = this.maxLength;
 
     this.body = [];
     this.body.push(Engine.scene.add.sprite(x,y,'UI','healthbar_left'));
@@ -18,13 +17,14 @@ function LiquidBar(x,y,w){
     x += w;
     this.body.push(Engine.scene.add.sprite(x,y,'UI','healthbar_right'));
 
+    color = color || 'red';
     x -= w;
     x -= 15;
     y += 3;
-    this.liquidBody = Engine.scene.add.tileSprite(x,y,50,14,'UI','health_middle');
+    this.liquidBody = Engine.scene.add.tileSprite(x,y,50,14,'UI','progress_'+color+'_middle');
     this.body.push(this.liquidBody);
     x += 50;
-    this.liquidHead = Engine.scene.add.sprite(x,y,'UI','health_top');
+    this.liquidHead = Engine.scene.add.sprite(x,y,'UI','progress_'+color+'_top');
     this.body.push(this.liquidHead);
 
     this.body.forEach(function(e){
@@ -72,6 +72,10 @@ LiquidBar.prototype.setLevel = function(level,max){
         this.liquidBody.width = newLength;
         this.liquidHead.x -= dw;
     }
+};
+
+LiquidBar.prototype.getPct = function(){
+    return Math.floor((this.level/this.max)*100);
 };
 
 LiquidBar.prototype.display = function(){

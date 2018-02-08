@@ -8,7 +8,17 @@ if(onServer){
     World = require('./World.js').World;
 }
 
-var Utils = {};
+var Utils = {
+    colors: {},
+    fonts: {}
+};
+
+Utils.colors.gold = '#ffd700';
+Utils.colors.red = '#ee1111';
+Utils.colors.green = '#11ee11';
+
+Utils.fonts.normal = 'arial';
+Utils.fonts.fancy = 'belwe';
 
 // ### Coordinates methodes ###
 

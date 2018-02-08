@@ -54,10 +54,11 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback){
     };
 };
 
-Panel.prototype.addText = function(x,y,text,color,size){
+Panel.prototype.addText = function(x,y,text,color,size,font){
     var color = color || '#ffffff';
     var size = size || 14;
-    var t = Engine.scene.add.text(this.x+x, this.y+y, text, { font: size+'px belwe', fill: color, stroke: '#000000', strokeThickness: 3 });
+    var font = font || Utils.fonts.fancy;
+    var t = Engine.scene.add.text(this.x+x, this.y+y, text, { font: size+'px '+font, fill: color, stroke: '#000000', strokeThickness: 3 });
     t.setDisplayOrigin(0,0);
     t.setScrollFactor(0);
     t.setDepth(Engine.UIDepth+1);

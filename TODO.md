@@ -51,10 +51,10 @@ Fort UI
 Monster drops loot
 Monster xp
 Display stat effects in character panel + xp bars
-Being-built panel
+Being-built panel (progress bar, material, productivity (commitment and dev level modifiers))
 Resource building panel
-Commitment, then functional commitment slots in char panel
-Civic xp
+Commitment, then functional commitment slots in char panel, + civic xp
+Multiplayer fights
 Help buttons
 Item descriptions
 

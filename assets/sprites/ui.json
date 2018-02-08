@@ -293,12 +293,20 @@
       "frame": {"x":324,"y":40,"w":9,"h":20}
     },
     {
-      "filename": "health_middle",
+      "filename": "progress_red_middle",
       "frame": {"x":409,"y":40,"w":5,"h":14}
     },
     {
-      "filename": "health_top",
+      "filename": "progress_red_top",
       "frame": {"x":416,"y":40,"w":8,"h":14}
+    },
+    {
+      "filename": "progress_gold_middle",
+      "frame": {"x":438,"y":40,"w":5,"h":14}
+    },
+    {
+      "filename": "progress_gold_top",
+      "frame": {"x":445,"y":40,"w":8,"h":14}
     },
     {
       "filename": "longslot_tl",

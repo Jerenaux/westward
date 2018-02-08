@@ -40,6 +40,7 @@ Engine.preload = function() {
     this.load.image('backpack', 'assets/sprites/backpack.png');
     this.load.image('coin', 'assets/sprites/coin.png');
     this.load.image('map', 'assets/sprites/map.png');
+    this.load.image('hammer', 'assets/sprites/hammer.png');
     this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
 
     this.load.image('fort', 'assets/sprites/buildings/fort.png');
@@ -97,7 +98,7 @@ Engine.preload = function() {
         }));
         firstgid += tilecount;
     }
-    console.log('Loading '+i+' tileset'+(i > 1 ? 's' : ''));
+    //console.log('Loading '+i+' tileset'+(i > 1 ? 's' : ''));
 };
 
 Engine.create = function(){
@@ -343,14 +344,18 @@ Engine.makeUI = function(){
     x -= gap;
     var coin = new UIElement(x,y,'coin',null,Engine.menus.trade);
     var map = new UIElement(x,y,'map',null,Engine.menus.fort);
+    var hammer = new UIElement(x,y,'hammer',null,Engine.menus.construction);
     coin.setVisible(false);
     map.setVisible(false);
+    hammer.setVisible(false);
     UIelements.push(coin);
     UIelements.push(map);
+    UIelements.push(hammer);
     Engine.UIelements = UIelements;
 
     Engine.menus['trade'].setIcon(coin);
     Engine.menus['fort'].setIcon(map);
+    Engine.menus['construction'].setIcon(hammer);
 
     var tooltip = Engine.scene.textures.addSpriteSheetFromAtlas(
         'tooltip',
@@ -519,7 +524,7 @@ Engine.makeConstructionMenu = function(){
     var w = 400;
     var x = (Engine.getGameConfig().width-w)/2;
     var padding = 10;
-    var progressh = 200;
+    var progressh = 230;
     var progressy = 100;
     var invy = progressy+progressh+padding;
     var constr = new Menu('Construction');
@@ -1228,6 +1233,7 @@ Engine.getTilesetFromTile = function(tile){
 };
 
 Engine.enterBuilding = function(id){
+    console.log('Entering '+id);
     var building = Engine.buildings[id];
     Engine.inBuilding = true;
     Engine.currentBuiling = building; // used to keep track of which building is displayed in menus
