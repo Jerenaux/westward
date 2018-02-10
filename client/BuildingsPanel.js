@@ -19,7 +19,7 @@ BuildingsPanel.prototype.getNextSlot = function(){
     return this.slots[this.slotCounter++];
 };
 
-BuildingsPanel.prototype.updateListing = function(){
+BuildingsPanel.prototype.displayListing = function(){
     var listing = Engine.currentBuiling.buildings;
     for(var i = 0; i < listing.length; i++){
         var data = listing[i];
@@ -52,7 +52,7 @@ BuildingsPanel.prototype.hideInterface = function(){
 
 BuildingsPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
-    //this.displayInterface();
+    this.displayListing();
 };
 
 BuildingsPanel.prototype.hide = function(){

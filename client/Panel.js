@@ -54,6 +54,13 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback){
     };
 };
 
+Panel.prototype.addPolyText = function(x,y,texts,colors){
+    if(texts.length != colors.length) return;
+    for(var i = 0; i < texts.length; i++){
+        x += this.addText(x,y,texts[i],colors[i]).width;
+    }
+};
+
 Panel.prototype.addText = function(x,y,text,color,size,font){
     var color = color || '#ffffff';
     var size = size || 14;

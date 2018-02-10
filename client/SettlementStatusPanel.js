@@ -12,16 +12,9 @@ SettlementStatusPanel.prototype.addInterface = function(){
     var startx = 15;
     var x = startx;
     var y = 20;
-    // ffd700
-    //this.addText(x,y,'Population: 12     |     Level: 1');
-    x += this.addText(x,y,"Population: ").width;
-    x += this.addText(x,y,"12",'#ffd700').width;
-    x += this.addText(x,y,"    |    Level: ").width;
-    this.addText(x,y,"1",'#ffd700');
-    x = startx;
+    this.addPolyText(x,y,["Population: ","12","    |    Dev. Level: ","1"],[null,Utils.colors.gold,null,Utils.colors.gold]);
     y += 20;
-    x += this.addText(x,y,"Food surplus:").width;
-    this.addText(x,y,"-20%",'#ff0000');
+    this.addPolyText(x,y,["Food surplus: ","-20%"],[null,Utils.colors.red]);
 };
 
 SettlementStatusPanel.prototype.displayInterface = function(){

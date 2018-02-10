@@ -15,7 +15,7 @@ CommitmentPanel.prototype.constructor = CommitmentPanel;
 
 CommitmentPanel.prototype.getNextSlot = function(){
     if(this.slotCounter >= this.slots.length){
-        this.slots.push(new LongSlot());
+        this.slots.push(new LongSlot(100));
     }
     return this.slots[this.slotCounter++];
 };

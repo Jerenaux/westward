@@ -12,33 +12,54 @@ CharacterPanel.prototype.constructor = CharacterPanel;
 
 CharacterPanel.prototype.addInterface = function(){
     this.texts = [];
-    var x = 15;
+    this.bars = [];
+    var alignx = 15;
+    var x = alignx;
     var y = 20;
-    this.addText(x,y,'Citizen of '+Engine.settlementsData[Engine.player.settlement].name);
+    this.addText(x,y,'Citizen of '+Engine.settlementsData[Engine.player.settlement].name,null,null,Utils.fonts.fancy);
     y += 20;
-    this.addText(x,y,"Level 1 Merchant -   0/100 Class XP");
-    y += 20;
-    this.addText(x,y,'Level 1 citizen   -   0/100 Civic XP');
-    y += 20;
-};
 
-/*CharacterPanel.prototype.addText = function(x,y,text){
-    var t = Engine.scene.add.text(this.x+x, this.y+y, text, { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    t.setDisplayOrigin(0,0);
-    t.setScrollFactor(0);
-    t.setDepth(Engine.UIDepth+1);
-    t.setVisible(false);
-    this.texts.push(t);
-    this.content.push(t);
-};*/
+    var classxp = Utils.randomInt(0,101);
+    this.addPolyText(x,y,["Level ","1"," Merchant   -   ",classxp+"/100"," Class XP"],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
+    y += 30;
+    var classbar = new MiniProgressBar(this.x+x,this.y+y,245);
+    classbar.setLevel(classxp,100);
+    this.bars.push(classbar);
+    y += 15;
+
+    var civicxp = Utils.randomInt(0,101);
+    this.addPolyText(x,y,["Level ","1"," citizen   -   ",civicxp+"/100"," Civic XP"],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
+    y += 30;
+    var civicbar = new MiniProgressBar(this.x+x,this.y+y,245);
+    civicbar.setLevel(civicxp,100);
+    this.bars.push(civicbar);
+};
 
 CharacterPanel.prototype.displayInterface = function(){
     this.texts.forEach(function(t){
         t.setVisible(true);
     });
+    this.bars.forEach(function(b){
+        b.display();
+    });
 };
+
+CharacterPanel.prototype.hideInterface = function(){
+    this.texts.forEach(function(t){
+        t.setVisible(false);
+    });
+    this.bars.forEach(function(b){
+        b.hide();
+    });
+};
+
 
 CharacterPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
     this.displayInterface();
+};
+
+CharacterPanel.prototype.hide = function(){
+    Panel.prototype.hide.call(this);
+    this.hideInterface();
 };

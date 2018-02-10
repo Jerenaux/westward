@@ -1260,7 +1260,6 @@ Engine.enterBuilding = function(id){
     }
 
     if(menu.panels['resources']) menu.panels['resources'].modifyInventory(building.inventory.items);
-    if(menu.panels['buildings']) menu.panels['buildings'].updateListing();
 
     Engine.buildingTitle.setText(buildingData.name);
     Engine.settlementTitle.setText(settlementData.name);

@@ -24,16 +24,12 @@ ConstructionPanel.prototype.addInterface = function(){
     var alignx = 10;
     var y = 130;
     var x = alignx;
-    y += this.addText(x,y,'Productivity modifiers:',null,14,Utils.fonts.normal).height;
-    x += this.addText(x,y,'+0%',null,14,Utils.fonts.normal).width;
-    y += this.addText(x,y,'development level',null,14,Utils.fonts.normal).height;
-    x = alignx;
-    x += this.addText(x,y,'-10%',Utils.colors.red,14,Utils.fonts.normal).width;
-    y += this.addText(x,y,'food deficit',null,14,Utils.fonts.normal).height;
-    x = alignx;
-    x += this.addText(x,y,'+7%',Utils.colors.green,14,Utils.fonts.normal).width;
-    y += this.addText(x,y,'citizen commitment (2)',null,14,Utils.fonts.normal).height;
-    x = alignx;
+    y += this.addText(x,y,'Productivity modifiers:',null,14,Utils.fonts.fancy).height;
+    this.addPolyText(x,y,['+0%',' development level'],[null,null]);
+    y += 15;
+    this.addPolyText(x,y,['-10%',' food deficit'],[Utils.colors.red,null]);
+    y += 15;
+    this.addPolyText(x,y,['+7%',' citizen commitment ','(2)'],[Utils.colors.green,null,Utils.colors.gold]);
 };
 
 ConstructionPanel.prototype.displayInterface = function(){

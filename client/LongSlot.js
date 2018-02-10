@@ -58,7 +58,7 @@ LongSlot.prototype.addIcon = function(atlas,frame){
 
 LongSlot.prototype.getNextText = function(){
     if(this.textCounter >= this.texts.length){
-        var t = Engine.scene.add.text(0,0, '', { font: '14px arial', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+        var t = Engine.scene.add.text(0,0, '', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
         t.setDisplayOrigin(0,0);
         t.setScrollFactor(0);
         t.setDepth(Engine.UIDepth+1);
@@ -73,7 +73,7 @@ LongSlot.prototype.addText = function(x,y,text,color,size){
         t.setFill(color);
         if(color == Utils.colors.red) t.setStroke(Utils.strokes.red);
     }
-    if(size) t.setFont(size+'px arial');
+    if(size) t.setFont(size+'px '+Utils.fonts.fancy);
     t.setText(text);
     t.setPosition(this.x+x,this.y+y);
     return t;
