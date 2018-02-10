@@ -21,7 +21,7 @@ SettlementStatusPanel.prototype.addInterface = function(){
     x = startx;
     y += 20;
     x += this.addText(x,y,"Food surplus:").width;
-    this.addText(x,y,"-20%",'#ee1111');
+    this.addText(x,y,"-20%",'#ff0000');
 };
 
 SettlementStatusPanel.prototype.displayInterface = function(){

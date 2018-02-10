@@ -1,0 +1,20 @@
+{
+  "frames":[
+    {
+      "filename": "fort",
+      "frame": {"x":217,"y":972,"w":34,"h":32}
+    },
+    {
+      "filename": "tradepost",
+      "frame": {"x":94,"y":202,"w":34,"h":32}
+    },
+    {
+      "filename": "inn",
+      "frame": {"x":75,"y":1112,"w":34,"h":32}
+    },
+    {
+      "filename": "tower",
+      "frame": {"x":73,"y":1182,"w":34,"h":32}
+    }
+  ]
+}

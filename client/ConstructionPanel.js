@@ -17,7 +17,7 @@ ConstructionPanel.prototype.addInterface = function(){
     this.addText(this.width/2,75,'(+10%/day)',Utils.colors.gold,16).setOrigin(0.5);
     var barw = this.width-100;
     var barx = (this.width-barw)/2;
-    this.bar = new LiquidBar(this.x+barx,this.y+100,barw,'gold');
+    this.bar = new BigProgressBar(this.x+barx,this.y+100,barw,'gold');
     this.bar.setLevel(50,100);
     pctText.setText(this.bar.getPct()+'%');
 

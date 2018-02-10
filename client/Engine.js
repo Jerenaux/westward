@@ -50,6 +50,7 @@ Engine.preload = function() {
     this.load.image('foundations', 'assets/sprites/buildings/foundations.png');
 
     this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
+    this.load.atlas('aok', 'assets/sprites/aok.png', 'assets/sprites/aok.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
     this.load.atlas('buildings', 'assets/sprites/buildings.png', 'assets/sprites/buildings.json');
@@ -509,7 +510,7 @@ Engine.makeBattleMenu = function(){
         property: 'useInBattle'
     });
     battle.addPanel('items',items);
-    var bar = new LiquidBar(835,445,170);
+    var bar = new BigProgressBar(835,445,170);
     bar.setLevel(Engine.player.stats['hp'],Stats.dict['hp'].max);
     battle.addPanel('bar',bar);
     battle.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
@@ -547,7 +548,7 @@ Engine.makeFortMenu = function(){
 
     var buildx = mapx+mapw+padding;
     var buildy = 100;
-    var buildw = 200;
+    var buildw = 250;
     var buildh = 390;
 
     var resx = mapx+mapw+buildw+(padding*2);
@@ -567,7 +568,7 @@ Engine.makeFortMenu = function(){
     var buildings = new BuildingsPanel(buildx,buildy,buildw,buildh,'Buildings');
     fort.addPanel('buildings',buildings);
     var resources = new InventoryPanel(resx,resy,resw,resh,'Resources');
-    resources.setInventory(new Inventory(8),8,true);
+    resources.setInventory(new Inventory(7),7,true);
     fort.addPanel('resources',resources);
     fort.addPanel('status',new SettlementStatusPanel(statx,staty,statw,stath,'Status'));
 

@@ -78,27 +78,7 @@ var Map = new Phaser.Class({
         return pin;
     },
 
-    /*addRedPin: function(x,y){
-        this.pins[0].setUp(x,y,'New building?','redpin');
-        Engine.currentMenu.panels['buildings'].display();
-        this.clickedTile = Utils.screenToMap(x,y,this);
-    },*/
-
-    /*addPins: function(nb){
-        for(var i = 0; i < nb; i++){
-            this.pins.push(new Pin(this.maskPicture));
-        }
-    },*/
-
-    /*updatePins: function(){
-        var diff = Object.keys(Engine.buildingsList).length - (this.pins.length-1);
-        if(diff > 0) this.addPins(diff);
-        this.hidePins();
-        this.displayPins();
-    },*/
-
     resetCounter: function(){
-        //this.nextPin = 1;  // the 0th pin is used for clicks
         this.pinsCounter = 0;
     },
 
@@ -119,20 +99,7 @@ var Map = new Phaser.Class({
         this.input.hitArea = new Phaser.Geom.Rectangle(rectx,recty,dragw,dragh);
 
         this.setVisible(true);
-        //this.displayPins();
     },
-
-    /*displayPins: function() {
-        for(var b in Engine.buildingsList) {
-            if(!Engine.buildingsList.hasOwnProperty(b)) continue;
-            var data = Engine.buildingsList[b];
-            var pct = Utils.tileToPct(data.x,data.y);
-            var dx = (pct.x - this.originX)*this.width;
-            var dy = (pct.y - this.originY)*this.height;
-            var pin = this.pins[this.nextPin++];
-            pin.setUp(this.x+dx,this.y+dy,Engine.buildingsData[data.type].name);
-        }
-    },*/
 
     hide: function(){
         this.hidePins();
@@ -170,6 +137,14 @@ var Pin = new Phaser.Class({
         this.setPosition(x,y);
         this.name = name;
         this.setVisible(true);
+    },
+
+    highlight: function(){
+        this.setTexture('redpin');
+    },
+
+    unhighlight: function(){
+        this.setTexture('pin');
     },
 
     handleOver: function(){

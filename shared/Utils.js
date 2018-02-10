@@ -10,11 +10,14 @@ if(onServer){
 
 var Utils = {
     colors: {},
+    strokes: {},
     fonts: {}
 };
 
 Utils.colors.gold = '#ffd700';
-Utils.colors.red = '#ee1111';
+Utils.colors.red = '#ff0000';
+Utils.colors.blue = '#558fff';
+Utils.strokes.red = '#331111';
 Utils.colors.green = '#11ee11';
 
 Utils.fonts.normal = 'arial';

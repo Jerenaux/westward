@@ -293,6 +293,42 @@
       "frame": {"x":324,"y":40,"w":9,"h":20}
     },
     {
+      "filename": "minibar_left",
+      "frame": {"x":282,"y":514,"w":6,"h":12}
+    },
+    {
+      "filename": "minibar_middle",
+      "frame": {"x":291,"y":514,"w":4,"h":12}
+    },
+    {
+      "filename": "minibar_right",
+      "frame": {"x":314,"y":514,"w":6,"h":12}
+    },
+    {
+      "filename": "miniprogress_gold_left",
+      "frame": {"x":284,"y":532,"w":4,"h":8}
+    },
+    {
+      "filename": "miniprogress_gold_right",
+      "frame": {"x":313,"y":532,"w":5,"h":8}
+    },
+    {
+      "filename": "miniprogress_gold_middle",
+      "frame": {"x":327,"y":516,"w":2,"h":8}
+    },
+    {
+      "filename": "miniprogress_green_left",
+      "frame": {"x":284,"y":543,"w":4,"h":8}
+    },
+    {
+      "filename": "miniprogress_green_right",
+      "frame": {"x":313,"y":543,"w":5,"h":8}
+    },
+    {
+      "filename": "miniprogress_green_middle",
+      "frame": {"x":327,"y":530,"w":2,"h":8}
+    },
+    {
       "filename": "progress_red_middle",
       "frame": {"x":409,"y":40,"w":5,"h":14}
     },
