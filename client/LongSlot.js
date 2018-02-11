@@ -49,8 +49,9 @@ LongSlot.prototype.createZone = function(){
 };
 
 LongSlot.prototype.addIcon = function(atlas,frame){
-    this.icon = Engine.scene.add.sprite(this.x+4, this.y+4, atlas, frame);
-    this.icon.setDisplayOrigin(0,0);
+    this.icon = Engine.scene.add.sprite(this.x+21, this.y+20, atlas, frame); // 4 + 18, 4 + 20
+    this.icon.setDisplayOrigin(Math.floor(this.icon.frame.width/2),Math.floor(this.icon.frame.height/2));
+    //this.icon.setDisplayOrigin(0,0);
     this.icon.setScrollFactor(0);
     this.icon.setDepth(Engine.UIDepth+1);
     this.icon.setVisible(false);

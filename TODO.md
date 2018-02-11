@@ -62,10 +62,9 @@ Week:
 Fort: next level requirements (+ add trade tax)
 Fort: unlockables of next level
 Fort: focus building pin on slot click (w/ tween)
-Construction: display material slots
 Construction: add commitment button
 Construction: earn civic xp on commit (and use real numbers in character)
-Economic loop: actual computation of productivity modifiers (real numbers)
+Economic loop: actual computation of productivity modifiers (real numbers) (check for materials)
 Economic loop: add a functional resource building (to commit to)
 Economic loop: productivity timer for construction
 Economic loop: apply effect of food deficit on players

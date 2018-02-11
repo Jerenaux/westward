@@ -61,5 +61,9 @@ var Building = new Phaser.Class({
     getPrice: function(id,action){
         var key = (action == 'sell' ? 0 : 1);
         return this.prices[id][key];
+    },
+
+    getItemNb: function(item){
+        return this.inventory.getNb(item);
     }
 });

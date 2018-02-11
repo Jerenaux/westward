@@ -531,11 +531,11 @@ Engine.makeConstructionMenu = function(){
     var invy = progressy+progressh+padding;
     var constr = new Menu('Construction');
     constr.addPanel('progress',new ConstructionPanel(x,progressy,w,progressh));
-    var inventory = new InventoryPanel(x,invy,w,150,'Inventory');
-    inventory.setInventory(new Inventory(16),8,true);
-    constr.addPanel('resources',inventory);
+    var materials = new MaterialsPanel(x,invy,w,150,'Materials');
+    //materials.setInventory(new Inventory(16),8,true);
+    constr.addPanel('materials',materials);
     constr.onUpdateShop = function(){
-        inventory.updateInventory();
+        materials.update();
     };
     return constr;
 };

@@ -117,8 +117,6 @@ InventoryPanel.prototype.displayInventory = function(){
         s.setVisible(true);
     });
 
-    var filter = this.config.filter;
-    var filterKey = this.config.filterKey;
     var nbDisplayed = 0;
     for(var item in this.inventory.items){
         if(!this.inventory.items.hasOwnProperty(item)) continue;
