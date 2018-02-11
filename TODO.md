@@ -58,6 +58,27 @@ Multiplayer fights
 Help buttons
 Item descriptions
 
+Week:
+Fort: next level requirements (+ add trade tax)
+Fort: unlockables of next level
+Fort: focus building pin on slot click (w/ tween)
+Map: skull icons
+Map: legend
+Construction: display material slots
+Construction: add commitment button
+Construction: earn civic xp on commit (and use real numbers in character)
+Economic loop: actual computation of productivity modifiers (real numbers)
+Economic loop: add a functional resource building (to commit to)
+Economic loop: productivity timer for construction
+Economic loop: apply effect of food deficit on players
+Economic loop: test all updates of all menus
+Character: display committed buildings
+Character: set class xp to 0, add respawn location message, add stats modifier message
+Battle: skin dead animals
+Battle: display event pop-ups after skinning
+Battle: multiplayer fights
+Finish: review base stats values
+
 
 Cleaning:
 --------

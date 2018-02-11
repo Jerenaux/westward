@@ -50,6 +50,7 @@ gs.server = server;
 server.clientUpdateRate = 1000/5; // Rate at which update packets are sent
 server.walkUpdateRate = 1000/20; // Rate at which positions are updated
 server.npcUpdateRate = 1000/5;
+server.settlementUpdateRate = 60*1000;
 
 server.resetStamp = 1516993794091; // ignore returning players with stamps older than this and treat them as new
 
@@ -142,6 +143,7 @@ server.setUpdateLoops = function(){
     setInterval(gs.updateNPC,server.npcUpdateRate);
     setInterval(gs.updateWalks,server.walkUpdateRate);
     setInterval(gs.updatePlayers,server.clientUpdateRate);
+    setInterval(gs.updateSettlements,server.settlementUpdateRate);
 };
 
 server.sendInitializationPacket = function(socket,packet){

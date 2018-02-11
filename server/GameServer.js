@@ -29,6 +29,7 @@ var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var ListMap = require('../shared/ListMap.js').ListMap;
 var AOI = require('./AOI.js').AOI;
 var Player = require('./Player.js').Player;
+var Settlement = require('./Settlement').Settlement;
 var Building = require('./Building.js').Building;
 var Animal = require('./Animal.js').Animal;
 var Battle = require('./Battle.js').Battle;
@@ -66,21 +67,23 @@ GameServer.readMap = function(mapsPath){
     GameServer.itemsData = JSON.parse(fs.readFileSync('./assets/data/items.json').toString());
     GameServer.animalsData = JSON.parse(fs.readFileSync('./assets/data/animals.json').toString());
 
+    // Settlements
+    GameServer.settlements = {};
+    GameServer.settlements[0] = new Settlement('New Beginning',12);
+
     // Read buildings
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
-    //GameServer.buildingsList = {}; // active list of the locations of all buildings
-    GameServer.forts = {}; // maps settlements to forts
-    GameServer.settlementBuildings = new ListMap(); // maps settlements to lists of buildings
+    //GameServer.forts = {}; // maps settlements to forts
+    //GameServer.settlementBuildings = new ListMap(); // maps settlements to lists of buildings
     GameServer.server.db.collection('buildings').find({}).toArray(function(err,buildings){
         if(err) throw err;
         for(var i = 0; i < buildings.length; i++){
             var data = buildings[i];
-            //var building = new Building(data.x,data.y,data.type,data.settlement,data.built,data.stock,data.gold,data.prices);
             var building = new Building(data);
             GameServer.buildings[building.id] = building;
-            //GameServer.buildingsList[building.id] = building.superTrim();
         }
         GameServer.updateStatus();
+        GameServer.updateSettlements();
     });
 
     // Spawn animals
@@ -315,18 +318,21 @@ GameServer.build = function(bid,tile,settlement){
     GameServer.server.sendAll('addBuildingPin',building.superTrim());
 };
 
-GameServer.registerBuilding = function(building,settlement){
-    GameServer.settlementBuildings.add(settlement,building);
-    var fort = GameServer.forts[settlement];
+GameServer.registerBuilding = function(building,sid){
+    var settlement = GameServer.settlements[sid];
+    settlement.addBuilding(building);
+    var fort = settlement.getFort();
     if(fort) fort.addBuilding(building);
 };
 
-GameServer.registerFort = function(fort,settlement){
-    GameServer.forts[settlement] = fort;
+GameServer.registerFort = function(fort,sid){
+    var settlement = GameServer.settlements[sid];
+    settlement.setFort(fort);
 };
 
-GameServer.getSettlementBuildings = function(settlement){
-    var list = GameServer.settlementBuildings.get(settlement);
+GameServer.getSettlementBuildings = function(sid){
+    var settlement = GameServer.settlements[sid];
+    var list = settlement.getBuildings();
     return list.map(function(b){
         return b.listingTrim();
     });
@@ -461,5 +467,11 @@ GameServer.updateNPC = function(){
     Object.keys(GameServer.animals).forEach(function(key) {
         var a = GameServer.animals[key];
         if(a.idle && !a.dead) a.updateIdle();
+    });
+};
+
+GameServer.updateSettlements = function(){
+    Object.keys(GameServer.settlements).forEach(function(key){
+        GameServer.settlements[key].update();
     });
 };

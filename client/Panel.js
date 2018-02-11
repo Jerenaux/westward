@@ -56,9 +56,13 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback){
 
 Panel.prototype.addPolyText = function(x,y,texts,colors){
     if(texts.length != colors.length) return;
+    var txts = [];
     for(var i = 0; i < texts.length; i++){
-        x += this.addText(x,y,texts[i],colors[i]).width;
+        var t = this.addText(x,y,texts[i],colors[i]);
+        x += t.width;
+        txts.push(t);
     }
+    return txts;
 };
 
 Panel.prototype.addText = function(x,y,text,color,size,font){

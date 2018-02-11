@@ -570,13 +570,17 @@ Engine.makeFortMenu = function(){
     var resources = new InventoryPanel(resx,resy,resw,resh,'Resources');
     resources.setInventory(new Inventory(7),7,true);
     fort.addPanel('resources',resources);
-    fort.addPanel('status',new SettlementStatusPanel(statx,staty,statw,stath,'Status'));
+    var status = new SettlementStatusPanel(statx,staty,statw,stath,'Status');
+    fort.addPanel('status',status);
 
     fort.onUpdateShop = function(){
         resources.updateInventory();
     };
     fort.onUpdateBuildings = function(){
         buildings.updateListing();
+    };
+    fort.onUpdateSettlementStatus = function(){
+        status.update();
     };
 
     /*var buildings = new InventoryPanel(100,100,180,200,'Buildings');
@@ -1132,28 +1136,45 @@ Engine.handleBattleUpdates = function(entity, data){
 Engine.updateBuilding = function(building,data){ // data contains the updated data from the server
     if(data.inventory){
         building.inventory.fromList(data.inventory);
-        Engine.checkForShopUpdate(building.id);
+        //Engine.checkForShopUpdate(building.id);
+        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShop');
     }
     if(data.gold) {
         building.gold = data.gold;
-        Engine.checkForShopUpdate(building.id);
+        //Engine.checkForShopUpdate(building.id);
+        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShopGold');
     }
     if(data.items){
         Engine.updateInventory(building.inventory,data.items);
-        Engine.checkForShopUpdate(building.id);
+        //Engine.checkForShopUpdate(building.id);
+        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShop');
     }
     if(data.prices){
         building.prices= data.prices;
-        Engine.checkForShopUpdate(building.id);
+        //Engine.checkForShopUpdate(building.id);
+        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShop');
     }
     if(data.buildings){
         building.buildings = data.buildings;
-        if(Engine.currentBuiling && Engine.currentBuiling.id == id) Engine.currentMenu.onUpdateBuildings();
+        //if(Engine.currentBuiling && Engine.currentBuiling.id == id) Engine.currentMenu.onUpdateBuildings();
+        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateBuildings');
+    }
+    if(data.population){
+        building.population = data.population;
+        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateSettlementStatus');
+    }
+    if(data.foodsurplus){
+        building.foodsurplus = data.foodsurplus;
+        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateSettlementStatus');
     }
 };
 
-Engine.checkForShopUpdate= function(id){
-    if(Engine.currentBuiling && Engine.currentBuiling.id == id) Engine.currentMenu.onUpdateShop();
+Engine.inThatBuilding = function(id){
+    return (Engine.currentBuiling && Engine.currentBuiling.id == id);
+};
+
+Engine.checkForBuildingMenuUpdate= function(id,callback){
+    if(Engine.inThatBuilding(id)) Engine.currentMenu[callback]();
 };
 
 Engine.addPlayer = function(id,x,y,settlement){

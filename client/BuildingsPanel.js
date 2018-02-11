@@ -44,10 +44,16 @@ BuildingsPanel.prototype.displayListing = function(){
     }
 };
 
+BuildingsPanel.prototype.updateListing = function(){
+    this.hideInterface();
+    this.displayListing();
+};
+
 BuildingsPanel.prototype.hideInterface = function(){
     this.slots.forEach(function(s){
         s.hide();
     });
+    this.slotCounter = 0;
 };
 
 BuildingsPanel.prototype.display = function(){
@@ -58,5 +64,4 @@ BuildingsPanel.prototype.display = function(){
 BuildingsPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
     this.hideInterface();
-    this.slotCounter = 0;
 };
