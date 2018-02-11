@@ -59,7 +59,7 @@ Help buttons
 Item descriptions
 
 Week:
-Fort: next level requirements (+ add trade tax)
+Fort: next level requirements
 Fort: unlockables of next level
 Fort: focus building pin on slot click (w/ tween)
 Construction: add commitment button
