@@ -123,5 +123,6 @@ LongSlot.prototype.hide = function(){
     this.textCounter = 0;
     if(this.bar) this.bar.hide();
     if(this.icon) this.icon.setVisible(false);
+    if(this.pin) this.pin.setVisible(false);
     this.zone.setVisible(false);
 };

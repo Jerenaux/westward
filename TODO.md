@@ -62,8 +62,6 @@ Week:
 Fort: next level requirements (+ add trade tax)
 Fort: unlockables of next level
 Fort: focus building pin on slot click (w/ tween)
-Map: skull icons
-Map: legend
 Construction: display material slots
 Construction: add commitment button
 Construction: earn civic xp on commit (and use real numbers in character)

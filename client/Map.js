@@ -58,8 +58,9 @@ var Map = new Phaser.Class({
     },
 
     handleClick: function(pointer){
-        /*if(pointer.downX != pointer.upX || pointer.downY != pointer.upY) return; // drag
-        this.addRedPin(pointer.x,pointer.y);*/
+        if(pointer.downX != pointer.upX || pointer.downY != pointer.upY) return; // drag
+        //this.addRedPin(pointer.x,pointer.y);
+        console.log(Utils.screenToMap(pointer.x,pointer.y,this));
     },
 
     getNextPin: function(){
@@ -69,12 +70,12 @@ var Map = new Phaser.Class({
         return this.pins[this.pinsCounter++];
     },
 
-    addPin: function(data){
-        var pct = Utils.tileToPct(data.x,data.y);
+    addPin: function(x,y,name,texture){
+        var pct = Utils.tileToPct(x,y);
         var dx = (pct.x - this.originX)*this.width;
         var dy = (pct.y - this.originY)*this.height;
         var pin = this.getNextPin();
-        pin.setUp(this.x+dx,this.y+dy,Engine.buildingsData[data.type].name);
+        pin.setUp(this.x+dx,this.y+dy,name,texture);
         return pin;
     },
 
@@ -111,10 +112,6 @@ var Map = new Phaser.Class({
         this.pins.forEach(function(p){
             p.setVisible(false);
         });
-    },
-
-    hideRedPin: function(){
-        this.pins[0].setVisible(false);
     }
 });
 
@@ -156,5 +153,9 @@ var Pin = new Phaser.Class({
 
     handleOut: function(){
         Engine.tooltip.hide();
+    },
+
+    hide: function(){
+        this.setVisible(false);
     }
 });

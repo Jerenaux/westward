@@ -37,7 +37,9 @@ BuildingsPanel.prototype.displayListing = function(){
         b.setOrigin(1,0);
         slot.display();
         if(Engine.currentMenu.panels['map']) {
-            var pin = Engine.currentMenu.panels['map'].map.addPin(listing[i]);
+            var data = listing[i];
+            var pin = Engine.currentMenu.panels['map'].map.addPin(data.x,data.y,Engine.buildingsData[data.type].name);
+            slot.pin = pin;
             slot.updateCallback('handleOver',pin.highlight.bind(pin));
             slot.updateCallback('handleOut',pin.unhighlight.bind(pin));
         }

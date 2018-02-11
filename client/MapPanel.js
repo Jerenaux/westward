@@ -19,8 +19,7 @@ MapPanel.prototype.addInterface = function(){
     this.bg.setVisible(false);
 
     this.map = new Map(mapx,mapy);
-    //this.map.addPins(Object.keys(Engine.buildingsList).length+1); // +1 for new building pin
-    //this.map.addPins(0);
+    this.pins = [];
 
     this.content.push(this.bg);
     this.content.push(this.map);
@@ -29,6 +28,26 @@ MapPanel.prototype.addInterface = function(){
 MapPanel.prototype.displayInterface = function(){
     this.bg.setVisible(true);
     this.map.display(this.bg.x,this.bg.y);
+    this.displayPins();
+};
+
+MapPanel.prototype.update = function(){
+    this.hidePins();
+    this.displayPins();
+};
+
+MapPanel.prototype.displayPins = function(){
+    var list = Engine.currentBuiling.danger;
+    for(var i = 0; i < list.length; i++){
+        this.pins.push(this.map.addPin(list[i][0],list[i][1],'Danger','skull'));
+    }
+};
+
+MapPanel.prototype.hidePins = function(){
+    this.pins.forEach(function(p){
+        p.hide();
+    });
+    this.pins = [];
 };
 
 MapPanel.prototype.display = function(){

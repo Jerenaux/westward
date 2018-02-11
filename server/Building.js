@@ -107,7 +107,7 @@ Building.prototype.takeGold = function(nb){
 // Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){
     var trimmed = {};
-    var broadcastProperties = ['id','type','settlement','gold','prices','built','buildings','population','foodsurplus']; // list of properties relevant for the client
+    var broadcastProperties = ['id','type','settlement','gold','prices','built','buildings','population','foodsurplus','danger']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

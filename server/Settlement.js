@@ -20,6 +20,11 @@ Settlement.prototype.getBuildings = function(){
 Settlement.prototype.setFort = function(fort){
     this.fort = fort;
     this.fort.setProperty('population',this.pop);
+    this.fort.setProperty('danger',[
+        [453,717],
+        [428,703],
+        [469,593]
+    ])
 };
 
 Settlement.prototype.getFort = function(){

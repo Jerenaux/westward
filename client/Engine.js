@@ -68,6 +68,7 @@ Engine.preload = function() {
     this.load.image('radial4', 'assets/sprites/radial4.png');
     this.load.image('fullmap', 'assets/sprites/fullmap_005_tr.png');
     // pin: https://www.iconfinder.com/icons/173052/map_marker_icon
+    this.load.image('skull', 'assets/sprites/skull.png');
     this.load.image('pin', 'assets/sprites/pin.png');
     this.load.image('redpin', 'assets/sprites/redpin.png');
     this.load.spritesheet('grid', 'assets/sprites/grid.png',{frameWidth:32,frameHeight:32});
@@ -581,6 +582,9 @@ Engine.makeFortMenu = function(){
     };
     fort.onUpdateSettlementStatus = function(){
         status.update();
+    };
+    fort.onUpdateMap = function(){
+        mapPanel.update();
     };
 
     /*var buildings = new InventoryPanel(100,100,180,200,'Buildings');
@@ -1166,6 +1170,10 @@ Engine.updateBuilding = function(building,data){ // data contains the updated da
     if(data.foodsurplus){
         building.foodsurplus = data.foodsurplus;
         Engine.checkForBuildingMenuUpdate(building.id,'onUpdateSettlementStatus');
+    }
+    if(data.danger){
+        building.danger = data.danger;
+        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateMap');
     }
 };
 
