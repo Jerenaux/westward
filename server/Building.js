@@ -8,7 +8,7 @@ var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
 var clone = require('clone');
 
-function Building(data){//x,y,type,settlement,built,stock,gold,prices){
+function Building(data){
     this.id = GameServer.lastBuildingID++;
     this.x = data.x;
     this.y = data.y;
@@ -19,6 +19,8 @@ function Building(data){//x,y,type,settlement,built,stock,gold,prices){
     this.prices = data.prices || {};
     this.gold = data.gold || 0;
     this.built = !!data.built;
+    this.progress = data.progress || 0;
+    this.prod = data.prod || 100;
     this.setOrUpdateAOI();
     this.addCollisions();
     this.registerBuilding();
@@ -33,6 +35,18 @@ Building.prototype.registerBuilding = function(){
         GameServer.registerFort(this,this.settlement);
         this.buildings = GameServer.getSettlementBuildings(this.settlement);
         this.updateBuildings();
+    }
+};
+
+Building.prototype.update = function(){
+    if(!this.built){
+        var rate = GameServer.buildingsData[this.type].buildRate;
+        if(!rate) return;
+        var increment = Math.round((this.prod/100)*rate);
+        console.log('increment of ',increment);
+        var newprogress = Utils.clamp(this.progress+increment,this.progress,100);
+        this.setProperty('progress',newprogress);
+        if(this.progress == 100) this.setProperty('built',true);
     }
 };
 
@@ -107,7 +121,9 @@ Building.prototype.takeGold = function(nb){
 // Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){
     var trimmed = {};
-    var broadcastProperties = ['id','type','settlement','gold','prices','built','buildings','population','foodsurplus','danger']; // list of properties relevant for the client
+    var broadcastProperties =
+        ['id','type','settlement','gold','prices','built','prod','progress',
+            'buildings','population','foodsurplus','danger']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -125,7 +141,7 @@ Building.prototype.dbTrim = function(){
 // Returns an object containing only the fields relevant to list buildings
 Building.prototype.listingTrim = function(){
     var trimmed = {};
-    var broadcastProperties = ['id','type','built'];
+    var broadcastProperties = ['id','type','built','progress','prod'];
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

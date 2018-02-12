@@ -530,12 +530,16 @@ Engine.makeConstructionMenu = function(){
     var progressy = 100;
     var invy = progressy+progressh+padding;
     var constr = new Menu('Construction');
-    constr.addPanel('progress',new ConstructionPanel(x,progressy,w,progressh));
+    var progress = new ConstructionPanel(x,progressy,w,progressh);
+    constr.addPanel('progress',progress);
     var materials = new MaterialsPanel(x,invy,w,150,'Materials');
     //materials.setInventory(new Inventory(16),8,true);
     constr.addPanel('materials',materials);
     constr.onUpdateShop = function(){
         materials.update();
+    };
+    constr.onUpdateConstruction = function(){
+        progress.update();
     };
     return constr;
 };
@@ -1174,6 +1178,14 @@ Engine.updateBuilding = function(building,data){ // data contains the updated da
     if(data.danger){
         building.danger = data.danger;
         Engine.checkForBuildingMenuUpdate(building.id,'onUpdateMap');
+    }
+    if(data.progress){
+        building.progress = data.progress;
+        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateConstruction');
+    }
+    if(data.prod){
+        building.prod = data.prod;
+        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateConstruction');
     }
 };
 

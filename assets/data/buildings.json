@@ -17,6 +17,7 @@
     "mainMenu": "fort",
     "icon": "fort",
     "recipe": {"3":50},
+    "displayProd": false,
     "entry": {
       "x": 6,
       "y": 5
@@ -41,6 +42,8 @@
       "x": 4,
       "y": 4
     },
+    "displayProd": false,
+    "buildRate":2,
     "mainMenu": "trade",
     "icon": "tradepost"
   },
@@ -59,7 +62,8 @@
     "sprite": "inn",
     "recipe": {"3":60},
     "name":"Inn",
-    "icon": "inn"
+    "icon": "inn",
+    "displayProd": false
   },
   "3":{
     "shape":[
@@ -75,7 +79,8 @@
     "sprite": "tower",
     "recipe": {"3":60},
     "name":"Tower",
-    "icon": "tower"
+    "icon": "tower",
+    "displayProd": false
   },
   "4":{
     "shape":[
@@ -88,6 +93,7 @@
     "height": 391,
     "sprite": "foundations",
     "name":"Foundations",
+    "displayProd": true,
     "entry": {
       "x": 16,
       "y": 8

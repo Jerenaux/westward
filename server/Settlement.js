@@ -33,12 +33,17 @@ Settlement.prototype.getFort = function(){
 
 Settlement.prototype.update = function(){
     console.log(this.name+' updating');
+
     var foodAmount = this.fort.getItemNb(1);
     var foodPerCitizen = 20;
     var required = foodPerCitizen*this.pop;
     var delta = foodAmount - required;
     var pct = delta/required;
     this.fort.setProperty('foodsurplus',pct);
+
+    this.buildings.forEach(function(b){
+        b.update();
+    });
 };
 
 module.exports.Settlement = Settlement;
