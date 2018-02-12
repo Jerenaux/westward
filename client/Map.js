@@ -34,6 +34,10 @@ var Map = new Phaser.Class({
         this.pins = [];
         this.resetCounter();
         this.clickedTile = null;
+
+        this.draggedX = 0;
+        this.draggedY = 0;
+        Engine.map = this;
     },
 
     handleDrag: function(x,y){
@@ -43,11 +47,36 @@ var Map = new Phaser.Class({
         var dy = this.y - y;
         this.x = x;
         this.y = y;
-        this.input.hitArea.x += dx;
-        this.input.hitArea.y += dy;
-        this.text.x -= dx;
-        this.text.y -= dy;
-        this.movePins(dx,dy);
+        this.dragMap(dx,dy,false);
+    },
+
+    dragMap: function(dx,dy,tween){ // x and y are destination coordinates
+        // Used to keep track of the current center of the map
+        this.draggedX += dx;
+        this.draggedY += dy;
+
+        if(tween){
+            var targets = this.pins.concat([this.text,this]);
+            var duration = 300;
+            Engine.scene.tweens.add({
+                    targets: targets,
+                    x: '-='+dx,
+                    y: '-='+dy,
+                    duration: duration
+                });
+            Engine.scene.tweens.add({
+                targets: this.input.hitArea,
+                x: '+='+dx,
+                y: '+='+dy,
+                duration: duration
+            });
+        }else {
+            this.input.hitArea.x += dx;
+            this.input.hitArea.y += dy;
+            this.text.x -= dx;
+            this.text.y -= dy;
+            this.movePins(dx, dy);
+        }
     },
 
     movePins: function(dx,dy){
@@ -65,7 +94,7 @@ var Map = new Phaser.Class({
 
     getNextPin: function(){
         if(this.pinsCounter >= this.pins.length){
-            this.pins.push(new Pin(this.maskPicture));
+            this.pins.push(new Pin(this,this.maskPicture));
         }
         return this.pins[this.pinsCounter++];
     },
@@ -75,8 +104,17 @@ var Map = new Phaser.Class({
         var dx = (pct.x - this.originX)*this.width;
         var dy = (pct.y - this.originY)*this.height;
         var pin = this.getNextPin();
-        pin.setUp(this.x+dx,this.y+dy,name,texture);
+        pin.setUp(x,y,this.x+dx,this.y+dy,name,texture);
         return pin;
+    },
+
+    focus: function(x,y){
+        var dx = x - (this.x + this.draggedX);
+        var dy = y - (this.y + this.draggedY);
+        // The map has to move in the opposite direction of the drag (w.r.t. center)
+        /*this.x -= dx;
+        this.y -= dy;*/
+        this.dragMap(dx,dy,true);
     },
 
     resetCounter: function(){
@@ -119,7 +157,7 @@ var Pin = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function Pin (mask) {
+    initialize: function Pin (map,mask) {
         CustomSprite.call(this, 0, 0, 'pin');
         this.setDepth(Engine.UIDepth+3);
         this.setScrollFactor(0);
@@ -127,10 +165,13 @@ var Pin = new Phaser.Class({
         this.setVisible(false);
         this.setInteractive();
         this.mask = new Phaser.Display.Masks.BitmapMask(Engine.scene,mask);
+        this.parentMap = map;
     },
 
-    setUp: function(x,y,name,texture){
+    setUp: function(tileX,tileY,x,y,name,texture){
         if(texture) this.setTexture(texture);
+        this.tileX = tileX;
+        this.tileY = tileY;
         this.setPosition(x,y);
         this.name = name;
         this.setVisible(true);
@@ -142,6 +183,10 @@ var Pin = new Phaser.Class({
 
     unhighlight: function(){
         this.setTexture('pin');
+    },
+
+    focus: function(){
+        this.parentMap.focus(this.x,this.y);
     },
 
     handleOver: function(){

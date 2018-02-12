@@ -19,7 +19,7 @@ CharacterPanel.prototype.addInterface = function(){
     this.addText(x,y,'Citizen of '+Engine.settlementsData[Engine.player.settlement].name,null,null,Utils.fonts.fancy);
     y += 20;
 
-    var classxp = Utils.randomInt(0,101);
+    var classxp = 0;
     this.addPolyText(x,y,["Level ","1"," Merchant   -   ",classxp+"/100"," Class XP"],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
     y += 30;
     var classbar = new MiniProgressBar(this.x+x,this.y+y,245);
@@ -33,6 +33,15 @@ CharacterPanel.prototype.addInterface = function(){
     var civicbar = new MiniProgressBar(this.x+x,this.y+y,245);
     civicbar.setLevel(civicxp,100);
     this.bars.push(civicbar);
+    y += 20;
+
+    this.addPolyText(x,y,['Respawn location: ','Fort ','of ','New Beginning'],[null,Utils.colors.gold,null,Utils.colors.gold]);
+    y += 30;
+    this.addText(x,y,'Stats modifiers:');
+    y+= 15;
+    this.addPolyText(x,y,['-0% ','fatigue'],[null,null]);
+    y += 15;
+    this.addPolyText(x,y,['-10% ','food deficit'],[Utils.colors.red,null]);
 };
 
 CharacterPanel.prototype.displayInterface = function(){

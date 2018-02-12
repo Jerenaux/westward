@@ -70,7 +70,6 @@ Economic loop: productivity timer for construction
 Economic loop: apply effect of food deficit on players
 Economic loop: test all updates of all menus
 Character: display committed buildings
-Character: set class xp to 0, add respawn location message, add stats modifier message
 Battle: skin dead animals
 Battle: display event pop-ups after skinning
 Battle: multiplayer fights

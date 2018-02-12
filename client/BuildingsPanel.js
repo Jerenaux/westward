@@ -38,10 +38,12 @@ BuildingsPanel.prototype.displayListing = function(){
         slot.display();
         if(Engine.currentMenu.panels['map']) {
             var data = listing[i];
-            var pin = Engine.currentMenu.panels['map'].map.addPin(data.x,data.y,Engine.buildingsData[data.type].name);
+            var map = Engine.currentMenu.panels['map'].map;
+            var pin = map.addPin(data.x,data.y,Engine.buildingsData[data.type].name);
             slot.pin = pin;
             slot.updateCallback('handleOver',pin.highlight.bind(pin));
             slot.updateCallback('handleOut',pin.unhighlight.bind(pin));
+            slot.updateCallback('handleClick',pin.focus.bind(pin));
         }
     }
 };
