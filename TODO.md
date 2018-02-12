@@ -68,6 +68,7 @@ Economic loop: add a functional resource building (to commit to)
 Economic loop: productivity timer for construction
 Economic loop: apply effect of food deficit on players
 Economic loop: update buildings panel in real time (clever updates)
+Economic loop: built transition (menu, collisions, frame) and cycle stuff
 Economic loop: test all updates of all menus 
 Character: display committed buildings
 Battle: skin dead animals

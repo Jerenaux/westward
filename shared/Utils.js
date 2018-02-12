@@ -172,7 +172,8 @@ Utils.clamp = function(x,min,max){ // restricts a value to a given interval (ret
     return Math.max(min, Math.min(x, max));
 };
 
-Utils.randomInt = function(low, high) { // [low, high[
+Utils.randomInt = function(low, high) { // [low, high]
+    high++;
     return Math.floor(Math.random() * (high - low) + low);
 };
 
