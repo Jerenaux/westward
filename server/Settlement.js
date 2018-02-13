@@ -2,7 +2,10 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 11-02-18.
  */
 
-function Settlement(name,pop){
+var GameServer = require('./GameServer.js').GameServer;
+
+function Settlement(id,name,pop){
+    this.id = id;
     this.name = name;
     this.pop = pop;
     this.fort = null;
@@ -34,12 +37,14 @@ Settlement.prototype.getFort = function(){
 Settlement.prototype.update = function(){
     console.log(this.name+' updating');
 
+    GameServer.addToFort(1,-1,this.id);
+
     var foodAmount = this.fort.getItemNb(1);
     var foodPerCitizen = 20;
     var required = foodPerCitizen*this.pop;
     var delta = foodAmount - required;
     var pct = delta/required;
-    this.fort.setProperty('foodsurplus',pct);
+    this.fort.setProperty('foodsurplus',Math.round(pct*100));
 
     this.buildings.forEach(function(b){
         b.update();

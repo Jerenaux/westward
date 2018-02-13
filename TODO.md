@@ -36,6 +36,7 @@ Settlement-focused experience:
 - Show committment slots in char panel
 
 Then:
+- Make Westward page
 - Have 2 settlements, with important differences 
 - World map-based settlement selection menu (mention key aspects, display enemy civ threats)
 - Class selection menu (describe impact on settlements)
@@ -65,10 +66,9 @@ Construction: add commitment button
 Construction: earn civic xp on commit (and use real numbers in character)
 Economic loop: actual computation of productivity modifiers (real numbers), effect on buildings (check for materials)
 Economic loop: add a functional resource building (to commit to)
-Economic loop: productivity timer for construction
 Economic loop: apply effect of food deficit on players
 Economic loop: update buildings panel in real time (clever updates)
-Economic loop: built transition (menu, collisions, frame) and cycle stuff
+Economic loop: built transition (menu, collisions, frame) 
 Economic loop: test all updates of all menus 
 Character: display committed buildings
 Battle: skin dead animals

@@ -32,7 +32,7 @@ SettlementStatusPanel.prototype.displayInterface = function(){
 SettlementStatusPanel.prototype.update = function(){
     var data = Engine.currentBuiling;
     this.populationTxt.setText(data.population);
-    this.surplusTxt.setText((data.foodsurplus*100)+'% ');
+    this.surplusTxt.setText(data.foodsurplus+'% ');
     this.surplusTxt.setFill(data.foodsurplus > 0 ? Utils.colors.green : Utils.colors.red);
     var needed = data.population*20;
     var owned = data.getItemNb(1);

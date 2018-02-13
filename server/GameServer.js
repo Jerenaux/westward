@@ -69,13 +69,11 @@ GameServer.readMap = function(mapsPath){
 
     // Settlements
     GameServer.settlements = {};
-    GameServer.settlements[0] = new Settlement('New Beginning',12);
+    GameServer.settlements[0] = new Settlement(0,'New Beginning',12);
 
     // Read buildings
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
-    //GameServer.forts = {}; // maps settlements to forts
-    //GameServer.settlementBuildings = new ListMap(); // maps settlements to lists of buildings
-    GameServer.server.db.collection('buildings').find({}).toArray(function(err,buildings){
+  GameServer.server.db.collection('buildings').find({}).toArray(function(err,buildings){
         if(err) throw err;
         for(var i = 0; i < buildings.length; i++){
             var data = buildings[i];
@@ -336,6 +334,12 @@ GameServer.getSettlementBuildings = function(sid){
     return list.map(function(b){
         return b.listingTrim();
     });
+};
+
+GameServer.addToFort = function(item,nb,sid){
+    var settlement = GameServer.settlements[sid];
+    var fort = settlement.getFort();
+    fort.giveItem(item,nb);
 };
 
 GameServer.allIngredientsOwned = function(player,recipe,nb){

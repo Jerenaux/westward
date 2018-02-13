@@ -44,6 +44,7 @@
     },
     "displayProd": false,
     "buildRate":2,
+    "buildInterval":30,
     "mainMenu": "trade",
     "icon": "tradepost"
   },
@@ -97,6 +98,29 @@
     "entry": {
       "x": 16,
       "y": 8
+    }
+  },
+  "5":{
+    "shape": [
+      33, 60,
+      130, 0,
+      255, 80,
+      255,185,
+      155, 230,
+      40, 145
+    ],
+     "width": 256,
+    "height": 240,
+    "sprite": "hunterhut",
+    "name": "Hunter hut",
+    "icon": "hut",
+    "mainMenu": "hut",
+    "displayProd": true,
+    "production": [[1,1]],
+    "prodInterval": 30,
+    "entry": {
+      "x": 0,
+      "y": 3
     }
   }
 }

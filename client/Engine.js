@@ -48,6 +48,7 @@ Engine.preload = function() {
     this.load.image('inn', 'assets/sprites/buildings/inn.png');
     this.load.image('tower', 'assets/sprites/buildings/tower.png');
     this.load.image('foundations', 'assets/sprites/buildings/foundations.png');
+    this.load.image('hunterhut', 'assets/sprites/buildings/hunterhut.png');
 
     this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
     this.load.atlas('aok', 'assets/sprites/aok.png', 'assets/sprites/aok.json');
@@ -330,6 +331,7 @@ Engine.makeUI = function(){
         'character': Engine.makeCharacterMenu(statsPanel),
         'trade': Engine.makeTradeMenu(),
         'fort': Engine.makeFortMenu(),
+        'hut': Engine.makeHutMenu(),
         'battle': Engine.makeBattleMenu(),
         'construction': Engine.makeConstructionMenu()
     };
@@ -520,6 +522,14 @@ Engine.makeBattleMenu = function(){
         bar.setLevel(Engine.player.stats['hp']);
     };
     return battle;
+};
+
+Engine.makeHutMenu = function(){
+    var hut = new Menu('Hut');
+    var w = 400;
+    var x = (Engine.getGameConfig().width-w)/2;
+    hut.addPanel('production',new ProductionPanel(x,100,w,230,'Production'));
+    return hut;
 };
 
 Engine.makeConstructionMenu = function(){
@@ -1194,7 +1204,9 @@ Engine.inThatBuilding = function(id){
 };
 
 Engine.checkForBuildingMenuUpdate= function(id,callback){
-    if(Engine.inThatBuilding(id)) Engine.currentMenu[callback]();
+    if(Engine.inThatBuilding(id) && Engine.inMenu) {
+        if(Engine.currentMenu[callback]) Engine.currentMenu[callback]();
+    }
 };
 
 Engine.addPlayer = function(id,x,y,settlement){

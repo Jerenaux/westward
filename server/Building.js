@@ -21,6 +21,8 @@ function Building(data){
     this.built = !!data.built;
     this.progress = data.progress || 0;
     this.prod = data.prod || 100;
+    this.lastBuildCycle = data.lastBuildCycle || Date.now();
+    this.lastProdCycle = data.lastProdCycle || Date.now();
     this.setOrUpdateAOI();
     this.addCollisions();
     this.registerBuilding();
@@ -39,15 +41,48 @@ Building.prototype.registerBuilding = function(){
 };
 
 Building.prototype.update = function(){
-    if(!this.built){
-        var rate = GameServer.buildingsData[this.type].buildRate;
-        if(!rate) return;
-        var increment = Math.round((this.prod/100)*rate);
-        console.log('increment of ',increment);
-        var newprogress = Utils.clamp(this.progress+increment,this.progress,100);
-        this.setProperty('progress',newprogress);
-        if(this.progress == 100) this.setProperty('built',true);
+    if(this.built) {
+        var deltaProd = Date.now() - this.lastProdCycle;
+        var interval = GameServer.buildingsData[this.type].prodInterval*1000;
+        var nbCycles = Math.floor(deltaProd/interval);
+        if(nbCycles > 0){
+            console.log(nbCycles,' build cycles for ',this.id);
+            this.lastProdCycle += nbCycles*interval;
+            for(var i = 0; i < nbCycles; i++){
+                this.updateProd();
+            }
+        }
+    }else{
+        var deltaBuild = Date.now() - this.lastBuildCycle;
+        var interval = GameServer.buildingsData[this.type].buildInterval*1000;
+        if(!interval) return;
+        var nbCycles = Math.floor(deltaBuild/interval);
+        console.log(nbCycles,' prod cycles for ',this.id);
+        if(nbCycles > 0){
+            this.lastBuildCycle += nbCycles*interval;
+            for(var i = 0; i < nbCycles; i++){
+                this.updateBuild();
+            }
+        }
     }
+};
+
+Building.prototype.updateProd = function(){
+    var production = GameServer.buildingsData[this.type].production;
+    for(var i = 0; i < production.length; i++){
+        var item = production[i][0];
+        var nb = production[i][1];
+        GameServer.addToFort(item,nb,this.settlement);
+    }
+};
+
+Building.prototype.updateBuild = function(){
+    var rate = GameServer.buildingsData[this.type].buildRate;
+    if(!rate) return;
+    var increment = Math.round((this.prod/100)*rate);
+    var newprogress = Utils.clamp(this.progress+increment,this.progress,100);
+    this.setProperty('progress',newprogress);
+    if(this.progress == 100) this.setProperty('built',true);
 };
 
 Building.prototype.addBuilding = function(building){

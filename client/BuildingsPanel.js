@@ -5,26 +5,17 @@
 
 function BuildingsPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
-    this.slotCounter = 0;
-    this.slots = [];
 }
 
 BuildingsPanel.prototype = Object.create(Panel.prototype);
 BuildingsPanel.prototype.constructor = BuildingsPanel;
-
-BuildingsPanel.prototype.getNextSlot = function(){
-    if(this.slotCounter >= this.slots.length){
-        this.slots.push(new LongSlot(150));
-    }
-    return this.slots[this.slotCounter++];
-};
 
 BuildingsPanel.prototype.displayListing = function(){
     var listing = Engine.currentBuiling.buildings;
     for(var i = 0; i < listing.length; i++){
         var data = listing[i];
         var buildingTypeData = Engine.buildingsData[data.type];
-        var slot = this.getNextSlot();
+        var slot = this.getNextLongSlot(150);
         slot.setUp(this.x+15,this.y + 30 + i*50);
 
         var icon = buildingTypeData.icon;
@@ -57,15 +48,8 @@ BuildingsPanel.prototype.displayListing = function(){
 };
 
 BuildingsPanel.prototype.updateListing = function(){
-    this.hideInterface();
+    this.hideLongSlots();
     this.displayListing();
-};
-
-BuildingsPanel.prototype.hideInterface = function(){
-    this.slots.forEach(function(s){
-        s.hide();
-    });
-    this.slotCounter = 0;
 };
 
 BuildingsPanel.prototype.display = function(){
@@ -75,5 +59,5 @@ BuildingsPanel.prototype.display = function(){
 
 BuildingsPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
-    this.hideInterface();
+    this.hideLongSlots();
 };
