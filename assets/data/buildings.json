@@ -114,7 +114,7 @@
     "sprite": "hunterhut",
     "name": "Hunter hut",
     "icon": "hut",
-    "mainMenu": "hut",
+    "mainMenu": "production",
     "displayProd": true,
     "production": [[1,1]],
     "prodInterval": 30,

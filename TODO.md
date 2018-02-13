@@ -62,7 +62,7 @@ Item descriptions
 Week:
 Fort: next level requirements
 Fort: unlockables of next level
-Construction: add commitment button
+Construction: add commitment button (to production buildings too)
 Construction: earn civic xp on commit (and use real numbers in character)
 Economic loop: actual computation of productivity modifiers (real numbers), effect on buildings (check for materials)
 Economic loop: add a functional resource building (to commit to)

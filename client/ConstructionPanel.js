@@ -18,16 +18,6 @@ ConstructionPanel.prototype.addInterface = function(){
     var barw = this.width-100;
     var barx = (this.width-barw)/2;
     this.bar = new BigProgressBar(this.x+barx,this.y+100,barw,'gold');
-
-    var alignx = 10;
-    var y = 130;
-    var x = alignx;
-    y += this.addText(x,y,'Productivity modifiers:',null,14,Utils.fonts.fancy).height;
-    this.addPolyText(x,y,['+0%',' development level'],[null,null]);
-    y += 15;
-    this.addPolyText(x,y,['-10%',' food deficit'],[Utils.colors.red,null]);
-    y += 15;
-    this.addPolyText(x,y,['+7%',' citizen commitment ','(2)'],[Utils.colors.green,null,Utils.colors.gold]);
 };
 
 ConstructionPanel.prototype.update = function(){
@@ -41,16 +31,18 @@ ConstructionPanel.prototype.update = function(){
 ConstructionPanel.prototype.displayInterface = function(){
     this.update();
     this.bar.display();
-    this.texts.forEach(function(t){
+    /*this.texts.forEach(function(t){
         t.setVisible(true);
-    });
+    });*/
+    this.displayTexts();
 };
 
 ConstructionPanel.prototype.hideInterface = function(){
     this.bar.hide();
-    this.texts.forEach(function(t){
+    /*this.texts.forEach(function(t){
         t.setVisible(false);
-    })
+    })*/
+    this.hideTexts();
 };
 
 ConstructionPanel.prototype.display = function(){

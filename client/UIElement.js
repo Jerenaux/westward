@@ -17,18 +17,9 @@ var UIElement = new Phaser.Class({
         this.menu = menu;
     },
 
-    setDownFrame: function(downFrame){
-        this.upFrame = this.frame.name;
-        this.downFrame = downFrame;
-        this.handleDown = function(){
-            this.setFrame(this.downFrame)
-        }
-    },
-
     handleClick: function(){
-        if(this.downFrame) this.setFrame(this.upFrame);
         if(this.menu.displayed){
-            this.menu.hide();
+            if(!Engine.inBuilding) this.menu.hide();
         }else {
             this.menu.display();
         }

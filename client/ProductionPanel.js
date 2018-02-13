@@ -14,16 +14,6 @@ ProductionPanel.prototype.constructor = ProductionPanel;
 
 ProductionPanel.prototype.addInterface = function(){
     this.addText(this.width/2,25,'Production:',null,20).setOrigin(0.5);
-
-    /*var alignx = 10;
-    var y = 130;
-    var x = alignx;
-    y += this.addText(x,y,'Productivity modifiers:',null,14,Utils.fonts.fancy).height;
-    this.addPolyText(x,y,['+0%',' development level'],[null,null]);
-    y += 15;
-    this.addPolyText(x,y,['-10%',' food deficit'],[Utils.colors.red,null]);
-    y += 15;
-    this.addPolyText(x,y,['+7%',' citizen commitment ','(2)'],[Utils.colors.green,null,Utils.colors.gold]);*/
 };
 
 ProductionPanel.prototype.displaySlots = function(){
@@ -39,10 +29,12 @@ ProductionPanel.prototype.displaySlots = function(){
         slot.setUp(this.x+x,this.y + y + i*50);
 
         var item = production[i][0];
+        var nb = production[i][1];
         var itemData = Engine.itemsData[item];
         slot.addIcon(itemData.atlas,itemData.frame);
 
         slot.addText(43,2,itemData.name);
+        slot.addText(43,16,'+'+nb+'/cycle',Utils.colors.gold);
         slot.display();
     }
 };

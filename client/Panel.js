@@ -60,7 +60,7 @@ Panel.prototype.addPolyText = function(x,y,texts,colors){
     if(texts.length != colors.length) return;
     var txts = [];
     for(var i = 0; i < texts.length; i++){
-        var t = this.addText(x,y,texts[i],colors[i]);
+        var t = this.addText(x,y,texts[i],colors[i]); // addText() pushed to this.texts
         x += t.width;
         txts.push(t);
     }
@@ -93,6 +93,12 @@ Panel.prototype.hideLongSlots = function(){
         s.hide();
     });
     this.longSlotsCounter = 0;
+};
+
+Panel.prototype.displayTexts = function(){
+    this.texts.forEach(function(t){
+        t.setVisible(true);
+    })
 };
 
 Panel.prototype.hideTexts = function(){

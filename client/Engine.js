@@ -331,7 +331,7 @@ Engine.makeUI = function(){
         'character': Engine.makeCharacterMenu(statsPanel),
         'trade': Engine.makeTradeMenu(),
         'fort': Engine.makeFortMenu(),
-        'hut': Engine.makeHutMenu(),
+        'production': Engine.makeProductionMenu(),
         'battle': Engine.makeBattleMenu(),
         'construction': Engine.makeConstructionMenu()
     };
@@ -346,20 +346,11 @@ Engine.makeUI = function(){
     x -= gap;
     UIelements.push(new UIElement(x,y,'backpack',null,Engine.menus.inventory));
     x -= gap;
-    var coin = new UIElement(x,y,'coin',null,Engine.menus.trade);
-    var map = new UIElement(x,y,'map',null,Engine.menus.fort);
-    var hammer = new UIElement(x,y,'hammer',null,Engine.menus.construction);
-    coin.setVisible(false);
-    map.setVisible(false);
-    hammer.setVisible(false);
-    UIelements.push(coin);
-    UIelements.push(map);
-    UIelements.push(hammer);
     Engine.UIelements = UIelements;
-
-    Engine.menus['trade'].setIcon(coin);
-    Engine.menus['fort'].setIcon(map);
-    Engine.menus['construction'].setIcon(hammer);
+    Engine.addMenuIcon(x,y,'coin',Engine.menus.trade);
+    Engine.addMenuIcon(x,y,'map',Engine.menus.fort);
+    Engine.addMenuIcon(x,y,'hammer',Engine.menus.construction);
+    Engine.addMenuIcon(x,y,'hammer',Engine.menus.production);
 
     var tooltip = Engine.scene.textures.addSpriteSheetFromAtlas(
         'tooltip',
@@ -375,6 +366,13 @@ Engine.makeUI = function(){
 
     Engine.makeBattleUI();
     Engine.displayUI();
+};
+
+Engine.addMenuIcon = function(x,y,frame,menu){
+    var icon = new UIElement(x,y,frame,null,menu);
+    icon.setVisible(false);
+    Engine.UIelements.push(icon);
+    menu.setIcon(icon);
 };
 
 Engine.makeBattleUI = function(){
@@ -524,27 +522,38 @@ Engine.makeBattleMenu = function(){
     return battle;
 };
 
-Engine.makeHutMenu = function(){
-    var hut = new Menu('Hut');
+Engine.makeProductionMenu = function(){
+    var production = new Menu('Hut');
     var w = 400;
+    var h = 250;
     var x = (Engine.getGameConfig().width-w)/2;
-    hut.addPanel('production',new ProductionPanel(x,100,w,230,'Production'));
-    return hut;
+    var prodw = 250;
+    var prodh = 100;
+    var prody = 230;
+    var prodx = (Engine.getGameConfig().width-prodw)/2;
+
+    production.addPanel('production',new ProductionPanel(x,100,w,h,'Production'));
+    production.addPanel('prod',new ProductivityPanel(prodx,prody,prodw,prodh,'Productivity modifiers'));
+    return production;
 };
 
 Engine.makeConstructionMenu = function(){
     var w = 400;
     var x = (Engine.getGameConfig().width-w)/2;
     var padding = 10;
-    var progressh = 230;
+    var progressh = 250;
     var progressy = 100;
     var invy = progressy+progressh+padding;
+    var prody = progressy+140;
+    var prodw = 250;
+    var prodx = (Engine.getGameConfig().width-prodw)/2;
+
     var constr = new Menu('Construction');
     var progress = new ConstructionPanel(x,progressy,w,progressh);
     constr.addPanel('progress',progress);
     var materials = new MaterialsPanel(x,invy,w,150,'Materials');
-    //materials.setInventory(new Inventory(16),8,true);
     constr.addPanel('materials',materials);
+    constr.addPanel('prod',new ProductivityPanel(prodx,prody,prodw,100,'Productivity modifiers'));
     constr.onUpdateShop = function(){
         materials.update();
     };

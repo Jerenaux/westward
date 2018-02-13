@@ -46,8 +46,8 @@ Building.prototype.update = function(){
         var interval = GameServer.buildingsData[this.type].prodInterval*1000;
         var nbCycles = Math.floor(deltaProd/interval);
         if(nbCycles > 0){
-            console.log(nbCycles,' build cycles for ',this.id);
             this.lastProdCycle += nbCycles*interval;
+            console.log(nbCycles,' build cycles for ',this.id);
             for(var i = 0; i < nbCycles; i++){
                 this.updateProd();
             }
@@ -57,8 +57,8 @@ Building.prototype.update = function(){
         var interval = GameServer.buildingsData[this.type].buildInterval*1000;
         if(!interval) return;
         var nbCycles = Math.floor(deltaBuild/interval);
-        console.log(nbCycles,' prod cycles for ',this.id);
         if(nbCycles > 0){
+            console.log(nbCycles,' prod cycles for ',this.id);
             this.lastBuildCycle += nbCycles*interval;
             for(var i = 0; i < nbCycles; i++){
                 this.updateBuild();
