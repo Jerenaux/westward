@@ -31,17 +31,11 @@ ConstructionPanel.prototype.update = function(){
 ConstructionPanel.prototype.displayInterface = function(){
     this.update();
     this.bar.display();
-    /*this.texts.forEach(function(t){
-        t.setVisible(true);
-    });*/
     this.displayTexts();
 };
 
 ConstructionPanel.prototype.hideInterface = function(){
     this.bar.hide();
-    /*this.texts.forEach(function(t){
-        t.setVisible(false);
-    })*/
     this.hideTexts();
 };
 

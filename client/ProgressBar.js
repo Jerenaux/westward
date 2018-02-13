@@ -36,18 +36,22 @@ ProgressBar.prototype.setLevel = function(level,max){
         var _head = this.head;
         var _tail = this.tail;
         var _lvl = this.level;
+        var _bar = this;
         Engine.scene.tweens.add(
             {
                 targets: this.barBody,
                 width: newLength,
                 duration: duration,
                 onStart: function(){
+                    if(!_bar.displayed) return;
                     if(_head) _head.setVisible(true);
                     if(_tail) _tail.setVisible(true);
                 },
                 onComplete: function(){
-                    if(_head) _head.setVisible(!(_lvl == 0));
-                    if(_tail) _tail.setVisible(!(_lvl == 0));
+                    if(!_bar.displayed) return;
+                    // Deal with cases where the bar drops to 0, need to hide head and tail
+                    if(_head && _head.visible) _head.setVisible(!(_lvl == 0));
+                    if(_tail && _tail.visible) _tail.setVisible(!(_lvl == 0));
                 }
             });
         if(_head) {
@@ -81,6 +85,8 @@ ProgressBar.prototype.hide = function(){
     this.body.forEach(function(e){
         e.setVisible(false);
     });
+    if(this.hasHead) this.head.setVisible(false);
+    if(this.hasTail) this.tail.setVisible(false);
     this.displayed = false;
 };
 
@@ -163,8 +169,3 @@ function BigProgressBar(x,y,w,color){
 
 BigProgressBar.prototype = Object.create(ProgressBar.prototype);
 BigProgressBar.prototype.constructor = BigProgressBar;
-
-/*BigProgressBar.prototype.display = function(){
-    ProgressBar.prototype.display.call(this);
-    if(this.level == 0) this.head.setVisible(false);
-};*/

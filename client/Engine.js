@@ -1129,14 +1129,14 @@ Engine.isHero = function(player){
 Engine.updatePlayer = function(player,data){ // data contains the updated data from the server
     if(data.path && (player.id != Engine.player.id || Engine.player.inFight)) player.move(data.path);
     if(data.inBuilding > -1) {
-        player.setVisible(false);
+        if(!player.isHero) player.setVisible(false);
         player.inBuilding = data.inBuilding;
-        if(Engine.isHero(player)) Engine.enterBuilding(data.inBuilding);
+        //if(Engine.isHero(player)) Engine.enterBuilding(data.inBuilding);
     }
     if(data.inBuilding == -1){
-        player.setVisible(true);
+        if(!player.isHero) player.setVisible(true);
         player.inBuilding = data.inBuilding;
-        if(Engine.isHero(player)) Engine.exitBuilding();
+        //if(Engine.isHero(player)) Engine.exitBuilding();
     }
     Engine.handleBattleUpdates(player,data);
     if(data.dead == true) {
@@ -1205,6 +1205,13 @@ Engine.updateBuilding = function(building,data){ // data contains the updated da
     if(data.prod){
         building.prod = data.prod;
         Engine.checkForBuildingMenuUpdate(building.id,'onUpdateConstruction');
+    }
+    if(data.built){
+        if(data.built == true && building.built == false) building.build();
+        if(Engine.inThatBuilding(building.id)){
+            Engine.exitBuilding();
+            Engine.enterBuilding(building.id);
+        }
     }
 };
 
@@ -1297,6 +1304,7 @@ Engine.getTilesetFromTile = function(tile){
 
 Engine.enterBuilding = function(id){
     console.log('Entering '+id);
+    Engine.player.setVisible(false);
     var building = Engine.buildings[id];
     Engine.inBuilding = true;
     Engine.currentBuiling = building; // used to keep track of which building is displayed in menus
@@ -1332,7 +1340,9 @@ Engine.enterBuilding = function(id){
 };
 
 Engine.exitBuilding = function(){
+    Engine.player.setVisible(true);
     Engine.inBuilding = false;
+    Engine.currentBuiling = null;
     Engine.currentMenu.hide();
     Engine.buildingTitle.hide();
     Engine.settlementTitle.hide();
@@ -1554,4 +1564,5 @@ Engine.buildSuccess = function(){
 
 Engine.leaveBuilding = function(){
     Client.sendExit();
+    Engine.exitBuilding();
 };

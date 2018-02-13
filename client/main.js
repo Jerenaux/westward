@@ -6,7 +6,7 @@ var TILE_HEIGHT = 32;
 
 var config = {
     //type: (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 ? Phaser.CANVAS : Phaser.AUTO),
-    type: Phaser.AUTO,
+    type: Phaser.WEBGL,
     width: VIEW_WIDTH*TILE_WIDTH,
     height: VIEW_HEIGHT*TILE_HEIGHT,
     parent: 'game',

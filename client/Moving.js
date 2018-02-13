@@ -80,6 +80,9 @@ var Moving = new Phaser.Class({
 
     move: function(path){
         path.shift();
+
+        if(path.length == 0) this.endMovement();
+
         var tweens = [];
         for(var i = 0; i < path.length; i++){
             var sx = (i == 0 ? this.tileX : path[i-1][0]);

@@ -24,8 +24,16 @@ var Building = new Phaser.Class({
         this.entry = data.entry;
         this.built = built;
 
-        var collisionData = (this.built ? data : Engine.buildingsData[FOUNDATIONS_ID]);
-        this.setCollisions(collisionData);
+        //var collisionData = (this.built ? data : Engine.buildingsData[FOUNDATIONS_ID]);
+        //this.setCollisions(collisionData);
+        this.setCollisions(data);
+    },
+
+    build: function(){
+        this.built = true;
+        this.setTexture(Engine.buildingsData[this.buildingType].sprite);
+        this.setOrigin(0.5);
+        this.setPosition(this.tileX*Engine.tileWidth,this.tileY*Engine.tileHeight);
     },
 
     setCollisions: function(data){

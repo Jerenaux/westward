@@ -47,28 +47,13 @@ Then:
 - Orientation panel in char menu hinting at what to do and where to go (w/ map?)
 Goal: 1h of gameplay?
 
-Random list:
-Fort UI
-Monster drops loot
-Monster xp
-Display stat effects in character panel + xp bars
-Being-built panel (progress bar, material, productivity (commitment and dev level modifiers))
-Resource building panel
-Commitment, then functional commitment slots in char panel, + civic xp
-Multiplayer fights
-Help buttons
-Item descriptions
-
 Week:
 Fort: next level requirements
-Fort: unlockables of next level
 Construction: add commitment button (to production buildings too)
 Construction: earn civic xp on commit (and use real numbers in character)
 Economic loop: actual computation of productivity modifiers (real numbers), effect on buildings (check for materials)
-Economic loop: add a functional resource building (to commit to)
 Economic loop: apply effect of food deficit on players
 Economic loop: update buildings panel in real time (clever updates)
-Economic loop: built transition (menu, collisions, frame) 
 Economic loop: test all updates of all menus 
 Character: display committed buildings
 Battle: skin dead animals

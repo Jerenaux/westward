@@ -44,7 +44,7 @@
     },
     "displayProd": false,
     "buildRate":2,
-    "buildInterval":30,
+    "buildInterval":15,
     "mainMenu": "trade",
     "icon": "tradepost"
   },

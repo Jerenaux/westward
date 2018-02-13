@@ -50,7 +50,12 @@ var Player = new Phaser.Class({
 
     endMovement: function() {
         Moving.prototype.endMovement.call(this);
-        if (this.inFight) Engine.updateGrid();
+        if(this.inFight) Engine.updateGrid();
+        if(this.isHero){
+            if(this.destinationAction && this.destinationAction.type == 1){
+                Engine.enterBuilding(this.destinationAction.id);
+            }
+        }
     },
 
     getEquipped: function(slot,subSlot){
