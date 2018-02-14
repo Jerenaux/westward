@@ -14,6 +14,10 @@ ProductionPanel.prototype.constructor = ProductionPanel;
 
 ProductionPanel.prototype.addInterface = function(){
     this.addText(this.width/2,25,'Production:',null,20).setOrigin(0.5);
+    var btnx = (this.width-100)/2;
+    this.button = new BigButton(this.x+btnx,this.y+250,'Commit!',function(){
+        console.log('big click');
+    });
 };
 
 ProductionPanel.prototype.displaySlots = function(){
@@ -47,15 +51,15 @@ ProductionPanel.prototype.update = function(){
 };
 
 ProductionPanel.prototype.displayInterface = function(){
-    this.texts.forEach(function(t){
-        t.setVisible(true);
-    });
+    this.displayTexts();
     this.displaySlots();
+    this.button.display();
 };
 
 ProductionPanel.prototype.hideInterface = function(){
     this.hideTexts();
     this.hideLongSlots();
+    this.button.hide();
 };
 
 ProductionPanel.prototype.display = function(){

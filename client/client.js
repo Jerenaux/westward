@@ -133,6 +133,10 @@ Client.sendBuild = function(id,tile){
     Client.socket.emit('build',{id:id,tile:tile});
 };
 
+Client.sendCommit = function(){
+    Client.socket.emit('commit');
+};
+
 
 // ####################"
 

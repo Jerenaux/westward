@@ -18,6 +18,10 @@ ConstructionPanel.prototype.addInterface = function(){
     var barw = this.width-100;
     var barx = (this.width-barw)/2;
     this.bar = new BigProgressBar(this.x+barx,this.y+100,barw,'gold');
+    var btnx = (this.width-100)/2;
+    this.button = new BigButton(this.x+btnx,this.y+250,'Commit!',function(){
+        console.log('big click');
+    });
 };
 
 ConstructionPanel.prototype.update = function(){
@@ -31,11 +35,13 @@ ConstructionPanel.prototype.update = function(){
 ConstructionPanel.prototype.displayInterface = function(){
     this.update();
     this.bar.display();
+    this.button.display();
     this.displayTexts();
 };
 
 ConstructionPanel.prototype.hideInterface = function(){
     this.bar.hide();
+    this.button.hide();
     this.hideTexts();
 };
 

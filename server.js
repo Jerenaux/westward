@@ -91,6 +91,10 @@ io.on('connection',function(socket){
             gs.handleBuild(data,socket.id);
         });
 
+        socket.on('commit',function(){
+            gs.handleCommit(socket.id);
+        });
+
         socket.on('unequip',function(data){
             gs.handleUnequip(data,socket.id);
         });

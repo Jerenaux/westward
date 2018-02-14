@@ -525,7 +525,7 @@ Engine.makeBattleMenu = function(){
 Engine.makeProductionMenu = function(){
     var production = new Menu('Production');
     var w = 400;
-    var h = 250;
+    var h = 300;
     var x = (Engine.getGameConfig().width-w)/2;
     var prodw = 250;
     var prodh = 100;
@@ -545,17 +545,18 @@ Engine.makeConstructionMenu = function(){
     var w = 400;
     var x = (Engine.getGameConfig().width-w)/2;
     var padding = 10;
-    var progressh = 250;
+    var progressh = 300;
     var progressy = 100;
     var invy = progressy+progressh+padding;
     var prody = progressy+140;
     var prodw = 250;
     var prodx = (Engine.getGameConfig().width-prodw)/2;
+    var materialh = 100;
 
     var constr = new Menu('Construction');
     var progress = new ConstructionPanel(x,progressy,w,progressh);
     constr.addPanel('progress',progress);
-    var materials = new MaterialsPanel(x,invy,w,150,'Materials');
+    var materials = new MaterialsPanel(x,invy,w,materialh,'Materials');
     constr.addPanel('materials',materials);
     var prod = new ProductivityPanel(prodx,prody,prodw,100,'Productivity modifiers');
     constr.addPanel('prod',prod);
@@ -826,8 +827,8 @@ Engine.isColliding = function(tile){ // tile is the index of the tile in the til
     return false;
 };
 
-Engine.handleDown = function(event){
-    if(event.gameObject && event.gameObject.handleDown) event.gameObject.handleDown();
+Engine.handleDown = function(pointer,objects){
+    if(objects[0].handleDown) objects[0].handleDown(pointer);
 };
 
 Engine.handleClick = function(pointer,objects){
@@ -1511,29 +1512,6 @@ Engine.removeCell = function(cell){
     Engine.battleZones.delete(cell.tx,cell.ty);
 };
 
-
-/*Engine.manageBattleZones = function(entity,zone){
-    if(zone.length == 0 && entity.battlezone.length > 0){ // remove
-        for(var i = 0; i < entity.battlezone.length; i++) {
-            var rect = entity.battlezone[i];
-            Engine.removeGrid({x:rect.x,y:rect.y},rect.w,rect.h);
-        }
-    }else{
-        for(var i = 0; i < zone.length; i++){
-            var rect = zone[i];
-            Engine.drawGrid({x:rect.x,y:rect.y},rect.w,rect.h);
-        }
-    }
-    entity.battlezone = zone;
-
-    Engine.displayedCells = Engine.battleZones.toList(); // used to keep track of what cells to delete
-    /*Engine.displayedCells.forEach(function(cell){
-        var frame = Engine.getGridFrame(cell.x,cell.y);
-        //console.log(frame);
-        cell.v.setFrame(frame);
-    });*/
-//};
-
 // ## UI-related functions ##
 // this functions need to have a this bound to them
 Engine.closePanel = function(){this.hide();};
@@ -1572,6 +1550,10 @@ Engine.sellClick = function(){
 
 Engine.buyClick = function(){
     Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
+};
+
+Engine.commitClick = function(){
+    Client.sendCommit();
 };
 
 Engine.buildError = function(){

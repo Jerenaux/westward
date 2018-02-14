@@ -391,6 +391,42 @@
     {
       "filename": "longslot_br_junction",
       "frame": {"x":152,"y":450,"w":18,"h":14}
+    },
+    {
+      "filename": "bigbutton_left",
+      "frame": {"x":633,"y":23,"w":41,"h":28}
+    },
+    {
+      "filename": "bigbutton_left_lit",
+      "frame": {"x":633,"y":53,"w":41,"h":28}
+    },
+    {
+      "filename": "bigbutton_left_pressed",
+      "frame": {"x":633,"y":83,"w":41,"h":28}
+    },
+    {
+      "filename": "bigbutton_middle",
+      "frame": {"x":675,"y":23,"w":4,"h":28}
+    },
+    {
+      "filename": "bigbutton_middle_lit",
+      "frame": {"x":675,"y":53,"w":4,"h":28}
+    },
+    {
+      "filename": "bigbutton_middle_pressed",
+      "frame": {"x":675,"y":83,"w":4,"h":28}
+    },
+    {
+      "filename": "bigbutton_right",
+      "frame": {"x":716,"y":23,"w":41,"h":28}
+    },
+    {
+      "filename": "bigbutton_right_lit",
+      "frame": {"x":716,"y":53,"w":41,"h":28}
+    },
+    {
+      "filename": "bigbutton_right_pressed",
+      "frame": {"x":716,"y":83,"w":41,"h":28}
     }
   ]
 }

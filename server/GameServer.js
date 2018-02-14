@@ -316,31 +316,9 @@ GameServer.build = function(bid,tile,settlement){
     GameServer.server.sendAll('addBuildingPin',building.superTrim());
 };
 
-/*GameServer.registerBuilding = function(building,sid){
-    var settlement = GameServer.settlements[sid];
-    settlement.addBuilding(building);
-    var fort = settlement.getFort();
-    if(fort) fort.addBuilding(building);
-};*/
+GameServer.handleCommit = function(socketID){
 
-/*GameServer.registerFort = function(fort,sid){
-    var settlement = GameServer.settlements[sid];
-    settlement.setFort(fort);
-};*/
-
-/*GameServer.getSettlementBuildings = function(sid){
-    var settlement = GameServer.settlements[sid];
-    var list = settlement.getBuildings();
-    return list.map(function(b){
-        return b.listingTrim();
-    });
-};*/
-
-/*GameServer.addToFort = function(item,nb,sid){
-    var settlement = GameServer.settlements[sid];
-    var fort = settlement.getFort();
-    fort.giveItem(item,nb);
-};*/
+};
 
 GameServer.allIngredientsOwned = function(player,recipe,nb){
     for(var item in recipe){
