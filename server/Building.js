@@ -3,6 +3,7 @@
  */
 var GameObject = require('./GameObject.js').GameObject;
 var GameServer = require('./GameServer.js').GameServer;
+var Formulas = require('../shared/Formulas.js').Formulas;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
@@ -13,7 +14,8 @@ function Building(data){
     this.x = data.x;
     this.y = data.y;
     this.type = data.type;
-    this.settlement = data.settlement;
+    this.sid = data.settlement;
+    this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(100);
     if(data.inventory) this.inventory.fromList(data.inventory);
     this.prices = data.prices || {};
@@ -21,6 +23,7 @@ function Building(data){
     this.built = !!data.built;
     this.progress = data.progress || 0;
     this.prod = data.prod || 100;
+    this.committed = 20;
     this.lastBuildCycle = data.lastBuildCycle || Date.now();
     this.lastProdCycle = data.lastProdCycle || Date.now();
     this.setOrUpdateAOI();
@@ -32,35 +35,40 @@ Building.prototype = Object.create(GameObject.prototype);
 Building.prototype.constructor = Building;
 
 Building.prototype.registerBuilding = function(){
-    GameServer.registerBuilding(this,this.settlement);
+    this.settlement.registerBuilding(this);
     if(this.type == 0){ // fort
-        GameServer.registerFort(this,this.settlement);
-        this.buildings = GameServer.getSettlementBuildings(this.settlement);
+        this.settlement.registerFort(this);
+        this.buildings = this.settlement.getBuildings();
         this.updateBuildings();
     }
 };
 
+Building.prototype.computeProductivity = function(){
+    console.log('Food prod = ',this.settlement.computeFoodProductivity());
+    var newprod = Formulas.computeProductivity(this.settlement.computeFoodProductivity(),Formulas.commitmentProductivityModifier(this.committed));
+    console.log('productivity : ',newprod);
+    newprod = Math.round(newprod);
+    this.setProperty('prod',newprod);
+};
+
 Building.prototype.update = function(){
-    if(this.built) {
-        var deltaProd = Date.now() - this.lastProdCycle;
-        var interval = GameServer.buildingsData[this.type].prodInterval*1000;
-        var nbCycles = Math.floor(deltaProd/interval);
-        if(nbCycles > 0){
-            this.lastProdCycle += nbCycles*interval;
-            console.log(nbCycles,' build cycles for ',this.id);
-            for(var i = 0; i < nbCycles; i++){
+    this.computeProductivity();
+
+    var buildingDataType = GameServer.buildingsData[this.type];
+    var cycleName = this.built ? 'lastProdCycle' : 'lastBuildCycle';
+    var interval = this.built ? buildingDataType.prodInterval : buildingDataType.buildInterval;
+
+    var delta = Date.now() - this[cycleName];
+    //console.log('[',this.id,'] delta = ',delta);
+    interval *= 1000;
+    var nbCycles = Math.floor(delta/interval);
+    if(nbCycles > 0){
+        this[cycleName] += nbCycles*interval;
+        console.log(nbCycles,' cycle for ',this.id);
+        for(var i = 0; i < nbCycles; i++){
+            if(this.built){
                 this.updateProd();
-            }
-        }
-    }else{
-        var deltaBuild = Date.now() - this.lastBuildCycle;
-        var interval = GameServer.buildingsData[this.type].buildInterval*1000;
-        if(!interval) return;
-        var nbCycles = Math.floor(deltaBuild/interval);
-        if(nbCycles > 0){
-            console.log(nbCycles,' prod cycles for ',this.id);
-            this.lastBuildCycle += nbCycles*interval;
-            for(var i = 0; i < nbCycles; i++){
+            }else{
                 this.updateBuild();
             }
         }
@@ -69,17 +77,19 @@ Building.prototype.update = function(){
 
 Building.prototype.updateProd = function(){
     var production = GameServer.buildingsData[this.type].production;
+    if(!production) return;
     for(var i = 0; i < production.length; i++){
         var item = production[i][0];
-        var nb = production[i][1];
-        GameServer.addToFort(item,nb,this.settlement);
+        var nb = Formulas.computeProdIncrement(this.prod,production[i][1]);
+        if(nb > 0) this.settlement.addToFort(item,nb);
     }
 };
 
 Building.prototype.updateBuild = function(){
     var rate = GameServer.buildingsData[this.type].buildRate;
     if(!rate) return;
-    var increment = Math.round((this.prod/100)*rate);
+    var increment = Formulas.computeBuildIncrement(this.prod,rate);
+    console.log('increment : ',increment);
     var newprogress = Utils.clamp(this.progress+increment,this.progress,100);
     this.setProperty('progress',newprogress);
     if(this.progress == 100) this.setProperty('built',true);
@@ -157,7 +167,7 @@ Building.prototype.takeGold = function(nb){
 Building.prototype.trim = function(){
     var trimmed = {};
     var broadcastProperties =
-        ['id','type','settlement','gold','prices','built','prod','progress',
+        ['id','type','sid','gold','prices','built','prod','progress','committed',
             'buildings','population','foodsurplus','danger']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];

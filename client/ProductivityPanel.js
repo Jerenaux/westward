@@ -15,16 +15,36 @@ ProductivityPanel.prototype.addInterface = function(){
     var alignx = 10;
     var y = 20;
     var x = alignx;
-    this.addPolyText(x,y,['+0%',' development level'],[null,null]);
+    this.addPolyText(x,y,['+100%',' development level'],[null,null]);
     y += 15;
-    this.addPolyText(x,y,['-10%',' food deficit'],[Utils.colors.red,null]);
+    var txts = this.addPolyText(x,y,['-1000%',' food deficit'],[Utils.colors.red,null]);
+    this.foodText = txts[0];
     y += 15;
-    this.addPolyText(x,y,['+7%',' citizen commitment ','(2)'],[Utils.colors.green,null,Utils.colors.gold]);
+    txts = this.addPolyText(x,y,['+100%',' citizen commitment ','(2)'],[Utils.colors.green,null,Utils.colors.gold]);
+    this.commitmentText = txts[0];
+    this.nbCommittedText = txts[2];
+    y += 15;
+    txts = this.addPolyText(x,y,['Total: ','100%'],[null,Utils.colors.gold]);
+    this.totalProd = txts[1];
+};
+
+ProductivityPanel.prototype.update = function(){
+    var data = Engine.currentBuiling;
+    this.totalProd.setText(data.prod+'%');
+    this.nbCommittedText.setText('('+data.committed+')');
+    var commitModifier = Formulas.commitmentProductivityModifier(data.committed);
+    this.commitmentText.setText('+'+commitModifier+'%');
+    this.commitmentText.setFill(commitModifier > 0 ? Utils.colors.green : Utils.colors.white);
+    var foodModifier = Formulas.deduceFoodModifier(data.prod,commitModifier);
+    this.foodText.setFill(foodModifier >= 0 ? Utils.colors.green : Utils.colors.red);
+    if(foodModifier >= 0) foodModifier = '+'+foodModifier;
+    this.foodText.setText(foodModifier+'%');
 };
 
 ProductivityPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
     this.displayTexts();
+    this.update();
 };
 
 ProductivityPanel.prototype.hide = function(){

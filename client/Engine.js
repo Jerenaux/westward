@@ -523,7 +523,7 @@ Engine.makeBattleMenu = function(){
 };
 
 Engine.makeProductionMenu = function(){
-    var production = new Menu('Hut');
+    var production = new Menu('Production');
     var w = 400;
     var h = 250;
     var x = (Engine.getGameConfig().width-w)/2;
@@ -533,7 +533,11 @@ Engine.makeProductionMenu = function(){
     var prodx = (Engine.getGameConfig().width-prodw)/2;
 
     production.addPanel('production',new ProductionPanel(x,100,w,h,'Production'));
-    production.addPanel('prod',new ProductivityPanel(prodx,prody,prodw,prodh,'Productivity modifiers'));
+    var prod = new ProductivityPanel(prodx,prody,prodw,prodh,'Productivity modifiers');
+    production.addPanel('prod',prod);
+    production.onUpdateProductivity = function(){
+        prod.update();
+    };
     return production;
 };
 
@@ -553,12 +557,16 @@ Engine.makeConstructionMenu = function(){
     constr.addPanel('progress',progress);
     var materials = new MaterialsPanel(x,invy,w,150,'Materials');
     constr.addPanel('materials',materials);
-    constr.addPanel('prod',new ProductivityPanel(prodx,prody,prodw,100,'Productivity modifiers'));
+    var prod = new ProductivityPanel(prodx,prody,prodw,100,'Productivity modifiers');
+    constr.addPanel('prod',prod);
     constr.onUpdateShop = function(){
         materials.update();
     };
     constr.onUpdateConstruction = function(){
         progress.update();
+    };
+    constr.onUpdateProductivity = function(){
+        prod.update();
     };
     return constr;
 };
@@ -1076,7 +1084,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.newbuildings) {
         for (var n = 0; n < data.newbuildings.length; n++) {
             var b = data.newbuildings[n];
-            var building = Engine.addBuilding(b.id, b.x, b.y, b.type, b.settlement, b.built);//, b.inventory, b.gold,b.prices);
+            var building = Engine.addBuilding(b.id, b.x, b.y, b.type, b.sid, b.built);//, b.inventory, b.gold,b.prices);
             Engine.updateBuilding(building,b);
         }
     }
@@ -1161,50 +1169,57 @@ Engine.handleBattleUpdates = function(entity, data){
 };
 
 Engine.updateBuilding = function(building,data){ // data contains the updated data from the server
+    var updateEvents = new Set();
     if(data.inventory){
         building.inventory.fromList(data.inventory);
-        //Engine.checkForShopUpdate(building.id);
-        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShop');
+        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShop');
+        updateEvents.add('onUpdateShop');
     }
     if(data.gold) {
         building.gold = data.gold;
-        //Engine.checkForShopUpdate(building.id);
-        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShopGold');
+        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShopGold');
+        updateEvents.add('onUpdateShopGold');
     }
     if(data.items){
         Engine.updateInventory(building.inventory,data.items);
-        //Engine.checkForShopUpdate(building.id);
-        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShop');
+        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShop');
+        updateEvents.add('onUpdateShop');
     }
     if(data.prices){
         building.prices= data.prices;
-        //Engine.checkForShopUpdate(building.id);
-        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShop');
+        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShop');
+        updateEvents.add('onUpdateShop');
     }
     if(data.buildings){
         building.buildings = data.buildings;
-        //if(Engine.currentBuiling && Engine.currentBuiling.id == id) Engine.currentMenu.onUpdateBuildings();
-        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateBuildings');
+        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateBuildings');
+        updateEvents.add('onUpdateBuildings');
     }
     if(data.population){
         building.population = data.population;
-        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateSettlementStatus');
+        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateSettlementStatus');
+        updateEvents.add('onUpdateSettlementStatus');
     }
     if(data.foodsurplus){
         building.foodsurplus = data.foodsurplus;
-        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateSettlementStatus');
+        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateSettlementStatus');
+        updateEvents.add('onUpdateSettlementStatus');
     }
     if(data.danger){
         building.danger = data.danger;
-        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateMap');
+        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateMap');
+        updateEvents.add('onUpdateMap');
     }
     if(data.progress){
         building.progress = data.progress;
-        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateConstruction');
+        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateConstruction');
+        updateEvents.add('onUpdateConstruction');
     }
     if(data.prod){
         building.prod = data.prod;
-        Engine.checkForBuildingMenuUpdate(building.id,'onUpdateConstruction');
+        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateConstruction');
+        updateEvents.add('onUpdateConstruction');
+        updateEvents.add('onUpdateProductivity');
     }
     if(data.built){
         if(data.built == true && building.built == false) building.build();
@@ -1213,6 +1228,14 @@ Engine.updateBuilding = function(building,data){ // data contains the updated da
             Engine.enterBuilding(building.id);
         }
     }
+    if(data.committed){
+        building.committed = data.committed;
+        updateEvents.add('onUpdateProductivity');
+    }
+
+    updateEvents.forEach(function(e){
+        Engine.checkForBuildingMenuUpdate(building.id,e);
+    });
 };
 
 Engine.inThatBuilding = function(id){

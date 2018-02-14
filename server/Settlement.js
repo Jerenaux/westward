@@ -3,6 +3,7 @@
  */
 
 var GameServer = require('./GameServer.js').GameServer;
+var Formulas = require('../shared/Formulas.js').Formulas;
 
 function Settlement(id,name,pop){
     this.id = id;
@@ -12,15 +13,18 @@ function Settlement(id,name,pop){
     this.buildings = [];
 }
 
-Settlement.prototype.addBuilding = function(building){
+Settlement.prototype.registerBuilding = function(building){
     this.buildings.push(building);
+    if(this.fort) this.fort.addBuilding(building);
 };
 
 Settlement.prototype.getBuildings = function(){
-    return this.buildings;
+    return this.buildings.map(function(b){
+        return b.listingTrim();
+    });
 };
 
-Settlement.prototype.setFort = function(fort){
+Settlement.prototype.registerFort = function(fort){
     this.fort = fort;
     this.fort.setProperty('population',this.pop);
     this.fort.setProperty('danger',[
@@ -34,17 +38,35 @@ Settlement.prototype.getFort = function(){
     return this.fort;
 };
 
-Settlement.prototype.update = function(){
-    console.log(this.name+' updating');
+Settlement.prototype.addToFort = function(item,nb){
+    this.fort.giveItem(item,nb);
+};
 
-    GameServer.addToFort(1,-1,this.id);
+Settlement.prototype.consumeFood = function(){
+    // TODO: take pop into account
+    this.addToFort(1,-1);
+};
 
+Settlement.prototype.computeFoodSurplus = function(){
     var foodAmount = this.fort.getItemNb(1);
     var foodPerCitizen = 20;
     var required = foodPerCitizen*this.pop;
     var delta = foodAmount - required;
     var pct = delta/required;
+    this.surplus = pct;
+    console.log('surplus :',pct);
     this.fort.setProperty('foodsurplus',Math.round(pct*100));
+};
+
+Settlement.prototype.computeFoodProductivity = function(){
+    return Formulas.foodProductivityModifier(this.surplus);
+};
+
+Settlement.prototype.update = function(){
+    console.log(this.name+' updating');
+
+    this.consumeFood();
+    this.computeFoodSurplus();
 
     this.buildings.forEach(function(b){
         b.update();

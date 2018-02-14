@@ -51,15 +51,16 @@ Week:
 Fort: next level requirements
 Construction: add commitment button (to production buildings too)
 Construction: earn civic xp on commit (and use real numbers in character)
-Economic loop: actual computation of productivity modifiers (real numbers), effect on buildings (check for materials)
-Economic loop: apply effect of food deficit on players
+Economic loop: impact of materials availability on building 
+Economic loop: apply effect of food deficit on players (+ update character panel)
 Economic loop: update buildings panel in real time (clever updates)
 Economic loop: test all updates of all menus 
 Character: display committed buildings
+Character: add new stats
 Battle: skin dead animals
 Battle: display event pop-ups after skinning
 Battle: multiplayer fights
-Finish: review base stats values
+Finish: review base stats values; test economy for a while
 
 
 Cleaning:

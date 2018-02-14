@@ -58,10 +58,6 @@ PersonalUpdatePacket.prototype.addAmmo = function(slot,nb){
     this.ammo.push({slot:slot,nb:nb});
 };
 
-/*PersonalUpdatePacket.prototype.addBuildingPin = function(data){
-    this.pins.push(data);
-};*/
-
 PersonalUpdatePacket.prototype.addMsg = function(msg){
     this.msgs.push(msg);
 };

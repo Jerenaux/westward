@@ -22,8 +22,9 @@ ProgressBar.prototype.finalize = function(){
 };
 
 ProgressBar.prototype.setLevel = function(level,max){
+    if(level == this.level && (!max || max == this.max)) return;
     if(max) this.max = max;
-    var delta = Math.abs(this.level-level)/this.max;
+    var delta = Math.abs(this.level-level)/this.max; // Used to compute duration of tween
     this.level = Utils.clamp(level,0,this.max);
     var pct = this.level/this.max;
     var newLength = Math.round(this.maxLength*pct);

@@ -34,7 +34,9 @@ ProductionPanel.prototype.displaySlots = function(){
         slot.addIcon(itemData.atlas,itemData.frame);
 
         slot.addText(43,2,itemData.name);
-        slot.addText(43,16,'+'+nb+'/cycle',Utils.colors.gold);
+
+        var increment = Formulas.computeProdIncrement(data.prod,nb);
+        slot.addText(43,16,'+'+increment+'/cycle',Utils.colors.gold);
         slot.display();
     }
 };

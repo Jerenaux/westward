@@ -24,7 +24,6 @@ var Stats = {
             suffix: '%'
         },
         acc: {
-            'key': 'acc',
             name: 'Accuracy',
             min: 0,
             max: 100,
@@ -33,7 +32,6 @@ var Stats = {
             suffix: '%'
         },
         def: {
-            'key': 'def',
             name: 'Defense',
             min: 0,
             max: 100,
@@ -41,7 +39,6 @@ var Stats = {
             frame:4
         },
         mdmg: {
-            'key': 'mdmg',
             name: 'Melee Damage',
             min: 0,
             max: 100,
@@ -49,7 +46,6 @@ var Stats = {
             frame: 3
         },
         rdmg: {
-            'key': 'rdmg',
             name: 'Ranged Damage',
             min: 0,
             max: 100,
