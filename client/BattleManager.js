@@ -44,26 +44,19 @@ BattleManager.getActiveFighter = function(id){
 
 BattleManager.manageTurn = function(shortID){
     if(!BattleManager.inBattle) return;
+
     var active = BattleManager.getActiveFighter(shortID);
-    /*if(active.isHero){
-        Engine.displayCounter();
-        BattleManager.actionTaken = false;
-    }else{
-        Engine.hideCounter();
-    }*/
-    if(active.isHero){
-        BattleManager.actionTaken = false;
-    }
+    if(active.isHero) BattleManager.actionTaken = false;
+
     var timer = Engine.currentMenu.panels['timer'].bar;
     timer.setLevel(100,100,1);
-    timer.setLevel(0,100,BattleManager.countdown);
+    timer.setLevel(0,100,BattleManager.countdown*1000);
     Engine.manageArrow(active);
 };
 
 BattleManager.endFight = function(){
     Engine.displayUI();
     Engine.showMarker();
-    Engine.hideCounter();
     Engine.hideBattleArrow();
     BattleManager.inBattle = false;
     Engine.menus.battle.hide();

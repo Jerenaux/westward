@@ -367,6 +367,9 @@ Engine.makeUI = function(){
 
     Engine.makeBattleUI();
     Engine.displayUI();
+
+    Engine.bar = new MiniProgressBar(20,20,300);
+    //Engine.bar.display();
 };
 
 Engine.addMenuIcon = function(x,y,frame,menu){
@@ -402,42 +405,11 @@ Engine.makeBattleUI = function(){
         }
     );
 
-    /*Engine.timerText = Engine.scene.add.text(
-        Engine.getGameConfig().width-20,
-        Engine.getGameConfig().height, '0',
-        { font: '45px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    Engine.timerText.setOrigin(1,1);
-    Engine.timerText.setScrollFactor(0);
-    Engine.timerText.setDepth(Engine.UIDepth+3);
-    Engine.timerText.setVisible(false);*/
-
     Engine.battleArrow = Engine.scene.add.sprite(0,0,'arrow');
     Engine.battleArrow.setVisible(false);
     Engine.battleArrow.setDepth(Engine.UIDepth);
     Engine.battleArrow.setOrigin(0,1);
 };
-
-/*Engine.displayCounter = function(){
-    if(Engine.timer) clearInterval(Engine.timer);
-    Engine.timer = setInterval(function(){
-        if(BattleManager.countdown < 0) {
-            clearInterval(Engine.timer);
-            Engine.timerText.setVisible(false);
-        }
-        Engine.updateCounter();
-    },1000);
-    Engine.updateCounter();
-    Engine.timerText.setVisible(true);
-};
-
-Engine.updateCounter = function(){
-    Engine.timerText.setText(BattleManager.countdown--);
-};
-
-Engine.hideCounter = function(){
-    Engine.timerText.setVisible(false);
-    clearInterval(Engine.timer);
-};*/
 
 Engine.displayBattleArrow = function(){
     Engine.battleArrow.setVisible(true);
@@ -454,8 +426,9 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
     sprite.setDepth(target.depth+1);
     sprite.anims.play(animation);
 
-    var text = Engine.getNextHP();
-    text.setPosition(target.x+16,target.y+16);
+    var targetY = target.y+16;
+    var text = Engine.getNextHP(targetY-40);
+    text.setPosition(target.x+16,targetY);
     text.setDepth(target.depth+1);
     text.setText('-'+dmg);
     text.tween.updateTo('y',text.y - 20,false);
@@ -463,8 +436,9 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
 };
 
 Engine.handleMissAnimation = function(target){
-    var text = Engine.getNextHP();
-    text.setPosition(target.x+16,target.y+16);
+    var targetY = target.y+16;
+    var text = Engine.getNextHP(targetY-40);
+    text.setPosition(target.x+16,targetY);
     text.setDepth(target.depth+1);
     text.setText('Miss');
     text.tween.play();
@@ -502,20 +476,26 @@ Engine.hideUI = function(){
 };
 
 Engine.makeBattleMenu = function(){
+    var alignx = 845;
     var battle = new Menu();
-    var equipment = new EquipmentPanel(835,100,170,120,'Equipment',true); // true: battle menu
+    var equipment = new EquipmentPanel(alignx,100,170,120,'Equipment',true); // true: battle menu
     battle.addPanel('equipment',equipment);
-    var items = new InventoryPanel(835,220,170,225,'Items');
+    var items = new InventoryPanel(alignx,220,170,225,'Items');
     items.setInventory(Engine.player.inventory,4,true,Engine.inventoryClick);
     items.modifyFilter({
         type: 'property',
         property: 'useInBattle'
     });
     battle.addPanel('items',items);
-    var bar = new BigProgressBar(835,445,170);
+    var bar = new BigProgressBar(alignx,445,170);
     bar.setLevel(Engine.player.stats['hp'],Stats.dict['hp'].max);
     battle.addPanel('bar',bar);
-    battle.addPanel('timer',new BattleTimerPanel(0,0,300,30));
+
+    var timerw = 300;
+    var timerh = 40;
+    var timerx = (Engine.getGameConfig().width-timerw)/2;
+    var timery = Engine.getGameConfig().height-timerh;
+    battle.addPanel('timer',new BattleTimerPanel(timerx,timery,timerw,timerh));
 
     battle.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
     battle.onUpdateInventory = items.updateInventory.bind(items);
@@ -1006,12 +986,6 @@ Engine.updateSelf = function(data){
         Engine.player.gold = data.gold;
         Engine.updateMenus('gold');
     }
-    /*if(data.pins){
-        for(var i = 0; i < data.pins.length; i++){
-            Engine.buildingsList[data.pins[i].id] = data.pins[i];
-        }
-        Engine.updateMenus('pins');
-    }*/
     if(data.msgs){
         for(var i = 0; i < data.msgs.length; i++){
             Engine.handleMsg(data.msgs[i]);
@@ -1061,8 +1035,7 @@ Engine.updateMenus = function(category){
         'stats': 'onUpdateStats',
         'equip': 'onUpdateEquipment',
         'inv': 'onUpdateInventory',
-        'gold': 'onUpdateGold',
-        'pins': 'onUpdatePins'
+        'gold': 'onUpdateGold'
     };
 
     for(var m in Engine.menus){
@@ -1450,7 +1423,7 @@ Engine.recycleAnim = function(sprite){
     Engine.availableAnimSprites.push(sprite);
 };
 
-Engine.getNextHP = function(){
+Engine.getNextHP = function(targetY){
     if(Engine.availableHP.length > 0) return Engine.availableHP.shift();
     var text = Engine.scene.add.text(0,0, '0',  { font: '20px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     text.setVisible(false);
@@ -1458,7 +1431,8 @@ Engine.getNextHP = function(){
     text.tween = Engine.scene.tweens.add(
         {
             targets: text,
-            y: '-=20',
+            //y: '-=20',
+            y: targetY,
             duration: 1000,
             paused: true,
             onStart: function(){

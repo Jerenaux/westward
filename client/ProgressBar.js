@@ -5,7 +5,7 @@
 function ProgressBar(x,y,w,color){
     this.displayed = false;
     this.max = 100;
-    this.level = 100;
+    this.level = 0;
     this.body = [];
     this.hasHead = false;
     this.hasTail = false;
@@ -22,10 +22,10 @@ ProgressBar.prototype.finalize = function(){
 };
 
 ProgressBar.prototype.setLevel = function(level,max,duration){
-    if(level == this.level && (!max || max == this.max)) return;
+    //if(level == this.level && (!max || max == this.max)) return;
     if(max) this.max = max;
     var delta = Math.abs(this.level-level)/this.max; // Used to compute duration of tween
-    this.level = Utils.clamp(level,0,this.max);
+    this.level = Utils.clamp(level,0,this.max); // TODO: Tween this.level?
     var pct = this.level/this.max;
     var newLength = Math.round(this.maxLength*pct);
 
@@ -33,12 +33,13 @@ ProgressBar.prototype.setLevel = function(level,max,duration){
 
     if(dw == 0) return;
     if(this.displayed){
-        var duration = duration || (delta * 2000);
+        var duration = duration || Math.max((delta * 2000),1);
         var _head = this.head;
         var _tail = this.tail;
         var _lvl = this.level;
         var _bar = this;
-        Engine.scene.tweens.add(
+        if(this.bodyTween) this.bodyTween.stop();
+        this.bodyTween = Engine.scene.tweens.add(
             {
                 targets: this.barBody,
                 width: newLength,
@@ -56,10 +57,12 @@ ProgressBar.prototype.setLevel = function(level,max,duration){
                 }
             });
         if(_head) {
-            Engine.scene.tweens.add(
+            if(this.headTween) this.headTween.stop();
+            this.headTween = Engine.scene.tweens.add(
                 {
                     targets: this.head,
-                    x: '-=' + dw,
+                    //x: '-=' + dw,
+                    x: this.zeroX + newLength,
                     duration: duration
                 });
         }
@@ -95,15 +98,14 @@ ProgressBar.prototype.hide = function(){
 
 function MiniProgressBar(x,y,w,color){
     ProgressBar.call(this,x,y,w,color);
-    
-    w -= 0;
-    this.maxLength = w+0;
 
+    this.maxLength = w;
     this.body.push(Engine.scene.add.sprite(x,y,'UI','minibar_left'));
     x += 6;
-    this.body.push(Engine.scene.add.tileSprite(x,y,w,12,'UI','minibar_middle'));
+    this.body.push(Engine.scene.add.tileSprite(x,y,w-1,12,'UI','minibar_middle'));
+    this.zeroX = x-2;
     x += w;
-    this.body.push(Engine.scene.add.sprite(x,y,'UI','minibar_right'));
+    this.body.push(Engine.scene.add.sprite(x-1,y,'UI','minibar_right'));
 
     color = color || 'gold';
     x -= w;
@@ -127,19 +129,6 @@ function MiniProgressBar(x,y,w,color){
 MiniProgressBar.prototype = Object.create(ProgressBar.prototype);
 MiniProgressBar.prototype.constructor = MiniProgressBar;
 
-/*MiniProgressBar.prototype.display = function(){
-    ProgressBar.prototype.display.call(this);
-    this.body[0].setFrame((this.level == 0 ? 'minibar_left' : 'minibar_left_filled'));
-    this.body[2].setFrame((this.level == this.max ? 'minibar_right_filled' : 'minibar_right'));
-};*/
-
-/*MiniProgressBar.prototype.tweenStart = function(){
-    this.body[0].setFrame((this.level == 0 ? 'minibar_left' : 'minibar_left_filled'));
-};
-
-MiniProgressBar.prototype.tweenEnd = function(){
-    this.body[0].setFrame((this.level == 0 ? 'minibar_left' : 'minibar_left_filled'));
-};*/
 
 // #######################
 
@@ -151,6 +140,7 @@ function BigProgressBar(x,y,w,color){
     this.body.push(Engine.scene.add.sprite(x,y,'UI','healthbar_left'));
     x += 24;
     this.body.push(Engine.scene.add.tileSprite(x,y,w,20,'UI','healthbar_middle'));
+    this.zeroX = x-15;
     x += w;
     this.body.push(Engine.scene.add.sprite(x,y,'UI','healthbar_right'));
 

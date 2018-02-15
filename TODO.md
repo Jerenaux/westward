@@ -65,6 +65,7 @@ Finish: review base stats values; test economy for a while
 Cleaning:
 --------
 Performance:
+- Concile the two coexisting menu update systems: the one used by updateSelf and the one used by updateBuilding
 - Dont send full building inventories when buying/selling (send arrays of deltas)
 - Use pool for footsteps (see Groups, who now act as pools)
 - Use pools for players, animals, ...

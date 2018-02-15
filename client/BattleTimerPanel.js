@@ -11,7 +11,8 @@ BattleTimerPanel.prototype = Object.create(Panel.prototype);
 BattleTimerPanel.prototype.constructor = BattleTimerPanel;
 
 BattleTimerPanel.prototype.addInterface = function(){
-    this.bar = new MiniProgressBar(this.x+10,this.y+10,this.width-40);
+    this.bar = new MiniProgressBar(this.x+10,this.y+15,this.width-40);
+    this.bar.setLevel(100,100);
 };
 
 BattleTimerPanel.prototype.display = function(){

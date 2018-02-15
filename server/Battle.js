@@ -215,6 +215,7 @@ Battle.prototype.applyDamage = function(f,dmg){
 };
 
 Battle.prototype.processAttack = function(a,b){
+    var delay = 1000;
     if(this.nextTo(a,b)){
         console.log('melee attack');
         var dmg = this.computeMeleeDamage(a,b);
@@ -222,7 +223,7 @@ Battle.prototype.processAttack = function(a,b){
         b.setProperty('meleeHit',dmg);
         return {
             success: true,
-            delay: 500
+            delay: delay
         };
     }else{
         if(!a.canRange()) return false;
@@ -238,7 +239,7 @@ Battle.prototype.processAttack = function(a,b){
         console.log('ranged attack');
         return {
             success: true,
-            delay: 500
+            delay: delay
         };
     }
 };
