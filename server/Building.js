@@ -44,9 +44,7 @@ Building.prototype.registerBuilding = function(){
 };
 
 Building.prototype.computeProductivity = function(){
-    console.log('Food prod = ',this.settlement.computeFoodProductivity());
     var newprod = Formulas.computeProductivity(this.settlement.computeFoodProductivity(),Formulas.commitmentProductivityModifier(this.committed));
-    console.log('productivity : ',newprod);
     newprod = Math.round(newprod);
     this.setProperty('prod',newprod);
 };
@@ -59,12 +57,11 @@ Building.prototype.update = function(){
     var interval = this.built ? buildingDataType.prodInterval : buildingDataType.buildInterval;
 
     var delta = Date.now() - this[cycleName];
-    //console.log('[',this.id,'] delta = ',delta);
     interval *= 1000;
     var nbCycles = Math.floor(delta/interval);
     if(nbCycles > 0){
         this[cycleName] += nbCycles*interval;
-        console.log(nbCycles,' cycle for ',this.id);
+        //console.log(nbCycles,' cycle for ',this.id);
         for(var i = 0; i < nbCycles; i++){
             if(this.built){
                 this.updateProd();
@@ -89,7 +86,6 @@ Building.prototype.updateBuild = function(){
     var rate = GameServer.buildingsData[this.type].buildRate;
     if(!rate) return;
     var increment = Formulas.computeBuildIncrement(this.prod,rate);
-    console.log('increment : ',increment);
     var newprogress = Utils.clamp(this.progress+increment,this.progress,100);
     this.setProperty('progress',newprogress);
     if(this.progress == 100) this.setProperty('built',true);

@@ -2,6 +2,7 @@
  * Created by Jerome on 09-10-17.
  */
 var GameObject = require('./GameObject.js').GameObject;
+var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
@@ -41,8 +42,6 @@ MovingEntity.prototype.updateWalk = function(){
     // At any given time, entity is in the process of moving from the 0th index to the 1st in the path array
     if(this.moving && Date.now() >= this.nextPathTick){
         if(this.path.length <= 1) return;
-        //if(debug) console.log('['+this.constructor.name+' '+this.id+'] Tick');
-        //if(debug) console.log('['+this.constructor.name+' '+this.id+'] Current path length : '+this.path.length);
         this.path.shift(); // Position 0 after the shift is where the entity is supposed to be at this time
         var x = this.path[0][0];
         var y = this.path[0][1];
@@ -60,6 +59,7 @@ MovingEntity.prototype.updatePosition = function(x,y){
     this.x = x;
     this.y = y;
     this.setOrUpdateAOI();
+    if(!this.inFight) GameServer.checkForBattle(this);
 };
 
 MovingEntity.prototype.endPath = function(){
@@ -67,7 +67,6 @@ MovingEntity.prototype.endPath = function(){
     this.moving = false;
     this.flagToStop = false;
     this.onArrival();
-    //console.log('path ended at',this.x,this.y);
 };
 
 MovingEntity.prototype.getEndOfPath = function(){

@@ -41,5 +41,6 @@ var Animal = new Phaser.Class({
         }else{
             Engine.requestBattle(Engine.player,this);
         }
+        Engine.interrupt = true;
     }
 });

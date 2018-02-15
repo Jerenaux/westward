@@ -151,6 +151,7 @@ Engine.create = function(){
     Engine.getGameInstance().canvas.style.cursor = Engine.cursor; // Sets the pointer to hand sprite
 
     Engine.dragging = false;
+    Engine.interrupt = false;
     Engine.scene.input.setTopOnly(false);
     Engine.scene.input.on('pointerdown', Engine.handleDown);
     Engine.scene.input.on('pointerup', Engine.handleClick);
@@ -828,12 +829,16 @@ Engine.isColliding = function(tile){ // tile is the index of the tile in the til
 };
 
 Engine.handleDown = function(pointer,objects){
-    if(objects[0].handleDown) objects[0].handleDown(pointer);
+    if(objects.length > 0 && objects[0].handleDown) objects[0].handleDown(pointer);
 };
 
 Engine.handleClick = function(pointer,objects){
     if(objects.length > 0){
         for(var i = 0; i < Math.min(objects.length,2); i++){ // disallow bubbling too deep, only useful in menus (i.e. shallow)
+            if(Engine.interrupt){
+                Engine.interrupt = false;
+                return;
+            }
             if(objects[i].handleClick) objects[i].handleClick(pointer);
         }
     }else{
@@ -1136,16 +1141,14 @@ Engine.isHero = function(player){
 };
 
 Engine.updatePlayer = function(player,data){ // data contains the updated data from the server
-    if(data.path && (player.id != Engine.player.id || Engine.player.inFight)) player.move(data.path);
+    if(data.path && !player.isHero) player.move(data.path);
     if(data.inBuilding > -1) {
         if(!player.isHero) player.setVisible(false);
         player.inBuilding = data.inBuilding;
-        //if(Engine.isHero(player)) Engine.enterBuilding(data.inBuilding);
     }
     if(data.inBuilding == -1){
         if(!player.isHero) player.setVisible(true);
         player.inBuilding = data.inBuilding;
-        //if(Engine.isHero(player)) Engine.exitBuilding();
     }
     Engine.handleBattleUpdates(player,data);
     if(data.dead == true) {
@@ -1382,10 +1385,10 @@ Engine.requestBattle = function(a,b) {
     Client.startBattle(b.id);
 };
 
-Engine.requestBattleMove = function(event){
+/*Engine.requestBattleMove = function(event){
     if(BattleManager.actionTaken) return;
     Engine.requestBattleAction('move',Engine.getMouseCoordinates(event).tile);
-};
+};*/
 
 Engine.requestBattleAttack = function(target){
     if(BattleManager.actionTaken) return;

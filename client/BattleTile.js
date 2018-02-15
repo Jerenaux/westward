@@ -19,6 +19,7 @@ var BattleTile = new Phaser.Class({
         this.setAlpha(0.5);
         this.setInteractive();
         this.baseFrame = 0;
+        this.inRange = false;
     },
 
     setUp: function(x,y){
@@ -31,10 +32,6 @@ var BattleTile = new Phaser.Class({
     },
 
     manageFrame: function(){
-        if(!BattleManager.inBattle) {
-            console.log('BattleManage status : ',BattleManager.inBattle);
-            return;
-        }
         this.dist = Utils.euclidean({
             x: this.tx,
             y: this.ty
@@ -42,7 +39,8 @@ var BattleTile = new Phaser.Class({
             x: Engine.player.tileX,
             y: Engine.player.tileY
         });
-        this.baseFrame = (this.dist <= PFUtils.battleRange ? 2 : 0);
+        this.inRange = (this.dist <= PFUtils.battleRange);
+        this.baseFrame = (this.inRange ? 2 : 0);
         this.setFrame(this.baseFrame);
     },
 
@@ -54,7 +52,7 @@ var BattleTile = new Phaser.Class({
         this.setFrame(this.baseFrame);
     },
 
-    handleClick: function(event){
-        Engine.requestBattleMove(event);
+    handleClick: function(pointer){
+        if(!Engine.player.inFight || this.inRange) Engine.moveToClick(pointer);
     }
 });

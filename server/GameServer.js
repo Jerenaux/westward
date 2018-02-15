@@ -64,6 +64,7 @@ GameServer.readMap = function(mapsPath){
         maxy: 661 //694
     };
 
+    GameServer.battleCells = new SpaceMap();
     GameServer.itemsData = JSON.parse(fs.readFileSync('./assets/data/items.json').toString());
     GameServer.animalsData = JSON.parse(fs.readFileSync('./assets/data/animals.json').toString());
 
@@ -86,7 +87,7 @@ GameServer.readMap = function(mapsPath){
 
     // Spawn animals
     var animals = JSON.parse(fs.readFileSync('./assets/maps/animals.json').toString());
-    for(var i = 0; i < animals.list.length; i++){
+    for(var i = 0; i < 1; i++){ // animals.list.length
         var data = animals.list[i];
         var x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
         var y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
@@ -340,6 +341,12 @@ GameServer.handlePath = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     player.setAction(data.action);
     player.setPath(data.path);
+    if(player.inFight){
+        // TODO: if(player.inBattleRange(x,y)) ...
+        player.battle.processAction(player,{
+            action: 'move'
+        });
+    }
 };
 
 GameServer.handleUse = function(data,socketID){
@@ -370,6 +377,10 @@ GameServer.handleUnequip = function(data,socketID) {
 GameServer.handleExit = function(socketID){
     var player = GameServer.getPlayer(socketID);
     player.exitBuilding();
+};
+
+GameServer.checkForBattle = function(entity){
+    if(GameServer.battleCells.get(entity.x,entity.y)) console.log('stepped in battlezone!');
 };
 
 GameServer.handleAOItransition = function(entity,previous){

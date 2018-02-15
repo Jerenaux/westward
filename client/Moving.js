@@ -28,53 +28,20 @@ var Moving = new Phaser.Class({
         this.battlezone = [];
 
         this.setInteractive();
-        //console.log('['+this.constructor.name+'] scene : ',this.scene);
-
-        /*this.halo = Engine.scene.add.image(0,0,'battlehalo');
-        this.halo.setDepth(Engine.markerDepth+0.1);
-        this.halo.setVisible(false);
-        this.displayedHalo = false;
-        this.updateHalo();
-        this.haloTween = Engine.scene.tweens.add({
-            targets: this.halo,
-            alpha: 0.2,
-            duration: 750,
-            yoyo: true,
-            repeat: -1,
-            paused: true
-        });*/
     },
 
     getShortID: function(){
         return this.constructor.name[0]+this.id;
     },
 
-    /*displayHalo: function(){
-        if(this.displayedHalo) return;
-        this.halo.setVisible(true);
-        this.haloTween.play();
-        this.displayedHalo = true;
-    },
-
-    hideHalo: function(){
-        if(!this.displayedHalo) return;
-        this.halo.setVisible(false);
-        this.haloTween.stop();
-        this.displayedHalo = false;
-    },
-
-    updateHalo: function(){
-        this.halo.setPosition(this.x+13,this.y+24);
-    },*/
-
     updateDepth: function(){
         try {
             this.setDepth(Engine.playersDepth + this.tileY / 1000);
         }catch(e){
-            /*console.log('attempted value : ',Engine.playersDepth + this.tileY / 1000);
+            console.log('attempted value : ',Engine.playersDepth + this.tileY / 1000);
             console.log(this.scene);
             console.log(this);
-            throw e;*/
+            throw e;
         }
     },
 

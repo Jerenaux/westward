@@ -54,7 +54,6 @@ Settlement.prototype.computeFoodSurplus = function(){
     var delta = foodAmount - required;
     var pct = delta/required;
     this.surplus = pct;
-    console.log('surplus :',pct);
     this.fort.setProperty('foodsurplus',Math.round(pct*100));
 };
 
@@ -63,7 +62,7 @@ Settlement.prototype.computeFoodProductivity = function(){
 };
 
 Settlement.prototype.update = function(){
-    console.log(this.name+' updating');
+    //console.log(this.name+' updating');
 
     this.consumeFood();
     this.computeFoodSurplus();

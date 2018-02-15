@@ -10,35 +10,31 @@ var TICK_RATE = 100; // milliseconds
 
 function Battle(f1,f2){
     this.id = GameServer.lastBattleID++;
-    this.participants = [f1,f2];
-    this.fighters = [f2,f1]; // the fighter at position 0 is the one currently in turn
+    this.participants = [];
+    this.fighters = []; // the fighter at position 0 is the one currently in turn
     this.teams = { // number of fighters of each 'team' involved in the fight
-        'Animal': 1,
-        'Player': 1
+        'Animal': 0,
+        'Player': 0
     };
     this.fallen = [];
     this.area = []; // array of rectangular areas
     this.ended = false;
     this.reset();
-    this.start();
+    this.start(f1,f2);
 }
 
-Battle.prototype.start = function(){
-    this.computeArea();
+Battle.prototype.start = function(f1,f2){
+    this.addFighter(f1);
+    this.addFighter(f2);
 
+    this.computeArea();
+    // todo: refine this?
     this.x = this.fighters[0].x;
     this.y = this.fighters[1].y;
     this.aoi = Utils.tileToAOI({x:this.x,y:this.y});
     GameServer.addAtLocation(this);
     GameServer.handleAOItransition(this, null);
 
-    var _battle = this;
-    this.fighters.forEach(function(f){
-        f.setProperty('inFight',true);
-        f.stopWalk();
-        if(f.isPlayer) f.notifyFight(true);
-        f.battle = _battle;
-    });
     this.loop = setInterval(this.update.bind(this),TICK_RATE);
     this.newTurn();
 };
@@ -69,17 +65,27 @@ Battle.prototype.getFighterIndex = function(f){
     return -1;
 };
 
+Battle.prototype.addFighter = function(f){
+    this.fighters.push(f);
+    this.participants.push(f);
+    this.updateTeams(f.constructor.name,1);
+    f.setProperty('inFight',true);
+    f.stopWalk();
+    if(f.isPlayer) f.notifyFight(true);
+    f.battle = this;
+};
+
 Battle.prototype.removeFighter = function(f,idx){
     if(idx == -1) idx = this.getFighterIndex(f);
     if(idx == -1) return;
     f.endFight();
     f.die();
     this.fighters.splice(idx,1);
-    this.updateTeams(f.constructor.name);
+    this.updateTeams(f.constructor.name,-1);
 };
 
-Battle.prototype.updateTeams = function(team){
-    this.teams[team]--;
+Battle.prototype.updateTeams = function(team,increment){
+    this.teams[team] += increment;
     if(this.teams[team] <= 0) this.end();
 };
 
@@ -150,14 +156,22 @@ Battle.prototype.setEndOfTurn = function(delay){
 };
 
 Battle.prototype.processMove = function(f,x,y){
-    if(f.inBattleRange(x,y)){
+    /*if(f.inBattleRange(x,y)){
         f.setPath(GameServer.findPath({x:f.x,y:f.y},{x:x,y:y}));
         return {
             success: true,
             delay: f.getPathDuration()
         };
     }
-    return false;
+    return false;*/
+    if(!f.isPlayer) {
+        console.log(f.x,f.y,x,y);
+        f.setPath(GameServer.findPath({x:f.x,y:f.y},{x:x,y:y}));
+    }
+    return {
+        success: true,
+        delay: f.getPathDuration()
+    };
 };
 
 Battle.prototype.nextTo = function(a,b){
@@ -224,17 +238,15 @@ Battle.prototype.processAttack = function(a,b){
 
 // Entites are only removed when the battle is over ; battlezones are only cleared at that time
 Battle.prototype.end = function(){
-    console.log('ending fight');
     this.ended = true;
     clearInterval(this.loop);
     this.participants.forEach(function(f){
         f.endFight();
         if(f.isPlayer) f.notifyFight(false);
-        //if(f.dead) setTimeout(GameServer.removeEntity,500,f);
     });
     GameServer.removeEntity(this);
+    this.cleanUp();
     console.log('[B'+this.id+'] Ended');
-    // TODO: respawn if quitting battle by disconnecting
 };
 
 Battle.prototype.computeArea = function(){
@@ -265,12 +277,35 @@ Battle.prototype.computeArea = function(){
     var w = Math.max(Math.abs(f1.x - f2.x)+3,3);
     var h = Math.max(Math.abs(f1.y - f2.y)+3,3);
 
-    this.area.push({
+    this.addArea({
         x: tl.x,
         y: tl.y,
         w: w,
         h: h
     });
+};
+
+Battle.prototype.addArea = function(area){
+    for(var x = area.x; x < area.x+area.w; x++){
+        for(var y = area.y; y < area.y+area.h; y++){
+            GameServer.battleCells.add(x,y,true);
+        }
+    }
+    this.area.push(area);
+};
+
+Battle.prototype.removeArea = function(area){
+    for(var x = area.x; x < area.x+area.w; x++){
+        for(var y = area.y; y < area.y+area.h; y++){
+            GameServer.battleCells.delete(x,y);
+        }
+    }
+};
+
+Battle.prototype.cleanUp = function(){
+    for(var i = 0; i < this.area.length; i++){
+        this.removeArea(this.area[i]);
+    }
 };
 
 Battle.prototype.trim = function(){

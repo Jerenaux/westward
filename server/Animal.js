@@ -33,7 +33,6 @@ Animal.prototype.setStartingStats = function(){
     for(var s in stats){
         if(!stats.hasOwnProperty(s)) return;
         this.setStat(s,stats[s]);
-        //this.stats[s] = stats[s];
     }
 };
 
@@ -97,7 +96,7 @@ Animal.prototype.decideBattleAction = function(){
     }else{
         data.action = 'move';
         var dest = this.computeBattleDestination(target);
-        //console.log('destination : ',dest.x,dest.y);
+        //console.log('destination found : ',dest.x,dest.y);
         data.x = dest.x;
         data.y = dest.y;
     }
@@ -124,8 +123,7 @@ Animal.prototype.computeBattleDestination = function(target){
     var dest = target.getEndOfPath();
     var closest = null;
     var minDist = 9999;
-    console.log(this.x,dest.x);
-    console.log(this.y,dest.y);
+    //console.log('target : ',dest.x,dest.y);
     for(var x = Math.min(this.x,dest.x); x <= Math.max(this.x,dest.x); x++){
         for(var y = Math.min(this.y,dest.y); y <= Math.max(this.y,dest.y); y++) {
             //console.log('considering ',x,y);

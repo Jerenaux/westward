@@ -49,7 +49,7 @@ Goal: 1h of gameplay?
 
 Week:
 Fort: next level requirements
-Construction: add commitment button (to production buildings too)
+Construction: handle commitment
 Construction: earn civic xp on commit (and use real numbers in character)
 Economic loop: impact of materials availability on building 
 Economic loop: apply effect of food deficit on players (+ update character panel)
@@ -97,9 +97,9 @@ Content:
 * Battle system
 - Respawn
 - Respawn if disconnect
-- Multiplayer fights (deal with: 1) stepping in active battlezone and 2) being into an appearing battlezone)
+- Add battle areas when new fighters
+- Deal with overlapping battlefields
 - Animal can trigger fights
-- Have monsters drop loot
 * Ecosystem
 - Listing and distribution of pick-up resources
 - Listing and distribution (and yield) of building resources
@@ -110,7 +110,7 @@ Content:
 * Settlement defense
 - Enable commander to build towers
 - Set up stats of towers and forts
-- Towers behave as animals and trigger fights
+- Towers behave as animals and trigger fights (same battle behavior)
 - Same with forts
 - Enable commander to build barracks
 - Production of NPC troops
