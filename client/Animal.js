@@ -35,6 +35,7 @@ var Animal = new Phaser.Class({
     },
 
     handleClick: function(){
+        console.log('animal click');
         // TODO: replace request logic
         if(Engine.player.inFight){
             Engine.requestBattleAttack(this);

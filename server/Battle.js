@@ -18,19 +18,22 @@ function Battle(f1,f2){
     };
     this.fallen = [];
     this.area = []; // array of rectangular areas
+    this.spannedAOIs = new Set();
     this.ended = false;
     this.reset();
     this.start(f1,f2);
 }
 
 Battle.prototype.start = function(f1,f2){
-    this.addFighter(f1);
     this.addFighter(f2);
+    this.addFighter(f1);
 
     this.computeArea();
-    // todo: refine this?
+    GameServer.checkForFighter(this.spannedAOIs);
+
+    // todo: refine this? Compute center..?
     this.x = this.fighters[0].x;
-    this.y = this.fighters[1].y;
+    this.y = this.fighters[0].y;
     this.aoi = Utils.tileToAOI({x:this.x,y:this.y});
     GameServer.addAtLocation(this);
     GameServer.handleAOItransition(this, null);
@@ -78,13 +81,17 @@ Battle.prototype.addFighter = function(f){
 Battle.prototype.removeFighter = function(f,idx){
     if(idx == -1) idx = this.getFighterIndex(f);
     if(idx == -1) return;
+    console.log('removing fighter');
+    var isTurnOf = this.isTurnOf(f);
     f.endFight();
     f.die();
     this.fighters.splice(idx,1);
     this.updateTeams(f.constructor.name,-1);
+    if(isTurnOf) this.setEndOfTurn(0);
 };
 
 Battle.prototype.updateTeams = function(team,increment){
+    //console.log('team ',team,':',this.teams[team],'inc = ',increment);
     this.teams[team] += increment;
     if(this.teams[team] <= 0) this.end();
 };
@@ -286,9 +293,14 @@ Battle.prototype.computeArea = function(){
 };
 
 Battle.prototype.addArea = function(area){
+    this.spannedAOIs.add(Utils.tileToAOI({x:area.x,y:area.y}));
+    this.spannedAOIs.add(Utils.tileToAOI({x:area.x+area.w,y:area.y}));
+    this.spannedAOIs.add(Utils.tileToAOI({x:area.x+area.w,y:area.y+area.h}));
+    this.spannedAOIs.add(Utils.tileToAOI({x:area.x,y:area.y+area.h}));
+
     for(var x = area.x; x < area.x+area.w; x++){
         for(var y = area.y; y < area.y+area.h; y++){
-            GameServer.battleCells.add(x,y,true);
+            GameServer.battleCells.add(x,y,this);
         }
     }
     this.area.push(area);

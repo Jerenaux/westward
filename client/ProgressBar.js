@@ -21,7 +21,7 @@ ProgressBar.prototype.finalize = function(){
     this.body[2].setDepth(Engine.UIDepth+2);
 };
 
-ProgressBar.prototype.setLevel = function(level,max){
+ProgressBar.prototype.setLevel = function(level,max,duration){
     if(level == this.level && (!max || max == this.max)) return;
     if(max) this.max = max;
     var delta = Math.abs(this.level-level)/this.max; // Used to compute duration of tween
@@ -33,7 +33,7 @@ ProgressBar.prototype.setLevel = function(level,max){
 
     if(dw == 0) return;
     if(this.displayed){
-        var duration = delta * 2000;
+        var duration = duration || (delta * 2000);
         var _head = this.head;
         var _tail = this.tail;
         var _lvl = this.level;

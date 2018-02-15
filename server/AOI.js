@@ -7,7 +7,7 @@ var UpdatePacket = require('./UpdatePacket.js').UpdatePacket;
 
 function AOI(id){
     this.id = id;
-    this.entities = []; // list of entities situated within the area corresponding to this AOI
+    this.entities = []; // list of entities situated within the area corresponding to this AOI; useful for synchronizing with new AOIs and as a form of quad-tree
     this.updatePacket = new UpdatePacket();
 }
 

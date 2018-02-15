@@ -59,7 +59,6 @@ Character: display committed buildings
 Character: add new stats
 Battle: skin dead animals
 Battle: display event pop-ups after skinning
-Battle: multiplayer fights
 Finish: review base stats values; test economy for a while
 
 
@@ -98,7 +97,8 @@ Content:
 - Respawn
 - Respawn if disconnect
 - Add battle areas when new fighters
-- Deal with overlapping battlefields
+-> Deal with overlapping battlefields
+-> Deal with big battlefields; focus camera on active player (problem: if far away, surrounding AOIs not displayed), ...
 - Animal can trigger fights
 * Ecosystem
 - Listing and distribution of pick-up resources

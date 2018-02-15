@@ -98,7 +98,7 @@ Player.prototype.hasItem = function(item,nb){
 };
 
 Player.prototype.giveItem = function(item,nb){
-    console.log('Giving ',GameServer.itemsData[item].name,'x',nb);
+    //console.log('Giving ',GameServer.itemsData[item].name,'x',nb);
     this.inventory.add(item,nb);
     this.updatePacket.addItem(item,this.inventory.getNb(item));
 };

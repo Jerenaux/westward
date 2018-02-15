@@ -87,11 +87,11 @@ GameServer.readMap = function(mapsPath){
 
     // Spawn animals
     var animals = JSON.parse(fs.readFileSync('./assets/maps/animals.json').toString());
-    for(var i = 0; i < 1; i++){ // animals.list.length
+    for(var i = 0; i < 3; i++){ // animals.list.length
         var data = animals.list[i];
-        var x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
-        var y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
-        var animal = new Animal(x,y,data.type);
+        //var x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
+        //var y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
+        var animal = new Animal(data.x,data.y,data.type);
         GameServer.animals[animal.id] = animal;
     }
 
@@ -164,6 +164,7 @@ GameServer.createInitializationPacket = function(playerID){
 };
 
 GameServer.handleDisconnect = function(socketID){
+    console.log('disconnect');
     var player = GameServer.getPlayer(socketID);
     if(!player) return;
     GameServer.removeEntity(player);
@@ -379,8 +380,19 @@ GameServer.handleExit = function(socketID){
     player.exitBuilding();
 };
 
+GameServer.checkForFighter = function(AOIs){
+    AOIs.forEach(function(id){
+        var aoi = GameServer.AOIs[id];
+        aoi.entities.forEach(function(e){
+            GameServer.checkForBattle(e);
+        });
+    });
+};
+
 GameServer.checkForBattle = function(entity){
-    if(GameServer.battleCells.get(entity.x,entity.y)) console.log('stepped in battlezone!');
+    if(entity.inFight) return;
+    var battle = GameServer.battleCells.get(entity.x,entity.y);
+    if(battle) battle.addFighter(entity);
 };
 
 GameServer.handleAOItransition = function(entity,previous){
@@ -459,7 +471,7 @@ GameServer.updateWalks = function(){
 GameServer.updateNPC = function(){
     Object.keys(GameServer.animals).forEach(function(key) {
         var a = GameServer.animals[key];
-        if(a.idle && !a.dead) a.updateIdle();
+        //if(a.idle && !a.dead) a.updateIdle();
     });
 };
 

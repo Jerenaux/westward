@@ -45,12 +45,18 @@ BattleManager.getActiveFighter = function(id){
 BattleManager.manageTurn = function(shortID){
     if(!BattleManager.inBattle) return;
     var active = BattleManager.getActiveFighter(shortID);
-    if(active.isHero){
+    /*if(active.isHero){
         Engine.displayCounter();
         BattleManager.actionTaken = false;
     }else{
         Engine.hideCounter();
+    }*/
+    if(active.isHero){
+        BattleManager.actionTaken = false;
     }
+    var timer = Engine.currentMenu.panels['timer'].bar;
+    timer.setLevel(100,100,1);
+    timer.setLevel(0,100,BattleManager.countdown);
     Engine.manageArrow(active);
 };
 
@@ -62,15 +68,3 @@ BattleManager.endFight = function(){
     BattleManager.inBattle = false;
     Engine.menus.battle.hide();
 };
-
-
-/*
-* Info about self:
-* - Start of fight: send a self update
-* - Whose turn it is
-* => handle UI, display message(s), arrow, counter and equipment
-* - End of fight
-* Info about others:
-* - battlezones
-* - animations and HP
-* */

@@ -402,14 +402,14 @@ Engine.makeBattleUI = function(){
         }
     );
 
-    Engine.timerText = Engine.scene.add.text(
+    /*Engine.timerText = Engine.scene.add.text(
         Engine.getGameConfig().width-20,
         Engine.getGameConfig().height, '0',
         { font: '45px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     Engine.timerText.setOrigin(1,1);
     Engine.timerText.setScrollFactor(0);
     Engine.timerText.setDepth(Engine.UIDepth+3);
-    Engine.timerText.setVisible(false);
+    Engine.timerText.setVisible(false);*/
 
     Engine.battleArrow = Engine.scene.add.sprite(0,0,'arrow');
     Engine.battleArrow.setVisible(false);
@@ -417,7 +417,7 @@ Engine.makeBattleUI = function(){
     Engine.battleArrow.setOrigin(0,1);
 };
 
-Engine.displayCounter = function(){
+/*Engine.displayCounter = function(){
     if(Engine.timer) clearInterval(Engine.timer);
     Engine.timer = setInterval(function(){
         if(BattleManager.countdown < 0) {
@@ -437,7 +437,7 @@ Engine.updateCounter = function(){
 Engine.hideCounter = function(){
     Engine.timerText.setVisible(false);
     clearInterval(Engine.timer);
-};
+};*/
 
 Engine.displayBattleArrow = function(){
     Engine.battleArrow.setVisible(true);
@@ -515,6 +515,8 @@ Engine.makeBattleMenu = function(){
     var bar = new BigProgressBar(835,445,170);
     bar.setLevel(Engine.player.stats['hp'],Stats.dict['hp'].max);
     battle.addPanel('bar',bar);
+    battle.addPanel('timer',new BattleTimerPanel(0,0,300,30));
+
     battle.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
     battle.onUpdateInventory = items.updateInventory.bind(items);
     battle.onUpdateStats = function(){

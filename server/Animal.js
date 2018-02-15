@@ -61,7 +61,7 @@ Animal.prototype.trim = function(){
 Animal.prototype.onArrival = function(){
     //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
     this.idle = true;
-    this.idleTime = Utils.randomInt(500,2999); //ms
+    this.idleTime = Utils.randomInt(1000,3500); //ms
 };
 
 Animal.prototype.updateIdle = function(){
