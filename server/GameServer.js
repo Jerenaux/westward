@@ -214,6 +214,11 @@ GameServer.removeFromLocation = function(entity){
     GameServer.AOIs[entity.aoi].deleteEntity(entity);
 };
 
+GameServer.handleChat = function(socketID,data){
+    var player = GameServer.getPlayer(socketID);
+    player.setProperty('chat',data);
+};
+
 GameServer.findPath = function(from,to){
     //console.log('looking for path : ',from,to);
     if(GameServer.collisions.get(to.y,to.x)) return null;

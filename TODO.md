@@ -57,6 +57,10 @@ Economic loop: update buildings panel in real time (clever updates)
 Economic loop: test all updates of all menus 
 Character: display committed buildings
 Character: add new stats
+Battle: test extensively
+Battle: fix HP
+Battle: don't include dead animals in battle
+Battle: permanence of dead animals + hover cards
 Battle: skin dead animals
 Battle: display event pop-ups after skinning
 Finish: review base stats values; test economy for a while

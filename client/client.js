@@ -137,6 +137,10 @@ Client.sendCommit = function(){
     Client.socket.emit('commit');
 };
 
+Client.sendChat = function(text){
+    Client.socket.emit('chat',text);
+};
+
 
 // ####################"
 

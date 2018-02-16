@@ -56,11 +56,11 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback){
     };
 };
 
-Panel.prototype.addPolyText = function(x,y,texts,colors){
+Panel.prototype.addPolyText = function(x,y,texts,colors,size){
     if(texts.length != colors.length) return;
     var txts = [];
     for(var i = 0; i < texts.length; i++){
-        var t = this.addText(x,y,texts[i],colors[i]); // addText() pushed to this.texts
+        var t = this.addText(x,y,texts[i],colors[i],size); // addText() pushed to this.texts
         x += t.width;
         txts.push(t);
     }

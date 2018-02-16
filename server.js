@@ -110,6 +110,10 @@ io.on('connection',function(socket){
         socket.on('exit',function(){
             gs.handleExit(socket.id);
         });
+
+        socket.on('chat',function(data){
+            gs.handleChat(data,socket.id);
+        });
     });
 
     socket.pings = [];

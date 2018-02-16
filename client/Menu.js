@@ -36,6 +36,7 @@ Menu.prototype.hideIcon = function(){
 Menu.prototype.display = function(){
     if(Engine.inMenu) Engine.currentMenu.hide();
     if(Engine.inPanel) Engine.currentPanel.hide();
+    if(Engine.chatBar.displayed) Engine.chatBar.hide();
 
     if(!Engine.inBuilding && this.title) this.title.display();
 

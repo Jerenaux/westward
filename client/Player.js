@@ -10,10 +10,11 @@ var Player = new Phaser.Class({
         Moving.call(this,x,y,texture,id);
         this.setFrame(33);
         this.displayOriginX = 16;
+        this.name = 'Player '+id;
 
         this.bubbleOffsetX = 55;
         this.bubbleOffsetY = 75;
-        //this.bubble = new Bubble(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
+        this.bubble = new Bubble(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
 
         this.animsKeys = {
             move_down: 'player_move_down',
@@ -76,13 +77,10 @@ var Player = new Phaser.Class({
 
     getStat: function(stat){
         return this.stats[stat];
-    }
+    },
 
-    /*onArrival: function(){
-        console.log('arrived');
-        if(!this.destinationAction) return;
-        if(this.destinationAction.type == 1){
-            console.log('Entering building ',this.destinationAction.id);
-        }
-    }*/
+    talk: function(text){
+        this.bubble.update(text);
+        this.bubble.display();
+    }
 });

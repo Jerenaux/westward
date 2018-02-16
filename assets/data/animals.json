@@ -1,6 +1,7 @@
 {
   "0":{
     "sprite":"wolves",
+    "name": "Wolf",
     "frame": 1,
     "stats": {
       "hp": 15,

@@ -159,7 +159,7 @@ Engine.create = function(){
     Engine.scene.input.on('pointerover', Engine.handleOver);
     Engine.scene.input.on('pointerout', Engine.handleOut);
     Engine.scene.input.on('drag', Engine.handleDrag);
-    //Engine.scene.input.events.on('KEY_DOWN_ENTER', Engine.toggleChatBar);
+    Engine.scene.input.keyboard.on('keydown', Engine.handleKeyboard);
 
     PFUtils.setup(Engine);
 
@@ -199,12 +199,10 @@ Engine.createMarker = function(){
     Engine.marker.previousTile = {x:0,y:0};
 };
 
-Engine.initWorld = function(player,buildings){
+Engine.initWorld = function(player){
     console.log(player);
     Engine.addHero(player.id,player.x,player.y,player.settlement);
-    //Engine.buildingsList = buildings;
     Engine.makeUI();
-    Engine.makeChatBar();
     Engine.createAnimations();
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
@@ -277,23 +275,9 @@ Engine.createAnimations = function(){
     });
 };
 
-Engine.makeChatBar = function(){
-    /*var chatw = 300;
-    var chatx = (32*16)-(chatw/2);
-    var chaty = Engine.scene.game.config.height;
-    Engine.chat = new Panel(chatx,chaty,chatw,96);
-    Engine.chat.addSprite('talk',null,12,8);
-    Engine.chat.setTweens(chatx,chaty,chatx,chaty - 40,200);
-    Engine.chat.domElement = document.getElementById("chat");
-    var domx = (32*16) - 100 + 12;
-    Engine.chat.domElement.style.left = domx+"px";
-    Engine.chat.domElement.style.top = (chaty-17)+"px";*/
-};
-
 Engine.toggleChatBar = function(){
-    /*if(Engine.inMenu) return;
-    if(Engine.chat.domElement.value != "") console.log("I said : "+Engine.chat.domElement.value);
-    Engine.chat.toggle();*/
+    if(Engine.inMenu && !BattleManager.inBattle) return;
+    Engine.chatBar.toggle();
 };
 
 Engine.deathAnimation = function(target){
@@ -368,8 +352,10 @@ Engine.makeUI = function(){
     Engine.makeBattleUI();
     Engine.displayUI();
 
-    Engine.bar = new MiniProgressBar(20,20,300);
-    //Engine.bar.display();
+    var chatw = 230;
+    var chath = 50;
+    var chaty = Engine.getGameConfig().height - chath;
+    Engine.chatBar = new ChatPanel(0,chaty,chatw,chath,'Chat');
 };
 
 Engine.addMenuIcon = function(x,y,frame,menu){
@@ -433,6 +419,15 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
     text.setText('-'+dmg);
     text.tween.updateTo('y',text.y - 20,false);
     text.tween.play();
+
+    Engine.scene.tweens.add(
+        {
+            targets: target,
+            alpha: 0,
+            duration: 100,
+            yoyo: true,
+            repeat: 3
+        });
 };
 
 Engine.handleMissAnimation = function(target){
@@ -444,22 +439,6 @@ Engine.handleMissAnimation = function(target){
     text.tween.play();
 };
 
-Engine.manageArrow = function(entity){
-    if(!BattleManager.inBattle) return;
-    if(Engine.battleArrow.tween) Engine.battleArrow.tween.stop();
-    Engine.battleArrow.setPosition(entity.x,entity.y);
-    Engine.battleArrow.tween = Engine.scene.tweens.add(
-        {
-            targets: Engine.battleArrow,
-            y: '-=20',
-            duration: 500,
-            yoyo: true,
-            repeat: 5,
-            onStart: function(){
-                Engine.battleArrow.setVisible(true);
-            }
-        });
-};
 
 Engine.displayUI = function(){
     Engine.UIHolder.display();
@@ -492,7 +471,7 @@ Engine.makeBattleMenu = function(){
     battle.addPanel('bar',bar);
 
     var timerw = 300;
-    var timerh = 40;
+    var timerh = 60;
     var timerx = (Engine.getGameConfig().width-timerw)/2;
     var timery = Engine.getGameConfig().height-timerh;
     battle.addPanel('timer',new BattleTimerPanel(timerx,timery,timerw,timerh));
@@ -810,6 +789,11 @@ Engine.isColliding = function(tile){ // tile is the index of the tile in the til
     return false;
 };
 
+Engine.handleKeyboard = function(event){
+    //console.log(event);
+    if(event.key == 'Enter') Engine.toggleChatBar();
+};
+
 Engine.handleDown = function(pointer,objects){
     if(objects.length > 0 && objects[0].handleDown) objects[0].handleDown(pointer);
 };
@@ -823,6 +807,7 @@ Engine.handleClick = function(pointer,objects){
             }
             if(objects[i].handleClick) objects[i].handleClick(pointer);
         }
+        Engine.interrupt = false;
     }else{
         if(!Engine.inMenu && !Engine.player.inFight && !Engine.dead) {
             if(Engine.inPanel) Engine.currentPanel.hide();
@@ -1131,6 +1116,7 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
         player.setVisible(false);
     }
     if(data.dead == false) player.setVisible(true);
+    if(data.chat && !player.isHero) player.talk(data.chat);
 };
 
 Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server
@@ -1516,6 +1502,7 @@ Engine.newbuildingClick = function(){
 };
 
 Engine.inventoryClick = function(){
+    console.log('inventoryClick');
     Client.sendUse(this.itemID);
 };
 

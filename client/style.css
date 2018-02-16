@@ -30,6 +30,7 @@
 }
 
 .chat:focus {
-    border: none;
+    border: 1px dotted black;
+    background-color: rgba(0,0,0,0.5);
     outline: none;
 }

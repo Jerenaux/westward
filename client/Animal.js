@@ -11,6 +11,7 @@ var Animal = new Phaser.Class({
         this.setFrame(data.frame);
         this.setDisplayOrigin(0);
         this.dead = false;
+        this.name = data.name;
 
         // TODO: move to the .json storing animal properties
         this.animsKeys = {
