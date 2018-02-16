@@ -214,7 +214,7 @@ GameServer.removeFromLocation = function(entity){
     GameServer.AOIs[entity.aoi].deleteEntity(entity);
 };
 
-GameServer.handleChat = function(socketID,data){
+GameServer.handleChat = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     player.setProperty('chat',data);
 };
@@ -476,7 +476,7 @@ GameServer.updateWalks = function(){
 GameServer.updateNPC = function(){
     Object.keys(GameServer.animals).forEach(function(key) {
         var a = GameServer.animals[key];
-        //if(a.idle && !a.dead) a.updateIdle();
+        if(a.idle && !a.dead) a.updateIdle();
     });
 };
 

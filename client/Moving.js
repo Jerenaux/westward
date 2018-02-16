@@ -99,7 +99,7 @@ var Moving = new Phaser.Class({
         }
         if(this.orientation != this.previousOrientation){
             this.previousOrientation = this.orientation;
-            this.anims.play(this.animsKeys['move_'+this.orientation]);
+            this.anims.play(this.walkAnimPrefix+'_move_'+this.orientation);
         }
 
         this.previousPosition = {

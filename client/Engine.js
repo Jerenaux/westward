@@ -210,55 +210,19 @@ Engine.initWorld = function(player){
 };
 
 Engine.createAnimations = function(){
-    Engine.scene.anims.create(config = {
-        key: 'player_move_down',
-        frames: Engine.scene.anims.generateFrameNumbers('hero', { start: 35, end: 38}),
-        frameRate: 10,
-        repeat: -1
-    });
-    Engine.scene.anims.create(config = {
-        key: 'player_move_right',
-        frames: Engine.scene.anims.generateFrameNumbers('hero', { start: 5, end: 8}),
-        frameRate: 10,
-        repeat: -1
-    });
-    Engine.scene.anims.create(config = {
-        key: 'player_move_left',
-        frames: Engine.scene.anims.generateFrameNumbers('hero', { start: 51, end: 54}),
-        frameRate: 10,
-        repeat: -1
-    });
-    Engine.scene.anims.create(config = {
-        key: 'player_move_up',
-        frames: Engine.scene.anims.generateFrameNumbers('hero', { start: 20, end: 23}),
-        frameRate: 10,
-        repeat: -1
-    });
+    Engine.createWalkAnimation('player_move_right','hero',5,8);
+    Engine.createWalkAnimation('player_move_up','hero',20,23);
+    Engine.createWalkAnimation('player_move_down','hero',35,38);
+    Engine.createWalkAnimation('player_move_left','hero',51,54);
+    Engine.createWalkAnimation('wolf_move_down','wolves',0,2);
+    Engine.createWalkAnimation('wolf_move_left','wolves',12,14);
+    Engine.createWalkAnimation('wolf_move_right','wolves',24,26);
+    Engine.createWalkAnimation('wolf_move_up','wolves',36,38);
+    Engine.createWalkAnimation('whitewolf_move_down','wolves',3,5);
+    Engine.createWalkAnimation('whitewolf_move_left','wolves',15,17);
+    Engine.createWalkAnimation('whitewolf_move_right','wolves',27,29);
+    Engine.createWalkAnimation('whitewolf_move_up','wolves',39,41);
 
-    Engine.scene.anims.create(config = {
-        key: 'wolf_move_up',
-        frames: Engine.scene.anims.generateFrameNumbers('wolves', { start: 36, end: 38}),
-        frameRate: 10,
-        repeat: -1
-    });
-    Engine.scene.anims.create(config = {
-        key: 'wolf_move_right',
-        frames: Engine.scene.anims.generateFrameNumbers('wolves', { start: 24, end: 26}),
-        frameRate: 10,
-        repeat: -1
-    });
-    Engine.scene.anims.create(config = {
-        key: 'wolf_move_left',
-        frames: Engine.scene.anims.generateFrameNumbers('wolves', { start: 12, end: 14}),
-        frameRate: 10,
-        repeat: -1
-    });
-    Engine.scene.anims.create(config = {
-        key: 'wolf_move_down',
-        frames: Engine.scene.anims.generateFrameNumbers('wolves', { start: 0, end: 2}),
-        frameRate: 10,
-        repeat: -1
-    });
     Engine.scene.anims.create(config = {
         key: 'melee',
         frames: Engine.scene.anims.generateFrameNumbers('sword_anim', { start: 0, end: 2}),
@@ -272,6 +236,15 @@ Engine.createAnimations = function(){
         frameRate: 15,
         hideOnComplete: true,
         onComplete: Engine.recycleAnim
+    });
+};
+
+Engine.createWalkAnimation = function(key,texture,start,end){
+    Engine.scene.anims.create(config = {
+        key: key,
+        frames: Engine.scene.anims.generateFrameNumbers(texture, { start: start, end: end}),
+        frameRate: 10,
+        repeat: -1
     });
 };
 
@@ -1032,7 +1005,6 @@ Engine.updateMenus = function(category){
 };
 
 Engine.update = function(){
-    //console.log(Engine.overSlot);
     //if(Engine.tooltip) console.log(Engine.tooltip.hasContent,Engine.tooltip.displayed);
 };
 
@@ -1044,7 +1016,6 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
             var player = Engine.addPlayer(p.id, p.x, p.y, p.settlement);
             Engine.updatePlayer(player,p);
         }
-        //if (data.newplayers.length > 0) Game.sortEntities(); // Sort entitites according to y coordinate to make them render properly above each other
     }
 
     if(data.newbuildings) {
@@ -1096,10 +1067,6 @@ Engine.traverseUpdateObject = function(obj,table,callback){
     });
 };
 
-Engine.isHero = function(player){
-    return player.id == Engine.player.id;
-};
-
 Engine.updatePlayer = function(player,data){ // data contains the updated data from the server
     if(data.path && !player.isHero) player.move(data.path);
     if(data.inBuilding > -1) {
@@ -1116,7 +1083,8 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
         player.setVisible(false);
     }
     if(data.dead == false) player.setVisible(true);
-    if(data.chat && !player.isHero) player.talk(data.chat);
+    if(!player.firstUpdate && !player.isHero && data.chat) player.talk(data.chat);
+    player.firstUpdate = false;
 };
 
 Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server

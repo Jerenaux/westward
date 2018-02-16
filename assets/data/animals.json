@@ -3,10 +3,34 @@
     "sprite":"wolves",
     "name": "Wolf",
     "frame": 1,
+    "walkPrefix": "wolf",
+    "restingFrames": {
+        "up": 37,
+        "down": 1,
+        "left": 13,
+        "right": 25
+    },
     "stats": {
       "hp": 15,
       "def": 9,
       "mdmg": 12
+    }
+  },
+  "1":{
+    "sprite":"wolves",
+    "name": "White wolf",
+    "frame": 4,
+    "walkPrefix": "whitewolf",
+    "restingFrames": {
+      "up": 40,
+      "down": 4,
+      "left": 16,
+      "right": 28
+    },
+    "stats": {
+      "hp": 30,
+      "def": 12,
+      "mdmg": 15
     }
   }
 }

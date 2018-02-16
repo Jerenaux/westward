@@ -84,7 +84,6 @@ Bubble.prototype.resize = function(width,height){
     var newHeight = Math.max(height, 20);
     var dw = this.width - newWidth;
     var dh = this.height - newHeight;
-    console.log(dw,dh);
 
     var resizeWidthList = [1,4,7];
     var resizeHeightList = [3,4,5];
