@@ -2,7 +2,7 @@
   "0":{
     "sprite":"wolves",
     "name": "Wolf",
-    "frame": 1,
+    "frame": 25,
     "walkPrefix": "wolf",
     "restingFrames": {
         "up": 37,
@@ -19,7 +19,7 @@
   "1":{
     "sprite":"wolves",
     "name": "White wolf",
-    "frame": 4,
+    "frame": 28,
     "walkPrefix": "whitewolf",
     "restingFrames": {
       "up": 40,

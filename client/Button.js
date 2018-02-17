@@ -29,6 +29,7 @@ var Button = new Phaser.Class({
         if(!this.enabled) return;
         this.setFrame(this.currentFrame);
         this.callback();
+        Engine.interrupt = true;
     },
 
     enable: function(){

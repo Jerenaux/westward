@@ -5,7 +5,7 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
-var TURN_DURATION = 5*1000; // milliseconds
+var TURN_DURATION = 10*1000; // milliseconds
 var TICK_RATE = 100; // milliseconds
 
 function Battle(f1,f2){
@@ -226,7 +226,11 @@ Battle.prototype.processAttack = function(a,b){
             delay: delay
         };
     }else{
-        if(!a.canRange()) return false;
+        console.log('ranged attack');
+        if(!a.canRange()) {
+            console.log('cannot range');
+            return false;
+        }
         a.decreaseAmmo();
         var hit = this.computeRangedHit(a,b);
         if(hit){

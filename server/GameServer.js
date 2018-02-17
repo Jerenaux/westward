@@ -476,7 +476,7 @@ GameServer.updateWalks = function(){
 GameServer.updateNPC = function(){
     Object.keys(GameServer.animals).forEach(function(key) {
         var a = GameServer.animals[key];
-        if(a.idle && !a.dead) a.updateIdle();
+        //if(a.idle && !a.dead) a.updateIdle();
     });
 };
 

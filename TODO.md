@@ -61,8 +61,11 @@ Battle: test extensively
 Battle: fix HP
 Battle: don't include dead animals in battle
 Battle: permanence of dead animals + hover cards
+Battle: stop walking when entering battle zone
 Battle: skin dead animals
 Battle: display event pop-ups after skinning
+Battle: don't move to busy cells
+Chat: send timeout
 Finish: review base stats values; test economy for a while
 
 
@@ -112,6 +115,8 @@ Content:
 - Work out location and mechanics of enemy civ.  
 * Inventory
 - Pick up items
+* Movement
+- Improve timeline and orientation using the onStart callbacks of individual tweens
 * Settlement defense
 - Enable commander to build towers
 - Set up stats of towers and forts

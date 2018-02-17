@@ -32,5 +32,18 @@ var Animal = new Phaser.Class({
             Engine.requestBattle(Engine.player,this);
         }
         Engine.interrupt = true;
+    },
+
+    handleOver: function(){
+        if(BattleManager.inBattle) {
+            var dx = Math.abs(this.tileX-Engine.player.tileX);
+            var dy = Math.abs(this.tileY-Engine.player.tileY);
+            var cursor = (dx+dy == 1 || (dx == 1 && dy == 1) ? Engine.swordCursor : Engine.bowCursor);
+            Engine.setCursor(cursor);
+        }
+    },
+
+    handleOut: function(){
+        if(BattleManager.inBattle) Engine.setCursor();
     }
 });

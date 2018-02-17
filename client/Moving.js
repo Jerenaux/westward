@@ -50,6 +50,8 @@ var Moving = new Phaser.Class({
 
         if(path.length == 0) this.endMovement();
 
+        if(this.isActiveFighter) BattleManager.deactivateCell();
+
         var tweens = [];
         for(var i = 0; i < path.length; i++){
             var sx = (i == 0 ? this.tileX : path[i-1][0]);
@@ -60,7 +62,10 @@ var Moving = new Phaser.Class({
             tweens.push({
                 targets: this,
                 x: {value: ex*Engine.tileWidth, duration: time*1000},
-                y: {value: ey*Engine.tileHeight, duration: time*1000}
+                y: {value: ey*Engine.tileHeight, duration: time*1000},
+                /*onStart: function(){
+                    console.log('start');
+                }*/
             });
         }
 

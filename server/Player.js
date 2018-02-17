@@ -216,6 +216,7 @@ Player.prototype.getAmmo = function(containerSlot){
 };
 
 Player.prototype.canRange = function(){
+    console.log(this.equipment);
     var weapon = this.getRangedWeapon();
     if(weapon == -1) return false;
     return this.getAmmo(this.getRangedContainer(weapon)) > 0;
@@ -287,7 +288,7 @@ Player.prototype.getDataFromDb = function(document){
             var dbvalue = document['equipment'][equip][i];
             if(dbvalue > -1) this.equip(equip,dbvalue,true); // true: data from DB
         }
-        if(eq.ammo) this.load(equip,document['equipment']['containers'][equip]);
+        if(eq.containedIn) this.load(eq.containedIn,document['equipment']['containers'][eq.containedIn]);
     }
     for(var i = 0; i < document.inventory.length; i++){
         var item = document.inventory[i];

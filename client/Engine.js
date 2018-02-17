@@ -24,7 +24,9 @@ var Engine = {
     craftInvSize: 5, // max number of ingredients for crafting
     key: 'main', // key of the scene, for Phaser
     playerIsInitialized: false,
-    cursor: 'url(/assets/sprites/cursor.png), auto' // image of the mouse cursor in normal circumstances
+    cursor: 'url(/assets/sprites/cursor.png), auto', // image of the mouse cursor in normal circumstances
+    bowCursor: 'url(/assets/sprites/bowcursor32.png), auto',
+    swordCursor: 'url(/assets/sprites/swordcursor32.png), auto'
 };
 
 Engine.preload = function() {
@@ -72,8 +74,6 @@ Engine.preload = function() {
     this.load.image('skull', 'assets/sprites/skull.png');
     this.load.image('pin', 'assets/sprites/pin.png');
     this.load.image('redpin', 'assets/sprites/redpin.png');
-    this.load.spritesheet('grid', 'assets/sprites/grid.png',{frameWidth:32,frameHeight:32});
-    this.load.spritesheet('redgrid', 'assets/sprites/redgrid.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
     this.load.image('arrow', 'assets/sprites/arrow.png');
     this.load.spritesheet('sword_anim', 'assets/sprites/Sword1.png',{frameWidth:96,frameHeight:96});
@@ -148,7 +148,8 @@ Engine.create = function(){
     Engine.settlementsData = Engine.scene.cache.json.get('settlements');
 
     Engine.createMarker();
-    Engine.getGameInstance().canvas.style.cursor = Engine.cursor; // Sets the pointer to hand sprite
+    //Engine.getGameInstance().canvas.style.cursor = Engine.cursor;
+    Engine.setCursor();
 
     Engine.dragging = false;
     Engine.interrupt = false;
@@ -177,10 +178,18 @@ Engine.create = function(){
     Engine.blitters.push(Engine.scene.add.blitter(0,0,'ground_tiles').setDepth(0));
     Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(2));
     Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
-    Engine.useBlitters = true;
+    Engine.useBlitters = false;
 
     Engine.created = true;
     Client.requestData();
+
+    console.log(Engine.scene);
+    console.log(Engine.scene.load);
+    console.log(Engine.scene.cache);
+};
+
+Engine.setCursor = function(cursor){
+    Engine.getGameInstance().canvas.style.cursor = (cursor || Engine.cursor);
 };
 
 Engine.getGameInstance = function(){
@@ -329,6 +338,9 @@ Engine.makeUI = function(){
     var chath = 50;
     var chaty = Engine.getGameConfig().height - chath;
     Engine.chatBar = new ChatPanel(0,chaty,chatw,chath,'Chat');
+
+    //Engine.testBar = new MiniProgressBar(20,20,300);
+    //Engine.testBar.display();
 };
 
 Engine.addMenuIcon = function(x,y,frame,menu){
@@ -364,19 +376,19 @@ Engine.makeBattleUI = function(){
         }
     );
 
-    Engine.battleArrow = Engine.scene.add.sprite(0,0,'arrow');
+    /*Engine.battleArrow = Engine.scene.add.sprite(0,0,'arrow');
     Engine.battleArrow.setVisible(false);
     Engine.battleArrow.setDepth(Engine.UIDepth);
-    Engine.battleArrow.setOrigin(0,1);
+    Engine.battleArrow.setOrigin(0,1);*/
 };
 
-Engine.displayBattleArrow = function(){
+/*Engine.displayBattleArrow = function(){
     Engine.battleArrow.setVisible(true);
 };
 
 Engine.hideBattleArrow = function(){
     Engine.battleArrow.setVisible(false);
-};
+};*/
 
 Engine.handleBattleAnimation = function(animation,target,dmg){
     var sprite = Engine.getNextAnim();
@@ -1210,6 +1222,7 @@ Engine.addBattle = function(id,area){
         var rect = area[i];
         Engine.drawGrid({x:rect.x,y:rect.y},rect.w,rect.h);
     }
+    BattleManager.activateCell();
     Engine.displayedCells = Engine.battleZones.toList();
 };
 
@@ -1470,7 +1483,6 @@ Engine.newbuildingClick = function(){
 };
 
 Engine.inventoryClick = function(){
-    console.log('inventoryClick');
     Client.sendUse(this.itemID);
 };
 

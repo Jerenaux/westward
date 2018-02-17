@@ -21,14 +21,24 @@ ProgressBar.prototype.finalize = function(){
     this.body[2].setDepth(Engine.UIDepth+2);
 };
 
+ProgressBar.prototype.reset = function(){
+    if(this.bodyTween) this.bodyTween.stop();
+    if(this.headTween) this.headTween.stop();
+    this.level = this.max;
+    this.barBody.width = this.maxLength;
+    if(this.head) {
+        this.head.x = this.fullX;
+        this.head.setVisible(true);
+    }
+    if(this.tail) this.tail.setVisible(true);
+};
+
 ProgressBar.prototype.setLevel = function(level,max,duration){
-    //if(level == this.level && (!max || max == this.max)) return;
     if(max) this.max = max;
     var delta = Math.abs(this.level-level)/this.max; // Used to compute duration of tween
     this.level = Utils.clamp(level,0,this.max); // TODO: Tween this.level?
     var pct = this.level/this.max;
     var newLength = Math.round(this.maxLength*pct);
-
     var dw = this.barBody.width - newLength;
 
     if(dw == 0) return;
@@ -106,6 +116,7 @@ function MiniProgressBar(x,y,w,color){
     this.zeroX = x-2;
     x += w;
     this.body.push(Engine.scene.add.sprite(x-1,y,'UI','minibar_right'));
+    this.fullX = x-1;
 
     color = color || 'gold';
     x -= w;
@@ -143,6 +154,7 @@ function BigProgressBar(x,y,w,color){
     this.zeroX = x-15;
     x += w;
     this.body.push(Engine.scene.add.sprite(x,y,'UI','healthbar_right'));
+    this.fullX = x;
 
     color = color || 'red';
     x -= w;
