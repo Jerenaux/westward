@@ -41,9 +41,12 @@ var Animal = new Phaser.Class({
             var cursor = (dx+dy == 1 || (dx == 1 && dy == 1) ? Engine.swordCursor : Engine.bowCursor);
             Engine.setCursor(cursor);
         }
+        Engine.tooltip.updateInfo((this.dead ? 'Dead ' : '')+this.name);
+        Engine.tooltip.display();
     },
 
     handleOut: function(){
         if(BattleManager.inBattle) Engine.setCursor();
+        Engine.tooltip.hide();
     }
 });

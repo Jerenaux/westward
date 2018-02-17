@@ -35,6 +35,8 @@ function BigButton(x,y,text,callback){
     this.text.setDisplayOrigin(0,0);
     this.text.setVisible(false);
     this.text.setInteractive();
+
+    this.lastClick = Date.now();
 }
 
 BigButton.prototype.setText = function(text){
@@ -54,7 +56,10 @@ BigButton.prototype.handleDown = function(){
 };
 
 BigButton.prototype.handleClick = function(){
-    this.callback();
+    if(Date.now() - this.lastClick > 500){
+        this.callback();
+        this.lastClick = Date.now();
+    }
     this.handleOver();
 };
 

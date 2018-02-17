@@ -182,10 +182,6 @@ Engine.create = function(){
 
     Engine.created = true;
     Client.requestData();
-
-    console.log(Engine.scene);
-    console.log(Engine.scene.load);
-    console.log(Engine.scene.cache);
 };
 
 Engine.setCursor = function(cursor){
@@ -210,7 +206,7 @@ Engine.createMarker = function(){
 
 Engine.initWorld = function(player){
     console.log(player);
-    Engine.addHero(player.id,player.x,player.y,player.settlement);
+    Engine.addHero(player.id,player.x,player.y,player.settlement,player.commitSlots);
     Engine.makeUI();
     Engine.createAnimations();
     Engine.playerIsInitialized = true;
@@ -663,6 +659,9 @@ Engine.makeCharacterMenu = function(statsPanel){
     character.addPanel('commit',new CommitmentPanel(commitx,commity,commitw,commith,'Commitment'));
     character.addPanel('stats',statsPanel);
     character.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
+    character.onUpdateCommit = function(){
+        character.panels['commit'].update();
+    };
     return character;
 };
 
@@ -670,7 +669,7 @@ Engine.getIngredientsPanel = function(){
     return Engine.menus['crafting'].panels['ingredients'];
 };
 
-Engine.addHero = function(id,x,y,settlement){
+Engine.addHero = function(id,x,y,settlement,commit){
     Engine.player = Engine.addPlayer(id,x,y,settlement);
     Engine.player.isHero = true;
     Engine.camera.startFollow(Engine.player);
@@ -682,8 +681,7 @@ Engine.addHero = function(id,x,y,settlement){
     Engine.player.itemRecipes.fromList([[6,1],[10,1],[15,1],[16,1]]);
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = Equipment.getSkeleton();
-    Engine.statsTexts = Stats.getSkeleton();
-    Engine.goldTexts = [];
+    Engine.player.commitSlots = commit;
     Engine.updateEnvironment();
 };
 
@@ -863,17 +861,6 @@ Engine.updatePosition = function(player){
     }
 };
 
-/*Engine.getMouseCoordinates = function(event){
-    var pxX = Engine.camera.scrollX + event.x;
-    var pxY = Engine.camera.scrollY + event.y;
-    var tileX = Math.floor(pxX/Engine.tileWidth);
-    var tileY = Math.floor(pxY/Engine.tileHeight);
-    return {
-        tile:{x:tileX,y:tileY},
-        pixel:{x:pxX,y:pxY}
-    };
-};*/
-
 Engine.getMouseCoordinates = function(pointer){
     var pxX = Engine.camera.scrollX + pointer.x;
     var pxY = Engine.camera.scrollY + pointer.y;
@@ -956,6 +943,10 @@ Engine.updateSelf = function(data){
         Engine.player.gold = data.gold;
         Engine.updateMenus('gold');
     }
+    if(data.nbcommit >= 0){
+        Engine.player.commitSlots[0] = data.nbcommit;
+        Engine.updateMenus('commit');
+    }
     if(data.msgs){
         for(var i = 0; i < data.msgs.length; i++){
             Engine.handleMsg(data.msgs[i]);
@@ -1005,7 +996,8 @@ Engine.updateMenus = function(category){
         'stats': 'onUpdateStats',
         'equip': 'onUpdateEquipment',
         'inv': 'onUpdateInventory',
-        'gold': 'onUpdateGold'
+        'gold': 'onUpdateGold',
+        'commit': 'onUpdateCommit'
     };
 
     for(var m in Engine.menus){
@@ -1041,7 +1033,6 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.newanimals) {
         for (var n = 0; n < data.newanimals.length; n++) {
             var a = data.newanimals[n];
-            if(a.dead) continue;
             var animal = Engine.addAnimal(a.id, a.x, a.y, a.type);
             Engine.updateAnimal(animal,a);
         }
@@ -1499,6 +1490,7 @@ Engine.buyClick = function(){
 };
 
 Engine.commitClick = function(){
+    console.log('sending');
     Client.sendCommit();
 };
 

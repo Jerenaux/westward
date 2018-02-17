@@ -143,6 +143,7 @@ Tooltip.prototype.display = function(){
 };
 
 Tooltip.prototype.hide = function(){
+    if(!this.displayed) return;
     this.text.setText("");
     this.container.forEach(function(e){
         e.setVisible(false);

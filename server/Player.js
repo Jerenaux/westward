@@ -19,6 +19,7 @@ function Player(){
     this.settlement = 0;
     this.gold = 0;
     this.inBuilding = -1;
+    this.commitSlots = [3,3];
     this.stats = Stats.getSkeleton();
     this.equipment = Equipment.getSkeleton();
 }
@@ -69,6 +70,15 @@ Player.prototype.setStartingStats = function(){
 Player.prototype.setStat = function(key,value){
     this.stats[key] = value;
     this.updatePacket.addStat(key,this.stats[key]);
+};
+
+Player.prototype.hasFreeCommitSlot = function(){
+    return this.commitSlots[0] > 0;
+};
+
+Player.prototype.updateCommit = function(inc){
+    this.commitSlots[0] = Utils.clamp(this.commitSlots[0]+inc,0,this.commitSlots[1]);
+    this.updatePacket.nbcommit = this.commitSlots[0];
 };
 
 Player.prototype.giveGold = function(nb){
@@ -241,8 +251,16 @@ Player.prototype.getHealth = function(){
     return this.stats['hp'];
 };
 
-Player.prototype.isInBuilding = function(){
-    return this.inBuilding > -1;
+Player.prototype.initTrim = function(){
+    // Return a smaller object, containing a subset of the initial properties, to be sent to the client
+    var trimmed = {};
+    var broadcastProperties = ['id','settlement','commitSlots']; // list of properties relevant for the client
+    for(var p = 0; p < broadcastProperties.length; p++){
+        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
+    }
+    trimmed.x = parseInt(this.x);
+    trimmed.y = parseInt(this.y);
+    return trimmed;
 };
 
 Player.prototype.trim = function(){
@@ -315,6 +333,10 @@ Player.prototype.enterBuilding = function(id){
 
 Player.prototype.exitBuilding = function(){
     this.setProperty('inBuilding', -1);
+};
+
+Player.prototype.isInBuilding = function(){
+    return this.inBuilding > -1;
 };
 
 Player.prototype.notifyFight = function(flag){

@@ -155,7 +155,7 @@ GameServer.finalizePlayer = function(socket,player){
 GameServer.createInitializationPacket = function(playerID){
     // Create the packet that the client will receive from the server in order to initialize the game
     return {
-        player: GameServer.players[playerID].trim(), // info about the player
+        player: GameServer.players[playerID].initTrim(), // info about the player
         nbconnected: GameServer.server.getNbConnected()
         //buildings: GameServer.buildingsList
     };
@@ -315,7 +315,6 @@ GameServer.build = function(bid,tile,settlement){
     };
     var building = new Building(data);
     GameServer.buildings[building.id] = building;
-    //GameServer.buildingsList[building.id] = building.superTrim();
     GameServer.server.db.collection('buildings').insertOne(building.dbTrim(),function(err){
         if(err) throw err;
         console.log('build successfull');
@@ -324,6 +323,20 @@ GameServer.build = function(bid,tile,settlement){
 };
 
 GameServer.handleCommit = function(socketID){
+    var player = GameServer.getPlayer(socketID);
+    if(!player.isInBuilding()) {
+        console.log('not in building');
+        return;
+    }
+    if(!player.hasFreeCommitSlot()) {
+        console.log('out of free slots');
+        return;
+    }
+    // TODO: increments change based on civic level?
+    player.updateCommit(-1);
+    var building = GameServer.buildings[player.inBuilding];
+    building.updateCommit(1);
+    console.log('commit processed');
 
 };
 

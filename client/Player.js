@@ -16,13 +16,6 @@ var Player = new Phaser.Class({
         this.bubbleOffsetX = 55;
         this.bubbleOffsetY = 75;
         this.bubble = new Bubble(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
-
-        /*this.animsKeys = {
-            move_down: 'player_move_down',
-            move_up: 'player_move_up',
-            move_right: 'player_move_right',
-            move_left: 'player_move_left'
-        };*/
         this.walkAnimPrefix = 'player';
 
         this.restingFrames = {

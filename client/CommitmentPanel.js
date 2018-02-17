@@ -23,13 +23,13 @@ CommitmentPanel.prototype.getNextSlot = function(){
 CommitmentPanel.prototype.addInterface = function(){
     var size = 16;
     var x = 15;
-    x += this.addText(x,210,'3/3','#ffd700',size).width;
-    x += this.addText(x,210,' free commitment slots',null,size).width;
+    var txts = this.addPolyText(x,210,['3/3 ','free commitment slots'],[Utils.colors.gold,null],size);
+    this.nbText = txts[0];
 };
 
 CommitmentPanel.prototype.displayInterface = function(){
     var yoffset = 40;
-    var nb = 3;
+    var nb = Engine.player.commitSlots[1];
     for(var i = 0; i < nb; i++){
         var slot = this.getNextSlot();
         slot.setUp(this.x+15,this.y + yoffset + i*50);
@@ -38,6 +38,11 @@ CommitmentPanel.prototype.displayInterface = function(){
     this.texts.forEach(function(t){
         t.setVisible(true);
     });
+    this.update();
+};
+
+CommitmentPanel.prototype.update = function(){
+    this.nbText.setText(Engine.player.commitSlots[0]+'/'+Engine.player.commitSlots[1]);
 };
 
 CommitmentPanel.prototype.hideInterface = function(){

@@ -5,7 +5,7 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
-var TURN_DURATION = 10*1000; // milliseconds
+var TURN_DURATION = 5*1000; // milliseconds
 var TICK_RATE = 100; // milliseconds
 
 function Battle(f1,f2){

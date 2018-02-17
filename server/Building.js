@@ -49,6 +49,11 @@ Building.prototype.computeProductivity = function(){
     this.setProperty('prod',newprod);
 };
 
+Building.prototype.updateCommit = function(inc){
+    this.setProperty('committed',Utils.clamp(this.committed+inc,0,999));
+    this.computeProductivity();
+};
+
 Building.prototype.update = function(){
     this.computeProductivity();
 
@@ -152,12 +157,13 @@ Building.prototype.takeItem = function(item,nb){
 };
 
 Building.prototype.giveGold = function(nb){
-    this.setProperty('gold',this.gold+nb);
+    this.setProperty('gold',Utils.clamp(this.gold+nb),0,000000);
 };
 
 Building.prototype.takeGold = function(nb){
-    this.setProperty('gold',this.gold-nb);
+    this.setProperty('gold',Utils.clamp(this.gold-nb,0,999999));
 };
+
 
 // Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){
