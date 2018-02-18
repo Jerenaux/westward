@@ -371,20 +371,40 @@ Engine.makeBattleUI = function(){
             }
         }
     );
-
-    /*Engine.battleArrow = Engine.scene.add.sprite(0,0,'arrow');
-    Engine.battleArrow.setVisible(false);
-    Engine.battleArrow.setDepth(Engine.UIDepth);
-    Engine.battleArrow.setOrigin(0,1);*/
 };
 
-/*Engine.displayBattleArrow = function(){
-    Engine.battleArrow.setVisible(true);
+Engine.getNextHP = function(targetY){
+    if(Engine.availableHP.length > 0) {
+        console.log('reusing HP');
+        return Engine.availableHP.shift();
+    }
+    console.log('creating HP');
+    var text = Engine.scene.add.text(0,0, '0',  { font: '20px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    text.setVisible(false);
+    text.setOrigin(0.5,1);
+    text.tween = Engine.scene.tweens.add(
+        {
+            targets: text,
+            y: targetY,
+            duration: 1000,
+            paused: true,
+            onStart: function(){
+                text.setVisible(true);
+            },
+            onComplete: function(){
+                text.setVisible(false);
+                setTimeout(function(){
+                    Engine.recycleHP(text);
+                },20);
+            }
+        }
+    );
+    return text;
 };
 
-Engine.hideBattleArrow = function(){
-    Engine.battleArrow.setVisible(false);
-};*/
+Engine.recycleHP = function(text){
+    Engine.availableHP.push(text);
+};
 
 Engine.handleBattleAnimation = function(animation,target,dmg){
     var sprite = Engine.getNextAnim();
@@ -398,7 +418,6 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
     text.setPosition(target.x+16,targetY);
     text.setDepth(target.depth+1);
     text.setText('-'+dmg);
-    text.tween.updateTo('y',text.y - 20,false);
     text.tween.play();
 
     Engine.scene.tweens.add(
@@ -535,7 +554,12 @@ Engine.makeFortMenu = function(){
     var statx = resx;
     var staty = resy + resh;
     var statw = resw;
-    var stath = buildh - resh;
+    var stath = 150;
+
+    var lvlx = resx;
+    var lvly = staty + stath;
+    var lvlw = resw;
+    var lvlh = 150;
 
     var fort = new Menu('Fort');
     var mapPanel = new MapPanel(mapx,mapy,mapw,maph,'',true); // true = invisible
@@ -548,9 +572,12 @@ Engine.makeFortMenu = function(){
     fort.addPanel('resources',resources);
     var status = new SettlementStatusPanel(statx,staty,statw,stath,'Status');
     fort.addPanel('status',status);
+    var devlvl = new DevLevelPanel(lvlx,lvly,lvlw,lvlh,'Next level requirements');
+    fort.addPanel('devlvl',devlvl);
 
     fort.onUpdateShop = function(){
         resources.updateInventory();
+        devlvl.update();
     };
     fort.onUpdateBuildings = function(){
         buildings.updateListing();
@@ -561,18 +588,6 @@ Engine.makeFortMenu = function(){
     fort.onUpdateMap = function(){
         mapPanel.update();
     };
-
-    /*var buildings = new InventoryPanel(100,100,180,200,'Buildings');
-    buildings.setInventory(Engine.player.buildingRecipes,3,false,Engine.newbuildingClick);
-    fort.addPanel('newbuildings',buildings,true);
-    var confirm = new NewbuildingPanel(100, 300, 180, 170);
-    fort.addPanel('confirm',confirm,true); // true = hide on menu open
-    var ingredients = new InventoryPanel(130,385,50,50,'',true); // true = invisible
-    ingredients.setInventory(new Inventory(2),2,true);
-    fort.addPanel('ingredients',ingredients,true);
-    fort.onUpdatePins = function(){
-        mapPanel.map.updatePins();
-    };*/
     return fort;
 };
 
@@ -792,7 +807,7 @@ Engine.handleClick = function(pointer,objects){
         }
         Engine.interrupt = false;
     }else{
-        if(!Engine.inMenu && !Engine.player.inFight && !Engine.dead) {
+        if(!Engine.inMenu && !BattleManager.inBattle && !Engine.dead) {
             if(Engine.inPanel) Engine.currentPanel.hide();
             Engine.moveToClick(pointer);
         }
@@ -877,8 +892,8 @@ Engine.trackMouse = function(event){
     if(Engine.player && !Engine.player.inFight) Engine.updateMarker(position.tile);
     if(Engine.tooltip && Engine.tooltip.displayed) Engine.tooltip.updatePosition(event.x,event.y);
     if(Engine.debug){
-        document.getElementById('pxx').innerHTML = position.pixel.x;
-        document.getElementById('pxy').innerHTML = position.pixel.y;
+        document.getElementById('pxx').innerHTML = Math.round(position.pixel.x);
+        document.getElementById('pxy').innerHTML = Math.round(position.pixel.y);
         document.getElementById('tx').innerHTML = position.tile.x;
         document.getElementById('ty').innerHTML = position.tile.y;
         document.getElementById('aoi').innerHTML = Utils.tileToAOI(position.tile);
@@ -1086,7 +1101,7 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
         player.setVisible(false);
     }
     if(data.dead == false) player.setVisible(true);
-    if(!player.firstUpdate && !player.isHero && data.chat) player.talk(data.chat);
+    if(!player.isHero && data.chat) player.talk(data.chat);
     player.firstUpdate = false;
 };
 
@@ -1379,34 +1394,6 @@ Engine.getNextAnim = function(){
 
 Engine.recycleAnim = function(sprite){
     Engine.availableAnimSprites.push(sprite);
-};
-
-Engine.getNextHP = function(targetY){
-    if(Engine.availableHP.length > 0) return Engine.availableHP.shift();
-    var text = Engine.scene.add.text(0,0, '0',  { font: '20px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    text.setVisible(false);
-    text.setOrigin(0.5,1);
-    text.tween = Engine.scene.tweens.add(
-        {
-            targets: text,
-            //y: '-=20',
-            y: targetY,
-            duration: 1000,
-            paused: true,
-            onStart: function(){
-                text.setVisible(true);
-            },
-            onComplete: function(){
-                text.setVisible(false);
-                Engine.recycleHP(text);
-            }
-        }
-    );
-    return text;
-};
-
-Engine.recycleHP = function(text){
-    Engine.availableHP.push(text);
 };
 
 Engine.drawGrid = function(tl,w,h){

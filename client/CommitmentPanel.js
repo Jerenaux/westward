@@ -4,21 +4,11 @@
 
 function CommitmentPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
-    this.slotCounter = 0;
-    this.slots = [];
-    this.texts = [];
     this.addInterface();
 }
 
 CommitmentPanel.prototype = Object.create(Panel.prototype);
 CommitmentPanel.prototype.constructor = CommitmentPanel;
-
-CommitmentPanel.prototype.getNextSlot = function(){
-    if(this.slotCounter >= this.slots.length){
-        this.slots.push(new LongSlot(100));
-    }
-    return this.slots[this.slotCounter++];
-};
 
 CommitmentPanel.prototype.addInterface = function(){
     var size = 16;
@@ -31,13 +21,11 @@ CommitmentPanel.prototype.displayInterface = function(){
     var yoffset = 40;
     var nb = Engine.player.commitSlots[1];
     for(var i = 0; i < nb; i++){
-        var slot = this.getNextSlot();
+        var slot = this.getNextLongSlot(100);
         slot.setUp(this.x+15,this.y + yoffset + i*50);
         slot.display();
     }
-    this.texts.forEach(function(t){
-        t.setVisible(true);
-    });
+    this.displayTexts();
     this.update();
 };
 
@@ -46,12 +34,8 @@ CommitmentPanel.prototype.update = function(){
 };
 
 CommitmentPanel.prototype.hideInterface = function(){
-    this.slots.forEach(function(s){
-        s.hide();
-    });
-    this.texts.forEach(function(t){
-        t.setVisible(false);
-    });
+    this.hideLongSlots();
+    this.hideTexts();
 };
 
 CommitmentPanel.prototype.display = function(){

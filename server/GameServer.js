@@ -216,7 +216,7 @@ GameServer.removeFromLocation = function(entity){
 
 GameServer.handleChat = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
-    player.setProperty('chat',data);
+    player.setChat(data);
 };
 
 GameServer.findPath = function(from,to){

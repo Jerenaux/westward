@@ -16,6 +16,7 @@ SettlementStatusPanel.prototype.addInterface = function(){
     this.populationTxt = txts[1];
     y += 20;
     txts = this.addPolyText(x,y,["Food surplus: ","100%","(1000/1000)"],[null,null,null]);
+    this.foodStatusTxt = txts[0];
     this.surplusTxt = txts[1];
     this.foodRatioTxt = txts[2]
     y += 20;
@@ -33,10 +34,11 @@ SettlementStatusPanel.prototype.update = function(){
     var data = Engine.currentBuiling;
     this.populationTxt.setText(data.population);
     this.surplusTxt.setText(data.foodsurplus+'% ');
-    this.surplusTxt.setFill(data.foodsurplus > 0 ? Utils.colors.green : Utils.colors.red);
+    this.surplusTxt.setFill(data.foodsurplus >= 0 ? Utils.colors.green : Utils.colors.red);
     var needed = data.population*20;
     var owned = data.getItemNb(1);
     this.foodRatioTxt.setText(" ("+owned+"/"+needed+")");
+    this.foodStatusTxt.setText(data.foodsurplus >= 0 ? 'Food surplus: ' : 'Food deficit: ');
 };
 
 SettlementStatusPanel.prototype.display = function(){

@@ -50,10 +50,9 @@ EquipmentPanel.prototype.addEquipSlot = function(x,y,name,shade,contained,slotNa
     slot.setVisible(false);
 
     if(contained){
-        var text = Engine.scene.add.text(this.x+x+28, this.y+y+20, '0',{font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3});
+        var text = Engine.scene.add.text(this.x+x+38, this.y+y+19, '0',{font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3});
         text.setOrigin(1,0);
         text.setScrollFactor(0);
-        text.setDisplayOrigin(0,0);
         text.setVisible(false);
         text.setDepth(Engine.UIDepth+3);
         slotObj.text = text;

@@ -5,7 +5,8 @@
 var BattleManager = {
     inBattle: false,
     countdown: -1,
-    actionTaken: false
+    actionTaken: false,
+    isPlayerTurn: false
 };
 
 BattleManager.handleFightStatus = function(status){
@@ -19,12 +20,11 @@ BattleManager.handleFightStatus = function(status){
 BattleManager.startFight = function(){
     Engine.hideUI();
     Engine.hideMarker();
-    //Engine.displayBattleArrow();
     Engine.fightText.tween.play();
     BattleManager.inBattle = true;
     Engine.menus.battle.display();
 
-    BattleManager.onFightStart();
+    //BattleManager.onFightStart();
 };
 
 BattleManager.setCounter = function(seconds){
@@ -57,7 +57,8 @@ BattleManager.manageTurn = function(shortID){
     if(!this.active){
         console.log('shortID = ',shortID);
     }
-    if(this.active.isHero) BattleManager.actionTaken = false;
+    BattleManager.isPlayerTurn = this.active.isHero;
+    BattleManager.actionTaken = false;
     this.active.isActiveFighter = true;
     BattleManager.activateCell();
 
@@ -67,7 +68,28 @@ BattleManager.manageTurn = function(shortID){
     timer.reset();
     timer.setLevel(0,100,BattleManager.countdown*1000);
 
-    if(this.active.isHero) BattleManager.onOwnTurn();
+    //if(this.active.isHero) BattleManager.onOwnTurn();
+};
+
+BattleManager.canTakeAction = function(){
+    if(!BattleManager.inBattle) return false;
+    if(!BattleManager.isPlayerTurn) return false;
+    if(BattleManager.actionTaken) return false;
+    return true;
+};
+
+BattleManager.processTileClick = function(tile,pointer){
+    if(!BattleManager.canTakeAction()) return;
+    if(!tile.inRange) return;
+    Engine.moveToClick(pointer);
+    BattleManager.actionTaken = true;
+};
+
+BattleManager.processAnimalClick = function(animal){
+    // TODO: replace request logic
+    if(!BattleManager.canTakeAction()) return;
+    Engine.requestBattleAttack(animal);
+    BattleManager.actionTaken = true;
 };
 
 BattleManager.getActiveCell = function(){

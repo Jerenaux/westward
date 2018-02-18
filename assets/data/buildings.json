@@ -122,5 +122,11 @@
       "x": 0,
       "y": 3
     }
+  },
+  "6":{
+    "name": "Lumber camp",
+    "icon": "lumbercamp",
+    "mainMenu": "production",
+    "displayProd": true
   }
 }

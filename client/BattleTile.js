@@ -75,14 +75,14 @@ var BattleTile = new Phaser.Class({
     },
 
     handleOver: function(){
-        this.setFrame(1);
+        if(!this.active) this.setFrame(1);
     },
 
     handleOut: function(){
-        this.setFrame(this.baseFrame);
+        if(!this.active) this.setFrame(this.baseFrame);
     },
 
     handleClick: function(pointer){
-        if(!Engine.player.inFight || this.inRange) Engine.moveToClick(pointer);
+        BattleManager.processTileClick(this,pointer);
     }
 });

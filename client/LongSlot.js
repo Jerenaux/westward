@@ -72,7 +72,7 @@ LongSlot.prototype.addText = function(x,y,text,color,size){
     var t = this.getNextText();
     if(color) {
         t.setFill(color);
-        if(color == Utils.colors.red) t.setStroke(Utils.strokes.red);
+        //if(color == Utils.colors.red) t.setStroke(Utils.strokes.red);
     }
     if(size) t.setFont(size+'px '+Utils.fonts.fancy);
     t.setText(text);
@@ -80,8 +80,9 @@ LongSlot.prototype.addText = function(x,y,text,color,size){
     return t;
 };
 
-LongSlot.prototype.addProgressBar = function(x,y,level,max,color){
-    this.bar = new MiniProgressBar(this.x+x,this.y+y,0.8*this.width,color);
+LongSlot.prototype.addProgressBar = function(x,y,level,max,color,width){
+    width = width || 0.8*this.width;
+    this.bar = new MiniProgressBar(this.x+x,this.y+y,width,color);
     this.bar.setLevel(level,max);
     return this.bar;
 };

@@ -48,7 +48,7 @@ Then:
 Goal: 1h of gameplay?
 
 Week:
-Fort: next level requirements
+Fort: staff
 Construction: temporal aspects of commitment
 Construction: earn civic xp on commit (and use real numbers in character)
 Economic loop: impact of materials availability on building 
@@ -58,14 +58,14 @@ Economic loop: test all updates of all menus
 Character: display committed buildings + hide buttons where already committed/when out of slots
 Character: add new stats
 Battle: test extensively
-Battle: fix HP
+Battle: fights after few reloads
+Battle: disconnects in multiplayer fights
 Battle: don't include dead animals in battle
 Battle: stop walking when entering battle zone
 Battle: skin dead animals
 Battle: display event pop-ups after skinning
-Battle: don't move to busy cells
+Battle: don't move to busy cells / collisions
 Battle: center camera
-Chat: send timeout
 Finish: review base stats values; test economy for a while
 
 

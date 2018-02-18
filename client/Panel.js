@@ -7,6 +7,7 @@ function Panel(x,y,width,height,title,invisible){
     this.capsules = {};
     this.longSlotsCounter = 0;
     this.longSlots = [];
+    this.texts = [];
     if(title) this.addCapsule('title',20,-9,title);
 }
 
@@ -83,7 +84,7 @@ Panel.prototype.addText = function(x,y,text,color,size,font){
 
 Panel.prototype.getNextLongSlot = function(width){
     if(this.longSlotsCounter >= this.longSlots.length){
-        this.longSlots.push(new LongSlot(width));
+        this.longSlots.push(new LongSlot(width || 100));
     }
     return this.longSlots[this.longSlotsCounter++];
 };

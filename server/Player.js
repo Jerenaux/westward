@@ -22,6 +22,7 @@ function Player(){
     this.commitSlots = [3,3];
     this.stats = Stats.getSkeleton();
     this.equipment = Equipment.getSkeleton();
+    this.chatTimer = null;
 }
 
 Player.prototype = Object.create(MovingEntity.prototype);
@@ -341,6 +342,15 @@ Player.prototype.isInBuilding = function(){
 
 Player.prototype.notifyFight = function(flag){
     this.updatePacket.fightNotification(flag);
+};
+
+Player.prototype.setChat = function(text){
+    if(this.chatTimer) clearTimeout(this.chatTimer);
+    this.setProperty('chat',text);
+    var _player = this;
+    this.chatTimer = setTimeout(function(){
+        _player.chat = undefined;
+    },5000);
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){

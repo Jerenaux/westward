@@ -19,6 +19,7 @@ ProductivityPanel.prototype.addInterface = function(){
     y += 15;
     var txts = this.addPolyText(x,y,['-1000%',' food deficit'],[Utils.colors.red,null]);
     this.foodText = txts[0];
+    this.deficitText = txts[1];
     y += 15;
     txts = this.addPolyText(x,y,['+100%',' citizen commitment ','(2)'],[Utils.colors.green,null,Utils.colors.gold]);
     this.commitmentText = txts[0];
@@ -39,6 +40,7 @@ ProductivityPanel.prototype.update = function(){
     this.foodText.setFill(foodModifier >= 0 ? Utils.colors.green : Utils.colors.red);
     if(foodModifier >= 0) foodModifier = '+'+foodModifier;
     this.foodText.setText(foodModifier+'%');
+    this.deficitText.setText(foodModifier >= 0 ? 'food surplus' : 'food deficit');
 };
 
 ProductivityPanel.prototype.display = function(){
