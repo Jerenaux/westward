@@ -11,7 +11,13 @@ function Settlement(id,name,pop){
     this.pop = pop;
     this.fort = null;
     this.buildings = [];
+    this.players = [];
 }
+
+Settlement.prototype.registerPlayer = function(player){
+    this.players.push(player);
+    player.updateStats(this.surplus);
+};
 
 Settlement.prototype.registerBuilding = function(building){
     this.buildings.push(building);
@@ -32,10 +38,6 @@ Settlement.prototype.registerFort = function(fort){
         [428,703],
         [469,593]
     ])
-};
-
-Settlement.prototype.getFort = function(){
-    return this.fort;
 };
 
 Settlement.prototype.addToFort = function(item,nb){
@@ -70,6 +72,11 @@ Settlement.prototype.update = function(){
     this.buildings.forEach(function(b){
         b.update();
     });
+
+    var surplus = this.surplus;
+    this.players.forEach(function(p){
+        p.updateStats(surplus);
+    })
 };
 
 module.exports.Settlement = Settlement;

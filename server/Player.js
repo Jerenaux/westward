@@ -20,7 +20,8 @@ function Player(){
     this.gold = 0;
     this.inBuilding = -1;
     this.commitSlots = [3,3];
-    this.stats = Stats.getSkeleton();
+    //this.stats = Stats.getSkeleton();
+    this.setUpStats();
     this.equipment = Equipment.getSkeleton();
     this.chatTimer = null;
 }
@@ -32,6 +33,11 @@ Player.prototype.setIDs = function(dbID,socketID){
     this.id = GameServer.lastPlayerID++;
     this.dbID = dbID;
     this.socketID = socketID;
+};
+
+Player.prototype.registerPlayer = function(){
+    var settlement = GameServer.settlements[this.settlement];
+    settlement.registerPlayer(this);
 };
 
 Player.prototype.setStartingPosition = function(){
@@ -69,8 +75,16 @@ Player.prototype.setStartingStats = function(){
 };
 
 Player.prototype.setStat = function(key,value){
-    this.stats[key] = value;
+    this.stats[key] = Utils.clamp(value,Stats.dict[key].min,Stats.dict[key].max);
     this.updatePacket.addStat(key,this.stats[key]);
+};
+
+Player.prototype.updateStats = function(surplus){
+    for(var i = 0; i < Stats.list.length; i++) {
+        var key = Stats.list[i];
+        var value = (1-surplus)*this.stats[key];
+        this.setStat(key,value);
+    }
 };
 
 Player.prototype.hasFreeCommitSlot = function(){
@@ -145,10 +159,7 @@ Player.prototype.canEquip = function(slot,item,fromDB){
 
 Player.prototype.equip = function(slot,item,fromDB){
     if(!this.equipment.hasOwnProperty(slot)) return;
-    if(!this.canEquip(slot,item,fromDB)) {
-        console.log('Error: cant equip');
-        return;
-    }
+    if(!this.canEquip(slot,item,fromDB)) return;
     var conflictSlot = Equipment.dict[slot].conflict; // Name of the slot with which the new object could conflict
     var subSlot = this.getFreeSubslot(slot); // index of the first free subslot
     if(subSlot == -1) { // no free subslot found
@@ -161,19 +172,17 @@ Player.prototype.equip = function(slot,item,fromDB){
     this.equipment[slot][subSlot] = item;
     this.updatePacket.addEquip(slot,subSlot,item);
 
-    if(!fromDB) { // when loading from db, simply update fields, don't compute consequences
-        this.applyEffects(item);
-        var nb = 1;
+    this.applyEffects(item);
+    var nb = 1;
 
-        // Manage related container, if any
-        var containerSlot = Equipment.dict[slot].containedIn;
-        if(containerSlot) {
-            nb = this.computeLoad(containerSlot,item); // compute how much will be added to the container
-            this.load(containerSlot, nb);
-        }
-
-        this.takeItem(item, nb);
+    // Manage related container, if any
+    var containerSlot = Equipment.dict[slot].containedIn;
+    if(containerSlot) {
+        nb = this.computeLoad(containerSlot,item); // compute how much will be added to the container
+        this.load(containerSlot, nb);
     }
+
+    if(!fromDB) this.takeItem(item, nb);
 };
 
 Player.prototype.unequip = function(slot,subSlot){

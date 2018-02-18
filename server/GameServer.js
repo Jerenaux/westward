@@ -149,6 +149,7 @@ GameServer.finalizePlayer = function(socket,player){
     GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
     GameServer.nbConnectedChanged = true;
     player.setOrUpdateAOI(); // takes care of adding to the world as well
+    player.registerPlayer();
     console.log(GameServer.server.getNbConnected()+' connected');
 };
 
