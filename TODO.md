@@ -66,6 +66,7 @@ Battle: skin dead animals
 Battle: display event pop-ups after skinning
 Battle: don't move to busy cells / collisions
 Battle: center camera
+Bug: scene bug in movingEntity about depth? Reproduce by moving a lot, having someone deco...
 Finish: review base stats values; test economy for a while
 
 

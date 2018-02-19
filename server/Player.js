@@ -20,8 +20,8 @@ function Player(){
     this.gold = 0;
     this.inBuilding = -1;
     this.commitSlots = [3,3];
-    //this.stats = Stats.getSkeleton();
-    this.setUpStats();
+    this.stats = Stats.getSkeleton();
+    //this.setUpStats();
     this.equipment = Equipment.getSkeleton();
     this.chatTimer = null;
 }
@@ -80,11 +80,11 @@ Player.prototype.setStat = function(key,value){
 };
 
 Player.prototype.updateStats = function(surplus){
-    for(var i = 0; i < Stats.list.length; i++) {
+    /*for(var i = 0; i < Stats.list.length; i++) {
         var key = Stats.list[i];
         var value = (1-surplus)*this.stats[key];
         this.setStat(key,value);
-    }
+    }*/
 };
 
 Player.prototype.hasFreeCommitSlot = function(){
