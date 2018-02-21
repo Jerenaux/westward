@@ -16,7 +16,7 @@ function Settlement(id,name,pop){
 
 Settlement.prototype.registerPlayer = function(player){
     this.players.push(player);
-    player.updateStats(this.surplus);
+    player.applyFoodModifier(Formulas.computePlayerFoodModifier(this.surplus));
 };
 
 Settlement.prototype.registerBuilding = function(building){
@@ -64,7 +64,7 @@ Settlement.prototype.computeFoodProductivity = function(){
 };
 
 Settlement.prototype.update = function(){
-    //console.log(this.name+' updating');
+    console.log(this.name+' updating');
 
     this.consumeFood();
     this.computeFoodSurplus();
@@ -73,9 +73,9 @@ Settlement.prototype.update = function(){
         b.update();
     });
 
-    var surplus = this.surplus;
+    var _surplus = this.surplus;
     this.players.forEach(function(p){
-        p.updateStats(surplus);
+        p.applyFoodModifier(Formulas.computePlayerFoodModifier(_surplus));
     })
 };
 

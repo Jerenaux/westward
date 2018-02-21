@@ -52,7 +52,7 @@ server.walkUpdateRate = 1000/20; // Rate at which positions are updated
 server.npcUpdateRate = 1000/5;
 server.settlementUpdateRate = 60*1000;
 
-server.resetStamp = 1516993794091; // ignore returning players with stamps older than this and treat them as new
+server.resetStamp = 1519130567967; // ignore returning players with stamps older than this and treat them as new
 
 io.on('connection',function(socket){
 

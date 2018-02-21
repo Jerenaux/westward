@@ -68,7 +68,7 @@ StatsPanel.prototype.addStat = function(x,y,s){
 StatsPanel.prototype.updateStats = function(){
     for(var stat in Stats.dict) {
         if (!Stats.dict.hasOwnProperty(stat)) continue;
-        var value = Engine.player.getStat(stat);
+        var value = Engine.player.getStatValue(stat);
         var statInfo = Stats.dict[stat];
         var suffix = statInfo.suffix;
         if(suffix) value = value+suffix;

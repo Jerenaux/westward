@@ -35,6 +35,10 @@ var Moving = new Phaser.Class({
     },
 
     updateDepth: function(){
+        if(!this.scene){
+            console.log('Alert: scene undefined');
+            console.log(this);
+        }
         try {
             this.setDepth(Engine.playersDepth + this.tileY / 1000);
         }catch(e){

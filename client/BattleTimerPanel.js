@@ -20,6 +20,7 @@ BattleTimerPanel.prototype.addInterface = function(){
     });
     y += 25;
     this.bar = new MiniProgressBar(this.x+x,this.y+y,this.width-40);
+    this.bar.name = "battle timer";
     this.bar.setLevel(100,100);
 };
 

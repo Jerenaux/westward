@@ -46,7 +46,7 @@ var Player = new Phaser.Class({
 
     endMovement: function() {
         Moving.prototype.endMovement.call(this);
-        if(this.inFight) Engine.updateGrid();
+        if(BattleManager.inBattle) Engine.updateGrid();
         if(this.isHero){
             if(this.destinationAction && this.destinationAction.type == 1){
                 Engine.enterBuilding(this.destinationAction.id);
@@ -70,8 +70,8 @@ var Player = new Phaser.Class({
         return this.equipment.containers[slot];
     },
 
-    getStat: function(stat){
-        return this.stats[stat];
+    getStatValue: function(stat){
+        return this.stats[stat].getValue();
     },
 
     talk: function(text){

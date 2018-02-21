@@ -374,11 +374,8 @@ Engine.makeBattleUI = function(){
 };
 
 Engine.getNextHP = function(targetY){
-    if(Engine.availableHP.length > 0) {
-        console.log('reusing HP');
-        return Engine.availableHP.shift();
-    }
-    console.log('creating HP');
+    if(Engine.availableHP.length > 0) return Engine.availableHP.shift();
+
     var text = Engine.scene.add.text(0,0, '0',  { font: '20px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     text.setVisible(false);
     text.setOrigin(0.5,1);
@@ -454,20 +451,25 @@ Engine.hideUI = function(){
     }
 };
 
+Engine.getPlayerHealth = function(){
+    return Engine.player.stats['hp'].getValue();
+};
+
 Engine.makeBattleMenu = function(){
     var alignx = 845;
     var battle = new Menu();
     var equipment = new EquipmentPanel(alignx,100,170,120,'Equipment',true); // true: battle menu
     battle.addPanel('equipment',equipment);
     var items = new InventoryPanel(alignx,220,170,225,'Items');
-    items.setInventory(Engine.player.inventory,4,true,Engine.inventoryClick);
+    items.setInventory(Engine.player.inventory,4,true,BattleManager.processInventoryClick);
     items.modifyFilter({
         type: 'property',
         property: 'useInBattle'
     });
     battle.addPanel('items',items);
     var bar = new BigProgressBar(alignx,445,170);
-    bar.setLevel(Engine.player.stats['hp'],Stats.dict['hp'].max);
+    bar.name = 'battle health bar';
+    bar.setLevel(Engine.getPlayerHealth(),Stats.dict['hp'].max);
     battle.addPanel('bar',bar);
 
     var timerw = 300;
@@ -479,7 +481,7 @@ Engine.makeBattleMenu = function(){
     battle.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
     battle.onUpdateInventory = items.updateInventory.bind(items);
     battle.onUpdateStats = function(){
-        bar.setLevel(Engine.player.stats['hp']);
+        bar.setLevel(Engine.getPlayerHealth());
     };
     return battle;
 };
@@ -850,7 +852,20 @@ Engine.computePath = function(position){
     Engine.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(Engine.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
     var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, x, y, Engine.PFgrid);
     if(path.length > PFUtils.maxPathLength) return;
+    path = Engine.trimPath(path);
     Engine.player.move(path);
+};
+
+// Shortens the path so that it stops at a battlezone transition
+Engine.trimPath = function(path){
+    var inBattleZone = !!Engine.battleZones.get(path[0][0],path[0][1]);
+    var p = [];
+    for(var i = 0; i < path.length; i++){
+        var flag = !!Engine.battleZones.get(path[i][0],path[i][1]);
+        p.push(path[i]);
+        if(flag != inBattleZone) break;
+    }
+    return p;
 };
 
 Engine.updatePosition = function(player){
@@ -933,14 +948,17 @@ Engine.checkCollision = function(tile){ // tile is x, y pair
 * */
 
 Engine.updateSelf = function(data){
+    var updateEvents = new Set();
+
     if(data.items) {
         Engine.updateInventory(Engine.player.inventory,data.items);
-        Engine.updateMenus('inv');
+        updateEvents.add('inv');
     }
     if(data.stats){
         for(var i = 0; i < data.stats.length; i++){
             Engine.updateStat(data.stats[i].k,data.stats[i].v);
         }
+        updateEvents.add('stats');
     }
     if(data.ammo){
         for(var i = 0; i < data.ammo.length; i++){
@@ -954,13 +972,14 @@ Engine.updateSelf = function(data){
             Engine.updateEquipment(eq.slot,eq.subSlot,eq.item);
         }
     }
+    if(data.ammo || data.equipment) updateEvents.add('equip');
     if(data.gold){
         Engine.player.gold = data.gold;
-        Engine.updateMenus('gold');
+        updateEvents.add('gold');
     }
     if(data.nbcommit >= 0){
         Engine.player.commitSlots[0] = data.nbcommit;
-        Engine.updateMenus('commit');
+        updateEvents.add('commit');
     }
     if(data.msgs){
         for(var i = 0; i < data.msgs.length; i++){
@@ -971,6 +990,10 @@ Engine.updateSelf = function(data){
     if(data.remainingTime) BattleManager.setCounter(data.remainingTime);
     if(data.activeID) BattleManager.manageTurn(data.activeID);
     if(data.dead) Engine.manageDeath();
+
+    updateEvents.forEach(function(e){
+        Engine.updateMenus(e);
+    });
 };
 
 Engine.handleMsg = function(msg){
@@ -985,17 +1008,14 @@ Engine.handleMsg = function(msg){
 
 Engine.updateAmmo = function(slot,nb){
     Engine.player.equipment.containers[slot] = nb;
-    Engine.updateMenus('equip');
 };
 
 Engine.updateEquipment = function(slot,subSlot,item){
     Engine.player.equipment[slot][subSlot] = item;
-    Engine.updateMenus('equip');
 };
 
 Engine.updateStat = function(key,value){
-    Engine.player.stats[key] = value;
-    Engine.updateMenus('stats');
+    Engine.player.stats[key].setBaseValue(value);
 };
 
 Engine.updateInventory = function(inventory,items){
@@ -1102,6 +1122,9 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
     }
     if(data.dead == false) player.setVisible(true);
     if(!player.isHero && data.chat) player.talk(data.chat);
+    /*if(data.stop){
+        console.log('Stopping at ',data.stop.x,data.stop.y);
+    }*/
     player.firstUpdate = false;
 };
 
@@ -1409,15 +1432,9 @@ Engine.drawGrid = function(tl,w,h){
 };
 
 Engine.updateGrid = function(){
-    for(var i = 0; i < Engine.player.battlezone.length; i++) {
-        var rect = Engine.player.battlezone[i];
-        var tl = {x:rect.x,y:rect.y};
-        for(var x = tl.x; x < tl.x+rect.w; x++){
-            for(var y = tl.y; y < tl.y+rect.h; y++){
-                var cell = Engine.isBattlezone(x,y);
-                if(cell) cell.manageFrame();
-            }
-        }
+    for(var i = 0; i < Engine.displayedCells.length; i++){
+        var cell = Engine.displayedCells[i].v;
+        cell.manageFrame();
     }
 };
 

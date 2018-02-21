@@ -11,7 +11,6 @@ CharacterPanel.prototype = Object.create(Panel.prototype);
 CharacterPanel.prototype.constructor = CharacterPanel;
 
 CharacterPanel.prototype.addInterface = function(){
-    this.texts = [];
     this.bars = [];
     var alignx = 15;
     var x = alignx;
@@ -23,6 +22,7 @@ CharacterPanel.prototype.addInterface = function(){
     this.addPolyText(x,y,["Level ","1"," Merchant   -   ",classxp+"/100"," Class XP"],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
     y += 30;
     var classbar = new MiniProgressBar(this.x+x,this.y+y,245);
+    classbar.name = 'class xp bar';
     classbar.setLevel(classxp,100);
     this.bars.push(classbar);
     y += 15;
@@ -31,6 +31,7 @@ CharacterPanel.prototype.addInterface = function(){
     this.addPolyText(x,y,["Level ","1"," citizen   -   ",civicxp+"/100"," Civic XP"],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
     y += 30;
     var civicbar = new MiniProgressBar(this.x+x,this.y+y,245);
+    civicbar.name = 'civic xp bar';
     civicbar.setLevel(civicxp,100);
     this.bars.push(civicbar);
     y += 20;
@@ -41,27 +42,28 @@ CharacterPanel.prototype.addInterface = function(){
     y+= 15;
     this.addPolyText(x,y,['-0% ','fatigue'],[null,null]);
     y += 15;
-    this.addPolyText(x,y,['-10% ','food deficit'],[Utils.colors.red,null]);
+    var txts = this.addPolyText(x,y,['-10% ','food deficit'],[Utils.colors.red,null]);
+    this.foodModifierTxt = txts[0];
+};
+
+CharacterPanel.prototype.update = function(){
+    //this.foodModifierTxt.setText();
 };
 
 CharacterPanel.prototype.displayInterface = function(){
-    this.texts.forEach(function(t){
-        t.setVisible(true);
-    });
+    this.displayTexts();
     this.bars.forEach(function(b){
         b.display();
     });
+    this.update();
 };
 
 CharacterPanel.prototype.hideInterface = function(){
-    this.texts.forEach(function(t){
-        t.setVisible(false);
-    });
+    this.hideTexts();
     this.bars.forEach(function(b){
         b.hide();
     });
 };
-
 
 CharacterPanel.prototype.display = function(){
     Panel.prototype.display.call(this);

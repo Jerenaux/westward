@@ -31,6 +31,7 @@ BuildingsPanel.prototype.displayListing = function(){
 
         var progress = (data.built ? 100 : data.progress);
         var bar = slot.addProgressBar(43,22,progress,100,(data.built ? 'green' : 'gold'));
+        bar.name = 'status bar of building '+buildingTypeData.name;
         var b = slot.addText(slot.totalwidth,18,bar.getPct()+'%',(data.built ? Utils.colors.green : Utils.colors.gold),12);
         b.setOrigin(1,0);
 

@@ -87,11 +87,12 @@ GameServer.readMap = function(mapsPath){
 
     // Spawn animals
     var animals = JSON.parse(fs.readFileSync('./assets/maps/animals.json').toString());
-    for(var i = 0; i < 3; i++){ // animals.list.length
-        var data = animals.list[i];
-        //var x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
-        //var y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
-        var animal = new Animal(data.x,data.y,data.type);
+    for(var i = 0; i < 13; i++){ // animals.list.length
+        //var data = animals.list[i];
+        var x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
+        var y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
+        //var animal = new Animal(data.x,data.y,data.type);
+        var animal = new Animal(x,y,0);
         GameServer.animals[animal.id] = animal;
     }
 
@@ -115,7 +116,6 @@ GameServer.addNewPlayer = function(socket){
     var player = new Player();
     player.setStartingPosition();
     player.setStartingInventory();
-    player.setStartingStats();
     var document = player.dbTrim();
     GameServer.server.db.collection('players').insertOne(document,function(err){
         if(err) throw err;
@@ -409,7 +409,7 @@ GameServer.checkForFighter = function(AOIs){
 };
 
 GameServer.checkForBattle = function(entity){
-    if(entity.inFight) return;
+    if(entity.inFight || entity.moving || entity.dead) return;
     var battle = GameServer.battleCells.get(entity.x,entity.y);
     if(battle) battle.addFighter(entity);
 };

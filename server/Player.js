@@ -20,8 +20,7 @@ function Player(){
     this.gold = 0;
     this.inBuilding = -1;
     this.commitSlots = [3,3];
-    this.stats = Stats.getSkeleton();
-    //this.setUpStats();
+    this.setUpStats();
     this.equipment = Equipment.getSkeleton();
     this.chatTimer = null;
 }
@@ -67,24 +66,36 @@ Player.prototype.setStartingInventory = function(){
     this.giveGold(500);
 };
 
-Player.prototype.setStartingStats = function(){
-    for(var i = 0; i < Stats.list.length; i++) {
-        var key = Stats.list[i];
-        this.setStat(key,Stats.dict[key].start);
-    }
+Player.prototype.setUpStats = function(){
+    this.stats = Stats.getSkeleton();
+    this.foodModifier = null;
 };
 
 Player.prototype.setStat = function(key,value){
-    this.stats[key] = Utils.clamp(value,Stats.dict[key].min,Stats.dict[key].max);
-    this.updatePacket.addStat(key,this.stats[key]);
+    this.getStat(key).setBaseValue(value);
+    this.refreshStat(key);
 };
 
-Player.prototype.updateStats = function(surplus){
-    /*for(var i = 0; i < Stats.list.length; i++) {
-        var key = Stats.list[i];
-        var value = (1-surplus)*this.stats[key];
-        this.setStat(key,value);
-    }*/
+Player.prototype.refreshStat = function(key){
+    this.updatePacket.addStat(key,this.getStat(key).getValue());
+};
+
+Player.prototype.applyDamage = function(dmg){
+    MovingEntity.prototype.applyDamage.call(this,dmg);
+    this.refreshStat('hp');
+};
+
+Player.prototype.applyFoodModifier = function(foodModifier){
+    for(var stat in this.stats){
+        if(!this.stats.hasOwnProperty(stat)) return;
+        var statObj = this.getStat(stat);
+        //console.log('before : ',statObj.getValue());
+        if(this.foodModifier !== null) statObj.removeRelativeModifier(this.foodModifier);
+        statObj.addRelativeModifier(foodModifier);
+        //console.log('after : ',statObj.getValue());
+        this.refreshStat(stat);
+    }
+    this.foodModifier = foodModifier;
 };
 
 Player.prototype.hasFreeCommitSlot = function(){
@@ -172,7 +183,7 @@ Player.prototype.equip = function(slot,item,fromDB){
     this.equipment[slot][subSlot] = item;
     this.updatePacket.addEquip(slot,subSlot,item);
 
-    this.applyEffects(item);
+    this.applyAbsoluteModifiers(item);
     var nb = 1;
 
     // Manage related container, if any
@@ -193,10 +204,34 @@ Player.prototype.unequip = function(slot,subSlot){
     var nb = containerSlot ? this.equipment.containers[containerSlot] : 1;
     if(containerSlot) this.unload(containerSlot);
     if(containedSlot) this.unequip(containedSlot,0);
-    this.applyEffects(item,-1);
+    this.applyAbsoluteModifiers(item,-1);
     this.equipment[slot][subSlot] = -1;
     this.giveItem(item,nb);
     this.updatePacket.addEquip(slot,subSlot,-1);
+};
+
+Player.prototype.applyAbsoluteModifiers = function(item,change){
+    var change = change || 1;
+    var itemData = GameServer.itemsData[item];
+    if(!itemData.effects) return;
+    for (var stat in itemData.effects) {
+        if (!itemData.effects.hasOwnProperty(stat)) continue;
+        if(change == 1){
+            this.applyAbsoluteModifier(stat, itemData.effects[stat]);
+        }else if(change == -1) {
+            this.removeAbsoluteModifier(stat, itemData.effects[stat]);
+        }
+    }
+};
+
+Player.prototype.applyAbsoluteModifier = function(stat,modifier){
+    this.getStat(stat).addAbsoluteModifier(modifier);
+    this.refreshStat(stat);
+};
+
+Player.prototype.removeAbsoluteModifier = function(stat,modifier){
+    this.getStat(stat).removeAbsoluteModifier(modifier);
+    this.refreshStat(stat);
 };
 
 // Compute how much of item `item` can be added to container `containerSlot`
@@ -253,12 +288,10 @@ Player.prototype.applyEffects = function(item,coef){
 };
 
 Player.prototype.applyEffect = function(stat,delta){
-    var newvalue = Utils.clamp(this.stats[stat]+delta,Stats.dict[stat].min,Stats.dict[stat].max);
-    this.setStat(stat,newvalue);
-};
-
-Player.prototype.getHealth = function(){
-    return this.stats['hp'];
+    //var newvalue = Utils.clamp(this.stats[stat]+delta,Stats.dict[stat].min,Stats.dict[stat].max);
+    //this.setStat(stat,newvalue);
+    this.getStat(stat).increment(delta);
+    this.refreshStat(stat);
 };
 
 Player.prototype.initTrim = function(){
@@ -289,11 +322,16 @@ Player.prototype.trim = function(){
 Player.prototype.dbTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be stored in the database
     var trimmed = {};
-    var dbProperties = ['x','y','stats','equipment','gold']; // list of properties relevant to store in the database
+    var dbProperties = ['x','y','equipment','gold']; // list of properties relevant to store in the database
     for(var p = 0; p < dbProperties.length; p++){
         trimmed[dbProperties[p]] = this[dbProperties[p]];
     }
     trimmed.inventory = this.inventory.toList();
+    trimmed.stats = {};
+    for(var statKey in Stats.dict){
+        if(!Stats.dict.hasOwnProperty(statKey)) return;
+        trimmed.stats[statKey] = this.getStat(statKey).getBaseValue();
+    }
     return trimmed;
 };
 
@@ -331,8 +369,10 @@ Player.prototype.setAction = function(action){
     this.action = action;
 };
 
-Player.prototype.onArrival = function(){
+Player.prototype.onEndOfPath = function(){
     //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
+    MovingEntity.prototype.onEndOfPath.call(this);
+    if(this.inFight) return;
     if(!this.action) return;
     if(this.action.type == 1) this.enterBuilding(this.action.id);
 };

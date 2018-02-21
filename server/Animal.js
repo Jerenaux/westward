@@ -6,7 +6,7 @@ var Utils = require('../shared/Utils.js').Utils;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
 var World = require('../shared/World.js').World;
-//var Stats = require('../shared/Stats.js').Stats;
+var Stats = require('../shared/Stats.js').Stats;
 
 var debug = false;
 
@@ -20,7 +20,7 @@ function Animal(x,y,type){
     this.type = type;
     this.idle = true;
     this.idleTime = 200;
-    this.stats = {}; //Stats.getSkeleton();
+    this.stats = Stats.getSkeleton();
     this.setStartingStats();
     this.setOrUpdateAOI();
 }
@@ -37,7 +37,7 @@ Animal.prototype.setStartingStats = function(){
 };
 
 Animal.prototype.setStat = function(key,value){
-    this.stats[key] = value;
+    this.getStat(key).setBaseValue(value);
 };
 
 /*Animal.prototype.setStartingPosition = function(){
@@ -58,8 +58,19 @@ Animal.prototype.trim = function(){
     return trimmed;
 };
 
-Animal.prototype.onArrival = function(){
+Animal.prototype.endFight = function(){
+    MovingEntity.prototype.endFight.call(this);
+    this.setIdle();
+};
+
+Animal.prototype.onEndOfPath = function(){
     //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
+    MovingEntity.prototype.onEndOfPath.call(this);
+    if(this.inFight) return;
+    this.setIdle();
+};
+
+Animal.prototype.setIdle = function(){
     this.idle = true;
     this.idleTime = Utils.randomInt(1000,3500); //ms
 };
@@ -104,6 +115,7 @@ Animal.prototype.decideBattleAction = function(){
 };
 
 Animal.prototype.selectTarget = function(){
+    //console.log('selecting target');
     var fighters = this.battle.fighters;
     var minHP = 9999;
     var currentTarget = null;

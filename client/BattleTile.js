@@ -83,6 +83,10 @@ var BattleTile = new Phaser.Class({
     },
 
     handleClick: function(pointer){
-        BattleManager.processTileClick(this,pointer);
+        if(BattleManager.inBattle){
+            BattleManager.processTileClick(this,pointer);
+        }else{
+            Engine.moveToClick(pointer);
+        }
     }
 });

@@ -64,9 +64,14 @@ MovingEntity.prototype.updatePosition = function(x,y){
 
 MovingEntity.prototype.endPath = function(){
     if(debug) console.log('['+this.constructor.name+' '+this.id+'] Arrived at destination');
+    //if(this.flagToStop) this.setProperty('stop',{x:this.x,y:this.y});
     this.moving = false;
     this.flagToStop = false;
-    this.onArrival();
+    this.onEndOfPath();
+};
+
+MovingEntity.prototype.onEndOfPath = function(){
+    GameServer.checkForBattle(this);
 };
 
 MovingEntity.prototype.getEndOfPath = function(){
@@ -89,20 +94,29 @@ MovingEntity.prototype.getPathDuration = function(){
 
 MovingEntity.prototype.stopWalk = function(){
     if(!this.moving) return;
-    //console.log('Entity is at ',this.x,this.y);
     this.flagToStop = true;
-    this.setProperty('stop',true);
 };
 
 MovingEntity.prototype.die = function(){
     this.setProperty('dead',true);
     if(this.isPlayer) this.updatePacket.dead = true;
-
 };
 
 MovingEntity.prototype.endFight = function(){
     this.setProperty('inFight',false);
     this.battle = null;
+};
+
+MovingEntity.prototype.getStat = function(key){
+    return this.stats[key];
+};
+
+MovingEntity.prototype.getHealth = function(){
+    return this.getStat('hp').getValue();
+};
+
+MovingEntity.prototype.applyDamage = function(dmg){
+    this.getStat('hp').increment(dmg);
 };
 
 MovingEntity.prototype.inBattleRange = function(x,y){

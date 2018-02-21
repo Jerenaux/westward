@@ -88,7 +88,14 @@ BattleManager.processTileClick = function(tile,pointer){
 BattleManager.processAnimalClick = function(animal){
     // TODO: replace request logic
     if(!BattleManager.canTakeAction()) return;
+    if(animal.dead) return;
     Engine.requestBattleAttack(animal);
+    BattleManager.actionTaken = true;
+};
+
+BattleManager.processInventoryClick = function(){
+    if(!BattleManager.canTakeAction()) return;
+    Engine.inventoryClick.call(this); // "this" has been bound to the clicked item
     BattleManager.actionTaken = true;
 };
 

@@ -47,6 +47,11 @@ Then:
 - Orientation panel in char menu hinting at what to do and where to go (w/ map?)
 Goal: 1h of gameplay?
 
+Battlezones:
+- New fight: check non-moving in-zone
+- End of path: check for battlezone
+- Client path: shorten at first battle cell
+
 Week:
 Fort: staff
 Construction: temporal aspects of commitment
@@ -55,17 +60,20 @@ Economic loop: impact of materials availability on building
 Economic loop: apply effect of food deficit on players (+ update character panel)
 Economic loop: update buildings panel in real time (clever updates)
 Economic loop: test all updates of all menus 
+Econmic loop: skin dead animals
+UI: display event pop-ups after skinning
 Character: display committed buildings + hide buttons where already committed/when out of slots
 Character: add new stats
+Character: display stat details
+Character: foodSurplus in self update, used for ProductivityPanel & CharacterPanel updates
 Battle: test extensively
-Battle: fights after few reloads
 Battle: disconnects in multiplayer fights
-Battle: don't include dead animals in battle
-Battle: stop walking when entering battle zone
-Battle: skin dead animals
-Battle: display event pop-ups after skinning
+Battle: animals stop walking when entering battle zone
 Battle: don't move to busy cells / collisions
-Battle: center camera
+Batte: don't start fight with animal already in fight
+Battle: long delay when player's ATB entirely empty
+Battle: fill ATB of whoever's turn it is when dragged into fight
+Battle: when dying, hide battle UI, even if fight ongoing
 Bug: scene bug in movingEntity about depth? Reproduce by moving a lot, having someone deco...
 Finish: review base stats values; test economy for a while
 

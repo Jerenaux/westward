@@ -29,10 +29,14 @@ Formulas.commitmentProductivityModifier = function(commitment){
 Formulas.computeProductivity = function(foodModifier,commitModifier){
     // Adapt 'deduceFoodModifier()' accordingly
     return Utils.clamp(100 + foodModifier + commitModifier,0,1000);
-}
+};
 
 Formulas.deduceFoodModifier = function(total,commitModifier){
     return total - 100 - commitModifier;
+};
+
+Formulas.computePlayerFoodModifier = function(surplus){
+    return surplus/2;
 };
 
 if (onServer) module.exports.Formulas = Formulas;
