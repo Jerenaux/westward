@@ -87,10 +87,11 @@ GameServer.readMap = function(mapsPath){
 
     // Spawn animals
     var animals = JSON.parse(fs.readFileSync('./assets/maps/animals.json').toString());
-    for(var i = 0; i < 13; i++){ // animals.list.length
+    for(var i = 0; i < 10; i++){ // animals.list.length
         //var data = animals.list[i];
         var x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
         var y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
+        if(GameServer.collisions.get(y,x)) continue;
         //var animal = new Animal(data.x,data.y,data.type);
         var animal = new Animal(x,y,0);
         GameServer.animals[animal.id] = animal;
@@ -488,10 +489,12 @@ GameServer.updateWalks = function(){
 };
 
 GameServer.updateNPC = function(){
+    //var a = Date.now();
     Object.keys(GameServer.animals).forEach(function(key) {
         var a = GameServer.animals[key];
         if(a.idle && !a.dead) a.updateIdle();
     });
+    //console.log(Date.now()-a+' ms to update all NPC');
 };
 
 GameServer.updateSettlements = function(){

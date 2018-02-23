@@ -96,6 +96,20 @@ PFUtils.getDuration = function(sx,sy,ex,ey){ // Compute movement duration, units
     return d/PFUtils.speed;
 };
 
+// Shortens the path so that it stops at a battlezone transition
+PFUtils.trimPath = function(path,map){
+    // TODO: no trim if start from battlezone
+    var inBattleZone = !!map.get(path[0][0],path[0][1]);
+    if(inBattleZone) return path;
+    var p = [];
+    for(var i = 0; i < path.length; i++){
+        p.push(path[i]);
+        var flag = !!map.get(path[i][0],path[i][1]);
+        if(flag != inBattleZone) break;
+    }
+    return p;
+};
+
 PFUtils.euclidean = function(a,b){
     return Math.sqrt(Math.pow(a.x-b.x,2)+Math.pow(a.y- b.y,2));
 };

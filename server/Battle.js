@@ -4,6 +4,7 @@
 var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
+var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 
 var TURN_DURATION = 3*1000; // milliseconds
 var TICK_RATE = 100; // milliseconds
@@ -19,6 +20,7 @@ function Battle(f1,f2){
     this.fallen = [];
     this.area = []; // array of rectangular areas
     this.spannedAOIs = new Set();
+    this.positions = new SpaceMap();
     this.ended = false;
     this.reset();
     this.start(f1,f2);
@@ -71,6 +73,7 @@ Battle.prototype.getFighterIndex = function(f){
 Battle.prototype.addFighter = function(f){
     this.fighters.push(f);
     this.participants.push(f);
+    this.positions.add(f.x,f.y,f);
     this.updateTeams(f.constructor.name,1);
     f.setProperty('inFight',true);
     f.stopWalk();
@@ -85,6 +88,7 @@ Battle.prototype.removeFighter = function(f,idx){
     f.endFight();
     f.die();
     this.fighters.splice(idx,1);
+    if(f.isPlayer) this.positions.delete(f.x,f.y); // if animal, leave busy for his body
     this.updateTeams(f.constructor.name,-1);
     if(isTurnOf) this.setEndOfTurn(0);
 };
@@ -117,7 +121,10 @@ Battle.prototype.newTurn = function(){
         }
     }
 
-    if(!activeFighter.isPlayer) activeFighter.decideBattleAction();
+    if(!activeFighter.isPlayer) {
+        //activeFighter.decideBattleAction();
+        setTimeout(activeFighter.decideBattleAction.bind(activeFighter),500);
+    }
 };
 
 Battle.prototype.getActiveFighter = function(){
@@ -145,8 +152,14 @@ Battle.prototype.processAction = function(f,data){
     if(!this.isTurnOf(f) || this.actionTaken) return;
     var result;
     switch(data.action){
+        case 'pass':
+            result = {
+                success: true,
+                delay: 100
+            };
+            break;
         case 'move':
-            result = this.processMove(f,data.x,data.y);
+            result = this.processMove(f);
             break;
         case 'attack':
             var target = this.getFighterByID(data.id);
@@ -161,20 +174,18 @@ Battle.prototype.setEndOfTurn = function(delay){
     this.endTime = this.countdown - delay;
 };
 
-Battle.prototype.processMove = function(f,x,y){
-    /*if(f.inBattleRange(x,y)){
-        f.setPath(GameServer.findPath({x:f.x,y:f.y},{x:x,y:y}));
-        return {
-            success: true,
-            delay: f.getPathDuration()
-        };
-    }
-    return false;*/
-    if(!f.isPlayer) f.setPath(GameServer.findPath({x:f.x,y:f.y},{x:x,y:y}));
+Battle.prototype.processMove = function(f){
+    this.positions.delete(f.x,f.y);
+    var pos = f.getEndOfPath();
+    this.positions.add(pos.x,pos.y,f);
     return {
         success: true,
         delay: f.getPathDuration()
     };
+};
+
+Battle.prototype.isPositionFree = function(x,y){
+    return !this.positions.get(x,y);
 };
 
 Battle.prototype.nextTo = function(a,b){
@@ -258,29 +269,32 @@ Battle.prototype.computeArea = function(){
     var f1 = this.fighters[1];
     var f2 = this.fighters[0]; // TODO: generalize to more fighters
 
+    var pos1 = f1.getEndOfPath();
+    var pos2 = f2.getEndOfPath();
+
     var tl = {x: null, y: null};
-    if (f1.x <= f2.x && f1.y <= f2.y) {
-        tl.x = f1.x;
-        tl.y = f1.y;
-    } else if (f1.x <= f2.x && f1.y > f2.y) {
-        tl.x = f1.x;
-        tl.y = f2.y;
-    }else if(f1.x > f2.x && f1.y <= f2.y){
-        tl.x = f2.x;
-        tl.y = f1.y;
-    }else if(f1.x > f2.x && f1.y > f2.y){
-        tl.x = f2.x;
-        tl.y = f2.y;
+    if (pos1.x <= pos2.x && pos1.y <= pos2.y) {
+        tl.x = pos1.x;
+        tl.y = pos1.y;
+    } else if (pos1.x <= pos2.x && pos1.y > pos2.y) {
+        tl.x = pos1.x;
+        tl.y = pos2.y;
+    }else if(pos1.x > pos2.x && pos1.y <= pos2.y){
+        tl.x = pos2.x;
+        tl.y = pos1.y;
+    }else if(pos1.x > pos2.x && pos1.y > pos2.y){
+        tl.x = pos2.x;
+        tl.y = pos2.y;
     }
 
-    if(f1.x == f2.x) tl.x -= 1;
-    if(f1.y == f2.y) tl.y -= 1;
+    if(pos1.x == pos2.x) tl.x -= 1;
+    if(pos1.y == pos2.y) tl.y -= 1;
 
     tl.x -= 1;
     tl.y -= 1;
 
-    var w = Math.max(Math.abs(f1.x - f2.x)+3,3);
-    var h = Math.max(Math.abs(f1.y - f2.y)+3,3);
+    var w = Math.max(Math.abs(pos1.x - pos2.x)+3,3);
+    var h = Math.max(Math.abs(pos1.y - pos2.y)+3,3);
 
     this.addArea({
         x: tl.x,

@@ -35,18 +35,11 @@ var Moving = new Phaser.Class({
     },
 
     updateDepth: function(){
-        if(!this.scene){
+        /*if(!this.scene){
             console.log('Alert: scene undefined');
             console.log(this);
-        }
-        try {
-            this.setDepth(Engine.playersDepth + this.tileY / 1000);
-        }catch(e){
-            console.log('attempted value : ',Engine.playersDepth + this.tileY / 1000);
-            console.log(this.scene);
-            console.log(this);
-            throw e;
-        }
+        }*/
+        this.setDepth(Engine.playersDepth + this.tileY / 1000);
     },
 
     move: function(path){
@@ -66,7 +59,7 @@ var Moving = new Phaser.Class({
             tweens.push({
                 targets: this,
                 x: {value: ex*Engine.tileWidth, duration: time*1000},
-                y: {value: ey*Engine.tileHeight, duration: time*1000},
+                y: {value: ey*Engine.tileHeight, duration: time*1000}
                 /*onStart: function(){
                     console.log('start');
                 }*/
@@ -84,7 +77,7 @@ var Moving = new Phaser.Class({
                 mover.previousOrientation = null;
             },
             onUpdate: function(){
-                    mover.updatePosition();
+                mover.updatePosition();
             },
             onComplete: mover.endMovement.bind(mover)
         });
@@ -97,6 +90,11 @@ var Moving = new Phaser.Class({
     },
     
     updatePosition: function(){
+        /*if(!this.scene){
+            console.log('(UP) Alert: scene undefined for '+this.constructor.name+' '+this.id);
+            console.log(this);
+        }*/
+        if(!this.scene) return; // quick fix before the bug gets fixed in Phaser
         if(this.x > this.previousPosition.x){ // right
             this.orientation = 'right';
         }else if(this.x < this.previousPosition.x) { // left
@@ -123,7 +121,6 @@ var Moving = new Phaser.Class({
         this.chunk = Utils.tileToAOI({x: this.tileX, y: this.tileY});
 
         if(this.bubble) this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
-        //this.updateHalo();
 
         if(this.constructor.name == 'Player' && this.id == Engine.player.id) {
             if(this.chunk != this.previousChunk) Engine.updateEnvironment();

@@ -178,7 +178,7 @@ Engine.create = function(){
     Engine.blitters.push(Engine.scene.add.blitter(0,0,'ground_tiles').setDepth(0));
     Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(2));
     Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
-    Engine.useBlitters = false;
+    Engine.useBlitters = true;
 
     Engine.created = true;
     Client.requestData();
@@ -852,20 +852,8 @@ Engine.computePath = function(position){
     Engine.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(Engine.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
     var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, x, y, Engine.PFgrid);
     if(path.length > PFUtils.maxPathLength) return;
-    path = Engine.trimPath(path);
+    path = PFUtils.trimPath(path,Engine.battleZones);
     Engine.player.move(path);
-};
-
-// Shortens the path so that it stops at a battlezone transition
-Engine.trimPath = function(path){
-    var inBattleZone = !!Engine.battleZones.get(path[0][0],path[0][1]);
-    var p = [];
-    for(var i = 0; i < path.length; i++){
-        var flag = !!Engine.battleZones.get(path[i][0],path[i][1]);
-        p.push(path[i]);
-        if(flag != inBattleZone) break;
-    }
-    return p;
 };
 
 Engine.updatePosition = function(player){

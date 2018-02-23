@@ -47,12 +47,25 @@ Then:
 - Orientation panel in char menu hinting at what to do and where to go (w/ map?)
 Goal: 1h of gameplay?
 
-Battlezones:
-- New fight: check non-moving in-zone
-- End of path: check for battlezone
-- Client path: shorten at first battle cell
+Battle debug:
+-------------
+Battle: long delay when player's ATB entirely empty
+Battle: animals keep target
+Battle: one attack's tween can mess with another's and the player stays half transparent
+Battle: melee attacks from two cells away
+Multiplayer:
+Battle: test align of turnee text
+Battle: manageFrame of cells when dragged into battle 
+Battle: don't start fight with animal already in fight
+Battle: fill ATB of whoever's turn it is when dragged into fight
+Battle: notify of new fighters
+Battle: disconnects in multiplayer fights
+Battle: when dying, hide battle UI, even if fight ongoing
+Battle: test extensively
+Battle: respawn
 
 Week:
+-----
 Fort: staff
 Construction: temporal aspects of commitment
 Construction: earn civic xp on commit (and use real numbers in character)
@@ -66,17 +79,7 @@ Character: display committed buildings + hide buttons where already committed/wh
 Character: add new stats
 Character: display stat details
 Character: foodSurplus in self update, used for ProductivityPanel & CharacterPanel updates
-Battle: test extensively
-Battle: disconnects in multiplayer fights
-Battle: animals stop walking when entering battle zone
-Battle: don't move to busy cells / collisions
-Batte: don't start fight with animal already in fight
-Battle: long delay when player's ATB entirely empty
-Battle: fill ATB of whoever's turn it is when dragged into fight
-Battle: when dying, hide battle UI, even if fight ongoing
-Bug: scene bug in movingEntity about depth? Reproduce by moving a lot, having someone deco...
 Finish: review base stats values; test economy for a while
-
 
 Cleaning:
 --------
