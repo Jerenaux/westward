@@ -80,22 +80,16 @@ Animal.prototype.updateIdle = function(){
     if(this.inFight) return;
     this.idleTime -= GameServer.server.npcUpdateRate;
     if(this.idleTime <= 0){
-        var a = Date.now();
         var dest = this.findRandomDestination();
         var path = GameServer.findPath({x:this.x,y:this.y},dest);
         if(!path || path.length <= 1){
             this.idleTime = 200;
             return;
         }
-        //var pl = path.length;
         path = PFUtils.trimPath(path,GameServer.battleCells);
-        /*if(path.length != pl){
-            console.log('trimmed path (',path.length,' vs ',pl,'), end at ',path[path.length-1][0],path[path.length-1][1]);
-        }*/
         if(debug) console.log('['+this.constructor.name+' '+this.id+'] Found path of length '+path.length);
         this.idle = false;
         this.setPath(path);
-        console.log('Dest took '+(Date.now()-a)+' ms to decide');
     }
 };
 
@@ -111,7 +105,6 @@ Animal.prototype.findRandomDestination = function(){
 };
 
 Animal.prototype.decideBattleAction = function(){
-    var a = Date.now();
     var target = this.selectTarget();
     var data = {};
     if(this.battle.nextTo(this,target)){
@@ -130,7 +123,6 @@ Animal.prototype.decideBattleAction = function(){
         }
     }
     this.battle.processAction(this,data);
-    console.log('Action took '+(Date.now()-a)+' ms to decide');
 };
 
 Animal.prototype.selectTarget = function(){
@@ -155,12 +147,13 @@ Animal.prototype.computeBattleDestination = function(target){
     var closest = null;
     var minDist = 9999;
     //console.log('target : ',dest.x,dest.y);
-    for(var x = Math.min(this.x,dest.x); x <= Math.max(this.x,dest.x); x++){
-        for(var y = Math.min(this.y,dest.y); y <= Math.max(this.y,dest.y); y++) {
+    for(var x = Math.min(this.x,dest.x-1); x <= Math.max(this.x,dest.x+1); x++){
+        for(var y = Math.min(this.y,dest.y-1); y <= Math.max(this.y,dest.y+1); y++) {
             if(x == dest.x && y == dest.y) continue;
-            if(!this.inBattleRange(x,y)) continue;
-            if(GameServer.collisions.get(y,x)) continue;
+            if(!this.battle.isPosition(x,y)) continue;
             if(!this.battle.isPositionFree(x,y)) continue;
+            if(PFUtils.checkCollision(x,y)) continue;
+            if(!this.inBattleRange(x,y)) continue;
 
             if(this.battle.nextTo({x:x,y:y},dest)) return {x:x,y:y};
 

@@ -40,11 +40,8 @@ Player.prototype.registerPlayer = function(){
 };
 
 Player.prototype.setStartingPosition = function(){
-    //this.x = Utils.randomInt(523,542);
-    //this.y = Utils.randomInt(690,700);
     this.x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
     this.y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
-    console.log('Hi at ('+this.x+', '+this.y+')');
 };
 
 Player.prototype.setStartingInventory = function(){

@@ -91,7 +91,7 @@ GameServer.readMap = function(mapsPath){
         //var data = animals.list[i];
         var x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
         var y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
-        if(GameServer.collisions.get(y,x)) continue;
+        if(PFUtils.checkCollision(x,y)) continue;
         //var animal = new Animal(data.x,data.y,data.type);
         var animal = new Animal(x,y,0);
         GameServer.animals[animal.id] = animal;
@@ -99,6 +99,16 @@ GameServer.readMap = function(mapsPath){
 
     GameServer.updateStatus();
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
+
+    // For debugging purposes:
+    var dummySocket = {
+        id: 0,
+        emit: function(){}
+    };
+    var player = GameServer.addNewPlayer(dummySocket,531,661);
+    var animal = new Animal(541,661,0);
+    GameServer.animals[animal.id] = animal;
+    new Battle(player,animal);
 };
 
 GameServer.getPlayer = function(socketID){
@@ -113,9 +123,14 @@ GameServer.checkPlayerID = function(id){ // check if no other player is using sa
     return (GameServer.players[id] === undefined);
 };*/
 
-GameServer.addNewPlayer = function(socket){
+GameServer.addNewPlayer = function(socket,x,y){ // todo: remove x and y (debug)
     var player = new Player();
-    player.setStartingPosition();
+    if(x){ // todo: remove (debug)
+        player.x = x;
+        player.y = y;
+    }else {
+        player.setStartingPosition();
+    }
     player.setStartingInventory();
     var document = player.dbTrim();
     GameServer.server.db.collection('players').insertOne(document,function(err){
@@ -125,6 +140,7 @@ GameServer.addNewPlayer = function(socket){
         GameServer.finalizePlayer(socket,player);
         GameServer.server.sendID(socket,mongoID);
     });
+    return player;
 };
 
 GameServer.loadPlayer = function(socket,id){
@@ -221,12 +237,12 @@ GameServer.handleChat = function(data,socketID){
     player.setChat(data);
 };
 
-GameServer.findPath = function(from,to){
-    //console.log('looking for path : ',from,to);
-    if(GameServer.collisions.get(to.y,to.x)) return null;
 
-    GameServer.PFgrid.nodes = new Proxy(clone(GameServer.collisions),PFUtils.firstDimensionHandler); // Recreates a new grid each time
-    return GameServer.PFfinder.findPath(from.x, from.y, to.x, to.y, GameServer.PFgrid);
+GameServer.findPath = function(from,to){
+    if(PFUtils.checkCollision(to.x,to.y)) return null;
+    var path = GameServer.PFfinder.findPath(from.x, from.y, to.x, to.y, GameServer.PFgrid);
+    PF.reset();
+    return path;
 };
 
 GameServer.handleBattle = function(opponentID,socketID){

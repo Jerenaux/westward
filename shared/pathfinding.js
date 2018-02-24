@@ -1042,6 +1042,7 @@ function AStarFinder(opt) {
  */
 AStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
     PF.consideredNodes = 0;
+    PF.inspectedNodes = [];
     var openList = new Heap(function(nodeA, nodeB) {
             return nodeA.f - nodeB.f;
         }),
@@ -1060,17 +1061,18 @@ AStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
     // push the start node into the open list
     openList.push(startNode);
     startNode.opened = true;
+    PF.inspectedNodes.push(startNode);
 
     // while the open list is not empty
     while (!openList.empty()) {
         // pop the position of node which has the minimum `f` value.
         node = openList.pop();
         node.closed = true;
-        //console.log(++PF.consideredNodes);
         if(++PF.consideredNodes > 1000) return [];
 
         // if reached the end position, construct the path and return it
         if (node === endNode) {
+            //console.log(PF.inspectedNodes.length,' nodes considered');
             return Util.backtrace(endNode);
         }
 
@@ -1101,6 +1103,7 @@ AStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
                 if (!neighbor.opened) {
                     openList.push(neighbor);
                     neighbor.opened = true;
+                    PF.inspectedNodes.push(neighbor);
                 } else {
                     // the neighbor can be reached with smaller cost.
                     // Since its f value has been updated, we have to

@@ -11,7 +11,8 @@ if(onServer){
 var PFUtils = {
     speed: 5, // 5 tiles/sec
     maxPathLength: 36,
-    battleRange: 3
+    battleRange: 3,
+    collisionMap: null
 };
 /* The handler captures all queries to the object, be it with [] or .
  *  Since it captures queries with ., it also captures method calls.
@@ -62,23 +63,43 @@ PFUtils.firstDimensionHandler = {
 
 PFUtils.setup = function(supervisor){
     supervisor.collisions = new SpaceMap(); // contains 1 for the coordinates that are non-walkables
+    PFUtils.collisionMap = supervisor.collisions;
     supervisor.PFgrid = new PF.Grid(0,0); // grid placeholder for the pathfinding
+    supervisor.PFgrid.nodes = new Proxy(supervisor.collisions,PFUtils.firstDimensionHandler);
     supervisor.PFfinder = PFUtils.getFinder();
     // Replaces the isWalkableAt method of the PF library
     PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;
     PF.consideredNodes = 0;
+    PF.inspectedNodes = [];
+
+    PF.reset = function(){
+        PF.inspectedNodes.forEach(function(node){
+            node.opened = false;
+            node.closed = false;
+            node.parent = null;
+        });
+        PF.inspectedNodes = [];
+    };
 };
 
 PFUtils.getFinder = function(){
     return new PF.AStarFinder({
-        //allowDiagonal: true,  // Turn back on when approprate sprites are available
-        allowDiagonal: false,
+        allowDiagonal: false,  // Turn back on when approprate sprites are available
         dontCrossCorners: true
     });
 };
 
 PFUtils.isWalkable = function(x, y) {
     return this.nodes[y][x].walkable;
+};
+
+PFUtils.checkCollision = function(x,y){
+    if(!PFUtils.collisionMap[y]) return false;
+    var node = PFUtils.collisionMap[y][x]; // y, then x!
+    if(node === undefined) return false;
+    if(node == 0) return false;
+    if(node == 1) return true;
+    return !node.walkable;
 };
 
 PFUtils.getDuration = function(sx,sy,ex,ey){ // Compute movement duration, units are tiles and seconds
@@ -98,7 +119,6 @@ PFUtils.getDuration = function(sx,sy,ex,ey){ // Compute movement duration, units
 
 // Shortens the path so that it stops at a battlezone transition
 PFUtils.trimPath = function(path,map){
-    // TODO: no trim if start from battlezone
     var inBattleZone = !!map.get(path[0][0],path[0][1]);
     if(inBattleZone) return path;
     var p = [];

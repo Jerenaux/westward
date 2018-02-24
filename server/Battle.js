@@ -184,6 +184,10 @@ Battle.prototype.processMove = function(f){
     };
 };
 
+Battle.prototype.isPosition = function(x,y){
+    return GameServer.battleCells.has(x,y);
+};
+
 Battle.prototype.isPositionFree = function(x,y){
     return !this.positions.get(x,y);
 };

@@ -423,7 +423,10 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
             alpha: 0,
             duration: 100,
             yoyo: true,
-            repeat: 3
+            repeat: 3,
+            onStart: function(){
+                target.setAlpha(1); // so that if it takes over another tween immediately, it starts from the proper alpha value
+            }
         });
 };
 
@@ -846,11 +849,15 @@ Engine.moveToClick = function(pointer){
 };
 
 Engine.computePath = function(position){
+    //if(Engine.checkCollision(position)) return;
     var x = position.x;
     var y = position.y;
-    if(Engine.collisions.get(y,x) == 1) return; // y, then x!
-    Engine.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(Engine.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
+    if(PFUtils.checkCollision(x,y)) return;
+    //if(Engine.collisions.get(y,x) == 1) return; // y, then x!
+    //Engine.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(Engine.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
     var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, x, y, Engine.PFgrid);
+    PF.reset();
+    if(path.length == 0) return;
     if(path.length > PFUtils.maxPathLength) return;
     path = PFUtils.trimPath(path,Engine.battleZones);
     Engine.player.move(path);
@@ -908,7 +915,8 @@ Engine.updateMarker = function(tile){
     Engine.marker.y = (tile.y*Engine.tileHeight);
     if(tile.x != Engine.marker.previousTile.x || tile.y != Engine.marker.previousTile.y){
         Engine.marker.previousTile = tile;
-        if(Engine.checkCollision(tile)){
+        //if(Engine.checkCollision(tile)){
+        if(PFUtils.checkCollision(tile.x,tile.y)){
             Engine.marker.setFrame(1);
         }else{
             Engine.marker.setFrame(0);
@@ -925,11 +933,14 @@ Engine.showMarker = function(){
 };
 
 // Return true if there is a collision on that tile
-Engine.checkCollision = function(tile){ // tile is x, y pair
-    //if(Engine.displayedChunks.length < 4) return; // If less than 4, it means that wherever you are the chunks haven't finished displaying
+/*Engine.checkCollision = function(tile){ // tile is x, y pair
     if(!Engine.collisions[tile.y]) return false;
-    return !!Engine.collisions[tile.y][tile.x];
-};
+    var node = Engine.collisions[tile.y][tile.x];
+    if(node === undefined) return false;
+    if(node == 0) return false;
+    if(node == 1) return true;
+    return !node.walkable;
+};*/
 
 /*
 * #### UPDATE CODE #####
@@ -1410,7 +1421,7 @@ Engine.recycleAnim = function(sprite){
 Engine.drawGrid = function(tl,w,h){
     for(var x = tl.x; x < tl.x+w; x++){
         for(var y = tl.y; y < tl.y+h; y++){
-            if(!Engine.checkCollision({x:x,y:y}) && !Engine.isBattlezone(x,y)) {
+            if(!PFUtils.checkCollision(x,y) && !Engine.isBattlezone(x,y)) {
                 var cell = Engine.getNextCell();
                 cell.setUp(x,y);
                 Engine.battleZones.add(x,y,cell);

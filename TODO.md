@@ -49,18 +49,14 @@ Goal: 1h of gameplay?
 
 Battle debug:
 -------------
-Battle: long delay when player's ATB entirely empty
-Battle: animals keep target
-Battle: one attack's tween can mess with another's and the player stays half transparent
-Battle: melee attacks from two cells away
 Multiplayer:
 Battle: test align of turnee text
 Battle: manageFrame of cells when dragged into battle 
 Battle: don't start fight with animal already in fight
 Battle: fill ATB of whoever's turn it is when dragged into fight
-Battle: notify of new fighters
 Battle: disconnects in multiplayer fights
 Battle: when dying, hide battle UI, even if fight ongoing
+Battle: notify of new fighters
 Battle: test extensively
 Battle: respawn
 
@@ -84,6 +80,9 @@ Finish: review base stats values; test economy for a while
 Cleaning:
 --------
 Performance:
+- Animals keep their target
+- "Sleep" mode for NPC when no player in currentAOI.entities (change flags on AOI transition, not on every NPC update loop iteration)
+- Pathmaking instead of pahfinding?
 - Concile the two coexisting menu update systems: the one used by updateSelf and the one used by updateBuilding
 - Dont send full building inventories when buying/selling (send arrays of deltas)
 - Use pool for footsteps (see Groups, who now act as pools)
@@ -114,6 +113,7 @@ Order:
 Content:
 -------
 * Battle system
+- Animals have sorted list of targets, iteratr through it when first one not reachable for some reason
 - Respawn
 - Respawn if disconnect
 - Add battle areas when new fighters

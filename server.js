@@ -161,8 +161,9 @@ server.sendInitializationPacket = function(socket,packet){
 };
 
 server.sendUpdate = function(socketID,pkg){
+    var socket = server.getSocket(socketID);
     pkg = server.addStamp(pkg);
-    pkg.latency = Math.floor(server.getSocket(socketID).latency);
+    if(socket) pkg.latency = Math.floor(socket.latency);
     //if(server.enableBinary) pkg = Encoder.encode(pkg,CoDec.finalUpdateSchema);
     if(pkg) io.in(socketID).emit('update',pkg);
 };
