@@ -2,7 +2,7 @@
  * Created by jeren on 25-01-18.
  */
 
-function ProgressBar(x,y,w,color){
+function ProgressBar(){
     this.displayed = false;
     this.max = 100;
     this.level = 0;
@@ -44,6 +44,7 @@ ProgressBar.prototype.setLevel = function(level,max,duration){
     if(dw == 0) return;
     if(this.displayed){
         var duration = duration || Math.max((delta * 2000),1);
+        console.log('duration : ',duration);
         var _head = this.head;
         var _tail = this.tail;
         var _lvl = this.level;

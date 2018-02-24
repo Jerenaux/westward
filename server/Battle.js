@@ -116,7 +116,7 @@ Battle.prototype.newTurn = function(){
     for(var i = 0; i < this.fighters.length; i++){
         var f = this.fighters[i];
         if(f.isPlayer) {
-            if(i == 0) f.updatePacket.remainingTime = this.countdown/1000;
+            f.updatePacket.remainingTime = this.countdown/1000;
             f.updatePacket.activeID = activeFighter.getShortID();
         }
     }

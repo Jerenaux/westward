@@ -50,14 +50,16 @@ Goal: 1h of gameplay?
 Battle debug:
 -------------
 Multiplayer:
-Battle: test align of turnee text
-Battle: manageFrame of cells when dragged into battle 
+Battle: wrong HP y? (side-by-side fight)
 Battle: don't start fight with animal already in fight
-Battle: fill ATB of whoever's turn it is when dragged into fight
 Battle: disconnects in multiplayer fights
 Battle: when dying, hide battle UI, even if fight ongoing
+Battle: prevent races towards same cell, resulting in two fighters on same (lock cell?)
+Battle: make irregular battlezones?
+Battle: prevent monsters from pathfinding out of area?
 Battle: notify of new fighters
-Battle: test extensively
+Battle: merge overlapping battles?
+Battle: test extensively (multiplayer, battles side-by-side, overlap...)
 Battle: respawn
 
 Week:

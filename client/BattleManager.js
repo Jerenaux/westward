@@ -18,11 +18,13 @@ BattleManager.handleFightStatus = function(status){
 };
 
 BattleManager.startFight = function(){
+    BattleManager.inBattle = true;
     Engine.hideUI();
     Engine.hideMarker();
     Engine.fightText.tween.play();
-    BattleManager.inBattle = true;
+    Engine.updateGrid();
     Engine.menus.battle.display();
+    Engine.menus.battle.panels.timer.hide();
 
     //BattleManager.onFightStart();
 };
@@ -48,23 +50,25 @@ BattleManager.manageTurn = function(shortID){
     //console.log('##############');
     if(!BattleManager.inBattle) return;
 
+    var timerPanel = Engine.currentMenu.panels['timer'];
+    var timer = timerPanel.bar;
+    if(!timerPanel.displayed) timerPanel.display();
+
     if(this.active) {
         BattleManager.deactivateCell();
         this.active.isActiveFighter = false;
     }
 
     this.active = BattleManager.getActiveFighter(shortID);
-    if(!this.active){
-        console.log('shortID = ',shortID);
-    }
+
+    if(!this.active) console.log('shortID = ',shortID);
+
     BattleManager.isPlayerTurn = this.active.isHero;
     BattleManager.actionTaken = false;
     this.active.isActiveFighter = true;
     BattleManager.activateCell();
 
-    var timerPanel = Engine.currentMenu.panels['timer'];
     timerPanel.updateText(this.active.name,this.active.isHero);
-    var timer = timerPanel.bar;
     timer.reset();
     timer.setLevel(0,100,BattleManager.countdown*1000);
 

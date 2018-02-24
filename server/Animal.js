@@ -105,6 +105,7 @@ Animal.prototype.findRandomDestination = function(){
 };
 
 Animal.prototype.decideBattleAction = function(){
+    if(!this.inFight) return;
     var target = this.selectTarget();
     var data = {};
     if(this.battle.nextTo(this,target)){
