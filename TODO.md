@@ -14,27 +14,6 @@ Prototype level:
 - Think about typical gameplay scenarios and decide milestones accordingly
 - Profiles: new vs old player, focused on self vs setllement, x 4 classes
 
-Settlement-focused experience:
-- Checks out settlement status in fort
--> Food surplus bonuses/maluses
--> Development goals + "next level"
--> Resource levels
--> Buildings status
--> Military threats
--> Map legend
--> Officials
--> Taxes
-(-> Disable official prerogatives)
-- Based on that, determine mission: bring in resource, combat threat, build...
-- Lack of food: hunt and kill something
-- Lack of gold: sell furs
-- Other: go and commit to relevant buildings
-- Commit to buildings being built, until completion
-- Earn civic xp with commitment
-- Gray out some actions based on civic level
-- Show dev level impact in stats panel
-- Show committment slots in char panel
-
 Then:
 - Make Westward page
 - Have 2 settlements, with important differences 
@@ -47,25 +26,22 @@ Then:
 - Orientation panel in char menu hinting at what to do and where to go (w/ map?)
 Goal: 1h of gameplay?
 
-Battle debug:
--------------
-Multiplayer:
-Battle: wrong HP y? (side-by-side fight)
-Battle: don't start fight with animal already in fight
-Battle: disconnects in multiplayer fights
-Battle: when dying, hide battle UI, even if fight ongoing
-Battle: prevent races towards same cell, resulting in two fighters on same (lock cell?)
-Battle: make irregular battlezones?
-Battle: prevent monsters from pathfinding out of area?
-Battle: notify of new fighters
-Battle: merge overlapping battles?
-Battle: test extensively (multiplayer, battles side-by-side, overlap...)
-Battle: respawn
-
 Week:
 -----
+Battle: cells are not updated anymore
+Battle: clicking on red cell ends turn?
+Battle: wrong HP y? (side-by-side fight)
+Battle: don't start fight with animal already in fight
+Battle: disconnet/deaths in spectated fights
+Battle: stepping into building/fight?
+Battle: disconnects/deaths in multiplayer fights
+Battle: when dying, hide battle UI, even if fight ongoing
+Battle: constrain pathfinding to battlezones
+Battle: expand battle zone for new fighters (with small delays)
+Battle: notify of new fighters
+Battle: test extensively (multiplayer, battles side-by-side, overlap...)
+Battle: respawn
 Fort: staff
-Construction: temporal aspects of commitment
 Construction: earn civic xp on commit (and use real numbers in character)
 Economic loop: impact of materials availability on building 
 Economic loop: apply effect of food deficit on players (+ update character panel)
@@ -73,11 +49,12 @@ Economic loop: update buildings panel in real time (clever updates)
 Economic loop: test all updates of all menus 
 Econmic loop: skin dead animals
 UI: display event pop-ups after skinning
-Character: display committed buildings + hide buttons where already committed/when out of slots
+Character: display committed buildings
+Character: hide buttons where already committed/when out of slots
 Character: add new stats
 Character: display stat details
 Character: foodSurplus in self update, used for ProductivityPanel & CharacterPanel updates
-Finish: review base stats values; test economy for a while
+Finish: review base stats values; test economy for a while; decide duration of all cycles (eco, spawn...)
 
 Cleaning:
 --------
@@ -98,6 +75,7 @@ Performance:
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 - To check if update packets are empty: iterate over keys and check for emptyness using typeof (if array and length 0 ...)
 Order:
+- Compress repeated code in updateWorld()
 - Remove unnecessary files (esp. sprites)
 - Remove "longslot" stuff intended for stretching longslots vertically?
 - Find out how to generate graphics objects (grid tiles, gradients...) programmatically for various uses

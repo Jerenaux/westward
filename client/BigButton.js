@@ -61,6 +61,7 @@ BigButton.prototype.handleClick = function(){
         this.lastClick = Date.now();
     }
     this.handleOver();
+    Engine.interrupt = true;
 };
 
 BigButton.prototype.handleOver = function(){

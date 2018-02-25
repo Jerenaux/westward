@@ -9,7 +9,7 @@ var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var TURN_DURATION = 3*1000; // milliseconds
 var TICK_RATE = 100; // milliseconds
 
-function Battle(f1,f2){
+function Battle(){
     this.id = GameServer.lastBattleID++;
     this.participants = [];
     this.fighters = []; // the fighter at position 0 is the one currently in turn
@@ -18,28 +18,16 @@ function Battle(f1,f2){
         'Player': 0
     };
     this.fallen = [];
-    this.area = []; // array of rectangular areas
     this.spannedAOIs = new Set();
-    this.positions = new SpaceMap();
+    this.positions = new SpaceMap(); // positions occupied by fighters
+    this.cells = new SpaceMap();
     this.ended = false;
+
     this.reset();
-    this.start(f1,f2);
+    //this.start(f1,f2);
 }
 
-Battle.prototype.start = function(f1,f2){
-    this.addFighter(f2);
-    this.addFighter(f1);
-
-    this.computeArea();
-    GameServer.checkForFighter(this.spannedAOIs);
-
-    // todo: refine this? Compute center..?
-    this.x = this.fighters[0].x;
-    this.y = this.fighters[0].y;
-    this.aoi = Utils.tileToAOI({x:this.x,y:this.y});
-    GameServer.addAtLocation(this);
-    GameServer.handleAOItransition(this, null);
-
+Battle.prototype.start = function(){
     this.loop = setInterval(this.update.bind(this),TICK_RATE);
     this.newTurn();
 };
@@ -264,85 +252,57 @@ Battle.prototype.end = function(){
         f.endFight();
         if(f.isPlayer) f.notifyFight(false);
     });
-    GameServer.removeEntity(this);
     this.cleanUp();
     console.log('[B'+this.id+'] Ended');
 };
 
-Battle.prototype.computeArea = function(){
-    var f1 = this.fighters[1];
-    var f2 = this.fighters[0]; // TODO: generalize to more fighters
-
-    var pos1 = f1.getEndOfPath();
-    var pos2 = f2.getEndOfPath();
-
-    var tl = {x: null, y: null};
-    if (pos1.x <= pos2.x && pos1.y <= pos2.y) {
-        tl.x = pos1.x;
-        tl.y = pos1.y;
-    } else if (pos1.x <= pos2.x && pos1.y > pos2.y) {
-        tl.x = pos1.x;
-        tl.y = pos2.y;
-    }else if(pos1.x > pos2.x && pos1.y <= pos2.y){
-        tl.x = pos2.x;
-        tl.y = pos1.y;
-    }else if(pos1.x > pos2.x && pos1.y > pos2.y){
-        tl.x = pos2.x;
-        tl.y = pos2.y;
-    }
-
-    if(pos1.x == pos2.x) tl.x -= 1;
-    if(pos1.y == pos2.y) tl.y -= 1;
-
-    tl.x -= 1;
-    tl.y -= 1;
-
-    var w = Math.max(Math.abs(pos1.x - pos2.x)+3,3);
-    var h = Math.max(Math.abs(pos1.y - pos2.y)+3,3);
-
-    this.addArea({
-        x: tl.x,
-        y: tl.y,
-        w: w,
-        h: h
-    });
-};
-
 Battle.prototype.addArea = function(area){
-    this.spannedAOIs.add(Utils.tileToAOI({x:area.x,y:area.y}));
-    this.spannedAOIs.add(Utils.tileToAOI({x:area.x+area.w,y:area.y}));
-    this.spannedAOIs.add(Utils.tileToAOI({x:area.x+area.w,y:area.y+area.h}));
-    this.spannedAOIs.add(Utils.tileToAOI({x:area.x,y:area.y+area.h}));
+    var x = area.x;
+    var y = area.y;
+    var w = area.w;
+    var h = area.h;
+    // spannedAOIs are used to narrow down the search for new fighters
+    // it's more efficient to iterate through the few entities of an AOI than through all the positions of a battle zone
+    this.spannedAOIs.add(Utils.tileToAOI({x:x,y:y}));
+    this.spannedAOIs.add(Utils.tileToAOI({x:x+w,y:y}));
+    this.spannedAOIs.add(Utils.tileToAOI({x:x+w,y:y+h}));
+    this.spannedAOIs.add(Utils.tileToAOI({x:x,y:y+h}));
 
-    for(var x = area.x; x < area.x+area.w; x++){
-        for(var y = area.y; y < area.y+area.h; y++){
-            GameServer.battleCells.add(x,y,this);
+    var maxx = x+w;
+    var maxy = y+h;
+    var sy = y;
+    for(; x < maxx; x++){
+        for(y = sy; y < maxy; y++){
+            GameServer.addBattleCell(this,x,y);
         }
     }
-    this.area.push(area);
-};
 
-Battle.prototype.removeArea = function(area){
-    for(var x = area.x; x < area.x+area.w; x++){
-        for(var y = area.y; y < area.y+area.h; y++){
-            GameServer.battleCells.delete(x,y);
-        }
-    }
+    GameServer.checkForFighter(this.spannedAOIs);
 };
 
 Battle.prototype.cleanUp = function(){
-    for(var i = 0; i < this.area.length; i++){
-        this.removeArea(this.area[i]);
-    }
-};
-
-Battle.prototype.trim = function(){
-    var trimmed = {};
-    var broadcastProperties = ['id','area']; // list of properties relevant for the client
-    for(var p = 0; p < broadcastProperties.length; p++){
-        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
-    }
-    return trimmed;
+    var _battle = this;
+    this.cells.toList().forEach(function(cell){
+        GameServer.removeBattleCell(_battle,cell.x,cell.y);
+    });
 };
 
 module.exports.Battle = Battle;
+
+function BattleCell(x,y,battle){
+    this.id = GameServer.lastCellID++;
+    this.x = x;
+    this.y = y;
+    this.aoi = Utils.tileToAOI({x:this.x,y:this.y});
+    this.battle = battle;
+}
+
+BattleCell.prototype.trim = function(){
+    return {
+        id: this.id,
+        x: this.x,
+        y: this.y
+    };
+};
+
+module.exports.BattleCell = BattleCell;

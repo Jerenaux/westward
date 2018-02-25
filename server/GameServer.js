@@ -11,6 +11,7 @@ var GameServer = {
     lastBuildingID: 0,
     lastAnimalID: 0,
     lastBattleID: 0,
+    lastCellID: 0,
     players: {}, // player.id -> player
     animals: {}, // animal.id -> animal
     buildings: {}, // building.id -> building
@@ -26,13 +27,14 @@ module.exports.GameServer = GameServer;
 var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
-var ListMap = require('../shared/ListMap.js').ListMap;
+//var ListMap = require('../shared/ListMap.js').ListMap;
 var AOI = require('./AOI.js').AOI;
 var Player = require('./Player.js').Player;
 var Settlement = require('./Settlement').Settlement;
 var Building = require('./Building.js').Building;
 var Animal = require('./Animal.js').Animal;
 var Battle = require('./Battle.js').Battle;
+var BattleCell = require('./Battle.js').BattleCell;
 var PF = require('../shared/pathfinding.js');
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
@@ -105,10 +107,28 @@ GameServer.readMap = function(mapsPath){
         id: 0,
         emit: function(){}
     };
-    var player = GameServer.addNewPlayer(dummySocket,531,661);
+    GameServer.addNewPlayer(dummySocket,531,661);
     var animal = new Animal(541,661,0);
+    animal.idle = false;
     GameServer.animals[animal.id] = animal;
-    new Battle(player,animal);
+
+    setTimeout(function(){
+        //GameServer.handleBattle(animal.id,dummySocket.id);
+    },1000);
+};
+
+GameServer.setUpdateLoops = function(){
+    var clientUpdateRate = 1000/5; // Rate at which update packets are sent
+    var walkUpdateRate = 1000/20; // Rate at which positions are updated
+    var npcUpdateRate = 1000/5;
+    var settlementUpdateRate = 60*1000;
+    var playerUpdateRate = 60*1000;
+
+    setInterval(GameServer.updateNPC,npcUpdateRate);
+    setInterval(GameServer.updateWalks,walkUpdateRate);
+    setInterval(GameServer.updateClients,clientUpdateRate);
+    setInterval(GameServer.updateSettlements,settlementUpdateRate);
+    setInterval(GameServer.updatePlayers,playerUpdateRate);
 };
 
 GameServer.getPlayer = function(socketID){
@@ -210,9 +230,8 @@ GameServer.removeEntity = function(entity){
             break;
     }
     if(arr) delete arr[entity.id];
-    if(entity.battle) entity.battle.removeFighter(entity,-1);
+    if(entity.canFight && entity.battle) entity.battle.removeFighter(entity,-1);
 };
-
 
 GameServer.getAOIAt = function(x,y){
     return GameServer.AOIs[Utils.tileToAOI({x:x,y:y})];
@@ -237,7 +256,6 @@ GameServer.handleChat = function(data,socketID){
     player.setChat(data);
 };
 
-
 GameServer.findPath = function(from,to){
     if(PFUtils.checkCollision(to.x,to.y)) return null;
     var path = GameServer.PFfinder.findPath(from.x, from.y, to.x, to.y, GameServer.PFgrid);
@@ -252,7 +270,90 @@ GameServer.handleBattle = function(opponentID,socketID){
     if(animal.moving) return;
     if(animal.dead) return;
     // TODO: check for proximity
-    new Battle(player,animal);
+    var area = GameServer.computeBattleArea(player,animal);
+    var battle = GameServer.checkBattleOverlap(area);
+    if(!battle) battle = new Battle();
+    battle.addFighter(player);
+    battle.addFighter(animal);
+    battle.addArea(area);
+    battle.start();
+};
+
+GameServer.computeBattleArea = function(f1,f2){
+    var pos1 = f1.getEndOfPath();
+    var pos2 = f2.getEndOfPath();
+
+    var tl = {x: null, y: null};
+    if (pos1.x <= pos2.x && pos1.y <= pos2.y) {
+        tl.x = pos1.x;
+        tl.y = pos1.y;
+    } else if (pos1.x <= pos2.x && pos1.y > pos2.y) {
+        tl.x = pos1.x;
+        tl.y = pos2.y;
+    }else if(pos1.x > pos2.x && pos1.y <= pos2.y){
+        tl.x = pos2.x;
+        tl.y = pos1.y;
+    }else if(pos1.x > pos2.x && pos1.y > pos2.y){
+        tl.x = pos2.x;
+        tl.y = pos2.y;
+    }
+
+    if(pos1.x == pos2.x) tl.x -= 1;
+    if(pos1.y == pos2.y) tl.y -= 1;
+
+    tl.x -= 1;
+    tl.y -= 1;
+
+    var w = Math.max(Math.abs(pos1.x - pos2.x)+3,3);
+    var h = Math.max(Math.abs(pos1.y - pos2.y)+3,3);
+
+    return {
+        x: tl.x,
+        y: tl.y,
+        w: w,
+        h: h
+    };
+};
+
+GameServer.checkBattleOverlap = function(area){
+    for(var x = area.x; x < area.x+area.w; x++){
+        for(var y = area.y; y < area.y+area.h; y++){
+            var cell = GameServer.battleCells.get(x,y);
+            if(cell) return cell.battle;
+        }
+    }
+    return null;
+};
+
+GameServer.checkForFighter = function(AOIs){
+    AOIs.forEach(function(id){
+        var aoi = GameServer.AOIs[id];
+        aoi.entities.forEach(function(e){
+            GameServer.checkForBattle(e);
+        });
+    });
+};
+
+GameServer.checkForBattle = function(entity){
+    if(!entity.canFight || entity.inFight || entity.moving || entity.dead) return;
+    var cell = GameServer.battleCells.get(entity.x,entity.y);
+    if(cell) cell.battle.addFighter(entity);
+};
+
+GameServer.addBattleCell = function(battle,x,y){
+    if(GameServer.battleCells.get(x,y)) return;
+    var cell = new BattleCell(x,y,battle);
+    GameServer.battleCells.add(x,y,cell);
+    battle.cells.add(x,y,cell);
+    GameServer.addAtLocation(cell);
+    GameServer.handleAOItransition(cell);
+};
+
+GameServer.removeBattleCell = function(battle,x,y){
+    var cell = battle.cells.get(x,y);
+    GameServer.removeEntity(cell);
+    GameServer.battleCells.delete(x,y);
+    battle.cells.delete(x,y);
 };
 
 GameServer.handleBattleAction = function(data,socketID){
@@ -271,7 +372,7 @@ GameServer.handleShop = function(data,socketID) {
         if(!building.canSell(item,nb)) return;
         var price = building.getPrice(item,nb,'buy');
         if(!player.canBuy(price)) return;
-        player.takeGold(price);
+        player.takeGold(price);is
         player.giveItem(item,nb);
         building.takeItem(item,nb);
         building.giveGold(price);
@@ -297,7 +398,7 @@ GameServer.handleCraft = function(data,socketID){
     GameServer.operateCraft(player, recipe, targetItem, nb);
 };
 
-GameServer.handleBuild = function(data,socketID){
+/*GameServer.handleBuild = function(data,socketID){
     var bid = data.id;
     var tile = data.tile;
     var player = GameServer.getPlayer(socketID);
@@ -338,24 +439,16 @@ GameServer.build = function(bid,tile,settlement){
         console.log('build successfull');
     });
     GameServer.server.sendAll('addBuildingPin',building.superTrim());
-};
+};*/
 
 GameServer.handleCommit = function(socketID){
     var player = GameServer.getPlayer(socketID);
-    if(!player.isInBuilding()) {
-        console.log('not in building');
-        return;
-    }
-    if(!player.hasFreeCommitSlot()) {
-        console.log('out of free slots');
-        return;
-    }
+    if(!player.isInBuilding()) return;
+    if(!player.hasFreeCommitSlot()) return;
+    var buildingID = player.inBuilding;
+    player.takeCommitmentSlot(buildingID);
+    GameServer.buildings[buildingID].updateCommit(1);
     // TODO: increments change based on civic level?
-    player.updateCommit(-1);
-    var building = GameServer.buildings[player.inBuilding];
-    building.updateCommit(1);
-    console.log('commit processed');
-
 };
 
 GameServer.allIngredientsOwned = function(player,recipe,nb){
@@ -416,21 +509,6 @@ GameServer.handleExit = function(socketID){
     player.exitBuilding();
 };
 
-GameServer.checkForFighter = function(AOIs){
-    AOIs.forEach(function(id){
-        var aoi = GameServer.AOIs[id];
-        aoi.entities.forEach(function(e){
-            GameServer.checkForBattle(e);
-        });
-    });
-};
-
-GameServer.checkForBattle = function(entity){
-    if(entity.inFight || entity.moving || entity.dead) return;
-    var battle = GameServer.battleCells.get(entity.x,entity.y);
-    if(battle) battle.addFighter(entity);
-};
-
 GameServer.handleAOItransition = function(entity,previous){
     // When something moves from one AOI to another (or appears inside an AOI), identify which AOIs should be notified and update them
     // Miodel: update many, fetch one
@@ -447,7 +525,7 @@ GameServer.handleAOItransition = function(entity,previous){
     });
 };
 
-GameServer.updatePlayers = function(){ //Function responsible for setting up and sending update packets to clients
+GameServer.updateClients = function(){ //Function responsible for setting up and sending update packets to clients
     Object.keys(GameServer.players).forEach(function(key) {
         var player = GameServer.players[key];
         var localPkg = player.getIndividualUpdatePackage(); // the local pkg is player-specific
@@ -516,5 +594,11 @@ GameServer.updateNPC = function(){
 GameServer.updateSettlements = function(){
     Object.keys(GameServer.settlements).forEach(function(key){
         GameServer.settlements[key].update();
+    });
+};
+
+GameServer.updatePlayers = function(){
+    Object.keys(GameServer.players).forEach(function(key){
+        GameServer.players[key].update();
     });
 };

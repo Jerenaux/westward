@@ -5,11 +5,11 @@
 function UpdatePacket(){
     this.newplayers = []; // new player objects to add to the world
     this.newbuildings = [];
-    this.newbattles = [];
+    this.newcells = [];
     this.newanimals = [];
     this.removedplayers = [];
     this.removedanimals = [];
-    this.removedbattles = [];
+    this.removedcells = [];
     this.players = {}; // list of player objects already existing for which properties have been updated
     this.animals = {};
     this.buildings = {};
@@ -29,8 +29,8 @@ UpdatePacket.prototype.addObject = function(object){
         case 'Animal':
             arr = this.newanimals;
             break;
-        case 'Battle':
-            arr = this.newbattles;
+        case 'BattleCell':
+            arr = this.newcells;
             break;
     }
     // Check that the object to insert is not already present (possible since when pulling updates from neighboring AOIs)
@@ -52,8 +52,8 @@ UpdatePacket.prototype.removeObject = function(object){
         case 'Animal':
             arr = this.removedanimals;
             break;
-        case 'Battle':
-            arr = this.removedbattles;
+        case 'BattleCell':
+            arr = this.removedcells;
             break;
     }
     // Check that the object to remove is not already listed (possible since when pulling updates from neighboring AOIs)

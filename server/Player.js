@@ -10,16 +10,20 @@ var Inventory = require('../shared/Inventory.js').Inventory;
 var Stats = require('../shared/Stats.js').Stats;
 var Equipment = require('../shared/Equipment.js').Equipment;
 
+var NB_SLOTS = 3;
+var COMMIT_DURATION = 30*1000;
+
 function Player(){
     this.updatePacket = new PersonalUpdatePacket();
     this.isPlayer = true;
+    this.canFight = true;
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.action = null;
     this.inventory = new Inventory();
     this.settlement = 0;
     this.gold = 0;
     this.inBuilding = -1;
-    this.commitSlots = [3,3];
+    this.commitSlots = [];
     this.setUpStats();
     this.equipment = Equipment.getSkeleton();
     this.chatTimer = null;
@@ -96,13 +100,26 @@ Player.prototype.applyFoodModifier = function(foodModifier){
 };
 
 Player.prototype.hasFreeCommitSlot = function(){
-    return this.commitSlots[0] > 0;
+    //return this.commitSlots[0] > 0;
+    return this.commitSlots.length < NB_SLOTS;
 };
 
-Player.prototype.updateCommit = function(inc){
+Player.prototype.takeCommitmentSlot = function(buildingID){
+    this.commitSlots.push({
+        building: buildingID,
+        stamp: Date.now()
+    });
+};
+
+Player.prototype.freeCommitmentSlot = function(){
+    this.commitSlots.shift();
+};
+
+/*Player.prototype.updateCommit = function(inc){
+    // Updates the free commitment slots counter
     this.commitSlots[0] = Utils.clamp(this.commitSlots[0]+inc,0,this.commitSlots[1]);
     this.updatePacket.nbcommit = this.commitSlots[0];
-};
+};*/
 
 Player.prototype.giveGold = function(nb){
     this.gold += nb;
@@ -319,7 +336,7 @@ Player.prototype.trim = function(){
 Player.prototype.dbTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be stored in the database
     var trimmed = {};
-    var dbProperties = ['x','y','equipment','gold']; // list of properties relevant to store in the database
+    var dbProperties = ['x','y','equipment','gold','commitSlots']; // list of properties relevant to store in the database
     for(var p = 0; p < dbProperties.length; p++){
         trimmed[dbProperties[p]] = this[dbProperties[p]];
     }
@@ -358,6 +375,7 @@ Player.prototype.getDataFromDb = function(document){
         this.giveItem(item[0],item[1]);
     }
     if(!document.gold) document.gold = 0;
+    this.commitSlots = document.commitSlots || [];
     this.giveGold(document.gold);
     this.setOrUpdateAOI();
 };
@@ -406,4 +424,17 @@ Player.prototype.getIndividualUpdatePackage = function(){
     return pkg;
 };
 
+Player.prototype.update = function() {
+    for(var i = 0; i < this.commitSlots.length; i++){
+        var slot = this.commitSlots[i];
+        if(Date.now() - slot.stamp > COMMIT_DURATION){
+            var building = GameServer.buildings[slot.building];
+            building.updateCommit(-1);
+            this.freeCommitmentSlot();
+            i--;
+        }else{
+            break;
+        }
+    }
+};
 module.exports.Player = Player;

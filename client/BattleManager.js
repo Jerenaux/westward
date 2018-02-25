@@ -78,8 +78,7 @@ BattleManager.manageTurn = function(shortID){
 BattleManager.canTakeAction = function(){
     if(!BattleManager.inBattle) return false;
     if(!BattleManager.isPlayerTurn) return false;
-    if(BattleManager.actionTaken) return false;
-    return true;
+    return !BattleManager.actionTaken;
 };
 
 BattleManager.processTileClick = function(tile,pointer){
@@ -105,7 +104,7 @@ BattleManager.processInventoryClick = function(){
 
 BattleManager.getActiveCell = function(){
     if(!this.active) return;
-    return Engine.battleZones.get(this.active.tileX,this.active.tileY);
+    return Engine.battleCellsMap.get(this.active.tileX,this.active.tileY);
 };
 
 BattleManager.deactivateCell = function(){

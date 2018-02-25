@@ -119,9 +119,7 @@ Engine.create = function(){
     Engine.displayedChunks = [];
     Engine.mapDataCache = {};
 
-    Engine.battleZones = new SpaceMap();
     Engine.availableGridCells = [];
-    Engine.displayedCells = [];
     Engine.availableAnimSprites = [];
     Engine.availableHP = [];
 
@@ -129,9 +127,12 @@ Engine.create = function(){
     Engine.animals = {}; // animal.id -> building object
     Engine.buildings = {}; // building.id -> building object
     Engine.battles = {};
+    Engine.battleCells = {};
     Engine.displayedPlayers = new Set();
     Engine.displayedBuildings = new Set();
     Engine.displayedAnimals = new Set();
+    Engine.displayedCells = new Set();
+    Engine.battleCellsMap = new SpaceMap();
 
     Engine.debug = true;
     Engine.showHero = true;
@@ -729,17 +730,18 @@ Engine.updateDisplayedEntities = function(){
     Engine.updateDisplay(Engine.displayedPlayers,Engine.players,adjacent,Engine.removePlayer);
     Engine.updateDisplay(Engine.displayedBuildings,Engine.buildings,adjacent,Engine.removeBuilding);
     Engine.updateDisplay(Engine.displayedAnimals,Engine.animals,adjacent,Engine.removeAnimal);
+    Engine.updateDisplay(Engine.displayedCells,Engine.battleCells,adjacent,Engine.removeBattleCell);
 
-    Engine.displayedCells.forEach(function(cell){
-        if(adjacent.indexOf(cell.v.chunk) == -1) Engine.removeCell(cell.v);
-    });
+    /*Engine.displayedCells.forEach(function(cell){
+        if(adjacent.indexOf(cell.chunk) == -1) Engine.removeBattleCell(cell);
+    });*/
 };
 
 // Check if the entities of some list are in a neighboring chunk or not
 Engine.updateDisplay = function(list,map,adjacent,removalCallback){
     list.forEach(function(id){
         var p = map[id];
-        if(p.chunk === undefined)console.log('WARNING: no chunk defined for ',p);
+        if(p.chunk === undefined) console.log('WARNING: no chunk defined for ',p);
         // check if the AOI of entity p is in the list of the AOI's adjacent to the main player
         if(p) if(adjacent.indexOf(p.chunk) == -1) removalCallback(p.id);
     });
@@ -859,7 +861,7 @@ Engine.computePath = function(position){
     PF.reset();
     if(path.length == 0) return;
     if(path.length > PFUtils.maxPathLength) return;
-    path = PFUtils.trimPath(path,Engine.battleZones);
+    path = PFUtils.trimPath(path,Engine.battleCellsMap);
     Engine.player.move(path);
 };
 
@@ -1072,16 +1074,17 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
         }
     }
 
-    if(data.newbattles) {
-        for (var n = 0; n < data.newbattles.length; n++) {
-            var b = data.newbattles[n];
-            Engine.addBattle(b.id, b.area);
+    if(data.newcells) {
+        for (var n = 0; n < data.newcells.length; n++) {
+            var b = data.newcells[n];
+            Engine.addBattleCell(b.id, b.x, b.y);
         }
+        BattleManager.activateCell();
     }
 
     if(data.removedplayers) Engine.traverseRemovalArrays(data.removedplayers,Engine.removePlayer);
     if(data.removedanimals) Engine.traverseRemovalArrays(data.removedanimals,Engine.removeAnimal);
-    if(data.removedbattles) Engine.traverseRemovalArrays(data.removedbattles,Engine.removeBattle);
+    if(data.removedcells) Engine.traverseRemovalArrays(data.removedcells,Engine.removeBattleCell);
 
     // data.players is an associative array mapping the id's of the entities
     // to small object indicating which properties need to be updated. The following code iterate over
@@ -1136,7 +1139,6 @@ Engine.updateAnimal = function(animal,data){ // data contains the updated data f
 
 Engine.handleBattleUpdates = function(entity, data){
     if(data.inFight !== undefined) entity.inFight = data.inFight;
-    //if(data.battlezone) Engine.manageBattleZones(entity, data.battlezone);
     if(data.meleeHit !== undefined) Engine.handleBattleAnimation('melee',entity,data.meleeHit);
     if(data.rangedMiss !== undefined) Engine.handleMissAnimation(entity);
 };
@@ -1244,7 +1246,24 @@ Engine.addAnimal = function(id,x,y,type){
     return animal;
 };
 
-Engine.addBattle = function(id,area){
+Engine.addBattleCell = function(id,x,y){
+    var cell = Engine.getNextCell();
+    cell.setUp(x,y);
+    Engine.battleCells[id] = cell;
+    Engine.battleCellsMap.add(x,y,cell);
+    Engine.displayedCells.add(id);
+};
+
+Engine.removeBattleCell = function(id){
+    var cell = Engine.battleCells[id];
+    Engine.displayedCells.delete(id);
+    Engine.battleCellsMap.delete(cell.tx,cell.ty);
+    delete Engine.battleCells[id];
+    cell.setVisible(false);
+    Engine.availableGridCells.push(cell);
+};
+
+/*Engine.addBattle = function(id,area){
     Engine.battles[id] = area;
     for(var i = 0; i < area.length; i++){
         var rect = area[i];
@@ -1261,7 +1280,7 @@ Engine.removeBattle = function(id){
         Engine.removeGrid({x:rect.x,y:rect.y},rect.w,rect.h);
     }
     Engine.displayedCells = Engine.battleZones.toList();
-};
+};*/
 
 
 Engine.removeBuilding = function(id){
@@ -1370,7 +1389,7 @@ Engine.requestBattleAction = function(action,data){
     Client.battleAction(action,data);
 };
 
-Engine.getGridFrame = function(x,y){
+/*Engine.getGridFrame = function(x,y){
     var grid = Engine.battleZones;
     var hasleft = grid.has(x-1,y);
     var hasright = grid.has(parseInt(x)+1,y);
@@ -1396,10 +1415,10 @@ Engine.getGridFrame = function(x,y){
 
     //console.log(x,y,col,row,hasleft,hasright,hastop,hasbottom);
     return Utils.gridToLine(col,row,3);
-};
+};*/
 
-Engine.isBattlezone = function(x,y){
-    return Engine.battleZones.get(x,y);
+Engine.isBattleCell = function(x,y){
+    return Engine.battleCells.get(x,y);
 };
 
 Engine.getNextCell = function(){
@@ -1418,7 +1437,7 @@ Engine.recycleAnim = function(sprite){
     Engine.availableAnimSprites.push(sprite);
 };
 
-Engine.drawGrid = function(tl,w,h){
+/*Engine.drawGrid = function(tl,w,h){
     for(var x = tl.x; x < tl.x+w; x++){
         for(var y = tl.y; y < tl.y+h; y++){
             if(!PFUtils.checkCollision(x,y) && !Engine.isBattlezone(x,y)) {
@@ -1428,7 +1447,7 @@ Engine.drawGrid = function(tl,w,h){
             }
         }
     }
-};
+};*/
 
 Engine.updateGrid = function(){
     for(var i = 0; i < Engine.displayedCells.length; i++){
@@ -1437,20 +1456,15 @@ Engine.updateGrid = function(){
     }
 };
 
-Engine.removeGrid = function(tl,w,h) {
+/*Engine.removeGrid = function(tl,w,h) {
     for(var x = tl.x; x < tl.x+w; x++){
         for(var y = tl.y; y < tl.y+h; y++){
             var cell = Engine.isBattlezone(x,y);
             if(cell) Engine.removeCell(cell);
         }
     }
-};
+};*/
 
-Engine.removeCell = function(cell){
-    cell.setVisible(false);
-    Engine.availableGridCells.push(cell);
-    Engine.battleZones.delete(cell.tx,cell.ty);
-};
 
 // ## UI-related functions ##
 // this functions need to have a this bound to them
