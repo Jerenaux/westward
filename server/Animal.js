@@ -79,7 +79,7 @@ Animal.prototype.setIdle = function(){
 
 Animal.prototype.updateIdle = function(){
     if(this.inFight) return;
-    this.idleTime -= GameServer.server.npcUpdateRate;
+    this.idleTime -= GameServer.npcUpdateRate;
     if(this.idleTime <= 0){
         var dest = this.findRandomDestination();
         var path = GameServer.findPath({x:this.x,y:this.y},dest);

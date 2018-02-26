@@ -205,9 +205,9 @@ Engine.createMarker = function(){
     Engine.marker.previousTile = {x:0,y:0};
 };
 
-Engine.initWorld = function(player){
-    console.log(player);
-    Engine.addHero(player.id,player.x,player.y,player.settlement,player.commitSlots);
+Engine.initWorld = function(data){
+    console.log(data);
+    Engine.addHero(data); //player.id,player.x,player.y,player.settlement,player.commitSlots
     Engine.makeUI();
     Engine.createAnimations();
     Engine.playerIsInitialized = true;
@@ -683,6 +683,9 @@ Engine.makeCharacterMenu = function(statsPanel){
     character.onUpdateCommit = function(){
         character.panels['commit'].update();
     };
+    character.onUpdateCharacter = function(){
+        character.panels['info'].update();
+    };
     return character;
 };
 
@@ -690,19 +693,21 @@ Engine.getIngredientsPanel = function(){
     return Engine.menus['crafting'].panels['ingredients'];
 };
 
-Engine.addHero = function(id,x,y,settlement,commit){
-    Engine.player = Engine.addPlayer(id,x,y,settlement);
+Engine.addHero = function(data){ //player.id,player.x,player.y,player.settlement,player.commitSlots
+    Engine.player = Engine.addPlayer(data.id,data.x,data.y,data.settlement);
     Engine.player.isHero = true;
     Engine.camera.startFollow(Engine.player);
     Engine.player.inventory = new Inventory();
-    Engine.player.gold = 0;
-    Engine.player.buildingRecipes = new Inventory(9);
-    Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
+    Engine.player.gold = data.gold;
+    Engine.player.civicxp = data.civicxp[0];
+    Engine.player.maxcivicxp = data.civicxp[1];
+    //Engine.player.buildingRecipes = new Inventory(9);
+    //Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
     Engine.player.itemRecipes = new Inventory(10);
     Engine.player.itemRecipes.fromList([[6,1],[10,1],[15,1],[16,1]]);
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = Equipment.getSkeleton();
-    Engine.player.commitSlots = commit;
+    Engine.player.commitSlots = data.commitSlots;
     Engine.updateEnvironment();
 };
 
@@ -982,6 +987,10 @@ Engine.updateSelf = function(data){
         Engine.player.commitSlots[0] = data.nbcommit;
         updateEvents.add('commit');
     }
+    if(data.civicxp >= 0){
+        Engine.player.civicxp = data.civicxp;
+        updateEvents.add('character');
+    }
     if(data.msgs){
         for(var i = 0; i < data.msgs.length; i++){
             Engine.handleMsg(data.msgs[i]);
@@ -1033,7 +1042,8 @@ Engine.updateMenus = function(category){
         'equip': 'onUpdateEquipment',
         'inv': 'onUpdateInventory',
         'gold': 'onUpdateGold',
-        'commit': 'onUpdateCommit'
+        'commit': 'onUpdateCommit',
+        'character': 'onUpdateCharacter'
     };
 
     for(var m in Engine.menus){

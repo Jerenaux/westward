@@ -27,13 +27,14 @@ CharacterPanel.prototype.addInterface = function(){
     this.bars.push(classbar);
     y += 15;
 
-    var civicxp = Utils.randomInt(0,101);
-    this.addPolyText(x,y,["Level ","1"," citizen   -   ",civicxp+"/100"," Civic XP"],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
+    //var civicxp = Engine.player.civicxp; //Utils.randomInt(0,101);
+    var txts = this.addPolyText(x,y,["Level ","1"," citizen   -   ","10/100"," Civic XP"],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
+    this.civicXPtxt = txts[3];
     y += 30;
-    var civicbar = new MiniProgressBar(this.x+x,this.y+y,245);
-    civicbar.name = 'civic xp bar';
-    civicbar.setLevel(civicxp,100);
-    this.bars.push(civicbar);
+    this.civicbar = new MiniProgressBar(this.x+x,this.y+y,245);
+    this.civicbar.name = 'civic xp bar';
+    this.civicbar.setLevel(0,100);
+    this.bars.push(this.civicbar);
     y += 20;
 
     this.addPolyText(x,y,['Respawn location: ','Fort ','of ','New Beginning'],[null,Utils.colors.gold,null,Utils.colors.gold]);
@@ -47,6 +48,8 @@ CharacterPanel.prototype.addInterface = function(){
 };
 
 CharacterPanel.prototype.update = function(){
+    this.civicXPtxt.setText(Engine.player.civicxp+'/'+Engine.player.maxcivicxp);
+    this.civicbar.setLevel(Engine.player.civicxp,Engine.player.maxcivicxp);
     //this.foodModifierTxt.setText();
 };
 

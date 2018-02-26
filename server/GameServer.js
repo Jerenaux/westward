@@ -120,11 +120,11 @@ GameServer.readMap = function(mapsPath){
 GameServer.setUpdateLoops = function(){
     var clientUpdateRate = 1000/5; // Rate at which update packets are sent
     var walkUpdateRate = 1000/20; // Rate at which positions are updated
-    var npcUpdateRate = 1000/5;
+    GameServer.npcUpdateRate = 1000/5;
     var settlementUpdateRate = 60*1000;
     var playerUpdateRate = 60*1000;
 
-    setInterval(GameServer.updateNPC,npcUpdateRate);
+    setInterval(GameServer.updateNPC,GameServer.npcUpdateRate);
     setInterval(GameServer.updateWalks,walkUpdateRate);
     setInterval(GameServer.updateClients,clientUpdateRate);
     setInterval(GameServer.updateSettlements,settlementUpdateRate);
@@ -448,7 +448,9 @@ GameServer.handleCommit = function(socketID){
     var buildingID = player.inBuilding;
     player.takeCommitmentSlot(buildingID);
     GameServer.buildings[buildingID].updateCommit(1);
-    // TODO: increments change based on civic level?
+    player.gainCivicXP(20);
+    // TODO: increment change based on civic level?
+    // TODO: xp reward change based on building?
 };
 
 GameServer.allIngredientsOwned = function(player,recipe,nb){
@@ -583,12 +585,10 @@ GameServer.updateWalks = function(){
 };
 
 GameServer.updateNPC = function(){
-    //var a = Date.now();
     Object.keys(GameServer.animals).forEach(function(key) {
         var a = GameServer.animals[key];
         if(a.idle && !a.dead) a.updateIdle();
     });
-    //console.log(Date.now()-a+' ms to update all NPC');
 };
 
 GameServer.updateSettlements = function(){

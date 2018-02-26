@@ -28,6 +28,8 @@ Goal: 1h of gameplay?
 
 Week:
 -----
+Battle: don't drag in players in building
+Batle:  close menu when dragged in
 Battle: cells are not updated anymore
 Battle: clicking on red cell ends turn?
 Battle: wrong HP y? (side-by-side fight)
@@ -42,14 +44,14 @@ Battle: notify of new fighters
 Battle: test extensively (multiplayer, battles side-by-side, overlap...)
 Battle: respawn
 Fort: staff
-Construction: earn civic xp on commit (and use real numbers in character)
+Construction: notification of civic xp gain
 Economic loop: impact of materials availability on building 
 Economic loop: apply effect of food deficit on players (+ update character panel)
 Economic loop: update buildings panel in real time (clever updates)
 Economic loop: test all updates of all menus 
 Econmic loop: skin dead animals
 UI: display event pop-ups after skinning
-Character: display committed buildings
+Character: display committed buildings (update when commit/uncommit)
 Character: hide buttons where already committed/when out of slots
 Character: add new stats
 Character: display stat details

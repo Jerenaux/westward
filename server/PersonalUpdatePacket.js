@@ -7,7 +7,6 @@ function PersonalUpdatePacket(){
     this.stats = [];
     this.equipment = [];
     this.ammo = [];
-    //this.pins = [];
     this.msgs = [];
 }
 

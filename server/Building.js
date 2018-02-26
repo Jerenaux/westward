@@ -50,7 +50,6 @@ Building.prototype.computeProductivity = function(){
 };
 
 Building.prototype.updateCommit = function(inc){
-    console.log('Commtment updaed');
     this.setProperty('committed',Utils.clamp(this.committed+inc,0,999));
     this.computeProductivity();
 };

@@ -24,6 +24,7 @@ function Player(){
     this.gold = 0;
     this.inBuilding = -1;
     this.commitSlots = [];
+    this.civicxp = [0,100];
     this.setUpStats();
     this.equipment = Equipment.getSkeleton();
     this.chatTimer = null;
@@ -115,11 +116,10 @@ Player.prototype.freeCommitmentSlot = function(){
     this.commitSlots.shift();
 };
 
-/*Player.prototype.updateCommit = function(inc){
-    // Updates the free commitment slots counter
-    this.commitSlots[0] = Utils.clamp(this.commitSlots[0]+inc,0,this.commitSlots[1]);
-    this.updatePacket.nbcommit = this.commitSlots[0];
-};*/
+Player.prototype.gainCivicXP = function(inc){
+    this.civicxp[0] = Utils.clamp(this.civicxp[0]+inc,0,this.civicxp[1]);
+    this.updatePacket.civicxp = this.civicxp[0];
+};
 
 Player.prototype.giveGold = function(nb){
     this.gold += nb;
@@ -311,12 +311,16 @@ Player.prototype.applyEffect = function(stat,delta){
 Player.prototype.initTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','settlement','commitSlots']; // list of properties relevant for the client
+    var broadcastProperties = ['id','settlement','gold','civicxp']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
+    trimmed.commitSlots = [];
+    this.commitSlots.forEach(function(slot){
+        trimmed.commitSlots.push(slot.building);
+    });
     return trimmed;
 };
 
@@ -336,7 +340,7 @@ Player.prototype.trim = function(){
 Player.prototype.dbTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be stored in the database
     var trimmed = {};
-    var dbProperties = ['x','y','equipment','gold','commitSlots']; // list of properties relevant to store in the database
+    var dbProperties = ['x','y','equipment','gold','commitSlots','civicxp']; // list of properties relevant to store in the database
     for(var p = 0; p < dbProperties.length; p++){
         trimmed[dbProperties[p]] = this[dbProperties[p]];
     }
@@ -376,6 +380,7 @@ Player.prototype.getDataFromDb = function(document){
     }
     if(!document.gold) document.gold = 0;
     this.commitSlots = document.commitSlots || [];
+    this.civicxp = document.civicxp || [0,100];
     this.giveGold(document.gold);
     this.setOrUpdateAOI();
 };
