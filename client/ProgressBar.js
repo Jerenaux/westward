@@ -33,6 +33,10 @@ ProgressBar.prototype.reset = function(){
     if(this.tail) this.tail.setVisible(true);
 };
 
+ProgressBar.prototype.setCallback = function(callback){
+    this.completionCallback = callback;
+};
+
 ProgressBar.prototype.setLevel = function(level,max,duration){
     if(max) this.max = max;
     var delta = Math.abs(this.level-level)/this.max; // Used to compute duration of tween
@@ -64,6 +68,7 @@ ProgressBar.prototype.setLevel = function(level,max,duration){
                     // Deal with cases where the bar drops to 0, need to hide head and tail
                     if(_head && _head.visible) _head.setVisible(!(_lvl == 0));
                     if(_tail && _tail.visible) _tail.setVisible(!(_lvl == 0));
+                    if(_bar.completionCallback) _bar.completionCallback();
                 }
             });
         if(_head) {

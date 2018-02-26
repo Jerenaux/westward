@@ -4,7 +4,6 @@
 
 function BattleTimerPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
-    this.texts = [];
     this.addInterface();
 }
 

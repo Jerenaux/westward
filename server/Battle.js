@@ -11,20 +11,18 @@ var TICK_RATE = 100; // milliseconds
 
 function Battle(){
     this.id = GameServer.lastBattleID++;
-    this.participants = [];
+    //this.participants = [];
     this.fighters = []; // the fighter at position 0 is the one currently in turn
     this.teams = { // number of fighters of each 'team' involved in the fight
         'Animal': 0,
         'Player': 0
     };
-    this.fallen = [];
+    //this.fallen = [];
     this.spannedAOIs = new Set();
     this.positions = new SpaceMap(); // positions occupied by fighters
     this.cells = new SpaceMap();
     this.ended = false;
-
     this.reset();
-    //this.start(f1,f2);
 }
 
 Battle.prototype.start = function(){
@@ -41,14 +39,14 @@ Battle.prototype.update = function(){
 };
 
 Battle.prototype.endOfTurn = function(){
-    for(var j = 0; j < this.fallen.length; j++) {
+    /*for(var j = 0; j < this.fallen.length; j++) {
         for (var i = this.fighters.length - 1; i >= 0; i--) {
             var fighter = this.fighters[i];
             var fallen = this.fallen[j];
             if(fighter.getShortID() == fallen.getShortID()) this.removeFighter(fighter,i);
         }
     }
-    this.fallen = [];
+    this.fallen = [];*/
 };
 
 Battle.prototype.getFighterIndex = function(f){
@@ -60,7 +58,7 @@ Battle.prototype.getFighterIndex = function(f){
 
 Battle.prototype.addFighter = function(f){
     this.fighters.push(f);
-    this.participants.push(f);
+    //this.participants.push(f);
     this.positions.add(f.x,f.y,f);
     this.updateTeams(f.constructor.name,1);
     f.setProperty('inFight',true);
@@ -69,23 +67,27 @@ Battle.prototype.addFighter = function(f){
     f.battle = this;
 };
 
-Battle.prototype.removeFighter = function(f,idx){
-    if(idx == -1) idx = this.getFighterIndex(f);
+Battle.prototype.removeFighter = function(f){
+    var idx = this.getFighterIndex(f);
     if(idx == -1) return;
     var isTurnOf = this.isTurnOf(f);
     f.endFight();
     f.die();
     this.fighters.splice(idx,1);
     if(f.isPlayer) this.positions.delete(f.x,f.y); // if animal, leave busy for his body
-    this.updateTeams(f.constructor.name,-1);
     if(isTurnOf) this.setEndOfTurn(0);
+    if(f.isPlayer) f.notifyFight(false);
+    this.updateTeams(f.constructor.name,-1);
 };
 
 Battle.prototype.updateTeams = function(team,increment){
-    //console.log('team ',team,':',this.teams[team],'inc = ',increment);
     this.teams[team] += increment;
     if(this.teams[team] <= 0) this.end();
 };
+
+/*Battle.prototype.manageDeath = function(f){
+    this.removeFighter(f);
+};*/
 
 Battle.prototype.reset = function(){
     this.countdown = TURN_DURATION;
@@ -210,7 +212,7 @@ Battle.prototype.computeRangedHit = function(a,b){
 
 Battle.prototype.applyDamage = function(f,dmg){
     f.applyDamage(-dmg);
-    if(f.getHealth() == 0) this.fallen.push(f);
+    if(f.getHealth() == 0) this.removeFighter(f);
 };
 
 Battle.prototype.processAttack = function(a,b){
@@ -248,7 +250,7 @@ Battle.prototype.processAttack = function(a,b){
 Battle.prototype.end = function(){
     this.ended = true;
     clearInterval(this.loop);
-    this.participants.forEach(function(f){
+    this.fighters.forEach(function(f){
         f.endFight();
         if(f.isPlayer) f.notifyFight(false);
     });

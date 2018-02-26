@@ -24,7 +24,7 @@ BuildingsPanel.prototype.displayListing = function(){
         slot.addText(43,2,buildingTypeData.name);
 
         if(buildingTypeData.displayProd || !data.built) {
-            var prod = data.prod;//Utils.randomInt(70, 121);
+            var prod = data.prod;
             var p = slot.addText(slot.totalwidth, 2, prod + '%', (prod >= 100 ? Utils.colors.green : Utils.colors.red), 12);
             p.setOrigin(1, 0);
         }

@@ -87,6 +87,23 @@ Player.prototype.applyDamage = function(dmg){
     this.refreshStat('hp');
 };
 
+Player.prototype.die = function(){
+    MovingEntity.prototype.die.call(this);
+    this.updatePacket.dead = true;
+};
+
+Player.prototype.respawn = function(){
+    this.setProperty('dead',false);
+    this.updatePacket.dead = false;
+    this.setStat('hp',10); // TODO: adapt remaining health
+    var respawnLocation = GameServer.settlements[this.settlement].respawnLocation;
+    this.x = respawnLocation.x;
+    this.y = respawnLocation.y;
+    this.setOrUpdateAOI();
+    // TODO: loose loot
+
+};
+
 Player.prototype.applyFoodModifier = function(foodModifier){
     for(var stat in this.stats){
         if(!this.stats.hasOwnProperty(stat)) return;
@@ -101,7 +118,6 @@ Player.prototype.applyFoodModifier = function(foodModifier){
 };
 
 Player.prototype.hasFreeCommitSlot = function(){
-    //return this.commitSlots[0] > 0;
     return this.commitSlots.length < NB_SLOTS;
 };
 
@@ -302,8 +318,6 @@ Player.prototype.applyEffects = function(item,coef){
 };
 
 Player.prototype.applyEffect = function(stat,delta){
-    //var newvalue = Utils.clamp(this.stats[stat]+delta,Stats.dict[stat].min,Stats.dict[stat].max);
-    //this.setStat(stat,newvalue);
     this.getStat(stat).increment(delta);
     this.refreshStat(stat);
 };

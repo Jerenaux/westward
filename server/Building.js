@@ -38,9 +38,13 @@ Building.prototype.registerBuilding = function(){
     this.settlement.registerBuilding(this);
     if(this.type == 0){ // fort
         this.settlement.registerFort(this);
-        this.buildings = this.settlement.getBuildings();
-        this.updateBuildings();
+        this.refreshListing();
     }
+};
+
+Building.prototype.refreshListing = function(){
+    this.buildings = this.settlement.getBuildings();
+    this.updateBuildings();
 };
 
 Building.prototype.computeProductivity = function(){
@@ -52,6 +56,7 @@ Building.prototype.computeProductivity = function(){
 Building.prototype.updateCommit = function(inc){
     this.setProperty('committed',Utils.clamp(this.committed+inc,0,999));
     this.computeProductivity();
+    this.settlement.refreshListing();
 };
 
 Building.prototype.update = function(){
@@ -163,7 +168,6 @@ Building.prototype.giveGold = function(nb){
 Building.prototype.takeGold = function(nb){
     this.setProperty('gold',Utils.clamp(this.gold-nb,0,999999));
 };
-
 
 // Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){

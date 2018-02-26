@@ -37,11 +37,20 @@ Settlement.prototype.registerFort = function(fort){
         [453,717],
         [428,703],
         [469,593]
-    ])
+    ]);
+    this.respawnLocation = {
+        x: GameServer.buildingsData[0].entry.x + this.fort.x,
+        y: GameServer.buildingsData[0].entry.y + this.fort.y
+    };
+    console.log(this.respawnLocation);
 };
 
 Settlement.prototype.addToFort = function(item,nb){
     this.fort.giveItem(item,nb);
+};
+
+Settlement.prototype.refreshListing = function(){
+    this.fort.refreshListing();
 };
 
 Settlement.prototype.consumeFood = function(){
@@ -72,6 +81,7 @@ Settlement.prototype.update = function(){
     this.buildings.forEach(function(b){
         b.update();
     });
+    this.refreshListing();
 
     var _surplus = this.surplus;
     this.players.forEach(function(p){

@@ -118,11 +118,17 @@ BattleManager.activateCell = function(){
 };
 
 BattleManager.endFight = function(){
-    Engine.displayUI();
-    Engine.showMarker();
     Engine.setCursor();
     BattleManager.inBattle = false;
     Engine.menus.battle.hide();
+    if(Engine.dead) {
+        var respawnPanel = Engine.menus["battle"].panels['respawn'];
+        respawnPanel.display();
+        respawnPanel.trigger();
+    }else{
+        Engine.displayUI();
+        Engine.showMarker();
+    }
 };
 
 // #######################

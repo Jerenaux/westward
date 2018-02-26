@@ -28,6 +28,9 @@ Goal: 1h of gameplay?
 
 Week:
 -----
+Battle: check that upon death, all cells are red
+Battle: battle cells ignore collisions
+Battle: add routine so that monsters don't stay on same cell as players
 Battle: don't drag in players in building
 Batle:  close menu when dragged in
 Battle: cells are not updated anymore
@@ -47,13 +50,13 @@ Fort: staff
 Construction: notification of civic xp gain
 Economic loop: impact of materials availability on building 
 Economic loop: apply effect of food deficit on players (+ update character panel)
-Economic loop: update buildings panel in real time (clever updates)
 Economic loop: test all updates of all menus 
 Econmic loop: skin dead animals
 UI: display event pop-ups after skinning
 Character: display committed buildings (update when commit/uncommit)
 Character: hide buttons where already committed/when out of slots
 Character: add new stats
+Character: stats modifier should not affect health
 Character: display stat details
 Character: foodSurplus in self update, used for ProductivityPanel & CharacterPanel updates
 Finish: review base stats values; test economy for a while; decide duration of all cycles (eco, spawn...)

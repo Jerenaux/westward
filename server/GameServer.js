@@ -113,7 +113,7 @@ GameServer.readMap = function(mapsPath){
     GameServer.animals[animal.id] = animal;
 
     setTimeout(function(){
-        //GameServer.handleBattle(animal.id,dummySocket.id);
+        GameServer.handleBattle(animal.id,dummySocket.id);
     },1000);
 };
 
@@ -222,15 +222,12 @@ GameServer.removeEntity = function(entity){
         case 'Player':
             arr = GameServer.players;
             break;
-        /*case 'Building':
-         arr = this.newbuildings;
-         break;*/
         case 'Animal':
             arr = GameServer.animals;
             break;
     }
     if(arr) delete arr[entity.id];
-    if(entity.canFight && entity.battle) entity.battle.removeFighter(entity,-1);
+    if(entity.canFight && entity.battle) entity.battle.removeFighter(entity);
 };
 
 GameServer.getAOIAt = function(x,y){
@@ -440,6 +437,12 @@ GameServer.build = function(bid,tile,settlement){
     });
     GameServer.server.sendAll('addBuildingPin',building.superTrim());
 };*/
+
+GameServer.handleRespawn = function(socketID){
+    var player = GameServer.getPlayer(socketID);
+    if(!player.dead) return;
+    player.respawn();
+};
 
 GameServer.handleCommit = function(socketID){
     var player = GameServer.getPlayer(socketID);

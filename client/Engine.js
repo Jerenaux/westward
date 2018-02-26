@@ -271,8 +271,8 @@ Engine.deathAnimation = function(target){
 
 Engine.manageDeath = function(){
     Engine.dead = true;
-    Engine.hideUI();
-    Engine.hideMarker();
+    //Engine.hideUI();
+    //Engine.hideMarker();
 };
 
 Engine.makeBuildingTitle = function(){
@@ -481,6 +481,10 @@ Engine.makeBattleMenu = function(){
     var timerx = (Engine.getGameConfig().width-timerw)/2;
     var timery = Engine.getGameConfig().height-timerh;
     battle.addPanel('timer',new BattleTimerPanel(timerx,timery,timerw,timerh));
+
+    var respawnh = 90;
+    var respawny = (Engine.getGameConfig().height-respawnh)/2;
+    battle.addPanel('respawn',new RespawnPanel(timerx,respawny,timerw,respawnh),true);
 
     battle.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
     battle.onUpdateInventory = items.updateInventory.bind(items);
@@ -922,7 +926,6 @@ Engine.updateMarker = function(tile){
     Engine.marker.y = (tile.y*Engine.tileHeight);
     if(tile.x != Engine.marker.previousTile.x || tile.y != Engine.marker.previousTile.y){
         Engine.marker.previousTile = tile;
-        //if(Engine.checkCollision(tile)){
         if(PFUtils.checkCollision(tile.x,tile.y)){
             Engine.marker.setFrame(1);
         }else{
@@ -932,11 +935,11 @@ Engine.updateMarker = function(tile){
 };
 
 Engine.hideMarker = function(){
-    Engine.marker.visible = false;
+    Engine.marker.setVisible(false);
 };
 
 Engine.showMarker = function(){
-    Engine.marker.visible = true;
+    Engine.marker.setVisible(true);
 };
 
 // Return true if there is a collision on that tile
@@ -996,10 +999,10 @@ Engine.updateSelf = function(data){
             Engine.handleMsg(data.msgs[i]);
         }
     }
+    if(data.dead) Engine.manageDeath();
     if(data.fightStatus !== undefined) BattleManager.handleFightStatus(data.fightStatus);
     if(data.remainingTime) BattleManager.setCounter(data.remainingTime);
     if(data.activeID) BattleManager.manageTurn(data.activeID);
-    if(data.dead) Engine.manageDeath();
 
     updateEvents.forEach(function(e){
         Engine.updateMenus(e);
@@ -1162,27 +1165,22 @@ Engine.updateBuilding = function(building,data){ // data contains the updated da
     }
     if(data.gold) {
         building.gold = data.gold;
-        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShopGold');
         updateEvents.add('onUpdateShopGold');
     }
     if(data.items){
         Engine.updateInventory(building.inventory,data.items);
-        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShop');
         updateEvents.add('onUpdateShop');
     }
     if(data.prices){
         building.prices= data.prices;
-        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShop');
         updateEvents.add('onUpdateShop');
     }
     if(data.buildings){
         building.buildings = data.buildings;
-        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateBuildings');
         updateEvents.add('onUpdateBuildings');
     }
     if(data.population){
         building.population = data.population;
-        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateSettlementStatus');
         updateEvents.add('onUpdateSettlementStatus');
     }
     if(data.foodsurplus){
@@ -1517,8 +1515,12 @@ Engine.buyClick = function(){
 };
 
 Engine.commitClick = function(){
-    console.log('sending');
     Client.sendCommit();
+};
+
+Engine.respawnClick = function(){ // this bound to respawn panel
+    console.log('requesting respawn');
+    this.hide();
 };
 
 Engine.buildError = function(){

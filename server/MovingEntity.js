@@ -99,7 +99,6 @@ MovingEntity.prototype.stopWalk = function(){
 
 MovingEntity.prototype.die = function(){
     this.setProperty('dead',true);
-    if(this.isPlayer) this.updatePacket.dead = true;
 };
 
 MovingEntity.prototype.endFight = function(){
