@@ -35,10 +35,6 @@ var Moving = new Phaser.Class({
     },
 
     updateDepth: function(){
-        /*if(!this.scene){
-            console.log('Alert: scene undefined');
-            console.log(this);
-        }*/
         this.setDepth(Engine.playersDepth + this.tileY / 1000);
     },
 
@@ -77,7 +73,7 @@ var Moving = new Phaser.Class({
                 mover.previousOrientation = null;
             },
             onUpdate: function(){
-                mover.updatePosition();
+                mover.updateMovement();
             },
             onComplete: mover.endMovement.bind(mover)
         });
@@ -89,11 +85,7 @@ var Moving = new Phaser.Class({
         this.setFrame(this.restingFrames[this.orientation]);
     },
     
-    updatePosition: function(){
-        /*if(!this.scene){
-            console.log('(UP) Alert: scene undefined for '+this.constructor.name+' '+this.id);
-            console.log(this);
-        }*/
+    updateMovement: function(){
         if(!this.scene) return; // quick fix before the bug gets fixed in Phaser
         if(this.x > this.previousPosition.x){ // right
             this.orientation = 'right';
@@ -109,23 +101,10 @@ var Moving = new Phaser.Class({
             this.anims.play(this.walkAnimPrefix+'_move_'+this.orientation);
         }
 
-        this.previousPosition = {
-            x: this.x,
-            y: this.y
-        };
-        this.tileX = Math.floor(this.x/Engine.tileWidth);
-        this.tileY = Math.floor(this.y/Engine.tileHeight);
         if(this.constructor.name == 'Player') this.leaveFootprint();
-
-        this.updateDepth();
-        this.chunk = Utils.tileToAOI({x: this.tileX, y: this.tileY});
-
         if(this.bubble) this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
 
-        if(this.constructor.name == 'Player' && this.id == Engine.player.id) {
-            if(this.chunk != this.previousChunk) Engine.updateEnvironment();
-            this.previousChunk = this.chunk;
-        }
+        this.updatePosition();
 
         if(this.flagForStop && (this.tileX != this.previousTile.x || this.tileY != this.previousTile.y)){
             console.log(this.movement);
@@ -135,6 +114,29 @@ var Moving = new Phaser.Class({
 
         this.previousTile.x = this.tileX;
         this.previousTile.y = this.tileY;
+    },
+
+    updatePosition: function(){
+        this.previousPosition = {
+            x: this.x,
+            y: this.y
+        };
+        this.tileX = Math.floor(this.x/Engine.tileWidth);
+        this.tileY = Math.floor(this.y/Engine.tileHeight);
+
+        this.updateDepth();
+        this.chunk = Utils.tileToAOI({x: this.tileX, y: this.tileY});
+
+        if(this.constructor.name == 'Player' && this.id == Engine.player.id) {
+            if(this.chunk != this.previousChunk) Engine.updateEnvironment();
+            this.previousChunk = this.chunk;
+        }
+    },
+
+    teleport: function(x,y){
+        this.x = x*Engine.tileWidth;
+        this.y = y*Engine.tileHeight;
+        this.updatePosition();
     },
 
     stop: function(){

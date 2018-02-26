@@ -271,8 +271,12 @@ Engine.deathAnimation = function(target){
 
 Engine.manageDeath = function(){
     Engine.dead = true;
-    //Engine.hideUI();
-    //Engine.hideMarker();
+};
+
+Engine.manageRespawn = function(){
+    Engine.showMarker();
+    Engine.displayUI();
+    Engine.dead = false;
 };
 
 Engine.makeBuildingTitle = function(){
@@ -999,7 +1003,10 @@ Engine.updateSelf = function(data){
             Engine.handleMsg(data.msgs[i]);
         }
     }
-    if(data.dead) Engine.manageDeath();
+    if(data.dead !== undefined){
+        if(data.dead == true) Engine.manageDeath();
+        if(data.dead == false) Engine.manageRespawn();
+    }
     if(data.fightStatus !== undefined) BattleManager.handleFightStatus(data.fightStatus);
     if(data.remainingTime) BattleManager.setCounter(data.remainingTime);
     if(data.activeID) BattleManager.manageTurn(data.activeID);
@@ -1131,15 +1138,10 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
         player.inBuilding = data.inBuilding;
     }
     Engine.handleBattleUpdates(player,data);
-    if(data.dead == true) {
-        Engine.deathAnimation(player);
-        player.setVisible(false);
-    }
-    if(data.dead == false) player.setVisible(true);
+    if(data.dead == true) player.die(!player.firstUpdate);
+    if(data.dead == false) player.respawn();
     if(!player.isHero && data.chat) player.talk(data.chat);
-    /*if(data.stop){
-        console.log('Stopping at ',data.stop.x,data.stop.y);
-    }*/
+    if(data.x >= 0 && data.y >= 0) player.teleport(data.x,data.y);
     player.firstUpdate = false;
 };
 
@@ -1377,15 +1379,14 @@ Engine.exitBuilding = function(){
     Engine.UIHolder.resize(115);
 };
 
-Engine.requestBattle = function(a,b) {
+/*Engine.requestBattle = function(a,b) {
     // Assumes for now that a is the player (hero) and b an animal
     Client.startBattle(b.id);
-};
-
-/*Engine.requestBattleMove = function(event){
-    if(BattleManager.actionTaken) return;
-    Engine.requestBattleAction('move',Engine.getMouseCoordinates(event).tile);
 };*/
+
+Engine.processAnimalClick = function(target){
+    Client.animalClick(target.id);
+};
 
 Engine.requestBattleAttack = function(target){
     if(BattleManager.actionTaken) return;
@@ -1519,7 +1520,7 @@ Engine.commitClick = function(){
 };
 
 Engine.respawnClick = function(){ // this bound to respawn panel
-    console.log('requesting respawn');
+    Client.sendRespawn();
     this.hide();
 };
 

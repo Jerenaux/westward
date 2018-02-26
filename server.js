@@ -94,8 +94,12 @@ io.on('connection',function(socket){
             gs.handleUnequip(data,socket.id);
         });
 
-        socket.on('battle',function(data){
+        /*socket.on('battle',function(data){
             gs.handleBattle(data,socket.id);
+        });*/
+
+        socket.on('animalClick',function(data){
+            gs.handleAnimalClick(data,socket.id);
         });
 
         socket.on('battleAction',function(data){
@@ -108,6 +112,10 @@ io.on('connection',function(socket){
 
         socket.on('chat',function(data){
             gs.handleChat(data,socket.id);
+        });
+
+        socket.on('respawn',function(data){
+            gs.handleRespawn(socket.id);
         });
     });
 

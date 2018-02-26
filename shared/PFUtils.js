@@ -44,10 +44,23 @@ PFUtils.secondDimensionHandler = {
         return target[key];
     }
 };
+
+PFUtils.invertedSsecondDimensionHandler = {
+    get: function(target,key){
+        if(target.hasOwnProperty(key)){
+            if(target[key] == 10){
+                target[key] = new PF.Node(parseInt(key),parseInt(target.firstDim));
+            }
+        }else{
+            target[key] = new PF.Node(parseInt(key),parseInt(target.firstDim),false);
+        }
+        return target[key];
+    }
+};
 /* Handles accesses to spaceMap along the firstDimension, e.g. map[x]
  *  It first checks for function calls. If not, then it checks if there is something at the given
  *  coordinate. If not, a enmpty object is placed there. In any case, whatever is found there is returned
- *  as a proxy to be handled by the 2nd dimension handler.
+ *  as a proxy to be handled by the 2nd dimension handler (which one depends on the 'invert' parameter)
  * */
 PFUtils.firstDimensionHandler = {
     get: function(target,key){ // target is the spacemap ; key is actually a coordinate, a x or a y value
@@ -56,16 +69,24 @@ PFUtils.firstDimensionHandler = {
         }else{
             if(!target.hasOwnProperty(key)) target[key] = {};
             target[key].firstDim = key; // trick to carry along what was the first dimension
-            return new Proxy(target[key], PFUtils.secondDimensionHandler);
+            return new Proxy(target[key], (target.invert ? PFUtils.invertedSecondDimensionHandler : PFUtils.secondDimensionHandler));
         }
     }
+};
+
+PFUtils.setGridUp = function(grid, map, invert){
+    if(invert) grid.invert = true;
+    grid.nodes = new Proxy(map,PFUtils.firstDimensionHandler);
 };
 
 PFUtils.setup = function(supervisor){
     supervisor.collisions = new SpaceMap(); // contains 1 for the coordinates that are non-walkables
     PFUtils.collisionMap = supervisor.collisions;
+
     supervisor.PFgrid = new PF.Grid(0,0); // grid placeholder for the pathfinding
-    supervisor.PFgrid.nodes = new Proxy(supervisor.collisions,PFUtils.firstDimensionHandler);
+    PFUtils.setGridUp(supervisor.PFgrid,supervisor.collisions);
+    //supervisor.PFgrid.nodes = new Proxy(supervisor.collisions,PFUtils.firstDimensionHandler);
+
     supervisor.PFfinder = PFUtils.getFinder();
     // Replaces the isWalkableAt method of the PF library
     PF.Grid.prototype.isWalkableAt = PFUtils.isWalkable;

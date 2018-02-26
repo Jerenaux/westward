@@ -118,7 +118,7 @@ Animal.prototype.decideBattleAction = function(){
         var dest = this.computeBattleDestination(target);
         //console.log('destination found : ',dest.x,dest.y);
         if(dest) {
-            var path = GameServer.findPath({x: this.x, y: this.y}, dest);
+            var path = GameServer.findPath({x: this.x, y: this.y}, dest,this.battle.PFgrid);
             this.setPath(path);
         }else{
             data.action = 'pass';

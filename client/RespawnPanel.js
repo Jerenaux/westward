@@ -13,14 +13,17 @@ RespawnPanel.prototype.constructor = RespawnPanel;
 RespawnPanel.prototype.addInterface = function(){
     var x = this.width/2;
     var y = 10;
-    var txt = this.addText(x,y,'You are dead! Respawning in:',Utils.colors.white,16);
+    var txt = this.addText(x,y,'You are dead!',Utils.colors.white,16);
     txt.setOrigin(0.5,0);
     y += 25;
+    this.waitTxt = this.addText(x,y,'Waiting to respawn...',Utils.colors.white,16);
+    this.waitTxt.setOrigin(0.5,0);
+    y += 30;
     this.bar = new MiniProgressBar(this.x+10,this.y+y,this.width-40);
     this.bar.name = "respawn timer";
     this.bar.setLevel(100,100)
     var btnx = (this.width-100)/2;
-    this.button = new BigButton(this.x+btnx,this.y+y,'Respawn',Engine.respawnClick.bind(this));
+    this.button = new BigButton(this.x+btnx,this.y+y-15,'Respawn',Engine.respawnClick.bind(this));
 };
 
 RespawnPanel.prototype.trigger = function(){
@@ -30,6 +33,7 @@ RespawnPanel.prototype.trigger = function(){
 
 RespawnPanel.prototype.showButton = function(){
     this.bar.hide();
+    this.waitTxt.setVisible(false);
     this.button.display();
 };
 

@@ -113,7 +113,7 @@ GameServer.readMap = function(mapsPath){
     GameServer.animals[animal.id] = animal;
 
     setTimeout(function(){
-        GameServer.handleBattle(animal.id,dummySocket.id);
+        //GameServer.handleBattle(player,animal);
     },1000);
 };
 
@@ -253,16 +253,27 @@ GameServer.handleChat = function(data,socketID){
     player.setChat(data);
 };
 
-GameServer.findPath = function(from,to){
+GameServer.findPath = function(from,to,grid){
     if(PFUtils.checkCollision(to.x,to.y)) return null;
-    var path = GameServer.PFfinder.findPath(from.x, from.y, to.x, to.y, GameServer.PFgrid);
+    grid = grid || GameServer.PFgrid;
+    var path = GameServer.PFfinder.findPath(from.x, from.y, to.x, to.y, grid);
     PF.reset();
     return path;
 };
 
-GameServer.handleBattle = function(opponentID,socketID){
+GameServer.handleAnimalClick = function(animalID,socketID){
     var player = GameServer.getPlayer(socketID);
-    var animal = GameServer.animals[opponentID];
+    var animal = GameServer.animals[animalID];
+    if(animal.dead){
+        console.log('skinning');
+    }else{
+        GameServer.handleBattle(player,animal);
+    }
+};
+
+GameServer.handleBattle = function(player,animal){
+    //var player = GameServer.getPlayer(socketID);
+    //var animal = GameServer.animals[opponentID];
     if(player.inFight) return;
     if(animal.moving) return;
     if(animal.dead) return;
@@ -332,7 +343,7 @@ GameServer.checkForFighter = function(AOIs){
 };
 
 GameServer.checkForBattle = function(entity){
-    if(!entity.canFight || entity.inFight || entity.moving || entity.dead) return;
+    if(!entity.canFight || entity.inFight || entity.moving || entity.dead || entity.inBuilding) return;
     var cell = GameServer.battleCells.get(entity.x,entity.y);
     if(cell) cell.battle.addFighter(entity);
 };
@@ -342,6 +353,7 @@ GameServer.addBattleCell = function(battle,x,y){
     var cell = new BattleCell(x,y,battle);
     GameServer.battleCells.add(x,y,cell);
     battle.cells.add(x,y,cell);
+    battle.PFcells.add(x,y,0);
     GameServer.addAtLocation(cell);
     GameServer.handleAOItransition(cell);
 };
@@ -350,7 +362,7 @@ GameServer.removeBattleCell = function(battle,x,y){
     var cell = battle.cells.get(x,y);
     GameServer.removeEntity(cell);
     GameServer.battleCells.delete(x,y);
-    battle.cells.delete(x,y);
+    // No need to remove from battle.cells, since the battle object will disappear soon
 };
 
 GameServer.handleBattleAction = function(data,socketID){

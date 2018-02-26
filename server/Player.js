@@ -97,8 +97,8 @@ Player.prototype.respawn = function(){
     this.updatePacket.dead = false;
     this.setStat('hp',10); // TODO: adapt remaining health
     var respawnLocation = GameServer.settlements[this.settlement].respawnLocation;
-    this.x = respawnLocation.x;
-    this.y = respawnLocation.y;
+    this.setProperty('x', respawnLocation.x);
+    this.setProperty('y', respawnLocation.y);
     this.setOrUpdateAOI();
     // TODO: loose loot
 
@@ -301,7 +301,6 @@ Player.prototype.getAmmo = function(containerSlot){
 };
 
 Player.prototype.canRange = function(){
-    console.log(this.equipment);
     var weapon = this.getRangedWeapon();
     if(weapon == -1) return false;
     return this.getAmmo(this.getRangedContainer(weapon)) > 0;

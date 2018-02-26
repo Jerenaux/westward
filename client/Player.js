@@ -77,5 +77,16 @@ var Player = new Phaser.Class({
     talk: function(text){
         this.bubble.update(text);
         this.bubble.display();
+    },
+
+    die: function(showAnim){
+        if(showAnim) Engine.deathAnimation(this);
+        if(this.bubble) this.bubble.hide();
+        this.setVisible(false);
+    },
+
+    respawn: function(){
+        Engine.deathAnimation(this);
+        this.setVisible(true);
     }
 });

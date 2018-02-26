@@ -19,16 +19,16 @@ var Animal = new Phaser.Class({
     die: function(){
         this.setFrame(49);
         this.dead = true;
-        //Engine.deathAnimation(animal);
-        //setTimeout(Engine.removeAnimal,500,animal.id);
     },
 
     handleClick: function(){
         // TODO: replace request logic
+        if(Engine.dead) return;
         if(BattleManager.inBattle){
             BattleManager.processAnimalClick(this);
         }else{
-            Engine.requestBattle(Engine.player,this);
+            //Engine.requestBattle(Engine.player,this);
+            Engine.processAnimalClick(this);
         }
         Engine.interrupt = true;
     },

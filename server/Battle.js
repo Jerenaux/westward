@@ -11,16 +11,19 @@ var TICK_RATE = 100; // milliseconds
 
 function Battle(){
     this.id = GameServer.lastBattleID++;
-    //this.participants = [];
     this.fighters = []; // the fighter at position 0 is the one currently in turn
     this.teams = { // number of fighters of each 'team' involved in the fight
         'Animal': 0,
         'Player': 0
     };
-    //this.fallen = [];
     this.spannedAOIs = new Set();
     this.positions = new SpaceMap(); // positions occupied by fighters
     this.cells = new SpaceMap();
+
+    this.PFcells = new SpaceMap();
+    this.PFgrid = new PF.Grid(0,0);
+    PFUtils.setGridUp(this.PFgrid,this.PFcells,true);
+
     this.ended = false;
     this.reset();
 }
@@ -38,16 +41,7 @@ Battle.prototype.update = function(){
     }
 };
 
-Battle.prototype.endOfTurn = function(){
-    /*for(var j = 0; j < this.fallen.length; j++) {
-        for (var i = this.fighters.length - 1; i >= 0; i--) {
-            var fighter = this.fighters[i];
-            var fallen = this.fallen[j];
-            if(fighter.getShortID() == fallen.getShortID()) this.removeFighter(fighter,i);
-        }
-    }
-    this.fallen = [];*/
-};
+Battle.prototype.endOfTurn = function(){};
 
 Battle.prototype.getFighterIndex = function(f){
     for(var i = 0; i < this.fighters.length; i++){
@@ -58,7 +52,6 @@ Battle.prototype.getFighterIndex = function(f){
 
 Battle.prototype.addFighter = function(f){
     this.fighters.push(f);
-    //this.participants.push(f);
     this.positions.add(f.x,f.y,f);
     this.updateTeams(f.constructor.name,1);
     f.setProperty('inFight',true);
@@ -175,7 +168,7 @@ Battle.prototype.processMove = function(f){
 };
 
 Battle.prototype.isPosition = function(x,y){
-    return GameServer.battleCells.has(x,y);
+    return this.cells.has(x,y);
 };
 
 Battle.prototype.isPositionFree = function(x,y){
@@ -275,7 +268,7 @@ Battle.prototype.addArea = function(area){
     var sy = y;
     for(; x < maxx; x++){
         for(y = sy; y < maxy; y++){
-            GameServer.addBattleCell(this,x,y);
+            if(!PFUtils.checkCollision(x,y)) GameServer.addBattleCell(this,x,y);
         }
     }
 

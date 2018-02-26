@@ -74,7 +74,7 @@ Client.socket.on('update',function(data){ // This event triggers uppon receiving
     //if(data.latency) Game.setLatency(data.latency);
     //if(data.latency) console.log('[lat] '+data.latency+' ms');
     if(data.local) console.log(data.local);
-    if(data.global) console.log(data.global);
+    //if(data.global) console.log(data.global);
     if(data.local) Engine.updateSelf(data.local); // Should come first
     if(data.global) Engine.updateWorld(data.global);
 });
@@ -100,8 +100,12 @@ Client.sendPath = function(path,action){
     Client.socket.emit('path',{path:path,action:action});
 };
 
-Client.startBattle = function(targetID){
+/*Client.startBattle = function(targetID){
     Client.socket.emit('battle',targetID);
+};*/
+
+Client.animalClick = function(targetID){
+    Client.socket.emit('animalClick',targetID);
 };
 
 Client.battleAction = function(action,data){
@@ -141,6 +145,9 @@ Client.sendChat = function(text){
     Client.socket.emit('chat',text);
 };
 
+Client.sendRespawn = function(){
+    Client.socket.emit('respawn');
+};
 
 // ####################"
 
