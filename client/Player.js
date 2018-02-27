@@ -5,12 +5,12 @@ var Player = new Phaser.Class({
 
     Extends: Moving,
 
-    initialize: function Player (x, y, texture, id) {
+    initialize: function Player (data) { // x, y, texture, id
         // Using call(), the called method will be executed while having 'this' pointing to the first argumentof call()
-        Moving.call(this,x,y,texture,id);
+        Moving.call(this,data.x,data.y,'hero',data.id);
         this.setFrame(33);
         this.displayOriginX = 16;
-        this.name = 'Player '+id;
+        this.name = 'Player '+this.id;
         this.firstUpdate = true;
 
         this.bubbleOffsetX = 55;
@@ -28,15 +28,23 @@ var Player = new Phaser.Class({
         this.destinationAction = null;
     },
 
-    setDestinationAction: function(type,id){
-        if(type == 0){
-            this.destinationAction = null;
-            return;
+    update: function(data){
+        if(data.path && !this.isHero) this.move(data.path);
+        if(data.inBuilding > -1) {
+            if(!this.isHero) this.setVisible(false);
+            this.inBuilding = data.inBuilding;
         }
-        this.destinationAction = {
-            type: type,
-            id: id
+        if(data.inBuilding == -1){
+            if(!this.isHero) this.setVisible(true);
+            this.inBuilding = data.inBuilding;
         }
+        if(data.settlement) this.settlement = settlement;
+        Engine.handleBattleUpdates(this,data);
+        if(data.dead == true) this.die(!this.firstUpdate);
+        if(data.dead == false) this.respawn();
+        if(!this.isHero && data.chat) this.talk(data.chat);
+        if(data.x >= 0 && data.y >= 0) this.teleport(data.x,data.y);
+        this.firstUpdate = false;
     },
 
     move: function(path){
@@ -53,6 +61,37 @@ var Player = new Phaser.Class({
             }
         }
     },
+
+    talk: function(text){
+        this.bubble.update(text);
+        this.bubble.display();
+    },
+
+    die: function(showAnim){
+        if(showAnim) Engine.deathAnimation(this);
+        if(this.bubble) this.bubble.hide();
+        this.setVisible(false);
+    },
+
+    respawn: function(){
+        Engine.deathAnimation(this);
+        this.setVisible(true);
+    },
+
+    // ### SETTERS ####
+
+    setDestinationAction: function(type,id){
+        if(type == 0){
+            this.destinationAction = null;
+            return;
+        }
+        this.destinationAction = {
+            type: type,
+            id: id
+        }
+    },
+
+    // ### GETTERS ####
 
     getEquipped: function(slot,subSlot){
         return this.equipment[slot][subSlot];
@@ -72,21 +111,5 @@ var Player = new Phaser.Class({
 
     getStatValue: function(stat){
         return this.stats[stat].getValue();
-    },
-
-    talk: function(text){
-        this.bubble.update(text);
-        this.bubble.display();
-    },
-
-    die: function(showAnim){
-        if(showAnim) Engine.deathAnimation(this);
-        if(this.bubble) this.bubble.hide();
-        this.setVisible(false);
-    },
-
-    respawn: function(){
-        Engine.deathAnimation(this);
-        this.setVisible(true);
     }
 });

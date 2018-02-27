@@ -98,6 +98,10 @@ Animal.prototype.canRange = function(){
     return true;
 };
 
+Animal.prototype.isInBuilding = function(){
+    return false;
+};
+
 Animal.prototype.findRandomDestination = function(){
     return {
         x: Utils.clamp(this.x + Utils.randomInt(-5,5),0,World.worldWidth),

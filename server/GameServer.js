@@ -342,8 +342,9 @@ GameServer.checkForFighter = function(AOIs){
 };
 
 GameServer.checkForBattle = function(entity){
-    if(!entity.canFight || entity.inFight || entity.moving || entity.dead || entity.inBuilding) return;
+    if(!entity.canFight || entity.inFight || entity.moving || entity.dead || entity.isInBuilding()) return;
     var cell = GameServer.battleCells.get(entity.x,entity.y);
+    //if(entity.constructor.name == 'Player') console.log('fetched ',cell);
     if(cell) cell.battle.addFighter(entity);
 };
 

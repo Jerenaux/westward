@@ -108,17 +108,14 @@ Player.prototype.respawn = function(){
     this.setProperty('y', respawnLocation.y);
     this.setOrUpdateAOI();
     // TODO: loose loot
-
 };
 
 Player.prototype.applyFoodModifier = function(foodModifier){
     for(var stat in this.stats){
         if(!this.stats.hasOwnProperty(stat)) return;
         var statObj = this.getStat(stat);
-        //console.log('before : ',statObj.getValue());
         if(this.foodModifier !== null) statObj.removeRelativeModifier(this.foodModifier);
         statObj.addRelativeModifier(foodModifier);
-        //console.log('after : ',statObj.getValue());
         this.refreshStat(stat);
     }
     this.foodModifier = foodModifier;

@@ -5,15 +5,22 @@ var Animal = new Phaser.Class({
 
     Extends: Moving,
 
-    initialize: function Animal (x, y, type, id) {
-        var data = Engine.animalsData[type];
-        Moving.call(this,x,y,data.sprite,id);
-        this.setFrame(data.frame);
+    initialize: function Animal (data) { // x, y, type, id
+        var animalData = Engine.animalsData[data.type];
+        Moving.call(this,data.x,data.y,animalData.sprite,data.id);
+        this.setFrame(animalData.frame);
         this.setDisplayOrigin(0);
         this.dead = false;
-        this.name = data.name;
-        this.walkAnimPrefix = data.walkPrefix;
-        this.restingFrames = data.restingFrames;
+        this.name = animalData.name;
+        this.walkAnimPrefix = animalData.walkPrefix;
+        this.restingFrames = animalData.restingFrames;
+    },
+
+    update: function(data){
+        if(data.path) this.move(data.path);
+        if(data.stop) this.stop();
+        Engine.handleBattleUpdates(this,data);
+        if(data.dead) this.die();
     },
 
     die: function(){
@@ -21,13 +28,14 @@ var Animal = new Phaser.Class({
         this.dead = true;
     },
 
+    // ### INPUT ###
+
     handleClick: function(){
         // TODO: replace request logic
         if(Engine.dead) return;
         if(BattleManager.inBattle){
             BattleManager.processAnimalClick(this);
         }else{
-            //Engine.requestBattle(Engine.player,this);
             Engine.processAnimalClick(this);
         }
         Engine.interrupt = true;

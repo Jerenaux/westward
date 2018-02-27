@@ -179,7 +179,6 @@ InventoryPanel.prototype.setUpZone = function(nbDisplayed){
 
 InventoryPanel.prototype.modifyInventory = function(items){
     this.inventory.setItems(items);
-    //this.updateInventory();
 };
 
 InventoryPanel.prototype.setFilter = function(filter){
@@ -204,7 +203,6 @@ InventoryPanel.prototype.applyFilter = function(item){
 
 InventoryPanel.prototype.modifyFilter = function(filter){
     this.setFilter(filter);
-    //this.updateInventory();
 };
 
 // Refresh the content of a displayed inventory
@@ -228,7 +226,7 @@ InventoryPanel.prototype.resetCounters = function(){
 InventoryPanel.prototype.display = function(){
     if(this.displayed) return;
     Panel.prototype.display.call(this);
-    this.displayInventory(); // display is equivalent to update
+    //this.displayInventory(); // not called because will be called by the menu when opening (via trigger)
 };
 
 InventoryPanel.prototype.hide = function(){

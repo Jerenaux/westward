@@ -19,6 +19,7 @@ BattleManager.handleFightStatus = function(status){
 
 BattleManager.startFight = function(){
     BattleManager.inBattle = true;
+    if(Engine.currentMenu) Engine.currentMenu.hide();
     Engine.hideUI();
     Engine.hideMarker();
     Engine.fightText.tween.play();
@@ -123,8 +124,10 @@ BattleManager.endFight = function(){
     Engine.menus.battle.hide();
     if(Engine.dead) {
         var respawnPanel = Engine.menus["battle"].panels['respawn'];
-        respawnPanel.display();
-        respawnPanel.trigger();
+        setTimeout(function(){
+            respawnPanel.display();
+            respawnPanel.trigger();
+        },1000);
     }else{
         Engine.displayUI();
         Engine.showMarker();

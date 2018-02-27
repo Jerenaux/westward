@@ -8,25 +8,86 @@ var Building = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function Building (id, x, y, type, settlement, built){
-        var data = Engine.buildingsData[type];
-        var sprite = (built ? data.sprite : Engine.buildingsData[FOUNDATIONS_ID].sprite);
-        CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, sprite);
+    initialize: function Building (data){ //id, x, y, type, settlement, built
+        var buildingData = Engine.buildingsData[data.type];
+        var sprite = (data.built ? buildingData.sprite : Engine.buildingsData[FOUNDATIONS_ID].sprite);
+        CustomSprite.call(this, data.x*Engine.tileWidth, data.y*Engine.tileHeight, sprite);
 
-        this.tileX = x;
-        this.tileY = y;
-        this.id = id;
-        this.buildingType = type;
-        this.settlement = settlement;
+        this.tileX = data.x;
+        this.tileY = data.y;
+        this.id = data.id;
+        this.buildingType = data.type;
+        this.settlement = data.sid;
         this.inventory = new Inventory(100);
         this.prices = {};
-        this.chunk = Utils.tileToAOI({x:x,y:y});
-        this.entry = data.entry;
-        this.built = built;
+        this.chunk = Utils.tileToAOI({x:this.tileX,y:this.tileY});
+        this.entry = buildingData.entry;
+        this.built = data.built;
 
         //var collisionData = (this.built ? data : Engine.buildingsData[FOUNDATIONS_ID]);
         //this.setCollisions(collisionData);
-        this.setCollisions(data);
+        this.setCollisions(buildingData);
+    },
+
+    update: function(data){
+        var updateEvents = new Set();
+        if(data.inventory){
+            this.inventory.fromList(data.inventory);
+            updateEvents.add('onUpdateShop');
+        }
+        if(data.gold) {
+            this.gold = data.gold;
+            updateEvents.add('onUpdateShopGold');
+        }
+        if(data.items){
+            Engine.updateInventory(this.inventory,data.items);
+            updateEvents.add('onUpdateShop');
+        }
+        if(data.prices){
+            this.prices= data.prices;
+            updateEvents.add('onUpdateShop');
+        }
+        if(data.buildings){
+            this.buildings = data.buildings;
+            updateEvents.add('onUpdateBuildings');
+        }
+        if(data.population){
+            this.population = data.population;
+            updateEvents.add('onUpdateSettlementStatus');
+        }
+        if(data.foodsurplus){
+            this.foodsurplus = data.foodsurplus;
+            updateEvents.add('onUpdateSettlementStatus');
+        }
+        if(data.danger){
+            this.danger = data.danger;
+            updateEvents.add('onUpdateMap');
+        }
+        if(data.progress){
+            this.progress = data.progress;
+            updateEvents.add('onUpdateConstruction');
+        }
+        if(data.prod){
+            this.prod = data.prod;
+            updateEvents.add('onUpdateConstruction');
+            updateEvents.add('onUpdateProductivity');
+        }
+        if(data.built){
+            if(data.built == true && this.built == false) this.build();
+            if(Engine.inThatBuilding(this.id)){
+                Engine.exitBuilding();
+                Engine.enterBuilding(this.id);
+            }
+        }
+
+        if(data.committed){
+            this.committed = data.committed;
+            updateEvents.add('onUpdateProductivity');
+        }
+
+        updateEvents.forEach(function(e){
+            Engine.checkForBuildingMenuUpdate(this.id,e);
+        },this);
     },
 
     build: function(){
@@ -35,6 +96,8 @@ var Building = new Phaser.Class({
         this.setOrigin(0.5);
         this.setPosition(this.tileX*Engine.tileWidth,this.tileY*Engine.tileHeight);
     },
+
+    // ### SETTERS ###
 
     setCollisions: function(data){
         var shape = new Phaser.Geom.Polygon(data.shape);
@@ -55,16 +118,7 @@ var Building = new Phaser.Class({
         PFUtils.collisionsFromShape(shape.points,spriteX,spriteY,data.width,data.height,Engine.collisions);
     },
 
-    handleClick: function(){
-        if(Engine.inMenu || Engine.player.inFight) return;
-        if(!this.entry) return;
-        var pos = {
-            x: this.tileX + this.entry.x,
-            y: this.tileY + this.entry.y
-        };
-        Engine.player.setDestinationAction(1,this.id); // 1 for building
-        Engine.computePath(pos);
-    },
+    // ### GETTERS ###
 
     getPrice: function(id,action){
         var key = (action == 'sell' ? 0 : 1);
@@ -73,5 +127,18 @@ var Building = new Phaser.Class({
 
     getItemNb: function(item){
         return this.inventory.getNb(item);
+    },
+
+    // ### INPUT ###
+
+    handleClick: function(){
+        if(Engine.inMenu || Engine.player.inFight || Engine.dead) return;
+        if(!this.entry) return;
+        var pos = {
+            x: this.tileX + this.entry.x,
+            y: this.tileY + this.entry.y
+        };
+        Engine.player.setDestinationAction(1,this.id); // 1 for building
+        Engine.computePath(pos);
     }
 });

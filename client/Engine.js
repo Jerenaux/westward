@@ -32,9 +32,7 @@ var Engine = {
 Engine.preload = function() {
     this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
 
-    this.load.image('talk', 'assets/sprites/talk.png');
     this.load.image('footsteps', 'assets/sprites/footsteps.png');
-    this.load.image('battlehalo', 'assets/sprites/battlehalo.png');
 
     this.load.image('scroll', 'assets/sprites/scroll.png');
     this.load.image('tome', 'assets/sprites/tome.png');
@@ -56,26 +54,18 @@ Engine.preload = function() {
     this.load.atlas('aok', 'assets/sprites/aok.png', 'assets/sprites/aok.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
-    this.load.atlas('buildings', 'assets/sprites/buildings.png', 'assets/sprites/buildings.json');
-    this.load.atlas('icons', 'assets/sprites/icons.png', 'assets/sprites/icons.json'); // remove?
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
     this.load.spritesheet('icons2', 'assets/sprites/icons2.png',{frameWidth:25,frameHeight:24});
     this.load.image('tail', 'assets/sprites/tail.png');
-    this.load.image('scrollbg', 'assets/sprites/scroll400.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll_horiz.png');
-    this.load.image('radial', 'assets/sprites/radial.png');
-    this.load.image('radial1', 'assets/sprites/radial1.png');
-    this.load.image('radial2', 'assets/sprites/radial2.png');
     this.load.image('radial3', 'assets/sprites/radial3.png');
-    this.load.image('radial4', 'assets/sprites/radial4.png');
     this.load.image('fullmap', 'assets/sprites/fullmap_005_tr.png');
     // pin: https://www.iconfinder.com/icons/173052/map_marker_icon
     this.load.image('skull', 'assets/sprites/skull.png');
     this.load.image('pin', 'assets/sprites/pin.png');
     this.load.image('redpin', 'assets/sprites/redpin.png');
     this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
-    this.load.image('arrow', 'assets/sprites/arrow.png');
     this.load.spritesheet('sword_anim', 'assets/sprites/Sword1.png',{frameWidth:96,frameHeight:96});
     this.load.spritesheet('death', 'assets/sprites/death.png',{frameWidth:48,frameHeight:48});
 
@@ -616,19 +606,6 @@ Engine.makeFortMenu = function(){
     var devlvl = new DevLevelPanel(lvlx,lvly,lvlw,lvlh,'Next level requirements');
     fort.addPanel('devlvl',devlvl);
 
-    /*fort.onUpdateShop = function(){
-        resources.updateInventory();
-        devlvl.update();
-    };
-    fort.onUpdateBuildings = function(){
-        buildings.updateListing();
-    };
-    fort.onUpdateSettlementStatus = function(){
-        status.update();
-    };
-    fort.onUpdateMap = function(){
-        mapPanel.update();
-    };*/
     fort.addEvent('onUpdateShop',function(){
         resources.updateInventory();
         devlvl.update();
@@ -652,23 +629,6 @@ Engine.makeTradeMenu = function(){
     var action = new ShopPanel(212,420,300,100,'Buy/Sell');
     trade.addPanel('action',action);
 
-    /*trade.onUpdateInventory = function(){
-        client.updateInventory();
-        action.update();
-    };
-    trade.onUpdateShop = function(){
-        shop.updateInventory();
-        action.update();
-    };
-    trade.onUpdateGold = function(){
-        client.updateCapsule('gold',Engine.player.gold);
-        action.update();
-    };
-    trade.onUpdateShopGold = function(){
-        var gold = Engine.currentBuiling.gold || 0;
-        shop.updateCapsule('gold',gold);
-        action.update();
-    };*/
     trade.addEvent('onUpdateInventory',function(){
         client.updateInventory();
         action.update();
@@ -682,8 +642,7 @@ Engine.makeTradeMenu = function(){
         action.update();
     });
     trade.addEvent('onUpdateShopGold',function(){
-        var gold = Engine.currentBuiling.gold || 0;
-        shop.updateCapsule('gold',gold);
+        shop.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
         action.update();
     });
     return trade;
@@ -701,10 +660,10 @@ Engine.makeCraftingMenu = function(){
     var items = new InventoryPanel(40,100,390,380,'Items');
     items.setInventory(Engine.player.inventory,10,true);
     crafting.addPanel('items',items);
-    /*crafting.onUpdateInventory = function(){
-        items.updateInventory();
-        ingredients.updateInventory();
-    };*/
+
+    crafting.addEvent('onUpdateRecipes',function(){
+        recipes.updateInventory();
+    });
     crafting.addEvent('onUpdateInventory',function(){
         items.updateInventory();
         ingredients.updateInventory();
@@ -721,12 +680,6 @@ Engine.makeInventory = function(statsPanel){
     var equipment = new EquipmentPanel(665,100,330,260,'Equipment');
     inventory.addPanel('equipment',equipment);
     inventory.addPanel('stats',statsPanel);
-    /*inventory.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
-    inventory.onUpdateInventory = items.updateInventory.bind(items);
-    inventory.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
-    inventory.onUpdateGold = function(){
-        items.updateCapsule('gold',Engine.player.gold);
-    };*/
     inventory.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
     inventory.addEvent('onUpdateInventory',items.updateInventory.bind(items));
     inventory.addEvent('onUpdateStats',statsPanel.updateStats.bind(statsPanel));
@@ -769,7 +722,8 @@ Engine.getIngredientsPanel = function(){
 };
 
 Engine.addHero = function(data){ //player.id,player.x,player.y,player.settlement,player.commitSlots
-    Engine.player = Engine.addPlayer(data.id,data.x,data.y,data.settlement);
+    Engine.player = Engine.addPlayer(data); // data.id,data.x,data.y
+    Engine.player.settlement = data.settlement;
     Engine.player.isHero = true;
     Engine.camera.startFollow(Engine.player);
     Engine.player.inventory = new Inventory();
@@ -1133,29 +1087,9 @@ Engine.update = function(){
 
 // Processes the global update packages received from the server
 Engine.updateWorld = function(data){  // data is the update package from the server
-    if(data.newplayers) {
-        for (var n = 0; n < data.newplayers.length; n++) {
-            var p = data.newplayers[n];
-            var player = Engine.addPlayer(p.id, p.x, p.y, p.settlement);
-            Engine.updatePlayer(player,p);
-        }
-    }
-
-    if(data.newbuildings) {
-        for (var n = 0; n < data.newbuildings.length; n++) {
-            var b = data.newbuildings[n];
-            var building = Engine.addBuilding(b.id, b.x, b.y, b.type, b.sid, b.built);//, b.inventory, b.gold,b.prices);
-            Engine.updateBuilding(building,b);
-        }
-    }
-
-    if(data.newanimals) {
-        for (var n = 0; n < data.newanimals.length; n++) {
-            var a = data.newanimals[n];
-            var animal = Engine.addAnimal(a.id, a.x, a.y, a.type);
-            Engine.updateAnimal(animal,a);
-        }
-    }
+    if(data.newplayers) Engine.createElements(data.newplayers,Engine.addPlayer,Engine.updatePlayer);
+    if(data.newbuildings) Engine.createElements(data.newbuildings,Engine.addBuilding,Engine.updateBuilding);
+    if(data.newanimals) Engine.createElements(data.newanimals,Engine.addAnimal,Engine.updateAnimal);
 
     if(data.newcells) {
         for (var n = 0; n < data.newcells.length; n++) {
@@ -1164,34 +1098,46 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
         }
         BattleManager.activateCell();
     }
+    /*if(data.newcells) {
+        Engine.createElements(data.newcells,Engine.addBattleCell);
+        BattleManager.activateCell();
+    }*/
 
-    if(data.removedplayers) Engine.traverseRemovalArrays(data.removedplayers,Engine.removePlayer);
-    if(data.removedanimals) Engine.traverseRemovalArrays(data.removedanimals,Engine.removeAnimal);
-    if(data.removedcells) Engine.traverseRemovalArrays(data.removedcells,Engine.removeBattleCell);
+    if(data.removedplayers) Engine.removeElements(data.removedplayers,Engine.removePlayer);
+    if(data.removedanimals) Engine.removeElements(data.removedanimals,Engine.removeAnimal);
+    if(data.removedcells) Engine.removeElements(data.removedcells,Engine.removeBattleCell);
 
     // data.players is an associative array mapping the id's of the entities
     // to small object indicating which properties need to be updated. The following code iterate over
     // these objects and call the relevant update functions.
-    if(data.players) Engine.traverseUpdateObject(data.players,Engine.players,Engine.updatePlayer);
-    if(data.animals) Engine.traverseUpdateObject(data.animals,Engine.animals,Engine.updateAnimal);
-    if(data.buildings) Engine.traverseUpdateObject(data.buildings,Engine.buildings,Engine.updateBuilding);
+    if(data.players) Engine.updateElements(data.players,Engine.players,Engine.updatePlayer);
+    if(data.animals) Engine.updateElements(data.animals,Engine.animals,Engine.updateAnimal);
+    if(data.buildings) Engine.updateElements(data.buildings,Engine.buildings,Engine.updateBuilding);
 };
 
-Engine.traverseRemovalArrays = function(arr,callback){
-    for (var i = 0; i < arr.length; i++) {
-        callback(arr[i]);
-    }
+// TODO: replace callbacks by systematic owned methids
+Engine.createElements = function(arr,creationCallback,updateCallback){
+    arr.forEach(function(e){
+        updateCallback(creationCallback(e),e);
+    });
+};
+
+Engine.removeElements = function(arr,callback){
+    arr.forEach(function(e){
+        callback(e);
+    });
 };
 
 // For each element in obj, call callback on it
-Engine.traverseUpdateObject = function(obj,table,callback){
+Engine.updateElements = function(obj,table,callback){
     Object.keys(obj).forEach(function (key) {
         if(table[key]) callback(table[key],obj[key]);
     });
 };
 
 Engine.updatePlayer = function(player,data){ // data contains the updated data from the server
-    if(data.path && !player.isHero) player.move(data.path);
+    player.update(data);
+    /*if(data.path && !player.isHero) player.move(data.path);
     if(data.inBuilding > -1) {
         if(!player.isHero) player.setVisible(false);
         player.inBuilding = data.inBuilding;
@@ -1200,21 +1146,24 @@ Engine.updatePlayer = function(player,data){ // data contains the updated data f
         if(!player.isHero) player.setVisible(true);
         player.inBuilding = data.inBuilding;
     }
+    if(data.settlement) player.settlement = settlement;
     Engine.handleBattleUpdates(player,data);
     if(data.dead == true) player.die(!player.firstUpdate);
     if(data.dead == false) player.respawn();
     if(!player.isHero && data.chat) player.talk(data.chat);
     if(data.x >= 0 && data.y >= 0) player.teleport(data.x,data.y);
-    player.firstUpdate = false;
+    player.firstUpdate = false;*/
 };
 
 Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server
-    if(data.path) animal.move(data.path);
+    animal.update(data);
+    /*if(data.path) animal.move(data.path);
     if(data.stop) animal.stop();
     Engine.handleBattleUpdates(animal,data);
-    if(data.dead) animal.die();
+    if(data.dead) animal.die();*/
 };
 
+// TODO: move to moving?
 Engine.handleBattleUpdates = function(entity, data){
     if(data.inFight !== undefined) entity.inFight = data.inFight;
     if(data.meleeHit !== undefined) Engine.handleBattleAnimation('melee',entity,data.meleeHit);
@@ -1222,63 +1171,7 @@ Engine.handleBattleUpdates = function(entity, data){
 };
 
 Engine.updateBuilding = function(building,data){ // data contains the updated data from the server
-    var updateEvents = new Set();
-    if(data.inventory){
-        building.inventory.fromList(data.inventory);
-        updateEvents.add('onUpdateShop');
-    }
-    if(data.gold) {
-        building.gold = data.gold;
-        updateEvents.add('onUpdateShopGold');
-    }
-    if(data.items){
-        Engine.updateInventory(building.inventory,data.items);
-        updateEvents.add('onUpdateShop');
-    }
-    if(data.prices){
-        building.prices= data.prices;
-        updateEvents.add('onUpdateShop');
-    }
-    if(data.buildings){
-        building.buildings = data.buildings;
-        updateEvents.add('onUpdateBuildings');
-    }
-    if(data.population){
-        building.population = data.population;
-        updateEvents.add('onUpdateSettlementStatus');
-    }
-    if(data.foodsurplus){
-        building.foodsurplus = data.foodsurplus;
-        updateEvents.add('onUpdateSettlementStatus');
-    }
-    if(data.danger){
-        building.danger = data.danger;
-        updateEvents.add('onUpdateMap');
-    }
-    if(data.progress){
-        building.progress = data.progress;
-        updateEvents.add('onUpdateConstruction');
-    }
-    if(data.prod){
-        building.prod = data.prod;
-        updateEvents.add('onUpdateConstruction');
-        updateEvents.add('onUpdateProductivity');
-    }
-    if(data.built){
-        if(data.built == true && building.built == false) building.build();
-        if(Engine.inThatBuilding(building.id)){
-            Engine.exitBuilding();
-            Engine.enterBuilding(building.id);
-        }
-    }
-    if(data.committed){
-        building.committed = data.committed;
-        updateEvents.add('onUpdateProductivity');
-    }
-
-    updateEvents.forEach(function(e){
-        Engine.checkForBuildingMenuUpdate(building.id,e);
-    });
+    building.update(data);
 };
 
 Engine.inThatBuilding = function(id){
@@ -1287,31 +1180,32 @@ Engine.inThatBuilding = function(id){
 
 Engine.checkForBuildingMenuUpdate= function(id,event){
     if(Engine.inThatBuilding(id) && Engine.inMenu) {
-        //if(Engine.currentMenu[callback]) Engine.currentMenu[callback]();
         Engine.currentMenu.trigger(event);
     }
 };
 
-Engine.addPlayer = function(id,x,y,settlement){
-    if(Engine.playerIsInitialized && id == Engine.player.id) return;
-    var sprite = new Player(x,y,'hero',id);
-    sprite.settlement = settlement;
-    Engine.players[id] = sprite;
-    Engine.displayedPlayers.add(id);
+Engine.addPlayer = function(data){ // id,x,y
+    if(Engine.playerIsInitialized && data.id == Engine.player.id){
+        console.warn('Duplicate initialization of hero');
+        return;
+    }
+    var sprite = new Player(data); // x,y,'hero',id
+    Engine.players[sprite.id] = sprite;
+    Engine.displayedPlayers.add(sprite.id);
     return sprite;
 };
 
-Engine.addBuilding = function(id,x,y,type,settlement,built){//},inv,gold,prices){
-    var building = new Building(id,x,y,type,settlement,built);//,inv,gold,prices);
-    Engine.buildings[id] = building;
-    Engine.displayedBuildings.add(id);
+Engine.addBuilding = function(data){ // id,x,y,type,settlement,built
+    var building = new Building(data); // id,x,y,type,settlement,built
+    Engine.buildings[building.id] = building;
+    Engine.displayedBuildings.add(building.id);
     return building;
 };
 
-Engine.addAnimal = function(id,x,y,type){
-    var animal = new Animal(x,y,type,id);
-    Engine.animals[id] = animal;
-    Engine.displayedAnimals.add(id);
+Engine.addAnimal = function(data){ // id,x,y,type
+    var animal = new Animal(data);
+    Engine.animals[animal.id] = animal;
+    Engine.displayedAnimals.add(animal.id);
     return animal;
 };
 
@@ -1379,8 +1273,8 @@ Engine.enterBuilding = function(id){
     menu.displayIcon();
     menu.display();
 
+    //TODO: remove
     if(menu.panels['shop']) {
-        menu.panels['shop'].updateCapsule('gold', building.gold);
         menu.panels['shop'].modifyInventory(building.inventory.items);
         menu.panels['client'].modifyFilter({
             type: 'prices',
@@ -1396,7 +1290,10 @@ Engine.enterBuilding = function(id){
         menu.panels['shop'].updateInventory();
     }
 
-    if(menu.panels['resources']) menu.panels['resources'].modifyInventory(building.inventory.items);
+    if(menu.panels['resources']){
+        menu.panels['resources'].modifyInventory(building.inventory.items);
+        menu.panels['resources'].updateInventory();
+    }
 
     Engine.buildingTitle.setText(buildingData.name);
     Engine.settlementTitle.setText(settlementData.name);
@@ -1419,11 +1316,6 @@ Engine.exitBuilding = function(){
     }
     Engine.UIHolder.resize(115);
 };
-
-/*Engine.requestBattle = function(a,b) {
-    // Assumes for now that a is the player (hero) and b an animal
-    Client.startBattle(b.id);
-};*/
 
 Engine.processAnimalClick = function(target){
     Client.animalClick(target.id);

@@ -180,7 +180,7 @@ Building.prototype.trim = function(){
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    trimmed.inventory = this.inventory.toList();
+    if(this.inventory.size > 0) trimmed.inventory = this.inventory.toList();
     return trimmed;
 };
 

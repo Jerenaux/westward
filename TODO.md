@@ -30,10 +30,8 @@ Week:
 -----
 Battle: test that pathfinding is constrained to battle grid
 Battle: refuse battles if obstacles in the way (w/ notification)
-Battle: small delay before respawn tab
 Battle: check that upon death, all cells are red
 Battle: add routine so that monsters don't stay on same cell as players
-Batle:  close menu when dragged in
 Battle: cells are not updated anymore
 Battle: clicking on red cell ends turn?
 Battle: wrong HP y? (side-by-side fight)
@@ -46,17 +44,18 @@ Battle: expand battle zone for new fighters (with small delays)
 Battle: notify of new fighters
 Battle: test extensively (multiplayer, battles side-by-side, overlap...)
 Fort: staff
+Fort: dev lvl progress bar glitch
 Construction: notification of civic xp gain
 Economic loop: impact of materials availability on building 
-Economic loop: apply effect of food deficit on players (+ update character panel)
 Economic loop: test all updates of all menus 
 Econmic loop: skin dead animals
 UI: display event pop-ups after skinning
 Character: display committed buildings (update when commit/uncommit)
 Character: add new stats
 Character: stats modifier should not affect health
-Character: display stat details
+Character: display stat modifier details
 Character: foodSurplus in self update, used for ProductivityPanel & CharacterPanel updates
+
 Finish: review base stats values; test economy for a while; decide duration of all cycles (eco, spawn...)
 
 Cleaning:
@@ -79,7 +78,9 @@ Performance:
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 - To check if update packets are empty: iterate over keys and check for emptyness using typeof (if array and length 0 ...)
 Order:
-- Compress repeated code in updateWorld()
+- add update() to BattleCells, so that createElements() can use it for all new elements
+- Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
+- Tie input events to game objects, rather than global functions (use topOnly)
 - Remove unnecessary files (esp. sprites)
 - Remove "longslot" stuff intended for stretching longslots vertically?
 - Find out how to generate graphics objects (grid tiles, gradients...) programmatically for various uses

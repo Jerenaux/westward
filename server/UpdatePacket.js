@@ -13,7 +13,6 @@ function UpdatePacket(){
     this.players = {}; // list of player objects already existing for which properties have been updated
     this.animals = {};
     this.buildings = {};
-    //this.disconnected = []; // list of id's of disconnected players since last update
 }
 
 UpdatePacket.prototype.addObject = function(object){
