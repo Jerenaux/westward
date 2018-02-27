@@ -19,7 +19,7 @@ CommitmentPanel.prototype.addInterface = function(){
 
 CommitmentPanel.prototype.displayInterface = function(){
     var yoffset = 40;
-    var nb = 3;
+    var nb = Engine.player.commitSlots.max;
     for(var i = 0; i < nb; i++){
         var slot = this.getNextLongSlot(100);
         slot.setUp(this.x+15,this.y + yoffset + i*50);
@@ -30,7 +30,8 @@ CommitmentPanel.prototype.displayInterface = function(){
 };
 
 CommitmentPanel.prototype.update = function(){
-    this.nbText.setText((3-Engine.player.commitSlots.length)+'/3');
+    var current = (Engine.player.commitSlots.max-Engine.getCommitSlots().length);
+    this.nbText.setText(current+'/'+Engine.player.commitSlots.max);
 };
 
 CommitmentPanel.prototype.hideInterface = function(){

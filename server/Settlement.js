@@ -42,7 +42,6 @@ Settlement.prototype.registerFort = function(fort){
         x: GameServer.buildingsData[0].entry.x + this.fort.x,
         y: GameServer.buildingsData[0].entry.y + this.fort.y
     };
-    console.log(this.respawnLocation);
 };
 
 Settlement.prototype.addToFort = function(item,nb){

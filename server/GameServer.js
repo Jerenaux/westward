@@ -195,7 +195,6 @@ GameServer.createInitializationPacket = function(playerID){
     return {
         player: GameServer.players[playerID].initTrim(), // info about the player
         nbconnected: GameServer.server.getNbConnected()
-        //buildings: GameServer.buildingsList
     };
     // No need to send list of existing players, GameServer.handleAOItransition() will look for players in adjacent AOIs
     // and add them to the "newplayers" array of the next update packet

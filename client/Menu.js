@@ -5,6 +5,7 @@
 function Menu(title){
     this.container = [];
     this.panels = {};
+    this.events = {};
     this.hideOnOpen = {};
     this.displayed = false;
     if(title) this.makeTitle(title);
@@ -18,7 +19,16 @@ Menu.prototype.makeTitle = function(title){
 
 Menu.prototype.addPanel = function(name,panel,hideOnOpen){
     this.panels[name] = panel;
+    panel.name = name;
     this.hideOnOpen[name] = !!hideOnOpen;
+};
+
+Menu.prototype.addEvent = function(name,callback){
+    this.events[name] = callback;
+};
+
+Menu.prototype.trigger = function(event){
+    if(this.events[event]) this.events[event]();
 };
 
 Menu.prototype.setIcon = function(icon){
@@ -44,6 +54,11 @@ Menu.prototype.display = function(){
     for(var p in this.panels){
         if(!this.panels.hasOwnProperty(p)) continue;
         if(!this.hideOnOpen[p]) this.panels[p].display();
+    }
+
+    for(var event in this.events){
+        if(!this.events.hasOwnProperty(event)) continue;
+        this.trigger(event);
     }
 
     Engine.inMenu = true;

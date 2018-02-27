@@ -46,12 +46,21 @@ ProductionPanel.prototype.displaySlots = function(){
 ProductionPanel.prototype.update = function(){
     this.hideLongSlots();
     this.displaySlots();
+    this.displayCommitButton();
+};
+
+ProductionPanel.prototype.displayCommitButton = function(){
+    if(Engine.canCommit()){
+        this.button.display();
+    }else{
+        this.button.hide();
+    }
 };
 
 ProductionPanel.prototype.displayInterface = function(){
     this.displayTexts();
     this.displaySlots();
-    this.button.display();
+    this.displayCommitButton();
 };
 
 ProductionPanel.prototype.hideInterface = function(){

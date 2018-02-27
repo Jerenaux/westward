@@ -74,6 +74,7 @@ CraftingPanel.prototype.setUp = function(itemID){
     this.craftItem.countText.setVisible(true);
 
     Engine.getIngredientsPanel().modifyInventory(this.makeIngredientsList(data.recipe,1));
+    Engine.getIngredientsPanel().updateInventory();
     this.manageButtons();
 };
 

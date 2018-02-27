@@ -29,12 +29,21 @@ ConstructionPanel.prototype.update = function(){
     this.progressText.setText(this.bar.getPct()+'%');
     var increment = Formulas.computeBuildIncrement(data.prod,Engine.buildingsData[data.buildingType].buildRate);//Math.round((data.prod/100)*Engine.buildingsData[data.buildingType].buildRate);
     this.incrementText.setText('(+'+increment+'%/cycle)');
+    this.displayCommitButton();
+};
+
+ConstructionPanel.prototype.displayCommitButton = function(){
+    if(Engine.canCommit()){
+        this.button.display();
+    }else{
+        this.button.hide();
+    }
 };
 
 ConstructionPanel.prototype.displayInterface = function(){
     this.update();
     this.bar.display();
-    this.button.display();
+    this.displayCommitButton();
     this.displayTexts();
 };
 

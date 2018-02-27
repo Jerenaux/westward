@@ -53,7 +53,6 @@ Economic loop: test all updates of all menus
 Econmic loop: skin dead animals
 UI: display event pop-ups after skinning
 Character: display committed buildings (update when commit/uncommit)
-Character: hide buttons where already committed/when out of slots
 Character: add new stats
 Character: stats modifier should not affect health
 Character: display stat details
@@ -67,6 +66,7 @@ Performance:
 - "Sleep" mode for NPC when no player in currentAOI.entities (change flags on AOI transition, not on every NPC update loop iteration)
 - Pathmaking instead of pahfinding?
 - Concile the two coexisting menu update systems: the one used by updateSelf and the one used by updateBuilding
+-> All menus have an update() method called on display; upon new server data, only update() the current menu
 - Dont send full building inventories when buying/selling (send arrays of deltas)
 - Use pool for footsteps (see Groups, who now act as pools)
 - Use pools for players, animals, ...
@@ -213,6 +213,7 @@ interactions with buildings, time spent in each individual menu, etc.
 
 Content:
 -------
+* Cheat-proof everything 
 * Battle system
 - Battle experience
 - Identify characters in the way of ranged attacks

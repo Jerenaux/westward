@@ -10,7 +10,7 @@ var Inventory = require('../shared/Inventory.js').Inventory;
 var Stats = require('../shared/Stats.js').Stats;
 var Equipment = require('../shared/Equipment.js').Equipment;
 
-var NB_SLOTS = 3;
+var NB_SLOTS = 2;
 var COMMIT_DURATION = 30*1000;
 
 function Player(){
@@ -23,7 +23,7 @@ function Player(){
     this.settlement = 0;
     this.gold = 0;
     this.inBuilding = -1;
-    this.commitSlots = [];
+    this.commitSlots = this.getCommitSlotsShell();
     this.civicxp = [0,100];
     this.setUpStats();
     this.equipment = Equipment.getSkeleton();
@@ -32,6 +32,13 @@ function Player(){
 
 Player.prototype = Object.create(MovingEntity.prototype);
 Player.prototype.constructor = Player;
+
+Player.prototype.getCommitSlotsShell = function(){
+    return {
+        slots: [],
+        max: NB_SLOTS
+    }
+};
 
 Player.prototype.setIDs = function(dbID,socketID){
     this.id = GameServer.lastPlayerID++;
@@ -118,18 +125,46 @@ Player.prototype.applyFoodModifier = function(foodModifier){
 };
 
 Player.prototype.hasFreeCommitSlot = function(){
-    return this.commitSlots.length < NB_SLOTS;
+    return this.getSlots().length < this.commitSlots.max;
 };
 
 Player.prototype.takeCommitmentSlot = function(buildingID){
-    this.commitSlots.push({
+    this.addToSlots({
         building: buildingID,
         stamp: Date.now()
     });
+    this.syncCommitSlots();
 };
 
 Player.prototype.freeCommitmentSlot = function(){
-    this.commitSlots.shift();
+    this.removeSlot();
+    this.syncCommitSlots();
+};
+
+Player.prototype.trimCommitSlots = function(){
+    var slots = [];
+    this.getSlots().forEach(function(slot){
+        slots.push(slot.building);
+    });
+    var trimmed = this.getCommitSlotsShell();
+    trimmed.slots = slots;
+    return trimmed;
+};
+
+Player.prototype.syncCommitSlots = function(){
+    this.updatePacket.commitSlots = this.trimCommitSlots();
+};
+
+Player.prototype.addToSlots = function(data){
+    this.commitSlots.slots.push(data);
+};
+
+Player.prototype.removeSlot = function(){
+    this.commitSlots.slots.shift();
+};
+
+Player.prototype.getSlots = function(){
+    return this.commitSlots.slots;
 };
 
 Player.prototype.gainCivicXP = function(inc){
@@ -330,10 +365,7 @@ Player.prototype.initTrim = function(){
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    trimmed.commitSlots = [];
-    this.commitSlots.forEach(function(slot){
-        trimmed.commitSlots.push(slot.building);
-    });
+    trimmed.commitSlots = this.trimCommitSlots();
     return trimmed;
 };
 
@@ -392,7 +424,7 @@ Player.prototype.getDataFromDb = function(document){
         this.giveItem(item[0],item[1]);
     }
     if(!document.gold) document.gold = 0;
-    this.commitSlots = document.commitSlots || [];
+    this.commitSlots = document.commitSlots || this.getCommitSlotsShell();
     this.civicxp = document.civicxp || [0,100];
     this.giveGold(document.gold);
     this.setOrUpdateAOI();
@@ -443,8 +475,9 @@ Player.prototype.getIndividualUpdatePackage = function(){
 };
 
 Player.prototype.update = function() {
-    for(var i = 0; i < this.commitSlots.length; i++){
-        var slot = this.commitSlots[i];
+    var slots = this.getSlots();
+    for(var i = 0; i < slots.length; i++){
+        var slot = slots[i];
         if(Date.now() - slot.stamp > COMMIT_DURATION){
             var building = GameServer.buildings[slot.building];
             building.updateCommit(-1);

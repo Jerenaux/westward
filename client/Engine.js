@@ -259,6 +259,20 @@ Engine.toggleChatBar = function(){
     Engine.chatBar.toggle();
 };
 
+Engine.getCommitSlots = function(){
+    return Engine.player.commitSlots.slots;
+};
+
+Engine.canCommit = function(){
+    if(!Engine.hasFreeCommitSlot()) return;
+    var idx = Engine.getCommitSlots().indexOf(Engine.currentBuiling.id);
+    return (idx == -1);
+};
+
+Engine.hasFreeCommitSlot = function(){
+    return Engine.getCommitSlots().length < Engine.player.commitSlots.max;
+};
+
 Engine.deathAnimation = function(target){
     var anim = Engine.getNextAnim();
     anim.setPosition(target.x+48,target.y+48);
@@ -444,7 +458,6 @@ Engine.handleMissAnimation = function(target){
     text.tween.play();
 };
 
-
 Engine.displayUI = function(){
     Engine.UIHolder.display();
     for(var i = 0; i < 3; i++){
@@ -492,9 +505,12 @@ Engine.makeBattleMenu = function(){
 
     battle.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
     battle.onUpdateInventory = items.updateInventory.bind(items);
-    battle.onUpdateStats = function(){
+    /*battle.onUpdateStats = function(){
         bar.setLevel(Engine.getPlayerHealth());
-    };
+    };*/
+    battle.addEvent('onUpdateStats',function(){
+        bar.setLevel(Engine.getPlayerHealth());
+    });
     return battle;
 };
 
@@ -508,12 +524,19 @@ Engine.makeProductionMenu = function(){
     var prody = 230;
     var prodx = (Engine.getGameConfig().width-prodw)/2;
 
-    production.addPanel('production',new ProductionPanel(x,100,w,h,'Production'));
-    var prod = new ProductivityPanel(prodx,prody,prodw,prodh,'Productivity modifiers');
-    production.addPanel('prod',prod);
-    production.onUpdateProductivity = function(){
+    var productionPanel = new ProductionPanel(x,100,w,h,'Production');
+    production.addPanel('production',productionPanel);
+    var productivity = new ProductivityPanel(prodx,prody,prodw,prodh,'Productivity modifiers');
+    production.addPanel('productivity',productivity);
+
+    /*production.onUpdateProductivity = function(){
         prod.update();
     };
+    production.onUpdateCommit = function(){
+        production.panels['production'].update();
+    };*/
+    production.addEvent('onUpdateProductivity',productivity.update.bind(productivity));
+    production.addEvent('onUpdateCommit',productionPanel.update.bind(productionPanel));
     return production;
 };
 
@@ -536,7 +559,8 @@ Engine.makeConstructionMenu = function(){
     constr.addPanel('materials',materials);
     var prod = new ProductivityPanel(prodx,prody,prodw,100,'Productivity modifiers');
     constr.addPanel('prod',prod);
-    constr.onUpdateShop = function(){
+
+    /*constr.onUpdateShop = function(){
         materials.update();
     };
     constr.onUpdateConstruction = function(){
@@ -544,7 +568,10 @@ Engine.makeConstructionMenu = function(){
     };
     constr.onUpdateProductivity = function(){
         prod.update();
-    };
+    };*/
+    constr.addEvent('onUpdateShop',materials.update.bind(materials));
+    constr.addEvent('onUpdateConstruction',progress.update.bind(progress));
+    constr.addEvent('onUpdateProductivity',prod.update.bind(prod));
     return constr;
 };
 
@@ -589,7 +616,7 @@ Engine.makeFortMenu = function(){
     var devlvl = new DevLevelPanel(lvlx,lvly,lvlw,lvlh,'Next level requirements');
     fort.addPanel('devlvl',devlvl);
 
-    fort.onUpdateShop = function(){
+    /*fort.onUpdateShop = function(){
         resources.updateInventory();
         devlvl.update();
     };
@@ -601,7 +628,14 @@ Engine.makeFortMenu = function(){
     };
     fort.onUpdateMap = function(){
         mapPanel.update();
-    };
+    };*/
+    fort.addEvent('onUpdateShop',function(){
+        resources.updateInventory();
+        devlvl.update();
+    });
+    fort.addEvent('onUpdateBuildings',buildings.updateListing.bind(buildings));
+    fort.addEvent('onUpdateSettlementStatus',status.update.bind(status));
+    fort.addEvent('onUpdateMap',mapPanel.update.bind(mapPanel));
     return fort;
 };
 
@@ -617,7 +651,8 @@ Engine.makeTradeMenu = function(){
     trade.addPanel('shop',shop);
     var action = new ShopPanel(212,420,300,100,'Buy/Sell');
     trade.addPanel('action',action);
-    trade.onUpdateInventory = function(){
+
+    /*trade.onUpdateInventory = function(){
         client.updateInventory();
         action.update();
     };
@@ -633,7 +668,24 @@ Engine.makeTradeMenu = function(){
         var gold = Engine.currentBuiling.gold || 0;
         shop.updateCapsule('gold',gold);
         action.update();
-    };
+    };*/
+    trade.addEvent('onUpdateInventory',function(){
+        client.updateInventory();
+        action.update();
+    });
+    trade.addEvent('onUpdateShop',function(){
+        shop.updateInventory();
+        action.update();
+    });
+    trade.addEvent('onUpdateGold',function(){
+        client.updateCapsule('gold',Engine.player.gold);
+        action.update();
+    });
+    trade.addEvent('onUpdateShopGold',function(){
+        var gold = Engine.currentBuiling.gold || 0;
+        shop.updateCapsule('gold',gold);
+        action.update();
+    });
     return trade;
 };
 
@@ -649,10 +701,14 @@ Engine.makeCraftingMenu = function(){
     var items = new InventoryPanel(40,100,390,380,'Items');
     items.setInventory(Engine.player.inventory,10,true);
     crafting.addPanel('items',items);
-    crafting.onUpdateInventory = function(){
+    /*crafting.onUpdateInventory = function(){
         items.updateInventory();
         ingredients.updateInventory();
-    };
+    };*/
+    crafting.addEvent('onUpdateInventory',function(){
+        items.updateInventory();
+        ingredients.updateInventory();
+    });
     return crafting;
 };
 
@@ -665,12 +721,18 @@ Engine.makeInventory = function(statsPanel){
     var equipment = new EquipmentPanel(665,100,330,260,'Equipment');
     inventory.addPanel('equipment',equipment);
     inventory.addPanel('stats',statsPanel);
-    inventory.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
+    /*inventory.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
     inventory.onUpdateInventory = items.updateInventory.bind(items);
     inventory.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
     inventory.onUpdateGold = function(){
         items.updateCapsule('gold',Engine.player.gold);
-    };
+    };*/
+    inventory.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
+    inventory.addEvent('onUpdateInventory',items.updateInventory.bind(items));
+    inventory.addEvent('onUpdateStats',statsPanel.updateStats.bind(statsPanel));
+    inventory.addEvent('onUpdateGold',function(){
+        items.updateCapsule('gold',Engine.player.gold);
+    });
     return inventory;
 };
 
@@ -684,16 +746,21 @@ Engine.makeCharacterMenu = function(statsPanel){
     var commitx = infox - padding - commitw;
     var commity = infoy;
     var character = new Menu('Character');
-    character.addPanel('info',new CharacterPanel(infox,infoy,330,infoh,'<Player name>'));
-    character.addPanel('commit',new CommitmentPanel(commitx,commity,commitw,commith,'Commitment'));
+    var infoPanel = new CharacterPanel(infox,infoy,330,infoh,'<Player name>');
+    character.addPanel('info',infoPanel);
+    var commitPanel = new CommitmentPanel(commitx,commity,commitw,commith,'Commitment');
+    character.addPanel('commit',commitPanel);
     character.addPanel('stats',statsPanel);
-    character.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
+    /*character.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
     character.onUpdateCommit = function(){
         character.panels['commit'].update();
     };
     character.onUpdateCharacter = function(){
         character.panels['info'].update();
-    };
+    };*/
+    character.addEvent('onUpdateStats',statsPanel.updateStats.bind(statsPanel));
+    character.addEvent('onUpdateCommit',commitPanel.update.bind(commitPanel));
+    character.addEvent('onUpdateCharacter',infoPanel.update.bind(infoPanel));
     return character;
 };
 
@@ -990,8 +1057,8 @@ Engine.updateSelf = function(data){
         Engine.player.gold = data.gold;
         updateEvents.add('gold');
     }
-    if(data.nbcommit >= 0){
-        Engine.player.commitSlots[0] = data.nbcommit;
+    if(data.commitSlots){
+        Engine.player.commitSlots = data.commitSlots;
         updateEvents.add('commit');
     }
     if(data.civicxp >= 0){
@@ -1014,16 +1081,6 @@ Engine.updateSelf = function(data){
     updateEvents.forEach(function(e){
         Engine.updateMenus(e);
     });
-};
-
-Engine.handleMsg = function(msg){
-    switch(msg){
-        case 'nobuild':
-            Engine.buildError();
-            break;
-        case 'okbuild':
-            Engine.buildSuccess();
-    }
 };
 
 Engine.updateAmmo = function(slot,nb){
@@ -1056,11 +1113,17 @@ Engine.updateMenus = function(category){
         'character': 'onUpdateCharacter'
     };
 
-    for(var m in Engine.menus){
-        if(!Engine.menus.hasOwnProperty(m)) continue;
-        var menu = Engine.menus[m];
-        var callback = callbackMap[category];
-        if(menu[callback]) menu[callback]();
+    var event = callbackMap[category];
+    if(Engine.currentMenu) Engine.currentMenu.trigger(event);
+};
+
+Engine.handleMsg = function(msg){
+    switch(msg){
+        case 'nobuild':
+            Engine.buildError();
+            break;
+        case 'okbuild':
+            Engine.buildSuccess();
     }
 };
 
@@ -1162,7 +1225,6 @@ Engine.updateBuilding = function(building,data){ // data contains the updated da
     var updateEvents = new Set();
     if(data.inventory){
         building.inventory.fromList(data.inventory);
-        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateShop');
         updateEvents.add('onUpdateShop');
     }
     if(data.gold) {
@@ -1187,22 +1249,18 @@ Engine.updateBuilding = function(building,data){ // data contains the updated da
     }
     if(data.foodsurplus){
         building.foodsurplus = data.foodsurplus;
-        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateSettlementStatus');
         updateEvents.add('onUpdateSettlementStatus');
     }
     if(data.danger){
         building.danger = data.danger;
-        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateMap');
         updateEvents.add('onUpdateMap');
     }
     if(data.progress){
         building.progress = data.progress;
-        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateConstruction');
         updateEvents.add('onUpdateConstruction');
     }
     if(data.prod){
         building.prod = data.prod;
-        //Engine.checkForBuildingMenuUpdate(building.id,'onUpdateConstruction');
         updateEvents.add('onUpdateConstruction');
         updateEvents.add('onUpdateProductivity');
     }
@@ -1227,9 +1285,10 @@ Engine.inThatBuilding = function(id){
     return (Engine.currentBuiling && Engine.currentBuiling.id == id);
 };
 
-Engine.checkForBuildingMenuUpdate= function(id,callback){
+Engine.checkForBuildingMenuUpdate= function(id,event){
     if(Engine.inThatBuilding(id) && Engine.inMenu) {
-        if(Engine.currentMenu[callback]) Engine.currentMenu[callback]();
+        //if(Engine.currentMenu[callback]) Engine.currentMenu[callback]();
+        Engine.currentMenu.trigger(event);
     }
 };
 
@@ -1272,26 +1331,6 @@ Engine.removeBattleCell = function(id){
     cell.setVisible(false);
     Engine.availableGridCells.push(cell);
 };
-
-/*Engine.addBattle = function(id,area){
-    Engine.battles[id] = area;
-    for(var i = 0; i < area.length; i++){
-        var rect = area[i];
-        Engine.drawGrid({x:rect.x,y:rect.y},rect.w,rect.h);
-    }
-    BattleManager.activateCell();
-    Engine.displayedCells = Engine.battleZones.toList();
-};
-
-Engine.removeBattle = function(id){
-    var area = Engine.battles[id];
-    for(var i = 0; i < area.length; i++){
-        var rect = area[i];
-        Engine.removeGrid({x:rect.x,y:rect.y},rect.w,rect.h);
-    }
-    Engine.displayedCells = Engine.battleZones.toList();
-};*/
-
 
 Engine.removeBuilding = function(id){
     var sprite = Engine.buildings[id];
@@ -1353,6 +1392,8 @@ Engine.enterBuilding = function(id){
             items: building.prices,
             key: 1
         });
+        menu.panels['client'].updateInventory();
+        menu.panels['shop'].updateInventory();
     }
 
     if(menu.panels['resources']) menu.panels['resources'].modifyInventory(building.inventory.items);
