@@ -1392,10 +1392,13 @@ Engine.recycleAnim = function(sprite){
 };*/
 
 Engine.updateGrid = function(){
-    for(var i = 0; i < Engine.displayedCells.length; i++){
+    Engine.displayedCells.forEach(function(id){
+        Engine.battleCells[id].manageFrame();
+    });
+    /*for(var i = 0; i < Engine.displayedCells.length; i++){
         var cell = Engine.displayedCells[i].v;
         cell.manageFrame();
-    }
+    }*/
 };
 
 /*Engine.removeGrid = function(tl,w,h) {

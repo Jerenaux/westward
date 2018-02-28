@@ -226,4 +226,6 @@ Building.prototype.addCollisions = function(){
     PFUtils.collisionsFromShape(this.shape,spriteX,spriteY,data.width,data.height,GameServer.collisions);
 };
 
+Building.prototype.canFight = function(){return false;}
+
 module.exports.Building = Building;

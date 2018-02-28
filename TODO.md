@@ -28,20 +28,14 @@ Goal: 1h of gameplay?
 
 Week:
 -----
-Battle: test that pathfinding is constrained to battle grid
+Battle: display inventory
 Battle: refuse battles if obstacles in the way (w/ notification)
 Battle: check that upon death, all cells are red
 Battle: add routine so that monsters don't stay on same cell as players
-Battle: cells are not updated anymore
-Battle: clicking on red cell ends turn?
 Battle: wrong HP y? (side-by-side fight)
-Battle: don't start fight with animal already in fight
 Battle: disconnet/deaths in spectated fights
 Battle: stepping into building/fight?
-Battle: disconnects/deaths in multiplayer fights
 Battle: when dying, hide battle UI, even if fight ongoing
-Battle: expand battle zone for new fighters (with small delays)
-Battle: notify of new fighters
 Battle: test extensively (multiplayer, battles side-by-side, overlap...)
 Fort: staff
 Fort: dev lvl progress bar glitch

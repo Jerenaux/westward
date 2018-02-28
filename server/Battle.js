@@ -300,4 +300,6 @@ BattleCell.prototype.trim = function(){
     };
 };
 
+BattleCell.prototype.canFight = function(){return false;}
+
 module.exports.BattleCell = BattleCell;

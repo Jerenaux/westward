@@ -14,7 +14,6 @@ var debug = false;
 function Animal(x,y,type){
     this.id = GameServer.lastAnimalID++;
     this.isPlayer = false;
-    this.canFight = true;
     //this.setStartingPosition();
     this.x = x;
     this.y = y;
@@ -118,12 +117,17 @@ Animal.prototype.decideBattleAction = function(){
         data.action = 'attack';
         data.id = target.getShortID();
     }else{
-        data.action = 'move';
         var dest = this.computeBattleDestination(target);
         //console.log('destination found : ',dest.x,dest.y);
         if(dest) {
             var path = GameServer.findPath({x: this.x, y: this.y}, dest,this.battle.PFgrid);
-            this.setPath(path);
+            if(path.length > 0){
+                this.setPath(path);
+                data.action = 'move';
+            }else{
+                console.log('Combat path of length 0');
+                data.action = 'pass';
+            }
         }else{
             data.action = 'pass';
         }

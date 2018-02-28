@@ -34,7 +34,7 @@ BattleManager.setCounter = function(seconds){
     BattleManager.countdown = seconds;
 };
 
-BattleManager.getActiveFighter = function(id){
+BattleManager.getActiveFighter = function(id,debug){
     var map;
     switch(id[0]){
         case 'P':
@@ -44,6 +44,7 @@ BattleManager.getActiveFighter = function(id){
             map = Engine.animals;
             break;
     }
+    if(debug) console.warn(map);
     return map[id.slice(1)];
 };
 
@@ -60,9 +61,12 @@ BattleManager.manageTurn = function(shortID){
         this.active.isActiveFighter = false;
     }
 
-    this.active = BattleManager.getActiveFighter(shortID);
+    this.active = BattleManager.getActiveFighter(shortID,false);
 
-    if(!this.active) console.log('shortID = ',shortID);
+    if(!this.active) {
+        console.warn('shortID = ',shortID);
+        BattleManager.getActiveFighter(shortID,true);
+    }
 
     BattleManager.isPlayerTurn = this.active.isHero;
     BattleManager.actionTaken = false;
@@ -74,6 +78,10 @@ BattleManager.manageTurn = function(shortID){
     timer.setLevel(0,100,BattleManager.countdown*1000);
 
     //if(this.active.isHero) BattleManager.onOwnTurn();
+};
+
+BattleManager.endOfMovement = function(){
+    Engine.updateGrid();
 };
 
 BattleManager.canTakeAction = function(){

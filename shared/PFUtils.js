@@ -45,10 +45,11 @@ PFUtils.secondDimensionHandler = {
     }
 };
 
-PFUtils.invertedSsecondDimensionHandler = {
+PFUtils.invertedSecondDimensionHandler = {
     get: function(target,key){
+        //console.log('2: accessing ',key);
         if(target.hasOwnProperty(key)){
-            if(target[key] == 10){
+            if(target[key] == 0){
                 target[key] = new PF.Node(parseInt(key),parseInt(target.firstDim));
             }
         }else{
@@ -67,6 +68,7 @@ PFUtils.firstDimensionHandler = {
         if(key in target.__proto__) {
             return target.__proto__[key];
         }else{
+            //console.log('1: accessing ',key);
             if(!target.hasOwnProperty(key)) target[key] = {};
             target[key].firstDim = key; // trick to carry along what was the first dimension
             return new Proxy(target[key], (target.invert ? PFUtils.invertedSecondDimensionHandler : PFUtils.secondDimensionHandler));
@@ -75,7 +77,7 @@ PFUtils.firstDimensionHandler = {
 };
 
 PFUtils.setGridUp = function(grid, map, invert){
-    if(invert) grid.invert = true;
+    if(invert) map.invert = true;
     grid.nodes = new Proxy(map,PFUtils.firstDimensionHandler);
 };
 

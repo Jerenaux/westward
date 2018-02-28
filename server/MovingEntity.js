@@ -101,6 +101,22 @@ MovingEntity.prototype.die = function(){
     this.setProperty('dead',true);
 };
 
+MovingEntity.prototype.isDead = function(){
+    return this.dead;
+};
+
+MovingEntity.prototype.isInFight = function(){
+    return this.inFight;
+};
+
+MovingEntity.prototype.isMoving = function(){
+    return this.moving;
+};
+
+MovingEntity.prototype.canFight = function(){
+    return true;
+};
+
 MovingEntity.prototype.endFight = function(){
     this.setProperty('inFight',false);
     this.battle = null;

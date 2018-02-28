@@ -107,8 +107,8 @@ GameServer.readMap = function(mapsPath){
         id: 0,
         emit: function(){}
     };
-    GameServer.addNewPlayer(dummySocket,531,661);
-    var animal = new Animal(541,661,0);
+    var player = GameServer.addNewPlayer(dummySocket,531,661);
+    var animal = new Animal(541,655,0); // 541, 661
     animal.idle = false;
     GameServer.animals[animal.id] = animal;
 
@@ -226,7 +226,7 @@ GameServer.removeEntity = function(entity){
             break;
     }
     if(arr) delete arr[entity.id];
-    if(entity.canFight && entity.battle) entity.battle.removeFighter(entity);
+    if(entity.canFight() && entity.battle) entity.battle.removeFighter(entity);
 };
 
 GameServer.getAOIAt = function(x,y){
@@ -263,27 +263,32 @@ GameServer.findPath = function(from,to,grid){
 GameServer.handleAnimalClick = function(animalID,socketID){
     var player = GameServer.getPlayer(socketID);
     var animal = GameServer.animals[animalID];
-    if(animal.dead){
+    if(animal.isDead()){
         console.log('skinning');
-    }else{
+    }else if(!animal.isInFight()){
         GameServer.handleBattle(player,animal);
     }
 };
 
 GameServer.handleBattle = function(player,animal){
-    //var player = GameServer.getPlayer(socketID);
-    //var animal = GameServer.animals[opponentID];
     if(player.inFight) return;
     if(animal.moving) return;
     if(animal.dead) return;
     // TODO: check for proximity
     var area = GameServer.computeBattleArea(player,animal);
+    console.log('Integrity : ',GameServer.checkAreaIntegrity(area));
     var battle = GameServer.checkBattleOverlap(area);
     if(!battle) battle = new Battle();
     battle.addFighter(player);
     battle.addFighter(animal);
     battle.addArea(area);
     battle.start();
+};
+
+GameServer.checkAreaIntegrity = function(area){
+    var path = GameServer.findPath(area,{x:area.x+area.w,y:area.y+area.h});
+    console.log(path);
+    return (path && path.length > 0);
 };
 
 GameServer.computeBattleArea = function(f1,f2){
@@ -342,10 +347,18 @@ GameServer.checkForFighter = function(AOIs){
 };
 
 GameServer.checkForBattle = function(entity){
-    if(!entity.canFight || entity.inFight || entity.moving || entity.dead || entity.isInBuilding()) return;
+    if(!entity.canFight() || entity.isInFight() || entity.isMoving() || entity.isDead() || entity.isInBuilding()) return;
     var cell = GameServer.battleCells.get(entity.x,entity.y);
-    //if(entity.constructor.name == 'Player') console.log('fetched ',cell);
-    if(cell) cell.battle.addFighter(entity);
+    if(cell) {
+        var area = {
+            x: entity.x-1,
+            y: entity.y-1,
+            w: 3,
+            h: 3
+        };
+        cell.battle.addFighter(entity);
+        cell.battle.addArea(area);
+    }
 };
 
 GameServer.addBattleCell = function(battle,x,y){
@@ -353,7 +366,7 @@ GameServer.addBattleCell = function(battle,x,y){
     var cell = new BattleCell(x,y,battle);
     GameServer.battleCells.add(x,y,cell);
     battle.cells.add(x,y,cell);
-    battle.PFcells.add(x,y,0);
+    battle.PFcells.add(y,x,0); // y, then x!
     GameServer.addAtLocation(cell);
     GameServer.handleAOItransition(cell);
 };

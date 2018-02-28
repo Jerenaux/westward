@@ -16,7 +16,6 @@ var COMMIT_DURATION = 30*1000;
 function Player(){
     this.updatePacket = new PersonalUpdatePacket();
     this.isPlayer = true;
-    this.canFight = true;
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.action = null;
     this.inventory = new Inventory();
