@@ -80,7 +80,12 @@ BattleManager.manageTurn = function(shortID){
     //if(this.active.isHero) BattleManager.onOwnTurn();
 };
 
-BattleManager.endOfMovement = function(){
+BattleManager.onNewCells = function(){
+    Engine.updateGrid();
+    BattleManager.activateCell();
+};
+
+BattleManager.onEndOfMovement = function(){
     Engine.updateGrid();
 };
 
@@ -126,16 +131,21 @@ BattleManager.activateCell = function(){
     if(cell) cell.activate();
 };
 
+BattleManager.onDeath = function(){
+    Engine.updateGrid();
+    var respawnPanel = Engine.menus["battle"].panels['respawn'];
+    setTimeout(function(){
+        respawnPanel.display();
+        respawnPanel.trigger();
+    },1000);
+};
+
 BattleManager.endFight = function(){
     Engine.setCursor();
     BattleManager.inBattle = false;
     Engine.menus.battle.hide();
     if(Engine.dead) {
-        var respawnPanel = Engine.menus["battle"].panels['respawn'];
-        setTimeout(function(){
-            respawnPanel.display();
-            respawnPanel.trigger();
-        },1000);
+       BattleManager.onDeath();
     }else{
         Engine.displayUI();
         Engine.showMarker();

@@ -463,6 +463,10 @@ Player.prototype.setChat = function(text){
     },5000);
 };
 
+Player.prototype.addMsg = function(msg){
+    this.updatePacket.addMsg(msg);
+};
+
 Player.prototype.getIndividualUpdatePackage = function(){
     if(this.updatePacket.isEmpty()) return null;
     var pkg = this.updatePacket;

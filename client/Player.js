@@ -54,7 +54,7 @@ var Player = new Phaser.Class({
 
     endMovement: function() {
         Moving.prototype.endMovement.call(this);
-        if(BattleManager.inBattle) BattleManager.endOfMovement();
+        if(BattleManager.inBattle) BattleManager.onEndOfMovement();
         if(this.isHero){
             if(this.destinationAction && this.destinationAction.type == 1){
                 Engine.enterBuilding(this.destinationAction.id);

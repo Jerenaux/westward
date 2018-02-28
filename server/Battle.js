@@ -50,9 +50,22 @@ Battle.prototype.getFighterIndex = function(f){
     return -1;
 };
 
+Battle.prototype.managePosition = function(f){
+    var busy = this.positions.get(f.x,f.y);
+    if(busy){
+        console.log('busy cell for ',f.getShortID());
+        if(!f.isPlayer){
+            f.queueAction('move');
+        }else if(!busy.isPlayer){
+            busy.queueAction('move');
+        }
+    }
+    this.positions.add(f.x,f.y,f);
+};
+
 Battle.prototype.addFighter = function(f){
     this.fighters.push(f);
-    this.positions.add(f.x,f.y,f);
+    this.managePosition(f);
     this.updateTeams(f.constructor.name,1);
     f.setProperty('inFight',true);
     f.stopWalk();
@@ -78,10 +91,6 @@ Battle.prototype.updateTeams = function(team,increment){
     if(this.teams[team] <= 0) this.end();
 };
 
-/*Battle.prototype.manageDeath = function(f){
-    this.removeFighter(f);
-};*/
-
 Battle.prototype.reset = function(){
     this.countdown = TURN_DURATION;
     this.endTime = 0;
@@ -93,21 +102,16 @@ Battle.prototype.newTurn = function(){
     this.fighters.push(this.fighters.shift());
     this.reset();
     console.log('[B'+this.id+'] New turn');
-    //console.log('[B'+this.id+'] It is now '+(this.fighters[0].constructor.name)+'\'s turn');
 
     var activeFighter = this.getActiveFighter();
-    for(var i = 0; i < this.fighters.length; i++){
-        var f = this.fighters[i];
+    this.fighters.forEach(function(f){
         if(f.isPlayer) {
             f.updatePacket.remainingTime = this.countdown/1000;
             f.updatePacket.activeID = activeFighter.getShortID();
         }
-    }
+    },this);
 
-    if(!activeFighter.isPlayer) {
-        //activeFighter.decideBattleAction();
-        setTimeout(activeFighter.decideBattleAction.bind(activeFighter),500);
-    }
+    if(!activeFighter.isPlayer) setTimeout(activeFighter.decideBattleAction.bind(activeFighter),500);
 };
 
 Battle.prototype.getActiveFighter = function(){
@@ -158,7 +162,8 @@ Battle.prototype.setEndOfTurn = function(delay){
 };
 
 Battle.prototype.processMove = function(f){
-    this.positions.delete(f.x,f.y);
+    var busy = this.positions.get(f.x,f.y);
+    if(busy && (busy.getShortID() == f.getShortID())) this.positions.delete(f.x,f.y);
     var pos = f.getEndOfPath();
     this.positions.add(pos.x,pos.y,f);
     return {
@@ -266,8 +271,8 @@ Battle.prototype.addArea = function(area){
     var maxx = x+w;
     var maxy = y+h;
     var sy = y;
-    for(; x < maxx; x++){
-        for(y = sy; y < maxy; y++){
+    for(; x <= maxx; x++){
+        for(y = sy; y <= maxy; y++){
             if(!PFUtils.checkCollision(x,y)) GameServer.addBattleCell(this,x,y);
         }
     }
@@ -280,6 +285,10 @@ Battle.prototype.cleanUp = function(){
     this.cells.toList().forEach(function(cell){
         GameServer.removeBattleCell(_battle,cell.x,cell.y);
     });
+};
+
+Battle.prototype.getCells = function(){
+    return this.cells.toList();
 };
 
 module.exports.Battle = Battle;

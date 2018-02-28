@@ -885,16 +885,16 @@ Engine.moveToClick = function(pointer){
 };
 
 Engine.computePath = function(position){
-    //if(Engine.checkCollision(position)) return;
     var x = position.x;
     var y = position.y;
     if(PFUtils.checkCollision(x,y)) return;
-    //if(Engine.collisions.get(y,x) == 1) return; // y, then x!
-    //Engine.PFgrid.nodes = new Proxy(JSON.parse(JSON.stringify(Engine.collisions)),PFUtils.firstDimensionHandler); // Recreates a new grid each time
     var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, x, y, Engine.PFgrid);
     PF.reset();
     if(path.length == 0) return;
-    if(path.length > PFUtils.maxPathLength) return;
+    if(path.length > PFUtils.maxPathLength) {
+        Engine.handleMsg('It\'s too far!');
+        return;
+    }
     path = PFUtils.trimPath(path,Engine.battleCellsMap);
     Engine.player.move(path);
 };
@@ -1072,13 +1072,14 @@ Engine.updateMenus = function(category){
 };
 
 Engine.handleMsg = function(msg){
-    switch(msg){
+    /*switch(msg){
         case 'nobuild':
             Engine.buildError();
             break;
         case 'okbuild':
             Engine.buildSuccess();
-    }
+    }*/
+    Engine.player.talk(msg);
 };
 
 Engine.update = function(){
@@ -1096,7 +1097,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
             var b = data.newcells[n];
             Engine.addBattleCell(b.id, b.x, b.y);
         }
-        BattleManager.activateCell();
+        BattleManager.onNewCells();
     }
     /*if(data.newcells) {
         Engine.createElements(data.newcells,Engine.addBattleCell);
@@ -1379,36 +1380,11 @@ Engine.recycleAnim = function(sprite){
     Engine.availableAnimSprites.push(sprite);
 };
 
-/*Engine.drawGrid = function(tl,w,h){
-    for(var x = tl.x; x < tl.x+w; x++){
-        for(var y = tl.y; y < tl.y+h; y++){
-            if(!PFUtils.checkCollision(x,y) && !Engine.isBattlezone(x,y)) {
-                var cell = Engine.getNextCell();
-                cell.setUp(x,y);
-                Engine.battleZones.add(x,y,cell);
-            }
-        }
-    }
-};*/
-
 Engine.updateGrid = function(){
     Engine.displayedCells.forEach(function(id){
         Engine.battleCells[id].manageFrame();
     });
-    /*for(var i = 0; i < Engine.displayedCells.length; i++){
-        var cell = Engine.displayedCells[i].v;
-        cell.manageFrame();
-    }*/
 };
-
-/*Engine.removeGrid = function(tl,w,h) {
-    for(var x = tl.x; x < tl.x+w; x++){
-        for(var y = tl.y; y < tl.y+h; y++){
-            var cell = Engine.isBattlezone(x,y);
-            if(cell) Engine.removeCell(cell);
-        }
-    }
-};*/
 
 
 // ## UI-related functions ##

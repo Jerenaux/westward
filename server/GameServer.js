@@ -107,8 +107,8 @@ GameServer.readMap = function(mapsPath){
         id: 0,
         emit: function(){}
     };
-    var player = GameServer.addNewPlayer(dummySocket,531,661);
-    var animal = new Animal(541,655,0); // 541, 661
+    var player = GameServer.addNewPlayer(dummySocket,531,655);
+    var animal = new Animal(541,660,0); // 541, 655
     animal.idle = false;
     GameServer.animals[animal.id] = animal;
 
@@ -255,6 +255,7 @@ GameServer.handleChat = function(data,socketID){
 GameServer.findPath = function(from,to,grid){
     if(PFUtils.checkCollision(to.x,to.y)) return null;
     grid = grid || GameServer.PFgrid;
+    //console.log('pathfinding from ',from.x,from.y,' to ',to.x,to.y);
     var path = GameServer.PFfinder.findPath(from.x, from.y, to.x, to.y, grid);
     PF.reset();
     return path;
@@ -276,7 +277,10 @@ GameServer.handleBattle = function(player,animal){
     if(animal.dead) return;
     // TODO: check for proximity
     var area = GameServer.computeBattleArea(player,animal);
-    console.log('Integrity : ',GameServer.checkAreaIntegrity(area));
+    if(!GameServer.checkAreaIntegrity(area)){
+        player.addMsg('There is an obstacle in the way!');
+        return;
+    }
     var battle = GameServer.checkBattleOverlap(area);
     if(!battle) battle = new Battle();
     battle.addFighter(player);
@@ -286,8 +290,15 @@ GameServer.handleBattle = function(player,animal){
 };
 
 GameServer.checkAreaIntegrity = function(area){
-    var path = GameServer.findPath(area,{x:area.x+area.w,y:area.y+area.h});
-    console.log(path);
+    var cells = new SpaceMap();
+    for(var x = area.x; x <= area.x+area.w; x++){
+        for(var y = area.y; y <= area.y+area.h; y++){
+            if(!PFUtils.checkCollision(x,y)) cells.add(y,x,0); // y then x
+        }
+    }
+    var grid = new PF.Grid(0,0);
+    PFUtils.setGridUp(grid,cells,true);
+    var path = GameServer.findPath(area,{x:area.x+area.w,y:area.y+area.h},grid);
     return (path && path.length > 0);
 };
 
@@ -353,8 +364,8 @@ GameServer.checkForBattle = function(entity){
         var area = {
             x: entity.x-1,
             y: entity.y-1,
-            w: 3,
-            h: 3
+            w: 2,
+            h: 2
         };
         cell.battle.addFighter(entity);
         cell.battle.addArea(area);

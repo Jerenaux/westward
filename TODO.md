@@ -28,15 +28,15 @@ Goal: 1h of gameplay?
 
 Week:
 -----
+Battle: trim should cancel any end of path action
 Battle: display inventory
-Battle: refuse battles if obstacles in the way (w/ notification)
-Battle: check that upon death, all cells are red
-Battle: add routine so that monsters don't stay on same cell as players
+Battle: frame issue when hovering active cell
+Battle: empty respawn bar after first respawn?
 Battle: wrong HP y? (side-by-side fight)
-Battle: disconnet/deaths in spectated fights
 Battle: stepping into building/fight?
 Battle: when dying, hide battle UI, even if fight ongoing
 Battle: test extensively (multiplayer, battles side-by-side, overlap...)
+Animals: they stop wandering after a while? (or they are ghosts? Haven't been properly deleted?)
 Fort: staff
 Fort: dev lvl progress bar glitch
 Construction: notification of civic xp gain
@@ -72,6 +72,7 @@ Performance:
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 - To check if update packets are empty: iterate over keys and check for emptyness using typeof (if array and length 0 ...)
 Order:
+- Centralize all texts
 - add update() to BattleCells, so that createElements() can use it for all new elements
 - Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
 - Tie input events to game objects, rather than global functions (use topOnly)
@@ -152,6 +153,9 @@ Design document:
 Polish:
 ------
 Visual:
+- Cut corners of big battlezones? (but make sure it doesn't impact integrity)
+- Variety of small "talk" bubbles in reaction to things happening (+ symbol bubbles?)
+- Adapt bubble duration (in bubble.display) depending on number of words
 - Different mouse cursors depending on battle situation
 - Add dirt below buildings
 - Find better font

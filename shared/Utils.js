@@ -169,6 +169,10 @@ Utils.euclidean = function(a,b){
     return Math.sqrt(Math.pow(a.x-b.x,2)+Math.pow(a.y- b.y,2));
 };
 
+Utils.manhattan = function(a,b){
+    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+};
+
 Utils.clamp = function(x,min,max){ // restricts a value to a given interval (return the value unchanged if within the interval
     return Math.max(min, Math.min(x, max));
 };

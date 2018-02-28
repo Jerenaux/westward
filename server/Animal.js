@@ -18,6 +18,7 @@ function Animal(x,y,type){
     this.x = x;
     this.y = y;
     this.inFight = false;
+    this.actionQueue = [];
     this.type = type;
     this.idle = true;
     this.idleTime = 200;
@@ -108,31 +109,72 @@ Animal.prototype.findRandomDestination = function(){
     };
 };
 
+Animal.prototype.queueAction = function(action){
+    this.actionQueue.push(action);
+};
+
 Animal.prototype.decideBattleAction = function(){
     if(!this.inFight) return;
-    var target = this.selectTarget();
+    var action = this.actionQueue.shift();
+    if(!action) action = 'attack';
+    var target = this.selectTarget(); // TODO: keep current target
+    // TODO: if target kept or assigned, check for existence
+    var data;
+    switch(action){
+        case 'attack':
+            data = this.attackTarget(target);
+            break;
+        case 'move':
+            data = this.findFreeCell();
+            if(data.action == 'pass') this.queueAction('move');
+            break;
+    }
+    this.battle.processAction(this,data);
+};
+
+Animal.prototype.findFreeCell = function(){
+    var list = this.battle.getCells(); //{x,y,v} objects
+    var pos = {x:this.x,y:this.y};
+    list.sort(function(a,b){
+        if(Utils.manhattan(a,pos) < Utils.manhattan(b,pos)) return -1;
+        return 1;
+    });
+    console.log(pos,list);
+    list.forEach(function(cell){
+        if(this.battle.isPositionFree(cell.x,cell.y)) return this.findBattlePath(cell);
+    },this);
+    return {
+        action: 'pass'
+    };
+};
+
+Animal.prototype.findBattlePath = function(dest){
+    var data = {};
+    var path = GameServer.findPath({x: this.x, y: this.y}, dest,this.battle.PFgrid);
+    if(path.length > 0){
+        this.setPath(path);
+        data.action = 'move';
+    }else{
+        console.log('Combat path of length 0');
+        data.action = 'pass';
+    }
+    return data;
+};
+
+Animal.prototype.attackTarget = function(target){
     var data = {};
     if(this.battle.nextTo(this,target)){
-        //console.log('melee : ',this.id,' at ',this.x,this.y);
         data.action = 'attack';
         data.id = target.getShortID();
     }else{
         var dest = this.computeBattleDestination(target);
-        //console.log('destination found : ',dest.x,dest.y);
         if(dest) {
-            var path = GameServer.findPath({x: this.x, y: this.y}, dest,this.battle.PFgrid);
-            if(path.length > 0){
-                this.setPath(path);
-                data.action = 'move';
-            }else{
-                console.log('Combat path of length 0');
-                data.action = 'pass';
-            }
+            data = this.findBattlePath(dest);
         }else{
             data.action = 'pass';
         }
     }
-    this.battle.processAction(this,data);
+    return data;
 };
 
 Animal.prototype.selectTarget = function(){
