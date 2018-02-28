@@ -87,7 +87,7 @@ Animal.prototype.updateIdle = function(){
             this.idleTime = 200;
             return;
         }
-        path = PFUtils.trimPath(path,GameServer.battleCells);
+        path = PFUtils.trimPath(path,GameServer.battleCells).path;
         if(debug) console.log('['+this.constructor.name+' '+this.id+'] Found path of length '+path.length);
         this.idle = false;
         this.setPath(path);
@@ -133,16 +133,16 @@ Animal.prototype.decideBattleAction = function(){
 };
 
 Animal.prototype.findFreeCell = function(){
-    var list = this.battle.getCells(); //{x,y,v} objects
     var pos = {x:this.x,y:this.y};
+    var list = this.battle.getCells(); //{x,y,v} objects
     list.sort(function(a,b){
         if(Utils.manhattan(a,pos) < Utils.manhattan(b,pos)) return -1;
         return 1;
     });
-    console.log(pos,list);
-    list.forEach(function(cell){
+    for(var i = 0; i < list.length; i++){
+        var cell = list[i];
         if(this.battle.isPositionFree(cell.x,cell.y)) return this.findBattlePath(cell);
-    },this);
+    }
     return {
         action: 'pass'
     };

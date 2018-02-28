@@ -493,14 +493,14 @@ Engine.makeBattleMenu = function(){
     var respawny = (Engine.getGameConfig().height-respawnh)/2;
     battle.addPanel('respawn',new RespawnPanel(timerx,respawny,timerw,respawnh),true);
 
-    battle.onUpdateEquipment = equipment.updateEquipment.bind(equipment);
-    battle.onUpdateInventory = items.updateInventory.bind(items);
-    /*battle.onUpdateStats = function(){
-        bar.setLevel(Engine.getPlayerHealth());
-    };*/
+    battle.addEvent('onUpdateInventory',items.updateInventory.bind(items));
+    battle.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
+
     battle.addEvent('onUpdateStats',function(){
         bar.setLevel(Engine.getPlayerHealth());
     });
+
+    battle.addEvent('onStart',items.updateInventory.bind(items));
     return battle;
 };
 
@@ -519,12 +519,6 @@ Engine.makeProductionMenu = function(){
     var productivity = new ProductivityPanel(prodx,prody,prodw,prodh,'Productivity modifiers');
     production.addPanel('productivity',productivity);
 
-    /*production.onUpdateProductivity = function(){
-        prod.update();
-    };
-    production.onUpdateCommit = function(){
-        production.panels['production'].update();
-    };*/
     production.addEvent('onUpdateProductivity',productivity.update.bind(productivity));
     production.addEvent('onUpdateCommit',productionPanel.update.bind(productionPanel));
     return production;
@@ -550,15 +544,6 @@ Engine.makeConstructionMenu = function(){
     var prod = new ProductivityPanel(prodx,prody,prodw,100,'Productivity modifiers');
     constr.addPanel('prod',prod);
 
-    /*constr.onUpdateShop = function(){
-        materials.update();
-    };
-    constr.onUpdateConstruction = function(){
-        progress.update();
-    };
-    constr.onUpdateProductivity = function(){
-        prod.update();
-    };*/
     constr.addEvent('onUpdateShop',materials.update.bind(materials));
     constr.addEvent('onUpdateConstruction',progress.update.bind(progress));
     constr.addEvent('onUpdateProductivity',prod.update.bind(prod));
@@ -895,7 +880,9 @@ Engine.computePath = function(position){
         Engine.handleMsg('It\'s too far!');
         return;
     }
-    path = PFUtils.trimPath(path,Engine.battleCellsMap);
+    var trim = PFUtils.trimPath(path,Engine.battleCellsMap);
+    if(trim.trimmed) Engine.player.setDestinationAction(0);
+    path = trim.path;
     Engine.player.move(path);
 };
 

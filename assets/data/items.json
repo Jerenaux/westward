@@ -65,14 +65,14 @@
     "name": "Tunic",
     "equipment": "armor",
     "recipe":{"9":2},
-    "effects":{"def":2}
+    "effects":{"def":15}
   },
   "11":{
     "atlas": "items2",
     "frame":"pirate-sword",
     "name": "Sword",
     "equipment": "meleew",
-    "effects":{"mdmg":12},
+    "effects":{"mdmg":15},
     "useInBattle": true
   },
   "12":{
@@ -89,7 +89,7 @@
     "frame":"shield1",
     "name": "Wooden shield",
     "equipment": "shield",
-    "effects":{"def":1}
+    "effects":{"def":10}
   },
   "14":{
     "atlas": "items2",
@@ -136,7 +136,7 @@
     "frame":"arrow",
     "name": "Arrow",
     "equipment": "arrows",
-    "effects":{"rdmg":2},
+    "effects":{"rdmg":12},
     "ammo": "quiver",
     "useInBattle": true
   }

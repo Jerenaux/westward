@@ -95,8 +95,7 @@ GameServer.readMap = function(mapsPath){
         var y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
         if(PFUtils.checkCollision(x,y)) continue;
         //var animal = new Animal(data.x,data.y,data.type);
-        var animal = new Animal(x,y,0);
-        GameServer.animals[animal.id] = animal;
+        GameServer.addAnimal(x,y,0);
     }
 
     GameServer.updateStatus();
@@ -107,14 +106,22 @@ GameServer.readMap = function(mapsPath){
         id: 0,
         emit: function(){}
     };
-    var player = GameServer.addNewPlayer(dummySocket,531,655);
-    var animal = new Animal(541,660,0); // 541, 655
+    var player = GameServer.addNewPlayer(dummySocket,531,660);
+
+    var animal = GameServer.addAnimal(536,660,0);
     animal.idle = false;
-    GameServer.animals[animal.id] = animal;
+    animal = GameServer.addAnimal(536,660,0);
+    animal.idle = false;
 
     setTimeout(function(){
-        //GameServer.handleBattle(player,animal);
+        GameServer.handleBattle(player,animal);
     },1000);
+};
+
+GameServer.addAnimal = function(x,y,type){
+    var animal = new Animal(x,y,type);
+    GameServer.animals[animal.id] = animal;
+    return animal;
 };
 
 GameServer.setUpdateLoops = function(){
@@ -272,12 +279,13 @@ GameServer.handleAnimalClick = function(animalID,socketID){
 };
 
 GameServer.handleBattle = function(player,animal){
-    if(player.inFight) return;
-    if(animal.moving) return;
-    if(animal.dead) return;
+    if(player.isInFight()) return;
+    if(animal.isMoving()) return;
+    if(animal.isDead()) return;
     // TODO: check for proximity
     var area = GameServer.computeBattleArea(player,animal);
     if(!GameServer.checkAreaIntegrity(area)){
+        console.log('#!');
         player.addMsg('There is an obstacle in the way!');
         return;
     }

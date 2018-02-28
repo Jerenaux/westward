@@ -28,29 +28,23 @@ Goal: 1h of gameplay?
 
 Week:
 -----
-Battle: trim should cancel any end of path action
-Battle: display inventory
-Battle: frame issue when hovering active cell
-Battle: empty respawn bar after first respawn?
-Battle: wrong HP y? (side-by-side fight)
-Battle: stepping into building/fight?
-Battle: when dying, hide battle UI, even if fight ongoing
+Battle: tune values
+Battle: still HP position problem
 Battle: test extensively (multiplayer, battles side-by-side, overlap...)
 Animals: they stop wandering after a while? (or they are ghosts? Haven't been properly deleted?)
 Fort: staff
 Fort: dev lvl progress bar glitch
 Construction: notification of civic xp gain
-Economic loop: impact of materials availability on building 
 Economic loop: test all updates of all menus 
 Econmic loop: skin dead animals
 UI: display event pop-ups after skinning
 Character: display committed buildings (update when commit/uncommit)
 Character: add new stats
-Character: stats modifier should not affect health
 Character: display stat modifier details
 Character: foodSurplus in self update, used for ProductivityPanel & CharacterPanel updates
 
-Finish: review base stats values; test economy for a while; decide duration of all cycles (eco, spawn...)
+Finish: review base stats values; test economy for a while;
+decide duration of all cycles (eco, spawn...); inspect all panes and set interesting values to everything
 
 Cleaning:
 --------
@@ -94,18 +88,17 @@ Content:
 -------
 * Battle system
 - Animals have sorted list of targets, iteratr through it when first one not reachable for some reason
-- Respawn
-- Respawn if disconnect
-- Add battle areas when new fighters
--> Deal with overlapping battlefields
 -> Deal with big battlefields; focus camera on active player (problem: if far away, surrounding AOIs not displayed), ...
 - Animal can trigger fights
+* Character
+- Dissociate hp and hpmax, and make relative modifiers only impact the max
 * Ecosystem
 - Listing and distribution of pick-up resources
 - Listing and distribution (and yield) of building resources
 - Listing and distribution of animals
 - Work out location and mechanics of enemy civ.  
 * Inventory
+- Have only one ammo type equiped at all time (depending on weapon), for rdmg stat
 - Pick up items
 * Movement
 - Improve timeline and orientation using the onStart callbacks of individual tweens
@@ -120,10 +113,6 @@ Content:
 - Make troops engage enemies
 * Settlement economy
 - Yellow pins for unbuilt buildings
-- Mnenu for unbuilt buildings
-- Commitment mechanic for building
-- Resource loop from resource buildings
-- Impact of commitment on resource gathering
 - Move stock around buildings
 - Let chancellor set prices in trade post
 - Automatic shop systemn in port for chancellor
@@ -132,10 +121,7 @@ Content:
 - Let governor name chancellors
 - Salaries for officials
 - Work out settlement levels
-- Impact on player stats
 * Settlement management
-- Display settlement stats (level, resources...)
-- More info on building hover
 - Restrict prerogatives based on official position
 - Enable governor to name chancellors and commanders
 - Election of governors

@@ -122,6 +122,10 @@ MovingEntity.prototype.endFight = function(){
     this.battle = null;
 };
 
+MovingEntity.prototype.getStats = function(){
+    return Object.keys(this.stats);
+};
+
 MovingEntity.prototype.getStat = function(key){
     return this.stats[key];
 };

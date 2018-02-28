@@ -15,9 +15,10 @@ var Stats = {
             name: 'Health',
             min: 0,
             max: 100,
-            start: 50,
+            start: 100,
             frame: 1,
-            showMax: true
+            showMax: true,
+            noModifier: true
         },
         fat: {
             name: 'Fatigue',
@@ -39,14 +40,14 @@ var Stats = {
             name: 'Defense',
             min: 0,
             max: 100,
-            start: 10,
+            start: 5,
             frame:4
         },
         mdmg: {
             name: 'Melee Damage',
             min: 0,
             max: 100,
-            start: 1,
+            start: 10,
             frame: 3
         },
         rdmg: {

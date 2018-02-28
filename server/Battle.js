@@ -53,7 +53,7 @@ Battle.prototype.getFighterIndex = function(f){
 Battle.prototype.managePosition = function(f){
     var busy = this.positions.get(f.x,f.y);
     if(busy){
-        console.log('busy cell for ',f.getShortID());
+        console.log('busy cell for ',f.getShortID(),' with ',busy.getShortID(),' at ',f.x,f.y);
         if(!f.isPlayer){
             f.queueAction('move');
         }else if(!busy.isPlayer){
@@ -186,12 +186,38 @@ Battle.prototype.nextTo = function(a,b){
     return (dx <= 1 && dy <= 1);
 };
 
-Battle.prototype.computeMeleeDamage = function(a,b){
-    return Math.max(a.getStat('mdmg').getValue() - b.getStat('def').getValue(),0);
+Battle.prototype.computeDamage = function(type,a,b){
+    var def = b.getStat('def').getValue();
+    var dmg;
+    switch(type){
+        case 'melee':
+            var atk = a.getStat('mdmg').getValue();
+            dmg = this.computeMeleeDamage(atk,def);
+            break;
+        case 'ranged':
+            var atk = a.getStat('rdmg').getValue();
+            dmg = this.computeRangedDamage(atk,def);
+            break;
+    }
+    return Utils.clamp(Math.ceil(dmg),1,10000);
 };
 
-Battle.prototype.computeRangedDamage = function(a,b){
-    return Math.max(a.getStat('rdmg').getValue() - b.getStat('def').getValue(),0);
+Battle.prototype.computeMeleeDamage = function(dmg,def){
+    //return Math.max(a.getStat('mdmg').getValue() - b.getStat('def').getValue(),0);
+    var dmgRnd = dmg/5;
+    var defRnd = def/5;
+    dmg += Utils.randomInt(dmg-dmgRnd,dmg+dmgRnd);
+    def += Utils.randomInt(def-defRnd,def+defRnd);
+    return (10*Math.pow(dmg,0.5)) - (5*Math.pow(def,0.5));
+};
+
+Battle.prototype.computeRangedDamage = function(dmg,def){
+    //return Math.max(a.getStat('rdmg').getValue() - b.getStat('def').getValue(),0);
+    var dmgRnd = dmg/5;
+    var defRnd = def/5;
+    dmg += Utils.randomInt(dmg-dmgRnd,dmg+dmgRnd);
+    def += Utils.randomInt(def-defRnd,def+defRnd);
+    return (10*Math.pow(dmg,0.5)) - (3*Math.pow(def,0.5));
 };
 
 Battle.prototype.computeRangedHit = function(a,b){
@@ -218,7 +244,8 @@ Battle.prototype.processAttack = function(a,b){
     if(b.dead) return;
     if(this.nextTo(a,b)){
         //console.log('melee attack');
-        var dmg = this.computeMeleeDamage(a,b);
+        //var dmg = this.computeMeleeDamage(a,b);
+        var dmg = this.computeDamage('melee',a,b);
         this.applyDamage(b,dmg);
         b.setProperty('meleeHit',dmg);
         return {
@@ -231,7 +258,8 @@ Battle.prototype.processAttack = function(a,b){
         a.decreaseAmmo();
         var hit = this.computeRangedHit(a,b);
         if(hit){
-            dmg = this.computeRangedDamage(a,b);
+            //dmg = this.computeRangedDamage(a,b);
+            dmg = this.computeDamage('ranged',a,b);
             this.applyDamage(b,dmg);
             b.setProperty('meleeHit',dmg);
         }else { // miss

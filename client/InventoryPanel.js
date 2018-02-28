@@ -39,7 +39,6 @@ InventoryPanel.prototype.setInventory = function(inventory,maxwidth,showNumbers,
         showNumbers: showNumbers,
         compareTo: compare
     };
-    //if(filter) this.setFilter(filter);
     if(!this.slotsAdded) this.addSlots();
 };
 

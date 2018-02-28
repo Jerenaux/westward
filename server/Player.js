@@ -110,13 +110,22 @@ Player.prototype.respawn = function(){
 };
 
 Player.prototype.applyFoodModifier = function(foodModifier){
-    for(var stat in this.stats){
-        if(!this.stats.hasOwnProperty(stat)) return;
+    this.getStats().forEach(function(stat){
+        //console.log(stat,':',Stats.dict[stat],Stats.dict[stat].showMax);
+        if(Stats.dict[stat].noModifier) return;
         var statObj = this.getStat(stat);
         if(this.foodModifier !== null) statObj.removeRelativeModifier(this.foodModifier);
         statObj.addRelativeModifier(foodModifier);
         this.refreshStat(stat);
-    }
+    },this);
+    /*for(var stat in this.stats){
+        if(!this.stats.hasOwnProperty(stat)) continue;
+        if(Stats.dict[stat].noModifier) continue;
+        var statObj = this.getStat(stat);
+        if(this.foodModifier !== null) statObj.removeRelativeModifier(this.foodModifier);
+        statObj.addRelativeModifier(foodModifier);
+        this.refreshStat(stat);
+    }*/
     this.foodModifier = foodModifier;
 };
 

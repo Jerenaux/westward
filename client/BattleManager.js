@@ -136,7 +136,6 @@ BattleManager.onDeath = function(){
     var respawnPanel = Engine.menus["battle"].panels['respawn'];
     setTimeout(function(){
         respawnPanel.display();
-        respawnPanel.trigger();
     },1000);
 };
 
