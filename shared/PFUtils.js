@@ -186,15 +186,13 @@ PFUtils.isInPolygon = function (polygon, x, y)  // polygon is array of points
 };
 
 PFUtils.collisionsFromShape = function(shape,tileX,tileY,width,height,map,checkOnly){ // shape is array of points
-    //var collidingCells = [];
     for(var x = 0; x < width; x += 32){
-        var px = x;// + 16;
+        var px = x;
         for(var y = 0; y < height; y += 32) {
-            var py = y;// + 16;
+            var py = y;
             if(PFUtils.isInPolygon(shape,px,py)){
                 var wx = tileX + x/32;
                 var wy = tileY + y/32;
-                //collidingCells.push({x:wx,y:wy});
                 if(checkOnly){
                     if(map.get(wy,wx)) return false;
                 }else {
@@ -204,7 +202,6 @@ PFUtils.collisionsFromShape = function(shape,tileX,tileY,width,height,map,checkO
         }
     }
     return true;
-    //return collidingCells;
 };
 
 if (onServer) module.exports.PFUtils = PFUtils;

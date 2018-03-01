@@ -13,6 +13,7 @@ function Building(data){
     this.id = GameServer.lastBuildingID++;
     this.x = data.x;
     this.y = data.y;
+    this.isBuilding = true;
     this.type = data.type;
     this.sid = data.settlement;
     this.settlement = GameServer.settlements[this.sid];

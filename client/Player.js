@@ -109,7 +109,11 @@ var Player = new Phaser.Class({
         return this.equipment.containers[slot];
     },
 
+    getStat: function(stat){
+        return this.stats[stat];
+    },
+
     getStatValue: function(stat){
-        return this.stats[stat].getValue();
+        return this.getStat(stat).getValue();
     }
 });

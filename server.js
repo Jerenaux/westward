@@ -40,7 +40,6 @@ server.listen(process.env.PORT || 8081,function(){
         server.db = db;
         console.log('Connection to db established');
         gs.readMap(myArgs.maps);
-        gs.setUpdateLoops();
     });
 });
 
@@ -58,11 +57,10 @@ io.on('connection',function(socket){
         }
         console.log('['+socket.id+'] Initialized');
         if(!data.stamp || data.stamp < server.resetStamp) data.new = true; // TODO Remove eventually
+        data.new = true; // todo: remove
         if(data.new){
-            //if(!gs.checkSocketID(socket.id)) return;
             gs.addNewPlayer(socket);
         }else{
-            //if(!gs.checkPlayerID(data.id)) return;
             gs.loadPlayer(socket,data.id);
         }
 

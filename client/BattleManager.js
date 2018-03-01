@@ -57,7 +57,7 @@ BattleManager.manageTurn = function(shortID){
     if(!timerPanel.displayed) timerPanel.display();
 
     if(this.active) {
-        BattleManager.deactivateCell();
+        //BattleManager.deactivateCell();
         this.active.isActiveFighter = false;
     }
 
@@ -71,7 +71,8 @@ BattleManager.manageTurn = function(shortID){
     BattleManager.isPlayerTurn = this.active.isHero;
     BattleManager.actionTaken = false;
     this.active.isActiveFighter = true;
-    BattleManager.activateCell();
+    //BattleManager.activateCell();
+    Engine.updateGrid();
 
     timerPanel.updateText(this.active.name,this.active.isHero);
     timer.reset();
@@ -114,6 +115,11 @@ BattleManager.processInventoryClick = function(){
     if(!BattleManager.canTakeAction()) return;
     Engine.inventoryClick.call(this); // "this" has been bound to the clicked item
     BattleManager.actionTaken = true;
+};
+
+BattleManager.isActiveCell = function(cell){
+    if(!this.active) return false;
+    return (cell.tx == this.active.tileX && cell.ty == this.active.tileY);
 };
 
 BattleManager.getActiveCell = function(){

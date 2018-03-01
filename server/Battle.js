@@ -203,7 +203,6 @@ Battle.prototype.computeDamage = function(type,a,b){
 };
 
 Battle.prototype.computeMeleeDamage = function(dmg,def){
-    //return Math.max(a.getStat('mdmg').getValue() - b.getStat('def').getValue(),0);
     var dmgRnd = dmg/5;
     var defRnd = def/5;
     dmg += Utils.randomInt(dmg-dmgRnd,dmg+dmgRnd);
@@ -212,7 +211,6 @@ Battle.prototype.computeMeleeDamage = function(dmg,def){
 };
 
 Battle.prototype.computeRangedDamage = function(dmg,def){
-    //return Math.max(a.getStat('rdmg').getValue() - b.getStat('def').getValue(),0);
     var dmgRnd = dmg/5;
     var defRnd = def/5;
     dmg += Utils.randomInt(dmg-dmgRnd,dmg+dmgRnd);
@@ -243,8 +241,6 @@ Battle.prototype.processAttack = function(a,b){
     var delay = 500;
     if(b.dead) return;
     if(this.nextTo(a,b)){
-        //console.log('melee attack');
-        //var dmg = this.computeMeleeDamage(a,b);
         var dmg = this.computeDamage('melee',a,b);
         this.applyDamage(b,dmg);
         b.setProperty('meleeHit',dmg);

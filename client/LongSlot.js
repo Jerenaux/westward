@@ -41,7 +41,7 @@ LongSlot.prototype.updateCallback = function(event,callback){
 };
 
 LongSlot.prototype.createZone = function(){
-    var zone = Engine.scene.add.zone(0,0,this.totalwidth,38); // this.x,this.y,this.totalwidth,40
+    var zone = Engine.scene.add.zone(0,0,this.totalwidth,38);
     zone.setDepth(Engine.UIDepth+10);
     zone.setScrollFactor(0);
     zone.setInteractive();

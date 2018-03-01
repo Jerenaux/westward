@@ -2,11 +2,14 @@
  * Created by Jerome on 24-02-17.
  */
 
-var GameServer = require('./GameServer.js').GameServer;
 var UpdatePacket = require('./UpdatePacket.js').UpdatePacket;
+var Utils = require('../shared/Utils.js').Utils;
 
 function AOI(id){
     this.id = id;
+    var origin = Utils.AOItoTile(this.id);
+    this.x = origin.x;
+    this.y = origin.y;
     this.entities = []; // list of entities situated within the area corresponding to this AOI; useful for synchronizing with new AOIs and as a form of quad-tree
     this.updatePacket = new UpdatePacket();
 }
@@ -20,16 +23,26 @@ AOI.prototype.clear = function(){
 };
 
 AOI.prototype.addEntity = function(entity){
-    //console.log('[AOI '+this.id+'] Added '+entity.constructor.name+' '+entity.id);
     this.entities.push(entity);
-    //if(entity.constructor.name == 'Player') GameServer.server.addToRoom(entity.socketID,'AOI'+this.id);
 };
 
 AOI.prototype.deleteEntity = function(entity) {
-    //console.log('[AOI '+this.id+'] Removed '+entity.constructor.name+' '+entity.id);
     var idx = this.entities.indexOf(entity);
     if (idx >= 0) this.entities.splice( idx, 1 );
-    //if(entity.constructor.name == 'Player') GameServer.server.leaveRoom(entity.socketID,'AOI'+this.id);
+};
+
+AOI.prototype.hasPlayer = function(){
+    for(var i = 0; i < this.entities.length; i++){
+        if(this.entities[i].isPlayer) return true;
+    }
+    return false;
+};
+
+AOI.prototype.hasBuilding = function(){
+    for(var i = 0; i < this.entities.length; i++){
+        if(this.entities[i].isBuilding) return true;
+    }
+    return false;
 };
 
 module.exports.AOI = AOI;

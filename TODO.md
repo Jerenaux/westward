@@ -28,22 +28,25 @@ Goal: 1h of gameplay?
 
 Week:
 -----
-Battle: tune values
-Battle: still HP position problem
-Battle: test extensively (multiplayer, battles side-by-side, overlap...)
+Battle: path not found
+Battle: update hover card of life bar
+Battle: test extensively (solo, multiplayer, battles side-by-side, overlap...)
+Debug: remove default new player
 Animals: they stop wandering after a while? (or they are ghosts? Haven't been properly deleted?)
 Fort: staff
 Fort: dev lvl progress bar glitch
 Construction: notification of civic xp gain
 Economic loop: test all updates of all menus 
 Econmic loop: skin dead animals
+UI: test tooltip of items (after having added hpmax)
 UI: display event pop-ups after skinning
+UI: dont tween progress bars when opening menu
 Character: display committed buildings (update when commit/uncommit)
 Character: add new stats
 Character: display stat modifier details
 Character: foodSurplus in self update, used for ProductivityPanel & CharacterPanel updates
 
-Finish: review base stats values; test economy for a while;
+Finish:  test economy for a while;
 decide duration of all cycles (eco, spawn...); inspect all panes and set interesting values to everything
 
 Cleaning:
@@ -90,8 +93,6 @@ Content:
 - Animals have sorted list of targets, iteratr through it when first one not reachable for some reason
 -> Deal with big battlefields; focus camera on active player (problem: if far away, surrounding AOIs not displayed), ...
 - Animal can trigger fights
-* Character
-- Dissociate hp and hpmax, and make relative modifiers only impact the max
 * Ecosystem
 - Listing and distribution of pick-up resources
 - Listing and distribution (and yield) of building resources

@@ -137,6 +137,8 @@ var Moving = new Phaser.Class({
         this.x = x*Engine.tileWidth;
         this.y = y*Engine.tileHeight;
         this.updatePosition();
+        this.previousTile.x = this.tileX;
+        this.previousTile.y = this.tileY;
     },
 
     stop: function(){

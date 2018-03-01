@@ -382,29 +382,12 @@ Engine.makeBattleUI = function(){
     );
 };
 
-Engine.getNextHP = function(targetY){
+Engine.getNextHP = function(){
     if(Engine.availableHP.length > 0) return Engine.availableHP.shift();
 
     var text = Engine.scene.add.text(0,0, '0',  { font: '20px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     text.setVisible(false);
     text.setOrigin(0.5,1);
-    text.tween = Engine.scene.tweens.add(
-        {
-            targets: text,
-            y: targetY,
-            duration: 1000,
-            paused: true,
-            onStart: function(){
-                text.setVisible(true);
-            },
-            onComplete: function(){
-                text.setVisible(false);
-                setTimeout(function(){
-                    Engine.recycleHP(text);
-                },20);
-            }
-        }
-    );
     return text;
 };
 
@@ -419,12 +402,27 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
     sprite.setDepth(target.depth+1);
     sprite.anims.play(animation);
 
-    var targetY = target.y+16;
-    var text = Engine.getNextHP(targetY-40);
-    text.setPosition(target.x+16,targetY);
+    var text = Engine.getNextHP();
+    text.setPosition(target.x+16,target.y+16);
     text.setDepth(target.depth+1);
     text.setText('-'+dmg);
-    text.tween.play();
+
+    Engine.scene.tweens.add(
+        {
+            targets: text,
+            y: target.y-40,
+            duration: 1000,
+            onStart: function(){
+                text.setVisible(true);
+            },
+            onComplete: function(){
+                text.setVisible(false);
+                setTimeout(function(){
+                    Engine.recycleHP(text);
+                },20);
+            }
+        }
+    );
 
     Engine.scene.tweens.add(
         {
@@ -463,7 +461,13 @@ Engine.hideUI = function(){
 };
 
 Engine.getPlayerHealth = function(){
-    return Engine.player.stats['hp'].getValue();
+    return Engine.player.getStatValue('hp');
+    //return Engine.player.stats['hp'].getValue();
+};
+
+Engine.getPlayerMaxHealth = function(){
+    return Engine.player.getStatValue('hpmax');
+    //return Engine.player.stats['maxhp'].getValue();
 };
 
 Engine.makeBattleMenu = function(){
@@ -478,9 +482,9 @@ Engine.makeBattleMenu = function(){
         property: 'useInBattle'
     });
     battle.addPanel('items',items);
-    var bar = new BigProgressBar(alignx,445,170);
+    var bar = new BigProgressBar(alignx,445,170,'red',true);
     bar.name = 'battle health bar';
-    bar.setLevel(Engine.getPlayerHealth(),Stats.dict['hp'].max);
+    //bar.setLevel(Engine.getPlayerHealth(),Stats.dict['hp'].max);
     battle.addPanel('bar',bar);
 
     var timerw = 300;
@@ -497,7 +501,7 @@ Engine.makeBattleMenu = function(){
     battle.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
 
     battle.addEvent('onUpdateStats',function(){
-        bar.setLevel(Engine.getPlayerHealth());
+        bar.setLevel(Engine.getPlayerHealth(),Engine.getPlayerMaxHealth());
     });
 
     battle.addEvent('onStart',items.updateInventory.bind(items));

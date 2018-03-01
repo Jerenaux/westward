@@ -33,8 +33,14 @@ var BattleTile = new Phaser.Class({
     },
 
     manageFrame: function(){
-        if(this.active) return;
         if(BattleManager.inBattle) {
+            if(BattleManager.isActiveCell(this)){
+                this.activate();
+                return;
+            }else{
+                this.deactivate();
+            }
+
             this.dist = Utils.euclidean({
                 x: this.tx,
                 y: this.ty
@@ -60,7 +66,7 @@ var BattleTile = new Phaser.Class({
     deactivate: function(){
         if(!this.active) return;
         this.active = false;
-        if(this.tween) this.tween.stop();
+        //if(this.tween) this.tween.stop();
         this.manageFrame();
         this.setAlpha(0.5);
     },

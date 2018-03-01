@@ -9,15 +9,23 @@ if(onServer){
 }
 
 var Stats = {
-    list: ['hp','fat','acc','def','mdmg','rdmg'],
+    list: ['hp','hpmax','fat','acc','def','mdmg','rdmg'],
     dict: {
+        hpmax: {
+            name: 'Health',
+            min: 0,
+            max: 10000,
+            start: 100,
+            frame: 1,
+            isMax: 'hp'
+        },
         hp: {
             name: 'Health',
             min: 0,
-            max: 100,
+            max: 10000,
             start: 100,
             frame: 1,
-            showMax: true,
+            hasMax: 'hpmax',
             noModifier: true
         },
         fat: {
@@ -39,21 +47,21 @@ var Stats = {
         def: {
             name: 'Defense',
             min: 0,
-            max: 100,
-            start: 5,
+            max: 1000,
+            start: 7,
             frame:4
         },
         mdmg: {
             name: 'Melee Damage',
             min: 0,
-            max: 100,
-            start: 10,
+            max: 1000,
+            start: 12,
             frame: 3
         },
         rdmg: {
             name: 'Ranged Damage',
             min: 0,
-            max: 100,
+            max: 1000,
             start: 10,
             frame: 5
         }
@@ -65,22 +73,34 @@ Stats.getSkeleton = function(){
     for(var statKey in Stats.dict){
         if(!Stats.dict.hasOwnProperty(statKey)) return;
         var statData = Stats.dict[statKey];
-        skeleton[statKey] = new Stat(statKey,statData.start);
+        var max = (statData.hasMax ? skeleton[statData.hasMax] : null);
+        skeleton[statKey] = new Stat(statKey,statData.start,max);
     }
     return skeleton;
 };
 
 if (onServer) module.exports.Stats = Stats;
 
-function Stat(key,value){
+function Stat(key,value,max){
     this.key = key;
-    this.baseValue = value;
+    this.maxStat = max;
     this.absoluteModifiers = [];
     this.relativeModifiers = [];
+    this.setBaseValue(value);
 }
 
 Stat.prototype.getBaseValue = function(){
     return this.baseValue;
+};
+
+Stat.prototype.getCap = function(){
+    var statData = Stats.dict[this.key];
+    return (this.maxStat ? Math.min(this.maxStat.getValue(),statData.max) : statData.max);
+};
+
+Stat.prototype.clamp = function(v){
+    var statData = Stats.dict[this.key];
+    return Utils.clamp(v,statData.min,this.getCap());
 };
 
 Stat.prototype.getValue = function(){
@@ -92,16 +112,17 @@ Stat.prototype.getValue = function(){
     this.relativeModifiers.forEach(function(m){
         base *= (1+m);
     });
-    return Utils.clamp(Math.round(base),statData.min,statData.max);
+    //return Utils.clamp(Math.round(base),statData.min,this.getCap());
+    return this.clamp(Math.round(base));
 };
 
 Stat.prototype.setBaseValue = function(value){
-    var statData = Stats.dict[this.key];
-    this.baseValue = Utils.clamp(value,statData.min,statData.max);
+    this.baseValue = this.clamp(value);
 };
 
 Stat.prototype.increment = function(inc){
-    this.setBaseValue(this.baseValue+inc);
+    var base = this.clamp(this.getBaseValue());
+    this.setBaseValue(base+inc);
 };
 
 Stat.prototype.addAbsoluteModifier = function(modifier){

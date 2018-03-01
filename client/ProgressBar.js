@@ -2,14 +2,32 @@
  * Created by jeren on 25-01-18.
  */
 
-function ProgressBar(){
+function ProgressBar(x,y,w){
     this.displayed = false;
     this.max = 100;
     this.level = 0;
     this.body = [];
+    this.x = x;
+    this.y = y;
+    this.w = w;
     this.hasHead = false;
     this.hasTail = false;
 }
+
+ProgressBar.prototype.setUpZone = function(zone){
+    zone.setDepth(Engine.UIDepth+10);
+    zone.setScrollFactor(0);
+    zone.setInteractive();
+    var _bar = this;
+    zone.handleOver = function(){
+        Engine.tooltip.updateInfo(_bar.level+'/'+_bar.max);
+        Engine.tooltip.display();
+    };
+    zone.handleOut = function(){
+        Engine.tooltip.hide();
+    };
+    return zone;
+};
 
 ProgressBar.prototype.finalize = function(){
     this.body.forEach(function(e){
@@ -145,10 +163,9 @@ function MiniProgressBar(x,y,w,color){
 MiniProgressBar.prototype = Object.create(ProgressBar.prototype);
 MiniProgressBar.prototype.constructor = MiniProgressBar;
 
-
 // #######################
 
-function BigProgressBar(x,y,w,color){
+function BigProgressBar(x,y,w,color,hasZone){
     ProgressBar.call(this,x,y,w,color);
     w -= 32;
     this.maxLength = w+9;
@@ -173,7 +190,13 @@ function BigProgressBar(x,y,w,color){
     this.finalize();
 
     this.hasHead = true;
+    if(hasZone) this.zone = this.createZone();
 }
 
 BigProgressBar.prototype = Object.create(ProgressBar.prototype);
 BigProgressBar.prototype.constructor = BigProgressBar;
+
+BigProgressBar.prototype.createZone = function(){
+    var zone = Engine.scene.add.zone(this.x,this.y,this.maxLength,20);
+    this.setUpZone(zone);
+};

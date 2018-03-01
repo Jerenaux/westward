@@ -35,12 +35,16 @@ var Building = require('./Building.js').Building;
 var Animal = require('./Animal.js').Animal;
 var Battle = require('./Battle.js').Battle;
 var BattleCell = require('./Battle.js').BattleCell;
+var SpawnZone = require('./SpawnZone.js').SpawnZone;
 var PF = require('../shared/pathfinding.js');
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 GameServer.updateStatus = function(){
     GameServer.initializationTicks++;
-    if(GameServer.initializationTicks == GameServer.requiredTicks) GameServer.initialized = true;
+    if(GameServer.initializationTicks == GameServer.requiredTicks) {
+        GameServer.initialized = true;
+        GameServer.setUpdateLoops();
+    }
 };
 
 GameServer.readMap = function(mapsPath){
@@ -76,7 +80,7 @@ GameServer.readMap = function(mapsPath){
 
     // Read buildings
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
-  GameServer.server.db.collection('buildings').find({}).toArray(function(err,buildings){
+    GameServer.server.db.collection('buildings').find({}).toArray(function(err,buildings){
         if(err) throw err;
         for(var i = 0; i < buildings.length; i++){
             var data = buildings[i];
@@ -88,7 +92,7 @@ GameServer.readMap = function(mapsPath){
     });
 
     // Spawn animals
-    var animals = JSON.parse(fs.readFileSync('./assets/maps/animals.json').toString());
+    /*var animals = JSON.parse(fs.readFileSync('./assets/maps/animals.json').toString());
     for(var i = 0; i < 10; i++){ // animals.list.length
         //var data = animals.list[i];
         var x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
@@ -96,16 +100,21 @@ GameServer.readMap = function(mapsPath){
         if(PFUtils.checkCollision(x,y)) continue;
         //var animal = new Animal(data.x,data.y,data.type);
         GameServer.addAnimal(x,y,0);
-    }
+    }*/
+
+    GameServer.spawnZones = [];
+    GameServer.spawnZones.push(new SpawnZone(1566,3,3));
+    GameServer.updateSpawnZones();
 
     GameServer.updateStatus();
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
 
     // For debugging purposes:
-    var dummySocket = {
+   /* var dummySocket = {
         id: 0,
         emit: function(){}
     };
+
     var player = GameServer.addNewPlayer(dummySocket,531,660);
 
     var animal = GameServer.addAnimal(536,660,0);
@@ -115,7 +124,7 @@ GameServer.readMap = function(mapsPath){
 
     setTimeout(function(){
         GameServer.handleBattle(player,animal);
-    },1000);
+    },1000);*/
 };
 
 GameServer.addAnimal = function(x,y,type){
@@ -130,12 +139,14 @@ GameServer.setUpdateLoops = function(){
     GameServer.npcUpdateRate = 1000/5;
     var settlementUpdateRate = 60*1000;
     var playerUpdateRate = 60*1000;
+    var spawnZoneUpdateRate = 2*60*1000;
 
     setInterval(GameServer.updateNPC,GameServer.npcUpdateRate);
     setInterval(GameServer.updateWalks,walkUpdateRate);
     setInterval(GameServer.updateClients,clientUpdateRate);
     setInterval(GameServer.updateSettlements,settlementUpdateRate);
     setInterval(GameServer.updatePlayers,playerUpdateRate);
+    setInterval(GameServer.updateSpawnZones,spawnZoneUpdateRate);
 };
 
 GameServer.getPlayer = function(socketID){
@@ -285,7 +296,6 @@ GameServer.handleBattle = function(player,animal){
     // TODO: check for proximity
     var area = GameServer.computeBattleArea(player,animal);
     if(!GameServer.checkAreaIntegrity(area)){
-        console.log('#!');
         player.addMsg('There is an obstacle in the way!');
         return;
     }
@@ -647,5 +657,11 @@ GameServer.updateSettlements = function(){
 GameServer.updatePlayers = function(){
     Object.keys(GameServer.players).forEach(function(key){
         GameServer.players[key].update();
+    });
+};
+
+GameServer.updateSpawnZones = function(){
+    GameServer.spawnZones.forEach(function(zone){
+        zone.update();
     });
 };

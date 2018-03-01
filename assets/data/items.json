@@ -65,7 +65,7 @@
     "name": "Tunic",
     "equipment": "armor",
     "recipe":{"9":2},
-    "effects":{"def":15}
+    "effects":{"def":4}
   },
   "11":{
     "atlas": "items2",
@@ -89,7 +89,7 @@
     "frame":"shield1",
     "name": "Wooden shield",
     "equipment": "shield",
-    "effects":{"def":10}
+    "effects":{"def":2}
   },
   "14":{
     "atlas": "items2",
