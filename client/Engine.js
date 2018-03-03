@@ -56,7 +56,7 @@ Engine.preload = function() {
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
-    this.load.spritesheet('icons2', 'assets/sprites/icons2.png',{frameWidth:25,frameHeight:24});
+    this.load.spritesheet('icons2', 'assets/sprites/icons.png',{frameWidth:25,frameHeight:24});
     this.load.image('tail', 'assets/sprites/tail.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll_horiz.png');
     this.load.image('radial3', 'assets/sprites/radial3.png');
@@ -169,7 +169,7 @@ Engine.create = function(){
     Engine.blitters.push(Engine.scene.add.blitter(0,0,'ground_tiles').setDepth(0));
     Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(2));
     Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
-    Engine.useBlitters = true;
+    Engine.useBlitters = false;
 
     Engine.created = true;
     Client.requestData();
@@ -295,7 +295,7 @@ Engine.makeUI = function(){
 
     Engine.makeBuildingTitle();
 
-    var statsPanel = new StatsPanel(665,380,330,100,'Stats');
+    var statsPanel = new StatsPanel(665,335,330,145,'Stats');
 
     Engine.menus = {
         'inventory': Engine.makeInventory(statsPanel),
@@ -483,8 +483,7 @@ Engine.makeBattleMenu = function(){
     });
     battle.addPanel('items',items);
     var bar = new BigProgressBar(alignx,445,170,'red',true);
-    bar.name = 'battle health bar';
-    //bar.setLevel(Engine.getPlayerHealth(),Stats.dict['hp'].max);
+    bar.name = 'health bar';
     battle.addPanel('bar',bar);
 
     var timerw = 300;
@@ -666,7 +665,8 @@ Engine.makeInventory = function(statsPanel){
     items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
     items.addCapsule('gold',100,-9,'999','gold');
     inventory.addPanel('items',items);
-    var equipment = new EquipmentPanel(665,100,330,260,'Equipment');
+    // 665,335,330,145,'Stats');
+    var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
     inventory.addPanel('equipment',equipment);
     inventory.addPanel('stats',statsPanel);
     inventory.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
@@ -680,7 +680,7 @@ Engine.makeInventory = function(statsPanel){
 
 Engine.makeCharacterMenu = function(statsPanel){
     var padding = 10;
-    var infoh = 260;
+    var infoh = 235;
     var infox = 665;
     var infoy = 100;
     var commith = infoh;
@@ -693,13 +693,6 @@ Engine.makeCharacterMenu = function(statsPanel){
     var commitPanel = new CommitmentPanel(commitx,commity,commitw,commith,'Commitment');
     character.addPanel('commit',commitPanel);
     character.addPanel('stats',statsPanel);
-    /*character.onUpdateStats = statsPanel.updateStats.bind(statsPanel);
-    character.onUpdateCommit = function(){
-        character.panels['commit'].update();
-    };
-    character.onUpdateCharacter = function(){
-        character.panels['info'].update();
-    };*/
     character.addEvent('onUpdateStats',statsPanel.updateStats.bind(statsPanel));
     character.addEvent('onUpdateCommit',commitPanel.update.bind(commitPanel));
     character.addEvent('onUpdateCharacter',infoPanel.update.bind(infoPanel));
@@ -754,10 +747,6 @@ Engine.updateDisplayedEntities = function(){
     Engine.updateDisplay(Engine.displayedBuildings,Engine.buildings,adjacent,Engine.removeBuilding);
     Engine.updateDisplay(Engine.displayedAnimals,Engine.animals,adjacent,Engine.removeAnimal);
     Engine.updateDisplay(Engine.displayedCells,Engine.battleCells,adjacent,Engine.removeBattleCell);
-
-    /*Engine.displayedCells.forEach(function(cell){
-        if(adjacent.indexOf(cell.chunk) == -1) Engine.removeBattleCell(cell);
-    });*/
 };
 
 // Check if the entities of some list are in a neighboring chunk or not
@@ -879,8 +868,8 @@ Engine.computePath = function(position){
     if(PFUtils.checkCollision(x,y)) return;
     var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, x, y, Engine.PFgrid);
     PF.reset();
-    if(path.length == 0) return;
-    if(path.length > PFUtils.maxPathLength) {
+    //if(path.length == 0) return;
+    if(path.length == 0 || path.length > PFUtils.maxPathLength) {
         Engine.handleMsg('It\'s too far!');
         return;
     }
@@ -1176,25 +1165,22 @@ Engine.checkForBuildingMenuUpdate= function(id,event){
     }
 };
 
-Engine.addPlayer = function(data){ // id,x,y
-    if(Engine.playerIsInitialized && data.id == Engine.player.id){
-        console.warn('Duplicate initialization of hero');
-        return;
-    }
-    var sprite = new Player(data); // x,y,'hero',id
+Engine.addPlayer = function(data){
+    var sprite = new Player(data);
     Engine.players[sprite.id] = sprite;
     Engine.displayedPlayers.add(sprite.id);
     return sprite;
 };
 
-Engine.addBuilding = function(data){ // id,x,y,type,settlement,built
-    var building = new Building(data); // id,x,y,type,settlement,built
+Engine.addBuilding = function(data){
+    var building = new Building(data);
     Engine.buildings[building.id] = building;
     Engine.displayedBuildings.add(building.id);
     return building;
 };
 
-Engine.addAnimal = function(data){ // id,x,y,type
+Engine.addAnimal = function(data){
+    if(Engine.animals.hasOwnProperty(data.id)) console.warn('duplicate animal ',data.id,'at',data.x,data.y,'last seen at ',Engine.animals[data.id].tileX,',',Engine.animals[data.id].tileY);
     var animal = new Animal(data);
     Engine.animals[animal.id] = animal;
     Engine.displayedAnimals.add(animal.id);
@@ -1441,4 +1427,10 @@ Engine.buildSuccess = function(){
 Engine.leaveBuilding = function(){
     Client.sendExit();
     Engine.exitBuilding();
+};
+
+Engine.snap = function(){
+    game.renderer.snapshot(function(img){
+        console.log(img.src);
+    });
 };

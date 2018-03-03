@@ -64,11 +64,11 @@ var Equipment = {
             name: 'Necklace'
         },
         acc:{
-            nb: 3,
-            x: 100,
-            y: 200,
+            nb: 2,
+            x: 270,
+            y: 150,
             shade: 'ring',
-            xincrement: 50,
+            xincrement: 40,
             name: 'Accessory'
         },
         quiver:{

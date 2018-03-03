@@ -25,7 +25,6 @@ var Moving = new Phaser.Class({
         this.orientation = 'down';
         this.previousOrientation = this.orientation;
         this.movement = null;
-        this.battlezone = [];
 
         this.setInteractive();
     },
@@ -80,6 +79,7 @@ var Moving = new Phaser.Class({
     },
 
     endMovement: function(){
+        if(!this.active) return; // quick fix
         this.flagForStop = false;
         this.anims.stop();
         this.setFrame(this.restingFrames[this.orientation]);

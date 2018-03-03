@@ -11,7 +11,7 @@ var Animal = new Phaser.Class({
         this.setFrame(animalData.frame);
         this.setDisplayOrigin(0);
         this.dead = false;
-        this.name = animalData.name;
+        this.name = animalData.name+' '+this.id;
         this.walkAnimPrefix = animalData.walkPrefix;
         this.restingFrames = animalData.restingFrames;
     },

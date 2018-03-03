@@ -13,15 +13,16 @@ StatsPanel.prototype.constructor = StatsPanel;
 StatsPanel.prototype.addStats = function(){
     this.stats = {};
     var tlx = 20;
-    var tly = 25;
+    var tly = 20;
     var horizMargin = 100;
     var vertMargin = 30;
     var i = 0;
+    var nbHoriz = 3;
     for(var stat in Stats.dict) {
         if (!Stats.dict.hasOwnProperty(stat)) continue;
         if(Stats.dict[stat].isMax) continue;
-        var x = tlx + (i%3)*horizMargin;
-        var y = tly + Math.floor(i/3)*vertMargin;
+        var x = tlx + (i%nbHoriz)*horizMargin;
+        var y = tly + Math.floor(i/nbHoriz)*vertMargin;
         this.addStat(this.x+x,this.y+y,stat);
         i++;
     }
@@ -74,7 +75,6 @@ StatsPanel.prototype.updateStats = function(){
         var value = Engine.player.getStatValue(stat);
         var suffix = statInfo.suffix;
         if(suffix) value = value+suffix;
-        //if(statInfo.showMax) value = value+"/"+statInfo.max;
         if(statInfo.hasMax) value = value+"/"+Engine.player.getStatValue(statInfo.hasMax);
         var statObj = this.stats[stat];
         statObj.text.setText(value);

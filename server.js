@@ -57,7 +57,8 @@ io.on('connection',function(socket){
         }
         console.log('['+socket.id+'] Initialized');
         if(!data.stamp || data.stamp < server.resetStamp) data.new = true; // TODO Remove eventually
-        data.new = true; // todo: remove
+
+        data.new = true; // TODO: REMOVE
         if(data.new){
             gs.addNewPlayer(socket);
         }else{
@@ -92,9 +93,6 @@ io.on('connection',function(socket){
             gs.handleUnequip(data,socket.id);
         });
 
-        /*socket.on('battle',function(data){
-            gs.handleBattle(data,socket.id);
-        });*/
 
         socket.on('animalClick',function(data){
             gs.handleAnimalClick(data,socket.id);
@@ -114,6 +112,10 @@ io.on('connection',function(socket){
 
         socket.on('respawn',function(data){
             gs.handleRespawn(socket.id);
+        });
+
+        socket.on('screenshot',function(data){
+            gs.handleScreenshot(data);
         });
     });
 

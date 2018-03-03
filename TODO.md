@@ -28,11 +28,8 @@ Goal: 1h of gameplay?
 
 Week:
 -----
-Battle: path not found
 Battle: update hover card of life bar
-Battle: test extensively (solo, multiplayer, battles side-by-side, overlap...)
-Debug: remove default new player
-Animals: they stop wandering after a while? (or they are ghosts? Haven't been properly deleted?)
+Battle: position used by bubbles and footprints is wrong after respawn
 Fort: staff
 Fort: dev lvl progress bar glitch
 Construction: notification of civic xp gain
@@ -41,8 +38,6 @@ Econmic loop: skin dead animals
 UI: test tooltip of items (after having added hpmax)
 UI: display event pop-ups after skinning
 UI: dont tween progress bars when opening menu
-Character: display committed buildings (update when commit/uncommit)
-Character: add new stats
 Character: display stat modifier details
 Character: foodSurplus in self update, used for ProductivityPanel & CharacterPanel updates
 
@@ -52,6 +47,7 @@ decide duration of all cycles (eco, spawn...); inspect all panes and set interes
 Cleaning:
 --------
 Performance:
+- Use Phaser tilemaps?
 - Animals keep their target
 - "Sleep" mode for NPC when no player in currentAOI.entities (change flags on AOI transition, not on every NPC update loop iteration)
 - Pathmaking instead of pahfinding?

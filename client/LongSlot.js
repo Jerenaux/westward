@@ -115,16 +115,24 @@ LongSlot.prototype.display = function(){
     this.zone.setVisible(true);
 };
 
-LongSlot.prototype.hide = function(){
-    this.slices.forEach(function(s){
-        s.setVisible(false);
-    });
-    this.texts.forEach(function(s){
-        s.setVisible(false);
-    });
+LongSlot.prototype.clear = function(){
+    this.hideTexts();
     this.textCounter = 0;
     if(this.bar) this.bar.hide();
     if(this.icon) this.icon.setVisible(false);
     if(this.pin) this.pin.setVisible(false);
+};
+
+LongSlot.prototype.hideTexts = function(){
+    this.texts.forEach(function(t){
+        t.setVisible(false);
+    })
+};
+
+LongSlot.prototype.hide = function(){
+    this.slices.forEach(function(s){
+        s.setVisible(false);
+    });
+    this.clear();
     this.zone.setVisible(false);
 };

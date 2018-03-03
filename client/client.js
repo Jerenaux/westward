@@ -154,3 +154,8 @@ Client.sendRespawn = function(){
 Client.sendMapData = function(id,data){
     Client.socket.emit('mapdata',{id:id,data:data});
 };
+
+Client.sendScreenshot = function(image){
+    console.log(image);
+    Client.socket.emit('screenshot',{img:image});
+};

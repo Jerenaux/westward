@@ -109,14 +109,6 @@ UpdatePacket.prototype.synchronize = function(AOI){
 };
 
 UpdatePacket.prototype.isEmpty = function(){
-    /*if(this.disconnected.length > 0) return false;
-    if(this.newplayers.length > 0) return false;
-    if(this.newbuildings.length > 0) return false;
-    if(this.newanimals.length > 0) return false;
-    if(Object.keys(this.players).length > 0) return false;
-    if(Object.keys(this.animals).length > 0) return false;
-    if(Object.keys(this.buildings).length > 0) return false;
-    return true;*/
     for(var field in this){
         if(!this.hasOwnProperty(field)) continue;
         if(this[field] && this[field].constructor.name == 'Array') {
@@ -131,14 +123,6 @@ UpdatePacket.prototype.isEmpty = function(){
 };
 
 UpdatePacket.prototype.clean = function(){
-    /*if(!this.disconnected.length) this.disconnected = undefined;
-    if(!this.newplayers.length) this.newplayers = undefined;
-    if(!this.newanimals.length) this.newanimals = undefined;
-    if(!this.newbuildings.length) this.newbuildings = undefined;
-    if(!Object.keys(this.players).length) this.players = undefined;
-    if(!Object.keys(this.animals).length) this.animals = undefined;
-    if(!Object.keys(this.buildings).length) this.buildings = undefined;
-    return this;*/
     for(var field in this){
         if(!this.hasOwnProperty(field)) continue;
         if(this[field] && this[field].constructor.name == 'Array'){

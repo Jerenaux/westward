@@ -570,18 +570,28 @@ GameServer.handleExit = function(socketID){
 
 GameServer.handleAOItransition = function(entity,previous){
     // When something moves from one AOI to another (or appears inside an AOI), identify which AOIs should be notified and update them
-    // Miodel: update many, fetch one
+    // Model: update many, fetch one
     var AOIs = Utils.listAdjacentAOIs(entity.aoi);
+    var newAOIs = [];
+    var oldAOIs = [];
     if(previous){
         var previousAOIs = Utils.listAdjacentAOIs(previous);
         // Array_A.diff(Array_B) returns the elements in A that are not in B
         // This is used because only the AOIs that are now adjacent, but were not before, need an update. Those who where already adjacent are up-to-date
-        AOIs = AOIs.diff(previousAOIs);
+        newAOIs = AOIs.diff(previousAOIs);
+        oldAOIs = previousAOIs.diff(AOIs);
+    }else{
+        newAOIs = AOIs;
     }
-    AOIs.forEach(function(aoi){
+    newAOIs.forEach(function(aoi){
         if(entity.constructor.name == 'Player') entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
         GameServer.addObjectToAOI(aoi,entity);
     });
+    oldAOIs.forEach(function(aoi){
+        GameServer.removeObjectFromAOI(aoi,entity);
+    });
+    // There shouldn't be a case where an entity is both added and removed from an AOI in the same update packer
+    // (e.g. back and forth random path) because the update frequency is higher than the movement time
 };
 
 GameServer.updateClients = function(){ //Function responsible for setting up and sending update packets to clients
@@ -663,5 +673,13 @@ GameServer.updatePlayers = function(){
 GameServer.updateSpawnZones = function(){
     GameServer.spawnZones.forEach(function(zone){
         zone.update();
+    });
+};
+
+GameServer.handleScreenshot = function(data){
+    console.log(data);
+    GameServer.server.db.collection('screenshots').insertOne(data,function(err){
+        if(err) throw err;
+        console.log('Screenshot saved');
     });
 };

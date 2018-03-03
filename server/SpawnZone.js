@@ -26,7 +26,9 @@ SpawnZone.prototype.update = function(){
 
 SpawnZone.prototype.spawnInAOI = function(aoi){
     // TODO: refine, specify how many to spawn, min, max, develop matrix ecosystem...
-    for(var i = 0; i < 10; i++){
+    var nb = 20 - aoi.entities.length;
+    if(nb <= 0) return;
+    for(var i = 0; i < nb; i++){
         var x = Utils.randomInt(aoi.x,aoi.x+World.chunkWidth);
         var y = Utils.randomInt(aoi.y,aoi.y+World.chunkHeight);
         if(PFUtils.checkCollision(x,y)) continue;

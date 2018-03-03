@@ -51,11 +51,13 @@ Tooltip.prototype.makeBody = function(){
 };
 
 Tooltip.prototype.makeStatsIcons = function(){
-    for(var i = 0; i < Stats.list.length; i++) {
-        var s = Stats.dict[Stats.list[i]];
+    var i = 0;
+    for(var stat in Stats.dict) {
+        if (!Stats.dict.hasOwnProperty(stat)) continue;
+        var statData = Stats.dict[stat];
         var x = this.x+15;
-        var y = this.y+(30*(i+1));
-        var icon = Engine.scene.add.sprite(x,y,'icons2', s.frame);
+        var y = this.y+(30*(i + 1));
+        var icon = Engine.scene.add.sprite(x,y,'icons2', statData.frame);
         var text = Engine.scene.add.text(x+30,y+2, '100',
             { font: '12px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
         );
@@ -65,28 +67,31 @@ Tooltip.prototype.makeStatsIcons = function(){
         this.iconsTexts.push(text);
         this.container.push(icon);
         this.container.push(text);
+        i++;
     }
 };
 
 Tooltip.prototype.updateInfo = function(name, effects){
-    //if(!this.displayed) return;
     effects = effects || {};
     if(name) {
         this.text.setText(name);
         var nbEffects = Object.keys(effects).length;
         this.updateSize(nbEffects);
-        for(var i = 0; i < Stats.list.length; i++){
+        var i = 0;
+        for(var stat in Stats.dict) {
+            if (!Stats.dict.hasOwnProperty(stat)) continue;
             this.icons[i].setVisible((i < nbEffects));
             this.iconsTexts[i].setVisible((i < nbEffects));
             if(i < nbEffects){
                 var key = Object.keys(effects)[i];
                 var val = effects[key];
-                var s = Stats.dict[key];
+                var statData = Stats.dict[key];
                 if(val > 0) val = "+"+val;
-                if(s.suffix) val = val+s.suffix;
-                this.icons[i].setFrame(s.frame);
+                if(statData.suffix) val = val+statData.suffix;
+                this.icons[i].setFrame(statData.frame);
                 this.iconsTexts[i].setText(val);
             }
+            i++;
         }
     }
 };

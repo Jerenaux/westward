@@ -23,6 +23,7 @@ var UIElement = new Phaser.Class({
         }else {
             this.menu.display();
         }
+        Engine.interrupt = true;
     },
 
     display: function(){

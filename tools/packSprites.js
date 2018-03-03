@@ -7,8 +7,6 @@ var Spritesmith = require('spritesmith');
 
 var myArgs = require('optimist').argv;
 var indir = myArgs.i;
-//var outdir = myArgs.o;
-//var outName = myArgs.n;
 var sprites = [];
 
 fs.readdir(indir,function(err,files){

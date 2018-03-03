@@ -18,6 +18,7 @@ ProgressBar.prototype.setUpZone = function(zone){
     zone.setDepth(Engine.UIDepth+10);
     zone.setScrollFactor(0);
     zone.setInteractive();
+    zone.setVisible(false);
     var _bar = this;
     zone.handleOver = function(){
         Engine.tooltip.updateInfo(_bar.level+'/'+_bar.max);
@@ -115,6 +116,7 @@ ProgressBar.prototype.display = function(){
     });
     if(this.level == 0 && this.hasHead) this.head.setVisible(false);
     if(this.level == 0 && this.hasTail) this.tail.setVisible(false);
+    if(this.zone) this.zone.setVisible(true);
     this.displayed = true;
 };
 
@@ -124,6 +126,7 @@ ProgressBar.prototype.hide = function(){
     });
     if(this.hasHead) this.head.setVisible(false);
     if(this.hasTail) this.tail.setVisible(false);
+    if(this.zone) this.zone.setVisible(false);
     this.displayed = false;
 };
 
@@ -199,4 +202,5 @@ BigProgressBar.prototype.constructor = BigProgressBar;
 BigProgressBar.prototype.createZone = function(){
     var zone = Engine.scene.add.zone(this.x,this.y,this.maxLength,20);
     this.setUpZone(zone);
+    return zone;
 };

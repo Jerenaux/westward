@@ -406,9 +406,9 @@ Player.prototype.getDataFromDb = function(document){
     for(var p = 0; p < dbProperties.length; p++){
         this[dbProperties[p]] = document[dbProperties[p]];
     }
-    for(var i = 0; i < Stats.list.length; i++) {
-        var key = Stats.list[i];
-        if(document['stats'][key] >= 0) this.setStat(key,document['stats'][key]);
+    for(var stat in Stats.dict) {
+        if (!Stats.dict.hasOwnProperty(stat)) continue;
+        if(document['stats'][stat] >= 0) this.setStat(stat,document['stats'][stat]);
     }
     for(var equip in Equipment.dict) {
         if (!Equipment.dict.hasOwnProperty(equip)) continue;

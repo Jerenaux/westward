@@ -9,7 +9,7 @@ if(onServer){
 }
 
 var Stats = {
-    list: ['hp','hpmax','fat','acc','def','mdmg','rdmg'],
+    //list: ['hp','hpmax','fat','acc','def','mdmg','rdmg'],
     dict: {
         hpmax: {
             name: 'Health',
@@ -64,6 +64,46 @@ var Stats = {
             max: 1000,
             start: 10,
             frame: 5
+        },
+        smith: {
+            name: 'Smithing',
+            min: 0,
+            max: 100,
+            start: 10,
+            frame: 6,
+            suffix: '%'
+        },
+        brew: {
+            name: 'Brewing',
+            min: 0,
+            max: 100,
+            start: 10,
+            frame: 7,
+            suffix: '%'
+        },
+        skin: {
+            name: 'Harvesting',
+            min: 0,
+            max: 100,
+            start: 10,
+            frame: 8,
+            suffix: '%'
+        },
+        nego: {
+            name: 'Negotiation',
+            min: 0,
+            max: 100,
+            start: 10,
+            frame: 9,
+            suffix: '%'
+        },
+        orient: {
+            name: 'Orientation',
+            min: 0,
+            max: 100,
+            start: 10,
+            frame: 10,
+            suffix: '%'
         }
     }
 };
