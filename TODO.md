@@ -29,15 +29,17 @@ Goal: 1h of gameplay?
 Week:
 -----
 Battle: update hover card of life bar
-Battle: position used by bubbles and footprints is wrong after respawn
 Fort: staff
 Fort: dev lvl progress bar glitch
 Construction: notification of civic xp gain
 Economic loop: test all updates of all menus 
 Econmic loop: skin dead animals
+Net: ghost animals when transitioning aoi?
 UI: test tooltip of items (after having added hpmax)
 UI: display event pop-ups after skinning
 UI: dont tween progress bars when opening menu
+UI: accessories tooltip glitch
+Character: upon de-commit, slots are not cleared
 Character: display stat modifier details
 Character: foodSurplus in self update, used for ProductivityPanel & CharacterPanel updates
 
@@ -54,7 +56,6 @@ Performance:
 - Concile the two coexisting menu update systems: the one used by updateSelf and the one used by updateBuilding
 -> All menus have an update() method called on display; upon new server data, only update() the current menu
 - Dont send full building inventories when buying/selling (send arrays of deltas)
-- Use pool for footsteps (see Groups, who now act as pools)
 - Use pools for players, animals, ...
 - Fix null values in left-fringe chunks (fixed?)
 ->nulls in corrupted chunks likely arise from "undefined" values being converted to null by JSON.stringify
@@ -63,10 +64,10 @@ Performance:
 - Flattening: second pass to delete water-only chunks based on visibility
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
-- To check if update packets are empty: iterate over keys and check for emptyness using typeof (if array and length 0 ...)
 Order:
+- Entity manager where you declare entities, which sets up the corresponding factory and data structures (list, map, displaylist...) 
+- Clean up Building.update() and updateSelf()
 - Centralize all texts
-- add update() to BattleCells, so that createElements() can use it for all new elements
 - Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
 - Tie input events to game objects, rather than global functions (use topOnly)
 - Remove unnecessary files (esp. sprites)
@@ -79,9 +80,6 @@ Order:
 - Merge all the addXXX and removeXXX methods (but keepl separate lists) + merge addXXX loops in updateWorld()
 - Split server in two (game and dev server)
 - Remove unnecessary Geometry methods (and world-building methods from studio/Engine)
-- Restructure UI, maybe remove UIElement, only have a set of generic functions to bind to interactive sprites?
-- Anchor panel elements at center, not top-left
-- Make chatbar panel a subclass of Panels? Wait to see if other panels don't need DOM elements
 
 Content:
 -------

@@ -29,10 +29,10 @@ var BattleTile = new Phaser.Class({
         this.tx = x;
         this.ty = y;
         this.setVisible(true);
-        this.manageFrame();
+        this.update();
     },
 
-    manageFrame: function(){
+    update: function(){
         if(BattleManager.inBattle) {
             if(BattleManager.isActiveCell(this)){
                 this.activate();
@@ -66,8 +66,7 @@ var BattleTile = new Phaser.Class({
     deactivate: function(){
         if(!this.active) return;
         this.active = false;
-        //if(this.tween) this.tween.stop();
-        this.manageFrame();
+        this.update();
         this.setAlpha(0.5);
     },
 

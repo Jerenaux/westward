@@ -110,6 +110,7 @@ Engine.create = function(){
     Engine.mapDataCache = {};
 
     Engine.availableGridCells = [];
+    Engine.availablePrints = [];
     Engine.availableAnimSprites = [];
     Engine.availableHP = [];
 
@@ -947,16 +948,6 @@ Engine.showMarker = function(){
     Engine.marker.setVisible(true);
 };
 
-// Return true if there is a collision on that tile
-/*Engine.checkCollision = function(tile){ // tile is x, y pair
-    if(!Engine.collisions[tile.y]) return false;
-    var node = Engine.collisions[tile.y][tile.x];
-    if(node === undefined) return false;
-    if(node == 0) return false;
-    if(node == 1) return true;
-    return !node.walkable;
-};*/
-
 /*
 * #### UPDATE CODE #####
 * */
@@ -1068,21 +1059,10 @@ Engine.update = function(){
 
 // Processes the global update packages received from the server
 Engine.updateWorld = function(data){  // data is the update package from the server
-    if(data.newplayers) Engine.createElements(data.newplayers,Engine.addPlayer,Engine.updatePlayer);
-    if(data.newbuildings) Engine.createElements(data.newbuildings,Engine.addBuilding,Engine.updateBuilding);
-    if(data.newanimals) Engine.createElements(data.newanimals,Engine.addAnimal,Engine.updateAnimal);
-
-    if(data.newcells) {
-        for (var n = 0; n < data.newcells.length; n++) {
-            var b = data.newcells[n];
-            Engine.addBattleCell(b.id, b.x, b.y);
-        }
-        BattleManager.onNewCells();
-    }
-    /*if(data.newcells) {
-        Engine.createElements(data.newcells,Engine.addBattleCell);
-        BattleManager.activateCell();
-    }*/
+    if(data.newplayers) Engine.createElements(data.newplayers,Engine.addPlayer);
+    if(data.newbuildings) Engine.createElements(data.newbuildings,Engine.addBuilding);
+    if(data.newanimals) Engine.createElements(data.newanimals,Engine.addAnimal);
+    if(data.newcells) Engine.createElements(data.newcells,Engine.addBattleCell);
 
     if(data.removedplayers) Engine.removeElements(data.removedplayers,Engine.removePlayer);
     if(data.removedanimals) Engine.removeElements(data.removedanimals,Engine.removeAnimal);
@@ -1091,15 +1071,22 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     // data.players is an associative array mapping the id's of the entities
     // to small object indicating which properties need to be updated. The following code iterate over
     // these objects and call the relevant update functions.
-    if(data.players) Engine.updateElements(data.players,Engine.players,Engine.updatePlayer);
-    if(data.animals) Engine.updateElements(data.animals,Engine.animals,Engine.updateAnimal);
-    if(data.buildings) Engine.updateElements(data.buildings,Engine.buildings,Engine.updateBuilding);
+    if(data.players) Engine.updateElements(data.players,Engine.players);
+    if(data.animals) Engine.updateElements(data.animals,Engine.animals);
+    if(data.buildings) Engine.updateElements(data.buildings,Engine.buildings);
 };
 
 // TODO: replace callbacks by systematic owned methids
-Engine.createElements = function(arr,creationCallback,updateCallback){
+Engine.createElements = function(arr,creationCallback){
     arr.forEach(function(e){
-        updateCallback(creationCallback(e),e);
+        creationCallback(e).update(e);
+    });
+};
+
+// For each element in obj, call update()
+Engine.updateElements = function(obj,table){
+    Object.keys(obj).forEach(function (key) {
+        if(table[key]) table[key].update(obj[key]);
     });
 };
 
@@ -1109,50 +1096,10 @@ Engine.removeElements = function(arr,callback){
     });
 };
 
-// For each element in obj, call callback on it
-Engine.updateElements = function(obj,table,callback){
-    Object.keys(obj).forEach(function (key) {
-        if(table[key]) callback(table[key],obj[key]);
-    });
-};
-
-Engine.updatePlayer = function(player,data){ // data contains the updated data from the server
-    player.update(data);
-    /*if(data.path && !player.isHero) player.move(data.path);
-    if(data.inBuilding > -1) {
-        if(!player.isHero) player.setVisible(false);
-        player.inBuilding = data.inBuilding;
-    }
-    if(data.inBuilding == -1){
-        if(!player.isHero) player.setVisible(true);
-        player.inBuilding = data.inBuilding;
-    }
-    if(data.settlement) player.settlement = settlement;
-    Engine.handleBattleUpdates(player,data);
-    if(data.dead == true) player.die(!player.firstUpdate);
-    if(data.dead == false) player.respawn();
-    if(!player.isHero && data.chat) player.talk(data.chat);
-    if(data.x >= 0 && data.y >= 0) player.teleport(data.x,data.y);
-    player.firstUpdate = false;*/
-};
-
-Engine.updateAnimal = function(animal,data){ // data contains the updated data from the server
-    animal.update(data);
-    /*if(data.path) animal.move(data.path);
-    if(data.stop) animal.stop();
-    Engine.handleBattleUpdates(animal,data);
-    if(data.dead) animal.die();*/
-};
-
-// TODO: move to moving?
 Engine.handleBattleUpdates = function(entity, data){
     if(data.inFight !== undefined) entity.inFight = data.inFight;
     if(data.meleeHit !== undefined) Engine.handleBattleAnimation('melee',entity,data.meleeHit);
     if(data.rangedMiss !== undefined) Engine.handleMissAnimation(entity);
-};
-
-Engine.updateBuilding = function(building,data){ // data contains the updated data from the server
-    building.update(data);
 };
 
 Engine.inThatBuilding = function(id){
@@ -1187,12 +1134,13 @@ Engine.addAnimal = function(data){
     return animal;
 };
 
-Engine.addBattleCell = function(id,x,y){
+Engine.addBattleCell = function(data){
     var cell = Engine.getNextCell();
-    cell.setUp(x,y);
-    Engine.battleCells[id] = cell;
-    Engine.battleCellsMap.add(x,y,cell);
-    Engine.displayedCells.add(id);
+    cell.setUp(data.x,data.y);
+    Engine.battleCells[data.id] = cell;
+    Engine.battleCellsMap.add(cell.tx,cell.ty,cell);
+    Engine.displayedCells.add(data.id);
+    return cell;
 };
 
 Engine.removeBattleCell = function(id){
@@ -1346,6 +1294,12 @@ Engine.getNextCell = function(){
     return new BattleTile();
 };
 
+Engine.getNextPrint = function(){
+    if(Engine.availablePrints.length > 0) return Engine.availablePrints.shift();
+    console.log('creating footprint');
+    return Engine.scene.add.image(0,0,'footsteps');
+};
+
 Engine.getNextAnim = function(){
     if(Engine.availableAnimSprites.length > 0) return Engine.availableAnimSprites.shift();
     var sprite = Engine.scene.add.sprite(0,0,'sword_anim',0);
@@ -1357,9 +1311,13 @@ Engine.recycleAnim = function(sprite){
     Engine.availableAnimSprites.push(sprite);
 };
 
+Engine.recyclePrint = function(print){
+    Engine.availablePrints.push(print);
+};
+
 Engine.updateGrid = function(){
     Engine.displayedCells.forEach(function(id){
-        Engine.battleCells[id].manageFrame();
+        Engine.battleCells[id].update();
     });
 };
 

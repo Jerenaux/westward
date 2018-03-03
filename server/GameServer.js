@@ -456,10 +456,10 @@ GameServer.handleCraft = function(data,socketID){
     console.log('builing request',bid,tile);
     if(GameServer.canBuild(bid,tile)){
         GameServer.build(bid,tile,player.settlement);
-        GameServer.server.sendMsg(player,'okbuild');
+        // todo: send ok message
     }else{
-        GameServer.server.sendMsg(player,'nobuild');
-    }
+        // todo: send error message
+     }
 };
 
 GameServer.canBuild = function(bid,tile){
@@ -489,16 +489,15 @@ GameServer.build = function(bid,tile,settlement){
         if(err) throw err;
         console.log('build successfull');
     });
-    GameServer.server.sendAll('addBuildingPin',building.superTrim());
 };*/
 
-GameServer.handleRespawn = function(socketID){
+GameServer.handleRespawn = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     if(!player.dead) return;
     player.respawn();
 };
 
-GameServer.handleCommit = function(socketID){
+GameServer.handleCommit = function(data,socketID){ // keep data argument
     var player = GameServer.getPlayer(socketID);
     if(!player.isInBuilding()) return;
     if(!player.hasFreeCommitSlot()) return;
@@ -563,7 +562,7 @@ GameServer.handleUnequip = function(data,socketID) {
     player.unequip(slot,subSlot);
 };
 
-GameServer.handleExit = function(socketID){
+GameServer.handleExit = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     player.exitBuilding();
 };

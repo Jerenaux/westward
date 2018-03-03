@@ -69,7 +69,7 @@ Client.socket.on('wait',function(){
 
 Client.socket.on('update',function(data){ // This event triggers uppon receiving an update packet (data)
     //if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.finalUpdateSchema); // if in binary format, decode first
-    Client.socket.emit('ponq',data.stamp);  // send back a pong stamp to compute latency
+    //Client.socket.emit('ponq',data.stamp);  // send back a pong stamp to compute latency
     //if(data.nbconnected !== undefined) Game.updateNbConnected(data.nbconnected);
     //if(data.latency) Game.setLatency(data.latency);
     //if(data.latency) console.log('[lat] '+data.latency+' ms');

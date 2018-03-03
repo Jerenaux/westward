@@ -101,10 +101,11 @@ var Moving = new Phaser.Class({
             this.anims.play(this.walkAnimPrefix+'_move_'+this.orientation);
         }
 
+        this.updatePosition();
+
         if(this.constructor.name == 'Player') this.leaveFootprint();
         if(this.bubble) this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
 
-        this.updatePosition();
 
         if(this.flagForStop && (this.tileX != this.previousTile.x || this.tileY != this.previousTile.y)){
             console.log(this.movement);
@@ -159,8 +160,9 @@ var Moving = new Phaser.Class({
             }
             var sx = this.previousTile.x*Engine.tileWidth + Engine.tileWidth/2;
             var sy = this.previousTile.y*Engine.tileHeight + Engine.tileHeight/2;
-            // TODO: use pool instead
-            var print = Engine.scene.add.image(sx,sy,'footsteps');
+
+            var print = Engine.getNextPrint();
+            print.setPosition(sx,sy);
             print.angle += angle;
             print.alpha = 0.7;
             print.depth = Engine.markerDepth;
@@ -168,7 +170,12 @@ var Moving = new Phaser.Class({
             Engine.scene.tweens.add({
                 targets: print,
                 alpha: 0,
-                duration: 1500
+                duration: 1500,
+                onComplete: function(tween,targets){
+                    targets.forEach(function(t){
+                        Engine.recyclePrint(t);
+                    });
+                }
             });
         }
     }
