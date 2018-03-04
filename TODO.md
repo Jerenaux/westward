@@ -35,16 +35,15 @@ Fort: staff
 Fort: dev lvl progress bar glitch
 Construction: notification of civic xp gain
 Economic loop: test all updates of all menus 
-Econmic loop: skin dead animals
 Economic loop: harvest herbs
 Net: ghost animals when transitioning aoi? + removal of non-existing ones
 UI: test tooltip of items (after having added hpmax)
 UI: display event pop-ups after skinning
 UI: dont tween progress bars when opening menu
 UI: accessories tooltip glitch
+UI: bubble doesn't show when taking before moving
 Character: upon de-commit, slots are not cleared
-Character: display stat modifier details
-Character: foodSurplus in self update, used for ProductivityPanel & CharacterPanel updates
+Character: display stat modifiers details
 
 Finish:  test economy for a while;
 decide duration of all cycles (eco, spawn...); inspect all panes and set interesting values to everything
@@ -140,6 +139,7 @@ Design document:
 Polish:
 ------
 Visual:
+- Show "new" tag when opening inventory
 - Cut corners of big battlezones? (but make sure it doesn't impact integrity)
 - Variety of small "talk" bubbles in reaction to things happening (+ symbol bubbles?)
 - Adapt bubble duration (in bubble.display) depending on number of words

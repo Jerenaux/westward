@@ -66,7 +66,10 @@ var Player = new Phaser.Class({
     },
 
     move: function(path){
-        if(this.isHero) Client.sendPath(path,this.destinationAction);
+        if(this.isHero){
+            if(this.destinationAction) path.pop();
+            Client.sendPath(path,this.destinationAction);
+        }
         Moving.prototype.move.call(this,path);
     },
 
@@ -107,6 +110,7 @@ var Player = new Phaser.Class({
             type: type,
             id: id
         }
+        console.log('action set to',this.destinationAction);
     },
 
     // ### GETTERS ####

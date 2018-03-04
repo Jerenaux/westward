@@ -243,21 +243,19 @@ Battle.prototype.processAttack = function(a,b){
     if(this.nextTo(a,b)){
         var dmg = this.computeDamage('melee',a,b);
         this.applyDamage(b,dmg);
-        b.setProperty('meleeHit',dmg);
+        b.setProperty('hit',dmg);
         return {
             success: true,
             delay: delay
         };
     }else{
-        //console.log('ranged attack');
         if(!a.canRange()) return false;
         a.decreaseAmmo();
         var hit = this.computeRangedHit(a,b);
         if(hit){
-            //dmg = this.computeRangedDamage(a,b);
             dmg = this.computeDamage('ranged',a,b);
             this.applyDamage(b,dmg);
-            b.setProperty('meleeHit',dmg);
+            b.setProperty('hit',dmg);
         }else { // miss
             b.setProperty('rangedMiss',true);
         }

@@ -84,7 +84,7 @@ Client.socket.on('pid',function(playerID){ // the 'pid' event is used for the se
 });
 
 Client.setLocalData = function(id){ // store the player ID in localStorage
-    console.log('your ID : '+id);
+    //console.log('your ID : '+id);
     localStorage.setItem(Client.storageIDKey,id);
     localStorage.setItem('idStamp',Date.now());
 };
@@ -99,10 +99,6 @@ Client.requestData = function(){ // request the data to be used for initWorld()
 Client.sendPath = function(path,action){
     Client.socket.emit('path',{path:path,action:action});
 };
-
-/*Client.startBattle = function(targetID){
-    Client.socket.emit('battle',targetID);
-};*/
 
 Client.animalClick = function(targetID){
     Client.socket.emit('animalClick',targetID);
@@ -156,6 +152,5 @@ Client.sendMapData = function(id,data){
 };
 
 Client.sendScreenshot = function(image){
-    console.log(image);
     Client.socket.emit('screenshot',{img:image});
 };

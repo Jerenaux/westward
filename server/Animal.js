@@ -220,4 +220,9 @@ Animal.prototype.computeBattleDestination = function(target){
     return closest;
 };
 
+Animal.prototype.remove = function(){
+    if(this.battle) this.battle.removeFighter(this);
+    delete GameServer.animals[this.id];
+};
+
 module.exports.Animal = Animal;

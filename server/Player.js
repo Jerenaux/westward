@@ -9,6 +9,7 @@ var GameServer = require('./GameServer.js').GameServer;
 var Inventory = require('../shared/Inventory.js').Inventory;
 var Stats = require('../shared/Stats.js').Stats;
 var Equipment = require('../shared/Equipment.js').Equipment;
+var Formulas = require('../shared/Formulas.js').Formulas;
 
 var NB_SLOTS = 2;
 var COMMIT_DURATION = 30*1000;
@@ -109,7 +110,8 @@ Player.prototype.respawn = function(){
     // TODO: loose loot
 };
 
-Player.prototype.applyFoodModifier = function(foodModifier){
+Player.prototype.applyFoodModifier = function(foodSurplus){
+    var foodModifier = Formulas.computePlayerFoodModifier(foodSurplus);
     this.getStats().forEach(function(stat){
         if(Stats.dict[stat].noModifier) return;
         var statObj = this.getStat(stat);
@@ -118,11 +120,7 @@ Player.prototype.applyFoodModifier = function(foodModifier){
         this.refreshStat(stat);
     },this);
     this.foodModifier = foodModifier;
-    /*console.log(this.stats);
-    console.log('max:',this.stats['hpmax'].getValue());
-    console.log(this.stats['hp'].getValue());
-    this.stats['hp'].increment(-10);
-    console.log(this.stats['hp'].getValue());*/
+    this.updatePacket.foodSurplus = foodSurplus;
 };
 
 Player.prototype.hasFreeCommitSlot = function(){
@@ -496,4 +494,11 @@ Player.prototype.update = function() {
         }
     }
 };
+
+Player.prototype.remove = function(){
+    if(this.battle) this.battle.removeFighter(this);
+    GameServer.settlements[this.settlement].removePlayer(this);
+    delete GameServer.players[this.id];
+};
+
 module.exports.Player = Player;

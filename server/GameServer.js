@@ -233,18 +233,7 @@ GameServer.removeEntity = function(entity){
     AOIs.forEach(function(aoi){
         GameServer.removeObjectFromAOI(aoi,entity);
     });
-
-    var arr;
-    switch(entity.constructor.name){
-        case 'Player':
-            arr = GameServer.players;
-            break;
-        case 'Animal':
-            arr = GameServer.animals;
-            break;
-    }
-    if(arr) delete arr[entity.id];
-    if(entity.canFight() && entity.battle) entity.battle.removeFighter(entity);
+    entity.remove();
 };
 
 GameServer.getAOIAt = function(x,y){
@@ -290,7 +279,14 @@ GameServer.skinAnimal = function(player,animalID){
     var animal = GameServer.animals[animalID];
     // TODO: check for proximity
     if(!animal.isDead()) return;
-    console.log('skinning');
+    var loot = GameServer.animalsData[animal.type].loot;
+    if(!loot) return;
+    for(var item in loot){
+        if(!loot.hasOwnProperty(item)) continue;
+        player.giveItem(item,loot[item]);
+        //player.addFlyingTxt('Got '+loot[item]+' ',GameServer.itemsData[item].name);
+    }
+    GameServer.removeEntity(animal);
 };
 
 GameServer.handleBattle = function(player,animal){
@@ -679,10 +675,12 @@ GameServer.updateSpawnZones = function(){
     });
 };
 
-GameServer.handleScreenshot = function(data){
-    console.log(data);
+GameServer.handleScreenshot = function(data,socketID){
+    var player = GameServer.getPlayer(socketID);
+    data.player = player.trim();
     GameServer.server.db.collection('screenshots').insertOne(data,function(err){
         if(err) throw err;
         console.log('Screenshot saved');
     });
+    player.addMsg('Bug reported! Thanks!');
 };

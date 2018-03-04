@@ -7,20 +7,6 @@ var Animal = new Phaser.Class({
 
     initialize: function Animal() {
         Moving.call(this,0,0);
-        /*if(Engine.animals.hasOwnProperty(data.id)) console.warn('duplicate animal ',data.id,'at',data.x,data.y,'last seen at ',Engine.animals[data.id].tileX,',',Engine.animals[data.id].tileY);
-
-        var animalData = Engine.animalsData[data.type];
-        Moving.call(this,data.x,data.y,animalData.sprite,data.id);
-
-        Engine.animals[this.id] = this;
-        Engine.displayedAnimals.add(this.id);
-
-        this.setFrame(animalData.frame);
-        this.setDisplayOrigin(0);
-        this.dead = false;
-        this.name = animalData.name+' '+this.id;
-        this.walkAnimPrefix = animalData.walkPrefix;
-        this.restingFrames = animalData.restingFrames;*/
     },
 
     setUp: function(data){

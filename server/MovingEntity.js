@@ -16,7 +16,6 @@ MovingEntity.prototype = Object.create(GameObject.prototype);
 MovingEntity.prototype.constructor = MovingEntity;
 
 MovingEntity.prototype.setPath = function(path){
-    //console.log('['+this.constructor.name+' '+this.id+'] moving to path');
     this.setProperty('path',path);
     this.updatePathTick();
     this.moving = true;
@@ -147,6 +146,10 @@ MovingEntity.prototype.inBattleRange = function(x,y){
         y: y
     });
     return dist <= PFUtils.battleRange;
+};
+
+MovingEntity.prototype.addFlyingText = function(txt){
+
 };
 
 module.exports.MovingEntity = MovingEntity;

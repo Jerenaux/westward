@@ -18,10 +18,6 @@ Formulas.computeProdIncrement = function(prod,nb){
     return Math.round((prod/100)*nb);
 };
 
-Formulas.foodProductivityModifier = function(surplus){
-    return surplus*40; // TODO: include dev level
-};
-
 Formulas.commitmentProductivityModifier = function(commitment){
     return 2*commitment;
 };
@@ -39,15 +35,8 @@ Formulas.computePlayerFoodModifier = function(surplus){
     return surplus/2;
 };
 
-Formulas.test = function(dmg,def){
-    //return Math.max(a.getStat('mdmg').getValue() - b.getStat('def').getValue(),0);
-    var dmgRnd = dmg/5;
-    var defRnd = def/5;
-    dmg += Utils.randomInt(dmg-dmgRnd,dmg+dmgRnd);
-    def += Utils.randomInt(def-defRnd,def+defRnd);
-    var dmg = (10*Math.pow(dmg,0.5)) - (5*Math.pow(def,0.5));
-    return Math.ceil(dmg);
+Formulas.computeSettlementFoodModifier = function(surplus){
+    return surplus*40; // TODO: include dev level
 };
-
 
 if (onServer) module.exports.Formulas = Formulas;

@@ -27,7 +27,6 @@ CharacterPanel.prototype.addInterface = function(){
     this.bars.push(classbar);
     y += 15;
 
-    //var civicxp = Engine.player.civicxp; //Utils.randomInt(0,101);
     var txts = this.addPolyText(x,y,["Level ","1"," citizen   -   ","10/100"," Civic XP"],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
     this.civicXPtxt = txts[3];
     y += 30;
@@ -50,7 +49,9 @@ CharacterPanel.prototype.addInterface = function(){
 CharacterPanel.prototype.update = function(){
     this.civicXPtxt.setText(Engine.player.civicxp+'/'+Engine.player.maxcivicxp);
     this.civicbar.setLevel(Engine.player.civicxp,Engine.player.maxcivicxp);
-    //this.foodModifierTxt.setText();
+    var foodModifier = Math.round(Formulas.computePlayerFoodModifier(Engine.player.foodSurplus)*100);
+    this.foodModifierTxt.setFill(foodModifier < 0 ? Utils.colors.red : Utils.colors.white);
+    this.foodModifierTxt.setText(foodModifier+"%");
 };
 
 CharacterPanel.prototype.displayInterface = function(){

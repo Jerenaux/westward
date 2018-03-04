@@ -33,6 +33,7 @@ Engine.preload = function() {
     this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
 
     this.load.image('footsteps', 'assets/sprites/footsteps.png');
+    this.load.image('bug', 'assets/sprites/bug.png');
 
     this.load.image('scroll', 'assets/sprites/scroll.png');
     this.load.image('tome', 'assets/sprites/tome.png');
@@ -199,7 +200,6 @@ Engine.createMarker = function(){
 Engine.initWorld = function(data){
     console.log(data);
     Engine.addHero(data);
-    console.log(Engine.player);
     Engine.makeUI();
     Engine.createAnimations();
     Engine.playerIsInitialized = true;
@@ -294,6 +294,20 @@ Engine.makeBuildingTitle = function(){
 Engine.makeUI = function(){
     Engine.UIHolder = new UIHolder(1000,500,'right');
     Engine.UIHolder.resize(115);
+
+    var bug = Engine.scene.add.image(Engine.getGameConfig().width-10,10,'bug');
+    bug.setOrigin(1,0);
+    bug.setScrollFactor(0);
+    bug.setInteractive();
+    bug.setDepth(Engine.UIDepth+10);
+    bug.handleClick = Engine.snap;
+    bug.handleOver = function(){
+        Engine.tooltip.updateInfo('Snap a pic of a bug');
+        Engine.tooltip.display();
+    };
+    bug.handleOut = function(){
+        Engine.tooltip.hide();
+    };
 
     Engine.makeBuildingTitle();
 
@@ -870,7 +884,6 @@ Engine.computePath = function(position){
     if(PFUtils.checkCollision(x,y)) return;
     var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, x, y, Engine.PFgrid);
     PF.reset();
-    //if(path.length == 0) return;
     if(path.length == 0 || path.length > PFUtils.maxPathLength) {
         Engine.handleMsg('It\'s too far!');
         return;
@@ -996,6 +1009,11 @@ Engine.updateSelf = function(data){
             Engine.handleMsg(data.msgs[i]);
         }
     }
+    if(data.foodSurplus){
+        Engine.player.foodSurplus = data.foodSurplus;
+        updateEvents.add('character');
+        updateEvents.add('productivity');
+    }
     if(data.dead !== undefined){
         if(data.dead == true) Engine.manageDeath();
         if(data.dead == false) Engine.manageRespawn();
@@ -1031,12 +1049,13 @@ Engine.updateInventory = function(inventory,items){
 
 Engine.updateMenus = function(category){
     var callbackMap = {
-        'stats': 'onUpdateStats',
-        'equip': 'onUpdateEquipment',
-        'inv': 'onUpdateInventory',
-        'gold': 'onUpdateGold',
+        'character': 'onUpdateCharacter',
         'commit': 'onUpdateCommit',
-        'character': 'onUpdateCharacter'
+        'equip': 'onUpdateEquipment',
+        'gold': 'onUpdateGold',
+        'inv': 'onUpdateInventory',
+        'productivity':'onUpdateProductivity',
+        'stats': 'onUpdateStats'
     };
 
     var event = callbackMap[category];
@@ -1044,18 +1063,11 @@ Engine.updateMenus = function(category){
 };
 
 Engine.handleMsg = function(msg){
-    /*switch(msg){
-        case 'nobuild':
-            Engine.buildError();
-            break;
-        case 'okbuild':
-            Engine.buildSuccess();
-    }*/
     Engine.player.talk(msg);
 };
 
 Engine.update = function(){
-    //if(Engine.tooltip) console.log(Engine.tooltip.hasContent,Engine.tooltip.displayed);
+
 };
 
 // Processes the global update packages received from the server
@@ -1099,7 +1111,7 @@ Engine.removeElements = function(arr,callback){
 
 Engine.handleBattleUpdates = function(entity, data){
     if(data.inFight !== undefined) entity.inFight = data.inFight;
-    if(data.meleeHit !== undefined) Engine.handleBattleAnimation('melee',entity,data.meleeHit);
+    if(data.hit !== undefined) Engine.handleBattleAnimation('melee',entity,data.hit);
     if(data.rangedMiss !== undefined) Engine.handleMissAnimation(entity);
 };
 
@@ -1238,7 +1250,7 @@ Engine.exitBuilding = function(){
 
 Engine.processAnimalClick = function(target){
     if(target.dead){
-        Engine.player.setDestinationAction(2,this.id); // 2 for animal
+        Engine.player.setDestinationAction(2,target.id); // 2 for animal
         Engine.computePath({x:target.tileX,y:target.tileY});
     }else{
         Client.animalClick(target.id);
@@ -1385,6 +1397,6 @@ Engine.leaveBuilding = function(){
 
 Engine.snap = function(){
     game.renderer.snapshot(function(img){
-        console.log(img.src);
+        Client.sendScreenshot(img.src);
     });
 };
