@@ -5,9 +5,38 @@ var Animal = new Phaser.Class({
 
     Extends: Moving,
 
-    initialize: function Animal (data) { // x, y, type, id
+    initialize: function Animal() {
+        Moving.call(this,0,0);
+        /*if(Engine.animals.hasOwnProperty(data.id)) console.warn('duplicate animal ',data.id,'at',data.x,data.y,'last seen at ',Engine.animals[data.id].tileX,',',Engine.animals[data.id].tileY);
+
         var animalData = Engine.animalsData[data.type];
         Moving.call(this,data.x,data.y,animalData.sprite,data.id);
+
+        Engine.animals[this.id] = this;
+        Engine.displayedAnimals.add(this.id);
+
+        this.setFrame(animalData.frame);
+        this.setDisplayOrigin(0);
+        this.dead = false;
+        this.name = animalData.name+' '+this.id;
+        this.walkAnimPrefix = animalData.walkPrefix;
+        this.restingFrames = animalData.restingFrames;*/
+    },
+
+    setUp: function(data){
+        if(Engine.animals.hasOwnProperty(data.id)){
+            console.warn('duplicate animal ',data.id,'at',data.x,data.y,'last seen at ',
+                Engine.animals[data.id].tileX,',',Engine.animals[data.id].tileY);
+        }
+
+        var animalData = Engine.animalsData[data.type];
+        this.id = data.id;
+
+        Engine.animals[this.id] = this;
+        Engine.displayedAnimals.add(this.id);
+
+        this.setPosition(data.x,data.y);
+        this.setTexture(animalData.sprite);
         this.setFrame(animalData.frame);
         this.setDisplayOrigin(0);
         this.dead = false;
@@ -23,6 +52,12 @@ var Animal = new Phaser.Class({
         if(data.dead) this.die();
     },
 
+    remove: function(){
+        Engine.displayedAnimals.delete(this.id);
+        delete Engine.animals[this.id];
+        this.destroy();
+    },
+
     die: function(){
         this.setFrame(49);
         this.dead = true;
@@ -31,9 +66,8 @@ var Animal = new Phaser.Class({
     // ### INPUT ###
 
     handleClick: function(){
-        // TODO: replace request logic
-        if(Engine.dead) return;
         if(BattleManager.inBattle){
+            if(Engine.dead) return;
             BattleManager.processAnimalClick(this);
         }else{
             Engine.processAnimalClick(this);

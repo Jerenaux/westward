@@ -5,23 +5,13 @@ var Moving = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function Moving (x, y, texture, id) {
+    initialize: function Moving (x, y){// texture, id) {
         // Using call(), the called method will be executed while having 'this' pointing to the first argumentof call()
-        CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, texture);
+        //CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, texture);
+        CustomSprite.call(this, 0,0);
 
-        this.id = id;
-        this.chunk = Utils.tileToAOI({x:x,y:y});
-        this.tileX = x;
-        this.tileY = y;
-        this.updateDepth();
-        this.previousPosition = {
-            x : x*Engine.tileWidth,
-            y : y*Engine.tileHeight
-        };
-        this.previousTile = {
-            x: this.tileX,
-            y: this.tileY
-        };
+        //this.id = id;
+
         this.orientation = 'down';
         this.previousOrientation = this.orientation;
         this.movement = null;
@@ -29,12 +19,32 @@ var Moving = new Phaser.Class({
         this.setInteractive();
     },
 
-    getShortID: function(){
-        return this.constructor.name[0]+this.id;
+    setPosition: function(x,y){
+        Phaser.GameObjects.Components.Transform.setPosition.call(this,x*Engine.tileWidth,y*Engine.tileHeight);
+        this.chunk = Utils.tileToAOI({x:x,y:y});
+        this.tileX = x;
+        this.tileY = y;
+        this.updateDepth();
+        this.updatePreviousPosition(x,y);
     },
 
     updateDepth: function(){
         this.setDepth(Engine.playersDepth + this.tileY / 1000);
+    },
+
+    updatePreviousPosition: function(tileX,tileY){
+        this.previousPosition = {
+            x : this.x,
+            y : this.y
+        };
+        this.previousTile = {
+            x: tileX,
+            y: tileY
+        };
+    },
+
+    getShortID: function(){
+        return this.constructor.name[0]+this.id;
     },
 
     move: function(path){

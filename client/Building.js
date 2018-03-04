@@ -8,7 +8,7 @@ var Building = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function Building (data){ //id, x, y, type, settlement, built
+    initialize: function Building (data){
         var buildingData = Engine.buildingsData[data.type];
         var sprite = (data.built ? buildingData.sprite : Engine.buildingsData[FOUNDATIONS_ID].sprite);
         CustomSprite.call(this, data.x*Engine.tileWidth, data.y*Engine.tileHeight, sprite);
@@ -16,6 +16,10 @@ var Building = new Phaser.Class({
         this.tileX = data.x;
         this.tileY = data.y;
         this.id = data.id;
+
+        Engine.buildings[this.id] = this;
+        Engine.displayedBuildings.add(this.id);
+
         this.buildingType = data.type;
         this.settlement = data.sid;
         this.inventory = new Inventory(100);

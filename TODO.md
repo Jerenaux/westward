@@ -16,7 +16,9 @@ Prototype level:
 
 Then:
 - Make Westward page
-- Have 2 settlements, with important differences 
+- Trailer
+- Have 2 settlements, with important differences
+- Several very different buildings 
 - World map-based settlement selection menu (mention key aspects, display enemy civ threats)
 - Class selection menu (describe impact on settlements)
 - Help buttons *everywhere*
@@ -34,7 +36,8 @@ Fort: dev lvl progress bar glitch
 Construction: notification of civic xp gain
 Economic loop: test all updates of all menus 
 Econmic loop: skin dead animals
-Net: ghost animals when transitioning aoi?
+Economic loop: harvest herbs
+Net: ghost animals when transitioning aoi? + removal of non-existing ones
 UI: test tooltip of items (after having added hpmax)
 UI: display event pop-ups after skinning
 UI: dont tween progress bars when opening menu
@@ -65,7 +68,10 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
-- Entity manager where you declare entities, which sets up the corresponding factory and data structures (list, map, displaylist...) 
+- Setters/getters everywhere
+- Clean orientation code based on tweens, not previous pos?
+- Streamline getNext/recycle stuff
+- Hero class, StatsManager, EquipmentManager (NetworkManager?)
 - Clean up Building.update() and updateSelf()
 - Centralize all texts
 - Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
@@ -195,6 +201,7 @@ Content:
 -------
 * Cheat-proof everything 
 * Battle system
+- Fighters queue indicating participants and upcoming turns
 - Battle experience
 - Identify characters in the way of ranged attacks
 - Anti-friendly fire safety for ranged attacks
@@ -264,6 +271,7 @@ Content:
 - Give items/money
 * Settlement defense
 * Settlement economy
+- Fixed building spots; number increases with dev level
 * Skills menu
 * Trade
 - Enable bonuses of merchants

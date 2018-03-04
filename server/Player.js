@@ -441,13 +441,16 @@ Player.prototype.onEndOfPath = function(){
     if(this.inFight) return;
     if(!this.action) return;
     if(this.action.type == 1) this.enterBuilding(this.action.id);
+    if(this.action.type == 2) GameServer.skinAnimal(this,this.action.id);
 };
 
 Player.prototype.enterBuilding = function(id){
+    // TODO: check for proximity
     this.setProperty('inBuilding', id);
 };
 
 Player.prototype.exitBuilding = function(){
+    // TODO: check if ok
     this.setProperty('inBuilding', -1);
 };
 

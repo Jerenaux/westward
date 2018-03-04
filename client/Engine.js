@@ -198,7 +198,8 @@ Engine.createMarker = function(){
 
 Engine.initWorld = function(data){
     console.log(data);
-    Engine.addHero(data); //player.id,player.x,player.y,player.settlement,player.commitSlots
+    Engine.addHero(data);
+    console.log(Engine.player);
     Engine.makeUI();
     Engine.createAnimations();
     Engine.playerIsInitialized = true;
@@ -1113,24 +1114,19 @@ Engine.checkForBuildingMenuUpdate= function(id,event){
 };
 
 Engine.addPlayer = function(data){
-    var sprite = new Player(data);
-    Engine.players[sprite.id] = sprite;
-    Engine.displayedPlayers.add(sprite.id);
+    var sprite = new Player();
+    sprite.setUp(data);
     return sprite;
 };
 
 Engine.addBuilding = function(data){
     var building = new Building(data);
-    Engine.buildings[building.id] = building;
-    Engine.displayedBuildings.add(building.id);
     return building;
 };
 
 Engine.addAnimal = function(data){
-    if(Engine.animals.hasOwnProperty(data.id)) console.warn('duplicate animal ',data.id,'at',data.x,data.y,'last seen at ',Engine.animals[data.id].tileX,',',Engine.animals[data.id].tileY);
-    var animal = new Animal(data);
-    Engine.animals[animal.id] = animal;
-    Engine.displayedAnimals.add(animal.id);
+    var animal = new Animal();
+    animal.setUp(data);
     return animal;
 };
 
@@ -1161,19 +1157,16 @@ Engine.removeBuilding = function(id){
 
 Engine.removePlayer = function(id){
     // TODO: use pools
-    var sprite = Engine.players[id];
-    sprite.destroy();
-    Engine.displayedPlayers.delete(id);
-    delete Engine.players[id];
+    Engine.players[id].remove();
 };
 
 Engine.removeAnimal = function(id){
     // TODO: use pools
-    if(!Engine.animals.hasOwnProperty(id)) return;
-    var sprite = Engine.animals[id];
-    sprite.destroy();
-    Engine.displayedAnimals.delete(id);
-    delete Engine.animals[id];
+    if(!Engine.animals.hasOwnProperty(id)) {
+        console.warn('Attempt to remove non-existing animal');
+        return;
+    }
+    Engine.animals[id].remove();
 };
 
 Engine.getTilesetFromTile = function(tile){
@@ -1244,7 +1237,12 @@ Engine.exitBuilding = function(){
 };
 
 Engine.processAnimalClick = function(target){
-    Client.animalClick(target.id);
+    if(target.dead){
+        Engine.player.setDestinationAction(2,this.id); // 2 for animal
+        Engine.computePath({x:target.tileX,y:target.tileY});
+    }else{
+        Client.animalClick(target.id);
+    }
 };
 
 Engine.requestBattleAttack = function(target){
@@ -1296,7 +1294,6 @@ Engine.getNextCell = function(){
 
 Engine.getNextPrint = function(){
     if(Engine.availablePrints.length > 0) return Engine.availablePrints.shift();
-    console.log('creating footprint');
     return Engine.scene.add.image(0,0,'footsteps');
 };
 
@@ -1320,7 +1317,6 @@ Engine.updateGrid = function(){
         Engine.battleCells[id].update();
     });
 };
-
 
 // ## UI-related functions ##
 // this functions need to have a this bound to them

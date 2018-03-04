@@ -5,16 +5,19 @@ var Player = new Phaser.Class({
 
     Extends: Moving,
 
-    initialize: function Player (data) { // x, y, texture, id
+    initialize: function Player () {
         // Using call(), the called method will be executed while having 'this' pointing to the first argumentof call()
-        Moving.call(this,data.x,data.y,'hero',data.id);
+        //Moving.call(this,data.x,data.y,'hero',data.id);
+        Moving.call(this,0,0);
+
+        this.setTexture('hero');
         this.setFrame(33);
-        this.displayOriginX = 16;
-        this.name = 'Player '+this.id;
+        this.setOrigin(0.4,0.9);
         this.firstUpdate = true;
 
         this.bubbleOffsetX = 55;
         this.bubbleOffsetY = 75;
+        // TODO: use pool of bubbles
         this.bubble = new Bubble(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
         this.walkAnimPrefix = 'player';
 
@@ -26,6 +29,15 @@ var Player = new Phaser.Class({
         };
 
         this.destinationAction = null;
+    },
+
+    setUp: function(data){
+        this.id = data.id;
+        Engine.players[this.id] = this;
+        Engine.displayedPlayers.add(this.id);
+
+        this.name = 'Player '+this.id;
+        this.setPosition(data.x,data.y);
     },
 
     update: function(data){
@@ -45,6 +57,12 @@ var Player = new Phaser.Class({
         if(!this.isHero && data.chat) this.talk(data.chat);
         if(data.x >= 0 && data.y >= 0) this.teleport(data.x,data.y);
         this.firstUpdate = false;
+    },
+
+    remove: function(){
+        Engine.displayedPlayers.delete(this.id);
+        delete Engine.players[this.id];
+        this.destroy();
     },
 
     move: function(path){

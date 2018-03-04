@@ -282,11 +282,15 @@ GameServer.findPath = function(from,to,grid){
 GameServer.handleAnimalClick = function(animalID,socketID){
     var player = GameServer.getPlayer(socketID);
     var animal = GameServer.animals[animalID];
-    if(animal.isDead()){
-        console.log('skinning');
-    }else if(!animal.isInFight()){
-        GameServer.handleBattle(player,animal);
-    }
+    if(!animal.isDead() && !animal.isInFight()) GameServer.handleBattle(player,animal);
+};
+
+GameServer.skinAnimal = function(player,animalID){
+    if(!GameServer.animals.hasOwnProperty(animalID)) return;
+    var animal = GameServer.animals[animalID];
+    // TODO: check for proximity
+    if(!animal.isDead()) return;
+    console.log('skinning');
 };
 
 GameServer.handleBattle = function(player,animal){
