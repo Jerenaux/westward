@@ -37,7 +37,6 @@ ProductivityPanel.prototype.update = function(){
     this.commitmentText.setText('+'+commitModifier+'%');
     this.commitmentText.setFill(commitModifier > 0 ? Utils.colors.green : Utils.colors.white);
 
-    console.log('surplus',Engine.player.foodSurplus);
     var foodModifier = Math.round(Formulas.computeSettlementFoodModifier(Engine.player.foodSurplus));
 
     this.foodText.setFill(foodModifier >= 0 ? Utils.colors.green : Utils.colors.red);

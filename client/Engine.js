@@ -95,6 +95,30 @@ Engine.preload = function() {
     //console.log('Loading '+i+' tileset'+(i > 1 ? 's' : ''));
 };
 
+Engine.entityManager = {
+    entities: [],
+    constructors: {},
+    maps: {},
+    pools: {},
+    displayLists: {},
+
+    registerEntityType: function(key,constructor,map){
+        Engine.entityManager.entities.push(key);
+        Engine.entityManager.constructors[key] = constructor;
+        Engine.entityManager.maps[key] = map;
+        Engine.entityManager.pools[key] = [];
+        Engine.entityManager.displayLists[key] = new Set();
+    },
+
+    addToDisplayList: function(entity){
+        Engine.entityManager.displayLists[entity.entityType].add(entity.id);
+    },
+
+    removeFromDisplayList: function(entity){
+        Engine.entityManager.displayLists[entity.entityType].delete(entity.id);
+    }
+};
+
 Engine.create = function(){
     var masterData = Boot.masterData;
     World.readMasterData(masterData);
@@ -110,21 +134,21 @@ Engine.create = function(){
     Engine.displayedChunks = [];
     Engine.mapDataCache = {};
 
-    Engine.availableGridCells = [];
-    Engine.availablePrints = [];
-    Engine.availableAnimSprites = [];
-    Engine.availableHP = [];
+    Engine.gridCellsPool = [];
+    Engine.printsPool = [];
+    Engine.animSpritesPool = [];
+    Engine.HPpool = [];
 
     Engine.players = {}; // player.id -> player object
     Engine.animals = {}; // animal.id -> building object
     Engine.buildings = {}; // building.id -> building object
-    Engine.battles = {};
-    Engine.battleCells = {};
-    Engine.displayedPlayers = new Set();
-    Engine.displayedBuildings = new Set();
-    Engine.displayedAnimals = new Set();
-    Engine.displayedCells = new Set();
+    Engine.battleCells = {}; // cell.id -> cell object
     Engine.battleCellsMap = new SpaceMap();
+    Engine.entityManager.registerEntityType('player',Player,Engine.players);
+    Engine.entityManager.registerEntityType('animal',Animal,Engine.animals);
+    Engine.entityManager.registerEntityType('building',Building,Engine.buildings);
+    Engine.entityManager.registerEntityType('cell',BattleTile,Engine.battleCells);
+    // TODO:  use in pools
 
     Engine.debug = true;
     Engine.showHero = true;
@@ -141,7 +165,6 @@ Engine.create = function(){
     Engine.settlementsData = Engine.scene.cache.json.get('settlements');
 
     Engine.createMarker();
-    //Engine.getGameInstance().canvas.style.cursor = Engine.cursor;
     Engine.setCursor();
 
     Engine.dragging = false;
@@ -399,7 +422,7 @@ Engine.makeBattleUI = function(){
 };
 
 Engine.getNextHP = function(){
-    if(Engine.availableHP.length > 0) return Engine.availableHP.shift();
+    if(Engine.HPpool.length > 0) return Engine.HPpool.shift();
 
     var text = Engine.scene.add.text(0,0, '0',  { font: '20px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     text.setVisible(false);
@@ -408,7 +431,7 @@ Engine.getNextHP = function(){
 };
 
 Engine.recycleHP = function(text){
-    Engine.availableHP.push(text);
+    Engine.HPpool.push(text);
 };
 
 Engine.handleBattleAnimation = function(animation,target,dmg){
@@ -758,20 +781,24 @@ Engine.updateDisplayedEntities = function(){
     // Whenever the player moves to a different AOI, for each player displayed in the game, check if it will still be
     // visible from the new AOI; if not, remove it
     if(!Engine.created) return;
-    var adjacent = Utils.listAdjacentAOIs(Engine.player.chunk);
-    Engine.updateDisplay(Engine.displayedPlayers,Engine.players,adjacent,Engine.removePlayer);
-    Engine.updateDisplay(Engine.displayedBuildings,Engine.buildings,adjacent,Engine.removeBuilding);
-    Engine.updateDisplay(Engine.displayedAnimals,Engine.animals,adjacent,Engine.removeAnimal);
-    Engine.updateDisplay(Engine.displayedCells,Engine.battleCells,adjacent,Engine.removeBattleCell);
+    var adjacentChunks = Utils.listAdjacentAOIs(Engine.player.chunk);
+
+    Engine.entityManager.entities.forEach(function(entityType){
+        Engine.updateDisplay(
+            Engine.entityManager.displayLists[entityType],
+            Engine.entityManager.maps[entityType],
+            adjacentChunks
+        );
+    });
 };
 
 // Check if the entities of some list are in a neighboring chunk or not
-Engine.updateDisplay = function(list,map,adjacent,removalCallback){
+Engine.updateDisplay = function(list,map,adjacent){
     list.forEach(function(id){
-        var p = map[id];
-        if(p.chunk === undefined) console.log('WARNING: no chunk defined for ',p);
+        var element = map[id];
+        if(element.chunk === undefined) console.warn('No chunk defined for ',element);
         // check if the AOI of entity p is in the list of the AOI's adjacent to the main player
-        if(p) if(adjacent.indexOf(p.chunk) == -1) removalCallback(p.id);
+        if(element) if(adjacent.indexOf(element.chunk) == -1) element.remove();
     });
 };
 
@@ -1072,14 +1099,10 @@ Engine.update = function(){
 
 // Processes the global update packages received from the server
 Engine.updateWorld = function(data){  // data is the update package from the server
-    if(data.newplayers) Engine.createElements(data.newplayers,Engine.addPlayer);
-    if(data.newbuildings) Engine.createElements(data.newbuildings,Engine.addBuilding);
-    if(data.newanimals) Engine.createElements(data.newanimals,Engine.addAnimal);
-    if(data.newcells) Engine.createElements(data.newcells,Engine.addBattleCell);
-
-    if(data.removedplayers) Engine.removeElements(data.removedplayers,Engine.removePlayer);
-    if(data.removedanimals) Engine.removeElements(data.removedanimals,Engine.removeAnimal);
-    if(data.removedcells) Engine.removeElements(data.removedcells,Engine.removeBattleCell);
+    if(data.newplayers) Engine.createElements(data.newplayers,'player');
+    if(data.newbuildings) Engine.createElements(data.newbuildings,'building');
+    if(data.newanimals) Engine.createElements(data.newanimals,'animal');
+    if(data.newcells) Engine.createElements(data.newcells,'cell');
 
     // data.players is an associative array mapping the id's of the entities
     // to small object indicating which properties need to be updated. The following code iterate over
@@ -1087,25 +1110,39 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.players) Engine.updateElements(data.players,Engine.players);
     if(data.animals) Engine.updateElements(data.animals,Engine.animals);
     if(data.buildings) Engine.updateElements(data.buildings,Engine.buildings);
+
+    if(data.removedplayers) Engine.removeElements(data.removedplayers,Engine.players);
+    if(data.removedanimals) Engine.removeElements(data.removedanimals,Engine.animals);
+    if(data.removedcells) Engine.removeElements(data.removedcells,Engine.battleCells);
 };
 
 // TODO: replace callbacks by systematic owned methids
-Engine.createElements = function(arr,creationCallback){
-    arr.forEach(function(e){
-        creationCallback(e).update(e);
+Engine.createElements = function(arr,entityType){
+    arr.forEach(function(data){
+        var e = new Engine.entityManager.constructors[entityType]();
+        e.setUp(data);
+        e.update(data);
     });
 };
 
 // For each element in obj, call update()
 Engine.updateElements = function(obj,table){
     Object.keys(obj).forEach(function (key) {
-        if(table[key]) table[key].update(obj[key]);
+        if(!table.hasOwnProperty(key)) {
+            console.warn('Attempt to update non-existing element');
+            return;
+        }
+        table[key].update(obj[key]);
     });
 };
 
-Engine.removeElements = function(arr,callback){
-    arr.forEach(function(e){
-        callback(e);
+Engine.removeElements = function(arr,table){
+    arr.forEach(function(id){
+        if(!table.hasOwnProperty(id)) {
+            console.warn('Attempt to remove non-existing element');
+            return;
+        }
+        table[id].remove();
     });
 };
 
@@ -1133,6 +1170,7 @@ Engine.addPlayer = function(data){
 
 Engine.addBuilding = function(data){
     var building = new Building(data);
+    building.setUp(data);
     return building;
 };
 
@@ -1144,41 +1182,8 @@ Engine.addAnimal = function(data){
 
 Engine.addBattleCell = function(data){
     var cell = Engine.getNextCell();
-    cell.setUp(data.x,data.y);
-    Engine.battleCells[data.id] = cell;
-    Engine.battleCellsMap.add(cell.tx,cell.ty,cell);
-    Engine.displayedCells.add(data.id);
+    cell.setUp(data.id,data.x,data.y);
     return cell;
-};
-
-Engine.removeBattleCell = function(id){
-    var cell = Engine.battleCells[id];
-    Engine.displayedCells.delete(id);
-    Engine.battleCellsMap.delete(cell.tx,cell.ty);
-    delete Engine.battleCells[id];
-    cell.setVisible(false);
-    Engine.availableGridCells.push(cell);
-};
-
-Engine.removeBuilding = function(id){
-    var sprite = Engine.buildings[id];
-    sprite.destroy();
-    Engine.displayedBuildings.delete(id);
-    delete Engine.buildings[id];
-};
-
-Engine.removePlayer = function(id){
-    // TODO: use pools
-    Engine.players[id].remove();
-};
-
-Engine.removeAnimal = function(id){
-    // TODO: use pools
-    if(!Engine.animals.hasOwnProperty(id)) {
-        console.warn('Attempt to remove non-existing animal');
-        return;
-    }
-    Engine.animals[id].remove();
 };
 
 Engine.getTilesetFromTile = function(tile){
@@ -1300,32 +1305,32 @@ Engine.isBattleCell = function(x,y){
 };
 
 Engine.getNextCell = function(){
-    if(Engine.availableGridCells.length > 0) return Engine.availableGridCells.shift();
+    if(Engine.gridCellsPool.length > 0) return Engine.gridCellsPool.shift();
     return new BattleTile();
 };
 
 Engine.getNextPrint = function(){
-    if(Engine.availablePrints.length > 0) return Engine.availablePrints.shift();
+    if(Engine.printsPool.length > 0) return Engine.printsPool.shift();
     return Engine.scene.add.image(0,0,'footsteps');
 };
 
 Engine.getNextAnim = function(){
-    if(Engine.availableAnimSprites.length > 0) return Engine.availableAnimSprites.shift();
+    if(Engine.animSpritesPool.length > 0) return Engine.animSpritesPool.shift();
     var sprite = Engine.scene.add.sprite(0,0,'sword_anim',0);
     sprite.setVisible(false);
     return sprite;
 };
 
 Engine.recycleAnim = function(sprite){
-    Engine.availableAnimSprites.push(sprite);
+    Engine.animSpritesPool.push(sprite);
 };
 
 Engine.recyclePrint = function(print){
-    Engine.availablePrints.push(print);
+    Engine.printsPool.push(print);
 };
 
 Engine.updateGrid = function(){
-    Engine.displayedCells.forEach(function(id){
+    Engine.entityManager.displayLists['cell'].forEach(function(id){
         Engine.battleCells[id].update();
     });
 };

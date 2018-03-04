@@ -13,6 +13,7 @@ var BattleTile = new Phaser.Class({
         x = x || 0;
         y = y || 0;
         CustomSprite.call(this, x, y, '3grid',0);
+        this.entityType = 'cell';
         
         this.setDepth(Engine.markerDepth);
         this.setDisplayOrigin(0,0);
@@ -23,13 +24,18 @@ var BattleTile = new Phaser.Class({
         this.active = false;
     },
 
-    setUp: function(x,y){
-        this.setPosition(x*32,y*32);
-        this.chunk = Utils.tileToAOI({x:x,y:y});
-        this.tx = x;
-        this.ty = y;
+    setUp: function(data){
+        this.id = data.id;
+        this.setPosition(data.x*32,data.y*32);
+        this.tx = data.x;
+        this.ty = data.y;
+        this.chunk = Utils.tileToAOI({x:this.tx,y:this.ty});
         this.setVisible(true);
         this.update();
+
+        Engine.battleCells[this.id] = this;
+        Engine.battleCellsMap.add(this.tx,this.ty,this);
+        Engine.entityManager.addToDisplayList(this);
     },
 
     update: function(){
@@ -68,6 +74,15 @@ var BattleTile = new Phaser.Class({
         this.active = false;
         this.update();
         this.setAlpha(0.5);
+    },
+
+    remove: function(){
+        this.setVisible(false);
+        //Engine.displayedCells.delete(this.id);
+        Engine.entityManager.removeFromDisplayList(this);
+        Engine.battleCellsMap.delete(this.tx,this.ty);
+        delete Engine.battleCells[this.id];
+        Engine.gridCellsPool.push(this);
     },
 
     handleOver: function(){

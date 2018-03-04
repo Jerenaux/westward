@@ -7,6 +7,7 @@ var Animal = new Phaser.Class({
 
     initialize: function Animal() {
         Moving.call(this,0,0);
+        this.entityType = 'animal';
     },
 
     setUp: function(data){
@@ -19,7 +20,8 @@ var Animal = new Phaser.Class({
         this.id = data.id;
 
         Engine.animals[this.id] = this;
-        Engine.displayedAnimals.add(this.id);
+        //Engine.displayedAnimals.add(this.id);
+        Engine.entityManager.addToDisplayList(this);
 
         this.setPosition(data.x,data.y);
         this.setTexture(animalData.sprite);
@@ -39,7 +41,8 @@ var Animal = new Phaser.Class({
     },
 
     remove: function(){
-        Engine.displayedAnimals.delete(this.id);
+        //Engine.displayedAnimals.delete(this.id);
+        Engine.entityManager.removeFromDisplayList(this);
         delete Engine.animals[this.id];
         this.destroy();
     },

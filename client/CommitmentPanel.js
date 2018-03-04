@@ -17,9 +17,6 @@ CommitmentPanel.prototype.addInterface = function(){
     this.nbText = txts[0];
 };
 
-/*CommitmentPanel.prototype.displayInterface = function(){
-    this.update();
-};*/
 
 CommitmentPanel.prototype.update = function(){
     this.hideLongSlots();
@@ -27,7 +24,7 @@ CommitmentPanel.prototype.update = function(){
     var yoffset = 40;
     var nb = Engine.player.commitSlots.max;
     var slots = Engine.getCommitSlots();
-    console.log(slots);
+
     for(var i = 0; i < nb; i++){
         var slot = this.getNextLongSlot(100);
         slot.setUp(this.x+15,this.y + yoffset + i*50);
@@ -38,7 +35,6 @@ CommitmentPanel.prototype.update = function(){
             if(icon) slot.addIcon('aok',icon);
             slot.addText(43,2,buildingTypeData.name);
         }else{
-            console.log('clearing');
             slot.clear();
         }
 
@@ -57,7 +53,6 @@ CommitmentPanel.prototype.hideInterface = function(){
 CommitmentPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
     this.displayTexts();
-    //this.displayInterface();
 };
 
 CommitmentPanel.prototype.hide = function(){

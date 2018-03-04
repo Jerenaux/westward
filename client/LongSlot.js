@@ -119,14 +119,17 @@ LongSlot.prototype.clear = function(){
     this.hideTexts();
     this.textCounter = 0;
     if(this.bar) this.bar.hide();
-    if(this.icon) this.icon.setVisible(false);
+    if(this.icon) {
+        this.icon.setVisible(false);
+        this.icon = null;
+    }
     if(this.pin) this.pin.setVisible(false);
 };
 
 LongSlot.prototype.hideTexts = function(){
     this.texts.forEach(function(t){
         t.setVisible(false);
-    })
+    });
 };
 
 LongSlot.prototype.hide = function(){
@@ -134,5 +137,6 @@ LongSlot.prototype.hide = function(){
         s.setVisible(false);
     });
     this.clear();
+    this.texts = [];
     this.zone.setVisible(false);
 };

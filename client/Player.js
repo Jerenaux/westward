@@ -7,8 +7,9 @@ var Player = new Phaser.Class({
 
     initialize: function Player () {
         // Using call(), the called method will be executed while having 'this' pointing to the first argumentof call()
-        //Moving.call(this,data.x,data.y,'hero',data.id);
         Moving.call(this,0,0);
+
+        this.entityType = 'player';
 
         this.setTexture('hero');
         this.setFrame(33);
@@ -17,8 +18,7 @@ var Player = new Phaser.Class({
 
         this.bubbleOffsetX = 55;
         this.bubbleOffsetY = 75;
-        // TODO: use pool of bubbles
-        this.bubble = new Bubble(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
+
         this.walkAnimPrefix = 'player';
 
         this.restingFrames = {
@@ -34,10 +34,16 @@ var Player = new Phaser.Class({
     setUp: function(data){
         this.id = data.id;
         Engine.players[this.id] = this;
-        Engine.displayedPlayers.add(this.id);
+        //Engine.displayedPlayers.add(this.id);
+        Engine.entityManager.addToDisplayList(this);
 
         this.name = 'Player '+this.id;
         this.setPosition(data.x,data.y);
+        // TODO: use pool of bubbles
+        this.bubble = new Bubble(
+            (data.x*Engine.tileWidth)-this.bubbleOffsetX,
+            (data.y*Engine.tileHeight)-this.bubbleOffsetY
+        );
     },
 
     update: function(data){
@@ -60,7 +66,8 @@ var Player = new Phaser.Class({
     },
 
     remove: function(){
-        Engine.displayedPlayers.delete(this.id);
+        //Engine.displayedPlayers.delete(this.id);
+        Engine.entityManager.removeFromDisplayList(this);
         delete Engine.players[this.id];
         this.destroy();
     },
@@ -109,8 +116,7 @@ var Player = new Phaser.Class({
         this.destinationAction = {
             type: type,
             id: id
-        }
-        console.log('action set to',this.destinationAction);
+        };
     },
 
     // ### GETTERS ####

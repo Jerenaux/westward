@@ -233,7 +233,7 @@ GameServer.removeEntity = function(entity){
     AOIs.forEach(function(aoi){
         GameServer.removeObjectFromAOI(aoi,entity);
     });
-    entity.remove();
+    if(entity.remove) entity.remove();
 };
 
 GameServer.getAOIAt = function(x,y){

@@ -15,7 +15,6 @@ Prototype level:
 - Profiles: new vs old player, focused on self vs setllement, x 4 classes
 
 Then:
-- Make Westward page
 - Trailer
 - Have 2 settlements, with important differences
 - Several very different buildings 
@@ -41,8 +40,8 @@ UI: test tooltip of items (after having added hpmax)
 UI: display event pop-ups after skinning
 UI: dont tween progress bars when opening menu
 UI: accessories tooltip glitch
-UI: bubble doesn't show when taking before moving
-Character: upon de-commit, slots are not cleared
+Help: buttons in menus
+Help: buttons in buildings
 Character: display stat modifiers details
 
 Finish:  test economy for a while;
@@ -72,6 +71,7 @@ Order:
 - Streamline getNext/recycle stuff
 - Hero class, StatsManager, EquipmentManager (NetworkManager?)
 - Clean up Building.update() and updateSelf()
+- Use pools for everything (also for speech bubbles)
 - Centralize all texts
 - Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
 - Tie input events to game objects, rather than global functions (use topOnly)
