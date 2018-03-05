@@ -26,7 +26,7 @@ Panel.prototype.updateCapsule = function(name,text){
     this.capsules[name].setText(text);
 };
 
-Panel.prototype.addButton = function(x,y,color,symbol,callback,helpText){
+Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpText){
     x += this.x;
     y += this.y;
     var ring = Engine.scene.add.sprite(x,y,'UI','ring');
@@ -58,7 +58,7 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpText){
     zone.setOrigin(0);
     zone.setVisible(false);
     zone.handleOver = function(){
-        Engine.tooltip.updateInfo(helpText);
+        Engine.tooltip.updateInfo(helpTitle,helpText);
         Engine.tooltip.display();
     };
     zone.handleOut = function(){

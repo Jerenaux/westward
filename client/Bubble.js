@@ -2,10 +2,11 @@
  * Created by Jerome on 19-11-17.
  */
 
-function Bubble(x,y){
+function Bubble(x,y,isNotification){
     this.container = [];
     this.x = x;
     this.y = y;
+    this.isNotificiation = isNotification || false;
     this.makeBubble(x,y);
     this.finalize();
 }
@@ -38,7 +39,7 @@ Bubble.prototype.makeBubble = function(sx,sy){
     this.container.push(Engine.scene.add.sprite(x,y,'bubble',8));
     y += 5;
     x -= 0.25*w;
-    this.container.push(Engine.scene.add.sprite(x,y,'tail'));
+    if(!this.isNotificiation) this.container.push(Engine.scene.add.sprite(x,y,'tail'));
     var textx = startx + 5;
     var texty = starty + 5;
     this.text = Engine.scene.add.text(textx, texty, "Hello world I'm new in Westward",
@@ -70,6 +71,7 @@ Bubble.prototype.finalize = function(){
         e.depth = Engine.bubbleDepth;
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
+        if(this.isNotificiation) e.setScrollFactor(0);
         if(!isText) e.alpha = 0.7;
     }
 };
@@ -85,10 +87,11 @@ Bubble.prototype.resize = function(width,height){
     var dw = this.width - newWidth;
     var dh = this.height - newHeight;
 
+    var last = this.container.length-1;
     var resizeWidthList = [1,4,7];
     var resizeHeightList = [3,4,5];
-    var moveXList = [0,1,3,4,6,7,10];
-    var moveYList = [0,1,2,3,4,5,10];
+    var moveXList = [0,1,3,4,6,7,last];
+    var moveYList = [0,1,2,3,4,5,last];
 
     var _slices = this.container;
     resizeWidthList.forEach(function(i){
@@ -114,9 +117,10 @@ Bubble.prototype.display = function(){
     });
     if(this.timer) clearTimeout(this.timer);
     var _bubble = this;
+    var duration = this.isNotificiation ? Engine.notificationDuration : 5000;
     this.timer = setTimeout(function(){
             _bubble.hide();
-    },5000);
+    },duration);
 };
 
 Bubble.prototype.hide = function(){

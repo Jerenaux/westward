@@ -21,6 +21,8 @@ var Engine = {
     tooltipElementsDepth: 17,
     tooltipTextDepth: 18,
 
+    notificationDuration: 1000,
+
     craftInvSize: 5, // max number of ingredients for crafting
     key: 'main', // key of the scene, for Phaser
     playerIsInitialized: false,
@@ -74,6 +76,7 @@ Engine.preload = function() {
     this.load.json('items', 'assets/data/items.json');
     this.load.json('animals', 'assets/data/animals.json');
     this.load.json('settlements', 'assets/data/settlements.json');
+    this.load.json('texts', 'assets/data/texts.json');
 
     Engine.collidingTiles = []; // list of tile ids that collide (from tilesets.json)
     for(var i = 0, firstgid = 1; i < Boot.tilesets.length; i++){
@@ -163,6 +166,7 @@ Engine.create = function(){
     Engine.animalsData = Engine.scene.cache.json.get('animals');
     Engine.itemsData = Engine.scene.cache.json.get('items');
     Engine.settlementsData = Engine.scene.cache.json.get('settlements');
+    Engine.textsData = Engine.scene.cache.json.get('texts');
 
     Engine.createMarker();
     Engine.setCursor();
@@ -335,6 +339,7 @@ Engine.makeUI = function(){
     Engine.makeBuildingTitle();
 
     var statsPanel = new StatsPanel(665,335,330,145,'Stats');
+    statsPanel.addButton(300, 8, 'blue','help',null,'',Engine.textsData['stats_help']);
 
     Engine.menus = {
         'inventory': Engine.makeInventory(statsPanel),
@@ -704,9 +709,10 @@ Engine.makeInventory = function(statsPanel){
     items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
     items.addCapsule('gold',100,-9,'999','gold');
     // TODO: add click callback too + wrap text
-    items.addButton(570, 8, 'blue','help',null,'Lorem ipsum dolor sit amet consectuetur erat');
+    items.addButton(570, 8, 'blue','help',null,'',Engine.textsData['inventory_help']);
     inventory.addPanel('items',items);
     var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
+    equipment.addButton(300, 8, 'blue','help',null,'',Engine.textsData['equipment_help']);
     inventory.addPanel('equipment',equipment);
     inventory.addPanel('stats',statsPanel);
     inventory.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
@@ -1092,6 +1098,32 @@ Engine.updateMenus = function(category){
 
 Engine.handleMsg = function(msg){
     Engine.player.talk(msg);
+};
+
+Engine.handleNotifications = function(msgs){
+    // TODO: add to localstorage for display in character panel
+    var i = 0;
+    msgs.forEach(function(msg){
+        var notif = new Bubble(0,0,true); // TODO: use pool
+        notif.update(msg);
+        var x = (Engine.getGameConfig().width-notif.width)/2;
+        var y = Engine.getGameConfig().height - notif.height - 30;
+        notif.updatePosition(x,y);
+
+        Engine.scene.tweens.addCounter({
+            from: y,
+            to: y-50,
+            duration: Engine.notificationDuration,
+            delay: i*500,
+            onStart: function(){
+                notif.display();
+            },
+            onUpdate: function(tween){
+                notif.updatePosition(x,tween.getValue());
+            }
+        });
+        i++;
+    });
 };
 
 Engine.update = function(){

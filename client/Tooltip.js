@@ -14,12 +14,20 @@ function Tooltip(){
     this.icons = [];
     this.iconsTexts = [];
     this.displayed = false;
-    this.text = Engine.scene.add.text(this.x+13,this.y+4, '',
-        { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
+    this.titleText = Engine.scene.add.text(this.x+13,this.y+4, '',
+        { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3,
+            wordWrap: {width: 250, useAdvancedWrap: true}
+        }
+    );
+    this.descText = Engine.scene.add.text(this.x+13,0, '',
+        { font: '13px '+Utils.fonts.normal, fill: '#ffffff', stroke: '#000000', strokeThickness: 3,
+            wordWrap: {width: 250, useAdvancedWrap: true}
+        }
     );
     this.makeBody();
     this.makeStatsIcons();
-    this.container.push(this.text);
+    this.container.push(this.titleText);
+    this.container.push(this.descText);
     this.finalize();
 }
 
@@ -71,28 +79,42 @@ Tooltip.prototype.makeStatsIcons = function(){
     }
 };
 
-Tooltip.prototype.updateInfo = function(name, effects){
-    effects = effects || {};
-    if(name) {
-        this.text.setText(name);
-        var nbEffects = Object.keys(effects).length;
-        this.updateSize(nbEffects);
-        var i = 0;
-        for(var stat in Stats.dict) {
-            if (!Stats.dict.hasOwnProperty(stat)) continue;
-            this.icons[i].setVisible((i < nbEffects));
-            this.iconsTexts[i].setVisible((i < nbEffects));
-            if(i < nbEffects){
-                var key = Object.keys(effects)[i];
-                var val = effects[key];
-                var statData = Stats.dict[key];
-                if(val > 0) val = "+"+val;
-                if(statData.suffix) val = val+statData.suffix;
-                this.icons[i].setFrame(statData.frame);
-                this.iconsTexts[i].setText(val);
-            }
-            i++;
+Tooltip.prototype.updateInfo = function(title, text, itemID){
+    if(title) this.titleText.setText(title);
+    text = text || '';
+    var descY = title ? this.y+25 : this.y+4;
+    this.descText.y = descY;
+    this.descText.setText(text);
+    var nbEffects = 0;
+    if(itemID > -1){
+        var effects = Engine.itemsData[itemID].effects || {};
+        nbEffects = Object.keys(effects).length;
+        this.displayStats(effects,nbEffects);
+    }
+    this.updateSize(nbEffects);
+};
+
+Tooltip.prototype.displayStats = function(effects,nbEffects){
+    var i = 0;
+    var descH = this.descText.text ? this.descText.height : 0;
+    for(var stat in Stats.dict) {
+        if (!Stats.dict.hasOwnProperty(stat)) continue;
+        this.icons[i].setVisible((i < nbEffects));
+        this.iconsTexts[i].setVisible((i < nbEffects));
+        if(i < nbEffects){
+            var key = Object.keys(effects)[i];
+            var val = effects[key];
+            var statData = Stats.dict[key];
+            if(val > 0) val = "+"+val;
+            if(statData.suffix) val = val+statData.suffix;
+            var icon = this.icons[i];
+            var text = this.iconsTexts[i];
+            icon.y = this.y + descH + (30*(i + 1));
+            text.y = this.y + descH+ (30*(i + 1)) + 2;
+            icon.setFrame(statData.frame);
+            text.setText(val);
         }
+        i++;
     }
 };
 
@@ -117,8 +139,12 @@ Tooltip.prototype.updatePosition = function(x,y){
 };
 
 Tooltip.prototype.updateSize = function(nbEffects){
-    var w = Math.max(this.text.width,this.MIN_WIDTH);
-    var h = this.text.height - 15 + (nbEffects*30);
+    var titleW = (this.titleText.text ? this.titleText.width : 0);
+    var titleH = (this.titleText.text ? this.titleText.height : 0);
+    var descW = (this.descText.text ? this.descText.width : 0);
+    var descH = (this.descText.text ? this.descText.height : 0);
+    var w = Math.max(titleW,descW,this.MIN_WIDTH);
+    var h = titleH + descH - 15 + (nbEffects*30);
     var dw = this.width - w;
     var dh = this.height - h;
     this.width = w;
@@ -149,7 +175,8 @@ Tooltip.prototype.display = function(){
 
 Tooltip.prototype.hide = function(){
     if(!this.displayed) return;
-    this.text.setText("");
+    this.titleText.setText("");
+    this.descText.setText("");
     this.container.forEach(function(e){
         e.setVisible(false);
     });
@@ -166,7 +193,7 @@ Tooltip.prototype.finalize = function(){
         if(isText) e.depth++;
         e.setScrollFactor(0);
         if(!e.centered) e.setDisplayOrigin(0,0);
-        if(!e.notInteractive) e.setInteractive();
+        //if(!e.notInteractive) e.setInteractive();
         e.setVisible(false);
     });
 };

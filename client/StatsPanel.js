@@ -48,7 +48,7 @@ StatsPanel.prototype.addStat = function(x,y,s){
     statObj.text = text;
     this.content.push(text);
 
-    var zone = Engine.scene.add.zone(x,y,90,30);
+    var zone = Engine.scene.add.zone(x,y,70,30);
     zone.setDepth(Engine.UIDepth+10);
     zone.setScrollFactor(0);
     zone.setVisible(false);

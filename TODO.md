@@ -42,7 +42,7 @@ UI: dont tween progress bars when opening menu
 UI: accessories tooltip glitch
 Help: buttons in menus
 Help: buttons in buildings
-Item descriptions
+Equipment slot descriptions (guns less accurate, ...)
 Skills descriptions
 Gold hover cards
 Character: display stat modifiers details
@@ -143,7 +143,7 @@ Polish:
 ------
 Visual:
 - Show "new" tag when opening inventory
-- Cut corners of big battlezones? (but make sure it doesn't impact integrity)
+- Cut corners of big battlezones? (but make sure it doesn't impact integrity: save integrity path and used it for that)
 - Variety of small "talk" bubbles in reaction to things happening (+ symbol bubbles?)
 - Adapt bubble duration (in bubble.display) depending on number of words
 - Different mouse cursors depending on battle situation

@@ -1,0 +1,5 @@
+{
+  "inventory_help": "This is your inventory. Clicking on consumable items will consume them. Clicking on equipable items will equip them. Some equipment can increase your inventory size.",
+  "equipment_help": "This is your equipment. Click on a piece of equipment to unequip it. You cannot equip a ranged weapon and a melee weapon at the same time. You must equip an ammo containr (e.g. quiver) before equipping the corresponding ammunition (e.g. arrows).",
+  "stats_help": "These are you character stats. Their values influence the success and impact of various actions. Most of them can be increased by specific pieces of equipment. They can also decrease because of fatigue or if your settlement is in food deficit!"
+}
