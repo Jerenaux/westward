@@ -115,10 +115,8 @@ Building = new Phaser.Class({
     },
 
     remove: function(){
-        //Engine.displayedBuildings.delete(this.id);
-        Engine.entityManager.removeFromDisplayList(this);
+        CustomSprite.prototype.remove.call(this);
         delete Engine.buildings[this.id];
-        this.destroy();
     },
 
     // ### SETTERS ###

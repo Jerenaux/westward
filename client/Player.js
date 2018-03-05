@@ -66,10 +66,8 @@ var Player = new Phaser.Class({
     },
 
     remove: function(){
-        //Engine.displayedPlayers.delete(this.id);
-        Engine.entityManager.removeFromDisplayList(this);
+        CustomSprite.prototype.remove.call(this);
         delete Engine.players[this.id];
-        this.destroy();
     },
 
     move: function(path){

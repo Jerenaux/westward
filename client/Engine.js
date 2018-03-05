@@ -117,29 +117,62 @@ Engine.entityManager = {
         Engine.entityManager.displayLists[entity.entityType].add(entity.id);
     },
 
+    addToPool: function(entity){
+        Engine.entityManager.pools[entity.entityType].push(entity);
+    },
+
     removeFromDisplayList: function(entity){
         Engine.entityManager.displayLists[entity.entityType].delete(entity.id);
     }
 };
 
+function Pool(factory){
+    this.factory = factory;
+    this.reserve = [];
+}
+
+Pool.prototype.getNext = function(){
+    if(this.reserve.length > 0) return this.reserve.shift();
+    console.log('creating new element');
+    return this.factory();
+};
+
+Pool.prototype.recycle = function(element){
+    this.reserve.push(element);
+};
+
 Engine.create = function(){
+    Engine.scene = this.scene.scene;
     var masterData = Boot.masterData;
     World.readMasterData(masterData);
     Engine.nbLayers = masterData.nbLayers;
-    if(!Engine.nbLayers) console.log('WARNING : falsy number of layers : '+console.log(Engine.nbLayers));
+    if(!Engine.nbLayers) console.warn('falsy number of layers : '+console.log(Engine.nbLayers));
     Engine.mapDataLocation = Boot.mapDataLocation;
     console.log('Master file read, setting up world of size '+World.worldWidth+' x '+World.worldHeight+' with '+Engine.nbLayers+' layers');
 
     Engine.tilesets = masterData.tilesets;
     Engine.tilesetMap = {}; // maps tiles to tilesets;
 
-    Engine.chunks = {}; // holds references to the Containers containing the chunks
+    Engine.chunks = {}; // holds references to the containers containing the chunks
     Engine.displayedChunks = [];
     Engine.mapDataCache = {};
 
-    Engine.gridCellsPool = [];
+    Engine.spritePool = new Pool(function(){
+        var sprite = Engine.scene.add.sprite(0,0);
+        sprite.recycle = function(){
+            Engine.spritePool.recycle(sprite);
+        };
+        return sprite;
+    });
+    Engine.imagePool = new Pool(function(){
+        var image = Engine.scene.add.image(0,0);
+        image.recycle = function(){
+            Engine.imagePool.recycle(image);
+        };
+        return image;
+    });
+
     Engine.printsPool = [];
-    Engine.animSpritesPool = [];
     Engine.HPpool = [];
 
     Engine.players = {}; // player.id -> player object
@@ -151,13 +184,11 @@ Engine.create = function(){
     Engine.entityManager.registerEntityType('animal',Animal,Engine.animals);
     Engine.entityManager.registerEntityType('building',Building,Engine.buildings);
     Engine.entityManager.registerEntityType('cell',BattleTile,Engine.battleCells);
-    // TODO:  use in pools
 
     Engine.debug = true;
     Engine.showHero = true;
     Engine.showGrid = false;
 
-    Engine.scene = this.scene.scene;
     Engine.camera = Engine.scene.cameras.main;
     Engine.camera.setBounds(0,0,Engine.worldWidth*Engine.tileWidth,Engine.worldHeight*Engine.tileHeight);
     Engine.camera.roundPixels = true; // Very important for the camera to scroll smoothly accross the map
@@ -253,14 +284,20 @@ Engine.createAnimations = function(){
         frames: Engine.scene.anims.generateFrameNumbers('sword_anim', { start: 0, end: 2}),
         frameRate: 15,
         hideOnComplete: true,
-        onComplete: Engine.recycleAnim
+        //onComplete: Engine.recycleSprite
+        onComplete: function(sprite){
+            sprite.recycle();
+        }
     });
     Engine.scene.anims.create(config = {
         key: 'death',
         frames: Engine.scene.anims.generateFrameNumbers('death', { start: 0, end: 5}),
         frameRate: 15,
         hideOnComplete: true,
-        onComplete: Engine.recycleAnim
+        //onComplete: Engine.recycleSprite
+        onComplete: function(sprite){
+            sprite.recycle();
+        }
     });
 };
 
@@ -293,7 +330,7 @@ Engine.hasFreeCommitSlot = function(){
 };
 
 Engine.deathAnimation = function(target){
-    var anim = Engine.getNextAnim();
+    var anim = Engine.spritePool.getNext();
     anim.setPosition(target.x+48,target.y+48);
     anim.setVisible(true);
     anim.setTexture('death');
@@ -440,7 +477,9 @@ Engine.recycleHP = function(text){
 };
 
 Engine.handleBattleAnimation = function(animation,target,dmg){
-    var sprite = Engine.getNextAnim();
+    //var sprite = Engine.spritePool.getNext('sword_anim');
+    sprite.setTexture('sword_anim');
+    sprite.setDisplayOrigin(sprite.frame.width/2,sprite.frame.height/2); // quick fix
     sprite.setPosition(target.x+16,target.y+16);
     sprite.setVisible(true);
     sprite.setDepth(target.depth+1);
@@ -916,6 +955,7 @@ Engine.computePath = function(position){
     var x = position.x;
     var y = position.y;
     if(PFUtils.checkCollision(x,y)) return;
+    //console.log(Engine.player.tileX, Engine.player.tileY, x, y);
     var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, x, y, Engine.PFgrid);
     PF.reset();
     if(path.length == 0 || path.length > PFUtils.maxPathLength) {
@@ -1149,10 +1189,11 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.removedcells) Engine.removeElements(data.removedcells,Engine.battleCells);
 };
 
-// TODO: replace callbacks by systematic owned methids
 Engine.createElements = function(arr,entityType){
+    var pool = Engine.entityManager.pools[entityType];
+    var constructor = Engine.entityManager.constructors[entityType];
     arr.forEach(function(data){
-        var e = new Engine.entityManager.constructors[entityType]();
+        var e = pool.length > 0 ? pool.shift() : new constructor();
         e.setUp(data);
         e.update(data);
     });
@@ -1199,24 +1240,6 @@ Engine.addPlayer = function(data){
     var sprite = new Player();
     sprite.setUp(data);
     return sprite;
-};
-
-Engine.addBuilding = function(data){
-    var building = new Building(data);
-    building.setUp(data);
-    return building;
-};
-
-Engine.addAnimal = function(data){
-    var animal = new Animal();
-    animal.setUp(data);
-    return animal;
-};
-
-Engine.addBattleCell = function(data){
-    var cell = Engine.getNextCell();
-    cell.setUp(data.id,data.x,data.y);
-    return cell;
 };
 
 Engine.getTilesetFromTile = function(tile){
@@ -1337,25 +1360,17 @@ Engine.isBattleCell = function(x,y){
     return Engine.battleCells.get(x,y);
 };
 
-Engine.getNextCell = function(){
-    if(Engine.gridCellsPool.length > 0) return Engine.gridCellsPool.shift();
-    return new BattleTile();
-};
-
 Engine.getNextPrint = function(){
     if(Engine.printsPool.length > 0) return Engine.printsPool.shift();
     return Engine.scene.add.image(0,0,'footsteps');
 };
 
-Engine.getNextAnim = function(){
-    if(Engine.animSpritesPool.length > 0) return Engine.animSpritesPool.shift();
-    var sprite = Engine.scene.add.sprite(0,0,'sword_anim',0);
-    sprite.setVisible(false);
-    return sprite;
+Engine.recycleSprite = function(sprite){
+    Engine.spritePool.recycle(sprite);
 };
 
-Engine.recycleAnim = function(sprite){
-    Engine.animSpritesPool.push(sprite);
+Engine.recycleImage = function(image){
+    Engine.imagePool.recycle(image);
 };
 
 Engine.recyclePrint = function(print){

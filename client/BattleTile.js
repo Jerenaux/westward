@@ -77,12 +77,9 @@ var BattleTile = new Phaser.Class({
     },
 
     remove: function(){
-        this.setVisible(false);
-        //Engine.displayedCells.delete(this.id);
-        Engine.entityManager.removeFromDisplayList(this);
+        CustomSprite.prototype.remove.call(this);
         Engine.battleCellsMap.delete(this.tx,this.ty);
         delete Engine.battleCells[this.id];
-        Engine.gridCellsPool.push(this);
     },
 
     handleOver: function(){

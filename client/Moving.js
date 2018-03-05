@@ -172,8 +172,10 @@ var Moving = new Phaser.Class({
             var sy = this.previousTile.y*Engine.tileHeight + Engine.tileHeight/2;
 
             var print = Engine.getNextPrint();
+            //var print = Engine.spritePool.getNext();
+            //print.setTexture('footsteps');
             print.setPosition(sx,sy);
-            print.angle += angle;
+            print.angle = angle;
             print.alpha = 0.7;
             print.depth = Engine.markerDepth;
 
@@ -184,6 +186,7 @@ var Moving = new Phaser.Class({
                 onComplete: function(tween,targets){
                     targets.forEach(function(t){
                         Engine.recyclePrint(t);
+                        //t.recycle();
                     });
                 }
             });

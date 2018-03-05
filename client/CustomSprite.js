@@ -10,5 +10,12 @@ var CustomSprite = new Phaser.Class({
         Phaser.GameObjects.Sprite.call(this, Engine.scene, x, y, texture);
         Engine.scene.add.displayList.add(this);
         Engine.scene.add.updateList.add(this);
+    },
+
+    remove: function(){
+        //console.log('removing',this.entityType);
+        this.setVisible(false);
+        Engine.entityManager.removeFromDisplayList(this);
+        Engine.entityManager.addToPool(this);
     }
 });

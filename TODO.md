@@ -39,6 +39,7 @@ Net: ghost animals when transitioning aoi? + removal of non-existing ones
 UI: test tooltip of items (after having added hpmax)
 UI: display event pop-ups after skinning
 UI: dont tween progress bars when opening menu
+UI: add notifs to everything
 UI: accessories tooltip glitch
 Help: buttons in menus
 Help: buttons in buildings

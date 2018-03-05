@@ -41,10 +41,8 @@ var Animal = new Phaser.Class({
     },
 
     remove: function(){
-        //Engine.displayedAnimals.delete(this.id);
-        Engine.entityManager.removeFromDisplayList(this);
+        CustomSprite.prototype.remove.call(this);
         delete Engine.animals[this.id];
-        this.destroy();
     },
 
     die: function(){
