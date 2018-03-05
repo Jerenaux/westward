@@ -23,9 +23,9 @@ CraftingPanel.prototype.addInterface = function(){
     this.content.push(ring);
     this.ring = ring;
 
-    this.buttons.push(this.addButton(ringx+92,ringy+13,'green','ok',this.requestCraft.bind(this)));
-    this.buttons.push(this.addButton(ringx+5,ringy+82,'blue','plus',this.increaseAmount.bind(this)));
-    this.buttons.push(this.addButton(ringx+22,ringy+99,'blue','minus',this.decreaseAmount.bind(this)));
+    this.addButton(ringx+92,ringy+13,'green','ok',this.requestCraft.bind(this),'Craft');
+    this.addButton(ringx+5,ringy+82,'blue','plus',this.increaseAmount.bind(this),'Increase by 1');
+    this.addButton(ringx+22,ringy+99,'blue','minus',this.decreaseAmount.bind(this),'Decrease by 1');
 
     var item = new ItemSprite();
     item.setPosition(this.x+ringx+(ring.frame.width/2),this.y+ringy+(ring.frame.height/2));
@@ -57,9 +57,6 @@ CraftingPanel.prototype.displayInterface = function(){
      this.ring.setVisible(true);
      this.buttons.forEach(function(b){
          b.btn.disable();
-         b.btn.setVisible(true);
-         b.symbol.setVisible(true);
-         b.ring.setVisible(true);
      });
 };
 

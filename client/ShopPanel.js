@@ -52,9 +52,9 @@ ShopPanel.prototype.addInterface = function(){
     name.setScrollFactor(0);
     this.content.push(name);
 
-    this.buttons.push(this.addButton(125,50,'green','ok',this.requestPurchase.bind(this)));
-    this.buttons.push(this.addButton(90,50,'blue','plus',this.increaseAmount.bind(this)));
-    this.buttons.push(this.addButton(65,50,'blue','minus',this.decreaseAmount.bind(this)));
+    this.addButton(125,50,'green','ok',this.requestPurchase.bind(this),'Confirm');
+    this.addButton(90,50,'blue','plus',this.increaseAmount.bind(this),'Increase by 1');
+    this.addButton(65,50,'blue','minus',this.decreaseAmount.bind(this),'Decrease by 1');
 
     this.shopItem = {
         id: -1,
@@ -136,7 +136,7 @@ ShopPanel.prototype.manageButtons = function(){
     var plusBtn = this.buttons[1].btn;
     var minusBtn = this.buttons[2].btn;
 
-    if(this.shopItem.count == 1){
+    if(this.shopItem.count <= 1){
         minusBtn.disable();
     }else{
         minusBtn.enable();
@@ -175,9 +175,9 @@ ShopPanel.prototype.displayInterface = function(){
     this.gold.setVisible(true);
     this.buttons.forEach(function(b){
         b.btn.disable();
-        b.btn.setVisible(true);
+        /*b.btn.setVisible(true);
         b.symbol.setVisible(true);
-        b.ring.setVisible(true);
+        b.ring.setVisible(true);*/
     });
 };
 

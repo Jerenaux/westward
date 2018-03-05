@@ -65,6 +65,7 @@ var Animal = new Phaser.Class({
     },
 
     handleOver: function(){
+        if(!BattleManager.inBattle && Engine.inMenu) return;
         if(BattleManager.inBattle) {
             var dx = Math.abs(this.tileX-Engine.player.tileX);
             var dy = Math.abs(this.tileY-Engine.player.tileY);

@@ -703,8 +703,9 @@ Engine.makeInventory = function(statsPanel){
     var items = new InventoryPanel(40,100,600,380,'Items');
     items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
     items.addCapsule('gold',100,-9,'999','gold');
+    // TODO: add click callback too + wrap text
+    items.addButton(570, 8, 'blue','help',null,'Lorem ipsum dolor sit amet consectuetur erat');
     inventory.addPanel('items',items);
-    // 665,335,330,145,'Stats');
     var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
     inventory.addPanel('equipment',equipment);
     inventory.addPanel('stats',statsPanel);

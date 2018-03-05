@@ -8,6 +8,7 @@ function Panel(x,y,width,height,title,invisible){
     this.longSlotsCounter = 0;
     this.longSlots = [];
     this.texts = [];
+    this.buttons = [];
     if(title) this.addCapsule('title',20,-9,title);
 }
 
@@ -25,7 +26,7 @@ Panel.prototype.updateCapsule = function(name,text){
     this.capsules[name].setText(text);
 };
 
-Panel.prototype.addButton = function(x,y,color,symbol,callback){
+Panel.prototype.addButton = function(x,y,color,symbol,callback,helpText){
     x += this.x;
     y += this.y;
     var ring = Engine.scene.add.sprite(x,y,'UI','ring');
@@ -50,11 +51,30 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback){
     s.setVisible(false);
     this.content.push(s);
 
-    return {
+    var zone = Engine.scene.add.zone(x,y,24,24);
+    zone.setDepth(Engine.UIDepth+10);
+    zone.setScrollFactor(0);
+    zone.setInteractive();
+    zone.setOrigin(0);
+    zone.setVisible(false);
+    zone.handleOver = function(){
+        Engine.tooltip.updateInfo(helpText);
+        Engine.tooltip.display();
+    };
+    zone.handleOut = function(){
+        Engine.tooltip.hide();
+    };
+    this.content.push(zone);
+
+    var btnObj = {
         btn: btn,
         symbol: s,
-        ring: ring
+        ring: ring,
+        zone: zone
     };
+    this.buttons.push(btnObj);
+
+    return btnObj;
 };
 
 Panel.prototype.addPolyText = function(x,y,texts,colors,size){
@@ -113,6 +133,12 @@ Panel.prototype.display = function(){
     for(var capsule in this.capsules){
         this.capsules[capsule].display();
     }
+    this.buttons.forEach(function(b){
+        b.btn.setVisible(true);
+        b.symbol.setVisible(true);
+        b.ring.setVisible(true);
+        b.zone.setVisible(true);
+    });
 };
 
 function Capsule(x,y,icon,container){

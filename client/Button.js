@@ -22,10 +22,12 @@ var Button = new Phaser.Class({
     },
 
     handleDown: function(){
+        if(!this.callback) return;
         if(this.enabled) this.setFrame(this.currentFrame+'-pressed');
     },
 
     handleClick: function(){
+        if(!this.callback) return;
         if(!this.enabled) return;
         this.setFrame(this.currentFrame);
         this.callback();

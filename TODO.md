@@ -42,6 +42,9 @@ UI: dont tween progress bars when opening menu
 UI: accessories tooltip glitch
 Help: buttons in menus
 Help: buttons in buildings
+Item descriptions
+Skills descriptions
+Gold hover cards
 Character: display stat modifiers details
 
 Finish:  test economy for a while;
