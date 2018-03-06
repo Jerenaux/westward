@@ -114,7 +114,6 @@ var Moving = new Phaser.Class({
         if(this.constructor.name == 'Player') this.leaveFootprint();
         if(this.bubble) this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
 
-
         if(this.flagForStop && (this.tileX != this.previousTile.x || this.tileY != this.previousTile.y)){
             console.log(this.movement);
             this.movement.stop();
@@ -169,10 +168,12 @@ var Moving = new Phaser.Class({
             var sx = this.previousTile.x*Engine.tileWidth + Engine.tileWidth/2;
             var sy = this.previousTile.y*Engine.tileHeight + Engine.tileHeight/2;
 
-            var print = Engine.getNextPrint();
+            //var print = Engine.getNextPrint();
             //var print = Engine.spritePool.getNext();
             //print.setTexture('footsteps');
+            var print = Engine.footprintsPool.getNext();
             print.setPosition(sx,sy);
+            print.setVisible(true);
             print.angle = angle;
             print.alpha = 0.7;
             print.depth = Engine.markerDepth;
@@ -181,11 +182,8 @@ var Moving = new Phaser.Class({
                 targets: print,
                 alpha: 0,
                 duration: 1500,
-                onComplete: function(tween,targets){
-                    targets.forEach(function(t){
-                        Engine.recyclePrint(t);
-                        //t.recycle();
-                    });
+                onComplete: function(){
+                    print.recycle();
                 }
             });
         }

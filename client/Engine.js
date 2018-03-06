@@ -95,7 +95,6 @@ Engine.preload = function() {
         }));
         firstgid += tilecount;
     }
-    //console.log('Loading '+i+' tileset'+(i > 1 ? 's' : ''));
 };
 
 Engine.entityManager = {
@@ -126,15 +125,39 @@ Engine.entityManager = {
     }
 };
 
-function Pool(factory){
-    this.factory = factory;
+function Pool(type,texture,constructor){
+    this.type = type;
+    this.texture = texture;
+    this.constructor = constructor;
     this.reserve = [];
 }
 
 Pool.prototype.getNext = function(){
     if(this.reserve.length > 0) return this.reserve.shift();
-    console.log('creating new element');
-    return this.factory();
+    //console.log('creating new element');
+    var element;
+    switch(this.type){
+        case 'sprite':
+            element = Engine.scene.add.sprite(0,0,this.texture);
+            break;
+        case 'image':
+            element = Engine.scene.add.image(0,0,this.texture);
+            break;
+        case 'text':
+            element = Engine.scene.add.text(0,0, '');
+            break;
+        case 'custom':
+            return new this.constructor();
+        default:
+            console.warn('no type defined');
+            break;
+    }
+    var _pool = this;
+    element.recycle = function(){
+        this.setVisible(false);
+        _pool.recycle(this);
+    };
+    return element;
 };
 
 Pool.prototype.recycle = function(element){
@@ -157,23 +180,13 @@ Engine.create = function(){
     Engine.displayedChunks = [];
     Engine.mapDataCache = {};
 
-    Engine.spritePool = new Pool(function(){
-        var sprite = Engine.scene.add.sprite(0,0);
-        sprite.recycle = function(){
-            Engine.spritePool.recycle(sprite);
-        };
-        return sprite;
+    var animations = ['death','sword_anim'];
+    Engine.animationsPools = {};
+    animations.forEach(function(key){
+        Engine.animationsPools[key] = new Pool('sprite',key);
     });
-    Engine.imagePool = new Pool(function(){
-        var image = Engine.scene.add.image(0,0);
-        image.recycle = function(){
-            Engine.imagePool.recycle(image);
-        };
-        return image;
-    });
-
-    Engine.printsPool = [];
-    Engine.HPpool = [];
+    Engine.footprintsPool = new Pool('image','footsteps');
+    Engine.textPool = new Pool('text');
 
     Engine.players = {}; // player.id -> player object
     Engine.animals = {}; // animal.id -> building object
@@ -330,10 +343,10 @@ Engine.hasFreeCommitSlot = function(){
 };
 
 Engine.deathAnimation = function(target){
-    var anim = Engine.spritePool.getNext();
+    var anim = Engine.animationsPools['death'].getNext();
     anim.setPosition(target.x+48,target.y+48);
     anim.setVisible(true);
-    anim.setTexture('death');
+    //anim.setTexture('death');
     anim.setDepth(target.depth+1);
     anim.anims.play('death');
     target.setVisible(false);
@@ -463,7 +476,8 @@ Engine.makeBattleUI = function(){
     );
 };
 
-Engine.getNextHP = function(){
+
+/*Engine.getNextHP = function(){
     if(Engine.HPpool.length > 0) return Engine.HPpool.shift();
 
     var text = Engine.scene.add.text(0,0, '0',  { font: '20px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
@@ -474,18 +488,20 @@ Engine.getNextHP = function(){
 
 Engine.recycleHP = function(text){
     Engine.HPpool.push(text);
-};
+};*/
 
 Engine.handleBattleAnimation = function(animation,target,dmg){
-    //var sprite = Engine.spritePool.getNext('sword_anim');
-    sprite.setTexture('sword_anim');
+    var sprite = Engine.animationsPools['sword_anim'].getNext();
     sprite.setDisplayOrigin(sprite.frame.width/2,sprite.frame.height/2); // quick fix
     sprite.setPosition(target.x+16,target.y+16);
     sprite.setVisible(true);
     sprite.setDepth(target.depth+1);
     sprite.anims.play(animation);
 
-    var text = Engine.getNextHP();
+    var text = Engine.textPool.getNext();
+    text.setStyle({ font: 'belwe', fontSize: 20, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    text.setFont('20px belwe');
+    text.setOrigin(0.5,1);
     text.setPosition(target.x+16,target.y+16);
     text.setDepth(target.depth+1);
     text.setText('-'+dmg);
@@ -499,10 +515,11 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
                 text.setVisible(true);
             },
             onComplete: function(){
-                text.setVisible(false);
-                setTimeout(function(){
+                text.recycle();
+                //text.setVisible(false);
+                /*setTimeout(function(){
                     Engine.recycleHP(text);
-                },20);
+                },20);*/
             }
         }
     );
@@ -522,11 +539,26 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
 
 Engine.handleMissAnimation = function(target){
     var targetY = target.y+16;
-    var text = Engine.getNextHP(targetY-40);
+    //var text = Engine.getNextHP(targetY-40);
+    var text = Engine.textPool.getNext();
+    text.setStyle({ font: 'belwe', fontSize: 20, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    text.setFont('20px belwe');
     text.setPosition(target.x+16,targetY);
     text.setDepth(target.depth+1);
     text.setText('Miss');
-    text.tween.play();
+    Engine.scene.tweens.add(
+        {
+            targets: text,
+            y: target.y-40,
+            duration: 1000,
+            onStart: function(){
+                text.setVisible(true);
+            },
+            onComplete: function(){
+                text.recycle();
+            }
+        }
+    );
 };
 
 Engine.displayUI = function(){
@@ -1144,32 +1176,36 @@ Engine.handleNotifications = function(msgs){
     // TODO: add to localstorage for display in character panel
     var i = 0;
     msgs.forEach(function(msg){
-        var notif = new Bubble(0,0,true); // TODO: use pool
-        notif.update(msg);
-        var x = (Engine.getGameConfig().width-notif.getWidth())/2 - notif.getOrigin();
-        var y = Engine.getGameConfig().height + (notif.getHeight()+3)*i;// - notif.height - 30;
-        notif.updatePosition(x,y);
-
-        var tween = Engine.scene.tweens.addCounter({
-            from: y,
-            to: y-(40*msgs.length),
-            duration: 500,
-            paused: true,
-            ease: 'Quad.easeOut',
-            onStart: function(){
-                notif.display();
-            },
-            onUpdate: function(tween){
-                notif.updatePosition(x,tween.getValue());
-            }
-        });
-
-        var delay = i*250;
-        setTimeout(function(){
-            tween.play();
-        },delay);
+        Engine.showNotification(msg,i,msgs.length);
         i++;
     });
+};
+
+Engine.showNotification = function(msg,i,nb){
+    var notif = new Bubble(0,0,true); // TODO: use pool
+    notif.update(msg);
+    var x = (Engine.getGameConfig().width-notif.getWidth())/2 - notif.getOrigin();
+    var y = Engine.getGameConfig().height + (notif.getHeight()+3)*i;
+    notif.updatePosition(x,y);
+
+    var tween = Engine.scene.tweens.addCounter({
+        from: y,
+        to: y-(40*nb),
+        duration: 300,
+        paused: true,
+        ease: 'Quad.easeOut',
+        onStart: function(){
+            notif.display();
+        },
+        onUpdate: function(tween){
+            notif.updatePosition(x,tween.getValue());
+        }
+    });
+
+    var delay = i*50;
+    setTimeout(function(){
+        tween.play();
+    },delay);
 };
 
 Engine.update = function(){

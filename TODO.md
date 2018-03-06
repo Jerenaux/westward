@@ -30,6 +30,7 @@ Goal: 1h of gameplay?
 Week:
 -----
 Battle: update hover card of life bar
+Battle: test if battle zone disappears when dying, one player, multiple animals
 Fort: staff
 Fort: dev lvl progress bar glitch
 Construction: notification of civic xp gain

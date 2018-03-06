@@ -13,7 +13,7 @@ var Player = new Phaser.Class({
 
         this.setTexture('hero');
         this.setFrame(33);
-        this.setOrigin(0.4,0.9);
+        this.setOrigin(0.2,0.5);
         this.firstUpdate = true;
 
         this.bubbleOffsetX = 55;
@@ -29,21 +29,18 @@ var Player = new Phaser.Class({
         };
 
         this.destinationAction = null;
+
+        this.bubble = new Bubble(0,0);
     },
 
     setUp: function(data){
         this.id = data.id;
         Engine.players[this.id] = this;
-        //Engine.displayedPlayers.add(this.id);
         Engine.entityManager.addToDisplayList(this);
 
         this.name = 'Player '+this.id;
         this.setPosition(data.x,data.y);
-        // TODO: use pool of bubbles
-        this.bubble = new Bubble(
-            (data.x*Engine.tileWidth)-this.bubbleOffsetX,
-            (data.y*Engine.tileHeight)-this.bubbleOffsetY
-        );
+        this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
     },
 
     update: function(data){
