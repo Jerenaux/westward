@@ -111,6 +111,22 @@ Bubble.prototype.resize = function(width,height){
     this.height = newHeight;
 };
 
+Bubble.prototype.getWidth = function(){
+    return (this.container[2].x+this.container[2].width)-this.container[0].x;
+};
+
+Bubble.prototype.getHeight = function(){
+    return (this.container[8].y+this.container[8].height)-this.container[2].y;
+};
+
+Bubble.prototype.getOrigin = function(){
+    return this.container[0].x;
+};
+
+Bubble.prototype.getCenter = function(){
+    return this.container[1].x+(this.container[1].width/2);
+};
+
 Bubble.prototype.display = function(){
     this.container.forEach(function(e){
         e.setVisible(true);

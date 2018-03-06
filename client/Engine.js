@@ -21,7 +21,7 @@ var Engine = {
     tooltipElementsDepth: 17,
     tooltipTextDepth: 18,
 
-    notificationDuration: 1000,
+    notificationDuration: 1500, // TODO: adapt based on notif length?
 
     craftInvSize: 5, // max number of ingredients for crafting
     key: 'main', // key of the scene, for Phaser
@@ -1146,15 +1146,16 @@ Engine.handleNotifications = function(msgs){
     msgs.forEach(function(msg){
         var notif = new Bubble(0,0,true); // TODO: use pool
         notif.update(msg);
-        var x = (Engine.getGameConfig().width-notif.width)/2;
-        var y = Engine.getGameConfig().height - notif.height - 30;
+        var x = (Engine.getGameConfig().width-notif.getWidth())/2 - notif.getOrigin();
+        var y = Engine.getGameConfig().height + (notif.getHeight()+3)*i;// - notif.height - 30;
         notif.updatePosition(x,y);
 
-        Engine.scene.tweens.addCounter({
+        var tween = Engine.scene.tweens.addCounter({
             from: y,
-            to: y-50,
-            duration: Engine.notificationDuration,
-            delay: i*500,
+            to: y-(40*msgs.length),
+            duration: 500,
+            paused: true,
+            ease: 'Quad.easeOut',
             onStart: function(){
                 notif.display();
             },
@@ -1162,6 +1163,11 @@ Engine.handleNotifications = function(msgs){
                 notif.updatePosition(x,tween.getValue());
             }
         });
+
+        var delay = i*250;
+        setTimeout(function(){
+            tween.play();
+        },delay);
         i++;
     });
 };
@@ -1452,4 +1458,16 @@ Engine.snap = function(){
     game.renderer.snapshot(function(img){
         Client.sendScreenshot(img.src);
     });
+};
+
+Engine.debugScreen = function(){
+    var graphics = Engine.scene.add.graphics();
+    graphics.setDepth(Engine.UIDepth+10);
+    graphics.setScrollFactor(0);
+    graphics.lineStyle(1, 0x00ff00, 3);
+    graphics.beginPath();
+    graphics.moveTo(512, 0);
+    graphics.lineTo(512, 576);
+    graphics.strokePath();
+    graphics.closePath();
 };

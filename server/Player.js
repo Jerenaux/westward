@@ -86,7 +86,8 @@ Player.prototype.setStat = function(key,value){
 };
 
 Player.prototype.refreshStat = function(key){
-    this.updatePacket.addStat(key,this.getStat(key).getValue());
+    //this.updatePacket.addStat(key,this.getStat(key).getValue());
+    this.updatePacket.addStat(this.getStat(key).trim());
 };
 
 Player.prototype.applyDamage = function(dmg){

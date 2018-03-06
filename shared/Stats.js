@@ -9,7 +9,6 @@ if(onServer){
 }
 
 var Stats = {
-    //list: ['hp','hpmax','fat','acc','def','mdmg','rdmg'],
     dict: {
         hpmax: {
             name: 'Health',
@@ -144,7 +143,7 @@ Stat.prototype.clamp = function(v){
 };
 
 Stat.prototype.getValue = function(){
-    var statData = Stats.dict[this.key];
+    //var statData = Stats.dict[this.key];
     var base = this.getBaseValue();
     this.absoluteModifiers.forEach(function(m){
         base += m;
@@ -152,7 +151,6 @@ Stat.prototype.getValue = function(){
     this.relativeModifiers.forEach(function(m){
         base *= (1+m);
     });
-    //return Utils.clamp(Math.round(base),statData.min,this.getCap());
     return this.clamp(Math.round(base));
 };
 
@@ -181,6 +179,21 @@ Stat.prototype.removeAbsoluteModifier = function(modifier){
 Stat.prototype.removeRelativeModifier = function(modifier){
     var idx = this.relativeModifiers.indexOf(modifier);
     if(idx > -1) this.relativeModifiers.splice(idx,1);
+};
+
+Stat.prototype.trim = function(){
+      var obj = {
+          k: this.key,
+          v: this.getValue(),
+          r: [],
+          a: this.absoluteModifiers
+      };
+      this.relativeModifiers.forEach(function(m){
+          obj.r.push(Math.round(m*100));
+      });
+      if(obj.r.length == 0) obj.r = undefined;
+      if(obj.a.length == 0) obj.a = undefined;
+      return obj;
 };
 
 if (onServer) module.exports.Stat = Stat;

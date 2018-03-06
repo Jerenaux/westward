@@ -10,8 +10,6 @@ var Moving = new Phaser.Class({
         //CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, texture);
         CustomSprite.call(this, 0,0);
 
-        //this.id = id;
-
         this.orientation = 'down';
         this.previousOrientation = this.orientation;
         this.movement = null;

@@ -45,8 +45,9 @@ PersonalUpdatePacket.prototype.addItem = function(item,nb){
     this.items.push([item,nb]);
 };
 
-PersonalUpdatePacket.prototype.addStat = function(key,value){
-    this.stats.push({k:key,v:value});
+PersonalUpdatePacket.prototype.addStat = function(stat){
+    //this.stats.push({k:key,v:value});
+    this.stats.push(stat);
 };
 
 PersonalUpdatePacket.prototype.addEquip = function(slot,subSlot,item){

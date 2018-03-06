@@ -37,15 +37,15 @@ Economic loop: test all updates of all menus
 Economic loop: harvest herbs
 Net: ghost animals when transitioning aoi? + removal of non-existing ones
 UI: test tooltip of items (after having added hpmax)
-UI: display event pop-ups after skinning
 UI: dont tween progress bars when opening menu
-UI: add notifs to everything
+UI: add notifs to everything (skinning, xp, using items, shopping, commitment, ...)
 UI: accessories tooltip glitch
 Help: buttons in menus
 Help: buttons in buildings
 Equipment slot descriptions (guns less accurate, ...)
 Skills descriptions
 Gold hover cards
+Character: health doesn't go above 100 even if max increased by surplus
 Character: display stat modifiers details
 
 Finish:  test economy for a while;

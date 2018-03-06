@@ -40,17 +40,20 @@ CharacterPanel.prototype.addInterface = function(){
     y += 30;
     this.addText(x,y,'Stats modifiers:');
     y+= 15;
-    this.addPolyText(x,y,['-0% ','fatigue'],[null,null]);
+    var txts = this.addPolyText(x,y,['-100% ','fatigue'],[null,null]);
+    this.fatigueText = txts[0];
     y += 15;
-    var txts = this.addPolyText(x,y,['-10% ','food deficit'],[Utils.colors.red,null]);
+    var txts = this.addPolyText(x,y,['-100% ','food deficit'],[Utils.colors.red,null]);
     this.foodModifierTxt = txts[0];
 };
 
 CharacterPanel.prototype.update = function(){
+    this.fatigueText.setText('0%');
     this.civicXPtxt.setText(Engine.player.civicxp+'/'+Engine.player.maxcivicxp);
     this.civicbar.setLevel(Engine.player.civicxp,Engine.player.maxcivicxp);
     var foodModifier = Math.round(Formulas.computePlayerFoodModifier(Engine.player.foodSurplus)*100);
-    this.foodModifierTxt.setFill(foodModifier < 0 ? Utils.colors.red : Utils.colors.white);
+    this.foodModifierTxt.setFill(foodModifier < 0 ? Utils.colors.red : Utils.colors.green);
+    if(foodModifier > 0) foodModifier = '+'+foodModifier;
     this.foodModifierTxt.setText(foodModifier+"%");
 };
 
