@@ -53,7 +53,7 @@ StatsPanel.prototype.addStat = function(x,y,s){
     zone.setScrollFactor(0);
     zone.setVisible(false);
     zone.handleOver = function(){
-        Engine.tooltip.updateInfo(stat.name);
+        Engine.tooltip.updateInfo(stat.name,'',-1,(stat.hasMax ? stat.hasMax : s));
         Engine.tooltip.display();
     };
     zone.handleOut = function(){

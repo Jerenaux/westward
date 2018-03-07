@@ -13,6 +13,8 @@ function Tooltip(){
     this.container = [];
     this.icons = [];
     this.iconsTexts = [];
+    this.modifierTexts = [];
+    this.modifierCounter = 0;
     this.displayed = false;
     this.titleText = Engine.scene.add.text(this.x+13,this.y+4, '',
         { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3,
@@ -79,19 +81,43 @@ Tooltip.prototype.makeStatsIcons = function(){
     }
 };
 
-Tooltip.prototype.updateInfo = function(title, text, itemID){
+Tooltip.prototype.updateInfo = function(title, text, itemID, stat){
     if(title) this.titleText.setText(title);
     text = text || '';
     var descY = title ? this.y+25 : this.y+4;
     this.descText.y = descY;
     this.descText.setText(text);
+    var nbLines = 0;
     var nbEffects = 0;
     if(itemID > -1){
         var effects = Engine.itemsData[itemID].effects || {};
         nbEffects = Object.keys(effects).length;
         this.displayStats(effects,nbEffects);
+        nbLines += nbEffects;
     }
-    this.updateSize(nbEffects);
+    if(stat) {
+        this.displayModifiers(stat);
+        nbLines++;
+    }
+    this.updateSize(nbLines);
+};
+
+Tooltip.prototype.getNextText = function() {
+    if (this.modifierCounter >= this.modifierTexts.length) {
+        var t = Engine.scene.add.text(0, 0, '', {
+            font: '14px ' + Utils.fonts.fancy,
+            fill: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 3
+        });
+        t.setDisplayOrigin(0, 0);
+        t.setScrollFactor(0);
+        t.setDepth(Engine.tooltipDepth + 2);
+        t.dontDisplay = true;
+        this.container.push(t);
+        this.modifierTexts.push(t);
+    }
+    return this.modifierTexts[this.modifierCounter++];
 };
 
 Tooltip.prototype.displayStats = function(effects,nbEffects){
@@ -118,6 +144,37 @@ Tooltip.prototype.displayStats = function(effects,nbEffects){
     }
 };
 
+Tooltip.prototype.displayModifiers = function(stat){
+    var statObj = Engine.player.getStat(stat);
+    var y = this.y + 10;
+    var x = this.x + 13;
+    if(this.titleText.text) y += this.titleText.height;
+    if(this.descText.text) y += this.descText.height;
+    statObj.absoluteModifiers.forEach(function(m){
+        var txt = this.makeModifierText(x,y,m,'absolute');
+        x += 40;
+    },this);
+    statObj.relativeModifiers.forEach(function(m){
+        var txt = this.makeModifierText(x,y,m,'relative');
+        x += 20;
+    },this);
+};
+
+Tooltip.prototype.makeModifierText = function(x,y,value,type){
+    var txt = this.getNextText();
+    var number = value;
+    if(type == 'relative') value = (value*100)+'%';
+    if(number >= 0) value = '+'+value;
+    if(number > 0) txt.setFill(Utils.colors.green);
+    if(number == 0) txt.setFill(Utils.colors.white);
+    if(number < 0) txt.setFill(Utils.colors.red);
+
+    txt.setPosition(x,y);
+    txt.setText(value);
+    txt.setVisible(true);
+    return txt;
+};
+
 // Called from Engine.trackMouse()
 Tooltip.prototype.updatePosition = function(x,y){
     x += this.xOffset;
@@ -138,13 +195,13 @@ Tooltip.prototype.updatePosition = function(x,y){
     this.y += dy;
 };
 
-Tooltip.prototype.updateSize = function(nbEffects){
+Tooltip.prototype.updateSize = function(nbLines){
     var titleW = (this.titleText.text ? this.titleText.width : 0);
     var titleH = (this.titleText.text ? this.titleText.height : 0);
     var descW = (this.descText.text ? this.descText.width : 0);
     var descH = (this.descText.text ? this.descText.height : 0);
     var w = Math.max(titleW,descW,this.MIN_WIDTH);
-    var h = titleH + descH - 15 + (nbEffects*30);
+    var h = titleH + descH - 15 + (nbLines*30);
     var dw = this.width - w;
     var dh = this.height - h;
     this.width = w;
@@ -183,6 +240,7 @@ Tooltip.prototype.hide = function(){
     this.icons.forEach(function(e){
         e.setVisible(false);
     });
+    this.modifierCounter = 0;
     this.displayed = false;
 };
 
@@ -193,7 +251,6 @@ Tooltip.prototype.finalize = function(){
         if(isText) e.depth++;
         e.setScrollFactor(0);
         if(!e.centered) e.setDisplayOrigin(0,0);
-        //if(!e.notInteractive) e.setInteractive();
         e.setVisible(false);
     });
 };

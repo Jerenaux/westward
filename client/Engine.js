@@ -577,12 +577,10 @@ Engine.hideUI = function(){
 
 Engine.getPlayerHealth = function(){
     return Engine.player.getStatValue('hp');
-    //return Engine.player.stats['hp'].getValue();
 };
 
 Engine.getPlayerMaxHealth = function(){
     return Engine.player.getStatValue('hpmax');
-    //return Engine.player.stats['maxhp'].getValue();
 };
 
 Engine.makeBattleMenu = function(){
@@ -1081,7 +1079,7 @@ Engine.updateSelf = function(data){
     }
     if(data.stats){
         for(var i = 0; i < data.stats.length; i++){
-            Engine.updateStat(data.stats[i].k,data.stats[i].v);
+            Engine.updateStat(data.stats[i].k,data.stats[i]);
         }
         updateEvents.add('stats');
     }
@@ -1141,8 +1139,21 @@ Engine.updateEquipment = function(slot,subSlot,item){
     Engine.player.equipment[slot][subSlot] = item;
 };
 
-Engine.updateStat = function(key,value){
-    Engine.player.stats[key].setBaseValue(value);
+Engine.updateStat = function(key,data){
+    var statObj = Engine.player.getStat(key);
+    statObj.setBaseValue(data.v);
+    statObj.relativeModifiers = [];
+    statObj.absoluteModifiers = [];
+    if(data.r){
+        data.r.forEach(function(m){
+            statObj.relativeModifiers.push(m/100);
+        })
+    }if(data.a){
+        data.a.forEach(function(m){
+            statObj.absoluteModifiers.push(m);
+        })
+    }
+    //console.log(Engine.player.getStat(key));
 };
 
 Engine.updateInventory = function(inventory,items){

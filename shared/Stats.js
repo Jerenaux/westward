@@ -184,7 +184,7 @@ Stat.prototype.removeRelativeModifier = function(modifier){
 Stat.prototype.trim = function(){
       var obj = {
           k: this.key,
-          v: this.getValue(),
+          v: this.getBaseValue(),
           r: [],
           a: this.absoluteModifiers
       };

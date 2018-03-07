@@ -41,6 +41,7 @@ UI: test tooltip of items (after having added hpmax)
 UI: dont tween progress bars when opening menu
 UI: add notifs to everything (skinning, xp, using items, shopping, commitment, ...)
 UI: accessories tooltip glitch
+UI: fix big buttons
 Help: buttons in menus
 Help: buttons in buildings
 Equipment slot descriptions (guns less accurate, ...)
