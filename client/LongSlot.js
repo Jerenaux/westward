@@ -49,12 +49,16 @@ LongSlot.prototype.createZone = function(){
 };
 
 LongSlot.prototype.addIcon = function(atlas,frame){
-    this.icon = Engine.scene.add.sprite(this.x+21, this.y+20, atlas, frame); // 4 + 18, 4 + 20
-    this.icon.setDisplayOrigin(Math.floor(this.icon.frame.width/2),Math.floor(this.icon.frame.height/2));
-    //this.icon.setDisplayOrigin(0,0);
-    this.icon.setScrollFactor(0);
-    this.icon.setDepth(Engine.UIDepth+1);
-    this.icon.setVisible(false);
+    if(this.icon){
+        this.icon.setTexture(atlas);
+        this.icon.setFrame(frame);
+    }else {
+        this.icon = Engine.scene.add.sprite(this.x + 21, this.y + 20, atlas, frame);
+        this.icon.setScrollFactor(0);
+        this.icon.setDepth(Engine.UIDepth + 1);
+        this.icon.setVisible(false);
+    }
+    this.icon.setDisplayOrigin(Math.floor(this.icon.frame.width / 2), Math.floor(this.icon.frame.height / 2));
 };
 
 LongSlot.prototype.getNextText = function(){
@@ -104,6 +108,7 @@ LongSlot.prototype.setUp = function(x,y){
 };
 
 LongSlot.prototype.display = function(){
+    if(this.displayed) return;
     this.slices.forEach(function(s){
         s.setVisible(true);
     });
@@ -113,6 +118,7 @@ LongSlot.prototype.display = function(){
     if(this.bar) this.bar.display();
     if(this.icon) this.icon.setVisible(true);
     this.zone.setVisible(true);
+    this.displayed = true;
 };
 
 LongSlot.prototype.clear = function(){
@@ -121,7 +127,7 @@ LongSlot.prototype.clear = function(){
     if(this.bar) this.bar.hide();
     if(this.icon) {
         this.icon.setVisible(false);
-        this.icon = null;
+        //this.icon = null;
     }
     if(this.pin) this.pin.setVisible(false);
 };
@@ -137,6 +143,6 @@ LongSlot.prototype.hide = function(){
         s.setVisible(false);
     });
     this.clear();
-    this.texts = [];
     this.zone.setVisible(false);
+    this.displayed = false;
 };

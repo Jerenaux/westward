@@ -17,7 +17,7 @@ Prototype level:
 Then:
 - Trailer
 - Have 2 settlements, with important differences
-- Several very different buildings 
+- Several very different buildings, working chains and cycles
 - World map-based settlement selection menu (mention key aspects, display enemy civ threats)
 - Class selection menu (describe impact on settlements)
 - Help buttons *everywhere*
@@ -25,10 +25,41 @@ Then:
 - One-time single-panel combat tutorial when first combat
 - One-time single-panel intro text when first login
 - Orientation panel in char menu hinting at what to do and where to go (w/ map?)
+-	Possibility to travel between two settlements
+-	Commitment rewarded by some gold
+-	Animals attack on the way (put spawn zones along the way)
+-	Quick craft: potions and arrows
+-	Decide recipes for both( see crafting) and make sure that the ingredients are available on the way
+-	Start equipment: sword, bow, quiver, 5 arrows, 1 potion, some gold
+-	Shop: tunic, shield, a few arrows, a few potions
+-	No staff: set up buildings, goods flows and prices myself
+-	Fully functional economy: after crafting decided, have all the necessary buildings in place and the loops that connect them
+-	No functional trade root but measure danger along it (add markers on map?)
 Goal: 1h of gameplay?
+
+Crafting part:
+-	Look at all available item sprites, organize them in tiers (raw, refined, final), try to make as many connections as possible
+-	Decide what is grabbable, what is harvested by buildings (what buildings)
+-	Decide what is basic, what needs buildings, what is smith/brew, craftsman level
+-	Then scatter raw materials in interesting ways
+-	Decide building chains for refined and finals
+-	Gold: raw, ingots, coins (only coins used for actual trade)
+
+Orientation part:
+-	Food deficit -> go kill something and sell food (and some furs too), or go and promote the farm or fish hut. 
+-	½ lumber camp built -> go promote it
+-	Low on gold: go find stuff to harvest or to kill in the wild, and sell or commit
+-	No tunic: go buy one, or go craft one in forge (needs building but basic)  [if artisan, allow to craft something sturdier and other stuff as well]
+-	Low on health or arrows: quick-craft a potion or try to buy some
+-	Go and secure trade route
+-	In settlement A: buy resource A and bring it to B
+-	In settlement B: the opposite
+
 
 Week:
 -----
+Design document
+Decide crafting economy
 Battle: update hover card of life bar
 Battle: test if battle zone disappears when dying, one player, multiple animals
 Fort: staff
@@ -38,17 +69,13 @@ Economic loop: test all updates of all menus
 Economic loop: harvest herbs
 Net: ghost animals when transitioning aoi? + removal of non-existing ones
 UI: test tooltip of items (after having added hpmax)
-UI: dont tween progress bars when opening menu
 UI: add notifs to everything (skinning, xp, using items, shopping, commitment, ...)
-UI: accessories tooltip glitch
-UI: fix big buttons
 Help: buttons in menus
 Help: buttons in buildings
 Equipment slot descriptions (guns less accurate, ...)
 Skills descriptions
 Gold hover cards
 Character: health doesn't go above 100 even if max increased by surplus
-Character: display stat modifiers details
 
 Finish:  test economy for a while;
 decide duration of all cycles (eco, spawn...); inspect all panes and set interesting values to everything
@@ -72,12 +99,12 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Reworkd longslot system
+- Rethink the calling of all events on menu open
 - Setters/getters everywhere
 - Clean orientation code based on tweens, not previous pos?
-- Streamline getNext/recycle stuff
 - Hero class, StatsManager, EquipmentManager (NetworkManager?)
 - Clean up Building.update() and updateSelf()
-- Use pools for everything (also for speech bubbles)
 - Centralize all texts
 - Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
 - Tie input events to game objects, rather than global functions (use topOnly)

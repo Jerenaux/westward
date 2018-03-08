@@ -137,7 +137,7 @@ GameServer.setUpdateLoops = function(){
     var clientUpdateRate = 1000/5; // Rate at which update packets are sent
     var walkUpdateRate = 1000/20; // Rate at which positions are updated
     GameServer.npcUpdateRate = 1000/5;
-    var settlementUpdateRate = 60*1000;
+    var settlementUpdateRate = 10*1000;
     var playerUpdateRate = 60*1000;
     var spawnZoneUpdateRate = 2*60*1000;
 

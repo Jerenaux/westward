@@ -33,9 +33,13 @@ CommitmentPanel.prototype.update = function(){
             var buildingTypeData =  Engine.buildingsData[slots[i]];
             var icon = buildingTypeData.icon;
             if(icon) slot.addIcon('aok',icon);
-            slot.addText(43,2,buildingTypeData.name);
+            slot.text = slot.addText(43,2,buildingTypeData.name);
         }else{
-            slot.clear();
+            if(slot.icon){
+                slot.icon.setVisible(false);
+                slot.icon = null;
+            }
+            if(slot.text) slot.text.setText('');
         }
 
         slot.display();

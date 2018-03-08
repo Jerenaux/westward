@@ -35,6 +35,8 @@ function BigButton(x,y,text,callback){
     this.text.setDisplayOrigin(0,0);
     this.text.setVisible(false);
     this.text.setInteractive();
+    this.text.handleOver = _parent.handleOver.bind(_parent);
+    this.text.handleOut = _parent.handleOut.bind(_parent);
 
     this.lastClick = Date.now();
 }
@@ -44,15 +46,19 @@ BigButton.prototype.setText = function(text){
     this.text.setText(text);
     var newWidth = this.text.width - 45;
     var dw = newWidth - currentWidth;
-    this.slices[1].width += dw;
     this.slices[2].x += dw;
-    this.slices[1].setInteractive();
+    var body = this.slices[1];
+    body.width += dw;
+    body.setInteractive();
+    body.refWidth = body.width;
+    body.refHeight = body.height;
 };
 
 BigButton.prototype.handleDown = function(){
     this.slices[0].setFrame('bigbutton_left_pressed');
     this.slices[1].setFrame('bigbutton_middle_pressed');
     this.slices[2].setFrame('bigbutton_right_pressed');
+    this.resetSize();
 };
 
 BigButton.prototype.handleClick = function(){
@@ -68,12 +74,20 @@ BigButton.prototype.handleOver = function(){
     this.slices[0].setFrame('bigbutton_left_lit');
     this.slices[1].setFrame('bigbutton_middle_lit');
     this.slices[2].setFrame('bigbutton_right_lit');
+    this.resetSize();
 };
 
 BigButton.prototype.handleOut = function(){
     this.slices[0].setFrame('bigbutton_left');
     this.slices[1].setFrame('bigbutton_middle');
     this.slices[2].setFrame('bigbutton_right');
+    this.resetSize();
+};
+
+BigButton.prototype.resetSize = function(){
+    var body = this.slices[1];
+    body.setSize(body.refWidth,body.refHeight);
+    //body.setInteractive();
 };
 
 BigButton.prototype.display = function(){

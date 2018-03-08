@@ -148,14 +148,15 @@ function MiniProgressBar(x,y,w,color){
     x -= w;
     x -= 5;
     y += 2;
-    this.tail = Engine.scene.add.sprite(x,y,'UI','miniprogress_'+color+'_left');
+    this.tail = Engine.scene.add.sprite(x,y,'UI');
     this.body.push(this.tail);
     x += 4;
-    this.barBody = Engine.scene.add.tileSprite(x,y,1,8,'UI','miniprogress_'+color+'_middle');
+    this.barBody = Engine.scene.add.tileSprite(x,y,1,8,'UI');
     this.body.push(this.barBody);
     x += 1;
-    this.head = Engine.scene.add.sprite(x,y,'UI','miniprogress_'+color+'_right');
+    this.head = Engine.scene.add.sprite(x,y,'UI');
     this.body.push(this.head);
+    this.setColor(color);
 
     this.hasHead = true;
     this.hasTail = true;
@@ -165,6 +166,15 @@ function MiniProgressBar(x,y,w,color){
 
 MiniProgressBar.prototype = Object.create(ProgressBar.prototype);
 MiniProgressBar.prototype.constructor = MiniProgressBar;
+
+MiniProgressBar.prototype.setColor = function(color){
+    this.tail.setFrame('miniprogress_'+color+'_left');
+    this.barBody.initWidth = this.barBody.width;
+    this.barBody.initHeight = this.barBody.height;
+    this.barBody.setFrame('miniprogress_'+color+'_middle');
+    this.barBody.setSize(this.barBody.initWidth,this.barBody.initHeight);
+    this.head.setFrame('miniprogress_'+color+'_right');
+};
 
 // #######################
 
