@@ -52,8 +52,8 @@
   "9":{
     "atlas": "items2",
     "frame":"hide",
-    "name": "Hide",
-    "desc": "Crafting material obtained from dead animals. Used to craft several pieces of equipment."
+    "name": "Pelt",
+    "desc": "Crafting material obtained from dead animals. Used to craft several pieces of equipment. Also very valuable to sell to settlements."
   },
   "10":{
     "atlas": "items2",

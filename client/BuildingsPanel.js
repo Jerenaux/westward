@@ -12,13 +12,16 @@ BuildingsPanel.prototype = Object.create(Panel.prototype);
 BuildingsPanel.prototype.constructor = BuildingsPanel;
 
 BuildingsPanel.prototype.displayListing = function(){
+    var xoffset = 15;
+    var yoffset = 40;
+
     var listing = Engine.currentBuiling.buildings;
     for(var i = 0; i < listing.length; i++){
         var data = listing[i];
         var buildingTypeData = Engine.buildingsData[data.type];
 
         var slot = this.displayedSlots[i] || this.getNextLongSlot(150);
-        slot.setUp(this.x+15,this.y + 30 + i*50);
+        slot.setUp(this.x+xoffset,this.y + yoffset + i*50);
         var displayProd = buildingTypeData.displayProd || !data.built;
 
         var newSlot = (slot.topicID != data.id);

@@ -84,7 +84,10 @@ Tooltip.prototype.makeStatsIcons = function(){
 Tooltip.prototype.updateInfo = function(title, text, itemID, stat){
     if(title) this.titleText.setText(title);
     text = text || '';
-    var descY = title ? this.y+25 : this.y+4;
+    var descY = this.y + 4;
+    if(title) descY += 21;
+    if(stat) descY += 25;
+    //var descY = title ? this.y+25 : this.y+4;
     this.descText.y = descY;
     this.descText.setText(text);
     var nbLines = 0;
@@ -146,10 +149,10 @@ Tooltip.prototype.displayStats = function(effects,nbEffects){
 
 Tooltip.prototype.displayModifiers = function(stat){
     var statObj = Engine.player.getStat(stat);
-    var y = this.y + 10;
+    var y = this.y + 5;
     var x = this.x + 13;
     if(this.titleText.text) y += this.titleText.height;
-    if(this.descText.text) y += this.descText.height;
+    //if(this.descText.text) y += this.descText.height;
     statObj.absoluteModifiers.forEach(function(m){
         var txt = this.makeModifierText(x,y,m,'absolute');
         x += 40;

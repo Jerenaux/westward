@@ -132,6 +132,7 @@ LongSlot.prototype.clear = function(){
     if(this.pin) this.pin.setVisible(false);
 };
 
+
 LongSlot.prototype.hideTexts = function(){
     this.texts.forEach(function(t){
         t.setVisible(false);

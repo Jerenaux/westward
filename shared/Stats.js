@@ -12,6 +12,7 @@ var Stats = {
     dict: {
         hpmax: {
             name: 'Health',
+            desc: 'If it gets to 0, you die. Potions can replenish it.',
             min: 0,
             max: 10000,
             start: 100,
@@ -20,6 +21,7 @@ var Stats = {
         },
         hp: {
             name: 'Health',
+            desc: 'If it gets to 0, you die. Potions can replenish it.',
             min: 0,
             max: 10000,
             start: 100,
@@ -29,6 +31,7 @@ var Stats = {
         },
         fat: {
             name: 'Fatigue',
+            desc: 'Fatigue increases as you perform actions and can impact your other stats negatively past a certain point. Rest and some potions can reduce it.',
             min: 0,
             max: 100,
             start: 0,
@@ -37,6 +40,7 @@ var Stats = {
         },
         acc: {
             name: 'Accuracy',
+            desc: 'Indicates your base chances to hit a target with a ranged weapon. It depends on the currently equipped ranged weapon. In battle, this number decreases based on the distance of the target.',
             min: 0,
             max: 100,
             start: 50,
@@ -45,6 +49,7 @@ var Stats = {
         },
         def: {
             name: 'Defense',
+            desc: 'Resistance to all types of damage. Can be increased by several pieces of equipment.',
             min: 0,
             max: 1000,
             start: 7,
@@ -52,6 +57,7 @@ var Stats = {
         },
         mdmg: {
             name: 'Melee Damage',
+            desc: 'Offensive power of your melee attacks. Depends on the currently equipped melee weapon.',
             min: 0,
             max: 1000,
             start: 12,
@@ -59,6 +65,7 @@ var Stats = {
         },
         rdmg: {
             name: 'Ranged Damage',
+            desc: 'Offensive power of your ranged attacks. Depends on the projectiles of the currently equipped ranged weapon.',
             min: 0,
             max: 1000,
             start: 10,
@@ -66,6 +73,7 @@ var Stats = {
         },
         smith: {
             name: 'Smithing',
+            desc: 'Reflects your ability to craft items and equipment.',
             min: 0,
             max: 100,
             start: 10,
@@ -74,6 +82,7 @@ var Stats = {
         },
         brew: {
             name: 'Brewing',
+            desc: 'Reflects your ability to craft potions and consumables.',
             min: 0,
             max: 100,
             start: 10,
@@ -82,6 +91,7 @@ var Stats = {
         },
         skin: {
             name: 'Harvesting',
+            desc: 'Reflects your ability to gather items from dead animals or from plants.',
             min: 0,
             max: 100,
             start: 10,
@@ -90,6 +100,7 @@ var Stats = {
         },
         nego: {
             name: 'Negotiation',
+            desc: 'Reflects your ability to negotiate better prices when trading.',
             min: 0,
             max: 100,
             start: 10,
@@ -98,6 +109,7 @@ var Stats = {
         },
         orient: {
             name: 'Orientation',
+            desc: 'Reflects your ability to find objects, people and locations in the wild.',
             min: 0,
             max: 100,
             start: 10,

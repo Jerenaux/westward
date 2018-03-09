@@ -20,18 +20,13 @@ Then:
 - Several very different buildings, working chains and cycles
 - World map-based settlement selection menu (mention key aspects, display enemy civ threats)
 - Class selection menu (describe impact on settlements)
-- Help buttons *everywhere*
-- Add short descriptions to items
 - One-time single-panel combat tutorial when first combat
 - One-time single-panel intro text when first login
 - Orientation panel in char menu hinting at what to do and where to go (w/ map?)
 -	Possibility to travel between two settlements
--	Commitment rewarded by some gold
 -	Animals attack on the way (put spawn zones along the way)
 -	Quick craft: potions and arrows
--	Decide recipes for both( see crafting) and make sure that the ingredients are available on the way
--	Start equipment: sword, bow, quiver, 5 arrows, 1 potion, some gold
--	Shop: tunic, shield, a few arrows, a few potions
+-	=> Decide recipes for both( see crafting) and make sure that the ingredients are available on the way
 -	No staff: set up buildings, goods flows and prices myself
 -	Fully functional economy: after crafting decided, have all the necessary buildings in place and the loops that connect them
 -	No functional trade root but measure danger along it (add markers on map?)
@@ -59,26 +54,31 @@ Orientation part:
 Week:
 -----
 Design document
+Bug: bubble at wrong location after respawn
 Decide crafting economy
-Battle: update hover card of life bar
 Battle: test if battle zone disappears when dying, one player, multiple animals
 Fort: staff
-Fort: dev lvl progress bar glitch
 Construction: notification of civic xp gain
-Economic loop: test all updates of all menus 
 Economic loop: harvest herbs
+Economic loop: display gold reward of commitment
+Economic loop: commitment gives gold
+Economic loop: clamp settlement resources (at least food to 0)
 Net: ghost animals when transitioning aoi? + removal of non-existing ones
-UI: test tooltip of items (after having added hpmax)
 UI: add notifs to everything (skinning, xp, using items, shopping, commitment, ...)
 Help: buttons in menus
 Help: buttons in buildings
 Equipment slot descriptions (guns less accurate, ...)
-Skills descriptions
 Gold hover cards
-Character: health doesn't go above 100 even if max increased by surplus
+Start equipment: sword, bow, quiver, 5 arrows, 1 potion, some gold
 
-Finish:  test economy for a while;
-decide duration of all cycles (eco, spawn...); inspect all panes and set interesting values to everything
+
+Finish:
+-------
+Shop: tunic, shield, a few arrows, a few potions
+Economic loop: test all updates of all menus 
+Test economy for a while; decide duration of all cycles (eco, spawn...); inspect all panes and set interesting values to everything
+When forge, update equip advice to include crafting
+Update tips
 
 Cleaning:
 --------
@@ -105,7 +105,7 @@ Order:
 - Clean orientation code based on tweens, not previous pos?
 - Hero class, StatsManager, EquipmentManager (NetworkManager?)
 - Clean up Building.update() and updateSelf()
-- Centralize all texts
+- Centralize all texts (incl. stats, equip, and even item descriptions)
 - Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
 - Tie input events to game objects, rather than global functions (use topOnly)
 - Remove unnecessary files (esp. sprites)
@@ -172,6 +172,7 @@ Design document:
 Polish:
 ------
 Visual:
+- Favicon
 - Show "new" tag when opening inventory
 - Cut corners of big battlezones? (but make sure it doesn't impact integrity: save integrity path and used it for that)
 - Variety of small "talk" bubbles in reaction to things happening (+ symbol bubbles?)

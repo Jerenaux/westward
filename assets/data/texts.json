@@ -1,5 +1,15 @@
 {
   "inventory_help": "This is your inventory. Clicking on consumable items will consume them. Clicking on equipable items will equip them. Some equipment can increase your inventory size.",
   "equipment_help": "This is your equipment. Click on a piece of equipment to unequip it. You cannot equip a ranged weapon and a melee weapon at the same time. You must equip an ammo containr (e.g. quiver) before equipping the corresponding ammunition (e.g. arrows).",
-  "stats_help": "These are you character stats. Their values influence the success and impact of various actions. Most of them can be increased by specific pieces of equipment. They can also decrease because of fatigue or if your settlement is in food deficit!"
+  "stats_help": "These are you character stats. Their values influence the success and impact of various actions. Most of them can be increased by specific pieces of equipment. They can also decrease because of fatigue or if your settlement is in food deficit!",
+
+  "buildings_help": "The list of buildings belonging to the settlement. Clicking on one will focus the map on it. A golden progress bar indicates the progress of the construction of an unfinished building, while a green bar represents the health of a finished building. The number at the bottom-right corresponds to the progress of the bar. The number at the top-right (if any) indicates the productivity of the building.",
+  "resources_help": "The stockpile of resources of the settlement, gathered by resource buildings or moved from the Trade Post.",
+
+  "health_advice": "You are low on health. Before venturing away from civilization, make sure to craft some red potions, or to buy some at the nearest Trade Post.",
+  "equip_advice":"Your equipment is a bit light. See if you can't purchase somethig better at the nearest Trade Post.",
+  "location_advice":"Looking for a building in particular? Try to find the Fort, it provides a map of the surroundings.",
+  "gold_advice_food": "Go sell your food and pelts!",
+  "gold_advice": "Need gold? Settlements are in demand of food and pelts. Hunt animals to acquire some.",
+  "deficit_advice": "Your settlement is in food deficit! Try to find food and sell it at the Trade Post!"
 }

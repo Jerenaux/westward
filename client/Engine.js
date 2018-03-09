@@ -698,8 +698,10 @@ Engine.makeFortMenu = function(){
     fort.addPanel('map',mapPanel);
 
     var buildings = new BuildingsPanel(buildx,buildy,buildw,buildh,'Buildings');
+    buildings.addButton(220, 8, 'blue','help',null,'',Engine.textsData['buildings_help']);
     fort.addPanel('buildings',buildings);
     var resources = new InventoryPanel(resx,resy,resw,resh,'Resources');
+    resources.addButton(resw-30, 8, 'blue','help',null,'',Engine.textsData['resources_help']);
     resources.setInventory(new Inventory(7),7,true);
     fort.addPanel('resources',resources);
     var status = new SettlementStatusPanel(statx,staty,statw,stath,'Status');
@@ -798,15 +800,21 @@ Engine.makeCharacterMenu = function(statsPanel){
     var infoh = 235;
     var infox = 665;
     var infoy = 100;
+    var todow = 300;
+    var todoh = 380;
+    var todox = infox - padding - todow;
+    var todoy = 100;
     var commith = infoh;
     var commitw = 300;
-    var commitx = infox - padding - commitw;
+    var commitx = todox - padding - commitw;
     var commity = infoy;
     var character = new Menu('Character');
     var infoPanel = new CharacterPanel(infox,infoy,330,infoh,'<Player name>');
     character.addPanel('info',infoPanel);
     var commitPanel = new CommitmentPanel(commitx,commity,commitw,commith,'Commitment');
     character.addPanel('commit',commitPanel);
+    var todoPanel = new SuggestPanel(todox,todoy,todow,todoh,'Suggested actions');
+    character.addPanel('todo',todoPanel);
     character.addPanel('stats',statsPanel);
     character.addEvent('onUpdateStats',statsPanel.updateStats.bind(statsPanel));
     character.addEvent('onUpdateCommit',commitPanel.update.bind(commitPanel));

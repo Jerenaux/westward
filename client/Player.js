@@ -124,6 +124,10 @@ var Player = new Phaser.Class({
         return this.equipment[slot][0] > -1;
     },
 
+    hasItem: function(item,nb){
+        return (this.inventory.getNb(item) >= nb);
+    },
+
     getContainerID: function(slot){
         return this.equipment[slot][0];
     },
