@@ -633,6 +633,7 @@ Engine.makeProductionMenu = function(){
     var productionPanel = new ProductionPanel(x,100,w,h,'Production');
     production.addPanel('production',productionPanel);
     var productivity = new ProductivityPanel(prodx,prody,prodw,prodh,'Productivity modifiers');
+    productivity.addButton(prodw-30, 8, 'blue','help',null,'',Engine.textsData['productivity_help']);
     production.addPanel('productivity',productivity);
 
     production.addEvent('onUpdateProductivity',productivity.update.bind(productivity));
@@ -654,10 +655,12 @@ Engine.makeConstructionMenu = function(){
 
     var constr = new Menu('Construction');
     var progress = new ConstructionPanel(x,progressy,w,progressh);
+    progress.addButton(w-30, 8, 'blue','help',null,'',Engine.textsData['progress_help']);
     constr.addPanel('progress',progress);
     var materials = new MaterialsPanel(x,invy,w,materialh,'Materials');
     constr.addPanel('materials',materials);
     var prod = new ProductivityPanel(prodx,prody,prodw,100,'Productivity modifiers');
+    prod.addButton(prodw-30, 8, 'blue','help',null,'',Engine.textsData['productivity_help']);
     constr.addPanel('prod',prod);
 
     constr.addEvent('onUpdateShop',materials.update.bind(materials));
@@ -695,23 +698,30 @@ Engine.makeFortMenu = function(){
 
     var fort = new Menu('Fort');
     var mapPanel = new MapPanel(mapx,mapy,mapw,maph,'',true); // true = invisible
+    mapPanel.addButton(mapw-30, 8, 'blue','help',null,'',Engine.textsData['map_help']);
     fort.addPanel('map',mapPanel);
 
     var buildings = new BuildingsPanel(buildx,buildy,buildw,buildh,'Buildings');
     buildings.addButton(220, 8, 'blue','help',null,'',Engine.textsData['buildings_help']);
     fort.addPanel('buildings',buildings);
     var resources = new InventoryPanel(resx,resy,resw,resh,'Resources');
+    resources.addCapsule('gold',150,-9,'999','gold');
     resources.addButton(resw-30, 8, 'blue','help',null,'',Engine.textsData['resources_help']);
     resources.setInventory(new Inventory(7),7,true);
     fort.addPanel('resources',resources);
     var status = new SettlementStatusPanel(statx,staty,statw,stath,'Status');
+    status.addButton(statw-30, 8, 'blue','help',null,'',Engine.textsData['setstatus_help']);
     fort.addPanel('status',status);
     var devlvl = new DevLevelPanel(lvlx,lvly,lvlw,lvlh,'Next level requirements');
+    devlvl.addButton(lvlw-30, 8, 'blue','help',null,'',Engine.textsData['devlvl_help']);
     fort.addPanel('devlvl',devlvl);
 
     fort.addEvent('onUpdateShop',function(){
         resources.updateInventory();
         devlvl.update();
+    });
+    fort.addEvent('onUpdateShopGold',function(){
+        resources.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
     });
     fort.addEvent('onUpdateBuildings',buildings.updateListing.bind(buildings));
     fort.addEvent('onUpdateSettlementStatus',status.update.bind(status));
@@ -1121,7 +1131,8 @@ Engine.updateSelf = function(data){
             Engine.handleMsg(data.msgs[i]);
         }
     }
-    if(data.foodSurplus){
+    if(data.notifs) Engine.handleNotifications(data.notifs);
+    if(data.foodSurplus !== undefined){
         Engine.player.foodSurplus = data.foodSurplus;
         updateEvents.add('character');
         updateEvents.add('productivity');

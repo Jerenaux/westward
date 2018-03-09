@@ -55,7 +55,7 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
     zone.setDepth(Engine.UIDepth+10);
     zone.setScrollFactor(0);
     zone.setInteractive();
-    zone.setOrigin(0);
+    //zone.setOrigin(0);
     zone.setVisible(false);
     zone.handleOver = function(){
         Engine.tooltip.updateInfo(helpTitle,helpText);

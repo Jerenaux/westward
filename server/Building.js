@@ -162,6 +162,10 @@ Building.prototype.takeItem = function(item,nb){
     this.setProperty('items',this.inventory.toList());
 };
 
+Building.prototype.getGold = function(){
+    return this.gold;
+};
+
 Building.prototype.giveGold = function(nb){
     this.setProperty('gold',Utils.clamp(this.gold+nb),0,000000);
 };

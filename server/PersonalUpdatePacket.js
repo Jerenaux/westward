@@ -8,6 +8,7 @@ function PersonalUpdatePacket(){
     this.equipment = [];
     this.ammo = [];
     this.msgs = [];
+    this.notifs = [];
 }
 
 PersonalUpdatePacket.prototype.isEmpty = function(){
@@ -60,6 +61,10 @@ PersonalUpdatePacket.prototype.addAmmo = function(slot,nb){
 
 PersonalUpdatePacket.prototype.addMsg = function(msg){
     this.msgs.push(msg);
+};
+
+PersonalUpdatePacket.prototype.addNotif = function(msg){
+    this.notifs.push(msg);
 };
 
 PersonalUpdatePacket.prototype.fightNotification = function(flag){

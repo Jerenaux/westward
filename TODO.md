@@ -58,13 +58,10 @@ Bug: bubble at wrong location after respawn
 Decide crafting economy
 Battle: test if battle zone disappears when dying, one player, multiple animals
 Fort: staff
-Construction: notification of civic xp gain
 Economic loop: harvest herbs
-Economic loop: display gold reward of commitment
-Economic loop: commitment gives gold
 Economic loop: clamp settlement resources (at least food to 0)
 Net: ghost animals when transitioning aoi? + removal of non-existing ones
-UI: add notifs to everything (skinning, xp, using items, shopping, commitment, ...)
+UI: add notifs to everything (using items, shopping, commitment, ...)
 Help: buttons in menus
 Help: buttons in buildings
 Equipment slot descriptions (guns less accurate, ...)

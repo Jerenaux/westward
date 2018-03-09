@@ -49,6 +49,14 @@ Settlement.prototype.registerFort = function(fort){
     };
 };
 
+Settlement.prototype.getFortGold = function(){
+    return this.fort.getGold();
+};
+
+Settlement.prototype.takeFortGold = function(nb){
+    this.fort.takeGold(nb);
+};
+
 Settlement.prototype.addToFort = function(item,nb){
     this.fort.giveItem(item,nb);
 };

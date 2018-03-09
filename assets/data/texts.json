@@ -5,6 +5,11 @@
 
   "buildings_help": "The list of buildings belonging to the settlement. Clicking on one will focus the map on it. A golden progress bar indicates the progress of the construction of an unfinished building, while a green bar represents the health of a finished building. The number at the bottom-right corresponds to the progress of the bar. The number at the top-right (if any) indicates the productivity of the building.",
   "resources_help": "The stockpile of resources of the settlement, gathered by resource buildings or moved from the Trade Post.",
+  "setstatus_help": "Basic information about the settlement. The food surplus or deficit corresponds to the excess (or lack thereof) of food with respect to the stockpile to keep as a function of the current population. Food surplus or deficit increases or decreases, respectively, the productivity of buildings and the stats of the citizens.",
+  "devlvl_help": "The list of goals to meet for the settlement to be able to reach the next development level. Development levels unlock new buildings, access to new resources and many other useful things.",
+  "map_help": "Represents the area arround the settlement. Drag the map to have a look at the surroundings. The pins indicate buildings. The skulls indicate danger.",
+  "productivity_help": "Indicates all the factors that are affecting the productivity of this building, and how. The higher the productivity, the faster the building will be built, or the more resources it will produce. Food surplus is achieved by storing enough food at the fort. Commitment indicates how many citizens are committing themselves to this building at the moment. ",
+  "progress_help": "Ths building is under construction. You can see here how close it is to completion, and at what rate this progress increases (+x%/cycle). Committing to the construction (by clicking the 'commit' button) will help speed it up. You will be rewarded with civic XP and possibly gold.",
 
   "health_advice": "You are low on health. Before venturing away from civilization, make sure to craft some red potions, or to buy some at the nearest Trade Post.",
   "equip_advice":"Your equipment is a bit light. See if you can't purchase somethig better at the nearest Trade Post.",

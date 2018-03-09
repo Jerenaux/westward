@@ -284,7 +284,7 @@ GameServer.skinAnimal = function(player,animalID){
     for(var item in loot){
         if(!loot.hasOwnProperty(item)) continue;
         player.giveItem(item,loot[item]);
-        //player.addFlyingTxt('Got '+loot[item]+' ',GameServer.itemsData[item].name);
+        player.addNotif('+'+loot[item]+' '+GameServer.itemsData[item].name);
     }
     GameServer.removeEntity(animal);
 };
@@ -502,11 +502,18 @@ GameServer.handleCommit = function(data,socketID){ // keep data argument
     if(!player.isInBuilding()) return;
     if(!player.hasFreeCommitSlot()) return;
     var buildingID = player.inBuilding;
+    var building = GameServer.buildings[buildingID];
     player.takeCommitmentSlot(buildingID);
-    GameServer.buildings[buildingID].updateCommit(1);
-    player.gainCivicXP(20);
+    building.updateCommit(1);
+    var gain = 20;
+    player.gainCivicXP(gain,true);
+    //player.addNotif('+'+gain+' civic XP');
     // TODO: increment change based on civic level?
     // TODO: xp reward change based on building?
+    var fortGold = building.settlement.getFortGold();
+    var reward = Math.min(20,fortGold); // TODO: adapt as well
+    building.settlement.takeFortGold(reward);
+    player.giveGold(reward,true);
 };
 
 GameServer.allIngredientsOwned = function(player,recipe,nb){

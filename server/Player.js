@@ -166,19 +166,22 @@ Player.prototype.getSlots = function(){
     return this.commitSlots.slots;
 };
 
-Player.prototype.gainCivicXP = function(inc){
+Player.prototype.gainCivicXP = function(inc,notify){
     this.civicxp[0] = Utils.clamp(this.civicxp[0]+inc,0,this.civicxp[1]);
     this.updatePacket.civicxp = this.civicxp[0];
+    if(notify) this.addNotif('+'+inc+' civic XP');
 };
 
-Player.prototype.giveGold = function(nb){
-    this.gold += nb;
+Player.prototype.giveGold = function(nb,notify){
+    this.gold = Utils.clamp(this.gold+nb,0,100000);
     this.updatePacket.updateGold(this.gold);
+    if(notify) this.addNotif('+'+nb+' gold');
 };
 
-Player.prototype.takeGold = function(nb){
-    this.gold -= nb;
+Player.prototype.takeGold = function(nb,notify){
+    this.gold = Utils.clamp(this.gold-nb,0,100000);
     this.updatePacket.updateGold(this.gold);
+    if(notify) this.addNotif('-'+nb+' gold');
 };
 
 Player.prototype.canBuy = function(price){ // check if building has gold and room
@@ -471,6 +474,10 @@ Player.prototype.setChat = function(text){
 
 Player.prototype.addMsg = function(msg){
     this.updatePacket.addMsg(msg);
+};
+
+Player.prototype.addNotif = function(msg){
+    this.updatePacket.addNotif(msg);
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){
