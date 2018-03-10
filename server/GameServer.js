@@ -423,16 +423,16 @@ GameServer.handleShop = function(data,socketID) {
         if(!building.canSell(item,nb)) return;
         var price = building.getPrice(item,nb,'buy');
         if(!player.canBuy(price)) return;
-        player.takeGold(price);is
-        player.giveItem(item,nb);
+        player.takeGold(price,true);
+        player.giveItem(item,nb,true);
         building.takeItem(item,nb);
         building.giveGold(price);
     }else{
         if(!player.hasItem(item,nb)) return;
         if(!building.canBuy(item,nb)) return;
         var price = building.getPrice(item,nb,'sell');
-        player.giveGold(price);
-        player.takeItem(item,nb);
+        player.giveGold(price,true);
+        player.takeItem(item,nb,true);
         building.takeGold(price);
         building.giveItem(item,nb);
     }
@@ -503,11 +503,10 @@ GameServer.handleCommit = function(data,socketID){ // keep data argument
     if(!player.hasFreeCommitSlot()) return;
     var buildingID = player.inBuilding;
     var building = GameServer.buildings[buildingID];
-    player.takeCommitmentSlot(buildingID);
+    player.takeCommitmentSlot(buildingID,true);
     building.updateCommit(1);
     var gain = 20;
     player.gainCivicXP(gain,true);
-    //player.addNotif('+'+gain+' civic XP');
     // TODO: increment change based on civic level?
     // TODO: xp reward change based on building?
     var fortGold = building.settlement.getFortGold();
@@ -527,9 +526,9 @@ GameServer.allIngredientsOwned = function(player,recipe,nb){
 GameServer.operateCraft = function(player,recipe,targetItem,nb){
     for(var item in recipe) {
         if (!recipe.hasOwnProperty(item)) continue;
-        player.takeItem(item,recipe[item]*nb);
+        player.takeItem(item,recipe[item]*nb,true);
     }
-    player.giveItem(targetItem,nb);
+    player.giveItem(targetItem,nb,true);
 };
 
 GameServer.handlePath = function(data,socketID){
@@ -556,8 +555,8 @@ GameServer.handleUse = function(data,socketID){
     if(itemData.equipment) {
         player.equip(itemData.equipment, item, false); // false: not from DB
     }else  if(itemData.effects){
-        player.applyEffects(item);
-        player.takeItem(item,1);
+        player.applyEffects(item,1,true);
+        player.takeItem(item,1,true);
     }
 };
 
@@ -566,7 +565,7 @@ GameServer.handleUnequip = function(data,socketID) {
     var slot = data.slot;
     var subSlot = data.subslot;
     if(player.equipment[slot][subSlot] == -1) return;
-    player.unequip(slot,subSlot);
+    player.unequip(slot,subSlot,true);
 };
 
 GameServer.handleExit = function(data,socketID){

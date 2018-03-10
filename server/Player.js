@@ -61,13 +61,13 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(1,1);
     this.giveItem(2,1);
     this.giveItem(3,1);
+    this.giveItem(4,1);
     this.giveItem(5,14);
     this.giveItem(9,3);
     this.giveItem(9,3);
     this.giveItem(11,2);
     this.giveItem(12,1);
     this.giveItem(13,1);
-    this.giveItem(14,1);
     this.giveItem(17,3);
     this.giveItem(18,1);
     this.giveItem(19,1);
@@ -127,17 +127,19 @@ Player.prototype.hasFreeCommitSlot = function(){
     return this.getSlots().length < this.commitSlots.max;
 };
 
-Player.prototype.takeCommitmentSlot = function(buildingID){
+Player.prototype.takeCommitmentSlot = function(buildingID,notify){
     this.addToSlots({
         building: buildingID,
         stamp: Date.now()
     });
     this.syncCommitSlots();
+    if(notify) this.addNotif('Committed to '+GameServer.buildings[buildingID].name);
 };
 
 Player.prototype.freeCommitmentSlot = function(){
-    this.removeSlot();
+    var slot = this.removeSlot();
     this.syncCommitSlots();
+    this.addNotif('Committed to '+GameServer.buildings[slot.building].name);
 };
 
 Player.prototype.trimCommitSlots = function(){
@@ -159,7 +161,7 @@ Player.prototype.addToSlots = function(data){
 };
 
 Player.prototype.removeSlot = function(){
-    this.commitSlots.slots.shift();
+    return this.commitSlots.slots.shift();
 };
 
 Player.prototype.getSlots = function(){
@@ -200,16 +202,18 @@ Player.prototype.hasItem = function(item,nb){
     return (this.inventory.getNb(item) >= nb);
 };
 
-Player.prototype.giveItem = function(item,nb){
+Player.prototype.giveItem = function(item,nb,notify){
     //console.log('Giving ',GameServer.itemsData[item].name,'x',nb);
     this.inventory.add(item,nb);
     this.updatePacket.addItem(item,this.inventory.getNb(item));
+    if(notify) this.addNotif('+'+nb+' '+GameServer.itemsData[item].name);
 };
 
-Player.prototype.takeItem = function(item,nb){
-    console.log('Taking ',GameServer.itemsData[item].name,'x',nb);
+Player.prototype.takeItem = function(item,nb,notify){
+    //console.log('Taking ',GameServer.itemsData[item].name,'x',nb);
     this.inventory.take(item,nb);
     this.updatePacket.addItem(item,this.inventory.getNb(item));
+    if(notify) this.addNotif('-'+nb+' '+GameServer.itemsData[item].name);
 };
 
 Player.prototype.isEquipped = function(slot,subSlot){
@@ -249,6 +253,7 @@ Player.prototype.equip = function(slot,item,fromDB){
     // equip item
     this.equipment[slot][subSlot] = item;
     this.updatePacket.addEquip(slot,subSlot,item);
+    if(!fromDB) this.addNotif('Equipped '+GameServer.itemsData[item].name);
 
     this.applyAbsoluteModifiers(item);
     var nb = 1;
@@ -263,18 +268,19 @@ Player.prototype.equip = function(slot,item,fromDB){
     if(!fromDB) this.takeItem(item, nb);
 };
 
-Player.prototype.unequip = function(slot,subSlot){
+Player.prototype.unequip = function(slot,subSlot,notify){
     var item = this.equipment[slot][subSlot];
     if(item == -1) return;
     var containerSlot = Equipment.dict[slot].containedIn;
     var containedSlot = Equipment.dict[slot].contains;
     var nb = containerSlot ? this.equipment.containers[containerSlot] : 1;
-    if(containerSlot) this.unload(containerSlot);
-    if(containedSlot) this.unequip(containedSlot,0);
+    if(containerSlot) this.unload(containerSlot,notify);
+    if(containedSlot) this.unequip(containedSlot,0,notify);
     this.applyAbsoluteModifiers(item,-1);
     this.equipment[slot][subSlot] = -1;
     this.giveItem(item,nb);
     this.updatePacket.addEquip(slot,subSlot,-1);
+    if(notify) this.addNotif('Unequipped '+GameServer.itemsData[item].name);
 };
 
 Player.prototype.applyAbsoluteModifiers = function(item,change){
@@ -314,9 +320,11 @@ Player.prototype.load = function(containerSlot,nb){
     this.updatePacket.addAmmo(containerSlot,this.equipment.containers[containerSlot]);
 };
 
-Player.prototype.unload = function(containerSlot){
+Player.prototype.unload = function(containerSlot,notify){
+    var item = this.equipment.containers[containerSlot];
     this.equipment.containers[containerSlot] = 0;
     this.updatePacket.addAmmo(containerSlot,0);
+    //if(notify) this.addNotif('Unloaded '+GameServer.itemsData[item].name);
 };
 
 Player.prototype.decreaseAmmo = function(){
@@ -343,20 +351,25 @@ Player.prototype.canRange = function(){
     return this.getAmmo(this.getRangedContainer(weapon)) > 0;
 };
 
-Player.prototype.applyEffects = function(item,coef){
+Player.prototype.applyEffects = function(item,coef,notify){
     var coef = coef || 1;
     var itemData = GameServer.itemsData[item];
     if(!itemData.effects) return;
     for (var stat in itemData.effects) {
         if (!itemData.effects.hasOwnProperty(stat)) continue;
-        this.applyEffect(stat, coef*itemData.effects[stat]);
+        this.applyEffect(stat, coef*itemData.effects[stat],notify);
     }
 };
 
 // Apply effect of consumable object
-Player.prototype.applyEffect = function(stat,delta){
+Player.prototype.applyEffect = function(stat,delta,notify){
     this.getStat(stat).increment(delta);
     this.refreshStat(stat);
+    if(notify) {
+        var change = delta;
+        if(change >= 0) change = '+'+change;
+        this.addNotif(Stats.dict[stat].name+' '+change);
+    }
 };
 
 Player.prototype.initTrim = function(){

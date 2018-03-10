@@ -122,7 +122,8 @@ var Map = new Phaser.Class({
     },
 
     display: function(x,y){
-        var origin = Utils.tileToPct(Engine.currentBuiling.tileX,Engine.currentBuiling.tileY);
+        var tile = Engine.currentBuiling.getTilePosition();
+        var origin = Utils.tileToPct(tile.x,tile.y);
         this.setOrigin(origin.x,origin.y);
         this.setPosition(x,y);
         this.initialX = this.x;

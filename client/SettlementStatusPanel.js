@@ -31,14 +31,15 @@ SettlementStatusPanel.prototype.displayInterface = function(){
 };
 
 SettlementStatusPanel.prototype.update = function(){
-    var data = Engine.currentBuiling;
-    this.populationTxt.setText(data.population);
-    this.surplusTxt.setText(data.foodsurplus+'% ');
-    this.surplusTxt.setFill(data.foodsurplus >= 0 ? Utils.colors.green : Utils.colors.red);
-    var needed = data.population*20;
-    var owned = data.getItemNb(1);
+    var foodSurplus = Engine.currentBuiling.getFoodSurplus();
+    var population = Engine.currentBuiling.getPopulation();
+    this.populationTxt.setText(population);
+    this.surplusTxt.setText(Math.round(foodSurplus)+'% ');
+    this.surplusTxt.setFill(foodSurplus >= 0 ? Utils.colors.green : Utils.colors.red);
+    var needed = population*20;
+    var owned = Engine.currentBuiling.getItemNb(Engine.config.FOOD_ID);
     this.foodRatioTxt.setText(" ("+owned+"/"+needed+")");
-    this.foodStatusTxt.setText(data.foodsurplus >= 0 ? 'Food surplus: ' : 'Food deficit: ');
+    this.foodStatusTxt.setText(foodSurplus >= 0 ? 'Food surplus: ' : 'Food deficit: ');
 };
 
 SettlementStatusPanel.prototype.display = function(){

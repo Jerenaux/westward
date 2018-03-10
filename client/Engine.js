@@ -28,7 +28,11 @@ var Engine = {
     playerIsInitialized: false,
     cursor: 'url(/assets/sprites/cursor.png), auto', // image of the mouse cursor in normal circumstances
     bowCursor: 'url(/assets/sprites/bowcursor32.png), auto',
-    swordCursor: 'url(/assets/sprites/swordcursor32.png), auto'
+    swordCursor: 'url(/assets/sprites/swordcursor32.png), auto',
+
+    config: {
+        FOOD_ID: 1
+    }
 };
 
 Engine.preload = function() {
@@ -1135,7 +1139,8 @@ Engine.updateSelf = function(data){
     if(data.foodSurplus !== undefined){
         Engine.player.foodSurplus = data.foodSurplus;
         updateEvents.add('character');
-        updateEvents.add('productivity');
+        //updateEvents.add('productivity');
+        //updateEvents.add('settlementStatus');
     }
     if(data.dead !== undefined){
         if(data.dead == true) Engine.manageDeath();
@@ -1172,7 +1177,6 @@ Engine.updateStat = function(key,data){
             statObj.absoluteModifiers.push(m);
         })
     }
-    //console.log(Engine.player.getStat(key));
 };
 
 Engine.updateInventory = function(inventory,items){
@@ -1191,6 +1195,7 @@ Engine.updateMenus = function(category){
         'gold': 'onUpdateGold',
         'inv': 'onUpdateInventory',
         'productivity':'onUpdateProductivity',
+        //'settlementStatus': 'onUpdateSettlementStatus',
         'stats': 'onUpdateStats'
     };
 
@@ -1209,6 +1214,7 @@ Engine.handleNotifications = function(msgs){
         Engine.showNotification(msg,i,msgs.length);
         i++;
     });
+    // TODO: keep list of displayed notifications
 };
 
 Engine.showNotification = function(msg,i,nb){
@@ -1220,7 +1226,7 @@ Engine.showNotification = function(msg,i,nb){
 
     var tween = Engine.scene.tweens.addCounter({
         from: y,
-        to: y-(40*nb),
+        to: y-(40*nb), // TODO: compute dest based on previous msg dest + current msg height
         duration: 300,
         paused: true,
         ease: 'Quad.easeOut',

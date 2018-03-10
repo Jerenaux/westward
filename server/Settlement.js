@@ -77,7 +77,11 @@ Settlement.prototype.computeFoodSurplus = function(){
     var delta = foodAmount - required;
     var pct = delta/required;
     this.surplus = pct;
-    this.fort.setProperty('foodsurplus',Math.round(pct*100));
+    var roundedSUrplus = this.surplus*100;
+    this.buildings.forEach(function(building){
+        building.setProperty('foodsurplus',roundedSUrplus);
+    });
+    //this.fort.setProperty('foodsurplus',Math.round(pct*100));
 };
 
 Settlement.prototype.computeFoodProductivity = function(){

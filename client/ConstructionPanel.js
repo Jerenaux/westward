@@ -27,7 +27,7 @@ ConstructionPanel.prototype.update = function(){
     var data = Engine.currentBuiling;
     this.bar.setLevel(data.progress);
     this.progressText.setText(this.bar.getPct()+'%');
-    var increment = Formulas.computeBuildIncrement(data.prod,Engine.buildingsData[data.buildingType].buildRate);//Math.round((data.prod/100)*Engine.buildingsData[data.buildingType].buildRate);
+    var increment = Formulas.computeBuildIncrement(data.prod,Engine.buildingsData[data.buildingType].buildRate);
     this.incrementText.setText('(+'+increment+'%/cycle)');
     this.displayCommitButton();
 };

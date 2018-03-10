@@ -55,6 +55,10 @@
     {
       "filename": "gold-pile",
       "frame": {"x":288,"y":504,"w":24,"h":24}
+    },
+    {
+      "filename": "bomb",
+      "frame": {"x":48,"y":816,"w":24,"h":24}
     }
   ]
 }

@@ -31,13 +31,14 @@ ProductivityPanel.prototype.addInterface = function(){
 
 ProductivityPanel.prototype.update = function(){
     var data = Engine.currentBuiling;
+    var foodSurplus = Engine.currentBuiling.getFoodSurplus();
     this.totalProd.setText(data.prod+'%');
     this.nbCommittedText.setText('('+data.committed+')');
     var commitModifier = Formulas.commitmentProductivityModifier(data.committed);
     this.commitmentText.setText('+'+commitModifier+'%');
     this.commitmentText.setFill(commitModifier > 0 ? Utils.colors.green : Utils.colors.white);
 
-    var foodModifier = Math.round(Formulas.computeSettlementFoodModifier(Engine.player.foodSurplus));
+    var foodModifier = Math.round(Formulas.computeSettlementFoodModifier(foodSurplus/100));
 
     this.foodText.setFill(foodModifier >= 0 ? Utils.colors.green : Utils.colors.red);
     this.deficitText.setText(foodModifier >= 0 ? 'food surplus' : 'food deficit');

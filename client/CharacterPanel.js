@@ -45,6 +45,7 @@ CharacterPanel.prototype.addInterface = function(){
     y += 15;
     var txts = this.addPolyText(x,y,['-100% ','food deficit'],[Utils.colors.red,null]);
     this.foodModifierTxt = txts[0];
+    this.foodModifierLabel = txts[1];
 };
 
 CharacterPanel.prototype.update = function(){
@@ -53,6 +54,7 @@ CharacterPanel.prototype.update = function(){
     this.civicbar.setLevel(Engine.player.civicxp,Engine.player.maxcivicxp);
     var foodModifier = Math.round(Formulas.computePlayerFoodModifier(Engine.player.foodSurplus)*100);
     this.foodModifierTxt.setFill(foodModifier < 0 ? Utils.colors.red : Utils.colors.green);
+    this.foodModifierLabel.setText(Engine.player.foodSurplus >= 0 ? 'Food surplus' : 'Food deficit');
     if(foodModifier > 0) foodModifier = '+'+foodModifier;
     this.foodModifierTxt.setText(foodModifier+"%");
 };

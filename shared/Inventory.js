@@ -9,6 +9,13 @@ function Inventory(size){
     this.size = 0;
 }
 
+Inventory.prototype.updateItems = function(items){
+    // items is an array of smaller arrays of format [item id, nb]
+    items.forEach(function(i){
+        this.update(i[0],i[1]);
+    },this);
+};
+
 // Replace the amount of an object in the inventory, or add it if non-existent
 Inventory.prototype.update = function(item,nb){
     var previousAmount = this.getNb(item);

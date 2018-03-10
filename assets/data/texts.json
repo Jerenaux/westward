@@ -4,7 +4,7 @@
   "stats_help": "These are you character stats. Their values influence the success and impact of various actions. Most of them can be increased by specific pieces of equipment. They can also decrease because of fatigue or if your settlement is in food deficit!",
 
   "buildings_help": "The list of buildings belonging to the settlement. Clicking on one will focus the map on it. A golden progress bar indicates the progress of the construction of an unfinished building, while a green bar represents the health of a finished building. The number at the bottom-right corresponds to the progress of the bar. The number at the top-right (if any) indicates the productivity of the building.",
-  "resources_help": "The stockpile of resources of the settlement, gathered by resource buildings or moved from the Trade Post.",
+  "resources_help": "The stockpile of resources of the settlement, gathered by resource buildings or moved from the Trade Post. The capsule above indicates the amount of currency in the coffers of the Fort.",
   "setstatus_help": "Basic information about the settlement. The food surplus or deficit corresponds to the excess (or lack thereof) of food with respect to the stockpile to keep as a function of the current population. Food surplus or deficit increases or decreases, respectively, the productivity of buildings and the stats of the citizens.",
   "devlvl_help": "The list of goals to meet for the settlement to be able to reach the next development level. Development levels unlock new buildings, access to new resources and many other useful things.",
   "map_help": "Represents the area arround the settlement. Drag the map to have a look at the surroundings. The pins indicate buildings. The skulls indicate danger.",

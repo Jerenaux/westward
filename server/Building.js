@@ -15,6 +15,7 @@ function Building(data){
     this.y = data.y;
     this.isBuilding = true;
     this.type = data.type;
+    this.name = GameServer.buildingsData[this.type].name;
     this.sid = data.settlement;
     this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(100);

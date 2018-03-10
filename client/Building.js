@@ -10,7 +10,6 @@ Building = new Phaser.Class({
     Extends: CustomSprite,
 
     initialize: function Building() {
-        //CustomSprite.call(this, data.x*Engine.tileWidth, data.y*Engine.tileHeight,sprite);
         CustomSprite.call(this, 0, 0);
         this.entityType = 'building';
     },
@@ -24,22 +23,18 @@ Building = new Phaser.Class({
             Math.round(this.frame.height/2)
         );
 
-        this.setPosition(data.x * Engine.tileWidth, data.y * Engine.tileHeight);
-        this.tileX = data.x;
-        this.tileY = data.y;
-        this.id = data.id;
+        this.setTilePosition(data.x,data.y,true);
+        this.setID(data.id);
 
         Engine.buildings[this.id] = this;
-        //Engine.displayedBuildings.add(this.id);
         Engine.entityManager.addToDisplayList(this);
 
         this.buildingType = data.type;
         this.settlement = data.sid;
         this.inventory = new Inventory(100);
         this.prices = {};
-        this.chunk = Utils.tileToAOI({x: this.tileX, y: this.tileY});
         this.entry = buildingData.entry;
-        this.built = data.built;
+        this.setBuilt(data.built);
 
         //var collisionData = (this.built ? data : Engine.buildingsData[FOUNDATIONS_ID]);
         //this.setCollisions(collisionData);
@@ -47,57 +42,48 @@ Building = new Phaser.Class({
     },
 
     build: function () {
-        this.built = true;
+        this.setBuilt(true);
         this.setTexture(Engine.buildingsData[this.buildingType].sprite);
         this.setOrigin(0.5);
-        this.setPosition(this.tileX * Engine.tileWidth, this.tileY * Engine.tileHeight);
+        this.setTilePosition(this.tx,this.ty,true);
     },
 
     update: function (data) {
-        var updateEvents = new Set();
-        if (data.inventory) {
-            this.inventory.fromList(data.inventory);
-            updateEvents.add('onUpdateShop');
+        var callbacks = {
+            'buildings': this.setBuildingsListing,
+            'foodsurplus': this.setFoodSurplus,
+            'gold': this.setGold,
+            'inventory': this.setInventory, // sets whole inventor
+            'items': this.updateInventory, // update individual entries in inventory
+            'population': this.setPopulation,
+            'prices': this.setPrices
+        };
+        this.updateEvents = new Set();
+
+        for(var field in callbacks){
+            if(!callbacks.hasOwnProperty(field)) continue;
+            if(field in data) callbacks[field].call(this,data[field]);
         }
-        if (data.gold) {
-            this.gold = data.gold;
-            updateEvents.add('onUpdateShopGold');
-        }
-        if (data.items) {
-            Engine.updateInventory(this.inventory, data.items);
-            updateEvents.add('onUpdateShop');
-        }
-        if (data.prices) {
-            this.prices = data.prices;
-            updateEvents.add('onUpdateShop');
-        }
-        if (data.buildings) {
-            this.buildings = data.buildings;
-            updateEvents.add('onUpdateBuildings');
-        }
-        if (data.population) {
-            this.population = data.population;
-            updateEvents.add('onUpdateSettlementStatus');
-        }
-        if (data.foodsurplus) {
+
+        /*if (data.foodsurplus) {
             this.foodsurplus = data.foodsurplus;
-            updateEvents.add('onUpdateSettlementStatus');
-        }
+            this.updateEvents.add('onUpdateSettlementStatus');
+        }*/
         if (data.danger) {
             this.danger = data.danger;
-            updateEvents.add('onUpdateMap');
+            this.updateEvents.add('onUpdateMap');
         }
         if (data.progress) {
             this.progress = data.progress;
-            updateEvents.add('onUpdateConstruction');
+            this.updateEvents.add('onUpdateConstruction');
         }
         if (data.prod) {
             this.prod = data.prod;
-            updateEvents.add('onUpdateConstruction');
-            updateEvents.add('onUpdateProductivity');
+            this.updateEvents.add('onUpdateConstruction');
+            this.updateEvents.add('onUpdateProductivity');
         }
         if (data.built) {
-            if (data.built == true && this.built == false) this.build();
+            if (data.built == true && !this.isBuilt()) this.build();
             if (Engine.inThatBuilding(this.id)) {
                 Engine.exitBuilding();
                 Engine.enterBuilding(this.id);
@@ -106,10 +92,10 @@ Building = new Phaser.Class({
 
         if (data.committed) {
             this.committed = data.committed;
-            updateEvents.add('onUpdateProductivity');
+            this.updateEvents.add('onUpdateProductivity');
         }
 
-        updateEvents.forEach(function (e) {
+        this.updateEvents.forEach(function (e) {
             Engine.checkForBuildingMenuUpdate(this.id, e);
         }, this);
     },
@@ -121,6 +107,15 @@ Building = new Phaser.Class({
 
     // ### SETTERS ###
 
+    setBuildingsListing: function(buildings){
+        this.buildings = buildings;
+        this.updateEvents.add('onUpdateBuildings');
+    },
+
+    setBuilt: function(flag){
+        this.built = flag;
+    },
+
     setCollisions: function (data) {
         var shape = new Phaser.Geom.Polygon(data.shape);
         this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
@@ -128,19 +123,57 @@ Building = new Phaser.Class({
         var center = true;
         var spriteX, spriteY;
         if (center) {
-            spriteX = this.tileX - Math.ceil((data.width / 2) / World.tileWidth);
-            spriteY = this.tileY - Math.ceil((data.height / 2) / World.tileHeight);
-            this.setDepth(Engine.buildingsDepth + this.tileY / 1000);
+            spriteX = this.tx - Math.ceil((data.width / 2) / World.tileWidth);
+            spriteY = this.ty - Math.ceil((data.height / 2) / World.tileHeight);
+            this.setDepth(Engine.buildingsDepth + this.ty / 1000);
         } else {
             this.setDisplayOrigin(0);
-            this.setDepth(Engine.buildingsDepth + (this.tileY + ((data.height / 2) / 32)) / 1000);
-            spriteX = this.tileX;
-            spriteY = this.tileY;
+            this.setDepth(Engine.buildingsDepth + (this.ty + ((data.height / 2) / 32)) / 1000);
+            spriteX = this.tx;
+            spriteY = this.ty;
         }
         PFUtils.collisionsFromShape(shape.points, spriteX, spriteY, data.width, data.height, Engine.collisions);
     },
 
+    setFoodSurplus: function(foodsurplus){
+        this.foodsurplus = foodsurplus;
+        this.updateEvents.add('onUpdateSettlementStatus');
+    },
+
+    setGold: function(gold){
+        this.gold = gold;
+        this.updateEvents.add('onUpdateShopGold');
+    },
+
+    setInventory: function(inventory){
+        this.inventory.fromList(inventory);
+        this.updateEvents.add('onUpdateShop');
+    },
+
+    setPopulation: function(population){
+        this.population = population;
+        this.updateEvents.add('onUpdateSettlementStatus');
+    },
+
+    setPrices: function(prices){
+        this.prices = prices;
+        this.updateEvents.add('onUpdateShop');
+    },
+
+    updateInventory: function(items){
+        this.inventory.updateItems(items);
+        this.updateEvents.add('onUpdateShop');
+    },
+
     // ### GETTERS ###
+
+    getFoodSurplus: function(){
+        return this.foodsurplus;
+    },
+
+    getPopulation: function(){
+        return this.population;
+    },
 
     getPrice: function (id, action) {
         var key = (action == 'sell' ? 0 : 1);
@@ -151,14 +184,25 @@ Building = new Phaser.Class({
         return this.inventory.getNb(item);
     },
 
+    getTilePosition: function(){
+        return {
+            x: this.tx,
+            y: this.ty
+        }
+    },
+
+    isBuilt: function(){
+        return this.built;
+    },
+
     // ### INPUT ###
 
     handleClick: function () {
         if (Engine.inMenu || Engine.player.inFight || Engine.dead) return;
         if (!this.entry) return;
         var pos = {
-            x: this.tileX + this.entry.x,
-            y: this.tileY + this.entry.y
+            x: this.tx + this.entry.x,
+            y: this.ty + this.entry.y
         };
         Engine.player.setDestinationAction(1, this.id); // 1 for building
         Engine.computePath(pos);

@@ -27,7 +27,10 @@
     "desc": "Used by settlements to build new buildings."
   },
   "4":{
-
+    "atlas": "items2",
+    "frame":"bomb",
+    "name": "Bomb",
+    "desc": "[SOON] Can be used in battle for area-of-effect damage."
   },
   "5":{
     "atlas": "items2",

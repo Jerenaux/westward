@@ -11,75 +11,72 @@ Polish
 Prototype level:
 ###############
 
-- Think about typical gameplay scenarios and decide milestones accordingly
-- Profiles: new vs old player, focused on self vs setllement, x 4 classes
-
-Then:
-- Trailer
-- Have 2 settlements, with important differences
-- Several very different buildings, working chains and cycles
-- World map-based settlement selection menu (mention key aspects, display enemy civ threats)
-- Class selection menu (describe impact on settlements)
-- One-time single-panel combat tutorial when first combat
-- One-time single-panel intro text when first login
-- Orientation panel in char menu hinting at what to do and where to go (w/ map?)
--	Possibility to travel between two settlements
--	Animals attack on the way (put spawn zones along the way)
--	Quick craft: potions and arrows
--	=> Decide recipes for both( see crafting) and make sure that the ingredients are available on the way
--	No staff: set up buildings, goods flows and prices myself
--	Fully functional economy: after crafting decided, have all the necessary buildings in place and the loops that connect them
--	No functional trade root but measure danger along it (add markers on map?)
-Goal: 1h of gameplay?
-
-Crafting part:
--	Look at all available item sprites, organize them in tiers (raw, refined, final), try to make as many connections as possible
--	Decide what is grabbable, what is harvested by buildings (what buildings)
--	Decide what is basic, what needs buildings, what is smith/brew, craftsman level
--	Then scatter raw materials in interesting ways
--	Decide building chains for refined and finals
--	Gold: raw, ingots, coins (only coins used for actual trade)
-
-Orientation part:
--	Food deficit -> go kill something and sell food (and some furs too), or go and promote the farm or fish hut. 
--	½ lumber camp built -> go promote it
--	Low on gold: go find stuff to harvest or to kill in the wild, and sell or commit
--	No tunic: go buy one, or go craft one in forge (needs building but basic)  [if artisan, allow to craft something sturdier and other stuff as well]
--	Low on health or arrows: quick-craft a potion or try to buy some
--	Go and secure trade route
--	In settlement A: buy resource A and bring it to B
--	In settlement B: the opposite
-
-
 Week:
 -----
 Design document
-Bug: bubble at wrong location after respawn
-Decide crafting economy
-Battle: test if battle zone disappears when dying, one player, multiple animals
-Fort: staff
-Economic loop: harvest herbs
+One-time single-panel combat tutorial when first combat
+Set up a second settlement, test its fort and respawn
+World map-based settlement selection menu (mention key startegic aspects, display enemy civ threats)
+Class selection menu (describe impact on settlements)
+Fort: staff (msg: you need civic lvl2 to vote for governor)
+Battle: monsters trigger fights (move spawn zones)
+Economic loop: harvest herbs (scatter roots)
 Economic loop: clamp settlement resources (at least food to 0)
-Net: ghost animals when transitioning aoi? + removal of non-existing ones
-UI: add notifs to everything (using items, shopping, commitment, ...)
+Help: One-time single-panel intro text when first login
 Help: buttons in menus
 Help: buttons in buildings
 Equipment slot descriptions (guns less accurate, ...)
-Gold hover cards
+Quick-craft recipes: bow, potion + arrow, hatchet
 Start equipment: sword, bow, quiver, 5 arrows, 1 potion, some gold
-
 
 Finish:
 -------
-Shop: tunic, shield, a few arrows, a few potions
-Economic loop: test all updates of all menus 
-Test economy for a while; decide duration of all cycles (eco, spawn...); inspect all panes and set interesting values to everything
+Trailer
+Decide cycle (eco, spawn)
+Make sure all menus have something interesting to show 
+Test economy for a while
 When forge, update equip advice to include crafting
-Update tips
+Reread all tips and help
+Economic loop: test all updates of all menus
+Synchronize presentation page, maybe explicit which features are still absent
+Online shop: tunic, shield, a few arrows, a few potions
+
+Economy build-up:
+----------------
+*1 recipe a day*
+Make recipes for 5 items (sword, bullets, bombs...) + create ingredients
+Make recipes (randomly?) for 5 consumables (potion, antidote, steady stuff...) + create ingredients
+Recipes for fancy bullets and bombs
+Add recipes for all intermediary ingredients
+Workshop building, interface = usual crafting menu
+Add shop interface as well
+Display recipes with building and class restrictions
+Scatter basic ingredients
+Coal mine
+Resource flow to trade post
+Gold flow from tarde post to fort
+Add all other mines (iron, sulfur, gold) + flows
+Add wood and stone flow to trade post
+Specific interface for workshop, with own stock and settlement stock + gold
+-> 100% own stock or 100% city stock to begin with
+-> If using city stock, created item also lands in city stock
+Fork trade post gold flow to fork and workshop
+Set reward of recipes for settlement (0 = disabled)
+Golden ore flow from mine to workshop
+Recipe for golden ore -> gold ingots
+Recipe for gold ingots -> currency
+Addition "fuel" field (wood)
+Add dialog to allow using own stuff for missing ingredients when city-forging
+Make spawn zones for plants/shrooms/etc.
+Make separate brewing interface, similar but with adjustable dosage
+Add "brewing" time
+Add checkboxes for what should be boiled or grinded
+
 
 Cleaning:
 --------
 Performance:
+- Fix "already existing/non-existing" bugs
 - Use Phaser tilemaps?
 - Animals keep their target
 - "Sleep" mode for NPC when no player in currentAOI.entities (change flags on AOI transition, not on every NPC update loop iteration)
@@ -96,9 +93,11 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
-- Reworkd longslot system
+- "getName()" method to get items names rather than accessing dict
+- Rework longslot system
 - Rethink the calling of all events on menu open
 - Setters/getters everywhere
+- Remove Engine.updateInventory() (moved to Inventory)
 - Clean orientation code based on tweens, not previous pos?
 - Hero class, StatsManager, EquipmentManager (NetworkManager?)
 - Clean up Building.update() and updateSelf()
@@ -119,6 +118,7 @@ Order:
 Content:
 -------
 * Battle system
+Bug: bubble at wrong location after respawn
 - Animals have sorted list of targets, iteratr through it when first one not reachable for some reason
 -> Deal with big battlefields; focus camera on active player (problem: if far away, surrounding AOIs not displayed), ...
 - Animal can trigger fights
@@ -126,10 +126,13 @@ Content:
 - Listing and distribution of pick-up resources
 - Listing and distribution (and yield) of building resources
 - Listing and distribution of animals
+- Roots obtained from "harvesting" plants (yields flower + root; different plants, different flowers and roots)
 - Work out location and mechanics of enemy civ.  
 * Inventory
+- Add crafting recipes
+- Gold hover card (in buildings too)
 - Have only one ammo type equiped at all time (depending on weapon), for rdmg stat
-- Pick up items
+- Two resources for guns: bullets and powder (different powders with different properties)
 * Movement
 - Improve timeline and orientation using the onStart callbacks of individual tweens
 * Settlement defense
@@ -159,6 +162,8 @@ Content:
 Design document:
 ---------------
 - Finish copying notes (currently: in ambiance, npc dialogues)
+- Concile all texts (doc, crafting.txt)
+- Decide list of buildings, items, ...
 - Make Excel tables (crafting, inventory, bestiary, ...)
 - Make powerpoint
 - Make feature matrix
@@ -231,6 +236,7 @@ interactions with buildings, time spent in each individual menu, etc.
 Content:
 -------
 * Cheat-proof everything 
+- Including crafting recipes
 * Battle system
 - Fighters queue indicating participants and upcoming turns
 - Battle experience
@@ -328,6 +334,7 @@ Deployment:
 
 Testing:
 -------
+- Make public attributions to assets you used
 - Figure out testing:
 - Have a test server, test database a test map set up
 - Open browser and run test script in test world

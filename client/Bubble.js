@@ -44,6 +44,7 @@ Bubble.prototype.makeBubble = function(sx,sy){
     var texty = starty + 5;
     this.text = Engine.scene.add.text(textx, texty, "Hello world I'm new in Westward",
         { font: '12px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3,
+            align: 'center',
             wordWrap: {width: w, useAdvancedWrap: true}
         }
     );
@@ -69,6 +70,7 @@ Bubble.prototype.finalize = function(){
         var e = this.container[i];
         var isText = (e.constructor.name == 'Text');
         e.depth = Engine.bubbleDepth;
+        if(this.isNotificiation) e.depth += 20;
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
         if(this.isNotificiation) e.setScrollFactor(0);

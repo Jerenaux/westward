@@ -13,9 +13,26 @@ var CustomSprite = new Phaser.Class({
     },
 
     remove: function(){
-        //console.log('removing',this.entityType);
         this.setVisible(false);
         Engine.entityManager.removeFromDisplayList(this);
         Engine.entityManager.addToPool(this);
+    },
+
+    // ### SETTERS ###
+
+    setID: function(id){
+        this.id = id;
+    },
+
+    setTilePosition: function(x,y,setPixelPosition){
+        this.tx = x;
+        this.ty = y;
+        this.chunk = Utils.tileToAOI({x: this.tx, y: this.ty});
+        if(setPixelPosition) this.setPosition(this.tx * Engine.tileWidth, this.ty * Engine.tileHeight);
     }
+
+    /*setPosition: function(x,y){
+        Phaser.GameObjects.Sprite.setPosition.call(this,x,y);
+
+    }*/
 });

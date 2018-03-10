@@ -14,13 +14,13 @@ var Animal = new Phaser.Class({
         if(Engine.animals.hasOwnProperty(data.id)){
             console.warn('duplicate animal ',data.id,'at',data.x,data.y,'last seen at ',
                 Engine.animals[data.id].tileX,',',Engine.animals[data.id].tileY);
+            Engine.animals[data.id].remove();
         }
 
         var animalData = Engine.animalsData[data.type];
         this.id = data.id;
 
         Engine.animals[this.id] = this;
-        //Engine.displayedAnimals.add(this.id);
         Engine.entityManager.addToDisplayList(this);
 
         this.setPosition(data.x,data.y);
