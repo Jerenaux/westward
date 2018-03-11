@@ -13,6 +13,7 @@ function Building(data){
     this.id = GameServer.lastBuildingID++;
     this.x = data.x;
     this.y = data.y;
+    console.log('x and y');
     this.isBuilding = true;
     this.type = data.type;
     this.name = GameServer.buildingsData[this.type].name;
@@ -28,9 +29,13 @@ function Building(data){
     this.committed = 20;
     this.lastBuildCycle = data.lastBuildCycle || Date.now();
     this.lastProdCycle = data.lastProdCycle || Date.now();
+    console.log('all properties');
     this.setOrUpdateAOI();
+    console.log('AOI set');
     this.addCollisions();
+    console.log('collisions set');
     this.registerBuilding();
+    console.log('building registered');
 }
 
 Building.prototype = Object.create(GameObject.prototype);
@@ -191,8 +196,18 @@ Building.prototype.trim = function(){
 };
 
 Building.prototype.dbTrim = function(){
-    var building = clone(this);
+    var building = {};
+    var broadcastProperties =
+        ['type','name','sid','gold','prices','built','prod','progress','committed',
+            'buildings','population','foodsurplus','danger']; // list of properties relevant for the client
+    for(var p = 0; p < broadcastProperties.length; p++){
+        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
+    }
+    trimmed.x = parseInt(this.x);
+    trimmed.y = parseInt(this.y);
+    if(this.inventory.size > 0) trimmed.inventory = this.inventory.toList();
     building.inventory = this.inventory.toList();
+    return building;
 };
 
 // Returns an object containing only the fields relevant to list buildings
@@ -232,6 +247,6 @@ Building.prototype.addCollisions = function(){
     PFUtils.collisionsFromShape(this.shape,spriteX,spriteY,data.width,data.height,GameServer.collisions);
 };
 
-Building.prototype.canFight = function(){return false;}
+Building.prototype.canFight = function(){return false;};
 
 module.exports.Building = Building;

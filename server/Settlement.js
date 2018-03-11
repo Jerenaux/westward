@@ -89,6 +89,10 @@ Settlement.prototype.computeFoodProductivity = function(){
 };
 
 Settlement.prototype.update = function(){
+    if(!this.fort) {
+        console.log('No fort for settlement ',this.id);
+        return;
+    }
     console.log(this.name+' updating');
 
     this.consumeFood();

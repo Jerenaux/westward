@@ -26,19 +26,42 @@
         .coord {
             width: 3em;
         }
+        input, select {
+            margin: 5px;
+        }
     </style>
 </head>
 <body>
 <h1>Westward admin</h1>
+<h2>Buildings</h2>
+<table class="table">
+    <thead>
+    <tr>
+        <!-- <th scope="col">#</th>-->
+    </tr>
+    </thead>
+    <tbody>
+        <!-- <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+        </tr> -->
+    </tbody>
+</table>
 <button id="newbuildbtn" type="button" class="btn btn-primary">Add building</button>
 <div class="forms">
 <!-- New Building -->
 <form action=""  method="POST"  id="newbuildform">
     <b>New Building:</b><br/>
-    (<input class="coord" name="x" type="number" placeholder="x" size="1" >,
-    <input class="coord" name="y" type="number" placeholder="y" size="3" >)<br/>
-    <input class="number" name="type" type="number" placeholder="Type" size="3" ><br/>
-    <input class="number" name="settlement" type="number" placeholder="Settlement"  size="3" ><br/>
+    (<input required class="coord" name="x" type="number" placeholder="x" size="1" >,
+    <input required class="coord" name="y" type="number" placeholder="y" size="3" >)<br/>
+    <select required name="type" id="buildTypeSelect">
+        <option value="">--Type--</option>
+    </select><br/>
+    <select required name="settlement" id="settlementSelect">
+        <option value="">--Settlement--</option>
+    </select><br/>
     Built </b><input name="built" type="checkbox"><br/>
     <input id="submitnewbuildbtn" class="btn" type="submit" value="Ok" name="submit">
 </form>

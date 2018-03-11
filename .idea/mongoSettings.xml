@@ -10,6 +10,7 @@
               <option value="localhost:27017" />
             </list>
           </option>
+          <option name="shellArgumentsLine" value="-h localhost:27017 " />
           <option name="shellWorkingDir" value="C:\Users\jeren\Gamedev\db" />
           <option name="sshTunnelingConfiguration">
             <SshTunnelingConfiguration />

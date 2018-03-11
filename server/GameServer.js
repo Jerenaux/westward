@@ -3,8 +3,9 @@
  */
 var fs = require('fs');
 var pathmodule = require('path');
-var clone = require('clone'); // used to clone objects, essentially used for clonick update packets
+var clone = require('clone'); // used to clone objects, essentially used for clonicg update packets
 var ObjectId = require('mongodb').ObjectID;
+var mongoose = require('mongoose');
 
 var GameServer = {
     lastPlayerID: 0,
@@ -42,12 +43,33 @@ var PFUtils = require('../shared/PFUtils.js').PFUtils;
 GameServer.updateStatus = function(){
     GameServer.initializationTicks++;
     if(GameServer.initializationTicks == GameServer.requiredTicks) {
+        console.log('GameServer initialized');
         GameServer.initialized = true;
         GameServer.setUpdateLoops();
     }
 };
 
+GameServer.createModels = function(){
+    var buildingSchema = mongoose.Schema({
+        x: {type: Number, min: 0},
+        y: {type: Number, min: 0},
+        type: {type: Number, min: 0},
+        sid: {type: Number, min: 0},
+        inventory: [[]],
+        prices: [[]], // do better?
+        gold: {type: Number, min: 0},
+        built: Boolean,
+        progress: {type: Number, min: 0, max: 1},
+        productivity: {type: Number, min: 0},
+        committed: {type: Number, min: 0},
+        lastBuildCycle: { type: Date, default: Date.now },
+        lastProdCycle: { type: Date, default: Date.now }
+    });
+    GameServer.BuildingModel = mongoose.model('Building', buildingSchema);
+};
+
 GameServer.readMap = function(mapsPath){
+    GameServer.createModels();
     GameServer.mapsPath = mapsPath; // TODO remove, useless, debug
     console.log('Loading map data from '+mapsPath);
     var masterData = JSON.parse(fs.readFileSync(mapsPath+'/master.json').toString());
@@ -77,16 +99,29 @@ GameServer.readMap = function(mapsPath){
     // Settlements
     GameServer.settlements = {};
     GameServer.settlements[0] = new Settlement(0,'New Beginning',12);
+    GameServer.settlements[1] = new Settlement(1,'Hope',2);
 
     // Read buildings
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
-    GameServer.server.db.collection('buildings').find({}).toArray(function(err,buildings){
-        if(err) throw err;
-        for(var i = 0; i < buildings.length; i++){
+    GameServer.BuildingModel.find(function (err, buildings) {
+        if (err) return console.log(err);
+        //console.log(buildings);
+        console.log(buildings.length);
+        buildings.forEach(function(data){
+            console.log('!!');
+            console.log(data);
+            var building = new Building(data);
+            console.log(building);
+            GameServer.buildings[building.id] = building;
+            console.log('ok');
+        });
+        /*for(var i = 0; i < buildings.length; i++){
             var data = buildings[i];
+            console.log(data.x,data.y,data.type);
             var building = new Building(data);
             GameServer.buildings[building.id] = building;
-        }
+        }*/
+        console.log('#');
         GameServer.updateStatus();
         GameServer.updateSettlements();
     });
@@ -695,11 +730,22 @@ GameServer.handleScreenshot = function(data,socketID){
 
 GameServer.insertNewBuilding = function(data){
     console.log(data);
-    return;
+    if(!'built' in data) data.built = false;
+
     var building = new Building(data);
-    GameServer.buildings[building.id] = building;
-    GameServer.server.db.collection('buildings').insertOne(building.dbTrim(),function(err){
-        if(err) throw err;
-        console.log('build successfull');
+    var document = new GameServer.BuildingModel(building);
+
+    document.save(function (err) {
+        if (err) return console.error(err);
+        console.log('Build successfull');
+        GameServer.buildings[building.id] = building;
     });
+};
+
+GameServer.listBuildings = function(){
+    var list = [];
+    for(var id in GameServer.buildings){
+        list.push(GameServer.buildings[id].trim());
+    }
+    return list;
 };

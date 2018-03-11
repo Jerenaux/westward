@@ -7,6 +7,7 @@ var path = require('path');
 
 var quickselect = require('quickselect'); // Used to compute the median for latency
 var mongo = require('mongodb').MongoClient;
+var mongoose = require('mongoose');
 var myArgs = require('optimist').argv;
 
 app.use('/assets',express.static(__dirname + '/assets'));
@@ -39,8 +40,16 @@ if(process.env.DEV == 1) {
 
 server.listen(process.env.PORT || 8081,function(){
     console.log('Listening on '+server.address().port);
-    mongo.connect(process.env.MONGODB_URI,function(err,db){ //|| 'mongodb://localhost:27017/westward'
+    /*mongo.connect(process.env.MONGODB_URI,function(err,db){ //|| 'mongodb://localhost:27017/westward'
         if(err) throw(err);
+        server.db = db;
+        console.log('Connection to db established');
+        gs.readMap(myArgs.maps);
+    });*/
+    mongoose.connect(process.env.MONGODB_URI);
+    var db = mongoose.connection;
+    db.on('error', console.error.bind(console, 'connection error:'));
+    db.once('open', function() {
         server.db = db;
         console.log('Connection to db established');
         gs.readMap(myArgs.maps);
@@ -124,8 +133,16 @@ io.on('connection',function(socket){
             var event = pkt.data[0];
             var data = pkt.data[1];
             console.log('ADMIN:',event,data);
-            if(callbacksMap.hasOwnProperty(event)) callbacksMap[event](data);
+            if(callbacksMap.hasOwnProperty(event)) {
+                callbacksMap[event](data);
+            }else{
+                handler.call(this,pkt);
+            }
         };
+
+        socket.on('listbuildings',function(){
+            socket.emit('buildingslist',gs.listBuildings());
+        });
     });
 
     // #########################
