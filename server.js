@@ -3,6 +3,7 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io').listen(server);
 var fs = require('fs');
+var path = require('path');
 
 var quickselect = require('quickselect'); // Used to compute the median for latency
 var mongo = require('mongodb').MongoClient;
@@ -14,10 +15,14 @@ app.use('/lib',express.static(__dirname + '/lib'));
 app.use('/server',express.static(__dirname + '/server'));
 app.use('/shared',express.static(__dirname + '/shared'));
 app.use('/maps',express.static(myArgs.maps));
+app.use('/admin',express.static(path.join(__dirname,'admin')));
 if(process.env.DEV == 1) app.use('/studio',express.static(__dirname + '/studio'));
 
 app.get('/',function(req,res){
-    res.sendFile(__dirname+'/index.html');
+    res.sendFile(path.join(__dirname,'index.html'));
+});
+app.get('/admin',function(req,res){
+    res.sendFile(path.join(__dirname,'admin','admin.html'));
 });
 
 if(process.env.DEV == 1) {
@@ -107,7 +112,24 @@ io.on('connection',function(socket){
     });
 
     // #########################
-    if(process.env.DEV == 1) {
+
+    // TODO: secure
+    socket.on('admin',function(){
+        var callbacksMap = {
+            'admin_newbuilding': gs.insertNewBuilding
+        };
+
+        var handler = socket.onevent;
+        socket.onevent = function(pkt){
+            var event = pkt.data[0];
+            var data = pkt.data[1];
+            console.log('ADMIN:',event,data);
+            if(callbacksMap.hasOwnProperty(event)) callbacksMap[event](data);
+        };
+    });
+
+    // #########################
+    /*if(process.env.DEV == 1) {
         socket.on('mapdata',function(data){
             console.log('Saving changes to chunk '+data.id+'...');
             var dir = __dirname+'/assets/maps/chunks/'; // Replace by env variable
@@ -116,7 +138,7 @@ io.on('connection',function(socket){
                 console.log('done'); // replace by counter
             });
         });
-    }
+    }*/
 });
 
 server.sendInitializationPacket = function(socket,packet){

@@ -47,7 +47,10 @@
     "useInBattle": true
   },
   "7":{
-
+    "atlas": "items",
+    "frame":"wood",
+    "name": "Wood",
+    "desc": "Crafting material used to make wooden weapons or to make charcoal."
   },
   "8":{
 

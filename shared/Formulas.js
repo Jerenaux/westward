@@ -36,7 +36,6 @@ Formulas.computePlayerFoodModifier = function(surplus){
 };
 
 Formulas.computeSettlementFoodModifier = function(surplus){
-    console.log('input surplus:',surplus,'returns ',surplus*40);
     return surplus*40; // TODO: include dev level
 };
 

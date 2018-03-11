@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="/socket.io/socket.io.js"></script>
+    <script
+            src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script
+            src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+            integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">    <title>Admin</title>
+    <style>
+        body{
+            padding: 10px;
+        }
+        form {
+            display: none;
+        }
+        .forms {
+            margin-top: 20px;
+        }
+        .coord {
+            width: 3em;
+        }
+    </style>
+</head>
+<body>
+<h1>Westward admin</h1>
+<button id="newbuildbtn" type="button" class="btn btn-primary">Add building</button>
+<div class="forms">
+<!-- New Building -->
+<form action=""  method="POST"  id="newbuildform">
+    <b>New Building:</b><br/>
+    (<input class="coord" name="x" type="number" placeholder="x" size="1" >,
+    <input class="coord" name="y" type="number" placeholder="y" size="3" >)<br/>
+    <input class="number" name="type" type="number" placeholder="Type" size="3" ><br/>
+    <input class="number" name="settlement" type="number" placeholder="Settlement"  size="3" ><br/>
+    Built </b><input name="built" type="checkbox"><br/>
+    <input id="submitnewbuildbtn" class="btn" type="submit" value="Ok" name="submit">
+</form>
+</div>
+
+</body>
+<script src="admin.js" type="text/javascript"></script>
+</html>

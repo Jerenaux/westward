@@ -13,6 +13,7 @@ Prototype level:
 
 Week:
 -----
+*1 item/recipe a day*
 Design document
 One-time single-panel combat tutorial when first combat
 Set up a second settlement, test its fort and respawn
@@ -43,7 +44,7 @@ Online shop: tunic, shield, a few arrows, a few potions
 
 Economy build-up:
 ----------------
-*1 recipe a day*
+*1 item/recipe a day*
 Make recipes for 5 items (sword, bullets, bombs...) + create ingredients
 Make recipes (randomly?) for 5 consumables (potion, antidote, steady stuff...) + create ingredients
 Recipes for fancy bullets and bombs
@@ -235,7 +236,7 @@ interactions with buildings, time spent in each individual menu, etc.
 
 Content:
 -------
-* Cheat-proof everything 
+* Cheat-proof everything , secure admin
 - Including crafting recipes
 * Battle system
 - Fighters queue indicating participants and upcoming turns

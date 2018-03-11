@@ -69,9 +69,9 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(12,1);
     this.giveItem(13,1);
     this.giveItem(17,3);
-    this.giveItem(18,1);
-    this.giveItem(19,1);
-    this.giveItem(20,9);
+    this.giveItem(7,1); // wood
+    this.giveItem(19,1); // quiver
+    this.giveItem(20,9); // arrows
     this.giveGold(500);
 };
 

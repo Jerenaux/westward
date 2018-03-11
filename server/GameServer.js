@@ -681,6 +681,8 @@ GameServer.updateSpawnZones = function(){
     });
 };
 
+// #############################
+
 GameServer.handleScreenshot = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     data.player = player.trim();
@@ -689,4 +691,15 @@ GameServer.handleScreenshot = function(data,socketID){
         console.log('Screenshot saved');
     });
     player.addMsg('Bug reported! Thanks!');
+};
+
+GameServer.insertNewBuilding = function(data){
+    console.log(data);
+    return;
+    var building = new Building(data);
+    GameServer.buildings[building.id] = building;
+    GameServer.server.db.collection('buildings').insertOne(building.dbTrim(),function(err){
+        if(err) throw err;
+        console.log('build successfull');
+    });
 };
