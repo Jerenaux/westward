@@ -125,6 +125,8 @@ io.on('connection',function(socket){
     // TODO: secure
     socket.on('admin',function(){
         var callbacksMap = {
+            'admin_deletebuilding': gs.deleteBuilding,
+            'admin_listbuildings': gs.listBuildings,
             'admin_newbuilding': gs.insertNewBuilding
         };
 
@@ -133,16 +135,15 @@ io.on('connection',function(socket){
             var event = pkt.data[0];
             var data = pkt.data[1];
             console.log('ADMIN:',event,data);
-            if(callbacksMap.hasOwnProperty(event)) {
-                callbacksMap[event](data);
-            }else{
+            if(callbacksMap.hasOwnProperty(event)) callbacksMap[event](data,socket.id);
+            /*else{
                 handler.call(this,pkt);
-            }
+            }*/
         };
 
-        socket.on('listbuildings',function(){
+        /*socket.on('listbuildings',function(){
             socket.emit('buildingslist',gs.listBuildings());
-        });
+        });*/
     });
 
     // #########################
@@ -162,6 +163,11 @@ server.sendInitializationPacket = function(socket,packet){
     packet = server.addStamp(packet);
     //if(server.enableBinary) packet = Encoder.encode(packet,CoDec.initializationSchema);
     socket.emit('init',packet);
+};
+
+server.sendAdminUpdate = function(socketID,name,pkg){
+    var socket = server.getSocket(socketID);
+    if(pkg) io.in(socketID).emit(name,pkg);
 };
 
 server.sendUpdate = function(socketID,pkg){

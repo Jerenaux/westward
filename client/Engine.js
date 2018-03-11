@@ -894,7 +894,7 @@ Engine.updateDisplayedEntities = function(){
 Engine.updateDisplay = function(list,map,adjacent){
     list.forEach(function(id){
         var element = map[id];
-        if(element.chunk === undefined) console.warn('No chunk defined for ',element);
+        if(Engine.debug && element.chunk === undefined) console.warn('No chunk defined for ',element);
         // check if the AOI of entity p is in the list of the AOI's adjacent to the main player
         if(element) if(adjacent.indexOf(element.chunk) == -1) element.remove();
     });
@@ -1265,6 +1265,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.removedplayers) Engine.removeElements(data.removedplayers,Engine.players);
     if(data.removedanimals) Engine.removeElements(data.removedanimals,Engine.animals);
     if(data.removedcells) Engine.removeElements(data.removedcells,Engine.battleCells);
+    if(data.removedbuildings) Engine.removeElements(data.removedbuildings,Engine.buildings);
 };
 
 Engine.createElements = function(arr,entityType){
@@ -1281,7 +1282,7 @@ Engine.createElements = function(arr,entityType){
 Engine.updateElements = function(obj,table){
     Object.keys(obj).forEach(function (key) {
         if(!table.hasOwnProperty(key)) {
-            console.warn('Attempt to update non-existing element');
+            if(Engine.debug) console.warn('Attempt to update non-existing element');
             return;
         }
         table[key].update(obj[key]);
@@ -1291,7 +1292,7 @@ Engine.updateElements = function(obj,table){
 Engine.removeElements = function(arr,table){
     arr.forEach(function(id){
         if(!table.hasOwnProperty(id)) {
-            console.warn('Attempt to remove non-existing element');
+            if(Engine.debug) console.warn('Attempt to remove non-existing element');
             return;
         }
         table[id].remove();

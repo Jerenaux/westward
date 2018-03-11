@@ -41,4 +41,12 @@ GameObject.prototype.updateAOIs = function(property,value){
     });
 };
 
+GameObject.prototype.setModel = function(model) {
+    this.model = model;
+};
+GameObject.prototype.getModel = function() {
+    return this.model;
+};
+
+
 module.exports.GameObject = GameObject;

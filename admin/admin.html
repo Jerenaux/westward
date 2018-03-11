@@ -34,19 +34,12 @@
 <body>
 <h1>Westward admin</h1>
 <h2>Buildings</h2>
-<table class="table">
+<table id="buildings" class="table table-striped table-hover">
     <thead>
-    <tr>
-        <!-- <th scope="col">#</th>-->
-    </tr>
+        <tr>
+        </tr>
     </thead>
     <tbody>
-        <!-- <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-        </tr> -->
     </tbody>
 </table>
 <button id="newbuildbtn" type="button" class="btn btn-primary">Add building</button>
@@ -59,7 +52,7 @@
     <select required name="type" id="buildTypeSelect">
         <option value="">--Type--</option>
     </select><br/>
-    <select required name="settlement" id="settlementSelect">
+    <select required name="sid" id="settlementSelect">
         <option value="">--Settlement--</option>
     </select><br/>
     Built </b><input name="built" type="checkbox"><br/>

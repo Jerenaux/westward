@@ -13,11 +13,10 @@ function Building(data){
     this.id = GameServer.lastBuildingID++;
     this.x = data.x;
     this.y = data.y;
-    console.log('x and y');
     this.isBuilding = true;
     this.type = data.type;
     this.name = GameServer.buildingsData[this.type].name;
-    this.sid = data.settlement;
+    this.sid = data.sid;
     this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(100);
     if(data.inventory) this.inventory.fromList(data.inventory);
@@ -29,13 +28,9 @@ function Building(data){
     this.committed = 20;
     this.lastBuildCycle = data.lastBuildCycle || Date.now();
     this.lastProdCycle = data.lastProdCycle || Date.now();
-    console.log('all properties');
     this.setOrUpdateAOI();
-    console.log('AOI set');
     this.addCollisions();
-    console.log('collisions set');
     this.registerBuilding();
-    console.log('building registered');
 }
 
 Building.prototype = Object.create(GameObject.prototype);
@@ -178,6 +173,11 @@ Building.prototype.giveGold = function(nb){
 
 Building.prototype.takeGold = function(nb){
     this.setProperty('gold',Utils.clamp(this.gold-nb,0,999999));
+};
+
+Building.prototype.remove = function(){
+    // TODO: keep track of players inside, and make them leave first
+    delete GameServer.buildings[this.id];
 };
 
 // Returns an object containing only the fields relevant for the client to display in the game

@@ -44,11 +44,12 @@ Admin.extractHeaders = function(data){
             headers.add(field);
         }
     });
-    console.log(headers);
+    return headers;
 };
 
-Admin.generateOptions('buildings','buildTypeSelect');
-Admin.generateOptions('settlements','settlementSelect');
+Admin.deleteClick = function(id){
+    console.log('deleting',id);
+};
 
 $("#newbuildbtn").click(function() {
     $("#newbuildform").toggle( "clip", 100 );
@@ -60,8 +61,14 @@ $("#newbuildform").submit(function(e) {
     $("#newbuildform").toggle( "clip", 100 );
 });
 
+$('#buildings').on('click','a',function(event){
+    event.preventDefault();
+    var id = event.target.id;
+    Client.send('deletebuilding',id);
+});
+
 Client.requestBuildings = function(){
-    Client.socket.emit('listbuildings');
+    Client.send('listbuildings');
 };
 
 Client.send = function(msg,data){
@@ -69,6 +76,26 @@ Client.send = function(msg,data){
     Client.socket.emit('admin_'+msg,data);
 };
 
-Client.socket.on('buildingslist',function(list){
-    Admin.extractHeaders(list);
+Client.socket.on('buildings',function(list){
+    var headers = Admin.extractHeaders(list);
+    headers.forEach(function(header){
+        $('#buildings > thead > tr').append("<th scope='col'>"+header+"</th>");
+    });
+    $('#buildings > thead > tr').append("<th scope='col'></th>");
+
+    list.forEach(function(building){
+        var line = "<th scope=\"row\">"+building.id+"</th>";
+        for(var field in building){
+            if(!building.hasOwnProperty(field)) continue;
+            if(field == 'id') continue;
+            line += "<td>"+building[field]+"</td>";
+        }
+        line += "<td><a href=''><img id='"+building.id+"' src='delete.png'/></a></td>";
+        $('#buildings > tbody').append("<tr>"+line+"</tr>");
+    });
 });
+
+
+Admin.generateOptions('buildings','buildTypeSelect');
+Admin.generateOptions('settlements','settlementSelect');
+Client.requestBuildings();

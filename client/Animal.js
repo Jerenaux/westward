@@ -12,7 +12,7 @@ var Animal = new Phaser.Class({
 
     setUp: function(data){
         if(Engine.animals.hasOwnProperty(data.id)){
-            console.warn('duplicate animal ',data.id,'at',data.x,data.y,'last seen at ',
+            if(Engine.debug) console.warn('duplicate animal ',data.id,'at',data.x,data.y,'last seen at ',
                 Engine.animals[data.id].tileX,',',Engine.animals[data.id].tileY);
             Engine.animals[data.id].remove();
         }

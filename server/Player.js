@@ -460,6 +460,7 @@ Player.prototype.onEndOfPath = function(){
 
 Player.prototype.enterBuilding = function(id){
     // TODO: check for proximity
+    // TODO: add to a list of people in the building object
     this.setProperty('inBuilding', id);
 };
 

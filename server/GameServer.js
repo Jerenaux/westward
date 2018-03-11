@@ -105,38 +105,16 @@ GameServer.readMap = function(mapsPath){
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
     GameServer.BuildingModel.find(function (err, buildings) {
         if (err) return console.log(err);
-        //console.log(buildings);
-        console.log(buildings.length);
         buildings.forEach(function(data){
-            console.log('!!');
-            console.log(data);
             var building = new Building(data);
-            console.log(building);
+            building.setModel(data);
             GameServer.buildings[building.id] = building;
-            console.log('ok');
         });
-        /*for(var i = 0; i < buildings.length; i++){
-            var data = buildings[i];
-            console.log(data.x,data.y,data.type);
-            var building = new Building(data);
-            GameServer.buildings[building.id] = building;
-        }*/
-        console.log('#');
         GameServer.updateStatus();
         GameServer.updateSettlements();
     });
 
     // Spawn animals
-    /*var animals = JSON.parse(fs.readFileSync('./assets/maps/animals.json').toString());
-    for(var i = 0; i < 10; i++){ // animals.list.length
-        //var data = animals.list[i];
-        var x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
-        var y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
-        if(PFUtils.checkCollision(x,y)) continue;
-        //var animal = new Animal(data.x,data.y,data.type);
-        GameServer.addAnimal(x,y,0);
-    }*/
-
     GameServer.spawnZones = [];
     GameServer.spawnZones.push(new SpawnZone(1566,3,3));
     GameServer.updateSpawnZones();
@@ -728,24 +706,45 @@ GameServer.handleScreenshot = function(data,socketID){
     player.addMsg('Bug reported! Thanks!');
 };
 
-GameServer.insertNewBuilding = function(data){
-    console.log(data);
-    if(!'built' in data) data.built = false;
-
-    var building = new Building(data);
-    var document = new GameServer.BuildingModel(building);
-
-    document.save(function (err) {
-        if (err) return console.error(err);
-        console.log('Build successfull');
-        GameServer.buildings[building.id] = building;
-    });
-};
-
-GameServer.listBuildings = function(){
+GameServer.getBuildings = function(){
     var list = [];
     for(var id in GameServer.buildings){
         list.push(GameServer.buildings[id].trim());
     }
     return list;
+};
+
+GameServer.listBuildings = function(data,socketID){
+    GameServer.sendBuildings(socketID);
+};
+
+GameServer.sendBuildings = function(socketID){
+    GameServer.server.sendAdminUpdate(socketID,'buildings',GameServer.getBuildings());
+};
+
+GameServer.insertNewBuilding = function(data,socketID){
+    console.log(data);
+    if(!'built' in data) data.built = false;
+
+    var building = new Building(data);
+    var document = new GameServer.BuildingModel(building);
+    building.setModel(document);
+
+    document.save(function (err) {
+        if (err) return console.error(err);
+        console.log('Build successfull');
+        GameServer.buildings[building.id] = building;
+        GameServer.sendBuildings(socketID);
+    });
+};
+
+GameServer.deleteBuilding = function(id,socketID){
+    var building = GameServer.buildings[id];
+    var document = building.getModel();
+    document.remove(function(err){
+        if (err) return console.error(err);
+        console.log('Building removed');
+        GameServer.removeEntity(building);
+        GameServer.sendBuildings(socketID);
+    });
 };
