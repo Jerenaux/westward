@@ -10,6 +10,9 @@ var mongo = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
 var myArgs = require('optimist').argv;
 
+var gs = require('./server/GameServer.js').GameServer;
+gs.server = server;
+
 app.use('/assets',express.static(__dirname + '/assets'));
 app.use('/client',express.static(__dirname + '/client'));
 app.use('/lib',express.static(__dirname + '/lib'));
@@ -22,8 +25,28 @@ if(process.env.DEV == 1) app.use('/studio',express.static(__dirname + '/studio')
 app.get('/',function(req,res){
     res.sendFile(path.join(__dirname,'index.html'));
 });
+
 app.get('/admin',function(req,res){
     res.sendFile(path.join(__dirname,'admin','admin.html'));
+});
+
+var handlers = {
+    'buildings': gs.getBuildings,
+    'settlements': gs.getSettlements
+};
+var categories = Object.keys(handlers);
+
+categories.forEach(function(cat){
+    app.get('/admin/' + cat, function (req, res) {
+        console.log('[ADMIN] requesting ' + cat);
+        var data = handlers[cat]();
+        if (data.length == 0) {
+            res.status(204).end();
+        } else {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).send(data).end();
+        }
+    });
 });
 
 if(process.env.DEV == 1) {
@@ -40,12 +63,6 @@ if(process.env.DEV == 1) {
 
 server.listen(process.env.PORT || 8081,function(){
     console.log('Listening on '+server.address().port);
-    /*mongo.connect(process.env.MONGODB_URI,function(err,db){ //|| 'mongodb://localhost:27017/westward'
-        if(err) throw(err);
-        server.db = db;
-        console.log('Connection to db established');
-        gs.readMap(myArgs.maps);
-    });*/
     mongoose.connect(process.env.MONGODB_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
@@ -56,8 +73,6 @@ server.listen(process.env.PORT || 8081,function(){
     });
 });
 
-var gs = require('./server/GameServer.js').GameServer;
-gs.server = server;
 
 server.resetStamp = 1519130567967; // ignore returning players with stamps older than this and treat them as new
 

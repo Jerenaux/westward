@@ -178,7 +178,6 @@ Animal.prototype.attackTarget = function(target){
 };
 
 Animal.prototype.selectTarget = function(){
-    //console.log('selecting target');
     var fighters = this.battle.fighters;
     var minHP = 9999;
     var currentTarget = null;

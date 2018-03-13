@@ -27,6 +27,10 @@
     {
       "filename":"wood",
       "frame": {"x":0,"y":352,"w":32,"h":32}
+    },
+    {
+      "filename":"string",
+      "frame": {"x":256,"y":0,"w":32,"h":32}
     }
   ]
 }

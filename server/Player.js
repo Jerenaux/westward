@@ -68,7 +68,7 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(11,2);
     this.giveItem(12,1);
     this.giveItem(13,1);
-    this.giveItem(17,3);
+    this.giveItem(8,5); // thick grass
     this.giveItem(7,1); // wood
     this.giveItem(19,1); // quiver
     this.giveItem(20,9); // arrows
@@ -111,6 +111,7 @@ Player.prototype.respawn = function(){
 };
 
 Player.prototype.applyFoodModifier = function(foodSurplus){
+    if(isNaN(foodSurplus)) return; // Could happen if no fort
     var foodModifier = Formulas.computePlayerFoodModifier(foodSurplus);
     this.getStats().forEach(function(stat){
         if(Stats.dict[stat].noModifier) return;

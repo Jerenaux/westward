@@ -27,6 +27,14 @@ Settlement.prototype.removePlayer = function(player){
 Settlement.prototype.registerBuilding = function(building){
     this.buildings.push(building);
     if(this.fort) this.fort.addBuilding(building);
+    this.refreshListing();
+};
+
+Settlement.prototype.removeBuilding = function(building){
+    for(var i = 0; i < this.buildings.length; i++){
+        if(this.buildings[i].id == building.id) this.buildings.splice(i,1);
+    }
+    if(this.fort.id == building.id) this.fort = null;
 };
 
 Settlement.prototype.getBuildings = function(){
@@ -62,6 +70,7 @@ Settlement.prototype.addToFort = function(item,nb){
 };
 
 Settlement.prototype.refreshListing = function(){
+    if(!this.fort) return;
     this.fort.refreshListing();
 };
 
@@ -89,11 +98,8 @@ Settlement.prototype.computeFoodProductivity = function(){
 };
 
 Settlement.prototype.update = function(){
-    if(!this.fort) {
-        console.log('No fort for settlement ',this.id);
-        return;
-    }
-    console.log(this.name+' updating');
+    if(!this.fort) return;
+    //console.log(this.name+' updating');
 
     this.consumeFood();
     this.computeFoodSurplus();

@@ -176,10 +176,12 @@ Stat.prototype.increment = function(inc){
 };
 
 Stat.prototype.addAbsoluteModifier = function(modifier){
+    if(isNaN(modifier)) return;
     this.absoluteModifiers.push(modifier);
 };
 
 Stat.prototype.addRelativeModifier = function(modifier){
+    if(isNaN(modifier)) return;
     this.relativeModifiers.push(modifier);
 };
 

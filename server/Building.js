@@ -7,7 +7,7 @@ var Formulas = require('../shared/Formulas.js').Formulas;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
-var clone = require('clone');
+//var clone = require('clone');
 
 function Building(data){
     this.id = GameServer.lastBuildingID++;
@@ -18,13 +18,14 @@ function Building(data){
     this.name = GameServer.buildingsData[this.type].name;
     this.sid = data.sid;
     this.settlement = GameServer.settlements[this.sid];
-    this.inventory = new Inventory(100);
-    if(data.inventory) this.inventory.fromList(data.inventory);
+    this.inventory = new Inventory(100); // Inventory object
+    this.items = data.items;  // items list used when saving/loading to/from db
+    if(this.items) this.inventory.fromList(this.items);
     this.prices = data.prices || {};
     this.gold = data.gold || 0;
     this.built = !!data.built;
     this.progress = data.progress || 0;
-    this.prod = data.prod || 100;
+    this.productivity = data.productivity || 100;
     this.committed = 20;
     this.lastBuildCycle = data.lastBuildCycle || Date.now();
     this.lastProdCycle = data.lastProdCycle || Date.now();
@@ -52,7 +53,7 @@ Building.prototype.refreshListing = function(){
 Building.prototype.computeProductivity = function(){
     var newprod = Formulas.computeProductivity(this.settlement.computeFoodProductivity(),Formulas.commitmentProductivityModifier(this.committed));
     newprod = Math.round(newprod);
-    this.setProperty('prod',newprod);
+    this.setProperty('productivity',newprod);
 };
 
 Building.prototype.updateCommit = function(inc){
@@ -89,7 +90,7 @@ Building.prototype.updateProd = function(){
     if(!production) return;
     for(var i = 0; i < production.length; i++){
         var item = production[i][0];
-        var nb = Formulas.computeProdIncrement(this.prod,production[i][1]);
+        var nb = Formulas.computeProdIncrement(this.productivity,production[i][1]);
         if(nb > 0) this.settlement.addToFort(item,nb);
     }
 };
@@ -97,10 +98,10 @@ Building.prototype.updateProd = function(){
 Building.prototype.updateBuild = function(){
     var rate = GameServer.buildingsData[this.type].buildRate;
     if(!rate) return;
-    var increment = Formulas.computeBuildIncrement(this.prod,rate);
-    var newprogress = Utils.clamp(this.progress+increment,this.progress,100);
+    var increment = Formulas.computeBuildIncrement(this.productivity,rate/100);
+    var newprogress = Utils.clamp(this.progress+increment,this.progress,1);
     this.setProperty('progress',newprogress);
-    if(this.progress == 100) this.setProperty('built',true);
+    if(this.progress == 1) this.setProperty('built',true);
 };
 
 Building.prototype.addBuilding = function(building){
@@ -114,7 +115,7 @@ Building.prototype.updateBuildings = function(){
 
 Building.prototype.getPrice = function(item,nb,action){
     var key = (action == 'sell' ? 0 : 1);
-    return this.prices[item][key]*nb;
+    return parseInt(this.prices[item][key])*nb;
 };
 
 Building.prototype.canBuy = function(item,nb){ // check if building has gold and room
@@ -168,23 +169,24 @@ Building.prototype.getGold = function(){
 };
 
 Building.prototype.giveGold = function(nb){
-    this.setProperty('gold',Utils.clamp(this.gold+nb),0,000000);
+    this.setProperty('gold',Utils.clamp(this.gold+nb,0,99999));
 };
 
 Building.prototype.takeGold = function(nb){
-    this.setProperty('gold',Utils.clamp(this.gold-nb,0,999999));
+    this.setProperty('gold',Utils.clamp(this.gold-nb,0,99999));
 };
 
 Building.prototype.remove = function(){
     // TODO: keep track of players inside, and make them leave first
     delete GameServer.buildings[this.id];
+    this.settlement.removeBuilding(this);
 };
 
 // Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){
     var trimmed = {};
     var broadcastProperties =
-        ['id','type','sid','gold','prices','built','prod','progress','committed',
+        ['id','type','sid','gold','prices','built','productivity','progress','committed',
             'buildings','population','foodsurplus','danger']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
@@ -196,24 +198,26 @@ Building.prototype.trim = function(){
 };
 
 Building.prototype.dbTrim = function(){
-    var building = {};
+    /*var building = {};
     var broadcastProperties =
-        ['type','name','sid','gold','prices','built','prod','progress','committed',
-            'buildings','population','foodsurplus','danger']; // list of properties relevant for the client
+        ['type','sid','gold','built','productivity','prices','progress','committed']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
-        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
+        building[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
-    trimmed.x = parseInt(this.x);
-    trimmed.y = parseInt(this.y);
-    if(this.inventory.size > 0) trimmed.inventory = this.inventory.toList();
+    building.x = parseInt(this.x);
+    building.y = parseInt(this.y);
+    // todo: prices
+    //if(this.inventory.size > 0) trimmed.inventory = this.inventory.toList();
     building.inventory = this.inventory.toList();
-    return building;
+    return building;*/
+    this.items = this.inventory.toList();
+    return this;
 };
 
 // Returns an object containing only the fields relevant to list buildings
 Building.prototype.listingTrim = function(){
     var trimmed = {};
-    var broadcastProperties = ['id','type','built','progress','prod'];
+    var broadcastProperties = ['id','type','built','progress','productivity'];
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

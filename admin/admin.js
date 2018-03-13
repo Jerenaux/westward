@@ -5,10 +5,40 @@
 Client = {};
 Admin = {};
 
-Client.socket = io.connect();
-Client.socket.emit('admin');
+var app = angular.module('admin',[]);
 
-Admin.generateOptions = function(file,select){
+app.controller("mainCtrl", [
+    '$scope','$http',
+    function($scope,$http) {
+        var categories = ['settlements','buildings'];
+        $scope.getData = function(category){
+            $http.get("/admin/"+category+"/").then(function(res) {
+                if(res.status == 200){
+                    $scope[category] = res.data;
+                }
+            },function(err){});
+        };
+
+        categories.forEach(function(cat){
+            $scope[cat] = [];
+            $scope.getData(cat);
+        });
+    }
+]);
+
+app.filter('displayBuilding',function(){
+    return function(raw){
+        raw.buildings = undefined;
+        raw.danger = undefined;
+        return JSON.stringify(raw,null,2);
+    }
+});
+
+Client.socket = io.connect();
+//Client.socket.emit('admin');
+
+
+/*Admin.generateOptions = function(file,select){
     $.getJSON( "/assets/data/"+file+".json", function(data) {
         console.log(data);
         for(var key in data){
@@ -74,28 +104,8 @@ Client.requestBuildings = function(){
 Client.send = function(msg,data){
     console.log(msg,data);
     Client.socket.emit('admin_'+msg,data);
-};
+};*/
 
-Client.socket.on('buildings',function(list){
-    var headers = Admin.extractHeaders(list);
-    headers.forEach(function(header){
-        $('#buildings > thead > tr').append("<th scope='col'>"+header+"</th>");
-    });
-    $('#buildings > thead > tr').append("<th scope='col'></th>");
-
-    list.forEach(function(building){
-        var line = "<th scope=\"row\">"+building.id+"</th>";
-        for(var field in building){
-            if(!building.hasOwnProperty(field)) continue;
-            if(field == 'id') continue;
-            line += "<td>"+building[field]+"</td>";
-        }
-        line += "<td><a href=''><img id='"+building.id+"' src='delete.png'/></a></td>";
-        $('#buildings > tbody').append("<tr>"+line+"</tr>");
-    });
-});
-
-
-Admin.generateOptions('buildings','buildTypeSelect');
+/*Admin.generateOptions('buildings','buildTypeSelect');
 Admin.generateOptions('settlements','settlementSelect');
-Client.requestBuildings();
+Client.requestBuildings();*/

@@ -480,23 +480,9 @@ Engine.makeBattleUI = function(){
     );
 };
 
-
-/*Engine.getNextHP = function(){
-    if(Engine.HPpool.length > 0) return Engine.HPpool.shift();
-
-    var text = Engine.scene.add.text(0,0, '0',  { font: '20px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    text.setVisible(false);
-    text.setOrigin(0.5,1);
-    return text;
-};
-
-Engine.recycleHP = function(text){
-    Engine.HPpool.push(text);
-};*/
-
 Engine.handleBattleAnimation = function(animation,target,dmg){
     var sprite = Engine.animationsPools['sword_anim'].getNext();
-    sprite.setDisplayOrigin(sprite.frame.width/2,sprite.frame.height/2); // quick fix
+    sprite.setOrigin(0.5);
     sprite.setPosition(target.x+16,target.y+16);
     sprite.setVisible(true);
     sprite.setDepth(target.depth+1);
@@ -852,7 +838,7 @@ Engine.addHero = function(data){ //player.id,player.x,player.y,player.settlement
     //Engine.player.buildingRecipes = new Inventory(9);
     //Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
     Engine.player.itemRecipes = new Inventory(10);
-    Engine.player.itemRecipes.fromList([[6,1],[10,1],[15,1],[16,1]]);
+    Engine.player.itemRecipes.fromList([[6,1],[10,1],[15,1],[16,1],[21,1]]);
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = Equipment.getSkeleton();
     Engine.player.commitSlots = data.commitSlots;

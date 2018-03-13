@@ -18,10 +18,6 @@ Building = new Phaser.Class({
         var buildingData = Engine.buildingsData[data.type];
         var sprite = (data.built ? buildingData.sprite : Engine.buildingsData[FOUNDATIONS_ID].sprite);
         this.setTexture(sprite);
-        this.setDisplayOrigin( // quick fix before Phaser fix
-            Math.round(this.frame.width/2),
-            Math.round(this.frame.height/2)
-        );
 
         this.setTilePosition(data.x,data.y,true);
         this.setID(data.id);
@@ -77,8 +73,8 @@ Building = new Phaser.Class({
             this.progress = data.progress;
             this.updateEvents.add('onUpdateConstruction');
         }
-        if (data.prod) {
-            this.prod = data.prod;
+        if (data.productivity) {
+            this.prod = data.productivity;
             this.updateEvents.add('onUpdateConstruction');
             this.updateEvents.add('onUpdateProductivity');
         }

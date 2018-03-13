@@ -53,7 +53,10 @@
     "desc": "Crafting material used to make wooden weapons or to make charcoal."
   },
   "8":{
-
+    "atlas": "items2",
+    "frame":"thickgrass",
+    "name": "Thick Grass",
+    "desc": "Crafting material used to make string."
   },
   "9":{
     "atlas": "items2",
@@ -142,5 +145,12 @@
     "effects":{"rdmg":12},
     "ammo": "quiver",
     "useInBattle": true
+  },
+  "21":{
+    "atlas": "items",
+    "frame":"string",
+    "name": "String",
+    "desc": "Robust string made from plant fibers, primarily used to make bows.",
+    "recipe":{"8":5}
   }
 }

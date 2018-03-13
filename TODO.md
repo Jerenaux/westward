@@ -11,22 +11,17 @@ Polish
 Prototype level:
 ###############
 
-518 648 0
-524 670 1
-431 620 2
-458 437 3
-502 723 3
-536 655 5
-
-
 Week:
 -----
 *1 item/recipe a day*
+Bug: no animals on buildings (wrong collisions?)
+Bug: wrong click area of foundations
 Design document
 One-time single-panel combat tutorial when first combat
-Set up a second settlement, test its fort and respawn
+Test second settlement (fort and respawn)
 World map-based settlement selection menu (mention key startegic aspects, display enemy civ threats)
 Class selection menu (describe impact on settlements)
+Title screen
 Fort: staff (msg: you need civic lvl2 to vote for governor)
 Battle: monsters trigger fights (move spawn zones)
 Economic loop: harvest herbs (scatter roots)
@@ -102,6 +97,12 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Settlements: after compute food surplus, one central method to broadcast it to buildings and players, using one
+common "formatFoorSurplus" method to decide exact formatting (witg a reciprocal function client-side)
+- Building update: somehow check for fields in data not in map, and make a warning?
+- Remove quick fixes about setFrame (big buttons, ctrl+f on quick fix)
+- Deduce food_id from database
+- Use schemas for players
 - "getName()" method to get items names rather than accessing dict
 - Rework longslot system
 - Rethink the calling of all events on menu open

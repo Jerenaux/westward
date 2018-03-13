@@ -7,7 +7,6 @@ var Moving = new Phaser.Class({
 
     initialize: function Moving (x, y){// texture, id) {
         // Using call(), the called method will be executed while having 'this' pointing to the first argumentof call()
-        //CustomSprite.call(this, x*Engine.tileWidth, y*Engine.tileHeight, texture);
         CustomSprite.call(this, 0,0);
 
         this.orientation = 'down';

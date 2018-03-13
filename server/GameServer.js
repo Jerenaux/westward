@@ -19,7 +19,7 @@ var GameServer = {
     socketMap: {}, // socket.id -> player.id
     nbConnectedChanged: false,
     initializationTicks: 0,
-    requiredTicks: 2, // required number of initialization ticks
+    requiredTicks: 0, // required number of initialization ticks
     initialized: false
 };
 
@@ -40,7 +40,8 @@ var SpawnZone = require('./SpawnZone.js').SpawnZone;
 var PF = require('../shared/pathfinding.js');
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
-GameServer.updateStatus = function(){
+GameServer.updateStatus = function(name){
+    console.log('Successful initialization step:',name);
     GameServer.initializationTicks++;
     if(GameServer.initializationTicks == GameServer.requiredTicks) {
         console.log('GameServer initialized');
@@ -55,11 +56,11 @@ GameServer.createModels = function(){
         y: {type: Number, min: 0},
         type: {type: Number, min: 0},
         sid: {type: Number, min: 0},
-        inventory: [[]],
-        prices: [[]], // do better?
+        items: [[]], // list format of inventory
+        prices: mongoose.Schema.Types.Mixed,
         gold: {type: Number, min: 0},
         built: Boolean,
-        progress: {type: Number, min: 0, max: 1},
+        progress: {type: Number, min: 0, max: 100},
         productivity: {type: Number, min: 0},
         committed: {type: Number, min: 0},
         lastBuildCycle: { type: Date, default: Date.now },
@@ -69,6 +70,7 @@ GameServer.createModels = function(){
 };
 
 GameServer.readMap = function(mapsPath){
+    GameServer.requiredTicks++;
     GameServer.createModels();
     GameServer.mapsPath = mapsPath; // TODO remove, useless, debug
     console.log('Loading map data from '+mapsPath);
@@ -102,6 +104,7 @@ GameServer.readMap = function(mapsPath){
     GameServer.settlements[1] = new Settlement(1,'Hope',2);
 
     // Read buildings
+    GameServer.requiredTicks++;
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
     GameServer.BuildingModel.find(function (err, buildings) {
         if (err) return console.log(err);
@@ -110,7 +113,7 @@ GameServer.readMap = function(mapsPath){
             building.setModel(data);
             GameServer.buildings[building.id] = building;
         });
-        GameServer.updateStatus();
+        GameServer.updateStatus('buildings');
         GameServer.updateSettlements();
     });
 
@@ -119,7 +122,7 @@ GameServer.readMap = function(mapsPath){
     GameServer.spawnZones.push(new SpawnZone(1566,3,3));
     GameServer.updateSpawnZones();
 
-    GameServer.updateStatus();
+    GameServer.updateStatus('reading map');
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
 
     // For debugging purposes:
@@ -435,6 +438,7 @@ GameServer.handleShop = function(data,socketID) {
     if(action == 'buy'){
         if(!building.canSell(item,nb)) return;
         var price = building.getPrice(item,nb,'buy');
+        console.log(price);
         if(!player.canBuy(price)) return;
         player.takeGold(price,true);
         player.giveItem(item,nb,true);
@@ -714,6 +718,10 @@ GameServer.getBuildings = function(){
     return list;
 };
 
+GameServer.getSettlements = function(){
+    return [0,1];
+};
+
 GameServer.listBuildings = function(data,socketID){
     GameServer.sendBuildings(socketID);
 };
@@ -729,6 +737,8 @@ GameServer.insertNewBuilding = function(data,socketID){
     var building = new Building(data);
     var document = new GameServer.BuildingModel(building);
     building.setModel(document);
+    console.log(building);
+    console.log(document);
 
     document.save(function (err) {
         if (err) return console.error(err);

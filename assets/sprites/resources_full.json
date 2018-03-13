@@ -59,6 +59,10 @@
     {
       "filename": "bomb",
       "frame": {"x":48,"y":816,"w":24,"h":24}
+    },
+    {
+      "filename": "thickgrass",
+      "frame": {"x":168,"y":456,"w":24,"h":24}
     }
   ]
 }

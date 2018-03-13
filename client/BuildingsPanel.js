@@ -46,8 +46,8 @@ BuildingsPanel.prototype.displayListing = function(){
 
         if(slot.prodText) {
             if(displayProd) {
-                slot.prodText.setText(data.prod + '%');
-                slot.prodText.setFill((data.prod >= 100 ? Utils.colors.green : Utils.colors.red));
+                slot.prodText.setText(data.productivity + '%');
+                slot.prodText.setFill((data.productivity >= 100 ? Utils.colors.green : Utils.colors.red));
             }else{
                 slot.prodText.setText('');
             }

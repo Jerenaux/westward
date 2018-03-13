@@ -30,7 +30,7 @@ Inventory.prototype.update = function(item,nb){
 
 Inventory.prototype.isFull = function(){
     return this.size == this.maxSize;
-}
+};
 
 Inventory.prototype.addNew = function(item){
     this.items[item] = 0;
@@ -50,12 +50,11 @@ Inventory.prototype.setItems = function(items){
 
 Inventory.prototype.add = function(item,nb){
     if(!this.hasItem(item)) this.addNew(item);
-    this.updateNb(item,this.getNb(item)+nb);
+    this.updateNb(item,this.getNb(item)+parseInt(nb));
 };
 
 Inventory.prototype.take = function(item,nb){
-    var _nb = Math.min(nb,this.getNb(item));
-    this.updateNb(item,this.getNb(item)-_nb);
+    this.updateNb(item,this.getNb(item)-Math.min(nb,this.getNb(item)));
     if(this.getNb(item) == 0) this.remove(item);
 };
 
