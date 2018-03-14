@@ -21,7 +21,6 @@ One-time single-panel combat tutorial when first combat
 Test second settlement (fort and respawn)
 World map-based settlement selection menu (mention key startegic aspects, display enemy civ threats)
 Class selection menu (describe impact on settlements)
-Title screen
 Fort: staff (msg: you need civic lvl2 to vote for governor)
 Battle: monsters trigger fights (move spawn zones)
 Economic loop: harvest herbs (scatter roots)
@@ -184,6 +183,8 @@ Design document:
 Polish:
 ------
 Visual:
+- Polish title screen (leaves, bird passing in the distance...)
+- Fade-in/out transitions (wait for containers?)
 - Favicon
 - Show "new" tag when opening inventory
 - Cut corners of big battlezones? (but make sure it doesn't impact integrity: save integrity path and used it for that)

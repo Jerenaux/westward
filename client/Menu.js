@@ -2,7 +2,8 @@
  * Created by Jerome on 07-10-17.
  */
 
-function Menu(title){
+function Menu(title,scene){
+    this.scene = scene || Engine.scene;
     this.container = [];
     this.panels = {};
     this.events = {};
@@ -12,7 +13,7 @@ function Menu(title){
 }
 
 Menu.prototype.makeTitle = function(title){
-    this.title = new UIHolder(945,15,'right');
+    this.title = new UIHolder(945,15,'right','big',this.scene);
     this.title.setText(title);
     this.title.setButton(this.hide.bind(this));
 };

@@ -1,7 +1,8 @@
 /**
  * Created by jeren on 06-01-18.
  */
-function UIHolder(x,y,align,style){
+function UIHolder(x,y,align,style,scene){
+    this.scene = scene;
     this.slices = [];
     this.width = 1;
     this.width_ = this.width; // previous width

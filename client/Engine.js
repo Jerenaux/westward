@@ -57,7 +57,6 @@ Engine.preload = function() {
     this.load.image('foundations', 'assets/sprites/buildings/foundations.png');
     this.load.image('hunterhut', 'assets/sprites/buildings/hunterhut.png');
 
-    this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
     this.load.atlas('aok', 'assets/sprites/aok.png', 'assets/sprites/aok.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
@@ -270,6 +269,7 @@ Engine.createMarker = function(){
     Engine.marker.depth = Engine.markerDepth;
     Engine.marker.setDisplayOrigin(0,0);
     Engine.marker.previousTile = {x:0,y:0};
+    Engine.hideMarker();
 };
 
 Engine.initWorld = function(data){
@@ -280,6 +280,7 @@ Engine.initWorld = function(data){
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     // TODO: when all chunks loaded, fade-out Boot scene
+    Engine.showMarker();
 };
 
 Engine.createAnimations = function(){
