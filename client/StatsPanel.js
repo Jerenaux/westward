@@ -32,34 +32,34 @@ StatsPanel.prototype.addStats = function(){
 StatsPanel.prototype.addStat = function(x,y,s){
     var stat = Stats.dict[s];
     var statObj = {};
-    var icon = Engine.scene.add.sprite(x,y,'icons2',stat.frame);
+    var icon = UI.scene.add.sprite(x,y,'icons2',stat.frame);
     icon.setScrollFactor(0);
     icon.setDisplayOrigin(0,0);
-    icon.setDepth(Engine.UIDepth+1);
+    icon.setDepth(1);
     icon.setVisible(false);
     statObj.icon = icon;
     this.content.push(icon);
 
-    var text = Engine.scene.add.text(x+30, y, '', { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    var text = UI.scene.add.text(x+30, y, '', { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     text.setScrollFactor(0);
     text.setDisplayOrigin(0,0);
-    text.setDepth(Engine.UIDepth+1);
+    text.setDepth(1);
     text.setVisible(false);
     statObj.text = text;
     this.content.push(text);
 
-    var zone = Engine.scene.add.zone(x,y,70,30);
-    zone.setDepth(Engine.UIDepth+10);
+    var zone = UI.scene.add.zone(x,y,70,30);
+    zone.setDepth(10);
     zone.setScrollFactor(0);
     zone.setVisible(false);
-    zone.handleOver = function(){
-        Engine.tooltip.updateInfo(stat.name,stat.desc,-1,(stat.hasMax ? stat.hasMax : s));
-        Engine.tooltip.display();
-    };
-    zone.handleOut = function(){
-        Engine.tooltip.hide();
-    };
     zone.setInteractive();
+    zone.on('pointerover',function(){
+        UI.tooltip.updateInfo(stat.name,stat.desc,-1,(stat.hasMax ? stat.hasMax : s));
+        UI.tooltip.display();
+    });
+    zone.on('pointerout',function(){
+        UI.tooltip.hide();
+    });
     statObj.zone = zone;
     this.content.push(zone);
 

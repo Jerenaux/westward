@@ -29,12 +29,26 @@ Panel.prototype.updateCapsule = function(name,text){
 Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpText){
     x += this.x;
     y += this.y;
-    var ring = Engine.scene.add.sprite(x,y,'UI','ring');
-    ring.setDepth(Engine.UIDepth+2);
+    var ring = UI.scene.add.sprite(x,y,'UI','ring');
+    ring.setDepth(2);
     ring.setScrollFactor(0);
     ring.setDisplayOrigin(0,0);
     ring.setVisible(false);
     this.content.push(ring);
+
+    var zone = UI.scene.add.zone(x,y,24,24);
+    zone.setDepth(10);
+    zone.setScrollFactor(0);
+    zone.setInteractive();
+    zone.setVisible(false);
+    zone.on('pointerover',function(){
+        UI.tooltip.updateInfo(helpTitle,helpText);
+        UI.tooltip.display();
+    });
+    zone.on('pointerout',function(){
+        UI.tooltip.hide();
+    });
+    this.content.push(zone);
 
     x += 5;
     y += 5;
@@ -44,27 +58,12 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
     x += 3;
     y += 3;
 
-    var s = Engine.scene.add.sprite(x,y,'UI',symbol);
-    s.setDepth(Engine.UIDepth+3);
+    var s = UI.scene.add.sprite(x,y,'UI',symbol);
+    s.setDepth(3);
     s.setScrollFactor(0);
     s.setDisplayOrigin(0,0);
     s.setVisible(false);
     this.content.push(s);
-
-    var zone = Engine.scene.add.zone(x,y,24,24);
-    zone.setDepth(Engine.UIDepth+10);
-    zone.setScrollFactor(0);
-    zone.setInteractive();
-    //zone.setOrigin(0);
-    zone.setVisible(false);
-    zone.handleOver = function(){
-        Engine.tooltip.updateInfo(helpTitle,helpText);
-        Engine.tooltip.display();
-    };
-    zone.handleOut = function(){
-        Engine.tooltip.hide();
-    };
-    this.content.push(zone);
 
     var btnObj = {
         btn: btn,
@@ -92,10 +91,10 @@ Panel.prototype.addText = function(x,y,text,color,size,font){
     var color = color || '#ffffff';
     var size = size || 14;
     var font = font || Utils.fonts.fancy;
-    var t = Engine.scene.add.text(this.x+x, this.y+y, text, { font: size+'px '+font, fill: color, stroke: '#000000', strokeThickness: 3 });
+    var t = UI.scene.add.text(this.x+x, this.y+y, text, { font: size+'px '+font, fill: color, stroke: '#000000', strokeThickness: 3 });
     t.setDisplayOrigin(0,0);
     t.setScrollFactor(0);
-    t.setDepth(Engine.UIDepth+1);
+    t.setDepth(1);
     t.setVisible(false);
     this.texts.push(t);
     this.content.push(t);
@@ -148,8 +147,8 @@ function Capsule(x,y,icon,container){
     this.width_ = this.width; // previous width
     
     if(icon) {
-        this.icon = Engine.scene.add.sprite(x+8,y+6,'UI',icon);
-        this.icon.setDepth(Engine.UIDepth+2);
+        this.icon = UI.scene.add.sprite(x+8,y+6,'UI',icon);
+        this.icon.setDepth(2);
         this.icon.setScrollFactor(0);
         this.icon.setDisplayOrigin(0,0);
         this.icon.setVisible(false);
@@ -157,25 +156,25 @@ function Capsule(x,y,icon,container){
     var textX = (this.icon ? x + this.icon.width : x) + 10;
     var textY = (this.icon ? y - 1: y);
 
-    this.text = Engine.scene.add.text(textX, textY, '',
+    this.text = UI.scene.add.text(textX, textY, '',
         { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
     );
 
-    this.slices.push(Engine.scene.add.sprite(x,y,'UI','capsule-left'));
+    this.slices.push(UI.scene.add.sprite(x,y,'UI','capsule-left'));
     x += 24;
-    this.slices.push(Engine.scene.add.tileSprite(x,y,this.width,24,'UI','capsule-middle'));
+    this.slices.push(UI.scene.add.tileSprite(x,y,this.width,24,'UI','capsule-middle'));
     x += this.width;
-    this.slices.push(Engine.scene.add.sprite(x,y,'UI','capsule-right'));
+    this.slices.push(UI.scene.add.sprite(x,y,'UI','capsule-right'));
 
     this.slices.forEach(function(e){
-        e.setDepth(Engine.UIDepth+1);
+        e.setDepth(1);
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
         container.push(e); // don't use concat
     });
 
-    this.text.setDepth(Engine.UIDepth+2);
+    this.text.setDepth(2);
     this.text.setScrollFactor(0);
     this.text.setDisplayOrigin(0,0);
     this.text.setVisible(false);

@@ -73,8 +73,8 @@ Client.socket.on('update',function(data){ // This event triggers uppon receiving
     //if(data.nbconnected !== undefined) Game.updateNbConnected(data.nbconnected);
     //if(data.latency) Game.setLatency(data.latency);
     //if(data.latency) console.log('[lat] '+data.latency+' ms');
-    if(data.local) console.log(data.local);
-    if(data.global) console.log(data.global);
+    //if(data.local) console.log(data.local);
+    //if(data.global) console.log(data.global);
     if(data.local) Engine.updateSelf(data.local); // Should come first
     if(data.global) Engine.updateWorld(data.global);
 });

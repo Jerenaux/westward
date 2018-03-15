@@ -16,17 +16,11 @@ InventoryPanel.prototype = Object.create(Panel.prototype);
 InventoryPanel.prototype.constructor = InventoryPanel;
 
 InventoryPanel.prototype.createZone = function(){
-    var zone = Engine.scene.add.zone(0,0,0,0);
-    zone.setDepth(Engine.UIDepth+10);
+    var zone = UI.scene.add.zone(0,0,0,0);
+    zone.setDepth(10);
     zone.setScrollFactor(0);
-    zone.handleOver = function(){
-        Engine.tooltip.display();
-        //console.log('hover');
-    };
-    zone.handleOut = function(){
-        Engine.tooltip.hide();
-        //console.log('out');
-    };
+    zone.on('pointerover',UI.tooltip.display.bind(UI.tooltip));
+    zone.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
     this.content.push(zone);
     return zone;
 };
@@ -44,10 +38,10 @@ InventoryPanel.prototype.setInventory = function(inventory,maxwidth,showNumbers,
 
 InventoryPanel.prototype.getNextSlot = function(){
     if(this.slotsCounter >= this.slots.length){
-        var s = Engine.scene.add.sprite(0,0,'UI','slots-middle');
+        var s = UI.scene.add.sprite(0,0,'UI','slots-middle');
         s.setDisplayOrigin(0,0);
         s.setScrollFactor(0);
-        s.setDepth(Engine.UIDepth+1);
+        s.setDepth(1);
         this.slots.push(s);
         this.content.push(s);
     }
@@ -94,13 +88,13 @@ InventoryPanel.prototype.getNextSprite = function(){
         var textconfig = { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 };
         var s = {
             item: new ItemSprite(),
-            text: Engine.scene.add.text(0, 0, '1',textconfig)
+            text: UI.scene.add.text(0, 0, '1',textconfig)
         };
         var slot = this.slots[this.spritesCounter];
         s.text.setOrigin(1,0);
         s.text.setScrollFactor(0);
         s.text.setVisible(false);
-        s.text.setDepth(Engine.UIDepth+2);
+        s.text.setDepth(2);
         s.text.setPosition(slot.x+36,slot.y+18);
         s.item.setPosition(slot.x+18,slot.y+20);
         this.sprites.push(s);

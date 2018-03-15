@@ -26,7 +26,7 @@ SpawnZone.prototype.update = function(){
 
 SpawnZone.prototype.spawnInAOI = function(aoi){
     // TODO: refine, specify how many to spawn, min, max, develop matrix ecosystem...
-    var nb = 5 - aoi.entities.length;
+    var nb = 0 - aoi.entities.length;
     if(nb <= 0) return;
     for(var i = 0; i < nb; i++){
         var x = Utils.randomInt(aoi.x,aoi.x+World.chunkWidth);

@@ -18,6 +18,7 @@
     "equipment": "rangedw",
     "ammo": "quiver",
     "effects":{"acc":40},
+    "recipe": {"7":1,"21":1},
     "useInBattle": true
   },
   "3":{

@@ -15,7 +15,7 @@ function ProgressBar(x,y,w){
 }
 
 ProgressBar.prototype.setUpZone = function(zone){
-    zone.setDepth(Engine.UIDepth+10);
+    zone.setDepth(10);
     zone.setScrollFactor(0);
     zone.setInteractive();
     zone.setVisible(false);
@@ -32,12 +32,12 @@ ProgressBar.prototype.setUpZone = function(zone){
 
 ProgressBar.prototype.finalize = function(){
     this.body.forEach(function(e){
-        e.setDepth(Engine.UIDepth+1);
+        e.setDepth(1);
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
     });
-    this.body[2].setDepth(Engine.UIDepth+2);
+    this.body[2].setDepth(2);
 };
 
 ProgressBar.prototype.reset = function(){
@@ -72,7 +72,7 @@ ProgressBar.prototype.setLevel = function(level,max,duration){
         var _lvl = this.level;
         var _bar = this;
         if(this.bodyTween) this.bodyTween.stop();
-        this.bodyTween = Engine.scene.tweens.add(
+        this.bodyTween = UI.scene.tweens.add(
             {
                 targets: this.barBody,
                 width: newLength,
@@ -136,25 +136,25 @@ function MiniProgressBar(x,y,w,color){
     ProgressBar.call(this,x,y,w,color);
 
     this.maxLength = w;
-    this.body.push(Engine.scene.add.sprite(x,y,'UI','minibar_left'));
+    this.body.push(UI.scene.add.sprite(x,y,'UI','minibar_left'));
     x += 6;
-    this.body.push(Engine.scene.add.tileSprite(x,y,w-1,12,'UI','minibar_middle'));
+    this.body.push(UI.scene.add.tileSprite(x,y,w-1,12,'UI','minibar_middle'));
     this.zeroX = x-2;
     x += w;
-    this.body.push(Engine.scene.add.sprite(x-1,y,'UI','minibar_right'));
+    this.body.push(UI.scene.add.sprite(x-1,y,'UI','minibar_right'));
     this.fullX = x-1;
 
     color = color || 'gold';
     x -= w;
     x -= 5;
     y += 2;
-    this.tail = Engine.scene.add.sprite(x,y,'UI');
+    this.tail = UI.scene.add.sprite(x,y,'UI');
     this.body.push(this.tail);
     x += 4;
-    this.barBody = Engine.scene.add.tileSprite(x,y,1,8,'UI');
+    this.barBody = UI.scene.add.tileSprite(x,y,1,8,'UI');
     this.body.push(this.barBody);
     x += 1;
-    this.head = Engine.scene.add.sprite(x,y,'UI');
+    this.head = UI.scene.add.sprite(x,y,'UI');
     this.body.push(this.head);
     this.setColor(color);
 
@@ -183,22 +183,22 @@ function BigProgressBar(x,y,w,color,hasZone){
     w -= 32;
     this.maxLength = w+9;
 
-    this.body.push(Engine.scene.add.sprite(x,y,'UI','healthbar_left'));
+    this.body.push(UI.scene.add.sprite(x,y,'UI','healthbar_left'));
     x += 24;
-    this.body.push(Engine.scene.add.tileSprite(x,y,w,20,'UI','healthbar_middle'));
+    this.body.push(UI.scene.add.tileSprite(x,y,w,20,'UI','healthbar_middle'));
     this.zeroX = x-15;
     x += w;
-    this.body.push(Engine.scene.add.sprite(x,y,'UI','healthbar_right'));
+    this.body.push(UI.scene.add.sprite(x,y,'UI','healthbar_right'));
     this.fullX = x;
 
     color = color || 'red';
     x -= w;
     x -= 15;
     y += 3;
-    this.barBody = Engine.scene.add.tileSprite(x,y,50,14,'UI','progress_'+color+'_middle');
+    this.barBody = UI.scene.add.tileSprite(x,y,50,14,'UI','progress_'+color+'_middle');
     this.body.push(this.barBody);
     x += 50;
-    this.head = Engine.scene.add.sprite(x,y,'UI','progress_'+color+'_top');
+    this.head = UI.scene.add.sprite(x,y,'UI','progress_'+color+'_top');
     this.body.push(this.head);
     this.finalize();
 
@@ -210,7 +210,7 @@ BigProgressBar.prototype = Object.create(ProgressBar.prototype);
 BigProgressBar.prototype.constructor = BigProgressBar;
 
 BigProgressBar.prototype.createZone = function(){
-    var zone = Engine.scene.add.zone(this.x,this.y,this.maxLength,20);
+    var zone = UI.scene.add.zone(this.x,this.y,this.maxLength,20);
     this.setUpZone(zone);
     return zone;
 };

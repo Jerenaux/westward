@@ -16,12 +16,12 @@ function Tooltip(){
     this.modifierTexts = [];
     this.modifierCounter = 0;
     this.displayed = false;
-    this.titleText = Engine.scene.add.text(this.x+13,this.y+4, '',
+    this.titleText = UI.scene.add.text(this.x+13,this.y+4, '',
         { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3,
             wordWrap: {width: 250, useAdvancedWrap: true}
         }
     );
-    this.descText = Engine.scene.add.text(this.x+13,0, '',
+    this.descText = UI.scene.add.text(this.x+13,0, '',
         { font: '13px '+Utils.fonts.normal, fill: '#ffffff', stroke: '#000000', strokeThickness: 3,
             wordWrap: {width: 250, useAdvancedWrap: true}
         }
@@ -39,25 +39,25 @@ Tooltip.prototype.makeBody = function(){
     var y = this.y;
     var w = this.width;
     var h = this.height;
-    this.container.push(Engine.scene.add.sprite(x,y,'tooltip',0));
+    this.container.push(UI.scene.add.sprite(x,y,'tooltip',0));
     x += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth,'tooltip',1));
+    this.container.push(UI.scene.add.tileSprite(x,y,w,sideWidth,'tooltip',1));
     x += w;
-    this.container.push(Engine.scene.add.sprite(x,y,'tooltip',2));
+    this.container.push(UI.scene.add.sprite(x,y,'tooltip',2));
     x = this.x;
     y += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'tooltip',3));
+    this.container.push(UI.scene.add.tileSprite(x,y,sideWidth,h,'tooltip',3));
     x += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,h,'tooltip',4));
+    this.container.push(UI.scene.add.tileSprite(x,y,w,h,'tooltip',4));
     x += w;
-    this.container.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'tooltip',5));
+    this.container.push(UI.scene.add.tileSprite(x,y,sideWidth,h,'tooltip',5));
     x = this.x;
     y += h;
-    this.container.push(Engine.scene.add.sprite(x,y,'tooltip',6));
+    this.container.push(UI.scene.add.sprite(x,y,'tooltip',6));
     x += sideWidth;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,sideWidth,'tooltip',7));
+    this.container.push(UI.scene.add.tileSprite(x,y,w,sideWidth,'tooltip',7));
     x += w;
-    this.container.push(Engine.scene.add.sprite(x,y,'tooltip',8));
+    this.container.push(UI.scene.add.sprite(x,y,'tooltip',8));
 };
 
 Tooltip.prototype.makeStatsIcons = function(){
@@ -67,8 +67,8 @@ Tooltip.prototype.makeStatsIcons = function(){
         var statData = Stats.dict[stat];
         var x = this.x+15;
         var y = this.y+(30*(i + 1));
-        var icon = Engine.scene.add.sprite(x,y,'icons2', statData.frame);
-        var text = Engine.scene.add.text(x+30,y+2, '100',
+        var icon = UI.scene.add.sprite(x,y,'icons2', statData.frame);
+        var text = UI.scene.add.text(x+30,y+2, '100',
             { font: '12px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
         );
         icon.dontDisplay = true;
@@ -87,7 +87,6 @@ Tooltip.prototype.updateInfo = function(title, text, itemID, stat){
     var descY = this.y + 4;
     if(title) descY += 21;
     if(stat) descY += 25;
-    //var descY = title ? this.y+25 : this.y+4;
     this.descText.y = descY;
     this.descText.setText(text);
     var nbLines = 0;
@@ -107,7 +106,7 @@ Tooltip.prototype.updateInfo = function(title, text, itemID, stat){
 
 Tooltip.prototype.getNextText = function() {
     if (this.modifierCounter >= this.modifierTexts.length) {
-        var t = Engine.scene.add.text(0, 0, '', {
+        var t = UI.scene.add.text(0, 0, '', {
             font: '14px ' + Utils.fonts.fancy,
             fill: '#ffffff',
             stroke: '#000000',
@@ -115,7 +114,7 @@ Tooltip.prototype.getNextText = function() {
         });
         t.setDisplayOrigin(0, 0);
         t.setScrollFactor(0);
-        t.setDepth(Engine.tooltipDepth + 2);
+        t.setDepth(UI.tooltipDepth + 2);
         t.dontDisplay = true;
         this.container.push(t);
         this.modifierTexts.push(t);
@@ -152,7 +151,6 @@ Tooltip.prototype.displayModifiers = function(stat){
     var y = this.y + 5;
     var x = this.x + 13;
     if(this.titleText.text) y += this.titleText.height;
-    //if(this.descText.text) y += this.descText.height;
     statObj.absoluteModifiers.forEach(function(m){
         var txt = this.makeModifierText(x,y,m,'absolute');
         x += 40;
@@ -182,7 +180,7 @@ Tooltip.prototype.makeModifierText = function(x,y,value,type){
 Tooltip.prototype.updatePosition = function(x,y){
     x += this.xOffset;
     y += this.yOffset;
-    if(x > Engine.getGameConfig().width - this.width - 20) {
+    if(x > UI.getGameWidth() - this.width - 20) {
         x -= (this.width+20);
         y += 20;
     }
@@ -250,7 +248,7 @@ Tooltip.prototype.hide = function(){
 Tooltip.prototype.finalize = function(){
     this.container.forEach(function(e){
         var isText = (e.constructor.name == 'Text');
-        if(e.depth == 1 || !e.depth) e.setDepth(Engine.tooltipDepth);
+        if(e.depth == 1 || !e.depth) e.setDepth(UI.tooltipDepth);
         if(isText) e.depth++;
         e.setScrollFactor(0);
         if(!e.centered) e.setDisplayOrigin(0,0);

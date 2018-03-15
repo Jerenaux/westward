@@ -15,10 +15,10 @@ CraftingPanel.prototype.constructor = CraftingPanel;
 CraftingPanel.prototype.addInterface = function(){
     var ringx = 80;
     var ringy = 50;
-    var ring = Engine.scene.add.image(this.x+ringx,this.y+ringy,'UI','craftring');
+    var ring = UI.scene.add.image(this.x+ringx,this.y+ringy,'UI','craftring');
     ring.setScrollFactor(0);
     ring.setDisplayOrigin(0,0);
-    ring.setDepth(Engine.UIDepth+1);
+    ring.setDepth(1);
     ring.setVisible(false);
     this.content.push(ring);
     this.ring = ring;
@@ -32,10 +32,10 @@ CraftingPanel.prototype.addInterface = function(){
     item.showTooltip = false;
     this.content.push(item);
 
-    var count = Engine.scene.add.text(this.x+ringx+(ring.frame.width/2),this.y+ringy+85, '0',  { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    var count = UI.scene.add.text(this.x+ringx+(ring.frame.width/2),this.y+ringy+85, '0',  { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     count.setOrigin(0.5,0.5);
     count.setVisible(false);
-    count.setDepth(Engine.UIDepth+2);
+    count.setDepth(2);
     count.setScrollFactor(0);
     this.content.push(count);
 

@@ -18,31 +18,32 @@ Bubble.prototype.makeBubble = function(sx,sy){
     var x = startx;
     var w = 100;
     var h = 30;
-    this.container.push(Engine.scene.add.sprite(x,y,'bubble',0));
+    var scene = (this.isNotificiation ? UI.scene : Engine.scene);
+    this.container.push(scene.add.sprite(x,y,'bubble',0));
     x += 5;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,5,'bubble',1));
+    this.container.push(scene.add.tileSprite(x,y,w,5,'bubble',1));
     x += w;
-    this.container.push(Engine.scene.add.sprite(x,y,'bubble',2));
+    this.container.push(scene.add.sprite(x,y,'bubble',2));
     x = startx;
     y += 5;
-    this.container.push(Engine.scene.add.tileSprite(x,y,5,h,'bubble',3));
+    this.container.push(scene.add.tileSprite(x,y,5,h,'bubble',3));
     x += 5;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,h,'bubble',4));
+    this.container.push(scene.add.tileSprite(x,y,w,h,'bubble',4));
     x += w;
-    this.container.push(Engine.scene.add.tileSprite(x,y,5,h,'bubble',5));
+    this.container.push(scene.add.tileSprite(x,y,5,h,'bubble',5));
     y += h;
     x = startx;
-    this.container.push(Engine.scene.add.sprite(x,y,'bubble',6));
+    this.container.push(scene.add.sprite(x,y,'bubble',6));
     x += 5;
-    this.container.push(Engine.scene.add.tileSprite(x,y,w,5,'bubble',7));
+    this.container.push(scene.add.tileSprite(x,y,w,5,'bubble',7));
     x += w;
-    this.container.push(Engine.scene.add.sprite(x,y,'bubble',8));
+    this.container.push(scene.add.sprite(x,y,'bubble',8));
     y += 5;
     x -= 0.25*w;
-    if(!this.isNotificiation) this.container.push(Engine.scene.add.sprite(x,y,'tail'));
+    if(!this.isNotificiation) this.container.push(scene.add.sprite(x,y,'tail'));
     var textx = startx + 5;
     var texty = starty + 5;
-    this.text = Engine.scene.add.text(textx, texty, "Hello world I'm new in Westward",
+    this.text = scene.add.text(textx, texty, "Hello world I'm new in Westward",
         { font: '12px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3,
             align: 'center',
             wordWrap: {width: w, useAdvancedWrap: true}
@@ -69,8 +70,9 @@ Bubble.prototype.finalize = function(){
     for(var i = 0; i < this.container.length; i++){
         var e = this.container[i];
         var isText = (e.constructor.name == 'Text');
-        e.depth = Engine.bubbleDepth;
-        if(this.isNotificiation) e.depth += 20;
+        e.setDepth(10);
+        //e.depth = Engine.bubbleDepth;
+        //if(this.isNotificiation) e.depth += 20;
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
         if(this.isNotificiation) e.setScrollFactor(0);

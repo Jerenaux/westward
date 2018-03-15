@@ -14,8 +14,12 @@ Prototype level:
 Week:
 -----
 *1 item/recipe a day*
+Bug: wrong building displayed in commit slots
+Bug: stop speeding tweens when starting scene?
+Bug: re-entering building needs two clicks
 Bug: no animals on buildings (wrong collisions?)
 Bug: wrong click area of foundations
+UI: test snapshot of bugs of menus
 Design document
 One-time single-panel combat tutorial when first combat
 Test second settlement (fort and respawn)

@@ -14,35 +14,39 @@ function LongSlot(width){
     this.textCounter = 0;
     var sw = 8;
     var bw = width;
-    this.slices.push(Engine.scene.add.sprite(x, y, 'UI', 'longslot_1'));
+    this.slices.push(UI.scene.add.sprite(x, y, 'UI', 'longslot_1'));
     x += 16;
-    this.slices.push(Engine.scene.add.tileSprite(x, y, sw, 40, 'UI', 'longslot_2'));
+    this.slices.push(UI.scene.add.tileSprite(x, y, sw, 40, 'UI', 'longslot_2'));
     x += sw;
-    this.slices.push(Engine.scene.add.sprite(x, y, 'UI', 'longslot_3'));
+    this.slices.push(UI.scene.add.sprite(x, y, 'UI', 'longslot_3'));
     x += 16;
-    this.slices.push(Engine.scene.add.sprite(x, y, 'UI', 'longslot_4'));
+    this.slices.push(UI.scene.add.sprite(x, y, 'UI', 'longslot_4'));
     x += 16;
-    this.slices.push(Engine.scene.add.tileSprite(x, y, bw, 40, 'UI', 'longslot_5'));
+    this.slices.push(UI.scene.add.tileSprite(x, y, bw, 40, 'UI', 'longslot_5'));
     x += bw;
-    this.slices.push(Engine.scene.add.sprite(x, y, 'UI', 'longslot_9'));
+    this.slices.push(UI.scene.add.sprite(x, y, 'UI', 'longslot_9'));
 
     this.slices.forEach(function(s){
         s.setDisplayOrigin(0,0);
         s.setScrollFactor(0);
-        s.setDepth(Engine.UIDepth+1);
+        s.setDepth(1);
         s.setVisible(false);
     });
 
     this.zone = this.createZone();
 }
 
+LongSlot.prototype.clearCallbacks = function(){
+    this.zone.removeAllListeners();
+};
+
 LongSlot.prototype.updateCallback = function(event,callback){
-    this.zone[event] = callback;
+    this.zone.on(event,callback);
 };
 
 LongSlot.prototype.createZone = function(){
-    var zone = Engine.scene.add.zone(0,0,this.totalwidth,38);
-    zone.setDepth(Engine.UIDepth+10);
+    var zone = UI.scene.add.zone(0,0,this.totalwidth,38);
+    zone.setDepth(10);
     zone.setScrollFactor(0);
     zone.setInteractive();
     return zone;
@@ -53,9 +57,9 @@ LongSlot.prototype.addIcon = function(atlas,frame){
         this.icon.setTexture(atlas);
         this.icon.setFrame(frame);
     }else {
-        this.icon = Engine.scene.add.sprite(this.x + 21, this.y + 20, atlas, frame);
+        this.icon = UI.scene.add.sprite(this.x + 21, this.y + 20, atlas, frame);
         this.icon.setScrollFactor(0);
-        this.icon.setDepth(Engine.UIDepth + 1);
+        this.icon.setDepth(1);
         this.icon.setVisible(false);
     }
     this.icon.setDisplayOrigin(Math.floor(this.icon.frame.width / 2), Math.floor(this.icon.frame.height / 2));
@@ -63,10 +67,10 @@ LongSlot.prototype.addIcon = function(atlas,frame){
 
 LongSlot.prototype.getNextText = function(){
     if(this.textCounter >= this.texts.length){
-        var t = Engine.scene.add.text(0,0, '', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+        var t = UI.scene.add.text(0,0, '', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
         t.setDisplayOrigin(0,0);
         t.setScrollFactor(0);
-        t.setDepth(Engine.UIDepth+1);
+        t.setDepth(1);
         this.texts.push(t);
     }
     return this.texts[this.textCounter++];

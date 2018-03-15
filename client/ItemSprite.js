@@ -10,13 +10,15 @@ var ItemSprite = new Phaser.Class({
     initialize: function ItemSprite (x,y) {
         x = x || 0;
         y = y || 0;
-        CustomSprite.call(this, x, y, '');
+        CustomSprite.call(this, UI.scene, x, y, '');
 
         this.setScrollFactor(0);
         this.setInteractive();
         this.setVisible(false);
-        this.setDepth(Engine.UIDepth+1);
+        this.setDepth(1);
         this.showTooltip = true;
+
+        this.on('pointerover',this.handleOver.bind(this));
     },
 
     setUp: function(id,data,callback){
@@ -28,10 +30,10 @@ var ItemSprite = new Phaser.Class({
         this.name = data.name;
         this.desc = data.desc;
         this.effects = data.effects;
-        if(callback) this.handleClick = callback.bind(this);
+        if(callback) this.on('pointerup',callback.bind(this));
     },
 
     handleOver: function(){
-        if(this.showTooltip) Engine.tooltip.updateInfo(this.name,this.desc,this.itemID);
+        if(this.showTooltip) UI.tooltip.updateInfo(this.name,this.desc,this.itemID);
     }
 });

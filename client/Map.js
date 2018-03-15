@@ -6,41 +6,44 @@ var Map = new Phaser.Class({
     Extends: CustomSprite,
 
     initialize: function Map(x, y) {
-        CustomSprite.call(this, x, y, 'fullmap');
+        CustomSprite.call(this, UI.scene, x, y, 'fullmap');
 
-        this.setDepth(Engine.UIDepth+2);
+        this.setDepth(2);
         this.setScrollFactor(0);
         this.setVisible(false);
 
-        var mask = Engine.scene.add.sprite(x,y,'radial3');
+        var mask = UI.scene.add.sprite(x,y,'radial3');
         mask.setScale(1.1);
-        mask.setDepth(Engine.UIDepth+2);
+        mask.setDepth(2);
         mask.setScrollFactor(0);
         mask.setVisible(false);
-        this.mask = new Phaser.Display.Masks.BitmapMask(Engine.scene,mask);
+        this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
         this.maskPicture = mask;
 
-        this.text = Engine.scene.add.text(0, 0, 'New Beginning',{font: '60px treamd', fill: '#966f33', stroke: '#000000', strokeThickness: 3});
-        this.text.setDepth(Engine.UIDepth+3);
+        this.text = UI.scene.add.text(0, 0, 'New Beginning',{font: '60px treamd', fill: '#966f33', stroke: '#000000', strokeThickness: 3});
+        this.text.setDepth(3);
         this.text.setVisible(false);
         this.text.setScrollFactor(0,0);
         this.text.setAlpha(0.5);
         this.text.setOrigin(0.5);
-        this.text.mask = new Phaser.Display.Masks.BitmapMask(Engine.scene,mask);
+        this.text.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
 
         this.setInteractive(new Phaser.Geom.Rectangle(0,0,this.width,this.height),Phaser.Geom.Rectangle.Contains);
-        Engine.scene.input.setDraggable(this);
+        UI.scene.input.setDraggable(this);
+        this.draggedX = 0;
+        this.draggedY = 0;
+
+        this.on('drag',this.handleDrag.bind(this));
 
         this.pins = [];
         this.resetCounter();
         this.clickedTile = null;
 
-        this.draggedX = 0;
-        this.draggedY = 0;
         Engine.map = this;
+
     },
 
-    handleDrag: function(x,y){
+    handleDrag: function(pointer,x,y){
         if(Math.abs(x-this.initialX) > 500) return;
         if(Math.abs(y-this.initialY) > 500) return;
         var dx = this.x - x;
@@ -55,16 +58,17 @@ var Map = new Phaser.Class({
         this.draggedX += dx;
         this.draggedY += dy;
 
+        //console.log(this.input.hitArea);
         if(tween){
             var targets = this.pins.concat([this.text,this]);
             var duration = 300;
-            Engine.scene.tweens.add({
+            UI.scene.tweens.add({
                     targets: targets,
                     x: '-='+dx,
                     y: '-='+dy,
                     duration: duration
                 });
-            Engine.scene.tweens.add({
+            UI.scene.tweens.add({
                 targets: this.input.hitArea,
                 x: '+='+dx,
                 y: '+='+dy,
@@ -114,6 +118,7 @@ var Map = new Phaser.Class({
         // The map has to move in the opposite direction of the drag (w.r.t. center)
         /*this.x -= dx;
         this.y -= dy;*/
+        console.log('dragging',dx,dy);
         this.dragMap(dx,dy,true);
     },
 
@@ -159,13 +164,13 @@ var Pin = new Phaser.Class({
     Extends: CustomSprite,
 
     initialize: function Pin (map,mask) {
-        CustomSprite.call(this, 0, 0, 'pin');
-        this.setDepth(Engine.UIDepth+3);
+        CustomSprite.call(this, UI.scene, 0, 0, 'pin');
+        this.setDepth(5);
         this.setScrollFactor(0);
         this.setOrigin(0.5,1);
         this.setVisible(false);
         this.setInteractive();
-        this.mask = new Phaser.Display.Masks.BitmapMask(Engine.scene,mask);
+        this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
         this.parentMap = map;
     },
 

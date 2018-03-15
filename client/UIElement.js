@@ -7,7 +7,7 @@ var UIElement = new Phaser.Class({
     Extends: CustomSprite,
 
     initialize: function UIElement (x, y, texture, frame, menu) {
-        CustomSprite.call(this, x, y, texture);
+        CustomSprite.call(this, UI.scene, x, y, texture);
         if(frame) this.setFrame(frame);
 
         this.depth = Engine.UIDepth+1;
@@ -15,6 +15,8 @@ var UIElement = new Phaser.Class({
         this.setInteractive();
         this.setDisplayOrigin(0,0);
         this.menu = menu;
+
+        this.on('pointerdown',this.handleClick.bind(this));
     },
 
     handleClick: function(){

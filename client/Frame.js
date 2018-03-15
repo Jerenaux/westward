@@ -27,27 +27,27 @@ Frame.prototype.makeFrame = function(){
 
     var x = this.x;
     var y = this.y;
-    this.slices.push(Engine.scene.add.sprite(x,y,'UI','panel-topleft'));
+    this.slices.push(UI.scene.add.sprite(x,y,'UI','panel-topleft'));
     x += sideWidth;
-    this.slices.push(Engine.scene.add.tileSprite(x,y,w,sideWidth,'UI','panel-top'));
+    this.slices.push(UI.scene.add.tileSprite(x,y,w,sideWidth,'UI','panel-top'));
     x += w;
-    this.slices.push(Engine.scene.add.sprite(x,y,'UI','panel-topright'));
+    this.slices.push(UI.scene.add.sprite(x,y,'UI','panel-topright'));
     x = this.x;
     y += sideWidth;
-    this.slices.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-left'));
+    this.slices.push(UI.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-left'));
     x += sideWidth;
 
-    var center = Engine.scene.add.tileSprite(x,y,w,h,'UI','panel-center');
+    var center = UI.scene.add.tileSprite(x,y,w,h,'UI','panel-center');
     this.slices.push(center);
     x += w;
-    this.slices.push(Engine.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-right'));
+    this.slices.push(UI.scene.add.tileSprite(x,y,sideWidth,h,'UI','panel-right'));
     x = this.x;
     y += h;
-    this.slices.push(Engine.scene.add.sprite(x,y,'UI','panel-bottomleft'));
+    this.slices.push(UI.scene.add.sprite(x,y,'UI','panel-bottomleft'));
     x += sideWidth;
-    this.slices.push(Engine.scene.add.tileSprite(x,y,w,sideWidth,'UI','panel-bottom'));
+    this.slices.push(UI.scene.add.tileSprite(x,y,w,sideWidth,'UI','panel-bottom'));
     x += w;
-    this.slices.push(Engine.scene.add.sprite(x,y,'UI','panel-bottomright'));
+    this.slices.push(UI.scene.add.sprite(x,y,'UI','panel-bottomright'));
 
     this.finalize();
 };
@@ -140,7 +140,7 @@ Frame.prototype.hideFrame = function(){
 
 Frame.prototype.finalize = function(){
     this.slices.forEach(function(e){
-        e.setDepth(Engine.UIDepth);
+        e.setDepth(0);
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);

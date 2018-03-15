@@ -1,8 +1,7 @@
 /**
  * Created by jeren on 06-01-18.
  */
-function UIHolder(x,y,align,style,scene){
-    this.scene = scene;
+function UIHolder(x,y,align,style){
     this.slices = [];
     this.width = 1;
     this.width_ = this.width; // previous width
@@ -18,7 +17,7 @@ function UIHolder(x,y,align,style,scene){
         leftFrame = 'title-left';
         middleFrame = 'title-center';
         rightFrame = 'title-right';
-        this.depth = Engine.UIDepth;
+        this.depth = 0;
     }else if(style == 'small'){
         sliceWidth = 24;
         sliceHeight = 24;
@@ -27,7 +26,7 @@ function UIHolder(x,y,align,style,scene){
         leftFrame = 'capsule-left';
         middleFrame = 'capsule-middle';
         rightFrame = 'capsule-right';
-        this.depth = Engine.UIDepth+2;
+        this.depth = 2;
     }
 
     var xl, yl, xm, ym, xr, yr;
@@ -45,19 +44,18 @@ function UIHolder(x,y,align,style,scene){
     var textX = x;
     var textY = y + yOffset;
 
-    this.text = Engine.scene.add.text(textX, textY, '', { font: fontSize+'px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.text = UI.scene.add.text(textX, textY, '', { font: fontSize+'px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
 
-    this.slices.push(Engine.scene.add.sprite(xl,yl,'UI',leftFrame));
-    this.slices.push(Engine.scene.add.tileSprite(xm,ym,this.width,sliceHeight,'UI',middleFrame));
-    this.slices.push(Engine.scene.add.sprite(xr,yr,'UI',rightFrame));
+    this.slices.push(UI.scene.add.sprite(xl,yl,'UI',leftFrame));
+    this.slices.push(UI.scene.add.tileSprite(xm,ym,this.width,sliceHeight,'UI',middleFrame));
+    this.slices.push(UI.scene.add.sprite(xr,yr,'UI',rightFrame));
 
-    var _this = this;
     this.slices.forEach(function(e){
-        e.setDepth(_this.depth);
+        e.setDepth(this.depth);
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
-    });
+    },this);
 
     this.text.setDepth(this.depth+1);
     this.text.setScrollFactor(0);

@@ -66,9 +66,10 @@ BuildingsPanel.prototype.displayListing = function(){
                 var map = Engine.currentMenu.panels['map'].map;
                 var pin = map.addPin(data.x, data.y, buildingTypeData.name);
                 slot.pin = pin;
-                slot.updateCallback('handleOver', pin.highlight.bind(pin));
-                slot.updateCallback('handleOut', pin.unhighlight.bind(pin));
-                slot.updateCallback('handleClick', pin.focus.bind(pin));
+                slot.clearCallbacks();
+                slot.updateCallback('pointerover', pin.highlight.bind(pin));
+                slot.updateCallback('pointerout', pin.unhighlight.bind(pin));
+                slot.updateCallback('pointerup', pin.focus.bind(pin));
             }
         }
     }

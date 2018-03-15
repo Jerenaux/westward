@@ -2,16 +2,16 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 14-02-18.
  */
 
-function BigButton(x,y,text,callback,scene){
-    this.scene = scene || Engine.scene;
+function BigButton(x,y,text,callback){
+    //var UI = Engine.scene.get('UI');
     this.slices = [];
     var textX = x + 20;
-    this.slices.push(this.scene.add.sprite(x,y,'UI','bigbutton_left'));
+    this.slices.push(UI.scene.add.sprite(x,y,'UI','bigbutton_left'));
     x += 41;
-    this.slices.push(this.scene.add.tileSprite(x,y,4,28,'UI','bigbutton_middle'));
+    this.slices.push(UI.scene.add.tileSprite(x,y,4,28,'UI','bigbutton_middle'));
     x += 4;
-    this.slices.push(this.scene.add.sprite(x,y,'UI','bigbutton_right'));
-    this.text = this.scene.add.text(textX, y+2, '', { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.slices.push(UI.scene.add.sprite(x,y,'UI','bigbutton_right'));
+    this.text = UI.scene.add.text(textX, y+2, '', { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
 
     this.callback = callback;
     this.text.handleDown = this.handleDown.bind(this);
@@ -21,32 +21,28 @@ function BigButton(x,y,text,callback,scene){
 
     var _parent = this;
     this.slices.forEach(function(e){
-        e.setDepth(Engine.UIDepth+1);
+        e.setDepth(1);
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
-        e.setInteractive();
-        //e.handleDown = _parent.handleDown.bind(_parent);
-        //e.handleClick = _parent.handleClick.bind(_parent);
-        //e.handleOver = _parent.handleOver.bind(_parent);
-        //e.handleOut = _parent.handleOut.bind(_parent);
-        e.on('pointerdown',_parent.handleDown.bind(_parent));
-        e.on('pointerup',_parent.handleClick.bind(_parent));
-        e.on('pointerover',_parent.handleOver.bind(_parent));
-        e.on('pointerout',_parent.handleOut.bind(_parent));
-    });
-    this.text.setDepth(Engine.UIDepth+2);
+        this.attachCallbacks(e);
+    },this);
+    this.text.setDepth(2);
     this.text.setScrollFactor(0);
     this.text.setDisplayOrigin(0,0);
     this.text.setVisible(false);
-    this.text.setInteractive();
-    //this.text.handleOver = _parent.handleOver.bind(_parent);
-    //this.text.handleOut = _parent.handleOut.bind(_parent);
-    this.text.on('pointerover',_parent.handleOver.bind(_parent));
-    this.text.on('pointerout',_parent.handleOut.bind(_parent));
+    this.attachCallbacks(this.text);
 
-    this.lastClick = Date.now();
+    this.lastClick = 0;
 }
+
+BigButton.prototype.attachCallbacks = function(element){
+    element.setInteractive();
+    element.on('pointerdown',this.handleDown.bind(this));
+    element.on('pointerup',this.handleClick.bind(this));
+    element.on('pointerover',this.handleOver.bind(this));
+    element.on('pointerout',this.handleOut.bind(this));
+};
 
 BigButton.prototype.setText = function(text){
     var currentWidth = this.text.width;

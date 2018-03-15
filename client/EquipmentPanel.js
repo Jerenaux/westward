@@ -34,32 +34,28 @@ EquipmentPanel.prototype.addEquip = function(){
 
 EquipmentPanel.prototype.addEquipSlot = function(x,y,name,shade,contained,slotName,subSlot){
     var slotObj = {};
-    var slot = Engine.scene.add.sprite(this.x+x,this.y+y,'UI','equipment-slot');
+    var slot = UI.scene.add.sprite(this.x+x,this.y+y,'UI','equipment-slot');
     var item = new ItemSprite(this.x+x+20,this.y+y+20);
     slot.setInteractive();
-    slot.handleOver = function(){
-        Engine.tooltip.display();
-    };
-    slot.handleOut = function(){
-        Engine.tooltip.hide();
-    };
-    slot.handleClick = Engine.unequipClick.bind(slotObj);
-    slot.setDepth(Engine.UIDepth+1);
+    slot.on('pointerover',UI.tooltip.display.bind(UI.tooltip));
+    slot.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
+    slot.on('pointerup',Engine.unequipClick.bind(slotObj));
+    //slot.handleClick = Engine.unequipClick.bind(slotObj);
+    slot.setDepth(1);
     slot.setScrollFactor(0);
     slot.setDisplayOrigin(0,0);
     slot.setVisible(false);
 
     if(contained){
-        var text = Engine.scene.add.text(this.x+x+38, this.y+y+19, '0',{font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3});
+        var text = UI.scene.add.text(this.x+x+38, this.y+y+19, '0',{font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3});
         text.setOrigin(1,0);
         text.setScrollFactor(0);
         text.setVisible(false);
-        text.setDepth(Engine.UIDepth+3);
+        text.setDepth(3);
         slotObj.text = text;
         this.content.push(text);
     }
 
-    //slotObj.id = -1;
     slotObj.slot = slot; // slot sprite
     slotObj.item = item; // item sprite
     slotObj.shade = shade; // name of the shade frame

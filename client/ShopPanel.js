@@ -12,17 +12,17 @@ ShopPanel.prototype = Object.create(Panel.prototype);
 ShopPanel.prototype.constructor = ShopPanel;
 
 ShopPanel.prototype.addInterface = function(){
-    var slot = Engine.scene.add.sprite(this.x+20,this.y+30,'UI','equipment-slot');
-    slot.setDepth(Engine.UIDepth+1);
+    var slot = UI.scene.add.sprite(this.x+20,this.y+30,'UI','equipment-slot');
+    slot.setDepth(1);
     slot.setScrollFactor(0);
     slot.setDisplayOrigin(0,0);
     slot.setVisible(false);
     this.content.push(slot);
     this.slot = slot;
 
-    var gold = Engine.scene.add.sprite(this.x+240,this.y+35,'items2','gold-pile');
+    var gold = UI.scene.add.sprite(this.x+240,this.y+35,'items2','gold-pile');
     gold.setScale(1.5);
-    gold.setDepth(Engine.UIDepth+1);
+    gold.setDepth(1);
     gold.setScrollFactor(0);
     gold.setDisplayOrigin(0,0);
     gold.setVisible(false);
@@ -34,21 +34,21 @@ ShopPanel.prototype.addInterface = function(){
     item.showTooltip = false;
     this.content.push(item);
 
-    var count = Engine.scene.add.text(this.x+47,this.y+50, '0',  { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    var count = UI.scene.add.text(this.x+47,this.y+50, '0',  { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     count.setVisible(false);
-    count.setDepth(Engine.UIDepth+2);
+    count.setDepth(2);
     count.setScrollFactor(0);
     this.content.push(count);
 
-    var price = Engine.scene.add.text(this.x+240,this.y+50, '0',  { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    var price = UI.scene.add.text(this.x+240,this.y+50, '0',  { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     price.setVisible(false);
-    price.setDepth(Engine.UIDepth+2);
+    price.setDepth(2);
     price.setScrollFactor(0);
     this.content.push(price);
 
     var name = Engine.scene.add.text(this.x+65,this.y+25, '0',  { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     name.setVisible(false);
-    name.setDepth(Engine.UIDepth+2);
+    name.setDepth(2);
     name.setScrollFactor(0);
     this.content.push(name);
 

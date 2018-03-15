@@ -62,7 +62,6 @@ Engine.preload = function() {
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
-    this.load.spritesheet('icons2', 'assets/sprites/icons.png',{frameWidth:25,frameHeight:24});
     this.load.image('tail', 'assets/sprites/tail.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll_horiz.png');
     this.load.image('radial3', 'assets/sprites/radial3.png');
@@ -384,11 +383,11 @@ Engine.makeUI = function(){
     bug.setDepth(Engine.UIDepth+10);
     bug.handleClick = Engine.snap;
     bug.handleOver = function(){
-        Engine.tooltip.updateInfo('Snap a pic of a bug');
-        Engine.tooltip.display();
+        UI.tooltip.updateInfo('Snap a pic of a bug');
+        UI.tooltip.display();
     };
     bug.handleOut = function(){
-        Engine.tooltip.hide();
+        UI.tooltip.hide();
     };
 
     Engine.makeBuildingTitle();
@@ -423,7 +422,7 @@ Engine.makeUI = function(){
     Engine.addMenuIcon(x,y,'hammer',Engine.menus.construction);
     Engine.addMenuIcon(x,y,'hammer',Engine.menus.production);
 
-    var tooltip = Engine.scene.textures.addSpriteSheetFromAtlas(
+    /*var tooltip = Engine.scene.textures.addSpriteSheetFromAtlas(
         'tooltip',
         {
             atlas: 'UI',
@@ -432,8 +431,8 @@ Engine.makeUI = function(){
             frameHeight: 13,
             endFrame: 8
         }
-    );
-    Engine.tooltip = new Tooltip();
+    );*/
+    //Engine.tooltip = new Tooltip();
 
     Engine.makeBattleUI();
     Engine.displayUI();
@@ -827,8 +826,8 @@ Engine.getIngredientsPanel = function(){
     return Engine.menus['crafting'].panels['ingredients'];
 };
 
-Engine.addHero = function(data){ //player.id,player.x,player.y,player.settlement,player.commitSlots
-    Engine.player = Engine.addPlayer(data); // data.id,data.x,data.y
+Engine.addHero = function(data){
+    Engine.player = Engine.addPlayer(data);
     Engine.player.settlement = data.settlement;
     Engine.player.isHero = true;
     Engine.camera.startFollow(Engine.player);
@@ -839,7 +838,7 @@ Engine.addHero = function(data){ //player.id,player.x,player.y,player.settlement
     //Engine.player.buildingRecipes = new Inventory(9);
     //Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
     Engine.player.itemRecipes = new Inventory(10);
-    Engine.player.itemRecipes.fromList([[6,1],[10,1],[15,1],[16,1],[21,1]]);
+    Engine.player.itemRecipes.fromList([[6,1],[10,1],[15,1],[16,1],[21,1],[2,1]]);
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = Equipment.getSkeleton();
     Engine.player.commitSlots = data.commitSlots;
@@ -944,6 +943,7 @@ Engine.handleDown = function(pointer,objects){
 };
 
 Engine.handleClick = function(pointer,objects){
+    console.warn(objects.length);
     if(objects.length > 0){
         for(var i = 0; i < Math.min(objects.length,2); i++){ // disallow bubbling too deep, only useful in menus (i.e. shallow)
             if(Engine.interrupt){
@@ -1044,7 +1044,6 @@ Engine.getMouseCoordinates = function(pointer){
 Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
     if(Engine.player && !Engine.player.inFight) Engine.updateMarker(position.tile);
-    if(Engine.tooltip && Engine.tooltip.displayed) Engine.tooltip.updatePosition(event.x,event.y);
     if(Engine.debug){
         document.getElementById('pxx').innerHTML = Math.round(position.pixel.x);
         document.getElementById('pxy').innerHTML = Math.round(position.pixel.y);
@@ -1068,7 +1067,7 @@ Engine.updateMarker = function(tile){
 };
 
 Engine.hideMarker = function(){
-    Engine.marker.setVisible(false);
+    if(Engine.marker) Engine.marker.setVisible(false);
 };
 
 Engine.showMarker = function(){
@@ -1122,12 +1121,10 @@ Engine.updateSelf = function(data){
             Engine.handleMsg(data.msgs[i]);
         }
     }
-    if(data.notifs) Engine.handleNotifications(data.notifs);
+    if(data.notifs) UI.handleNotifications(data.notifs);
     if(data.foodSurplus !== undefined){
         Engine.player.foodSurplus = data.foodSurplus;
         updateEvents.add('character');
-        //updateEvents.add('productivity');
-        //updateEvents.add('settlementStatus');
     }
     if(data.dead !== undefined){
         if(data.dead == true) Engine.manageDeath();
@@ -1192,43 +1189,6 @@ Engine.updateMenus = function(category){
 
 Engine.handleMsg = function(msg){
     Engine.player.talk(msg);
-};
-
-Engine.handleNotifications = function(msgs){
-    // TODO: add to localstorage for display in character panel
-    var i = 0;
-    msgs.forEach(function(msg){
-        Engine.showNotification(msg,i,msgs.length);
-        i++;
-    });
-    // TODO: keep list of displayed notifications
-};
-
-Engine.showNotification = function(msg,i,nb){
-    var notif = new Bubble(0,0,true); // TODO: use pool
-    notif.update(msg);
-    var x = (Engine.getGameConfig().width-notif.getWidth())/2 - notif.getOrigin();
-    var y = Engine.getGameConfig().height + (notif.getHeight()+3)*i;
-    notif.updatePosition(x,y);
-
-    var tween = Engine.scene.tweens.addCounter({
-        from: y,
-        to: y-(40*nb), // TODO: compute dest based on previous msg dest + current msg height
-        duration: 300,
-        paused: true,
-        ease: 'Quad.easeOut',
-        onStart: function(){
-            notif.display();
-        },
-        onUpdate: function(tween){
-            notif.updatePosition(x,tween.getValue());
-        }
-    });
-
-    var delay = i*50;
-    setTimeout(function(){
-        tween.play();
-    },delay);
 };
 
 Engine.update = function(){

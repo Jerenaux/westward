@@ -10,7 +10,7 @@ Building = new Phaser.Class({
     Extends: CustomSprite,
 
     initialize: function Building() {
-        CustomSprite.call(this, 0, 0);
+        CustomSprite.call(this, Engine.scene, 0, 0);
         this.entityType = 'building';
     },
 

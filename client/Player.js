@@ -7,7 +7,7 @@ var Player = new Phaser.Class({
 
     initialize: function Player () {
         // Using call(), the called method will be executed while having 'this' pointing to the first argumentof call()
-        Moving.call(this,0,0);
+        Moving.call(this);
 
         this.entityType = 'player';
 

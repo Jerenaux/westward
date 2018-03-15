@@ -2,8 +2,7 @@
  * Created by Jerome on 07-10-17.
  */
 
-function Menu(title,scene){
-    this.scene = scene || Engine.scene;
+function Menu(title){
     this.container = [];
     this.panels = {};
     this.events = {};
@@ -47,7 +46,7 @@ Menu.prototype.hideIcon = function(){
 Menu.prototype.display = function(){
     if(Engine.inMenu) Engine.currentMenu.hide();
     if(Engine.inPanel) Engine.currentPanel.hide();
-    if(Engine.chatBar.displayed) Engine.chatBar.hide();
+    if(Engine.chatBar && Engine.chatBar.displayed) Engine.chatBar.hide();
 
     if(!Engine.inBuilding && this.title) this.title.display();
 
