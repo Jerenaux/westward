@@ -20,13 +20,11 @@ ProgressBar.prototype.setUpZone = function(zone){
     zone.setInteractive();
     zone.setVisible(false);
     var _bar = this;
-    zone.handleOver = function(){
-        Engine.tooltip.updateInfo(_bar.level+'/'+_bar.max);
-        Engine.tooltip.display();
-    };
-    zone.handleOut = function(){
-        Engine.tooltip.hide();
-    };
+    zone.on('pointerover',function(){
+        UI.tooltip.updateInfo(_bar.level+'/'+_bar.max);
+        UI.tooltip.display();
+    });
+    zone.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
     return zone;
 };
 

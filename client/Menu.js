@@ -21,6 +21,7 @@ Menu.prototype.addPanel = function(name,panel,hideOnOpen){
     this.panels[name] = panel;
     panel.name = name;
     this.hideOnOpen[name] = !!hideOnOpen;
+    return panel;
 };
 
 Menu.prototype.addEvent = function(name,callback){

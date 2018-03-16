@@ -10,12 +10,6 @@ function SuggestPanel(x,y,width,height,title){
 SuggestPanel.prototype = Object.create(Panel.prototype);
 SuggestPanel.prototype.constructor = SuggestPanel;
 
-/*SuggestPanel.prototype.makeInterface = function(){
-    for(var i = 0; i < 5; i++){
-        this.addText(0,0,'');
-    }
-};*/
-
 SuggestPanel.prototype.getText = function(i,x,y){
     if(i >= this.texts.length) this.addText(0,0,'');
     var text = this.texts[i];
@@ -35,35 +29,35 @@ SuggestPanel.prototype.displayTips = function(){
 
     if(Engine.player.foodSurplus < 0){
         var txt = this.getText(i++,x,y);
-        txt.setText(Engine.textsData['deficit_advice']);
+        txt.setText(UI.textsData['deficit_advice']);
         txt.setFill(Utils.colors.gold);
         y += txt.height + padding;
     }
 
     if(Engine.player.getStatValue('hp') < Engine.player.getStatValue('hpmax')/3){
         var txt = this.getText(i++,x,y);
-        txt.setText(Engine.textsData['health_advice']);
+        txt.setText(UI.textsData['health_advice']);
         y += txt.height + padding;
     }
 
     if(Engine.player.getEquipped('armor',0) == -1){
         var txt = this.getText(i++,x,y);
-        txt.setText(Engine.textsData['equip_advice']);
+        txt.setText(UI.textsData['equip_advice']);
         y += txt.height + padding;
     }
 
     if(Engine.player.gold < 100){
         var txt = this.getText(i++,x,y);
         if(Engine.player.hasItem(1,1) || Engine.player.hasItem(9,1)){
-            txt.setText(Engine.textsData['gold_advice_food']);
+            txt.setText(UI.textsData['gold_advice_food']);
         }else{
-            txt.setText(Engine.textsData['gold_advice']);
+            txt.setText(UI.textsData['gold_advice']);
         }
         y += txt.height + padding;
     }
 
     var txt = this.getText(i++,x,y);
-    txt.setText(Engine.textsData['location_advice']);
+    txt.setText(UI.textsData['location_advice']);
 };
 
 SuggestPanel.prototype.display = function(){

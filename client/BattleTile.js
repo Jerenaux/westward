@@ -12,7 +12,7 @@ var BattleTile = new Phaser.Class({
     initialize: function BattleTile (x,y) {
         x = x || 0;
         y = y || 0;
-        CustomSprite.call(this, x, y, '3grid',0);
+        CustomSprite.call(this, Engine.scene, x, y, '3grid',0);
         this.entityType = 'cell';
         
         this.setDepth(Engine.markerDepth);

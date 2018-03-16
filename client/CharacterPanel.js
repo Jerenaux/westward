@@ -19,7 +19,7 @@ CharacterPanel.prototype.addInterface = function(){
     y += 20;
 
     var classxp = 0;
-    this.addPolyText(x,y,["Level ","1"," Merchant   -   ",classxp+"/100"," Class XP"],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
+    this.addPolyText(x,y,["Level ","1"," Merchant   -   ",classxp+"/100"," "+UI.textsData['classxp']],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
     y += 30;
     var classbar = new MiniProgressBar(this.x+x,this.y+y,245);
     classbar.name = 'class xp bar';

@@ -16,5 +16,17 @@
   "location_advice":"Looking for a building in particular? Try to find the Fort, it provides a map of the surroundings.",
   "gold_advice_food": "Go sell your food and pelts!",
   "gold_advice": "Need gold? Settlements are in demand of food and pelts. Hunt animals to acquire some.",
-  "deficit_advice": "Your settlement is in food deficit! Try to find food and sell it at the Trade Post!"
+  "deficit_advice": "Your settlement is in food deficit! Try to find food and sell it at the Trade Post!",
+
+  "classxp": "Path XP",
+  "class_soldier": "Soldier",
+  "class_craftsman": "Craftsman",
+  "class_merchant": "Merchant",
+  "class_explorer": "Explorer",
+  "class_selection_title": "Pick your path",
+  "class_selection": "Select carefully the path you'll follow. Each comes with unique benefits and will define your role in the economy and the settlement of the Continent. In addition, you will only be able to acquire Path experience by performing relevant activities.",
+  "soldier_desc": "The Path of War",
+  "merchant_desc": "The Path of Coin",
+  "explorer_desc": "The Path of Discovery",
+  "craftsman_desc": "The Path of Creation"
 }

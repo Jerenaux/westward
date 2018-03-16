@@ -44,6 +44,7 @@ var Player = new Phaser.Class({
     },
 
     update: function(data){
+        console.log('updating player');
         if(data.path && !this.isHero) this.move(data.path);
         if(data.inBuilding > -1) {
             if(!this.isHero) this.setVisible(false);

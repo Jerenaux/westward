@@ -11,6 +11,7 @@ var UI = {
         console.log('preloading UI');
         this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
         this.load.spritesheet('icons2', 'assets/sprites/icons.png',{frameWidth:25,frameHeight:24});
+        this.load.json('texts', 'assets/data/texts.json');
     },
 
     create: function () {
@@ -29,13 +30,15 @@ var UI = {
         );
         UI.tooltip = new Tooltip();
 
+        UI.textsData = this.cache.json.get('texts');
+
         this.input.setTopOnly(false);
         this.input.on('pointermove',function(event){
             if(UI.tooltip) UI.tooltip.updatePosition(event.x,event.y);
         });
-        this.input.on('gameobjectdown', function (pointer, gameObject) {
+        /*this.input.on('gameobjectdown', function (pointer, gameObject) {
             console.warn(gameObject);
-        });
+        });*/
     },
 
     getConfig: function(){
@@ -89,25 +92,37 @@ var UI = {
 
     makeClassMenu: function() {
         var title = new UIHolder(512,10,'center');
-        title.setText('class selection');
+        title.setText(UI.textsData['class_selection_title']);
 
         var menu = new Menu();
+        var desch = 100;
         var classw = 250;
         var classh = 150;
         var padding = 20;
         var tlx = 1024 / 2 - classw - padding;
-        var y = 576 / 2 - classh - padding;
+        var y = 100;
         var x = tlx;
         menu.addPanel('title',title);
-        menu.addPanel('soldier',new Panel(x, y, classw, classh, 'Soldier'));
+        var infow = (2*classw)+padding;
+        var info = menu.addPanel('info',new InfoPanel(x, y, infow, desch));
+        var text = info.addText(10,10,UI.textsData['class_selection']);
+        text.setWordWrapWidth(infow-10,true);
+        y += desch + padding;
+        this.makeClassPanel(menu,'soldier',x,y,classw,classh);
         x += classw+padding;
-        menu.addPanel('merchant',new Panel(x, y, classw, classh, 'Merchant'));
+        menu.addPanel('merchant',new Panel(x, y, classw, classh, UI.textsData['class_merchant']));
         x = tlx;
         y += classh+padding;
-        menu.addPanel('craftsman',new Panel(x, y, classw, classh, 'Craftsman'));
+        menu.addPanel('craftsman',new Panel(x, y, classw, classh, UI.textsData['class_craftsman']));
         x += classw+padding;
-        menu.addPanel('explorer',new Panel(x, y, classw, classh, 'Explorer'));
+        menu.addPanel('explorer',new Panel(x, y, classw, classh, UI.textsData['class_explorer']));
         return menu;
+    },
+
+    makeClassPanel: function(menu,className,x,y,classw,classh){
+        var panel = menu.addPanel(className,new InfoPanel(x, y, classw, classh, UI.textsData['class_'+className]));
+        var text = panel.addText(10,15,UI.textsData[className+'_desc']);
+        text.setWordWrapWidth(classw-10,true);
     }
 
 };
