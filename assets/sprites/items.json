@@ -31,6 +31,10 @@
     {
       "filename":"string",
       "frame": {"x":256,"y":0,"w":32,"h":32}
+    },
+    {
+      "filename":"carbon",
+      "frame": {"x":224,"y":0,"w":32,"h":32}
     }
   ]
 }

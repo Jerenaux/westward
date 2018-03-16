@@ -86,9 +86,8 @@ io.on('connection',function(socket){
         console.log('['+socket.id+'] Initialized');
         if(!data.stamp || data.stamp < server.resetStamp) data.new = true; // TODO Remove eventually
 
-        data.new = true; // TODO: REMOVE
         if(data.new){
-            gs.addNewPlayer(socket);
+            gs.addNewPlayer(socket,data);
         }else{
             gs.loadPlayer(socket,data.id);
         }

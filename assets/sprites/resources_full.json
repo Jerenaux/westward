@@ -63,6 +63,10 @@
     {
       "filename": "thickgrass",
       "frame": {"x":168,"y":456,"w":24,"h":24}
+    },
+    {
+      "filename": "coal",
+      "frame": {"x":120,"y":792,"w":24,"h":24}
     }
   ]
 }

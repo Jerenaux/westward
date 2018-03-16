@@ -187,6 +187,7 @@ Design document:
 Polish:
 ------
 Visual:
+- Move marker on move() event (in addition to mousemove) and handle keeping pressed
 - Polish title screen (leaves, bird passing in the distance...)
 - Fade-in/out transitions (wait for containers?)
 - Favicon
@@ -221,7 +222,6 @@ Sound:
 - Unique noise for items
 - Crafting SFX
 General:
-- Item descriptions
 - Keyboard shortcuts for menus?
 - Categories of items? (How to concile with various backpack sizes)? Sorting of items?
 - Feedback for rejected paths because too long (question mark, sound, ...)
@@ -230,7 +230,6 @@ General:
 - HUD, title screen, animations ...
 - Animal noises when beasts in proximity, animal footsteps, player footsteps noise
 - Carcasses, traces of fight
-- Fix panel tweens (positions not update often enough?)
 - Varied and nice landmarks to give life to the world and act as waypoints
 
 

@@ -177,14 +177,11 @@ GameServer.checkPlayerID = function(id){ // check if no other player is using sa
     return (GameServer.players[id] === undefined);
 };*/
 
-GameServer.addNewPlayer = function(socket,x,y){ // todo: remove x and y (debug)
+GameServer.addNewPlayer = function(socket,data){
+    if(!data.selectedClass) return;
+    console.log('new player of class',data.selectedClass);
     var player = new Player();
-    if(x){ // todo: remove (debug)
-        player.x = x;
-        player.y = y;
-    }else {
-        player.setStartingPosition();
-    }
+    player.setStartingPosition();
     player.setStartingInventory();
     var document = player.dbTrim();
     GameServer.server.db.collection('players').insertOne(document,function(err){

@@ -31,19 +31,13 @@ Client.emptyQueue = function(){ // Process the events that have been queued duri
 Client.getInitRequest = function(){ // Returns the data object to send to request the initialization data
     // In case of a new player, set new to true and send the name of the player
     // Else, set new to false and send it's id instead to fetch the corresponding data in the database
-    /*if(Client.isNewPlayer()) return {new:true,name:Client.getName(),clientTime:Date.now()};
-    var id = Client.getPlayerID();
-    return {new:false,id:id,clientTime:Date.now()};*/
-    if(Client.isNewPlayer()) return {new:true};
-    return {new:false,stamp:localStorage.getItem('idStamp'),id:Client.getPlayerID()};
+    if(Client.isNewPlayer()) return {new:true,selectedClass: UI.selectedClass};
+    return {new:false,id:Client.getPlayerID()};
 };
 
 Client.isNewPlayer = function(){
+    return true;
     var id = Client.getPlayerID();
-    /*var name = Client.getName();
-    var armor = Client.getArmor();
-    var weapon = Client.getWeapon();*/
-    //return !(id !== undefined && name && armor && weapon);
     return (id === null);
 };
 

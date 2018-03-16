@@ -58,8 +58,11 @@ var Boot = new Phaser.Class({
             alpha: 0,
             duration: 1000,
             onComplete: function(){
-                UI.makeClassMenu().display();
-                //_boot.scene.start('main');
+                if(Client.isNewPlayer()){
+                    UI.classMenu.display();
+                }else {
+                    _boot.scene.start('main');
+                }
             }
         });
     },

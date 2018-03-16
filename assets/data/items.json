@@ -153,5 +153,18 @@
     "name": "String",
     "desc": "Robust string made from plant fibers, primarily used to make bows.",
     "recipe":{"8":5}
+  },
+  "22":{
+    "atlas": "items2",
+    "frame":"coal",
+    "name": "Coal",
+    "desc": "Crafting material that can be mined or obtained from wood. Can be used to heat furnaces, as an ingredient for antidotes or can be converted into carbon."
+  },
+  "23":{
+    "atlas": "items",
+    "frame":"carbon",
+    "name": "Carbon",
+    "desc": "Crafting material obtained from coal. In combination with iron, it can be used to make steel.",
+    "recipe":{"22":5}
   }
 }

@@ -15,7 +15,6 @@ var UI = {
     },
 
     create: function () {
-        this.scene.get('boot').updateReadyTick();
         this.scene.bringToTop();
 
         this.textures.addSpriteSheetFromAtlas(
@@ -39,6 +38,9 @@ var UI = {
         /*this.input.on('gameobjectdown', function (pointer, gameObject) {
             console.warn(gameObject);
         });*/
+        UI.classMenu = UI.makeClassMenu();
+
+        this.scene.get('boot').updateReadyTick();
     },
 
     getConfig: function(){
@@ -95,34 +97,45 @@ var UI = {
         title.setText(UI.textsData['class_selection_title']);
 
         var menu = new Menu();
-        var desch = 100;
-        var classw = 250;
-        var classh = 150;
+        var desch = 60;
+        var classw = 400;
+        var classh = 195;
         var padding = 20;
         var tlx = 1024 / 2 - classw - padding;
-        var y = 100;
+        var y = 80;
         var x = tlx;
         menu.addPanel('title',title);
         var infow = (2*classw)+padding;
         var info = menu.addPanel('info',new InfoPanel(x, y, infow, desch));
-        var text = info.addText(10,10,UI.textsData['class_selection']);
-        text.setWordWrapWidth(infow-10,true);
+        var text = info.addText(10,10,UI.textsData['class_selection'],Utils.colors.white,14,Utils.fonts.normal);
+        text.setWordWrapWidth(infow-15,true);
         y += desch + padding;
         this.makeClassPanel(menu,'soldier',x,y,classw,classh);
         x += classw+padding;
-        menu.addPanel('merchant',new Panel(x, y, classw, classh, UI.textsData['class_merchant']));
+        this.makeClassPanel(menu,'craftsman',x,y,classw,classh);
         x = tlx;
         y += classh+padding;
-        menu.addPanel('craftsman',new Panel(x, y, classw, classh, UI.textsData['class_craftsman']));
+        this.makeClassPanel(menu,'merchant',x,y,classw,classh);
         x += classw+padding;
-        menu.addPanel('explorer',new Panel(x, y, classw, classh, UI.textsData['class_explorer']));
+        this.makeClassPanel(menu,'explorer',x,y,classw,classh);
         return menu;
     },
 
     makeClassPanel: function(menu,className,x,y,classw,classh){
-        var panel = menu.addPanel(className,new InfoPanel(x, y, classw, classh, UI.textsData['class_'+className]));
-        var text = panel.addText(10,15,UI.textsData[className+'_desc']);
-        text.setWordWrapWidth(classw-10,true);
+        var panel = menu.addPanel(className,new ClassPanel(x, y, classw, classh, UI.textsData['class_'+className]));
+        panel.setClass(className);
+    },
+
+    selectClass: function(name){
+        console.log('selecting',name);
+        UI.selectedClass = name; // TODO: pass as scene data instead
+        UI.sceneTransition(2);
+    },
+
+    sceneTransition: function(from,to){
+        UI.scene.scene.cameras.main.fade(1000);
+
+        UI.scene.scene.cameras.main.flash(1000);
     }
 
 };
