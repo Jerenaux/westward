@@ -15,7 +15,6 @@ Week:
 -----
 *1 item/recipe a day*
 Bug: wrong building displayed in commit slots
-Bug: stop speeding tweens when starting scene?
 Bug: re-entering building needs two clicks
 Bug: no animals on buildings (wrong collisions?)
 Bug: wrong click area of foundations
@@ -24,7 +23,6 @@ Design document
 One-time single-panel combat tutorial when first combat
 Test second settlement (fort and respawn)
 World map-based settlement selection menu (mention key startegic aspects, display enemy civ threats)
-Class selection menu (describe impact on settlements)
 Fort: staff (msg: you need civic lvl2 to vote for governor)
 Battle: monsters trigger fights (move spawn zones)
 Economic loop: harvest herbs (scatter roots)
@@ -47,6 +45,8 @@ Reread all tips and help
 Economic loop: test all updates of all menus
 Synchronize presentation page, maybe explicit which features are still absent
 Online shop: tunic, shield, a few arrows, a few potions
+Permanent players
+Polish
 
 Economy build-up:
 ----------------
@@ -174,6 +174,10 @@ Bug: bubble at wrong location after respawn
 
 Design document:
 ---------------
+- Make numeric simulations linking everything:
+-> Time to acquire dev level goals based on building production rates, varying number of buildings, productivity, etc.
+-> Evolution of food surplus based on number of players, buildings, etc.
+-> Set all these paremeters in a virtual settlement, simulate one day/week/month/year buy iteratively computing all cycles and their consequences in that time, then see results
 - Finish copying notes (currently: in ambiance, npc dialogues)
 - Concile all texts (doc, crafting.txt)
 - Decide list of buildings, items, ...

@@ -26,13 +26,13 @@ EquipmentPanel.prototype.addEquip = function(){
             var x = xpos+(i*xinc)+xoffset;
             var y = (this.battleMenu ? eq.battley : eq.y) + yoffset;
             var displayName = eq.nb > 1 ? eq.name+' '+(i+1) : eq.name;
-            this.slots[equip].push(this.addEquipSlot(x,y,displayName,eq.shade,eq.containedIn,equip,i));
+            this.slots[equip].push(this.addEquipSlot(x,y,displayName,eq.desc,eq.shade,eq.containedIn,equip,i));
         }
     }
     this.updateEquipment();
 };
 
-EquipmentPanel.prototype.addEquipSlot = function(x,y,name,shade,contained,slotName,subSlot){
+EquipmentPanel.prototype.addEquipSlot = function(x,y,name,desc,shade,contained,slotName,subSlot){
     var slotObj = {};
     var slot = UI.scene.add.sprite(this.x+x,this.y+y,'UI','equipment-slot');
     var item = new ItemSprite(this.x+x+20,this.y+y+20);
@@ -40,7 +40,6 @@ EquipmentPanel.prototype.addEquipSlot = function(x,y,name,shade,contained,slotNa
     slot.on('pointerover',UI.tooltip.display.bind(UI.tooltip));
     slot.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
     slot.on('pointerup',Engine.unequipClick.bind(slotObj));
-    //slot.handleClick = Engine.unequipClick.bind(slotObj);
     slot.setDepth(1);
     slot.setScrollFactor(0);
     slot.setDisplayOrigin(0,0);
@@ -60,6 +59,7 @@ EquipmentPanel.prototype.addEquipSlot = function(x,y,name,shade,contained,slotNa
     slotObj.item = item; // item sprite
     slotObj.shade = shade; // name of the shade frame
     slotObj.name = name; // name for the tooltip
+    slotObj.desc = desc;
     slotObj.slotName = slotName; // name of the slot
     slotObj.subSlot = subSlot; // number of the subslot
     this.content.push(slot);
@@ -82,7 +82,8 @@ EquipmentPanel.prototype.updateEquipment = function(){
                         id: -1,
                         atlas: 'UI',
                         frame: currentItem.shade+'-shade',
-                        name: currentItem.name
+                        name: currentItem.name,
+                        desc: currentItem.desc
                     };
                 }else{
                     data = Engine.itemsData[newItem];

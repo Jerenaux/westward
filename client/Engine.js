@@ -276,8 +276,10 @@ Engine.initWorld = function(data){
     Engine.createAnimations();
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
-    // TODO: when all chunks loaded, fade-out Boot scene
     Engine.showMarker();
+    setTimeout(function(){
+        UI.scene.cameras.main._fadeAlpha = 0;
+    },500);
 };
 
 Engine.createAnimations = function(){
@@ -825,11 +827,13 @@ Engine.getIngredientsPanel = function(){
 };
 
 Engine.addHero = function(data){
+    // data comes from the initTrim()'ed packet of the player
     Engine.player = Engine.addPlayer(data);
     Engine.player.settlement = data.settlement;
     Engine.player.isHero = true;
     Engine.camera.startFollow(Engine.player);
     Engine.player.inventory = new Inventory();
+    Engine.player.class = data.class;
     Engine.player.gold = data.gold;
     Engine.player.civicxp = data.civicxp[0];
     Engine.player.maxcivicxp = data.civicxp[1];
@@ -1069,7 +1073,7 @@ Engine.hideMarker = function(){
 };
 
 Engine.showMarker = function(){
-    Engine.marker.setVisible(true);
+    if(Engine.marker) Engine.marker.setVisible(true);
 };
 
 /*

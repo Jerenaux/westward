@@ -216,6 +216,10 @@ Utils.printArray = function(arr){
     console.log(JSON.stringify(arr));
 };
 
+Utils.capitalizeFirstLetter = function(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
 function coordinatesPairToTile(coords){
     return {
         x: Math.floor(coords.x/World.tileWidth),

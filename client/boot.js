@@ -61,7 +61,7 @@ var Boot = new Phaser.Class({
                 if(Client.isNewPlayer()){
                     UI.classMenu.display();
                 }else {
-                    _boot.scene.start('main');
+                    UI.sceneTransition('title');
                 }
             }
         });

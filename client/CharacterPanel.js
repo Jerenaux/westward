@@ -19,7 +19,8 @@ CharacterPanel.prototype.addInterface = function(){
     y += 20;
 
     var classxp = 0;
-    this.addPolyText(x,y,["Level ","1"," Merchant   -   ",classxp+"/100"," "+UI.textsData['classxp']],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
+    var txts = this.addPolyText(x,y,["Level ","1"," Merchant   -   ",classxp+"/100"," "+UI.textsData['classxp']],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
+    this.classText = txts[2];
     y += 30;
     var classbar = new MiniProgressBar(this.x+x,this.y+y,245);
     classbar.name = 'class xp bar';
@@ -49,6 +50,7 @@ CharacterPanel.prototype.addInterface = function(){
 };
 
 CharacterPanel.prototype.update = function(){
+    this.classText.setText(" "+Utils.capitalizeFirstLetter(Engine.player.class)+"   -   ");
     this.fatigueText.setText('0%');
     this.civicXPtxt.setText(Engine.player.civicxp+'/'+Engine.player.maxcivicxp);
     this.civicbar.setLevel(Engine.player.civicxp,Engine.player.maxcivicxp);

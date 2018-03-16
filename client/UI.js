@@ -129,13 +129,20 @@ var UI = {
     selectClass: function(name){
         console.log('selecting',name);
         UI.selectedClass = name; // TODO: pass as scene data instead
-        UI.sceneTransition(2);
+        UI.sceneTransition('class');
     },
 
-    sceneTransition: function(from,to){
-        UI.scene.scene.cameras.main.fade(1000);
-
-        UI.scene.scene.cameras.main.flash(1000);
+    sceneTransition: function(from){
+        var fadeDuration = 500;
+        if(from == 'title'){
+            fadeDuration = 200;
+        }else if(from == 'class'){
+            UI.classMenu.hide();
+        }
+        var camera = UI.scene.cameras.main;
+        camera.fade(fadeDuration);
+        UI.scene.scene.shutdown('boot');
+        UI.scene.scene.launch('main');
     }
 
 };

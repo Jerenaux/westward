@@ -56,6 +56,10 @@ Player.prototype.setStartingPosition = function(){
     this.y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
 };
 
+Player.prototype.setClass = function(className){
+    this.class = className;
+};
+
 Player.prototype.setStartingInventory = function(){
     this.giveItem(0,20); // red powder
     this.giveItem(1,1); //food
@@ -377,7 +381,7 @@ Player.prototype.applyEffect = function(stat,delta,notify){
 Player.prototype.initTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','settlement','gold','civicxp']; // list of properties relevant for the client
+    var broadcastProperties = ['id','settlement','gold','civicxp','class']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -403,15 +407,12 @@ Player.prototype.trim = function(){
 Player.prototype.dbTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be stored in the database
     var trimmed = {};
-    var dbProperties = ['x','y','equipment','gold','commitSlots','civicxp']; // list of properties relevant to store in the database
+    var dbProperties = ['x','y','equipment','gold','commitSlots','civicxp','class']; // list of properties relevant to store in the database
     for(var p = 0; p < dbProperties.length; p++){
         trimmed[dbProperties[p]] = this[dbProperties[p]];
     }
     trimmed.inventory = this.inventory.toList();
     trimmed.stats = {};
-    /*this.getStats().forEach(function(s){
-        trimmed.stats[s] = this.getStat(s).getBaseValue();
-    },this);*/
     return trimmed;
 };
 
@@ -440,6 +441,7 @@ Player.prototype.getDataFromDb = function(document){
         var item = document.inventory[i];
         this.giveItem(item[0],item[1]);
     }
+    if(document.class) this.setClass(document.class);
     if(!document.gold) document.gold = 0;
     this.commitSlots = document.commitSlots || this.getCommitSlotsShell();
     this.civicxp = document.civicxp || [0,100];
