@@ -732,22 +732,20 @@ GameServer.sendBuildings = function(socketID){
     GameServer.server.sendAdminUpdate(socketID,'buildings',GameServer.getBuildings());
 };
 
-GameServer.insertNewBuilding = function(data,socketID){
+GameServer.insertNewBuilding = function(data){
     console.log(data);
     if(!'built' in data) data.built = false;
 
     var building = new Building(data);
     var document = new GameServer.BuildingModel(building);
     building.setModel(document);
-    console.log(building);
-    console.log(document);
 
     document.save(function (err) {
         if (err) return console.error(err);
         console.log('Build successfull');
         GameServer.buildings[building.id] = building;
-        GameServer.sendBuildings(socketID);
     });
+    return true;
 };
 
 GameServer.deleteBuilding = function(id,socketID){

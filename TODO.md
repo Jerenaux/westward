@@ -19,6 +19,7 @@ Bug: wrong click area of foundations
 Bug: still click issue after closing menus
 Fix starting position conflitc with buildings
 UI: test snapshot of bugs of menus
+UI: info panel on first play (basic commands + what's not implemented yet)
 Design document
 Test second settlement (fort and respawn)
 World map-based settlement selection menu (mention key startegic aspects, display enemy civ threats)

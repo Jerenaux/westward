@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var server = require('http').Server(app);
+var bodyParser = require("body-parser");
 var io = require('socket.io').listen(server);
 var fs = require('fs');
 var path = require('path');
@@ -20,6 +21,8 @@ app.use('/server',express.static(__dirname + '/server'));
 app.use('/shared',express.static(__dirname + '/shared'));
 app.use('/maps',express.static(myArgs.maps));
 app.use('/admin',express.static(path.join(__dirname,'admin')));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 if(process.env.DEV == 1) app.use('/studio',express.static(__dirname + '/studio'));
 
 app.get('/',function(req,res){
@@ -30,21 +33,44 @@ app.get('/admin',function(req,res){
     res.sendFile(path.join(__dirname,'admin','admin.html'));
 });
 
-var handlers = {
+var GEThandlers = {
     'buildings': gs.getBuildings,
     'settlements': gs.getSettlements
 };
-var categories = Object.keys(handlers);
+var categories = Object.keys(GEThandlers);
 
 categories.forEach(function(cat){
     app.get('/admin/' + cat, function (req, res) {
         console.log('[ADMIN] requesting ' + cat);
-        var data = handlers[cat]();
+        var data = GEThandlers[cat]();
         if (data.length == 0) {
             res.status(204).end();
         } else {
             res.setHeader('Content-Type', 'application/json');
             res.status(200).send(data).end();
+        }
+    });
+});
+
+var POSThandlers = {
+    'newbuilding': gs.insertNewBuilding
+};
+var events = Object.keys(POSThandlers);
+
+events.forEach(function(e){
+    app.post('/admin/' + e, function (req, res) {
+        console.log('[ADMIN] posting ' + e);
+        var data = req.body;
+        if(!data){
+            res.status(400).end();
+            return;
+        }
+        var result = POSThandlers[e](data);
+        if (!result) {
+            res.status(500).end();
+        } else {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(201).send().end();
         }
     });
 });
@@ -137,7 +163,7 @@ io.on('connection',function(socket){
     // #########################
 
     // TODO: secure
-    socket.on('admin',function(){
+    /*socket.on('admin',function(){
         var callbacksMap = {
             'admin_deletebuilding': gs.deleteBuilding,
             'admin_listbuildings': gs.listBuildings,
@@ -150,15 +176,11 @@ io.on('connection',function(socket){
             var data = pkt.data[1];
             console.log('ADMIN:',event,data);
             if(callbacksMap.hasOwnProperty(event)) callbacksMap[event](data,socket.id);
-            /*else{
+            else{
                 handler.call(this,pkt);
-            }*/
+            }
         };
-
-        /*socket.on('listbuildings',function(){
-            socket.emit('buildingslist',gs.listBuildings());
-        });*/
-    });
+    });*/
 
     // #########################
     /*if(process.env.DEV == 1) {

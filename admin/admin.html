@@ -41,7 +41,18 @@
                     </div>
                 </div>
             </div>
-
+            <button type="button" class="btn btn-primary" ng-click="buildingForms[$index].visible = !buildingForms[$index].visible">Add building</button>
+            <div class="forms" ng-show="buildingForms[$index].visible">
+                <form ng-submit="addBuilding(settlement.id)">
+                    <b>New Building:</b><br/>
+                    (<input required class="coord" ng-model="buildingForms[$index].x" placeholder="x" size="1" >,
+                    <input required class="coord" ng-model="buildingForms[$index].y"  placeholder="y" size="3" >)<br/>
+                    <select ng-model="buildingForms[$index].type" ng-options="id as info.name for (id, info) in data.buildings"></select><br/>
+                    <select ng-model="buildingForms[$index].sid" ng-options="set.id as set.name for set in settlements"></select><br/>
+                    Built </b><input ng-model="buildingForms[$index].built" type="checkbox"><br/>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
         </div>
     </div>
 

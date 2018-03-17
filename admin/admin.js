@@ -14,18 +14,20 @@ app.controller("mainCtrl", [
     function($scope,$http) {
         var categories = ['settlements'];
         var dataCategories = ['buildings','items'];
+        $scope.data = {};
 
-        $scope.getJSON = function(category){
+        getJSON = function(category){
             $http.get("/assets/data/"+category+".json").then(function(res) {
                 if(res.status == 200){
                     Data[category+'Data'] = res.data;
+                    $scope.data[category] = Data[category+'Data'];
                     Data.counter++;
-                    if(Data.counter == dataCategories.length) $scope.getListings();
+                    if(Data.counter == dataCategories.length) getListings();
                 }
             },function(err){});
         };
 
-        $scope.getData = function(category){
+        getData = function(category){
             $http.get("/admin/"+category+"/").then(function(res) {
                 if(res.status == 200){
                     console.log(res.data);
@@ -34,18 +36,38 @@ app.controller("mainCtrl", [
             },function(err){});
         };
 
-        $scope.getListings = function(){
+        getListings = function(){
             categories.forEach(function(cat){
                 $scope[cat] = [];
-                $scope.getData(cat);
+                getData(cat);
+            });
+
+            $scope.buildingForms = {};
+            $scope.settlements.forEach(function(settlement){
+                $scope.buildingForms[settlement.id] = {
+                    visible: false
+                };
             });
         };
 
         dataCategories.forEach(function(cat){
-            $scope.getJSON(cat);
+            getJSON(cat);
         });
 
-        setInterval($scope.getListings,60*1000);
+        $scope.addBuilding = function(id){
+            var data = $scope.buildingForms[id];
+            data.visible = undefined;
+            $http.post("/admin/newbuilding/", data).then(function(res) {
+                if(res.status == 201){
+                    $scope.postForm.$setUntouched();
+                    $scope.postForm.$setPristine();
+                    getListings();
+                }
+            },function(err){});
+            console.log(data);
+        };
+
+        setInterval(getListings,60*1000);
     }
 ]);
 
@@ -149,10 +171,10 @@ Client.requestBuildings = function(){
     Client.send('listbuildings');
 };
 
-Client.send = function(msg,data){
-    console.log(msg,data);
-    Client.socket.emit('admin_'+msg,data);
-};*/
+    Client.send = function(msg,data){
+        console.log(msg,data);
+        Client.socket.emit('admin_'+msg,data);
+    };*/
 
 /*Admin.generateOptions('buildings','buildTypeSelect');
 Admin.generateOptions('settlements','settlementSelect');

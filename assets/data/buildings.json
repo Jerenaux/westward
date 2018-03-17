@@ -15,6 +15,8 @@
     "sprite": "fort",
     "name":"Fort",
     "mainMenu": "fort",
+    "fort": true,
+    "staff": true,
     "icon": "fort",
     "recipe": {"3":50},
     "displayProd": false,
@@ -38,6 +40,7 @@
     "sprite": "tradepost",
     "name":"Trade Post",
     "recipe": {"3":40},
+    "trade": true,
     "entry": {
       "x": 4,
       "y": 4
@@ -61,6 +64,7 @@
     "width": 535,
     "height": 465,
     "sprite": "inn",
+    "trade": true,
     "recipe": {"3":60},
     "name":"Inn",
     "icon": "inn",
@@ -127,6 +131,7 @@
     "name": "Lumber camp",
     "icon": "lumbercamp",
     "mainMenu": "production",
-    "displayProd": true
+    "displayProd": true,
+    "production": [[3,1]]
   }
 }

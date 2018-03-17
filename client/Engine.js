@@ -37,6 +37,7 @@ var Engine = {
 
 Engine.preload = function() {
     this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
+    this.load.spritesheet('faces', 'assets/sprites/faces.png',{frameWidth:32,frameHeight:32});
 
     this.load.image('footsteps', 'assets/sprites/footsteps.png');
     this.load.image('bug', 'assets/sprites/bug.png');
@@ -400,6 +401,7 @@ Engine.makeUI = function(){
         'crafting': Engine.makeCraftingMenu(),
         'character': Engine.makeCharacterMenu(statsPanel),
         'trade': Engine.makeTradeMenu(),
+        'staff': Engine.makeStaffMenu(),
         'fort': Engine.makeFortMenu(),
         'production': Engine.makeProductionMenu(),
         'battle': Engine.makeBattleMenu(),
@@ -421,18 +423,8 @@ Engine.makeUI = function(){
     Engine.addMenuIcon(x,y,'map',Engine.menus.fort);
     Engine.addMenuIcon(x,y,'hammer',Engine.menus.construction);
     Engine.addMenuIcon(x,y,'hammer',Engine.menus.production);
-
-    /*var tooltip = Engine.scene.textures.addSpriteSheetFromAtlas(
-        'tooltip',
-        {
-            atlas: 'UI',
-            frame: 'tooltip',
-            frameWidth: 13,
-            frameHeight: 13,
-            endFrame: 8
-        }
-    );*/
-    //Engine.tooltip = new Tooltip();
+    x -= gap;
+    Engine.addMenuIcon(x,y,'tome',Engine.menus.staff);
 
     Engine.makeBattleUI();
     Engine.displayUI();
@@ -657,6 +649,11 @@ Engine.makeConstructionMenu = function(){
     constr.addEvent('onUpdateConstruction',progress.update.bind(progress));
     constr.addEvent('onUpdateProductivity',prod.update.bind(prod));
     return constr;
+};
+
+Engine.makeStaffMenu = function(){
+    var menu = new Menu('Officials');
+    return menu;
 };
 
 Engine.makeFortMenu = function(){
@@ -1294,11 +1291,27 @@ Engine.enterBuilding = function(id){
     Engine.currentBuiling = building; // used to keep track of which building is displayed in menus
     var buildingData = Engine.buildingsData[building.buildingType];
     var settlementData = Engine.settlementsData[building.settlement];
-    var menu = (building.built ? Engine.menus[buildingData.mainMenu] : Engine.menus['construction']);
-    menu.displayIcon();
-    menu.display();
+
+    var menus = [];
+    if(building.built) {
+        if (buildingData.fort) menus.push(Engine.menus.fort);
+        if (buildingData.trade) menus.push(Engine.menus.trade);
+        if (buildingData.production) menus.push(Engine.menus.production);
+        if (buildingData.staff) menus.push(Engine.menus.staff);
+    }else{
+        menus.push(Engine.menus.construction);
+    }
+    //if(buildingData.production) menus.push(Engine.menus.production);
+    //var menu = (building.built ? Engine.menus[buildingData.mainMenu] : Engine.menus['construction']);
+    //menu.displayIcon();
+    //menu.display();
+    menus.forEach(function(m){
+        m.displayIcon();
+    });
+    menus[0].display();
 
     //TODO: remove
+    var menu = menus[0];
     if(menu.panels['shop']) {
         menu.panels['shop'].modifyInventory(building.inventory.items);
         menu.panels['client'].modifyFilter({
@@ -1325,7 +1338,8 @@ Engine.enterBuilding = function(id){
     if(Engine.buildingTitle.width < Engine.settlementTitle.width) Engine.buildingTitle.resize(Engine.settlementTitle.width);
     Engine.buildingTitle.display();
     Engine.settlementTitle.display();
-    Engine.UIHolder.resize(115+50);
+
+    Engine.UIHolder.resize(Engine.getHolderSize());
 };
 
 Engine.exitBuilding = function(){
@@ -1339,7 +1353,19 @@ Engine.exitBuilding = function(){
         if(!Engine.menus.hasOwnProperty(m)) continue;
         Engine.menus[m].hideIcon();
     }
-    Engine.UIHolder.resize(115);
+    Engine.UIHolder.resize(Engine.getHolderSize());
+};
+
+Engine.getHolderSize = function(){
+    return (Engine.countIcons()-1)*50 + 15;
+};
+
+Engine.countIcons = function(){
+    var count = 0;
+    Engine.UIelements.forEach(function(e){
+        if(e.visible) count++;
+    });
+    return count;
 };
 
 Engine.processAnimalClick = function(target){
