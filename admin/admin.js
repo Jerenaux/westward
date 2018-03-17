@@ -3,28 +3,76 @@
  */
 
 Client = {};
-Admin = {};
+Data = {
+    counter: 0
+};
 
 var app = angular.module('admin',[]);
 
 app.controller("mainCtrl", [
     '$scope','$http',
     function($scope,$http) {
-        var categories = ['settlements','buildings'];
+        var categories = ['settlements'];
+        var dataCategories = ['buildings','items'];
+
+        $scope.getJSON = function(category){
+            $http.get("/assets/data/"+category+".json").then(function(res) {
+                if(res.status == 200){
+                    Data[category+'Data'] = res.data;
+                    Data.counter++;
+                    if(Data.counter == dataCategories.length) $scope.getListings();
+                }
+            },function(err){});
+        };
+
         $scope.getData = function(category){
             $http.get("/admin/"+category+"/").then(function(res) {
                 if(res.status == 200){
+                    console.log(res.data);
                     $scope[category] = res.data;
                 }
             },function(err){});
         };
 
-        categories.forEach(function(cat){
-            $scope[cat] = [];
-            $scope.getData(cat);
+        $scope.getListings = function(){
+            categories.forEach(function(cat){
+                $scope[cat] = [];
+                $scope.getData(cat);
+            });
+        };
+
+        dataCategories.forEach(function(cat){
+            $scope.getJSON(cat);
         });
+
+        setInterval($scope.getListings,60*1000);
     }
 ]);
+
+app.filter('pctFilter',function(){
+    return function(pct,showPlus){
+        if(showPlus && pct > 0) pct = '+'+pct;
+        return pct+'%';
+    }
+});
+
+app.filter('buildingTypeFilter',function(){
+    return function(type){
+        return Data.buildingsData[type].name;
+    }
+});
+
+app.filter('shopFilter',function(){
+    return function(entry,prices){
+        var item = entry[0];
+        var nb= entry[1];
+        var string = Data.itemsData[item].name+' ('+nb+')';
+        if(prices[item]){
+            string += ' '+prices[item][0]+'/'+prices[item][1];
+        }
+        return string;
+    }
+});
 
 app.filter('displayBuilding',function(){
     return function(raw){

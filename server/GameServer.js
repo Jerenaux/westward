@@ -717,7 +717,11 @@ GameServer.getBuildings = function(){
 };
 
 GameServer.getSettlements = function(){
-    return [0,1];
+    var list = [];
+    for(var id in GameServer.settlements){
+        list.push(GameServer.settlements[id].trim());
+    }
+    return list;
 };
 
 GameServer.listBuildings = function(data,socketID){

@@ -30,7 +30,6 @@ Economic loop: clamp settlement resources (at least food to 0)
 Help: One-time single-panel intro text when first login
 Help: buttons in menus
 Help: buttons in buildings
-Equipment slot descriptions (guns less accurate, ...)
 Quick-craft recipes: bow, potion + arrow, hatchet
 Start equipment: sword, bow, quiver, 5 arrows, 1 potion, some gold
 

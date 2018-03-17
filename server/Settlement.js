@@ -115,4 +115,16 @@ Settlement.prototype.update = function(){
     })
 };
 
+Settlement.prototype.trim = function(){
+    var trimmed = {};
+    var broadcastProperties = ['id','name','pop','surplus'];
+    for(var p = 0; p < broadcastProperties.length; p++){
+        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
+    }
+    trimmed.buildings = this.buildings.map(function(building){
+        return building.trim();
+    });
+    return trimmed;
+};
+
 module.exports.Settlement = Settlement;

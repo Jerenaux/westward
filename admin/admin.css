@@ -1,0 +1,31 @@
+body{
+    padding: 10px;
+}
+form {
+    display: none;
+}
+.forms {
+    margin-top: 20px;
+}
+.coord {
+    width: 3em;
+}
+input, select {
+    margin: 5px;
+}
+textarea {
+    width: 300px;
+    height: 200px;
+}
+.box {
+    display: flex;
+    flex-wrap: wrap;
+}
+.panel {
+    border-radius: 0;
+    margin-right: 10px;
+}
+
+.building_panel {
+    width: 300px;
+}
