@@ -166,5 +166,11 @@
     "name": "Carbon",
     "desc": "Crafting material obtained from coal. In combination with iron, it can be used to make steel.",
     "recipe":{"22":5}
+  },
+  "24":{
+    "atlas": "items2",
+    "frame":"iron",
+    "name": "Iron ore",
+    "desc": "Crafting material that can be mined and used to make steel or several items."
   }
 }

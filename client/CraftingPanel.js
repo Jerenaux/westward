@@ -58,6 +58,7 @@ CraftingPanel.prototype.displayInterface = function(){
      this.buttons.forEach(function(b){
          b.btn.disable();
      });
+     this.buttons[3].btn.enable(); // enable help button
 };
 
 CraftingPanel.prototype.setUp = function(itemID){
@@ -79,6 +80,7 @@ CraftingPanel.prototype.manageButtons = function(){
     var okBtn = this.buttons[0].btn;
     var plusBtn = this.buttons[1].btn;
     var minusBtn = this.buttons[2].btn;
+    var helpBtn = this.buttons[3].btn;
 
     if(this.craftItem.count == 1){
         minusBtn.disable();
@@ -97,6 +99,8 @@ CraftingPanel.prototype.manageButtons = function(){
     }else{
         okBtn.disable();
     }
+
+    helpBtn.enable();
 };
 
 CraftingPanel.prototype.canCraft = function(){

@@ -755,13 +755,16 @@ Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
     var recipes = new InventoryPanel(765,100,235,380,'Recipes');
     recipes.setInventory(Engine.player.itemRecipes,4,false,Engine.recipeClick);
+    recipes.addButton(205, 8, 'blue','help',null,'',UI.textsData['recipes_help']);
     crafting.addPanel('recipes',recipes);
-    crafting.addPanel('combi',new CraftingPanel(450,100,290,380,'Combination'));
+    var combi = crafting.addPanel('combi',new CraftingPanel(450,100,290,380,'Combination'));
+    combi.addButton(260, 8, 'blue','help',null,'',UI.textsData['combi_help']);
     var ingredients = new InventoryPanel(450,300,290,380,'',true); // true = invisible
     ingredients.setInventory(new Inventory(5),5,true,null,Engine.player.inventory);
     crafting.addPanel('ingredients',ingredients);
     var items = new InventoryPanel(40,100,390,380,'Items');
-    items.setInventory(Engine.player.inventory,10,true);
+    items.addButton(360, 8, 'blue','help',null,'',UI.textsData['craftitems_help']);
+    items.setInventory(Engine.player.inventory,9,true);
     crafting.addPanel('items',items);
 
     crafting.addEvent('onUpdateRecipes',function(){
@@ -810,8 +813,10 @@ Engine.makeCharacterMenu = function(statsPanel){
     var commity = infoy;
     var character = new Menu('Character');
     var infoPanel = new CharacterPanel(infox,infoy,330,infoh,'<Player name>');
+    infoPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['status_help']);
     character.addPanel('info',infoPanel);
     var commitPanel = new CommitmentPanel(commitx,commity,commitw,commith,'Commitment');
+    commitPanel.addButton(commitw-30, 8, 'blue','help',null,'',UI.textsData['commitment_help']);
     character.addPanel('commit',commitPanel);
     var todoPanel = new SuggestPanel(todox,todoy,todow,todoh,'Suggested actions');
     character.addPanel('todo',todoPanel);

@@ -27,6 +27,11 @@ BattleManager.startFight = function(){
     Engine.menus.battle.display();
     Engine.menus.battle.panels.timer.hide();
 
+    /*if(Client.isFirstBattle()){
+        console.log('first battle');
+        Client.hadFirstBattle();
+    }*/
+
     //BattleManager.onFightStart();
 };
 

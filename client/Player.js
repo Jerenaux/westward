@@ -31,6 +31,7 @@ var Player = new Phaser.Class({
         this.destinationAction = null;
 
         this.bubble = new Bubble(0,0);
+        this.flipPrint = false;
     },
 
     setUp: function(data){

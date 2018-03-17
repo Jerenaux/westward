@@ -14,21 +14,18 @@ Prototype level:
 Week:
 -----
 *1 item/recipe a day*
-Bug: wrong building displayed in commit slots
-Bug: re-entering building needs two clicks
 Bug: no animals on buildings (wrong collisions?)
 Bug: wrong click area of foundations
+Bug: still click issue after closing menus
+Fix starting position conflitc with buildings
 UI: test snapshot of bugs of menus
 Design document
-One-time single-panel combat tutorial when first combat
 Test second settlement (fort and respawn)
 World map-based settlement selection menu (mention key startegic aspects, display enemy civ threats)
 Fort: staff (msg: you need civic lvl2 to vote for governor)
 Battle: monsters trigger fights (move spawn zones)
 Economic loop: harvest herbs (scatter roots)
 Economic loop: clamp settlement resources (at least food to 0)
-Help: One-time single-panel intro text when first login
-Help: buttons in menus
 Help: buttons in buildings
 Quick-craft recipes: bow, potion + arrow, hatchet
 Start equipment: sword, bow, quiver, 5 arrows, 1 potion, some gold
@@ -57,6 +54,7 @@ Add recipes for all intermediary ingredients
 Workshop building, interface = usual crafting menu
 Add shop interface as well
 Display recipes with building and class restrictions
+Update help text of recipes
 Scatter basic ingredients
 Coal mine
 Resource flow to trade post
@@ -99,6 +97,7 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Move UI stuff from Engine to UI
 - Settlements: after compute food surplus, one central method to broadcast it to buildings and players, using one
 common "formatFoorSurplus" method to decide exact formatting (witg a reciprocal function client-side)
 - Building update: somehow check for fields in data not in map, and make a warning?

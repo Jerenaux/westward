@@ -8,6 +8,7 @@ var UI = {
 
     preload: function () {
         UI.scene = this;
+        this.input.setGlobalTopOnly(true); // Prevent clicks to bubble down to game scene
         console.log('preloading UI');
         this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
         this.load.spritesheet('icons2', 'assets/sprites/icons.png',{frameWidth:25,frameHeight:24});
@@ -39,6 +40,7 @@ var UI = {
             console.warn(gameObject);
         });*/
         UI.classMenu = UI.makeClassMenu();
+        UI.battleTutorial = UI.makeBattleTutorialPanel();
 
         this.scene.get('boot').updateReadyTick();
     },
@@ -92,6 +94,7 @@ var UI = {
         },delay);
     },
 
+
     makeClassMenu: function() {
         var title = new UIHolder(512,10,'center');
         title.setText(UI.textsData['class_selection_title']);
@@ -108,7 +111,6 @@ var UI = {
         var infow = (2*classw)+padding;
         var info = menu.addPanel('info',new InfoPanel(x, y, infow, desch));
         var text = info.addText(10,10,UI.textsData['class_selection'],Utils.colors.white,14,Utils.fonts.normal);
-        text.setWordWrapWidth(infow-15,true);
         y += desch + padding;
         this.makeClassPanel(menu,'soldier',x,y,classw,classh);
         x += classw+padding;
@@ -126,6 +128,16 @@ var UI = {
         panel.setClass(className);
     },
 
+    makeBattleTutorialPanel: function(){
+        var h = 200;
+        var w = 200;
+        var y = UI.getGameHeight()-h;
+        var panel = new InfoPanel(0,y,w,h,'Battle tutorial');
+        panel.addText(UI.textsData['battle_help']);
+        panel.addBigButton('Got it');
+        return panel;
+    },
+
     selectClass: function(name){
         console.log('selecting',name);
         UI.selectedClass = name; // TODO: pass as scene data instead
@@ -141,8 +153,10 @@ var UI = {
         }
         var camera = UI.scene.cameras.main;
         camera.fade(fadeDuration);
-        UI.scene.scene.shutdown('boot');
-        UI.scene.scene.launch('main');
+        setTimeout(function(){
+            UI.scene.scene.shutdown('boot');
+            UI.scene.scene.launch('main');
+        },fadeDuration);
     }
 
 };

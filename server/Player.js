@@ -77,6 +77,7 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(20,9); // arrows
     this.giveItem(22,1); // coal
     this.giveItem(23,1); // carbon
+    this.giveItem(24,1); // iron
     this.giveGold(500);
 };
 
@@ -145,13 +146,13 @@ Player.prototype.takeCommitmentSlot = function(buildingID,notify){
 Player.prototype.freeCommitmentSlot = function(){
     var slot = this.removeSlot();
     this.syncCommitSlots();
-    this.addNotif('Committed to '+GameServer.buildings[slot.building].name);
+    this.addNotif('Commitment to '+GameServer.buildings[slot.building].name+' ended');
 };
 
 Player.prototype.trimCommitSlots = function(){
     var slots = [];
     this.getSlots().forEach(function(slot){
-        slots.push(slot.building);
+        slots.push(GameServer.buildings[slot.building].type); // Sends the building type, not ID anymore!
     });
     var trimmed = this.getCommitSlotsShell();
     trimmed.slots = slots;
