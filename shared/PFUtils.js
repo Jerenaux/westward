@@ -196,6 +196,7 @@ PFUtils.collisionsFromShape = function(shape,tileX,tileY,width,height,map,checkO
                 if(checkOnly){
                     if(map.get(wy,wx)) return false;
                 }else {
+                    //console.log('adding collision at',wx,wy);
                     map.add(wy, wx, 1);
                 }
             }

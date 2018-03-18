@@ -164,6 +164,10 @@ Utils.listAdjacentAOIs = function(current){
     return AOIs;
 };
 
+Utils.formatMoney = function(nb){
+    return 'coin'+(nb > 1 ? 's' : '');
+};
+
 Utils.euclidean = function(a,b){
     //console.log('dist between',a,b);
     return Math.sqrt(Math.pow(a.x-b.x,2)+Math.pow(a.y- b.y,2));

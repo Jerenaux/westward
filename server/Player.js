@@ -3,6 +3,7 @@
  */
 
 var Utils = require('../shared/Utils.js').Utils;
+var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var PersonalUpdatePacket = require('./PersonalUpdatePacket.js').PersonalUpdatePacket;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
@@ -52,8 +53,16 @@ Player.prototype.registerPlayer = function(){
 };
 
 Player.prototype.setStartingPosition = function(){
-    this.x = Utils.randomInt(GameServer.startArea.minx,GameServer.startArea.maxx);
-    this.y = Utils.randomInt(GameServer.startArea.miny,GameServer.startArea.maxy);
+    var i = 0;
+    var x, y;
+    while(i < 10) {
+        x = Utils.randomInt(GameServer.startArea.minx, GameServer.startArea.maxx);
+        y = Utils.randomInt(GameServer.startArea.miny, GameServer.startArea.maxy);
+        if(!PFUtils.checkCollision(x,y)) break;
+        i++;
+    }
+    this.x = x;
+    this.y = y;
 };
 
 Player.prototype.setClass = function(className){
@@ -61,23 +70,26 @@ Player.prototype.setClass = function(className){
 };
 
 Player.prototype.setStartingInventory = function(){
-    this.giveItem(0,20); // red powder
-    this.giveItem(1,1); //food
-    this.giveItem(2,1); // bow
+    /*this.giveItem(0,20); // red powder
     this.giveItem(3,1); // timber
     this.giveItem(4,1); // bomb
     this.giveItem(5,14); // root
-    this.giveItem(9,6); // pelt
-    this.giveItem(11,2); // sword
     this.giveItem(12,1); // gun
     this.giveItem(13,1); // shield
     this.giveItem(8,5); // thick grass
     this.giveItem(7,1); // wood
-    this.giveItem(19,1); // quiver
-    this.giveItem(20,9); // arrows
     this.giveItem(22,1); // coal
     this.giveItem(23,1); // carbon
     this.giveItem(24,1); // iron
+    this.giveItem(25,1); // gold*/
+
+    this.giveItem(1,1); //food
+    this.giveItem(9,2); // pelt
+    this.giveItem(20,5); // arrows
+    this.giveItem(19,1); // quiver
+    this.giveItem(2,1); // bow
+    this.giveItem(11,2); // sword
+    this.giveItem(6,1); // potion
     this.giveGold(500);
 };
 
@@ -184,13 +196,13 @@ Player.prototype.gainCivicXP = function(inc,notify){
 Player.prototype.giveGold = function(nb,notify){
     this.gold = Utils.clamp(this.gold+nb,0,100000);
     this.updatePacket.updateGold(this.gold);
-    if(notify) this.addNotif('+'+nb+' gold');
+    if(notify) this.addNotif('+'+nb+' '+Utils.formatMoney(nb));
 };
 
 Player.prototype.takeGold = function(nb,notify){
     this.gold = Utils.clamp(this.gold-nb,0,100000);
     this.updatePacket.updateGold(this.gold);
-    if(notify) this.addNotif('-'+nb+' gold');
+    if(notify) this.addNotif('-'+nb+' '+Utils.formatMoney(nb));
 };
 
 Player.prototype.canBuy = function(price){ // check if building has gold and room
@@ -210,14 +222,12 @@ Player.prototype.hasItem = function(item,nb){
 };
 
 Player.prototype.giveItem = function(item,nb,notify){
-    //console.log('Giving ',GameServer.itemsData[item].name,'x',nb);
     this.inventory.add(item,nb);
     this.updatePacket.addItem(item,this.inventory.getNb(item));
     if(notify) this.addNotif('+'+nb+' '+GameServer.itemsData[item].name);
 };
 
 Player.prototype.takeItem = function(item,nb,notify){
-    //console.log('Taking ',GameServer.itemsData[item].name,'x',nb);
     this.inventory.take(item,nb);
     this.updatePacket.addItem(item,this.inventory.getNb(item));
     if(notify) this.addNotif('-'+nb+' '+GameServer.itemsData[item].name);

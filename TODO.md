@@ -14,22 +14,19 @@ Prototype level:
 Week:
 -----
 *1 item/recipe a day*
-Bug: no animals on buildings (wrong collisions?)
 Bug: wrong click area of foundations
 Bug: still click issue after closing menus
-Fix starting position conflitc with buildings
+Fix huge food surplus
+Fix/check new building not being built?
 UI: test snapshot of bugs of menus
 UI: info panel on first play (basic commands + what's not implemented yet)
 Design document
 Test second settlement (fort and respawn)
 World map-based settlement selection menu (mention key startegic aspects, display enemy civ threats)
-Fort: staff (msg: you need civic lvl2 to vote for governor)
 Battle: monsters trigger fights (move spawn zones)
 Economic loop: harvest herbs (scatter roots)
-Economic loop: clamp settlement resources (at least food to 0)
 Help: buttons in buildings
-Quick-craft recipes: bow, potion + arrow, hatchet
-Start equipment: sword, bow, quiver, 5 arrows, 1 potion, some gold
+Quick-craft recipes: arrow, hatchet
 
 Finish:
 -------
@@ -190,6 +187,7 @@ Design document:
 Polish:
 ------
 Visual:
+- Revamp class selection
 - Move marker on move() event (in addition to mousemove) and handle keeping pressed
 - Polish title screen (leaves, bird passing in the distance...)
 - Fade-in/out transitions (wait for containers?)

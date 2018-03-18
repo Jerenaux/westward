@@ -104,7 +104,7 @@ app.filter('displayBuilding',function(){
     }
 });
 
-Client.socket = io.connect();
+//Client.socket = io.connect();
 //Client.socket.emit('admin');
 
 

@@ -172,6 +172,8 @@ var Pin = new Phaser.Class({
         this.setInteractive();
         this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
         this.parentMap = map;
+        this.on('pointerover',this.handleOver.bind(this));
+        this.on('pointerout',this.handleOut.bind(this));
     },
 
     setUp: function(tileX,tileY,x,y,name,texture){
@@ -198,12 +200,12 @@ var Pin = new Phaser.Class({
     handleOver: function(){
         if(Math.abs(this.x - this.mask.bitmapMask.x) > this.mask.bitmapMask.width/2) return;
         if(Math.abs(this.y - this.mask.bitmapMask.y) > this.mask.bitmapMask.height/2) return;
-        Engine.tooltip.updateInfo(this.name);
-        Engine.tooltip.display();
+        UI.tooltip.updateInfo(this.name);
+        UI.tooltip.display();
     },
 
     handleOut: function(){
-        Engine.tooltip.hide();
+        UI.tooltip.hide();
     },
 
     hide: function(){

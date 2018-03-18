@@ -68,6 +68,9 @@ Settlement.prototype.takeFortGold = function(nb){
 Settlement.prototype.addToFort = function(item,nb){
     this.fort.giveItem(item,nb);
 };
+Settlement.prototype.takeFromFort = function(item,nb){
+    this.fort.takeItem(item,nb);
+};
 
 Settlement.prototype.refreshListing = function(){
     if(!this.fort) return;
@@ -75,8 +78,7 @@ Settlement.prototype.refreshListing = function(){
 };
 
 Settlement.prototype.consumeFood = function(){
-    // TODO: take pop into account
-    this.addToFort(1,-1);
+    this.takeFromFort(1,Math.floor(this.pop/10));
 };
 
 Settlement.prototype.computeFoodSurplus = function(){

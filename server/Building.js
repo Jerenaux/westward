@@ -248,6 +248,7 @@ Building.prototype.addCollisions = function(){
         spriteY = this.y;
     }
 
+    //console.log('adding collisions for building ',this.id);
     PFUtils.collisionsFromShape(this.shape,spriteX,spriteY,data.width,data.height,GameServer.collisions);
 };
 

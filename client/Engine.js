@@ -653,6 +653,26 @@ Engine.makeConstructionMenu = function(){
 
 Engine.makeStaffMenu = function(){
     var menu = new Menu('Officials');
+    var govw = 250;
+    var govh = 150;
+    var govx = (UI.getGameWidth()-govw)/2;
+    var govy = 100;
+
+    var padding = 10;
+    var chanx = govx - govw/2 - padding/2;
+    var chany = govy + govh + 20;
+    var chanh = 200;
+
+    var commx = govx + govw/2 + padding/2;
+    console.log(govw,chanh,chanx,chany,commx);
+
+    var gov = menu.addPanel('governor',new StaffPanel(govx,govy,govw,govh,'Governor'));
+    gov.addStaff([{name:'Mr. Governor'}]);
+    gov.addCenterText('Your civic level is too low to vote for the Governor');
+    var chan = menu.addPanel('chancellors',new StaffPanel(chanx,chany,govw,chanh,'Chancellors'));
+    chan.addStaff([{name:'Palpatine'},{name:'Valorum'},{name:'Tobby'}]);
+    var comm = menu.addPanel('commanders',new StaffPanel(commx,chany,govw,chanh,'Commanders'));
+    comm.addStaff([{name:'Adama'},{name:'William Riker'}]);
     return menu;
 };
 
@@ -721,10 +741,12 @@ Engine.makeTradeMenu = function(){
     var client = new InventoryPanel(212,100,300,300,'Your items');
     client.setInventory(Engine.player.inventory,7,true,Engine.sellClick);
     client.addCapsule('gold',150,-9,'999','gold');
+    client.addButton(270, 8, 'blue','help',null,'',UI.textsData['sell_help']);
     trade.addPanel('client',client);
     var shop = new InventoryPanel(542,100,300,300,'Shop');
     shop.setInventory(new Inventory(20),7,true,Engine.buyClick);
     shop.addCapsule('gold',100,-9,'999','gold');
+    shop.addButton(270, 8, 'blue','help',null,'',UI.textsData['buy_help']);
     trade.addPanel('shop',shop);
     var action = new ShopPanel(212,420,300,100,'Buy/Sell');
     trade.addPanel('action',action);
@@ -842,7 +864,7 @@ Engine.addHero = function(data){
     //Engine.player.buildingRecipes = new Inventory(9);
     //Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
     Engine.player.itemRecipes = new Inventory(10);
-    Engine.player.itemRecipes.fromList([[6,1],[10,1],[15,1],[16,1],[21,1],[2,1]]);
+    Engine.player.itemRecipes.fromList([[6,1],[21,1],[2,1]]);
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = Equipment.getSkeleton();
     Engine.player.commitSlots = data.commitSlots;

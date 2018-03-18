@@ -88,13 +88,14 @@ GameServer.readMap = function(mapsPath){
     GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()));
 
     GameServer.startArea = {
-        minx: 523, //537,
-        maxx: 537, //543,
-        miny: 655, //690,
-        maxy: 661 //694
+        minx: 517,
+        maxx: 531,
+        miny: 656,
+        maxy: 662
     };
 
     GameServer.battleCells = new SpaceMap();
+    GameServer.textData = JSON.parse(fs.readFileSync('./assets/data/texts.json').toString());
     GameServer.itemsData = JSON.parse(fs.readFileSync('./assets/data/items.json').toString());
     GameServer.animalsData = JSON.parse(fs.readFileSync('./assets/data/animals.json').toString());
 
@@ -115,12 +116,13 @@ GameServer.readMap = function(mapsPath){
         });
         GameServer.updateStatus('buildings');
         GameServer.updateSettlements();
+
+        // Spawn animals
+        GameServer.spawnZones = [];
+        GameServer.spawnZones.push(new SpawnZone(1566,3,3));
+        GameServer.updateSpawnZones();
     });
 
-    // Spawn animals
-    GameServer.spawnZones = [];
-    GameServer.spawnZones.push(new SpawnZone(1566,3,3));
-    GameServer.updateSpawnZones();
 
     GameServer.updateStatus('reading map');
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');

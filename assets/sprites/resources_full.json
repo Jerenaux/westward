@@ -71,6 +71,10 @@
     {
       "filename": "iron",
       "frame": {"x":144,"y":792,"w":24,"h":24}
+    },
+    {
+      "filename": "rawgold",
+      "frame": {"x":192,"y":504,"w":24,"h":24}
     }
   ]
 }

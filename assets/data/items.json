@@ -37,12 +37,13 @@
     "atlas": "items2",
     "frame":"root",
     "name": "Root",
-    "desc": "Crafting material used to brew red potions."
+    "desc": "Crafting material used to brew several types of potions."
   },
   "6":{
     "atlas": "items2",
     "frame":"redpotion",
     "name": "Red potion",
+    "desc": "Made from roots and red powder, regenerates some health.",
     "recipe": {"5":1,"0":2},
     "effects":{"hp":50},
     "useInBattle": true
@@ -136,6 +137,7 @@
     "name": "Small quiver",
     "equipment": "quiver",
     "capacity": 10,
+    "desc": "Can contain up to 10 arrows",
     "useInBattle": true
   },
   "20":{
@@ -172,5 +174,11 @@
     "frame":"iron",
     "name": "Iron ore",
     "desc": "Crafting material that can be mined and used to make steel or several items."
+  },
+  "25":{
+    "atlas": "items2",
+    "frame":"rawgold",
+    "name": "Gold ore",
+    "desc": "Precious crafting material that can be mined and is ultimately used to mint coins."
   }
 }
