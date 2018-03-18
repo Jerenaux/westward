@@ -43,9 +43,13 @@ app.controller("mainCtrl", [
             });
 
             $scope.buildingForms = {};
+            $scope.deleteForms = {};
             $scope.settlements.forEach(function(settlement){
                 $scope.buildingForms[settlement.id] = {
                     visible: false
+                };
+                $scope.deleteForms[settlement.id] = {
+                    id: -1
                 };
             });
         };
@@ -58,13 +62,17 @@ app.controller("mainCtrl", [
             var data = $scope.buildingForms[id];
             data.visible = undefined;
             $http.post("/admin/newbuilding/", data).then(function(res) {
-                if(res.status == 201){
-                    $scope.postForm.$setUntouched();
-                    $scope.postForm.$setPristine();
-                    getListings();
-                }
+                if(res.status == 201) getListings();
             },function(err){});
             console.log(data);
+        };
+
+        $scope.deleteBuilding = function(id){
+            var data = $scope.deleteForms[id];
+            console.log('deleting',data);
+            $http.post("/admin/deletebuilding/", data).then(function(res) {
+                if(res.status == 201) setTimeout(getListings,200);
+            },function(err){});
         };
 
         setInterval(getListings,60*1000);

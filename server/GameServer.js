@@ -750,13 +750,13 @@ GameServer.insertNewBuilding = function(data){
     return true;
 };
 
-GameServer.deleteBuilding = function(id,socketID){
-    var building = GameServer.buildings[id];
+GameServer.deleteBuilding = function(data){
+    var building = GameServer.buildings[data.id];
     var document = building.getModel();
     document.remove(function(err){
         if (err) return console.error(err);
         console.log('Building removed');
         GameServer.removeEntity(building);
-        GameServer.sendBuildings(socketID);
     });
+    return true;
 };

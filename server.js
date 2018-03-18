@@ -53,7 +53,8 @@ categories.forEach(function(cat){
 });
 
 var POSThandlers = {
-    'newbuilding': gs.insertNewBuilding
+    'newbuilding': gs.insertNewBuilding,
+    'deletebuilding': gs.deleteBuilding
 };
 var events = Object.keys(POSThandlers);
 
