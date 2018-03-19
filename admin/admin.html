@@ -14,7 +14,6 @@
     <div class="panel panel-default" ng-repeat="settlement in settlements">
         <div class="panel-heading"><b>{{settlement.name}}</b>&nbsp;|&nbsp{{settlement.pop}} citizens&nbsp;|&nbsp;{{settlement.surplus | number:2 | pctFilter:true }}</div>
         <div class="panel-body">
-
             <div class="box">
                 <div class="panel panel-default building_panel" ng-repeat="building in settlement.buildings">
                     <div class="panel-heading">#{{building.id}} <b>{{building.type | buildingTypeFilter}}</b></div>
@@ -28,6 +27,14 @@
                             Inventory:<br/>
                             <span ng-repeat="itm in building.inventory">{{itm | shopFilter:building.prices}}  <br/></span>
                         </div>
+
+                        <form ng-submit="setStock(building.id)">
+                            Set
+                            <select ng-model="inventoryForms[building.id].item" ng-options="id as info.name for (id, info) in data.itemsList | orderBy:'name'"></select><br/>
+                            To
+                            <input required ng-model="inventoryForms[building.id].nb" size="2">
+                            <button type="submit" class="btn btn-success">+</button>
+                        </form>
                         <!-- {{building | displayBuilding}}-->
                     </div>
                 </div>

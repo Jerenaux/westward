@@ -760,3 +760,7 @@ GameServer.deleteBuilding = function(data){
     });
     return true;
 };
+
+GameServer.setBuildingItem = function(data){
+
+};

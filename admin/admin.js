@@ -20,6 +20,13 @@ app.controller("mainCtrl", [
             $http.get("/assets/data/"+category+".json").then(function(res) {
                 if(res.status == 200){
                     Data[category+'Data'] = res.data;
+                    $scope.data[category+'List'] = [];
+                    for(var key in res.data){
+                        if(!res.data.hasOwnProperty(key)) continue;
+                        var entry = res.data[key];
+                        entry.key = key;
+                        $scope.data[category+'List'].push(entry);
+                    }
                     $scope.data[category] = Data[category+'Data'];
                     Data.counter++;
                     if(Data.counter == dataCategories.length) getListings();
@@ -44,6 +51,7 @@ app.controller("mainCtrl", [
 
             $scope.buildingForms = {};
             $scope.deleteForms = {};
+            $scope.inventoryForms = {};
             $scope.settlements.forEach(function(settlement){
                 $scope.buildingForms[settlement.id] = {
                     visible: false
@@ -51,7 +59,13 @@ app.controller("mainCtrl", [
                 $scope.deleteForms[settlement.id] = {
                     id: -1
                 };
+
+                settlement.buildings.forEach(function(building){
+                    $scope.inventoryForms[building.id] = {};
+                });
             });
+
+
         };
 
         dataCategories.forEach(function(cat){
@@ -62,7 +76,7 @@ app.controller("mainCtrl", [
             var data = $scope.buildingForms[id];
             data.visible = undefined;
             $http.post("/admin/newbuilding/", data).then(function(res) {
-                if(res.status == 201) getListings();
+                if(res.status == 201) setTimeout(getListings,200);
             },function(err){});
             console.log(data);
         };
@@ -73,6 +87,15 @@ app.controller("mainCtrl", [
             $http.post("/admin/deletebuilding/", data).then(function(res) {
                 if(res.status == 201) setTimeout(getListings,200);
             },function(err){});
+        };
+
+        $scope.setStock = function(id){
+            var data = $scope.inventoryForms[id];
+            data.building = id;
+            console.log(data);
+            /*$http.post("/admin/setitem/", data).then(function(res) {
+                if(res.status == 201) setTimeout(getListings,200);
+            },function(err){});*/
         };
 
         setInterval(getListings,60*1000);

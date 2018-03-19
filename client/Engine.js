@@ -279,8 +279,9 @@ Engine.initWorld = function(data){
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
     setTimeout(function(){
-        UI.scene.cameras.main._fadeAlpha = 0;
-    },500);
+        //UI.scene.cameras.main._fadeAlpha = 0;
+        UI.camera._fadeAlpha = 0;
+    },200);
 };
 
 Engine.createAnimations = function(){

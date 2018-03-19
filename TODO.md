@@ -94,6 +94,7 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Clean scene transition code
 - Move UI stuff from Engine to UI
 - Settlements: after compute food surplus, one central method to broadcast it to buildings and players, using one
 common "formatFoorSurplus" method to decide exact formatting (witg a reciprocal function client-side)

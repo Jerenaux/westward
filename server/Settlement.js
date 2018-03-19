@@ -129,4 +129,17 @@ Settlement.prototype.trim = function(){
     return trimmed;
 };
 
+// Trimming for the purpose of settlement selection
+Settlement.prototype.selectionTrim = function(){
+    var trimmed = {};
+    var broadcastProperties = ['id','name','pop','surplus'];
+    for(var p = 0; p < broadcastProperties.length; p++){
+        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
+    }
+    trimmed.x = this.fort.x;
+    trimmed.y = this.fort.y;
+    trimmed.buildings = this.buildings.length;
+    return trimmed;
+};
+
 module.exports.Settlement = Settlement;

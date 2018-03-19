@@ -35,9 +35,14 @@ Client.getInitRequest = function(){ // Returns the data object to send to reques
     return {new:false,id:Client.getPlayerID()};
 };
 
+Client.checkForNewPlayer = function(){
+    Client.newPlayer = true;
+    return;
+    Client.newPlayer =  (Client.getPlayerID() === null);
+};
+
 Client.isNewPlayer = function(){
-    return true;
-    return (Client.getPlayerID() === null);
+    return Client.newPlayer;
 };
 
 Client.getPlayerID = function(){
@@ -95,6 +100,7 @@ Client.setLocalData = function(id){ // store the player ID in localStorage
 /// ##### SENDERS ######
 
 Client.requestData = function(){ // request the data to be used for initWorld()
+    console.log('requesting data');
     Client.socket.emit('init-world',Client.getInitRequest());
 };
 

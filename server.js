@@ -54,7 +54,8 @@ categories.forEach(function(cat){
 
 var POSThandlers = {
     'newbuilding': gs.insertNewBuilding,
-    'deletebuilding': gs.deleteBuilding
+    'deletebuilding': gs.deleteBuilding,
+    'setitem': gs.setBuildingItem
 };
 var events = Object.keys(POSThandlers);
 

@@ -14,11 +14,13 @@ var UI = {
         this.load.spritesheet('icons2', 'assets/sprites/icons.png',{frameWidth:25,frameHeight:24});
         this.load.json('texts', 'assets/data/texts.json');
 
-        this.load.image('bigbg', 'assets/sprites/bigbg.png');
-        this.load.image('worldmap', 'assets/sprites/worldmap.png');
-        this.load.image('compass', 'assets/sprites/compass.png');
-        this.load.image('setlicon', 'assets/sprites/setlicon.png');
-        this.load.image('wood', 'assets/sprites/wood.jpg');
+        if(Client.isNewPlayer()) {
+            this.load.image('bigbg', 'assets/sprites/bigbg.png');
+            this.load.image('worldmap', 'assets/sprites/worldmap.png');
+            this.load.image('compass', 'assets/sprites/compass.png');
+            this.load.image('setlicon', 'assets/sprites/setlicon.png');
+            this.load.image('wood', 'assets/sprites/wood.jpg');
+        }
     },
 
     create: function () {
@@ -34,8 +36,9 @@ var UI = {
                 endFrame: 8
             }
         );
-        UI.tooltip = new Tooltip();
 
+        UI.tooltip = new Tooltip();
+        UI.camera = UI.scene.cameras.main;
         UI.textsData = this.cache.json.get('texts');
 
         this.input.setTopOnly(false);
@@ -45,9 +48,7 @@ var UI = {
         /*this.input.on('gameobjectdown', function (pointer, gameObject) {
             console.warn(gameObject);
         });*/
-        // todo: don't make if not new player
-        UI.classMenu = UI.makeClassMenu();
-        //UI.settlementMenu = UI.makeSettlementSelectionMenu();
+        if(Client.isNewPlayer()) UI.classMenu = UI.makeClassMenu();
 
         this.scene.get('boot').updateReadyTick();
     },
@@ -145,77 +146,119 @@ var UI = {
         return panel;
     },
 
-    makeSettlementSelectionMenu: function(){
-        UI.scene.add.image(0,0,'wood').setOrigin(0);
-        var scroll = UI.scene.add.image(UI.getGameWidth()/2,UI.getGameHeight()/2,'bigbg');
-        scroll.setScale(1.3);
-        /*var scrollMask = UI.scene.add.image(UI.getGameWidth()/2,UI.getGameHeight()/2,'bigbg');
-        scrollMask.setVisible(false);
-        scrollMask.setScale(0.98);*/
-        var map = UI.scene.add.image(UI.getGameWidth()/2,UI.getGameHeight()/2,'worldmap');
-        //UI.scene.add.image(130,20,'compass').setOrigin(0).setScale(0.5);
-        UI.scene.add.image(10,0,'compass').setOrigin(0).setScale(0.5);
-        //map.setScale(0.75);
-        map.x += 50;
-        map.y += 150;
-        map.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,scroll);
-
-        var icon1 = UI.scene.add.image(430,400,'setlicon');
-        var icon2 = UI.scene.add.image(840,100,'setlicon');
-        icon1.setInteractive();
-        icon2.setInteractive();
-
-        UI.scene.tweens.add({
-            targets: [icon1,icon2],
-            alpha: 0.2,
-            duration: 750,
-            yoyo: true,
-            loopDelay: 1000,
-            loop: -1
-        });
-
-        var w = 300;
-        var h = 100;
-        var panel = new Panel(UI.getGameWidth()-w,UI.getGameHeight()-h,w,h,'Choose a settlement');
-        var txt = panel.addText(10,15,'Click on one of the blinking icons for more information about the corresponding settlement.');
-        txt.setWordWrapWidth(w-15,true);
-        panel.display();
-        panel.displayTexts();
-
-        var w = 350;
-        var h = 300;
-        var nb = new Panel(UI.getGameWidth()-w,UI.getGameHeight()-h,w,h,'New Beginning');
-        var txt = nb.addText(10,15,'New Beginning was the first settlement.');
-        txt.setWordWrapWidth(w-15,true);
-
-        icon1.on('pointerdown',function(){
-            panel.hide();
-            panel.hideTexts();
-            nb.display();
-            nb.displayTexts();
-        });
-
-    },
-
-    selectClass: function(name){
-        console.log('selecting',name);
-        UI.selectedClass = name; // TODO: pass as scene data instead
-        UI.sceneTransition('class');
-    },
-
-    sceneTransition: function(from){
+    sceneTransition: function(from,to){
         var fadeDuration = 500;
         if(from == 'title'){
             fadeDuration = 200;
         }else if(from == 'class'){
             UI.classMenu.hide();
         }
+
         var camera = UI.scene.cameras.main;
         camera.fade(fadeDuration);
         setTimeout(function(){
-            UI.scene.scene.shutdown('boot');
-            UI.scene.scene.launch('main');
+            if(to == 'map'){
+                UI.scene.cameras.main._fadeAlpha = 0;
+                UI.makeSettlementSelectionMenu();
+            }else if(to == 'game') {
+                UI.scene.scene.shutdown('boot');
+                UI.scene.scene.launch('main');
+            }
         },fadeDuration);
     }
+};
 
+UI.leaveTitleScreen = function(){
+    Boot.button.hide();
+    UI.scene.tweens.add({
+        targets: Boot.title,
+        alpha: 0,
+        duration: 1000,
+        onComplete: function(){
+            if(Client.isNewPlayer()){
+                UI.displayClassMenu();
+            }else {
+                UI.launchGame();
+            }
+        }
+    });
+};
+
+UI.displayClassMenu = function(){
+    UI.classMenu.display();
+};
+
+UI.selectClass = function(name){
+    UI.selectedClass = name;
+    var fadeDuration = 200;
+    UI.camera.fade(fadeDuration);
+    setTimeout(function(){
+        UI.classMenu.hide();
+        Boot.background.setVisible(false);
+        UI.displaySettlementSelectionMenu();
+        UI.camera._fadeAlpha = 0;
+    },fadeDuration);
+};
+
+UI.displaySettlementSelectionMenu =  function(){
+    var content = [];
+    content.push(UI.scene.add.image(0,0,'wood').setOrigin(0));
+    var scroll = UI.scene.add.image(UI.getGameWidth()/2,UI.getGameHeight()/2,'bigbg');
+    content.push(scroll);
+    scroll.setScale(1.3);
+    /*var scrollMask = UI.scene.add.image(UI.getGameWidth()/2,UI.getGameHeight()/2,'bigbg');
+    scrollMask.setVisible(false);
+    scrollMask.setScale(0.98);*/
+    var map = UI.scene.add.image(UI.getGameWidth()/2,UI.getGameHeight()/2,'worldmap');
+    content.push(map);
+    content.push(UI.scene.add.image(10,0,'compass').setOrigin(0).setScale(0.5));
+    //map.setScale(0.75);
+    map.x += 50;
+    map.y += 150;
+    map.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,scroll);
+
+    var icon1 = UI.scene.add.image(430,400,'setlicon');
+    var icon2 = UI.scene.add.image(840,100,'setlicon');
+    icon1.setInteractive();
+    icon2.setInteractive();
+
+    UI.scene.tweens.add({
+        targets: [icon1,icon2],
+        alpha: 0.2,
+        duration: 750,
+        yoyo: true,
+        loopDelay: 1000,
+        loop: -1
+    });
+
+    var w = 300;
+    var h = 100;
+    var panel = new Panel(UI.getGameWidth()-w,UI.getGameHeight()-h,w,h,'Choose a settlement');
+    var txt = panel.addText(10,15,'Click on one of the blinking icons for more information about the corresponding settlement.');
+    txt.setWordWrapWidth(w-15,true);
+    panel.display();
+    panel.displayTexts();
+
+    var w = 350;
+    var h = 300;
+    var nb = new Panel(UI.getGameWidth()-w,UI.getGameHeight()-h,w,h,'New Beginning');
+    var txt = nb.addText(10,15,'New Beginning was the first settlement.');
+    txt.setWordWrapWidth(w-15,true);
+
+    icon1.on('pointerdown',function(){
+        panel.hide();
+        panel.hideTexts();
+        nb.display();
+        nb.displayTexts();
+    });
+
+};
+
+UI.launchGame = function(){
+    var fadeDuration = 500;
+    UI.camera.fade(fadeDuration);
+    setTimeout(function(){
+        UI.scene.scene.shutdown('boot');
+        UI.scene.scene.launch('main');
+    },fadeDuration);
 };

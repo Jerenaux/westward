@@ -19,56 +19,41 @@ var Boot = new Phaser.Class({
     },
 
     create: function(){
+        Client.checkForNewPlayer();
         this.scene.launch('UI');
 
         var masterData = this.cache.json.get(Boot.masterKey);
         Boot.tilesets = masterData.tilesets;
         Boot.masterData = masterData;
 
-        this.add.image(0,0,'background').setOrigin(0);
+        Boot.background = this.add.image(0,0,'background').setOrigin(0);
+
+
+        this.totalReadyTicks = 2;
+        this.onReady = this.displayButton;
         this.displayTitle();
     },
 
     updateReadyTick: function() {
         this.readyTicks++;
-        if (this.readyTicks == 2) this.displayButton();
+        if (this.readyTicks == this.totalReadyTicks) this.onReady.call(this);
     },
 
     displayTitle: function(){
         Boot.title = this.add.text(512,115, 'Westward',
             { font: '150px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 10 }
             ).setOrigin(0.5,0).setAlpha(0);
-        var _boot = this;
+
         this.tweens.add({
             targets: Boot.title,
             alpha: 1,
             duration: 1000,
-            onComplete: function(){
-                _boot.updateReadyTick();
-            }
-        });
-
-    },
-
-    hideTitle: function(){
-        var _boot = this;
-        Boot.button.hide();
-        this.tweens.add({
-            targets: Boot.title,
-            alpha: 0,
-            duration: 1000,
-            onComplete: function(){
-                if(Client.isNewPlayer()){
-                    UI.classMenu.display();
-                }else {
-                    UI.sceneTransition('title');
-                }
-            }
+            onComplete: this.updateReadyTick.bind(this)
         });
     },
 
     displayButton: function(){
-        Boot.button = new BigButton(512-40,300,'Play',this.hideTitle.bind(this));
+        Boot.button = new BigButton(512-40,300,'Play',UI.leaveTitleScreen);
         Boot.button.display();
     }
 });
