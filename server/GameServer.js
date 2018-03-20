@@ -101,8 +101,8 @@ GameServer.readMap = function(mapsPath){
 
     // Settlements
     GameServer.settlements = {};
-    GameServer.settlements[0] = new Settlement(0,'New Beginning',12);
-    GameServer.settlements[1] = new Settlement(1,'Hope',2);
+    GameServer.settlements[0] = new Settlement(0,'New Beginning',12,1);
+    GameServer.settlements[1] = new Settlement(1,'Hope',2,3);
 
     // Read buildings
     GameServer.requiredTicks++;
@@ -180,12 +180,16 @@ GameServer.checkPlayerID = function(id){ // check if no other player is using sa
 };*/
 
 GameServer.addNewPlayer = function(socket,data){
-    if(!data.selectedClass) return;
-    console.log('new player of class',data.selectedClass);
+    //if(!data.selectedClass) return;
+    if(!data.selectedClass) data.selectedClass = 'merchant';
+    if(!data.selectedSettlement) data.selectedSettlement = 0;
+    console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
-    player.setStartingPosition();
     player.setStartingInventory();
+    player.setSettlement(data.selectedSettlement);
     player.setClass(data.selectedClass);
+    //player.setStartingPosition();
+    player.spawn();
     var document = player.dbTrim();
     GameServer.server.db.collection('players').insertOne(document,function(err){
         if(err) throw err;
@@ -718,20 +722,23 @@ GameServer.getBuildings = function(){
     return list;
 };
 
-GameServer.getSettlements = function(){
+// List settlements for selection screen
+GameServer.listSettlements = function(trimCallback){
+    trimCallback = trimCallback || 'trim';
     var list = [];
     for(var id in GameServer.settlements){
-        list.push(GameServer.settlements[id].trim());
+        list.push(GameServer.settlements[id][trimCallback]());
     }
     return list;
 };
 
-GameServer.listBuildings = function(data,socketID){
-    GameServer.sendBuildings(socketID);
-};
-
-GameServer.sendBuildings = function(socketID){
-    GameServer.server.sendAdminUpdate(socketID,'buildings',GameServer.getBuildings());
+GameServer.getSettlements = function(){
+    /*var list = [];
+    for(var id in GameServer.settlements){
+        list.push(GameServer.settlements[id].trim());
+    }
+    return list;*/
+    return GameServer.listSettlements();
 };
 
 GameServer.insertNewBuilding = function(data){

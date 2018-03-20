@@ -35,6 +35,7 @@ var Engine = {
     }
 };
 
+
 Engine.preload = function() {
     this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('faces', 'assets/sprites/faces.png',{frameWidth:32,frameHeight:32});
@@ -272,6 +273,7 @@ Engine.createMarker = function(){
 
 Engine.initWorld = function(data){
     console.log(data);
+    Engine.toponymsData = data.settlements;
     Engine.addHero(data);
     Engine.makeUI();
     Engine.createAnimations();
@@ -279,7 +281,6 @@ Engine.initWorld = function(data){
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
     setTimeout(function(){
-        //UI.scene.cameras.main._fadeAlpha = 0;
         UI.camera._fadeAlpha = 0;
     },200);
 };
@@ -665,7 +666,6 @@ Engine.makeStaffMenu = function(){
     var chanh = 200;
 
     var commx = govx + govw/2 + padding/2;
-    console.log(govw,chanh,chanx,chany,commx);
 
     var gov = menu.addPanel('governor',new StaffPanel(govx,govy,govw,govh,'Governor'));
     gov.addStaff([{name:'Mr. Governor'}]);

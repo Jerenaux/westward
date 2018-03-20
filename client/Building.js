@@ -61,10 +61,6 @@ Building = new Phaser.Class({
             if(field in data) callbacks[field].call(this,data[field]);
         }
 
-        /*if (data.foodsurplus) {
-            this.foodsurplus = data.foodsurplus;
-            this.updateEvents.add('onUpdateSettlementStatus');
-        }*/
         if (data.danger) {
             this.danger = data.danger;
             this.updateEvents.add('onUpdateMap');

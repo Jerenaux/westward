@@ -1,5 +1,7 @@
 {
   "currency": "coin",
+  "settlement_0": "New Beginning is the oldest settlement on the Continent. However, due to initial setbacks and grievous attacks from the natives, it is far less developed than Hope, in the north. Settlers keep coming because its location promises very lucrative yields of rare crops that grow only there and could be sold a fortune to the Mainland, once the necessary infrastructure to harvest them and to defend the settlement is put in place.",
+  "settlement_1": "Hope is the most developed settlement on the Continent, and the theatre of the first steps of a promising mining industry. Only there can iron and coal be mined and decent weapons forged at the moment. This will give Hope a crucial role in fueling and leading the colonization of the Continent, but it will also make it a target for the attacks of the natives.",
 
   "inventory_help": "This is your inventory. Clicking on consumable items will consume them. Clicking on equipable items will equip them. Some equipment can increase your inventory size.",
   "equipment_help": "This is your equipment. Click on a piece of equipment to unequip it. You cannot equip a ranged weapon and a melee weapon at the same time. You must equip an ammo container (e.g. quiver) before equipping the corresponding ammunition (e.g. arrows).",

@@ -69,6 +69,10 @@ Player.prototype.setClass = function(className){
     this.class = className;
 };
 
+Player.prototype.setSettlement = function(sid){
+    this.settlement = sid;
+};
+
 Player.prototype.setStartingInventory = function(){
     /*this.giveItem(0,20); // red powder
     this.giveItem(3,1); // timber
@@ -117,13 +121,18 @@ Player.prototype.die = function(){
     this.updatePacket.dead = true;
 };
 
+Player.prototype.spawn = function(){
+    var respawnLocation = GameServer.settlements[this.settlement].respawnLocation;
+    this.setProperty('x', respawnLocation.x);
+    this.setProperty('y', respawnLocation.y);
+    console.log('spawning at ',this.x,this.y);
+};
+
 Player.prototype.respawn = function(){
     this.setProperty('dead',false);
     this.updatePacket.dead = false;
     this.setStat('hp',10); // TODO: adapt remaining health
-    var respawnLocation = GameServer.settlements[this.settlement].respawnLocation;
-    this.setProperty('x', respawnLocation.x);
-    this.setProperty('y', respawnLocation.y);
+    this.spawn();
     this.setOrUpdateAOI();
     // TODO: loose loot
 };
@@ -399,6 +408,7 @@ Player.prototype.initTrim = function(){
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     trimmed.commitSlots = this.trimCommitSlots();
+    trimmed.settlements = GameServer.listSettlements('mapTrim');
     return trimmed;
 };
 
@@ -453,6 +463,7 @@ Player.prototype.getDataFromDb = function(document){
         this.giveItem(item[0],item[1]);
     }
     if(document.class) this.setClass(document.class);
+    if(document.settlement) this.setSettlement(document.settlement);
     if(!document.gold) document.gold = 0;
     this.commitSlots = document.commitSlots || this.getCommitSlotsShell();
     this.civicxp = document.civicxp || [0,100];

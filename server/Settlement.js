@@ -4,10 +4,13 @@
 
 var GameServer = require('./GameServer.js').GameServer;
 var Formulas = require('../shared/Formulas.js').Formulas;
+var World = require('../shared/World.js').World;
 
-function Settlement(id,name,pop){
+function Settlement(id,name,pop,level){
     this.id = id;
     this.name = name;
+    this.desc = GameServer.textData['settlement_'+this.id];
+    this.level = level;
     this.pop = pop;
     this.fort = null;
     this.buildings = [];
@@ -132,13 +135,25 @@ Settlement.prototype.trim = function(){
 // Trimming for the purpose of settlement selection
 Settlement.prototype.selectionTrim = function(){
     var trimmed = {};
-    var broadcastProperties = ['id','name','pop','surplus'];
+    var broadcastProperties = ['id','name','pop','surplus','desc','level'];
+    for(var p = 0; p < broadcastProperties.length; p++){
+        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
+    }
+    trimmed.x = (this.fort.x-30)/World.worldWidth; // quick fix
+    trimmed.y = (this.fort.y-10)/World.worldHeight;
+    trimmed.buildings = this.buildings.length;
+    return trimmed;
+};
+
+// Trimming for the purpose of fort map display
+Settlement.prototype.mapTrim = function(){
+    var trimmed = {};
+    var broadcastProperties = ['name'];
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
     trimmed.x = this.fort.x;
     trimmed.y = this.fort.y;
-    trimmed.buildings = this.buildings.length;
     return trimmed;
 };
 

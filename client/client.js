@@ -10,33 +10,45 @@ Client = {
 
 Client.socket = io.connect();
 
-// The following checks if the game is initialized or not, and based on this either queues the events or process them
-// The original socket.onevent function is copied to onevent. That way, onevent can be used to call the origianl function,
-// whereas socket.onevent can be modified for our purpose!
-var onevent = Client.socket.onevent;
-Client.socket.onevent = function (packet) {
-    if(!Engine.playerIsInitialized && packet.data[0] != Client.initEventName && packet.data[0] != 'dbError'){
-        Client.eventsQueue.push(packet);
-    }else{
-        onevent.call(this, packet);    // original call
-    }
-};
-
 Client.emptyQueue = function(){ // Process the events that have been queued during initialization
     for(var e = 0; e < Client.eventsQueue.length; e++){
         onevent.call(Client.socket,Client.eventsQueue[e]);
     }
 };
 
+Client.requestData = function(){ // request the data to be used for initWorld()
+    console.log('requesting data');
+    Client.socket.emit('init-world',Client.getInitRequest());
+
+    // The following checks if the game is initialized or not, and based on this either queues the events or process them
+    // The original socket.onevent function is copied to onevent. That way, onevent can be used to call the origianl function,
+    // whereas socket.onevent can be modified for our purpose!
+    var onevent = Client.socket.onevent;
+    Client.socket.onevent = function (packet) {
+        if(!Engine.playerIsInitialized && packet.data[0] != Client.initEventName && packet.data[0] != 'dbError'){
+            Client.eventsQueue.push(packet);
+        }else{
+            onevent.call(this, packet);    // original call
+        }
+    };
+};
+
 Client.getInitRequest = function(){ // Returns the data object to send to request the initialization data
     // In case of a new player, set new to true and send the name of the player
     // Else, set new to false and send it's id instead to fetch the corresponding data in the database
-    if(Client.isNewPlayer()) return {new:true,selectedClass: UI.selectedClass};
+    if(Client.isNewPlayer()) {
+        return {
+            new:true,
+            stamp:localStorage.getItem('idStamp'),
+            selectedClass: UI.selectedClass,
+            selectedSettlement: UI.selectedSettlement
+        };
+    }
     return {new:false,id:Client.getPlayerID()};
 };
 
 Client.checkForNewPlayer = function(){
-    Client.newPlayer = true;
+    Client.newPlayer = false;
     return;
     Client.newPlayer =  (Client.getPlayerID() === null);
 };
@@ -74,6 +86,10 @@ Client.socket.on('wait',function(){
     setTimeout(Client.requestData, 500); // Just try again in 500ms
 });
 
+Client.socket.on('settlement-data',function(data){
+    UI.displaySettlements(data);
+});
+
 Client.socket.on('update',function(data){ // This event triggers uppon receiving an update packet (data)
     //if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.finalUpdateSchema); // if in binary format, decode first
     //Client.socket.emit('ponq',data.stamp);  // send back a pong stamp to compute latency
@@ -96,12 +112,10 @@ Client.setLocalData = function(id){ // store the player ID in localStorage
     localStorage.setItem('idStamp',Date.now());
 };
 
-
 /// ##### SENDERS ######
 
-Client.requestData = function(){ // request the data to be used for initWorld()
-    console.log('requesting data');
-    Client.socket.emit('init-world',Client.getInitRequest());
+Client.requestSettlementData = function(){
+    Client.socket.emit('settlement-data');
 };
 
 Client.sendPath = function(path,action){

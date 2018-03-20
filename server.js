@@ -105,6 +105,7 @@ server.listen(process.env.PORT || 8081,function(){
 server.resetStamp = 1519130567967; // ignore returning players with stamps older than this and treat them as new
 
 io.on('connection',function(socket){
+    console.log('connect');
 
     socket.on('init-world',function(data){
         if(!gs.initialized){
@@ -114,6 +115,7 @@ io.on('connection',function(socket){
         console.log('['+socket.id+'] Initialized');
         if(!data.stamp || data.stamp < server.resetStamp) data.new = true; // TODO Remove eventually
 
+        console.log(data);
         if(data.new){
             gs.addNewPlayer(socket,data);
         }else{
@@ -156,6 +158,11 @@ io.on('connection',function(socket){
            if(socket.pings.length > 20) socket.pings.shift(); // keep the size down to 20
            socket.latency = server.quickMedian(socket.pings.slice(0)); // quickMedian used the quickselect algorithm to compute the median of a list of values
        });*/
+    });
+
+    socket.on('settlement-data',function(){
+        console.log('processing settlement data');
+        socket.emit('settlement-data',gs.listSettlements('selectionTrim'));
     });
 
     socket.on('disconnect',function(){
@@ -203,10 +210,10 @@ server.sendInitializationPacket = function(socket,packet){
     socket.emit('init',packet);
 };
 
-server.sendAdminUpdate = function(socketID,name,pkg){
+/*server.sendAdminUpdate = function(socketID,name,pkg){
     var socket = server.getSocket(socketID);
     if(pkg) io.in(socketID).emit(name,pkg);
-};
+};*/
 
 server.sendUpdate = function(socketID,pkg){
     var socket = server.getSocket(socketID);

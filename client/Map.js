@@ -20,13 +20,18 @@ var Map = new Phaser.Class({
         this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
         this.maskPicture = mask;
 
-        this.text = UI.scene.add.text(0, 0, 'New Beginning',{font: '60px treamd', fill: '#966f33', stroke: '#000000', strokeThickness: 3});
+        this.toponyms = [];
+        Engine.toponymsData.forEach(function(toponym){
+            this.addText(toponym);
+        },this);
+
+        /*this.text = UI.scene.add.text(0, 0, 'New Beginning',{font: '60px treamd', fill: '#966f33', stroke: '#000000', strokeThickness: 3});
         this.text.setDepth(3);
         this.text.setVisible(false);
         this.text.setScrollFactor(0,0);
         this.text.setAlpha(0.5);
         this.text.setOrigin(0.5);
-        this.text.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
+        this.text.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);*/
 
         this.setInteractive(new Phaser.Geom.Rectangle(0,0,this.width,this.height),Phaser.Geom.Rectangle.Contains);
         UI.scene.input.setDraggable(this);
@@ -41,6 +46,20 @@ var Map = new Phaser.Class({
 
         Engine.map = this;
 
+    },
+
+    addText: function(toponym){
+        var text = UI.scene.add.text(0, 0, toponym.name,{font: '60px treamd', fill: '#966f33', stroke: '#000000', strokeThickness: 3});
+        text.setDepth(3);
+        text.setVisible(false);
+        text.setScrollFactor(0,0);
+        text.setAlpha(0.5);
+        text.setOrigin(0.5);
+        var location = this.computeMapLocation(toponym.x,toponym.y);
+        text.setPosition(location.x,location.y);
+        console.log('adding at',location);
+        text.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,this.maskPicture);
+        this.toponyms.push(text);
     },
 
     handleDrag: function(pointer,x,y){
@@ -60,7 +79,7 @@ var Map = new Phaser.Class({
 
         //console.log(this.input.hitArea);
         if(tween){
-            var targets = this.pins.concat([this.text,this]);
+            var targets = this.pins.concat([this.text,this]).concat(this.toponyms);
             var duration = 300;
             UI.scene.tweens.add({
                     targets: targets,
@@ -103,12 +122,26 @@ var Map = new Phaser.Class({
         return this.pins[this.pinsCounter++];
     },
 
-    addPin: function(x,y,name,texture){
-        var pct = Utils.tileToPct(x,y);
+    computeMapLocation: function(tx,ty){
+        console.log(tx,ty);
+        var pct = Utils.tileToPct(tx,ty);
+        console.log(pct);
         var dx = (pct.x - this.originX)*this.width;
         var dy = (pct.y - this.originY)*this.height;
+        return {
+            x: this.x+dx,
+            y: this.y+dy
+        }
+    },
+
+    addPin: function(x,y,name,texture){
+        /*var pct = Utils.tileToPct(x,y);
+        var dx = (pct.x - this.originX)*this.width;
+        var dy = (pct.y - this.originY)*this.height;*/
+        var location = this.computeMapLocation(x,y);
         var pin = this.getNextPin();
-        pin.setUp(x,y,this.x+dx,this.y+dy,name,texture);
+        //pin.setUp(x,y,this.x+dx,this.y+dy,name,texture);
+        pin.setUp(x,y,location.x,location.y,name,texture);
         return pin;
     },
 
@@ -118,7 +151,6 @@ var Map = new Phaser.Class({
         // The map has to move in the opposite direction of the drag (w.r.t. center)
         /*this.x -= dx;
         this.y -= dy;*/
-        console.log('dragging',dx,dy);
         this.dragMap(dx,dy,true);
     },
 
@@ -134,8 +166,12 @@ var Map = new Phaser.Class({
         this.initialX = this.x;
         this.initialY = this.y;
 
-        this.text.setPosition(x,y);
-        this.text.setVisible(true);
+        console.log('text would be at ',x,y);
+        //this.text.setPosition(x,y);
+        //this.text.setVisible(true);
+        this.toponyms.forEach(function(t){
+            t.setVisible(true);
+        });
 
         var dragw = 400;
         var dragh = 400;
@@ -148,7 +184,10 @@ var Map = new Phaser.Class({
 
     hide: function(){
         this.hidePins();
-        this.text.setVisible(false);
+        //this.text.setVisible(false);
+        this.toponyms.forEach(function(t){
+            t.setVisible(false);
+        });
     },
 
     hidePins: function(){

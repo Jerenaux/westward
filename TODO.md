@@ -15,13 +15,15 @@ Week:
 -----
 *1 item/recipe a day*
 Bug: wrong click area of foundations
-Bug: still click issue after closing menus
 Fix huge food surplus
 Fix/check new building not being built?
 UI: info panel on first play (basic commands + what's not implemented yet)
 Design document
-Test second settlement (fort and respawn)
-World map-based settlement selection menu (mention key startegic aspects, display enemy civ threats)
+Test second settlement respawn
+Settlement selection: display enemy camps
+Settlement selection: display infoPanel
+Map: display actual settlement name, test drag
+Character: display actual respawn point 
 Battle: monsters trigger fights (move spawn zones)
 Economic loop: harvest herbs (scatter roots)
 Help: buttons in buildings
@@ -240,7 +242,7 @@ V1 level:
 
 Analytics:
 ---------
-- Use gameanalytics? http://phaser.io/tutorials/game-analytics
+- Implement custom analytics
 - Log as many things as possible: session duration, distance travelled per session, time spent in settlement per session, in nature per session,
 interactions with buildings, time spent in each individual menu, etc.
 - Cluster "heavy" players vs "small-time" players and look for differences between the two

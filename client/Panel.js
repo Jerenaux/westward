@@ -92,6 +92,7 @@ Panel.prototype.addText = function(x,y,text,color,size,font){
     var size = size || 14;
     var font = font || Utils.fonts.fancy;
     var t = UI.scene.add.text(this.x+x, this.y+y, text, { font: size+'px '+font, fill: color, stroke: '#000000', strokeThickness: 4 });
+    t.setWordWrapWidth(this.width-20,false);
     t.setDisplayOrigin(0,0);
     t.setScrollFactor(0);
     t.setDepth(1);

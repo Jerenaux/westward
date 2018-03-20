@@ -13,8 +13,8 @@ MapPanel.prototype.constructor = MapPanel;
 MapPanel.prototype.addInterface = function(){
     var mapx = this.x + this.width/2;
     var mapy = this.y + this.height/2;
-    this.bg = Engine.scene.add.sprite(mapx,mapy,'scrollbgh');
-    this.bg.setDepth(Engine.UIDepth+1);
+    this.bg = UI.scene.add.sprite(mapx,mapy,'scrollbgh');
+    this.bg.setDepth(1);
     this.bg.setScrollFactor(0);
     this.bg.setVisible(false);
 

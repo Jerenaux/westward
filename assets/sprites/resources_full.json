@@ -75,6 +75,10 @@
     {
       "filename": "rawgold",
       "frame": {"x":192,"y":504,"w":24,"h":24}
+    },
+    {
+      "filename": "stone",
+      "frame": {"x":336,"y":504,"w":24,"h":24}
     }
   ]
 }

@@ -180,5 +180,17 @@
     "frame":"rawgold",
     "name": "Gold ore",
     "desc": "Precious crafting material that can be mined and is ultimately used to mint coins."
+  },
+  "26":{
+    "atlas": "items2",
+    "frame":"stone",
+    "name": "Stone",
+    "desc": "Crafting material used to make primitive weapons."
+  },
+  "27":{
+    "atlas": "items",
+    "frame":"bone",
+    "name": "Bone",
+    "desc": "Crafting material obtained from dead animals used to make primitive weapons."
   }
 }

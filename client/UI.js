@@ -178,7 +178,7 @@ UI.leaveTitleScreen = function(){
             if(Client.isNewPlayer()){
                 UI.displayClassMenu();
             }else {
-                UI.launchGame();
+                UI.launchGame(true);
             }
         }
     });
@@ -190,7 +190,7 @@ UI.displayClassMenu = function(){
 
 UI.selectClass = function(name){
     UI.selectedClass = name;
-    var fadeDuration = 200;
+    var fadeDuration = 500;
     UI.camera.fade(fadeDuration);
     setTimeout(function(){
         UI.classMenu.hide();
@@ -217,46 +217,71 @@ UI.displaySettlementSelectionMenu =  function(){
     map.y += 150;
     map.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,scroll);
 
-    var icon1 = UI.scene.add.image(430,400,'setlicon');
-    var icon2 = UI.scene.add.image(840,100,'setlicon');
-    icon1.setInteractive();
-    icon2.setInteractive();
+    var w = 300;
+    var h = 100;
+    var panel = new InfoPanel(UI.getGameWidth()-w,UI.getGameHeight()-h,w,h,'Choose a settlement');
+    var txt = panel.addText(10,15,'Click on one of the blinking icons for more information about the corresponding settlement.');
+    panel.display();
+
+    UI.SSmap = map;
+    UI.SSpanel = panel;
+    UI.SScontent = content;
+    Client.requestSettlementData();
+};
+
+UI.displaySettlements = function(list){
+    list.forEach(function(e){
+        UI.displaySettlement(e);
+    });
+};
+
+UI.displaySettlement = function(data){
+    console.log(data.x,data.y);
+    var x = data.x*UI.SSmap.width;
+    var y = data.y*UI.SSmap.height;
+    var icon = UI.scene.add.image(x,y,'setlicon');
+    icon.setInteractive();
+    UI.SScontent.push(icon);
 
     UI.scene.tweens.add({
-        targets: [icon1,icon2],
+        targets: icon,
         alpha: 0.2,
         duration: 750,
         yoyo: true,
+        delay: 1000,
         loopDelay: 1000,
         loop: -1
     });
 
-    var w = 300;
-    var h = 100;
-    var panel = new Panel(UI.getGameWidth()-w,UI.getGameHeight()-h,w,h,'Choose a settlement');
-    var txt = panel.addText(10,15,'Click on one of the blinking icons for more information about the corresponding settlement.');
-    txt.setWordWrapWidth(w-15,true);
-    panel.display();
-    panel.displayTexts();
-
     var w = 350;
     var h = 300;
-    var nb = new Panel(UI.getGameWidth()-w,UI.getGameHeight()-h,w,h,'New Beginning');
-    var txt = nb.addText(10,15,'New Beginning was the first settlement.');
-    txt.setWordWrapWidth(w-15,true);
+    var panel = new SettlementPanel(UI.getGameWidth()-w,UI.getGameHeight()-h,w,h,data.name);
+    //var txt = panel.addText(10,15,'New Beginning was the first settlement.');
+    panel.setUp(data);
 
-    icon1.on('pointerdown',function(){
-        panel.hide();
-        panel.hideTexts();
-        nb.display();
-        nb.displayTexts();
+    icon.on('pointerdown',function(){
+        UI.SSpanel.hide();
+        panel.display();
+        UI.SSpanel = panel;
     });
-
 };
 
-UI.launchGame = function(){
+UI.selectSettlement = function(id){
+    UI.selectedSettlement = id;
     var fadeDuration = 500;
     UI.camera.fade(fadeDuration);
+    setTimeout(function(){
+        UI.SScontent.forEach(function(c){
+            c.setVisible(false);
+        });
+        UI.SSpanel.hide();
+        UI.launchGame(false);
+    },fadeDuration);
+};
+
+UI.launchGame = function(fade){
+    var fadeDuration = (fade ? 500: 0);
+    if(fade) UI.camera.fade(fadeDuration);
     setTimeout(function(){
         UI.scene.scene.shutdown('boot');
         UI.scene.scene.launch('main');
