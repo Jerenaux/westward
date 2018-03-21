@@ -103,6 +103,16 @@ GameServer.readMap = function(mapsPath){
     GameServer.settlements = {};
     GameServer.settlements[0] = new Settlement(0,'New Beginning',12,1);
     GameServer.settlements[1] = new Settlement(1,'Hope',2,3);
+    GameServer.settlements[0].danger = [
+        [453,717],
+        [428,703],
+        [469,593]
+        ];
+    GameServer.settlements[1].danger = [
+        [453,717],
+        [428,703],
+        [469,593]
+    ];
 
     // Read buildings
     GameServer.requiredTicks++;
@@ -182,7 +192,7 @@ GameServer.checkPlayerID = function(id){ // check if no other player is using sa
 GameServer.addNewPlayer = function(socket,data){
     //if(!data.selectedClass) return;
     if(!data.selectedClass) data.selectedClass = 'merchant';
-    if(!data.selectedSettlement) data.selectedSettlement = 0;
+    if(data.selectedSettlement == undefined) data.selectedSettlement = 1;
     console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
     player.setStartingInventory();
@@ -733,11 +743,6 @@ GameServer.listSettlements = function(trimCallback){
 };
 
 GameServer.getSettlements = function(){
-    /*var list = [];
-    for(var id in GameServer.settlements){
-        list.push(GameServer.settlements[id].trim());
-    }
-    return list;*/
     return GameServer.listSettlements();
 };
 

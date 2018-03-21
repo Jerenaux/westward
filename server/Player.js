@@ -92,8 +92,13 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(20,5); // arrows
     this.giveItem(19,1); // quiver
     this.giveItem(2,1); // bow
-    this.giveItem(11,2); // sword
+    //this.giveItem(11,2); // sword
     this.giveItem(6,1); // potion
+
+    this.giveItem(8,5); // thick grass
+    this.giveItem(7,1); // wood
+    this.giveItem(26,1); // wood
+
     this.giveGold(500);
 };
 

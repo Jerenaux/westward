@@ -39,6 +39,10 @@
     {
       "filename":"bone",
       "frame": {"x":384,"y":32,"w":32,"h":32}
+    },
+    {
+      "filename":"basic_axe",
+      "frame": {"x":32,"y":224,"w":32,"h":32}
     }
   ]
 }

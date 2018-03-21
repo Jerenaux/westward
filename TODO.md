@@ -15,13 +15,15 @@ Week:
 -----
 *1 item/recipe a day*
 Bug: wrong click area of foundations
+Bug: weird notifs behavior when crafting hatchet
+Map: add danger to hope's map
 Fix huge food surplus
 Fix/check new building not being built?
 UI: info panel on first play (basic commands + what's not implemented yet)
 Design document
 Test second settlement respawn
 Settlement selection: display enemy camps
-Settlement selection: display infoPanel
+Settlement selection: display infoPanel (say that it's possible to rech other settlement, etc.)
 Map: display actual settlement name, test drag
 Character: display actual respawn point 
 Battle: monsters trigger fights (move spawn zones)
@@ -79,6 +81,7 @@ Add checkboxes for what should be boiled or grinded
 Cleaning:
 --------
 Performance:
+- Avoid duplicate pins in maps, danger pins etc.
 - Fix "already existing/non-existing" bugs
 - Use Phaser tilemaps?
 - Animals keep their target
@@ -96,6 +99,7 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Put settlement stuff in database
 - Clean scene transition code
 - Move UI stuff from Engine to UI
 - Settlements: after compute food surplus, one central method to broadcast it to buildings and players, using one
@@ -133,6 +137,7 @@ Bug: bubble at wrong location after respawn
 - Animals have sorted list of targets, iteratr through it when first one not reachable for some reason
 -> Deal with big battlefields; focus camera on active player (problem: if far away, surrounding AOIs not displayed), ...
 - Animal can trigger fights
+- Get arrows back when skinning
 * Ecosystem
 - Listing and distribution of pick-up resources
 - Listing and distribution (and yield) of building resources

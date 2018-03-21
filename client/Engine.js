@@ -67,7 +67,7 @@ Engine.preload = function() {
     this.load.image('tail', 'assets/sprites/tail.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll_horiz.png');
     this.load.image('radial3', 'assets/sprites/radial3.png');
-    this.load.image('fullmap', 'assets/sprites/fullmap_005_tr.png');
+    this.load.image('fullmap', 'assets/sprites/fortmap.png');
     // pin: https://www.iconfinder.com/icons/173052/map_marker_icon
     this.load.image('skull', 'assets/sprites/skull.png');
     this.load.image('pin', 'assets/sprites/pin.png');
@@ -865,7 +865,7 @@ Engine.addHero = function(data){
     //Engine.player.buildingRecipes = new Inventory(9);
     //Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
     Engine.player.itemRecipes = new Inventory(10);
-    Engine.player.itemRecipes.fromList([[6,1],[21,1],[2,1]]);
+    Engine.player.itemRecipes.fromList([[6,1],[21,1],[2,1],[28,1]]);
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = Equipment.getSkeleton();
     Engine.player.commitSlots = data.commitSlots;

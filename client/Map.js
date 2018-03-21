@@ -25,46 +25,40 @@ var Map = new Phaser.Class({
             this.addText(toponym);
         },this);
 
-        /*this.text = UI.scene.add.text(0, 0, 'New Beginning',{font: '60px treamd', fill: '#966f33', stroke: '#000000', strokeThickness: 3});
-        this.text.setDepth(3);
-        this.text.setVisible(false);
-        this.text.setScrollFactor(0,0);
-        this.text.setAlpha(0.5);
-        this.text.setOrigin(0.5);
-        this.text.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);*/
-
         this.setInteractive(new Phaser.Geom.Rectangle(0,0,this.width,this.height),Phaser.Geom.Rectangle.Contains);
         UI.scene.input.setDraggable(this);
         this.draggedX = 0;
         this.draggedY = 0;
 
         this.on('drag',this.handleDrag.bind(this));
+        this.on('pointerup',this.handleClick.bind(this));
 
         this.pins = [];
         this.resetCounter();
         this.clickedTile = null;
 
         Engine.map = this;
-
     },
 
     addText: function(toponym){
         var text = UI.scene.add.text(0, 0, toponym.name,{font: '60px treamd', fill: '#966f33', stroke: '#000000', strokeThickness: 3});
+        text.tx = toponym.x;
+        text.ty = toponym.y;
         text.setDepth(3);
         text.setVisible(false);
         text.setScrollFactor(0,0);
         text.setAlpha(0.5);
         text.setOrigin(0.5);
-        var location = this.computeMapLocation(toponym.x,toponym.y);
-        text.setPosition(location.x,location.y);
-        console.log('adding at',location);
         text.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,this.maskPicture);
         this.toponyms.push(text);
     },
 
     handleDrag: function(pointer,x,y){
-        if(Math.abs(x-this.initialX) > 500) return;
-        if(Math.abs(y-this.initialY) > 500) return;
+        // TODO: check for Phaser way of restricting distance
+        if(x < this.minX) return;
+        if(x > this.maxX) return;
+        if(y < this.minY) return;
+        if(y > this.maxY) return;
         var dx = this.x - x;
         var dy = this.y - y;
         this.x = x;
@@ -77,7 +71,6 @@ var Map = new Phaser.Class({
         this.draggedX += dx;
         this.draggedY += dy;
 
-        //console.log(this.input.hitArea);
         if(tween){
             var targets = this.pins.concat([this.text,this]).concat(this.toponyms);
             var duration = 300;
@@ -96,8 +89,7 @@ var Map = new Phaser.Class({
         }else {
             this.input.hitArea.x += dx;
             this.input.hitArea.y += dy;
-            this.text.x -= dx;
-            this.text.y -= dy;
+            this.moveTexts(dx,dy);
             this.movePins(dx, dy);
         }
     },
@@ -109,9 +101,15 @@ var Map = new Phaser.Class({
         });
     },
 
+    moveTexts: function(dx,dy){
+        this.toponyms.forEach(function(p){
+            p.x -= dx;
+            p.y -= dy;
+        });
+    },
+
     handleClick: function(pointer){
         if(pointer.downX != pointer.upX || pointer.downY != pointer.upY) return; // drag
-        //this.addRedPin(pointer.x,pointer.y);
         console.log(Utils.screenToMap(pointer.x,pointer.y,this));
     },
 
@@ -123,24 +121,18 @@ var Map = new Phaser.Class({
     },
 
     computeMapLocation: function(tx,ty){
-        console.log(tx,ty);
         var pct = Utils.tileToPct(tx,ty);
-        console.log(pct);
         var dx = (pct.x - this.originX)*this.width;
         var dy = (pct.y - this.originY)*this.height;
         return {
-            x: this.x+dx,
-            y: this.y+dy
+            x: Math.round(this.x+dx),
+            y: Math.round(this.y+dy)
         }
     },
 
     addPin: function(x,y,name,texture){
-        /*var pct = Utils.tileToPct(x,y);
-        var dx = (pct.x - this.originX)*this.width;
-        var dy = (pct.y - this.originY)*this.height;*/
         var location = this.computeMapLocation(x,y);
         var pin = this.getNextPin();
-        //pin.setUp(x,y,this.x+dx,this.y+dy,name,texture);
         pin.setUp(x,y,location.x,location.y,name,texture);
         return pin;
     },
@@ -149,8 +141,6 @@ var Map = new Phaser.Class({
         var dx = x - (this.x + this.draggedX);
         var dy = y - (this.y + this.draggedY);
         // The map has to move in the opposite direction of the drag (w.r.t. center)
-        /*this.x -= dx;
-        this.y -= dy;*/
         this.dragMap(dx,dy,true);
     },
 
@@ -163,15 +153,24 @@ var Map = new Phaser.Class({
         var origin = Utils.tileToPct(tile.x,tile.y);
         this.setOrigin(origin.x,origin.y);
         this.setPosition(x,y);
-        this.initialX = this.x;
-        this.initialY = this.y;
 
-        console.log('text would be at ',x,y);
-        //this.text.setPosition(x,y);
-        //this.text.setVisible(true);
+        this.minY = this.y - (this.height-this.displayOriginY) + this.mask.bitmapMask.height/2;
+        // Max position the map can move down to; = initial Y + distance to upper border - half the mask height
+        this.maxY = this.y + this.displayOriginY - this.mask.bitmapMask.height/2;
+        this.minX = this.x - (this.width-this.displayOriginX) + this.mask.bitmapMask.width/2;
+        this.maxX = this.x + this.displayOriginX - this.mask.bitmapMask.width/2;
+
+        // TODO: store the 500 in config somewhere
+        this.minX = Math.max(this.minX,this.x-500);
+        this.maxX = Math.min(this.maxX,this.x+500);
+        this.minY = Math.max(this.minY,this.y-500);
+        this.maxY = Math.min(this.maxY,this.y+500);
+
         this.toponyms.forEach(function(t){
+            var location = this.computeMapLocation(t.tx,t.ty);
+            t.setPosition(location.x,location.y);
             t.setVisible(true);
-        });
+        },this);
 
         var dragw = 400;
         var dragh = 400;

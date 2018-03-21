@@ -79,7 +79,7 @@
     "frame":"pirate-sword",
     "name": "Sword",
     "equipment": "meleew",
-    "effects":{"mdmg":15},
+    "effects":{"mdmg":20},
     "useInBattle": true,
     "desc": "An adventurer's best friend."
   },
@@ -192,5 +192,15 @@
     "frame":"bone",
     "name": "Bone",
     "desc": "Crafting material obtained from dead animals used to make primitive weapons."
+  },
+  "28":{
+    "atlas": "items",
+    "frame":"basic_axe",
+    "name": "Stone hatchet",
+    "desc": "Basic weapon of fortune that can be crafted from wood and stone.",
+    "recipe":{"7":1,"21":1,"26":1},
+    "equipment": "meleew",
+    "effects":{"mdmg":5},
+    "useInBattle": true
   }
 }

@@ -49,11 +49,12 @@ Settlement.prototype.getBuildings = function(){
 Settlement.prototype.registerFort = function(fort){
     this.fort = fort;
     this.fort.setProperty('population',this.pop);
-    this.fort.setProperty('danger',[
+    /*this.fort.setProperty('danger',[
         [453,717],
         [428,703],
         [469,593]
-    ]);
+    ]);*/
+    this.fort.setProperty('danger',this.danger);
     this.respawnLocation = {
         x: GameServer.buildingsData[0].entry.x + this.fort.x,
         y: GameServer.buildingsData[0].entry.y + this.fort.y
