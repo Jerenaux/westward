@@ -39,6 +39,7 @@ var UI = {
 
         UI.tooltip = new Tooltip();
         UI.camera = UI.scene.cameras.main;
+        UI.notifications = [];
         UI.textsData = this.cache.json.get('texts');
 
         this.input.setTopOnly(false);
@@ -79,12 +80,18 @@ var UI = {
         var notif = new Bubble(0,0,true); // TODO: use pool
         notif.update(msg);
         var x = (UI.getGameWidth()-notif.getWidth())/2 - notif.getOrigin();
-        var y = UI.getGameHeight() + (notif.getHeight()+3)*i;
+        var deltay = 10;
+        UI.notifications.forEach(function(n){
+            deltay += n.getHeight()+10;
+        });
+        var y = UI.getGameHeight() + deltay;
         notif.updatePosition(x,y);
+        notif.setDuration(nb);
 
+        var endy = y - 2*deltay - 30 - 5;
         var tween = UI.scene.tweens.addCounter({
             from: y,
-            to: y-(40*nb), // TODO: compute dest based on previous msg dest + current msg height
+            to: endy,
             duration: 300,
             paused: true,
             ease: 'Quad.easeOut',
@@ -100,40 +107,7 @@ var UI = {
         setTimeout(function(){
             tween.play();
         },delay);
-    },
-
-
-    makeClassMenu: function() {
-        var title = new UIHolder(512,10,'center');
-        title.setText(UI.textsData['class_selection_title']);
-
-        var menu = new Menu();
-        var desch = 60;
-        var classw = 400;
-        var classh = 195;
-        var padding = 20;
-        var tlx = 1024 / 2 - classw - padding;
-        var y = 80;
-        var x = tlx;
-        menu.addPanel('title',title);
-        var infow = (2*classw)+padding;
-        var info = menu.addPanel('info',new InfoPanel(x, y, infow, desch));
-        var text = info.addText(10,10,UI.textsData['class_selection'],Utils.colors.white,14,Utils.fonts.normal);
-        y += desch + padding;
-        this.makeClassPanel(menu,'soldier',x,y,classw,classh);
-        x += classw+padding;
-        this.makeClassPanel(menu,'craftsman',x,y,classw,classh);
-        x = tlx;
-        y += classh+padding;
-        this.makeClassPanel(menu,'merchant',x,y,classw,classh);
-        x += classw+padding;
-        this.makeClassPanel(menu,'explorer',x,y,classw,classh);
-        return menu;
-    },
-
-    makeClassPanel: function(menu,className,x,y,classw,classh){
-        var panel = menu.addPanel(className,new ClassPanel(x, y, classw, classh, UI.textsData['class_'+className]));
-        panel.setClass(className);
+        UI.notifications.push(notif);
     },
 
     makeBattleTutorialPanel: function(){
@@ -144,28 +118,40 @@ var UI = {
         panel.addText(UI.textsData['battle_help']);
         panel.addBigButton('Got it');
         return panel;
-    },
-
-    sceneTransition: function(from,to){
-        var fadeDuration = 500;
-        if(from == 'title'){
-            fadeDuration = 200;
-        }else if(from == 'class'){
-            UI.classMenu.hide();
-        }
-
-        var camera = UI.scene.cameras.main;
-        camera.fade(fadeDuration);
-        setTimeout(function(){
-            if(to == 'map'){
-                UI.scene.cameras.main._fadeAlpha = 0;
-                UI.makeSettlementSelectionMenu();
-            }else if(to == 'game') {
-                UI.scene.scene.shutdown('boot');
-                UI.scene.scene.launch('main');
-            }
-        },fadeDuration);
     }
+};
+
+UI.makeClassMenu = function() {
+    var title = new UIHolder(512,10,'center');
+    title.setText(UI.textsData['class_selection_title']);
+
+    var menu = new Menu();
+    var desch = 60;
+    var classw = 400;
+    var classh = 195;
+    var padding = 20;
+    var tlx = 1024 / 2 - classw - padding;
+    var y = 80;
+    var x = tlx;
+    menu.addPanel('title',title);
+    var infow = (2*classw)+padding;
+    var info = menu.addPanel('info',new InfoPanel(x, y, infow, desch));
+    var text = info.addText(10,10,UI.textsData['class_selection'],Utils.colors.white,14,Utils.fonts.normal);
+    y += desch + padding;
+    this.makeClassPanel(menu,'soldier',x,y,classw,classh);
+    x += classw+padding;
+    this.makeClassPanel(menu,'craftsman',x,y,classw,classh);
+    x = tlx;
+    y += classh+padding;
+    this.makeClassPanel(menu,'merchant',x,y,classw,classh);
+    x += classw+padding;
+    this.makeClassPanel(menu,'explorer',x,y,classw,classh);
+    return menu;
+};
+
+UI.makeClassPanel = function(menu,className,x,y,classw,classh){
+    var panel = menu.addPanel(className,new ClassPanel(x, y, classw, classh, UI.textsData['class_'+className]));
+    panel.setClass(className);
 };
 
 UI.leaveTitleScreen = function(){

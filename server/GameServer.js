@@ -52,13 +52,35 @@ GameServer.updateStatus = function(name){
 
 GameServer.createModels = function(){
     var buildingSchema = mongoose.Schema({
-        x: {type: Number, min: 0},
-        y: {type: Number, min: 0},
+        x: {type: Number, min: 0, required: true},
+        y: {type: Number, min: 0, required: true},
+        type: {type: Number, min: 0, required: true},
+        sid: {type: Number, min: 0, required: true},
+        // TODO: play with setter/getter (look-up before)
+        inventory: [[]], // list format of inventory
+        prices: mongoose.Schema.Types.Mixed,
+        gold: {type: Number, min: 0},
+        built: Boolean,
+        progress: {type: Number, min: 0, max: 100},
+        productivity: {type: Number, min: 0},
+        committed: {type: Number, min: 0},
+        lastBuildCycle: { type: Date, default: Date.now },
+        lastProdCycle: { type: Date, default: Date.now }
+    });
+    var playerSchema = mongoose.Schema({
+        x: {type: Number, min: 0, required: true},
+        y: {type: Number, min: 0, required: true},
+        gold: {type: Number, min: 0},
+        civicxp: {type: Number, min: 0}, // do not store
+        class: {type: Number, min: 0},
+        equipment: mongoose.Schema.Types.Mixed,
+        // stats are NOT saved, as they only consist in base values + modifiers; modifiers are re-applied contextually, not saved
+
         type: {type: Number, min: 0},
         sid: {type: Number, min: 0},
         items: [[]], // list format of inventory
         prices: mongoose.Schema.Types.Mixed,
-        gold: {type: Number, min: 0},
+
         built: Boolean,
         progress: {type: Number, min: 0, max: 100},
         productivity: {type: Number, min: 0},
@@ -109,9 +131,8 @@ GameServer.readMap = function(mapsPath){
         [469,593]
         ];
     GameServer.settlements[1].danger = [
-        [453,717],
-        [428,703],
-        [469,593]
+        [1005,41],
+        [940,224]
     ];
 
     // Read buildings
@@ -452,7 +473,6 @@ GameServer.handleShop = function(data,socketID) {
     if(action == 'buy'){
         if(!building.canSell(item,nb)) return;
         var price = building.getPrice(item,nb,'buy');
-        console.log(price);
         if(!player.canBuy(price)) return;
         player.takeGold(price,true);
         player.giveItem(item,nb,true);
@@ -774,5 +794,8 @@ GameServer.deleteBuilding = function(data){
 };
 
 GameServer.setBuildingItem = function(data){
-
+    console.log(data);
+    var building = GameServer.buildings[data.building];
+    building.setItem(data.item,data.nb);
+    return true;
 };

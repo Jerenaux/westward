@@ -19,8 +19,8 @@ function Building(data){
     this.sid = data.sid;
     this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(100); // Inventory object
-    this.items = data.items;  // items list used when saving/loading to/from db
-    if(this.items) this.inventory.fromList(this.items);
+    //this.items = data.items;  // items list used when saving/loading to/from db || NOPE: used as well to send updates to client
+    if(data.inventory) this.inventory.fromList(data.inventory);
     this.prices = data.prices || {};
     this.gold = data.gold || 0;
     this.built = !!data.built;
@@ -164,6 +164,10 @@ Building.prototype.takeItem = function(item,nb){
     this.setProperty('items',this.inventory.toList());
 };
 
+Building.prototype.setItem = function(item,nb){
+    this.inventory.update(item,nb);
+};
+
 Building.prototype.getGold = function(){
     return this.gold;
 };
@@ -198,18 +202,6 @@ Building.prototype.trim = function(){
 };
 
 Building.prototype.dbTrim = function(){
-    /*var building = {};
-    var broadcastProperties =
-        ['type','sid','gold','built','productivity','prices','progress','committed']; // list of properties relevant for the client
-    for(var p = 0; p < broadcastProperties.length; p++){
-        building[broadcastProperties[p]] = this[broadcastProperties[p]];
-    }
-    building.x = parseInt(this.x);
-    building.y = parseInt(this.y);
-    // todo: prices
-    //if(this.inventory.size > 0) trimmed.inventory = this.inventory.toList();
-    building.inventory = this.inventory.toList();
-    return building;*/
     this.items = this.inventory.toList();
     return this;
 };

@@ -615,6 +615,7 @@ Engine.makeProductionMenu = function(){
     var prodx = (Engine.getGameConfig().width-prodw)/2;
 
     var productionPanel = new ProductionPanel(x,100,w,h,'Production');
+    productionPanel.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['prod_help']);
     production.addPanel('production',productionPanel);
     var productivity = new ProductivityPanel(prodx,prody,prodw,prodh,'Productivity modifiers');
     productivity.addButton(prodw-30, 8, 'blue','help',null,'',UI.textsData['productivity_help']);

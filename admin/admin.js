@@ -93,9 +93,9 @@ app.controller("mainCtrl", [
             var data = $scope.inventoryForms[id];
             data.building = id;
             console.log(data);
-            /*$http.post("/admin/setitem/", data).then(function(res) {
+            $http.post("/admin/setitem/", data).then(function(res) {
                 if(res.status == 201) setTimeout(getListings,200);
-            },function(err){});*/
+            },function(err){});
         };
 
         setInterval(getListings,60*1000);

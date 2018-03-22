@@ -7,6 +7,7 @@ function Bubble(x,y,isNotification){
     this.x = x;
     this.y = y;
     this.isNotificiation = isNotification || false;
+    this.duration = this.isNotificiation ? Engine.notificationDuration : 5000;
     this.makeBubble(x,y);
     this.finalize();
 }
@@ -71,8 +72,6 @@ Bubble.prototype.finalize = function(){
         var e = this.container[i];
         var isText = (e.constructor.name == 'Text');
         e.setDepth(10);
-        //e.depth = Engine.bubbleDepth;
-        //if(this.isNotificiation) e.depth += 20;
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
         if(this.isNotificiation) e.setScrollFactor(0);
@@ -131,16 +130,20 @@ Bubble.prototype.getCenter = function(){
     return this.container[1].x+(this.container[1].width/2);
 };
 
+Bubble.prototype.setDuration = function(nb){
+    this.duration *= Math.ceil(nb/2);
+};
+
 Bubble.prototype.display = function(){
     this.container.forEach(function(e){
         e.setVisible(true);
     });
     if(this.timer) clearTimeout(this.timer);
     var _bubble = this;
-    var duration = this.isNotificiation ? Engine.notificationDuration : 5000;
     this.timer = setTimeout(function(){
             _bubble.hide();
-    },duration);
+            if(_bubble.isNotificiation) UI.notifications.shift();
+    },this.duration);
 };
 
 Bubble.prototype.hide = function(){

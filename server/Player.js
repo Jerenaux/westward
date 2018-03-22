@@ -449,10 +449,11 @@ Player.prototype.getDataFromDb = function(document){
     for(var p = 0; p < dbProperties.length; p++){
         this[dbProperties[p]] = document[dbProperties[p]];
     }
-    for(var stat in Stats.dict) {
+    // stats are not saved, see schema
+    /*for(var stat in Stats.dict) {
         if (!Stats.dict.hasOwnProperty(stat)) continue;
         if(document['stats'][stat] >= 0) this.setStat(stat,document['stats'][stat]);
-    }
+    }*/
     for(var equip in Equipment.dict) {
         if (!Equipment.dict.hasOwnProperty(equip)) continue;
         var eq = Equipment.dict[equip];

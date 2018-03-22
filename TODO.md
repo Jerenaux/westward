@@ -14,9 +14,9 @@ Prototype level:
 Week:
 -----
 *1 item/recipe a day*
+UI: change cursor in Boot
+Map: use Phaser API to restrict scrolling
 Bug: wrong click area of foundations
-Bug: weird notifs behavior when crafting hatchet
-Map: add danger to hope's map
 Fix huge food surplus
 Fix/check new building not being built?
 UI: info panel on first play (basic commands + what's not implemented yet)
@@ -24,11 +24,11 @@ Design document
 Test second settlement respawn
 Settlement selection: display enemy camps
 Settlement selection: display infoPanel (say that it's possible to rech other settlement, etc.)
-Map: display actual settlement name, test drag
 Character: display actual respawn point 
 Battle: monsters trigger fights (move spawn zones)
 Economic loop: harvest herbs (scatter roots)
 Help: buttons in buildings
+Help: buttons in battle menu
 Quick-craft recipes: arrow, hatchet
 
 Finish:

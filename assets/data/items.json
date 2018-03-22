@@ -202,5 +202,14 @@
     "equipment": "meleew",
     "effects":{"mdmg":5},
     "useInBattle": true
+  },
+  "29":{
+    "atlas": "items",
+    "frame":"bone_arrow",
+    "name": "Bone arrow",
+    "equipment": "arrows",
+    "effects":{"rdmg":6},
+    "ammo": "quiver",
+    "useInBattle": true
   }
 }
