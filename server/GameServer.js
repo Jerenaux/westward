@@ -57,7 +57,9 @@ GameServer.createModels = function(){
         type: {type: Number, min: 0, required: true},
         sid: {type: Number, min: 0, required: true},
         // TODO: play with setter/getter (look-up before)
-        items: [[]], // list format of inventory
+        inventory: {type: [[]], set:function(inventory){
+                return inventory.toList(true); // true: filter zeroes
+            }},
         prices: mongoose.Schema.Types.Mixed,
         gold: {type: Number, min: 0},
         built: Boolean,
@@ -821,5 +823,7 @@ GameServer.setBuildingItem = function(data){
     console.log(data);
     var building = GameServer.buildings[data.building];
     building.setItem(data.item,data.nb);
+    building.save();
     return true;
 };
+

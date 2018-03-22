@@ -18,6 +18,8 @@ UI: change cursor in Boot
 Map: use Phaser API to restrict scrolling
 Bug: wrong click area of foundations
 Bug: fixed ghost updated
+Bug: moving down right after connect doesn't play anim
+Battle: check if menu closed when dragged into battle
 Fix/check new building not being built?
 UI: info panel on first play (basic commands + what's not implemented yet)
 Design document
@@ -25,7 +27,6 @@ Test second settlement respawn
 Settlement selection: display enemy camps
 Settlement selection: display infoPanel (say that it's possible to rech other settlement, etc.)
 Character: display actual respawn point 
-Battle: monsters trigger fights (move spawn zones)
 Economic loop: harvest herbs (scatter roots)
 Help: buttons in buildings
 Quick-craft recipes: arrow, hatchet

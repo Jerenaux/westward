@@ -7,29 +7,29 @@ var Formulas = require('../shared/Formulas.js').Formulas;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
-//var clone = require('clone');
 
 function Building(data){
     this.id = GameServer.lastBuildingID++;
+    this.isBuilding = true;
+
     this.x = data.x;
     this.y = data.y;
-    this.isBuilding = true;
     this.type = data.type;
     this.name = GameServer.buildingsData[this.type].name;
     this.sid = data.sid;
     this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(100); // Inventory object
-    if(data.items) this.inventory.fromList(data.items);
-    //if(data.inventory) this.inventory.fromList(data.inventory);
-    //this.items = data.items;  // items list used when saving/loading to/from db || NOPE: used as well to send updates to client
+    if(data.inventory) this.inventory.fromList(data.inventory);
     this.prices = data.prices || {};
     this.gold = data.gold || 0;
     this.built = !!data.built;
     this.progress = data.progress || 0;
     this.productivity = data.productivity || 100;
-    this.committed = 20;
-    this.lastBuildCycle = Date.now(); //data.lastBuildCycle || Date.now();
-    this.lastProdCycle = Date.now(); // data.lastProdCycle || Date.now();
+    this.committed = data.committed || 0;
+
+    this.lastBuildCycle = data.lastBuildCycle || Date.now();
+    this.lastProdCycle = data.lastProdCycle || Date.now();
+
     this.setOrUpdateAOI();
     this.addCollisions();
     this.registerBuilding();
@@ -37,6 +37,11 @@ function Building(data){
 
 Building.prototype = Object.create(GameObject.prototype);
 Building.prototype.constructor = Building;
+
+Building.prototype.resetCounters = function(){
+    this.lastBuildCycle = Date.now();
+    this.lastProdCycle = Date.now();
+};
 
 Building.prototype.registerBuilding = function(){
     this.settlement.registerBuilding(this);
@@ -84,6 +89,7 @@ Building.prototype.update = function(){
             }
         }
     }
+    this.save();
 };
 
 Building.prototype.updateProd = function(){
@@ -102,7 +108,10 @@ Building.prototype.updateBuild = function(){
     var increment = Formulas.computeBuildIncrement(this.productivity,rate/100);
     var newprogress = Utils.clamp(this.progress+increment,this.progress,1);
     this.setProperty('progress',newprogress);
-    if(this.progress == 1) this.setProperty('built',true);
+    if(this.progress == 1){
+        this.setProperty('built',true);
+        this.resetCounters();
+    }
 };
 
 Building.prototype.addBuilding = function(building){
@@ -187,6 +196,20 @@ Building.prototype.remove = function(){
     this.settlement.removeBuilding(this);
 };
 
+// Save changes to DB
+// TODO: move up to GameObject
+Building.prototype.save = function(){
+    var _building = this;
+    GameServer.BuildingModel.findById(this.model._id, function (err, doc) {
+        if (err) throw err;
+
+        doc.set(_building);
+        doc.save(function (err) {
+            if (err) throw err;
+        });
+    });
+};
+
 // Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){
     var trimmed = {};
@@ -200,11 +223,6 @@ Building.prototype.trim = function(){
     trimmed.y = parseInt(this.y);
     if(this.inventory.size > 0) trimmed.inventory = this.inventory.toList();
     return trimmed;
-};
-
-Building.prototype.dbTrim = function(){
-    this.items = this.inventory.toList();
-    return this;
 };
 
 // Returns an object containing only the fields relevant to list buildings

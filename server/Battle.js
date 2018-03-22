@@ -239,7 +239,7 @@ Battle.prototype.applyDamage = function(f,dmg){
 
 Battle.prototype.processAttack = function(a,b){
     var delay = 500;
-    if(b.dead) return;
+    if(!b || b.isDead()) return;
     if(this.nextTo(a,b)){
         var dmg = this.computeDamage('melee',a,b);
         this.applyDamage(b,dmg);

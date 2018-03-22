@@ -16,6 +16,10 @@ app.controller("mainCtrl", [
         var dataCategories = ['buildings','items'];
         $scope.data = {};
 
+        /*
+        * Workflow: getJSON, then getListings, then generate forms
+        * */
+
         getJSON = function(category){
             $http.get("/assets/data/"+category+".json").then(function(res) {
                 if(res.status == 200){
@@ -24,7 +28,7 @@ app.controller("mainCtrl", [
                     for(var key in res.data){
                         if(!res.data.hasOwnProperty(key)) continue;
                         var entry = res.data[key];
-                        entry.key = key;
+                        entry.id = key;
                         $scope.data[category+'List'].push(entry);
                     }
                     $scope.data[category] = Data[category+'Data'];

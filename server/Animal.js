@@ -221,7 +221,7 @@ Animal.prototype.computeBattleDestination = function(target){
 
 Animal.prototype.shouldAttack = function(target){
     if(!target.isPlayer) return false;
-    return Utils.euclidean(this,target) < 5;
+    return Utils.euclidean(this,target) < 10;
 };
 
 Animal.prototype.remove = function(){

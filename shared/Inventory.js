@@ -81,11 +81,11 @@ Inventory.prototype.contains = function(inv){
     return true;
 };
 
-Inventory.prototype.toList = function(){
+Inventory.prototype.toList = function(filterZeroes){
     var list = [];
     for(var item in this.items){
         if(!this.items.hasOwnProperty(item)) continue;
-        list.push([item,this.items[item]]);
+        if(!filterZeroes || this.items[item] > 0) list.push([item,this.items[item]]);
     }
     return list;
 };
