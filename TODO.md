@@ -17,7 +17,7 @@ Week:
 UI: change cursor in Boot
 Map: use Phaser API to restrict scrolling
 Bug: wrong click area of foundations
-Fix huge food surplus
+Bug: fixed ghost updated
 Fix/check new building not being built?
 UI: info panel on first play (basic commands + what's not implemented yet)
 Design document
@@ -28,7 +28,6 @@ Character: display actual respawn point
 Battle: monsters trigger fights (move spawn zones)
 Economic loop: harvest herbs (scatter roots)
 Help: buttons in buildings
-Help: buttons in battle menu
 Quick-craft recipes: arrow, hatchet
 
 Finish:

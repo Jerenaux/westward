@@ -57,7 +57,7 @@ GameServer.createModels = function(){
         type: {type: Number, min: 0, required: true},
         sid: {type: Number, min: 0, required: true},
         // TODO: play with setter/getter (look-up before)
-        inventory: [[]], // list format of inventory
+        items: [[]], // list format of inventory
         prices: mongoose.Schema.Types.Mixed,
         gold: {type: Number, min: 0},
         built: Boolean,
@@ -213,7 +213,7 @@ GameServer.checkPlayerID = function(id){ // check if no other player is using sa
 GameServer.addNewPlayer = function(socket,data){
     //if(!data.selectedClass) return;
     if(!data.selectedClass) data.selectedClass = 'merchant';
-    if(data.selectedSettlement == undefined) data.selectedSettlement = 1;
+    if(data.selectedSettlement == undefined) data.selectedSettlement = 0;
     console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
     player.setStartingInventory();
@@ -340,14 +340,13 @@ GameServer.skinAnimal = function(player,animalID){
     GameServer.removeEntity(animal);
 };
 
-GameServer.handleBattle = function(player,animal){
-    if(player.isInFight()) return;
-    if(animal.isMoving()) return;
-    if(animal.isDead()) return;
+GameServer.handleBattle = function(player,animal,aggro){
+    if(player.isInFight() || player.isInFight() || player.isDead()) return;
+    if(animal.isMoving() || animal.isDead()) return;
     // TODO: check for proximity
     var area = GameServer.computeBattleArea(player,animal);
     if(!GameServer.checkAreaIntegrity(area)){
-        player.addMsg('There is an obstacle in the way!');
+        if(!aggro) player.addMsg('There is an obstacle in the way!');
         return;
     }
     var battle = GameServer.checkBattleOverlap(area);
@@ -438,6 +437,31 @@ GameServer.checkForBattle = function(entity){
         };
         cell.battle.addFighter(entity);
         cell.battle.addArea(area);
+    }
+};
+
+GameServer.checkForHostiles = function(entity){
+    var AOIs = Utils.listAdjacentAOIs(entity.aoi);
+    for(var i = 0; i < AOIs.length; i++){
+        var aoi = GameServer.AOIs[AOIs[i]];
+        for(var j = 0; j < aoi.entities.length; j++){
+            var e = aoi.entities[j];
+            if(e.canFight()){
+                // If the player ended his movement, check if neighboring e's should attack him
+                // Else, check if entity should attack neighboring e's
+                var attack = false;
+                if(entity.isPlayer){
+                    if(!e.isPlayer) attack = e.shouldAttack(entity);
+                }else{
+                    attack = entity.shouldAttack(e);
+                }
+                if(attack){
+                    console.log('starting fight with ',e.getShortID());
+                    GameServer.handleBattle(entity,e,true);
+                    return;
+                }
+            }
+        }
     }
 };
 

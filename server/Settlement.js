@@ -49,11 +49,6 @@ Settlement.prototype.getBuildings = function(){
 Settlement.prototype.registerFort = function(fort){
     this.fort = fort;
     this.fort.setProperty('population',this.pop);
-    /*this.fort.setProperty('danger',[
-        [453,717],
-        [428,703],
-        [469,593]
-    ]);*/
     this.fort.setProperty('danger',this.danger);
     this.respawnLocation = {
         x: GameServer.buildingsData[0].entry.x + this.fort.x,
@@ -96,13 +91,14 @@ Settlement.prototype.computeFoodSurplus = function(){
     this.buildings.forEach(function(building){
         building.setProperty('foodsurplus',roundedSUrplus);
     });
-    //this.fort.setProperty('foodsurplus',Math.round(pct*100));
+    //console.log('food surplus = ',this.surplus);
 };
 
 Settlement.prototype.computeFoodProductivity = function(){
     return Formulas.computeSettlementFoodModifier(this.surplus);
 };
 
+// Called immeditaley after buildings are read + at a regular interval (updateSettlements())
 Settlement.prototype.update = function(){
     if(!this.fort) return;
     //console.log(this.name+' updating');
@@ -115,10 +111,9 @@ Settlement.prototype.update = function(){
     });
     this.refreshListing();
 
-    var _surplus = this.surplus;
     this.players.forEach(function(p){
-        GameServer.players[p].applyFoodModifier(_surplus);
-    })
+        GameServer.players[p].applyFoodModifier(this.surplus);
+    },this)
 };
 
 Settlement.prototype.trim = function(){

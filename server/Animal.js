@@ -219,6 +219,11 @@ Animal.prototype.computeBattleDestination = function(target){
     return closest;
 };
 
+Animal.prototype.shouldAttack = function(target){
+    if(!target.isPlayer) return false;
+    return Utils.euclidean(this,target) < 5;
+};
+
 Animal.prototype.remove = function(){
     if(this.battle) this.battle.removeFighter(this);
     delete GameServer.animals[this.id];

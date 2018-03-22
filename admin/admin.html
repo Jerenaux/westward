@@ -30,7 +30,7 @@
 
                         <form ng-submit="setStock(building.id)">
                             <!-- TODO: fix orderBy not affecting id!-->
-                            <span ng-repeat="(id, info) in data.itemsList | orderBy:'name'">{{id}},{{info.name}} </span>
+                            <!-- <span ng-repeat="(id, info) in data.itemsList | orderBy:'name'">{{id}},{{info.name}} </span>-->
                             Set
                             <select ng-model="inventoryForms[building.id].item" ng-options="id as info.name for (id, info) in data.itemsList | orderBy:'name'"></select><br/>
                             To

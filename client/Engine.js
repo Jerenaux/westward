@@ -571,6 +571,7 @@ Engine.makeBattleMenu = function(){
     var alignx = 845;
     var battle = new Menu();
     var equipment = new EquipmentPanel(alignx,100,170,120,'Equipment',true); // true: battle menu
+    equipment.addButton(140, 8, 'blue','help',null,'',UI.textsData['battleitems_help']);
     battle.addPanel('equipment',equipment);
     var items = new InventoryPanel(alignx,220,170,225,'Items');
     items.setInventory(Engine.player.inventory,4,true,BattleManager.processInventoryClick);
@@ -587,11 +588,13 @@ Engine.makeBattleMenu = function(){
     var timerh = 60;
     var timerx = (Engine.getGameConfig().width-timerw)/2;
     var timery = Engine.getGameConfig().height-timerh;
-    battle.addPanel('timer',new BattleTimerPanel(timerx,timery,timerw,timerh));
+    var timerPanel = battle.addPanel('timer',new BattleTimerPanel(timerx,timery,timerw,timerh));
+    timerPanel.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['battletimer_help']);
 
     var respawnh = 90;
     var respawny = (Engine.getGameConfig().height-respawnh)/2;
-    battle.addPanel('respawn',new RespawnPanel(timerx,respawny,timerw,respawnh),true);
+    var respawn = battle.addPanel('respawn',new RespawnPanel(timerx,respawny,timerw,respawnh),true);
+    respawn.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['respawn_help']);
 
     battle.addEvent('onUpdateInventory',items.updateInventory.bind(items));
     battle.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));

@@ -184,6 +184,9 @@ Tooltip.prototype.updatePosition = function(x,y){
         x -= (this.width+20);
         y += 20;
     }
+    if(y > UI.getGameHeight() - this.height - 20){
+        y -= (this.height+20);
+    }
     var dx = x - this.x;
     var dy = y - this.y;
     if(dx == 0 && dy == 0) return;

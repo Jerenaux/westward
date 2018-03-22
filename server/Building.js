@@ -19,16 +19,17 @@ function Building(data){
     this.sid = data.sid;
     this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(100); // Inventory object
+    if(data.items) this.inventory.fromList(data.items);
+    //if(data.inventory) this.inventory.fromList(data.inventory);
     //this.items = data.items;  // items list used when saving/loading to/from db || NOPE: used as well to send updates to client
-    if(data.inventory) this.inventory.fromList(data.inventory);
     this.prices = data.prices || {};
     this.gold = data.gold || 0;
     this.built = !!data.built;
     this.progress = data.progress || 0;
     this.productivity = data.productivity || 100;
     this.committed = 20;
-    this.lastBuildCycle = data.lastBuildCycle || Date.now();
-    this.lastProdCycle = data.lastProdCycle || Date.now();
+    this.lastBuildCycle = Date.now(); //data.lastBuildCycle || Date.now();
+    this.lastProdCycle = Date.now(); // data.lastProdCycle || Date.now();
     this.setOrUpdateAOI();
     this.addCollisions();
     this.registerBuilding();
