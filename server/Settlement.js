@@ -85,23 +85,21 @@ Settlement.prototype.computeFoodSurplus = function(){
     var foodPerCitizen = 20;
     var required = foodPerCitizen*this.pop;
     var delta = foodAmount - required;
-    var pct = delta/required;
-    this.surplus = pct;
-    var roundedSUrplus = this.surplus*100;
+    this.surplus = Formulas.decimalToPct(delta/required);
+    console.log('Surplus for ',this.name,':',this.surplus,'%');
     this.buildings.forEach(function(building){
-        building.setProperty('foodsurplus',roundedSUrplus);
-    });
-    //console.log('food surplus = ',this.surplus);
+        building.setProperty('foodsurplus',this.surplus);
+    },this);
 };
 
-Settlement.prototype.computeFoodProductivity = function(){
-    return Formulas.computeSettlementFoodModifier(this.surplus);
+Settlement.prototype.computeFoodModifier = function(){
+    // Not converted to % since not broadcast
+    return Formulas.computeSettlementFoodModifier(Formulas.pctToDecimal(this.surplus));
 };
 
 // Called immeditaley after buildings are read + at a regular interval (updateSettlements())
 Settlement.prototype.update = function(){
     if(!this.fort) return;
-    //console.log(this.name+' updating');
 
     this.consumeFood();
     this.computeFoodSurplus();

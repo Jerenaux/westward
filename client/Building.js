@@ -52,7 +52,8 @@ Building = new Phaser.Class({
             'inventory': this.setInventory, // sets whole inventor
             'items': this.updateInventory, // update individual entries in inventory
             'population': this.setPopulation,
-            'prices': this.setPrices
+            'prices': this.setPrices,
+            'progress': this.setProgress
         };
         this.updateEvents = new Set();
 
@@ -65,10 +66,7 @@ Building = new Phaser.Class({
             this.danger = data.danger;
             this.updateEvents.add('onUpdateMap');
         }
-        if (data.progress) {
-            this.progress = data.progress;
-            this.updateEvents.add('onUpdateConstruction');
-        }
+
         if (data.productivity) {
             this.prod = data.productivity;
             this.updateEvents.add('onUpdateConstruction');
@@ -153,6 +151,11 @@ Building = new Phaser.Class({
         this.updateEvents.add('onUpdateShop');
     },
 
+    setProgress: function(progress){
+        this.progress = progress;
+        this.updateEvents.add('onUpdateConstruction');
+    },
+
     updateInventory: function(items){
         this.inventory.updateItems(items);
         this.updateEvents.add('onUpdateShop');
@@ -199,5 +202,14 @@ Building = new Phaser.Class({
         };
         Engine.player.setDestinationAction(1, this.id); // 1 for building
         Engine.computePath(pos);
+    },
+
+    handleOver: function(){
+        if(BattleManager.inBattle || Engine.inMenu) return;
+        UI.setCursor(UI.buildingCursor);
+    },
+
+    handleOut: function(){
+        UI.setCursor();
     }
 });

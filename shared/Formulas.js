@@ -10,25 +10,36 @@ if(onServer) {
 
 var Formulas = {};
 
-Formulas.computeBuildIncrement = function(prod,rate){
-    return Math.round((prod/100)*rate);
+Formulas.decimalToPct = function(decimalValue){
+    if(Math.abs(decimalValue) >= 10 ) {
+        console.warn('WARNING: wrong number format for decimal value',decimalValue);
+        console.trace();
+    }
+    return Math.round(Utils.clamp(decimalValue,-2,2)*100);
 };
 
-Formulas.computeProdIncrement = function(prod,nb){
-    return Math.round((prod/100)*nb);
+Formulas.pctToDecimal = function(pctValue){
+    if(Math.abs(pctValue) < 1 ) console.warn('WARNING: wrong number format for %',pctValue);
+    return Utils.clamp(pctValue,-200,200)/100;
 };
+
+// For modifiers, all formulas expect decimal values as input and return decimal values as output
 
 Formulas.commitmentProductivityModifier = function(commitment){
-    return 2*commitment;
+    return (2*commitment)/100;
 };
 
 Formulas.computeProductivity = function(foodModifier,commitModifier){
-    // Adapt 'deduceFoodModifier()' accordingly
-    return Utils.clamp(100 + foodModifier + commitModifier,0,1000);
+    //return Utils.clamp(100 + foodModifier + commitModifier,0,1000);
+    return Utils.clamp(1 + foodModifier + commitModifier,0,10); // TODO: is it ok to allow 0 producivity?
 };
 
-Formulas.deduceFoodModifier = function(total,commitModifier){
-    return total - 100 - commitModifier;
+Formulas.computeBuildIncrement = function(prod,rate){
+    return Math.round(prod*rate); // rate is not trated as a %
+};
+
+Formulas.computeProdIncrement = function(prod,nb){
+    return Math.round(prod*nb);
 };
 
 Formulas.computePlayerFoodModifier = function(surplus){
@@ -36,7 +47,7 @@ Formulas.computePlayerFoodModifier = function(surplus){
 };
 
 Formulas.computeSettlementFoodModifier = function(surplus){
-    return surplus*40; // TODO: include dev level
+    return (surplus*40)/100; // TODO: factor in dev level
 };
 
 if (onServer) module.exports.Formulas = Formulas;

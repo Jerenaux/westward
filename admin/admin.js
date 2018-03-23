@@ -12,13 +12,27 @@ var app = angular.module('admin',[]);
 app.controller("mainCtrl", [
     '$scope','$http',
     function($scope,$http) {
+        // Indexed by settlement id
+        $scope.newBuildingForms = {};
+        $scope.deleteForms = {};
+        // Indexed by building id
+        $scope.editForms = {};
+        $scope.inventoryForms = {};
+
         var categories = ['settlements'];
         var dataCategories = ['buildings','items'];
         $scope.data = {};
 
         /*
-        * Workflow: getJSON, then getListings, then generate forms
+        * Workflow: getJSON, then getListings
         * */
+
+        $scope.toggleVisibility = function(f,id){
+            var map = $scope[f];
+            if(!map.hasOwnProperty(id)) map[id] = {};
+            var oldvalue = map[id].visible || false;
+            map[id].visible = !oldvalue;
+        };
 
         getJSON = function(category){
             $http.get("/assets/data/"+category+".json").then(function(res) {
@@ -51,22 +65,6 @@ app.controller("mainCtrl", [
             categories.forEach(function(cat){
                 $scope[cat] = [];
                 getData(cat);
-            });
-
-            $scope.buildingForms = {};
-            $scope.deleteForms = {};
-            $scope.inventoryForms = {};
-            $scope.settlements.forEach(function(settlement){
-                $scope.buildingForms[settlement.id] = {
-                    visible: false
-                };
-                $scope.deleteForms[settlement.id] = {
-                    id: -1
-                };
-
-                settlement.buildings.forEach(function(building){
-                    $scope.inventoryForms[building.id] = {};
-                });
             });
 
 

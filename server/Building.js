@@ -57,9 +57,12 @@ Building.prototype.refreshListing = function(){
 };
 
 Building.prototype.computeProductivity = function(){
-    var newprod = Formulas.computeProductivity(this.settlement.computeFoodProductivity(),Formulas.commitmentProductivityModifier(this.committed));
-    newprod = Math.round(newprod);
-    this.setProperty('productivity',newprod);
+    // Not converted to % since they are not broadcast
+    var foodModifier = this.settlement.computeFoodModifier();
+    var commitmentModifier = Formulas.commitmentProductivityModifier(this.committed);
+    var productivity = Formulas.decimalToPct(Formulas.computeProductivity(foodModifier,commitmentModifier));
+    console.log('Productivity for building',this.id,':',productivity,'% (',foodModifier,',',commitmentModifier,')');
+    this.setProperty('productivity',productivity);
 };
 
 Building.prototype.updateCommit = function(inc){
@@ -72,6 +75,7 @@ Building.prototype.update = function(){
     this.computeProductivity();
 
     var buildingDataType = GameServer.buildingsData[this.type];
+    if(this.built && !buildingDataType.production) return;
     var cycleName = this.built ? 'lastProdCycle' : 'lastBuildCycle';
     var interval = this.built ? buildingDataType.prodInterval : buildingDataType.buildInterval;
 
@@ -81,34 +85,37 @@ Building.prototype.update = function(){
     if(nbCycles > 0){
         this[cycleName] += nbCycles*interval;
         //console.log(nbCycles,' cycle for ',this.id);
-        for(var i = 0; i < nbCycles; i++){
-            if(this.built){
-                this.updateProd();
-            }else{
-                this.updateBuild();
-            }
+        if(this.built){
+            this.updateProd(nbCycles);
+        }else{
+            this.updateBuild(nbCycles);
         }
     }
     this.save();
 };
 
-Building.prototype.updateProd = function(){
+Building.prototype.updateProd = function(nbCycles){
     var production = GameServer.buildingsData[this.type].production;
     if(!production) return;
     for(var i = 0; i < production.length; i++){
         var item = production[i][0];
-        var nb = Formulas.computeProdIncrement(this.productivity,production[i][1]);
-        if(nb > 0) this.settlement.addToFort(item,nb);
+        var baseNb = production[i][1];
+        var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
+        var actualNb = nbCycles*increment;
+        console.log('producing ',actualNb,'items',item,'(',increment,',',nbCycles,')');
+        if(actualNb > 0) this.settlement.addToFort(item,actualNb);
     }
+    this.lastProdCycle = Date.now();
 };
 
-Building.prototype.updateBuild = function(){
-    var rate = GameServer.buildingsData[this.type].buildRate;
+Building.prototype.updateBuild = function(nbCycles){
+    var rate = GameServer.buildingsData[this.type].buildRate; // Base progress increase per cycle, before factoring productivity in
     if(!rate) return;
-    var increment = Formulas.computeBuildIncrement(this.productivity,rate/100);
-    var newprogress = Utils.clamp(this.progress+increment,this.progress,1);
-    this.setProperty('progress',newprogress);
-    if(this.progress == 1){
+    var increment = nbCycles*Formulas.computeBuildIncrement(Formulas.pctToDecimal(this.productivity),rate);
+    console.log('Building ',increment,'%');
+    this.setProperty('progress',Utils.clamp(this.progress+increment,this.progress,100));
+    this.lastBuildCycle = Date.now();
+    if(this.progress == 100){
         this.setProperty('built',true);
         this.resetCounters();
     }

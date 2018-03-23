@@ -63,8 +63,7 @@ GameServer.createModels = function(){
         prices: mongoose.Schema.Types.Mixed,
         gold: {type: Number, min: 0},
         built: Boolean,
-        progress: {type: Number, min: 0, max: 100},
-        productivity: {type: Number, min: 0},
+        progress: {type: Number, min: 0, max: 100}, // %
         committed: {type: Number, min: 0},
         lastBuildCycle: { type: Date, default: Date.now },
         lastProdCycle: { type: Date, default: Date.now }
@@ -77,18 +76,6 @@ GameServer.createModels = function(){
         class: {type: Number, min: 0},
         equipment: mongoose.Schema.Types.Mixed,
         // stats are NOT saved, as they only consist in base values + modifiers; modifiers are re-applied contextually, not saved
-
-        type: {type: Number, min: 0},
-        sid: {type: Number, min: 0},
-        items: [[]], // list format of inventory
-        prices: mongoose.Schema.Types.Mixed,
-
-        built: Boolean,
-        progress: {type: Number, min: 0, max: 100},
-        productivity: {type: Number, min: 0},
-        committed: {type: Number, min: 0},
-        lastBuildCycle: { type: Date, default: Date.now },
-        lastProdCycle: { type: Date, default: Date.now }
     });
     GameServer.BuildingModel = mongoose.model('Building', buildingSchema);
 };
@@ -216,7 +203,7 @@ GameServer.checkPlayerID = function(id){ // check if no other player is using sa
 GameServer.addNewPlayer = function(socket,data){
     //if(!data.selectedClass) return;
     if(!data.selectedClass) data.selectedClass = 'merchant';
-    if(data.selectedSettlement == undefined) data.selectedSettlement = 1;
+    if(data.selectedSettlement == undefined) data.selectedSettlement = 0;
     console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
     player.setStartingInventory();
@@ -589,8 +576,10 @@ GameServer.handleCommit = function(data,socketID){ // keep data argument
     // TODO: xp reward change based on building?
     var fortGold = building.settlement.getFortGold();
     var reward = Math.min(20,fortGold); // TODO: adapt as well
-    building.settlement.takeFortGold(reward);
-    player.giveGold(reward,true);
+    if(reward) {
+        building.settlement.takeFortGold(reward);
+        player.giveGold(reward, true);
+    }
 };
 
 GameServer.allIngredientsOwned = function(player,recipe,nb){

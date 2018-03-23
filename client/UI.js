@@ -8,6 +8,7 @@ var UI = {
     cursor: 'url(/assets/sprites/cursor.png), auto', // image of the mouse cursor in normal circumstances
     bowCursor: 'url(/assets/sprites/bowcursor32.png), auto',
     swordCursor: 'url(/assets/sprites/swordcursor32.png), auto',
+    buildingCursor: 'url(/assets/sprites/buildingcursor.png), auto',
 
     preload: function () {
         UI.scene = this;

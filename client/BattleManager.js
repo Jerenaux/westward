@@ -141,7 +141,7 @@ BattleManager.onDeath = function(){
 };
 
 BattleManager.endFight = function(){
-    Engine.setCursor();
+    UI.setCursor();
     BattleManager.inBattle = false;
     Engine.menus.battle.hide();
     if(Engine.dead) {

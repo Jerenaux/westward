@@ -221,6 +221,7 @@ Animal.prototype.computeBattleDestination = function(target){
 
 Animal.prototype.shouldAttack = function(target){
     if(!target.isPlayer) return false;
+    if(!GameServer.animalsData[this.type].aggro) return false;
     return Utils.euclidean(this,target) < 10;
 };
 
