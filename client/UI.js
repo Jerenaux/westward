@@ -5,6 +5,9 @@
 var UI = {
     key: 'UI',
     tooltipDepth: 20,
+    cursor: 'url(/assets/sprites/cursor.png), auto', // image of the mouse cursor in normal circumstances
+    bowCursor: 'url(/assets/sprites/bowcursor32.png), auto',
+    swordCursor: 'url(/assets/sprites/swordcursor32.png), auto',
 
     preload: function () {
         UI.scene = this;
@@ -18,6 +21,7 @@ var UI = {
             this.load.image('bigbg', 'assets/sprites/bigbg.png');
             this.load.image('worldmap', 'assets/sprites/worldmap.png');
             this.load.image('compass', 'assets/sprites/compass.png');
+            this.load.image('dangersetl', 'assets/sprites/dangersetl.png');
             this.load.image('setlicon', 'assets/sprites/setlicon.png');
             this.load.image('wood', 'assets/sprites/wood.jpg');
         }
@@ -41,6 +45,7 @@ var UI = {
         UI.camera = UI.scene.cameras.main;
         UI.notifications = [];
         UI.textsData = this.cache.json.get('texts');
+        UI.setCursor();
 
         this.input.setTopOnly(false);
         this.input.on('pointermove',function(event){
@@ -52,18 +57,6 @@ var UI = {
         if(Client.isNewPlayer()) UI.classMenu = UI.makeClassMenu();
 
         this.scene.get('boot').updateReadyTick();
-    },
-
-    getConfig: function(){
-        return this.scene.sys.game.config;
-    },
-
-    getGameWidth: function(){
-        return UI.getConfig().width;
-    },
-
-    getGameHeight: function(){
-        return UI.getConfig().height;
     },
 
     handleNotifications: function(msgs){
@@ -119,6 +112,22 @@ var UI = {
         panel.addBigButton('Got it');
         return panel;
     }
+};
+
+UI.getConfig = function(){
+    return this.scene.sys.game.config;
+};
+
+UI.getGameWidth = function(){
+    return UI.getConfig().width;
+};
+
+UI.getGameHeight = function(){
+    return UI.getConfig().height;
+};
+
+UI.setCursor = function(cursor){
+    UI.scene.sys.game.canvas.style.cursor = (cursor || UI.cursor);
 };
 
 UI.makeClassMenu = function() {
@@ -206,13 +215,18 @@ UI.displaySettlementSelectionMenu =  function(){
     var w = 300;
     var h = 100;
     var panel = new InfoPanel(UI.getGameWidth()-w,UI.getGameHeight()-h,w,h,'Choose a settlement');
-    var txt = panel.addText(10,15,'Click on one of the blinking icons for more information about the corresponding settlement.');
+    panel.addText(10,15,'Click on one of the blinking icons for more information about the corresponding settlement.');
     panel.display();
 
     UI.SSmap = map;
     UI.SSpanel = panel;
     UI.SScontent = content;
     Client.requestSettlementData();
+
+    UI.SScontent.push(UI.scene.add.image(480,456,'dangersetl').setAlpha(0.6));
+    UI.SScontent.push(UI.scene.add.image(180,36,'dangersetl').setAlpha(0.6));
+    UI.SScontent.push(UI.scene.add.image(660,45,'dangersetl').setAlpha(0.6));
+    UI.SScontent.push(UI.scene.add.image(120,548,'dangersetl').setAlpha(0.6));
 };
 
 UI.displaySettlements = function(list){
@@ -222,7 +236,6 @@ UI.displaySettlements = function(list){
 };
 
 UI.displaySettlement = function(data){
-    console.log(data.x,data.y);
     var x = data.x*UI.SSmap.width;
     var y = data.y*UI.SSmap.height;
     var icon = UI.scene.add.image(x,y,'setlicon');

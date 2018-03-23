@@ -9,7 +9,8 @@
     "atlas": "items",
     "frame":"food",
     "name": "Food",
-    "desc": "Of no use to individuals, this is in contrast the most important resource for a settlement, allowing them to maintain food surplus and develop. Make sure to sell your food to your settlement! Food can be obtained from dead animals or gathered by specific resource buildings."
+    "desc": "Of no use to individuals, this is in contrast the most important resource for a settlement, allowing them to maintain food surplus and develop. Make sure to sell your food to your settlement! Food can be obtained from dead animals or gathered by specific resource buildings.",
+    "isResource": true
   },
   "2":{
     "atlas": "items",
@@ -211,5 +212,12 @@
     "effects":{"rdmg":6},
     "ammo": "quiver",
     "useInBattle": true
+  },
+  "30":{
+    "atlas": "items2",
+    "frame":"feather",
+    "name": "Feather",
+    "desc": "Crafting material used to make arrows.",
+    "isMaterial": true
   }
 }

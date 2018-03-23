@@ -26,9 +26,6 @@ var Engine = {
     craftInvSize: 5, // max number of ingredients for crafting
     key: 'main', // key of the scene, for Phaser
     playerIsInitialized: false,
-    cursor: 'url(/assets/sprites/cursor.png), auto', // image of the mouse cursor in normal circumstances
-    bowCursor: 'url(/assets/sprites/bowcursor32.png), auto',
-    swordCursor: 'url(/assets/sprites/swordcursor32.png), auto',
 
     config: {
         FOOD_ID: 1
@@ -215,7 +212,6 @@ Engine.create = function(){
     Engine.settlementsData = Engine.scene.cache.json.get('settlements');
 
     Engine.createMarker();
-    Engine.setCursor();
 
     Engine.dragging = false;
     Engine.interrupt = false;
@@ -248,10 +244,6 @@ Engine.create = function(){
 
     Engine.created = true;
     Client.requestData();
-};
-
-Engine.setCursor = function(cursor){
-    Engine.getGameInstance().canvas.style.cursor = (cursor || Engine.cursor);
 };
 
 Engine.getGameInstance = function(){

@@ -14,17 +14,15 @@ Prototype level:
 Week:
 -----
 *1 item/recipe a day*
-UI: change cursor in Boot
-Map: use Phaser API to restrict scrolling
+Bug: battle not ended when reload!
 Bug: wrong click area of foundations
 Bug: fixed ghost updated
 Bug: moving down right after connect doesn't play anim
-Battle: check if menu closed when dragged into battle
+Battle: check that hostiles are detected when player move (test with immobile wolves)
 Fix/check new building not being built?
 UI: info panel on first play (basic commands + what's not implemented yet)
 Design document
-Test second settlement respawn
-Settlement selection: display enemy camps
+Define spawn zones better (no settlements inside)
 Settlement selection: display infoPanel (say that it's possible to rech other settlement, etc.)
 Character: display actual respawn point 
 Economic loop: harvest herbs (scatter roots)
@@ -194,6 +192,7 @@ Design document:
 Polish:
 ------
 Visual:
+- "Tip of the day"
 - Revamp class selection
 - Move marker on move() event (in addition to mousemove) and handle keeping pressed
 - Polish title screen (leaves, bird passing in the distance...)
@@ -315,6 +314,7 @@ Content:
 - Chat
 - Gazette
 * Mail system (using birds)
+-> Very first mail is a RP mail giving some background about the game
 * (Mini)map system
 * Movement
 - Check paths and block if error

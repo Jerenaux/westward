@@ -74,19 +74,6 @@ Player.prototype.setSettlement = function(sid){
 };
 
 Player.prototype.setStartingInventory = function(){
-    /*this.giveItem(0,20); // red powder
-    this.giveItem(3,1); // timber
-    this.giveItem(4,1); // bomb
-    this.giveItem(5,14); // root
-    this.giveItem(12,1); // gun
-    this.giveItem(13,1); // shield
-    this.giveItem(8,5); // thick grass
-    this.giveItem(7,1); // wood
-    this.giveItem(22,1); // coal
-    this.giveItem(23,1); // carbon
-    this.giveItem(24,1); // iron
-    this.giveItem(25,1); // gold*/
-
     this.giveItem(1,1); //food
     this.giveItem(9,2); // pelt
     this.giveItem(20,5); // arrows
@@ -95,9 +82,7 @@ Player.prototype.setStartingInventory = function(){
     //this.giveItem(11,2); // sword
     this.giveItem(6,1); // potion
 
-    this.giveItem(8,5); // thick grass
-    this.giveItem(7,1); // wood
-    this.giveItem(26,1); // wood
+    this.giveItem(30,1); // thick grass
 
     this.giveGold(500);
 };

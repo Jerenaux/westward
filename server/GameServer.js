@@ -153,6 +153,7 @@ GameServer.readMap = function(mapsPath){
         // Spawn animals
         GameServer.spawnZones = [];
         GameServer.spawnZones.push(new SpawnZone(1566,3,3));
+        GameServer.spawnZones.push(new SpawnZone(389,3,3));
         GameServer.updateSpawnZones();
     });
 
@@ -215,7 +216,7 @@ GameServer.checkPlayerID = function(id){ // check if no other player is using sa
 GameServer.addNewPlayer = function(socket,data){
     //if(!data.selectedClass) return;
     if(!data.selectedClass) data.selectedClass = 'merchant';
-    if(data.selectedSettlement == undefined) data.selectedSettlement = 0;
+    if(data.selectedSettlement == undefined) data.selectedSettlement = 1;
     console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
     player.setStartingInventory();

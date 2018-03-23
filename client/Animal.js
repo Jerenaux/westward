@@ -67,15 +67,15 @@ var Animal = new Phaser.Class({
         if(BattleManager.inBattle) {
             var dx = Math.abs(this.tileX-Engine.player.tileX);
             var dy = Math.abs(this.tileY-Engine.player.tileY);
-            var cursor = (dx+dy == 1 || (dx == 1 && dy == 1) ? Engine.swordCursor : Engine.bowCursor);
-            Engine.setCursor(cursor);
+            var cursor = (dx+dy == 1 || (dx == 1 && dy == 1) ? UI.swordCursor : UI.bowCursor);
+            UI.setCursor(cursor);
         }
         UI.tooltip.updateInfo((this.dead ? 'Dead ' : '')+this.name);
         UI.tooltip.display();
     },
 
     handleOut: function(){
-        if(BattleManager.inBattle) Engine.setCursor();
+        if(BattleManager.inBattle) UI.setCursor();
         UI.tooltip.hide();
     }
 });

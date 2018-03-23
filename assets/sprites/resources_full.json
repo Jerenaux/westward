@@ -79,6 +79,10 @@
     {
       "filename": "stone",
       "frame": {"x":336,"y":504,"w":24,"h":24}
+    },
+    {
+      "filename": "feather",
+      "frame": {"x":24,"y":504,"w":24,"h":24}
     }
   ]
 }
