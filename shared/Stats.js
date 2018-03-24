@@ -155,13 +155,12 @@ Stat.prototype.clamp = function(v){
 };
 
 Stat.prototype.getValue = function(){
-    //var statData = Stats.dict[this.key];
     var base = this.getBaseValue();
     this.absoluteModifiers.forEach(function(m){
         base += m;
     });
     this.relativeModifiers.forEach(function(m){
-        base *= (1+m);
+        base *= (1+(m/100));
     });
     return this.clamp(Math.round(base));
 };
@@ -199,12 +198,9 @@ Stat.prototype.trim = function(){
       var obj = {
           k: this.key,
           v: this.getBaseValue(),
-          r: [],
+          r: this.relativeModifiers,
           a: this.absoluteModifiers
       };
-      this.relativeModifiers.forEach(function(m){
-          obj.r.push(Math.round(m*100));
-      });
       if(obj.r.length == 0) obj.r = undefined;
       if(obj.a.length == 0) obj.a = undefined;
       return obj;

@@ -1,0 +1,18 @@
+{
+  "0": {
+    "name": "Soldier",
+    "desc": "The Path of War. Soldiers excel in battle, be it against wildlife or humans, which is expressed by several permanent bonuses to their battle-related stats. These bonuses are also applied to any troops they may command as Commanders. Finally, only they can wield advanced battle equipment. They play an important role in the defense of settlements, securing of trade routes and attack of enemy encampments."
+  },
+  "1": {
+    "name": "Merchant",
+    "desc": "The Path of Coin. Merchants are savvy negotiators able to make the best deals in any transaction. They are also adept managers, who can set up networks of caravans to transport goods across the Continent and own several shops per settlement. They often end up very wealthy by playing an active role in the functioning of the economy and in the distribution of resources and crafted goods."
+  },
+  "2": {
+    "name": "Craftsman",
+    "desc": "The Path of Creation. Craftsmen are polymaths with deep knowledge of metallurgy and alchemy. As such, they can convert the fruits of the earth into weapons and the gifts of the plains into equipment and potions. Both the settlements and the other citizens rely on them for the manufacture of vital products that only they can make."
+  },
+  "3": {
+    "name": "Explorer",
+    "desc": "The Path of Discovery. Explorers can travel longer distances than anyone and avoid battles more easily to find rare resources only available in remote locations - or to discover these locations in the first place. In addition, their experience with nature makes them more apt to gather crafting materials from dead animals and plants. This gives them important functions as scouts and providers of useful elements."
+  }
+}

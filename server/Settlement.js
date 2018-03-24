@@ -6,20 +6,27 @@ var GameServer = require('./GameServer.js').GameServer;
 var Formulas = require('../shared/Formulas.js').Formulas;
 var World = require('../shared/World.js').World;
 
-function Settlement(id,name,pop,level){
-    this.id = id;
-    this.name = name;
-    this.desc = GameServer.textData['settlement_'+this.id];
-    this.level = level;
-    this.pop = pop;
+function Settlement(data){
+    this.id = data.id;
+    this.name = data.name;
+    this.desc = data.description;//GameServer.textData['settlement_'+this.id];
+    this.level = data.level;
+    this.pop = data.population;
+    this.lastCycle = data.lastCycle;
+    console.log('lastCycle set to',this.lastCycle);
+
     this.fort = null;
     this.buildings = [];
     this.players = [];
 }
 
+Settlement.prototype.setModel = function(model) {
+    this.model = model;
+};
+
 Settlement.prototype.registerPlayer = function(player){
     this.players.push(player.id);
-    player.applyFoodModifier(Formulas.computePlayerFoodModifier(this.surplus));
+    player.applyFoodModifier(this.surplus);
 };
 
 Settlement.prototype.removePlayer = function(player){
@@ -77,7 +84,17 @@ Settlement.prototype.refreshListing = function(){
 };
 
 Settlement.prototype.consumeFood = function(){
-    this.takeFromFort(1,Math.floor(this.pop/10));
+    var rate = 30*1000; // every 30sec
+    console.log(Date.now() - this.lastCycle);
+    var nbCycles = Math.floor((Date.now() - this.lastCycle)/rate);
+    if(nbCycles > 0) {
+        var consumption = Math.floor(this.pop / 10) * nbCycles;
+        console.log(this.name, 'consuming', consumption, 'food');
+        if (consumption) this.takeFromFort(1, consumption);
+
+        this.lastCycle = Date.now();
+        this.save();
+    }
 };
 
 Settlement.prototype.computeFoodSurplus = function(){
@@ -111,7 +128,19 @@ Settlement.prototype.update = function(){
 
     this.players.forEach(function(p){
         GameServer.players[p].applyFoodModifier(this.surplus);
-    },this)
+    },this);
+};
+
+Settlement.prototype.save = function(){
+    var _settlement = this;
+    GameServer.SettlementModel.findById(this.model._id, function (err, doc) {
+        if (err) throw err;
+
+        doc.set(_settlement);
+        doc.save(function (err) {
+            if (err) throw err;
+        });
+    });
 };
 
 Settlement.prototype.trim = function(){

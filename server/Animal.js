@@ -42,12 +42,6 @@ Animal.prototype.setStat = function(key,value){
     this.getStat(key).setBaseValue(value);
 };
 
-/*Animal.prototype.setStartingPosition = function(){
-    this.x = Utils.randomInt(23,44);
-    this.y = Utils.randomInt(1,16);
-    console.log('Grrrr at ('+this.x+', '+this.y+')');
-};*/
-
 Animal.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};

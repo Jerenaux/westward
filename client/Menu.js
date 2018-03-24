@@ -64,6 +64,7 @@ Menu.prototype.display = function(){
 
     Engine.inMenu = true;
     Engine.hideMarker();
+    UI.setCursor();
     this.displayed = true;
 };
 

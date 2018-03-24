@@ -14,22 +14,18 @@ Prototype level:
 Week:
 -----
 *1 item/recipe a day*
-Bug: battle not ended when reload!
 Bug: starting hostile fight when already in fight
 Bug: investigate logs of "starting fight with P0" without actual fights
 Bug: fixed ghost updated
 Bug: moving down right after connect doesn't play anim
 Battle: check that hostiles are detected when player move (test with immobile wolves)
-Fix pct format for stats
 UI: info panel on first play (basic commands + what's not implemented yet)
 Design document
 Define spawn zones better (no settlements inside)
 Settlement selection: display infoPanel (say that it's possible to rech other settlement, etc.)
-Settlement: use timer for food consumption as well
 Character: display actual respawn point 
 Economic loop: harvest herbs (scatter roots)
 Help: buttons in buildings
-Quick-craft recipes: arrow, hatchet
 
 Finish:
 -------

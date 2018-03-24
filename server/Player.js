@@ -52,7 +52,7 @@ Player.prototype.registerPlayer = function(){
     settlement.registerPlayer(this);
 };
 
-Player.prototype.setStartingPosition = function(){
+/*Player.prototype.setStartingPosition = function(){
     var i = 0;
     var x, y;
     while(i < 10) {
@@ -63,7 +63,7 @@ Player.prototype.setStartingPosition = function(){
     }
     this.x = x;
     this.y = y;
-};
+};*/
 
 Player.prototype.setClass = function(className){
     this.class = className;
@@ -127,9 +127,9 @@ Player.prototype.respawn = function(){
     // TODO: loose loot
 };
 
-Player.prototype.applyFoodModifier = function(foodSurplus){
+Player.prototype.applyFoodModifier = function(foodSurplus){ // %
     if(isNaN(foodSurplus)) return; // Could happen if no fort
-    var foodModifier = Formulas.computePlayerFoodModifier(foodSurplus);
+    var foodModifier = Formulas.decimalToPct(Formulas.computePlayerFoodModifier(Formulas.pctToDecimal(foodSurplus)));
     this.getStats().forEach(function(stat){
         if(Stats.dict[stat].noModifier) return;
         var statObj = this.getStat(stat);
@@ -428,6 +428,8 @@ Player.prototype.dbTrim = function(){
 };
 
 Player.prototype.getDataFromDb = function(document){
+    // TODO: think about how to handle references to other entities
+    // eg. inBuilding (how to retrieve proper building if server went down since), commitment...
     // Set up the player based on the data stored in the databse
     // document is the mongodb document retrieved form the database
     var dbProperties = ['x','y'];
@@ -435,10 +437,6 @@ Player.prototype.getDataFromDb = function(document){
         this[dbProperties[p]] = document[dbProperties[p]];
     }
     // stats are not saved, see schema
-    /*for(var stat in Stats.dict) {
-        if (!Stats.dict.hasOwnProperty(stat)) continue;
-        if(document['stats'][stat] >= 0) this.setStat(stat,document['stats'][stat]);
-    }*/
     for(var equip in Equipment.dict) {
         if (!Equipment.dict.hasOwnProperty(equip)) continue;
         var eq = Equipment.dict[equip];

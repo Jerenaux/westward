@@ -16,10 +16,10 @@ var GameServer = {
     players: {}, // player.id -> player
     animals: {}, // animal.id -> animal
     buildings: {}, // building.id -> building
+    settlements: {},
     socketMap: {}, // socket.id -> player.id
     nbConnectedChanged: false,
-    initializationTicks: 0,
-    requiredTicks: 0, // required number of initialization ticks
+    initializationStep: 0,
     initialized: false
 };
 
@@ -40,23 +40,34 @@ var SpawnZone = require('./SpawnZone.js').SpawnZone;
 var PF = require('../shared/pathfinding.js');
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
-GameServer.updateStatus = function(name){
-    console.log('Successful initialization step:',name);
-    GameServer.initializationTicks++;
-    if(GameServer.initializationTicks == GameServer.requiredTicks) {
+GameServer.updateStatus = function(){
+    console.log('Successful initialization step:',GameServer.initializationSequence[GameServer.initializationStep++]);
+    if(GameServer.initializationStep == GameServer.initializationSequence.length) {
         console.log('GameServer initialized');
         GameServer.initialized = true;
         GameServer.setUpdateLoops();
+    }else{
+        var next = GameServer.initializationSequence[GameServer.initializationStep];
+        //console.log('Moving on to next step:',next);
+        GameServer.initializationMethods[next].call();
     }
 };
 
 GameServer.createModels = function(){
+    var settlementSchema = mongoose.Schema({
+        id: {type: Number, min: 0, required: true},
+        name: {type: String, required: true},
+        description: String,
+        population: {type: Number, min: 0, required: true},
+        level: {type: Number, min: 0, required: true},
+        lastCycle: { type: Date, default: Date.now }
+    });
     var buildingSchema = mongoose.Schema({
+        id: {type: Number, min: 0, required: true},
         x: {type: Number, min: 0, required: true},
         y: {type: Number, min: 0, required: true},
         type: {type: Number, min: 0, required: true},
         sid: {type: Number, min: 0, required: true},
-        // TODO: play with setter/getter (look-up before)
         inventory: {type: [[]], set:function(inventory){
                 return inventory.toList(true); // true: filter zeroes
             }},
@@ -72,16 +83,26 @@ GameServer.createModels = function(){
         x: {type: Number, min: 0, required: true},
         y: {type: Number, min: 0, required: true},
         gold: {type: Number, min: 0},
-        civicxp: {type: Number, min: 0}, // do not store
+        civicxp: {type: Number, min: 0}, // do not store max
         class: {type: Number, min: 0},
-        equipment: mongoose.Schema.Types.Mixed,
+        equipment: mongoose.Schema.Types.Mixed
         // stats are NOT saved, as they only consist in base values + modifiers; modifiers are re-applied contextually, not saved
     });
+    GameServer.SettlementModel = mongoose.model('Settlement', settlementSchema);
     GameServer.BuildingModel = mongoose.model('Building', buildingSchema);
 };
 
 GameServer.readMap = function(mapsPath){
-    GameServer.requiredTicks++;
+    //GameServer.initializationSequence = ['static_data','settlements','buildings','spawn_zones'];
+    GameServer.initializationMethods = {
+        'static_data': null,
+        'settlements': GameServer.loadSettlements,
+        'buildings': GameServer.loadBuildings,
+        'spawn_zones': GameServer.setUpSpawnZones
+    };
+    GameServer.initializationSequence = Object.keys(GameServer.initializationMethods);
+    //console.log(GameServer.initializationSequence);
+
     GameServer.createModels();
     GameServer.mapsPath = mapsPath; // TODO remove, useless, debug
     console.log('Loading map data from '+mapsPath);
@@ -98,34 +119,38 @@ GameServer.readMap = function(mapsPath){
     PFUtils.setup(GameServer);
     GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()));
 
-    GameServer.startArea = {
-        minx: 517,
-        maxx: 531,
-        miny: 656,
-        maxy: 662
-    };
-
     GameServer.battleCells = new SpaceMap();
     GameServer.textData = JSON.parse(fs.readFileSync('./assets/data/texts.json').toString());
     GameServer.itemsData = JSON.parse(fs.readFileSync('./assets/data/items.json').toString());
     GameServer.animalsData = JSON.parse(fs.readFileSync('./assets/data/animals.json').toString());
 
-    // Settlements
-    GameServer.settlements = {};
-    GameServer.settlements[0] = new Settlement(0,'New Beginning',12,1);
-    GameServer.settlements[1] = new Settlement(1,'Hope',2,3);
-    GameServer.settlements[0].danger = [
-        [453,717],
-        [428,703],
-        [469,593]
-        ];
-    GameServer.settlements[1].danger = [
-        [1005,41],
-        [940,224]
-    ];
+    console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
+    GameServer.updateStatus();
+};
 
-    // Read buildings
-    GameServer.requiredTicks++;
+GameServer.loadSettlements = function(){
+    GameServer.SettlementModel.find(function (err, settlements) {
+        if (err) return console.log(err);
+        settlements.forEach(function(data){
+            var settlement = new Settlement(data);
+            settlement.setModel(data);
+            GameServer.settlements[settlement.id] = settlement;
+        });
+        GameServer.updateStatus();
+
+        GameServer.settlements[0].danger = [
+            [453,717],
+            [428,703],
+            [469,593]
+        ];
+        GameServer.settlements[1].danger = [
+            [1005,41],
+            [940,224]
+        ];
+    });
+};
+
+GameServer.loadBuildings = function(){
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
     GameServer.BuildingModel.find(function (err, buildings) {
         if (err) return console.log(err);
@@ -134,36 +159,17 @@ GameServer.readMap = function(mapsPath){
             building.setModel(data);
             GameServer.buildings[building.id] = building;
         });
-        GameServer.updateStatus('buildings');
+        GameServer.updateStatus();
         GameServer.updateSettlements();
-
-        // Spawn animals
-        GameServer.spawnZones = [];
-        GameServer.spawnZones.push(new SpawnZone(1566,3,3));
-        GameServer.spawnZones.push(new SpawnZone(389,3,3));
-        GameServer.updateSpawnZones();
     });
+};
 
-
-    GameServer.updateStatus('reading map');
-    console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
-
-    // For debugging purposes:
-   /* var dummySocket = {
-        id: 0,
-        emit: function(){}
-    };
-
-    var player = GameServer.addNewPlayer(dummySocket,531,660);
-
-    var animal = GameServer.addAnimal(536,660,0);
-    animal.idle = false;
-    animal = GameServer.addAnimal(536,660,0);
-    animal.idle = false;
-
-    setTimeout(function(){
-        GameServer.handleBattle(player,animal);
-    },1000);*/
+GameServer.setUpSpawnZones = function(){
+    GameServer.spawnZones = [];
+    GameServer.spawnZones.push(new SpawnZone(1566,3,3));
+    GameServer.spawnZones.push(new SpawnZone(389,3,3));
+    GameServer.updateSpawnZones();
+    GameServer.updateStatus();
 };
 
 GameServer.addAnimal = function(x,y,type){
@@ -788,7 +794,7 @@ GameServer.insertNewBuilding = function(data){
 
     var building = new Building(data);
     var document = new GameServer.BuildingModel(building);
-    building.setModel(document);
+    building.setModel(document); // ref to model is needed at least to get _id
 
     document.save(function (err) {
         if (err) return console.error(err);

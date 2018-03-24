@@ -21,8 +21,8 @@ var Map = new Phaser.Class({
         this.maskPicture = mask;
 
         this.toponyms = [];
-        Engine.toponymsData.forEach(function(toponym){
-            this.addText(toponym);
+        Engine.settlementsData.forEach(function(s){
+            this.addText(s);
         },this);
 
         this.setInteractive(new Phaser.Geom.Rectangle(0,0,this.width,this.height),Phaser.Geom.Rectangle.Contains);
@@ -40,10 +40,10 @@ var Map = new Phaser.Class({
         Engine.map = this;
     },
 
-    addText: function(toponym){
-        var text = UI.scene.add.text(0, 0, toponym.name,{font: '60px treamd', fill: '#966f33', stroke: '#000000', strokeThickness: 3});
-        text.tx = toponym.x;
-        text.ty = toponym.y;
+    addText: function(settlement){
+        var text = UI.scene.add.text(0, 0, settlement.name,{font: '60px treamd', fill: '#966f33', stroke: '#000000', strokeThickness: 3});
+        text.tx = settlement.x;
+        text.ty = settlement.y;
         text.setDepth(3);
         text.setVisible(false);
         text.setScrollFactor(0,0);

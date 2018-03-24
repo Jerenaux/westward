@@ -76,7 +76,7 @@ Engine.preload = function() {
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
     this.load.json('animals', 'assets/data/animals.json');
-    this.load.json('settlements', 'assets/data/settlements.json');
+    //this.load.json('settlements', 'assets/data/settlements.json');
 
     Engine.collidingTiles = []; // list of tile ids that collide (from tilesets.json)
     for(var i = 0, firstgid = 1; i < Boot.tilesets.length; i++){
@@ -209,7 +209,6 @@ Engine.create = function(){
     Engine.buildingsData = Engine.scene.cache.json.get('buildings');
     Engine.animalsData = Engine.scene.cache.json.get('animals');
     Engine.itemsData = Engine.scene.cache.json.get('items');
-    Engine.settlementsData = Engine.scene.cache.json.get('settlements');
 
     Engine.createMarker();
 
@@ -265,7 +264,7 @@ Engine.createMarker = function(){
 
 Engine.initWorld = function(data){
     console.log(data);
-    Engine.toponymsData = data.settlements;
+    Engine.settlementsData = data.settlements;
     Engine.addHero(data);
     Engine.makeUI();
     Engine.createAnimations();
@@ -861,7 +860,7 @@ Engine.addHero = function(data){
     //Engine.player.buildingRecipes = new Inventory(9);
     //Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
     Engine.player.itemRecipes = new Inventory(10);
-    Engine.player.itemRecipes.fromList([[6,1],[21,1],[2,1],[28,1]]);
+    Engine.player.itemRecipes.fromList([[6,1],[21,1],[2,1],[28,1],[29,1]]);
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = Equipment.getSkeleton();
     Engine.player.commitSlots = data.commitSlots;

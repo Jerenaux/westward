@@ -54,7 +54,7 @@ CharacterPanel.prototype.update = function(){
     this.fatigueText.setText('0%');
     this.civicXPtxt.setText(Engine.player.civicxp+'/'+Engine.player.maxcivicxp);
     this.civicbar.setLevel(Engine.player.civicxp,Engine.player.maxcivicxp);
-    var foodModifier = Math.round(Formulas.computePlayerFoodModifier(Engine.player.foodSurplus)*100);
+    var foodModifier = Formulas.decimalToPct(Formulas.computePlayerFoodModifier(Formulas.pctToDecimal(Engine.player.foodSurplus)));
     this.foodModifierTxt.setFill(foodModifier < 0 ? Utils.colors.red : Utils.colors.green);
     this.foodModifierLabel.setText(Engine.player.foodSurplus >= 0 ? 'Food surplus' : 'Food deficit');
     if(foodModifier > 0) foodModifier = '+'+foodModifier;

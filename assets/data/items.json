@@ -211,7 +211,11 @@
     "equipment": "arrows",
     "effects":{"rdmg":6},
     "ammo": "quiver",
-    "useInBattle": true
+    "useInBattle": true,
+    "isEquipment": true,
+    "isCrafted": true,
+    "crafTier": 1,
+    "recipe":{"7":1,"27":1,"30":4}
   },
   "30":{
     "atlas": "items2",

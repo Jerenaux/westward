@@ -9,8 +9,15 @@ var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
 
 function Building(data){
-    this.id = GameServer.lastBuildingID++;
     this.isBuilding = true;
+
+    this.id = -1;
+    if(data.id > -1){
+        this.id = data.id;
+        GameServer.lastBuildingID = Math.max(GameServer.lastBuildingID,this.id);
+    }else{
+        this.id = ++GameServer.lastBuildingID;
+    }
 
     this.x = data.x;
     this.y = data.y;
