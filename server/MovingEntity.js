@@ -67,7 +67,7 @@ MovingEntity.prototype.endPath = function(){
     this.moving = false;
     this.flagToStop = false;
     this.onEndOfPath();
-    GameServer.checkForHostiles(this);
+    this.checkForHostiles(this);
 };
 
 MovingEntity.prototype.onEndOfPath = function(){

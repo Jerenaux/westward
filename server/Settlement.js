@@ -85,7 +85,6 @@ Settlement.prototype.refreshListing = function(){
 
 Settlement.prototype.consumeFood = function(){
     var rate = 30*1000; // every 30sec
-    console.log(Date.now() - this.lastCycle);
     var nbCycles = Math.floor((Date.now() - this.lastCycle)/rate);
     if(nbCycles > 0) {
         var consumption = Math.floor(this.pop / 10) * nbCycles;

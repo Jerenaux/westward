@@ -38,6 +38,7 @@ var Player = new Phaser.Class({
         this.id = data.id;
         Engine.players[this.id] = this;
         Engine.entityManager.addToDisplayList(this);
+        this.setVisible(true);
 
         this.name = 'Player '+this.id;
         this.setPosition(data.x,data.y);

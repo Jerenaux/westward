@@ -337,8 +337,7 @@ GameServer.skinAnimal = function(player,animalID){
 };
 
 GameServer.handleBattle = function(player,animal,aggro){
-    if(player.isInFight() || player.isInFight() || player.isDead()) return;
-    if(animal.isMoving() || animal.isDead()) return;
+    if(!player.isAvailableForFight() || !animal.isAvailableForFight()) return;
     // TODO: check for proximity
     var area = GameServer.computeBattleArea(player,animal);
     if(!GameServer.checkAreaIntegrity(area)){
@@ -437,7 +436,7 @@ GameServer.checkForBattle = function(entity){
 };
 
 GameServer.checkForHostiles = function(entity){
-    var AOIs = Utils.listAdjacentAOIs(entity.aoi);
+    /*var AOIs = Utils.listAdjacentAOIs(entity.aoi);
     for(var i = 0; i < AOIs.length; i++){
         var aoi = GameServer.AOIs[AOIs[i]];
         for(var j = 0; j < aoi.entities.length; j++){
@@ -458,7 +457,7 @@ GameServer.checkForHostiles = function(entity){
                 }
             }
         }
-    }
+    }*/
 };
 
 GameServer.addBattleCell = function(battle,x,y){
@@ -666,9 +665,10 @@ GameServer.handleAOItransition = function(entity,previous){
         GameServer.addObjectToAOI(aoi,entity);
     });
     oldAOIs.forEach(function(aoi){
+        if(entity.constructor.name == 'Player') entity.oldAOIs.push(aoi);
         GameServer.removeObjectFromAOI(aoi,entity);
     });
-    // There shouldn't be a case where an entity is both added and removed from an AOI in the same update packer
+    // There shouldn't be a case where an entity is both added and removed from an AOI in the same update packet
     // (e.g. back and forth random path) because the update frequency is higher than the movement time
 };
 
@@ -679,9 +679,15 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         var globalPkg = GameServer.AOIs[player.aoi].getUpdatePacket(); // the global pkg is AOI-specific
         var individualGlobalPkg = clone(globalPkg,false); // clone the global pkg to be able to modify it without affecting the original
         // player.newAOIs is the list of AOIs about which the player hasn't checked for updates yet
-        for(var i = 0; i < player.newAOIs.length; i++){
-         individualGlobalPkg.synchronize(GameServer.AOIs[player.newAOIs[i]]); // fetch entities from the new AOIs
-        }
+        /*for(var i = 0; i < player.newAOIs.length; i++){
+            individualGlobalPkg.synchronize(GameServer.AOIs[player.newAOIs[i]]); // fetch entities from the new AOIs
+        }*/
+        player.newAOIs.forEach(function(aoi){
+            individualGlobalPkg.synchronize(GameServer.AOIs[aoi]); // fetch entities from the new AOIs
+        });
+        player.oldAOIs.forEach(function(aoi){
+            individualGlobalPkg.desync(GameServer.AOIs[aoi]); // fortget entities from old AOIs
+        });
         individualGlobalPkg.removeEcho(player.id); // remove redundant information from multiple update sources
         if(individualGlobalPkg.isEmpty()) individualGlobalPkg = null;
         if(individualGlobalPkg === null && localPkg === null && !GameServer.nbConnectedChanged) return;
@@ -691,6 +697,7 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         if(GameServer.nbConnectedChanged) finalPackage.nbconnected = GameServer.server.getNbConnected();
         GameServer.server.sendUpdate(player.socketID,finalPackage);
         player.newAOIs = [];
+        player.oldAOIs = [];
     });
     GameServer.nbConnectedChanged = false;
     GameServer.clearAOIs(); // erase the update content of all AOIs that had any

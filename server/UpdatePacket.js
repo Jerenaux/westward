@@ -109,6 +109,12 @@ UpdatePacket.prototype.synchronize = function(AOI){
     }
 };
 
+UpdatePacket.prototype.desync = function(AOI){
+    for(var i = 0; i < AOI.entities.length; i++){
+        this.removeObject(AOI.entities[i]);
+    }
+};
+
 UpdatePacket.prototype.isEmpty = function(){
     for(var field in this){
         if(!this.hasOwnProperty(field)) continue;

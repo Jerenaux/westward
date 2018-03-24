@@ -14,6 +14,7 @@ var debug = false;
 function Animal(x,y,type){
     this.id = GameServer.lastAnimalID++;
     this.isPlayer = false;
+    this.isAnimal = true;
     //this.setStartingPosition();
     this.x = x;
     this.y = y;
@@ -23,6 +24,7 @@ function Animal(x,y,type){
     this.idle = true;
     this.idleTime = 200;
     this.stats = Stats.getSkeleton();
+    this.setAggressive();
     this.setStartingStats();
     this.setOrUpdateAOI();
 }
@@ -40,6 +42,14 @@ Animal.prototype.setStartingStats = function(){
 
 Animal.prototype.setStat = function(key,value){
     this.getStat(key).setBaseValue(value);
+};
+
+Animal.prototype.setAggressive = function(){
+    this.aggressive =  GameServer.animalsData[this.type].aggro;
+};
+
+Animal.prototype.isAggressive = function(){
+    return this.aggressive;
 };
 
 Animal.prototype.trim = function(){
@@ -213,10 +223,26 @@ Animal.prototype.computeBattleDestination = function(target){
     return closest;
 };
 
-Animal.prototype.shouldAttack = function(target){
-    if(!target.isPlayer) return false;
-    if(!GameServer.animalsData[this.type].aggro) return false;
-    return Utils.euclidean(this,target) < 10;
+Animal.prototype.checkForHostiles = function(){
+    if(!this.isAggressive()) return;
+    var AOIs = Utils.listAdjacentAOIs(this.aoi);
+    for(var i = 0; i < AOIs.length; i++){
+        var aoi = GameServer.AOIs[AOIs[i]];
+        for(var j = 0; j < aoi.entities.length; j++) {
+            var entity = aoi.entities[j];
+            if(!entity.isPlayer) continue;
+            if(!entity.isAvailableForFight()) continue;
+            if(Utils.euclidean(this,entity) < 10){
+                console.log(this.getShortID(),'spots',entity.getShortID());
+                GameServer.handleBattle(entity,this,true);
+                break;
+            }
+        }
+    }
+};
+
+Animal.prototype.isAvailableForFight = function(){
+    return (!this.isInFight() && !this.isDead() && !this.isMoving());
 };
 
 Animal.prototype.remove = function(){

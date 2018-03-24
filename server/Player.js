@@ -19,6 +19,7 @@ function Player(){
     this.updatePacket = new PersonalUpdatePacket();
     this.isPlayer = true;
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
+    this.oldAOIs = [];
     this.action = null;
     this.inventory = new Inventory();
     this.settlement = 0;
@@ -473,6 +474,25 @@ Player.prototype.onEndOfPath = function(){
     if(this.action.type == 2) GameServer.skinAnimal(this,this.action.id);
 };
 
+Player.prototype.checkForHostiles = function(){
+    var AOIs = Utils.listAdjacentAOIs(this.aoi);
+    for(var i = 0; i < AOIs.length; i++){
+        var aoi = GameServer.AOIs[AOIs[i]];
+        for(var j = 0; j < aoi.entities.length; j++) {
+            var entity = aoi.entities[j];
+            if(!entity.isAnimal) continue;
+            if(!entity.isAggressive()) continue;
+            if(!entity.isAvailableForFight()) continue;
+            if(Utils.euclidean(this,entity) < 10){
+                console.log(this.getShortID(),'spots',entity.getShortID());
+                //this.addMsg('!'+entity.getShortID());
+                GameServer.handleBattle(this,entity,true);
+                break;
+            }
+        }
+    }
+};
+
 Player.prototype.enterBuilding = function(id){
     // TODO: check for proximity
     // TODO: add to a list of people in the building object
@@ -482,6 +502,10 @@ Player.prototype.enterBuilding = function(id){
 Player.prototype.exitBuilding = function(){
     // TODO: check if ok
     this.setProperty('inBuilding', -1);
+};
+
+Player.prototype.isAvailableForFight = function(){
+    return (!this.isInFight() && !this.isInBuilding() && !this.isDead() && !this.isMoving());
 };
 
 Player.prototype.isInBuilding = function(){

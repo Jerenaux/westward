@@ -880,14 +880,15 @@ Engine.updateEnvironment = function(){
         Engine.displayChunk(newChunks[j]);
     }
 
-    Engine.updateDisplayedEntities();
+    //Engine.updateDisplayedEntities();
 };
 
-Engine.updateDisplayedEntities = function(){
+/*Engine.updateDisplayedEntities = function(){
     // Whenever the player moves to a different AOI, for each player displayed in the game, check if it will still be
     // visible from the new AOI; if not, remove it
     if(!Engine.created) return;
     var adjacentChunks = Utils.listAdjacentAOIs(Engine.player.chunk);
+    console.log(adjacentChunks);
 
     Engine.entityManager.entities.forEach(function(entityType){
         Engine.updateDisplay(
@@ -896,17 +897,17 @@ Engine.updateDisplayedEntities = function(){
             adjacentChunks
         );
     });
-};
+};*/
 
 // Check if the entities of some list are in a neighboring chunk or not
-Engine.updateDisplay = function(list,map,adjacent){
+/*Engine.updateDisplay = function(list,map,adjacent){
     list.forEach(function(id){
         var element = map[id];
         if(Engine.debug && element.chunk === undefined) console.warn('No chunk defined for ',element);
         // check if the AOI of entity p is in the list of the AOI's adjacent to the main player
         if(element) if(adjacent.indexOf(element.chunk) == -1) element.remove();
     });
-};
+};*/
 
 Engine.displayChunk = function(id){
     if(Engine.mapDataCache[id]){
@@ -1241,6 +1242,7 @@ Engine.createElements = function(arr,entityType){
     var pool = Engine.entityManager.pools[entityType];
     var constructor = Engine.entityManager.constructors[entityType];
     arr.forEach(function(data){
+        //console.log('creating',entityType,data.id);
         var e = pool.length > 0 ? pool.shift() : new constructor();
         e.setUp(data);
         e.update(data);
@@ -1251,7 +1253,7 @@ Engine.createElements = function(arr,entityType){
 Engine.updateElements = function(obj,table){
     Object.keys(obj).forEach(function (key) {
         if(!table.hasOwnProperty(key)) {
-            if(Engine.debug) console.warn('Attempt to update non-existing element');
+            if(Engine.debug) console.warn('Attempt to update non-existing element with ID',key);
             return;
         }
         table[key].update(obj[key]);
@@ -1261,7 +1263,7 @@ Engine.updateElements = function(obj,table){
 Engine.removeElements = function(arr,table){
     arr.forEach(function(id){
         if(!table.hasOwnProperty(id)) {
-            if(Engine.debug) console.warn('Attempt to remove non-existing element');
+            if(Engine.debug) console.warn('Attempt to remove non-existing element with ID',id);
             return;
         }
         table[id].remove();

@@ -14,12 +14,15 @@ Prototype level:
 Week:
 -----
 *1 item/recipe a day*
+Investigate spawn amount of spawn zones
 Bug: starting hostile fight when already in fight
-Bug: investigate logs of "starting fight with P0" without actual fights
-Bug: fixed ghost updated
+Bug: fixed ghost updates
+=> still duplicates; check if correlates with entry present in both new and removed?
 Bug: moving down right after connect doesn't play anim
+Polish: make fighters look toward targets
 Battle: check that hostiles are detected when player move (test with immobile wolves)
 UI: info panel on first play (basic commands + what's not implemented yet)
+UI: still can't re-enter building after click
 Design document
 Define spawn zones better (no settlements inside)
 Settlement selection: display infoPanel (say that it's possible to rech other settlement, etc.)

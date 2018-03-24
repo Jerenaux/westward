@@ -18,6 +18,7 @@ Building = new Phaser.Class({
         var buildingData = Engine.buildingsData[data.type];
         var sprite = (data.built ? buildingData.sprite : Engine.buildingsData[FOUNDATIONS_ID].sprite);
         this.setTexture(sprite);
+        this.setVisible(true);
 
         this.setTilePosition(data.x,data.y,true);
         this.setID(data.id);

@@ -19,6 +19,7 @@ var Animal = new Phaser.Class({
 
         var animalData = Engine.animalsData[data.type];
         this.id = data.id;
+        console.log('new ',data.id);
 
         Engine.animals[this.id] = this;
         Engine.entityManager.addToDisplayList(this);
@@ -27,6 +28,7 @@ var Animal = new Phaser.Class({
         this.setTexture(animalData.sprite);
         this.setFrame(animalData.frame);
         this.setDisplayOrigin(0);
+        this.setVisible(true);
         this.dead = false;
         this.name = animalData.name+' '+this.id;
         this.walkAnimPrefix = animalData.walkPrefix;
@@ -41,6 +43,7 @@ var Animal = new Phaser.Class({
     },
 
     remove: function(){
+        console.log('remove ',this.id,'(',this.tileX,',',this.tileY,',',this.chunk,',)');
         CustomSprite.prototype.remove.call(this);
         delete Engine.animals[this.id];
     },
