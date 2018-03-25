@@ -21,7 +21,6 @@ var TradeEvent = Event.discriminator(
         action: Number,
         price: Number,
         nb: Number,
-        totalPrice: Number,
         isEquipment: {type: Boolean, default: false},
         isConsumable: {type: Boolean, default: false},
         isResource: {type: Boolean, default: false},
@@ -32,10 +31,10 @@ var TradeEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
-
 var Prism = {
     actions: {
-        'buy': 0
+        'buy': 0,
+        'sell': 1
     }
 };
 
@@ -49,10 +48,20 @@ Prism.logEvent = function(player,actionKey,data){
     data.pid = player.id;
 
     switch(action){
-        case '0': // buy
+        case 0: // buy, fall-through to next
+        case 1: // sell
+            getItemData(data);
             var event = new TradeEvent(data);
+            console.log(event);
             break;
     }
 };
+
+function getItemData(data){
+    console.log('KEYS:')
+    console.log(Object.keys(TradeEvent.schema.paths).filter(function(k){
+        return k[0] != '_';
+    }));
+}
 
 module.exports.Prism = Prism;

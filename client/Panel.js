@@ -139,6 +139,13 @@ Panel.prototype.display = function(){
         b.ring.setVisible(true);
         b.zone.setVisible(true);
     });
+    Engine.inPanel = true;
+    Engine.currentPanel = this;
+};
+
+Panel.prototype.hide = function(){
+    Frame.prototype.hide.call(this);
+    Engine.inPanel = false;
 };
 
 function Capsule(x,y,icon,container){

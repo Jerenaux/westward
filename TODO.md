@@ -16,17 +16,14 @@ Week:
 *1 item/recipe a day*
 Investigate spawn amount of spawn zones
 Bug: starting hostile fight when already in fight
-Bug: fixed ghost updates
-=> still duplicates; check if correlates with entry present in both new and removed?
+Bug: weird health bar behavior
 Bug: moving down right after connect doesn't play anim
 Polish: make fighters look toward targets
-Battle: check that hostiles are detected when player move (test with immobile wolves)
-UI: info panel on first play (basic commands + what's not implemented yet)
-UI: still can't re-enter building after click
+Polish: continuous movement system
+Center play button
+Battle: check for hostiles makes animals join battles!
 Design document
 Define spawn zones better (no settlements inside)
-Settlement selection: display infoPanel (say that it's possible to rech other settlement, etc.)
-Character: display actual respawn point 
 Economic loop: harvest herbs (scatter roots)
 Help: buttons in buildings
 

@@ -223,5 +223,12 @@
     "name": "Feather",
     "desc": "Crafting material used to make arrows.",
     "isMaterial": true
+  },
+  "31":{
+    "atlas": "items",
+    "frame":"wheat",
+    "name": "Wheat",
+    "desc": "Resource harvested from farms that can be converted into food at a Mill.",
+    "isResource": true
   }
 }

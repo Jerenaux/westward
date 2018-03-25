@@ -24,6 +24,7 @@ InfoPanel.prototype.display = function(){
     this.displayTexts();
     if(this.button) this.button.display();
 };
+
 InfoPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
     this.hideTexts();

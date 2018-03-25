@@ -16,8 +16,11 @@
         <div class="panel-body">
             <div class="box">
                 <div class="panel panel-default building_panel" ng-repeat="building in settlement.buildings">
-                    <div class="panel-heading">#{{building.id}} <b>{{building.type | buildingTypeFilter}}</b></div>
-                    <div class="panel-body">
+                    <div class="panel-heading">
+                        #{{building.id}} <b>{{building.type | buildingTypeFilter}}</b>
+                        <button type="button" class="btn btn-sm btn-success edit-btn" ng-click="toggleVisibility('editForms',building.id)">Edit</button><br/>
+                    </div>
+                    <div class="panel-body building-body">
                         ({{building.x}},{{building.y}})<br/>
                         Gold: {{building.gold}}<br/>
                         Committed: {{building.committed}}<br/>
@@ -28,15 +31,15 @@
                             <span ng-repeat="itm in building.inventory">{{itm | shopFilter:building.prices}}  <br/></span>
                         </div>
 
-                        <button type="button" class="btn btn-primary" ng-click="toggleVisibility('editForms',building.id)">Edit</button><br/>
-
-                        <form ng-show="editForms[building.id].visible" ng-submit="setStock(building.id)">
-                            Set
-                            <select ng-model="inventoryForms[building.id].item" ng-options="item.id as item.name for item in data.itemsList | orderBy:'name'"></select><br/>
-                            To
-                            <input required ng-model="inventoryForms[building.id].nb" size="2">
-                            <button type="submit" class="btn btn-success">+</button>
-                        </form>
+                        <div class="edit-div">
+                            <form ng-show="editForms[building.id].visible" ng-submit="setStock(building.id)">
+                                Set
+                                <select ng-model="inventoryForms[building.id].item" ng-options="item.id as item.name for item in data.itemsList | orderBy:'name'"></select><br/>
+                                To
+                                <input required ng-model="inventoryForms[building.id].nb" size="2">
+                                <button type="submit" class="btn btn-success">+</button>
+                            </form>
+                        </div>
                         <!-- {{building | displayBuilding}}-->
                     </div>
                 </div>

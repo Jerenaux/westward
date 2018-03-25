@@ -263,6 +263,8 @@ Engine.createMarker = function(){
 };
 
 Engine.initWorld = function(data){
+    Engine.animalUpdates = new ListMap(); // debug purpose, remove
+
     console.log(data);
     Engine.settlementsData = data.settlements;
     Engine.addHero(data);
@@ -274,6 +276,18 @@ Engine.initWorld = function(data){
     setTimeout(function(){
         UI.camera._fadeAlpha = 0;
     },200);
+
+    if(Client.isNewPlayer()) {
+        var w = 400;
+        var h = 290;
+        var y = 20;
+        var panel = new InfoPanel((UI.getGameWidth() - w) / 2, (UI.getGameHeight() - h) / 2, w, h, 'Welcome');
+        var text = panel.addText(10, y, UI.textsData['welcome'], null, 14, Utils.fonts.normal);
+        var ys = y + text.height + 10;
+        panel.addText(10, ys, UI.textsData['not_implemented'], null, 14, Utils.fonts.normal);
+        panel.addBigButton('Got it');
+        panel.display();
+    }
 };
 
 Engine.createAnimations = function(){
@@ -663,11 +677,14 @@ Engine.makeStaffMenu = function(){
     var commx = govx + govw/2 + padding/2;
 
     var gov = menu.addPanel('governor',new StaffPanel(govx,govy,govw,govh,'Governor'));
+    gov.addButton(govw-30, 8, 'blue','help',null,'',UI.textsData['governor_help']);
     gov.addStaff([{name:'Mr. Governor'}]);
     gov.addCenterText('Your civic level is too low to vote for the Governor');
     var chan = menu.addPanel('chancellors',new StaffPanel(chanx,chany,govw,chanh,'Chancellors'));
+    chan.addButton(govw-30, 8, 'blue','help',null,'',UI.textsData['chancellor_help']);
     chan.addStaff([{name:'Palpatine'},{name:'Valorum'},{name:'Tobby'}]);
     var comm = menu.addPanel('commanders',new StaffPanel(commx,chany,govw,chanh,'Commanders'));
+    comm.addButton(govw-30, 8, 'blue','help',null,'',UI.textsData['commander_help']);
     comm.addStaff([{name:'Adama'},{name:'William Riker'}]);
     return menu;
 };
@@ -969,6 +986,7 @@ Engine.handleClick = function(pointer,objects){
     if(objects.length > 0){
         for(var i = 0; i < Math.min(objects.length,2); i++){ // disallow bubbling too deep, only useful in menus (i.e. shallow)
             if(Engine.interrupt){
+                console.log('interrupt');
                 Engine.interrupt = false;
                 return;
             }
@@ -976,8 +994,8 @@ Engine.handleClick = function(pointer,objects){
         }
         Engine.interrupt = false;
     }else{
-        if(!Engine.inMenu && !BattleManager.inBattle && !Engine.dead) {
-            if(Engine.inPanel) Engine.currentPanel.hide();
+        if(!Engine.inPanel && !Engine.inMenu && !BattleManager.inBattle && !Engine.dead) {
+            //if(Engine.inPanel) Engine.currentPanel.hide();
             Engine.moveToClick(pointer);
         }
     }
@@ -1220,6 +1238,20 @@ Engine.update = function(){
 
 // Processes the global update packages received from the server
 Engine.updateWorld = function(data){  // data is the update package from the server
+
+    var track = new Set();
+    if(data.newanimals){
+        data.newanimals.forEach(function(n){
+           track.add(n.id);
+        });
+    }
+    //console.log(track);
+    if(data.removedanimals){
+        data.removedanimals.forEach(function(id){
+            if(track.has(id)) console.warn('ID',id,'present in both new and remove');
+        });
+    }
+
     if(data.newplayers) Engine.createElements(data.newplayers,'player');
     if(data.newbuildings) Engine.createElements(data.newbuildings,'building');
     if(data.newanimals) Engine.createElements(data.newanimals,'animal');
@@ -1389,6 +1421,7 @@ Engine.countIcons = function(){
 };
 
 Engine.processAnimalClick = function(target){
+    if(Engine.inPanel) return;
     if(target.dead){
         Engine.player.setDestinationAction(2,target.id); // 2 for animal
         Engine.computePath({x:target.tileX,y:target.tileY});
@@ -1544,3 +1577,7 @@ Engine.debugScreen = function(){
     graphics.strokePath();
     graphics.closePath();
 };
+
+function s(id){
+    console.log(Engine.animalUpdates[id]);
+}

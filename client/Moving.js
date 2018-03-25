@@ -62,7 +62,7 @@ var Moving = new Phaser.Class({
     },
 
     move: function(path){
-        if(path.length == 0) this.endMovement();
+        if(path.length <= 1) this.endMovement();
         if(this.isActiveFighter) BattleManager.deactivateCell();
 
         var tweens = [];
@@ -92,7 +92,6 @@ var Moving = new Phaser.Class({
 
     endMovement: function(){
         if(!this.active) return; // quick fix
-        //this.flagForStop = false;
         this.previousOrientation = null;
         this.anims.stop();
         this.setFrame(this.restingFrames[this.orientation]);

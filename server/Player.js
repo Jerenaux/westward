@@ -83,7 +83,7 @@ Player.prototype.setStartingInventory = function(){
     //this.giveItem(11,2); // sword
     this.giveItem(6,1); // potion
 
-    this.giveItem(30,1); // thick grass
+    this.giveItem(31,1);
 
     this.giveGold(500);
 };

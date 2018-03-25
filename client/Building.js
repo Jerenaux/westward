@@ -195,7 +195,7 @@ Building = new Phaser.Class({
     // ### INPUT ###
 
     handleClick: function () {
-        if (Engine.inMenu || Engine.player.inFight || Engine.dead) return;
+        if (Engine.inPanel || Engine.inMenu || Engine.player.inFight || Engine.dead) return;
         if (!this.entry) return;
         var pos = {
             x: this.tx + this.entry.x,

@@ -47,6 +47,10 @@
     {
       "filename":"bone_arrow",
       "frame": {"x":192,"y":192,"w":32,"h":32}
+    },
+    {
+      "filename":"wheat",
+      "frame": {"x":288,"y":32,"w":32,"h":32}
     }
   ]
 }

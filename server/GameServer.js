@@ -39,6 +39,8 @@ var BattleCell = require('./Battle.js').BattleCell;
 var SpawnZone = require('./SpawnZone.js').SpawnZone;
 var PF = require('../shared/pathfinding.js');
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
+var Prism = require('./Prism.js').Prism;
+
 
 GameServer.updateStatus = function(){
     console.log('Successful initialization step:',GameServer.initializationSequence[GameServer.initializationStep++]);
@@ -80,6 +82,7 @@ GameServer.createModels = function(){
         lastProdCycle: { type: Date, default: Date.now }
     });
     var playerSchema = mongoose.Schema({
+        // TODO: think about ID
         x: {type: Number, min: 0, required: true},
         y: {type: Number, min: 0, required: true},
         gold: {type: Number, min: 0},
@@ -179,7 +182,7 @@ GameServer.addAnimal = function(x,y,type){
 };
 
 GameServer.setUpdateLoops = function(){
-    var clientUpdateRate = 1000/5; // Rate at which update packets are sent
+    var clientUpdateRate = 1000/8; // Rate at which update packets are sent
     var walkUpdateRate = 1000/20; // Rate at which positions are updated
     GameServer.npcUpdateRate = 1000/5;
     var settlementUpdateRate = 10*1000;
@@ -188,7 +191,7 @@ GameServer.setUpdateLoops = function(){
 
     setInterval(GameServer.updateNPC,GameServer.npcUpdateRate);
     setInterval(GameServer.updateWalks,walkUpdateRate);
-    setInterval(GameServer.updateClients,clientUpdateRate);
+    setInterval(GameServer.updateClients,Math.round(clientUpdateRate));
     setInterval(GameServer.updateSettlements,settlementUpdateRate);
     setInterval(GameServer.updatePlayers,playerUpdateRate);
     setInterval(GameServer.updateSpawnZones,spawnZoneUpdateRate);
@@ -207,15 +210,13 @@ GameServer.checkPlayerID = function(id){ // check if no other player is using sa
 };*/
 
 GameServer.addNewPlayer = function(socket,data){
-    //if(!data.selectedClass) return;
-    if(!data.selectedClass) data.selectedClass = 'merchant';
+    if(data.selectedClass == undefined) data.selectedClass = 1;
     if(data.selectedSettlement == undefined) data.selectedSettlement = 0;
     console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
     player.setStartingInventory();
     player.setSettlement(data.selectedSettlement);
     player.setClass(data.selectedClass);
-    //player.setStartingPosition();
     player.spawn();
     var document = player.dbTrim();
     GameServer.server.db.collection('players').insertOne(document,function(err){
@@ -506,6 +507,7 @@ GameServer.handleShop = function(data,socketID) {
         building.takeGold(price);
         building.giveItem(item,nb);
     }
+    Prism.logEvent(player,action,{id:item,price:price,nb:nb});
 };
 
 GameServer.handleCraft = function(data,socketID){

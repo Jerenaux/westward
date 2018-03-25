@@ -35,6 +35,7 @@ ChatPanel.prototype.toggle = function(){
 
 ChatPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
+    Engine.inPanel = false;
     this.input.style.display = "inline";
     this.input.focus();
 };

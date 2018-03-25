@@ -8,11 +8,12 @@ function ClassPanel(x,y,width,height,title){
 ClassPanel.prototype = Object.create(Panel.prototype);
 ClassPanel.prototype.constructor = ClassPanel;
 
-ClassPanel.prototype.setClass = function(name){
-    var text = this.addText(10,15,UI.textsData[name+'_desc'],Utils.colors.white,14,Utils.fonts.normal);
+ClassPanel.prototype.setClass = function(id){
+    var classData = UI.classesData[id];
+    var text = this.addText(10,15,classData.desc,Utils.colors.white,14,Utils.fonts.normal);
     text.setWordWrapWidth(this.width-15,true);
     this.button = new BigButton(this.x+(this.width/2)-45,this.y+this.height-35,'Select',function(){
-        UI.selectClass(name);
+        UI.selectClass(id);
     });
 };
 

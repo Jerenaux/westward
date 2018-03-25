@@ -1,7 +1,5 @@
 {
   "currency": "coin",
-  "settlement_0": "New Beginning is the oldest settlement on the Continent. However, due to initial setbacks and grievous attacks from the natives, it is far less developed than Hope, in the north. Settlers keep coming because its location promises very lucrative yields of rare crops that grow only there and could be sold a fortune to the Mainland, once the necessary infrastructure to harvest them and to defend the settlement is put in place.",
-  "settlement_1": "Hope is the most developed settlement on the Continent, and the theatre of the first steps of a promising mining industry. Only there can iron and coal be mined and decent weapons forged at the moment. This will give Hope a crucial role in fueling and leading the colonization of the Continent, but it will also make it a target for the attacks of the natives.",
 
   "inventory_help": "This is your inventory. Clicking on consumable items will consume them. Clicking on equipable items will equip them. Some equipment can increase your inventory size.",
   "equipment_help": "This is your equipment. Click on a piece of equipment to unequip it. You cannot equip a ranged weapon and a melee weapon at the same time. You must equip an ammo container (e.g. quiver) before equipping the corresponding ammunition (e.g. arrows).",
@@ -27,6 +25,9 @@
   "sell_help": "This panel only displays the items that you own and that the shop you are visitting is willing to buy (buying price greater than 0, as set by a chancellor). Click on an item to start selling it. The capsule at the top of the panel indicates your amount of money.",
   "buy_help": "This panel displays the items that are in stock in the shop which have a selling price greater than 0, as set by a chencellor. Click on an item to start buying it. The capsule at the top of the panel indicates the amount of money in the coffers of the building.",
   "prod_help": "This building produces resources at regular intervals called \"cycles\". Cycle duration varies from one building type to another, and can range from a few minutes to a day. The amount of resources produced after each cycle is listed in the panel, and depends on the productivity of the building. The produced resource are automatically stored in the Fort.",
+  "governor_help": "Each settlement has one Governor. He is chosen by a system of permanent election, where all citizens above a certain civic level can vote at any time to another citizen for this office. The Governor can name the other officials of the settlement, namely the Chancellors and Commanders.",
+  "chancellor_help": "The Chancellors manage the economy of the settlement. They can decide what buildings to build and where, they set the prices at the Trade Post, and control the flow of resources between the various buildings.",
+  "commander_help": "The Commanders are in charge of the defense of the settlement. They decide where to build towers, and they can recruit and position troops to defend in case of an attack.",
 
   "health_advice": "You are low on health. Before venturing away from civilization, make sure to craft some red potions, or to buy some at the nearest Trade Post.",
   "equip_advice":"Your equipment is a bit light. See if you can't purchase somethig better at the nearest Trade Post.",
@@ -36,14 +37,9 @@
   "deficit_advice": "Your settlement is in food deficit! Try to find food and sell it at the Trade Post!",
 
   "classxp": "Path XP",
-  "class_soldier": "Soldier",
-  "class_craftsman": "Craftsman",
-  "class_merchant": "Merchant",
-  "class_explorer": "Explorer",
   "class_selection_title": "Pick your path",
   "class_selection": "Select carefully the path you'll follow. Each comes with unique benefits and will define your role in the economy and the settlement of the Continent. In the end, however, remember that all paths lead West...",
-  "soldier_desc": "The Path of War. Soldiers excel in battle, be it against wildlife or humans, which is expressed by several permanent bonuses to their battle-related stats. These bonuses are also applied to any troops they may command as Commanders. Finally, only they can wield advanced battle equipment. They play an important role in the defense of settlements, securing of trade routes and attack of enemy encampments.",
-  "merchant_desc": "The Path of Coin. Merchants are savvy negotiators able to make the best deals in any transaction. They are also adept managers, who can set up networks of caravans to transport goods across the Continent and own several shops per settlement. They often end up very wealthy by playing an active role in the functioning of the economy and in the distribution of resources and crafted goods.",
-  "explorer_desc": "The Path of Discovery. Explorers can travel longer distances than anyone and avoid battles more easily to find rare resources only available in remote locations - or to discover these locations in the first place. In addition, their experience with nature makes them more apt to gather crafting materials from dead animals and plants. This gives them important functions as scouts and providers of useful elements.",
-  "craftsman_desc": "The Path of Creation. Craftsmen are polymaths with deep knowledge of metallurgy and alchemy. As such, they can convert the fruits of the earth into weapons and the gifts of the plains into equipment and potions. Both the settlements and the other citizens rely on them for the manufacture of vital products that only they can make."
-}
+  "settlement_intro": "Select in which settlement you want to begin your adventure. A more developed settlement makes life easier, but might offer less opportunities for earning a civic position, or could be far away from useful resources. In any case, you are free to travel to another settlement (and encouraged to do so for trade), but the trip may be long and dangerous! Click on the green blinking icons on the map for more information about the settlements.",
+  "welcome": "Welcome to Westward. Click on the ground to move. Click on buildings to visit them. Click on animals to attack them. Press enter to open the chat bar. The icons in the bottom-right corner of the screen open different menus.",
+  "not_implemented": "The following features are mentioned in the demo but not implemented yet: civic levels, path levels, development levels, using bombs in battle and fatigue. In addition, the enemy civilization is totally absent at the moment, and it is not possible to elect Governors yet. Not to mention all the other planned features that are not mentioned anywhere yet. Coming soon!"
+ }

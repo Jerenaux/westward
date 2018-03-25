@@ -37,7 +37,7 @@ CharacterPanel.prototype.addInterface = function(){
     this.bars.push(this.civicbar);
     y += 20;
 
-    this.addPolyText(x,y,['Respawn location: ','Fort ','of ','New Beginning'],[null,Utils.colors.gold,null,Utils.colors.gold]);
+    this.addPolyText(x,y,['Respawn location: ','Fort ','of ',Engine.settlementsData[Engine.player.settlement].name],[null,Utils.colors.gold,null,Utils.colors.gold]);
     y += 30;
     this.addText(x,y,'Stats modifiers:');
     y+= 15;
@@ -50,7 +50,7 @@ CharacterPanel.prototype.addInterface = function(){
 };
 
 CharacterPanel.prototype.update = function(){
-    this.classText.setText(" "+Utils.capitalizeFirstLetter(Engine.player.class)+"   -   ");
+    this.classText.setText(" "+UI.classesData[Engine.player.class].name+"   -   ");
     this.fatigueText.setText('0%');
     this.civicXPtxt.setText(Engine.player.civicxp+'/'+Engine.player.maxcivicxp);
     this.civicbar.setLevel(Engine.player.civicxp,Engine.player.maxcivicxp);

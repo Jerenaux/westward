@@ -26,3 +26,12 @@ textarea {
 .building_panel {
     width: 300px;
 }
+.edit-btn{
+    float: right;
+    margin-top: -5px;
+    margin-right: -10px;
+}
+.edit-div{
+    position: relative;
+    bottom: 0;
+}

@@ -17,6 +17,7 @@ var UI = {
         this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
         this.load.spritesheet('icons2', 'assets/sprites/icons.png',{frameWidth:25,frameHeight:24});
         this.load.json('texts', 'assets/data/texts.json');
+        this.load.json('classes', 'assets/data/classes.json');
 
         if(Client.isNewPlayer()) {
             this.load.image('bigbg', 'assets/sprites/bigbg.png');
@@ -46,6 +47,7 @@ var UI = {
         UI.camera = UI.scene.cameras.main;
         UI.notifications = [];
         UI.textsData = this.cache.json.get('texts');
+        UI.classesData = this.cache.json.get('classes');
         UI.setCursor();
 
         this.input.setTopOnly(false);
@@ -146,22 +148,27 @@ UI.makeClassMenu = function() {
     menu.addPanel('title',title);
     var infow = (2*classw)+padding;
     var info = menu.addPanel('info',new InfoPanel(x, y, infow, desch));
-    var text = info.addText(10,10,UI.textsData['class_selection'],Utils.colors.white,14,Utils.fonts.normal);
+    info.addText(10,10,UI.textsData['class_selection'],Utils.colors.white,14,Utils.fonts.normal);
     y += desch + padding;
-    this.makeClassPanel(menu,'soldier',x,y,classw,classh);
-    x += classw+padding;
-    this.makeClassPanel(menu,'craftsman',x,y,classw,classh);
-    x = tlx;
-    y += classh+padding;
-    this.makeClassPanel(menu,'merchant',x,y,classw,classh);
-    x += classw+padding;
-    this.makeClassPanel(menu,'explorer',x,y,classw,classh);
+
+    var i = 0;
+    for(var classID in UI.classesData){
+        this.makeClassPanel(menu,classID,x,y,classw,classh);
+        x += classw+padding;
+        if(++i == 2){
+            i = 0;
+            x = tlx;
+            y += classh+padding;
+        }
+    }
+
     return menu;
 };
 
-UI.makeClassPanel = function(menu,className,x,y,classw,classh){
-    var panel = menu.addPanel(className,new ClassPanel(x, y, classw, classh, UI.textsData['class_'+className]));
-    panel.setClass(className);
+UI.makeClassPanel = function(menu,classID,x,y,classw,classh){
+    var classData = UI.classesData[classID];
+    var panel = menu.addPanel('class_'+classID,new ClassPanel(x, y, classw, classh, classData.name));
+    panel.setClass(classID);
 };
 
 UI.leaveTitleScreen = function(){
@@ -184,8 +191,8 @@ UI.displayClassMenu = function(){
     UI.classMenu.display();
 };
 
-UI.selectClass = function(name){
-    UI.selectedClass = name;
+UI.selectClass = function(id){
+    UI.selectedClass = id;
     var fadeDuration = 500;
     UI.camera.fade(fadeDuration);
     setTimeout(function(){
@@ -213,27 +220,48 @@ UI.displaySettlementSelectionMenu =  function(){
     map.y += 150;
     map.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,scroll);
 
-    var w = 300;
+    /*var w = 300;
     var h = 100;
     var panel = new InfoPanel(UI.getGameWidth()-w,UI.getGameHeight()-h,w,h,'Choose a settlement');
-    panel.addText(10,15,'Click on one of the blinking icons for more information about the corresponding settlement.');
-    panel.display();
+    panel.addText(10,15,'Click on one of the green blinking icons for more information about the corresponding settlement.');
+    panel.display();*/
 
     UI.SSmap = map;
-    UI.SSpanel = panel;
     UI.SScontent = content;
     Client.requestSettlementData();
 
-    UI.SScontent.push(UI.scene.add.image(480,456,'dangersetl').setAlpha(0.6));
-    UI.SScontent.push(UI.scene.add.image(180,36,'dangersetl').setAlpha(0.6));
-    UI.SScontent.push(UI.scene.add.image(660,45,'dangersetl').setAlpha(0.6));
-    UI.SScontent.push(UI.scene.add.image(120,548,'dangersetl').setAlpha(0.6));
+    UI.displatEnemySettlement(480,456);
+    UI.displatEnemySettlement(180,36);
+    UI.displatEnemySettlement(660,45);
+    UI.displatEnemySettlement(120,548);
+
+    var w = 400;
+    var h = 220;
+    var panel = new InfoPanel((UI.getGameWidth()-w)/2,(UI.getGameHeight()-h)/2,w,h,'Settlement selection');
+    panel.addText(10,15,UI.textsData['settlement_intro'],null,14,Utils.fonts.normal);
+    panel.addBigButton('Got it');
+    panel.display();
+    UI.SSpanel = panel;
+
 };
 
 UI.displaySettlements = function(list){
     list.forEach(function(e){
         UI.displaySettlement(e);
     });
+};
+
+UI.displatEnemySettlement = function(x,y){
+    var icon = UI.scene.add.image(x,y,'dangersetl').setAlpha(0.6);
+    icon.setInteractive();
+    icon.on('pointerover',function(){
+        UI.tooltip.updateInfo('Enemy camp');
+        UI.tooltip.display();
+    });
+    icon.on('pointerout',function(){
+        UI.tooltip.hide();
+    });
+    UI.SScontent.push(icon);
 };
 
 UI.displaySettlement = function(data){
@@ -256,13 +284,19 @@ UI.displaySettlement = function(data){
     var w = 350;
     var h = 300;
     var panel = new SettlementPanel(UI.getGameWidth()-w,UI.getGameHeight()-h,w,h,data.name);
-    //var txt = panel.addText(10,15,'New Beginning was the first settlement.');
     panel.setUp(data);
 
     icon.on('pointerdown',function(){
-        UI.SSpanel.hide();
+        if(UI.SSpanel) UI.SSpanel.hide();
         panel.display();
         UI.SSpanel = panel;
+    });
+    icon.on('pointerover',function(){
+        UI.tooltip.updateInfo(data.name);
+        UI.tooltip.display();
+    });
+    icon.on('pointerout',function(){
+        UI.tooltip.hide();
     });
 };
 

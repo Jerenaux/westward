@@ -11,6 +11,7 @@ var Animal = new Phaser.Class({
     },
 
     setUp: function(data){
+        Engine.animalUpdates.add(data.id,'create');
         if(Engine.animals.hasOwnProperty(data.id)){
             if(Engine.debug) console.warn('duplicate animal ',data.id,'at',data.x,data.y,'last seen at ',
                 Engine.animals[data.id].tileX,',',Engine.animals[data.id].tileY);
@@ -19,7 +20,7 @@ var Animal = new Phaser.Class({
 
         var animalData = Engine.animalsData[data.type];
         this.id = data.id;
-        console.log('new ',data.id);
+        //console.log('new ',data.id);
 
         Engine.animals[this.id] = this;
         Engine.entityManager.addToDisplayList(this);
@@ -36,6 +37,7 @@ var Animal = new Phaser.Class({
     },
 
     update: function(data){
+        Engine.animalUpdates.add(this.id,'update');
         if(data.path) this.move(data.path);
         if(data.stop) this.stop();
         Engine.handleBattleUpdates(this,data);
@@ -43,7 +45,8 @@ var Animal = new Phaser.Class({
     },
 
     remove: function(){
-        console.log('remove ',this.id,'(',this.tileX,',',this.tileY,',',this.chunk,',)');
+        //console.log('remove ',this.id,'(',this.tileX,',',this.tileY,',',this.chunk,',)');
+        Engine.animalUpdates.add(this.id,'remove');
         CustomSprite.prototype.remove.call(this);
         delete Engine.animals[this.id];
     },
@@ -62,7 +65,7 @@ var Animal = new Phaser.Class({
         }else{
             Engine.processAnimalClick(this);
         }
-        Engine.interrupt = true;
+        //Engine.interrupt = true;
     },
 
     handleOver: function(){
