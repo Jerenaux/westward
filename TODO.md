@@ -15,6 +15,7 @@ Week:
 -----
 *1 item/recipe a day*
 Bug: moving down right after connect doesn't play anim
+Bug: dont pathfind outside of world bounds
 Update collisions
 Polish: continuous movement system
 Make wandering animals converge to battles? (efficient: notify animals of new battles, don't have them check at every idle)
@@ -22,6 +23,7 @@ Design document
 Define spawn zones better (no settlements inside)
 Economic loop: harvest herbs (scatter roots)
 Help: buttons in buildings
+Figure out way to stop players (in case of being dragged in)
 
 Finish:
 -------

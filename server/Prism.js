@@ -8,7 +8,6 @@ var mongoose = require('mongoose');
 // All events correspond to *actions* performed by *players*
 // Frequency tables and means don't need logging
 
-// TODO: make event child specific to item-related events
 var eventSchema = new mongoose.Schema({
     pid: {type: Number, min: 0},
     time: { type: Date, default: Date.now }
@@ -58,10 +57,12 @@ Prism.logEvent = function(player,actionKey,data){
 };
 
 function getItemData(data){
-    console.log('KEYS:')
-    console.log(Object.keys(TradeEvent.schema.paths).filter(function(k){
+    var fields = Object.keys(TradeEvent.schema.paths).filter(function(k){
         return k[0] != '_';
-    }));
+    });
+    fields.forEach(function(field){
+        data[field] = GameServer.itemsData[data.id][field];
+    });
 }
 
 module.exports.Prism = Prism;

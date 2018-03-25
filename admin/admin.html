@@ -12,13 +12,33 @@
 <div ng-app="admin" ng-controller="mainCtrl">
 
     <div class="panel panel-default" ng-repeat="settlement in settlements">
-        <div class="panel-heading"><b>{{settlement.name}}</b>&nbsp;|&nbsp{{settlement.pop}} citizens&nbsp;|&nbsp;{{settlement.surplus | number:2 | pctFilter:true }}</div>
+        <div class="panel-heading">
+            <b>{{settlement.name}}</b>&nbsp;|&nbsp<span class="glyphicon glyphicon-user"></span> {{settlement.pop}}&nbsp;|&nbsp;{{settlement.surplus | number:2 | pctFilter:true }}
+            <button type="button" class="btn btn-primary edit-btn" ng-click="newBuildingForms[$index].visible = !newBuildingForms[$index].visible">
+                <span class="glyphicon glyphicon-plus"></span>
+            </button><br/>
+        </div>
         <div class="panel-body">
+
+            <div class="forms" ng-show="newBuildingForms[$index].visible">
+                <form ng-submit="addBuilding(settlement.id)">
+                    <b>New Building:</b><br/>
+                    (<input required class="coord" ng-model="newBuildingForms[$index].x" placeholder="x" size="1" >,
+                    <input required class="coord" ng-model="newBuildingForms[$index].y"  placeholder="y" size="3" >)<br/>
+                    <select ng-model="newBuildingForms[$index].type" ng-options="id as info.name for (id, info) in data.buildings"></select><br/>
+                    <select ng-model="newBuildingForms[$index].sid" ng-options="set.id as set.name for set in settlements"></select><br/>
+                    Built </b><input ng-model="newBuildingForms[$index].built" type="checkbox"><br/>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+
             <div class="box">
                 <div class="panel panel-default building_panel" ng-repeat="building in settlement.buildings">
                     <div class="panel-heading">
                         #{{building.id}} <b>{{building.type | buildingTypeFilter}}</b>
-                        <button type="button" class="btn btn-sm btn-success edit-btn" ng-click="toggleVisibility('editForms',building.id)">Edit</button><br/>
+                        <button type="button" class="btn btn-sm btn-primary edit-btn" ng-click="toggleVisibility('editForms',building.id)">
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </button><br/>
                     </div>
                     <div class="panel-body building-body">
                         ({{building.x}},{{building.y}})<br/>
@@ -29,7 +49,7 @@
                         <div ng-show="building.inventory.length > 0">
                             Inventory:<br/>
                             <span ng-repeat="itm in building.inventory">{{itm | shopFilter:building.prices}}  <br/></span>
-                        </div>
+                        </div><br/><br/>
 
                         <div class="edit-div">
                             <form ng-show="editForms[building.id].visible" ng-submit="setStock(building.id)">
@@ -44,24 +64,13 @@
                     </div>
                 </div>
             </div>
-            <button type="button" class="btn btn-primary" ng-click="newBuildingForms[$index].visible = !newBuildingForms[$index].visible">Add building</button><br/>
 
             <form ng-submit="deleteBuilding($index)">
                 <input required ng-model="deleteForms[$index].id" placeholder="building ID">
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <button type="submit" class="btn btn-danger btn-sm">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </button>
             </form>
-
-            <div class="forms" ng-show="newBuildingForms[$index].visible">
-                <form ng-submit="addBuilding(settlement.id)">
-                    <b>New Building:</b><br/>
-                    (<input required class="coord" ng-model="newBuildingForms[$index].x" placeholder="x" size="1" >,
-                    <input required class="coord" ng-model="newBuildingForms[$index].y"  placeholder="y" size="3" >)<br/>
-                    <select ng-model="newBuildingForms[$index].type" ng-options="id as info.name for (id, info) in data.buildings"></select><br/>
-                    <select ng-model="newBuildingForms[$index].sid" ng-options="set.id as set.name for set in settlements"></select><br/>
-                    Built </b><input ng-model="newBuildingForms[$index].built" type="checkbox"><br/>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
         </div>
     </div>
 

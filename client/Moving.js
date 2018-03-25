@@ -51,7 +51,7 @@ var Moving = new Phaser.Class({
 
     updateChunk: function(){
         this.chunk = Utils.tileToAOI({x:this.tileX,y:this.tileY});
-        if(this.constructor.name == 'Player' && this.isHero) {
+        if(this.isHero) {
             if(this.chunk != this.previousChunk) Engine.updateEnvironment();
             this.previousChunk = this.chunk;
         }
@@ -82,7 +82,12 @@ var Moving = new Phaser.Class({
             });
         }
 
-        if(this.movement !== null) this.movement.stop();
+        if(this.movement !== null){
+            /*var progress = this.movement.progress;
+            if(this.isHero) console.log(progress);
+            if(progress < 1) tweens.shift();*/
+            this.movement.stop();
+        }
         this.movement = Engine.scene.tweens.timeline({
             tweens: tweens,
             onUpdate: this.frameByFrameUpdate.bind(this),
@@ -125,6 +130,11 @@ var Moving = new Phaser.Class({
         if(this.orientation != this.previousOrientation){
             this.previousOrientation = this.orientation;
             this.anims.play(this.walkAnimPrefix+'_move_'+this.orientation);
+        }
+
+        if(this.isHero){
+            var position = Engine.getMouseCoordinates(Engine.lastPointer);
+            Engine.updateMarker(position.tile);
         }
     },
 

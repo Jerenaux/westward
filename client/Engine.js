@@ -1076,6 +1076,7 @@ Engine.getMouseCoordinates = function(pointer){
     var pxY = Engine.camera.scrollY + pointer.y;
     var tileX = Math.floor(pxX/Engine.tileWidth);
     var tileY = Math.floor(pxY/Engine.tileHeight);
+    Engine.lastPointer = {x:pointer.x,y:pointer.y};
     return {
         tile:{x:tileX,y:tileY},
         pixel:{x:pxX,y:pxY}
