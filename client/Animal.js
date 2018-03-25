@@ -11,7 +11,7 @@ var Animal = new Phaser.Class({
     },
 
     setUp: function(data){
-        Engine.animalUpdates.add(data.id,'create');
+        //Engine.animalUpdates.add(data.id,'create');
         if(Engine.animals.hasOwnProperty(data.id)){
             if(Engine.debug) console.warn('duplicate animal ',data.id,'at',data.x,data.y,'last seen at ',
                 Engine.animals[data.id].tileX,',',Engine.animals[data.id].tileY);
@@ -37,16 +37,20 @@ var Animal = new Phaser.Class({
     },
 
     update: function(data){
-        Engine.animalUpdates.add(this.id,'update');
+        //Engine.animalUpdates.add(this.id,'update');
         if(data.path) this.move(data.path);
         if(data.stop) this.stop();
+        if(data.facing) {
+            this.computeOrientation(this.tileX,this.tileY,data.facing.x,data.facing.y);
+            this.faceOrientation();
+        }
         Engine.handleBattleUpdates(this,data);
         if(data.dead) this.die();
     },
 
     remove: function(){
         //console.log('remove ',this.id,'(',this.tileX,',',this.tileY,',',this.chunk,',)');
-        Engine.animalUpdates.add(this.id,'remove');
+        //Engine.animalUpdates.add(this.id,'remove');
         CustomSprite.prototype.remove.call(this);
         delete Engine.animals[this.id];
     },

@@ -56,6 +56,10 @@ var Player = new Phaser.Class({
             if(!this.isHero) this.setVisible(true);
             this.inBuilding = data.inBuilding;
         }
+        if(data.facing) {
+            this.computeOrientation(this.tileX,this.tileY,data.facing.x,data.facing.y);
+            this.faceOrientation();
+        }
         if(data.settlement) this.settlement = settlement;
         Engine.handleBattleUpdates(this,data);
         if(data.dead == true) this.die(!this.firstUpdate);

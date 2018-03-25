@@ -82,20 +82,11 @@ Animal.prototype.setIdle = function(){
 };
 
 Animal.prototype.updateIdle = function(){
-    return;
     if(this.inFight) return;
     this.idleTime -= GameServer.npcUpdateRate;
     if(this.idleTime <= 0){
-        var dest = this.findRandomDestination();
-        var path = GameServer.findPath({x:this.x,y:this.y},dest);
-        if(!path || path.length <= 1){
-            this.idleTime = 200;
-            return;
-        }
-        path = PFUtils.trimPath(path,GameServer.battleCells).path;
-        if(debug) console.log('['+this.constructor.name+' '+this.id+'] Found path of length '+path.length);
-        this.idle = false;
-        this.setPath(path);
+        var success = this.goToDestination(this.findRandomDestination());
+        if(!success) this.idleTime = 200;
     }
 };
 
@@ -112,6 +103,18 @@ Animal.prototype.findRandomDestination = function(){
         x: Utils.clamp(this.x + Utils.randomInt(-5,5),0,World.worldWidth),
         y: Utils.clamp(this.y + Utils.randomInt(-5,5),0,World.worldHeight)
     };
+};
+
+Animal.prototype.goToDestination = function(dest){
+    var path = GameServer.findPath({x:this.x,y:this.y},dest);
+    if(!path || path.length <= 1) return false;
+    var trim = PFUtils.trimPath(path,GameServer.battleCells);
+    //console.log('trimmed:',trim.trimmed);
+    path = trim.path;
+    if(debug) console.log('['+this.constructor.name+' '+this.id+'] Found path of length '+path.length);
+    this.idle = false;
+    this.setPath(path);
+    return true;
 };
 
 Animal.prototype.queueAction = function(action){
@@ -226,6 +229,7 @@ Animal.prototype.computeBattleDestination = function(target){
 
 Animal.prototype.checkForHostiles = function(){
     if(!this.isAggressive()) return;
+    if(this.isInFight()) return;
     var AOIs = Utils.listAdjacentAOIs(this.aoi);
     for(var i = 0; i < AOIs.length; i++){
         var aoi = GameServer.AOIs[AOIs[i]];
@@ -235,7 +239,11 @@ Animal.prototype.checkForHostiles = function(){
             if(!entity.isAvailableForFight()) continue;
             if(Utils.euclidean(this,entity) < 10){
                 console.log(this.getShortID(),'spots',entity.getShortID());
-                GameServer.handleBattle(entity,this,true);
+                if(entity.isInFight()){
+                    this.goToDestination(entity);
+                }else {
+                    GameServer.handleBattle(entity, this, true);
+                }
                 break;
             }
         }
@@ -243,7 +251,7 @@ Animal.prototype.checkForHostiles = function(){
 };
 
 Animal.prototype.isAvailableForFight = function(){
-    return (!this.isInFight() && !this.isDead() && !this.isMoving());
+    return (!this.isDead() && !this.isMoving());
 };
 
 Animal.prototype.remove = function(){

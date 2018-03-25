@@ -279,4 +279,6 @@ Building.prototype.addCollisions = function(){
 
 Building.prototype.canFight = function(){return false;};
 
+Building.prototype.isAvailableForFight = function(){return false;}
+
 module.exports.Building = Building;

@@ -164,7 +164,7 @@ Tooltip.prototype.displayModifiers = function(stat){
 Tooltip.prototype.makeModifierText = function(x,y,value,type){
     var txt = this.getNextText();
     var number = value;
-    if(type == 'relative') value = (Math.round(value*100))+'%';
+    if(type == 'relative') value = value+'%';
     if(number >= 0) value = '+'+value;
     if(number > 0) txt.setFill(Utils.colors.green);
     if(number == 0) txt.setFill(Utils.colors.white);

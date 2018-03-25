@@ -237,10 +237,11 @@ Battle.prototype.applyDamage = function(f,dmg){
     if(f.getHealth() == 0) this.removeFighter(f);
 };
 
-Battle.prototype.processAttack = function(a,b){
+Battle.prototype.processAttack = function(a,b){ // a attacks b
     var delay = 500;
     if(!b || b.isDead()) return;
     if(this.nextTo(a,b)){
+        a.setProperty('facing',{x:b.x,y:b.y});
         var dmg = this.computeDamage('melee',a,b);
         this.applyDamage(b,dmg);
         b.setProperty('hit',dmg);
@@ -332,5 +333,7 @@ BattleCell.prototype.trim = function(){
 };
 
 BattleCell.prototype.canFight = function(){return false;}
+BattleCell.prototype.isAvailableForFight = function(){return false;}
+
 
 module.exports.BattleCell = BattleCell;

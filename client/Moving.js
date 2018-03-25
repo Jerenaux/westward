@@ -101,18 +101,26 @@ var Moving = new Phaser.Class({
         if(this.bubble) this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
     },
 
+    computeOrientation: function(fromX,fromY,toX,toY){
+        if(fromX > toX){
+            this.orientation = 'left';
+        }else if(fromX < toX) {
+            this.orientation = 'right';
+        }else if(fromY > toY) {
+            this.orientation = 'up';
+        }else if(fromY < toY) {
+            this.orientation = 'down';
+        }
+    },
+
+    faceOrientation: function(){
+        this.setFrame(this.restingFrames[this.orientation]);
+    },
+    
     tileByTilePreUpdate: function(tween,targets,startX,startY,endX,endY){
         if(!this.scene) return; // quick fix before the bug gets fixed in Phaser
 
-        if(startX > endX){
-            this.orientation = 'left';
-        }else if(startX < endX) {
-            this.orientation = 'right';
-        }else if(startY > endY) {
-            this.orientation = 'up';
-        }else if(startY < endY) {
-            this.orientation = 'down';
-        }
+        this.computeOrientation(startX,startY,endX,endY);
 
         if(this.orientation != this.previousOrientation){
             this.previousOrientation = this.orientation;

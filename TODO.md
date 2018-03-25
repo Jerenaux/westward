@@ -14,14 +14,10 @@ Prototype level:
 Week:
 -----
 *1 item/recipe a day*
-Investigate spawn amount of spawn zones
-Bug: starting hostile fight when already in fight
-Bug: weird health bar behavior
 Bug: moving down right after connect doesn't play anim
-Polish: make fighters look toward targets
+Update collisions
 Polish: continuous movement system
-Center play button
-Battle: check for hostiles makes animals join battles!
+Make wandering animals converge to battles? (efficient: notify animals of new battles, don't have them check at every idle)
 Design document
 Define spawn zones better (no settlements inside)
 Economic loop: harvest herbs (scatter roots)

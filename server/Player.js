@@ -485,7 +485,6 @@ Player.prototype.checkForHostiles = function(){
             if(!entity.isAvailableForFight()) continue;
             if(Utils.euclidean(this,entity) < 10){
                 console.log(this.getShortID(),'spots',entity.getShortID());
-                //this.addMsg('!'+entity.getShortID());
                 GameServer.handleBattle(this,entity,true);
                 break;
             }
@@ -505,7 +504,7 @@ Player.prototype.exitBuilding = function(){
 };
 
 Player.prototype.isAvailableForFight = function(){
-    return (!this.isInFight() && !this.isInBuilding() && !this.isDead() && !this.isMoving());
+    return (!this.isInBuilding() && !this.isDead() && !this.isMoving());
 };
 
 Player.prototype.isInBuilding = function(){

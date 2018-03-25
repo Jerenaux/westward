@@ -1189,13 +1189,15 @@ Engine.updateEquipment = function(slot,subSlot,item){
 };
 
 Engine.updateStat = function(key,data){
+    /*if(key == 'hp') console.log('NEW HP:',data.v);*/
+
     var statObj = Engine.player.getStat(key);
     statObj.setBaseValue(data.v);
     statObj.relativeModifiers = [];
     statObj.absoluteModifiers = [];
     if(data.r){
         data.r.forEach(function(m){
-            statObj.relativeModifiers.push(m/100);
+            statObj.relativeModifiers.push(m);
         })
     }if(data.a){
         data.a.forEach(function(m){
@@ -1239,7 +1241,7 @@ Engine.update = function(){
 // Processes the global update packages received from the server
 Engine.updateWorld = function(data){  // data is the update package from the server
 
-    var track = new Set();
+    /*var track = new Set();
     if(data.newanimals){
         data.newanimals.forEach(function(n){
            track.add(n.id);
@@ -1250,7 +1252,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
         data.removedanimals.forEach(function(id){
             if(track.has(id)) console.warn('ID',id,'present in both new and remove');
         });
-    }
+    }*/
 
     if(data.newplayers) Engine.createElements(data.newplayers,'player');
     if(data.newbuildings) Engine.createElements(data.newbuildings,'building');
@@ -1564,18 +1566,6 @@ Engine.snap = function(){
     game.renderer.snapshot(function(img){
         Client.sendScreenshot(img.src);
     });
-};
-
-Engine.debugScreen = function(){
-    var graphics = Engine.scene.add.graphics();
-    graphics.setDepth(Engine.UIDepth+10);
-    graphics.setScrollFactor(0);
-    graphics.lineStyle(1, 0x00ff00, 3);
-    graphics.beginPath();
-    graphics.moveTo(512, 0);
-    graphics.lineTo(512, 576);
-    graphics.strokePath();
-    graphics.closePath();
 };
 
 function s(id){

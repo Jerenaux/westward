@@ -338,7 +338,7 @@ GameServer.skinAnimal = function(player,animalID){
 };
 
 GameServer.handleBattle = function(player,animal,aggro){
-    if(!player.isAvailableForFight() || !animal.isAvailableForFight()) return;
+    if(!player.isAvailableForFight() || player.isInFight() || !animal.isAvailableForFight() || animal.isInFight()) return;
     // TODO: check for proximity
     var area = GameServer.computeBattleArea(player,animal);
     if(!GameServer.checkAreaIntegrity(area)){
@@ -422,43 +422,20 @@ GameServer.checkForFighter = function(AOIs){
 };
 
 GameServer.checkForBattle = function(entity){
-    if(!entity.canFight() || entity.isInFight() || entity.isMoving() || entity.isDead() || entity.isInBuilding()) return;
+    if(!entity.isAvailableForFight() || entity.isInFight()) return;
     var cell = GameServer.battleCells.get(entity.x,entity.y);
-    if(cell) {
-        var area = {
-            x: entity.x-1,
-            y: entity.y-1,
-            w: 2,
-            h: 2
-        };
-        cell.battle.addFighter(entity);
-        cell.battle.addArea(area);
-    }
+    if(cell) GameServer.expandBattle(cell.battle,entity);
 };
 
-GameServer.checkForHostiles = function(entity){
-    /*var AOIs = Utils.listAdjacentAOIs(entity.aoi);
-    for(var i = 0; i < AOIs.length; i++){
-        var aoi = GameServer.AOIs[AOIs[i]];
-        for(var j = 0; j < aoi.entities.length; j++){
-            var e = aoi.entities[j];
-            if(e.canFight()){
-                // If the player ended his movement, check if neighboring e's should attack him
-                // Else, check if entity should attack neighboring e's
-                var attack = false;
-                if(entity.isPlayer){
-                    if(!e.isPlayer) attack = e.shouldAttack(entity);
-                }else{
-                    attack = entity.shouldAttack(e);
-                }
-                if(attack){
-                    console.log('starting fight with ',e.getShortID());
-                    GameServer.handleBattle(entity,e,true);
-                    return;
-                }
-            }
-        }
-    }*/
+GameServer.expandBattle = function(battle,entity){
+    var area = {
+        x: entity.x-1,
+        y: entity.y-1,
+        w: 2,
+        h: 2
+    };
+    battle.addFighter(entity);
+    battle.addArea(area);
 };
 
 GameServer.addBattleCell = function(battle,x,y){

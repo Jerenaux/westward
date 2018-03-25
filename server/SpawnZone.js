@@ -34,6 +34,7 @@ SpawnZone.prototype.spawnInAOI = function(aoi){
         if(PFUtils.checkCollision(x,y)) continue;
         GameServer.addAnimal(x,y,0);
     }
+    //console.log(Object.keys(GameServer.animals).length,'animals in the world');
 };
 
 module.exports.SpawnZone = SpawnZone;

@@ -321,3 +321,15 @@ UI.launchGame = function(fade){
         UI.scene.scene.launch('main');
     },fadeDuration);
 };
+
+UI.debugScreen = function(){
+    var graphics = UI.scene.add.graphics();
+    graphics.setDepth(10);
+    graphics.setScrollFactor(0);
+    graphics.lineStyle(1, 0x00ff00, 3);
+    graphics.beginPath();
+    graphics.moveTo(512, 0);
+    graphics.lineTo(512, 576);
+    graphics.strokePath();
+    graphics.closePath();
+};
