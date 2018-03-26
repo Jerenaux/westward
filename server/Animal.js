@@ -52,6 +52,10 @@ Animal.prototype.isAggressive = function(){
     return this.aggressive;
 };
 
+Animal.prototype.setSpawnZone = function(zone){
+    this.spawnZone = zone;
+};
+
 Animal.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
@@ -252,6 +256,11 @@ Animal.prototype.checkForHostiles = function(){
 
 Animal.prototype.isAvailableForFight = function(){
     return (!this.isDead() && !this.isMoving());
+};
+
+Animal.prototype.die = function(){
+    MovingEntity.prototype.die.call(this);
+    this.spawnZone.decrement(this.type);
 };
 
 Animal.prototype.remove = function(){

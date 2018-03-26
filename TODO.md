@@ -14,16 +14,21 @@ Prototype level:
 Week:
 -----
 *1 item/recipe a day*
+Use fade-in
+Set wolf hp back to 150
+Migrate to tilemaps? (test first with scrolling tilemap)
 Bug: moving down right after connect doesn't play anim
 Bug: dont pathfind outside of world bounds
 Update collisions
 Polish: continuous movement system
-Make wandering animals converge to battles? (efficient: notify animals of new battles, don't have them check at every idle)
 Design document
 Define spawn zones better (no settlements inside)
+Spawn zones: spawn based on native population count, not entities in zone
 Economic loop: harvest herbs (scatter roots)
 Help: buttons in buildings
 Figure out way to stop players (in case of being dragged in)
+=> "stop" property that triggers a rewind (keep in memory 5 last cells)
+=> Opens the door to attacking moving targets + having animals intercept players
 
 Finish:
 -------
@@ -212,7 +217,7 @@ Visual:
 - Highlight buttons and buildings on hover
 - When hovering equipment, highlight corresponding equip slot
 - Use particle emitters for several cool effects, like cloud puffs, dust, lights, etc.
-- Light effect layer
+- Light effect layer (https://www.codeandweb.com/texturepacker/tutorials/how-to-create-light-effects-in-phaser3)
 - Add cloud silhouettes
 - Custom movement marker
 - Different footpritns for different animals

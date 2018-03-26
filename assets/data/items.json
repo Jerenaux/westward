@@ -230,5 +230,15 @@
     "name": "Wheat",
     "desc": "Resource harvested from farms that can be converted into food at a Mill.",
     "isResource": true
+  },
+  "32":{
+    "atlas": "items",
+    "frame":"iron_ingot",
+    "name": "Iron ingot",
+    "desc": "Intermediate crafting material obtained from iron ore destined to make steel.",
+    "isCrafted": true,
+    "isMaterial": true,
+    "craftTier": 1,
+    "recipe":{"24":5}
   }
 }

@@ -169,8 +169,14 @@ GameServer.loadBuildings = function(){
 
 GameServer.setUpSpawnZones = function(){
     GameServer.spawnZones = [];
-    GameServer.spawnZones.push(new SpawnZone(1566,3,3));
-    GameServer.spawnZones.push(new SpawnZone(389,3,3));
+    var data = {
+        0:{
+            min: 20,
+            rate: 3
+        }
+    };
+    GameServer.spawnZones.push(new SpawnZone([1567,1665,1666,1716,1717,1768],data));
+    //GameServer.spawnZones.push(new SpawnZone(389,3,3));
     GameServer.updateSpawnZones();
     GameServer.updateStatus();
 };
@@ -187,7 +193,7 @@ GameServer.setUpdateLoops = function(){
     GameServer.npcUpdateRate = 1000/5;
     var settlementUpdateRate = 10*1000;
     var playerUpdateRate = 60*1000;
-    var spawnZoneUpdateRate = 2*60*1000;
+    var spawnZoneUpdateRate = 15*1000;
 
     setInterval(GameServer.updateNPC,GameServer.npcUpdateRate);
     setInterval(GameServer.updateWalks,walkUpdateRate);

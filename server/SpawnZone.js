@@ -7,34 +7,58 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
-function SpawnZone(tl,w,h){
-    this.aois = [];
-
-    for(var x = 0; x < w; x++){
-        for(var y = 0; y < h; y++){
-            var aoi = tl+x+(World.nbChunksHorizontal*y);
-            this.aois.push(GameServer.AOIs[aoi]);
-        }
+function SpawnZone(aois,spawnData){
+    this.aois = aois;
+    this.spawnData = spawnData;
+    this.population = {};
+    for(var animal in spawnData){
+        this.population[animal] = 0;
     }
 }
 
 SpawnZone.prototype.update = function(){
-    this.aois.forEach(function(aoi){
-        if(!aoi.hasPlayer() && !aoi.hasBuilding()) this.spawnInAOI(aoi);
-    },this);
+    var freeAOIs = this.aois.map(function(aoi){
+        return GameServer.AOIs[aoi];
+    }).filter(function(AOI){
+        return !AOI.hasPlayer();
+    });
+    /*console.log(freeAOIs.map(function(AOI){
+        return AOI.id;
+    }));*/
+
+    for(var animal in this.spawnData){
+        //console.log(this.population[animal] ,'vs', this.spawnData[animal].min);
+        var current = this.population[animal];
+        var min = this.spawnData[animal].min;
+        if(current < min){
+            var nb = Math.min(this.spawnData[animal].rate,min-current);
+            this.spawn(freeAOIs,animal,nb);
+        }
+    }
 };
 
-SpawnZone.prototype.spawnInAOI = function(aoi){
-    // TODO: refine, specify how many to spawn, min, max, develop matrix ecosystem...
-    var nb = 3 - aoi.entities.length;
-    if(nb <= 0) return;
+SpawnZone.prototype.spawn = function(AOIs,animalID,nb){
+    console.log('Spawning',nb,GameServer.animalsData[animalID].name);
+
     for(var i = 0; i < nb; i++){
-        var x = Utils.randomInt(aoi.x,aoi.x+World.chunkWidth);
-        var y = Utils.randomInt(aoi.y,aoi.y+World.chunkHeight);
-        if(PFUtils.checkCollision(x,y)) continue;
-        GameServer.addAnimal(x,y,0);
+        var AOI = Utils.randomElement(AOIs);
+        var x = Utils.randomInt(AOI.x,AOI.x+World.chunkWidth);
+        var y = Utils.randomInt(AOI.y,AOI.y+World.chunkHeight);
+        if(PFUtils.checkCollision(x,y)) {
+            i--;
+            continue;
+        }
+        console.log('spawining in ',AOI.id);
+        var animal = GameServer.addAnimal(x,y,animalID);
+        animal.setSpawnZone(this);
+        this.population[animalID]++;
     }
-    //console.log(Object.keys(GameServer.animals).length,'animals in the world');
+
+    console.log(this.population);
+};
+
+SpawnZone.prototype.decrement = function(type){
+    this.population[type]--;
 };
 
 module.exports.SpawnZone = SpawnZone;

@@ -13,7 +13,6 @@ function Settlement(data){
     this.level = data.level;
     this.pop = data.population;
     this.lastCycle = data.lastCycle;
-    console.log('lastCycle set to',this.lastCycle);
 
     this.fort = null;
     this.buildings = [];
