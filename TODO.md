@@ -18,14 +18,18 @@ Use fade-in
 Migrate to tilemaps? (test first with scrolling tilemap)
 Bug: moving down right after connect doesn't play anim
 Bug: dont pathfind outside of world bounds
-Update collisions
+Battle: allow attacking moving targets
+Battle: have animals intercept players (hostility)
+Update collisions file
 Polish: continuous movement system
+-> When new movement, if ongoing movement, flag for stop, let current tween finish, and then onComplete, if flagged for stop, stop timeline and trigger new one (from the tile at which the current one ended)
 Design document
 Economic loop: harvest herbs (scatter roots)
 Help: buttons in buildings
 Figure out way to stop players (in case of being dragged in)
-=> "stop" property that triggers a rewind (keep in memory 5 last cells)
-=> Opens the door to attacking moving targets + having animals intercept players
+-> Client moving adds a tile in running list of 5 after each tween onComplete of timeline
+-> Broadcast stop property (!= flag for stop from above), with server coordinates
+-> On stop: rewind tiles in that list up to stop position
 
 Finish:
 -------
