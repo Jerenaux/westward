@@ -15,15 +15,12 @@ Week:
 -----
 *1 item/recipe a day*
 Use fade-in
-Set wolf hp back to 150
 Migrate to tilemaps? (test first with scrolling tilemap)
 Bug: moving down right after connect doesn't play anim
 Bug: dont pathfind outside of world bounds
 Update collisions
 Polish: continuous movement system
 Design document
-Define spawn zones better (no settlements inside)
-Spawn zones: spawn based on native population count, not entities in zone
 Economic loop: harvest herbs (scatter roots)
 Help: buttons in buildings
 Figure out way to stop players (in case of being dragged in)
@@ -160,6 +157,7 @@ Bug: bubble at wrong location after respawn
 - Set up stats of troops
 - Make troops engage enemies
 * Settlement economy
+- Once a building is built in a spawnzone AOI, remove that AOI from the zone
 - Yellow pins for unbuilt buildings
 - Move stock around buildings
 - Let chancellor set prices in trade post
