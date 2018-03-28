@@ -489,7 +489,6 @@ Player.prototype.exitBuilding = function(){
 };
 
 Player.prototype.isAvailableForFight = function(){
-    //return (!this.isInBuilding() && !this.isDead() && !this.isMoving());
     return (!this.isInBuilding() && !this.isDead());
 };
 

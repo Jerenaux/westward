@@ -13,46 +13,20 @@ Prototype level:
 
 Week:
 -----
-Stopping:
-Flagforstop and flagforrewind + rewind dest
-on tile update:
-if flagforstop, end movement
-if flagrewing, compute rewind path and rewind
-stop without arguments: 
-If moving:just flag for stop
-else: nothing
-stop with arguments:
-set rewind flags
-if moving: flag for stop
-else: rewind
-rewind: set flag to false
-
-clientStop and serverStop have in common:
-- Finish walking current tile, then stop (flagForStop)
-- Upon doing so, immediately start walking another path (possibly empty)
-- serverStop needs to trigger the new path if no current movement
-Test cases: player walking, animal going back-and-forth
-
-
-
 *1 item/recipe a day*
 Market research
 Use fade-in
 When ranged without ranged weapon: bubble notif!
 Check why stats constantly sent
 Migrate to tilemaps? (test first with scrolling tilemap)
+Bug: wolf stuck between trees in battle
+Bug: wolf on player position doesn't move
 Bug: moving down right after connect doesn't play anim
 Bug: dont pathfind outside of world bounds
-Battle: allow attacking moving targets
-Battle: have animals intercept players (hostility)
 Update collisions file
-Polish: continuous movement system
--> When new movement, if ongoing movement, flag for stop, let current tween finish, and then onComplete, if flagged for stop, stop timeline and trigger new one (from the tile at which the current one ended)
 Design document
 Economic loop: harvest herbs (scatter roots)
 Help: buttons in buildings
-Figure out way to stop players (in case of being dragged in)
--> Wrong rewind speed?
 
 Finish:
 -------
@@ -227,7 +201,7 @@ Polish:
 Visual:
 - "Tip of the day"
 - Revamp class selection
-- Move marker on move() event (in addition to mousemove) and handle keeping pressed
+- Fix continuous movement
 - Polish title screen (leaves, bird passing in the distance...)
 - Fade-in/out transitions (wait for containers?)
 - Favicon

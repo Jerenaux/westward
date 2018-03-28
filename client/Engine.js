@@ -897,35 +897,7 @@ Engine.updateEnvironment = function(){
     for(var j = 0; j < newChunks.length; j++){
         Engine.displayChunk(newChunks[j]);
     }
-
-    //Engine.updateDisplayedEntities();
 };
-
-/*Engine.updateDisplayedEntities = function(){
-    // Whenever the player moves to a different AOI, for each player displayed in the game, check if it will still be
-    // visible from the new AOI; if not, remove it
-    if(!Engine.created) return;
-    var adjacentChunks = Utils.listAdjacentAOIs(Engine.player.chunk);
-    console.log(adjacentChunks);
-
-    Engine.entityManager.entities.forEach(function(entityType){
-        Engine.updateDisplay(
-            Engine.entityManager.displayLists[entityType],
-            Engine.entityManager.maps[entityType],
-            adjacentChunks
-        );
-    });
-};*/
-
-// Check if the entities of some list are in a neighboring chunk or not
-/*Engine.updateDisplay = function(list,map,adjacent){
-    list.forEach(function(id){
-        var element = map[id];
-        if(Engine.debug && element.chunk === undefined) console.warn('No chunk defined for ',element);
-        // check if the AOI of entity p is in the list of the AOI's adjacent to the main player
-        if(element) if(adjacent.indexOf(element.chunk) == -1) element.remove();
-    });
-};*/
 
 Engine.displayChunk = function(id){
     if(Engine.mapDataCache[id]){
@@ -986,17 +958,16 @@ Engine.handleDown = function(pointer,objects){
 Engine.handleClick = function(pointer,objects){
     if(objects.length > 0){
         for(var i = 0; i < Math.min(objects.length,2); i++){ // disallow bubbling too deep, only useful in menus (i.e. shallow)
-            if(Engine.interrupt){
+            /*if(Engine.interrupt){
                 console.log('interrupt');
                 Engine.interrupt = false;
                 return;
-            }
+            }*/
             if(objects[i].handleClick) objects[i].handleClick(pointer);
         }
-        Engine.interrupt = false;
+        //Engine.interrupt = false;
     }else{
         if(!Engine.inPanel && !Engine.inMenu && !BattleManager.inBattle && !Engine.dead) {
-            //if(Engine.inPanel) Engine.currentPanel.hide();
             Engine.moveToClick(pointer);
         }
     }
@@ -1036,7 +1007,9 @@ Engine.computePath = function(position){
     var y = position.y;
     if(PFUtils.checkCollision(x,y)) return;
     //console.log(Engine.player.tileX, Engine.player.tileY, x, y);
-    var path = Engine.PFfinder.findPath(Engine.player.tileX, Engine.player.tileY, x, y, Engine.PFgrid);
+    var start = Engine.player.getPFstart(); // Engine.player.tileX, Engine.player.tileY
+    if(Engine.player.moving) Engine.player.stop();
+    var path = Engine.PFfinder.findPath(start.x, start.y, x, y, Engine.PFgrid);
     PF.reset();
     if(path.length == 0 || path.length > PFUtils.maxPathLength) {
         Engine.handleMsg('It\'s too far!');
@@ -1045,7 +1018,10 @@ Engine.computePath = function(position){
     var trim = PFUtils.trimPath(path,Engine.battleCellsMap);
     if(trim.trimmed) Engine.player.setDestinationAction(0);
     path = trim.path;
-    Engine.player.move(path);
+
+    if(Engine.player.destinationAction) path.pop();
+    Client.sendPath(path,Engine.player.destinationAction);
+    Engine.player.queuePath(path);
 };
 
 Engine.updatePosition = function(player){
@@ -1576,4 +1552,8 @@ function s(id){
 
 function h(id){
     console.log(Engine.animals[id].lastSteps);
+}
+
+function st(id){
+    Client.socket.emit('exec-stop',id);
 }

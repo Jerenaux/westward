@@ -373,8 +373,10 @@ GameServer.checkAreaIntegrity = function(area){
 };
 
 GameServer.computeBattleArea = function(f1,f2){
-    var pos1 = f1.getEndOfPath();
-    var pos2 = f2.getEndOfPath();
+    /*var pos1 = f1.getEndOfPath();
+    var pos2 = f2.getEndOfPath();*/
+    var pos1 = f1.getEndOfTile();
+    var pos2 = f2.getEndOfTile();
 
     var tl = {x: null, y: null};
     if (pos1.x <= pos2.x && pos1.y <= pos2.y) {

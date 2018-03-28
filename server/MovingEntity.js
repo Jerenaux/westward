@@ -63,15 +63,32 @@ MovingEntity.prototype.updatePosition = function(x,y){
 
 MovingEntity.prototype.endPath = function(){
     if(debug) console.log('['+this.constructor.name+' '+this.id+'] Arrived at destination');
-    if(this.flagToStop) this.setProperty('stop',{x:this.x,y:this.y});
+    if(this.flagToStop) {
+        console.log('***STOP AT',this.x,this.y,'***');
+        this.setProperty('stop',{x:this.x,y:this.y});
+    }
     this.moving = false;
     this.flagToStop = false;
     this.onEndOfPath();
-    if(this.isPlayer) this.checkForHostiles(this);
+    this.checkForHostiles(this);
 };
 
 MovingEntity.prototype.onEndOfPath = function(){
     GameServer.checkForBattle(this);
+};
+
+MovingEntity.prototype.getEndOfTile = function(){
+    if(this.path) {
+        return {
+            x: this.path[0][0],
+            y: this.path[0][1]
+        };
+    }else{
+        return {
+            x: this.x,
+            y: this.y
+        }
+    }
 };
 
 MovingEntity.prototype.getEndOfPath = function(){

@@ -6,13 +6,13 @@ var Moving = new Phaser.Class({
     Extends: CustomSprite,
 
     initialize: function Moving (){
-        this.lastSteps = [];
         // Using call(), the called method will be executed while having 'this' pointing to the first argumentof call()
         CustomSprite.call(this, Engine.scene, 0,0);
 
         this.orientation = 'down';
         this.previousOrientation = this.orientation;
         this.movement = null;
+        this.currentPath = [];
 
         this.setInteractive();
     },
@@ -31,22 +31,10 @@ var Moving = new Phaser.Class({
 
     // Updates the position; primarily called as the entity moves around and has moved by at least 1 tile
     updatePosition: function(x,y){ // x and y are tile cordinates
-        //console.log('[',this.id,'] updating to',x,y);
         this.updatePreviousPosition();
         this.setTilePosition(x,y);
         this.updateDepth();
         this.updateChunk();
-        if(!this.rewinding) this.recordPosition();
-    },
-
-    recordPosition: function(){
-        this.lastSteps.push({
-            x: this.tileX,
-            y: this.tileY
-        });
-        if(this.lastSteps.length > 5) this.lastSteps.shift();
-        //console.log('[',this.id,']',JSON.stringify(this.lastSteps));
-
     },
 
     updatePreviousPosition: function(){
@@ -75,8 +63,12 @@ var Moving = new Phaser.Class({
     },
 
     move: function(path){
-        if(path.length <= 1) this.endMovement();
+        if(path.length <= 1) {
+            this.endMovement();
+            return;
+        }
         if(this.isActiveFighter) BattleManager.deactivateCell();
+        this.currentPath = path;
 
         var tweens = [];
         for(var i = 0; i < path.length-1; i++){
@@ -95,18 +87,12 @@ var Moving = new Phaser.Class({
             });
         }
 
-        if(this.movement !== null) this.movement.stop();
-
+        this.moving = true;
         this.movement = Engine.scene.tweens.timeline({
             tweens: tweens,
-            onSart: this.beginMovement.bind(this),
             onUpdate: this.frameByFrameUpdate.bind(this),
             onComplete: this.endMovement.bind(this)
         });
-    },
-
-    beginMovement: function(){
-        this.moving = true;
     },
 
     frameByFrameUpdate: function(){
@@ -131,6 +117,7 @@ var Moving = new Phaser.Class({
     
     tileByTilePreUpdate: function(tween,targets,startX,startY,endX,endY){
         if(!this.scene) return; // quick fix before the bug gets fixed in Phaser
+        this.currentTweenTo = {x:endX,y:endY};
 
         this.computeOrientation(startX,startY,endX,endY);
 
@@ -152,14 +139,11 @@ var Moving = new Phaser.Class({
         var ty = Math.floor(this.y/Engine.tileHeight);
         this.updatePosition(tx,ty);
 
-        //if(this.constructor.name == 'Player') this.leaveFootprint();
         this.leaveFootprint();
 
-        if(this.flagForStop){
-            this.flagForStop = false;
+        if(this.flagForStop || (this.stopPos && this.stopPos.x == tx && this.stopPos.y == ty)){
             this.movement.stop(); // TODO: use new phaser argument to call endMovement automatically
             this.endMovement();
-            this.rewind();
         }
     },
 
@@ -167,40 +151,76 @@ var Moving = new Phaser.Class({
         this.setPosition(x,y);
     },
 
-    stop: function(x,y){
-        console.log('STOPPING',this.constructor.name,this.id,'at',x,y);
-        console.log('currently at',this.tileX,this.tileY);
-        if(this.tileX == x && this.tileY == y) return;
-        this.flagForStop = true;
-        if(x === undefined && y === undefined) return;
-
-        var path = [];
-        for(var i = this.lastSteps.length - 1; i >= 0; i--){
-            var tile = this.lastSteps[i];
-            path.push([tile.x,tile.y]);
-            if(tile.x == x && tile.y == y) break;
-        }
-        this.rewindPath = path;
-        if(!this.moving){
-            this.flagForStop = false;
-            this.rewind();
+    getPFstart: function(){
+        if(this.moving){
+            return this.currentTweenTo;
+        }else{
+            return {
+                x: this.tileX,
+                y: this.tileY
+            }
         }
     },
 
-    rewind: function(){
-        this.rewinding = true;
-        console.log(this.rewindPath);
-        this.move(this.rewindPath);
-        this.rewindPath = [];
+    serverStop: function(x,y){
+        //console.log('SERVER STOP AT',x,y,'currently going to',this.currentTweenTo);
+        var timeOffset = -1; // assume stop position in the past
+        var stopIndex = -1;
+        var currentIndex = -1;
+        for(var i = 0; i < this.currentPath.length; i++){
+            var px = this.currentPath[i][0];
+            var py = this.currentPath[i][1];
+            if(this.currentTweenTo.x == px && this.currentTweenTo.y == py) currentIndex = i;
+            if(px == x && py == y) stopIndex = i;
+            if(currentIndex > -1 && stopIndex > -1) break;
+        }
+        console.log(stopIndex,currentIndex);
+        if(stopIndex == -1) console.warn('stop index not found');
+        if(stopIndex == currentIndex) timeOffset = 0;
+        if(stopIndex > currentIndex) timeOffset = 1;
+        //console.log('time offset =',timeOffset);
+
+        switch (timeOffset){
+            case -1:
+                var backtrack = this.currentPath.slice(stopIndex,currentIndex+1);
+                backtrack.reverse();
+                this.stop();
+                this.queuePath(backtrack);
+                break;
+            case 0:
+                this.stop();
+                break;
+            case 1:
+                this.stopPos = {x:x,y:y};
+                break;
+        }
+
+    },
+    stop: function(){
+        if(this.moving) this.flagForStop = true;
+    },
+
+    queuePath: function(path){
+        if(this.moving){
+            this.queuedPath = path;
+        }else{
+            this.move(path);
+        }
     },
 
     endMovement: function(){
         if(!this.active) return; // quick fix
         this.moving = false;
-        this.rewinding = false;
+        this.flagForStop = false;
+        this.stopPos = null;
         this.previousOrientation = null;
         this.anims.stop();
         this.setFrame(this.restingFrames[this.orientation]);
+
+        if(this.queuedPath){
+            this.move(this.queuedPath);
+            this.queuedPath = null;
+        }
     },
 
     leaveFootprint: function(){

@@ -134,7 +134,9 @@ io.on('connection',function(socket){
             'screenshot': gs.handleScreenshot,
             'shop': gs.handleShop,
             'unequip': gs.handleUnequip,
-            'use': gs.handleUse
+            'use': gs.handleUse,
+
+            'exec-stop': gs.execStop
         };
 
         var handler = socket.onevent;

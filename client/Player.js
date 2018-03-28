@@ -61,7 +61,7 @@ var Player = new Phaser.Class({
             this.computeOrientation(this.tileX,this.tileY,data.facing.x,data.facing.y);
             this.faceOrientation();
         }
-        if(data.stop) this.stop(data.stop.x,data.stop.y); // TODO: move to new Moving update() supermethod
+        if(data.stop) this.serverStop(data.stop.x,data.stop.y); // TODO: move to new Moving update() supermethod
         if(data.settlement) this.settlement = settlement;
         Engine.handleBattleUpdates(this,data);
         if(data.dead == true) this.die(!this.firstUpdate);
@@ -74,18 +74,6 @@ var Player = new Phaser.Class({
     remove: function(){
         CustomSprite.prototype.remove.call(this);
         delete Engine.players[this.id];
-    },
-
-    move: function(path){
-        if(!path){
-            console.warn('no path in Player.move()');
-            return;
-        }
-        if(this.isHero){
-            if(this.destinationAction) path.pop();
-            if(!this.rewinding) Client.sendPath(path,this.destinationAction);
-        }
-        Moving.prototype.move.call(this,path);
     },
 
     endMovement: function() {
