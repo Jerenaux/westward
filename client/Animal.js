@@ -33,13 +33,15 @@ var Animal = new Phaser.Class({
         this.dead = false;
         this.name = animalData.name+' '+this.id;
         this.walkAnimPrefix = animalData.walkPrefix;
+        this.footprintsFrame = animalData.footprintsFrame;
+        this.printsVertOffset = animalData.printsVertOffset;
         this.restingFrames = animalData.restingFrames;
     },
 
     update: function(data){
         //Engine.animalUpdates.add(this.id,'update');
         if(data.path) this.move(data.path);
-        if(data.stop) this.stop();
+        if(data.stop) this.stop(data.stop.x,data.stop.y); // TODO: move to new Moving update() supermethod
         if(data.facing) {
             this.computeOrientation(this.tileX,this.tileY,data.facing.x,data.facing.y);
             this.faceOrientation();

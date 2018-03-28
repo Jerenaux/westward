@@ -37,7 +37,8 @@ Engine.preload = function() {
     this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('faces', 'assets/sprites/faces.png',{frameWidth:32,frameHeight:32});
 
-    this.load.image('footsteps', 'assets/sprites/footsteps.png');
+    //this.load.image('footsteps', 'assets/sprites/footsteps.png');
+    this.load.spritesheet('footsteps', 'assets/sprites/footstepssheet.png',{frameWidth:16,frameHeight:16});
     this.load.image('bug', 'assets/sprites/bug.png');
 
     this.load.image('scroll', 'assets/sprites/scroll.png');
@@ -877,7 +878,7 @@ Engine.addHero = function(data){
     //Engine.player.buildingRecipes = new Inventory(9);
     //Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
     Engine.player.itemRecipes = new Inventory(10);
-    Engine.player.itemRecipes.fromList([[6,1],[21,1],[2,1],[28,1],[29,1]]);
+    Engine.player.itemRecipes.fromList([[6,1],[21,1],[2,1],[28,1],[29,1],[34,1]]);
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = Equipment.getSkeleton();
     Engine.player.commitSlots = data.commitSlots;
@@ -1085,7 +1086,7 @@ Engine.getMouseCoordinates = function(pointer){
 
 Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
-    if(Engine.player && !Engine.player.inFight) Engine.updateMarker(position.tile);
+    if(Engine.player) Engine.updateMarker(position.tile); // && !Engine.player.inFight
     if(Engine.debug){
         document.getElementById('pxx').innerHTML = Math.round(position.pixel.x);
         document.getElementById('pxy').innerHTML = Math.round(position.pixel.y);
@@ -1571,4 +1572,8 @@ Engine.snap = function(){
 
 function s(id){
     console.log(Engine.animalUpdates[id]);
+}
+
+function h(id){
+    console.log(Engine.animals[id].lastSteps);
 }

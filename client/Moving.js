@@ -6,6 +6,7 @@ var Moving = new Phaser.Class({
     Extends: CustomSprite,
 
     initialize: function Moving (){
+        this.lastSteps = [];
         // Using call(), the called method will be executed while having 'this' pointing to the first argumentof call()
         CustomSprite.call(this, Engine.scene, 0,0);
 
@@ -30,10 +31,22 @@ var Moving = new Phaser.Class({
 
     // Updates the position; primarily called as the entity moves around and has moved by at least 1 tile
     updatePosition: function(x,y){ // x and y are tile cordinates
+        //console.log('[',this.id,'] updating to',x,y);
         this.updatePreviousPosition();
         this.setTilePosition(x,y);
         this.updateDepth();
         this.updateChunk();
+        if(!this.rewinding) this.recordPosition();
+    },
+
+    recordPosition: function(){
+        this.lastSteps.push({
+            x: this.tileX,
+            y: this.tileY
+        });
+        if(this.lastSteps.length > 5) this.lastSteps.shift();
+        //console.log('[',this.id,']',JSON.stringify(this.lastSteps));
+
     },
 
     updatePreviousPosition: function(){
@@ -82,24 +95,18 @@ var Moving = new Phaser.Class({
             });
         }
 
-        if(this.movement !== null){
-            /*var progress = this.movement.progress;
-            if(this.isHero) console.log(progress);
-            if(progress < 1) tweens.shift();*/
-            this.movement.stop();
-        }
+        if(this.movement !== null) this.movement.stop();
+
         this.movement = Engine.scene.tweens.timeline({
             tweens: tweens,
+            onSart: this.beginMovement.bind(this),
             onUpdate: this.frameByFrameUpdate.bind(this),
             onComplete: this.endMovement.bind(this)
         });
     },
 
-    endMovement: function(){
-        if(!this.active) return; // quick fix
-        this.previousOrientation = null;
-        this.anims.stop();
-        this.setFrame(this.restingFrames[this.orientation]);
+    beginMovement: function(){
+        this.moving = true;
     },
 
     frameByFrameUpdate: function(){
@@ -145,29 +152,65 @@ var Moving = new Phaser.Class({
         var ty = Math.floor(this.y/Engine.tileHeight);
         this.updatePosition(tx,ty);
 
-        if(this.constructor.name == 'Player') this.leaveFootprint();
+        //if(this.constructor.name == 'Player') this.leaveFootprint();
+        this.leaveFootprint();
 
-        /*if(this.flagForStop && (this.tileX != this.previousTile.x || this.tileY != this.previousTile.y)){
-            console.log(this.movement);
-            this.movement.stop();
+        if(this.flagForStop){
+            this.flagForStop = false;
+            this.movement.stop(); // TODO: use new phaser argument to call endMovement automatically
             this.endMovement();
-        }*/
+            this.rewind();
+        }
     },
 
     teleport: function(x,y){
         this.setPosition(x,y);
     },
 
-    stop: function(){
+    stop: function(x,y){
+        console.log('STOPPING',this.constructor.name,this.id,'at',x,y);
+        console.log('currently at',this.tileX,this.tileY);
+        if(this.tileX == x && this.tileY == y) return;
         this.flagForStop = true;
+        if(x === undefined && y === undefined) return;
+
+        var path = [];
+        for(var i = this.lastSteps.length - 1; i >= 0; i--){
+            var tile = this.lastSteps[i];
+            path.push([tile.x,tile.y]);
+            if(tile.x == x && tile.y == y) break;
+        }
+        this.rewindPath = path;
+        if(!this.moving){
+            this.flagForStop = false;
+            this.rewind();
+        }
+    },
+
+    rewind: function(){
+        this.rewinding = true;
+        console.log(this.rewindPath);
+        this.move(this.rewindPath);
+        this.rewindPath = [];
+    },
+
+    endMovement: function(){
+        if(!this.active) return; // quick fix
+        this.moving = false;
+        this.rewinding = false;
+        this.previousOrientation = null;
+        this.anims.stop();
+        this.setFrame(this.restingFrames[this.orientation]);
     },
 
     leaveFootprint: function(){
         var print = Engine.footprintsPool.getNext();
+        print.setFrame(this.footprintsFrame);
 
         // Position
         var sx = this.previousPosition.x + Engine.tileWidth/2;
         var sy = this.previousPosition.y + Engine.tileHeight/2;
+        if(this.printsVertOffset) sy += this.printsVertOffset;
         print.setPosition(sx,sy);
 
         // Angle

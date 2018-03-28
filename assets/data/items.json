@@ -240,5 +240,23 @@
     "isMaterial": true,
     "craftTier": 1,
     "recipe":{"24":5}
+  },
+  "33":{
+    "atlas": "items",
+    "frame":"steel_ingot",
+    "name": "Steel ingot",
+    "desc": "Intermediate crafting material obtained from iron ingots and carbon and used to forge weapons.",
+    "isCrafted": true,
+    "isMaterial": true,
+    "craftTier": 2,
+    "recipe":{"23":1,"32":4}
+  },
+  "34":{
+    "atlas": "items",
+    "frame":"sulfur",
+    "name": "Sulfur",
+    "desc": "Crafting material used to make black powder.",
+    "isResource": true,
+    "isMaterial": true
   }
 }

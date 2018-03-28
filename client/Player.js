@@ -20,6 +20,7 @@ var Player = new Phaser.Class({
         this.bubbleOffsetY = 75;
 
         this.walkAnimPrefix = 'player';
+        this.footprintsFrame = 0;
 
         this.restingFrames = {
             up: 20,
@@ -60,6 +61,7 @@ var Player = new Phaser.Class({
             this.computeOrientation(this.tileX,this.tileY,data.facing.x,data.facing.y);
             this.faceOrientation();
         }
+        if(data.stop) this.stop(data.stop.x,data.stop.y); // TODO: move to new Moving update() supermethod
         if(data.settlement) this.settlement = settlement;
         Engine.handleBattleUpdates(this,data);
         if(data.dead == true) this.die(!this.firstUpdate);
@@ -75,9 +77,13 @@ var Player = new Phaser.Class({
     },
 
     move: function(path){
+        if(!path){
+            console.warn('no path in Player.move()');
+            return;
+        }
         if(this.isHero){
             if(this.destinationAction) path.pop();
-            Client.sendPath(path,this.destinationAction);
+            if(!this.rewinding) Client.sendPath(path,this.destinationAction);
         }
         Moving.prototype.move.call(this,path);
     },

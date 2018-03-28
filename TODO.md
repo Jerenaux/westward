@@ -13,8 +13,33 @@ Prototype level:
 
 Week:
 -----
+Stopping:
+Flagforstop and flagforrewind + rewind dest
+on tile update:
+if flagforstop, end movement
+if flagrewing, compute rewind path and rewind
+stop without arguments: 
+If moving:just flag for stop
+else: nothing
+stop with arguments:
+set rewind flags
+if moving: flag for stop
+else: rewind
+rewind: set flag to false
+
+clientStop and serverStop have in common:
+- Finish walking current tile, then stop (flagForStop)
+- Upon doing so, immediately start walking another path (possibly empty)
+- serverStop needs to trigger the new path if no current movement
+Test cases: player walking, animal going back-and-forth
+
+
+
 *1 item/recipe a day*
+Market research
 Use fade-in
+When ranged without ranged weapon: bubble notif!
+Check why stats constantly sent
 Migrate to tilemaps? (test first with scrolling tilemap)
 Bug: moving down right after connect doesn't play anim
 Bug: dont pathfind outside of world bounds
@@ -27,13 +52,12 @@ Design document
 Economic loop: harvest herbs (scatter roots)
 Help: buttons in buildings
 Figure out way to stop players (in case of being dragged in)
--> Client moving adds a tile in running list of 5 after each tween onComplete of timeline
--> Broadcast stop property (!= flag for stop from above), with server coordinates
--> On stop: rewind tiles in that list up to stop position
+-> Wrong rewind speed?
 
 Finish:
 -------
 Trailer
+Put all recipes in on-the-go crafting menu before workshop comes around
 Decide cycle (eco, spawn)
 Make sure all menus have something interesting to show 
 Test economy for a while
@@ -44,6 +68,12 @@ Synchronize presentation page, maybe explicit which features are still absent
 Online shop: tunic, shield, a few arrows, a few potions
 Permanent players
 Polish
+
+Admin
+-----
+Toggle build
+Polish
+Display last and *next* cycles
 
 Economy build-up:
 ----------------

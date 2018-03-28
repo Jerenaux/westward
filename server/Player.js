@@ -53,19 +53,6 @@ Player.prototype.registerPlayer = function(){
     settlement.registerPlayer(this);
 };
 
-/*Player.prototype.setStartingPosition = function(){
-    var i = 0;
-    var x, y;
-    while(i < 10) {
-        x = Utils.randomInt(GameServer.startArea.minx, GameServer.startArea.maxx);
-        y = Utils.randomInt(GameServer.startArea.miny, GameServer.startArea.maxy);
-        if(!PFUtils.checkCollision(x,y)) break;
-        i++;
-    }
-    this.x = x;
-    this.y = y;
-};*/
-
 Player.prototype.setClass = function(className){
     this.class = className;
 };
@@ -82,8 +69,6 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(2,1); // bow
     //this.giveItem(11,2); // sword
     this.giveItem(6,1); // potion
-
-    this.giveItem(31,1);
 
     this.giveGold(500);
 };
@@ -499,12 +484,13 @@ Player.prototype.enterBuilding = function(id){
 };
 
 Player.prototype.exitBuilding = function(){
-    // TODO: check if ok
+    // TODO: check if in building first
     this.setProperty('inBuilding', -1);
 };
 
 Player.prototype.isAvailableForFight = function(){
-    return (!this.isInBuilding() && !this.isDead() && !this.isMoving());
+    //return (!this.isInBuilding() && !this.isDead() && !this.isMoving());
+    return (!this.isInBuilding() && !this.isDead());
 };
 
 Player.prototype.isInBuilding = function(){

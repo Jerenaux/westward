@@ -168,15 +168,15 @@ GameServer.loadBuildings = function(){
 };
 
 GameServer.setUpSpawnZones = function(){
+    //GameServer.addAnimal(524,658,0); // REMOVE
     GameServer.spawnZones = [];
     var data = {
         0:{
-            min: 20,
+            min: 20, // 20
             rate: 3
         }
     };
     GameServer.spawnZones.push(new SpawnZone([1567,1665,1666,1716,1717,1768],data));
-    //GameServer.spawnZones.push(new SpawnZone(389,3,3));
     GameServer.updateSpawnZones();
     GameServer.updateStatus();
 };

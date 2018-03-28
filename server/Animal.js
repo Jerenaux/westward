@@ -255,7 +255,8 @@ Animal.prototype.checkForHostiles = function(){
 };
 
 Animal.prototype.isAvailableForFight = function(){
-    return (!this.isDead() && !this.isMoving());
+    //return (!this.isDead() && !this.isMoving());
+    return (!this.isDead());
 };
 
 Animal.prototype.die = function(){

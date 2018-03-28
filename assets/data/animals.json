@@ -3,8 +3,10 @@
     "sprite":"wolves",
     "name": "Wolf",
     "frame": 25,
-    "aggro": false,
+    "aggro": true,
     "walkPrefix": "wolf",
+    "footprintsFrame": 1,
+    "printsVertOffset": 10,
     "restingFrames": {
         "up": 37,
         "down": 1,

@@ -63,7 +63,7 @@ MovingEntity.prototype.updatePosition = function(x,y){
 
 MovingEntity.prototype.endPath = function(){
     if(debug) console.log('['+this.constructor.name+' '+this.id+'] Arrived at destination');
-    //if(this.flagToStop) this.setProperty('stop',{x:this.x,y:this.y});
+    if(this.flagToStop) this.setProperty('stop',{x:this.x,y:this.y});
     this.moving = false;
     this.flagToStop = false;
     this.onEndOfPath();
