@@ -11,11 +11,13 @@ var GameServer = {
     lastPlayerID: 0,
     lastBuildingID: 0,
     lastAnimalID: 0,
+    lastItemID: 0,
     lastBattleID: 0,
     lastCellID: 0,
     players: {}, // player.id -> player
     animals: {}, // animal.id -> animal
     buildings: {}, // building.id -> building
+    items: {},
     settlements: {},
     socketMap: {}, // socket.id -> player.id
     nbConnectedChanged: false,
@@ -34,6 +36,7 @@ var Player = require('./Player.js').Player;
 var Settlement = require('./Settlement').Settlement;
 var Building = require('./Building.js').Building;
 var Animal = require('./Animal.js').Animal;
+var Item = require('./Item.js').Item;
 var Battle = require('./Battle.js').Battle;
 var BattleCell = require('./Battle.js').BattleCell;
 var SpawnZone = require('./SpawnZone.js').SpawnZone;
@@ -96,7 +99,6 @@ GameServer.createModels = function(){
 };
 
 GameServer.readMap = function(mapsPath){
-    //GameServer.initializationSequence = ['static_data','settlements','buildings','spawn_zones'];
     GameServer.initializationMethods = {
         'static_data': null,
         'settlements': GameServer.loadSettlements,
@@ -168,15 +170,26 @@ GameServer.loadBuildings = function(){
 };
 
 GameServer.setUpSpawnZones = function(){
-    //GameServer.addAnimal(524,658,0); // REMOVE
     GameServer.spawnZones = [];
-    var data = {
+    GameServer.addItem(524,658,5); // REMOVE
+    GameServer.addItem(528,653,5); // REMOVE
+
+    var animals = {
         0:{
             min: 20, // 20
             rate: 3
         }
     };
-    GameServer.spawnZones.push(new SpawnZone([1567,1665,1666,1716,1717,1768],data));
+    GameServer.spawnZones.push(new SpawnZone([1567,1665,1666,1716,1717,1768],animals));
+
+    var items = {
+        5: {
+            min: 20,
+            rate: 2
+        }
+    };
+    GameServer.spawnZones.push(new SpawnZone([1567,1665,1666,1716,1717,1768],null,items));
+
     GameServer.updateSpawnZones();
     GameServer.updateStatus();
 };
@@ -185,6 +198,12 @@ GameServer.addAnimal = function(x,y,type){
     var animal = new Animal(x,y,type);
     GameServer.animals[animal.id] = animal;
     return animal;
+};
+
+GameServer.addItem = function(x,y,type){
+    var item = new Item(x,y,type);
+    GameServer.items[item.id] = item;
+    return item;
 };
 
 GameServer.setUpdateLoops = function(){
@@ -343,6 +362,16 @@ GameServer.skinAnimal = function(player,animalID){
     GameServer.removeEntity(animal);
 };
 
+GameServer.pickUpItem = function(player,itemID){
+    if(!GameServer.items.hasOwnProperty(itemID)) return;
+    var item = GameServer.items[itemID];
+    // TODO: check for proximity
+    var nb = 1;
+    player.giveItem(item.type,nb);
+    player.addNotif('+'+nb+' '+GameServer.itemsData[item.type].name);
+    GameServer.removeEntity(item);
+};
+
 GameServer.handleBattle = function(player,animal,aggro){
     if(!player.isAvailableForFight() || player.isInFight() || !animal.isAvailableForFight() || animal.isInFight()) return;
     // TODO: check for proximity
@@ -373,8 +402,6 @@ GameServer.checkAreaIntegrity = function(area){
 };
 
 GameServer.computeBattleArea = function(f1,f2){
-    /*var pos1 = f1.getEndOfPath();
-    var pos2 = f2.getEndOfPath();*/
     var pos1 = f1.getEndOfTile();
     var pos2 = f2.getEndOfTile();
 

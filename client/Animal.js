@@ -71,7 +71,6 @@ var Animal = new Phaser.Class({
         }else{
             Engine.processAnimalClick(this);
         }
-        //Engine.interrupt = true;
     },
 
     handleOver: function(){

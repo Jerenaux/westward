@@ -166,8 +166,4 @@ MovingEntity.prototype.inBattleRange = function(x,y){
     return dist <= PFUtils.battleRange;
 };
 
-MovingEntity.prototype.addFlyingText = function(txt){
-
-};
-
 module.exports.MovingEntity = MovingEntity;

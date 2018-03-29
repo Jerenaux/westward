@@ -192,11 +192,13 @@ Engine.create = function(){
     Engine.players = {}; // player.id -> player object
     Engine.animals = {}; // animal.id -> building object
     Engine.buildings = {}; // building.id -> building object
+    Engine.items = {};
     Engine.battleCells = {}; // cell.id -> cell object
     Engine.battleCellsMap = new SpaceMap();
     Engine.entityManager.registerEntityType('player',Player,Engine.players);
     Engine.entityManager.registerEntityType('animal',Animal,Engine.animals);
     Engine.entityManager.registerEntityType('building',Building,Engine.buildings);
+    Engine.entityManager.registerEntityType('item',Item,Engine.items);
     Engine.entityManager.registerEntityType('cell',BattleTile,Engine.battleCells);
 
     Engine.debug = true;
@@ -878,7 +880,7 @@ Engine.addHero = function(data){
     //Engine.player.buildingRecipes = new Inventory(9);
     //Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
     Engine.player.itemRecipes = new Inventory(10);
-    Engine.player.itemRecipes.fromList([[6,1],[21,1],[2,1],[28,1],[29,1],[34,1]]);
+    Engine.player.itemRecipes.fromList([[6,1],[21,1],[2,1],[28,1],[29,1],[35,1]]);
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = Equipment.getSkeleton();
     Engine.player.commitSlots = data.commitSlots;
@@ -1003,6 +1005,7 @@ Engine.moveToClick = function(pointer){
 };
 
 Engine.computePath = function(position){
+    //console.log('path to',position);
     var x = position.x;
     var y = position.y;
     if(PFUtils.checkCollision(x,y)) return;
@@ -1235,7 +1238,9 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.newplayers) Engine.createElements(data.newplayers,'player');
     if(data.newbuildings) Engine.createElements(data.newbuildings,'building');
     if(data.newanimals) Engine.createElements(data.newanimals,'animal');
+    if(data.newitems) Engine.createElements(data.newitems,'item');
     if(data.newcells) Engine.createElements(data.newcells,'cell');
+
 
     // data.players is an associative array mapping the id's of the entities
     // to small object indicating which properties need to be updated. The following code iterate over
@@ -1246,6 +1251,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
 
     if(data.removedplayers) Engine.removeElements(data.removedplayers,Engine.players);
     if(data.removedanimals) Engine.removeElements(data.removedanimals,Engine.animals);
+    if(data.removeditems) Engine.removeElements(data.removeditems,Engine.items);
     if(data.removedcells) Engine.removeElements(data.removedcells,Engine.battleCells);
     if(data.removedbuildings) Engine.removeElements(data.removedbuildings,Engine.buildings);
 };
@@ -1408,6 +1414,12 @@ Engine.processAnimalClick = function(target){
     }else{
         Client.animalClick(target.id);
     }
+};
+
+Engine.processItemClick = function(target){
+    if(Engine.inPanel) return;
+    Engine.player.setDestinationAction(3,target.id); // 3 for item
+    Engine.computePath({x:target.tx,y:target.ty});
 };
 
 Engine.requestBattleAttack = function(target){

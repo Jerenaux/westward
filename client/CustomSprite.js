@@ -30,9 +30,4 @@ var CustomSprite = new Phaser.Class({
         this.chunk = Utils.tileToAOI({x: this.tx, y: this.ty});
         if(setPixelPosition) this.setPosition(this.tx * Engine.tileWidth, this.ty * Engine.tileHeight);
     }
-
-    /*setPosition: function(x,y){
-        Phaser.GameObjects.Sprite.setPosition.call(this,x,y);
-
-    }*/
 });

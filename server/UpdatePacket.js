@@ -7,9 +7,11 @@ function UpdatePacket(){
     this.newbuildings = [];
     this.newcells = [];
     this.newanimals = [];
+    this.newitems = [];
     this.removedplayers = [];
     this.removedanimals = [];
     this.removedbuildings = [];
+    this.removeditems = [];
     this.removedcells = [];
     this.players = {}; // list of player objects already existing for which properties have been updated
     this.animals = {};
@@ -28,6 +30,9 @@ UpdatePacket.prototype.addObject = function(object){
             break;
         case 'Animal':
             arr = this.newanimals;
+            break;
+        case 'Item':
+            arr = this.newitems;
             break;
         case 'BattleCell':
             arr = this.newcells;
@@ -51,6 +56,9 @@ UpdatePacket.prototype.removeObject = function(object){
             break;
         case 'Animal':
             arr = this.removedanimals;
+            break;
+        case 'Item':
+            arr = this.removeditems;
             break;
         case 'BattleCell':
             arr = this.removedcells;

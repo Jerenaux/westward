@@ -4,8 +4,7 @@
 
 var FOUNDATIONS_ID = 4;
 
-var Building;
-Building = new Phaser.Class({
+var Building = new Phaser.Class({
 
     Extends: CustomSprite,
 

@@ -16,6 +16,8 @@ Week:
 *1 item/recipe a day*
 Market research
 Use fade-in
+Building hovercards
+Item hovercards
 When ranged without ranged weapon: bubble notif!
 Check why stats constantly sent
 Migrate to tilemaps? (test first with scrolling tilemap)
@@ -25,13 +27,14 @@ Bug: moving down right after connect doesn't play anim
 Bug: dont pathfind outside of world bounds
 Update collisions file
 Design document
-Economic loop: harvest herbs (scatter roots)
+Test race for pick up items
 Help: buttons in buildings
 
 Finish:
 -------
 Trailer
 Put all recipes in on-the-go crafting menu before workshop comes around
+Make interesting spawn zones
 Decide cycle (eco, spawn)
 Make sure all menus have something interesting to show 
 Test economy for a while
@@ -103,6 +106,8 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Client-side, GameObject use tx and ty while Moving use tileX and tileY (and they both have a setPosition method)
+=> fix in processItemClick, etc, test a lot
 - Put settlement stuff in database
 - Clean scene transition code
 - Move UI stuff from Engine to UI

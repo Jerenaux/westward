@@ -196,6 +196,7 @@ var Moving = new Phaser.Class({
         }
 
     },
+
     stop: function(){
         if(this.moving) this.flagForStop = true;
     },

@@ -7,12 +7,18 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
-function SpawnZone(aois,spawnData){
+function SpawnZone(aois,animalsData,itemsData){
     this.aois = aois;
-    this.spawnData = spawnData;
+    this.animalsData = animalsData;
+    this.itemsData = itemsData;
     this.population = {};
-    for(var animal in spawnData){
+    this.items = {};
+
+    for(var animal in animalsData){
         this.population[animal] = 0;
+    }
+    for(var item in itemsData){
+        this.items[item] = 0;
     }
 }
 
@@ -22,23 +28,35 @@ SpawnZone.prototype.update = function(){
     }).filter(function(AOI){
         return !AOI.hasPlayer();
     });
-    /*console.log(freeAOIs.map(function(AOI){
-        return AOI.id;
-    }));*/
 
-    for(var animal in this.spawnData){
-        //console.log(this.population[animal] ,'vs', this.spawnData[animal].min);
+    /*for(var animal in this.animalsData){
+        //console.log(this.population[animal] ,'vs', this.animalsData[animal].min);
         var current = this.population[animal];
-        var min = this.spawnData[animal].min;
+        var min = this.animalsData[animal].min;
         if(current < min){
-            var nb = Math.min(this.spawnData[animal].rate,min-current);
+            var nb = Math.min(this.animalsData[animal].rate,min-current);
             this.spawn(freeAOIs,animal,nb);
+        }
+    }*/
+    this.computeDelta(this.animalsData,this.population,'animal',freeAOIs);
+    this.computeDelta(this.itemsData,this.items,'item',freeAOIs);
+};
+
+SpawnZone.prototype.computeDelta = function(map,countMap,type,freeAOIs){
+    for(var key in map){
+        //console.log(this.population[animal] ,'vs', this.animalsData[animal].min);
+        var current = countMap[key];
+        var min = map[key].min;
+        if(current < min){
+            var nb = Math.min(map[key].rate,min-current);
+            this.spawn(freeAOIs,type,key,nb);
         }
     }
 };
 
-SpawnZone.prototype.spawn = function(AOIs,animalID,nb){
-    console.log('Spawning',nb,GameServer.animalsData[animalID].name);
+SpawnZone.prototype.spawn = function(AOIs,type,id,nb){
+    var data = (type == 'animal' ? GameServer.animalsData[id] : GameServer.itemsData[id]);
+    console.log('Spawning',nb,data.name);
 
     for(var i = 0; i < nb; i++){
         var AOI = Utils.randomElement(AOIs);
@@ -48,13 +66,18 @@ SpawnZone.prototype.spawn = function(AOIs,animalID,nb){
             i--;
             continue;
         }
-        console.log('spawining in ',AOI.id);
-        var animal = GameServer.addAnimal(x,y,animalID);
-        animal.setSpawnZone(this);
-        this.population[animalID]++;
-    }
+        //console.log('spawining in ',AOI.id);
 
-    console.log(this.population);
+        if(type == 'animal') {
+            var animal = GameServer.addAnimal(x, y, id);
+            animal.setSpawnZone(this);
+            this.population[id]++;
+        }else if(type == 'item'){
+            var item = GameServer.addItem(x, y, id);
+            item.setSpawnZone(this);
+            this.items[id]++;
+        }
+    }
 };
 
 SpawnZone.prototype.decrement = function(type){

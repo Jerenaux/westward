@@ -457,6 +457,7 @@ Player.prototype.onEndOfPath = function(){
     if(!this.action) return;
     if(this.action.type == 1) this.enterBuilding(this.action.id);
     if(this.action.type == 2) GameServer.skinAnimal(this,this.action.id);
+    if(this.action.type == 3) GameServer.pickUpItem(this,this.action.id);
 };
 
 Player.prototype.checkForHostiles = function(){
