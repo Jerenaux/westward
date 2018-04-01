@@ -26,18 +26,10 @@ SpawnZone.prototype.update = function(){
     var freeAOIs = this.aois.map(function(aoi){
         return GameServer.AOIs[aoi];
     }).filter(function(AOI){
-        return !AOI.hasPlayer();
+        //return !AOI.hasPlayer();
+        return !GameServer.vision.has(AOI.id);
     });
 
-    /*for(var animal in this.animalsData){
-        //console.log(this.population[animal] ,'vs', this.animalsData[animal].min);
-        var current = this.population[animal];
-        var min = this.animalsData[animal].min;
-        if(current < min){
-            var nb = Math.min(this.animalsData[animal].rate,min-current);
-            this.spawn(freeAOIs,animal,nb);
-        }
-    }*/
     this.computeDelta(this.animalsData,this.population,'animal',freeAOIs);
     this.computeDelta(this.itemsData,this.items,'item',freeAOIs);
 };

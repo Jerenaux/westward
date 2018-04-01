@@ -6,7 +6,7 @@ var Boot = new Phaser.Class({
 
     Extends: Phaser.Scene,
     initialize: function Boot() {
-        Phaser.Scene.call(this, { key: 'boot' });
+        Phaser.Scene.call(this, { key: 'boot',plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager','LightsPlugin']});
         this.readyTicks = 0;
     },
 
@@ -40,7 +40,7 @@ var Boot = new Phaser.Class({
     },
 
     displayTitle: function(){
-        Boot.title = this.add.text(512,115, 'Westward',
+        Boot.title = this.add.text(512,128, 'Westward',
             { font: '150px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 10 }
             ).setOrigin(0.5,0).setAlpha(0);
 

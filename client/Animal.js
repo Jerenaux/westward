@@ -78,7 +78,10 @@ var Animal = new Phaser.Class({
         if(BattleManager.inBattle) {
             var dx = Math.abs(this.tileX-Engine.player.tileX);
             var dy = Math.abs(this.tileY-Engine.player.tileY);
-            var cursor = (dx+dy == 1 || (dx == 1 && dy == 1) ? UI.swordCursor : UI.bowCursor);
+            var cursor = (this.dead ? UI.cursor : (dx+dy == 1 || (dx == 1 && dy == 1) ? UI.swordCursor : UI.bowCursor));
+            UI.setCursor(cursor);
+        }else{
+            var cursor = (this.dead ? UI.handCursor : UI.swordCursor);
             UI.setCursor(cursor);
         }
         UI.tooltip.updateInfo((this.dead ? 'Dead ' : '')+this.name);
@@ -86,7 +89,8 @@ var Animal = new Phaser.Class({
     },
 
     handleOut: function(){
-        if(BattleManager.inBattle) UI.setCursor();
+        //if(BattleManager.inBattle) UI.setCursor();
+        UI.setCursor();
         UI.tooltip.hide();
     }
 });

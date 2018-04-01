@@ -22,6 +22,7 @@ var Item = new Phaser.Class({
         this.setTilePosition(data.x,data.y,true);
         this.setID(data.id);
 
+        this.name = itemData.name;
         Engine.items[this.id] = this;
         Engine.entityManager.addToDisplayList(this);
     },
@@ -33,5 +34,17 @@ var Item = new Phaser.Class({
 
     handleClick: function(){
         if(!BattleManager.inBattle) Engine.processItemClick(this);
+    },
+
+    handleOver: function(){
+        if(BattleManager.inBattle || Engine.inMenu) return;
+        UI.setCursor(UI.handCursor);
+        UI.tooltip.updateInfo(this.name);
+        UI.tooltip.display();
+    },
+
+    handleOut: function(){
+        UI.setCursor();
+        UI.tooltip.hide();
     }
 });

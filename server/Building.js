@@ -128,6 +128,11 @@ Building.prototype.updateBuild = function(nbCycles){
     }
 };
 
+Building.prototype.toggleBuild = function(){
+    this.setProperty('built',!this.built);
+    this.setProperty('progress',(this.built ? 100 : 0));
+};
+
 Building.prototype.addBuilding = function(building){
     this.buildings.push(building.listingTrim());
     this.updateBuildings();

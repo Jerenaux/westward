@@ -102,9 +102,10 @@
   },
   "14":{
     "atlas": "items2",
-    "frame":"green-necklace",
-    "name": "Emerald necklace",
-    "equipment": "necklace"
+    "frame":"sunflower",
+    "name": "Butterflower",
+    "desc": "Flower with regenerative properties used to brew potions.",
+    "isMaterial": true
   },
   "15":{
     "atlas": "items2",
@@ -121,16 +122,18 @@
     "recipe":{"9":1}
   },
   "17":{
-    "atlas": "items2",
-    "frame":"ruby-ring",
-    "name": "Ruby ring",
-    "equipment": "acc"
+    "atlas": "items",
+    "frame":"yellowpowder",
+    "name": "Citrinitas",
+    "desc": "Alchemical substance used to brew healing potions.",
+    "recipe":{"14":2},
+    "isCrafted": true,
+    "craftTier": 1,
+    "isMaterial": true
   },
   "18":{
-    "atlas": "items2",
-    "frame":"golden-ring",
-    "name": "Golden ring",
-    "equipment": "acc"
+
+
   },
   "19":{
     "atlas": "items",

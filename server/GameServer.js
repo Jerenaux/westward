@@ -20,6 +20,7 @@ var GameServer = {
     items: {},
     settlements: {},
     socketMap: {}, // socket.id -> player.id
+    vision: new Set(), // set of AOIs potentially seen by at least one player
     nbConnectedChanged: false,
     initializationStep: 0,
     initialized: false
@@ -89,7 +90,7 @@ GameServer.createModels = function(){
         x: {type: Number, min: 0, required: true},
         y: {type: Number, min: 0, required: true},
         gold: {type: Number, min: 0},
-        civicxp: {type: Number, min: 0}, // do not store max
+        civicxp: {type: Number, min: 0},
         class: {type: Number, min: 0},
         equipment: mongoose.Schema.Types.Mixed
         // stats are NOT saved, as they only consist in base values + modifiers; modifiers are re-applied contextually, not saved
@@ -111,7 +112,7 @@ GameServer.readMap = function(mapsPath){
     GameServer.createModels();
     GameServer.mapsPath = mapsPath; // TODO remove, useless, debug
     console.log('Loading map data from '+mapsPath);
-    var masterData = JSON.parse(fs.readFileSync(mapsPath+'/master.json').toString());
+    var masterData = JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'master.json')).toString());
     World.readMasterData(masterData);
 
     GameServer.AOIs = []; // Maps AOI id to AOI object
@@ -171,12 +172,11 @@ GameServer.loadBuildings = function(){
 
 GameServer.setUpSpawnZones = function(){
     GameServer.spawnZones = [];
-    GameServer.addItem(524,658,5); // REMOVE
-    GameServer.addItem(528,653,5); // REMOVE
+    GameServer.addAnimal(489,675,0); // REMOVE
 
     var animals = {
         0:{
-            min: 20, // 20
+            min: 20,
             rate: 3
         }
     };
@@ -674,16 +674,35 @@ GameServer.handleAOItransition = function(entity,previous){
     }else{
         newAOIs = AOIs;
     }
+
+    if(entity.isPlayer) {
+        entity.setFieldOfVision(AOIs);
+        GameServer.updateVision();
+    }
+
     newAOIs.forEach(function(aoi){
-        if(entity.constructor.name == 'Player') entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
+        //if(entity.constructor.name == 'Player') entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
+        if(entity.isPlayer) entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
         GameServer.addObjectToAOI(aoi,entity);
     });
     oldAOIs.forEach(function(aoi){
-        if(entity.constructor.name == 'Player') entity.oldAOIs.push(aoi);
+        //if(entity.constructor.name == 'Player') entity.oldAOIs.push(aoi);
+        if(entity.isPlayer) entity.oldAOIs.push(aoi);
         GameServer.removeObjectFromAOI(aoi,entity);
     });
     // There shouldn't be a case where an entity is both added and removed from an AOI in the same update packet
     // (e.g. back and forth random path) because the update frequency is higher than the movement time
+};
+
+GameServer.updateVision = function(){
+    GameServer.vision = new Set();
+    for(var pid in GameServer.players){
+        var player = GameServer.players[pid];
+        player.fieldOfVision.forEach(function(aoi){
+           GameServer.vision.add(aoi);
+        });
+    }
+    console.log('VISION:',GameServer.vision);
 };
 
 GameServer.updateClients = function(){ //Function responsible for setting up and sending update packets to clients
@@ -753,7 +772,7 @@ GameServer.updateWalks = function(){
 GameServer.updateNPC = function(){
     Object.keys(GameServer.animals).forEach(function(key) {
         var a = GameServer.animals[key];
-        if(a.idle && !a.dead) a.updateIdle();
+        if(a.doesWander() && a.idle && !a.isDead()) a.updateIdle();
     });
 };
 
@@ -840,6 +859,13 @@ GameServer.setBuildingItem = function(data){
     console.log(data);
     var building = GameServer.buildings[data.building];
     building.setItem(data.item,data.nb);
+    building.save();
+    return true;
+};
+
+GameServer.toggleBuild = function(data){
+    var building = GameServer.buildings[data.id];
+    building.toggleBuild();
     building.save();
     return true;
 };

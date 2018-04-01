@@ -50,6 +50,7 @@ Battle.prototype.getFighterIndex = function(f){
     return -1;
 };
 
+// Called by addFighter
 Battle.prototype.managePosition = function(f){
     var busy = this.positions.get(f.x,f.y);
     if(busy){
@@ -234,37 +235,39 @@ Battle.prototype.computeRangedHit = function(a,b){
 
 Battle.prototype.applyDamage = function(f,dmg){
     f.applyDamage(-dmg);
-    if(f.getHealth() == 0) this.removeFighter(f);
+    if(f.getHealth() == 0){
+        this.removeFighter(f);
+        return true;
+    }
+    return false;
 };
 
 Battle.prototype.processAttack = function(a,b){ // a attacks b
     var delay = 500;
+    var killed = false;
     if(!b || b.isDead()) return;
     if(this.nextTo(a,b)){
         a.setProperty('facing',{x:b.x,y:b.y});
         var dmg = this.computeDamage('melee',a,b);
-        this.applyDamage(b,dmg);
+        killed = this.applyDamage(b,dmg);
         b.setProperty('hit',dmg);
-        return {
-            success: true,
-            delay: delay
-        };
     }else{
         if(!a.canRange()) return false;
         a.decreaseAmmo();
         var hit = this.computeRangedHit(a,b);
         if(hit){
             dmg = this.computeDamage('ranged',a,b);
-            this.applyDamage(b,dmg);
+            killed = this.applyDamage(b,dmg);
             b.setProperty('hit',dmg);
         }else { // miss
             b.setProperty('rangedMiss',true);
         }
-        return {
-            success: true,
-            delay: delay
-        };
     }
+    if(killed && a.isPlayer) a.addNotif(GameServer.animalsData[b.type].name+' killed');
+    return {
+        success: true,
+        delay: delay
+    };
 };
 
 // Entites are only removed when the battle is over ; battlezones are only cleared at that time

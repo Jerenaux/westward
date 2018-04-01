@@ -53,9 +53,10 @@ categories.forEach(function(cat){
 });
 
 var POSThandlers = {
-    'newbuilding': gs.insertNewBuilding,
     'deletebuilding': gs.deleteBuilding,
-    'setitem': gs.setBuildingItem
+    'newbuilding': gs.insertNewBuilding,
+    'setitem': gs.setBuildingItem,
+    'togglebuild': gs.toggleBuild
 };
 var events = Object.keys(POSThandlers);
 
@@ -173,25 +174,6 @@ io.on('connection',function(socket){
 
     // #########################
 
-    // TODO: secure
-    /*socket.on('admin',function(){
-        var callbacksMap = {
-            'admin_deletebuilding': gs.deleteBuilding,
-            'admin_listbuildings': gs.listBuildings,
-            'admin_newbuilding': gs.insertNewBuilding
-        };
-
-        var handler = socket.onevent;
-        socket.onevent = function(pkt){
-            var event = pkt.data[0];
-            var data = pkt.data[1];
-            console.log('ADMIN:',event,data);
-            if(callbacksMap.hasOwnProperty(event)) callbacksMap[event](data,socket.id);
-            else{
-                handler.call(this,pkt);
-            }
-        };
-    });*/
 
     // #########################
     /*if(process.env.DEV == 1) {

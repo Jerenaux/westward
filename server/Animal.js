@@ -25,6 +25,7 @@ function Animal(x,y,type){
     this.idleTime = 200;
     this.stats = Stats.getSkeleton();
     this.setAggressive();
+    this.setWander();
     this.setStartingStats();
     this.setOrUpdateAOI();
 }
@@ -46,6 +47,14 @@ Animal.prototype.setStat = function(key,value){
 
 Animal.prototype.setAggressive = function(){
     this.aggressive =  GameServer.animalsData[this.type].aggro;
+};
+
+Animal.prototype.setWander = function(){
+    this.wander =  GameServer.animalsData[this.type].wander;
+};
+
+Animal.prototype.doesWander = function(){
+    return this.wander;
 };
 
 Animal.prototype.isAggressive = function(){

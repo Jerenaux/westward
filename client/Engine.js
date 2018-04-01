@@ -25,6 +25,7 @@ var Engine = {
 
     craftInvSize: 5, // max number of ingredients for crafting
     key: 'main', // key of the scene, for Phaser
+    plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager','LightsPlugin'],
     playerIsInitialized: false,
 
     config: {
@@ -34,10 +35,11 @@ var Engine = {
 
 
 Engine.preload = function() {
+    Engine.useTilemaps = false;
+
     this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('faces', 'assets/sprites/faces.png',{frameWidth:32,frameHeight:32});
 
-    //this.load.image('footsteps', 'assets/sprites/footsteps.png');
     this.load.spritesheet('footsteps', 'assets/sprites/footstepssheet.png',{frameWidth:16,frameHeight:16});
     this.load.image('bug', 'assets/sprites/bug.png');
 
@@ -77,16 +79,24 @@ Engine.preload = function() {
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('items', 'assets/data/items.json');
     this.load.json('animals', 'assets/data/animals.json');
-    //this.load.json('settlements', 'assets/data/settlements.json');
 
     Engine.collidingTiles = []; // list of tile ids that collide (from tilesets.json)
+    Engine.tilesheets = [];
+
     for(var i = 0, firstgid = 1; i < Boot.tilesets.length; i++){
         var tileset = Boot.tilesets[i];
         var absolutePath = tileset.image;
         var tokens = absolutePath.split('\\');
         var img = tokens[tokens.length-1];
         var path = 'assets/tilesets/'+img;
-        this.load.spritesheet(tileset.name, path,{frameWidth:tileset.tilewidth,frameHeight:tileset.tileheight});
+
+        if(Engine.useTilemaps){
+            this.load.image(tileset.name, path);
+        }else{
+            this.load.spritesheet(tileset.name, path,{frameWidth:tileset.tilewidth,frameHeight:tileset.tileheight});
+        }
+        Engine.tilesheets.push(tileset.name);
+        //console.log(tileset.name,firstgid);
 
         var columns = Math.floor(tileset.imagewidth/Engine.tileWidth);
         var tilecount = columns * Math.floor(tileset.imageheight/Engine.tileHeight);
@@ -312,8 +322,7 @@ Engine.createAnimations = function(){
         frames: Engine.scene.anims.generateFrameNumbers('sword_anim', { start: 0, end: 2}),
         frameRate: 15,
         hideOnComplete: true,
-        //onComplete: Engine.recycleSprite
-        onComplete: function(sprite){
+         onComplete: function(sprite){
             sprite.recycle();
         }
     });
@@ -322,7 +331,6 @@ Engine.createAnimations = function(){
         frames: Engine.scene.anims.generateFrameNumbers('death', { start: 0, end: 5}),
         frameRate: 15,
         hideOnComplete: true,
-        //onComplete: Engine.recycleSprite
         onComplete: function(sprite){
             sprite.recycle();
         }
@@ -875,12 +883,12 @@ Engine.addHero = function(data){
     Engine.player.inventory = new Inventory();
     Engine.player.class = data.class;
     Engine.player.gold = data.gold;
-    Engine.player.civicxp = data.civicxp[0];
-    Engine.player.maxcivicxp = data.civicxp[1];
+    Engine.player.civicxp = data.civicxp;
+    Engine.player.maxcivicxp = 100;
     //Engine.player.buildingRecipes = new Inventory(9);
     //Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
     Engine.player.itemRecipes = new Inventory(10);
-    Engine.player.itemRecipes.fromList([[6,1],[21,1],[2,1],[28,1],[29,1],[35,1]]);
+    Engine.player.itemRecipes.fromList([[6,1],[21,1],[2,1],[28,1],[29,1],[35,1],[17,1]]);
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = Equipment.getSkeleton();
     Engine.player.commitSlots = data.commitSlots;
@@ -924,9 +932,9 @@ Engine.loadJSON = function(path,callback,data){
 };
 
 Engine.drawChunk = function(mapData,id){
-    var chunk = new Chunk(mapData,id,1);
+    var chunk = new Chunk(mapData, id, 1);
     Engine.chunks[chunk.id] = chunk;
-    if(!Engine.mapDataCache[chunk.id]) Engine.mapDataCache[chunk.id] = mapData;
+    if (!Engine.mapDataCache[chunk.id]) Engine.mapDataCache[chunk.id] = mapData;
     chunk.drawLayers();
     Engine.displayedChunks.push(chunk.id);
 };
@@ -941,11 +949,7 @@ Engine.addCollision = function(x,y,tile){
 };
 
 Engine.isColliding = function(tile){ // tile is the index of the tile in the tileset
-    for(var i = 0; i < Engine.collidingTiles.length; i++){
-        if(Engine.collidingTiles[i] > tile) return false;
-        if(Engine.collidingTiles[i] == tile) return true;
-    }
-    return false;
+    return Engine.collidingTiles.includes(tile);
 };
 
 Engine.handleKeyboard = function(event){
@@ -960,11 +964,6 @@ Engine.handleDown = function(pointer,objects){
 Engine.handleClick = function(pointer,objects){
     if(objects.length > 0){
         for(var i = 0; i < Math.min(objects.length,2); i++){ // disallow bubbling too deep, only useful in menus (i.e. shallow)
-            /*if(Engine.interrupt){
-                console.log('interrupt');
-                Engine.interrupt = false;
-                return;
-            }*/
             if(objects[i].handleClick) objects[i].handleClick(pointer);
         }
         //Engine.interrupt = false;

@@ -26,9 +26,10 @@ function Player(){
     this.gold = 0;
     this.inBuilding = -1;
     this.commitSlots = this.getCommitSlotsShell();
-    this.civicxp = [0,100];
+    this.civicxp = 0;
     this.setUpStats();
     this.equipment = Equipment.getSkeleton();
+    this.fieldOfVision = [];
     this.chatTimer = null;
 }
 
@@ -61,6 +62,10 @@ Player.prototype.setSettlement = function(sid){
     this.settlement = sid;
 };
 
+Player.prototype.setFieldOfVision = function(aois){
+    this.fieldOfVision = aois;
+};
+
 Player.prototype.setStartingInventory = function(){
     this.giveItem(1,1); //food
     this.giveItem(9,2); // pelt
@@ -69,6 +74,7 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(2,1); // bow
     //this.giveItem(11,2); // sword
     this.giveItem(6,1); // potion
+    this.giveItem(14,1); // potion
 
     this.giveGold(500);
 };
@@ -116,6 +122,7 @@ Player.prototype.respawn = function(){
 Player.prototype.applyFoodModifier = function(foodSurplus){ // %
     if(isNaN(foodSurplus)) return; // Could happen if no fort
     var foodModifier = Formulas.decimalToPct(Formulas.computePlayerFoodModifier(Formulas.pctToDecimal(foodSurplus)));
+    if(foodModifier == this.foodModifier) return;
     this.getStats().forEach(function(stat){
         if(Stats.dict[stat].noModifier) return;
         var statObj = this.getStat(stat);
@@ -173,8 +180,8 @@ Player.prototype.getSlots = function(){
 };
 
 Player.prototype.gainCivicXP = function(inc,notify){
-    this.civicxp[0] = Utils.clamp(this.civicxp[0]+inc,0,this.civicxp[1]);
-    this.updatePacket.civicxp = this.civicxp[0];
+    this.civicxp = Utils.clamp(this.civicxp+inc,0,100);
+    this.updatePacket.civicxp = this.civicxp;
     if(notify) this.addNotif('+'+inc+' civic XP');
 };
 
@@ -349,8 +356,16 @@ Player.prototype.getAmmo = function(containerSlot){
 
 Player.prototype.canRange = function(){
     var weapon = this.getRangedWeapon();
-    if(weapon == -1) return false;
-    return this.getAmmo(this.getRangedContainer(weapon)) > 0;
+    if(weapon == -1) {
+        this.addMsg('I don\'t have a ranged weapon equipped!');
+        return false;
+    }
+    if(this.getAmmo(this.getRangedContainer(weapon)) > 0){
+        return true;
+    }else{
+        this.addMsg('I\'m out of ammo!');
+        return false;
+    }
 };
 
 Player.prototype.applyEffects = function(item,coef,notify){
@@ -441,7 +456,7 @@ Player.prototype.getDataFromDb = function(document){
     if(document.settlement) this.setSettlement(document.settlement);
     if(!document.gold) document.gold = 0;
     this.commitSlots = document.commitSlots || this.getCommitSlotsShell();
-    this.civicxp = document.civicxp || [0,100];
+    this.civicxp = document.civicxp || 0;
     this.giveGold(document.gold);
     this.setOrUpdateAOI();
 };

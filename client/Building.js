@@ -28,8 +28,10 @@ var Building = new Phaser.Class({
         this.buildingType = data.type;
         this.settlement = data.sid;
         this.inventory = new Inventory(100);
+        this.name = buildingData.name;
         this.prices = {};
         this.entry = buildingData.entry;
+        this.built = false;
         this.setBuilt(data.built);
 
         //var collisionData = (this.built ? data : Engine.buildingsData[FOUNDATIONS_ID]);
@@ -38,7 +40,7 @@ var Building = new Phaser.Class({
     },
 
     build: function () {
-        this.setBuilt(true);
+        this.built = true;
         this.setTexture(Engine.buildingsData[this.buildingType].sprite);
         this.setOrigin(0.5);
         this.setTilePosition(this.tx,this.ty,true);
@@ -47,12 +49,16 @@ var Building = new Phaser.Class({
     update: function (data) {
         var callbacks = {
             'buildings': this.setBuildingsListing,
+            'built': this.setBuilt,
+            'committed': this.setCommitted,
+            'danger': this.setDangerIcons,
             'foodsurplus': this.setFoodSurplus,
             'gold': this.setGold,
             'inventory': this.setInventory, // sets whole inventor
             'items': this.updateInventory, // update individual entries in inventory
             'population': this.setPopulation,
             'prices': this.setPrices,
+            'productivity': this.setProductivity,
             'progress': this.setProgress
         };
         this.updateEvents = new Set();
@@ -60,29 +66,6 @@ var Building = new Phaser.Class({
         for(var field in callbacks){
             if(!callbacks.hasOwnProperty(field)) continue;
             if(field in data) callbacks[field].call(this,data[field]);
-        }
-
-        if (data.danger) {
-            this.danger = data.danger;
-            this.updateEvents.add('onUpdateMap');
-        }
-
-        if (data.productivity) {
-            this.prod = data.productivity;
-            this.updateEvents.add('onUpdateConstruction');
-            this.updateEvents.add('onUpdateProductivity');
-        }
-        if (data.built) {
-            if (data.built == true && !this.isBuilt()) this.build();
-            if (Engine.inThatBuilding(this.id)) {
-                Engine.exitBuilding();
-                Engine.enterBuilding(this.id);
-            }
-        }
-
-        if (data.committed) {
-            this.committed = data.committed;
-            this.updateEvents.add('onUpdateProductivity');
         }
 
         this.updateEvents.forEach(function (e) {
@@ -104,7 +87,12 @@ var Building = new Phaser.Class({
     },
 
     setBuilt: function(flag){
-        this.built = flag;
+        if (flag == true && !this.isBuilt()) this.build();
+
+        if (Engine.inThatBuilding(this.id)) {
+            Engine.exitBuilding();
+            Engine.enterBuilding(this.id);
+        }
     },
 
     setCollisions: function (data) {
@@ -124,6 +112,16 @@ var Building = new Phaser.Class({
             spriteY = this.ty;
         }
         PFUtils.collisionsFromShape(shape.points, spriteX, spriteY, data.width, data.height, Engine.collisions);
+    },
+
+    setCommitted: function(committed){
+        this.committed = committed;
+        this.updateEvents.add('onUpdateProductivity');
+    },
+
+    setDangerIcons: function(danger){
+        this.danger = danger;
+        this.updateEvents.add('onUpdateMap');
     },
 
     setFoodSurplus: function(foodsurplus){
@@ -154,6 +152,12 @@ var Building = new Phaser.Class({
     setProgress: function(progress){
         this.progress = progress;
         this.updateEvents.add('onUpdateConstruction');
+    },
+
+    setProductivity: function(productivity){
+        this.prod = productivity;
+        this.updateEvents.add('onUpdateConstruction');
+        this.updateEvents.add('onUpdateProductivity');
     },
 
     updateInventory: function(items){
@@ -207,9 +211,12 @@ var Building = new Phaser.Class({
     handleOver: function(){
         if(BattleManager.inBattle || Engine.inMenu) return;
         UI.setCursor(UI.buildingCursor);
+        UI.tooltip.updateInfo(this.name);
+        UI.tooltip.display();
     },
 
     handleOut: function(){
         UI.setCursor();
+        UI.tooltip.hide();
     }
 });

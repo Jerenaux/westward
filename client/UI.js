@@ -4,11 +4,13 @@
 
 var UI = {
     key: 'UI',
+    plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager','LightsPlugin'],
     tooltipDepth: 20,
     cursor: 'url(/assets/sprites/cursor.png), auto', // image of the mouse cursor in normal circumstances
     bowCursor: 'url(/assets/sprites/bowcursor32.png), auto',
     swordCursor: 'url(/assets/sprites/swordcursor32.png), auto',
     buildingCursor: 'url(/assets/sprites/buildingcursor.png), auto',
+    handCursor: 'url(/assets/sprites/handicon.png), auto',
 
     preload: function () {
         UI.scene = this;
@@ -317,6 +319,7 @@ UI.launchGame = function(fade){
     var fadeDuration = (fade ? 500: 0);
     if(fade) UI.camera.fade(fadeDuration);
     setTimeout(function(){
+        Boot.background.setVisible(false);
         UI.scene.scene.shutdown('boot');
         UI.scene.scene.launch('main');
     },fadeDuration);

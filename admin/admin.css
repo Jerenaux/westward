@@ -7,9 +7,6 @@ body{
 .coord {
     width: 3em;
 }
-input, select {
-    margin: 5px;
-}
 textarea {
     width: 300px;
     height: 200px;
@@ -24,7 +21,7 @@ textarea {
 }
 
 .building_panel {
-    width: 300px;
+    width: 350px;
 }
 .edit-btn{
     float: right;
@@ -34,4 +31,7 @@ textarea {
 .edit-div{
     position: relative;
     bottom: 0;
+}
+.item-select{
+    width: 200px;
 }

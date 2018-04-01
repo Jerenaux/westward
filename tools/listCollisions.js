@@ -16,15 +16,16 @@ var collisions = new SpaceMap();
 function listCollisions(directory){
     if(!directory){
         console.log('ERROR : No directory specified! Arguments :');
-        console.log('-i = directory relative to assets/maps containing the chunks to parse');
+        console.log('-i = directory containing the chunks to parse');
         return;
     }
 
-    var indir = path.join(__dirname,WorldEditor.mapsPath,directory);
-    var masterData = JSON.parse(fs.readFileSync(path.join(indir,'master.json')).toString());
+    //var indir = path.join(__dirname,WorldEditor.mapsPath,directory);
+    //var masterData = JSON.parse(fs.readFileSync(path.join(indir,'master.json')).toString());
+    var masterData = JSON.parse(fs.readFileSync(path.join(directory,'master.json')).toString());
     World.readMasterData(masterData);
 
-    var tilesetsData = JSON.parse(fs.readFileSync(path.join(__dirname,'/../assets/maps/tilesets.json')).toString()); // tilesets.json is a "static" file in assets/maps
+    var tilesetsData = JSON.parse(fs.readFileSync(path.join(__dirname,'..','assets','maps','tilesets.json')).toString()); // tilesets.json is a "static" file in assets/maps
     for(var i = 0, firstgid = 1; i < tilesetsData.tilesets.length; i++) {
         var tileset = tilesetsData.tilesets[i];
         for(var j = 0; j < tileset.collisions.length; j++){
@@ -36,19 +37,16 @@ function listCollisions(directory){
         var tilecount = columns * Math.floor(tileset.imageheight/tileheight);
         firstgid += tilecount;
     }
-    //console.log(colliding);
 
     var nbChunks = World.nbChunksHorizontal*World.nbChunksVertical;
     console.log(nbChunks+' chunks to process');
     for(var i = 0; i < nbChunks; i++){
-        findCollisions(indir,'chunk'+i+'.json',i);
+        findCollisions(directory,'chunk'+i+'.json',i);
     }
 
-    //console.log(collisions);
-
-    fs.writeFile(indir+'/collisions.json',JSON.stringify(collisions.toList()),function(err){
+    fs.writeFile(path.join(directory,'collisions.json'),JSON.stringify(collisions.toList()),function(err){
         if(err) throw err;
-        console.log('Collisions SpaceMap written to '+indir);
+        console.log('Collisions SpaceMap written to '+directory);
     });
 }
 

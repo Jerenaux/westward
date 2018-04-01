@@ -11,7 +11,7 @@ function BigButton(x,y,text,callback){
     this.slices.push(UI.scene.add.tileSprite(x,y,4,28,'UI','bigbutton_middle'));
     x += 4;
     this.slices.push(UI.scene.add.sprite(x,y,'UI','bigbutton_right'));
-    this.text = UI.scene.add.text(textX, y+2, '', { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.text = UI.scene.add.text(textX, y+4, '', { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
 
     this.callback = callback;
     this.text.handleDown = this.handleDown.bind(this);

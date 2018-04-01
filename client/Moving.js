@@ -10,7 +10,7 @@ var Moving = new Phaser.Class({
         CustomSprite.call(this, Engine.scene, 0,0);
 
         this.orientation = 'down';
-        this.previousOrientation = this.orientation;
+        this.previousOrientation = null;
         this.movement = null;
         this.currentPath = [];
 
@@ -219,8 +219,9 @@ var Moving = new Phaser.Class({
         this.setFrame(this.restingFrames[this.orientation]);
 
         if(this.queuedPath){
-            this.move(this.queuedPath);
+            var _path = this.queuedPath.slice();
             this.queuedPath = null;
+            this.move(_path);
         }
     },
 

@@ -100,6 +100,12 @@ app.controller("mainCtrl", [
             },function(err){});
         };
 
+        $scope.toggleBuild = function(id){
+            $http.post("/admin/togglebuild/", {id:id}).then(function(res) {
+                if(res.status == 201) setTimeout(getListings,200);
+            },function(err){});
+        };
+
         setInterval(getListings,60*1000);
     }
 ]);

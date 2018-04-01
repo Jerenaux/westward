@@ -45,10 +45,14 @@ PFUtils.secondDimensionHandler = {
     }
 };
 
+// Used for pathfinding in battlegrids
 PFUtils.invertedSecondDimensionHandler = {
     get: function(target,key){
         //console.log('2: accessing ',key);
-        if(target.hasOwnProperty(key)){
+    if(target.firstDim < 0 || key < 0 || key > World.worldHeight || target.firstDim > World.worldWidth) {
+        return new PF.Node(parseInt(key),parseInt(target.firstDim),false);
+    }
+    if(target.hasOwnProperty(key)){
             if(target[key] == 0){
                 target[key] = new PF.Node(parseInt(key),parseInt(target.firstDim));
             }

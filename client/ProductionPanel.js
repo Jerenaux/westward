@@ -37,7 +37,7 @@ ProductionPanel.prototype.displaySlots = function(){
 
         slot.addText(43,2,itemData.name);
 
-        var increment = Formulas.computeProdIncrement(data.prod,nb);
+        var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(data.prod),nb);
         slot.addText(43,16,'+'+increment+'/cycle',Utils.colors.gold);
         slot.display();
     }

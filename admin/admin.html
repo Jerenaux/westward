@@ -36,6 +36,7 @@
                 <div class="panel panel-default building_panel" ng-repeat="building in settlement.buildings">
                     <div class="panel-heading">
                         #{{building.id}} <b>{{building.type | buildingTypeFilter}}</b>
+                        <span ng-show="building.built" class="glyphicon glyphicon-ok"></span>
                         <button type="button" class="btn btn-sm btn-primary edit-btn" ng-click="toggleVisibility('editForms',building.id)">
                             <span class="glyphicon glyphicon-edit"></span>
                         </button><br/>
@@ -45,28 +46,31 @@
                         Gold: {{building.gold}}<br/>
                         Committed: {{building.committed}}<br/>
                         Productivity: {{building.productivity | pctFilter}}<br/>
-                        Progress: {{building.progress | pctFilter}}<br/><br/>
+                        {{building.built ? '' : 'Progress: '+(building.progress | pctFilter)}}<br/><br/>
                         <div ng-show="building.inventory.length > 0">
                             Inventory:<br/>
                             <span ng-repeat="itm in building.inventory">{{itm | shopFilter:building.prices}}  <br/></span>
                         </div><br/><br/>
 
-                        <div class="edit-div">
-                            <form ng-show="editForms[building.id].visible" ng-submit="setStock(building.id)">
-                                Set
-                                <select ng-model="inventoryForms[building.id].item" ng-options="item.id as item.name for item in data.itemsList | orderBy:'name'"></select><br/>
-                                To
-                                <input required ng-model="inventoryForms[building.id].nb" size="2">
-                                <button type="submit" class="btn btn-success">+</button>
-                            </form>
+                        <div class="edit-div" ng-show="editForms[building.id].visible">
+                            <form class="form-inline"  ng-submit="setStock(building.id)">
+                                <select class="item-select form-control form-control-sm" ng-model="inventoryForms[building.id].item" ng-options="item.id as item.name for item in data.itemsList | orderBy:'name'"></select>
+                                <input class="form-control form-control-sm" required ng-model="inventoryForms[building.id].nb" size="2">
+                                <button type="submit" class="btn btn-success">
+                                    <span class="glyphicon glyphicon-ok"></span>
+                                </button>
+                            </form><br/>
+                            <button type="submit" class="btn btn-danger" ng-click="toggleBuild(building.id)">
+                                <span class="glyphicon glyphicon-wrench"></span>
+                            </button>
                         </div>
                         <!-- {{building | displayBuilding}}-->
                     </div>
                 </div>
             </div>
 
-            <form ng-submit="deleteBuilding($index)">
-                <input required ng-model="deleteForms[$index].id" placeholder="building ID">
+            <form class="form-inline" ng-submit="deleteBuilding($index)">
+                <input class="form-control form-control-sm" required ng-model="deleteForms[$index].id" placeholder="building ID">
                 <button type="submit" class="btn btn-danger btn-sm">
                     <span class="glyphicon glyphicon-remove"></span>
                 </button>

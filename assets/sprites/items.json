@@ -67,6 +67,10 @@
     {
       "filename": "blackpowder",
       "frame": {"x":256,"y":64,"w":32,"h":32}
+    },
+    {
+      "filename": "yellowpowder",
+      "frame": {"x":480,"y":224,"w":32,"h":32}
     }
   ]
 }

@@ -37,32 +37,35 @@ WorldEditor.W = { // Enum-like structure that maps position to numerical ID
     topRightIn: 10,
     topLeftIn: 11
 };
-
+// 27->36
+// 48->52
+// 9 -> 24
+// 30->40
 WorldEditor.shore = { // indexes of tiles in tilesets for shores
-    topRight: 249,
-    top: 248,
-    topLeft: 247,
-    left: 268,
-    bottomLeft: 289,
-    bottom: 290,
-    bottomRight: 291,
-    right: 270,
-    bottomRightOut: 250,
-    bottomLeftOut: 251,
-    topRightOut: 271,
-    topLeftOut: 272,
-    water: 292, // 241 + 51
-    water2: 269
+    topRight: 241+22, //241+8,
+    top: 241+21, //241+7,
+    topLeft: 241+20, //241+6,
+    left: 241+36, // 241+27 = 268,
+    bottomLeft: 241+52, // 241 + 48 = 289,
+    bottom: 241+53, // 241+49 = 290,
+    bottomRight: 241+54, // 241+50 = 291,
+    right: 241+38, // 241 + 29 = 270,
+    bottomRightOut: 241+24, // 241+9=250,
+    bottomLeftOut: 241+25, //241+10=251,
+    topRightOut: 241+40, // 241+30=271,
+    topLeftOut: 241+41, //241+31=272,
+    water: 241+56, //241+51 = 292,
+    water2: 241+37 // 241 + 28 = 269
 };
 
 WorldEditor.grass = {
-    topLeft: 284,
-    topRight: 285,
-    bottomLeft: 305,
-    bottomRight: 306
+    topLeft: 241+17, //241+43, // 284 -> 258
+    topRight: 241+18, //241+44, // 285 -> 259
+    bottomLeft: 241+33, //241+64, // 305 -> 274
+    bottomRight: 241+34 //241+65 // 306 -> 275
 };
 
-WorldEditor.cliff = { // indexes of tiles in tilesets for cliffs
+/*WorldEditor.cliff = { // indexes of tiles in tilesets for cliffs
     topRightOut: 21,
     topRightOut_right: 22,
     topRightOut_top: 6,
@@ -95,7 +98,7 @@ WorldEditor.cliff = { // indexes of tiles in tilesets for cliffs
     topLeftIn_btm: 54,
     topLeftIn_alt: 68,
     topLeftIn_altbtm: 83
-};
+};*/
 
 WorldEditor.TreesInfo = {
     tilesetWidth: 21 // width in tiles of the tilset containing the trees

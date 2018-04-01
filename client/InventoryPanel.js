@@ -95,7 +95,7 @@ InventoryPanel.prototype.getNextSprite = function(){
         s.text.setScrollFactor(0);
         s.text.setVisible(false);
         s.text.setDepth(2);
-        s.text.setPosition(slot.x+36,slot.y+18);
+        s.text.setPosition(slot.x+36,slot.y+20);
         s.item.setPosition(slot.x+18,slot.y+20);
         this.sprites.push(s);
         this.content.push(s.item);
