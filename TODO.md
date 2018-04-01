@@ -17,26 +17,20 @@ Week:
 Market research
 Use fade-in
 Design document
-
-Finish:
--------
 Trailer
 Put all recipes in on-the-go crafting menu before workshop comes around
 Make interesting spawn zones (for both settlements)
 Decide cycle (eco, spawn)
 Make sure all menus have something interesting to show 
-Test economy for a while
-When forge, update equip advice to include crafting
 Reread all tips and help
 Economic loop: test all updates of all menus
-Synchronize presentation page, maybe explicit which features are still absent
-Online shop: tunic, shield, a few arrows, a few potions
+Shop: tunic, shield, a few arrows, a few potions
 Permanent players
-Polish
 
 Admin
 -----
 Display last and *next* cycles
+Dump db
 
 Economy build-up:
 ----------------
@@ -46,6 +40,7 @@ Make recipes (randomly?) for 5 consumables (potion, antidote, steady stuff...) +
 Recipes for fancy bullets and bombs
 Add recipes for all intermediary ingredients
 Workshop building, interface = usual crafting menu
+-> update advice
 Add shop interface as well
 Display recipes with building and class restrictions
 Update help text of recipes

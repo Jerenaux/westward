@@ -38,16 +38,18 @@
     "atlas": "items2",
     "frame":"root",
     "name": "Root",
-    "desc": "Crafting material used to brew several types of potions."
+    "desc": "Root of a common plant all over the Continent. Crafting material involved in the brewing of several types of potions."
   },
   "6":{
     "atlas": "items2",
-    "frame":"redpotion",
-    "name": "Red potion",
-    "desc": "Made from roots and red powder, regenerates some health.",
-    "recipe": {"5":1,"0":2},
-    "effects":{"hp":50},
-    "useInBattle": true
+    "frame":"flask",
+    "name": "Dead man's shot",
+    "desc": "Bitter potion made of citrinitas and clover, regenerates a lot of health.",
+    "recipe": {"17":1,"18":1},
+    "effects":{"hp":100},
+    "useInBattle": true,
+    "isCrafted": true,
+    "craftTier": 2
   },
   "7":{
     "atlas": "items",
@@ -126,14 +128,17 @@
     "frame":"yellowpowder",
     "name": "Citrinitas",
     "desc": "Alchemical substance used to brew healing potions.",
-    "recipe":{"14":2},
+    "recipe":{"14":2,"5":1},
     "isCrafted": true,
     "craftTier": 1,
     "isMaterial": true
   },
   "18":{
-
-
+    "atlas": "items2",
+    "frame":"clover",
+    "name": "Clover",
+    "desc": "Plant used as alchemical ingredient for brewing health potions.",
+    "isMaterial": true
   },
   "19":{
     "atlas": "items",

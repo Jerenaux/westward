@@ -87,6 +87,14 @@
     {
       "filename": "sunflower",
       "frame": {"x":312,"y":288,"w":24,"h":24}
+    },
+    {
+      "filename": "clover",
+      "frame": {"x":240,"y":288,"w":24,"h":24}
+    },
+    {
+      "filename": "flask",
+      "frame": {"x":288,"y":312,"w":24,"h":24}
     }
   ]
 }

@@ -74,7 +74,7 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(2,1); // bow
     //this.giveItem(11,2); // sword
     this.giveItem(6,1); // potion
-    this.giveItem(14,1); // potion
+    this.giveItem(14,1); //
 
     this.giveGold(500);
 };
