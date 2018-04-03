@@ -72,8 +72,12 @@ SpawnZone.prototype.spawn = function(AOIs,type,id,nb){
     }
 };
 
-SpawnZone.prototype.decrement = function(type){
-    this.population[type]--;
+SpawnZone.prototype.decrement = function(category,id){
+    if(category == 'animal'){
+        this.items[id]--;
+    }else if(category == 'item') {
+        this.population[id]--;
+    }
 };
 
 module.exports.SpawnZone = SpawnZone;

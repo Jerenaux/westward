@@ -176,19 +176,36 @@ GameServer.setUpSpawnZones = function(){
 
     var animals = {
         0:{
-            min: 20,
+            min: 15,
             rate: 3
         }
     };
-    GameServer.spawnZones.push(new SpawnZone([1567,1665,1666,1716,1717,1768],animals));
+    //GameServer.spawnZones.push(new SpawnZone([1567,1665,1666,1716,1717,1768],animals));
 
     var items = {
-        5: {
-            min: 20,
+        8: {
+            min: 15,
+            rate: 2
+        },
+        14: {
+            min: 10,
+            rate: 2
+        },7: {
+            min: 10,
+            rate: 3
+        },18: {
+            min: 10,
+            rate: 2
+        },26: {
+            min: 10,
+            rate: 2
+        },30: {
+            min: 10,
             rate: 2
         }
     };
-    GameServer.spawnZones.push(new SpawnZone([1567,1665,1666,1716,1717,1768],null,items));
+    GameServer.spawnZones.push(new SpawnZone([1516,1566,1567,1665,1666,1716,1717,1768],animals,items));
+    GameServer.spawnZones.push(new SpawnZone([339,388,491,537,539,540,541,542],animals,items));
 
     GameServer.updateSpawnZones();
     GameServer.updateStatus();
@@ -519,6 +536,7 @@ GameServer.handleShop = function(data,socketID) {
         building.takeGold(price);
         building.giveItem(item,nb);
     }
+    building.save();
     Prism.logEvent(player,action,{id:item,price:price,nb:nb});
 };
 
@@ -859,6 +877,14 @@ GameServer.setBuildingItem = function(data){
     console.log(data);
     var building = GameServer.buildings[data.building];
     building.setItem(data.item,data.nb);
+    building.save();
+    return true;
+};
+
+GameServer.setBuildingPrice = function(data){
+    console.log(data);
+    var building = GameServer.buildings[data.building];
+    building.setPrices(data.item,data.buy,data.sell);
     building.save();
     return true;
 };

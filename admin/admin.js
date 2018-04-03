@@ -18,14 +18,10 @@ app.controller("mainCtrl", [
         // Indexed by building id
         $scope.editForms = {};
         $scope.inventoryForms = {};
+        $scope.priceForms = {};
 
-        var categories = ['settlements'];
-        var dataCategories = ['buildings','items'];
+        var dataCategories = ['buildings','items']; // Categories data (JSON), not instances
         $scope.data = {};
-
-        /*
-        * Workflow: getJSON, then getListings
-        * */
 
         $scope.toggleVisibility = function(f,id){
             var map = $scope[f];
@@ -47,28 +43,39 @@ app.controller("mainCtrl", [
                     }
                     $scope.data[category] = Data[category+'Data'];
                     Data.counter++;
-                    if(Data.counter == dataCategories.length) getListings();
+                    if(Data.counter == dataCategories.length) getData();
                 }
             },function(err){});
         };
 
-        getData = function(category){
-            $http.get("/admin/"+category+"/").then(function(res) {
+        getData = function(){
+            $http.get("/admin/settlements/").then(function(res) {
                 if(res.status == 200){
                     console.log(res.data);
-                    $scope[category] = res.data;
+                    $scope.settlements = res.data;
+                    $scope.buildings = {};
+
+                    res.data.forEach(function(set){
+                        set.buildings.forEach(function(build){
+                            $scope.buildings[build.id] = build;
+                            $scope.buildings[build.id].inv = [];
+                            //for(var itm in build.inventory){
+                            if(!build.inventory) return;
+                            build.inventory.forEach(function(itmdata){
+                                var itm = itmdata[0];
+                                $scope.buildings[build.id].inv.push({
+                                    id:itm,
+                                    name: $scope.data.items[itm].name
+                                });
+                            });
+                            console.log($scope.buildings[build.id].inv);
+                        });
+                    });
+                    console.log($scope.buildings);
                 }
             },function(err){});
         };
 
-        getListings = function(){
-            categories.forEach(function(cat){
-                $scope[cat] = [];
-                getData(cat);
-            });
-
-
-        };
 
         dataCategories.forEach(function(cat){
             getJSON(cat);
@@ -78,7 +85,7 @@ app.controller("mainCtrl", [
             var data = $scope.buildingForms[id];
             data.visible = undefined;
             $http.post("/admin/newbuilding/", data).then(function(res) {
-                if(res.status == 201) setTimeout(getListings,200);
+                if(res.status == 201) setTimeout(getData,200);
             },function(err){});
             console.log(data);
         };
@@ -87,7 +94,7 @@ app.controller("mainCtrl", [
             var data = $scope.deleteForms[id];
             console.log('deleting',data);
             $http.post("/admin/deletebuilding/", data).then(function(res) {
-                if(res.status == 201) setTimeout(getListings,200);
+                if(res.status == 201) setTimeout(getData,200);
             },function(err){});
         };
 
@@ -96,17 +103,35 @@ app.controller("mainCtrl", [
             data.building = id;
             console.log(data);
             $http.post("/admin/setitem/", data).then(function(res) {
-                if(res.status == 201) setTimeout(getListings,200);
+                if(res.status == 201) setTimeout(getData,200);
+            },function(err){});
+        };
+
+        $scope.setPrice = function(id){
+            var data = $scope.priceForms[id];
+            data.building = id;
+            console.log(data);
+            $http.post("/admin/setprice/", data).then(function(res) {
+                if(res.status == 201) setTimeout(getData,200);
             },function(err){});
         };
 
         $scope.toggleBuild = function(id){
             $http.post("/admin/togglebuild/", {id:id}).then(function(res) {
-                if(res.status == 201) setTimeout(getListings,200);
+                if(res.status == 201) setTimeout(getData,200);
             },function(err){});
         };
 
-        setInterval(getListings,60*1000);
+        $scope.updatePrices = function(buildingID){
+            var id = $scope.priceForms[buildingID].item;
+            var prices = $scope.buildings[buildingID].prices;
+            if(prices) {
+                $scope.priceForms[buildingID].buy = prices[id][0];
+                $scope.priceForms[buildingID].sell = prices[id][1];
+            }
+        };
+
+        setInterval(getData,90*1000);
     }
 ]);
 
@@ -128,9 +153,7 @@ app.filter('shopFilter',function(){
         var item = entry[0];
         var nb= entry[1];
         var string = Data.itemsData[item].name+' ('+nb+')';
-        if(prices[item]){
-            string += ' '+prices[item][0]+'/'+prices[item][1];
-        }
+        if(prices[item]) string += ' '+prices[item][0]+'/'+prices[item][1];
         return string;
     }
 });
@@ -142,79 +165,3 @@ app.filter('displayBuilding',function(){
         return JSON.stringify(raw,null,2);
     }
 });
-
-//Client.socket = io.connect();
-//Client.socket.emit('admin');
-
-
-/*Admin.generateOptions = function(file,select){
-    $.getJSON( "/assets/data/"+file+".json", function(data) {
-        console.log(data);
-        for(var key in data){
-            if(!data.hasOwnProperty(key)) continue;
-            $('#'+select).append($('<option>', {
-                value: key,
-                text: data[key].name
-            }));
-        }
-    });
-};
-
-Admin.formatFormData = function(raw){
-    var obj = {};
-    raw.forEach(function(data){
-        var value = data.value;
-        if(value == "") return;
-        if(value == "on"){
-            value = true;
-        }else if(!isNaN(+value)){
-            value = +value;
-        }
-        obj[data.name] = value;
-    });
-    return obj;
-};
-
-Admin.extractHeaders = function(data){
-    var headers = new Set();
-    data.forEach(function(e){
-        for(var field in e){
-            if(!e.hasOwnProperty(field)) continue;
-            headers.add(field);
-        }
-    });
-    return headers;
-};
-
-Admin.deleteClick = function(id){
-    console.log('deleting',id);
-};
-
-$("#newbuildbtn").click(function() {
-    $("#newbuildform").toggle( "clip", 100 );
-});
-
-$("#newbuildform").submit(function(e) {
-    e.preventDefault();
-    Client.send('newbuilding',Admin.formatFormData($(this).serializeArray()));
-    $("#newbuildform").toggle( "clip", 100 );
-});
-
-$('#buildings').on('click','a',function(event){
-    event.preventDefault();
-    var id = event.target.id;
-    Client.send('deletebuilding',id);
-});
-
-Client.requestBuildings = function(){
-    Client.send('listbuildings');
-};
-
-    Client.send = function(msg,data){
-        console.log(msg,data);
-        Client.socket.emit('admin_'+msg,data);
-    };*/
-
-/*Admin.generateOptions('buildings','buildTypeSelect');
-Admin.generateOptions('settlements','settlementSelect');
-Client.requestBuildings();*/

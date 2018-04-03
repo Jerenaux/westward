@@ -105,6 +105,7 @@ var Player = new Phaser.Class({
     // ### SETTERS ####
 
     setDestinationAction: function(type,id){
+        //console.log('setting to',type,id);
         if(type == 0){
             this.destinationAction = null;
             return;

@@ -91,7 +91,8 @@ Inventory.prototype.toList = function(filterZeroes){
 };
 
 Inventory.prototype.fromList = function(list){
-    for(var i = 0; i < list.length; i++){
+    if(list.length > this.maxSize) console.warn('Too many items provided to inventory');
+    for(var i = 0; i < Math.min(list.length,this.maxSize); i++){
         this.add(list[i][0],list[i][1]);
     }
 };

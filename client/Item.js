@@ -8,7 +8,7 @@ var Item = new Phaser.Class({
     initialize: function Item() {
         CustomSprite.call(this, Engine.scene, 0, 0);
         this.setDepth(2);
-        this.setOrigin(-0.3);
+        //this.setOrigin(-0.3);
         this.setInteractive();
         this.entityType = 'item';
     },
@@ -20,6 +20,8 @@ var Item = new Phaser.Class({
         this.setVisible(true);
 
         this.setTilePosition(data.x,data.y,true);
+        this.x += World.tileWidth/2;
+        this.y += World.tileHeight/2;
         this.setID(data.id);
 
         this.name = itemData.name;

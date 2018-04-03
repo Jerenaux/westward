@@ -162,7 +162,7 @@ function Capsule(x,y,icon,container){
         this.icon.setVisible(false);
     }
     var textX = (this.icon ? x + this.icon.width : x) + 10;
-    var textY = (this.icon ? y - 1: y);
+    var textY = (this.icon ? y +1: y+2);
 
     this.text = UI.scene.add.text(textX, textY, '',
         { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }

@@ -269,7 +269,7 @@ Animal.prototype.isAvailableForFight = function(){
 
 Animal.prototype.die = function(){
     MovingEntity.prototype.die.call(this);
-    this.spawnZone.decrement(this.type);
+    this.spawnZone.decrement('animal',this.type);
 };
 
 Animal.prototype.remove = function(){

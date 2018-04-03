@@ -18,13 +18,13 @@ Market research
 Use fade-in
 Design document
 Trailer
-Put all recipes in on-the-go crafting menu before workshop comes around
-Make interesting spawn zones (for both settlements)
+Bug: double click on building enters it
+Look towards destination action
+Add buildings to Hope, and stock them
 Decide cycle (eco, spawn)
 Make sure all menus have something interesting to show 
 Reread all tips and help
 Economic loop: test all updates of all menus
-Shop: tunic, shield, a few arrows, a few potions
 Permanent players
 
 Admin

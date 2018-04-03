@@ -67,16 +67,11 @@ Player.prototype.setFieldOfVision = function(aois){
 };
 
 Player.prototype.setStartingInventory = function(){
-    this.giveItem(1,1); //food
-    this.giveItem(9,2); // pelt
-    this.giveItem(20,5); // arrows
-    this.giveItem(19,1); // quiver
-    this.giveItem(2,1); // bow
-    //this.giveItem(11,2); // sword
-    this.giveItem(6,1); // potion
-    this.giveItem(14,1); //
+    this.giveItem(6,2);
+    this.giveItem(13,1);
+    this.giveItem(28,1);
 
-    this.giveGold(500);
+    this.giveGold(100);
 };
 
 Player.prototype.setUpStats = function(){

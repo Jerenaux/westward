@@ -53,6 +53,7 @@
                         </div><br/><br/>
 
                         <div class="edit-div" ng-show="editForms[building.id].visible">
+                            <!-- Items -->
                             <form class="form-inline"  ng-submit="setStock(building.id)">
                                 <select class="item-select form-control form-control-sm" ng-model="inventoryForms[building.id].item" ng-options="item.id as item.name for item in data.itemsList | orderBy:'name'"></select>
                                 <input class="form-control form-control-sm" required ng-model="inventoryForms[building.id].nb" size="2">
@@ -60,6 +61,16 @@
                                     <span class="glyphicon glyphicon-ok"></span>
                                 </button>
                             </form><br/>
+                            <!-- Prices -->
+                            <form class="form-inline"  ng-submit="setPrice(building.id)">
+                                <select class="item-select form-control form-control-sm" ng-change="updatePrices(building.id)" ng-model="priceForms[building.id].item" ng-options="item.id as item.name for item in buildings[building.id].inv | orderBy:'name'"></select>
+                                <input class="form-control form-control-sm" required ng-model="priceForms[building.id].buy" size="2">
+                                <input class="form-control form-control-sm" required value="building.prices[1]" ng-model="priceForms[building.id].sell" size="2">
+                                <button type="submit" class="btn btn-success">
+                                    <span class="glyphicon glyphicon-ok"></span>
+                                </button>
+                            </form><br/>
+
                             <button type="submit" class="btn btn-danger" ng-click="toggleBuild(building.id)">
                                 <span class="glyphicon glyphicon-wrench"></span>
                             </button>

@@ -186,7 +186,7 @@ InventoryPanel.prototype.applyFilter = function(item){
     if(this.config.filterType == 'prices'){
         var filter = this.config.filterItems;
         if(!filter.hasOwnProperty(item)) return false;
-        if(!filter[item][this.config.filterKey] > 0) return false;
+        if(!(parseInt(filter[item][this.config.filterKey]) > 0)) return false;
         return true;
     }else if(this.config.filterType == 'property'){
         var filter = this.config.filterProperty;

@@ -152,7 +152,7 @@ Building.prototype.canBuy = function(item,nb){ // check if building has gold and
         console.log('Error: building inventory full');
         return false;
     }
-    if(!this.prices.hasOwnProperty(item) || this.prices[item][0] == 0){
+    if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item][0]) == 0){
         console.log('Error: building does not buy this item');
         return false;
     }
@@ -168,8 +168,8 @@ Building.prototype.canSell = function(item,nb){
         console.log('Error: building does not have this item');
         return false;
     }
-    if(!this.prices.hasOwnProperty(item) || this.prices[item][0] == 0){
-        console.log('Error: building does not sel this item');
+    if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item][1]) == 0){
+        console.log('Error: building does not sell this item');
         return false;
     }
     return true;
@@ -195,6 +195,10 @@ Building.prototype.takeItem = function(item,nb){
 
 Building.prototype.setItem = function(item,nb){
     this.inventory.update(item,nb);
+};
+
+Building.prototype.setPrices = function(item,buy,sell){
+    this.prices[item] = [parseInt(buy),parseInt(sell)];
 };
 
 Building.prototype.getGold = function(){

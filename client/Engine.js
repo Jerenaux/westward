@@ -885,10 +885,10 @@ Engine.addHero = function(data){
     Engine.player.gold = data.gold;
     Engine.player.civicxp = data.civicxp;
     Engine.player.maxcivicxp = 100;
-    //Engine.player.buildingRecipes = new Inventory(9);
-    //Engine.player.buildingRecipes.fromList([[4,1],[7,1],[8,1]]);
-    Engine.player.itemRecipes = new Inventory(10);
-    Engine.player.itemRecipes.fromList([[6,1],[21,1],[2,1],[28,1],[29,1],[35,1],[17,1]]);
+    Engine.player.itemRecipes = new Inventory(12);
+    Engine.player.itemRecipes.fromList(
+        [[2,1],[4,1],[6,1],[10,1],[17,1],[21,1],[23,1],[28,1],[29,1],[32,1],[33,1],[35,1]]
+    );
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = Equipment.getSkeleton();
     Engine.player.commitSlots = data.commitSlots;
@@ -1009,7 +1009,7 @@ Engine.computePath = function(position){
     var y = position.y;
     if(PFUtils.checkCollision(x,y)) return;
     //console.log(Engine.player.tileX, Engine.player.tileY, x, y);
-    var start = Engine.player.getPFstart(); // Engine.player.tileX, Engine.player.tileY
+    var start = Engine.player.getPFstart();
     if(Engine.player.moving) Engine.player.stop();
     var path = Engine.PFfinder.findPath(start.x, start.y, x, y, Engine.PFgrid);
     PF.reset();
@@ -1321,7 +1321,6 @@ Engine.getTilesetFromTile = function(tile){
 };
 
 Engine.enterBuilding = function(id){
-    console.log('Entering '+id);
     Engine.player.setVisible(false);
     var building = Engine.buildings[id];
     Engine.inBuilding = true;
@@ -1338,10 +1337,7 @@ Engine.enterBuilding = function(id){
     }else{
         menus.push(Engine.menus.construction);
     }
-    //if(buildingData.production) menus.push(Engine.menus.production);
-    //var menu = (building.built ? Engine.menus[buildingData.mainMenu] : Engine.menus['construction']);
-    //menu.displayIcon();
-    //menu.display();
+
     menus.forEach(function(m){
         m.displayIcon();
     });

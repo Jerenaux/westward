@@ -32,13 +32,17 @@
     "atlas": "items2",
     "frame":"bomb",
     "name": "Bomb",
-    "desc": "[SOON] Can be used in battle for area-of-effect damage."
+    "desc": "Will be usable in battle for area-of-effect damage.",
+    "recipe": {"32":1,"35":2},
+    "isCrafted": true,
+    "craftTier": 2
   },
   "5":{
     "atlas": "items2",
     "frame":"root",
     "name": "Root",
-    "desc": "Root of a common plant all over the Continent. Crafting material involved in the brewing of several types of potions."
+    "desc": "Root of a common plant all over the Continent. Crafting material involved in the brewing of several types of potions.",
+    "isMaterial": true
   },
   "6":{
     "atlas": "items2",

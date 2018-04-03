@@ -56,6 +56,7 @@ var POSThandlers = {
     'deletebuilding': gs.deleteBuilding,
     'newbuilding': gs.insertNewBuilding,
     'setitem': gs.setBuildingItem,
+    'setprice': gs.setBuildingPrice,
     'togglebuild': gs.toggleBuild
 };
 var events = Object.keys(POSThandlers);
@@ -194,10 +195,6 @@ server.sendInitializationPacket = function(socket,packet){
     socket.emit('init',packet);
 };
 
-/*server.sendAdminUpdate = function(socketID,name,pkg){
-    var socket = server.getSocket(socketID);
-    if(pkg) io.in(socketID).emit(name,pkg);
-};*/
 
 server.sendUpdate = function(socketID,pkg){
     var socket = server.getSocket(socketID);

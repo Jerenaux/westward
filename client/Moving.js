@@ -142,8 +142,9 @@ var Moving = new Phaser.Class({
         this.leaveFootprint();
 
         if(this.flagForStop || (this.stopPos && this.stopPos.x == tx && this.stopPos.y == ty)){
-            this.movement.stop(); // TODO: use new phaser argument to call endMovement automatically
-            this.endMovement();
+            if(this.isHero) Engine.player.setDestinationAction(0);
+            this.movement.stop();
+            this.endMovement(); // TODO: have it called automatically by stop()
         }
     },
 
@@ -174,7 +175,7 @@ var Moving = new Phaser.Class({
             if(px == x && py == y) stopIndex = i;
             if(currentIndex > -1 && stopIndex > -1) break;
         }
-        console.log(stopIndex,currentIndex);
+        //console.log(stopIndex,currentIndex);
         if(stopIndex == -1) console.warn('stop index not found');
         if(stopIndex == currentIndex) timeOffset = 0;
         if(stopIndex > currentIndex) timeOffset = 1;

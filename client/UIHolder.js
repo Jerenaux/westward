@@ -8,12 +8,13 @@ function UIHolder(x,y,align,style){
     this.align = align;
 
     if(!style) style = 'big';
-    var sliceWidth, sliceHeight, fontSize, leftFrame, middleFrame, rightFrame, yOffset;
+    var sliceWidth, sliceHeight, fontSize, leftFrame, middleFrame, rightFrame, yOffset, xOffset;
     if(style == 'big'){
         sliceWidth = 32;
         sliceHeight = 64;
         fontSize = 32;
-        yOffset = 5;
+        yOffset = 10;
+        xOffset = -5;
         leftFrame = 'title-left';
         middleFrame = 'title-center';
         rightFrame = 'title-right';
@@ -23,6 +24,7 @@ function UIHolder(x,y,align,style){
         sliceHeight = 24;
         fontSize = 16;
         yOffset = 0;
+        xOffset = 0;
         leftFrame = 'capsule-left';
         middleFrame = 'capsule-middle';
         rightFrame = 'capsule-right';
@@ -41,7 +43,7 @@ function UIHolder(x,y,align,style){
         xr = xm;
     }
 
-    var textX = x;
+    var textX = x + xOffset;
     var textY = y + yOffset;
 
     this.text = UI.scene.add.text(textX, textY, '', { font: fontSize+'px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
