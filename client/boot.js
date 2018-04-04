@@ -32,6 +32,20 @@ var Boot = new Phaser.Class({
         this.totalReadyTicks = 2;
         this.onReady = this.displayButton;
         this.displayTitle();
+
+        Boot.WEBGL = true;
+
+        try { gl = game.canvas.getContext("webgl"); }
+        catch (x) { gl = null; }
+
+        if (gl == null) {
+            try { gl = game.canvas.getContext("experimental-webgl"); experimental = true; }
+            catch (x) { gl = null; }
+        }
+        if(!gl){
+            Boot.WEBGL = false;
+            console.warn('WEBGL not supported');
+        }
     },
 
     updateReadyTick: function() {

@@ -81,6 +81,17 @@ app.controller("mainCtrl", [
             getJSON(cat);
         });
 
+        getScreenshots = function(){
+            $scope.screenshots = [];
+            $http.get("/admin/screenshots/").then(function(res) {
+                if(res.status == 200){
+                    $scope.screenshots = res.data;
+                    console.log($scope.screenshots);
+                }
+            },function(err){});
+        };
+        getScreenshots();
+
         $scope.addBuilding = function(id){
             var data = $scope.buildingForms[id];
             data.visible = undefined;
@@ -163,5 +174,11 @@ app.filter('displayBuilding',function(){
         raw.buildings = undefined;
         raw.danger = undefined;
         return JSON.stringify(raw,null,2);
+    }
+});
+
+app.filter('processImg',function(){
+    return function(img){
+        return img.split(",")[1];
     }
 });

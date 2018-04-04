@@ -48,7 +48,7 @@ Client.getInitRequest = function(){ // Returns the data object to send to reques
 };
 
 Client.checkForNewPlayer = function(){
-    Client.newPlayer = true;
+    Client.newPlayer = false;
     return;
     Client.newPlayer =  (Client.getPlayerID() === null);
 };

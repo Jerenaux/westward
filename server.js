@@ -52,6 +52,11 @@ categories.forEach(function(cat){
     });
 });
 
+app.get('/admin/screenshots', function (req, res) {
+    console.log('[ADMIN] requesting screenshots');
+    gs.getScreenshots(res);
+});
+
 var POSThandlers = {
     'deletebuilding': gs.deleteBuilding,
     'newbuilding': gs.insertNewBuilding,

@@ -75,7 +75,7 @@
                                 <span class="glyphicon glyphicon-wrench"></span>
                             </button>
                         </div>
-                        <!-- {{building | displayBuilding}}-->
+                        {{building | displayBuilding}}
                     </div>
                 </div>
             </div>
@@ -89,7 +89,17 @@
         </div>
     </div>
 
+    <div class="panel panel-default" ng-repeat="screenshot in screenshots">
+        <div class="panel-heading">
+            {{screenshot.stamp | date}} @ ({{screenshot.player.x}}, {{screenshot.player.y}})
+        </div>
+        <div class="panel-body">
+            <img class="bug-snap" data-ng-src="data:image/png;base64,{{screenshot.img | processImg}}"/>
+        </div>
+    </div>
+
 </div>
+
 
 </body>
 <script src="admin.js" type="text/javascript"></script>

@@ -18,7 +18,9 @@ Market research
 Use fade-in
 Design document
 Trailer
+Fix mask issue
 Bug: double click on building enters it
+Make animals aggressive again
 Look towards destination action
 Add buildings to Hope, and stock them
 Decide cycle (eco, spawn)

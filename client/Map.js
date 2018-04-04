@@ -14,11 +14,25 @@ var Map = new Phaser.Class({
 
         var mask = UI.scene.add.sprite(x,y,'radial3');
         mask.setScale(1.1);
-        mask.setDepth(2);
-        mask.setScrollFactor(0);
         mask.setVisible(false);
-        this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
-        this.maskPicture = mask;
+        if(Boot.WEBGL){
+            mask.setDepth(2);
+            mask.setScrollFactor(0);
+            this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
+            this.maskOverlay = mask;
+        }else{
+            var shape = UI.scene.make.graphics();
+            shape.fillStyle('#ffffff');
+            var w = mask.frame.width;
+            var h = mask.frame.height;
+            shape.fillRect(x-(w/2), y-(h/2), w, h);
+            this.mask = new Phaser.Display.Masks.GeometryMask(UI.scene, shape);
+            this.maskOverlay = shape;
+        }
+        this.maskSize = {
+            width: mask.frame.width,
+            height: mask.frame.heigt
+        };
 
         this.toponyms = [];
         Engine.settlementsData.forEach(function(s){
@@ -49,7 +63,7 @@ var Map = new Phaser.Class({
         text.setScrollFactor(0,0);
         text.setAlpha(0.5);
         text.setOrigin(0.5);
-        text.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,this.maskPicture);
+        text.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,this.maskOverlay);
         this.toponyms.push(text);
     },
 
@@ -115,7 +129,7 @@ var Map = new Phaser.Class({
 
     getNextPin: function(){
         if(this.pinsCounter >= this.pins.length){
-            this.pins.push(new Pin(this,this.maskPicture));
+            this.pins.push(new Pin(this,this.maskOverlay));
         }
         return this.pins[this.pinsCounter++];
     },
@@ -154,11 +168,15 @@ var Map = new Phaser.Class({
         this.setOrigin(origin.x,origin.y);
         this.setPosition(x,y);
 
-        this.minY = this.y - (this.height-this.displayOriginY) + this.mask.bitmapMask.height/2;
+        //this.minY = this.y - (this.height-this.displayOriginY) + this.mask.bitmapMask.height/2;
+        this.minY = this.y - (this.height-this.displayOriginY) + this.maskSize.height/2;
         // Max position the map can move down to; = initial Y + distance to upper border - half the mask height
-        this.maxY = this.y + this.displayOriginY - this.mask.bitmapMask.height/2;
+        /*this.maxY = this.y + this.displayOriginY - this.mask.bitmapMask.height/2;
         this.minX = this.x - (this.width-this.displayOriginX) + this.mask.bitmapMask.width/2;
-        this.maxX = this.x + this.displayOriginX - this.mask.bitmapMask.width/2;
+        this.maxX = this.x + this.displayOriginX - this.mask.bitmapMask.width/2;*/
+        this.maxY = this.y + this.displayOriginY - this.maskSize.height/2;
+        this.minX = this.x - (this.width-this.displayOriginX) + this.maskSize.width/2;
+        this.maxX = this.x + this.displayOriginX - this.maskSize.width/2;
 
         // TODO: store the 500 in config somewhere
         this.minX = Math.max(this.minX,this.x-500);

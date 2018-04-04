@@ -52,7 +52,7 @@ Engine.preload = function() {
     this.load.image('hammer', 'assets/sprites/hammer.png');
     this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
 
-    this.load.image('fort', 'assets/sprites/buildings/fort.png');
+    this.load.image('fort', 'assets/sprites/buildings/fort_300.png');
     this.load.image('tradepost', 'assets/sprites/buildings/tradepost.png');
     this.load.image('inn', 'assets/sprites/buildings/inn.png');
     this.load.image('tower', 'assets/sprites/buildings/tower.png');
@@ -176,6 +176,7 @@ Pool.prototype.recycle = function(element){
 };
 
 Engine.create = function(){
+    console.log(game);
     Engine.scene = this.scene.scene;
     var masterData = Boot.masterData;
     World.readMasterData(masterData);

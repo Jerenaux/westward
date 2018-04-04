@@ -277,7 +277,7 @@ GameServer.loadPlayer = function(socket,id){
         if(!doc) {
             //GameServer.server.sendError(socket);
             console.log('ERROR : no matching document');
-            GameServer.addNewPlayer(socket);
+            GameServer.addNewPlayer(socket, {});
             return;
         }
         var player = new Player();
@@ -817,6 +817,7 @@ GameServer.updateSpawnZones = function(){
 GameServer.handleScreenshot = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     data.player = player.trim();
+    data.stamp = Date.now();
     GameServer.server.db.collection('screenshots').insertOne(data,function(err){
         if(err) throw err;
         console.log('Screenshot saved');
@@ -894,5 +895,18 @@ GameServer.toggleBuild = function(data){
     building.toggleBuild();
     building.save();
     return true;
+};
+
+GameServer.getScreenshots = function(res){
+    GameServer.server.db.collection('screenshots').find({}).toArray(function(err,docs){
+        if(err) throw err;
+        console.log('LENgtH:',docs.length);
+        if (docs.length == 0) {
+            res.status(204).end();
+        } else {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).send(docs).end();
+        }
+    });
 };
 

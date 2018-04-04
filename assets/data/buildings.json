@@ -1,6 +1,28 @@
 {
   "0":{
     "shape":[
+      0, 170,
+      290, 170,
+      290, 395,
+      0, 395
+    ],
+    "width": 300,
+    "height": 398,
+    "sprite": "fort",
+    "name":"Fort",
+    "mainMenu": "fort",
+    "fort": true,
+    "staff": true,
+    "icon": "fort",
+    "recipe": {"3":50},
+    "displayProd": false,
+    "entry": {
+      "x": -4,
+      "y": 6
+    }
+  },
+  "0_":{
+    "shape":[
       53, 100,
       230, 0,
       465, 40,
