@@ -25,6 +25,14 @@ Formulas.pctToDecimal = function(pctValue){
 
 // For modifiers, all formulas expect decimal values as input and return decimal values as output
 
+Formulas.foodConsumption = function(population){
+    return population;
+};
+
+Formulas.computeRequiredFood = function(population){
+    return population*10;
+};
+
 Formulas.commitmentProductivityModifier = function(commitment){
     return (2*commitment)/100;
 };

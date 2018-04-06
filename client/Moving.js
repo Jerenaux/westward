@@ -111,6 +111,10 @@ var Moving = new Phaser.Class({
         }
     },
 
+    setOrientation: function(orientation){
+        this.orientation = orientation;
+    },
+
     faceOrientation: function(){
         this.setFrame(this.restingFrames[this.orientation]);
     },
@@ -142,7 +146,7 @@ var Moving = new Phaser.Class({
         this.leaveFootprint();
 
         if(this.flagForStop || (this.stopPos && this.stopPos.x == tx && this.stopPos.y == ty)){
-            if(this.isHero) Engine.player.setDestinationAction(0);
+            //if(this.isHero) Engine.player.setDestinationAction(0);
             this.movement.stop();
             this.endMovement(); // TODO: have it called automatically by stop()
         }

@@ -69,7 +69,7 @@
     },
     "displayProd": false,
     "buildRate":2,
-    "buildInterval":15,
+    "buildInterval":3600,
     "mainMenu": "trade",
     "icon": "tradepost"
   },
@@ -142,8 +142,10 @@
     "icon": "hut",
     "mainMenu": "production",
     "displayProd": true,
-    "production": [[1,1]],
-    "prodInterval": 30,
+    "production": [[1,10]],
+    "prodInterval": 43200,
+    "buildRate":10,
+    "buildInterval":3600,
     "entry": {
       "x": 0,
       "y": 3

@@ -12,8 +12,8 @@ function DevLevelPanel(x,y,width,height,title){
         level: 0
     });
     this.dummySlots.push({
-        txt: "Lumbercamp",
-        icon: ["aok","lumbercamp"],
+        txt: "Timber",
+        icon: ["items2","timber"],
         level: 0
     });
 }
@@ -48,11 +48,19 @@ DevLevelPanel.prototype.update = function(){
     //console.log(this.displayedSlots);
     var slot1 = this.displayedSlots[0];
     var slot2 = this.displayedSlots[1];
+
     var nb = Engine.currentBuiling.getItemNb(1);
     var total = 400;
     slot1.progressTxt.setText(nb+"/"+total);
     slot1.progressTxt.setFill(nb >= total ? Utils.colors.green : Utils.colors.white);
     slot1.bar.setLevel(nb,total);
+
+    var nb = Engine.currentBuiling.getItemNb(3);
+    var total = 250;
+    slot2.progressTxt.setText(nb+"/"+total);
+    slot2.progressTxt.setFill(nb >= total ? Utils.colors.green : Utils.colors.white);
+    slot2.bar.setLevel(nb,total);
+
     slot1.display();
     slot2.display();
 };

@@ -238,7 +238,7 @@ Building.prototype.trim = function(){
     var trimmed = {};
     var broadcastProperties =
         ['id','type','sid','gold','prices','built','productivity','progress','committed',
-            'buildings','population','foodsurplus','danger']; // list of properties relevant for the client
+            'buildings','population','foodsurplus','danger','devlevel']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

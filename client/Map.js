@@ -63,7 +63,10 @@ var Map = new Phaser.Class({
         text.setScrollFactor(0,0);
         text.setAlpha(0.5);
         text.setOrigin(0.5);
-        text.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,this.maskOverlay);
+        text.mask = (Boot.WEBGL
+                ? new Phaser.Display.Masks.BitmapMask(UI.scene,this.maskOverlay)
+                : new Phaser.Display.Masks.GeometryMask(UI.scene, this.maskOverlay)
+        );
         this.toponyms.push(text);
     },
 
@@ -129,7 +132,7 @@ var Map = new Phaser.Class({
 
     getNextPin: function(){
         if(this.pinsCounter >= this.pins.length){
-            this.pins.push(new Pin(this,this.maskOverlay));
+            this.pins.push(new Pin(this,this.maskOverlay,this.maskSize));
         }
         return this.pins[this.pinsCounter++];
     },
@@ -168,12 +171,7 @@ var Map = new Phaser.Class({
         this.setOrigin(origin.x,origin.y);
         this.setPosition(x,y);
 
-        //this.minY = this.y - (this.height-this.displayOriginY) + this.mask.bitmapMask.height/2;
         this.minY = this.y - (this.height-this.displayOriginY) + this.maskSize.height/2;
-        // Max position the map can move down to; = initial Y + distance to upper border - half the mask height
-        /*this.maxY = this.y + this.displayOriginY - this.mask.bitmapMask.height/2;
-        this.minX = this.x - (this.width-this.displayOriginX) + this.mask.bitmapMask.width/2;
-        this.maxX = this.x + this.displayOriginX - this.mask.bitmapMask.width/2;*/
         this.maxY = this.y + this.displayOriginY - this.maskSize.height/2;
         this.minX = this.x - (this.width-this.displayOriginX) + this.maskSize.width/2;
         this.maxX = this.x + this.displayOriginX - this.maskSize.width/2;
@@ -219,14 +217,19 @@ var Pin = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function Pin (map,mask) {
+    initialize: function Pin (map,mask,maskSize) {
         CustomSprite.call(this, UI.scene, 0, 0, 'pin');
         this.setDepth(5);
         this.setScrollFactor(0);
         this.setOrigin(0.5,1);
         this.setVisible(false);
         this.setInteractive();
-        this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
+        //this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
+        this.mask = (Boot.WEBGL
+                ? new Phaser.Display.Masks.BitmapMask(UI.scene,mask)
+                : new Phaser.Display.Masks.GeometryMask(UI.scene,mask)
+        );
+        this.maskSize = maskSize;
         this.parentMap = map;
         this.on('pointerover',this.handleOver.bind(this));
         this.on('pointerout',this.handleOut.bind(this));
@@ -254,8 +257,10 @@ var Pin = new Phaser.Class({
     },
 
     handleOver: function(){
-        if(Math.abs(this.x - this.mask.bitmapMask.x) > this.mask.bitmapMask.width/2) return;
-        if(Math.abs(this.y - this.mask.bitmapMask.y) > this.mask.bitmapMask.height/2) return;
+        //if(Math.abs(this.x - this.mask.bitmapMask.x) > this.mask.bitmapMask.width/2) return;
+        //if(Math.abs(this.y - this.mask.bitmapMask.y) > this.mask.bitmapMask.height/2) return;
+        if(Math.abs(this.x - this.mask.x) > this.maskSize.width/2) return;
+        if(Math.abs(this.y - this.mask.y) > this.maskSize.height/2) return;
         UI.tooltip.updateInfo(this.name);
         UI.tooltip.display();
     },

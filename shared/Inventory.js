@@ -12,7 +12,7 @@ function Inventory(size){
 Inventory.prototype.updateItems = function(items){
     // items is an array of smaller arrays of format [item id, nb]
     items.forEach(function(i){
-        this.update(i[0],i[1]);
+        this.update(i[0],parseInt(i[1]));
     },this);
 };
 
@@ -64,7 +64,7 @@ Inventory.prototype.hasItem = function(item){
 
 Inventory.prototype.getNb = function(item){
     if(!this.items.hasOwnProperty(item)) return 0;
-    return this.items[item];
+    return parseInt(this.items[item]);
 };
 
 Inventory.prototype.updateNb = function(item,nb){

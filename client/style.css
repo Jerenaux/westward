@@ -34,3 +34,8 @@
     background-color: rgba(0,0,0,0.5);
     outline: none;
 }
+
+.danger {
+    color: red;
+    font-weight: bold;
+}

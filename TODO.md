@@ -1,72 +1,51 @@
+Out-of-world pathfinding (quick fix)
+
+Admin
+Analytics
 Cleaning
+Content
+*Ambiance
 * Battle system
+* Civics
+* Craftsmen gameplay
+* Explorer gameplay
 * Inventory
+* Merchant gameplay
+* Misc
+* Orientation
+* Packaging
 * Settlement defense
 * Settlement economy
-* Settlement management
+* Soldier gameplay
+Deployment
 Design document
 Polish
+Testing
+World Building
 
 ###############
-Prototype level:
+V1 level:
 ###############
-
-Week:
------
-*1 item/recipe a day*
-Market research
-Use fade-in
-Design document
-Trailer
-Fix mask issue
-Bug: double click on building enters it
-Make animals aggressive again
-Look towards destination action
-Add buildings to Hope, and stock them
-Decide cycle (eco, spawn)
-Make sure all menus have something interesting to show 
-Reread all tips and help
-Economic loop: test all updates of all menus
-Permanent players
 
 Admin
 -----
+Set gold
+Set coordinates
+Set settlement parameters
 Display last and *next* cycles
 Dump db
+Secure
 
-Economy build-up:
-----------------
-*1 item/recipe a day*
-Make recipes for 5 items (sword, bullets, bombs...) + create ingredients
-Make recipes (randomly?) for 5 consumables (potion, antidote, steady stuff...) + create ingredients
-Recipes for fancy bullets and bombs
-Add recipes for all intermediary ingredients
-Workshop building, interface = usual crafting menu
--> update advice
-Add shop interface as well
-Display recipes with building and class restrictions
-Update help text of recipes
-Scatter basic ingredients
-Coal mine
-Resource flow to trade post
-Gold flow from tarde post to fort
-Add all other mines (iron, sulfur, gold) + flows
-Add wood and stone flow to trade post
-Specific interface for workshop, with own stock and settlement stock + gold
--> 100% own stock or 100% city stock to begin with
--> If using city stock, created item also lands in city stock
-Fork trade post gold flow to fork and workshop
-Set reward of recipes for settlement (0 = disabled)
-Golden ore flow from mine to workshop
-Recipe for golden ore -> gold ingots
-Recipe for gold ingots -> currency
-Addition "fuel" field (wood)
-Add dialog to allow using own stuff for missing ingredients when city-forging
-Make spawn zones for plants/shrooms/etc.
-Make separate brewing interface, similar but with adjustable dosage
-Add "brewing" time
-Add checkboxes for what should be boiled or grinded
-
+Analytics:
+---------
+- Implement custom analytics, save in db
+- Look for nice statistical library
+- Log as many things as possible: session duration, distance travelled per session, time spent in settlement per session, in nature per session,
+interactions with buildings, time spent in each individual menu, etc.
+- Cluster "heavy" players vs "small-time" players and look for differences between the two
+- Analyze sessions of one-time players who never come back
+- Find other meaningful clusters (maybe in unsupervized fashion)
+- Compare behaviors to how you expect the game to be played
 
 Cleaning:
 --------
@@ -125,25 +104,68 @@ common "formatFoorSurplus" method to decide exact formatting (witg a reciprocal 
 
 Content:
 -------
+* Ambiance
+- Footsteps to all creatures, sound effects (on actions + environment: birds, water, ...)
+- Animal noises when beasts in proximity, animal footsteps, player footsteps noise
+- Carcasses, traces of fight, traces of campfires
 * Battle system
-Bug: bubble at wrong location after respawn
+- Get arrows back when skinning
 - Animals have sorted list of targets, iteratr through it when first one not reachable for some reason
 -> Deal with big battlefields; focus camera on active player (problem: if far away, surrounding AOIs not displayed), ...
-- Animal can trigger fights
-- Get arrows back when skinning
-* Ecosystem
-- Listing and distribution of pick-up resources
-- Listing and distribution (and yield) of building resources
-- Listing and distribution of animals
-- Roots obtained from "harvesting" plants (yields flower + root; different plants, different flowers and roots)
-- Work out location and mechanics of enemy civ.  
+- Fighters queue indicating participants and upcoming turns
+- Identify characters in the way of ranged attacks
+- Anti-friendly fire safety for ranged attacks
+- Stats and formulas for bombs
+- Mechanic for bombs
+- Anti-friendly fire safety for bombs
+- Shield stats and formulas
+- Shield mechanics
+- Increase fatigue when fighting
+- Effect of fatigue on fighting
+- Compute probability of items breaking and discard them
+- Accommodate NPC
+* Civics
+- Civic levels
+- Elections
+- Naming officials
+* Craftsmen gameplay
+- XP
+- Bonuses
+- Recipes
+- Tier
+- Upgrades
+- Naming
+- Quests
+* Explorer gameplay
+- XP
+- Bonuses
+- Fog of war
+- Map mechanics
+- Quests
 * Inventory
-- Add crafting recipes
-- Gold hover card (in buildings too)
-- Have only one ammo type equiped at all time (depending on weapon), for rdmg stat
-- Two resources for guns: bullets and powder (different powders with different properties)
-* Movement
-- Improve timeline and orientation using the onStart callbacks of individual tweens
+- Dropping items
+- Work out inventory size mechanics, ammo, types...
+* Merchant gameplay
+- XP
+- Bonuses
+- Shops
+- Caravans
+- Homeland trade
+- Inns
+- Quests
+* Misc
+- Events log
+- Fatigue
+- Rest
+- Campfires
+- Respawn losses
+- Messaging -> Very first mail is a RP mail giving some background about the game
+- Leaderboards
+- Guilds
+* Orientation
+* Packaging
+-> Nb connected, permanent players, player names, ..
+-> Cheat-proof
 * Settlement defense
 - Enable commander to build towers
 - Set up stats of towers and forts
@@ -154,27 +176,65 @@ Bug: bubble at wrong location after respawn
 - Set up stats of troops
 - Make troops engage enemies
 * Settlement economy
-- Once a building is built in a spawnzone AOI, remove that AOI from the zone
-- Yellow pins for unbuilt buildings
-- Move stock around buildings
+keep track of commit slots in buildings as well, to de-commit deconnected players
+Make recipes (randomly?) for 5 consumables (potion, antidote, steady stuff...) + create ingredients
+Recipes for fancy bullets and bombs
+Add recipes for all intermediary ingredients
+Workshop building, interface = usual crafting menu
+-> update advice
+Add shop interface as well
+Display recipes with building and class restrictions
+Update help text of recipes
+Scatter basic ingredients
+Coal mine
+Resource flow to trade post
+Gold flow from tarde post to fort
+Add all other mines (iron, sulfur, gold) + flows
+Add wood and stone flow to trade post
+Specific interface for workshop, with own stock and settlement stock + gold
+-> 100% own stock or 100% city stock to begin with
+-> If using city stock, created item also lands in city stock
+Fork trade post gold flow to fork and workshop
+Set reward of recipes for settlement (0 = disabled)
+Golden ore flow from mine to workshop
+Recipe for golden ore -> gold ingots
+Recipe for gold ingots -> currency
+Addition "fuel" field (wood)
+Add dialog to allow using own stuff for missing ingredients when city-forging
+Make spawn zones for plants/shrooms/etc.
+Make separate brewing interface, similar but with adjustable dosage
+Add "brewing" time
+Add checkboxes for what should be boiled or grinded
+- Resources flow
 - Let chancellor set prices in trade post
-- Automatic shop systemn in port for chancellor
 - Trade with overseas
-- Restrict prerogatives based on official position
-- Let governor name chancellors
-- Salaries for officials
-- Work out settlement levels
-* Settlement management
-- Restrict prerogatives based on official position
-- Enable governor to name chancellors and commanders
-- Election of governors
+- Salaries for officials, taxes
+- New buildings
+- Dev levels
+* Soldier gameplay
+- XP
+- Bonuses
+- Bombs
+- Rare/strong foes
+- Quests
+
+Deployment:
+----------
+- Flatten chunks and reduce them to arrays only
+- Code to load flattened chunks in game
+- Separate as much as possible the code required for production and the code required for testing
+- Tool to gather, uglify and compress all relevant source files and move them to production directory
+- Automate git upload to Heroku (http://radek.io/2015/10/27/nodegit/)
+- Full pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
+- Tool to automatically merge all graphic assets in atlases?
+- Way to interact with Node server online, without restarting (e.g. change variables, reload data...)
+- Improve flattening by making transparency checks
+- Secure chunk access? (check client position before serving)
+- Desktop app (automated)
 
 Design document:
 ---------------
-- Make numeric simulations linking everything:
--> Time to acquire dev level goals based on building production rates, varying number of buildings, productivity, etc.
--> Evolution of food surplus based on number of players, buildings, etc.
--> Set all these paremeters in a virtual settlement, simulate one day/week/month/year buy iteratively computing all cycles and their consequences in that time, then see results
+-> Market research
 - Finish copying notes (currently: in ambiance, npc dialogues)
 - Concile all texts (doc, crafting.txt)
 - Decide list of buildings, items, ...
@@ -188,6 +248,7 @@ Design document:
 Polish:
 ------
 Visual:
+- Fade-in
 - "Tip of the day"
 - Revamp class selection
 - Fix continuous movement
@@ -227,132 +288,17 @@ Sound:
 General:
 - Keyboard shortcuts for menus?
 - Categories of items? (How to concile with various backpack sizes)? Sorting of items?
-- Feedback for rejected paths because too long (question mark, sound, ...)
 - Polish existing content
-- Footsteps, light effects, sound effects (on actions + environment: birds, water, ...)
+- Light effects
 - HUD, title screen, animations ...
-- Animal noises when beasts in proximity, animal footsteps, player footsteps noise
-- Carcasses, traces of fight
 - Varied and nice landmarks to give life to the world and act as waypoints
-
-
-###############
-V1 level:
-###############
-
-Analytics:
----------
-- Implement custom analytics
-- Log as many things as possible: session duration, distance travelled per session, time spent in settlement per session, in nature per session,
-interactions with buildings, time spent in each individual menu, etc.
-- Cluster "heavy" players vs "small-time" players and look for differences between the two
-- Analyze sessions of one-time players who never come back
-- Find other meaningful clusters (maybe in unsupervized fashion)
-- Compare behaviors to how you expect the game to be played
-
-Content:
--------
-* Cheat-proof everything , secure admin
-- Including crafting recipes
-* Battle system
-- Fighters queue indicating participants and upcoming turns
-- Battle experience
-- Identify characters in the way of ranged attacks
-- Anti-friendly fire safety for ranged attacks
-- Stats and formulas for bombs
-- Mechanic for bombs
-- Anti-friendly fire safety for bombs
-- Shield stats and formulas
-- Shield mechanics
-- Increase fatigue when fighting
-- Effect of fatigue on fighting
-- Loss of equipment upon respawning
-- Compute probability of items breaking and discard them
-- Accommodate NPC
-* Character menu:
-- Lvl-up system
-- Make actions generate an entry in events log
-- Events log: what you did (and effects: xp gains, health gains, ...), the notifications you got, what you said and people around said
-- Daily quests
-* Crafting
-- Determine quality level based on artisan level
-- Design upgrade system
-- Upgrade menu
-- Upgrade mechanic based on quality
-- Increase fatigue when crafting
-- Effect of fatigue on crafting
-- Set up tool to define hunting areas
-- Have wildlife spawn accordingly
-* Daily quests
-* Exploration/travel:
-- Campfires
-- Travel increases fatigue
-- Spotting of settlements, with indicator
-- Spotting of inns, with indicator
-- Spotting of wildlife and enemies, with indicator
-- Spotting of other players
-- Increase range based on class and possible items
-* (Mini)map system
-* Equipment menu
-* HUD/Menus
-- Fatigue meter
-- Minimap
-- Daily quests
-*Inventory:
-- Add possibility to throw item, (incl. number)
-- Allow to use multiple items in one action
-* Inns
-(- Enable players to put construction site)
-(- Enable players to commit to construction)
-- Shop management (custom stock, prices...)
-- Set respawn fee
-- Set respawn site
-- Chat
-- Gazette
-* Mail system (using birds)
--> Very first mail is a RP mail giving some background about the game
-* (Mini)map system
-* Movement
-- Check paths and block if error
-- Keep track of player position along path on server
-- Adjust movement duration based on latency
-- Remove possible echo
-- Investigate smoothenPath and compressPath)
-- Hold & click
-* NPC
-* Pop-up fade-out notifications to everything in corners (+ log in character menu)
-* Player interactions:
-- Display menu when click on players, display buttons (give item, give money)
-- Give items/money
-* Settlement defense
-* Settlement economy
-- Fixed building spots; number increases with dev level
-* Skills menu
-* Trade
-- Enable bonuses of merchants
-- Allow merchants and artisans to build their shops
-* Tutorial
-* World map
-- Menu with static image
-- Minimap
-- Fog of war and exploration (chunks-based)
-
-Deployment:
-----------
-- Flatten chunks and reduce them to arrays only
-- Code to load flattened chunks in game
-- Separate as much as possible the code required for production and the code required for testing
-- Tool to gather, uglify and compress all relevant source files and move them to production directory
-- Automate git upload to Heroku (http://radek.io/2015/10/27/nodegit/)
-- Full pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
-- Tool to automatically merge all graphic assets in atlases?
-- Way to interact with Node server online, without restarting (e.g. change variables, reload data...)
-- Improve flattening by making transparency checks
-- Secure chunk access? (check client position before serving)
 
 Testing:
 -------
-- Make public attributions to assets you used
+- Make numeric simulations linking everything:
+-> Time to acquire dev level goals based on building production rates, varying number of buildings, productivity, etc.
+-> Evolution of food surplus based on number of players, buildings, etc.
+-> Set all these paremeters in a virtual settlement, simulate one day/week/month/year buy iteratively computing all cycles and their consequences in that time, then see results
 - Figure out testing:
 - Have a test server, test database a test map set up
 - Open browser and run test script in test world
@@ -360,17 +306,14 @@ Testing:
 - Have the testing pipeline work with both development and production code (run it once, prodify, then check again, the upload)
 - Optimize: remove divisions, benchmark runtimes, etc.
 
-Tools:
-------
+World building:
+--------------
+-> Custom pathfinding, World editor, manage spawn zones...
 Custom chunk editor:
 - Arrows on the fringes of the window allow to move quickly to adjacent chunks
 - See borders of adjacent chunks to match fringe tiles
 - Preserve whatever extra info is in the JSON file (vs Tiled who rewrites it)
 - Versioning of individual chunks (saved in separate folder), for unlimited undos
-
-
-World building:
---------------
 - Add random elements (w/ scripts to remove them):
 -> Patches of dirt
 -> Tree decorations: flowers, stones, bushes
@@ -383,10 +326,3 @@ World building:
 - Store forests and trees separately (trees.json) during dev?
 -> During flattening, read that file and draw trees tile by tile
 -> Test high-layers after flattening
-
-###############
-V2 level:
-###############
-- PvP
-- Naval exploration
-

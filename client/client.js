@@ -37,6 +37,7 @@ Client.getInitRequest = function(){ // Returns the data object to send to reques
     // In case of a new player, set new to true and send the name of the player
     // Else, set new to false and send it's id instead to fetch the corresponding data in the database
     if(Client.isNewPlayer()) {
+        console.log('Requesting data for new player');
         return {
             new:true,
             stamp:localStorage.getItem('idStamp'),
@@ -48,8 +49,6 @@ Client.getInitRequest = function(){ // Returns the data object to send to reques
 };
 
 Client.checkForNewPlayer = function(){
-    Client.newPlayer = false;
-    return;
     Client.newPlayer =  (Client.getPlayerID() === null);
 };
 

@@ -52,6 +52,7 @@ var Building = new Phaser.Class({
             'built': this.setBuilt,
             'committed': this.setCommitted,
             'danger': this.setDangerIcons,
+            'devlevel': this.setDevLevel,
             'foodsurplus': this.setFoodSurplus,
             'gold': this.setGold,
             'inventory': this.setInventory, // sets whole inventor
@@ -124,6 +125,11 @@ var Building = new Phaser.Class({
         this.updateEvents.add('onUpdateMap');
     },
 
+    setDevLevel: function(level){
+        this.devlevel = level;
+        this.updateEvents.add('onUpdateSettlementStatus');
+    },
+
     setFoodSurplus: function(foodsurplus){
         this.foodsurplus = foodsurplus;
         this.updateEvents.add('onUpdateSettlementStatus');
@@ -167,6 +173,10 @@ var Building = new Phaser.Class({
 
     // ### GETTERS ###
 
+    getDevLevel: function(){
+        return this.devlevel;
+    },
+
     getFoodSurplus: function(){
         return this.foodsurplus;
     },
@@ -204,7 +214,7 @@ var Building = new Phaser.Class({
             x: this.tx + this.entry.x,
             y: this.ty + this.entry.y
         };
-        Engine.player.setDestinationAction(1, this.id); // 1 for building
+        Engine.player.setDestinationAction(1, this.id, pos.x, pos.y); // 1 for building
         Engine.computePath(pos);
     },
 

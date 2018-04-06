@@ -1022,7 +1022,7 @@ Engine.computePath = function(position){
     if(trim.trimmed) Engine.player.setDestinationAction(0);
     path = trim.path;
 
-    if(Engine.player.destinationAction) path.pop();
+    if(Engine.player.destinationAction && Engine.player.destinationAction.type != 1) path.pop();
     Client.sendPath(path,Engine.player.destinationAction);
     Engine.player.queuePath(path);
 };
@@ -1405,7 +1405,7 @@ Engine.countIcons = function(){
 Engine.processAnimalClick = function(target){
     if(Engine.inPanel) return;
     if(target.dead){
-        Engine.player.setDestinationAction(2,target.id); // 2 for animal
+        Engine.player.setDestinationAction(2,target.id,target.tileX,target.tileY); // 2 for animal
         Engine.computePath({x:target.tileX,y:target.tileY});
     }else{
         Client.animalClick(target.id);
@@ -1414,7 +1414,7 @@ Engine.processAnimalClick = function(target){
 
 Engine.processItemClick = function(target){
     if(Engine.inPanel) return;
-    Engine.player.setDestinationAction(3,target.id); // 3 for item
+    Engine.player.setDestinationAction(3,target.id,target.tx,target.ty); // 3 for item
     Engine.computePath({x:target.tx,y:target.ty});
 };
 

@@ -54,7 +54,9 @@ Settlement.prototype.getBuildings = function(){
 
 Settlement.prototype.registerFort = function(fort){
     this.fort = fort;
+    // TODO: update fort when these values change
     this.fort.setProperty('population',this.pop);
+    this.fort.setProperty('devlevel',this.level);
     this.fort.setProperty('danger',this.danger);
     this.respawnLocation = {
         x: GameServer.buildingsData[0].entry.x + this.fort.x,
@@ -83,10 +85,11 @@ Settlement.prototype.refreshListing = function(){
 };
 
 Settlement.prototype.consumeFood = function(){
-    var rate = 30*1000; // every 30sec
+    var rate = GameServer.cycles.foodConsumptionRate;
     var nbCycles = Math.floor((Date.now() - this.lastCycle)/rate);
     if(nbCycles > 0) {
-        var consumption = Math.floor(this.pop / 10) * nbCycles;
+        //var consumption = Math.min(1,Math.floor(this.pop / 10) * nbCycles);
+        var consumption = Formulas.foodConsumption(this.pop)*nbCycles;
         console.log(this.name, 'consuming', consumption, 'food');
         if (consumption) this.takeFromFort(1, consumption);
 
@@ -97,8 +100,7 @@ Settlement.prototype.consumeFood = function(){
 
 Settlement.prototype.computeFoodSurplus = function(){
     var foodAmount = this.fort.getItemNb(1);
-    var foodPerCitizen = 20;
-    var required = foodPerCitizen*this.pop;
+    var required = Formulas.computeRequiredFood(this.pop);
     var delta = foodAmount - required;
     this.surplus = Formulas.decimalToPct(delta/required);
     console.log('Surplus for ',this.name,':',this.surplus,'%');

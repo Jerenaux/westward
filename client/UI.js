@@ -220,13 +220,12 @@ UI.displaySettlementSelectionMenu =  function(){
     //map.setScale(0.75);
     map.x += 50;
     map.y += 150;
-    map.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,scroll);
 
-    /*var w = 300;
-    var h = 100;
-    var panel = new InfoPanel(UI.getGameWidth()-w,UI.getGameHeight()-h,w,h,'Choose a settlement');
-    panel.addText(10,15,'Click on one of the green blinking icons for more information about the corresponding settlement.');
-    panel.display();*/
+    if(Boot.WEBGL){
+        map.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,scroll);
+    }else{
+        scroll.setScale(1.4);
+    }
 
     UI.SSmap = map;
     UI.SScontent = content;

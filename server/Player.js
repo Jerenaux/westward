@@ -22,7 +22,8 @@ function Player(){
     this.oldAOIs = [];
     this.action = null;
     this.inventory = new Inventory();
-    this.settlement = 0;
+    this.sid = 0;
+    this.settlement = null;
     this.gold = 0;
     this.inBuilding = -1;
     this.commitSlots = this.getCommitSlotsShell();
@@ -49,17 +50,19 @@ Player.prototype.setIDs = function(dbID,socketID){
     this.socketID = socketID;
 };
 
+// Called by finalizePlayer
 Player.prototype.registerPlayer = function(){
-    var settlement = GameServer.settlements[this.settlement];
-    settlement.registerPlayer(this);
+    //var settlement = GameServer.settlements[this.sid];
+    this.settlement.registerPlayer(this);
 };
 
-Player.prototype.setClass = function(className){
-    this.class = className;
+Player.prototype.setClass = function(classID){
+    this.class = classID;
 };
 
 Player.prototype.setSettlement = function(sid){
-    this.settlement = sid;
+    this.sid = sid;
+    this.settlement = GameServer.settlements[this.sid];
 };
 
 Player.prototype.setFieldOfVision = function(aois){
@@ -67,6 +70,9 @@ Player.prototype.setFieldOfVision = function(aois){
 };
 
 Player.prototype.setStartingInventory = function(){
+    this.giveItem(2,1);
+    this.giveItem(19,1);
+    this.giveItem(20,3);
     this.giveItem(6,2);
     this.giveItem(13,1);
     this.giveItem(28,1);
@@ -99,7 +105,8 @@ Player.prototype.die = function(){
 };
 
 Player.prototype.spawn = function(){
-    var respawnLocation = GameServer.settlements[this.settlement].respawnLocation;
+    //var respawnLocation = GameServer.settlements[this.settlement].respawnLocation;
+    var respawnLocation = this.settlement.respawnLocation;
     this.setProperty('x', respawnLocation.x);
     this.setProperty('y', respawnLocation.y);
     console.log('spawning at ',this.x,this.y);
@@ -387,10 +394,11 @@ Player.prototype.applyEffect = function(stat,delta,notify){
 Player.prototype.initTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','settlement','gold','civicxp','class']; // list of properties relevant for the client
+    var broadcastProperties = ['id','gold','civicxp','class']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
+    trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     trimmed.commitSlots = this.trimCommitSlots();
@@ -401,17 +409,18 @@ Player.prototype.initTrim = function(){
 Player.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','path','settlement','inFight','inBuilding','chat',
+    var broadcastProperties = ['id','path','inFight','inBuilding','chat',
         'battlezone','dead']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
+    trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     return trimmed;
 };
 
-Player.prototype.dbTrim = function(){
+/*Player.prototype.dbTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be stored in the database
     var trimmed = {};
     var dbProperties = ['x','y','equipment','gold','commitSlots','civicxp','class']; // list of properties relevant to store in the database
@@ -421,9 +430,9 @@ Player.prototype.dbTrim = function(){
     trimmed.inventory = this.inventory.toList();
     trimmed.stats = {};
     return trimmed;
-};
+};*/
 
-Player.prototype.getDataFromDb = function(document){
+/*Player.prototype.getDataFromDb = function(document){
     // TODO: think about how to handle references to other entities
     // eg. inBuilding (how to retrieve proper building if server went down since), commitment...
     // Set up the player based on the data stored in the databse
@@ -453,6 +462,34 @@ Player.prototype.getDataFromDb = function(document){
     this.commitSlots = document.commitSlots || this.getCommitSlotsShell();
     this.civicxp = document.civicxp || 0;
     this.giveGold(document.gold);
+    this.setOrUpdateAOI();
+};*/
+
+Player.prototype.getDataFromDb = function(data){
+    // TODO: think about how to handle references to other entities
+    // eg. inBuilding (how to retrieve proper building if server went down since), commitment...
+    this.x = data.x;
+    this.y = data.y;
+    this.civicxp = data.civicxp;
+    this.setClass(data.class);
+    // stats are not saved, see schema
+    // TODO: create an EquipmentManager
+    for(var equip in Equipment.dict) {
+        if (!Equipment.dict.hasOwnProperty(equip)) continue;
+        var eq = Equipment.dict[equip];
+        for(var i = 0; i < eq.nb; i++) {
+            if(!data.equipment.hasOwnProperty(equip)) continue;
+            var dbvalue = data.equipment[i];
+            if(dbvalue > -1) this.equip(equip,dbvalue,true); // true: data from DB
+        }
+        if(eq.containedIn) this.load(eq.containedIn,data.equipment.container[eq.containedIn]);
+    }
+    this.inventory.fromList(data.inventory);
+    this.setSettlement(document.sid);
+    this.commitSlots = data.commitSlots;
+    // TODO: de-commit expired slots
+    this.giveGold(document.gold);
+
     this.setOrUpdateAOI();
 };
 
@@ -552,7 +589,8 @@ Player.prototype.update = function() {
 
 Player.prototype.remove = function(){
     if(this.battle) this.battle.removeFighter(this);
-    GameServer.settlements[this.settlement].removePlayer(this);
+    //GameServer.settlements[this.settlement].removePlayer(this);
+    this.settlement.removePlayer(this);
     delete GameServer.players[this.id];
 };
 

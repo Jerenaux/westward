@@ -95,6 +95,14 @@
     {
       "filename": "flask",
       "frame": {"x":288,"y":312,"w":24,"h":24}
+    },
+    {
+      "filename": "stingleaf",
+      "frame": {"x":120,"y":456,"w":24,"h":24}
+    },
+    {
+      "filename": "whitepetal",
+      "frame": {"x":288,"y":288,"w":24,"h":24}
     }
   ]
 }

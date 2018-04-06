@@ -93,7 +93,7 @@ app.controller("mainCtrl", [
         getScreenshots();
 
         $scope.addBuilding = function(id){
-            var data = $scope.buildingForms[id];
+            var data = $scope.newBuildingForms[id];
             data.visible = undefined;
             $http.post("/admin/newbuilding/", data).then(function(res) {
                 if(res.status == 201) setTimeout(getData,200);

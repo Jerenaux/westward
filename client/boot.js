@@ -38,13 +38,10 @@ var Boot = new Phaser.Class({
         try { gl = game.canvas.getContext("webgl"); }
         catch (x) { gl = null; }
 
-        if (gl == null) {
-            try { gl = game.canvas.getContext("experimental-webgl"); experimental = true; }
-            catch (x) { gl = null; }
-        }
         if(!gl){
             Boot.WEBGL = false;
             console.warn('WEBGL not supported');
+            document.getElementById("danger").innerText = "Your browser does not support WebGL. Some visual effects will be disabled or may render poorly.";
         }
     },
 

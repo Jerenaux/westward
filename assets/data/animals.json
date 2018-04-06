@@ -3,7 +3,7 @@
     "sprite":"wolves",
     "name": "Wolf",
     "frame": 25,
-    "aggro": false,
+    "aggro": true,
     "wander": true,
     "walkPrefix": "wolf",
     "footprintsFrame": 1,

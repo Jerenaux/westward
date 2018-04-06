@@ -80,9 +80,17 @@ var Player = new Phaser.Class({
         Moving.prototype.endMovement.call(this);
         if(BattleManager.inBattle) BattleManager.onEndOfMovement();
         if(this.isHero){
-            if(this.destinationAction && this.destinationAction.type == 1){
-                Engine.enterBuilding(this.destinationAction.id);
+            var da = this.destinationAction;
+            if(da && da.type == 1) {
+                var dx = Math.abs(da.x - this.tileX);
+                var dy = Math.abs(da.y - this.tileY);
+                if (dx <= 1 && dy <= 1){
+                    Engine.enterBuilding(da.id);
+                    this.setOrientation('up');
+                    this.faceOrientation();
+                }
             }
+
         }
     },
 
@@ -104,7 +112,7 @@ var Player = new Phaser.Class({
 
     // ### SETTERS ####
 
-    setDestinationAction: function(type,id){
+    setDestinationAction: function(type,id,x,y){
         //console.log('setting to',type,id);
         if(type == 0){
             this.destinationAction = null;
@@ -112,7 +120,9 @@ var Player = new Phaser.Class({
         }
         this.destinationAction = {
             type: type,
-            id: id
+            id: id,
+            x: x,
+            y: y
         };
     },
 

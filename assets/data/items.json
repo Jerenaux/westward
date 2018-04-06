@@ -280,5 +280,19 @@
     "isMaterial": true,
     "isCrafted": true,
     "craftTier": 1
+  },
+  "36":{
+    "atlas": "items2",
+    "frame":"stingleaf",
+    "name": "Stingleaf",
+    "desc": "Plant with cleansing properties used to brew potions.",
+    "isMaterial": true
+  },
+  "37":{
+    "atlas": "items2",
+    "frame":"whitepetal",
+    "name": "Whitepetal",
+    "desc": "Flower with cleansing properties used to brew potions.",
+    "isMaterial": true
   }
 }

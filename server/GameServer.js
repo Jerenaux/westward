@@ -23,7 +23,18 @@ var GameServer = {
     vision: new Set(), // set of AOIs potentially seen by at least one player
     nbConnectedChanged: false,
     initializationStep: 0,
-    initialized: false
+    initialized: false,
+
+    clientUpdateRate: 1000/8, // Rate at which update packets are sent
+    walkUpdateRate: 1000/20, // Rate at which positions are updated
+    npcUpdateRate: 1000/5,
+    playerUpdateRate: 60*1000,
+    settlementUpdateRate: 3600*1000,
+    spawnZoneUpdateRate: 3600*1000
+};
+
+GameServer.cycles = {
+    foodConsumptionRate: 8*3600*1000
 };
 
 module.exports.GameServer = GameServer;
@@ -92,11 +103,17 @@ GameServer.createModels = function(){
         gold: {type: Number, min: 0},
         civicxp: {type: Number, min: 0},
         class: {type: Number, min: 0},
-        equipment: mongoose.Schema.Types.Mixed
+        equipment: mongoose.Schema.Types.Mixed,
+        commitSlots: mongoose.Schema.Types.Mixed,
+        sid: {type: Number, min: 0, required: true},
+        inventory: {type: [[]], set:function(inventory){
+                return inventory.toList(true); // true: filter zeroes
+            }}
         // stats are NOT saved, as they only consist in base values + modifiers; modifiers are re-applied contextually, not saved
     });
     GameServer.SettlementModel = mongoose.model('Settlement', settlementSchema);
     GameServer.BuildingModel = mongoose.model('Building', buildingSchema);
+    GameServer.PlayerModel = mongoose.model('Player', playerSchema);
 };
 
 GameServer.readMap = function(mapsPath){
@@ -172,19 +189,17 @@ GameServer.loadBuildings = function(){
 
 GameServer.setUpSpawnZones = function(){
     GameServer.spawnZones = [];
-    GameServer.addAnimal(489,675,0); // REMOVE
 
     var animals = {
         0:{
-            min: 15,
-            rate: 3
+            min: 10, //10
+            rate: 3 // 3
         }
     };
-    //GameServer.spawnZones.push(new SpawnZone([1567,1665,1666,1716,1717,1768],animals));
 
     var items = {
         8: {
-            min: 15,
+            min: 10,
             rate: 2
         },
         14: {
@@ -224,19 +239,19 @@ GameServer.addItem = function(x,y,type){
 };
 
 GameServer.setUpdateLoops = function(){
-    var clientUpdateRate = 1000/8; // Rate at which update packets are sent
-    var walkUpdateRate = 1000/20; // Rate at which positions are updated
+    /*GameServer.clientUpdateRate = 1000/8; // Rate at which update packets are sent
+    GameServer.walkUpdateRate = 1000/20; // Rate at which positions are updated
     GameServer.npcUpdateRate = 1000/5;
-    var settlementUpdateRate = 10*1000;
-    var playerUpdateRate = 60*1000;
-    var spawnZoneUpdateRate = 15*1000;
+    GameServer.settlementUpdateRate = 10*1000;
+    GameServer.playerUpdateRate = 60*1000;
+    GameServer.spawnZoneUpdateRate = 15*1000;*/
 
     setInterval(GameServer.updateNPC,GameServer.npcUpdateRate);
-    setInterval(GameServer.updateWalks,walkUpdateRate);
-    setInterval(GameServer.updateClients,Math.round(clientUpdateRate));
-    setInterval(GameServer.updateSettlements,settlementUpdateRate);
-    setInterval(GameServer.updatePlayers,playerUpdateRate);
-    setInterval(GameServer.updateSpawnZones,spawnZoneUpdateRate);
+    setInterval(GameServer.updateWalks,GameServer.walkUpdateRate);
+    setInterval(GameServer.updateClients,Math.round(GameServer.clientUpdateRate));
+    setInterval(GameServer.updateSettlements,GameServer.settlementUpdateRate);
+    setInterval(GameServer.updatePlayers,GameServer.playerUpdateRate);
+    setInterval(GameServer.updateSpawnZones,GameServer.spawnZoneUpdateRate);
 };
 
 GameServer.getPlayer = function(socketID){
@@ -260,10 +275,23 @@ GameServer.addNewPlayer = function(socket,data){
     player.setSettlement(data.selectedSettlement);
     player.setClass(data.selectedClass);
     player.spawn();
-    var document = player.dbTrim();
-    GameServer.server.db.collection('players').insertOne(document,function(err){
+
+    //var document = player.dbTrim();
+    var document = new GameServer.PlayerModel(player);
+    player.setModel(document);
+
+    /*GameServer.server.db.collection('players').insertOne(document,function(err){
         if(err) throw err;
         var mongoID = document._id.toString(); // The Mongo driver for NodeJS appends the _id field to the original object reference
+        player.setIDs(mongoID,socket.id);
+        GameServer.finalizePlayer(socket,player);
+        GameServer.server.sendID(socket,mongoID);
+    });*/
+
+    document.save(function (err,doc) {
+        if (err) return console.error(err);
+        console.log('New player created');
+        var mongoID = doc._id.toString();
         player.setIDs(mongoID,socket.id);
         GameServer.finalizePlayer(socket,player);
         GameServer.server.sendID(socket,mongoID);
@@ -272,7 +300,24 @@ GameServer.addNewPlayer = function(socket,data){
 };
 
 GameServer.loadPlayer = function(socket,id){
-    GameServer.server.db.collection('players').findOne({_id: new ObjectId(id)},function(err,doc){
+    console.log('Loading player',id);
+    GameServer.PlayerModel.findOne(
+        {_id: new ObjectId(id)},
+        function (err, doc) {
+            if (err) return console.warn(err);
+            if(!doc) {
+                console.log('ERROR : no matching document');
+                GameServer.addNewPlayer(socket, {});
+                return;
+            }
+            var player = new Player();
+            var mongoID = doc._id.toString();
+            player.setIDs(mongoID,socket.id);
+            player.getDataFromDb(doc);
+            GameServer.finalizePlayer(socket,player);
+        }
+    );
+    /*GameServer.server.db.collection('players').findOne({_id: new ObjectId(id)},function(err,doc){
         if(err) throw err;
         if(!doc) {
             //GameServer.server.sendError(socket);
@@ -285,7 +330,7 @@ GameServer.loadPlayer = function(socket,id){
         player.setIDs(mongoID,socket.id);
         player.getDataFromDb(doc);
         GameServer.finalizePlayer(socket,player);
-    });
+    });*/
 };
 
 GameServer.finalizePlayer = function(socket,player){
@@ -406,9 +451,11 @@ GameServer.handleBattle = function(player,animal,aggro){
 };
 
 GameServer.checkAreaIntegrity = function(area){
+    console.log(area);
     var cells = new SpaceMap();
     for(var x = area.x; x <= area.x+area.w; x++){
         for(var y = area.y; y <= area.y+area.h; y++){
+            console.log('collision at',x,y,':',PFUtils.checkCollision(x,y));
             if(!PFUtils.checkCollision(x,y)) cells.add(y,x,0); // y then x
         }
     }
@@ -900,7 +947,6 @@ GameServer.toggleBuild = function(data){
 GameServer.getScreenshots = function(res){
     GameServer.server.db.collection('screenshots').find({}).toArray(function(err,docs){
         if(err) throw err;
-        console.log('LENgtH:',docs.length);
         if (docs.length == 0) {
             res.status(204).end();
         } else {

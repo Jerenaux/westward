@@ -49,7 +49,7 @@ PFUtils.secondDimensionHandler = {
 PFUtils.invertedSecondDimensionHandler = {
     get: function(target,key){
         //console.log('2: accessing ',key);
-    if(target.firstDim < 0 || key < 0 || key > World.worldHeight || target.firstDim > World.worldWidth) {
+    if(target.firstDim < 0 || key < 0 || key > World.worldWidth || target.firstDim > World.worldHeight) {
         return new PF.Node(parseInt(key),parseInt(target.firstDim),false);
     }
     if(target.hasOwnProperty(key)){
