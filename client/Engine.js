@@ -176,7 +176,6 @@ Pool.prototype.recycle = function(element){
 };
 
 Engine.create = function(){
-    console.log(game);
     Engine.scene = this.scene.scene;
     var masterData = Boot.masterData;
     World.readMasterData(masterData);
@@ -826,7 +825,7 @@ Engine.makeInventory = function(statsPanel){
     var items = new InventoryPanel(40,100,600,380,'Items');
     items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
     items.addCapsule('gold',100,-9,'999','gold');
-    // TODO: add click callback too + wrap text
+    inventory.addPanel('itemAction',new ItemActionPanel(70,220,200,200),true);
     items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help']);
     inventory.addPanel('items',items);
     var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
@@ -1508,7 +1507,9 @@ Engine.newbuildingClick = function(){
 };
 
 Engine.inventoryClick = function(){
-    Client.sendUse(this.itemID);
+    //Client.sendUse(this.itemID);
+    Engine.currentMenu.panels['itemAction'].setUp(this.itemID);
+    Engine.currentMenu.panels['itemAction'].display();
 };
 
 Engine.unequipClick = function(){ // Sent when unequipping something

@@ -419,13 +419,9 @@ WorldEditor.fill = function(fillNode,stop){ // fills the world with water, but s
                 x: node.x + contour[i][0],
                 y: node.y + contour[i][1]
             };
-            //if(candidate.x < 0 || candidate.y < 0 || candidate.x >= World.worldWidth || candidate.y >= World.worldHeight) continue;
             if(!WorldEditor.isInWorldBounds(candidate.x,candidate.y)) continue;
 
-            if(!WorldEditor.isBusy(candidate)) {
-                //console.log('adding ',candidate.x,candidate.y);
-                queue.push(candidate);
-            }
+            if(!WorldEditor.isBusy(candidate)) queue.push(candidate);
         }
 
         counter++;

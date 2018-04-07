@@ -239,13 +239,6 @@ GameServer.addItem = function(x,y,type){
 };
 
 GameServer.setUpdateLoops = function(){
-    /*GameServer.clientUpdateRate = 1000/8; // Rate at which update packets are sent
-    GameServer.walkUpdateRate = 1000/20; // Rate at which positions are updated
-    GameServer.npcUpdateRate = 1000/5;
-    GameServer.settlementUpdateRate = 10*1000;
-    GameServer.playerUpdateRate = 60*1000;
-    GameServer.spawnZoneUpdateRate = 15*1000;*/
-
     setInterval(GameServer.updateNPC,GameServer.npcUpdateRate);
     setInterval(GameServer.updateWalks,GameServer.walkUpdateRate);
     setInterval(GameServer.updateClients,Math.round(GameServer.clientUpdateRate));
@@ -280,14 +273,6 @@ GameServer.addNewPlayer = function(socket,data){
     var document = new GameServer.PlayerModel(player);
     player.setModel(document);
 
-    /*GameServer.server.db.collection('players').insertOne(document,function(err){
-        if(err) throw err;
-        var mongoID = document._id.toString(); // The Mongo driver for NodeJS appends the _id field to the original object reference
-        player.setIDs(mongoID,socket.id);
-        GameServer.finalizePlayer(socket,player);
-        GameServer.server.sendID(socket,mongoID);
-    });*/
-
     document.save(function (err,doc) {
         if (err) return console.error(err);
         console.log('New player created');
@@ -315,22 +300,9 @@ GameServer.loadPlayer = function(socket,id){
             player.setIDs(mongoID,socket.id);
             player.getDataFromDb(doc);
             GameServer.finalizePlayer(socket,player);
+            player.update();
         }
     );
-    /*GameServer.server.db.collection('players').findOne({_id: new ObjectId(id)},function(err,doc){
-        if(err) throw err;
-        if(!doc) {
-            //GameServer.server.sendError(socket);
-            console.log('ERROR : no matching document');
-            GameServer.addNewPlayer(socket, {});
-            return;
-        }
-        var player = new Player();
-        var mongoID = doc._id.toString();
-        player.setIDs(mongoID,socket.id);
-        player.getDataFromDb(doc);
-        GameServer.finalizePlayer(socket,player);
-    });*/
 };
 
 GameServer.finalizePlayer = function(socket,player){
@@ -653,7 +625,8 @@ GameServer.handleCommit = function(data,socketID){ // keep data argument
     var buildingID = player.inBuilding;
     var building = GameServer.buildings[buildingID];
     player.takeCommitmentSlot(buildingID,true);
-    building.updateCommit(1);
+    building.addCommit(player);
+    //building.updateCommit(1);
     var gain = 20;
     player.gainCivicXP(gain,true);
     // TODO: increment change based on civic level?
@@ -742,6 +715,7 @@ GameServer.handleAOItransition = function(entity,previous){
 
     if(entity.isPlayer) {
         entity.setFieldOfVision(AOIs);
+        console.log('Vision AOIs:',AOIs,entity.fieldOfVision);
         GameServer.updateVision();
     }
 
@@ -760,8 +734,10 @@ GameServer.handleAOItransition = function(entity,previous){
 };
 
 GameServer.updateVision = function(){
+    console.log('Updating vision');
     GameServer.vision = new Set();
     for(var pid in GameServer.players){
+        console.log('Checking field of vision for player',pid);
         var player = GameServer.players[pid];
         player.fieldOfVision.forEach(function(aoi){
            GameServer.vision.add(aoi);

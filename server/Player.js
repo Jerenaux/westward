@@ -420,51 +420,6 @@ Player.prototype.trim = function(){
     return trimmed;
 };
 
-/*Player.prototype.dbTrim = function(){
-    // Return a smaller object, containing a subset of the initial properties, to be stored in the database
-    var trimmed = {};
-    var dbProperties = ['x','y','equipment','gold','commitSlots','civicxp','class']; // list of properties relevant to store in the database
-    for(var p = 0; p < dbProperties.length; p++){
-        trimmed[dbProperties[p]] = this[dbProperties[p]];
-    }
-    trimmed.inventory = this.inventory.toList();
-    trimmed.stats = {};
-    return trimmed;
-};*/
-
-/*Player.prototype.getDataFromDb = function(document){
-    // TODO: think about how to handle references to other entities
-    // eg. inBuilding (how to retrieve proper building if server went down since), commitment...
-    // Set up the player based on the data stored in the databse
-    // document is the mongodb document retrieved form the database
-    var dbProperties = ['x','y'];
-    for(var p = 0; p < dbProperties.length; p++){
-        this[dbProperties[p]] = document[dbProperties[p]];
-    }
-    // stats are not saved, see schema
-    for(var equip in Equipment.dict) {
-        if (!Equipment.dict.hasOwnProperty(equip)) continue;
-        var eq = Equipment.dict[equip];
-        for(var i = 0; i < eq.nb; i++) {
-            if(!document['equipment'].hasOwnProperty(equip)) continue;
-            var dbvalue = document['equipment'][equip][i];
-            if(dbvalue > -1) this.equip(equip,dbvalue,true); // true: data from DB
-        }
-        if(eq.containedIn) this.load(eq.containedIn,document['equipment']['containers'][eq.containedIn]);
-    }
-    for(var i = 0; i < document.inventory.length; i++){
-        var item = document.inventory[i];
-        this.giveItem(item[0],item[1]);
-    }
-    if(document.class) this.setClass(document.class);
-    if(document.settlement) this.setSettlement(document.settlement);
-    if(!document.gold) document.gold = 0;
-    this.commitSlots = document.commitSlots || this.getCommitSlotsShell();
-    this.civicxp = document.civicxp || 0;
-    this.giveGold(document.gold);
-    this.setOrUpdateAOI();
-};*/
-
 Player.prototype.getDataFromDb = function(data){
     // TODO: think about how to handle references to other entities
     // eg. inBuilding (how to retrieve proper building if server went down since), commitment...
@@ -482,15 +437,16 @@ Player.prototype.getDataFromDb = function(data){
             var dbvalue = data.equipment[i];
             if(dbvalue > -1) this.equip(equip,dbvalue,true); // true: data from DB
         }
-        if(eq.containedIn) this.load(eq.containedIn,data.equipment.container[eq.containedIn]);
+        if(eq.containedIn) this.load(eq.containedIn,data.equipment.containers[eq.containedIn]);
     }
-    this.inventory.fromList(data.inventory);
-    this.setSettlement(document.sid);
+    //this.inventory.fromList(data.inventory);
+    data.inventory.forEach(function(i){
+         this.giveItem(i[0],i[1]);
+    },this);
+    this.setSettlement(data.sid);
     this.commitSlots = data.commitSlots;
     // TODO: de-commit expired slots
-    this.giveGold(document.gold);
-
-    this.setOrUpdateAOI();
+    this.giveGold(data.gold);
 };
 
 Player.prototype.setAction = function(action){
@@ -578,7 +534,7 @@ Player.prototype.update = function() {
         var slot = slots[i];
         if(Date.now() - slot.stamp > COMMIT_DURATION){
             var building = GameServer.buildings[slot.building];
-            building.updateCommit(-1);
+            //building.updateCommit(-1);
             this.freeCommitmentSlot();
             i--;
         }else{
@@ -592,6 +548,7 @@ Player.prototype.remove = function(){
     //GameServer.settlements[this.settlement].removePlayer(this);
     this.settlement.removePlayer(this);
     delete GameServer.players[this.id];
+    GameServer.updateVision();
 };
 
 module.exports.Player = Player;

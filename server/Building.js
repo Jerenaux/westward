@@ -72,6 +72,11 @@ Building.prototype.computeProductivity = function(){
     this.setProperty('productivity',productivity);
 };
 
+Building.prototype.addCommit = function(player){
+    // TODO: keep list of committed stamps, check at each update and remove commit
+    // TODO: decide if update player or let players update themselves
+};
+
 Building.prototype.updateCommit = function(inc){
     this.setProperty('committed',Utils.clamp(this.committed+inc,0,999));
     this.computeProductivity();

@@ -1,10 +1,7 @@
-Out-of-world pathfinding (quick fix)
-
 Admin
 Analytics
 Cleaning
-Content
-*Ambiance
+* Ambiance
 * Battle system
 * Civics
 * Craftsmen gameplay
@@ -50,6 +47,7 @@ interactions with buildings, time spent in each individual menu, etc.
 Cleaning:
 --------
 Performance:
+- Use WeakMaps on server for players, animals, etc.
 - Avoid duplicate pins in maps, danger pins etc.
 - Fix "already existing/non-existing" bugs
 - Use Phaser tilemaps?
@@ -105,6 +103,7 @@ common "formatFoorSurplus" method to decide exact formatting (witg a reciprocal 
 Content:
 -------
 * Ambiance
+- Plants spawn in clusters
 - Footsteps to all creatures, sound effects (on actions + environment: birds, water, ...)
 - Animal noises when beasts in proximity, animal footsteps, player footsteps noise
 - Carcasses, traces of fight, traces of campfires
@@ -144,6 +143,7 @@ Content:
 - Quests
 * Inventory
 - Dropping items
+- Hover cards on gold
 - Work out inventory size mechanics, ammo, types...
 * Merchant gameplay
 - XP
@@ -154,6 +154,7 @@ Content:
 - Inns
 - Quests
 * Misc
+- Fix continuous movement system
 - Events log
 - Fatigue
 - Rest

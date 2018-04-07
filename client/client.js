@@ -40,15 +40,23 @@ Client.getInitRequest = function(){ // Returns the data object to send to reques
         console.log('Requesting data for new player');
         return {
             new:true,
-            stamp:localStorage.getItem('idStamp'),
             selectedClass: UI.selectedClass,
             selectedSettlement: UI.selectedSettlement
         };
     }
-    return {new:false,id:Client.getPlayerID()};
+    return {
+        new:false,
+        id:Client.getPlayerID(),
+        stamp: Client.getIDStamp()
+    };
+};
+
+Client.getIDStamp = function(){
+    return localStorage.getItem('idStamp');
 };
 
 Client.checkForNewPlayer = function(){
+    console.log('Player id:',Client.getPlayerID());
     Client.newPlayer =  (Client.getPlayerID() === null);
 };
 

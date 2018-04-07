@@ -175,9 +175,6 @@ ShopPanel.prototype.displayInterface = function(){
     this.gold.setVisible(true);
     this.buttons.forEach(function(b){
         b.btn.disable();
-        /*b.btn.setVisible(true);
-        b.symbol.setVisible(true);
-        b.ring.setVisible(true);*/
     });
 };
 
