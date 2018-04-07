@@ -322,6 +322,7 @@ Engine.createAnimations = function(){
         frames: Engine.scene.anims.generateFrameNumbers('sword_anim', { start: 0, end: 2}),
         frameRate: 15,
         hideOnComplete: true,
+        // TODO: test if callback still called after v3.3
          onComplete: function(sprite){
             sprite.recycle();
         }
@@ -331,6 +332,7 @@ Engine.createAnimations = function(){
         frames: Engine.scene.anims.generateFrameNumbers('death', { start: 0, end: 5}),
         frameRate: 15,
         hideOnComplete: true,
+        // TODO: test if callback still called after v3.3
         onComplete: function(sprite){
             sprite.recycle();
         }
@@ -1565,4 +1567,8 @@ function h(id){
 
 function st(id){
     Client.socket.emit('exec-stop',id);
+}
+
+function cl(){
+    localStorage.clear();
 }

@@ -143,7 +143,6 @@ Content:
 - Quests
 * Inventory
 - Dropping items
-- Hover cards on gold
 - Work out inventory size mechanics, ammo, types...
 * Merchant gameplay
 - XP
@@ -260,16 +259,10 @@ Visual:
 - Cut corners of big battlezones? (but make sure it doesn't impact integrity: save integrity path and used it for that)
 - Variety of small "talk" bubbles in reaction to things happening (+ symbol bubbles?)
 - Adapt bubble duration (in bubble.display) depending on number of words
-- Different mouse cursors depending on battle situation
 - Add dirt below buildings
-- Find better font
-- Pop-up notifications after actions
-- Fix tooltips displaying too long on equipped equipment slots
-- Display stats effects relative to current equipment
-- Help buttons everywhere
 - Animation when using item, throwing item, equipping... (reactive, before getting network response)
-- Menu sprites change size when hovered / clicked
-- Hover cards over craftring buttons
+- Hover frame for closing cross
+- Hover background for inventory tiles?
 - Hower card over gold indicator
 - Highlight buttons and buildings on hover
 - When hovering equipment, highlight corresponding equip slot
@@ -277,7 +270,6 @@ Visual:
 - Light effect layer (https://www.codeandweb.com/texturepacker/tutorials/how-to-create-light-effects-in-phaser3)
 - Add cloud silhouettes
 - Custom movement marker
-- Different footpritns for different animals
 - Use matter.js to simulate wind on leaves? (Dead/alive leaves flying on screen)
 Sound:
 - Sound effects when clicking (for moving, on buttons in menus, sounds of shuffling pages...)

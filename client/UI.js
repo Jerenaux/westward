@@ -195,14 +195,21 @@ UI.displayClassMenu = function(){
 
 UI.selectClass = function(id){
     UI.selectedClass = id;
-    var fadeDuration = 500;
-    UI.camera.fade(fadeDuration);
+    UI.camera.fadeOut(500,function(camera){
+        console.log('fade callback');
+        UI.classMenu.hide();
+        Boot.background.setVisible(false);
+        UI.displaySettlementSelectionMenu();
+        UI.camera._fadeAlpha = 0;
+    });
+    //var fadeDuration = 500;
+    /*UI.camera.fade(fadeDuration);
     setTimeout(function(){
         UI.classMenu.hide();
         Boot.background.setVisible(false);
         UI.displaySettlementSelectionMenu();
         UI.camera._fadeAlpha = 0;
-    },fadeDuration);
+    },fadeDuration);*/
 };
 
 UI.displaySettlementSelectionMenu =  function(){

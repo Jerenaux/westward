@@ -17,6 +17,20 @@ var UIElement = new Phaser.Class({
         this.menu = menu;
 
         this.on('pointerdown',this.handleClick.bind(this));
+        this.on('pointerover',this.handleOver.bind(this));
+        this.on('pointerout',this.handleOut.bind(this));
+    },
+
+    handleOver: function(){
+        this.x -= 3;
+        this.y -= 3;
+        this.setScale(1.05);
+    },
+
+    handleOut: function(){
+        this.x += 3;
+        this.y += 3;
+        this.setScale(1);
     },
 
     handleClick: function(){
