@@ -106,6 +106,7 @@ Content:
 -------
 * Ambiance
 - Plants spawn in clusters
+- Specific zones for all items, not random spread
 - Footsteps to all creatures, sound effects (on actions + environment: birds, water, ...)
 - Animal noises when beasts in proximity, animal footsteps, player footsteps noise
 - Carcasses, traces of fight, traces of campfires

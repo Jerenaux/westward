@@ -123,27 +123,14 @@ var Equipment = {
             containedIn: 'ammo_pouch',
             showInBattle: true
         }
+    },
+
+    getData: function(slot){
+        if(slot in Equipment.slots) return Equipment.slots[slot];
+        if(slot in Equipment.containers) return Equipment.containers[slot];
+        if(slot in Equipment.ammo) return Equipment.ammo[slot];
     }
 };
-
-// Returns a data structure to store data related to equipment
-/*Equipment.getSkeleton = function(){
-    var skeleton = {
-        containers: {}
-    };
-    for(var equip in Equipment.dict){
-        if(!Equipment.dict.hasOwnProperty(equip)) continue;
-        var sl = [];
-        for(var i = 0; i < Equipment.dict[equip].nb; i++){
-            sl.push(-1);
-        }
-        skeleton[equip] = sl;
-        if(Equipment.dict[equip].container){
-            skeleton.containers[equip] = 0;
-        }
-    }
-    return skeleton;
-};*/
 
 function EquipmentManager(){
     /* One slot per equipment type, setters and getters,
@@ -158,33 +145,57 @@ function EquipmentManager(){
         this.containers[container] = -1;
     }
     for(var ammo in Equipment.ammo){
-        this.ammo[ammo] = 0;
+        var data = Equipment.ammo[ammo];
+        this.ammo[ammo] = {
+            id: -1,
+            nb: 0,
+            container: data.container // string label of container slot
+        };
     }
 }
 
+// Returns the ID of the item equipped at the given slot
 EquipmentManager.prototype.get = function(label){
     if(label in this.slots) return this.slots[label];
     if(label in this.containers) return this.containers[label];
-    if(label in this.ammo) return this.ammo[label];
+    if(label in this.ammo) return this.ammo[label].id;
     return -1;
+};
+
+// Returns the label of the container for a giver ammo type
+EquipmentManager.prototype.getContainer = function(ammo){
+    return this.ammo[ammo].container;
 };
 
 EquipmentManager.prototype.getNbAmmo = function(ammo){
     return this.ammo[ammo];
 };
 
-/*EquipmentManager.prototype.getMaxAmmo = function(ammo){
-    var container = Equipment.ammo[ammo].containedIn;
-    return this.getCapacity(container);
+EquipmentManager.prototype.hasAnyAmmo = function(ammo){
+    var data = this.ammo[ammo];
+    return (data.type > -1 && data.nb > 0);
 };
 
-EquipmentManager.prototype.getCapacity = function(container){
-    var item = this.containers[container];
-    var data = (onServer ? GameServer.itemsData)
-};*/
+EquipmentManager.prototype.load = function(ammo,nb){
+    this.ammo[ammo].nb += nb;
+};
 
-// ensure proper display in menu;
-// work out (un)equipping everything; ensure display in battle; test effects
+EquipmentManager.prototype.set = function(label,id){
+    if(label in this.slots){
+        this.slots[label] = id;
+    }
+    if(label in this.containers){
+        var container = this.containers[label];
+        container.id = id;
+    }
+    if(label in this.ammo){
+        this.ammo[label].id = id;
+        // todo set nb?
+    }
+};
+
+// work out unequipping everything; remove subslots from equip updates; ensure display in battle; test effects
+// re-enable equip from db
 
 if (onServer){
     module.exports.Equipment = Equipment;

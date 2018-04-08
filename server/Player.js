@@ -9,6 +9,7 @@ var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
 var Inventory = require('../shared/Inventory.js').Inventory;
 var Stats = require('../shared/Stats.js').Stats;
+var Equipment = require('../shared/Equipment.js').Equipment;
 var EquipmentManager = require('../shared/Equipment.js').EquipmentManager;
 var Formulas = require('../shared/Formulas.js').Formulas;
 
@@ -227,30 +228,33 @@ Player.prototype.takeItem = function(item,nb,notify){
     if(notify) this.addNotif('-'+nb+' '+GameServer.itemsData[item].name);
 };
 
-Player.prototype.isEquipped = function(slot,subSlot){
-    return this.equipment[slot][subSlot] > -1;
+Player.prototype.isEquipped = function(slot){
+    //return this.equipment[slot][subSlot] > -1;
+    return this.equipment.get(slot) > 1;
 };
 
-Player.prototype.getEquipped = function(slot,subSlot){
-    return this.equipment[slot][subSlot];
+Player.prototype.getEquipped = function(slot){
+    return this.equipment.get(slot);
 };
 
-Player.prototype.getFreeSubslot = function(slot){
+/*Player.prototype.getFreeSubslot = function(slot){
     for(var i = 0; i < this.equipment[slot].length; i++){
         if(this.equipment[slot][i] == -1) return i;
     }
     return -1;
-};
+};*/
 
-Player.prototype.canEquip = function(slot,item,fromDB){
-    if(fromDB) return true;
+Player.prototype.canEquip = function(slot,item){
     if(!this.hasItem(item, 1)) return false;
-    var containerSlot = Equipment.dict[slot].containedIn;
-    if(containerSlot && this.equipment[containerSlot][0] == -1) return false;
+    // If it's ammo, check that the proper container is equipped
+    if(slot in Equipment.ammo){
+        var container = this.equipment.getContainer(slot);
+        if(!this.equipment.get(container)) return false;
+    }
     return true;
 };
 
-Player.prototype.equip = function(slot,item,fromDB){
+/*Player.prototype.equip = function(slot,item,fromDB){
     if(!this.equipment.hasOwnProperty(slot)) return;
     if(!this.canEquip(slot,item,fromDB)) return;
     var conflictSlot = Equipment.dict[slot].conflict; // Name of the slot with which the new object could conflict
@@ -274,6 +278,34 @@ Player.prototype.equip = function(slot,item,fromDB){
     if(containerSlot) {
         nb = this.computeLoad(containerSlot,item); // compute how much will be added to the container
         this.load(containerSlot, nb);
+    }
+
+    if(!fromDB) this.takeItem(item, nb);
+};*/
+
+Player.prototype.equip = function(slot,item,fromDB){
+    if(!fromDB && !this.canEquip(slot,item)) return;
+    var slotData = Equipment.getData(slot);
+    var itemData = GameServer.itemsData[item];
+
+    if(this.isEquipped(slot)) this.unequip(slot);
+
+    var conflictSlot = slotData.conflict; // Name of the slot with which the new object could conflict
+    if(conflictSlot && this.isEquipped(conflictSlot)) this.unequip(conflictSlot);
+
+    // equip item
+    this.equipment.set(slot,item);
+    this.updatePacket.addEquip(slot,item);
+    if(!fromDB) this.addNotif('Equipped '+itemData.name);
+
+    this.applyAbsoluteModifiers(item);
+    var nb = 1;
+
+    // Manage ammo
+    if(slot in Equipment.ammo){
+        var container = this.equipment.getContainer(slot);
+        nb = this.computeLoad(slot,container,item); // compute how much will be added to the container
+        this.load(slot, nb);
     }
 
     if(!fromDB) this.takeItem(item, nb);
@@ -319,16 +351,20 @@ Player.prototype.removeAbsoluteModifier = function(stat,modifier){
 };
 
 // Compute how much of item `item` can be added to container `containerSlot`
-Player.prototype.computeLoad = function(containerSlot,item){
-    var currentNb = this.equipment.containers[containerSlot];
+Player.prototype.computeLoad = function(ammo,container,item){
+    var currentNb = this.equipment.getNbAmmo(ammo);
+    var capacity = GameServer.itemsData[container].capacity;
+    return Math.min(this.inventory.getNb(item), capacity - currentNb);
+    /*var currentNb = this.equipment.containers[containerSlot];
     var containerItem = this.equipment[containerSlot][0];
     var capacity = GameServer.itemsData[containerItem].capacity;
-    return Math.min(this.inventory.getNb(item), capacity - currentNb);
+    return Math.min(this.inventory.getNb(item), capacity - currentNb);*/
 };
 
-Player.prototype.load = function(containerSlot,nb){
-    this.equipment.containers[containerSlot] += nb;
-    this.updatePacket.addAmmo(containerSlot,this.equipment.containers[containerSlot]);
+Player.prototype.load = function(ammo,nb){
+    //this.equipment.containers[containerSlot] += nb;
+    this.equipment.load(ammo,nb);
+    this.updatePacket.addAmmo(ammo,this.equipment.getNbAmmo(ammo));
 };
 
 Player.prototype.unload = function(containerSlot,notify){
@@ -429,7 +465,7 @@ Player.prototype.getDataFromDb = function(data){
     this.setClass(data.class);
     // stats are not saved, see schema
     // TODO: create an EquipmentManager
-    for(var equip in Equipment.dict) {
+    /*for(var equip in Equipment.dict) {
         if (!Equipment.dict.hasOwnProperty(equip)) continue;
         var eq = Equipment.dict[equip];
         for(var i = 0; i < eq.nb; i++) {
@@ -438,7 +474,7 @@ Player.prototype.getDataFromDb = function(data){
             if(dbvalue > -1) this.equip(equip,dbvalue,true); // true: data from DB
         }
         if(eq.containedIn) this.load(eq.containedIn,data.equipment.containers[eq.containedIn]);
-    }
+    }*/
     //this.inventory.fromList(data.inventory);
     data.inventory.forEach(function(i){
          this.giveItem(i[0],i[1]);

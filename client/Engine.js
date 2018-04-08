@@ -1509,13 +1509,13 @@ Engine.newbuildingClick = function(){
 };
 
 Engine.inventoryClick = function(){
-    //Client.sendUse(this.itemID);
+    Client.sendUse(this.itemID);
     Engine.currentMenu.panels['itemAction'].setUp(this.itemID);
     Engine.currentMenu.panels['itemAction'].display();
 };
 
 Engine.unequipClick = function(){ // Sent when unequipping something
-    Client.sendUnequip(this.slotName,this.subSlot);
+    Client.sendUnequip(this.slotName);
 };
 
 Engine.sellClick = function(){

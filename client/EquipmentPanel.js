@@ -4,7 +4,7 @@
 
 function EquipmentPanel(x,y,width,height,title,battleMenu){
     Panel.call(this,x,y,width,height,title);
-    this.slots = {};
+    this.slots = [];
     this.battleMenu = battleMenu;
     this.addEquipment();
 }
@@ -13,30 +13,14 @@ EquipmentPanel.prototype = Object.create(Panel.prototype);
 EquipmentPanel.prototype.constructor = EquipmentPanel;
 
 EquipmentPanel.prototype.addEquipment = function(){
-    /*var xoffset = (this.battleMenu ? 10 : -40);
-    var yoffset = (this.battleMenu? 10 : 0);
-    for(var equip in Equipment.dict){
-        if(!Equipment.dict.hasOwnProperty(equip)) continue;
-        var eq = Equipment.dict[equip];
-        if(this.battleMenu && !eq.showInBattle) continue;
-        this.slots[equip] = [];
-        for(var i = 0; i < eq.nb; i++) {
-            var xinc = eq.xincrement || 0;
-            var xpos = (this.battleMenu ? eq.battlex : eq.x);
-            var x = xpos+(i*xinc)+xoffset;
-            var y = (this.battleMenu ? eq.battley : eq.y) + yoffset;
-            var displayName = eq.nb > 1 ? eq.name+' '+(i+1) : eq.name;
-            this.slots[equip].push(this.addEquipSlot(x,y,displayName,eq.desc,eq.shade,eq.containedIn,equip,i));
-        }
-    }*/
     for(var slot in Equipment.slots){
-        this.makeSlots(Equipment.slots[slot]);
+        this.makeSlots(slot,Equipment.slots[slot]);
     }
     for(var container in Equipment.containers){
-        this.makeSlots(Equipment.containers[container]);
+        this.makeSlots(container,Equipment.containers[container]);
     }
     for(var ammo in Equipment.ammo){
-        this.makeSlots(Equipment.ammo[ammo],true);
+        this.makeSlots(ammo,Equipment.ammo[ammo],true);
     }
     this.updateEquipment();
 };
@@ -47,7 +31,7 @@ EquipmentPanel.prototype.makeSlots = function(label,data,displayNumber){
     var yoffset = (this.battleMenu? 10 : 0);
     var x = (this.battleMenu ? data.battlex : data.x) + xoffset;
     var y = (this.battleMenu ? data.battley : data.y) + yoffset;
-    this.slots[label].push(this.addEquipSlot(x,y,data.name,data.desc,data.shade,displayNumber,label));
+    this.slots.push(this.addEquipSlot(x,y,data.name,data.desc,data.shade,displayNumber,label));
 };
 
 EquipmentPanel.prototype.addEquipSlot = function(x,y,name,desc,shade,displayNumber,slotName){
@@ -73,7 +57,8 @@ EquipmentPanel.prototype.addEquipSlot = function(x,y,name,desc,shade,displayNumb
         this.content.push(text);
     }
 
-    slotObj.id = -1; // id of the item
+    // Null = no value, -1 = nothing equipped
+    slotObj.id = null; // id of the item
     slotObj.slot = slot; // slot sprite
     slotObj.item = item; // item sprite
     slotObj.shade = shade; // name of the shade frame
@@ -107,72 +92,27 @@ EquipmentPanel.prototype.updateEquipment = function(){
 
         if(slot.text){
             if(newItem > -1) {
-                slot.text.setText(Engine.player.getNbAmmo(slot.slotName));
+                var nb = Engine.player.getNbAmmo(slot.slotName);
+                slot.text.setText(nb);
                 if(this.displayed){
                     var capacity = Engine.player.getMaxAmmo(slot.slotName);
-                    //this.displayCountText(slot.text,Engine.player.getContainerID(eq.containedIn),equip);
+                    var color = (nb == capacity ? '#ffd700' : '#ffffff');
+                    slot.text.setFill(color);
                 }
-            }else{
-                slot.text.setVisible(false);
             }
         }
     },this);
-    /*for(var equip in Equipment.dict) {
-        if (!Equipment.dict.hasOwnProperty(equip)) continue;
-        var eq = Equipment.dict[equip];
-        if(this.battleMenu && !eq.showInBattle) continue;
-        for(var i = 0; i < eq.nb; i++) {
-            var newItem = Engine.player.getEquipped(equip,i);
-            var currentItem = this.slots[equip][i];
-            if(newItem != currentItem.id){
-                var data;
-                if(newItem == -1){
-                    data = {
-                        id: -1,
-                        atlas: 'UI',
-                        frame: currentItem.shade+'-shade',
-                        name: currentItem.name,
-                        desc: currentItem.desc
-                    };
-                }else{
-                    data = Engine.itemsData[newItem];
-                }
-                currentItem.item.setUp(newItem,data);
-                currentItem.id = newItem;
-            }
-            if(eq.containedIn ) {
-                if(newItem > -1) {
-                    currentItem.text.setText(Engine.player.getNbInContainer(eq.containedIn));
-                    if(this.displayed) this.displayCountText(currentItem.text,Engine.player.getContainerID(eq.containedIn),equip);
-                }else{
-                    currentItem.text.setVisible(false);
-                }
-            }
-        }
-    }*/
-};
-
-EquipmentPanel.prototype.displayCountText = function(text,item,slot){
-    var nb = Engine.player.getNbInContainer(slot);
-    var capacity = Engine.itemsData[item].capacity;
-    text.setVisible(true);
-    var color = (nb == capacity ? '#ffd700' : '#ffffff');
-    text.setFill(color);
 };
 
 EquipmentPanel.prototype.displaySlots = function(){
     // Each entry of the map is a list of slotObj for the corresponding equipment slot
-    for(var equip in Equipment.dict){
-        if(!Equipment.dict.hasOwnProperty(equip)) continue;
-        var eq = Equipment.dict[equip];
-        if(this.battleMenu && !eq.showInBattle) continue;
-        for(var i = 0; i < this.slots[equip].length; i++){
-            var s = this.slots[equip][i];
-            s.item.setVisible(true);
-            s.slot.setVisible(true);
-            if(s.text && Engine.player.isAmmoEquipped(equip)) this.displayCountText(s.text,Engine.player.getContainerID(eq.containedIn),equip);
+    this.slots.forEach(function(slot){
+        slot.item.setVisible(true);
+        slot.slot.setVisible(true);
+        if(slot.text) {
+            if(Engine.player.isAmmoEquipped(slot.slotName)) slot.text.setVisible(true);
         }
-    }
+    });
 };
 
 EquipmentPanel.prototype.display = function(){
