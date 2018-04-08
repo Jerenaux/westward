@@ -256,6 +256,7 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
         a.decreaseAmmo();
         var hit = this.computeRangedHit(a,b);
         if(hit){
+            b.arrows++; // TODO use setter
             dmg = this.computeDamage('ranged',a,b);
             killed = this.applyDamage(b,dmg);
             b.setProperty('hit',dmg);

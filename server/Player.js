@@ -9,7 +9,7 @@ var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
 var Inventory = require('../shared/Inventory.js').Inventory;
 var Stats = require('../shared/Stats.js').Stats;
-var Equipment = require('../shared/Equipment.js').Equipment;
+var EquipmentManager = require('../shared/Equipment.js').EquipmentManager;
 var Formulas = require('../shared/Formulas.js').Formulas;
 
 var NB_SLOTS = 2;
@@ -29,7 +29,7 @@ function Player(){
     this.commitSlots = this.getCommitSlotsShell();
     this.civicxp = 0;
     this.setUpStats();
-    this.equipment = Equipment.getSkeleton();
+    this.equipment = new EquipmentManager();
     this.fieldOfVision = [];
     this.chatTimer = null;
 }

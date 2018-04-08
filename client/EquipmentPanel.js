@@ -6,14 +6,14 @@ function EquipmentPanel(x,y,width,height,title,battleMenu){
     Panel.call(this,x,y,width,height,title);
     this.slots = {};
     this.battleMenu = battleMenu;
-    this.addEquip();
+    this.addEquipment();
 }
 
 EquipmentPanel.prototype = Object.create(Panel.prototype);
 EquipmentPanel.prototype.constructor = EquipmentPanel;
 
-EquipmentPanel.prototype.addEquip = function(){
-    var xoffset = (this.battleMenu ? 10 : -40);
+EquipmentPanel.prototype.addEquipment = function(){
+    /*var xoffset = (this.battleMenu ? 10 : -40);
     var yoffset = (this.battleMenu? 10 : 0);
     for(var equip in Equipment.dict){
         if(!Equipment.dict.hasOwnProperty(equip)) continue;
@@ -28,11 +28,29 @@ EquipmentPanel.prototype.addEquip = function(){
             var displayName = eq.nb > 1 ? eq.name+' '+(i+1) : eq.name;
             this.slots[equip].push(this.addEquipSlot(x,y,displayName,eq.desc,eq.shade,eq.containedIn,equip,i));
         }
+    }*/
+    for(var slot in Equipment.slots){
+        this.makeSlots(Equipment.slots[slot]);
+    }
+    for(var container in Equipment.containers){
+        this.makeSlots(Equipment.containers[container]);
+    }
+    for(var ammo in Equipment.ammo){
+        this.makeSlots(Equipment.ammo[ammo],true);
     }
     this.updateEquipment();
 };
 
-EquipmentPanel.prototype.addEquipSlot = function(x,y,name,desc,shade,contained,slotName,subSlot){
+EquipmentPanel.prototype.makeSlots = function(label,data,displayNumber){
+    if(this.battleMenu && !data.showInBattle) return;
+    var xoffset = (this.battleMenu ? 10 : -40);
+    var yoffset = (this.battleMenu? 10 : 0);
+    var x = (this.battleMenu ? data.battlex : data.x) + xoffset;
+    var y = (this.battleMenu ? data.battley : data.y) + yoffset;
+    this.slots[label].push(this.addEquipSlot(x,y,data.name,data.desc,data.shade,displayNumber,label));
+};
+
+EquipmentPanel.prototype.addEquipSlot = function(x,y,name,desc,shade,displayNumber,slotName){
     var slotObj = {};
     var slot = UI.scene.add.sprite(this.x+x,this.y+y,'UI','equipment-slot');
     var item = new ItemSprite(this.x+x+20,this.y+y+20);
@@ -45,7 +63,7 @@ EquipmentPanel.prototype.addEquipSlot = function(x,y,name,desc,shade,contained,s
     slot.setDisplayOrigin(0,0);
     slot.setVisible(false);
 
-    if(contained){
+    if(displayNumber){
         var text = UI.scene.add.text(this.x+x+38, this.y+y+19, '0',{font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3});
         text.setOrigin(1,0);
         text.setScrollFactor(0);
@@ -55,20 +73,51 @@ EquipmentPanel.prototype.addEquipSlot = function(x,y,name,desc,shade,contained,s
         this.content.push(text);
     }
 
+    slotObj.id = -1; // id of the item
     slotObj.slot = slot; // slot sprite
     slotObj.item = item; // item sprite
     slotObj.shade = shade; // name of the shade frame
     slotObj.name = name; // name for the tooltip
     slotObj.desc = desc;
     slotObj.slotName = slotName; // name of the slot
-    slotObj.subSlot = subSlot; // number of the subslot
     this.content.push(slot);
     this.content.push(item);
     return slotObj;
 };
 
 EquipmentPanel.prototype.updateEquipment = function(){
-    for(var equip in Equipment.dict) {
+    this.slots.forEach(function(slot){
+        var newItem = Engine.player.getEquipped(slot.slotName);
+        var currentItem = slot.id;
+        if(newItem == currentItem) return;
+        var data;
+        if(newItem == -1){
+            data = {
+                id: -1,
+                atlas: 'UI',
+                frame: slot.shade+'-shade',
+                name: slot.name,
+                desc: slot.desc
+            };
+        }else{
+            data = Engine.itemsData[newItem];
+        }
+        slot.item.setUp(newItem,data);
+        slot.id = newItem;
+
+        if(slot.text){
+            if(newItem > -1) {
+                slot.text.setText(Engine.player.getNbAmmo(slot.slotName));
+                if(this.displayed){
+                    var capacity = Engine.player.getMaxAmmo(slot.slotName);
+                    //this.displayCountText(slot.text,Engine.player.getContainerID(eq.containedIn),equip);
+                }
+            }else{
+                slot.text.setVisible(false);
+            }
+        }
+    },this);
+    /*for(var equip in Equipment.dict) {
         if (!Equipment.dict.hasOwnProperty(equip)) continue;
         var eq = Equipment.dict[equip];
         if(this.battleMenu && !eq.showInBattle) continue;
@@ -100,7 +149,7 @@ EquipmentPanel.prototype.updateEquipment = function(){
                 }
             }
         }
-    }
+    }*/
 };
 
 EquipmentPanel.prototype.displayCountText = function(text,item,slot){

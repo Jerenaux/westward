@@ -387,6 +387,10 @@ GameServer.skinAnimal = function(player,animalID){
     // TODO: check for proximity
     if(!animal.isDead()) return;
     var loot = GameServer.animalsData[animal.type].loot;
+    /*if(animal.arrows > 0){
+        if(!loot) loot = {};
+        loot[20] = Math.floor(animal.arrows*0.75);
+    }*/
     if(!loot) return;
     for(var item in loot){
         if(!loot.hasOwnProperty(item)) continue;
@@ -427,7 +431,7 @@ GameServer.checkAreaIntegrity = function(area){
     var cells = new SpaceMap();
     for(var x = area.x; x <= area.x+area.w; x++){
         for(var y = area.y; y <= area.y+area.h; y++){
-            console.log('collision at',x,y,':',PFUtils.checkCollision(x,y));
+            //console.log('collision at',x,y,':',PFUtils.checkCollision(x,y));
             if(!PFUtils.checkCollision(x,y)) cells.add(y,x,0); // y then x
         }
     }

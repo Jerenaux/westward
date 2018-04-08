@@ -19,6 +19,7 @@ Design document
 Polish
 Testing
 World Building
+Free
 
 ###############
 V1 level:
@@ -66,6 +67,7 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Central config file: walking speed, food id, arrow id and proportion of back arrows (for skinning), etc.
 - Use data registry for data exchange between scenes (see Phaser World 119)
 - Client-side, GameObject use tx and ty while Moving use tileX and tileY (and they both have a setPosition method)
 => fix in processItemClick, etc, test a lot
@@ -107,6 +109,7 @@ Content:
 - Footsteps to all creatures, sound effects (on actions + environment: birds, water, ...)
 - Animal noises when beasts in proximity, animal footsteps, player footsteps noise
 - Carcasses, traces of fight, traces of campfires
+- Paths along most-travelled paths
 * Battle system
 - Get arrows back when skinning
 - Animals have sorted list of targets, iteratr through it when first one not reachable for some reason
@@ -143,7 +146,10 @@ Content:
 - Quests
 * Inventory
 - Dropping items
-- Work out inventory size mechanics, ammo, types...
+- Belt mechanics (quick-use slots for potions, bombs and weapons)
+- Backpack mechanics
+- Gunpowder mechanics (multiple pouches?)
+- Ammo types
 * Merchant gameplay
 - XP
 - Bonuses
@@ -177,6 +183,7 @@ Content:
 - Make troops engage enemies
 * Settlement economy
 keep track of commit slots in buildings as well, to de-commit deconnected players
+Recipe: paper cartridges (paper also for bombs?)?
 Make recipes (randomly?) for 5 consumables (potion, antidote, steady stuff...) + create ingredients
 Recipes for fancy bullets and bombs
 Add recipes for all intermediary ingredients
@@ -264,9 +271,8 @@ Visual:
 - Hover frame for closing cross
 - Hover background for inventory tiles?
 - Hower card over gold indicator
-- Highlight buttons and buildings on hover
 - When hovering equipment, highlight corresponding equip slot
-- Use particle emitters for several cool effects, like cloud puffs, dust, lights, etc.
+- Use particle emitters for several cool effects, like cloud puffs, dust when walking, lights, etc.
 - Light effect layer (https://www.codeandweb.com/texturepacker/tutorials/how-to-create-light-effects-in-phaser3)
 - Add cloud silhouettes
 - Custom movement marker

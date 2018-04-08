@@ -15,7 +15,6 @@ function Animal(x,y,type){
     this.id = GameServer.lastAnimalID++;
     this.isPlayer = false;
     this.isAnimal = true;
-    //this.setStartingPosition();
     this.x = x;
     this.y = y;
     this.inFight = false;
@@ -24,6 +23,7 @@ function Animal(x,y,type){
     this.idle = true;
     this.idleTime = 200;
     this.stats = Stats.getSkeleton();
+    this.arrows = 0;
     this.setAggressive();
     this.setWander();
     this.setStartingStats();

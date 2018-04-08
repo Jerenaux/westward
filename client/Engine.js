@@ -892,7 +892,7 @@ Engine.addHero = function(data){
         [[2,1],[4,1],[6,1],[10,1],[17,1],[21,1],[23,1],[28,1],[29,1],[32,1],[33,1],[35,1]]
     );
     Engine.player.stats = Stats.getSkeleton();
-    Engine.player.equipment = Equipment.getSkeleton();
+    Engine.player.equipment = new EquipmentManager();
     Engine.player.commitSlots = data.commitSlots;
     Engine.updateEnvironment();
 };
