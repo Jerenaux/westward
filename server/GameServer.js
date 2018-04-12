@@ -193,7 +193,7 @@ GameServer.setUpSpawnZones = function(){
     var animals = {
         0:{
             min: 10, //10
-            rate: 3 // 3
+            rate: 10 // 3
         }
     };
 
@@ -691,9 +691,7 @@ GameServer.handleUse = function(data,socketID){
 GameServer.handleUnequip = function(data,socketID) {
     var player = GameServer.getPlayer(socketID);
     var slot = data.slot;
-    var subSlot = data.subslot;
-    if(player.equipment[slot][subSlot] == -1) return;
-    player.unequip(slot,subSlot,true);
+    player.unequip(slot,true);
 };
 
 GameServer.handleExit = function(data,socketID){

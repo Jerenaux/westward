@@ -466,19 +466,20 @@ Engine.addMenuIcon = function(x,y,frame,menu){
 };
 
 Engine.makeBattleUI = function(){
-    Engine.fightText = Engine.scene.add.text(Engine.getGameConfig().width/2,50, 'Fight!',  { font: '45px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    Engine.fightText = UI.scene.add.text(Engine.getGameConfig().width/2,50, 'Fight!',  { font: '45px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     Engine.fightText.setOrigin(0.5);
     Engine.fightText.setScrollFactor(0);
-    Engine.fightText.setDepth(Engine.UIDepth+3);
+    Engine.fightText.setDepth(3);
     Engine.fightText.setVisible(false);
+};
 
-    Engine.fightText.tween = Engine.scene.tweens.add(
+Engine.tweenFighText = function(){
+    UI.scene.tweens.add(
         {
             targets: Engine.fightText,
             scaleX: 1,
             scaleY: 1,
             duration: 100,
-            paused: true,
             onStart: function(){
                 Engine.fightText.setScale(10);
                 Engine.fightText.setVisible(true);
@@ -1123,7 +1124,7 @@ Engine.updateSelf = function(data){
     if(data.equipment){
         for(var i = 0; i < data.equipment.length; i++){
             var eq = data.equipment[i];
-            Engine.updateEquipment(eq.slot,eq.subSlot,eq.item);
+            Engine.updateEquipment(eq.slot,eq.item);
         }
     }
     if(data.ammo || data.equipment) updateEvents.add('equip');
@@ -1163,16 +1164,16 @@ Engine.updateSelf = function(data){
 };
 
 Engine.updateAmmo = function(slot,nb){
-    Engine.player.equipment.containers[slot] = nb;
+    //Engine.player.equipment.containers[slot] = nb;
+    Engine.player.equipment.setAmmo(slot,nb);
 };
 
-Engine.updateEquipment = function(slot,subSlot,item){
-    Engine.player.equipment[slot][subSlot] = item;
+Engine.updateEquipment = function(slot,item){
+    //Engine.player.equipment[slot][subSlot] = item;
+    Engine.player.equipment.set(slot,item);
 };
 
 Engine.updateStat = function(key,data){
-    /*if(key == 'hp') console.log('NEW HP:',data.v);*/
-
     var statObj = Engine.player.getStat(key);
     statObj.setBaseValue(data.v);
     statObj.relativeModifiers = [];
@@ -1510,8 +1511,12 @@ Engine.newbuildingClick = function(){
 
 Engine.inventoryClick = function(){
     Client.sendUse(this.itemID);
-    Engine.currentMenu.panels['itemAction'].setUp(this.itemID);
-    Engine.currentMenu.panels['itemAction'].display();
+    return;
+    if(!BattleManager.inBattle) {
+        // itemAction is the small panel appearing in the inventory displaying options such as use, throw...
+        Engine.currentMenu.panels['itemAction'].setUp(this.itemID);
+        Engine.currentMenu.panels['itemAction'].display();
+    }
 };
 
 Engine.unequipClick = function(){ // Sent when unequipping something

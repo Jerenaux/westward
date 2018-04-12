@@ -38,6 +38,7 @@ Analytics:
 ---------
 - Implement custom analytics, save in db
 - Look for nice statistical library
+- Log drains and faucets
 - Log as many things as possible: session duration, distance travelled per session, time spent in settlement per session, in nature per session,
 interactions with buildings, time spent in each individual menu, etc.
 - Cluster "heavy" players vs "small-time" players and look for differences between the two

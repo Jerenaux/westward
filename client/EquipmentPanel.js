@@ -74,7 +74,7 @@ EquipmentPanel.prototype.updateEquipment = function(){
     this.slots.forEach(function(slot){
         var newItem = Engine.player.getEquipped(slot.slotName);
         var currentItem = slot.id;
-        if(newItem == currentItem) return;
+        //if(newItem == currentItem) return;
         var data;
         if(newItem == -1){
             data = {
@@ -91,13 +91,16 @@ EquipmentPanel.prototype.updateEquipment = function(){
         slot.id = newItem;
 
         if(slot.text){
-            if(newItem > -1) {
+            if(newItem == -1) {
+                slot.text.setVisible(false);
+            }else{
                 var nb = Engine.player.getNbAmmo(slot.slotName);
                 slot.text.setText(nb);
                 if(this.displayed){
                     var capacity = Engine.player.getMaxAmmo(slot.slotName);
-                    var color = (nb == capacity ? '#ffd700' : '#ffffff');
+                    var color = (nb == capacity ? Utils.colors.gold : Utils.colors.white);
                     slot.text.setFill(color);
+                    slot.text.setVisible(true);
                 }
             }
         }

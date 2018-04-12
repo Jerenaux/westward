@@ -108,7 +108,7 @@ var Equipment = {
             shade: 'arrow',
             name: 'Arrows',
             desc: 'Ammunition type used by bows. Only one type of arrow can be equipped at any given time. If the number of arrows is yellow, it means that the quiver is full.',
-            containedIn: 'quiver',
+            container: 'quiver',
             showInBattle: true
         },
         bullets:{
@@ -120,7 +120,7 @@ var Equipment = {
             shade: 'bullets',
             name: 'Bullets',
             desc: 'Ammunition type used by guns. Only one type of bullets can be equipped at any given time. If the number of bullets is yellow, it means that the pouch is full.',
-            containedIn: 'ammo_pouch',
+            container: 'ammo_pouch',
             showInBattle: true
         }
     },
@@ -142,7 +142,11 @@ function EquipmentManager(){
         this.slots[slot] = -1;
     }
     for(var container in Equipment.containers){
-        this.containers[container] = -1;
+        var data = Equipment.containers[container];
+        this.containers[container] = {
+            id: -1,
+            contains: data.contains
+        };
     }
     for(var ammo in Equipment.ammo){
         var data = Equipment.ammo[ammo];
@@ -157,18 +161,23 @@ function EquipmentManager(){
 // Returns the ID of the item equipped at the given slot
 EquipmentManager.prototype.get = function(label){
     if(label in this.slots) return this.slots[label];
-    if(label in this.containers) return this.containers[label];
+    if(label in this.containers) return this.containers[label].id;
     if(label in this.ammo) return this.ammo[label].id;
     return -1;
 };
 
-// Returns the label of the container for a giver ammo type
+// Returns the *label* of the ammo contained in a given container
+EquipmentManager.prototype.getAmmoType = function(container){
+    return this.containers[container].contains;
+};
+
+// Returns the *label* of the container for a giver ammo type
 EquipmentManager.prototype.getContainer = function(ammo){
     return this.ammo[ammo].container;
 };
 
 EquipmentManager.prototype.getNbAmmo = function(ammo){
-    return this.ammo[ammo];
+    return this.ammo[ammo].nb;
 };
 
 EquipmentManager.prototype.hasAnyAmmo = function(ammo){
@@ -181,20 +190,15 @@ EquipmentManager.prototype.load = function(ammo,nb){
 };
 
 EquipmentManager.prototype.set = function(label,id){
-    if(label in this.slots){
-        this.slots[label] = id;
-    }
-    if(label in this.containers){
-        var container = this.containers[label];
-        container.id = id;
-    }
-    if(label in this.ammo){
-        this.ammo[label].id = id;
-        // todo set nb?
-    }
+    if(label in this.slots) this.slots[label] = id;
+    if(label in this.containers) this.containers[label].id = id;
+    if(label in this.ammo) this.ammo[label].id = id;
 };
 
-// work out unequipping everything; remove subslots from equip updates; ensure display in battle; test effects
+EquipmentManager.prototype.setAmmo = function(ammo,nb){
+    this.ammo[ammo].nb = nb;
+};
+
 // re-enable equip from db
 
 if (onServer){

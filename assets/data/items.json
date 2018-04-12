@@ -18,7 +18,7 @@
     "name": "Bow",
     "equipment": "rangedw",
     "ammo": "quiver",
-    "effects":{"acc":40},
+    "effects":{"acc":70},
     "recipe": {"7":1,"21":1},
     "useInBattle": true
   },
@@ -96,7 +96,7 @@
     "name": "Gun",
     "equipment": "rangedw",
     "ammo": "ammo_pouch",
-    "effects":{"acc":20},
+    "effects":{"acc":50},
     "useInBattle": true
   },
   "13":{

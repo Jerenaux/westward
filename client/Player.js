@@ -139,7 +139,7 @@ var Player = new Phaser.Class({
 
     getMaxAmmo: function(slot){
         //return this.equipment.getMaxAmmo(slot);
-        var container = this.equipment.getContainer(slot);
+        var container = this.equipment.get(this.equipment.getContainer(slot));
         return Engine.itemsData[container].capacity;
     },
 

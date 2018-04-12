@@ -22,7 +22,8 @@ BattleManager.startFight = function(){
     if(Engine.currentMenu) Engine.currentMenu.hide();
     Engine.hideUI();
     Engine.hideMarker();
-    Engine.fightText.tween.play();
+    //Engine.fightText.tween.play();
+    Engine.tweenFighText();
     Engine.updateGrid();
     Engine.menus.battle.display();
     Engine.menus.battle.panels.timer.hide();

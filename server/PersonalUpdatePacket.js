@@ -47,12 +47,11 @@ PersonalUpdatePacket.prototype.addItem = function(item,nb){
 };
 
 PersonalUpdatePacket.prototype.addStat = function(stat){
-    //this.stats.push({k:key,v:value});
     this.stats.push(stat);
 };
 
-PersonalUpdatePacket.prototype.addEquip = function(slot,subSlot,item){
-    this.equipment.push({slot:slot,subSlot:subSlot,item:item});
+PersonalUpdatePacket.prototype.addEquip = function(slot,item){
+    this.equipment.push({slot:slot,item:item});
 };
 
 PersonalUpdatePacket.prototype.addAmmo = function(slot,nb){
