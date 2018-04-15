@@ -6,6 +6,7 @@ var pathmodule = require('path');
 var clone = require('clone'); // used to clone objects, essentially used for clonicg update packets
 var ObjectId = require('mongodb').ObjectID;
 var mongoose = require('mongoose');
+var config = require('config');
 
 var GameServer = {
     lastPlayerID: 0,
@@ -28,13 +29,14 @@ var GameServer = {
     clientUpdateRate: 1000/8, // Rate at which update packets are sent
     walkUpdateRate: 1000/20, // Rate at which positions are updated
     npcUpdateRate: 1000/5,
-    playerUpdateRate: 60*1000,
-    settlementUpdateRate: 3600*1000,
+    playerUpdateRate: 10*1000,//3600*1000,
+    settlementUpdateRate: 10*1000,//3600*1000,
     spawnZoneUpdateRate: 3600*1000
 };
 
 GameServer.cycles = {
-    foodConsumptionRate: 8*3600*1000
+    foodConsumptionRate: 8*3600*1000,
+    commitmentDuration: 10*1000//3600*1000
 };
 
 module.exports.GameServer = GameServer;
@@ -63,6 +65,7 @@ GameServer.updateStatus = function(){
         console.log('GameServer initialized');
         GameServer.initialized = true;
         GameServer.setUpdateLoops();
+        GameServer.onInitialized();
     }else{
         var next = GameServer.initializationSequence[GameServer.initializationStep];
         //console.log('Moving on to next step:',next);
@@ -92,7 +95,8 @@ GameServer.createModels = function(){
         gold: {type: Number, min: 0},
         built: Boolean,
         progress: {type: Number, min: 0, max: 100}, // %
-        committed: {type: Number, min: 0},
+        //committed: {type: Number, min: 0},
+        commitStamps: [Date],
         lastBuildCycle: { type: Date, default: Date.now },
         lastProdCycle: { type: Date, default: Date.now }
     });
@@ -193,7 +197,7 @@ GameServer.setUpSpawnZones = function(){
     var animals = {
         0:{
             min: 10, //10
-            rate: 10 // 3
+            rate: 3 // 3
         }
     };
 
@@ -238,13 +242,25 @@ GameServer.addItem = function(x,y,type){
     return item;
 };
 
+GameServer.onInitialized = function(){
+    /*var animal = GameServer.addAnimal(1202,168,0);
+    animal.die();
+    GameServer.addItem(1200,166,14);*/
+};
+
 GameServer.setUpdateLoops = function(){
-    setInterval(GameServer.updateNPC,GameServer.npcUpdateRate);
-    setInterval(GameServer.updateWalks,GameServer.walkUpdateRate);
-    setInterval(GameServer.updateClients,Math.round(GameServer.clientUpdateRate));
-    setInterval(GameServer.updateSettlements,GameServer.settlementUpdateRate);
-    setInterval(GameServer.updatePlayers,GameServer.playerUpdateRate);
-    setInterval(GameServer.updateSpawnZones,GameServer.spawnZoneUpdateRate);
+    var loops = {
+        'clientUpdateRate': GameServer.updateClients,
+        'npcUpdateRate': GameServer.updateNPC,
+        'playerUpdateRate': GameServer.updatePlayers,
+        'settlementUpdateRate': GameServer.updateSettlements,
+        'spawnZoneUpdateRate': GameServer.updateSpawnZones,
+        'walkUpdateRate': GameServer.updateWalk
+    };
+
+    for(var loop in loops){
+        setInterval(loops[loop],config.get('rates.'+loop));
+    }
 };
 
 GameServer.getPlayer = function(socketID){
@@ -629,8 +645,7 @@ GameServer.handleCommit = function(data,socketID){ // keep data argument
     var buildingID = player.inBuilding;
     var building = GameServer.buildings[buildingID];
     player.takeCommitmentSlot(buildingID,true);
-    building.addCommit(player);
-    //building.updateCommit(1);
+    building.addCommit();
     var gain = 20;
     player.gainCivicXP(gain,true);
     // TODO: increment change based on civic level?

@@ -89,7 +89,6 @@ BigButton.prototype.handleOut = function(){
 BigButton.prototype.resetSize = function(){
     var body = this.slices[1];
     body.setSize(body.refWidth,body.refHeight);
-    //body.setInteractive();
 };
 
 BigButton.prototype.display = function(){

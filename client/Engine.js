@@ -59,6 +59,8 @@ Engine.preload = function() {
     this.load.image('foundations', 'assets/sprites/buildings/foundations.png');
     this.load.image('hunterhut', 'assets/sprites/buildings/hunterhut.png');
 
+    this.load.atlas('megaset', 'assets/sprites/megaset-2.png', 'assets/sprites/megaset-2.json');
+
     this.load.atlas('aok', 'assets/sprites/aok.png', 'assets/sprites/aok.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
@@ -1576,4 +1578,24 @@ function st(id){
 
 function cl(){
     localStorage.clear();
+}
+
+function test(){
+    var color = 'gold';
+    var barBody = UI.scene.add.tileSprite(100,100,1,8,'UI');
+    barBody.setFrame('miniprogress_'+color+'_middle');
+    barBody.setDepth(1);
+    barBody.setScrollFactor(0);
+    barBody.setDisplayOrigin(0,0);
+    barBody.setVisible(false);
+    barBody.setDepth(1);
+    barBody.setVisible(true);
+    barBody.setFrame('bigbutton_middle_lit');
+
+    //var s = UI.scene.add.tileSprite(100,100, 200, 200, 'megaset','hotdog');
+    /*var s = UI.scene.add.tileSprite(100,100, 200, 200, 'UI');
+    s.setScrollFactor(0);
+    s.setDepth(100);
+    s.setDisplayOrigin(0);
+    s.setFrame('miniprogress_gold_middle');*/
 }

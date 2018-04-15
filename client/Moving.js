@@ -127,7 +127,8 @@ var Moving = new Phaser.Class({
 
         if(this.orientation != this.previousOrientation){
             this.previousOrientation = this.orientation;
-            this.anims.play(this.walkAnimPrefix+'_move_'+this.orientation);
+            //this.anims.play(this.walkAnimPrefix+'_move_'+this.orientation);
+            this.play(this.walkAnimPrefix+'_move_'+this.orientation);
         }
 
         if(this.isHero){
@@ -146,7 +147,6 @@ var Moving = new Phaser.Class({
         this.leaveFootprint();
 
         if(this.flagForStop || (this.stopPos && this.stopPos.x == tx && this.stopPos.y == ty)){
-            //if(this.isHero) Engine.player.setDestinationAction(0);
             this.movement.stop();
             this.endMovement(); // TODO: have it called automatically by stop()
         }

@@ -539,9 +539,7 @@ Player.prototype.update = function() {
     var slots = this.getSlots();
     for(var i = 0; i < slots.length; i++){
         var slot = slots[i];
-        if(Date.now() - slot.stamp > COMMIT_DURATION){
-            var building = GameServer.buildings[slot.building];
-            //building.updateCommit(-1);
+        if(Date.now() - slot.stamp > GameServer.cycles.commitmentDuration){
             this.freeCommitmentSlot();
             i--;
         }else{

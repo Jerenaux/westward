@@ -36,7 +36,7 @@ Item.prototype.trim = function() {
 };
 
 Item.prototype.remove = function(){
-    this.spawnZone.decrement('item',this.type);
+    if(this.spawnZone) this.spawnZone.decrement('item',this.type);
     delete GameServer.items[this.id];
 };
 

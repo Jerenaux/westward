@@ -32,7 +32,9 @@ function Building(data){
     this.built = !!data.built;
     this.progress = data.progress || 0;
     this.productivity = data.productivity || 100;
-    this.committed = data.committed || 0;
+    //this.committed = data.committed || 0;
+    this.committed = 0;
+    this.commitStamps = data.commitStamps || [];
 
     this.lastBuildCycle = data.lastBuildCycle || Date.now();
     this.lastProdCycle = data.lastProdCycle || Date.now();
@@ -72,18 +74,28 @@ Building.prototype.computeProductivity = function(){
     this.setProperty('productivity',productivity);
 };
 
-Building.prototype.addCommit = function(player){
+Building.prototype.addCommit = function(){
+    this.commitStamps.push(Date.now());
+    this.updateNbCommitted();
     // TODO: keep list of committed stamps, check at each update and remove commit
     // TODO: decide if update player or let players update themselves
+    // TODO: update schema
 };
 
-Building.prototype.updateCommit = function(inc){
-    this.setProperty('committed',Utils.clamp(this.committed+inc,0,999));
-    this.computeProductivity();
-    this.settlement.refreshListing();
+Building.prototype.updateCommitment = function(){
+    this.commitStamps = this.commitStamps.filter(function(stamp){
+        return (Date.now()-stamp) < GameServer.cycles.commitmentDuration;
+    });
+    //this.committed = this.commitStamps.length;
+    this.updateNbCommitted();
+};
+
+Building.prototype.updateNbCommitted = function(){
+    this.setProperty('committed',this.commitStamps.length)
 };
 
 Building.prototype.update = function(){
+    this.updateCommitment();
     this.computeProductivity();
 
     var buildingDataType = GameServer.buildingsData[this.type];

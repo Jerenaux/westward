@@ -49,17 +49,14 @@ interactions with buildings, time spent in each individual menu, etc.
 Cleaning:
 --------
 Performance:
-- Use WeakMaps on server for players, animals, etc.
 - Avoid duplicate pins in maps, danger pins etc.
 - Fix "already existing/non-existing" bugs
-- Use Phaser tilemaps?
 - Animals keep their target
 - "Sleep" mode for NPC when no player in currentAOI.entities (change flags on AOI transition, not on every NPC update loop iteration)
 - Pathmaking instead of pahfinding?
 - Concile the two coexisting menu update systems: the one used by updateSelf and the one used by updateBuilding
 -> All menus have an update() method called on display; upon new server data, only update() the current menu
 - Dont send full building inventories when buying/selling (send arrays of deltas)
-- Use pools for players, animals, ...
 - Fix null values in left-fringe chunks (fixed?)
 ->nulls in corrupted chunks likely arise from "undefined" values being converted to null by JSON.stringify
 -> Happens on the fringe -> because for these drawShore returns undefined?!
@@ -68,7 +65,7 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
-- Central config file: walking speed, food id, arrow id and proportion of back arrows (for skinning), etc.
+- Central config file: walking speed, food id, commitment duration, etc.
 - Use data registry for data exchange between scenes (see Phaser World 119)
 - Client-side, GameObject use tx and ty while Moving use tileX and tileY (and they both have a setPosition method)
 => fix in processItemClick, etc, test a lot
@@ -147,6 +144,7 @@ Content:
 - Map mechanics
 - Quests
 * Inventory
+- In shops, filter-out bought/sold items by graying them, but still display
 - Dropping items
 - Belt mechanics (quick-use slots for potions, bombs and weapons)
 - Backpack mechanics
@@ -184,17 +182,15 @@ Content:
 - Set up stats of troops
 - Make troops engage enemies
 * Settlement economy
-keep track of commit slots in buildings as well, to de-commit deconnected players
+Implement and test decommitment from db data
 Recipe: paper cartridges (paper also for bombs?)?
 Make recipes (randomly?) for 5 consumables (potion, antidote, steady stuff...) + create ingredients
 Recipes for fancy bullets and bombs
-Add recipes for all intermediary ingredients
 Workshop building, interface = usual crafting menu
 -> update advice
 Add shop interface as well
 Display recipes with building and class restrictions
 Update help text of recipes
-Scatter basic ingredients
 Coal mine
 Resource flow to trade post
 Gold flow from tarde post to fort
@@ -257,7 +253,7 @@ Design document:
 Polish:
 ------
 Visual:
-- Fade-in
+- Use sprite with animations
 - "Tip of the day"
 - Revamp class selection
 - Fix continuous movement

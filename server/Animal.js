@@ -1,7 +1,7 @@
 /**
  * Created by Jerome on 09-10-17.
  */
-
+"use strict";
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
@@ -279,7 +279,7 @@ Animal.prototype.isAvailableForFight = function(){
 
 Animal.prototype.die = function(){
     MovingEntity.prototype.die.call(this);
-    this.spawnZone.decrement('animal',this.type);
+    if(this.spawnZone) this.spawnZone.decrement('animal',this.type);
 };
 
 Animal.prototype.remove = function(){

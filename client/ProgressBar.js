@@ -167,10 +167,10 @@ MiniProgressBar.prototype.constructor = MiniProgressBar;
 
 MiniProgressBar.prototype.setColor = function(color){
     this.tail.setFrame('miniprogress_'+color+'_left');
-    this.barBody.initWidth = this.barBody.width;
-    this.barBody.initHeight = this.barBody.height;
+    //this.barBody.initWidth = this.barBody.width;
+    //this.barBody.initHeight = this.barBody.height;
     this.barBody.setFrame('miniprogress_'+color+'_middle');
-    this.barBody.setSize(this.barBody.initWidth,this.barBody.initHeight);
+    //this.barBody.setSize(this.barBody.initWidth,this.barBody.initHeight);
     this.head.setFrame('miniprogress_'+color+'_right');
 };
 
