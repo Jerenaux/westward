@@ -120,13 +120,20 @@ GameServer.createModels = function(){
     GameServer.PlayerModel = mongoose.model('Player', playerSchema);
 };
 
-GameServer.readMap = function(mapsPath){
-    GameServer.initializationMethods = {
-        'static_data': null,
-        'settlements': GameServer.loadSettlements,
-        'buildings': GameServer.loadBuildings,
-        'spawn_zones': GameServer.setUpSpawnZones
-    };
+GameServer.readMap = function(mapsPath,test){
+    if(test){
+        GameServer.initializationMethods = {
+            'static_data': null,
+            'dummyWorld': GameServer.loadDummyWorld
+        };
+    }else {
+        GameServer.initializationMethods = {
+            'static_data': null,
+            'settlements': GameServer.loadSettlements,
+            'buildings': GameServer.loadBuildings,
+            'spawn_zones': GameServer.setUpSpawnZones
+        };
+    }
     GameServer.initializationSequence = Object.keys(GameServer.initializationMethods);
     //console.log(GameServer.initializationSequence);
 
@@ -150,6 +157,7 @@ GameServer.readMap = function(mapsPath){
     GameServer.textData = JSON.parse(fs.readFileSync('./assets/data/texts.json').toString());
     GameServer.itemsData = JSON.parse(fs.readFileSync('./assets/data/items.json').toString());
     GameServer.animalsData = JSON.parse(fs.readFileSync('./assets/data/animals.json').toString());
+    GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
@@ -161,7 +169,7 @@ GameServer.loadSettlements = function(){
         settlements.forEach(function(data){
             var settlement = new Settlement(data);
             settlement.setModel(data);
-            GameServer.settlements[settlement.id] = settlement;
+            //GameServer.settlements[settlement.id] = settlement;
         });
         GameServer.updateStatus();
 
@@ -178,7 +186,6 @@ GameServer.loadSettlements = function(){
 };
 
 GameServer.loadBuildings = function(){
-    GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
     GameServer.BuildingModel.find(function (err, buildings) {
         if (err) return console.log(err);
         buildings.forEach(function(data){
@@ -243,24 +250,30 @@ GameServer.addItem = function(x,y,type){
 };
 
 GameServer.onInitialized = function(){
-    /*var animal = GameServer.addAnimal(1202,168,0);
+    console.log('--- Performing on initialization tasks ---');
+    var animal = GameServer.addAnimal(1202,168,0);
     animal.die();
-    GameServer.addItem(1200,166,14);*/
+    console.log('animal spawned');
+    GameServer.addItem(1200,166,14);
+    console.log('item added');
 };
 
 GameServer.setUpdateLoops = function(){
+    console.log('Setting up loops...');
     var loops = {
         'clientUpdateRate': GameServer.updateClients,
         'npcUpdateRate': GameServer.updateNPC,
         'playerUpdateRate': GameServer.updatePlayers,
         'settlementUpdateRate': GameServer.updateSettlements,
         'spawnZoneUpdateRate': GameServer.updateSpawnZones,
-        'walkUpdateRate': GameServer.updateWalk
+        'walkUpdateRate': GameServer.updateWalks
     };
 
     for(var loop in loops){
+        if(!(typeof loops[loop] === 'function')) console.warn('No valid function for',loop);
         setInterval(loops[loop],config.get('rates.'+loop));
     }
+    console.log('Loops set');
 };
 
 GameServer.getPlayer = function(socketID){
@@ -949,3 +962,30 @@ GameServer.getScreenshots = function(res){
     });
 };
 
+GameServer.loadDummyWorld = function(){
+    console.log('Creating test world');
+    GameServer.spawnZones = [];
+    new Settlement({
+        name: 'dummyLand',
+        id: -2,
+        level: 1,
+        population: 0,
+        lastCycle: Date.now()
+    });
+    new Building({
+        x: 0,
+        y: 0,
+        type: 0,
+        sid: -2,
+        built: true
+    });
+    new Building({
+        x: 0,
+        y: 0,
+        type: 5,
+        sid: -2,
+        built: true
+    });
+    GameServer.updateSettlements();
+    GameServer.updateStatus();
+};

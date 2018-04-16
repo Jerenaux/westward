@@ -9,7 +9,7 @@ var World = require('../shared/World.js').World;
 function Settlement(data){
     this.id = data.id;
     this.name = data.name;
-    this.desc = data.description;//GameServer.textData['settlement_'+this.id];
+    this.desc = data.description;
     this.level = data.level;
     this.pop = data.population;
     this.lastCycle = data.lastCycle;
@@ -17,6 +17,8 @@ function Settlement(data){
     this.fort = null;
     this.buildings = [];
     this.players = [];
+
+    GameServer.settlements[this.id] = this;
 }
 
 Settlement.prototype.setModel = function(model) {
@@ -100,9 +102,18 @@ Settlement.prototype.consumeFood = function(){
 
 Settlement.prototype.computeFoodSurplus = function(){
     var foodAmount = this.fort.getItemNb(1);
+    if(this.pop === undefined){
+        console.warn('Undefined population for settlement',this.name);
+        this.pop = 0;
+    }
     var required = Formulas.computeRequiredFood(this.pop);
     var delta = foodAmount - required;
+    console.log(foodAmount,required,delta,this.pop);
     this.surplus = Formulas.decimalToPct(delta/required);
+    if(isNaN(this.surplus)){
+        console.warn('NaN surplus for settlement',this.name);
+        this.surplus = 0;
+    }
     console.log('Surplus for ',this.name,':',this.surplus,'%');
     this.buildings.forEach(function(building){
         building.setProperty('foodsurplus',this.surplus);
@@ -132,6 +143,7 @@ Settlement.prototype.update = function(){
 };
 
 Settlement.prototype.save = function(){
+    if(!this.model) return;
     var _settlement = this;
     GameServer.SettlementModel.findById(this.model._id, function (err, doc) {
         if (err) throw err;

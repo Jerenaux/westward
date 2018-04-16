@@ -31,8 +31,7 @@ function Building(data){
     this.gold = data.gold || 0;
     this.built = !!data.built;
     this.progress = data.progress || 0;
-    this.productivity = data.productivity || 100;
-    //this.committed = data.committed || 0;
+    this.productivity = 100;
     this.committed = 0;
     this.commitStamps = data.commitStamps || [];
 
@@ -239,6 +238,7 @@ Building.prototype.remove = function(){
 // Save changes to DB
 // TODO: move up to GameObject
 Building.prototype.save = function(){
+    if(!this.model) return;
     var _building = this;
     GameServer.BuildingModel.findById(this.model._id, function (err, doc) {
         if (err) throw err;

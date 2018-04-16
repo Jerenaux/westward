@@ -104,7 +104,7 @@ server.listen(process.env.PORT || 8081,function(){
     db.once('open', function() {
         server.db = db;
         console.log('Connection to db established');
-        gs.readMap(myArgs.maps);
+        gs.readMap(myArgs.maps,myArgs.test);
     });
 });
 

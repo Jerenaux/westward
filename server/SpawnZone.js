@@ -48,7 +48,7 @@ SpawnZone.prototype.computeDelta = function(map,countMap,type,freeAOIs){
 
 SpawnZone.prototype.spawn = function(AOIs,type,id,nb){
     var data = (type == 'animal' ? GameServer.animalsData[id] : GameServer.itemsData[id]);
-    console.log('Spawning',nb,data.name);
+    //console.log('Spawning',nb,data.name);
 
     for(var i = 0; i < nb; i++){
         var AOI = Utils.randomElement(AOIs);
