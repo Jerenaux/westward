@@ -145,17 +145,34 @@ Player.prototype.hasFreeCommitSlot = function(){
 Player.prototype.takeCommitmentSlot = function(buildingID,notify){
     this.addToSlots({
         building: buildingID,
-        stamp: Date.now()
+        //stamp: Date.now()
+        stamp: 1
     });
     this.syncCommitSlots();
     if(notify) this.addNotif('Committed to '+GameServer.buildings[buildingID].name);
 };
 
-Player.prototype.freeCommitmentSlot = function(){
+Player.prototype.updateCommitment = function(){
+    if(!GameServer.isTimeToUpdate('commitment')) return false;
+    this.commitSlots.slots = [];
+    this.syncCommitSlots();
+    /*var slots = this.getSlots();
+    for(var i = 0; i < slots.length; i++){
+        var slot = slots[i];
+        if(Date.now() - slot.stamp > GameServer.cycles.commitmentDuration){
+            this.freeCommitmentSlot();
+            i--;
+        }else{
+            break;
+        }
+    }*/
+};
+
+/*Player.prototype.freeCommitmentSlot = function(){
     var slot = this.removeSlot();
     this.syncCommitSlots();
     this.addNotif('Commitment to '+GameServer.buildings[slot.building].name+' ended');
-};
+};*/
 
 Player.prototype.trimCommitSlots = function(){
     var slots = [];
@@ -536,16 +553,7 @@ Player.prototype.getIndividualUpdatePackage = function(){
 };
 
 Player.prototype.update = function() {
-    var slots = this.getSlots();
-    for(var i = 0; i < slots.length; i++){
-        var slot = slots[i];
-        if(Date.now() - slot.stamp > GameServer.cycles.commitmentDuration){
-            this.freeCommitmentSlot();
-            i--;
-        }else{
-            break;
-        }
-    }
+    this.updateCommitment();
 };
 
 Player.prototype.remove = function(){

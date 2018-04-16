@@ -23,10 +23,11 @@ function SpawnZone(aois,animalsData,itemsData){
 }
 
 SpawnZone.prototype.update = function(){
+    if(!GameServer.isTimeToUpdate('spawnZones')) return;
+
     var freeAOIs = this.aois.map(function(aoi){
         return GameServer.AOIs[aoi];
     }).filter(function(AOI){
-        //return !AOI.hasPlayer();
         return !GameServer.vision.has(AOI.id);
     });
 

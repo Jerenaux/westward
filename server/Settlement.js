@@ -87,7 +87,8 @@ Settlement.prototype.refreshListing = function(){
 };
 
 Settlement.prototype.consumeFood = function(){
-    var rate = GameServer.cycles.foodConsumptionRate;
+    if(!GameServer.isTimeToUpdate('foodConsumption')) return false;
+    /*var rate = GameServer.cycles.foodConsumptionRate;
     var nbCycles = Math.floor((Date.now() - this.lastCycle)/rate);
     if(nbCycles > 0) {
         //var consumption = Math.min(1,Math.floor(this.pop / 10) * nbCycles);
@@ -97,9 +98,15 @@ Settlement.prototype.consumeFood = function(){
 
         this.lastCycle = Date.now();
         this.save();
-    }
+    }*/
+    var consumption = Formulas.foodConsumption(this.pop);
+    console.log(this.name, 'consuming', consumption, 'food');
+    if (consumption) this.takeFromFort(1, consumption);
+    // No need to save, surplus will be recomputed upon loading settlement
+    return (consumption > 0);
 };
 
+// Called whenever food amount changes and directly after all buildings are read
 Settlement.prototype.computeFoodSurplus = function(){
     var foodAmount = this.fort.getItemNb(1);
     if(this.pop === undefined){
@@ -108,7 +115,6 @@ Settlement.prototype.computeFoodSurplus = function(){
     }
     var required = Formulas.computeRequiredFood(this.pop);
     var delta = foodAmount - required;
-    console.log(foodAmount,required,delta,this.pop);
     this.surplus = Formulas.decimalToPct(delta/required);
     if(isNaN(this.surplus)){
         console.warn('NaN surplus for settlement',this.name);
@@ -125,21 +131,26 @@ Settlement.prototype.computeFoodModifier = function(){
     return Formulas.computeSettlementFoodModifier(Formulas.pctToDecimal(this.surplus));
 };
 
-// Called immeditaley after buildings are read + at a regular interval (updateSettlements())
 Settlement.prototype.update = function(){
     if(!this.fort) return;
 
-    this.consumeFood();
-    this.computeFoodSurplus();
+    var consumed = this.consumeFood();
 
-    this.buildings.forEach(function(b){
+    /*this.buildings.forEach(function(b){
         b.update();
     });
-    this.refreshListing();
+    this.refreshListing();*/
+    if(consumed) {
+        this.computeFoodSurplus();
 
-    this.players.forEach(function(p){
-        GameServer.players[p].applyFoodModifier(this.surplus);
-    },this);
+        this.players.forEach(function (p) {
+            GameServer.players[p].applyFoodModifier(this.surplus);
+        }, this);
+
+        this.buildings.forEach(function (building) {
+            building.computeProductivity();
+        });
+    }
 };
 
 Settlement.prototype.save = function(){

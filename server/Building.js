@@ -64,6 +64,7 @@ Building.prototype.refreshListing = function(){
     this.updateBuildings();
 };
 
+// Called whenever commitment or settlement's food surplus changes
 Building.prototype.computeProductivity = function(){
     // Not converted to % since they are not broadcast
     var foodModifier = this.settlement.computeFoodModifier();
@@ -74,30 +75,33 @@ Building.prototype.computeProductivity = function(){
 };
 
 Building.prototype.addCommit = function(){
-    this.commitStamps.push(Date.now());
+    //this.commitStamps.push(Date.now());
+    this.commitStamps.push(1);
     this.updateNbCommitted();
-    // TODO: keep list of committed stamps, check at each update and remove commit
-    // TODO: decide if update player or let players update themselves
-    // TODO: update schema
 };
 
 Building.prototype.updateCommitment = function(){
+    if(!GameServer.isTimeToUpdate('commitment')) return false;
+    /*this.commitStamps.map().filter();
+
     this.commitStamps = this.commitStamps.filter(function(stamp){
         return (Date.now()-stamp) < GameServer.cycles.commitmentDuration;
-    });
+    });*/
     //this.committed = this.commitStamps.length;
+    this.commitStamps = [];
     this.updateNbCommitted();
 };
 
 Building.prototype.updateNbCommitted = function(){
-    this.setProperty('committed',this.commitStamps.length)
+    this.setProperty('committed',this.commitStamps.length);
+    this.computeProductivity();
 };
 
 Building.prototype.update = function(){
     this.updateCommitment();
-    this.computeProductivity();
+    //this.computeProductivity();
 
-    var buildingDataType = GameServer.buildingsData[this.type];
+    /*var buildingDataType = GameServer.buildingsData[this.type];
     if(this.built && !buildingDataType.production) return;
     var cycleName = this.built ? 'lastProdCycle' : 'lastBuildCycle';
     var interval = this.built ? buildingDataType.prodInterval : buildingDataType.buildInterval;
@@ -114,30 +118,39 @@ Building.prototype.update = function(){
             this.updateBuild(nbCycles);
         }
     }
-    this.save();
+    this.save();*/
+    if(this.built){
+        this.updateProd();
+    }else{
+        this.updateBuild();
+    }
 };
 
-Building.prototype.updateProd = function(nbCycles){
+Building.prototype.updateProd = function(){
+    if(!GameServer.isTimeToUpdate('production')) return false;
     var production = GameServer.buildingsData[this.type].production;
     if(!production) return;
     for(var i = 0; i < production.length; i++){
         var item = production[i][0];
         var baseNb = production[i][1];
         var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
-        var actualNb = nbCycles*increment;
-        console.log('producing ',actualNb,'items',item,'(',increment,',',nbCycles,')');
+        //var actualNb = nbCycles*increment;
+        var actualNb = increment;
+        console.log('producing ',actualNb,' ',GameServer.itemsData[item].name);
         if(actualNb > 0) this.settlement.addToFort(item,actualNb);
     }
-    this.lastProdCycle = Date.now();
+    //this.lastProdCycle = Date.now();
 };
 
-Building.prototype.updateBuild = function(nbCycles){
-    var rate = GameServer.buildingsData[this.type].buildRate; // Base progress increase per cycle, before factoring productivity in
+Building.prototype.updateBuild = function(){
+    if(!GameServer.isTimeToUpdate('build')) return false;
+    var rate = GameServer.buildingsData[this.type].buildRate; // Base progress increase per turn, before factoring productivity in
     if(!rate) return;
-    var increment = nbCycles*Formulas.computeBuildIncrement(Formulas.pctToDecimal(this.productivity),rate);
+    //var increment = nbCycles*Formulas.computeBuildIncrement(Formulas.pctToDecimal(this.productivity),rate);
+    var increment = Formulas.computeBuildIncrement(Formulas.pctToDecimal(this.productivity),rate);
     console.log('Building ',increment,'%');
     this.setProperty('progress',Utils.clamp(this.progress+increment,this.progress,100));
-    this.lastBuildCycle = Date.now();
+    //this.lastBuildCycle = Date.now();
     if(this.progress == 100){
         this.setProperty('built',true);
         this.resetCounters();

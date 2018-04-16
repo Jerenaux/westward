@@ -66,6 +66,7 @@ GameServer.updateStatus = function(){
         GameServer.initialized = true;
         GameServer.setUpdateLoops();
         GameServer.onInitialized();
+        GameServer.startEconomy();
     }else{
         var next = GameServer.initializationSequence[GameServer.initializationStep];
         //console.log('Moving on to next step:',next);
@@ -74,13 +75,14 @@ GameServer.updateStatus = function(){
 };
 
 GameServer.createModels = function(){
+    // TODO: remove temporal data from schemas?
     var settlementSchema = mongoose.Schema({
         id: {type: Number, min: 0, required: true},
         name: {type: String, required: true},
         description: String,
         population: {type: Number, min: 0, required: true},
         level: {type: Number, min: 0, required: true},
-        lastCycle: { type: Date, default: Date.now }
+        //lastCycle: { type: Date, default: Date.now }
     });
     var buildingSchema = mongoose.Schema({
         id: {type: Number, min: 0, required: true},
@@ -96,9 +98,9 @@ GameServer.createModels = function(){
         built: Boolean,
         progress: {type: Number, min: 0, max: 100}, // %
         //committed: {type: Number, min: 0},
-        commitStamps: [Date],
+        /*commitStamps: [Date],
         lastBuildCycle: { type: Date, default: Date.now },
-        lastProdCycle: { type: Date, default: Date.now }
+        lastProdCycle: { type: Date, default: Date.now }*/
     });
     var playerSchema = mongoose.Schema({
         // TODO: think about ID
@@ -193,14 +195,14 @@ GameServer.loadBuildings = function(){
             building.setModel(data);
             GameServer.buildings[building.id] = building;
         });
+        GameServer.setUpSettlements();
         GameServer.updateStatus();
-        GameServer.updateSettlements();
     });
 };
 
 GameServer.setUpSpawnZones = function(){
     GameServer.spawnZones = [];
-
+    // TODO: move to JSON file
     var animals = {
         0:{
             min: 10, //10
@@ -261,19 +263,59 @@ GameServer.onInitialized = function(){
 GameServer.setUpdateLoops = function(){
     console.log('Setting up loops...');
     var loops = {
-        'clientUpdateRate': GameServer.updateClients,
-        'npcUpdateRate': GameServer.updateNPC,
-        'playerUpdateRate': GameServer.updatePlayers,
-        'settlementUpdateRate': GameServer.updateSettlements,
-        'spawnZoneUpdateRate': GameServer.updateSpawnZones,
-        'walkUpdateRate': GameServer.updateWalks
+        'client': GameServer.updateClients,
+        'npc': GameServer.updateNPC,
+        //'playerUpdateRate': GameServer.updatePlayers,
+        //'settlementUpdateRate': GameServer.updateSettlements,
+        //'spawnZoneUpdateRate': GameServer.updateSpawnZones,
+        'walk': GameServer.updateWalks
     };
 
     for(var loop in loops){
         if(!(typeof loops[loop] === 'function')) console.warn('No valid function for',loop);
-        setInterval(loops[loop],config.get('rates.'+loop));
+        setInterval(loops[loop],config.get('updateRates.'+loop));
     }
     console.log('Loops set');
+};
+
+GameServer.startEconomy = function(){
+    GameServer.economyTurns = config.get('economyCycles.turns');
+    GameServer.elapsedTurns = 0;
+    var maxDuration = 0;
+    for(var event in GameServer.economyTurns){
+        var duration = GameServer.economyTurns[event];
+        if(duration > maxDuration) maxDuration = duration;
+    }
+    console.log('Longest event:',maxDuration);
+    GameServer.maxTurns = maxDuration;
+
+    // TODO: compute turns elapsed during server shutdown?
+    setInterval(GameServer.economyTurn,config.get('economyCycles.turnDuration')*1000);
+};
+
+GameServer.economyTurn = function(){
+    GameServer.elapsedTurns++;
+    console.log('Turn',GameServer.elapsedTurns);
+    GameServer.updateEconomicEntities(GameServer.spawnZones);
+    GameServer.updateEconomicEntities(GameServer.settlements); // food surplus
+    // TODO: commitment in terms of turns!
+    GameServer.updateEconomicEntities(GameServer.buildings); // prod, build, commit
+    GameServer.updateEconomicEntities(GameServer.players); // commit
+    if(GameServer.elapsedTurns == GameServer.maxTurns) GameServer.elapsedTurns = 0;
+};
+
+GameServer.updateEconomicEntities = function(entities){
+    for(var key in entities){
+        entities[key].update();
+    }
+};
+
+GameServer.getCommitmentDuration = function(){
+    return GameServer.economyTurns.commitment;
+};
+
+GameServer.isTimeToUpdate = function(event){
+    return (GameServer.elapsedTurns%GameServer.economyTurns[event] == 0);
 };
 
 GameServer.getPlayer = function(socketID){
@@ -847,7 +889,13 @@ GameServer.updateNPC = function(){
     });
 };
 
-GameServer.updateSettlements = function(){
+GameServer.setUpSettlements = function(){
+    Object.keys(GameServer.settlements).forEach(function(key){
+        GameServer.settlements[key].computeFoodSurplus();
+    });
+};
+
+/*GameServer.updateSettlements = function(){
     Object.keys(GameServer.settlements).forEach(function(key){
         GameServer.settlements[key].update();
     });
@@ -863,7 +911,7 @@ GameServer.updateSpawnZones = function(){
     GameServer.spawnZones.forEach(function(zone){
         zone.update();
     });
-};
+};*/
 
 // #############################
 

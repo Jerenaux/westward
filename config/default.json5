@@ -4,16 +4,24 @@
         battleRange: 3, // distance that can be travelled in one turn in battle
         maxPathLength: 36
     },
-    rates: {
-        // hours
-        foodConsumptionRate: 8,
-        spawnZoneUpdateRate: 1,
-        // ms
-        playerUpdateRate: 10000,
-        settlementUpdateRate: 10000,
-        clientUpdateRate: 125,
-        walkUpdateRate: 50,
-        npcUpdateRate: 200
+    economyCycles: {
+        // Unit: seconds
+        turnDuration: 10,
+        // Unit: turns
+        turns: {
+            build: 1,
+            foodConsumption: 8,
+            commitment: 1,
+            production: 1,
+            settlements: 1,
+            spawnZones: 1
+        }
+    },
+    updateRates: {
+        // Unit: ms
+        client: 125,
+        walk: 50,
+        npc: 200
     },
     misc: {
         foodID: 1,
