@@ -64,50 +64,6 @@ var UI = {
         this.scene.get('boot').updateReadyTick();
     },
 
-    handleNotifications: function(msgs){
-        // TODO: add to localstorage for display in character panel
-        var i = 0;
-        msgs.forEach(function(msg){
-            UI.showNotification(msg,i,msgs.length);
-            i++;
-        });
-        // TODO: keep list of displayed notifications
-    },
-
-    showNotification: function(msg,i,nb){
-        var notif = new Bubble(0,0,true); // TODO: use pool
-        notif.update(msg);
-        var x = (UI.getGameWidth()-notif.getWidth())/2 - notif.getOrigin();
-        var deltay = 10;
-        UI.notifications.forEach(function(n){
-            deltay += n.getHeight()+10;
-        });
-        var y = UI.getGameHeight() + deltay;
-        notif.updatePosition(x,y);
-        notif.setDuration(nb);
-
-        var endy = y - 2*deltay - 30 - 5;
-        var tween = UI.scene.tweens.addCounter({
-            from: y,
-            to: endy,
-            duration: 300,
-            paused: true,
-            ease: 'Quad.easeOut',
-            onStart: function(){
-                notif.display();
-            },
-            onUpdate: function(tween){
-                notif.updatePosition(x,tween.getValue());
-            }
-        });
-
-        var delay = i*50;
-        setTimeout(function(){
-            tween.play();
-        },delay);
-        UI.notifications.push(notif);
-    },
-
     makeBattleTutorialPanel: function(){
         var h = 200;
         var w = 200;
@@ -118,6 +74,65 @@ var UI = {
         return panel;
     }
 };
+
+UI.handleNotifications = function(msgs){
+    // TODO: add to localstorage for display in character panel
+    var notifs = [];
+    var totalHeight = 0;
+    var padding = 10;
+    msgs.forEach(function(msg){
+        var notif = new Bubble(0,0,true); // TODO: use pool (separate speech bubbles from notifs)
+        notif.update(msg);
+        totalHeight += (notif.getHeight() + padding);
+        notifs.push(notifs);
+    });
+    UI.notifications.forEach(function(notif){
+        notif.shift(0,-totalHeight);
+    });
+};
+
+/*UI.handleNotifications = function(msgs){
+    // TODO: add to localstorage for display in character panel
+    var i = 0;
+    msgs.forEach(function(msg){
+        UI.showNotification(msg,i,msgs.length);
+        i++;
+    });
+};
+
+UI.showNotification = function(msg,i,nb){
+    var notif = new Bubble(0,0,true); // TODO: use pool
+    notif.update(msg);
+    var x = (UI.getGameWidth()-notif.getWidth())/2 - notif.getOrigin();
+    var deltay = 10;
+    UI.notifications.forEach(function(n){
+        deltay += n.getHeight()+10;
+    });
+    var y = UI.getGameHeight() + deltay;
+    notif.updatePosition(x,y);
+    notif.setDuration(nb);
+
+    var endy = y - 2*deltay - 30 - 5;
+    var tween = UI.scene.tweens.addCounter({
+        from: y,
+        to: endy,
+        duration: 300,
+        paused: true,
+        ease: 'Quad.easeOut',
+        onStart: function(){
+            notif.display();
+        },
+        onUpdate: function(tween){
+            notif.updatePosition(x,tween.getValue());
+        }
+    });
+
+    var delay = i*50;
+    setTimeout(function(){
+        tween.play();
+    },delay);
+    UI.notifications.push(notif);
+};*/
 
 UI.getConfig = function(){
     return this.scene.sys.game.config;
@@ -323,12 +338,13 @@ UI.selectSettlement = function(id){
 
 UI.launchGame = function(fade){
     var fadeDuration = (fade ? 500: 0);
-    if(fade) UI.camera.fade(fadeDuration);
-    setTimeout(function(){
+    UI.camera.fadeOut(fadeDuration);
+    UI.camera.once('camerafadeoutcomplete',function(){
         Boot.background.setVisible(false);
         UI.scene.scene.shutdown('boot');
         UI.scene.scene.launch('main');
-    },fadeDuration);
+        UI.camera.fadeIn(fadeDuration);
+    });
 };
 
 UI.debugScreen = function(){

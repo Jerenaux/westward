@@ -154,18 +154,15 @@ Player.prototype.takeCommitmentSlot = function(buildingID,notify){
 
 Player.prototype.updateCommitment = function(){
     if(!GameServer.isTimeToUpdate('commitment')) return false;
+
+    var slots = this.getSlots();
+    if(slots.length = 0) return;
+    slots.forEach(function(slot){
+        this.addNotif('Commitment to '+GameServer.buildings[slot.building].name+' ended');
+    },this);
+
     this.commitSlots.slots = [];
     this.syncCommitSlots();
-    /*var slots = this.getSlots();
-    for(var i = 0; i < slots.length; i++){
-        var slot = slots[i];
-        if(Date.now() - slot.stamp > GameServer.cycles.commitmentDuration){
-            this.freeCommitmentSlot();
-            i--;
-        }else{
-            break;
-        }
-    }*/
 };
 
 /*Player.prototype.freeCommitmentSlot = function(){

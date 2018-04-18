@@ -124,6 +124,7 @@ Building.prototype.update = function(){
     }else{
         this.updateBuild();
     }
+    this.save();
 };
 
 Building.prototype.updateProd = function(){

@@ -1,3 +1,6 @@
+Bug: fix fort map north scroll
+Overlapping notifications
+
 Admin
 Analytics
 Cleaning
@@ -49,6 +52,7 @@ interactions with buildings, time spent in each individual menu, etc.
 Cleaning:
 --------
 Performance:
+- Use pool for notifications
 - Avoid duplicate pins in maps, danger pins etc.
 - Fix "already existing/non-existing" bugs
 - Animals keep their target
@@ -183,6 +187,8 @@ Content:
 - Set up stats of troops
 - Make troops engage enemies
 * Settlement economy
+Stop sending commit slots repeatedly
+Hide commit button when already committed
 Implement and test decommitment from db data
 Recipe: paper cartridges (paper also for bombs?)?
 Make recipes (randomly?) for 5 consumables (potion, antidote, steady stuff...) + create ingredients

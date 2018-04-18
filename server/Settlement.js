@@ -88,17 +88,6 @@ Settlement.prototype.refreshListing = function(){
 
 Settlement.prototype.consumeFood = function(){
     if(!GameServer.isTimeToUpdate('foodConsumption')) return false;
-    /*var rate = GameServer.cycles.foodConsumptionRate;
-    var nbCycles = Math.floor((Date.now() - this.lastCycle)/rate);
-    if(nbCycles > 0) {
-        //var consumption = Math.min(1,Math.floor(this.pop / 10) * nbCycles);
-        var consumption = Formulas.foodConsumption(this.pop)*nbCycles;
-        console.log(this.name, 'consuming', consumption, 'food');
-        if (consumption) this.takeFromFort(1, consumption);
-
-        this.lastCycle = Date.now();
-        this.save();
-    }*/
     var consumption = Formulas.foodConsumption(this.pop);
     console.log(this.name, 'consuming', consumption, 'food');
     if (consumption) this.takeFromFort(1, consumption);
@@ -108,6 +97,7 @@ Settlement.prototype.consumeFood = function(){
 
 // Called whenever food amount changes and directly after all buildings are read
 Settlement.prototype.computeFoodSurplus = function(){
+    console.log('Computing food surplus...');
     var foodAmount = this.fort.getItemNb(1);
     if(this.pop === undefined){
         console.warn('Undefined population for settlement',this.name);
@@ -136,10 +126,6 @@ Settlement.prototype.update = function(){
 
     var consumed = this.consumeFood();
 
-    /*this.buildings.forEach(function(b){
-        b.update();
-    });
-    this.refreshListing();*/
     if(consumed) {
         this.computeFoodSurplus();
 
@@ -150,6 +136,7 @@ Settlement.prototype.update = function(){
         this.buildings.forEach(function (building) {
             building.computeProductivity();
         });
+        this.refreshListing();
     }
 };
 

@@ -288,9 +288,6 @@ Engine.initWorld = function(data){
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
-    setTimeout(function(){
-        UI.camera._fadeAlpha = 0;
-    },200);
 
     if(Client.isNewPlayer()) {
         var w = 400;

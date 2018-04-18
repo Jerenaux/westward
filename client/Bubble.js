@@ -55,16 +55,20 @@ Bubble.prototype.makeBubble = function(sx,sy){
     this.height = h;
 };
 
-Bubble.prototype.updatePosition = function(nx,ny){
-    var dx = nx - this.x;
-    var dy = ny - this.y;
+Bubble.prototype.shift = function(dx,dy){
     if(dx == 0 && dy == 0) return;
     this.container.forEach(function(e){
         e.x += dx;
         e.y += dy;
     });
-    this.x = nx;
-    this.y = ny;
+    this.x += dx;
+    this.y += dy;
+};
+
+Bubble.prototype.updatePosition = function(nx,ny){
+    var dx = nx - this.x;
+    var dy = ny - this.y;
+    this.shift(dx,dy);
 };
 
 Bubble.prototype.finalize = function(){

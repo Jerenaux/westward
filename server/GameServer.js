@@ -69,7 +69,7 @@ GameServer.updateStatus = function(){
         GameServer.startEconomy();
     }else{
         var next = GameServer.initializationSequence[GameServer.initializationStep];
-        //console.log('Moving on to next step:',next);
+        console.log('Moving on to next step:',next);
         GameServer.initializationMethods[next].call();
     }
 };
@@ -235,7 +235,6 @@ GameServer.setUpSpawnZones = function(){
     GameServer.spawnZones.push(new SpawnZone([1516,1566,1567,1665,1666,1716,1717,1768],animals,items));
     GameServer.spawnZones.push(new SpawnZone([339,388,491,537,539,540,541,542],animals,items));
 
-    GameServer.updateSpawnZones();
     GameServer.updateStatus();
 };
 
@@ -252,12 +251,12 @@ GameServer.addItem = function(x,y,type){
 };
 
 GameServer.onInitialized = function(){
-    console.log('--- Performing on initialization tasks ---');
+    /*console.log('--- Performing on initialization tasks ---');
     var animal = GameServer.addAnimal(1202,168,0);
     animal.die();
     console.log('animal spawned');
     GameServer.addItem(1200,166,14);
-    console.log('item added');
+    console.log('item added');*/
 };
 
 GameServer.setUpdateLoops = function(){
@@ -286,7 +285,6 @@ GameServer.startEconomy = function(){
         var duration = GameServer.economyTurns[event];
         if(duration > maxDuration) maxDuration = duration;
     }
-    console.log('Longest event:',maxDuration);
     GameServer.maxTurns = maxDuration;
 
     // TODO: compute turns elapsed during server shutdown?
@@ -296,10 +294,18 @@ GameServer.startEconomy = function(){
 GameServer.economyTurn = function(){
     GameServer.elapsedTurns++;
     console.log('Turn',GameServer.elapsedTurns);
-    GameServer.updateEconomicEntities(GameServer.spawnZones);
+
+    GameServer.spawnZones.forEach(function(zone){
+        zone.update();
+    });
+
     GameServer.updateEconomicEntities(GameServer.settlements); // food surplus
-    // TODO: commitment in terms of turns!
     GameServer.updateEconomicEntities(GameServer.buildings); // prod, build, commit
+
+    for(var sid in GameServer.settlements){
+        GameServer.settlements[sid].refreshListing();
+    }
+
     GameServer.updateEconomicEntities(GameServer.players); // commit
     if(GameServer.elapsedTurns == GameServer.maxTurns) GameServer.elapsedTurns = 0;
 };
