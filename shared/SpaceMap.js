@@ -12,6 +12,7 @@ function SpaceMap(){}
 SpaceMap.prototype.add = function(x,y,object){
     if(!this.hasOwnProperty(x))this[x] = {};
     if(!this[x].hasOwnProperty(y))this[x][y] = [];
+    if(object === undefined) object = 1;
     this[x][y] = object; // replaces any existing object
 };
 
@@ -55,6 +56,20 @@ SpaceMap.prototype.fromList = function(list) { // unserialize from list represen
         var item = list[i];
         this.add(item.x,item.y,(item.v || {}));
     }
+};
+
+SpaceMap.prototype.toString = function(){ // serialize to a list representation
+    var s = "";
+    for(x in this){
+        if(this.hasOwnProperty(x)){
+            for(y in this[x]){
+                if(this[x].hasOwnProperty(y)) {
+                    s += "("+x+","+y+","+this[x][y]+")";
+                }
+            }
+        }
+    }
+    return s;
 };
 
 if (onServer) module.exports.SpaceMap = SpaceMap;

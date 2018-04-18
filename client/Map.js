@@ -31,7 +31,7 @@ var Map = new Phaser.Class({
         }
         this.maskSize = {
             width: mask.frame.width,
-            height: mask.frame.heigt
+            height: mask.frame.height
         };
 
         this.toponyms = [];

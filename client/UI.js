@@ -75,44 +75,51 @@ var UI = {
     }
 };
 
+// TODO: test two quick waves
 UI.handleNotifications = function(msgs){
+    if(UI.runningNotifications){
+        setTimeout(UI.handleNotifications,UI.runningNotifications*10,msgs);
+        return;
+    }
     // TODO: add to localstorage for display in character panel
     var notifs = [];
-    var totalHeight = 0;
     var padding = 10;
+    var totalHeight = padding;
     msgs.forEach(function(msg){
         var notif = new Bubble(0,0,true); // TODO: use pool (separate speech bubbles from notifs)
         notif.update(msg);
         totalHeight += (notif.getHeight() + padding);
-        notifs.push(notifs);
+        notifs.push(notif);
+    });
+    UI.notifications = UI.notifications.filter(function(notif){
+        return notif.displayed;
     });
     UI.notifications.forEach(function(notif){
-        notif.shift(0,-totalHeight);
+        UI.scene.tweens.addCounter({
+            from: notif.y,
+            to: notif.y - totalHeight,
+            duration: 300,
+            ease: 'Quad.easeOut',
+            onUpdate: function(tween){
+                notif.updatePosition(notif.x,tween.getValue());
+            }
+        });
     });
-};
-
-/*UI.handleNotifications = function(msgs){
-    // TODO: add to localstorage for display in character panel
-    var i = 0;
-    msgs.forEach(function(msg){
-        UI.showNotification(msg,i,msgs.length);
-        i++;
+    var cumulativeHeight = 0;
+    notifs.forEach(function(notif,i){
+        UI.showNotification(notif,i,cumulativeHeight);
+        cumulativeHeight += notif.getHeight() + padding;
     });
+    console.log('total time = ',300+(msgs.length-1)*50);
 };
-
-UI.showNotification = function(msg,i,nb){
-    var notif = new Bubble(0,0,true); // TODO: use pool
-    notif.update(msg);
+UI.runningNotifications = 0;
+UI.showNotification = function(notif,i,height) {
     var x = (UI.getGameWidth()-notif.getWidth())/2 - notif.getOrigin();
-    var deltay = 10;
-    UI.notifications.forEach(function(n){
-        deltay += n.getHeight()+10;
-    });
-    var y = UI.getGameHeight() + deltay;
+    var y = UI.getGameHeight();
     notif.updatePosition(x,y);
-    notif.setDuration(nb);
 
-    var endy = y - 2*deltay - 30 - 5;
+    var endy = y - height - 50;
+    notif.endy = endy;
     var tween = UI.scene.tweens.addCounter({
         from: y,
         to: endy,
@@ -120,10 +127,15 @@ UI.showNotification = function(msg,i,nb){
         paused: true,
         ease: 'Quad.easeOut',
         onStart: function(){
+            UI.runningNotifications++;
             notif.display();
         },
         onUpdate: function(tween){
             notif.updatePosition(x,tween.getValue());
+        },
+        onComplete: function(){
+            //console.log('done at ',Date.now());
+            UI.runningNotifications--;
         }
     });
 
@@ -132,7 +144,7 @@ UI.showNotification = function(msg,i,nb){
         tween.play();
     },delay);
     UI.notifications.push(notif);
-};*/
+};
 
 UI.getConfig = function(){
     return this.scene.sys.game.config;

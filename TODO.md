@@ -1,6 +1,3 @@
-Bug: fix fort map north scroll
-Overlapping notifications
-
 Admin
 Analytics
 Cleaning
@@ -69,6 +66,7 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Config: toggle aggro
 - Move spawnZone data to JSON file
 - Central config file: https://github.com/lorenwest/node-config/wiki/Configuration-Files
 - Use data registry for data exchange between scenes (see Phaser World 119)

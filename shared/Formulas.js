@@ -11,10 +11,7 @@ if(onServer) {
 var Formulas = {};
 
 Formulas.decimalToPct = function(decimalValue){
-    if(Math.abs(decimalValue) >= 10 ) {
-        console.warn('WARNING: wrong number format for decimal value',decimalValue);
-        console.trace();
-    }
+    if(Math.abs(decimalValue) >= 10 ) console.warn('WARNING: wrong number format for decimal value',decimalValue);
     return Math.round(Utils.clamp(decimalValue,-2,2)*100);
 };
 

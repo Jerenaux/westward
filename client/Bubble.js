@@ -139,18 +139,17 @@ Bubble.prototype.setDuration = function(nb){
 };
 
 Bubble.prototype.display = function(){
+    this.displayed = true;
     this.container.forEach(function(e){
         e.setVisible(true);
     });
     if(this.timer) clearTimeout(this.timer);
-    var _bubble = this;
-    this.timer = setTimeout(function(){
-            _bubble.hide();
-            if(_bubble.isNotificiation) UI.notifications.shift();
-    },this.duration);
+    this.timer = setTimeout(this.hide.bind(this),this.duration);
+
 };
 
 Bubble.prototype.hide = function(){
+    this.displayed = false;
     this.container.forEach(function(e){
         e.setVisible(false);
     });

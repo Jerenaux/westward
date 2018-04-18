@@ -6,48 +6,71 @@
     <script src="/lib/phaser.js"></script>
 </head>
 <body>
-<div id="game"></div>
+<canvas width="800" height="650" id="game"></canvas>
 </body>
+<script src="shared/SpaceMap.js" type="text/javascript"></script>
+<script src="shared/Pathfinder.js" type="text/javascript"></script>
+<script src="shared/Utils.js" type="text/javascript"></script>
 <script type="text/javascript">
 
-    var Test = {
-        preload: function(){
-            this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
-        },
+    var c_canvas = document.getElementById("game");
+    var context = c_canvas.getContext("2d");
 
-        create: function(){
-            this.add.image(100,100,'hero');
-            var id = 0;
-            Test.loadJSON('/maps/chunk' + id + '.json', Test.drawChunk, id);
+    var ts = 32;
+    var height = 640;
+    var width = 640;
+
+    for (var x = 0.5; x < width+1; x += ts) {
+        context.moveTo(x, 0);
+        context.lineTo(x, width);
+    }
+
+    for (var y = 0.5; y < height+1; y += ts) {
+        context.moveTo(0, y);
+        context.lineTo(height, y);
+    }
+
+    for(var x = 0; x < width/ts; x++){
+        for(var y = 0; y < height/ts; y++){
+            context.fillText(x+","+y,(x*ts),(y*ts)+10);
         }
+    }
+
+    context.strokeStyle = "#ddd";
+    context.stroke();
+
+    var grid = new SpaceMap();
+
+    c_canvas.onclick = function(e){
+        var tx = Math.floor(e.layerX/ts);
+        var ty = Math.floor(e.layerY/ts);
+        console.log(tx+','+ty);
+        context.fillStyle = "#000000";
+        context.fillRect(tx*ts,ty*ts,ts,ts);
+        grid.add(tx,ty);
     };
 
-    Test.loadJSON = function(path,callback,data){
-        var xobj = new XMLHttpRequest();
-        xobj.overrideMimeType("application/json");
-        xobj.open('GET', path, true);
-        xobj.onreadystatechange = function () {
-            if (xobj.readyState == 4 && xobj.status == "200") {
-                // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-                callback(JSON.parse(xobj.responseText),data);
-            }
-        };
-        xobj.send(null);
+    function onOpen(tx,ty){
+        console.log('adding ',tx,ty,'to open set');
+        context.fillStyle = "#00aaff";
+        context.fillRect(tx*ts+1,ty*ts+1,ts-2,ts-2);
+    }
+
+    function onClose(tx,ty){
+        console.log('adding ',tx,ty,'to closed set');
+        context.fillStyle = "#00cc00";
+        context.fillRect(tx*ts+1,ty*ts+1,ts-2,ts-2);
+    }
+
+    World = {
+        worldWidth: 20,
+        worldHeight: 20
     };
 
-    Test.drawChunk = function(data,id){
-        console.log(data,id);
-    };
-
-    var config = {
-        //type: (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 ? Phaser.CANVAS : Phaser.AUTO),
-        type: Phaser.WEBGL,
-        width: 32*32,
-        height: 32*18,
-        parent: 'game',
-        scene: [Test]
-    };
-
-    var game = new Phaser.Game(config);
+    function pf(sx,sy,ex,ey){
+        var finder = new Pathfinder(grid);
+        finder.setCallbacks(onOpen,onClose);
+        finder.findPath({x:sx,y:sy},{x:ex,y:ey});
+    }
 </script>
 </html>

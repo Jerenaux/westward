@@ -21,7 +21,7 @@ var Engine = {
     tooltipElementsDepth: 17,
     tooltipTextDepth: 18,
 
-    notificationDuration: 1500, // TODO: adapt based on notif length?
+    notificationDuration: 3000, // TODO: adapt based on notif length?
 
     craftInvSize: 5, // max number of ingredients for crafting
     key: 'main', // key of the scene, for Phaser
@@ -239,6 +239,7 @@ Engine.create = function(){
     Engine.scene.input.keyboard.on('keydown', Engine.handleKeyboard);
 
     PFUtils.setup(Engine);
+    Engine.testCollisions = new SpaceMap();
 
     Engine.inMenu = false;
     Engine.inPanel = false;
@@ -947,7 +948,10 @@ Engine.removeChunk = function(id){
 };
 
 Engine.addCollision = function(x,y,tile){
-    if(Engine.isColliding(tile)) Engine.collisions.add(y,x,1);
+    if(Engine.isColliding(tile)) {
+        Engine.testCollisions.add(x,y,1);
+        Engine.collisions.add(y,x,1);
+    }
 };
 
 Engine.isColliding = function(tile){ // tile is the index of the tile in the tileset
