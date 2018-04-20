@@ -94,6 +94,7 @@ var BattleTile = new Phaser.Class({
         if(BattleManager.inBattle){
             BattleManager.processTileClick(this,pointer);
         }else{
+            if(Engine.dead) return false;
             Engine.moveToClick(pointer);
         }
     }

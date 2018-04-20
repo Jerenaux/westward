@@ -99,6 +99,7 @@ var Building = new Phaser.Class({
     setCollisions: function (data) {
         var shape = new Phaser.Geom.Polygon(data.shape);
         this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
+        this.input.hitArea = shape; // will override previous interactive zone, if any (e.g. if object recycled from pool)
 
         var center = true;
         var spriteX, spriteY;

@@ -210,7 +210,11 @@ UI.leaveTitleScreen = function(){
             if(Client.isNewPlayer()){
                 UI.displayClassMenu();
             }else {
-                UI.launchGame(true);
+                UI.camera.fadeOut(500);
+                UI.camera.once('camerafadeoutcomplete',function(){
+                    UI.launchGame();
+                    UI.camera.fadeIn(500);
+                });
             }
         }
     });
@@ -222,21 +226,13 @@ UI.displayClassMenu = function(){
 
 UI.selectClass = function(id){
     UI.selectedClass = id;
-    UI.camera.fadeOut(500,function(camera){
-        console.log('fade callback');
+    UI.camera.fadeOut(500);
+    UI.camera.once('camerafadeoutcomplete',function(){
         UI.classMenu.hide();
         Boot.background.setVisible(false);
         UI.displaySettlementSelectionMenu();
-        UI.camera._fadeAlpha = 0;
+        UI.camera.fadeIn(500);
     });
-    //var fadeDuration = 500;
-    /*UI.camera.fade(fadeDuration);
-    setTimeout(function(){
-        UI.classMenu.hide();
-        Boot.background.setVisible(false);
-        UI.displaySettlementSelectionMenu();
-        UI.camera._fadeAlpha = 0;
-    },fadeDuration);*/
 };
 
 UI.displaySettlementSelectionMenu =  function(){
@@ -336,27 +332,33 @@ UI.displaySettlement = function(data){
 };
 
 UI.selectSettlement = function(id){
+    console.log('Settlement selected (',id,')');
     UI.selectedSettlement = id;
     var fadeDuration = 500;
-    UI.camera.fade(fadeDuration);
-    setTimeout(function(){
+    UI.camera.fadeOut(fadeDuration);
+    UI.camera.once('camerafadeoutcomplete',function(){
         UI.SScontent.forEach(function(c){
             c.setVisible(false);
         });
         UI.SSpanel.hide();
-        UI.launchGame(false);
-    },fadeDuration);
+        UI.launchGame();
+        UI.camera.fadeIn(fadeDuration);
+    });
 };
 
 UI.launchGame = function(fade){
-    var fadeDuration = (fade ? 500: 0);
+    Boot.background.setVisible(false);
+    UI.scene.scene.shutdown('boot');
+    UI.scene.scene.launch('main');
+    /*var fadeDuration = (fade ? 500: 0);
     UI.camera.fadeOut(fadeDuration);
     UI.camera.once('camerafadeoutcomplete',function(){
         Boot.background.setVisible(false);
         UI.scene.scene.shutdown('boot');
         UI.scene.scene.launch('main');
         UI.camera.fadeIn(fadeDuration);
-    });
+    });*/
+
 };
 
 UI.debugScreen = function(){

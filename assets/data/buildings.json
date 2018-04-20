@@ -127,6 +127,27 @@
   },
   "5":{
     "shape": [
+      0, 82,
+      293, 82,
+      293, 250,
+      0,250
+    ],
+    "width": 293,
+    "height": 250,
+    "sprite": "hunterhut",
+    "name": "Hunter hut",
+    "icon": "hut",
+    "mainMenu": "production",
+    "displayProd": true,
+    "production": [[1,1]],
+    "buildRate":10,
+    "entry": {
+      "x": -3,
+      "y": 4
+    }
+  },
+  "_5":{
+    "shape": [
       33, 60,
       130, 0,
       255, 80,

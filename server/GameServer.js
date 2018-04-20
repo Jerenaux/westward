@@ -205,8 +205,8 @@ GameServer.setUpSpawnZones = function(){
     // TODO: move to JSON file
     var animals = {
         0:{
-            min: 10, //10
-            rate: 3 // 3
+            min: 20, //10
+            rate: 10 // 3
         }
     };
 
@@ -288,6 +288,7 @@ GameServer.startEconomy = function(){
     GameServer.maxTurns = maxDuration;
 
     // TODO: compute turns elapsed during server shutdown?
+    GameServer.economyTurn();
     setInterval(GameServer.economyTurn,config.get('economyCycles.turnDuration')*1000);
 };
 

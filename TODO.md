@@ -173,6 +173,7 @@ Content:
 - Guilds
 * Orientation
 * Packaging
+-> Determine new player by querying server
 -> Nb connected, permanent players, player names, ..
 -> Cheat-proof
 * Settlement defense

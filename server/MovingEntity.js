@@ -23,7 +23,7 @@ MovingEntity.prototype.setPath = function(path){
 
 MovingEntity.prototype.updatePathTick = function(){ // Compute in how many seconds will the entity have moved by one tile
     if(this.path.length <= 1){
-        console.log('['+this.constructor.name+' '+this.id+'] ERROR: Path too short (length = '+this.path.length+')');
+        //console.log('['+this.constructor.name+' '+this.id+'] ERROR: Path too short (length = '+this.path.length+')');
         this.endPath();
         return;
     }
@@ -57,16 +57,14 @@ MovingEntity.prototype.updateWalk = function(){
 MovingEntity.prototype.updatePosition = function(x,y){
     this.x = x;
     this.y = y;
+    if(this.isPlayer) console.log('Position:',this.x,',',this.y);
     this.setOrUpdateAOI();
     if(!this.inFight) GameServer.checkForBattle(this);
 };
 
 MovingEntity.prototype.endPath = function(){
     if(debug) console.log('['+this.constructor.name+' '+this.id+'] Arrived at destination');
-    if(this.flagToStop) {
-        console.log('***STOP AT',this.x,this.y,'***');
-        this.setProperty('stop',{x:this.x,y:this.y});
-    }
+    if(this.flagToStop) this.setProperty('stop',{x:this.x,y:this.y});
     this.moving = false;
     this.flagToStop = false;
     this.onEndOfPath();

@@ -75,19 +75,12 @@ Building.prototype.computeProductivity = function(){
 };
 
 Building.prototype.addCommit = function(){
-    //this.commitStamps.push(Date.now());
     this.commitStamps.push(1);
     this.updateNbCommitted();
 };
 
 Building.prototype.updateCommitment = function(){
     if(!GameServer.isTimeToUpdate('commitment')) return false;
-    /*this.commitStamps.map().filter();
-
-    this.commitStamps = this.commitStamps.filter(function(stamp){
-        return (Date.now()-stamp) < GameServer.cycles.commitmentDuration;
-    });*/
-    //this.committed = this.commitStamps.length;
     this.commitStamps = [];
     this.updateNbCommitted();
 };
@@ -99,26 +92,6 @@ Building.prototype.updateNbCommitted = function(){
 
 Building.prototype.update = function(){
     this.updateCommitment();
-    //this.computeProductivity();
-
-    /*var buildingDataType = GameServer.buildingsData[this.type];
-    if(this.built && !buildingDataType.production) return;
-    var cycleName = this.built ? 'lastProdCycle' : 'lastBuildCycle';
-    var interval = this.built ? buildingDataType.prodInterval : buildingDataType.buildInterval;
-
-    var delta = Date.now() - this[cycleName];
-    interval *= 1000;
-    var nbCycles = Math.floor(delta/interval);
-    if(nbCycles > 0){
-        this[cycleName] += nbCycles*interval;
-        //console.log(nbCycles,' cycle for ',this.id);
-        if(this.built){
-            this.updateProd(nbCycles);
-        }else{
-            this.updateBuild(nbCycles);
-        }
-    }
-    this.save();*/
     if(this.built){
         this.updateProd();
     }else{
@@ -135,12 +108,10 @@ Building.prototype.updateProd = function(){
         var item = production[i][0];
         var baseNb = production[i][1];
         var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
-        //var actualNb = nbCycles*increment;
         var actualNb = increment;
         console.log('producing ',actualNb,' ',GameServer.itemsData[item].name);
         if(actualNb > 0) this.settlement.addToFort(item,actualNb);
     }
-    //this.lastProdCycle = Date.now();
 };
 
 Building.prototype.updateBuild = function(){

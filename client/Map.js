@@ -29,6 +29,7 @@ var Map = new Phaser.Class({
             this.mask = new Phaser.Display.Masks.GeometryMask(UI.scene, shape);
             this.maskOverlay = shape;
         }
+        this.maskOverlay.setVisible(false);
         this.maskSize = {
             width: mask.frame.width,
             height: mask.frame.height
@@ -195,6 +196,7 @@ var Map = new Phaser.Class({
         this.input.hitArea = new Phaser.Geom.Rectangle(rectx,recty,dragw,dragh);
 
         this.setVisible(true);
+        if(!Boot.WEBGL) this.maskOverlay.setVisible(true);
     },
 
     hide: function(){
@@ -203,6 +205,7 @@ var Map = new Phaser.Class({
         this.toponyms.forEach(function(t){
             t.setVisible(false);
         });
+        this.maskOverlay.setVisible(false);
     },
 
     hidePins: function(){

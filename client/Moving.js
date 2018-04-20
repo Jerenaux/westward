@@ -127,7 +127,6 @@ var Moving = new Phaser.Class({
 
         if(this.orientation != this.previousOrientation){
             this.previousOrientation = this.orientation;
-            //this.anims.play(this.walkAnimPrefix+'_move_'+this.orientation);
             this.play(this.walkAnimPrefix+'_move_'+this.orientation);
         }
 
@@ -175,15 +174,13 @@ var Moving = new Phaser.Class({
         for(var i = 0; i < this.currentPath.length; i++){
             var px = this.currentPath[i][0];
             var py = this.currentPath[i][1];
-            if(this.currentTweenTo.x == px && this.currentTweenTo.y == py) currentIndex = i;
+            if(this.currentTweenTo && this.currentTweenTo.x == px && this.currentTweenTo.y == py) currentIndex = i;
             if(px == x && py == y) stopIndex = i;
             if(currentIndex > -1 && stopIndex > -1) break;
         }
-        //console.log(stopIndex,currentIndex);
         if(stopIndex == -1) console.warn('stop index not found');
         if(stopIndex == currentIndex) timeOffset = 0;
         if(stopIndex > currentIndex) timeOffset = 1;
-        //console.log('time offset =',timeOffset);
 
         switch (timeOffset){
             case -1:

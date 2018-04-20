@@ -40,25 +40,67 @@
     context.stroke();
 
     var grid = new SpaceMap();
+    var exclGrid = new SpaceMap();
+    exclGrid.add(4,2);
+    exclGrid.add(5,2);
+
+    function blacken(tx,ty){
+        context.fillStyle = "#000000";
+        context.fillRect(tx*ts,ty*ts,ts,ts);
+        grid.add(tx,ty);
+    }
+
+    blacken(6,0);
+    blacken(6,1);
+    blacken(6,2);
+    blacken(6,3);
+    blacken(6,4);
+    blacken(6,5);
+    blacken(6,6);
+    blacken(0,6);
+    blacken(1,6);
+    blacken(2,6);
+    blacken(3,6);
+    blacken(4,6);
+
+    blacken(4,7);
+    blacken(3,0);
+    blacken(2,11);
+    blacken(11,2);
+    blacken(10,8);
+    blacken(16,7);
+    blacken(19,10);
+    blacken(15,11);
+    blacken(13,14);
+
+    /*for(var i = 0; i < 10; i++){
+        var tx = Utils.randomInt(0,19);
+        var ty = Utils.randomInt(0,19);
+        blacken(tx,ty);
+    }*/
 
     c_canvas.onclick = function(e){
         var tx = Math.floor(e.layerX/ts);
         var ty = Math.floor(e.layerY/ts);
         console.log(tx+','+ty);
-        context.fillStyle = "#000000";
-        context.fillRect(tx*ts,ty*ts,ts,ts);
-        grid.add(tx,ty);
+        blacken(tx,ty);
     };
 
     function onOpen(tx,ty){
-        console.log('adding ',tx,ty,'to open set');
+        //console.log('adding ',tx,ty,'to open set');
         context.fillStyle = "#00aaff";
         context.fillRect(tx*ts+1,ty*ts+1,ts-2,ts-2);
     }
 
     function onClose(tx,ty){
-        console.log('adding ',tx,ty,'to closed set');
+        //console.log('adding ',tx,ty,'to closed set');
         context.fillStyle = "#00cc00";
+        context.fillRect(tx*ts+1,ty*ts+1,ts-2,ts-2);
+    }
+
+    function onBacktrack(tx,ty){
+        //console.log('Backtracking to',tx,ty);
+        context.fillStyle = "#ffcc00";
         context.fillRect(tx*ts+1,ty*ts+1,ts-2,ts-2);
     }
 
@@ -68,8 +110,8 @@
     };
 
     function pf(sx,sy,ex,ey){
-        var finder = new Pathfinder(grid);
-        finder.setCallbacks(onOpen,onClose);
+        var finder = new Pathfinder(grid,50,false);
+        finder.setCallbacks(onOpen,onClose,onBacktrack);
         finder.findPath({x:sx,y:sy},{x:ex,y:ey});
     }
 </script>

@@ -65,6 +65,7 @@ Battle.prototype.managePosition = function(f){
 };
 
 Battle.prototype.addFighter = function(f){
+    console.log('Adding fighter from ',f.x,',',f.y);
     this.fighters.push(f);
     this.managePosition(f);
     this.updateTeams(f.constructor.name,1);

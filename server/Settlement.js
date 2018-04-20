@@ -105,6 +105,7 @@ Settlement.prototype.computeFoodSurplus = function(){
     }
     var required = Formulas.computeRequiredFood(this.pop);
     var delta = foodAmount - required;
+    console.log('delta = ',delta,'required=',required);
     this.surplus = Formulas.decimalToPct(delta/required);
     if(isNaN(this.surplus)){
         console.warn('NaN surplus for settlement',this.name);

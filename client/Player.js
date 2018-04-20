@@ -62,7 +62,7 @@ var Player = new Phaser.Class({
             this.faceOrientation();
         }
         if(data.stop) this.serverStop(data.stop.x,data.stop.y); // TODO: move to new Moving update() supermethod
-        if(data.settlement) this.settlement = settlement;
+        if(data.settlement) this.settlement = data.settlement;
         Engine.handleBattleUpdates(this,data);
         if(data.dead == true) this.die(!this.firstUpdate);
         if(data.dead == false) this.respawn();
@@ -95,6 +95,7 @@ var Player = new Phaser.Class({
     },
 
     talk: function(text){
+        console.log('Talking');
         this.bubble.update(text);
         this.bubble.display();
     },

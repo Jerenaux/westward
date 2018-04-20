@@ -89,6 +89,7 @@ BattleManager.onEndOfMovement = function(){
 BattleManager.canTakeAction = function(){
     if(!BattleManager.inBattle) return false;
     if(!BattleManager.isPlayerTurn) return false;
+    if(Engine.dead) return false;
     return !BattleManager.actionTaken;
 };
 

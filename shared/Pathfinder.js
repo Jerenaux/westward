@@ -4,21 +4,24 @@
 
 var onServer = (typeof window === 'undefined');
 
-/*
-* PF in sparse matrix, check for world bounds,
-* operate in arbitrary sparse grid, stops at boundaries of arbitrary grid,
-* reusable, returns no path as soon as max length exceeded,
-* option: avoid cells occupied by other entities, return duration together with path (computed incrementally)
-* */
+// TODO: detect when the movement could be a straight line, check collisions and return straight line, don't perform PF
 
-function Pathfinder(navGrid,exclusionGrid){
+/*Experiment:
+* - Setting heuristic to 1, 0, -1
+* - Remove -2
+* - Don't increase G
+* => Best result: f = h!*/
+
+function Pathfinder(navGrid,maxLength,allowDiagonal){
     this.grid = navGrid;
-    this.exclusionGrid = exclusionGrid;
+    this.maxLength = maxLength || 50;
+    this.allowDiagonal = allowDiagonal || false;
 }
 
-Pathfinder.prototype.setCallbacks = function(openCb, closeCb){
+Pathfinder.prototype.setCallbacks = function(openCb, closeCb, backtrackCb){
     this.openCb = openCb;
     this.closeCb = closeCb;
+    this.backtrackCb = backtrackCb;
 };
 
 Pathfinder.prototype.findPath = function(from,to){
@@ -26,51 +29,41 @@ Pathfinder.prototype.findPath = function(from,to){
     var end = new Node(to.x,to.y);
     var closedSet = new SpaceMap(); // Set of nodes already evaluated
     this.openSet = []; // The list of currently discovered nodes that are not evaluated yet
-    this.cameFrom = {}; // For each node, which node it can most efficiently be reached from
+    this.cameFrom = new SpaceMap(); // For each node, which node it can most efficiently be reached from
     this.considered = 0;
 
     this.addToOpenSet(start);
     start.setG(0);
-    start.setH(this.h(start,end));
+    start.setH(this.heuristic(start,end));
 
     while(this.openSet.length > 0){
-        var minFNode = this.openSet.shift();
-        console.log('---');
-        console.log('Fetching',minFNode.toString());
         this.considered++;
-        if(this.considered > 10000){
-            console.log('Early stop');
+
+        var minFNode = this.openSet.shift();
+        if(minFNode.equals(end)) return this.backtrack(minFNode);
+
+        if(minFNode.g > this.maxLength){
+            console.log('Max length reached');
             break;
         }
-        if(minFNode.equals(end)) return this.backtrack(minFNode);
 
         closedSet.add(minFNode.x,minFNode.y,1);
         if(this.closeCb) this.closeCb(minFNode.x,minFNode.y);
-        //console.log(closedSet.toString());
 
-        var neighbors = this.generateNeighbors(minFNode);
+        var neighbors = this.generateNeighbors(minFNode,end);
         neighbors.forEach(function(neighbor){
-            console.log('Considering neighbor',neighbor.toString());
-            //console.log(closedSet.toString(),closedSet.get(neighbor.x,neighbor.y));
             if(closedSet.get(neighbor.x,neighbor.y)) return;
 
-            //TODO: when diagonal movement, switch to euclidean
-            var g = minFNode.g + Utils.manhattan(minFNode,neighbor);
-            console.log('G = ',g);
-            if(g >= neighbor.g){
-                console.log('G too high:',g,neighbor.g);
-                return;
-            }
-            this.cameFrom[neighbor] = minFNode;
+            var g = minFNode.g + this.heuristic(minFNode,neighbor);
+            if(g >= neighbor.g) return;
+
+            this.cameFrom.add(neighbor.x,neighbor.y,minFNode);
             neighbor.setG(g);
-            neighbor.setH(this.h(neighbor,end));
-            console.log('New values',neighbor.toString());
+            neighbor.setH(this.heuristic(neighbor,end));
 
             this.addToOpenSet(neighbor);
-            //console.log(this.openSet.toString());
         },this);
     }
-    this.reset();
     return null;
 };
 
@@ -89,7 +82,12 @@ Pathfinder.prototype.addToOpenSet = function(node){
 
 Pathfinder.prototype.generateNeighbors = function(node){
     var neighbors = [];
-    var offsets = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
+    var offsets;
+    if(this.allowDiagonal){
+        offsets = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
+    }else{
+        offsets = [[-1,0],[0,-1],[1,0],[0,1]];
+    }
     offsets.forEach(function(o){
         var n = new Node(node.x+o[0],node.y+o[1]);
         if(this.isWalkable(n)) neighbors.push(n);
@@ -98,7 +96,6 @@ Pathfinder.prototype.generateNeighbors = function(node){
 };
 
 Pathfinder.prototype.isWalkable = function(node){
-    console.log('Walkable at ',node.x,',',node.y,':',this.grid.get(node.x,node.y));
     return (
         node.x >= 0 && node.y >= 0
         && node.x < World.worldWidth && node.y < World.worldHeight
@@ -107,28 +104,36 @@ Pathfinder.prototype.isWalkable = function(node){
 };
 
 Pathfinder.prototype.backtrack = function(node){
-    //TODO: replace comeFrom by SpaceMap
-    var path = [node];
-    console.log(node,this.cameFrom);
-    console.log('backtrack',node in this.cameFrom);
-    while(node in this.cameFrom){
-        node = this.cameFrom[node];
+    console.log('Done after',this.considered,'fetches');
+    var path = [];
+
+    while(node){
         path.push(node);
+        if(path.length > 4) {
+            var t4 = path[path.length - 4];
+            if (Math.abs(node.x - t4.x) + Math.abs(node.y - t4.y) == 1) path.splice(path.length-3,2);
+        }
+        node = this.cameFrom.get(node.x,node.y);
     }
-    this.reset();
+
+    path.forEach(function(node){
+        this.backtrackCb(node.x,node.y);
+        },this);
+
+    console.log('Path length:',path.length);
+    console.log(path.toString());
+
     return path;
 };
 
-Pathfinder.prototype.reset = function(){
-    this.considered = 0;
-    this.openSet = [];
-    this.cameFrom = {};
-};
-
-Pathfinder.prototype.h = function(A,B){
-    //return Utils.euclidean(A,B);
-    //TODO: when diagonal movement, switch to euclidean
-    return Utils.manhattan(A,B) - 2;
+Pathfinder.prototype.heuristic = function(A,B){
+    if(this.allowDiagonal){ // Squared Euclidean distance
+        var dx = A.x - B.x;
+        var dy = A.y - B.y;
+        return dx*dx + dy*dy;
+    }else { // Manhattan distance
+        return Math.abs(A.x - B.x) + Math.abs(A.y - B.y) - 2;
+    }
 };
 
 function Node(x,y){
@@ -140,7 +145,7 @@ function Node(x,y){
 }
 
 Node.prototype.toString = function(){
-    return "["+this.x+","+this.y+"] (g = "+this.g+", h = "+this.h+", f = "+this.f+")";
+    return "["+this.x+","+this.y+"]";
 };
 
 Node.prototype.setG = function(g){
@@ -157,6 +162,7 @@ Node.prototype.setH = function(h){
 Node.prototype.updateF = function(){
     // the total cost of getting from the start node to the goal by passing by that node
     this.f = this.g+this.h;
+    //this.f = this.h;
 };
 
 Node.prototype.equals = function(B){

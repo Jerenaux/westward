@@ -57,7 +57,7 @@ Engine.preload = function() {
     this.load.image('inn', 'assets/sprites/buildings/inn.png');
     this.load.image('tower', 'assets/sprites/buildings/tower.png');
     this.load.image('foundations', 'assets/sprites/buildings/foundations.png');
-    this.load.image('hunterhut', 'assets/sprites/buildings/hunterhut.png');
+    this.load.image('hunterhut', 'assets/sprites/buildings/hut2.png');
 
     this.load.atlas('megaset', 'assets/sprites/megaset-2.png', 'assets/sprites/megaset-2.json');
 
@@ -896,6 +896,7 @@ Engine.addHero = function(data){
     Engine.player.equipment = new EquipmentManager();
     Engine.player.commitSlots = data.commitSlots;
     Engine.updateEnvironment();
+    Engine.setupScript();
 };
 
 Engine.updateEnvironment = function(){
@@ -1265,6 +1266,7 @@ Engine.createElements = function(arr,entityType){
     var pool = Engine.entityManager.pools[entityType];
     var constructor = Engine.entityManager.constructors[entityType];
     arr.forEach(function(data){
+        //console.log('CREATING:',data);
         //console.log('creating',entityType,data.id);
         var e = pool.length > 0 ? pool.shift() : new constructor();
         e.setUp(data);
@@ -1327,6 +1329,7 @@ Engine.getTilesetFromTile = function(tile){
 };
 
 Engine.enterBuilding = function(id){
+    console.log('Entering',id);
     Engine.player.setVisible(false);
     var building = Engine.buildings[id];
     Engine.inBuilding = true;
@@ -1565,38 +1568,46 @@ Engine.snap = function(){
     });
 };
 
-function s(id){
-    console.log(Engine.animalUpdates[id]);
-}
-
-function h(id){
-    console.log(Engine.animals[id].lastSteps);
-}
-
-function st(id){
-    Client.socket.emit('exec-stop',id);
-}
-
 function cl(){
     localStorage.clear();
 }
 
-function test(){
-    var color = 'gold';
-    var barBody = UI.scene.add.tileSprite(100,100,1,8,'UI');
-    barBody.setFrame('miniprogress_'+color+'_middle');
-    barBody.setDepth(1);
-    barBody.setScrollFactor(0);
-    barBody.setDisplayOrigin(0,0);
-    barBody.setVisible(false);
-    barBody.setDepth(1);
-    barBody.setVisible(true);
-    barBody.setFrame('bigbutton_middle_lit');
+// #########################
 
-    //var s = UI.scene.add.tileSprite(100,100, 200, 200, 'megaset','hotdog');
-    /*var s = UI.scene.add.tileSprite(100,100, 200, 200, 'UI');
-    s.setScrollFactor(0);
-    s.setDepth(100);
-    s.setDisplayOrigin(0);
-    s.setFrame('miniprogress_gold_middle');*/
-}
+Engine.setupScript = function(){
+
+    var scriptFn = {
+        'selfTalk': Engine.player.talk.bind(Engine.player),
+        'spawn': spawn,
+        'talk': Client.sendChat,
+        'test': test
+    };
+
+    function test(txt){
+        console.log('TESTING',txt);
+    }
+
+    function spawn(x,y,id,cat){
+        var arr = [{
+            x: x,
+            y: y,
+            type: 0,
+            id: id
+        }];
+        Engine.createElements(arr,cat);
+    }
+
+    var scriptDelay = 0;
+    Engine.script = function(){
+        schedule('spawn',2000,1200,167,0,'animal');
+        schedule('spawn',2000,1205,167,0,'player');
+        schedule('talk',3000,'Test 3');
+        scriptDelay = 0;
+    };
+
+    function schedule(event,delay,arg1,arg2,arg3,arg4){
+        scriptDelay += delay;
+        //console.log('calling ',scriptFn[event],'after',scriptDelay);
+        setTimeout(scriptFn[event],scriptDelay,arg1,arg2,arg3,arg4);
+    }
+};
