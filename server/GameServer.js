@@ -337,6 +337,16 @@ GameServer.checkPlayerID = function(id){ // check if no other player is using sa
     return (GameServer.players[id] === undefined);
 };*/
 
+GameServer.dummyPlayer = function(x,y) {
+    var player = new Player();
+    player.setSettlement(0);
+    player.spawn(x, y);
+    player.id = GameServer.lastPlayerID++;
+    GameServer.players[player.id] = player;
+    player.setOrUpdateAOI(); // takes care of adding to the world as well
+    return player;
+};
+
 GameServer.addNewPlayer = function(socket,data){
     if(data.selectedClass == undefined) data.selectedClass = 1;
     if(data.selectedSettlement == undefined) data.selectedSettlement = 0;
@@ -1043,4 +1053,24 @@ GameServer.loadDummyWorld = function(){
     });
     GameServer.updateSettlements();
     GameServer.updateStatus();
+};
+
+GameServer.startScript = function(){
+    var wpos = [
+        [1200,167]
+    ];
+    var ppos = [
+        [1205,167]
+    ];
+    var players = [];
+    var wolves = [];
+
+    wpos.forEach(function(w){
+        wolves.push(GameServer.addAnimal(w[0],w[1],0));
+    });
+    ppos.forEach(function(p){
+        players.push(GameServer.dummyPlayer(p[0],p[1]));
+    });
+
+    setTimeout(players[0].setChat.bind(players[0]),500,'Hello');
 };

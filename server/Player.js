@@ -106,11 +106,10 @@ Player.prototype.die = function(){
     this.updatePacket.dead = true;
 };
 
-Player.prototype.spawn = function(){
-    //var respawnLocation = GameServer.settlements[this.settlement].respawnLocation;
+Player.prototype.spawn = function(x,y){ // todo: remove args
     var respawnLocation = this.settlement.respawnLocation;
-    this.setProperty('x', respawnLocation.x);
-    this.setProperty('y', respawnLocation.y);
+    this.setProperty('x', x || respawnLocation.x);
+    this.setProperty('y', y || respawnLocation.y);
     console.log('spawning at ',this.x,this.y);
 };
 
@@ -528,6 +527,7 @@ Player.prototype.notifyFight = function(flag){
 Player.prototype.setChat = function(text){
     if(this.chatTimer) clearTimeout(this.chatTimer);
     this.setProperty('chat',text);
+    console.log('Saying',this.chat);
     var _player = this;
     this.chatTimer = setTimeout(function(){
         _player.chat = undefined;

@@ -240,6 +240,7 @@ Engine.create = function(){
 
     PFUtils.setup(Engine);
     Engine.testCollisions = new SpaceMap();
+    Engine.newFinder = new Pathfinder(Engine.testCollisions,36);
 
     Engine.inMenu = false;
     Engine.inPanel = false;
@@ -896,7 +897,6 @@ Engine.addHero = function(data){
     Engine.player.equipment = new EquipmentManager();
     Engine.player.commitSlots = data.commitSlots;
     Engine.updateEnvironment();
-    Engine.setupScript();
 };
 
 Engine.updateEnvironment = function(){
@@ -1018,12 +1018,19 @@ Engine.computePath = function(position){
     //console.log(Engine.player.tileX, Engine.player.tileY, x, y);
     var start = Engine.player.getPFstart();
     if(Engine.player.moving) Engine.player.stop();
-    var path = Engine.PFfinder.findPath(start.x, start.y, x, y, Engine.PFgrid);
+
+    /*var path = Engine.PFfinder.findPath(start.x, start.y, x, y, Engine.PFgrid);
     PF.reset();
     if(path.length == 0 || path.length > PFUtils.maxPathLength) {
         Engine.handleMsg('It\'s too far!');
         return;
+    }*/
+    var path = Engine.newFinder.findPath(start,{x:x,y:y});
+    if(!path) {
+        Engine.handleMsg('It\'s too far!');
+        return;
     }
+
     var trim = PFUtils.trimPath(path,Engine.battleCellsMap);
     if(trim.trimmed) Engine.player.setDestinationAction(0);
     path = trim.path;
@@ -1572,7 +1579,10 @@ function cl(){
     localStorage.clear();
 }
 
-// #########################
+
+function s(){
+    Client.socket.emit('ss');
+}
 
 Engine.setupScript = function(){
 

@@ -50,28 +50,18 @@
         grid.add(tx,ty);
     }
 
-    blacken(6,0);
+    blacken(5,6);
     blacken(6,1);
     blacken(6,2);
     blacken(6,3);
     blacken(6,4);
     blacken(6,5);
     blacken(6,6);
-    blacken(0,6);
     blacken(1,6);
     blacken(2,6);
     blacken(3,6);
     blacken(4,6);
 
-    blacken(4,7);
-    blacken(3,0);
-    blacken(2,11);
-    blacken(11,2);
-    blacken(10,8);
-    blacken(16,7);
-    blacken(19,10);
-    blacken(15,11);
-    blacken(13,14);
 
     /*for(var i = 0; i < 10; i++){
         var tx = Utils.randomInt(0,19);
@@ -113,6 +103,18 @@
         var finder = new Pathfinder(grid,50,false);
         finder.setCallbacks(onOpen,onClose,onBacktrack);
         finder.findPath({x:sx,y:sy},{x:ex,y:ey});
+        console.log(finder.heuristic(
+            {x:7,
+            y:3},
+            {x:17,
+            y:5}
+        ));
+        console.log(finder.heuristic(
+            {x:8,
+                y:2},
+            {x:17,
+                y:5}
+        ))
     }
 </script>
 </html>

@@ -4,14 +4,6 @@
 
 var onServer = (typeof window === 'undefined');
 
-// TODO: detect when the movement could be a straight line, check collisions and return straight line, don't perform PF
-
-/*Experiment:
-* - Setting heuristic to 1, 0, -1
-* - Remove -2
-* - Don't increase G
-* => Best result: f = h!*/
-
 function Pathfinder(navGrid,maxLength,allowDiagonal){
     this.grid = navGrid;
     this.maxLength = maxLength || 50;
@@ -54,7 +46,8 @@ Pathfinder.prototype.findPath = function(from,to){
         neighbors.forEach(function(neighbor){
             if(closedSet.get(neighbor.x,neighbor.y)) return;
 
-            var g = minFNode.g + this.heuristic(minFNode,neighbor);
+            //var g = minFNode.g + this.heuristic(minFNode,neighbor);
+            var g = minFNode.g + 1;
             if(g >= neighbor.g) return;
 
             this.cameFrom.add(neighbor.x,neighbor.y,minFNode);
@@ -88,6 +81,8 @@ Pathfinder.prototype.generateNeighbors = function(node){
     }else{
         offsets = [[-1,0],[0,-1],[1,0],[0,1]];
     }
+    // TODO: try to shuffle the head of the openSet (all those with same minimal f value)
+    //Utils.shuffle(offsets);
     offsets.forEach(function(o){
         var n = new Node(node.x+o[0],node.y+o[1]);
         if(this.isWalkable(n)) neighbors.push(n);
@@ -108,22 +103,20 @@ Pathfinder.prototype.backtrack = function(node){
     var path = [];
 
     while(node){
-        path.push(node);
-        if(path.length > 4) {
+        //path.push(node);
+        path.push([node.x,node.y]);
+        /*if(path.length > 4) {
             var t4 = path[path.length - 4];
             if (Math.abs(node.x - t4.x) + Math.abs(node.y - t4.y) == 1) path.splice(path.length-3,2);
-        }
+        }*/
+        if(this.backtrackCb) this.backtrackCb(node.x, node.y);
         node = this.cameFrom.get(node.x,node.y);
     }
 
-    path.forEach(function(node){
-        this.backtrackCb(node.x,node.y);
-        },this);
-
     console.log('Path length:',path.length);
-    console.log(path.toString());
+    console.log(path,path.toString());
 
-    return path;
+    return path.reverse();
 };
 
 Pathfinder.prototype.heuristic = function(A,B){
@@ -132,7 +125,7 @@ Pathfinder.prototype.heuristic = function(A,B){
         var dy = A.y - B.y;
         return dx*dx + dy*dy;
     }else { // Manhattan distance
-        return Math.abs(A.x - B.x) + Math.abs(A.y - B.y) - 2;
+        return Math.abs(A.x - B.x) + Math.abs(A.y - B.y);// - 2;
     }
 };
 

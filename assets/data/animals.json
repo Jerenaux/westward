@@ -4,7 +4,7 @@
     "name": "Wolf",
     "frame": 25,
     "aggro": false,
-    "wander": true,
+    "wander": false,
     "walkPrefix": "wolf",
     "footprintsFrame": 1,
     "printsVertOffset": 10,

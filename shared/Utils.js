@@ -216,6 +216,15 @@ Utils.insert = function(a1,a2,pos){ // insert array a1 at position pos in array 
     a1.splice.apply(a1, [pos, 0].concat(a2));
 };
 
+Utils.shuffle = function(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+};
+
 Utils.printArray = function(arr){
     console.log(JSON.stringify(arr));
 };
