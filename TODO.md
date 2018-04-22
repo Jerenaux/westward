@@ -52,7 +52,6 @@ Performance:
 - Use pool for notifications
 - Avoid duplicate pins in maps, danger pins etc.
 - Fix "already existing/non-existing" bugs
-- Animals keep their target
 - "Sleep" mode for NPC when no player in currentAOI.entities (change flags on AOI transition, not on every NPC update loop iteration)
 - Pathmaking instead of pahfinding?
 - Concile the two coexisting menu update systems: the one used by updateSelf and the one used by updateBuilding
@@ -113,6 +112,7 @@ Content:
 - Carcasses, traces of fight, traces of campfires
 - Paths along most-travelled paths
 * Battle system
+- Use custom pathfinder to find battle cell (fulfill condition is a function rather than a specific cell)
 - Get arrows back when skinning
 - Animals have sorted list of targets, iteratr through it when first one not reachable for some reason
 -> Deal with big battlefields; focus camera on active player (problem: if far away, surrounding AOIs not displayed), ...
@@ -312,6 +312,7 @@ Testing:
 World building:
 --------------
 -> Custom pathfinding, World editor, manage spawn zones...
+Custom pathfinding: remove quick fix from Animal.goToDestination()
 Custom chunk editor:
 - Arrows on the fringes of the window allow to move quickly to adjacent chunks
 - See borders of adjacent chunks to match fringe tiles

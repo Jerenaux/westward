@@ -68,7 +68,7 @@ Battle.prototype.addFighter = function(f){
     console.log('Adding fighter from ',f.x,',',f.y);
     this.fighters.push(f);
     this.managePosition(f);
-    this.updateTeams(f.constructor.name,1);
+    this.updateTeams(f.battleTeam,1);
     f.setProperty('inFight',true);
     f.stopWalk();
     if(f.isPlayer) f.notifyFight(true);
@@ -85,7 +85,7 @@ Battle.prototype.removeFighter = function(f){
     if(f.isPlayer) this.positions.delete(f.x,f.y); // if animal, leave busy for his body
     if(isTurnOf) this.setEndOfTurn(0);
     if(f.isPlayer) f.notifyFight(false);
-    this.updateTeams(f.constructor.name,-1);
+    this.updateTeams(f.battleTeam,-1);
 };
 
 Battle.prototype.updateTeams = function(team,increment){
@@ -113,7 +113,7 @@ Battle.prototype.newTurn = function(){
         }
     },this);
 
-    if(!activeFighter.isPlayer) setTimeout(activeFighter.decideBattleAction.bind(activeFighter),500);
+    if(!activeFighter.isPlayer || activeFighter.isNPC) setTimeout(activeFighter.decideBattleAction.bind(activeFighter),500);
 };
 
 Battle.prototype.getActiveFighter = function(){

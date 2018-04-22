@@ -342,6 +342,7 @@ GameServer.dummyPlayer = function(x,y) {
     player.setSettlement(0);
     player.spawn(x, y);
     player.id = GameServer.lastPlayerID++;
+    player.isNPC = true;
     GameServer.players[player.id] = player;
     player.setOrUpdateAOI(); // takes care of adding to the world as well
     return player;
@@ -1056,11 +1057,16 @@ GameServer.loadDummyWorld = function(){
 };
 
 GameServer.startScript = function(){
+    GameServer.scriptTime = 0;
+
     var wpos = [
-        [1200,167]
+        [1191,167],
+        [1192,168],
+        [1198,163],
+        [1203,173]
     ];
     var ppos = [
-        [1205,167]
+        [1208,168]
     ];
     var players = [];
     var wolves = [];
@@ -1072,5 +1078,22 @@ GameServer.startScript = function(){
         players.push(GameServer.dummyPlayer(p[0],p[1]));
     });
 
-    setTimeout(players[0].setChat.bind(players[0]),500,'Hello');
+    var main = players[0];
+    GameServer.moveTo(main,1000,1202,168);
+    GameServer.schedule(GameServer,'handleBattle',1200,[main,wolves[0]]);
+    GameServer.moveTo(wolves[2],1000,1199,166);
+    GameServer.moveTo(wolves[3],1000,1200,169);
+    GameServer.schedule(main,'setChat',1000,['Help!']);
+};
+
+GameServer.moveTo = function(actor,delay,x,y){
+    GameServer.schedule(actor,'setPath',delay,[GameServer.findPath({x:actor.x,y:actor.y},{x:x,y:y})]);
+};
+
+GameServer.schedule = function(actor,fn,delay,args){
+    GameServer.scriptTime += delay;
+    setTimeout(function(args){
+        console.log(args);
+        actor[fn].apply(actor,args);
+    },GameServer.scriptTime,args);
 };

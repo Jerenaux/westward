@@ -31,7 +31,8 @@ Pathfinder.prototype.findPath = function(from,to){
     while(this.openSet.length > 0){
         this.considered++;
 
-        var minFNode = this.openSet.shift();
+        var minFNode = this.getMinFNode();
+        console.log('Considering ',minFNode.toString());
         if(minFNode.equals(end)) return this.backtrack(minFNode);
 
         if(minFNode.g > this.maxLength){
@@ -46,7 +47,6 @@ Pathfinder.prototype.findPath = function(from,to){
         neighbors.forEach(function(neighbor){
             if(closedSet.get(neighbor.x,neighbor.y)) return;
 
-            //var g = minFNode.g + this.heuristic(minFNode,neighbor);
             var g = minFNode.g + 1;
             if(g >= neighbor.g) return;
 
@@ -56,8 +56,25 @@ Pathfinder.prototype.findPath = function(from,to){
 
             this.addToOpenSet(neighbor);
         },this);
+        console.log(this.openSet.toString());
     }
     return null;
+};
+
+Pathfinder.prototype.getMinFNode = function(){
+    if(this.allowDiagonal){
+        return this.openSet.shift();
+    }else{
+        var minF = this.openSet[0].f;
+        var g = this.openSet[0].g;
+        var idcs = [];
+        for(var i = 0; i < this.openSet.length; i++){
+            var n = this.openSet[i];
+            if(n.f == minF && n.g == g) idcs.push(i)
+        }
+        var j =  idcs[Math.floor(Math.random()*idcs.length)];
+        return this.openSet.splice(j,1)[0];
+    }
 };
 
 Pathfinder.prototype.addToOpenSet = function(node){
@@ -81,8 +98,8 @@ Pathfinder.prototype.generateNeighbors = function(node){
     }else{
         offsets = [[-1,0],[0,-1],[1,0],[0,1]];
     }
-    // TODO: try to shuffle the head of the openSet (all those with same minimal f value)
-    //Utils.shuffle(offsets);
+
+    // TODO: add "cur corners" consideration
     offsets.forEach(function(o){
         var n = new Node(node.x+o[0],node.y+o[1]);
         if(this.isWalkable(n)) neighbors.push(n);
@@ -103,13 +120,12 @@ Pathfinder.prototype.backtrack = function(node){
     var path = [];
 
     while(node){
-        //path.push(node);
         path.push([node.x,node.y]);
         /*if(path.length > 4) {
             var t4 = path[path.length - 4];
             if (Math.abs(node.x - t4.x) + Math.abs(node.y - t4.y) == 1) path.splice(path.length-3,2);
         }*/
-        if(this.backtrackCb) this.backtrackCb(node.x, node.y);
+        //if(this.backtrackCb) this.backtrackCb(node.x, node.y);
         node = this.cameFrom.get(node.x,node.y);
     }
 
@@ -121,9 +137,12 @@ Pathfinder.prototype.backtrack = function(node){
 
 Pathfinder.prototype.heuristic = function(A,B){
     if(this.allowDiagonal){ // Squared Euclidean distance
-        var dx = A.x - B.x;
+        /*var dx = A.x - B.x;
         var dy = A.y - B.y;
-        return dx*dx + dy*dy;
+        return Math.sqrt(dx*dx + dy*dy);
+        return dx*dx + dy*dy;*/
+        // Chebyshev
+        return Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
     }else { // Manhattan distance
         return Math.abs(A.x - B.x) + Math.abs(A.y - B.y);// - 2;
     }
@@ -138,7 +157,7 @@ function Node(x,y){
 }
 
 Node.prototype.toString = function(){
-    return "["+this.x+","+this.y+"]";
+    return "["+this.x+","+this.y+"] (f = "+this.f+", g = "+this.g+", h = "+this.h+")";
 };
 
 Node.prototype.setG = function(g){

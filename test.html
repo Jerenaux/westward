@@ -80,12 +80,16 @@
         //console.log('adding ',tx,ty,'to open set');
         context.fillStyle = "#00aaff";
         context.fillRect(tx*ts+1,ty*ts+1,ts-2,ts-2);
+        context.fillStyle = "#000000";
+        context.fillText(tx+","+ty,(tx*ts),(ty*ts)+10);
     }
 
     function onClose(tx,ty){
         //console.log('adding ',tx,ty,'to closed set');
         context.fillStyle = "#00cc00";
         context.fillRect(tx*ts+1,ty*ts+1,ts-2,ts-2);
+        context.fillStyle = "#000000";
+        context.fillText(tx+","+ty,(tx*ts),(ty*ts)+10);
     }
 
     function onBacktrack(tx,ty){
@@ -100,21 +104,9 @@
     };
 
     function pf(sx,sy,ex,ey){
-        var finder = new Pathfinder(grid,50,false);
+        var finder = new Pathfinder(grid,50,true);
         finder.setCallbacks(onOpen,onClose,onBacktrack);
         finder.findPath({x:sx,y:sy},{x:ex,y:ey});
-        console.log(finder.heuristic(
-            {x:7,
-            y:3},
-            {x:17,
-            y:5}
-        ));
-        console.log(finder.heuristic(
-            {x:8,
-                y:2},
-            {x:17,
-                y:5}
-        ))
     }
 </script>
 </html>

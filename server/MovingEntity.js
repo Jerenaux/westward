@@ -10,6 +10,7 @@ var debug = false;
 
 function MovingEntity(){
     this.moving = false;
+    this.actionQueue = [];
 }
 
 MovingEntity.prototype = Object.create(GameObject.prototype);
@@ -128,6 +129,10 @@ MovingEntity.prototype.isMoving = function(){
     return this.moving;
 };
 
+MovingEntity.prototype.isSameTeam = function(f){
+    return this.isPlayer == f.isPlayer;
+};
+
 MovingEntity.prototype.canFight = function(){
     return true;
 };
@@ -163,5 +168,116 @@ MovingEntity.prototype.inBattleRange = function(x,y){
     });
     return dist <= PFUtils.battleRange;
 };
+
+MovingEntity.prototype.queueAction = function(action){
+    this.actionQueue.push(action);
+};
+
+MovingEntity.prototype.decideBattleAction = function(){
+    if(!this.inFight) return;
+    var action = this.actionQueue.shift();
+    if(!action) action = 'attack';
+    if(!this.target || !this.target.isInFight()) this.target = this.selectTarget();
+    var data;
+    switch(action){
+        case 'attack':
+            data = this.attackTarget();
+            break;
+        case 'move':
+            data = this.findFreeCell();
+            if(data.action == 'pass') this.queueAction('move');
+            break;
+    }
+    this.battle.processAction(this,data);
+};
+
+MovingEntity.prototype.findFreeCell = function(){
+    var pos = {x:this.x,y:this.y};
+    var list = this.battle.getCells(); //{x,y,v} objects
+    list.sort(function(a,b){
+        if(Utils.manhattan(a,pos) < Utils.manhattan(b,pos)) return -1;
+        return 1;
+    });
+    for(var i = 0; i < list.length; i++){
+        var cell = list[i];
+        if(this.battle.isPositionFree(cell.x,cell.y)) return this.findBattlePath(cell);
+    }
+    return {
+        action: 'pass'
+    };
+};
+
+MovingEntity.prototype.findBattlePath = function(dest){
+    var data = {};
+    var path = GameServer.findPath({x: this.x, y: this.y}, dest,this.battle.PFgrid);
+    if(path.length > 0){
+        this.setPath(path);
+        data.action = 'move';
+    }else{
+        console.log('Combat path of length 0');
+        data.action = 'pass';
+    }
+    return data;
+};
+
+MovingEntity.prototype.attackTarget = function(){
+    var data = {};
+    if(this.battle.nextTo(this,this.target)){
+        data.action = 'attack';
+        data.id = this.target.getShortID();
+    }else{
+        var dest = this.computeBattleDestination(this.target);
+        if(dest) {
+            data = this.findBattlePath(dest);
+        }else{
+            data.action = 'pass';
+        }
+    }
+    return data;
+};
+
+MovingEntity.prototype.selectTarget = function(){
+    var fighters = this.battle.fighters;
+    var minHP = 9999;
+    var currentTarget = null;
+    for(var i = 0; i < fighters.length; i++){
+        var f = fighters[i];
+        //if(!f.isPlayer) continue;
+        if(this.isSameTeam(f)) continue;
+        if(f.getHealth() < minHP){
+            minHP = f.getHealth();
+            currentTarget = f;
+        }
+    }
+    //console.log('Selected target ',currentTarget.getShortID());
+    return currentTarget;
+};
+
+MovingEntity.prototype.computeBattleDestination = function(target){
+    var dest = target.getEndOfPath();
+    var closest = null;
+    var minDist = 9999;
+    //console.log('target : ',dest.x,dest.y);
+    for(var x = Math.min(this.x,dest.x-1); x <= Math.max(this.x,dest.x+1); x++){
+        for(var y = Math.min(this.y,dest.y-1); y <= Math.max(this.y,dest.y+1); y++) {
+            if(x == dest.x && y == dest.y) continue;
+            if(!this.battle.isPosition(x,y)) continue;
+            if(!this.battle.isPositionFree(x,y)) continue;
+            if(PFUtils.checkCollision(x,y)) continue;
+            if(!this.inBattleRange(x,y)) continue;
+
+            if(this.battle.nextTo({x:x,y:y},dest)) return {x:x,y:y};
+
+            var dist = Utils.euclidean({x:x,y:y},{x:dest.x,y:dest.y});
+            if(dist < minDist){
+                minDist = dist;
+                closest = {x:x,y:y};
+            }
+        }
+    }
+    if(closest == null) console.log('not found');
+    return closest;
+};
+
 
 module.exports.MovingEntity = MovingEntity;
