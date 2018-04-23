@@ -48,24 +48,22 @@ var Player = new Phaser.Class({
 
     update: function(data){
         console.log('updating player');
-        if(data.path && !this.isHero) this.move(data.path);
-        if(data.inBuilding > -1) {
-            if(!this.isHero) this.setVisible(false);
-            this.inBuilding = data.inBuilding;
+
+        var callbacks = {
+            'dead': this.processDeath,
+            'facing': this.setOrientation,
+            'inBuilding': this.processBuilding,
+            'path': this.processPath,
+            'stop': this.processStop
+        };
+
+        for(var field in callbacks){
+            if(!callbacks.hasOwnProperty(field)) continue;
+            if(field in data) callbacks[field].call(this,data[field]);
         }
-        if(data.inBuilding == -1){
-            if(!this.isHero) this.setVisible(true);
-            this.inBuilding = data.inBuilding;
-        }
-        if(data.facing) {
-            this.computeOrientation(this.tileX,this.tileY,data.facing.x,data.facing.y);
-            this.faceOrientation();
-        }
-        if(data.stop) this.serverStop(data.stop.x,data.stop.y); // TODO: move to new Moving update() supermethod
-        if(data.settlement) this.settlement = data.settlement;
+
         Engine.handleBattleUpdates(this,data);
-        if(data.dead == true) this.die(!this.firstUpdate);
-        if(data.dead == false) this.respawn();
+        //TODO: move these to callbacks loop
         if(!this.isHero && data.chat) this.talk(data.chat);
         if(data.x >= 0 && data.y >= 0) this.teleport(data.x,data.y);
         this.firstUpdate = false;
@@ -74,6 +72,17 @@ var Player = new Phaser.Class({
     remove: function(){
         CustomSprite.prototype.remove.call(this);
         delete Engine.players[this.id];
+    },
+
+    die: function(showAnim){
+        if(showAnim) Engine.deathAnimation(this);
+        if(this.bubble) this.bubble.hide();
+        this.setVisible(false);
+    },
+
+    respawn: function(){
+        Engine.deathAnimation(this);
+        this.setVisible(true);
     },
 
     endMovement: function() {
@@ -100,18 +109,31 @@ var Player = new Phaser.Class({
         this.bubble.display();
     },
 
-    die: function(showAnim){
-        if(showAnim) Engine.deathAnimation(this);
-        if(this.bubble) this.bubble.hide();
-        this.setVisible(false);
-    },
-
-    respawn: function(){
-        Engine.deathAnimation(this);
-        this.setVisible(true);
-    },
-
     // ### SETTERS ####
+
+    processBuilding: function(inBuilding){
+        if(inBuilding > -1) {
+            if(!this.isHero) this.setVisible(false);
+            this.inBuilding = inBuilding;
+        }
+        if(inBuilding == -1){
+            if(!this.isHero) this.setVisible(true);
+            this.inBuilding = inBuilding;
+        }
+    },
+
+    processDeath: function(dead){
+        if(dead == true) this.die(!this.firstUpdate);
+        if(dead == false) this.respawn();
+    },
+
+    processPath: function(path){
+        if(!this.isHero) this.move(path);
+    },
+
+    processStop: function(stop){
+        this.serverStop(stop.x,stop.y); // TODO: move to new Moving update() supermethod
+    },
 
     setDestinationAction: function(type,id,x,y){
         //console.log('setting to',type,id);
@@ -127,15 +149,15 @@ var Player = new Phaser.Class({
         };
     },
 
+    setOrientation: function(facing){
+        this.computeOrientation(this.tileX,this.tileY,facing.x,facing.y);
+        this.faceOrientation();
+    },
+
     // ### GETTERS ####
 
     getEquipped: function(slot){
         return this.equipment.get(slot);
-    },
-
-    isAmmoEquipped: function(slot){
-        //return this.equipment[slot][0] > -1;
-        return this.equipment.hasAnyAmmo(slot);
     },
 
     getMaxAmmo: function(slot){
@@ -158,5 +180,10 @@ var Player = new Phaser.Class({
 
     hasItem: function(item,nb){
         return (this.inventory.getNb(item) >= nb);
+    },
+
+    isAmmoEquipped: function(slot){
+        //return this.equipment[slot][0] > -1;
+        return this.equipment.hasAnyAmmo(slot);
     }
 });

@@ -161,6 +161,9 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.animalsData = JSON.parse(fs.readFileSync('./assets/data/animals.json').toString());
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
 
+    GameServer.enableWander = config.get('wildlife.wander');
+    GameServer.enableAggro = config.get('wildlife.aggro');
+
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
 };
@@ -201,39 +204,13 @@ GameServer.loadBuildings = function(){
 };
 
 GameServer.setUpSpawnZones = function(){
+    GameServer.spawnZonesData = JSON.parse(fs.readFileSync('./assets/data/spawnzones.json').toString());
     GameServer.spawnZones = [];
-    // TODO: move to JSON file
-    var animals = {
-        0:{
-            min: 20, //10
-            rate: 10 // 3
-        }
-    };
 
-    var items = {
-        8: {
-            min: 10,
-            rate: 2
-        },
-        14: {
-            min: 10,
-            rate: 2
-        },7: {
-            min: 10,
-            rate: 3
-        },18: {
-            min: 10,
-            rate: 2
-        },26: {
-            min: 10,
-            rate: 2
-        },30: {
-            min: 10,
-            rate: 2
-        }
-    };
-    GameServer.spawnZones.push(new SpawnZone([1516,1566,1567,1665,1666,1716,1717,1768],animals,items));
-    GameServer.spawnZones.push(new SpawnZone([339,388,491,537,539,540,541,542],animals,items));
+    for(var key in GameServer.spawnZonesData){
+        var data = GameServer.spawnZonesData[key];
+        GameServer.spawnZones.push(new SpawnZone(data.aois,data.animals,data.items));
+    }
 
     GameServer.updateStatus();
 };
@@ -1061,9 +1038,10 @@ GameServer.startScript = function(){
 
     var wpos = [
         [1191,167],
-        [1192,168],
-        [1198,163],
-        [1203,173]
+        [1192,170],
+        [1194,163],
+        [1203,173],
+        [1190,168]
     ];
     var ppos = [
         [1208,168]

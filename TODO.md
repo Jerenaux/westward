@@ -65,40 +65,29 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
-- Config: toggle aggro
-- Move spawnZone data to JSON file
-- Central config file: https://github.com/lorenwest/node-config/wiki/Configuration-Files
+- Clean schemas
 - Use data registry for data exchange between scenes (see Phaser World 119)
 - Client-side, GameObject use tx and ty while Moving use tileX and tileY (and they both have a setPosition method)
 => fix in processItemClick, etc, test a lot
-- Put settlement stuff in database
 - Clean scene transition code
 - Move UI stuff from Engine to UI
-- Settlements: after compute food surplus, one central method to broadcast it to buildings and players, using one
-common "formatFoorSurplus" method to decide exact formatting (witg a reciprocal function client-side)
 - Building update: somehow check for fields in data not in map, and make a warning?
 - Remove quick fixes about setFrame (big buttons, ctrl+f on quick fix)
-- Deduce food_id from database
-- Use schemas for players
 - "getName()" method to get items names rather than accessing dict
 - Rework longslot system
 - Rethink the calling of all events on menu open
 - Setters/getters everywhere
-- Remove Engine.updateInventory() (moved to Inventory)
-- Clean orientation code based on tweens, not previous pos?
-- Hero class, StatsManager, EquipmentManager (NetworkManager?)
+- Client-side, move common update elements of player and animal to new moving.update()
+- StatsManager (NetworkManager?)
 - Clean up Building.update() and updateSelf()
 - Centralize all texts (incl. stats, equip, and even item descriptions)
 - Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
-- Tie input events to game objects, rather than global functions (use topOnly)
 - Remove unnecessary files (esp. sprites)
 - Remove "longslot" stuff intended for stretching longslots vertically?
 - Find out how to generate graphics objects (grid tiles, gradients...) programmatically for various uses
-- Use events gameobject events for input + custom events for updating menus (https://phaser.io/phaser3/devlog/112)
 - One clean, central way to manage tilesets, config variables, depth, blitters... (blitter selection in client/Chunk, "mawLayer" field in WorldEditor ...)
 - Give toString method to custom objects to replace [this.constructor.name this.id] ...
 - Decide what to do with assets/maps folder, both for dev and prod
-- Merge all the addXXX and removeXXX methods (but keepl separate lists) + merge addXXX loops in updateWorld()
 - Split server in two (game and dev server)
 - Remove unnecessary Geometry methods (and world-building methods from studio/Engine)
 

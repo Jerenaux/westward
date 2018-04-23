@@ -1,8 +1,13 @@
+// https://github.com/lorenwest/node-config/wiki/Configuration-Files
 {
     pathdinfing: {
         walkingSpeed: 5, // tiles/sec
         battleRange: 3, // distance that can be travelled in one turn in battle
         maxPathLength: 36
+    },
+    wildlife: {
+        aggro: true,
+        wander: true
     },
     economyCycles: {
         // Unit: seconds

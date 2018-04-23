@@ -110,7 +110,7 @@ UI.handleNotifications = function(msgs){
         UI.showNotification(notif,i,cumulativeHeight);
         cumulativeHeight += notif.getHeight() + padding;
     });
-    console.log('total time = ',300+(msgs.length-1)*50);
+    //console.log('total time = ',300+(msgs.length-1)*50);
 };
 UI.runningNotifications = 0;
 UI.showNotification = function(notif,i,height) {

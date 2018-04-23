@@ -880,7 +880,9 @@ Engine.getIngredientsPanel = function(){
 
 Engine.addHero = function(data){
     // data comes from the initTrim()'ed packet of the player
-    Engine.player = Engine.addPlayer(data);
+    //Engine.player = Engine.addPlayer(data);
+    Engine.player = new Hero();
+    Engine.player.setUp(data);
     Engine.player.settlement = data.settlement;
     Engine.player.isHero = true;
     Engine.camera.startFollow(Engine.player);
@@ -1117,7 +1119,7 @@ Engine.updateSelf = function(data){
     var updateEvents = new Set();
 
     if(data.items) {
-        Engine.updateInventory(Engine.player.inventory,data.items);
+        Engine.player.inventory.updateItems(data.items);
         updateEvents.add('inv');
     }
     if(data.stats){
@@ -1197,14 +1199,6 @@ Engine.updateStat = function(key,data){
         data.a.forEach(function(m){
             statObj.absoluteModifiers.push(m);
         })
-    }
-};
-
-Engine.updateInventory = function(inventory,items){
-    // items is an array of smaller arrays of format [item id, nb]
-    for(var i = 0; i < items.length; i++){
-        var item = items[i];
-        inventory.update(item[0],item[1]);
     }
 };
 
@@ -1579,45 +1573,6 @@ function cl(){
     localStorage.clear();
 }
 
-
 function s(){
     Client.socket.emit('ss');
 }
-
-Engine.setupScript = function(){
-
-    var scriptFn = {
-        'selfTalk': Engine.player.talk.bind(Engine.player),
-        'spawn': spawn,
-        'talk': Client.sendChat,
-        'test': test
-    };
-
-    function test(txt){
-        console.log('TESTING',txt);
-    }
-
-    function spawn(x,y,id,cat){
-        var arr = [{
-            x: x,
-            y: y,
-            type: 0,
-            id: id
-        }];
-        Engine.createElements(arr,cat);
-    }
-
-    var scriptDelay = 0;
-    Engine.script = function(){
-        schedule('spawn',2000,1200,167,0,'animal');
-        schedule('spawn',2000,1205,167,0,'player');
-        schedule('talk',3000,'Test 3');
-        scriptDelay = 0;
-    };
-
-    function schedule(event,delay,arg1,arg2,arg3,arg4){
-        scriptDelay += delay;
-        //console.log('calling ',scriptFn[event],'after',scriptDelay);
-        setTimeout(scriptFn[event],scriptDelay,arg1,arg2,arg3,arg4);
-    }
-};

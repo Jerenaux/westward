@@ -9,17 +9,43 @@ var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 function SpawnZone(aois,animalsData,itemsData){
     this.aois = aois;
-    this.animalsData = animalsData;
-    this.itemsData = itemsData;
+    this.animalsData = {};
+    this.itemsData = {};
     this.population = {};
     this.items = {};
 
-    for(var animal in animalsData){
+    animalsData.forEach(function(data){
+        var animalID = data[0];
+        var rate = data[1];
+        var min = data[2];
+        this.population[animalID] = 0;
+        this.animalsData[animalID] = {
+            rate: rate,
+            min: min
+        }
+    },this);
+
+    itemsData.forEach(function(data){
+        var itemID = data[0];
+        var rate = data[1];
+        var min = data[2];
+        this.items[itemID] = 0;
+        this.itemsData[itemID] = {
+            rate: rate,
+            min: min
+        }
+    },this);
+
+    /*for(var animal in animalsData){
+        var data = animalsData[animal];
         this.population[animal] = 0;
+        this.animalsData[animal] = {
+            rate:
+        }
     }
     for(var item in itemsData){
         this.items[item] = 0;
-    }
+    }*/
 }
 
 SpawnZone.prototype.update = function(){
@@ -49,7 +75,7 @@ SpawnZone.prototype.computeDelta = function(map,countMap,type,freeAOIs){
 
 SpawnZone.prototype.spawn = function(AOIs,type,id,nb){
     var data = (type == 'animal' ? GameServer.animalsData[id] : GameServer.itemsData[id]);
-    //console.log('Spawning',nb,data.name);
+    console.log('Spawning',nb,data.name);
 
     for(var i = 0; i < nb; i++){
         var AOI = Utils.randomElement(AOIs);

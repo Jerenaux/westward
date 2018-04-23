@@ -55,11 +55,11 @@ Animal.prototype.setWander = function(){
 };
 
 Animal.prototype.doesWander = function(){
-    return this.wander;
+    return (this.wander && GameServer.enableWander);
 };
 
 Animal.prototype.isAggressive = function(){
-    return this.aggressive;
+    return (this.aggressive && GameServer.enableAggro);
 };
 
 Animal.prototype.setSpawnZone = function(zone){
