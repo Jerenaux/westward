@@ -1,3 +1,6 @@
+Bug: position of pruchase amount in shop
+Bug: weird notifs when equipping 16 arrows
+
 Admin
 Analytics
 Cleaning
@@ -102,6 +105,7 @@ Content:
 - Paths along most-travelled paths
 * Battle system
 - Use custom pathfinder to find battle cell (fulfill condition is a function rather than a specific cell)
+- Custom PF: don't cross cells occupied by other fighters
 - Get arrows back when skinning
 - Animals have sorted list of targets, iteratr through it when first one not reachable for some reason
 -> Deal with big battlefields; focus camera on active player (problem: if far away, surrounding AOIs not displayed), ...
@@ -122,10 +126,10 @@ Content:
 - Elections
 - Naming officials
 * Craftsmen gameplay
-- XP
 - Bonuses
 - Recipes
 - Tier
+- XP based on multiple factors
 - Upgrades
 - Naming
 - Quests
@@ -151,6 +155,8 @@ Content:
 - Inns
 - Quests
 * Misc
+- Display path xp
+- Levels
 - Fix continuous movement system
 - Events log
 - Fatigue
@@ -175,6 +181,7 @@ Content:
 - Set up stats of troops
 - Make troops engage enemies
 * Settlement economy
+Have hunter huts produce pelts, bones...
 Stop sending commit slots repeatedly
 Hide commit button when already committed
 Implement and test decommitment from db data

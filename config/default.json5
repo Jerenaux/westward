@@ -1,35 +1,41 @@
 // https://github.com/lorenwest/node-config/wiki/Configuration-Files
 {
-    pathdinfing: {
-        walkingSpeed: 5, // tiles/sec
-        battleRange: 3, // distance that can be travelled in one turn in battle
-        maxPathLength: 36
-    },
-    wildlife: {
-        aggro: true,
-        wander: true
-    },
-    economyCycles: {
+   classes: {
+        soldier: 0,
+        merchant: 1,
+        craftsman: 2,
+        explorer: 3
+   },
+   economyCycles: {
         // Unit: seconds
-        turnDuration: 10,
+        turnDuration: 60,
         // Unit: turns
         turns: {
             build: 1,
             foodConsumption: 8,
-            commitment: 1,
+            commitment: 10,
             production: 1,
             settlements: 1,
             spawnZones: 1
         }
     },
-    updateRates: {
-        // Unit: ms
-        client: 125,
-        walk: 50,
-        npc: 200
-    },
     misc: {
         foodID: 1,
         harvestEfficiency: 0.75 // % of resources that can be harvested from a source
+    },
+    pathdinfing: {
+            walkingSpeed: 5, // tiles/sec
+            battleRange: 3, // distance that can be travelled in one turn in battle
+            maxPathLength: 36
+    },
+    updateRates: {
+            // Unit: ms
+            client: 125,
+            walk: 50,
+            npc: 200
+    },
+    wildlife: {
+        aggro: true,
+        wander: true
     }
 }

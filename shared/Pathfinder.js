@@ -56,7 +56,7 @@ Pathfinder.prototype.findPath = function(from,to){
 
             this.addToOpenSet(neighbor);
         },this);
-        console.log(this.openSet.toString());
+        //console.log(this.openSet.toString());
     }
     return null;
 };

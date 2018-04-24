@@ -1171,6 +1171,8 @@ Engine.updateSelf = function(data){
     if(data.remainingTime) BattleManager.setCounter(data.remainingTime);
     if(data.activeID) BattleManager.manageTurn(data.activeID);
 
+    if(data.x >= 0 && data.y >= 0) Engine.player.teleport(data.x,data.y);
+
     updateEvents.forEach(function(e){
         Engine.updateMenus(e);
     });

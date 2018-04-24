@@ -43,7 +43,7 @@ var Stats = {
             desc: 'Indicates your base chances to hit a target with a ranged weapon. It depends on the currently equipped ranged weapon. In battle, this number decreases based on the distance of the target.',
             min: 0,
             max: 100,
-            start: 0,
+            start: 50,
             frame: 2,
             suffix: '%'
         },

@@ -96,11 +96,7 @@ GameServer.createModels = function(){
         prices: mongoose.Schema.Types.Mixed,
         gold: {type: Number, min: 0},
         built: Boolean,
-        progress: {type: Number, min: 0, max: 100}, // %
-        //committed: {type: Number, min: 0},
-        /*commitStamps: [Date],
-        lastBuildCycle: { type: Date, default: Date.now },
-        lastProdCycle: { type: Date, default: Date.now }*/
+        progress: {type: Number, min: 0, max: 100} // %
     });
     var playerSchema = mongoose.Schema({
         // TODO: think about ID
@@ -108,6 +104,7 @@ GameServer.createModels = function(){
         y: {type: Number, min: 0, required: true},
         gold: {type: Number, min: 0},
         civicxp: {type: Number, min: 0},
+        classxp: {type: Number, min: 0},
         class: {type: Number, min: 0},
         equipment: mongoose.Schema.Types.Mixed,
         commitSlots: mongoose.Schema.Types.Mixed,
@@ -163,6 +160,7 @@ GameServer.readMap = function(mapsPath,test){
 
     GameServer.enableWander = config.get('wildlife.wander');
     GameServer.enableAggro = config.get('wildlife.aggro');
+    GameServer.classes = config.get('classes');
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
@@ -633,11 +631,12 @@ GameServer.handleCraft = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var targetItem = data.id;
     var nb = data.nb;
-    var building = GameServer.itemsData[targetItem].building;
-    if(building) return;
+    //var building = GameServer.itemsData[targetItem].building;
+    //if(building) return;
     var recipe = GameServer.itemsData[targetItem].recipe;
     if(!GameServer.allIngredientsOwned(player,recipe,nb)) return;
     GameServer.operateCraft(player, recipe, targetItem, nb);
+    if(player.isCraftsman()) player.gainClassXP(5,true); // TODO: vary based on multiple factors
 };
 
 /*GameServer.handleBuild = function(data,socketID){

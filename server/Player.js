@@ -30,6 +30,7 @@ function Player(){
     this.inBuilding = -1;
     this.commitSlots = this.getCommitSlotsShell();
     this.civicxp = 0;
+    this.classxp = 0;
     this.setUpStats();
     this.equipment = new EquipmentManager();
     console.log(this.equipment);
@@ -62,6 +63,10 @@ Player.prototype.registerPlayer = function(){
 
 Player.prototype.setClass = function(classID){
     this.class = classID;
+};
+
+Player.prototype.isCraftsman = function(){
+    return this.class == GameServer.classes.craftsman;
 };
 
 Player.prototype.setSettlement = function(sid){
@@ -110,8 +115,12 @@ Player.prototype.die = function(){
 
 Player.prototype.spawn = function(x,y){ // todo: remove args
     var respawnLocation = this.settlement.respawnLocation;
-    this.setProperty('x', x || respawnLocation.x);
-    this.setProperty('y', y || respawnLocation.y);
+    var x = x || respawnLocation.x;
+    var y = y || respawnLocation.y;
+    this.setProperty('x', x);
+    this.setProperty('y', y);
+    this.updatePacket.x = x;
+    this.updatePacket.y = y;
     console.log('spawning at ',this.x,this.y);
 };
 
@@ -166,12 +175,6 @@ Player.prototype.updateCommitment = function(){
     this.syncCommitSlots();
 };
 
-/*Player.prototype.freeCommitmentSlot = function(){
-    var slot = this.removeSlot();
-    this.syncCommitSlots();
-    this.addNotif('Commitment to '+GameServer.buildings[slot.building].name+' ended');
-};*/
-
 Player.prototype.trimCommitSlots = function(){
     var slots = [];
     this.getSlots().forEach(function(slot){
@@ -201,7 +204,13 @@ Player.prototype.getSlots = function(){
 Player.prototype.gainCivicXP = function(inc,notify){
     this.civicxp = Utils.clamp(this.civicxp+inc,0,100);
     this.updatePacket.civicxp = this.civicxp;
-    if(notify) this.addNotif('+'+inc+' civic XP');
+    if(notify) this.addNotif('+'+inc+' Civic XP');
+};
+
+Player.prototype.gainClassXP = function(inc,notify){
+    this.classxp = Utils.clamp(this.classxp+inc,0,100);
+    this.updatePacket.classxp = this.classxp;
+    if(notify) this.addNotif('+'+inc+' Path XP');
 };
 
 Player.prototype.giveGold = function(nb,notify){
@@ -416,7 +425,7 @@ Player.prototype.applyEffect = function(stat,delta,notify){
 Player.prototype.initTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','gold','civicxp','class']; // list of properties relevant for the client
+    var broadcastProperties = ['id','gold','civicxp','class','classxp']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -448,9 +457,9 @@ Player.prototype.getDataFromDb = function(data){
     this.x = data.x;
     this.y = data.y;
     this.civicxp = data.civicxp;
+    this.classxp = data.classxp;
     this.setClass(data.class);
     // stats are not saved, see schema
-    // TODO: create an EquipmentManager
     /*for(var equip in Equipment.dict) {
         if (!Equipment.dict.hasOwnProperty(equip)) continue;
         var eq = Equipment.dict[equip];

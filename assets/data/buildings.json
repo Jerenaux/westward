@@ -139,7 +139,7 @@
     "icon": "hut",
     "mainMenu": "production",
     "displayProd": true,
-    "production": [[1,1]],
+    "production": [[1,2]],
     "buildRate":10,
     "entry": {
       "x": -3,
