@@ -35,6 +35,7 @@ function Player(){
     this.equipment = new EquipmentManager();
     console.log(this.equipment);
     this.fieldOfVision = [];
+    this.visitedAOIs = new Set();
     this.chatTimer = null;
     MovingEntity.call(this);
 }
@@ -63,6 +64,10 @@ Player.prototype.registerPlayer = function(){
 
 Player.prototype.setClass = function(classID){
     this.class = classID;
+};
+
+Player.prototype.isExplorer = function(){
+    return this.class == GameServer.classes.explorer;
 };
 
 Player.prototype.isCraftsman = function(){
@@ -482,6 +487,17 @@ Player.prototype.getDataFromDb = function(data){
 
 Player.prototype.setAction = function(action){
     this.action = action;
+};
+
+Player.prototype.onAOItransition = function(newAOI,previousAOI){
+    if(this.isExplorer()) {
+        if(!previousAOI) this.visitedAOIs.add(newAOI);
+        if(!this.visitedAOIs.has(newAOI)) {
+            this.visitedAOIs.add(newAOI);
+            this.addNotif('New area visited');
+            this.gainClassXP(5, true); // TODO: vary based on multiple factors
+        }
+    }
 };
 
 Player.prototype.onEndOfPath = function(){

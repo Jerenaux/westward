@@ -86,6 +86,17 @@ Utils.screenToMap = function(x,y,map){
 
 // ### Quadrant-related methods ###
 
+Utils.AOIcoordinates = function(aoi){
+    return {
+        x : (aoi%World.nbChunksHorizontal),
+        y : Math.floor(aoi/World.nbChunksHorizontal)
+    }
+};
+
+Utils.distanceBetweenAOIs = function(A,B){
+    return Utils.manhattan(Utils.AOIcoordinates(A),Utils.AOIcoordinates(B));
+};
+
 Utils.tileToQuadrant = function(x,y,quadW,quadH){
     if(!quadW) quadW = 10;
     if(!quadH) quadH = 10;

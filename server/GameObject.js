@@ -24,6 +24,7 @@ GameObject.prototype.setOrUpdateAOI = function(){
         this.aoi = newAOI;
         GameServer.addAtLocation(this);
         GameServer.handleAOItransition(this, previousAOI);
+        if(this.isPlayer) this.onAOItransition(newAOI,previousAOI);
     }
 };
 
@@ -42,6 +43,10 @@ GameObject.prototype.updateAOIs = function(property,value){
     AOIs.forEach(function(aoi){
         GameServer.updateAOIproperty(aoi,category,id,property,value);
     });
+};
+
+GameObject.prototype.getAOI = function(){
+    return this.aoi;
 };
 
 GameObject.prototype.setModel = function(model) {

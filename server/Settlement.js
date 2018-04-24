@@ -66,6 +66,10 @@ Settlement.prototype.registerFort = function(fort){
     };
 };
 
+Settlement.prototype.getAOI = function(){
+    return this.fort.getAOI();
+};
+
 Settlement.prototype.getFortGold = function(){
     return this.fort.getGold();
 };

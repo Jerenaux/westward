@@ -126,16 +126,19 @@ Content:
 - Elections
 - Naming officials
 * Craftsmen gameplay
-- Bonuses
 - Recipes
 - Tier
 - XP based on multiple factors
+- Bonuses
 - Upgrades
 - Naming
 - Quests
 * Explorer gameplay
-- XP
+- XP proportional to distance 
 - Bonuses
+- Reset visitted AOIs when going to fort
+- Reward only when checking in at fort? (more fun to get it on the go)
+- Do not grant XP for inhabitted AOIs (keep track of them somehow)
 - Fog of war
 - Map mechanics
 - Quests
