@@ -714,6 +714,10 @@ function Node(x, y, walkable) {
      * @type boolean
      */
     this.walkable = (walkable === undefined ? true : walkable);
+
+    this.toString = function(){
+        return "["+this.x+","+this.y+"] (f = "+this.f+", g = "+this.g+", h = "+this.h+")";
+    }
 }
 
 module.exports = Node;
@@ -1067,6 +1071,9 @@ AStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
     while (!openList.empty()) {
         // pop the position of node which has the minimum `f` value.
         node = openList.pop();
+        //console.log('Considering',node.toString());
+        log('log2','Considering '+node.toString());
+
         node.closed = true;
         if(++PF.consideredNodes > 1000) return [];
 
@@ -1112,6 +1119,7 @@ AStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
                 }
             }
         } // end for each neighbor
+        log('log2',openList.toArray().toString());
     } // end while not open list empty
 
     // fail to find the path

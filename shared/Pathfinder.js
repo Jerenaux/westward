@@ -32,7 +32,8 @@ Pathfinder.prototype.findPath = function(from,to){
         this.considered++;
 
         var minFNode = this.getMinFNode();
-        console.log('Considering ',minFNode.toString());
+        //console.log('Considering ',minFNode.toString());
+        log('log1','Considering '+minFNode.toString());
         if(minFNode.equals(end)) return this.backtrack(minFNode);
 
         if(minFNode.g > this.maxLength){
@@ -53,10 +54,12 @@ Pathfinder.prototype.findPath = function(from,to){
             this.cameFrom.add(neighbor.x,neighbor.y,minFNode);
             neighbor.setG(g);
             neighbor.setH(this.heuristic(neighbor,end));
+            if(this.allowDiagonal) neighbor.setI(this.manhattan(neighbor,end));
 
             this.addToOpenSet(neighbor);
         },this);
         //console.log(this.openSet.toString());
+        log('log1',this.openSet.toString());
     }
     return null;
 };
@@ -78,16 +81,25 @@ Pathfinder.prototype.getMinFNode = function(){
 };
 
 Pathfinder.prototype.addToOpenSet = function(node){
+    if(this.openCb) this.openCb(node.x,node.y);
     for(var i = 0; i < this.openSet.length; i++){
+        if(node.equals(this.openSet[i])) return;
         if(node.f < this.openSet[i].f){
             this.openSet.splice(i,0,node);
             return;
         }else if(node.f == this.openSet[i].f){
-            if(node.equals(this.openSet[i])) return;
+            if(node.h < this.openSet[i].h){
+                this.openSet.splice(i,0,node);
+                return;
+            }else if(node.h == this.openSet[i].h){
+                if(node.i < this.openSet[i].i){
+                    this.openSet.splice(i,0,node);
+                    return;
+                }
+            }
         }
     }
     this.openSet.push(node);
-    if(this.openCb) this.openCb(node.x,node.y);
 };
 
 Pathfinder.prototype.generateNeighbors = function(node){
@@ -125,7 +137,7 @@ Pathfinder.prototype.backtrack = function(node){
             var t4 = path[path.length - 4];
             if (Math.abs(node.x - t4.x) + Math.abs(node.y - t4.y) == 1) path.splice(path.length-3,2);
         }*/
-        //if(this.backtrackCb) this.backtrackCb(node.x, node.y);
+        if(this.backtrackCb) this.backtrackCb(node.x, node.y);
         node = this.cameFrom.get(node.x,node.y);
     }
 
@@ -135,6 +147,14 @@ Pathfinder.prototype.backtrack = function(node){
     return path.reverse();
 };
 
+Pathfinder.prototype.manhattan = function(A,B){
+    return Math.abs(A.x - B.x) + Math.abs(A.y - B.y);// - 2;
+};
+
+Pathfinder.prototype.chebyshev = function(A,B){
+    return Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
+};
+
 Pathfinder.prototype.heuristic = function(A,B){
     if(this.allowDiagonal){ // Squared Euclidean distance
         /*var dx = A.x - B.x;
@@ -142,9 +162,11 @@ Pathfinder.prototype.heuristic = function(A,B){
         return Math.sqrt(dx*dx + dy*dy);
         return dx*dx + dy*dy;*/
         // Chebyshev
-        return Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
+        //return Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
+        return this.chebyshev(A,B);
     }else { // Manhattan distance
-        return Math.abs(A.x - B.x) + Math.abs(A.y - B.y);// - 2;
+        //return Math.abs(A.x - B.x) + Math.abs(A.y - B.y);// - 2;
+        return this.manhattan(A,B);
     }
 };
 
@@ -153,11 +175,12 @@ function Node(x,y){
     this.y = y;
     this.g = Infinity;
     this.h = 0;
+    this.i = 0;
     this.f = Infinity;
 }
 
 Node.prototype.toString = function(){
-    return "["+this.x+","+this.y+"] (f = "+this.f+", g = "+this.g+", h = "+this.h+")";
+    return "["+this.x+","+this.y+"] (f = "+this.f+", g = "+this.g+", h = "+this.h+", i = "+this.i+")";
 };
 
 Node.prototype.setG = function(g){
@@ -169,6 +192,11 @@ Node.prototype.setG = function(g){
 Node.prototype.setH = function(h){
     this.h = h;
     this.updateF();
+};
+
+// Additional Manhattan-based heuristic to break ties
+Node.prototype.setI = function(i){
+    this.i = i;
 };
 
 Node.prototype.updateF = function(){

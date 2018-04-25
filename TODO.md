@@ -68,6 +68,7 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Use containers
 - Clean schemas
 - Use data registry for data exchange between scenes (see Phaser World 119)
 - Client-side, GameObject use tx and ty while Moving use tileX and tileY (and they both have a setPosition method)
@@ -258,6 +259,7 @@ Design document:
 Polish:
 ------
 Visual:
+- More dramatic apparition of battle tiles
 - Use sprite with animations
 - "Tip of the day"
 - Revamp class selection

@@ -7,9 +7,16 @@
 </head>
 <body>
 <canvas width="800" height="650" id="game"></canvas>
+<table style="vertical-align: top;">
+    <tr>
+        <td id="log1"></td>
+        <td id="log2"  style="vertical-align: top;"></td>
+    </tr>
+</table>
 </body>
 <script src="shared/SpaceMap.js" type="text/javascript"></script>
 <script src="shared/Pathfinder.js" type="text/javascript"></script>
+<script src="shared/pathfinding.js" type="text/javascript"></script>
 <script src="shared/Utils.js" type="text/javascript"></script>
 <script type="text/javascript">
 
@@ -40,14 +47,19 @@
     context.stroke();
 
     var grid = new SpaceMap();
-    var exclGrid = new SpaceMap();
-    exclGrid.add(4,2);
-    exclGrid.add(5,2);
+    var matrix = [];
+    for(var x = 0; x < 20; x++){
+        var col = [];
+        for(var y = 0; y < 20; y++){
+            col.push(0);
+        }
+        matrix.push(col);
+    }
 
     function blacken(tx,ty){
         context.fillStyle = "#000000";
         context.fillRect(tx*ts,ty*ts,ts,ts);
-        grid.add(tx,ty);
+        grid.add(tx,ty,1);
     }
 
     blacken(5,6);
@@ -96,6 +108,8 @@
         //console.log('Backtracking to',tx,ty);
         context.fillStyle = "#ffcc00";
         context.fillRect(tx*ts+1,ty*ts+1,ts-2,ts-2);
+        context.fillStyle = "#000000";
+        context.fillText(tx+","+ty,(tx*ts),(ty*ts)+10);
     }
 
     World = {
@@ -107,6 +121,19 @@
         var finder = new Pathfinder(grid,50,true);
         finder.setCallbacks(onOpen,onClose,onBacktrack);
         finder.findPath({x:sx,y:sy},{x:ex,y:ey});
+
+        console.log('#########################');
+
+        var refgrid = new PF.Grid(matrix);
+        var reffinder = new PF.AStarFinder({
+            allowDiagonal: true,
+            heuristic: PF.Heuristic.chebyshev
+        });
+        console.log(reffinder.findPath(sx, sy, ex, ey, refgrid).toString());
+    }
+
+    function log(field,txt){
+        document.getElementById(field).innerText += txt+"\n";
     }
 </script>
 </html>
