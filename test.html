@@ -9,8 +9,8 @@
 <canvas width="800" height="650" id="game"></canvas>
 <table style="vertical-align: top;">
     <tr>
-        <td id="log1"></td>
-        <td id="log2"  style="vertical-align: top;"></td>
+        <td id="log1" style="width: 450px;"></td>
+        <td id="log2"  style="width: 450px; vertical-align: top;"></td>
     </tr>
 </table>
 </body>
@@ -132,8 +132,9 @@
         console.log(reffinder.findPath(sx, sy, ex, ey, refgrid).toString());
     }
 
-    function log(field,txt){
-        document.getElementById(field).innerText += txt+"\n";
+    function log(field,txt,bold){
+        if(bold) txt = '<b>'+txt+'</b>';
+        document.getElementById(field).innerHTML += txt+"<br/>";
     }
 </script>
 </html>

@@ -17,12 +17,18 @@ Pathfinder.prototype.setCallbacks = function(openCb, closeCb, backtrackCb){
 };
 
 Pathfinder.prototype.findPath = function(from,to){
-    var start = new Node(from.x,from.y);
-    var end = new Node(to.x,to.y);
+    //TODO: cut corners, compare number of nodes considered between two approaches
+    // todo: replac with 'closed' flag?
     var closedSet = new SpaceMap(); // Set of nodes already evaluated
     this.openSet = []; // The list of currently discovered nodes that are not evaluated yet
+    // todo: replace with 'parent' fag?
     this.cameFrom = new SpaceMap(); // For each node, which node it can most efficiently be reached from
+    this.nodes = new SpaceMap();
     this.considered = 0;
+    /*var start = new Node(from.x,from.y);
+    var end = new Node(to.x,to.y);*/
+    var start = this.getNode(from.x,from.y);
+    var end = this.getNode(to.x,to.y);
 
     this.addToOpenSet(start);
     start.setG(0);
@@ -33,7 +39,7 @@ Pathfinder.prototype.findPath = function(from,to){
 
         var minFNode = this.getMinFNode();
         //console.log('Considering ',minFNode.toString());
-        log('log1','Considering '+minFNode.toString());
+        log('log1','Considering '+minFNode.toString(),true);
         if(minFNode.equals(end)) return this.backtrack(minFNode);
 
         if(minFNode.g > this.maxLength){
@@ -48,20 +54,32 @@ Pathfinder.prototype.findPath = function(from,to){
         neighbors.forEach(function(neighbor){
             if(closedSet.get(neighbor.x,neighbor.y)) return;
 
-            var g = minFNode.g + 1;
-            if(g >= neighbor.g) return;
+            //var g = minFNode.g + 1;
+            var g = minFNode.g + this.euclidean(minFNode,neighbor);
+            //if(g >= neighbor.g) return;
 
-            this.cameFrom.add(neighbor.x,neighbor.y,minFNode);
-            neighbor.setG(g);
-            neighbor.setH(this.heuristic(neighbor,end));
-            if(this.allowDiagonal) neighbor.setI(this.manhattan(neighbor,end));
+            //log('log1','Neighbor '+neighbor.toMiniString()+' : ng = '+g+" vs "+neighbor.g+", "+neighbor.opened);
+            if(!neighbor.opened || g < neighbor.g) {
+                this.cameFrom.add(neighbor.x, neighbor.y, minFNode);
+                //log('log1', 'Parent of ' + neighbor.toMiniString() + 'set to' + minFNode.toMiniString());
+                neighbor.setG(g);
+                neighbor.setH(this.heuristic(neighbor, end));
+                if (this.allowDiagonal) neighbor.setI(this.manhattan(neighbor, end));
 
-            this.addToOpenSet(neighbor);
+                if(!neighbor.opened) this.addToOpenSet(neighbor);
+            }
         },this);
-        //console.log(this.openSet.toString());
-        log('log1',this.openSet.toString());
+        //log('log1',this.openSet.toString());
     }
     return null;
+};
+
+Pathfinder.prototype.getNode = function(x,y){
+    var n = this.nodes.get(x,y);
+    if(n) return n;
+    var node = new Node(x,y);
+    this.nodes.add(x,y,node);
+    return node;
 };
 
 Pathfinder.prototype.getMinFNode = function(){
@@ -82,24 +100,26 @@ Pathfinder.prototype.getMinFNode = function(){
 
 Pathfinder.prototype.addToOpenSet = function(node){
     if(this.openCb) this.openCb(node.x,node.y);
+    var pos = this.openSet.length;
     for(var i = 0; i < this.openSet.length; i++){
         if(node.equals(this.openSet[i])) return;
         if(node.f < this.openSet[i].f){
-            this.openSet.splice(i,0,node);
-            return;
+            pos = i;
+            break;
         }else if(node.f == this.openSet[i].f){
             if(node.h < this.openSet[i].h){
-                this.openSet.splice(i,0,node);
-                return;
+                pos = i;
+                break;
             }else if(node.h == this.openSet[i].h){
                 if(node.i < this.openSet[i].i){
-                    this.openSet.splice(i,0,node);
-                    return;
+                    pos = i;
+                    break;
                 }
             }
         }
     }
-    this.openSet.push(node);
+    this.openSet.splice(pos,0,node);
+    node.opened = true;
 };
 
 Pathfinder.prototype.generateNeighbors = function(node){
@@ -113,7 +133,7 @@ Pathfinder.prototype.generateNeighbors = function(node){
 
     // TODO: add "cur corners" consideration
     offsets.forEach(function(o){
-        var n = new Node(node.x+o[0],node.y+o[1]);
+        var n = this.getNode(node.x+o[0],node.y+o[1]);
         if(this.isWalkable(n)) neighbors.push(n);
     },this);
     return neighbors;
@@ -155,6 +175,10 @@ Pathfinder.prototype.chebyshev = function(A,B){
     return Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
 };
 
+Pathfinder.prototype.euclidean = function(A,B){
+    return Math.sqrt(Math.pow(A.x-B.x,2)+Math.pow(A.y-B.y,2));
+};
+
 Pathfinder.prototype.heuristic = function(A,B){
     if(this.allowDiagonal){ // Squared Euclidean distance
         /*var dx = A.x - B.x;
@@ -177,10 +201,15 @@ function Node(x,y){
     this.h = 0;
     this.i = 0;
     this.f = Infinity;
+    this.opened = false;
 }
 
 Node.prototype.toString = function(){
-    return "["+this.x+","+this.y+"] (f = "+this.f+", g = "+this.g+", h = "+this.h+", i = "+this.i+")";
+    return "["+this.x+","+this.y+"] (f = "+this.f+", g = "+this.g+", h = "+this.h+", i = "+this.i+", "+this.opened+")";
+};
+
+Node.prototype.toMiniString = function(){
+    return "["+this.x+","+this.y+"]";
 };
 
 Node.prototype.setG = function(g){

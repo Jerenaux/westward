@@ -716,8 +716,12 @@ function Node(x, y, walkable) {
     this.walkable = (walkable === undefined ? true : walkable);
 
     this.toString = function(){
-        return "["+this.x+","+this.y+"] (f = "+this.f+", g = "+this.g+", h = "+this.h+")";
-    }
+        return "["+this.x+","+this.y+"] (f = "+this.f+", g = "+this.g+", h = "+this.h+", "+this.opened+")";
+    };
+
+    this.toMiniString = function(){
+        return "["+this.x+","+this.y+"]";
+    };
 }
 
 module.exports = Node;
@@ -1072,7 +1076,7 @@ AStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
         // pop the position of node which has the minimum `f` value.
         node = openList.pop();
         //console.log('Considering',node.toString());
-        log('log2','Considering '+node.toString());
+        if(typeof window !== 'undefined') log('log2','Considering '+node.toString(),true);
 
         node.closed = true;
         if(++PF.consideredNodes > 1000) return [];
@@ -1101,11 +1105,13 @@ AStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
 
             // check if the neighbor has not been inspected yet, or
             // can be reached with smaller cost from the current node
+            //if(typeof window !== 'undefined') log('log2','Neighbor '+neighbor.toMiniString()+' : ng = '+ng+" vs "+neighbor.g+", "+neighbor.opened);
             if (!neighbor.opened || ng < neighbor.g) {
                 neighbor.g = ng;
                 neighbor.h = neighbor.h || weight * heuristic(abs(x - endX), abs(y - endY));
                 neighbor.f = neighbor.g + neighbor.h;
                 neighbor.parent = node;
+                //if(typeof window !== 'undefined') log('log2','Parent of '+neighbor.toMiniString()+'set to '+node.toMiniString());
 
                 if (!neighbor.opened) {
                     openList.push(neighbor);
@@ -1119,7 +1125,7 @@ AStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
                 }
             }
         } // end for each neighbor
-        log('log2',openList.toArray().toString());
+        //if(typeof window !== 'undefined') log('log2',openList.toArray().toString());
     } // end while not open list empty
 
     // fail to find the path
