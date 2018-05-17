@@ -26,7 +26,7 @@ app.use(bodyParser.json());
 if(process.env.DEV == 1) app.use('/studio',express.static(__dirname + '/studio'));
 
 app.get('/',function(req,res){
-    res.sendFile(path.join(__dirname,'test.html'));
+    res.sendFile(path.join(__dirname,'index.html'));
 });
 
 app.get('/admin',function(req,res){
@@ -59,6 +59,7 @@ app.get('/admin/screenshots', function (req, res) {
 
 var POSThandlers = {
     'deletebuilding': gs.deleteBuilding,
+    'dump': gs.dump,
     'newbuilding': gs.insertNewBuilding,
     'setitem': gs.setBuildingItem,
     'setprice': gs.setBuildingPrice,

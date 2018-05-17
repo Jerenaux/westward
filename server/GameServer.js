@@ -1004,6 +1004,22 @@ GameServer.getScreenshots = function(res){
     });
 };
 
+GameServer.dump = function(){
+    GameServer.server.db.collection('buildings').find().toArray(function(err,docs){
+        if(err) throw err;
+        /*docs.forEach(function(doc){
+            console.log(JSON.stringify(doc));
+        });*/
+        fs.writeFile(pathmodule.join(__dirname,'..','buildingsdump.json'),JSON.stringify(docs),function(err){
+            if(err) throw err;
+            console.log('Buildings dumped');
+        });
+    });
+    return true;
+};
+
+// ########################
+
 GameServer.loadDummyWorld = function(){
     console.log('Creating test world');
     GameServer.spawnZones = [];

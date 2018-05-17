@@ -89,9 +89,13 @@
         </div>
     </div>
 
+    <button type="button" style="margin-bottom: 10px;" class="btn btn-primary" ng-click="dump()">
+        <!-- <span class="glyphicon glyphicon-edit"></span>-->Export
+    </button><br/>
+
     <div class="panel panel-default" ng-repeat="screenshot in screenshots">
         <div class="panel-heading">
-            {{screenshot.stamp | date}} @ ({{screenshot.player.x}}, {{screenshot.player.y}})
+            {{screenshot.stamp | date}} @ ({{screenshot.player.x}}, {{screenshot.player.y}}) | {{screenshot.browser}}
         </div>
         <div class="panel-body">
             <img class="bug-snap" data-ng-src="data:image/png;base64,{{screenshot.img | processImg}}"/>

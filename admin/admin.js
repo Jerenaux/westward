@@ -142,6 +142,13 @@ app.controller("mainCtrl", [
             }
         };
 
+        $scope.dump = function(){
+            $http.post("/admin/dump/").then(
+                function(res) {},
+                function(err){}
+                );
+        };
+
         setInterval(getData,90*1000);
     }
 ]);

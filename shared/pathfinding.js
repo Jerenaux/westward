@@ -1076,7 +1076,7 @@ AStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
         // pop the position of node which has the minimum `f` value.
         node = openList.pop();
         //console.log('Considering',node.toString());
-        if(typeof window !== 'undefined') log('log2','Considering '+node.toString(),true);
+        //if(typeof window !== 'undefined') log('log2','Considering '+node.toString(),true);
 
         node.closed = true;
         if(++PF.consideredNodes > 1000) return [];

@@ -30,7 +30,18 @@ var ItemSprite = new Phaser.Class({
         this.name = data.name;
         this.desc = data.desc;
         this.effects = data.effects;
-        if(callback) this.on('pointerup',callback.bind(this));
+        this.disabled = false;
+        if(callback) {
+            this.off('pointerup');
+            this.on('pointerup',callback.bind(this));
+        }
+    },
+
+    disable: function(){
+        if(this.disabled) return;
+        this.disabled = true;
+        this.setTexture(this.texture.key+'_gr',this.frame.name);
+        this.off('pointerup');
     },
 
     handleOver: function(){

@@ -34,10 +34,12 @@ ShopPanel.prototype.addInterface = function(){
     item.showTooltip = false;
     this.content.push(item);
 
-    var count = UI.scene.add.text(this.x+47,this.y+50, '0',  { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    // this.x+47,this.y+50
+    var count = UI.scene.add.text(slot.x+38,slot.y+40, '0',  { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     count.setVisible(false);
     count.setDepth(2);
     count.setScrollFactor(0);
+    count.setOrigin(1,1);
     this.content.push(count);
 
     var price = UI.scene.add.text(this.x+240,this.y+50, '0',  { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });

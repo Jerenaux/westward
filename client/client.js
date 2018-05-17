@@ -181,6 +181,6 @@ Client.sendMapData = function(id,data){
     Client.socket.emit('mapdata',{id:id,data:data});
 };
 
-Client.sendScreenshot = function(image){
-    Client.socket.emit('screenshot',{img:image});
+Client.sendScreenshot = function(image,browser){
+    Client.socket.emit('screenshot',{img:image,browser:browser});
 };

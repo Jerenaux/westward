@@ -25,8 +25,7 @@ Pathfinder.prototype.findPath = function(from,to){
     this.cameFrom = new SpaceMap(); // For each node, which node it can most efficiently be reached from
     this.nodes = new SpaceMap();
     this.considered = 0;
-    /*var start = new Node(from.x,from.y);
-    var end = new Node(to.x,to.y);*/
+
     var start = this.getNode(from.x,from.y);
     var end = this.getNode(to.x,to.y);
 

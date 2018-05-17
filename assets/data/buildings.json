@@ -6,6 +6,12 @@
       290, 395,
       0, 395
     ],
+    "base": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0
+    },
     "width": 300,
     "height": 398,
     "sprite": "fort",
@@ -19,32 +25,6 @@
     "entry": {
       "x": -4,
       "y": 6
-    }
-  },
-  "0_":{
-    "shape":[
-      53, 100,
-      230, 0,
-      465, 40,
-      520, 170,
-      525, 325,
-      350, 425,
-      107, 380,
-      47, 250
-    ],
-    "width": 550,
-    "height": 427,
-    "sprite": "fort",
-    "name":"Fort",
-    "mainMenu": "fort",
-    "fort": true,
-    "staff": true,
-    "icon": "fort",
-    "recipe": {"3":50},
-    "displayProd": false,
-    "entry": {
-      "x": 6,
-      "y": 5
     }
   },
   "1":{
@@ -93,15 +73,23 @@
   },
   "3":{
     "shape":[
-      100, 80,
-      320, 0,
-      475, 105,
-      480, 390,
-      240, 500,
-      80, 400
+      0, 100,
+      115, 0,
+      240, 100,
+      240, 210,
+      200, 275,
+      200, 410,
+      120, 450,
+      40, 410,
+      40, 275,
+      20, 210
     ],
-    "width": 488,
-    "height": 500,
+    "width": 244,
+    "height": 460,
+    "entry": {
+      "x": 3,
+      "y": 12
+    },
     "sprite": "tower",
     "recipe": {"3":60},
     "name":"Tower",
@@ -144,29 +132,6 @@
     "entry": {
       "x": -3,
       "y": 4
-    }
-  },
-  "_5":{
-    "shape": [
-      33, 60,
-      130, 0,
-      255, 80,
-      255,185,
-      155, 230,
-      40, 145
-    ],
-     "width": 256,
-    "height": 240,
-    "sprite": "hunterhut",
-    "name": "Hunter hut",
-    "icon": "hut",
-    "mainMenu": "production",
-    "displayProd": true,
-    "production": [[1,1]],
-    "buildRate":10,
-    "entry": {
-      "x": 0,
-      "y": 3
     }
   },
   "6":{

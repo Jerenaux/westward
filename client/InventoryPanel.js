@@ -105,21 +105,33 @@ InventoryPanel.prototype.getNextSprite = function(){
     return this.sprites[this.spritesCounter++];
 };
 
+InventoryPanel.prototype.hasHardFilter = function(){
+    return this.config.filter && this.config.hardFilter;
+};
+
+InventoryPanel.prototype.hasSoftFilter = function(){
+    return this.config.filter && !this.config.hardFilter;
+};
+
 InventoryPanel.prototype.displayInventory = function(){
     this.slots.forEach(function(s){
         s.setVisible(true);
     });
 
     var nbDisplayed = 0;
+    console.log(this.config.filter);
     for(var item in this.inventory.items){
         if(!this.inventory.items.hasOwnProperty(item)) continue;
         var amount = this.inventory.getNb(item);
         if(amount == 0) continue;
-        if(this.config.filter){
+        if(this.hasHardFilter()){
             if(!this.applyFilter(item)) continue;
         }
         var sprite = this.getNextSprite();
         sprite.item.setUp(item,Engine.itemsData[item],this.itemCallback);
+        if(this.hasSoftFilter()){
+            if(!this.applyFilter(item)) sprite.item.disable();
+        }
         sprite.item.setVisible(true);
         if(this.config.showNumbers){
             sprite.text.setText(amount);
@@ -180,6 +192,7 @@ InventoryPanel.prototype.setFilter = function(filter){
     this.config.filterItems = filter.items;
     this.config.filterKey = filter.key;
     this.config.filterProperty = filter.property;
+    this.config.hardFilter = filter.hard;
 };
 
 InventoryPanel.prototype.applyFilter = function(item){

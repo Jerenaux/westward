@@ -152,7 +152,6 @@ var Moving = new Phaser.Class({
     },
 
     teleport: function(x,y){
-        console.log('teleportin to',x,y);
         this.setPosition(x,y);
     },
 

@@ -1,5 +1,10 @@
-Bug: position of pruchase amount in shop
-Bug: weird notifs when equipping 16 arrows
+Priority:
+- Sound
+- (Mini)map
+- Background info (mail?)
+- Less empty 
+- Graphics
+- Refine distribution of pickup items
 
 Admin
 Analytics
@@ -30,11 +35,12 @@ V1 level:
 
 Admin
 -----
+Import db
+-> Iterate over import object, if matching id in db, update fields, if not, insert new entry 
+Maintenance mode
 Set gold
 Set coordinates
 Set settlement parameters
-Display last and *next* cycles
-Dump db
 Secure
 
 Analytics:
@@ -320,6 +326,7 @@ Custom chunk editor:
 - Preserve whatever extra info is in the JSON file (vs Tiled who rewrites it)
 - Versioning of individual chunks (saved in separate folder), for unlimited undos
 - Add random elements (w/ scripts to remove them):
+Building editor (set shapes etc.)
 -> Patches of dirt
 -> Tree decorations: flowers, stones, bushes
 - Add cliffs in empty areas

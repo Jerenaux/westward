@@ -64,6 +64,8 @@ Engine.preload = function() {
     this.load.atlas('aok', 'assets/sprites/aok.png', 'assets/sprites/aok.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
+    this.load.atlas('items_gr', 'assets/sprites/items_gr.png', 'assets/sprites/items.json');
+    this.load.atlas('items2_gr', 'assets/sprites/resources_full_gr.png', 'assets/sprites/resources_full.json');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
     this.load.image('tail', 'assets/sprites/tail.png');
@@ -79,7 +81,7 @@ Engine.preload = function() {
     this.load.spritesheet('death', 'assets/sprites/death.png',{frameWidth:48,frameHeight:48});
 
     this.load.json('buildings', 'assets/data/buildings.json');
-    this.load.json('items', 'assets/data/items.json');
+    this.load.json('itemsData', 'assets/data/items.json');
     this.load.json('animals', 'assets/data/animals.json');
 
     Engine.collidingTiles = []; // list of tile ids that collide (from tilesets.json)
@@ -223,7 +225,7 @@ Engine.create = function(){
 
     Engine.buildingsData = Engine.scene.cache.json.get('buildings');
     Engine.animalsData = Engine.scene.cache.json.get('animals');
-    Engine.itemsData = Engine.scene.cache.json.get('items');
+    Engine.itemsData = Engine.scene.cache.json.get('itemsData');
 
     Engine.createMarker();
 
@@ -597,7 +599,8 @@ Engine.makeBattleMenu = function(){
     items.setInventory(Engine.player.inventory,4,true,BattleManager.processInventoryClick);
     items.modifyFilter({
         type: 'property',
-        property: 'useInBattle'
+        property: 'useInBattle',
+        hard: true
     });
     battle.addPanel('items',items);
     var bar = new BigProgressBar(alignx,445,170,'red',true);
@@ -1021,17 +1024,17 @@ Engine.computePath = function(position){
     var start = Engine.player.getPFstart();
     if(Engine.player.moving) Engine.player.stop();
 
-    /*var path = Engine.PFfinder.findPath(start.x, start.y, x, y, Engine.PFgrid);
+    var path = Engine.PFfinder.findPath(start.x, start.y, x, y, Engine.PFgrid);
     PF.reset();
     if(path.length == 0 || path.length > PFUtils.maxPathLength) {
         Engine.handleMsg('It\'s too far!');
         return;
-    }*/
-    var path = Engine.newFinder.findPath(start,{x:x,y:y});
+    }
+    /*var path = Engine.newFinder.findPath(start,{x:x,y:y});
     if(!path) {
         Engine.handleMsg('It\'s too far!');
         return;
-    }
+    }*/
 
     var trim = PFUtils.trimPath(path,Engine.battleCellsMap);
     if(trim.trimmed) Engine.player.setDestinationAction(0);
@@ -1362,12 +1365,14 @@ Engine.enterBuilding = function(id){
         menu.panels['client'].modifyFilter({
             type: 'prices',
             items: building.prices,
-            key: 0
+            key: 0,
+            hard: false
         });
         menu.panels['shop'].modifyFilter({
             type: 'prices',
             items: building.prices,
-            key: 1
+            key: 1,
+            hard: true
         });
         menu.panels['client'].updateInventory();
         menu.panels['shop'].updateInventory();
@@ -1567,7 +1572,7 @@ Engine.leaveBuilding = function(){
 
 Engine.snap = function(){
     game.renderer.snapshot(function(img){
-        Client.sendScreenshot(img.src);
+        Client.sendScreenshot(img.src,detectBrowser());
     });
 };
 
@@ -1577,4 +1582,36 @@ function cl(){
 
 function s(){
     Client.socket.emit('ss');
+}
+
+function detectBrowser(){
+    // Opera 8.0+
+    var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+    if(isOpera) return 'Opera';
+
+    // Firefox 1.0+
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+    if(isFirefox) return 'Firefox';
+
+    // Safari 3.0+ "[object HTMLElementConstructor]"
+    var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || safari.pushNotification);
+    if(isSafari) return 'Safari';
+
+    // Internet Explorer 6-11
+    var isIE = /*@cc_on!@*/false || !!document.documentMode;
+    if(isIE) return 'IE';
+
+    // Edge 20+
+    var isEdge = !isIE && !!window.StyleMedia;
+    if(isEdge) return 'Edge';
+
+    // Chrome 1+
+    var isChrome = !!window.chrome && !!window.chrome.webstore;
+    if(isChrome) return 'Chrome';
+
+    // Blink engine detection
+    var isBlink = (isChrome || isOpera) && !!window.CSS;
+    if(isBlink) return 'Blink';
+
+    return 'unknown';
 }
