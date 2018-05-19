@@ -121,6 +121,7 @@ var Moving = new Phaser.Class({
     
     tileByTilePreUpdate: function(tween,targets,startX,startY,endX,endY){
         if(!this.scene) return; // quick fix before the bug gets fixed in Phaser
+        //if(this.isHero) console.warn('pre-start');
         this.currentTweenTo = {x:endX,y:endY};
 
         this.computeOrientation(startX,startY,endX,endY);
@@ -138,12 +139,14 @@ var Moving = new Phaser.Class({
 
     tileByTilePostUpdate: function(){
         if(!this.scene) return; // quick fix before the bug gets fixed in Phaser
+        //if(this.isHero) console.warn('post-start');
 
         var tx = Math.floor(this.x/Engine.tileWidth);
         var ty = Math.floor(this.y/Engine.tileHeight);
         this.updatePosition(tx,ty);
 
         this.leaveFootprint();
+        this.playSound();
 
         if(this.flagForStop || (this.stopPos && this.stopPos.x == tx && this.stopPos.y == ty)){
             this.movement.stop();
@@ -238,17 +241,13 @@ var Moving = new Phaser.Class({
         print.setPosition(sx,sy);
 
         // Angle
-        var dx = this.tileX - this.previousPosition.tx;
-        var dy = this.tileY - this.previousPosition.ty;
-
-        var angle = 0; // clockwise rotations
-        if(dx == 1 && dy == 0){ // went right
-            angle = 90;
-        }else if(dx == -1 && dy == 0){ // went left
-            angle = -90
-        }else if(dx == 0 && dy == 1){ // went down
-            angle = 180;
-        }
+        var angles = {
+            'up': 0,
+            'down': 180,
+            'left': -90,
+            'right': 90
+        };
+        var angle = angles[this.orientation];
         print.angle = angle;
 
         //Flip
@@ -267,5 +266,22 @@ var Moving = new Phaser.Class({
                 print.recycle();
             }
         });
+
+    },
+
+    playSound: function(){
+        var maxVolume = 5;
+        var volume = maxVolume;
+        if(!this.isHero){
+            var dist = Utils.manhattan({x:this.tileX,y:this.tileY},{x:Engine.player.tileX,y:Engine.player.tileY});
+            var hearingDistance = 30;
+            if(dist < hearingDistance){
+                var d = hearingDistance-dist;
+                volume = Math.round(Utils.clamp(d/hearingDistance,0,1)*maxVolume);
+            }else{
+                volume = 0;
+            }
+        }
+        if(volume > 0) Engine.audio.footsteps.setVolume(volume).play();
     }
 });

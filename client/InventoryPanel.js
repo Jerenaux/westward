@@ -119,7 +119,6 @@ InventoryPanel.prototype.displayInventory = function(){
     });
 
     var nbDisplayed = 0;
-    console.log(this.config.filter);
     for(var item in this.inventory.items){
         if(!this.inventory.items.hasOwnProperty(item)) continue;
         var amount = this.inventory.getNb(item);

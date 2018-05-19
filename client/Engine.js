@@ -40,6 +40,8 @@ Engine.preload = function() {
     this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('faces', 'assets/sprites/faces.png',{frameWidth:32,frameHeight:32});
 
+    this.load.audio('footsteps','assets/sfx/footsteps.wav');
+
     this.load.spritesheet('footsteps', 'assets/sprites/footstepssheet.png',{frameWidth:16,frameHeight:16});
     this.load.image('bug', 'assets/sprites/bug.png');
 
@@ -181,6 +183,7 @@ Pool.prototype.recycle = function(element){
 
 Engine.create = function(){
     Engine.scene = this.scene.scene;
+
     var masterData = Boot.masterData;
     World.readMasterData(masterData);
     Engine.nbLayers = masterData.nbLayers;
@@ -228,6 +231,8 @@ Engine.create = function(){
     Engine.itemsData = Engine.scene.cache.json.get('itemsData');
 
     Engine.createMarker();
+    Engine.createAnimations();
+    Engine.createSounds();
 
     Engine.dragging = false;
     Engine.interrupt = false;
@@ -288,7 +293,6 @@ Engine.initWorld = function(data){
     Engine.settlementsData = data.settlements;
     Engine.addHero(data);
     Engine.makeUI();
-    Engine.createAnimations();
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
@@ -304,6 +308,15 @@ Engine.initWorld = function(data){
         panel.addBigButton('Got it');
         panel.display();
     }
+};
+
+Engine.createSounds = function(){
+    Engine.audio = {};
+    Engine.audio.footsteps = Engine.scene.sound.add('footsteps');
+
+    /*var sound = Engine.scene.sound.add('footsteps');
+    console.log(sound);
+    sound.setLoop(true).play();*/
 };
 
 Engine.createAnimations = function(){
@@ -1582,6 +1595,10 @@ function cl(){
 
 function s(){
     Client.socket.emit('ss');
+}
+
+function soundtest(){
+    Engine.audio.footsteps.play();
 }
 
 function detectBrowser(){
