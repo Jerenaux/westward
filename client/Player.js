@@ -107,6 +107,7 @@ var Player = new Phaser.Class({
         console.log('Talking');
         this.bubble.update(text);
         this.bubble.display();
+        Engine.audio.speech.play();
     },
 
     // ### SETTERS ####

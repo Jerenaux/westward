@@ -21,6 +21,9 @@ var UI = {
         this.load.json('texts', 'assets/data/texts.json');
         this.load.json('classes', 'assets/data/classes.json');
 
+        this.load.audio('click','assets/sfx/click.wav');
+        this.load.audio('error','assets/sfx/error.wav');
+
         if(Client.isNewPlayer()) {
             this.load.image('bigbg', 'assets/sprites/bigbg.png');
             this.load.image('worldmap', 'assets/sprites/worldmap.png');
@@ -61,6 +64,8 @@ var UI = {
         });*/
         if(Client.isNewPlayer()) UI.classMenu = UI.makeClassMenu();
 
+        UI.createSounds();
+
         this.scene.get('boot').updateReadyTick();
     },
 
@@ -75,7 +80,12 @@ var UI = {
     }
 };
 
-// TODO: test two quick waves
+UI.createSounds = function(){
+    UI.audio = {};
+    UI.audio.click = UI.scene.sound.add('click');
+    UI.audio.error = UI.scene.sound.add('error');
+};
+
 UI.handleNotifications = function(msgs){
     if(UI.runningNotifications){
         setTimeout(UI.handleNotifications,UI.runningNotifications*10,msgs);

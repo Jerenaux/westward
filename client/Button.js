@@ -30,10 +30,13 @@ var Button = new Phaser.Class({
 
     handleClick: function(){
         if(!this.callback) return;
-        if(!this.enabled) return;
+        if(!this.enabled){
+            UI.audio.error.play();
+            return;
+        }
         this.setFrame(this.currentFrame);
         this.callback();
-        //Engine.interrupt = true;
+        UI.audio.click.play();
     },
 
     enable: function(){

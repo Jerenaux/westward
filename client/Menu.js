@@ -17,6 +17,10 @@ Menu.prototype.makeTitle = function(title){
     this.title.setButton(this.hide.bind(this));
 };
 
+Menu.prototype.setSound = function(sound){
+    this.sound = sound;
+};
+
 Menu.prototype.addPanel = function(name,panel,hideOnOpen){
     this.panels[name] = panel;
     panel.name = name;
@@ -50,6 +54,7 @@ Menu.prototype.display = function(){
     if(Engine.chatBar && Engine.chatBar.displayed) Engine.chatBar.hide();
 
     if(!Engine.inBuilding && this.title) this.title.display();
+    if(this.sound) this.sound.play();
 
     Engine.currentMenu = this;
     for(var p in this.panels){

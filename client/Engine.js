@@ -41,6 +41,9 @@ Engine.preload = function() {
     this.load.spritesheet('faces', 'assets/sprites/faces.png',{frameWidth:32,frameHeight:32});
 
     this.load.audio('footsteps','assets/sfx/footsteps.wav');
+    this.load.audio('sellbuy','assets/sfx/sell_buy_item.wav');
+    this.load.audio('speech','assets/sfx/speech.ogg');
+    this.load.audio('inventory','assets/sfx/leather_inventory.wav');
 
     this.load.spritesheet('footsteps', 'assets/sprites/footstepssheet.png',{frameWidth:16,frameHeight:16});
     this.load.image('bug', 'assets/sprites/bug.png');
@@ -313,6 +316,9 @@ Engine.initWorld = function(data){
 Engine.createSounds = function(){
     Engine.audio = {};
     Engine.audio.footsteps = Engine.scene.sound.add('footsteps');
+    Engine.audio.sellBuy = Engine.scene.sound.add('sellbuy');
+    Engine.audio.speech = Engine.scene.sound.add('speech');
+    Engine.audio.inventory = Engine.scene.sound.add('inventory');
 
     /*var sound = Engine.scene.sound.add('footsteps');
     console.log(sound);
@@ -805,6 +811,7 @@ Engine.makeTradeMenu = function(){
     });
     trade.addEvent('onUpdateGold',function(){
         client.updateCapsule('gold',Engine.player.gold);
+        Engine.audio.sellBuy.play();
         action.update();
     });
     trade.addEvent('onUpdateShopGold',function(){
@@ -842,6 +849,7 @@ Engine.makeCraftingMenu = function(){
 
 Engine.makeInventory = function(statsPanel){
     var inventory = new Menu('Inventory');
+    inventory.setSound(Engine.audio.inventory);
     var items = new InventoryPanel(40,100,600,380,'Items');
     items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
     items.addCapsule('gold',100,-9,'999','gold');
