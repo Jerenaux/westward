@@ -74,6 +74,7 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Refactor building management, shapes, positioning... (from bottom-left)
 - Use containers
 - Clean schemas
 - Use data registry for data exchange between scenes (see Phaser World 119)

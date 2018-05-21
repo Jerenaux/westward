@@ -67,7 +67,7 @@ BigButton.prototype.handleDown = function(){
 BigButton.prototype.handleClick = function(){
     if(Date.now() - this.lastClick > 500){
         this.callback();
-        UI.audio.click.play();
+        UI.scene.sound.add('click').play();
         this.lastClick = Date.now();
     }
     this.handleOver();

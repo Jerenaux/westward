@@ -282,6 +282,6 @@ var Moving = new Phaser.Class({
                 volume = 0;
             }
         }
-        if(volume > 0) Engine.audio.footsteps.setVolume(volume).play();
+        Engine.scene.sound.add('footsteps').setVolume(volume).play();
     }
 });

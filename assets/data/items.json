@@ -20,7 +20,8 @@
     "ammo": "quiver",
     "effects":{"acc":20},
     "recipe": {"7":1,"21":1},
-    "useInBattle": true
+    "useInBattle": true,
+    "sound": "cloth"
   },
   "3":{
     "atlas": "items2",
@@ -53,7 +54,8 @@
     "effects":{"hp":100},
     "useInBattle": true,
     "isCrafted": true,
-    "craftTier": 2
+    "craftTier": 2,
+    "sound": "alchemy"
   },
   "7":{
     "atlas": "items",
@@ -104,7 +106,8 @@
     "frame":"shield1",
     "name": "Wooden shield",
     "equipment": "shield",
-    "effects":{"def":2}
+    "effects":{"def":2},
+    "sound": "equip"
   },
   "14":{
     "atlas": "items2",
@@ -151,7 +154,8 @@
     "equipment": "quiver",
     "capacity": 10,
     "desc": "Can contain up to 10 arrows",
-    "useInBattle": true
+    "useInBattle": true,
+    "sound": "cloth"
   },
   "20":{
     "atlas": "items",
@@ -160,7 +164,8 @@
     "equipment": "arrows",
     "effects":{"rdmg":12},
     "ammo": "quiver",
-    "useInBattle": true
+    "useInBattle": true,
+    "sound": "woodsmall"
   },
   "21":{
     "atlas": "items",
@@ -214,7 +219,8 @@
     "recipe":{"7":1,"21":1,"26":1},
     "equipment": "meleew",
     "effects":{"mdmg":5},
-    "useInBattle": true
+    "useInBattle": true,
+    "sound": "equip"
   },
   "29":{
     "atlas": "items",
@@ -227,7 +233,8 @@
     "isEquipment": true,
     "isCrafted": true,
     "crafTier": 1,
-    "recipe":{"7":1,"27":1,"30":4}
+    "recipe":{"7":1,"27":1,"30":4},
+    "sound": "woodsmall"
   },
   "30":{
     "atlas": "items2",

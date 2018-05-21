@@ -64,8 +64,6 @@ var UI = {
         });*/
         if(Client.isNewPlayer()) UI.classMenu = UI.makeClassMenu();
 
-        UI.createSounds();
-
         this.scene.get('boot').updateReadyTick();
     },
 
@@ -78,12 +76,6 @@ var UI = {
         panel.addBigButton('Got it');
         return panel;
     }
-};
-
-UI.createSounds = function(){
-    UI.audio = {};
-    UI.audio.click = UI.scene.sound.add('click');
-    UI.audio.error = UI.scene.sound.add('error');
 };
 
 UI.handleNotifications = function(msgs){

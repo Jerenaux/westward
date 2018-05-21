@@ -31,12 +31,12 @@ var Button = new Phaser.Class({
     handleClick: function(){
         if(!this.callback) return;
         if(!this.enabled){
-            UI.audio.error.play();
+            UI.scene.sound.add('error').play();
             return;
         }
         this.setFrame(this.currentFrame);
         this.callback();
-        UI.audio.click.play();
+        UI.scene.sound.add('click').play();
     },
 
     enable: function(){

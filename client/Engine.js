@@ -33,17 +33,28 @@ var Engine = {
     }
 };
 
-
 Engine.preload = function() {
     Engine.useTilemaps = false;
 
     this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('faces', 'assets/sprites/faces.png',{frameWidth:32,frameHeight:32});
 
+    Engine.audioFiles = [];
     this.load.audio('footsteps','assets/sfx/footsteps.wav');
     this.load.audio('sellbuy','assets/sfx/sell_buy_item.wav');
     this.load.audio('speech','assets/sfx/speech.ogg');
     this.load.audio('inventory','assets/sfx/leather_inventory.wav');
+    this.load.audio('crafting','assets/sfx/metal-clash.wav');
+    this.load.audio('page_turn','assets/sfx/turn_page.wav');
+    this.load.audio('equip','assets/sfx/chainmail1.wav');
+    this.load.audio('cloth','assets/sfx/cloth.wav');
+    this.load.audio('woodsmall','assets/sfx/wood-small.wav');
+    this.load.audio('alchemy','assets/sfx/alchemy.wav');
+    this.load.audio('birds1','assets/sfx/birds1.wav');
+    this.load.audio('birds2','assets/sfx/birds2.wav');
+    this.load.audio('birds3','assets/sfx/birds3.wav');
+    this.load.audio('raven','assets/sfx/raven.wav');
+    this.load.audio('bubbles','assets/sfx/bubbles.wav');
 
     this.load.spritesheet('footsteps', 'assets/sprites/footstepssheet.png',{frameWidth:16,frameHeight:16});
     this.load.image('bug', 'assets/sprites/bug.png');
@@ -235,7 +246,6 @@ Engine.create = function(){
 
     Engine.createMarker();
     Engine.createAnimations();
-    Engine.createSounds();
 
     Engine.dragging = false;
     Engine.interrupt = false;
@@ -291,6 +301,7 @@ Engine.createMarker = function(){
 
 Engine.initWorld = function(data){
     Engine.animalUpdates = new ListMap(); // debug purpose, remove
+    Engine.firstSelfUpdate = true;
 
     console.log(data);
     Engine.settlementsData = data.settlements;
@@ -311,19 +322,42 @@ Engine.initWorld = function(data){
         panel.addBigButton('Got it');
         panel.display();
     }
+
+    // todo: move to config file
+    var ambient = [
+        {name:'birds1',volume:1},
+        {name:'birds2',volume:1},
+        {name:'birds3',volume:1},
+        {name:'raven',volume:0.1}
+    ];
+    setInterval(function(){
+        var sound = Utils.randomElement(ambient);
+        Engine.scene.sound.add(sound.name).setVolume(sound.volume).play();
+    },10000);
 };
 
-Engine.createSounds = function(){
+/*Engine.createSounds = function(){
     Engine.audio = {};
     Engine.audio.footsteps = Engine.scene.sound.add('footsteps');
     Engine.audio.sellBuy = Engine.scene.sound.add('sellbuy');
     Engine.audio.speech = Engine.scene.sound.add('speech');
     Engine.audio.inventory = Engine.scene.sound.add('inventory');
+    Engine.audio.crafting = Engine.scene.sound.add('crafting');
+    Engine.audio.character = Engine.scene.sound.add('page_turn');
+    Engine.audio.equip = Engine.scene.sound.add('equip');
+    Engine.audio.cloth = Engine.scene.sound.add('cloth');
+    Engine.audio.woodsmall = Engine.scene.sound.add('woodsmall');
+    Engine.audio.alchemy = Engine.scene.sound.add('alchemy');
+    Engine.audio.birds1 = Engine.scene.sound.add('birds1');
+    Engine.audio.birds2 = Engine.scene.sound.add('birds2');
+    Engine.audio.birds3 = Engine.scene.sound.add('birds3');
+    Engine.audio.raven = Engine.scene.sound.add('raven');
+    Engine.audio.bubbles = Engine.scene.sound.add('bubbles');
 
-    /*var sound = Engine.scene.sound.add('footsteps');
+    var sound = Engine.scene.sound.add('footsteps');
     console.log(sound);
-    sound.setLoop(true).play();*/
-};
+    sound.setLoop(true).play();
+};*/
 
 Engine.createAnimations = function(){
     Engine.createWalkAnimation('player_move_right','hero',5,8);
@@ -811,7 +845,7 @@ Engine.makeTradeMenu = function(){
     });
     trade.addEvent('onUpdateGold',function(){
         client.updateCapsule('gold',Engine.player.gold);
-        Engine.audio.sellBuy.play();
+        Engine.scene.sound.add('sellbuy').play();
         action.update();
     });
     trade.addEvent('onUpdateShopGold',function(){
@@ -823,6 +857,7 @@ Engine.makeTradeMenu = function(){
 
 Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
+    crafting.setSound(Engine.scene.sound.add('crafting'));
     var recipes = new InventoryPanel(765,100,235,380,'Recipes');
     recipes.setInventory(Engine.player.itemRecipes,4,false,Engine.recipeClick);
     recipes.addButton(205, 8, 'blue','help',null,'',UI.textsData['recipes_help']);
@@ -849,7 +884,7 @@ Engine.makeCraftingMenu = function(){
 
 Engine.makeInventory = function(statsPanel){
     var inventory = new Menu('Inventory');
-    inventory.setSound(Engine.audio.inventory);
+    inventory.setSound(Engine.scene.sound.add('inventory'));
     var items = new InventoryPanel(40,100,600,380,'Items');
     items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
     items.addCapsule('gold',100,-9,'999','gold');
@@ -883,6 +918,7 @@ Engine.makeCharacterMenu = function(statsPanel){
     var commitx = todox - padding - commitw;
     var commity = infoy;
     var character = new Menu('Character');
+    character.setSound(Engine.scene.sound.add('page_turn'));
     var infoPanel = new CharacterPanel(infox,infoy,330,infoh,'<Player name>');
     infoPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['status_help']);
     character.addPanel('info',infoPanel);
@@ -1145,6 +1181,13 @@ Engine.updateSelf = function(data){
     if(data.items) {
         Engine.player.inventory.updateItems(data.items);
         updateEvents.add('inv');
+        if(!Engine.firstSelfUpdate) {
+            data.items.forEach(function (item) {
+                var sound = Engine.itemsData[item[0]].sound;
+                //if (sound) Engine.audio[sound].play();
+                if(sound) Engine.scene.sound.add(sound).play();
+            });
+        }
     }
     if(data.stats){
         for(var i = 0; i < data.stats.length; i++){
@@ -1200,6 +1243,8 @@ Engine.updateSelf = function(data){
     updateEvents.forEach(function(e){
         Engine.updateMenus(e);
     });
+
+    Engine.firstSelfUpdate = false;
 };
 
 Engine.updateAmmo = function(slot,nb){
@@ -1208,7 +1253,6 @@ Engine.updateAmmo = function(slot,nb){
 };
 
 Engine.updateEquipment = function(slot,item){
-    //Engine.player.equipment[slot][subSlot] = item;
     Engine.player.equipment.set(slot,item);
 };
 
@@ -1374,6 +1418,8 @@ Engine.enterBuilding = function(id){
         menus.push(Engine.menus.construction);
     }
 
+    if(menus.length == 0) return;
+
     menus.forEach(function(m){
         m.displayIcon();
     });
@@ -1538,6 +1584,8 @@ Engine.togglePanel = function(){ // When clicking on a player/building/animal, t
 
 Engine.recipeClick = function(){
     Engine.menus['crafting'].panels['combi'].setUp(this.itemID);
+    var sound = Engine.itemsData[this.itemID].sound;
+    if(sound) Engine.audio[sound].play();
 };
 
 Engine.newbuildingClick = function(){
