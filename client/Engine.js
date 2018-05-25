@@ -68,6 +68,7 @@ Engine.preload = function() {
     this.load.image('backpack', 'assets/sprites/backpack.png');
     this.load.image('coin', 'assets/sprites/coin.png');
     this.load.image('map', 'assets/sprites/map.png');
+    this.load.image('self_map', 'assets/sprites/self_map.png');
     this.load.image('hammer', 'assets/sprites/hammer.png');
     this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
 
@@ -346,6 +347,7 @@ Engine.createAnimations = function(){
     Engine.createWalkAnimation('player_move_down','hero',130,138,15);
     Engine.createWalkAnimation('player_move_left','hero',117,125,15);
     // TODO: reverse them
+    // TODO: add death
     Engine.createAttackAnimation('player_attack_right','hero',195,200);
     Engine.createAttackAnimation('player_attack_down','hero',182,187);
     Engine.createAttackAnimation('player_attack_left','hero',169,174);
@@ -374,15 +376,11 @@ Engine.createAnimations = function(){
             sprite.recycle();
         }
     });
+
     Engine.scene.anims.create(config = {
-        key: 'death',
-        frames: Engine.scene.anims.generateFrameNumbers('death', { start: 0, end: 5}),
-        frameRate: 15,
-        hideOnComplete: true,
-        // TODO: test if callback still called after v3.3
-        onComplete: function(sprite){
-            sprite.recycle();
-        }
+        key: 'player_death',
+        frames: Engine.scene.anims.generateFrameNumbers('hero', { start: 260, end: 265}),
+        frameRate: 10
     });
 };
 
@@ -425,7 +423,7 @@ Engine.hasFreeCommitSlot = function(){
     return Engine.getCommitSlots().length < Engine.player.commitSlots.max;
 };
 
-Engine.deathAnimation = function(target){
+/*Engine.deathAnimation = function(target){
     var anim = Engine.animationsPools['death'].getNext();
     anim.setPosition(target.x+48,target.y+48);
     anim.setVisible(true);
@@ -433,7 +431,7 @@ Engine.deathAnimation = function(target){
     anim.setDepth(target.depth+1);
     anim.anims.play('death');
     target.setVisible(false);
-};
+};*/
 
 Engine.manageDeath = function(){
     Engine.dead = true;
@@ -453,7 +451,6 @@ Engine.makeBuildingTitle = function(){
 
 Engine.makeUI = function(){
     Engine.UIHolder = new UIHolder(1000,500,'right');
-    Engine.UIHolder.resize(115);
 
     var bug = UI.scene.add.image(Engine.getGameConfig().width-10,10,'bug');
     bug.setOrigin(1,0);
@@ -487,8 +484,10 @@ Engine.makeUI = function(){
 
     var UIelements = [];
     var gap = 50;
-    var x = 930;
-    var y = 500;
+    var x = 960;
+    var y = 535;
+    UIelements.push(new UIElement(x,y,'self_map',null,Engine.menus.character));
+    x -= gap;
     UIelements.push(new UIElement(x,y,'scroll',null,Engine.menus.character));
     x -= gap;
     UIelements.push(new UIElement(x,y,'tools',null,Engine.menus.crafting));
@@ -496,6 +495,8 @@ Engine.makeUI = function(){
     UIelements.push(new UIElement(x,y,'backpack',null,Engine.menus.inventory));
     x -= gap;
     Engine.UIelements = UIelements;
+    Engine.UIHolder.resize(Engine.getHolderSize());
+
     Engine.addMenuIcon(x,y,'coin',Engine.menus.trade);
     Engine.addMenuIcon(x,y,'map',Engine.menus.fort);
     Engine.addMenuIcon(x,y,'hammer',Engine.menus.construction);
@@ -510,9 +511,6 @@ Engine.makeUI = function(){
     var chath = 50;
     var chaty = Engine.getGameConfig().height - chath;
     Engine.chatBar = new ChatPanel(0,chaty,chatw,chath,'Chat');
-
-    //Engine.testBar = new MiniProgressBar(20,20,300);
-    //Engine.testBar.display();
 };
 
 Engine.addMenuIcon = function(x,y,frame,menu){

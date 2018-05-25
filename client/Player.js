@@ -49,7 +49,8 @@ var Player = new Phaser.Class({
 
     update: function(data){
         console.log('updating player');
-        console.log(data);
+
+        if(data.x >= 0 && data.y >= 0) this.teleport(data.x,data.y);
 
         var callbacks = {
             'dead': this.processDeath,
@@ -66,9 +67,7 @@ var Player = new Phaser.Class({
         }
 
         Engine.handleBattleUpdates(this,data);
-        //TODO: move these to callbacks loop
         if(!this.isHero && data.chat) this.talk(data.chat);
-        if(data.x >= 0 && data.y >= 0) this.teleport(data.x,data.y);
         this.firstUpdate = false;
     },
 
@@ -78,13 +77,16 @@ var Player = new Phaser.Class({
     },
 
     die: function(showAnim){
-        if(showAnim) Engine.deathAnimation(this);
         if(this.bubble) this.bubble.hide();
-        this.setVisible(false);
+        if(showAnim){
+            this.play(this.animPrefix+'_death');
+        }else{
+            this.setVisible(false);
+        }
     },
 
     respawn: function(){
-        Engine.deathAnimation(this);
+        //Engine.deathAnimation(this);
         this.setVisible(true);
     },
 

@@ -3,15 +3,10 @@ Priority:
 -> Make full invetory of available sfx by types
 -> Dipatch them in-game
 - Graphics (30min/day)
--> Make design doc
--> Draw building locations on scene
--> Draw draft of fort, workshop, trade post
--> Scan, add to design doc + screens of inspiration
 - Map
 -> Ask background scroll to Tom (1000x400)
 - Background info (mail?)
 - Refine distribution of pickup items
-- Add improved character sheet
 
 Admin
 Analytics
@@ -139,6 +134,8 @@ Content:
 - Accommodate NPC
 * Civics
 - Civic levels
+- Change settlement
+- Update population based on players
 - Elections
 - Naming officials
 * Craftsmen gameplay
@@ -186,6 +183,7 @@ Content:
 -> Future: custom markers, not synced
 -> Future: markes about animal and plant populations, synced with fort, can be enabled/disabled on map
 - Quests
+- Civic XP when synchronizing enemy camps
 * Inventory
 - In shops, filter-out bought/sold items by graying them, but still display
 - Dropping items
@@ -265,6 +263,7 @@ Add checkboxes for what should be boiled or grinded
 - Salaries for officials, taxes
 - New buildings
 - Dev levels
+- Lists of items rewarded by civic xp
 * Soldier gameplay
 - XP
 - Bonuses
