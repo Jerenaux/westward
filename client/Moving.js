@@ -128,7 +128,7 @@ var Moving = new Phaser.Class({
 
         if(this.orientation != this.previousOrientation){
             this.previousOrientation = this.orientation;
-            this.play(this.walkAnimPrefix+'_move_'+this.orientation);
+            this.play(this.animPrefix+'_move_'+this.orientation);
         }
 
         if(this.isHero){

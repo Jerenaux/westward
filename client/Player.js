@@ -12,22 +12,23 @@ var Player = new Phaser.Class({
         this.entityType = 'player';
 
         this.setTexture('hero');
-        this.setFrame(33);
         this.setOrigin(0.2,0.5);
         this.firstUpdate = true;
 
         this.bubbleOffsetX = 55;
         this.bubbleOffsetY = 75;
 
-        this.walkAnimPrefix = 'player';
+        this.animPrefix = 'player';
         this.footprintsFrame = 0;
+        this.printsVertOffset = 10;
 
         this.restingFrames = {
-            up: 20,
-            down: 33,
-            left: 52,
-            right: 7
+            up: 104,
+            down: 130,
+            left: 117,
+            right: 143
         };
+        this.setFrame(this.restingFrames.down);
 
         this.destinationAction = null;
 
@@ -48,12 +49,14 @@ var Player = new Phaser.Class({
 
     update: function(data){
         console.log('updating player');
+        console.log(data);
 
         var callbacks = {
             'dead': this.processDeath,
-            'facing': this.setOrientation,
             'inBuilding': this.processBuilding,
+            'melee_atk': this.processMeleeAttack,
             'path': this.processPath,
+            'ranged_atk': this.processRangedAttack,
             'stop': this.processStop
         };
 
@@ -104,10 +107,9 @@ var Player = new Phaser.Class({
     },
 
     talk: function(text){
-        console.log('Talking');
         this.bubble.update(text);
         this.bubble.display();
-        Engine.audio.speech.play();
+        Engine.scene.sound.add('speech').play();
     },
 
     // ### SETTERS ####
@@ -128,8 +130,18 @@ var Player = new Phaser.Class({
         if(dead == false) this.respawn();
     },
 
+    processMeleeAttack: function(facing){
+        this.setOrientation(facing);
+        this.play(this.animPrefix+'_attack_'+this.orientation);
+    },
+
     processPath: function(path){
         if(!this.isHero) this.move(path);
+    },
+
+    processRangedAttack: function(facing){
+        this.setOrientation(facing);
+        this.play(this.animPrefix+'_bow_'+this.orientation);
     },
 
     processStop: function(stop){

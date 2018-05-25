@@ -36,7 +36,8 @@ var Engine = {
 Engine.preload = function() {
     Engine.useTilemaps = false;
 
-    this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
+    //this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
+    this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('faces', 'assets/sprites/faces.png',{frameWidth:32,frameHeight:32});
 
     Engine.audioFiles = [];
@@ -55,6 +56,8 @@ Engine.preload = function() {
     this.load.audio('birds3','assets/sfx/birds3.wav');
     this.load.audio('raven','assets/sfx/raven.wav');
     this.load.audio('bubbles','assets/sfx/bubbles.wav');
+    this.load.audio('powder','assets/sfx/powder.wav');
+    this.load.audio('clank','assets/sfx/clank.wav');
 
     this.load.spritesheet('footsteps', 'assets/sprites/footstepssheet.png',{frameWidth:16,frameHeight:16});
     this.load.image('bug', 'assets/sprites/bug.png');
@@ -74,8 +77,6 @@ Engine.preload = function() {
     this.load.image('tower', 'assets/sprites/buildings/tower.png');
     this.load.image('foundations', 'assets/sprites/buildings/foundations.png');
     this.load.image('hunterhut', 'assets/sprites/buildings/hut2.png');
-
-    this.load.atlas('megaset', 'assets/sprites/megaset-2.png', 'assets/sprites/megaset-2.json');
 
     this.load.atlas('aok', 'assets/sprites/aok.png', 'assets/sprites/aok.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
@@ -237,8 +238,11 @@ Engine.create = function(){
     Engine.showGrid = false;
 
     Engine.camera = Engine.scene.cameras.main;
-    Engine.camera.setBounds(0,0,Engine.worldWidth*Engine.tileWidth,Engine.worldHeight*Engine.tileHeight);
-    Engine.camera.roundPixels = true; // Very important for the camera to scroll smoothly accross the map
+    ///Engine.camera.setBounds(0,0,World.worldWidth*World.tileWidth,World.worldHeight*World.tileHeight);
+    //Engine.camera.roundPixels = true; // Very important for the camera to scroll smoothly accross the map [not anymore after extrusion?]
+
+    /*Engine.minimap = Engine.scene.cameras.add(750,10,200,115);
+    Engine.minimap.setZoom(0.1);*/
 
     Engine.buildingsData = Engine.scene.cache.json.get('buildings');
     Engine.animalsData = Engine.scene.cache.json.get('animals');
@@ -327,8 +331,8 @@ Engine.initWorld = function(data){
     var ambient = [
         {name:'birds1',volume:1},
         {name:'birds2',volume:1},
-        {name:'birds3',volume:1},
-        {name:'raven',volume:0.1}
+        {name:'birds3',volume:1}
+        //{name:'raven',volume:0.1}
     ];
     setInterval(function(){
         var sound = Utils.randomElement(ambient);
@@ -336,34 +340,21 @@ Engine.initWorld = function(data){
     },10000);
 };
 
-/*Engine.createSounds = function(){
-    Engine.audio = {};
-    Engine.audio.footsteps = Engine.scene.sound.add('footsteps');
-    Engine.audio.sellBuy = Engine.scene.sound.add('sellbuy');
-    Engine.audio.speech = Engine.scene.sound.add('speech');
-    Engine.audio.inventory = Engine.scene.sound.add('inventory');
-    Engine.audio.crafting = Engine.scene.sound.add('crafting');
-    Engine.audio.character = Engine.scene.sound.add('page_turn');
-    Engine.audio.equip = Engine.scene.sound.add('equip');
-    Engine.audio.cloth = Engine.scene.sound.add('cloth');
-    Engine.audio.woodsmall = Engine.scene.sound.add('woodsmall');
-    Engine.audio.alchemy = Engine.scene.sound.add('alchemy');
-    Engine.audio.birds1 = Engine.scene.sound.add('birds1');
-    Engine.audio.birds2 = Engine.scene.sound.add('birds2');
-    Engine.audio.birds3 = Engine.scene.sound.add('birds3');
-    Engine.audio.raven = Engine.scene.sound.add('raven');
-    Engine.audio.bubbles = Engine.scene.sound.add('bubbles');
-
-    var sound = Engine.scene.sound.add('footsteps');
-    console.log(sound);
-    sound.setLoop(true).play();
-};*/
-
 Engine.createAnimations = function(){
-    Engine.createWalkAnimation('player_move_right','hero',5,8);
-    Engine.createWalkAnimation('player_move_up','hero',20,23);
-    Engine.createWalkAnimation('player_move_down','hero',35,38);
-    Engine.createWalkAnimation('player_move_left','hero',51,54);
+    Engine.createWalkAnimation('player_move_right','hero',143,151,15);
+    Engine.createWalkAnimation('player_move_up','hero',104,112,15);
+    Engine.createWalkAnimation('player_move_down','hero',130,138,15);
+    Engine.createWalkAnimation('player_move_left','hero',117,125,15);
+    // TODO: reverse them
+    Engine.createAttackAnimation('player_attack_right','hero',195,200);
+    Engine.createAttackAnimation('player_attack_down','hero',182,187);
+    Engine.createAttackAnimation('player_attack_left','hero',169,174);
+    Engine.createAttackAnimation('player_attack_up','hero',156,161);
+    Engine.createAttackAnimation('player_bow_right','hero',247,259);
+    Engine.createAttackAnimation('player_bow_down','hero',234,246);
+    Engine.createAttackAnimation('player_bow_left','hero',221,233);
+    Engine.createAttackAnimation('player_bow_up','hero',208,220);
+
     Engine.createWalkAnimation('wolf_move_down','wolves',0,2);
     Engine.createWalkAnimation('wolf_move_left','wolves',12,14);
     Engine.createWalkAnimation('wolf_move_right','wolves',24,26);
@@ -395,11 +386,22 @@ Engine.createAnimations = function(){
     });
 };
 
-Engine.createWalkAnimation = function(key,texture,start,end){
+Engine.createAttackAnimation = function(key,texture,start,end){
+    var frames = Engine.scene.anims.generateFrameNumbers(texture, { start: start, end: end});
+    frames.push({key:texture, frame:start});
+    Engine.scene.anims.create(config = {
+        key: key,
+        frames: frames,
+        frameRate: 15
+    });
+};
+
+Engine.createWalkAnimation = function(key,texture,start,end,rate){
+    rate = rate || 10;
     Engine.scene.anims.create(config = {
         key: key,
         frames: Engine.scene.anims.generateFrameNumbers(texture, { start: start, end: end}),
-        frameRate: 10,
+        frameRate: rate,
         repeat: -1
     });
 };
@@ -453,19 +455,18 @@ Engine.makeUI = function(){
     Engine.UIHolder = new UIHolder(1000,500,'right');
     Engine.UIHolder.resize(115);
 
-    var bug = Engine.scene.add.image(Engine.getGameConfig().width-10,10,'bug');
+    var bug = UI.scene.add.image(Engine.getGameConfig().width-10,10,'bug');
     bug.setOrigin(1,0);
     bug.setScrollFactor(0);
     bug.setInteractive();
-    bug.setDepth(Engine.UIDepth+10);
-    bug.handleClick = Engine.snap;
-    bug.handleOver = function(){
+    bug.setDepth(10);
+
+    bug.on('pointerup',Engine.snap);
+    bug.on('pointerover',function(){
         UI.tooltip.updateInfo('Snap a pic of a bug');
         UI.tooltip.display();
-    };
-    bug.handleOut = function(){
-        UI.tooltip.hide();
-    };
+    });
+    bug.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
 
     Engine.makeBuildingTitle();
 
@@ -945,7 +946,10 @@ Engine.addHero = function(data){
     Engine.player.setUp(data);
     Engine.player.settlement = data.settlement;
     Engine.player.isHero = true;
+
     Engine.camera.startFollow(Engine.player);
+    //Engine.minimap.startFollow(Engine.player);
+
     Engine.player.inventory = new Inventory();
     Engine.player.class = data.class;
     Engine.player.gold = data.gold;
@@ -1585,7 +1589,7 @@ Engine.togglePanel = function(){ // When clicking on a player/building/animal, t
 Engine.recipeClick = function(){
     Engine.menus['crafting'].panels['combi'].setUp(this.itemID);
     var sound = Engine.itemsData[this.itemID].sound;
-    if(sound) Engine.audio[sound].play();
+    if(sound) Engine.scene.sound.add(sound).play();
 };
 
 Engine.newbuildingClick = function(){
@@ -1653,8 +1657,15 @@ function s(){
     Client.socket.emit('ss');
 }
 
-function soundtest(){
-    Engine.audio.footsteps.play();
+function camtest(){
+    var cam = Engine.scene.cameras.add(800,0,200,200);
+    cam.setZoom(0.2);
+    cam.setBounds(0,0,50*30*32,57*20*32);
+    Engine.camera.startFollow(Engine.player);
+
+    /*cam.scrollX = Engine.camera.scrollX;
+    cam.scrollY = Engine.camera.scrollY;*/
+    console.log(cam);
 }
 
 function detectBrowser(){

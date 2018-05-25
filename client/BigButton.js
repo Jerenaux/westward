@@ -58,6 +58,7 @@ BigButton.prototype.setText = function(text){
 };
 
 BigButton.prototype.handleDown = function(){
+    UI.scene.sound.add('click').play();
     this.slices[0].setFrame('bigbutton_left_pressed');
     this.slices[1].setFrame('bigbutton_middle_pressed');
     this.slices[2].setFrame('bigbutton_right_pressed');
@@ -67,7 +68,6 @@ BigButton.prototype.handleDown = function(){
 BigButton.prototype.handleClick = function(){
     if(Date.now() - this.lastClick > 500){
         this.callback();
-        UI.scene.sound.add('click').play();
         this.lastClick = Date.now();
     }
     this.handleOver();

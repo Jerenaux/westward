@@ -32,7 +32,7 @@ var Animal = new Phaser.Class({
         this.setVisible(true);
         this.dead = false;
         this.name = animalData.name+' '+this.id;
-        this.walkAnimPrefix = animalData.walkPrefix;
+        this.animPrefix = animalData.walkPrefix;
         this.footprintsFrame = animalData.footprintsFrame;
         this.printsVertOffset = animalData.printsVertOffset;
         this.restingFrames = animalData.restingFrames;

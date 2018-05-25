@@ -248,12 +248,13 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
     var killed = false;
     if(!b || b.isDead()) return;
     if(this.nextTo(a,b)){
-        a.setProperty('facing',{x:b.x,y:b.y});
+        a.setProperty('melee_atk',{x:b.x,y:b.y});
         var dmg = this.computeDamage('melee',a,b);
         killed = this.applyDamage(b,dmg);
         b.setProperty('hit',dmg);
     }else{
         if(!a.canRange()) return false;
+        a.setProperty('ranged_atk',{x:b.x,y:b.y});
         a.decreaseAmmo();
         var hit = this.computeRangedHit(a,b);
         if(hit){

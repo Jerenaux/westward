@@ -1,10 +1,17 @@
 Priority:
-- Sound
-- (Mini)map
+- Sound: (10min/day)
+-> Make full invetory of available sfx by types
+-> Dipatch them in-game
+- Graphics (30min/day)
+-> Make design doc
+-> Draw building locations on scene
+-> Draw draft of fort, workshop, trade post
+-> Scan, add to design doc + screens of inspiration
+- Map
+-> Ask background scroll to Tom (1000x400)
 - Background info (mail?)
-- Less empty 
-- Graphics
 - Refine distribution of pickup items
+- Add improved character sheet
 
 Admin
 Analytics
@@ -112,6 +119,7 @@ Content:
 - Carcasses, traces of fight, traces of campfires
 - Paths along most-travelled paths
 * Battle system
+- Walk towards enemy before triggering battle (to limit size of battle arena and center everything)
 - Use custom pathfinder to find battle cell (fulfill condition is a function rather than a specific cell)
 - Custom PF: don't cross cells occupied by other fighters
 - Get arrows back when skinning
@@ -143,12 +151,40 @@ Content:
 - Quests
 * Explorer gameplay
 - XP proportional to distance 
-- Bonuses
 - Reset visitted AOIs when going to fort
 - Reward only when checking in at fort? (more fun to get it on the go)
 - Do not grant XP for inhabitted AOIs (keep track of them somehow)
-- Fog of war
 - Map mechanics
+-> Map class: display standard tr map at some location, with hide/display methods and panning
+-> addMask: adds a specifiec mask on top of the map. Provide rect dimensions for geom mask fallback if no WebGL
+-> Zoom:
+--> Make another zoom-level tr map, which becomes default. The 005 ones becomes "zoom-out" mode
+--> addButtons method to add zoom buttons at speicifc coordinates 
+-> Data:
+--> Map instance comes with list of markers: x, y, and icon (buildings, danger)
+--> Display markers at right coordinates, hover cards, panning
+--> Think about link to buildings in fort (hover, center on click)
+-> Data sync:
+--> Iterate over markers of one map, if not in second map, add them
+--> Each player memorizes own markers (when building is displayed in surrounding AOIs), reset when visitting fort
+--> Danger markers automatically added to map when player dies
+--> Destoyed building: automatically deletes marker in corresponding fort
+--> Sync when visitting fort
+--> Fort sync first: absorb markers from player, reset player
+--> Player sync: copy fort markers
+-> Fog of war:
+--> Map instance stores list of AOIs together with timestamp
+--> Player memorizes visitted AOIs
+--> Two-way sync when visitting fort
+--> Mini-masks per AOI, only applied if timestamp smaller than x
+--> Work-out nice geometry
+-> Clusters:
+--> Split both zoom-level into chunks
+--> Map all AOIs and markers to world map chunks
+--> download only the relevant chunks, on the fly
+-> Minimap: circular mask, no zoom buttons, no drag/drag following player, no fog of war
+-> Future: custom markers, not synced
+-> Future: markes about animal and plant populations, synced with fort, can be enabled/disabled on map
 - Quests
 * Inventory
 - In shops, filter-out bought/sold items by graying them, but still display
@@ -267,13 +303,12 @@ Polish:
 ------
 Visual:
 - More dramatic apparition of battle tiles
-- Use sprite with animations
+- Hide move marker (use different mouse cursors for can/can't walk to)
 - "Tip of the day"
 - Revamp class selection
 - Fix continuous movement
 - Polish title screen (leaves, bird passing in the distance...)
 - Fade-in/out transitions (wait for containers?)
-- Favicon
 - Show "new" tag when opening inventory
 - Cut corners of big battlezones? (but make sure it doesn't impact integrity: save integrity path and used it for that)
 - Variety of small "talk" bubbles in reaction to things happening (+ symbol bubbles?)
