@@ -193,6 +193,13 @@ var Player = new Phaser.Class({
         return this.getStat(stat).getValue();
     },
 
+    getTilePosition: function(){
+        return {
+            x: this.tileX,
+            y: this.tileY
+        }
+    },
+
     hasItem: function(item,nb){
         return (this.inventory.getNb(item) >= nb);
     },

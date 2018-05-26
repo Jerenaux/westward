@@ -89,10 +89,12 @@ Engine.preload = function() {
     this.load.image('tail', 'assets/sprites/tail.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll_horiz.png');
     this.load.image('radial3', 'assets/sprites/radial3.png');
+    this.load.image('radialrect', 'assets/sprites/radial_rect.png');
     this.load.image('fullmap', 'assets/sprites/fortmap.png');
     // pin: https://www.iconfinder.com/icons/173052/map_marker_icon
     this.load.image('skull', 'assets/sprites/skull.png');
     this.load.image('pin', 'assets/sprites/pin.png');
+    this.load.image('x', 'assets/sprites/x.png');
     this.load.image('redpin', 'assets/sprites/redpin.png');
     this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('sword_anim', 'assets/sprites/Sword1.png',{frameWidth:96,frameHeight:96});
@@ -471,22 +473,23 @@ Engine.makeUI = function(){
     statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help']);
 
     Engine.menus = {
-        'inventory': Engine.makeInventory(statsPanel),
-        'crafting': Engine.makeCraftingMenu(),
-        'character': Engine.makeCharacterMenu(statsPanel),
-        'trade': Engine.makeTradeMenu(),
-        'staff': Engine.makeStaffMenu(),
-        'fort': Engine.makeFortMenu(),
-        'production': Engine.makeProductionMenu(),
         'battle': Engine.makeBattleMenu(),
-        'construction': Engine.makeConstructionMenu()
+        'character': Engine.makeCharacterMenu(statsPanel),
+        'construction': Engine.makeConstructionMenu(),
+        'crafting': Engine.makeCraftingMenu(),
+        'fort': Engine.makeFortMenu(),
+        'inventory': Engine.makeInventory(statsPanel),
+        'map': Engine.makeMapMenu(),
+        'production': Engine.makeProductionMenu(),
+        'staff': Engine.makeStaffMenu(),
+        'trade': Engine.makeTradeMenu()
     };
 
     var UIelements = [];
     var gap = 50;
     var x = 960;
     var y = 535;
-    UIelements.push(new UIElement(x,y,'self_map',null,Engine.menus.character));
+    UIelements.push(new UIElement(x,y,'self_map',null,Engine.menus.map));
     x -= gap;
     UIelements.push(new UIElement(x,y,'scroll',null,Engine.menus.character));
     x -= gap;
@@ -759,6 +762,15 @@ Engine.makeStaffMenu = function(){
     return menu;
 };
 
+Engine.makeMapMenu = function(){
+    var map = new Menu('Map');
+    var mapPanel = new MapPanel(10,100,1000,380,'',false); // true = invisible
+    mapPanel.addMap('player','radialrect',1000,380,-1,-1);
+    //mapPanel.addButton(mapw-30, 8, 'blue','help',null,'',UI.textsData['map_help']);
+    map.addPanel('map',mapPanel);
+    return map;
+};
+
 Engine.makeFortMenu = function(){
     var padding = 10;
     var mapx = 10;
@@ -788,6 +800,8 @@ Engine.makeFortMenu = function(){
 
     var fort = new Menu('Fort');
     var mapPanel = new MapPanel(mapx,mapy,mapw,maph,'',true); // true = invisible
+    mapPanel.addBackground('scrollbgh');
+    mapPanel.addMap('building','radial3',400,400,300,300);
     mapPanel.addButton(mapw-30, 8, 'blue','help',null,'',UI.textsData['map_help']);
     fort.addPanel('map',mapPanel);
 

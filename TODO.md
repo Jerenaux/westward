@@ -4,7 +4,7 @@ Priority:
 -> Dipatch them in-game
 - Graphics (30min/day)
 - Map
--> Ask background scroll to Tom (1000x400)
+-> Ask background scroll to Tom (1000x380)
 - Background info (mail?)
 - Refine distribution of pickup items
 
@@ -152,15 +152,13 @@ Content:
 - Reward only when checking in at fort? (more fun to get it on the go)
 - Do not grant XP for inhabitted AOIs (keep track of them somehow)
 - Map mechanics
--> Map class: display standard tr map at some location, with hide/display methods and panning
--> addMask: adds a specifiec mask on top of the map. Provide rect dimensions for geom mask fallback if no WebGL
--> Zoom:
---> Make another zoom-level tr map, which becomes default. The 005 ones becomes "zoom-out" mode
---> addButtons method to add zoom buttons at speicifc coordinates 
 -> Data:
 --> Map instance comes with list of markers: x, y, and icon (buildings, danger)
 --> Display markers at right coordinates, hover cards, panning
 --> Think about link to buildings in fort (hover, center on click)
+-> Zoom:
+--> Make another zoom-level tr map, which becomes default. The 005 ones becomes "zoom-out" mode
+--> addButtons method to add zoom buttons at speicifc coordinates 
 -> Data sync:
 --> Iterate over markers of one map, if not in second map, add them
 --> Each player memorizes own markers (when building is displayed in surrounding AOIs), reset when visitting fort

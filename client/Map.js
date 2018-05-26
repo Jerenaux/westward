@@ -5,43 +5,26 @@ var Map = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function Map(x, y) {
+    initialize: function Map(x, y, viewW, viewH, target, dragWidth, dragHeight) {
         CustomSprite.call(this, UI.scene, x, y, 'fullmap');
 
         this.setDepth(2);
         this.setScrollFactor(0);
         this.setVisible(false);
 
-        var mask = UI.scene.add.sprite(x,y,'radial3');
-        mask.setScale(1.1);
-        mask.setVisible(false);
-        if(Boot.WEBGL){
-            mask.setDepth(2);
-            mask.setScrollFactor(0);
-            this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
-            this.maskOverlay = mask;
-        }else{
-            var shape = UI.scene.make.graphics();
-            shape.fillStyle('#ffffff');
-            var w = mask.frame.width;
-            var h = mask.frame.height;
-            shape.fillRect(x-(w/2), y-(h/2), w, h);
-            this.mask = new Phaser.Display.Masks.GeometryMask(UI.scene, shape);
-            this.maskOverlay = shape;
-        }
-        this.maskOverlay.setVisible(false);
-        this.maskSize = {
-            width: mask.frame.width,
-            height: mask.frame.height
-        };
+        this.viewRect = new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH);
+        console.log(this.viewRect);
 
+        this.target = target;
         this.toponyms = [];
         Engine.settlementsData.forEach(function(s){
             this.addText(s);
         },this);
 
-        this.setInteractive(new Phaser.Geom.Rectangle(0,0,this.width,this.height),Phaser.Geom.Rectangle.Contains);
+        this.setInteractive();
         UI.scene.input.setDraggable(this);
+        this.dragWidth = (dragWidth > -1 ? dragWidth : 999999);
+        this.dragHeight = (dragHeight > -1 ? dragHeight : 999999);
         this.draggedX = 0;
         this.draggedY = 0;
 
@@ -52,7 +35,38 @@ var Map = new Phaser.Class({
         this.resetCounter();
         this.clickedTile = null;
 
-        Engine.map = this;
+    },
+
+    addMask: function(texture){
+        var mask = UI.scene.add.sprite(this.x,this.y,texture);
+        mask.setVisible(false);
+        //mask.setScale(1.1);
+        if(Boot.WEBGL){
+            mask.setDepth(2);
+            mask.setScrollFactor(0);
+            this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
+            this.maskOverlay = mask;
+        }else{
+            var shape = UI.scene.make.graphics();
+            shape.fillStyle('#ffffff');
+            var w = mask.frame.width;
+            var h = mask.frame.height;
+            shape.fillRect(this.x-(w/2), this.y-(h/2), w, h);
+            this.mask = new Phaser.Display.Masks.GeometryMask(UI.scene, shape);
+            this.maskOverlay = shape;
+        }
+        this.maskOverlay.setVisible(false);
+        this.maskSize = {
+            width: mask.frame.width,
+            height: mask.frame.height
+        };
+
+        this.toponyms.forEach(function(toponym){
+            toponym.mask = (Boot.WEBGL
+                    ? new Phaser.Display.Masks.BitmapMask(UI.scene,this.maskOverlay)
+                    : new Phaser.Display.Masks.GeometryMask(UI.scene, this.maskOverlay)
+            );
+        },this);
     },
 
     addText: function(settlement){
@@ -64,10 +78,6 @@ var Map = new Phaser.Class({
         text.setScrollFactor(0,0);
         text.setAlpha(0.5);
         text.setOrigin(0.5);
-        text.mask = (Boot.WEBGL
-                ? new Phaser.Display.Masks.BitmapMask(UI.scene,this.maskOverlay)
-                : new Phaser.Display.Masks.GeometryMask(UI.scene, this.maskOverlay)
-        );
         this.toponyms.push(text);
     },
 
@@ -132,12 +142,11 @@ var Map = new Phaser.Class({
     },
 
     getNextPin: function(){
-        if(this.pinsCounter >= this.pins.length){
-            this.pins.push(new Pin(this,this.maskOverlay,this.maskSize));
-        }
+        if(this.pinsCounter >= this.pins.length) this.pins.push(new Pin(this,this.maskOverlay));
         return this.pins[this.pinsCounter++];
     },
 
+    // Maps a tile coordinate to % coordinate on the map
     computeMapLocation: function(tx,ty){
         var pct = Utils.tileToPct(tx,ty);
         var dx = (pct.x - this.originX)*this.width;
@@ -167,21 +176,26 @@ var Map = new Phaser.Class({
     },
 
     display: function(x,y){
-        var tile = Engine.currentBuiling.getTilePosition();
+        var tile;
+        if(this.target == 'building'){
+            tile = Engine.currentBuiling.getTilePosition();
+        }else{
+            tile = Engine.player.getTilePosition();
+        }
         var origin = Utils.tileToPct(tile.x,tile.y);
         this.setOrigin(origin.x,origin.y);
         this.setPosition(x,y);
+        if(this.target == 'player') this.addPin(tile.x,tile.y,'Your position','x');
 
         this.minY = this.y - (this.height-this.displayOriginY) + this.maskSize.height/2;
         this.maxY = this.y + this.displayOriginY - this.maskSize.height/2;
         this.minX = this.x - (this.width-this.displayOriginX) + this.maskSize.width/2;
         this.maxX = this.x + this.displayOriginX - this.maskSize.width/2;
 
-        // TODO: store the 500 in config somewhere
-        this.minX = Math.max(this.minX,this.x-500);
-        this.maxX = Math.min(this.maxX,this.x+500);
-        this.minY = Math.max(this.minY,this.y-500);
-        this.maxY = Math.min(this.maxY,this.y+500);
+        this.minX = Math.max(this.minX,this.x-this.dragWidth);
+        this.maxX = Math.min(this.maxX,this.x+this.dragWidth);
+        this.minY = Math.max(this.minY,this.y-this.dragHeight);
+        this.maxY = Math.min(this.maxY,this.y+this.dragHeight);
 
         this.toponyms.forEach(function(t){
             var location = this.computeMapLocation(t.tx,t.ty);
@@ -189,11 +203,9 @@ var Map = new Phaser.Class({
             t.setVisible(true);
         },this);
 
-        var dragw = 400;
-        var dragh = 400;
-        var rectx = (this.width*origin.x)-(dragw/2);
-        var recty = (this.height*origin.y)-(dragh/2);
-        this.input.hitArea = new Phaser.Geom.Rectangle(rectx,recty,dragw,dragh);
+        var rectx = (this.width*origin.x)-(this.viewRect.width/2);
+        var recty = (this.height*origin.y)-(this.viewRect.height/2);
+        this.input.hitArea = new Phaser.Geom.Rectangle(rectx,recty,this.viewRect.width,this.viewRect.height);
 
         this.setVisible(true);
         if(!Boot.WEBGL) this.maskOverlay.setVisible(true);
@@ -220,19 +232,17 @@ var Pin = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function Pin (map,mask,maskSize) {
+    initialize: function Pin (map,mask) {
         CustomSprite.call(this, UI.scene, 0, 0, 'pin');
         this.setDepth(5);
         this.setScrollFactor(0);
         this.setOrigin(0.5,1);
         this.setVisible(false);
         this.setInteractive();
-        //this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
         this.mask = (Boot.WEBGL
                 ? new Phaser.Display.Masks.BitmapMask(UI.scene,mask)
                 : new Phaser.Display.Masks.GeometryMask(UI.scene,mask)
         );
-        this.maskSize = maskSize;
         this.parentMap = map;
         this.on('pointerover',this.handleOver.bind(this));
         this.on('pointerout',this.handleOut.bind(this));
@@ -260,10 +270,7 @@ var Pin = new Phaser.Class({
     },
 
     handleOver: function(){
-        //if(Math.abs(this.x - this.mask.bitmapMask.x) > this.mask.bitmapMask.width/2) return;
-        //if(Math.abs(this.y - this.mask.bitmapMask.y) > this.mask.bitmapMask.height/2) return;
-        if(Math.abs(this.x - this.mask.x) > this.maskSize.width/2) return;
-        if(Math.abs(this.y - this.mask.y) > this.maskSize.height/2) return;
+        if(!this.parentMap.viewRect.contains(this.x,this.y)) return;
         UI.tooltip.updateInfo(this.name);
         UI.tooltip.display();
     },
