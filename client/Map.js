@@ -185,7 +185,13 @@ var Map = new Phaser.Class({
         var origin = Utils.tileToPct(tile.x,tile.y);
         this.setOrigin(origin.x,origin.y);
         this.setPosition(x,y);
-        if(this.target == 'player') this.addPin(tile.x,tile.y,'Your position','x');
+
+        if(this.target == 'player') {
+            this.addPin(tile.x,tile.y,'Your position','x');
+            Engine.player.markers.forEach(function(data){
+                this.addPin(data.x,data.y,Engine.buildingsData[data.type].name);
+            },this);
+        }
 
         this.minY = this.y - (this.height-this.displayOriginY) + this.maskSize.height/2;
         this.maxY = this.y + this.displayOriginY - this.maskSize.height/2;

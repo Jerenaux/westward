@@ -54,6 +54,12 @@ Settlement.prototype.getBuildings = function(){
     });
 };
 
+Settlement.prototype.getBuildingMarkers = function(){
+    return this.buildings.map(function(b){
+        return {marker:'building',x:b.x,y:b.y,type:b.type};
+    });
+};
+
 Settlement.prototype.registerFort = function(fort){
     this.fort = fort;
     // TODO: update fort when these values change

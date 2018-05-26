@@ -92,7 +92,8 @@
     "equipment": "meleew",
     "effects":{"mdmg":20},
     "useInBattle": true,
-    "desc": "An adventurer's best friend."
+    "desc": "An adventurer's best friend.",
+    "sound": "sword"
   },
   "12":{
     "atlas": "items2",

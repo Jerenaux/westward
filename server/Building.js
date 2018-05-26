@@ -262,6 +262,18 @@ Building.prototype.listingTrim = function(){
     return trimmed;
 };
 
+// Returns an object containing only the fields relevant to display on map
+Building.prototype.mapTrim = function(){
+    var trimmed = {};
+    var broadcastProperties = ['type'];
+    for(var p = 0; p < broadcastProperties.length; p++){
+        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
+    }
+    trimmed.x = parseInt(this.x);
+    trimmed.y = parseInt(this.y);
+    return trimmed;
+};
+
 Building.prototype.addCollisions = function(){
     var type = (this.built ? this.type : 4);
     var data = GameServer.buildingsData[type];

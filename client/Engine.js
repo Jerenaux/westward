@@ -58,6 +58,7 @@ Engine.preload = function() {
     this.load.audio('bubbles','assets/sfx/bubbles.wav');
     this.load.audio('powder','assets/sfx/powder.wav');
     this.load.audio('clank','assets/sfx/clank.wav');
+    this.load.audio('sword','assets/sfx/sword.wav');
 
     this.load.spritesheet('footsteps', 'assets/sprites/footstepssheet.png',{frameWidth:16,frameHeight:16});
     this.load.image('bug', 'assets/sprites/bug.png');
@@ -307,7 +308,7 @@ Engine.createMarker = function(){
 };
 
 Engine.initWorld = function(data){
-    Engine.animalUpdates = new ListMap(); // debug purpose, remove
+    //Engine.animalUpdates = new ListMap(); // debug purpose, remove
     Engine.firstSelfUpdate = true;
 
     console.log(data);
@@ -317,6 +318,7 @@ Engine.initWorld = function(data){
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
+    Engine.player.markers = data.markers;
 
     if(Client.isNewPlayer()) {
         var w = 400;
