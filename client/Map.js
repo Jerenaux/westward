@@ -13,7 +13,6 @@ var Map = new Phaser.Class({
         this.setVisible(false);
 
         this.viewRect = new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH);
-        console.log(this.viewRect);
 
         this.target = target;
         this.toponyms = [];
@@ -137,6 +136,7 @@ var Map = new Phaser.Class({
     },
 
     handleClick: function(pointer){
+        console.log('click');
         if(pointer.downX != pointer.upX || pointer.downY != pointer.upY) return; // drag
         console.log(Utils.screenToMap(pointer.x,pointer.y,this));
     },
@@ -187,7 +187,8 @@ var Map = new Phaser.Class({
         this.setPosition(x,y);
 
         if(this.target == 'player') {
-            this.addPin(tile.x,tile.y,'Your position','x');
+            this.centerPin = this.addPin(tile.x,tile.y,'Your position','x');
+            this.centerPin.noDrag = true;
             Engine.player.markers.forEach(function(data){
                 this.addPin(data.x,data.y,Engine.buildingsData[data.type].name);
             },this);
@@ -219,10 +220,10 @@ var Map = new Phaser.Class({
 
     hide: function(){
         this.hidePins();
-        //this.text.setVisible(false);
         this.toponyms.forEach(function(t){
             t.setVisible(false);
         });
+        this.setVisible(false);
         this.maskOverlay.setVisible(false);
     },
 

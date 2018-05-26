@@ -6,6 +6,7 @@ Priority:
 - Map
 -> Ask background scroll to Tom (1000x380)
 - Background info (mail?)
+- Move respawn counter down to see body
 - Refine distribution of pickup items
 
 Admin

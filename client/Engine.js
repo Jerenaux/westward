@@ -89,9 +89,14 @@ Engine.preload = function() {
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
     this.load.image('tail', 'assets/sprites/tail.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll_horiz.png');
+    this.load.image('longscroll', 'assets/sprites/longscroll.png');
     this.load.image('radial3', 'assets/sprites/radial3.png');
-    this.load.image('radialrect', 'assets/sprites/radial_rect.png');
+    this.load.image('circlemask', 'assets/sprites/circlemask.png');
+    //this.load.image('radialrect', 'assets/sprites/radial_rect.png');
+    this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
     this.load.image('fullmap', 'assets/sprites/fortmap.png');
+    this.load.image('minimap', 'assets/sprites/minimap2.png');
+    this.load.image('mapring', 'assets/sprites/mapring.png');
     // pin: https://www.iconfinder.com/icons/173052/map_marker_icon
     this.load.image('skull', 'assets/sprites/skull.png');
     this.load.image('pin', 'assets/sprites/pin.png');
@@ -242,11 +247,6 @@ Engine.create = function(){
     Engine.showGrid = false;
 
     Engine.camera = Engine.scene.cameras.main;
-    ///Engine.camera.setBounds(0,0,World.worldWidth*World.tileWidth,World.worldHeight*World.tileHeight);
-    //Engine.camera.roundPixels = true; // Very important for the camera to scroll smoothly accross the map [not anymore after extrusion?]
-
-    /*Engine.minimap = Engine.scene.cameras.add(750,10,200,115);
-    Engine.minimap.setZoom(0.1);*/
 
     Engine.buildingsData = Engine.scene.cache.json.get('buildings');
     Engine.animalsData = Engine.scene.cache.json.get('animals');
@@ -343,6 +343,11 @@ Engine.initWorld = function(data){
         var sound = Utils.randomElement(ambient);
         Engine.scene.sound.add(sound.name).setVolume(sound.volume).play();
     },10000);
+
+    Engine.miniMap = new MapPanel(Engine.getGameConfig().width-210,10,200,200,'',true); // true = invisible
+    Engine.miniMap.addBackground('minimap');
+    Engine.miniMap.addMap('player','circlemask',200,200,0,0);
+    Engine.miniMap.displayInterface();
 };
 
 Engine.createAnimations = function(){
@@ -766,8 +771,9 @@ Engine.makeStaffMenu = function(){
 
 Engine.makeMapMenu = function(){
     var map = new Menu('Map');
-    var mapPanel = new MapPanel(10,100,1000,380,'',false); // true = invisible
-    mapPanel.addMap('player','radialrect',1000,380,-1,-1);
+    var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
+    mapPanel.addBackground('longscroll');
+    mapPanel.addMap('player','radiallongrect',1000,380,-1,-1);
     //mapPanel.addButton(mapw-30, 8, 'blue','help',null,'',UI.textsData['map_help']);
     map.addPanel('map',mapPanel);
     return map;
