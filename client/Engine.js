@@ -59,6 +59,7 @@ Engine.preload = function() {
     this.load.audio('powder','assets/sfx/powder.wav');
     this.load.audio('clank','assets/sfx/clank.wav');
     this.load.audio('sword','assets/sfx/sword.wav');
+    this.load.audio('soft','assets/sfx/soft.ogg');
 
     this.load.spritesheet('footsteps', 'assets/sprites/footstepssheet.png',{frameWidth:16,frameHeight:16});
     this.load.image('bug', 'assets/sprites/bug.png');
@@ -93,7 +94,7 @@ Engine.preload = function() {
     this.load.image('radial3', 'assets/sprites/radial3.png');
     this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
     this.load.image('fullmap', 'assets/sprites/fortmap.png');
-    this.load.image('minimap', 'assets/sprites/minimap2.png');
+    this.load.image('minimap', 'assets/sprites/minimap2s.png');
     // pin: https://www.iconfinder.com/icons/173052/map_marker_icon
     this.load.image('skull', 'assets/sprites/skull.png');
     this.load.image('pin', 'assets/sprites/pin.png');
@@ -1489,6 +1490,7 @@ Engine.exitBuilding = function(){
         Engine.menus[m].hideIcon();
     }
     Engine.UIHolder.resize(Engine.getHolderSize());
+    Engine.miniMap.focus();
 };
 
 Engine.getHolderSize = function(){

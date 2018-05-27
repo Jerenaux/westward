@@ -12,6 +12,10 @@ var Map = new Phaser.Class({
         this.setScrollFactor(0);
         this.setVisible(false);
 
+        /*this.container = UI.scene.add.container(x,y);
+        this.container.setDepth(2);
+        this.container.add(this);*/
+
         this.center = {
             x: x,
             y: y
@@ -39,7 +43,6 @@ var Map = new Phaser.Class({
         this.pins = [];
         this.resetCounter();
         this.clickedTile = null;
-
     },
 
     addMask: function(texture,shapeData){
@@ -51,6 +54,7 @@ var Map = new Phaser.Class({
                 mask.setDepth(2);
                 mask.setScrollFactor(0);
                 this.maskType = 'bitmap';
+                //this.container.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
                 this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
                 this.maskOverlay = mask;
             }else{ // Creates a rect shape based on mask texture
@@ -79,6 +83,7 @@ var Map = new Phaser.Class({
                     break;
             }
 
+            //this.container.mask = new Phaser.Display.Masks.GeometryMask(UI.scene, shape);
             this.mask = new Phaser.Display.Masks.GeometryMask(UI.scene, shape);
             this.maskOverlay = shape;
             this.maskType = 'geom';
@@ -125,7 +130,7 @@ var Map = new Phaser.Class({
         this.draggedY += dy;
 
         if(tween){
-            var targets = this.pins.concat([this.text,this]).concat(this.toponyms);
+            var targets = this.tweenablePins.concat([this.text,this]).concat(this.toponyms);
             var duration = 300;
             UI.scene.tweens.add({
                     targets: targets,
@@ -182,10 +187,11 @@ var Map = new Phaser.Class({
         }
     },
 
-    addPin: function(x,y,name,texture){
+    addPin: function(x,y,name,texture,noTween){
         var location = this.computeMapLocation(x,y);
         var pin = this.getNextPin();
         pin.setUp(x,y,location.x,location.y,name,texture);
+        if(!noTween) this.tweenablePins.push(pin);
         return pin;
     },
 
@@ -198,6 +204,7 @@ var Map = new Phaser.Class({
 
     resetCounter: function(){
         this.pinsCounter = 0;
+        this.tweenablePins = [];
     },
 
     display: function(){
@@ -213,7 +220,7 @@ var Map = new Phaser.Class({
         this.setPosition(this.center.x,this.center.y);
 
         if(this.target == 'player') {
-            this.addPin(tile.x,tile.y,'Your position','x');
+            this.addPin(tile.x,tile.y,'Your position','x',true);
             Engine.player.markers.forEach(function(data){
                 this.addPin(data.x,data.y,Engine.buildingsData[data.type].name);
             },this);
@@ -276,12 +283,16 @@ var Pin = new Phaser.Class({
                 : new Phaser.Display.Masks.GeometryMask(UI.scene,mask)
         );
         this.parentMap = map;
+        //this.parentMap.container.add(this);
         this.on('pointerover',this.handleOver.bind(this));
         this.on('pointerout',this.handleOut.bind(this));
     },
 
     setUp: function(tileX,tileY,x,y,name,texture){
-        if(texture) this.setTexture(texture);
+        if(texture) {
+            this.setTexture(texture);
+            this.setOrigin(0.5);
+        }
         this.tileX = tileX;
         this.tileY = tileY;
         this.setPosition(x,y);

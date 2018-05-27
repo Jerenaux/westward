@@ -152,12 +152,11 @@ var Moving = new Phaser.Class({
             this.movement.stop();
             this.endMovement(); // TODO: have it called automatically by stop()
         }
-
-        if(this.isHero) Engine.miniMap.focus();
     },
 
     teleport: function(x,y){
         this.setPosition(x,y);
+        if(this.isHero) Engine.miniMap.focus();
     },
 
     getPFstart: function(){
@@ -224,6 +223,7 @@ var Moving = new Phaser.Class({
         this.previousOrientation = null;
         this.anims.stop();
         this.setFrame(this.restingFrames[this.orientation]);
+        if(this.isHero) Engine.miniMap.focus();
 
         if(this.queuedPath){
             var _path = this.queuedPath.slice();

@@ -3,21 +3,22 @@
  */
 
 function MiniMap(){
-    var x = Engine.getGameConfig().width -120;
-    var y = 120;
+    var r = 150;
+
+    var x = Engine.getGameConfig().width - r/2 - 20;
+    var y = r/2 + 20;
 
     this.bg = UI.scene.add.sprite(x,y,'minimap');
     this.bg.setDepth(1);
     this.bg.setScrollFactor(0);
     this.bg.setVisible(false);
 
-    this.map = new Map(x,y,200,200,0,0,'player',false);
+    this.map = new Map(x,y,r,r,0,0,'player',false);
     this.map.addMask(null,{
         type: 'circle',
         x: x,
         y: y,
-        w: 190,
-        h: 190
+        w: 0.95*r
     });
 }
 

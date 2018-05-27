@@ -62,19 +62,22 @@
     "atlas": "items",
     "frame":"wood",
     "name": "Wood",
-    "desc": "Crafting material used to make wooden weapons or to make charcoal."
+    "desc": "Crafting material used to make wooden weapons or to make charcoal.",
+    "sound": "woodsmall"
   },
   "8":{
     "atlas": "items2",
     "frame":"thickgrass",
     "name": "Thick Grass",
-    "desc": "Crafting material used to make string."
+    "desc": "Crafting material used to make string.",
+    "sound": "soft"
   },
   "9":{
     "atlas": "items2",
     "frame":"hide",
     "name": "Pelt",
-    "desc": "Crafting material obtained from dead animals. Used to craft several pieces of equipment. Also very valuable to sell to settlements."
+    "desc": "Crafting material obtained from dead animals. Used to craft several pieces of equipment. Also very valuable to sell to settlements.",
+    "sound": "cloth"
   },
   "10":{
     "atlas": "items2",
@@ -102,7 +105,8 @@
     "equipment": "rangedw",
     "ammo": "ammo_pouch",
     "effects":{"acc":5},
-    "useInBattle": true
+    "useInBattle": true,
+    "sound": "equip"
   },
   "13":{
     "atlas": "items2",
@@ -117,7 +121,8 @@
     "frame":"sunflower",
     "name": "Butterflower",
     "desc": "Flower with regenerative properties used to brew potions.",
-    "isMaterial": true
+    "isMaterial": true,
+    "sound": "soft"
   },
   "15":{
     "atlas": "items2",
@@ -149,7 +154,8 @@
     "frame":"clover",
     "name": "Clover",
     "desc": "Plant used as alchemical ingredient for brewing health potions.",
-    "isMaterial": true
+    "isMaterial": true,
+    "sound": "soft"
   },
   "19":{
     "atlas": "items",
@@ -209,13 +215,15 @@
     "atlas": "items2",
     "frame":"stone",
     "name": "Stone",
-    "desc": "Crafting material used to make primitive weapons."
+    "desc": "Crafting material used to make primitive weapons.",
+    "sound": "equip"
   },
   "27":{
     "atlas": "items",
     "frame":"bone",
     "name": "Bone",
-    "desc": "Crafting material obtained from dead animals used to make primitive weapons."
+    "desc": "Crafting material obtained from dead animals used to make primitive weapons.",
+    "sound": "woodsmall"
   },
   "28":{
     "atlas": "items",
@@ -247,7 +255,8 @@
     "frame":"feather",
     "name": "Feather",
     "desc": "Crafting material used to make arrows.",
-    "isMaterial": true
+    "isMaterial": true,
+    "sound": "soft"
   },
   "31":{
     "atlas": "items",

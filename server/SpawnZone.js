@@ -16,8 +16,8 @@ function SpawnZone(aois,animalsData,itemsData){
 
     animalsData.forEach(function(data){
         var animalID = data[0];
-        var rate = data[1];
-        var min = data[2];
+        var min = data[1];
+        var rate = data[2];
         this.population[animalID] = 0;
         this.animalsData[animalID] = {
             rate: rate,
@@ -27,25 +27,14 @@ function SpawnZone(aois,animalsData,itemsData){
 
     itemsData.forEach(function(data){
         var itemID = data[0];
-        var rate = data[1];
-        var min = data[2];
+        var min = data[1];
+        var rate = data[2];
         this.items[itemID] = 0;
         this.itemsData[itemID] = {
             rate: rate,
             min: min
         }
     },this);
-
-    /*for(var animal in animalsData){
-        var data = animalsData[animal];
-        this.population[animal] = 0;
-        this.animalsData[animal] = {
-            rate:
-        }
-    }
-    for(var item in itemsData){
-        this.items[item] = 0;
-    }*/
 }
 
 SpawnZone.prototype.update = function(){
@@ -77,14 +66,23 @@ SpawnZone.prototype.spawn = function(AOIs,type,id,nb){
     var data = (type == 'animal' ? GameServer.animalsData[id] : GameServer.itemsData[id]);
     console.log('Spawning',nb,data.name);
 
-    for(var i = 0; i < nb; i++){
-        var AOI = Utils.randomElement(AOIs);
+    var AOI = Utils.randomElement(AOIs);
+    var cx = Utils.randomInt(AOI.x,AOI.x+World.chunkWidth);
+    var cy = Utils.randomInt(AOI.y,AOI.y+World.chunkHeight);
+
+    for(var i = 0, j = 0; i < nb; i++, j++){
+        if(j == 20) break;
+        /*var AOI = Utils.randomElement(AOIs);
         var x = Utils.randomInt(AOI.x,AOI.x+World.chunkWidth);
-        var y = Utils.randomInt(AOI.y,AOI.y+World.chunkHeight);
+        var y = Utils.randomInt(AOI.y,AOI.y+World.chunkHeight);*/
+
+        var x = Utils.randomInt(cx-3,cx+3);
+        var y = Utils.randomInt(cy-3,cy+3);
         if(PFUtils.checkCollision(x,y)) {
             i--;
             continue;
         }
+        console.log(x,y);
         //console.log('spawining in ',AOI.id);
 
         if(type == 'animal') {

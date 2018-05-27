@@ -57,10 +57,11 @@ Client.getIDStamp = function(){
 
 Client.checkForNewPlayer = function(){
     console.log('Player id:',Client.getPlayerID());
-    Client.newPlayer =  (Client.getPlayerID() === null);
+    Client.newPlayer = (Client.getPlayerID() === null);
 };
 
 Client.isNewPlayer = function(){
+    return true;
     return Client.newPlayer;
 };
 

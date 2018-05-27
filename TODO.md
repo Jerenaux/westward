@@ -5,13 +5,7 @@ Priority:
 - Graphics (30min/day)
 - Map
 -> Ask background scroll to Tom (1000x380)
--> Smaller minimap
 - Background info (mail?)
-- Refine distribution of pickup items
-
-Bugs:
-- Re-center minimap upon teleport
-- Minimap centering off
 
 Admin
 Analytics
@@ -81,6 +75,7 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Reimplement maps using containers
 - Refactor building management, shapes, positioning... (from bottom-left)
 - Use containers
 - Clean schemas

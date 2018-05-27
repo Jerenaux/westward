@@ -69,7 +69,7 @@ Menu.prototype.display = function(){
 
     Engine.inMenu = true;
     Engine.hideMarker();
-    Engine.miniMap.hide();
+    if(Engine.miniMap) Engine.miniMap.hide();
     UI.setCursor();
     this.displayed = true;
 };
@@ -85,6 +85,6 @@ Menu.prototype.hide = function(){
     Engine.inMenu = false;
     Engine.currentMenu = null;
     Engine.showMarker();
-    Engine.miniMap.display();
+    if(Engine.miniMap)  Engine.miniMap.display();
     this.displayed = false;
 };

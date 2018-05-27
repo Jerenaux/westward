@@ -35,7 +35,7 @@
             npc: 200
     },
     wildlife: {
-        aggro: false,
+        aggro: true,
         wander: true
     }
 }
