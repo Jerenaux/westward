@@ -91,12 +91,9 @@ Engine.preload = function() {
     this.load.image('scrollbgh', 'assets/sprites/scroll_horiz.png');
     this.load.image('longscroll', 'assets/sprites/longscroll.png');
     this.load.image('radial3', 'assets/sprites/radial3.png');
-    this.load.image('circlemask', 'assets/sprites/circlemask.png');
-    //this.load.image('radialrect', 'assets/sprites/radial_rect.png');
     this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
     this.load.image('fullmap', 'assets/sprites/fortmap.png');
     this.load.image('minimap', 'assets/sprites/minimap2.png');
-    this.load.image('mapring', 'assets/sprites/mapring.png');
     // pin: https://www.iconfinder.com/icons/173052/map_marker_icon
     this.load.image('skull', 'assets/sprites/skull.png');
     this.load.image('pin', 'assets/sprites/pin.png');
@@ -320,6 +317,8 @@ Engine.initWorld = function(data){
     Engine.showMarker();
     Engine.player.markers = data.markers;
 
+    Engine.miniMap.display();
+
     if(Client.isNewPlayer()) {
         var w = 400;
         var h = 290;
@@ -344,10 +343,6 @@ Engine.initWorld = function(data){
         Engine.scene.sound.add(sound.name).setVolume(sound.volume).play();
     },10000);
 
-    Engine.miniMap = new MapPanel(Engine.getGameConfig().width-210,10,200,200,'',true); // true = invisible
-    Engine.miniMap.addBackground('minimap');
-    Engine.miniMap.addMap('player','circlemask',200,200,0,0);
-    Engine.miniMap.displayInterface();
 };
 
 Engine.createAnimations = function(){
@@ -475,6 +470,7 @@ Engine.makeUI = function(){
     bug.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
 
     Engine.makeBuildingTitle();
+    Engine.miniMap = new MiniMap();
 
     var statsPanel = new StatsPanel(665,335,330,145,'Stats');
     statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help']);
@@ -504,6 +500,7 @@ Engine.makeUI = function(){
     x -= gap;
     UIelements.push(new UIElement(x,y,'backpack',null,Engine.menus.inventory));
     x -= gap;
+    Engine.nbBasicUIEelements = 4;
     Engine.UIelements = UIelements;
     Engine.UIHolder.resize(Engine.getHolderSize());
 
@@ -584,10 +581,6 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
             },
             onComplete: function(){
                 text.recycle();
-                //text.setVisible(false);
-                /*setTimeout(function(){
-                    Engine.recycleHP(text);
-                },20);*/
             }
         }
     );
@@ -631,16 +624,19 @@ Engine.handleMissAnimation = function(target){
 
 Engine.displayUI = function(){
     Engine.UIHolder.display();
-    for(var i = 0; i < 3; i++){
+    for(var i = 0; i < Engine.nbBasicUIEelements; i++){
         Engine.UIelements[i].setVisible(true);
     }
 };
 
 Engine.hideUI = function(){
     Engine.UIHolder.hide();
-    for(var i = 0; i < 3; i++){
+    /*for(var i = 0; i < 3; i++){
         Engine.UIelements[i].setVisible(false);
-    }
+    }*/
+    Engine.UIelements.forEach(function(e){
+        e.setVisible(false);
+    });
 };
 
 Engine.getPlayerHealth = function(){
@@ -677,7 +673,7 @@ Engine.makeBattleMenu = function(){
     timerPanel.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['battletimer_help']);
 
     var respawnh = 90;
-    var respawny = (Engine.getGameConfig().height-respawnh)/2;
+    var respawny = 400;//(Engine.getGameConfig().height-respawnh)/2;
     var respawn = battle.addPanel('respawn',new RespawnPanel(timerx,respawny,timerw,respawnh),true);
     respawn.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['respawn_help']);
 
@@ -961,14 +957,12 @@ Engine.getIngredientsPanel = function(){
 
 Engine.addHero = function(data){
     // data comes from the initTrim()'ed packet of the player
-    //Engine.player = Engine.addPlayer(data);
     Engine.player = new Hero();
     Engine.player.setUp(data);
     Engine.player.settlement = data.settlement;
     Engine.player.isHero = true;
 
     Engine.camera.startFollow(Engine.player);
-    //Engine.minimap.startFollow(Engine.player);
 
     Engine.player.inventory = new Inventory();
     Engine.player.class = data.class;

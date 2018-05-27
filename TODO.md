@@ -5,9 +5,13 @@ Priority:
 - Graphics (30min/day)
 - Map
 -> Ask background scroll to Tom (1000x380)
+-> Smaller minimap
 - Background info (mail?)
-- Move respawn counter down to see body
 - Refine distribution of pickup items
+
+Bugs:
+- Re-center minimap upon teleport
+- Minimap centering off
 
 Admin
 Analytics

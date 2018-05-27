@@ -153,10 +153,7 @@ var Moving = new Phaser.Class({
             this.endMovement(); // TODO: have it called automatically by stop()
         }
 
-        if(this.isHero) {
-            var mapLoc = Engine.miniMap.map.computeMapLocation(this.tileX, this.tileY);
-            Engine.miniMap.map.focus(mapLoc.x, mapLoc.y);
-        }
+        if(this.isHero) Engine.miniMap.focus();
     },
 
     teleport: function(x,y){

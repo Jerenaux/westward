@@ -20,45 +20,25 @@ MapPanel.prototype.addBackground = function(texture){
 };
 
 MapPanel.prototype.addMap = function(target,texture,w,h,dragX,dragY){
-    this.map = new Map(this.mapx,this.mapy,w,h,target,dragX,dragY);
+    this.map = new Map(this.mapx,this.mapy,w,h,dragX,dragY,target,true);
     this.map.addMask(texture);
-    this.pins = []; // todo: move to map
     this.content.push(this.map);
 };
 
 MapPanel.prototype.displayInterface = function(){
     if(this.bg) this.bg.setVisible(true);
-    this.map.display(this.mapx,this.mapy);
-    //this.displayPins(); // todo: move to map
+    this.map.display();
 };
 
 MapPanel.prototype.hideInterface = function(){
     if(this.bg) this.bg.setVisible(false);
     this.map.hide();
-    //this.displayPins(); // todo: move to map
 };
-
 
 MapPanel.prototype.update = function(){
     //this.hidePins(); // todo: move to map
     //this.displayPins();
 };
-
-// todo: move to map
-//MapPanel.prototype.displayPins = function(){
-    /*var list = Engine.currentBuiling.danger;
-    for(var i = 0; i < list.length; i++){
-        this.pins.push(this.map.addPin(list[i][0],list[i][1],'Danger','skull'));
-    }*/
-//};
-
-// todo: move to map
-/*MapPanel.prototype.hidePins = function(){
-    this.pins.forEach(function(p){
-        p.hide();
-    });
-    this.pins = [];
-};*/
 
 MapPanel.prototype.display = function(){
     Panel.prototype.display.call(this);

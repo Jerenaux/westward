@@ -5,20 +5,26 @@ var Map = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function Map(x, y, viewW, viewH, target, dragWidth, dragHeight) {
+    initialize: function Map(x, y, viewW, viewH, dragWidth, dragHeight, target, showToponyms) {
         CustomSprite.call(this, UI.scene, x, y, 'fullmap');
 
         this.setDepth(2);
         this.setScrollFactor(0);
         this.setVisible(false);
 
+        this.center = {
+            x: x,
+            y: y
+        };
         this.viewRect = new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH);
 
         this.target = target;
         this.toponyms = [];
-        Engine.settlementsData.forEach(function(s){
-            this.addText(s);
-        },this);
+        if(showToponyms) {
+            Engine.settlementsData.forEach(function (s) {
+                this.addText(s);
+            }, this);
+        }
 
         this.setInteractive();
         UI.scene.input.setDraggable(this);
@@ -36,29 +42,49 @@ var Map = new Phaser.Class({
 
     },
 
-    addMask: function(texture){
-        var mask = UI.scene.add.sprite(this.x,this.y,texture);
-        mask.setVisible(false);
-        //mask.setScale(1.1);
-        if(Boot.WEBGL){
-            mask.setDepth(2);
-            mask.setScrollFactor(0);
-            this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
-            this.maskOverlay = mask;
-        }else{
+    addMask: function(texture,shapeData){
+        if(texture){
+            var mask = UI.scene.add.sprite(this.x,this.y,texture);
+            mask.setVisible(false);
+            if(Boot.WEBGL){
+                //mask.setScale(1.1);
+                mask.setDepth(2);
+                mask.setScrollFactor(0);
+                this.maskType = 'bitmap';
+                this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
+                this.maskOverlay = mask;
+            }else{ // Creates a rect shape based on mask texture
+                var w = mask.frame.width;
+                var h = mask.frame.height;
+                shapeData = {
+                    type: 'rect',
+                    x: this.x-(w/2),
+                    y: this.y-(h/2),
+                    w: w,
+                    h: h
+                };
+            }
+        }
+
+        if(shapeData){
             var shape = UI.scene.make.graphics();
             shape.fillStyle('#ffffff');
-            var w = mask.frame.width;
-            var h = mask.frame.height;
-            shape.fillRect(this.x-(w/2), this.y-(h/2), w, h);
+
+            switch(shapeData.type){
+                case 'rect':
+                    shape.fillRect(shapeData.x,shapeData.y,shapeData.w,shapeData.h);
+                    break;
+                case 'circle':
+                    shape.fillCircle(shapeData.x, shapeData.y, shapeData.w/2);
+                    break;
+            }
+
             this.mask = new Phaser.Display.Masks.GeometryMask(UI.scene, shape);
             this.maskOverlay = shape;
+            this.maskType = 'geom';
         }
+
         this.maskOverlay.setVisible(false);
-        this.maskSize = {
-            width: mask.frame.width,
-            height: mask.frame.height
-        };
 
         this.toponyms.forEach(function(toponym){
             toponym.mask = (Boot.WEBGL
@@ -136,7 +162,6 @@ var Map = new Phaser.Class({
     },
 
     handleClick: function(pointer){
-        console.log('click');
         if(pointer.downX != pointer.upX || pointer.downY != pointer.upY) return; // drag
         console.log(Utils.screenToMap(pointer.x,pointer.y,this));
     },
@@ -175,29 +200,29 @@ var Map = new Phaser.Class({
         this.pinsCounter = 0;
     },
 
-    display: function(x,y){
+    display: function(){
         var tile;
         if(this.target == 'building'){
             tile = Engine.currentBuiling.getTilePosition();
         }else{
             tile = Engine.player.getTilePosition();
         }
+
         var origin = Utils.tileToPct(tile.x,tile.y);
         this.setOrigin(origin.x,origin.y);
-        this.setPosition(x,y);
+        this.setPosition(this.center.x,this.center.y);
 
         if(this.target == 'player') {
-            this.centerPin = this.addPin(tile.x,tile.y,'Your position','x');
-            this.centerPin.noDrag = true;
+            this.addPin(tile.x,tile.y,'Your position','x');
             Engine.player.markers.forEach(function(data){
                 this.addPin(data.x,data.y,Engine.buildingsData[data.type].name);
             },this);
         }
 
-        this.minY = this.y - (this.height-this.displayOriginY) + this.maskSize.height/2;
-        this.maxY = this.y + this.displayOriginY - this.maskSize.height/2;
-        this.minX = this.x - (this.width-this.displayOriginX) + this.maskSize.width/2;
-        this.maxX = this.x + this.displayOriginX - this.maskSize.width/2;
+        this.minY = this.y - (this.height-this.displayOriginY) + this.viewRect.height/2;
+        this.maxY = this.y + this.displayOriginY - this.viewRect.height/2;
+        this.minX = this.x - (this.width-this.displayOriginX) + this.viewRect.width/2;
+        this.maxX = this.x + this.displayOriginX - this.viewRect.width/2;
 
         this.minX = Math.max(this.minX,this.x-this.dragWidth);
         this.maxX = Math.min(this.maxX,this.x+this.dragWidth);
@@ -215,7 +240,7 @@ var Map = new Phaser.Class({
         this.input.hitArea = new Phaser.Geom.Rectangle(rectx,recty,this.viewRect.width,this.viewRect.height);
 
         this.setVisible(true);
-        if(!Boot.WEBGL) this.maskOverlay.setVisible(true);
+        if(this.maskType == 'geom') this.maskOverlay.setVisible(true);
     },
 
     hide: function(){
@@ -224,7 +249,7 @@ var Map = new Phaser.Class({
             t.setVisible(false);
         });
         this.setVisible(false);
-        this.maskOverlay.setVisible(false);
+        if(this.maskOverlay) this.maskOverlay.setVisible(false);
     },
 
     hidePins: function(){
@@ -246,7 +271,7 @@ var Pin = new Phaser.Class({
         this.setOrigin(0.5,1);
         this.setVisible(false);
         this.setInteractive();
-        this.mask = (Boot.WEBGL
+        if(mask) this.mask = (Boot.WEBGL
                 ? new Phaser.Display.Masks.BitmapMask(UI.scene,mask)
                 : new Phaser.Display.Masks.GeometryMask(UI.scene,mask)
         );
