@@ -4,10 +4,11 @@
 
 var onServer = (typeof window === 'undefined');
 
-function Pathfinder(navGrid,maxLength,allowDiagonal){
+function Pathfinder(navGrid,maxLength,allowDiagonal,cutCorners){
     this.grid = navGrid;
     this.maxLength = maxLength || 50;
     this.allowDiagonal = allowDiagonal || false;
+    this.cutCorners = cutCorners || false;
 }
 
 Pathfinder.prototype.setCallbacks = function(openCb, closeCb, backtrackCb){
@@ -17,7 +18,6 @@ Pathfinder.prototype.setCallbacks = function(openCb, closeCb, backtrackCb){
 };
 
 Pathfinder.prototype.findPath = function(from,to){
-    //TODO: cut corners, compare number of nodes considered between two approaches
     // todo: replac with 'closed' flag?
     var closedSet = new SpaceMap(); // Set of nodes already evaluated
     this.openSet = []; // The list of currently discovered nodes that are not evaluated yet
@@ -38,7 +38,7 @@ Pathfinder.prototype.findPath = function(from,to){
 
         var minFNode = this.getMinFNode();
         //console.log('Considering ',minFNode.toString());
-        log('log1','Considering '+minFNode.toString(),true);
+        //log('log1','Considering '+minFNode.toString(),true);
         if(minFNode.equals(end)) return this.backtrack(minFNode);
 
         if(minFNode.g > this.maxLength){
@@ -53,9 +53,7 @@ Pathfinder.prototype.findPath = function(from,to){
         neighbors.forEach(function(neighbor){
             if(closedSet.get(neighbor.x,neighbor.y)) return;
 
-            //var g = minFNode.g + 1;
             var g = minFNode.g + this.euclidean(minFNode,neighbor);
-            //if(g >= neighbor.g) return;
 
             //log('log1','Neighbor '+neighbor.toMiniString()+' : ng = '+g+" vs "+neighbor.g+", "+neighbor.opened);
             if(!neighbor.opened || g < neighbor.g) {
@@ -130,10 +128,15 @@ Pathfinder.prototype.generateNeighbors = function(node){
         offsets = [[-1,0],[0,-1],[1,0],[0,1]];
     }
 
-    // TODO: add "cur corners" consideration
-    offsets.forEach(function(o){
+    offsets.forEach(function(o,i){
         var n = this.getNode(node.x+o[0],node.y+o[1]);
-        if(this.isWalkable(n)) neighbors.push(n);
+        if(!this.isWalkable(n)) return;
+        if(this.allowDiagonal && !this.cutCorners && i%2 != 0){ // because corners are at odd positions in offsets array
+            // Compute corner nodes that could be cut
+            if(!this.isWalkable(this.getNode(node.x,node.y+o[1]))) return;
+            if(!this.isWalkable(this.getNode(node.x+o[0],node.y))) return;
+        }
+        neighbors.push(n);
     },this);
     return neighbors;
 };
@@ -152,10 +155,6 @@ Pathfinder.prototype.backtrack = function(node){
 
     while(node){
         path.push([node.x,node.y]);
-        /*if(path.length > 4) {
-            var t4 = path[path.length - 4];
-            if (Math.abs(node.x - t4.x) + Math.abs(node.y - t4.y) == 1) path.splice(path.length-3,2);
-        }*/
         if(this.backtrackCb) this.backtrackCb(node.x, node.y);
         node = this.cameFrom.get(node.x,node.y);
     }
@@ -167,7 +166,7 @@ Pathfinder.prototype.backtrack = function(node){
 };
 
 Pathfinder.prototype.manhattan = function(A,B){
-    return Math.abs(A.x - B.x) + Math.abs(A.y - B.y);// - 2;
+    return Math.abs(A.x - B.x) + Math.abs(A.y - B.y);
 };
 
 Pathfinder.prototype.chebyshev = function(A,B){
@@ -179,16 +178,9 @@ Pathfinder.prototype.euclidean = function(A,B){
 };
 
 Pathfinder.prototype.heuristic = function(A,B){
-    if(this.allowDiagonal){ // Squared Euclidean distance
-        /*var dx = A.x - B.x;
-        var dy = A.y - B.y;
-        return Math.sqrt(dx*dx + dy*dy);
-        return dx*dx + dy*dy;*/
-        // Chebyshev
-        //return Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
+    if(this.allowDiagonal){
         return this.chebyshev(A,B);
-    }else { // Manhattan distance
-        //return Math.abs(A.x - B.x) + Math.abs(A.y - B.y);// - 2;
+    }else {
         return this.manhattan(A,B);
     }
 };

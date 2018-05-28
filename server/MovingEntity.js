@@ -58,7 +58,7 @@ MovingEntity.prototype.updateWalk = function(){
 MovingEntity.prototype.updatePosition = function(x,y){
     this.x = x;
     this.y = y;
-    if(this.isPlayer) console.log('Position:',this.x,',',this.y);
+    //if(this.isPlayer) console.log('Position:',this.x,',',this.y);
     this.setOrUpdateAOI();
     if(!this.inFight) GameServer.checkForBattle(this);
 };

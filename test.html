@@ -118,7 +118,7 @@
     };
 
     function pf(sx,sy,ex,ey){
-        var finder = new Pathfinder(grid,50,true);
+        var finder = new Pathfinder(grid,50,true,false);
         finder.setCallbacks(onOpen,onClose,onBacktrack);
         finder.findPath({x:sx,y:sy},{x:ex,y:ey});
 

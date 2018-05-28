@@ -152,6 +152,7 @@ Content:
 - Reward only when checking in at fort? (more fun to get it on the go)
 - Do not grant XP for inhabitted AOIs (keep track of them somehow)
 - Map mechanics
+-> Fix tracking
 -> Zoom:
 --> Make another zoom-level tr map, which becomes default. The 005 ones becomes "zoom-out" mode
 --> addButtons method to add zoom buttons at speicifc coordinates 
