@@ -76,8 +76,10 @@ SpawnZone.prototype.spawn = function(AOIs,type,id,nb){
         var x = Utils.randomInt(AOI.x,AOI.x+World.chunkWidth);
         var y = Utils.randomInt(AOI.y,AOI.y+World.chunkHeight);*/
 
-        var x = Utils.randomInt(cx-3,cx+3);
-        var y = Utils.randomInt(cy-3,cy+3);
+        // TODO: put range in conf file
+        var range = 2;
+        var x = Utils.randomInt(cx-range,cx+range);
+        var y = Utils.randomInt(cy-range,cy+range);
         if(PFUtils.checkCollision(x,y)) {
             i--;
             continue;

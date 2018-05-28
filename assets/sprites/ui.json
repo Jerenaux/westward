@@ -431,6 +431,22 @@
     {
       "filename": "bigbutton_right_pressed",
       "frame": {"x":716,"y":83,"w":41,"h":28}
+    },
+    {
+      "filename": "scroll_up",
+      "frame": {"x":775,"y":201,"w":24,"h":27}
+    },
+    {
+      "filename": "scroll",
+      "frame": {"x":775,"y":230,"w":24,"h":3}
+    },
+    {
+      "filename": "scroll_down",
+      "frame": {"x":775,"y":235,"w":24,"h":25}
+    },
+    {
+      "filename": "scroll_pin",
+      "frame": {"x":821,"y":223,"w":12,"h":15}
     }
   ]
 }

@@ -41,5 +41,15 @@
   "class_selection": "Select carefully the path you'll follow. Each comes with unique benefits and will define your role in the economy and the settlement of the Continent. In the end, however, remember that all paths lead West...",
   "settlement_intro": "Select in which settlement you want to begin your adventure. A more developed settlement makes life easier, but might offer less opportunities for earning a civic position, or could be far away from useful resources. In any case, you are free to travel to another settlement (and encouraged to do so for trade), but the trip may be long and dangerous! Click on the green blinking icons on the map for more information about the settlements.",
   "welcome": "Welcome to Westward. Click on the ground to move. Click on buildings to visit them. Click on animals to attack them. Press enter to open the chat bar. The icons in the bottom-right corner of the screen open different menus.",
-  "not_implemented": "The following features are mentioned in the demo but not implemented yet: civic levels, path levels, development levels, using bombs in battle and fatigue. In addition, the enemy civilization is totally absent at the moment, and it is not possible to elect Governors yet. Not to mention all the other planned features that are not mentioned anywhere yet. Coming soon!"
- }
+  "not_implemented": "The following features are mentioned in the demo but not implemented yet: civic levels, path levels, development levels, using bombs in battle and fatigue. In addition, the enemy civilization is totally absent at the moment, and it is not possible to elect Governors yet. Not to mention all the other planned features that are not mentioned anywhere yet. Coming soon!",
+
+  "intro_title": "A few recommendations",
+  "intro_letter": [
+    "Dear friend,",
+    "If you get this letter, you must have arrived safely in [SETL]. I hope the journey wasn’t too rough.",
+    "At the time of your arrival, the settlement must still be in a sorry state. As you’ll soon discover, life on the Continent is not easy. Some say that these plains are like a wild animal who refuses to be tamed. But if you and other brave settlers like you play their part, I’m sure we will eventually succeed.",
+    "Here are a few recommendations. You won’t make a name for yourself alone. You won’t achieve much unless your settlement thrives. Collaborate with the other settlers to increase its resources and expand its territory. Try to bring back food every day, at least as much as what you eat. And follow the directions of the Governor and the Chancellors. Hell, if you do well and get noticed by your fellow settlers, you may even become Governor yourself one day!",
+    "But most of all, be careful when venturing out. As you may know, we are not alone in this land. And its inhabitants have only one wish, to throw us back in the sea. As if the dangerous wildlife was not enough. If possible, always go as a group.",
+    "A friend "
+  ]
+}

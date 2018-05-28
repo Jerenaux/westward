@@ -61,7 +61,7 @@ Client.checkForNewPlayer = function(){
 };
 
 Client.isNewPlayer = function(){
-    return true;
+    //return true;
     return Client.newPlayer;
 };
 

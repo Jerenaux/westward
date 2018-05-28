@@ -47,6 +47,9 @@ Engine.preload = function() {
     this.load.audio('inventory','assets/sfx/leather_inventory.wav');
     this.load.audio('crafting','assets/sfx/metal-clash.wav');
     this.load.audio('page_turn','assets/sfx/turn_page.wav');
+    this.load.audio('page_turn2','assets/sfx/turn_page2.wav');
+    this.load.audio('page_turn3','assets/sfx/turn_page3.wav');
+    this.load.audio('book','assets/sfx/book.wav');
     this.load.audio('equip','assets/sfx/chainmail1.wav');
     this.load.audio('cloth','assets/sfx/cloth.wav');
     this.load.audio('woodsmall','assets/sfx/wood-small.wav');
@@ -60,6 +63,7 @@ Engine.preload = function() {
     this.load.audio('clank','assets/sfx/clank.wav');
     this.load.audio('sword','assets/sfx/sword.wav');
     this.load.audio('soft','assets/sfx/soft.ogg');
+    this.load.audio('hit','assets/sfx/hit.wav');
 
     this.load.spritesheet('footsteps', 'assets/sprites/footstepssheet.png',{frameWidth:16,frameHeight:16});
     this.load.image('bug', 'assets/sprites/bug.png');
@@ -72,6 +76,7 @@ Engine.preload = function() {
     this.load.image('map', 'assets/sprites/map.png');
     this.load.image('self_map', 'assets/sprites/self_map.png');
     this.load.image('hammer', 'assets/sprites/hammer.png');
+    this.load.image('envelope', 'assets/sprites/envelope.png');
     this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
 
     this.load.image('fort', 'assets/sprites/buildings/fort_300.png');
@@ -317,6 +322,7 @@ Engine.initWorld = function(data){
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
     Engine.player.markers = data.markers;
+    Engine.players.unread = 1;
 
     Engine.miniMap.display();
 
@@ -428,16 +434,6 @@ Engine.hasFreeCommitSlot = function(){
     return Engine.getCommitSlots().length < Engine.player.commitSlots.max;
 };
 
-/*Engine.deathAnimation = function(target){
-    var anim = Engine.animationsPools['death'].getNext();
-    anim.setPosition(target.x+48,target.y+48);
-    anim.setVisible(true);
-    //anim.setTexture('death');
-    anim.setDepth(target.depth+1);
-    anim.anims.play('death');
-    target.setVisible(false);
-};*/
-
 Engine.manageDeath = function(){
     Engine.dead = true;
 };
@@ -484,15 +480,20 @@ Engine.makeUI = function(){
         'fort': Engine.makeFortMenu(),
         'inventory': Engine.makeInventory(statsPanel),
         'map': Engine.makeMapMenu(),
+        'messages': Engine.makeMessagesMenu(),
         'production': Engine.makeProductionMenu(),
         'staff': Engine.makeStaffMenu(),
         'trade': Engine.makeTradeMenu()
     };
 
     var UIelements = [];
+    Engine.nbBasicUIEelements = 5;
     var gap = 50;
     var x = 960;
     var y = 535;
+    var letter = new UIElement(x,y,'envelope',null,Engine.menus.messages);
+    UIelements.push(letter);
+    x -= gap;
     UIelements.push(new UIElement(x,y,'self_map',null,Engine.menus.map));
     x -= gap;
     UIelements.push(new UIElement(x,y,'scroll',null,Engine.menus.character));
@@ -501,7 +502,6 @@ Engine.makeUI = function(){
     x -= gap;
     UIelements.push(new UIElement(x,y,'backpack',null,Engine.menus.inventory));
     x -= gap;
-    Engine.nbBasicUIEelements = 4;
     Engine.UIelements = UIelements;
     Engine.UIHolder.resize(Engine.getHolderSize());
 
@@ -519,6 +519,20 @@ Engine.makeUI = function(){
     var chath = 50;
     var chaty = Engine.getGameConfig().height - chath;
     Engine.chatBar = new ChatPanel(0,chaty,chatw,chath,'Chat');
+
+    letter.tween = UI.scene.tweens.add(
+        {
+            targets: letter,
+            y: '-=20',
+            duration: 400,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Quad.easeOut',
+            onRepeat: function(_tween, _sprite){
+                if(_sprite.flagForStop) _tween.stop();
+            }
+        }
+    );
 };
 
 Engine.addMenuIcon = function(x,y,frame,menu){
@@ -562,6 +576,9 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
     sprite.setPosition(target.x+16,target.y+16);
     sprite.setVisible(true);
     sprite.setDepth(target.depth+1);
+    sprite.on('animationstart',function(){
+        Engine.scene.sound.add('hit').play();
+    });
     sprite.anims.play(animation);
 
     var text = Engine.textPool.getNext();
@@ -632,9 +649,6 @@ Engine.displayUI = function(){
 
 Engine.hideUI = function(){
     Engine.UIHolder.hide();
-    /*for(var i = 0; i < 3; i++){
-        Engine.UIelements[i].setVisible(false);
-    }*/
     Engine.UIelements.forEach(function(e){
         e.setVisible(false);
     });
@@ -739,8 +753,42 @@ Engine.makeConstructionMenu = function(){
     return constr;
 };
 
+Engine.makeMessagesMenu = function(){
+    var title = UI.textsData['intro_title'];
+
+    var menu = new Menu('Letters');
+    menu.setSound(Engine.scene.sound.add('page_turn3'));
+    var x = 150;
+    var listw = 250;
+    var gap = 20;
+    var list = menu.addPanel('list',new MessagesPanel(x,100,listw,380,'Letters'));
+    list.addMessages([{
+        name: title
+    }]);
+    var msg = menu.addPanel('msg',new InfoPanel(x+listw+gap,100,500,380,'Current message'));
+    msg.addMask();
+    msg.addScroll();
+    var txt = msg.addText(15,20,'Title: '+title);
+
+    var x = 15;
+    var y = 20 + txt.height;
+    UI.textsData['intro_letter'].forEach(function(t){
+        t = t.replace(/\[SETL\]/, Engine.settlementsData[Engine.player.settlement].name);
+        var txt = msg.addText(x,y,t);
+        y += txt.height+3;
+    });
+
+    menu.addEvent('onOpen',function(){
+        Engine.UIelements[0].flagForStop = true;
+    });
+
+    return menu;
+};
+
 Engine.makeStaffMenu = function(){
     var menu = new Menu('Officials');
+    menu.setSound(Engine.scene.sound.add('book'));
+
     var govw = 250;
     var govh = 150;
     var govx = (UI.getGameWidth()-govw)/2;
@@ -768,6 +816,7 @@ Engine.makeStaffMenu = function(){
 
 Engine.makeMapMenu = function(){
     var map = new Menu('Map');
+    map.setSound(Engine.scene.sound.add('page_turn2'));
     var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
     mapPanel.addBackground('longscroll');
     mapPanel.addMap('player','radiallongrect',1000,380,-1,-1);
