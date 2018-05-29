@@ -207,6 +207,14 @@ var Map = new Phaser.Class({
         this.tweenablePins = [];
     },
 
+    zoomIn: function(){
+        this.setTexture('fullmap_zoomed');
+    },
+
+    zoomOut: function(){
+        this.setTexture('fullmap');
+    },
+
     display: function(){
         var tile;
         if(this.target == 'building'){

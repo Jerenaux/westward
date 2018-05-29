@@ -1,11 +1,3 @@
-Priority:
-- Sound: (10min/day)
--> Make full invetory of available sfx by types
--> Dipatch them in-game
-- Graphics (30min/day)
-- Map
--> Ask background scroll to Tom (1000x380)
-- Background info (mail?)
 
 Admin
 Analytics
@@ -75,6 +67,7 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Deal differently with net updates when visibility lost (https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
 - Reimplement maps using containers
 - Refactor building management, shapes, positioning... (from bottom-left)
 - Use containers
@@ -115,6 +108,7 @@ Content:
 - Paths along most-travelled paths
 * Battle system
 - Walk towards enemy before triggering battle (to limit size of battle arena and center everything)
+-> Make coherent with intercept distance of animals
 - Use custom pathfinder to find battle cell (fulfill condition is a function rather than a specific cell)
 - Custom PF: don't cross cells occupied by other fighters
 - Get arrows back when skinning
@@ -147,15 +141,13 @@ Content:
 - Naming
 - Quests
 * Explorer gameplay
-- XP proportional to distance 
-- Reset visitted AOIs when going to fort
-- Reward only when checking in at fort? (more fun to get it on the go)
-- Do not grant XP for inhabitted AOIs (keep track of them somehow)
 - Map mechanics
--> Fix tracking
+-> Fix tracking (use containers first?)
 -> Zoom:
 --> Make another zoom-level tr map, which becomes default. The 005 ones becomes "zoom-out" mode
---> addButtons method to add zoom buttons at speicifc coordinates 
+--> addButtons method to add zoom buttons at speicifc coordinates
+--> Zoom in/out with scroll 
+--> Decide what level of zoom for Fort and Minimap
 -> Data sync:
 --> Iterate over markers of one map, if not in second map, add them
 --> Each player memorizes own markers (when building is displayed in surrounding AOIs), reset when visitting fort
@@ -179,6 +171,7 @@ Content:
 -> Future: markes about animal and plant populations, synced with fort, can be enabled/disabled on map
 - Quests
 - Civic XP when synchronizing enemy camps
+- Less XP based on lvl (up to 0 XP around settlements past a certain level)
 * Inventory
 - In shops, filter-out bought/sold items by graying them, but still display
 - Dropping items
@@ -258,6 +251,7 @@ Add checkboxes for what should be boiled or grinded
 - Salaries for officials, taxes
 - New buildings
 - Dev levels
+- Impact of dev level on exploration XP reward
 - Lists of items rewarded by civic xp
 * Soldier gameplay
 - XP

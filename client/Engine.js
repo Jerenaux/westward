@@ -99,6 +99,7 @@ Engine.preload = function() {
     this.load.image('radial3', 'assets/sprites/radial3.png');
     this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
     this.load.image('fullmap', 'assets/sprites/fortmap.png');
+    this.load.image('fullmap_zoomed', 'assets/sprites/fortmap_01.png');
     this.load.image('minimap', 'assets/sprites/minimap2s.png');
     // pin: https://www.iconfinder.com/icons/173052/map_marker_icon
     this.load.image('skull', 'assets/sprites/skull.png');
@@ -768,12 +769,14 @@ Engine.makeMessagesMenu = function(){
     var msg = menu.addPanel('msg',new InfoPanel(x+listw+gap,100,500,380,'Current message'));
     msg.addMask();
     msg.addScroll();
-    var txt = msg.addText(15,20,'Title: '+title);
+    //var txt = msg.addText(15,20,'Title: '+title);
 
     var x = 15;
-    var y = 20 + txt.height;
+    //var y = 20 + txt.height;
+    var y = 20;
     UI.textsData['intro_letter'].forEach(function(t){
         t = t.replace(/\[SETL\]/, Engine.settlementsData[Engine.player.settlement].name);
+        t = t.replace(/\[OTSETL\]/, Engine.settlementsData[1-Engine.player.settlement+0].name); // quick fix
         var txt = msg.addText(x,y,t);
         y += txt.height+3;
     });
@@ -819,8 +822,12 @@ Engine.makeMapMenu = function(){
     map.setSound(Engine.scene.sound.add('page_turn2'));
     var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
     mapPanel.addBackground('longscroll');
-    mapPanel.addMap('player','radiallongrect',1000,380,-1,-1);
-    //mapPanel.addButton(mapw-30, 8, 'blue','help',null,'',UI.textsData['map_help']);
+    var mapInstance = mapPanel.addMap('player','radiallongrect',1000,380,-1,-1);
+    mapPanel.addButton(960, 8, 'blue','help',null,'',UI.textsData['self_map_help']);
+    // TODO: move in Map.js, method addZoom, positions buttons based on viewWidt/height and
+    // controls enable/disable of buttons based on zoom flag
+    mapPanel.addButton(960, 310, 'blue','plus',mapInstance.zoomIn.bind(mapInstance),'Zoom in');
+    mapPanel.addButton(960, 340, 'blue','minus',mapInstance.zoomOut.bind(mapInstance),'Zoom out');
     map.addPanel('map',mapPanel);
     return map;
 };

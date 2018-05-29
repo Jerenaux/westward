@@ -24,7 +24,7 @@ Engine.boot = function(){
         Engine.baseViewWidth*Engine.tileWidth,
         Engine.baseViewHeight*Engine.tileHeight,
         {
-            antialias: false,
+            antialias: true,
             view: document.getElementById('game'),
             //resolution: 0.5,
             preserveDrawingBuffer: true // to allow image captures from canvas
@@ -123,7 +123,9 @@ Engine.readMaster = function(masterData){
         var absolutePath = tileset.image;
         var tokens = absolutePath.split('\\');
         var img = tokens[tokens.length-1];
+        //if(img == 'ground_tiles.png') img = 'ground_tiles_not_extr.png';
         var path = '../assets/tilesets/'+img;
+        console.warn(path);
         PIXI.loader.add(tileset.name,path);
     }
 
@@ -782,7 +784,8 @@ Engine.displayQuadrant = function(quad){
 Engine.captureAll = function(){
     Engine.performCapture = true;
     Engine.captureStage = new PIXI.Container();
-    Engine.captureScale = 0.05; // 0.025 for settlement selection map
+    // Zoom levels: 005 and 01
+    Engine.captureScale = 0.1; // 0.025 for settlement selection map
     Engine.player.visible = false;
     Engine.captureCount = 0;
     Engine.quadW = 50;

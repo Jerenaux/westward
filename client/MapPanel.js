@@ -23,6 +23,7 @@ MapPanel.prototype.addMap = function(target,texture,w,h,dragX,dragY){
     this.map = new Map(this.mapx,this.mapy,w,h,dragX,dragY,target,true);
     this.map.addMask(texture);
     this.content.push(this.map);
+    return this.map;
 };
 
 MapPanel.prototype.displayInterface = function(){

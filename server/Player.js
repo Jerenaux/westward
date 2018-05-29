@@ -497,12 +497,16 @@ Player.prototype.setAction = function(action){
 };
 
 Player.prototype.onAOItransition = function(newAOI,previousAOI){
-    if(this.isExplorer()) {
-        if(!previousAOI) this.visitedAOIs.add(newAOI);
-        if(!this.visitedAOIs.has(newAOI)) {
-            this.visitedAOIs.add(newAOI);
-            this.addNotif('New area visited');
-            this.gainClassXP(5, true); // TODO: vary based on multiple factors
+    if(!this.visitedAOIs.has(newAOI)) {
+        this.visitedAOIs.add(newAOI);
+        if(previousAOI && this.isExplorer()){ // if previousAOI: don't grant XP for spawning in fort
+            var A = Utils.lineToGrid(this.settlement.fort.aoi,World.nbChunksHorizontal);
+            var B = Utils.lineToGrid(newAOI,World.nbChunksHorizontal);
+            var dist = Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
+            if(dist > 2) { // todo: make depend on dev level
+                this.addNotif('New area visited');
+                this.gainClassXP(dist * 5, true); // TODO: facotr in class level
+            }
         }
     }
 };
@@ -539,6 +543,11 @@ Player.prototype.enterBuilding = function(id){
     // TODO: check for proximity
     // TODO: add to a list of people in the building object
     this.setProperty('inBuilding', id);
+
+    if(this.settlement.fort.id == id){
+        console.log('Came back to fort');
+        this.visitedAOIs.clear();
+    }
 };
 
 Player.prototype.exitBuilding = function(){
