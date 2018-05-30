@@ -978,7 +978,39 @@ Engine.makeInventory = function(statsPanel){
     return inventory;
 };
 
-Engine.makeCharacterMenu = function(statsPanel){
+Engine.makeCharacterMenu = function(){
+    var menu = new Menu('Character');
+    menu.setSound(Engine.scene.sound.add('page_turn'));
+
+    var citizenx = 40;
+    var citizeny = 100;
+    var citizenw = 470;
+    var citizenh = 200;
+    var gap = 10;
+    var classx = citizenx+citizenw+gap;
+    var classy = 100;
+    var classw = 470;
+    var classh = 300;
+    var questy = classy+classh;
+    var logy = citizeny+citizenh;
+    var questh = 380-classh;
+    var logh = 380 - citizenh;
+
+    var citizen = menu.addPanel('citizen', new CitizenPanel(citizenx,citizeny,citizenw,citizenh,'Civic status'));
+    var log = menu.addPanel('log', new Panel(citizenx,logy,citizenw,logh,'Events log'));
+
+    var classpanel = menu.addPanel('class', new CharacterPanel(classx,classy,classw,classh,'Multi-Class status'));
+    var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
+
+    var commit = menu.addPanel('commit',new InventoryPanel(citizenx+10,citizeny+20,150,100,''));
+    commit.setInventory(new Inventory(6),3,false);
+
+    menu.addEvent('onUpdateCharacter',classpanel.update.bind(classpanel));
+
+    return menu;
+};
+
+/*Engine.makeCharacterMenu = function(statsPanel){
     var padding = 10;
     var infoh = 235;
     var infox = 665;
@@ -1006,7 +1038,7 @@ Engine.makeCharacterMenu = function(statsPanel){
     character.addEvent('onUpdateCommit',commitPanel.update.bind(commitPanel));
     character.addEvent('onUpdateCharacter',infoPanel.update.bind(infoPanel));
     return character;
-};
+};*/
 
 Engine.getIngredientsPanel = function(){
     return Engine.menus['crafting'].panels['ingredients'];

@@ -74,6 +74,10 @@ Player.prototype.isCraftsman = function(){
     return this.class == GameServer.classes.craftsman;
 };
 
+Player.prototype.isMerchant = function(){
+    return this.class == GameServer.classes.merchant;
+};
+
 Player.prototype.setSettlement = function(sid){
     this.sid = sid;
     this.settlement = GameServer.settlements[this.sid];

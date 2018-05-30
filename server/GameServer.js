@@ -622,6 +622,7 @@ GameServer.handleShop = function(data,socketID) {
         player.takeItem(item,nb,true);
         building.takeGold(price);
         building.giveItem(item,nb);
+        if(player.isMerchant()) player.gainClassXP(Math.floor(price/10), true); // TODO: factor in class level
     }
     building.save();
     Prism.logEvent(player,action,{id:item,price:price,nb:nb});

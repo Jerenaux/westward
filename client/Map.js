@@ -224,7 +224,11 @@ var Map = new Phaser.Class({
         }
 
         var origin = Utils.tileToPct(tile.x,tile.y);
-        this.setOrigin(origin.x,origin.y);
+        var maxOriginX = (this.width - this.viewRect.width/2)/this.width;
+        var minOriginX = (this.viewRect.width/2)/this.width;
+        var maxOriginY = (this.height - this.viewRect.height/2)/this.height;
+        var minOriginY = (this.viewRect.height/2)/this.height;
+        this.setOrigin(Utils.clamp(origin.x,minOriginX,maxOriginX),Utils.clamp(origin.y,minOriginY,maxOriginY));
         this.setPosition(this.center.x,this.center.y);
 
         if(this.target == 'player') {

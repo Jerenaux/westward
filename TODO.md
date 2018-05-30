@@ -1,10 +1,10 @@
-
 Admin
 Analytics
 Cleaning
 * Ambiance
 * Battle system
 * Civics
+* Character panel
 * Craftsmen gameplay
 * Explorer gameplay
 * Inventory
@@ -114,9 +114,13 @@ Content:
 - Get arrows back when skinning
 - Animals have sorted list of targets, iteratr through it when first one not reachable for some reason
 -> Deal with big battlefields; focus camera on active player (problem: if far away, surrounding AOIs not displayed), ...
-- Fighters queue indicating participants and upcoming turns
+- New interface:
+Timer at bottom, icon of active fighter on the left, queue of others on the right
+Skip turn below
+Health and fatigue above, numerically + battle counters (movement, actions...)
+Belt slots above + ammo slots + active weapon (ranged vs melee)
+=> Allow both melee & ranged equipped at same type, ranged active by default
 - Identify characters in the way of ranged attacks
-- Anti-friendly fire safety for ranged attacks
 - Stats and formulas for bombs
 - Mechanic for bombs
 - Anti-friendly fire safety for bombs
@@ -132,13 +136,26 @@ Content:
 - Update population based on players
 - Elections
 - Naming officials
+* Character panel
+- Remove % stats panel
+- Display health, fatigue and gold permanently in HUD
+- Redisplay committment slots
+- Share all XP sources
+- Levels
+- LvlUp selected class
+- Ability points
+- Ability system
+- Events log
+Add help
 * Craftsmen gameplay
+- Workshop interface
 - Recipes
 - Tier
 - XP based on multiple factors
 - Bonuses
 - Upgrades
 - Naming
+- Dismantling
 - Quests
 * Explorer gameplay
 - Map mechanics
@@ -172,32 +189,32 @@ Content:
 - Quests
 - Civic XP when synchronizing enemy camps
 - Less XP based on lvl (up to 0 XP around settlements past a certain level)
+- Bonuses
 * Inventory
-- In shops, filter-out bought/sold items by graying them, but still display
 - Dropping items
+- Clicking on item: compare stats effects with currently equipped, if any
 - Belt mechanics (quick-use slots for potions, bombs and weapons)
 - Backpack mechanics
 - Gunpowder mechanics (multiple pouches?)
 - Ammo types
 * Merchant gameplay
-- XP
-- Bonuses
 - Shops
 - Caravans
 - Homeland trade
 - Inns
 - Quests
+- Bonuses
+- Tax evasion
+- Less XP based on level
 * Misc
-- Display path xp
-- Levels
 - Fix continuous movement system
-- Events log
-- Fatigue
+- Fatigue 
 - Rest
 - Campfires
 - Respawn losses
-- Messaging -> Very first mail is a RP mail giving some background about the game
+- Messaging
 - Leaderboards
+- View info on other players (levels...)
 - Guilds
 * Orientation
 * Packaging
@@ -277,6 +294,7 @@ Deployment:
 Design document:
 ---------------
 -> Market research
+- Put "stats.txt" cleanly in design doc
 - Finish copying notes (currently: in ambiance, npc dialogues)
 - Concile all texts (doc, crafting.txt)
 - Decide list of buildings, items, ...
