@@ -109,11 +109,12 @@ Content:
 * Battle system
 - Walk towards enemy before triggering battle (to limit size of battle arena and center everything)
 -> Make coherent with intercept distance of animals
-- Use custom pathfinder to find battle cell (fulfill condition is a function rather than a specific cell)
-- Custom PF: don't cross cells occupied by other fighters
+- Better monster positioning (sort available cells based on chebyshev distance and self distance)
 - Get arrows back when skinning
 - Animals have sorted list of targets, iteratr through it when first one not reachable for some reason
--> Deal with big battlefields; focus camera on active player (problem: if far away, surrounding AOIs not displayed), ...
+- Deal with big battlefields:
+-> Limit battlefield size
+-> focus camera on active player
 - New interface:
 Timer at bottom, icon of active fighter on the left, queue of others on the right
 Skip turn below

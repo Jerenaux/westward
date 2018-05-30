@@ -93,6 +93,7 @@ Engine.preload = function() {
     this.load.atlas('items2_gr', 'assets/sprites/resources_full_gr.png', 'assets/sprites/resources_full.json');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
+    this.load.image('orientation', 'assets/sprites/orientation.png');
     this.load.image('tail', 'assets/sprites/tail.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll_horiz.png');
     this.load.image('longscroll', 'assets/sprites/longscroll.png');
@@ -1761,15 +1762,67 @@ function s(){
     Client.socket.emit('ss');
 }
 
-function camtest(){
-    var cam = Engine.scene.cameras.add(800,0,200,200);
-    cam.setZoom(0.2);
-    cam.setBounds(0,0,50*30*32,57*20*32);
-    Engine.camera.startFollow(Engine.player);
+function or3(x,y){
+    x = (x*32)+16;
+    y = (y*32)+16;
+    x -= Engine.player.x;
+    y -= Engine.player.y;
+    var a = 1024;
+    var b = 576;
 
-    /*cam.scrollX = Engine.camera.scrollX;
-    cam.scrollY = Engine.camera.scrollY;*/
-    console.log(cam);
+    if(x > b/2 && y > )
+}
+
+function or2(x,y){
+    // "coordinates of intersection between line and rectangle"
+    // https://math.stackexchange.com/questions/2397682/intersection-between-rectangle-and-line-from-center-point
+
+    // https://math.stackexchange.com/questions/655369/coordinate-of-intersection-between-line-and-square
+
+    //x = (x*32)+16;
+    //y = (y*32)+16;
+    x -= Engine.player.tileX;
+    y -= Engine.player.tileY;
+    //x -= Engine.player.x;
+    //y -= Engine.player.y;
+    //x -= (Engine.camera.scrollX + 512);
+    //y -= (Engine.camera.scrollY + 288);
+    console.log(x,y);
+    //y *= -1;
+    var u = Math.max(Math.abs(x),Math.abs(y));
+    var xp = x/u;
+    var yp = y/u;
+    console.log(xp,yp);
+
+    var vert = Engine.getGameConfig().height;
+    var horiz = Engine.getGameConfig().width;
+    xp = horiz/2 + (horiz/2)*xp;
+    yp = vert/2 + (vert/2)*yp;
+    console.log(xp,yp);
+    var o = UI.scene.add.sprite(xp,yp,'orientation');
+    o.setScrollFactor(0);
+    o.setDepth(10);
+}
+
+function or(x,y){
+    var angle = -(Math.atan2(y - Engine.player.tileY, x - Engine.player.tileX));
+    orangle(angle);
+}
+
+function orangle(angle){
+    var vert = Engine.getGameConfig().height;
+    var horiz = Engine.getGameConfig().width;
+    //console.log(angle,Math.cos(angle),Math.sin(angle),Math.tan(angle),Math.atan(angle));
+
+    var x = horiz/2 + Math.cos(angle)*(horiz/2);
+    var y = vert/2 + Math.sin(angle)*(vert/2);
+    console.log(angle,x,y);
+    /*var x = horiz/2 + horiz/2;
+    var y = vert/2 + (horiz*Math.sin(angle))/(2*Math.cos(angle));*/
+    console.log(angle,x,y);
+    var o = UI.scene.add.sprite(x,y,'orientation');
+    o.setScrollFactor(0);
+    o.setDepth(10);
 }
 
 function detectBrowser(){
