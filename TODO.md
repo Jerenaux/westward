@@ -108,8 +108,6 @@ Content:
 - Carcasses, traces of fight, traces of campfires
 - Paths along most-travelled paths
 * Battle system
-- Walk towards enemy before triggering battle (to limit size of battle arena and center everything)
--> Make coherent with intercept distance of animals
 - Better monster positioning (sort available cells based on chebyshev distance and self distance)
 - Get arrows back when skinning
 - Animals have sorted list of targets, iteratr through it when first one not reachable for some reason
@@ -219,6 +217,13 @@ Add help
 - View info on other players (levels...)
 - Guilds
 * Orientation
+- Make proper class
+- Vary size with distance
+- Work out proper depth
+- Add icons
+- Add sound effects
+- Add plants
+- Fator in explorer abilities
 * Packaging
 -> Determine new player by querying server
 -> Nb connected, permanent players, player names, ..

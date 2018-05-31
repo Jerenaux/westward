@@ -195,7 +195,7 @@ MovingEntity.prototype.findFreeCell = function(){
     var pos = {x:this.x,y:this.y};
     var list = this.battle.getCells(); //{x,y,v} objects
     list.sort(function(a,b){
-        if(Utils.manhattan(a,pos) < Utils.manhattan(b,pos)) return -1;
+        if(Utils.chebyshev(a,pos) < Utils.chebyshev(b,pos)) return -1;
         return 1;
     });
     for(var i = 0; i < list.length; i++){
@@ -256,9 +256,28 @@ MovingEntity.prototype.selectTarget = function(){
 MovingEntity.prototype.computeBattleDestination = function(target){
     var dest = target.getEndOfPath();
     var closest = null;
-    var minDist = 9999;
+    //var minDist = 9999;
+    var r = GameServer.battleParameters.battleRange;
+    var candidates = [];
+    for(var x = this.x - r; x < this.x + r + 1; x++){
+        for(var y = this.y - r; y < this.y + r + 1; y++){
+            if(x == dest.x && y == dest.y) continue;
+            if(!this.battle.isPosition(x,y)) continue;
+            if(!this.battle.isPositionFree(x,y)) continue;
+            if(PFUtils.checkCollision(x,y)) continue;
+            if(!this.inBattleRange(x,y)) continue; // still needed as long as Euclidean range, the double-loop include corners outside of Euclidean range
+        }
+    }
+    var _self = this;
+    candidates.sort(function(a,b){
+        var dA = Utils.chebyshev(a,pos) + Utils.chebyshev(a,_self);
+        var dB = Utils.chebyshev(b,pos) + Utils.chebyshev(b,_self);
+        if(dA < dB) return -1;
+        return 1;
+    });
+    closest = candidates[0];
     //console.log('target : ',dest.x,dest.y);
-    for(var x = Math.min(this.x,dest.x-1); x <= Math.max(this.x,dest.x+1); x++){
+    /*for(var x = Math.min(this.x,dest.x-1); x <= Math.max(this.x,dest.x+1); x++){
         for(var y = Math.min(this.y,dest.y-1); y <= Math.max(this.y,dest.y+1); y++) {
             if(x == dest.x && y == dest.y) continue;
             if(!this.battle.isPosition(x,y)) continue;
@@ -274,8 +293,8 @@ MovingEntity.prototype.computeBattleDestination = function(target){
                 closest = {x:x,y:y};
             }
         }
-    }
-    if(closest == null) console.log('not found');
+    }*/
+    //if(closest == null) console.log('not found');
     return closest;
 };
 

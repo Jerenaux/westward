@@ -25,11 +25,11 @@
     },
     pathdinfing: {
         walkingSpeed: 5, // tiles/sec
-        battleRange: 3, // distance that can be travelled in one turn in battle
         maxPathLength: 36
     },
     battle: {
-        aggroRange: 8 // chebyshev distance
+        aggroRange: 10, // chebyshev distance
+        battleRange: 3 // distance that can be travelled in one turn in battle; TODO: variable
     },
     updateRates: {
             // Unit: ms

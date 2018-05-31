@@ -312,6 +312,74 @@ Engine.createMarker = function(){
     Engine.hideMarker();
 };
 
+Engine.addFringePin = function(){
+    // TODO: add pool
+    var o = UI.scene.add.sprite(0,0,'orientation');
+    o.setScrollFactor(0);
+    o.setDepth(2);
+    o.setOrigin(0.5,1);
+    return o;
+};
+
+Engine.updateFringePin = function(pin,x,y){
+    x -= Engine.player.tileX;
+    y -= Engine.player.tileY;
+    //var m = y/x;  slope
+    // line: y = (y_c/x_c)*x   no intercept for lines going through origin
+    // top: y = -9   equation of top size
+    // => (yc/xc)*x = 9 <=> x = -9*xc/yc;
+    // bottom: y = 10
+
+    var vert = Engine.getGameConfig().height;
+    var horiz = Engine.getGameConfig().width;
+
+    var A = {
+        x: -(horiz/(2*World.tileWidth)),
+        y: -(vert/(2*World.tileHeight))
+    };
+    var B = {
+        x: (horiz/(2*World.tileWidth)),
+        y: -(vert/(2*World.tileHeight))
+    };
+    var C = {
+        x: (horiz/(2*World.tileWidth)),
+        y: (vert/(2*World.tileHeight))
+    };
+
+    var d1 = Math.sign(x*B.y - y*B.x);
+    var d2 = Math.sign(x*A.y - y*A.x);
+    /*
+    *       1, -1
+    * 1,1           -1, -1
+    *       -1, 1
+    * */
+    var xp, yp, angle;
+    if(d1 == 1 && d2 == -1){
+        xp = A.y*(x/y);
+        yp = A.y;
+        angle = 180;
+    }else if(d1 == -1 && d2 == -1){
+        xp = B.x;
+        yp = B.x*(y/x);
+        angle = -90;
+    }else if(d1 == -1 && d2 == 1){
+        xp = C.y*(x/y);
+        yp = C.y;
+        angle = 0
+    }else if(d1 ==1 && d2 == 1){
+        xp = A.x;
+        yp = A.x*(y/x);
+        angle = 90
+    }else{
+        console.warn('no sector (x=',x,', y = ',y,')');
+    }
+    xp = horiz/2 + xp*World.tileWidth;
+    yp = vert/2 + yp*World.tileHeight;
+
+    pin.setPosition(xp,yp);
+    pin.setAngle(angle);
+};
+
 Engine.initWorld = function(data){
     //Engine.animalUpdates = new ListMap(); // debug purpose, remove
     Engine.firstSelfUpdate = true;
@@ -1760,129 +1828,6 @@ function cl(){
 
 function s(){
     Client.socket.emit('ss');
-}
-
-function or3(x,y){
-    x -= Engine.player.tileX;
-    y -= Engine.player.tileY;
-    //var m = y/x;  slope
-    // line: y = (y_c/x_c)*x   no intercept for lines going through origin
-    // top: y = -9   equation of top size
-    // => (yc/xc)*x = 9 <=> x = -9*xc/yc;
-    // bottom: y = 10
-
-    var vert = Engine.getGameConfig().height;
-    var horiz = Engine.getGameConfig().width;
-
-    var A = {
-        x: -(horiz/(2*World.tileWidth)),
-        y: -(vert/(2*World.tileHeight))
-    };
-    var B = {
-        x: (horiz/(2*World.tileWidth)),
-        y: -(vert/(2*World.tileHeight))
-    };
-    var C = {
-        x: (horiz/(2*World.tileWidth)),
-        y: (vert/(2*World.tileHeight))
-    };
-
-    var d1 = Math.sign(x*B.y - y*B.x);
-    var d2 = Math.sign(x*A.y - y*A.x);
-    console.log(d1,d2);
-    /*
-    *       1, -1
-    * 1,1           -1, -1
-    *       -1, 1
-    * */
-    var xp, yp, angle;
-    if(d1 == 1 && d2 == -1){
-        xp = A.y*(x/y);
-        yp = A.y;
-        angle = 180;
-    }else if(d1 == -1 && d2 == -1){
-        xp = B.x;
-        yp = B.x*(y/x);
-        angle = -90;
-    }else if(d1 == -1 && d2 == 1){
-        xp = C.y*(x/y);
-        yp = C.y;
-        angle = 0
-    }else if(d1 ==1 && d2 == 1){
-        xp = A.x;
-        yp = A.x*(y/x);
-        angle = 90
-    }else{
-        console.warn('no sector');
-    }
-    console.log(xp,yp);
-    xp = 512 + xp*World.tileWidth;
-    yp = 288 + yp*World.tileHeight;
-    console.log(xp,yp);
-    var o = UI.scene.add.sprite(xp,yp,'orientation');
-    o.setScrollFactor(0);
-    o.setDepth(10);
-    o.setOrigin(0.5,1);
-    o.setAngle(angle);
-}
-
-
-function or2(x,y){
-    // "coordinates of intersection between line and rectangle"
-    // https://math.stackexchange.com/questions/2397682/intersection-between-rectangle-and-line-from-center-point
-
-    // https://math.stackexchange.com/questions/655369/coordinate-of-intersection-between-line-and-square
-
-    //x = (x*32)+16;
-    //y = (y*32)+16;
-    x -= Engine.player.tileX;
-    y -= Engine.player.tileY;
-    //x -= Engine.player.x;
-    //y -= Engine.player.y;
-    //x -= (Engine.camera.scrollX + 512);
-    //y -= (Engine.camera.scrollY + 288);
-    console.log(x,y);
-    //y *= -1;
-    var u = Math.max(Math.abs(x),Math.abs(y));
-    var xp = x/u;
-    var yp = y/u;
-    console.log(xp,yp);
-
-    var vert = Engine.getGameConfig().height;
-    var horiz = Engine.getGameConfig().width;
-    xp = horiz/2 + (horiz/2)*xp;
-    yp = vert/2 + (vert/2)*yp;
-    console.log(xp,yp);
-    var o = UI.scene.add.sprite(xp,yp,'orientation');
-    o.setScrollFactor(0);
-    o.setDepth(10);
-}
-
-function or(x,y){
-    var angle = (Math.atan2(y - Engine.player.tileY, x - Engine.player.tileX));
-    console.log('angle = ',angle);
-    orangle(angle);
-}
-
-function ca(x,y){
-    var angle = (Math.atan2(y - 288, x - 512));
-    console.log(angle,'rad ',angle*(180/Math.PI),'°');
-}
-
-function orangle(angle){
-    var vert = Engine.getGameConfig().height;
-    var horiz = Engine.getGameConfig().width;
-    //console.log(angle,Math.cos(angle),Math.sin(angle),Math.tan(angle),Math.atan(angle));
-
-    var x = horiz/2 + Math.cos(angle)*(horiz/2);
-    var y = vert/2 + Math.sin(angle)*(vert/2);
-    console.log(angle,x,y);
-    /*var x = horiz/2 + horiz/2;
-    var y = vert/2 + (horiz*Math.sin(angle))/(2*Math.cos(angle));*/
-    console.log(angle,x,y);
-    var o = UI.scene.add.sprite(x,y,'orientation');
-    o.setScrollFactor(0);
-    o.setDepth(10);
 }
 
 function detectBrowser(){

@@ -36,6 +36,8 @@ var Animal = new Phaser.Class({
         this.footprintsFrame = animalData.footprintsFrame;
         this.printsVertOffset = animalData.printsVertOffset;
         this.restingFrames = animalData.restingFrames;
+
+        this.manageFringePin();
     },
 
     update: function(data){
@@ -54,6 +56,10 @@ var Animal = new Phaser.Class({
         //console.log('remove ',this.id,'(',this.tileX,',',this.tileY,',',this.chunk,',)');
         //Engine.animalUpdates.add(this.id,'remove');
         CustomSprite.prototype.remove.call(this);
+        if(this.fringePin) {
+            this.fringePin.destroy();
+            this.fringePin = null;
+        }
         delete Engine.animals[this.id];
     },
 

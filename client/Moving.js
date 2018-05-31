@@ -62,6 +62,24 @@ var Moving = new Phaser.Class({
         return this.constructor.name[0]+this.id;
     },
 
+    manageFringePin: function(){
+        if(!this.fringePin) this.fringePin = Engine.addFringePin();
+        var viewRect = new Phaser.Geom.Rectangle(Engine.camera.scrollX,Engine.camera.scrollY,Engine.camera.width,Engine.camera.height);
+        var inCamera = viewRect.contains(this.x,this.y);
+        if(inCamera) {
+            if(this.fringePin.visible){
+                console.log('OFF for',this.id);
+                this.fringePin.setVisible(false);
+            }
+        }else{
+            if(!this.fringePin.visible){
+                console.log('ON for',this.id);
+                this.fringePin.setVisible(true);
+            }
+            Engine.updateFringePin(this.fringePin,this.tileX,this.tileY);
+        }
+    },
+
     move: function(path){
         if(path.length <= 1) {
             this.endMovement();
@@ -147,6 +165,7 @@ var Moving = new Phaser.Class({
 
         this.leaveFootprint();
         this.playSound();
+        if(!this.isHero) this.manageFringePin();
 
         if(this.flagForStop || (this.stopPos && this.stopPos.x == tx && this.stopPos.y == ty)){
             this.movement.stop();
