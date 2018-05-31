@@ -151,7 +151,7 @@ Animal.prototype.checkForHostiles = function(){
             var entity = aoi.entities[j];
             if(!entity.isPlayer) continue;
             if(!entity.isAvailableForFight()) continue;
-            if(Utils.euclidean(this,entity) < 10){
+            if(Utils.chebyshev(this,entity) <= GameServer.battleParameters.aggroRange){
                 console.log(this.getShortID(),'spots',entity.getShortID());
                 if(entity.isInFight()){
                     this.goToDestination(entity);

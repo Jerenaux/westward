@@ -1763,15 +1763,69 @@ function s(){
 }
 
 function or3(x,y){
-    x = (x*32)+16;
-    y = (y*32)+16;
-    x -= Engine.player.x;
-    y -= Engine.player.y;
-    var a = 1024;
-    var b = 576;
+    x -= Engine.player.tileX;
+    y -= Engine.player.tileY;
+    //var m = y/x;  slope
+    // line: y = (y_c/x_c)*x   no intercept for lines going through origin
+    // top: y = -9   equation of top size
+    // => (yc/xc)*x = 9 <=> x = -9*xc/yc;
+    // bottom: y = 10
 
-    if(x > b/2 && y > )
+    var vert = Engine.getGameConfig().height;
+    var horiz = Engine.getGameConfig().width;
+
+    var A = {
+        x: -(horiz/(2*World.tileWidth)),
+        y: -(vert/(2*World.tileHeight))
+    };
+    var B = {
+        x: (horiz/(2*World.tileWidth)),
+        y: -(vert/(2*World.tileHeight))
+    };
+    var C = {
+        x: (horiz/(2*World.tileWidth)),
+        y: (vert/(2*World.tileHeight))
+    };
+
+    var d1 = Math.sign(x*B.y - y*B.x);
+    var d2 = Math.sign(x*A.y - y*A.x);
+    console.log(d1,d2);
+    /*
+    *       1, -1
+    * 1,1           -1, -1
+    *       -1, 1
+    * */
+    var xp, yp, angle;
+    if(d1 == 1 && d2 == -1){
+        xp = A.y*(x/y);
+        yp = A.y;
+        angle = 180;
+    }else if(d1 == -1 && d2 == -1){
+        xp = B.x;
+        yp = B.x*(y/x);
+        angle = -90;
+    }else if(d1 == -1 && d2 == 1){
+        xp = C.y*(x/y);
+        yp = C.y;
+        angle = 0
+    }else if(d1 ==1 && d2 == 1){
+        xp = A.x;
+        yp = A.x*(y/x);
+        angle = 90
+    }else{
+        console.warn('no sector');
+    }
+    console.log(xp,yp);
+    xp = 512 + xp*World.tileWidth;
+    yp = 288 + yp*World.tileHeight;
+    console.log(xp,yp);
+    var o = UI.scene.add.sprite(xp,yp,'orientation');
+    o.setScrollFactor(0);
+    o.setDepth(10);
+    o.setOrigin(0.5,1);
+    o.setAngle(angle);
 }
+
 
 function or2(x,y){
     // "coordinates of intersection between line and rectangle"
@@ -1805,8 +1859,14 @@ function or2(x,y){
 }
 
 function or(x,y){
-    var angle = -(Math.atan2(y - Engine.player.tileY, x - Engine.player.tileX));
+    var angle = (Math.atan2(y - Engine.player.tileY, x - Engine.player.tileX));
+    console.log('angle = ',angle);
     orangle(angle);
+}
+
+function ca(x,y){
+    var angle = (Math.atan2(y - 288, x - 512));
+    console.log(angle,'rad ',angle*(180/Math.PI),'°');
 }
 
 function orangle(angle){

@@ -534,7 +534,7 @@ Player.prototype.checkForHostiles = function(){
             if(!entity.isAnimal) continue;
             if(!entity.isAggressive()) continue;
             if(!entity.isAvailableForFight()) continue;
-            if(Utils.euclidean(this,entity) < 10){
+            if(Utils.chebyshev(this,entity) <= GameServer.battleParameters.aggroRange){
                 console.log(this.getShortID(),'spots',entity.getShortID());
                 GameServer.handleBattle(this,entity,true);
                 break;

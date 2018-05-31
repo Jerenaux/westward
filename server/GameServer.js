@@ -161,6 +161,7 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.enableWander = config.get('wildlife.wander');
     GameServer.enableAggro = config.get('wildlife.aggro');
     GameServer.classes = config.get('classes');
+    GameServer.battleParameters = config.get('battle');
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
@@ -442,7 +443,13 @@ GameServer.findPath = function(from,to,grid){
 GameServer.handleAnimalClick = function(animalID,socketID){
     var player = GameServer.getPlayer(socketID);
     var animal = GameServer.animals[animalID];
-    if(!animal.isDead() && !animal.isInFight()) GameServer.handleBattle(player,animal);
+    if(!animal.isDead() && !animal.isInFight()){
+        if(Utils.chebyshev(player,animal) <= GameServer.battleParameters.aggroRange) {
+            GameServer.handleBattle(player, animal);
+        }else{
+            player.addMsg('I must get closer!');
+        }
+    }
 };
 
 GameServer.skinAnimal = function(player,animalID){

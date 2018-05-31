@@ -184,6 +184,10 @@ Utils.euclidean = function(a,b){
     return Math.sqrt(Math.pow(a.x-b.x,2)+Math.pow(a.y- b.y,2));
 };
 
+Utils.chebyshev = function(A,B){
+    return Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
+};
+
 Utils.manhattan = function(a,b){
     return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 };

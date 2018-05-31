@@ -367,10 +367,24 @@ UI.debugScreen = function(){
     var graphics = UI.scene.add.graphics();
     graphics.setDepth(10);
     graphics.setScrollFactor(0);
+
     graphics.lineStyle(1, 0x00ff00, 3);
+
     graphics.beginPath();
     graphics.moveTo(512, 0);
     graphics.lineTo(512, 576);
+    graphics.strokePath();
+    graphics.closePath();
+
+    graphics.beginPath();
+    graphics.moveTo(0, 288);
+    graphics.lineTo(1024, 288);
+    graphics.strokePath();
+    graphics.closePath();
+
+    graphics.beginPath();
+    graphics.moveTo(512, 288);
+    graphics.lineTo(1024, 576);
     graphics.strokePath();
     graphics.closePath();
 };

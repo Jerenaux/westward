@@ -67,6 +67,7 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Add as much stuff as possible to config file
 - Deal differently with net updates when visibility lost (https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
 - Reimplement maps using containers
 - Refactor building management, shapes, positioning... (from bottom-left)
