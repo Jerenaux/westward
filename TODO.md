@@ -96,7 +96,6 @@ Order:
 - Give toString method to custom objects to replace [this.constructor.name this.id] ...
 - Decide what to do with assets/maps folder, both for dev and prod
 - Split server in two (game and dev server)
-- Remove unnecessary Geometry methods (and world-building methods from studio/Engine)
 
 Content:
 -------
@@ -108,12 +107,7 @@ Content:
 - Carcasses, traces of fight, traces of campfires
 - Paths along most-travelled paths
 * Battle system
-- Better monster positioning (sort available cells based on chebyshev distance and self distance)
 - Get arrows back when skinning
-- Animals have sorted list of targets, iteratr through it when first one not reachable for some reason
-- Deal with big battlefields:
--> Limit battlefield size
--> focus camera on active player
 - New interface:
 Timer at bottom, icon of active fighter on the left, queue of others on the right
 Skip turn below
@@ -207,6 +201,13 @@ Add help
 - Tax evasion
 - Less XP based on level
 * Misc
+- New camera system?
+-> Doesn't follow (except in battle)
+-> Only follow when click destination is in screen margins (define margins size)
+-> Space to interrupt movement?
+or
+-> Moves when cursor on sides (refresh pins), to some extent
+-> Also moves using keystrokes; space to center
 - Fix continuous movement system
 - Fatigue 
 - Rest
@@ -216,11 +217,11 @@ Add help
 - Leaderboards
 - View info on other players (levels...)
 - Guilds
-* Orientation
-- Add icons
+* Orientations
 - Add sound effects
 - Add plants
 - Fator in explorer abilities
+- Don't angle icon?
 - Smoother movement
 * Packaging
 -> Determine new player by querying server

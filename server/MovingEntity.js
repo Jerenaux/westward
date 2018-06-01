@@ -242,7 +242,6 @@ MovingEntity.prototype.selectTarget = function(){
     var currentTarget = null;
     for(var i = 0; i < fighters.length; i++){
         var f = fighters[i];
-        //if(!f.isPlayer) continue;
         if(this.isSameTeam(f)) continue;
         if(f.getHealth() < minHP){
             minHP = f.getHealth();
@@ -255,8 +254,6 @@ MovingEntity.prototype.selectTarget = function(){
 
 MovingEntity.prototype.computeBattleDestination = function(target){
     var dest = target.getEndOfPath();
-    var closest = null;
-    //var minDist = 9999;
     var r = GameServer.battleParameters.battleRange;
     var candidates = [];
     for(var x = this.x - r; x < this.x + r + 1; x++){
@@ -266,35 +263,26 @@ MovingEntity.prototype.computeBattleDestination = function(target){
             if(!this.battle.isPositionFree(x,y)) continue;
             if(PFUtils.checkCollision(x,y)) continue;
             if(!this.inBattleRange(x,y)) continue; // still needed as long as Euclidean range, the double-loop include corners outside of Euclidean range
+            candidates.push({
+                x: x,
+                y: y
+            });
         }
     }
     var _self = this;
     candidates.sort(function(a,b){
-        var dA = Utils.chebyshev(a,pos) + Utils.chebyshev(a,_self);
-        var dB = Utils.chebyshev(b,pos) + Utils.chebyshev(b,_self);
+        var dA = Utils.chebyshev(a,dest);
+        var dB = Utils.chebyshev(b,dest);
+        if(dA == dB){
+            var selfA = Utils.chebyshev(a,_self);
+            var selfB = Utils.chebyshev(b,_self);
+            if(selfA < selfB) return -1;
+            return 1;
+        }
         if(dA < dB) return -1;
         return 1;
     });
-    closest = candidates[0];
-    //console.log('target : ',dest.x,dest.y);
-    /*for(var x = Math.min(this.x,dest.x-1); x <= Math.max(this.x,dest.x+1); x++){
-        for(var y = Math.min(this.y,dest.y-1); y <= Math.max(this.y,dest.y+1); y++) {
-            if(x == dest.x && y == dest.y) continue;
-            if(!this.battle.isPosition(x,y)) continue;
-            if(!this.battle.isPositionFree(x,y)) continue;
-            if(PFUtils.checkCollision(x,y)) continue;
-            if(!this.inBattleRange(x,y)) continue;
-
-            if(this.battle.nextTo({x:x,y:y},dest)) return {x:x,y:y};
-
-            var dist = Utils.euclidean({x:x,y:y},{x:dest.x,y:dest.y});
-            if(dist < minDist){
-                minDist = dist;
-                closest = {x:x,y:y};
-            }
-        }
-    }*/
-    //if(closest == null) console.log('not found');
+    var closest = candidates[0];
     return closest;
 };
 

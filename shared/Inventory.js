@@ -32,6 +32,10 @@ Inventory.prototype.isFull = function(){
     return this.size == this.maxSize;
 };
 
+Inventory.prototype.isEmpty = function(){
+    return this.size == 0;
+};
+
 Inventory.prototype.addNew = function(item){
     this.items[item] = 0;
     this.size++;

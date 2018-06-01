@@ -255,10 +255,10 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
     }else{
         if(!a.canRange()) return false;
         a.setProperty('ranged_atk',{x:b.x,y:b.y});
-        a.decreaseAmmo();
+        var ammoID = a.decreaseAmmo();
         var hit = this.computeRangedHit(a,b);
         if(hit){
-            b.arrows++; // TODO use setter
+            if(b.isAnimal) b.addToLoot(ammoID,1);
             dmg = this.computeDamage('ranged',a,b);
             killed = this.applyDamage(b,dmg);
             b.setProperty('hit',dmg);

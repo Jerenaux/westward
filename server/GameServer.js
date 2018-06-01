@@ -24,19 +24,7 @@ var GameServer = {
     vision: new Set(), // set of AOIs potentially seen by at least one player
     nbConnectedChanged: false,
     initializationStep: 0,
-    initialized: false,
-
-    clientUpdateRate: 1000/8, // Rate at which update packets are sent
-    walkUpdateRate: 1000/20, // Rate at which positions are updated
-    npcUpdateRate: 1000/5,
-    playerUpdateRate: 10*1000,//3600*1000,
-    settlementUpdateRate: 10*1000,//3600*1000,
-    spawnZoneUpdateRate: 3600*1000
-};
-
-GameServer.cycles = {
-    foodConsumptionRate: 8*3600*1000,
-    commitmentDuration: 10*1000//3600*1000
+    initialized: false
 };
 
 module.exports.GameServer = GameServer;
@@ -44,7 +32,6 @@ module.exports.GameServer = GameServer;
 var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
-//var ListMap = require('../shared/ListMap.js').ListMap;
 var AOI = require('./AOI.js').AOI;
 var Player = require('./Player.js').Player;
 var Settlement = require('./Settlement').Settlement;
@@ -162,6 +149,7 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.enableAggro = config.get('wildlife.aggro');
     GameServer.classes = config.get('classes');
     GameServer.battleParameters = config.get('battle');
+    GameServer.wildlifeParameters = config.get('wildlife');
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
@@ -237,12 +225,12 @@ GameServer.onInitialized = function(){
 
 GameServer.setUpdateLoops = function(){
     console.log('Setting up loops...');
+
+    GameServer.NPCupdateRate = config.get('updateRates.npc');
+
     var loops = {
         'client': GameServer.updateClients,
         'npc': GameServer.updateNPC,
-        //'playerUpdateRate': GameServer.updatePlayers,
-        //'settlementUpdateRate': GameServer.updateSettlements,
-        //'spawnZoneUpdateRate': GameServer.updateSpawnZones,
         'walk': GameServer.updateWalks
     };
 
@@ -457,16 +445,11 @@ GameServer.skinAnimal = function(player,animalID){
     var animal = GameServer.animals[animalID];
     // TODO: check for proximity
     if(!animal.isDead()) return;
-    var loot = GameServer.animalsData[animal.type].loot;
-    /*if(animal.arrows > 0){
-        if(!loot) loot = {};
-        loot[20] = Math.floor(animal.arrows*0.75);
-    }*/
-    if(!loot) return;
-    for(var item in loot){
-        if(!loot.hasOwnProperty(item)) continue;
-        player.giveItem(item,loot[item]);
-        player.addNotif('+'+loot[item]+' '+GameServer.itemsData[item].name);
+    if(animal.loot.isEmpty()) return;
+    for(var item in animal.loot.items){
+        // TODO: take harvesting ability into consideration
+        player.giveItem(item,animal.loot.items[item]);
+        player.addNotif('+'+animal.loot.items[item]+' '+GameServer.itemsData[item].name);
     }
     GameServer.removeEntity(animal);
 };

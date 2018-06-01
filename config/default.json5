@@ -28,7 +28,7 @@
         maxPathLength: 36
     },
     battle: {
-        aggroRange: 10, // chebyshev distance
+        aggroRange: 9, // chebyshev distance
         battleRange: 3 // distance that can be travelled in one turn in battle; TODO: variable
     },
     updateRates: {
@@ -39,6 +39,8 @@
     },
     wildlife: {
         aggro: false,
-        wander: true
+        wander: true,
+        idleTime: [1, 3.5], // random bounds; in seconds
+        idleRetry: 200 // ms
     }
 }

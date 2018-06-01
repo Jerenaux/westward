@@ -8,6 +8,7 @@ var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
 var World = require('../shared/World.js').World;
 var Stats = require('../shared/Stats.js').Stats;
+var Inventory = require('../shared/Inventory.js').Inventory;
 
 var debug = false;
 
@@ -20,19 +21,31 @@ function Animal(x,y,type){
     this.y = y;
     this.inFight = false;
     this.type = type;
-    this.idle = true;
-    this.idleTime = 200;
     this.stats = Stats.getSkeleton();
-    this.arrows = 0;
     this.setAggressive();
     this.setWander();
     this.setStartingStats();
+    this.setLoot();
     this.setOrUpdateAOI();
+    this.setIdle();
     MovingEntity.call(this);
 }
 
 Animal.prototype = Object.create(MovingEntity.prototype);
 Animal.prototype.constructor = Animal;
+
+Animal.prototype.setLoot = function(){
+    this.loot = new Inventory(10);
+    var loot = GameServer.animalsData[this.type].loot;
+    for(var id in loot){
+        this.loot.add(id,loot[id]);
+    }
+};
+
+Animal.prototype.addToLoot = function(id,nb){
+    console.log('Adding ',nb,'of id',id);
+    this.loot.add(id,nb);
+};
 
 Animal.prototype.setStartingStats = function(){
     var stats = GameServer.animalsData[this.type].stats;
@@ -47,6 +60,7 @@ Animal.prototype.setStat = function(key,value){
 };
 
 Animal.prototype.setAggressive = function(){
+    // Different from global aggro parameter, specifies if this specific animal should be aggressive pr not
     this.aggressive =  GameServer.animalsData[this.type].aggro;
 };
 
@@ -92,15 +106,15 @@ Animal.prototype.onEndOfPath = function(){
 
 Animal.prototype.setIdle = function(){
     this.idle = true;
-    this.idleTime = Utils.randomInt(1000,3500); //ms
+    this.idleTime = Utils.randomInt(GameServer.wildlifeParameters.idleTime[0]*1000,GameServer.wildlifeParameters.idleTime[1]*1000);
 };
 
 Animal.prototype.updateIdle = function(){
     if(this.inFight) return;
-    this.idleTime -= GameServer.npcUpdateRate;
+    this.idleTime -= GameServer.NPCupdateRate;
     if(this.idleTime <= 0){
-        var success = this.goToDestination(this.findRandomDestination());
-        if(!success) this.idleTime = 200;
+        var foundPath = this.goToDestination(this.findRandomDestination());
+        if(!foundPath) this.idleTime = GameServer.wildlifeParameters.idleRetry;
     }
 };
 

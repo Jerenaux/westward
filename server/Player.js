@@ -3,7 +3,6 @@
  */
 
 var Utils = require('../shared/Utils.js').Utils;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var PersonalUpdatePacket = require('./PersonalUpdatePacket.js').PersonalUpdatePacket;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
@@ -14,7 +13,6 @@ var EquipmentManager = require('../shared/Equipment.js').EquipmentManager;
 var Formulas = require('../shared/Formulas.js').Formulas;
 
 var NB_SLOTS = 2;
-var COMMIT_DURATION = 30*1000;
 
 function Player(){
     this.updatePacket = new PersonalUpdatePacket();
@@ -33,7 +31,6 @@ function Player(){
     this.classxp = 0;
     this.setUpStats();
     this.equipment = new EquipmentManager();
-    console.log(this.equipment);
     this.fieldOfVision = [];
     this.visitedAOIs = new Set();
     this.chatTimer = null;
@@ -94,6 +91,8 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(6,2);
     this.giveItem(13,1);
     this.giveItem(28,1);
+
+    this.giveItem(29,3);
 
     this.giveGold(100);
 };
@@ -377,10 +376,12 @@ Player.prototype.unload = function(ammo,notify){
 
 Player.prototype.decreaseAmmo = function(){
     var ammoType = this.equipment.getAmmoType(this.getRangedContainer(this.getRangedWeapon()));
+    var ammoID = this.equipment.get(ammoType);
     this.equipment.load(ammoType,-1);
     var nb = this.equipment.getNbAmmo(ammoType);
     if(nb == 0) this.unequip(ammoType);
     this.updatePacket.addAmmo(ammoType,nb);
+    return ammoID;
 };
 
 Player.prototype.getRangedWeapon = function(){
