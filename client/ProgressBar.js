@@ -93,9 +93,9 @@ ProgressBar.prototype.setLevel = function(level,max,duration){
             this.headTween = Engine.scene.tweens.add(
                 {
                     targets: this.head,
-                    //x: '-=' + dw,
                     x: this.zeroX + newLength,
-                    duration: duration
+                    duration: duration,
+                    delay: 30
                 });
         }
     }else {

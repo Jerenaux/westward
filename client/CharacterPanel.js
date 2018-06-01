@@ -27,15 +27,6 @@ CharacterPanel.prototype.addInterface = function(){
         this.bars.push(classbar);
         y += 15;
     }
-    /*var classxp = 0;
-    var txts = this.addPolyText(x,y,["Level ","1"," Merchant   -   ",classxp+"/100"," "+UI.textsData['classxp']],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
-    this.classText = txts[2];
-    y += 30;
-    var classbar = new MiniProgressBar(this.x+x,this.y+y,245);
-    classbar.name = 'class xp bar';
-    classbar.setLevel(classxp,100);
-    this.bars.push(classbar);
-    y += 15;*/
 
     this.addText(x,y,'Stats modifiers:');
     y+= 15;

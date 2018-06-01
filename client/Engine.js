@@ -323,9 +323,6 @@ Engine.initWorld = function(data){
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
-    Engine.player.markers = data.markers;
-    Engine.players.unread = 1;
-
     Engine.miniMap.display();
 
     if(Client.isNewPlayer()) {
@@ -945,9 +942,10 @@ Engine.makeCraftingMenu = function(){
     crafting.addPanel('recipes',recipes);
     var combi = crafting.addPanel('combi',new CraftingPanel(450,100,290,380,'Combination'));
     combi.addButton(260, 8, 'blue','help',null,'',UI.textsData['combi_help']);
-    var ingredients = new InventoryPanel(450,300,290,380,'',true); // true = invisible
+
+    var ingredients = crafting.addPanel('ingredients',new InventoryPanel(450,300,290,380,'',true)); // true = invisible
     ingredients.setInventory(new Inventory(5),5,true,null,Engine.player.inventory);
-    crafting.addPanel('ingredients',ingredients);
+
     var items = new InventoryPanel(40,100,390,380,'Items');
     items.addButton(360, 8, 'blue','help',null,'',UI.textsData['craftitems_help']);
     items.setInventory(Engine.player.inventory,9,true);
@@ -1009,10 +1007,11 @@ Engine.makeCharacterMenu = function(){
     var classpanel = menu.addPanel('class', new CharacterPanel(classx,classy,classw,classh,'Multi-Class status'));
     var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
 
-    var commit = menu.addPanel('commit',new InventoryPanel(citizenx+10,citizeny+20,150,100,''));
-    commit.setInventory(new Inventory(6),3,false);
+    var commit = menu.addPanel('commit',new InventoryPanel(citizenx+10,citizeny,150,100,'',true));
+    commit.setInventory(new Inventory(Engine.player.commitSlots.max),3,false);
 
     menu.addEvent('onUpdateCharacter',classpanel.update.bind(classpanel));
+    menu.addEvent('onUpdateCommit',commit.updateInventory.bind(commit));
 
     return menu;
 };
@@ -1060,11 +1059,14 @@ Engine.addHero = function(data){
 
     Engine.camera.startFollow(Engine.player);
 
+    Engine.player.markers = data.markers;
+    Engine.players.unread = 1;
+
     Engine.player.inventory = new Inventory();
     Engine.player.class = data.class;
     Engine.player.gold = data.gold;
+    Engine.player.civiclvl = data.civiclvl;
     Engine.player.civicxp = data.civicxp;
-    Engine.player.maxcivicxp = 100;
     Engine.player.itemRecipes = new Inventory(12);
     Engine.player.itemRecipes.fromList(
         [[2,1],[4,1],[6,1],[10,1],[17,1],[21,1],[23,1],[28,1],[29,1],[32,1],[33,1],[35,1]]
@@ -1329,6 +1331,10 @@ Engine.updateSelf = function(data){
     if(data.commitSlots){
         Engine.player.commitSlots = data.commitSlots;
         updateEvents.add('commit');
+    }
+    if(data.civiclvl >= 0){
+        Engine.player.civiclvl = data.civiclvl;
+        updateEvents.add('character');
     }
     if(data.civicxp >= 0){
         Engine.player.civicxp = data.civicxp;

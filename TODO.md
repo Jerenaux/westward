@@ -125,7 +125,9 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Compute probability of items breaking and discard them
 - Accommodate NPC
 * Civics
-- Civic levels
+- Finish all civic panel related stuff (commitment, etc.)
+- Apply taxes
+- Civic abilities
 - Change settlement
 - Update population based on players
 - Elections
@@ -202,6 +204,10 @@ Add help
 - Less XP based on level
 * Misc
 - New camera system?
+https://www.gamasutra.com/blogs/ItayKeren/20150511/243083/Scroll_Back_The_Theory_and_Practice_of_Cameras_in_SideScrollers.php
+-> Doesn't follow in central rect window, only follows when getting out of it and until player stops
+( allows for small position adjustments)
+or
 -> Doesn't follow (except in battle)
 -> Only follow when click destination is in screen margins (define margins size)
 -> Space to interrupt movement?

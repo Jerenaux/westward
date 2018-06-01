@@ -58,4 +58,8 @@ Formulas.computeSettlementFoodModifier = function(surplus){
     return (surplus*40)/100; // TODO: factor in dev level
 };
 
+Formulas.computeMaxCivicXP = function(level){
+    return Math.round(Math.exp((level)/5)*100);
+};
+
 if (onServer) module.exports.Formulas = Formulas;

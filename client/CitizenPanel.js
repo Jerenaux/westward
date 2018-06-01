@@ -23,6 +23,7 @@ CitizenPanel.prototype.addInterface = function(){
     y += 20;
 
     var txts = this.addPolyText(x,y,["Level ","1"," citizen   -   ","10/100"," Civic XP"],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
+    this.civicLvltxt = txts[1];
     this.civicXPtxt = txts[3];
     y += 30;
     this.civicbar = new MiniProgressBar(this.x+x,this.y+y,245);
@@ -36,8 +37,10 @@ CitizenPanel.prototype.addInterface = function(){
 };
 
 CitizenPanel.prototype.update = function(){
-    this.civicXPtxt.setText(Engine.player.civicxp+'/'+Engine.player.maxcivicxp);
-    this.civicbar.setLevel(Engine.player.civicxp,Engine.player.maxcivicxp);
+    var max = Formulas.computeMaxCivicXP(Engine.player.civiclvl);
+    this.civicXPtxt.setText(Engine.player.civicxp+'/'+max);
+    this.civicbar.setLevel(Engine.player.civicxp,max);
+    this.civicLvltxt.setText(Engine.player.civiclvl);
 };
 
 CitizenPanel.prototype.displayInterface = function(){

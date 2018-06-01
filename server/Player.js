@@ -12,8 +12,6 @@ var Equipment = require('../shared/Equipment.js').Equipment;
 var EquipmentManager = require('../shared/Equipment.js').EquipmentManager;
 var Formulas = require('../shared/Formulas.js').Formulas;
 
-var NB_SLOTS = 2;
-
 function Player(){
     this.updatePacket = new PersonalUpdatePacket();
     this.isPlayer = true;
@@ -27,6 +25,7 @@ function Player(){
     this.gold = 0;
     this.inBuilding = -1;
     this.commitSlots = this.getCommitSlotsShell();
+    this.civiclvl = 0;
     this.civicxp = 0;
     this.classxp = 0;
     this.setUpStats();
@@ -43,7 +42,7 @@ Player.prototype.constructor = Player;
 Player.prototype.getCommitSlotsShell = function(){
     return {
         slots: [],
-        max: NB_SLOTS
+        max: GameServer.civicParameters.baseNbCommitSlots
     }
 };
 
@@ -210,9 +209,20 @@ Player.prototype.getSlots = function(){
 };
 
 Player.prototype.gainCivicXP = function(inc,notify){
-    this.civicxp = Utils.clamp(this.civicxp+inc,0,100);
-    this.updatePacket.civicxp = this.civicxp;
     if(notify) this.addNotif('+'+inc+' Civic XP');
+    var max = Formulas.computeMaxCivicXP(this.civiclvl);
+    this.civicxp = Utils.clamp(this.civicxp+inc,0,99999);
+    if(this.civicxp >= max){
+        if(this.civiclvl == GameServer.civicParameters.maxCivicLvl){
+            this.civicxp = max;
+        }else{
+            this.civicxp -= max;
+            this.civiclvl++;
+            this.updatePacket.civiclvl = this.civiclvl;
+            if(notify) this.addNotif('Reached Civic level '+this.civiclvl+'!');
+        }
+    }
+    this.updatePacket.civicxp = this.civicxp;
 };
 
 Player.prototype.gainClassXP = function(inc,notify){
@@ -435,7 +445,7 @@ Player.prototype.applyEffect = function(stat,delta,notify){
 Player.prototype.initTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','gold','civicxp','class','classxp']; // list of properties relevant for the client
+    var broadcastProperties = ['id','gold','civicxp','civiclvl','class','classxp']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -473,6 +483,7 @@ Player.prototype.getDataFromDb = function(data){
     // eg. inBuilding (how to retrieve proper building if server went down since), commitment...
     this.x = data.x;
     this.y = data.y;
+    this.civiclvl = data.civiclvl;
     this.civicxp = data.civicxp;
     this.classxp = data.classxp;
     this.setClass(data.class);

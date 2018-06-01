@@ -90,6 +90,7 @@ GameServer.createModels = function(){
         x: {type: Number, min: 0, required: true},
         y: {type: Number, min: 0, required: true},
         gold: {type: Number, min: 0},
+        civiclvl: {type: Number, min: 0},
         civicxp: {type: Number, min: 0},
         classxp: {type: Number, min: 0},
         class: {type: Number, min: 0},
@@ -148,8 +149,10 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.enableWander = config.get('wildlife.wander');
     GameServer.enableAggro = config.get('wildlife.aggro');
     GameServer.classes = config.get('classes');
+
     GameServer.battleParameters = config.get('battle');
     GameServer.wildlifeParameters = config.get('wildlife');
+    GameServer.civicParameters = config.get('civics');
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();

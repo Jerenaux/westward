@@ -1,10 +1,18 @@
 // https://github.com/lorenwest/node-config/wiki/Configuration-Files
 {
+   battle: {
+        aggroRange: 9, // chebyshev distance
+        battleRange: 3 // distance that can be travelled in one turn in battle; TODO: variable
+   },
    classes: {
         soldier: 0,
         merchant: 1,
         craftsman: 2,
         explorer: 3
+   },
+   civics: {
+        maxCivicLvl: 10,
+        baseNbCommitSlots: 2
    },
    economyCycles: {
         // Unit: seconds
@@ -26,10 +34,6 @@
     pathdinfing: {
         walkingSpeed: 5, // tiles/sec
         maxPathLength: 36
-    },
-    battle: {
-        aggroRange: 9, // chebyshev distance
-        battleRange: 3 // distance that can be travelled in one turn in battle; TODO: variable
     },
     updateRates: {
             // Unit: ms
