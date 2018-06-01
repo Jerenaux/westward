@@ -217,13 +217,11 @@ Add help
 - View info on other players (levels...)
 - Guilds
 * Orientation
-- Make proper class
-- Vary size with distance
-- Work out proper depth
 - Add icons
 - Add sound effects
 - Add plants
 - Fator in explorer abilities
+- Smoother movement
 * Packaging
 -> Determine new player by querying server
 -> Nb connected, permanent players, player names, ..

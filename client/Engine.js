@@ -93,7 +93,7 @@ Engine.preload = function() {
     this.load.atlas('items2_gr', 'assets/sprites/resources_full_gr.png', 'assets/sprites/resources_full.json');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
-    this.load.image('orientation', 'assets/sprites/orientation.png');
+    this.load.image('orientation', 'assets/sprites/wolf_orientation.png');
     this.load.image('tail', 'assets/sprites/tail.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll_horiz.png');
     this.load.image('longscroll', 'assets/sprites/longscroll.png');
@@ -312,74 +312,6 @@ Engine.createMarker = function(){
     Engine.hideMarker();
 };
 
-Engine.addFringePin = function(){
-    // TODO: add pool
-    var o = UI.scene.add.sprite(0,0,'orientation');
-    o.setScrollFactor(0);
-    o.setDepth(2);
-    o.setOrigin(0.5,1);
-    return o;
-};
-
-Engine.updateFringePin = function(pin,x,y){
-    x -= Engine.player.tileX;
-    y -= Engine.player.tileY;
-    //var m = y/x;  slope
-    // line: y = (y_c/x_c)*x   no intercept for lines going through origin
-    // top: y = -9   equation of top size
-    // => (yc/xc)*x = 9 <=> x = -9*xc/yc;
-    // bottom: y = 10
-
-    var vert = Engine.getGameConfig().height;
-    var horiz = Engine.getGameConfig().width;
-
-    var A = {
-        x: -(horiz/(2*World.tileWidth)),
-        y: -(vert/(2*World.tileHeight))
-    };
-    var B = {
-        x: (horiz/(2*World.tileWidth)),
-        y: -(vert/(2*World.tileHeight))
-    };
-    var C = {
-        x: (horiz/(2*World.tileWidth)),
-        y: (vert/(2*World.tileHeight))
-    };
-
-    var d1 = Math.sign(x*B.y - y*B.x);
-    var d2 = Math.sign(x*A.y - y*A.x);
-    /*
-    *       1, -1
-    * 1,1           -1, -1
-    *       -1, 1
-    * */
-    var xp, yp, angle;
-    if(d1 == 1 && d2 == -1){
-        xp = A.y*(x/y);
-        yp = A.y;
-        angle = 180;
-    }else if(d1 == -1 && d2 == -1){
-        xp = B.x;
-        yp = B.x*(y/x);
-        angle = -90;
-    }else if(d1 == -1 && d2 == 1){
-        xp = C.y*(x/y);
-        yp = C.y;
-        angle = 0
-    }else if(d1 ==1 && d2 == 1){
-        xp = A.x;
-        yp = A.x*(y/x);
-        angle = 90
-    }else{
-        console.warn('no sector (x=',x,', y = ',y,')');
-    }
-    xp = horiz/2 + xp*World.tileWidth;
-    yp = vert/2 + yp*World.tileHeight;
-
-    pin.setPosition(xp,yp);
-    pin.setAngle(angle);
-};
-
 Engine.initWorld = function(data){
     //Engine.animalUpdates = new ListMap(); // debug purpose, remove
     Engine.firstSelfUpdate = true;
@@ -512,6 +444,12 @@ Engine.manageRespawn = function(){
     Engine.showMarker();
     Engine.displayUI();
     Engine.dead = false;
+};
+
+Engine.updateAllOrientationPins = function(){
+    Engine.entityManager.displayLists['animal'].forEach(function(aid){
+        Engine.animals[aid].manageOrientationPin();
+    });
 };
 
 Engine.makeBuildingTitle = function(){
