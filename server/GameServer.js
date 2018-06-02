@@ -92,8 +92,9 @@ GameServer.createModels = function(){
         gold: {type: Number, min: 0},
         civiclvl: {type: Number, min: 0},
         civicxp: {type: Number, min: 0},
-        classxp: {type: Number, min: 0},
-        class: {type: Number, min: 0},
+        classxp: mongoose.Schema.Types.Mixed, //{type: Number, min: 0},
+        classlvl: mongoose.Schema.Types.Mixed,
+        //class: {type: Number, min: 0},
         equipment: mongoose.Schema.Types.Mixed,
         commitSlots: mongoose.Schema.Types.Mixed,
         sid: {type: Number, min: 0, required: true},
@@ -149,6 +150,7 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.enableWander = config.get('wildlife.wander');
     GameServer.enableAggro = config.get('wildlife.aggro');
     GameServer.classes = config.get('classes');
+    GameServer.classData = JSON.parse(fs.readFileSync('./assets/data/classes.json').toString());
 
     GameServer.battleParameters = config.get('battle');
     GameServer.wildlifeParameters = config.get('wildlife');
@@ -322,10 +324,8 @@ GameServer.addNewPlayer = function(socket,data){
     var player = new Player();
     player.setStartingInventory();
     player.setSettlement(data.selectedSettlement);
-    player.setClass(data.selectedClass);
     player.spawn();
 
-    //var document = player.dbTrim();
     var document = new GameServer.PlayerModel(player);
     player.setModel(document);
 
@@ -615,7 +615,7 @@ GameServer.handleShop = function(data,socketID) {
         player.takeItem(item,nb,true);
         building.takeGold(price);
         building.giveItem(item,nb);
-        if(player.isMerchant()) player.gainClassXP(Math.floor(price/10), true); // TODO: factor in class level
+        player.gainClassXP(GameServer.classes.merchant,Math.floor(price/10), true); // TODO: factor in class level
     }
     building.save();
     Prism.logEvent(player,action,{item:item,price:price,nb:nb});
@@ -630,7 +630,7 @@ GameServer.handleCraft = function(data,socketID){
     var recipe = GameServer.itemsData[targetItem].recipe;
     if(!GameServer.allIngredientsOwned(player,recipe,nb)) return;
     GameServer.operateCraft(player, recipe, targetItem, nb);
-    if(player.isCraftsman()) player.gainClassXP(5,true); // TODO: vary based on multiple factors
+    player.gainClassXP(GameServer.classes.craftsman,5,true); // TODO: vary based on multiple factors
 };
 
 /*GameServer.handleBuild = function(data,socketID){
@@ -970,6 +970,15 @@ GameServer.setBuildingItem = function(data){
     building.save();
     return true;
 };
+
+GameServer.setBuildingGold = function(data){
+    console.log(data);
+    var building = GameServer.buildings[data.building];
+    building.setGold(data.gold);
+    building.save();
+    return true;
+};
+
 
 GameServer.setBuildingPrice = function(data){
     console.log(data);

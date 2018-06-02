@@ -31,10 +31,9 @@ Admin
 -----
 Import db
 -> Iterate over import object, if matching id in db, update fields, if not, insert new entry 
-Maintenance mode
-Set gold
 Set coordinates
 Set settlement parameters
+Maintenance mode
 Secure
 
 Analytics:
@@ -140,7 +139,6 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Remove % stats panel
 - Display health, fatigue and gold permanently in HUD
 - Redisplay committment slots
-- Share all XP sources
 - Levels
 - LvlUp selected class
 - Ability points

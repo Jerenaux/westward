@@ -27,7 +27,18 @@ function Player(){
     this.commitSlots = this.getCommitSlotsShell();
     this.civiclvl = 0;
     this.civicxp = 0;
-    this.classxp = 0;
+    this.classxp = {
+        0: 0,
+        1: 0,
+        2: 0,
+        3: 0
+    };
+    this.classlvl = {
+        0: 0,
+        1: 0,
+        2: 0,
+        3: 0
+    };
     this.setUpStats();
     this.equipment = new EquipmentManager();
     this.fieldOfVision = [];
@@ -56,10 +67,6 @@ Player.prototype.setIDs = function(dbID,socketID){
 Player.prototype.registerPlayer = function(){
     //var settlement = GameServer.settlements[this.sid];
     this.settlement.registerPlayer(this);
-};
-
-Player.prototype.setClass = function(classID){
-    this.class = classID;
 };
 
 Player.prototype.isExplorer = function(){
@@ -225,10 +232,10 @@ Player.prototype.gainCivicXP = function(inc,notify){
     this.updatePacket.civicxp = this.civicxp;
 };
 
-Player.prototype.gainClassXP = function(inc,notify){
-    this.classxp = Utils.clamp(this.classxp+inc,0,100);
+Player.prototype.gainClassXP = function(classID,inc,notify){
+    this.classxp[classID] = Utils.clamp(this.classxp[classID]+inc,0,100);
     this.updatePacket.classxp = this.classxp;
-    if(notify) this.addNotif('+'+inc+' Path XP');
+    if(notify) this.addNotif('+'+inc+' '+GameServer.classData[classID].name+' XP');
 };
 
 Player.prototype.giveGold = function(nb,notify){
@@ -445,7 +452,7 @@ Player.prototype.applyEffect = function(stat,delta,notify){
 Player.prototype.initTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','gold','civicxp','civiclvl','class','classxp']; // list of properties relevant for the client
+    var broadcastProperties = ['id','gold','civicxp','civiclvl','classxp','classlvl']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -486,7 +493,7 @@ Player.prototype.getDataFromDb = function(data){
     this.civiclvl = data.civiclvl;
     this.civicxp = data.civicxp;
     this.classxp = data.classxp;
-    this.setClass(data.class);
+    this.classlvl = data.classlvl;
     // stats are not saved, see schema
     /*for(var equip in Equipment.dict) {
         if (!Equipment.dict.hasOwnProperty(equip)) continue;
@@ -515,13 +522,13 @@ Player.prototype.setAction = function(action){
 Player.prototype.onAOItransition = function(newAOI,previousAOI){
     if(!this.visitedAOIs.has(newAOI)) {
         this.visitedAOIs.add(newAOI);
-        if(previousAOI && this.isExplorer()){ // if previousAOI: don't grant XP for spawning in fort
+        if(previousAOI){ // if previousAOI: don't grant XP for spawning in fort
             var A = Utils.lineToGrid(this.settlement.fort.aoi,World.nbChunksHorizontal);
             var B = Utils.lineToGrid(newAOI,World.nbChunksHorizontal);
             var dist = Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
             if(dist > 2) { // todo: make depend on dev level
                 this.addNotif('New area visited');
-                this.gainClassXP(dist * 5, true); // TODO: facotr in class level
+                this.gainClassXP(GameServer.classes.explorer,dist * 5, true); // TODO: facotr in class level
             }
         }
     }

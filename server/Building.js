@@ -28,7 +28,7 @@ function Building(data){
     this.inventory = new Inventory(100); // Inventory object
     if(data.inventory) this.inventory.fromList(data.inventory);
     this.prices = data.prices || {};
-    this.gold = data.gold || 0;
+    this.setGold(data.gold || 0);
     this.built = !!data.built;
     this.progress = data.progress || 0;
     this.productivity = 100;
@@ -72,6 +72,10 @@ Building.prototype.computeProductivity = function(){
     var productivity = Formulas.decimalToPct(Formulas.computeProductivity(foodModifier,commitmentModifier));
     console.log('Productivity for building',this.id,':',productivity,'% (',foodModifier,',',commitmentModifier,')');
     this.setProperty('productivity',productivity);
+};
+
+Building.prototype.setGold = function(gold){
+    this.gold = gold;
 };
 
 Building.prototype.addCommit = function(){

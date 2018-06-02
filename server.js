@@ -66,6 +66,7 @@ var POSThandlers = {
     'deletebuilding': gs.deleteBuilding,
     'dump': gs.dump,
     'newbuilding': gs.insertNewBuilding,
+    'setgold': gs.setBuildingGold,
     'setitem': gs.setBuildingItem,
     'setprice': gs.setBuildingPrice,
     'togglebuild': gs.toggleBuild

@@ -54,6 +54,7 @@
 
                         <div class="edit-div" ng-show="editForms[building.id].visible">
                             <!-- Items -->
+                            <b>Inventory:</b>
                             <form class="form-inline"  ng-submit="setStock(building.id)">
                                 <select class="item-select form-control form-control-sm" ng-model="inventoryForms[building.id].item" ng-options="item.id as item.name for item in data.itemsList | orderBy:'name'"></select>
                                 <input class="form-control form-control-sm" required ng-model="inventoryForms[building.id].nb" size="2">
@@ -62,6 +63,7 @@
                                 </button>
                             </form><br/>
                             <!-- Prices -->
+                            <b>Prices:</b>
                             <form class="form-inline"  ng-submit="setPrice(building.id)">
                                 <select class="item-select form-control form-control-sm" ng-change="updatePrices(building.id)" ng-model="priceForms[building.id].item" ng-options="item.id as item.name for item in buildings[building.id].inv | orderBy:'name'"></select>
                                 <input class="form-control form-control-sm" required ng-model="priceForms[building.id].buy" size="2">
@@ -71,7 +73,15 @@
                                 </button>
                             </form><br/>
 
-                            <button type="submit" class="btn btn-danger" ng-click="toggleBuild(building.id)">
+                            <b>Gold:</b>
+                            <form class="form-inline"  ng-submit="setGold(building.id)">
+                                <input class="form-control form-control-sm" required ng-model="goldForms[building.id]" size="2">
+                                <button type="submit" class="btn btn-success">
+                                    <span class="glyphicon glyphicon-ok"></span>
+                                </button>
+                            </form><br/>
+
+                            <button title="Togge build" type="submit" class="btn btn-danger" ng-click="toggleBuild(building.id)">
                                 <span class="glyphicon glyphicon-wrench"></span>
                             </button>
                         </div>

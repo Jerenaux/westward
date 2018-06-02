@@ -16,7 +16,7 @@ CitizenPanel.prototype.constructor = CitizenPanel;
 
 CitizenPanel.prototype.addInterface = function(){
     this.bars = [];
-    var alignx = 170;
+    var alignx = 160;
     var x = alignx;
     var y = 20;
     this.addText(x,y,'Citizen of '+Engine.settlementsData[Engine.player.settlement].name,null,null,Utils.fonts.fancy);

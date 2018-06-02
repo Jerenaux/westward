@@ -45,8 +45,8 @@ var Animal = new Phaser.Class({
         //Engine.animalUpdates.add(this.id,'update');
         if(data.path) this.queuePath(data.path);
         if(data.stop) this.serverStop(data.stop.x,data.stop.y); // TODO: move to new Moving update() supermethod
-        if(data.facing) {
-            this.computeOrientation(this.tileX,this.tileY,data.facing.x,data.facing.y);
+        if(data.melee_atk) {
+            this.computeOrientation(this.tileX,this.tileY,data.melee_atk.x,data.melee_atk.y);
             this.faceOrientation();
         }
         Engine.handleBattleUpdates(this,data);

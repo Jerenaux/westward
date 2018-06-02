@@ -57,6 +57,8 @@ Engine.preload = function() {
     this.load.audio('birds1','assets/sfx/birds1.wav');
     this.load.audio('birds2','assets/sfx/birds2.wav');
     this.load.audio('birds3','assets/sfx/birds3.wav');
+    this.load.audio('bird','assets/sfx/bird.wav');
+    this.load.audio('cricket','assets/sfx/cricket.wav');
     this.load.audio('raven','assets/sfx/raven.wav');
     this.load.audio('bubbles','assets/sfx/bubbles.wav');
     this.load.audio('powder','assets/sfx/powder.wav');
@@ -65,6 +67,9 @@ Engine.preload = function() {
     this.load.audio('soft','assets/sfx/soft.ogg');
     this.load.audio('hit','assets/sfx/hit.wav');
     this.load.audio('wolfambient','assets/sfx/wolfambient1.wav');
+    this.load.audio('wind1','assets/sfx/wind1.wav');
+    this.load.audio('wind2','assets/sfx/wind2.wav');
+    this.load.audio('wind3','assets/sfx/wind3.wav');
 
     this.load.spritesheet('footsteps', 'assets/sprites/footstepssheet.png',{frameWidth:16,frameHeight:16});
     this.load.image('bug', 'assets/sprites/bug.png');
@@ -346,13 +351,26 @@ Engine.initWorld = function(data){
     var ambient = [
         {name:'birds1',volume:1},
         {name:'birds2',volume:1},
-        {name:'birds3',volume:1}
+        {name:'birds3',volume:1},
+        {name:'bird',volume:1},
+        {name:'cricket',volume:1}
         //{name:'raven',volume:0.1}
     ];
     setInterval(function(){
         var sound = Utils.randomElement(ambient);
         Engine.scene.sound.add(sound.name).setVolume(sound.volume).play();
     },10000);
+
+    var weather = [
+        {name:'wind1',volume:1},
+        {name:'wind2',volume:1},
+        {name:'wind3',volume:1}
+        //{name:'raven',volume:0.1}
+    ];
+    setInterval(function(){
+        var sound = Utils.randomElement(weather);
+        Engine.scene.sound.add(sound.name).setVolume(sound.volume).play();
+    },17000);
 
 };
 
@@ -490,7 +508,7 @@ Engine.makeUI = function(){
 
     Engine.menus = {
         'battle': Engine.makeBattleMenu(),
-        'character': Engine.makeCharacterMenu(statsPanel),
+        'character': Engine.makeCharacterMenu(),
         'construction': Engine.makeConstructionMenu(),
         'crafting': Engine.makeCraftingMenu(),
         'fort': Engine.makeFortMenu(),
@@ -1022,6 +1040,7 @@ Engine.makeCharacterMenu = function(){
     commit.setInventory(new Inventory(Engine.player.commitSlots.max),3,false);
 
     menu.addEvent('onUpdateCharacter',classpanel.update.bind(classpanel));
+    menu.addEvent('onUpdateCitizen',citizen.update.bind(citizen));
     menu.addEvent('onUpdateCommit',commit.updateInventory.bind(commit));
 
     return menu;
@@ -1072,11 +1091,14 @@ Engine.addHero = function(data){
     Engine.player.markers = data.markers;
     Engine.players.unread = 1;
 
+    // TODO: move to Hero
     Engine.player.inventory = new Inventory();
     Engine.player.class = data.class;
     Engine.player.gold = data.gold;
     Engine.player.civiclvl = data.civiclvl;
     Engine.player.civicxp = data.civicxp;
+    Engine.player.classxp = data.classxp;
+    Engine.player.classlvl = data.classlvl;
     Engine.player.itemRecipes = new Inventory(12);
     Engine.player.itemRecipes.fromList(
         [[2,1],[4,1],[6,1],[10,1],[17,1],[21,1],[23,1],[28,1],[29,1],[32,1],[33,1],[35,1]]
@@ -1310,7 +1332,6 @@ Engine.updateSelf = function(data){
         if(!Engine.firstSelfUpdate) {
             data.items.forEach(function (item) {
                 var sound = Engine.itemsData[item[0]].sound;
-                //if (sound) Engine.audio[sound].play();
                 if(sound) Engine.scene.sound.add(sound).play();
             });
         }
@@ -1342,13 +1363,21 @@ Engine.updateSelf = function(data){
         Engine.player.commitSlots = data.commitSlots;
         updateEvents.add('commit');
     }
+    if(data.classxp){
+        Engine.player.classxp = data.classxp;
+        updateEvents.add('character');
+    }
+    if(data.classlvl){
+        Engine.player.classlvl = data.classlvl;
+        updateEvents.add('character');
+    }
     if(data.civiclvl >= 0){
         Engine.player.civiclvl = data.civiclvl;
-        updateEvents.add('character');
+        updateEvents.add('citizen');
     }
     if(data.civicxp >= 0){
         Engine.player.civicxp = data.civicxp;
-        updateEvents.add('character');
+        updateEvents.add('citizen');
     }
     if(data.msgs){
         for(var i = 0; i < data.msgs.length; i++){
@@ -1405,6 +1434,7 @@ Engine.updateStat = function(key,data){
 Engine.updateMenus = function(category){
     var callbackMap = {
         'character': 'onUpdateCharacter',
+        'citizen': 'onUpdateCitizen',
         'commit': 'onUpdateCommit',
         'equip': 'onUpdateEquipment',
         'gold': 'onUpdateGold',

@@ -19,6 +19,7 @@ app.controller("mainCtrl", [
         $scope.editForms = {};
         $scope.inventoryForms = {};
         $scope.priceForms = {};
+        $scope.goldForms = {};
 
         var dataCategories = ['buildings','items']; // Categories data (JSON), not instances
         $scope.data = {};
@@ -134,6 +135,15 @@ app.controller("mainCtrl", [
             data.building = id;
             console.log(data);
             $http.post("/admin/setprice/", data).then(function(res) {
+                if(res.status == 201) setTimeout(getData,200);
+            },function(err){});
+        };
+
+        $scope.setGold = function(id){
+            var data = {gold:$scope.goldForms[id]};
+            data.building = id;
+            console.log(data);
+            $http.post("/admin/setgold/", data).then(function(res) {
                 if(res.status == 201) setTimeout(getData,200);
             },function(err){});
         };
