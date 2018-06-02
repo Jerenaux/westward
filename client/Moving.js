@@ -14,8 +14,6 @@ var Moving = new Phaser.Class({
         this.movement = null;
         this.currentPath = [];
 
-        this.orientationPin = new OrientationPin();
-
         this.setInteractive();
     },
 
@@ -65,7 +63,8 @@ var Moving = new Phaser.Class({
     },
 
     manageOrientationPin: function(){
-        var viewRect = new Phaser.Geom.Rectangle(Engine.camera.scrollX,Engine.camera.scrollY,Engine.camera.width-World.tileWidth,Engine.camera.height-World.tileHeight);
+        if(this.isHero) return;
+        var viewRect = new Phaser.Geom.Rectangle(Engine.camera.scrollX,Engine.camera.scrollY,Engine.camera.width,Engine.camera.height);
         var inCamera = viewRect.contains(this.x,this.y);
         if(inCamera) {
             this.orientationPin.hide();

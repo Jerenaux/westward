@@ -618,7 +618,7 @@ GameServer.handleShop = function(data,socketID) {
         if(player.isMerchant()) player.gainClassXP(Math.floor(price/10), true); // TODO: factor in class level
     }
     building.save();
-    Prism.logEvent(player,action,{id:item,price:price,nb:nb});
+    Prism.logEvent(player,action,{item:item,price:price,nb:nb});
 };
 
 GameServer.handleCraft = function(data,socketID){
@@ -988,6 +988,18 @@ GameServer.toggleBuild = function(data){
 
 GameServer.getScreenshots = function(res){
     GameServer.server.db.collection('screenshots').find({}).toArray(function(err,docs){
+        if(err) throw err;
+        if (docs.length == 0) {
+            res.status(204).end();
+        } else {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).send(docs).end();
+        }
+    });
+};
+
+GameServer.getEvents = function(res){
+    GameServer.server.db.collection('events').find({}).toArray(function(err,docs){
         if(err) throw err;
         if (docs.length == 0) {
             res.status(204).end();

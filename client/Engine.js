@@ -64,6 +64,7 @@ Engine.preload = function() {
     this.load.audio('sword','assets/sfx/sword.wav');
     this.load.audio('soft','assets/sfx/soft.ogg');
     this.load.audio('hit','assets/sfx/hit.wav');
+    this.load.audio('wolfambient','assets/sfx/wolfambient1.wav');
 
     this.load.spritesheet('footsteps', 'assets/sprites/footstepssheet.png',{frameWidth:16,frameHeight:16});
     this.load.image('bug', 'assets/sprites/bug.png');
@@ -93,7 +94,8 @@ Engine.preload = function() {
     this.load.atlas('items2_gr', 'assets/sprites/resources_full_gr.png', 'assets/sprites/resources_full.json');
     this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
-    this.load.image('orientation', 'assets/sprites/wolf_orientation.png');
+    this.load.image('orientation', 'assets/sprites/orientation.png');
+    this.load.image('wolforient', 'assets/sprites/wolforient.png');
     this.load.image('tail', 'assets/sprites/tail.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll_horiz.png');
     this.load.image('longscroll', 'assets/sprites/longscroll.png');
@@ -324,6 +326,7 @@ Engine.initWorld = function(data){
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
     Engine.miniMap.display();
+    Engine.updateAllOrientationPins();
 
     if(Client.isNewPlayer()) {
         var w = 400;
@@ -337,7 +340,9 @@ Engine.initWorld = function(data){
         panel.display();
     }
 
-    // todo: move to config file
+    // todo: move all to dedicated sound manager
+    Engine.lastOrientationSound = 0;
+    // todo: move to JSON file
     var ambient = [
         {name:'birds1',volume:1},
         {name:'birds2',volume:1},
@@ -446,6 +451,12 @@ Engine.manageRespawn = function(){
 Engine.updateAllOrientationPins = function(){
     Engine.entityManager.displayLists['animal'].forEach(function(aid){
         Engine.animals[aid].manageOrientationPin();
+    });
+    Engine.entityManager.displayLists['item'].forEach(function(iid){
+        Engine.items[iid].manageOrientationPin();
+    });
+    Engine.entityManager.displayLists['player'].forEach(function(pid){
+        Engine.players[pid].manageOrientationPin();
     });
 };
 
@@ -1055,7 +1066,6 @@ Engine.addHero = function(data){
     Engine.player = new Hero();
     Engine.player.setUp(data);
     Engine.player.settlement = data.settlement;
-    Engine.player.isHero = true;
 
     Engine.camera.startFollow(Engine.player);
 

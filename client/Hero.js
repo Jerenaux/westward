@@ -7,6 +7,6 @@ var Hero = new Phaser.Class({
 
     initialize: function(){
         Player.call(this);
-        this.setTint(0xffffff);
+        this.isHero = true;
     }
 });

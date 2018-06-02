@@ -1,4 +1,7 @@
 // https://github.com/lorenwest/node-config/wiki/Configuration-Files
+/*
+To add: time gap between two orientation sounds (OrientationPin.display())
+*/
 {
    battle: {
         aggroRange: 9, // chebyshev distance

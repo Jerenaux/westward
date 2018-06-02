@@ -92,6 +92,17 @@ app.controller("mainCtrl", [
         };
         getScreenshots();
 
+        getEvents = function(){
+            $scope.events = [];
+            $http.get("/admin/events/").then(function(res) {
+                if(res.status == 200){
+                    $scope.events = res.data;
+                    console.log($scope.events);
+                }
+            },function(err){});
+        };
+        getEvents();
+
         $scope.addBuilding = function(id){
             var data = $scope.newBuildingForms[id];
             data.visible = undefined;

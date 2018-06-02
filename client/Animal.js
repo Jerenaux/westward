@@ -8,6 +8,7 @@ var Animal = new Phaser.Class({
     initialize: function Animal() {
         Moving.call(this,0,0);
         this.entityType = 'animal';
+        this.orientationPin = new OrientationPin('animal');
     },
 
     setUp: function(data){
@@ -56,10 +57,8 @@ var Animal = new Phaser.Class({
         //console.log('remove ',this.id,'(',this.tileX,',',this.tileY,',',this.chunk,',)');
         //Engine.animalUpdates.add(this.id,'remove');
         CustomSprite.prototype.remove.call(this);
-        if(this.fringePin) {
-            this.fringePin.destroy();
-            this.fringePin = null;
-        }
+        this.orientationPin.hide();
+        this.orientationPin.reset();
         delete Engine.animals[this.id];
     },
 

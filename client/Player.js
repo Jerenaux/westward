@@ -33,6 +33,7 @@ var Player = new Phaser.Class({
         this.destinationAction = null;
 
         this.bubble = new Bubble(0,0);
+        this.orientationPin = new OrientationPin('player');
         this.flipPrint = false;
     },
 
@@ -45,6 +46,8 @@ var Player = new Phaser.Class({
         this.name = 'Player '+this.id;
         this.setPosition(data.x,data.y);
         this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
+
+        this.manageOrientationPin();
     },
 
     update: function(data){
@@ -73,6 +76,7 @@ var Player = new Phaser.Class({
 
     remove: function(){
         CustomSprite.prototype.remove.call(this);
+        this.orientationPin.hide();
         delete Engine.players[this.id];
     },
 

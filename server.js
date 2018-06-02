@@ -57,6 +57,11 @@ app.get('/admin/screenshots', function (req, res) {
     gs.getScreenshots(res);
 });
 
+app.get('/admin/events', function (req, res) {
+    console.log('[ADMIN] requesting events');
+    gs.getEvents(res);
+});
+
 var POSThandlers = {
     'deletebuilding': gs.deleteBuilding,
     'dump': gs.dump,

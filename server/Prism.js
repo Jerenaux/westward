@@ -19,6 +19,7 @@ var TradeEvent = Event.discriminator(
     new mongoose.Schema({
         action: Number,
         price: Number,
+        item: Number,
         nb: Number,
         isEquipment: {type: Boolean, default: false},
         isConsumable: {type: Boolean, default: false},
@@ -46,14 +47,19 @@ Prism.logEvent = function(player,actionKey,data){
     data.action = action;
     data.pid = player.id;
 
+    var event;
     switch(action){
         case 0: // buy, fall-through to next
         case 1: // sell
-            getItemData(data);
-            var event = new TradeEvent(data);
-            console.log(event);
+            data = getItemData(data);
+            event = new TradeEvent(data);
             break;
     }
+    console.log(event);
+    event.save(function(err){
+        if(err) throw err;
+        console.log('Event logged');
+    });
 };
 
 function getItemData(data){
@@ -61,8 +67,9 @@ function getItemData(data){
         return k[0] != '_';
     });
     fields.forEach(function(field){
-        data[field] = GameServer.itemsData[data.id][field];
+        data[field] = (data[field] !== undefined ? data[field] : GameServer.itemsData[data.item][field]);
     });
+    return data;
 }
 
 module.exports.Prism = Prism;

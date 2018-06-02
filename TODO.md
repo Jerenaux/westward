@@ -17,6 +17,7 @@ Cleaning
 * Soldier gameplay
 Deployment
 Design document
+Faking
 Polish
 Testing
 World Building
@@ -38,7 +39,7 @@ Secure
 
 Analytics:
 ---------
-- Implement custom analytics, save in db
+- Display events in admin
 - Look for nice statistical library
 - Log drains and faucets
 - Log as many things as possible: session duration, distance travelled per session, time spent in settlement per session, in nature per session,
@@ -100,10 +101,13 @@ Order:
 Content:
 -------
 * Ambiance
-- Plants spawn in clusters
+- Modulate fight sfx based on distance
+-> Make special modulator function which expects a sound effect, a location and some parameters
+to decide the actual volume, use it for footstepts and all non-ambient sfx
+- Location sfx for each building
+- Maximum ambient noises
+-> Multiple categories (weather, animals, terrain...), distinct random intervals
 - Specific zones for all items, not random spread
-- Footsteps to all creatures, sound effects (on actions + environment: birds, water, ...)
-- Animal noises when beasts in proximity, animal footsteps, player footsteps noise
 - Carcasses, traces of fight, traces of campfires
 - Paths along most-travelled paths
 * Battle system
@@ -186,6 +190,7 @@ Add help
 - Civic XP when synchronizing enemy camps
 - Less XP based on lvl (up to 0 XP around settlements past a certain level)
 - Bonuses
+- Show plant markers based on ability
 * Inventory
 - Dropping items
 - Clicking on item: compare stats effects with currently equipped, if any
@@ -217,18 +222,19 @@ or
 - Fix continuous movement system
 - Fatigue 
 - Rest
-- Campfires
+- Campfires (+ orientation pin + long distance smoke pins)
 - Respawn losses
 - Messaging
 - Leaderboards
 - View info on other players (levels...)
 - Guilds
 * Orientations
-- Add sound effects
-- Add plants
-- Fator in explorer abilities
-- Don't angle icon?
-- Smoother movement
+- Limit plants markers to explorers
+- Pins for fights
+- Pins for gunshots and explosions (requires special networking for long-distance sounds)
+-> Much slower noise variation according to distance (since heard from very far)
+-> Pin disappears after a few seconds
+- Pins for alarm bells (same)
 * Packaging
 -> Determine new player by querying server
 -> Nb connected, permanent players, player names, ..
