@@ -62,4 +62,8 @@ Formulas.computeMaxCivicXP = function(level){
     return Math.round(Math.exp((level)/5)*100);
 };
 
+Formulas.computeMaxClassXP = function(level){
+    return Math.round(Math.exp((level)/10)*100);
+};
+
 if (onServer) module.exports.Formulas = Formulas;

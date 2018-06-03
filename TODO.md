@@ -190,12 +190,12 @@ Add help
 - Bonuses
 - Show plant markers based on ability
 * Inventory
-- Dropping items
-- Clicking on item: compare stats effects with currently equipped, if any
+- Click window for items, with use button
+- Click window: display stat effects
 - Belt mechanics (quick-use slots for potions, bombs and weapons)
 - Backpack mechanics
 - Gunpowder mechanics (multiple pouches?)
-- Ammo types
+- Dropping items
 * Merchant gameplay
 - Shops
 - Caravans
@@ -227,7 +227,7 @@ or
 - View info on other players (levels...)
 - Guilds
 * Orientations
-- Limit plants markers to explorers
+- Deal with pins in battle & after respawn
 - Pins for fights
 - Pins for gunshots and explosions (requires special networking for long-distance sounds)
 -> Much slower noise variation according to distance (since heard from very far)

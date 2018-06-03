@@ -31,7 +31,7 @@ function Player(){
         0: 0,
         1: 0,
         2: 0,
-        3: 0
+        3: 90
     };
     this.classlvl = {
         0: 0,
@@ -53,7 +53,7 @@ Player.prototype.constructor = Player;
 Player.prototype.getCommitSlotsShell = function(){
     return {
         slots: [],
-        max: GameServer.civicParameters.baseNbCommitSlots
+        max: GameServer.characterParameters.baseNbCommitSlots
     }
 };
 
@@ -220,7 +220,7 @@ Player.prototype.gainCivicXP = function(inc,notify){
     var max = Formulas.computeMaxCivicXP(this.civiclvl);
     this.civicxp = Utils.clamp(this.civicxp+inc,0,99999);
     if(this.civicxp >= max){
-        if(this.civiclvl == GameServer.civicParameters.maxCivicLvl){
+        if(this.civiclvl == GameServer.characterParameters.maxCivicLvl){
             this.civicxp = max;
         }else{
             this.civicxp -= max;
@@ -233,9 +233,20 @@ Player.prototype.gainCivicXP = function(inc,notify){
 };
 
 Player.prototype.gainClassXP = function(classID,inc,notify){
-    this.classxp[classID] = Utils.clamp(this.classxp[classID]+inc,0,100);
-    this.updatePacket.classxp = this.classxp;
     if(notify) this.addNotif('+'+inc+' '+GameServer.classData[classID].name+' XP');
+    var max = Formulas.computeMaxClassXP(this.classlvl[classID]);
+    this.classxp[classID] = Utils.clamp(this.classxp[classID]+inc,0,999999);
+    if(this.classxp[classID] >= max){
+        if(this.classlvl[classID] == GameServer.characterParameters.maxClassLvl){
+            this.classxp[classID] = max;
+        }else{
+            this.classxp[classID] -= max;
+            this.classlvl[classID]++;
+            this.updatePacket.classlvl = this.classlvl;
+            if(notify) this.addNotif('Reached '+GameServer.classData[classID].name+' level '+this.classlvl[classID]+'!');
+        }
+    }
+    this.updatePacket.classxp = this.classxp;
 };
 
 Player.prototype.giveGold = function(nb,notify){

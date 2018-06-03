@@ -13,8 +13,9 @@ To add: time gap between two orientation sounds (OrientationPin.display())
         craftsman: 2,
         explorer: 3
    },
-   civics: {
+   character: {
         maxCivicLvl: 10,
+        maxClassLvl: 100,
         baseNbCommitSlots: 2
    },
    economyCycles: {

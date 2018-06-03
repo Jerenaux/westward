@@ -154,7 +154,7 @@ GameServer.readMap = function(mapsPath,test){
 
     GameServer.battleParameters = config.get('battle');
     GameServer.wildlifeParameters = config.get('wildlife');
-    GameServer.civicParameters = config.get('civics');
+    GameServer.characterParameters = config.get('character');
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();

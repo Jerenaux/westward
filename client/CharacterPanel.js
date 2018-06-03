@@ -16,16 +16,21 @@ CharacterPanel.prototype.addInterface = function(){
     var x = alignx;
     var y = 20;
 
+    this.classes = {};
     for(var classID in UI.classesData){
         var classxp = Utils.randomInt(10,50);
         var txts = this.addPolyText(x,y,["Level ","0"," "+UI.classesData[classID].name+"   -   ",classxp+"/100"," "+UI.textsData['classxp']],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
-        this.classText = txts[2];
         y += 30;
         var classbar = new MiniProgressBar(this.x+x,this.y+y,245);
         classbar.name = 'class xp bar';
         classbar.setLevel(classxp,100);
         this.bars.push(classbar);
         y += 15;
+        this.classes[classID] = {
+            level: txts[1],
+            text: txts[3],
+            bar: classbar
+        }
     }
 
     this.addText(x,y,'Stats modifiers:');
@@ -39,6 +44,13 @@ CharacterPanel.prototype.addInterface = function(){
 };
 
 CharacterPanel.prototype.update = function(){
+    for(var classID in UI.classesData) {
+        var max = Formulas.computeMaxClassXP(Engine.player.classlvl[classID]);
+        this.classes[classID].level.setText(Engine.player.classlvl[classID]);
+        this.classes[classID].text.setText(Engine.player.classxp[classID]+'/'+max);
+        this.classes[classID].bar.setLevel(Engine.player.classxp[classID],max);
+    }
+
     //this.classText.setText(" "+UI.classesData[Engine.player.class].name+"   -   ");
     this.fatigueText.setText('0%');
     var foodModifier = Formulas.decimalToPct(Formulas.computePlayerFoodModifier(Formulas.pctToDecimal(Engine.player.foodSurplus)));
