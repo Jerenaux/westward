@@ -29,7 +29,6 @@ function BigButton(x,y,text,callback){
     },this);
     this.text.setDepth(2);
     this.text.setScrollFactor(0);
-    this.text.setDisplayOrigin(0,0);
     this.text.setVisible(false);
     this.attachCallbacks(this.text);
 
@@ -45,13 +44,18 @@ BigButton.prototype.attachCallbacks = function(element){
 };
 
 BigButton.prototype.setText = function(text){
-    var currentWidth = this.text.width;
+    /*var currentWidth = this.text.width;
     this.text.setText(text);
-    var newWidth = this.text.width - 45;
-    var dw = newWidth - currentWidth;
+    var newWidth = this.text.width;
+    var dw = newWidth - currentWidth - 45; // 45 for left and right sides
+
     this.slices[2].x += dw;
     var body = this.slices[1];
-    body.width += dw;
+    body.width += dw;*/
+
+    this.text.setText(text);
+    var body = this.slices[1];
+
     body.setInteractive();
     body.refWidth = body.width;
     body.refHeight = body.height;

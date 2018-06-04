@@ -3,7 +3,8 @@
  */
 var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
+//var PFUtils = require('../shared/PFUtils.js').PFUtils;
+var PathFinder =  require('../shared/Pathfinder.js').Pathfinder;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 
 var TURN_DURATION = 3*1000; // milliseconds
@@ -20,9 +21,10 @@ function Battle(){
     this.positions = new SpaceMap(); // positions occupied by fighters
     this.cells = new SpaceMap();
 
-    this.PFcells = new SpaceMap();
+    /*this.PFcells = new SpaceMap();
     this.PFgrid = new PF.Grid(0,0);
-    PFUtils.setGridUp(this.PFgrid,this.PFcells,true);
+    PFUtils.setGridUp(this.PFgrid,this.PFcells,true);*/
+    this.pathFinder = new Pathfinder(this.cells,99,false,false,true);
 
     this.ended = false;
     this.reset();
@@ -69,6 +71,7 @@ Battle.prototype.addFighter = function(f){
     this.fighters.push(f);
     this.managePosition(f);
     this.updateTeams(f.battleTeam,1);
+    f.xpPool = 0;
     f.setProperty('inFight',true);
     f.stopWalk();
     if(f.isPlayer) f.notifyFight(true);
@@ -237,10 +240,19 @@ Battle.prototype.computeRangedHit = function(a,b){
 Battle.prototype.applyDamage = function(f,dmg){
     f.applyDamage(-dmg);
     if(f.getHealth() == 0){
+        if(f.isAnimal) this.rewardXP(f);
         this.removeFighter(f);
         return true;
     }
     return false;
+};
+
+Battle.prototype.rewardXP = function(animal){
+    var xp = GameServer.animalsData[animal.type].xp || 0;
+    if(!xp) return;
+    this.fighters.forEach(function(f){
+        if(f.isPlayer) f.xpPool += xp;
+    })
 };
 
 Battle.prototype.processAttack = function(a,b){ // a attacks b
@@ -273,6 +285,10 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
     };
 };
 
+Battle.prototype.findPath = function(from,to){
+    return this.pathFinder.findPath(from,to);
+};
+
 // Entites are only removed when the battle is over ; battlezones are only cleared at that time
 Battle.prototype.end = function(){
     this.ended = true;
@@ -302,7 +318,8 @@ Battle.prototype.addArea = function(area){
     var sy = y;
     for(; x <= maxx; x++){
         for(y = sy; y <= maxy; y++){
-            if(!PFUtils.checkCollision(x,y)) GameServer.addBattleCell(this,x,y);
+            //if(!PFUtils.checkCollision(x,y)) GameServer.addBattleCell(this,x,y);
+            if(!GameServer.checkCollision(x,y)) GameServer.addBattleCell(this,x,y);
         }
     }
 

@@ -289,18 +289,6 @@ var Moving = new Phaser.Class({
     },
 
     playSound: function(){
-        var maxVolume = 5;
-        var volume = maxVolume;
-        if(!this.isHero){
-            var dist = Utils.manhattan({x:this.tileX,y:this.tileY},{x:Engine.player.tileX,y:Engine.player.tileY});
-            var hearingDistance = 30;
-            if(dist < hearingDistance){
-                var d = hearingDistance-dist;
-                volume = Math.round(Utils.clamp(d/hearingDistance,0,1)*maxVolume);
-            }else{
-                volume = 0;
-            }
-        }
-        Engine.scene.sound.add('footsteps').setVolume(volume).play();
+        Engine.playLocalizedSound('footsteps',5,{x:this.tileX,y:this.tileY});
     }
 });

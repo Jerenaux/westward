@@ -41,7 +41,8 @@ var Item = require('./Item.js').Item;
 var Battle = require('./Battle.js').Battle;
 var BattleCell = require('./Battle.js').BattleCell;
 var SpawnZone = require('./SpawnZone.js').SpawnZone;
-var PF = require('../shared/pathfinding.js');
+//var PF = require('../shared/pathfinding.js');
+var Pathfinder =  require('../shared/Pathfinder.js').Pathfinder;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Prism = require('./Prism.js').Prism;
 
@@ -138,9 +139,6 @@ GameServer.readMap = function(mapsPath,test){
         GameServer.AOIs.push(new AOI(i));
     }
 
-    PFUtils.setup(GameServer);
-    GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()));
-
     GameServer.battleCells = new SpaceMap();
     GameServer.textData = JSON.parse(fs.readFileSync('./assets/data/texts.json').toString());
     GameServer.itemsData = JSON.parse(fs.readFileSync('./assets/data/items.json').toString());
@@ -155,6 +153,12 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.battleParameters = config.get('battle');
     GameServer.wildlifeParameters = config.get('wildlife');
     GameServer.characterParameters = config.get('character');
+    GameServer.PFParameters = config.get('pathfinding');
+
+    //PFUtils.setup(GameServer);
+    GameServer.collisions = new SpaceMap();
+    GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()));
+    GameServer.pathFinder = new Pathfinder(GameServer.collisions,GameServer.PFParameters.maxPathLength);
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
@@ -324,6 +328,7 @@ GameServer.addNewPlayer = function(socket,data){
     var player = new Player();
     player.setStartingInventory();
     player.setSettlement(data.selectedSettlement);
+    player.classLvlUp(data.selectedClass,false);
     player.spawn();
 
     var document = new GameServer.PlayerModel(player);
@@ -422,13 +427,18 @@ GameServer.handleChat = function(data,socketID){
     player.setChat(data);
 };
 
+GameServer.checkCollision = function(x,y){
+    return !!GameServer.collisions.get(x,y);
+};
+
 GameServer.findPath = function(from,to,grid){
-    if(PFUtils.checkCollision(to.x,to.y)) return null;
-    grid = grid || GameServer.PFgrid;
+    //if(PFUtils.checkCollision(to.x,to.y)) return null;
+    if(GameServer.checkCollision(to.x,to.y)) return null;
+    /*grid = grid || GameServer.PFgrid;
     //console.log('pathfinding from ',from.x,from.y,' to ',to.x,to.y);
     var path = GameServer.PFfinder.findPath(from.x, from.y, to.x, to.y, grid);
-    PF.reset();
-    return path;
+    PF.reset();*/
+    return GameServer.pathFinder.findPath(from,to);
 };
 
 GameServer.handleAnimalClick = function(animalID,socketID){
@@ -489,7 +499,7 @@ GameServer.checkAreaIntegrity = function(area){
     for(var x = area.x; x <= area.x+area.w; x++){
         for(var y = area.y; y <= area.y+area.h; y++){
             //console.log('collision at',x,y,':',PFUtils.checkCollision(x,y));
-            if(!PFUtils.checkCollision(x,y)) cells.add(y,x,0); // y then x
+            if(!GameServer.checkCollision(x,y)) cells.add(y,x,0); // y then x
         }
     }
     var grid = new PF.Grid(0,0);

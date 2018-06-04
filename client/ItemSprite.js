@@ -44,6 +44,14 @@ var ItemSprite = new Phaser.Class({
         this.off('pointerup');
     },
 
+    display: function(){
+        this.setVisible(true);
+    },
+
+    hide: function(){
+        this.setVisible(false);
+    },
+
     handleOver: function(){
         if(this.showTooltip) UI.tooltip.updateInfo(this.name,this.desc,this.itemID);
     }

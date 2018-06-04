@@ -56,6 +56,7 @@ ProgressBar.prototype.setCallback = function(callback){
 
 ProgressBar.prototype.setLevel = function(level,max,duration){
     if(max) this.max = max;
+    var direction = Math.sign(this.level-level);
     var delta = Math.abs(this.level-level)/this.max; // Used to compute duration of tween
     this.level = Utils.clamp(level,0,this.max); // TODO: Tween this.level?
     var pct = this.level/this.max;
@@ -95,7 +96,7 @@ ProgressBar.prototype.setLevel = function(level,max,duration){
                     targets: this.head,
                     x: this.zeroX + newLength,
                     duration: duration,
-                    delay: 30
+                    delay: (direction == 1 ? 0 : 30)
                 });
         }
     }else {

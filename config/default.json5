@@ -35,9 +35,10 @@ To add: time gap between two orientation sounds (OrientationPin.display())
         foodID: 1,
         harvestEfficiency: 0.75 // % of resources that can be harvested from a source
     },
-    pathdinfing: {
+    pathfinding: {
         walkingSpeed: 5, // tiles/sec
-        maxPathLength: 36
+        maxPathLength: 36,
+        battleRange: 3
     },
     updateRates: {
             // Unit: ms

@@ -3,10 +3,12 @@
  */
 
 function ItemActionPanel(x,y,width,height,title){
-    Panel.call(this,x,y,width,height,title,true);
+    Panel.call(this,x,y,width,height,title);
 
-    this.slot = this.getNextLongSlot(100);
-    this.slot.setUp(this.x,this.y);
+    this.icon = new ItemSprite(this.x + 30, this.y + 30);
+    this.text = this.addText(50, 20,'',Utils.colors.white,16);
+    this.icon.showTooltip = false;
+    this.button = new BigButton(this.x+20,this.y+50,'Equip',this.hide.bind(this));
 }
 
 ItemActionPanel.prototype = Object.create(Panel.prototype);
@@ -14,15 +16,25 @@ ItemActionPanel.prototype.constructor = ItemActionPanel;
 
 ItemActionPanel.prototype.setUp = function(itemID){
     var data = Engine.itemsData[itemID];
-    this.slot.addIcon(data.atlas,data.frame);
+    this.icon.setUp(itemID,data);
+    this.text.setText(data.name);
+    if(data.effects){
+        this.button.setText(data.equipment ? 'Equip' : 'Use');
+    }else{
+        this.button.hide();
+    }
 };
 
 ItemActionPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
-    this.slot.display();
+    this.icon.display();
+    this.text.setVisible(true);
+    this.button.display();
 };
 
 ItemActionPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
-    this.slot.hide();
+    this.icon.hide();
+    this.text.setVisible(false);
+    this.button.hide();
 };

@@ -1,7 +1,10 @@
+Fix before release:
+- Bigbuttons
+- pathfinding
+
 Admin
 Analytics
 Cleaning
-* Ambiance
 * Battle system
 * Civics
 * Character panel
@@ -67,6 +70,7 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Send a digested config file from server to client
 - Add as much stuff as possible to config file
 - Deal differently with net updates when visibility lost (https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
 - Reimplement maps using containers
@@ -100,15 +104,11 @@ Order:
 Content:
 -------
 * Ambiance
-- Modulate fight sfx based on distance
--> Make special modulator function which expects a sound effect, a location and some parameters
-to decide the actual volume, use it for footstepts and all non-ambient sfx
+- Carcasses, traces of fight
+- Paths along most-travelled paths
 - Location sfx for each building
 - Maximum ambient noises
 -> Multiple categories (weather, animals, terrain...), distinct random intervals
-- Specific zones for all items, not random spread
-- Carcasses, traces of fight, traces of campfires
-- Paths along most-travelled paths
 * Battle system
 - Get arrows back when skinning
 - New interface:
@@ -136,11 +136,9 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Elections
 - Naming officials
 * Character panel
-- Remove % stats panel
 - Display health, fatigue and gold permanently in HUD
+- Remove % stats panel
 - Redisplay committment slots
-- Levels
-- LvlUp selected class
 - Ability points
 - Ability system
 - Events log
@@ -220,13 +218,14 @@ or
 - Fix continuous movement system
 - Fatigue 
 - Rest
-- Campfires (+ orientation pin + long distance smoke pins)
+- Campfires (+ leftovers + orientation pin + long distance smoke pins)
 - Respawn losses
 - Messaging
 - Leaderboards
 - View info on other players (levels...)
 - Guilds
 * Orientations
+- No pin for dead animals
 - Deal with pins in battle & after respawn
 - Pins for fights
 - Pins for gunshots and explosions (requires special networking for long-distance sounds)
@@ -287,10 +286,10 @@ Add checkboxes for what should be boiled or grinded
 - Impact of dev level on exploration XP reward
 - Lists of items rewarded by civic xp
 * Soldier gameplay
-- XP
 - Bonuses
 - Bombs
 - Rare/strong foes
+- Advanced XP
 - Quests
 
 Deployment:
@@ -385,6 +384,7 @@ Custom chunk editor:
 - Versioning of individual chunks (saved in separate folder), for unlimited undos
 - Add random elements (w/ scripts to remove them):
 Building editor (set shapes etc.)
+Set spawn zones in editor
 -> Patches of dirt
 -> Tree decorations: flowers, stones, bushes
 - Add cliffs in empty areas

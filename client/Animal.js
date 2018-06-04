@@ -48,6 +48,7 @@ var Animal = new Phaser.Class({
         if(data.melee_atk) {
             this.computeOrientation(this.tileX,this.tileY,data.melee_atk.x,data.melee_atk.y);
             this.faceOrientation();
+            if(Utils.randomInt(1,10) >= 8) Engine.playLocalizedSound('wolfattack1',1,{x:this.tileX,y:this.tileY});
         }
         Engine.handleBattleUpdates(this,data);
         if(data.dead) this.die();

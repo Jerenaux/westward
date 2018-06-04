@@ -4,11 +4,12 @@
 
 var onServer = (typeof window === 'undefined');
 
-function Pathfinder(navGrid,maxLength,allowDiagonal,cutCorners){
+function Pathfinder(navGrid,maxLength,allowDiagonal,cutCorners,reverseWalkable){
     this.grid = navGrid;
     this.maxLength = maxLength || 50;
     this.allowDiagonal = allowDiagonal || false;
     this.cutCorners = cutCorners || false;
+    this.reverseWalkable = reverseWalkable || false;
 }
 
 Pathfinder.prototype.setCallbacks = function(openCb, closeCb, backtrackCb){
@@ -42,7 +43,7 @@ Pathfinder.prototype.findPath = function(from,to){
         if(minFNode.equals(end)) return this.backtrack(minFNode);
 
         if(minFNode.g > this.maxLength){
-            console.log('Max length reached');
+            //console.log('Max length reached');
             break;
         }
 
@@ -145,12 +146,19 @@ Pathfinder.prototype.isWalkable = function(node){
     return (
         node.x >= 0 && node.y >= 0
         && node.x < World.worldWidth && node.y < World.worldHeight
-        && !this.grid.get(node.x,node.y)
+        //&& !this.grid.get(node.x,node.y)
+        && this.canWalk(node.x,node.y)
     )
 };
 
+Pathfinder.prototype.canWalk = function(x,y){
+    var get = this.grid.get(x,y);
+    if(this.reverseWalkable) get = !get;
+    return !get;
+};
+
 Pathfinder.prototype.backtrack = function(node){
-    console.log('Done after',this.considered,'fetches');
+    //console.log('Done after',this.considered,'fetches');
     var path = [];
 
     while(node){
@@ -159,8 +167,8 @@ Pathfinder.prototype.backtrack = function(node){
         node = this.cameFrom.get(node.x,node.y);
     }
 
-    console.log('Path length:',path.length);
-    console.log(path,path.toString());
+    /*console.log('Path length:',path.length);
+    console.log(path,path.toString());*/
 
     return path.reverse();
 };

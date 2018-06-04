@@ -22,8 +22,10 @@ var Engine = {
     tooltipTextDepth: 18,
 
     notificationDuration: 3000, // TODO: adapt based on notif length?
-
+    hearingDistance: 30, // tiles
     craftInvSize: 5, // max number of ingredients for crafting
+    maxPathLength: 36,
+
     key: 'main', // key of the scene, for Phaser
     plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager','LightsPlugin'],
     playerIsInitialized: false,
@@ -67,6 +69,7 @@ Engine.preload = function() {
     this.load.audio('soft','assets/sfx/soft.ogg');
     this.load.audio('hit','assets/sfx/hit.wav');
     this.load.audio('wolfambient','assets/sfx/wolfambient1.wav');
+    this.load.audio('wolfattack1','assets/sfx/wolfattack1.wav');
     this.load.audio('wind1','assets/sfx/wind1.wav');
     this.load.audio('wind2','assets/sfx/wind2.wav');
     this.load.audio('wind3','assets/sfx/wind3.wav');
@@ -278,9 +281,9 @@ Engine.create = function(){
     Engine.scene.input.on('drag', Engine.handleDrag);
     Engine.scene.input.keyboard.on('keydown', Engine.handleKeyboard);
 
-    PFUtils.setup(Engine);
-    Engine.testCollisions = new SpaceMap();
-    Engine.newFinder = new Pathfinder(Engine.testCollisions,36);
+    //PFUtils.setup(Engine);
+    Engine.collisions = new SpaceMap();
+    Engine.pathFinder = new Pathfinder(Engine.collisions,Engine.maxPathLength);
 
     Engine.inMenu = false;
     Engine.inPanel = false;
@@ -333,7 +336,7 @@ Engine.initWorld = function(data){
     Engine.miniMap.display();
     Engine.updateAllOrientationPins();
 
-    if(Client.isNewPlayer()) {
+    /*if(Client.isNewPlayer()) {
         var w = 400;
         var h = 290;
         var y = 20;
@@ -343,35 +346,42 @@ Engine.initWorld = function(data){
         panel.addText(10, ys, UI.textsData['not_implemented'], null, 14, Utils.fonts.normal);
         panel.addBigButton('Got it');
         panel.display();
-    }
+    }*/
 
     // todo: move all to dedicated sound manager
     Engine.lastOrientationSound = 0;
-    // todo: move to JSON file
-    var ambient = [
+    // todo: move to JSON file (+ config for delay)
+    Engine.ambientSounds([
         {name:'birds1',volume:1},
         {name:'birds2',volume:1},
         {name:'birds3',volume:1},
         {name:'bird',volume:1},
         {name:'cricket',volume:1}
-        //{name:'raven',volume:0.1}
-    ];
-    setInterval(function(){
-        var sound = Utils.randomElement(ambient);
-        Engine.scene.sound.add(sound.name).setVolume(sound.volume).play();
-    },10000);
-
-    var weather = [
+    ], 10000);
+    Engine.ambientSounds([
         {name:'wind1',volume:1},
         {name:'wind2',volume:1},
         {name:'wind3',volume:1}
-        //{name:'raven',volume:0.1}
-    ];
-    setInterval(function(){
-        var sound = Utils.randomElement(weather);
-        Engine.scene.sound.add(sound.name).setVolume(sound.volume).play();
-    },17000);
+    ],17000);
 
+};
+
+Engine.ambientSounds = function(sounds,interval){
+    setInterval(function(){
+        var sound = Utils.randomElement(sounds);
+        Engine.scene.sound.add(sound.name).setVolume(sound.volume).play();
+    },interval);
+};
+
+Engine.playLocalizedSound = function(sound,maxVolume,location){
+    var volume = maxVolume;
+    var dist = Utils.manhattan(location,{x:Engine.player.tileX,y:Engine.player.tileY});
+    if(dist < Engine.hearingDistance){
+        var d = Engine.hearingDistance-dist;
+        //volume = Math.round(Utils.clamp(d/Engine.hearingDistance,0,1)*maxVolume);
+        volume = Utils.clamp(d/Engine.hearingDistance,0,1)*maxVolume;
+        Engine.scene.sound.add(sound).setVolume(volume).play();
+    }
 };
 
 Engine.createAnimations = function(){
@@ -611,7 +621,7 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
     sprite.setVisible(true);
     sprite.setDepth(target.depth+1);
     sprite.on('animationstart',function(){
-        Engine.scene.sound.add('hit').play();
+        Engine.playLocalizedSound('hit',1,{x:target.tileX,y:target.tileY});
     });
     sprite.anims.play(animation);
 
@@ -996,7 +1006,7 @@ Engine.makeInventory = function(statsPanel){
     var items = new InventoryPanel(40,100,600,380,'Items');
     items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
     items.addCapsule('gold',100,-9,'999','gold');
-    inventory.addPanel('itemAction',new ItemActionPanel(70,220,200,200),true);
+    inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,100),true);
     items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help']);
     inventory.addPanel('items',items);
     var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
@@ -1160,11 +1170,17 @@ Engine.removeChunk = function(id){
 
 Engine.addCollision = function(x,y,tile){
     if(Engine.isColliding(tile)) {
-        Engine.testCollisions.add(x,y,1);
-        Engine.collisions.add(y,x,1);
+        //Engine.testCollisions.add(x,y,1);
+        Engine.collisions.add(x,y,1);
     }
 };
 
+// Check if a non-walkable tile is at a given position or not
+Engine.checkCollision = function(x,y){
+    return !!Engine.collisions.get(x,y);
+};
+
+// Check if a given tile type is walkable or not
 Engine.isColliding = function(tile){ // tile is the index of the tile in the tileset
     return Engine.collidingTiles.includes(tile);
 };
@@ -1224,22 +1240,22 @@ Engine.computePath = function(position){
     //console.log('path to',position);
     var x = position.x;
     var y = position.y;
-    if(PFUtils.checkCollision(x,y)) return;
+    if(Engine.checkCollision(x,y)) return;
     //console.log(Engine.player.tileX, Engine.player.tileY, x, y);
     var start = Engine.player.getPFstart();
-    if(Engine.player.moving) Engine.player.stop();
+    //if(Engine.player.moving) Engine.player.stop();
 
-    var path = Engine.PFfinder.findPath(start.x, start.y, x, y, Engine.PFgrid);
+    /*var path = Engine.PFfinder.findPath(start.x, start.y, x, y, Engine.PFgrid);
     PF.reset();
     if(path.length == 0 || path.length > PFUtils.maxPathLength) {
         Engine.handleMsg('It\'s too far!');
         return;
-    }
-    /*var path = Engine.newFinder.findPath(start,{x:x,y:y});
+    }*/
+    var path = Engine.pathFinder.findPath(start,{x:x,y:y});
     if(!path) {
         Engine.handleMsg('It\'s too far!');
         return;
-    }*/
+    }
 
     var trim = PFUtils.trimPath(path,Engine.battleCellsMap);
     if(trim.trimmed) Engine.player.setDestinationAction(0);
@@ -1303,7 +1319,7 @@ Engine.updateMarker = function(tile){
     Engine.marker.y = (tile.y*Engine.tileHeight);
     if(tile.x != Engine.marker.previousTile.x || tile.y != Engine.marker.previousTile.y){
         Engine.marker.previousTile = tile;
-        if(PFUtils.checkCollision(tile.x,tile.y)){
+        if(Engine.checkCollision(tile.x,tile.y)){
             Engine.marker.setFrame(1);
         }else{
             Engine.marker.setFrame(0);
@@ -1754,9 +1770,11 @@ Engine.newbuildingClick = function(){
 };
 
 Engine.inventoryClick = function(){
-    Client.sendUse(this.itemID);
-    return;
-    if(!BattleManager.inBattle) {
+    //Client.sendUse(this.itemID);
+    //return;
+    if(BattleManager.inBattle) {
+        Client.sendUse(this.itemID);
+    }else{
         // itemAction is the small panel appearing in the inventory displaying options such as use, throw...
         Engine.currentMenu.panels['itemAction'].setUp(this.itemID);
         Engine.currentMenu.panels['itemAction'].display();

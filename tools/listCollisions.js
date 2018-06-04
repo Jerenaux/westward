@@ -64,7 +64,7 @@ function findCollisions(indir,fileName,chunkID){
             if(collides(map.layers[j].data[i])){
                 var x = origin.x + i % map.width;
                 var y = origin.y + Math.floor(i / map.width);
-                collisions.add(y,x,1); // IMPORTANT, y before x!!
+                collisions.add(x,y,1);
                 //console.log('collision at '+x+', '+y);
                 break;
             }

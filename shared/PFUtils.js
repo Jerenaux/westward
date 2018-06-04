@@ -162,7 +162,8 @@ PFUtils.trimPath = function(path,map){
     return {
         trimmed: (p.length != path.length),
         path: p
-    };};
+    };
+};
 
 PFUtils.euclidean = function(a,b){
     return Math.sqrt(Math.pow(a.x-b.x,2)+Math.pow(a.y- b.y,2));
@@ -201,7 +202,7 @@ PFUtils.collisionsFromShape = function(shape,tileX,tileY,width,height,map,checkO
                     if(map.get(wy,wx)) return false;
                 }else {
                     //console.log('adding collision at',wx,wy);
-                    map.add(wy, wx, 1);
+                    map.add(wx, wy, 1); // /!\  x/y order
                 }
             }
         }

@@ -80,7 +80,7 @@ SpawnZone.prototype.spawn = function(AOIs,type,id,nb){
         var range = 2;
         var x = Utils.randomInt(cx-range,cx+range);
         var y = Utils.randomInt(cy-range,cy+range);
-        if(PFUtils.checkCollision(x,y)) {
+        if(GameServer.checkCollision(x,y)) {
             i--;
             continue;
         }

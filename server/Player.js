@@ -31,7 +31,7 @@ function Player(){
         0: 0,
         1: 0,
         2: 0,
-        3: 90
+        3: 0
     };
     this.classlvl = {
         0: 0,
@@ -241,12 +241,16 @@ Player.prototype.gainClassXP = function(classID,inc,notify){
             this.classxp[classID] = max;
         }else{
             this.classxp[classID] -= max;
-            this.classlvl[classID]++;
-            this.updatePacket.classlvl = this.classlvl;
-            if(notify) this.addNotif('Reached '+GameServer.classData[classID].name+' level '+this.classlvl[classID]+'!');
+            this.classLvlUp(classID,notify);
         }
     }
     this.updatePacket.classxp = this.classxp;
+};
+
+Player.prototype.classLvlUp = function(classID, notify){
+    this.classlvl[classID]++;
+    this.updatePacket.classlvl = this.classlvl;
+    if(notify) this.addNotif('Reached '+GameServer.classData[classID].name+' level '+this.classlvl[classID]+'!');
 };
 
 Player.prototype.giveGold = function(nb,notify){
@@ -587,6 +591,11 @@ Player.prototype.enterBuilding = function(id){
 Player.prototype.exitBuilding = function(){
     // TODO: check if in building first
     this.setProperty('inBuilding', -1);
+};
+
+Player.prototype.endFight = function(){
+    MovingEntity.prototype.endFight.call(this);
+    if(this.xpPool) this.gainClassXP(0,this.xpPool,true);
 };
 
 Player.prototype.isAvailableForFight = function(){
