@@ -210,7 +210,6 @@ MovingEntity.prototype.findFreeCell = function(){
 MovingEntity.prototype.findBattlePath = function(dest){
     var data = {};
     var path = this.battle.findPath({x: this.x, y: this.y}, dest);
-    //var path = GameServer.findPath({x: this.x, y: this.y}, dest,this.battle.PFgrid);
     if(path.length > 0){
         this.setPath(path);
         data.action = 'move';
@@ -239,7 +238,7 @@ MovingEntity.prototype.attackTarget = function(){
 
 MovingEntity.prototype.selectTarget = function(){
     var fighters = this.battle.fighters;
-    var minHP = 9999;
+    var minHP = 99999;
     var currentTarget = null;
     for(var i = 0; i < fighters.length; i++){
         var f = fighters[i];
@@ -262,7 +261,6 @@ MovingEntity.prototype.computeBattleDestination = function(target){
             if(x == dest.x && y == dest.y) continue;
             if(!this.battle.isPosition(x,y)) continue;
             if(!this.battle.isPositionFree(x,y)) continue;
-            //if(PFUtils.checkCollision(x,y)) continue;
             if(GameServer.checkCollision(x,y)) continue;
             if(!this.inBattleRange(x,y)) continue; // still needed as long as Euclidean range, the double-loop include corners outside of Euclidean range
             candidates.push({

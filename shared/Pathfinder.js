@@ -4,6 +4,10 @@
 
 var onServer = (typeof window === 'undefined');
 
+if(onServer){
+    SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
+}
+
 function Pathfinder(navGrid,maxLength,allowDiagonal,cutCorners,reverseWalkable){
     this.grid = navGrid;
     this.maxLength = maxLength || 50;
@@ -146,7 +150,6 @@ Pathfinder.prototype.isWalkable = function(node){
     return (
         node.x >= 0 && node.y >= 0
         && node.x < World.worldWidth && node.y < World.worldHeight
-        //&& !this.grid.get(node.x,node.y)
         && this.canWalk(node.x,node.y)
     )
 };

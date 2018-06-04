@@ -22,9 +22,8 @@ function MiniMap(){
     });
 }
 
-MiniMap.prototype.focus = function(){
-    var mapLoc = this.map.computeMapLocation(Engine.player.tileX, Engine.player.tileY);
-    this.map.focus(mapLoc.x,mapLoc.y);
+MiniMap.prototype.follow = function(){
+    this.map.follow();
 };
 
 MiniMap.prototype.display = function(){

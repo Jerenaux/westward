@@ -41,9 +41,7 @@ var Item = require('./Item.js').Item;
 var Battle = require('./Battle.js').Battle;
 var BattleCell = require('./Battle.js').BattleCell;
 var SpawnZone = require('./SpawnZone.js').SpawnZone;
-//var PF = require('../shared/pathfinding.js');
 var Pathfinder =  require('../shared/Pathfinder.js').Pathfinder;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Prism = require('./Prism.js').Prism;
 
 
@@ -151,9 +149,10 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.classData = JSON.parse(fs.readFileSync('./assets/data/classes.json').toString());
 
     GameServer.battleParameters = config.get('battle');
-    GameServer.wildlifeParameters = config.get('wildlife');
+    GameServer.buildingParameters = config.get('buildings');
     GameServer.characterParameters = config.get('character');
     GameServer.PFParameters = config.get('pathfinding');
+    GameServer.wildlifeParameters = config.get('wildlife');
 
     //PFUtils.setup(GameServer);
     GameServer.collisions = new SpaceMap();
@@ -431,7 +430,7 @@ GameServer.checkCollision = function(x,y){
     return !!GameServer.collisions.get(x,y);
 };
 
-GameServer.findPath = function(from,to,grid){
+GameServer.findPath = function(from,to){
     //if(PFUtils.checkCollision(to.x,to.y)) return null;
     if(GameServer.checkCollision(to.x,to.y)) return null;
     /*grid = grid || GameServer.PFgrid;
@@ -494,17 +493,18 @@ GameServer.handleBattle = function(player,animal,aggro){
 };
 
 GameServer.checkAreaIntegrity = function(area){
-    console.log(area);
     var cells = new SpaceMap();
     for(var x = area.x; x <= area.x+area.w; x++){
         for(var y = area.y; y <= area.y+area.h; y++){
             //console.log('collision at',x,y,':',PFUtils.checkCollision(x,y));
-            if(!GameServer.checkCollision(x,y)) cells.add(y,x,0); // y then x
+            if(!GameServer.checkCollision(x,y)) cells.add(x,y,0); // y then x
         }
     }
-    var grid = new PF.Grid(0,0);
-    PFUtils.setGridUp(grid,cells,true);
-    var path = GameServer.findPath(area,{x:area.x+area.w,y:area.y+area.h},grid);
+    //var grid = new PF.Grid(0,0);
+    //PFUtils.setGridUp(grid,cells,true);
+    //var path = GameServer.findPath(area,{x:area.x+area.w,y:area.y+area.h},grid);
+    var integrityPathfinder = new Pathfinder(cells,999);
+    var path = integrityPathfinder.findPath(area,{x:area.x+area.w,y:area.y+area.h});
     return (path && path.length > 0);
 };
 
@@ -585,7 +585,7 @@ GameServer.addBattleCell = function(battle,x,y){
     var cell = new BattleCell(x,y,battle);
     GameServer.battleCells.add(x,y,cell);
     battle.cells.add(x,y,cell);
-    battle.PFcells.add(y,x,0); // y, then x!
+    //battle.PFcells.add(y,x,0); // y, then x!
     GameServer.addAtLocation(cell);
     GameServer.handleAOItransition(cell);
 };

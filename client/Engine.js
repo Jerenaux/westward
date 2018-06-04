@@ -1647,7 +1647,7 @@ Engine.exitBuilding = function(){
         Engine.menus[m].hideIcon();
     }
     Engine.UIHolder.resize(Engine.getHolderSize());
-    Engine.miniMap.focus();
+    Engine.miniMap.follow();
 };
 
 Engine.getHolderSize = function(){

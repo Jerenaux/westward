@@ -124,6 +124,24 @@ var Map = new Phaser.Class({
         this.dragMap(dx,dy,false);
     },
 
+    focus: function(x,y){
+        var dx = x - (this.x + this.draggedX);
+        var dy = y - (this.y + this.draggedY);
+        console.log(dx,dy);
+        // The map has to move in the opposite direction of the drag (w.r.t. center)
+        this.dragMap(dx,dy,true);
+    },
+
+    follow: function(){
+        var pos = {x:Engine.player.tileX,y:Engine.player.tileY};
+        var ox = this.displayOriginX;
+        var oy = this.displayOriginY;
+        this.centerMap(pos);
+        var dx = this.displayOriginX - ox;
+        var dy = this.displayOriginY - oy;
+        this.dragMap(dx,dy,false);
+    },
+
     dragMap: function(dx,dy,tween){ // x and y are destination coordinates
         // Used to keep track of the current center of the map
         this.draggedX += dx;
@@ -153,7 +171,7 @@ var Map = new Phaser.Class({
     },
 
     movePins: function(dx,dy){
-        this.pins.forEach(function(p){
+        this.tweenablePins.forEach(function(p){
             p.x -= dx;
             p.y -= dy;
         });
@@ -195,13 +213,6 @@ var Map = new Phaser.Class({
         return pin;
     },
 
-    focus: function(x,y){
-        var dx = x - (this.x + this.draggedX);
-        var dy = y - (this.y + this.draggedY);
-        // The map has to move in the opposite direction of the drag (w.r.t. center)
-        this.dragMap(dx,dy,true);
-    },
-
     resetCounter: function(){
         this.pinsCounter = 0;
         this.tweenablePins = [];
@@ -215,6 +226,16 @@ var Map = new Phaser.Class({
         this.setTexture('fullmap');
     },
 
+    centerMap: function(tile){
+        var origin = Utils.tileToPct(tile.x,tile.y);
+        var maxOriginX = (this.width - this.viewRect.width/2)/this.width;
+        var minOriginX = (this.viewRect.width/2)/this.width;
+        var maxOriginY = (this.height - this.viewRect.height/2)/this.height;
+        var minOriginY = (this.viewRect.height/2)/this.height;
+        this.setOrigin(Utils.clamp(origin.x,minOriginX,maxOriginX),Utils.clamp(origin.y,minOriginY,maxOriginY));
+        this.setPosition(this.center.x,this.center.y);
+    },
+
     display: function(){
         var tile;
         if(this.target == 'building'){
@@ -223,13 +244,7 @@ var Map = new Phaser.Class({
             tile = Engine.player.getTilePosition();
         }
 
-        var origin = Utils.tileToPct(tile.x,tile.y);
-        var maxOriginX = (this.width - this.viewRect.width/2)/this.width;
-        var minOriginX = (this.viewRect.width/2)/this.width;
-        var maxOriginY = (this.height - this.viewRect.height/2)/this.height;
-        var minOriginY = (this.viewRect.height/2)/this.height;
-        this.setOrigin(Utils.clamp(origin.x,minOriginX,maxOriginX),Utils.clamp(origin.y,minOriginY,maxOriginY));
-        this.setPosition(this.center.x,this.center.y);
+        this.centerMap(tile);
 
         if(this.target == 'player') {
             this.addPin(tile.x,tile.y,'Your position','x',true);

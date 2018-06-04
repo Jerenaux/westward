@@ -4,13 +4,13 @@
 var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 //var PFUtils = require('../shared/PFUtils.js').PFUtils;
-var PathFinder =  require('../shared/Pathfinder.js').Pathfinder;
+var Pathfinder =  require('../shared/Pathfinder.js').Pathfinder;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 
-var TURN_DURATION = 3*1000; // milliseconds
-var TICK_RATE = 100; // milliseconds
+var TICK_RATE;
 
 function Battle(){
+    TICK_RATE = GameServer.battleParameters.tickRate; // milliseconds
     this.id = GameServer.lastBattleID++;
     this.fighters = []; // the fighter at position 0 is the one currently in turn
     this.teams = { // number of fighters of each 'team' involved in the fight
@@ -21,9 +21,6 @@ function Battle(){
     this.positions = new SpaceMap(); // positions occupied by fighters
     this.cells = new SpaceMap();
 
-    /*this.PFcells = new SpaceMap();
-    this.PFgrid = new PF.Grid(0,0);
-    PFUtils.setGridUp(this.PFgrid,this.PFcells,true);*/
     this.pathFinder = new Pathfinder(this.cells,99,false,false,true);
 
     this.ended = false;
@@ -97,7 +94,7 @@ Battle.prototype.updateTeams = function(team,increment){
 };
 
 Battle.prototype.reset = function(){
-    this.countdown = TURN_DURATION;
+    this.countdown = GameServer.battleParameters.turnDuration*1000;
     this.endTime = 0;
     this.actionTaken = false;
 };
@@ -204,7 +201,7 @@ Battle.prototype.computeDamage = function(type,a,b){
             dmg = this.computeRangedDamage(atk,def);
             break;
     }
-    return Utils.clamp(Math.ceil(dmg),1,10000);
+    return Utils.clamp(Math.ceil(dmg),GameServer.battleParameters.minDamage,GameServer.battleParameters.maxDamage);
 };
 
 Battle.prototype.computeMeleeDamage = function(dmg,def){
@@ -231,8 +228,8 @@ Battle.prototype.computeRangedHit = function(a,b){
         x: b.x,
         y: b.y
     });
-    var chance = Math.ceil(a.getStat('acc').getValue() - (dist*5));
-    var rand = Utils.randomInt(0,101);
+    var chance = Math.ceil(a.getStat('acc').getValue() - (dist*GameServer.battleParameters.rangePenalty));
+    var rand = Utils.randomInt(0,100);
     //console.log('ranged hit : ',rand,chance);
     return rand < chance;
 };
@@ -318,7 +315,6 @@ Battle.prototype.addArea = function(area){
     var sy = y;
     for(; x <= maxx; x++){
         for(y = sy; y <= maxy; y++){
-            //if(!PFUtils.checkCollision(x,y)) GameServer.addBattleCell(this,x,y);
             if(!GameServer.checkCollision(x,y)) GameServer.addBattleCell(this,x,y);
         }
     }

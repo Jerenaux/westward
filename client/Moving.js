@@ -161,6 +161,7 @@ var Moving = new Phaser.Class({
         this.playSound();
         if(this.isHero){
             Engine.updateAllOrientationPins();
+            Engine.miniMap.follow();
         }else{
             this.manageOrientationPin();
         }
@@ -173,7 +174,7 @@ var Moving = new Phaser.Class({
 
     teleport: function(x,y){
         this.setPosition(x,y);
-        if(this.isHero) Engine.miniMap.focus();
+        if(this.isHero) Engine.miniMap.follow();
     },
 
     getPFstart: function(){
@@ -240,7 +241,6 @@ var Moving = new Phaser.Class({
         this.previousOrientation = null;
         this.anims.stop();
         this.setFrame(this.restingFrames[this.orientation]);
-        if(this.isHero) Engine.miniMap.focus();
 
         if(this.queuedPath){
             var _path = this.queuedPath.slice();

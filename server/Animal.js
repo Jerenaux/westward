@@ -127,25 +127,16 @@ Animal.prototype.isInBuilding = function(){
 };
 
 Animal.prototype.findRandomDestination = function(){
+    var r = GameServer.wildlifeParameters.wanderRange;
     return {
-        x: Utils.clamp(this.x + Utils.randomInt(-5,5),0,World.worldWidth),
-        y: Utils.clamp(this.y + Utils.randomInt(-5,5),0,World.worldHeight)
+        x: Utils.clamp(this.x + Utils.randomInt(-r,r),0,World.worldWidth),
+        y: Utils.clamp(this.y + Utils.randomInt(-r,r),0,World.worldHeight)
     };
 };
 
 Animal.prototype.goToDestination = function(dest){
     var path = GameServer.findPath({x:this.x,y:this.y},dest);
     if(!path || path.length <= 1) return false;
-
-    // quick fix
-    var p = [];
-    for(var i = 0; i < path.length; i++){
-        var cell = path[i];
-        if(cell[0] < 0 || cell[1] < 0 || cell[0] > World.worldWidth
-            || cell[1] > World.worldHeight) break;
-        p.push(cell);
-    }
-    path = p;
 
     var trim = PFUtils.trimPath(path,GameServer.battleCells);
     path = trim.path;

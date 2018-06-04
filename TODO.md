@@ -1,6 +1,5 @@
 Fix before release:
 - Bigbuttons
-- pathfinding
 
 Admin
 Analytics
@@ -136,6 +135,8 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Elections
 - Naming officials
 * Character panel
+- restore "setClass" to use to compute different XP gains per class
+- Adjust XP gains per class
 - Display health, fatigue and gold permanently in HUD
 - Remove % stats panel
 - Redisplay committment slots
@@ -246,10 +247,11 @@ or
 - Set up stats of troops
 - Make troops engage enemies
 * Settlement economy
-Have hunter huts produce pelts, bones...
 Stop sending commit slots repeatedly
 Hide commit button when already committed
 Implement and test decommitment from db data
+Modify update commit code to accomodate for commitment of > 1 turn
+Have hunter huts produce pelts, bones...
 Recipe: paper cartridges (paper also for bombs?)?
 Make recipes (randomly?) for 5 consumables (potion, antidote, steady stuff...) + create ingredients
 Recipes for fancy bullets and bombs
@@ -375,16 +377,14 @@ Testing:
 
 World building:
 --------------
--> Custom pathfinding, World editor, manage spawn zones...
-Custom pathfinding: remove quick fix from Animal.goToDestination()
-Custom chunk editor:
+Custom chunk/world editor:
 - Arrows on the fringes of the window allow to move quickly to adjacent chunks
 - See borders of adjacent chunks to match fringe tiles
 - Preserve whatever extra info is in the JSON file (vs Tiled who rewrites it)
 - Versioning of individual chunks (saved in separate folder), for unlimited undos
 - Add random elements (w/ scripts to remove them):
 Building editor (set shapes etc.)
-Set spawn zones in editor
+Manage spawn zones in editor
 -> Patches of dirt
 -> Tree decorations: flowers, stones, bushes
 - Add cliffs in empty areas

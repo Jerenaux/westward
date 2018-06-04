@@ -25,7 +25,7 @@ function Building(data){
     this.name = GameServer.buildingsData[this.type].name;
     this.sid = data.sid;
     this.settlement = GameServer.settlements[this.sid];
-    this.inventory = new Inventory(100); // Inventory object
+    this.inventory = new Inventory(GameServer.buildingParameters.inventorySize);
     if(data.inventory) this.inventory.fromList(data.inventory);
     this.prices = data.prices || {};
     this.setGold(data.gold || 0);
@@ -122,11 +122,9 @@ Building.prototype.updateBuild = function(){
     if(!GameServer.isTimeToUpdate('build')) return false;
     var rate = GameServer.buildingsData[this.type].buildRate; // Base progress increase per turn, before factoring productivity in
     if(!rate) return;
-    //var increment = nbCycles*Formulas.computeBuildIncrement(Formulas.pctToDecimal(this.productivity),rate);
     var increment = Formulas.computeBuildIncrement(Formulas.pctToDecimal(this.productivity),rate);
     console.log('Building ',increment,'%');
     this.setProperty('progress',Utils.clamp(this.progress+increment,this.progress,100));
-    //this.lastBuildCycle = Date.now();
     if(this.progress == 100){
         this.setProperty('built',true);
         this.resetCounters();
@@ -211,11 +209,11 @@ Building.prototype.getGold = function(){
 };
 
 Building.prototype.giveGold = function(nb){
-    this.setProperty('gold',Utils.clamp(this.gold+nb,0,99999));
+    this.setProperty('gold',Utils.clamp(this.gold+nb,0,GameServer.buildingParameters.maxGold));
 };
 
 Building.prototype.takeGold = function(nb){
-    this.setProperty('gold',Utils.clamp(this.gold-nb,0,99999));
+    this.setProperty('gold',Utils.clamp(this.gold-nb,0,GameServer.buildingParameters.maxGold));
 };
 
 Building.prototype.remove = function(){
