@@ -100,7 +100,7 @@ Settlement.prototype.consumeFood = function(){
     if(!GameServer.isTimeToUpdate('foodConsumption')) return false;
     var consumption = Formulas.foodConsumption(this.pop);
     console.log(this.name, 'consuming', consumption, 'food');
-    if (consumption) this.takeFromFort(1, consumption);
+    if (consumption) this.takeFromFort(GameServer.miscParameters.foodID, consumption);
     // No need to save, surplus will be recomputed upon loading settlement
     return (consumption > 0);
 };
@@ -108,7 +108,7 @@ Settlement.prototype.consumeFood = function(){
 // Called whenever food amount changes and directly after all buildings are read
 Settlement.prototype.computeFoodSurplus = function(){
     console.log('Computing food surplus...');
-    var foodAmount = this.fort.getItemNb(1);
+    var foodAmount = this.fort.getItemNb(GameServer.miscParameters.foodID);
     if(this.pop === undefined){
         console.warn('Undefined population for settlement',this.name);
         this.pop = 0;

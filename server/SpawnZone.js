@@ -72,9 +72,6 @@ SpawnZone.prototype.spawn = function(AOIs,type,id,nb){
 
     for(var i = 0, j = 0; i < nb; i++, j++){
         if(j == 20) break;
-        /*var AOI = Utils.randomElement(AOIs);
-        var x = Utils.randomInt(AOI.x,AOI.x+World.chunkWidth);
-        var y = Utils.randomInt(AOI.y,AOI.y+World.chunkHeight);*/
 
         // TODO: put range in conf file
         var range = 2;

@@ -23,9 +23,12 @@ To add: time gap between two orientation sounds (OrientationPin.display())
         explorer: 3
    },
    character: {
+        baseNbCommitSlots: 2,
         maxCivicLvl: 10,
+        maxCivicXP: 99999,
         maxClassLvl: 100,
-        baseNbCommitSlots: 2
+        maxClassXP: 999999,
+        maxGold: 100000
    },
    economyCycles: {
         // Unit: seconds
@@ -42,7 +45,6 @@ To add: time gap between two orientation sounds (OrientationPin.display())
     },
     misc: {
         foodID: 1,
-        harvestEfficiency: 0.75 // % of resources that can be harvested from a source
     },
     pathfinding: {
         walkingSpeed: 5, // tiles/sec

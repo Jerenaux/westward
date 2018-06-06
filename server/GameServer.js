@@ -151,6 +151,7 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.battleParameters = config.get('battle');
     GameServer.buildingParameters = config.get('buildings');
     GameServer.characterParameters = config.get('character');
+    GameServer.miscParameters = config.get('misc');
     GameServer.PFParameters = config.get('pathfinding');
     GameServer.wildlifeParameters = config.get('wildlife');
 

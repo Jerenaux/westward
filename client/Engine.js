@@ -38,7 +38,6 @@ var Engine = {
 Engine.preload = function() {
     Engine.useTilemaps = false;
 
-    //this.load.spritesheet('hero', 'assets/sprites/hero.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('faces', 'assets/sprites/faces.png',{frameWidth:32,frameHeight:32});
 
@@ -88,10 +87,10 @@ Engine.preload = function() {
     this.load.image('envelope', 'assets/sprites/envelope.png');
     this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
 
-    this.load.image('fort', 'assets/sprites/buildings/fort_300.png');
-    this.load.image('tradepost', 'assets/sprites/buildings/tradepost.png');
+    this.load.image('fort', 'assets/sprites/buildings/fort2.png');
+    this.load.image('tradepost', 'assets/sprites/buildings/tradepost2.png');
     this.load.image('inn', 'assets/sprites/buildings/inn.png');
-    this.load.image('tower', 'assets/sprites/buildings/tower.png');
+    this.load.image('tower', 'assets/sprites/buildings/tower2.png');
     this.load.image('foundations', 'assets/sprites/buildings/foundations.png');
     this.load.image('hunterhut', 'assets/sprites/buildings/hut2.png');
 
@@ -1241,19 +1240,12 @@ Engine.computePath = function(position){
     var x = position.x;
     var y = position.y;
     if(Engine.checkCollision(x,y)) return;
-    //console.log(Engine.player.tileX, Engine.player.tileY, x, y);
     var start = Engine.player.getPFstart();
-    //if(Engine.player.moving) Engine.player.stop();
+    if(Engine.player.moving) Engine.player.stop();
 
-    /*var path = Engine.PFfinder.findPath(start.x, start.y, x, y, Engine.PFgrid);
-    PF.reset();
-    if(path.length == 0 || path.length > PFUtils.maxPathLength) {
-        Engine.handleMsg('It\'s too far!');
-        return;
-    }*/
     var path = Engine.pathFinder.findPath(start,{x:x,y:y});
     if(!path) {
-        Engine.handleMsg('It\'s too far!');
+        Engine.player.talk('It\'s too far!');
         return;
     }
 
@@ -1340,97 +1332,10 @@ Engine.showMarker = function(){
 * */
 
 Engine.updateSelf = function(data){
-    var updateEvents = new Set();
-
-    if(data.items) {
-        Engine.player.inventory.updateItems(data.items);
-        updateEvents.add('inv');
-        if(!Engine.firstSelfUpdate) {
-            data.items.forEach(function (item) {
-                var sound = Engine.itemsData[item[0]].sound;
-                if(sound) Engine.scene.sound.add(sound).play();
-            });
-        }
-    }
-    if(data.stats){
-        for(var i = 0; i < data.stats.length; i++){
-            Engine.updateStat(data.stats[i].k,data.stats[i]);
-        }
-        updateEvents.add('stats');
-    }
-    if(data.ammo){
-        for(var i = 0; i < data.ammo.length; i++){
-            var am = data.ammo[i];
-            Engine.updateAmmo(am.slot,am.nb);
-        }
-    }
-    if(data.equipment){
-        for(var i = 0; i < data.equipment.length; i++){
-            var eq = data.equipment[i];
-            Engine.updateEquipment(eq.slot,eq.item);
-        }
-    }
-    if(data.ammo || data.equipment) updateEvents.add('equip');
-    if(data.gold){
-        Engine.player.gold = data.gold;
-        updateEvents.add('gold');
-    }
-    if(data.commitSlots){
-        Engine.player.commitSlots = data.commitSlots;
-        updateEvents.add('commit');
-    }
-    if(data.classxp){
-        Engine.player.classxp = data.classxp;
-        updateEvents.add('character');
-    }
-    if(data.classlvl){
-        Engine.player.classlvl = data.classlvl;
-        updateEvents.add('character');
-    }
-    if(data.civiclvl >= 0){
-        Engine.player.civiclvl = data.civiclvl;
-        updateEvents.add('citizen');
-    }
-    if(data.civicxp >= 0){
-        Engine.player.civicxp = data.civicxp;
-        updateEvents.add('citizen');
-    }
-    if(data.msgs){
-        for(var i = 0; i < data.msgs.length; i++){
-            Engine.handleMsg(data.msgs[i]);
-        }
-    }
-    if(data.notifs) UI.handleNotifications(data.notifs);
-    if(data.foodSurplus !== undefined){
-        Engine.player.foodSurplus = data.foodSurplus;
-        updateEvents.add('character');
-    }
-    if(data.dead !== undefined){
-        if(data.dead == true) Engine.manageDeath();
-        if(data.dead == false) Engine.manageRespawn();
-    }
-    if(data.fightStatus !== undefined) BattleManager.handleFightStatus(data.fightStatus);
-    if(data.remainingTime) BattleManager.setCounter(data.remainingTime);
-    if(data.activeID) BattleManager.manageTurn(data.activeID);
-
-    if(data.x >= 0 && data.y >= 0) Engine.player.teleport(data.x,data.y);
-
-    updateEvents.forEach(function(e){
-        Engine.updateMenus(e);
-    });
-
-    Engine.firstSelfUpdate = false;
+    Engine.player.updateData(data);
 };
 
-Engine.updateAmmo = function(slot,nb){
-    //Engine.player.equipment.containers[slot] = nb;
-    Engine.player.equipment.setAmmo(slot,nb);
-};
-
-Engine.updateEquipment = function(slot,item){
-    Engine.player.equipment.set(slot,item);
-};
-
+// TODO: move to Hero()
 Engine.updateStat = function(key,data){
     var statObj = Engine.player.getStat(key);
     statObj.setBaseValue(data.v);
@@ -1456,16 +1361,11 @@ Engine.updateMenus = function(category){
         'gold': 'onUpdateGold',
         'inv': 'onUpdateInventory',
         'productivity':'onUpdateProductivity',
-        //'settlementStatus': 'onUpdateSettlementStatus',
         'stats': 'onUpdateStats'
     };
 
     var event = callbackMap[category];
     if(Engine.currentMenu) Engine.currentMenu.trigger(event);
-};
-
-Engine.handleMsg = function(msg){
-    Engine.player.talk(msg);
 };
 
 Engine.update = function(){
@@ -1770,8 +1670,8 @@ Engine.newbuildingClick = function(){
 };
 
 Engine.inventoryClick = function(){
-    //Client.sendUse(this.itemID);
-    //return;
+    Client.sendUse(this.itemID);
+    return;
     if(BattleManager.inBattle) {
         Client.sendUse(this.itemID);
     }else{

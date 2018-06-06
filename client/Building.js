@@ -18,6 +18,7 @@ var Building = new Phaser.Class({
         var sprite = (data.built ? buildingData.sprite : Engine.buildingsData[FOUNDATIONS_ID].sprite);
         this.setTexture(sprite);
         this.setVisible(true);
+        this.setScale(0.8);
 
         //data.y++;
         //this.setOrigin(0,1);

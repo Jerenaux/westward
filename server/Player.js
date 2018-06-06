@@ -91,14 +91,13 @@ Player.prototype.setFieldOfVision = function(aois){
 };
 
 Player.prototype.setStartingInventory = function(){
+    // TODO: move to some config file
     this.giveItem(2,1);
     this.giveItem(19,1);
     this.giveItem(20,3);
     this.giveItem(6,2);
     this.giveItem(13,1);
     this.giveItem(28,1);
-
-    this.giveItem(29,3);
 
     this.giveGold(100);
 };
@@ -129,8 +128,8 @@ Player.prototype.die = function(){
 
 Player.prototype.spawn = function(x,y){ // todo: remove args
     var respawnLocation = this.settlement.respawnLocation;
-    var x = x || respawnLocation.x;
-    var y = y || respawnLocation.y;
+    x = x || respawnLocation.x;
+    y = y || respawnLocation.y;
     this.setProperty('x', x);
     this.setProperty('y', y);
     this.updatePacket.x = x;
@@ -169,7 +168,6 @@ Player.prototype.hasFreeCommitSlot = function(){
 Player.prototype.takeCommitmentSlot = function(buildingID,notify){
     this.addToSlots({
         building: buildingID,
-        //stamp: Date.now()
         stamp: 1
     });
     this.syncCommitSlots();
@@ -218,7 +216,7 @@ Player.prototype.getSlots = function(){
 Player.prototype.gainCivicXP = function(inc,notify){
     if(notify) this.addNotif('+'+inc+' Civic XP');
     var max = Formulas.computeMaxCivicXP(this.civiclvl);
-    this.civicxp = Utils.clamp(this.civicxp+inc,0,99999);
+    this.civicxp = Utils.clamp(this.civicxp+inc,0,GameServer.characterParameters.maxCivicXP);
     if(this.civicxp >= max){
         if(this.civiclvl == GameServer.characterParameters.maxCivicLvl){
             this.civicxp = max;
@@ -235,7 +233,7 @@ Player.prototype.gainCivicXP = function(inc,notify){
 Player.prototype.gainClassXP = function(classID,inc,notify){
     if(notify) this.addNotif('+'+inc+' '+GameServer.classData[classID].name+' XP');
     var max = Formulas.computeMaxClassXP(this.classlvl[classID]);
-    this.classxp[classID] = Utils.clamp(this.classxp[classID]+inc,0,999999);
+    this.classxp[classID] = Utils.clamp(this.classxp[classID]+inc,0,GameServer.characterParameters.maxClassXP);
     if(this.classxp[classID] >= max){
         if(this.classlvl[classID] == GameServer.characterParameters.maxClassLvl){
             this.classxp[classID] = max;
@@ -254,13 +252,13 @@ Player.prototype.classLvlUp = function(classID, notify){
 };
 
 Player.prototype.giveGold = function(nb,notify){
-    this.gold = Utils.clamp(this.gold+nb,0,100000);
+    this.gold = Utils.clamp(this.gold+nb,0,GameServer.characterParameters.maxGold);
     this.updatePacket.updateGold(this.gold);
     if(notify) this.addNotif('+'+nb+' '+Utils.formatMoney(nb));
 };
 
 Player.prototype.takeGold = function(nb,notify){
-    this.gold = Utils.clamp(this.gold-nb,0,100000);
+    this.gold = Utils.clamp(this.gold-nb,0,GameServer.characterParameters.maxGold);
     this.updatePacket.updateGold(this.gold);
     if(notify) this.addNotif('-'+nb+' '+Utils.formatMoney(nb));
 };
