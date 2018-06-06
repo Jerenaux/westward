@@ -18,10 +18,9 @@ var Building = new Phaser.Class({
         var sprite = (data.built ? buildingData.sprite : Engine.buildingsData[FOUNDATIONS_ID].sprite);
         this.setTexture(sprite);
         this.setVisible(true);
-        this.setScale(0.8);
 
-        //data.y++;
-        //this.setOrigin(0,1);
+        data.y++;
+        this.setOrigin(0,1);
         this.setTilePosition(data.x,data.y,true);
         this.setID(data.id);
 
@@ -33,23 +32,26 @@ var Building = new Phaser.Class({
         this.inventory = new Inventory(100);
         this.name = buildingData.name;
         this.prices = {};
-        this.entry = buildingData.entry;
         this.built = false;
+        if(buildingData.entrance) {
+            this.entrance = {
+                x: this.tx + buildingData.entrance.x,
+                y: this.ty + buildingData.entrance.y
+            };
+        }
         this.setBuilt(data.built);
 
-        var shape = new Phaser.Geom.Polygon(buildingData.shape);
+        /*var shape = new Phaser.Geom.Polygon(buildingData.shape);
         this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
-        this.input.hitArea = shape; // will override previous interactive zone, if any (e.g. if object recycled from pool)
+        this.input.hitArea = shape; // will override previous interactive zone, if any (e.g. if object recycled from pool)*/
+        this.setInteractive();
 
-        //var collisionData = (this.built ? data : Engine.buildingsData[FOUNDATIONS_ID]);
-        //this.setCollisions(collisionData);
         this.setCollisions(buildingData);
     },
 
     build: function () {
         this.built = true;
         this.setTexture(Engine.buildingsData[this.buildingType].sprite);
-        this.setOrigin(0.5);
         this.setTilePosition(this.tx,this.ty,true);
     },
 
@@ -104,7 +106,25 @@ var Building = new Phaser.Class({
     },
 
     setCollisions: function (data) {
-        var shape = new Phaser.Geom.Polygon(data.shape);
+        var coll = data.collisions;
+
+        for(var x = this.tx + coll.x; x < this.tx + coll.x + coll.w; x++){
+            for(var y = this.ty + coll.y; y < this.ty + coll.y + coll.h; y++) {
+                Engine.collisions.add(x,y);
+            }
+        }
+
+        var entrance = data.entrance;
+        if(entrance) {
+            for (var x = this.tx + entrance.x; x < this.tx + entrance.x + entrance.w; x++) {
+                for (var y = this.ty + entrance.y; y < this.ty + entrance.y + entrance.h; y++) {
+                    Engine.collisions.delete(x, y);
+                }
+            }
+        }
+
+        this.setDepth(Engine.buildingsDepth + (this.ty + coll.y)/1000);
+        /*var shape = new Phaser.Geom.Polygon(data.shape);
         var center = true;
         var spriteX, spriteY;
         if (center) {
@@ -117,7 +137,7 @@ var Building = new Phaser.Class({
             spriteX = this.tx;
             spriteY = this.ty;
         }
-        PFUtils.collisionsFromShape(shape.points, spriteX, spriteY, data.width, data.height, Engine.collisions);
+        PFUtils.collisionsFromShape(shape.points, spriteX, spriteY, data.width, data.height, Engine.collisions);*/
     },
 
     setCommitted: function(committed){
@@ -214,13 +234,9 @@ var Building = new Phaser.Class({
 
     handleClick: function () {
         if (Engine.inPanel || Engine.inMenu || Engine.player.inFight || Engine.dead) return;
-        if (!this.entry) return;
-        var pos = {
-            x: this.tx + this.entry.x,
-            y: this.ty + this.entry.y
-        };
-        Engine.player.setDestinationAction(1, this.id, pos.x, pos.y); // 1 for building
-        Engine.computePath(pos);
+        if (!this.entrance) return;
+        Engine.player.setDestinationAction(1, this.id, this.entrance.x, this.entrance.y); // 1 for building
+        Engine.computePath(this.entrance);
     },
 
     handleOver: function(){

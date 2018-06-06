@@ -1,19 +1,19 @@
 {
   "0":{
-    "shape":[
-      0, 170,
-      290, 170,
-      290, 395,
-      0, 395
-    ],
-    "base": {
-        "x": 0,
-        "y": 0,
-        "w": 0,
-        "h": 0
+    "width": 418,
+    "height": 529,
+    "collisions": {
+      "x": 0,
+      "y": -12,
+      "w": 12,
+      "h": 11
     },
-    "width": 300,
-    "height": 398,
+    "entrance": {
+      "x": 6,
+      "y": -1,
+      "w:": 1,
+      "h": 2
+    },
     "sprite": "fort",
     "name":"Fort",
     "mainMenu": "fort",
@@ -21,108 +21,69 @@
     "staff": true,
     "icon": "fort",
     "recipe": {"3":50},
-    "displayProd": false,
-    "entry": {
-      "x": -4,
-      "y": 6
-    }
+    "displayProd": false
   },
   "1":{
-    "shape":[
-      70, 105,
-      200, 10,
-      330, 0,
-      550, 155,
-      555,300,
-      285, 400,
-      60, 270
-    ],
-    "width": 590,
-    "height": 425,
+    "width": 491,
+    "height": 320,
+    "collisions": {
+      "x": 0,
+      "y": -8,
+      "w": 15,
+      "h": 7
+    },
+    "entrance": {
+      "x": 3,
+      "y": -2,
+      "w:": 2,
+      "h": 2
+    },
     "sprite": "tradepost",
     "name":"Trade Post",
     "recipe": {"3":40},
     "trade": true,
-    "entry": {
-      "x": 4,
-      "y": 4
-    },
     "displayProd": false,
     "buildRate":2,
     "mainMenu": "trade",
     "icon": "tradepost"
   },
   "2":{
-    "shape":[
-      60, 95,
-      205, 10,
-      330, 0,
-      530, 130,
-      530, 350,
-      240, 460,
-      40, 365
-    ],
-    "width": 535,
-    "height": 465,
-    "sprite": "inn",
-    "trade": true,
-    "recipe": {"3":60},
-    "name":"Inn",
-    "icon": "inn",
-    "displayProd": false
-  },
-  "3":{
-    "shape":[
-      95, 285,
-      230, 285,
-      230, 540,
-      90, 540
-    ],
-    "width": 325,
-    "height": 550,
+    "width": 185,
+    "height": 480,
+    "collisions": {
+      "x": -4,
+      "y": 1,
+      "w": 4,
+      "h": 4
+    },
     "sprite": "tower",
     "recipe": {"3":60},
     "name":"Tower",
     "icon": "tower",
     "displayProd": false
   },
-  "4":{
-    "shape":[
-      5,180,
-      370,0,
-      737,183,
-      373,386
-    ],
-    "width": 739,
-    "height": 391,
-    "sprite": "foundations",
-    "name":"Foundations",
-    "displayProd": true,
-    "entry": {
-      "x": 16,
-      "y": 8
-    }
-  },
   "5":{
-    "shape": [
-      0, 82,
-      293, 82,
-      293, 250,
-      0,250
-    ],
     "width": 293,
-    "height": 250,
+    "height": 256,
+    "collisions": {
+      "x": 0,
+      "y": -4,
+      "w": 9,
+      "h": 4
+    },
+    "entrance": {
+      "x": 2,
+      "y": 0,
+      "w:": 1,
+      "h": 1
+    },
     "sprite": "hunterhut",
     "name": "Hunter hut",
     "icon": "hut",
     "mainMenu": "production",
     "displayProd": true,
     "production": [[1,2]],
-    "buildRate":10,
-    "entry": {
-      "x": -3,
-      "y": 4
-    }
+    "buildRate":10
   },
   "6":{
     "name": "Lumber camp",

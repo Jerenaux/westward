@@ -1,5 +1,6 @@
 Fix before release:
 - Bigbuttons
+- Buildings
 
 Admin
 Analytics
@@ -53,6 +54,7 @@ interactions with buildings, time spent in each individual menu, etc.
 Cleaning:
 --------
 Performance:
+- Remove unnecessary files (pathfinding lib, old building sprites...)
 - Use pool for notifications
 - Avoid duplicate pins in maps, danger pins etc.
 - Fix "already existing/non-existing" bugs

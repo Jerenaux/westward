@@ -87,7 +87,7 @@ Engine.preload = function() {
     this.load.image('envelope', 'assets/sprites/envelope.png');
     this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
 
-    this.load.image('fort', 'assets/sprites/buildings/fort2.png');
+    this.load.image('fort', 'assets/sprites/buildings/fort3.png');
     this.load.image('tradepost', 'assets/sprites/buildings/tradepost2.png');
     this.load.image('inn', 'assets/sprites/buildings/inn.png');
     this.load.image('tower', 'assets/sprites/buildings/tower2.png');
@@ -1236,7 +1236,7 @@ Engine.moveToClick = function(pointer){
 };
 
 Engine.computePath = function(position){
-    //console.log('path to',position);
+    console.log('path to',position);
     var x = position.x;
     var y = position.y;
     if(Engine.checkCollision(x,y)) return;
