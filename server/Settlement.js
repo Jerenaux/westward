@@ -56,7 +56,12 @@ Settlement.prototype.getBuildings = function(){
 
 Settlement.prototype.getBuildingMarkers = function(){
     return this.buildings.map(function(b){
-        return {marker:'building',x:b.x,y:b.y,type:b.type};
+        return {
+            marker:'building',
+            x:b.x + Math.round(b.width/2),
+            y:b.y,
+            type:b.type
+        };
     });
 };
 
@@ -67,8 +72,8 @@ Settlement.prototype.registerFort = function(fort){
     this.fort.setProperty('devlevel',this.level);
     this.fort.setProperty('danger',this.danger);
     this.respawnLocation = {
-        x: GameServer.buildingsData[0].entry.x + this.fort.x,
-        y: GameServer.buildingsData[0].entry.y + this.fort.y
+        x: this.fort.x + GameServer.buildingsData[0].entrance.x,
+        y: this.fort.y + GameServer.buildingsData[0].entrance.y + 2
     };
 };
 

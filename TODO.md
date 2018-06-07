@@ -1,6 +1,7 @@
 Fix before release:
 - Bigbuttons
-- Buildings
+- Buildings (server-side)
+- Map drag (and zoom)
 
 Admin
 Analytics

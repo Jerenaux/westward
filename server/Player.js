@@ -480,7 +480,6 @@ Player.prototype.initTrim = function(){
        markers = markers.concat(GameServer.settlements[key].getBuildingMarkers());
     });
     trimmed.markers = markers;
-    //trimmed.markers = this.settlement.getBuildingMarkers();
     return trimmed;
 };
 

@@ -39,6 +39,9 @@ var Map = new Phaser.Class({
 
         this.on('drag',this.handleDrag.bind(this));
         this.on('pointerup',this.handleClick.bind(this));
+        this.on('pointerdown',function(){
+            console.log('down');
+        });
 
         this.pins = [];
         this.resetCounter();
@@ -113,10 +116,12 @@ var Map = new Phaser.Class({
 
     handleDrag: function(pointer,x,y){
         // TODO: check for Phaser way of restricting distance
+        console.log('dragging');
         if(x < this.minX) return;
         if(x > this.maxX) return;
         if(y < this.minY) return;
         if(y > this.maxY) return;
+        console.log('all clear');
         var dx = this.x - x;
         var dy = this.y - y;
         this.x = x;
@@ -127,7 +132,6 @@ var Map = new Phaser.Class({
     focus: function(x,y){
         var dx = x - (this.x + this.draggedX);
         var dy = y - (this.y + this.draggedY);
-        console.log(dx,dy);
         // The map has to move in the opposite direction of the drag (w.r.t. center)
         this.dragMap(dx,dy,true);
     },
@@ -185,6 +189,7 @@ var Map = new Phaser.Class({
     },
 
     handleClick: function(pointer){
+        console.log('handleclick');
         if(pointer.downX != pointer.upX || pointer.downY != pointer.upY) return; // drag
         console.log(Utils.screenToMap(pointer.x,pointer.y,this));
     },
@@ -322,6 +327,7 @@ var Pin = new Phaser.Class({
         }
         this.tileX = tileX;
         this.tileY = tileY;
+        this.setDepth(this.depth + this.tileY/1000);
         this.setPosition(x,y);
         this.name = name;
         this.setVisible(true);

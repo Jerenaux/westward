@@ -126,6 +126,8 @@ var Player = new Phaser.Class({
             this.inBuilding = inBuilding;
         }
         if(inBuilding == -1){
+            this.orientation = 'down';
+            this.faceOrientation();
             if(!this.isHero) this.setVisible(true);
             this.inBuilding = inBuilding;
         }

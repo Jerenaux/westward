@@ -41,10 +41,9 @@ var Building = new Phaser.Class({
         }
         this.setBuilt(data.built);
 
-        /*var shape = new Phaser.Geom.Polygon(buildingData.shape);
+        var shape = new Phaser.Geom.Polygon(buildingData.shape);
         this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
-        this.input.hitArea = shape; // will override previous interactive zone, if any (e.g. if object recycled from pool)*/
-        this.setInteractive();
+        this.input.hitArea = shape; // will override previous interactive zone, if any (e.g. if object recycled from pool)
 
         this.setCollisions(buildingData);
     },
@@ -116,6 +115,10 @@ var Building = new Phaser.Class({
 
         var entrance = data.entrance;
         if(entrance) {
+            //console.log(this.tx,entrance.x,entrance.w);
+            //console.log(this.ty,entrance.y,entrance.h);
+            //console.log(this.tx + entrance.x,this.tx + entrance.x + entrance.w);
+            //console.log(this.ty + entrance.y,this.ty + entrance.y + entrance.h);
             for (var x = this.tx + entrance.x; x < this.tx + entrance.x + entrance.w; x++) {
                 for (var y = this.ty + entrance.y; y < this.ty + entrance.y + entrance.h; y++) {
                     Engine.collisions.delete(x, y);
@@ -123,7 +126,7 @@ var Building = new Phaser.Class({
             }
         }
 
-        this.setDepth(Engine.buildingsDepth + (this.ty + coll.y)/1000);
+        this.setDepth(Engine.buildingsDepth + (this.ty - 2)/1000);
         /*var shape = new Phaser.Geom.Polygon(data.shape);
         var center = true;
         var spriteX, spriteY;

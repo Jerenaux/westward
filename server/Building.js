@@ -21,8 +21,13 @@ function Building(data){
 
     this.x = data.x;
     this.y = data.y;
+
     this.type = data.type;
-    this.name = GameServer.buildingsData[this.type].name;
+    var buildingData = GameServer.buildingsData[this.type];
+    this.width = Math.ceil(buildingData.width/World.tileWidth);
+    this.height = Math.ceil(buildingData.height/World.tileHeight);
+
+    this.name = buildingData.name;
     this.sid = data.sid;
     this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(GameServer.buildingParameters.inventorySize);
@@ -35,21 +40,21 @@ function Building(data){
     this.committed = 0;
     this.commitStamps = data.commitStamps || [];
 
-    this.lastBuildCycle = data.lastBuildCycle || Date.now();
-    this.lastProdCycle = data.lastProdCycle || Date.now();
+    //this.lastBuildCycle = data.lastBuildCycle || Date.now();
+    //this.lastProdCycle = data.lastProdCycle || Date.now();
 
     this.setOrUpdateAOI();
-    this.addCollisions();
+    //this.addCollisions();
     this.registerBuilding();
 }
 
 Building.prototype = Object.create(GameObject.prototype);
 Building.prototype.constructor = Building;
 
-Building.prototype.resetCounters = function(){
+/*Building.prototype.resetCounters = function(){
     this.lastBuildCycle = Date.now();
     this.lastProdCycle = Date.now();
-};
+};*/
 
 Building.prototype.registerBuilding = function(){
     this.settlement.registerBuilding(this);
@@ -127,7 +132,7 @@ Building.prototype.updateBuild = function(){
     this.setProperty('progress',Utils.clamp(this.progress+increment,this.progress,100));
     if(this.progress == 100){
         this.setProperty('built',true);
-        this.resetCounters();
+        //this.resetCounters();
     }
 };
 

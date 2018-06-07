@@ -1,21 +1,32 @@
 {
   "0":{
+    "name":"Fort",
     "width": 418,
     "height": 529,
+    "shape": [
+      0, 120,
+      205, 0,
+      410, 120,
+      410, 300,
+      385, 315,
+      380, 500,
+      40, 500,
+      30, 315,
+      0, 300
+    ],
     "collisions": {
-      "x": 0,
+      "x": 1,
       "y": -12,
-      "w": 12,
+      "w": 11,
       "h": 11
     },
     "entrance": {
       "x": 6,
-      "y": -1,
-      "w:": 1,
+      "y": -2,
+      "w": 1,
       "h": 2
     },
     "sprite": "fort",
-    "name":"Fort",
     "mainMenu": "fort",
     "fort": true,
     "staff": true,
@@ -24,8 +35,15 @@
     "displayProd": false
   },
   "1":{
+    "name":"Trade Post",
     "width": 491,
     "height": 320,
+    "shape": [
+      25, 230,
+      25, 25,
+      475, 25,
+      475, 230
+    ],
     "collisions": {
       "x": 0,
       "y": -8,
@@ -34,12 +52,11 @@
     },
     "entrance": {
       "x": 3,
-      "y": -2,
-      "w:": 2,
+      "y": -3,
+      "w": 2,
       "h": 2
     },
     "sprite": "tradepost",
-    "name":"Trade Post",
     "recipe": {"3":40},
     "trade": true,
     "displayProd": false,
@@ -50,21 +67,29 @@
   "2":{
     "width": 185,
     "height": 480,
+    "name":"Tower",
     "collisions": {
-      "x": -4,
-      "y": 1,
+      "x": 1,
+      "y": -4,
       "w": 4,
       "h": 4
     },
     "sprite": "tower",
     "recipe": {"3":60},
-    "name":"Tower",
+
     "icon": "tower",
     "displayProd": false
   },
   "5":{
+    "name": "Hunter hut",
     "width": 293,
     "height": 256,
+    "shape": [
+      0, 82,
+      293, 82,
+      293, 250,
+      0,250
+    ],
     "collisions": {
       "x": 0,
       "y": -4,
@@ -74,11 +99,10 @@
     "entrance": {
       "x": 2,
       "y": 0,
-      "w:": 1,
+      "w": 1,
       "h": 1
     },
     "sprite": "hunterhut",
-    "name": "Hunter hut",
     "icon": "hut",
     "mainMenu": "production",
     "displayProd": true,
