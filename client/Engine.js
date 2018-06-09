@@ -1670,8 +1670,8 @@ Engine.newbuildingClick = function(){
 };
 
 Engine.inventoryClick = function(){
-    Client.sendUse(this.itemID);
-    return;
+    //Client.sendUse(this.itemID);
+    //return;
     if(BattleManager.inBattle) {
         Client.sendUse(this.itemID);
     }else{

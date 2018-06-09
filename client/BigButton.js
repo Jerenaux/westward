@@ -3,15 +3,14 @@
  */
 
 function BigButton(x,y,text,callback){
-    //var UI = Engine.scene.get('UI');
     this.slices = [];
-    var textX = x + 20;
-    this.slices.push(UI.scene.add.sprite(x,y,'UI','bigbutton_left'));
-    x += 41;
+    //var textX = x + 20;
+    var sideWidth = 22;
+    this.slices.push(UI.scene.add.sprite(x-sideWidth,y,'UI','bigbutton_left'));
     this.slices.push(UI.scene.add.tileSprite(x,y,4,28,'UI','bigbutton_middle'));
-    x += 4;
-    this.slices.push(UI.scene.add.sprite(x,y,'UI','bigbutton_right'));
-    this.text = UI.scene.add.text(textX, y+4, '', { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.slices.push(UI.scene.add.sprite(x+sideWidth,y,'UI','bigbutton_right'));
+    this.text = UI.scene.add.text(x, y, '', { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.text.setOrigin(0.5);
 
     this.callback = callback;
     this.text.handleDown = this.handleDown.bind(this);
@@ -19,14 +18,13 @@ function BigButton(x,y,text,callback){
     this.enabled = true;
     this.setText(text);
 
-    var _parent = this;
     this.slices.forEach(function(e){
         e.setDepth(1);
         e.setScrollFactor(0);
-        e.setDisplayOrigin(0,0);
         e.setVisible(false);
         this.attachCallbacks(e);
     },this);
+
     this.text.setDepth(2);
     this.text.setScrollFactor(0);
     this.text.setVisible(false);
@@ -44,17 +42,19 @@ BigButton.prototype.attachCallbacks = function(element){
 };
 
 BigButton.prototype.setText = function(text){
-    /*var currentWidth = this.text.width;
     this.text.setText(text);
-    var newWidth = this.text.width;
-    var dw = newWidth - currentWidth - 45; // 45 for left and right sides
 
-    this.slices[2].x += dw;
+    var left = this.slices[0];
     var body = this.slices[1];
-    body.width += dw;*/
+    var right = this.slices[2];
 
-    this.text.setText(text);
-    var body = this.slices[1];
+    var currentw = body.width;
+    var neww = this.text.width - 45;
+    var dw = neww - currentw;
+
+    body.width = neww;
+    left.x -= dw/2;
+    right.x += dw/2;
 
     body.setInteractive();
     body.refWidth = body.width;

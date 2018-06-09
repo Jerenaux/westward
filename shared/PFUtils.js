@@ -73,7 +73,26 @@ PFUtils.isInPolygon = function (polygon, x, y)  // polygon is array of points
     return inside;
 };
 
-PFUtils.collisionsFromShape = function(shape,tileX,tileY,width,height,map,checkOnly){ // shape is array of points
+PFUtils.buildingCollisions = function(tx,ty,data,collisionMap){
+    var coll = data.collisions;
+
+    for(var x = tx + coll.x; x < tx + coll.x + coll.w; x++){
+        for(var y = ty + coll.y; y < ty + coll.y + coll.h; y++) {
+            collisionMap.add(x,y);
+        }
+    }
+
+    var entrance = data.entrance;
+    if(entrance) {
+        for (var x = tx + entrance.x; x < tx + entrance.x + entrance.w; x++) {
+            for (var y = ty + entrance.y; y < ty + entrance.y + entrance.h; y++) {
+                collisionMap.delete(x, y);
+            }
+        }
+    }
+};
+
+/*PFUtils.collisionsFromShape = function(shape,tileX,tileY,width,height,map,checkOnly){ // shape is array of points
     for(var x = 0; x < width; x += 32){
         var px = x;
         for(var y = 0; y < height; y += 32) {
@@ -91,6 +110,6 @@ PFUtils.collisionsFromShape = function(shape,tileX,tileY,width,height,map,checkO
         }
     }
     return true;
-};
+};*/
 
 if (onServer) module.exports.PFUtils = PFUtils;

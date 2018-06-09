@@ -406,15 +406,15 @@
     },
     {
       "filename": "bigbutton_left",
-      "frame": {"x":633,"y":23,"w":41,"h":28}
+      "frame": {"x":633,"y":23,"w":40,"h":28}
     },
     {
       "filename": "bigbutton_left_lit",
-      "frame": {"x":633,"y":53,"w":41,"h":28}
+      "frame": {"x":633,"y":53,"w":40,"h":28}
     },
     {
       "filename": "bigbutton_left_pressed",
-      "frame": {"x":633,"y":83,"w":41,"h":28}
+      "frame": {"x":633,"y":83,"w":40,"h":28}
     },
     {
       "filename": "bigbutton_middle",

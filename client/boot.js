@@ -64,7 +64,7 @@ var Boot = new Phaser.Class({
     },
 
     displayButton: function(){
-        Boot.button = new BigButton(512-40,300,'Play',UI.leaveTitleScreen);
+        Boot.button = new BigButton(512,300,'Play',UI.leaveTitleScreen);
         Boot.button.display();
     }
 });

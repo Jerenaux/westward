@@ -40,21 +40,13 @@ function Building(data){
     this.committed = 0;
     this.commitStamps = data.commitStamps || [];
 
-    //this.lastBuildCycle = data.lastBuildCycle || Date.now();
-    //this.lastProdCycle = data.lastProdCycle || Date.now();
-
     this.setOrUpdateAOI();
-    //this.addCollisions();
+    this.addCollisions();
     this.registerBuilding();
 }
 
 Building.prototype = Object.create(GameObject.prototype);
 Building.prototype.constructor = Building;
-
-/*Building.prototype.resetCounters = function(){
-    this.lastBuildCycle = Date.now();
-    this.lastProdCycle = Date.now();
-};*/
 
 Building.prototype.registerBuilding = function(){
     this.settlement.registerBuilding(this);
@@ -282,29 +274,8 @@ Building.prototype.mapTrim = function(){
 };
 
 Building.prototype.addCollisions = function(){
-    var type = (this.built ? this.type : 4);
-    var data = GameServer.buildingsData[type];
-    var shape = data.shape;
-    this.shape = [];
-    for(var i = 0; i < shape.length; i+=2){
-        this.shape.push({
-            x: shape[i],
-            y: shape[i+1]
-        });
-    }
-
-    var center = true;
-    var spriteX, spriteY;
-    if(center){
-        spriteX = this.x - Math.ceil((data.width/2)/World.tileWidth);
-        spriteY = this.y - Math.ceil((data.height/2)/World.tileHeight);
-    }else{
-        spriteX = this.x;
-        spriteY = this.y;
-    }
-
-    //console.log('adding collisions for building ',this.id);
-    PFUtils.collisionsFromShape(this.shape,spriteX,spriteY,data.width,data.height,GameServer.collisions);
+    // TODO: adapt based on built status
+    PFUtils.buildingCollisions(this.x,this.y,GameServer.buildingsData[this.type],GameServer.collisions);
 };
 
 Building.prototype.canFight = function(){return false;};

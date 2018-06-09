@@ -105,42 +105,8 @@ var Building = new Phaser.Class({
     },
 
     setCollisions: function (data) {
-        var coll = data.collisions;
-
-        for(var x = this.tx + coll.x; x < this.tx + coll.x + coll.w; x++){
-            for(var y = this.ty + coll.y; y < this.ty + coll.y + coll.h; y++) {
-                Engine.collisions.add(x,y);
-            }
-        }
-
-        var entrance = data.entrance;
-        if(entrance) {
-            //console.log(this.tx,entrance.x,entrance.w);
-            //console.log(this.ty,entrance.y,entrance.h);
-            //console.log(this.tx + entrance.x,this.tx + entrance.x + entrance.w);
-            //console.log(this.ty + entrance.y,this.ty + entrance.y + entrance.h);
-            for (var x = this.tx + entrance.x; x < this.tx + entrance.x + entrance.w; x++) {
-                for (var y = this.ty + entrance.y; y < this.ty + entrance.y + entrance.h; y++) {
-                    Engine.collisions.delete(x, y);
-                }
-            }
-        }
-
+        PFUtils.buildingCollisions(this.tx,this.ty,data,Engine.collisions);
         this.setDepth(Engine.buildingsDepth + (this.ty - 2)/1000);
-        /*var shape = new Phaser.Geom.Polygon(data.shape);
-        var center = true;
-        var spriteX, spriteY;
-        if (center) {
-            spriteX = this.tx - Math.ceil((data.width / 2) / World.tileWidth);
-            spriteY = this.ty - Math.ceil((data.height / 2) / World.tileHeight);
-            this.setDepth(Engine.buildingsDepth + this.ty / 1000);
-        } else {
-            //this.setDisplayOrigin(0);
-            this.setDepth(Engine.buildingsDepth + (this.ty + ((data.height / 2) / 32)) / 1000);
-            spriteX = this.tx;
-            spriteY = this.ty;
-        }
-        PFUtils.collisionsFromShape(shape.points, spriteX, spriteY, data.width, data.height, Engine.collisions);*/
     },
 
     setCommitted: function(committed){

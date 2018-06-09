@@ -8,7 +8,7 @@ function ItemActionPanel(x,y,width,height,title){
     this.icon = new ItemSprite(this.x + 30, this.y + 30);
     this.text = this.addText(50, 20,'',Utils.colors.white,16);
     this.icon.showTooltip = false;
-    this.button = new BigButton(this.x+20,this.y+50,'Equip',this.hide.bind(this));
+    this.button = new BigButton(this.x+50,this.y+65,'Equip',this.sendUse.bind(this));
 }
 
 ItemActionPanel.prototype = Object.create(Panel.prototype);
@@ -16,6 +16,7 @@ ItemActionPanel.prototype.constructor = ItemActionPanel;
 
 ItemActionPanel.prototype.setUp = function(itemID){
     var data = Engine.itemsData[itemID];
+    this.itemID = itemID;
     this.icon.setUp(itemID,data);
     this.text.setText(data.name);
     if(data.effects){
@@ -23,6 +24,11 @@ ItemActionPanel.prototype.setUp = function(itemID){
     }else{
         this.button.hide();
     }
+};
+
+ItemActionPanel.prototype.sendUse = function(){
+    Client.sendUse(this.itemID);
+    this.hide();
 };
 
 ItemActionPanel.prototype.display = function(){

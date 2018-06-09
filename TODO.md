@@ -1,6 +1,6 @@
-Fix before release:
-- Bigbuttons
-- Buildings (server-side)
+Release:
+- Reset food
+- Sync buildings
 
 Admin
 Analytics
@@ -309,7 +309,6 @@ Deployment:
 
 Design document:
 ---------------
--> Market research
 - Put "stats.txt" cleanly in design doc
 - Finish copying notes (currently: in ambiance, npc dialogues)
 - Concile all texts (doc, crafting.txt)
