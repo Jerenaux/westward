@@ -1,7 +1,6 @@
 Fix before release:
 - Bigbuttons
 - Buildings (server-side)
-- Map drag (and zoom)
 
 Admin
 Analytics
@@ -112,7 +111,6 @@ Content:
 - Maximum ambient noises
 -> Multiple categories (weather, animals, terrain...), distinct random intervals
 * Battle system
-- Get arrows back when skinning
 - New interface:
 Timer at bottom, icon of active fighter on the left, queue of others on the right
 Skip turn below
@@ -159,10 +157,8 @@ Add help
 - Quests
 * Explorer gameplay
 - Map mechanics
--> Fix tracking (use containers first?)
 -> Zoom:
---> Make another zoom-level tr map, which becomes default. The 005 ones becomes "zoom-out" mode
---> addButtons method to add zoom buttons at speicifc coordinates
+--> Fix zoom-out out of map bounds
 --> Zoom in/out with scroll 
 --> Decide what level of zoom for Fort and Minimap
 -> Data sync:

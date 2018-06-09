@@ -22,6 +22,15 @@ var Map = new Phaser.Class({
         };
         this.viewRect = new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH);
 
+        this.minOrigin = {
+            x: (this.viewRect.width/2)/this.width,
+            y: (this.viewRect.height/2)/this.height
+        };
+        this.maxOrigin = {
+            x: (this.width - this.viewRect.width/2)/this.width,
+            y: (this.height - this.viewRect.height/2)/this.height
+        };
+
         this.target = target;
         this.toponyms = [];
         if(showToponyms) {
@@ -39,9 +48,6 @@ var Map = new Phaser.Class({
 
         this.on('drag',this.handleDrag.bind(this));
         this.on('pointerup',this.handleClick.bind(this));
-        this.on('pointerdown',function(){
-            console.log('down');
-        });
 
         this.pins = [];
         this.resetCounter();
@@ -116,12 +122,10 @@ var Map = new Phaser.Class({
 
     handleDrag: function(pointer,x,y){
         // TODO: check for Phaser way of restricting distance
-        console.log('dragging');
         if(x < this.minX) return;
         if(x > this.maxX) return;
         if(y < this.minY) return;
         if(y > this.maxY) return;
-        console.log('all clear');
         var dx = this.x - x;
         var dy = this.y - y;
         this.x = x;
@@ -141,6 +145,9 @@ var Map = new Phaser.Class({
         var ox = this.displayOriginX;
         var oy = this.displayOriginY;
         this.centerMap(pos);
+        if(this.positionCross){
+            this.positionCross.setPosition(this.center.x,this.center.y);
+        }
         var dx = this.displayOriginX - ox;
         var dy = this.displayOriginY - oy;
         this.dragMap(dx,dy,false);
@@ -152,7 +159,7 @@ var Map = new Phaser.Class({
         this.draggedY += dy;
 
         if(tween){
-            var targets = this.tweenablePins.concat([this.text,this]).concat(this.toponyms);
+            var targets = this.displayedPins.concat([this.text,this]).concat(this.toponyms);
             var duration = 300;
             UI.scene.tweens.add({
                     targets: targets,
@@ -175,7 +182,7 @@ var Map = new Phaser.Class({
     },
 
     movePins: function(dx,dy){
-        this.tweenablePins.forEach(function(p){
+        this.displayedPins.forEach(function(p){
             p.x -= dx;
             p.y -= dy;
         });
@@ -189,7 +196,6 @@ var Map = new Phaser.Class({
     },
 
     handleClick: function(pointer){
-        console.log('handleclick');
         if(pointer.downX != pointer.upX || pointer.downY != pointer.upY) return; // drag
         console.log(Utils.screenToMap(pointer.x,pointer.y,this));
     },
@@ -210,35 +216,72 @@ var Map = new Phaser.Class({
         }
     },
 
-    addPin: function(x,y,name,texture,noTween){
+    addPin: function(x,y,name,texture){
         var location = this.computeMapLocation(x,y);
         var pin = this.getNextPin();
         pin.setUp(x,y,location.x,location.y,name,texture);
-        if(!noTween) this.tweenablePins.push(pin);
+        this.displayedPins.push(pin);
         return pin;
     },
 
     resetCounter: function(){
         this.pinsCounter = 0;
-        this.tweenablePins = [];
+        this.displayedPins = [];
     },
 
     zoomIn: function(){
         this.setTexture('fullmap_zoomed');
+        this.zoom();
     },
 
     zoomOut: function(){
         this.setTexture('fullmap');
+        this.zoom();
+    },
+
+    zoom: function(){
+        this.displayedPins.forEach(function(pin){
+            pin.reposition();
+        });
+        this.setInputArea();
+        this.positionToponyms();
+        this.computeDragLimits();
+
+        //console.log(this.x+this.draggedX,this.minX,this.maxX);
+        //console.log(this.y+this.draggedY,this.minY,this.maxY);
+    },
+
+    positionToponyms: function(){
+        this.toponyms.forEach(function(t){
+            var location = this.computeMapLocation(t.tx,t.ty);
+            t.setPosition(location.x,location.y);
+            t.setVisible(true);
+        },this);
     },
 
     centerMap: function(tile){
-        var origin = Utils.tileToPct(tile.x,tile.y);
-        var maxOriginX = (this.width - this.viewRect.width/2)/this.width;
-        var minOriginX = (this.viewRect.width/2)/this.width;
-        var maxOriginY = (this.height - this.viewRect.height/2)/this.height;
-        var minOriginY = (this.viewRect.height/2)/this.height;
-        this.setOrigin(Utils.clamp(origin.x,minOriginX,maxOriginX),Utils.clamp(origin.y,minOriginY,maxOriginY));
+        var o = Utils.tileToPct(tile.x,tile.y);
+        this.setOrigin(Utils.clamp(o.x,this.minOrigin.x,this.maxOrigin.x),Utils.clamp(o.y,this.minOrigin.y,this.maxOrigin.y));
         this.setPosition(this.center.x,this.center.y);
+    },
+
+    setInputArea: function(){
+        // TODO: remove draggedX,Y once enable re-centering upon zoom?
+        var rectx = this.displayOriginX + this.draggedX -(this.viewRect.width/2);
+        var recty = this.displayOriginY + this.draggedY -(this.viewRect.height/2);
+        this.input.hitArea = new Phaser.Geom.Rectangle(rectx,recty,this.viewRect.width,this.viewRect.height);
+    },
+
+    computeDragLimits: function(){
+        this.minY = this.y - (this.height-this.displayOriginY) + this.viewRect.height/2;
+        this.maxY = this.y + this.displayOriginY - this.viewRect.height/2;
+        this.minX = this.x - (this.width-this.displayOriginX) + this.viewRect.width/2;
+        this.maxX = this.x + this.displayOriginX - this.viewRect.width/2;
+
+        this.minX = Math.max(this.minX,this.x-this.dragWidth);
+        this.maxX = Math.min(this.maxX,this.x+this.dragWidth);
+        this.minY = Math.max(this.minY,this.y-this.dragHeight);
+        this.maxY = Math.min(this.maxY,this.y+this.dragHeight);
     },
 
     display: function(){
@@ -250,33 +293,17 @@ var Map = new Phaser.Class({
         }
 
         this.centerMap(tile);
+        this.setInputArea();
+        this.positionToponyms();
+        this.computeDragLimits();
 
         if(this.target == 'player') {
-            this.addPin(tile.x,tile.y,'Your position','x',true);
+            this.positionCross = this.addPin(tile.x,tile.y,'Your position','x',true);
+            this.positionCross.setDepth(this.positionCross.depth+5);
             Engine.player.markers.forEach(function(data){
                 this.addPin(data.x,data.y,Engine.buildingsData[data.type].name);
             },this);
         }
-
-        this.minY = this.y - (this.height-this.displayOriginY) + this.viewRect.height/2;
-        this.maxY = this.y + this.displayOriginY - this.viewRect.height/2;
-        this.minX = this.x - (this.width-this.displayOriginX) + this.viewRect.width/2;
-        this.maxX = this.x + this.displayOriginX - this.viewRect.width/2;
-
-        this.minX = Math.max(this.minX,this.x-this.dragWidth);
-        this.maxX = Math.min(this.maxX,this.x+this.dragWidth);
-        this.minY = Math.max(this.minY,this.y-this.dragHeight);
-        this.maxY = Math.min(this.maxY,this.y+this.dragHeight);
-
-        this.toponyms.forEach(function(t){
-            var location = this.computeMapLocation(t.tx,t.ty);
-            t.setPosition(location.x,location.y);
-            t.setVisible(true);
-        },this);
-
-        var rectx = (this.width*origin.x)-(this.viewRect.width/2);
-        var recty = (this.height*origin.y)-(this.viewRect.height/2);
-        this.input.hitArea = new Phaser.Geom.Rectangle(rectx,recty,this.viewRect.width,this.viewRect.height);
 
         this.setVisible(true);
         if(this.maskType == 'geom') this.maskOverlay.setVisible(true);
@@ -343,6 +370,11 @@ var Pin = new Phaser.Class({
 
     focus: function(){
         this.parentMap.focus(this.x,this.y);
+    },
+
+    reposition: function(){
+        var location = this.parentMap.computeMapLocation(this.tileX,this.tileY);
+        this.setPosition(location.x,location.y);
     },
 
     handleOver: function(){
