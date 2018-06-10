@@ -40,6 +40,7 @@ var Building = new Phaser.Class({
             };
         }
         this.setBuilt(data.built);
+        this.setDepth(Engine.buildingsDepth + (this.ty - buildingData.depthOffset)/1000);
 
         var shape = new Phaser.Geom.Polygon(buildingData.shape);
         this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
@@ -106,7 +107,6 @@ var Building = new Phaser.Class({
 
     setCollisions: function (data) {
         PFUtils.buildingCollisions(this.tx,this.ty,data,Engine.collisions);
-        this.setDepth(Engine.buildingsDepth + (this.ty - 2)/1000);
     },
 
     setCommitted: function(committed){

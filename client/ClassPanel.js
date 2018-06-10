@@ -12,7 +12,7 @@ ClassPanel.prototype.setClass = function(id){
     var classData = UI.classesData[id];
     var text = this.addText(10,15,classData.desc,Utils.colors.white,14,Utils.fonts.normal);
     text.setWordWrapWidth(this.width-15,true);
-    this.button = new BigButton(this.x+(this.width/2)-45,this.y+this.height-35,'Select',function(){
+    this.button = new BigButton(this.x+(this.width/2),this.y+this.height-20,'Select',function(){
         UI.selectClass(id);
     });
 };

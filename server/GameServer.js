@@ -211,6 +211,18 @@ GameServer.setUpSpawnZones = function(){
     GameServer.updateStatus();
 };
 
+GameServer.addNPC = function(x,y){
+    var npc = new Player(); // TODO: make subclass?
+    npc.setSettlement(0);
+    npc.spawn(x, y);
+    npc.setAppearance('enemy');
+    npc.id = GameServer.lastPlayerID++;
+    npc.isNPC = true;
+    GameServer.players[npc.id] = npc;
+    npc.setOrUpdateAOI(); // takes care of adding to the world as well
+    return npc;
+};
+
 GameServer.addAnimal = function(x,y,type){
     var animal = new Animal(x,y,type);
     GameServer.animals[animal.id] = animal;
@@ -224,6 +236,7 @@ GameServer.addItem = function(x,y,type){
 };
 
 GameServer.onInitialized = function(){
+    GameServer.addNPC(529,655);
     /*console.log('--- Performing on initialization tasks ---');
     var animal = GameServer.addAnimal(1202,168,0);
     animal.die();
@@ -309,6 +322,7 @@ GameServer.getPlayer = function(socketID){
 GameServer.checkPlayerID = function(id){ // check if no other player is using same player ID
     return (GameServer.players[id] === undefined);
 };*/
+
 
 GameServer.dummyPlayer = function(x,y) {
     var player = new Player();

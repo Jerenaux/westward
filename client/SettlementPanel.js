@@ -11,7 +11,7 @@ SettlementPanel.prototype.constructor = SettlementPanel;
 
 SettlementPanel.prototype.addBigButton = function(text){
     var id = this.settlementID;
-    this.button = new BigButton(this.x+(this.width/2)-45,this.y+this.height-35,text,function(){
+    this.button = new BigButton(this.x+(this.width/2),this.y+this.height-20,text,function(){
         UI.selectSettlement(id);
     });
 };

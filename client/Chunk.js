@@ -85,7 +85,12 @@ Chunk.prototype.drawTile = function(x,y,tile,layer){
         sprite = Engine.scene.add.image(x*Engine.tileWidth,y*Engine.tileHeight,tileset.name,tile);
         sprite.setDisplayOrigin(0,0);
         sprite.tileID = tile;
-        sprite.depth = layerDepth[layer];
+        //sprite.depth = layerDepth[layer];
+        if(layer >= 3){
+            sprite.setDepth(2+(y+layer)/1000);
+        }else{
+            sprite.setDepth(layerDepth[layer]);
+        }
     }
     return sprite;
 };

@@ -26,6 +26,7 @@
       "w": 1,
       "h": 2
     },
+    "depthOffset": 2,
     "sprite": "fort",
     "mainMenu": "fort",
     "fort": true,
@@ -56,6 +57,7 @@
       "w": 2,
       "h": 2
     },
+    "depthOffset": 2,
     "sprite": "tradepost",
     "recipe": {"3":40},
     "trade": true,
@@ -74,9 +76,9 @@
       "w": 4,
       "h": 4
     },
+    "depthOffset": 1,
     "sprite": "tower",
     "recipe": {"3":60},
-
     "icon": "tower",
     "displayProd": false
   },
@@ -102,6 +104,7 @@
       "w": 1,
       "h": 1
     },
+    "depthOffset": 2,
     "sprite": "hunterhut",
     "icon": "hut",
     "mainMenu": "production",

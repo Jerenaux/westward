@@ -63,6 +63,10 @@ Player.prototype.setIDs = function(dbID,socketID){
     this.socketID = socketID;
 };
 
+Player.prototype.setAppearance = function(appearance){
+    this.setProperty('appearance',appearance);
+};
+
 // Called by finalizePlayer
 Player.prototype.registerPlayer = function(){
     //var settlement = GameServer.settlements[this.sid];
@@ -487,7 +491,7 @@ Player.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
     var broadcastProperties = ['id','path','inFight','inBuilding','chat',
-        'battlezone','dead']; // list of properties relevant for the client
+        'battlezone','dead','appearance']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

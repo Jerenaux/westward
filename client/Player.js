@@ -47,6 +47,8 @@ var Player = new Phaser.Class({
         this.setPosition(data.x,data.y);
         this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
 
+        if(data.appearance) this.setTexture(data.appearance,this.frame);
+
         this.manageOrientationPin();
     },
 

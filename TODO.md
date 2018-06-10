@@ -1,6 +1,6 @@
 Release:
 - Reset food
-- Sync buildings
+- Newplayer only
 
 Admin
 Analytics
@@ -9,6 +9,7 @@ Cleaning
 * Civics
 * Character panel
 * Craftsmen gameplay
+* Enemy civ
 * Explorer gameplay
 * Inventory
 * Merchant gameplay
@@ -187,6 +188,18 @@ Add help
 - Less XP based on lvl (up to 0 XP around settlements past a certain level)
 - Bonuses
 - Show plant markers based on ability
+* Enemy civ
+- Wander behavior (solor)
+- Set up stats and equipment
+- Aggro behavior
+- Battle AI
+- Spawn zones
+- Wander behavior (squad)
+- Buildings health 
+- Buildings destruction
+- Settlement attack behavior (what time intervals, how many...)
+- Territory zones: if player step in, send small squad to track
+- Camps, own economy?
 * Inventory
 - Click window for items, with use button
 - Click window: display stat effects
@@ -238,6 +251,8 @@ or
 -> Cheat-proof
 * Settlement defense
 - Enable commander to build towers
+- Buildings health
+- Show updated health in fort
 - Set up stats of towers and forts
 - Towers behave as animals and trigger fights (same battle behavior)
 - Same with forts
@@ -309,8 +324,7 @@ Deployment:
 
 Design document:
 ---------------
-- Put "stats.txt" cleanly in design doc
-- Finish copying notes (currently: in ambiance, npc dialogues)
+- Finish copying notes (last: leaderboard keyword and meta-game stuff)
 - Concile all texts (doc, crafting.txt)
 - Decide list of buildings, items, ...
 - Make Excel tables (crafting, inventory, bestiary, ...)
@@ -323,6 +337,7 @@ Design document:
 Polish:
 ------
 Visual:
+- Add weapons to temporary character sprites
 - More dramatic apparition of battle tiles
 - Hide move marker (use different mouse cursors for can/can't walk to)
 - "Tip of the day"

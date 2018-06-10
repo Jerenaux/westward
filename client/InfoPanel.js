@@ -21,7 +21,7 @@ InfoPanel.prototype.addText = function(x,y,text,color,size,font){
 };
 
 InfoPanel.prototype.addBigButton = function(text){
-    this.button = new BigButton(this.x+(this.width/2),this.y+this.height-35,text,this.hide.bind(this));
+    this.button = new BigButton(this.x+(this.width/2),this.y+this.height-20,text,this.hide.bind(this));
 };
 
 InfoPanel.prototype.addMask = function(){
