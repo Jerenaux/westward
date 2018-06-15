@@ -5,6 +5,7 @@
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
+var NPC = require('./NPC.js').NPC;
 var GameServer = require('./GameServer.js').GameServer;
 var World = require('../shared/World.js').World;
 var Stats = require('../shared/Stats.js').Stats;
@@ -14,7 +15,6 @@ var debug = false;
 
 function Animal(x,y,type){
     this.id = GameServer.lastAnimalID++;
-    this.isPlayer = false;
     this.isAnimal = true;
     this.battleTeam = 'Animal';
     this.x = x;
@@ -28,10 +28,10 @@ function Animal(x,y,type){
     this.setLoot();
     this.setOrUpdateAOI();
     this.setIdle();
-    MovingEntity.call(this);
+    NPC.call(this);
 }
 
-Animal.prototype = Object.create(MovingEntity.prototype);
+Animal.prototype = Object.create(NPC.prototype);
 Animal.prototype.constructor = Animal;
 
 Animal.prototype.setLoot = function(){

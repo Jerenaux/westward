@@ -6,11 +6,8 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
-var debug = false;
-
 function MovingEntity(){
     this.moving = false;
-    this.actionQueue = [];
 }
 
 MovingEntity.prototype = Object.create(GameObject.prototype);
@@ -24,7 +21,6 @@ MovingEntity.prototype.setPath = function(path){
 
 MovingEntity.prototype.updatePathTick = function(){ // Compute in how many seconds will the entity have moved by one tile
     if(this.path.length <= 1){
-        //console.log('['+this.constructor.name+' '+this.id+'] ERROR: Path too short (length = '+this.path.length+')');
         this.endPath();
         return;
     }
@@ -34,7 +30,6 @@ MovingEntity.prototype.updatePathTick = function(){ // Compute in how many secon
             this.path[1][0],
             this.path[1][1]
         )*1000;
-    if(debug && duration < 200) console.log('['+this.constructor.name+' '+this.id+'] Next tick in '+duration+' ms');
     this.nextPathTick = Date.now() + duration;
 };
 
@@ -58,13 +53,11 @@ MovingEntity.prototype.updateWalk = function(){
 MovingEntity.prototype.updatePosition = function(x,y){
     this.x = x;
     this.y = y;
-    //if(this.isPlayer) console.log('Position:',this.x,',',this.y);
     this.setOrUpdateAOI();
     if(!this.inFight) GameServer.checkForBattle(this);
 };
 
 MovingEntity.prototype.endPath = function(){
-    if(debug) console.log('['+this.constructor.name+' '+this.id+'] Arrived at destination');
     if(this.flagToStop) this.setProperty('stop',{x:this.x,y:this.y});
     this.moving = false;
     this.flagToStop = false;
@@ -76,7 +69,7 @@ MovingEntity.prototype.onEndOfPath = function(){
     GameServer.checkForBattle(this);
 };
 
-MovingEntity.prototype.getEndOfTile = function(){
+/*MovingEntity.prototype.getEndOfTile = function(){
     if(this.path) {
         return {
             x: this.path[0][0],
@@ -88,7 +81,7 @@ MovingEntity.prototype.getEndOfTile = function(){
             y: this.y
         }
     }
-};
+};*/
 
 MovingEntity.prototype.getEndOfPath = function(){
     if(this.path) {
@@ -130,7 +123,8 @@ MovingEntity.prototype.isMoving = function(){
 };
 
 MovingEntity.prototype.isSameTeam = function(f){
-    return this.isPlayer == f.isPlayer;
+    //return this.isPlayer == f.isPlayer;
+    return this.battleTeam == f.battleTeam;
 };
 
 MovingEntity.prototype.canFight = function(){

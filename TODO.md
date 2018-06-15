@@ -1,3 +1,8 @@
+Pre-release:
+- Cursor bug when new game
+- Scrollable list of buildings
+- Sprinkle new buildings 
+
 Release:
 - Reset food
 - Newplayer only
@@ -45,6 +50,7 @@ Analytics:
 - Display events in admin
 - Look for nice statistical library
 - Log drains and faucets
+- Log pathfinding destinations, consider making heatmap in the long term
 - Log as many things as possible: session duration, distance travelled per session, time spent in settlement per session, in nature per session,
 interactions with buildings, time spent in each individual menu, etc.
 - Cluster "heavy" players vs "small-time" players and look for differences between the two
@@ -72,6 +78,9 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- From 10.0: use pointer.worldX and worldY to handle location clicks
+- From 10.0: use this.input.setDefaultCursor() to set cursor
+- From 10.0: use button.input.cursor = 'url(assets/cursors/sword.cur), pointer  for hover cursor changes
 - Send a digested config file from server to client
 - Add as much stuff as possible to config file
 - Deal differently with net updates when visibility lost (https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
@@ -128,6 +137,9 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Effect of fatigue on fighting
 - Compute probability of items breaking and discard them
 - Accommodate NPC
+- Display health somehow
+- Let NPC use items (restore health, ...)
+- Allow 3-way fights (civs vs animals vs players)
 * Civics
 - Finish all civic panel related stuff (commitment, etc.)
 - Apply taxes
@@ -145,7 +157,7 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Ability points
 - Ability system
 - Events log
-Add help
+- Add help back
 * Craftsmen gameplay
 - Workshop interface
 - Recipes
@@ -189,11 +201,21 @@ Add help
 - Bonuses
 - Show plant markers based on ability
 * Enemy civ
-- Wander behavior (solor)
+MovingEntity (movement)
+- Player
+- NPC
+-- Animal (specific wander, aggro, target selection...)
+-- Civ (specific wander, aggro, target selection...)
+=> list of civ types, together with their base stats and equipment
+=> refactor checkforhostiles: 
+- Hostiles call their own when ending movement (?)
+- When player ends movement (?), list hostiles in neighborhood and check for each if they should attack hero
+
 - Set up stats and equipment
 - Aggro behavior
 - Battle AI
 - Spawn zones
+- Own orientation pins
 - Wander behavior (squad)
 - Buildings health 
 - Buildings destruction
@@ -260,12 +282,24 @@ or
 - Production of NPC troops
 - Set up stats of troops
 - Make troops engage enemies
+- Troops control: no grouping with players, but list of orders to dispatch
+-> Orders: go guard location x, patrol at location x
+-> NPC will deploy appropriate move behavior accordingly and aggro any enemies automatically
+(+ add in check for aggro code, detection of neighboring battle cells, so it intervenes in ongoing fights too)
+-> Map-based interface in the fort, on the left list of troops (with randomly generated names),
+select them, select order, and select location
+-> NPC lvl-up like players, full soldier mode, improve battle abilities (can be checked in menu)
+-> "training mode", costs money and food, make soldier unavailable, comes back lvled-up (higher level, higher cost)
+-> Each has own equipment; resource flow to barracks, all items stored there can freely be assigned
+to soldiers 
+-> For training and change of equipment, soldier need to be at barracks to make changes ("come back" order)
+- Maintaining troops consumes food as well (more than players? Less?)
 * Settlement economy
 Stop sending commit slots repeatedly
 Hide commit button when already committed
 Implement and test decommitment from db data
 Modify update commit code to accomodate for commitment of > 1 turn
-Have hunter huts produce pelts, bones...
+Have hunter huts produce pelts
 Recipe: paper cartridges (paper also for bombs?)?
 Make recipes (randomly?) for 5 consumables (potion, antidote, steady stuff...) + create ingredients
 Recipes for fancy bullets and bombs
@@ -274,7 +308,6 @@ Workshop building, interface = usual crafting menu
 Add shop interface as well
 Display recipes with building and class restrictions
 Update help text of recipes
-Coal mine
 Resource flow to trade post
 Gold flow from tarde post to fort
 Add all other mines (iron, sulfur, gold) + flows
@@ -294,12 +327,12 @@ Make separate brewing interface, similar but with adjustable dosage
 Add "brewing" time
 Add checkboxes for what should be boiled or grinded
 - Resources flow
+- Dev levels
+- Impact of dev level on exploration XP reward
 - Let chancellor set prices in trade post
 - Trade with overseas
 - Salaries for officials, taxes
-- New buildings
-- Dev levels
-- Impact of dev level on exploration XP reward
+- Allow creation of new buildings (fixed locations to begin with)
 - Lists of items rewarded by civic xp
 * Soldier gameplay
 - Bonuses
@@ -326,6 +359,8 @@ Design document:
 ---------------
 - Finish copying notes (last: leaderboard keyword and meta-game stuff)
 - Concile all texts (doc, crafting.txt)
+- Add recent ideas about soldier control (see settlement defense)
+- Re-read, update with recent ideas
 - Decide list of buildings, items, ...
 - Make Excel tables (crafting, inventory, bestiary, ...)
 - Make powerpoint

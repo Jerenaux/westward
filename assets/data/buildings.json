@@ -80,43 +80,172 @@
     "sprite": "tower",
     "recipe": {"3":60},
     "icon": "tower",
-    "displayProd": false
+    "displayProd": false,
+    "buildRate":2
   },
   "5":{
     "name": "Hunter hut",
-    "width": 293,
-    "height": 256,
+    "width": 260,
+    "height": 320,
     "shape": [
-      0, 82,
-      293, 82,
-      293, 250,
-      0,250
+      0, 96,
+      32, 64,
+      224, 64,
+      260, 96,
+      258, 210,
+      242, 210,
+      242, 290,
+      20, 290,
+      20, 210,
+      0, 210
     ],
     "collisions": {
       "x": 0,
-      "y": -4,
-      "w": 9,
-      "h": 4
+      "y": -6,
+      "w": 8,
+      "h": 5
     },
     "entrance": {
-      "x": 2,
-      "y": 0,
-      "w": 1,
-      "h": 1
+      "x": 3,
+      "y": -2,
+      "w": 2,
+      "h": 2
     },
     "depthOffset": 2,
     "sprite": "hunterhut",
     "icon": "hut",
     "mainMenu": "production",
     "displayProd": true,
-    "production": [[1,2]],
+    "production": [[1,1]],
     "buildRate":10
   },
   "6":{
     "name": "Lumber camp",
+    "width": 274,
+    "height": 288,
+    "shape": [
+      0, 64,
+      112, 0,
+      224, 64,
+      224, 150,
+      274, 180,
+      274, 257,
+      25, 257
+    ],
+    "collisions": {
+      "x": 0,
+      "y": -6,
+      "w": 9,
+      "h": 5
+    },
+    "entrance": {
+      "x": 3,
+      "y": -2,
+      "w": 1,
+      "h": 2
+    },
     "icon": "lumbercamp",
+    "sprite": "lumbercamp",
     "mainMenu": "production",
+    "depthOffset": 2,
     "displayProd": true,
-    "production": [[3,1]]
+    "production": [[3,1]],
+    "buildRate":10
+  },
+  "7":{
+    "name": "Coal mine",
+    "width": 276,
+    "height": 256,
+    "shape": [
+      32, 64,
+      124, 0,
+      256, 96,
+      256, 224,
+      32, 224,
+      0, 150
+    ],
+    "collisions": {
+      "x": 0,
+      "y": -5,
+      "w": 8,
+      "h": 3
+    },
+    "entrance": {
+      "x": 4,
+      "y": -2,
+      "w": 2,
+      "h": 2
+    },
+    "icon": "mine",
+    "sprite": "coalmine",
+    "mainMenu": "production",
+    "depthOffset": 3,
+    "displayProd": true,
+    "production": [[22,1]],
+    "buildRate":10
+  },
+  "8":{
+    "name": "Iron mine",
+    "width": 276,
+    "height": 256,
+    "shape": [
+      32, 64,
+      124, 0,
+      256, 96,
+      256, 224,
+      32, 224,
+      0, 150
+    ],
+    "collisions": {
+      "x": 0,
+      "y": -5,
+      "w": 8,
+      "h": 3
+    },
+    "entrance": {
+      "x": 4,
+      "y": -2,
+      "w": 2,
+      "h": 2
+    },
+    "icon": "mine",
+    "sprite": "ironmine",
+    "mainMenu": "production",
+    "depthOffset": 3,
+    "displayProd": true,
+    "production": [[24,1]],
+    "buildRate":10
+  },
+  "9":{
+    "name": "Gold mine",
+    "width": 276,
+    "height": 256,
+    "shape": [
+      32, 64,
+      124, 0,
+      256, 96,
+      256, 224,
+      32, 224,
+      0, 150
+    ],
+    "collisions": {
+      "x": 0,
+      "y": -5,
+      "w": 8,
+      "h": 3
+    },
+    "entrance": {
+      "x": 4,
+      "y": -2,
+      "w": 2,
+      "h": 2
+    },
+    "icon": "mine",
+    "sprite": "goldmine",
+    "mainMenu": "production",
+    "depthOffset": 3,
+    "displayProd": true,
+    "production": [[25,1]],
+    "buildRate":10
   }
 }

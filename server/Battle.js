@@ -15,6 +15,7 @@ function Battle(){
     this.fighters = []; // the fighter at position 0 is the one currently in turn
     this.teams = { // number of fighters of each 'team' involved in the fight
         'Animal': 0,
+        'Civ': 0,
         'Player': 0
     };
     this.spannedAOIs = new Set();
@@ -113,7 +114,7 @@ Battle.prototype.newTurn = function(){
         }
     },this);
 
-    if(!activeFighter.isPlayer || activeFighter.isNPC) setTimeout(activeFighter.decideBattleAction.bind(activeFighter),500);
+    if(!activeFighter.isPlayer || activeFighter.isDummy) setTimeout(activeFighter.decideBattleAction.bind(activeFighter),500);
 };
 
 Battle.prototype.getActiveFighter = function(){

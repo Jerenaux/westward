@@ -18,11 +18,15 @@
     },
     {
       "filename": "hut",
-      "frame": {"x":174,"y":900,"w":36,"h":36}
+      "frame": {"x":174,"y":900,"w":34,"h":32}
     },
     {
       "filename": "lumbercamp",
       "frame": {"x":196,"y":1112,"w":34,"h":32}
+    },
+    {
+      "filename": "mine",
+      "frame": {"x":237,"y":1112,"w":34,"h":32}
     }
   ]
 }

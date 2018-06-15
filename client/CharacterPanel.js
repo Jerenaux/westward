@@ -19,7 +19,7 @@ CharacterPanel.prototype.addInterface = function(){
     this.classes = {};
     for(var classID in UI.classesData){
         var classxp = Utils.randomInt(10,50);
-        var txts = this.addPolyText(x,y,["Level ","0"," "+UI.classesData[classID].name+"   -   ",classxp+"/100"," "+UI.textsData['classxp']],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
+        var txts = this.addPolyText(x,y,["Level ","100 ",UI.classesData[classID].name+"     -   ",classxp+"/999999 ",UI.textsData['classxp']],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
         y += 30;
         var classbar = new MiniProgressBar(this.x+x,this.y+y,245);
         classbar.name = 'class xp bar';

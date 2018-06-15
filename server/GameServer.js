@@ -217,7 +217,7 @@ GameServer.addNPC = function(x,y){
     npc.spawn(x, y);
     npc.setAppearance('enemy');
     npc.id = GameServer.lastPlayerID++;
-    npc.isNPC = true;
+    npc.isDummy = true;
     GameServer.players[npc.id] = npc;
     npc.setOrUpdateAOI(); // takes care of adding to the world as well
     return npc;
@@ -329,7 +329,7 @@ GameServer.dummyPlayer = function(x,y) {
     player.setSettlement(0);
     player.spawn(x, y);
     player.id = GameServer.lastPlayerID++;
-    player.isNPC = true;
+    player.isDummy = true;
     GameServer.players[player.id] = player;
     player.setOrUpdateAOI(); // takes care of adding to the world as well
     return player;
@@ -524,8 +524,10 @@ GameServer.checkAreaIntegrity = function(area){
 };
 
 GameServer.computeBattleArea = function(f1,f2){
-    var pos1 = f1.getEndOfTile();
-    var pos2 = f2.getEndOfTile();
+    //var pos1 = f1.getEndOfTile();
+    //var pos2 = f2.getEndOfTile();
+    var pos1 = f1.getEndOfPath();
+    var pos2 = f2.getEndOfPath();
 
     var tl = {x: null, y: null};
     if (pos1.x <= pos2.x && pos1.y <= pos2.y) {

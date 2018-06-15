@@ -90,10 +90,13 @@ Engine.preload = function() {
 
     this.load.image('fort', 'assets/sprites/buildings/fort3.png');
     this.load.image('tradepost', 'assets/sprites/buildings/tradepost2.png');
-    this.load.image('inn', 'assets/sprites/buildings/inn.png');
     this.load.image('tower', 'assets/sprites/buildings/tower2.png');
-    this.load.image('foundations', 'assets/sprites/buildings/foundations.png');
-    this.load.image('hunterhut', 'assets/sprites/buildings/hut2.png');
+    this.load.image('lumbercamp', 'assets/sprites/buildings/lumbercamp.png');
+    this.load.image('coalmine', 'assets/sprites/buildings/coalmine.png');
+    this.load.image('ironmine', 'assets/sprites/buildings/ironmine.png');
+    this.load.image('goldmine', 'assets/sprites/buildings/goldmine.png');
+    //this.load.image('foundations', 'assets/sprites/buildings/foundations.png');
+    this.load.image('hunterhut', 'assets/sprites/buildings/hut.png');
 
     this.load.atlas('aok', 'assets/sprites/aok.png', 'assets/sprites/aok.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
@@ -1237,7 +1240,6 @@ Engine.moveToClick = function(pointer){
 };
 
 Engine.computePath = function(position){
-    console.log('path to',position);
     var x = position.x;
     var y = position.y;
     if(Engine.checkCollision(x,y)) return;
