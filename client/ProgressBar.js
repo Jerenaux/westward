@@ -35,7 +35,7 @@ ProgressBar.prototype.finalize = function(){
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
-        e.mask = this.mask;
+        if(this.mask) e.mask = this.mask;
     },this);
     this.body[2].setDepth(2);
 };
@@ -187,7 +187,7 @@ MiniProgressBar.prototype.setColor = function(color){
 // #######################
 
 function BigProgressBar(x,y,w,color,hasZone){
-    ProgressBar.call(this,x,y,w,color);
+    ProgressBar.call(this,x,y,w);
     w -= 32;
     this.maxLength = w+9;
 

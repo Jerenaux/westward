@@ -68,6 +68,7 @@ Performance:
 - Pathmaking instead of pahfinding?
 - Concile the two coexisting menu update systems: the one used by updateSelf and the one used by updateBuilding
 -> All menus have an update() method called on display; upon new server data, only update() the current menu
+-> DOn't call all updates on display; update when receiving server data, and that's it
 - Dont send full building inventories when buying/selling (send arrays of deltas)
 - Fix null values in left-fringe chunks (fixed?)
 ->nulls in corrupted chunks likely arise from "undefined" values being converted to null by JSON.stringify
@@ -260,8 +261,6 @@ or
 - View info on other players (levels...)
 - Guilds
 * Orientations
-- No pin for dead animals
-- Deal with pins in battle & after respawn
 - Pins for fights
 - Pins for gunshots and explosions (requires special networking for long-distance sounds)
 -> Much slower noise variation according to distance (since heard from very far)

@@ -54,6 +54,9 @@ CharacterPanel.prototype.update = function(){
         this.classes[classID].text.setText(Engine.player.classxp[classID]+'/'+max);
         this.classes[classID].bar.setLevel(Engine.player.classxp[classID],max);
     }*/
+    for(var classID in UI.classesData) {
+        Engine.menus.character.panels['class_'+classID].update();
+    }
 
     this.fatigueText.setText('0%');
     var foodModifier = Formulas.decimalToPct(Formulas.computePlayerFoodModifier(Formulas.pctToDecimal(Engine.player.foodSurplus)));

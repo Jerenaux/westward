@@ -64,8 +64,12 @@ var Moving = new Phaser.Class({
 
     manageOrientationPin: function(){
         if(this.isHero) return;
-        var viewRect = new Phaser.Geom.Rectangle(Engine.camera.scrollX,Engine.camera.scrollY,Engine.camera.width,Engine.camera.height);
-        var inCamera = viewRect.contains(this.x,this.y);
+        if(this.dead) {
+            this.orientationPin.hide();
+            return;
+        }
+        var viewRect = new Phaser.Geom.Rectangle(Engine.camera.scrollX-10,Engine.camera.scrollY-10,Engine.camera.width+20,Engine.camera.height+20);
+        var inCamera =  viewRect.contains(this.x,this.y);
         if(inCamera) {
             this.orientationPin.hide();
         }else{
@@ -151,7 +155,6 @@ var Moving = new Phaser.Class({
 
     tileByTilePostUpdate: function(){
         if(!this.scene) return; // quick fix before the bug gets fixed in Phaser
-        //if(this.isHero) console.warn('post-start');
 
         var tx = Math.floor(this.x/Engine.tileWidth);
         var ty = Math.floor(this.y/Engine.tileHeight);

@@ -334,12 +334,14 @@ Engine.initWorld = function(data){
     console.log(data);
     Engine.settlementsData = data.settlements;
     Engine.addHero(data);
+    Engine.player.updateViewRect();
     Engine.makeUI();
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
     Engine.miniMap.display();
     Engine.updateAllOrientationPins();
+
 
     /*if(Client.isNewPlayer()) {
         var w = 400;
@@ -479,6 +481,7 @@ Engine.manageRespawn = function(){
     Engine.showMarker();
     Engine.displayUI();
     Engine.dead = false;
+    Engine.updateAllOrientationPins();
 };
 
 Engine.updateAllOrientationPins = function(){
@@ -1053,7 +1056,8 @@ Engine.makeCharacterMenu = function(){
     var cw = Math.round((classw - 45)/2);
     var ch = (classh - 100)/2;
     for(var classID in UI.classesData) {
-        menu.addPanel('class_'+classID, new ClassMiniPanel(cx,cy,cw,ch,UI.classesData[classID].name));
+        var p = menu.addPanel('class_'+classID, new ClassMiniPanel(cx,cy,cw,ch,UI.classesData[classID].name));
+        p.setClass(classID);
         cx += cw + 15;
         if(classID == 1){
             cx = sx;
@@ -1073,36 +1077,6 @@ Engine.makeCharacterMenu = function(){
     return menu;
 };
 
-/*Engine.makeCharacterMenu = function(statsPanel){
-    var padding = 10;
-    var infoh = 235;
-    var infox = 665;
-    var infoy = 100;
-    var todow = 300;
-    var todoh = 380;
-    var todox = infox - padding - todow;
-    var todoy = 100;
-    var commith = infoh;
-    var commitw = 300;
-    var commitx = todox - padding - commitw;
-    var commity = infoy;
-    var character = new Menu('Character');
-    character.setSound(Engine.scene.sound.add('page_turn'));
-    var infoPanel = new CharacterPanel(infox,infoy,330,infoh,'<Player name>');
-    infoPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['status_help']);
-    character.addPanel('info',infoPanel);
-    var commitPanel = new CommitmentPanel(commitx,commity,commitw,commith,'Commitment');
-    commitPanel.addButton(commitw-30, 8, 'blue','help',null,'',UI.textsData['commitment_help']);
-    character.addPanel('commit',commitPanel);
-    var todoPanel = new SuggestPanel(todox,todoy,todow,todoh,'Suggested actions');
-    character.addPanel('todo',todoPanel);
-    character.addPanel('stats',statsPanel);
-    character.addEvent('onUpdateStats',statsPanel.updateStats.bind(statsPanel));
-    character.addEvent('onUpdateCommit',commitPanel.update.bind(commitPanel));
-    character.addEvent('onUpdateCharacter',infoPanel.update.bind(infoPanel));
-    return character;
-};*/
-
 Engine.getIngredientsPanel = function(){
     return Engine.menus['crafting'].panels['ingredients'];
 };
@@ -1111,14 +1085,12 @@ Engine.addHero = function(data){
     // data comes from the initTrim()'ed packet of the player
     Engine.player = new Hero();
     Engine.player.setUp(data);
+    Engine.camera.startFollow(Engine.player); // leave outside of constructor
+
+    // TODO: move to hero
     Engine.player.settlement = data.settlement;
-
-    Engine.camera.startFollow(Engine.player);
-
     Engine.player.markers = data.markers;
     Engine.players.unread = 1;
-
-    // TODO: move to Hero
     Engine.player.inventory = new Inventory();
     Engine.player.class = data.class;
     Engine.player.gold = data.gold;

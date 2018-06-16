@@ -21,7 +21,6 @@ var Animal = new Phaser.Class({
 
         var animalData = Engine.animalsData[data.type];
         this.id = data.id;
-        //console.log('new ',data.id);
 
         Engine.animals[this.id] = this;
         Engine.entityManager.addToDisplayList(this);

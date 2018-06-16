@@ -8,6 +8,13 @@ var Hero = new Phaser.Class({
     initialize: function(){
         Player.call(this);
         this.isHero = true;
+
+        this.viewRect = new Phaser.Geom.Rectangle(
+            Engine.camera.scrollX,
+            Engine.camera.scrollY,
+            Engine.camera.width,
+            Engine.camera.height
+        );
     },
 
     updateData: function(data){ // don't call this 'update' or conflict with Phaser method
@@ -44,6 +51,11 @@ var Hero = new Phaser.Class({
         if(data.x >= 0 && data.y >= 0) this.teleport(data.x,data.y);
 
         Engine.firstSelfUpdate = false;
+    },
+
+    updateViewRect: function(){
+        this.viewRect.setPosition(Engine.camera.scrollX,Engine.camera.scrollY);
+        //console.log(this.viewRect);
     },
 
     // ### UPDATES #####
