@@ -1,11 +1,10 @@
-Pre-release:
-- Cursor bug when new game
-- Scrollable list of buildings
-- Sprinkle new buildings 
+Pre-release: 
 
 Release:
-- Reset food
 - Newplayer only
+- Push
+- Position buildings
+- Reset food
 
 Admin
 Analytics
@@ -78,6 +77,7 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Remove global engine hover/out events, use local ones in animals, buildings...
 - From 10.0: use pointer.worldX and worldY to handle location clicks
 - From 10.0: use this.input.setDefaultCursor() to set cursor
 - From 10.0: use button.input.cursor = 'url(assets/cursors/sword.cur), pointer  for hover cursor changes
@@ -305,6 +305,7 @@ Make recipes (randomly?) for 5 consumables (potion, antidote, steady stuff...) +
 Recipes for fancy bullets and bombs
 Workshop building, interface = usual crafting menu
 -> update advice
+furnace system?
 Add shop interface as well
 Display recipes with building and class restrictions
 Update help text of recipes

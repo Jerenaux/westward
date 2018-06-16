@@ -2,7 +2,7 @@
  * Created by jeren on 25-01-18.
  */
 
-function ProgressBar(x,y,w){
+function ProgressBar(x,y,w,mask){
     this.displayed = false;
     this.max = 100;
     this.level = 0;
@@ -12,6 +12,7 @@ function ProgressBar(x,y,w){
     this.w = w;
     this.hasHead = false;
     this.hasTail = false;
+    this.mask = mask;
 }
 
 ProgressBar.prototype.setUpZone = function(zone){
@@ -34,8 +35,16 @@ ProgressBar.prototype.finalize = function(){
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
-    });
+        e.mask = this.mask;
+    },this);
     this.body[2].setDepth(2);
+};
+
+ProgressBar.prototype.move = function(dx,dy){
+    this.body.forEach(function(b){
+        b.x += dx;
+        b.y += dy;
+    })
 };
 
 ProgressBar.prototype.reset = function(){
@@ -131,8 +140,8 @@ ProgressBar.prototype.hide = function(){
 
 // #######################
 
-function MiniProgressBar(x,y,w,color){
-    ProgressBar.call(this,x,y,w,color);
+function MiniProgressBar(x,y,w,color,mask){
+    ProgressBar.call(this,x,y,w,mask);
 
     this.maxLength = w;
     this.body.push(UI.scene.add.sprite(x,y,'UI','minibar_left'));

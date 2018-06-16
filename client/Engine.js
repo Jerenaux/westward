@@ -279,6 +279,8 @@ Engine.create = function(){
     Engine.scene.input.on('pointerdown', Engine.handleDown);
     Engine.scene.input.on('pointerup', Engine.handleClick);
     Engine.scene.input.on('pointermove', Engine.trackMouse);
+
+    // TODO: move these to classes
     Engine.scene.input.on('pointerover', Engine.handleOver);
     Engine.scene.input.on('pointerout', Engine.handleOut);
     Engine.scene.input.on('drag', Engine.handleDrag);
@@ -812,13 +814,10 @@ Engine.makeMessagesMenu = function(){
     list.addMessages([{
         name: title
     }]);
-    var msg = menu.addPanel('msg',new InfoPanel(x+listw+gap,100,500,380,'Current message'));
-    msg.addMask();
-    msg.addScroll();
-    //var txt = msg.addText(15,20,'Title: '+title);
+    var msg = menu.addPanel('msg',new InfoPanel(x+listw+gap,100,500,380,'Selected letter'));
+    msg.makeScrollable(); // TODO: only if text too long
 
     var x = 15;
-    //var y = 20 + txt.height;
     var y = 20;
     UI.textsData['intro_letter'].forEach(function(t){
         t = t.replace(/\[SETL\]/, Engine.settlementsData[Engine.player.settlement].name);
@@ -913,7 +912,8 @@ Engine.makeFortMenu = function(){
     fort.addPanel('map',mapPanel);
 
     var buildings = new BuildingsPanel(buildx,buildy,buildw,buildh,'Buildings');
-    buildings.addButton(220, 8, 'blue','help',null,'',UI.textsData['buildings_help']);
+    buildings.addButton(130, -9, 'blue','help',null,'',UI.textsData['buildings_help']);
+    buildings.makeScrollable();
     fort.addPanel('buildings',buildings);
     var resources = new InventoryPanel(resx,resy,resw,resh,'Resources');
     resources.addCapsule('gold',150,-9,'999','gold');
@@ -1047,6 +1047,20 @@ Engine.makeCharacterMenu = function(){
     var log = menu.addPanel('log', new Panel(citizenx,logy,citizenw,logh,'Events log'));
 
     var classpanel = menu.addPanel('class', new CharacterPanel(classx,classy,classw,classh,'Multi-Class status'));
+    var sx = classx + 15;
+    var cx = sx;
+    var cy = classy + 30;
+    var cw = Math.round((classw - 45)/2);
+    var ch = (classh - 100)/2;
+    for(var classID in UI.classesData) {
+        menu.addPanel('class_'+classID, new ClassMiniPanel(cx,cy,cw,ch,UI.classesData[classID].name));
+        cx += cw + 15;
+        if(classID == 1){
+            cx = sx;
+            cy += ch;
+        }
+    }
+
     var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
 
     var commit = menu.addPanel('commit',new InventoryPanel(citizenx+10,citizeny,150,100,'',true));
@@ -1211,6 +1225,7 @@ Engine.handleClick = function(pointer,objects){
 };
 
 Engine.handleOver = function(pointer,objects){
+    if(pointer.x == 0 && pointer.y == 0) return; // quick fix
     if(objects.length > 0){
         for(var i = 0; i < Math.min(objects.length,2); i++) { // disallow bubbling too deep, only useful in menus (i.e. shallow)
             var obj = objects[i];
@@ -1503,6 +1518,7 @@ Engine.enterBuilding = function(id){
         m.displayIcon();
     });
     menus[0].display();
+    building.handleOut();
 
     //TODO: remove
     var menu = menus[0];

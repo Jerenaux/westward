@@ -42,9 +42,13 @@ var Building = new Phaser.Class({
         this.setBuilt(data.built);
         this.setDepth(Engine.buildingsDepth + (this.ty - buildingData.depthOffset)/1000);
 
-        var shape = new Phaser.Geom.Polygon(buildingData.shape);
-        this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
-        this.input.hitArea = shape; // will override previous interactive zone, if any (e.g. if object recycled from pool)
+        if(buildingData.shape) {
+            var shape = new Phaser.Geom.Polygon(buildingData.shape);
+            this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
+            this.input.hitArea = shape; // will override previous interactive zone, if any (e.g. if object recycled from pool)
+
+            //this.on('pointerover',this.handleOver.bind(this));
+        }
 
         this.setCollisions(buildingData);
     },

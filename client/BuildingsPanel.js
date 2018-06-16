@@ -13,14 +13,15 @@ BuildingsPanel.prototype.constructor = BuildingsPanel;
 
 BuildingsPanel.prototype.displayListing = function(){
     var xoffset = 15;
-    var yoffset = 40;
+    var yoffset = 30;
 
     var listing = Engine.currentBuiling.buildings;
+
     for(var i = 0; i < listing.length; i++){
         var data = listing[i];
         var buildingTypeData = Engine.buildingsData[data.type];
 
-        var slot = this.displayedSlots[i] || this.getNextLongSlot(150);
+        var slot = this.displayedSlots[i] || this.getNextLongSlot(120);
         slot.setUp(this.x+xoffset,this.y + yoffset + i*50);
         var displayProd = buildingTypeData.displayProd || !data.built;
 

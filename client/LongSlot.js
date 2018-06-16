@@ -2,9 +2,10 @@
  * Created by jeren on 06-02-18.
  */
 
-function LongSlot(width){
+function LongSlot(width,mask){
     this.x = 0;
     this.y = 0;
+    this.mask = mask;
     this.width = width;
     this.totalwidth = this.width + 70;
     var x = 0;
@@ -31,6 +32,7 @@ function LongSlot(width){
         s.setScrollFactor(0);
         s.setDepth(1);
         s.setVisible(false);
+        s.mask = mask;
     });
 
     this.zone = this.createZone();
@@ -61,6 +63,7 @@ LongSlot.prototype.addIcon = function(atlas,frame){
         this.icon.setScrollFactor(0);
         this.icon.setDepth(1);
         this.icon.setVisible(false);
+        this.icon.mask = this.mask;
     }
     this.icon.setDisplayOrigin(Math.floor(this.icon.frame.width / 2), Math.floor(this.icon.frame.height / 2));
 };
@@ -71,6 +74,7 @@ LongSlot.prototype.getNextText = function(){
         t.setDisplayOrigin(0,0);
         t.setScrollFactor(0);
         t.setDepth(1);
+        t.mask = this.mask;
         this.texts.push(t);
     }
     return this.texts[this.textCounter++];
@@ -90,7 +94,7 @@ LongSlot.prototype.addText = function(x,y,text,color,size){
 
 LongSlot.prototype.addProgressBar = function(x,y,level,max,color,width){
     width = width || 0.8*this.width;
-    this.bar = new MiniProgressBar(this.x+x,this.y+y,width,color);
+    this.bar = new MiniProgressBar(this.x+x,this.y+y,width,color,this.mask);
     this.bar.setLevel(level,max);
     return this.bar;
 };
@@ -111,6 +115,16 @@ LongSlot.prototype.setUp = function(x,y){
     this.zone.setPosition(this.x,this.y);
 };
 
+LongSlot.prototype.move = function(dx,dy){
+    var content = this.slices.concat(this.texts);
+    if(this.icon) content.push(this.icon);
+    content.forEach(function(c){
+        c.x += dx;
+        c.y += dy;
+    });
+    if(this.bar) this.bar.move(dx,dy);
+};
+
 LongSlot.prototype.display = function(){
     if(this.displayed) return;
     this.slices.forEach(function(s){
@@ -129,13 +143,9 @@ LongSlot.prototype.clear = function(){
     this.hideTexts();
     this.textCounter = 0;
     if(this.bar) this.bar.hide();
-    if(this.icon) {
-        this.icon.setVisible(false);
-        //this.icon = null;
-    }
+    if(this.icon) this.icon.setVisible(false);
     if(this.pin) this.pin.setVisible(false);
 };
-
 
 LongSlot.prototype.hideTexts = function(){
     this.texts.forEach(function(t){

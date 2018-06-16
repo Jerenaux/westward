@@ -203,7 +203,7 @@
     "atlas": "items2",
     "frame":"iron",
     "name": "Iron ore",
-    "desc": "Crafting material that can be mined and used to make steel or several items."
+    "desc": "Crafting material that can be mined and used to make steel for several items."
   },
   "25":{
     "atlas": "items2",

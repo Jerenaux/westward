@@ -102,9 +102,95 @@ Panel.prototype.addText = function(x,y,text,color,size,font){
     return t;
 };
 
+Panel.prototype.makeScrollable = function(){
+    if(this.scrollable) return;
+    this.scrollable = true;
+    this.addMask();
+    this.addScroll();
+};
+
+Panel.prototype.addMask = function(){
+    var shape = UI.scene.make.graphics();
+    shape.fillStyle('#ffffff');
+    shape.fillRect(this.x,this.y+15,this.width,this.height-25);
+    this.mask = new Phaser.Display.Masks.GeometryMask(UI.scene, shape);
+};
+
+Panel.prototype.setWrap = function(wrap){
+    this.wrap = wrap;
+};
+
+Panel.prototype.scroll = function(y){
+    y = Utils.clamp(y,this.upperScrollLimit,this.lowerScrollLimit);
+    var dy = this.scrollPin.y - y;
+    this.scrollPin.y = y;
+    this.texts.forEach(function(t){
+        t.y += dy;
+    })
+    this.longSlots.forEach(function(s){
+        s.move(0,dy);
+    });
+    this.scrolled += y;
+};
+
+Panel.prototype.addScroll = function(){
+    this.setWrap(45);
+    var x = this.x+this.width-18;
+    var downY = this.y+this.height-20;
+    var upOffset = 25;
+    var upY = this.y+upOffset;
+    var height = downY-upY-25;
+    var up = UI.scene.add.sprite(x,upY,'UI','scroll_up');
+    var mid = UI.scene.add.tileSprite(x,upY+13+(height/2),24,height,'UI','scroll');
+    var down = UI.scene.add.sprite(x,downY,'UI','scroll_down');
+    var pin = UI.scene.add.sprite(x,upY+25,'UI','scroll_pin');
+
+    this.scrolled = 0;
+    this.upperScrollLimit = upY+25;
+    this.lowerScrollLimit = downY-25;
+    this.scrollPin = pin;
+    /*function scroll(y){
+        y = Utils.clamp(y,upY+25,downY-25);
+        var dy = pin.y - y;
+        pin.y = y;
+        _this.texts.forEach(function(t){
+            t.y += dy;
+        })
+        _this.longSlots.forEach(function(s){
+            s.move(0,dy);
+        });
+        this.scrolled += y;
+    }*/
+
+    pin.setInteractive();
+    UI.scene.input.setDraggable(pin);
+    var _this = this;
+    pin.on('drag',function(pointer,x,y){
+        _this.scroll(y);
+    });
+
+    this.addButton(this.width-30,upOffset-15,'blue','up',function(){
+        _this.scroll(pin.y - 20);
+    },'Scroll up');
+    this.addButton(this.width-30,this.height-32,'blue','down',function(){
+        _this.scroll(pin.y + 20);
+    },'Scroll down');
+
+    up.setVisible(false);
+    mid.setVisible(false);
+    down.setVisible(false);
+    pin.setVisible(false);
+    this.scrollItems = [up,mid,down,pin];
+
+    this.content.push(up);
+    this.content.push(mid);
+    this.content.push(down);
+    this.content.push(pin);
+};
+
 Panel.prototype.getNextLongSlot = function(width){
     if(this.longSlotsCounter >= this.longSlots.length){
-        this.longSlots.push(new LongSlot(width || 100));
+        this.longSlots.push(new LongSlot(width || 100,this.mask));
     }
     return this.longSlots[this.longSlotsCounter++];
 };
@@ -133,18 +219,27 @@ Panel.prototype.display = function(){
     for(var capsule in this.capsules){
         this.capsules[capsule].display();
     }
+
     this.buttons.forEach(function(b){
         b.btn.setVisible(true);
         b.symbol.setVisible(true);
         b.ring.setVisible(true);
         b.zone.setVisible(true);
     });
+
+    if(this.scrollable){
+        this.scrollItems.forEach(function(e){
+            e.setVisible(true);
+        })
+    }
+
     Engine.inPanel = true;
     Engine.currentPanel = this;
 };
 
 Panel.prototype.hide = function(){
     Frame.prototype.hide.call(this);
+    if(this.scrollable) this.scroll(-this.scrolled);
     Engine.inPanel = false;
 };
 

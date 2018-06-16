@@ -236,7 +236,7 @@ GameServer.addItem = function(x,y,type){
 };
 
 GameServer.onInitialized = function(){
-    GameServer.addNPC(529,655);
+    //GameServer.addNPC(529,655);
     /*console.log('--- Performing on initialization tasks ---');
     var animal = GameServer.addAnimal(1202,168,0);
     animal.die();

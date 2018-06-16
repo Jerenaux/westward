@@ -11,7 +11,7 @@ CharacterPanel.prototype = Object.create(Panel.prototype);
 CharacterPanel.prototype.constructor = CharacterPanel;
 
 CharacterPanel.prototype.addInterface = function(){
-    this.bars = [];
+    /*this.bars = [];
     var alignx = 15;
     var x = alignx;
     var y = 20;
@@ -31,7 +31,11 @@ CharacterPanel.prototype.addInterface = function(){
             text: txts[3],
             bar: classbar
         }
-    }
+    }*/
+
+    var alignx = 15;
+    var x = alignx;
+    var y = 240;
 
     this.addText(x,y,'Stats modifiers:');
     y+= 15;
@@ -44,14 +48,13 @@ CharacterPanel.prototype.addInterface = function(){
 };
 
 CharacterPanel.prototype.update = function(){
-    for(var classID in UI.classesData) {
+    /*for(var classID in UI.classesData) {
         var max = Formulas.computeMaxClassXP(Engine.player.classlvl[classID]);
         this.classes[classID].level.setText(Engine.player.classlvl[classID]);
         this.classes[classID].text.setText(Engine.player.classxp[classID]+'/'+max);
         this.classes[classID].bar.setLevel(Engine.player.classxp[classID],max);
-    }
+    }*/
 
-    //this.classText.setText(" "+UI.classesData[Engine.player.class].name+"   -   ");
     this.fatigueText.setText('0%');
     var foodModifier = Formulas.decimalToPct(Formulas.computePlayerFoodModifier(Formulas.pctToDecimal(Engine.player.foodSurplus)));
     this.foodModifierTxt.setFill(foodModifier < 0 ? Utils.colors.red : Utils.colors.green);
@@ -62,17 +65,17 @@ CharacterPanel.prototype.update = function(){
 
 CharacterPanel.prototype.displayInterface = function(){
     this.displayTexts();
-    this.bars.forEach(function(b){
+    /*this.bars.forEach(function(b){
         b.display();
-    });
+    });*/
     this.update();
 };
 
 CharacterPanel.prototype.hideInterface = function(){
     this.hideTexts();
-    this.bars.forEach(function(b){
+    /*this.bars.forEach(function(b){
         b.hide();
-    });
+    });*/
 };
 
 CharacterPanel.prototype.display = function(){
