@@ -15,9 +15,9 @@ function Animal(x,y,type){
     this.id = GameServer.lastAnimalID++;
     this.isAnimal = true;
     this.battleTeam = 'Animal';
+    this.updateCategory = 'animals';
     this.x = x;
     this.y = y;
-    this.inFight = false;
     this.type = type;
     this.setAggressive();
     this.setWander();

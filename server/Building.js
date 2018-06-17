@@ -10,6 +10,8 @@ var Inventory = require('../shared/Inventory.js').Inventory;
 
 function Building(data){
     this.isBuilding = true;
+    this.battleTeam = 'Building';
+    this.updateCategory = 'buildings';
 
     this.id = -1;
     if(data.id > -1){

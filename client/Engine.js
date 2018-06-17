@@ -252,6 +252,7 @@ Engine.create = function(){
     Engine.animals = {}; // animal.id -> building object
     Engine.buildings = {}; // building.id -> building object
     Engine.items = {};
+    Engine.civs = {};
     Engine.battleCells = {}; // cell.id -> cell object
     Engine.battleCellsMap = new SpaceMap();
     Engine.entityManager.registerEntityType('player',Player,Engine.players);
@@ -259,6 +260,7 @@ Engine.create = function(){
     Engine.entityManager.registerEntityType('building',Building,Engine.buildings);
     Engine.entityManager.registerEntityType('item',Item,Engine.items);
     Engine.entityManager.registerEntityType('cell',BattleTile,Engine.battleCells);
+    Engine.entityManager.registerEntityType('civ',Civ,Engine.civs);
 
     Engine.debug = true;
     Engine.showHero = true;
@@ -1383,6 +1385,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.newanimals) Engine.createElements(data.newanimals,'animal');
     if(data.newitems) Engine.createElements(data.newitems,'item');
     if(data.newcells) Engine.createElements(data.newcells,'cell');
+    if(data.newcivs) Engine.createElements(data.newcivs,'cell');
 
 
     // data.players is an associative array mapping the id's of the entities
@@ -1391,12 +1394,14 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     if(data.players) Engine.updateElements(data.players,Engine.players);
     if(data.animals) Engine.updateElements(data.animals,Engine.animals);
     if(data.buildings) Engine.updateElements(data.buildings,Engine.buildings);
+    if(data.civs) Engine.updateElements(data.civs,Engine.civs);
 
     if(data.removedplayers) Engine.removeElements(data.removedplayers,Engine.players);
     if(data.removedanimals) Engine.removeElements(data.removedanimals,Engine.animals);
     if(data.removeditems) Engine.removeElements(data.removeditems,Engine.items);
     if(data.removedcells) Engine.removeElements(data.removedcells,Engine.battleCells);
     if(data.removedbuildings) Engine.removeElements(data.removedbuildings,Engine.buildings);
+    if(data.removedcivs) Engine.removeElements(data.removedcivs,Engine.civs);
 };
 
 Engine.createElements = function(arr,entityType){

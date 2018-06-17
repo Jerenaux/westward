@@ -3,41 +3,17 @@
  */
 
 function UpdatePacket(){
-    this.newplayers = []; // new player objects to add to the world
-    this.newbuildings = [];
-    this.newcells = [];
-    this.newanimals = [];
-    this.newitems = [];
-    this.removedplayers = [];
-    this.removedanimals = [];
-    this.removedbuildings = [];
-    this.removeditems = [];
-    this.removedcells = [];
-    this.players = {}; // list of player objects already existing for which properties have been updated
-    this.animals = {};
-    this.buildings = {};
+    var entities = ['animals','buildings','cells','civs','items','players'];
+
+    entities.forEach(function(e){
+        this['new'+e] = [];
+        this['removed'+e] = [];
+        this[e] = {};
+    },this);
 }
 
 UpdatePacket.prototype.addObject = function(object){
-    //console.log('[Updt] adding object '+object.id);
-    var arr;
-    switch(object.constructor.name){
-        case 'Player':
-            arr = this.newplayers;
-            break;
-        case 'Building':
-            arr = this.newbuildings;
-            break;
-        case 'Animal':
-            arr = this.newanimals;
-            break;
-        case 'Item':
-            arr = this.newitems;
-            break;
-        case 'BattleCell':
-            arr = this.newcells;
-            break;
-    }
+    var arr = this['new'+object.updateCategory];
     // Check that the object to insert is not already present (possible since when pulling updates from neighboring AOIs)
     for(var i = 0; i < arr.length; i++){
         if(arr[i].id == object.id) return;
@@ -46,24 +22,7 @@ UpdatePacket.prototype.addObject = function(object){
 };
 
 UpdatePacket.prototype.removeObject = function(object){
-    var arr;
-    switch(object.constructor.name){
-        case 'Player':
-            arr = this.removedplayers;
-            break;
-        case 'Building':
-            arr = this.removedbuildings;
-            break;
-        case 'Animal':
-            arr = this.removedanimals;
-            break;
-        case 'Item':
-            arr = this.removeditems;
-            break;
-        case 'BattleCell':
-            arr = this.removedcells;
-            break;
-    }
+    var arr = this['removed'+object.updateCategory];
     // Check that the object to remove is not already listed (possible since when pulling updates from neighboring AOIs)
     for(var i = 0; i < arr.length; i++){
         if(arr[i] == object.id) return;
@@ -72,19 +31,7 @@ UpdatePacket.prototype.removeObject = function(object){
 };
 
 UpdatePacket.prototype.updateProperty = function(type,id,property,value){
-    //console.log('updating property type = '+type+', id = '+id+', prop = '+property+', val = '+value);
-    var map;
-    switch(type){
-        case 'Player':
-            map = this.players;
-            break;
-        case 'Animal':
-            map = this.animals;
-            break;
-        case 'Building':
-            map = this.buildings;
-            break;
-    }
+    var map = this[type];
     if(!map.hasOwnProperty(id)) map[id] = {};
     if(map[id][property] != value) map[id][property] = value;
 };

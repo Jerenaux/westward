@@ -12,11 +12,13 @@ var GameServer = {
     lastPlayerID: 0,
     lastBuildingID: 0,
     lastAnimalID: 0,
+    lastCivID: 0,
     lastItemID: 0,
     lastBattleID: 0,
     lastCellID: 0,
     players: {}, // player.id -> player
     animals: {}, // animal.id -> animal
+    civs: {}, // civ.id -> civ
     buildings: {}, // building.id -> building
     items: {},
     settlements: {},
@@ -208,15 +210,9 @@ GameServer.setUpSpawnZones = function(){
     GameServer.updateStatus();
 };
 
-GameServer.addNPC = function(x,y){
-    var npc = new Player(); // TODO: make subclass?
-    npc.setSettlement(0);
-    npc.spawn(x, y);
-    npc.setAppearance('enemy');
-    npc.id = GameServer.lastPlayerID++;
-    npc.isDummy = true;
-    GameServer.players[npc.id] = npc;
-    npc.setOrUpdateAOI(); // takes care of adding to the world as well
+GameServer.addCiv = function(x,y){
+    var npc = new Civ(x,y);
+    GameServer.civs[npc.id] = npc;
     return npc;
 };
 
@@ -233,7 +229,7 @@ GameServer.addItem = function(x,y,type){
 };
 
 GameServer.onInitialized = function(){
-    //GameServer.addNPC(529,655);
+    //GameServer.addCiv(529,655);
     /*console.log('--- Performing on initialization tasks ---');
     var animal = GameServer.addAnimal(1202,168,0);
     animal.die();

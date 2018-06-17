@@ -65,6 +65,7 @@ Performance:
 - Avoid duplicate pins in maps, danger pins etc.
 - Fix "already existing/non-existing" bugs
 - "Sleep" mode for NPC when no player in currentAOI.entities (change flags on AOI transition, not on every NPC update loop iteration)
+-> Also applyes to aggro detection
 - Pathmaking instead of pahfinding?
 - Concile the two coexisting menu update systems: the one used by updateSelf and the one used by updateBuilding
 -> All menus have an update() method called on display; upon new server data, only update() the current menu
@@ -202,7 +203,7 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Bonuses
 - Show plant markers based on ability
 * Enemy civ
-- Civ class: battleTeam, aggroMatrix, etc.
+- Client-side civ management
 - JSON civ types, together with their base stats and equipment
 - Aggro behavior
 - Spawn zones

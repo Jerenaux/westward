@@ -337,6 +337,7 @@ Battle.prototype.getCells = function(){
 module.exports.Battle = Battle;
 
 function BattleCell(x,y,battle){
+    this.updateCategory = 'cells';
     this.id = GameServer.lastCellID++;
     this.x = x;
     this.y = y;

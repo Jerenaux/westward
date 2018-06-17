@@ -12,6 +12,7 @@ var Inventory = require('../shared/Inventory.js').Inventory;
 function NPC(){
     this.isPlayer = false;
     this.isNPC = true;
+    this.inFight = false;
     this.actionQueue = [];
     MovingEntity.call(this);
 }
