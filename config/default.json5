@@ -55,10 +55,11 @@ To add: time gap between two orientation sounds (OrientationPin.display())
             // Unit: ms
             client: 125,
             walk: 50,
-            npc: 200
+            wander: 200,
+            aggro: 2000
     },
     wildlife: {
-        aggro: false,
+        aggro: true,
         wander: true,
         wanderRange: 5,
         idleTime: [1, 3.5], // random bounds; in seconds

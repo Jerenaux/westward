@@ -61,14 +61,12 @@ GameServer.updateStatus = function(){
 };
 
 GameServer.createModels = function(){
-    // TODO: remove temporal data from schemas?
     var settlementSchema = mongoose.Schema({
         id: {type: Number, min: 0, required: true},
         name: {type: String, required: true},
         description: String,
         population: {type: Number, min: 0, required: true},
-        level: {type: Number, min: 0, required: true},
-        //lastCycle: { type: Date, default: Date.now }
+        level: {type: Number, min: 0, required: true}
     });
     var buildingSchema = mongoose.Schema({
         id: {type: Number, min: 0, required: true},
@@ -91,9 +89,8 @@ GameServer.createModels = function(){
         gold: {type: Number, min: 0},
         civiclvl: {type: Number, min: 0},
         civicxp: {type: Number, min: 0},
-        classxp: mongoose.Schema.Types.Mixed, //{type: Number, min: 0},
+        classxp: mongoose.Schema.Types.Mixed,
         classlvl: mongoose.Schema.Types.Mixed,
-        //class: {type: Number, min: 0},
         equipment: mongoose.Schema.Types.Mixed,
         commitSlots: mongoose.Schema.Types.Mixed,
         sid: {type: Number, min: 0, required: true},
@@ -248,12 +245,13 @@ GameServer.onInitialized = function(){
 GameServer.setUpdateLoops = function(){
     console.log('Setting up loops...');
 
-    GameServer.NPCupdateRate = config.get('updateRates.npc');
+    GameServer.NPCupdateRate = config.get('updateRates.wander');
 
     var loops = {
-        'client': GameServer.updateClients,
-        'npc': GameServer.updateNPC,
-        'walk': GameServer.updateWalks
+        'client': GameServer.updateClients, // send update to clients
+        'aggro': GameServer.checkForAggro,
+        'wander': GameServer.updateNPC, // npc wander behavior
+        'walk': GameServer.updateWalks // update positions
     };
 
     for(var loop in loops){
@@ -511,21 +509,15 @@ GameServer.checkAreaIntegrity = function(area){
     var cells = new SpaceMap();
     for(var x = area.x; x <= area.x+area.w; x++){
         for(var y = area.y; y <= area.y+area.h; y++){
-            //console.log('collision at',x,y,':',PFUtils.checkCollision(x,y));
             if(!GameServer.checkCollision(x,y)) cells.add(x,y,0); // y then x
         }
     }
-    //var grid = new PF.Grid(0,0);
-    //PFUtils.setGridUp(grid,cells,true);
-    //var path = GameServer.findPath(area,{x:area.x+area.w,y:area.y+area.h},grid);
     var integrityPathfinder = new Pathfinder(cells,999);
     var path = integrityPathfinder.findPath(area,{x:area.x+area.w,y:area.y+area.h});
     return (path && path.length > 0);
 };
 
 GameServer.computeBattleArea = function(f1,f2){
-    //var pos1 = f1.getEndOfTile();
-    //var pos2 = f2.getEndOfTile();
     var pos1 = f1.getEndOfPath();
     var pos2 = f2.getEndOfPath();
 
@@ -561,6 +553,7 @@ GameServer.computeBattleArea = function(f1,f2){
     };
 };
 
+// Check if a battle area overlaps with another battel's area
 GameServer.checkBattleOverlap = function(area){
     for(var x = area.x; x < area.x+area.w; x++){
         for(var y = area.y; y < area.y+area.h; y++){
@@ -571,6 +564,7 @@ GameServer.checkBattleOverlap = function(area){
     return null;
 };
 
+// Check if a new battlezone covers other entities
 GameServer.checkForFighter = function(AOIs){
     AOIs.forEach(function(id){
         var aoi = GameServer.AOIs[id];
@@ -580,6 +574,7 @@ GameServer.checkForFighter = function(AOIs){
     });
 };
 
+// Check if the entity has stepped inside a battle area
 GameServer.checkForBattle = function(entity){
     if(!entity.isAvailableForFight() || entity.isInFight()) return;
     var cell = GameServer.battleCells.get(entity.x,entity.y);
@@ -800,8 +795,8 @@ GameServer.handleAOItransition = function(entity,previous){
         newAOIs = AOIs;
     }
 
+    if(entity.setFieldOfVision) entity.setFieldOfVision(AOIs);
     if(entity.isPlayer) {
-        entity.setFieldOfVision(AOIs);
         console.log('Vision AOIs:',AOIs,entity.fieldOfVision);
         GameServer.updateVision();
     }
@@ -821,10 +816,8 @@ GameServer.handleAOItransition = function(entity,previous){
 };
 
 GameServer.updateVision = function(){
-    console.log('Updating vision');
     GameServer.vision = new Set();
     for(var pid in GameServer.players){
-        console.log('Checking field of vision for player',pid);
         var player = GameServer.players[pid];
         player.fieldOfVision.forEach(function(aoi){
            GameServer.vision.add(aoi);
@@ -897,6 +890,13 @@ GameServer.updateWalks = function(){
     });
 };
 
+GameServer.checkForAggro = function(){
+    Object.keys(GameServer.animals).forEach(function(key) {
+        GameServer.animals[key].checkForAggro();
+    });
+    // TODO: add civs
+};
+
 GameServer.updateNPC = function(){
     Object.keys(GameServer.animals).forEach(function(key) {
         var a = GameServer.animals[key];
@@ -909,24 +909,6 @@ GameServer.setUpSettlements = function(){
         GameServer.settlements[key].computeFoodSurplus();
     });
 };
-
-/*GameServer.updateSettlements = function(){
-    Object.keys(GameServer.settlements).forEach(function(key){
-        GameServer.settlements[key].update();
-    });
-};
-
-GameServer.updatePlayers = function(){
-    Object.keys(GameServer.players).forEach(function(key){
-        GameServer.players[key].update();
-    });
-};
-
-GameServer.updateSpawnZones = function(){
-    GameServer.spawnZones.forEach(function(zone){
-        zone.update();
-    });
-};*/
 
 // #############################
 

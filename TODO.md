@@ -202,19 +202,9 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Bonuses
 - Show plant markers based on ability
 * Enemy civ
-MovingEntity (movement)
-- Player
-- NPC
--- Animal (specific wander, aggro, target selection...)
--- Civ (specific wander, aggro, target selection...)
-=> list of civ types, together with their base stats and equipment
-=> refactor checkforhostiles: 
-- Hostiles call their own when ending movement (?)
-- When player ends movement (?), list hostiles in neighborhood and check for each if they should attack hero
-
-- Set up stats and equipment
+- Civ class: battleTeam, aggroMatrix, etc.
+- JSON civ types, together with their base stats and equipment
 - Aggro behavior
-- Battle AI
 - Spawn zones
 - Own orientation pins
 - Wander behavior (squad)
@@ -425,6 +415,34 @@ Testing:
 
 World building:
 --------------
+1/ World creation:
+Multilayer image:
+- One layer for coastlines; trace SVG path, modify manually and then recompute and export path as blueprint
++ fill nodes
+- One layer for forests, based on color detection; consider saving trees in separate data structure (and displaying them as single images like buildings)
+Creation:
+- One script reads blueprints, create chunks with coastlines, fill water
+- (If tiled-trees: one script to apply them)
+NB: trees as images opens the way for ecology dynamics: trees disppearing with time, timber supply
+diminishing, ...
+
+2/ Cartography
+- Has to come from actual in-game world
+- Capture whole game map, with trees and all terrain elements
+- Do so at arbitrary zoom levels
+(- split in chunks)
+- Apply post-processing effects to make it look nice
+
+3/ World editor
+-> Need to visualize game world at different zoom levels
+-> Display and modify buildings
+-> Display and modify spawnzones
+-> Manage trees?
+-> Integrate with admin to display and modify settlement data (+ events etc.) 
+
+4/Chunk editor: used Tiled in world mode
+5/Building editor (visually define shape, collisons, etc.)
+--
 Custom chunk/world editor:
 - Arrows on the fringes of the window allow to move quickly to adjacent chunks
 - See borders of adjacent chunks to match fringe tiles

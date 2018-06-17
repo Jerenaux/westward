@@ -90,10 +90,6 @@ Player.prototype.setSettlement = function(sid){
     this.settlement = GameServer.settlements[this.sid];
 };
 
-Player.prototype.setFieldOfVision = function(aois){
-    this.fieldOfVision = aois;
-};
-
 Player.prototype.setStartingInventory = function(){
     // TODO: move to some config file
     this.giveItem(2,1);
@@ -560,23 +556,6 @@ Player.prototype.onEndOfPath = function(){
     if(this.action.type == 3) GameServer.pickUpItem(this,this.action.id);
 };
 
-Player.prototype.checkForHostiles = function(){
-    var AOIs = Utils.listAdjacentAOIs(this.aoi);
-    for(var i = 0; i < AOIs.length; i++){
-        var aoi = GameServer.AOIs[AOIs[i]];
-        for(var j = 0; j < aoi.entities.length; j++) {
-            var entity = aoi.entities[j];
-            if(!entity.isAnimal) continue;
-            if(!entity.isAggressive()) continue;
-            if(!entity.isAvailableForFight()) continue;
-            if(Utils.chebyshev(this,entity) <= GameServer.battleParameters.aggroRange){
-                console.log(this.getShortID(),'spots',entity.getShortID());
-                GameServer.handleBattle(this,entity,true);
-                break;
-            }
-        }
-    }
-};
 
 Player.prototype.enterBuilding = function(id){
     // TODO: check for proximity

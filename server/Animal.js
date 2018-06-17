@@ -8,8 +8,6 @@ var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var NPC = require('./NPC.js').NPC;
 var GameServer = require('./GameServer.js').GameServer;
 var World = require('../shared/World.js').World;
-var Stats = require('../shared/Stats.js').Stats;
-var Inventory = require('../shared/Inventory.js').Inventory;
 
 var debug = false;
 
@@ -21,11 +19,10 @@ function Animal(x,y,type){
     this.y = y;
     this.inFight = false;
     this.type = type;
-    this.stats = Stats.getSkeleton();
     this.setAggressive();
     this.setWander();
-    this.setStartingStats();
-    this.setLoot();
+    this.setStartingStats(GameServer.animalsData[this.type].stats);
+    this.setLoot(GameServer.animalsData[this.type].loot);
     this.setOrUpdateAOI();
     this.setIdle();
     NPC.call(this);
@@ -34,34 +31,16 @@ function Animal(x,y,type){
 Animal.prototype = Object.create(NPC.prototype);
 Animal.prototype.constructor = Animal;
 
-Animal.prototype.setLoot = function(){
-    this.loot = new Inventory(10);
-    var loot = GameServer.animalsData[this.type].loot;
-    for(var id in loot){
-        this.loot.add(id,loot[id]);
-    }
-};
-
-Animal.prototype.addToLoot = function(id,nb){
-    console.log('Adding ',nb,'of id',id);
-    this.loot.add(id,nb);
-};
-
-Animal.prototype.setStartingStats = function(){
-    var stats = GameServer.animalsData[this.type].stats;
-    for(var s in stats){
-        if(!stats.hasOwnProperty(s)) return;
-        this.setStat(s,stats[s]);
-    }
-};
-
-Animal.prototype.setStat = function(key,value){
-    this.getStat(key).setBaseValue(value);
-};
-
 Animal.prototype.setAggressive = function(){
     // Different from global aggro parameter, specifies if this specific animal should be aggressive pr not
     this.aggressive =  GameServer.animalsData[this.type].aggro;
+
+    // TODO: move to config somehow?
+    this.aggroMatrix = {
+        'Player': true,
+        'Civ': true,
+        'Building': false
+    };
 };
 
 Animal.prototype.setWander = function(){
@@ -70,10 +49,6 @@ Animal.prototype.setWander = function(){
 
 Animal.prototype.doesWander = function(){
     return (this.wander && GameServer.enableWander);
-};
-
-Animal.prototype.isAggressive = function(){
-    return (this.aggressive && GameServer.enableAggro);
 };
 
 Animal.prototype.setSpawnZone = function(zone){
@@ -119,12 +94,9 @@ Animal.prototype.updateIdle = function(){
 };
 
 Animal.prototype.canRange = function(){
-    return true;
-};
-
-Animal.prototype.isInBuilding = function(){
     return false;
 };
+
 
 Animal.prototype.findRandomDestination = function(){
     var r = GameServer.wildlifeParameters.wanderRange;
@@ -146,7 +118,7 @@ Animal.prototype.goToDestination = function(dest){
     return true;
 };
 
-Animal.prototype.checkForHostiles = function(){
+/*Animal.prototype.checkForHostiles = function(){
     if(!this.isAggressive()) return;
     if(this.isInFight()) return;
     var AOIs = Utils.listAdjacentAOIs(this.aoi);
@@ -167,11 +139,7 @@ Animal.prototype.checkForHostiles = function(){
             }
         }
     }
-};
-
-Animal.prototype.isAvailableForFight = function(){
-    return (!this.isDead());
-};
+};*/
 
 Animal.prototype.die = function(){
     MovingEntity.prototype.die.call(this);

@@ -57,7 +57,7 @@
       "w": 2,
       "h": 2
     },
-    "depthOffset": 2,
+    "depthOffset": 3,
     "sprite": "tradepost",
     "recipe": {"3":40},
     "trade": true,
