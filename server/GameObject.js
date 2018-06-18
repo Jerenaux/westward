@@ -17,7 +17,6 @@ GameObject.prototype.setOrUpdateAOI = function(){
     var newAOI = Utils.tileToAOI({x:this.x,y:this.y});
     if(!GameServer.AOIs.hasOwnProperty(newAOI)) console.warn('Wrong AOI',newAOI,'for coordinates',this.x,',',this.y);
     if(newAOI != previousAOI) {
-        //console.log('['+this.constructor.name+' '+this.id+'] moving to AOI '+newAOI);
         if(previousAOI !== null) GameServer.removeFromLocation(this);
         this.aoi = newAOI;
         GameServer.addAtLocation(this);

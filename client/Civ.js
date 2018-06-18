@@ -27,11 +27,15 @@ var Civ = new Phaser.Class({
             left: 117,
             right: 143
         };
-        this.setFrame(this.restingFrames.down);
+        this.setFrame(this.restingFrames.down,false,false);
         this.setOrigin(0.2,0.5);
+
+        var shape = new Phaser.Geom.Polygon([20,15,50,15,50, 60, 20, 60]);
+        this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
+
         this.setVisible(true);
         this.dead = false;
-        this.name = '???';
+        this.name = 'מִ  ת  נַ  גֵ  ד';
 
         this.animPrefix = 'player';
         this.footprintsFrame = 0;

@@ -19,6 +19,7 @@ function Animal(x,y,type){
     this.x = x;
     this.y = y;
     this.type = type;
+    this.xpReward = GameServer.animalsData[this.type].xp || 0;
     this.setAggressive();
     this.setWander();
     this.setStartingStats(GameServer.animalsData[this.type].stats);
@@ -58,7 +59,7 @@ Animal.prototype.setSpawnZone = function(zone){
 Animal.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','path','type','inFight','battlezone','dead']; // list of properties relevant for the client
+    var broadcastProperties = ['id','path','type','inFight','dead']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

@@ -14,7 +14,6 @@ var Moving = new Phaser.Class({
         this.movement = null;
         this.currentPath = [];
 
-        this.setInteractive();
     },
 
     // Sets position regardless of previous position; primarily called by children.setUp()

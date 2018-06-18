@@ -29,6 +29,7 @@ var Animal = new Phaser.Class({
         this.setTexture(animalData.sprite);
         this.setFrame(animalData.frame);
         this.setDisplayOrigin(0);
+        this.setInteractive();
         this.setVisible(true);
         this.dead = false;
         this.name = animalData.name+' '+this.id;

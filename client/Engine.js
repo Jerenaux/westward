@@ -1366,42 +1366,17 @@ Engine.update = function(){
 
 // Processes the global update packages received from the server
 Engine.updateWorld = function(data){  // data is the update package from the server
+    // TODO: store client/server-shared list somewhere
+    var entities = ['animal','building','cell','civ','item','player'];
 
-    /*var track = new Set();
-    if(data.newanimals){
-        data.newanimals.forEach(function(n){
-           track.add(n.id);
-        });
-    }
-    //console.log(track);
-    if(data.removedanimals){
-        data.removedanimals.forEach(function(id){
-            if(track.has(id)) console.warn('ID',id,'present in both new and remove');
-        });
-    }*/
-
-    if(data.newplayers) Engine.createElements(data.newplayers,'player');
-    if(data.newbuildings) Engine.createElements(data.newbuildings,'building');
-    if(data.newanimals) Engine.createElements(data.newanimals,'animal');
-    if(data.newitems) Engine.createElements(data.newitems,'item');
-    if(data.newcells) Engine.createElements(data.newcells,'cell');
-    if(data.newcivs) Engine.createElements(data.newcivs,'cell');
-
-
-    // data.players is an associative array mapping the id's of the entities
-    // to small object indicating which properties need to be updated. The following code iterate over
-    // these objects and call the relevant update functions.
-    if(data.players) Engine.updateElements(data.players,Engine.players);
-    if(data.animals) Engine.updateElements(data.animals,Engine.animals);
-    if(data.buildings) Engine.updateElements(data.buildings,Engine.buildings);
-    if(data.civs) Engine.updateElements(data.civs,Engine.civs);
-
-    if(data.removedplayers) Engine.removeElements(data.removedplayers,Engine.players);
-    if(data.removedanimals) Engine.removeElements(data.removedanimals,Engine.animals);
-    if(data.removeditems) Engine.removeElements(data.removeditems,Engine.items);
-    if(data.removedcells) Engine.removeElements(data.removedcells,Engine.battleCells);
-    if(data.removedbuildings) Engine.removeElements(data.removedbuildings,Engine.buildings);
-    if(data.removedcivs) Engine.removeElements(data.removedcivs,Engine.civs);
+    entities.forEach(function(e){
+        var news = data['new'+e+'s'];
+        var edits = data[e+'s'];
+        var dels = data['removed'+e+'s'];
+        if(news) Engine.createElements(news,e);
+        if(edits) Engine.updateElements(edits,Engine[e+'s']);
+        if(dels) Engine.removeElements(dels,Engine[e+'s']);
+    });
 };
 
 Engine.createElements = function(arr,entityType){

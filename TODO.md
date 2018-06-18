@@ -1,4 +1,6 @@
 Pre-release: 
+- Fix: dead animals move in battle
+- Fix: disappearance of battle cells (general removing of elements problem)?
 
 Release:
 - Newplayer only
@@ -49,6 +51,7 @@ Analytics:
 - Display events in admin
 - Look for nice statistical library
 - Log drains and faucets
+- Log where items are bought/sold
 - Log pathfinding destinations, consider making heatmap in the long term
 - Log as many things as possible: session duration, distance travelled per session, time spent in settlement per session, in nature per session,
 interactions with buildings, time spent in each individual menu, etc.
@@ -79,6 +82,7 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Central shared list of entities
 - Remove global engine hover/out events, use local ones in animals, buildings...
 - From 10.0: use pointer.worldX and worldY to handle location clicks
 - From 10.0: use this.input.setDefaultCursor() to set cursor
@@ -203,8 +207,7 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Bonuses
 - Show plant markers based on ability
 * Enemy civ
-- Client-side civ management
-- JSON civ types, together with their base stats and equipment
+- Trigger battle on click
 - Aggro behavior
 - Spawn zones
 - Own orientation pins
@@ -213,7 +216,12 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Buildings destruction
 - Settlement attack behavior (what time intervals, how many...)
 - Territory zones: if player step in, send small squad to track
-- Camps, own economy?
+- Camps
+- Name generator
+- Camp economy
+- Civs loot equipment and equip it
+- Civs gain XP, level-up, become stronger (increase associated xp reward accordingly)
+- Reflect that in hover card
 * Inventory
 - Click window for items, with use button
 - Click window: display stat effects

@@ -65,11 +65,10 @@ Battle.prototype.managePosition = function(f){
 };
 
 Battle.prototype.addFighter = function(f){
-    console.log('Adding fighter from ',f.x,',',f.y);
     this.fighters.push(f);
     this.managePosition(f);
     this.updateTeams(f.battleTeam,1);
-    f.xpPool = 0;
+    f.xpPool = 0; // running total of XP that the fighter will receive at the end of the fight
     f.setProperty('inFight',true);
     f.stopWalk();
     if(f.isPlayer) f.notifyFight(true);
@@ -238,16 +237,17 @@ Battle.prototype.computeRangedHit = function(a,b){
 Battle.prototype.applyDamage = function(f,dmg){
     f.applyDamage(-dmg);
     if(f.getHealth() == 0){
-        if(f.isAnimal) this.rewardXP(f);
+        if(f.xpReward) this.rewardXP(f.xpReward);
         this.removeFighter(f);
         return true;
     }
     return false;
 };
 
-Battle.prototype.rewardXP = function(animal){
-    var xp = GameServer.animalsData[animal.type].xp || 0;
-    if(!xp) return;
+// Called each time a fighter dies, add its XP to the running total
+Battle.prototype.rewardXP = function(xp){
+    //var xp = GameServer.animalsData[animal.type].xp || 0;
+    //if(!xp) return;
     this.fighters.forEach(function(f){
         if(f.isPlayer) f.xpPool += xp;
     })

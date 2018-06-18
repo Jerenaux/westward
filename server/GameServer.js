@@ -39,6 +39,7 @@ var Player = require('./Player.js').Player;
 var Settlement = require('./Settlement').Settlement;
 var Building = require('./Building.js').Building;
 var Animal = require('./Animal.js').Animal;
+var Civ = require('./Civ.js').Civ;
 var Item = require('./Item.js').Item;
 var Battle = require('./Battle.js').Battle;
 var BattleCell = require('./Battle.js').BattleCell;
@@ -49,16 +50,20 @@ var Prism = require('./Prism.js').Prism;
 
 GameServer.updateStatus = function(){
     console.log('Successful initialization step:',GameServer.initializationSequence[GameServer.initializationStep++]);
-    if(GameServer.initializationStep == GameServer.initializationSequence.length) {
-        console.log('GameServer initialized');
-        GameServer.initialized = true;
-        GameServer.setUpdateLoops();
-        GameServer.onInitialized();
-        GameServer.startEconomy();
-    }else{
-        var next = GameServer.initializationSequence[GameServer.initializationStep];
-        console.log('Moving on to next step:',next);
-        GameServer.initializationMethods[next].call();
+    try {
+        if (GameServer.initializationStep == GameServer.initializationSequence.length) {
+            console.log('GameServer initialized');
+            GameServer.initialized = true;
+            GameServer.setUpdateLoops();
+            GameServer.onInitialized();
+            GameServer.startEconomy();
+        } else {
+            var next = GameServer.initializationSequence[GameServer.initializationStep];
+            console.log('Moving on to next step:', next);
+            GameServer.initializationMethods[next].call();
+        }
+    }catch(e){
+        console.warn(e);
     }
 };
 
@@ -140,6 +145,7 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.textData = JSON.parse(fs.readFileSync('./assets/data/texts.json').toString());
     GameServer.itemsData = JSON.parse(fs.readFileSync('./assets/data/items.json').toString());
     GameServer.animalsData = JSON.parse(fs.readFileSync('./assets/data/animals.json').toString());
+    GameServer.civsData = JSON.parse(fs.readFileSync('./assets/data/civs.json').toString());
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
 
     GameServer.enableWander = config.get('wildlife.wander');
@@ -211,7 +217,7 @@ GameServer.setUpSpawnZones = function(){
 };
 
 GameServer.addCiv = function(x,y){
-    var npc = new Civ(x,y);
+    var npc = new Civ(x,y,0);
     GameServer.civs[npc.id] = npc;
     return npc;
 };
@@ -229,7 +235,7 @@ GameServer.addItem = function(x,y,type){
 };
 
 GameServer.onInitialized = function(){
-    //GameServer.addCiv(529,655);
+    GameServer.addCiv(1203, 167);
     /*console.log('--- Performing on initialization tasks ---');
     var animal = GameServer.addAnimal(1202,168,0);
     animal.die();
@@ -796,7 +802,6 @@ GameServer.handleAOItransition = function(entity,previous){
         console.log('Vision AOIs:',AOIs,entity.fieldOfVision);
         GameServer.updateVision();
     }
-
     newAOIs.forEach(function(aoi){
         //if(entity.constructor.name == 'Player') entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
         if(entity.isPlayer) entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
