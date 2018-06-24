@@ -37,7 +37,7 @@ var Civ = new Phaser.Class({
         this.dead = false;
         this.name = 'מִ  ת  נַ  גֵ  ד';
 
-        this.animPrefix = 'player';
+        this.animPrefix = 'enemy';
         this.footprintsFrame = 0;
         this.printsVertOffset = 10;
 
@@ -50,6 +50,7 @@ var Civ = new Phaser.Class({
         if(data.melee_atk) {
             this.computeOrientation(this.tileX,this.tileY,data.melee_atk.x,data.melee_atk.y);
             this.faceOrientation();
+            this.play(this.animPrefix+'_attack_'+this.orientation);
         }
         Engine.handleBattleUpdates(this,data);
         if(data.dead) this.die();
@@ -64,7 +65,7 @@ var Civ = new Phaser.Class({
     },
 
     die: function(){
-        //this.setFrame(49);
+        this.play(this.animPrefix+'_death');
         this.dead = true;
     },
 
@@ -73,9 +74,9 @@ var Civ = new Phaser.Class({
     handleClick: function(){
         if(BattleManager.inBattle){
             if(Engine.dead) return;
-            //BattleManager.processAnimalClick(this);
+            BattleManager.processNPCClick(this);
         }else{
-            //Engine.processAnimalClick(this);
+            Engine.processNPCClick(this);
         }
     },
 

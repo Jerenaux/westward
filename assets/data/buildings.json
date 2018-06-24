@@ -247,5 +247,43 @@
     "displayProd": true,
     "production": [[25,1]],
     "buildRate":10
+  },
+  "10":{
+    "name": "Farm",
+    "width": 492,
+    "height": 320,
+    "shape": [
+      60, 250,
+      60, 50,
+      110, 0,
+      165, 50,
+      165, 95,
+      450, 100,
+      450, 250
+    ],
+    "collisions": {
+      "x": 1,
+      "y": -6,
+      "w": 14,
+      "h": 5
+    },
+    "entrance": {
+      "x": 3,
+      "y": -2,
+      "w": 1,
+      "h": 1
+    },
+    "icon": "farm",
+    "sprite": "farm",
+    "mainMenu": "production",
+    "accessory": {
+      "frame": "blades1",
+      "x": 110,
+      "y": -235
+    },
+    "depthOffset": 6,
+    "displayProd": true,
+    "production": [[1,1]],
+    "buildRate":10
   }
 }

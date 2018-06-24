@@ -21,9 +21,9 @@ RespawnPanel.prototype.addInterface = function(){
     y += 30;
     this.bar = new MiniProgressBar(this.x+10,this.y+y,this.width-40);
     this.bar.name = "respawn timer";
-    this.bar.setLevel(100,100)
-    var btnx = (this.width-100)/2;
-    this.button = new BigButton(this.x+btnx,this.y+y-15,'Respawn',Engine.respawnClick.bind(this));
+    this.bar.setLevel(100,100);
+    var btnx = this.width/2;
+    this.button = new BigButton(this.x+btnx,this.y+y,'Respawn',Engine.respawnClick.bind(this));
 };
 
 RespawnPanel.prototype.trigger = function(){

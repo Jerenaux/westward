@@ -129,6 +129,9 @@ Battle.prototype.getFighterByID = function(id){
         case 'A':
             map = GameServer.animals;
             break;
+        case 'C':
+            map = GameServer.civs;
+            break;
     }
     return map[id.slice(1)];
 };

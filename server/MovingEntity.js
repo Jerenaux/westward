@@ -67,6 +67,7 @@ MovingEntity.prototype.endPath = function(){
     if(this.flagToStop) this.setProperty('stop',{x:this.x,y:this.y});
     this.moving = false;
     this.flagToStop = false;
+    this.path = null;
     this.onEndOfPath();
 };
 
@@ -75,7 +76,7 @@ MovingEntity.prototype.onEndOfPath = function(){
 };
 
 MovingEntity.prototype.getEndOfPath = function(){
-    if(this.path) {
+    if(this.path && this.path.length) {
         return {
             x: this.path[this.path.length - 1][0],
             y: this.path[this.path.length - 1][1]

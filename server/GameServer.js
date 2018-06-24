@@ -455,12 +455,25 @@ GameServer.findPath = function(from,to){
     return GameServer.pathFinder.findPath(from,to);
 };
 
-GameServer.handleAnimalClick = function(animalID,socketID){
+/*GameServer.handleAnimalClick = function(animalID,socketID){
     var player = GameServer.getPlayer(socketID);
     var animal = GameServer.animals[animalID];
     if(!animal.isDead() && !animal.isInFight()){
         if(Utils.chebyshev(player,animal) <= GameServer.battleParameters.aggroRange) {
             GameServer.handleBattle(player, animal);
+        }else{
+            player.addMsg('I must get closer!');
+        }
+    }
+};*/
+
+GameServer.handleNPCClick = function(data,socketID){
+    var targetID = data.id;
+    var player = GameServer.getPlayer(socketID);
+    var target = (data.type == 0 ? GameServer.animals[targetID] : GameServer.civs[targetID]);
+    if(!target.isDead() && !target.isInFight()){
+        if(Utils.chebyshev(player,target) <= GameServer.battleParameters.aggroRange) {
+            GameServer.handleBattle(player, target);
         }else{
             player.addMsg('I must get closer!');
         }
@@ -887,6 +900,10 @@ GameServer.updateWalks = function(){
     });
     Object.keys(GameServer.animals).forEach(function(key) {
         var a = GameServer.animals[key];
+        if(a.moving) a.updateWalk();
+    });
+    Object.keys(GameServer.civs).forEach(function(key) {
+        var a = GameServer.civs[key];
         if(a.moving) a.updateWalk();
     });
 };

@@ -158,6 +158,8 @@ var Player = new Phaser.Class({
     },
 
     setDestinationAction: function(type,id,x,y){
+        // TODO: centralize somewhere
+        // 1 = enter building, 2 = skin, 3 = pick item, 4 = civ-related
         //console.log('setting to',type,id);
         if(type == 0){
             this.destinationAction = null;

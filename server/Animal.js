@@ -86,7 +86,7 @@ Animal.prototype.setIdle = function(){
 };
 
 Animal.prototype.updateIdle = function(){
-    if(this.inFight) return;
+    if(this.isInFight() || this.isDead()) return;
     this.idleTime -= GameServer.NPCupdateRate;
     if(this.idleTime <= 0){
         var foundPath = this.goToDestination(this.findRandomDestination());
@@ -144,6 +144,7 @@ Animal.prototype.goToDestination = function(dest){
 
 Animal.prototype.die = function(){
     MovingEntity.prototype.die.call(this);
+    this.idle = false;
     if(this.spawnZone) this.spawnZone.decrement('animal',this.type);
 };
 

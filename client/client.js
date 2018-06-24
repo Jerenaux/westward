@@ -130,8 +130,12 @@ Client.sendPath = function(path,action){
     Client.socket.emit('path',{path:path,action:action});
 };
 
-Client.animalClick = function(targetID){
+/*Client.animalClick = function(targetID){
     Client.socket.emit('animalClick',targetID);
+};*/
+
+Client.NPCClick = function(targetID,type){
+    Client.socket.emit('NPCClick',{id:targetID,type:type});
 };
 
 Client.battleAction = function(action,data){

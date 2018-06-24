@@ -48,6 +48,9 @@ BattleManager.getActiveFighter = function(id,debug){
         case 'A':
             map = Engine.animals;
             break;
+        case 'C':
+            map = Engine.civs;
+            break;
     }
     if(debug) console.warn(map);
     return map[id.slice(1)];
@@ -99,11 +102,17 @@ BattleManager.processTileClick = function(tile,pointer){
     BattleManager.actionTaken = true;
 };
 
-BattleManager.processAnimalClick = function(animal){
-    // TODO: replace request logic
+/*BattleManager.processAnimalClick = function(animal){
     if(!BattleManager.canTakeAction()) return;
     if(animal.dead) return;
     Engine.requestBattleAttack(animal);
+    BattleManager.actionTaken = true;
+};*/
+
+BattleManager.processNPCClick = function(target){
+    if(!BattleManager.canTakeAction()) return;
+    if(target.dead) return;
+    Engine.requestBattleAttack(target);
     BattleManager.actionTaken = true;
 };
 

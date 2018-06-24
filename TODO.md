@@ -1,12 +1,29 @@
-Pre-release: 
-- Fix: dead animals move in battle
-- Fix: disappearance of battle cells (general removing of elements problem)?
-
 Release:
 - Newplayer only
 - Push
 - Position buildings
 - Reset food
+
+* Battle system
+* Civics
+* Character panel
+* Craftsmen gameplay
+* Enemy civ
+* Explorer gameplay
+* Inventory
+* Merchant gameplay
+* Misc
+* Orientation
+* Packaging
+* Settlement defense
+* Settlement economy
+* Soldier gameplay
+Design document
+Free
+
+#####################################################
+#####################################################
+#####################################################
 
 Admin
 Analytics
@@ -17,6 +34,7 @@ Cleaning
 * Craftsmen gameplay
 * Enemy civ
 * Explorer gameplay
+* Help
 * Inventory
 * Merchant gameplay
 * Misc
@@ -207,7 +225,6 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Bonuses
 - Show plant markers based on ability
 * Enemy civ
-- Trigger battle on click
 - Aggro behavior
 - Spawn zones
 - Own orientation pins
@@ -222,6 +239,10 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Civs loot equipment and equip it
 - Civs gain XP, level-up, become stronger (increase associated xp reward accordingly)
 - Reflect that in hover card
+* Help
+- Review existing help buttons
+- Add missing help buttons (including on specific lines to describe fatigue, food surplus...)
+- Make tutorial quests (commitment & civic xp, battle, crafting...)
 * Inventory
 - Click window for items, with use button
 - Click window: display stat effects
@@ -239,7 +260,7 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Tax evasion
 - Less XP based on level
 * Misc
-- New camera system?
+- New camera system? ("dead zone")
 https://www.gamasutra.com/blogs/ItayKeren/20150511/243083/Scroll_Back_The_Theory_and_Practice_of_Cameras_in_SideScrollers.php
 -> Doesn't follow in central rect window, only follows when getting out of it and until player stops
 ( allows for small position adjustments)

@@ -95,6 +95,10 @@ Engine.preload = function() {
     this.load.image('coalmine', 'assets/sprites/buildings/coalmine.png');
     this.load.image('ironmine', 'assets/sprites/buildings/ironmine.png');
     this.load.image('goldmine', 'assets/sprites/buildings/goldmine.png');
+    this.load.image('farm', 'assets/sprites/buildings/farm.png');
+    this.load.image('blades1', 'assets/sprites/buildings/blades1.png');
+    this.load.image('blades2', 'assets/sprites/buildings/blades2.png');
+    this.load.image('blades3', 'assets/sprites/buildings/blades3.png');
     //this.load.image('foundations', 'assets/sprites/buildings/foundations.png');
     this.load.image('hunterhut', 'assets/sprites/buildings/hut.png');
 
@@ -117,7 +121,7 @@ Engine.preload = function() {
     this.load.image('minimap', 'assets/sprites/minimap2s.png');
     // pin: https://www.iconfinder.com/icons/173052/map_marker_icon
     this.load.image('skull', 'assets/sprites/skull.png');
-    this.load.image('pin', 'assets/sprites/pin.png');
+    this.load.image('pin', 'assets/sprites/tradeicon6.png');
     this.load.image('x', 'assets/sprites/x.png');
     this.load.image('redpin', 'assets/sprites/redpin.png');
     this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
@@ -345,17 +349,26 @@ Engine.initWorld = function(data){
     Engine.updateAllOrientationPins();
 
 
-    /*if(Client.isNewPlayer()) {
+    if(Client.isNewPlayer()) {
         var w = 400;
         var h = 290;
-        var y = 20;
         var panel = new InfoPanel((UI.getGameWidth() - w) / 2, (UI.getGameHeight() - h) / 2, w, h, 'Welcome');
-        var text = panel.addText(10, y, UI.textsData['welcome'], null, 14, Utils.fonts.normal);
-        var ys = y + text.height + 10;
-        panel.addText(10, ys, UI.textsData['not_implemented'], null, 14, Utils.fonts.normal);
+        panel.setWrap(20);
+
+        var x = 15;
+        var y = 20;
+        UI.textsData['welcome'].forEach(function(t){
+            var txt = panel.addText(x,y,t);
+            y += txt.height+3;
+        });
+
+        //var text = panel.addText(10, y, UI.textsData['welcome'], null, 14, Utils.fonts.fancy);
+        //var ys = y + text.height + 10;
+        //panel.addText(10, ys, UI.textsData['not_implemented'], null, 14, Utils.fonts.normal);
+
         panel.addBigButton('Got it');
         panel.display();
-    }*/
+    }
 
     // todo: move all to dedicated sound manager
     Engine.lastOrientationSound = 0;
@@ -394,12 +407,12 @@ Engine.playLocalizedSound = function(sound,maxVolume,location){
 };
 
 Engine.createAnimations = function(){
+    // Player
     Engine.createWalkAnimation('player_move_right','hero',143,151,15);
     Engine.createWalkAnimation('player_move_up','hero',104,112,15);
     Engine.createWalkAnimation('player_move_down','hero',130,138,15);
     Engine.createWalkAnimation('player_move_left','hero',117,125,15);
     // TODO: reverse them
-    // TODO: add death
     Engine.createAttackAnimation('player_attack_right','hero',195,200);
     Engine.createAttackAnimation('player_attack_down','hero',182,187);
     Engine.createAttackAnimation('player_attack_left','hero',169,174);
@@ -409,6 +422,22 @@ Engine.createAnimations = function(){
     Engine.createAttackAnimation('player_bow_left','hero',221,233);
     Engine.createAttackAnimation('player_bow_up','hero',208,220);
 
+    // Civ
+    Engine.createWalkAnimation('enemy_move_right','enemy',143,151,15);
+    Engine.createWalkAnimation('enemy_move_up','enemy',104,112,15);
+    Engine.createWalkAnimation('enemy_move_down','enemy',130,138,15);
+    Engine.createWalkAnimation('enemy_move_left','enemy',117,125,15);
+
+    Engine.createAttackAnimation('enemy_attack_right','enemy',195,200);
+    Engine.createAttackAnimation('enemy_attack_down','enemy',182,187);
+    Engine.createAttackAnimation('enemy_attack_left','enemy',169,174);
+    Engine.createAttackAnimation('enemy_attack_up','enemy',156,161);
+    Engine.createAttackAnimation('enemy_bow_right','enemy',247,259);
+    Engine.createAttackAnimation('enemy_bow_down','enemy',234,246);
+    Engine.createAttackAnimation('enemy_bow_left','enemy',221,233);
+    Engine.createAttackAnimation('enemy_bow_up','enemy',208,220);
+    
+    // Wolves
     Engine.createWalkAnimation('wolf_move_down','wolves',0,2);
     Engine.createWalkAnimation('wolf_move_left','wolves',12,14);
     Engine.createWalkAnimation('wolf_move_right','wolves',24,26);
@@ -432,6 +461,12 @@ Engine.createAnimations = function(){
     Engine.scene.anims.create(config = {
         key: 'player_death',
         frames: Engine.scene.anims.generateFrameNumbers('hero', { start: 260, end: 265}),
+        frameRate: 10
+    });
+
+    Engine.scene.anims.create(config = {
+        key: 'enemy_death',
+        frames: Engine.scene.anims.generateFrameNumbers('enemy', { start: 260, end: 265}),
         frameRate: 10
     });
 };
@@ -643,6 +678,7 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
     text.setDepth(target.depth+1);
     text.setText('-'+dmg);
 
+    // HP tween
     Engine.scene.tweens.add(
         {
             targets: text,
@@ -657,6 +693,7 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
         }
     );
 
+    // Blink tween
     Engine.scene.tweens.add(
         {
             targets: target,
@@ -1375,7 +1412,7 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
         var dels = data['removed'+e+'s'];
         if(news) Engine.createElements(news,e);
         if(edits) Engine.updateElements(edits,Engine[e+'s']);
-        if(dels) Engine.removeElements(dels,Engine[e+'s']);
+        if(dels) Engine.removeElements(dels,(e == 'cell' ? Engine.battleCells : Engine[e+'s'])); // quick fix
     });
 };
 
@@ -1533,13 +1570,24 @@ Engine.countIcons = function(){
     return count;
 };
 
-Engine.processAnimalClick = function(target){
+/*Engine.processAnimalClick = function(target){
     if(Engine.inPanel) return;
     if(target.dead){
         Engine.player.setDestinationAction(2,target.id,target.tileX,target.tileY); // 2 for animal
         Engine.computePath({x:target.tileX,y:target.tileY});
     }else{
         Client.animalClick(target.id);
+    }
+};*/
+
+Engine.processNPCClick = function(target){
+    if(Engine.inPanel) return;
+    if(target.dead){
+        var action = target.entityType == 'animal' ? 2 : 4;
+        Engine.player.setDestinationAction(action,target.id,target.tileX,target.tileY); // 2 for NPC
+        Engine.computePath({x:target.tileX,y:target.tileY});
+    }else{
+        Client.NPCClick(target.id,(target.entityType == 'animal' ? 0 : 1));
     }
 };
 

@@ -63,6 +63,7 @@ var Moving = new Phaser.Class({
 
     manageOrientationPin: function(){
         if(this.isHero) return;
+        if(!this.orientationPin) return;
         if(this.dead) {
             this.orientationPin.hide();
             return;

@@ -50,6 +50,22 @@ var Building = new Phaser.Class({
             //this.on('pointerover',this.handleOver.bind(this));
         }
 
+        if(buildingData.accessory){
+            this.accessory = Engine.scene.add.sprite(
+                this.x+buildingData.accessory.x,
+                this.y+buildingData.accessory.y,
+                buildingData.accessory.frame
+            );
+            this.accessory.setDepth(this.depth);
+            Engine.scene.tweens.add(
+                {
+                    targets: this.accessory,
+                    angle: '+=360',
+                    duration: 10000,
+                    repeat: -1
+                });
+        }
+
         this.setCollisions(buildingData);
     },
 
@@ -89,6 +105,7 @@ var Building = new Phaser.Class({
 
     remove: function(){
         // TODO: remove collisions
+        if(this.accessory) this.accessory.destroy();
         CustomSprite.prototype.remove.call(this);
         delete Engine.buildings[this.id];
     },

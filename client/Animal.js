@@ -73,9 +73,10 @@ var Animal = new Phaser.Class({
     handleClick: function(){
         if(BattleManager.inBattle){
             if(Engine.dead) return;
-            BattleManager.processAnimalClick(this);
+            BattleManager.processNPCClick(this);
         }else{
-            Engine.processAnimalClick(this);
+            //Engine.processAnimalClick(this);
+            Engine.processNPCClick(this);
         }
     },
 
