@@ -56,9 +56,11 @@ Settlement.prototype.getBuildings = function(){
 
 Settlement.prototype.getBuildingMarkers = function(){
     return this.buildings.map(function(b){
+        var entrance = GameServer.buildingsData[b.type].entrance;
+        var xoffset = (entrance ? entrance.x + 2 : Math.round(b.width/2));
         return {
             marker:'building',
-            x:b.x + Math.round(b.width/2),
+            x: b.x + xoffset,
             y:b.y,
             type:b.type
         };

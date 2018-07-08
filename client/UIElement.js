@@ -2,18 +2,18 @@
  * Created by Jerome on 07-10-17.
  */
 
+// Class for icons of the UI tray
 var UIElement = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function UIElement (x, y, texture, frame, menu) {
-        CustomSprite.call(this, UI.scene, x, y, texture);
-        if(frame) this.setFrame(frame);
+    initialize: function UIElement (x, y, frame, menu) {
+        CustomSprite.call(this, UI.scene, x, y, 'trayicons');
+        this.setFrame(frame);
 
         this.depth = Engine.UIDepth+1;
         this.setScrollFactor(0);
         this.setInteractive();
-        //this.setDisplayOrigin(0,0);
         this.menu = menu;
 
         this.on('pointerdown',this.handleClick.bind(this));

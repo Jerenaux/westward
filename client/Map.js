@@ -216,10 +216,10 @@ var Map = new Phaser.Class({
         }
     },
 
-    addPin: function(x,y,name,texture){
+    addPin: function(x,y,name,frame){
         var location = this.computeMapLocation(x,y);
         var pin = this.getNextPin();
-        pin.setUp(x,y,location.x,location.y,name,texture);
+        pin.setUp(x,y,location.x,location.y,name,frame);
         this.displayedPins.push(pin);
         return pin;
     },
@@ -298,10 +298,12 @@ var Map = new Phaser.Class({
         this.computeDragLimits();
 
         if(this.target == 'player') {
-            this.positionCross = this.addPin(tile.x,tile.y,'Your position','x',true);
+            this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
             this.positionCross.setDepth(this.positionCross.depth+5);
             Engine.player.markers.forEach(function(data){
-                this.addPin(data.x,data.y,Engine.buildingsData[data.type].name);
+                this.addPin(data.x,data.y,
+                    Engine.buildingsData[data.type].name,
+                    Engine.buildingsData[data.type].mapicon);
             },this);
         }
 
@@ -328,13 +330,18 @@ var Map = new Phaser.Class({
 
 var Pin = new Phaser.Class({
 
-    Extends: CustomSprite,
+    //Extends: CustomSprite,
+    Extends: Phaser.GameObjects.RenderTexture,
+
 
     initialize: function Pin (map,mask) {
-        CustomSprite.call(this, UI.scene, 0, 0, 'pin');
+        //CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
+        Phaser.GameObjects.RenderTexture.call(this, UI.scene, 0, 0, 16,16);
+        UI.scene.add.displayList.add(this);
+        //UI.scene.add.updateList.add(this);
+
         this.setDepth(5);
         this.setScrollFactor(0);
-        this.setOrigin(0.5,1);
         this.setVisible(false);
         this.setInteractive();
         if(mask) this.mask = (Boot.WEBGL
@@ -347,11 +354,22 @@ var Pin = new Phaser.Class({
         this.on('pointerout',this.handleOut.bind(this));
     },
 
-    setUp: function(tileX,tileY,x,y,name,texture){
-        if(texture) {
-            this.setTexture(texture);
-            this.setOrigin(0.5);
+    setUp: function(tileX,tileY,x,y,name,frame){
+        /*if(frame) {
+            this.setFrame(frame);
+            this.setOrigin(0.5,1);
+        }*/
+
+        if(frame == 'x'){
+            this.setOrigin(0.2,0.5);
+        }else{
+            this.setOrigin(0.5,1);
         }
+        var icon = Engine.scene.add.sprite(0,0,'mapicons',frame);
+        var bg = Engine.scene.add.sprite(0,0,'mapicons','bg');
+        if(frame != 'x') this.draw(bg.texture,bg.frame,0,0);
+        this.draw(icon.texture,icon.frame,0,0);
+
         this.tileX = tileX;
         this.tileY = tileY;
         this.setDepth(this.depth + this.tileY/1000);
@@ -361,11 +379,11 @@ var Pin = new Phaser.Class({
     },
 
     highlight: function(){
-        this.setTexture('redpin');
+        //this.setTexture('redpin');
     },
 
     unhighlight: function(){
-        this.setTexture('pin');
+        //this.setTexture('pin');
     },
 
     focus: function(){

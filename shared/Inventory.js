@@ -4,9 +4,8 @@
 var onServer = (typeof window === 'undefined');
 
 function Inventory(size){
-    this.items = {}; // item.id -> nb
     this.maxSize = size || 20;
-    this.size = 0;
+    this.clear();
 }
 
 Inventory.prototype.updateItems = function(items){
@@ -14,6 +13,11 @@ Inventory.prototype.updateItems = function(items){
     items.forEach(function(i){
         this.update(i[0],parseInt(i[1]));
     },this);
+};
+
+Inventory.prototype.clear = function(){
+    this.items = {}; // item.id -> nb
+    this.size = 0;
 };
 
 // Replace the amount of an object in the inventory, or add it if non-existent

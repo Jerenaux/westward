@@ -20,6 +20,7 @@ MaterialsPanel.prototype.getNextSlot = function(){
 };
 MaterialsPanel.prototype.displayMaterials = function(){
     var materials = Engine.buildingsData[Engine.currentBuiling.buildingType].recipe;
+    if(!materials) return;
     var keys = Object.keys(materials);
     for(var i = 0; i < keys.length; i++) {
         var item = keys[i];

@@ -4,7 +4,7 @@
 var onServer = (typeof window === 'undefined');
 
 if(onServer){
-    PF = require('./pathfinding.js');
+    var Utils = require('./Utils.js').Utils;
 }
 
 var PFUtils = {
@@ -17,7 +17,7 @@ PFUtils.getDuration = function(sx,sy,ex,ey){ // Compute movement duration, units
     // v = 160px/sec
     // px/(px/sec)
     //console.log(sx+', '+sy+', '+ex+', '+ey);
-    var d = PFUtils.euclidean({
+    var d = Utils.euclidean({
         x: sx,
         y: sy
     },{
@@ -48,31 +48,6 @@ PFUtils.trimPath = function(path,map){
     };
 };
 
-PFUtils.euclidean = function(a,b){
-    return Math.sqrt(Math.pow(a.x-b.x,2)+Math.pow(a.y- b.y,2));
-};
-
-PFUtils.isInPolygon = function (polygon, x, y)  // polygon is array of points
-{
-    var inside = false;
-
-    for (var i = -1, j = polygon.length - 1; ++i < polygon.length; j = i)
-    {
-        var ix = polygon[i].x;
-        var iy = polygon[i].y;
-
-        var jx = polygon[j].x;
-        var jy = polygon[j].y;
-
-        if (((iy <= y && y < jy) || (jy <= y && y < iy)) && (x < (jx - ix) * (y - iy) / (jy - iy) + ix))
-        {
-            inside = !inside;
-        }
-    }
-
-    return inside;
-};
-
 PFUtils.buildingCollisions = function(tx,ty,data,collisionMap){
     var coll = data.collisions;
 
@@ -92,24 +67,5 @@ PFUtils.buildingCollisions = function(tx,ty,data,collisionMap){
     }
 };
 
-/*PFUtils.collisionsFromShape = function(shape,tileX,tileY,width,height,map,checkOnly){ // shape is array of points
-    for(var x = 0; x < width; x += 32){
-        var px = x;
-        for(var y = 0; y < height; y += 32) {
-            var py = y;
-            if(PFUtils.isInPolygon(shape,px,py)){
-                var wx = tileX + x/32;
-                var wy = tileY + y/32;
-                if(checkOnly){
-                    if(map.get(wy,wx)) return false;
-                }else {
-                    //console.log('adding collision at',wx,wy);
-                    map.add(wx, wy, 1); // /!\  x/y order
-                }
-            }
-        }
-    }
-    return true;
-};*/
 
 if (onServer) module.exports.PFUtils = PFUtils;

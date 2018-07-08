@@ -14,10 +14,11 @@ var UI = {
 
     preload: function () {
         UI.scene = this;
-        this.input.setGlobalTopOnly(true); // Prevent clicks to bubble down to game scene
-        console.log('preloading UI');
+        this.input.setGlobalTopOnly(true); // Prevent clicks from bubbling down to game scene
+
         this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
         this.load.spritesheet('icons2', 'assets/sprites/icons.png',{frameWidth:25,frameHeight:24});
+
         this.load.json('texts', 'assets/data/texts.json');
         this.load.json('classes', 'assets/data/classes.json');
 

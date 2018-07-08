@@ -9,6 +9,13 @@ var myArgs = require('optimist').argv;
 var indir = myArgs.i;
 var sprites = [];
 
+/*
+* Args:
+*  -i : input dir
+*  -o : output dir
+*  -n : output file name
+* */
+
 fs.readdir(indir,function(err,files){
     if(err) throw err;
     // List sprites to pack

@@ -65,7 +65,7 @@ BuildingsPanel.prototype.displayListing = function(){
             if (Engine.currentMenu.panels['map']) {
                 var data = listing[i];
                 var map = Engine.currentMenu.panels['map'].map;
-                var pin = map.addPin(data.x, data.y, buildingTypeData.name);
+                var pin = map.addPin(data.x, data.y, buildingTypeData.name, buildingTypeData.mapicon);
                 slot.pin = pin;
                 slot.clearCallbacks();
                 slot.updateCallback('pointerover', pin.highlight.bind(pin));

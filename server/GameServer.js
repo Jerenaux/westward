@@ -235,7 +235,7 @@ GameServer.addItem = function(x,y,type){
 };
 
 GameServer.onInitialized = function(){
-    GameServer.addCiv(1203, 167);
+    //GameServer.addCiv(1203, 167);
     /*console.log('--- Performing on initialization tasks ---');
     var animal = GameServer.addAnimal(1202,168,0);
     animal.die();

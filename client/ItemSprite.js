@@ -24,7 +24,7 @@ var ItemSprite = new Phaser.Class({
     setUp: function(id,data,callback){
         this.setTexture(data.atlas);
         this.setFrame(data.frame);
-        this.setDisplayOrigin(Math.floor(this.frame.width/2),Math.floor(this.frame.height/2));
+        this.setOrigin(0.5);
 
         this.itemID = id;
         this.name = data.name;

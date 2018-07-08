@@ -81,7 +81,7 @@ interactions with buildings, time spent in each individual menu, etc.
 Cleaning:
 --------
 Performance:
-- Remove unnecessary files (pathfinding lib, old building sprites...)
+- Remove unnecessary files
 - Use pool for notifications
 - Avoid duplicate pins in maps, danger pins etc.
 - Fix "already existing/non-existing" bugs
@@ -139,6 +139,7 @@ Order:
 Content:
 -------
 * Ambiance
+- Enemy civs talk in fight (speech bubbles)
 - Carcasses, traces of fight
 - Paths along most-travelled paths
 - Location sfx for each building
@@ -161,18 +162,21 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Effect of fatigue on fighting
 - Compute probability of items breaking and discard them
 - Accommodate NPC
-- Display health somehow
+- Display health of enemies somehow
 - Let NPC use items (restore health, ...)
-- Allow 3-way fights (civs vs animals vs players)
+- 3-way battles
 * Civics
+- Civic slots: send building type&id bundles, client stores two inventories, for logic and icon display
 - Finish all civic panel related stuff (commitment, etc.)
+- Server side: check that not committing twice to same building
 - Apply taxes
 - Civic abilities
 - Change settlement
-- Update population based on players
+- Update population based on players (requires permanent players)
 - Elections
 - Naming officials
 * Character panel
+-> Indicate starvation level of settlement
 - restore "setClass" to use to compute different XP gains per class
 - Adjust XP gains per class
 - Display health, fatigue and gold permanently in HUD
@@ -193,7 +197,8 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Dismantling
 - Quests
 * Explorer gameplay
-- Map mechanics
+- Map mechanics:
+- Buggy building centering in fort?
 -> Zoom:
 --> Fix zoom-out out of map bounds
 --> Zoom in/out with scroll 
@@ -243,6 +248,7 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Review existing help buttons
 - Add missing help buttons (including on specific lines to describe fatigue, food surplus...)
 - Make tutorial quests (commitment & civic xp, battle, crafting...)
+- Pop-up boxes describing things first time (first time in fort, workshop, character menu...)
 * Inventory
 - Click window for items, with use button
 - Click window: display stat effects
@@ -260,6 +266,14 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Tax evasion
 - Less XP based on level
 * Misc
+- Fatigue 
+-> Accumulate it with actions, server-side ("stamina"): walking, committing, crafting, ...
+-> Relate to food surplus
+-> Display in character panel
+-> Impact on actions
+- Rest
+- Campfires (+ leftovers + orientation pin + long distance smoke pins)
+- Fix continuous movement system
 - New camera system? ("dead zone")
 https://www.gamasutra.com/blogs/ItayKeren/20150511/243083/Scroll_Back_The_Theory_and_Practice_of_Cameras_in_SideScrollers.php
 -> Doesn't follow in central rect window, only follows when getting out of it and until player stops
@@ -271,17 +285,12 @@ or
 or
 -> Moves when cursor on sides (refresh pins), to some extent
 -> Also moves using keystrokes; space to center
-- Fix continuous movement system
-- Fatigue 
-- Rest
-- Campfires (+ leftovers + orientation pin + long distance smoke pins)
-- Respawn losses
+- Respawn losses?
 - Messaging
 - Leaderboards
 - View info on other players (levels...)
 - Guilds
 * Orientations
-- Pins for fights
 - Pins for gunshots and explosions (requires special networking for long-distance sounds)
 -> Much slower noise variation according to distance (since heard from very far)
 -> Pin disappears after a few seconds
@@ -328,10 +337,8 @@ furnace system?
 Add shop interface as well
 Display recipes with building and class restrictions
 Update help text of recipes
-Resource flow to trade post
+Resource flow from all resource buildings to trade post
 Gold flow from tarde post to fort
-Add all other mines (iron, sulfur, gold) + flows
-Add wood and stone flow to trade post
 Specific interface for workshop, with own stock and settlement stock + gold
 -> 100% own stock or 100% city stock to begin with
 -> If using city stock, created item also lands in city stock
@@ -346,7 +353,6 @@ Make spawn zones for plants/shrooms/etc.
 Make separate brewing interface, similar but with adjustable dosage
 Add "brewing" time
 Add checkboxes for what should be boiled or grinded
-- Resources flow
 - Dev levels
 - Impact of dev level on exploration XP reward
 - Let chancellor set prices in trade post
@@ -492,3 +498,20 @@ Manage spawn zones in editor
 - Store forests and trees separately (trees.json) during dev?
 -> During flattening, read that file and draw trees tile by tile
 -> Test high-layers after flattening
+
+
+UI:
+---
+- 8-directional characters, + attack (ranged & melee), object, die animations ...
+- Mouse pointers for attacks (ranged & melee), in-battle item use, pick ups, buildings, moving, ...
+- Movement target indicator
+- Better battle tiles
+- Battle UI
+- Crafting/Workshop UI
+- Better orientation pins (w/ way to indicate if in-fight)
+- Better new player screens (class selection, settlement selection...)
+- Abilities screen, civic screen...
+- Landscape, trees, ...
+- Animals (w/ animations)
+- Enemy civs, enemy camps 
+- Logo 

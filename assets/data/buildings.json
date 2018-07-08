@@ -28,6 +28,7 @@
     },
     "depthOffset": 2,
     "sprite": "fort",
+    "mapicon": "star",
     "mainMenu": "fort",
     "fort": true,
     "staff": true,
@@ -59,6 +60,7 @@
     },
     "depthOffset": 3,
     "sprite": "tradepost",
+    "mapicon": "money",
     "recipe": {"3":40},
     "trade": true,
     "displayProd": false,
@@ -78,10 +80,14 @@
     },
     "depthOffset": 1,
     "sprite": "tower",
+    "mapicon": "tower",
     "recipe": {"3":60},
     "icon": "tower",
     "displayProd": false,
     "buildRate":2
+  },
+  "3": {
+    "name": "Workshop"
   },
   "5":{
     "name": "Hunter hut",
@@ -113,6 +119,7 @@
     },
     "depthOffset": 2,
     "sprite": "hunterhut",
+    "mapicon": "meat",
     "icon": "hut",
     "mainMenu": "production",
     "displayProd": true,
@@ -146,6 +153,7 @@
     },
     "icon": "lumbercamp",
     "sprite": "lumbercamp",
+    "mapicon": "wood",
     "mainMenu": "production",
     "depthOffset": 2,
     "displayProd": true,
@@ -177,6 +185,7 @@
       "h": 2
     },
     "icon": "mine",
+    "mapicon": "coal",
     "sprite": "coalmine",
     "mainMenu": "production",
     "depthOffset": 3,
@@ -209,6 +218,7 @@
       "h": 2
     },
     "icon": "mine",
+    "mapicon": "iron",
     "sprite": "ironmine",
     "mainMenu": "production",
     "depthOffset": 3,
@@ -242,6 +252,7 @@
     },
     "icon": "mine",
     "sprite": "goldmine",
+    "mapicon": "gold",
     "mainMenu": "production",
     "depthOffset": 3,
     "displayProd": true,
@@ -275,6 +286,7 @@
     },
     "icon": "farm",
     "sprite": "farm",
+    "mapicon": "wheat",
     "mainMenu": "production",
     "accessory": {
       "frame": "blades1",

@@ -16,13 +16,17 @@ ClassMiniPanel.prototype.setClass = function(id){
 
 ClassMiniPanel.prototype.addInterface = function(){
     var xoffset = 10;
-    var txts = this.addPolyText(xoffset,17,["Level ","10"," - ","100/100",UI.textsData['classxp']],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
+    var txts = this.addPolyText(xoffset,17,["Level ","10"," - ","0/100",UI.textsData['classxp']],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
     this.lvlTxt = txts[1];
     this.xpTxt = txts[3];
     var classbar = new MiniProgressBar(this.x+xoffset,this.y+42,this.width-30);
     classbar.name = 'class xp bar';
     classbar.setLevel(100,100);
     this.bar = classbar;
+    this.button = new BigButton(this.x+60,this.y+this.height-25,'Abilities',function(){
+        console.log('click');
+    });
+    this.addPolyText(160,this.height-35,['0','AP'],[Utils.colors.gold,Utils.colors.white],16);
 };
 
 ClassMiniPanel.prototype.update = function(){
@@ -34,14 +38,14 @@ ClassMiniPanel.prototype.update = function(){
 
 ClassMiniPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
-    //this.button.display();
     this.bar.display();
+    this.button.display();
     this.displayTexts();
 };
 
 ClassMiniPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
-    //this.button.hide();
     this.bar.hide();
+    this.button.hide();
     this.hideTexts();
 };

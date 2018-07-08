@@ -58,6 +58,13 @@ var Hero = new Phaser.Class({
         //console.log(this.viewRect);
     },
 
+    setCommitSlots: function(commitSlots){
+        if(!this.commitSlots) this.commitSlots = new Inventory(commitSlots.max);
+        commitSlots.slots.forEach(function(s){
+            this.commitSlots.add(s,1);
+        },this);
+    },
+
     // ### UPDATES #####
 
     handleDeath: function(dead){
@@ -108,7 +115,9 @@ var Hero = new Phaser.Class({
     },
 
     updateCommitSlots: function(commitSlots){
-        this.commitSlots = commitSlots;
+        //this.commitSlots = commitSlots;
+        this.commitSlots.clear();
+        this.setCommitSlots(commitSlots);
         this.updateEvents.add('commit');
         // TODO: add sound effect
     },

@@ -79,6 +79,7 @@ var Moving = new Phaser.Class({
     },
 
     move: function(path){
+        //if(this.isHero) console.log('move from (',path[0][0],',',path[0][1],') to (',path[path.length-1][0],',',path[path.length-1][1],')');
         if(path.length <= 1) {
             this.endMovement();
             return;

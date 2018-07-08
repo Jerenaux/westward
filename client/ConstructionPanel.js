@@ -19,8 +19,8 @@ ConstructionPanel.prototype.addInterface = function(){
     var barx = (this.width-barw)/2;
     this.bar = new BigProgressBar(this.x+barx,this.y+100,barw,'gold');
     this.bar.name = 'construction progress bar';
-    var btnx = (this.width-100)/2;
-    this.button = new BigButton(this.x+btnx,this.y+250,'Commit!',Engine.commitClick);
+    var btnx = this.width/2;
+    this.button = new BigButton(this.x+btnx,this.y+260,'Commit!',Engine.commitClick);
 };
 
 ConstructionPanel.prototype.update = function(){

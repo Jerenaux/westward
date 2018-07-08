@@ -9,14 +9,17 @@ var Building = new Phaser.Class({
     Extends: CustomSprite,
 
     initialize: function Building() {
-        CustomSprite.call(this, Engine.scene, 0, 0);
+        CustomSprite.call(this, Engine.scene, 0, 0, 'buildings_sprites');
         this.entityType = 'building';
     },
 
     setUp: function (data) {
         var buildingData = Engine.buildingsData[data.type];
-        var sprite = (data.built ? buildingData.sprite : Engine.buildingsData[FOUNDATIONS_ID].sprite);
-        this.setTexture(sprite);
+        var sprite = buildingData.sprite;
+        if(!data.built) sprite += '_construction';
+
+        //this.setTexture(sprite);
+        this.setFrame(sprite);
         this.setVisible(true);
 
         data.y++;
@@ -39,8 +42,9 @@ var Building = new Phaser.Class({
                 y: this.ty + buildingData.entrance.y
             };
         }
-        this.setBuilt(data.built);
+
         this.setDepth(Engine.buildingsDepth + (this.ty - buildingData.depthOffset)/1000);
+        this.setBuilt(data.built);
 
         if(buildingData.shape) {
             var shape = new Phaser.Geom.Polygon(buildingData.shape);
@@ -49,6 +53,14 @@ var Building = new Phaser.Class({
 
             //this.on('pointerover',this.handleOver.bind(this));
         }
+
+        this.setCollisions(buildingData);
+    },
+
+    build: function () {
+        this.built = true;
+        var buildingData = Engine.buildingsData[this.buildingType];
+        this.setFrame(buildingData.sprite);
 
         if(buildingData.accessory){
             this.accessory = Engine.scene.add.sprite(
@@ -65,14 +77,7 @@ var Building = new Phaser.Class({
                     repeat: -1
                 });
         }
-
-        this.setCollisions(buildingData);
-    },
-
-    build: function () {
-        this.built = true;
-        this.setTexture(Engine.buildingsData[this.buildingType].sprite);
-        this.setTilePosition(this.tx,this.ty,true);
+        //this.setTilePosition(this.tx,this.ty,true);
     },
 
     update: function (data) {

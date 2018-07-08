@@ -10,10 +10,15 @@ function InventoryPanel(x,y,width,height,title,invisible){
     this.slotsCounter = 0;
     this.slotsAdded = false;
     this.zone = this.createZone();
+    this.dataMap = Engine.itemsData;
 }
 
 InventoryPanel.prototype = Object.create(Panel.prototype);
 InventoryPanel.prototype.constructor = InventoryPanel;
+
+InventoryPanel.prototype.setDataMap = function(map){
+    this.dataMap = map;
+};
 
 InventoryPanel.prototype.createZone = function(){
     var zone = UI.scene.add.zone(0,0,0,0);
@@ -81,6 +86,7 @@ InventoryPanel.prototype.setSlotFrame = function(slot,row,col,i){
     if(col == this.config.maxwidth-1 || i == this.inventory.maxSize-1) frame += 'right';
     if(frame == initialName) frame += 'middle';
     slot.setFrame(frame);
+    if(col == 0) slot.fringeSlot = true;
 };
 
 InventoryPanel.prototype.getNextSprite = function(){
@@ -127,7 +133,10 @@ InventoryPanel.prototype.displayInventory = function(){
             if(!this.applyFilter(item)) continue;
         }
         var sprite = this.getNextSprite();
-        sprite.item.setUp(item,Engine.itemsData[item],this.itemCallback);
+        sprite.item.setUp(item,this.dataMap[item],this.itemCallback);
+        var slot = this.slots[nbDisplayed];
+        if(slot.fringeSlot) sprite.item.setOrigin(sprite.item.originX-0.1,sprite.item.originY);
+
         if(this.hasSoftFilter()){
             if(!this.applyFilter(item)) sprite.item.disable();
         }

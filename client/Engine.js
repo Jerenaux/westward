@@ -38,10 +38,49 @@ var Engine = {
 Engine.preload = function() {
     Engine.useTilemaps = false;
 
-    this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64});
+    // Characters
     this.load.spritesheet('enemy', 'assets/sprites/enemy.png',{frameWidth:64,frameHeight:64});
-    this.load.spritesheet('faces', 'assets/sprites/faces.png',{frameWidth:32,frameHeight:32});
+    this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64});
+    this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
 
+    // Misc
+    this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
+    this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
+    this.load.spritesheet('faces', 'assets/sprites/faces.png',{frameWidth:32,frameHeight:32});
+    this.load.spritesheet('footsteps', 'assets/sprites/footstepssheet.png',{frameWidth:16,frameHeight:16});
+    this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
+
+    // Animations
+    this.load.spritesheet('sword_anim', 'assets/sprites/Sword1.png',{frameWidth:96,frameHeight:96});
+    //this.load.spritesheet('death', 'assets/sprites/death.png',{frameWidth:48,frameHeight:48});
+
+    // Buildings
+    this.load.atlas('buildings_sprites', 'assets/sprites/buildings.png', 'assets/sprites/buildings.json');
+
+    // Icons
+    this.load.atlas('mapicons', 'assets/sprites/mapicons.png', 'assets/sprites/mapicons.json');
+    this.load.atlas('trayicons', 'assets/sprites/trayicons.png', 'assets/sprites/trayicons.json');
+
+    this.load.atlas('aok', 'assets/sprites/aok.png', 'assets/sprites/aok.json');
+    this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
+    this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
+    this.load.atlas('items_gr', 'assets/sprites/items_gr.png', 'assets/sprites/items.json');
+    this.load.atlas('items2_gr', 'assets/sprites/resources_full_gr.png', 'assets/sprites/resources_full.json');
+
+    // Misc
+    this.load.image('bug', 'assets/sprites/bug.png');
+    this.load.image('orientation', 'assets/sprites/orientation.png');
+    this.load.image('wolforient', 'assets/sprites/wolforient.png');
+    this.load.image('tail', 'assets/sprites/tail.png');
+    this.load.image('scrollbgh', 'assets/sprites/scroll_horiz.png');
+    this.load.image('longscroll', 'assets/sprites/longscroll.png');
+    this.load.image('radial3', 'assets/sprites/radial3.png');
+    this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
+    this.load.image('fullmap', 'assets/sprites/fortmap.png');
+    this.load.image('fullmap_zoomed', 'assets/sprites/fortmap_01.png');
+    this.load.image('minimap', 'assets/sprites/minimap2s.png');
+
+    // SFX
     Engine.audioFiles = [];
     this.load.audio('footsteps','assets/sfx/footsteps.wav');
     this.load.audio('sellbuy','assets/sfx/sell_buy_item.wav');
@@ -73,60 +112,6 @@ Engine.preload = function() {
     this.load.audio('wind1','assets/sfx/wind1.wav');
     this.load.audio('wind2','assets/sfx/wind2.wav');
     this.load.audio('wind3','assets/sfx/wind3.wav');
-
-    this.load.spritesheet('footsteps', 'assets/sprites/footstepssheet.png',{frameWidth:16,frameHeight:16});
-    this.load.image('bug', 'assets/sprites/bug.png');
-
-    this.load.image('scroll', 'assets/sprites/scroll.png');
-    this.load.image('tome', 'assets/sprites/tome.png');
-    this.load.image('tools', 'assets/sprites/tools.png');
-    this.load.image('backpack', 'assets/sprites/backpack.png');
-    this.load.image('coin', 'assets/sprites/coin.png');
-    this.load.image('map', 'assets/sprites/map.png');
-    this.load.image('self_map', 'assets/sprites/self_map.png');
-    this.load.image('hammer', 'assets/sprites/hammer.png');
-    this.load.image('envelope', 'assets/sprites/envelope.png');
-    this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
-
-    this.load.image('fort', 'assets/sprites/buildings/fort3.png');
-    this.load.image('tradepost', 'assets/sprites/buildings/tradepost2.png');
-    this.load.image('tower', 'assets/sprites/buildings/tower2.png');
-    this.load.image('lumbercamp', 'assets/sprites/buildings/lumbercamp.png');
-    this.load.image('coalmine', 'assets/sprites/buildings/coalmine.png');
-    this.load.image('ironmine', 'assets/sprites/buildings/ironmine.png');
-    this.load.image('goldmine', 'assets/sprites/buildings/goldmine.png');
-    this.load.image('farm', 'assets/sprites/buildings/farm.png');
-    this.load.image('blades1', 'assets/sprites/buildings/blades1.png');
-    this.load.image('blades2', 'assets/sprites/buildings/blades2.png');
-    this.load.image('blades3', 'assets/sprites/buildings/blades3.png');
-    //this.load.image('foundations', 'assets/sprites/buildings/foundations.png');
-    this.load.image('hunterhut', 'assets/sprites/buildings/hut.png');
-
-    this.load.atlas('aok', 'assets/sprites/aok.png', 'assets/sprites/aok.json');
-    this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
-    this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
-    this.load.atlas('items_gr', 'assets/sprites/items_gr.png', 'assets/sprites/items.json');
-    this.load.atlas('items2_gr', 'assets/sprites/resources_full_gr.png', 'assets/sprites/resources_full.json');
-    this.load.spritesheet('marker', 'assets/sprites/marker.png',{frameWidth:32,frameHeight:32});
-    this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
-    this.load.image('orientation', 'assets/sprites/orientation.png');
-    this.load.image('wolforient', 'assets/sprites/wolforient.png');
-    this.load.image('tail', 'assets/sprites/tail.png');
-    this.load.image('scrollbgh', 'assets/sprites/scroll_horiz.png');
-    this.load.image('longscroll', 'assets/sprites/longscroll.png');
-    this.load.image('radial3', 'assets/sprites/radial3.png');
-    this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
-    this.load.image('fullmap', 'assets/sprites/fortmap.png');
-    this.load.image('fullmap_zoomed', 'assets/sprites/fortmap_01.png');
-    this.load.image('minimap', 'assets/sprites/minimap2s.png');
-    // pin: https://www.iconfinder.com/icons/173052/map_marker_icon
-    this.load.image('skull', 'assets/sprites/skull.png');
-    this.load.image('pin', 'assets/sprites/tradeicon6.png');
-    this.load.image('x', 'assets/sprites/x.png');
-    this.load.image('redpin', 'assets/sprites/redpin.png');
-    this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
-    this.load.spritesheet('sword_anim', 'assets/sprites/Sword1.png',{frameWidth:96,frameHeight:96});
-    this.load.spritesheet('death', 'assets/sprites/death.png',{frameWidth:48,frameHeight:48});
 
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('itemsData', 'assets/data/items.json');
@@ -276,6 +261,14 @@ Engine.create = function(){
     Engine.animalsData = Engine.scene.cache.json.get('animals');
     Engine.itemsData = Engine.scene.cache.json.get('itemsData');
 
+    Engine.buildingIconsData = {};
+    for(var building in Engine.buildingsData){
+        Engine.buildingIconsData[building] = {
+            'atlas': 'aok',
+            'frame': Engine.buildingsData[building].icon
+        };
+    }
+
     Engine.createMarker();
     Engine.createAnimations();
 
@@ -292,7 +285,6 @@ Engine.create = function(){
     Engine.scene.input.on('drag', Engine.handleDrag);
     Engine.scene.input.keyboard.on('keydown', Engine.handleKeyboard);
 
-    //PFUtils.setup(Engine);
     Engine.collisions = new SpaceMap();
     Engine.pathFinder = new Pathfinder(Engine.collisions,Engine.maxPathLength);
 
@@ -362,10 +354,6 @@ Engine.initWorld = function(data){
             y += txt.height+3;
         });
 
-        //var text = panel.addText(10, y, UI.textsData['welcome'], null, 14, Utils.fonts.fancy);
-        //var ys = y + text.height + 10;
-        //panel.addText(10, ys, UI.textsData['not_implemented'], null, 14, Utils.fonts.normal);
-
         panel.addBigButton('Got it');
         panel.display();
     }
@@ -386,6 +374,13 @@ Engine.initWorld = function(data){
         {name:'wind3',volume:1}
     ],17000);
 
+    /*var rt = Engine.scene.add.renderTexture(400, 300, 800, 600);
+    rt.setScrollFactor(0);
+    rt.setDepth(10);
+    var pin = Engine.scene.add.sprite(0,0,'mapicons','iron');
+    var bg = Engine.scene.add.sprite(0,0,'mapicons','bg');
+    rt.draw(bg.texture,bg.frame,100,100);
+    rt.draw(pin.texture,pin.frame,100,100);*/
 };
 
 Engine.ambientSounds = function(sounds,interval){
@@ -496,18 +491,20 @@ Engine.toggleChatBar = function(){
     Engine.chatBar.toggle();
 };
 
-Engine.getCommitSlots = function(){
+/*Engine.getCommitSlots = function(){
     return Engine.player.commitSlots.slots;
-};
+};*/
 
 Engine.canCommit = function(){
     if(!Engine.hasFreeCommitSlot()) return;
-    var idx = Engine.getCommitSlots().indexOf(Engine.currentBuiling.id);
-    return (idx == -1);
+    //var idx = Engine.getCommitSlots().indexOf(Engine.currentBuiling.id);
+    //return (idx == -1);
+    return !Engine.player.commitSlots.hasItem(Engine.currentBuiling.id);
 };
 
 Engine.hasFreeCommitSlot = function(){
-    return Engine.getCommitSlots().length < Engine.player.commitSlots.max;
+    //return Engine.getCommitSlots().length < Engine.player.commitSlots.max;
+    return !Engine.player.commitSlots.isFull();
 };
 
 Engine.manageDeath = function(){
@@ -580,16 +577,16 @@ Engine.makeUI = function(){
     var gap = 50;
     var x = 960;
     var y = 535;
-    var letter = new UIElement(x,y,'envelope',null,Engine.menus.messages);
+    var letter = new UIElement(x,y,'envelope',Engine.menus.messages);
     UIelements.push(letter);
     x -= gap;
-    UIelements.push(new UIElement(x,y,'self_map',null,Engine.menus.map));
+    UIelements.push(new UIElement(x,y,'self_map',Engine.menus.map));
     x -= gap;
-    UIelements.push(new UIElement(x,y,'scroll',null,Engine.menus.character));
+    UIelements.push(new UIElement(x,y,'scroll',Engine.menus.character));
     x -= gap;
-    UIelements.push(new UIElement(x,y,'tools',null,Engine.menus.crafting));
+    UIelements.push(new UIElement(x,y,'tools',Engine.menus.crafting));
     x -= gap;
-    UIelements.push(new UIElement(x,y,'backpack',null,Engine.menus.inventory));
+    UIelements.push(new UIElement(x,y,'backpack',Engine.menus.inventory));
     x -= gap;
     Engine.UIelements = UIelements;
     Engine.UIHolder.resize(Engine.getHolderSize());
@@ -625,7 +622,7 @@ Engine.makeUI = function(){
 };
 
 Engine.addMenuIcon = function(x,y,frame,menu){
-    var icon = new UIElement(x,y,frame,null,menu);
+    var icon = new UIElement(x,y,frame,menu);
     icon.setVisible(false);
     Engine.UIelements.push(icon);
     menu.setIcon(icon);
@@ -705,6 +702,9 @@ Engine.handleBattleAnimation = function(animation,target,dmg){
                 target.setAlpha(1); // so that if it takes over another tween immediately, it starts from the proper alpha value
             }
         });
+
+    // Orientation pin
+
 };
 
 Engine.handleMissAnimation = function(target){
@@ -819,7 +819,7 @@ Engine.makeProductionMenu = function(){
 Engine.makeConstructionMenu = function(){
     var w = 400;
     var x = (Engine.getGameConfig().width-w)/2;
-    var padding = 10;
+    var padding = 0;
     var progressh = 300;
     var progressy = 100;
     var invy = progressy+progressh+padding;
@@ -832,13 +832,13 @@ Engine.makeConstructionMenu = function(){
     var progress = new ConstructionPanel(x,progressy,w,progressh);
     progress.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['progress_help']);
     constr.addPanel('progress',progress);
-    var materials = new MaterialsPanel(x,invy,w,materialh,'Materials');
-    constr.addPanel('materials',materials);
+    //var materials = new MaterialsPanel(x,invy,w,materialh,'Materials');
+    //constr.addPanel('materials',materials);
     var prod = new ProductivityPanel(prodx,prody,prodw,100,'Productivity modifiers');
     prod.addButton(prodw-30, 8, 'blue','help',null,'',UI.textsData['productivity_help']);
     constr.addPanel('prod',prod);
 
-    constr.addEvent('onUpdateShop',materials.update.bind(materials));
+    //constr.addEvent('onUpdateShop',materials.update.bind(materials));
     constr.addEvent('onUpdateConstruction',progress.update.bind(progress));
     constr.addEvent('onUpdateProductivity',prod.update.bind(prod));
     return constr;
@@ -1107,7 +1107,10 @@ Engine.makeCharacterMenu = function(){
     var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
 
     var commit = menu.addPanel('commit',new InventoryPanel(citizenx+10,citizeny,150,100,'',true));
-    commit.setInventory(new Inventory(Engine.player.commitSlots.max),3,false);
+    commit.setInventory(Engine.player.commitSlots,3,false);
+    commit.setDataMap(Engine.buildingIconsData);
+
+    menu.addPanel('abilities',new Panel(citizenx,citizeny,citizenw,citizenh),true);
 
     menu.addEvent('onUpdateCharacter',classpanel.update.bind(classpanel));
     menu.addEvent('onUpdateCitizen',citizen.update.bind(citizen));
@@ -1126,7 +1129,7 @@ Engine.addHero = function(data){
     Engine.player.setUp(data);
     Engine.camera.startFollow(Engine.player); // leave outside of constructor
 
-    // TODO: move to hero
+    // TODO: move to hero, setUp method
     Engine.player.settlement = data.settlement;
     Engine.player.markers = data.markers;
     Engine.players.unread = 1;
@@ -1143,7 +1146,8 @@ Engine.addHero = function(data){
     );
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = new EquipmentManager();
-    Engine.player.commitSlots = data.commitSlots;
+    //Engine.player.commitSlots = data.commitSlots;
+    Engine.player.setCommitSlots(data.commitSlots);
     Engine.updateEnvironment();
 };
 
