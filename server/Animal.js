@@ -119,29 +119,6 @@ Animal.prototype.goToDestination = function(dest){
     return true;
 };
 
-/*Animal.prototype.checkForHostiles = function(){
-    if(!this.isAggressive()) return;
-    if(this.isInFight()) return;
-    var AOIs = Utils.listAdjacentAOIs(this.aoi);
-    for(var i = 0; i < AOIs.length; i++){
-        var aoi = GameServer.AOIs[AOIs[i]];
-        for(var j = 0; j < aoi.entities.length; j++) {
-            var entity = aoi.entities[j];
-            if(!entity.isPlayer) continue;
-            if(!entity.isAvailableForFight()) continue;
-            if(Utils.chebyshev(this,entity) <= GameServer.battleParameters.aggroRange){
-                console.log(this.getShortID(),'spots',entity.getShortID());
-                if(entity.isInFight()){
-                    this.goToDestination(entity);
-                }else {
-                    GameServer.handleBattle(entity, this, true);
-                }
-                break;
-            }
-        }
-    }
-};*/
-
 Animal.prototype.die = function(){
     MovingEntity.prototype.die.call(this);
     this.idle = false;

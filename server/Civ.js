@@ -28,7 +28,7 @@ Civ.prototype.constructor = Civ;
 Civ.prototype.setAggressive = function(){
     // Different from global aggro parameter, specifies if this specific animal should be aggressive pr not
 
-    //this.aggressive =  GameServer.animalsData[this.type].aggro;
+    this.aggressive = true; // TODO: make it depend on in-game factors?
 
     // TODO: move to config somehow?
     this.aggroMatrix = {

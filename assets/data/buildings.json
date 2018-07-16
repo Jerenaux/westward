@@ -87,7 +87,43 @@
     "buildRate":2
   },
   "3": {
-    "name": "Workshop"
+    "name": "Workshop",
+    "width": 697,
+    "height": 288,
+    "shape": [
+      35, 250,
+      35, 170,
+      15, 145,
+      15, 60,
+      85, 10,
+      640, 10,
+      685, 60,
+      685, 145,
+      670, 170,
+      670, 250
+    ],
+    "collisions": {
+      "x": 1,
+      "y": -7,
+      "w": 20,
+      "h": 7
+    },
+    "entrance": {
+      "x": 9,
+      "y": -2,
+      "w": 1,
+      "h": 2
+    },
+    "depthOffset": 3,
+    "sprite": "workshop",
+    "mapicon": "anvil",
+    "recipe": {"3":40},
+    "trade": true,
+    "displayProd": false,
+    "workshop": true,
+    "buildRate":2,
+    "mainMenu": "crafting",
+    "icon": "workshop"
   },
   "5":{
     "name": "Hunter hut",
@@ -184,7 +220,7 @@
       "w": 2,
       "h": 2
     },
-    "icon": "mine",
+    "icon": "coalmine",
     "mapicon": "coal",
     "sprite": "coalmine",
     "mainMenu": "production",
@@ -217,7 +253,7 @@
       "w": 2,
       "h": 2
     },
-    "icon": "mine",
+    "icon": "ironmine",
     "mapicon": "iron",
     "sprite": "ironmine",
     "mainMenu": "production",
@@ -250,7 +286,7 @@
       "w": 2,
       "h": 2
     },
-    "icon": "mine",
+    "icon": "goldmine",
     "sprite": "goldmine",
     "mapicon": "gold",
     "mainMenu": "production",

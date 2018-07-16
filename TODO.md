@@ -1,7 +1,11 @@
+Bugs:
+- dead wolves keep fighting
+- Wrong battle areas sometimes (apparently based on end destination, not current one)
+
 Release:
 - Newplayer only
 - Push
-- Position buildings
+- Position buildings (add workshop!)
 - Reset food
 
 * Battle system
@@ -168,6 +172,7 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 * Civics
 - Civic slots: send building type&id bundles, client stores two inventories, for logic and icon display
 - Finish all civic panel related stuff (commitment, etc.)
+- Use Phaser 3.11 setCrop to crop icons when on fringe
 - Server side: check that not committing twice to same building
 - Apply taxes
 - Civic abilities
@@ -187,15 +192,23 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Events log
 - Add help back
 * Craftsmen gameplay
-- Workshop interface
-- Recipes
-- Tier
+- Dual stocks
+-> Only possible to use exclusively one or the other atm
+-> Crafted item goes to corresponding stock
+-> Button to switch between the two
+- Recipes for golden ore -> gold ingots -> currency
+- Add dosage mechanic when brewing 
+- Recipes learning/collecting/unlocking...
 - XP based on multiple factors
+- Tiers
 - Bonuses
 - Upgrades
 - Naming
 - Dismantling
 - Quests
+- Distinct interfaces for forging & brewing?
+-> Furnace mechanics? (Duration and temperature, coald and/or wood as fuel...)
+-> Brewing mechanics? (Brew duration, fuel as well...)
 * Explorer gameplay
 - Map mechanics:
 - Buggy building centering in fort?
@@ -230,7 +243,7 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Bonuses
 - Show plant markers based on ability
 * Enemy civ
-- Aggro behavior
+- Aggro behavior (test npc vs animal)
 - Spawn zones
 - Own orientation pins
 - Wander behavior (squad)
@@ -275,6 +288,7 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Campfires (+ leftovers + orientation pin + long distance smoke pins)
 - Fix continuous movement system
 - New camera system? ("dead zone")
+=> Try new Phaser 3.11 deadzone first 
 https://www.gamasutra.com/blogs/ItayKeren/20150511/243083/Scroll_Back_The_Theory_and_Practice_of_Cameras_in_SideScrollers.php
 -> Doesn't follow in central rect window, only follows when getting out of it and until player stops
 ( allows for small position adjustments)
@@ -291,6 +305,7 @@ or
 - View info on other players (levels...)
 - Guilds
 * Orientations
+-> Use new Phaser 3.11 Camera.worldView for on-screen checks
 - Pins for gunshots and explosions (requires special networking for long-distance sounds)
 -> Much slower noise variation according to distance (since heard from very far)
 -> Pin disappears after a few seconds
@@ -331,28 +346,11 @@ Have hunter huts produce pelts
 Recipe: paper cartridges (paper also for bombs?)?
 Make recipes (randomly?) for 5 consumables (potion, antidote, steady stuff...) + create ingredients
 Recipes for fancy bullets and bombs
-Workshop building, interface = usual crafting menu
--> update advice
-furnace system?
-Add shop interface as well
-Display recipes with building and class restrictions
-Update help text of recipes
-Resource flow from all resource buildings to trade post
-Gold flow from tarde post to fort
-Specific interface for workshop, with own stock and settlement stock + gold
--> 100% own stock or 100% city stock to begin with
--> If using city stock, created item also lands in city stock
-Fork trade post gold flow to fork and workshop
-Set reward of recipes for settlement (0 = disabled)
-Golden ore flow from mine to workshop
-Recipe for golden ore -> gold ingots
-Recipe for gold ingots -> currency
-Addition "fuel" field (wood)
-Add dialog to allow using own stuff for missing ingredients when city-forging
-Make spawn zones for plants/shrooms/etc.
-Make separate brewing interface, similar but with adjustable dosage
-Add "brewing" time
-Add checkboxes for what should be boiled or grinded
+- Resource flow from all resource buildings to trade post
+- Gold flow from tarde post to fort
+- Fork trade post gold flow to fork and workshop
+- Set reward of recipes for settlement (0 = disabled)
+- Make spawn zones for plants/shrooms/etc.
 - Dev levels
 - Impact of dev level on exploration XP reward
 - Let chancellor set prices in trade post
@@ -398,6 +396,7 @@ Design document:
 Polish:
 ------
 Visual:
+- Use new Phaser 3.11 setTintFill to add halo over hovered game entities?
 - Add weapons to temporary character sprites
 - More dramatic apparition of battle tiles
 - Hide move marker (use different mouse cursors for can/can't walk to)

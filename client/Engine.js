@@ -60,8 +60,8 @@ Engine.preload = function() {
     // Icons
     this.load.atlas('mapicons', 'assets/sprites/mapicons.png', 'assets/sprites/mapicons.json');
     this.load.atlas('trayicons', 'assets/sprites/trayicons.png', 'assets/sprites/trayicons.json');
+    this.load.atlas('aok', 'assets/sprites/buildingsicons.png', 'assets/sprites/buildingsicons.json');
 
-    this.load.atlas('aok', 'assets/sprites/aok.png', 'assets/sprites/aok.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
     this.load.atlas('items_gr', 'assets/sprites/items_gr.png', 'assets/sprites/items.json');
@@ -373,17 +373,10 @@ Engine.initWorld = function(data){
         {name:'wind2',volume:1},
         {name:'wind3',volume:1}
     ],17000);
-
-    /*var rt = Engine.scene.add.renderTexture(400, 300, 800, 600);
-    rt.setScrollFactor(0);
-    rt.setDepth(10);
-    var pin = Engine.scene.add.sprite(0,0,'mapicons','iron');
-    var bg = Engine.scene.add.sprite(0,0,'mapicons','bg');
-    rt.draw(bg.texture,bg.frame,100,100);
-    rt.draw(pin.texture,pin.frame,100,100);*/
 };
 
 Engine.ambientSounds = function(sounds,interval){
+    return;
     setInterval(function(){
         var sound = Utils.randomElement(sounds);
         Engine.scene.sound.add(sound.name).setVolume(sound.volume).play();
@@ -1042,6 +1035,18 @@ Engine.makeCraftingMenu = function(){
         items.updateInventory();
         ingredients.updateInventory();
     });
+    crafting.addEvent('onDisplay',function(){
+        // TODO: make this much cleaner
+        var isWorkshop = (Engine.currentBuiling ? Engine.buildingsData[Engine.currentBuiling.buildingType].workshop : false);
+        if(isWorkshop){
+            recipes.inventory = new Inventory(Engine.workshopRecipes.maxSize);
+            recipes.modifyInventory(Engine.workshopRecipes.items);
+        }else{
+            recipes.inventory = new Inventory(Engine.player.itemRecipes.maxSize);
+            recipes.modifyInventory(Engine.player.itemRecipes.items);
+        }
+        recipes.updateInventory();
+    });
     return crafting;
 };
 
@@ -1140,10 +1145,16 @@ Engine.addHero = function(data){
     Engine.player.civicxp = data.civicxp;
     Engine.player.classxp = data.classxp;
     Engine.player.classlvl = data.classlvl;
+
     Engine.player.itemRecipes = new Inventory(12);
-    Engine.player.itemRecipes.fromList(
-        [[2,1],[4,1],[6,1],[10,1],[17,1],[21,1],[23,1],[28,1],[29,1],[32,1],[33,1],[35,1]]
-    );
+    Engine.workshopRecipes = new Inventory(20);
+
+    // TODO: move to conf file somewhere
+    var goCraft = [[2,1],[21,1],[28,1],[29,1]];
+    var workshopCraft = goCraft.concat([[4,1],[6,1],[10,1],[17,1],[23,1],[32,1],[33,1],[35,1]]);
+    Engine.player.itemRecipes.fromList(goCraft);
+    Engine.workshopRecipes.fromList(workshopCraft);
+
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = new EquipmentManager();
     //Engine.player.commitSlots = data.commitSlots;
@@ -1270,6 +1281,7 @@ Engine.moveToClick = function(pointer){
 };
 
 Engine.computePath = function(position){
+    //console.log('going to ',position);
     var x = position.x;
     var y = position.y;
     if(Engine.checkCollision(x,y)) return;
@@ -1497,6 +1509,7 @@ Engine.enterBuilding = function(id){
 
     var menus = [];
     if(building.built) {
+        // Displays the tray icons based on flags in the building data
         if (buildingData.fort) menus.push(Engine.menus.fort);
         if (buildingData.trade) menus.push(Engine.menus.trade);
         if (buildingData.production) menus.push(Engine.menus.production);
@@ -1510,32 +1523,27 @@ Engine.enterBuilding = function(id){
     menus.forEach(function(m){
         m.displayIcon();
     });
-    menus[0].display();
+    var mainMenu = Engine.menus[buildingData.mainMenu]; 
+    mainMenu.display();
     building.handleOut();
 
     //TODO: remove
-    var menu = menus[0];
-    if(menu.panels['shop']) {
-        menu.panels['shop'].modifyInventory(building.inventory.items);
-        menu.panels['client'].modifyFilter({
+    if(mainMenu.panels['shop']) {
+        mainMenu.panels['shop'].modifyInventory(building.inventory.items);
+        mainMenu.panels['client'].modifyFilter({
             type: 'prices',
             items: building.prices,
             key: 0,
             hard: false
         });
-        menu.panels['shop'].modifyFilter({
+        mainMenu.panels['shop'].modifyFilter({
             type: 'prices',
             items: building.prices,
             key: 1,
             hard: true
         });
-        menu.panels['client'].updateInventory();
-        menu.panels['shop'].updateInventory();
-    }
-
-    if(menu.panels['resources']){
-        menu.panels['resources'].modifyInventory(building.inventory.items);
-        menu.panels['resources'].updateInventory();
+        mainMenu.panels['client'].updateInventory();
+        mainMenu.panels['shop'].updateInventory();
     }
 
     Engine.buildingTitle.setText(buildingData.name);

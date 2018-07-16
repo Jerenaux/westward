@@ -66,6 +66,7 @@ var Building = new Phaser.Class({
             this.accessory = Engine.scene.add.sprite(
                 this.x+buildingData.accessory.x,
                 this.y+buildingData.accessory.y,
+                'buildings_sprites',
                 buildingData.accessory.frame
             );
             this.accessory.setDepth(this.depth);

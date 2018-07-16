@@ -123,7 +123,6 @@ InventoryPanel.prototype.displayInventory = function(){
     this.slots.forEach(function(s){
         s.setVisible(true);
     });
-
     var nbDisplayed = 0;
     for(var item in this.inventory.items){
         if(!this.inventory.items.hasOwnProperty(item)) continue;

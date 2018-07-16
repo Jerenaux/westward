@@ -208,9 +208,11 @@ GameServer.setUpSpawnZones = function(){
     GameServer.spawnZonesData = JSON.parse(fs.readFileSync('./assets/data/spawnzones.json').toString());
     GameServer.spawnZones = [];
 
-    for(var key in GameServer.spawnZonesData){
-        var data = GameServer.spawnZonesData[key];
-        GameServer.spawnZones.push(new SpawnZone(data.aois,data.animals,data.items));
+    if(!config.get('wildlife.nolife')) {
+        for (var key in GameServer.spawnZonesData) {
+            var data = GameServer.spawnZonesData[key];
+            GameServer.spawnZones.push(new SpawnZone(data.aois, data.animals, data.items));
+        }
     }
 
     GameServer.updateStatus();
@@ -235,7 +237,7 @@ GameServer.addItem = function(x,y,type){
 };
 
 GameServer.onInitialized = function(){
-    //GameServer.addCiv(1203, 167);
+    //GameServer.addCiv(1203, 172);
     /*console.log('--- Performing on initialization tasks ---');
     var animal = GameServer.addAnimal(1202,168,0);
     animal.die();
@@ -912,7 +914,9 @@ GameServer.checkForAggro = function(){
     Object.keys(GameServer.animals).forEach(function(key) {
         GameServer.animals[key].checkForAggro();
     });
-    // TODO: add civs
+    Object.keys(GameServer.civs).forEach(function(key) {
+        GameServer.civs[key].checkForAggro();
+    });
 };
 
 GameServer.updateNPC = function(){

@@ -90,7 +90,7 @@ MovingEntity.prototype.getEndOfPath = function(){
 };
 
 MovingEntity.prototype.getPathDuration = function(){
-    return this.path.length*(1000/PFUtils.speed);
+    return (this.path ? this.path.length*(1000/PFUtils.speed) : 0);
 };
 
 MovingEntity.prototype.stopWalk = function(){

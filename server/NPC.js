@@ -54,7 +54,7 @@ NPC.prototype.setStat = function(key,value){
 NPC.prototype.checkForAggro = function(){
     if(!this.isAggressive()) return;
     if(this.isInFight()) return;
-    //var AOIs = Utils.listAdjacentAOIs(this.aoi);
+
     var AOIs = this.fieldOfVision;
     for(var i = 0; i < AOIs.length; i++){
         var aoi = GameServer.AOIs[AOIs[i]];
@@ -62,6 +62,7 @@ NPC.prototype.checkForAggro = function(){
             var entity = aoi.entities[j];
             if(!this.aggroAgainst(entity)) continue;
             if(!entity.isAvailableForFight()) continue;
+            //TODO: vary aggro range?
             if(Utils.chebyshev(this,entity) <= GameServer.battleParameters.aggroRange){
                 if(entity.isInFight()){
                     this.goToDestination(entity);
@@ -115,7 +116,7 @@ NPC.prototype.findFreeCell = function(){
 NPC.prototype.findBattlePath = function(dest){
     var data = {};
     var path = this.battle.findPath({x: this.x, y: this.y}, dest);
-    if(path.length > 0){
+    if(path && path.length > 0){
         this.setPath(path);
         data.action = 'move';
     }else{
