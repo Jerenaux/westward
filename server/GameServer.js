@@ -237,6 +237,8 @@ GameServer.addItem = function(x,y,type){
 };
 
 GameServer.onInitialized = function(){
+    console.warn('OnInitialized...');
+    GameServer.addItem(1263,168,1);
     //GameServer.addCiv(1203, 172);
     /*console.log('--- Performing on initialization tasks ---');
     var animal = GameServer.addAnimal(1202,168,0);

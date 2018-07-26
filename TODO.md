@@ -1,6 +1,7 @@
 Bugs:
 - dead wolves keep fighting
 - Wrong battle areas sometimes (apparently based on end destination, not current one)
+- Pickup items in water?
 
 Release:
 - Newplayer only
@@ -196,19 +197,19 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 -> Only possible to use exclusively one or the other atm
 -> Crafted item goes to corresponding stock
 -> Button to switch between the two
-- Recipes for golden ore -> gold ingots -> currency
-- Add dosage mechanic when brewing 
+(- Recipes for golden ore -> gold ingots -> currency)
+(- Add dosage mechanic when brewing) 
 - Recipes learning/collecting/unlocking...
 - XP based on multiple factors
-- Tiers
-- Bonuses
-- Upgrades
-- Naming
-- Dismantling
+- Abilities
 - Quests
-- Distinct interfaces for forging & brewing?
+(- Tiers)
+(- Upgrades)
+(- Naming)
+(- Dismantling)
+(- Distinct interfaces for forging & brewing?
 -> Furnace mechanics? (Duration and temperature, coald and/or wood as fuel...)
--> Brewing mechanics? (Brew duration, fuel as well...)
+-> Brewing mechanics? (Brew duration, fuel as well...))
 * Explorer gameplay
 - Map mechanics:
 - Buggy building centering in fort?
@@ -243,10 +244,9 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Bonuses
 - Show plant markers based on ability
 * Enemy civ
-- Aggro behavior (test npc vs animal)
-- Spawn zones
 - Own orientation pins
 - Wander behavior (squad)
+- Spawn zones
 - Buildings health 
 - Buildings destruction
 - Settlement attack behavior (what time intervals, how many...)
@@ -257,6 +257,7 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Civs loot equipment and equip it
 - Civs gain XP, level-up, become stronger (increase associated xp reward accordingly)
 - Reflect that in hover card
+- Test NPC vs animals
 * Help
 - Review existing help buttons
 - Add missing help buttons (including on specific lines to describe fatigue, food surplus...)

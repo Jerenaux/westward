@@ -59,7 +59,7 @@ To add: time gap between two orientation sounds (OrientationPin.display())
             aggro: 2000
     },
     wildlife: { // make Civ category?
-        aggro: true,
+        aggro: false,
         nolife: false,
         wander: true,
         wanderRange: 5,

@@ -26,6 +26,8 @@ var Engine = {
     craftInvSize: 5, // max number of ingredients for crafting
     maxPathLength: 36,
 
+    debugMarker: true,
+
     key: 'main', // key of the scene, for Phaser
     plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager','LightsPlugin'],
     playerIsInitialized: false,
@@ -566,7 +568,6 @@ Engine.makeUI = function(){
     };
 
     var UIelements = [];
-    Engine.nbBasicUIEelements = 5;
     var gap = 50;
     var x = 960;
     var y = 535;
@@ -577,10 +578,11 @@ Engine.makeUI = function(){
     x -= gap;
     UIelements.push(new UIElement(x,y,'scroll',Engine.menus.character));
     x -= gap;
-    UIelements.push(new UIElement(x,y,'tools',Engine.menus.crafting));
-    x -= gap;
+    //UIelements.push(new UIElement(x,y,'tools',Engine.menus.crafting));
+    //x -= gap;
     UIelements.push(new UIElement(x,y,'backpack',Engine.menus.inventory));
     x -= gap;
+    Engine.nbBasicUIEelements = UIelements.length;
     Engine.UIelements = UIelements;
     Engine.UIHolder.resize(Engine.getHolderSize());
 
@@ -589,6 +591,7 @@ Engine.makeUI = function(){
     Engine.addMenuIcon(x,y,'hammer',Engine.menus.construction);
     Engine.addMenuIcon(x,y,'hammer',Engine.menus.production);
     x -= gap;
+    Engine.addMenuIcon(x,y,'tools',Engine.menus.crafting);
     Engine.addMenuIcon(x,y,'tome',Engine.menus.staff);
 
     Engine.makeBattleUI();
@@ -1014,7 +1017,7 @@ Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
     crafting.setSound(Engine.scene.sound.add('crafting'));
     var recipes = new InventoryPanel(765,100,235,380,'Recipes');
-    recipes.setInventory(Engine.player.itemRecipes,4,false,Engine.recipeClick);
+    recipes.setInventory(Engine.workshopRecipes,4,false,Engine.recipeClick);
     recipes.addButton(205, 8, 'blue','help',null,'',UI.textsData['recipes_help']);
     crafting.addPanel('recipes',recipes);
     var combi = crafting.addPanel('combi',new CraftingPanel(450,100,290,380,'Combination'));
@@ -1023,10 +1026,16 @@ Engine.makeCraftingMenu = function(){
     var ingredients = crafting.addPanel('ingredients',new InventoryPanel(450,300,290,380,'',true)); // true = invisible
     ingredients.setInventory(new Inventory(5),5,true,null,Engine.player.inventory);
 
-    var items = new InventoryPanel(40,100,390,380,'Items');
+    var items = new InventoryPanel(40,100,390,185,'Your items');
     items.addButton(360, 8, 'blue','help',null,'',UI.textsData['craftitems_help']);
     items.setInventory(Engine.player.inventory,9,true);
     crafting.addPanel('items',items);
+
+    var shop = new InventoryPanel(40,290,390,185,'Workshop stock');
+    shop.setInventory(new Inventory(20),9,true);
+    //shop.addButton(270, 8, 'blue','help',null,'',UI.textsData['buy_help']);
+    crafting.addPanel('shop',shop);
+
 
     crafting.addEvent('onUpdateRecipes',function(){
         recipes.updateInventory();
@@ -1035,7 +1044,10 @@ Engine.makeCraftingMenu = function(){
         items.updateInventory();
         ingredients.updateInventory();
     });
-    crafting.addEvent('onDisplay',function(){
+    crafting.addEvent('onUpdateShop',function(){
+        shop.updateInventory();
+    });
+    /*crafting.addEvent('onDisplay',function(){
         // TODO: make this much cleaner
         var isWorkshop = (Engine.currentBuiling ? Engine.buildingsData[Engine.currentBuiling.buildingType].workshop : false);
         if(isWorkshop){
@@ -1046,7 +1058,7 @@ Engine.makeCraftingMenu = function(){
             recipes.modifyInventory(Engine.player.itemRecipes.items);
         }
         recipes.updateInventory();
-    });
+    });*/
     return crafting;
 };
 
@@ -1146,12 +1158,12 @@ Engine.addHero = function(data){
     Engine.player.classxp = data.classxp;
     Engine.player.classlvl = data.classlvl;
 
-    Engine.player.itemRecipes = new Inventory(12);
+    Engine.player.itemRecipes = new Inventory(16);
     Engine.workshopRecipes = new Inventory(20);
 
     // TODO: move to conf file somewhere
     var goCraft = [[2,1],[21,1],[28,1],[29,1]];
-    var workshopCraft = goCraft.concat([[4,1],[6,1],[10,1],[17,1],[23,1],[32,1],[33,1],[35,1]]);
+    var workshopCraft = goCraft.concat([[4,1],[6,1],[10,1],[17,1],[23,1],[32,1],[33,1],[35,1],[38,1]]);
     Engine.player.itemRecipes.fromList(goCraft);
     Engine.workshopRecipes.fromList(workshopCraft);
 
@@ -1328,8 +1340,9 @@ Engine.updatePosition = function(player){
 };
 
 Engine.getMouseCoordinates = function(pointer){
-    var pxX = Engine.camera.scrollX + pointer.x;
-    var pxY = Engine.camera.scrollY + pointer.y;
+    // +16 so that the target tile is below the middle of the cursor
+    var pxX = Engine.camera.scrollX + pointer.x;// + 16;
+    var pxY = Engine.camera.scrollY + pointer.y;// + 16;
     var tileX = Math.floor(pxX/Engine.tileWidth);
     var tileY = Math.floor(pxY/Engine.tileHeight);
     Engine.lastPointer = {x:pointer.x,y:pointer.y};
@@ -1341,7 +1354,7 @@ Engine.getMouseCoordinates = function(pointer){
 
 Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
-    if(Engine.player) Engine.updateMarker(position.tile); // && !Engine.player.inFight
+    if(Engine.player) Engine.updateMarker(position.tile);
     if(Engine.debug){
         document.getElementById('pxx').innerHTML = Math.round(position.pixel.x);
         document.getElementById('pxy').innerHTML = Math.round(position.pixel.y);
@@ -1357,9 +1370,11 @@ Engine.updateMarker = function(tile){
     if(tile.x != Engine.marker.previousTile.x || tile.y != Engine.marker.previousTile.y){
         Engine.marker.previousTile = tile;
         if(Engine.checkCollision(tile.x,tile.y)){
-            Engine.marker.setFrame(1);
+            //UI.setCursor();
+            if(Engine.debugMarker) Engine.marker.setFrame(1);
         }else{
-            Engine.marker.setFrame(0);
+            //UI.setCursor(UI.moveCursor);
+            if(Engine.debugMarker) Engine.marker.setFrame(0);
         }
     }
 };
@@ -1369,7 +1384,7 @@ Engine.hideMarker = function(){
 };
 
 Engine.showMarker = function(){
-    if(Engine.marker) Engine.marker.setVisible(true);
+    if(Engine.debugMarker && Engine.marker) Engine.marker.setVisible(true);
 };
 
 /*
@@ -1512,6 +1527,7 @@ Engine.enterBuilding = function(id){
         // Displays the tray icons based on flags in the building data
         if (buildingData.fort) menus.push(Engine.menus.fort);
         if (buildingData.trade) menus.push(Engine.menus.trade);
+        if (buildingData.workshop) menus.push(Engine.menus.crafting);
         if (buildingData.production) menus.push(Engine.menus.production);
         if (buildingData.staff) menus.push(Engine.menus.staff);
     }else{
@@ -1527,24 +1543,49 @@ Engine.enterBuilding = function(id){
     mainMenu.display();
     building.handleOut();
 
-    //TODO: remove
-    if(mainMenu.panels['shop']) {
+    //TODO: rework
+    menus.forEach(function(menu){
+        if(menu.panels['shop']) {
+            menu.panels['shop'].modifyInventory(building.inventory.items);
+            menu.panels['shop'].modifyFilter({
+                type: 'prices',
+                items: building.prices,
+                key: 1,
+                hard: !buildingData.workshop
+            });
+            menu.panels['shop'].updateInventory();
+
+            if(menu.panels['client']) {
+                menu.panels['client'].modifyFilter({
+                    type: 'prices',
+                    items: building.prices,
+                    key: 0,
+                    hard: false
+                });
+                menu.panels['client'].updateInventory();
+            }
+        }
+    });
+    /*if(mainMenu.panels['shop']) {
         mainMenu.panels['shop'].modifyInventory(building.inventory.items);
-        mainMenu.panels['client'].modifyFilter({
-            type: 'prices',
-            items: building.prices,
-            key: 0,
-            hard: false
-        });
         mainMenu.panels['shop'].modifyFilter({
             type: 'prices',
             items: building.prices,
             key: 1,
-            hard: true
+            hard: !buildingData.workshop
         });
-        mainMenu.panels['client'].updateInventory();
         mainMenu.panels['shop'].updateInventory();
-    }
+
+        if(mainMenu.panels['client']) {
+            mainMenu.panels['client'].modifyFilter({
+                type: 'prices',
+                items: building.prices,
+                key: 0,
+                hard: false
+            });
+            mainMenu.panels['client'].updateInventory();
+        }
+    }*/
 
     Engine.buildingTitle.setText(buildingData.name);
     Engine.settlementTitle.setText(settlementData.name);

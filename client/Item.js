@@ -50,8 +50,13 @@ var Item = new Phaser.Class({
         }
     },
 
+    handleDown: function(){
+        UI.setCursor(UI.handCursor2);
+    },
+
     handleClick: function(){
         if(!BattleManager.inBattle) Engine.processItemClick(this);
+        UI.setCursor(UI.handCursor);
     },
 
     handleOver: function(){

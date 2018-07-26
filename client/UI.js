@@ -8,9 +8,12 @@ var UI = {
     tooltipDepth: 20,
     cursor: 'url(/assets/sprites/cursor.png), auto', // image of the mouse cursor in normal circumstances
     bowCursor: 'url(/assets/sprites/bowcursor32.png), auto',
-    swordCursor: 'url(/assets/sprites/swordcursor32.png), auto',
-    buildingCursor: 'url(/assets/sprites/buildingcursor.png), auto',
-    handCursor: 'url(/assets/sprites/handicon.png), auto',
+    swordCursor: 'url(/assets/sprites/sabre.png), auto',
+    buildingCursor: 'url(/assets/sprites/door.png), auto', // buildingcursor
+    buildingCursor2: 'url(/assets/sprites/door2.png), auto', // buildingcursor
+    handCursor: 'url(/assets/sprites/hand.png), auto',
+    handCursor2: 'url(/assets/sprites/hand2.png), auto',
+    moveCursor: 'url(/assets/sprites/movement.png), auto',
 
     preload: function () {
         UI.scene = this;

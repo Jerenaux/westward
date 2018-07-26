@@ -228,11 +228,17 @@ var Building = new Phaser.Class({
 
     // ### INPUT ###
 
+    handleDown: function(){
+        UI.setCursor(UI.buildingCursor2);
+    },
+
+
     handleClick: function () {
         if (Engine.inPanel || Engine.inMenu || Engine.player.inFight || Engine.dead) return;
         if (!this.entrance) return;
         Engine.player.setDestinationAction(1, this.id, this.entrance.x, this.entrance.y); // 1 for building
         Engine.computePath(this.entrance);
+        UI.setCursor(UI.buildingCursor);
     },
 
     handleOver: function(){

@@ -319,5 +319,16 @@
     "name": "Whitepetal",
     "desc": "Flower with cleansing properties used to brew potions.",
     "isMaterial": true
+  },
+    "38":{
+    "atlas": "items",
+    "frame":"gold_ingot",
+    "name": "Gold ingot",
+    "desc": "Precious rafting material obtained from golden ore destined to mint coins.",
+    "isCrafted": true,
+    "isMaterial": true,
+    "craftTier": 1,
+    "recipe":{"25":5},
+    "sound": "clank"
   }
 }
