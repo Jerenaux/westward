@@ -330,5 +330,31 @@
     "craftTier": 1,
     "recipe":{"25":5},
     "sound": "clank"
+  },
+  "39":{
+    "atlas": "items2",
+    "frame":"bullet",
+    "name": "Bullet",
+    "desc": "Ammunition used with firearms",
+    "isCrafted": true,
+    "isMaterial": false,
+    "craftTier": 1,
+    "recipe":{"24":1},
+    "output": 5,
+    "equipment": "bullets",
+    "effects":{"rdmg":60},
+    "ammo": "ammo_pouch",
+    "useInBattle": true,
+    "sound": "clank"
+  },
+  "40":{
+    "atlas": "items2",
+    "frame":"ammopouch",
+    "name": "Small bullets pouch",
+    "equipment": "ammo_pouch",
+    "capacity": 10,
+    "desc": "Can contain up to 10 bullets",
+    "useInBattle": true,
+    "sound": "cloth"
   }
 }

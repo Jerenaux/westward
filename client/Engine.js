@@ -44,6 +44,7 @@ Engine.preload = function() {
     this.load.spritesheet('enemy', 'assets/sprites/enemy.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
+    this.load.spritesheet('bears', 'assets/sprites/bears2.png',{frameWidth:56,frameHeight:56});
 
     // Misc
     this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
@@ -436,6 +437,12 @@ Engine.createAnimations = function(){
     Engine.createWalkAnimation('whitewolf_move_left','wolves',15,17);
     Engine.createWalkAnimation('whitewolf_move_right','wolves',27,29);
     Engine.createWalkAnimation('whitewolf_move_up','wolves',39,41);
+
+    //Bears
+    Engine.createWalkAnimation('bear_move_down','bears',9,11);
+    Engine.createWalkAnimation('bear_move_left','bears',21,23);
+    Engine.createWalkAnimation('bear_move_right','bears',33,35);
+    Engine.createWalkAnimation('bear_move_up','bears',45,47);
 
     Engine.scene.anims.create(config = {
         key: 'melee',
@@ -1163,7 +1170,7 @@ Engine.addHero = function(data){
 
     // TODO: move to conf file somewhere
     var goCraft = [[2,1],[21,1],[28,1],[29,1]];
-    var workshopCraft = goCraft.concat([[4,1],[6,1],[10,1],[17,1],[23,1],[32,1],[33,1],[35,1],[38,1]]);
+    var workshopCraft = goCraft.concat([[4,1],[6,1],[10,1],[17,1],[23,1],[32,1],[33,1],[35,1],[38,1],[39,1]]);
     Engine.player.itemRecipes.fromList(goCraft);
     Engine.workshopRecipes.fromList(workshopCraft);
 

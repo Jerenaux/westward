@@ -70,14 +70,18 @@ var Animal = new Phaser.Class({
 
     // ### INPUT ###
 
+    handleDown: function(){
+        UI.setCursor(UI.handCursor2);
+    },
+
     handleClick: function(){
         if(BattleManager.inBattle){
             if(Engine.dead) return;
             BattleManager.processNPCClick(this);
         }else{
-            //Engine.processAnimalClick(this);
             Engine.processNPCClick(this);
         }
+        UI.setCursor(UI.handCursor);
     },
 
     handleOver: function(){

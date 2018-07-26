@@ -144,32 +144,32 @@ Order:
 Content:
 -------
 * Ambiance
-- Enemy civs talk in fight (speech bubbles)
+- From : https://forums.rpgmakerweb.com/index.php?threads/whtdragons-animals-and-running-horses-now-with-more-dragons.53552/
+-> Add seagulls, birds, frogs, small mammals, fishes (tinted), ...
+-> Have fun with unicorn
 - Carcasses, traces of fight
 - Paths along most-travelled paths
 - Location sfx for each building
 - Maximum ambient noises
 -> Multiple categories (weather, animals, terrain...), distinct random intervals
 * Battle system
-- New interface:
+- Bombs, traps, poisons, potions, oils...
+(-> trap bonuses to explorers? Natural crafting recipe to them?)
+- Increase fatigue when fighting
+- Effect of fatigue on fighting
+(- Gunpowder mechanics; remove it from bullet recipe?)
+(- New interface:
 Timer at bottom, icon of active fighter on the left, queue of others on the right
 Skip turn below
 Health and fatigue above, numerically + battle counters (movement, actions...)
 Belt slots above + ammo slots + active weapon (ranged vs melee)
-=> Allow both melee & ranged equipped at same type, ranged active by default
-- Identify characters in the way of ranged attacks
-- Stats and formulas for bombs
-- Mechanic for bombs
-- Anti-friendly fire safety for bombs
-- Shield stats and formulas
-- Shield mechanics
-- Increase fatigue when fighting
-- Effect of fatigue on fighting
-- Compute probability of items breaking and discard them
-- Accommodate NPC
-- Display health of enemies somehow
-- Let NPC use items (restore health, ...)
-- 3-way battles
+=> Allow both melee & ranged equipped at same type, ranged active by default)
+(- Compute probability of items breaking and discard them)
+(- Identify characters in the way of ranged attacks)
+(- Anti-friendly fire safety for bombs)
+(- Display health of enemies somehow)
+(- Let NPC use items (restore health, ...))
+(- 3-way battles)
 * Civics
 - Civic slots: send building type&id bundles, client stores two inventories, for logic and icon display
 - Finish all civic panel related stuff (commitment, etc.)
@@ -197,12 +197,15 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 -> Only possible to use exclusively one or the other atm
 -> Crafted item goes to corresponding stock
 -> Button to switch between the two
-(- Recipes for golden ore -> gold ingots -> currency)
-(- Add dosage mechanic when brewing) 
+- Several directly personnaly useful recipes for equipment etc. (bigger quivers, better projetiles, etc.)
 - Recipes learning/collecting/unlocking...
+-> Don't forget to take into account workshop level, craftsmen abilities with woodwork/metalwork/etc.
+-> Be creative with multiple kinds of pelts, etc.
+- Display output nb
 - XP based on multiple factors
 - Abilities
 - Quests
+(- Recipes for golden ore -> gold ingots -> currency)
 (- Tiers)
 (- Upgrades)
 (- Naming)
@@ -210,6 +213,7 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 (- Distinct interfaces for forging & brewing?
 -> Furnace mechanics? (Duration and temperature, coald and/or wood as fuel...)
 -> Brewing mechanics? (Brew duration, fuel as well...))
+(- Add dosage mechanic when brewing) 
 * Explorer gameplay
 - Map mechanics:
 - Buggy building centering in fort?
@@ -360,11 +364,13 @@ Recipes for fancy bullets and bombs
 - Allow creation of new buildings (fixed locations to begin with)
 - Lists of items rewarded by civic xp
 * Soldier gameplay
-- Bonuses
-- Bombs
-- Rare/strong foes
-- Advanced XP
+- Monster variety & more spawn zones
+-> Brown wolves south, black ones south more powerful, same with gray and white wolves north
++ others
+- Abilities
 - Quests
+(- Rare/strong foes)
+(- Advanced XP)
 
 Deployment:
 ----------

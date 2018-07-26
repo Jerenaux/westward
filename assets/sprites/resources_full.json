@@ -103,6 +103,14 @@
     {
       "filename": "whitepetal",
       "frame": {"x":288,"y":288,"w":24,"h":24}
+    },
+    {
+      "filename": "bullet",
+      "frame": {"x":24,"y":816,"w":24,"h":24}
+    },
+    {
+      "filename": "ammopouch",
+      "frame": {"x":168,"y":384,"w":24,"h":24}
     }
   ]
 }

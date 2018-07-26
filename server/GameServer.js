@@ -237,8 +237,7 @@ GameServer.addItem = function(x,y,type){
 };
 
 GameServer.onInitialized = function(){
-    console.warn('OnInitialized...');
-    GameServer.addItem(1263,168,1);
+    GameServer.addAnimal(1202,168,5);
     //GameServer.addCiv(1203, 172);
     /*console.log('--- Performing on initialization tasks ---');
     var animal = GameServer.addAnimal(1202,168,0);
@@ -755,7 +754,8 @@ GameServer.operateCraft = function(player,recipe,targetItem,nb){
         if (!recipe.hasOwnProperty(item)) continue;
         player.takeItem(item,recipe[item]*nb,true);
     }
-    player.giveItem(targetItem,nb,true);
+    var output = GameServer.itemsData[targetItem].output || 1;
+    player.giveItem(targetItem,nb*output,true);
 };
 
 GameServer.handlePath = function(data,socketID){

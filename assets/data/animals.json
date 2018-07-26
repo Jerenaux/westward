@@ -43,5 +43,22 @@
       "def": 12,
       "mdmg": 15
     }
+  },
+  "5":{
+    "sprite":"bears",
+    "name": "Bear",
+    "frame": 9,
+    "walkPrefix": "bear",
+    "restingFrames": {
+      "up": 45,
+      "down": 9,
+      "left": 21,
+      "right": 33
+    },
+    "stats": {
+      "hp": 300,
+      "def": 30,
+      "mdmg": 30
+    }
   }
 }

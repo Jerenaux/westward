@@ -164,6 +164,17 @@ UI.getGameHeight = function(){
     return UI.getConfig().height;
 };
 
+UI.manageCursor = function(){
+    /*
+    * - Keep track of hovering ground, game entities or UI
+    * - Game entities and UI have in/out methods to update this
+    * - If hover both UI and entity at same time, UI has precedence
+    * - Each time it changes, determine proper cursor based on flags (by calling manageCursor)
+    * - Additional flag for bombs, set by battle actions
+    * - Leverage this to update tooltips in real time?
+    * */
+};
+
 UI.setCursor = function(cursor){
     UI.scene.sys.game.canvas.style.cursor = (cursor || UI.cursor);
 };
