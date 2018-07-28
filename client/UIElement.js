@@ -22,15 +22,17 @@ var UIElement = new Phaser.Class({
     },
 
     handleOver: function(){
-        this.x -= 3;
+        UI.manageCursor(1,'UI');
+        /*this.x -= 3;
         this.y -= 3;
-        this.setScale(1.05);
+        this.setScale(1.05);*/
     },
 
     handleOut: function(){
-        this.x += 3;
+        UI.manageCursor(0,'UI');
+        /*this.x += 3;
         this.y += 3;
-        this.setScale(1);
+        this.setScale(1);*/
     },
 
     handleClick: function(){

@@ -65,7 +65,7 @@ CraftingPanel.prototype.setUp = function(itemID){
     var data = Engine.itemsData[itemID];
     this.craftItem.id = itemID;
     this.craftItem.item.setUp(itemID,data);
-    this.craftItem.count = 1;
+    this.craftItem.count = 1; //(Engine.itemsData[itemID].output || 1);
     this.craftItem.countText.setText(1);
     this.craftItem.recipe = data.recipe;
     this.craftItem.item.setVisible(true);
@@ -104,10 +104,12 @@ CraftingPanel.prototype.manageButtons = function(){
 };
 
 CraftingPanel.prototype.canCraft = function(){
+    var refInventory = (Engine.craftingStock == 1 ? Engine.player.inventory : Engine.currentBuiling.inventory);
     var ingredients = Engine.getIngredientsPanel().inventory;
     for(var item in ingredients.items){
         if(!ingredients.items.hasOwnProperty(item)) continue;
-        if(ingredients.getNb(item) > Engine.player.inventory.getNb(item)) return false;
+        //if(ingredients.getNb(item) > Engine.player.inventory.getNb(item)) return false;
+        if(ingredients.getNb(item) > refInventory.getNb(item)) return false;
     }
     return true;
 };
@@ -121,9 +123,11 @@ CraftingPanel.prototype.decreaseAmount = function(){
 };
 
 CraftingPanel.prototype.changeAmount = function(inc){
+    //var output = (Engine.itemsData[itemID].output || 1);
     this.craftItem.count = Utils.clamp(this.craftItem.count+inc,1,999);
     this.craftItem.countText.setText(this.craftItem.count);
     Engine.getIngredientsPanel().modifyInventory(this.makeIngredientsList(this.craftItem.recipe,this.craftItem.count));
+    Engine.getIngredientsPanel().updateInventory();
     this.manageButtons();
 };
 
@@ -151,6 +155,6 @@ CraftingPanel.prototype.reset = function(){
 
 CraftingPanel.prototype.requestCraft = function(){
     if(Date.now() - this.lastCraft < 200) return;
-    Client.sendCraft(this.craftItem.id,this.craftItem.count);
+    Client.sendCraft(this.craftItem.id,this.craftItem.count,Engine.craftingStock);
     this.lastCraft = Date.now();
 };

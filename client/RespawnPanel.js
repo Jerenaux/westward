@@ -40,6 +40,7 @@ RespawnPanel.prototype.showButton = function(){
 RespawnPanel.prototype.display = function(){
     this.bar.setLevel(100,100);
     Panel.prototype.display.call(this);
+    this.button.hide();
     this.bar.display();
     this.displayTexts();
     this.trigger();

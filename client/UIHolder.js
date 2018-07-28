@@ -57,6 +57,14 @@ function UIHolder(x,y,align,style){
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
+
+        e.setInteractive();
+        e.on('pointerover',function(){
+            UI.manageCursor(1,'UI');
+        });
+        e.on('pointerout',function(){
+            UI.manageCursor(0,'UI');
+        });
     },this);
 
     this.text.setDepth(this.depth+1);

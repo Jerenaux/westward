@@ -661,18 +661,6 @@ GameServer.handleShop = function(data,socketID) {
     Prism.logEvent(player,action,{item:item,price:price,nb:nb});
 };
 
-GameServer.handleCraft = function(data,socketID){
-    var player = GameServer.getPlayer(socketID);
-    var targetItem = data.id;
-    var nb = data.nb;
-    //var building = GameServer.itemsData[targetItem].building;
-    //if(building) return;
-    var recipe = GameServer.itemsData[targetItem].recipe;
-    if(!GameServer.allIngredientsOwned(player,recipe,nb)) return;
-    GameServer.operateCraft(player, recipe, targetItem, nb);
-    player.gainClassXP(GameServer.classes.craftsman,5,true); // TODO: vary based on multiple factors
-};
-
 /*GameServer.handleBuild = function(data,socketID){
     var bid = data.id;
     var tile = data.tile;
@@ -741,21 +729,38 @@ GameServer.handleCommit = function(data,socketID){ // keep data argument
     }
 };
 
-GameServer.allIngredientsOwned = function(player,recipe,nb){
+GameServer.handleCraft = function(data,socketID){
+    var player = GameServer.getPlayer(socketID);
+    var buildingID = player.inBuilding;
+    var building = GameServer.buildings[buildingID];
+    var targetItem = data.id;
+    var nb = data.nb;
+    var stock = data.stock;
+    if(!targetItem) return;
+    //var building = GameServer.itemsData[targetItem].building;
+    //if(building) return;
+    var recipient = (stock == 1 ? player : building);
+    var recipe = GameServer.itemsData[targetItem].recipe;
+    if(!GameServer.allIngredientsOwned(recipient,recipe,nb)) return;
+    GameServer.operateCraft(recipient, recipe, targetItem, nb);
+    player.gainClassXP(GameServer.classes.craftsman,5,true); // TODO: vary based on multiple factors
+};
+
+GameServer.allIngredientsOwned = function(entity,recipe,nb){
     for(var item in recipe){
         if(!recipe.hasOwnProperty(item)) continue;
-        if(!player.hasItem(item,recipe[item]*nb)) return false;
+        if(!entity.hasItem(item,recipe[item]*nb)) return false;
     }
     return true;
 };
 
-GameServer.operateCraft = function(player,recipe,targetItem,nb){
+GameServer.operateCraft = function(recipient,recipe,targetItem,nb){
     for(var item in recipe) {
         if (!recipe.hasOwnProperty(item)) continue;
-        player.takeItem(item,recipe[item]*nb,true);
+        recipient.takeItem(item,recipe[item]*nb,true);
     }
     var output = GameServer.itemsData[targetItem].output || 1;
-    player.giveItem(targetItem,nb*output,true);
+    recipient.giveItem(targetItem,nb*output,true);
 };
 
 GameServer.handlePath = function(data,socketID){

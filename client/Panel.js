@@ -227,6 +227,8 @@ Panel.prototype.display = function(){
         b.zone.setVisible(true);
     });
 
+    if(this.button) this.button.display(); // big button
+
     if(this.scrollable){
         this.scrollItems.forEach(function(e){
             e.setVisible(true);
@@ -240,6 +242,7 @@ Panel.prototype.display = function(){
 Panel.prototype.hide = function(){
     Frame.prototype.hide.call(this);
     if(this.scrollable) this.scroll(-this.scrolled);
+    if(this.button) this.button.hide(); // big button
     Engine.inPanel = false;
 };
 

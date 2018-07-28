@@ -26,7 +26,7 @@ var Engine = {
     craftInvSize: 5, // max number of ingredients for crafting
     maxPathLength: 36,
 
-    debugMarker: true,
+    debugMarker: false,
 
     key: 'main', // key of the scene, for Phaser
     plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager','LightsPlugin'],
@@ -539,6 +539,7 @@ Engine.makeBuildingTitle = function(){
 };
 
 Engine.makeUI = function(){
+    // TODO: make a zone with onpointerover = cursor is over UI, and make slices not interactive anymore
     Engine.UIHolder = new UIHolder(1000,500,'right');
 
     var bug = UI.scene.add.image(Engine.getGameConfig().width-10,10,'bug');
@@ -577,7 +578,7 @@ Engine.makeUI = function(){
     var UIelements = [];
     var gap = 50;
     var x = 960;
-    var y = 535;
+    var y = 530;
     var letter = new UIElement(x,y,'envelope',Engine.menus.messages);
     UIelements.push(letter);
     x -= gap;
@@ -595,11 +596,11 @@ Engine.makeUI = function(){
 
     Engine.addMenuIcon(x,y,'coin',Engine.menus.trade);
     Engine.addMenuIcon(x,y,'map',Engine.menus.fort);
-    Engine.addMenuIcon(x,y,'hammer',Engine.menus.construction);
-    Engine.addMenuIcon(x,y,'hammer',Engine.menus.production);
+    Engine.addMenuIcon(x,y,'cogs',Engine.menus.construction);
+    Engine.addMenuIcon(x,y,'cogs',Engine.menus.production);
     x -= gap;
     Engine.addMenuIcon(x,y,'tools',Engine.menus.crafting);
-    Engine.addMenuIcon(x,y,'tome',Engine.menus.staff);
+    Engine.addMenuIcon(x,y,'staff',Engine.menus.staff);
 
     Engine.makeBattleUI();
     Engine.displayUI();
@@ -973,6 +974,7 @@ Engine.makeFortMenu = function(){
     fort.addPanel('devlvl',devlvl);
 
     fort.addEvent('onUpdateShop',function(){
+        resources.modifyInventory(Engine.currentBuiling.inventory.items);
         resources.updateInventory();
         devlvl.update();
     });
@@ -1036,12 +1038,20 @@ Engine.makeCraftingMenu = function(){
     var items = new InventoryPanel(40,100,390,185,'Your items');
     items.addButton(360, 8, 'blue','help',null,'',UI.textsData['craftitems_help']);
     items.setInventory(Engine.player.inventory,9,true);
+    items.button = new BigButton(items.x+(items.width/2),items.y+items.height-20,
+        'Use this inventory',function(){
+            Engine.toggleStock(1);
+        });
     crafting.addPanel('items',items);
 
-    var shop = new InventoryPanel(40,290,390,185,'Workshop stock');
-    shop.setInventory(new Inventory(20),9,true);
-    //shop.addButton(270, 8, 'blue','help',null,'',UI.textsData['buy_help']);
-    crafting.addPanel('shop',shop);
+    var stock = new InventoryPanel(40,290,390,185,'Workshop stock');
+    stock.setInventory(new Inventory(20),9,true);
+    //stock.addButton(270, 8, 'blue','help',null,'',UI.textsData['buy_help']);
+    stock.button = new BigButton(stock.x+(stock.width/2),stock.y+stock.height-20,
+        'Use this inventory',function(){
+            Engine.toggleStock(2);
+        });
+    crafting.addPanel('stock',stock);
 
 
     crafting.addEvent('onUpdateRecipes',function(){
@@ -1051,21 +1061,17 @@ Engine.makeCraftingMenu = function(){
         items.updateInventory();
         ingredients.updateInventory();
     });
-    crafting.addEvent('onUpdateShop',function(){
+    /*crafting.addEvent('onUpdateShop',function(){
         shop.updateInventory();
-    });
-    /*crafting.addEvent('onDisplay',function(){
-        // TODO: make this much cleaner
-        var isWorkshop = (Engine.currentBuiling ? Engine.buildingsData[Engine.currentBuiling.buildingType].workshop : false);
-        if(isWorkshop){
-            recipes.inventory = new Inventory(Engine.workshopRecipes.maxSize);
-            recipes.modifyInventory(Engine.workshopRecipes.items);
-        }else{
-            recipes.inventory = new Inventory(Engine.player.itemRecipes.maxSize);
-            recipes.modifyInventory(Engine.player.itemRecipes.items);
-        }
-        recipes.updateInventory();
     });*/
+    crafting.addEvent('onUpdateShop',function(){
+        stock.modifyInventory(Engine.currentBuiling.inventory.items);
+        stock.updateInventory();
+    });
+
+    crafting.addEvent('onDisplay',function(){
+        Engine.toggleStock(1);
+    });
     return crafting;
 };
 
@@ -1253,7 +1259,14 @@ Engine.handleKeyboard = function(event){
 };
 
 Engine.handleDown = function(pointer,objects){
-    if(objects.length > 0 && objects[0].handleDown) objects[0].handleDown(pointer);
+    if(objects.length > 0 && objects[0].handleDown){
+        objects[0].handleDown(pointer);
+    }else{
+        if(!Engine.inPanel && !Engine.inMenu && !BattleManager.inBattle && !Engine.dead) {
+            console.log('down');
+            UI.setCursor(UI.moveCursor2);
+        }
+    }
 };
 
 Engine.handleClick = function(pointer,objects){
@@ -1264,6 +1277,8 @@ Engine.handleClick = function(pointer,objects){
         //Engine.interrupt = false;
     }else{
         if(!Engine.inPanel && !Engine.inMenu && !BattleManager.inBattle && !Engine.dead) {
+            console.log('up');
+            UI.setCursor(UI.moveCursor);
             Engine.moveToClick(pointer);
         }
     }
@@ -1350,6 +1365,10 @@ Engine.getMouseCoordinates = function(pointer){
     // +16 so that the target tile is below the middle of the cursor
     var pxX = Engine.camera.scrollX + pointer.x;// + 16;
     var pxY = Engine.camera.scrollY + pointer.y;// + 16;
+    if(!Engine.debugMarker){
+        pxX += 16;
+        pxY += 16;
+    }
     var tileX = Math.floor(pxX/Engine.tileWidth);
     var tileY = Math.floor(pxY/Engine.tileHeight);
     Engine.lastPointer = {x:pointer.x,y:pointer.y};
@@ -1573,26 +1592,6 @@ Engine.enterBuilding = function(id){
             }
         }
     });
-    /*if(mainMenu.panels['shop']) {
-        mainMenu.panels['shop'].modifyInventory(building.inventory.items);
-        mainMenu.panels['shop'].modifyFilter({
-            type: 'prices',
-            items: building.prices,
-            key: 1,
-            hard: !buildingData.workshop
-        });
-        mainMenu.panels['shop'].updateInventory();
-
-        if(mainMenu.panels['client']) {
-            mainMenu.panels['client'].modifyFilter({
-                type: 'prices',
-                items: building.prices,
-                key: 0,
-                hard: false
-            });
-            mainMenu.panels['client'].updateInventory();
-        }
-    }*/
 
     Engine.buildingTitle.setText(buildingData.name);
     Engine.settlementTitle.setText(settlementData.name);
@@ -1742,6 +1741,21 @@ Engine.recipeClick = function(){
     Engine.menus['crafting'].panels['combi'].setUp(this.itemID);
     var sound = Engine.itemsData[this.itemID].sound;
     if(sound) Engine.scene.sound.add(sound).play();
+};
+
+Engine.toggleStock = function(stockID){
+    Engine.craftingStock = stockID;
+    if(stockID == 1){
+        Engine.currentMenu.panels['stock'].button.display();
+        Engine.currentMenu.panels['items'].button.hide();
+        Engine.currentMenu.panels['ingredients'].modifyReferenceInventory(Engine.player.inventory);
+    }else{
+        Engine.currentMenu.panels['items'].button.display();
+        Engine.currentMenu.panels['stock'].button.hide();
+        Engine.currentMenu.panels['ingredients'].modifyReferenceInventory(Engine.currentBuiling.inventory);
+    }
+    Engine.currentMenu.panels['ingredients'].updateInventory();
+    Engine.currentMenu.panels['combi'].manageButtons();
 };
 
 Engine.newbuildingClick = function(){

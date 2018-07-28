@@ -84,7 +84,7 @@ var Animal = new Phaser.Class({
         UI.setCursor(UI.handCursor);
     },
 
-    handleOver: function(){
+    setCursor: function(){
         if(!BattleManager.inBattle && Engine.inMenu) return;
         if(BattleManager.inBattle) {
             var dx = Math.abs(this.tileX-Engine.player.tileX);
@@ -99,9 +99,13 @@ var Animal = new Phaser.Class({
         UI.tooltip.display();
     },
 
+    handleOver: function(){
+        UI.manageCursor(1,'animal',this);
+    },
+
     handleOut: function(){
-        //if(BattleManager.inBattle) UI.setCursor();
-        UI.setCursor();
+        UI.manageCursor(0,'animal');
+        //UI.setCursor();
         UI.tooltip.hide();
     }
 });

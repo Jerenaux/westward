@@ -193,10 +193,6 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Events log
 - Add help back
 * Craftsmen gameplay
-- Dual stocks
--> Only possible to use exclusively one or the other atm
--> Crafted item goes to corresponding stock
--> Button to switch between the two
 - Several directly personnaly useful recipes for equipment etc. (bigger quivers, better projetiles, etc.)
 - Recipes learning/collecting/unlocking...
 -> Don't forget to take into account workshop level, craftsmen abilities with woodwork/metalwork/etc.

@@ -143,8 +143,8 @@ Client.battleAction = function(action,data){
     Client.socket.emit('battleAction',data);
 };
 
-Client.sendCraft = function(id,nb){
-    Client.socket.emit('craft',{id:id,nb:nb});
+Client.sendCraft = function(id,nb,stock){
+    Client.socket.emit('craft',{id:id,nb:nb,stock:stock});
 };
 
 Client.sendPurchase = function(id,nb, action){

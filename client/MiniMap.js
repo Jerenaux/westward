@@ -20,6 +20,14 @@ function MiniMap(){
         y: y,
         w: 0.95*r
     });
+
+    this.bg.setInteractive();
+    this.bg.on('pointerover',function(){
+        UI.manageCursor(1,'UI');
+    });
+    this.bg.on('pointerout',function(){
+        UI.manageCursor(0,'UI');
+    });
 }
 
 MiniMap.prototype.follow = function(){

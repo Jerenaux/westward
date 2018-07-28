@@ -23,11 +23,11 @@ InfoPanel.prototype.addBigButton = function(text){
 InfoPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
     this.displayTexts();
-    if(this.button) this.button.display();
+    //if(this.button) this.button.display();
 };
 
 InfoPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
     this.hideTexts();
-    if(this.button) this.button.hide();
+    //if(this.button) this.button.hide();
 };

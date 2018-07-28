@@ -14,6 +14,7 @@ var UI = {
     handCursor: 'url(/assets/sprites/hand.png), auto',
     handCursor2: 'url(/assets/sprites/hand2.png), auto',
     moveCursor: 'url(/assets/sprites/movement.png), auto',
+    moveCursor2: 'url(/assets/sprites/movement2.png), auto',
 
     preload: function () {
         UI.scene = this;
@@ -58,6 +59,17 @@ var UI = {
         UI.textsData = this.cache.json.get('texts');
         UI.classesData = this.cache.json.get('classes');
         UI.setCursor();
+
+        /*UI.hovering = 'ground';
+        UI.hoverTargets = {
+            'animal': false,
+            'building': false,
+            'item': false,
+            'ground': true,
+            'player': false,
+            'UI': false
+        };*/
+        UI.hovering = [];
 
         this.input.setTopOnly(false);
         this.input.on('pointermove',function(event){
@@ -164,12 +176,26 @@ UI.getGameHeight = function(){
     return UI.getConfig().height;
 };
 
-UI.manageCursor = function(){
+UI.manageCursor = function(inout,type,target){
+    if(inout == 1){
+        UI.hovering.push(type);
+        if(target) UI.hoverTarget = target;
+    }else{
+        UI.hovering.pop();
+    }
+    var hovering = UI.hovering[UI.hovering.length-1] || 'ground';
+    //console.log('hovering : ',hovering);
+    if(hovering != 'UI' && hovering != 'ground') target.setCursor();
+    if(hovering == 'ground' && !Engine.inMenu) UI.setCursor(UI.moveCursor);
+    if(hovering == 'UI' ) UI.setCursor();
+
+
     /*
     * - Keep track of hovering ground, game entities or UI
     * - Game entities and UI have in/out methods to update this
     * - If hover both UI and entity at same time, UI has precedence
-    * - Each time it changes, determine proper cursor based on flags (by calling manageCursor)
+    * - Each time it changes, determine proper target based on flags (by calling manageCursor)
+    * - Then call own "setcursor" method of target for actual decision logic
     * - Additional flag for bombs, set by battle actions
     * - Leverage this to update tooltips in real time?
     * */

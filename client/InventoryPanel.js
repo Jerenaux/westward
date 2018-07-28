@@ -218,6 +218,10 @@ InventoryPanel.prototype.modifyFilter = function(filter){
     this.setFilter(filter);
 };
 
+InventoryPanel.prototype.modifyReferenceInventory = function(inventory){
+    this.config.compareTo = inventory;
+};
+
 // Refresh the content of a displayed inventory
 InventoryPanel.prototype.updateInventory = function(){
     if(!this.displayed) return;

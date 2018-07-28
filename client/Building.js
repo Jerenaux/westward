@@ -241,15 +241,21 @@ var Building = new Phaser.Class({
         UI.setCursor(UI.buildingCursor);
     },
 
-    handleOver: function(){
+    setCursor: function(){
         if(BattleManager.inBattle || Engine.inMenu) return;
         UI.setCursor(UI.buildingCursor);
         UI.tooltip.updateInfo(this.name);
         UI.tooltip.display();
     },
 
+    handleOver: function(){
+        UI.manageCursor(1,'building',this);
+
+    },
+
     handleOut: function(){
-        UI.setCursor();
+        UI.manageCursor(0,'building');
+        //UI.setCursor();
         UI.tooltip.hide();
     }
 });

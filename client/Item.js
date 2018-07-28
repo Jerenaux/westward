@@ -59,15 +59,20 @@ var Item = new Phaser.Class({
         UI.setCursor(UI.handCursor);
     },
 
-    handleOver: function(){
+    setCursor: function(){
         if(BattleManager.inBattle || Engine.inMenu) return;
         UI.setCursor(UI.handCursor);
         UI.tooltip.updateInfo(this.name);
         UI.tooltip.display();
     },
 
+    handleOver: function(){
+        UI.manageCursor(1,'item',this);
+    },
+
     handleOut: function(){
-        UI.setCursor();
+        UI.manageCursor(0,'item');
+        //UI.setCursor();
         UI.tooltip.hide();
     }
 });
