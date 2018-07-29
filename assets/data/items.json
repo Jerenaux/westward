@@ -21,7 +21,8 @@
     "effects":{"acc":20},
     "recipe": {"7":1,"21":1},
     "useInBattle": true,
-    "sound": "cloth"
+    "sound": "cloth",
+    "isCrafted": true
   },
   "3":{
     "atlas": "items2",
@@ -35,9 +36,12 @@
     "name": "Bomb",
     "desc": "Will be usable in battle for area-of-effect damage.",
     "recipe": {"32":1,"35":2},
+    "isWeapon": true,
     "isCrafted": true,
     "craftTier": 2,
-    "sound": "cloth"
+    "sound": "cloth",
+    "stickMouse": true,
+    "useInBattle": true
   },
   "5":{
     "atlas": "items2",
@@ -51,6 +55,7 @@
     "frame":"flask",
     "name": "Dead man's shot",
     "desc": "Bitter potion made of citrinitas and clover, regenerates a lot of health.",
+    "isPotion": true,
     "recipe": {"17":1,"18":1},
     "effects":{"hp":100},
     "useInBattle": true,
@@ -84,6 +89,7 @@
     "frame":"tunic",
     "name": "Tunic",
     "equipment": "armor",
+    "isCrafted": true,
     "recipe":{"9":2},
     "effects":{"def":4},
     "sound": "cloth"
@@ -96,7 +102,9 @@
     "effects":{"mdmg":20},
     "useInBattle": true,
     "desc": "An adventurer's best friend.",
-    "sound": "sword"
+    "sound": "sword",
+    "isCrafted": true,
+    "recipe":{"33":3}
   },
   "12":{
     "atlas": "items2",
@@ -106,7 +114,9 @@
     "ammo": "ammo_pouch",
     "effects":{"acc":5},
     "useInBattle": true,
-    "sound": "equip"
+    "sound": "equip",
+    "isCrafted": true,
+    "recipe": {"7":2,"24":2}
   },
   "13":{
     "atlas": "items2",
@@ -114,7 +124,9 @@
     "name": "Wooden shield",
     "equipment": "shield",
     "effects":{"def":2},
-    "sound": "equip"
+    "sound": "equip",
+    "isCrafted": true,
+    "recipe": {"7": 10}
   },
   "14":{
     "atlas": "items2",
@@ -129,6 +141,7 @@
     "frame":"boots",
     "name": "Leather boots",
     "equipment": "boots",
+    "isCrafted": true,
     "recipe":{"9":1}
   },
   "16":{
@@ -136,6 +149,7 @@
     "frame":"belt",
     "name": "Leather belt",
     "equipment": "belt",
+    "isCrafted": true,
     "recipe":{"9":1}
   },
   "17":{
@@ -165,7 +179,9 @@
     "capacity": 10,
     "desc": "Can contain up to 10 arrows",
     "useInBattle": true,
-    "sound": "cloth"
+    "sound": "cloth",
+    "isCrafted": true,
+    "recipe": {"9":1,"21":1}
   },
   "20":{
     "atlas": "items",
@@ -175,13 +191,17 @@
     "effects":{"rdmg":12},
     "ammo": "quiver",
     "useInBattle": true,
-    "sound": "woodsmall"
+    "sound": "woodsmall",
+    "isCrafted": true,
+    "recipe":{"7":1,"24":1,"30":4}
   },
   "21":{
     "atlas": "items",
     "frame":"string",
     "name": "String",
     "desc": "Robust string made from plant fibers, primarily used to make bows.",
+    "isCrafted": true,
+    "isMaterial": true,
     "recipe":{"8":5},
     "sound": "cloth"
   },
@@ -189,13 +209,19 @@
     "atlas": "items2",
     "frame":"coal",
     "name": "Coal",
-    "desc": "Crafting material that can be mined or obtained from wood. Can be used to heat furnaces, as an ingredient for antidotes or can be converted into carbon."
+    "desc": "Crafting material that can be mined or obtained from wood. Can be used to heat furnaces, as an ingredient for antidotes or can be converted into carbon.",
+    "isCrafted": true,
+    "isResource": true,
+    "isMaterial": true,
+    "recipe": {"7": 5}
   },
   "23":{
     "atlas": "items",
     "frame":"carbon",
     "name": "Carbon",
     "desc": "Crafting material obtained from coal. In combination with iron, it can be used to make steel.",
+    "isCrafted": true,
+    "isMaterial": true,
     "recipe":{"22":5},
     "sound": "clank"
   },
@@ -230,6 +256,7 @@
     "frame":"basic_axe",
     "name": "Stone hatchet",
     "desc": "Basic weapon of fortune that can be crafted from wood and stone.",
+    "isCrafted": true,
     "recipe":{"7":1,"21":1,"26":1},
     "equipment": "meleew",
     "effects":{"mdmg":5},
@@ -355,6 +382,8 @@
     "capacity": 10,
     "desc": "Can contain up to 10 bullets",
     "useInBattle": true,
-    "sound": "cloth"
+    "sound": "cloth",
+    "isCrafted": true,
+    "recipe": {"9":1,"21":1}
   }
 }

@@ -263,4 +263,8 @@ Array.prototype.diff = function(a) { // returns the elements in the array that a
     return this.filter(function(i) {return a.indexOf(i) < 0;});
 };
 
+Array.prototype.last = function(){
+    return this[this.length-1];
+};
+
 if (onServer) module.exports.Utils = Utils;

@@ -73,6 +73,7 @@ BattleManager.manageTurn = function(shortID){
     }
 
     BattleManager.isPlayerTurn = this.active.isHero;
+    if(!BattleManager.isPlayerTurn) UI.manageCursor(0,'sticky'); // remove any sticky
     BattleManager.actionTaken = false;
     this.active.isActiveFighter = true;
     Engine.updateGrid();
@@ -95,22 +96,28 @@ BattleManager.canTakeAction = function(){
     return !BattleManager.actionTaken;
 };
 
+BattleManager.processBombClick = function(){
+
+};
+
 BattleManager.processTileClick = function(tile,pointer){
     if(!BattleManager.canTakeAction()) return;
+
+    if(Engine.stickyCursor){
+        BattleManager.processBombClick(tile);
+        return;
+    }
+
     if(!tile.inRange) return;
     Engine.moveToClick(pointer);
     BattleManager.actionTaken = true;
 };
 
-/*BattleManager.processAnimalClick = function(animal){
-    if(!BattleManager.canTakeAction()) return;
-    if(animal.dead) return;
-    Engine.requestBattleAttack(animal);
-    BattleManager.actionTaken = true;
-};*/
-
 BattleManager.processNPCClick = function(target){
     if(!BattleManager.canTakeAction()) return;
+
+    if(Engine.stickyCursor) return; // Will bubble down to TileClick
+
     if(target.dead) return;
     Engine.requestBattleAttack(target);
     BattleManager.actionTaken = true;
@@ -118,8 +125,7 @@ BattleManager.processNPCClick = function(target){
 
 BattleManager.processInventoryClick = function(){
     if(!BattleManager.canTakeAction()) return;
-    Engine.inventoryClick.call(this); // "this" has been bound to the clicked item
-    BattleManager.actionTaken = true;
+    BattleManager.actionTaken = Engine.inventoryClick.call(this); // "this" has been bound to the clicked item
 };
 
 BattleManager.isActiveCell = function(cell){
@@ -151,7 +157,8 @@ BattleManager.onDeath = function(){
 };
 
 BattleManager.endFight = function(){
-    UI.setCursor();
+    //UI.setCursor();
+    UI.manageCursor(0,'sticky'); // remove sticku, if any
     BattleManager.inBattle = false;
     Engine.menus.battle.hide();
     if(Engine.dead) {

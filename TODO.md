@@ -18,7 +18,6 @@ Release:
 * Inventory
 * Merchant gameplay
 * Misc
-* Orientation
 * Packaging
 * Settlement defense
 * Settlement economy
@@ -194,12 +193,12 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Add help back
 * Craftsmen gameplay
 - Several directly personnaly useful recipes for equipment etc. (bigger quivers, better projetiles, etc.)
-- Recipes learning/collecting/unlocking...
 -> Don't forget to take into account workshop level, craftsmen abilities with woodwork/metalwork/etc.
--> Be creative with multiple kinds of pelts, etc.
 - Display output nb
 - XP based on multiple factors
 - Abilities
+- At some point, made scrollable recipes panel
+-> Keep locked recipes but disable them 
 - Quests
 (- Recipes for golden ore -> gold ingots -> currency)
 (- Tiers)

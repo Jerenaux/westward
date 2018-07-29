@@ -13,26 +13,30 @@ CraftingPanel.prototype = Object.create(Panel.prototype);
 CraftingPanel.prototype.constructor = CraftingPanel;
 
 CraftingPanel.prototype.addInterface = function(){
-    var ringx = 80;
-    var ringy = 50;
-    var ring = UI.scene.add.image(this.x+ringx,this.y+ringy,'UI','craftring');
+    //var ringx = 80;
+    var ringy = 100;
+    var ring = UI.scene.add.image(this.x+(this.width/2),this.y+ringy,'UI','craftring');
     ring.setScrollFactor(0);
-    ring.setDisplayOrigin(0,0);
+    //ring.setDisplayOrigin(0,0);
     ring.setDepth(1);
     ring.setVisible(false);
     this.content.push(ring);
     this.ring = ring;
+    var ringw = ring.frame.width;
+    var ringh = ring.frame.height;
 
-    this.addButton(ringx+92,ringy+13,'green','ok',this.requestCraft.bind(this),'Craft');
-    this.addButton(ringx+5,ringy+82,'blue','plus',this.increaseAmount.bind(this),'Increase by 1');
-    this.addButton(ringx+22,ringy+99,'blue','minus',this.decreaseAmount.bind(this),'Decrease by 1');
+    var x = ring.x-(ringw/2)-this.x;
+    var y = ring.y - (ringh/2)-this.y;
+    this.addButton(x+92,y+13,'green','ok',this.requestCraft.bind(this),'Craft');
+    this.addButton(x+5,y+82,'blue','plus',this.increaseAmount.bind(this),'Increase by 1');
+    this.addButton(x+22,y+99,'blue','minus',this.decreaseAmount.bind(this),'Decrease by 1');
 
     var item = new ItemSprite();
-    item.setPosition(this.x+ringx+(ring.frame.width/2),this.y+ringy+(ring.frame.height/2));
+    item.setPosition(this.x+ring.x+(ringw/2),this.y+ringy+(ringh/2));
     item.showTooltip = false;
     this.content.push(item);
 
-    var count = UI.scene.add.text(this.x+ringx+(ring.frame.width/2),this.y+ringy+85, '0',  { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    var count = UI.scene.add.text(this.x+ring.x+(ring.frame.width/2),this.y+ringy+85, '0',  { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     count.setOrigin(0.5,0.5);
     count.setVisible(false);
     count.setDepth(2);

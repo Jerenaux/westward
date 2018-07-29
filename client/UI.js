@@ -15,6 +15,9 @@ var UI = {
     handCursor2: 'url(/assets/sprites/hand2.png), auto',
     moveCursor: 'url(/assets/sprites/movement.png), auto',
     moveCursor2: 'url(/assets/sprites/movement2.png), auto',
+    bombCursor: 'url(/assets/sprites/bombcursor.png), auto',
+    // TODO: make spritesheet of cursors, and one central animation dynamic
+    // (global ondown/onup handlers who change the current frame of cursor to alternate version
 
     preload: function () {
         UI.scene = this;
@@ -177,17 +180,40 @@ UI.getGameHeight = function(){
 };
 
 UI.manageCursor = function(inout,type,target){
+    var data = {
+        type: type,
+        target: target
+    };
+    var hovering = UI.hovering.last() || {type:'ground'};
+
     if(inout == 1){
-        UI.hovering.push(type);
-        if(target) UI.hoverTarget = target;
+        if(hovering.type == 'sticky') return; // don't change cursor if currently sticky
+        UI.hovering.push(data);
     }else{
+        if(type == 'sticky' && hovering.type != 'sticky') return; // don't remove a sticky if not currently sticky
         UI.hovering.pop();
     }
-    var hovering = UI.hovering[UI.hovering.length-1] || 'ground';
-    //console.log('hovering : ',hovering);
-    if(hovering != 'UI' && hovering != 'ground') target.setCursor();
-    if(hovering == 'ground' && !Engine.inMenu) UI.setCursor(UI.moveCursor);
-    if(hovering == 'UI' ) UI.setCursor();
+    var hovering = UI.hovering.last() || {type:'ground'};
+    console.log('hovering : ',hovering);
+    if(hovering.type == 'sticky'){
+        UI.setCursor(UI.bombCursor);
+    }else if(hovering.type == 'UI'){
+        UI.setCursor();
+    }else if(hovering.type != 'UI' && hovering.type != 'ground' && hovering.type != 'tile') {
+        hovering.target.setCursor();
+    }else if(hovering.type == 'tile'){
+        UI.setCursor(UI.moveCursor);
+    }else if(hovering.type == 'ground'){
+        if(Engine.inMenu){
+            UI.setCursor();
+        }else {
+            UI.setCursor(UI.moveCursor);
+        }
+    }
+
+    /*if(hovering.type != 'UI' && hovering.type != 'ground') hovering.target.setCursor();
+    if(hovering.type == 'ground' && !Engine.inMenu) UI.setCursor(UI.moveCursor);
+    if(hovering.type == 'UI' ) UI.setCursor();*/
 
 
     /*

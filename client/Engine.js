@@ -1025,14 +1025,28 @@ Engine.makeTradeMenu = function(){
 Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
     crafting.setSound(Engine.scene.sound.add('crafting'));
-    var recipes = new InventoryPanel(765,100,235,380,'Recipes');
-    recipes.setInventory(Engine.workshopRecipes,4,false,Engine.recipeClick);
-    recipes.addButton(205, 8, 'blue','help',null,'',UI.textsData['recipes_help']);
-    crafting.addPanel('recipes',recipes);
-    var combi = crafting.addPanel('combi',new CraftingPanel(450,100,290,380,'Combination'));
-    combi.addButton(260, 8, 'blue','help',null,'',UI.textsData['combi_help']);
 
-    var ingredients = crafting.addPanel('ingredients',new InventoryPanel(450,300,290,380,'',true)); // true = invisible
+    //var recipes = new InventoryPanel(765,100,235,380,'Recipes');
+    //recipes.setInventory(Engine.workshopRecipes,4,false,Engine.recipeClick);
+    var recipes = new Panel(700,100,300,380,'Recipes');
+    recipes.addButton(270, 8, 'blue','help',null,'',UI.textsData['recipes_help']);
+    crafting.addPanel('recipes',recipes);
+
+    var y = 135;
+    var h = 155;
+    var gap = 20;
+    var categories = ['equipment','ingredients'];
+    categories.forEach(function(cat){
+        var inv = new InventoryPanel(710, y, 280, h,Utils.capitalizeFirstLetter(cat));
+        inv.setInventory(Engine[cat+'Recipes'],6,false,Engine.recipeClick);
+        crafting.addPanel('cat_'+cat,inv);
+        y += (h+gap);
+    });
+
+    var combi = crafting.addPanel('combi',new CraftingPanel(450,100,240,380,'Combination'));
+    combi.addButton(210, 8, 'blue','help',null,'',UI.textsData['combi_help']);
+
+    var ingredients = crafting.addPanel('ingredients',new InventoryPanel(450,300,240,380,'',true)); // true = invisible
     ingredients.setInventory(new Inventory(5),5,true,null,Engine.player.inventory);
 
     var items = new InventoryPanel(40,100,390,185,'Your items');
@@ -1053,17 +1067,18 @@ Engine.makeCraftingMenu = function(){
         });
     crafting.addPanel('stock',stock);
 
-
     crafting.addEvent('onUpdateRecipes',function(){
-        recipes.updateInventory();
+        //recipes.updateInventory();
+        categories.forEach(function(cat){
+            crafting.panels['cat_'+cat].updateInventory();
+        });
     });
+
     crafting.addEvent('onUpdateInventory',function(){
         items.updateInventory();
         ingredients.updateInventory();
     });
-    /*crafting.addEvent('onUpdateShop',function(){
-        shop.updateInventory();
-    });*/
+
     crafting.addEvent('onUpdateShop',function(){
         stock.modifyInventory(Engine.currentBuiling.inventory.items);
         stock.updateInventory();
@@ -1171,18 +1186,50 @@ Engine.addHero = function(data){
     Engine.player.classxp = data.classxp;
     Engine.player.classlvl = data.classlvl;
 
-    Engine.player.itemRecipes = new Inventory(16);
-    Engine.workshopRecipes = new Inventory(20);
 
-    // TODO: move to conf file somewhere
-    var goCraft = [[2,1],[21,1],[28,1],[29,1]];
-    var workshopCraft = goCraft.concat([[4,1],[6,1],[10,1],[17,1],[23,1],[32,1],[33,1],[35,1],[38,1],[39,1]]);
-    Engine.player.itemRecipes.fromList(goCraft);
-    Engine.workshopRecipes.fromList(workshopCraft);
+    // TODO: move this part somewhere else
+    var weaponsRecipes = [];
+    var equipmentRecipes = [];
+    var ingredientsRecipes = [];
+    var potionRecipes = [];
+
+    for(var key in Engine.itemsData){
+        // TODO: standardize flags (isWeapon, ...)
+        var item = Engine.itemsData[key];
+        if(item.isCrafted){
+            if(item.equipment){
+                /*if(item.equipment == 'meleew' || item.equipment == 'rangedw' || item.ammo){
+                    weaponsRecipes.push(key);
+                }else{
+                    equipmentRecipes.push(key);
+                }*/
+                equipmentRecipes.push(key);
+            }
+            if(item.isPotion) equipmentRecipes.push(key);
+            if(item.isWeapon) equipmentRecipes.push(key);
+            if(item.isMaterial) ingredientsRecipes.push(key);
+        }
+    }
+
+    //console.log("w",weaponsRecipes);
+    //console.log("eq",equipmentRecipes);
+    //console.log("ingredients",ingredientsRecipes);
+    //console.log("potions",potionRecipes);
+
+    Engine.weaponsRecipes = new Inventory(12);
+    Engine.equipmentRecipes = new Inventory(18);
+    Engine.ingredientsRecipes = new Inventory(18);
+    Engine.potionsRecipes = new Inventory(12);
+
+    equipmentRecipes.forEach(function(w){
+        Engine.equipmentRecipes.add(w,1);
+    });
+    ingredientsRecipes.forEach(function(w){
+        Engine.ingredientsRecipes.add(w,1);
+    });
 
     Engine.player.stats = Stats.getSkeleton();
     Engine.player.equipment = new EquipmentManager();
-    //Engine.player.commitSlots = data.commitSlots;
     Engine.player.setCommitSlots(data.commitSlots);
     Engine.updateEnvironment();
 };
@@ -1263,7 +1310,6 @@ Engine.handleDown = function(pointer,objects){
         objects[0].handleDown(pointer);
     }else{
         if(!Engine.inPanel && !Engine.inMenu && !BattleManager.inBattle && !Engine.dead) {
-            console.log('down');
             UI.setCursor(UI.moveCursor2);
         }
     }
@@ -1274,10 +1320,8 @@ Engine.handleClick = function(pointer,objects){
         for(var i = 0; i < Math.min(objects.length,2); i++){ // disallow bubbling too deep, only useful in menus (i.e. shallow)
             if(objects[i].handleClick) objects[i].handleClick(pointer);
         }
-        //Engine.interrupt = false;
     }else{
         if(!Engine.inPanel && !Engine.inMenu && !BattleManager.inBattle && !Engine.dead) {
-            console.log('up');
             UI.setCursor(UI.moveCursor);
             Engine.moveToClick(pointer);
         }
@@ -1763,14 +1807,20 @@ Engine.newbuildingClick = function(){
 };
 
 Engine.inventoryClick = function(){
-    //Client.sendUse(this.itemID);
-    //return;
     if(BattleManager.inBattle) {
-        Client.sendUse(this.itemID);
+        var sticky = Engine.itemsData[this.itemID].stickMouse;
+        UI.manageCursor(+sticky,'sticky');
+        if(sticky){
+            Engine.stickyCursor = true;
+            return false;
+        }else {
+            Client.sendUse(this.itemID);
+            return true;
+        }
     }else{
         // itemAction is the small panel appearing in the inventory displaying options such as use, throw...
-        Engine.currentMenu.panels['itemAction'].setUp(this.itemID);
         Engine.currentMenu.panels['itemAction'].display();
+        Engine.currentMenu.panels['itemAction'].setUp(this.itemID);
     }
 };
 

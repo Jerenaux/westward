@@ -100,7 +100,7 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(13,1);
     this.giveItem(28,1);
 
-    this.giveItem(9,2);
+    this.giveItem(4,2);
     /*this.giveItem(12,1);
     this.giveItem(24,2);
     this.giveItem(39,5);
