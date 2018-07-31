@@ -55,7 +55,7 @@ Engine.preload = function() {
 
     // Animations
     this.load.spritesheet('sword_anim', 'assets/sprites/Sword1.png',{frameWidth:96,frameHeight:96});
-    //this.load.spritesheet('death', 'assets/sprites/death.png',{frameWidth:48,frameHeight:48});
+    this.load.spritesheet('explostion', 'assets/sprites/explosion.png',{frameWidth:100,frameHeight:100});
 
     // Buildings
     this.load.atlas('buildings_sprites', 'assets/sprites/buildings.png', 'assets/sprites/buildings.json');
@@ -232,7 +232,7 @@ Engine.create = function(){
     Engine.displayedChunks = [];
     Engine.mapDataCache = {};
 
-    var animations = ['death','sword_anim'];
+    var animations = ['explosion','sword_anim'];
     Engine.animationsPools = {};
     animations.forEach(function(key){
         Engine.animationsPools[key] = new Pool('sprite',key);
@@ -456,6 +456,17 @@ Engine.createAnimations = function(){
     });
 
     Engine.scene.anims.create(config = {
+        key: 'explosion',
+        frames: Engine.scene.anims.generateFrameNumbers('explosion', { start: 0, end: 80}),
+        frameRate: 15,
+        hideOnComplete: true,
+        // TODO: test if callback still called after v3.3
+        onComplete: function(sprite){
+            sprite.recycle();
+        }
+    });
+
+    Engine.scene.anims.create(config = {
         key: 'player_death',
         frames: Engine.scene.anims.generateFrameNumbers('hero', { start: 260, end: 265}),
         frameRate: 10
@@ -579,16 +590,14 @@ Engine.makeUI = function(){
     var gap = 50;
     var x = 960;
     var y = 530;
-    var letter = new UIElement(x,y,'envelope',Engine.menus.messages);
+    var letter = new UIElement(x,y,Engine.menus.messages,'envelope');
     UIelements.push(letter);
     x -= gap;
-    UIelements.push(new UIElement(x,y,'self_map',Engine.menus.map));
+    UIelements.push(new UIElement(x,y,Engine.menus.map,'self_map'));
     x -= gap;
-    UIelements.push(new UIElement(x,y,'scroll',Engine.menus.character));
+    UIelements.push(new UIElement(x,y,Engine.menus.character,'scroll'));
     x -= gap;
-    //UIelements.push(new UIElement(x,y,'tools',Engine.menus.crafting));
-    //x -= gap;
-    UIelements.push(new UIElement(x,y,'backpack',Engine.menus.inventory));
+    UIelements.push(new UIElement(x,y,Engine.menus.inventory,'backpack'));
     x -= gap;
     Engine.nbBasicUIEelements = UIelements.length;
     Engine.UIelements = UIelements;
@@ -626,7 +635,7 @@ Engine.makeUI = function(){
 };
 
 Engine.addMenuIcon = function(x,y,frame,menu){
-    var icon = new UIElement(x,y,frame,menu);
+    var icon = new UIElement(x,y,menu,frame);
     icon.setVisible(false);
     Engine.UIelements.push(icon);
     menu.setIcon(icon);
@@ -658,6 +667,10 @@ Engine.tweenFighText = function(){
             }
         }
     );
+};
+
+Engine.handleExplosion = function(){
+
 };
 
 Engine.handleBattleAnimation = function(animation,target,dmg){
@@ -1306,23 +1319,18 @@ Engine.handleKeyboard = function(event){
 };
 
 Engine.handleDown = function(pointer,objects){
-    if(objects.length > 0 && objects[0].handleDown){
-        objects[0].handleDown(pointer);
-    }else{
-        if(!Engine.inPanel && !Engine.inMenu && !BattleManager.inBattle && !Engine.dead) {
-            UI.setCursor(UI.moveCursor2);
-        }
-    }
+    UI.downCursor();
+    if(objects.length > 0 && objects[0].handleDown)objects[0].handleDown(pointer);
 };
 
 Engine.handleClick = function(pointer,objects){
+    UI.upCursor();
     if(objects.length > 0){
         for(var i = 0; i < Math.min(objects.length,2); i++){ // disallow bubbling too deep, only useful in menus (i.e. shallow)
             if(objects[i].handleClick) objects[i].handleClick(pointer);
         }
     }else{
         if(!Engine.inPanel && !Engine.inMenu && !BattleManager.inBattle && !Engine.dead) {
-            UI.setCursor(UI.moveCursor);
             Engine.moveToClick(pointer);
         }
     }
@@ -1440,10 +1448,8 @@ Engine.updateMarker = function(tile){
     if(tile.x != Engine.marker.previousTile.x || tile.y != Engine.marker.previousTile.y){
         Engine.marker.previousTile = tile;
         if(Engine.checkCollision(tile.x,tile.y)){
-            //UI.setCursor();
             if(Engine.debugMarker) Engine.marker.setFrame(1);
         }else{
-            //UI.setCursor(UI.moveCursor);
             if(Engine.debugMarker) Engine.marker.setFrame(0);
         }
     }
@@ -1673,16 +1679,6 @@ Engine.countIcons = function(){
     return count;
 };
 
-/*Engine.processAnimalClick = function(target){
-    if(Engine.inPanel) return;
-    if(target.dead){
-        Engine.player.setDestinationAction(2,target.id,target.tileX,target.tileY); // 2 for animal
-        Engine.computePath({x:target.tileX,y:target.tileY});
-    }else{
-        Client.animalClick(target.id);
-    }
-};*/
-
 Engine.processNPCClick = function(target){
     if(Engine.inPanel) return;
     if(target.dead){
@@ -1705,6 +1701,12 @@ Engine.requestBattleAttack = function(target){
     Engine.requestBattleAction('attack',{id:target.getShortID()});
 };
 
+Engine.requestBomb = function(x,y){
+    if(BattleManager.actionTaken) return;
+    Engine.requestBattleAction('bomb',{x:x,y:y});
+};
+
+// General battle action method called by the more specific ones (except moving)
 Engine.requestBattleAction = function(action,data){
     BattleManager.actionTaken = true;
     Client.battleAction(action,data);

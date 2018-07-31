@@ -229,7 +229,7 @@ var Building = new Phaser.Class({
     // ### INPUT ###
 
     handleDown: function(){
-        UI.setCursor(UI.buildingCursor2);
+        //UI.setCursor(UI.buildingCursor2);
     },
 
 
@@ -238,12 +238,12 @@ var Building = new Phaser.Class({
         if (!this.entrance) return;
         Engine.player.setDestinationAction(1, this.id, this.entrance.x, this.entrance.y); // 1 for building
         Engine.computePath(this.entrance);
-        UI.setCursor(UI.buildingCursor);
+        //UI.setCursor(UI.buildingCursor);
     },
 
     setCursor: function(){
         if(BattleManager.inBattle || Engine.inMenu) return;
-        UI.setCursor(UI.buildingCursor);
+        UI.setCursor('building');
         UI.tooltip.updateInfo(this.name);
         UI.tooltip.display();
     },
@@ -255,7 +255,6 @@ var Building = new Phaser.Class({
 
     handleOut: function(){
         UI.manageCursor(0,'building');
-        //UI.setCursor();
         UI.tooltip.hide();
     }
 });

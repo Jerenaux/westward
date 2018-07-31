@@ -104,11 +104,10 @@ Performance:
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
+- Proper initial cursor (using continuous polling or sth?)
 - Central shared list of entities
 - Remove global engine hover/out events, use local ones in animals, buildings...
 - From 10.0: use pointer.worldX and worldY to handle location clicks
-- From 10.0: use this.input.setDefaultCursor() to set cursor
-- From 10.0: use button.input.cursor = 'url(assets/cursors/sword.cur), pointer  for hover cursor changes
 - Send a digested config file from server to client
 - Add as much stuff as possible to config file
 - Deal differently with net updates when visibility lost (https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
@@ -152,7 +151,11 @@ Content:
 - Maximum ambient noises
 -> Multiple categories (weather, animals, terrain...), distinct random intervals
 * Battle system
-- Bombs, traps, poisons, potions, oils...
+- Bombs:
+-> Animation
+-> Variable damage based on bomb type
+-> Factor defense in
+- traps, poisons, potions, oils...
 (-> trap bonuses to explorers? Natural crafting recipe to them?)
 - Increase fatigue when fighting
 - Effect of fatigue on fighting
@@ -173,13 +176,13 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Civic slots: send building type&id bundles, client stores two inventories, for logic and icon display
 - Finish all civic panel related stuff (commitment, etc.)
 - Use Phaser 3.11 setCrop to crop icons when on fringe
-- Server side: check that not committing twice to same building
 - Apply taxes
 - Civic abilities
-- Change settlement
-- Update population based on players (requires permanent players)
 - Elections
 - Naming officials
+(- Change settlement
+- Update population based on players (requires permanent players)
+- Server side: check that not committing twice to same building)
 * Character panel
 -> Indicate starvation level of settlement
 - restore "setClass" to use to compute different XP gains per class

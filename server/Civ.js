@@ -14,7 +14,7 @@ function Civ(x,y,type){
     this.y = y;
     this.type = type;
     this.xpReward = GameServer.civsData[this.type].xp || 0;
-
+    this.name = 'Enemy';
     this.setAggressive();
     this.setStartingStats(GameServer.civsData[this.type].stats);
     this.setLoot(GameServer.civsData[this.type].loot);

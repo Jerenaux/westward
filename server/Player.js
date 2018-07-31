@@ -17,6 +17,7 @@ function Player(){
     this.isPlayer = true;
     this.battleTeam = 'Player';
     this.updateCategory = 'players';
+    this.name = 'Player';
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.oldAOIs = [];
     this.action = null;

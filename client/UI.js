@@ -6,18 +6,6 @@ var UI = {
     key: 'UI',
     plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager','LightsPlugin'],
     tooltipDepth: 20,
-    cursor: 'url(/assets/sprites/cursor.png), auto', // image of the mouse cursor in normal circumstances
-    bowCursor: 'url(/assets/sprites/bowcursor32.png), auto',
-    swordCursor: 'url(/assets/sprites/sabre.png), auto',
-    buildingCursor: 'url(/assets/sprites/door.png), auto', // buildingcursor
-    buildingCursor2: 'url(/assets/sprites/door2.png), auto', // buildingcursor
-    handCursor: 'url(/assets/sprites/hand.png), auto',
-    handCursor2: 'url(/assets/sprites/hand2.png), auto',
-    moveCursor: 'url(/assets/sprites/movement.png), auto',
-    moveCursor2: 'url(/assets/sprites/movement2.png), auto',
-    bombCursor: 'url(/assets/sprites/bombcursor.png), auto',
-    // TODO: make spritesheet of cursors, and one central animation dynamic
-    // (global ondown/onup handlers who change the current frame of cursor to alternate version
 
     preload: function () {
         UI.scene = this;
@@ -61,26 +49,27 @@ var UI = {
         UI.notifications = [];
         UI.textsData = this.cache.json.get('texts');
         UI.classesData = this.cache.json.get('classes');
+
+        // TODO: move to config or sth
+        UI.cursors = {
+            default: 'cursor',
+            bomb: 'bombcursor',
+            building: 'door',
+            combat: 'sabre',
+            item: 'hand',
+            melee: 'swordcursor32',
+            move: 'movement',
+            range: 'bowcursor32'
+        };
+        UI.dualCursors = ['move','item','building','combat'];
         UI.setCursor();
 
-        /*UI.hovering = 'ground';
-        UI.hoverTargets = {
-            'animal': false,
-            'building': false,
-            'item': false,
-            'ground': true,
-            'player': false,
-            'UI': false
-        };*/
         UI.hovering = [];
 
         this.input.setTopOnly(false);
         this.input.on('pointermove',function(event){
             if(UI.tooltip) UI.tooltip.updatePosition(event.x,event.y);
         });
-        /*this.input.on('gameobjectdown', function (pointer, gameObject) {
-            console.warn(gameObject);
-        });*/
         if(Client.isNewPlayer()) UI.classMenu = UI.makeClassMenu();
 
         this.scene.get('boot').updateReadyTick();
@@ -191,44 +180,40 @@ UI.manageCursor = function(inout,type,target){
         UI.hovering.push(data);
     }else{
         if(type == 'sticky' && hovering.type != 'sticky') return; // don't remove a sticky if not currently sticky
+        if(type != 'sticky' && hovering.type == 'sticky') return; // ignore out if cursor is sticky
         UI.hovering.pop();
     }
     var hovering = UI.hovering.last() || {type:'ground'};
     console.log('hovering : ',hovering);
     if(hovering.type == 'sticky'){
-        UI.setCursor(UI.bombCursor);
+        UI.setCursor('bomb');
     }else if(hovering.type == 'UI'){
         UI.setCursor();
     }else if(hovering.type != 'UI' && hovering.type != 'ground' && hovering.type != 'tile') {
         hovering.target.setCursor();
     }else if(hovering.type == 'tile'){
-        UI.setCursor(UI.moveCursor);
+        UI.setCursor('move');
     }else if(hovering.type == 'ground'){
         if(Engine.inMenu){
             UI.setCursor();
         }else {
-            UI.setCursor(UI.moveCursor);
+            UI.setCursor('move');
         }
     }
-
-    /*if(hovering.type != 'UI' && hovering.type != 'ground') hovering.target.setCursor();
-    if(hovering.type == 'ground' && !Engine.inMenu) UI.setCursor(UI.moveCursor);
-    if(hovering.type == 'UI' ) UI.setCursor();*/
-
-
-    /*
-    * - Keep track of hovering ground, game entities or UI
-    * - Game entities and UI have in/out methods to update this
-    * - If hover both UI and entity at same time, UI has precedence
-    * - Each time it changes, determine proper target based on flags (by calling manageCursor)
-    * - Then call own "setcursor" method of target for actual decision logic
-    * - Additional flag for bombs, set by battle actions
-    * - Leverage this to update tooltips in real time?
-    * */
 };
 
-UI.setCursor = function(cursor){
-    UI.scene.sys.game.canvas.style.cursor = (cursor || UI.cursor);
+UI.downCursor = function(){
+    if(UI.dualCursors.includes(UI.currentCursor)) UI.setCursor(UI.currentCursor,true);
+};
+
+UI.upCursor = function(){
+    UI.setCursor(UI.currentCursor);
+};
+
+UI.setCursor = function(cursor,down){
+    var cursorFile = UI.cursors[cursor || 'default'];
+    UI.scene.sys.game.canvas.style.cursor = 'url(/assets/sprites/cursors/'+cursorFile+(down ? '2' : '')+'.png), auto';
+    UI.currentCursor = cursor;
 };
 
 UI.makeClassMenu = function() {

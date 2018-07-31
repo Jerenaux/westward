@@ -96,8 +96,9 @@ BattleManager.canTakeAction = function(){
     return !BattleManager.actionTaken;
 };
 
-BattleManager.processBombClick = function(){
-
+BattleManager.processBombClick = function(tile){
+    Engine.requestBomb(tile.tx,tile.ty);
+    BattleManager.actionTaken = true;
 };
 
 BattleManager.processTileClick = function(tile,pointer){

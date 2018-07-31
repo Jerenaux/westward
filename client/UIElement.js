@@ -7,7 +7,7 @@ var UIElement = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function UIElement (x, y, frame, menu) {
+    initialize: function UIElement (x, y, menu, frame) {
         CustomSprite.call(this, UI.scene, x, y, 'trayicons');
         this.setFrame(frame);
 
@@ -23,16 +23,17 @@ var UIElement = new Phaser.Class({
 
     handleOver: function(){
         UI.manageCursor(1,'UI');
-        /*this.x -= 3;
-        this.y -= 3;
-        this.setScale(1.05);*/
+        var trayFrames = Engine.scene.textures.list['trayicons'].frames;
+        var hoverFrame = this.frame.name+'_hover';
+        if(trayFrames.hasOwnProperty(hoverFrame)){
+            this.initialFrame = this.frame.name;
+            this.setFrame(hoverFrame);
+        }
     },
 
     handleOut: function(){
         UI.manageCursor(0,'UI');
-        /*this.x += 3;
-        this.y += 3;
-        this.setScale(1);*/
+        if(this.initialFrame) this.setFrame(this.initialFrame);
     },
 
     handleClick: function(){

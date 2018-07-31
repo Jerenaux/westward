@@ -142,20 +142,23 @@ Battle.prototype.isTurnOf = function(f){
 
 Battle.prototype.processAction = function(f,data){
     if(!this.isTurnOf(f) || this.actionTaken) return;
-    var result;
+    var result; // small object with result and delay fields, to indicat success and time to wait (for animations etc.)
     switch(data.action){
+        case 'attack':
+            var target = this.getFighterByID(data.id);
+            result = this.processAttack(f,target);
+            break;
+        case 'bomb':
+            result = this.processBomb(f,data.x,data.y);
+            break;
+        case 'move':
+            result = this.processMove(f);
+            break;
         case 'pass':
             result = {
                 success: true,
                 delay: 100
             };
-            break;
-        case 'move':
-            result = this.processMove(f);
-            break;
-        case 'attack':
-            var target = this.getFighterByID(data.id);
-            result = this.processAttack(f,target);
             break;
     }
     if(result && result.success) this.setEndOfTurn(result.delay);
@@ -164,6 +167,25 @@ Battle.prototype.processAction = function(f,data){
 Battle.prototype.setEndOfTurn = function(delay){
     this.actionTaken = true;
     this.endTime = this.countdown - delay;
+};
+
+Battle.prototype.processBomb = function(f,tx,ty){
+    // TODO: add thrower anim
+    for(var x = tx-1; x <= tx+1; x++){
+        for(var y = ty-1; y <= ty+1; y++){
+            var victim = this.positions.get(x,y);
+            if(victim){
+                var dmg = this.computeDamage('bomb',null,victim);
+                var killed = this.applyDamage(victim,dmg);
+                victim.setProperty('hit',dmg); // for the flash and hp display
+                if(killed && f.isPlayer) f.addNotif(victim.name+' killed');
+            }
+        }
+    }
+    return {
+        success: true,
+        delay: 1000
+    };
 };
 
 Battle.prototype.processMove = function(f){
@@ -195,6 +217,9 @@ Battle.prototype.computeDamage = function(type,a,b){
     var def = b.getStat('def').getValue();
     var dmg;
     switch(type){
+        case 'bomb':
+            dmg = 100; // TODO: refine
+            break;
         case 'melee':
             var atk = a.getStat('mdmg').getValue();
             dmg = this.computeMeleeDamage(atk,def);
@@ -261,10 +286,10 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
     var killed = false;
     if(!b || b.isDead()) return;
     if(this.nextTo(a,b)){
-        a.setProperty('melee_atk',{x:b.x,y:b.y});
+        a.setProperty('melee_atk',{x:b.x,y:b.y}); // for the attack animation of attacker
         var dmg = this.computeDamage('melee',a,b);
         killed = this.applyDamage(b,dmg);
-        b.setProperty('hit',dmg);
+        b.setProperty('hit',dmg); // for the flash and hp display
     }else{
         if(!a.canRange()) return false;
         a.setProperty('ranged_atk',{x:b.x,y:b.y});
@@ -279,7 +304,7 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
             b.setProperty('rangedMiss',true);
         }
     }
-    if(killed && a.isPlayer) a.addNotif(GameServer.animalsData[b.type].name+' killed');
+    if(killed && a.isPlayer) a.addNotif(b.name+' killed');
     return {
         success: true,
         delay: delay

@@ -83,7 +83,7 @@ var BattleTile = new Phaser.Class({
     },
 
     setCursor: function(){
-        UI.setCursor(UI.moveCursor);
+        UI.setCursor('move');
     },
 
     handleOver: function(){

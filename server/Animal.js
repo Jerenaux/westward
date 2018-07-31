@@ -20,6 +20,7 @@ function Animal(x,y,type){
     this.y = y;
     this.type = type;
     this.xpReward = GameServer.animalsData[this.type].xp || 0;
+    this.name = GameServer.animalsData[this.type].name;
     this.setAggressive();
     this.setWander();
     this.setStartingStats(GameServer.animalsData[this.type].stats);
