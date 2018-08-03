@@ -107,7 +107,7 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(39,5);
     this.giveItem(40,1);*/
 
-    this.giveGold(100);
+    this.giveGold(300);
 };
 
 Player.prototype.setUpStats = function(){
@@ -175,7 +175,8 @@ Player.prototype.hasFreeCommitSlot = function(){
 
 Player.prototype.takeCommitmentSlot = function(buildingID,notify){
     this.addToSlots({
-        building: buildingID,
+        id: buildingID,
+        type: GameServer.buildings[buildingID].type,
         stamp: 1
     });
     this.syncCommitSlots();
@@ -187,7 +188,7 @@ Player.prototype.updateCommitment = function(){
 
     var slots = this.getSlots();
     if(slots.length = 0) return;
-    slots.forEach(function(slot){
+    slots.forEach(function(slot){ // Assumes a duration of 1 turn for now
         this.addNotif('Commitment to '+GameServer.buildings[slot.building].name+' ended');
     },this);
 
@@ -198,7 +199,11 @@ Player.prototype.updateCommitment = function(){
 Player.prototype.trimCommitSlots = function(){
     var slots = [];
     this.getSlots().forEach(function(slot){
-        slots.push(GameServer.buildings[slot.building].type); // Sends the building type, not ID anymore!
+        //slots.push(GameServer.buildings[slot.building].type);
+        slots.push({
+            type: slot.type,
+            id: slot.id
+        });
     });
     var trimmed = this.getCommitSlotsShell();
     trimmed.slots = slots;

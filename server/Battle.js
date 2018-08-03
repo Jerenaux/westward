@@ -171,6 +171,7 @@ Battle.prototype.setEndOfTurn = function(delay){
 
 Battle.prototype.processBomb = function(f,tx,ty){
     // TODO: add thrower anim
+    // TODO: check if player has a bomb in inventory
     for(var x = tx-1; x <= tx+1; x++){
         for(var y = ty-1; y <= ty+1; y++){
             var victim = this.positions.get(x,y);

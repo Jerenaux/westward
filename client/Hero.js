@@ -17,6 +17,25 @@ var Hero = new Phaser.Class({
         );
     },
 
+    setUp: function(data){
+        Player.prototype.setUp.call(this,data);
+
+        this.settlement = data.settlement;
+        this.markers = data.markers;
+        this.unread = 1;
+        this.inventory = new Inventory();
+        this.stats = Stats.getSkeleton();
+        this.equipment = new EquipmentManager();
+        this.setCommitSlots(data.commitSlots);
+
+        //this.class = data.class;
+        this.gold = data.gold;
+        this.civiclvl = data.civiclvl;
+        this.civicxp = data.civicxp;
+        this.classxp = data.classxp;
+        this.classlvl = data.classlvl;
+    },
+
     updateData: function(data){ // don't call this 'update' or conflict with Phaser method
         var callbacks = {
             'ammo': this.updateAmmo,
@@ -59,10 +78,68 @@ var Hero = new Phaser.Class({
     },
 
     setCommitSlots: function(commitSlots){
-        if(!this.commitSlots) this.commitSlots = new Inventory(commitSlots.max);
+        // Data structures are cleared in updateCommitSlots
+        if(!this.commitTypes) this.commitTypes = new Inventory(commitSlots.max);
+        if(!this.commitIDs) this.commitIDs = [];
+        this.maxCommitSlots = commitSlots.max;
+
+        commitSlots.slots.forEach(function(s){
+            this.commitTypes.add(s.type,1);
+            this.commitIDs.push(s.id);
+        },this);
+
+        /*if(!this.commitSlots) this.commitSlots = new Inventory(commitSlots.max);
         commitSlots.slots.forEach(function(s){
             this.commitSlots.add(s,1);
-        },this);
+        },this);*/
+    },
+
+    canCommit: function(){
+        if(!this.hasFreeCommitSlot()) return;
+        return !this.commitIDs.includes(Engine.currentBuiling.id);
+    },
+
+    hasFreeCommitSlot: function(){
+        return (this.commitIDs.length != this.maxCommitSlots);
+    },
+
+
+// ### GETTERS ###
+
+    getEquipped: function(slot){
+        return this.equipment.get(slot); // Returns the ID of the item equipped at the given slot
+    },
+
+    getMaxAmmo: function(slot){
+        var container = this.equipment.get(this.equipment.getContainer(slot));
+        return Engine.itemsData[container].capacity;
+    },
+
+    getNbAmmo: function(slot){
+        return this.equipment.getNbAmmo(slot);
+    },
+
+    getRangedCursor: function(){
+        var rangedw = this.getEquipped('rangedw');
+        console.log('rangedw = ',rangedw);
+        if(rangedw == -1) return 'bow';
+        return (Engine.itemsData[rangedw].ammo == 'quiver' ? 'bow' : 'gun');
+    },
+
+    getStat: function(stat){
+        return this.stats[stat];
+    },
+
+    getStatValue: function(stat){
+        return this.getStat(stat).getValue();
+    },
+
+    hasItem: function(item,nb){
+        return (this.inventory.getNb(item) >= nb);
+    },
+
+    isAmmoEquipped: function(slot){
+        return this.equipment.hasAnyAmmo(slot);
     },
 
     // ### UPDATES #####
@@ -115,8 +192,9 @@ var Hero = new Phaser.Class({
     },
 
     updateCommitSlots: function(commitSlots){
-        //this.commitSlots = commitSlots;
-        this.commitSlots.clear();
+        //this.commitSlots.clear();
+        this.commitTypes.clear();
+        this.commitIDs = [];
         this.setCommitSlots(commitSlots);
         this.updateEvents.add('commit');
         // TODO: add sound effect

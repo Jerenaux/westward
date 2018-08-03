@@ -180,28 +180,6 @@ var Player = new Phaser.Class({
 
     // ### GETTERS ####
 
-    getEquipped: function(slot){
-        return this.equipment.get(slot);
-    },
-
-    getMaxAmmo: function(slot){
-        //return this.equipment.getMaxAmmo(slot);
-        var container = this.equipment.get(this.equipment.getContainer(slot));
-        return Engine.itemsData[container].capacity;
-    },
-
-    getNbAmmo: function(slot){
-        return this.equipment.getNbAmmo(slot);
-    },
-
-    getStat: function(stat){
-        return this.stats[stat];
-    },
-
-    getStatValue: function(stat){
-        return this.getStat(stat).getValue();
-    },
-
     getTilePosition: function(){
         return {
             x: this.tileX,
@@ -209,12 +187,4 @@ var Player = new Phaser.Class({
         }
     },
 
-    hasItem: function(item,nb){
-        return (this.inventory.getNb(item) >= nb);
-    },
-
-    isAmmoEquipped: function(slot){
-        //return this.equipment[slot][0] > -1;
-        return this.equipment.hasAnyAmmo(slot);
-    }
 });

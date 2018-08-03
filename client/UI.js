@@ -54,14 +54,15 @@ var UI = {
         UI.cursors = {
             default: 'cursor',
             bomb: 'bombcursor',
+            bow: 'bow',
             building: 'door',
             combat: 'sabre',
+            gun: 'gun',
             item: 'hand',
-            melee: 'swordcursor32',
-            move: 'movement',
-            range: 'bowcursor32'
+            melee: 'melee',
+            move: 'movement'
         };
-        UI.dualCursors = ['move','item','building','combat'];
+        UI.dualCursors = ['move','item','building','combat','melee','bow','gun'];
         UI.setCursor();
 
         UI.hovering = [];
@@ -177,14 +178,15 @@ UI.manageCursor = function(inout,type,target){
 
     if(inout == 1){
         if(hovering.type == 'sticky') return; // don't change cursor if currently sticky
+        if(type == 'tile' && (hovering.type == 'npc')) return;
         UI.hovering.push(data);
     }else{
-        if(type == 'sticky' && hovering.type != 'sticky') return; // don't remove a sticky if not currently sticky
-        if(type != 'sticky' && hovering.type == 'sticky') return; // ignore out if cursor is sticky
+        if(type != hovering.type) return;
         UI.hovering.pop();
     }
+
     var hovering = UI.hovering.last() || {type:'ground'};
-    console.log('hovering : ',hovering);
+    //console.log('hovering : ',hovering.type);
     if(hovering.type == 'sticky'){
         UI.setCursor('bomb');
     }else if(hovering.type == 'UI'){
@@ -192,7 +194,8 @@ UI.manageCursor = function(inout,type,target){
     }else if(hovering.type != 'UI' && hovering.type != 'ground' && hovering.type != 'tile') {
         hovering.target.setCursor();
     }else if(hovering.type == 'tile'){
-        UI.setCursor('move');
+        //UI.setCursor('move');
+        UI.setCursor();
     }else if(hovering.type == 'ground'){
         if(Engine.inMenu){
             UI.setCursor();

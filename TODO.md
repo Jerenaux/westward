@@ -152,6 +152,7 @@ Content:
 -> Multiple categories (weather, animals, terrain...), distinct random intervals
 * Battle system
 - Bombs:
+-> Remove from inventory
 -> Animation
 -> Variable damage based on bomb type
 -> Factor defense in
@@ -173,11 +174,10 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 (- Let NPC use items (restore health, ...))
 (- 3-way battles)
 * Civics
-- Civic slots: send building type&id bundles, client stores two inventories, for logic and icon display
 - Finish all civic panel related stuff (commitment, etc.)
-- Use Phaser 3.11 setCrop to crop icons when on fringe
 - Apply taxes
 - Civic abilities
+- variable civic xp when committing, based on factors
 - Elections
 - Naming officials
 (- Change settlement

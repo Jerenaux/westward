@@ -3,10 +3,10 @@
  */
 var Animal = new Phaser.Class({
 
-    Extends: Moving,
+    Extends: NPC,
 
     initialize: function Animal() {
-        Moving.call(this,0,0);
+        NPC.call(this);
         this.entityType = 'animal';
         this.orientationPin = new OrientationPin('animal');
     },
@@ -66,15 +66,12 @@ var Animal = new Phaser.Class({
     die: function(){
         this.setFrame(49);
         this.dead = true;
-    },
+    }
 
     // ### INPUT ###
 
-    handleDown: function(){
-        //UI.setCursor(UI.handCursor2);
-    },
 
-    handleClick: function(){
+    /*handleClick: function(){
         if(BattleManager.inBattle){
             if(Engine.dead) return;
             BattleManager.processNPCClick(this);
@@ -89,7 +86,7 @@ var Animal = new Phaser.Class({
         if(BattleManager.inBattle) {
             var dx = Math.abs(this.tileX-Engine.player.tileX);
             var dy = Math.abs(this.tileY-Engine.player.tileY);
-            var cursor = (this.dead ? UI.cursor : (dx+dy == 1 || (dx == 1 && dy == 1) ? 'melee' : 'range'));
+            var cursor = (this.dead ? 'cursor' : (dx+dy == 1 || (dx == 1 && dy == 1) ? 'melee' : 'range'));
             UI.setCursor(cursor);
         }else{
             var cursor = (this.dead ? 'item' : 'combat');
@@ -106,5 +103,5 @@ var Animal = new Phaser.Class({
     handleOut: function(){
         UI.manageCursor(0,'animal');
         UI.tooltip.hide();
-    }
+    }*/
 });

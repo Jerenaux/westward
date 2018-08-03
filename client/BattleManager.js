@@ -99,6 +99,7 @@ BattleManager.canTakeAction = function(){
 BattleManager.processBombClick = function(tile){
     Engine.requestBomb(tile.tx,tile.ty);
     BattleManager.actionTaken = true;
+    Engine.stickyCursor = false;
 };
 
 BattleManager.processTileClick = function(tile,pointer){

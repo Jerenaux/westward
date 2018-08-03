@@ -334,6 +334,7 @@ Engine.initWorld = function(data){
 
     console.log(data);
     Engine.settlementsData = data.settlements;
+    Engine.makeRecipesLists();
     Engine.addHero(data);
     Engine.player.updateViewRect();
     Engine.makeUI();
@@ -504,22 +505,6 @@ Engine.toggleChatBar = function(){
     Engine.chatBar.toggle();
 };
 
-/*Engine.getCommitSlots = function(){
-    return Engine.player.commitSlots.slots;
-};*/
-
-Engine.canCommit = function(){
-    if(!Engine.hasFreeCommitSlot()) return;
-    //var idx = Engine.getCommitSlots().indexOf(Engine.currentBuiling.id);
-    //return (idx == -1);
-    return !Engine.player.commitSlots.hasItem(Engine.currentBuiling.id);
-};
-
-Engine.hasFreeCommitSlot = function(){
-    //return Engine.getCommitSlots().length < Engine.player.commitSlots.max;
-    return !Engine.player.commitSlots.isFull();
-};
-
 Engine.manageDeath = function(){
     Engine.dead = true;
 };
@@ -619,6 +604,7 @@ Engine.makeUI = function(){
     var chaty = Engine.getGameConfig().height - chath;
     Engine.chatBar = new ChatPanel(0,chaty,chatw,chath,'Chat');
 
+    // TODO: make conditional to unread
     letter.tween = UI.scene.tweens.add(
         {
             targets: letter,
@@ -1165,7 +1151,7 @@ Engine.makeCharacterMenu = function(){
     var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
 
     var commit = menu.addPanel('commit',new InventoryPanel(citizenx+10,citizeny,150,100,'',true));
-    commit.setInventory(Engine.player.commitSlots,3,false);
+    commit.setInventory(Engine.player.commitTypes,3,false);
     commit.setDataMap(Engine.buildingIconsData);
 
     menu.addPanel('abilities',new Panel(citizenx,citizeny,citizenw,citizenh),true);
@@ -1181,26 +1167,7 @@ Engine.getIngredientsPanel = function(){
     return Engine.menus['crafting'].panels['ingredients'];
 };
 
-Engine.addHero = function(data){
-    // data comes from the initTrim()'ed packet of the player
-    Engine.player = new Hero();
-    Engine.player.setUp(data);
-    Engine.camera.startFollow(Engine.player); // leave outside of constructor
-
-    // TODO: move to hero, setUp method
-    Engine.player.settlement = data.settlement;
-    Engine.player.markers = data.markers;
-    Engine.players.unread = 1;
-    Engine.player.inventory = new Inventory();
-    Engine.player.class = data.class;
-    Engine.player.gold = data.gold;
-    Engine.player.civiclvl = data.civiclvl;
-    Engine.player.civicxp = data.civicxp;
-    Engine.player.classxp = data.classxp;
-    Engine.player.classlvl = data.classlvl;
-
-
-    // TODO: move this part somewhere else
+Engine.makeRecipesLists = function(){
     var weaponsRecipes = [];
     var equipmentRecipes = [];
     var ingredientsRecipes = [];
@@ -1240,10 +1207,25 @@ Engine.addHero = function(data){
     ingredientsRecipes.forEach(function(w){
         Engine.ingredientsRecipes.add(w,1);
     });
+};
 
-    Engine.player.stats = Stats.getSkeleton();
-    Engine.player.equipment = new EquipmentManager();
-    Engine.player.setCommitSlots(data.commitSlots);
+Engine.addHero = function(data){
+    // data comes from the initTrim()'ed packet of the player
+    Engine.player = new Hero();
+    Engine.player.setUp(data);
+    Engine.camera.startFollow(Engine.player); // leave outside of constructor
+
+    /*Engine.player.settlement = data.settlement;
+    Engine.player.markers = data.markers;
+    Engine.players.unread = 1;
+    Engine.player.inventory = new Inventory();
+    Engine.player.class = data.class;
+    Engine.player.gold = data.gold;
+    Engine.player.civiclvl = data.civiclvl;
+    Engine.player.civicxp = data.civicxp;
+    Engine.player.classxp = data.classxp;
+    Engine.player.classlvl = data.classlvl;*/
+
     Engine.updateEnvironment();
 };
 

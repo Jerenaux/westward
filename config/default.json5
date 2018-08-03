@@ -37,7 +37,7 @@ To add: time gap between two orientation sounds (OrientationPin.display())
         turns: {
             build: 1,
             foodConsumption: 8,
-            commitment: 10,
+            commitment: 1,
             production: 1,
             settlements: 1,
             spawnZones: 1

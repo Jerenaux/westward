@@ -50,7 +50,7 @@ ProductionPanel.prototype.update = function(){
 };
 
 ProductionPanel.prototype.displayCommitButton = function(){
-    if(Engine.canCommit()){
+    if(Engine.player.canCommit()){
         this.button.display();
     }else{
         this.button.hide();

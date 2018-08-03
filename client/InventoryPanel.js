@@ -97,7 +97,7 @@ InventoryPanel.prototype.getNextSprite = function(){
             text: UI.scene.add.text(0, 0, '1',textconfig)
         };
         var slot = this.slots[this.spritesCounter];
-        if(!slot) console.warn('Too much in inventory');
+        if(!slot) console
         s.text.setOrigin(1,0);
         s.text.setScrollFactor(0);
         s.text.setVisible(false);
@@ -135,7 +135,10 @@ InventoryPanel.prototype.displayInventory = function(){
         var sprite = this.getNextSprite();
         sprite.item.setUp(item,this.dataMap[item],this.itemCallback);
         var slot = this.slots[nbDisplayed];
-        if(slot.fringeSlot) sprite.item.setOrigin(sprite.item.originX-0.1,sprite.item.originY);
+        if(slot.fringeSlot){
+            sprite.item.setOrigin(sprite.item.originX-0.1,sprite.item.originY);
+            if(sprite.item.frame.width > 32) sprite.item.setCrop(0,0,32,32);
+        }
 
         if(this.hasSoftFilter()){
             if(!this.applyFilter(item)) sprite.item.disable();

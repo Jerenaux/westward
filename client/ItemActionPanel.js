@@ -19,7 +19,7 @@ ItemActionPanel.prototype.setUp = function(itemID){
     this.itemID = itemID;
     this.icon.setUp(itemID,data);
     this.text.setText(data.name);
-    if(data.effects){
+    if(data.effects || data.equipment){
         this.button.setText(data.equipment ? 'Equip' : 'Use');
     }else{
         this.button.hide();
