@@ -82,6 +82,8 @@ var BattleTile = new Phaser.Class({
         delete Engine.battleCells[this.id];
     },
 
+    // ### INPUT ###
+
     setCursor: function(){
         UI.setCursor('move');
     },

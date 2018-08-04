@@ -152,8 +152,7 @@ Content:
 -> Multiple categories (weather, animals, terrain...), distinct random intervals
 * Battle system
 - Bombs:
--> Remove from inventory
--> Animation
+-> Sound effect
 -> Variable damage based on bomb type
 -> Factor defense in
 - traps, poisons, potions, oils...
@@ -195,7 +194,8 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Events log
 - Add help back
 * Craftsmen gameplay
-- Several directly personnaly useful recipes for equipment etc. (bigger quivers, better projetiles, etc.)
+- Several directly personnaly useful recipes for equipment etc.
+-> Ammo containers of various sizes, various kinds of bullets and arrows, various bombs + variations of all the rest
 -> Don't forget to take into account workshop level, craftsmen abilities with woodwork/metalwork/etc.
 - Display output nb
 - XP based on multiple factors

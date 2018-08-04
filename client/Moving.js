@@ -294,5 +294,9 @@ var Moving = new Phaser.Class({
 
     playSound: function(){
         Engine.playLocalizedSound('footsteps',5,{x:this.tileX,y:this.tileY});
+    },
+
+    handleBattleAnimation: function(data){
+
     }
 });

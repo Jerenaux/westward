@@ -55,7 +55,7 @@ Engine.preload = function() {
 
     // Animations
     this.load.spritesheet('sword_anim', 'assets/sprites/Sword1.png',{frameWidth:96,frameHeight:96});
-    this.load.spritesheet('explostion', 'assets/sprites/explosion.png',{frameWidth:100,frameHeight:100});
+    this.load.spritesheet('explosion', 'assets/sprites/explosion.png',{frameWidth:100,frameHeight:100});
 
     // Buildings
     this.load.atlas('buildings_sprites', 'assets/sprites/buildings.png', 'assets/sprites/buildings.json');
@@ -232,7 +232,7 @@ Engine.create = function(){
     Engine.displayedChunks = [];
     Engine.mapDataCache = {};
 
-    var animations = ['explosion','sword_anim'];
+    var animations = ['explosion','sword'];
     Engine.animationsPools = {};
     animations.forEach(function(key){
         Engine.animationsPools[key] = new Pool('sprite',key);
@@ -446,7 +446,7 @@ Engine.createAnimations = function(){
     Engine.createWalkAnimation('bear_move_up','bears',45,47);
 
     Engine.scene.anims.create(config = {
-        key: 'melee',
+        key: 'sword',
         frames: Engine.scene.anims.generateFrameNumbers('sword_anim', { start: 0, end: 2}),
         frameRate: 15,
         hideOnComplete: true,
@@ -459,7 +459,7 @@ Engine.createAnimations = function(){
     Engine.scene.anims.create(config = {
         key: 'explosion',
         frames: Engine.scene.anims.generateFrameNumbers('explosion', { start: 0, end: 80}),
-        frameRate: 15,
+        frameRate: 75,
         hideOnComplete: true,
         // TODO: test if callback still called after v3.3
         onComplete: function(sprite){
@@ -659,17 +659,23 @@ Engine.handleExplosion = function(){
 
 };
 
-Engine.handleBattleAnimation = function(animation,target,dmg){
-    var sprite = Engine.animationsPools['sword_anim'].getNext();
+Engine.handleBattleAnimation = function(data){
+    var sprite = Engine.animationsPools[data.name].getNext();
     sprite.setOrigin(0.5);
-    sprite.setPosition(target.x+16,target.y+16);
+    var x = (data.x+0.5)*Engine.tileWidth;
+    var y = (data.y+0.5)*Engine.tileHeight;
+    sprite.setPosition(x,y);
     sprite.setVisible(true);
-    sprite.setDepth(target.depth+1);
+    sprite.setDepth(5);
     sprite.on('animationstart',function(){
-        Engine.playLocalizedSound('hit',1,{x:target.tileX,y:target.tileY});
+        // TODO: test if callback fires
+       Engine.playLocalizedSound('hit',1,{x:data.x,y:data.y});
     });
-    sprite.anims.play(animation);
+    console.log(sprite);
+    sprite.anims.play(data.name);
+};
 
+Engine.handleHit = function(animation,target,dmg){
     var text = Engine.textPool.getNext();
     text.setStyle({ font: 'belwe', fontSize: 20, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     text.setFont('20px belwe');
@@ -1509,8 +1515,6 @@ Engine.createElements = function(arr,entityType){
     var pool = Engine.entityManager.pools[entityType];
     var constructor = Engine.entityManager.constructors[entityType];
     arr.forEach(function(data){
-        //console.log('CREATING:',data);
-        //console.log('creating',entityType,data.id);
         var e = pool.length > 0 ? pool.shift() : new constructor();
         e.setUp(data);
         e.update(data);
@@ -1540,8 +1544,9 @@ Engine.removeElements = function(arr,table){
 
 Engine.handleBattleUpdates = function(entity, data){
     if(data.inFight !== undefined) entity.inFight = data.inFight;
-    if(data.hit !== undefined) Engine.handleBattleAnimation('melee',entity,data.hit);
+    if(data.hit !== undefined) Engine.handleHit('melee',entity,data.hit);
     if(data.rangedMiss !== undefined) Engine.handleMissAnimation(entity);
+    if(data.animation) this.handleBattleAnimation(data.animation);
 };
 
 Engine.inThatBuilding = function(id){

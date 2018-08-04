@@ -44,16 +44,8 @@ var Civ = new Phaser.Class({
         //this.manageOrientationPin();
     },
 
-    update: function(data){
-        if(data.path) this.queuePath(data.path);
-        if(data.stop) this.serverStop(data.stop.x,data.stop.y); // TODO: move to new Moving update() supermethod
-        if(data.melee_atk) {
-            this.computeOrientation(this.tileX,this.tileY,data.melee_atk.x,data.melee_atk.y);
-            this.faceOrientation();
-            this.play(this.animPrefix+'_attack_'+this.orientation);
-        }
-        Engine.handleBattleUpdates(this,data);
-        if(data.dead) this.die();
+    onAttack: function(){
+
     },
 
     remove: function(){

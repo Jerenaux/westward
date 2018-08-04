@@ -20,7 +20,7 @@ function Battle(){
     };
     this.spannedAOIs = new Set();
     this.positions = new SpaceMap(); // positions occupied by fighters
-    this.cells = new SpaceMap();
+    this.cells = new SpaceMap(); // all the BattleCell objects
 
     this.pathFinder = new Pathfinder(this.cells,99,false,false,true);
 
@@ -171,7 +171,13 @@ Battle.prototype.setEndOfTurn = function(delay){
 
 Battle.prototype.processBomb = function(f,tx,ty){
     // TODO: add thrower anim
-    // TODO: check if player has a bomb in inventory
+    if(!f.hasItem(4,1)) return false;
+    f.takeItem(4,1);
+    f.setProperty('animation',{
+        name: 'explosion',
+        x: tx,
+        y: ty
+    });
     for(var x = tx-1; x <= tx+1; x++){
         for(var y = ty-1; y <= ty+1; y++){
             var victim = this.positions.get(x,y);
@@ -275,8 +281,6 @@ Battle.prototype.applyDamage = function(f,dmg){
 
 // Called each time a fighter dies, add its XP to the running total
 Battle.prototype.rewardXP = function(xp){
-    //var xp = GameServer.animalsData[animal.type].xp || 0;
-    //if(!xp) return;
     this.fighters.forEach(function(f){
         if(f.isPlayer) f.xpPool += xp;
     })
@@ -290,6 +294,11 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
         a.setProperty('melee_atk',{x:b.x,y:b.y}); // for the attack animation of attacker
         var dmg = this.computeDamage('melee',a,b);
         killed = this.applyDamage(b,dmg);
+        a.setProperty('animation',{
+            name: 'sword',
+            x: b.x,
+            y: b.y
+        });
         b.setProperty('hit',dmg); // for the flash and hp display
     }else{
         if(!a.canRange()) return false;
@@ -300,6 +309,11 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
             if(b.isAnimal) b.addToLoot(ammoID,1);
             dmg = this.computeDamage('ranged',a,b);
             killed = this.applyDamage(b,dmg);
+            a.setProperty('animation',{
+                name: 'sword',
+                x: b.x,
+                y: b.y
+            });
             b.setProperty('hit',dmg);
         }else { // miss
             b.setProperty('rangedMiss',true);
