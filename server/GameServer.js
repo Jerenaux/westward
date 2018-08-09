@@ -730,6 +730,7 @@ GameServer.handleCommit = function(data,socketID){ // keep data argument
 };
 
 GameServer.handleCraft = function(data,socketID){
+    if(data.id == -1) return;
     var player = GameServer.getPlayer(socketID);
     var buildingID = player.inBuilding;
     var building = GameServer.buildings[buildingID];

@@ -32,11 +32,11 @@ CraftingPanel.prototype.addInterface = function(){
     this.addButton(x+22,y+99,'blue','minus',this.decreaseAmount.bind(this),'Decrease by 1');
 
     var item = new ItemSprite();
-    item.setPosition(this.x+ring.x+(ringw/2),this.y+ringy+(ringh/2));
+    item.setPosition(this.x+x+(ringw/2)+5,this.y+y+(ringh/2));
     item.showTooltip = false;
     this.content.push(item);
 
-    var count = UI.scene.add.text(this.x+ring.x+(ring.frame.width/2),this.y+ringy+85, '0',  { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    var count = UI.scene.add.text(this.x+x+(ringw/2)+5,this.y+y+(ringh/2)+30, '0',  { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     count.setOrigin(0.5,0.5);
     count.setVisible(false);
     count.setDepth(2);

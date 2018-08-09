@@ -25,6 +25,9 @@ var Animal = new Phaser.Class({
         Engine.animals[this.id] = this;
         Engine.entityManager.addToDisplayList(this);
 
+        this.cellsWidth = animalData.width || 1;
+        this.cellsHeight = animalData.height || 1;
+
         this.setPosition(data.x,data.y);
         this.setTexture(animalData.sprite);
         this.setFrame(animalData.frame);

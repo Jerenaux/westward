@@ -75,9 +75,9 @@ Engine.preload = function() {
     this.load.image('orientation', 'assets/sprites/orientation.png');
     this.load.image('wolforient', 'assets/sprites/wolforient.png');
     this.load.image('tail', 'assets/sprites/tail.png');
-    this.load.image('scrollbgh', 'assets/sprites/scroll_horiz.png');
+    this.load.image('scrollbgh', 'assets/sprites/scroll.png');
     this.load.image('longscroll', 'assets/sprites/longscroll.png');
-    this.load.image('radial3', 'assets/sprites/radial3.png');
+    this.load.image('radial3', 'assets/sprites/scroll_mask.png');
     this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
     this.load.image('fullmap', 'assets/sprites/fortmap.png');
     this.load.image('fullmap_zoomed', 'assets/sprites/fortmap_01.png');
@@ -1174,38 +1174,34 @@ Engine.getIngredientsPanel = function(){
 };
 
 Engine.makeRecipesLists = function(){
-    var weaponsRecipes = [];
-    var equipmentRecipes = [];
-    var ingredientsRecipes = [];
-    var potionRecipes = [];
 
-    for(var key in Engine.itemsData){
+    // TODO: put in conf somewhere
+    var equipmentRecipes = [28,11,10,13,15,16,2,19,29,20,12,40,39,4,6];
+    var ingredientsRecipes = [22,23,32,33,38,35,17,21];
+
+    /*for(var key in Engine.itemsData){
         // TODO: standardize flags (isWeapon, ...)
         var item = Engine.itemsData[key];
         if(item.isCrafted){
             if(item.equipment){
-                /*if(item.equipment == 'meleew' || item.equipment == 'rangedw' || item.ammo){
-                    weaponsRecipes.push(key);
-                }else{
-                    equipmentRecipes.push(key);
-                }*/
                 equipmentRecipes.push(key);
             }
             if(item.isPotion) equipmentRecipes.push(key);
             if(item.isWeapon) equipmentRecipes.push(key);
             if(item.isMaterial) ingredientsRecipes.push(key);
         }
-    }
+    }*/
 
     //console.log("w",weaponsRecipes);
     //console.log("eq",equipmentRecipes);
     //console.log("ingredients",ingredientsRecipes);
     //console.log("potions",potionRecipes);
 
-    Engine.weaponsRecipes = new Inventory(12);
+
+    //Engine.weaponsRecipes = new Inventory(12);
     Engine.equipmentRecipes = new Inventory(18);
     Engine.ingredientsRecipes = new Inventory(18);
-    Engine.potionsRecipes = new Inventory(12);
+    //Engine.potionsRecipes = new Inventory(12);
 
     equipmentRecipes.forEach(function(w){
         Engine.equipmentRecipes.add(w,1);
@@ -1614,7 +1610,7 @@ Engine.enterBuilding = function(id){
                 type: 'prices',
                 items: building.prices,
                 key: 1,
-                hard: !buildingData.workshop
+                hard: true//!buildingData.workshop
             });
             menu.panels['shop'].updateInventory();
 

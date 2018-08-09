@@ -326,7 +326,7 @@
     "atlas": "items",
     "frame":"blackpowder",
     "name": "Black powder",
-    "desc": "Crafting material made from coal and sulfur used to make bullets.",
+    "desc": "Crafting material made from coal and sulfur used to make bullets and explosives.",
     "recipe":{"22":1,"34":1},
     "isMaterial": true,
     "isCrafted": true,
@@ -385,5 +385,16 @@
     "sound": "cloth",
     "isCrafted": true,
     "recipe": {"9":1,"21":1}
+  },
+  "41":{
+    "atlas": "items",
+    "frame":"crimsonpowder",
+    "name": "Crimson dust",
+    "desc": "Enhanced gunpowder used to craft advanced explosives and ammunition.",
+    "recipe":{"22":1,"34":1},
+    "isMaterial": true,
+    "isCrafted": true,
+    "craftTier": 1,
+    "sound": "powder"
   }
 }

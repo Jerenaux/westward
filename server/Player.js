@@ -41,6 +41,10 @@ function Player(){
         2: 0,
         3: 0
     };
+
+    this.cellsWidth = 1;
+    this.cellsHeight = 1;
+
     this.setUpStats();
     this.equipment = new EquipmentManager();
     this.fieldOfVision = [];
@@ -98,14 +102,8 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(19,1);
     this.giveItem(20,3);
     this.giveItem(6,2);
-    this.giveItem(13,1);
     this.giveItem(28,1);
-
     this.giveItem(4,2);
-    /*this.giveItem(12,1);
-    this.giveItem(24,2);
-    this.giveItem(39,5);
-    this.giveItem(40,1);*/
 
     this.giveGold(300);
 };

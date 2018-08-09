@@ -125,12 +125,13 @@ InventoryPanel.prototype.displayInventory = function(){
         s.setVisible(true);
     });
     var nbDisplayed = 0;
-    for(var item in this.inventory.items){
-        if(!this.inventory.items.hasOwnProperty(item)) continue;
+    //for(var item in this.inventory.items){
+    this.inventory.order.forEach(function(item){
+        if(!this.inventory.items.hasOwnProperty(item)) return;
         var amount = this.inventory.getNb(item);
-        if(amount == 0) continue;
+        if(amount == 0) return;
         if(this.hasHardFilter()){
-            if(!this.applyFilter(item)) continue;
+            if(!this.applyFilter(item)) return;
         }
         var sprite = this.getNextSprite();
         sprite.item.setUp(item,this.dataMap[item],this.itemCallback);
@@ -154,7 +155,7 @@ InventoryPanel.prototype.displayInventory = function(){
             sprite.text.setVisible(true);
         }
         nbDisplayed++;
-    }
+    },this);
     this.nbDisplayed = nbDisplayed;
     this.setUpZone(nbDisplayed);
 };

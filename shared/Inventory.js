@@ -17,6 +17,7 @@ Inventory.prototype.updateItems = function(items){
 
 Inventory.prototype.clear = function(){
     this.items = {}; // item.id -> nb
+    this.order = [];
     this.size = 0;
 };
 
@@ -42,6 +43,7 @@ Inventory.prototype.isEmpty = function(){
 
 Inventory.prototype.addNew = function(item){
     this.items[item] = 0;
+    this.order.push(item);
     this.size++;
 };
 
@@ -54,6 +56,7 @@ Inventory.prototype.setItems = function(items){
     if(items == null) items = {};
     this.items = items;
     this.size = Object.keys(this.items).length;
+    this.order = Object.keys(this.items);
 };
 
 Inventory.prototype.add = function(item,nb){

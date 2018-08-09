@@ -29,6 +29,8 @@ var Player = new Phaser.Class({
             right: 143
         };
         this.setFrame(this.restingFrames.down);
+        this.cellsWidth = 1;
+        this.cellsHeight = 1;
 
         this.destinationAction = null;
 

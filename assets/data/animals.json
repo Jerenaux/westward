@@ -49,6 +49,8 @@
     "name": "Bear",
     "frame": 9,
     "walkPrefix": "bear",
+    "width": 2,
+    "height": 2,
     "restingFrames": {
       "up": 45,
       "down": 9,

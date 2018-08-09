@@ -51,7 +51,7 @@ Battle.prototype.getFighterIndex = function(f){
 };
 
 // Called by addFighter
-Battle.prototype.managePosition = function(f){
+Battle.prototype.checkConflict = function(f){
     var busy = this.positions.get(f.x,f.y);
     if(busy){
         console.log('busy cell for ',f.getShortID(),' with ',busy.getShortID(),' at ',f.x,f.y);
@@ -61,12 +61,29 @@ Battle.prototype.managePosition = function(f){
             busy.queueAction('move');
         }
     }
-    this.positions.add(f.x,f.y,f);
+    //this.positions.add(f.x,f.y,f);
+    this.addAtPosition(f);
+};
+
+Battle.prototype.addAtPosition = function(f){
+    for(var i = 0; i < f.cellsWidth; i++){
+        for(var j = 0; j < f.cellsHeight; j++){
+            this.positions.add(f.x+i,f.y+j,f);
+        }
+    }
+};
+
+Battle.prototype.removeFromPosition = function(f){
+    for(var i = 0; i < f.cellsWidth; i++){
+        for(var j = 0; j < f.cellsHeight; j++){
+            this.positions.delete(f.x+i,f.y+j);
+        }
+    }
 };
 
 Battle.prototype.addFighter = function(f){
     this.fighters.push(f);
-    this.managePosition(f);
+    this.checkConflict(f);
     this.updateTeams(f.battleTeam,1);
     f.xpPool = 0; // running total of XP that the fighter will receive at the end of the fight
     f.setProperty('inFight',true);
@@ -82,7 +99,8 @@ Battle.prototype.removeFighter = function(f){
     f.endFight();
     f.die();
     this.fighters.splice(idx,1);
-    if(f.isPlayer) this.positions.delete(f.x,f.y); // if animal, leave busy for his body
+    //if(f.isPlayer) this.positions.delete(f.x,f.y); // if animal, leave busy for his body
+    if(f.isPlayer) this.removeFromPosition(f); // if animal, leave busy for his body
     if(isTurnOf) this.setEndOfTurn(0);
     if(f.isPlayer) f.notifyFight(false);
     this.updateTeams(f.battleTeam,-1);
@@ -196,10 +214,12 @@ Battle.prototype.processBomb = function(f,tx,ty){
 };
 
 Battle.prototype.processMove = function(f){
-    var busy = this.positions.get(f.x,f.y);
-    if(busy && (busy.getShortID() == f.getShortID())) this.positions.delete(f.x,f.y);
+    //var busy = this.positions.get(f.x,f.y);
+    //if(busy && (busy.getShortID() == f.getShortID())) this.positions.delete(f.x,f.y);
+    this.removeFromPosition(f);
     var pos = f.getEndOfPath();
-    this.positions.add(pos.x,pos.y,f);
+    //this.positions.add(pos.x,pos.y,f);
+    this.addAtPosition(f);
     return {
         success: true,
         delay: f.getPathDuration()
@@ -215,9 +235,16 @@ Battle.prototype.isPositionFree = function(x,y){
 };
 
 Battle.prototype.nextTo = function(a,b){
-    var dx = Math.abs(a.x - b.x);
+    for(var ay = a.y; ay < a.y + a.cellsHeight +1; ay++){
+        for(var ax = a.x; ax < a.x + a.cellsWidth +1; ax++){
+            var found = this.positions.get(ax,ay);
+            if(found && found.getShortID() == b.getShortID()) return true;
+        }
+    }
+    return false;
+    /*var dx = Math.abs(a.x - b.x);
     var dy = Math.abs(a.y - b.y);
-    return (dx <= 1 && dy <= 1);
+    return (dx <= 1 && dy <= 1);*/
 };
 
 Battle.prototype.computeDamage = function(type,a,b){

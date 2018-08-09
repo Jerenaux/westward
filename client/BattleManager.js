@@ -132,23 +132,25 @@ BattleManager.processInventoryClick = function(){
 
 BattleManager.isActiveCell = function(cell){
     if(!this.active) return false;
-    return (cell.tx == this.active.tileX && cell.ty == this.active.tileY);
+    console.log(this.active.getOccupiedCells());
+    return this.active.getOccupiedCells(true).includes(cell.hash());
 };
 
-BattleManager.getActiveCell = function(){
+/*BattleManager.getActiveCells = function(){
     if(!this.active) return;
-    return Engine.battleCellsMap.get(this.active.tileX,this.active.tileY);
-};
+    return this.active.getOccupiedCells();
+    //return Engine.battleCellsMap.get(this.active.tileX,this.active.tileY);
+};*/
 
-BattleManager.deactivateCell = function(){
-    var cell = this.getActiveCell();
+/*BattleManager.deactivateCell = function(){
+    var cell = this.getActiveCells();
     if(cell) cell.deactivate();
-};
+};*/
 
-BattleManager.activateCell = function(){
+/*BattleManager.activateCell = function(){
     var cell = this.getActiveCell();
     if(cell) cell.activate();
-};
+};*/
 
 BattleManager.onDeath = function(){
     Engine.updateGrid();

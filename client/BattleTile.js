@@ -82,6 +82,10 @@ var BattleTile = new Phaser.Class({
         delete Engine.battleCells[this.id];
     },
 
+    hash: function(){
+        return this.tx+"_"+this.ty;
+    },
+
     // ### INPUT ###
 
     setCursor: function(){

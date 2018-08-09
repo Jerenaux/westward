@@ -13,11 +13,15 @@ function Civ(x,y,type){
     this.x = x;
     this.y = y;
     this.type = type;
-    this.xpReward = GameServer.civsData[this.type].xp || 0;
+
+    var civData = GameServer.civsData[this.type];
+    this.cellsWidth = civData.width || 1;
+    this.cellsHeight = civData.height || 1;
+    this.xpReward = civData.xp || 0;
     this.name = 'Enemy';
     this.setAggressive();
-    this.setStartingStats(GameServer.civsData[this.type].stats);
-    this.setLoot(GameServer.civsData[this.type].loot);
+    this.setStartingStats(civData.stats);
+    this.setLoot(civData.loot);
     this.setOrUpdateAOI();
     NPC.call(this);
 }

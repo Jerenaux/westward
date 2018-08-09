@@ -84,7 +84,7 @@ var Moving = new Phaser.Class({
             this.endMovement();
             return;
         }
-        if(this.isActiveFighter) BattleManager.deactivateCell();
+        //if(this.isActiveFighter) BattleManager.deactivateCell();
         this.currentPath = path;
 
         var tweens = [];
@@ -160,6 +160,8 @@ var Moving = new Phaser.Class({
         var tx = Math.floor(this.x/Engine.tileWidth);
         var ty = Math.floor(this.y/Engine.tileHeight);
         this.updatePosition(tx,ty);
+
+        //if(this.isActiveFighter) Engine.updateGrid();
 
         this.leaveFootprint();
         this.playSound();
@@ -296,7 +298,17 @@ var Moving = new Phaser.Class({
         Engine.playLocalizedSound('footsteps',5,{x:this.tileX,y:this.tileY});
     },
 
-    handleBattleAnimation: function(data){
-
+    getOccupiedCells: function(hash){
+        var cells = [];
+        for(var i = 0; i < this.cellsWidth; i++){
+            for(var j = 0; j < this.cellsHeight; j++){
+                if(hash){
+                    cells.push((this.tileX+i)+'_'+(this.tileY+j));
+                }else{
+                    cells.push({x:this.tileX,y:this.tileY});
+                }
+            }
+        }
+        return cells;
     }
 });

@@ -111,6 +111,18 @@
     {
       "filename": "ammopouch",
       "frame": {"x":168,"y":384,"w":24,"h":24}
+    },
+    {
+      "filename": "biggerammopouch",
+      "frame": {"x":192,"y":384,"w":24,"h":24}
+    },
+    {
+      "filename": "bomb2",
+      "frame": {"x":72,"y":816,"w":24,"h":24}
+    },
+    {
+      "filename": "antidote",
+      "frame": {"x":264,"y":312,"w":24,"h":24}
     }
   ]
 }

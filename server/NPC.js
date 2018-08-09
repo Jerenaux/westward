@@ -128,6 +128,7 @@ NPC.prototype.findBattlePath = function(dest){
 
 NPC.prototype.attackTarget = function(){
     var data = {};
+    // TODO: accomodate for ranged attacks
     if(this.battle.nextTo(this,this.target)){
         data.action = 'attack';
         data.id = this.target.getShortID();

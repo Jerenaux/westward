@@ -2,6 +2,7 @@ Bugs:
 - dead wolves keep fighting
 - Wrong battle areas sometimes (apparently based on end destination, not current one)
 - Pickup items in water?
+- Wrong pathfinding/targets in battle?
 
 Release:
 - Newplayer only
@@ -153,6 +154,7 @@ Content:
 * Battle system
 - Bombs:
 -> Sound effect
+-> Throw animation?
 -> Variable damage based on bomb type
 -> Factor defense in
 - traps, poisons, potions, oils...
@@ -194,15 +196,17 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Events log
 - Add help back
 * Craftsmen gameplay
-- Several directly personnaly useful recipes for equipment etc.
--> Ammo containers of various sizes, various kinds of bullets and arrows, various bombs + variations of all the rest
--> Don't forget to take into account workshop level, craftsmen abilities with woodwork/metalwork/etc.
+-> Add special gunpowder (crimson dust), special bomb type, larger pouch, one interesting potion
 - Display output nb
+- Lock some recipes based on dev level
+-> keep locked recipes but disable them (indicate why)
+- Think of short, nice names 
 - XP based on multiple factors
 - Abilities
-- At some point, made scrollable recipes panel
--> Keep locked recipes but disable them 
+- Lock some recipes on abilities
+- At some point, made scrollable recipes panel 
 - Quests
+(Backpacks, gold pouches of various sizes...)
 (- Recipes for golden ore -> gold ingots -> currency)
 (- Tiers)
 (- Upgrades)
@@ -362,6 +366,9 @@ Recipes for fancy bullets and bombs
 - Allow creation of new buildings (fixed locations to begin with)
 - Lists of items rewarded by civic xp
 * Soldier gameplay
+- New compute battle destination in server/NPC
+- New "nex to" logic in battles
+- Battle cursors use new "next to" logic
 - Monster variety & more spawn zones
 -> Brown wolves south, black ones south more powerful, same with gray and white wolves north
 + others

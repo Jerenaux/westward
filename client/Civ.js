@@ -13,11 +13,14 @@ var Civ = new Phaser.Class({
     },
 
     setUp: function(data){
-        //var animalData = Engine.animalsData[data.type];
+        var civData = Engine.civsData[data.type];
         this.id = data.id;
 
         Engine.civs[this.id] = this;
         Engine.entityManager.addToDisplayList(this);
+
+        this.cellsWidth = civData.width || 1;
+        this.cellsHeight = civData.height || 1;
 
         this.setPosition(data.x,data.y);
         this.setTexture('enemy');
