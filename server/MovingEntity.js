@@ -61,7 +61,8 @@ MovingEntity.prototype.updatePosition = function(x,y){
     this.x = x;
     this.y = y;
     this.setOrUpdateAOI();
-    if(!this.inFight) GameServer.checkForBattle(this);
+    //if(!this.inFight) GameServer.checkForBattle(this);
+    if(!this.inFight) this.checkForBattle();
 };
 
 MovingEntity.prototype.endPath = function(){
@@ -73,7 +74,8 @@ MovingEntity.prototype.endPath = function(){
 };
 
 MovingEntity.prototype.onEndOfPath = function(){
-    GameServer.checkForBattle(this); // Check if the entity has stepped inside a battle area
+    //GameServer.checkForBattle(this);
+    this.checkForBattle();// Check if the entity has stepped inside a battle area
 };
 
 MovingEntity.prototype.getEndOfPath = function(){
@@ -97,6 +99,35 @@ MovingEntity.prototype.getPathDuration = function(){
 MovingEntity.prototype.stopWalk = function(){
     if(!this.moving) return;
     this.flagToStop = true;
+};
+
+MovingEntity.prototype.getBattleAreaAround = function(cells){
+    cells = cells || new SpaceMap();
+    for(var x = this.x - 1; x <= this.x + this.cellsWidth; x++){
+        for(var y = this.y - 1; y <= this.y + this.cellsHeight; y++) {
+            if(!GameServer.checkCollision(x,y)) cells.add(x,y);
+        }
+    }
+    return cells;
+};
+
+// Check if the entity has stepped inside a battle area
+MovingEntity.prototype.checkForBattle = function(){
+    if(!this.isAvailableForFight() || this.isInFight()) return;
+    for(var x = this.x; x < this.x + this.cellsWidth; x++){
+        for(var y = this.y; y < this.y + this.cellsHeight; y++) {
+            var cell = GameServer.battleCells.get(x,y);
+            if(cell) GameServer.expandBattle(cell.battle,this);
+        }
+    }
+};
+
+
+MovingEntity.prototype.getCenter = function(){
+    return {
+        x: Math.floor(this.x + this.cellsWidth/2),
+        y: Math.floor(this.y + this.cellsHeight/2)
+    };
 };
 
 // ### Equipment ###

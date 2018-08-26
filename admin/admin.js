@@ -158,6 +158,7 @@ app.controller("mainCtrl", [
             var id = $scope.priceForms[buildingID].item;
             var prices = $scope.buildings[buildingID].prices;
             if(prices) {
+                if(!prices.hasOwnProperty(id)) prices[id] = [];
                 $scope.priceForms[buildingID].buy = prices[id][0];
                 $scope.priceForms[buildingID].sell = prices[id][1];
             }

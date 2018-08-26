@@ -137,8 +137,8 @@ io.on('connection',function(socket){
         }
 
         var callbacksMap = {
-            //'animalClick': gs.handleAnimalClick,
             'battleAction': gs.handleBattleAction,
+            'buildingClick': gs.handleBuildingClick,
             'chat': gs.handleChat,
             'commit': gs.handleCommit,
             'craft': gs.handleCraft,

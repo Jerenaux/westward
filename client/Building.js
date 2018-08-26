@@ -238,7 +238,7 @@ var Building = new Phaser.Class({
         if (!this.entrance) return;
         Engine.player.setDestinationAction(1, this.id, this.entrance.x, this.entrance.y); // 1 for building
         Engine.computePath(this.entrance);
-        //UI.setCursor(UI.buildingCursor);
+        //Client.buildingClick(this.id);
     },
 
     setCursor: function(){

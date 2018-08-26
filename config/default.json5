@@ -4,8 +4,8 @@ To add: time gap between two orientation sounds (OrientationPin.display())
 */
 {
    battle: {
-        enabled: false,
-        aggroRange: 7, // chebyshev distance
+        enabled: true,
+        aggroRange: 10, // chebyshev distance
         battleRange: 3, // distance that can be travelled in one turn in battle; TODO: variable
         maxDamage: 10000,
         minDamage: 1,
@@ -33,7 +33,7 @@ To add: time gap between two orientation sounds (OrientationPin.display())
    },
    economyCycles: {
         // Unit: seconds
-        turnDuration: 60,
+        turnDuration: 120,
         // Unit: turns
         turns: {
             build: 1,
@@ -60,9 +60,9 @@ To add: time gap between two orientation sounds (OrientationPin.display())
             aggro: 2000
     },
     wildlife: { // make Civ category?
-        aggro: false,
+        aggro: true,
         nolife: false,
-        wander: true,
+        wander: false,
         wanderRange: 5,
         idleTime: [1, 3.5], // random bounds; in seconds
         idleRetry: 200 // ms

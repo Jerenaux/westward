@@ -28,8 +28,12 @@ function Building(data){
     var buildingData = GameServer.buildingsData[this.type];
     this.width = Math.ceil(buildingData.width/World.tileWidth);
     this.height = Math.ceil(buildingData.height/World.tileHeight);
-    this.cellsWidth = this.width+1;
-    this.cellsHeight = this.height;
+
+    var coll = buildingData.collisions;
+    this.coll = coll;
+    this.entrance = buildingData.entrance;
+    this.cellsWidth = coll.w;
+    this.cellsHeight = coll.h;
 
     this.name = buildingData.name;
     this.sid = data.sid;
@@ -285,6 +289,38 @@ Building.prototype.mapTrim = function(){
 Building.prototype.addCollisions = function(){
     // TODO: adapt based on built status
     PFUtils.buildingCollisions(this.x,this.y,GameServer.buildingsData[this.type],GameServer.collisions);
+};
+
+Building.prototype.getBattleAreaAround = function(cells){
+    cells = cells || new SpaceMap();
+
+    for(var x = -1; x <= this.cellsWidth; x++){
+        for(var y = 0; y <= this.cellsHeight+1; y++) {
+            var realx = this.x + this.coll.x + x;
+            var realy = this.y + this.coll.y + y;
+            if(!GameServer.checkCollision(realx,realy)) cells.add(realx,realy);
+        }
+    }
+    return cells;
+};
+
+Building.prototype.checkForBattle = function(){
+    if(!this.isAvailableForFight() || this.isInFight()) return;
+    for(var x = 0; x < this.cellsWidth; x++){
+        for(var y = 0; y < this.cellsHeight+1; y++) {
+            var realx = this.x + this.coll.x + x;
+            var realy = this.y + this.coll.y + y;
+            var cell = GameServer.battleCells.get(realx,realy);
+            if(cell) GameServer.expandBattle(cell.battle,this);
+        }
+    }
+};
+
+Building.prototype.getCenter = function(){
+    return {
+        x: this.x + this.entrance.x,
+        y: this.y + this.entrance.y
+    };
 };
 
 Building.prototype.canFight = function(){return true;};

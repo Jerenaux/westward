@@ -130,9 +130,10 @@ Client.sendPath = function(path,action){
     Client.socket.emit('path',{path:path,action:action});
 };
 
-/*Client.animalClick = function(targetID){
-    Client.socket.emit('animalClick',targetID);
-};*/
+// TODO: remove after testing
+Client.buildingClick = function(targetID){
+    Client.socket.emit('buildingClick',{id:targetID});
+};
 
 Client.NPCClick = function(targetID,type){
     Client.socket.emit('NPCClick',{id:targetID,type:type});

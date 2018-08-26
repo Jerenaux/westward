@@ -1,12 +1,15 @@
 {
   "name": "westward",
   "version": "1.0.0",
-  "description": "",
+  "description": "Westward, a collaborative MMO",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
+  "engines": {
+    "npm": "^5.7.1"
+  }
   "author": "",
   "license": "ISC",
   "devDependencies": {

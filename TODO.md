@@ -1,6 +1,8 @@
 Bugs:
-- dead wolves keep fighting
-- Pickup items in water?
+- Pickup items in water
+- Wolf walking on water 
+=> Probably related
+- Gray out sell inventory in shop as well?
 
 Spatial issues:
 - Spotting for aggro / aggro distance
@@ -13,10 +15,9 @@ Release:
 - Newplayer only (flush)
 - Dis/enable battles
 - Push
-- Position buildings (add workshop!)
-- Reset food
+- Reset food, update stocks
 
-Daily: design doc, world building
+Daily: design doc, world building, comments system
 
 Part I: Mechanics
 Part II: World building
@@ -30,13 +31,18 @@ Pillars:
 
 Chapter 1
 1) The War
-- Enemy civ raids (spawn & go)
 - Building mechanics (damage, destruction and repair)
+-> Handle health, display in Fort
+-> Auto repair based on productivity
+-> Destruction transition
+- Enemy civ raids (spawn & go)
 - Towers
 - Settlers counterattacks 
 2) The Economy
 - Resource flows between buildings, incl. gold generation
 - Introduce new wood ingredient obtained from timber (logs?)
+- Fix the right amount of buildings in each settlement, their output per turn, turn duration
++ set suitable stocks to bootstrap economy
 - Starvation (impact) (think of ways to make it painfully visible)
 - Settlement-oriented HUD: see below
 - Missions menu

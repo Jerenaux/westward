@@ -41,4 +41,6 @@ Item.prototype.remove = function(){
     delete GameServer.items[this.id];
 };
 
+Item.prototype.canFight = function(){return false;};
+
 module.exports.Item = Item;
