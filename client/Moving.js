@@ -296,9 +296,9 @@ var Moving = new Phaser.Class({
 
     playSound: function(){
         Engine.playLocalizedSound('footsteps',5,{x:this.tileX,y:this.tileY});
-    },
+    }
 
-    getOccupiedCells: function(hash){
+    /*getOccupiedCells: function(hash){
         var cells = [];
         for(var i = 0; i < this.cellsWidth; i++){
             for(var j = 0; j < this.cellsHeight; j++){
@@ -310,5 +310,5 @@ var Moving = new Phaser.Class({
             }
         }
         return cells;
-    }
+    }*/
 });

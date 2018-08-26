@@ -41,6 +41,13 @@ function Player(){
         2: 0,
         3: 0
     };
+    this.ap = {
+        0: 0,
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0 // civic AP
+    };
 
     this.cellsWidth = 1;
     this.cellsHeight = 1;
@@ -234,8 +241,15 @@ Player.prototype.gainCivicXP = function(inc,notify){
         }else{
             this.civicxp -= max;
             this.civiclvl++;
+            var nb = 3;
+            this.ap[4] += nb; // TODO: vary number
+            this.updatePacket.ap = this.ap;
             this.updatePacket.civiclvl = this.civiclvl;
-            if(notify) this.addNotif('Reached Civic level '+this.civiclvl+'!');
+            if(notify) {
+                this.addNotif('Reached Civic level '+this.civiclvl+'!');
+                this.addNotif('Earned '+nb+' AP!');
+            }
+
         }
     }
     this.updatePacket.civicxp = this.civicxp;
@@ -258,8 +272,14 @@ Player.prototype.gainClassXP = function(classID,inc,notify){
 
 Player.prototype.classLvlUp = function(classID, notify){
     this.classlvl[classID]++;
+    var nb = 3; // TODO: vary number
+    this.ap[classID] += nb;
     this.updatePacket.classlvl = this.classlvl;
-    if(notify) this.addNotif('Reached '+GameServer.classData[classID].name+' level '+this.classlvl[classID]+'!');
+    this.updatePacket.ap = this.ap;
+    if(notify) {
+        this.addNotif('Reached '+GameServer.classData[classID].name+' level '+this.classlvl[classID]+'!');
+        this.addNotif('Earned '+nb+' AP!');
+    }
 };
 
 Player.prototype.giveGold = function(nb,notify){
@@ -476,7 +496,7 @@ Player.prototype.applyEffect = function(stat,delta,notify){
 Player.prototype.initTrim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','gold','civicxp','civiclvl','classxp','classlvl']; // list of properties relevant for the client
+    var broadcastProperties = ['id','gold','civicxp','civiclvl','classxp','classlvl','ap']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

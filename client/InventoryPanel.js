@@ -125,7 +125,6 @@ InventoryPanel.prototype.displayInventory = function(){
         s.setVisible(true);
     });
     var nbDisplayed = 0;
-    //for(var item in this.inventory.items){
     this.inventory.order.forEach(function(item){
         if(!this.inventory.items.hasOwnProperty(item)) return;
         var amount = this.inventory.getNb(item);
@@ -146,7 +145,7 @@ InventoryPanel.prototype.displayInventory = function(){
         }
         sprite.item.setVisible(true);
         if(this.config.showNumbers){
-            sprite.text.setText(amount);
+            sprite.text.setText(amount); // "\uD83D\uDD12"
             if(this.config.compareTo){
                 var ref = this.config.compareTo.getNb(item);
                 var fill = (amount > ref ? '#ee1111' : '#ffffff');

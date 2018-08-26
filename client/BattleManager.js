@@ -51,6 +51,9 @@ BattleManager.getActiveFighter = function(id,debug){
         case 'C':
             map = Engine.civs;
             break;
+        case 'B':
+            map = Engine.buildings;
+            break;
     }
     if(debug) console.warn(map);
     return map[id.slice(1)];
@@ -132,8 +135,9 @@ BattleManager.processInventoryClick = function(){
 
 BattleManager.isActiveCell = function(cell){
     if(!this.active) return false;
-    console.log(this.active.getOccupiedCells());
-    return this.active.getOccupiedCells(true).includes(cell.hash());
+    //console.log(this.active.getOccupiedCells());
+    //return this.active.getOccupiedCells(true).includes(cell.hash());
+    return Engine.getOccupiedCells(this.active,true).includes(cell.hash());
 };
 
 /*BattleManager.getActiveCells = function(){

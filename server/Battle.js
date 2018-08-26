@@ -82,12 +82,13 @@ Battle.prototype.removeFromPosition = function(f){
 };
 
 Battle.prototype.addFighter = function(f){
+    //console.warn('Adding fighter ',f.id);
     this.fighters.push(f);
-    this.checkConflict(f);
+    if(f.isMovingEntity) this.checkConflict(f);
     this.updateTeams(f.battleTeam,1);
     f.xpPool = 0; // running total of XP that the fighter will receive at the end of the fight
     f.setProperty('inFight',true);
-    f.stopWalk();
+    if(f.isMovingEntity) f.stopWalk();
     if(f.isPlayer) f.notifyFight(true);
     f.battle = this;
 };
@@ -235,13 +236,28 @@ Battle.prototype.isPositionFree = function(x,y){
 };
 
 Battle.prototype.nextTo = function(a,b){
-    for(var ay = a.y; ay < a.y + a.cellsHeight +1; ay++){
+    var Arect = {
+        tlx: a.x - 1,
+        tly: a.y - 1,
+        brx: a.x + a.cellsWidth + 1,
+        bry: a.y + a.cellsHeight + 1
+    };
+    var Brect = {
+        tlx: b.x,
+        tly: b.y,
+        brx: b.x + b.cellsWidth,
+        bry: b.y + b.cellsHeight
+    };
+    if(Arect.tlx >= Brect.brx || Brect.tlx >= Arect.brx) return false;
+    if(Arect.tly >= Brect.bry || Brect.tly >= Arect.bry) return false;
+    return true;
+    /*for(var ay = a.y; ay < a.y + a.cellsHeight +1; ay++){
         for(var ax = a.x; ax < a.x + a.cellsWidth +1; ax++){
             var found = this.positions.get(ax,ay);
             if(found && found.getShortID() == b.getShortID()) return true;
         }
     }
-    return false;
+    return false;*/
     /*var dx = Math.abs(a.x - b.x);
     var dy = Math.abs(a.y - b.y);
     return (dx <= 1 && dy <= 1);*/
@@ -370,7 +386,7 @@ Battle.prototype.end = function(){
 };
 
 Battle.prototype.addArea = function(area){
-    var x = area.x;
+    /*var x = area.x;
     var y = area.y;
     var w = area.w;
     var h = area.h;
@@ -379,16 +395,20 @@ Battle.prototype.addArea = function(area){
     this.spannedAOIs.add(Utils.tileToAOI({x:x,y:y}));
     this.spannedAOIs.add(Utils.tileToAOI({x:x+w,y:y}));
     this.spannedAOIs.add(Utils.tileToAOI({x:x+w,y:y+h}));
-    this.spannedAOIs.add(Utils.tileToAOI({x:x,y:y+h}));
+    this.spannedAOIs.add(Utils.tileToAOI({x:x,y:y+h}));*/
 
-    var maxx = x+w;
+    /*var maxx = x+w;
     var maxy = y+h;
     var sy = y;
     for(; x <= maxx; x++){
         for(y = sy; y <= maxy; y++){
             if(!GameServer.checkCollision(x,y)) GameServer.addBattleCell(this,x,y);
         }
-    }
+    }*/
+    area.forEach(function(c){
+        GameServer.addBattleCell(this,c.x,c.y);
+        this.spannedAOIs.add(Utils.tileToAOI({x:c.x,y:c.y}));
+    },this);
 
     GameServer.checkForFighter(this.spannedAOIs);
 };

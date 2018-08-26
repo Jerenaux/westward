@@ -19,18 +19,18 @@ function Animal(x,y,type){
     this.x = x;
     this.y = y;
 
+    this.type = type;
     var animalData = GameServer.animalsData[this.type];
 
     this.cellsWidth = animalData.width || 1;
     this.cellsHeight = animalData.height || 1;
-    this.type = type;
     this.xpReward = animalData.xp || 0;
     this.name = animalData.name;
     this.setAggressive();
     this.setWander();
     this.setStartingStats(animalData.stats);
     this.setLoot(animalData.loot);
-    this.setOrUpdateAOI();
+    //this.setOrUpdateAOI();
     this.setIdle();
     NPC.call(this);
 }

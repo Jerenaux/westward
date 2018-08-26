@@ -15,6 +15,7 @@ function NPC(){
     this.inFight = false;
     this.actionQueue = [];
     MovingEntity.call(this);
+    this.setOrUpdateAOI();
 }
 
 NPC.prototype = Object.create(MovingEntity.prototype);

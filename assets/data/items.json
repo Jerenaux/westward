@@ -34,8 +34,8 @@
     "atlas": "items2",
     "frame":"bomb",
     "name": "Bomb",
-    "desc": "Will be usable in battle for area-of-effect damage.",
-    "recipe": {"32":1,"35":2},
+    "desc": "Explosive usable in battle to harm multiple targets (friends or foes) simultaneously.",
+    "recipe": {"24":3,"35":2},
     "isWeapon": true,
     "isCrafted": true,
     "craftTier": 2,
@@ -90,7 +90,7 @@
     "name": "Tunic",
     "equipment": "armor",
     "isCrafted": true,
-    "recipe":{"9":2},
+    "recipe":{"43":8},
     "effects":{"def":4},
     "sound": "cloth"
   },
@@ -142,7 +142,7 @@
     "name": "Leather boots",
     "equipment": "boots",
     "isCrafted": true,
-    "recipe":{"9":1}
+    "recipe":{"43":4}
   },
   "16":{
     "atlas": "items2",
@@ -150,7 +150,7 @@
     "name": "Leather belt",
     "equipment": "belt",
     "isCrafted": true,
-    "recipe":{"9":1}
+    "recipe":{"43":1}
   },
   "17":{
     "atlas": "items",
@@ -181,7 +181,7 @@
     "useInBattle": true,
     "sound": "cloth",
     "isCrafted": true,
-    "recipe": {"9":1,"21":1}
+    "recipe": {"43":3,"21":1}
   },
   "20":{
     "atlas": "items",
@@ -384,17 +384,53 @@
     "useInBattle": true,
     "sound": "cloth",
     "isCrafted": true,
-    "recipe": {"9":1,"21":1}
+    "recipe": {"43":2,"21":1}
   },
   "41":{
     "atlas": "items",
     "frame":"crimsonpowder",
     "name": "Crimson dust",
     "desc": "Enhanced gunpowder used to craft advanced explosives and ammunition.",
-    "recipe":{"22":1,"34":1},
+    "recipe":{"24":1,"34":1,"35":1},
     "isMaterial": true,
     "isCrafted": true,
     "craftTier": 1,
     "sound": "powder"
+  },
+  "42":{
+    "atlas": "items2",
+    "frame":"biggerammopouch",
+    "name": "Normal bullets pouch",
+    "equipment": "ammo_pouch",
+    "capacity": 20,
+    "desc": "Can contain up to 20 bullets",
+    "useInBattle": true,
+    "sound": "cloth",
+    "isCrafted": true,
+    "recipe": {"43":4,"21":2}
+  },
+  "43":{
+    "atlas": "items",
+    "frame":"leather",
+    "name": "Leather",
+    "desc": "Crafting material made from pelts used to craft various pieces of equipment.",
+    "isCrafted": true,
+    "isMaterial": true,
+    "recipe":{"9":1},
+    "output": 5,
+    "sound": "cloth"
+  },
+  "44":{
+    "atlas": "items2",
+    "frame":"bomb2",
+    "name": "Crimson strike",
+    "desc": "Advanced explosive, inflicts much more damage than traditional bombs.",
+    "recipe": {"24":3,"41":2},
+    "isWeapon": true,
+    "isCrafted": true,
+    "craftTier": 2,
+    "sound": "cloth",
+    "stickMouse": true,
+    "useInBattle": true
   }
 }

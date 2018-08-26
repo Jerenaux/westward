@@ -87,7 +87,8 @@ GameServer.createModels = function(){
         prices: mongoose.Schema.Types.Mixed,
         gold: {type: Number, min: 0},
         built: Boolean,
-        progress: {type: Number, min: 0, max: 100} // %
+        progress: {type: Number, min: 0, max: 100}, // %
+        health: {type: Number, min: 0}
     });
     var playerSchema = mongoose.Schema({
         // TODO: think about ID
@@ -98,6 +99,7 @@ GameServer.createModels = function(){
         civicxp: {type: Number, min: 0},
         classxp: mongoose.Schema.Types.Mixed,
         classlvl: mongoose.Schema.Types.Mixed,
+        ap: mongoose.Schema.Types.Mixed,
         equipment: mongoose.Schema.Types.Mixed,
         commitSlots: mongoose.Schema.Types.Mixed,
         sid: {type: Number, min: 0, required: true},
@@ -150,6 +152,7 @@ GameServer.readMap = function(mapsPath,test){
 
     GameServer.enableWander = config.get('wildlife.wander');
     GameServer.enableAggro = config.get('wildlife.aggro');
+    GameServer.enableBattles = config.get('battle.enabled');
     GameServer.classes = config.get('classes');
     GameServer.classData = JSON.parse(fs.readFileSync('./assets/data/classes.json').toString());
 
@@ -237,9 +240,12 @@ GameServer.addItem = function(x,y,type){
 };
 
 GameServer.onInitialized = function(){
-    GameServer.addAnimal(1202,168,5);
-    //GameServer.addCiv(1203, 172);
-    /*console.log('--- Performing on initialization tasks ---');
+    console.warn('--- Performing on initialization tasks ---');
+    //GameServer.addAnimal(1203,168,0);
+    //GameServer.addCiv(1203, 167);
+    /*GameServer.addAnimal(1202,167,5);
+    GameServer.addAnimal(1207,167,0);*/
+    /*
     var animal = GameServer.addAnimal(1202,168,0);
     animal.die();
     console.log('animal spawned');
@@ -449,26 +455,10 @@ GameServer.checkCollision = function(x,y){
 };
 
 GameServer.findPath = function(from,to){
-    //if(PFUtils.checkCollision(to.x,to.y)) return null;
     if(GameServer.checkCollision(to.x,to.y)) return null;
-    /*grid = grid || GameServer.PFgrid;
-    //console.log('pathfinding from ',from.x,from.y,' to ',to.x,to.y);
-    var path = GameServer.PFfinder.findPath(from.x, from.y, to.x, to.y, grid);
-    PF.reset();*/
     return GameServer.pathFinder.findPath(from,to);
 };
 
-/*GameServer.handleAnimalClick = function(animalID,socketID){
-    var player = GameServer.getPlayer(socketID);
-    var animal = GameServer.animals[animalID];
-    if(!animal.isDead() && !animal.isInFight()){
-        if(Utils.chebyshev(player,animal) <= GameServer.battleParameters.aggroRange) {
-            GameServer.handleBattle(player, animal);
-        }else{
-            player.addMsg('I must get closer!');
-        }
-    }
-};*/
 
 GameServer.handleNPCClick = function(data,socketID){
     var targetID = data.id;
@@ -508,10 +498,18 @@ GameServer.pickUpItem = function(player,itemID){
 };
 
 GameServer.handleBattle = function(player,animal,aggro){
+    if(!GameServer.enableBattles){
+        if(!aggro) player.addMsg('Battles are disabled at the moment');
+        return;
+    }
     if(!player.isAvailableForFight() || player.isInFight() || !animal.isAvailableForFight() || animal.isInFight()) return;
     // TODO: check for proximity
     var area = GameServer.computeBattleArea(player,animal);
-    if(!GameServer.checkAreaIntegrity(area)){
+    /*if(!GameServer.checkAreaIntegrity(area)){
+        if(!aggro) player.addMsg('There is an obstacle in the way!');
+        return;
+    }*/
+    if(!area){
         if(!aggro) player.addMsg('There is an obstacle in the way!');
         return;
     }
@@ -523,20 +521,40 @@ GameServer.handleBattle = function(player,animal,aggro){
     battle.start();
 };
 
-GameServer.checkAreaIntegrity = function(area){
+/*GameServer.checkAreaIntegrity = function(area){
     var cells = new SpaceMap();
     for(var x = area.x; x <= area.x+area.w; x++){
         for(var y = area.y; y <= area.y+area.h; y++){
-            if(!GameServer.checkCollision(x,y)) cells.add(x,y,0); // y then x
+            if(!GameServer.checkCollision(x,y)) cells.add(x,y,0);
         }
     }
     var integrityPathfinder = new Pathfinder(cells,999);
+    // Look for path from one corner to th other
     var path = integrityPathfinder.findPath(area,{x:area.x+area.w,y:area.y+area.h});
     return (path && path.length > 0);
-};
+};*/
 
 GameServer.computeBattleArea = function(f1,f2){
-    var pos1 = f1.getEndOfPath();
+    var cells = new SpaceMap();
+    var fs = [f1,f2];
+    fs.forEach(function(f){
+        for(var x = f.x - 1; x <= f.x + f.cellsWidth; x++){
+            for(var y = f.y - 1; y <= f.y + f.cellsHeight; y++) {
+                if(!GameServer.checkCollision(x,y)) cells.add(x,y);
+            }
+        }
+    });
+
+    // TODO: go from center to center
+    // A default length limit is built-in the pathfinder
+    var path = GameServer.findPath(f1,f2);
+    if(!path || path.length == 0) return null;
+    path.forEach(function(cell){
+        cells.add(cell[0],cell[1]);
+    });
+    return cells.toList();
+
+    /*var pos1 = f1.getEndOfPath();
     var pos2 = f2.getEndOfPath();
 
     var tl = {x: null, y: null};
@@ -568,17 +586,21 @@ GameServer.computeBattleArea = function(f1,f2){
         y: tl.y,
         w: w,
         h: h
-    };
+    };*/
 };
 
 // Check if a battle area overlaps with another battel's area
 GameServer.checkBattleOverlap = function(area){
-    for(var x = area.x; x < area.x+area.w; x++){
+    area.forEach(function(c){
+        var cell = GameServer.battleCells.get(c.x,c.y);
+        if(cell) return cell.battle;
+    });
+    /*for(var x = area.x; x < area.x+area.w; x++){
         for(var y = area.y; y < area.y+area.h; y++){
             var cell = GameServer.battleCells.get(x,y);
             if(cell) return cell.battle;
         }
-    }
+    }*/
     return null;
 };
 
@@ -595,18 +617,29 @@ GameServer.checkForFighter = function(AOIs){
 // Check if the entity has stepped inside a battle area
 GameServer.checkForBattle = function(entity){
     if(!entity.isAvailableForFight() || entity.isInFight()) return;
-    var cell = GameServer.battleCells.get(entity.x,entity.y);
-    if(cell) GameServer.expandBattle(cell.battle,entity);
+    for(var ay = entity.y; ay <= entity.y + entity.cellsHeight +1; ay++){
+        for(var ax = entity.x; ax <= entity.x + entity.cellsWidth +1; ax++){
+            var cell = GameServer.battleCells.get(ax,ay);
+            if(cell) GameServer.expandBattle(cell.battle,entity);
+            return;
+        }
+    }
 };
 
-GameServer.expandBattle = function(battle,entity){
-    var area = {
+GameServer.expandBattle = function(battle,f){
+    /*var area = {
         x: entity.x-1,
-        y: entity.y-1,
-        w: 2,
-        h: 2
-    };
-    battle.addFighter(entity);
+        y: (entity.isBuilding ? entity.y - entity.cellsHeight : entity.y-1),
+        w: entity.cellsWidth+1,
+        h: entity.cellsHeight+1
+    };*/
+    var area = new SpaceMap();
+    for(var x = f.x - 1; x < f.x + f.cellsWidth; x++){
+        for(var y = f.y - 1; y < f.y + f.cellsHeight; y++) {
+            if(!GameServer.checkCollision(x,y)) area.add(x,y);
+        }
+    }
+    battle.addFighter(f);
     battle.addArea(area);
 };
 
@@ -744,7 +777,7 @@ GameServer.handleCraft = function(data,socketID){
     var recipe = GameServer.itemsData[targetItem].recipe;
     if(!GameServer.allIngredientsOwned(recipient,recipe,nb)) return;
     GameServer.operateCraft(recipient, recipe, targetItem, nb);
-    player.gainClassXP(GameServer.classes.craftsman,5,true); // TODO: vary based on multiple factors
+    player.gainClassXP(GameServer.classes.craftsman,5*nb,true); // TODO: vary based on multiple factors
 };
 
 GameServer.allIngredientsOwned = function(entity,recipe,nb){

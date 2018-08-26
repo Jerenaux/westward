@@ -22,7 +22,8 @@ function Civ(x,y,type){
     this.setAggressive();
     this.setStartingStats(civData.stats);
     this.setLoot(civData.loot);
-    this.setOrUpdateAOI();
+    //this.setOrUpdateAOI();
+    console.warn('creating NPC');
     NPC.call(this);
 }
 
@@ -30,7 +31,7 @@ Civ.prototype = Object.create(NPC.prototype);
 Civ.prototype.constructor = Civ;
 
 Civ.prototype.setAggressive = function(){
-    // Different from global aggro parameter, specifies if this specific animal should be aggressive pr not
+    // Different from global aggro parameter, specifies if this specific civ should be aggressive pr not
 
     this.aggressive = true; // TODO: make it depend on in-game factors?
 

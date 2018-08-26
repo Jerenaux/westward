@@ -39,9 +39,31 @@
       "right": 28
     },
     "stats": {
-      "hp": 30,
+      "hp": 200,
       "def": 12,
-      "mdmg": 15
+      "mdmg": 4
+    }
+  },
+  "2":{
+    "sprite":"toadmen",
+    "name": "Shroom",
+    "frame": 55,
+    "walkPrefix": "toad",
+    "width": 2,
+    "height": 2,
+    "aggro": true,
+    "wander": true,
+    "footprintsFrame": 1,
+    "restingFrames": {
+      "up": 45,
+      "down": 9,
+      "left": 21,
+      "right": 33
+    },
+    "stats": {
+      "hp": 300,
+      "def": 16,
+      "mdmg": 5
     }
   },
   "5":{
@@ -51,6 +73,9 @@
     "walkPrefix": "bear",
     "width": 2,
     "height": 2,
+    "aggro": true,
+    "wander": true,
+    "footprintsFrame": 1,
     "restingFrames": {
       "up": 45,
       "down": 9,
@@ -59,8 +84,8 @@
     },
     "stats": {
       "hp": 300,
-      "def": 30,
-      "mdmg": 1
+      "def": 16,
+      "mdmg": 5
     }
   }
 }

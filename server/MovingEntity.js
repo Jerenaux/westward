@@ -7,6 +7,7 @@ var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 function MovingEntity(){
+    this.isMoving
     this.moving = false;
 }
 

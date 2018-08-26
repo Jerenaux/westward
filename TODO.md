@@ -1,14 +1,138 @@
 Bugs:
 - dead wolves keep fighting
-- Wrong battle areas sometimes (apparently based on end destination, not current one)
 - Pickup items in water?
-- Wrong pathfinding/targets in battle?
+
+Spatial issues:
+- Spotting for aggro / aggro distance
+- Next to
+- Including new entities when battle expands
+- Entering battle when moving into area
+- Deciding size of battle area
 
 Release:
-- Newplayer only
+- Newplayer only (flush)
+- Dis/enable battles
 - Push
 - Position buildings (add workshop!)
 - Reset food
+
+Daily: design doc, world building
+
+Part I: Mechanics
+Part II: World building
+Part III: Atmosphere & polish
+Part IV: Cleaning, optimization and admin
+
+Pillars:
+1) The War
+2) The Economy
+3) The Wild
+
+Chapter 1
+1) The War
+- Enemy civ raids (spawn & go)
+- Building mechanics (damage, destruction and repair)
+- Towers
+- Settlers counterattacks 
+2) The Economy
+- Resource flows between buildings, incl. gold generation
+- Introduce new wood ingredient obtained from timber (logs?)
+- Starvation (impact) (think of ways to make it painfully visible)
+- Settlement-oriented HUD: see below
+- Missions menu
+(-> Eventually: missions, quests & achievements)
+(-> Missions: bring food, defend, commit, follow chancellor directives,
+defend trade routes, scout, maintain supplies)
+(-> Control quests distribution?    )
+3) The Wild
+- Fog of war (timed)
+- Icons synchronization
+
+Chapter 2
+1) The War
+- Barracks and troops
+- Fortified civ camps, rebuilds
+2) The Economy
+- Permanent, named players
+- Governor (fixed) & officials
+- Dev. levels
+- Impact on crafting, buildings, ...
+- New World (https://worldspinner.com/)
+- New buildings, settlements expansion
+3) The Wild
+- Resources & misc map icons
+- Trade routes (chancellors only), mark on maps
+
+Chapter 3:
+1) The War
+- Unit types & counters
+- Advanced battle mechanics & UI
+- Automated raids by commander, displayed to entice players
+2) The Economy
+- Elections
+- Taxes
+- Citizenship changes
+- Homeland trade
+- Economy orientation by chancellors
+- Backpacks, purses, belts, gloves (remove shields) ...
+- War economy (tower ammunitions, ...)
+3) The Wild
+- Fatigue & rest, impact on everything
+
+Chapter 4:
+Fancy title screen (with number of players, events stream, map background...)
+Class selection
+Player abilities
+Advanced XP systems
+Class quests & civic quests (endless supply in missions menu)
+Personal shops & caravans
+World-building: items, fauna & flora
+Corresponding spawn mechanics
+Corresponding admin tools
+Advanced crafting mechanics & interface
+Recipes mechanics
+Tiers, brittleness, ...
+New geography, adding world content
+Corresponding editing tools
+Ambient elements
+Civ style
+Advanced civ mechanics
+Messaging
+Advanced social features
+Diplomacy
+...
+
+
+
+Interface upgrades:
+- Class selection
+- Settlement selection
+- Crafting menu
+- Battle interface
+- HUD
+
+
+UI
+# Put settlement to the forefront
+- Name next to minimap
+- Lvl, # citizens, # buildings?, # troops
+- Food (abundance, normal, hunger, starvation)
+- Security? 
+- Bell icon when attacks
+- Blinking icon on map when attacks?
+- Displayed for the settlement currently visited
+- Help icon to invite to visit fort for more details
+- Compass icon pointing towards local Fort at all time (if equipped)
+- Death icons + "last attacks" icons
+
+Misc:
+- Re-introduce movement marker, not square, make it lag behind and wiggle below cursor? 
+
+
+
+##################################################
+##################################################
+##################################################
 
 * Battle system
 * Civics
@@ -16,14 +140,13 @@ Release:
 * Craftsmen gameplay
 * Enemy civ
 * Explorer gameplay
-* Inventory
 * Merchant gameplay
-* Misc
 * Packaging
 * Settlement defense
 * Settlement economy
 * Soldier gameplay
 Design document
+World building
 Free
 
 #####################################################
@@ -86,6 +209,8 @@ interactions with buildings, time spent in each individual menu, etc.
 Cleaning:
 --------
 Performance:
+- Much batter position handling
+- Server-side, have all entities maintain Rect objects for proximity computations (e.g. checkForBattle etc.)
 - Remove unnecessary files
 - Use pool for notifications
 - Avoid duplicate pins in maps, danger pins etc.
@@ -153,15 +278,19 @@ Content:
 -> Multiple categories (weather, animals, terrain...), distinct random intervals
 * Battle system
 - Bombs:
+-> Stats??
+-> Greater effect against buildings
 -> Sound effect
 -> Throw animation?
 -> Variable damage based on bomb type
 -> Factor defense in
 - traps, poisons, potions, oils...
+- burn effects inflicted by (crimson?) explosives
 (-> trap bonuses to explorers? Natural crafting recipe to them?)
 - Increase fatigue when fighting
 - Effect of fatigue on fighting
-(- Gunpowder mechanics; remove it from bullet recipe?)
+( - Camera follows active figher? Could be more dynamic ; possibly with deadzone to avoid twitch)
+- Gunpowder mechanics; remove it from bullet recipe?)
 (- New interface:
 Timer at bottom, icon of active fighter on the left, queue of others on the right
 Skip turn below
@@ -175,13 +304,12 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 (- Let NPC use items (restore health, ...))
 (- 3-way battles)
 * Civics
-- Finish all civic panel related stuff (commitment, etc.)
-- Apply taxes
 - Civic abilities
-- variable civic xp when committing, based on factors
 - Elections
 - Naming officials
-(- Change settlement
+(- variable civic xp when committing, based on factors
+- Taxes
+- Change settlement
 - Update population based on players (requires permanent players)
 - Server side: check that not committing twice to same building)
 * Character panel
@@ -196,17 +324,17 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Events log
 - Add help back
 * Craftsmen gameplay
--> Add special gunpowder (crimson dust), special bomb type, larger pouch, one interesting potion
-- Display output nb
-- Lock some recipes based on dev level
--> keep locked recipes but disable them (indicate why)
 - Think of short, nice names 
-- XP based on multiple factors
 - Abilities
 - Lock some recipes on abilities
 - At some point, made scrollable recipes panel 
 - Quests
-(Backpacks, gold pouches of various sizes...)
+- Mystery potion that uses all plants in game, as a challenge
+- Lock some recipes based on dev level
+-> keep locked recipes but disable them (indicate why)
+(
+- XP based on multiple factors
+Backpacks, gold pouches of various sizes...)
 (- Recipes for golden ore -> gold ingots -> currency)
 (- Tiers)
 (- Upgrades)
@@ -216,6 +344,7 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 -> Furnace mechanics? (Duration and temperature, coald and/or wood as fuel...)
 -> Brewing mechanics? (Brew duration, fuel as well...))
 (- Add dosage mechanic when brewing) 
+(- Full list of items)
 * Explorer gameplay
 - Map mechanics:
 - Buggy building centering in fort?
@@ -250,27 +379,30 @@ Belt slots above + ammo slots + active weapon (ranged vs melee)
 - Bonuses
 - Show plant markers based on ability
 * Enemy civ
-- Own orientation pins
-- Wander behavior (squad)
-- Spawn zones
-- Buildings health 
-- Buildings destruction
+// Lookup "tribal concept art" for inspiration on civs look
+//: one single building type that spawns civs at regular intervals + map icons
+-> Sprinkle several camps around settlements
+- Inclusion of buildings in fights
+- Targetting of buildings by civs
+- Processing of attacks, destruction
 - Settlement attack behavior (what time intervals, how many...)
+- Allow players to attack buildings
+- Tower behavior
+- Auto-repair (for both settlers and civs), link to commitment
+(- Wander behavior (squad), patrols
 - Territory zones: if player step in, send small squad to track
-- Camps
 - Name generator
 - Camp economy
 - Civs loot equipment and equip it
 - Civs gain XP, level-up, become stronger (increase associated xp reward accordingly)
 - Reflect that in hover card
-- Test NPC vs animals
+- Test NPC vs animals)
 * Help
 - Review existing help buttons
 - Add missing help buttons (including on specific lines to describe fatigue, food surplus...)
 - Make tutorial quests (commitment & civic xp, battle, crafting...)
 - Pop-up boxes describing things first time (first time in fort, workshop, character menu...)
 * Inventory
-- Click window for items, with use button
 - Click window: display stat effects
 - Belt mechanics (quick-use slots for potions, bombs and weapons)
 - Backpack mechanics
@@ -327,6 +459,7 @@ or
 - Show updated health in fort
 - Set up stats of towers and forts
 - Towers behave as animals and trigger fights (same battle behavior)
+- Manage arrows stock? Need for arrow economy? Ammo economy?
 - Same with forts
 - Enable commander to build barracks
 - Production of NPC troops
@@ -349,7 +482,7 @@ Stop sending commit slots repeatedly
 Hide commit button when already committed
 Implement and test decommitment from db data
 Modify update commit code to accomodate for commitment of > 1 turn
-Have hunter huts produce pelts
+Have hunter huts produce pelts (good for leather economy)
 Recipe: paper cartridges (paper also for bombs?)?
 Make recipes (randomly?) for 5 consumables (potion, antidote, steady stuff...) + create ingredients
 Recipes for fancy bullets and bombs
@@ -366,15 +499,15 @@ Recipes for fancy bullets and bombs
 - Allow creation of new buildings (fixed locations to begin with)
 - Lists of items rewarded by civic xp
 * Soldier gameplay
-- New compute battle destination in server/NPC
-- New "nex to" logic in battles
+- New compute battle destination in server/NPC?
 - Battle cursors use new "next to" logic
 - Monster variety & more spawn zones
--> Brown wolves south, black ones south more powerful, same with gray and white wolves north
-+ others
 - Abilities
 - Quests
-(- Rare/strong foes)
+(- Whole ecology, variants of animals along north/south axis,
+-> Brown wolves south, black ones south more powerful, same with gray and white wolves north
++ unicorn
+- Rare/strong foes)
 (- Advanced XP)
 
 Deployment:
@@ -393,8 +526,6 @@ Deployment:
 
 Design document:
 ---------------
-- Finish copying notes (last: leaderboard keyword and meta-game stuff)
-- Concile all texts (doc, crafting.txt)
 - Add recent ideas about soldier control (see settlement defense)
 - Re-read, update with recent ideas
 - Decide list of buildings, items, ...
@@ -514,7 +645,6 @@ Manage spawn zones in editor
 UI:
 ---
 - 8-directional characters, + attack (ranged & melee), object, die animations ...
-- Mouse pointers for attacks (ranged & melee), in-battle item use, pick ups, buildings, moving, ...
 - Movement target indicator
 - Better battle tiles
 - Battle UI

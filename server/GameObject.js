@@ -4,6 +4,7 @@
 
 var Utils = require('../shared/Utils.js').Utils;
 var GameServer = require('./GameServer.js').GameServer;
+//var Rect = require('./Rect.js').Rect;
 
 // Parent class of all game objects : players, monsters and items (not NPC because they are not processed server-side)
 function GameObject(){}
@@ -11,6 +12,10 @@ function GameObject(){}
 GameObject.prototype.getShortID = function(){
     return this.constructor.name[0]+this.id;
 };
+
+/*GameObject.prototype.setRect = function(x,y,w,h){
+    this.rect = new Rect(x,y,w,h);
+};*/
 
 GameObject.prototype.setOrUpdateAOI = function(){
     var previousAOI = (this.aoi !== undefined ? this.aoi : null);

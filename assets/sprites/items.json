@@ -79,6 +79,10 @@
     {
       "filename": "crimsonpowder",
       "frame": {"x":256,"y":96,"w":32,"h":32}
+    },
+    {
+      "filename": "leather",
+      "frame": {"x":352,"y":448,"w":32,"h":32}
     }
   ]
 }

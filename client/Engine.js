@@ -43,8 +43,10 @@ Engine.preload = function() {
     // Characters
     this.load.spritesheet('enemy', 'assets/sprites/enemy.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64});
-    this.load.spritesheet('wolves', 'assets/sprites/wolves.png',{frameWidth:32,frameHeight:32});
-    this.load.spritesheet('bears', 'assets/sprites/bears2.png',{frameWidth:56,frameHeight:56});
+    this.load.spritesheet('wolves', 'assets/sprites/animals/wolves.png',{frameWidth:32,frameHeight:32});
+    this.load.spritesheet('bears', 'assets/sprites/animals/bears2.png',{frameWidth:56,frameHeight:56});
+    this.load.spritesheet('toadmen', 'assets/sprites/animals/toadmen.png',{frameWidth:48,frameHeight:48});
+
 
     // Misc
     this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
@@ -72,8 +74,9 @@ Engine.preload = function() {
 
     // Misc
     this.load.image('bug', 'assets/sprites/bug.png');
-    this.load.image('orientation', 'assets/sprites/orientation.png');
-    this.load.image('wolforient', 'assets/sprites/wolforient.png');
+    this.load.atlas('orientation', 'assets/sprites/orientation.png', 'assets/sprites/orientation.json');
+    //this.load.image('orientation', 'assets/sprites/orientation.png');
+    //this.load.image('wolforient', 'assets/sprites/wolforient.png');
     this.load.image('tail', 'assets/sprites/tail.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll.png');
     this.load.image('longscroll', 'assets/sprites/longscroll.png');
@@ -119,6 +122,7 @@ Engine.preload = function() {
     this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('itemsData', 'assets/data/items.json');
     this.load.json('animals', 'assets/data/animals.json');
+    this.load.json('civs', 'assets/data/civs.json');
 
     Engine.collidingTiles = []; // list of tile ids that collide (from tilesets.json)
     Engine.tilesheets = [];
@@ -262,6 +266,7 @@ Engine.create = function(){
 
     Engine.buildingsData = Engine.scene.cache.json.get('buildings');
     Engine.animalsData = Engine.scene.cache.json.get('animals');
+    Engine.civsData = Engine.scene.cache.json.get('civs');
     Engine.itemsData = Engine.scene.cache.json.get('itemsData');
 
     Engine.buildingIconsData = {};
@@ -520,6 +525,9 @@ Engine.updateAllOrientationPins = function(){
     Engine.entityManager.displayLists['animal'].forEach(function(aid){
         Engine.animals[aid].manageOrientationPin();
     });
+    Engine.entityManager.displayLists['civ'].forEach(function(cid){
+        Engine.civs[cid].manageOrientationPin();
+    });
     Engine.entityManager.displayLists['item'].forEach(function(iid){
         Engine.items[iid].manageOrientationPin();
     });
@@ -558,6 +566,7 @@ Engine.makeUI = function(){
     statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help']);
 
     Engine.menus = {
+        'abilities': Engine.makeAbilitiesMenu(),
         'battle': Engine.makeBattleMenu(),
         'character': Engine.makeCharacterMenu(),
         'construction': Engine.makeConstructionMenu(),
@@ -919,11 +928,11 @@ Engine.makeMapMenu = function(){
     var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
     mapPanel.addBackground('longscroll');
     var mapInstance = mapPanel.addMap('player','radiallongrect',1000,380,-1,-1);
-    mapPanel.addButton(960, 8, 'blue','help',null,'',UI.textsData['self_map_help']);
+    mapPanel.addButton(953, -2, 'blue','help',null,'',UI.textsData['self_map_help']);
     // TODO: move in Map.js, method addZoom, positions buttons based on viewWidt/height and
     // controls enable/disable of buttons based on zoom flag
-    mapPanel.addButton(960, 310, 'blue','plus',mapInstance.zoomIn.bind(mapInstance),'Zoom in');
-    mapPanel.addButton(960, 340, 'blue','minus',mapInstance.zoomOut.bind(mapInstance),'Zoom out');
+    mapPanel.addButton(940, 320, 'blue','plus',mapInstance.zoomIn.bind(mapInstance),'Zoom in');
+    mapPanel.addButton(930, 350, 'blue','minus',mapInstance.zoomOut.bind(mapInstance),'Zoom out');
     map.addPanel('map',mapPanel);
     return map;
 };
@@ -1117,6 +1126,13 @@ Engine.makeInventory = function(statsPanel){
     return inventory;
 };
 
+Engine.makeAbilitiesMenu = function(){
+    var menu = new Menu('Abilities');
+    menu.addPanel('abilities',new AbilitiesPanel(40,100,600,380,'Abilities'));
+    menu.addPanel('desc',new AbilityPanel(660,100,340,380,'Description'));
+    return menu;
+};
+
 Engine.makeCharacterMenu = function(){
     var menu = new Menu('Character');
     menu.setSound(Engine.scene.sound.add('page_turn'));
@@ -1145,13 +1161,15 @@ Engine.makeCharacterMenu = function(){
     var cw = Math.round((classw - 45)/2);
     var ch = (classh - 100)/2;
     for(var classID in UI.classesData) {
-        var p = menu.addPanel('class_'+classID, new ClassMiniPanel(cx,cy,cw,ch,UI.classesData[classID].name));
-        p.setClass(classID);
+        var p = menu.addPanel('class_'+classID, new ClassMiniPanel(cx,cy,cw,ch,UI.classesData[classID].name,classID));
         cx += cw + 15;
         if(classID == 1){
             cx = sx;
             cy += ch;
         }
+
+        //var ab = menu.addPanel('abilities_'+classID, new Panel(citizenx,citizeny,citizenw,citizenh,'Abilities'), true);
+        //ab.addButton(citizenw,-8,'red','close',ab.hide.bind(ab),'Close');
     }
 
     var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
@@ -1160,7 +1178,7 @@ Engine.makeCharacterMenu = function(){
     commit.setInventory(Engine.player.commitTypes,3,false);
     commit.setDataMap(Engine.buildingIconsData);
 
-    menu.addPanel('abilities',new Panel(citizenx,citizeny,citizenw,citizenh),true);
+    //menu.addPanel('abilities',new Panel(citizenx,citizeny,citizenw,citizenh),true);
 
     menu.addEvent('onUpdateCharacter',classpanel.update.bind(classpanel));
     menu.addEvent('onUpdateCitizen',citizen.update.bind(citizen));
@@ -1176,8 +1194,8 @@ Engine.getIngredientsPanel = function(){
 Engine.makeRecipesLists = function(){
 
     // TODO: put in conf somewhere
-    var equipmentRecipes = [28,11,10,13,15,16,2,19,29,20,12,40,39,4,6];
-    var ingredientsRecipes = [22,23,32,33,38,35,17,21];
+    var equipmentRecipes = [28,11,10,13,15,16,2,19,29,20,12,40,42,39,4,44,6];
+    var ingredientsRecipes = [22,23,32,33,38,35,41,17,21,43];
 
     /*for(var key in Engine.itemsData){
         // TODO: standardize flags (isWeapon, ...)
@@ -1216,18 +1234,6 @@ Engine.addHero = function(data){
     Engine.player = new Hero();
     Engine.player.setUp(data);
     Engine.camera.startFollow(Engine.player); // leave outside of constructor
-
-    /*Engine.player.settlement = data.settlement;
-    Engine.player.markers = data.markers;
-    Engine.players.unread = 1;
-    Engine.player.inventory = new Inventory();
-    Engine.player.class = data.class;
-    Engine.player.gold = data.gold;
-    Engine.player.civiclvl = data.civiclvl;
-    Engine.player.civicxp = data.civicxp;
-    Engine.player.classxp = data.classxp;
-    Engine.player.classlvl = data.classlvl;*/
-
     Engine.updateEnvironment();
 };
 
@@ -1401,7 +1407,7 @@ Engine.getMouseCoordinates = function(pointer){
     // +16 so that the target tile is below the middle of the cursor
     var pxX = Engine.camera.scrollX + pointer.x;// + 16;
     var pxY = Engine.camera.scrollY + pointer.y;// + 16;
-    if(!Engine.debugMarker){
+    if(!Engine.debugMarker && !BattleManager.inBattle){
         pxX += 16;
         pxY += 16;
     }
@@ -1748,6 +1754,20 @@ Engine.updateGrid = function(){
     Engine.entityManager.displayLists['cell'].forEach(function(id){
         Engine.battleCells[id].update();
     });
+};
+
+Engine.getOccupiedCells = function(entity,hash){
+    var cells = [];
+    for(var i = 0; i < entity.cellsWidth; i++){
+        for(var j = 0; j < entity.cellsHeight; j++){
+            if(hash){
+                cells.push((entity.tileX+i)+'_'+(entity.tileY+j));
+            }else{
+                cells.push({x:entity.tileX,y:entity.tileY});
+            }
+        }
+    }
+    return cells;
 };
 
 // ## UI-related functions ##

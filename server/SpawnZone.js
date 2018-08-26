@@ -5,7 +5,6 @@
 var World = require('../shared/World.js').World;
 var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 function SpawnZone(aois,animalsData,itemsData){
     this.aois = aois;
@@ -14,27 +13,31 @@ function SpawnZone(aois,animalsData,itemsData){
     this.population = {};
     this.items = {};
 
-    animalsData.forEach(function(data){
-        var animalID = data[0];
-        var min = data[1];
-        var rate = data[2];
-        this.population[animalID] = 0;
-        this.animalsData[animalID] = {
-            rate: rate,
-            min: min
-        }
-    },this);
+    if(animalsData){
+        animalsData.forEach(function(data){
+            var animalID = data[0];
+            var min = data[1];
+            var rate = data[2];
+            this.population[animalID] = 0;
+            this.animalsData[animalID] = {
+                rate: rate,
+                min: min
+            }
+        },this);
+    }
 
-    itemsData.forEach(function(data){
-        var itemID = data[0];
-        var min = data[1];
-        var rate = data[2];
-        this.items[itemID] = 0;
-        this.itemsData[itemID] = {
-            rate: rate,
-            min: min
-        }
-    },this);
+    if(itemsData){
+        itemsData.forEach(function(data){
+            var itemID = data[0];
+            var min = data[1];
+            var rate = data[2];
+            this.items[itemID] = 0;
+            this.itemsData[itemID] = {
+                rate: rate,
+                min: min
+            }
+        },this);
+    }
 }
 
 SpawnZone.prototype.update = function(){

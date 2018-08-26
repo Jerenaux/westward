@@ -18,6 +18,7 @@ var Hero = new Phaser.Class({
     },
 
     setUp: function(data){
+        // data comes from Player.initTrim() server-side
         Player.prototype.setUp.call(this,data);
 
         this.settlement = data.settlement;
@@ -28,17 +29,18 @@ var Hero = new Phaser.Class({
         this.equipment = new EquipmentManager();
         this.setCommitSlots(data.commitSlots);
 
-        //this.class = data.class;
         this.gold = data.gold;
         this.civiclvl = data.civiclvl;
         this.civicxp = data.civicxp;
         this.classxp = data.classxp;
         this.classlvl = data.classlvl;
+        this.ap = data.ap;
     },
 
     updateData: function(data){ // don't call this 'update' or conflict with Phaser method
         var callbacks = {
             'ammo': this.updateAmmo,
+            'ap': this.updateAP,
             'civiclvl': this.updateCivicLvl,
             'classlvl': this.updateClassLvl,
             'classxp': this.updateClassXP,
@@ -121,7 +123,6 @@ var Hero = new Phaser.Class({
 
     getRangedCursor: function(){
         var rangedw = this.getEquipped('rangedw');
-        console.log('rangedw = ',rangedw);
         if(rangedw == -1) return 'bow';
         return (Engine.itemsData[rangedw].ammo == 'quiver' ? 'bow' : 'gun');
     },
@@ -165,6 +166,13 @@ var Hero = new Phaser.Class({
             this.equipment.setAmmo(am.slot,am.nb);
         }
         this.updateEvents.add('equip');
+    },
+
+    updateAP: function(ap){
+        this.ap = ap;
+        this.updateEvents.add('character');
+        this.updateEvents.add('citizen');
+        //TODO: add sound effect
     },
 
     updateCivicLvl: function(civiclvl){

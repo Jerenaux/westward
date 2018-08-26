@@ -9,7 +9,7 @@ var Civ = new Phaser.Class({
     initialize: function Civ() {
         NPC.call(this);
         this.entityType = 'civ';
-        //this.orientationPin = new OrientationPin('animal');
+        this.orientationPin = new OrientationPin('civ');
     },
 
     setUp: function(data){

@@ -13,11 +13,9 @@ CraftingPanel.prototype = Object.create(Panel.prototype);
 CraftingPanel.prototype.constructor = CraftingPanel;
 
 CraftingPanel.prototype.addInterface = function(){
-    //var ringx = 80;
     var ringy = 100;
     var ring = UI.scene.add.image(this.x+(this.width/2),this.y+ringy,'UI','craftring');
     ring.setScrollFactor(0);
-    //ring.setDisplayOrigin(0,0);
     ring.setDepth(1);
     ring.setVisible(false);
     this.content.push(ring);
@@ -69,8 +67,9 @@ CraftingPanel.prototype.setUp = function(itemID){
     var data = Engine.itemsData[itemID];
     this.craftItem.id = itemID;
     this.craftItem.item.setUp(itemID,data);
-    this.craftItem.count = 1; //(Engine.itemsData[itemID].output || 1);
-    this.craftItem.countText.setText(1);
+    this.craftItem.count = 1;
+    var output = (Engine.itemsData[this.craftItem.id].output || 1);
+    this.craftItem.countText.setText(this.craftItem.count*output);
     this.craftItem.recipe = data.recipe;
     this.craftItem.item.setVisible(true);
     this.craftItem.countText.setVisible(true);
@@ -127,9 +126,9 @@ CraftingPanel.prototype.decreaseAmount = function(){
 };
 
 CraftingPanel.prototype.changeAmount = function(inc){
-    //var output = (Engine.itemsData[itemID].output || 1);
+    var output = (Engine.itemsData[this.craftItem.id].output || 1);
     this.craftItem.count = Utils.clamp(this.craftItem.count+inc,1,999);
-    this.craftItem.countText.setText(this.craftItem.count);
+    this.craftItem.countText.setText(this.craftItem.count*output);
     Engine.getIngredientsPanel().modifyInventory(this.makeIngredientsList(this.craftItem.recipe,this.craftItem.count));
     Engine.getIngredientsPanel().updateInventory();
     this.manageButtons();

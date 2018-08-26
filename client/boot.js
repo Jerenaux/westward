@@ -16,6 +16,7 @@ var Boot = new Phaser.Class({
         this.load.json(Boot.masterKey,Boot.mapDataLocation+'/master.json');
 
         this.load.image('background', 'assets/sprites/background.png');
+        this.load.image('logo', 'assets/sprites/logo.png');
     },
 
     create: function(){
@@ -51,9 +52,10 @@ var Boot = new Phaser.Class({
     },
 
     displayTitle: function(){
-        Boot.title = this.add.text(512,128, 'Westward',
+        /*Boot.title = this.add.text(512,128, 'Westward',
             { font: '150px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 10 }
-            ).setOrigin(0.5,0).setAlpha(0);
+            ).setOrigin(0.5,0).setAlpha(0);*/
+        Boot.title = this.add.image(512,218,'logo').setAlpha(0);
 
         this.tweens.add({
             targets: Boot.title,
@@ -64,7 +66,7 @@ var Boot = new Phaser.Class({
     },
 
     displayButton: function(){
-        Boot.button = new BigButton(512,300,'Play',UI.leaveTitleScreen);
+        Boot.button = new BigButton(512,400,'Play',UI.leaveTitleScreen);
         Boot.button.display();
     }
 });

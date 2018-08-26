@@ -34,7 +34,8 @@
     "staff": true,
     "icon": "fort",
     "recipe": {"3":50},
-    "displayProd": false
+    "displayProd": false,
+    "health": 500
   },
   "1":{
     "name":"Trade Post",
@@ -66,7 +67,8 @@
     "displayProd": false,
     "buildRate":2,
     "mainMenu": "trade",
-    "icon": "tradepost"
+    "icon": "tradepost",
+    "health": 250
   },
   "2":{
     "width": 185,
@@ -84,7 +86,8 @@
     "recipe": {"3":60},
     "icon": "tower",
     "displayProd": false,
-    "buildRate":2
+    "buildRate":2,
+    "health": 250
   },
   "3": {
     "name": "Workshop",
@@ -123,7 +126,8 @@
     "workshop": true,
     "buildRate":2,
     "mainMenu": "crafting",
-    "icon": "workshop"
+    "icon": "workshop",
+    "health": 250
   },
   "5":{
     "name": "Hunter hut",
@@ -160,7 +164,8 @@
     "mainMenu": "production",
     "displayProd": true,
     "production": [[1,1]],
-    "buildRate":10
+    "buildRate":10,
+    "health": 50
   },
   "6":{
     "name": "Lumber camp",
@@ -194,7 +199,8 @@
     "depthOffset": 2,
     "displayProd": true,
     "production": [[3,1]],
-    "buildRate":10
+    "buildRate":10,
+    "health": 50
   },
   "7":{
     "name": "Coal mine",
@@ -227,7 +233,8 @@
     "depthOffset": 3,
     "displayProd": true,
     "production": [[22,1]],
-    "buildRate":10
+    "buildRate":10,
+    "health": 50
   },
   "8":{
     "name": "Iron mine",
@@ -260,7 +267,8 @@
     "depthOffset": 3,
     "displayProd": true,
     "production": [[24,1]],
-    "buildRate":10
+    "buildRate":10,
+    "health": 50
   },
   "9":{
     "name": "Gold mine",
@@ -293,7 +301,8 @@
     "depthOffset": 3,
     "displayProd": true,
     "production": [[25,1]],
-    "buildRate":10
+    "buildRate":10,
+    "health": 50
   },
   "10":{
     "name": "Farm",
@@ -332,6 +341,7 @@
     "depthOffset": 6,
     "displayProd": true,
     "production": [[1,1]],
-    "buildRate":10
+    "buildRate":10,
+    "health": 250
   }
 }

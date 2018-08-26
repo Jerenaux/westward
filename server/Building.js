@@ -28,6 +28,8 @@ function Building(data){
     var buildingData = GameServer.buildingsData[this.type];
     this.width = Math.ceil(buildingData.width/World.tileWidth);
     this.height = Math.ceil(buildingData.height/World.tileHeight);
+    this.cellsWidth = this.width+1;
+    this.cellsHeight = this.height;
 
     this.name = buildingData.name;
     this.sid = data.sid;
@@ -38,6 +40,11 @@ function Building(data){
     this.setGold(data.gold || 0);
     this.built = !!data.built;
     this.progress = data.progress || 0;
+
+    this.inFight = false;
+    this.maxhealth = buildingData.health;
+    this.health = data.health || this.health;
+
     this.productivity = 100;
     this.committed = 0;
     this.commitStamps = data.commitStamps || [];
@@ -69,7 +76,7 @@ Building.prototype.computeProductivity = function(){
     var foodModifier = this.settlement.computeFoodModifier();
     var commitmentModifier = Formulas.commitmentProductivityModifier(this.committed);
     var productivity = Formulas.decimalToPct(Formulas.computeProductivity(foodModifier,commitmentModifier));
-    console.log('Productivity for building',this.id,':',productivity,'% (',foodModifier,',',commitmentModifier,')');
+    //console.log('Productivity for building',this.id,':',productivity,'% (',foodModifier,',',commitmentModifier,')');
     this.setProperty('productivity',productivity);
 };
 
@@ -112,7 +119,7 @@ Building.prototype.updateProd = function(){
         var baseNb = production[i][1];
         var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
         var actualNb = increment;
-        console.log('producing ',actualNb,' ',GameServer.itemsData[item].name);
+        //console.log('producing ',actualNb,' ',GameServer.itemsData[item].name);
         if(actualNb > 0) this.settlement.addToFort(item,actualNb);
     }
 };
@@ -280,8 +287,28 @@ Building.prototype.addCollisions = function(){
     PFUtils.buildingCollisions(this.x,this.y,GameServer.buildingsData[this.type],GameServer.collisions);
 };
 
-Building.prototype.canFight = function(){return false;};
+Building.prototype.canFight = function(){return true;};
 
-Building.prototype.isAvailableForFight = function(){return false;}
+Building.prototype.isDestroyed = function(){
+    return this.health == 0;
+};
+
+Building.prototype.isAvailableForFight = function() {
+    return !this.isDestroyed();
+};
+
+Building.prototype.isInFight = function(){
+    return this.inFight;
+};
+
+Building.prototype.endFight = function(){
+    this.inFight = false;
+};
+
+Building.prototype.decideBattleAction = function(){
+    this.battle.processAction(this,{
+        action: 'pass'
+    });
+};
 
 module.exports.Building = Building;

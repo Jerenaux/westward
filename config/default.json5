@@ -4,6 +4,7 @@ To add: time gap between two orientation sounds (OrientationPin.display())
 */
 {
    battle: {
+        enabled: false,
         aggroRange: 7, // chebyshev distance
         battleRange: 3, // distance that can be travelled in one turn in battle; TODO: variable
         maxDamage: 10000,

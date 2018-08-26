@@ -6,23 +6,32 @@ var OrientationPin = new Phaser.Class({
 
     Extends: CustomSprite,
 
-    initialize: function OrientationPin (type,atlas,frame) {
-        CustomSprite.call(this, UI.scene, 0, 0, 'orientation');
+    initialize: function OrientationPin(type,iconAtlas,iconFrame) {
+        CustomSprite.call(this, UI.scene, 0, 0,'orientation');
         //this.setDepth(5);
+
+        this.type = type;
+        if(this.type == 'animal') {
+            iconAtlas = 'orientation';
+            iconFrame = 'animal_icon';
+            this.setFrame('animal_pin');
+        }else if(this.type == 'player') {
+            iconAtlas = 'orientation';
+            iconFrame = 'player_icon';
+            this.setFrame('player_pin');
+        }else if(this.type == 'civ'){
+            iconAtlas = 'orientation';
+            iconFrame = 'civ_icon';
+            this.setFrame('civ_pin');
+        }else if(this.type == 'item'){
+            this.setFrame('item_pin');
+        }
+
         this.setScrollFactor(0);
         this.setOrigin(0.5,1);
         this.setDepth(-1);
 
-        this.type = type;
-        if(this.type == 'animal') {
-            atlas = 'wolforient';
-        }else if(this.type == 'player'){
-            atlas = 'faces';
-            this.setTint('0x00bbff');
-        }else if(this.type == 'item'){
-            this.setTint('0x00ffbb');
-        }
-        this.icon = UI.scene.add.sprite(0,0,atlas,frame);
+        this.icon = UI.scene.add.sprite(0,0,iconAtlas,iconFrame);
         this.icon.setScrollFactor(0);
         this.icon.setDepth(-0.5);
         this.icon.setVisible(false);
@@ -71,8 +80,10 @@ var OrientationPin = new Phaser.Class({
         * 1,1           -1, -1
         *       -1, 1
         * */
+        // xp & yp are pin coordinates
+        // idx & idy are icone offsets
         var xp, yp, angle, maxdist, idx, idy;
-        if(d1 == 1 && d2 == -1){
+        if(d1 == 1 && d2 == -1){ // top side
             xp = A.y*(x/y);
             yp = A.y;
             angle = 180;
