@@ -11,17 +11,21 @@ var NPC = new Phaser.Class({
     },
 
     update: function(data){
-        // TODO: use callback map like others
-        if(data.path) this.queuePath(data.path);
-        if(data.stop) this.serverStop(data.stop.x,data.stop.y); // TODO: move to new Moving update() supermethod
-        if(data.melee_atk) {
-            this.computeOrientation(this.tileX,this.tileY,data.melee_atk.x,data.melee_atk.y);
-            this.faceOrientation();
-            this.onAttack();
+        var callbacks = {
+            'dead': this.die,
+            'melee_atk': this.processMeleeAttack,
+            'path': this.queuePath,
+            'stop': this.serverStop// TODO: move to a new Moving update() supermethod
+        };
+
+        for(var field in callbacks){
+            if(!callbacks.hasOwnProperty(field)) continue;
+            if(field in data) callbacks[field].call(this,data[field]);
         }
+
         Engine.handleBattleUpdates(this,data);
-        if(data.dead) this.die();
     },
+
 
     // ### INPUT ###
 

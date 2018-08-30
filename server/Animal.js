@@ -15,6 +15,7 @@ function Animal(x,y,type){
     this.id = GameServer.lastAnimalID++;
     this.isAnimal = true;
     this.battleTeam = 'Animal';
+    this.entityCategory = 'Animal';
     this.updateCategory = 'animals';
     this.x = x;
     this.y = y;

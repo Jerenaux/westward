@@ -9,6 +9,7 @@ function Civ(x,y,type){
     this.id = GameServer.lastCivID++;
     this.isCiv = true;
     this.battleTeam = 'Civ';
+    this.entityCategory = 'Civ';
     this.updateCategory = 'civs';
     this.x = x;
     this.y = y;

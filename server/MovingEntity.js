@@ -9,6 +9,7 @@ var PFUtils = require('../shared/PFUtils.js').PFUtils;
 function MovingEntity(){
     this.isMoving
     this.moving = false;
+    this.xoffset = 0;
 }
 
 MovingEntity.prototype = Object.create(GameObject.prototype);

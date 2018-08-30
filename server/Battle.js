@@ -148,6 +148,9 @@ Battle.prototype.getFighterByID = function(id){
         case 'A':
             map = GameServer.animals;
             break;
+        case 'B':
+            map = GameServer.buildings;
+            break;
         case 'C':
             map = GameServer.civs;
             break;
@@ -236,7 +239,8 @@ Battle.prototype.isPositionFree = function(x,y){
 };
 
 Battle.prototype.nextTo = function(a,b){
-    var Arect = {
+    return (Utils.multiTileChebyshev(a,b) == 0);
+    /*var Arect = {
         tlx: a.x - 1,
         tly: a.y - 1,
         brx: a.x + a.cellsWidth + 1,
@@ -248,19 +252,10 @@ Battle.prototype.nextTo = function(a,b){
         brx: b.x + b.cellsWidth,
         bry: b.y + b.cellsHeight
     };
+    // TODO: check instead if edges are touching?
     if(Arect.tlx >= Brect.brx || Brect.tlx >= Arect.brx) return false;
     if(Arect.tly >= Brect.bry || Brect.tly >= Arect.bry) return false;
-    return true;
-    /*for(var ay = a.y; ay < a.y + a.cellsHeight +1; ay++){
-        for(var ax = a.x; ax < a.x + a.cellsWidth +1; ax++){
-            var found = this.positions.get(ax,ay);
-            if(found && found.getShortID() == b.getShortID()) return true;
-        }
-    }
-    return false;*/
-    /*var dx = Math.abs(a.x - b.x);
-    var dy = Math.abs(a.y - b.y);
-    return (dx <= 1 && dy <= 1);*/
+    return true;*/
 };
 
 Battle.prototype.computeDamage = function(type,a,b){

@@ -1,7 +1,6 @@
 Bugs:
-- Pickup items in water
-- Wolf walking on water 
-=> Probably related
+- Animals occupying same battle cell
+- Spawning in battle area, moving: doesn't stop movement
 - Gray out sell inventory in shop as well?
 
 Spatial issues:
@@ -36,6 +35,7 @@ Chapter 1
 -> Auto repair based on productivity
 -> Destruction transition
 - Enemy civ raids (spawn & go)
+- Attack anim of civs? If available?
 - Towers
 - Settlers counterattacks 
 2) The Economy
@@ -79,6 +79,7 @@ Chapter 3:
 - Taxes
 - Citizenship changes
 - Homeland trade
+- Cash crops
 - Economy orientation by chancellors
 - Backpacks, purses, belts, gloves (remove shields) ...
 - War economy (tower ammunitions, ...)

@@ -7,10 +7,12 @@ var Formulas = require('../shared/Formulas.js').Formulas;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
+var Stats = require('../shared/Stats.js').Stats;
 
 function Building(data){
     this.isBuilding = true;
-    this.battleTeam = 'Building';
+    this.battleTeam = 'Player';
+    this.entityCategory = 'Building';
     this.updateCategory = 'buildings';
 
     this.id = -1;
@@ -31,6 +33,7 @@ function Building(data){
 
     var coll = buildingData.collisions;
     this.coll = coll;
+    this.xoffset = coll.x;
     this.entrance = buildingData.entrance;
     this.cellsWidth = coll.w;
     this.cellsHeight = coll.h;
@@ -46,8 +49,15 @@ function Building(data){
     this.progress = data.progress || 0;
 
     this.inFight = false;
-    this.maxhealth = buildingData.health;
-    this.health = data.health || this.health;
+
+    this.stats = Stats.getSkeleton();
+    this.stats['hp'].setBaseValue(buildingData.health);
+    this.stats['hpmax'].setBaseValue(buildingData.health);
+    // TODO: move to JSON
+    this.stats['def'].setBaseValue(100);
+    this.stats['acc'].setBaseValue(90);
+    this.stats['mdmg'].setBaseValue(100);
+    this.stats['rdmg'].setBaseValue(100);
 
     this.productivity = 100;
     this.committed = 0;
@@ -318,15 +328,15 @@ Building.prototype.checkForBattle = function(){
 
 Building.prototype.getCenter = function(){
     return {
-        x: this.x + this.entrance.x,
-        y: this.y + this.entrance.y
+        x: this.x + (this.entrance ? this.entrance.x : 0),
+        y: this.y + (this.entrance ? this.entrance.y : 0)
     };
 };
 
 Building.prototype.canFight = function(){return true;};
 
 Building.prototype.isDestroyed = function(){
-    return this.health == 0;
+    return !this.built;
 };
 
 Building.prototype.isAvailableForFight = function() {
@@ -345,6 +355,33 @@ Building.prototype.decideBattleAction = function(){
     this.battle.processAction(this,{
         action: 'pass'
     });
+};
+
+// ### Stats ###
+
+Building.prototype.applyDamage = function(dmg){
+    this.getStat('hp').increment(dmg);
+    // TODO: broadcast
+};
+
+Building.prototype.getHealth = function(){
+    return this.getStat('hp').getValue();
+};
+
+Building.prototype.getStat = function(key){
+    return this.stats[key];
+};
+
+Building.prototype.getStats = function(){
+    return Object.keys(this.stats);
+};
+
+Building.prototype.die = function(){
+    this.toggleBuild();
+};
+
+Building.prototype.isDead = function(){
+    return this.isDestroyed();
 };
 
 module.exports.Building = Building;

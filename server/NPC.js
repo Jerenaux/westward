@@ -4,7 +4,6 @@
 
 var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var Stats = require('../shared/Stats.js').Stats;
 var Inventory = require('../shared/Inventory.js').Inventory;
@@ -145,7 +144,7 @@ NPC.prototype.attackTarget = function(){
 };
 
 NPC.prototype.aggroAgainst = function(f){
-    return this.aggroMatrix[f.battleTeam];
+    return this.aggroMatrix[f.entityCategory];
 };
 
 NPC.prototype.selectTarget = function(){
@@ -165,7 +164,9 @@ NPC.prototype.selectTarget = function(){
 };
 
 NPC.prototype.computeBattleDestination = function(target){
-    var dest = target.getEndOfPath();
+    //var dest = target.getEndOfPath();
+    var dest = target;
+    //console.warn('Destination :',target.x,target.y);
     var r = GameServer.battleParameters.battleRange;
     var candidates = [];
     for(var x = this.x - r; x < this.x + r + 1; x++){
@@ -177,17 +178,21 @@ NPC.prototype.computeBattleDestination = function(target){
             if(!this.inBattleRange(x,y)) continue; // still needed as long as Euclidean range, the double-loop include corners outside of Euclidean range
             candidates.push({
                 x: x,
-                y: y
+                y: y,
+                cellsWidth: 1,
+                cellsHeight: 1
             });
         }
     }
     var _self = this;
     candidates.sort(function(a,b){
-        var dA = Utils.chebyshev(a,dest);
-        var dB = Utils.chebyshev(b,dest);
+        var dA = Utils.multiTileChebyshev(a,dest);
+        var dB = Utils.multiTileChebyshev(b,dest);
+        a.dist = dA;
+        b.dist = dB;
         if(dA == dB){
-            var selfA = Utils.chebyshev(a,_self);
-            var selfB = Utils.chebyshev(b,_self);
+            var selfA = Utils.multiTileChebyshev(a,_self);
+            var selfB = Utils.multiTileChebyshev(b,_self);
             if(selfA < selfB) return -1;
             return 1;
         }

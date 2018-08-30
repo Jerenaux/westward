@@ -44,18 +44,24 @@ var Civ = new Phaser.Class({
         this.footprintsFrame = 0;
         this.printsVertOffset = 10;
 
-        //this.manageOrientationPin();
+        this.manageOrientationPin();
     },
 
-    onAttack: function(){
-
+    processMeleeAttack: function(facing){
+        this.computeOrientation(this.tileX,this.tileY,facing.x,facing.y);
+        this.faceOrientation();
+        this.play(this.animPrefix+'_attack_'+this.orientation);
     },
+
+    /*onAttack: function(){
+        this.play(this.animPrefix+'_attack_'+this.orientation);
+    },*/
 
     remove: function(){
         //console.log('remove ',this.id,'(',this.tileX,',',this.tileY,',',this.chunk,',)');
         CustomSprite.prototype.remove.call(this);
-        //this.orientationPin.hide();
-        //this.orientationPin.reset();
+        this.orientationPin.hide();
+        this.orientationPin.reset();
         delete Engine.civs[this.id];
     },
 

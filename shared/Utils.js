@@ -188,6 +188,40 @@ Utils.chebyshev = function(A,B){
     return Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
 };
 
+Utils.multiTileChebyshev = function(A,B){
+    // take min or max of both edges to use in place of previous coordinates?
+    var dx = Math.min(
+        Math.abs(A.x-B.x),
+        Math.abs(A.x+A.cellsWidth-B.x),
+        Math.abs(A.x-(B.x+B.cellsWidth)),
+        Math.abs(A.x+A.cellsWidth-(B.x+B.cellsWidth))
+    );
+    var dy = Math.min(
+        Math.abs(A.y-B.y),
+        Math.abs(A.y+A.cellsHeight-B.y),
+        Math.abs(A.y-(B.y+B.cellsHeight)),
+        Math.abs(A.y+A.cellsHeight-(B.y+B.cellsHeight))
+    );
+    return Math.max(dx,dy);
+};
+
+/*Utils.multiTileChebyshev = function(A,B){
+  // take min or max of both edges to use in place of previous coordinates?
+    var dx = Math.min(
+        Math.abs(A.x+A.xoffset-(B.x+B.xoffset)),
+        Math.abs(A.x+A.xoffset+A.cellsWidth-(B.x+B.xoffset)),
+        Math.abs(A.x+A.xoffset-(B.x+B.xoffset+B.cellsWidth)),
+        Math.abs(A.x+A.xoffset+A.cellsWidth-(B.x+B.xoffset+B.cellsWidth))
+    );
+    var dy = Math.min(
+        Math.abs(A.y-B.y),
+        Math.abs(A.y+A.cellsHeight-B.y),
+        Math.abs(A.y-(B.y+B.cellsHeight)),
+        Math.abs(A.y+A.cellsHeight-(B.y+B.cellsHeight))
+    );
+    return Math.max(dx,dy);
+};*/
+
 Utils.manhattan = function(a,b){
     return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 };

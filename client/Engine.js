@@ -680,11 +680,11 @@ Engine.handleBattleAnimation = function(data){
         // TODO: test if callback fires
        Engine.playLocalizedSound('hit',1,{x:data.x,y:data.y});
     });
-    console.log(sprite);
     sprite.anims.play(data.name);
 };
 
 Engine.handleHit = function(animation,target,dmg){
+    console.warn('handle hit');
     var text = Engine.textPool.getNext();
     text.setStyle({ font: 'belwe', fontSize: 20, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     text.setFont('20px belwe');
@@ -1546,9 +1546,9 @@ Engine.removeElements = function(arr,table){
 
 Engine.handleBattleUpdates = function(entity, data){
     if(data.inFight !== undefined) entity.inFight = data.inFight;
-    if(data.hit !== undefined) Engine.handleHit('melee',entity,data.hit);
-    if(data.rangedMiss !== undefined) Engine.handleMissAnimation(entity);
-    if(data.animation) this.handleBattleAnimation(data.animation);
+    if(data.hit !== undefined) Engine.handleHit('melee',entity,data.hit); // hit is a property of the defender
+    if(data.rangedMiss !== undefined) Engine.handleMissAnimation(entity); // miss as well
+    if(data.animation) this.handleBattleAnimation(data.animation); // animation is a property of the attacker
 };
 
 Engine.inThatBuilding = function(id){

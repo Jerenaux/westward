@@ -61,10 +61,10 @@ var Player = new Phaser.Class({
         var callbacks = {
             'dead': this.processDeath,
             'inBuilding': this.processBuilding,
-            'melee_atk': this.processMeleeAttack,
+            'melee_atk': this.processMeleeAttack, // for character animation
             'path': this.processPath,
-            'ranged_atk': this.processRangedAttack,
-            'stop': this.processStop
+            'ranged_atk': this.processRangedAttack, // for character animation
+            'stop': this.serverStop
         };
 
         for(var field in callbacks){
@@ -155,9 +155,9 @@ var Player = new Phaser.Class({
         this.play(this.animPrefix+'_bow_'+this.orientation);
     },
 
-    processStop: function(stop){
+    /*processStop: function(stop){
         this.serverStop(stop.x,stop.y); // TODO: move to new Moving update() supermethod
-    },
+    },*/
 
     setDestinationAction: function(type,id,x,y){
         // TODO: centralize somewhere

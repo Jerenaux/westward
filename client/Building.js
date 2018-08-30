@@ -43,7 +43,7 @@ var Building = new Phaser.Class({
             };
         }
 
-        this.setDepth(Engine.buildingsDepth + (this.ty - buildingData.depthOffset)/1000);
+        this.depthOffset = buildingData.depthOffset;
         this.setBuilt(data.built);
 
         if(buildingData.shape) {
@@ -57,10 +57,15 @@ var Building = new Phaser.Class({
         this.setCollisions(buildingData);
     },
 
+    resetDepth: function(){
+        this.setDepth(Engine.buildingsDepth + (this.ty - this.depthOffset)/1000);
+    },
+
     build: function () {
         this.built = true;
         var buildingData = Engine.buildingsData[this.buildingType];
         this.setFrame(buildingData.sprite);
+        this.resetDepth();
 
         if(buildingData.accessory){
             this.accessory = Engine.scene.add.sprite(
@@ -78,7 +83,14 @@ var Building = new Phaser.Class({
                     repeat: -1
                 });
         }
-        //this.setTilePosition(this.tx,this.ty,true);
+    },
+
+    unbuild: function(){
+        this.built = false;
+        var buildingData = Engine.buildingsData[this.buildingType];
+        this.setFrame(buildingData.sprite+'_construction');
+        this.resetDepth();
+        if(this.accessory) this.accessory.destroy();
     },
 
     update: function (data) {
@@ -125,6 +137,7 @@ var Building = new Phaser.Class({
 
     setBuilt: function(flag){
         if (flag == true && !this.isBuilt()) this.build();
+        if  (flag == false && this.isBuilt()) this.unbuild();
 
         if (Engine.inThatBuilding(this.id)) {
             Engine.exitBuilding();

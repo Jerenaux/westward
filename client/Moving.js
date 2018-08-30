@@ -194,7 +194,9 @@ var Moving = new Phaser.Class({
         }
     },
 
-    serverStop: function(x,y){
+    serverStop: function(data){ //one argument because called from updates() metods
+        var x = data.x;
+        var y = data.y;
         //console.log('SERVER STOP AT',x,y,'currently going to',this.currentTweenTo);
         var timeOffset = -1; // assume stop position in the past
         var stopIndex = -1;

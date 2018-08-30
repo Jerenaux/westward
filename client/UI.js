@@ -22,8 +22,8 @@ var UI = {
 
         if(Client.isNewPlayer()) {
             this.load.image('bigbg', 'assets/sprites/bigbg.png');
+            this.load.image('bigbg_mask', 'assets/sprites/bigbg_mask.png');
             this.load.image('worldmap', 'assets/sprites/worldmap.png');
-            this.load.image('compass', 'assets/sprites/compass.png');
             this.load.image('dangersetl', 'assets/sprites/dangersetl.png');
             this.load.image('setlicon', 'assets/sprites/setlicon.png');
             this.load.image('wood', 'assets/sprites/wood.jpg');
@@ -265,7 +265,8 @@ UI.leaveTitleScreen = function(){
         duration: 1000,
         onComplete: function(){
             if(Client.isNewPlayer()){
-                UI.displayClassMenu();
+                //UI.displayClassMenu();
+                UI.displaySettlementSelectionMenu();
             }else {
                 UI.camera.fadeOut(500);
                 UI.camera.once('camerafadeoutcomplete',function(){
@@ -297,19 +298,16 @@ UI.displaySettlementSelectionMenu =  function(){
     content.push(UI.scene.add.image(0,0,'wood').setOrigin(0));
     var scroll = UI.scene.add.image(UI.getGameWidth()/2,UI.getGameHeight()/2,'bigbg');
     content.push(scroll);
-    scroll.setScale(1.3);
-    /*var scrollMask = UI.scene.add.image(UI.getGameWidth()/2,UI.getGameHeight()/2,'bigbg');
-    scrollMask.setVisible(false);
-    scrollMask.setScale(0.98);*/
     var map = UI.scene.add.image(UI.getGameWidth()/2,UI.getGameHeight()/2,'worldmap');
     content.push(map);
-    content.push(UI.scene.add.image(10,0,'compass').setOrigin(0).setScale(0.5));
-    //map.setScale(0.75);
-    map.x += 50;
+    //map.x += 50;
     map.y += 150;
 
     if(Boot.WEBGL){
-        map.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,scroll);
+        var mask = UI.scene.add.sprite(scroll.x,scroll.y,'bigbg_mask');
+        mask.setVisible(false);
+        //map.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
+        map.setMask(new Phaser.Display.Masks.BitmapMask(UI.scene,mask));
     }else{
         scroll.setScale(1.4);
     }
@@ -353,7 +351,7 @@ UI.displatEnemySettlement = function(x,y){
 };
 
 UI.displaySettlement = function(data){
-    var x = data.x*UI.SSmap.width;
+    var x = data.x*UI.SSmap.width - 50;
     var y = data.y*UI.SSmap.height;
     var icon = UI.scene.add.image(x,y,'setlicon');
     icon.setInteractive();

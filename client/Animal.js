@@ -44,9 +44,15 @@ var Animal = new Phaser.Class({
         this.manageOrientationPin();
     },
 
-    onAttack: function(){
+    processMeleeAttack: function(facing){
+        this.computeOrientation(this.tileX,this.tileY,facing.x,facing.y);
+        this.faceOrientation();
         if(Utils.randomInt(1,10) >= 8) Engine.playLocalizedSound('wolfattack1',1,{x:this.tileX,y:this.tileY});
     },
+
+    /*onAttack: function(){
+        if(Utils.randomInt(1,10) >= 8) Engine.playLocalizedSound('wolfattack1',1,{x:this.tileX,y:this.tileY});
+    },*/
 
     remove: function(){
         //console.log('remove ',this.id,'(',this.tileX,',',this.tileY,',',this.chunk,',)');

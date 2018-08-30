@@ -16,6 +16,7 @@ function Player(){
     this.updatePacket = new PersonalUpdatePacket();
     this.isPlayer = true;
     this.battleTeam = 'Player';
+    this.entityCategory = 'Player';
     this.updateCategory = 'players';
     this.name = 'Player';
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet

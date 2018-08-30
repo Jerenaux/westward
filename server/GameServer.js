@@ -241,10 +241,11 @@ GameServer.addItem = function(x,y,type){
 
 GameServer.onInitialized = function(){
     console.warn('--- Performing on initialization tasks ---');
-    GameServer.addAnimal(1203,168,0);
-    GameServer.addAnimal(1204,169,0);
-    GameServer.addAnimal(533,645,0);
-    GameServer.addCiv(509, 655);
+    //GameServer.addAnimal(1203,168,0);
+    //var a = GameServer.addAnimal(1204,169,0);
+    //var b = GameServer.addAnimal(1205,170,5);
+    //GameServer.addAnimal(533,645,0);
+    GameServer.addCiv(504, 656);
 };
 
 GameServer.setUpdateLoops = function(){
@@ -339,13 +340,13 @@ GameServer.dummyPlayer = function(x,y) {
 };
 
 GameServer.addNewPlayer = function(socket,data){
-    if(data.selectedClass == undefined) data.selectedClass = 1;
+    //if(data.selectedClass == undefined) data.selectedClass = 1;
     if(data.selectedSettlement == undefined) data.selectedSettlement = 0;
-    console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
+    //console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
     player.setStartingInventory();
     player.setSettlement(data.selectedSettlement);
-    player.classLvlUp(data.selectedClass,false);
+    //player.classLvlUp(data.selectedClass,false);
     player.spawn();
 
     var document = new GameServer.PlayerModel(player);
