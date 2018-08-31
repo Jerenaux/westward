@@ -340,7 +340,7 @@ Building.prototype.isDestroyed = function(){
 };
 
 Building.prototype.isAvailableForFight = function() {
-    return !this.isDestroyed();
+    return (!this.isDestroyed() && !this.type == 0);
 };
 
 Building.prototype.isInFight = function(){

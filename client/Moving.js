@@ -16,6 +16,21 @@ var Moving = new Phaser.Class({
 
     },
 
+    update: function(data){
+        var callbacks = {
+            'hit': this.handleHit, // for HP display and blink
+            'melee_atk': this.processMeleeAttack, // for character animation
+            'ranged_atk': this.processRangedAttack, // for character animation
+            'rangedMiss': this.handleMiss,
+            'stop': this.serverStop
+        };
+
+        for(var field in callbacks){
+            if(!callbacks.hasOwnProperty(field)) continue;
+            if(field in data) callbacks[field].call(this,data[field]);
+        }
+    },
+
     // Sets position regardless of previous position; primarily called by children.setUp()
     setPosition: function(x,y){ // x and y are tile coordinates
         Phaser.GameObjects.Components.Transform.setPosition.call(this,x*Engine.tileWidth,y*Engine.tileHeight);
@@ -80,7 +95,7 @@ var Moving = new Phaser.Class({
 
     move: function(path){
         //if(this.isHero) console.log('move from (',path[0][0],',',path[0][1],') to (',path[path.length-1][0],',',path[path.length-1][1],')');
-        if(path.length <= 1) {
+        if(!path || path.length <= 1) {
             this.endMovement();
             return;
         }
@@ -298,19 +313,22 @@ var Moving = new Phaser.Class({
 
     playSound: function(){
         Engine.playLocalizedSound('footsteps',5,{x:this.tileX,y:this.tileY});
-    }
+    },
 
-    /*getOccupiedCells: function(hash){
-        var cells = [];
-        for(var i = 0; i < this.cellsWidth; i++){
-            for(var j = 0; j < this.cellsHeight; j++){
-                if(hash){
-                    cells.push((this.tileX+i)+'_'+(this.tileY+j));
-                }else{
-                    cells.push({x:this.tileX,y:this.tileY});
-                }
-            }
+    getHPposition: function(){
+        return {
+            x: this.x+(this.cellsWidth*32)/2,
+            y: this.y+(this.cellsHeight*32)/2
         }
-        return cells;
-    }*/
+    },
+
+   handleHit: function(dmg){
+        var pos = this.getHPposition();
+        Engine.displayHit(this,pos.x,pos.y,20,40,dmg,false);
+   },
+
+    handleMiss: function(){
+        var pos = this.getHPposition();
+        Engine.displayHit(this,pos.x,pos.y,20,40,null,true);
+    }
 });

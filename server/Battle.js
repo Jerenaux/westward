@@ -87,7 +87,8 @@ Battle.prototype.addFighter = function(f){
     if(f.isMovingEntity) this.checkConflict(f);
     this.updateTeams(f.battleTeam,1);
     f.xpPool = 0; // running total of XP that the fighter will receive at the end of the fight
-    f.setProperty('inFight',true);
+    //f.setProperty('inFight',true);
+    f.inFight = true;
     if(f.isMovingEntity) f.stopWalk();
     if(f.isPlayer) f.notifyFight(true);
     f.battle = this;
@@ -343,6 +344,7 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
         a.setProperty('ranged_atk',{x:b.x,y:b.y});
         var ammoID = a.decreaseAmmo();
         var hit = this.computeRangedHit(a,b);
+        hit = false;
         if(hit){
             if(b.isAnimal) b.addToLoot(ammoID,1);
             dmg = this.computeDamage('ranged',a,b);

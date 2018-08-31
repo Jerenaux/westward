@@ -30,6 +30,10 @@ var Building = new Phaser.Class({
         Engine.buildings[this.id] = this;
         Engine.entityManager.addToDisplayList(this);
 
+        var coll = buildingData.collisions;
+        this.cellsWidth = coll.w;
+        this.cellsHeight = coll.h;
+
         this.buildingType = data.type;
         this.settlement = data.sid;
         this.inventory = new Inventory(100);
@@ -102,12 +106,14 @@ var Building = new Phaser.Class({
             'devlevel': this.setDevLevel,
             'foodsurplus': this.setFoodSurplus,
             'gold': this.setGold,
+            'hit': this.handleHit, // for HP display and blink
             'inventory': this.setInventory, // sets whole inventor
             'items': this.updateInventory, // update individual entries in inventory
             'population': this.setPopulation,
             'prices': this.setPrices,
             'productivity': this.setProductivity,
-            'progress': this.setProgress
+            'progress': this.setProgress,
+            'rangedMiss': this.handleMiss
         };
         this.updateEvents = new Set();
 
@@ -205,6 +211,23 @@ var Building = new Phaser.Class({
         this.updateEvents.add('onUpdateShop');
     },
 
+    getHPposition: function(){
+        return {
+            x: this.x+this.width/2,
+            y: this.y
+        }
+    },
+
+    handleHit: function(dmg){
+        var pos = this.getHPposition();
+        Engine.displayHit(this,pos.x,pos.y,50,80,dmg,false);
+    },
+
+    handleMiss: function(){
+        var pos = this.getHPposition();
+        Engine.displayHit(this,pos.x,pos.y,50,80,null,true);
+    },
+
     // ### GETTERS ###
 
     getDevLevel: function(){
@@ -247,7 +270,7 @@ var Building = new Phaser.Class({
 
 
     handleClick: function () {
-        if (Engine.inPanel || Engine.inMenu || Engine.player.inFight || Engine.dead) return;
+        if (Engine.inPanel || Engine.inMenu || BattleManager.inBattle || Engine.dead) return;
         if (!this.entrance) return;
         Engine.player.setDestinationAction(1, this.id, this.entrance.x, this.entrance.y); // 1 for building
         Engine.computePath(this.entrance);

@@ -683,7 +683,47 @@ Engine.handleBattleAnimation = function(data){
     sprite.anims.play(data.name);
 };
 
-Engine.handleHit = function(animation,target,dmg){
+Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss){
+    var text = Engine.textPool.getNext();
+    text.setStyle({ font: 'belwe', fontSize: size, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    text.setFont(size+'px belwe');
+    text.setOrigin(0.5,1);
+    text.setPosition(x,y);
+    text.setDepth(this.depth+1);
+    text.setText(miss ? 'Miss' : '-'+dmg);
+
+    // HP tween
+    Engine.scene.tweens.add(
+        {
+            targets: text,
+            y: target.y-yDelta,
+            duration: 1000,
+            onStart: function(){
+                text.setVisible(true);
+            },
+            onComplete: function(){
+                text.recycle();
+            }
+        }
+    );
+
+    if(miss) return;
+    // Blink tween
+    Engine.scene.tweens.add(
+        {
+            targets: target,
+            alpha: 0,
+            duration: 100,
+            yoyo: true,
+            repeat: 3,
+            onStart: function(){
+                target.setAlpha(1); // so that if it takes over another tween immediately, it starts from the proper alpha value
+            }
+        });
+
+};
+
+/*Engine.handleHit = function(animation,target,dmg){
     console.warn('handle hit');
     var text = Engine.textPool.getNext();
     text.setStyle({ font: 'belwe', fontSize: 20, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
@@ -723,9 +763,9 @@ Engine.handleHit = function(animation,target,dmg){
 
     // Orientation pin
 
-};
+};*/
 
-Engine.handleMissAnimation = function(target){
+/*Engine.handleMissAnimation = function(target){
     var targetY = target.y+16;
     //var text = Engine.getNextHP(targetY-40);
     var text = Engine.textPool.getNext();
@@ -747,7 +787,7 @@ Engine.handleMissAnimation = function(target){
             }
         }
     );
-};
+};*/
 
 Engine.displayUI = function(){
     Engine.UIHolder.display();
@@ -1545,9 +1585,8 @@ Engine.removeElements = function(arr,table){
 };
 
 Engine.handleBattleUpdates = function(entity, data){
-    if(data.inFight !== undefined) entity.inFight = data.inFight;
-    if(data.hit !== undefined) Engine.handleHit('melee',entity,data.hit); // hit is a property of the defender
-    if(data.rangedMiss !== undefined) Engine.handleMissAnimation(entity); // miss as well
+    //if(data.hit !== undefined) Engine.handleHit('melee',entity,data.hit); // hit is a property of the defender
+    //if(data.rangedMiss !== undefined) Engine.handleMissAnimation(entity); // miss as well
     if(data.animation) this.handleBattleAnimation(data.animation); // animation is a property of the attacker
 };
 

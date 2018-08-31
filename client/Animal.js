@@ -50,10 +50,6 @@ var Animal = new Phaser.Class({
         if(Utils.randomInt(1,10) >= 8) Engine.playLocalizedSound('wolfattack1',1,{x:this.tileX,y:this.tileY});
     },
 
-    /*onAttack: function(){
-        if(Utils.randomInt(1,10) >= 8) Engine.playLocalizedSound('wolfattack1',1,{x:this.tileX,y:this.tileY});
-    },*/
-
     remove: function(){
         //console.log('remove ',this.id,'(',this.tileX,',',this.tileY,',',this.chunk,',)');
         //Engine.animalUpdates.add(this.id,'remove');

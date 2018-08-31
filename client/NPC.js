@@ -11,11 +11,13 @@ var NPC = new Phaser.Class({
     },
 
     update: function(data){
+        Moving.prototype.update.call(this,data);
+
         var callbacks = {
             'dead': this.die,
-            'melee_atk': this.processMeleeAttack,
+            //'melee_atk': this.processMeleeAttack,
             'path': this.queuePath,
-            'stop': this.serverStop// TODO: move to a new Moving update() supermethod
+            //'stop': this.serverStop//
         };
 
         for(var field in callbacks){

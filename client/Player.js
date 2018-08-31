@@ -55,16 +55,16 @@ var Player = new Phaser.Class({
 
     update: function(data){
         console.log('updating player');
-
+        Moving.prototype.update.call(this,data);
         if(data.x >= 0 && data.y >= 0) this.teleport(data.x,data.y);
 
         var callbacks = {
             'dead': this.processDeath,
             'inBuilding': this.processBuilding,
-            'melee_atk': this.processMeleeAttack, // for character animation
-            'path': this.processPath,
-            'ranged_atk': this.processRangedAttack, // for character animation
-            'stop': this.serverStop
+            //'melee_atk': this.processMeleeAttack, // for character animation
+            'path': this.processPath
+            //'ranged_atk': this.processRangedAttack, // for character animation
+            //'stop': this.serverStop
         };
 
         for(var field in callbacks){
@@ -147,17 +147,14 @@ var Player = new Phaser.Class({
     },
 
     processPath: function(path){
-        if(!this.isHero) this.move(path);
+        //if(!this.isHero) this.move(path);
+        if(!this.isHero) this.queuePath(path);
     },
 
     processRangedAttack: function(facing){
         this.setOrientation(facing);
         this.play(this.animPrefix+'_bow_'+this.orientation);
     },
-
-    /*processStop: function(stop){
-        this.serverStop(stop.x,stop.y); // TODO: move to new Moving update() supermethod
-    },*/
 
     setDestinationAction: function(type,id,x,y){
         // TODO: centralize somewhere
