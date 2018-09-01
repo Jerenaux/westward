@@ -179,20 +179,20 @@ NPC.prototype.computeBattleDestination = function(target){
             candidates.push({
                 x: x,
                 y: y,
-                cellsWidth: 1,
-                cellsHeight: 1
+                w: 1,
+                h: 1
             });
         }
     }
     var _self = this;
     candidates.sort(function(a,b){
-        var dA = Utils.multiTileChebyshev(a,dest);
-        var dB = Utils.multiTileChebyshev(b,dest);
+        var dA = Utils.multiTileChebyshev(a,dest.getBattleRect());
+        var dB = Utils.multiTileChebyshev(b,dest.getBattleRect());
         a.dist = dA;
         b.dist = dB;
         if(dA == dB){
-            var selfA = Utils.multiTileChebyshev(a,_self);
-            var selfB = Utils.multiTileChebyshev(b,_self);
+            var selfA = Utils.multiTileChebyshev(a,_self.getBattleRect());
+            var selfB = Utils.multiTileChebyshev(b,_self.getBattleRect());
             if(selfA < selfB) return -1;
             return 1;
         }

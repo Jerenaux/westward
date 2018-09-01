@@ -677,7 +677,6 @@ Engine.handleBattleAnimation = function(data){
     sprite.setVisible(true);
     sprite.setDepth(5);
     sprite.on('animationstart',function(){
-        // TODO: test if callback fires
        Engine.playLocalizedSound('hit',1,{x:data.x,y:data.y});
     });
     sprite.anims.play(data.name);
@@ -689,7 +688,7 @@ Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss){
     text.setFont(size+'px belwe');
     text.setOrigin(0.5,1);
     text.setPosition(x,y);
-    text.setDepth(this.depth+1);
+    text.setDepth(target.depth+1);
     text.setText(miss ? 'Miss' : '-'+dmg);
 
     // HP tween
@@ -722,72 +721,6 @@ Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss){
         });
 
 };
-
-/*Engine.handleHit = function(animation,target,dmg){
-    console.warn('handle hit');
-    var text = Engine.textPool.getNext();
-    text.setStyle({ font: 'belwe', fontSize: 20, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    text.setFont('20px belwe');
-    text.setOrigin(0.5,1);
-    text.setPosition(target.x+16,target.y+16);
-    text.setDepth(target.depth+1);
-    text.setText('-'+dmg);
-
-    // HP tween
-    Engine.scene.tweens.add(
-        {
-            targets: text,
-            y: target.y-40,
-            duration: 1000,
-            onStart: function(){
-                text.setVisible(true);
-            },
-            onComplete: function(){
-                text.recycle();
-            }
-        }
-    );
-
-    // Blink tween
-    Engine.scene.tweens.add(
-        {
-            targets: target,
-            alpha: 0,
-            duration: 100,
-            yoyo: true,
-            repeat: 3,
-            onStart: function(){
-                target.setAlpha(1); // so that if it takes over another tween immediately, it starts from the proper alpha value
-            }
-        });
-
-    // Orientation pin
-
-};*/
-
-/*Engine.handleMissAnimation = function(target){
-    var targetY = target.y+16;
-    //var text = Engine.getNextHP(targetY-40);
-    var text = Engine.textPool.getNext();
-    text.setStyle({ font: 'belwe', fontSize: 20, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    text.setFont('20px belwe');
-    text.setPosition(target.x+16,targetY);
-    text.setDepth(target.depth+1);
-    text.setText('Miss');
-    Engine.scene.tweens.add(
-        {
-            targets: text,
-            y: target.y-40,
-            duration: 1000,
-            onStart: function(){
-                text.setVisible(true);
-            },
-            onComplete: function(){
-                text.recycle();
-            }
-        }
-    );
-};*/
 
 Engine.displayUI = function(){
     Engine.UIHolder.display();
@@ -1540,6 +1473,7 @@ Engine.update = function(){
 
 // Processes the global update packages received from the server
 Engine.updateWorld = function(data){  // data is the update package from the server
+    console.log(data);
     // TODO: store client/server-shared list somewhere
     var entities = ['animal','building','cell','civ','item','player'];
 
@@ -1582,12 +1516,6 @@ Engine.removeElements = function(arr,table){
         }
         table[id].remove();
     });
-};
-
-Engine.handleBattleUpdates = function(entity, data){
-    //if(data.hit !== undefined) Engine.handleHit('melee',entity,data.hit); // hit is a property of the defender
-    //if(data.rangedMiss !== undefined) Engine.handleMissAnimation(entity); // miss as well
-    if(data.animation) this.handleBattleAnimation(data.animation); // animation is a property of the attacker
 };
 
 Engine.inThatBuilding = function(id){

@@ -49,6 +49,7 @@ var Building = new Phaser.Class({
 
         this.depthOffset = buildingData.depthOffset;
         this.setBuilt(data.built);
+        this.resetDepth();
 
         if(buildingData.shape) {
             var shape = new Phaser.Geom.Polygon(buildingData.shape);
@@ -229,6 +230,15 @@ var Building = new Phaser.Class({
     },
 
     // ### GETTERS ###
+
+    getBattleRect: function(){
+        return {
+            x: this.x + coll.x,
+            y: this.y - this.cellsHeight,
+            w: this.cellsWidth,
+            h: this.cellsHeight
+        }
+    },
 
     getDevLevel: function(){
         return this.devlevel;

@@ -341,6 +341,7 @@ Building.prototype.isDestroyed = function(){
 
 Building.prototype.isAvailableForFight = function() {
     return (!this.isDestroyed() && !this.type == 0);
+    //return !this.isDestroyed();
 };
 
 Building.prototype.isInFight = function(){
@@ -382,6 +383,15 @@ Building.prototype.die = function(){
 
 Building.prototype.isDead = function(){
     return this.isDestroyed();
+};
+
+Building.prototype.getBattleRect = function(){
+    return {
+        x: this.x + this.xoffset,
+        y: this.y - this.cellsHeight,
+        w: this.cellsWidth,
+        h: this.cellsHeight
+    }
 };
 
 module.exports.Building = Building;

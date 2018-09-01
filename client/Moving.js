@@ -18,6 +18,7 @@ var Moving = new Phaser.Class({
 
     update: function(data){
         var callbacks = {
+            'animation': Engine.handleBattleAnimation,
             'hit': this.handleHit, // for HP display and blink
             'melee_atk': this.processMeleeAttack, // for character animation
             'ranged_atk': this.processRangedAttack, // for character animation
@@ -330,5 +331,14 @@ var Moving = new Phaser.Class({
     handleMiss: function(){
         var pos = this.getHPposition();
         Engine.displayHit(this,pos.x,pos.y,20,40,null,true);
+    },
+
+    getBattleRect: function(){
+        return {
+            x: this.x,
+            y: this.y,
+            w: this.cellsWidth,
+            h: this.cellsHeight
+        }
     }
 });

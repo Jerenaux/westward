@@ -31,10 +31,6 @@ Pillars:
 Chapter 1
 1) The War
 - Building mechanics (damage, destruction and repair)
--> Bug: multTileChebyshev not adapted for buildings y-inversion (fix x-offset at the same time)
--> Test multiplayer movements
--> Misses not displayed
--> Destroyed towers do not appear when new game?
 -> Handle health, display in Fort
 -> Auto repair based on productivity
 - Enemy civ raids (spawn & go)
@@ -88,6 +84,7 @@ Chapter 3:
 - War economy (tower ammunitions, ...)
 3) The Wild
 - Fatigue & rest, impact on everything
+- Different pelts and leathers, rework crafting recipes, full pelt economy
 
 Chapter 4:
 Fancy title screen (with number of players, events stream, map background...)

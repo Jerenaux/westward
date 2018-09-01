@@ -15,17 +15,13 @@ var NPC = new Phaser.Class({
 
         var callbacks = {
             'dead': this.die,
-            //'melee_atk': this.processMeleeAttack,
-            'path': this.queuePath,
-            //'stop': this.serverStop//
+            'path': this.queuePath
         };
 
         for(var field in callbacks){
             if(!callbacks.hasOwnProperty(field)) continue;
             if(field in data) callbacks[field].call(this,data[field]);
         }
-
-        Engine.handleBattleUpdates(this,data);
     },
 
 

@@ -196,6 +196,15 @@ MovingEntity.prototype.endFight = function(){
     this.battle = null;
 };
 
+MovingEntity.prototype.getBattleRect = function(){
+    return {
+        x: this.x,
+        y: this.y,
+        w: this.cellsWidth,
+        h: this.cellsHeight
+    }
+};
+
 
 
 module.exports.MovingEntity = MovingEntity;

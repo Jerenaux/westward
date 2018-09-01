@@ -61,10 +61,7 @@ var Player = new Phaser.Class({
         var callbacks = {
             'dead': this.processDeath,
             'inBuilding': this.processBuilding,
-            //'melee_atk': this.processMeleeAttack, // for character animation
             'path': this.processPath
-            //'ranged_atk': this.processRangedAttack, // for character animation
-            //'stop': this.serverStop
         };
 
         for(var field in callbacks){
@@ -72,7 +69,6 @@ var Player = new Phaser.Class({
             if(field in data) callbacks[field].call(this,data[field]);
         }
 
-        Engine.handleBattleUpdates(this,data);
         if(!this.isHero && data.chat) this.talk(data.chat);
         this.firstUpdate = false;
     },

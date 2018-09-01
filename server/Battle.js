@@ -240,23 +240,7 @@ Battle.prototype.isPositionFree = function(x,y){
 };
 
 Battle.prototype.nextTo = function(a,b){
-    return (Utils.multiTileChebyshev(a,b) == 0);
-    /*var Arect = {
-        tlx: a.x - 1,
-        tly: a.y - 1,
-        brx: a.x + a.cellsWidth + 1,
-        bry: a.y + a.cellsHeight + 1
-    };
-    var Brect = {
-        tlx: b.x,
-        tly: b.y,
-        brx: b.x + b.cellsWidth,
-        bry: b.y + b.cellsHeight
-    };
-    // TODO: check instead if edges are touching?
-    if(Arect.tlx >= Brect.brx || Brect.tlx >= Arect.brx) return false;
-    if(Arect.tly >= Brect.bry || Brect.tly >= Arect.bry) return false;
-    return true;*/
+    return (Utils.multiTileChebyshev(a.getBattleRect(),b.getBattleRect()) == 0);
 };
 
 Battle.prototype.computeDamage = function(type,a,b){
