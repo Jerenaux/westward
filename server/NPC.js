@@ -190,9 +190,9 @@ NPC.prototype.computeBattleDestination = function(target){
         var dB = Utils.multiTileChebyshev(b,dest.getBattleRect());
         a.dist = dA;
         b.dist = dB;
-        if(dA == dB){
-            var selfA = Utils.multiTileChebyshev(a,_self.getBattleRect());
-            var selfB = Utils.multiTileChebyshev(b,_self.getBattleRect());
+        if(dA == dB){ // If ties, break by picking closest cell
+            var selfA = Utils.multiTileManhattan(a,_self.getBattleRect());
+            var selfB = Utils.multiTileManhattan(b,_self.getBattleRect());
             if(selfA < selfB) return -1;
             return 1;
         }

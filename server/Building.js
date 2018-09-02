@@ -40,7 +40,8 @@ function Building(data){
 
     this.name = buildingData.name;
     this.sid = data.sid;
-    this.settlement = GameServer.settlements[this.sid];
+    this.civBuilding = (this.sid == -1);
+    if(this.civBuilding) this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(GameServer.buildingParameters.inventorySize);
     if(data.inventory) this.inventory.fromList(data.inventory);
     this.prices = data.prices || {};
@@ -72,6 +73,7 @@ Building.prototype = Object.create(GameObject.prototype);
 Building.prototype.constructor = Building;
 
 Building.prototype.registerBuilding = function(){
+    if(this.civBuilding) return;
     this.settlement.registerBuilding(this);
     if(this.type == 0){ // fort
         this.settlement.registerFort(this);
@@ -115,9 +117,11 @@ Building.prototype.updateNbCommitted = function(){
 };
 
 Building.prototype.update = function(){
+    if(this.civBuilding) return;
     this.updateCommitment();
     if(this.built){
         this.updateProd();
+        this.repair();
     }else{
         this.updateBuild();
     }
@@ -145,15 +149,26 @@ Building.prototype.updateBuild = function(){
     var increment = Formulas.computeBuildIncrement(Formulas.pctToDecimal(this.productivity),rate);
     console.log('Building ',increment,'%');
     this.setProperty('progress',Utils.clamp(this.progress+increment,this.progress,100));
-    if(this.progress == 100){
-        this.setProperty('built',true);
-        //this.resetCounters();
-    }
+    if(this.progress == 100) this.setProperty('built',true);
+};
+
+Building.prototype.repair = function(){
+    if(!GameServer.isTimeToUpdate('build')) return;
+    var maxHealth = this.getStat('hpmax').getValue();
+    var health = this.getStat('hp').getValue();
+    if(health == maxHealth) return;
+    var rate = GameServer.buildingsData[this.type].buildRate; // Base progress increase per turn, before factoring productivity in
+    if(!rate) return;
+    var increment = Formulas.computeBuildIncrement(Formulas.pctToDecimal(this.productivity),rate);
+    increment = Math.round((increment/100)*maxHealth);
+    var newHealth = Utils.clamp(health+increment,health,maxHealth);
+    this.getStat('hp').setBaseValue(newHealth);
 };
 
 Building.prototype.toggleBuild = function(){
     this.setProperty('built',!this.built);
     this.setProperty('progress',(this.built ? 100 : 0));
+    this.getStat('hp').setBaseValue(this.getStat('hpmax').getBaseValue());
 };
 
 Building.prototype.addBuilding = function(building){
@@ -279,6 +294,7 @@ Building.prototype.listingTrim = function(){
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
+    trimmed.health = this.getStat('hp').getValue()/this.getStat('hpmax').getValue();
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     return trimmed;

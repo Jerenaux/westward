@@ -190,7 +190,6 @@ Utils.chebyshev = function(A,B){
 
 // a & b should be rectangles, i.e. expose x, y, w and h
 Utils.multiTileChebyshev = function(A,B){
-    // take min or max of both edges to use in place of previous coordinates?
     var dx = Math.min(
         Math.abs(A.x-B.x),
         Math.abs(A.x+A.w-B.x),
@@ -206,8 +205,32 @@ Utils.multiTileChebyshev = function(A,B){
     return Math.max(dx,dy);
 };
 
+// With respect to B
+Utils.relativePosition = function(A,B){
+    return {
+        x: Math.sign(B.x-A.x),
+        y: Math.sign(B.y-A.y)
+    }
+};
+
 Utils.manhattan = function(a,b){
     return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+};
+
+Utils.multiTileManhattan = function(A,B){
+    var dx = Math.min(
+        Math.abs(A.x-B.x),
+        Math.abs(A.x+A.w-B.x),
+        Math.abs(A.x-(B.x+B.w)),
+        Math.abs(A.x+A.w-(B.x+B.w))
+    );
+    var dy = Math.min(
+        Math.abs(A.y-B.y),
+        Math.abs(A.y+A.h-B.y),
+        Math.abs(A.y-(B.y+B.h)),
+        Math.abs(A.y+A.h-(B.y+B.h))
+    );
+    return Math.abs(dx)+Math.abs(dy);
 };
 
 Utils.clamp = function(x,min,max){ // restricts a value to a given interval (return the value unchanged if within the interval

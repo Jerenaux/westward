@@ -30,13 +30,14 @@ Pillars:
 
 Chapter 1
 1) The War
-- Building mechanics (damage, destruction and repair)
--> Handle health, display in Fort
--> Auto repair based on productivity
-- Enemy civ raids (spawn & go)
-- Attack anim of civs? If available?
-- Towers
-- Settlers counterattacks 
+- Enemy civ camps
+-> Position buildings
+-> Display map icons (all visible)
+- Raids
+-> Spawn mechanic
+-> Pathfind to settlements (hard-code destination in camp data)
+- Towers; skip turns of non-fighting buildings
+- Settlers counterattacks (attacking buildings)
 2) The Economy
 - Resource flows between buildings, incl. gold generation
 - Introduce new wood ingredient obtained from timber (logs?)
@@ -123,7 +124,7 @@ UI
 # Put settlement to the forefront
 - Name next to minimap
 - Lvl, # citizens, # buildings?, # troops
-- Food (abundance, normal, hunger, starvation)
+- Food (also update prod and build panels)
 - Security? 
 - Bell icon when attacks
 - Blinking icon on map when attacks?
@@ -131,6 +132,7 @@ UI
 - Help icon to invite to visit fort for more details
 - Compass icon pointing towards local Fort at all time (if equipped)
 - Death icons + "last attacks" icons
+- Display health bar of buildings? Show damage somehow
 
 Misc:
 - Re-introduce movement marker, not square, make it lag behind and wiggle below cursor? 

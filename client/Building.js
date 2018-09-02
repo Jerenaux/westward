@@ -36,6 +36,7 @@ var Building = new Phaser.Class({
 
         this.buildingType = data.type;
         this.settlement = data.sid;
+        this.civBuilding = (this.settlement == -1);
         this.inventory = new Inventory(100);
         this.name = buildingData.name;
         this.prices = {};
@@ -280,6 +281,7 @@ var Building = new Phaser.Class({
 
 
     handleClick: function () {
+        if(this.civBuilding) return;
         if (Engine.inPanel || Engine.inMenu || BattleManager.inBattle || Engine.dead) return;
         if (!this.entrance) return;
         Engine.player.setDestinationAction(1, this.id, this.entrance.x, this.entrance.y); // 1 for building
@@ -289,7 +291,17 @@ var Building = new Phaser.Class({
 
     setCursor: function(){
         if(BattleManager.inBattle || Engine.inMenu) return;
-        UI.setCursor('building');
+        var cursor;
+        if(this.civBuilding){
+            if(this.built){
+                cursor = 'combat';
+            }else{
+                return;
+            }
+        }else{
+            cursor = 'building';
+        }
+        UI.setCursor(cursor);
         UI.tooltip.updateInfo(this.name);
         UI.tooltip.display();
     },

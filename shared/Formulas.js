@@ -43,7 +43,7 @@ Formulas.computeProductivity = function(foodModifier,commitModifier){
 };
 
 Formulas.computeBuildIncrement = function(prod,rate){
-    return Math.round(prod*rate); // rate is not trated as a %
+    return Math.round(prod*rate); // rate is not treated as a %
 };
 
 Formulas.computeProdIncrement = function(prod,nb){

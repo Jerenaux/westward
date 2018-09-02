@@ -129,6 +129,36 @@
     "icon": "workshop",
     "health": 250
   },
+  "4": {
+    "name": "Tent",
+    "width": 224,
+    "height": 256,
+    "shape": [
+      50, 250,
+      20, 225,
+      20, 165,
+      115, 35,
+      205, 180,
+      205, 235,
+      175, 255
+    ],
+    "collisions": {
+      "x": 0,
+      "y": -4,
+      "w": 7,
+      "h": 5
+    },
+    "entrance": {
+      "x": 3,
+      "y": -1,
+      "w": 1,
+      "h": 2
+    },
+    "depthOffset": 3,
+    "sprite": "civ",
+    "mapicon": "anvil",
+    "health": 150
+  },
   "5":{
     "name": "Hunter hut",
     "width": 260,

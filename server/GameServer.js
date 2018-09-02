@@ -124,7 +124,8 @@ GameServer.readMap = function(mapsPath,test){
             'static_data': null,
             'settlements': GameServer.loadSettlements,
             'buildings': GameServer.loadBuildings,
-            'spawn_zones': GameServer.setUpSpawnZones
+            'spawn_zones': GameServer.setUpSpawnZones,
+            'camps': GameServer.setUpCamps
         };
     }
     GameServer.initializationSequence = Object.keys(GameServer.initializationMethods);
@@ -194,14 +195,21 @@ GameServer.loadSettlements = function(){
     });
 };
 
+GameServer.addBuilding = function(data){
+    var building = new Building(data);
+    building.setModel(data);
+    GameServer.buildings[building.id] = building;
+};
+
 GameServer.loadBuildings = function(){
     GameServer.BuildingModel.find(function (err, buildings) {
         if (err) return console.log(err);
-        buildings.forEach(function(data){
+        buildings.forEach(GameServer.addBuilding);
+        /*buildings.forEach(function(data){
             var building = new Building(data);
             building.setModel(data);
             GameServer.buildings[building.id] = building;
-        });
+        });*/
         GameServer.setUpSettlements();
         GameServer.updateStatus();
     });
@@ -216,6 +224,26 @@ GameServer.setUpSpawnZones = function(){
             var data = GameServer.spawnZonesData[key];
             GameServer.spawnZones.push(new SpawnZone(data.aois, data.animals, data.items));
         }
+    }
+
+    GameServer.updateStatus();
+};
+
+GameServer.setUpCamps = function(){
+    GameServer.campsData = JSON.parse(fs.readFileSync('./assets/data/camps.json').toString());
+    //GameServer.camps = [];
+
+    for (var key in GameServer.campsData) {
+        var data = GameServer.campsData[key];
+        data.huts.forEach(function(hut){
+            GameServer.addBuilding({
+                x: hut.x,
+                y: hut.y,
+                sid: -1,
+                type: 4,
+                built: true
+            });
+        });
     }
 
     GameServer.updateStatus();

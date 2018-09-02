@@ -317,10 +317,11 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
         a.setProperty('melee_atk',{x:b.x,y:b.y}); // for the attack animation of attacker
         var dmg = this.computeDamage('melee',a,b);
         killed = this.applyDamage(b,dmg);
+        var pos = Utils.relativePosition(a,b);
         a.setProperty('animation',{
             name: 'sword',
-            x: b.x,
-            y: b.y
+            x: a.x+(pos.x*0.5)+(pos.x > 0 ? a.cellsWidth : 0),
+            y: a.y+(pos.y*0.5)+(pos.y > 0 ? a.cellsHeight : 0)
         });
         b.setProperty('hit',dmg); // for the flash and hp display
     }else{

@@ -671,8 +671,8 @@ Engine.handleExplosion = function(){
 Engine.handleBattleAnimation = function(data){
     var sprite = Engine.animationsPools[data.name].getNext();
     sprite.setOrigin(0.5);
-    var x = (data.x+0.5)*Engine.tileWidth;
-    var y = (data.y+0.5)*Engine.tileHeight;
+    var x = data.x*Engine.tileWidth;
+    var y = data.y*Engine.tileHeight;
     sprite.setPosition(x,y);
     sprite.setVisible(true);
     sprite.setDepth(5);
