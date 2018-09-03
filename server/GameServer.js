@@ -44,6 +44,7 @@ var Item = require('./Item.js').Item;
 var Battle = require('./Battle.js').Battle;
 var BattleCell = require('./Battle.js').BattleCell;
 var SpawnZone = require('./SpawnZone.js').SpawnZone;
+var Camp = require('./Camp.js').Camp;
 var Pathfinder =  require('../shared/Pathfinder.js').Pathfinder;
 var Prism = require('./Prism.js').Prism;
 
@@ -199,17 +200,14 @@ GameServer.addBuilding = function(data){
     var building = new Building(data);
     building.setModel(data);
     GameServer.buildings[building.id] = building;
+    return building;
 };
 
 GameServer.loadBuildings = function(){
+    console.log('#');
     GameServer.BuildingModel.find(function (err, buildings) {
         if (err) return console.log(err);
         buildings.forEach(GameServer.addBuilding);
-        /*buildings.forEach(function(data){
-            var building = new Building(data);
-            building.setModel(data);
-            GameServer.buildings[building.id] = building;
-        });*/
         GameServer.setUpSettlements();
         GameServer.updateStatus();
     });
@@ -231,25 +229,18 @@ GameServer.setUpSpawnZones = function(){
 
 GameServer.setUpCamps = function(){
     GameServer.campsData = JSON.parse(fs.readFileSync('./assets/data/camps.json').toString());
-    //GameServer.camps = [];
+    GameServer.camps = [];
 
     for (var key in GameServer.campsData) {
         var data = GameServer.campsData[key];
-        data.huts.forEach(function(hut){
-            GameServer.addBuilding({
-                x: hut.x,
-                y: hut.y,
-                sid: -1,
-                type: 4,
-                built: true
-            });
-        });
+        GameServer.camps.push(new Camp(data.huts));
     }
 
     GameServer.updateStatus();
 };
 
 GameServer.addCiv = function(x,y){
+    console.log('Spawning civ at',x,y);
     var npc = new Civ(x,y,0);
     GameServer.civs[npc.id] = npc;
     return npc;
@@ -316,6 +307,10 @@ GameServer.economyTurn = function(){
 
     GameServer.spawnZones.forEach(function(zone){
         zone.update();
+    });
+
+    GameServer.camps.forEach(function(camp){
+        camp.update();
     });
 
     GameServer.updateEconomicEntities(GameServer.settlements); // food surplus

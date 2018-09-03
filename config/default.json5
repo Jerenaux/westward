@@ -33,10 +33,11 @@ To add: time gap between two orientation sounds (OrientationPin.display())
    },
    economyCycles: {
         // Unit: seconds
-        turnDuration: 120,
+        turnDuration: 3,//120,
         // Unit: turns
         turns: {
             build: 1,
+            camps: 1,
             foodConsumption: 8,
             commitment: 1,
             production: 1,

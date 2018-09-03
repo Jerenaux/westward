@@ -30,14 +30,12 @@ Pillars:
 
 Chapter 1
 1) The War
-- Enemy civ camps
--> Position buildings
--> Display map icons (all visible)
 - Raids
--> Spawn mechanic
 -> Pathfind to settlements (hard-code destination in camp data)
+-> Raids in reaction to players?
 - Towers; skip turns of non-fighting buildings
 - Settlers counterattacks (attacking buildings)
+- Set locations of a few camps
 2) The Economy
 - Resource flows between buildings, incl. gold generation
 - Introduce new wood ingredient obtained from timber (logs?)

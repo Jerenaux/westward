@@ -130,7 +130,7 @@
     "health": 250
   },
   "4": {
-    "name": "Tent",
+    "name": "Enemy Tent",
     "width": 224,
     "height": 256,
     "shape": [
@@ -156,7 +156,8 @@
     },
     "depthOffset": 3,
     "sprite": "civ",
-    "mapicon": "anvil",
+    "mapicon": "tent",
+    "mapbg": "red",
     "health": 150
   },
   "5":{

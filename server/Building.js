@@ -41,14 +41,13 @@ function Building(data){
     this.name = buildingData.name;
     this.sid = data.sid;
     this.civBuilding = (this.sid == -1);
-    if(this.civBuilding) this.settlement = GameServer.settlements[this.sid];
+    if(!this.civBuilding) this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(GameServer.buildingParameters.inventorySize);
     if(data.inventory) this.inventory.fromList(data.inventory);
     this.prices = data.prices || {};
     this.setGold(data.gold || 0);
     this.built = !!data.built;
     this.progress = data.progress || 0;
-
     this.inFight = false;
 
     this.stats = Stats.getSkeleton();
@@ -59,11 +58,9 @@ function Building(data){
     this.stats['acc'].setBaseValue(90);
     this.stats['mdmg'].setBaseValue(100);
     this.stats['rdmg'].setBaseValue(100);
-
     this.productivity = 100;
     this.committed = 0;
     this.commitStamps = data.commitStamps || [];
-
     this.setOrUpdateAOI();
     this.addCollisions();
     this.registerBuilding();
@@ -260,6 +257,7 @@ Building.prototype.remove = function(){
 // Save changes to DB
 // TODO: move up to GameObject
 Building.prototype.save = function(){
+    if(this.civBuilding) return; // todo: remove
     if(!this.model) return;
     var _building = this;
     GameServer.BuildingModel.findById(this.model._id, function (err, doc) {

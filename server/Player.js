@@ -511,6 +511,9 @@ Player.prototype.initTrim = function(){
     Object.keys(GameServer.settlements).forEach(function(key){
        markers = markers.concat(GameServer.settlements[key].getBuildingMarkers());
     });
+    Object.keys(GameServer.camps).forEach(function(key){
+        markers = markers.concat(GameServer.camps[key].getBuildingMarkers());
+    });
     trimmed.markers = markers;
     return trimmed;
 };

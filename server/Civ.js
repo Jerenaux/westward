@@ -23,8 +23,6 @@ function Civ(x,y,type){
     this.setAggressive();
     this.setStartingStats(civData.stats);
     this.setLoot(civData.loot);
-    //this.setOrUpdateAOI();
-    console.warn('creating NPC');
     NPC.call(this);
 }
 

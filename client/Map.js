@@ -216,10 +216,10 @@ var Map = new Phaser.Class({
         }
     },
 
-    addPin: function(x,y,name,frame){
+    addPin: function(x,y,name,frame,bg){
         var location = this.computeMapLocation(x,y);
         var pin = this.getNextPin();
-        pin.setUp(x,y,location.x,location.y,name,frame);
+        pin.setUp(x,y,location.x,location.y,name,frame,bg);
         this.displayedPins.push(pin);
         return pin;
     },
@@ -303,7 +303,9 @@ var Map = new Phaser.Class({
             Engine.player.markers.forEach(function(data){
                 this.addPin(data.x,data.y,
                     Engine.buildingsData[data.type].name,
-                    Engine.buildingsData[data.type].mapicon);
+                    Engine.buildingsData[data.type].mapicon,
+                    Engine.buildingsData[data.type].mapbg
+                );
             },this);
         }
 
@@ -354,19 +356,15 @@ var Pin = new Phaser.Class({
         this.on('pointerout',this.handleOut.bind(this));
     },
 
-    setUp: function(tileX,tileY,x,y,name,frame){
-        /*if(frame) {
-            this.setFrame(frame);
-            this.setOrigin(0.5,1);
-        }*/
-
+    setUp: function(tileX,tileY,x,y,name,frame,bgframe){
         if(frame == 'x'){
             this.setOrigin(0.2,0.5);
         }else{
             this.setOrigin(0.5,1);
         }
         var icon = Engine.scene.add.sprite(0,0,'mapicons',frame);
-        var bg = Engine.scene.add.sprite(0,0,'mapicons','bg');
+        var bg = bgframe ? 'bg'+bgframe : 'bg';
+        var bg = Engine.scene.add.sprite(0,0,'mapicons',bg);
         if(frame != 'x') this.draw(bg.texture,bg.frame,0,0);
         this.draw(icon.texture,icon.frame,0,0);
 
