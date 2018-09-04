@@ -22,7 +22,7 @@ Pathfinder.prototype.setCallbacks = function(openCb, closeCb, backtrackCb){
     this.backtrackCb = backtrackCb;
 };
 
-Pathfinder.prototype.findPath = function(from,to){
+Pathfinder.prototype.findPath = function(from,to,seek){
     // todo: replac with 'closed' flag?
     var closedSet = new SpaceMap(); // Set of nodes already evaluated
     this.openSet = []; // The list of currently discovered nodes that are not evaluated yet
@@ -47,7 +47,7 @@ Pathfinder.prototype.findPath = function(from,to){
         if(minFNode.equals(end)) return this.backtrack(minFNode);
 
         if(minFNode.g > this.maxLength){
-            //console.log('Max length reached');
+            if(seek) return this.backtrack(minFNode);
             break;
         }
 

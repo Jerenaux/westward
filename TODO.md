@@ -31,11 +31,13 @@ Pillars:
 Chapter 1
 1) The War
 - Raids
--> Pathfind to settlements (hard-code destination in camp data)
--> Raids in reaction to players?
-- Towers; skip turns of non-fighting buildings
+-> onConnect: send civs (k closest?)
+-> onCampUpdate: pick k civs, identify closest player, attack
+-> Wander around camp
+- Towers (add auto-detect in gs.checkForAggro)); skip turns of non-fighting buildings
 - Settlers counterattacks (attacking buildings)
 - Set locations of a few camps
+- Fix bombs details
 2) The Economy
 - Resource flows between buildings, incl. gold generation
 - Introduce new wood ingredient obtained from timber (logs?)
@@ -130,7 +132,7 @@ UI
 - Help icon to invite to visit fort for more details
 - Compass icon pointing towards local Fort at all time (if equipped)
 - Death icons + "last attacks" icons
-- Display health bar of buildings? Show damage somehow
+- Display health bar of buildings? Show damage somehow (smoke w/ particles?)
 
 Misc:
 - Re-introduce movement marker, not square, make it lag behind and wiggle below cursor? 
@@ -232,7 +234,7 @@ Performance:
 - Fix null values in left-fringe chunks (fixed?)
 ->nulls in corrupted chunks likely arise from "undefined" values being converted to null by JSON.stringify
 -> Happens on the fringe -> because for these drawShore returns undefined?!
-- listCollisions: don't store water tiles, only shore etc.
+- listCollisions: don't store water tiles, only shore etc. (! beware of impact on trailblazer)
 - Flattening: second pass to delete water-only chunks based on visibility
 - Flattening based on transparency
 - Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]

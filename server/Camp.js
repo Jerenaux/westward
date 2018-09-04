@@ -24,7 +24,7 @@ function Camp(buildings){
 Camp.prototype.update = function(){
     if(!GameServer.isTimeToUpdate('camps')) return;
 
-    if(this.people.length < 10){
+    if(this.people.length < 10){ // TODO: config
         var hut = Utils.randomElement(this.buildings);
         var pos = hut.getCenter();
         pos.y += 2;

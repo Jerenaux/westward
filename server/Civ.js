@@ -4,6 +4,7 @@
 
 var GameServer = require('./GameServer.js').GameServer;
 var NPC = require('./NPC.js').NPC;
+var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 function Civ(x,y,type){
     this.id = GameServer.lastCivID++;
@@ -40,6 +41,21 @@ Civ.prototype.setAggressive = function(){
         'Animal': true,
         'Building': true
     };
+};
+
+Civ.prototype.setTrackedTarget = function(target){
+    this.trackedTarget = target;
+};
+
+Civ.prototype.updateTracking = function(){
+    if(!this.trackedTarget) return;
+    if(this.moving || this.isInFight() || this.isDead()) return;
+    var path = GameServer.findPath(this,this.trackedTarget,true);
+    if(!path || path.length <= 1) return;
+
+    var trim = PFUtils.trimPath(path,GameServer.battleCells);
+    path = trim.path;
+    this.setPath(path);
 };
 
 Civ.prototype.trim = function(){

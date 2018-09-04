@@ -53,10 +53,6 @@ var Civ = new Phaser.Class({
         this.play(this.animPrefix+'_attack_'+this.orientation);
     },
 
-    /*onAttack: function(){
-        this.play(this.animPrefix+'_attack_'+this.orientation);
-    },*/
-
     remove: function(){
         //console.log('remove ',this.id,'(',this.tileX,',',this.tileY,',',this.chunk,',)');
         CustomSprite.prototype.remove.call(this);

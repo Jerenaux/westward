@@ -264,7 +264,8 @@ GameServer.onInitialized = function(){
     //var a = GameServer.addAnimal(1204,169,0);
     //var b = GameServer.addAnimal(1205,170,5);
     //GameServer.addAnimal(533,645,0);
-    GameServer.addCiv(504, 656);
+    var civ = GameServer.addCiv(504, 656);
+    civ.setTrackedTarget({x:561,y:623});
 };
 
 GameServer.setUpdateLoops = function(){
@@ -474,9 +475,9 @@ GameServer.checkCollision = function(x,y){ // true = collision
     return !!GameServer.collisions.get(x,y);
 };
 
-GameServer.findPath = function(from,to){
+GameServer.findPath = function(from,to,seek){
     if(GameServer.checkCollision(to.x,to.y)) return null;
-    return GameServer.pathFinder.findPath(from,to);
+    return GameServer.pathFinder.findPath(from,to,seek);
 };
 
 // TODO: remove after testing
@@ -931,12 +932,17 @@ GameServer.checkForAggro = function(){
     Object.keys(GameServer.civs).forEach(function(key) {
         GameServer.civs[key].checkForAggro();
     });
+    //TODO: add towers
 };
 
 GameServer.updateNPC = function(){
     Object.keys(GameServer.animals).forEach(function(key) {
         var a = GameServer.animals[key];
         if(a.doesWander() && a.idle && !a.isDead()) a.updateIdle();
+    });
+    Object.keys(GameServer.civs).forEach(function(key) {
+        var a = GameServer.civs[key];
+        a.updateTracking();
     });
 };
 
