@@ -6,9 +6,10 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 
 
-function Camp(buildings){
+function Camp(buildings,target){
     this.buildings = [];
     this.people = [];
+    this.targetSettlement = target;
 
     buildings.forEach(function(hut){
         this.buildings.push(GameServer.addBuilding({
@@ -29,6 +30,26 @@ Camp.prototype.update = function(){
         var pos = hut.getCenter();
         pos.y += 2;
         this.people.push(GameServer.addCiv(pos.x,pos.y));
+    }
+
+    if(this.readyToRaid()) this.findTargets();
+};
+
+Camp.prototype.readyToRaid = function(){
+    return this.people.length >= 0; // TODO: config
+};
+
+Camp.prototype.findTargets = function(){
+    var player = Utils.randomElement(GameServer.settlements[this.targetSettlement].players);
+    if(!player) return;
+    this.raid(player);
+};
+
+Camp.prototype.raid = function(player){
+    for(var i = 0; i < 3; i++){ // TODO: config
+        var civ = Utils.randomElementRemoved(this.people);
+        if(!civ) break;
+        civ.setTrackedTarget(player);
     }
 };
 

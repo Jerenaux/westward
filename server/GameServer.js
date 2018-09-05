@@ -233,7 +233,7 @@ GameServer.setUpCamps = function(){
 
     for (var key in GameServer.campsData) {
         var data = GameServer.campsData[key];
-        GameServer.camps.push(new Camp(data.huts));
+        GameServer.camps.push(new Camp(data.huts,data.target));
     }
 
     GameServer.updateStatus();
@@ -264,8 +264,8 @@ GameServer.onInitialized = function(){
     //var a = GameServer.addAnimal(1204,169,0);
     //var b = GameServer.addAnimal(1205,170,5);
     //GameServer.addAnimal(533,645,0);
-    var civ = GameServer.addCiv(504, 656);
-    civ.setTrackedTarget({x:561,y:623});
+    //var civ = GameServer.addCiv(504, 656);
+    //civ.setTrackedTarget({x:561,y:623});
 };
 
 GameServer.setUpdateLoops = function(){
@@ -923,6 +923,18 @@ GameServer.updateWalks = function(){
         var a = GameServer.civs[key];
         if(a.moving) a.updateWalk();
     });
+};
+
+GameServer.checkForTracking = function(player){
+    console.log('Checking for tracking');
+    for(var i = 0; i < GameServer.camps.length; i++){
+        var camp = GameServer.camps[i];
+        //console.log(camp.targetSettlement == player.sid,camp.readyToRaid());
+        if(camp.targetSettlement == player.sid && camp.readyToRaid()){
+            camp.raid(player);
+            break;
+        }
+    }
 };
 
 GameServer.checkForAggro = function(){

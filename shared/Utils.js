@@ -246,6 +246,10 @@ Utils.randomElement = function(arr){
     return arr[Math.floor(Math.random()*arr.length)];
 };
 
+Utils.randomElementRemoved = function(arr){
+    return arr.splice(Math.floor(Math.random()*arr.length),1)[0];
+};
+
 Utils.randomNorm = function(mean,std){ // Returns a value from a normal distribution
     return randomZ()*std+mean;
 };

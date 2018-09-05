@@ -83,7 +83,6 @@ Player.prototype.setAppearance = function(appearance){
 
 // Called by finalizePlayer
 Player.prototype.registerPlayer = function(){
-    //var settlement = GameServer.settlements[this.sid];
     this.settlement.registerPlayer(this);
 };
 

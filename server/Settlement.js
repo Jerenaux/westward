@@ -28,6 +28,7 @@ Settlement.prototype.setModel = function(model) {
 Settlement.prototype.registerPlayer = function(player){
     this.players.push(player.id);
     player.applyFoodModifier(this.surplus);
+    GameServer.checkForTracking(player);
 };
 
 Settlement.prototype.removePlayer = function(player){

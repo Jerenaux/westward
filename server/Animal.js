@@ -3,7 +3,6 @@
  */
 "use strict";
 var Utils = require('../shared/Utils.js').Utils;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var NPC = require('./NPC.js').NPC;
 var GameServer = require('./GameServer.js').GameServer;
@@ -112,18 +111,6 @@ Animal.prototype.findRandomDestination = function(){
         x: Utils.clamp(this.x + Utils.randomInt(-r,r),0,World.worldWidth),
         y: Utils.clamp(this.y + Utils.randomInt(-r,r),0,World.worldHeight)
     };
-};
-
-Animal.prototype.goToDestination = function(dest){
-    var path = GameServer.findPath({x:this.x,y:this.y},dest);
-    if(!path || path.length <= 1) return false;
-
-    var trim = PFUtils.trimPath(path,GameServer.battleCells);
-    path = trim.path;
-    if(debug) console.log('['+this.constructor.name+' '+this.id+'] Found path of length '+path.length);
-    this.idle = false;
-    this.setPath(path);
-    return true;
 };
 
 Animal.prototype.die = function(){

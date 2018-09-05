@@ -31,13 +31,14 @@ Pillars:
 Chapter 1
 1) The War
 - Raids
--> onConnect: send civs (k closest?)
--> onCampUpdate: pick k civs, identify closest player, attack
+-> Prevent civ from attacking own buildings
 -> Wander around camp
+-> Remove civ from camp upon death
 - Towers (add auto-detect in gs.checkForAggro)); skip turns of non-fighting buildings
 - Settlers counterattacks (attacking buildings)
 - Set locations of a few camps
 - Fix bombs details
+- New "building damage" stat (allows introducing specialized weapons: maces, ...)
 2) The Economy
 - Resource flows between buildings, incl. gold generation
 - Introduce new wood ingredient obtained from timber (logs?)
@@ -53,11 +54,14 @@ defend trade routes, scout, maintain supplies)
 3) The Wild
 - Fog of war (timed)
 - Icons synchronization
+=> Update texts
+=> Test with someone
 
 Chapter 2
 1) The War
 - Barracks and troops
 - Fortified civ camps, rebuilds
+- More involved raid mechanics
 2) The Economy
 - Permanent, named players
 - Governor (fixed) & officials

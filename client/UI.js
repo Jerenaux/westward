@@ -25,7 +25,8 @@ var UI = {
             this.load.image('bigbg_mask', 'assets/sprites/bigbg_mask.png');
             this.load.image('worldmap', 'assets/sprites/worldmap.png');
             this.load.image('dangersetl', 'assets/sprites/dangersetl.png');
-            this.load.image('setlicon', 'assets/sprites/setlicon.png');
+            //this.load.image('setlicon', 'assets/sprites/setlicon.png');
+            this.load.image('setldiamond', 'assets/sprites/setl_diamond.png');
             this.load.image('wood', 'assets/sprites/wood.jpg');
         }
     },
@@ -353,7 +354,8 @@ UI.displatEnemySettlement = function(x,y){
 UI.displaySettlement = function(data){
     var x = data.x*UI.SSmap.width - 50;
     var y = data.y*UI.SSmap.height;
-    var icon = UI.scene.add.image(x,y,'setlicon');
+    var icon = UI.scene.add.image(x,y,'setldiamond');
+    icon.setOrigin(0.5,1);
     icon.setInteractive();
     UI.SScontent.push(icon);
 

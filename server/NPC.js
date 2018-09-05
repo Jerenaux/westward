@@ -4,6 +4,7 @@
 
 var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
+var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var Stats = require('../shared/Stats.js').Stats;
 var Inventory = require('../shared/Inventory.js').Inventory;
@@ -73,6 +74,17 @@ NPC.prototype.checkForAggro = function(){
             }
         }
     }
+};
+
+NPC.prototype.goToDestination = function(dest){
+    var path = GameServer.findPath({x:this.x,y:this.y},dest);
+    if(!path || path.length <= 1) return false;
+
+    var trim = PFUtils.trimPath(path,GameServer.battleCells);
+    path = trim.path;
+    if(this.entityCategory == 'Animal') this.idle = false;
+    this.setPath(path);
+    return true;
 };
 
 NPC.prototype.queueAction = function(action){
