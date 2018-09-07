@@ -125,6 +125,7 @@ GameServer.readMap = function(mapsPath,test){
             'static_data': null,
             'settlements': GameServer.loadSettlements,
             'buildings': GameServer.loadBuildings,
+            'settlementsSetup': GameServer.setUpSettlements,
             'spawn_zones': GameServer.setUpSpawnZones,
             'camps': GameServer.setUpCamps
         };
@@ -153,7 +154,8 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
 
     GameServer.enableWander = config.get('wildlife.wander');
-    GameServer.enableAggro = config.get('wildlife.aggro');
+    GameServer.enableAnimalAggro = config.get('wildlife.aggro');
+    GameServer.enableCivAggro = config.get('civs.aggro');
     GameServer.enableBattles = config.get('battle.enabled');
     GameServer.classes = config.get('classes');
     GameServer.classData = JSON.parse(fs.readFileSync('./assets/data/classes.json').toString());
@@ -164,6 +166,8 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.miscParameters = config.get('misc');
     GameServer.PFParameters = config.get('pathfinding');
     GameServer.wildlifeParameters = config.get('wildlife');
+    GameServer.civsParameters = config.get('civs');
+
 
     //PFUtils.setup(GameServer);
     GameServer.collisions = new SpaceMap();
@@ -204,14 +208,18 @@ GameServer.addBuilding = function(data){
 };
 
 GameServer.loadBuildings = function(){
-    console.log('#');
+    if(config.get('buildings.nobuildings')){
+        GameServer.updateStatus();
+        return;
+    }
     GameServer.BuildingModel.find(function (err, buildings) {
         if (err) return console.log(err);
         buildings.forEach(GameServer.addBuilding);
-        GameServer.setUpSettlements();
+        //GameServer.setUpSettlements();
         GameServer.updateStatus();
     });
 };
+
 
 GameServer.setUpSpawnZones = function(){
     GameServer.spawnZonesData = JSON.parse(fs.readFileSync('./assets/data/spawnzones.json').toString());
@@ -260,12 +268,13 @@ GameServer.addItem = function(x,y,type){
 
 GameServer.onInitialized = function(){
     console.warn('--- Performing on initialization tasks ---');
-    //GameServer.addAnimal(1203,168,0);
+    //GameServer.addAnimal(513,654,0);
+    //GameServer.addCiv(513,657);
     //var a = GameServer.addAnimal(1204,169,0);
     //var b = GameServer.addAnimal(1205,170,5);
     //GameServer.addAnimal(533,645,0);
-    //var civ = GameServer.addCiv(504, 656);
-    //civ.setTrackedTarget({x:561,y:623});
+    /*var civ = GameServer.addCiv(414, 646);
+    civ.setTrackedTarget({x:518,y:656});*/
 };
 
 GameServer.setUpdateLoops = function(){
@@ -500,18 +509,19 @@ GameServer.handleNPCClick = function(data,socketID){
     }
 };
 
-GameServer.skinAnimal = function(player,animalID){
-    if(!GameServer.animals.hasOwnProperty(animalID)) return;
-    var animal = GameServer.animals[animalID];
+GameServer.lootNPC = function(player,type,ID){
+    var map = (type == 'animal' ? GameServer.animals : GameServer.civs);
+    if(!map.hasOwnProperty(ID)) return;
+    var NPC = map[ID];
     // TODO: check for proximity
-    if(!animal.isDead()) return;
-    if(animal.loot.isEmpty()) return;
-    for(var item in animal.loot.items){
+    if(!NPC.isDead()) return;
+    if(NPC.loot.isEmpty()) return;
+    for(var item in NPC.loot.items){
         // TODO: take harvesting ability into consideration
-        player.giveItem(item,animal.loot.items[item]);
-        player.addNotif('+'+animal.loot.items[item]+' '+GameServer.itemsData[item].name);
+        player.giveItem(item,NPC.loot.items[item]);
+        player.addNotif('+'+NPC.loot.items[item]+' '+GameServer.itemsData[item].name);
     }
-    GameServer.removeEntity(animal);
+    GameServer.removeEntity(NPC); // TODO: handle differently, leave carcasses
 };
 
 GameServer.pickUpItem = function(player,itemID){
@@ -543,16 +553,6 @@ GameServer.handleBattle = function(player,animal,aggro){
     battle.addArea(area);
     battle.start();
 };
-
-/*GameServer.getBattleAreaAround = function(f,cells){
-    cells = cells || new SpaceMap();
-    for(var x = f.x - 1; x <= f.x + f.cellsWidth; x++){
-        for(var y = f.y - 1; y <= f.y + f.cellsHeight; y++) {
-            if(!GameServer.checkCollision(x,y)) cells.add(x,y);
-        }
-    }
-    return cells;
-};*/
 
 GameServer.computeBattleArea = function(f1,f2){
     var cells = new SpaceMap();
@@ -607,7 +607,6 @@ GameServer.checkForFighter = function(AOIs){
     AOIs.forEach(function(id){
         var aoi = GameServer.AOIs[id];
         aoi.entities.forEach(function(e){
-            //if(e.canFight()) GameServer.checkForBattle(e);
             if(e.canFight()) e.checkForBattle();
         });
     });
@@ -944,7 +943,7 @@ GameServer.checkForAggro = function(){
     Object.keys(GameServer.civs).forEach(function(key) {
         GameServer.civs[key].checkForAggro();
     });
-    //TODO: add towers
+    //TODO: add towers?
 };
 
 GameServer.updateNPC = function(){
@@ -962,6 +961,7 @@ GameServer.setUpSettlements = function(){
     Object.keys(GameServer.settlements).forEach(function(key){
         GameServer.settlements[key].computeFoodSurplus();
     });
+    GameServer.updateStatus();
 };
 
 // #############################

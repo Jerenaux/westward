@@ -115,6 +115,7 @@ Settlement.prototype.consumeFood = function(){
 
 // Called whenever food amount changes and directly after all buildings are read
 Settlement.prototype.computeFoodSurplus = function(){
+    if(!this.fort) return;
     console.log('Computing food surplus...');
     var foodAmount = this.fort.getItemNb(GameServer.miscParameters.foodID);
     if(this.pop === undefined){
@@ -204,8 +205,8 @@ Settlement.prototype.mapTrim = function(){
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
-    trimmed.x = this.fort.x;
-    trimmed.y = this.fort.y;
+    trimmed.x = (this.fort ? this.fort.x : 0);
+    trimmed.y = (this.fort ? this.fort.y : 0);
     return trimmed;
 };
 

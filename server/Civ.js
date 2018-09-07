@@ -4,6 +4,7 @@
 
 var GameServer = require('./GameServer.js').GameServer;
 var NPC = require('./NPC.js').NPC;
+var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 function Civ(x,y,type){
@@ -39,8 +40,17 @@ Civ.prototype.setAggressive = function(){
     this.aggroMatrix = {
         'Player': true,
         'Animal': true,
-        'Building': true
+        'CivBuilding': false,
+        'PlayerBuilding': true
     };
+};
+
+Civ.prototype.isAggressive = function(){
+    return (this.aggressive && GameServer.enableCivAggro);
+};
+
+Civ.prototype.setCamp = function(camp){
+    this.camp = camp;
 };
 
 Civ.prototype.setTrackedTarget = function(target){
@@ -56,6 +66,12 @@ Civ.prototype.updateTracking = function(){
     var trim = PFUtils.trimPath(path,GameServer.battleCells);
     path = trim.path;
     this.setPath(path);
+};
+
+Civ.prototype.die = function(){
+    MovingEntity.prototype.die.call(this);
+    //this.idle = false;
+    if(this.camp) this.camp.remove(this);
 };
 
 Civ.prototype.trim = function(){

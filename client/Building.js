@@ -38,7 +38,7 @@ var Building = new Phaser.Class({
         this.settlement = data.sid;
         this.civBuilding = (this.settlement == -1);
         this.inventory = new Inventory(100);
-        this.name = buildingData.name;
+        this.name = buildingData.name+' '+this.id;
         this.prices = {};
         this.built = false;
         if(buildingData.entrance) {

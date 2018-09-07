@@ -18,6 +18,7 @@ function Player(){
     this.battleTeam = 'Player';
     this.entityCategory = 'Player';
     this.updateCategory = 'players';
+    this.battlePriority = 1;
     this.name = 'Player';
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.oldAOIs = [];
@@ -586,8 +587,9 @@ Player.prototype.onEndOfPath = function(){
     if(this.inFight) return;
     if(!this.action) return;
     if(this.action.type == 1) this.enterBuilding(this.action.id);
-    if(this.action.type == 2) GameServer.skinAnimal(this,this.action.id);
+    if(this.action.type == 2) GameServer.lootNPC(this,'animal',this.action.id);
     if(this.action.type == 3) GameServer.pickUpItem(this,this.action.id);
+    if(this.action.type == 4) GameServer.lootNPC(this,'civ',this.action.id);
 };
 
 

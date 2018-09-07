@@ -7,7 +7,8 @@ var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 function MovingEntity(){
-    this.isMoving
+    this.isMovingEntity = true;
+    this.skipBattleTurn = false; // used to distinguish from buildings
     this.moving = false;
     this.xoffset = 0;
 }

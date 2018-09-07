@@ -61,7 +61,6 @@ Battle.prototype.checkConflict = function(f){
             busy.queueAction('move');
         }
     }
-    //this.positions.add(f.x,f.y,f);
     this.addAtPosition(f);
 };
 
@@ -101,8 +100,7 @@ Battle.prototype.removeFighter = function(f){
     f.endFight();
     f.die();
     this.fighters.splice(idx,1);
-    //if(f.isPlayer) this.positions.delete(f.x,f.y); // if animal, leave busy for his body
-    if(f.isPlayer) this.removeFromPosition(f); // if animal, leave busy for his body
+    if(f.isPlayer) this.removeFromPosition(f); // if NPC, leave busy for his body
     if(isTurnOf) this.setEndOfTurn(0);
     if(f.isPlayer) f.notifyFight(false);
     this.updateTeams(f.battleTeam,-1);
@@ -110,7 +108,13 @@ Battle.prototype.removeFighter = function(f){
 
 Battle.prototype.updateTeams = function(team,increment){
     this.teams[team] += increment;
-    if(this.teams[team] <= 0) this.end();
+    if(this.teams[team] <= 0) {
+        var nbAlive = 0;
+        for(team in this.teams){
+            if(this.teams[team] > 0) nbAlive++;
+        }
+        if(nbAlive == 1) this.end();
+    }
 };
 
 Battle.prototype.reset = function(){
@@ -132,6 +136,11 @@ Battle.prototype.newTurn = function(){
             f.updatePacket.activeID = activeFighter.getShortID();
         }
     },this);
+
+    if(activeFighter.skipBattleTurn){
+        this.newTurn();
+        return;
+    }
 
     if(!activeFighter.isPlayer || activeFighter.isDummy) setTimeout(activeFighter.decideBattleAction.bind(activeFighter),500);
 };
@@ -172,7 +181,7 @@ Battle.prototype.processAction = function(f,data){
             result = this.processAttack(f,target);
             break;
         case 'bomb':
-            result = this.processBomb(f,data.x,data.y);
+            result = this.processAoE(f,data.x,data.y);
             break;
         case 'move':
             result = this.processMove(f);
@@ -192,7 +201,7 @@ Battle.prototype.setEndOfTurn = function(delay){
     this.endTime = this.countdown - delay;
 };
 
-Battle.prototype.processBomb = function(f,tx,ty){
+Battle.prototype.processAoE = function(f,tx,ty){
     // TODO: add thrower anim
     if(!f.hasItem(4,1)) return false;
     f.takeItem(4,1);
@@ -201,17 +210,20 @@ Battle.prototype.processBomb = function(f,tx,ty){
         x: tx,
         y: ty
     });
-    for(var x = tx-1; x <= tx+1; x++){
-        for(var y = ty-1; y <= ty+1; y++){
-            var victim = this.positions.get(x,y);
-            if(victim){
-                var dmg = this.computeDamage('bomb',null,victim);
-                var killed = this.applyDamage(victim,dmg);
-                victim.setProperty('hit',dmg); // for the flash and hp display
-                if(killed && f.isPlayer) f.addNotif(victim.name+' killed');
-            }
+    var rect = {
+        x: tx-1,
+        y: ty-1,
+        w: 3,
+        h: 3
+    };
+    this.fighters.forEach(function(f){
+        if(Utils.overlap(rect,f.getBattleRect())){
+            var dmg = this.computeDamage('bomb',null,f);
+            var killed = this.applyDamage(f,dmg);
+            f.setProperty('hit',dmg); // for the flash and hp display
+            if(killed && f.isPlayer) f.addNotif(f.name+' killed');
         }
-    }
+    },this);
     return {
         success: true,
         delay: 1000
@@ -329,9 +341,8 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
         a.setProperty('ranged_atk',{x:b.x,y:b.y});
         var ammoID = a.decreaseAmmo();
         var hit = this.computeRangedHit(a,b);
-        hit = false;
         if(hit){
-            if(b.isAnimal) b.addToLoot(ammoID,1);
+            if(b.isNPC && ammoID > -1) b.addToLoot(ammoID,1);
             dmg = this.computeDamage('ranged',a,b);
             killed = this.applyDamage(b,dmg);
             a.setProperty('animation',{
@@ -368,25 +379,6 @@ Battle.prototype.end = function(){
 };
 
 Battle.prototype.addArea = function(area){
-    /*var x = area.x;
-    var y = area.y;
-    var w = area.w;
-    var h = area.h;
-    // spannedAOIs are used to narrow down the search for new fighters
-    // it's more efficient to iterate through the few entities of an AOI than through all the positions of a battle zone
-    this.spannedAOIs.add(Utils.tileToAOI({x:x,y:y}));
-    this.spannedAOIs.add(Utils.tileToAOI({x:x+w,y:y}));
-    this.spannedAOIs.add(Utils.tileToAOI({x:x+w,y:y+h}));
-    this.spannedAOIs.add(Utils.tileToAOI({x:x,y:y+h}));*/
-
-    /*var maxx = x+w;
-    var maxy = y+h;
-    var sy = y;
-    for(; x <= maxx; x++){
-        for(y = sy; y <= maxy; y++){
-            if(!GameServer.checkCollision(x,y)) GameServer.addBattleCell(this,x,y);
-        }
-    }*/
     area.forEach(function(c){
         GameServer.addBattleCell(this,c.x,c.y);
         this.spannedAOIs.add(Utils.tileToAOI({x:c.x,y:c.y}));

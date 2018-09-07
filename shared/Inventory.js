@@ -13,6 +13,7 @@ Inventory.prototype.updateItems = function(items){
     items.forEach(function(i){
         this.update(i[0],parseInt(i[1]));
     },this);
+    console.log(this.items);
 };
 
 Inventory.prototype.clear = function(){
@@ -49,6 +50,8 @@ Inventory.prototype.addNew = function(item){
 
 Inventory.prototype.remove = function(item){
     //this.items[item] = undefined;  // need to keep track of items at 0 for updates
+    var idx = this.order.indexOf(item);
+    if(idx > -1) this.order.splice(idx,1);
     this.size--;
 };
 

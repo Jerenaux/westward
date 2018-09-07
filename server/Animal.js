@@ -16,6 +16,7 @@ function Animal(x,y,type){
     this.battleTeam = 'Animal';
     this.entityCategory = 'Animal';
     this.updateCategory = 'animals';
+    this.battlePriority = 2;
     this.x = x;
     this.y = y;
 
@@ -46,8 +47,13 @@ Animal.prototype.setAggressive = function(){
     this.aggroMatrix = {
         'Player': true,
         'Civ': true,
-        'Building': false
+        'CivBuilding': false,
+        'PlayerBuilding': false
     };
+};
+
+Animal.prototype.isAggressive = function(){
+    return (this.aggressive && GameServer.enableAnimalAggro);
 };
 
 Animal.prototype.setWander = function(){
@@ -99,11 +105,6 @@ Animal.prototype.updateIdle = function(){
         if(!foundPath) this.idleTime = GameServer.wildlifeParameters.idleRetry;
     }
 };
-
-Animal.prototype.canRange = function(){
-    return false;
-};
-
 
 Animal.prototype.findRandomDestination = function(){
     var r = GameServer.wildlifeParameters.wanderRange;

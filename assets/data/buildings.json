@@ -35,7 +35,9 @@
     "icon": "fort",
     "recipe": {"3":50},
     "displayProd": false,
-    "health": 500
+    "canFight": true,
+    "health": 500,
+    "dmg": 20
   },
   "1":{
     "name":"Trade Post",
@@ -68,6 +70,7 @@
     "buildRate":2,
     "mainMenu": "trade",
     "icon": "tradepost",
+    "canFight": false,
     "health": 250
   },
   "2":{
@@ -87,7 +90,9 @@
     "icon": "tower",
     "displayProd": false,
     "buildRate":2,
-    "health": 250
+    "canFight": true,
+    "health": 250,
+    "dmg": 10
   },
   "3": {
     "name": "Workshop",
@@ -127,6 +132,7 @@
     "buildRate":2,
     "mainMenu": "crafting",
     "icon": "workshop",
+    "canFight": false,
     "health": 250
   },
   "4": {
@@ -157,6 +163,7 @@
     "depthOffset": 3,
     "sprite": "civ",
     "mapicon": "tent",
+    "canFight": false,
     "mapbg": "red",
     "health": 150
   },
@@ -194,6 +201,7 @@
     "icon": "hut",
     "mainMenu": "production",
     "displayProd": true,
+    "canFight": false,
     "production": [[1,1]],
     "buildRate":10,
     "health": 50
@@ -230,6 +238,7 @@
     "depthOffset": 2,
     "displayProd": true,
     "production": [[3,1]],
+    "canFight": false,
     "buildRate":10,
     "health": 50
   },
@@ -264,6 +273,7 @@
     "depthOffset": 3,
     "displayProd": true,
     "production": [[22,1]],
+    "canFight": false,
     "buildRate":10,
     "health": 50
   },
@@ -298,6 +308,7 @@
     "depthOffset": 3,
     "displayProd": true,
     "production": [[24,1]],
+    "canFight": false,
     "buildRate":10,
     "health": 50
   },
@@ -332,6 +343,7 @@
     "depthOffset": 3,
     "displayProd": true,
     "production": [[25,1]],
+    "canFight": false,
     "buildRate":10,
     "health": 50
   },
@@ -372,6 +384,7 @@
     "depthOffset": 6,
     "displayProd": true,
     "production": [[1,1]],
+    "canFight": false,
     "buildRate":10,
     "health": 250
   }

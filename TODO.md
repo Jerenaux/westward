@@ -3,13 +3,6 @@ Bugs:
 - Spawning in battle area, moving: doesn't stop movement
 - Gray out sell inventory in shop as well?
 
-Spatial issues:
-- Spotting for aggro / aggro distance
-- Next to
-- Including new entities when battle expands
-- Entering battle when moving into area
-- Deciding size of battle area
-
 Release:
 - Newplayer only (flush)
 - Dis/enable battles
@@ -31,10 +24,13 @@ Pillars:
 Chapter 1
 1) The War
 - Raids
--> Prevent civ from attacking own buildings
+-> XP for civs
+-> Infinite loop in fight between 3 civs and a tower
+-> Wrong area for hunter huts? Same with towers, doesn't go "high" enough in y
+-> Camps not raiding online players?
+-> Wolves keep occupying same cell
 -> Wander around camp
--> Remove civ from camp upon death
-- Towers (add auto-detect in gs.checkForAggro)); skip turns of non-fighting buildings
+-> Display fired arrows from buildings & players
 - Settlers counterattacks (attacking buildings)
 - Set locations of a few camps
 - Fix bombs details
@@ -54,6 +50,7 @@ defend trade routes, scout, maintain supplies)
 3) The Wild
 - Fog of war (timed)
 - Icons synchronization
+- Proper marker
 => Update texts
 => Test with someone
 

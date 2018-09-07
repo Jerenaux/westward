@@ -53,8 +53,7 @@ NPC.prototype.setStat = function(key,value){
 // ### Battle ###
 
 NPC.prototype.checkForAggro = function(){
-    if(!this.isAggressive()) return;
-    if(this.isInFight()) return;
+    if(!this.isAggressive() || this.isInFight() || !this.isAvailableForFight()) return;
 
     var AOIs = this.fieldOfVision;
     for(var i = 0; i < AOIs.length; i++){
@@ -85,6 +84,10 @@ NPC.prototype.goToDestination = function(dest){
     if(this.entityCategory == 'Animal') this.idle = false;
     this.setPath(path);
     return true;
+};
+
+NPC.prototype.canRange = function(){
+    return false;
 };
 
 NPC.prototype.queueAction = function(action){
@@ -160,19 +163,32 @@ NPC.prototype.aggroAgainst = function(f){
 };
 
 NPC.prototype.selectTarget = function(){
-    var fighters = this.battle.fighters;
-    var minHP = 99999;
+    var fighters = this.battle.fighters.slice();
+    /*var minHP = 99999;
     var currentTarget = null;
     for(var i = 0; i < fighters.length; i++){
         var f = fighters[i];
         if(this.isSameTeam(f)) continue;
         if(!this.aggroAgainst(f)) continue;
+        if(f.isBuilding && currentTarget && !currentTarget.isBuilding) continue;
         if(f.getHealth() < minHP){
             minHP = f.getHealth();
             currentTarget = f;
         }
-    }
-    return currentTarget;
+    }*/
+    fighters = fighters.filter(function(f){
+        return (!this.isSameTeam(f) && this.aggroAgainst(f));
+    },this);
+    fighters.sort(function(a,b){
+        if(a.battlePriority == b.battlePriority){
+            if(a.getHealth() < b.getHealth()) return -1;
+            return 1;
+        }else{
+            if(a.battlePriority < b.battlePriority) return -1;
+            return 1;
+        }
+    });
+    return fighters[0];
 };
 
 NPC.prototype.computeBattleDestination = function(target){
@@ -216,10 +232,6 @@ NPC.prototype.computeBattleDestination = function(target){
 };
 
 // ### Status ###
-
-NPC.prototype.isAggressive = function(){
-    return (this.aggressive && GameServer.enableAggro);
-};
 
 NPC.prototype.isInBuilding = function(){
     return false;

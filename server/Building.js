@@ -14,6 +14,7 @@ function Building(data){
     this.battleTeam = 'Player';
     this.entityCategory = 'Building';
     this.updateCategory = 'buildings';
+    this.battlePriority = 3;
 
     this.id = -1;
     if(data.id > -1){
@@ -38,9 +39,12 @@ function Building(data){
     this.cellsWidth = coll.w;
     this.cellsHeight = coll.h;
 
+    this.skipBattleTurn = !buildingData.canFight;
     this.name = buildingData.name;
     this.sid = data.sid;
     this.civBuilding = (this.sid == -1);
+    if(this.civBuilding) this.battleTeam = 'Civ';
+    this.entityCategory = (this.civBuilding ? 'CivBuilding' : 'PlayerBuilding');
     if(!this.civBuilding) this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(GameServer.buildingParameters.inventorySize);
     if(data.inventory) this.inventory.fromList(data.inventory);
@@ -54,10 +58,10 @@ function Building(data){
     this.stats['hp'].setBaseValue(buildingData.health);
     this.stats['hpmax'].setBaseValue(buildingData.health);
     // TODO: move to JSON
-    this.stats['def'].setBaseValue(100);
-    this.stats['acc'].setBaseValue(90);
+    this.stats['def'].setBaseValue(20);
+    this.stats['acc'].setBaseValue(100);
     this.stats['mdmg'].setBaseValue(100);
-    this.stats['rdmg'].setBaseValue(100);
+    this.stats['rdmg'].setBaseValue(buildingData.dmg || 0);
     this.productivity = 100;
     this.committed = 0;
     this.commitStamps = data.commitStamps || [];
@@ -366,10 +370,42 @@ Building.prototype.endFight = function(){
     this.inFight = false;
 };
 
+Building.prototype.canRange = function(){
+    return true;
+};
+
+Building.prototype.decreaseAmmo = function(){
+    // TODO: manage ammo stock
+    return -1;
+};
+
 Building.prototype.decideBattleAction = function(){
-    this.battle.processAction(this,{
-        action: 'pass'
+    if(!this.target || !this.target.isInFight()) this.target = this.selectTarget();
+    var data = this.attackTarget();
+    this.battle.processAction(this,data);
+};
+
+Building.prototype.isSameTeam = function(f){
+    return this.battleTeam == f.battleTeam;
+};
+
+Building.prototype.selectTarget = function(){
+    var fighters = this.battle.fighters.slice();
+    fighters = fighters.filter(function(f){
+        return (!this.isSameTeam(f));
+    },this);
+    fighters.sort(function(a,b){
+        if(a.getHealth() < b.getHealth()) return -1;
+        return 1;
     });
+    return fighters[0];
+};
+
+Building.prototype.attackTarget = function(){
+    return {
+        action: 'attack',
+        id: this.target.getShortID()
+    };
 };
 
 // ### Stats ###

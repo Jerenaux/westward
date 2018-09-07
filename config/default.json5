@@ -14,6 +14,7 @@ To add: time gap between two orientation sounds (OrientationPin.display())
         tickRate: 100, // milliseconds, granularity of battle updates
    },
    buildings: {
+        nobuildings: false,
         inventorySize: 100,
         maxGold: 99999
    },
@@ -60,7 +61,12 @@ To add: time gap between two orientation sounds (OrientationPin.display())
             wander: 200,
             aggro: 2000
     },
-    wildlife: { // make Civ category?
+    civs: {
+        aggro: true,
+        wander: false,
+        raidMinimum: 0
+    },
+    wildlife: {
         aggro: true,
         nolife: false,
         wander: true,

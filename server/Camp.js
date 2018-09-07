@@ -25,18 +25,19 @@ function Camp(buildings,target){
 Camp.prototype.update = function(){
     if(!GameServer.isTimeToUpdate('camps')) return;
 
-    if(this.people.length < 10){ // TODO: config
+    if(this.people.length < 10){ // TODO: variable camp parameter (size)
         var hut = Utils.randomElement(this.buildings);
         var pos = hut.getCenter();
         pos.y += 2;
-        this.people.push(GameServer.addCiv(pos.x,pos.y));
+        var civ = GameServer.addCiv(pos.x,pos.y);
+        this.people.push(civ);
     }
 
     if(this.readyToRaid()) this.findTargets();
 };
 
 Camp.prototype.readyToRaid = function(){
-    return this.people.length >= 0; // TODO: config
+    return this.people.length >= GameServer.civsParameters.raidMinimum;
 };
 
 Camp.prototype.findTargets = function(){
@@ -50,6 +51,15 @@ Camp.prototype.raid = function(player){
         var civ = Utils.randomElementRemoved(this.people);
         if(!civ) break;
         civ.setTrackedTarget(player);
+    }
+};
+
+Camp.prototype.remove = function(civ){
+    for(var i = 0; i < this.people.length; i++){
+        if(civ.id == this.people[i].id){
+            this.people.splice(i,1);
+            break;
+        }
     }
 };
 

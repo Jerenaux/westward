@@ -188,6 +188,12 @@ Utils.chebyshev = function(A,B){
     return Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
 };
 
+Utils.overlap = function(a,b){
+    if(a.x > b.x + b.w || b.x > a.x + a.w) return false;
+    if(a.y > b.y + b.h || b.y > a.y + a.h) return false;
+    return true;
+};
+
 // a & b should be rectangles, i.e. expose x, y, w and h
 Utils.multiTileChebyshev = function(A,B){
     var dx = Math.min(
