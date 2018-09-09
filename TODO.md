@@ -1,5 +1,6 @@
 Bugs:
 - Animals occupying same battle cell
+-> Infinite loop in fight between 3 civs and a tower?
 - Spawning in battle area, moving: doesn't stop movement
 - Gray out sell inventory in shop as well?
 
@@ -23,18 +24,19 @@ Pillars:
 
 Chapter 1
 1) The War
-- Raids
--> XP for civs
--> Infinite loop in fight between 3 civs and a tower
+- Set locations of a few camps
+-> Test fights around towers (towers not involved, broken nextTo)
+-> Dead NPC appear alive if late at the party
+-> Display fired arrows from buildings & players
+---
 -> Wrong area for hunter huts? Same with towers, doesn't go "high" enough in y
 -> Camps not raiding online players?
 -> Wolves keep occupying same cell
+-> Test fights with bears
 -> Wander around camp
--> Display fired arrows from buildings & players
-- Settlers counterattacks (attacking buildings)
-- Set locations of a few camps
 - Fix bombs details
 - New "building damage" stat (allows introducing specialized weapons: maces, ...)
+=> Ranged weapon have very low building damage, melee weapon more, maces and axes much more, bombs a lot
 2) The Economy
 - Resource flows between buildings, incl. gold generation
 - Introduce new wood ingredient obtained from timber (logs?)
@@ -51,6 +53,7 @@ defend trade routes, scout, maintain supplies)
 - Fog of war (timed)
 - Icons synchronization
 - Proper marker
+- Cursor shenanigans
 => Update texts
 => Test with someone
 

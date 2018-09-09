@@ -53,6 +53,10 @@ var Civ = new Phaser.Class({
         this.play(this.animPrefix+'_attack_'+this.orientation);
     },
 
+    getShortID: function(){
+        return 'C'+this.id;
+    },
+
     remove: function(){
         //console.log('remove ',this.id,'(',this.tileX,',',this.tileY,',',this.chunk,',)');
         CustomSprite.prototype.remove.call(this);

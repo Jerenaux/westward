@@ -86,7 +86,6 @@ Battle.prototype.addFighter = function(f){
     if(f.isMovingEntity) this.checkConflict(f);
     this.updateTeams(f.battleTeam,1);
     f.xpPool = 0; // running total of XP that the fighter will receive at the end of the fight
-    //f.setProperty('inFight',true);
     f.inFight = true;
     if(f.isMovingEntity) f.stopWalk();
     if(f.isPlayer) f.notifyFight(true);
@@ -217,7 +216,7 @@ Battle.prototype.processAoE = function(f,tx,ty){
         h: 3
     };
     this.fighters.forEach(function(f){
-        if(Utils.overlap(rect,f.getBattleRect())){
+        if(Utils.overlap(rect,f.getRect())){
             var dmg = this.computeDamage('bomb',null,f);
             var killed = this.applyDamage(f,dmg);
             f.setProperty('hit',dmg); // for the flash and hp display
@@ -249,10 +248,6 @@ Battle.prototype.isPosition = function(x,y){
 
 Battle.prototype.isPositionFree = function(x,y){
     return !this.positions.get(x,y);
-};
-
-Battle.prototype.nextTo = function(a,b){
-    return (Utils.multiTileChebyshev(a.getBattleRect(),b.getBattleRect()) == 0);
 };
 
 Battle.prototype.computeDamage = function(type,a,b){
@@ -325,7 +320,11 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
     var delay = 500;
     var killed = false;
     if(!b || b.isDead()) return;
-    if(this.nextTo(a,b)){
+    console.warn('btl',a.getRect());
+    console.warn('btl',b.getRect());
+    console.warn(Utils.multiTileChebyshev(a.getRect(),b.getRect()));
+    console.warn(Utils.nextTo(a,b));
+    if(Utils.nextTo(a,b)){
         a.setProperty('melee_atk',{x:b.x,y:b.y}); // for the attack animation of attacker
         var dmg = this.computeDamage('melee',a,b);
         killed = this.applyDamage(b,dmg);
@@ -355,7 +354,7 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
             b.setProperty('rangedMiss',true);
         }
     }
-    if(killed && a.isPlayer) a.addNotif(b.name+' killed');
+    if(killed && a.isPlayer) a.addNotif(b.name+' '+(b.isBuilding ? 'destroyed' : 'killed'));
     return {
         success: true,
         delay: delay

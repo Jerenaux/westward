@@ -34,7 +34,7 @@ To add: time gap between two orientation sounds (OrientationPin.display())
    },
    economyCycles: {
         // Unit: seconds
-        turnDuration: 120,
+        turnDuration: 600,
         // Unit: turns
         turns: {
             build: 1,
@@ -64,7 +64,7 @@ To add: time gap between two orientation sounds (OrientationPin.display())
     civs: {
         aggro: true,
         wander: false,
-        raidMinimum: 0
+        raidMinimum: 8
     },
     wildlife: {
         aggro: true,

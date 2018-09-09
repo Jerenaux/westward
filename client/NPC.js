@@ -30,7 +30,7 @@ var NPC = new Phaser.Class({
     handleClick: function(){
         if(BattleManager.inBattle){
             if(Engine.dead) return;
-            BattleManager.processNPCClick(this);
+            BattleManager.processEntityClick(this);
         }else{
             Engine.processNPCClick(this);
         }
@@ -38,15 +38,20 @@ var NPC = new Phaser.Class({
 
     setCursor: function(){
         if(!BattleManager.inBattle && Engine.inMenu) return;
+        var cursor;
         if(BattleManager.inBattle) {
-            var dx = Math.abs(this.tileX-Engine.player.tileX);
-            var dy = Math.abs(this.tileY-Engine.player.tileY);
-            var cursor = (this.dead ? 'cursor' : (dx+dy == 1 || (dx == 1 && dy == 1) ? 'melee' : Engine.player.getRangedCursor()));
-            UI.setCursor(cursor);
+            if(this.dead){
+                cursor = 'cursor';
+            }else{
+                /*console.warn(this.getRect());
+                console.warn(Engine.player.getRect());
+                console.warn(Utils.nextTo(Engine.player,this));*/
+                cursor = (Utils.nextTo(Engine.player,this) ? 'melee' : Engine.player.getRangedCursor());
+            }
         }else{
-            var cursor = (this.dead ? 'item' : 'combat');
-            UI.setCursor(cursor);
+            cursor = (this.dead ? 'item' : 'combat');
         }
+        UI.setCursor(cursor);
         UI.tooltip.updateInfo((this.dead ? 'Dead ' : '')+this.name);
         UI.tooltip.display();
     },

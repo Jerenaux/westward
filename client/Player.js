@@ -182,4 +182,7 @@ var Player = new Phaser.Class({
         }
     },
 
+    getShortID: function(){
+        return 'P'+this.id;
+    }
 });

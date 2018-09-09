@@ -101,7 +101,7 @@ NPC.prototype.decideBattleAction = function(){
     if(!this.target || !this.target.isInFight()) this.target = this.selectTarget();
     var data;
     switch(action){
-        case 'attack':
+        case 'attack': // If not next to and can'r range, will become a 'move' action
             data = this.attackTarget();
             break;
         case 'move':
@@ -144,7 +144,11 @@ NPC.prototype.findBattlePath = function(dest){
 NPC.prototype.attackTarget = function(){
     var data = {};
     // TODO: accomodate for ranged attacks
-    if(this.battle.nextTo(this,this.target)){
+    console.warn('npc',this.getRect());
+    console.warn('npc',this.target.getRect());
+    console.warn(Utils.multiTileChebyshev(this.getRect(),this.target.getRect()));
+    console.warn(Utils.nextTo(this,this.target));
+    if(Utils.nextTo(this,this.target)){
         data.action = 'attack';
         data.id = this.target.getShortID();
     }else{
@@ -214,13 +218,13 @@ NPC.prototype.computeBattleDestination = function(target){
     }
     var _self = this;
     candidates.sort(function(a,b){
-        var dA = Utils.multiTileChebyshev(a,dest.getBattleRect());
-        var dB = Utils.multiTileChebyshev(b,dest.getBattleRect());
+        var dA = Utils.multiTileChebyshev(a,dest.getRect());
+        var dB = Utils.multiTileChebyshev(b,dest.getRect());
         a.dist = dA;
         b.dist = dB;
         if(dA == dB){ // If ties, break by picking closest cell
-            var selfA = Utils.multiTileManhattan(a,_self.getBattleRect());
-            var selfB = Utils.multiTileManhattan(b,_self.getBattleRect());
+            var selfA = Utils.multiTileManhattan(a,_self.getRect());
+            var selfB = Utils.multiTileManhattan(b,_self.getRect());
             if(selfA < selfB) return -1;
             return 1;
         }

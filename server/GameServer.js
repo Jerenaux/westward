@@ -268,7 +268,7 @@ GameServer.addItem = function(x,y,type){
 
 GameServer.onInitialized = function(){
     console.warn('--- Performing on initialization tasks ---');
-    //GameServer.addAnimal(513,654,0);
+    GameServer.addAnimal(503,656,0);
     //GameServer.addCiv(513,657);
     //var a = GameServer.addAnimal(1204,169,0);
     //var b = GameServer.addAnimal(1205,170,5);
@@ -489,11 +489,17 @@ GameServer.findPath = function(from,to,seek){
     return GameServer.pathFinder.findPath(from,to,seek);
 };
 
-// TODO: remove after testing
 GameServer.handleBuildingClick = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var target = GameServer.buildings[data.id];
-    GameServer.handleBattle(player, target);
+
+    if(!target.isDestroyed() && !target.isInFight()){
+        if(Utils.multiTileChebyshev(player.getRect(),target.getRect()) <= GameServer.battleParameters.aggroRange) {
+            GameServer.handleBattle(player, target);
+        }else{
+            player.addMsg('I must get closer!');
+        }
+    }
 };
 
 GameServer.handleNPCClick = function(data,socketID){

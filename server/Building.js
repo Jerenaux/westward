@@ -59,7 +59,7 @@ function Building(data){
     this.stats['hpmax'].setBaseValue(buildingData.health);
     // TODO: move to JSON
     this.stats['def'].setBaseValue(20);
-    this.stats['acc'].setBaseValue(100);
+    this.stats['acc'].setBaseValue(1000);
     this.stats['mdmg'].setBaseValue(100);
     this.stats['rdmg'].setBaseValue(buildingData.dmg || 0);
     this.productivity = 100;
@@ -339,7 +339,10 @@ Building.prototype.checkForBattle = function(){
             var realx = this.x + this.coll.x + x;
             var realy = this.y + this.coll.y + y;
             var cell = GameServer.battleCells.get(realx,realy);
-            if(cell) GameServer.expandBattle(cell.battle,this);
+            if(cell){
+                GameServer.expandBattle(cell.battle,this);
+                return;
+            }
         }
     }
 };
@@ -358,8 +361,8 @@ Building.prototype.isDestroyed = function(){
 };
 
 Building.prototype.isAvailableForFight = function() {
-    return (!this.isDestroyed() && !this.type == 0);
-    //return !this.isDestroyed();
+    return false;
+    return (!this.isDestroyed());
 };
 
 Building.prototype.isInFight = function(){
@@ -435,7 +438,7 @@ Building.prototype.isDead = function(){
     return this.isDestroyed();
 };
 
-Building.prototype.getBattleRect = function(){
+Building.prototype.getRect = function(){
     return {
         x: this.x + this.xoffset,
         y: this.y - this.cellsHeight,

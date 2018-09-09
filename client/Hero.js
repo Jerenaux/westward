@@ -5,7 +5,7 @@
 var Hero = new Phaser.Class({
     Extends: Player,
 
-    initialize: function(){
+    initialize: function Hero(){
         Player.call(this);
         this.isHero = true;
 

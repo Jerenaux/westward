@@ -188,15 +188,28 @@ Utils.chebyshev = function(A,B){
     return Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
 };
 
+Utils.nextTo = function(a,b){
+    return (Utils.multiTileChebyshev(a.getRect(),b.getRect()) == 0);
+};
+
 Utils.overlap = function(a,b){
     if(a.x > b.x + b.w || b.x > a.x + a.w) return false;
     if(a.y > b.y + b.h || b.y > a.y + a.h) return false;
     return true;
 };
 
+Utils.multiChebcomponent = function(A,B,coord,length){
+    return Math.min(
+        Math.abs(A[coord]-B[coord]),
+        Math.abs(A[coord]+A[length]-B[coord]),
+        Math.abs(A[coord]-(B[coord]+B[length])),
+        Math.abs(A[coord]+A[length]-(B[coord]+B[length]))
+    );
+};
+
 // a & b should be rectangles, i.e. expose x, y, w and h
 Utils.multiTileChebyshev = function(A,B){
-    var dx = Math.min(
+    /*var dx = Math.min(
         Math.abs(A.x-B.x),
         Math.abs(A.x+A.w-B.x),
         Math.abs(A.x-(B.x+B.w)),
@@ -207,8 +220,10 @@ Utils.multiTileChebyshev = function(A,B){
         Math.abs(A.y+A.h-B.y),
         Math.abs(A.y-(B.y+B.h)),
         Math.abs(A.y+A.h-(B.y+B.h))
-    );
-    return Math.max(dx,dy);
+    );*/
+    //console.warn(dx,dy);
+    //return Math.max(dx,dy);
+    return Math.max(Utils.multiChebcomponent(A,B,'x','w'),Utils.multiChebcomponent(A,B,'y','h'));
 };
 
 // With respect to B

@@ -71,7 +71,7 @@ BattleManager.manageTurn = function(shortID){
     this.active = BattleManager.getActiveFighter(shortID,false);
 
     if(!this.active) {
-        console.warn('shortID = ',shortID);
+        console.warn('shortID = ',shortID,', 0th = ',shortID[0]);
         BattleManager.getActiveFighter(shortID,true);
     }
 
@@ -118,12 +118,13 @@ BattleManager.processTileClick = function(tile,pointer){
     BattleManager.actionTaken = true;
 };
 
-BattleManager.processNPCClick = function(target){
+BattleManager.processEntityClick = function(target){
     if(!BattleManager.canTakeAction()) return;
 
     if(Engine.stickyCursor) return; // Will bubble down to TileClick
 
-    if(target.dead) return;
+    //if(target.dead) return;
+    if(target.isDisabled()) return;
     Engine.requestBattleAttack(target);
     BattleManager.actionTaken = true;
 };
@@ -139,22 +140,6 @@ BattleManager.isActiveCell = function(cell){
     //return this.active.getOccupiedCells(true).includes(cell.hash());
     return Engine.getOccupiedCells(this.active,true).includes(cell.hash());
 };
-
-/*BattleManager.getActiveCells = function(){
-    if(!this.active) return;
-    return this.active.getOccupiedCells();
-    //return Engine.battleCellsMap.get(this.active.tileX,this.active.tileY);
-};*/
-
-/*BattleManager.deactivateCell = function(){
-    var cell = this.getActiveCells();
-    if(cell) cell.deactivate();
-};*/
-
-/*BattleManager.activateCell = function(){
-    var cell = this.getActiveCell();
-    if(cell) cell.activate();
-};*/
 
 BattleManager.onDeath = function(){
     Engine.updateGrid();

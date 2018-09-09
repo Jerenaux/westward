@@ -170,6 +170,20 @@ UI.getGameHeight = function(){
     return UI.getConfig().height;
 };
 
+/*UI.manageBattleCursor = function(entity){
+    var cursor;
+    if(BattleManager.inBattle) {
+        if(entity.dead){
+            cursor = 'cursor';
+        }else{
+            cursor = (Utils.nextTo(Engine.player,entity) ? 'melee' : Engine.player.getRangedCursor());
+        }
+    }else{
+        cursor = (entity.dead ? 'item' : 'combat');
+    }
+    UI.setCursor(cursor);
+};*/
+
 UI.manageCursor = function(inout,type,target){
     var data = {
         type: type,
@@ -407,15 +421,6 @@ UI.launchGame = function(fade){
     Boot.background.setVisible(false);
     UI.scene.scene.shutdown('boot');
     UI.scene.scene.launch('main');
-    /*var fadeDuration = (fade ? 500: 0);
-    UI.camera.fadeOut(fadeDuration);
-    UI.camera.once('camerafadeoutcomplete',function(){
-        Boot.background.setVisible(false);
-        UI.scene.scene.shutdown('boot');
-        UI.scene.scene.launch('main');
-        UI.camera.fadeIn(fadeDuration);
-    });*/
-
 };
 
 UI.debugScreen = function(){

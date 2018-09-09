@@ -22,7 +22,7 @@ var Building = new Phaser.Class({
         this.setFrame(sprite);
         this.setVisible(true);
 
-        data.y++;
+        //data.y++;
         this.setOrigin(0,1);
         this.setTilePosition(data.x,data.y,true);
         this.setID(data.id);
@@ -31,6 +31,7 @@ var Building = new Phaser.Class({
         Engine.entityManager.addToDisplayList(this);
 
         var coll = buildingData.collisions;
+        this.coll = coll;
         this.cellsWidth = coll.w;
         this.cellsHeight = coll.h;
 
@@ -38,7 +39,7 @@ var Building = new Phaser.Class({
         this.settlement = data.sid;
         this.civBuilding = (this.settlement == -1);
         this.inventory = new Inventory(100);
-        this.name = buildingData.name+' '+this.id;
+        this.name = buildingData.name;//+' '+this.id;
         this.prices = {};
         this.built = false;
         if(buildingData.entrance) {
@@ -232,10 +233,10 @@ var Building = new Phaser.Class({
 
     // ### GETTERS ###
 
-    getBattleRect: function(){
+    getRect: function(){
         return {
-            x: this.x + coll.x,
-            y: this.y - this.cellsHeight,
+            x: this.tx + this.coll.x,
+            y: this.ty - this.cellsHeight,
             w: this.cellsWidth,
             h: this.cellsHeight
         }
@@ -273,6 +274,14 @@ var Building = new Phaser.Class({
         return this.built;
     },
 
+    isDisabled: function(){
+        return !this.built;
+    },
+
+    getShortID: function(){
+        return 'B'+this.id;
+    },
+
     // ### INPUT ###
 
     handleDown: function(){
@@ -281,27 +290,34 @@ var Building = new Phaser.Class({
 
 
     handleClick: function () {
-        if(this.civBuilding) return;
-        if (Engine.inPanel || Engine.inMenu || BattleManager.inBattle || Engine.dead) return;
-        if (!this.entrance) return;
-        Engine.player.setDestinationAction(1, this.id, this.entrance.x, this.entrance.y); // 1 for building
-        Engine.computePath(this.entrance);
-        //Client.buildingClick(this.id);
+        if (Engine.inMenu && !BattleManager.inBattle || Engine.dead) return;
+        if(BattleManager.inBattle){
+            if(this.civBuilding) BattleManager.processEntityClick(this);
+        }else{
+            if(this.civBuilding){
+                Client.buildingClick(this.id);
+            }else {
+                if (!this.entrance) return;
+                Engine.player.setDestinationAction(1, this.id, this.entrance.x, this.entrance.y); // 1 for building
+                Engine.computePath(this.entrance);
+            }
+        }
     },
 
     setCursor: function(){
-        if(BattleManager.inBattle || Engine.inMenu) return;
-        var cursor;
-        if(this.civBuilding){
-            if(this.built){
-                cursor = 'combat';
-            }else{
-                return;
-            }
+        if(!BattleManager.inBattle && Engine.inMenu) return;
+        var cursor = null;
+        if(BattleManager.inBattle) {
+            console.warn(this.getRect());
+            if (this.civBuilding && this.built) cursor = (Utils.nextTo(Engine.player, this) ? 'melee' : Engine.player.getRangedCursor());
         }else{
-            cursor = 'building';
+            if(this.civBuilding){
+                if(this.built) cursor = 'combat';
+            }else{
+                cursor = 'building';
+            }
         }
-        UI.setCursor(cursor);
+        if(cursor) UI.setCursor(cursor);
         UI.tooltip.updateInfo(this.name);
         UI.tooltip.display();
     },

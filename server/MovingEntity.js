@@ -197,7 +197,7 @@ MovingEntity.prototype.endFight = function(){
     this.battle = null;
 };
 
-MovingEntity.prototype.getBattleRect = function(){
+MovingEntity.prototype.getRect = function(){
     return {
         x: this.x,
         y: this.y,

@@ -26,7 +26,7 @@ var Engine = {
     craftInvSize: 5, // max number of ingredients for crafting
     maxPathLength: 36,
 
-    debugMarker: false,
+    debugMarker: true,
 
     key: 'main', // key of the scene, for Phaser
     plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager','LightsPlugin'],
@@ -1473,7 +1473,7 @@ Engine.update = function(){
 
 // Processes the global update packages received from the server
 Engine.updateWorld = function(data){  // data is the update package from the server
-    console.log(data);
+    //console.log(data);
     // TODO: store client/server-shared list somewhere
     var entities = ['animal','building','cell','civ','item','player'];
 

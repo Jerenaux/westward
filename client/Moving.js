@@ -73,10 +73,6 @@ var Moving = new Phaser.Class({
         }
     },
 
-    getShortID: function(){
-        return this.constructor.name[0]+this.id;
-    },
-
     manageOrientationPin: function(){
         if(this.isHero) return;
         if(!this.orientationPin) return;
@@ -333,10 +329,14 @@ var Moving = new Phaser.Class({
         Engine.displayHit(this,pos.x,pos.y,20,40,null,true);
     },
 
-    getBattleRect: function(){
+    isDisabled: function(){
+        return !!this.dead;
+    },
+
+    getRect: function(){
         return {
-            x: this.x,
-            y: this.y,
+            x: this.tileX,
+            y: this.tileY,
             w: this.cellsWidth,
             h: this.cellsHeight
         }

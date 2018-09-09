@@ -10,12 +10,9 @@ var GameServer = require('./GameServer.js').GameServer;
 function GameObject(){}
 
 GameObject.prototype.getShortID = function(){
-    return this.constructor.name[0]+this.id;
+    //return this.constructor.name[0]+this.id;
+    return this.entityCategory[0]+this.id;
 };
-
-/*GameObject.prototype.setRect = function(x,y,w,h){
-    this.rect = new Rect(x,y,w,h);
-};*/
 
 GameObject.prototype.setOrUpdateAOI = function(){
     var previousAOI = (this.aoi !== undefined ? this.aoi : null);
