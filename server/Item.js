@@ -7,6 +7,7 @@ var GameServer = require('./GameServer.js').GameServer;
 
 function Item(x,y,type){
     this.updateCategory = 'items';
+    this.entityCategory = 'Item';
     this.id = GameServer.lastItemID++;
     this.isPlayer = false;
     this.isAnimal = false;

@@ -89,10 +89,20 @@ SpaceMapList.prototype.add = function(x,y,object){
 
 // Works also by calling mySpaceMap[x][y]
 SpaceMapList.prototype.get = function(x,y){
-    if(!this.hasOwnProperty(x)) return null;
-    if(!this[x].hasOwnProperty(y)) return null;
+    if(!this.hasOwnProperty(x)) return [];
+    if(!this[x].hasOwnProperty(y)) return [];
     return this[x][y];
 };
+
+SpaceMapList.prototype.delete = function(x,y,object){
+    if(!this.hasOwnProperty(x)) return;
+    if(!this[x].hasOwnProperty(y)) return;
+    this[x][y].splice(this[x][y].findIndex(function(e){
+        return e.getShortID() == object.getShortID();
+    }),1);
+    if(Object.keys(this[x]).length == 0) delete this[x];
+};
+
 
 if (onServer) {
     module.exports.SpaceMap = SpaceMap;

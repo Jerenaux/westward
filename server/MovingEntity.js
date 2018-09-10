@@ -18,10 +18,10 @@ MovingEntity.prototype.constructor = MovingEntity;
 
 // ### Movement ###
 
-MovingEntity.prototype.onAddAtLocation = function(){
+MovingEntity.prototype.travelOccupiedCells = function(action){
     for(var x = this.x; x < this.x + this.cellsWidth; x++){
         for(var y = this.y; y < this.y + this.cellsHeight; y++) {
-            GameServer.positions.add(x,y,this);
+            GameServer.positions[action](x,y,this);
         }
     }
 };
@@ -68,9 +68,11 @@ MovingEntity.prototype.updateWalk = function(){
 };
 
 MovingEntity.prototype.updatePosition = function(x,y){
+    this.onRemoveAtLocation();
     this.x = x;
     this.y = y;
     this.setOrUpdateAOI();
+    this.onAddAtLocation();
     if(!this.inFight) this.checkForBattle();
 };
 
@@ -212,6 +214,9 @@ MovingEntity.prototype.getRect = function(){
     }
 };
 
-
+MovingEntity.prototype.remove = function(){
+    if(this.battle) this.battle.removeFighter(this);
+    this.onRemoveAtLocation();
+};
 
 module.exports.MovingEntity = MovingEntity;

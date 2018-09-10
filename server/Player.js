@@ -148,6 +148,7 @@ Player.prototype.spawn = function(x,y){ // todo: remove args
     this.setProperty('y', y);
     this.updatePacket.x = x;
     this.updatePacket.y = y;
+    this.onAddAtLocation();
     console.log('spawning at ',this.x,this.y);
 };
 
@@ -155,6 +156,7 @@ Player.prototype.respawn = function(){
     this.setProperty('dead',false);
     this.updatePacket.dead = false;
     this.setStat('hp',10); // TODO: adapt remaining health
+    this.onRemoveAtLocation();
     this.spawn();
     this.setOrUpdateAOI();
     // TODO: loose loot
@@ -656,9 +658,10 @@ Player.prototype.update = function() {
 };
 
 Player.prototype.remove = function(){
+    console.warn('removing player');
     if(this.battle) this.battle.removeFighter(this);
-    //GameServer.settlements[this.settlement].removePlayer(this);
     this.settlement.removePlayer(this);
+    this.onRemoveAtLocation();
     delete GameServer.players[this.id];
     GameServer.updateVision();
 };

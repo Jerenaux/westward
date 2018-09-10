@@ -65,6 +65,7 @@ function Building(data){
     this.productivity = 100;
     this.committed = 0;
     this.commitStamps = data.commitStamps || [];
+    this.onAddAtLocation();
     this.setOrUpdateAOI();
     this.addCollisions();
     this.registerBuilding();
@@ -323,12 +324,12 @@ Building.prototype.addCollisions = function(){
     PFUtils.buildingCollisions(this.x,this.y,GameServer.buildingsData[this.type],GameServer.collisions);
 };
 
-Building.prototype.onAddAtLocation = function(){
+Building.prototype.travelOccupiedCells = function(action){
     for(var x = -1; x <= this.cellsWidth; x++){
         for(var y = 0; y <= this.cellsHeight+1; y++) {
             var realx = this.x + this.coll.x + x;
             var realy = this.y + this.coll.y + y;
-            GameServer.positions.add(realx,realy,this);
+            GameServer.positions[action](realx,realy,this);
         }
     }
 };
@@ -345,26 +346,6 @@ Building.prototype.getBattleAreaAround = function(cells){
     }
     return cells;
 };
-
-/*Building.prototype.checkForBattle = function(){
-    console.warn('B',this.id,'checkin for battle');
-    if(!this.isAvailableForFight() || this.isInFight()) return;
-    console.warn('conditions ok');
-    console.warn(GameServer.battleCells.toList().length,'cells in world');
-    for(var x = 0; x < this.cellsWidth; x++){
-        for(var y = 0; y < this.cellsHeight+1; y++) {
-            var realx = this.x + this.coll.x + x;
-            var realy = this.y + this.coll.y + y;
-            console.warn(realx,realy);
-            var cell = GameServer.battleCells.get(realx,realy);
-            if(cell){
-                console.log('Battle found');
-                GameServer.expandBattle(cell.battle,this);
-                return;
-            }
-        }
-    }
-};*/
 
 Building.prototype.getCenter = function(){
     return {

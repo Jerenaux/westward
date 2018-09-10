@@ -27,7 +27,10 @@ AOI.prototype.addEntity = function(entity){
 };
 
 AOI.prototype.deleteEntity = function(entity) {
-    var idx = this.entities.indexOf(entity);
+    //var idx = this.entities.indexOf(entity);
+    var idx = this.entities.findIndex(function(e){
+        return e.getShortID() == entity.getShortID();
+    });
     if (idx >= 0) this.entities.splice( idx, 1 );
 };
 

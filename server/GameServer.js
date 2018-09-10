@@ -174,7 +174,6 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.pathFinder = new Pathfinder(GameServer.collisions,GameServer.PFParameters.maxPathLength);
 
     GameServer.positions = new SpaceMapList();
-    // TODO: add at location, remove at location, moving.updateposition
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
@@ -449,6 +448,7 @@ GameServer.handleDisconnect = function(socketID){
 };
 
 GameServer.removeEntity = function(entity){
+    console.warn('removing entity');
     GameServer.removeFromLocation(entity);
     var AOIs = Utils.listAdjacentAOIs(entity.aoi);
     AOIs.forEach(function(aoi){
@@ -463,7 +463,7 @@ GameServer.getAOIAt = function(x,y){
 
 GameServer.addAtLocation = function(entity){
     // Add some entity to all the data structures related to position (e.g. the AOI)
-    GameServer.AOIs[entity.aoi].addEntity(entity,null);
+    GameServer.AOIs[entity.aoi].addEntity(entity);
     // the "entities" of an AOI list what entities are present in it; it's distinct from adding and object to an AOI
     // using GameServer.addObjectToAOI(), which actually adds the object to the update packages so that it can be created by
     // the clients (addObjectToAOI is called by GameServer.handleAOItransition)
@@ -611,16 +611,6 @@ GameServer.checkBattleOverlap = function(area){
     return null;
 };
 
-// Check if a new battlezone covers other entities
-/*GameServer.checkForFighter = function(AOIs){
-    AOIs.forEach(function(id){
-        var aoi = GameServer.AOIs[id];
-        aoi.entities.forEach(function(e){
-            if(e.canFight()) e.checkForBattle();
-        });
-    });
-};*/
-
 GameServer.expandBattle = function(battle,f){
     var area = f.getBattleAreaAround();
     battle.addFighter(f);
@@ -639,13 +629,10 @@ GameServer.addBattleCell = function(battle,x,y){
     GameServer.battleCells.add(x,y,cell);
     battle.cells.add(x,y,cell);
 
-    // TODO: query positionManager at given coordinates, if match and canfight/isavailable, expand battle
-
-    /*var aoi = GameServer.AOIs[cell.aoi];
-    aoi.entities.forEach(function(e){
-        if(e.canFight() && e.isAvailableForFight()
-            && Utils.nextTo(e,cell,true)) GameServer.expandBattle(cell.battle,e);
-    });*/
+    GameServer.positions.get(x,y).forEach(function(e){
+        console.warn(e.getShortID());
+        if(e.canFight() && e.isAvailableForFight()) GameServer.expandBattle(cell.battle,e);
+    });
 };
 
 GameServer.removeBattleCell = function(battle,x,y){

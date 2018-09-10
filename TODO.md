@@ -25,12 +25,12 @@ Pillars:
 Chapter 1
 1) The War
 - Set locations of a few camps
--> Test fights around towers (towers not involved)
 -> Dead NPC appear alive if late at the party
 -> Inactive civ when in battle with hunter hut
 -> Display fired arrows from buildings & players
----
 -> Can't take action after asking for ranged attack without ranged weapon
+---
+-> trimPath for multicell entities
 -> Wrong area for hunter huts? Same with towers, doesn't go "high" enough in y
 -> Camps not raiding online players?
 -> Wolves keep occupying same cell

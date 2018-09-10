@@ -121,7 +121,7 @@ Animal.prototype.die = function(){
 };
 
 Animal.prototype.remove = function(){
-    if(this.battle) this.battle.removeFighter(this);
+    MovingEntity.prototype.remove.call(this);
     delete GameServer.animals[this.id];
 };
 

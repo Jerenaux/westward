@@ -74,6 +74,11 @@ Civ.prototype.die = function(){
     if(this.camp) this.camp.remove(this);
 };
 
+Civ.prototype.remove = function(){
+    MovingEntity.prototype.remove.call(this);
+    delete GameServer.civs[this.id];
+};
+
 Civ.prototype.trim = function(){
     // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};

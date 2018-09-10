@@ -15,6 +15,7 @@ function NPC(){
     this.inFight = false;
     this.actionQueue = [];
     MovingEntity.call(this);
+    this.onAddAtLocation();
     this.setOrUpdateAOI();
 }
 
@@ -99,6 +100,7 @@ NPC.prototype.decideBattleAction = function(){
     var action = this.actionQueue.shift();
     if(!action) action = 'attack';
     if(!this.target || !this.target.isInFight()) this.target = this.selectTarget();
+    if(!this.target) return;
     var data;
     switch(action){
         case 'attack': // If not next to and can'r range, will become a 'move' action
@@ -164,18 +166,7 @@ NPC.prototype.aggroAgainst = function(f){
 
 NPC.prototype.selectTarget = function(){
     var fighters = this.battle.fighters.slice();
-    /*var minHP = 99999;
-    var currentTarget = null;
-    for(var i = 0; i < fighters.length; i++){
-        var f = fighters[i];
-        if(this.isSameTeam(f)) continue;
-        if(!this.aggroAgainst(f)) continue;
-        if(f.isBuilding && currentTarget && !currentTarget.isBuilding) continue;
-        if(f.getHealth() < minHP){
-            minHP = f.getHealth();
-            currentTarget = f;
-        }
-    }*/
+    if(fighters.length == 0) return null;
     fighters = fighters.filter(function(f){
         return (!this.isSameTeam(f) && this.aggroAgainst(f));
     },this);

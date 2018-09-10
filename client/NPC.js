@@ -11,6 +11,7 @@ var NPC = new Phaser.Class({
     },
 
     update: function(data){
+        console.warn('updatin');
         Moving.prototype.update.call(this,data);
 
         var callbacks = {

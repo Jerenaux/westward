@@ -19,8 +19,8 @@ GameObject.prototype.setOrUpdateAOI = function(){
     var newAOI = Utils.tileToAOI({x:this.x,y:this.y});
     if(!GameServer.AOIs.hasOwnProperty(newAOI)) console.warn('Wrong AOI',newAOI,'for coordinates',this.x,',',this.y);
     if(newAOI != previousAOI) {
-        this.aoi = newAOI;
         if(previousAOI !== null) GameServer.removeFromLocation(this);
+        this.aoi = newAOI; // has to come after previous line
         GameServer.addAtLocation(this);
         GameServer.handleAOItransition(this, previousAOI);
         if(this.isPlayer) this.onAOItransition(newAOI,previousAOI);
@@ -55,6 +55,14 @@ GameObject.prototype.getModel = function() {
 };
 
 GameObject.prototype.onAddAtLocation = function(){
+    this.travelOccupiedCells('add');
+};
+
+GameObject.prototype.onRemoveAtLocation = function(){
+    this.travelOccupiedCells('delete');
+};
+
+GameObject.prototype.travelOccupiedCells = function(){
     // empty shell for children who do not implement it
 };
 
