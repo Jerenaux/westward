@@ -308,7 +308,6 @@ var Building = new Phaser.Class({
         if(!BattleManager.inBattle && Engine.inMenu) return;
         var cursor = null;
         if(BattleManager.inBattle) {
-            console.warn(this.getRect());
             if (this.civBuilding && this.built) cursor = (Utils.nextTo(Engine.player, this) ? 'melee' : Engine.player.getRangedCursor());
         }else{
             if(this.civBuilding){

@@ -284,6 +284,15 @@ var Map = new Phaser.Class({
         this.maxY = Math.min(this.maxY,this.y+this.dragHeight);
     },
 
+    applyFogOfWar: function(){
+        this.fow = UI.scene.add.graphics();
+
+        this.fow.fillStyle(0xffff00, 1);
+        this.fow.fillRect(this.x-50, this.y-50, 100, 100);
+        this.fow.setDepth(this.depth+1);
+        this.fow.setScrollFactor(0);
+    },
+
     display: function(){
         var tile;
         if(this.target == 'building'){
@@ -296,6 +305,7 @@ var Map = new Phaser.Class({
         this.setInputArea();
         this.positionToponyms();
         this.computeDragLimits();
+        if(!this.minimap) this.applyFogOfWar();
 
         if(this.target == 'player') {
             this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
@@ -319,6 +329,7 @@ var Map = new Phaser.Class({
             t.setVisible(false);
         });
         this.setVisible(false);
+        if(this.fow) this.fow.destroy();
         if(this.maskOverlay) this.maskOverlay.setVisible(false);
     },
 

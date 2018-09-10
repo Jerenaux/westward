@@ -54,7 +54,6 @@ BuildingsPanel.prototype.displayListing = function(){
             }
         }
 
-        console.log(data);
         var progress = (data.built ? data.health*100 : data.progress);
         slot.bar.setLevel(progress);
         slot.bar.setColor(data.built ? 'green' : 'gold');

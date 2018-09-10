@@ -18,6 +18,14 @@ MovingEntity.prototype.constructor = MovingEntity;
 
 // ### Movement ###
 
+MovingEntity.prototype.onAddAtLocation = function(){
+    for(var x = this.x; x < this.x + this.cellsWidth; x++){
+        for(var y = this.y; y < this.y + this.cellsHeight; y++) {
+            GameServer.positions.add(x,y,this);
+        }
+    }
+};
+
 MovingEntity.prototype.setFieldOfVision = function(aois){
     this.fieldOfVision = aois;
 };
@@ -63,7 +71,6 @@ MovingEntity.prototype.updatePosition = function(x,y){
     this.x = x;
     this.y = y;
     this.setOrUpdateAOI();
-    //if(!this.inFight) GameServer.checkForBattle(this);
     if(!this.inFight) this.checkForBattle();
 };
 
@@ -76,7 +83,6 @@ MovingEntity.prototype.endPath = function(){
 };
 
 MovingEntity.prototype.onEndOfPath = function(){
-    //GameServer.checkForBattle(this);
     this.checkForBattle();// Check if the entity has stepped inside a battle area
 };
 
@@ -105,7 +111,7 @@ MovingEntity.prototype.stopWalk = function(){
 
 MovingEntity.prototype.getBattleAreaAround = function(cells){
     cells = cells || new SpaceMap();
-    for(var x = this.x - 1; x <= this.x + this.cellsWidth; x++){
+    for(var x = this.x - 1; x <= this.x + this.cellsWidth; x++){ // <= since we want the cells all around
         for(var y = this.y - 1; y <= this.y + this.cellsHeight; y++) {
             if(!GameServer.checkCollision(x,y)) cells.add(x,y);
         }

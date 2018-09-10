@@ -11,7 +11,7 @@ function SpaceMap(){}
 
 SpaceMap.prototype.add = function(x,y,object){
     if(!this.hasOwnProperty(x))this[x] = {};
-    if(!this[x].hasOwnProperty(y))this[x][y] = [];
+    //if(!this[x].hasOwnProperty(y)) this[x][y] = [];
     if(object === undefined) object = 1;
     this[x][y] = object; // replaces any existing object
 };
@@ -37,9 +37,9 @@ SpaceMap.prototype.delete = function(x,y){
 
 SpaceMap.prototype.toList = function(){ // serialize to a list representation
     var list = [];
-    for(x in this){
+    for(var x in this){
         if(this.hasOwnProperty(x)){
-            for(y in this[x]){
+            for(var y in this[x]){
                 if(this[x].hasOwnProperty(y)) list.push({
                     x: x,
                     y: y,
@@ -72,4 +72,29 @@ SpaceMap.prototype.toString = function(){ // serialize to a list representation
     return s;
 };
 
-if (onServer) module.exports.SpaceMap = SpaceMap;
+
+// ###############
+
+function SpaceMapList(){}
+
+//SpaceMapList.prototype = Object.create(SpaceMap.prototype);
+//SpaceMapList.prototype.constructor = SpaceMapList;
+
+SpaceMapList.prototype.add = function(x,y,object){
+    if(!this.hasOwnProperty(x))this[x] = {};
+    if(!this[x].hasOwnProperty(y)) this[x][y] = [];
+    if(object === undefined) object = 1;
+    this[x][y].push(object);
+};
+
+// Works also by calling mySpaceMap[x][y]
+SpaceMapList.prototype.get = function(x,y){
+    if(!this.hasOwnProperty(x)) return null;
+    if(!this[x].hasOwnProperty(y)) return null;
+    return this[x][y];
+};
+
+if (onServer) {
+    module.exports.SpaceMap = SpaceMap;
+    module.exports.SpaceMapList = SpaceMapList;
+}

@@ -25,16 +25,21 @@ Pillars:
 Chapter 1
 1) The War
 - Set locations of a few camps
--> Test fights around towers (towers not involved, broken nextTo)
+-> Test fights around towers (towers not involved)
 -> Dead NPC appear alive if late at the party
+-> Inactive civ when in battle with hunter hut
 -> Display fired arrows from buildings & players
 ---
+-> Can't take action after asking for ranged attack without ranged weapon
 -> Wrong area for hunter huts? Same with towers, doesn't go "high" enough in y
 -> Camps not raiding online players?
 -> Wolves keep occupying same cell
+-> Test bomb overlap (do not affect people touching area)
 -> Test fights with bears
 -> Wander around camp
 - Fix bombs details
+-> Fix NPC positioning
+-> Force battle pathfinding to fit in battle cells
 - New "building damage" stat (allows introducing specialized weapons: maces, ...)
 => Ranged weapon have very low building damage, melee weapon more, maces and axes much more, bombs a lot
 2) The Economy
@@ -51,6 +56,11 @@ defend trade routes, scout, maintain supplies)
 (-> Control quests distribution?    )
 3) The Wild
 - Fog of war (timed)
+-> Display a square on the map
+-> Display visibleAOIs on fort map
+-> Have visibleAOIs set depend on buildings, esp. towers
+-> Synchronize player.visittedAOIs to fort
+-> Own fog of wars for players, update own map as they wander, synchronize when back to fort
 - Icons synchronization
 - Proper marker
 - Cursor shenanigans

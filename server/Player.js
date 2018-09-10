@@ -57,7 +57,7 @@ function Player(){
     this.setUpStats();
     this.equipment = new EquipmentManager();
     this.fieldOfVision = [];
-    this.visitedAOIs = new Set();
+    this.visitedAOIs = new Set(); // List of AOIs visitted since last fort debrief
     this.chatTimer = null;
     MovingEntity.call(this);
 }
@@ -615,7 +615,7 @@ Player.prototype.endFight = function(){
 };
 
 Player.prototype.isAvailableForFight = function(){
-    return (!this.isInBuilding() && !this.isDead());
+    return (!this.isInBuilding() && !this.isDead() && !this.inFight);
 };
 
 Player.prototype.isInBuilding = function(){

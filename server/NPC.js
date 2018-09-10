@@ -144,10 +144,6 @@ NPC.prototype.findBattlePath = function(dest){
 NPC.prototype.attackTarget = function(){
     var data = {};
     // TODO: accomodate for ranged attacks
-    console.warn('npc',this.getRect());
-    console.warn('npc',this.target.getRect());
-    console.warn(Utils.multiTileChebyshev(this.getRect(),this.target.getRect()));
-    console.warn(Utils.nextTo(this,this.target));
     if(Utils.nextTo(this,this.target)){
         data.action = 'attack';
         data.id = this.target.getShortID();
@@ -242,7 +238,7 @@ NPC.prototype.isInBuilding = function(){
 };
 
 NPC.prototype.isAvailableForFight = function(){
-    return (!this.isDead());
+    return (!this.isDead() && !this.isInFight());
 };
 
 module.exports.NPC = NPC;

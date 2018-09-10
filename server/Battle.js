@@ -3,7 +3,7 @@
  */
 var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
-//var PFUtils = require('../shared/PFUtils.js').PFUtils;
+var GameObject = require('./GameObject.js').GameObject;
 var Pathfinder =  require('../shared/Pathfinder.js').Pathfinder;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 
@@ -18,9 +18,9 @@ function Battle(){
         'Civ': 0,
         'Player': 0
     };
-    this.spannedAOIs = new Set();
-    this.positions = new SpaceMap(); // positions occupied by fighters
-    this.cells = new SpaceMap(); // all the BattleCell objects
+    //this.spannedAOIs = new Set();
+    this.positions = new SpaceMap(); // positions occupied by fighters (obsolete?)
+    this.cells = new SpaceMap(); // all the BattleCell objects, used for battle pathfinding
 
     this.pathFinder = new Pathfinder(this.cells,99,false,false,true);
 
@@ -81,7 +81,7 @@ Battle.prototype.removeFromPosition = function(f){
 };
 
 Battle.prototype.addFighter = function(f){
-    //console.warn('Adding fighter ',f.id);
+    //console.warn('Adding fighter ',f.getShortID());
     this.fighters.push(f);
     if(f.isMovingEntity) this.checkConflict(f);
     this.updateTeams(f.battleTeam,1);
@@ -320,10 +320,10 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
     var delay = 500;
     var killed = false;
     if(!b || b.isDead()) return;
-    console.warn('btl',a.getRect());
+    /*console.warn('btl',a.getRect());
     console.warn('btl',b.getRect());
     console.warn(Utils.multiTileChebyshev(a.getRect(),b.getRect()));
-    console.warn(Utils.nextTo(a,b));
+    console.warn(Utils.nextTo(a,b));*/
     if(Utils.nextTo(a,b)){
         a.setProperty('melee_atk',{x:b.x,y:b.y}); // for the attack animation of attacker
         var dmg = this.computeDamage('melee',a,b);
@@ -377,14 +377,14 @@ Battle.prototype.end = function(){
     console.log('[B'+this.id+'] Ended');
 };
 
-Battle.prototype.addArea = function(area){
+/*Battle.prototype.addArea = function(area){
     area.forEach(function(c){
         GameServer.addBattleCell(this,c.x,c.y);
-        this.spannedAOIs.add(Utils.tileToAOI({x:c.x,y:c.y}));
+        //this.spannedAOIs.add(Utils.tileToAOI({x:c.x,y:c.y}));
     },this);
 
-    GameServer.checkForFighter(this.spannedAOIs);
-};
+    //GameServer.checkForFighter(this.spannedAOIs);
+};*/
 
 Battle.prototype.cleanUp = function(){
     var _battle = this;
@@ -404,9 +404,32 @@ function BattleCell(x,y,battle){
     this.id = GameServer.lastCellID++;
     this.x = x;
     this.y = y;
-    this.aoi = Utils.tileToAOI({x:this.x,y:this.y});
+    //this.aoi = Utils.tileToAOI({x:this.x,y:this.y});
     this.battle = battle;
+    this.setOrUpdateAOI();
 }
+
+BattleCell.prototype = Object.create(GameObject.prototype);
+BattleCell.prototype.constructor = BattleCell;
+
+BattleCell.prototype.countNeighbors = function(){
+    var nb = 0;
+    for(var x = this.x - 1; x <= this.x + 1; x++){
+        for(var y = this.y - 1; y <= this.y + 1; y++){
+            if(GameServer.battleCells.get(x,y)) nb++;
+        }
+    }
+    return nb;
+};
+
+BattleCell.prototype.getRect = function(){
+    return {
+        x: this.x,
+        y: this.y,
+        w: 1,
+        h: 1
+    }
+};
 
 BattleCell.prototype.trim = function(){
     return {

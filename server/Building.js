@@ -73,6 +73,10 @@ function Building(data){
 Building.prototype = Object.create(GameObject.prototype);
 Building.prototype.constructor = Building;
 
+Building.prototype.getShortID = function(){
+    return 'B'+this.id;
+};
+
 Building.prototype.registerBuilding = function(){
     if(this.civBuilding) return;
     this.settlement.registerBuilding(this);
@@ -319,6 +323,16 @@ Building.prototype.addCollisions = function(){
     PFUtils.buildingCollisions(this.x,this.y,GameServer.buildingsData[this.type],GameServer.collisions);
 };
 
+Building.prototype.onAddAtLocation = function(){
+    for(var x = -1; x <= this.cellsWidth; x++){
+        for(var y = 0; y <= this.cellsHeight+1; y++) {
+            var realx = this.x + this.coll.x + x;
+            var realy = this.y + this.coll.y + y;
+            GameServer.positions.add(realx,realy,this);
+        }
+    }
+};
+
 Building.prototype.getBattleAreaAround = function(cells){
     cells = cells || new SpaceMap();
 
@@ -332,20 +346,25 @@ Building.prototype.getBattleAreaAround = function(cells){
     return cells;
 };
 
-Building.prototype.checkForBattle = function(){
+/*Building.prototype.checkForBattle = function(){
+    console.warn('B',this.id,'checkin for battle');
     if(!this.isAvailableForFight() || this.isInFight()) return;
+    console.warn('conditions ok');
+    console.warn(GameServer.battleCells.toList().length,'cells in world');
     for(var x = 0; x < this.cellsWidth; x++){
         for(var y = 0; y < this.cellsHeight+1; y++) {
             var realx = this.x + this.coll.x + x;
             var realy = this.y + this.coll.y + y;
+            console.warn(realx,realy);
             var cell = GameServer.battleCells.get(realx,realy);
             if(cell){
+                console.log('Battle found');
                 GameServer.expandBattle(cell.battle,this);
                 return;
             }
         }
     }
-};
+};*/
 
 Building.prototype.getCenter = function(){
     return {
@@ -361,8 +380,7 @@ Building.prototype.isDestroyed = function(){
 };
 
 Building.prototype.isAvailableForFight = function() {
-    return false;
-    return (!this.isDestroyed());
+    return (!this.isDestroyed() && !this.isInFight());
 };
 
 Building.prototype.isInFight = function(){

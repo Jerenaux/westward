@@ -14,6 +14,7 @@ function MiniMap(){
     this.bg.setVisible(false);
 
     this.map = new Map(x,y,r,r,0,0,'player',false);
+    this.map.minimap = true;
     this.map.addMask(null,{
         type: 'circle',
         x: x,

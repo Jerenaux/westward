@@ -5,6 +5,7 @@
 var GameServer = require('./GameServer.js').GameServer;
 var Formulas = require('../shared/Formulas.js').Formulas;
 var World = require('../shared/World.js').World;
+var Utils = require('../shared/Utils.js').Utils;
 
 function Settlement(data){
     this.id = data.id;
@@ -12,7 +13,8 @@ function Settlement(data){
     this.desc = data.description;
     this.level = data.level;
     this.pop = data.population;
-    this.lastCycle = data.lastCycle;
+    //this.lastCycle = data.lastCycle;
+    this.visibleAOIs = new Set();
 
     this.fort = null;
     this.buildings = [];
@@ -78,6 +80,12 @@ Settlement.prototype.registerFort = function(fort){
         x: this.fort.x + GameServer.buildingsData[0].entrance.x,
         y: this.fort.y + GameServer.buildingsData[0].entrance.y + 2
     };
+
+    Utils.listAdjacentAOIs(this.fort.aoi).forEach(function(aoi){
+        this.visibleAOIs.add(aoi);
+    },this);
+    console.log('Visble AOIs:',this.visibleAOIs);
+    this.fort.setProperty('visibleAOIs',this.visibleAOIs);
 };
 
 Settlement.prototype.getAOI = function(){

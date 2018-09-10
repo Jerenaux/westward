@@ -34,6 +34,7 @@ module.exports.GameServer = GameServer;
 var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
+var SpaceMapList = require('../shared/SpaceMap.js').SpaceMapList;
 var AOI = require('./AOI.js').AOI;
 var Player = require('./Player.js').Player;
 var Settlement = require('./Settlement').Settlement;
@@ -168,11 +169,12 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.wildlifeParameters = config.get('wildlife');
     GameServer.civsParameters = config.get('civs');
 
-
-    //PFUtils.setup(GameServer);
     GameServer.collisions = new SpaceMap();
     GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()));
     GameServer.pathFinder = new Pathfinder(GameServer.collisions,GameServer.PFParameters.maxPathLength);
+
+    GameServer.positions = new SpaceMapList();
+    // TODO: add at location, remove at location, moving.updateposition
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
@@ -268,7 +270,7 @@ GameServer.addItem = function(x,y,type){
 
 GameServer.onInitialized = function(){
     console.warn('--- Performing on initialization tasks ---');
-    GameServer.addAnimal(503,656,0);
+    GameServer.addAnimal(495,654,0);
     //GameServer.addCiv(513,657);
     //var a = GameServer.addAnimal(1204,169,0);
     //var b = GameServer.addAnimal(1205,170,5);
@@ -540,14 +542,14 @@ GameServer.pickUpItem = function(player,itemID){
     GameServer.removeEntity(item);
 };
 
-GameServer.handleBattle = function(player,animal,aggro){
+GameServer.handleBattle = function(player,target,aggro){
     if(!GameServer.enableBattles){
         if(!aggro) player.addMsg('Battles are disabled at the moment');
         return;
     }
-    if(!player.isAvailableForFight() || player.isInFight() || !animal.isAvailableForFight() || animal.isInFight()) return;
+    if(!player.isAvailableForFight() || player.isInFight() || !target.isAvailableForFight() || target.isInFight()) return;
     // TODO: check for proximity
-    var area = GameServer.computeBattleArea(player,animal);
+    var area = GameServer.computeBattleArea(player,target);
     if(!area){
         if(!aggro) player.addMsg('There is an obstacle in the way!');
         return;
@@ -555,8 +557,9 @@ GameServer.handleBattle = function(player,animal,aggro){
     var battle = GameServer.checkBattleOverlap(area);
     if(!battle) battle = new Battle();
     battle.addFighter(player);
-    battle.addFighter(animal);
-    battle.addArea(area);
+    battle.addFighter(target);
+    //battle.addArea(area);
+    GameServer.addBattleArea(area,battle);
     battle.start();
 };
 
@@ -609,18 +612,25 @@ GameServer.checkBattleOverlap = function(area){
 };
 
 // Check if a new battlezone covers other entities
-GameServer.checkForFighter = function(AOIs){
+/*GameServer.checkForFighter = function(AOIs){
     AOIs.forEach(function(id){
         var aoi = GameServer.AOIs[id];
         aoi.entities.forEach(function(e){
             if(e.canFight()) e.checkForBattle();
         });
     });
-};
+};*/
+
 GameServer.expandBattle = function(battle,f){
     var area = f.getBattleAreaAround();
     battle.addFighter(f);
-    battle.addArea(area.toList());
+    GameServer.addBattleArea(area.toList(),battle);
+};
+
+GameServer.addBattleArea = function(area,battle){ // area should be a list
+    area.forEach(function(c){
+        GameServer.addBattleCell(battle,c.x,c.y);
+    },this);
 };
 
 GameServer.addBattleCell = function(battle,x,y){
@@ -628,8 +638,14 @@ GameServer.addBattleCell = function(battle,x,y){
     var cell = new BattleCell(x,y,battle);
     GameServer.battleCells.add(x,y,cell);
     battle.cells.add(x,y,cell);
-    GameServer.addAtLocation(cell);
-    GameServer.handleAOItransition(cell);
+
+    // TODO: query positionManager at given coordinates, if match and canfight/isavailable, expand battle
+
+    /*var aoi = GameServer.AOIs[cell.aoi];
+    aoi.entities.forEach(function(e){
+        if(e.canFight() && e.isAvailableForFight()
+            && Utils.nextTo(e,cell,true)) GameServer.expandBattle(cell.battle,e);
+    });*/
 };
 
 GameServer.removeBattleCell = function(battle,x,y){
@@ -838,12 +854,10 @@ GameServer.handleAOItransition = function(entity,previous){
         GameServer.updateVision();
     }
     newAOIs.forEach(function(aoi){
-        //if(entity.constructor.name == 'Player') entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
         if(entity.isPlayer) entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
         GameServer.addObjectToAOI(aoi,entity);
     });
     oldAOIs.forEach(function(aoi){
-        //if(entity.constructor.name == 'Player') entity.oldAOIs.push(aoi);
         if(entity.isPlayer) entity.oldAOIs.push(aoi);
         GameServer.removeObjectFromAOI(aoi,entity);
     });
@@ -859,7 +873,7 @@ GameServer.updateVision = function(){
            GameServer.vision.add(aoi);
         });
     }
-    console.log('VISION:',GameServer.vision);
+    //console.log('VISION:',GameServer.vision);
 };
 
 GameServer.updateClients = function(){ //Function responsible for setting up and sending update packets to clients

@@ -189,12 +189,21 @@ Utils.chebyshev = function(A,B){
 };
 
 Utils.nextTo = function(a,b){
-    return (Utils.multiTileChebyshev(a.getRect(),b.getRect()) == 0);
+    a = a.getRect();
+    b = b.getRect();
+    return Utils.overlap(a,b,true);
 };
 
-Utils.overlap = function(a,b){
-    if(a.x > b.x + b.w || b.x > a.x + a.w) return false;
-    if(a.y > b.y + b.h || b.y > a.y + a.h) return false;
+Utils.overlap = function(a,b,touch){
+    if(touch){ // touching counts as overlapping
+        if(a.x > b.x + b.w || b.x > a.x + a.w) return false;
+        if(a.y > b.y + b.h || b.y > a.y + a.h) return false;
+    }else{
+        if(a.x >= b.x + b.w || b.x >= a.x + a.w) return false;
+        if(a.y >= b.y + b.h || b.y >= a.y + a.h) return false;
+    }
+    //if(a.x > b.x + b.w || b.x > a.x + a.w) return false;
+    //if(a.y > b.y + b.h || b.y > a.y + a.h) return false;
     return true;
 };
 
