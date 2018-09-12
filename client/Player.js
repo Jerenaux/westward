@@ -47,7 +47,6 @@ var Player = new Phaser.Class({
 
         this.name = 'Player '+this.id;
         this.setPosition(data.x,data.y);
-        //if(this.isHero) this.updateViewRect();
         this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
 
         this.manageOrientationPin();
@@ -147,9 +146,11 @@ var Player = new Phaser.Class({
         if(!this.isHero) this.queuePath(path);
     },
 
-    processRangedAttack: function(facing){
-        this.setOrientation(facing);
+    processRangedAttack: function(data){ // TODO: move elsewhere when NPC will be able to range
+        this.setOrientation({x:data.x,y:data.y});
         this.play(this.animPrefix+'_bow_'+this.orientation);
+
+        Engine.displayArrow(this,{x:data.x,y:data.y},data.duration,data.delay);
     },
 
     setDestinationAction: function(type,id,x,y){

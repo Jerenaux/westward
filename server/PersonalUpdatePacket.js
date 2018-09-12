@@ -62,8 +62,11 @@ PersonalUpdatePacket.prototype.addMsg = function(msg){
     this.msgs.push(msg);
 };
 
-PersonalUpdatePacket.prototype.addNotif = function(msg){
-    this.notifs.push(msg);
+PersonalUpdatePacket.prototype.addNotif = function(msg,delay){
+    this.notifs.push({
+        msg: msg,
+        delay: delay
+    });
 };
 
 PersonalUpdatePacket.prototype.fightNotification = function(flag){

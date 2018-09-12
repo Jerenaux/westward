@@ -124,6 +124,7 @@ UI.handleNotifications = function(msgs){
     });
     //console.log('total time = ',300+(msgs.length-1)*50);
 };
+
 UI.runningNotifications = 0;
 UI.showNotification = function(notif,i,height) {
     var x = (UI.getGameWidth()-notif.getWidth())/2 - notif.getOrigin();

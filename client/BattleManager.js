@@ -99,6 +99,10 @@ BattleManager.canTakeAction = function(){
     return !BattleManager.actionTaken;
 };
 
+BattleManager.resetTurn = function(){
+    BattleManager.actionTaken = false;
+};
+
 BattleManager.processBombClick = function(tile){
     Engine.requestBomb(tile.tx,tile.ty);
     BattleManager.actionTaken = true;

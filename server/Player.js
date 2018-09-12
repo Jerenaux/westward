@@ -108,7 +108,7 @@ Player.prototype.setStartingInventory = function(){
     // TODO: move to some config file
     this.giveItem(2,1);
     this.giveItem(19,1);
-    this.giveItem(20,3);
+    this.giveItem(20,5);
     this.giveItem(6,2);
     this.giveItem(28,1);
     this.giveItem(4,2);
@@ -465,12 +465,14 @@ Player.prototype.canRange = function(){
     var weapon = this.getRangedWeapon();
     if(weapon == -1) {
         this.addMsg('I don\'t have a ranged weapon equipped!');
+        this.updatePacket.resetTurn = true;
         return false;
     }
     if(this.getAmmo(this.getRangedContainer(weapon)) > 0){
         return true;
     }else{
         this.addMsg('I\'m out of ammo!');
+        this.updatePacket.resetTurn = true;
         return false;
     }
 };
@@ -572,6 +574,7 @@ Player.prototype.onAOItransition = function(newAOI,previousAOI){
     if(!this.visitedAOIs.has(newAOI)) {
         this.visitedAOIs.add(newAOI);
         if(previousAOI){ // if previousAOI: don't grant XP for spawning in fort
+            if(!this.settlement.fort) return;
             var A = Utils.lineToGrid(this.settlement.fort.aoi,World.nbChunksHorizontal);
             var B = Utils.lineToGrid(newAOI,World.nbChunksHorizontal);
             var dist = Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
@@ -642,8 +645,8 @@ Player.prototype.addMsg = function(msg){
     this.updatePacket.addMsg(msg);
 };
 
-Player.prototype.addNotif = function(msg){
-    this.updatePacket.addNotif(msg);
+Player.prototype.addNotif = function(msg,delay){
+    this.updatePacket.addNotif(msg,delay);
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){
@@ -658,7 +661,7 @@ Player.prototype.update = function() {
 };
 
 Player.prototype.remove = function(){
-    console.warn('removing player');
+    console.log('removing player');
     if(this.battle) this.battle.removeFighter(this);
     this.settlement.removePlayer(this);
     this.onRemoveAtLocation();

@@ -136,6 +136,7 @@ Battle.prototype.newTurn = function(){
         }
     },this);
 
+    console.log('Is ',activeFighter.getShortID(),'frozen: ',activeFighter.skipBattleTurn);
     if(activeFighter.skipBattleTurn){
         this.newTurn();
         return;
@@ -299,6 +300,10 @@ Battle.prototype.computeRangedHit = function(a,b){
     return rand < chance;
 };
 
+Battle.prototype.computeTOF = function(a,b){
+    return (Utils.euclidean(a,b)/15)*1000; // TODO: put 15 (arrow speed) in conf
+};
+
 Battle.prototype.applyDamage = function(f,dmg){
     f.applyDamage(-dmg);
     if(f.getHealth() == 0){
@@ -317,14 +322,11 @@ Battle.prototype.rewardXP = function(xp){
 };
 
 Battle.prototype.processAttack = function(a,b){ // a attacks b
-    var delay = 500;
+    var delay = 0;
     var killed = false;
     if(!b || b.isDead()) return;
-    /*console.warn('btl',a.getRect());
-    console.warn('btl',b.getRect());
-    console.warn(Utils.multiTileChebyshev(a.getRect(),b.getRect()));
-    console.warn(Utils.nextTo(a,b));*/
     if(Utils.nextTo(a,b)){
+        delay = 500; //TODO: config
         a.setProperty('melee_atk',{x:b.x,y:b.y}); // for the attack animation of attacker
         var dmg = this.computeDamage('melee',a,b);
         killed = this.applyDamage(b,dmg);
@@ -334,27 +336,45 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
             x: a.x+(pos.x*0.5)+(pos.x > 0 ? a.cellsWidth : 0),
             y: a.y+(pos.y*0.5)+(pos.y > 0 ? a.cellsHeight : 0)
         });
-        b.setProperty('hit',dmg); // for the flash and hp display
+        b.setProperty('hit',{
+            dmg:dmg,
+            delay: 0
+        }); // for the flash and hp display
     }else{
         if(!a.canRange()) return false;
-        a.setProperty('ranged_atk',{x:b.x,y:b.y});
+        var fireDelay = 500; // TODO: conf
+        var tof = this.computeTOF(a,b);
+        delay = fireDelay + tof;
+        a.setProperty('ranged_atk',
+            {
+                x:b.x,
+                y:b.y,
+                delay: fireDelay,
+                duration: tof
+            }); // Character aimation + arrow; coordinates are to determine which direction to face
         var ammoID = a.decreaseAmmo();
         var hit = this.computeRangedHit(a,b);
+        hit = true; //TODO: remove
         if(hit){
             if(b.isNPC && ammoID > -1) b.addToLoot(ammoID,1);
             dmg = this.computeDamage('ranged',a,b);
             killed = this.applyDamage(b,dmg);
+            // TODO: use getCenter()
             a.setProperty('animation',{
                 name: 'sword',
                 x: b.x,
-                y: b.y
+                y: b.y,
+                delay: delay
             });
-            b.setProperty('hit',dmg);
+            b.setProperty('hit',{
+                dmg:dmg,
+                delay: delay
+            });
         }else { // miss
-            b.setProperty('rangedMiss',true);
+            b.setProperty('rangedMiss',{delay: delay});
         }
     }
-    if(killed && a.isPlayer) a.addNotif(b.name+' '+(b.isBuilding ? 'destroyed' : 'killed'));
+    if(killed && a.isPlayer) a.addNotif(b.name+' '+(b.isBuilding ? 'destroyed' : 'killed'),delay);
     return {
         success: true,
         delay: delay

@@ -8,13 +8,6 @@ var Hero = new Phaser.Class({
     initialize: function Hero(){
         Player.call(this);
         this.isHero = true;
-
-        /*this.viewRect = new Phaser.Geom.Rectangle(
-            Engine.camera.scrollX,
-            Engine.camera.scrollY,
-            Engine.camera.width,
-            Engine.camera.height
-        );*/
     },
 
     setUp: function(data){
@@ -52,6 +45,7 @@ var Hero = new Phaser.Class({
             'items': this.updateInventory,
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
+            'resetTurn': BattleManager.resetTurn,
             'stats': this.updateStats
         };
 
@@ -73,11 +67,6 @@ var Hero = new Phaser.Class({
 
         Engine.firstSelfUpdate = false;
     },
-
-    /*updateViewRect: function(){
-        this.viewRect.setPosition(Engine.camera.scrollX,Engine.camera.scrollY);
-        //console.log(this.viewRect);
-    },*/
 
     setCommitSlots: function(commitSlots){
         // Data structures are cleared in updateCommitSlots

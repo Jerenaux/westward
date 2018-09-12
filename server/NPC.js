@@ -15,6 +15,7 @@ function NPC(){
     this.inFight = false;
     this.actionQueue = [];
     MovingEntity.call(this);
+    this.skipBattleTurn = GameServer.battleParameters.freezeNPC;//false; // used to distinguish from buildings
     this.onAddAtLocation();
     this.setOrUpdateAOI();
 }

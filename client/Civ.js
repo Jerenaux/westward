@@ -68,13 +68,6 @@ var Civ = new Phaser.Class({
     },
 
     die: function(){
-        /*console.log('dying');
-        if(Engine.camera.worldView.contains(this.x,this.y)) {
-            this.play(this.animPrefix + '_death');
-        }else{
-            console.log('not in view');
-            this.setFrame(this.deathFrame,false,false);
-        }*/
         this.setFrame(this.deathFrame,false,false);
         this.dead = true;
     }

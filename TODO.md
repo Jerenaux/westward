@@ -24,11 +24,11 @@ Pillars:
 
 Chapter 1
 1) The War
+-> Arrow SFX
+-> Have arrows and anims target center
+-> Have them come from a configured shooting position
+-> Time death anim accordingly (move all damage processing at the end, to be worked out after animations)
 - Set locations of a few camps
--> Use centers for orientation pins
--> Inactive civ when in battle with hunter hut?
--> Display fired arrows from buildings & players
--> Can't take action after asking for ranged attack without ranged weapon
 ---
 -> trimPath for multicell entities
 -> Wrong area for hunter huts? Same with towers, doesn't go "high" enough in y
@@ -57,6 +57,7 @@ defend trade routes, scout, maintain supplies)
 3) The Wild
 - Proper marker
 - Cursor shenanigans
+- Fix bear footprints
 => Update texts
 => Test with someone
 
@@ -237,7 +238,7 @@ Performance:
 -> DOn't call all updates on display; update when receiving server data, and that's it
 - Rethink the calling of all events on menu open
 
-
+- Pool for arrows and projectiles
 - Remove unnecessary files
 - Use pool for notifications
 - Avoid duplicate pins in maps, danger pins etc.

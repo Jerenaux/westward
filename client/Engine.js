@@ -341,7 +341,6 @@ Engine.initWorld = function(data){
     Engine.settlementsData = data.settlements;
     Engine.makeRecipesLists();
     Engine.addHero(data);
-    //Engine.player.updateViewRect();
     Engine.makeUI();
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
@@ -670,19 +669,46 @@ Engine.handleExplosion = function(){
 
 Engine.handleBattleAnimation = function(data){
     var sprite = Engine.animationsPools[data.name].getNext();
+    sprite.setVisible(false);
     sprite.setOrigin(0.5);
     var x = data.x*Engine.tileWidth;
     var y = data.y*Engine.tileHeight;
     sprite.setPosition(x,y);
-    sprite.setVisible(true);
     sprite.setDepth(5);
-    sprite.on('animationstart',function(){
+    sprite.once('animationstart',function(){
        Engine.playLocalizedSound('hit',1,{x:data.x,y:data.y});
     });
-    sprite.anims.play(data.name);
+    setTimeout(function(){
+        sprite.setVisible(true);
+        sprite.anims.play(data.name);
+    },data.delay);
 };
 
-Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss){
+Engine.displayArrow = function(from,to,duration,delay){
+    var arrow = Engine.scene.add.sprite(from.x+16,from.y+16,'items','arrow');
+    arrow.setDepth(from.depth);
+    arrow.setVisible(false);
+    var angle = Phaser.Math.Angle.Between(from.x,from.y,to.x*32,to.y*32)*(180/Math.PI);
+    arrow.setAngle(angle + 45);
+
+    Engine.scene.tweens.add(
+        {
+            targets: arrow,
+            x: (to.x+0.5)*32,
+            y: (to.y+0.5)*32,
+            duration: duration,
+            delay: delay,
+            onComplete: function(){
+                arrow.destroy();
+            }
+        }
+    );
+    setTimeout(function(){
+        arrow.setVisible(true);
+    },delay);
+};
+
+Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss,delay){
     var text = Engine.textPool.getNext();
     text.setStyle({ font: 'belwe', fontSize: size, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     text.setFont(size+'px belwe');
@@ -697,14 +723,18 @@ Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss){
             targets: text,
             y: target.y-yDelta,
             duration: 1000,
-            onStart: function(){
+            delay: delay,
+            /*onStart: function(){
                 text.setVisible(true);
-            },
+            },*/
             onComplete: function(){
                 text.recycle();
             }
         }
     );
+    setTimeout(function(){
+        text.setVisible(true);
+    },delay);
 
     if(miss) return;
     // Blink tween
@@ -713,6 +743,7 @@ Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss){
             targets: target,
             alpha: 0,
             duration: 100,
+            delay: delay,
             yoyo: true,
             repeat: 3,
             onStart: function(){

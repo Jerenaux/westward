@@ -321,14 +321,14 @@ var Moving = new Phaser.Class({
         }
     },
 
-   handleHit: function(dmg){
+   handleHit: function(data){
         var pos = this.getHPposition();
-        Engine.displayHit(this,pos.x,pos.y,20,40,dmg,false);
+        Engine.displayHit(this,pos.x,pos.y,20,40,data.dmg,false,data.delay);
    },
 
     handleMiss: function(){
         var pos = this.getHPposition();
-        Engine.displayHit(this,pos.x,pos.y,20,40,null,true);
+        Engine.displayHit(this,pos.x,pos.y,20,40,null,true,data.delay);
     },
 
     isDisabled: function(){

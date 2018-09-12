@@ -115,6 +115,7 @@ var Building = new Phaser.Class({
             'prices': this.setPrices,
             'productivity': this.setProductivity,
             'progress': this.setProgress,
+            'ranged_atk': this.processRangedAttack,
             'rangedMiss': this.handleMiss
         };
         this.updateEvents = new Set();
@@ -231,6 +232,10 @@ var Building = new Phaser.Class({
     handleMiss: function(){
         var pos = this.getHPposition();
         Engine.displayHit(this,pos.x,pos.y,50,80,null,true);
+    },
+
+    processRangedAttack: function(data){
+        Engine.displayArrow(this,{x:data.x,y:data.y},data.duration,data.delay);
     },
 
     // ### GETTERS ###
