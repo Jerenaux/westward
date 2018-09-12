@@ -18,7 +18,6 @@ var Building = new Phaser.Class({
         var sprite = buildingData.sprite;
         if(!data.built) sprite += '_construction';
 
-        //this.setTexture(sprite);
         this.setFrame(sprite);
         this.setVisible(true);
 
@@ -121,7 +120,10 @@ var Building = new Phaser.Class({
         this.updateEvents = new Set();
 
         for(var field in callbacks){
-            if(!callbacks.hasOwnProperty(field)) continue;
+            if(!callbacks.hasOwnProperty(field)){
+                console.warn('No handler for field ',field,' for buildings');
+                continue;
+            }
             if(field in data) callbacks[field].call(this,data[field]);
         }
 

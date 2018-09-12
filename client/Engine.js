@@ -341,7 +341,7 @@ Engine.initWorld = function(data){
     Engine.settlementsData = data.settlements;
     Engine.makeRecipesLists();
     Engine.addHero(data);
-    Engine.player.updateViewRect();
+    //Engine.player.updateViewRect();
     Engine.makeUI();
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
@@ -1451,22 +1451,6 @@ Engine.updateStat = function(key,data){
     }
 };
 
-Engine.updateMenus = function(category){
-    var callbackMap = {
-        'character': 'onUpdateCharacter',
-        'citizen': 'onUpdateCitizen',
-        'commit': 'onUpdateCommit',
-        'equip': 'onUpdateEquipment',
-        'gold': 'onUpdateGold',
-        'inv': 'onUpdateInventory',
-        'productivity':'onUpdateProductivity',
-        'stats': 'onUpdateStats'
-    };
-
-    var event = callbackMap[category];
-    if(Engine.currentMenu) Engine.currentMenu.trigger(event);
-};
-
 Engine.update = function(){
 
 };
@@ -1516,6 +1500,22 @@ Engine.removeElements = function(arr,table){
         }
         table[id].remove();
     });
+};
+
+Engine.updateMenus = function(category){
+    var callbackMap = {
+        'character': 'onUpdateCharacter',
+        'citizen': 'onUpdateCitizen',
+        'commit': 'onUpdateCommit',
+        'equip': 'onUpdateEquipment',
+        'gold': 'onUpdateGold',
+        'inv': 'onUpdateInventory',
+        'productivity':'onUpdateProductivity',
+        'stats': 'onUpdateStats'
+    };
+
+    var event = callbackMap[category];
+    if(Engine.currentMenu) Engine.currentMenu.trigger(event);
 };
 
 Engine.inThatBuilding = function(id){

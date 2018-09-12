@@ -80,8 +80,9 @@ var Moving = new Phaser.Class({
             this.orientationPin.hide();
             return;
         }
-        var viewRect = new Phaser.Geom.Rectangle(Engine.camera.scrollX-10,Engine.camera.scrollY-10,Engine.camera.width+20,Engine.camera.height+20);
-        var inCamera =  viewRect.contains(this.x,this.y);
+        //var viewRect = new Phaser.Geom.Rectangle(Engine.camera.scrollX-10,Engine.camera.scrollY-10,Engine.camera.width+20,Engine.camera.height+20);
+        //var inCamera =  viewRect.contains(this.x,this.y);
+        var inCamera = Engine.camera.worldView.contains(this.x,this.y);
         if(inCamera) {
             this.orientationPin.hide();
         }else{
@@ -140,9 +141,9 @@ var Moving = new Phaser.Class({
         }
     },
 
-    setOrientation: function(orientation){
+    /*setOrientation: function(orientation){
         this.orientation = orientation;
-    },
+    },*/
 
     faceOrientation: function(){
         this.setFrame(this.restingFrames[this.orientation]);
@@ -255,6 +256,7 @@ var Moving = new Phaser.Class({
 
     endMovement: function(){
         if(!this.active) return; // quick fix
+        if(this.dead) return;
         this.moving = false;
         this.flagForStop = false;
         this.stopPos = null;

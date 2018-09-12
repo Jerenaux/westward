@@ -24,8 +24,8 @@ var UI = {
             this.load.image('bigbg', 'assets/sprites/bigbg.png');
             this.load.image('bigbg_mask', 'assets/sprites/bigbg_mask.png');
             this.load.image('worldmap', 'assets/sprites/worldmap.png');
-            this.load.image('dangersetl', 'assets/sprites/dangersetl.png');
-            //this.load.image('setlicon', 'assets/sprites/setlicon.png');
+            //this.load.image('dangersetl', 'assets/sprites/dangersetl.png');
+            this.load.image('campdiamond', 'assets/sprites/camp_diamond.png');
             this.load.image('setldiamond', 'assets/sprites/setl_diamond.png');
             this.load.image('wood', 'assets/sprites/wood.jpg');
         }
@@ -330,11 +330,7 @@ UI.displaySettlementSelectionMenu =  function(){
     UI.SSmap = map;
     UI.SScontent = content;
     Client.requestSettlementData();
-
-    UI.displatEnemySettlement(480,456);
-    UI.displatEnemySettlement(180,36);
-    UI.displatEnemySettlement(660,45);
-    UI.displatEnemySettlement(120,548);
+    Client.requestCampsData();
 
     var w = 400;
     var h = 220;
@@ -350,19 +346,6 @@ UI.displaySettlements = function(list){
     list.forEach(function(e){
         UI.displaySettlement(e);
     });
-};
-
-UI.displatEnemySettlement = function(x,y){
-    var icon = UI.scene.add.image(x,y,'dangersetl').setAlpha(0.6);
-    icon.setInteractive();
-    icon.on('pointerover',function(){
-        UI.tooltip.updateInfo('Enemy camp');
-        UI.tooltip.display();
-    });
-    icon.on('pointerout',function(){
-        UI.tooltip.hide();
-    });
-    UI.SScontent.push(icon);
 };
 
 UI.displaySettlement = function(data){
@@ -400,6 +383,29 @@ UI.displaySettlement = function(data){
     icon.on('pointerout',function(){
         UI.tooltip.hide();
     });
+};
+
+UI.displayCamps = function(list){
+    list.forEach(function(e){
+        UI.displayCamp(e);
+    });
+};
+
+UI.displayCamp = function(data){
+    var x = data.x*UI.SSmap.width - 50;
+    var y = data.y*UI.SSmap.height;
+    var icon = UI.scene.add.image(x,y,'campdiamond');
+    icon.setScale(0.6);
+    icon.setOrigin(0.5,1);
+    icon.setInteractive();
+    icon.on('pointerover',function(){
+        UI.tooltip.updateInfo('Enemy camp');
+        UI.tooltip.display();
+    });
+    icon.on('pointerout',function(){
+        UI.tooltip.hide();
+    });
+    UI.SScontent.push(icon);
 };
 
 UI.selectSettlement = function(id){

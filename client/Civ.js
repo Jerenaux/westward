@@ -13,6 +13,7 @@ var Civ = new Phaser.Class({
     },
 
     setUp: function(data){
+        console.log('setup');
         var civData = Engine.civsData[data.type];
         this.id = data.id;
 
@@ -30,6 +31,7 @@ var Civ = new Phaser.Class({
             left: 117,
             right: 143
         };
+        this.deathFrame = 265;
         this.setFrame(this.restingFrames.down,false,false);
         this.setOrigin(0.2,0.5);
 
@@ -38,7 +40,7 @@ var Civ = new Phaser.Class({
 
         this.setVisible(true);
         this.dead = false;
-        this.name = 'מִ  ת  נַ  גֵ  ד';
+        this.name = 'Behemah'; //'מִ  ת  נַ  גֵ  ד'
 
         this.animPrefix = 'enemy';
         this.footprintsFrame = 0;
@@ -66,7 +68,14 @@ var Civ = new Phaser.Class({
     },
 
     die: function(){
-        this.play(this.animPrefix+'_death');
+        /*console.log('dying');
+        if(Engine.camera.worldView.contains(this.x,this.y)) {
+            this.play(this.animPrefix + '_death');
+        }else{
+            console.log('not in view');
+            this.setFrame(this.deathFrame,false,false);
+        }*/
+        this.setFrame(this.deathFrame,false,false);
         this.dead = true;
     }
 });

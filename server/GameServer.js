@@ -242,7 +242,7 @@ GameServer.setUpCamps = function(){
 
     for (var key in GameServer.campsData) {
         var data = GameServer.campsData[key];
-        GameServer.camps.push(new Camp(data.huts,data.target));
+        GameServer.camps.push(new Camp(data.huts,data.target,data.center));
     }
 
     GameServer.updateStatus();
@@ -269,8 +269,8 @@ GameServer.addItem = function(x,y,type){
 
 GameServer.onInitialized = function(){
     console.warn('--- Performing on initialization tasks ---');
-    GameServer.addAnimal(495,654,0);
-    //GameServer.addCiv(513,657);
+    //GameServer.addAnimal(495,654,0);
+    GameServer.addCiv(468,654).setTrackedTarget({x:518,y:656});
     //var a = GameServer.addAnimal(1204,169,0);
     //var b = GameServer.addAnimal(1205,170,5);
     //GameServer.addAnimal(533,645,0);
@@ -448,7 +448,6 @@ GameServer.handleDisconnect = function(socketID){
 };
 
 GameServer.removeEntity = function(entity){
-    console.warn('removing entity');
     GameServer.removeFromLocation(entity);
     var AOIs = Utils.listAdjacentAOIs(entity.aoi);
     AOIs.forEach(function(aoi){
@@ -630,7 +629,6 @@ GameServer.addBattleCell = function(battle,x,y){
     battle.cells.add(x,y,cell);
 
     GameServer.positions.get(x,y).forEach(function(e){
-        console.warn(e.getShortID());
         if(e.canFight() && e.isAvailableForFight()) GameServer.expandBattle(cell.battle,e);
     });
 };
@@ -992,14 +990,25 @@ GameServer.getBuildings = function(){
     return list;
 };
 
+GameServer.listCamps = function(){
+    return GameServer.camps.map(function(c){
+        return {
+            x: c.center.x/World.worldWidth,
+            y: c.center.y/World.worldHeight
+        };
+    });
+    //trimmed.x = (this.fort.x-30)/World.worldWidth; // quick fix
+    //trimmed.y = (this.fort.y-10)/World.worldHeight;
+};
+
 // List settlements for selection screen
 GameServer.listSettlements = function(trimCallback){
     trimCallback = trimCallback || 'trim';
-    var list = [];
+    var settlements = [];
     for(var id in GameServer.settlements){
-        list.push(GameServer.settlements[id][trimCallback]());
+        settlements.push(GameServer.settlements[id][trimCallback]());
     }
-    return list;
+    return settlements;
 };
 
 GameServer.getSettlements = function(){

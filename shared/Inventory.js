@@ -13,7 +13,6 @@ Inventory.prototype.updateItems = function(items){
     items.forEach(function(i){
         this.update(i[0],parseInt(i[1]));
     },this);
-    console.log(this.items);
 };
 
 Inventory.prototype.clear = function(){

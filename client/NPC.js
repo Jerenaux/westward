@@ -11,7 +11,6 @@ var NPC = new Phaser.Class({
     },
 
     update: function(data){
-        console.warn('updatin');
         Moving.prototype.update.call(this,data);
 
         var callbacks = {
@@ -44,9 +43,6 @@ var NPC = new Phaser.Class({
             if(this.dead){
                 cursor = 'cursor';
             }else{
-                /*console.warn(this.getRect());
-                console.warn(Engine.player.getRect());
-                console.warn(Utils.nextTo(Engine.player,this));*/
                 cursor = (Utils.nextTo(Engine.player,this) ? 'melee' : Engine.player.getRangedCursor());
             }
         }else{

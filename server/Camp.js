@@ -6,10 +6,11 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 
 
-function Camp(buildings,target){
+function Camp(buildings,target,center){
     this.buildings = [];
     this.people = [];
     this.targetSettlement = target;
+    this.center = center;
 
     buildings.forEach(function(hut){
         this.buildings.push(GameServer.addBuilding({
@@ -72,6 +73,18 @@ Camp.prototype.getBuildingMarkers = function(){
             type: b.type
         }
     });
+};
+
+Camp.prototype.selectionTrim = function(){
+    var trimmed = {};
+    var broadcastProperties = ['id','name','pop','surplus','desc','level'];
+    for(var p = 0; p < broadcastProperties.length; p++){
+        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
+    }
+    trimmed.x = (this.fort.x-30)/World.worldWidth; // quick fix
+    trimmed.y = (this.fort.y-10)/World.worldHeight;
+    trimmed.buildings = this.buildings.length;
+    return trimmed;
 };
 
 module.exports.Camp = Camp;

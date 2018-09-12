@@ -9,12 +9,12 @@ var Hero = new Phaser.Class({
         Player.call(this);
         this.isHero = true;
 
-        this.viewRect = new Phaser.Geom.Rectangle(
+        /*this.viewRect = new Phaser.Geom.Rectangle(
             Engine.camera.scrollX,
             Engine.camera.scrollY,
             Engine.camera.width,
             Engine.camera.height
-        );
+        );*/
     },
 
     setUp: function(data){
@@ -37,7 +37,7 @@ var Hero = new Phaser.Class({
         this.ap = data.ap;
     },
 
-    updateData: function(data){ // don't call this 'update' or conflict with Phaser method
+    updateData: function(data){ // don't call this 'update' or else conflict with Player.update() for other player updates
         var callbacks = {
             'ammo': this.updateAmmo,
             'ap': this.updateAP,
@@ -74,10 +74,10 @@ var Hero = new Phaser.Class({
         Engine.firstSelfUpdate = false;
     },
 
-    updateViewRect: function(){
+    /*updateViewRect: function(){
         this.viewRect.setPosition(Engine.camera.scrollX,Engine.camera.scrollY);
         //console.log(this.viewRect);
-    },
+    },*/
 
     setCommitSlots: function(commitSlots){
         // Data structures are cleared in updateCommitSlots

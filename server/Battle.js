@@ -431,6 +431,10 @@ BattleCell.prototype.getRect = function(){
     }
 };
 
+BattleCell.prototype.getShortID = function(){
+    return 'btl'+this.id;
+};
+
 BattleCell.prototype.trim = function(){
     return {
         id: this.id,

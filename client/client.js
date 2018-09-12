@@ -98,6 +98,10 @@ Client.socket.on('settlement-data',function(data){
     UI.displaySettlements(data);
 });
 
+Client.socket.on('camps-data',function(data){
+    UI.displayCamps(data);
+});
+
 Client.socket.on('update',function(data){ // This event triggers uppon receiving an update packet (data)
     //if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.finalUpdateSchema); // if in binary format, decode first
     //Client.socket.emit('ponq',data.stamp);  // send back a pong stamp to compute latency
@@ -124,6 +128,10 @@ Client.setLocalData = function(id){ // store the player ID in localStorage
 
 Client.requestSettlementData = function(){
     Client.socket.emit('settlement-data');
+};
+
+Client.requestCampsData = function(){
+    Client.socket.emit('camps-data');
 };
 
 Client.sendPath = function(path,action){

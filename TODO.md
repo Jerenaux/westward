@@ -25,8 +25,8 @@ Pillars:
 Chapter 1
 1) The War
 - Set locations of a few camps
--> Dead NPC appear alive if late at the party
--> Inactive civ when in battle with hunter hut
+-> Use centers for orientation pins
+-> Inactive civ when in battle with hunter hut?
 -> Display fired arrows from buildings & players
 -> Can't take action after asking for ranged attack without ranged weapon
 ---
@@ -55,13 +55,6 @@ Chapter 1
 defend trade routes, scout, maintain supplies)
 (-> Control quests distribution?    )
 3) The Wild
-- Fog of war (timed)
--> Display a square on the map
--> Display visibleAOIs on fort map
--> Have visibleAOIs set depend on buildings, esp. towers
--> Synchronize player.visittedAOIs to fort
--> Own fog of wars for players, update own map as they wander, synchronize when back to fort
-- Icons synchronization
 - Proper marker
 - Cursor shenanigans
 => Update texts
@@ -80,6 +73,13 @@ Chapter 2
 - New World (https://worldspinner.com/)
 - New buildings, settlements expansion
 3) The Wild
+- Fog of war (timed)
+-> Display a square on the map
+-> Display visibleAOIs on fort map -> convex hull?
+-> Have visibleAOIs set depend on buildings, esp. towers
+-> Synchronize player.visittedAOIs to fort
+-> Own fog of wars for players, update own map as they wander, synchronize when back to fort
+- Icons synchronization
 - Resources & misc map icons
 - Trade routes (chancellors only), mark on maps
 
@@ -232,8 +232,12 @@ interactions with buildings, time spent in each individual menu, etc.
 Cleaning:
 --------
 Performance:
-- Much batter position handling
-- Server-side, have all entities maintain Rect objects for proximity computations (e.g. checkForBattle etc.)
+- Concile the two coexisting menu update systems: the one used by updateSelf and the one used by updateBuilding
+-> All menus have an update() method called on display; upon new server data, only update() the current menu
+-> DOn't call all updates on display; update when receiving server data, and that's it
+- Rethink the calling of all events on menu open
+
+
 - Remove unnecessary files
 - Use pool for notifications
 - Avoid duplicate pins in maps, danger pins etc.
@@ -241,9 +245,6 @@ Performance:
 - "Sleep" mode for NPC when no player in currentAOI.entities (change flags on AOI transition, not on every NPC update loop iteration)
 -> Also applyes to aggro detection
 - Pathmaking instead of pahfinding?
-- Concile the two coexisting menu update systems: the one used by updateSelf and the one used by updateBuilding
--> All menus have an update() method called on display; upon new server data, only update() the current menu
--> DOn't call all updates on display; update when receiving server data, and that's it
 - Dont send full building inventories when buying/selling (send arrays of deltas)
 - Fix null values in left-fringe chunks (fixed?)
 ->nulls in corrupted chunks likely arise from "undefined" values being converted to null by JSON.stringify
@@ -251,7 +252,6 @@ Performance:
 - listCollisions: don't store water tiles, only shore etc. (! beware of impact on trailblazer)
 - Flattening: second pass to delete water-only chunks based on visibility
 - Flattening based on transparency
-- Store tiles of the shape of a building somewhere instead of recomputing (e.g. in canBuild) [May be obsolete if buildings have rect shapes in future]
 Order:
 - Proper initial cursor (using continuous polling or sth?)
 - Central shared list of entities
@@ -261,26 +261,17 @@ Order:
 - Add as much stuff as possible to config file
 - Deal differently with net updates when visibility lost (https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
 - Reimplement maps using containers
-- Refactor building management, shapes, positioning... (from bottom-left)
 - Use containers
 - Clean schemas
 - Use data registry for data exchange between scenes (see Phaser World 119)
 - Client-side, GameObject use tx and ty while Moving use tileX and tileY (and they both have a setPosition method)
 => fix in processItemClick, etc, test a lot
-- Clean scene transition code
 - Move UI stuff from Engine to UI
-- Building update: somehow check for fields in data not in map, and make a warning?
-- Remove quick fixes about setFrame (big buttons, ctrl+f on quick fix)
 - "getName()" method to get items names rather than accessing dict
 - Rework longslot system
-- Rethink the calling of all events on menu open
 - Setters/getters everywhere
-- Client-side, move common update elements of player and animal to new moving.update()
-- StatsManager (NetworkManager?)
-- Clean up Building.update() and updateSelf()
 - Centralize all texts (incl. stats, equip, and even item descriptions)
 - Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
-- Remove unnecessary files (esp. sprites)
 - Remove "longslot" stuff intended for stretching longslots vertically?
 - Find out how to generate graphics objects (grid tiles, gradients...) programmatically for various uses
 - One clean, central way to manage tilesets, config variables, depth, blitters... (blitter selection in client/Chunk, "mawLayer" field in WorldEditor ...)
@@ -467,7 +458,7 @@ or
 - View info on other players (levels...)
 - Guilds
 * Orientations
--> Use new Phaser 3.11 Camera.worldView for on-screen checks
+-> Use new Phaser 3.11 Camera.worldView for on-screen checks for orientation pins (instead of player.viewRect, updateviewrect etc)
 - Pins for gunshots and explosions (requires special networking for long-distance sounds)
 -> Much slower noise variation according to distance (since heard from very far)
 -> Pin disappears after a few seconds

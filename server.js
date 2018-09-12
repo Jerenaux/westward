@@ -179,8 +179,11 @@ io.on('connection',function(socket){
     });
 
     socket.on('settlement-data',function(){
-        console.log('processing settlement data');
         socket.emit('settlement-data',gs.listSettlements('selectionTrim'));
+    });
+
+    socket.on('settlement-data',function(){
+        socket.emit('camps-data',gs.listCamps());
     });
 
     socket.on('disconnect',function(){

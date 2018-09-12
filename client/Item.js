@@ -40,8 +40,7 @@ var Item = new Phaser.Class({
 
     manageOrientationPin: function(){
         //return; // enable based on explorer abilities
-        var viewRect = new Phaser.Geom.Rectangle(Engine.camera.scrollX,Engine.camera.scrollY,Engine.camera.width-World.tileWidth,Engine.camera.height-World.tileHeight);
-        var inCamera = viewRect.contains(this.x,this.y);
+        var inCamera = Engine.camera.worldView.contains(this.x,this.y);
         if(inCamera) {
             this.orientationPin.hide();
         }else{
