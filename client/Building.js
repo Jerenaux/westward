@@ -226,14 +226,14 @@ var Building = new Phaser.Class({
         }
     },
 
-    handleHit: function(dmg){
+    handleHit: function(data){
         var pos = this.getHPposition();
-        Engine.displayHit(this,pos.x,pos.y,50,80,dmg,false);
+        Engine.displayHit(this,pos.x,pos.y,50,80,data.dmg,false,data.delay);
     },
 
-    handleMiss: function(){
+    handleMiss: function(data){
         var pos = this.getHPposition();
-        Engine.displayHit(this,pos.x,pos.y,50,80,null,true);
+        Engine.displayHit(this,pos.x,pos.y,50,80,null,true,data.delay);
     },
 
     processRangedAttack: function(data){

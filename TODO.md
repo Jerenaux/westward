@@ -25,13 +25,7 @@ Pillars:
 Chapter 1
 1) The War
 -> Have arrows and anims target center
--> Test bomb overlap (do not affect people touching area)
--> Bomb throw
--> Bomb sfx
-- Set locations of a few camps
--> Remove pins of dead npc
 -> trimPath for multicell entities
--> Wrong area for hunter huts? Same with towers, doesn't go "high" enough in y
 -> Camps not raiding online players?
 -> Wolves keep occupying same cell
 -> Test fights with bears
@@ -41,6 +35,7 @@ Chapter 1
 - New "building damage" stat (allows introducing specialized weapons: maces, ...)
 => Ranged weapon have very low building damage, melee weapon more, maces and axes much more, bombs a lot
 - Multiple bomb types with variable stats
+- Set locations of a few camps
 2) The Economy
 - Flows from tradepost? (Food to fort, ingredients to workshop)
 - Flow of some finished products (workshop -> trade post)? e.g. ammo ...
@@ -70,6 +65,7 @@ Chapter 2
 - Barracks and troops (need food inflow to barracks)
 - Fortified civ camps, rebuilds
 - More involved raid mechanics
+- NPC used ranged attacks (no firarms and bombs though)
 2) The Economy
 - More advanced simulations to balance resources
 - Permanent, named players
@@ -257,6 +253,8 @@ Performance:
 - Flattening: second pass to delete water-only chunks based on visibility
 - Flattening based on transparency
 Order:
+- Look up and put as many parameters as possible in conf
+- Inyegrate battle.processAttack & battle.processAoE?
 - Proper initial cursor (using continuous polling or sth?)
 - Central shared list of entities
 - Remove global engine hover/out events, use local ones in animals, buildings...

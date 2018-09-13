@@ -18,7 +18,6 @@ function Battle(){
         'Civ': 0,
         'Player': 0
     };
-    //this.spannedAOIs = new Set();
     this.positions = new SpaceMap(); // positions occupied by fighters (obsolete?)
     this.cells = new SpaceMap(); // all the BattleCell objects, used for battle pathfinding
 
@@ -201,35 +200,6 @@ Battle.prototype.setEndOfTurn = function(delay){
     this.endTime = this.countdown - delay;
 };
 
-Battle.prototype.processAoE = function(f,tx,ty){
-    // TODO: add thrower anim
-    if(!f.hasItem(4,1)) return false;
-    f.takeItem(4,1);
-    f.setProperty('animation',{
-        name: 'explosion',
-        x: tx,
-        y: ty
-    });
-    var rect = {
-        x: tx-1,
-        y: ty-1,
-        w: 3,
-        h: 3
-    };
-    this.fighters.forEach(function(f){
-        if(Utils.overlap(rect,f.getRect())){
-            var dmg = this.computeDamage('bomb',null,f);
-            var killed = this.applyDamage(f,dmg);
-            f.setProperty('hit',dmg); // for the flash and hp display
-            if(killed && f.isPlayer) f.addNotif(f.name+' killed');
-        }
-    },this);
-    return {
-        success: true,
-        delay: 1000
-    };
-};
-
 Battle.prototype.processMove = function(f){
     //var busy = this.positions.get(f.x,f.y);
     //if(busy && (busy.getShortID() == f.getShortID())) this.positions.delete(f.x,f.y);
@@ -300,8 +270,13 @@ Battle.prototype.computeRangedHit = function(a,b){
     return rand < chance;
 };
 
-Battle.prototype.computeTOF = function(a,b){
-    return (Utils.euclidean(a.getShootingPoint(),b)/15)*1000; // TODO: put 15 (arrow speed) in conf
+Battle.prototype.computeTOF = function(a,b,type){
+    // TODO: put speed in conf, different speed for arrow and bomb
+    var speeds = {
+        'arrow': 15,
+        'bomb': 10
+    };
+    return (Utils.euclidean(a.getShootingPoint(),b)/speeds[type])*1000;
 };
 
 Battle.prototype.applyDamage = function(f,dmg){
@@ -314,12 +289,57 @@ Battle.prototype.applyDamage = function(f,dmg){
     return false;
 };
 
-// Called each time a fighter dies, add its XP to the running total
-Battle.prototype.rewardXP = function(xp){
+Battle.prototype.processAoE = function(f,tx,ty){
+    // TODO: integrate to processAttack?
+    if(!f.hasItem(4,1)) return false;
+    f.takeItem(4,1);
+    var launchDelay = 100;
+    var tof = this.computeTOF(f,{x:tx,y:ty},'bomb');
+    var delay = launchDelay+tof;
+    f.setProperty('animation',{
+        name: 'explosion',
+        sound: 'bomb',
+        x: tx,
+        y: ty,
+        delay: delay
+    });
+    f.setProperty('bomb_atk',
+    {
+        x:tx,
+        y:ty,
+        delay: launchDelay,
+        duration: tof
+    });
+    var rect = {
+        x: tx-1,
+        y: ty-1,
+        w: 3,
+        h: 3
+    };
+    var damages = [];
     this.fighters.forEach(function(f){
-        if(f.isPlayer) f.xpPool += xp;
-    })
+        if(Utils.overlap(rect,f.getRect())){
+            var dmg = this.computeDamage('bomb',null,f);
+            damages.push([f,dmg]);
+            f.setProperty('hit',{
+                dmg: dmg,
+                delay: delay
+            }); // for the flash and hp display
+        }
+    },this);
+    setTimeout(function(){
+        damages.forEach(function(d){
+            var f = d[0];
+            var killed = this.applyDamage(f,d[1]);
+            if(killed && f.isPlayer) f.addNotif(f.name+' killed');
+        },this);
+    }.bind(this),delay);
+    return {
+        success: true,
+        delay: delay
+    };
 };
+
 
 Battle.prototype.processAttack = function(a,b){ // a attacks b
     var delay = 0;
@@ -330,7 +350,6 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
         delay = 500; //TODO: config
         a.setProperty('melee_atk',{x:b.x,y:b.y}); // for the attack animation of attacker
         dmg = this.computeDamage('melee',a,b);
-        //killed = this.applyDamage(b,dmg);
         var pos = Utils.relativePosition(a,b);
         a.setProperty('animation',{
             name: 'sword',
@@ -344,7 +363,7 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
     }else{
         if(!a.canRange()) return false;
         var fireDelay = 500; // TODO: conf
-        var tof = this.computeTOF(a,b);
+        var tof = this.computeTOF(a,b,'arrow');
         delay = fireDelay + tof;
         a.setProperty('ranged_atk',
             {
@@ -385,6 +404,13 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
 
 Battle.prototype.findPath = function(from,to){
     return this.pathFinder.findPath(from,to);
+};
+
+// Called each time a fighter dies, add its XP to the running total
+Battle.prototype.rewardXP = function(xp){
+    this.fighters.forEach(function(f){
+        if(f.isPlayer) f.xpPool += xp;
+    })
 };
 
 // Entites are only removed when the battle is over ; battlezones are only cleared at that time

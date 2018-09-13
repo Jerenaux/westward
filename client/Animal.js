@@ -40,7 +40,11 @@ var Animal = new Phaser.Class({
         this.footprintsFrame = animalData.footprintsFrame;
         this.printsVertOffset = animalData.printsVertOffset;
         this.restingFrames = animalData.restingFrames;
+        //this.manageOrientationPin();
+    },
 
+    update: function(data){
+        NPC.prototype.update.call(this,data);
         this.manageOrientationPin();
     },
 

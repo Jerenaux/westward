@@ -88,6 +88,7 @@ Engine.preload = function() {
     Engine.audioFiles = [];
     this.load.audio('arrow','assets/sfx/arrow.wav');
     this.load.audio('arrow_miss','assets/sfx/arrow_miss.wav');
+    this.load.audio('bomb','assets/sfx/bomb.wav');
     this.load.audio('footsteps','assets/sfx/footsteps.wav');
     this.load.audio('sellbuy','assets/sfx/sell_buy_item.wav');
     this.load.audio('speech','assets/sfx/speech.ogg');
@@ -244,6 +245,7 @@ Engine.create = function(){
     });
     Engine.footprintsPool = new Pool('image','footsteps');
     Engine.arrowsPool = new Pool('image','items');
+    Engine.bombsPool = new Pool('image','items2');
     Engine.textPool = new Pool('text');
 
     Engine.players = {}; // player.id -> player object
@@ -349,7 +351,6 @@ Engine.initWorld = function(data){
     Engine.showMarker();
     Engine.miniMap.display();
     Engine.updateAllOrientationPins();
-
 
     if(Client.isNewPlayer()) {
         var w = 400;
@@ -677,7 +678,8 @@ Engine.handleBattleAnimation = function(data){
     sprite.setPosition(x,y);
     sprite.setDepth(5);
     sprite.on('animationstart',function(){
-       Engine.playLocalizedSound('hit',1,{x:data.x,y:data.y});
+        var sound = data.sound || 'hit';
+        Engine.playLocalizedSound(sound,1,{x:data.x,y:data.y});
     });
     setTimeout(function(){
         sprite.setVisible(true);
@@ -697,12 +699,11 @@ Engine.displayArrow = function(from,to,depth,duration,delay){ // All coordinates
     Engine.scene.tweens.add(
         {
             targets: arrow,
-            x: (to.x+0.5)*32,
-            y: (to.y+0.5)*32,
+            x: (parseInt(to.x)+0.5)*32,
+            y: (parseInt(to.y)+0.5)*32,
             duration: duration,
             delay: delay,
             onComplete: function(){
-                //arrow.destroy();
                 arrow.recycle();
             }
         }
@@ -710,6 +711,31 @@ Engine.displayArrow = function(from,to,depth,duration,delay){ // All coordinates
     Engine.playLocalizedSound('arrow',4,{x:from.x/32,y:from.y/32});
     setTimeout(function(){
         arrow.setVisible(true);
+    },delay);
+};
+
+Engine.displayBomb = function(from,to,depth,duration,delay){ // All coordinates are pixels
+    var bomb = Engine.bombsPool.getNext();
+    bomb.setFrame('bomb');
+    bomb.setPosition(from.x+16,from.y+16);
+    bomb.setDepth(depth);
+    bomb.setVisible(false);
+
+    Engine.scene.tweens.add(
+        {
+            targets: bomb,
+            x: (parseInt(to.x)+0.5)*32,
+            y: (parseInt(to.y)+0.5)*32,
+            angle: '+=360',
+            duration: duration,
+            delay: delay,
+            onComplete: function(){
+                bomb.recycle();
+            }
+        }
+    );
+    setTimeout(function(){
+        bomb.setVisible(true);
     },delay);
 };
 

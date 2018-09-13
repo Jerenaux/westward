@@ -156,6 +156,16 @@ var Player = new Phaser.Class({
         Engine.displayArrow(from,{x:data.x,y:data.y},this.depth+1,data.duration,data.delay);
     },
 
+    processBombThrow: function(data){ // TODO: move up to NPC if they'll throw bombs
+        this.setOrientation({x:data.x,y:data.y});
+        this.play(this.animPrefix+'_attack_'+this.orientation);
+        var from = {
+            x: this.x,
+            y: this.y - 10
+        };
+        Engine.displayBomb(from,{x:data.x,y:data.y},this.depth+1,data.duration,data.delay);
+    },
+
     setDestinationAction: function(type,id,x,y){
         // TODO: centralize somewhere
         // 1 = enter building, 2 = skin, 3 = pick item, 4 = civ-related

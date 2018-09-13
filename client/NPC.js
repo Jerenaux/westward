@@ -22,6 +22,7 @@ var NPC = new Phaser.Class({
             if(!callbacks.hasOwnProperty(field)) continue;
             if(field in data) callbacks[field].call(this,data[field]);
         }
+        this.manageOrientationPin();
     },
 
 

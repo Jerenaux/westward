@@ -343,7 +343,7 @@ Building.prototype.getBattleAreaAround = function(cells){
     cells = cells || new SpaceMap();
 
     for(var x = -1; x <= this.cellsWidth; x++){
-        for(var y = 0; y <= this.cellsHeight+1; y++) {
+        for(var y = -1; y <= this.cellsHeight+1; y++) {
             var realx = this.x + this.coll.x + x;
             var realy = this.y + this.coll.y + y;
             if(!GameServer.checkCollision(realx,realy)) cells.add(realx,realy);

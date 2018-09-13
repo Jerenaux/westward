@@ -270,7 +270,7 @@ GameServer.addItem = function(x,y,type){
 GameServer.onInitialized = function(){
     console.warn('--- Performing on initialization tasks ---');
     //GameServer.addAnimal(495,654,0);
-    GameServer.addCiv(533,656);
+    GameServer.addCiv(393,590).setTrackedTarget({x:481,y:667});
     //var a = GameServer.addAnimal(1204,169,0);
     //var b = GameServer.addAnimal(1205,170,5);
     //GameServer.addAnimal(533,645,0);

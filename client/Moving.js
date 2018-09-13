@@ -18,6 +18,7 @@ var Moving = new Phaser.Class({
     update: function(data){
         var callbacks = {
             'animation': Engine.handleBattleAnimation,
+            'bomb_atk': this.processBombThrow,
             'hit': this.handleHit, // for HP display and blink
             'melee_atk': this.processMeleeAttack, // for character animation
             'ranged_atk': this.processRangedAttack, // for character animation
@@ -75,13 +76,14 @@ var Moving = new Phaser.Class({
     manageOrientationPin: function(){
         if(this.isHero) return;
         if(!this.orientationPin) return;
+
         if(this.dead) {
             this.orientationPin.hide();
             return;
         }
-        //var viewRect = new Phaser.Geom.Rectangle(Engine.camera.scrollX-10,Engine.camera.scrollY-10,Engine.camera.width+20,Engine.camera.height+20);
-        //var inCamera =  viewRect.contains(this.x,this.y);
-        var inCamera = Engine.camera.worldView.contains(this.x,this.y);
+
+        var c = this.getCenter();
+        var inCamera = Engine.camera.worldView.contains(c.x,c.y);
         if(inCamera) {
             this.orientationPin.hide();
         }else{
@@ -341,5 +343,12 @@ var Moving = new Phaser.Class({
             w: this.cellsWidth,
             h: this.cellsHeight
         }
+    },
+
+    getCenter: function(){
+        return {
+            x: Math.floor(this.x + this.cellsWidth*16),
+            y: Math.floor(this.y + this.cellsHeight*16)
+        };
     }
 });

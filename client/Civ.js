@@ -45,7 +45,7 @@ var Civ = new Phaser.Class({
         this.footprintsFrame = 0;
         this.printsVertOffset = 10;
 
-        this.manageOrientationPin();
+        //this.manageOrientationPin();
     },
 
     processMeleeAttack: function(facing){
