@@ -23,6 +23,10 @@ function NPC(){
 NPC.prototype = Object.create(MovingEntity.prototype);
 NPC.prototype.constructor = NPC;
 
+NPC.prototype.isInVision = function(){
+    return GameServer.vision.has(this.aoi);
+};
+
 // ### Equipment ###
 
 NPC.prototype.setLoot = function(loot){
@@ -55,6 +59,7 @@ NPC.prototype.setStat = function(key,value){
 // ### Battle ###
 
 NPC.prototype.checkForAggro = function(){
+    if(!this.isInVision()) return;
     if(!this.isAggressive() || this.isInFight() || !this.isAvailableForFight()) return;
 
     var AOIs = this.fieldOfVision;

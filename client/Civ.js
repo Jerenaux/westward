@@ -13,7 +13,6 @@ var Civ = new Phaser.Class({
     },
 
     setUp: function(data){
-        console.log('setup');
         var civData = Engine.civsData[data.type];
         this.id = data.id;
 

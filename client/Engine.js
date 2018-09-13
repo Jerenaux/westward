@@ -75,8 +75,6 @@ Engine.preload = function() {
     // Misc
     this.load.image('bug', 'assets/sprites/bug.png');
     this.load.atlas('orientation', 'assets/sprites/orientation.png', 'assets/sprites/orientation.json');
-    //this.load.image('orientation', 'assets/sprites/orientation.png');
-    //this.load.image('wolforient', 'assets/sprites/wolforient.png');
     this.load.image('tail', 'assets/sprites/tail.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll.png');
     this.load.image('longscroll', 'assets/sprites/longscroll.png');
@@ -88,6 +86,8 @@ Engine.preload = function() {
 
     // SFX
     Engine.audioFiles = [];
+    this.load.audio('arrow','assets/sfx/arrow.wav');
+    this.load.audio('arrow_miss','assets/sfx/arrow_miss.wav');
     this.load.audio('footsteps','assets/sfx/footsteps.wav');
     this.load.audio('sellbuy','assets/sfx/sell_buy_item.wav');
     this.load.audio('speech','assets/sfx/speech.ogg');
@@ -216,6 +216,7 @@ Pool.prototype.getNext = function(){
 };
 
 Pool.prototype.recycle = function(element){
+    //console.warn('recycling element');
     this.reserve.push(element);
 };
 
@@ -242,6 +243,7 @@ Engine.create = function(){
         Engine.animationsPools[key] = new Pool('sprite',key);
     });
     Engine.footprintsPool = new Pool('image','footsteps');
+    Engine.arrowsPool = new Pool('image','items');
     Engine.textPool = new Pool('text');
 
     Engine.players = {}; // player.id -> player object
@@ -384,7 +386,6 @@ Engine.initWorld = function(data){
 };
 
 Engine.ambientSounds = function(sounds,interval){
-    return;
     setInterval(function(){
         var sound = Utils.randomElement(sounds);
         Engine.scene.sound.add(sound.name).setVolume(sound.volume).play();
@@ -675,7 +676,7 @@ Engine.handleBattleAnimation = function(data){
     var y = data.y*Engine.tileHeight;
     sprite.setPosition(x,y);
     sprite.setDepth(5);
-    sprite.once('animationstart',function(){
+    sprite.on('animationstart',function(){
        Engine.playLocalizedSound('hit',1,{x:data.x,y:data.y});
     });
     setTimeout(function(){
@@ -684,9 +685,11 @@ Engine.handleBattleAnimation = function(data){
     },data.delay);
 };
 
-Engine.displayArrow = function(from,to,duration,delay){
-    var arrow = Engine.scene.add.sprite(from.x+16,from.y+16,'items','arrow');
-    arrow.setDepth(from.depth);
+Engine.displayArrow = function(from,to,depth,duration,delay){ // All coordinates are pixels
+    var arrow = Engine.arrowsPool.getNext();
+    arrow.setFrame('arrow');
+    arrow.setPosition(from.x+16,from.y+16);
+    arrow.setDepth(depth);
     arrow.setVisible(false);
     var angle = Phaser.Math.Angle.Between(from.x,from.y,to.x*32,to.y*32)*(180/Math.PI);
     arrow.setAngle(angle + 45);
@@ -699,10 +702,12 @@ Engine.displayArrow = function(from,to,duration,delay){
             duration: duration,
             delay: delay,
             onComplete: function(){
-                arrow.destroy();
+                //arrow.destroy();
+                arrow.recycle();
             }
         }
     );
+    Engine.playLocalizedSound('arrow',4,{x:from.x/32,y:from.y/32});
     setTimeout(function(){
         arrow.setVisible(true);
     },delay);
@@ -716,6 +721,7 @@ Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss,delay){
     text.setPosition(x,y);
     text.setDepth(target.depth+1);
     text.setText(miss ? 'Miss' : '-'+dmg);
+    text.setVisible(false);
 
     // HP tween
     Engine.scene.tweens.add(
@@ -724,15 +730,13 @@ Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss,delay){
             y: target.y-yDelta,
             duration: 1000,
             delay: delay,
-            /*onStart: function(){
-                text.setVisible(true);
-            },*/
             onComplete: function(){
                 text.recycle();
             }
         }
     );
     setTimeout(function(){
+        if(miss) Engine.playLocalizedSound('arrow_miss',4,{x:x/32,y:y/32});
         text.setVisible(true);
     },delay);
 

@@ -149,8 +149,11 @@ var Player = new Phaser.Class({
     processRangedAttack: function(data){ // TODO: move elsewhere when NPC will be able to range
         this.setOrientation({x:data.x,y:data.y});
         this.play(this.animPrefix+'_bow_'+this.orientation);
-
-        Engine.displayArrow(this,{x:data.x,y:data.y},data.duration,data.delay);
+        var from = {
+            x: this.x,
+            y: this.y - 10
+        };
+        Engine.displayArrow(from,{x:data.x,y:data.y},this.depth+1,data.duration,data.delay);
     },
 
     setDestinationAction: function(type,id,x,y){

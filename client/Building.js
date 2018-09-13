@@ -33,6 +33,7 @@ var Building = new Phaser.Class({
         this.coll = coll;
         this.cellsWidth = coll.w;
         this.cellsHeight = coll.h;
+        this.shootFrom = buildingData.shootFrom;
 
         this.buildingType = data.type;
         this.settlement = data.sid;
@@ -101,6 +102,7 @@ var Building = new Phaser.Class({
 
     update: function (data) {
         var callbacks = {
+            'animation': Engine.handleBattleAnimation,
             'buildings': this.setBuildingsListing,
             'built': this.setBuilt,
             'committed': this.setCommitted,
@@ -235,7 +237,11 @@ var Building = new Phaser.Class({
     },
 
     processRangedAttack: function(data){
-        Engine.displayArrow(this,{x:data.x,y:data.y},data.duration,data.delay);
+        var from = {
+            x: this.x + this.shootFrom.x,
+            y: this.y - (this.height-this.shootFrom.y)
+        }; // All coordinates are pixels
+        Engine.displayArrow(from,{x:data.x,y:data.y},this.depth+1,data.duration,data.delay);
     },
 
     // ### GETTERS ###
@@ -291,9 +297,9 @@ var Building = new Phaser.Class({
 
     // ### INPUT ###
 
-    handleDown: function(){
+    /*handleDown: function(){
         //UI.setCursor(UI.buildingCursor2);
-    },
+    },*/
 
 
     handleClick: function () {

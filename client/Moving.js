@@ -13,7 +13,6 @@ var Moving = new Phaser.Class({
         this.previousOrientation = null;
         this.movement = null;
         this.currentPath = [];
-
     },
 
     update: function(data){
@@ -326,7 +325,7 @@ var Moving = new Phaser.Class({
         Engine.displayHit(this,pos.x,pos.y,20,40,data.dmg,false,data.delay);
    },
 
-    handleMiss: function(){
+    handleMiss: function(data){
         var pos = this.getHPposition();
         Engine.displayHit(this,pos.x,pos.y,20,40,null,true,data.delay);
     },

@@ -645,8 +645,8 @@ Player.prototype.addMsg = function(msg){
     this.updatePacket.addMsg(msg);
 };
 
-Player.prototype.addNotif = function(msg,delay){
-    this.updatePacket.addNotif(msg,delay);
+Player.prototype.addNotif = function(msg){
+    this.updatePacket.addNotif(msg);
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){
@@ -667,6 +667,13 @@ Player.prototype.remove = function(){
     this.onRemoveAtLocation();
     delete GameServer.players[this.id];
     GameServer.updateVision();
+};
+
+Player.prototype.getShootingPoint = function(){
+    return {
+        x: this.x+1,
+        y: this.y+1
+    };
 };
 
 module.exports.Player = Player;

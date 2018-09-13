@@ -38,6 +38,7 @@ function Building(data){
     this.entrance = buildingData.entrance;
     this.cellsWidth = coll.w;
     this.cellsHeight = coll.h;
+    this.shootFrom = buildingData.shootFrom;
 
     this.skipBattleTurn = !buildingData.canFight;
     this.name = buildingData.name;
@@ -145,6 +146,7 @@ Building.prototype.updateProd = function(){
         var actualNb = increment;
         //console.log('producing ',actualNb,' ',GameServer.itemsData[item].name);
         if(actualNb > 0) this.settlement.addToFort(item,actualNb);
+        //if(actualNb > 0) this.settlement.dispatch(item,actualNb);
     }
 };
 
@@ -444,6 +446,13 @@ Building.prototype.getRect = function(){
         w: this.cellsWidth,
         h: this.cellsHeight
     }
+};
+
+Building.prototype.getShootingPoint = function(){
+    return {
+        x: this.x + Math.round(this.shootFrom.x/32),
+        y: this.y - (this.height-Math.round(this.shootFrom.y/32))
+    };
 };
 
 module.exports.Building = Building;

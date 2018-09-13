@@ -49,18 +49,18 @@ var Item = new Phaser.Class({
         }
     },
 
-    handleDown: function(){
+    /*handleDown: function(){
         UI.setCursor(UI.handCursor2);
-    },
+    },*/
 
     handleClick: function(){
         if(!BattleManager.inBattle) Engine.processItemClick(this);
-        UI.setCursor(UI.handCursor);
+        //UI.setCursor(UI.handCursor);
     },
 
     setCursor: function(){
         if(BattleManager.inBattle || Engine.inMenu) return;
-        UI.setCursor(UI.handCursor);
+        UI.setCursor('item');
         UI.tooltip.updateInfo(this.name);
         UI.tooltip.display();
     },

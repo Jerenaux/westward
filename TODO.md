@@ -24,12 +24,9 @@ Pillars:
 
 Chapter 1
 1) The War
--> Arrow SFX
 -> Have arrows and anims target center
--> Have them come from a configured shooting position
--> Time death anim accordingly (move all damage processing at the end, to be worked out after animations)
 - Set locations of a few camps
----
+-> Remove pins of dead npc
 -> trimPath for multicell entities
 -> Wrong area for hunter huts? Same with towers, doesn't go "high" enough in y
 -> Camps not raiding online players?
@@ -45,6 +42,7 @@ Chapter 1
 2) The Economy
 - Resource flows between buildings, incl. gold generation
 - Introduce new wood ingredient obtained from timber (logs?)
+- Have hunter huts produce pelts
 - Fix the right amount of buildings in each settlement, their output per turn, turn duration
 + set suitable stocks to bootstrap economy
 - Starvation (impact) (think of ways to make it painfully visible)
@@ -63,7 +61,7 @@ defend trade routes, scout, maintain supplies)
 
 Chapter 2
 1) The War
-- Barracks and troops
+- Barracks and troops (need food inflow to barracks)
 - Fortified civ camps, rebuilds
 - More involved raid mechanics
 2) The Economy
@@ -238,13 +236,11 @@ Performance:
 -> DOn't call all updates on display; update when receiving server data, and that's it
 - Rethink the calling of all events on menu open
 
-- Pool for arrows and projectiles
+- Make audio sprite
 - Remove unnecessary files
 - Use pool for notifications
 - Avoid duplicate pins in maps, danger pins etc.
 - Fix "already existing/non-existing" bugs
-- "Sleep" mode for NPC when no player in currentAOI.entities (change flags on AOI transition, not on every NPC update loop iteration)
--> Also applyes to aggro detection
 - Pathmaking instead of pahfinding?
 - Dont send full building inventories when buying/selling (send arrays of deltas)
 - Fix null values in left-fringe chunks (fixed?)
@@ -268,7 +264,6 @@ Order:
 - Client-side, GameObject use tx and ty while Moving use tileX and tileY (and they both have a setPosition method)
 => fix in processItemClick, etc, test a lot
 - Move UI stuff from Engine to UI
-- "getName()" method to get items names rather than accessing dict
 - Rework longslot system
 - Setters/getters everywhere
 - Centralize all texts (incl. stats, equip, and even item descriptions)
@@ -283,6 +278,7 @@ Order:
 Content:
 -------
 * Ambiance
+- Use all the AoE2 sounds
 - From : https://forums.rpgmakerweb.com/index.php?threads/whtdragons-animals-and-running-horses-now-with-more-dragons.53552/
 -> Add seagulls, birds, frogs, small mammals, fishes (tinted), ...
 -> Have fun with unicorn

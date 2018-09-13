@@ -20,6 +20,35 @@ function Settlement(data){
     this.buildings = [];
     this.players = [];
 
+    // TODO: make modifiable
+    this.dispatch = {
+        1: [ // food
+            [0,0,1] // 100% food to fort
+        ],
+        3: [ // timber
+            [0,0,8], // 80% timbe to fort ...
+            [1,0,1],
+            [3,0,1]
+        ]
+        /*22: {// coal
+            1: 10,
+            3: 90
+        },
+        24: { // iron ore
+            1: 10,
+            3: 90
+        },
+        25: { // gold ore
+            1: 10,
+            3: 90
+        },
+        34: { // sulfur
+            1: 10,
+            3: 90
+        }*/
+        // TODO: move some finished products from workshop to trade post
+    };
+
     GameServer.settlements[this.id] = this;
 }
 
@@ -110,6 +139,12 @@ Settlement.prototype.takeFromFort = function(item,nb){
 Settlement.prototype.refreshListing = function(){
     if(!this.fort) return;
     this.fort.refreshListing();
+};
+
+Settlement.prototype.dispatch = function(item,nb){
+    for(var targetBld in this.dispatch[item]){
+
+    }
 };
 
 Settlement.prototype.consumeFood = function(){

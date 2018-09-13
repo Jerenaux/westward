@@ -98,6 +98,7 @@ Animal.prototype.setIdle = function(){
 };
 
 Animal.prototype.updateIdle = function(){
+    if(!this.isInVision()) return;
     if(this.isInFight() || this.isDead()) return;
     this.idleTime -= GameServer.NPCupdateRate;
     if(this.idleTime <= 0){

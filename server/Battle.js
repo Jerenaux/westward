@@ -301,7 +301,7 @@ Battle.prototype.computeRangedHit = function(a,b){
 };
 
 Battle.prototype.computeTOF = function(a,b){
-    return (Utils.euclidean(a,b)/15)*1000; // TODO: put 15 (arrow speed) in conf
+    return (Utils.euclidean(a.getShootingPoint(),b)/15)*1000; // TODO: put 15 (arrow speed) in conf
 };
 
 Battle.prototype.applyDamage = function(f,dmg){
@@ -323,13 +323,14 @@ Battle.prototype.rewardXP = function(xp){
 
 Battle.prototype.processAttack = function(a,b){ // a attacks b
     var delay = 0;
+    var dmg = 0;
     var killed = false;
     if(!b || b.isDead()) return;
     if(Utils.nextTo(a,b)){
         delay = 500; //TODO: config
         a.setProperty('melee_atk',{x:b.x,y:b.y}); // for the attack animation of attacker
-        var dmg = this.computeDamage('melee',a,b);
-        killed = this.applyDamage(b,dmg);
+        dmg = this.computeDamage('melee',a,b);
+        //killed = this.applyDamage(b,dmg);
         var pos = Utils.relativePosition(a,b);
         a.setProperty('animation',{
             name: 'sword',
@@ -354,11 +355,9 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
             }); // Character aimation + arrow; coordinates are to determine which direction to face
         var ammoID = a.decreaseAmmo();
         var hit = this.computeRangedHit(a,b);
-        hit = true; //TODO: remove
         if(hit){
             if(b.isNPC && ammoID > -1) b.addToLoot(ammoID,1);
             dmg = this.computeDamage('ranged',a,b);
-            killed = this.applyDamage(b,dmg);
             // TODO: use getCenter()
             a.setProperty('animation',{
                 name: 'sword',
@@ -374,7 +373,10 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
             b.setProperty('rangedMiss',{delay: delay});
         }
     }
-    if(killed && a.isPlayer) a.addNotif(b.name+' '+(b.isBuilding ? 'destroyed' : 'killed'),delay);
+    setTimeout(function(){
+        killed = this.applyDamage(b,dmg);
+        if(killed && a.isPlayer) a.addNotif(b.name+' '+(b.isBuilding ? 'destroyed' : 'killed'));
+    }.bind(this),delay);
     return {
         success: true,
         delay: delay
