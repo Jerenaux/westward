@@ -145,8 +145,8 @@ Building.prototype.updateProd = function(){
         var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
         var actualNb = increment;
         //console.log('producing ',actualNb,' ',GameServer.itemsData[item].name);
-        if(actualNb > 0) this.settlement.addToFort(item,actualNb);
-        //if(actualNb > 0) this.settlement.dispatch(item,actualNb);
+        //if(actualNb > 0) this.settlement.addToFort(item,actualNb);
+        if(actualNb > 0) this.settlement.dispatchResource(item,actualNb);
     }
 };
 
@@ -276,7 +276,10 @@ Building.prototype.save = function(){
 
         doc.set(_building);
         doc.save(function (err) {
-            if (err) throw err;
+            if (err) {
+                console.log(err);
+                throw err;
+            }
         });
     });
 };

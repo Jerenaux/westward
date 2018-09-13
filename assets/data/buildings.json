@@ -210,7 +210,7 @@
     "mainMenu": "production",
     "displayProd": true,
     "canFight": false,
-    "production": [[1,1]],
+    "production": [[3,1],[9,1]],
     "buildRate":10,
     "health": 50
   },

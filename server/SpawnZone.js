@@ -67,7 +67,7 @@ SpawnZone.prototype.computeDelta = function(map,countMap,type,freeAOIs){
 
 SpawnZone.prototype.spawn = function(AOIs,type,id,nb){
     var data = (type == 'animal' ? GameServer.animalsData[id] : GameServer.itemsData[id]);
-    console.log('Spawning',nb,data.name);
+    //console.log('Spawning',nb,data.name);
 
     var AOI = Utils.randomElement(AOIs);
     var cx = Utils.randomInt(AOI.x,AOI.x+World.chunkWidth);
@@ -84,7 +84,7 @@ SpawnZone.prototype.spawn = function(AOIs,type,id,nb){
             i--;
             continue;
         }
-        console.log(x,y);
+        //console.log(x,y);
         //console.log('spawining in ',AOI.id);
 
         if(type == 'animal') {

@@ -13,7 +13,6 @@ function Settlement(data){
     this.desc = data.description;
     this.level = data.level;
     this.pop = data.population;
-    //this.lastCycle = data.lastCycle;
     this.visibleAOIs = new Set();
 
     this.fort = null;
@@ -26,31 +25,82 @@ function Settlement(data){
             [0,0,1] // 100% food to fort
         ],
         3: [ // timber
-            [0,0,8], // 80% timbe to fort ...
+            [0,0,8], // 80% timber to fort ...
             [1,0,1],
             [3,0,1]
+        ],
+        9: [ // pelts
+           [3,0,4],
+           [1,0,1]
+        ],
+        22:[ // coal
+            [1,0,1],
+            [3,0,9]
+        ],
+        24:[ // iron
+            [1,0,1],
+            [3,0,9]
+        ],
+        25:[ // gold
+            [3,0,1]
+        ],
+        34:[ // sulfur
+            [1,0,1],
+            [3,0,9]
         ]
-        /*22: {// coal
-            1: 10,
-            3: 90
-        },
-        24: { // iron ore
-            1: 10,
-            3: 90
-        },
-        25: { // gold ore
-            1: 10,
-            3: 90
-        },
-        34: { // sulfur
-            1: 10,
-            3: 90
-        }*/
-        // TODO: move some finished products from workshop to trade post
     };
 
     GameServer.settlements[this.id] = this;
 }
+
+Settlement.prototype.dispatchResource = function(item,nb){
+    if(!this.dispatch.hasOwnProperty(item)){
+        console.warn('No dispatch rule for item',item);
+        this.addToFort(item,nb);
+        return;
+    }
+    //console.log('-----Dispatching ',nb,' ',item,'------');
+    var failures = 0;
+    while(nb > 0) {
+        if(failures >= this.dispatch[item].length) break;
+        for (var i = 0; i < this.dispatch[item].length; i++) {
+            var d = this.dispatch[item][i];
+            var type = d[0];
+            var current = d[1];
+            var max = d[2];
+            if (current < max) {
+                var amount = Math.min(max - current, nb);
+                var success = this.addResourceToBuilding(type, item, amount);
+                if(success){
+                    this.dispatch[item][i][1] += amount;
+                    nb -= amount;
+                }else{
+                    failures++;
+                }
+                if (nb == 0) break;
+            }
+        }
+        if(nb > 0){
+            for (var i = 0; i < this.dispatch[item].length; i++) {
+                this.dispatch[item][i][1] = 0;
+            }
+        }
+    }
+};
+
+Settlement.prototype.addResourceToBuilding = function(type,item,nb){
+    var building = this.buildings.find(function(b){
+        return b.type == type;
+    });
+    if(!building){
+        console.warn('No building found of type',type);
+        return false;
+    }
+    if(building.isDestroyed()) return false;
+    building.giveItem(item,nb);
+    console.log('Dispatching',nb,' ',GameServer.itemsData[item].name,' to building',GameServer.buildingsData[type].name);
+    return true;
+};
 
 Settlement.prototype.setModel = function(model) {
     this.model = model;
@@ -141,12 +191,6 @@ Settlement.prototype.refreshListing = function(){
     this.fort.refreshListing();
 };
 
-Settlement.prototype.dispatch = function(item,nb){
-    for(var targetBld in this.dispatch[item]){
-
-    }
-};
-
 Settlement.prototype.consumeFood = function(){
     if(!GameServer.isTimeToUpdate('foodConsumption')) return false;
     var consumption = Formulas.foodConsumption(this.pop);
@@ -201,6 +245,14 @@ Settlement.prototype.update = function(){
         });
         this.refreshListing();
     }
+    this.spontaneousHarvesting();
+};
+
+Settlement.prototype.spontaneousHarvesting = function(){
+    // TODO: conf
+    this.addResourceToBuilding(3,7,Utils.randomInt(1,3)); // wood
+    this.addResourceToBuilding(3,26,Utils.randomInt(1,3)); // stone
+    this.addResourceToBuilding(3,27,Utils.randomInt(1,3)); // bone
 };
 
 Settlement.prototype.save = function(){

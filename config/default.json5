@@ -35,14 +35,14 @@ To add: time gap between two orientation sounds (OrientationPin.display())
    },
    economyCycles: {
         // Unit: seconds
-        turnDuration: 60,
+        turnDuration: 5,
         // Unit: turns
         turns: {
             build: 10,
             camps: 1,
             foodConsumption: 8,
             commitment: 1,
-            production: 10,
+            production: 1, // 10,for buildings + spontaneous harvesting
             settlements: 1,
             spawnZones: 1
         }

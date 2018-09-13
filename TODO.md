@@ -25,26 +25,31 @@ Pillars:
 Chapter 1
 1) The War
 -> Have arrows and anims target center
+-> Test bomb overlap (do not affect people touching area)
+-> Bomb throw
+-> Bomb sfx
 - Set locations of a few camps
 -> Remove pins of dead npc
 -> trimPath for multicell entities
 -> Wrong area for hunter huts? Same with towers, doesn't go "high" enough in y
 -> Camps not raiding online players?
 -> Wolves keep occupying same cell
--> Test bomb overlap (do not affect people touching area)
 -> Test fights with bears
 -> Wander around camp
-- Fix bombs details
 -> Fix NPC positioning
 -> Force battle pathfinding to fit in battle cells
 - New "building damage" stat (allows introducing specialized weapons: maces, ...)
 => Ranged weapon have very low building damage, melee weapon more, maces and axes much more, bombs a lot
+- Multiple bomb types with variable stats
 2) The Economy
-- Resource flows between buildings, incl. gold generation
+- Flows from tradepost? (Food to fort, ingredients to workshop)
+- Flow of some finished products (workshop -> trade post)? e.g. ammo ...
 - Introduce new wood ingredient obtained from timber (logs?)
-- Have hunter huts produce pelts
+- Currency? (+ flow from trade post and workshop to fort) / money flow
 - Fix the right amount of buildings in each settlement, their output per turn, turn duration
-+ set suitable stocks to bootstrap economy
+-> Simulate?
++ set suitable prices to bootstrap economy
+- Wipe out all stocks and let it live
 - Starvation (impact) (think of ways to make it painfully visible)
 - Settlement-oriented HUD: see below
 - Missions menu
@@ -52,6 +57,7 @@ Chapter 1
 (-> Missions: bring food, defend, commit, follow chancellor directives,
 defend trade routes, scout, maintain supplies)
 (-> Control quests distribution?    )
+- Commitment lasts multiple turns
 3) The Wild
 - Proper marker
 - Cursor shenanigans
@@ -65,6 +71,7 @@ Chapter 2
 - Fortified civ camps, rebuilds
 - More involved raid mechanics
 2) The Economy
+- More advanced simulations to balance resources
 - Permanent, named players
 - Governor (fixed) & officials
 - Dev. levels
