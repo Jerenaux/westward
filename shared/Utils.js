@@ -202,12 +202,26 @@ Utils.overlap = function(a,b,touch){
         if(a.x >= b.x + b.w || b.x >= a.x + a.w) return false;
         if(a.y >= b.y + b.h || b.y >= a.y + a.h) return false;
     }
-    //if(a.x > b.x + b.w || b.x > a.x + a.w) return false;
-    //if(a.y > b.y + b.h || b.y > a.y + a.h) return false;
     return true;
 };
 
-Utils.multiChebcomponent = function(A,B,coord,length){
+Utils.getBoxCenter = function(box){
+    return {
+        x: box.x + (box.w/2),
+        y: box.y + (box.h/2)
+    }
+};
+
+Utils.boxesDistance = function(a,b){
+    var ca = Utils.getBoxCenter(a);
+    var cb = Utils.getBoxCenter(b);
+    var dx = Math.max(0,Math.abs(ca.x-cb.x) - (a.w/2) - (b.w/2));
+    var dy = Math.max(0,Math.abs(ca.y-cb.y) - (a.h/2) - (b.h/2));
+    //console.warn(dx,dy);
+    return dx+dy;
+};
+
+/*Utils.multiChebcomponent = function(A,B,coord,length){
     return Math.min(
         Math.abs(A[coord]-B[coord]),
         Math.abs(A[coord]+A[length]-B[coord]),
@@ -218,22 +232,8 @@ Utils.multiChebcomponent = function(A,B,coord,length){
 
 // a & b should be rectangles, i.e. expose x, y, w and h
 Utils.multiTileChebyshev = function(A,B){
-    /*var dx = Math.min(
-        Math.abs(A.x-B.x),
-        Math.abs(A.x+A.w-B.x),
-        Math.abs(A.x-(B.x+B.w)),
-        Math.abs(A.x+A.w-(B.x+B.w))
-    );
-    var dy = Math.min(
-        Math.abs(A.y-B.y),
-        Math.abs(A.y+A.h-B.y),
-        Math.abs(A.y-(B.y+B.h)),
-        Math.abs(A.y+A.h-(B.y+B.h))
-    );*/
-    //console.warn(dx,dy);
-    //return Math.max(dx,dy);
     return Math.max(Utils.multiChebcomponent(A,B,'x','w'),Utils.multiChebcomponent(A,B,'y','h'));
-};
+};*/
 
 // With respect to B
 Utils.relativePosition = function(A,B){

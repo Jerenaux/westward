@@ -24,19 +24,17 @@ Pillars:
 
 Chapter 1
 1) The War
--> Have arrows and anims target center
+-> Fix NPC positioning: solve ties (buggy)
+-> Test with bear (+ fight civ vs bear)
 -> trimPath for multicell entities
--> Camps not raiding online players?
--> Wolves keep occupying same cell
--> Test fights with bears
+-> Force battle pathfinding to fit in battle cells (also for multi-tiles entities!)
 -> Wander around camp
--> Fix NPC positioning
--> Force battle pathfinding to fit in battle cells
 - New "building damage" stat (allows introducing specialized weapons: maces, ...)
 => Ranged weapon have very low building damage, melee weapon more, maces and axes much more, bombs a lot
 - Multiple bomb types with variable stats
 - Set locations of a few camps
 2) The Economy
+- Make specific update event for spontaneous harvesting, make it slow
 - Flows from tradepost? (Food to fort, ingredients to workshop)
 - Flow of some finished products (workshop -> trade post)? e.g. ammo ...
 - Introduce new wood ingredient obtained from timber (logs?)
@@ -56,7 +54,6 @@ defend trade routes, scout, maintain supplies)
 3) The Wild
 - Proper marker
 - Cursor shenanigans
-- Fix bear footprints
 => Update texts
 => Test with someone
 
@@ -66,10 +63,10 @@ Chapter 2
 - Fortified civ camps, rebuilds
 - More involved raid mechanics
 - NPC used ranged attacks (no firarms and bombs though)
-2) The Economy
+2) The Economy 
+(automatic economy)
 - More advanced simulations to balance resources
 - Permanent, named players
-- Governor (fixed) & officials
 - Dev. levels
 - Impact on crafting, buildings, ...
 - New World (https://worldspinner.com/)
@@ -91,6 +88,7 @@ Chapter 3:
 - Advanced battle mechanics & UI
 - Automated raids by commander, displayed to entice players
 2) The Economy
+- Governor & officials
 - Elections
 - Taxes
 - Citizenship changes

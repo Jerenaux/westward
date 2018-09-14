@@ -18,13 +18,13 @@
       "hpmax": 150,
       "hp": 150,
       "def": 8,
-      "mdmg": 6
+      "mdmg": 1
     },
     "xp": 10,
     "loot":{
       "9": 1,
       "1": 3,
-      "27": 2
+      "27": 1
     }
   },
   "1":{
@@ -75,7 +75,9 @@
     "height": 2,
     "aggro": true,
     "wander": true,
-    "footprintsFrame": 1,
+    "footprintsFrame": 2,
+    "printsHorizOffset": 12,
+    "printsVertOffset": 30,
     "restingFrames": {
       "up": 45,
       "down": 9,
@@ -86,6 +88,12 @@
       "hp": 300,
       "def": 16,
       "mdmg": 5
+    },
+    "xp": 30,
+    "loot":{
+      "9": 1,
+      "1": 6,
+      "27": 2
     }
   }
 }

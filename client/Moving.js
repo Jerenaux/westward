@@ -264,6 +264,7 @@ var Moving = new Phaser.Class({
         this.previousOrientation = null;
         this.anims.stop();
         this.setFrame(this.restingFrames[this.orientation]);
+        //if(this.isHero) Engine.camera.pan(this.x,this.y);
 
         if(this.queuedPath){
             var _path = this.queuedPath.slice();
@@ -280,6 +281,7 @@ var Moving = new Phaser.Class({
         var sx = this.previousPosition.x + Engine.tileWidth/2;
         var sy = this.previousPosition.y + Engine.tileHeight/2;
         if(this.printsVertOffset) sy += this.printsVertOffset;
+        if(this.printsHorizOffset) sx += this.printsHorizOffset;
         print.setPosition(sx,sy);
 
         // Angle

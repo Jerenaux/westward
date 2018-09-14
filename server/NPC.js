@@ -107,6 +107,7 @@ NPC.prototype.decideBattleAction = function(){
     if(!action) action = 'attack';
     if(!this.target || !this.target.isInFight()) this.target = this.selectTarget();
     if(!this.target) return;
+    console.log('Target of',this.getShortID(),'is',this.target.getShortID());
     var data;
     switch(action){
         case 'attack': // If not next to and can'r range, will become a 'move' action
@@ -120,7 +121,8 @@ NPC.prototype.decideBattleAction = function(){
     this.battle.processAction(this,data);
 };
 
-NPC.prototype.findFreeCell = function(){
+/*NPC.prototype.findFreeCell = function(){
+    // TODO: rework, no sorting, use of boxdistance, no call to battle.isPositionFree
     var pos = {x:this.x,y:this.y};
     var list = this.battle.getCells(); //{x,y,v} objects
     list.sort(function(a,b){
@@ -134,7 +136,7 @@ NPC.prototype.findFreeCell = function(){
     return {
         action: 'pass'
     };
-};
+};*/
 
 NPC.prototype.findBattlePath = function(dest){
     var data = {};
@@ -189,42 +191,38 @@ NPC.prototype.selectTarget = function(){
 };
 
 NPC.prototype.computeBattleDestination = function(target){
-    //var dest = target.getEndOfPath();
     var dest = target;
-    //console.warn('Destination :',target.x,target.y);
+    //console.warn('From ',this.x,this.y,' to ',target.x,target.y);
     var r = GameServer.battleParameters.battleRange;
-    var candidates = [];
+    var closest = null;
+    var minDist = Infinity;
+    var minSelfDist = Infinity;
     for(var x = this.x - r; x < this.x + r + 1; x++){
         for(var y = this.y - r; y < this.y + r + 1; y++){
             if(x == dest.x && y == dest.y) continue;
             if(!this.battle.isPosition(x,y)) continue;
-            if(!this.battle.isPositionFree(x,y)) continue;
-            if(GameServer.checkCollision(x,y)) continue;
+            //if(GameServer.checkCollision(x,y)) continue; redundant with previous line?
+            if(!GameServer.isPositionFree(x,y)) continue;
             if(!this.inBattleRange(x,y)) continue; // still needed as long as Euclidean range, the double-loop include corners outside of Euclidean range
-            candidates.push({
+            var candidate = {
                 x: x,
                 y: y,
                 w: 1,
                 h: 1
-            });
+            };
+            var d = Utils.boxesDistance(candidate,dest.getRect());
+            if(d < minDist){
+                minDist = d;
+                closest = candidate;
+            }else if(d == minDist){
+                var sd = Utils.boxesDistance(candidate,this.getRect());
+                if(sd < minSelfDist){
+                    minSelfDist = sd;
+                    closest = candidate;
+                }
+            }
         }
     }
-    var _self = this;
-    candidates.sort(function(a,b){
-        var dA = Utils.multiTileChebyshev(a,dest.getRect());
-        var dB = Utils.multiTileChebyshev(b,dest.getRect());
-        a.dist = dA;
-        b.dist = dB;
-        if(dA == dB){ // If ties, break by picking closest cell
-            var selfA = Utils.multiTileManhattan(a,_self.getRect());
-            var selfB = Utils.multiTileManhattan(b,_self.getRect());
-            if(selfA < selfB) return -1;
-            return 1;
-        }
-        if(dA < dB) return -1;
-        return 1;
-    });
-    var closest = candidates[0];
     return closest;
 };
 

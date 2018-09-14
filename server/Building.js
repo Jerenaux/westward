@@ -366,7 +366,7 @@ Building.prototype.isDestroyed = function(){
 };
 
 Building.prototype.isAvailableForFight = function() {
-    return (!this.isDestroyed() && !this.isInFight());
+    return (!this.isDestroyed() && !this.isInFight() && GameServer.buildingParameters.canfight);
 };
 
 Building.prototype.isInFight = function(){

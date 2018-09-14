@@ -37,8 +37,79 @@ var Engine = {
     }
 };
 
+/*var BlurPipeline = new Phaser.Class({
+
+    Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
+
+    initialize:
+    //https://github.com/mattdesl/lwjgl-basics/wiki/ShaderLesson5
+        function CustomPipeline(game) {
+            Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline.call(this, {
+                game: game,
+                renderer: game.renderer,
+                fragShader: [
+                    "precision mediump float;",
+
+                    //"in" attributes from our vertex shader
+                    "varying vec4 outColor;",
+                    "varying vec2 outTexCoord;",
+
+                    //declare uniforms
+                    "uniform sampler2D u_texture;",
+                    "uniform float resolution;",
+                    "uniform float radius;",
+                    "uniform vec2 dir;",
+
+                    "void main() {",
+                    //this will be our RGBA sum
+                    "vec4 sum = vec4(0.0);",
+
+                    //our original texcoord for this fragment
+                    "vec2 tc = outTexCoord;",
+
+                    //the amount to blur, i.e. how far off center to sample from
+                    //1.0 -> blur by one pixel
+                    //2.0 -> blur by two pixels, etc.
+                    "float blur = radius/resolution;",
+
+                    //the direction of our blur
+                    //(1.0, 0.0) -> x-axis blur
+                    //(0.0, 1.0) -> y-axis blur
+                    "float hstep = dir.x;",
+                    "float vstep = dir.y;",
+
+                    //apply blurring, using a 9-tap filter with predefined gaussian weights",
+
+                    "sum += texture2D(u_texture, vec2(tc.x - 4.0*blur*hstep, tc.y - 4.0*blur*vstep)) * 0.0162162162;",
+                    "sum += texture2D(u_texture, vec2(tc.x - 3.0*blur*hstep, tc.y - 3.0*blur*vstep)) * 0.0540540541;",
+                    "sum += texture2D(u_texture, vec2(tc.x - 2.0*blur*hstep, tc.y - 2.0*blur*vstep)) * 0.1216216216;",
+                    "sum += texture2D(u_texture, vec2(tc.x - 1.0*blur*hstep, tc.y - 1.0*blur*vstep)) * 0.1945945946;",
+
+                    "sum += texture2D(u_texture, vec2(tc.x, tc.y)) * 0.2270270270;",
+
+                    "sum += texture2D(u_texture, vec2(tc.x + 1.0*blur*hstep, tc.y + 1.0*blur*vstep)) * 0.1945945946;",
+                    "sum += texture2D(u_texture, vec2(tc.x + 2.0*blur*hstep, tc.y + 2.0*blur*vstep)) * 0.1216216216;",
+                    "sum += texture2D(u_texture, vec2(tc.x + 3.0*blur*hstep, tc.y + 3.0*blur*vstep)) * 0.0540540541;",
+                    "sum += texture2D(u_texture, vec2(tc.x + 4.0*blur*hstep, tc.y + 4.0*blur*vstep)) * 0.0162162162;",
+
+                    //discard alpha for our simple demo,return
+                    "gl_FragColor =  vec4(sum.rgb, 1.0);",
+                    "}"
+
+                ].join('\n')
+            });
+        }
+
+});*/
+
 Engine.preload = function() {
     Engine.useTilemaps = false;
+
+    /*Engine.blurPipeline = game.renderer.addPipeline('Custom', new BlurPipeline(this.sys.game));
+    Engine.blurPipeline.setFloat1('resolution', this.sys.game.config.width);
+    Engine.blurPipeline.setFloat1('radius', 1.0);
+    Engine.blurPipeline.setFloat2('dir', 1.0, 1.0);*/
+    // http://labs.phaser.io/edit.html?src=src\camera\camera%20blur%20shader.js
 
     // Characters
     this.load.spritesheet('enemy', 'assets/sprites/enemy.png',{frameWidth:64,frameHeight:64});
@@ -699,8 +770,8 @@ Engine.displayArrow = function(from,to,depth,duration,delay){ // All coordinates
     Engine.scene.tweens.add(
         {
             targets: arrow,
-            x: (parseInt(to.x)+0.5)*32,
-            y: (parseInt(to.y)+0.5)*32,
+            x: (parseInt(to.x))*32,
+            y: (parseInt(to.y))*32,
             duration: duration,
             delay: delay,
             onComplete: function(){
@@ -1268,6 +1339,14 @@ Engine.addHero = function(data){
     Engine.player = new Hero();
     Engine.player.setUp(data);
     Engine.camera.startFollow(Engine.player); // leave outside of constructor
+    Engine.camera.setDeadzone(7*32,5*32);
+    Engine.camera.setLerp(0.1);
+    /*var graphics = Engine.scene.add.graphics().setScrollFactor(0);
+    graphics.lineStyle(2, 0x00ff00, 1);
+    var w = Engine.camera.deadzone.width;
+    var h = Engine.camera.deadzone.height;
+    graphics.strokeRect(Engine.camera.centerX-(w/2), Engine.camera.centerY-(h/2), w, h);
+    graphics.setDepth(2000);*/
     Engine.updateEnvironment();
 };
 

@@ -160,7 +160,6 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.enableBattles = config.get('battle.enabled');
     GameServer.classes = config.get('classes');
     GameServer.classData = JSON.parse(fs.readFileSync('./assets/data/classes.json').toString());
-
     GameServer.battleParameters = config.get('battle');
     GameServer.buildingParameters = config.get('buildings');
     GameServer.characterParameters = config.get('character');
@@ -269,9 +268,10 @@ GameServer.addItem = function(x,y,type){
 
 GameServer.onInitialized = function(){
     console.warn('--- Performing on initialization tasks ---');
-    //GameServer.addAnimal(495,654,0);
-    GameServer.addCiv(393,590).setTrackedTarget({x:481,y:667});
-    //var a = GameServer.addAnimal(1204,169,0);
+    GameServer.addAnimal(508,654,0);
+    //GameServer.addAnimal(510,654,0);
+    //GameServer.addAnimal(511,654,0);
+    //GameServer.addCiv(393,590).setTrackedTarget({x:481,y:667});
     //var b = GameServer.addAnimal(1205,170,5);
     //GameServer.addAnimal(533,645,0);
     /*var civ = GameServer.addCiv(414, 646);
@@ -474,6 +474,16 @@ GameServer.removeFromLocation = function(entity){
     GameServer.AOIs[entity.aoi].deleteEntity(entity);
 };
 
+// Check if a *moving entity* (no building or anything) is at position
+GameServer.isPositionFree = function(x,y){
+    var entities = GameServer.positions.get(x,y);
+    if(entities.length == 0) return true;
+    entities = entities.filter(function(e){
+        return e.isMovingEntity;
+    });
+    return entities.length == 0;
+};
+
 GameServer.handleChat = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     player.setChat(data);
@@ -490,12 +500,17 @@ GameServer.findPath = function(from,to,seek){
     return GameServer.pathFinder.findPath(from,to,seek);
 };
 
+GameServer.isWithinAggroDist = function(a,b){
+    return Utils.boxesDistance(a.getRect(),b.getRect()) <= GameServer.battleParameters.aggroRange;
+};
+
 GameServer.handleBuildingClick = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var target = GameServer.buildings[data.id];
 
     if(!target.isDestroyed() && !target.isInFight()){
-        if(Utils.multiTileChebyshev(player.getRect(),target.getRect()) <= GameServer.battleParameters.aggroRange) {
+        //if(Utils.multiTileChebyshev(player.getRect(),target.getRect()) <= GameServer.battleParameters.aggroRange) {
+        if(GameServer.isWithinAggroDist(player,target)){
             GameServer.handleBattle(player, target);
         }else{
             player.addMsg('I must get closer!');
@@ -508,7 +523,8 @@ GameServer.handleNPCClick = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var target = (data.type == 0 ? GameServer.animals[targetID] : GameServer.civs[targetID]);
     if(!target.isDead() && !target.isInFight()){
-        if(Utils.chebyshev(player,target) <= GameServer.battleParameters.aggroRange) {
+        //if(Utils.chebyshev(player,target) <= GameServer.battleParameters.aggroRange) {
+        if(GameServer.isWithinAggroDist(player,target)){
             GameServer.handleBattle(player, target);
         }else{
             player.addMsg('I must get closer!');

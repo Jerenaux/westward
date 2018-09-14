@@ -39,8 +39,8 @@ var Animal = new Phaser.Class({
         this.animPrefix = animalData.walkPrefix;
         this.footprintsFrame = animalData.footprintsFrame;
         this.printsVertOffset = animalData.printsVertOffset;
+        this.printsHorizOffset = animalData.printsHorizOffset;
         this.restingFrames = animalData.restingFrames;
-        //this.manageOrientationPin();
     },
 
     update: function(data){

@@ -18,7 +18,7 @@ function Battle(){
         'Civ': 0,
         'Player': 0
     };
-    this.positions = new SpaceMap(); // positions occupied by fighters (obsolete?)
+    //this.positions = new SpaceMap(); // positions occupied by fighters (obsolete?)
     this.cells = new SpaceMap(); // all the BattleCell objects, used for battle pathfinding
 
     this.pathFinder = new Pathfinder(this.cells,99,false,false,true);
@@ -50,7 +50,7 @@ Battle.prototype.getFighterIndex = function(f){
 };
 
 // Called by addFighter
-Battle.prototype.checkConflict = function(f){
+/*Battle.prototype.checkConflict = function(f){
     var busy = this.positions.get(f.x,f.y);
     if(busy){
         console.log('busy cell for ',f.getShortID(),' with ',busy.getShortID(),' at ',f.x,f.y);
@@ -77,12 +77,12 @@ Battle.prototype.removeFromPosition = function(f){
             this.positions.delete(f.x+i,f.y+j);
         }
     }
-};
+};*/
 
 Battle.prototype.addFighter = function(f){
     //console.warn('Adding fighter ',f.getShortID());
     this.fighters.push(f);
-    if(f.isMovingEntity) this.checkConflict(f);
+    //if(f.isMovingEntity) this.checkConflict(f);
     this.updateTeams(f.battleTeam,1);
     f.xpPool = 0; // running total of XP that the fighter will receive at the end of the fight
     f.inFight = true;
@@ -98,7 +98,7 @@ Battle.prototype.removeFighter = function(f){
     f.endFight();
     f.die();
     this.fighters.splice(idx,1);
-    if(f.isPlayer) this.removeFromPosition(f); // if NPC, leave busy for his body
+    //if(f.isPlayer) this.removeFromPosition(f); // if NPC, leave busy for his body
     if(isTurnOf) this.setEndOfTurn(0);
     if(f.isPlayer) f.notifyFight(false);
     this.updateTeams(f.battleTeam,-1);
@@ -201,12 +201,9 @@ Battle.prototype.setEndOfTurn = function(delay){
 };
 
 Battle.prototype.processMove = function(f){
-    //var busy = this.positions.get(f.x,f.y);
-    //if(busy && (busy.getShortID() == f.getShortID())) this.positions.delete(f.x,f.y);
-    this.removeFromPosition(f);
+    //this.removeFromPosition(f);
     var pos = f.getEndOfPath();
-    //this.positions.add(pos.x,pos.y,f);
-    this.addAtPosition(f);
+    //this.addAtPosition(f);
     return {
         success: true,
         delay: f.getPathDuration()
@@ -217,9 +214,9 @@ Battle.prototype.isPosition = function(x,y){
     return this.cells.has(x,y);
 };
 
-Battle.prototype.isPositionFree = function(x,y){
+/*Battle.prototype.isPositionFree = function(x,y){
     return !this.positions.get(x,y);
-};
+};*/
 
 Battle.prototype.computeDamage = function(type,a,b){
     var def = b.getStat('def').getValue();
@@ -365,10 +362,11 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
         var fireDelay = 500; // TODO: conf
         var tof = this.computeTOF(a,b,'arrow');
         delay = fireDelay + tof;
+        var c = b.getCenter();
         a.setProperty('ranged_atk',
             {
-                x:b.x,
-                y:b.y,
+                x:c.x,
+                y:c.y,
                 delay: fireDelay,
                 duration: tof
             }); // Character aimation + arrow; coordinates are to determine which direction to face

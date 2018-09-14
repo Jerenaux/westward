@@ -15,6 +15,7 @@ To add: time gap between two orientation sounds (OrientationPin.display())
         tickRate: 100, // milliseconds, granularity of battle updates
    },
    buildings: {
+        canfight: false,
         nobuildings: false,
         inventorySize: 100,
         maxGold: 99999
