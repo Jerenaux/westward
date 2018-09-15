@@ -88,7 +88,7 @@ NPC.prototype.goToDestination = function(dest){
 
     var trim = PFUtils.trimPath(path,GameServer.battleCells);
     path = trim.path;
-    if(this.entityCategory == 'Animal') this.idle = false;
+    this.idle = false;
     this.setPath(path);
     return true;
 };
@@ -114,7 +114,8 @@ NPC.prototype.decideBattleAction = function(){
             data = this.attackTarget();
             break;
         case 'move':
-            data = this.findFreeCell();
+            //data = this.findFreeCell();
+            console.warn('move action for ',this.getShortID());
             if(data.action == 'pass') this.queueAction('move');
             break;
     }
@@ -190,9 +191,19 @@ NPC.prototype.selectTarget = function(){
     return fighters[0];
 };
 
+//Check if a *moving entity* (no building or anything) other than self is at position
+NPC.prototype.isPositionFree = function(x,y){
+    var entities = GameServer.positions.get(x,y);
+    if(entities.length == 0) return true;
+    entities = entities.filter(function(e){
+        return (e.isMovingEntity && e.getShortID() != this.getShortID());
+    },this);
+    return entities.length == 0;
+};
+
 NPC.prototype.computeBattleDestination = function(target){
     var dest = target;
-    //console.warn('From ',this.x,this.y,' to ',target.x,target.y);
+    console.warn('From ',this.x,this.y,' to ',target.x,target.y);
     var r = GameServer.battleParameters.battleRange;
     var closest = null;
     var minDist = Infinity;
@@ -202,20 +213,25 @@ NPC.prototype.computeBattleDestination = function(target){
             if(x == dest.x && y == dest.y) continue;
             if(!this.battle.isPosition(x,y)) continue;
             //if(GameServer.checkCollision(x,y)) continue; redundant with previous line?
-            if(!GameServer.isPositionFree(x,y)) continue;
+            if(!this.isPositionFree(x,y)) continue;
             if(!this.inBattleRange(x,y)) continue; // still needed as long as Euclidean range, the double-loop include corners outside of Euclidean range
             var candidate = {
                 x: x,
                 y: y,
-                w: 1,
-                h: 1
+                w: this.cellsWidth,//1,
+                h: this.cellsHeight//1
             };
+            //console.log(candidate);
             var d = Utils.boxesDistance(candidate,dest.getRect());
+            //console.log('d=',d);
             if(d < minDist){
                 minDist = d;
+                minSelfDist = Infinity;
                 closest = candidate;
             }else if(d == minDist){
-                var sd = Utils.boxesDistance(candidate,this.getRect());
+                // Simple manhattan distance because here we want to minimize travelled cells, not distance between (possibly multi-tile) entities
+                var sd = Utils.manhattan(candidate,this);
+                //console.log('sd=',sd);
                 if(sd < minSelfDist){
                     minSelfDist = sd;
                     closest = candidate;
@@ -234,6 +250,30 @@ NPC.prototype.isInBuilding = function(){
 
 NPC.prototype.isAvailableForFight = function(){
     return (!this.isDead() && !this.isInFight());
+};
+
+// ### Wander ###
+
+NPC.prototype.onEndOfPath = function(){
+    //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
+    MovingEntity.prototype.onEndOfPath.call(this);
+    if(this.inFight) return;
+    this.setIdle();
+};
+
+NPC.prototype.setIdle = function(){
+    this.idle = true;
+    this.idleTime = Utils.randomInt(GameServer.wildlifeParameters.idleTime[0]*1000,GameServer.wildlifeParameters.idleTime[1]*1000);
+};
+
+NPC.prototype.updateIdle = function(){
+    if(!this.isInVision()) return;
+    if(this.isInFight() || this.isDead()) return;
+    this.idleTime -= GameServer.NPCupdateRate;
+    if(this.idleTime <= 0){
+        var foundPath = this.goToDestination(this.findRandomDestination());
+        if(!foundPath) this.idleTime = GameServer.wildlifeParameters.idleRetry;
+    }
 };
 
 module.exports.NPC = NPC;

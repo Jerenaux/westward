@@ -43,7 +43,6 @@ Animal.prototype.setAggressive = function(){
     // Different from global aggro parameter, specifies if this specific animal should be aggressive pr not
     this.aggressive =  GameServer.animalsData[this.type].aggro;
 
-    // TODO: move to config somehow?
     this.aggroMatrix = {
         'Player': true,
         'Civ': true,
@@ -83,28 +82,6 @@ Animal.prototype.trim = function(){
 Animal.prototype.endFight = function(){
     MovingEntity.prototype.endFight.call(this);
     this.setIdle();
-};
-
-Animal.prototype.onEndOfPath = function(){
-    //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
-    MovingEntity.prototype.onEndOfPath.call(this);
-    if(this.inFight) return;
-    this.setIdle();
-};
-
-Animal.prototype.setIdle = function(){
-    this.idle = true;
-    this.idleTime = Utils.randomInt(GameServer.wildlifeParameters.idleTime[0]*1000,GameServer.wildlifeParameters.idleTime[1]*1000);
-};
-
-Animal.prototype.updateIdle = function(){
-    if(!this.isInVision()) return;
-    if(this.isInFight() || this.isDead()) return;
-    this.idleTime -= GameServer.NPCupdateRate;
-    if(this.idleTime <= 0){
-        var foundPath = this.goToDestination(this.findRandomDestination());
-        if(!foundPath) this.idleTime = GameServer.wildlifeParameters.idleRetry;
-    }
 };
 
 Animal.prototype.findRandomDestination = function(){

@@ -31,7 +31,7 @@ var Civ = new Phaser.Class({
             right: 143
         };
         this.deathFrame = 265;
-        this.setFrame(this.restingFrames.down,false,false);
+        this.setFrame(this.restingFrames.right,false,false);
         this.setOrigin(0.2,0.5);
 
         var shape = new Phaser.Geom.Polygon([20,15,50,15,50, 60, 20, 60]);

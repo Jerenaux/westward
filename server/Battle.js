@@ -268,10 +268,9 @@ Battle.prototype.computeRangedHit = function(a,b){
 };
 
 Battle.prototype.computeTOF = function(a,b,type){
-    // TODO: put speed in conf, different speed for arrow and bomb
     var speeds = {
-        'arrow': 15,
-        'bomb': 10
+        'arrow': GameServer.battleParameters.arrowSpeed,
+        'bomb': GameServer.battleParameters.bombSpeed
     };
     return (Utils.euclidean(a.getShootingPoint(),b)/speeds[type])*1000;
 };
@@ -324,6 +323,7 @@ Battle.prototype.processAoE = function(f,tx,ty){
             }); // for the flash and hp display
         }
     },this);
+    delay += 100;
     setTimeout(function(){
         damages.forEach(function(d){
             var f = d[0];
@@ -344,7 +344,7 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
     var killed = false;
     if(!b || b.isDead()) return;
     if(Utils.nextTo(a,b)){
-        delay = 500; //TODO: config
+        delay = GameServer.battleParameters.meleeAtkDelay;
         a.setProperty('melee_atk',{x:b.x,y:b.y}); // for the attack animation of attacker
         dmg = this.computeDamage('melee',a,b);
         var pos = Utils.relativePosition(a,b);
@@ -359,7 +359,7 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
         }); // for the flash and hp display
     }else{
         if(!a.canRange()) return false;
-        var fireDelay = 500; // TODO: conf
+        var fireDelay = GameServer.battleParameters.rangedAtkDelay;
         var tof = this.computeTOF(a,b,'arrow');
         delay = fireDelay + tof;
         var c = b.getCenter();
@@ -375,11 +375,10 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
         if(hit){
             if(b.isNPC && ammoID > -1) b.addToLoot(ammoID,1);
             dmg = this.computeDamage('ranged',a,b);
-            // TODO: use getCenter()
             a.setProperty('animation',{
                 name: 'sword',
-                x: b.x,
-                y: b.y,
+                x: c.x,
+                y: c.y,
                 delay: delay
             });
             b.setProperty('hit',{

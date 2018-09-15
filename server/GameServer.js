@@ -268,14 +268,12 @@ GameServer.addItem = function(x,y,type){
 
 GameServer.onInitialized = function(){
     console.warn('--- Performing on initialization tasks ---');
-    GameServer.addAnimal(508,654,0);
+    GameServer.addAnimal(515,655,5);
     //GameServer.addAnimal(510,654,0);
     //GameServer.addAnimal(511,654,0);
-    //GameServer.addCiv(393,590).setTrackedTarget({x:481,y:667});
-    //var b = GameServer.addAnimal(1205,170,5);
-    //GameServer.addAnimal(533,645,0);
-    /*var civ = GameServer.addCiv(414, 646);
-    civ.setTrackedTarget({x:518,y:656});*/
+    /*GameServer.addCiv(513,656);
+    GameServer.addCiv(514,657);
+    GameServer.addCiv(513,658);*/
 };
 
 GameServer.setUpdateLoops = function(){
@@ -472,16 +470,6 @@ GameServer.addAtLocation = function(entity){
 GameServer.removeFromLocation = function(entity){
     // Remove an entity from all data structures related to position (spaceMap and AOI)
     GameServer.AOIs[entity.aoi].deleteEntity(entity);
-};
-
-// Check if a *moving entity* (no building or anything) is at position
-GameServer.isPositionFree = function(x,y){
-    var entities = GameServer.positions.get(x,y);
-    if(entities.length == 0) return true;
-    entities = entities.filter(function(e){
-        return e.isMovingEntity;
-    });
-    return entities.length == 0;
 };
 
 GameServer.handleChat = function(data,socketID){
@@ -974,7 +962,7 @@ GameServer.updateNPC = function(){
     });
     Object.keys(GameServer.civs).forEach(function(key) {
         var a = GameServer.civs[key];
-        a.updateTracking();
+        a.updateBehavior();
     });
 };
 

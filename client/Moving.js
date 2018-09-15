@@ -82,8 +82,13 @@ var Moving = new Phaser.Class({
             return;
         }
 
+        var worldView = Engine.camera.worldView;
+        if(worldView.x == 0 && worldView.y == 0){ // small hack, worldView not updated yet
+            this.orientationPin.hide();
+            return;
+        };
         var c = this.getCenter();
-        var inCamera = Engine.camera.worldView.contains(c.x,c.y);
+        var inCamera = worldView.contains(c.x,c.y);
         if(inCamera) {
             this.orientationPin.hide();
         }else{

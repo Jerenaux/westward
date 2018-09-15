@@ -13,6 +13,10 @@ To add: time gap between two orientation sounds (OrientationPin.display())
         rangePenalty: 5, // accuracy penalty per tile
         turnDuration: 5, // seconds
         tickRate: 100, // milliseconds, granularity of battle updates
+        arrowSpeed: 15, // tiles/sec
+        bombSpeed: 10,
+        meleeAtkDelay: 500,
+        rangedAtkDelay: 500
    },
    buildings: {
         canfight: false,
@@ -64,14 +68,14 @@ To add: time gap between two orientation sounds (OrientationPin.display())
             aggro: 2000
     },
     civs: {
-        aggro: true,
+        aggro: false,
         wander: false,
         raidMinimum: 8
     },
     wildlife: {
-        aggro: true,
-        nolife: true,
-        wander: true,
+        aggro: false,
+        nolife: false,
+        wander: false,
         wanderRange: 5,
         idleTime: [1, 3.5], // random bounds; in seconds
         idleRetry: 200 // ms

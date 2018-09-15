@@ -24,11 +24,9 @@ Pillars:
 
 Chapter 1
 1) The War
--> Fix NPC positioning: solve ties (buggy)
--> Test with bear (+ fight civ vs bear)
--> trimPath for multicell entities
--> Force battle pathfinding to fit in battle cells (also for multi-tiles entities!)
 -> Wander around camp
+--> Decide what to do when endFIght() (compare with animals); "back to base" behavior? Further raid?
+-> Civs shout something when spotting players, sometimes when hit, when comrade falls, when dying and when victorious
 - New "building damage" stat (allows introducing specialized weapons: maces, ...)
 => Ranged weapon have very low building damage, melee weapon more, maces and axes much more, bombs a lot
 - Multiple bomb types with variable stats
@@ -87,6 +85,9 @@ Chapter 3:
 - Unit types & counters
 - Advanced battle mechanics & UI
 - Automated raids by commander, displayed to entice players
+-> Force player battle pathfinding to fit in battle cells
+-> Adapth pathfinding for multi-cell entities
+-> trimPath for multicell entities
 2) The Economy
 - Governor & officials
 - Elections

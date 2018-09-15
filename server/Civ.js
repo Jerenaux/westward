@@ -53,14 +53,34 @@ Civ.prototype.setCamp = function(camp){
     this.camp = camp;
 };
 
+Civ.prototype.updateBehavior = function(){
+    if(this.trackedTarget) {
+        this.updateTracking();
+    }else{
+        this.updateIdle();
+    }
+};
+
+Civ.prototype.findRandomDestination = function(){
+    var r = GameServer.wildlifeParameters.wanderRange; // TODO: specify one for civs specifically
+    var campR = 10; // TODO: conf
+    var xMin = Utils.clamp(this.camp.center.x-campR,0,World.worldWidth);
+    var xMax = Utils.clamp(this.camp.center.x+campR,0,World.worldWidth);
+    var yMin = Utils.clamp(this.camp.center.y-campR,0,World.worldHeight);
+    var yMax = Utils.clamp(this.camp.center.y+campR,0,World.worldHeight);
+    return {
+        x: Utils.clamp(this.x + Utils.randomInt(-r,r),xMin,xMax),
+        y: Utils.clamp(this.y + Utils.randomInt(-r,r),yMin,yMax)
+    };
+};
+
 Civ.prototype.setTrackedTarget = function(target){
     this.trackedTarget = target;
 };
 
 Civ.prototype.updateTracking = function(){
-    if(!this.trackedTarget) return;
     if(this.moving || this.isInFight() || this.isDead()) return;
-    var path = GameServer.findPath(this,this.trackedTarget,true);
+    var path = GameServer.findPath(this,this.trackedTarget,true); // true for seek-path pathfinding
     if(!path || path.length <= 1) return;
 
     var trim = PFUtils.trimPath(path,GameServer.battleCells);
@@ -70,7 +90,7 @@ Civ.prototype.updateTracking = function(){
 
 Civ.prototype.die = function(){
     MovingEntity.prototype.die.call(this);
-    //this.idle = false;
+    this.idle = false;
     if(this.camp) this.camp.remove(this);
 };
 

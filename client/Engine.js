@@ -736,10 +736,6 @@ Engine.tweenFighText = function(){
     );
 };
 
-Engine.handleExplosion = function(){
-
-};
-
 Engine.handleBattleAnimation = function(data){
     var sprite = Engine.animationsPools[data.name].getNext();
     sprite.setVisible(false);
@@ -755,6 +751,7 @@ Engine.handleBattleAnimation = function(data){
     setTimeout(function(){
         sprite.setVisible(true);
         sprite.anims.play(data.name);
+        if(data.sound == 'bomb') Engine.camera.shake(300,0.01);
     },data.delay);
 };
 
