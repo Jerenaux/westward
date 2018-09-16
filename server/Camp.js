@@ -31,6 +31,7 @@ Camp.prototype.update = function(){
         var pos = hut.getCenter();
         pos.y += 2;
         var civ = GameServer.addCiv(pos.x,pos.y);
+        civ.setCamp(this);
         this.people.push(civ);
     }
 
@@ -42,12 +43,15 @@ Camp.prototype.readyToRaid = function(){
 };
 
 Camp.prototype.findTargets = function(){
-    var player = Utils.randomElement(GameServer.settlements[this.targetSettlement].players);
-    if(!player) return;
+    var targetPlayers = GameServer.settlements[this.targetSettlement].players;
+    if(targetPlayers.length == 0) return;
+    var player = Utils.randomElement(targetPlayers);
     this.raid(player);
 };
 
-Camp.prototype.raid = function(player){
+Camp.prototype.raid = function(playerID){
+    console.log('raiding',playerID);
+    var player = GameServer.players[playerID];
     for(var i = 0; i < 3; i++){ // TODO: config
         var civ = Utils.randomElementRemoved(this.people);
         if(!civ) break;

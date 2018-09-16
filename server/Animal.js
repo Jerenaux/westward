@@ -60,7 +60,7 @@ Animal.prototype.setWander = function(){
 };
 
 Animal.prototype.doesWander = function(){
-    return (this.wander && GameServer.enableWander);
+    return (this.wander && GameServer.enableAnimalWander);
 };
 
 Animal.prototype.setSpawnZone = function(zone){
@@ -79,9 +79,9 @@ Animal.prototype.trim = function(){
     return trimmed;
 };
 
-Animal.prototype.endFight = function(){
+Animal.prototype.endFight = function(alive){
     MovingEntity.prototype.endFight.call(this);
-    this.setIdle();
+    if(alive) this.setIdle();
 };
 
 Animal.prototype.findRandomDestination = function(){

@@ -150,7 +150,8 @@
     "name": "Leather belt",
     "equipment": "belt",
     "isCrafted": true,
-    "recipe":{"43":1}
+    "recipe":{"43":1},
+    "slots": 2
   },
   "17":{
     "atlas": "items",

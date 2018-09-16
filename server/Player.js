@@ -533,6 +533,7 @@ Player.prototype.trim = function(){
     trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
+    trimmed.quickSlots = this.equipment.quickslots.nb;
     return trimmed;
 };
 

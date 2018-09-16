@@ -133,11 +133,13 @@ var Equipment = {
 };
 
 function EquipmentManager(){
-    /* One slot per equipment type, setters and getters,
-    * keep track of ammo and ammo capacity*/
     this.slots = {};
     this.containers = {};
     this.ammo = {};
+    this.quickslots = {
+        slots: [],
+        nb: 2
+    };
     for(var slot in Equipment.slots){
         this.slots[slot] = -1;
     }

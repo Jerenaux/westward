@@ -154,7 +154,8 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.civsData = JSON.parse(fs.readFileSync('./assets/data/civs.json').toString());
     GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
 
-    GameServer.enableWander = config.get('wildlife.wander');
+    GameServer.enableAnimalWander = config.get('wildlife.wander');
+    GameServer.enableCivWander = config.get('civs.wander');
     GameServer.enableAnimalAggro = config.get('wildlife.aggro');
     GameServer.enableCivAggro = config.get('civs.aggro');
     GameServer.enableBattles = config.get('battle.enabled');
@@ -268,7 +269,14 @@ GameServer.addItem = function(x,y,type){
 
 GameServer.onInitialized = function(){
     console.warn('--- Performing on initialization tasks ---');
-    GameServer.addAnimal(515,655,5);
+    //GameServer.addAnimal(515,655,5);
+    var civ = GameServer.addCiv(515,655);
+    civ.camp = {
+        center : {
+            x: 515,
+            y: 655
+        }
+    }
     //GameServer.addAnimal(510,654,0);
     //GameServer.addAnimal(511,654,0);
     /*GameServer.addCiv(513,656);
@@ -958,7 +966,7 @@ GameServer.checkForAggro = function(){
 GameServer.updateNPC = function(){
     Object.keys(GameServer.animals).forEach(function(key) {
         var a = GameServer.animals[key];
-        if(a.doesWander() && a.idle && !a.isDead()) a.updateIdle();
+        a.updateWander();
     });
     Object.keys(GameServer.civs).forEach(function(key) {
         var a = GameServer.civs[key];

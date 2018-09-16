@@ -83,7 +83,7 @@ NPC.prototype.checkForAggro = function(){
 };
 
 NPC.prototype.goToDestination = function(dest){
-    var path = GameServer.findPath({x:this.x,y:this.y},dest);
+    var path = GameServer.findPath({x:this.x,y:this.y},dest,true); // true for seek-path pathfinding
     if(!path || path.length <= 1) return false;
 
     var trim = PFUtils.trimPath(path,GameServer.battleCells);
@@ -266,12 +266,15 @@ NPC.prototype.setIdle = function(){
     this.idleTime = Utils.randomInt(GameServer.wildlifeParameters.idleTime[0]*1000,GameServer.wildlifeParameters.idleTime[1]*1000);
 };
 
-NPC.prototype.updateIdle = function(){
+NPC.prototype.updateWander = function(){
     if(!this.isInVision()) return;
-    if(this.isInFight() || this.isDead()) return;
+    if(this.isInFight() || this.isDead() || !this.idle || !this.doesWander()) return;
+    //console.log(this.getShortID(),'updates wander',this.idleTime);
     this.idleTime -= GameServer.NPCupdateRate;
     if(this.idleTime <= 0){
-        var foundPath = this.goToDestination(this.findRandomDestination());
+        var dest = this.findRandomDestination();
+        //console.log(dest);
+        var foundPath = this.goToDestination(dest);
         if(!foundPath) this.idleTime = GameServer.wildlifeParameters.idleRetry;
     }
 };

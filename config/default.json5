@@ -74,7 +74,7 @@ To add: time gap between two orientation sounds (OrientationPin.display())
     },
     wildlife: {
         aggro: false,
-        nolife: false,
+        nolife: true,
         wander: false,
         wanderRange: 5,
         idleTime: [1, 3.5], // random bounds; in seconds

@@ -86,9 +86,9 @@ var Moving = new Phaser.Class({
         if(worldView.x == 0 && worldView.y == 0){ // small hack, worldView not updated yet
             this.orientationPin.hide();
             return;
-        };
+        }
         var c = this.getCenter();
-        var inCamera = worldView.contains(c.x,c.y);
+        var inCamera = worldView.contains(c.x*32,c.y*32);
         if(inCamera) {
             this.orientationPin.hide();
         }else{
@@ -352,10 +352,10 @@ var Moving = new Phaser.Class({
         }
     },
 
-    getCenter: function(){
+    getCenter: function(){ // returns center in tiles
         return {
-            x: Math.floor(this.x + this.cellsWidth*16),
-            y: Math.floor(this.y + this.cellsHeight*16)
+            x: this.tileX + this.cellsWidth/2,//Math.floor(this.tileX + this.cellsWidth/2),
+            y: this.tileY + this.cellsHeight/2//Math.floor(this.tileY + this.cellsHeight/2)
         };
     }
 });

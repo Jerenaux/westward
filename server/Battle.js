@@ -95,7 +95,7 @@ Battle.prototype.removeFighter = function(f){
     var idx = this.getFighterIndex(f);
     if(idx == -1) return;
     var isTurnOf = this.isTurnOf(f);
-    f.endFight();
+    f.endFight(false);
     f.die();
     this.fighters.splice(idx,1);
     //if(f.isPlayer) this.removeFromPosition(f); // if NPC, leave busy for his body
@@ -415,7 +415,7 @@ Battle.prototype.end = function(){
     this.ended = true;
     clearInterval(this.loop);
     this.fighters.forEach(function(f){
-        f.endFight();
+        f.endFight(true);
         if(f.isPlayer) f.notifyFight(false);
     });
     this.cleanUp();

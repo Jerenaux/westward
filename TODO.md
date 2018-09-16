@@ -1,12 +1,10 @@
 Bugs:
-- Animals occupying same battle cell
--> Infinite loop in fight between 3 civs and a tower?
 - Spawning in battle area, moving: doesn't stop movement
 - Gray out sell inventory in shop as well?
 
 Release:
 - Newplayer only (flush)
-- Dis/enable battles
+- Dis/enable battles + wander, aggro, etc.
 - Push
 - Reset food, update stocks
 
@@ -24,8 +22,6 @@ Pillars:
 
 Chapter 1
 1) The War
--> Wander around camp
---> Decide what to do when endFIght() (compare with animals); "back to base" behavior? Further raid?
 -> Civs shout something when spotting players, sometimes when hit, when comrade falls, when dying and when victorious
 - New "building damage" stat (allows introducing specialized weapons: maces, ...)
 => Ranged weapon have very low building damage, melee weapon more, maces and axes much more, bombs a lot
@@ -59,7 +55,7 @@ Chapter 2
 1) The War
 - Barracks and troops (need food inflow to barracks)
 - Fortified civ camps, rebuilds
-- More involved raid mechanics
+- More involved raid mechanics (patrols, list of units ready to raid, units coming back to base, units healing when at base) using a more complex states scheme
 - NPC used ranged attacks (no firarms and bombs though)
 2) The Economy 
 (automatic economy)
@@ -420,7 +416,7 @@ Backpacks, gold pouches of various sizes...)
 * Inventory
 - Click window: display stat effects
 - Belt mechanics (quick-use slots for potions, bombs and weapons)
-- Backpack mechanics
+- Backpack mechanics, money pouches, ...
 - Gunpowder mechanics (multiple pouches?)
 - Dropping items
 * Merchant gameplay
@@ -459,7 +455,6 @@ or
 - View info on other players (levels...)
 - Guilds
 * Orientations
--> Use new Phaser 3.11 Camera.worldView for on-screen checks for orientation pins (instead of player.viewRect, updateviewrect etc)
 - Pins for gunshots and explosions (requires special networking for long-distance sounds)
 -> Much slower noise variation according to distance (since heard from very far)
 -> Pin disappears after a few seconds

@@ -1209,16 +1209,25 @@ Engine.makeCraftingMenu = function(){
 Engine.makeInventory = function(statsPanel){
     var inventory = new Menu('Inventory');
     inventory.setSound(Engine.scene.sound.add('inventory'));
+
     var items = new InventoryPanel(40,100,600,380,'Items');
     items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
     items.addCapsule('gold',100,-9,'999','gold');
-    inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,100),true);
     items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help']);
     inventory.addPanel('items',items);
+
+    inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,100),true);
+
     var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
     equipment.addButton(300, 8, 'blue','help',null,'',UI.textsData['equipment_help']);
     inventory.addPanel('equipment',equipment);
+
+    /*var belt = new InventoryPanel(70,350,500,60,'Belt');
+    belt.setInventory(new Inventory(2),10,true);
+    inventory.addPanel('belt',belt);*/
+
     inventory.addPanel('stats',statsPanel);
+
     inventory.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
     inventory.addEvent('onUpdateInventory',items.updateInventory.bind(items));
     inventory.addEvent('onUpdateStats',statsPanel.updateStats.bind(statsPanel));
@@ -1336,7 +1345,7 @@ Engine.addHero = function(data){
     Engine.player = new Hero();
     Engine.player.setUp(data);
     Engine.camera.startFollow(Engine.player); // leave outside of constructor
-    Engine.camera.setDeadzone(7*32,5*32);
+    //Engine.camera.setDeadzone(7*32,5*32);
     Engine.camera.setLerp(0.1);
     /*var graphics = Engine.scene.add.graphics().setScrollFactor(0);
     graphics.lineStyle(2, 0x00ff00, 1);

@@ -62,8 +62,8 @@ var OrientationPin = new Phaser.Class({
     update: function(x,y){
         x -= Engine.player.tileX;
         y -= Engine.player.tileY;
-        x += 0.5;
-        y += 0.5;
+        //x += 0.5;
+        //y += 0.5;
         //var m = y/x;  slope
         // line: y = (y_c/x_c)*x   no intercept for lines going through origin
         // top: y = -9   equation of top size
