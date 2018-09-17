@@ -19,7 +19,7 @@ To add: time gap between two orientation sounds (OrientationPin.display())
         rangedAtkDelay: 500
    },
    buildings: {
-        canfight: false,
+        canfight: true,
         nobuildings: false,
         inventorySize: 100,
         maxGold: 99999
@@ -44,12 +44,13 @@ To add: time gap between two orientation sounds (OrientationPin.display())
         // Unit: turns
         turns: {
             build: 10,
-            camps: 1,
-            foodConsumption: 8,
+            camps: 5,
             commitment: 1,
-            production: 10, // for buildings + spontaneous harvesting
+            foodConsumption: 8,
+            harvesting: 60,
+            production: 10,
             settlements: 1,
-            spawnZones: 1
+            spawnZones: 5
         }
     },
     misc: {
@@ -68,14 +69,14 @@ To add: time gap between two orientation sounds (OrientationPin.display())
             aggro: 2000
     },
     civs: {
-        aggro: false,
-        wander: false,
+        aggro: true,
+        wander: true,
         raidMinimum: 8
     },
     wildlife: {
-        aggro: false,
-        nolife: true,
-        wander: false,
+        aggro: true,
+        nolife: false,
+        wander: true,
         wanderRange: 5,
         idleTime: [1, 3.5], // random bounds; in seconds
         idleRetry: 200 // ms

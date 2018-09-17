@@ -26,7 +26,7 @@ Formulas.pctToDecimal = function(pctValue){
 // For modifiers, all formulas expect decimal values as input and return decimal values as output
 
 Formulas.foodConsumption = function(population){
-    return population;
+    return population; // TODO: set food/pop in conf
 };
 
 Formulas.computeRequiredFood = function(population){

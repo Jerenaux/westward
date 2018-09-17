@@ -15,9 +15,6 @@ var Player = new Phaser.Class({
         this.setOrigin(0.2,0.5);
         this.firstUpdate = true;
 
-        this.bubbleOffsetX = 55;
-        this.bubbleOffsetY = 75;
-
         this.animPrefix = 'player';
         this.footprintsFrame = 0;
         this.printsVertOffset = 10;
@@ -34,7 +31,6 @@ var Player = new Phaser.Class({
 
         this.destinationAction = null;
 
-        this.bubble = new Bubble(0,0);
         this.orientationPin = new OrientationPin('player');
         this.flipPrint = false;
     },
@@ -68,7 +64,6 @@ var Player = new Phaser.Class({
             if(field in data) callbacks[field].call(this,data[field]);
         }
 
-        if(!this.isHero && data.chat) this.talk(data.chat);
         this.firstUpdate = false;
     },
 
@@ -108,12 +103,6 @@ var Player = new Phaser.Class({
             }
 
         }
-    },
-
-    talk: function(text){
-        this.bubble.update(text);
-        this.bubble.display();
-        Engine.scene.sound.add('speech').play();
     },
 
     // ### SETTERS ####

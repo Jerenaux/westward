@@ -167,6 +167,13 @@ Battle.prototype.getFighterByID = function(id){
     return map[id.slice(1)];
 };
 
+Battle.prototype.getFighterByType = function(type){
+    for(var i = 0; i < this.fighters.length; i++){
+        if(this.fighters[i].getShortID()[0] == type) return this.fighters[i];
+    }
+    return null;
+};
+
 Battle.prototype.isTurnOf = function(f){
     return (f.getShortID() == this.getActiveFighter().getShortID());
 };
@@ -392,6 +399,16 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
     setTimeout(function(){
         killed = this.applyDamage(b,dmg);
         if(killed && a.isPlayer) a.addNotif(b.name+' '+(b.isBuilding ? 'destroyed' : 'killed'));
+        if(killed && a.isCiv && b.isPlayer) a.talk('killed_foe');
+        if(b.isCiv && a.isPlayer) {
+            if(killed) {
+                b.talk('self_falls');
+                var comrade = this.getFighterByType('C');
+                if (comrade) comrade.talk('comrade_falls');
+            }else{
+                b.talk('hit');
+            }
+        }
     }.bind(this),delay);
     return {
         success: true,

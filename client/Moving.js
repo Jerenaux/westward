@@ -13,12 +13,17 @@ var Moving = new Phaser.Class({
         this.previousOrientation = null;
         this.movement = null;
         this.currentPath = [];
+
+        this.bubbleOffsetX = 55;
+        this.bubbleOffsetY = 75;
+        this.bubble = new Bubble(0,0);
     },
 
     update: function(data){
         var callbacks = {
             'animation': Engine.handleBattleAnimation,
             'bomb_atk': this.processBombThrow,
+            'chat': this.talk,
             'hit': this.handleHit, // for HP display and blink
             'melee_atk': this.processMeleeAttack, // for character animation
             'ranged_atk': this.processRangedAttack, // for character animation
@@ -213,6 +218,12 @@ var Moving = new Phaser.Class({
         }
     },
 
+    selfStop: function(){
+        console.log('self stopping');
+        if(this.currentPath.length < 2) return;
+        this.queuePath([this.currentPath[1]]);
+    },
+
     serverStop: function(data){ //one argument because called from updates() metods
         var x = data.x;
         var y = data.y;
@@ -320,6 +331,13 @@ var Moving = new Phaser.Class({
 
     playSound: function(){
         Engine.playLocalizedSound('footsteps',5,{x:this.tileX,y:this.tileY});
+    },
+
+    talk: function(text){
+        //if(this.isHero) return;
+        this.bubble.update(text);
+        this.bubble.display();
+        Engine.scene.sound.add('speech').play();
     },
 
     getHPposition: function(){

@@ -1,7 +1,3 @@
-Bugs:
-- Spawning in battle area, moving: doesn't stop movement
-- Gray out sell inventory in shop as well?
-
 Release:
 - Newplayer only (flush)
 - Dis/enable battles + wander, aggro, etc.
@@ -22,13 +18,9 @@ Pillars:
 
 Chapter 1
 1) The War
--> Civs shout something when spotting players, sometimes when hit, when comrade falls, when dying and when victorious
-- New "building damage" stat (allows introducing specialized weapons: maces, ...)
-=> Ranged weapon have very low building damage, melee weapon more, maces and axes much more, bombs a lot
-- Multiple bomb types with variable stats
-- Set locations of a few camps
+- Adapt animatins and delays for firearms
 2) The Economy
-- Make specific update event for spontaneous harvesting, make it slow
+- Resource flows < 1 (e.g. pelts)
 - Flows from tradepost? (Food to fort, ingredients to workshop)
 - Flow of some finished products (workshop -> trade post)? e.g. ammo ...
 - Introduce new wood ingredient obtained from timber (logs?)
@@ -43,9 +35,16 @@ Chapter 1
 (-> Eventually: missions, quests & achievements)
 (-> Missions: bring food, defend, commit, follow chancellor directives,
 defend trade routes, scout, maintain supplies)
-(-> Control quests distribution?    )
+(-> Control quests distribution?)
 - Commitment lasts multiple turns
+- Gray out sell inventory in shop as well?
 3) The Wild
+- Slow when moving?
+- Spawning in battle area, moving: doesn't stop movement
+- Stop walk when opening menu
+- Camera bounds (test with northernmost camp)
+- Minimap cross stop moving below a certain y?
+- Northernmost camp not really visible on map
 - Proper marker
 - Cursor shenanigans
 => Update texts
@@ -53,6 +52,9 @@ defend trade routes, scout, maintain supplies)
 
 Chapter 2
 1) The War
+- New "building damage" stat (allows introducing specialized weapons: maces, ...)
+=> Ranged weapon have very low building damage, melee weapon more, maces and axes much more, bombs a lot
+- Multiple bomb types with variable stats
 - Barracks and troops (need food inflow to barracks)
 - Fortified civ camps, rebuilds
 - More involved raid mechanics (patrols, list of units ready to raid, units coming back to base, units healing when at base) using a more complex states scheme
@@ -176,6 +178,17 @@ Free
 Admin
 Analytics
 Cleaning
+Packaging
+Deployment
+Design document
+Polish
+Testing
+World Building
+
+
+Admin
+Analytics
+Cleaning
 * Battle system
 * Civics
 * Character panel
@@ -205,6 +218,7 @@ V1 level:
 
 Admin
 -----
+Modify conf file online and reload it
 Import db
 -> Iterate over import object, if matching id in db, update fields, if not, insert new entry 
 Set coordinates
@@ -214,7 +228,7 @@ Secure
 
 Analytics:
 ---------
-- Display events in admin
+- Pretty print events in admin: connects, purchases, AOI explorations, fights
 - Look for nice statistical library
 - Log drains and faucets
 - Log where items are bought/sold
@@ -282,7 +296,7 @@ Content:
 - From : https://forums.rpgmakerweb.com/index.php?threads/whtdragons-animals-and-running-horses-now-with-more-dragons.53552/
 -> Add seagulls, birds, frogs, small mammals, fishes (tinted), ...
 -> Have fun with unicorn
-- Carcasses, traces of fight
+- Carcasses, traces of fight, craters
 - Paths along most-travelled paths
 - Location sfx for each building
 - Maximum ambient noises

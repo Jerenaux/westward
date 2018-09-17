@@ -317,7 +317,7 @@ UI.displaySettlementSelectionMenu =  function(){
     UI.SSmap = map;
     UI.SScontent = content;
     Client.requestSettlementData();
-    Client.requestCampsData();
+    //Client.requestCampsData();
 
     var w = 400;
     var h = 220;

@@ -58,7 +58,6 @@ function Player(){
     this.equipment = new EquipmentManager();
     this.fieldOfVision = [];
     this.visitedAOIs = new Set(); // List of AOIs visitted since last fort debrief
-    this.chatTimer = null;
     MovingEntity.call(this);
 }
 
@@ -106,12 +105,12 @@ Player.prototype.setSettlement = function(sid){
 
 Player.prototype.setStartingInventory = function(){
     // TODO: move to some config file
-    this.giveItem(2,1);
+    /*this.giveItem(2,1);
     this.giveItem(19,1);
     this.giveItem(20,5);
     this.giveItem(6,2);
     this.giveItem(28,1);
-    this.giveItem(4,2);
+    this.giveItem(4,2);*/
 
     this.giveGold(300);
 };
@@ -630,16 +629,6 @@ Player.prototype.isInBuilding = function(){
 
 Player.prototype.notifyFight = function(flag){
     this.updatePacket.fightNotification(flag);
-};
-
-Player.prototype.setChat = function(text){
-    if(this.chatTimer) clearTimeout(this.chatTimer);
-    this.setProperty('chat',text);
-    console.log('Saying',this.chat);
-    var _player = this;
-    this.chatTimer = setTimeout(function(){
-        _player.chat = undefined;
-    },5000);
 };
 
 Player.prototype.addMsg = function(msg){

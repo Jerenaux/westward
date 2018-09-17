@@ -115,7 +115,39 @@ Civ.prototype.die = function(){
 
 Civ.prototype.endFight = function(alive){
     MovingEntity.prototype.endFight.call(this);
+    if(!this.camp) return;
     if(alive) this.setTrackedTarget(this.camp.center);
+};
+
+Civ.prototype.talk = function(signal){
+    // TODO: put all there in some conf files somewhere
+    var msg = null;
+    var upper = 10;
+    var t = 1;
+    switch(signal){
+        case 'battle_start':
+            var msgs = ['I found one!','There!'];
+            //var msgs = ['We must defend our land!','Go back to the sea!','']
+            if(Utils.randomInt(1,upper) > t) msg = Utils.randomElement(msgs);
+            break;
+        case 'hit':
+            var msgs = ['Argh','Ughn'];
+            if(Utils.randomInt(1,upper) > t) msg = Utils.randomElement(msgs);
+            break;
+        case 'self_falls':
+            var msgs = ['No...','My brothers will avenge me!'];
+            if(Utils.randomInt(1,upper) > t) msg = Utils.randomElement(msgs);
+            break;
+        case 'comrade_falls':
+            var msgs = ['I will avenge my fallen brother','I will spill your blood for this!'];
+            if(Utils.randomInt(1,upper) > t) msg = Utils.randomElement(msgs);
+            break;
+        case 'killed_foe':
+            var msgs = ['Retribution!','May you never come back.'];
+            if(Utils.randomInt(1,upper) > t) msg = Utils.randomElement(msgs);
+            break;
+    }
+    if(msg) this.setChat(msg);
 };
 
 Civ.prototype.remove = function(){

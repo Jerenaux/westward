@@ -11,6 +11,7 @@ function MovingEntity(){
     this.skipBattleTurn = false; // used to distinguish from buildings
     this.moving = false;
     this.xoffset = 0;
+    this.chatTimer = null;
 }
 
 MovingEntity.prototype = Object.create(GameObject.prototype);
@@ -138,6 +139,15 @@ MovingEntity.prototype.getCenter = function(){
         x: Math.floor(this.x + this.cellsWidth/2),
         y: Math.floor(this.y + this.cellsHeight/2)
     };
+};
+
+MovingEntity.prototype.setChat = function(text){
+    if(this.chatTimer) clearTimeout(this.chatTimer);
+    this.setProperty('chat',text);
+    var _entity = this;
+    this.chatTimer = setTimeout(function(){
+        _entity.chat = undefined;
+    },5000); // TODO: move to conf, make common to client and server
 };
 
 // ### Equipment ###

@@ -270,13 +270,15 @@ GameServer.addItem = function(x,y,type){
 GameServer.onInitialized = function(){
     console.warn('--- Performing on initialization tasks ---');
     //GameServer.addAnimal(515,655,5);
-    var civ = GameServer.addCiv(515,655);
+    GameServer.addCiv(515,655);
+    GameServer.addCiv(514,656);
+    /*var civ = GameServer.addCiv(515,655);
     civ.camp = {
         center : {
             x: 515,
             y: 655
         }
-    }
+    }*/
     //GameServer.addAnimal(510,654,0);
     //GameServer.addAnimal(511,654,0);
     /*GameServer.addCiv(513,656);
@@ -556,14 +558,14 @@ GameServer.pickUpItem = function(player,itemID){
 GameServer.handleBattle = function(player,target,aggro){
     if(!GameServer.enableBattles){
         if(!aggro) player.addMsg('Battles are disabled at the moment');
-        return;
+        return false;
     }
     if(!player.isAvailableForFight() || player.isInFight() || !target.isAvailableForFight() || target.isInFight()) return;
     // TODO: check for proximity
     var area = GameServer.computeBattleArea(player,target);
     if(!area){
         if(!aggro) player.addMsg('There is an obstacle in the way!');
-        return;
+        return false;
     }
     var battle = GameServer.checkBattleOverlap(area);
     if(!battle) battle = new Battle();
@@ -572,6 +574,7 @@ GameServer.handleBattle = function(player,target,aggro){
     //battle.addArea(area);
     GameServer.addBattleArea(area,battle);
     battle.start();
+    return true;
 };
 
 GameServer.computeBattleArea = function(f1,f2){

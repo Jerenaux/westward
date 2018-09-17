@@ -182,7 +182,7 @@ io.on('connection',function(socket){
         socket.emit('settlement-data',gs.listSettlements('selectionTrim'));
     });
 
-    socket.on('settlement-data',function(){
+    socket.on('camps-data',function(){
         socket.emit('camps-data',gs.listCamps());
     });
 

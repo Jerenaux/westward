@@ -74,7 +74,8 @@ NPC.prototype.checkForAggro = function(){
                 if(entity.isInFight()){
                     this.goToDestination(entity);
                 }else {
-                    GameServer.handleBattle(entity, this, true);
+                    var success = GameServer.handleBattle(entity, this, true);
+                    if(this.isCiv) this.talk('battle_start');
                 }
                 break;
             }

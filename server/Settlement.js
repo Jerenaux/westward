@@ -250,9 +250,10 @@ Settlement.prototype.update = function(){
 
 Settlement.prototype.spontaneousHarvesting = function(){
     // TODO: conf
-    this.addResourceToBuilding(3,7,Utils.randomInt(1,3)); // wood
-    this.addResourceToBuilding(3,26,Utils.randomInt(1,3)); // stone
-    this.addResourceToBuilding(3,27,Utils.randomInt(1,3)); // bone
+    if(!GameServer.isTimeToUpdate('harvesting')) return false;
+    this.addResourceToBuilding(3,7,Utils.randomInt(1,2)); // wood
+    this.addResourceToBuilding(3,26,Utils.randomInt(1,2)); // stone
+    this.addResourceToBuilding(3,27,Utils.randomInt(1,2)); // bone
 };
 
 Settlement.prototype.save = function(){
