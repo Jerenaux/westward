@@ -15,7 +15,7 @@
         <div class="panel-heading">
             <b>{{settlement.name}}</b>&nbsp;|&nbsp<span class="glyphicon glyphicon-user"></span> {{settlement.pop}}&nbsp;|&nbsp;{{settlement.surplus | number:2 | pctFilter:true }}
             <button type="button" class="btn btn-primary edit-btn" ng-click="newBuildingForms[$index].visible = !newBuildingForms[$index].visible">
-                <span class="glyphicon glyphicon-plus"></span>
+                <span title="Add building" class="glyphicon glyphicon-plus"></span>
             </button><br/>
         </div>
         <div class="panel-body">
@@ -37,7 +37,7 @@
                     <div class="panel-heading">
                         #{{building.id}} <b>{{building.type | buildingTypeFilter}}</b>
                         <span ng-show="building.built" class="glyphicon glyphicon-ok"></span>
-                        <button type="button" class="btn btn-sm btn-primary edit-btn" ng-click="toggleVisibility('editForms',building.id)">
+                        <button title="Edit building"  type="button" class="btn btn-sm btn-primary edit-btn" ng-click="toggleVisibility('editForms',building.id)">
                             <span class="glyphicon glyphicon-edit"></span>
                         </button><br/>
                     </div>
@@ -82,7 +82,7 @@
                             </form><br/>
 
                             <button title="Togge build" type="submit" class="btn btn-danger" ng-click="toggleBuild(building.id)">
-                                <span class="glyphicon glyphicon-wrench"></span>
+                                <span title="Toggle build" class="glyphicon glyphicon-wrench"></span>
                             </button>
                         </div>
                         <!-- {{building | displayBuilding}} -->
@@ -92,16 +92,21 @@
 
             <form class="form-inline" ng-submit="deleteBuilding($index)">
                 <input class="form-control form-control-sm" required ng-model="deleteForms[$index].id" placeholder="building ID">
-                <button type="submit" class="btn btn-danger btn-sm">
+                <button title="Remove building" type="submit" class="btn btn-danger btn-sm">
                     <span class="glyphicon glyphicon-remove"></span>
                 </button>
             </form>
         </div>
     </div>
 
-    <button type="button" style="margin-bottom: 10px;" class="btn btn-primary" ng-click="dump()">
-        <!-- <span class="glyphicon glyphicon-edit"></span>-->Export
-    </button><br/>
+    <button title="Export database" type="button" style="margin-bottom: 10px;" class="btn btn-primary" ng-click="dump()">
+        <span class="glyphicon glyphicon-save"></span>
+    </button>
+    <button file-browser title="Import database" type="button" style="margin-bottom: 10px;" class="btn btn-primary">
+        <span class="glyphicon glyphicon-open"></span>
+    </button> <!-- see http://embed.plnkr.co/2vgnFe/ -->
+    <!-- <input type="file" ngf-select ng-model="picFile" name="file" ngf-max-size="20MB" required ngf-model-invalid="errorFile">-->
+    <br/>
 
     <div class="panel panel-default" ng-repeat="screenshot in screenshots">
         <div class="panel-heading">

@@ -107,11 +107,14 @@ NPC.prototype.decideBattleAction = function(){
     var action = this.actionQueue.shift();
     if(!action) action = 'attack';
     if(!this.target || !this.target.isInFight()) this.target = this.selectTarget();
-    if(!this.target) return;
+    if(!this.target) {
+        this.battle.end();
+        return;
+    }
     console.log('Target of',this.getShortID(),'is',this.target.getShortID());
     var data;
     switch(action){
-        case 'attack': // If not next to and can'r range, will become a 'move' action
+        case 'attack': // If not next to and can't range, will become a 'move' action
             data = this.attackTarget();
             break;
         case 'move':
@@ -177,7 +180,22 @@ NPC.prototype.aggroAgainst = function(f){
 NPC.prototype.selectTarget = function(){
     var fighters = this.battle.fighters.slice();
     if(fighters.length == 0) return null;
-    fighters = fighters.filter(function(f){
+    var target = null;
+    for(var i = 1; i < fighters.length; i++){
+        var f = fighters[i];
+        if(this.isSameTeam(f) || !this.aggroAgainst(f)) continue;
+        if(!target){
+            target = f;
+            continue;
+        }
+        if(target.battlePriority == f.battlePriority){
+            if(f.getHealth() < target.getHealth()) target = f;
+        }else{
+            if(f.battlePriority < target.battlePriority) target = f;
+        }
+    }
+    return target;
+    /*fighters = fighters.filter(function(f){
         return (!this.isSameTeam(f) && this.aggroAgainst(f));
     },this);
     fighters.sort(function(a,b){
@@ -189,7 +207,7 @@ NPC.prototype.selectTarget = function(){
             return 1;
         }
     });
-    return fighters[0];
+    return fighters[0];*/
 };
 
 //Check if a *moving entity* (no building or anything) other than self is at position
@@ -275,6 +293,10 @@ NPC.prototype.updateWander = function(){
     if(this.idleTime <= 0){
         var dest = this.findRandomDestination();
         //console.log(dest);
+        if(!dest){
+            console.warn('No destination found');
+            return;
+        }
         var foundPath = this.goToDestination(dest);
         if(!foundPath) this.idleTime = GameServer.wildlifeParameters.idleRetry;
     }

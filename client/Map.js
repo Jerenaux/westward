@@ -373,6 +373,11 @@ var Pin = new Phaser.Class({
         }else{
             this.setOrigin(0.5,1);
         }
+        // Phaser 3.12:
+        /*var bg = bgframe ? 'bg'+bgframe : 'bg';
+        if(frame != 'x') this.drawFrame('mapicons',bg,0,0);
+        this.drawFrame('mapicons',frame,0,0);*/
+        // Phaser 3.11:
         var icon = Engine.scene.add.sprite(0,0,'mapicons',frame);
         var bg = bgframe ? 'bg'+bgframe : 'bg';
         var bg = Engine.scene.add.sprite(0,0,'mapicons',bg);

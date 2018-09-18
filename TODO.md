@@ -18,8 +18,9 @@ Pillars:
 
 Chapter 1
 1) The War
-- Adapt animatins and delays for firearms
+- Adapt animations and delays for firearms
 2) The Economy
+- Bug in workshop title
 - Resource flows < 1 (e.g. pelts)
 - Flows from tradepost? (Food to fort, ingredients to workshop)
 - Flow of some finished products (workshop -> trade post)? e.g. ammo ...
@@ -39,7 +40,10 @@ defend trade routes, scout, maintain supplies)
 - Commitment lasts multiple turns
 - Gray out sell inventory in shop as well?
 3) The Wild
-- Slow when moving?
+- Items spawn on top of each other
+- Slow when moving? Wait for 3.12 to see if better?
+-> Then if still need for blitters, solver depth issue
+-> How to destroy bobs in blitters?
 - Spawning in battle area, moving: doesn't stop movement
 - Stop walk when opening menu
 - Camera bounds (test with northernmost camp)
@@ -87,6 +91,7 @@ Chapter 3:
 -> Adapth pathfinding for multi-cell entities
 -> trimPath for multicell entities
 2) The Economy
+- Pinning recipes on UI (so as not to have to memorize ingredients)
 - Governor & officials
 - Elections
 - Taxes
@@ -97,6 +102,7 @@ Chapter 3:
 - Backpacks, purses, belts, gloves (remove shields) ...
 - War economy (tower ammunitions, ...)
 3) The Wild
+- Look into GameObject.willRender to see if can be used to know when a sprit is hidden by a tree, tower... 
 - Fatigue & rest, impact on everything
 - Different pelts and leathers, rework crafting recipes, full pelt economy
 
@@ -218,7 +224,6 @@ V1 level:
 
 Admin
 -----
-Modify conf file online and reload it
 Import db
 -> Iterate over import object, if matching id in db, update fields, if not, insert new entry 
 Set coordinates
@@ -608,6 +613,7 @@ Testing:
 -> Time to acquire dev level goals based on building production rates, varying number of buildings, productivity, etc.
 -> Evolution of food surplus based on number of players, buildings, etc.
 -> Set all these paremeters in a virtual settlement, simulate one day/week/month/year buy iteratively computing all cycles and their consequences in that time, then see results
+-> Check how the relationship between population and food-producing buildings evolves as pop grows
 - Figure out testing:
 - Have a test server, test database a test map set up
 - Open browser and run test script in test world

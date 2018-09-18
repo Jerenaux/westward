@@ -388,7 +388,7 @@ Building.prototype.decreaseAmmo = function(){
 
 Building.prototype.decideBattleAction = function(){
     if(!this.target || !this.target.isInFight()) this.target = this.selectTarget();
-    var data = this.attackTarget();
+    var data = (this.target ? this.attackTarget() : {action: 'pass'});
     this.battle.processAction(this,data);
 };
 
@@ -398,6 +398,23 @@ Building.prototype.isSameTeam = function(f){
 
 Building.prototype.selectTarget = function(){
     var fighters = this.battle.fighters.slice();
+    if(fighters.length == 0) return null;
+    var target = null;
+    for(var i = 1; i < fighters.length; i++){
+        var f = fighters[i];
+        if(this.isSameTeam(f)) continue;
+        if(!target){
+            target = f;
+            continue;
+        }
+        if(target.battlePriority == f.battlePriority){
+            if(f.getHealth() < target.getHealth()) target = f;
+        }else{
+            if(f.battlePriority < target.battlePriority) target = f;
+        }
+    }
+    return target;
+    /*var fighters = this.battle.fighters.slice();
     fighters = fighters.filter(function(f){
         return (!this.isSameTeam(f));
     },this);
@@ -405,7 +422,7 @@ Building.prototype.selectTarget = function(){
         if(a.getHealth() < b.getHealth()) return -1;
         return 1;
     });
-    return fighters[0];
+    return fighters[0];*/
 };
 
 Building.prototype.attackTarget = function(){

@@ -39,6 +39,7 @@
     "icon": "fort",
     "recipe": {"3":50},
     "displayProd": false,
+    "buildRate":2,
     "canFight": true,
     "health": 500,
     "dmg": 20

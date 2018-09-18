@@ -63,6 +63,7 @@ Civ.prototype.updateBehavior = function(){
     if(this.trackedTarget) {
         this.updateTracking();
     }else{
+        if(!this.camp) return;
         this.updateWander();
     }
 };
@@ -70,7 +71,7 @@ Civ.prototype.updateBehavior = function(){
 Civ.prototype.findRandomDestination = function(){
     if(!this.camp){
         console.warn('Civ without camp');
-        return;
+        return null;
     }
     var r = GameServer.wildlifeParameters.wanderRange; // TODO: specify one for civs specifically
     var campR = 10; // TODO: conf

@@ -336,7 +336,6 @@ var Building = new Phaser.Class({
 
     handleOver: function(){
         UI.manageCursor(1,'building',this);
-
     },
 
     handleOut: function(){

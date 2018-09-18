@@ -156,13 +156,13 @@ function MiniProgressBar(x,y,w,color,mask){
     x -= w;
     x -= 5;
     y += 2;
-    this.tail = UI.scene.add.sprite(x,y,'UI');
+    this.tail = UI.scene.add.sprite(x,y,'UI','miniprogress_gold_left');
     this.body.push(this.tail);
     x += 4;
-    this.barBody = UI.scene.add.tileSprite(x,y,1,8,'UI');
+    this.barBody = UI.scene.add.tileSprite(x,y,1,8,'UI','miniprogress_gold_middle');
     this.body.push(this.barBody);
     x += 1;
-    this.head = UI.scene.add.sprite(x,y,'UI');
+    this.head = UI.scene.add.sprite(x,y,'UI','miniprogress_gold_right');
     this.body.push(this.head);
     this.setColor(color);
 

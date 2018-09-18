@@ -377,15 +377,17 @@ Engine.create = function(){
     Engine.currentMenu = null;
     Engine.currentPanel = null;
 
-    /* * Blitters:
-     * - 1 for ground tileset, depth 0
-     * - 1 for trees tileset, depth 2
-     * - 1 for canopies, depth 6*/
-    Engine.blitters = [];
-    Engine.blitters.push(Engine.scene.add.blitter(0,0,'ground_tiles').setDepth(0));
-    Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(2));
-    Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
-    Engine.useBlitters = false;
+    Engine.useBlitters = true;
+    if(Engine.useBlitters){
+        /* * Blitters:
+    * - 1 for ground tileset, depth 0
+    * - 1 for trees tileset, depth 2
+    * - 1 for canopies, depth 6*/
+        Engine.blitters = [];
+        Engine.blitters.push(Engine.scene.add.blitter(0,0,'ground_tiles').setDepth(0));
+        Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(2));
+        Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
+    }
 
     Engine.created = true;
     Client.requestData();
@@ -420,7 +422,7 @@ Engine.initWorld = function(data){
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
-    Engine.miniMap.display();
+    if(Engine.miniMap) Engine.miniMap.display();
     Engine.updateAllOrientationPins();
 
     if(Client.isNewPlayer()) {
@@ -1067,16 +1069,20 @@ Engine.makeFortMenu = function(){
     var lvlh = 150;
 
     var fort = new Menu('Fort');
+
     var mapPanel = new MapPanel(mapx,mapy,mapw,maph,'',true); // true = invisible
     mapPanel.addBackground('scrollbgh');
     mapPanel.addMap('building','radial3',400,400,300,300);
     mapPanel.addButton(mapw-30, 8, 'blue','help',null,'',UI.textsData['map_help']);
     fort.addPanel('map',mapPanel);
+    fort.addEvent('onUpdateMap',mapPanel.update.bind(mapPanel));
 
     var buildings = new BuildingsPanel(buildx,buildy,buildw,buildh,'Buildings');
     buildings.addButton(130, -9, 'blue','help',null,'',UI.textsData['buildings_help']);
     buildings.makeScrollable();
     fort.addPanel('buildings',buildings);
+    fort.addEvent('onUpdateBuildings',buildings.updateListing.bind(buildings));
+
     var resources = new InventoryPanel(resx,resy,resw,resh,'Resources');
     resources.addCapsule('gold',150,-9,'999','gold');
     resources.addButton(resw-30, 8, 'blue','help',null,'',UI.textsData['resources_help']);
@@ -1097,9 +1103,7 @@ Engine.makeFortMenu = function(){
     fort.addEvent('onUpdateShopGold',function(){
         resources.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
     });
-    fort.addEvent('onUpdateBuildings',buildings.updateListing.bind(buildings));
     fort.addEvent('onUpdateSettlementStatus',status.update.bind(status));
-    fort.addEvent('onUpdateMap',mapPanel.update.bind(mapPanel));
     return fort;
 };
 
@@ -1401,6 +1405,7 @@ Engine.drawChunk = function(mapData,id){
 };
 
 Engine.removeChunk = function(id){
+    if(Engine.useBlitters) return; // todo: hack
     Engine.chunks[id].removeLayers();
     Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
 };
