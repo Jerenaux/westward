@@ -15,10 +15,10 @@
         "right": 25
     },
     "stats": {
-      "hpmax": 150,
-      "hp": 150,
-      "def": 8,
-      "mdmg": 4
+      "hpmax": 100,
+      "hp": 100,
+      "def": 5,
+      "mdmg": 2
     },
     "xp": 10,
     "loot":{

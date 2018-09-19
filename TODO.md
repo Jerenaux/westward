@@ -19,11 +19,14 @@ Pillars:
 Chapter 1
 1) The War
 - Adapt animations and delays for firearms
+- No XP when losing fight
+- Display notifications higher if battle UI on
 2) The Economy
 - Bug in workshop title
 - Resource flows < 1 (e.g. pelts)
 - Flows from tradepost? (Food to fort, ingredients to workshop)
 - Flow of some finished products (workshop -> trade post)? e.g. ammo ...
+=> But optional, don't send to fort if no rule
 - Introduce new wood ingredient obtained from timber (logs?)
 - Currency? (+ flow from trade post and workshop to fort) / money flow
 - Fix the right amount of buildings in each settlement, their output per turn, turn duration
@@ -60,6 +63,7 @@ Chapter 2
 => Ranged weapon have very low building damage, melee weapon more, maces and axes much more, bombs a lot
 - Multiple bomb types with variable stats
 - Barracks and troops (need food inflow to barracks)
+-> Troops need food to train + count for recurring food consumption
 - Fortified civ camps, rebuilds
 - More involved raid mechanics (patrols, list of units ready to raid, units coming back to base, units healing when at base) using a more complex states scheme
 - NPC used ranged attacks (no firarms and bombs though)

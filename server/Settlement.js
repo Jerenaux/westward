@@ -44,6 +44,9 @@ function Settlement(data){
         25:[ // gold
             [3,0,1]
         ],
+        28: [ // stone hatchet
+            [1,0,1]
+        ],
         34:[ // sulfur
             [1,0,1],
             [3,0,9]
@@ -53,10 +56,10 @@ function Settlement(data){
     GameServer.settlements[this.id] = this;
 }
 
-Settlement.prototype.dispatchResource = function(item,nb){
+Settlement.prototype.dispatchResource = function(item,nb,force){
     if(!this.dispatch.hasOwnProperty(item)){
-        console.warn('No dispatch rule for item',item);
-        this.addToFort(item,nb);
+        //console.warn('No dispatch rule for item',item);
+        if(force) this.addToFort(item,nb);
         return;
     }
     //console.log('-----Dispatching ',nb,' ',item,'------');

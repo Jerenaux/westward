@@ -53,6 +53,7 @@ function Building(data){
     this.setGold(data.gold || 0);
     this.built = !!data.built;
     this.progress = data.progress || 0;
+    this.isWorkshop = buildingData.workshop;
     this.inFight = false;
 
     this.stats = Stats.getSkeleton();
@@ -128,11 +129,20 @@ Building.prototype.update = function(){
     this.updateCommitment();
     if(this.built){
         this.updateProd();
+        if(this.isWorkshop) this.dispatchStock();
         this.repair();
     }else{
         this.updateBuild();
     }
     this.save();
+};
+
+Building.prototype.dispatchStock = function(){
+    if(!GameServer.isTimeToUpdate('production')) return false;
+    for(var item in this.inventory.items){
+        var nb = this.inventory.getNb(item);
+        if(nb > 0) this.settlement.dispatchResource(item,nb,false); // false: do not force dispatch
+    }
 };
 
 Building.prototype.updateProd = function(){
@@ -146,7 +156,7 @@ Building.prototype.updateProd = function(){
         var actualNb = increment;
         //console.log('producing ',actualNb,' ',GameServer.itemsData[item].name);
         //if(actualNb > 0) this.settlement.addToFort(item,actualNb);
-        if(actualNb > 0) this.settlement.dispatchResource(item,actualNb);
+        if(actualNb > 0) this.settlement.dispatchResource(item,actualNb,true); // true: force dispatch
     }
 };
 
@@ -414,15 +424,6 @@ Building.prototype.selectTarget = function(){
         }
     }
     return target;
-    /*var fighters = this.battle.fighters.slice();
-    fighters = fighters.filter(function(f){
-        return (!this.isSameTeam(f));
-    },this);
-    fighters.sort(function(a,b){
-        if(a.getHealth() < b.getHealth()) return -1;
-        return 1;
-    });
-    return fighters[0];*/
 };
 
 Building.prototype.attackTarget = function(){

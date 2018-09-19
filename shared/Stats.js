@@ -15,7 +15,7 @@ var Stats = {
             desc: 'If it gets to 0, you die. Potions can replenish it.',
             min: 0,
             max: 10000,
-            start: 100,
+            start: 300,
             frame: 1,
             isMax: 'hp'
         },
@@ -24,7 +24,7 @@ var Stats = {
             desc: 'If it gets to 0, you die. Potions can replenish it.',
             min: 0,
             max: 10000,
-            start: 100,
+            start: 300,
             frame: 1,
             hasMax: 'hpmax',
             noModifier: true
@@ -60,7 +60,7 @@ var Stats = {
             desc: 'Offensive power of your melee attacks. Depends on the currently equipped melee weapon.',
             min: 0,
             max: 1000,
-            start: 12,
+            start: 19,
             frame: 3
         },
         rdmg: {

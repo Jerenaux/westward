@@ -203,7 +203,7 @@
     "desc": "Robust string made from plant fibers, primarily used to make bows.",
     "isCrafted": true,
     "isMaterial": true,
-    "recipe":{"8":5},
+    "recipe":{"8":3},
     "sound": "cloth"
   },
   "22":{

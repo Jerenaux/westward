@@ -269,7 +269,7 @@ GameServer.addItem = function(x,y,type){
 
 GameServer.onInitialized = function(){
     console.warn('--- Performing on initialization tasks ---');
-    GameServer.addCiv(1205,167);
+    //GameServer.addCiv(1205,167);
     /*var civ = GameServer.addCiv(515,655);
     civ.camp = {
         center : {
@@ -277,7 +277,8 @@ GameServer.onInitialized = function(){
             y: 655
         }
     }*/
-    GameServer.addAnimal(1205,196,0);
+    GameServer.addCiv(1205,167);
+    GameServer.addCiv(1205,168);
     //GameServer.addAnimal(511,654,0);
     /*GameServer.addCiv(513,656);
     GameServer.addCiv(514,657);
