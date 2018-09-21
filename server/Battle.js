@@ -95,7 +95,7 @@ Battle.prototype.removeFighter = function(f){
     var idx = this.getFighterIndex(f);
     if(idx == -1) return;
     var isTurnOf = this.isTurnOf(f);
-    f.endFight(false);
+    f.endFight(false); // false for not alive
     f.die();
     this.fighters.splice(idx,1);
     //if(f.isPlayer) this.removeFromPosition(f); // if NPC, leave busy for his body
@@ -366,10 +366,11 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
         }); // for the flash and hp display
     }else{
         if(!a.canRange()) return false;
-        var fireDelay = GameServer.battleParameters.rangedAtkDelay;
+        var fireDelay = GameServer.battleParameters.rangedAtkDelay; // duration of character firing animation
         var tof = this.computeTOF(a,b,'arrow');
         delay = fireDelay + tof;
-        var c = b.getCenter();
+        var c = b.getCenter(true); // true for no rounding
+        console.warn('targetting ',c);
         a.setProperty('ranged_atk',
             {
                 x:c.x,
@@ -432,7 +433,7 @@ Battle.prototype.end = function(){
     this.ended = true;
     clearInterval(this.loop);
     this.fighters.forEach(function(f){
-        f.endFight(true);
+        f.endFight(true); // true for alive
         if(f.isPlayer) f.notifyFight(false);
     });
     this.cleanUp();

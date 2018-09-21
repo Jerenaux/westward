@@ -54,8 +54,10 @@ function Building(data){
     this.built = !!data.built;
     this.progress = data.progress || 0;
     this.isWorkshop = buildingData.workshop;
-    this.inFight = false;
 
+    this.newitems = new Inventory(GameServer.buildingParameters.inventorySize);
+
+    this.inFight = false;
     this.stats = Stats.getSkeleton();
     this.stats['hp'].setBaseValue(buildingData.health);
     this.stats['hpmax'].setBaseValue(buildingData.health);
@@ -129,7 +131,8 @@ Building.prototype.update = function(){
     this.updateCommitment();
     if(this.built){
         this.updateProd();
-        if(this.isWorkshop) this.dispatchStock();
+        //if(this.isWorkshop) this.dispatchStock();
+        this.dispatchStock();
         this.repair();
     }else{
         this.updateBuild();
@@ -137,26 +140,30 @@ Building.prototype.update = function(){
     this.save();
 };
 
+// Dispatch any items acquired by the building through trade or craft only
 Building.prototype.dispatchStock = function(){
-    if(!GameServer.isTimeToUpdate('production')) return false;
-    for(var item in this.inventory.items){
+    for(var item in this.newitems.items){
         var nb = this.inventory.getNb(item);
-        if(nb > 0) this.settlement.dispatchResource(item,nb,false); // false: do not force dispatch
+        console.warn('Dispatching new stuff:',item,nb);
+        if(nb > 0) this.settlement.dispatchResource(this,item,nb,false); // false: do not force dispatch
     }
+    this.newitems.clear();
 };
 
 Building.prototype.updateProd = function(){
-    if(!GameServer.isTimeToUpdate('production')) return false;
+    //if(!GameServer.isTimeToUpdate('production')) return false;
     var production = GameServer.buildingsData[this.type].production;
     if(!production) return;
     for(var i = 0; i < production.length; i++){
         var item = production[i][0];
         var baseNb = production[i][1];
+        var turns = production[i][2];
+        if(!GameServer.haveNbTurnsElapsed(turns)) continue;
         var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
         var actualNb = increment;
         //console.log('producing ',actualNb,' ',GameServer.itemsData[item].name);
         //if(actualNb > 0) this.settlement.addToFort(item,actualNb);
-        if(actualNb > 0) this.settlement.dispatchResource(item,actualNb,true); // true: force dispatch
+        if(actualNb > 0) this.settlement.dispatchResource(this,item,actualNb,true); // true: force dispatch
     }
 };
 
@@ -239,8 +246,9 @@ Building.prototype.hasItem = function(item,nb){
     return (this.inventory.getNb(item) >= nb);
 };
 
-Building.prototype.giveItem = function(item,nb){
+Building.prototype.giveItem = function(item,nb,remember){
     this.inventory.add(item,nb);
+    if(remember) this.newitems.add(item,nb);
     this.setProperty('items',this.inventory.toList());
 };
 

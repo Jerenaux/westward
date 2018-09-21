@@ -134,11 +134,18 @@ MovingEntity.prototype.checkForBattle = function(){
 };
 
 
-MovingEntity.prototype.getCenter = function(){
-    return {
-        x: Math.floor(this.x + this.cellsWidth/2),
-        y: Math.floor(this.y + this.cellsHeight/2)
-    };
+MovingEntity.prototype.getCenter = function(noRound){
+    if(noRound){
+        return {
+            x: this.x + this.cellsWidth / 2,
+            y: this.y + this.cellsHeight / 2
+        };
+    }else {
+        return {
+            x: Math.floor(this.x + this.cellsWidth / 2),
+            y: Math.floor(this.y + this.cellsHeight / 2)
+        };
+    }
 };
 
 MovingEntity.prototype.setChat = function(text){

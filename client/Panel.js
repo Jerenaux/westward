@@ -113,7 +113,7 @@ Panel.prototype.addMask = function(){
     var shape = UI.scene.make.graphics();
     shape.fillStyle('#ffffff');
     shape.fillRect(this.x,this.y+15,this.width,this.height-25);
-    this.mask = new Phaser.Display.Masks.GeometryMask(UI.scene, shape);
+    this.mask = shape.createGeometryMask();
 };
 
 Panel.prototype.setWrap = function(wrap){
@@ -126,7 +126,7 @@ Panel.prototype.scroll = function(y){
     this.scrollPin.y = y;
     this.texts.forEach(function(t){
         t.y += dy;
-    })
+    });
     this.longSlots.forEach(function(s){
         s.move(0,dy);
     });

@@ -211,7 +211,7 @@
     "mainMenu": "production",
     "displayProd": true,
     "canFight": false,
-    "production": [[1,3],[9,1]],
+    "production": [[1,3,10],[9,1,100]],
     "buildRate":10,
     "health": 50
   },
@@ -246,7 +246,7 @@
     "mainMenu": "production",
     "depthOffset": 2,
     "displayProd": true,
-    "production": [[3,1]],
+    "production": [[3,1,10]],
     "canFight": false,
     "buildRate":10,
     "health": 50
@@ -281,7 +281,7 @@
     "mainMenu": "production",
     "depthOffset": 3,
     "displayProd": true,
-    "production": [[22,1]],
+    "production": [[22,1,10]],
     "canFight": false,
     "buildRate":10,
     "health": 50
@@ -316,7 +316,7 @@
     "mainMenu": "production",
     "depthOffset": 3,
     "displayProd": true,
-    "production": [[24,1]],
+    "production": [[24,1,10]],
     "canFight": false,
     "buildRate":10,
     "health": 50
@@ -351,7 +351,7 @@
     "mainMenu": "production",
     "depthOffset": 3,
     "displayProd": true,
-    "production": [[25,1]],
+    "production": [[25,1,10]],
     "canFight": false,
     "buildRate":10,
     "health": 50
@@ -392,7 +392,7 @@
     },
     "depthOffset": 6,
     "displayProd": true,
-    "production": [[1,5]],
+    "production": [[1,5,10]],
     "canFight": false,
     "buildRate":10,
     "health": 250

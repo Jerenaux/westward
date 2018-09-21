@@ -35,7 +35,7 @@ ProgressBar.prototype.finalize = function(){
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
-        if(this.mask) e.mask = this.mask;
+        if(this.mask) e.setMask(this.mask);
     },this);
     this.body[2].setDepth(2);
 };

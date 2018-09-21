@@ -32,8 +32,8 @@ function LongSlot(width,mask){
         s.setScrollFactor(0);
         s.setDepth(1);
         s.setVisible(false);
-        s.mask = mask;
-    });
+        s.setMask(this.mask);
+    },this);
 
     this.zone = this.createZone();
 }
@@ -63,7 +63,7 @@ LongSlot.prototype.addIcon = function(atlas,frame){
         this.icon.setScrollFactor(0);
         this.icon.setDepth(1);
         this.icon.setVisible(false);
-        this.icon.mask = this.mask;
+        this.icon.setMask(this.mask);
     }
     this.icon.setDisplayOrigin(Math.floor(this.icon.frame.width / 2), Math.floor(this.icon.frame.height / 2));
 };
@@ -74,7 +74,7 @@ LongSlot.prototype.getNextText = function(){
         t.setDisplayOrigin(0,0);
         t.setScrollFactor(0);
         t.setDepth(1);
-        t.mask = this.mask;
+        t.setMask(this.mask);
         this.texts.push(t);
     }
     return this.texts[this.textCounter++];

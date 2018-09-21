@@ -614,9 +614,9 @@ Player.prototype.exitBuilding = function(){
     this.setProperty('inBuilding', -1);
 };
 
-Player.prototype.endFight = function(){
+Player.prototype.endFight = function(alive){
     MovingEntity.prototype.endFight.call(this);
-    if(this.xpPool) this.gainClassXP(0,this.xpPool,true);
+    if(this.xpPool && alive) this.gainClassXP(0,this.xpPool,true);
 };
 
 Player.prototype.isAvailableForFight = function(){

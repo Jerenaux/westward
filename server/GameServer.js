@@ -268,6 +268,7 @@ GameServer.addItem = function(x,y,type){
 };
 
 GameServer.onInitialized = function(){
+    if(!config.get('misc.performInit')) return;
     console.warn('--- Performing on initialization tasks ---');
     //GameServer.addCiv(1205,167);
     /*var civ = GameServer.addCiv(515,655);
@@ -278,7 +279,6 @@ GameServer.onInitialized = function(){
         }
     }*/
     GameServer.addCiv(1205,167);
-    GameServer.addCiv(1205,168);
     //GameServer.addAnimal(511,654,0);
     /*GameServer.addCiv(513,656);
     GameServer.addCiv(514,657);
@@ -307,12 +307,13 @@ GameServer.setUpdateLoops = function(){
 GameServer.startEconomy = function(){
     GameServer.economyTurns = config.get('economyCycles.turns');
     GameServer.elapsedTurns = 0;
-    var maxDuration = 0;
+    /*var maxDuration = 0;
     for(var event in GameServer.economyTurns){
         var duration = GameServer.economyTurns[event];
         if(duration > maxDuration) maxDuration = duration;
     }
-    GameServer.maxTurns = maxDuration;
+    GameServer.maxTurns = maxDuration;*/
+    GameServer.maxTurns = 100;
 
     // TODO: compute turns elapsed during server shutdown?
     GameServer.economyTurn();
@@ -332,7 +333,7 @@ GameServer.economyTurn = function(){
     });
 
     GameServer.updateEconomicEntities(GameServer.settlements); // food surplus
-    GameServer.updateEconomicEntities(GameServer.buildings); // prod, build, commit
+    GameServer.updateEconomicEntities(GameServer.buildings); // prod, build, commit ...
 
     for(var sid in GameServer.settlements){
         GameServer.settlements[sid].refreshListing();
@@ -354,6 +355,10 @@ GameServer.getCommitmentDuration = function(){
 
 GameServer.isTimeToUpdate = function(event){
     return (GameServer.elapsedTurns%GameServer.economyTurns[event] == 0);
+};
+
+GameServer.haveNbTurnsElapsed = function(nb){
+    return (GameServer.elapsedTurns%nb == 0);
 };
 
 GameServer.getPlayer = function(socketID){
@@ -681,7 +686,7 @@ GameServer.handleShop = function(data,socketID) {
         player.giveGold(price,true);
         player.takeItem(item,nb,true);
         building.takeGold(price);
-        building.giveItem(item,nb);
+        building.giveItem(item,nb,true); // true = remember
         player.gainClassXP(GameServer.classes.merchant,Math.floor(price/10), true); // TODO: factor in class level
     }
     building.save();
@@ -765,8 +770,6 @@ GameServer.handleCraft = function(data,socketID){
     var nb = data.nb;
     var stock = data.stock;
     if(!targetItem) return;
-    //var building = GameServer.itemsData[targetItem].building;
-    //if(building) return;
     var recipient = (stock == 1 ? player : building);
     var recipe = GameServer.itemsData[targetItem].recipe;
     if(!GameServer.allIngredientsOwned(recipient,recipe,nb)) return;
@@ -788,7 +791,7 @@ GameServer.operateCraft = function(recipient,recipe,targetItem,nb){
         recipient.takeItem(item,recipe[item]*nb,true);
     }
     var output = GameServer.itemsData[targetItem].output || 1;
-    recipient.giveItem(targetItem,nb*output,true);
+    recipient.giveItem(targetItem, nb * output, true); // true to notify player (if player) or rememeber transaction (if building)
 };
 
 GameServer.handlePath = function(data,socketID){

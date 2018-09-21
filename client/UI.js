@@ -132,6 +132,7 @@ UI.showNotification = function(notif,i,height) {
     notif.updatePosition(x,y);
 
     var endy = y - height - 50;
+    if(BattleManager.inBattle) endy -= 70;
     notif.endy = endy;
     var tween = UI.scene.tweens.addCounter({
         from: y,

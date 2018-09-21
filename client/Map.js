@@ -59,13 +59,9 @@ var Map = new Phaser.Class({
             var mask = UI.scene.add.sprite(this.x,this.y,texture);
             mask.setVisible(false);
             if(Boot.WEBGL){
-                //mask.setScale(1.1);
                 mask.setDepth(2);
                 mask.setScrollFactor(0);
-                this.maskType = 'bitmap';
-                //this.container.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
-                this.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
-                this.maskOverlay = mask;
+                this.setMask(new Phaser.Display.Masks.BitmapMask(UI.scene,mask));
             }else{ // Creates a rect shape based on mask texture
                 var w = mask.frame.width;
                 var h = mask.frame.height;
@@ -92,19 +88,11 @@ var Map = new Phaser.Class({
                     break;
             }
 
-            //this.container.mask = new Phaser.Display.Masks.GeometryMask(UI.scene, shape);
-            this.mask = new Phaser.Display.Masks.GeometryMask(UI.scene, shape);
-            this.maskOverlay = shape;
-            this.maskType = 'geom';
+            this.setMask(shape.createGeometryMask());
         }
 
-        this.maskOverlay.setVisible(false);
-
         this.toponyms.forEach(function(toponym){
-            toponym.mask = (Boot.WEBGL
-                    ? new Phaser.Display.Masks.BitmapMask(UI.scene,this.maskOverlay)
-                    : new Phaser.Display.Masks.GeometryMask(UI.scene, this.maskOverlay)
-            );
+            toponym.setMask(this.mask);
         },this);
     },
 
@@ -201,7 +189,7 @@ var Map = new Phaser.Class({
     },
 
     getNextPin: function(){
-        if(this.pinsCounter >= this.pins.length) this.pins.push(new Pin(this,this.maskOverlay));
+        if(this.pinsCounter >= this.pins.length) this.pins.push(new Pin(this));
         return this.pins[this.pinsCounter++];
     },
 
@@ -320,7 +308,6 @@ var Map = new Phaser.Class({
         }
 
         this.setVisible(true);
-        if(this.maskType == 'geom') this.maskOverlay.setVisible(true);
     },
 
     hide: function(){
@@ -330,7 +317,6 @@ var Map = new Phaser.Class({
         });
         this.setVisible(false);
         if(this.fow) this.fow.destroy();
-        if(this.maskOverlay) this.maskOverlay.setVisible(false);
     },
 
     hidePins: function(){
@@ -346,7 +332,6 @@ var Pin = new Phaser.Class({
     //Extends: CustomSprite,
     Extends: Phaser.GameObjects.RenderTexture,
 
-
     initialize: function Pin (map,mask) {
         //CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
         Phaser.GameObjects.RenderTexture.call(this, UI.scene, 0, 0, 16,16);
@@ -357,11 +342,12 @@ var Pin = new Phaser.Class({
         this.setScrollFactor(0);
         this.setVisible(false);
         this.setInteractive();
-        if(mask) this.mask = (Boot.WEBGL
+        /*if(mask) this.mask = (Boot.WEBGL
                 ? new Phaser.Display.Masks.BitmapMask(UI.scene,mask)
                 : new Phaser.Display.Masks.GeometryMask(UI.scene,mask)
-        );
+        );*/
         this.parentMap = map;
+        this.setMask(this.parentMap.mask);
         //this.parentMap.container.add(this);
         this.on('pointerover',this.handleOver.bind(this));
         this.on('pointerout',this.handleOut.bind(this));
@@ -374,15 +360,15 @@ var Pin = new Phaser.Class({
             this.setOrigin(0.5,1);
         }
         // Phaser 3.12:
-        /*var bg = bgframe ? 'bg'+bgframe : 'bg';
+        var bg = bgframe ? 'bg'+bgframe : 'bg';
         if(frame != 'x') this.drawFrame('mapicons',bg,0,0);
-        this.drawFrame('mapicons',frame,0,0);*/
+        this.drawFrame('mapicons',frame,0,0);
         // Phaser 3.11:
-        var icon = Engine.scene.add.sprite(0,0,'mapicons',frame);
+        /*var icon = Engine.scene.add.sprite(0,0,'mapicons',frame);
         var bg = bgframe ? 'bg'+bgframe : 'bg';
         var bg = Engine.scene.add.sprite(0,0,'mapicons',bg);
         if(frame != 'x') this.draw(bg.texture,bg.frame,0,0);
-        this.draw(icon.texture,icon.frame,0,0);
+        this.draw(icon.texture,icon.frame,0,0);*/
 
         this.tileX = tileX;
         this.tileY = tileY;

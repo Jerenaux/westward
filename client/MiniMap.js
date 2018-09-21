@@ -21,6 +21,7 @@ function MiniMap(){
         y: y,
         w: 0.95*r
     });
+    //this.map.addMask('minimap');
 
     this.bg.setInteractive();
     this.bg.on('pointerover',function(){

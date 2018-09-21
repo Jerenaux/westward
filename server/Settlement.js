@@ -24,6 +24,9 @@ function Settlement(data){
         1: [ // food
             [0,0,1] // 100% food to fort
         ],
+        2: [ // bow
+            [1,0,1]
+        ],
         3: [ // timber
             [0,0,8], // 80% timber to fort ...
             [1,0,1],
@@ -56,10 +59,13 @@ function Settlement(data){
     GameServer.settlements[this.id] = this;
 }
 
-Settlement.prototype.dispatchResource = function(item,nb,force){
+Settlement.prototype.dispatchResource = function(building,item,nb,force){
     if(!this.dispatch.hasOwnProperty(item)){
         //console.warn('No dispatch rule for item',item);
-        if(force) this.addToFort(item,nb);
+        if(force) {
+            this.addToFort(item,nb);
+            building.takeItem(item,nb);
+        }
         return;
     }
     //console.log('-----Dispatching ',nb,' ',item,'------');
@@ -76,6 +82,7 @@ Settlement.prototype.dispatchResource = function(item,nb,force){
                 var success = this.addResourceToBuilding(type, item, amount);
                 if(success){
                     this.dispatch[item][i][1] += amount;
+                    building.takeItem(item,amount);
                     nb -= amount;
                 }else{
                     failures++;

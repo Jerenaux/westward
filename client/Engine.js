@@ -377,7 +377,7 @@ Engine.create = function(){
     Engine.currentMenu = null;
     Engine.currentPanel = null;
 
-    Engine.useBlitters = true;
+    Engine.useBlitters = false;
     if(Engine.useBlitters){
         /* * Blitters:
     * - 1 for ground tileset, depth 0
@@ -763,14 +763,19 @@ Engine.displayArrow = function(from,to,depth,duration,delay){ // All coordinates
     arrow.setPosition(from.x+16,from.y+16);
     arrow.setDepth(depth);
     arrow.setVisible(false);
-    var angle = Phaser.Math.Angle.Between(from.x,from.y,to.x*32,to.y*32)*(180/Math.PI);
+
+    var destx = (parseFloat(to.x))*32;
+    var desty = (parseFloat(to.y))*32;
+    console.log(destx,desty);
+
+    var angle = Phaser.Math.Angle.Between(from.x,from.y,destx,desty)*(180/Math.PI);
     arrow.setAngle(angle + 45);
 
     Engine.scene.tweens.add(
         {
             targets: arrow,
-            x: (parseInt(to.x))*32,
-            y: (parseInt(to.y))*32,
+            x: destx,
+            y: desty,
             duration: duration,
             delay: delay,
             onComplete: function(){
@@ -1734,7 +1739,7 @@ Engine.enterBuilding = function(id){
                 type: 'prices',
                 items: building.prices,
                 key: 1,
-                hard: true//!buildingData.workshop
+                hard: false//!buildingData.workshop
             });
             menu.panels['shop'].updateInventory();
 

@@ -19,14 +19,9 @@ Pillars:
 Chapter 1
 1) The War
 - Adapt animations and delays for firearms
-- No XP when losing fight
 - Display notifications higher if battle UI on
 2) The Economy
 - Bug in workshop title
-- Resource flows < 1 (e.g. pelts)
-- Flows from tradepost? (Food to fort, ingredients to workshop)
-- Flow of some finished products (workshop -> trade post)? e.g. ammo ...
-=> But optional, don't send to fort if no rule
 - Introduce new wood ingredient obtained from timber (logs?)
 - Currency? (+ flow from trade post and workshop to fort) / money flow
 - Fix the right amount of buildings in each settlement, their output per turn, turn duration
@@ -41,10 +36,9 @@ Chapter 1
 defend trade routes, scout, maintain supplies)
 (-> Control quests distribution?)
 - Commitment lasts multiple turns
-- Gray out sell inventory in shop as well?
 3) The Wild
 - Items spawn on top of each other
-- Slow when moving? Wait for 3.12 to see if better?
+- Slow when moving?
 -> Then if still need for blitters, solver depth issue
 -> How to destroy bobs in blitters?
 - Spawning in battle area, moving: doesn't stop movement
@@ -271,6 +265,8 @@ Performance:
 - Flattening: second pass to delete water-only chunks based on visibility
 - Flattening based on transparency
 Order:
+- Store buildings data in separate files for the rendering stuff and the economic stuff;
+-> At least for economuc stuff, do it in json5
 - Look up and put as many parameters as possible in conf
 - Inyegrate battle.processAttack & battle.processAoE?
 - Proper initial cursor (using continuous polling or sth?)

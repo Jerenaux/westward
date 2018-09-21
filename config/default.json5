@@ -19,7 +19,7 @@ To add: time gap between two orientation sounds (OrientationPin.display())
         rangedAtkDelay: 500
    },
    buildings: {
-        canfight: false,
+        canfight: true,
         nobuildings: false,
         inventorySize: 100,
         maxGold: 99999
@@ -48,13 +48,14 @@ To add: time gap between two orientation sounds (OrientationPin.display())
             commitment: 1,
             foodConsumption: 10,
             harvesting: 60,
-            production: 10, // normal production + workshop dispatch
+            //production: 10, // normal production + workshop dispatch
             settlements: 1,
             spawnZones: 5
         }
     },
     misc: {
         foodID: 1,
+        performInit: true
     },
     pathfinding: {
         walkingSpeed: 5, // tiles/sec
@@ -69,7 +70,7 @@ To add: time gap between two orientation sounds (OrientationPin.display())
             aggro: 2000
     },
     civs: {
-        aggro: true,
+        aggro: false,
         wander: true,
         raidMinimum: 8
     },
