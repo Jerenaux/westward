@@ -2,11 +2,12 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 27-05-18.
  */
 
-function MiniMap(){
+function MiniMap(margin){
     var r = 150;
+    margin = margin || 20;
 
-    var x = Engine.getGameConfig().width - r/2 - 20;
-    var y = r/2 + 20;
+    var x = Engine.getGameConfig().width - r/2 - margin;
+    var y = r/2 + margin;
 
     this.bg = UI.scene.add.sprite(x,y,'minimap');
     this.bg.setDepth(1);

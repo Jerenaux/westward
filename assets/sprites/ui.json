@@ -455,6 +455,10 @@
     {
       "filename": "scroll_pin",
       "frame": {"x":821,"y":223,"w":12,"h":15}
+    },
+    {
+      "filename": "icon_holder",
+      "frame": {"x":802,"y":481,"w":44,"h":44}
     }
   ]
 }

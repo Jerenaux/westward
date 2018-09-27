@@ -194,7 +194,7 @@
     "useInBattle": true,
     "sound": "woodsmall",
     "isCrafted": true,
-    "recipe":{"7":1,"24":1,"30":4}
+    "recipe":{"7":1,"24":1,"30":1}
   },
   "21":{
     "atlas": "items",
@@ -367,7 +367,7 @@
     "isCrafted": true,
     "isMaterial": false,
     "craftTier": 1,
-    "recipe":{"24":1},
+    "recipe":{"24":1,"35":1},
     "output": 5,
     "equipment": "bullets",
     "effects":{"rdmg":60},

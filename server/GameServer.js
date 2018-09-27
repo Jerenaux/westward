@@ -269,8 +269,7 @@ GameServer.addItem = function(x,y,type){
 
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
-    console.warn('--- Performing on initialization tasks ---');
-    //GameServer.addCiv(1205,167);
+    console.log('--- Performing on initialization tasks ---');
     /*var civ = GameServer.addCiv(515,655);
     civ.camp = {
         center : {
@@ -278,8 +277,8 @@ GameServer.onInitialized = function(){
             y: 655
         }
     }*/
-    GameServer.addCiv(1205,167);
-    //GameServer.addAnimal(511,654,0);
+    //GameServer.addAnimal(1205,167,0);
+    //GameServer.addAnimal(1204,168,0);
     /*GameServer.addCiv(513,656);
     GameServer.addCiv(514,657);
     GameServer.addCiv(513,658);*/
@@ -307,13 +306,13 @@ GameServer.setUpdateLoops = function(){
 GameServer.startEconomy = function(){
     GameServer.economyTurns = config.get('economyCycles.turns');
     GameServer.elapsedTurns = 0;
-    /*var maxDuration = 0;
+    var maxDuration = 0;
     for(var event in GameServer.economyTurns){
         var duration = GameServer.economyTurns[event];
         if(duration > maxDuration) maxDuration = duration;
     }
-    GameServer.maxTurns = maxDuration;*/
-    GameServer.maxTurns = 100;
+    //GameServer.maxTurns = maxDuration;
+    GameServer.maxTurns = Math.max(maxDuration,300);
 
     // TODO: compute turns elapsed during server shutdown?
     GameServer.economyTurn();
@@ -437,7 +436,8 @@ GameServer.finalizePlayer = function(socket,player){
     GameServer.nbConnectedChanged = true;
     player.setOrUpdateAOI(); // takes care of adding to the world as well
     player.registerPlayer();
-    console.log(GameServer.server.getNbConnected()+' connected');
+    //console.log(GameServer.server.getNbConnected()+' connected');
+    Prism.logEvent(player,'connect',{stl:player.sid});
 };
 
 GameServer.createInitializationPacket = function(playerID){

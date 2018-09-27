@@ -20,7 +20,7 @@ function Settlement(data){
     this.players = [];
 
     // TODO: make modifiable
-    this.dispatch = {
+    this.dispatch = { // 0 = fort, 1 = trade post, 3 = workshop
         1: [ // food
             [0,0,1] // 100% food to fort
         ],
@@ -35,6 +35,18 @@ function Settlement(data){
         9: [ // pelts
            [3,0,4],
            [1,0,1]
+        ],
+        10: [ // tunic
+            [1,0,1]
+        ],
+        12: [ // gun
+            [1,0,1]
+        ],
+        13: [ // shield
+            [1,0,1]
+        ],
+        19: [ // quiver
+            [1,0,1]
         ],
         22:[ // coal
             [1,0,1],

@@ -10,23 +10,25 @@ var mongoose = require('mongoose');
 
 var eventSchema = new mongoose.Schema({
     pid: {type: Number, min: 0},
-    time: { type: Date, default: Date.now }
+    time: { type: Date, default: Date.now },
+    action: {type: Number, min: 0}
 });
 var Event = mongoose.model('Event', eventSchema);
 
 var TradeEvent = Event.discriminator(
     'TradeEvent',
     new mongoose.Schema({
-        action: Number,
         price: Number,
         item: Number,
-        nb: Number,
-        isEquipment: {type: Boolean, default: false},
-        isConsumable: {type: Boolean, default: false},
-        isResource: {type: Boolean, default: false},
-        isMaterial: {type: Boolean, default: false},
-        isCrafted: {type: Boolean, default: false},
-        craftTier: {type: Number, min: -1, default: -1}
+        nb: Number
+    }),
+    {discriminatorKey: 'kind'}
+);
+
+var ConnectEvent = Event.discriminator(
+    'ConnectEvent',
+    new mongoose.Schema({
+        stl: Number
     }),
     {discriminatorKey: 'kind'}
 );
@@ -34,13 +36,14 @@ var TradeEvent = Event.discriminator(
 var Prism = {
     actions: {
         'buy': 0,
-        'sell': 1
+        'sell': 1,
+        'connect': 2
     }
 };
 
 Prism.logEvent = function(player,actionKey,data){
-    if(!actionKey in Prism.actions){
-        console.log('ERROR: Unrecognized action key');
+    if(!(actionKey in Prism.actions)){
+        console.warn('ERROR: Unrecognized action key');
         return;
     }
     var action = Prism.actions[actionKey];
@@ -51,18 +54,21 @@ Prism.logEvent = function(player,actionKey,data){
     switch(action){
         case 0: // buy, fall-through to next
         case 1: // sell
-            data = getItemData(data);
+            //data = getItemData(data);
             event = new TradeEvent(data);
             break;
+        case 2: // connect
+            event = new ConnectEvent(data);
+            break;
     }
-    console.log(event);
+    console.log('event : ',event);
     event.save(function(err){
         if(err) throw err;
         console.log('Event logged');
     });
 };
 
-function getItemData(data){
+/*function getItemData(data){
     var fields = Object.keys(TradeEvent.schema.paths).filter(function(k){
         return k[0] != '_';
     });
@@ -70,6 +76,6 @@ function getItemData(data){
         data[field] = (data[field] !== undefined ? data[field] : GameServer.itemsData[data.item][field]);
     });
     return data;
-}
+}*/
 
 module.exports.Prism = Prism;

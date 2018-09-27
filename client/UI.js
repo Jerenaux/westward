@@ -12,6 +12,7 @@ var UI = {
         this.input.setGlobalTopOnly(true); // Prevent clicks from bubbling down to game scene
 
         this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
+        this.load.atlas('banners', 'assets/sprites/stlbanner.png', 'assets/sprites/stlbanner.json');
         this.load.spritesheet('icons2', 'assets/sprites/icons.png',{frameWidth:25,frameHeight:24});
 
         this.load.json('texts', 'assets/data/texts.json');
@@ -173,7 +174,12 @@ UI.getGameHeight = function(){
 };
 
 UI.manageCursor = function(inout,type,target){
-    var data = {
+    if(target){
+        target.setCursor();
+    }else{
+        UI.setCursor();
+    }
+    /*var data = {
         type: type,
         target: target
     };
@@ -205,7 +211,7 @@ UI.manageCursor = function(inout,type,target){
         }else {
             UI.setCursor('move');
         }
-    }
+    }*/
 };
 
 UI.downCursor = function(){
@@ -309,7 +315,6 @@ UI.displaySettlementSelectionMenu =  function(){
     if(Boot.WEBGL){
         var mask = UI.scene.add.sprite(scroll.x,scroll.y,'bigbg_mask');
         mask.setVisible(false);
-        //map.mask = new Phaser.Display.Masks.BitmapMask(UI.scene,mask);
         map.setMask(new Phaser.Display.Masks.BitmapMask(UI.scene,mask));
     }else{
         scroll.setScale(1.4);
@@ -343,6 +348,17 @@ UI.displaySettlement = function(data){
     icon.setOrigin(0.5,1);
     icon.setInteractive();
     UI.SScontent.push(icon);
+
+    var t = UI.scene.add.text(x, y+10, data.name, { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 4 });
+    t.setDepth(1).setScrollFactor(0).setOrigin(0.5);
+    var w = t.width;
+    var bannerx = x - 21 - w/2;
+    var bannery = y;
+    UI.SScontent.push(UI.scene.add.image(bannerx,bannery,'banners','left').setInteractive().setOrigin(0));
+    UI.SScontent.push(UI.scene.add.tileSprite(bannerx+21,bannery,w,24,'banners','middle').setInteractive().setOrigin(0));
+    UI.SScontent.push(UI.scene.add.image(bannerx+w+21,bannery,'banners','right').setInteractive().setOrigin(0));
+
+    UI.SScontent.push(t);
 
     UI.scene.tweens.add({
         targets: icon,

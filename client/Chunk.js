@@ -28,11 +28,14 @@ function Chunk(mapData,id,z){
 }
 
 Chunk.prototype.drawLayers = function(){
+    var grass = [258,259,274,275];
+    if(Engine.skipGrass) this.grass = Engine.scene.add.image(this.x*32,this.y*32,'grass'); // TODO: pool of grass
     for(var l = 0; l < this.layers.length; l++) {
         var layer = this.layers[l];
         var data = this.layerData[l];
         for (var i = 0; i < data.length; i++) {
             var tile = data[i];
+            if(Engine.skipGrass && grass.includes(tile)) continue; // TODO: improve
             if (tile == 0 || tile == null) continue;
             var coord = Utils.lineToGrid(i,this.width);
             var x = this.x + coord.x;
@@ -51,6 +54,7 @@ Chunk.prototype.removeLayers = function(){
             layer[i].destroy();
         }
     }
+    if(Engine.skipGrass) this.grass.destroy();
 };
 
 Chunk.prototype.addTile = function(x,y,tile,layer){

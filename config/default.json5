@@ -19,7 +19,7 @@ To add: time gap between two orientation sounds (OrientationPin.display())
         rangedAtkDelay: 500
    },
    buildings: {
-        canfight: true,
+        canfight: false,
         nobuildings: false,
         inventorySize: 100,
         maxGold: 99999
@@ -47,8 +47,7 @@ To add: time gap between two orientation sounds (OrientationPin.display())
             camps: 5,
             commitment: 1,
             foodConsumption: 10,
-            harvesting: 60,
-            //production: 10, // normal production + workshop dispatch
+            harvesting: 300,
             settlements: 1,
             spawnZones: 5
         }

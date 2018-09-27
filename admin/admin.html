@@ -118,7 +118,8 @@
     </div>
 
     <div ng-repeat="event in events">
-        {{event}}
+        <!--- ":this" means that a second argument is sent to the filter, which is a reference to the whole scope -->
+        {{event | eventFilter:this}}
     </div>
 
 </div>

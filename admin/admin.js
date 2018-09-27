@@ -211,3 +211,21 @@ app.filter('processImg',function(){
         return img.split(",")[1];
     }
 });
+
+app.filter('eventFilter',function(){
+    // TODO: sync event id's with Prism
+    return function(event,scope){
+        var t = new Date(event.time);
+        var dateStr = "["+t.getDate()+"/"+(t.getMonth()+1)+" "+t.getHours()+":"+t.getMinutes()+":"+t.getSeconds()+"]";
+        switch(event.action){
+            case 0:
+                return dateStr+" A player bought "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each";
+                break;
+            case 1:
+                return dateStr+" A player sold "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each";
+                break;
+            case 2:
+                return dateStr+" A player has connected in settlement "+event.stl;
+        }
+    }
+});

@@ -27,6 +27,8 @@ var Engine = {
     maxPathLength: 36,
 
     debugMarker: true,
+    dummyUI: false,
+    skipGrass: false,
 
     key: 'main', // key of the scene, for Phaser
     plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager','LightsPlugin'],
@@ -118,7 +120,13 @@ Engine.preload = function() {
     this.load.spritesheet('bears', 'assets/sprites/animals/bears2.png',{frameWidth:56,frameHeight:56});
     this.load.spritesheet('toadmen', 'assets/sprites/animals/toadmen.png',{frameWidth:48,frameHeight:48});
 
+    // ###### dummy
+    this.load.image('compass', 'assets/sprites/dummyUI/compas.png');
+    this.load.image('bell', 'assets/sprites/dummyUI/bell.png');
 
+    // #################""
+
+    this.load.image('grass', 'assets/sprites/grassbg.png');
     // Misc
     this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
@@ -418,7 +426,13 @@ Engine.initWorld = function(data){
     Engine.settlementsData = data.settlements;
     Engine.makeRecipesLists();
     Engine.addHero(data);
-    Engine.makeUI();
+
+    if(Engine.dummyUI){
+        Engine.makeDummyUI();
+    }else{
+        Engine.makeUI();
+    }
+
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
@@ -616,6 +630,43 @@ Engine.makeBuildingTitle = function(){
     Engine.settlementTitle = new UIHolder(512,55,'center','small');
 };
 
+// #############################
+
+function dummyRect(x,y,w,h){
+    var rect = UI.scene.add.rectangle(x, y, w, h, 0x6666ff);
+    rect.setDepth(0).setScrollFactor(0).setOrigin(0);
+    return rect;
+}
+
+function dummyText(x,y,txt){
+    var t = UI.scene.add.text(x, y, txt, { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 4 });
+    t.setDepth(1).setScrollFactor(0).setOrigin(0.5);
+    return t;
+}
+
+function dummyImage(x,y,atlas,frame){
+    var img = UI.scene.add.sprite(x,y,atlas,frame);
+    img.setDepth(2).setScrollFactor(0);
+    return img;
+}
+
+Engine.makeDummyUI = function(){
+    var sceneW = 1024;
+    var sceneH = 576;
+    dummyRect(0,0,sceneW,64);
+    var h = 32;
+    dummyRect(0,sceneH-h,sceneW,h);
+    dummyText(sceneW/2,16,'New Beginning');
+
+    Engine.miniMap = new MiniMap(2);
+    dummyImage(sceneW-22,22,'UI','icon_holder');
+    dummyImage(sceneW-172,22,'UI','icon_holder');
+    dummyImage(sceneW-22,22,'compass');
+    dummyImage(sceneW-172,22,'bell');
+};
+
+// #############################
+
 Engine.makeUI = function(){
     // TODO: make a zone with onpointerover = cursor is over UI, and make slices not interactive anymore
     Engine.UIHolder = new UIHolder(1000,500,'right');
@@ -633,8 +684,9 @@ Engine.makeUI = function(){
     });
     bug.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
 
-    Engine.makeBuildingTitle();
     Engine.miniMap = new MiniMap();
+
+    Engine.makeBuildingTitle();
 
     var statsPanel = new StatsPanel(665,335,330,145,'Stats');
     statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help']);
@@ -924,11 +976,11 @@ Engine.makeBattleMenu = function(){
 Engine.makeProductionMenu = function(){
     var production = new Menu('Production');
     var w = 400;
-    var h = 300;
+    var h = 330;
     var x = (Engine.getGameConfig().width-w)/2;
     var prodw = 250;
     var prodh = 100;
-    var prody = 230;
+    var prody = 260;
     var prodx = (Engine.getGameConfig().width-prodw)/2;
 
     var productionPanel = new ProductionPanel(x,100,w,h,'Production');
@@ -1084,7 +1136,7 @@ Engine.makeFortMenu = function(){
 
     var buildings = new BuildingsPanel(buildx,buildy,buildw,buildh,'Buildings');
     buildings.addButton(130, -9, 'blue','help',null,'',UI.textsData['buildings_help']);
-    buildings.makeScrollable();
+    //buildings.makeScrollable();
     fort.addPanel('buildings',buildings);
     fort.addEvent('onUpdateBuildings',buildings.updateListing.bind(buildings));
 

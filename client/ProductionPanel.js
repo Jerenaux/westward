@@ -15,7 +15,7 @@ ProductionPanel.prototype.constructor = ProductionPanel;
 ProductionPanel.prototype.addInterface = function(){
     this.addText(this.width/2,25,'Production:',null,20).setOrigin(0.5);
     var btnx = this.width/2;
-    this.button = new BigButton(this.x+btnx,this.y+250,'Commit!',Engine.commitClick);
+    this.button = new BigButton(this.x+btnx,this.y+280,'Commit!',Engine.commitClick);
 };
 
 ProductionPanel.prototype.displaySlots = function(){
