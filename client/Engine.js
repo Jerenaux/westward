@@ -121,8 +121,7 @@ Engine.preload = function() {
     this.load.spritesheet('toadmen', 'assets/sprites/animals/toadmen.png',{frameWidth:48,frameHeight:48});
 
     // ###### dummy
-    this.load.image('compass', 'assets/sprites/dummyUI/compas.png');
-    this.load.image('bell', 'assets/sprites/dummyUI/bell.png');
+    //this.load.atlas('dummy', 'assets/sprites/dummy.png', 'assets/sprites/dummy.json');
 
     // #################""
 
@@ -162,6 +161,7 @@ Engine.preload = function() {
     this.load.image('fullmap', 'assets/sprites/fortmap.png');
     this.load.image('fullmap_zoomed', 'assets/sprites/fortmap_01.png');
     this.load.image('minimap', 'assets/sprites/minimap2s.png');
+    this.load.image('mapring', 'assets/sprites/ring.png');
 
     // SFX
     Engine.audioFiles = [];
@@ -432,6 +432,7 @@ Engine.initWorld = function(data){
     }else{
         Engine.makeUI();
     }
+    Engine.setlCapsule.setText(data.settlements[data.settlement].name);
 
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
@@ -632,20 +633,25 @@ Engine.makeBuildingTitle = function(){
 
 // #############################
 
-function dummyRect(x,y,w,h){
-    var rect = UI.scene.add.rectangle(x, y, w, h, 0x6666ff);
+function dummyRect(x,y,w,h,color){
+    var rect = UI.scene.add.rectangle(x, y, w, h, (color || 0x6666ff));
     rect.setDepth(0).setScrollFactor(0).setOrigin(0);
     return rect;
 }
 
-function dummyText(x,y,txt){
-    var t = UI.scene.add.text(x, y, txt, { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 4 });
-    t.setDepth(1).setScrollFactor(0).setOrigin(0.5);
+function dummyText(x,y,txt,size,leftAlign){
+    var t = UI.scene.add.text(x, y, txt, { font: size+'px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 4 });
+    t.setDepth(1).setScrollFactor(0);
+    if(leftAlign){
+        t.setOrigin(0);
+    }else{
+        t.setOrigin(0.5);
+    }
     return t;
 }
 
-function dummyImage(x,y,atlas,frame){
-    var img = UI.scene.add.sprite(x,y,atlas,frame);
+function dummyImage(x,y,frame){
+    var img = UI.scene.add.sprite(x,y,'dummy',frame);
     img.setDepth(2).setScrollFactor(0);
     return img;
 }
@@ -653,19 +659,72 @@ function dummyImage(x,y,atlas,frame){
 Engine.makeDummyUI = function(){
     var sceneW = 1024;
     var sceneH = 576;
-    dummyRect(0,0,sceneW,64);
-    var h = 32;
-    dummyRect(0,sceneH-h,sceneW,h);
-    dummyText(sceneW/2,16,'New Beginning');
+
+    dummyRect(0,0,sceneW,32);
+
+    var x = 8;
+    dummyImage(x,8,'citizens');
+    x += 8;
+    var t = dummyText(x,0,'2/21',14,true);
+    x += t.width+10;
+    dummyImage(x,8,'meat');
+    x += 8;
+    t = dummyText(x,0,'150/250',14,true);
+    x += t.width+10;
+    dummyText(x,0,'Famine!',14,true);
+
+    t = dummyText(sceneW/2,16,'New Beginning',16);
+    dummyImage(t.x - t.width/2 - 10,16,'bell');
+    dummyText(sceneW/2+60,25,'Lvl 3',14);
 
     Engine.miniMap = new MiniMap(2);
-    dummyImage(sceneW-22,22,'UI','icon_holder');
-    dummyImage(sceneW-172,22,'UI','icon_holder');
+    //dummyImage(sceneW-22,22,'UI','icon_holder');
+    //dummyImage(sceneW-172,22,'UI','icon_holder');
     dummyImage(sceneW-22,22,'compass');
-    dummyImage(sceneW-172,22,'bell');
+
+    var h = 32;
+    dummyRect(0,sceneH-h,sceneW,h);
+
+    dummyText(0,sceneH-h,'100/150   Tired   100/500   3/12',14,true);
+    dummyRect(3,sceneH-(h/2)+2,200,10,0xef0000);
+
+    dummyText(sceneW/2,sceneH-h/2,'This is a notification',14);
 };
 
 // #############################
+
+function SettlementCapsule(x,y){
+    this.slices = [];
+    var w = 70;
+    this.slices.push(UI.scene.add.tileSprite(x,y,w,24,'UI','capsule-middle').setOrigin(1,0));
+    this.slices.push(UI.scene.add.sprite(x-w,y,'UI','capsule-left').setOrigin(1,0));
+    this.text = UI.scene.add.text(x-w+10, y, '',
+        { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
+    ).setOrigin(1,0);
+}
+
+SettlementCapsule.prototype.setText = function(text){
+    var tx = this.text.width;
+    this.text.setText(text);
+    var delta = this.text.width - tx - 20;
+
+    this.slices[0].width += delta;
+    this.slices[1].x -= delta;
+};
+
+SettlementCapsule.prototype.display = function(){
+    this.slices.forEach(function(slice){
+        slice.setVisible(true);
+    });
+    this.text.setVisible(true);
+};
+
+SettlementCapsule.prototype.hide = function(){
+    this.slices.forEach(function(slice){
+        slice.setVisible(false);
+    });
+    this.text.setVisible(false);
+};
 
 Engine.makeUI = function(){
     // TODO: make a zone with onpointerover = cursor is over UI, and make slices not interactive anymore
@@ -684,7 +743,16 @@ Engine.makeUI = function(){
     });
     bug.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
 
-    Engine.miniMap = new MiniMap();
+    Engine.miniMap = new MiniMap(2);
+    Engine.setlCapsule = new SettlementCapsule(950,3);
+
+    var caps = new Capsule(5,3,'UI','gold');
+    caps.setText('100/200');
+    caps.display();
+
+    var caps = new Capsule(120,3,'UI','smallpack');
+    caps.setText('20/12');
+    caps.display();
 
     Engine.makeBuildingTitle();
 
@@ -2053,36 +2121,4 @@ function cl(){
 
 function s(){
     Client.socket.emit('ss');
-}
-
-function detectBrowser(){
-    // Opera 8.0+
-    var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
-    if(isOpera) return 'Opera';
-
-    // Firefox 1.0+
-    var isFirefox = typeof InstallTrigger !== 'undefined';
-    if(isFirefox) return 'Firefox';
-
-    // Safari 3.0+ "[object HTMLElementConstructor]"
-    var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || safari.pushNotification);
-    if(isSafari) return 'Safari';
-
-    // Internet Explorer 6-11
-    var isIE = /*@cc_on!@*/false || !!document.documentMode;
-    if(isIE) return 'IE';
-
-    // Edge 20+
-    var isEdge = !isIE && !!window.StyleMedia;
-    if(isEdge) return 'Edge';
-
-    // Chrome 1+
-    var isChrome = !!window.chrome && !!window.chrome.webstore;
-    if(isChrome) return 'Chrome';
-
-    // Blink engine detection
-    var isBlink = (isChrome || isOpera) && !!window.CSS;
-    if(isBlink) return 'Blink';
-
-    return 'unknown';
 }

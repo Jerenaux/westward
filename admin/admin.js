@@ -218,14 +218,20 @@ app.filter('eventFilter',function(){
         var t = new Date(event.time);
         var dateStr = "["+t.getDate()+"/"+(t.getMonth()+1)+" "+t.getHours()+":"+t.getMinutes()+":"+t.getSeconds()+"]";
         switch(event.action){
-            case 0:
-                return dateStr+" A player bought "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each";
-                break;
-            case 1:
-                return dateStr+" A player sold "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each";
-                break;
-            case 2:
+            case 'buy':
+                return dateStr+" A player bought "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each at "+Data.buildingsData[event.building].name;
+            case 'sell':
+                return dateStr+" A player sold "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each "+Data.buildingsData[event.building].name;
+            case 'connect':
                 return dateStr+" A player has connected in settlement "+event.stl;
+            case 'disconnect':
+                return dateStr+" A player has disconnected";
+            case 'explore':
+                return dateStr+" A player has explored AOI "+event.aoi;
+            case 'building':
+                return dateStr+" A player has enterd building "+Data.buildingsData[event.building].name;
+            //default:
+                //return event;
         }
     }
 });

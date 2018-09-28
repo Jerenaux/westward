@@ -11,6 +11,7 @@ var Stats = require('../shared/Stats.js').Stats;
 var Equipment = require('../shared/Equipment.js').Equipment;
 var EquipmentManager = require('../shared/Equipment.js').EquipmentManager;
 var Formulas = require('../shared/Formulas.js').Formulas;
+var Prism = require('./Prism.js').Prism;
 
 function Player(){
     this.updatePacket = new PersonalUpdatePacket();
@@ -574,6 +575,7 @@ Player.prototype.onAOItransition = function(newAOI,previousAOI){
     if(!this.visitedAOIs.has(newAOI)) {
         this.visitedAOIs.add(newAOI);
         if(previousAOI){ // if previousAOI: don't grant XP for spawning in fort
+            Prism.logEvent(this,'explore',{aoi:newAOI});
             if(!this.settlement.fort) return;
             var A = Utils.lineToGrid(this.settlement.fort.aoi,World.nbChunksHorizontal);
             var B = Utils.lineToGrid(newAOI,World.nbChunksHorizontal);
@@ -607,6 +609,7 @@ Player.prototype.enterBuilding = function(id){
         console.log('Came back to fort');
         this.visitedAOIs.clear();
     }
+    Prism.logEvent(this,'building',{building:GameServer.buildings[id].type});
 };
 
 Player.prototype.exitBuilding = function(){

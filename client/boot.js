@@ -44,6 +44,11 @@ var Boot = new Phaser.Class({
             console.warn('WEBGL not supported');
             document.getElementById("danger").innerText = "Your browser does not support WebGL. Some visual effects will be disabled or may render poorly.";
         }
+
+        if(detectBrowser() != "Chrome"){
+            document.getElementById("browser").innerText = "This development version is best played using Chrome. With other browsers, lag and rendering issues may arise.";
+        }
+
     },
 
     updateReadyTick: function() {

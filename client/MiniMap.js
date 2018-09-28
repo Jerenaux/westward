@@ -14,13 +14,18 @@ function MiniMap(margin){
     this.bg.setScrollFactor(0);
     this.bg.setVisible(false);
 
+    this.ring = UI.scene.add.sprite(x,y,'mapring');
+    this.ring.setDepth(1);
+    this.ring.setScrollFactor(0);
+    this.ring.setVisible(false);
+
     this.map = new Map(x,y,r,r,0,0,'player',false);
     this.map.minimap = true;
     this.map.addMask(null,{
         type: 'circle',
         x: x,
         y: y,
-        w: 0.95*r
+        w: 133
     });
     //this.map.addMask('minimap');
 
@@ -39,10 +44,12 @@ MiniMap.prototype.follow = function(){
 
 MiniMap.prototype.display = function(){
     if(this.bg) this.bg.setVisible(true);
+    this.ring.setVisible(true);
     this.map.display();
 };
 
 MiniMap.prototype.hide = function(){
     if(this.bg) this.bg.setVisible(false);
+    this.ring.setVisible(false);
     this.map.hide();
 };

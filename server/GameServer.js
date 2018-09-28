@@ -454,6 +454,7 @@ GameServer.handleDisconnect = function(socketID){
     console.log('disconnect');
     var player = GameServer.getPlayer(socketID);
     if(!player) return;
+    Prism.logEvent(player,'disconnect');
     GameServer.removeEntity(player);
     delete GameServer.socketMap[socketID];
     GameServer.nbConnectedChanged = true;
@@ -690,7 +691,7 @@ GameServer.handleShop = function(data,socketID) {
         player.gainClassXP(GameServer.classes.merchant,Math.floor(price/10), true); // TODO: factor in class level
     }
     building.save();
-    Prism.logEvent(player,action,{item:item,price:price,nb:nb});
+    Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type});
 };
 
 /*GameServer.handleBuild = function(data,socketID){

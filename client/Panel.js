@@ -16,7 +16,7 @@ Panel.prototype = Object.create(Frame.prototype);
 Panel.prototype.constructor = Panel;
 
 Panel.prototype.addCapsule = function(name,x,y,text,icon){
-    var capsule = new Capsule(this.x+x,this.y+y,icon,this.content);
+    var capsule = new Capsule(this.x+x,this.y+y,'UI',icon,this.content);
     capsule.setText(text);
     this.capsules[name] = capsule;
 };
@@ -246,14 +246,14 @@ Panel.prototype.hide = function(){
     Engine.inPanel = false;
 };
 
-function Capsule(x,y,icon,container){
+function Capsule(x,y,iconAtlas,iconFrame,container){
     this.slices = [];
     this.icon = null;
     this.width = 1;
     this.width_ = this.width; // previous width
     
-    if(icon) {
-        this.icon = UI.scene.add.sprite(x+8,y+6,'UI',icon);
+    if(iconFrame) {
+        this.icon = UI.scene.add.sprite(x+8,y+6,iconAtlas,iconFrame);
         this.icon.setDepth(2);
         this.icon.setScrollFactor(0);
         this.icon.setDisplayOrigin(0,0);
@@ -277,7 +277,7 @@ function Capsule(x,y,icon,container){
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
-        container.push(e); // don't use concat
+        if(container) container.push(e); // don't use concat
     });
 
     this.text.setDepth(2);
@@ -285,8 +285,10 @@ function Capsule(x,y,icon,container){
     this.text.setDisplayOrigin(0,0);
     this.text.setVisible(false);
 
-    container.push(this.text);
-    if(this.icon) container.push(this.icon);
+    if(container) {
+        container.push(this.text);
+        if (this.icon) container.push(this.icon);
+    }
 }
 
 Capsule.prototype.setText = function(text){

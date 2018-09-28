@@ -62,7 +62,7 @@
     },
     {
       "filename": "capsule-middle",
-      "frame": {"x":660,"y":118,"w":22,"h":24}
+      "frame": {"x":660,"y":118,"w":21,"h":24}
     },
     {
       "filename": "capsule-right",
@@ -459,6 +459,10 @@
     {
       "filename": "icon_holder",
       "frame": {"x":802,"y":481,"w":44,"h":44}
+    },
+    {
+      "filename": "smallpack",
+      "frame": {"x":516,"y":436,"w":16,"h":15}
     }
   ]
 }

@@ -349,10 +349,10 @@ UI.displaySettlement = function(data){
     icon.setInteractive();
     UI.SScontent.push(icon);
 
-    var t = UI.scene.add.text(x, y+10, data.name, { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 4 });
+    var t = UI.scene.add.text(x, y+12, data.name, { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 4 });
     t.setDepth(1).setScrollFactor(0).setOrigin(0.5);
     var w = t.width;
-    var bannerx = x - 21 - w/2;
+    var bannerx = x - 27 - w/2;
     var bannery = y;
     UI.SScontent.push(UI.scene.add.image(bannerx,bannery,'banners','left').setInteractive().setOrigin(0));
     UI.SScontent.push(UI.scene.add.tileSprite(bannerx+21,bannery,w,24,'banners','middle').setInteractive().setOrigin(0));

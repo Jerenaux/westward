@@ -91,6 +91,7 @@ defend trade routes, scout, maintain supplies)
 - Northernmost camp not really visible on map
 - Re-introduce movement marker, not square, make it lag behind and wiggle below cursor? 
 - Cursor shenanigans
+- Poll at regular interval the sprite below mouse
 => Update texts
 => Test with someone
 
@@ -227,7 +228,6 @@ Cleaning
 Packaging
 Deployment
 Design document
-Polish
 Testing
 World Building
 
@@ -274,7 +274,7 @@ Secure
 
 Analytics:
 ---------
-- Pretty print events in admin: connects, purchases, AOI explorations, fights
+- Pretty print events in admin: menu opens?, commitment, fights, item uses
 - Button to flush events
 - Look for nice statistical library
 - Log drains and faucets
@@ -619,14 +619,12 @@ Visual:
 - Use new Phaser 3.11 setTintFill to add halo over hovered game entities?
 - Add weapons to temporary character sprites
 - More dramatic apparition of battle tiles
-- Hide move marker (use different mouse cursors for can/can't walk to)
 - "Tip of the day"
 - Revamp class selection
 - Fix continuous movement
 - Polish title screen (leaves, bird passing in the distance...)
 - Fade-in/out transitions (wait for containers?)
 - Show "new" tag when opening inventory
-- Cut corners of big battlezones? (but make sure it doesn't impact integrity: save integrity path and used it for that)
 - Variety of small "talk" bubbles in reaction to things happening (+ symbol bubbles?)
 - Adapt bubble duration (in bubble.display) depending on number of words
 - Add dirt below buildings
@@ -641,11 +639,8 @@ Visual:
 - Custom movement marker
 - Use matter.js to simulate wind on leaves? (Dead/alive leaves flying on screen)
 Sound:
-- Sound effects when clicking (for moving, on buttons in menus, sounds of shuffling pages...)
-- Noise when walking
 - Noise when clicking on building (each building its noise)
 - Noise when clicking on non-walkable tile
-- Unique noise for items
 - Crafting SFX
 General:
 - Keyboard shortcuts for menus?
