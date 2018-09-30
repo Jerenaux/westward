@@ -16,6 +16,17 @@ Pillars:
 2) The Economy
 3) The Wild
 
+
+Admin
+Analytics
+Cleaning
+Packaging
+Deployment
+Design document
+Testing
+World Building
+
+
 Chapter 1
 1) The War
 - Too little building damage from civs
@@ -221,16 +232,6 @@ Free
 #####################################################
 #####################################################
 #####################################################
-
-Admin
-Analytics
-Cleaning
-Packaging
-Deployment
-Design document
-Testing
-World Building
-
 
 Admin
 Analytics
@@ -589,14 +590,12 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
+- Automate git upload to Heroku (http://radek.io/2015/10/27/nodegit/)
 - Flatten chunks and reduce them to arrays only
 - Code to load flattened chunks in game
-- Separate as much as possible the code required for production and the code required for testing
 - Tool to gather, uglify and compress all relevant source files and move them to production directory
-- Automate git upload to Heroku (http://radek.io/2015/10/27/nodegit/)
 - Full pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?
-- Way to interact with Node server online, without restarting (e.g. change variables, reload data...)
 - Improve flattening by making transparency checks
 - Secure chunk access? (check client position before serving)
 - Desktop app (automated)

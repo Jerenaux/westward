@@ -18,9 +18,9 @@ StatsPanel.prototype.addStats = function(){
     var vertMargin = 30;
     var i = 0;
     var nbHoriz = 3;
-    for(var stat in Stats.dict) {
-        if (!Stats.dict.hasOwnProperty(stat)) continue;
-        if(Stats.dict[stat].isMax) continue;
+    for(var stat in Stats) {
+        if (!Stats.hasOwnProperty(stat)) continue;
+        if(Stats[stat].hidden) continue;
         var x = tlx + (i%nbHoriz)*horizMargin;
         var y = tly + Math.floor(i/nbHoriz)*vertMargin;
         this.addStat(this.x+x,this.y+y,stat);
@@ -30,7 +30,7 @@ StatsPanel.prototype.addStats = function(){
 };
 
 StatsPanel.prototype.addStat = function(x,y,s){
-    var stat = Stats.dict[s];
+    var stat = Stats[s];
     var statObj = {};
     var icon = UI.scene.add.sprite(x,y,'icons2',stat.frame);
     icon.setScrollFactor(0);
@@ -65,10 +65,10 @@ StatsPanel.prototype.addStat = function(x,y,s){
 };
 
 StatsPanel.prototype.updateStats = function(){
-    for(var stat in Stats.dict) {
-        if (!Stats.dict.hasOwnProperty(stat)) continue;
-        var statInfo = Stats.dict[stat];
-        if(statInfo.isMax) continue;
+    for(var stat in Stats) {
+        if (!Stats.hasOwnProperty(stat)) continue;
+        var statInfo = Stats[stat];
+        if(statInfo.hidden) continue;
         var value = Engine.player.getStatValue(stat);
         var suffix = statInfo.suffix;
         if(suffix) value = value+suffix;

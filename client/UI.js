@@ -75,6 +75,7 @@ var UI = {
         });
         if(Client.isNewPlayer()) UI.classMenu = UI.makeClassMenu();
 
+        console.log('UI scene created');
         this.scene.get('boot').updateReadyTick();
     },
 
@@ -427,10 +428,10 @@ UI.selectSettlement = function(id){
     });
 };
 
-UI.launchGame = function(fade){
+UI.launchGame = function(){
     Boot.background.setVisible(false);
     UI.scene.scene.shutdown('boot');
-    UI.scene.scene.launch('main');
+    UI.scene.scene.launch('game');
 };
 
 UI.debugScreen = function(){

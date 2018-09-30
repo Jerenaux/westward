@@ -47,6 +47,12 @@ PersonalUpdatePacket.prototype.addItem = function(item,nb){
 };
 
 PersonalUpdatePacket.prototype.addStat = function(stat){
+    for(var i = 0; i < this.stats.length; i++){
+        if(this.stats[i].k == stat.k){
+            this.stats.splice(i,1);
+            break;
+        }
+    }
     this.stats.push(stat);
 };
 

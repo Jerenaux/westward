@@ -55,13 +55,17 @@ Client.getIDStamp = function(){
     return localStorage.getItem('idStamp');
 };
 
+Client.getBootParameters = function(){
+    Client.socket.emit('boot-params');
+};
+
 Client.checkForNewPlayer = function(){
     console.log('Player id:',Client.getPlayerID());
     Client.newPlayer = (Client.getPlayerID() === null);
 };
 
 Client.isNewPlayer = function(){
-    //return true;
+    if(Client.bootParameters.forceNewPlayer) return true;
     return Client.newPlayer;
 };
 
@@ -100,6 +104,12 @@ Client.socket.on('settlement-data',function(data){
 
 Client.socket.on('camps-data',function(data){
     UI.displayCamps(data);
+});
+
+Client.socket.on('boot-params',function(data){
+    Client.bootParameters = data;
+    console.log(Client.bootParameters);
+    Boot.bootParamsReceived();
 });
 
 Client.socket.on('update',function(data){ // This event triggers uppon receiving an update packet (data)

@@ -15,8 +15,6 @@ var config = {
 
 var game = new Phaser.Game(config);
 
-
-
 function detectBrowser(){
     // Opera 8.0+
     var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;

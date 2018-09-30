@@ -121,6 +121,10 @@ server.resetStamp = 1519130567967; // ignore returning players with stamps older
 io.on('connection',function(socket){
     console.log('connect');
 
+    socket.on('boot-params',function(){
+        socket.emit('boot-params',gs.getBootParams());
+    });
+
     socket.on('init-world',function(data){
         if(!gs.initialized){
             socket.emit('wait');

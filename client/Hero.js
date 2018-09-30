@@ -18,7 +18,7 @@ var Hero = new Phaser.Class({
         this.markers = data.markers;
         this.unread = 1;
         this.inventory = new Inventory();
-        this.stats = Stats.getSkeleton();
+        this.stats = new StatsContainer();
         this.equipment = new EquipmentManager();
         this.setCommitSlots(data.commitSlots);
 
@@ -230,9 +230,26 @@ var Hero = new Phaser.Class({
 
     updateStats: function(stats){
         for(var i = 0; i < stats.length; i++){
-            Engine.updateStat(stats[i].k,stats[i]);
+            this.updateStat(stats[i].k,stats[i]);
         }
         this.updateEvents.add('stats');
         // TODO: add sound effect
+    },
+
+    updateStat: function(key,data){
+        var statObj = this.getStat(key);
+        statObj.setBaseValue(data.v);
+        statObj.relativeModifiers = [];
+        statObj.absoluteModifiers = [];
+        if(data.r){
+            data.r.forEach(function(m){
+                statObj.relativeModifiers.push(m);
+            })
+        }
+        if(data.a){
+            data.a.forEach(function(m){
+                statObj.absoluteModifiers.push(m);
+            })
+        }
     }
 });

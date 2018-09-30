@@ -463,6 +463,10 @@
     {
       "filename": "smallpack",
       "frame": {"x":516,"y":436,"w":16,"h":15}
+    },
+    {
+      "filename": "heart",
+      "frame": {"x":518,"y":458,"w":14,"h":14}
     }
   ]
 }

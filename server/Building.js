@@ -7,7 +7,7 @@ var Formulas = require('../shared/Formulas.js').Formulas;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
-var Stats = require('../shared/Stats.js').Stats;
+var StatsContainer = require('../shared/Stats.js').StatsContainer;
 
 function Building(data){
     this.isBuilding = true;
@@ -58,14 +58,13 @@ function Building(data){
     this.newitems = new Inventory(GameServer.buildingParameters.inventorySize);
 
     this.inFight = false;
-    this.stats = Stats.getSkeleton();
+    this.stats = new StatsContainer();
     this.stats['hp'].setBaseValue(buildingData.health);
     this.stats['hpmax'].setBaseValue(buildingData.health);
     // TODO: move to JSON
     this.stats['def'].setBaseValue(20);
     this.stats['acc'].setBaseValue(1000);
-    this.stats['mdmg'].setBaseValue(100);
-    this.stats['rdmg'].setBaseValue(buildingData.dmg || 0);
+    this.stats['dmg'].setBaseValue(buildingData.dmg || 0);
     this.productivity = 100;
     this.committed = 0;
     this.commitStamps = data.commitStamps || [];

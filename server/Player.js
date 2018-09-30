@@ -8,6 +8,7 @@ var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
 var Inventory = require('../shared/Inventory.js').Inventory;
 var Stats = require('../shared/Stats.js').Stats;
+var StatsContainer = require('../shared/Stats.js').StatsContainer;
 var Equipment = require('../shared/Equipment.js').Equipment;
 var EquipmentManager = require('../shared/Equipment.js').EquipmentManager;
 var Formulas = require('../shared/Formulas.js').Formulas;
@@ -68,7 +69,7 @@ Player.prototype.constructor = Player;
 Player.prototype.getCommitSlotsShell = function(){
     return {
         slots: [],
-        max: GameServer.characterParameters.baseNbCommitSlots
+        max: GameServer.characterParameters.variables.commitSlots
     }
 };
 
@@ -117,8 +118,21 @@ Player.prototype.setStartingInventory = function(){
 };
 
 Player.prototype.setUpStats = function(){
-    this.stats = Stats.getSkeleton();
+    this.stats = new StatsContainer();
+    var v = GameServer.characterParameters.variables;
+    var list = ['hpmax','dmg','def'];
+    list.forEach(function(s){
+        this.setStat(s,v[s]);
+    },this);
+    this.maxStat('hp');
+    console.warn(this.stats);
     this.foodModifier = null;
+};
+
+Player.prototype.maxStat = function(key){
+    var s = this.getStat(key);
+    s.setBaseValue(s.maxStat.getValue());
+    this.refreshStat(key);
 };
 
 Player.prototype.setStat = function(key,value){
@@ -167,7 +181,7 @@ Player.prototype.applyFoodModifier = function(foodSurplus){ // %
     var foodModifier = Formulas.decimalToPct(Formulas.computePlayerFoodModifier(Formulas.pctToDecimal(foodSurplus)));
     if(foodModifier == this.foodModifier) return;
     this.getStats().forEach(function(stat){
-        if(Stats.dict[stat].noModifier) return;
+        if(Stats[stat].noModifier) return;
         var statObj = this.getStat(stat);
         if(this.foodModifier !== null) statObj.removeRelativeModifier(this.foodModifier);
         statObj.addRelativeModifier(foodModifier);
@@ -494,7 +508,7 @@ Player.prototype.applyEffect = function(stat,delta,notify){
     if(notify) {
         var change = delta;
         if(change >= 0) change = '+'+change;
-        this.addNotif(Stats.dict[stat].name+' '+change);
+        this.addNotif(Stats[stat].name+' '+change);
     }
 };
 

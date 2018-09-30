@@ -169,6 +169,8 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.wildlifeParameters = config.get('wildlife');
     GameServer.civsParameters = config.get('civs');
 
+    GameServer.clientParameters = config.get('client');
+
     GameServer.collisions = new SpaceMap();
     GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()));
     GameServer.pathFinder = new Pathfinder(GameServer.collisions,GameServer.PFParameters.maxPathLength);
@@ -177,6 +179,10 @@ GameServer.readMap = function(mapsPath,test){
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
+};
+
+GameServer.getBootParams = function(){
+    return GameServer.clientParameters.boot;
 };
 
 GameServer.loadSettlements = function(){

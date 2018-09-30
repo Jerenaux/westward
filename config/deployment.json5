@@ -1,0 +1,42 @@
+{
+   battle: {
+        enabled: true,
+        freezeNPC: false,
+   },
+   buildings: {
+        canfight: true,
+        nobuildings: false
+   },
+   economyCycles: {
+        // Unit: seconds
+        turnDuration: 60,
+        // Unit: turns
+        turns: {
+            build: 10,
+            camps: 5,
+            commitment: 1,
+            foodConsumption: 10,
+            harvesting: 300,
+            settlements: 1,
+            spawnZones: 5
+        }
+    },
+    misc: {
+        performInit: false
+    },
+    civs: {
+        aggro: true,
+        wander: true,
+        raidMinimum: 8
+    },
+    wildlife: {
+        aggro: true,
+        nolife: false,
+        wander: true
+    },
+    client: {
+            boot:{
+                forceNewPlayer: true
+            }
+        }
+}

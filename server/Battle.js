@@ -233,17 +233,18 @@ Battle.prototype.computeDamage = function(type,a,b){
             dmg = 100; // TODO: refine
             break;
         case 'melee':
-            var atk = a.getStat('mdmg').getValue();
+            var atk = a.getStat('dmg').getValue();
             dmg = this.computeMeleeDamage(atk,def);
             break;
         case 'ranged':
-            var atk = a.getStat('rdmg').getValue();
+            var atk = a.getStat('dmg').getValue();
             dmg = this.computeRangedDamage(atk,def);
             break;
     }
     return Utils.clamp(Math.ceil(dmg),GameServer.battleParameters.minDamage,GameServer.battleParameters.maxDamage);
 };
 
+// TODO: merge both
 Battle.prototype.computeMeleeDamage = function(dmg,def){
     var dmgRnd = dmg/5;
     var defRnd = def/5;

@@ -20,8 +20,8 @@ var Boot = new Phaser.Class({
     },
 
     create: function(){
+        Client.getBootParameters();
         Client.checkForNewPlayer();
-        this.scene.launch('UI');
 
         var masterData = this.cache.json.get(Boot.masterKey);
         Boot.tilesets = masterData.tilesets;
@@ -29,9 +29,12 @@ var Boot = new Phaser.Class({
 
         Boot.background = this.add.image(0,0,'background').setOrigin(0);
 
-
-        this.totalReadyTicks = 2;
-        this.onReady = this.displayButton;
+        //this.totalReadyTicks = 1;
+        this.readyStages = {
+            1: this.launchUI, // 1 for getting boot parameters
+            2: this.displayButton // 2 for UI scene creation
+        };
+        //this.onReady = this.launchUI;//this.displayButton;
         this.displayTitle();
 
         Boot.WEBGL = true;
@@ -45,15 +48,17 @@ var Boot = new Phaser.Class({
             document.getElementById("danger").innerText = "Your browser does not support WebGL. Some visual effects will be disabled or may render poorly.";
         }
 
-        if(detectBrowser() != "Chrome"){
-            document.getElementById("browser").innerText = "This development version is best played using Chrome. With other browsers, lag and rendering issues may arise.";
-        }
-
+        if(detectBrowser() != "Chrome") document.getElementById("browser").innerText = "This development version is best played using Chrome. With other browsers, lag and rendering issues may arise.";
     },
 
     updateReadyTick: function() {
         this.readyTicks++;
-        if (this.readyTicks == this.totalReadyTicks) this.onReady.call(this);
+        //if (this.readyTicks == this.totalReadyTicks) this.onReady.call(this);
+        if(this.readyTicks in this.readyStages) this.readyStages[this.readyTicks].call(this);
+    },
+
+    launchUI: function(){
+        this.scene.launch('UI');
     },
 
     displayTitle: function(){
@@ -76,3 +81,7 @@ var Boot = new Phaser.Class({
     }
 });
 
+Boot.bootParamsReceived = function(){
+    console.log('Boot parameters received');
+    this.readyTicks++;
+};

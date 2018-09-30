@@ -30,7 +30,7 @@ var Engine = {
     dummyUI: false,
     skipGrass: false,
 
-    key: 'main', // key of the scene, for Phaser
+    key: 'game', // key of the scene, for Phaser
     plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager','LightsPlugin'],
     playerIsInitialized: false,
 
@@ -746,13 +746,24 @@ Engine.makeUI = function(){
     Engine.miniMap = new MiniMap(2);
     Engine.setlCapsule = new SettlementCapsule(950,3);
 
-    var caps = new Capsule(5,3,'UI','gold');
+    var img = UI.scene.add.sprite(x,y,'faces',0);
+    img.setScrollFactor(0).setOrigin(0);
+
+    var caps = new Capsule(37,3,'UI','heart');
+    caps.setText('150/200');
+    caps.display();
+
+    var caps = new Capsule(152,3,'UI','gold');
     caps.setText('100/200');
     caps.display();
 
-    var caps = new Capsule(120,3,'UI','smallpack');
+    var caps = new Capsule(265,3,'UI','smallpack');
     caps.setText('20/12');
     caps.display();
+
+    /*var caps = new Capsule(37,28,'UI','heart');
+    caps.setText('150/200');
+    caps.display();*/
 
     Engine.makeBuildingTitle();
 
@@ -1708,23 +1719,6 @@ Engine.showMarker = function(){
 
 Engine.updateSelf = function(data){
     Engine.player.updateData(data);
-};
-
-// TODO: move to Hero()
-Engine.updateStat = function(key,data){
-    var statObj = Engine.player.getStat(key);
-    statObj.setBaseValue(data.v);
-    statObj.relativeModifiers = [];
-    statObj.absoluteModifiers = [];
-    if(data.r){
-        data.r.forEach(function(m){
-            statObj.relativeModifiers.push(m);
-        })
-    }if(data.a){
-        data.a.forEach(function(m){
-            statObj.absoluteModifiers.push(m);
-        })
-    }
 };
 
 Engine.update = function(){

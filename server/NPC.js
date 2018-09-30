@@ -6,7 +6,7 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
-var Stats = require('../shared/Stats.js').Stats;
+var StatsContainer = require('../shared/Stats.js').StatsContainer;
 var Inventory = require('../shared/Inventory.js').Inventory;
 
 function NPC(){
@@ -44,8 +44,7 @@ NPC.prototype.addToLoot = function(id,nb){
 // ### Stats ###
 
 NPC.prototype.setStartingStats = function(stats){
-    //var stats = GameServer.animalsData[this.type].stats;
-    this.stats = Stats.getSkeleton();
+    this.stats = new StatsContainer();
     for(var s in stats){
         if(!stats.hasOwnProperty(s)) return;
         this.setStat(s,stats[s]);
