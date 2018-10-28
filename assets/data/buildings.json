@@ -396,5 +396,20 @@
     "canFight": false,
     "buildRate":10,
     "health": 250
+  },
+  "45":{
+    "name":"Shack",
+    "width":3,
+    "height":3
+  },
+  "46":{
+    "name":"Lumber camp",
+    "width":3,
+    "height":3
+  },
+  "47":{
+    "name":"Defense tower",
+    "width":3,
+    "height":3
   }
 }

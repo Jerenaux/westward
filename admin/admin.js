@@ -230,6 +230,8 @@ app.filter('eventFilter',function(){
                 return dateStr+" A player has explored AOI "+event.aoi;
             case 'building':
                 return dateStr+" A player has enterd building "+Data.buildingsData[event.building].name;
+            case 'server-start':
+                return dateStr+" SERVER RESTART";
             //default:
                 //return event;
         }

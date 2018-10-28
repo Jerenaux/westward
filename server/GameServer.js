@@ -49,7 +49,6 @@ var Camp = require('./Camp.js').Camp;
 var Pathfinder =  require('../shared/Pathfinder.js').Pathfinder;
 var Prism = require('./Prism.js').Prism;
 
-
 GameServer.updateStatus = function(){
     console.log('Successful initialization step:',GameServer.initializationSequence[GameServer.initializationStep++]);
     try {
@@ -179,6 +178,7 @@ GameServer.readMap = function(mapsPath,test){
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
+    Prism.logEvent(null,'server-start');
 };
 
 GameServer.getBootParams = function(){
@@ -449,8 +449,9 @@ GameServer.finalizePlayer = function(socket,player){
 GameServer.createInitializationPacket = function(playerID){
     // Create the packet that the client will receive from the server in order to initialize the game
     return {
-        player: GameServer.players[playerID].initTrim(), // info about the player
-        nbconnected: GameServer.server.getNbConnected()
+        config: config.get('client.config'),
+        nbconnected: GameServer.server.getNbConnected(),
+        player: GameServer.players[playerID].initTrim() // info about the player
     };
     // No need to send list of existing players, GameServer.handleAOItransition() will look for players in adjacent AOIs
     // and add them to the "newplayers" array of the next update packet

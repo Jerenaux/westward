@@ -78,11 +78,6 @@ var Hero = new Phaser.Class({
             this.commitTypes.add(s.type,1);
             this.commitIDs.push(s.id);
         },this);
-
-        /*if(!this.commitSlots) this.commitSlots = new Inventory(commitSlots.max);
-        commitSlots.slots.forEach(function(s){
-            this.commitSlots.add(s,1);
-        },this);*/
     },
 
     canCommit: function(){

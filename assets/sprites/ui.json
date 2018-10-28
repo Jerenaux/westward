@@ -462,11 +462,27 @@
     },
     {
       "filename": "smallpack",
-      "frame": {"x":516,"y":436,"w":16,"h":15}
+      "frame": {"x":482,"y":424,"w":13,"h":14}
     },
     {
       "filename": "heart",
-      "frame": {"x":518,"y":458,"w":14,"h":14}
+      "frame": {"x":506,"y":425,"w":13,"h":12}
+    },
+    {
+      "filename": "facebg",
+      "frame": {"x":351,"y":511,"w":43,"h":42}
+    },
+    {
+      "filename": "mapring",
+      "frame": {"x":550,"y":417,"w":150,"h":150}
+    },
+    {
+      "filename": "holder",
+      "frame": {"x":409,"y":519,"w":32,"h":31}
+    },
+    {
+      "filename": "holder_over",
+      "frame": {"x":442,"y":519,"w":32,"h":31}
     }
   ]
 }

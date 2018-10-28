@@ -9,7 +9,7 @@
   },
   "engines": {
     "npm": "^5.7.1"
-  }
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {

@@ -57,24 +57,18 @@ var DisconnectEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
-var Prism = {
-    /*actions: {
-        'buy': 0,
-        'sell': 1,
-        'connect': 2,
-        'disconnect': 3
-    }*/
-};
+var ServerStartEvent = Event.discriminator(
+    'ServerStartEvent',
+    new mongoose.Schema(),
+    {discriminatorKey: 'kind'}
+);
+
+var Prism = {};
 
 Prism.logEvent = function(player,action,data){
-    /*if(!(actionKey in Prism.actions)){
-        console.warn('ERROR: Unrecognized action key');
-        return;
-    }
-    var action = Prism.actions[actionKey];*/
     data = data || {};
     data.action = action;
-    data.pid = player.id;
+    data.pid = (player ? player.id : null);
 
     var map = {
         'building': BuildingEvent,
@@ -82,32 +76,14 @@ Prism.logEvent = function(player,action,data){
         'connect': ConnectEvent,
         'disconnect': DisconnectEvent,
         'explore': ExploreEvent,
-        'sell': TradeEvent
+        'sell': TradeEvent,
+        'server-start': ServerStartEvent
     };
     if(!(action in map)){
         console.warn('PRISM: Unrecognized event');
         return;
     }
-    var event = new map[action](data);//map[action].call(null,data);
-    /*switch(action){
-        case 'buy': // buy, fall-through to next
-        case 'sell': // sell
-            //data = getItemData(data);
-            event = new TradeEvent(data);
-            break;
-        case 'connect': // connect
-            event = new ConnectEvent(data);
-            break;
-        case 'disconnect':
-            event = new DisconnectEvent(data);
-            break;
-        case 'explore':
-            event = new ExploreEvent(data);
-            break;
-        default:
-            console.warn('Unrecognized event');
-            return;
-    }*/
+    var event = new map[action](data);
     console.log('event : ',event);
     event.save(function(err){
         if(err) throw err;

@@ -4,19 +4,6 @@ Release:
 - Push
 - Reset food, update stocks
 
-Daily: design doc, world building, comments system
-
-Part I: Mechanics
-Part II: World building
-Part III: Atmosphere & polish
-Part IV: Cleaning, optimization and admin
-
-Pillars:
-1) The War
-2) The Economy
-3) The Wild
-
-
 Admin
 Analytics
 Cleaning
@@ -26,70 +13,16 @@ Design document
 Testing
 World Building
 
-
-Chapter 1
-1) The War
-- Too little building damage from civs
-----
+Misc:
 - Adapt animations and delays for firearms
 - findcell in battle doesn't take path to get there into accoung (may be within radius but require to go around an obstacle!)
 - Change battle priority when player joins fight
 - In battle against NPC, have players have turns much more often
 - Make tiles above battle tiles transparent; same with buildings in fight?
-2) The Economy
-UI:
-- Top: about settlement and world
--> Settlement name + lvl
--> Bell in case of attack
--> Compass pointing to fort by default, to attack location if bell rings, or to custom ojectives
--> Top-left: display #connected/#citizens, food/required, famine, commitment slots
-- Bottom: about player
--> Bottom-left: numeric health and stamina on top of health bar
--> Next: gold/max, backpack busy/size
--> Middle: notifications + chat on top
--> Right: menu icons
--> Later: belt on top
-Battle UI:
--> Top: battle queue below counter gauge, prominent cell for turnee
--> "Your turn" in notifications
--> Below: health & stamina stuff, notifications
--> Bottom-right: weapon slots (+ ammo etc.) & belt
-Player menus:
--> Title on top of settlement name + exit icon
-Buildings:
--> Same
--> extra menus displayed prominently bottom-right
-
-
-
-- It's much easier to craft a gun than arrows and string-based stuff!
-- Add sulfur mines
-- Problem with food consumption?
-- Tune down ores production a bit? 
 - Make arrows in bulk?
 - Feather tufts
-- Stop harvesting beyond certain threshold / rethink
--> Have only one or two of each *pick up* item (wood, stone, thick grass ...) (no bones etc.)
----
-- Rethink "per cycle" display in prod panel
 - Introduce new wood ingredient obtained from timber, crafting wood, made in bulk (but then tune down timber prod)
 -> For shield, guns...?
-- Currency? (+ flow from trade post and workshop to fort) / money flow
-- Fix the right amount of buildings in each settlement, their output per turn, turn duration
--> Simulate?
-- Tune economy
-- Starvation (impact) (think of ways to make it painfully visible)
-- Settlement-oriented HUD: see below
--> Adapt positioning of orienation pins
-- Compass
-- Bell when attack
-- Missions menu
-(-> Eventually: missions, quests & achievements)
-(-> Missions: bring food, defend, commit, follow chancellor directives,
-defend trade routes, scout, maintain supplies)
-(-> Control quests distribution?)
-- Commitment lasts multiple turns; fix repeat send of commit slots
-3) The Wild
 - Clicks close to minimap fail
 - Display/hide/display map leads to warnings overflow
 - Still slow (make bick grass background on a blitter?)
@@ -100,114 +33,37 @@ defend trade routes, scout, maintain supplies)
 - Camera bounds (test with northernmost camp)
 - Minimap cross stop moving below a certain y?
 - Northernmost camp not really visible on map
-- Re-introduce movement marker, not square, make it lag behind and wiggle below cursor? 
-- Cursor shenanigans
 - Poll at regular interval the sprite below mouse
-=> Update texts
-=> Test with someone
-
-Chapter 2
-1) The War
-- New "building damage" stat (allows introducing specialized weapons: maces, ...)
-=> Ranged weapon have very low building damage, melee weapon more, maces and axes much more, bombs a lot
-- Multiple bomb types with variable stats
-- Barracks and troops (need food inflow to barracks)
--> Troops need food to train + count for recurring food consumption
-- Fortified civ camps, rebuilds
-- More involved raid mechanics (patrols, list of units ready to raid, units coming back to base, units healing when at base) using a more complex states scheme
-- NPC used ranged attacks (no firarms and bombs though)
-2) The Economy 
-(automatic economy)
-- More advanced simulations to balance resources
-- Permanent, named players
-- Dev. levels
-- Impact on crafting, buildings, ...
-- New buildings, settlements expansion
-- Homeland trade (automatic)
-- Cash crops
-- Economy orientation by chancellors
-- Backpacks, purses, belts, gloves (remove shields) ...
-- War economy (tower ammunitions, ...)
-3) The Wild
-- New World 
-- Fog of war (timed)
--> Display a square on the map
--> Display visibleAOIs on fort map -> convex hull?
--> Have visibleAOIs set depend on buildings, esp. towers
--> Synchronize player.visittedAOIs to fort
--> Own fog of wars for players, update own map as they wander, synchronize when back to fort
-- Icons synchronization
-- Resources & misc map icons
-- Trade routes (chancellors only), mark on maps
-- Fatigue & rest, impact on everything
-- Different pelts and leathers, rework crafting recipes, full pelt economy
-
-Chapter 3:
-1) The War
-- Unit types & counters
-- Advanced battle mechanics & UI (need belts first)
-- Automated raids by commander, displayed to entice players
--> Force player battle pathfinding to fit in battle cells
--> Adapth pathfinding for multi-cell entities
--> trimPath for multicell entities
-2) The Economy
-- Pinning recipes on UI (so as not to have to memorize ingredients)
-- Governor & officials
-- Elections
-- Taxes
-- Citizenship changes
-- Tuning of cash flows
-- Manual homeland trade
-3) The Wild
-- Look into GameObject.willRender to see if can be used to know when a sprit is hidden by a tree, tower... 
-
-Chapter 4:
-Fancy title screen (with number of players, events stream, map background...)
-Class selection
-Player abilities
-Advanced XP systems
-Class quests & civic quests (endless supply in missions menu)
-Personal shops & caravans
-World-building: items, fauna & flora
-Corresponding spawn mechanics
-Corresponding admin tools
-Advanced crafting mechanics & interface
-Recipes mechanics
-Tiers, brittleness, ...
-New geography, adding world content
-Corresponding editing tools
-Ambient elements
-Civ style
-Advanced civ mechanics
-Messaging
-Advanced social features
-Diplomacy
-...
+-> Need to display hunger and fatigue
+-> Keep class quests (+ "smart quests" based on settlement situation?)
+-> Menu to list buildings (but on-site management)
 
 
+##Tutorial:##
+First few words about permanent sandbox, collaborative survival, etc.
 
-Interface upgrades:
-- Class selection
-- Settlement selection
-- Crafting menu
-- Battle interface
-- HUD
+Part 1: buildings
+- Just arrived, need to settle
+- A few buildings present, and towers, safe zone
+- Build a shack
+- Point out useful buildings (workshop, brewery) are under construction buy other players, but need wood; 
+prompt to go build a lumbercamp at the proper location (building tut + auto resources tut, depletion...)
+- Explain that with that building, you can benefit other players, and their progress will benefit you in turn (access to crafting)
+- Insist that buildings are permanent and that everyone can see and interact with everyone else's buildings
 
+Part 2: exploration, crafting, trade and wildlife
+- Prompt to go craft an useful item, point out that a specific ingredient is missing
+- Prompt to go explore fog of war in a certain area (explain fog of war) + multi-class lvl tuto
+- On the way, attack by wildlife, battle tuto + food tuto
+- When resource found, tuto about pick up resources and ecology
+- Go back, sell and craft (trade & craft tuto)
 
-UI
-# Put settlement to the forefront
-- Name next to minimap
-- Lvl, # citizens, # buildings?, # troops
-- Food (also update prod and build panels)
-- Security? 
-- Bell icon when attacks
-- Blinking icon on map when attacks?
-- Displayed for the settlement currently visited
-- Help icon to invite to visit fort for more details
-- Compass icon pointing towards local Fort at all time (if equipped)
-- Death icons + "last attacks" icons
-- Display health bar of buildings? Show damage somehow (smoke w/ particles?)
+Part 3: enemy civ
+- Point out that lumber camp is exposed, need to build a tower
+- Immeditaley following, civs attack, explain geopolitical climate
+- Tougher fight, better equipment will be needed!
 
+Closing comments about pros and cons of starting in a settled/wild region, ultimate goal of surviving by pushing enemy civ back,
 
 
 ##################################################
@@ -266,6 +122,7 @@ V1 level:
 Admin
 -----
 "Running since ..." in admin
+Push desktop notifications for player connects
 Import db
 -> Iterate over import object, if matching id in db, update fields, if not, insert new entry 
 Set coordinates
@@ -276,7 +133,9 @@ Secure
 Analytics:
 ---------
 - Pretty print events in admin: menu opens?, commitment, fights, item uses
+- Log session-wide stats: how many players visit a building during session, do this, do that...
 - Button to flush events
+- Push desktop notifications for player connects
 - Look for nice statistical library
 - Log drains and faucets
 - Log where items are bought/sold
@@ -590,12 +449,13 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
+- Automatically copy files to deploy to deploy directory
 - Automate git upload to Heroku (http://radek.io/2015/10/27/nodegit/)
-- Flatten chunks and reduce them to arrays only
-- Code to load flattened chunks in game
-- Tool to gather, uglify and compress all relevant source files and move them to production directory
+- Tool to gather, uglify and compress all relevant source files when moving to production directory
 - Full pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?
+- Flatten chunks and reduce them to arrays only
+- Code to load flattened chunks in game
 - Improve flattening by making transparency checks
 - Secure chunk access? (check client position before serving)
 - Desktop app (automated)
@@ -651,11 +511,6 @@ General:
 
 Testing:
 -------
-- Make numeric simulations linking everything:
--> Time to acquire dev level goals based on building production rates, varying number of buildings, productivity, etc.
--> Evolution of food surplus based on number of players, buildings, etc.
--> Set all these paremeters in a virtual settlement, simulate one day/week/month/year buy iteratively computing all cycles and their consequences in that time, then see results
--> Check how the relationship between population and food-producing buildings evolves as pop grows
 - Figure out testing:
 - Have a test server, test database a test map set up
 - Open browser and run test script in test world
@@ -728,3 +583,155 @@ UI:
 - Animals (w/ animations)
 - Enemy civs, enemy camps 
 - Logo 
+
+
+
+
+
+Part I: Mechanics
+Part II: World building
+Part III: Atmosphere & polish
+Part IV: Cleaning, optimization and admin
+
+Pillars:
+1) The War
+2) The Economy
+3) The Wild
+
+
+Chapter 1
+1) The War
+- Too little building damage from civs
+----
+2) The Economy
+- No repair?
+- It's much easier to craft a gun than arrows and string-based stuff!
+- Add sulfur mines
+- Problem with food consumption?
+- Tune down ores production a bit? 
+
+---
+- Rethink "per cycle" display in prod panel
+- Introduce new wood ingredient obtained from timber, crafting wood, made in bulk (but then tune down timber prod)
+-> For shield, guns...?
+- Currency? (+ flow from trade post and workshop to fort) / money flow
+- Fix the right amount of buildings in each settlement, their output per turn, turn duration
+-> Simulate?
+- Tune economy
+- Starvation (impact) (think of ways to make it painfully visible)
+- Settlement-oriented HUD: see below
+-> Adapt positioning of orienation pins
+- Compass
+- Bell when attack
+- Missions menu
+(-> Eventually: missions, quests & achievements)
+(-> Missions: bring food, defend, commit, follow chancellor directives,
+defend trade routes, scout, maintain supplies)
+(-> Control quests distribution?)
+- Commitment lasts multiple turns; fix repeat send of commit slots
+3) The Wild
+=> Update texts
+=> Test with someone
+
+Chapter 2
+1) The War
+- New "building damage" stat (allows introducing specialized weapons: maces, ...)
+=> Ranged weapon have very low building damage, melee weapon more, maces and axes much more, bombs a lot
+- Multiple bomb types with variable stats
+- Barracks and troops (need food inflow to barracks)
+-> Troops need food to train + count for recurring food consumption
+- Fortified civ camps, rebuilds
+- More involved raid mechanics (patrols, list of units ready to raid, units coming back to base, units healing when at base) using a more complex states scheme
+- NPC use ranged attacks (no firarms and bombs though)
+2) The Economy 
+(automatic economy)
+- More advanced simulations to balance resources
+- Permanent, named players
+- Dev. levels
+- Impact on crafting, buildings, ...
+- New buildings, settlements expansion
+- Homeland trade (automatic)
+- Cash crops
+- Economy orientation by chancellors
+- Backpacks, purses, belts, gloves (remove shields) ...
+- War economy (tower ammunitions, ...)
+3) The Wild
+- New World 
+- Fog of war (timed)
+-> Display a square on the map
+-> Display visibleAOIs on fort map -> convex hull?
+-> Have visibleAOIs set depend on buildings, esp. towers
+-> Synchronize player.visittedAOIs to fort
+-> Own fog of wars for players, update own map as they wander, synchronize when back to fort
+- Icons synchronization
+- Resources & misc map icons
+- Trade routes (chancellors only), mark on maps
+- Fatigue & rest, impact on everything
+- Different pelts and leathers, rework crafting recipes, full pelt economy
+
+Chapter 3:
+1) The War
+- Unit types & counters
+- Advanced battle mechanics & UI (need belts first)
+- Automated raids by commander, displayed to entice players
+-> Force player battle pathfinding to fit in battle cells
+-> Adapth pathfinding for multi-cell entities
+-> trimPath for multicell entities
+2) The Economy
+- Pinning recipes on UI (so as not to have to memorize ingredients)
+- Governor & officials
+- Elections
+- Taxes
+- Citizenship changes
+- Tuning of cash flows
+- Manual homeland trade
+3) The Wild
+- Look into GameObject.willRender to see if can be used to know when a sprit is hidden by a tree, tower... 
+
+Chapter 4:
+Fancy title screen (with number of players, events stream, map background...)
+Class selection
+Player abilities
+Advanced XP systems
+Class quests & civic quests (endless supply in missions menu)
+Personal shops & caravans
+World-building: items, fauna & flora
+Corresponding spawn mechanics
+Corresponding admin tools
+Advanced crafting mechanics & interface
+Recipes mechanics
+Tiers, brittleness, ...
+New geography, adding world content
+Corresponding editing tools
+Ambient elements
+Civ style
+Advanced civ mechanics
+Messaging
+Advanced social features
+Diplomacy
+...
+
+
+
+Interface upgrades:
+- Class selection
+- Settlement selection
+- Crafting menu
+- Battle interface
+- HUD
+
+
+UI
+# Put settlement to the forefront
+- Name next to minimap
+- Lvl, # citizens, # buildings?, # troops
+- Food (also update prod and build panels)
+- Security? 
+- Bell icon when attacks
+- Blinking icon on map when attacks?
+- Displayed for the settlement currently visited
+- Help icon to invite to visit fort for more details
+- Compass icon pointing towards local Fort at all time (if equipped)
+- Death icons + "last attacks" icons
+- Display health bar of buildings? Show damage somehow (smoke w/ particles?)
+

@@ -222,7 +222,7 @@ Settlement.prototype.consumeFood = function(){
     return (consumption > 0);
 };
 
-// Called whenever food amount changes and directly after all buildings are read
+// Called whenever food is consumed and directly after all buildings are read
 Settlement.prototype.computeFoodSurplus = function(){
     if(!this.fort) return;
     console.log('Computing food surplus...');
@@ -233,12 +233,24 @@ Settlement.prototype.computeFoodSurplus = function(){
     }
     var required = Formulas.computeRequiredFood(this.pop);
     var delta = foodAmount - required;
-    console.log('delta = ',delta,'required=',required);
-    this.surplus = Formulas.decimalToPct(delta/required);
+    var pct = delta/required;
+
+    if(pct >= -0.1 && pct <= 0.1){
+        this.surplus = 0;
+    }else if(pct >= -0.3 && pct < -0.1){
+        this.surplus = -1;
+    }else if(pct < -0.3){
+        this.surplus = -2;
+    }else if(pct <= 0.3 && pct > 0.1){
+        this.surplus = 1;
+    }else if(this.pct > 0.3){
+        this.surplus = 2;
+    }
+    /*this.surplus = Formulas.decimalToPct(delta/required);
     if(isNaN(this.surplus)){
         console.warn('NaN surplus for settlement',this.name);
         this.surplus = 0;
-    }
+    }*/
     console.log('Surplus for ',this.name,':',this.surplus,'%');
     this.buildings.forEach(function(building){
         building.setProperty('foodsurplus',this.surplus);
@@ -247,7 +259,8 @@ Settlement.prototype.computeFoodSurplus = function(){
 
 Settlement.prototype.computeFoodModifier = function(){
     // Not converted to % since not broadcast
-    return Formulas.computeSettlementFoodModifier(Formulas.pctToDecimal(this.surplus));
+    //return Formulas.computeSettlementFoodModifier(Formulas.pctToDecimal(this.surplus));
+    return Formulas.computeSettlementFoodModifier(this.surplus);
 };
 
 Settlement.prototype.update = function(){
@@ -271,7 +284,7 @@ Settlement.prototype.update = function(){
 };
 
 Settlement.prototype.spontaneousHarvesting = function(){
-    // TODO: conf
+    // TODO: conf + tune down
     if(!GameServer.isTimeToUpdate('harvesting')) return false;
     this.addResourceToBuilding(3,7,Utils.randomInt(1,2)); // wood
     this.addResourceToBuilding(3,26,Utils.randomInt(1,2)); // stone

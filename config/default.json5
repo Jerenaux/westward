@@ -87,6 +87,9 @@
     client: {
         boot:{
             forceNewPlayer: false
+        },
+        config: {
+            chatTimeout: 5000 //ms
         }
     }
 }

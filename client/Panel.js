@@ -297,9 +297,18 @@ Capsule.prototype.setText = function(text){
     if(this.icon) this.width += this.icon.width;
 
     this.slices[1].width = this.width;
+    if(this.extraW) this.slices[1].width += this.extraW;
     this.slices[2].x += (this.width-this.width_);
 
     this.width_ = this.width;
+};
+
+Capsule.prototype.removeLeft = function(){
+    //var w = this.slices[0].width;
+    //console.warn(w);
+    this.extraW = 17;
+    this.slices[0].destroy();
+    this.slices[1].x -= this.extraW;
 };
 
 Capsule.prototype.display = function(){

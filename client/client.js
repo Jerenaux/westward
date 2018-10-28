@@ -88,7 +88,8 @@ Client.socket.on(Client.initEventName,function(data){ // This event triggers whe
     console.log('Init packet received');
     //if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.initializationSchema); // if in binary format, decode first
     Client.socket.emit('ponq',data.stamp); // send back a pong stamp to compute latency
-    Engine.initWorld(data.player,data.buildings);
+    Engine.configEngine(data.config);
+    Engine.initWorld(data.player);
     //Game.updateNbConnected(data.nbconnected);
 });
 

@@ -8,7 +8,10 @@ function Menu(title){
     this.events = {};
     this.hideOnOpen = {};
     this.displayed = false;
-    if(title) this.makeTitle(title);
+    if(title) {
+        this.makeTitle(title);
+        this.name = title;
+    }
 }
 
 Menu.prototype.makeTitle = function(title){
@@ -70,8 +73,7 @@ Menu.prototype.display = function(){
 
     Engine.inMenu = true;
     Engine.hideMarker();
-    if(Engine.miniMap) Engine.miniMap.hide();
-    Engine.setlCapsule.hide();
+    Engine.hideHUD();
     UI.setCursor();
     this.displayed = true;
 };
@@ -87,7 +89,14 @@ Menu.prototype.hide = function(){
     Engine.inMenu = false;
     Engine.currentMenu = null;
     Engine.showMarker();
-    if(Engine.miniMap)  Engine.miniMap.display();
-    Engine.setlCapsule.display();
+    Engine.displayHUD();
     this.displayed = false;
+};
+
+Menu.prototype.toggle = function(){
+    if(this.displayed){
+        this.hide();
+    }else{
+        this.display();
+    }
 };

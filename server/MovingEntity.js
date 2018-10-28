@@ -154,7 +154,7 @@ MovingEntity.prototype.setChat = function(text){
     var _entity = this;
     this.chatTimer = setTimeout(function(){
         _entity.chat = undefined;
-    },5000); // TODO: move to conf, make common to client and server
+    },GameServer.clientParameters.config.chatTimeout);
 };
 
 // ### Equipment ###

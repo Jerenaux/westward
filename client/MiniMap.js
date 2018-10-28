@@ -14,7 +14,7 @@ function MiniMap(margin){
     this.bg.setScrollFactor(0);
     this.bg.setVisible(false);
 
-    this.ring = UI.scene.add.sprite(x,y,'mapring');
+    this.ring = UI.scene.add.sprite(x,y,'UI','mapring');
     this.ring.setDepth(1);
     this.ring.setScrollFactor(0);
     this.ring.setVisible(false);

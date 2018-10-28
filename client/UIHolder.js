@@ -8,12 +8,13 @@ function UIHolder(x,y,align,style){
     this.align = align;
 
     if(!style) style = 'big';
+    this.style = style;
     var sliceWidth, sliceHeight, fontSize, leftFrame, middleFrame, rightFrame, yOffset, xOffset;
     if(style == 'big'){
         sliceWidth = 32;
         sliceHeight = 64;
         fontSize = 32;
-        yOffset = 10;
+        yOffset = 5;
         xOffset = -5;
         leftFrame = 'title-left';
         middleFrame = 'title-center';
@@ -79,7 +80,8 @@ function UIHolder(x,y,align,style){
 
 UIHolder.prototype.setText = function(text){
     this.text.setText(text);
-    this.resize(this.text.width);
+    var w = (this.style == 'big' ? Math.max(this.text.width,150) : this.text.width);
+    this.resize(w); // 170 to be long enough to allow displaying menu icons
 };
 
 UIHolder.prototype.resize = function(w){

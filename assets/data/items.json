@@ -433,5 +433,23 @@
     "sound": "cloth",
     "stickMouse": true,
     "useInBattle": true
+  },
+  "45":{
+    "atlas": "items2",
+    "frame":"timber",
+    "name": "Shack",
+    "desc": "A small dwelling where you can rest."
+  },
+  "46":{
+    "atlas": "items2",
+    "frame":"timber",
+    "name": "Lumber camp",
+    "desc": "This small camp produces a little bit of timber."
+  },
+  "47":{
+    "atlas": "items2",
+    "frame":"timber",
+    "name": "Defense tower",
+    "desc": "A wooden tower which can shoot at enemies."
   }
 }

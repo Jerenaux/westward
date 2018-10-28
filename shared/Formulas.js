@@ -38,7 +38,6 @@ Formulas.commitmentProductivityModifier = function(commitment){
 };
 
 Formulas.computeProductivity = function(foodModifier,commitModifier){
-    //return Utils.clamp(100 + foodModifier + commitModifier,0,1000);
     return Utils.clamp(1 + foodModifier + commitModifier,0,10); // TODO: is it ok to allow 0 producivity?
 };
 
@@ -50,12 +49,16 @@ Formulas.computeProdIncrement = function(prod,nb){
     return Math.round(prod*nb);
 };
 
+// Player stats get a <return value> bonus/malus
 Formulas.computePlayerFoodModifier = function(surplus){
-    return surplus/2;
+    //return surplus/2;
+    return surplus*0.25;
 };
 
+// Computes the "foodModifier" term for computeProductivity(
 Formulas.computeSettlementFoodModifier = function(surplus){
-    return (surplus*40)/100; // TODO: factor in dev level
+    //return (surplus*40)/100;
+    return surplus*0.25// TODO: factor in dev level
 };
 
 Formulas.computeMaxCivicXP = function(level){

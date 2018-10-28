@@ -125,7 +125,6 @@ Player.prototype.setUpStats = function(){
         this.setStat(s,v[s]);
     },this);
     this.maxStat('hp');
-    console.warn(this.stats);
     this.foodModifier = null;
 };
 
