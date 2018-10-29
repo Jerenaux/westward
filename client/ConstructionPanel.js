@@ -13,45 +13,61 @@ ConstructionPanel.prototype.constructor = ConstructionPanel;
 
 ConstructionPanel.prototype.addInterface = function(){
     this.addText(this.width/2,25,'Building under construction',null,20).setOrigin(0.5);
-    this.progressText = this.addText(this.width/2,50,'50%',null,20).setOrigin(0.5);
-    this.incrementText = this.addText(this.width/2,75,'(+10%/day)',Utils.colors.gold,16).setOrigin(0.5);
+    /*this.progressText = this.addText(this.width/2,50,'50%',null,20).setOrigin(0.5);
+    //this.incrementText = this.addText(this.width/2,75,'(+10%/day)',Utils.colors.gold,16).setOrigin(0.5);
     var barw = this.width-100;
     var barx = (this.width-barw)/2;
     this.bar = new BigProgressBar(this.x+barx,this.y+100,barw,'gold');
     this.bar.name = 'construction progress bar';
-    var btnx = this.width/2;
-    this.button = new BigButton(this.x+btnx,this.y+260,'Commit!',Engine.commitClick);
+    var btnx = this.width/2;*/
+    //this.button = new BigButton(this.x+btnx,this.y+260,'Commit!',Engine.commitClick);
 };
 
 ConstructionPanel.prototype.update = function(){
     var data = Engine.currentBuiling;
-    this.bar.setLevel(data.progress);
-    this.progressText.setText(this.bar.getPct()+'%');
+    //this.bar.setLevel(data.progress);
+    //this.progressText.setText(this.bar.getPct()+'%');
     //var increment = Formulas.computeBuildIncrement(data.prod,Engine.buildingsData[data.buildingType].buildRate);
-    var rate = Engine.buildingsData[data.buildingType].buildRate;
+    /*var rate = Engine.buildingsData[data.buildingType].buildRate;
     var increment = Formulas.computeBuildIncrement(Formulas.pctToDecimal(data.prod),rate);
-    this.incrementText.setText('(+'+increment+'%/cycle)');
-    this.displayCommitButton();
+    this.incrementText.setText('(+'+increment+'%/cycle)');*/
+    //this.displayCommitButton();
 };
 
-ConstructionPanel.prototype.displayCommitButton = function(){
+/*ConstructionPanel.prototype.displayCommitButton = function(){
     if(Engine.canCommit()){
         this.button.display();
     }else{
         this.button.hide();
     }
-};
+};*/
 
 ConstructionPanel.prototype.displayInterface = function(){
-    this.bar.display();
-    this.displayCommitButton();
+    //this.bar.display();
+    //this.displayCommitButton();
     this.displayTexts();
+
+    var materials = Engine.buildingsData[Engine.currentBuiling.buildingType].recipe;
+    if(!materials) return;
+    var i = 0;
+    for(var item in materials){
+        var nb = materials[item];
+        var slot = this.getNextLongSlot();
+        slot.setUp(this.x+20, this.y + 50 + (i++ * 50));
+        var itemData = Engine.itemsData[item];
+        slot.addIcon(itemData.atlas,itemData.frame);
+        slot.addText(43,2,itemData.name,null,13);
+        var owned = Engine.currentBuiling.getItemNb(item);
+        slot.addText(43,17,owned+'/'+nb,(owned >= nb ? Utils.colors.green : Utils.colors.red),13);
+        slot.display();
+    }
 };
 
 ConstructionPanel.prototype.hideInterface = function(){
-    this.bar.hide();
-    this.button.hide();
+    //this.bar.hide();
+    //this.button.hide();
     this.hideTexts();
+    this.hideLongSlots();
 };
 
 ConstructionPanel.prototype.display = function(){

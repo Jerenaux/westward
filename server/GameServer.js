@@ -81,7 +81,7 @@ GameServer.createModels = function(){
         x: {type: Number, min: 0, required: true},
         y: {type: Number, min: 0, required: true},
         type: {type: Number, min: 0, required: true},
-        sid: {type: Number, min: 0, required: true},
+        //sid: {type: Number, min: 0, required: true},
         inventory: {type: [[]], set:function(inventory){
                 return inventory.toList(true); // true: filter zeroes
             }},
@@ -701,47 +701,47 @@ GameServer.handleShop = function(data,socketID) {
     Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type});
 };
 
-/*GameServer.handleBuild = function(data,socketID){
+GameServer.handleBuild = function(data,socketID) {
     var bid = data.id;
     var tile = data.tile;
     var player = GameServer.getPlayer(socketID);
-    console.log('builing request',bid,tile);
-    if(GameServer.canBuild(bid,tile)){
-        GameServer.build(bid,tile,player.settlement);
-        // todo: send ok message
-    }else{
-        // todo: send error message
-     }
+    if (GameServer.canBuild(bid, tile)) {
+        bid = 6; // TODO: remove when proper assets available
+        GameServer.build(bid, tile);
+    } else {
+        player.addMsg('I can\'t build there!');
+    }
 };
 
 GameServer.canBuild = function(bid,tile){
     var data = GameServer.buildingsData[bid];
-    // TODO: store somewhere
-    var shape = [];
-    for(var i = 0; i < data.shape.length; i+=2){
-        shape.push({
-            x: data.shape[i],
-            y: data.shape[i+1]
-        });
+
+    for(var x = 0; x < data.width; x++){
+        for(var y = 0; y < data.height; y++) {
+            // ! minus sign
+            if(GameServer.checkCollision(tile.x+x,tile.y-y)) return false;
+        }
     }
-    return PFUtils.collisionsFromShape(shape,tile.x,tile.y,data.width,data.height,GameServer.collisions,true);
+    return true;
 };
 
-GameServer.build = function(bid,tile,settlement){
+GameServer.build = function(bid,tile){
     var data = {
         x: tile.x,
         y: tile.y,
         type: bid,
-        settlement: settlement,
         built: false
     };
     var building = new Building(data);
-    GameServer.buildings[building.id] = building;
-    GameServer.server.db.collection('buildings').insertOne(building.dbTrim(),function(err){
-        if(err) throw err;
-        console.log('build successfull');
+    var document = new GameServer.BuildingModel(building);
+    building.setModel(document); // ref to model is needed at least to get _id
+
+    document.save(function (err) {
+        if (err) return console.error(err);
+        console.log('Build successfull');
+        GameServer.buildings[building.id] = building;
     });
-};*/
+};
 
 GameServer.handleRespawn = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
@@ -1082,7 +1082,6 @@ GameServer.setBuildingGold = function(data){
     building.save();
     return true;
 };
-
 
 GameServer.setBuildingPrice = function(data){
     console.log(data);

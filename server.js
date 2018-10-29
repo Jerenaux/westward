@@ -143,6 +143,7 @@ io.on('connection',function(socket){
         var callbacksMap = {
             'battleAction': gs.handleBattleAction,
             'buildingClick': gs.handleBuildingClick,
+            'build': gs.handleBuild,
             'chat': gs.handleChat,
             'commit': gs.handleCommit,
             'craft': gs.handleCraft,
@@ -155,7 +156,6 @@ io.on('connection',function(socket){
             'unequip': gs.handleUnequip,
             'use': gs.handleUse,
 
-            'exec-stop': gs.execStop,
             'ss': gs.startScript
         };
 

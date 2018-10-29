@@ -618,10 +618,10 @@ Player.prototype.enterBuilding = function(id){
     // TODO: add to a list of people in the building object
     this.setProperty('inBuilding', id);
 
-    if(this.settlement.fort.id == id){
+    /*if(this.settlement.fort.id == id){
         console.log('Came back to fort');
         this.visitedAOIs.clear();
-    }
+    }*/
     Prism.logEvent(this,'building',{building:GameServer.buildings[id].type});
 };
 

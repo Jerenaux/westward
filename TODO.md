@@ -38,6 +38,18 @@ Misc:
 -> Keep class quests (+ "smart quests" based on settlement situation?)
 -> Menu to list buildings (but on-site management)
 
+- Giving resources to building
+- Incrment build upon giving
+- Production, adds to stock
+- Taking from building
+- Autobuild if no-recipe buildings
+(- Way to cancel build click)
+(- Block if animal/civ/player in the way)
+(- Decide how to handle items/spawn clusters in the way)
+(- One building site constraint)
+(- Cancel/destroy)
+(- Display info on top of blds)
+UI: display building health, owner 
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.
@@ -45,7 +57,6 @@ First few words about permanent sandbox, collaborative survival, etc.
 Part 1: buildings
 - Just arrived, need to settle
 - A few buildings present, and towers, safe zone
-- Build a shack
 - Point out useful buildings (workshop, brewery) are under construction buy other players, but need wood; 
 prompt to go build a lumbercamp at the proper location (building tut + auto resources tut, depletion...)
 - Explain that with that building, you can benefit other players, and their progress will benefit you in turn (access to crafting)
@@ -54,9 +65,10 @@ prompt to go build a lumbercamp at the proper location (building tut + auto reso
 Part 2: exploration, crafting, trade and wildlife
 - Prompt to go craft an useful item, point out that a specific ingredient is missing
 - Prompt to go explore fog of war in a certain area (explain fog of war) + multi-class lvl tuto
-- On the way, attack by wildlife, battle tuto + food tuto
+- On the way, attack by wildlife, battle tuto + food tuto (mention use for boosting production as well)
 - When resource found, tuto about pick up resources and ecology
 - Go back, sell and craft (trade & craft tuto)
+- Talk about fatigue + prompt to build a shack
 
 Part 3: enemy civ
 - Point out that lumber camp is exposed, need to build a tower

@@ -1204,13 +1204,13 @@ Engine.makeConstructionMenu = function(){
     constr.addPanel('progress',progress);
     //var materials = new MaterialsPanel(x,invy,w,materialh,'Materials');
     //constr.addPanel('materials',materials);
-    var prod = new ProductivityPanel(prodx,prody,prodw,100,'Productivity modifiers');
+    /*var prod = new ProductivityPanel(prodx,prody,prodw,100,'Productivity modifiers');
     prod.addButton(prodw-30, 8, 'blue','help',null,'',UI.textsData['productivity_help']);
-    constr.addPanel('prod',prod);
+    constr.addPanel('prod',prod);*/
 
     //constr.addEvent('onUpdateShop',materials.update.bind(materials));
     constr.addEvent('onUpdateConstruction',progress.update.bind(progress));
-    constr.addEvent('onUpdateProductivity',prod.update.bind(prod));
+    //constr.addEvent('onUpdateProductivity',prod.update.bind(prod));
     return constr;
 };
 
@@ -1480,10 +1480,16 @@ Engine.bldClick = function(){
 };
 
 Engine.bldUnclick = function(){
+    if(!Engine.bldRect.collides) {
+        var id = Engine.bldRect.bldID;
+        var bld = Engine.buildingsData[id];
+        var pos = Engine.bldRect.getBottomLeft();
+        pos.x = pos.x / 32;
+        pos.y = (pos.y / 32) - 1;
+        console.log("Building ", bld.name, " of size ", bld.width, "*", bld.height, " at ", (pos.x), ",", (pos.y));
+        Client.sendBuild(id, pos);
+    }
     Engine.showMarker();
-    var bld = Engine.buildingsData[Engine.bldRect.bldID];
-    var pos = Engine.bldRect.getBottomLeft();
-    console.log("Building ",bld.name," of size ",bld.width,"*",bld.height," at ",(pos.x/32),",",(pos.y/32-1));
     Engine.bldRect.destroy();
 };
 
@@ -1494,7 +1500,6 @@ Engine.updateBldRect = function(){
     for(var x = 0; x < Engine.bldRect.width/32; x++){
         if(collides) break;
         for(var y = 0; y < Engine.bldRect.height/32; y++){
-            //console.log(Engine.bldRect.x,Engine.bldRect.width/2,x);
             var cx = (Engine.bldRect.x-(Engine.bldRect.width/2))/32+x;
             var cy = (Engine.bldRect.y-(Engine.bldRect.height/2))/32+y;
             if(Engine.checkCollision(cx,cy)){
@@ -1503,6 +1508,7 @@ Engine.updateBldRect = function(){
             }
         }
     }
+    Engine.bldRect.collides = collides;
     if(collides){
         Engine.bldRect.setFillStyle(0xee0000);
     }else{
@@ -2001,15 +2007,19 @@ Engine.enterBuilding = function(id){
     var settlementData = Engine.settlementsData[building.settlement];
 
     var menus = [];
-    if(building.built) {
+    var mainMenu;
+    if(building.built == true) {
+        console.log('A');
         // Displays the tray icons based on flags in the building data
         if (buildingData.fort) menus.push(Engine.menus.fort);
         if (buildingData.trade) menus.push(Engine.menus.trade);
         if (buildingData.workshop) menus.push(Engine.menus.crafting);
         if (buildingData.production) menus.push(Engine.menus.production);
         if (buildingData.staff) menus.push(Engine.menus.staff);
+        mainMenu = Engine.menus[buildingData.mainMenu];
     }else{
         menus.push(Engine.menus.construction);
+        mainMenu = Engine.menus.construction;
     }
 
     if(menus.length == 0) return;
@@ -2017,7 +2027,7 @@ Engine.enterBuilding = function(id){
     menus.forEach(function(m){
         m.displayIcon();
     });
-    var mainMenu = Engine.menus[buildingData.mainMenu]; 
+
     mainMenu.display();
     building.handleOut();
 
@@ -2046,7 +2056,7 @@ Engine.enterBuilding = function(id){
     });
 
     Engine.buildingTitle.setText(buildingData.name);
-    Engine.settlementTitle.setText(settlementData.name);
+    //Engine.settlementTitle.setText(settlementData.name);
     if(Engine.buildingTitle.width < Engine.settlementTitle.width) Engine.buildingTitle.resize(Engine.settlementTitle.width);
     Engine.buildingTitle.display();
     Engine.settlementTitle.display();

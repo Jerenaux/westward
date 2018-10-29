@@ -71,7 +71,7 @@ function Building(data){
     this.onAddAtLocation();
     this.setOrUpdateAOI();
     this.addCollisions();
-    this.registerBuilding();
+    //this.registerBuilding();
 }
 
 Building.prototype = Object.create(GameObject.prototype);
@@ -81,14 +81,14 @@ Building.prototype.getShortID = function(){
     return 'B'+this.id;
 };
 
-Building.prototype.registerBuilding = function(){
+/*Building.prototype.registerBuilding = function(){
     if(this.civBuilding) return;
     this.settlement.registerBuilding(this);
     if(this.type == 0){ // fort
         this.settlement.registerFort(this);
         this.refreshListing();
     }
-};
+};*/
 
 Building.prototype.refreshListing = function(){
     this.buildings = this.settlement.getBuildings();
@@ -127,14 +127,13 @@ Building.prototype.updateNbCommitted = function(){
 
 Building.prototype.update = function(){
     if(this.civBuilding) return;
-    this.updateCommitment();
+    //this.updateCommitment();
     if(this.built){
         this.updateProd();
-        //if(this.isWorkshop) this.dispatchStock();
         this.dispatchStock();
         this.repair();
     }else{
-        this.updateBuild();
+        //this.updateBuild();
     }
     this.save();
 };
