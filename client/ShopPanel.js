@@ -1,11 +1,12 @@
 /**
  * Created by jeren on 28-12-17.
  */
-function ShopPanel(x,y,width,height,title){
+function ShopPanel(x,y,width,height,title,notShop){
     Panel.call(this,x,y,width,height,title);
     this.buttons = [];
     this.lastPurchase = Date.now();
     this.addInterface();
+    this.isShop = !notShop;
 }
 
 ShopPanel.prototype = Object.create(Panel.prototype);
@@ -20,14 +21,16 @@ ShopPanel.prototype.addInterface = function(){
     this.content.push(slot);
     this.slot = slot;
 
-    var gold = UI.scene.add.sprite(this.x+240,this.y+35,'items2','gold-pile');
-    gold.setScale(1.5);
-    gold.setDepth(1);
-    gold.setScrollFactor(0);
-    gold.setDisplayOrigin(0,0);
-    gold.setVisible(false);
-    this.content.push(gold);
-    this.gold = gold;
+    if(this.isShop) {
+        var gold = UI.scene.add.sprite(this.x + 240, this.y + 35, 'items2', 'gold-pile');
+        gold.setScale(1.5);
+        gold.setDepth(1);
+        gold.setScrollFactor(0);
+        gold.setDisplayOrigin(0, 0);
+        gold.setVisible(false);
+        this.content.push(gold);
+        this.gold = gold;
+    }
 
     var item = new ItemSprite();
     item.setPosition(this.x+20+18,this.y+30+18);
@@ -42,11 +45,18 @@ ShopPanel.prototype.addInterface = function(){
     count.setOrigin(1,1);
     this.content.push(count);
 
-    var price = UI.scene.add.text(this.x+240,this.y+50, '0',  { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    price.setVisible(false);
-    price.setDepth(2);
-    price.setScrollFactor(0);
-    this.content.push(price);
+    if(this.isShop) {
+        var price = UI.scene.add.text(this.x + 240, this.y + 50, '0', {
+            font: '14px belwe',
+            fill: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 3
+        });
+        price.setVisible(false);
+        price.setDepth(2);
+        price.setScrollFactor(0);
+        this.content.push(price);
+    }
 
     var name = Engine.scene.add.text(this.x+65,this.y+25, '0',  { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     name.setVisible(false);
@@ -75,14 +85,14 @@ ShopPanel.prototype.setUp = function(id,action){
     this.shopItem.id = id;
     this.shopItem.count = 1;
     this.shopItem.action = action;
-    this.shopItem.price = this.getPrice(id);
+    if(this.isShop) this.shopItem.price = this.getPrice(id);
     this.shopItem.item.setUp(id,data);
     this.shopItem.item.setVisible(true);
     this.shopItem.nameText.setText(data.name);
     this.shopItem.nameText.setVisible(true);
     this.shopItem.countText.setText(1);
     this.shopItem.countText.setVisible(true);
-    this.displayPrice();
+    if(this.isShop) this.displayPrice();
     var title = (action == 'buy' ? 'Buy' : 'Sell');
     this.capsules['title'].setText(title);
     this.manageButtons();
@@ -168,13 +178,13 @@ ShopPanel.prototype.decreaseAmount = function(){
 ShopPanel.prototype.changeAmount = function(inc){
     this.shopItem.count = Utils.clamp(this.shopItem.count+inc,1,999);
     this.shopItem.countText.setText(this.shopItem.count);
-    this.displayPrice();
+    if(this.isShop) this.displayPrice();
     this.manageButtons();
 };
 
 ShopPanel.prototype.displayInterface = function(){
     this.slot.setVisible(true);
-    this.gold.setVisible(true);
+    if(this.isShop) this.gold.setVisible(true);
     this.buttons.forEach(function(b){
         b.btn.disable();
     });
@@ -200,6 +210,10 @@ ShopPanel.prototype.reset = function(){
 
 ShopPanel.prototype.requestPurchase = function(){
     if(Date.now() - this.lastPurchase < 200) return;
-    Client.sendPurchase(this.shopItem.id,this.shopItem.count,this.shopItem.action);
+    if(this.isShop) {
+        Client.sendPurchase(this.shopItem.id, this.shopItem.count, this.shopItem.action);
+    }else{
+        Client.sendGive(this.shopItem.id,this.shopItem.count,Engine.currentBuiling.id);
+    }
     this.lastPurchase = Date.now();
 };

@@ -417,6 +417,10 @@
       "frame": {"x":633,"y":83,"w":40,"h":28}
     },
     {
+      "filename": "bigbutton_left_gray",
+      "frame": {"x":11,"y":577,"w":40,"h":28}
+    },
+    {
       "filename": "bigbutton_middle",
       "frame": {"x":675,"y":23,"w":4,"h":28}
     },
@@ -429,6 +433,10 @@
       "frame": {"x":675,"y":83,"w":4,"h":28}
     },
     {
+      "filename": "bigbutton_middle_gray",
+      "frame": {"x":53,"y":577,"w":4,"h":28}
+    },
+    {
       "filename": "bigbutton_right",
       "frame": {"x":716,"y":23,"w":41,"h":28}
     },
@@ -439,6 +447,10 @@
     {
       "filename": "bigbutton_right_pressed",
       "frame": {"x":716,"y":83,"w":41,"h":28}
+    },
+    {
+      "filename": "bigbutton_right_gray",
+      "frame": {"x":94,"y":577,"w":41,"h":28}
     },
     {
       "filename": "scroll_up",

@@ -1187,7 +1187,7 @@ Engine.makeProductionMenu = function(){
 };
 
 Engine.makeConstructionMenu = function(){
-    var w = 400;
+    var w = 500;
     var x = (Engine.getGameConfig().width-w)/2;
     var padding = 0;
     var progressh = 300;
@@ -1202,6 +1202,12 @@ Engine.makeConstructionMenu = function(){
     var progress = new ConstructionPanel(x,progressy,w,progressh);
     progress.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['progress_help']);
     constr.addPanel('progress',progress);
+
+    var action = new ShopPanel(212,420,300,100,'Give',true); // true = not shop, hack
+    constr.addPanel('action',action,false);
+
+    constr.addEvent('onUpdateShop',progress.update.bind(progress));
+
     //var materials = new MaterialsPanel(x,invy,w,materialh,'Materials');
     //constr.addPanel('materials',materials);
     /*var prod = new ProductivityPanel(prodx,prody,prodw,100,'Productivity modifiers');
@@ -1209,7 +1215,7 @@ Engine.makeConstructionMenu = function(){
     constr.addPanel('prod',prod);*/
 
     //constr.addEvent('onUpdateShop',materials.update.bind(materials));
-    constr.addEvent('onUpdateConstruction',progress.update.bind(progress));
+    //constr.addEvent('onUpdateConstruction',progress.update.bind(progress));
     //constr.addEvent('onUpdateProductivity',prod.update.bind(prod));
     return constr;
 };
@@ -1491,6 +1497,7 @@ Engine.bldUnclick = function(){
     }
     Engine.showMarker();
     Engine.bldRect.destroy();
+    Engine.bldRect = null;
 };
 
 Engine.updateBldRect = function(){
@@ -2262,6 +2269,11 @@ Engine.sellClick = function(){
 
 Engine.buyClick = function(){
     Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
+};
+
+Engine.giveClick = function(itemID){
+    console.log(itemID);
+    Engine.currentMenu.panels['action'].setUp(itemID,'sell');
 };
 
 Engine.commitClick = function(){

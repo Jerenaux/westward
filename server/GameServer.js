@@ -74,7 +74,9 @@ GameServer.createModels = function(){
         name: {type: String, required: true},
         description: String,
         population: {type: Number, min: 0, required: true},
-        level: {type: Number, min: 0, required: true}
+        level: {type: Number, min: 0, required: true},
+        x: {type: Number, min: 0, required: true},
+        y: {type: Number, min: 0, required: true}
     });
     var buildingSchema = mongoose.Schema({
         id: {type: Number, min: 0, required: true},
@@ -191,7 +193,6 @@ GameServer.loadSettlements = function(){
         settlements.forEach(function(data){
             var settlement = new Settlement(data);
             settlement.setModel(data);
-            //GameServer.settlements[settlement.id] = settlement;
         });
         GameServer.updateStatus();
 
@@ -670,6 +671,18 @@ GameServer.removeBattleCell = function(battle,x,y){
 GameServer.handleBattleAction = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     player.battle.processAction(player,data);
+};
+
+GameServer.giveToBuilding = function(data,socketID){
+    var player = GameServer.getPlayer(socketID);
+    var building = GameServer.buildings[data.building];
+    var nb = data.nb;
+    var item = data.item;
+
+    if(!player.hasItem(item,nb)) return;
+    player.takeItem(item,nb,true);
+    building.giveItem(item,nb,false);
+    building.updateBuild();
 };
 
 GameServer.handleShop = function(data,socketID) {

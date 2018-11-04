@@ -43,6 +43,7 @@ Misc:
 - Production, adds to stock
 - Taking from building
 - Autobuild if no-recipe buildings
+- Location constraint
 (- Way to cancel build click)
 (- Block if animal/civ/player in the way)
 (- Decide how to handle items/spawn clusters in the way)
@@ -50,6 +51,8 @@ Misc:
 (- Cancel/destroy)
 (- Display info on top of blds)
 UI: display building health, owner 
+
+Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.
@@ -144,7 +147,8 @@ Secure
 
 Analytics:
 ---------
-- Pretty print events in admin: menu opens?, commitment, fights, item uses
+- Pretty print events in admin: returning players, menu opens?, commitment, fights, item uses
+- Bundle events from one player into sessions
 - Log session-wide stats: how many players visit a building during session, do this, do that...
 - Button to flush events
 - Push desktop notifications for player connects

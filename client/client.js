@@ -187,6 +187,10 @@ Client.sendBuild = function(id,tile){
     Client.socket.emit('build',{id:id,tile:tile});
 };
 
+Client.sendGive  = function(item,nb,building){
+    Client.socket.emit('give',{item:item,nb:nb,building:building});
+};
+
 Client.sendCommit = function(){
     Client.socket.emit('commit');
 };

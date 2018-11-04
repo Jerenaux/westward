@@ -246,7 +246,7 @@
     "mainMenu": "production",
     "depthOffset": 2,
     "displayProd": true,
-    "recipe": {"3":3},
+    "recipe": {"3":3,"1":5},
     "production": [[3,1,10]],
     "canFight": false,
     "buildRate":10,

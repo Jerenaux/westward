@@ -165,7 +165,7 @@ Building.prototype.updateProd = function(){
     }
 };
 
-Building.prototype.updateBuild = function(){
+/*Building.prototype.updateBuild = function(){
     if(!GameServer.isTimeToUpdate('build')) return false;
     var rate = GameServer.buildingsData[this.type].buildRate; // Base progress increase per turn, before factoring productivity in
     if(!rate) return;
@@ -173,6 +173,16 @@ Building.prototype.updateBuild = function(){
     console.log('Building ',increment,'%');
     this.setProperty('progress',Utils.clamp(this.progress+increment,this.progress,100));
     if(this.progress == 100) this.setProperty('built',true);
+};*/
+
+Building.prototype.updateBuild = function(){
+    var buildingData = GameServer.buildingsData[this.type];
+    var recipe = buildingData.recipe;
+    for(var item in recipe){
+        if(!this.hasItem(item,recipe[item])) return false;
+    }
+    this.setProperty('built',true);
+    return true;
 };
 
 Building.prototype.repair = function(){

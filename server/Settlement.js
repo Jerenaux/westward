@@ -13,6 +13,8 @@ function Settlement(data){
     this.desc = data.description;
     this.level = data.level;
     this.pop = data.population;
+    this.x = data.x;
+    this.y = data.y;
     this.visibleAOIs = new Set();
 
     this.fort = null;
@@ -66,6 +68,11 @@ function Settlement(data){
             [1,0,1],
             [3,0,9]
         ]
+    };
+
+    this.respawnLocation = {
+        x: this.x,
+        y: this.y
     };
 
     GameServer.settlements[this.id] = this;
@@ -178,8 +185,10 @@ Settlement.prototype.registerFort = function(fort){
     this.fort.setProperty('devlevel',this.level);
     this.fort.setProperty('danger',this.danger);
     this.respawnLocation = {
-        x: this.fort.x + GameServer.buildingsData[0].entrance.x,
-        y: this.fort.y + GameServer.buildingsData[0].entrance.y + 2
+        //x: this.fort.x + GameServer.buildingsData[0].entrance.x,
+        //y: this.fort.y + GameServer.buildingsData[0].entrance.y + 2
+        x: this.x,
+        y: this.y
     };
 
     Utils.listAdjacentAOIs(this.fort.aoi).forEach(function(aoi){
@@ -323,8 +332,10 @@ Settlement.prototype.selectionTrim = function(){
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
-    trimmed.x = (this.fort.x-30)/World.worldWidth; // quick fix
-    trimmed.y = (this.fort.y-10)/World.worldHeight;
+    //trimmed.x = (this.fort.x-30)/World.worldWidth; // quick fix
+    //trimmed.y = (this.fort.y-10)/World.worldHeight;
+    trimmed.x = (this.x-30)/World.worldWidth; // quick fix
+    trimmed.y = (this.y-10)/World.worldHeight;
     trimmed.buildings = this.buildings.length;
     return trimmed;
 };

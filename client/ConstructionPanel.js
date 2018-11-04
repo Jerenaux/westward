@@ -5,6 +5,7 @@
 function ConstructionPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
     this.texts = [];
+    this.bigbuttons = [];
     this.addInterface();
 }
 
@@ -14,12 +15,12 @@ ConstructionPanel.prototype.constructor = ConstructionPanel;
 ConstructionPanel.prototype.addInterface = function(){
     this.addText(this.width/2,25,'Building under construction',null,20).setOrigin(0.5);
     /*this.progressText = this.addText(this.width/2,50,'50%',null,20).setOrigin(0.5);
-    //this.incrementText = this.addText(this.width/2,75,'(+10%/day)',Utils.colors.gold,16).setOrigin(0.5);
+    //this.incrementText = this.addText(this.width/2,75,'(+10%/day)',Utils.colors.gold,16).setOrigin(0.5);*/
     var barw = this.width-100;
     var barx = (this.width-barw)/2;
-    this.bar = new BigProgressBar(this.x+barx,this.y+100,barw,'gold');
+    this.bar = new BigProgressBar(this.x+barx,this.y+50,barw,'gold');
     this.bar.name = 'construction progress bar';
-    var btnx = this.width/2;*/
+    //var btnx = this.width/2;*/
     //this.button = new BigButton(this.x+btnx,this.y+260,'Commit!',Engine.commitClick);
 };
 
@@ -43,29 +44,56 @@ ConstructionPanel.prototype.update = function(){
 };*/
 
 ConstructionPanel.prototype.displayInterface = function(){
-    //this.bar.display();
+    this.bar.display();
     //this.displayCommitButton();
     this.displayTexts();
 
     var materials = Engine.buildingsData[Engine.currentBuiling.buildingType].recipe;
     if(!materials) return;
     var i = 0;
+    var total_needed = 0;
+    var total_owned = 0;
     for(var item in materials){
         var nb = materials[item];
         var slot = this.getNextLongSlot();
-        slot.setUp(this.x+20, this.y + 50 + (i++ * 50));
+        var y = this.y + 100 + (i++ * 50);
+        slot.setUp(this.x+20, y);
         var itemData = Engine.itemsData[item];
         slot.addIcon(itemData.atlas,itemData.frame);
         slot.addText(43,2,itemData.name,null,13);
         var owned = Engine.currentBuiling.getItemNb(item);
         slot.addText(43,17,owned+'/'+nb,(owned >= nb ? Utils.colors.green : Utils.colors.red),13);
         slot.display();
+
+        var btn = new BigButton(this.x+270,y+20,'Give '+itemData.name);
+        btn.item = item;
+        btn.callback = function(){
+            Engine.giveClick(this.item);
+        }.bind(btn);
+        btn.display();
+        this.bigbuttons.push(btn);
+        var btn = new BigButton(this.x+410,y+20,'Sell '+itemData.name);
+        btn.disable();
+        btn.display();
+        this.bigbuttons.push(btn);
+
+        total_needed += nb;
+        total_owned += owned;
     }
+    console.log(total_owned,total_needed);
+    this.bar.setLevel(total_owned,total_needed);
+};
+
+ConstructionPanel.prototype.update = function(){
+    this.hideLongSlots();
+    this.displayInterface();
 };
 
 ConstructionPanel.prototype.hideInterface = function(){
-    //this.bar.hide();
-    //this.button.hide();
+    this.bar.hide();
+    this.bigbuttons.forEach(function(b){
+        b.hide();
+    });
     this.hideTexts();
     this.hideLongSlots();
 };

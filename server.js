@@ -147,6 +147,7 @@ io.on('connection',function(socket){
             'chat': gs.handleChat,
             'commit': gs.handleCommit,
             'craft': gs.handleCraft,
+            'give':gs.giveToBuilding,
             'exit': gs.handleExit,
             'NPCClick': gs.handleNPCClick,
             'path': gs.handlePath,

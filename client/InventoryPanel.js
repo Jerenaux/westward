@@ -97,7 +97,6 @@ InventoryPanel.prototype.getNextSprite = function(){
             text: UI.scene.add.text(0, 0, '1',textconfig)
         };
         var slot = this.slots[this.spritesCounter];
-        if(!slot) console
         s.text.setOrigin(1,0);
         s.text.setScrollFactor(0);
         s.text.setVisible(false);

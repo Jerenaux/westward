@@ -31,6 +31,7 @@ function BigButton(x,y,text,callback){
     this.attachCallbacks(this.text);
 
     this.lastClick = 0;
+    this.enabled = true;
 }
 
 BigButton.prototype.attachCallbacks = function(element){
@@ -62,6 +63,7 @@ BigButton.prototype.setText = function(text){
 };
 
 BigButton.prototype.handleDown = function(){
+    if(!this.enabled) return;
     UI.scene.sound.add('click').play();
     this.slices[0].setFrame('bigbutton_left_pressed');
     this.slices[1].setFrame('bigbutton_middle_pressed');
@@ -70,6 +72,7 @@ BigButton.prototype.handleDown = function(){
 };
 
 BigButton.prototype.handleClick = function(){
+    if(!this.enabled) return;
     if(Date.now() - this.lastClick > 500){
         this.callback();
         this.lastClick = Date.now();
@@ -78,6 +81,7 @@ BigButton.prototype.handleClick = function(){
 };
 
 BigButton.prototype.handleOver = function(){
+    if(!this.enabled) return;
     this.slices[0].setFrame('bigbutton_left_lit');
     this.slices[1].setFrame('bigbutton_middle_lit');
     this.slices[2].setFrame('bigbutton_right_lit');
@@ -85,10 +89,24 @@ BigButton.prototype.handleOver = function(){
 };
 
 BigButton.prototype.handleOut = function(){
+    if(!this.enabled) return;
     this.slices[0].setFrame('bigbutton_left');
     this.slices[1].setFrame('bigbutton_middle');
     this.slices[2].setFrame('bigbutton_right');
     this.resetSize();
+};
+
+BigButton.prototype.disable = function(){
+    this.slices[0].setFrame('bigbutton_left_gray');
+    this.slices[1].setFrame('bigbutton_middle_gray');
+    this.slices[2].setFrame('bigbutton_right_gray');
+    this.resetSize();
+    this.enabled = false;
+    /*this.slices.forEach(function(s){
+        s.removeAllListeners();
+        s.off('pointerover');
+        //s.setInteractive(false);
+    });*/
 };
 
 BigButton.prototype.resetSize = function(){
