@@ -160,8 +160,9 @@ Building.prototype.updateProd = function(){
         var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
         var actualNb = increment;
         //console.log('producing ',actualNb,' ',GameServer.itemsData[item].name);
+        if(actualNb) this.giveItem(item,actualNb);
         //if(actualNb > 0) this.settlement.addToFort(item,actualNb);
-        if(actualNb > 0) this.settlement.dispatchResource(this,item,actualNb,true); // true: force dispatch
+        //if(actualNb > 0) this.settlement.dispatchResource(this,item,actualNb,true); // true: force dispatch
     }
 };
 

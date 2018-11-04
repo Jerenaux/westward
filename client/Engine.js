@@ -1177,11 +1177,17 @@ Engine.makeProductionMenu = function(){
     var productionPanel = new ProductionPanel(x,100,w,h,'Production');
     productionPanel.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['prod_help']);
     production.addPanel('production',productionPanel);
-    var productivity = new ProductivityPanel(prodx,prody,prodw,prodh,'Productivity modifiers');
-    productivity.addButton(prodw-30, 8, 'blue','help',null,'',UI.textsData['productivity_help']);
-    production.addPanel('productivity',productivity);
+    //var productivity = new ProductivityPanel(prodx,prody,prodw,prodh,'Productivity modifiers');
+    //productivity.addButton(prodw-30, 8, 'blue','help',null,'',UI.textsData['productivity_help']);
+    //production.addPanel('productivity',productivity);
+    var stock = production.addPanel('shop',new InventoryPanel(prodx,prody,prodw,prodh,'Stock'));
+    stock.setInventory(new Inventory(5),5,true);
+    production.addEvent('onDisplay',stock.updateInventory.bind(stock));
 
-    production.addEvent('onUpdateProductivity',productivity.update.bind(productivity));
+    production.addEvent('onUpdateShop',function(){
+        stock.updateInventory();
+    });
+    //production.addEvent('onUpdateProductivity',productivity.update.bind(productivity));
     production.addEvent('onUpdateCommit',productionPanel.update.bind(productionPanel));
     return production;
 };
@@ -1364,10 +1370,12 @@ Engine.makeTradeMenu = function(){
     var trade = new Menu('Trade');
     var client = trade.addPanel('client',new InventoryPanel(212,100,300,300,'Your items'));
     client.setInventory(Engine.player.inventory,7,true,Engine.sellClick);
+    client.filterItems = true;
     client.addCapsule('gold',150,-9,'999','gold');
     client.addButton(270, 8, 'blue','help',null,'',UI.textsData['sell_help']);
     var shop =  trade.addPanel('shop',new InventoryPanel(542,100,300,300,'Shop'));
     shop.setInventory(new Inventory(20),7,true,Engine.buyClick);
+    shop.filterItems = true;
     shop.addCapsule('gold',100,-9,'999','gold');
     shop.addButton(270, 8, 'blue','help',null,'',UI.textsData['buy_help']);
     var action = new ShopPanel(212,420,300,100,'Buy/Sell');
@@ -2016,7 +2024,6 @@ Engine.enterBuilding = function(id){
     var menus = [];
     var mainMenu;
     if(building.built == true) {
-        console.log('A');
         // Displays the tray icons based on flags in the building data
         if (buildingData.fort) menus.push(Engine.menus.fort);
         if (buildingData.trade) menus.push(Engine.menus.trade);
@@ -2042,21 +2049,25 @@ Engine.enterBuilding = function(id){
     menus.forEach(function(menu){
         if(menu.panels['shop']) {
             menu.panels['shop'].modifyInventory(building.inventory.items);
-            menu.panels['shop'].modifyFilter({
-                type: 'prices',
-                items: building.prices,
-                key: 1,
-                hard: false//!buildingData.workshop
-            });
+            if( menu.panels['shop'].filterItems) {
+                menu.panels['shop'].modifyFilter({
+                    type: 'prices',
+                    items: building.prices,
+                    key: 1,
+                    hard: false//!buildingData.workshop
+                });
+            }
             menu.panels['shop'].updateInventory();
 
             if(menu.panels['client']) {
-                menu.panels['client'].modifyFilter({
-                    type: 'prices',
-                    items: building.prices,
-                    key: 0,
-                    hard: false
-                });
+                if( menu.panels['client'].filterItems) {
+                    menu.panels['client'].modifyFilter({
+                        type: 'prices',
+                        items: building.prices,
+                        key: 0,
+                        hard: false
+                    });
+                }
                 menu.panels['client'].updateInventory();
             }
         }

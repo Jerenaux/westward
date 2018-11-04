@@ -38,11 +38,9 @@ Misc:
 -> Keep class quests (+ "smart quests" based on settlement situation?)
 -> Menu to list buildings (but on-site management)
 
-- Giving resources to building
-- Incrment build upon giving
-- Production, adds to stock
-- Taking from building
+
 - Autobuild if no-recipe buildings
+- Taking from building
 - Location constraint
 (- Way to cancel build click)
 (- Block if animal/civ/player in the way)
@@ -136,7 +134,7 @@ V1 level:
 
 Admin
 -----
-"Running since ..." in admin
+Update admin following changes
 Push desktop notifications for player connects
 Import db
 -> Iterate over import object, if matching id in db, update fields, if not, insert new entry 
