@@ -39,7 +39,6 @@ Misc:
 -> Menu to list buildings (but on-site management)
 
 
-- Autobuild if no-recipe buildings
 - Taking from building
 - Location constraint
 (- Way to cancel build click)
@@ -145,7 +144,7 @@ Secure
 
 Analytics:
 ---------
-- Pretty print events in admin: returning players, menu opens?, commitment, fights, item uses
+- Pretty print events in admin: returning players, new buildings, menu opens?, fights, item uses
 - Bundle events from one player into sessions
 - Log session-wide stats: how many players visit a building during session, do this, do that...
 - Button to flush events

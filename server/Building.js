@@ -68,14 +68,19 @@ function Building(data){
     this.productivity = 100;
     this.committed = 0;
     this.commitStamps = data.commitStamps || [];
-    this.onAddAtLocation();
-    this.setOrUpdateAOI();
-    this.addCollisions();
-    //this.registerBuilding();
 }
 
 Building.prototype = Object.create(GameObject.prototype);
 Building.prototype.constructor = Building;
+
+Building.prototype.embed = function(){
+    GameServer.buildings[this.id] = this;
+    this.onAddAtLocation();
+    this.setOrUpdateAOI();
+    this.addCollisions();
+    //this.registerBuilding();
+    this.updateBuild();
+};
 
 Building.prototype.getShortID = function(){
     return 'B'+this.id;
@@ -177,9 +182,11 @@ Building.prototype.updateProd = function(){
 };*/
 
 Building.prototype.updateBuild = function(){
+    if(this.built) return;
     var buildingData = GameServer.buildingsData[this.type];
     var recipe = buildingData.recipe;
     for(var item in recipe){
+        //console.log(this.hasItem(item,recipe[item]));
         if(!this.hasItem(item,recipe[item])) return false;
     }
     this.setProperty('built',true);

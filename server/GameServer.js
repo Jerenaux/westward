@@ -211,7 +211,8 @@ GameServer.loadSettlements = function(){
 GameServer.addBuilding = function(data){
     var building = new Building(data);
     building.setModel(data);
-    GameServer.buildings[building.id] = building;
+    //GameServer.buildings[building.id] = building;
+    building.embed();
     return building;
 };
 
@@ -752,7 +753,7 @@ GameServer.build = function(bid,tile){
     document.save(function (err) {
         if (err) return console.error(err);
         console.log('Build successfull');
-        GameServer.buildings[building.id] = building;
+        building.embed();
     });
 };
 
