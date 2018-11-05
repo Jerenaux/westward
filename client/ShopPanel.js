@@ -80,7 +80,7 @@ ShopPanel.prototype.addInterface = function(){
     };
 };
 
-ShopPanel.prototype.setUp = function(id,action){
+ShopPanel.prototype.setUp = function(id,action,title){
     var data = Engine.itemsData[id];
     this.shopItem.id = id;
     this.shopItem.count = 1;
@@ -93,14 +93,14 @@ ShopPanel.prototype.setUp = function(id,action){
     this.shopItem.countText.setText(1);
     this.shopItem.countText.setVisible(true);
     if(this.isShop) this.displayPrice();
-    var title = (action == 'buy' ? 'Buy' : 'Sell');
+    //var title = (action == 'buy' ? 'Buy' : 'Sell');
     this.capsules['title'].setText(title);
     this.manageButtons();
 };
 
 ShopPanel.prototype.update = function(){
     if(!this.displayed) return;
-    this.displayPrice();
+    if(this.isShop) this.displayPrice();
     this.manageButtons();
 };
 
@@ -213,7 +213,7 @@ ShopPanel.prototype.requestPurchase = function(){
     if(this.isShop) {
         Client.sendPurchase(this.shopItem.id, this.shopItem.count, this.shopItem.action);
     }else{
-        Client.sendGive(this.shopItem.id,this.shopItem.count,Engine.currentBuiling.id);
+        Client.sendStock(this.shopItem.id,this.shopItem.count,Engine.currentBuiling.id,this.shopItem.action);
     }
     this.lastPurchase = Date.now();
 };

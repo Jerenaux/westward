@@ -1181,11 +1181,16 @@ Engine.makeProductionMenu = function(){
     //productivity.addButton(prodw-30, 8, 'blue','help',null,'',UI.textsData['productivity_help']);
     //production.addPanel('productivity',productivity);
     var stock = production.addPanel('shop',new InventoryPanel(prodx,prody,prodw,prodh,'Stock'));
-    stock.setInventory(new Inventory(5),5,true);
+    stock.setInventory(new Inventory(5),5,true,Engine.takeClick);
+
+    var action = new ShopPanel(212,420,300,100,'Take',true); // true = not shop, hack
+    production.addPanel('action',action,false);
+
     production.addEvent('onDisplay',stock.updateInventory.bind(stock));
 
     production.addEvent('onUpdateShop',function(){
         stock.updateInventory();
+        action.update();
     });
     //production.addEvent('onUpdateProductivity',productivity.update.bind(productivity));
     production.addEvent('onUpdateCommit',productionPanel.update.bind(productionPanel));
@@ -1210,10 +1215,13 @@ Engine.makeConstructionMenu = function(){
     constr.addPanel('progress',progress);
 
     var action = new ShopPanel(212,420,300,100,'Give',true); // true = not shop, hack
-    constr.addPanel('action',action,false);
+    //action.capsules['title'].setText('Give');
+    constr.addPanel('action',action,true);
 
-    constr.addEvent('onUpdateShop',progress.update.bind(progress));
-
+    constr.addEvent('onUpdateShop',function(){
+        progress.update();
+        action.update();
+    });
     //var materials = new MaterialsPanel(x,invy,w,materialh,'Materials');
     //constr.addPanel('materials',materials);
     /*var prod = new ProductivityPanel(prodx,prody,prodw,100,'Productivity modifiers');
@@ -2275,16 +2283,20 @@ Engine.unequipClick = function(){ // Sent when unequipping something
 };
 
 Engine.sellClick = function(){
-    Engine.currentMenu.panels['action'].setUp(this.itemID,'sell');
+    Engine.currentMenu.panels['action'].setUp(this.itemID,'sell','Sell');
 };
 
 Engine.buyClick = function(){
-    Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
+    Engine.currentMenu.panels['action'].setUp(this.itemID,'buy','Buy');
 };
 
 Engine.giveClick = function(itemID){
-    console.log(itemID);
-    Engine.currentMenu.panels['action'].setUp(itemID,'sell');
+    Engine.currentMenu.panels['action'].display();
+    Engine.currentMenu.panels['action'].setUp(itemID,'sell','Give');
+};
+
+Engine.takeClick = function(){
+    Engine.currentMenu.panels['action'].setUp(this.itemID,'buy','Take');
 };
 
 Engine.commitClick = function(){

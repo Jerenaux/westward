@@ -120,7 +120,6 @@ InventoryPanel.prototype.hasSoftFilter = function(){
 };
 
 InventoryPanel.prototype.displayInventory = function(){
-    console.log('Displaying',this.name);
     this.slots.forEach(function(s){
         s.setVisible(true);
     });

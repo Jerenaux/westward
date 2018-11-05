@@ -674,16 +674,24 @@ GameServer.handleBattleAction = function(data,socketID){
     player.battle.processAction(player,data);
 };
 
-GameServer.giveToBuilding = function(data,socketID){
+GameServer.handleStockChange = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var building = GameServer.buildings[data.building];
     var nb = data.nb;
     var item = data.item;
+    var action = data.action;
+    if(!player.isInBuilding()) return;
 
-    if(!player.hasItem(item,nb)) return;
-    player.takeItem(item,nb,true);
-    building.giveItem(item,nb,false);
-    building.updateBuild();
+    if(action == 'buy'){ // = take
+        if(!building.hasItem(item,nb)) return;
+        building.takeItem(item,nb);
+        player.giveItem(item,nb,true);
+    }else{ // =give
+        if(!player.hasItem(item,nb)) return;
+        player.takeItem(item,nb,true);
+        building.giveItem(item,nb,false);
+        building.updateBuild();
+    }
 };
 
 GameServer.handleShop = function(data,socketID) {

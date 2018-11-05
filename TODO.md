@@ -38,8 +38,8 @@ Misc:
 -> Keep class quests (+ "smart quests" based on settlement situation?)
 -> Menu to list buildings (but on-site management)
 
-
-- Taking from building
+- Remove building material from stock when building
+- Constrain taking to owner
 - Location constraint
 (- Way to cancel build click)
 (- Block if animal/civ/player in the way)

@@ -171,6 +171,10 @@ Client.sendPurchase = function(id,nb, action){
     Client.socket.emit('shop',{id:id,nb:nb,action:action});
 };
 
+Client.sendStock  = function(item,nb,building,action){
+    Client.socket.emit('stock',{item:item,nb:nb,building:building,action:action});
+};
+
 Client.sendUse = function(id){
     Client.socket.emit('use',{item:id});
 };
@@ -185,10 +189,6 @@ Client.sendExit = function(){
 
 Client.sendBuild = function(id,tile){
     Client.socket.emit('build',{id:id,tile:tile});
-};
-
-Client.sendGive  = function(item,nb,building){
-    Client.socket.emit('give',{item:item,nb:nb,building:building});
 };
 
 Client.sendCommit = function(){
