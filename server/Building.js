@@ -40,9 +40,9 @@ function Building(data){
     this.cellsHeight = coll.h;
     this.shootFrom = buildingData.shootFrom;
 
+    this.owner = data.owner;
     this.skipBattleTurn = !buildingData.canFight;
     this.name = buildingData.name;
-    this.sid = data.sid;
     this.civBuilding = (this.sid == -1);
     if(this.civBuilding) this.battleTeam = 'Civ';
     this.entityCategory = (this.civBuilding ? 'CivBuilding' : 'PlayerBuilding');
@@ -135,12 +135,12 @@ Building.prototype.update = function(){
     //this.updateCommitment();
     if(this.built){
         this.updateProd();
-        this.dispatchStock();
+        //this.dispatchStock();
         this.repair();
+        this.save();
     }else{
         //this.updateBuild();
     }
-    this.save();
 };
 
 // Dispatch any items acquired by the building through trade or craft only
@@ -190,6 +190,9 @@ Building.prototype.updateBuild = function(){
         if(!this.hasItem(item,recipe[item])) return false;
     }
     this.setProperty('built',true);
+    for(var item in recipe){
+        this.takeItem(item,recipe[item]);
+    }
     return true;
 };
 
@@ -322,8 +325,7 @@ Building.prototype.save = function(){
 Building.prototype.trim = function(){
     var trimmed = {};
     var broadcastProperties =
-        ['id','type','sid','gold','prices','built','productivity','progress','committed',
-            'buildings','population','foodsurplus','danger','devlevel']; // list of properties relevant for the client
+        ['id','type','gold','prices','built','productivity','owner']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

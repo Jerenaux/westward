@@ -12,18 +12,18 @@ function Camp(buildings,target,center){
     this.targetSettlement = target;
     this.center = center;
 
-    buildings.forEach(function(hut){
+    /*buildings.forEach(function(hut){
         this.buildings.push(GameServer.addBuilding({
             x: hut.x,
             y: hut.y,
-            sid: -1,
             type: 4,
             built: true
         }));
-    },this);
+    },this);*/
 }
 
 Camp.prototype.update = function(){
+    return;
     if(!GameServer.isTimeToUpdate('camps')) return;
 
     if(this.people.length < 10){ // TODO: variable camp parameter (size)

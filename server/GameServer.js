@@ -84,6 +84,7 @@ GameServer.createModels = function(){
         y: {type: Number, min: 0, required: true},
         type: {type: Number, min: 0, required: true},
         //sid: {type: Number, min: 0, required: true},
+        owner: {type: Number, min: 0},
         inventory: {type: [[]], set:function(inventory){
                 return inventory.toList(true); // true: filter zeroes
             }},
@@ -684,6 +685,7 @@ GameServer.handleStockChange = function(data,socketID){
 
     if(action == 'buy'){ // = take
         if(!building.hasItem(item,nb)) return;
+        if(building.owner != player.id) return;
         building.takeItem(item,nb);
         player.giveItem(item,nb,true);
     }else{ // =give
@@ -729,7 +731,7 @@ GameServer.handleBuild = function(data,socketID) {
     var player = GameServer.getPlayer(socketID);
     if (GameServer.canBuild(bid, tile)) {
         bid = 6; // TODO: remove when proper assets available
-        GameServer.build(bid, tile);
+        GameServer.build(player, bid, tile);
     } else {
         player.addMsg('I can\'t build there!');
     }
@@ -747,11 +749,12 @@ GameServer.canBuild = function(bid,tile){
     return true;
 };
 
-GameServer.build = function(bid,tile){
+GameServer.build = function(player,bid,tile){
     var data = {
         x: tile.x,
         y: tile.y,
         type: bid,
+        owner: player.id,
         built: false
     };
     var building = new Building(data);

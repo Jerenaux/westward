@@ -36,7 +36,7 @@ var Building = new Phaser.Class({
         this.shootFrom = buildingData.shootFrom;
 
         this.buildingType = data.type;
-        this.settlement = data.sid;
+        this.owner = data.owner;
         this.civBuilding = (this.settlement == -1);
         this.inventory = new Inventory(100);
         this.name = buildingData.name;//+' '+this.id;
@@ -62,6 +62,8 @@ var Building = new Phaser.Class({
         }
 
         this.setCollisions(buildingData);
+
+        if(Engine.debugCollisions) this.setAlpha(0.1);
     },
 
     resetDepth: function(){

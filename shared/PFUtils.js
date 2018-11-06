@@ -54,6 +54,7 @@ PFUtils.buildingCollisions = function(tx,ty,data,collisionMap){
     for(var x = tx + coll.x; x < tx + coll.x + coll.w; x++){
         for(var y = ty + coll.y; y < ty + coll.y + coll.h; y++) {
             collisionMap.add(x,y);
+            if(!onServer && Engine.debugCollisions) Engine.scene.add.rectangle((x*32)+16,(y*32)+16, 32,32, 0xffa500).setAlpha(0.7).setDepth(100);
         }
     }
 

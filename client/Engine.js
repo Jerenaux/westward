@@ -29,6 +29,7 @@ var Engine = {
     maxPathLength: 36,
 
     debugMarker: true,
+    debugCollisions: true,
     dummyUI: false,
     skipGrass: false,
 
@@ -356,9 +357,12 @@ Engine.create = function(){
 
     Engine.buildingIconsData = {};
     for(var building in Engine.buildingsData){
+        var data = Engine.buildingsData[building];
         Engine.buildingIconsData[building] = {
             'atlas': 'aok',
-            'frame': Engine.buildingsData[building].icon
+            'frame': data.icon,
+            'name': data.name,
+            'desc': data.desc
         };
     }
 
@@ -380,6 +384,8 @@ Engine.create = function(){
 
     Engine.collisions = new SpaceMap();
     Engine.pathFinder = new Pathfinder(Engine.collisions,Engine.maxPathLength);
+
+    Engine.resources = new SpaceMap();
 
     Engine.inMenu = false;
     Engine.inPanel = false;
@@ -1184,7 +1190,7 @@ Engine.makeProductionMenu = function(){
     stock.setInventory(new Inventory(5),5,true,Engine.takeClick);
 
     var action = new ShopPanel(212,420,300,100,'Take',true); // true = not shop, hack
-    production.addPanel('action',action,false);
+    production.addPanel('action',action,true);
 
     production.addEvent('onDisplay',stock.updateInventory.bind(stock));
 
@@ -1476,7 +1482,7 @@ Engine.makeCraftingMenu = function(){
 
 Engine.makeBuildMenu = function(){
     Engine.buildRecipes = new Inventory(7);
-    var bldRecipes = [45,46,47];
+    var bldRecipes = [11,6,2]; // TODO: to conf
     bldRecipes.forEach(function(w){
         Engine.buildRecipes.add(w,1);
     });
@@ -1487,17 +1493,20 @@ Engine.makeBuildMenu = function(){
     var buildings = build.addPanel('build',new InventoryPanel(30,40,w,150,'Buildings'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
     buildings.setInventory(Engine.buildRecipes,5,false,Engine.bldClick);
+    buildings.setDataMap(Engine.buildingIconsData);
     build.addEvent('onDisplay',buildings.updateInventory.bind(buildings));
     return build;
 };
 
 Engine.bldClick = function(){
+    console.log('bldclick',this.itemID);
     var bld = Engine.buildingsData[this.itemID];
     Engine.currentMenu.hide();
 
-    Engine.hideMarker();
-    Engine.bldRect = Engine.scene.add.rectangle(0,0, bld.width*32, bld.height*32, 0x00ee00).setAlpha(0.7);
+    //Engine.hideMarker();
+    Engine.bldRect = Engine.scene.add.rectangle(0,0, bld.base.width*32, bld.base.height*32, 0x00ee00).setAlpha(0.7);
     Engine.bldRect.bldID = this.itemID;
+    Engine.bldRect.locationConstrained = bld.locationConstrained;
     Engine.updateBldRect();
 };
 
@@ -1517,11 +1526,13 @@ Engine.bldUnclick = function(){
 };
 
 Engine.updateBldRect = function(){
-    Engine.bldRect.x = Engine.marker.x+16;
-    Engine.bldRect.y = Engine.marker.y+16;
+    // Center coordinates ; !! marker has origin 0,0
+    Engine.bldRect.x = (Engine.bldRect.width%64 == 0 ? Engine.marker.x+32 : Engine.marker.x+16);
+    Engine.bldRect.y = (Engine.bldRect.height%64 == 0 ? Engine.marker.y+32 : Engine.marker.y+16);
     var collides = false;
+    var invalid = false;
     for(var x = 0; x < Engine.bldRect.width/32; x++){
-        if(collides) break;
+        if(collides || invalid) break;
         for(var y = 0; y < Engine.bldRect.height/32; y++){
             var cx = (Engine.bldRect.x-(Engine.bldRect.width/2))/32+x;
             var cy = (Engine.bldRect.y-(Engine.bldRect.height/2))/32+y;
@@ -1529,10 +1540,14 @@ Engine.updateBldRect = function(){
                 collides = true;
                 break;
             }
+            if(Engine.bldRect.locationConstrained && !Engine.checkResource(cx,cy)){
+                invalid = true;
+                break;
+            }
         }
     }
-    Engine.bldRect.collides = collides;
-    if(collides){
+    Engine.bldRect.collides = (collides || invalid);
+    if(collides || invalid){
         Engine.bldRect.setFillStyle(0xee0000);
     }else{
         Engine.bldRect.setFillStyle(0x00ee00);
@@ -1686,7 +1701,6 @@ Engine.addHero = function(data){
     var h = Engine.camera.deadzone.height;
     graphics.strokeRect(Engine.camera.centerX-(w/2), Engine.camera.centerY-(h/2), w, h);
     graphics.setDepth(2000);*/
-    Engine.updateEnvironment();
 };
 
 Engine.updateEnvironment = function(){
@@ -1739,16 +1753,28 @@ Engine.removeChunk = function(id){
     Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
 };
 
+Engine.addResource = function(origin,shape){
+    for(var x = shape.x/32; x < (shape.x+shape.width)/32; x++){
+        for(var y = shape.y/32; y < (shape.y+shape.height)/32; y++) {
+            Engine.resources.add(origin.x+x,origin.y+y,1);
+        }
+    }
+};
+
 Engine.addCollision = function(x,y,tile){
     if(Engine.isColliding(tile)) {
-        //Engine.testCollisions.add(x,y,1);
         Engine.collisions.add(x,y,1);
+        if(Engine.debugCollisions) Engine.scene.add.rectangle((x*32)+16,(y*32)+16, 32,32, 0xee0000).setAlpha(0.7);
     }
 };
 
 // Check if a non-walkable tile is at a given position or not
 Engine.checkCollision = function(x,y){
     return !!Engine.collisions.get(x,y);
+};
+
+Engine.checkResource = function(x,y){
+    return !!Engine.resources.get(x,y);
 };
 
 // Check if a given tile type is walkable or not
@@ -2296,6 +2322,8 @@ Engine.giveClick = function(itemID){
 };
 
 Engine.takeClick = function(){
+    if(Engine.currentBuiling.owner != Engine.player.id) return;
+    Engine.currentMenu.panels['action'].display();
     Engine.currentMenu.panels['action'].setUp(this.itemID,'buy','Take');
 };
 

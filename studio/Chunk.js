@@ -8,6 +8,7 @@ function Chunk(mapData,z){
 
     for(var i = 0; i < mapData.layers.length; i++){
         var data = this.fromFile ? mapData.layers[i].data : null ;
+        if(mapData.layers[i].type == 'objectgroup') continue;
         this.addChild(new Layer(data));
     }
 }

@@ -10,6 +10,7 @@ var layerDepth = { // maps layer id to depth
 
 function Chunk(mapData,id,z){
     this.fromFile = (mapData !== null);
+    //console.log(mapData);
     this.id = id;
     this.z = z;
     var origin = Utils.AOItoTile(this.id);
@@ -21,6 +22,12 @@ function Chunk(mapData,id,z){
     this.layerData = [];
 
     for(var i = 0; i < mapData.layers.length; i++){
+        if(mapData.layers[i].type == 'objectgroup'){
+            mapData.layers[i].objects.forEach(function(o){
+                Engine.addResource(origin,o);
+            });
+            continue;
+        }
         var data = this.fromFile ? mapData.layers[i].data : null ;
         this.layers.push([]); // will contain the tile sprites
         this.layerData.push(data); // contains the tiles ID

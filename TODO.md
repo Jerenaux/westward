@@ -38,9 +38,7 @@ Misc:
 -> Keep class quests (+ "smart quests" based on settlement situation?)
 -> Menu to list buildings (but on-site management)
 
-- Remove building material from stock when building
-- Constrain taking to owner
-- Location constraint
+
 (- Way to cancel build click)
 (- Block if animal/civ/player in the way)
 (- Decide how to handle items/spawn clusters in the way)
@@ -402,6 +400,7 @@ or
 * Packaging
 -> Determine new player by querying server
 -> Nb connected, permanent players, player names, ..
+Perma players: take care about required fields in player schema, be flexible
 -> Cheat-proof
 * Settlement defense
 - Enable commander to build towers
@@ -463,6 +462,7 @@ Recipes for fancy bullets and bombs
 Deployment:
 ----------
 - Automatically copy files to deploy to deploy directory
+- Automatically fetch maps that have been modified, and copy to deploy dir
 - Automate git upload to Heroku (http://radek.io/2015/10/27/nodegit/)
 - Tool to gather, uglify and compress all relevant source files when moving to production directory
 - Full pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
