@@ -33,11 +33,11 @@ var Map = new Phaser.Class({
 
         this.target = target;
         this.toponyms = [];
-        if(showToponyms) {
+        /*if(showToponyms) {
             Engine.settlementsData.forEach(function (s) {
                 this.addText(s);
             }, this);
-        }
+        }*/
 
         this.setInteractive();
         UI.scene.input.setDraggable(this);

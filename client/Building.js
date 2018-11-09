@@ -24,15 +24,16 @@ var Building = new Phaser.Class({
         //data.y++;
         this.setOrigin(0,1);
         this.setTilePosition(data.x,data.y,true);
+        if(buildingData.padding) this.x -= buildingData.padding;
         this.setID(data.id);
 
         Engine.buildings[this.id] = this;
         Engine.entityManager.addToDisplayList(this);
 
-        var coll = buildingData.collisions;
-        this.coll = coll;
-        this.cellsWidth = coll.w;
-        this.cellsHeight = coll.h;
+        //var coll = buildingData.collisions;
+        //this.coll = coll;
+        this.cellsWidth = buildingData.base.width;
+        this.cellsHeight = buildingData.base.height;
         this.shootFrom = buildingData.shootFrom;
 
         this.buildingType = data.type;
@@ -53,15 +54,16 @@ var Building = new Phaser.Class({
         this.setBuilt(data.built);
         this.resetDepth();
 
-        if(buildingData.shape) {
+        /*if(buildingData.shape) {
             var shape = new Phaser.Geom.Polygon(buildingData.shape);
             this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
             this.input.hitArea = shape; // will override previous interactive zone, if any (e.g. if object recycled from pool)
 
             //this.on('pointerover',this.handleOver.bind(this));
-        }
+        }*/
+        this.setInteractive();
 
-        this.setCollisions(buildingData);
+        this.setCollisions();
 
         if(Engine.debugCollisions) this.setAlpha(0.1);
     },
@@ -161,8 +163,9 @@ var Building = new Phaser.Class({
         }
     },
 
-    setCollisions: function (data) {
-        PFUtils.buildingCollisions(this.tx,this.ty,data,Engine.collisions);
+    setCollisions: function () {
+        //PFUtils.buildingCollisions(this.tx,this.ty,data,Engine.collisions);
+        PFUtils.buildingCollisions(this.tx,this.ty-this.cellsHeight,this.cellsWidth,this.cellsHeight,Engine.collisions);
     },
 
     setCommitted: function(committed){
@@ -303,6 +306,28 @@ var Building = new Phaser.Class({
         //UI.setCursor(UI.buildingCursor2);
     },*/
 
+    findEntrance: function(){
+        var closest = null;
+        var minDist = Infinity;
+        var minSelfDist = Infinity;
+        for(var x = -1; x <= this.cellsWidth+1; x++){
+            for(var y = -1; y < this.cellsHeight + 1; y++){
+                var cx = this.tx+x;
+                var cy = this.ty-this.cellsHeight+y;
+                var cell = {x:cx,y:cy};
+                if(Engine.checkCollision(cx,cy)) continue;
+                console.log('considering',cell);
+                var d = Utils.euclidean({x:Engine.player.tileX,y:Engine.player.tileY},cell);
+                console.log(d);
+                if(d < minDist){
+                    minDist = d;
+                    minSelfDist = Infinity;
+                    closest = cell;
+                }
+            }
+        }
+        return closest;
+    },
 
     handleClick: function () {
         if (Engine.inMenu && !BattleManager.inBattle || Engine.dead) return;
@@ -312,9 +337,10 @@ var Building = new Phaser.Class({
             if(this.civBuilding){
                 Client.buildingClick(this.id);
             }else {
-                if (!this.entrance) return;
-                Engine.player.setDestinationAction(1, this.id, this.entrance.x, this.entrance.y); // 1 for building
-                Engine.computePath(this.entrance);
+                //if (!this.entrance) return;
+                var entrance = this.findEntrance();
+                Engine.player.setDestinationAction(1, this.id, entrance.x, entrance.y); // 1 for building
+                Engine.computePath(entrance);
             }
         }
     },

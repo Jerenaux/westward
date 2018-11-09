@@ -16,8 +16,9 @@ InfoPanel.prototype.addText = function(x,y,text,color,size,font){
     return txt;
 };
 
-InfoPanel.prototype.addBigButton = function(text){
-    this.button = new BigButton(this.x+(this.width/2),this.y+this.height-20,text,this.hide.bind(this));
+InfoPanel.prototype.addBigButton = function(text,cb){
+    var callback = cb || this.hide.bind(this);
+    this.button = new BigButton(this.x+(this.width/2),this.y+this.height-20,text,callback);
 };
 
 InfoPanel.prototype.display = function(){

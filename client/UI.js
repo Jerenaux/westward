@@ -267,8 +267,10 @@ UI.makeClassPanel = function(menu,classID,x,y,classw,classh){
     panel.setClass(classID);
 };
 
-UI.leaveTitleScreen = function(){
-    Boot.button.hide();
+UI.launchGameMode = function(){
+    Boot.buttons.forEach(function(b){
+        b.hide();
+    });
     UI.scene.tweens.add({
         targets: Boot.title,
         alpha: 0,
@@ -280,10 +282,30 @@ UI.leaveTitleScreen = function(){
             }else {
                 UI.camera.fadeOut(500);
                 UI.camera.once('camerafadeoutcomplete',function(){
+                    Client.tutorial = false;
                     UI.launchGame();
                     UI.camera.fadeIn(500);
                 });
             }
+        }
+    });
+};
+
+UI.launchTutorialMode = function(){
+    Boot.buttons.forEach(function(b){
+        b.hide();
+    });
+    UI.scene.tweens.add({
+        targets: Boot.title,
+        alpha: 0,
+        duration: 1000,
+        onComplete: function(){
+            UI.camera.fadeOut(500);
+            UI.camera.once('camerafadeoutcomplete',function(){
+                Client.tutorial = true;
+                UI.launchGame();
+                UI.camera.fadeIn(500);
+            });
         }
     });
 };
@@ -414,7 +436,7 @@ UI.displayCamp = function(data){
 };
 
 UI.selectSettlement = function(id){
-    console.log('Settlement selected (',id,')');
+    console.log('Region selected (',id,')');
     UI.selectedSettlement = id;
     var fadeDuration = 500;
     UI.camera.fadeOut(fadeDuration);

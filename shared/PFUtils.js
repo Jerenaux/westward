@@ -48,7 +48,16 @@ PFUtils.trimPath = function(path,map){
     };
 };
 
-PFUtils.buildingCollisions = function(tx,ty,data,collisionMap){
+PFUtils.buildingCollisions = function(tx,ty,w,h,collisionMap){
+    for(var x = tx; x < tx + w; x++){
+        for(var y = ty; y < ty + h; y++){
+            collisionMap.add(x,y);
+            if(!onServer && Engine.debugCollisions) Engine.scene.add.rectangle((x*32)+16,(y*32)+16, 32,32, 0xffa500).setAlpha(0.7).setDepth(100);
+        }
+    }
+};
+
+/*PFUtils.buildingCollisions = function(tx,ty,data,collisionMap){
     var coll = data.collisions;
 
     for(var x = tx + coll.x; x < tx + coll.x + coll.w; x++){
@@ -66,7 +75,7 @@ PFUtils.buildingCollisions = function(tx,ty,data,collisionMap){
             }
         }
     }
-};
+};*/
 
 
 if (onServer) module.exports.PFUtils = PFUtils;

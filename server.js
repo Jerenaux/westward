@@ -125,7 +125,7 @@ io.on('connection',function(socket){
         socket.emit('boot-params',gs.getBootParams());
     });
 
-    socket.on('init-world',function(data){
+    socket.on('init-world',function(data){ // Sent by client.requestData()
         if(!gs.initialized){
             socket.emit('wait');
             return;

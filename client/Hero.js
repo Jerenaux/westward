@@ -20,7 +20,7 @@ var Hero = new Phaser.Class({
         this.inventory = new Inventory();
         this.stats = new StatsContainer();
         this.equipment = new EquipmentManager();
-        this.setCommitSlots(data.commitSlots);
+        //this.setCommitSlots(data.commitSlots);
 
         this.gold = data.gold;
         this.civiclvl = data.civiclvl;
@@ -37,7 +37,7 @@ var Hero = new Phaser.Class({
             'civiclvl': this.updateCivicLvl,
             'classlvl': this.updateClassLvl,
             'classxp': this.updateClassXP,
-            'commitSlots': this.updateCommitSlots,
+            //'commitSlots': this.updateCommitSlots,
             'dead': this.handleDeath,
             'equipment': this.updateEquipment,
             'foodSurplus': this.updateFoodSurplus,

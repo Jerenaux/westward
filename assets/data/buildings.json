@@ -9,7 +9,6 @@
     "depthOffset": 1,
     "sprite": "tower",
     "mapicon": "tower",
-    "recipe": {"3":60},
     "icon": "tower",
     "canFight": true,
     "health": 250,
@@ -31,18 +30,21 @@
     "mapicon": "wood",
     "mainMenu": "production",
     "depthOffset": 2,
-    "recipe": {"3":3},
     "production": [[3,1,10]],
     "canFight": false,
     "health": 50
   },
   "11":{
     "name": "Shack",
-    "icon": "lumbercamp",
-    "sprite": "lumbercamp",
+    "base":{
+      "width": 4,
+      "height": 3
+    },
+    "padding": 11,
+    "icon": "shack",
+    "sprite": "shack",
     "mapicon": "wood",
     "depthOffset": 2,
-    "recipe": {"3":3},
     "canFight": false,
     "health": 50
   }

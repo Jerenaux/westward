@@ -29,17 +29,13 @@ var Engine = {
     maxPathLength: 36,
 
     debugMarker: true,
-    debugCollisions: true,
+    debugCollisions: false,
     dummyUI: false,
     skipGrass: false,
 
     key: 'game', // key of the scene, for Phaser
     plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager','LightsPlugin'],
-    playerIsInitialized: false,
-
-    config: {
-        FOOD_ID: 1
-    }
+    playerIsInitialized: false
 };
 
 /*var BlurPipeline = new Phaser.Class({
@@ -406,7 +402,12 @@ Engine.create = function(){
     }
 
     Engine.created = true;
-    Client.requestData();
+    Engine.configEngine();
+    if(Client.tutorial){
+        Engine.bootTutorial();
+    }else{
+        Client.requestData();
+    }
 };
 
 Engine.getGameInstance = function(){
@@ -426,9 +427,73 @@ Engine.createMarker = function(){
     Engine.hideMarker();
 };
 
-Engine.configEngine = function(data){
-    console.log('config data:',data);
-    Engine.config = data;
+Engine.configEngine = function(){
+    Engine.config = Client.gameConfig.config;
+};
+
+Engine.nextTut = function(){
+    Engine.currentTutorialPanel.hide();
+    Engine.displayTutorial();
+};
+
+Engine.displayTutorial = function(){
+    var i = Engine.nextTutorial++;
+
+    var specs = [ // TODO: move to conf or sth
+        {pos:['c','c',350,146],ok:true},
+        {pos:[560,'c',300,100],ok:true},
+        {pos: null, ok: false, hook:'move'},
+        {pos: [560,'c',300,120], ok: true}
+    ];
+
+    var spec = specs[i];
+    var pos = spec.pos;
+    var j = 0;
+    while(pos === null){
+        pos = specs[i-j++].pos;
+    }
+
+    var x = pos[0];
+    var y = pos[1];
+    var w = pos[2];
+    var h = pos[3];
+    if(x == 'c') x = (UI.getGameWidth() - w) / 2;
+    if(y == 'c') y = (UI.getGameHeight() - h) / 2;
+    var panel = new InfoPanel(x, y, w, h, 'Tutorial');
+    panel.setWrap(30);
+
+    var x = 15;
+    var y = 20;
+    panel.addText(x,y,UI.textsData['tutorial'][i]);
+
+    if(spec.ok) panel.addBigButton('Next', Engine.nextTut);
+    if(spec.hook) Engine.tutHook = spec.hook;
+    panel.display();
+    Engine.currentTutorialPanel = panel;
+    Engine.inPanel = false;
+};
+
+Engine.tutorialHook = function(hook){
+    if(Engine.tutHook == hook) Engine.nextTut();
+};
+
+Engine.bootTutorial = function(){
+    var data = { // TODO: move to conf
+        id: 0,
+        x: 1211,
+        y: 160,
+        settlement: 1,
+        markers: []
+    };
+    Engine.initWorld(data);
+    data = {
+        gold: 100,
+        stats: [{k:'hpmax',v:300},{k:'hp',v:300}]
+    };
+    Engine.player.updateData(data);
+
+    Engine.nextTutorial = 0;
+    Engine.displayTutorial();
 };
 
 Engine.initWorld = function(data){
@@ -436,13 +501,18 @@ Engine.initWorld = function(data){
     Engine.firstSelfUpdate = true;
 
     console.log(data);
-    Engine.settlementsData = data.settlements;
+    //Engine.settlementsData = data.settlements;
     Engine.makeRecipesLists();
     Engine.addHero(data);
 
     Engine.makeUI();
 
-    Engine.setlCapsule.setText(data.settlements[data.settlement].name);
+    // TODO: move
+    var settlements = {
+        0: {name:'New Beginnng'},
+        1: {name:'Hope'}
+    };
+    Engine.setlCapsule.setText(settlements[data.settlement].name);
 
     Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
@@ -821,14 +891,14 @@ Engine.makeUI = function(){
         //'fort': Engine.makeFortMenu(),
         'inventory': Engine.makeInventory(statsPanel),
         'map': Engine.makeMapMenu(),
-        'messages': Engine.makeMessagesMenu(),
+        //'messages': Engine.makeMessagesMenu(),
         'production': Engine.makeProductionMenu(),
         'staff': Engine.makeStaffMenu(),
         'trade': Engine.makeTradeMenu()
     };
 
     Engine.menuIcons = [];
-    Engine.addMenu(1004,140,'menu_crow',Engine.menus.messages,895,73);
+    //Engine.addMenu(1004,140,'menu_crow',Engine.menus.messages,895,73);
     Engine.addMenu(967,159,'menu_map',Engine.menus.map,855,73);
     Engine.addMenu(922,159,'menu_backpack',Engine.menus.inventory,815,73);
     Engine.addMenu(884,136,'menu_dude',Engine.menus.character,775,73);
@@ -1513,11 +1583,11 @@ Engine.bldClick = function(){
 Engine.bldUnclick = function(){
     if(!Engine.bldRect.collides) {
         var id = Engine.bldRect.bldID;
-        var bld = Engine.buildingsData[id];
+        //var bld = Engine.buildingsData[id];
         var pos = Engine.bldRect.getBottomLeft();
         pos.x = pos.x / 32;
-        pos.y = (pos.y / 32) - 1;
-        console.log("Building ", bld.name, " of size ", bld.width, "*", bld.height, " at ", (pos.x), ",", (pos.y));
+        pos.y = (pos.y / 32);
+        console.log("Building at ", (pos.x), ",", (pos.y));
         Client.sendBuild(id, pos);
     }
     Engine.showMarker();
@@ -1633,15 +1703,15 @@ Engine.makeCharacterMenu = function(){
 
     var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
 
-    var commit = menu.addPanel('commit',new InventoryPanel(citizenx+10,citizeny,150,100,'',true));
+    /*var commit = menu.addPanel('commit',new InventoryPanel(citizenx+10,citizeny,150,100,'',true));
     commit.setInventory(Engine.player.commitTypes,3,false);
-    commit.setDataMap(Engine.buildingIconsData);
+    commit.setDataMap(Engine.buildingIconsData);*/
 
     //menu.addPanel('abilities',new Panel(citizenx,citizeny,citizenw,citizenh),true);
 
     menu.addEvent('onUpdateCharacter',classpanel.update.bind(classpanel));
     menu.addEvent('onUpdateCitizen',citizen.update.bind(citizen));
-    menu.addEvent('onUpdateCommit',commit.updateInventory.bind(commit));
+    //menu.addEvent('onUpdateCommit',commit.updateInventory.bind(commit));
 
     return menu;
 };
@@ -1804,6 +1874,7 @@ Engine.handleClick = function(pointer,objects){
                 Engine.bldUnclick();
             }else {
                 Engine.moveToClick(pointer);
+                if(Client.tutorial) Engine.tutorialHook('move');
             }
         }
     }
@@ -2053,7 +2124,7 @@ Engine.enterBuilding = function(id){
     Engine.inBuilding = true;
     Engine.currentBuiling = building; // used to keep track of which building is displayed in menus
     var buildingData = Engine.buildingsData[building.buildingType];
-    var settlementData = Engine.settlementsData[building.settlement];
+    //var settlementData = Engine.settlementsData[building.settlement];
 
     var menus = [];
     var mainMenu;

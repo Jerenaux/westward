@@ -60,5 +60,12 @@
     "In my opinion, there is of course only one true way to defend ourselves. We need to attack first. I’m petitioning the Governor of [OTSETL] to mount an offensive. I hope your governor and his Commanders can be more receptive, before it’s too late.",
     "May you and your settlement prosper;",
     "A friend "
+  ],
+
+  "tutorial": [
+    "Welcome to Westward's tutorial. In this firt par, we'll see how buildings can be built and how you can collaborate with other players to do so!",
+    "But first... that's you, right here, in the middle of the screen. That's your character. ",
+    "To move, simply click somewhere in the gras. Go ahead, try it!",
+    "All other actions take place by clicking on things, and will be covered throughout the rest of the tutorial."
   ]
 }

@@ -35,8 +35,9 @@
         wander: true
     },
     client: {
-            boot:{
-                forceNewPlayer: true
-            }
+        boot:{
+            forceNewPlayer: true,
+            offerTutorial: false
         }
+    }
 }

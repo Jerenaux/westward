@@ -76,11 +76,14 @@ var Boot = new Phaser.Class({
     },
 
     displayButton: function(){
-        Boot.button = new BigButton(512,400,'Play',UI.leaveTitleScreen);
-        Boot.button.display();
+        Boot.buttons = [];
+        Boot.buttons.push(new BigButton(512,400,'Play',UI.launchGameMode));
 
-        //Boot.tutorialbutton = new BigButton(512,400,'Tutorial',UI.leaveTitleScreen);
-        //Boot.tutorialbutton.display();
+        if(Client.gameConfig.boot.offerTutorial) Boot.buttons.push(new BigButton(512, 450, 'Tutorial', UI.launchTutorialMode));
+
+        Boot.buttons.forEach(function(b){
+            b.display();
+        })
     }
 });
 

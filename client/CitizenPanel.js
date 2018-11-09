@@ -19,7 +19,7 @@ CitizenPanel.prototype.addInterface = function(){
     var alignx = 160;
     var x = alignx;
     var y = 20;
-    this.addText(x,y,'Citizen of '+Engine.settlementsData[Engine.player.settlement].name,null,null,Utils.fonts.fancy);
+    //this.addText(x,y,'Citizen of '+Engine.settlementsData[Engine.player.settlement].name,null,null,Utils.fonts.fancy);
     y += 20;
 
     var txts = this.addPolyText(x,y,["Level ","1"," citizen   -   ","10/100"," Civic XP"],[null,Utils.colors.gold,null,Utils.colors.gold,null]);
@@ -32,7 +32,7 @@ CitizenPanel.prototype.addInterface = function(){
     this.bars.push(this.civicbar);
     y += 20;
 
-    this.addPolyText(x,y,['Respawn location: ','Fort ','of ',Engine.settlementsData[Engine.player.settlement].name],[null,Utils.colors.gold,null,Utils.colors.gold]);
+    //this.addPolyText(x,y,['Respawn location: ','Fort ','of ',Engine.settlementsData[Engine.player.settlement].name],[null,Utils.colors.gold,null,Utils.colors.gold]);
     y += 30;
 };
 

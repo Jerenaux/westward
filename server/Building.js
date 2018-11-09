@@ -29,15 +29,24 @@ function Building(data){
 
     this.type = data.type;
     var buildingData = GameServer.buildingsData[this.type];
-    this.width = Math.ceil(buildingData.width/World.tileWidth);
-    this.height = Math.ceil(buildingData.height/World.tileHeight);
+    //this.width = Math.ceil(buildingData.width/World.tileWidth);
+    //this.height = Math.ceil(buildingData.height/World.tileHeight);
 
-    var coll = buildingData.collisions;
+    /*var coll = buildingData.collisions;
     this.coll = coll;
     this.xoffset = coll.x;
     this.entrance = buildingData.entrance;
     this.cellsWidth = coll.w;
-    this.cellsHeight = coll.h;
+    this.cellsHeight = coll.h;*/
+    this.cellsWidth = buildingData.base.width;
+    this.cellsHeight = buildingData.base.height;
+    this.coll = {
+        x: this.x,
+        y: this.y - this.cellsHeight,
+        w: this.cellsWidth,
+        h: this.cellsHeight
+    };
+
     this.shootFrom = buildingData.shootFrom;
 
     this.owner = data.owner;
@@ -361,8 +370,8 @@ Building.prototype.mapTrim = function(){
 };
 
 Building.prototype.addCollisions = function(){
-    // TODO: adapt based on built status
-    PFUtils.buildingCollisions(this.x,this.y,GameServer.buildingsData[this.type],GameServer.collisions);
+    //PFUtils.buildingCollisions(this.x,this.y,GameServer.buildingsData[this.type],GameServer.collisions);
+    PFUtils.buildingCollisions(this.x,this.y-this.cellsHeight,this.cellsWidth,this.cellsHeight,GameServer.collisions);
 };
 
 Building.prototype.travelOccupiedCells = function(action){

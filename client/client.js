@@ -65,7 +65,7 @@ Client.checkForNewPlayer = function(){
 };
 
 Client.isNewPlayer = function(){
-    if(Client.bootParameters.forceNewPlayer) return true;
+    if(Client.gameConfig.boot.forceNewPlayer) return true;
     return Client.newPlayer;
 };
 
@@ -88,7 +88,7 @@ Client.socket.on(Client.initEventName,function(data){ // This event triggers whe
     console.log('Init packet received');
     //if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.initializationSchema); // if in binary format, decode first
     Client.socket.emit('ponq',data.stamp); // send back a pong stamp to compute latency
-    Engine.configEngine(data.config);
+    //Engine.configEngine(data.config);
     Engine.initWorld(data.player);
     //Game.updateNbConnected(data.nbconnected);
 });
@@ -108,8 +108,8 @@ Client.socket.on('camps-data',function(data){
 });
 
 Client.socket.on('boot-params',function(data){
-    Client.bootParameters = data;
-    console.log(Client.bootParameters);
+    Client.gameConfig = data;
+    console.log(Client.gameConfig);
     Boot.bootParamsReceived();
 });
 
@@ -120,7 +120,7 @@ Client.socket.on('update',function(data){ // This event triggers uppon receiving
     //if(data.latency) Game.setLatency(data.latency);
     //if(data.latency) console.log('[lat] '+data.latency+' ms');
     if(data.local) console.log(data.local);
-    //if(data.global) console.log(data.global);
+    if(data.global) console.log(data.global);
     if(data.local) Engine.updateSelf(data.local); // Should come first
     if(data.global) Engine.updateWorld(data.global);
 });

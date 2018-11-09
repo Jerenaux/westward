@@ -185,7 +185,7 @@ GameServer.readMap = function(mapsPath,test){
 };
 
 GameServer.getBootParams = function(){
-    return GameServer.clientParameters.boot;
+    return GameServer.clientParameters;
 };
 
 GameServer.loadSettlements = function(){
@@ -452,7 +452,7 @@ GameServer.finalizePlayer = function(socket,player){
 GameServer.createInitializationPacket = function(playerID){
     // Create the packet that the client will receive from the server in order to initialize the game
     return {
-        config: config.get('client.config'),
+        //config: config.get('client.config'),
         nbconnected: GameServer.server.getNbConnected(),
         player: GameServer.players[playerID].initTrim() // info about the player
     };
@@ -730,7 +730,6 @@ GameServer.handleBuild = function(data,socketID) {
     var tile = data.tile;
     var player = GameServer.getPlayer(socketID);
     if (GameServer.canBuild(bid, tile)) {
-        bid = 6; // TODO: remove when proper assets available
         GameServer.build(player, bid, tile);
     } else {
         player.addMsg('I can\'t build there!');

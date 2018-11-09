@@ -86,7 +86,8 @@
     },
     client: {
         boot:{
-            forceNewPlayer: false
+            forceNewPlayer: false,
+            offerTutorial: true
         },
         config: {
             chatTimeout: 5000 //ms

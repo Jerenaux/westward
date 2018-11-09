@@ -523,7 +523,7 @@ Player.prototype.initTrim = function(){
     trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    trimmed.commitSlots = this.trimCommitSlots();
+    //trimmed.commitSlots = this.trimCommitSlots();
     trimmed.settlements = GameServer.listSettlements('mapTrim'); // to have data to display toponyms on map
 
     var markers = [];
