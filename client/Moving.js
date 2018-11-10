@@ -280,7 +280,8 @@ var Moving = new Phaser.Class({
         this.previousOrientation = null;
         this.anims.stop();
         this.setFrame(this.restingFrames[this.orientation]);
-        //if(this.isHero) Engine.camera.pan(this.x,this.y);
+
+        if(this.isHero && Client.tutorial) Engine.tutorialHook('move');
 
         if(this.queuedPath){
             var _path = this.queuedPath.slice();

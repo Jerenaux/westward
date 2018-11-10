@@ -443,7 +443,11 @@ Engine.displayTutorial = function(){
         {pos:['c','c',350,146],ok:true},
         {pos:[560,'c',300,100],ok:true},
         {pos: null, ok: false, hook:'move'},
-        {pos: [560,'c',300,120], ok: true}
+        {pos: [560,'c',300,120], ok: true},
+        {pos: null, ok: true, camera:[1206,156]},
+        {pos: null, ok: true, camera:[1196,160]},
+        {pos: [724,'c',300,120], ok: false, hook:'bld:3'},
+        {pos: null, ok: true}
     ];
 
     var spec = specs[i];
@@ -451,6 +455,15 @@ Engine.displayTutorial = function(){
     var j = 0;
     while(pos === null){
         pos = specs[i-j++].pos;
+    }
+
+    if(spec.camera) {
+        Engine.camera.stopFollow();
+        Engine.camera.pan(spec.camera[0]*32,spec.camera[1]*32);
+    }else if(!spec.camera && i > 0 && specs[i-1].camera){
+        Engine.camera.pan(Engine.player.x,Engine.player.y,1000,'Linear',false,function(camera,progress){
+            if(progress == 1) Engine.camera.startFollow(Engine.player);
+        });
     }
 
     var x = pos[0];
@@ -491,6 +504,15 @@ Engine.bootTutorial = function(){
         stats: [{k:'hpmax',v:300},{k:'hp',v:300}]
     };
     Engine.player.updateData(data);
+    data = {
+        'newbuildings':[
+            {id:0,type:11,x:1203,y:156,built:true},
+            {id:1,type:11,x:1199,y:153,built:true},
+            {id:2,type:6,x:1189,y:159,built:true},
+            {id:3,type:6,x:1189,y:162,built:true}
+        ]
+    };
+    Engine.updateWorld(data);
 
     Engine.nextTutorial = 0;
     Engine.displayTutorial();
@@ -1874,7 +1896,6 @@ Engine.handleClick = function(pointer,objects){
                 Engine.bldUnclick();
             }else {
                 Engine.moveToClick(pointer);
-                if(Client.tutorial) Engine.tutorialHook('move');
             }
         }
     }
@@ -2184,6 +2205,7 @@ Engine.enterBuilding = function(id){
     Engine.buildingTitle.display();
     Engine.settlementTitle.display();
 
+    if(Client.tutorial) Engine.tutorialHook('bld:'+id);
     //Engine.UIHolder.resize(Engine.getHolderSize());
 };
 

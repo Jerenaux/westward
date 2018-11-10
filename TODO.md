@@ -40,6 +40,7 @@ Misc:
 
 - Minimap icons
 - Max 1 building of each type (unless ability)
+- Entering shack?
 (- Way to cancel build click)
 (- Block if animal/civ/player in the way)
 (- Decide how to handle items/spawn clusters in the way)
