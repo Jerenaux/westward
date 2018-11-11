@@ -214,6 +214,8 @@ ShopPanel.prototype.requestPurchase = function(){
         Client.sendPurchase(this.shopItem.id, this.shopItem.count, this.shopItem.action);
     }else{
         Client.sendStock(this.shopItem.id,this.shopItem.count,Engine.currentBuiling.id,this.shopItem.action);
+        if(Client.tutorial && this.shopItem.action == 'buy') Engine.tutorialHook('take:'+this.shopItem.id+':'+this.shopItem.count);
+        if(Client.tutorial && this.shopItem.action == 'sell') Engine.tutorialHook('give:'+this.shopItem.id+':'+this.shopItem.count);
     }
     this.lastPurchase = Date.now();
 };

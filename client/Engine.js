@@ -203,6 +203,8 @@ Engine.preload = function() {
     this.load.json('animals', 'assets/data/animals.json');
     this.load.json('civs', 'assets/data/civs.json');
 
+    if(Client.tutorial) this.load.json('tutorials', 'assets/data/tutorials.json');
+
     Engine.collidingTiles = []; // list of tile ids that collide (from tilesets.json)
     Engine.tilesheets = [];
 
@@ -404,7 +406,7 @@ Engine.create = function(){
     Engine.created = true;
     Engine.configEngine();
     if(Client.tutorial){
-        Engine.bootTutorial();
+        Engine.bootTutorial('part1');
     }else{
         Client.requestData();
     }
@@ -439,17 +441,7 @@ Engine.nextTut = function(){
 Engine.displayTutorial = function(){
     var i = Engine.nextTutorial++;
 
-    var specs = [ // TODO: move to conf or sth
-        {pos:['c','c',350,146],ok:true},
-        {pos:[560,'c',300,100],ok:true},
-        {pos: null, ok: false, hook:'move'},
-        {pos: [560,'c',300,120], ok: true},
-        {pos: null, ok: true, camera:[1206,156]},
-        {pos: null, ok: true, camera:[1196,160]},
-        {pos: [724,'c',300,120], ok: false, hook:'bld:3'},
-        {pos: null, ok: true}
-    ];
-
+    var specs = Engine.tutorialData;
     var spec = specs[i];
     var pos = spec.pos;
     var j = 0;
@@ -458,8 +450,12 @@ Engine.displayTutorial = function(){
     }
 
     if(spec.camera) {
-        Engine.camera.stopFollow();
-        Engine.camera.pan(spec.camera[0]*32,spec.camera[1]*32);
+        if(spec.camera == 'keep'){
+
+        }else {
+            Engine.camera.stopFollow();
+            Engine.camera.pan(spec.camera[0] * 32, spec.camera[1] * 32);
+        }
     }else if(!spec.camera && i > 0 && specs[i-1].camera){
         Engine.camera.pan(Engine.player.x,Engine.player.y,1000,'Linear',false,function(camera,progress){
             if(progress == 1) Engine.camera.startFollow(Engine.player);
@@ -477,10 +473,13 @@ Engine.displayTutorial = function(){
 
     var x = 15;
     var y = 20;
-    panel.addText(x,y,UI.textsData['tutorial'][i]);
+    panel.addText(x,y,spec.txt);
 
-    if(spec.ok) panel.addBigButton('Next', Engine.nextTut);
-    if(spec.hook) Engine.tutHook = spec.hook;
+    if(spec.hook){
+        Engine.tutHook = spec.hook;
+    }else{
+        panel.addBigButton('Next', Engine.nextTut);
+    }
     panel.display();
     Engine.currentTutorialPanel = panel;
     Engine.inPanel = false;
@@ -490,7 +489,13 @@ Engine.tutorialHook = function(hook){
     if(Engine.tutHook == hook) Engine.nextTut();
 };
 
-Engine.bootTutorial = function(){
+Engine.tutorialBld = function(x,y,bldID){
+    var items = [];
+    if(bldID == 6) items.push([3,5]);
+    Engine.updateWorld({newbuildings:[{id:4,type:6,built:true,x:x,y:y,items:items,owner:Engine.player.id}]});
+};
+
+Engine.bootTutorial = function(part){
     var data = { // TODO: move to conf
         id: 0,
         x: 1211,
@@ -514,6 +519,7 @@ Engine.bootTutorial = function(){
     };
     Engine.updateWorld(data);
 
+    Engine.tutorialData = Engine.scene.cache.json.get('tutorials')[part];
     Engine.nextTutorial = 0;
     Engine.displayTutorial();
 };
@@ -1581,6 +1587,7 @@ Engine.makeBuildMenu = function(){
 
     var build = new Menu();
     build.name = 'Build something'; // Allows to have a hover name without a menu title
+    build.hook = 'buildmenu';
     var w = 200;
     var buildings = build.addPanel('build',new InventoryPanel(30,40,w,150,'Buildings'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
@@ -1600,6 +1607,8 @@ Engine.bldClick = function(){
     Engine.bldRect.bldID = this.itemID;
     Engine.bldRect.locationConstrained = bld.locationConstrained;
     Engine.updateBldRect();
+
+    if(Client.tutorial) Engine.tutorialHook('bldselect:'+this.itemID);
 };
 
 Engine.bldUnclick = function(){
@@ -1610,7 +1619,12 @@ Engine.bldUnclick = function(){
         pos.x = pos.x / 32;
         pos.y = (pos.y / 32);
         console.log("Building at ", (pos.x), ",", (pos.y));
-        Client.sendBuild(id, pos);
+        if(Client.tutorial){
+            Engine.tutorialHook('bldunselect:'+id);
+            Engine.tutorialBld(pos.x,pos.y,id);
+        }else{
+            Client.sendBuild(id, pos);
+        }
     }
     Engine.showMarker();
     Engine.bldRect.destroy();
@@ -2222,6 +2236,7 @@ Engine.exitBuilding = function(){
     }
     //Engine.UIHolder.resize(Engine.getHolderSize());
     if(Engine.miniMap)  Engine.miniMap.follow();
+    if(Client.tutorial) Engine.tutorialHook('exit');
 };
 
 Engine.getHolderSize = function(){

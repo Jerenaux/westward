@@ -76,6 +76,8 @@ Menu.prototype.display = function(){
     Engine.hideHUD();
     UI.setCursor();
     this.displayed = true;
+
+    if(Client.tutorial && this.hook) Engine.tutorialHook(this.hook);
 };
 
 Menu.prototype.hide = function(){

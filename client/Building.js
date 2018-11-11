@@ -316,9 +316,7 @@ var Building = new Phaser.Class({
                 var cy = this.ty-this.cellsHeight+y;
                 var cell = {x:cx,y:cy};
                 if(Engine.checkCollision(cx,cy)) continue;
-                console.log('considering',cell);
                 var d = Utils.euclidean({x:Engine.player.tileX,y:Engine.player.tileY},cell);
-                console.log(d);
                 if(d < minDist){
                     minDist = d;
                     minSelfDist = Infinity;
