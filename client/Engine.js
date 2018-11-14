@@ -479,13 +479,26 @@ Engine.displayTutorial = function(){
         Engine.tutHook = spec.hook;
     }else{
         panel.addBigButton('Next', Engine.nextTut);
+        Engine.tutHook = null;
     }
     panel.display();
     Engine.currentTutorialPanel = panel;
     Engine.inPanel = false;
+
+    if(Engine.checkHook()) Engine.nextTut();
+};
+
+Engine.checkHook = function(){
+      if(!Engine.tutHook) return false;
+      var info = Engine.tutHook.split(':');
+      if(info[0] == 'stock'){
+          if(Engine.buildings[info[1]].getItemNb(info[2]) == info[3]) return true;
+      }
+      return false;
 };
 
 Engine.tutorialHook = function(hook){
+    console.log(hook,'vs',Engine.tutHook);
     if(Engine.tutHook == hook) Engine.nextTut();
 };
 
@@ -494,6 +507,29 @@ Engine.tutorialBld = function(x,y,bldID){
     if(bldID == 6) items.push([3,5]);
     Engine.updateWorld({newbuildings:[{id:4,type:6,built:true,x:x,y:y,items:items,owner:Engine.player.id}]});
 };
+
+Engine.tutorialStock = function(action,item,nb){
+    console.warn(action,item,nb);
+    // TODO: Make all this much more declarative
+    if(action == 'give') nb *= -1;
+    var newnb = Engine.currentBuiling.getItemNb(item)-nb;
+    var items = [[parseInt(item),newnb]];
+    var updt = {buildings:{}};
+    updt.buildings[Engine.currentBuiling.id] = {items:items};
+    Engine.updateWorld(updt);
+    items = [[parseInt(item),Engine.player.getItemNb()+nb]];
+    var sign = (nb > 0 ? '+' : '');
+    Engine.player.updateData(
+        {items:items,
+        notifs:[sign+nb+' '+Engine.itemsData[item].name]} // TODO: centralize notifs
+    );
+    //if(newnb == 0) Engine.tutorialHook('empty:'+Engine.currentBuiling.id+':'+item);
+    Engine.tutorialHook('stock:'+Engine.currentBuiling.id+':'+item+':'+newnb);
+    if(action == 'give'){
+        // TODO build
+    }
+}
+;
 
 Engine.bootTutorial = function(part){
     var data = { // TODO: move to conf
@@ -513,14 +549,13 @@ Engine.bootTutorial = function(part){
         'newbuildings':[
             {id:0,type:11,x:1203,y:156,built:true},
             {id:1,type:11,x:1199,y:153,built:true},
-            {id:2,type:6,x:1189,y:159,built:true},
-            {id:3,type:6,x:1189,y:162,built:true}
+            {id:2,type:3,x:1189,y:159,built:false}
         ]
     };
     Engine.updateWorld(data);
 
     Engine.tutorialData = Engine.scene.cache.json.get('tutorials')[part];
-    Engine.nextTutorial = 0;
+    Engine.nextTutorial = 12;
     Engine.displayTutorial();
 };
 
@@ -734,9 +769,10 @@ Engine.updateAllOrientationPins = function(){
 };
 
 Engine.makeBuildingTitle = function(){
-    Engine.buildingTitle = new UIHolder(512,10,'center');
-    Engine.buildingTitle.setButton(Engine.leaveBuilding);
-    Engine.settlementTitle = new UIHolder(512,55,'center','small');
+    //Engine.buildingTitle = new UIHolder(512,10,'center');
+    Engine.buildingTitle = new BuildingTitle(512,10);
+    //Engine.buildingTitle.setButton(Engine.leaveBuilding);
+    //Engine.settlementTitle = new UIHolder(512,55,'center','small');
 };
 
 // #############################
@@ -1013,15 +1049,19 @@ menuIcon = function(x,y,icon,menu,tox,toy){
 
 menuIcon.prototype.toggle = function(){
     if(this.displayed){
-        this.hide();
+        if(Engine.inBuilding){
+            this.fullhide();
+        }else {
+            this.hide();
+        }
     }else{
         this.display();
     }
 };
 
 menuIcon.prototype.display = function(){
-    //this.bg.setVisible(true);
-    //this.icon.setVisible(true);
+    this.bg.setVisible(true);
+    this.icon.setVisible(true);
     UI.scene.tweens.add(
         {
             targets: [this.bg,this.icon],
@@ -1034,8 +1074,6 @@ menuIcon.prototype.display = function(){
 };
 
 menuIcon.prototype.hide = function(){
-    //this.bg.setVisible(false);
-    //this.icon.setVisible(false);
     UI.scene.tweens.add(
         {
             targets: [this.bg,this.icon],
@@ -1044,6 +1082,12 @@ menuIcon.prototype.hide = function(){
             duration: 300
         }
     );
+    this.displayed = false;
+};
+
+menuIcon.prototype.fullhide = function(){
+    this.bg.setVisible(false);
+    this.icon.setVisible(false);
     this.displayed = false;
 };
 
@@ -1269,7 +1313,7 @@ Engine.makeBattleMenu = function(){
 };
 
 Engine.makeProductionMenu = function(){
-    var production = new Menu('Production');
+    var production = new Menu('Production',true); // ture = isBuilding
     var w = 400;
     var h = 330;
     var x = (Engine.getGameConfig().width-w)/2;
@@ -1297,7 +1341,7 @@ Engine.makeProductionMenu = function(){
         action.update();
     });
     //production.addEvent('onUpdateProductivity',productivity.update.bind(productivity));
-    production.addEvent('onUpdateCommit',productionPanel.update.bind(productionPanel));
+    //production.addEvent('onUpdateCommit',productionPanel.update.bind(productionPanel));
     return production;
 };
 
@@ -1598,7 +1642,6 @@ Engine.makeBuildMenu = function(){
 };
 
 Engine.bldClick = function(){
-    console.log('bldclick',this.itemID);
     var bld = Engine.buildingsData[this.itemID];
     Engine.currentMenu.hide();
 
@@ -2082,6 +2125,7 @@ Engine.createElements = function(arr,entityType){
 };
 
 // For each element in obj, call update()
+// format: list of {id,data}
 Engine.updateElements = function(obj,table){
     Object.keys(obj).forEach(function (key) {
         if(!table.hasOwnProperty(key)) {
@@ -2130,7 +2174,7 @@ Engine.inThatBuilding = function(id){
 };
 
 Engine.checkForBuildingMenuUpdate= function(id,event){
-    if(Engine.inThatBuilding(id) && Engine.inMenu) {
+    if(Engine.inThatBuilding(id)) {
         Engine.currentMenu.trigger(event);
     }
 };
@@ -2215,9 +2259,9 @@ Engine.enterBuilding = function(id){
 
     Engine.buildingTitle.setText(buildingData.name);
     //Engine.settlementTitle.setText(settlementData.name);
-    if(Engine.buildingTitle.width < Engine.settlementTitle.width) Engine.buildingTitle.resize(Engine.settlementTitle.width);
+    //if(Engine.buildingTitle.width < Engine.settlementTitle.width) Engine.buildingTitle.resize(Engine.settlementTitle.width);
     Engine.buildingTitle.display();
-    Engine.settlementTitle.display();
+    //Engine.settlementTitle.display();
 
     if(Client.tutorial) Engine.tutorialHook('bld:'+id);
     //Engine.UIHolder.resize(Engine.getHolderSize());
@@ -2229,7 +2273,7 @@ Engine.exitBuilding = function(){
     Engine.currentBuiling = null;
     Engine.currentMenu.hide();
     Engine.buildingTitle.hide();
-    Engine.settlementTitle.hide();
+    //Engine.settlementTitle.hide();
     for(var m in Engine.menus){
         if(!Engine.menus.hasOwnProperty(m)) continue;
         Engine.menus[m].hideIcon();

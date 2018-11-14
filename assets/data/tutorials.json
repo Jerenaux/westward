@@ -7,7 +7,7 @@
     {"pos": null, "camera":[1206,156],"txt":"See these shacks? They have been built by other players. Apparently, you are not alone around here."},
     {"pos": null, "camera":"keep","txt":"In Westward, players can build various buildings more or less anywhere to fulfill their needs and help them survive."},
     {"pos": null, "camera":[1196,160],"txt":"Looks like someone is building a Workshop. That will be very useful to craft important items."},
-    {"pos": [724,"c",300,120], "hook":"bld:3","txt":"Let's see how the construction is going. Click on the building to walk to and enter it."},
+    {"pos": [724,"c",300,120], "hook":"bld:2","txt":"Let's see how the construction is going. Click on the building to walk to and enter it."},
     {"pos": null,"txt":"Buildings are built by bringing construction material to them."},
     {"pos": null, "hook": "exit","txt":"Looks like timber is needed. Perhaps you could help? Exit the building by clicking on the cross."},
     {"pos": null,"txt":"You can acquire timber by building a lumber camp. It'll generate timber for you automatically at regular intervals."},
@@ -17,10 +17,10 @@
     {"pos": null,"txt":"Contrary to the Workshop you visitted, this building doesn't require construction material, so it's built immediately!"},
     {"pos": null, "hook":"bld:4","txt":"Enter your lumber camp by clicking on it."},
     {"pos": [10,50,300,140],"txt":"Production normally takes a bit of time, but for the sake of the tutorial, your building has magically produced timber in an instant!"},
-    {"pos": null,"hook":"take:3:5","txt":"Since you own this building, you can take anything from it's stock. Click on the timber icon and take it all."},
-    {"pos": null,"hook":"bld:3","txt":"Now exit your building and go to the Wokshop under construction."},
+    {"pos": null,"hook":"stock:4:3:0","txt":"Since you own this building, you can take anything from it's stock. Click on the timber icon and take it all."},
+    {"pos": null,"hook":"bld:2","txt":"Now exit your building and go to the Wokshop under construction."},
     {"pos":null,"txt":"You can contribute to a building's construction by giving material freely, or by selling it for money."},
-    {"pos":null,"hook":"give:3:5","txt":"Let's be altruistic for now. Click on the button to give all your timber."},
+    {"pos":null,"hook":"stock:2:3:5","txt":"Let's be altruistic for now. Click on the button to give all your timber."},
     {"pos":null,"txt":"Great! The Workshop has been built! It'll be essential to the local community's survival."},
     {"pos":null,"txt":"As you can see, players can complement and help each other, freely or for gold, to create settlements that will help them survive."}
   ]

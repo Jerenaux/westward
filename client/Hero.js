@@ -123,6 +123,10 @@ var Hero = new Phaser.Class({
         return (this.inventory.getNb(item) >= nb);
     },
 
+    getItemNb: function (item) {
+        return this.inventory.getNb(item);
+    },
+
     isAmmoEquipped: function(slot){
         return this.equipment.hasAnyAmmo(slot);
     },

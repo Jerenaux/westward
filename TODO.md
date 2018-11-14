@@ -185,6 +185,7 @@ Performance:
 - Flattening: second pass to delete water-only chunks based on visibility
 - Flattening based on transparency
 Order:
+- Clean all tutorial stuff
 - Store buildings data in separate files for the rendering stuff and the economic stuff;
 -> At least for economuc stuff, do it in json5
 - Send a digested config file from server to client

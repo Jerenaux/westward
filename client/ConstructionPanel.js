@@ -80,7 +80,6 @@ ConstructionPanel.prototype.displayInterface = function(){
         total_needed += nb;
         total_owned += owned;
     }
-    console.log(total_owned,total_needed);
     this.bar.setLevel(total_owned,total_needed);
 };
 

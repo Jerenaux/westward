@@ -210,12 +210,16 @@ ShopPanel.prototype.reset = function(){
 
 ShopPanel.prototype.requestPurchase = function(){
     if(Date.now() - this.lastPurchase < 200) return;
-    if(this.isShop) {
+    var stock = Engine.currentBuiling.getItemNb(this.shopItem.id);
+    if(this.shopItem.action == 'buy' && this.shopItem.count > stock) this.shopItem.count = stock;
+    if(this.isShop) { // When actually buying and selling
         Client.sendPurchase(this.shopItem.id, this.shopItem.count, this.shopItem.action);
-    }else{
+    }else{ // When taking and giving stock
         Client.sendStock(this.shopItem.id,this.shopItem.count,Engine.currentBuiling.id,this.shopItem.action);
-        if(Client.tutorial && this.shopItem.action == 'buy') Engine.tutorialHook('take:'+this.shopItem.id+':'+this.shopItem.count);
-        if(Client.tutorial && this.shopItem.action == 'sell') Engine.tutorialHook('give:'+this.shopItem.id+':'+this.shopItem.count);
+        if(Client.tutorial){
+            var verb = (this.shopItem.action == 'buy' ? 'take' : 'give');
+            Engine.tutorialStock(verb,this.shopItem.id,this.shopItem.count);
+        }
     }
     this.lastPurchase = Date.now();
 };

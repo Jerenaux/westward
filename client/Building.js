@@ -16,7 +16,7 @@ var Building = new Phaser.Class({
     setUp: function (data) {
         var buildingData = Engine.buildingsData[data.type];
         var sprite = buildingData.sprite;
-        if(!data.built) sprite += '_construction';
+        if(!data.built && buildingData.foundations) sprite = buildingData.foundations;
 
         this.setFrame(sprite);
         this.setVisible(true);

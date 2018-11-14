@@ -2,14 +2,24 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 14-02-18.
  */
 
-function BigButton(x,y,text,callback){
+function BigButton(x,y,text,callback,bigger){
     this.slices = [];
-    //var textX = x + 20;
     var sideWidth = 22;
-    this.slices.push(UI.scene.add.sprite(x-sideWidth,y,'UI','bigbutton_left'));
-    this.slices.push(UI.scene.add.tileSprite(x,y,4,28,'UI','bigbutton_middle'));
-    this.slices.push(UI.scene.add.sprite(x+sideWidth,y,'UI','bigbutton_right'));
-    this.text = UI.scene.add.text(x, y, '', { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+
+    this.bt = 'bigbutton';
+    var txtSize = 14;
+    var h = 28;
+    if(bigger){
+        this.bt = 'biggerbutton';
+        txtSize = 28;
+        h = 46;
+        sideWidth = 31;
+    }
+
+    this.slices.push(UI.scene.add.sprite(x-sideWidth,y,'UI',this.bt+'_left'));
+    this.slices.push(UI.scene.add.tileSprite(x,y,4,h,'UI',this.bt+'_middle'));
+    this.slices.push(UI.scene.add.sprite(x+sideWidth,y,'UI',this.bt+'_right'));
+    this.text = UI.scene.add.text(x, y, '', { font: txtSize+'px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     this.text.setOrigin(0.5);
 
     this.callback = callback;
@@ -65,9 +75,9 @@ BigButton.prototype.setText = function(text){
 BigButton.prototype.handleDown = function(){
     if(!this.enabled) return;
     UI.scene.sound.add('click').play();
-    this.slices[0].setFrame('bigbutton_left_pressed');
-    this.slices[1].setFrame('bigbutton_middle_pressed');
-    this.slices[2].setFrame('bigbutton_right_pressed');
+    this.slices[0].setFrame(this.bt+'_left_pressed');
+    this.slices[1].setFrame(this.bt+'_middle_pressed');
+    this.slices[2].setFrame(this.bt+'_right_pressed');
     this.resetSize();
 };
 
@@ -82,24 +92,24 @@ BigButton.prototype.handleClick = function(){
 
 BigButton.prototype.handleOver = function(){
     if(!this.enabled) return;
-    this.slices[0].setFrame('bigbutton_left_lit');
-    this.slices[1].setFrame('bigbutton_middle_lit');
-    this.slices[2].setFrame('bigbutton_right_lit');
+    this.slices[0].setFrame(this.bt+'_left_lit');
+    this.slices[1].setFrame(this.bt+'_middle_lit');
+    this.slices[2].setFrame(this.bt+'_right_lit');
     this.resetSize();
 };
 
 BigButton.prototype.handleOut = function(){
     if(!this.enabled) return;
-    this.slices[0].setFrame('bigbutton_left');
-    this.slices[1].setFrame('bigbutton_middle');
-    this.slices[2].setFrame('bigbutton_right');
+    this.slices[0].setFrame(this.bt+'_left');
+    this.slices[1].setFrame(this.bt+'_middle');
+    this.slices[2].setFrame(this.bt+'_right');
     this.resetSize();
 };
 
 BigButton.prototype.disable = function(){
-    this.slices[0].setFrame('bigbutton_left_gray');
-    this.slices[1].setFrame('bigbutton_middle_gray');
-    this.slices[2].setFrame('bigbutton_right_gray');
+    this.slices[0].setFrame(this.bt+'_left_gray');
+    this.slices[1].setFrame(this.bt+'_middle_gray');
+    this.slices[2].setFrame(this.bt+'_right_gray');
     this.resetSize();
     this.enabled = false;
     /*this.slices.forEach(function(s){

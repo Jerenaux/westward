@@ -453,6 +453,18 @@
       "frame": {"x":94,"y":577,"w":41,"h":28}
     },
     {
+      "filename": "biggerbutton_left",
+      "frame": {"x":143,"y":566,"w":62,"h":45}
+    },
+    {
+      "filename": "biggerbutton_middle",
+      "frame": {"x":252,"y":566,"w":6,"h":46}
+    },
+    {
+      "filename": "biggerbutton_right",
+      "frame": {"x":320,"y":566,"w":62,"h":45}
+    },
+    {
       "filename": "scroll_up",
       "frame": {"x":775,"y":201,"w":24,"h":27}
     },
@@ -495,6 +507,18 @@
     {
       "filename": "holder_over",
       "frame": {"x":442,"y":519,"w":32,"h":31}
+    },
+    {
+      "filename": "woodtitle_left",
+      "frame": {"x":666,"y":577,"w":49,"h":63}
+    },
+    {
+      "filename": "woodtitle_middle",
+      "frame": {"x":721,"y":577,"w":61,"h":63}
+    },
+    {
+      "filename": "woodtitle_right",
+      "frame": {"x":787,"y":577,"w":52,"h":63}
     }
   ]
 }
