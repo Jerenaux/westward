@@ -482,6 +482,7 @@ Engine.displayTutorial = function(){
         Engine.tutHook = null;
     }
     panel.display();
+    panel.moveUp(5);
     Engine.currentTutorialPanel = panel;
     Engine.inPanel = false;
 
@@ -1313,16 +1314,18 @@ Engine.makeBattleMenu = function(){
 };
 
 Engine.makeProductionMenu = function(){
-    var production = new Menu('Production',true); // ture = isBuilding
+    var production = new Menu('Production');
+    production.setTitlePos(100);
     var w = 400;
     var h = 330;
     var x = (Engine.getGameConfig().width-w)/2;
+    var y = 150;
     var prodw = 250;
     var prodh = 100;
-    var prody = 260;
+    var prody = y + 160;
     var prodx = (Engine.getGameConfig().width-prodw)/2;
 
-    var productionPanel = new ProductionPanel(x,100,w,h,'Production');
+    var productionPanel = new ProductionPanel(x,y,w,h);
     productionPanel.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['prod_help']);
     production.addPanel('production',productionPanel);
     //var productivity = new ProductivityPanel(prodx,prody,prodw,prodh,'Productivity modifiers');
@@ -1350,7 +1353,7 @@ Engine.makeConstructionMenu = function(){
     var x = (Engine.getGameConfig().width-w)/2;
     var padding = 0;
     var progressh = 300;
-    var progressy = 100;
+    var progressy = 150;
     var invy = progressy+progressh+padding;
     var prody = progressy+140;
     var prodw = 250;
@@ -1358,6 +1361,7 @@ Engine.makeConstructionMenu = function(){
     var materialh = 100;
 
     var constr = new Menu('Construction');
+    constr.setTitlePos(100);
     var progress = new ConstructionPanel(x,progressy,w,progressh);
     progress.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['progress_help']);
     constr.addPanel('progress',progress);
@@ -1759,8 +1763,8 @@ Engine.makeCharacterMenu = function(){
     var questh = 380-classh;
     var logh = 380 - citizenh;
 
-    var citizen = menu.addPanel('citizen', new CitizenPanel(citizenx,citizeny,citizenw,citizenh,'Civic status'));
-    var log = menu.addPanel('log', new Panel(citizenx,logy,citizenw,logh,'Events log'));
+    //var citizen = menu.addPanel('citizen', new CitizenPanel(citizenx,citizeny,citizenw,citizenh,'Civic status'));
+    var log = menu.addPanel('log', new Panel(citizenx,citizeny,citizenw,logh+citizenh,'Events log'));
 
     var classpanel = menu.addPanel('class', new CharacterPanel(classx,classy,classw,classh,'Multi-Class status'));
     var sx = classx + 15;
@@ -1789,7 +1793,7 @@ Engine.makeCharacterMenu = function(){
     //menu.addPanel('abilities',new Panel(citizenx,citizeny,citizenw,citizenh),true);
 
     menu.addEvent('onUpdateCharacter',classpanel.update.bind(classpanel));
-    menu.addEvent('onUpdateCitizen',citizen.update.bind(citizen));
+    //menu.addEvent('onUpdateCitizen',citizen.update.bind(citizen));
     //menu.addEvent('onUpdateCommit',commit.updateInventory.bind(commit));
 
     return menu;
@@ -2260,6 +2264,7 @@ Engine.enterBuilding = function(id){
     Engine.buildingTitle.setText(buildingData.name);
     //Engine.settlementTitle.setText(settlementData.name);
     //if(Engine.buildingTitle.width < Engine.settlementTitle.width) Engine.buildingTitle.resize(Engine.settlementTitle.width);
+    Engine.buildingTitle.move(Engine.currentMenu.titleY);
     Engine.buildingTitle.display();
     //Engine.settlementTitle.display();
 

@@ -133,9 +133,7 @@ var Map = new Phaser.Class({
         var ox = this.displayOriginX;
         var oy = this.displayOriginY;
         this.centerMap(pos);
-        if(this.positionCross){
-            this.positionCross.setPosition(this.center.x,this.center.y);
-        }
+        if(this.positionCross) this.positionCross.setPosition(this.center.x,this.center.y);
         var dx = this.displayOriginX - ox;
         var dy = this.displayOriginY - oy;
         this.dragMap(dx,dy,false);
@@ -297,7 +295,7 @@ var Map = new Phaser.Class({
 
         if(this.target == 'player') {
             this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
-            this.positionCross.setDepth(this.positionCross.depth+5);
+            //this.positionCross.setDepth(this.positionCross.depth+1);
             Engine.player.markers.forEach(function(data){
                 this.addPin(data.x,data.y,
                     Engine.buildingsData[data.type].name,
@@ -338,7 +336,7 @@ var Pin = new Phaser.Class({
         UI.scene.add.displayList.add(this);
         //UI.scene.add.updateList.add(this);
 
-        this.setDepth(5);
+        this.setDepth(2);
         this.setScrollFactor(0);
         this.setVisible(false);
         this.setInteractive();

@@ -40,7 +40,8 @@ Misc:
 
 - Minimap icons
 - Max 1 building of each type (unless ability)
-- Entering shack?
+- Entering shack? -> locked
+- Make other buildings too expensive to build in tut
 (- Way to cancel build click)
 (- Block if animal/civ/player in the way)
 (- Decide how to handle items/spawn clusters in the way)

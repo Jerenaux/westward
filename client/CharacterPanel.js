@@ -33,7 +33,7 @@ CharacterPanel.prototype.addInterface = function(){
         }
     }*/
 
-    var alignx = 15;
+    /*var alignx = 15;
     var x = alignx;
     var y = 240;
 
@@ -44,7 +44,7 @@ CharacterPanel.prototype.addInterface = function(){
     y += 15;
     var txts = this.addPolyText(x,y,['-1000% ','food deficit'],[Utils.colors.red,null]);
     this.foodModifierTxt = txts[0];
-    this.foodModifierLabel = txts[1];
+    this.foodModifierLabel = txts[1];*/
 };
 
 CharacterPanel.prototype.update = function(){
@@ -58,12 +58,12 @@ CharacterPanel.prototype.update = function(){
         Engine.menus.character.panels['class_'+classID].update();
     }
 
-    this.fatigueText.setText('0%');
+    /*this.fatigueText.setText('0%');
     var foodModifier = Formulas.decimalToPct(Formulas.computePlayerFoodModifier(Formulas.pctToDecimal(Engine.player.foodSurplus)));
     this.foodModifierTxt.setFill(foodModifier < 0 ? Utils.colors.red : Utils.colors.green);
     this.foodModifierLabel.setText(Engine.player.foodSurplus >= 0 ? 'food surplus' : 'food deficit');
     if(foodModifier > 0) foodModifier = '+'+foodModifier;
-    this.foodModifierTxt.setText(foodModifier+"%");
+    this.foodModifierTxt.setText(foodModifier+"%");*/
 };
 
 CharacterPanel.prototype.displayInterface = function(){

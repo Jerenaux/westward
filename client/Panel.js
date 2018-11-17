@@ -318,3 +318,24 @@ Capsule.prototype.display = function(){
     this.text.setVisible(true);
     if(this.icon) this.icon.setVisible(true);
 };
+
+Capsule.prototype.hide = function(){
+    this.slices.forEach(function(e){
+        e.setVisible(false);
+    });
+    this.text.setVisible(false);
+    if(this.icon) this.icon.setVisible(false);
+};
+
+Capsule.prototype.move = function(dx,dy){
+    this.slices.forEach(function(e){
+        e.x += dx;
+        e.y += dy;
+    });
+    this.text.x += dx;
+    this.text.y += dy;
+    if(this.icon) {
+        this.icon.x += dx;
+        this.icon.y += dy;
+    }
+};

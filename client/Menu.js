@@ -20,6 +20,10 @@ Menu.prototype.makeTitle = function(title){
     this.title.setText(title);
 };
 
+Menu.prototype.setTitlePos = function(y){
+    this.titleY = y;
+};
+
 Menu.prototype.setSound = function(sound){
     this.sound = sound;
 };
@@ -107,6 +111,7 @@ function BuildingTitle(x,y){
     this.slices = [];
     this.width = 1;
     this.width_ = this.width; // previous width
+    this.y = y;
 
     var sliceWidth, sliceHeight, fontSize, leftFrame, middleFrame, rightFrame, yOffset, xOffset;
     sliceWidth = 49;
@@ -117,7 +122,7 @@ function BuildingTitle(x,y){
     leftFrame = 'woodtitle_left';
     middleFrame = 'woodtitle_middle';
     rightFrame = 'woodtitle_right';
-    this.depth = 2;
+    this.depth = 1;
     this.align = 'center';
 
     var xl, yl, xm, ym, xr, yr;
@@ -127,7 +132,7 @@ function BuildingTitle(x,y){
     xr = xm;
 
     var textX = x + xOffset;
-    var textY = y + yOffset;
+    var textY = y + yOffset + 10;
 
     this.text = UI.scene.add.text(textX, textY, '', { font: fontSize+'px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
 
@@ -174,7 +179,15 @@ function BuildingTitle(x,y){
     }*/
     this.text.setOrigin(0.5,0);
     this.text.setVisible(false);
+
+    this.addCapsule('owner',0,-5,'John Doe\'s');
 }
+
+BuildingTitle.prototype.addCapsule = function(name,x,y,text,icon){
+    var capsule = new Capsule(this.slices[0].x+x,this.slices[0].y+y,'UI',icon,this.content);
+    capsule.setText(text);
+    this.capsule = capsule;
+};
 
 BuildingTitle.prototype.setText = function(text){
     this.text.setText(text);
@@ -189,16 +202,12 @@ BuildingTitle.prototype.resize = function(w){
     var right = this.slices[2];
     var delta = this.width-w;
 
-    if(this.align == 'right'){
-        left.x += delta;
-        middle.x += delta;
-    }else if(this.align == 'center'){
-        left.x += Math.floor(delta/2);
-        middle.x += Math.floor(delta/2);
-        right.x -= Math.floor(delta/2);
-        this.exit.x -= Math.floor(delta/2);
-    }
+    left.x += Math.floor(delta/2);
+    middle.x += Math.floor(delta/2);
+    right.x -= Math.floor(delta/2);
+    this.exit.x -= Math.floor(delta/2);
     middle.width -= delta;
+    this.capsule.move(Math.floor(delta/2),0);
 
     this.width = w;
     this.width_ = this.width;
@@ -210,6 +219,7 @@ BuildingTitle.prototype.display = function(){
     });
     this.text.setVisible(true);
     this.exit.setVisible(true);
+    this.capsule.display();
 };
 
 BuildingTitle.prototype.hide = function(){
@@ -218,4 +228,15 @@ BuildingTitle.prototype.hide = function(){
     });
     this.text.setVisible(false);
     this.exit.setVisible(false);
+    this.capsule.hide();
+};
+
+BuildingTitle.prototype.move = function(y){
+    var dy = y - this.y;
+    this.slices.forEach(function(e){
+        e.y += dy;
+    });
+    this.text.y += dy;
+    this.exit.y += dy;
+    this.capsule.move(0,dy);
 };

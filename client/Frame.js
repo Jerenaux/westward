@@ -145,3 +145,12 @@ Frame.prototype.finalize = function(){
         e.setVisible(false);
     });
 };
+
+Frame.prototype.moveUp = function(nb){
+    this.slices.forEach(function(e){
+        e.setDepth(e.depth+nb);
+    });
+    this.content.forEach(function(e){
+        e.setDepth(e.depth+nb);
+    });
+};
