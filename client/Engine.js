@@ -555,7 +555,7 @@ Engine.bootTutorial = function(part){
     Engine.updateWorld(data);
 
     Engine.tutorialData = Engine.scene.cache.json.get('tutorials')[part];
-    Engine.nextTutorial = 12;
+    Engine.nextTutorial = 0;
     Engine.displayTutorial();
 };
 

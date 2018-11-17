@@ -2,6 +2,12 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 23-04-18.
  */
 
+function classDataShell(){
+    for(var i = 0; i < 4; i++){
+        this[i] = 0;
+    }
+}
+
 var Hero = new Phaser.Class({
     Extends: Player,
 
@@ -25,9 +31,9 @@ var Hero = new Phaser.Class({
         this.gold = data.gold;
         this.civiclvl = data.civiclvl;
         this.civicxp = data.civicxp;
-        this.classxp = data.classxp;
-        this.classlvl = data.classlvl;
-        this.ap = data.ap;
+        this.classxp = data.classxp || new classDataShell();
+        this.classlvl = data.classlvl || new classDataShell();
+        this.ap = data.ap || new classDataShell();
     },
 
     updateData: function(data){ // don't call this 'update' or else conflict with Player.update() for other player updates

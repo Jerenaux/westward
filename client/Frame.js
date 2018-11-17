@@ -9,6 +9,8 @@ function Frame(x,y,w,h,invisible){
     this.y = y;
     this.x_ = x; // previous x and y coordinates
     this.y_ = y;
+    //this.depth = depth || 0;
+    this.depth = 0;
     this.width = w;
     this.height = h;
     this.showTween = null;
@@ -140,7 +142,7 @@ Frame.prototype.hideFrame = function(){
 
 Frame.prototype.finalize = function(){
     this.slices.forEach(function(e){
-        e.setDepth(0);
+        e.setDepth(this.depth);
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);

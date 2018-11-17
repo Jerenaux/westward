@@ -131,7 +131,6 @@ function BuildingTitle(x,y){
 
     this.text = UI.scene.add.text(textX, textY, '', { font: fontSize+'px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
 
-    console.log(xl,yl,xm,ym,xr,yr);
     this.slices.push(UI.scene.add.sprite(xl,yl,'UI',leftFrame));
     this.slices.push(UI.scene.add.tileSprite(xm,ym,this.width,sliceHeight,'UI',middleFrame));
     this.slices.push(UI.scene.add.sprite(xr,yr,'UI',rightFrame));
@@ -150,6 +149,21 @@ function BuildingTitle(x,y){
             UI.manageCursor(0,'UI');
         });*/
     },this);
+
+    this.exit = UI.scene.add.sprite(xr+10,yr+10,'UI','exit_icon');
+    this.exit.setDepth(this.depth+1);
+    this.exit.setScrollFactor(0);
+    this.exit.setVisible(false);
+    this.exit.setInteractive();
+    this.exit.setOrigin(0);
+    this.exit.on('pointerdown',Engine.exitBuilding);
+    var exit_ = this.exit;
+    this.exit.on('pointerover',function(){
+        exit_.setFrame('exit_icon_on');
+    });
+    this.exit.on('pointerout',function(){
+        exit_.setFrame('exit_icon');
+    });
 
     this.text.setDepth(this.depth+1);
     this.text.setScrollFactor(0);
@@ -182,6 +196,7 @@ BuildingTitle.prototype.resize = function(w){
         left.x += Math.floor(delta/2);
         middle.x += Math.floor(delta/2);
         right.x -= Math.floor(delta/2);
+        this.exit.x -= Math.floor(delta/2);
     }
     middle.width -= delta;
 
@@ -194,6 +209,7 @@ BuildingTitle.prototype.display = function(){
         e.setVisible(true);
     });
     this.text.setVisible(true);
+    this.exit.setVisible(true);
 };
 
 BuildingTitle.prototype.hide = function(){
@@ -201,4 +217,5 @@ BuildingTitle.prototype.hide = function(){
         e.setVisible(false);
     });
     this.text.setVisible(false);
+    this.exit.setVisible(false);
 };

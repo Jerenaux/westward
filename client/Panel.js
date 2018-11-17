@@ -2,8 +2,8 @@
  * Created by Jerome on 06-10-17.
  */
 
-function Panel(x,y,width,height,title,invisible){
-    Frame.call(this,x,y,width,height,invisible);
+function Panel(x,y,width,height,title,invisible,depth){
+    Frame.call(this,x,y,width,height,invisible,depth);
     this.capsules = {};
     this.longSlotsCounter = 0;
     this.longSlots = [];
@@ -16,7 +16,7 @@ Panel.prototype = Object.create(Frame.prototype);
 Panel.prototype.constructor = Panel;
 
 Panel.prototype.addCapsule = function(name,x,y,text,icon){
-    var capsule = new Capsule(this.x+x,this.y+y,'UI',icon,this.content);
+    var capsule = new Capsule(this.x+x,this.y+y,'UI',icon,this.content,this.depth);
     capsule.setText(text);
     this.capsules[name] = capsule;
 };
@@ -95,7 +95,7 @@ Panel.prototype.addText = function(x,y,text,color,size,font){
     t.setWordWrapWidth(this.width-20,false);
     t.setDisplayOrigin(0,0);
     t.setScrollFactor(0);
-    t.setDepth(1);
+    t.setDepth(this.depth+1);
     t.setVisible(false);
     this.texts.push(t);
     this.content.push(t);
@@ -246,7 +246,7 @@ Panel.prototype.hide = function(){
     Engine.inPanel = false;
 };
 
-function Capsule(x,y,iconAtlas,iconFrame,container){
+function Capsule(x,y,iconAtlas,iconFrame,container,depth){
     this.slices = [];
     this.icon = null;
     this.width = 1;
@@ -254,7 +254,7 @@ function Capsule(x,y,iconAtlas,iconFrame,container){
     
     if(iconFrame) {
         this.icon = UI.scene.add.sprite(x+8,y+6,iconAtlas,iconFrame);
-        this.icon.setDepth(2);
+        this.icon.setDepth(depth+2);
         this.icon.setScrollFactor(0);
         this.icon.setDisplayOrigin(0,0);
         this.icon.setVisible(false);
@@ -273,14 +273,14 @@ function Capsule(x,y,iconAtlas,iconFrame,container){
     this.slices.push(UI.scene.add.sprite(x,y,'UI','capsule-right'));
 
     this.slices.forEach(function(e){
-        e.setDepth(1);
+        e.setDepth(depth+1);
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
         if(container) container.push(e); // don't use concat
     });
 
-    this.text.setDepth(2);
+    this.text.setDepth(depth+2);
     this.text.setScrollFactor(0);
     this.text.setDisplayOrigin(0,0);
     this.text.setVisible(false);

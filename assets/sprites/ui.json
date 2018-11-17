@@ -457,12 +457,36 @@
       "frame": {"x":143,"y":566,"w":62,"h":45}
     },
     {
+      "filename": "biggerbutton_left_lit",
+      "frame": {"x":144,"y":615,"w":62,"h":45}
+    },
+    {
+      "filename": "biggerbutton_left_pressed",
+      "frame": {"x":392,"y":615,"w":62,"h":45}
+    },
+    {
       "filename": "biggerbutton_middle",
       "frame": {"x":252,"y":566,"w":6,"h":46}
     },
     {
+      "filename": "biggerbutton_middle_lit",
+      "frame": {"x":249,"y":615,"w":6,"h":45}
+    },
+    {
+      "filename": "biggerbutton_middle_pressed",
+      "frame": {"x":487,"y":615,"w":6,"h":45}
+    },
+    {
       "filename": "biggerbutton_right",
       "frame": {"x":320,"y":566,"w":62,"h":45}
+    },
+    {
+      "filename": "biggerbutton_right_lit",
+      "frame": {"x":320,"y":615,"w":62,"h":45}
+    },
+    {
+      "filename": "biggerbutton_right_pressed",
+      "frame": {"x":569,"y":615,"w":62,"h":45}
     },
     {
       "filename": "scroll_up",
@@ -519,6 +543,14 @@
     {
       "filename": "woodtitle_right",
       "frame": {"x":787,"y":577,"w":52,"h":63}
+    },
+    {
+      "filename": "exit_icon",
+      "frame": {"x":481,"y":516,"w":36,"h":36}
+    },
+    {
+      "filename": "exit_icon_on",
+      "frame": {"x":482,"y":565,"w":36,"h":36}
     }
   ]
 }
