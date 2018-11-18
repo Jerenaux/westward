@@ -45,3 +45,56 @@ ChatPanel.prototype.hide = function(){
     this.input.style.display = "none";
     this.input.value = "";
 };
+
+
+function NamePanel(x,y,width,height,title){
+    Panel.call(this,x,y,width,height,title);
+    this.addInterface();
+}
+
+NamePanel.prototype = Object.create(Panel.prototype);
+NamePanel.prototype.constructor = NamePanel;
+
+NamePanel.prototype.addInterface = function(){
+    this.input = document.getElementById("name");
+    this.input.style.left = (this.x+50)+"px";
+    this.input.style.top = (this.y+60)+"px";
+};
+
+NamePanel.prototype.handleInput = function(){
+    if(this.input.value != ""){
+        var text = this.input.value.substring(0,41);
+        Engine.player.talk(text);
+        Client.sendChat(text);
+    }
+};
+
+NamePanel.prototype.toggle = function(){
+    if(this.displayed){
+        this.handleInput();
+        this.hide();
+    }else{
+        this.display();
+    }
+};
+
+NamePanel.prototype.display = function(){
+    Panel.prototype.display.call(this);
+    this.input.style.display = "inline";
+    this.input.focus();
+    this.button.display();
+    this.displayTexts();
+};
+
+NamePanel.prototype.hide = function(){
+    Panel.prototype.hide.call(this);
+    this.input.style.display = "none";
+    this.input.value = "";
+    this.button.hide();
+    this.hideTexts();
+};
+
+NamePanel.prototype.addBigButton = function(text,cb){
+    var callback = cb || this.hide.bind(this);
+    this.button = new BigButton(this.x+(this.width/2),this.y+this.height-20,text,callback);
+};

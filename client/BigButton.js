@@ -137,3 +137,10 @@ BigButton.prototype.hide = function(){
     });
     this.text.setVisible(false);
 };
+
+BigButton.prototype.moveUp = function(nb){
+    this.slices.forEach(function(e){
+        e.setDepth(e.depth+nb);
+    });
+    this.text.setDepth(this.text.depth+nb);
+};

@@ -153,4 +153,5 @@ Frame.prototype.moveUp = function(nb){
     this.content.forEach(function(e){
         e.setDepth(e.depth+nb);
     });
+    if(this.button) this.button.moveUp(nb);
 };

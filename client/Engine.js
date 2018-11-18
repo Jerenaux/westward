@@ -550,7 +550,7 @@ Engine.bootTutorial = function(part){
         'newbuildings':[
             {id:0,type:11,x:1203,y:156,built:true},
             {id:1,type:11,x:1199,y:153,built:true},
-            {id:2,type:3,x:1189,y:159,built:false}
+            {id:2,type:3,x:1189,y:159,built:false,items:[[3,10]]}
         ]
     };
     Engine.updateWorld(data);
@@ -876,7 +876,7 @@ SettlementCapsule.prototype.hide = function(){
     Engine.menuIcons.push(UI.scene.add.sprite(x,y,'items2',icon).setScrollFactor(0).setDepth(2));
 };*/
 
-Engine.toggleMenuIcons = function(flag){
+Engine.toggleMenuIcons = function(){
     Engine.menuIcons.forEach(function(i){
         i.toggle();
     });
@@ -885,13 +885,13 @@ Engine.toggleMenuIcons = function(flag){
 Engine.hideHUD = function(){
     if(Engine.miniMap) Engine.miniMap.hide();
     Engine.setlCapsule.hide();
-    Engine.toggleMenuIcons(false);
+    Engine.toggleMenuIcons();
 };
 
 Engine.displayHUD = function(){
     if(Engine.miniMap)  Engine.miniMap.display();
     Engine.setlCapsule.display();
-    Engine.toggleMenuIcons(true);
+    Engine.toggleMenuIcons();
 };
 
 Engine.makeUI = function(){
@@ -1033,6 +1033,7 @@ menuIcon = function(x,y,icon,menu,tox,toy){
     this.icon = UI.scene.add.sprite(x,y,'items2',icon).setScrollFactor(0).setDepth(2); // bubble down to bg
     this.bg.on('pointerdown',function(){
         menu.toggle();
+        if(Engine.bldRect) Engine.bldUnclick(true);
     });
     var bg_ = this.bg;
     this.bg.on('pointerover',function(){
@@ -1075,6 +1076,7 @@ menuIcon.prototype.display = function(){
 };
 
 menuIcon.prototype.hide = function(){
+    this.displayed = false;
     UI.scene.tweens.add(
         {
             targets: [this.bg,this.icon],
@@ -1083,7 +1085,6 @@ menuIcon.prototype.hide = function(){
             duration: 300
         }
     );
-    this.displayed = false;
 };
 
 menuIcon.prototype.fullhide = function(){
@@ -1634,6 +1635,7 @@ Engine.makeBuildMenu = function(){
     });
 
     var build = new Menu();
+    build.keepHUD = true;
     build.name = 'Build something'; // Allows to have a hover name without a menu title
     build.hook = 'buildmenu';
     var w = 200;
@@ -1658,8 +1660,8 @@ Engine.bldClick = function(){
     if(Client.tutorial) Engine.tutorialHook('bldselect:'+this.itemID);
 };
 
-Engine.bldUnclick = function(){
-    if(!Engine.bldRect.collides) {
+Engine.bldUnclick = function(shutdown){
+    if(!Engine.bldRect.collides && !shutdown) {
         var id = Engine.bldRect.bldID;
         //var bld = Engine.buildingsData[id];
         var pos = Engine.bldRect.getBottomLeft();

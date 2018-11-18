@@ -41,16 +41,11 @@ Misc:
 - Minimap icons
 - Max 1 building of each type (unless ability)
 - Entering shack? -> locked
-- Make other buildings too expensive to build in tut
-(- Way to cancel build click)
 (- Block if animal/civ/player in the way)
 (- Decide how to handle items/spawn clusters in the way)
 (- One building site constraint)
-(- Cancel/destroy)
 (- Display info on top of blds)
 UI: display building health, owner 
-Tutorial mode:
-- Handle displaying menus when tut windows are open
 
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)

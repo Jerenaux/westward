@@ -77,7 +77,7 @@ Menu.prototype.display = function(){
 
     Engine.inMenu = true;
     Engine.hideMarker();
-    Engine.hideHUD();
+    if(!this.keepHUD) Engine.hideHUD();
     UI.setCursor();
     this.displayed = true;
 
@@ -95,7 +95,7 @@ Menu.prototype.hide = function(){
     Engine.inMenu = false;
     Engine.currentMenu = null;
     Engine.showMarker();
-    Engine.displayHUD();
+    if(!this.keepHUD) Engine.displayHUD();
     this.displayed = false;
 };
 
@@ -239,4 +239,5 @@ BuildingTitle.prototype.move = function(y){
     this.text.y += dy;
     this.exit.y += dy;
     this.capsule.move(0,dy);
+    this.y = y;
 };

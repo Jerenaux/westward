@@ -278,7 +278,8 @@ UI.launchGameMode = function(){
         onComplete: function(){
             if(Client.isNewPlayer()){
                 //UI.displayClassMenu();
-                UI.displaySettlementSelectionMenu();
+                //UI.displaySettlementSelectionMenu();
+                UI.displayNameBox();
             }else {
                 UI.camera.fadeOut(500);
                 UI.camera.once('camerafadeoutcomplete',function(){
@@ -323,6 +324,13 @@ UI.selectClass = function(id){
         UI.displaySettlementSelectionMenu();
         UI.camera.fadeIn(500);
     });
+};
+
+UI.displayNameBox = function(){
+    var panel = new NamePanel(362,150,300,120,'Character name');
+    panel.addText(10,20,'Enter the name of your character.');
+    panel.addBigButton('Next',UI.displaySettlementSelectionMenu);
+    panel.display();
 };
 
 UI.displaySettlementSelectionMenu =  function(){
