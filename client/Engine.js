@@ -1628,12 +1628,6 @@ Engine.makeCraftingMenu = function(){
 };
 
 Engine.makeBuildMenu = function(){
-    Engine.buildRecipes = new Inventory(7);
-    var bldRecipes = [11,6,2]; // TODO: to conf
-    bldRecipes.forEach(function(w){
-        Engine.buildRecipes.add(w,1);
-    });
-
     var build = new Menu();
     build.keepHUD = true;
     build.name = 'Build something'; // Allows to have a hover name without a menu title
@@ -1641,7 +1635,7 @@ Engine.makeBuildMenu = function(){
     var w = 200;
     var buildings = build.addPanel('build',new InventoryPanel(30,40,w,150,'Buildings'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
-    buildings.setInventory(Engine.buildRecipes,5,false,Engine.bldClick);
+    buildings.setInventory(Engine.player.buildRecipes,5,false,Engine.bldClick);
     buildings.setDataMap(Engine.buildingIconsData);
     build.addEvent('onDisplay',buildings.updateInventory.bind(buildings));
     return build;
@@ -2262,8 +2256,8 @@ Engine.enterBuilding = function(id){
             }
         }
     });
-
     Engine.buildingTitle.setText(buildingData.name);
+    Engine.buildingTitle.capsule.setText(Engine.currentBuiling.ownerName+'\'s');
     //Engine.settlementTitle.setText(settlementData.name);
     //if(Engine.buildingTitle.width < Engine.settlementTitle.width) Engine.buildingTitle.resize(Engine.settlementTitle.width);
     Engine.buildingTitle.move(Engine.currentMenu.titleY);

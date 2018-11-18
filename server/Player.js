@@ -21,7 +21,6 @@ function Player(){
     this.entityCategory = 'Player';
     this.updateCategory = 'players';
     this.battlePriority = 1;
-    this.name = 'Player';
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.oldAOIs = [];
     this.action = null;
@@ -74,7 +73,7 @@ Player.prototype.getCommitSlotsShell = function(){
 };
 
 Player.prototype.setIDs = function(dbID,socketID){
-    this.id = GameServer.lastPlayerID++;
+    //this.id = GameServer.lastPlayerID++;
     this.dbID = dbID;
     this.socketID = socketID;
 };
@@ -98,6 +97,10 @@ Player.prototype.isCraftsman = function(){
 
 Player.prototype.isMerchant = function(){
     return this.class == GameServer.classes.merchant;
+};
+
+Player.prototype.setName = function(name){
+    this.name = name;
 };
 
 Player.prototype.setSettlement = function(sid){
@@ -555,6 +558,8 @@ Player.prototype.trim = function(){
 Player.prototype.getDataFromDb = function(data){
     // TODO: think about how to handle references to other entities
     // eg. inBuilding (how to retrieve proper building if server went down since), commitment...
+    this.id = data.id;
+    this.name = data.name;
     this.x = data.x;
     this.y = data.y;
     this.civiclvl = data.civiclvl;

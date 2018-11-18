@@ -61,12 +61,8 @@ NamePanel.prototype.addInterface = function(){
     this.input.style.top = (this.y+60)+"px";
 };
 
-NamePanel.prototype.handleInput = function(){
-    if(this.input.value != ""){
-        var text = this.input.value.substring(0,41);
-        Engine.player.talk(text);
-        Client.sendChat(text);
-    }
+NamePanel.prototype.getValue = function(){
+    return this.input.value;
 };
 
 NamePanel.prototype.toggle = function(){

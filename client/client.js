@@ -41,7 +41,8 @@ Client.getInitRequest = function(){ // Returns the data object to send to reques
         return {
             new:true,
             selectedClass: UI.selectedClass,
-            selectedSettlement: UI.selectedSettlement
+            selectedSettlement: UI.selectedSettlement,
+            characterName: UI.characterName
         };
     }
     return {

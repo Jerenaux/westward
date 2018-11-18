@@ -31,7 +31,8 @@ GameObject.prototype.setProperty = function(property,value){
     // Updates a property of the object and update the AOI's around it
     //console.log(this.id+' sets '+property+' to '+value);
     this[property] = value;
-    if(this.id !== undefined) this.updateAOIs(property,value);
+    //if(this.id !== undefined) this.updateAOIs(property,value);
+    this.updateAOIs(property,value);
 };
 
 GameObject.prototype.updateAOIs = function(property,value){

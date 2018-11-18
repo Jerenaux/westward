@@ -38,6 +38,7 @@ var Building = new Phaser.Class({
 
         this.buildingType = data.type;
         this.owner = data.owner;
+        this.ownerName = data.ownerName;
         this.civBuilding = (this.settlement == -1);
         this.inventory = new Inventory(100);
         this.name = buildingData.name;//+' '+this.id;

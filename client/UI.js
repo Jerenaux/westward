@@ -331,9 +331,15 @@ UI.displayNameBox = function(){
     panel.addText(10,20,'Enter the name of your character.');
     panel.addBigButton('Next',UI.displaySettlementSelectionMenu);
     panel.display();
+    UI.namePanel = panel;
 };
 
 UI.displaySettlementSelectionMenu =  function(){
+    if(UI.namePanel){
+        UI.characterName = UI.namePanel.getValue();
+        if(!UI.characterName) return;
+        UI.namePanel.hide();
+    }
     var content = [];
     content.push(UI.scene.add.image(0,0,'wood').setOrigin(0));
     var scroll = UI.scene.add.image(UI.getGameWidth()/2,UI.getGameHeight()/2,'bigbg');
@@ -358,7 +364,7 @@ UI.displaySettlementSelectionMenu =  function(){
 
     var w = 400;
     var h = 220;
-    var panel = new InfoPanel((UI.getGameWidth()-w)/2,(UI.getGameHeight()-h)/2,w,h,'Settlement selection');
+    var panel = new InfoPanel((UI.getGameWidth()-w)/2,(UI.getGameHeight()-h)/2,w,h,'Region selection');
     panel.addText(10,15,UI.textsData['settlement_intro'],null,14,Utils.fonts.normal);
     panel.addBigButton('Got it');
     panel.display();

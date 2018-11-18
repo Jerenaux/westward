@@ -85,6 +85,7 @@ GameServer.createModels = function(){
         type: {type: Number, min: 0, required: true},
         //sid: {type: Number, min: 0, required: true},
         owner: {type: Number, min: 0},
+        ownerName: {type: String},
         inventory: {type: [[]], set:function(inventory){
                 return inventory.toList(true); // true: filter zeroes
             }},
@@ -95,7 +96,8 @@ GameServer.createModels = function(){
         health: {type: Number, min: 0}
     });
     var playerSchema = mongoose.Schema({
-        // TODO: think about ID
+        id: {type: Number, min: 0, required: true},
+        name: {type: String, required: true},
         x: {type: Number, min: 0, required: true},
         y: {type: Number, min: 0, required: true},
         gold: {type: Number, min: 0},
@@ -126,6 +128,7 @@ GameServer.readMap = function(mapsPath,test){
     }else {
         GameServer.initializationMethods = {
             'static_data': null,
+            'player_data': GameServer.readPlayersData,
             'settlements': GameServer.loadSettlements,
             'buildings': GameServer.loadBuildings,
             'settlementsSetup': GameServer.setUpSettlements,
@@ -186,6 +189,17 @@ GameServer.readMap = function(mapsPath,test){
 
 GameServer.getBootParams = function(){
     return GameServer.clientParameters;
+};
+
+GameServer.readPlayersData = function(){
+    GameServer.PlayerModel.find(function(err,players){
+        if (err) return console.log(err);
+        players.forEach(function(data){
+            if(data.id > GameServer.lastPlayerID) GameServer.lastPlayerID = data.id;
+        });
+        console.log('Last player ID:',GameServer.lastPlayerID);
+        GameServer.updateStatus();
+    });
 };
 
 GameServer.loadSettlements = function(){
@@ -400,6 +414,8 @@ GameServer.addNewPlayer = function(socket,data){
     var player = new Player();
     player.setStartingInventory();
     player.setSettlement(data.selectedSettlement);
+    player.setName(data.characterName);
+    player.id = GameServer.lastPlayerID++;
     //player.classLvlUp(data.selectedClass,false);
     player.spawn();
 
@@ -727,6 +743,7 @@ GameServer.handleShop = function(data,socketID) {
 };
 
 GameServer.handleBuild = function(data,socketID) {
+    console.warn('handleBuild');
     var bid = data.id;
     var tile = data.tile;
     var player = GameServer.getPlayer(socketID);
@@ -750,13 +767,16 @@ GameServer.canBuild = function(bid,tile){
 };
 
 GameServer.build = function(player,bid,tile){
+    console.warn('build');
     var data = {
         x: tile.x,
         y: tile.y,
         type: bid,
         owner: player.id,
+        ownerName: player.name,
         built: false
     };
+    console.warn(data);
     var building = new Building(data);
     var document = new GameServer.BuildingModel(building);
     building.setModel(document); // ref to model is needed at least to get _id
@@ -960,6 +980,7 @@ GameServer.removeObjectFromAOI = function(aoi,entity) {
 };
 
 GameServer.updateAOIproperty = function(aoi,category,id,property,value) {
+    if(aoi === undefined ||  isNaN(aoi)) return; // Can happen when initializing new player for example
     GameServer.AOIs[aoi].updatePacket.updateProperty(category, id, property, value);
     GameServer.dirtyAOIs.add(aoi);
 };

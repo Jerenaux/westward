@@ -1,8 +1,7 @@
 Release:
-- Newplayer only (flush)
+- Flush players once
 - Dis/enable battles + wander, aggro, etc.
 - Push
-- Reset food, update stocks
 
 Admin
 Analytics
@@ -38,14 +37,16 @@ Misc:
 -> Keep class quests (+ "smart quests" based on settlement situation?)
 -> Menu to list buildings (but on-site management)
 
+- Disqus
 - Minimap icons
+- Region selection texts
 - Max 1 building of each type (unless ability)
 - Entering shack? -> locked
 (- Block if animal/civ/player in the way)
 (- Decide how to handle items/spawn clusters in the way)
 (- One building site constraint)
 (- Display info on top of blds)
-UI: display building health, owner 
+UI: display building health 
 
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)

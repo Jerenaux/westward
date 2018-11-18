@@ -14,6 +14,8 @@ var Hero = new Phaser.Class({
     initialize: function Hero(){
         Player.call(this);
         this.isHero = true;
+
+        this.buildRecipes = new Inventory(7);
     },
 
     setUp: function(data){
@@ -40,6 +42,7 @@ var Hero = new Phaser.Class({
         var callbacks = {
             'ammo': this.updateAmmo,
             'ap': this.updateAP,
+            'builds': this.updateBuildRecipes,
             'civiclvl': this.updateCivicLvl,
             'classlvl': this.updateClassLvl,
             'classxp': this.updateClassXP,
@@ -167,6 +170,13 @@ var Hero = new Phaser.Class({
         this.updateEvents.add('character');
         this.updateEvents.add('citizen');
         //TODO: add sound effect
+    },
+
+    updateBuildRecipes: function(bldRecipes){
+        //var bldRecipes = [11,6,2];
+        bldRecipes.forEach(function(w){
+            this.buildRecipes.add(w,1);
+        },this);
     },
 
     updateCivicLvl: function(civiclvl){

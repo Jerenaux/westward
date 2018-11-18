@@ -50,6 +50,7 @@ function Building(data){
     this.shootFrom = buildingData.shootFrom;
 
     this.owner = data.owner;
+    this.ownerName = data.ownerName || 'John Doe';
     this.skipBattleTurn = !buildingData.canFight;
     this.name = buildingData.name;
     this.civBuilding = (this.sid == -1);
@@ -334,7 +335,7 @@ Building.prototype.save = function(){
 Building.prototype.trim = function(){
     var trimmed = {};
     var broadcastProperties =
-        ['id','type','gold','prices','built','productivity','owner']; // list of properties relevant for the client
+        ['id','type','gold','prices','built','productivity','owner','ownerName']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
