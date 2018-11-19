@@ -207,6 +207,7 @@ BuildingTitle.prototype.resize = function(w){
     right.x -= Math.floor(delta/2);
     this.exit.x -= Math.floor(delta/2);
     middle.width -= delta;
+    if(middle.width%2 != 0) middle.width++;
     this.capsule.move(Math.floor(delta/2),0);
 
     this.width = w;

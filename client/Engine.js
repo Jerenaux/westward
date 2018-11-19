@@ -958,8 +958,9 @@ Engine.makeUI = function(){
         'map': Engine.makeMapMenu(),
         //'messages': Engine.makeMessagesMenu(),
         'production': Engine.makeProductionMenu(),
-        'staff': Engine.makeStaffMenu(),
-        'trade': Engine.makeTradeMenu()
+        //'staff': Engine.makeStaffMenu(),
+        'trade': Engine.makeTradeMenu(),
+        'wip': Engine.makeWipMenu()
     };
 
     Engine.menuIcons = [];
@@ -1385,6 +1386,19 @@ Engine.makeConstructionMenu = function(){
     //constr.addEvent('onUpdateConstruction',progress.update.bind(progress));
     //constr.addEvent('onUpdateProductivity',prod.update.bind(prod));
     return constr;
+};
+
+Engine.makeWipMenu = function(){
+    var menu = new Menu();
+    menu.setTitlePos(100);
+    var w = 500;
+    var x = (Engine.getGameConfig().width-w)/2;
+
+    var panel = menu.addPanel('main',new InfoPanel(x,150,w,300));
+    var txt = panel.addText(110,150,'Nothing to do here (yet)',null,24);
+    console.warn(txt.width);
+
+    return menu;
 };
 
 Engine.makeMessagesMenu = function(){

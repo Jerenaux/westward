@@ -11,6 +11,7 @@
     "sprite": "tower",
     "foundations":"foundations_2",
     "mapicon": "tower",
+    "mainMenu": "wip",
     "icon": "tower",
     "canFight": true,
     "health": 250,
@@ -32,6 +33,7 @@
     "foundations": "foundations_1",
     "sprite": "shack",
     "mapicon": "workshop",
+    "mainMenu": "crafting",
     "depthOffset": 2,
     "canFight": false,
     "health": 50
@@ -65,6 +67,7 @@
     "foundations": "foundations_1",
     "sprite": "shack",
     "mapicon": "wood",
+    "mainMenu": "wip",
     "depthOffset": 2,
     "canFight": false,
     "health": 50

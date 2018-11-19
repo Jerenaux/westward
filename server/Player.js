@@ -51,6 +51,8 @@ function Player(){
         3: 0,
         4: 0 // civic AP
     };
+    this.baseBldrecipes = [11,6,2]; //TODO: conf
+    this.bldRecipes = [];
 
     this.cellsWidth = 1;
     this.cellsHeight = 1;
@@ -83,8 +85,33 @@ Player.prototype.setAppearance = function(appearance){
 };
 
 // Called by finalizePlayer
-Player.prototype.registerPlayer = function(){
-    this.settlement.registerPlayer(this);
+Player.prototype.updateBldRecipes = function(){
+    this.bldRecipes = [];
+    this.baseBldrecipes.forEach(function(b){
+        if(this.countOwnedBuildings(b) < 1) this.bldRecipes.push(b);
+    },this);
+    if(this.bldRecipes.length == 0) this.bldRecipes = [-1];
+    console.log('Bld recipes list:',this.bldRecipes);
+    this.updatePacket.bldRecipes = this.bldRecipes;
+};
+
+Player.prototype.listBuildings = function(){
+    this.buildings = [];
+    for(var bid in GameServer.buildings){
+        var building = GameServer.buildings[bid];
+        if(building.owner == this.id) this.buildings.push(building);
+    }
+    console.log('Player owns',this.buildings.length,'buildings');
+    this.updateBldRecipes();
+};
+
+Player.prototype.countOwnedBuildings = function(type){
+    if(type == -1) return this.buildings.length;
+    var count = 0;
+    this.buildings.forEach(function(b){
+        if(b.type == type) count++;
+    });
+    return count;
 };
 
 Player.prototype.isExplorer = function(){
@@ -116,8 +143,8 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(6,2);
     this.giveItem(28,1);
     this.giveItem(4,2);*/
-    this.giveItem(1,30);
-    this.giveItem(3,30);
+    //this.giveItem(1,30);
+    this.giveItem(3,5);
 
     this.giveGold(300);
 };
@@ -582,8 +609,7 @@ Player.prototype.getDataFromDb = function(data){
          this.giveItem(i[0],i[1]);
     },this);
     this.setSettlement(data.sid);
-    this.commitSlots = data.commitSlots;
-    // TODO: de-commit expired slots
+    //this.commitSlots = data.commitSlots;
     this.giveGold(data.gold);
 };
 

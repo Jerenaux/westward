@@ -415,7 +415,7 @@ GameServer.addNewPlayer = function(socket,data){
     player.setStartingInventory();
     player.setSettlement(data.selectedSettlement);
     player.setName(data.characterName);
-    player.id = GameServer.lastPlayerID++;
+    player.id = ++GameServer.lastPlayerID;
     //player.classLvlUp(data.selectedClass,false);
     player.spawn();
 
@@ -460,7 +460,7 @@ GameServer.finalizePlayer = function(socket,player){
     GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
     GameServer.nbConnectedChanged = true;
     player.setOrUpdateAOI(); // takes care of adding to the world as well
-    player.registerPlayer();
+    player.listBuildings();
     //console.log(GameServer.server.getNbConnected()+' connected');
     Prism.logEvent(player,'connect',{stl:player.sid});
 };
@@ -767,7 +767,6 @@ GameServer.canBuild = function(bid,tile){
 };
 
 GameServer.build = function(player,bid,tile){
-    console.warn('build');
     var data = {
         x: tile.x,
         y: tile.y,
@@ -785,6 +784,7 @@ GameServer.build = function(player,bid,tile){
         if (err) return console.error(err);
         console.log('Build successfull');
         building.embed();
+        player.listBuildings();
     });
 };
 

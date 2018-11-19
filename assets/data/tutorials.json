@@ -11,6 +11,7 @@
     {"pos": null,"txt":"Buildings are built by bringing construction material to them."},
     {"pos": null, "hook": "exit","txt":"Looks like timber is needed. Perhaps you could help? Exit the building by clicking on the door icon."},
     {"pos": null,"txt":"You can acquire timber by building a lumber camp. It'll generate timber for you automatically at regular intervals."},
+    {"pos": null,"txt":"The resources of the land deplete as players extract them, hence the continuous march Westward to keep finding new ones and expanding!"},
     {"pos": [50,50,300,120],"hook": "buildmenu","txt":"To build a building, first open the 'Build' menu by clicking on the shovel icon, here on the left."},
     {"pos": [280,50,300,120],"hook": "bldselect:6","txt":"Hover a building icon to see its name. Find the lumber camp icon and click on it."},
     {"pos": null,"hook": "bldunselect:6","txt":"Now pick a location to build it. It will only be possible next to a forest; get closer to the forest to the east and build it there. (Click back on the shovel to cancel)"},

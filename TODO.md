@@ -38,13 +38,12 @@ Misc:
 -> Menu to list buildings (but on-site management)
 
 - Disqus
-- Minimap icons
 - Region selection texts
-- Max 1 building of each type (unless ability)
-- Entering shack? -> locked
+- Review all item texts & help
+- Ensure battles work
+- Enable workshops and shops
 (- Block if animal/civ/player in the way)
 (- Decide how to handle items/spawn clusters in the way)
-(- One building site constraint)
 (- Display info on top of blds)
 UI: display building health 
 

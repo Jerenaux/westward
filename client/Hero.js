@@ -42,7 +42,7 @@ var Hero = new Phaser.Class({
         var callbacks = {
             'ammo': this.updateAmmo,
             'ap': this.updateAP,
-            'builds': this.updateBuildRecipes,
+            'bldRecipes': this.updateBuildRecipes,
             'civiclvl': this.updateCivicLvl,
             'classlvl': this.updateClassLvl,
             'classxp': this.updateClassXP,
@@ -173,7 +173,10 @@ var Hero = new Phaser.Class({
     },
 
     updateBuildRecipes: function(bldRecipes){
-        //var bldRecipes = [11,6,2];
+        if(bldRecipes.length == 1 && bldRecipes[0] == -1){
+            this.buildRecipes.clear();
+            return;
+        }
         bldRecipes.forEach(function(w){
             this.buildRecipes.add(w,1);
         },this);
