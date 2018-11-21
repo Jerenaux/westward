@@ -143,7 +143,7 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(6,2);
     this.giveItem(28,1);
     this.giveItem(4,2);*/
-    //this.giveItem(1,30);
+    //this.giveItem(4,3);
     this.giveItem(3,5);
 
     this.giveGold(300);

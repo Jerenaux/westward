@@ -42,7 +42,7 @@ var NPC = new Phaser.Class({
         var cursor;
         if(BattleManager.inBattle) {
             if(this.dead){
-                cursor = 'cursor';
+                cursor = 'default';
             }else{
                 cursor = (Utils.nextTo(Engine.player,this) ? 'melee' : Engine.player.getRangedCursor());
             }

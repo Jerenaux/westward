@@ -20,8 +20,8 @@ BattleManager.handleFightStatus = function(status){
 BattleManager.startFight = function(){
     BattleManager.inBattle = true;
     if(Engine.currentMenu) Engine.currentMenu.hide();
-    Engine.hideUI();
-    Engine.hideMarker();
+    //Engine.hideHUD();
+    //Engine.hideMarker();
     Engine.tweenFighText();
     Engine.updateGrid();
     Engine.menus.battle.display();
@@ -160,10 +160,10 @@ BattleManager.endFight = function(){
     Engine.menus.battle.hide();
     if(Engine.dead) {
        BattleManager.onDeath();
-    }else{
+    }/*else{
         Engine.displayUI();
         Engine.showMarker();
-    }
+    }*/
 };
 
 // #######################

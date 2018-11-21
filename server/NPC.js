@@ -221,7 +221,6 @@ NPC.prototype.isPositionFree = function(x,y){
 
 NPC.prototype.computeBattleDestination = function(target){
     var dest = target;
-    console.warn('From ',this.x,this.y,' to ',target.x,target.y);
     var r = GameServer.battleParameters.battleRange;
     var closest = null;
     var minDist = Infinity;

@@ -19,6 +19,7 @@ MovingEntity.prototype.constructor = MovingEntity;
 
 // ### Movement ###
 
+// Called by onAddAtLocation/onRemoveAtLocation; action = 'add' or 'delete'
 MovingEntity.prototype.travelOccupiedCells = function(action){
     for(var x = this.x; x < this.x + this.cellsWidth; x++){
         for(var y = this.y; y < this.y + this.cellsHeight; y++) {

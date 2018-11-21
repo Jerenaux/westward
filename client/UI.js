@@ -175,7 +175,9 @@ UI.getGameHeight = function(){
 };
 
 UI.manageCursor = function(inout,type,target){
+    if(target && target.entityType == 'cell' && Engine.cursorOnTarget) return;
     if(target){
+        Engine.cursorOnTarget = (target.entityType != 'cell');
         target.setCursor();
     }else{
         UI.setCursor();

@@ -601,6 +601,7 @@ Engine.initWorld = function(data){
         panel.display();
     }
 
+    return;
     // todo: move all to dedicated sound manager
     Engine.lastOrientationSound = 0;
     // todo: move to JSON file (+ config for delay)
@@ -1052,7 +1053,8 @@ menuIcon = function(x,y,icon,menu,tox,toy){
 
 menuIcon.prototype.toggle = function(){
     if(this.displayed){
-        if(Engine.inBuilding){
+        console.warn(Engine.currentMenu);
+        if(Engine.inBuilding || Engine.currentMenu.fullHide){
             this.fullhide();
         }else {
             this.hide();
@@ -1278,6 +1280,7 @@ Engine.getPlayerMaxHealth = function(){
 Engine.makeBattleMenu = function(){
     var alignx = 845;
     var battle = new Menu();
+    battle.fullHide = true;
     var equipment = new EquipmentPanel(alignx,100,170,120,'Equipment',true); // true: battle menu
     equipment.addButton(140, 8, 'blue','help',null,'',UI.textsData['battleitems_help']);
     battle.addPanel('equipment',equipment);
@@ -1396,7 +1399,6 @@ Engine.makeWipMenu = function(){
 
     var panel = menu.addPanel('main',new InfoPanel(x,150,w,300));
     var txt = panel.addText(110,150,'Nothing to do here (yet)',null,24);
-    console.warn(txt.width);
 
     return menu;
 };

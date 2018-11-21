@@ -180,7 +180,8 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()));
     GameServer.pathFinder = new Pathfinder(GameServer.collisions,GameServer.PFParameters.maxPathLength);
 
-    GameServer.positions = new SpaceMapList();
+    GameServer.positions = new SpaceMapList(); // positions occupied by moving entities and buildings
+    GameServer.itemPositions = new SpaceMapList();
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
@@ -300,7 +301,8 @@ GameServer.onInitialized = function(){
             y: 655
         }
     }*/
-    //GameServer.addAnimal(1205,167,0);
+    GameServer.addAnimal(1189,158,0);
+    GameServer.addItem(1199,160,3);
     //GameServer.addAnimal(1204,168,0);
     /*GameServer.addCiv(513,656);
     GameServer.addCiv(514,657);
@@ -743,27 +745,30 @@ GameServer.handleShop = function(data,socketID) {
 };
 
 GameServer.handleBuild = function(data,socketID) {
-    console.warn('handleBuild');
     var bid = data.id;
     var tile = data.tile;
     var player = GameServer.getPlayer(socketID);
-    if (GameServer.canBuild(bid, tile)) {
+    var buildPermit = GameServer.canBuild(bid, tile);
+    if (buildPermit == 1) {
         GameServer.build(player, bid, tile);
-    } else {
+    } else if(buildPermit == -1) {
         player.addMsg('I can\'t build there!');
+    }else if(buildPermit == -2){
+        player.addMsg('There is something in the way!');
     }
 };
 
 GameServer.canBuild = function(bid,tile){
     var data = GameServer.buildingsData[bid];
-
-    for(var x = 0; x < data.width; x++){
-        for(var y = 0; y < data.height; y++) {
+    for(var x = 0; x < data.base.width; x++){
+        for(var y = 0; y < data.base.height; y++) {
             // ! minus sign
-            if(GameServer.checkCollision(tile.x+x,tile.y-y)) return false;
+            if(GameServer.checkCollision(tile.x+x,tile.y-y)) return -1;
+            if(GameServer.positions.get(tile.x+x,tile.y-y).length > 0 ||
+                GameServer.itemPositions.get(tile.x+x,tile.y-y).length > 0) return -2;
         }
     }
-    return true;
+    return 1;
 };
 
 GameServer.build = function(player,bid,tile){
