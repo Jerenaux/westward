@@ -5,8 +5,8 @@ function ShopPanel(x,y,width,height,title,notShop){
     Panel.call(this,x,y,width,height,title);
     this.buttons = [];
     this.lastPurchase = Date.now();
-    this.addInterface();
     this.isShop = !notShop;
+    this.addInterface();
 }
 
 ShopPanel.prototype = Object.create(Panel.prototype);
@@ -21,16 +21,14 @@ ShopPanel.prototype.addInterface = function(){
     this.content.push(slot);
     this.slot = slot;
 
-    if(this.isShop) {
-        var gold = UI.scene.add.sprite(this.x + 240, this.y + 35, 'items2', 'gold-pile');
-        gold.setScale(1.5);
-        gold.setDepth(1);
-        gold.setScrollFactor(0);
-        gold.setDisplayOrigin(0, 0);
-        gold.setVisible(false);
-        this.content.push(gold);
-        this.gold = gold;
-    }
+    var gold = UI.scene.add.sprite(this.x + 240, this.y + 35, 'items2', 'gold-pile');
+    gold.setScale(1.5);
+    gold.setDepth(1);
+    gold.setScrollFactor(0);
+    gold.setDisplayOrigin(0, 0);
+    gold.setVisible(false);
+    this.content.push(gold);
+    this.gold = gold;
 
     var item = new ItemSprite();
     item.setPosition(this.x+20+18,this.y+30+18);
@@ -45,18 +43,16 @@ ShopPanel.prototype.addInterface = function(){
     count.setOrigin(1,1);
     this.content.push(count);
 
-    if(this.isShop) {
-        var price = UI.scene.add.text(this.x + 240, this.y + 50, '0', {
-            font: '14px belwe',
-            fill: '#ffffff',
-            stroke: '#000000',
-            strokeThickness: 3
-        });
-        price.setVisible(false);
-        price.setDepth(2);
-        price.setScrollFactor(0);
-        this.content.push(price);
-    }
+    var price = UI.scene.add.text(this.x + 240, this.y + 50, '0', {
+        font: '14px belwe',
+        fill: '#ffffff',
+        stroke: '#000000',
+        strokeThickness: 3
+    });
+    price.setVisible(false);
+    price.setDepth(2);
+    price.setScrollFactor(0);
+    this.content.push(price);
 
     var name = Engine.scene.add.text(this.x+65,this.y+25, '0',  { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     name.setVisible(false);
@@ -80,27 +76,45 @@ ShopPanel.prototype.addInterface = function(){
     };
 };
 
-ShopPanel.prototype.setUp = function(id,action,title){
+ShopPanel.prototype.isFinancial = function(){
+    if(!this.isShop) return false;
+    return !Engine.currentBuiling.isOwned();
+};
+
+ShopPanel.prototype.getTitle = function(action){
+    if(this.isFinancial()){
+        return (action == 'buy' ? 'Buy' : 'Sell');
+    }else{
+        return (action == 'buy' ? 'Take' : 'Give');
+    }
+};
+
+ShopPanel.prototype.getDefaultTitle = function(){
+    return this.isFinancial() ? 'Buy/Sell' : 'Give/Take';
+};
+
+ShopPanel.prototype.setUp = function(id,action){
     var data = Engine.itemsData[id];
     this.shopItem.id = id;
     this.shopItem.count = 1;
     this.shopItem.action = action;
-    if(this.isShop) this.shopItem.price = this.getPrice(id);
+    if(this.isFinancial()) this.shopItem.price = this.getPrice(id);
     this.shopItem.item.setUp(id,data);
     this.shopItem.item.setVisible(true);
     this.shopItem.nameText.setText(data.name);
     this.shopItem.nameText.setVisible(true);
     this.shopItem.countText.setText(1);
     this.shopItem.countText.setVisible(true);
-    if(this.isShop) this.displayPrice();
-    //var title = (action == 'buy' ? 'Buy' : 'Sell');
-    this.capsules['title'].setText(title);
+    this.shopItem.priceText.setVisible(this.isFinancial());
+    if(this.isFinancial()) this.displayPrice();
+    this.gold.setVisible(this.isFinancial());
+    this.capsules['title'].setText(this.getTitle(action));
     this.manageButtons();
 };
 
 ShopPanel.prototype.update = function(){
     if(!this.displayed) return;
-    if(this.isShop) this.displayPrice();
+    if(this.isFinancial()) this.displayPrice();
     this.manageButtons();
 };
 
@@ -184,7 +198,7 @@ ShopPanel.prototype.changeAmount = function(inc){
 
 ShopPanel.prototype.displayInterface = function(){
     this.slot.setVisible(true);
-    if(this.isShop) this.gold.setVisible(true);
+    if(this.isFinancial()) this.gold.setVisible(true);
     this.buttons.forEach(function(b){
         b.btn.disable();
     });
@@ -192,6 +206,7 @@ ShopPanel.prototype.displayInterface = function(){
 
 ShopPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
+    this.reset();
     this.displayInterface();
 };
 
@@ -205,7 +220,7 @@ ShopPanel.prototype.reset = function(){
     this.shopItem.id = -1;
     this.shopItem.count = 0;
     this.shopItem.price = 0;
-    this.capsules['title'].setText('Buy/Sell');
+    if(this.displayed) this.capsules['title'].setText(this.getDefaultTitle());
 };
 
 ShopPanel.prototype.requestPurchase = function(){

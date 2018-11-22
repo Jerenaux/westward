@@ -207,11 +207,12 @@ InventoryPanel.prototype.setFilter = function(filter){
 
 InventoryPanel.prototype.applyFilter = function(item){
     if(this.config.filterType == 'prices'){
+        if(Engine.currentBuiling.isOwned()) return true;
         var filter = this.config.filterItems;
         if(!filter.hasOwnProperty(item)) return false;
         if(!(parseInt(filter[item][this.config.filterKey]) > 0)) return false;
         return true;
-    }else if(this.config.filterType == 'property'){
+    }else if(this.config.filterType == 'property'){ // e.g. for items usable in battle
         var filter = this.config.filterProperty;
         return !!(Engine.itemsData[item][filter]);
     }

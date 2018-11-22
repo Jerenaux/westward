@@ -38,6 +38,22 @@
     "canFight": false,
     "health": 50
   },
+  "4":{
+    "name": "Shop",
+    "base":{
+      "width": 5,
+      "height": 4
+    },
+    "padding": 11,
+    "icon": "shop",
+    "foundations": "foundations_1",
+    "sprite": "shop",
+    "mapicon": "workshop",
+    "mainMenu": "trade",
+    "depthOffset": 2,
+    "canFight": false,
+    "health": 50
+  },
   "6":{
     "name": "Lumber camp",
     "base":{

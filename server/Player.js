@@ -51,7 +51,7 @@ function Player(){
         3: 0,
         4: 0 // civic AP
     };
-    this.baseBldrecipes = [11,6,2]; //TODO: conf
+    this.baseBldrecipes = [11,6,2,4]; //TODO: conf
     this.bldRecipes = [];
 
     this.cellsWidth = 1;

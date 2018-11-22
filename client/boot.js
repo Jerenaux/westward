@@ -16,7 +16,7 @@ var Boot = new Phaser.Class({
         this.load.json(Boot.masterKey,Boot.mapDataLocation+'/master.json');
 
         this.load.image('background', 'assets/sprites/background.png');
-        this.load.image('logo', 'assets/sprites/logo.png');
+        this.load.atlas('logo', 'assets/sprites/logo.png', 'assets/sprites/logo.json');
     },
 
     create: function(){
@@ -62,15 +62,23 @@ var Boot = new Phaser.Class({
     },
 
     displayTitle: function(){
-        Boot.title = this.add.text(512,128, 'Westward',
+        /*Boot.title = this.add.text(512,128, 'Westward',
             { font: '150px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 10 }
-            ).setOrigin(0.5,0).setAlpha(0);
-        //Boot.title = this.add.image(512,218,'logo').setAlpha(0);
+            ).setOrigin(0.5,0).setAlpha(0);*/
+        Boot.titleBg = this.add.image(512,218,'logo','bg').setAlpha(0).setScale(0.5);
+        Boot.title = this.add.image(512,218,'logo','text').setAlpha(0).setScale(0.5);
+
+        this.tweens.add({
+            targets: Boot.titleBg,
+            alpha: 1,
+            duration: 1000
+        });
 
         this.tweens.add({
             targets: Boot.title,
             alpha: 1,
-            duration: 1000,
+            duration: 1500,
+            delay: 750,
             onComplete: this.updateReadyTick.bind(this)
         });
     },

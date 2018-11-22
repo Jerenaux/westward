@@ -1053,7 +1053,6 @@ menuIcon = function(x,y,icon,menu,tox,toy){
 
 menuIcon.prototype.toggle = function(){
     if(this.displayed){
-        console.warn(Engine.currentMenu);
         if(Engine.inBuilding || Engine.currentMenu.fullHide){
             this.fullhide();
         }else {
@@ -1545,17 +1544,21 @@ Engine.makeFortMenu = function(){
 
 Engine.makeTradeMenu = function(){
     var trade = new Menu('Trade');
-    var client = trade.addPanel('client',new InventoryPanel(212,100,300,300,'Your items'));
+    trade.setTitlePos(90);
+    var y = 150;
+    var client = trade.addPanel('client',new InventoryPanel(212,y,300,300,'Your items'));
     client.setInventory(Engine.player.inventory,7,true,Engine.sellClick);
     client.filterItems = true;
     client.addCapsule('gold',150,-9,'999','gold');
     client.addButton(270, 8, 'blue','help',null,'',UI.textsData['sell_help']);
-    var shop =  trade.addPanel('shop',new InventoryPanel(542,100,300,300,'Shop'));
+    var shop =  trade.addPanel('shop',new InventoryPanel(542,y,300,300,'Shop'));
     shop.setInventory(new Inventory(20),7,true,Engine.buyClick);
     shop.filterItems = true;
     shop.addCapsule('gold',100,-9,'999','gold');
     shop.addButton(270, 8, 'blue','help',null,'',UI.textsData['buy_help']);
-    var action = new ShopPanel(212,420,300,100,'Buy/Sell');
+    var w = 300;
+    var x = (Engine.getGameConfig().width-w)/2;
+    var action = new ShopPanel(x,420,w,100,'Buy/Sell');
     trade.addPanel('action',action);
 
     trade.addEvent('onUpdateInventory',function(){
@@ -2236,8 +2239,6 @@ Engine.enterBuilding = function(id){
         mainMenu = Engine.menus.construction;
     }
 
-    if(menus.length == 0) return;
-
     menus.forEach(function(m){
         m.displayIcon();
     });
@@ -2246,32 +2247,32 @@ Engine.enterBuilding = function(id){
     building.handleOut();
 
     //TODO: rework
-    menus.forEach(function(menu){
-        if(menu.panels['shop']) {
-            menu.panels['shop'].modifyInventory(building.inventory.items);
-            if( menu.panels['shop'].filterItems) {
-                menu.panels['shop'].modifyFilter({
+    var menu = mainMenu;
+    if(menu.panels['shop']) {
+        menu.panels['shop'].modifyInventory(building.inventory.items);
+        if( menu.panels['shop'].filterItems) {
+            menu.panels['shop'].modifyFilter({
+                type: 'prices',
+                items: building.prices,
+                key: 1,
+                hard: false//!buildingData.workshop
+            });
+        }
+        menu.panels['shop'].updateInventory();
+
+        if(menu.panels['client']) {
+            if( menu.panels['client'].filterItems) {
+                menu.panels['client'].modifyFilter({
                     type: 'prices',
                     items: building.prices,
-                    key: 1,
-                    hard: false//!buildingData.workshop
+                    key: 0,
+                    hard: false
                 });
             }
-            menu.panels['shop'].updateInventory();
-
-            if(menu.panels['client']) {
-                if( menu.panels['client'].filterItems) {
-                    menu.panels['client'].modifyFilter({
-                        type: 'prices',
-                        items: building.prices,
-                        key: 0,
-                        hard: false
-                    });
-                }
-                menu.panels['client'].updateInventory();
-            }
+            menu.panels['client'].updateInventory();
         }
-    });
+    }
+
     Engine.buildingTitle.setText(buildingData.name);
     Engine.buildingTitle.capsule.setText(Engine.currentBuiling.ownerName+'\'s');
     //Engine.settlementTitle.setText(settlementData.name);
@@ -2478,22 +2479,22 @@ Engine.unequipClick = function(){ // Sent when unequipping something
 };
 
 Engine.sellClick = function(){
-    Engine.currentMenu.panels['action'].setUp(this.itemID,'sell','Sell');
+    Engine.currentMenu.panels['action'].setUp(this.itemID,'sell');
 };
 
 Engine.buyClick = function(){
-    Engine.currentMenu.panels['action'].setUp(this.itemID,'buy','Buy');
+    Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
 };
 
 Engine.giveClick = function(itemID){
     Engine.currentMenu.panels['action'].display();
-    Engine.currentMenu.panels['action'].setUp(itemID,'sell','Give');
+    Engine.currentMenu.panels['action'].setUp(itemID,'sell');
 };
 
 Engine.takeClick = function(){
     if(Engine.currentBuiling.owner != Engine.player.id) return;
     Engine.currentMenu.panels['action'].display();
-    Engine.currentMenu.panels['action'].setUp(this.itemID,'buy','Take');
+    Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
 };
 
 Engine.commitClick = function(){

@@ -37,12 +37,10 @@ Misc:
 -> Keep class quests (+ "smart quests" based on settlement situation?)
 -> Menu to list buildings (but on-site management)
 
-- Disqus
+- Comments
 - Region selection texts
 - Review all item texts & help
 - Enable workshops and shops
-(- Block if animal/civ/player in the way)
-(- Decide how to handle items/spawn clusters in the way)
 (- Display info on top of blds)
 UI: display building health 
 

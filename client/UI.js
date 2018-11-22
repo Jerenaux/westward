@@ -25,7 +25,6 @@ var UI = {
             this.load.image('bigbg', 'assets/sprites/bigbg.png');
             this.load.image('bigbg_mask', 'assets/sprites/bigbg_mask.png');
             this.load.image('worldmap', 'assets/sprites/worldmap.png');
-            //this.load.image('dangersetl', 'assets/sprites/dangersetl.png');
             this.load.image('campdiamond', 'assets/sprites/camp_diamond.png');
             this.load.image('setldiamond', 'assets/sprites/setl_diamond.png');
             this.load.image('wood', 'assets/sprites/wood.jpg');
@@ -272,6 +271,11 @@ UI.makeClassPanel = function(menu,classID,x,y,classw,classh){
 UI.launchGameMode = function(){
     Boot.buttons.forEach(function(b){
         b.hide();
+    });
+    UI.scene.tweens.add({
+        targets: Boot.titleBg,
+        alpha: 0,
+        duration: 1000
     });
     UI.scene.tweens.add({
         targets: Boot.title,
