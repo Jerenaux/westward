@@ -297,7 +297,7 @@ var Building = new Phaser.Class({
         return !this.built;
     },
 
-    isOwned: function(){ // buy the player
+    isOwned: function(){ // by the player
         return this.owner == Engine.player.id;
     },
 

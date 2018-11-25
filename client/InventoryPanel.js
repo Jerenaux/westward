@@ -192,8 +192,9 @@ InventoryPanel.prototype.setUpZone = function(nbDisplayed){
     this.zone.input.hitArea = polygon;
 };
 
-InventoryPanel.prototype.modifyInventory = function(items){
-    this.inventory.setItems(items);
+InventoryPanel.prototype.modifyInventory = function(inv){
+    //this.inventory.setItems(items);
+    this.inventory = inv;
 };
 
 InventoryPanel.prototype.setFilter = function(filter){

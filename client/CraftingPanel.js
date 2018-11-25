@@ -135,12 +135,14 @@ CraftingPanel.prototype.changeAmount = function(inc){
 };
 
 CraftingPanel.prototype.makeIngredientsList = function(recipe,amount){
-    var result = {};
+    var list = {};
     for(var item in recipe){
         if(!recipe.hasOwnProperty(item)) continue;
-        result[item] = recipe[item]*amount;
+        list[item] = recipe[item]*amount;
     }
-    return result;
+    var inv = new Inventory(10);
+    inv.setItems(list);
+    return inv;
 };
 
 

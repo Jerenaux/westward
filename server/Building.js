@@ -239,11 +239,12 @@ Building.prototype.getPrice = function(item,nb,action){
     return parseInt(this.prices[item][key])*nb;
 };
 
-Building.prototype.canBuy = function(item,nb){ // check if building has gold and room
+Building.prototype.canBuy = function(item,nb,isFinancial){ // check if building has gold and room
     if(this.inventory.isFull()) {
         console.log('Error: building inventory full');
         return false;
     }
+    if(isFinancial == false) return true;
     if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item][0]) == 0){
         console.log('Error: building does not buy this item');
         return false;
@@ -255,11 +256,12 @@ Building.prototype.canBuy = function(item,nb){ // check if building has gold and
     return true;
 };
 
-Building.prototype.canSell = function(item,nb){
+Building.prototype.canSell = function(item,nb,isFinancial){
     if(!this.hasItem(item,nb)){
         console.log('Error: building does not have this item');
         return false;
     }
+    if(!isFinancial) return true;
     if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item][1]) == 0){
         console.log('Error: building does not sell this item');
         return false;
@@ -284,6 +286,10 @@ Building.prototype.giveItem = function(item,nb,remember){
 Building.prototype.takeItem = function(item,nb){
     this.inventory.take(item,nb);
     this.setProperty('items',this.inventory.toList());
+};
+
+Building.prototype.isOwnedBy = function(player){
+    return this.owner == player.id;
 };
 
 Building.prototype.setItem = function(item,nb){

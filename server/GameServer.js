@@ -92,7 +92,6 @@ GameServer.createModels = function(){
         prices: mongoose.Schema.Types.Mixed,
         gold: {type: Number, min: 0},
         built: Boolean,
-        progress: {type: Number, min: 0, max: 100}, // %
         health: {type: Number, min: 0}
     });
     var playerSchema = mongoose.Schema({
@@ -694,7 +693,7 @@ GameServer.handleBattleAction = function(data,socketID){
     player.battle.processAction(player,data);
 };
 
-GameServer.handleStockChange = function(data,socketID){
+/*GameServer.handleStockChange = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var building = GameServer.buildings[data.building];
     var nb = data.nb;
@@ -713,7 +712,7 @@ GameServer.handleStockChange = function(data,socketID){
         building.giveItem(item,nb,false);
         building.updateBuild();
     }
-};
+};*/
 
 GameServer.handleShop = function(data,socketID) {
     var player = GameServer.getPlayer(socketID);
@@ -722,23 +721,28 @@ GameServer.handleShop = function(data,socketID) {
     var action = data.action;
     if(!player.isInBuilding()) return;
     var building = GameServer.buildings[player.inBuilding];
-    if(action == 'buy'){
-        if(!building.canSell(item,nb)) return;
-        var price = building.getPrice(item,nb,'buy');
-        if(!player.canBuy(price)) return;
-        player.takeGold(price,true);
+    var isFinancial = (!building.isOwnedBy(player));
+    if(action == 'buy'){ // or take
+        if(!building.canSell(item,nb,isFinancial)) return;
+        if(isFinancial) {
+            var price = building.getPrice(item, nb, 'buy');
+            if (!player.canBuy(price)) return;
+            player.takeGold(price, true);
+            building.giveGold(price);
+        }
         player.giveItem(item,nb,true);
         building.takeItem(item,nb);
-        building.giveGold(price);
-    }else{
+    }else{ // sell or give
         if(!player.hasItem(item,nb)) return;
-        if(!building.canBuy(item,nb)) return;
-        var price = building.getPrice(item,nb,'sell');
-        player.giveGold(price,true);
-        player.takeItem(item,nb,true);
-        building.takeGold(price);
+        if(!building.canBuy(item,nb,isFinancial)) return;
+        if(isFinancial) {
+            var price = building.getPrice(item, nb, 'sell');
+            player.giveGold(price, true);
+            building.takeGold(price);
+            player.gainClassXP(GameServer.classes.merchant,Math.floor(price/10), true); // TODO: factor in class level
+        }
+        player.takeItem(item, nb, true);
         building.giveItem(item,nb,true); // true = remember
-        player.gainClassXP(GameServer.classes.merchant,Math.floor(price/10), true); // TODO: factor in class level
     }
     building.save();
     Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type});

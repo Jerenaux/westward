@@ -192,7 +192,7 @@ ShopPanel.prototype.decreaseAmount = function(){
 ShopPanel.prototype.changeAmount = function(inc){
     this.shopItem.count = Utils.clamp(this.shopItem.count+inc,1,999);
     this.shopItem.countText.setText(this.shopItem.count);
-    if(this.isShop) this.displayPrice();
+    if(this.isFinancial()) this.displayPrice();
     this.manageButtons();
 };
 
@@ -227,7 +227,14 @@ ShopPanel.prototype.requestPurchase = function(){
     if(Date.now() - this.lastPurchase < 200) return;
     var stock = Engine.currentBuiling.getItemNb(this.shopItem.id);
     if(this.shopItem.action == 'buy' && this.shopItem.count > stock) this.shopItem.count = stock;
-    if(this.isShop) { // When actually buying and selling
+
+    Client.sendPurchase(this.shopItem.id, this.shopItem.count, this.shopItem.action);
+    if(!this.isShop && Client.tutorial){
+        var verb = (this.shopItem.action == 'buy' ? 'take' : 'give');
+        Engine.tutorialStock(verb,this.shopItem.id,this.shopItem.count);
+    }
+
+    /*if(this.isShop) { // When actually buying and selling
         Client.sendPurchase(this.shopItem.id, this.shopItem.count, this.shopItem.action);
     }else{ // When taking and giving stock
         Client.sendStock(this.shopItem.id,this.shopItem.count,Engine.currentBuiling.id,this.shopItem.action);
@@ -235,6 +242,6 @@ ShopPanel.prototype.requestPurchase = function(){
             var verb = (this.shopItem.action == 'buy' ? 'take' : 'give');
             Engine.tutorialStock(verb,this.shopItem.id,this.shopItem.count);
         }
-    }
+    }*/
     this.lastPurchase = Date.now();
 };

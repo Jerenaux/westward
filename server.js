@@ -153,7 +153,6 @@ io.on('connection',function(socket){
             'respawn': gs.handleRespawn,
             'screenshot': gs.handleScreenshot,
             'shop': gs.handleShop,
-            'stock':gs.handleStockChange,
             'unequip': gs.handleUnequip,
             'use': gs.handleUse,
 

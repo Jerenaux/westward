@@ -1583,15 +1583,17 @@ Engine.makeTradeMenu = function(){
 
 Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
+    crafting.setTitlePos(90);
     crafting.setSound(Engine.scene.sound.add('crafting'));
 
     //var recipes = new InventoryPanel(765,100,235,380,'Recipes');
     //recipes.setInventory(Engine.workshopRecipes,4,false,Engine.recipeClick);
-    var recipes = new Panel(700,100,300,380,'Recipes');
+    var yg = 150;
+    var recipes = new Panel(700,yg,300,380,'Recipes');
     recipes.addButton(270, 8, 'blue','help',null,'',UI.textsData['recipes_help']);
     crafting.addPanel('recipes',recipes);
 
-    var y = 135;
+    var y = yg+35;
     var h = 155;
     var gap = 20;
     var categories = ['equipment','ingredients'];
@@ -1601,13 +1603,13 @@ Engine.makeCraftingMenu = function(){
         y += (h+gap);
     });
 
-    var combi = crafting.addPanel('combi',new CraftingPanel(450,100,240,380,'Combination'));
+    var combi = crafting.addPanel('combi',new CraftingPanel(450,yg,240,380,'Combination'));
     combi.addButton(210, 8, 'blue','help',null,'',UI.textsData['combi_help']);
 
-    var ingredients = crafting.addPanel('ingredients',new InventoryPanel(450,300,240,380,'',true)); // true = invisible
+    var ingredients = crafting.addPanel('ingredients',new InventoryPanel(450,yg+200,240,380,'',true)); // true = invisible
     ingredients.setInventory(new Inventory(5),5,true,null,Engine.player.inventory);
 
-    var items = crafting.addPanel('items',new InventoryPanel(40,100,390,185,'Your items'));
+    var items = crafting.addPanel('items',new InventoryPanel(40,yg,390,185,'Your items'));
     items.addButton(360, 8, 'blue','help',null,'',UI.textsData['craftitems_help']);
     items.setInventory(Engine.player.inventory,9,true);
     items.button = new BigButton(items.x+(items.width/2),items.y+items.height-20,
@@ -1615,7 +1617,7 @@ Engine.makeCraftingMenu = function(){
             Engine.toggleStock(1);
         });
 
-    var stock = crafting.addPanel('stock',new InventoryPanel(40,290,390,185,'Workshop stock'));
+    var stock = crafting.addPanel('stock',new InventoryPanel(40,yg+190,390,185,'Workshop stock'));
     stock.setInventory(new Inventory(20),9,true);
     //stock.addButton(270, 8, 'blue','help',null,'',UI.textsData['buy_help']);
     stock.button = new BigButton(stock.x+(stock.width/2),stock.y+stock.height-20,
@@ -1626,7 +1628,7 @@ Engine.makeCraftingMenu = function(){
     crafting.addEvent('onUpdateRecipes',function(){
         //recipes.updateInventory();
         categories.forEach(function(cat){
-            crafting.panels['cat_'+cat].updateInventory();
+            crafting.panels[cat+'_cat'].updateInventory();
         });
     });
 
@@ -1636,7 +1638,7 @@ Engine.makeCraftingMenu = function(){
     });
 
     crafting.addEvent('onUpdateShop',function(){
-        stock.modifyInventory(Engine.currentBuiling.inventory.items);
+        stock.modifyInventory(Engine.currentBuiling.inventory);
         stock.updateInventory();
     });
 
@@ -2249,7 +2251,8 @@ Engine.enterBuilding = function(id){
     //TODO: rework
     var menu = mainMenu;
     if(menu.panels['shop']) {
-        menu.panels['shop'].modifyInventory(building.inventory.items);
+        //menu.panels['shop'].modifyInventory(building.inventory.items);
+        menu.panels['shop'].modifyInventory(building.inventory);
         if( menu.panels['shop'].filterItems) {
             menu.panels['shop'].modifyFilter({
                 type: 'prices',

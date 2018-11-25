@@ -523,9 +523,9 @@ General:
 
 Testing:
 -------
-- Figure out testing:
-- Have a test server, test database a test map set up
-- Open browser and run test script in test world
+- Make lists of bugs happening and think about tests to make to catch them, at the finest granularity possible
+- Tests on inventory manipulations, ...
+- Test the connexion of an old player to see if it crashes or not; build sth, start a fight, etc.
 - Manually run it before deployment
 - Have the testing pipeline work with both development and production code (run it once, prodify, then check again, the upload)
 - Optimize: remove divisions, benchmark runtimes, etc.
