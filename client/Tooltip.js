@@ -62,9 +62,13 @@ Tooltip.prototype.makeBody = function(){
 
 Tooltip.prototype.makeStatsIcons = function(){
     var i = 0;
-    for(var stat in Stats.dict) {
-        if (!Stats.dict.hasOwnProperty(stat)) continue;
-        var statData = Stats.dict[stat];
+    for(var stat in Stats) {
+        if (!Stats.hasOwnProperty(stat)) continue;
+        var statData = Stats[stat];
+        if(!statData) {
+            i++;
+            continue;
+        }
         var x = this.x+15;
         var y = this.y+(30*(i + 1));
         var icon = UI.scene.add.sprite(x,y,'icons2', statData.frame);
@@ -125,14 +129,19 @@ Tooltip.prototype.getNextText = function() {
 Tooltip.prototype.displayStats = function(effects,nbEffects){
     var i = 0;
     var descH = this.descText.text ? this.descText.height : 0;
-    for(var stat in Stats.dict) {
-        if (!Stats.dict.hasOwnProperty(stat)) continue;
+    for(var stat in Stats) {
+        if (!Stats.hasOwnProperty(stat)) continue;
         this.icons[i].setVisible((i < nbEffects));
         this.iconsTexts[i].setVisible((i < nbEffects));
         if(i < nbEffects){
             var key = Object.keys(effects)[i];
             var val = effects[key];
-            var statData = Stats.dict[key];
+            var statData = Stats[key];
+            if(!statData) {
+                console.warn('key not in statData, have stats names changed recently?');
+                i++;
+                continue;
+            }
             if(val > 0) val = "+"+val;
             if(statData.suffix) val = val+statData.suffix;
             var icon = this.icons[i];

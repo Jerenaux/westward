@@ -9,7 +9,7 @@
     "atlas": "items",
     "frame":"food",
     "name": "Food",
-    "desc": "Of no use to individuals, this is in contrast the most important resource for a settlement, allowing them to maintain food surplus and develop. Make sure to sell your food to your settlement! Food can be obtained from dead animals or gathered by specific resource buildings.",
+    "desc": "Can be used to boost the productivity of buildings, as well as to feed troops.",
     "isResource": true
   },
   "2":{
@@ -28,7 +28,7 @@
     "atlas": "items2",
     "frame":"timber",
     "name": "Timber",
-    "desc": "Used by settlements to build new buildings."
+    "desc": "Used to build new buildings."
   },
   "4":{
     "atlas": "items2",
@@ -54,7 +54,7 @@
     "atlas": "items2",
     "frame":"flask",
     "name": "Cradle",
-    "desc": "Bitter potion made of Daybreak and clover, regenerates a lot of health.",
+    "desc": "Bitter potion made of daybreak and clover, regenerates a lot of health.",
     "isPotion": true,
     "recipe": {"17":1,"18":1},
     "effects":{"hp":100},
@@ -260,7 +260,7 @@
     "isCrafted": true,
     "recipe":{"7":1,"21":1,"26":1},
     "equipment": "meleew",
-    "effects":{"mdmg":5},
+    "effects":{"dmg":5},
     "useInBattle": true,
     "sound": "equip"
   },

@@ -1,5 +1,4 @@
 // https://github.com/lorenwest/node-config/wiki/Configuration-Files
-
 {
    battle: {
         enabled: true,
@@ -90,7 +89,17 @@
             offerTutorial: true
         },
         config: {
-            chatTimeout: 5000 //ms
+            chatTimeout: 5000, //ms
+            starting: { // TODO: sync to db
+                0: {
+                    x: 1203,
+                    y: 154
+                },
+                1: {
+                    x: 512,
+                    y: 654
+                }
+            }
         }
     }
 }

@@ -38,11 +38,7 @@ Misc:
 -> Menu to list buildings (but on-site management)
 
 - Comments
-- Region selection texts
-- Review all item texts & help
-- Enable workshops and shops
-(- Display info on top of blds)
-UI: display building health 
+- Display info on top of blds
 
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
@@ -523,8 +519,9 @@ General:
 
 Testing:
 -------
+- Use Jasmine for client-side tests? Selenium for visual ones?
 - Make lists of bugs happening and think about tests to make to catch them, at the finest granularity possible
-- Tests on inventory manipulations, ...
+- Tests on inventory manipulations, proper display of stats in items (w.r.t names used in Stats)
 - Test the connexion of an old player to see if it crashes or not; build sth, start a fight, etc.
 - Manually run it before deployment
 - Have the testing pipeline work with both development and production code (run it once, prodify, then check again, the upload)

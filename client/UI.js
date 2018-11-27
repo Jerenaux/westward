@@ -413,16 +413,19 @@ UI.displaySettlement = function(data){
         loop: -1
     });
 
-    var w = 350;
+    /*var w = 350;
     var h = 300;
     var panel = new SettlementPanel(UI.getGameWidth()-w,UI.getGameHeight()-h,w,h,data.name);
-    panel.setUp(data);
+    panel.setUp(data);*/
+
+    icon.setlID = data.id;
 
     icon.on('pointerdown',function(){
         if(UI.SSpanel) UI.SSpanel.hide();
-        panel.display();
-        UI.SSpanel = panel;
-    });
+        //panel.display();
+        //UI.SSpanel = panel;
+        UI.selectSettlement(this.setlID);
+    }.bind(icon));
     icon.on('pointerover',function(){
         UI.tooltip.updateInfo(data.name);
         UI.tooltip.display();

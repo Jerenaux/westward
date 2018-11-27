@@ -1,6 +1,7 @@
 {
   "2":{
     "name":"Tower",
+    "desc": "A guard tower than can intercept enemies.",
     "padding": 15,
     "base":{
       "width": 4,
@@ -23,10 +24,12 @@
   },
   "3":{
     "name": "Workshop",
+    "desc": "Allows to perform crafting.",
     "base":{
       "width": 4,
       "height": 4
     },
+    "recipe": {"3":25},
     "padding": 11,
     "icon": "workshop",
     "foundations": "foundations_1",
@@ -39,6 +42,7 @@
   },
   "4":{
     "name": "Shop",
+    "desc": "Allows to sell or buy items to and from other players.",
     "base":{
       "width": 5,
       "height": 4
@@ -56,6 +60,7 @@
   },
   "6":{
     "name": "Lumber camp",
+    "desc": "Produces timber at regular intervals (must be placed next to a forest).",
     "base":{
       "width": 3,
       "height": 3
@@ -73,6 +78,7 @@
   },
   "11":{
     "name": "Shack",
+    "desc": "A place to rest.",
     "base":{
       "width": 4,
       "height": 3
