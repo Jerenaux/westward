@@ -155,7 +155,7 @@ CraftingPanel.prototype.reset = function(){
     this.craftItem.id = -1;
     this.craftItem.count = 0;
     this.craftItem.recipe = null;
-    Engine.getIngredientsPanel().modifyInventory([]);
+    Engine.getIngredientsPanel().modifyInventory(new Inventory(5));
 };
 
 CraftingPanel.prototype.requestCraft = function(){

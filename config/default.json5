@@ -90,7 +90,7 @@
         },
         config: {
             chatTimeout: 5000, //ms
-            starting: { // TODO: sync to db
+            /*starting: { // TODO: sync to db
                 0: {
                     x: 1203,
                     y: 154
@@ -99,7 +99,7 @@
                     x: 512,
                     y: 654
                 }
-            }
+            }*/
         }
     }
 }

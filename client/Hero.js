@@ -36,6 +36,7 @@ var Hero = new Phaser.Class({
         this.classxp = data.classxp || new classDataShell();
         this.classlvl = data.classlvl || new classDataShell();
         this.ap = data.ap || new classDataShell();
+        this.name = data.name;
     },
 
     updateData: function(data){ // don't call this 'update' or else conflict with Player.update() for other player updates

@@ -1,6 +1,5 @@
 Release:
-- Flush players once
-- Dis/enable battles + wander, aggro, etc.
+- Flush all db!
 - Push
 
 Admin
@@ -37,7 +36,8 @@ Misc:
 -> Keep class quests (+ "smart quests" based on settlement situation?)
 -> Menu to list buildings (but on-site management)
 
-- Comments
+
+- Better handling of returning players with no DB match
 - Display info on top of blds
 
 
@@ -460,7 +460,7 @@ Deployment:
 - Automatically fetch maps that have been modified, and copy to deploy dir
 - Automate git upload to Heroku (http://radek.io/2015/10/27/nodegit/)
 - Tool to gather, uglify and compress all relevant source files when moving to production directory
-- Full pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
+- Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?
 - Flatten chunks and reduce them to arrays only
 - Code to load flattened chunks in game
@@ -522,6 +522,7 @@ Testing:
 - Use Jasmine for client-side tests? Selenium for visual ones?
 - Make lists of bugs happening and think about tests to make to catch them, at the finest granularity possible
 - Tests on inventory manipulations, proper display of stats in items (w.r.t names used in Stats)
+- Entering and re-entering workshop
 - Test the connexion of an old player to see if it crashes or not; build sth, start a fight, etc.
 - Manually run it before deployment
 - Have the testing pipeline work with both development and production code (run it once, prodify, then check again, the upload)

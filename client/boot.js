@@ -21,7 +21,7 @@ var Boot = new Phaser.Class({
 
     create: function(){
         Client.getBootParameters();
-        Client.checkForNewPlayer();
+        //Client.checkForNewPlayer();
 
         var masterData = this.cache.json.get(Boot.masterKey);
         Boot.tilesets = masterData.tilesets;

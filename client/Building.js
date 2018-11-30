@@ -78,6 +78,7 @@ var Building = new Phaser.Class({
         var buildingData = Engine.buildingsData[this.buildingType];
         this.setFrame(buildingData.sprite);
         this.resetDepth();
+        this.setInteractive();
 
         if(buildingData.accessory){
             this.accessory = Engine.scene.add.sprite(

@@ -187,8 +187,25 @@ GameServer.readMap = function(mapsPath,test){
     Prism.logEvent(null,'server-start');
 };
 
-GameServer.getBootParams = function(){
-    return GameServer.clientParameters;
+GameServer.getBootParams = function(socket,data){
+    var playerID = data.id;
+    var pkg = clone(GameServer.clientParameters,false);
+
+    GameServer.PlayerModel.findOne(
+        {_id: new ObjectId(playerID)},
+        function (err, doc) {
+            if (err) return console.warn(err);
+            if(doc) {
+                pkg.newPlayer = false;
+            }else{
+                console.log('Unrecognized returning player ');
+                pkg.newPlayer = true;
+            }
+            //return GameServer.clientParameters;
+            console.warn(pkg);
+            socket.emit('boot-params',pkg);
+        }
+    );
 };
 
 GameServer.readPlayersData = function(){
@@ -300,8 +317,8 @@ GameServer.onInitialized = function(){
             y: 655
         }
     }*/
-    GameServer.addAnimal(1189,158,0);
-    GameServer.addItem(1199,160,3);
+    //GameServer.addAnimal(1189,158,0);
+    //GameServer.addItem(1199,160,3);
     //GameServer.addAnimal(1204,168,0);
     /*GameServer.addCiv(513,656);
     GameServer.addCiv(514,657);

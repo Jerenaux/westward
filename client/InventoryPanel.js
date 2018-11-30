@@ -193,7 +193,6 @@ InventoryPanel.prototype.setUpZone = function(nbDisplayed){
 };
 
 InventoryPanel.prototype.modifyInventory = function(inv){
-    //this.inventory.setItems(items);
     this.inventory = inv;
 };
 

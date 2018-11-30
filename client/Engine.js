@@ -124,7 +124,7 @@ Engine.preload = function() {
 
     // #################""
 
-    this.load.image('grass', 'assets/sprites/grassbg.png');
+    //this.load.image('grass', 'assets/sprites/grassbg.png');
     // Misc
     this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
@@ -441,6 +441,11 @@ Engine.nextTut = function(){
 Engine.displayTutorial = function(){
     var i = Engine.nextTutorial++;
 
+    if(i >= Engine.tutorialData.length){
+        Engine.currentTutorialPanel.hide();
+        return;
+    }
+
     var specs = Engine.tutorialData;
     var spec = specs[i];
     var pos = spec.pos;
@@ -499,7 +504,6 @@ Engine.checkHook = function(){
 };
 
 Engine.tutorialHook = function(hook){
-    console.log(hook,'vs',Engine.tutHook);
     if(Engine.tutHook == hook) Engine.nextTut();
 };
 
@@ -510,7 +514,6 @@ Engine.tutorialBld = function(x,y,bldID){
 };
 
 Engine.tutorialStock = function(action,item,nb){
-    console.warn(action,item,nb);
     // TODO: Make all this much more declarative
     if(action == 'give') nb *= -1;
     var newnb = Engine.currentBuiling.getItemNb(item)-nb;
@@ -518,7 +521,8 @@ Engine.tutorialStock = function(action,item,nb){
     var updt = {buildings:{}};
     updt.buildings[Engine.currentBuiling.id] = {items:items};
     Engine.updateWorld(updt);
-    items = [[parseInt(item),Engine.player.getItemNb()+nb]];
+    items = [];
+    items.push([parseInt(item),Engine.player.getItemNb(item)+nb]);
     var sign = (nb > 0 ? '+' : '');
     Engine.player.updateData(
         {items:items,
@@ -527,7 +531,12 @@ Engine.tutorialStock = function(action,item,nb){
     //if(newnb == 0) Engine.tutorialHook('empty:'+Engine.currentBuiling.id+':'+item);
     Engine.tutorialHook('stock:'+Engine.currentBuiling.id+':'+item+':'+newnb);
     if(action == 'give'){
-        // TODO build
+       var recipe = Engine.buildingsData[Engine.currentBuiling.buildingType].recipe;
+       if(newnb >= recipe[item]){
+           var updt = {buildings:{}};
+           updt.buildings[Engine.currentBuiling.id] = {built:true};
+           Engine.updateWorld(updt);
+       }
     }
 }
 ;
@@ -543,20 +552,21 @@ Engine.bootTutorial = function(part){
     Engine.initWorld(data);
     data = {
         gold: 100,
-        stats: [{k:'hpmax',v:300},{k:'hp',v:300}]
+        stats: [{k:'hpmax',v:300},{k:'hp',v:300}],
+        bldRecipes: [11,6,2,3,4]
     };
     Engine.player.updateData(data);
     data = {
         'newbuildings':[
-            {id:0,type:11,x:1203,y:156,built:true},
-            {id:1,type:11,x:1199,y:153,built:true},
-            {id:2,type:3,x:1189,y:159,built:false,items:[[3,10]]}
+            {id:0,type:11,x:1203,y:156,built:true,ownerName:'Roger'},
+            {id:1,type:11,x:1199,y:153,built:true,ownerName:'Tom'},
+            {id:2,type:3,x:1189,y:159,built:false,items:[[3,20]],ownerName:'Joe'}
         ]
     };
     Engine.updateWorld(data);
 
     Engine.tutorialData = Engine.scene.cache.json.get('tutorials')[part];
-    Engine.nextTutorial = 0;
+    Engine.nextTutorial = 15;
     Engine.displayTutorial();
 };
 
@@ -584,7 +594,7 @@ Engine.initWorld = function(data){
     if(Engine.miniMap) Engine.miniMap.display();
     Engine.updateAllOrientationPins();
 
-    if(Client.isNewPlayer()) {
+    if(Client.isNewPlayer() && !Client.tutorial) {
         var w = 400;
         var h = 290;
         var panel = new InfoPanel((UI.getGameWidth() - w) / 2, (UI.getGameHeight() - h) / 2, w, h, 'Welcome');
@@ -1632,14 +1642,14 @@ Engine.makeCraftingMenu = function(){
         });
     });
 
-    crafting.addEvent('onUpdateInventory',function(){
-        items.updateInventory();
-        ingredients.updateInventory();
-    });
-
     crafting.addEvent('onUpdateShop',function(){
         stock.modifyInventory(Engine.currentBuiling.inventory);
         stock.updateInventory();
+    });
+
+    crafting.addEvent('onUpdateInventory',function(){
+        items.updateInventory();
+        ingredients.updateInventory();
     });
 
     crafting.addEvent('onDisplay',function(){
@@ -2251,7 +2261,6 @@ Engine.enterBuilding = function(id){
     //TODO: rework
     var menu = mainMenu;
     if(menu.panels['shop']) {
-        //menu.panels['shop'].modifyInventory(building.inventory.items);
         menu.panels['shop'].modifyInventory(building.inventory);
         if( menu.panels['shop'].filterItems) {
             menu.panels['shop'].modifyFilter({
@@ -2277,7 +2286,8 @@ Engine.enterBuilding = function(id){
     }
 
     Engine.buildingTitle.setText(buildingData.name);
-    Engine.buildingTitle.capsule.setText(Engine.currentBuiling.ownerName+'\'s');
+    var owner = Engine.currentBuiling.ownerName || 'Player';
+    Engine.buildingTitle.capsule.setText(owner+'\'s');
     //Engine.settlementTitle.setText(settlementData.name);
     //if(Engine.buildingTitle.width < Engine.settlementTitle.width) Engine.buildingTitle.resize(Engine.settlementTitle.width);
     Engine.buildingTitle.move(Engine.currentMenu.titleY);

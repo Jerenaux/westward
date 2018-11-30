@@ -2,7 +2,7 @@
   "part1": [
     {"pos":["c","c",350,146],"txt":"Welcome to Westward's tutorial. In this first part, we'll see how buildings can be built and how you can collaborate with other players to do so!"},
     {"pos":[560,"c",300,100],"txt":"But first... that's you, right here, in the middle of the screen. That's your character. "},
-    {"pos": null,"hook":"move","txt":"To move, simply click somewhere in the gras. Go ahead, try it!"},
+    {"pos": null,"hook":"move","txt":"To move, simply click somewhere in the grass. Go ahead, try it!"},
     {"pos": [560,"c",300,120],"txt":"Great! All other actions take place by clicking on things, and will be covered throughout the rest of the tutorial."},
     {"pos": null, "camera":[1206,156],"txt":"See these shacks? They have been built by other players. Apparently, you are not alone around here."},
     {"pos": null, "camera":"keep","txt":"In Westward, players can build various buildings more or less anywhere to fulfill their needs and help them survive."},
@@ -11,18 +11,19 @@
     {"pos": null,"txt":"Buildings are built by bringing construction material to them."},
     {"pos": null, "hook": "exit","txt":"Looks like timber is needed. Perhaps you could help? Exit the building by clicking on the door icon."},
     {"pos": null,"txt":"You can acquire timber by building a lumber camp. It'll generate timber for you automatically at regular intervals."},
-    {"pos": null,"txt":"The resources of the land deplete as players extract them, hence the continuous march Westward to keep finding new ones and expanding!"},
+    {"pos": [724,"c",300,140],"txt":"The resources of the land deplete as players extract them, hence the continuous march Westward to keep finding new ones and expanding!"},
     {"pos": [50,50,300,120],"hook": "buildmenu","txt":"To build a building, first open the 'Build' menu by clicking on the shovel icon, here on the left."},
     {"pos": [280,50,300,120],"hook": "bldselect:6","txt":"Hover a building icon to see its name. Find the lumber camp icon and click on it."},
-    {"pos": null,"hook": "bldunselect:6","txt":"Now pick a location to build it. It will only be possible next to a forest; get closer to the forest to the east and build it there. (Click back on the shovel to cancel)"},
-    {"pos": null,"txt":"Contrary to the Workshop you visitted, this building doesn't require construction material, so it's built immediately!"},
+    {"pos": [280,50,300,125],"hook": "bldunselect:6","txt":"Now pick a location to build it. It will only be possible next to a forest; get closer to the forest to the east and build it there. (Click back on the shovel to cancel)"},
+    {"pos": null,"txt":"Contrary to the Workshop you visited, this building doesn't require construction material, so it's built immediately!"},
     {"pos": null, "hook":"bld:4","txt":"Enter your lumber camp by clicking on it."},
     {"pos": [10,50,300,140],"txt":"Production normally takes a bit of time, but for the sake of the tutorial, your building has magically produced timber in an instant!"},
     {"pos": null,"hook":"stock:4:3:0","txt":"Since you own this building, you can take anything from it's stock. Click on the timber icon and take it all."},
     {"pos": null,"hook":"bld:2","txt":"Now exit your building and go to the Wokshop under construction."},
     {"pos":null,"txt":"You can contribute to a building's construction by giving material freely, or by selling it for money."},
-    {"pos":null,"hook":"stock:2:3:5","txt":"Let's be altruistic for now. Click on the button to give all your timber."},
+    {"pos":null,"hook":"stock:2:3:25","txt":"Let's be altruistic for now. Click on the button to give all your timber."},
     {"pos":null,"txt":"Great! The Workshop has been built! It'll be essential to the local community's survival."},
-    {"pos":null,"txt":"As you can see, players can complement and help each other, freely or for gold, to create settlements that will help them survive."}
+    {"pos":null,"txt":"As you can see, players can complement and help each other, freely or for gold, to create settlements that will help them survive."},
+    {"pos":null,"txt":"This is the end of this tutorial, feel free to leave and explore the real game now!"}
   ]
 }

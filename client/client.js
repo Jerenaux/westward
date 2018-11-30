@@ -57,12 +57,12 @@ Client.getIDStamp = function(){
 };
 
 Client.getBootParameters = function(){
-    Client.socket.emit('boot-params');
+    Client.socket.emit('boot-params',{id:Client.getPlayerID()});
 };
 
 Client.checkForNewPlayer = function(){
     console.log('Player id:',Client.getPlayerID());
-    Client.newPlayer = (Client.getPlayerID() === null);
+    //Client.newPlayer = (Client.getPlayerID() === null);
 };
 
 Client.isNewPlayer = function(){
@@ -112,6 +112,7 @@ Client.socket.on('boot-params',function(data){
     Client.gameConfig = data;
     console.log(Client.gameConfig);
     Boot.bootParamsReceived();
+    Client.newPlayer = data.newPlayer;
 });
 
 Client.socket.on('update',function(data){ // This event triggers uppon receiving an update packet (data)

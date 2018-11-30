@@ -303,6 +303,11 @@ UI.launchTutorialMode = function(){
         b.hide();
     });
     UI.scene.tweens.add({
+        targets: Boot.titleBg,
+        alpha: 0,
+        duration: 1000
+    });
+    UI.scene.tweens.add({
         targets: Boot.title,
         alpha: 0,
         duration: 1000,
