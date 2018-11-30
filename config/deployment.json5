@@ -37,7 +37,7 @@
     client: {
         boot:{
             forceNewPlayer: true,
-            offerTutorial: false
+            offerTutorial: true
         }
     }
 }

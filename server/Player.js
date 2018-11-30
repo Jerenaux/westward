@@ -204,6 +204,7 @@ Player.prototype.respawn = function(){
     this.onRemoveAtLocation();
     this.spawn();
     this.setOrUpdateAOI();
+    this.save();
     // TODO: loose loot
 };
 
@@ -333,13 +334,19 @@ Player.prototype.classLvlUp = function(classID, notify){
 Player.prototype.giveGold = function(nb,notify){
     this.gold = Utils.clamp(this.gold+nb,0,GameServer.characterParameters.maxGold);
     this.updatePacket.updateGold(this.gold);
-    if(notify) this.addNotif('+'+nb+' '+Utils.formatMoney(nb));
+    if(notify){
+        this.addNotif('+'+nb+' '+Utils.formatMoney(nb));
+        this.save();
+    }
 };
 
 Player.prototype.takeGold = function(nb,notify){
     this.gold = Utils.clamp(this.gold-nb,0,GameServer.characterParameters.maxGold);
     this.updatePacket.updateGold(this.gold);
-    if(notify) this.addNotif('-'+nb+' '+Utils.formatMoney(nb));
+    if(notify){
+        this.addNotif('-'+nb+' '+Utils.formatMoney(nb));
+        this.save();
+    }
 };
 
 Player.prototype.canBuy = function(price){ // check if building has gold and room
@@ -361,13 +368,19 @@ Player.prototype.hasItem = function(item,nb){
 Player.prototype.giveItem = function(item,nb,notify){
     this.inventory.add(item,nb);
     this.updatePacket.addItem(item,this.inventory.getNb(item));
-    if(notify) this.addNotif('+'+nb+' '+GameServer.itemsData[item].name);
+    if(notify){
+        this.addNotif('+'+nb+' '+GameServer.itemsData[item].name);
+        this.save();
+    }
 };
 
 Player.prototype.takeItem = function(item,nb,notify){
     this.inventory.take(item,nb);
     this.updatePacket.addItem(item,this.inventory.getNb(item));
-    if(notify) this.addNotif('-'+nb+' '+GameServer.itemsData[item].name);
+    if(notify){
+        this.addNotif('-'+nb+' '+GameServer.itemsData[item].name);
+        this.save();
+    }
 };
 
 Player.prototype.isEquipped = function(slot){
@@ -415,6 +428,7 @@ Player.prototype.equip = function(slot,item,fromDB){
     if(!fromDB){
         this.addNotif('Equipped '+nb+' '+itemData.name+(nb > 1 ? 's' : ''));
         this.takeItem(item, nb);
+        this.save();
     }
 };
 
@@ -435,7 +449,10 @@ Player.prototype.unequip = function(slot,notify){
     this.updatePacket.addEquip(slot,-1);
     this.applyAbsoluteModifiers(item,-1);
 
-    if(notify) this.addNotif('Unequipped '+nb+' '+GameServer.itemsData[item].name+(nb > 1 ? 's' : ''));
+    if(notify){
+        this.addNotif('Unequipped '+nb+' '+GameServer.itemsData[item].name+(nb > 1 ? 's' : ''));
+        this.save();
+    }
 };
 
 Player.prototype.applyAbsoluteModifiers = function(item,change){
@@ -585,6 +602,7 @@ Player.prototype.trim = function(){
 Player.prototype.getDataFromDb = function(data){
     // TODO: think about how to handle references to other entities
     // eg. inBuilding (how to retrieve proper building if server went down since), commitment...
+    console.log(data);
     this.id = data.id;
     this.name = data.name;
     this.x = data.x;
@@ -594,17 +612,24 @@ Player.prototype.getDataFromDb = function(data){
     this.classxp = data.classxp;
     this.classlvl = data.classlvl;
     // stats are not saved, see schema
-    /*for(var equip in Equipment.dict) {
-        if (!Equipment.dict.hasOwnProperty(equip)) continue;
-        var eq = Equipment.dict[equip];
-        for(var i = 0; i < eq.nb; i++) {
-            if(!data.equipment.hasOwnProperty(equip)) continue;
-            var dbvalue = data.equipment[i];
-            if(dbvalue > -1) this.equip(equip,dbvalue,true); // true: data from DB
-        }
-        if(eq.containedIn) this.load(eq.containedIn,data.equipment.containers[eq.containedIn]);
-    }*/
-    //this.inventory.fromList(data.inventory);
+
+    for(var slot in data.equipment.slots){
+        var item = data.equipment.slots[slot];
+        if(item == -1) continue;
+        this.equip(slot,item,true);
+    }
+    for(var slot in data.equipment.containers){
+        var item = data.equipment.containers[slot].id;
+        if(item == -1) continue;
+        this.equip(slot,item,true);
+    }
+    for(var slot in data.equipment.ammo){
+        var item = data.equipment.ammo[slot].id;
+        var nb = data.equipment.ammo[slot].nb;
+        if(item == -1 || nb == 0) continue;
+        this.equip(slot,item,true);
+        this.load(slot,nb);
+    }
     data.inventory.forEach(function(i){
          this.giveItem(i[0],i[1]);
     },this);
@@ -622,14 +647,16 @@ Player.prototype.onAOItransition = function(newAOI,previousAOI){
         this.visitedAOIs.add(newAOI);
         if(previousAOI){ // if previousAOI: don't grant XP for spawning in fort
             Prism.logEvent(this,'explore',{aoi:newAOI});
-            if(!this.settlement.fort) return;
-            var A = Utils.lineToGrid(this.settlement.fort.aoi,World.nbChunksHorizontal);
+
+            /*var A = Utils.lineToGrid(this.settlement.fort.aoi,World.nbChunksHorizontal);
             var B = Utils.lineToGrid(newAOI,World.nbChunksHorizontal);
             var dist = Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
             if(dist > 2) { // todo: make depend on dev level
                 this.addNotif('New area visited');
                 this.gainClassXP(GameServer.classes.explorer,dist * 5, true); // TODO: facotr in class level
-            }
+            }*/
+
+            this.save();
         }
     }
 };
@@ -713,6 +740,22 @@ Player.prototype.getShootingPoint = function(){
         x: this.x+1,
         y: this.y+1
     };
+};
+
+Player.prototype.save = function(){
+    if(!this.model) return;
+    var _player = this;
+    GameServer.PlayerModel.findById(this.model._id, function (err, doc) {
+        if (err) throw err;
+
+        doc.set(_player);
+        doc.save(function (err) {
+            if (err) {
+                console.log(err);
+                throw err;
+            }
+        });
+    });
 };
 
 module.exports.Player = Player;

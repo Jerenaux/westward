@@ -37,7 +37,7 @@ Misc:
 -> Menu to list buildings (but on-site management)
 
 
-- Better handling of returning players with no DB match
+- Saving player data (items + position when AOI change)
 - Display info on top of blds
 
 
@@ -523,6 +523,7 @@ Testing:
 - Make lists of bugs happening and think about tests to make to catch them, at the finest granularity possible
 - Tests on inventory manipulations, proper display of stats in items (w.r.t names used in Stats)
 - Entering and re-entering workshop
+- Add security tests that check config values, tutorial start, nothing in "on initialize" ...
 - Test the connexion of an old player to see if it crashes or not; build sth, start a fight, etc.
 - Manually run it before deployment
 - Have the testing pipeline work with both development and production code (run it once, prodify, then check again, the upload)

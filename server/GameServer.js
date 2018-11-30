@@ -227,16 +227,6 @@ GameServer.loadSettlements = function(){
             settlement.setModel(data);
         });
         GameServer.updateStatus();
-
-        GameServer.settlements[0].danger = [
-            [453,717],
-            [428,703],
-            [469,593]
-        ];
-        GameServer.settlements[1].danger = [
-            [1005,41],
-            [940,224]
-        ];
     });
 };
 
@@ -256,7 +246,6 @@ GameServer.loadBuildings = function(){
     GameServer.BuildingModel.find(function (err, buildings) {
         if (err) return console.log(err);
         buildings.forEach(GameServer.addBuilding);
-        //GameServer.setUpSettlements();
         GameServer.updateStatus();
     });
 };
@@ -271,6 +260,7 @@ GameServer.setUpSpawnZones = function(){
             var data = GameServer.spawnZonesData[key];
             GameServer.spawnZones.push(new SpawnZone(data.aois, data.animals, data.items));
         }
+        console.log(GameServer.spawnZones.length,'spawn zones created');
     }
 
     GameServer.updateStatus();
@@ -310,19 +300,7 @@ GameServer.addItem = function(x,y,type){
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
-    /*var civ = GameServer.addCiv(515,655);
-    civ.camp = {
-        center : {
-            x: 515,
-            y: 655
-        }
-    }*/
-    //GameServer.addAnimal(1189,158,0);
-    //GameServer.addItem(1199,160,3);
-    //GameServer.addAnimal(1204,168,0);
-    /*GameServer.addCiv(513,656);
-    GameServer.addCiv(514,657);
-    GameServer.addCiv(513,658);*/
+    GameServer.addItem(1205,161,3);
 };
 
 GameServer.setUpdateLoops = function(){
@@ -466,8 +444,8 @@ GameServer.loadPlayer = function(socket,id){
             var mongoID = doc._id.toString();
             player.setIDs(mongoID,socket.id);
             player.getDataFromDb(doc);
+            player.setModel(doc);
             GameServer.finalizePlayer(socket,player);
-            player.update();
         }
     );
 };
@@ -600,8 +578,7 @@ GameServer.pickUpItem = function(player,itemID){
     var item = GameServer.items[itemID];
     // TODO: check for proximity
     var nb = 1;
-    player.giveItem(item.type,nb);
-    player.addNotif('+'+nb+' '+GameServer.itemsData[item.type].name);
+    player.giveItem(item.type,nb,true);
     GameServer.removeEntity(item);
 };
 
