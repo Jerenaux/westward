@@ -37,7 +37,6 @@ Misc:
 -> Menu to list buildings (but on-site management)
 
 
-- Saving player data (items + position when AOI change)
 - Display info on top of blds
 
 
