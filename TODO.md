@@ -37,8 +37,6 @@ Misc:
 -> Menu to list buildings (but on-site management)
 
 
-- Display info on top of blds
-
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
 
@@ -54,9 +52,10 @@ prompt to go build a lumbercamp at the proper location (building tut + auto reso
 - Insist that buildings are permanent and that everyone can see and interact with everyone else's buildings
 
 Part 2: exploration, crafting, trade and wildlife
-- Prompt to go craft an useful item, point out that a specific ingredient is missing
-- Prompt to go explore fog of war in a certain area (explain fog of war) + multi-class lvl tuto
-- On the way, attack by wildlife, battle tuto + food tuto (mention use for boosting production as well)
+- Prompt to go craft potion, point out that a specific ingredient is missing
+- Prompt to go explore fog of war in a certain area (explain fog of war) + map tuto
+- On the way, attack by wildlife, battle tuto
+- food tuto (mention use for boosting production as well)
 - When resource found, tuto about pick up resources and ecology
 - Go back, sell and craft (trade & craft tuto)
 - Talk about fatigue + prompt to build a shack
@@ -125,6 +124,8 @@ V1 level:
 Admin
 -----
 Update admin following changes
+Make cmd line system
+Edit buildings stock
 Push desktop notifications for player connects
 Import db
 -> Iterate over import object, if matching id in db, update fields, if not, insert new entry 
@@ -455,7 +456,10 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-- Automatically copy files to deploy to deploy directory
+- Look into bitbucket+Heroku pipelines, or Heroku pipelines
+=> Goal: one repository only
+=> Figure out what to do with maps (no indexing from PhpStorm? Fetching from external dirs?)
+=> Figure out how to exclude dev-specific files for production stage
 - Automatically fetch maps that have been modified, and copy to deploy dir
 - Automate git upload to Heroku (http://radek.io/2015/10/27/nodegit/)
 - Tool to gather, uglify and compress all relevant source files when moving to production directory
@@ -518,6 +522,9 @@ General:
 
 Testing:
 -------
+- https://hackernoon.com/testing-node-js-in-2018-10a04dd77391
+- Mocha + Chai :https://hackernoon.com/a-crash-course-on-testing-with-node-js-6c7428d3da02
+- Sinon: https://www.sitepoint.com/sinon-tutorial-javascript-testing-mocks-spies-stubs/
 - Use Jasmine for client-side tests? Selenium for visual ones?
 - Make lists of bugs happening and think about tests to make to catch them, at the finest granularity possible
 - Tests on inventory manipulations, proper display of stats in items (w.r.t names used in Stats)

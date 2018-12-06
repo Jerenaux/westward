@@ -15,6 +15,15 @@ var eventSchema = new mongoose.Schema({
 });
 var Event = mongoose.model('Event', eventSchema);
 
+/*Event.prototype.toLog = function(){
+    return this.__t;
+};*/
+
+/*TODO:
+* Store event descriptors in separate JSON file; store the fields +
+* a string template (https://stackoverflow.com/questions/30003353/can-es6-template-literals-be-substituted-at-runtime-or-reused) 1st answer
+* */
+
 var TradeEvent = Event.discriminator(
     'TradeEvent',
     new mongoose.Schema({

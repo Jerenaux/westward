@@ -14,6 +14,7 @@ function Building(data){
     this.battleTeam = 'Player';
     this.entityCategory = 'Building';
     this.updateCategory = 'buildings';
+    this.schemaModel = GameServer.BuildingModel;
     this.battlePriority = 3;
 
     this.id = -1;
@@ -142,14 +143,11 @@ Building.prototype.updateNbCommitted = function(){
 
 Building.prototype.update = function(){
     if(this.civBuilding) return;
-    //this.updateCommitment();
     if(this.built){
-        this.updateProd();
-        //this.dispatchStock();
-        this.repair();
-        this.save();
-    }else{
-        //this.updateBuild();
+        var hasProduced = this.updateProd();
+        //var hasRepaired = this.repair();
+        var hasRepaired = false;
+        if(hasProduced || hasRepaired) this.save();
     }
 };
 
@@ -164,21 +162,25 @@ Building.prototype.dispatchStock = function(){
 };
 
 Building.prototype.updateProd = function(){
-    //if(!GameServer.isTimeToUpdate('production')) return false;
     var production = GameServer.buildingsData[this.type].production;
-    if(!production) return;
+    if(!production) return false;
+    var produced = 0;
     for(var i = 0; i < production.length; i++){
         var item = production[i][0];
         var baseNb = production[i][1];
         var turns = production[i][2];
+        var cap = production[i][3];
         if(!GameServer.haveNbTurnsElapsed(turns)) continue;
         var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
-        var actualNb = increment;
-        //console.log('producing ',actualNb,' ',GameServer.itemsData[item].name);
-        if(actualNb) this.giveItem(item,actualNb);
-        //if(actualNb > 0) this.settlement.addToFort(item,actualNb);
-        //if(actualNb > 0) this.settlement.dispatchResource(this,item,actualNb,true); // true: force dispatch
+        var current = this.getItemNb(item);
+        if(current >= cap) continue;
+        var actualNb = Math.min(increment,cap-current);
+        if(actualNb) {
+            this.giveItem(item,actualNb);
+            produced += actualNb;
+        }
     }
+    return (produced > 0);
 };
 
 /*Building.prototype.updateBuild = function(){
@@ -206,7 +208,7 @@ Building.prototype.updateBuild = function(){
     return true;
 };
 
-Building.prototype.repair = function(){
+/*Building.prototype.repair = function(){
     if(!GameServer.isTimeToUpdate('build')) return;
     var maxHealth = this.getStat('hpmax').getValue();
     var health = this.getStat('hp').getValue();
@@ -217,7 +219,7 @@ Building.prototype.repair = function(){
     increment = Math.round((increment/100)*maxHealth);
     var newHealth = Utils.clamp(health+increment,health,maxHealth);
     this.getStat('hp').setBaseValue(newHealth);
-};
+};*/
 
 Building.prototype.toggleBuild = function(){
     this.setProperty('built',!this.built);
@@ -319,22 +321,9 @@ Building.prototype.remove = function(){
 };
 
 // Save changes to DB
-// TODO: move up to GameObject
 Building.prototype.save = function(){
     if(this.civBuilding) return; // todo: remove
-    if(!this.model) return;
-    var _building = this;
-    GameServer.BuildingModel.findById(this.model._id, function (err, doc) {
-        if (err) throw err;
-
-        doc.set(_building);
-        doc.save(function (err) {
-            if (err) {
-                console.log(err);
-                throw err;
-            }
-        });
-    });
+    GameObject.prototype.save.call(this);
 };
 
 // Returns an object containing only the fields relevant for the client to display in the game

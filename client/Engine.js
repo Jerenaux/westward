@@ -611,6 +611,20 @@ Engine.initWorld = function(data){
         panel.display();
     }
 
+    setInterval(function(){
+        if(Engine.currentBuiling){
+            var buildingTypeData = Engine.buildingsData[Engine.currentBuiling.buildingType];
+            var production = buildingTypeData.production;
+            if(!production) return;
+            for(var i = 0; i < production.length; i++){
+                var rate = production[i][2];
+                var rest = Engine.currentTurn%rate;
+                var remainder = rate-rest;
+                console.log(remainder);
+            }
+        }
+    },1000);
+
     return;
     // todo: move all to dedicated sound manager
     Engine.lastOrientationSound = 0;
@@ -1570,6 +1584,7 @@ Engine.makeTradeMenu = function(){
     var x = (Engine.getGameConfig().width-w)/2;
     var action = new ShopPanel(x,420,w,100,'Buy/Sell');
     trade.addPanel('action',action);
+    var prices = trade.addPanel('prics',new PricesPanel(670,420,200,100,'Set prices'),true);
 
     trade.addEvent('onUpdateInventory',function(){
         client.updateInventory();
@@ -2087,8 +2102,8 @@ Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
     if(Engine.player) Engine.updateMarker(position.tile);
     if(Engine.debug){
-        document.getElementById('pxx').innerHTML = Math.round(position.pixel.x);
-        document.getElementById('pxy').innerHTML = Math.round(position.pixel.y);
+        //document.getElementById('pxx').innerHTML = Math.round(position.pixel.x);
+        //document.getElementById('pxy').innerHTML = Math.round(position.pixel.y);
         document.getElementById('tx').innerHTML = position.tile.x;
         document.getElementById('ty').innerHTML = position.tile.y;
         document.getElementById('aoi').innerHTML = Utils.tileToAOI(position.tile);
@@ -2493,10 +2508,16 @@ Engine.unequipClick = function(){ // Sent when unequipping something
 
 Engine.sellClick = function(){
     Engine.currentMenu.panels['action'].setUp(this.itemID,'sell');
+    /*if(Engine.currentBuiling.isOwned()){
+        Engine.currentMenu.panels['prices'].display();
+    }*/
 };
 
 Engine.buyClick = function(){
     Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
+    /*if(Engine.currentBuiling.isOwned()){
+        Engine.currentMenu.panels['prices'].display();
+    }*/
 };
 
 Engine.giveClick = function(itemID){
@@ -2505,7 +2526,8 @@ Engine.giveClick = function(itemID){
 };
 
 Engine.takeClick = function(){
-    if(Engine.currentBuiling.owner != Engine.player.id) return;
+    //if(Engine.currentBuiling.owner != Engine.player.id) return;
+    if(!Engine.currentBuiling.isOwned()) return;
     Engine.currentMenu.panels['action'].display();
     Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
 };

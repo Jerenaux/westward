@@ -55,6 +55,34 @@ GameObject.prototype.getModel = function() {
     return this.model;
 };
 
+GameObject.prototype.save = function(){
+    if(!this.model) return;
+    if(this.dblocked) return;
+    this.dblocked = true;
+    var _document = this;
+    this.schemaModel.findById(this.model._id, function (err, doc) {
+        if (err) throw err;
+
+        doc.set(_document);
+        doc.save(function (err) {
+            _document.dblocked = false;
+            //if(err) console.warn(err);
+            if(err) throw err;
+            console.log(_document.entityCategory+' saved');
+        });
+    });
+    /*this.schemaModel.findOneAndUpdate(
+        {_id: this.model._id},
+        //_document, // Don't apply as is, go through schema!
+        {$set:this},
+        {},
+        function(err){
+            if(err) throw err;
+            console.log(_document.entityCategory+' saved')
+        }
+    );*/
+};
+
 GameObject.prototype.onAddAtLocation = function(){
     this.travelOccupiedCells('add');
 };

@@ -20,7 +20,10 @@ function Player(){
     this.battleTeam = 'Player';
     this.entityCategory = 'Player';
     this.updateCategory = 'players';
+    this.schemaModel = GameServer.PlayerModel;
     this.battlePriority = 1;
+
+
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.oldAOIs = [];
     this.action = null;
@@ -602,7 +605,6 @@ Player.prototype.trim = function(){
 Player.prototype.getDataFromDb = function(data){
     // TODO: think about how to handle references to other entities
     // eg. inBuilding (how to retrieve proper building if server went down since), commitment...
-    console.log(data);
     this.id = data.id;
     this.name = data.name;
     this.x = data.x;
@@ -740,22 +742,6 @@ Player.prototype.getShootingPoint = function(){
         x: this.x+1,
         y: this.y+1
     };
-};
-
-Player.prototype.save = function(){
-    if(!this.model) return;
-    var _player = this;
-    GameServer.PlayerModel.findById(this.model._id, function (err, doc) {
-        if (err) throw err;
-
-        doc.set(_player);
-        doc.save(function (err) {
-            if (err) {
-                console.log(err);
-                throw err;
-            }
-        });
-    });
 };
 
 module.exports.Player = Player;

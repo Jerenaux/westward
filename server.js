@@ -51,7 +51,7 @@ categories.forEach(function(cat){
         }
     });
 });
-
+// TODO: same behavior for the above and the below
 app.get('/admin/screenshots', function (req, res) {
     console.log('[ADMIN] requesting screenshots');
     gs.getScreenshots(res);

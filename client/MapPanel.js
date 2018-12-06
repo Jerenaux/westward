@@ -4,7 +4,7 @@
 
 function MapPanel(x,y,width,height,title,invisible){
     Panel.call(this,x,y,width,height,title,invisible);
-    this.mapx = this.x + this.width/2;
+    this.mapx = this.x + this.width/2; // Position of map sprite on screen
     this.mapy = this.y + this.height/2;
 }
 

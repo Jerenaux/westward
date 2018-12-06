@@ -28,7 +28,6 @@ var Hero = new Phaser.Class({
         this.inventory = new Inventory();
         this.stats = new StatsContainer();
         this.equipment = new EquipmentManager();
-        //this.setCommitSlots(data.commitSlots);
 
         this.gold = data.gold;
         this.civiclvl = data.civiclvl;

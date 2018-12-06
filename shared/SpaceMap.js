@@ -11,9 +11,14 @@ function SpaceMap(){}
 
 SpaceMap.prototype.add = function(x,y,object){
     if(!this.hasOwnProperty(x))this[x] = {};
-    //if(!this[x].hasOwnProperty(y)) this[x][y] = [];
     if(object === undefined) object = 1;
     this[x][y] = object; // replaces any existing object
+};
+
+SpaceMap.prototype.increment = function(x,y){
+    if(!this.hasOwnProperty(x))this[x] = {};
+    if(!this[x].hasOwnProperty(y)) this[x][y] = 0;
+    this[x][y]++;
 };
 
 // Works also by calling mySpaceMap[x][y]
@@ -76,9 +81,6 @@ SpaceMap.prototype.toString = function(){ // serialize to a list representation
 // ###############
 
 function SpaceMapList(){}
-
-//SpaceMapList.prototype = Object.create(SpaceMap.prototype);
-//SpaceMapList.prototype.constructor = SpaceMapList;
 
 SpaceMapList.prototype.add = function(x,y,object){
     if(!this.hasOwnProperty(x))this[x] = {};

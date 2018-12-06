@@ -190,6 +190,8 @@ GameServer.readMap = function(mapsPath,test){
 GameServer.getBootParams = function(socket,data){
     var playerID = data.id;
     var pkg = clone(GameServer.clientParameters,false);
+    if(!pkg.config) pkg.config = {};
+    pkg.config.turnDuration = GameServer.turnDuration;
 
     GameServer.PlayerModel.findOne(
         {_id: new ObjectId(playerID)},
@@ -201,8 +203,7 @@ GameServer.getBootParams = function(socket,data){
                 console.log('Unrecognized returning player ');
                 pkg.newPlayer = true;
             }
-            //return GameServer.clientParameters;
-            console.warn(pkg);
+            console.log(pkg);
             socket.emit('boot-params',pkg);
         }
     );
@@ -330,12 +331,12 @@ GameServer.startEconomy = function(){
         var duration = GameServer.economyTurns[event];
         if(duration > maxDuration) maxDuration = duration;
     }
-    //GameServer.maxTurns = maxDuration;
     GameServer.maxTurns = Math.max(maxDuration,300);
 
     // TODO: compute turns elapsed during server shutdown?
     GameServer.economyTurn();
-    setInterval(GameServer.economyTurn,config.get('economyCycles.turnDuration')*1000);
+    GameServer.turnDuration = config.get('economyCycles.turnDuration');
+    setInterval(GameServer.economyTurn,GameServer.turnDuration*1000);
 };
 
 GameServer.economyTurn = function(){
@@ -737,6 +738,7 @@ GameServer.handleShop = function(data,socketID) {
         }
         player.takeItem(item, nb, true);
         building.giveItem(item,nb,true); // true = remember
+        building.updateBuild();
     }
     building.save();
     Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type});
@@ -941,9 +943,6 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         var globalPkg = GameServer.AOIs[player.aoi].getUpdatePacket(); // the global pkg is AOI-specific
         var individualGlobalPkg = clone(globalPkg,false); // clone the global pkg to be able to modify it without affecting the original
         // player.newAOIs is the list of AOIs about which the player hasn't checked for updates yet
-        /*for(var i = 0; i < player.newAOIs.length; i++){
-            individualGlobalPkg.synchronize(GameServer.AOIs[player.newAOIs[i]]); // fetch entities from the new AOIs
-        }*/
         player.newAOIs.forEach(function(aoi){
             individualGlobalPkg.synchronize(GameServer.AOIs[aoi]); // fetch entities from the new AOIs
         });
@@ -957,6 +956,7 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         if(individualGlobalPkg) finalPackage.global = individualGlobalPkg.clean();
         if(localPkg) finalPackage.local = localPkg.clean();
         if(GameServer.nbConnectedChanged) finalPackage.nbconnected = GameServer.server.getNbConnected();
+        finalPackage.turn = GameServer.elapsedTurns;
         GameServer.server.sendUpdate(player.socketID,finalPackage);
         player.newAOIs = [];
         player.oldAOIs = [];

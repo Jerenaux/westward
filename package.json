@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "Westward, a collaborative MMO",
   "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha test",
     "start": "node server.js"
   },
   "engines": {
@@ -13,9 +16,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "chai": "^4.2.0",
     "dir-compare": "^1.4.0",
     "jimp": "^0.2.28",
+    "mocha": "^5.2.0",
     "mongo-express": "^0.44.0",
+    "request": "^2.88.0",
+    "sinon": "^7.1.1",
     "spritesmith": "^3.1.1",
     "uglify-js": "^3.1.9",
     "xml2js": "^0.4.19"

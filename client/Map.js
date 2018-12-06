@@ -16,7 +16,7 @@ var Map = new Phaser.Class({
         this.container.setDepth(2);
         this.container.add(this);*/
 
-        this.center = {
+        this.center = { // position of map sprite on screen
             x: x,
             y: y
         };
@@ -191,7 +191,7 @@ var Map = new Phaser.Class({
         return this.pins[this.pinsCounter++];
     },
 
-    // Maps a tile coordinate to % coordinate on the map
+    // Maps a tile coordinate to px coordinate on the map
     computeMapLocation: function(tx,ty){
         var pct = Utils.tileToPct(tx,ty);
         var dx = (pct.x - this.originX)*this.width;
@@ -245,7 +245,7 @@ var Map = new Phaser.Class({
         },this);
     },
 
-    centerMap: function(tile){
+    centerMap: function(tile){ // Adjusts the anchor, then position it in the center of the screen
         var o = Utils.tileToPct(tile.x,tile.y);
         this.setOrigin(Utils.clamp(o.x,this.minOrigin.x,this.maxOrigin.x),Utils.clamp(o.y,this.minOrigin.y,this.maxOrigin.y));
         this.setPosition(this.center.x,this.center.y);
@@ -271,10 +271,59 @@ var Map = new Phaser.Class({
     },
 
     applyFogOfWar: function(){
-        this.fow = UI.scene.add.graphics();
+        function angle(a,b){
+            return -(Math.atan2(b.y- a.y, b.x- a.x));//* (180/Math.PI);
+        }
 
-        this.fow.fillStyle(0xffff00, 1);
-        this.fow.fillRect(this.x-50, this.y-50, 100, 100);
+        //var aois = [341,389,390,391,438,439,440,490];
+        var aois = [341];
+        // Enumerating
+        var pts = new SpaceMap();
+        aois.forEach(function(aoi){
+            var corners  = Utils.getAOIcorners(aoi);
+            corners.forEach(function(pt){
+                pts.increment(pt.x,pt.y);
+            });
+        });
+        // Pruning
+        pts = pts.toList().filter(function(pt){
+            return (pt.v%2 != 0);
+        });
+        console.log(pts);
+        // Sorting
+        /*var center = pts.reduce(function(acc,val){
+            return {x:acc.x+parseInt(val.x),y:acc.y+parseInt(val.y)};
+        },{x:0,y:0});
+        center.x = center.x/pts.length;
+        center.y = center.y/pts.length;
+        pts.sort(function(a,b){
+            var aa = angle(a, center);
+            var bb = angle(b, center);
+            if(aa > bb) return 1;
+            if(aa < bb) return -1;
+            console.log(a,b,aa,bb);
+            // If ame angle, sort based on proxiity
+            var ea = Utils.euclidean(a,center);
+            var eb = Utils.euclidean(b,center);
+            console.log(ea,eb);
+            var sign = aa/Math.abs(aa);
+            if(aa == -90) sign = 1;
+            if(aa == 0) sign = -1;
+            if(ea > eb) return 1;//*sign;
+            if(ea < eb) return -1;//*sign;
+            return 0;
+        });
+        console.log(pts);*/
+        pts = pts.map(function(pt){
+            return this.computeMapLocation(pt.x,pt.y);
+        },this);
+        console.log(pts);
+        /*this.fow = UI.scene.add.graphics();
+        this.fow.fillStyle(0xffff00, 0.5);
+        this.fow.fillRect(tr.x, tr.y, (br.x-tr.x), (br.y-tr.y));*/
+        //var ct = this.computeMapLocation(center.x,center.y);
+        this.fow = UI.scene.add.polygon(0,0,pts,0xffff00,0.5);
+        this.fow.setOrigin(0);
         this.fow.setDepth(this.depth+1);
         this.fow.setScrollFactor(0);
     },
@@ -291,9 +340,9 @@ var Map = new Phaser.Class({
         this.setInputArea();
         this.positionToponyms();
         this.computeDragLimits();
-        //if(!this.minimap) this.applyFogOfWar();
+        if(!this.minimap) this.applyFogOfWar();
 
-        if(this.target == 'player') {
+        if(this.target == 'player') { // TODO: remove, always the case if no fort
             this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
             //this.positionCross.setDepth(this.positionCross.depth+1);
             Engine.player.markers.forEach(function(data){

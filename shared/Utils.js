@@ -41,6 +41,16 @@ Utils.AOItoTile = function(aoi){
     };
 };
 
+Utils.getAOIcorners = function(aoi){
+    var l = [];
+    var o = Utils.AOItoTile(aoi);
+    l.push(o);
+    l.push({x:o.x+World.chunkWidth,y:o.y});
+    l.push({x:o.x+World.chunkWidth,y:o.y+World.chunkHeight});
+    l.push({x:o.x,y:o.y+World.chunkHeight});
+    return l;
+};
+
 Utils.gridToLine = function(x,y,w){
     return (y*w)+x;
 };
@@ -302,7 +312,7 @@ Utils.removeElement = function(v,arr){
     if(idx > -1) arr.splice(idx,1);
 };
 
-Utils.insert = function(a1,a2,pos){ // insert array a1 at position pos in array a2
+Utils.insert = function(a1,a2,pos){ // insert array a2 at position pos in array a1
     a1.splice.apply(a1, [pos, 0].concat(a2));
 };
 

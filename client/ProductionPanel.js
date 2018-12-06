@@ -32,14 +32,16 @@ ProductionPanel.prototype.displaySlots = function(){
 
         var item = production[i][0];
         var nb = production[i][1];
+        var limit = production[i][3];
         var itemData = Engine.itemsData[item];
         slot.addIcon(itemData.atlas,itemData.frame);
 
-        slot.addText(43,2,itemData.name);
+        var xt = 43;
+        slot.addText(xt,2,itemData.name);
 
-        //var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(data.prod),nb);
-        //slot.addText(43,16,'+'+increment+'/cycle',Utils.colors.gold);
-        slot.addText(43,16,'+'+nb+'/cycle',Utils.colors.gold);
+        var t = slot.addText(xt,16,'+'+nb,Utils.colors.gold);
+        xt += t.width;
+        slot.addText(xt,18,'(limit: '+limit+')',Utils.colors.white,12);
         slot.display();
     }
 };
