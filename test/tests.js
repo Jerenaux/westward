@@ -3,29 +3,37 @@
  */
 var expect = require('chai').expect;
 var request = require('request');
+var io = require('socket.io-client');
+
+var gs = require('../server/GameServer.js').GameServer;
+
+var PORT = 8081; //TODO: read from conf file?
 
 describe('Server', function () {
-    it('Should run', function (done) {
-
-        // TODO: use env vars
-        request('http://localhost:8081' , function(error, response, body) {
-            console.log(body);
-            console.log(error);
-            //expect(body).to.equal('Hello World');
+    it('Run', function (done) {
+        request('http://localhost:'+PORT, function(error, response, body) {
             expect(response.statusCode).to.equal(200);
             done();
         });
+    });
 
-        // 1. ARRANGE
-        /*var x = 5;
-        var y = 1;
-        var sum1 = x + y;
-
-        // 2. ACT
-        var sum2 = x+y;
-
-        // 3. ASSERT
-        expect(sum2).to.be.equal(sum1);*/
-
+    it('io-connection',function(done){
+        var client = io('http://localhost:'+PORT); // https://github.com/agconti/socket.io.tests/blob/master/test/test.js
+        client.on('ack',function(){
+            expect(true).to.equal(true);
+            done();
+        });
     });
 });
+
+
+// 1. ARRANGE
+/*var x = 5;
+var y = 1;
+var sum1 = x + y;
+
+// 2. ACT
+var sum2 = x+y;
+
+// 3. ASSERT
+expect(sum2).to.be.equal(sum1);*/

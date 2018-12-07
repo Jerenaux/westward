@@ -121,6 +121,8 @@ server.resetStamp = 1519130567967; // ignore returning players with stamps older
 io.on('connection',function(socket){
     console.log('connect');
 
+    socket.emit('ack');
+
     socket.on('boot-params',function(data){
         //socket.emit('boot-params',gs.getBootParams(data));
         gs.getBootParams(socket,data);

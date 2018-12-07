@@ -271,58 +271,141 @@ var Map = new Phaser.Class({
     },
 
     applyFogOfWar: function(){
-        function angle(a,b){
-            return -(Math.atan2(b.y- a.y, b.x- a.x));//* (180/Math.PI);
+        function Pt(x,y){
+            this.x = x;
+            this.y = y;
+            this.c = 1;
+            this.nbors = [];
         }
 
-        //var aois = [341,389,390,391,438,439,440,490];
-        var aois = [341];
-        // Enumerating
-        var pts = new SpaceMap();
-        aois.forEach(function(aoi){
-            var corners  = Utils.getAOIcorners(aoi);
-            corners.forEach(function(pt){
-                pts.increment(pt.x,pt.y);
+        Pt.prototype.link = function(pt){
+            this.nbors.push(pt);
+        };
+
+        Pt.prototype.unlink = function(pt){
+            var idx = this.nbors.findIndex(function(e){
+                return (e.x == pt.x && e.y == pt.y);
             });
+            this.nbors.splice(idx,1);
+        };
+
+        Pt.prototype.equal = function(pt){
+            if(pt === null) return false;
+            return (this.x == pt.x && this.y == pt.y);
+        };
+
+        Pt.prototype.ts = function(){
+            return "("+this.x+","+this.y+")";
+        };
+
+        Pt.prototype.debug = function(){
+            console.log(this.ts(),"has",this.nbors.length,"neighbors and a count of",this.c);
+        };
+
+        function link(pts){
+            /*console.log('link candidates:');
+            pts.forEach(function(pt){
+                console.log(pt.ts());
+            });*/
+            for(var i = 0; i < pts.length; i++){
+                for(var j = i; j < pts.length; j++){
+                    var a = pts[i];
+                    var b = pts[j];
+                    var dx = Math.abs(a.x-b.x);
+                    var dy = Math.abs(a.y-b.y);
+                    if( dx ? !dy : dy ) { // xor
+                        //console.log("Linking",a.ts(),"to",b.ts());
+                        a.link(b);
+                        b.link(a);
+                    }
+                }
+            }
+        }
+
+        function unlink(pt){
+            pt.nbors.forEach(function(nb){
+                nb.unlink(pt);
+            });
+        }
+
+        function lint(pts){
+            /*console.log("linting");
+            pts.forEach(function(pt){
+                console.log(pt.ts());
+            });*/
+            for(var i = pts.length-2; i >= 0; i--){
+                if(i == pts.length-1) continue; // needed when there are 4 duplicates in a row
+                if(pts[i].equal(pts[i+1])){
+                    pts.splice(i+1,1);
+                    pts.splice(i,1);
+                }
+            }
+        }
+
+        var aois = [341,389,390,391,438,439,440,490];
+        var space = new SpaceMap();
+        aois.forEach(function(aoi){
+            var corners = Utils.getAOIcorners(aoi);
+            var pts = [];
+            corners.forEach(function(corner){
+                var pt = space.get(corner.x,corner.y);
+                if(pt){
+                    pt.c++;
+                }else{
+                    pt = new Pt(corner.x,corner.y);
+                    space.add(pt.x,pt.y,pt);
+                }
+                pts.push(pt);
+            });
+            link(pts);
         });
-        // Pruning
-        pts = pts.toList().filter(function(pt){
-            return (pt.v%2 != 0);
+
+        /*space.toList().forEach(function(pt){
+            pt.v.debug();
+        });*/
+
+        space.toList().forEach(function(entry){
+            var pt = entry.v;
+            if(pt.c%2 == 0){
+                unlink(pt);
+                link(pt.nbors);
+                space.delete(pt.x,pt.y);
+            }
         });
-        console.log(pts);
-        // Sorting
-        /*var center = pts.reduce(function(acc,val){
-            return {x:acc.x+parseInt(val.x),y:acc.y+parseInt(val.y)};
-        },{x:0,y:0});
-        center.x = center.x/pts.length;
-        center.y = center.y/pts.length;
-        pts.sort(function(a,b){
-            var aa = angle(a, center);
-            var bb = angle(b, center);
-            if(aa > bb) return 1;
-            if(aa < bb) return -1;
-            console.log(a,b,aa,bb);
-            // If ame angle, sort based on proxiity
-            var ea = Utils.euclidean(a,center);
-            var eb = Utils.euclidean(b,center);
-            console.log(ea,eb);
-            var sign = aa/Math.abs(aa);
-            if(aa == -90) sign = 1;
-            if(aa == 0) sign = -1;
-            if(ea > eb) return 1;//*sign;
-            if(ea < eb) return -1;//*sign;
-            return 0;
+
+        var l = space.toList();
+        l.forEach(function(entry){
+            var pt = entry.v;
+            lint(pt.nbors);
         });
-        console.log(pts);*/
-        pts = pts.map(function(pt){
+
+        var s = space.getFirst();
+        var path = [s];
+        var i = 0;
+        while(true){
+            if(i > 10000) break; //TODO: remove
+            var pt = path[0];
+            var pv = null;
+            if(path.length > 1) pv = path[1];
+            var nt = null;
+            for(var j = 0; j < pt.nbors.length; j++){
+                var nb = pt.nbors[j];
+                if(!nb.equal(pv)){
+                    nt = nb;
+                    break;
+                }
+            }
+            //if(nt === null) console.warn('no next for pt',pt.x,pt.y);
+            if(nt.equal(s)) break;
+            path.unshift(nt);
+            i++;
+        }
+
+        path = path.map(function(pt){
             return this.computeMapLocation(pt.x,pt.y);
         },this);
-        console.log(pts);
-        /*this.fow = UI.scene.add.graphics();
-        this.fow.fillStyle(0xffff00, 0.5);
-        this.fow.fillRect(tr.x, tr.y, (br.x-tr.x), (br.y-tr.y));*/
-        //var ct = this.computeMapLocation(center.x,center.y);
-        this.fow = UI.scene.add.polygon(0,0,pts,0xffff00,0.5);
+
+        this.fow = UI.scene.add.polygon(0,0,path,0xffff00,0.5);
         this.fow.setOrigin(0);
         this.fow.setDepth(this.depth+1);
         this.fow.setScrollFactor(0);

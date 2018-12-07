@@ -15,6 +15,16 @@ SpaceMap.prototype.add = function(x,y,object){
     this[x][y] = object; // replaces any existing object
 };
 
+SpaceMap.prototype.accumulate = function(x,y,object,cb){
+    if(!this.hasOwnProperty(x))this[x] = {};
+    if(object === undefined) object = 1;
+    if(this[x][y]){
+        cb.call(this[x][y]);
+    }else{
+        this[x][y] = object;
+    }
+};
+
 SpaceMap.prototype.increment = function(x,y){
     if(!this.hasOwnProperty(x))this[x] = {};
     if(!this[x].hasOwnProperty(y)) this[x][y] = 0;
@@ -38,6 +48,10 @@ SpaceMap.prototype.delete = function(x,y){
     if(!this[x].hasOwnProperty(y)) return;
     delete this[x][y];
     if(Object.keys(this[x]).length == 0) delete this[x];
+};
+
+SpaceMap.prototype.getFirst = function(){
+    return this.toList()[0].v;
 };
 
 SpaceMap.prototype.toList = function(){ // serialize to a list representation
