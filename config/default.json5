@@ -83,6 +83,9 @@
         idleTime: [1, 3.5], // random bounds; in seconds
         idleRetry: 200 // ms
     },
+    dev: {
+        mapsPath: '/../../maps' // relative to tools directory
+    },
     client: {
         boot:{
             forceNewPlayer: false,

@@ -51,8 +51,7 @@ for(var i = 0; i < nbChunks; i++){
     var p = path.join(indir,filename);
     if(!fs.existsSync(p)) return;
     var map = JSON.parse(fs.readFileSync(p).toString());
-
-    // columns, firstgid, tilecount
+    var origin = Utils.AOItoTile(i);
 
 
     // Change the path to tilesets, from actual to WorldEditor.tilesetsPath
@@ -62,11 +61,9 @@ for(var i = 0; i < nbChunks; i++){
     }*/
 
     //Update tilesets data
-    map.tilesets = tilesetsData.tilesets;
-    // TODO: update in in master.json too
+    //map.tilesets = tilesetsData.tilesets;
 
-    // 682 -> 369
-    var translation = {
+    /*var translation = {
         247: 261,
         248: 262,
         249: 263,
@@ -85,12 +82,15 @@ for(var i = 0; i < nbChunks; i++){
         292: 297,
         305: 274,
         306: 275
-    };
+    };*/
 
+    var grass = [258,259,274,275];
     //Update tile values
     for(var j = 0; j < map.layers.length; j++){
+        var t = 0;
+        if(!map.layers[j].hasOwnProperty("data")) continue;
         map.layers[j].data = map.layers[j].data.map(function(tile){
-            if(tile in translation){
+            /*if(tile in translation){
                 return translation[tile];
             }else{
                 if(tile > 369){
@@ -98,7 +98,15 @@ for(var i = 0; i < nbChunks; i++){
                 }else {
                     return tile;
                 }
+            }*/
+            if(grass.includes(tile)){
+                var tx = Utils.lineToGrid(t,World.chunkWidth);
+                //console.log(t,(tx.x%3)+(tx.y%3)*16);
+                tile = 241+81+(tx.x%3)+(tx.y%3)*16;
             }
+            t++;
+            return tile;
+
         });
     }
 

@@ -124,7 +124,6 @@ io.on('connection',function(socket){
     socket.emit('ack');
 
     socket.on('boot-params',function(data){
-        //socket.emit('boot-params',gs.getBootParams(data));
         gs.getBootParams(socket,data);
     });
 
@@ -219,7 +218,6 @@ server.sendInitializationPacket = function(socket,packet){
     socket.emit('init',packet);
 };
 
-
 server.sendUpdate = function(socketID,pkg){
     var socket = server.getSocket(socketID);
     pkg = server.addStamp(pkg);
@@ -254,5 +252,9 @@ server.quickMedian = function(arr){ // Compute the median of an array using the 
 
 server.sendID = function(socket,playerID){
     socket.emit('pid',playerID);
+};
+
+server.sendError = function(socket){
+    socket.emit('serv-error'); // "error" only is a reserved socket.io event name
 };
 

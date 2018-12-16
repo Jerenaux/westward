@@ -192,6 +192,7 @@ GameServer.getBootParams = function(socket,data){
     var pkg = clone(GameServer.clientParameters,false);
     if(!pkg.config) pkg.config = {};
     pkg.config.turnDuration = GameServer.turnDuration;
+    pkg.nbc = GameServer.server.getNbConnected();
 
     GameServer.PlayerModel.findOne(
         {_id: new ObjectId(playerID)},
@@ -406,7 +407,12 @@ GameServer.dummyPlayer = function(x,y) {
 
 GameServer.addNewPlayer = function(socket,data){
     //if(data.selectedClass == undefined) data.selectedClass = 1;
-    if(data.selectedSettlement == undefined) data.selectedSettlement = 0;
+
+    if(!data.characterName){
+        GameServer.server.sendError(socket); // TODO: make a dict of errors somewhere
+        return;
+    }
+    var region = data.selectedSettlement || 0;
     //console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
     player.setStartingInventory();

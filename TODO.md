@@ -36,9 +36,22 @@ Misc:
 -> Keep class quests (+ "smart quests" based on settlement situation?)
 -> Menu to list buildings (but on-site management)
 
-
-
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
+
+Move away from tiles:
+- 96x96 grass chunks, loaded positionnally
+- Tiles only for other terrain elements (water, dirt, ...)
+- Everything on top are single-image objects (possibly rendered in multiple parts with different depths)
+(- What about multi-AOI objects?)
+Sparse format, declarative (grass, water, ...)
+- Specific tiles (e.g. water joints) computed positionnally
+- Default filler tile for empty ones, on layer 0
+Store tilesets and images as atlases
+Inexistant chunks filled by water
+Editor to visualize and edit result
+Built-in exploration, to test collisions and depths
+Zoom
+
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.
@@ -136,7 +149,8 @@ Secure
 
 Analytics:
 ---------
-- Pretty print events in admin: returning players, new buildings, menu opens?, fights, item uses
+- Pretty print events in admin: add player names, returning players, new buildings, menu opens?, fights, item uses
+- Session duration stats
 - Bundle events from one player into sessions
 - Log session-wide stats: how many players visit a building during session, do this, do that...
 - Button to flush events
@@ -393,10 +407,9 @@ or
 -> Pin disappears after a few seconds
 - Pins for alarm bells (same)
 * Packaging
--> Determine new player by querying server
--> Nb connected, permanent players, player names, ..
-Perma players: take care about required fields in player schema, be flexible
--> Cheat-proof
+- Display nb connected
+- Cheat-proof: proper auth system, lock admin
+- Automate standalone app build (as part of deployment)
 * Settlement defense
 - Enable commander to build towers
 - Buildings health
@@ -456,13 +469,12 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
+- Migrate to one single repository (Heroku)
+OR
+- Keep only Bitbucket one and look into "deploy to heroku" bitbucket tutorials
+https://confluence.atlassian.com/bitbucket/deploy-to-heroku-872013667.html
 - Look into bitbucket+Heroku pipelines, or Heroku pipelines
-=> Goal: one repository only
-=> Figure out what to do with maps (no indexing from PhpStorm? Fetching from external dirs?)
-=> Figure out how to exclude dev-specific files for production stage
-- Automatically fetch maps that have been modified, and copy to deploy dir
-- Automate git upload to Heroku (http://radek.io/2015/10/27/nodegit/)
-- Tool to gather, uglify and compress all relevant source files when moving to production directory
+- Tool to gather, uglify and compress all relevant source files 
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?
 - Flatten chunks and reduce them to arrays only
@@ -573,6 +585,7 @@ Custom chunk/world editor:
 - Add random elements (w/ scripts to remove them):
 Building editor (set shapes etc.)
 Manage spawn zones in editor
+Flip trees horizontally to introduce variety
 -> Patches of dirt
 -> Tree decorations: flowers, stones, bushes
 - Add cliffs in empty areas

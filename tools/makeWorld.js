@@ -88,7 +88,7 @@ function makeTilesetsData(){
 }
 
 function makeBasis(tilesetsData){
-    // tilesetsData is only needed so that the chunks can be edited in Tiled; must be removed for production
+    // tilesetsData is only needed so that the chunks can be edited in Tiled; must be removed for production (TODO)
     // Create base grasst slate, with fields that Tiled will need
     var basis = {
         width: chunkWidth,

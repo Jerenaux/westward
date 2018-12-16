@@ -112,6 +112,8 @@ Client.socket.on('boot-params',function(data){
     console.log(Client.gameConfig);
     Boot.bootParamsReceived();
     Client.newPlayer = data.newPlayer;
+    Client.nbConnected = data.nbc;
+    console.log(Client.nbConnected+' connected');
 });
 
 Client.socket.on('update',function(data){ // This event triggers uppon receiving an update packet (data)

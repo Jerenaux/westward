@@ -21,7 +21,6 @@ var Boot = new Phaser.Class({
 
     create: function(){
         Client.getBootParameters();
-        //Client.checkForNewPlayer();
 
         var masterData = this.cache.json.get(Boot.masterKey);
         Boot.tilesets = masterData.tilesets;
@@ -29,12 +28,10 @@ var Boot = new Phaser.Class({
 
         Boot.background = this.add.image(0,0,'background').setOrigin(0);
 
-        //this.totalReadyTicks = 1;
         this.readyStages = {
             1: this.launchUI, // 1 for getting boot parameters
             2: this.displayButton // 2 for UI scene creation
         };
-        //this.onReady = this.launchUI;//this.displayButton;
         this.displayTitle();
 
         Boot.WEBGL = true;

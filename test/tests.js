@@ -10,6 +10,12 @@ var gs = require('../server/GameServer.js').GameServer;
 var PORT = 8081; //TODO: read from conf file?
 
 describe('Server', function () {
+
+    /*var client;
+    before('socket-client',function(){
+        client = io('http://localhost:'+PORT); // https://github.com/agconti/socket.io.tests/blob/master/test/test.js
+    });*/
+
     it('Run', function (done) {
         request('http://localhost:'+PORT, function(error, response, body) {
             expect(response.statusCode).to.equal(200);
@@ -17,11 +23,24 @@ describe('Server', function () {
         });
     });
 
+    var client;
     it('io-connection',function(done){
-        var client = io('http://localhost:'+PORT); // https://github.com/agconti/socket.io.tests/blob/master/test/test.js
+        client = io('http://localhost:'+PORT); // https://github.com/agconti/socket.io.tests/blob/master/test/test.js
         client.on('ack',function(){
             expect(true).to.equal(true);
             done();
+        });
+    });
+
+    var inputs = [{},{new:true}];
+    inputs.forEach(function(input,i){
+        // Loop only the emits, declare receiving event only one, and use a counter or somesuch to make sure everything is error
+        it('io-init-world-'+i,function(done){
+            client.emit('init-world',input);
+            client.on('serv-error',function(){
+                expect(true).to.equal(true);
+                done();
+            })
         });
     });
 });

@@ -4,9 +4,13 @@
 var Map = new Phaser.Class({
 
     Extends: CustomSprite,
+    //Extends: Phaser.GameObjects.RenderTexture,
 
     initialize: function Map(x, y, viewW, viewH, dragWidth, dragHeight, target, showToponyms) {
         CustomSprite.call(this, UI.scene, x, y, 'fullmap');
+        //Phaser.GameObjects.RenderTexture.call(this, UI.scene, x, y, 2400,1824);
+        //UI.scene.add.displayList.add(this);
+        //this.draw('fullmap',0,0);
 
         this.setDepth(2);
         this.setScrollFactor(0);
@@ -162,6 +166,8 @@ var Map = new Phaser.Class({
         }else {
             this.input.hitArea.x += dx;
             this.input.hitArea.y += dy;
+            //this.fow.x -= dx;
+            //this.fow.y -= dy;
             this.moveTexts(dx,dy);
             this.movePins(dx, dy);
         }
@@ -274,7 +280,7 @@ var Map = new Phaser.Class({
         function Pt(x,y){
             this.x = x;
             this.y = y;
-            this.c = 1;
+            this.c = 1; // count
             this.nbors = [];
         }
 
@@ -302,7 +308,7 @@ var Map = new Phaser.Class({
             console.log(this.ts(),"has",this.nbors.length,"neighbors and a count of",this.c);
         };
 
-        function link(pts){
+        function link(pts){ // link together all points in list
             /*console.log('link candidates:');
             pts.forEach(function(pt){
                 console.log(pt.ts());
@@ -313,7 +319,7 @@ var Map = new Phaser.Class({
                     var b = pts[j];
                     var dx = Math.abs(a.x-b.x);
                     var dy = Math.abs(a.y-b.y);
-                    if( dx ? !dy : dy ) { // xor
+                    if( dx ? !dy : dy ) { // xor, equivalent to avoiding diagonals
                         //console.log("Linking",a.ts(),"to",b.ts());
                         a.link(b);
                         b.link(a);
@@ -322,13 +328,13 @@ var Map = new Phaser.Class({
             }
         }
 
-        function unlink(pt){
+        function unlink(pt){ // unlink a point from all its neighbors
             pt.nbors.forEach(function(nb){
                 nb.unlink(pt);
             });
         }
 
-        function lint(pts){
+        function lint(pts){ // remove side-by-side duplicate neighbors
             /*console.log("linting");
             pts.forEach(function(pt){
                 console.log(pt.ts());
@@ -366,7 +372,7 @@ var Map = new Phaser.Class({
 
         space.toList().forEach(function(entry){
             var pt = entry.v;
-            if(pt.c%2 == 0){
+            if(pt.c%2 == 0){ // redundant points have the property of having even counts
                 unlink(pt);
                 link(pt.nbors);
                 space.delete(pt.x,pt.y);
@@ -388,7 +394,7 @@ var Map = new Phaser.Class({
             var pv = null;
             if(path.length > 1) pv = path[1];
             var nt = null;
-            for(var j = 0; j < pt.nbors.length; j++){
+            for(var j = 0; j < pt.nbors.length; j++){ // Find next neighbor to travel to
                 var nb = pt.nbors[j];
                 if(!nb.equal(pv)){
                     nt = nb;
@@ -405,10 +411,19 @@ var Map = new Phaser.Class({
             return this.computeMapLocation(pt.x,pt.y);
         },this);
 
-        this.fow = UI.scene.add.polygon(0,0,path,0xffff00,0.5);
+        this.fow = UI.scene.add.polygon(0,0,path,0x000000,1);
         this.fow.setOrigin(0);
         this.fow.setDepth(this.depth+1);
         this.fow.setScrollFactor(0);
+        //this.fow.setVisible(false);
+        //this.setMask(new Phaser.Display.Masks.BitmapMask(UI.scene,this.fow));
+
+        /*console.log(this);
+        var msk = this.mask.bitmapMask;
+        //this.fog = UI.scene.add.rectangle(this.x,this.y,msk.width,msk.height,0x000000,0.7);
+        this.fog = UI.scene.add.render
+        this.fog.setDepth(this.depth+2);
+        this.fog.setScrollFactor(0);*/
     },
 
     display: function(){
@@ -447,6 +462,7 @@ var Map = new Phaser.Class({
         });
         this.setVisible(false);
         if(this.fow) this.fow.destroy();
+        if(this.fog) this.fog.destroy();
     },
 
     hidePins: function(){
