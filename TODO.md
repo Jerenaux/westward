@@ -49,6 +49,8 @@ Sparse format, declarative (grass, water, ...)
 Store tilesets and images as atlases
 Inexistant chunks filled by water
 Editor to visualize and edit result
+Store and edit game data (resources, spawn zones, civs logic...)
+-> Like for collisions, build a digest for the server
 Built-in exploration, to test collisions and depths
 Zoom
 

@@ -9,6 +9,42 @@ var config = require('config');
 
 var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
+var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
+
+var counter = 0;
+var total = 0;
+
+function Chunk(id){
+    this.id = id;
+    var origin = Utils.AOItoTile(this.id);
+    this.x = origin.x;
+    this.y = origin.y;
+    this.defaultTile = 'grass';
+    this.layers = [new SpaceMap()];
+}
+
+Chunk.prototype.trim = function(){
+    var layers = [];
+    this.layers.forEach(function(layer){
+       layers.push(layer.toList());
+    });
+    return {
+        id: this.id,
+        x: this.x,
+        y: this.y,
+        default: this.defaultTile,
+        layers: layers
+    };
+};
+
+Chunk.prototype.write = function(chunkpath){
+    var name = 'chunk'+this.id+'.json';
+    fs.writeFile(path.join(chunkpath,name),JSON.stringify(this.trim()),function(err){
+        if(err) throw err;
+        counter++;
+        if(counter == total) console.log(counter+' files written');
+    });
+};
 
 function makeWorld(outdir){
     // Default values
@@ -46,6 +82,14 @@ function makeWorld(outdir){
     }
 
     World.setUp(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight);
+
+    var chunks = {};
+    chunks[0] = new Chunk(0);
+    total = 1;
+
+    for(var id in chunks){
+        chunks[id].write(outdir);
+    }
 }
 
 var myArgs = require('optimist').argv;
