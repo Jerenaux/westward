@@ -21,6 +21,7 @@ app.use('/server',express.static(__dirname + '/server'));
 app.use('/shared',express.static(__dirname + '/shared'));
 app.use('/maps',express.static(myArgs.maps));
 app.use('/admin',express.static(path.join(__dirname,'admin')));
+app.use('/editor',express.static(path.join(__dirname,'editor')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 if(process.env.DEV == 1) app.use('/studio',express.static(__dirname + '/studio'));

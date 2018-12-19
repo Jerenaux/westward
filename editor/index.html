@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="/lib/phaser.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <link href="/client/style.css" rel="stylesheet">
+    <title>Editor</title>
+    <!-- link rel="shortcut icon" type="image/x-icon" href="assets/images/favicon.ico"> -->
+</head>
+<body>
+    <div class="fontPreload">.</div> <!-- don't forget the dot, the div cannot be empty-->
+    <div class="fontPreloadTreamd">.</div>
+    <center><div id='game'>Hello
+    </div>
+    <div class="info">
+        Tile: <span id="tx">0</span>,<span id="ty">0</span>&nbsp;
+        AOI: <span id="aoi">0</span>
+        <!-- Pixel: <span id="pxx">0</span>,<span id="pxy">0</span><br/> -->
+    </div>
+    </center>
+</body>
+
+<script src="client/Chunk.js" type="text/javascript"></script>
+
+<script src="shared/World.js" type="text/javascript"></script>
+<script src="shared/Utils.js" type="text/javascript"></script>
+<script src="shared/PFUtils.js" type="text/javascript"></script>
+<script src="shared/ListMap.js" type="text/javascript"></script>
+<script src="shared/SpaceMap.js" type="text/javascript"></script>
+<script src="shared/Pathfinder.js" type="text/javascript"></script>
+
+</html>
