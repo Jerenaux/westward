@@ -49,6 +49,7 @@ Move away from tiles:
 [ ] Specific tiles (e.g. water joints) computed positionnally
 [x] Default filler tile for empty ones, on layer 0
 [x] Store tilesets and images as atlases
+[ ] Worl maker: store coasts
 [ ] Inexistant chunks filled by water
 [ ] Add decor elements via editor
 [ ] Store and edit game data (resources, spawn zones, civs logic...)
