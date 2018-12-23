@@ -34,6 +34,10 @@ app.get('/admin',function(req,res){
     res.sendFile(path.join(__dirname,'admin','admin.html'));
 });
 
+app.get('/editor',function(req,res){
+    res.sendFile(path.join(__dirname,'editor','index.html'));
+});
+
 var GEThandlers = {
     'buildings': gs.getBuildings,
     'settlements': gs.getSettlements

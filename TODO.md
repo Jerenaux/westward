@@ -39,20 +39,23 @@ Misc:
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
 
 Move away from tiles:
-- 96x96 grass chunks, loaded positionnally
-- Tiles only for other terrain elements (water, dirt, ...)
-- Everything on top are single-image objects (possibly rendered in multiple parts with different depths)
-(- What about multi-AOI objects?)
-Sparse format, declarative (grass, water, ...)
-- Specific tiles (e.g. water joints) computed positionnally
-- Default filler tile for empty ones, on layer 0
-Store tilesets and images as atlases
-Inexistant chunks filled by water
-Editor to visualize and edit result
-Store and edit game data (resources, spawn zones, civs logic...)
+[ ] Zoom
+[ ] Panning
+[x] 96x96 grass chunks, loaded positionnally
+[x] Tiles only for other terrain elements (water, dirt, ...)
+[ ] Everything on top are single-image objects (possibly rendered in multiple parts with different depths)
+(What about objects spanning more than 2 AOIs?)
+[x] Sparse format, declarative (grass, water, ...)
+[ ] Specific tiles (e.g. water joints) computed positionnally
+[x] Default filler tile for empty ones, on layer 0
+[x] Store tilesets and images as atlases
+[ ] Inexistant chunks filled by water
+[ ] Add decor elements via editor
+[ ] Store and edit game data (resources, spawn zones, civs logic...)
 -> Like for collisions, build a digest for the server
-Built-in exploration, to test collisions and depths
-Zoom
+[ ] Built-in exploration, to test collisions and depths
+[ ] Re-enable blitters, at least for ground and water?
+
 
 
 ##Tutorial:##

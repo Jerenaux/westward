@@ -11,8 +11,8 @@ World.setUp = function(nbHoriz,nbVert,chunkW,chunkH,tileW,tileH){
     World.nbChunksVertical = nbVert;
     World.chunkWidth = chunkW;
     World.chunkHeight = chunkH;
-    World.tileWidth = tileW;
-    World.tileHeight = tileH;
+    World.tileWidth = tileW || 32;
+    World.tileHeight = tileH || 32;
     World.computeProperties();
 };
 
@@ -20,7 +20,7 @@ World.readMasterData = function(data){
     World.setUp(
         data.nbChunksHoriz,data.nbChunksVert,
         data.chunkWidth,data.chunkHeight,
-        data.tilesets[0].tilewidth, data.tilesets[0].tileheight
+        //data.tilesets[0].tilewidth, data.tilesets[0].tileheight
     );
 };
 

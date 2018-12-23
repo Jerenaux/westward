@@ -1,0 +1,112 @@
+{
+  "data":{
+      "grassPrefix": "grass",
+      "grassSize": 2
+  },
+  "frames":[
+    {
+      "filename": "grass_0",
+      "frame": {"x":32,"y":32,"w":32,"h":32}
+    },
+    {
+      "filename": "grass_1",
+      "frame": {"x":64,"y":32,"w":32,"h":32}
+    },
+    {
+      "filename": "grass_2",
+      "frame": {"x":32,"y":64,"w":32,"h":32}
+    },
+    {
+      "filename": "grass_3",
+      "frame": {"x":64,"y":64,"w":32,"h":32}
+    },
+    {
+      "filename": "newgrass_0",
+      "frame": {"x":32,"y":128,"w":32,"h":32}
+    },
+    {
+      "filename": "newgrass_1",
+      "frame": {"x":64,"y":128,"w":32,"h":32}
+    },
+    {
+      "filename": "newgrass_2",
+      "frame": {"x":96,"y":128,"w":32,"h":32}
+    },
+    {
+      "filename": "newgrass_3",
+      "frame": {"x":32,"y":160,"w":32,"h":32}
+    },
+    {
+      "filename": "newgrass_4",
+      "frame": {"x":64,"y":160,"w":32,"h":32}
+    },
+    {
+      "filename": "newgrass_5",
+      "frame": {"x":96,"y":160,"w":32,"h":32}
+    },
+    {
+      "filename": "newgrass_6",
+      "frame": {"x":32,"y":192,"w":32,"h":32}
+    },
+    {
+      "filename": "newgrass_7",
+      "frame": {"x":64,"y":192,"w":32,"h":32}
+    },
+    {
+      "filename": "newgrass_8",
+      "frame": {"x":64,"y":192,"w":32,"h":32}
+    },
+    {
+      "filename": "water",
+      "frame": {"x":192,"y":64,"w":32,"h":32}
+    },
+    {
+      "filename": "water_bottom",
+      "frame": {"x":192,"y":96,"w":32,"h":32}
+    },
+    {
+      "filename": "water_top",
+      "frame": {"x":192,"y":32,"w":32,"h":32}
+    },
+    {
+      "filename": "water_left",
+      "frame": {"x":160,"y":64,"w":32,"h":32}
+    },
+    {
+      "filename": "water_right",
+      "frame": {"x":224,"y":64,"w":32,"h":32}
+    },
+    {
+      "filename": "water_bend_tl",
+      "frame": {"x":160,"y":32,"w":32,"h":32}
+    },
+    {
+      "filename": "water_bend_bl",
+      "frame": {"x":160,"y":96,"w":32,"h":32}
+    },
+    {
+      "filename": "water_bend_tr",
+      "frame": {"x":224,"y":32,"w":32,"h":32}
+    },
+    {
+      "filename": "water_bend_br",
+      "frame": {"x":224,"y":96,"w":32,"h":32}
+    },
+    {
+      "filename": "water_corner_tl",
+      "frame": {"x":288,"y":32,"w":32,"h":32}
+    },
+    {
+      "filename": "water_corner_bl",
+      "frame": {"x":288,"y":64,"w":32,"h":32}
+    },
+    {
+      "filename": "water_corner_tr",
+      "frame": {"x":320,"y":32,"w":32,"h":32}
+    },
+    {
+      "filename": "water_corner_br",
+      "frame": {"x":320,"y":64,"w":32,"h":32}
+    }
+  ]
+}

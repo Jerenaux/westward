@@ -90,6 +90,32 @@ function makeWorld(outdir){
     for(var id in chunks){
         chunks[id].write(outdir);
     }
+
+    writeMasterFile(outdir);
+    writeCollisions(outdir); //TODO: listCollisions instead
+}
+
+function writeMasterFile(outdir){
+    // Write master file
+    var master = {
+        //tilesets : tilesetsData.tilesets,
+        chunkWidth: chunkWidth,
+        chunkHeight: chunkHeight,
+        nbChunksHoriz: nbHoriz,
+        nbChunksVert: nbVert
+    };
+    fs.writeFile(path.join(outdir,'master.json'),JSON.stringify(master),function(err){
+        if(err) throw err;
+        console.log('Master written');
+    });
+}
+
+function writeCollisions(outdir){
+    // Write master file
+    fs.writeFile(path.join(outdir,'collisions.json'),JSON.stringify([]),function(err){
+        if(err) throw err;
+        console.log('Collisions written');
+    });
 }
 
 var myArgs = require('optimist').argv;

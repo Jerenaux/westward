@@ -37,7 +37,7 @@ function detectBrowser(){
     if(isEdge) return 'Edge';
 
     // Chrome 1+
-    var isChrome = !!window.chrome && !!window.chrome.webstore;
+    var isChrome = !!window.chrome;
     if(isChrome) return 'Chrome';
 
     // Blink engine detection
