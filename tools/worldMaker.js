@@ -26,7 +26,7 @@ function Chunk(id){
 Chunk.prototype.trim = function(){
     var layers = [];
     this.layers.forEach(function(layer){
-       layers.push(layer.toList());
+       layers.push(layer.toList()); // TODO: make smaller lists
     });
     return {
         id: this.id,

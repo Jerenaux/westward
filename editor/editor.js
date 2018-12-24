@@ -106,6 +106,7 @@ Chunk.prototype.draw = function(){
             //if(Engine) Engine.addCollision(x,y,tile); // TODO: add to Editor as well for visualisation
         },this);
     },this);
+    Editor.scene.add.image(11*32,16*32,'tileset','stump');
 };
 
 Chunk.prototype.hasWater = function(x,y){
@@ -113,51 +114,23 @@ Chunk.prototype.hasWater = function(x,y){
 };
 
 Chunk.prototype.hasCoast = function(x,y){
+    if(x < 0 || y < 0) return true;
     return (this.ground.get(x,y) == 'c');
 };
 
 Chunk.prototype.drawCoastTile = function(x,y){
-    var tile = 'water_top';
-    // TODO: fetch data from neghboring chunk
-    /*if(this.hasWater(x+1,y+1)) tile = 'water_bend_tl';
-    if(this.hasWater(x+1,y-1)) tile = 'water_bend_bl';
-    if(this.hasWater(x-1,y+1)) tile = 'water_bend_tr';
-    if(this.hasWater(x-1,y-1)) tile = 'water_bend_br';
-    if(this.hasWater(x,y-1)) tile = 'water_bottom';
-    if(this.hasWater(x,y+1)) tile = 'water_top';
-    if(this.hasWater(x+1,y)) tile = 'water_left';
-    if(this.hasWater(x-1,y)) tile = 'water_right';
-    if(this.hasWater(x-1,y) && this.hasWater(x,y-1)) tile = 'water_corner_tl';
-    if(this.hasWater(x-1,y) && this.hasWater(x,y+1)) tile = 'water_corner_bl';
-    if(this.hasWater(x+1,y) && this.hasWater(x,y-1)) tile = 'water_corner_tr';
-    if(this.hasWater(x+1,y) && this.hasWater(x,y+1)) tile = 'water_corner_br';*/
-    /*if(this.hasWater(x,y-1) && !this.hasWater(x+1,y) && !this.hasWater(x-1,y)) tile = 'water_bottom';
-    else if(this.hasWater(x,y+1) && !this.hasWater(x+1,y) && !this.hasWater(x-1,y)) tile = 'water_top';
-    else if(this.hasWater(x+1,y) && !this.hasWater(x,y-1) && !this.hasWater(x,y+1)) tile = 'water_left';
-    else if(this.hasWater(x-1,y) && !this.hasWater(x,y-1) && !this.hasWater(x,y+1)) tile = 'water_right';
-    else if(this.hasWater(x-1,y) && this.hasWater(x,y-1)) tile = 'water_corner_tl';
-    else if(this.hasWater(x-1,y) && this.hasWater(x,y+1)) tile = 'water_corner_bl';
-    else if(this.hasWater(x+1,y) && this.hasWater(x,y-1)) tile = 'water_corner_tr';
-    else if(this.hasWater(x+1,y) && this.hasWater(x,y+1)) tile = 'water_corner_br';
-    else if(this.hasWater(x+1,y+1)) tile = 'water_bend_tl';
-    else if(this.hasWater(x+1,y-1)) tile = 'water_bend_bl';
-    else if(this.hasWater(x-1,y+1)) tile = 'water_bend_tr';
-    else if(this.hasWater(x-1,y-1)) tile = 'water_bend_br';
-    var isFlat = (tile.includes('top') || tile.includes('bottom'))
-    if(this.hasCoast(x,y-1) && this.hasCoast(x+1,y) && isFlat) tile = 'water_bend_bl';*/
     var tile;
-    // https://stackoverflow.com/questions/8901987/map-tiling-algorithm
-    if(this.hasCoast(x-1,y) && this.hasCoast(x+1,y)){ // Horizontal edge
+    if(this.hasCoast(x-1,y) && this.hasCoast(x+1,y)  && (this.hasWater(x,y-1) || this.hasWater(x,y+1))){ // Horizontal edge
         tile = (this.hasWater(x,y-1) ? 'water_bottom' : 'water_top');
-    }else if(this.hasCoast(x,y-1) && this.hasCoast(x,y+1)) { // Vertical edge
+    }else if(this.hasCoast(x,y-1) && this.hasCoast(x,y+1) && (this.hasWater(x+1,y) || this.hasWater(x-1,y))) { // Vertical edge
         tile = (this.hasWater(x-1,y) ? 'water_right' : 'water_left');
-    }else if(this.hasCoast(x,y+1) && this.hasCoast(x+1,y)) { // tl
+    }else if(this.hasCoast(x,y+1) && this.hasCoast(x+1,y) && (this.hasWater(x+1,y+1) || this.hasWater(x-1,y-1)) ) { // tl
         tile = (this.hasWater(x+1,y+1) ? 'water_bend_tl' : 'water_corner_tl');
-    }else if(this.hasCoast(x-1,y) && this.hasCoast(x,y+1)) { // tr
+    }else if(this.hasCoast(x-1,y) && this.hasCoast(x,y+1) && (this.hasWater(x-1,y+1) || this.hasWater(x+1,y-1))) { // tr
         tile = (this.hasWater(x-1,y+1) ? 'water_bend_tr' : 'water_corner_tr');
-    }else if(this.hasCoast(x,y-1) && this.hasCoast(x-1,y)) { // br
+    }else if(this.hasCoast(x,y-1) && this.hasCoast(x-1,y) && (this.hasWater(x+1,y+1) || this.hasWater(x-1,y-1))) { // br
         tile = (this.hasWater(x-1,y-1) ? 'water_bend_br' : 'water_corner_br');
-    }else if(this.hasCoast(x+1,y) && this.hasCoast(x,y-1)) { // bl
+    }else if(this.hasCoast(x+1,y) && this.hasCoast(x,y-1) && (this.hasWater(x-1,y+1) || this.hasWater(x+1,y-1))) { // bl
         tile = (this.hasWater(x+1,y-1) ? 'water_bend_bl' : 'water_corner_bl');
     }
     this.drawTile(x,y,tile);

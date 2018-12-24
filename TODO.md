@@ -491,8 +491,7 @@ https://confluence.atlassian.com/bitbucket/deploy-to-heroku-872013667.html
 
 Design document:
 ---------------
-- Add recent ideas about soldier control (see settlement defense)
-- Re-read, update with recent ideas
+- Re-read every month (last: ?, read up to "commitment")
 - Decide list of buildings, items, ...
 - Make Excel tables (crafting, inventory, bestiary, ...)
 - Make powerpoint

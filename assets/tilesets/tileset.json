@@ -107,6 +107,31 @@
     {
       "filename": "water_corner_br",
       "frame": {"x":320,"y":64,"w":32,"h":32}
+    },
+    {
+      "filename": "tree_1",
+      "frame": {"x":5,"y":298,"w":126,"h":150},
+      "anchor": {"x":0.21,"y":1}
+    },
+    {
+      "filename": "tree_2",
+      "frame": {"x":132,"y":284,"w":128,"h":164},
+      "anchor": {"x":0.25,"y":1}
+    },
+    {
+      "filename": "tree_3",
+      "frame": {"x":260,"y":279,"w":151,"h":169},
+      "anchor": {"x":0.18,"y":1}
+    },
+    {
+      "filename": "tree_dead",
+      "frame": {"x":378,"y":128,"w":134,"h":151},
+      "anchor": {"x":0.04,"y":1}
+    },
+    {
+      "filename": "stump",
+      "frame": {"x":169,"y":194,"w":74,"h":64},
+      "anchor": {"x":0,"y":1}
     }
   ]
 }
