@@ -54,26 +54,36 @@ SpaceMap.prototype.getFirst = function(){
     return this.toList()[0].v;
 };
 
-SpaceMap.prototype.toList = function(){ // serialize to a list representation
+SpaceMap.prototype.toList = function(compact){ // serialize to a list representation
     var list = [];
     for(var x in this){
         if(this.hasOwnProperty(x)){
             for(var y in this[x]){
-                if(this[x].hasOwnProperty(y)) list.push({
-                    x: x,
-                    y: y,
-                    v: this[x][y]
-                });
+                if(this[x].hasOwnProperty(y)){
+                    if(compact){
+                        list.push([x,y,this[x][y]])
+                    }else {
+                        list.push({
+                            x: x,
+                            y: y,
+                            v: this[x][y]
+                        });
+                    }
+                }
             }
         }
     }
     return list;
 };
 
-SpaceMap.prototype.fromList = function(list) { // unserialize from list representation
+SpaceMap.prototype.fromList = function(list,compact) { // unserialize from list representation
     for(var i = 0; i < list.length; i++){
         var item = list[i];
-        this.add(item.x,item.y,(item.v || {}));
+        if(compact){
+            this.add(item[0],item[1],(item[2] || {}))
+        }else {
+            this.add(item.x, item.y, (item.v || {}));
+        }
     }
 };
 

@@ -23,7 +23,36 @@ Editor.create = function(){
     World.readMasterData(this.cache.json.get('master'));
     Editor.tilesetData = this.cache.json.get('tileset').data;
     console.log(Editor.tilesetData);
+    Editor.camera = Editor.scene.cameras.main;
+    Editor.scene.input.on('pointermove', Editor.trackMouse);
+    Editor.scene.input.on('pointerdown', Editor.centerCamera);
     Editor.updateEnvironment();
+};
+
+Editor.centerCamera = function(pointer){
+    var position = Editor.getMouseCoordinates(pointer);
+    Editor.camera.centerOn(position.pixel.x,position.pixel.y);
+};
+
+Editor.getMouseCoordinates = function(pointer){
+    var pxX = Editor.camera.scrollX + pointer.x;
+    var pxY = Editor.camera.scrollY + pointer.y;
+    var tileX = Math.floor(pxX/TILE_WIDTH);
+    var tileY = Math.floor(pxY/TILE_HEIGHT);
+    return {
+        tile:{x:tileX,y:tileY},
+        pixel:{x:pxX,y:pxY}
+    };
+};
+
+Editor.trackMouse = function(event){
+    var position = Editor.getMouseCoordinates(event);
+    //Editor.updateMarker(position.tile);
+    //document.getElementById('pxx').innerHTML = Math.round(position.pixel.x);
+    //document.getElementById('pxy').innerHTML = Math.round(position.pixel.y);
+    document.getElementById('tx').innerHTML = position.tile.x;
+    document.getElementById('ty').innerHTML = position.tile.y;
+    document.getElementById('aoi').innerHTML = Utils.tileToAOI(position.tile);
 };
 
 Editor.updateEnvironment = function(){
@@ -77,13 +106,11 @@ function Chunk(data){
 
 Chunk.prototype.draw = function(){
     // Ground
-    console.log(World.chunkWidth,World.chunkHeight);
-    // TODO: don't put grass below full water tiles; draw after? (and set depth explicitly)
     for(var x_ = 0; x_ < World.chunkWidth; x_++){
         for(var y_ = 0; y_ < World.chunkHeight; y_++) {
-            if(this.hasWater(x_,y_)) continue;
             var tx = this.x + x_;
             var ty = this.y + y_;
+            if(this.hasWater(tx,ty)) continue;
             if(this.defaultTile == 'grass') {
                 var gs = Editor.tilesetData.grassSize;
                 var t = (tx % gs) + (ty % gs) * gs;
@@ -106,16 +133,29 @@ Chunk.prototype.draw = function(){
             //if(Engine) Engine.addCollision(x,y,tile); // TODO: add to Editor as well for visualisation
         },this);
     },this);
-    Editor.scene.add.image(11*32,16*32,'tileset','stump');
+    //Editor.scene.add.image(11*32,16*32,'tileset','stump');
+};
+
+Chunk.prototype.neighborHas = function(x,y,v){
+    var id = Utils.tileToAOI({x:x,y:y});
+    console.log('Asking neighbor ',id);
+    return Editor.chunks[id].has(x,y,v);
+};
+
+Chunk.prototype.has = function(x,y,v){
+    var cx = x - this.x;
+    var cy = y - this.y;
+    if(cy >= World.chunkHeight) return this.neighborHas(x,y,v);
+    return (this.ground.get(cx,cy) == v);
 };
 
 Chunk.prototype.hasWater = function(x,y){
-    return (this.ground.get(x,y) == 'w');
+    return this.has(x,y,'w');
 };
 
 Chunk.prototype.hasCoast = function(x,y){
-    if(x < 0 || y < 0) return true;
-    return (this.ground.get(x,y) == 'c');
+    //if(x < 0 || y < 0) return true;
+    return this.has(x,y,'c');
 };
 
 Chunk.prototype.drawCoastTile = function(x,y){
@@ -133,6 +173,7 @@ Chunk.prototype.drawCoastTile = function(x,y){
     }else if(this.hasCoast(x+1,y) && this.hasCoast(x,y-1) && (this.hasWater(x-1,y+1) || this.hasWater(x+1,y-1))) { // bl
         tile = (this.hasWater(x+1,y-1) ? 'water_bend_bl' : 'water_corner_bl');
     }
+    if(tile === undefined) console.warn('undefined at',x,y);
     this.drawTile(x,y,tile);
 };
 
@@ -164,7 +205,7 @@ Editor.zoom = function(coef){
     Editor.zoomIndex = Utils.clamp(Editor.zoomIndex - coef,0,Editor.zoomScales.length-1);
     Editor.zoomScale = Editor.zoomScales[Editor.zoomIndex];
 
-    Editor.scene.cameras.main.setZoom(Editor.zoomScale);
+    Editor.camera.setZoom(Editor.zoomScale);
 
     Editor.updateEnvironment();
 };

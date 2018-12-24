@@ -45,11 +45,13 @@ Move away from tiles:
 [x] Tiles only for other terrain elements (water, dirt, ...)
 [ ] Everything on top are single-image objects (possibly rendered in multiple parts with different depths)
 (What about objects spanning more than 2 AOIs?)
+[ ] Test trees overlaps
+[ ] Visualize collisions
 [x] Sparse format, declarative (grass, water, ...)
-[ ] Specific tiles (e.g. water joints) computed positionnally
+[x] Specific tiles (e.g. water joints) computed positionnally
 [x] Default filler tile for empty ones, on layer 0
 [x] Store tilesets and images as atlases
-[ ] Worl maker: store coasts
+[ ] World maker: store coasts
 [ ] Inexistant chunks filled by water
 [ ] Add decor elements via editor
 [ ] Store and edit game data (resources, spawn zones, civs logic...)
@@ -193,6 +195,7 @@ Performance:
 - listCollisions: don't store water tiles, only shore etc. (! beware of impact on trailblazer)
 - Flattening: second pass to delete water-only chunks based on visibility
 - Flattening based on transparency
+- Look into gzipping maps
 Order:
 - Clean all tutorial stuff
 - Store buildings data in separate files for the rendering stuff and the economic stuff;
@@ -415,6 +418,8 @@ or
 * Packaging
 - Display nb connected
 - Cheat-proof: proper auth system, lock admin
+https://medium.freecodecamp.org/learn-how-to-handle-authentication-with-node-using-passport-js-4a56ed18e81e
+https://w3layouts.com/validate-login-register-forms-flat-responsive-widget-template/
 - Automate standalone app build (as part of deployment)
 * Settlement defense
 - Enable commander to build towers
@@ -475,11 +480,8 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-- Migrate to one single repository (Heroku)
-OR
-- Keep only Bitbucket one and look into "deploy to heroku" bitbucket tutorials
 https://confluence.atlassian.com/bitbucket/deploy-to-heroku-872013667.html
-- Look into bitbucket+Heroku pipelines, or Heroku pipelines
+- push with -f, add maps
 - Tool to gather, uglify and compress all relevant source files 
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?
@@ -491,6 +493,7 @@ https://confluence.atlassian.com/bitbucket/deploy-to-heroku-872013667.html
 
 Design document:
 ---------------
+- Use stumps for depleting forests
 - Re-read every month (last: ?, read up to "commitment")
 - Decide list of buildings, items, ...
 - Make Excel tables (crafting, inventory, bestiary, ...)
