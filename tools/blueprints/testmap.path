@@ -5,7 +5,7 @@
 <svg xmlns="http://www.w3.org/2000/svg"
      width="14.2204in" height="14.2204in"
      viewBox="0 0 1024 1024">
-<fill nodes="1 1"></fill>
+<fill nodes="1 1,15 10"></fill>
   <path id="Sélection"
         fill="none" stroke="black" stroke-width="1"
         d="M 1024.00,0.00

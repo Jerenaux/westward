@@ -54,7 +54,7 @@
     },
     {
       "filename": "newgrass_8",
-      "frame": {"x":64,"y":192,"w":32,"h":32}
+      "frame": {"x":96,"y":192,"w":32,"h":32}
     },
     {
       "filename": "water",

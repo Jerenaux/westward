@@ -35,7 +35,7 @@ Chunk.prototype.get = function(x,y){
 Chunk.prototype.trim = function(){
     var layers = [];
     this.layers.forEach(function(layer){
-       layers.push(layer.toList()); // TODO: make smaller lists
+       layers.push(layer.toList(true)); // ture = compact list
     });
     return {
         id: this.id,
@@ -138,11 +138,15 @@ function applyBlueprint(blueprint){
                 if (j > 0) addTiles.shift();
                 tiles = tiles.concat(addTiles);
             }
+            console.log('From',tiles[0],'to',tiles[tiles.length-1]);
+            /*tiles.forEach(function(t){
+                console.log(t);
+            });*/
 
             tiles = Geometry.forwardSmoothPass(tiles);
             tiles = Geometry.backwardSmoothPass(tiles);
             //if(tiles.length > 1) WorldEditor.drawShore(tiles);
-            if(tiles.length > 1) drawShore(tiles);
+            if(tiles.length > 1) addShore(tiles);
         }
 
         if(doFill) {
@@ -150,6 +154,7 @@ function applyBlueprint(blueprint){
                 fill(fillNodes[k]);
             }
         }
+        drawShore();
 
         // TODO: Prune chunks / set default tile as water
         /*var visible = new Set();
@@ -261,8 +266,17 @@ function addTile(tile,value){
     chunk.add(tile.x-chunk.x,tile.y-chunk.y,value);
 }
 
+function getTile(x,y){
+    var id = Utils.tileToAOI({x:x,y:y});
+    if(!(id in chunks)) return;
+    var chunk = chunks[id];
+    return chunk.get(x-chunk.x,y-chunk.y);
+}
+
+// Fillnode coords are in tiles! (Should be improved)
 function fill(fillNode,stop){ // fills the world with water, but stops at coastlines
     console.log('Filling ...');
+    //if(fillNode.x < 0 || fillNode.x > 1 || fillNode.y < 0 || fillNode.y > 0) console.warn('Wrong fillNode coordinates');
     var stoppingCritetion = stop || 40000;
     var queue = [];
     queue.push(fillNode);
@@ -275,11 +289,7 @@ function fill(fillNode,stop){ // fills the world with water, but stops at coastl
         //console.log('filling at ',node.x,node.y,WorldEditor.isBusy(node));
         if(isBusy(node)) continue;
         // put a tile at location
-
-        //fillTiles.push(node);
-        //WorldEditor.busyTiles.add(node.x,node.y,1);
         addTile(node,'w');
-        //console.log('adding water at',node);
         // expand
         for(var i = 0; i < contour.length; i++){
             var candidate = {
@@ -296,18 +306,47 @@ function fill(fillNode,stop){ // fills the world with water, but stops at coastl
             break;
         }
     }
-    /*console.log('volume : '+fillTiles.length);
-
-    for(var i = 0; i < fillTiles.length; i++){
-        var tile = fillTiles[i];
-        WorldEditor.addTile(tile.x, tile.y, WorldEditor.shore.water);
-    }*/
 }
 
-function drawShore(tiles){
-    tiles.forEach(function(tile){
-        addTile(tile,'c');
-        //console.log('drawing shore at',tile);
+function addShore(tiles){
+    tiles.forEach(function(t) {
+        if(!isInWorldBounds(t.x,t.y)) return;
+        addTile(t,'c');
+        //console.log('adding shore at',t);
+        coast.push(t);
+    });
+}
+
+function hasCoast(x,y){
+    var t = getTile(x,y);
+    return !(!t || t == 'w');
+}
+
+function hasWater(x,y){
+    return getTile(x,y) == 'w';
+}
+
+function drawShore(){
+    console.log('Drawing shore ...');
+    coast.forEach(function(c){
+        var x = c.x;
+        var y = c.y;
+        var tile;
+        if(hasCoast(x-1,y) && hasCoast(x+1,y)  && (hasWater(x,y-1) || hasWater(x,y+1))){ // Horizontal edge
+            tile = (hasWater(x,y-1) ? 'wb' : 'wt');
+        }else if(hasCoast(x,y-1) && hasCoast(x,y+1) && (hasWater(x+1,y) || hasWater(x-1,y))) { // Vertical edge
+            tile = (hasWater(x-1,y) ? 'wr' : 'wl');
+        }else if(hasCoast(x,y+1) && hasCoast(x+1,y) && (hasWater(x+1,y+1) || hasWater(x-1,y-1)) ) { // tl
+            tile = (hasWater(x+1,y+1) ? 'wbtl' : 'wctl');
+        }else if(hasCoast(x-1,y) && hasCoast(x,y+1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // tr
+            tile = (hasWater(x-1,y+1) ? 'wbtr' : 'wctr');
+        }else if(hasCoast(x,y-1) && hasCoast(x-1,y) && (hasWater(x+1,y+1) || hasWater(x-1,y-1))) { // br
+            tile = (hasWater(x-1,y-1) ? 'wbbr' : 'wcbr');
+        }else if(hasCoast(x+1,y) && hasCoast(x,y-1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // bl
+            tile = (hasWater(x+1,y-1) ? 'wbbl' : 'wcbl');
+        }
+        if(tile === undefined) console.warn('undefined at',x,y);
+        addTile(c,tile);
     });
 }
 
@@ -336,6 +375,7 @@ function writeCollisions(outdir){
 
 var myArgs = require('optimist').argv;
 chunks = {};
+coast = [];
 nbHoriz = myArgs.nbhoriz;
 nbVert = myArgs.nbvert;
 chunkWidth = myArgs.chunkw;

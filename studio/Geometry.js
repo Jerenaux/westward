@@ -197,6 +197,9 @@ Geometry.forwardSmoothPass = function(tiles){
             });
             i++;
         }
+        if(dx == 0 && dy == 2){ // vertical gap
+            tiles.splice(i,1); // simply remove it
+        }
     }
     return tiles;
 };
