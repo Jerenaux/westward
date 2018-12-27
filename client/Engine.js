@@ -2,7 +2,7 @@
  * Created by Jerome on 26-06-17.
  */
 var Engine = {
-    // Move to conf?
+    // TODO: Move to conf?
     baseViewWidth: 32,
     baseViewHeight: 18,
     tileWidth: 32,
@@ -22,9 +22,7 @@ var Engine = {
     tooltipElementsDepth: 17,
     tooltipTextDepth: 18,
 
-    // Move to conf
-    notificationDuration: 3000, // TODO: adapt based on notif length?
-    hearingDistance: 30, // tiles
+    // TODO: Move to conf
     craftInvSize: 5, // max number of ingredients for crafting
     maxPathLength: 36,
 
@@ -345,6 +343,7 @@ Engine.getGameInstance = function(){
     return Engine.scene.sys.game;
 };
 
+// TODO: rename / remove
 Engine.getGameConfig = function(){
     return Engine.getGameInstance().config;
 };
@@ -582,10 +581,11 @@ Engine.ambientSounds = function(sounds,interval){
 Engine.playLocalizedSound = function(sound,maxVolume,location){
     var volume = maxVolume;
     var dist = Utils.manhattan(location,{x:Engine.player.tileX,y:Engine.player.tileY});
-    if(dist < Engine.hearingDistance){
-        var d = Engine.hearingDistance-dist;
+    var hearingDistance = Engine.config.hearingDistance;
+    if(dist < hearingDistance){
+        var d = hearingDistance-dist;
         //volume = Math.round(Utils.clamp(d/Engine.hearingDistance,0,1)*maxVolume);
-        volume = Utils.clamp(d/Engine.hearingDistance,0,1)*maxVolume;
+        volume = Utils.clamp(d/hearingDistance,0,1)*maxVolume;
         Engine.scene.sound.add(sound).setVolume(volume).play();
     }
 };

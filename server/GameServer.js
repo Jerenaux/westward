@@ -1091,6 +1091,7 @@ GameServer.listSettlements = function(trimCallback){
     return settlements;
 };
 
+// TODO: remove
 GameServer.getSettlements = function(){
     return GameServer.listSettlements();
 };
@@ -1153,27 +1154,17 @@ GameServer.toggleBuild = function(data){
     return true;
 };
 
-GameServer.getScreenshots = function(res){
+GameServer.getScreenshots = function(cb){
     GameServer.server.db.collection('screenshots').find({}).toArray(function(err,docs){
         if(err) throw err;
-        if (docs.length == 0) {
-            res.status(204).end();
-        } else {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200).send(docs).end();
-        }
+        cb(docs);
     });
 };
 
-GameServer.getEvents = function(res){
+GameServer.getEvents = function(cb){
     GameServer.server.db.collection('events').find({}).toArray(function(err,docs){
         if(err) throw err;
-        if (docs.length == 0) {
-            res.status(204).end();
-        } else {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200).send(docs).end();
-        }
+        cb(docs);
     });
 };
 

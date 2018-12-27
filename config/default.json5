@@ -91,8 +91,10 @@
             forceNewPlayer: false,
             offerTutorial: true
         },
-        config: {
+        config: { // Will be in Engine.config
             chatTimeout: 5000, //ms
+            notificationTimeout: 3000, //ms ; TODO: adapt based on length?
+            hearingDistance: 30, // tiles
             /*starting: { // TODO: sync to db
                 0: {
                     x: 1203,

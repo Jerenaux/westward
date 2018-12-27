@@ -153,7 +153,6 @@ Client.sendPath = function(path,action){
     Client.socket.emit('path',{path:path,action:action});
 };
 
-// TODO: remove after testing
 Client.buildingClick = function(targetID){
     Client.socket.emit('buildingClick',{id:targetID});
 };

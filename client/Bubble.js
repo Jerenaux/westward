@@ -7,7 +7,7 @@ function Bubble(x,y,isNotification){
     this.x = x;
     this.y = y;
     this.isNotificiation = isNotification || false;
-    this.duration = this.isNotificiation ? Engine.notificationDuration : Engine.config.chatTimeout;
+    this.duration = this.isNotificiation ? Engine.config.notificationDuration : Engine.config.chatTimeout;
     this.makeBubble(x,y);
     this.finalize();
 }

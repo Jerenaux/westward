@@ -6,6 +6,7 @@ var path = require('path');
 var clone = require('clone');
 var xml2js = require('xml2js');
 var config = require('config');
+var Jimp = require("jimp");
 
 var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
@@ -22,7 +23,12 @@ function Chunk(id){
     this.y = origin.y;
     this.defaultTile = 'grass';
     this.layers = [new SpaceMap()];
+    this.decor = [];
 }
+
+Chunk.prototype.addDecor = function(x,y,v){
+    this.decor.push([x,y,v]);
+};
 
 Chunk.prototype.add = function(x,y,v){
     this.layers[0].add(x,y,v);
@@ -42,7 +48,8 @@ Chunk.prototype.trim = function(){
         x: this.x,
         y: this.y,
         default: this.defaultTile,
-        layers: layers
+        layers: layers,
+        decor: this.decor
     };
 };
 
@@ -103,6 +110,73 @@ function makeWorld(outdir,blueprint){
 
     applyBlueprint(blueprint);
 
+    var img = blueprint.split('.')[0]+'.png';
+    console.log('Scanning image ',img);
+    Jimp.read(path.join(__dirname,'blueprints',img), function (err, image) {
+        if (err) throw err;
+        createForests(image,outdir);
+    });
+}
+
+function createForests(image,outdir){
+    // TODO: add tree variety north/south gradient
+    var trees = new SpaceMap();
+    var greenpixels = [];
+    image.scan(0, 0, image.bitmap.width, image.bitmap.height, function (x, y, idx) {
+        //if(done) return;
+        // x, y is the position of this pixel on the image
+        // idx is the position start position of this rgba tuple in the bitmap Buffer
+        // this is the image
+
+        var red = this.bitmap.data[idx + 0];
+        var green = this.bitmap.data[idx + 1];
+        var blue = this.bitmap.data[idx + 2];
+
+        if (red == 203 && green == 230 && blue == 163) greenpixels.push({x: x, y: y});
+    });
+
+    greenpixels.sort(function (a, b) {
+        if (a.y < b.y) return -1;
+        if (a.y == b.y) return 0;
+        if (a.y > b.y) return 1;
+    });
+
+    var xRandRange = 7;
+    var yRandRange = 7;
+    var nbtrees = 0;
+    for (var i = 0; i < greenpixels.length; i++) {
+        var px = greenpixels[i];
+        var x = px.x;
+        var y = px.y;
+        var gx = Math.round(x * (nbHoriz * chunkWidth / image.bitmap.width));
+        var gy = Math.round(y * (nbVert * chunkHeight / image.bitmap.height));
+        gx += Utils.randomInt(-xRandRange, xRandRange + 1);
+        gy += Utils.randomInt(-yRandRange, yRandRange + 1);
+
+        var free = true;
+        for(var xi = 0; xi < 2; xi++){
+            for(var yi = 0; yi < 2; yi++){
+                if(trees.get(gx+xi,gx-yi)) free = false;
+            }
+        }
+        if(free){
+            for(var xi = 0; xi < 2; xi++){
+                for(var yi = 0; yi < 2; yi++){
+                    trees.add(gx+xi,gx-yi,1);
+                }
+            }
+            addDecor({x: gx, y: gy}, 't1');
+            console.log('adding tree at',gx,gy);
+            nbtrees++;
+        }
+    }
+    console.log(nbtrees + ' trees drawn');
+
+    /*fs.writeFile(path.join(__dirname,'blueprints','trees.json'),JSON.stringify(greenPixels),function(err){
+        if(err) throw err;
+        console.log('Green pixels written');
+    });*/
+
     for(var id in chunks){
         chunks[id].write(outdir);
     }
@@ -113,7 +187,7 @@ function makeWorld(outdir,blueprint){
 
 function applyBlueprint(blueprint){
     var parser = new xml2js.Parser();
-    var blueprint = fs.readFileSync(__dirname+'/blueprints/'+blueprint).toString();
+    var blueprint = fs.readFileSync(path.join(__dirname,'blueprints',blueprint)).toString();
     parser.parseString(blueprint, function (err, result) {
         if(err) throw err;
         var read = readPath(result);
@@ -257,6 +331,13 @@ function isBusy(node){
 
 function isInWorldBounds(x,y){
     return !(x < 0 || y < 0 || x >= World.worldWidth || y >= World.worldHeight);
+}
+
+function addDecor(tile,decor){
+    var id = Utils.tileToAOI(tile);
+    if(!(id in chunks)) return;
+    var chunk = chunks[id];
+    chunk.addDecor(tile.x-chunk.x,tile.y-chunk.y,decor);
 }
 
 function addTile(tile,value){

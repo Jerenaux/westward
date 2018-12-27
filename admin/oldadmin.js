@@ -213,7 +213,6 @@ app.filter('processImg',function(){
 });
 
 app.filter('eventFilter',function(){
-    // TODO: sync event id's with Prism
     return function(event,scope){
         var t = new Date(event.time);
         var dateStr = "["+t.getDate()+"/"+(t.getMonth()+1)+" "+t.getHours()+":"+t.getMinutes()+":"+t.getSeconds()+"]";

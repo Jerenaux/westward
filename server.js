@@ -39,32 +39,25 @@ app.get('/editor',function(req,res){
 });
 
 var GEThandlers = {
-    'buildings': gs.getBuildings,
-    'settlements': gs.getSettlements
+    //'buildings': gs.getBuildings,
+    'events': gs.getEvents,
+    'screenshots': gs.getScreenshots
 };
 var categories = Object.keys(GEThandlers);
 
 categories.forEach(function(cat){
     app.get('/admin/' + cat, function (req, res) {
         console.log('[ADMIN] requesting ' + cat);
-        var data = GEThandlers[cat]();
-        if (data.length == 0) {
-            res.status(204).end();
-        } else {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200).send(data).end();
-        }
+        if(!(cat in GEThandlers)) return;
+        GEThandlers[cat](function(data){
+            if (data.length == 0) {
+                res.status(204).end();
+            } else {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200).send(data).end();
+            }
+        });
     });
-});
-// TODO: same behavior for the above and the below
-app.get('/admin/screenshots', function (req, res) {
-    console.log('[ADMIN] requesting screenshots');
-    gs.getScreenshots(res);
-});
-
-app.get('/admin/events', function (req, res) {
-    console.log('[ADMIN] requesting events');
-    gs.getEvents(res);
 });
 
 var POSThandlers = {

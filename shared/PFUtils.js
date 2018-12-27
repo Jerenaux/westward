@@ -57,25 +57,5 @@ PFUtils.buildingCollisions = function(tx,ty,w,h,collisionMap){
     }
 };
 
-/*PFUtils.buildingCollisions = function(tx,ty,data,collisionMap){
-    var coll = data.collisions;
-
-    for(var x = tx + coll.x; x < tx + coll.x + coll.w; x++){
-        for(var y = ty + coll.y; y < ty + coll.y + coll.h; y++) {
-            collisionMap.add(x,y);
-            if(!onServer && Engine.debugCollisions) Engine.scene.add.rectangle((x*32)+16,(y*32)+16, 32,32, 0xffa500).setAlpha(0.7).setDepth(100);
-        }
-    }
-
-    var entrance = data.entrance;
-    if(entrance) {
-        for (var x = tx + entrance.x; x < tx + entrance.x + entrance.w; x++) {
-            for (var y = ty + entrance.y; y < ty + entrance.y + entrance.h; y++) {
-                collisionMap.delete(x, y);
-            }
-        }
-    }
-};*/
-
 
 if (onServer) module.exports.PFUtils = PFUtils;

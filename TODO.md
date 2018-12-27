@@ -144,14 +144,13 @@ V1 level:
 
 Admin
 -----
-Update admin following changes
+List buildings, players
 Make cmd line system
 Edit buildings stock
 Push desktop notifications for player connects
 Import db
 -> Iterate over import object, if matching id in db, update fields, if not, insert new entry 
 Set coordinates
-Set settlement parameters
 Maintenance mode
 Secure
 

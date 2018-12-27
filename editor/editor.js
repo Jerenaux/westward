@@ -55,8 +55,8 @@ Editor.updateEnvironment = function(){
         Editor.removeChunk(oldChunks[i]);
     }
 
-    Editor.count = 0;
-    Editor.total = newChunks.length;
+    /*Editor.count = 0;
+    Editor.total = newChunks.length;*/
     console.log('Loading',Editor.total,'chunks');
     for(var j = 0; j < newChunks.length; j++){
         Editor.displayChunk(newChunks[j]);
@@ -91,8 +91,8 @@ Editor.addChunk = function(mapData){
     Editor.chunks[chunk.id] = chunk;
     if (!Editor.mapDataCache[chunk.id]) Editor.mapDataCache[chunk.id] = mapData;
     Editor.displayedChunks.push(chunk.id);
-    Editor.count++;
-    if(Editor.count == Editor.total) Editor.drawChunks();
+    /*Editor.count++;
+    if(Editor.count == Editor.total) Editor.drawChunks();*/
 };
 
 Editor.drawChunks = function(){
@@ -123,11 +123,13 @@ function Chunk(data){
     this.y = parseInt(data.y);
     this.defaultTile = data.default;
     this.layers = data.layers;
+    this.decor = data.decor;
     this.ground = new SpaceMap();
     this.ground.fromList(this.layers[0],true); // true = compact list
     this.tiles = [];
+    this.images = [];
     this.displayed = false;
-    //this.draw();
+    this.draw();
 }
 
 Chunk.prototype.draw = function(){
@@ -172,6 +174,11 @@ Chunk.prototype.draw = function(){
     },this);
     //Editor.scene.add.image(11*32,16*32,'tileset','stump');
     console.log(this.tiles.length);
+
+    this.decor.forEach(function(data){
+        this.drawImage(data[0],data[1],'tree_1');
+    },this);
+
     this.displayed = true;
 };
 
@@ -211,8 +218,14 @@ Chunk.prototype.drawTile = function(x,y,tile){
     this.tiles.push(sprite);
 };
 
-Chunk.prototype.erase = function(){
+Chunk.prototype.drawImage = function(x,y,image){
+    console.log(x,y,image);
+    var img = Editor.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',image);
+    this.images.push(img);
+};
 
+Chunk.prototype.erase = function(){
+    //TODO: destroy tiles and images
 };
 
 var VIEW_WIDTH = 30;
