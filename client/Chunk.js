@@ -42,9 +42,11 @@ Chunk.prototype.drawLayers = function(){
         var data = this.layerData[l];
         for (var i = 0; i < data.length; i++) {
             var tile = data[i];
-            if(Engine.skipGrass && grass.includes(tile)) continue; // TODO: improve
             if (tile == 0 || tile == null) continue;
             var coord = Utils.lineToGrid(i,this.width);
+            if(tile >= 322 && tile <= 357){
+                tile = 241+17+(coord.x%2)+(coord.y%2)*16;
+            }
             var x = this.x + coord.x;
             var y = this.y + coord.y;
             var sprite = this.drawTile(x,y,tile,l);
