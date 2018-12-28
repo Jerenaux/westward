@@ -108,6 +108,7 @@ function makeWorld(outdir,blueprint){
     }
     console.log(total+' chunks created ('+nbHoriz+' x '+nbVert+')');
 
+    // TODO: rename (bluepirnts actually pertain to shores and water, ...) + make clean sucession of functions, not nested (use promises?)
     applyBlueprint(blueprint);
 
     var img = blueprint.split('.')[0]+'.png';
@@ -144,20 +145,23 @@ function createForests(image,outdir){
     var xRandRange = 7;
     var yRandRange = 7;
     var nbtrees = 0;
+    console.warn(nbHoriz,chunkWidth,image.bitmap.width);
+    console.warn(nbVert,chunkHeight,image.bitmap.height);
     for (var i = 0; i < greenpixels.length; i++) {
         var px = greenpixels[i];
-        var x = px.x;
-        var y = px.y;
-        var gx = Math.round(x * (nbHoriz * chunkWidth / image.bitmap.width));
-        var gy = Math.round(y * (nbVert * chunkHeight / image.bitmap.height));
+        var gx = Math.round(px.x * (nbHoriz * chunkWidth / image.bitmap.width));
+        var gy = Math.round(px.y * (nbVert * chunkHeight / image.bitmap.height));
         gx += Utils.randomInt(-xRandRange, xRandRange + 1);
         gy += Utils.randomInt(-yRandRange, yRandRange + 1);
 
         var free = true;
         for(var xi = 0; xi < 2; xi++){
             for(var yi = 0; yi < 2; yi++){
-                if(trees.get(gx+xi,gx-yi)) free = false;
+                if(isBusy({x:gx+xi,y:gy-yi})) free = false;
+                if(trees.get(gx+xi,gy-yi)) free = false;
+                if(!free) break;
             }
+            if(!free) break;
         }
         if(free){
             for(var xi = 0; xi < 2; xi++){
@@ -324,8 +328,10 @@ function readPath(result){
 }
 
 function isBusy(node){
+    if(!isInWorldBounds(node.x,node.y)) return true;
     var id = Utils.tileToAOI(node);
     var chunk = chunks[id];
+    //console.log(node);
     return !!chunk.get(node.x-chunk.x,node.y-chunk.y);
 }
 
@@ -427,7 +433,7 @@ function drawShore(){
             tile = (hasWater(x+1,y-1) ? 'wbbl' : 'wcbl');
         }
         if(tile === undefined) console.warn('undefined at',x,y);
-        addTile(c,tile);
+        if(tile) addTile(c,tile);
     });
 }
 

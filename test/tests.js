@@ -46,7 +46,7 @@ describe('Server', function () {
             }
             onevent.call(this, packet);    // original call
         };
-        errInputs.forEach(function(input,i){
+        errInputs.forEach(function(input){
             client.emit('init-world',input);
         });
     });

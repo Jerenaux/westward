@@ -166,9 +166,13 @@ Chunk.prototype.draw = function(){
     this.layers.forEach(function(layer){
         layer.forEach(function(data){
             var tile = data[2];
+            if(tile === undefined) return;
             var x = this.x + parseInt(data[0]);
             var y = this.y + parseInt(data[1]);
-            this.drawTile(x, y, atlasmap[tile]);
+            var name = atlasmap[tile];
+            if(!(tile in atlasmap)) console.warn(x,y,tile);
+            if(name && name.indexOf('water') != -1) name = Editor.tilesetData.waterPrefix+name;
+            this.drawTile(x, y, name);
             //if(Engine) Engine.addCollision(x,y,tile); // TODO: add to Editor as well for visualisation
         },this);
     },this);
@@ -221,6 +225,7 @@ Chunk.prototype.drawTile = function(x,y,tile){
 Chunk.prototype.drawImage = function(x,y,image){
     console.log(x,y,image);
     var img = Editor.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',image);
+    img.setDepth(y);
     this.images.push(img);
 };
 
