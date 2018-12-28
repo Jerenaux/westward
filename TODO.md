@@ -1,7 +1,3 @@
-Release:
-- Flush all db!
-- Push
-
 Admin
 Analytics
 Cleaning
@@ -479,14 +475,10 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-https://confluence.atlassian.com/bitbucket/deploy-to-heroku-872013667.html
-- push with -f, add maps
+- Tool to automate db interactions when deploying (flushing sth, ...)
 - Tool to gather, uglify and compress all relevant source files 
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?
-- Flatten chunks and reduce them to arrays only
-- Code to load flattened chunks in game
-- Improve flattening by making transparency checks
 - Secure chunk access? (check client position before serving)
 - Desktop app (automated)
 

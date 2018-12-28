@@ -32,15 +32,22 @@ describe('Server', function () {
         });
     });
 
-    var inputs = [{},{new:true}];
-    inputs.forEach(function(input,i){
-        // Loop only the emits, declare receiving event only one, and use a counter or somesuch to make sure everything is error
-        it('io-init-world-'+i,function(done){
-            client.emit('init-world',input);
-            client.on('serv-error',function(){
-                expect(true).to.equal(true);
+    it('io-init-world-errs',function(done) {
+        var errInputs = [{},{new:true}];
+        var nbEvts = 0;
+        var nbErrs = 0;
+        var onevent = client.onevent;
+        client.onevent = function (packet) {
+            nbEvts++;
+            if (packet.data[0] == 'serv-error') nbErrs++;
+            if (nbEvts == errInputs.length) {
+                expect(nbErrs).to.equal(nbEvts);
                 done();
-            })
+            }
+            onevent.call(this, packet);    // original call
+        };
+        errInputs.forEach(function(input,i){
+            client.emit('init-world',input);
         });
     });
 });
