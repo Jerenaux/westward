@@ -145,35 +145,44 @@ function createForests(image,outdir){
     var xRandRange = 7;
     var yRandRange = 7;
     var nbtrees = 0;
-    console.warn(nbHoriz,chunkWidth,image.bitmap.width);
-    console.warn(nbVert,chunkHeight,image.bitmap.height);
+    console.log(greenpixels.length,'green pixels');
     for (var i = 0; i < greenpixels.length; i++) {
         var px = greenpixels[i];
+        console.log('pixel:',px);
         var gx = Math.round(px.x * (nbHoriz * chunkWidth / image.bitmap.width));
         var gy = Math.round(px.y * (nbVert * chunkHeight / image.bitmap.height));
+        console.log('world:',gx,gy);
         gx += Utils.randomInt(-xRandRange, xRandRange + 1);
         gy += Utils.randomInt(-yRandRange, yRandRange + 1);
+        console.log('random:',gx,gy);
 
         var free = true;
-        for(var xi = 0; xi < 2; xi++){
-            for(var yi = 0; yi < 2; yi++){
+        var span = 2;
+        for(var xi = 0; xi < span; xi++){
+            for(var yi = 0; yi < span; yi++){
                 if(isBusy({x:gx+xi,y:gy-yi})) free = false;
+                console.log(trees.get(gx+xi,gy-yi));
                 if(trees.get(gx+xi,gy-yi)) free = false;
                 if(!free) break;
             }
             if(!free) break;
         }
+        console.log('free:',free);
         if(free){
-            for(var xi = 0; xi < 2; xi++){
-                for(var yi = 0; yi < 2; yi++){
+            for(var xi = 0; xi < span; xi++){
+                for(var yi = 0; yi < span; yi++){
                     trees.add(gx+xi,gx-yi,1);
                 }
             }
             addDecor({x: gx, y: gy}, 't1');
-            console.log('adding tree at',gx,gy);
+            console.warn('adding tree at',gx,gy);
             nbtrees++;
+
         }
+        if(nbtrees == 10) break;
     }
+    console.log(trees);
+    console.log()
     console.log(nbtrees + ' trees drawn');
 
     /*fs.writeFile(path.join(__dirname,'blueprints','trees.json'),JSON.stringify(greenPixels),function(err){
