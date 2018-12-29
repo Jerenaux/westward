@@ -7,6 +7,7 @@ var clone = require('clone');
 var xml2js = require('xml2js');
 var config = require('config');
 var Jimp = require("jimp");
+var rwc = require('random-weighted-choice');
 
 var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
@@ -120,7 +121,10 @@ function makeWorld(outdir,blueprint){
 }
 
 function createForests(image,outdir){
-    // TODO: add tree variety north/south gradient
+    console.log('Creating forest ...');
+    var poles = [Math.floor(World.worldHeight/2),World.worldHeight,0]; // Pole for tree 1, 2 and 3 respectively
+
+    // TODO: add dead trees
     var trees = new SpaceMap();
     var greenpixels = [];
     image.scan(0, 0, image.bitmap.width, image.bitmap.height, function (x, y, idx) {
@@ -148,41 +152,34 @@ function createForests(image,outdir){
     console.log(greenpixels.length,'green pixels');
     for (var i = 0; i < greenpixels.length; i++) {
         var px = greenpixels[i];
-        console.log('pixel:',px);
         var gx = Math.round(px.x * (nbHoriz * chunkWidth / image.bitmap.width));
         var gy = Math.round(px.y * (nbVert * chunkHeight / image.bitmap.height));
-        console.log('world:',gx,gy);
         gx += Utils.randomInt(-xRandRange, xRandRange + 1);
         gy += Utils.randomInt(-yRandRange, yRandRange + 1);
-        console.log('random:',gx,gy);
 
-        var free = true;
-        var span = 2;
-        for(var xi = 0; xi < span; xi++){
-            for(var yi = 0; yi < span; yi++){
-                if(isBusy({x:gx+xi,y:gy-yi})) free = false;
-                console.log(trees.get(gx+xi,gy-yi));
-                if(trees.get(gx+xi,gy-yi)) free = false;
-                if(!free) break;
-            }
-            if(!free) break;
-        }
-        console.log('free:',free);
-        if(free){
-            for(var xi = 0; xi < span; xi++){
-                for(var yi = 0; yi < span; yi++){
-                    trees.add(gx+xi,gx-yi,1);
-                }
-            }
-            addDecor({x: gx, y: gy}, 't1');
-            console.warn('adding tree at',gx,gy);
-            nbtrees++;
-
-        }
-        if(nbtrees == 10) break;
+        var dists = [];
+        var distsum = 0;
+        poles.forEach(function(p){
+            var d = Math.abs(gy-p);
+            if(d == 0) d = 0.1;
+            d *= d; // Polarizes more
+            dists.push(d);
+            distsum += d;
+        });
+        var sumweights = 0;
+        var weights = dists.map(function(d){
+            var w = distsum/d;
+            sumweights += w;
+            return w;
+        });
+        var table = weights.map(function(w,i){
+            var w = Math.round((w/sumweights)*10); // Normalization
+            if(w <= 2) w = 0;
+            return {weight: w, id: i+1};
+        });
+        var tree = 't'+(Utils.randomInt(1,101) <= 1 ? 'd' : rwc(table));
+        if(plantTree(trees,gx,gy,tree)) nbtrees++;
     }
-    console.log(trees);
-    console.log()
     console.log(nbtrees + ' trees drawn');
 
     /*fs.writeFile(path.join(__dirname,'blueprints','trees.json'),JSON.stringify(greenPixels),function(err){
@@ -196,6 +193,31 @@ function createForests(image,outdir){
 
     writeMasterFile(outdir);
     writeCollisions(outdir); //TODO: listCollisions instead
+}
+
+function plantTree(trees,x,y,tree){
+    var free = true;
+    var xspan = 3;
+    var yspan = 2;
+    var pos = [];
+    for(var xi = 0; xi < xspan; xi++){
+        for(var yi = 0; yi < yspan; yi++){
+            var rx = x+xi;
+            var ry = y-yi;
+            pos.push([rx,ry]);
+            if(isBusy({x:rx,y:ry})) free = false;
+            if(trees.get(rx,ry)) free = false;
+            if(!free) break;
+        }
+        if(!free) break;
+    }
+    if(!free) return false;
+    pos.forEach(function(p){
+        trees.add(p[0],p[1],1);
+    });
+    addDecor({x: x, y: y}, tree);
+    //console.warn('adding tree at',x,y);
+    return true;
 }
 
 function applyBlueprint(blueprint){

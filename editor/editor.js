@@ -180,7 +180,7 @@ Chunk.prototype.draw = function(){
     console.log(this.tiles.length);
 
     this.decor.forEach(function(data){
-        this.drawImage(data[0],data[1],'tree_1');
+        this.drawImage(data[0],data[1],data[2]);
     },this);
 
     this.displayed = true;
@@ -223,8 +223,13 @@ Chunk.prototype.drawTile = function(x,y,tile){
 };
 
 Chunk.prototype.drawImage = function(x,y,image){
-    console.log(x,y,image);
-    var img = Editor.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',image);
+    var atlasmap = {
+        't1':'tree_1',
+        't2':'tree_2',
+        't3':'tree_3',
+        'td':'tree_dead'
+    };
+    var img = Editor.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',atlasmap[image]);
     img.setDepth(y);
     this.images.push(img);
 };

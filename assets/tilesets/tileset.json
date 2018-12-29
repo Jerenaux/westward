@@ -169,22 +169,22 @@
     {
       "filename": "tree_2",
       "frame": {"x":132,"y":284,"w":128,"h":164},
-      "anchor": {"x":0.25,"y":1}
+      "anchor": {"x":0.25,"y":0.8}
     },
     {
       "filename": "tree_3",
       "frame": {"x":260,"y":279,"w":151,"h":169},
-      "anchor": {"x":0.18,"y":1}
+      "anchor": {"x":0.18,"y":0.8}
     },
     {
       "filename": "tree_dead",
       "frame": {"x":378,"y":128,"w":134,"h":151},
-      "anchor": {"x":0.04,"y":1}
+      "anchor": {"x":0.04,"y":0.8}
     },
     {
       "filename": "stump",
       "frame": {"x":10,"y":449,"w":74,"h":63},
-      "anchor": {"x":0,"y":1}
+      "anchor": {"x":0,"y":0.5}
     }
   ]
 }
