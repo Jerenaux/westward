@@ -56,7 +56,7 @@ Move away from tiles:
 [ ] Collisions fetched from tileset for client, no digest 
 [ ] Built-in exploration, to test collisions and depths
 [ ] Re-enable blitters, at least for ground and water?
-[ ] Remove legacy tiles after a while (from png and json)
+[ ] Remove legacy tiles after a while (from png and json) + old tileset files
 
 
 
