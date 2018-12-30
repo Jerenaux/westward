@@ -10,7 +10,7 @@ var Editor = {
 
     zoomScale: 1,
     zoomScales: [2,1,0.75,0.5,0.25,0.1,0.05,0.025,0.01],
-    zoomIndex: 0
+    zoomIndex: 1
 };
 
 Editor.preload = function(){
@@ -47,7 +47,27 @@ Editor.getMouseCoordinates = function(pointer){
 };
 
 Editor.updateEnvironment = function(){
-    var chunks = Utils.listAdjacentAOIs(Editor.focusChunk);
+    var cpos = Utils.AOItoTile(Editor.focusChunk);
+    cpos.x /= World.chunkWidth;
+    cpos.y /= World.chunkHeight;
+    var vizW = Math.ceil((VIEW_WIDTH/Editor.zoomScale)/World.chunkWidth);
+    var vizH = Math.ceil((VIEW_HEIGHT/Editor.zoomScale)/World.chunkHeight);
+    var vizL = Math.min(Math.floor(vizW/2),cpos.x);
+    var vizR = Math.min(vizW-vizL,World.nbChunksHorizontal);
+    var vizT = Math.min(Math.floor(vizH/2),cpos.y);
+    var vizB = Math.min(vizH-vizT,World.nbChunksVertical);
+
+    console.log(vizW,vizH,vizL,vizR,vizT,vizB);
+
+    var chunks = new Set();
+    for(var x = Editor.focusChunk-vizL; x < Editor.focusChunk+vizR; x++){
+        chunks.add(x);
+    }
+    for(var y = Editor.focusChunk-(vizT*World.nbChunksHorizontal); y < Editor.focusChunk+(vizB*World.nbChunksHorizontal); y+=World.nbChunksHorizontal){
+        chunks.add(y);
+    }
+    chunks = Array.from(chunks);
+    //var chunks = Utils.listAdjacentAOIs(Editor.focusChunk);
     var newChunks = chunks.diff(Editor.displayedChunks);
     var oldChunks = Editor.displayedChunks.diff(chunks);
 
@@ -55,9 +75,6 @@ Editor.updateEnvironment = function(){
         Editor.removeChunk(oldChunks[i]);
     }
 
-    /*Editor.count = 0;
-    Editor.total = newChunks.length;*/
-    console.log('Loading',Editor.total,'chunks');
     for(var j = 0; j < newChunks.length; j++){
         Editor.displayChunk(newChunks[j]);
     }
@@ -111,7 +128,6 @@ Editor.removeChunk = function(id){
 Editor.zoom = function(coef){
     Editor.zoomIndex = Utils.clamp(Editor.zoomIndex - coef,0,Editor.zoomScales.length-1);
     Editor.zoomScale = Editor.zoomScales[Editor.zoomIndex];
-
     Editor.camera.setZoom(Editor.zoomScale);
 
     Editor.updateEnvironment();
@@ -180,7 +196,9 @@ Chunk.prototype.draw = function(){
     console.log(this.tiles.length);
 
     this.decor.forEach(function(data){
-        this.drawImage(data[0],data[1],data[2]);
+        var x = this.x + parseInt(data[0]);
+        var y = this.y + parseInt(data[1]);
+        this.drawImage(x,y,data[2]);
     },this);
 
     this.displayed = true;

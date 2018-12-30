@@ -17,6 +17,14 @@ var Geometry = require('../studio/Geometry.js').Geometry;
 var counter = 0;
 var total = 0;
 
+/*
+* README: //TODO: update
+* - Shores are first populated with 'c' tiles based on blueprint (applyBlueprint)
+* - Then the seas are filled, using 'c' tiles as stop tiles (fill)
+* - Then the shores are actually drawn, replacing 'c' based on neighbors (drawShore)
+* - Then forests are added
+* */
+
 function Chunk(id){
     this.id = id;
     var origin = Utils.AOItoTile(this.id);
@@ -33,6 +41,10 @@ Chunk.prototype.addDecor = function(x,y,v){
 
 Chunk.prototype.add = function(x,y,v){
     this.layers[0].add(x,y,v);
+};
+
+Chunk.prototype.remove = function(x,y,v){
+    this.layers[0].delete(x,y);
 };
 
 Chunk.prototype.get = function(x,y){
@@ -237,7 +249,7 @@ function applyBlueprint(blueprint){
         for(var i = 0; i < allPts.length; i++) {
             var pts = allPts[i];
             var nbPts = pts.length;
-            console.log('processing curve '+i+' of length '+nbPts);
+            //console.log('processing curve '+i+' of length '+nbPts);
             var tiles = [];
             for (var j = 0; j <= nbPts - 1; j++) {
                 var s = pts[j];
@@ -247,7 +259,7 @@ function applyBlueprint(blueprint){
                 if (j > 0) addTiles.shift();
                 tiles = tiles.concat(addTiles);
             }
-            console.log('From',tiles[0],'to',tiles[tiles.length-1]);
+            //console.log('From',tiles[0],'to',tiles[tiles.length-1]);
             /*tiles.forEach(function(t){
                 console.log(t);
             });*/
@@ -294,6 +306,10 @@ function applyBlueprint(blueprint){
     });
 }
 
+function pixelToTile(){
+    //TODO: use
+}
+
 function readPath(result){
     var viewbox = result.svg.$.viewBox.split(" ");
     var curveW = parseInt(viewbox[2]);
@@ -307,8 +323,10 @@ function readPath(result){
             var coords = nodes[k].split(" ");
             if(coords.length > 2) console.log('WARNING: fill nodes coordinates badly formatted');
             fillNodes.push({
-                x: parseInt(coords[0]),
-                y: parseInt(coords[1])
+                //x: parseInt(coords[0]),
+                //y: parseInt(coords[1])
+                x: Math.floor((parseInt(coords[0])/curveW)*World.worldWidth),
+                y: Math.floor((parseInt(coords[1])/curveH)*World.worldHeight)
             });
         }
     }else{
@@ -377,6 +395,13 @@ function addDecor(tile,decor){
     chunk.addDecor(tile.x-chunk.x,tile.y-chunk.y,decor);
 }
 
+function removeTile(tile){
+    var id = Utils.tileToAOI(tile);
+    if(!(id in chunks)) return;
+    var chunk = chunks[id];
+    chunk.remove(tile.x-chunk.x,tile.y-chunk.y);
+}
+
 function addTile(tile,value){
     var id = Utils.tileToAOI(tile);
     if(!(id in chunks)) return;
@@ -428,6 +453,7 @@ function fill(fillNode,stop){ // fills the world with water, but stops at coastl
 
 function addShore(tiles){
     tiles.forEach(function(t) {
+        //if(t.x == 0 || t.y == 0) return;
         if(!isInWorldBounds(t.x,t.y)) return;
         addTile(t,'c');
         //console.log('adding shore at',t);
@@ -436,6 +462,7 @@ function addShore(tiles){
 }
 
 function hasCoast(x,y){
+    if(!isInWorldBounds(x,y)) return true; // When looking for a neighbor out of bounds, assume it's present; allows seamless connections with borders
     var t = getTile(x,y);
     return !(!t || t == 'w');
 }
@@ -463,8 +490,12 @@ function drawShore(){
         }else if(hasCoast(x+1,y) && hasCoast(x,y-1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // bl
             tile = (hasWater(x+1,y-1) ? 'wbbl' : 'wcbl');
         }
-        if(tile === undefined) console.warn('undefined at',x,y);
-        if(tile) addTile(c,tile);
+        if(tile === undefined){
+            //console.warn('undefined at',x,y);
+            removeTile(c);
+        }else{
+            addTile(c,tile); // Will replace any 'c'
+        }
     });
 }
 
