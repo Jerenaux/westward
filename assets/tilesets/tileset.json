@@ -2,189 +2,165 @@
   "data":{
       "grassPrefix": "newgrass",
       "grassSize": 3,
-      "waterPrefix": "new"
+      "waterPrefix": ""
   },
-  "frames":[
-    {
-      "filename": "grass_0",
+  "frames": {
+    "grass_0":{
       "frame": {"x":32,"y":32,"w":32,"h":32}
     },
-    {
-      "filename": "grass_1",
+    "grass_1":{
       "frame": {"x":64,"y":32,"w":32,"h":32}
     },
-    {
-      "filename": "grass_2",
+    "grass_2":{
       "frame": {"x":32,"y":64,"w":32,"h":32}
     },
-    {
-      "filename": "grass_3",
+    "grass_3":{
       "frame": {"x":64,"y":64,"w":32,"h":32}
     },
-    {
-      "filename": "newgrass_0",
+    "newgrass_0":{
       "frame": {"x":32,"y":128,"w":32,"h":32}
     },
-    {
-      "filename": "newgrass_1",
+    "newgrass_1":{
       "frame": {"x":64,"y":128,"w":32,"h":32}
     },
-    {
-      "filename": "newgrass_2",
+    "newgrass_2":{
       "frame": {"x":96,"y":128,"w":32,"h":32}
     },
-    {
-      "filename": "newgrass_3",
+    "newgrass_3":{
       "frame": {"x":32,"y":160,"w":32,"h":32}
     },
-    {
-      "filename": "newgrass_4",
+    "newgrass_4":{
       "frame": {"x":64,"y":160,"w":32,"h":32}
     },
-    {
-      "filename": "newgrass_5",
+    "newgrass_5":{
       "frame": {"x":96,"y":160,"w":32,"h":32}
     },
-    {
-      "filename": "newgrass_6",
+    "newgrass_6":{
       "frame": {"x":32,"y":192,"w":32,"h":32}
     },
-    {
-      "filename": "newgrass_7",
+    "newgrass_7":{
       "frame": {"x":64,"y":192,"w":32,"h":32}
     },
-    {
-      "filename": "newgrass_8",
+    "newgrass_8":{
       "frame": {"x":96,"y":192,"w":32,"h":32}
     },
-    {
-      "filename": "water",
+    "water":{
       "frame": {"x":192,"y":64,"w":32,"h":32}
     },
-    {
-      "filename": "water_bottom",
+    "water_bottom":{
       "frame": {"x":192,"y":96,"w":32,"h":32}
     },
-    {
-      "filename": "water_top",
+    "water_top":{
       "frame": {"x":192,"y":32,"w":32,"h":32}
     },
-    {
-      "filename": "water_left",
+    "water_left":{
       "frame": {"x":160,"y":64,"w":32,"h":32}
     },
-    {
-      "filename": "water_right",
+    "water_right":{
       "frame": {"x":224,"y":64,"w":32,"h":32}
     },
-    {
-      "filename": "water_bend_tl",
+    "water_bend_tl":{
       "frame": {"x":160,"y":32,"w":32,"h":32}
     },
-    {
-      "filename": "water_bend_bl",
+    "water_bend_bl":{
       "frame": {"x":160,"y":96,"w":32,"h":32}
     },
-    {
-      "filename": "water_bend_tr",
+    "water_bend_tr":{
       "frame": {"x":224,"y":32,"w":32,"h":32}
     },
-    {
-      "filename": "water_bend_br",
+    "water_bend_br":{
       "frame": {"x":224,"y":96,"w":32,"h":32}
     },
-    {
-      "filename": "water_corner_tl",
+    "water_corner_tl":{
       "frame": {"x":288,"y":32,"w":32,"h":32}
     },
-    {
-      "filename": "water_corner_bl",
+    "water_corner_bl":{
       "frame": {"x":288,"y":64,"w":32,"h":32}
     },
-    {
-      "filename": "water_corner_tr",
+    "water_corner_tr":{
       "frame": {"x":320,"y":32,"w":32,"h":32}
     },
-    {
-      "filename": "water_corner_br",
+    "water_corner_br":{
       "frame": {"x":320,"y":64,"w":32,"h":32}
     },
-    {
-      "filename": "newwater",
+    "newwater":{
       "frame": {"x":192,"y":192,"w":32,"h":32}
     },
-    {
-      "filename": "newwater_bottom",
-      "frame": {"x":192,"y":224,"w":32,"h":32}
+    "newwater_bottom":{
+      "frame": {"x":192,"y":224,"w":32,"h":32},
+      "collides": true
     },
-    {
-      "filename": "newwater_top",
+    "newwater_top":{
       "frame": {"x":192,"y":160,"w":32,"h":32}
     },
-    {
-      "filename": "newwater_left",
+    "newwater_left":{
       "frame": {"x":160,"y":192,"w":32,"h":32}
     },
-    {
-      "filename": "newwater_right",
+    "newwater_right":{
       "frame": {"x":224,"y":192,"w":32,"h":32}
     },
-    {
-      "filename": "newwater_bend_tl",
+    "newwater_bend_tl":{
       "frame": {"x":160,"y":160,"w":32,"h":32}
     },
-    {
-      "filename": "newwater_bend_bl",
+    "newwater_bend_bl":{
       "frame": {"x":160,"y":224,"w":32,"h":32}
     },
-    {
-      "filename": "newwater_bend_tr",
+    "newwater_bend_tr":{
       "frame": {"x":224,"y":160,"w":32,"h":32}
     },
-    {
-      "filename": "newwater_bend_br",
+    "newwater_bend_br":{
       "frame": {"x":224,"y":224,"w":32,"h":32}
     },
-    {
-      "filename": "newwater_corner_tl",
+    "newwater_corner_tl":{
       "frame": {"x":288,"y":160,"w":32,"h":32}
     },
-    {
-      "filename": "newwater_corner_bl",
+    "newwater_corner_bl":{
       "frame": {"x":288,"y":192,"w":32,"h":32}
     },
-    {
-      "filename": "newwater_corner_tr",
+    "newwater_corner_tr":{
       "frame": {"x":320,"y":160,"w":32,"h":32}
     },
-    {
-      "filename": "newwater_corner_br",
+    "newwater_corner_br":{
       "frame": {"x":320,"y":192,"w":32,"h":32}
     },
-    {
-      "filename": "tree_1",
+    "tree_1":{
       "frame": {"x":5,"y":298,"w":126,"h":150},
       "anchor": {"x":0.21,"y":0.8}
     },
-    {
-      "filename": "tree_2",
+    "tree_2":{
       "frame": {"x":132,"y":284,"w":128,"h":164},
       "anchor": {"x":0.25,"y":0.8}
     },
-    {
-      "filename": "tree_3",
+    "tree_3":{
       "frame": {"x":260,"y":279,"w":151,"h":169},
       "anchor": {"x":0.18,"y":0.8}
     },
-    {
-      "filename": "tree_dead",
+    "tree_dead":{
       "frame": {"x":378,"y":128,"w":134,"h":151},
       "anchor": {"x":0.04,"y":0.8}
     },
-    {
-      "filename": "stump",
+    "stump":{
       "frame": {"x":10,"y":449,"w":74,"h":63},
       "anchor": {"x":0,"y":0.5}
     }
-  ]
+  },
+  "shorthands" : {
+    "w":"newwater",
+    "wt":"newwater_top",
+    "wb":"newwater_bottom",
+    "wl":"newwater_left",
+    "wr":"newwater_right",
+    "wbtl":"newwater_bend_tl",
+    "wctl":"newwater_corner_tl",
+    "wbtr":"newwater_bend_tr",
+    "wctr":"newwater_corner_tr",
+    "wbbr":"newwater_bend_br",
+    "wcbr":"newwater_corner_br",
+    "wbbl":"newwater_bend_bl",
+    "wcbl":"newwater_corner_bl",
+    "t1":"tree_1",
+    "t2":"tree_2",
+    "t3":"tree_3",
+    "td":"tree_dead"
+  }
 }

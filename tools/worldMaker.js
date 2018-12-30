@@ -54,7 +54,7 @@ Chunk.prototype.get = function(x,y){
 Chunk.prototype.trim = function(){
     var layers = [];
     this.layers.forEach(function(layer){
-       layers.push(layer.toList(true)); // ture = compact list
+       layers.push(layer.toList(true)); // true = compact list
     });
     return {
         id: this.id,
@@ -97,6 +97,8 @@ function makeWorld(outdir,blueprint){
     if(!tileWidth) tileWidth = defTileW;
     if(!tileHeight) tileHeight = defTileH;
 
+    tileset = JSON.parse(fs.readFileSync(path.join(__dirname,'..','assets','tilesets','tileset.json')).toString());
+
     var mapsPath = config.get('dev.mapsPath');
     outdir = (outdir ? path.join(__dirname,mapsPath,outdir) : path.join(__dirname,mapsPath,'chunks'));
     if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);
@@ -136,8 +138,6 @@ function createForests(image,outdir){
     console.log('Creating forest ...');
     var poles = [Math.floor(World.worldHeight/2),World.worldHeight,0]; // Pole for tree 1, 2 and 3 respectively
 
-    // TODO: add dead trees
-    var trees = new SpaceMap();
     var greenpixels = [];
     image.scan(0, 0, image.bitmap.width, image.bitmap.height, function (x, y, idx) {
         //if(done) return;
@@ -152,11 +152,11 @@ function createForests(image,outdir){
         if (red == 203 && green == 230 && blue == 163) greenpixels.push({x: x, y: y});
     });
 
-    greenpixels.sort(function (a, b) {
+    /*greenpixels.sort(function (a, b) { //TODO: remove?
         if (a.y < b.y) return -1;
         if (a.y == b.y) return 0;
         if (a.y > b.y) return 1;
-    });
+    });*/
 
     var xRandRange = 7;
     var yRandRange = 7;
@@ -190,7 +190,7 @@ function createForests(image,outdir){
             return {weight: w, id: i+1};
         });
         var tree = 't'+(Utils.randomInt(1,101) <= 1 ? 'd' : rwc(table));
-        if(plantTree(trees,gx,gy,tree)) nbtrees++;
+        if(plantTree(gx,gy,tree)) nbtrees++;
     }
     console.log(nbtrees + ' trees drawn');
 
@@ -207,7 +207,7 @@ function createForests(image,outdir){
     writeCollisions(outdir); //TODO: listCollisions instead
 }
 
-function plantTree(trees,x,y,tree){
+function plantTree(x,y,tree){
     var free = true;
     var xspan = 3;
     var yspan = 2;
@@ -238,35 +238,29 @@ function applyBlueprint(blueprint){
     parser.parseString(blueprint, function (err, result) {
         if(err) throw err;
         var read = readPath(result);
-        var allPts = read.allPts; // array of arrays ; list of curves in the blueprint
+        var paths = read.allPts; // array of arrays ; list of paths in the blueprint
         var fillNodes = read.fillNodes;
 
-        allPts.sort(function(a,b){
+        /*paths.sort(function(a,b){ // TODO: remove?
             if(a.length >= b.length) return -1;
             return 1;
-        });
+        });*/
 
-        for(var i = 0; i < allPts.length; i++) {
-            var pts = allPts[i];
+        for(var i = 0; i < paths.length; i++) {
+            var pts = paths[i];
             var nbPts = pts.length;
             //console.log('processing curve '+i+' of length '+nbPts);
             var tiles = [];
             for (var j = 0; j <= nbPts - 1; j++) {
                 var s = pts[j];
                 var e = (j == nbPts - 1 ? pts[0] : pts[j + 1]);
-                //console.log(s,e);
                 var addTiles = Geometry.addCorners(Geometry.straightLine(s, e));
                 if (j > 0) addTiles.shift();
                 tiles = tiles.concat(addTiles);
             }
-            //console.log('From',tiles[0],'to',tiles[tiles.length-1]);
-            /*tiles.forEach(function(t){
-                console.log(t);
-            });*/
 
             tiles = Geometry.forwardSmoothPass(tiles);
             tiles = Geometry.backwardSmoothPass(tiles);
-            //if(tiles.length > 1) WorldEditor.drawShore(tiles);
             if(tiles.length > 1) addShore(tiles);
         }
 
@@ -307,7 +301,7 @@ function applyBlueprint(blueprint){
 }
 
 function pixelToTile(){
-    //TODO: use
+    //TODO: use in readPath
 }
 
 function readPath(result){
@@ -416,11 +410,10 @@ function getTile(x,y){
     return chunk.get(x-chunk.x,y-chunk.y);
 }
 
-// Fillnode coords are in tiles! (Should be improved)
 function fill(fillNode,stop){ // fills the world with water, but stops at coastlines
     console.log('Filling ...');
     //if(fillNode.x < 0 || fillNode.x > 1 || fillNode.y < 0 || fillNode.y > 0) console.warn('Wrong fillNode coordinates');
-    var stoppingCritetion = stop || 40000;
+    var stoppingCritetion = stop || 1000000;
     var queue = [];
     queue.push(fillNode);
     var fillTiles = [];
@@ -452,6 +445,7 @@ function fill(fillNode,stop){ // fills the world with water, but stops at coastl
 }
 
 function addShore(tiles){
+    var coast = [];
     tiles.forEach(function(t) {
         //if(t.x == 0 || t.y == 0) return;
         if(!isInWorldBounds(t.x,t.y)) return;
@@ -459,6 +453,7 @@ function addShore(tiles){
         //console.log('adding shore at',t);
         coast.push(t);
     });
+    coasts.push(coast);
 }
 
 function hasCoast(x,y){
@@ -473,30 +468,42 @@ function hasWater(x,y){
 
 function drawShore(){
     console.log('Drawing shore ...');
-    coast.forEach(function(c){
-        var x = c.x;
-        var y = c.y;
-        var tile;
-        if(hasCoast(x-1,y) && hasCoast(x+1,y)  && (hasWater(x,y-1) || hasWater(x,y+1))){ // Horizontal edge
-            tile = (hasWater(x,y-1) ? 'wb' : 'wt');
-        }else if(hasCoast(x,y-1) && hasCoast(x,y+1) && (hasWater(x+1,y) || hasWater(x-1,y))) { // Vertical edge
-            tile = (hasWater(x-1,y) ? 'wr' : 'wl');
-        }else if(hasCoast(x,y+1) && hasCoast(x+1,y) && (hasWater(x+1,y+1) || hasWater(x-1,y-1)) ) { // tl
-            tile = (hasWater(x+1,y+1) ? 'wbtl' : 'wctl');
-        }else if(hasCoast(x-1,y) && hasCoast(x,y+1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // tr
-            tile = (hasWater(x-1,y+1) ? 'wbtr' : 'wctr');
-        }else if(hasCoast(x,y-1) && hasCoast(x-1,y) && (hasWater(x+1,y+1) || hasWater(x-1,y-1))) { // br
-            tile = (hasWater(x-1,y-1) ? 'wbbr' : 'wcbr');
-        }else if(hasCoast(x+1,y) && hasCoast(x,y-1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // bl
-            tile = (hasWater(x+1,y-1) ? 'wbbl' : 'wcbl');
-        }
-        if(tile === undefined){
-            //console.warn('undefined at',x,y);
-            removeTile(c);
-        }else{
-            addTile(c,tile); // Will replace any 'c'
-        }
+    coasts.forEach(function(coast){
+        var undef = false;
+        coast.forEach(function(c){
+            var x = c.x;
+            var y = c.y;
+            var tile;
+            if(hasCoast(x-1,y) && hasCoast(x+1,y)  && (hasWater(x,y-1) || hasWater(x,y+1))){ // Horizontal edge
+                tile = (hasWater(x,y-1) ? 'wb' : 'wt');
+            }else if(hasCoast(x,y-1) && hasCoast(x,y+1) && (hasWater(x+1,y) || hasWater(x-1,y))) { // Vertical edge
+                tile = (hasWater(x-1,y) ? 'wr' : 'wl');
+            }else if(hasCoast(x,y+1) && hasCoast(x+1,y) && (hasWater(x+1,y+1) || hasWater(x-1,y-1)) ) { // tl
+                tile = (hasWater(x+1,y+1) ? 'wbtl' : 'wctl');
+            }else if(hasCoast(x-1,y) && hasCoast(x,y+1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // tr
+                tile = (hasWater(x-1,y+1) ? 'wbtr' : 'wctr');
+            }else if(hasCoast(x,y-1) && hasCoast(x-1,y) && (hasWater(x+1,y+1) || hasWater(x-1,y-1))) { // br
+                tile = (hasWater(x-1,y-1) ? 'wbbr' : 'wcbr');
+            }else if(hasCoast(x+1,y) && hasCoast(x,y-1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // bl
+                tile = (hasWater(x+1,y-1) ? 'wbbl' : 'wcbl');
+            }
+            if(tile === undefined){
+                //console.warn('undefined at',x,y);
+                //removeTile(c);
+                undef = true;
+            }else{
+                addTile(c,tile); // Will replace any 'c'
+                if(collides(tile)) collisions.add(x,y,1);
+            }
+        });
+        //if(undef) console.warn('issue with path from',coast[0],'to',coast[coast.length-2]);
     });
+    console.warn('###',collides('wb'));
+    console.log(tileset.frames[tileset.shorthands['wb']]);
+}
+
+function collides(tile){
+    return tileset.frames[tileset.shorthands[tile]].collides;
 }
 
 function writeMasterFile(outdir){
@@ -516,7 +523,8 @@ function writeMasterFile(outdir){
 
 function writeCollisions(outdir){
     // Write master file
-    fs.writeFile(path.join(outdir,'collisions.json'),JSON.stringify([]),function(err){
+    var colls = trees.toList().concat(collisions.toList());
+    fs.writeFile(path.join(outdir,'collisions.json'),JSON.stringify(colls),function(err){
         if(err) throw err;
         console.log('Collisions written');
     });
@@ -524,7 +532,10 @@ function writeCollisions(outdir){
 
 var myArgs = require('optimist').argv;
 chunks = {};
-coast = [];
+coasts = [];
+trees = new SpaceMap();
+collisions = new SpaceMap();
+tileset = null;
 nbHoriz = myArgs.nbhoriz;
 nbVert = myArgs.nbvert;
 chunkWidth = myArgs.chunkw;
@@ -533,5 +544,6 @@ tileWidth = myArgs.tilew;
 tileHeight = myArgs.tileh;
 doFill = myArgs.fill;
 write = myArgs.write;
+
 
 makeWorld(myArgs.outdir,myArgs.blueprint);

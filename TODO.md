@@ -35,25 +35,28 @@ Misc:
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
 
 Move away from tiles:
-[ ] Zoom
+[x] Zoom
 [ ] Panning
 [x] 96x96 grass chunks, loaded positionnally
 [x] Tiles only for other terrain elements (water, dirt, ...)
 [ ] Everything on top are single-image objects (possibly rendered in multiple parts with different depths)
 (What about objects spanning more than 2 AOIs?)
-[ ] Test trees overlaps
+[x] Test trees overlaps
 [ ] Visualize collisions
 [x] Sparse format, declarative (grass, water, ...)
 [x] Specific tiles (e.g. water joints) computed positionnally
 [x] Default filler tile for empty ones, on layer 0
 [x] Store tilesets and images as atlases
-[ ] World maker: store coasts
+[x] World maker: store coasts
 [ ] Inexistant chunks filled by water
 [ ] Add decor elements via editor
 [ ] Store and edit game data (resources, spawn zones, civs logic...)
--> Like for collisions, build a digest for the server
+[x] Collisions listed from tileset
+[x] Collisions digest for server, displayed in editor
+[ ] Collisions fetched from tileset for client, no digest 
 [ ] Built-in exploration, to test collisions and depths
 [ ] Re-enable blitters, at least for ground and water?
+[ ] Remove legacy tiles after a while (from png and json)
 
 
 

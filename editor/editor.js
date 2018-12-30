@@ -2,6 +2,9 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 22-12-18.
  */
 
+var DRAW_IMAGES = true;
+var BLIT = false;
+
 var Editor = {
     focusChunk: 0,
     mapDataCache: {},
@@ -9,27 +12,37 @@ var Editor = {
     chunks: {},
 
     zoomScale: 1,
-    zoomScales: [2,1,0.75,0.5,0.25,0.1,0.05,0.025,0.01],
+    zoomScales: [2,1,0.75,0.5,0.25,0.1],// 0.05,0.025,0.01
     zoomIndex: 1
 };
 
 Editor.preload = function(){
     this.load.json('master','../maps/master.json');
+    this.load.json('collisions','../maps/collisions.json');
     this.load.atlas('tileset', '../assets/tilesets/tileset.png', '../assets/tilesets/tileset.json');
 };
 
 Editor.create = function(){
     Editor.scene = this.scene.scene;
     World.readMasterData(this.cache.json.get('master'));
+    Editor.atlas = this.cache.json.get('tileset').frames;
     Editor.tilesetData = this.cache.json.get('tileset').data;
+    Editor.shorthands = this.cache.json.get('tileset').shorthands;
+    Editor.collisions = new SpaceMap();
+    Editor.collisions.fromList(this.cache.json.get('collisions'));
     console.log(Editor.tilesetData);
     Editor.camera = Editor.scene.cameras.main;
     Editor.camera.setBounds(0,0,World.worldWidth*TILE_WIDTH,World.worldHeight*TILE_HEIGHT);
-    Editor.updateEnvironment();
+
+    var pos = Utils.AOItoTile(Editor.focusChunk);
+    Editor.centerCamera(pos.x,pos.y,Editor.focusChunk);
+    //Editor.updateEnvironment();
+
+    if(BLIT) Editor.ground = Editor.scene.add.blitter(0,0,'tileset');
 };
 
 Editor.centerCamera = function(x,y,id){
-    console.log(x,y,id);
+    //console.log(x,y,id);
     Editor.camera.centerOn(x*TILE_WIDTH,y*TILE_HEIGHT);
     Editor.focusChunk = id;
     Editor.updateEnvironment();
@@ -57,22 +70,20 @@ Editor.updateEnvironment = function(){
     var vizT = Math.min(Math.floor(vizH/2),cpos.y);
     var vizB = Math.min(vizH-vizT,World.nbChunksVertical);
 
-    console.log(vizW,vizH,vizL,vizR,vizT,vizB);
-
     var chunks = new Set();
-    for(var x = Editor.focusChunk-vizL; x < Editor.focusChunk+vizR; x++){
-        chunks.add(x);
-    }
-    for(var y = Editor.focusChunk-(vizT*World.nbChunksHorizontal); y < Editor.focusChunk+(vizB*World.nbChunksHorizontal); y+=World.nbChunksHorizontal){
-        chunks.add(y);
+    for(var x = -vizL; x < vizR; x++){
+        for(var y = -(vizT*World.nbChunksHorizontal); y < (vizB*World.nbChunksHorizontal); y+=World.nbChunksHorizontal){
+            chunks.add(Editor.focusChunk+x+y);
+        }
     }
     chunks = Array.from(chunks);
     //var chunks = Utils.listAdjacentAOIs(Editor.focusChunk);
     var newChunks = chunks.diff(Editor.displayedChunks);
     var oldChunks = Editor.displayedChunks.diff(chunks);
+    console.log('Displaying',newChunks.length,'/',chunks.length,'chunks');
 
     for (var i = 0; i < oldChunks.length; i++) {
-        Editor.removeChunk(oldChunks[i]);
+        //Editor.removeChunk(oldChunks[i]);
     }
 
     for(var j = 0; j < newChunks.length; j++){
@@ -108,8 +119,6 @@ Editor.addChunk = function(mapData){
     Editor.chunks[chunk.id] = chunk;
     if (!Editor.mapDataCache[chunk.id]) Editor.mapDataCache[chunk.id] = mapData;
     Editor.displayedChunks.push(chunk.id);
-    /*Editor.count++;
-    if(Editor.count == Editor.total) Editor.drawChunks();*/
 };
 
 Editor.drawChunks = function(){
@@ -149,7 +158,6 @@ function Chunk(data){
 }
 
 Chunk.prototype.draw = function(){
-    console.log('Drawing',this.id);
     // Ground
     for(var x_ = 0; x_ < World.chunkWidth; x_++){
         for(var y_ = 0; y_ < World.chunkHeight; y_++) {
@@ -164,42 +172,28 @@ Chunk.prototype.draw = function(){
         }
     }
     // Layers
-    var atlasmap = { // TODO: central location accessed by worldMaker & editor
-        'w':'water',
-        'wt':'water_top',
-        'wb':'water_bottom',
-        'wl':'water_left',
-        'wr':'water_right',
-        'wbtl':'water_bend_tl',
-        'wctl':'water_corner_tl',
-        'wbtr':'water_bend_tr',
-        'wctr':'water_corner_tr',
-        'wbbr':'water_bend_br',
-        'wcbr':'water_corner_br',
-        'wbbl':'water_bend_bl',
-        'wcbl':'water_corner_bl'
-    };
     this.layers.forEach(function(layer){
         layer.forEach(function(data){
             var tile = data[2];
             if(tile === undefined) return;
             var x = this.x + parseInt(data[0]);
             var y = this.y + parseInt(data[1]);
-            var name = atlasmap[tile];
-            if(!(tile in atlasmap)) console.warn(x,y,tile);
+            var name = Editor.shorthands[tile];
+            if(!(tile in Editor.shorthands)) return; // TODO: remove in editor
             if(name && name.indexOf('water') != -1) name = Editor.tilesetData.waterPrefix+name;
             this.drawTile(x, y, name);
             //if(Engine) Engine.addCollision(x,y,tile); // TODO: add to Editor as well for visualisation
         },this);
     },this);
-    //Editor.scene.add.image(11*32,16*32,'tileset','stump');
-    console.log(this.tiles.length);
+    if(this.tiles.length > 700) console.warn(this.tiles.length);
 
-    this.decor.forEach(function(data){
-        var x = this.x + parseInt(data[0]);
-        var y = this.y + parseInt(data[1]);
-        this.drawImage(x,y,data[2]);
-    },this);
+    if(DRAW_IMAGES) {
+        this.decor.forEach(function (data) {
+            var x = this.x + parseInt(data[0]);
+            var y = this.y + parseInt(data[1]);
+            this.drawImage(x, y, data[2]);
+        }, this);
+    }
 
     this.displayed = true;
 };
@@ -216,9 +210,16 @@ Chunk.prototype.hasWater = function(x,y){
 };
 
 Chunk.prototype.drawTile = function(x,y,tile){
-    //console.log('Drawing',tile,'at',x,y);
+    if(BLIT){
+        Editor.ground.create(x * World.tileWidth, y * World.tileHeight, tile);
+        return;
+    }
     var sprite = Editor.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',tile);
     // TODO: remove in game
+    if(Editor.collisions.get(x,y)){
+        sprite.hasCollision = true;
+        sprite.setTint(0xff0000);
+    }
     sprite.setInteractive();
     sprite.on('pointerover',function(){
         var dbg = tile+' '+this.ground.get(x-this.x,y-this.y);
@@ -229,7 +230,7 @@ Chunk.prototype.drawTile = function(x,y,tile){
         sprite.setTint(0xaaaaaa);
     }.bind(this));
     sprite.on('pointerout',function(){
-        sprite.setTint(0xffffff);
+        sprite.setTint(sprite.hasCollision ? 0xff0000 : 0xffffff);
     });
     sprite.on('pointerdown',function(){
         Editor.centerCamera(x,y,this.id);
@@ -240,15 +241,15 @@ Chunk.prototype.drawTile = function(x,y,tile){
     this.tiles.push(sprite);
 };
 
+Chunk.prototype.getAtlasData = function(image,data){
+    return Editor.atlas[Editor.shorthands[image]][data];
+};
+
 Chunk.prototype.drawImage = function(x,y,image){
-    var atlasmap = {
-        't1':'tree_1',
-        't2':'tree_2',
-        't3':'tree_3',
-        'td':'tree_dead'
-    };
-    var img = Editor.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',atlasmap[image]);
+    var img = Editor.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',Editor.shorthands[image]);
     img.setDepth(y);
+    var anchor = this.getAtlasData(image,'anchor');
+    img.setOrigin(anchor.x,anchor.y);
     this.images.push(img);
 };
 
