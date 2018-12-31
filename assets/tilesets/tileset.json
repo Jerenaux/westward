@@ -51,7 +51,8 @@
       "frame": {"x":192,"y":96,"w":32,"h":32}
     },
     "water_top":{
-      "frame": {"x":192,"y":32,"w":32,"h":32}
+      "frame": {"x":192,"y":32,"w":32,"h":32},
+      "collides": true
     },
     "water_left":{
       "frame": {"x":160,"y":64,"w":32,"h":32}
@@ -72,26 +73,30 @@
       "frame": {"x":224,"y":96,"w":32,"h":32}
     },
     "water_corner_tl":{
-      "frame": {"x":288,"y":32,"w":32,"h":32}
+      "frame": {"x":288,"y":32,"w":32,"h":32},
+      "collides": true
     },
     "water_corner_bl":{
-      "frame": {"x":288,"y":64,"w":32,"h":32}
+      "frame": {"x":288,"y":64,"w":32,"h":32},
+      "collides": true
     },
     "water_corner_tr":{
-      "frame": {"x":320,"y":32,"w":32,"h":32}
+      "frame": {"x":320,"y":32,"w":32,"h":32},
+      "collides": true
     },
     "water_corner_br":{
-      "frame": {"x":320,"y":64,"w":32,"h":32}
+      "frame": {"x":320,"y":64,"w":32,"h":32},
+      "collides": true
     },
     "newwater":{
       "frame": {"x":192,"y":192,"w":32,"h":32}
     },
     "newwater_bottom":{
-      "frame": {"x":192,"y":224,"w":32,"h":32},
-      "collides": true
+      "frame": {"x":192,"y":224,"w":32,"h":32}
     },
     "newwater_top":{
-      "frame": {"x":192,"y":160,"w":32,"h":32}
+      "frame": {"x":192,"y":160,"w":32,"h":32},
+      "collides": true
     },
     "newwater_left":{
       "frame": {"x":160,"y":192,"w":32,"h":32}
@@ -112,16 +117,20 @@
       "frame": {"x":224,"y":224,"w":32,"h":32}
     },
     "newwater_corner_tl":{
-      "frame": {"x":288,"y":160,"w":32,"h":32}
+      "frame": {"x":288,"y":160,"w":32,"h":32},
+      "collides": true
     },
     "newwater_corner_bl":{
-      "frame": {"x":288,"y":192,"w":32,"h":32}
+      "frame": {"x":288,"y":192,"w":32,"h":32},
+      "collides": true
     },
     "newwater_corner_tr":{
-      "frame": {"x":320,"y":160,"w":32,"h":32}
+      "frame": {"x":320,"y":160,"w":32,"h":32},
+      "collides": true
     },
     "newwater_corner_br":{
-      "frame": {"x":320,"y":192,"w":32,"h":32}
+      "frame": {"x":320,"y":192,"w":32,"h":32},
+      "collides": true
     },
     "tree_1":{
       "frame": {"x":5,"y":298,"w":126,"h":150},
@@ -142,6 +151,14 @@
     "stump":{
       "frame": {"x":10,"y":449,"w":74,"h":63},
       "anchor": {"x":0,"y":0.5}
+    },
+    "bush_1":{
+      "frame": {"x":393,"y":6,"w":34,"h":36},
+      "anchor": {"x":0,"y":0}
+    },
+    "bush_2":{
+      "frame": {"x":433,"y":10,"w":32,"h":32},
+      "anchor": {"x":0,"y":0}
     }
   },
   "shorthands" : {
@@ -161,6 +178,8 @@
     "t1":"tree_1",
     "t2":"tree_2",
     "t3":"tree_3",
-    "td":"tree_dead"
+    "td":"tree_dead",
+    "b1":"bush_1",
+    "b2":"bush_2"
   }
 }

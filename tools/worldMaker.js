@@ -498,8 +498,6 @@ function drawShore(){
         });
         //if(undef) console.warn('issue with path from',coast[0],'to',coast[coast.length-2]);
     });
-    console.warn('###',collides('wb'));
-    console.log(tileset.frames[tileset.shorthands['wb']]);
 }
 
 function collides(tile){
