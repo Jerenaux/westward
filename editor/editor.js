@@ -4,6 +4,7 @@
 
 var DRAW_IMAGES = true;
 var BLIT = false;
+var COLL = 'client';
 
 var Editor = {
     focusTile: {x:0,y:0},
@@ -29,7 +30,7 @@ Editor.create = function(){
     Editor.tilesetData = this.cache.json.get('tileset').data;
     Editor.shorthands = this.cache.json.get('tileset').shorthands;
     Editor.collisions = new SpaceMap();
-    Editor.collisions.fromList(this.cache.json.get('collisions'));
+    if(COLL == 'server') Editor.collisions.fromList(this.cache.json.get('collisions'));
     console.log(Editor.tilesetData);
     Editor.camera = Editor.scene.cameras.main;
     Editor.camera.setBounds(0,0,World.worldWidth*TILE_WIDTH,World.worldHeight*TILE_HEIGHT);
@@ -152,6 +153,7 @@ function Chunk(data){
     this.ground = new SpaceMap();
     this.ground.fromList(this.layers[0],true); // true = compact list
     this.tiles = [];
+    this.tilesMap = new SpaceMap(); // TODO: remove in prod?
     this.images = [];
     this.displayed = false;
     this.draw();
@@ -200,8 +202,13 @@ Chunk.prototype.draw = function(){
 Chunk.prototype.has = function(x,y,v){
     var cx = x - this.x;
     var cy = y - this.y;
-    if(cy >= World.chunkHeight || cx >= World.chunkWidth || cx < 0 || cy < 0) return this.neighborHas(x,y,v);
     return (this.ground.get(cx,cy) == v);
+};
+
+Chunk.prototype.getTile = function(x,y){
+    var cx = x - this.x;
+    var cy = y - this.y;
+    return this.tilesMap.get(cx,cy);
 };
 
 Chunk.prototype.hasWater = function(x,y){
@@ -212,7 +219,12 @@ Chunk.prototype.tintSprite = function(sprite){ // TODO: remove in game
     //if(!sprite.hasServerCollision && !sprite.hasServerCollision) return;
     //sprite.setTint((sprite.hasServerCollision ? 0xff0000 : 0xffff),(sprite.hasServerCollision ? 0xff0000 : 0xffff),(sprite.hasClientCollision ? 0x0000ff : 0xffff),(sprite.hasClientCollision ? 0x0000ff : 0xffff));
     //sprite.setTint((sprite.hasServerCollision ? 0xff0000 : 0xffffff));
-    sprite.setTint((sprite.hasClientCollision ? 0xff0000 : 0xffffff));
+    /*if(COLL == 'client'){
+        sprite.setTint((sprite.hasClientCollision ? 0xff0000 : 0xffffff));
+    }else{
+        sprite.setTint((sprite.hasServerCollision ? 0xff0000 : 0xffffff));
+    }*/
+    sprite.setTint((sprite.collides ? 0xff0000 : 0xffffff));
 };
 
 Chunk.prototype.drawTile = function(x,y,tile){
@@ -222,8 +234,14 @@ Chunk.prototype.drawTile = function(x,y,tile){
     }
     var sprite = Editor.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',tile);
     // TODO: remove in game
-    sprite.hasServerCollision = !!Editor.collisions.get(x,y);
-    sprite.hasClientCollision = !!this.getAtlasData(tile,'collides',true);
+    //sprite.hasServerCollision = !!Editor.collisions.get(x,y);
+    //sprite.hasClientCollision = !!this.getAtlasData(tile,'collides',true);
+    if(COLL == 'client'){
+        sprite.collides = !!this.getAtlasData(tile,'collides',true);
+        if(sprite.collides) Editor.collisions.add(x,y);
+    }else{
+        sprite.collides = !!Editor.collisions.get(x,y);
+    }
     //if(sprite.hasServerCollision != sprite.hasClientCollision) console.warn('inconsistent collision data for tile',tile,sprite.hasClientCollision,sprite.hasServerCollision);
     this.tintSprite(sprite);
     sprite.setInteractive();
@@ -246,6 +264,7 @@ Chunk.prototype.drawTile = function(x,y,tile){
     sprite.setDisplayOrigin(0,0);
     sprite.tileID = tile;
     this.tiles.push(sprite);
+    this.tilesMap.add(x-this.x,y-this.y,sprite);
 };
 
 Chunk.prototype.getAtlasData = function(image,data,longname){
@@ -263,6 +282,19 @@ Chunk.prototype.drawImage = function(x,y,image){
     img.setDepth(y);
     var anchor = this.getAtlasData(image,'anchor');
     img.setOrigin(anchor.x,anchor.y);
+    var collisions = this.getAtlasData(image,'collisions');
+    if(collisions) {
+        collisions.forEach(function (coll) {
+            var cx = x + coll[0];
+            var cy = y + coll[1];
+            if (COLL == 'client') Editor.collisions.add(cx, cy, 1);
+            var tile = this.getTile(cx, cy);
+            if(tile) { // Will sometimes be null for tiles of images overlapping AOIs
+                tile.collides = true;
+                this.tintSprite(tile);
+            }
+        }, this);
+    }
     this.images.push(img);
 };
 

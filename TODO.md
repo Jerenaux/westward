@@ -36,11 +36,10 @@ Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-
 
 World building: move away from tiles:
 [x] Zoom
-[ ] Panning
+[x] Panning
 [x] 96x96 grass chunks, loaded positionnally
 [x] Tiles only for other terrain elements (water, dirt, ...)
-[ ] Everything on top are single-image objects (possibly rendered in multiple parts with different depths)
-(What about objects spanning more than 2 AOIs?)
+[x] Everything on top are single-image objects (possibly rendered in multiple parts with different depths)
 [x] Test trees overlaps
 [x] Sparse format, declarative (grass, water, ...)
 [x] Specific tiles (e.g. water joints) computed positionnally
