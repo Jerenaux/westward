@@ -61,7 +61,7 @@ app.use('/client',express.static(__dirname + '/client'));
 app.use('/lib',express.static(__dirname + '/lib'));
 app.use('/server',express.static(__dirname + '/server'));
 app.use('/shared',express.static(__dirname + '/shared'));
-app.use('/maps',express.static(myArgs.maps));
+app.use('/maps',express.static(myArgs.maps || path.join(__dirname,'/maps')));
 app.use('/admin',express.static(path.join(__dirname,'admin')));
 app.use('/editor',express.static(path.join(__dirname,'editor')));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -145,13 +145,13 @@ if(process.env.DEV == 1) {
 
 server.listen(process.env.PORT || 8081,function(){
     console.log('Listening on '+server.address().port);
-    mongoose.connect(process.env.MONGODB_URI);
+    mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward');
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function() {
         server.db = db;
         console.log('Connection to db established');
-        gs.readMap(myArgs.maps,myArgs.test);
+        gs.readMap(myArgs.maps || path.join(__dirname,'/maps'),myArgs.test);
     });
 });
 
