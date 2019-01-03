@@ -166,6 +166,16 @@
       "frame": {"x":433,"y":10,"w":32,"h":32},
       "anchor": {"x":0,"y":0},
       "collisions": [[0,0]]
+    },
+    "bush_3":{
+      "frame": {"x":392,"y":53,"w":37,"h":40},
+      "anchor": {"x":0,"y":0},
+      "collisions": [[0,0]]
+    },
+    "bush_lit":{
+      "frame": {"x":433,"y":52,"w":37,"h":40},
+      "anchor": {"x":0,"y":0},
+      "collisions": [[0,0]]
     }
   },
   "shorthands" : {
