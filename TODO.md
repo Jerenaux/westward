@@ -154,7 +154,7 @@ Secure
 
 Analytics:
 ---------
-- Pretty print events in admin: add player names, returning players, new buildings, menu opens?, fights, item uses
+- Pretty print events in admin: fix building event, add player names, returning players, new buildings, menu opens?, fights, item uses
 - Session duration stats
 - Bundle events from one player into sessions
 - Log session-wide stats: how many players visit a building during session, do this, do that...

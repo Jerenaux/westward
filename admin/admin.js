@@ -59,25 +59,33 @@ app.filter('processImg',function(){
     }
 });
 
+function prefix(txt,time,name){
+    var t = new Date(time);
+    var dateStr = "["+t.getDate()+"/"+(t.getMonth()+1)+" "+t.getHours()+":"+t.getMinutes()+":"+t.getSeconds()+"]"; 
+    var tokens = [dateStr,txt];
+    if(name) tokens.splice(1,0,'[name]');
+    return tokens.join(" ");
+}
+
 app.filter('eventFilter',function(){
     return function(event,scope){
-        var t = new Date(event.time);
-        var dateStr = "["+t.getDate()+"/"+(t.getMonth()+1)+" "+t.getHours()+":"+t.getMinutes()+":"+t.getSeconds()+"]";
+        
         switch(event.action){
             case 'buy':
-                return dateStr+" A player bought "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each at "+Data.buildingsData[event.building].name;
+                //return dateStr+" A player bought "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each at "+Data.buildingsData[event.building].name;
+                return prefix("A player bought "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each at "+Data.buildingsData[event.building].name,event.time,event.pname);
             case 'sell':
-                return dateStr+" A player sold "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each "+Data.buildingsData[event.building].name;
+                return prefix(" A player sold "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each "+Data.buildingsData[event.building].name,event.time,event.pname);
             case 'connect':
-                return dateStr+" A player has connected in settlement "+event.stl;
+                return prefix("A player has connected in settlement "+event.stl, event.time,event.pname);
             case 'disconnect':
-                return dateStr+" A player has disconnected";
+                return prefix("A player has disconnected", event.time,event.pname);
             case 'explore':
-                return dateStr+" A player has explored AOI "+event.aoi;
+                return prefix("A player has explored AOI ", event.time,event.pname);
             case 'building':
                 //return dateStr+" A player has enterd building "+Data.buildingsData[event.building].name;
             case 'server-start':
-                return dateStr+" SERVER RESTART";
+                return prefix(" SERVER RESTART",event.time);
             default:
                 return 'Undefined event';
         }

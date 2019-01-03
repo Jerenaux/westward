@@ -10,8 +10,9 @@ var mongoose = require('mongoose');
 
 var eventSchema = new mongoose.Schema({
     pid: {type: Number, min: 0},
+    pname: String,
     time: { type: Date, default: Date.now },
-    action: {type: String}
+    action: {type: String} // Also used in admin
 });
 var Event = mongoose.model('Event', eventSchema);
 
@@ -49,7 +50,8 @@ var BuildingEvent = Event.discriminator(
 var ConnectEvent = Event.discriminator(
     'ConnectEvent',
     new mongoose.Schema({
-        stl: Number
+        stl: Number,
+        name: String
     }),
     {discriminatorKey: 'kind'}
 );
@@ -72,6 +74,7 @@ Prism.logEvent = function(player,action,data){
     data = data || {};
     data.action = action;
     data.pid = (player ? player.id : null);
+    data.pname = (player ? player.name : null);
 
     var map = {
         'building': BuildingEvent,
