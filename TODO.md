@@ -154,7 +154,7 @@ Secure
 
 Analytics:
 ---------
-- Pretty print events in admin: fix building event, add player names, returning players, new buildings, menu opens?, fights, item uses
+- Pretty print events in admin: new buildings, returning players,  menu opens?, fights, item uses
 - Session duration stats
 - Bundle events from one player into sessions
 - Log session-wide stats: how many players visit a building during session, do this, do that...
@@ -477,7 +477,7 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-- Tool to automate db interactions when deploying (flushing sth, ...)
+- Tool to automate db interactions when deploying (SYNC, flushing sth, ...)
 - Tool to gather, uglify and compress all relevant source files 
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?

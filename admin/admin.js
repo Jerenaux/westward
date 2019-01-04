@@ -35,9 +35,7 @@ app.controller("mainCtrl", [
         getData = function(category){
             $scope[category] = [];
             $http.get("/admin/"+category+"/").then(function(res) {
-                if(res.status == 200){
-                    $scope[category] = res.data;
-                }
+                if(res.status == 200) $scope[category] = res.data;
             },function(err){});
         };
 
@@ -45,6 +43,7 @@ app.controller("mainCtrl", [
             getData('events');
             getData('screenshots');
             //getData('buildings');
+            console.log(Data.buildingsData);
         };
 
         Data.categories.forEach(function(category){
@@ -63,7 +62,7 @@ function prefix(txt,time,name){
     var t = new Date(time);
     var dateStr = "["+t.getDate()+"/"+(t.getMonth()+1)+" "+t.getHours()+":"+t.getMinutes()+":"+t.getSeconds()+"]"; 
     var tokens = [dateStr,txt];
-    if(name) tokens.splice(1,0,'[name]');
+    if(name) tokens.splice(1,0,'['+name+']');
     return tokens.join(" ");
 }
 
@@ -72,18 +71,19 @@ app.filter('eventFilter',function(){
         
         switch(event.action){
             case 'buy':
-                //return dateStr+" A player bought "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each at "+Data.buildingsData[event.building].name;
-                return prefix("A player bought "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each at "+Data.buildingsData[event.building].name,event.time,event.pname);
+                return prefix("Bought "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each at "+Data.buildingsData[event.building].name,event.time,event.pname);
             case 'sell':
-                return prefix(" A player sold "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each "+Data.buildingsData[event.building].name,event.time,event.pname);
+                return prefix("Sold "+event.nb+ " "+scope.data.items[event.item].name+" for "+event.price+" each "+Data.buildingsData[event.building].name,event.time,event.pname);
             case 'connect':
-                return prefix("A player has connected in settlement "+event.stl, event.time,event.pname);
+                return prefix("Connected in settlement "+event.stl, event.time,event.pname);
             case 'disconnect':
-                return prefix("A player has disconnected", event.time,event.pname);
+                return prefix("Disconnected", event.time,event.pname);
             case 'explore':
-                return prefix("A player has explored AOI ", event.time,event.pname);
+                return prefix("Explored AOI "+event.aoi, event.time,event.pname);
             case 'building':
-                //return dateStr+" A player has enterd building "+Data.buildingsData[event.building].name;
+                return prefix("Entered building "+Data.buildingsData[event.building].name,event.time,event.pname);
+            case 'newbuilding':
+                return prefix("Built "+Data.buildingsData[event.building].name+" at "+event.x+", "+event.y,event.time,event.pname);
             case 'server-start':
                 return prefix(" SERVER RESTART",event.time);
             default:

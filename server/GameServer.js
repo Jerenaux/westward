@@ -757,6 +757,7 @@ GameServer.handleBuild = function(data,socketID) {
     var buildPermit = GameServer.canBuild(bid, tile);
     if (buildPermit == 1) {
         GameServer.build(player, bid, tile);
+        Prism.logEvent(player,'newbuilding',{x:tile.x,y:tile.y,building:bid});
     } else if(buildPermit == -1) {
         player.addMsg('I can\'t build there!');
     }else if(buildPermit == -2){

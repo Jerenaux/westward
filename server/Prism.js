@@ -46,6 +46,16 @@ var BuildingEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var NewBuildingEvent = Event.discriminator(
+    'NewBuildingEvent',
+    new mongoose.Schema({
+        building: Number,
+        x: Number,
+        y: Number
+    }),
+    {discriminatorKey: 'kind'}
+);
+
 
 var ConnectEvent = Event.discriminator(
     'ConnectEvent',
@@ -82,6 +92,7 @@ Prism.logEvent = function(player,action,data){
         'connect': ConnectEvent,
         'disconnect': DisconnectEvent,
         'explore': ExploreEvent,
+        'newbuilding': NewBuildingEvent,
         'sell': TradeEvent,
         'server-start': ServerStartEvent
     };
