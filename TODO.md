@@ -58,6 +58,12 @@ World building: move away from tiles:
 [ ] Remove legacy tiles after a while (from png and json) + old tileset files
 
 
+Crafting:
+Requirements:
+- Display recipes + ingredients (after selection?)
+- Display self inventory?
+- Display bld inventory
+
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.
