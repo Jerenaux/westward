@@ -36,8 +36,12 @@ var Engine = {
     playerIsInitialized: false
 };
 
+var tilesetData = {};
+
 Engine.preload = function() {
     Engine.useTilemaps = false;
+
+    this.load.atlas('tileset', 'assets/tilesets/tileset.png', 'assets/tilesets/tileset.json');
 
     // Characters
     this.load.spritesheet('enemy', 'assets/sprites/enemy.png',{frameWidth:64,frameHeight:64});
@@ -132,7 +136,7 @@ Engine.preload = function() {
 
     if(Client.tutorial) this.load.json('tutorials', 'assets/data/tutorials.json');
 
-    Engine.collidingTiles = []; // list of tile ids that collide (from tilesets.json)
+    /*Engine.collidingTiles = []; // list of tile ids that collide (from tilesets.json)
     Engine.tilesheets = [];
 
     for(var i = 0, firstgid = 1; i < Boot.tilesets.length; i++){
@@ -157,7 +161,7 @@ Engine.preload = function() {
             return tile+firstgid;
         }));
         firstgid += tilecount;
-    }
+    }*/
 };
 
 Engine.entityManager = {
@@ -238,8 +242,11 @@ Engine.create = function(){
     Engine.mapDataLocation = Boot.mapDataLocation;
     console.log('Master file read, setting up world of size '+World.worldWidth+' x '+World.worldHeight+' with '+Engine.nbLayers+' layers');
 
-    Engine.tilesets = masterData.tilesets;
-    Engine.tilesetMap = {}; // maps tiles to tilesets;
+    //Engine.tilesets = masterData.tilesets;
+    //Engine.tilesetMap = {}; // maps tiles to tilesets;
+    tilesetData.atlas = Engine.scene.cache.json.get('tileset').frames;
+    tilesetData.config = Engine.scene.cache.json.get('tileset').config;
+    tilesetData.shorthands = Engine.scene.cache.json.get('tileset').shorthands;
 
     Engine.chunks = {}; // holds references to the containers containing the chunks
     Engine.displayedChunks = [];
@@ -1885,12 +1892,12 @@ Engine.addResource = function(origin,shape){
     }
 };
 
-Engine.addCollision = function(x,y,tile){
+/*Engine.addCollision = function(x,y,tile){
     if(Engine.isColliding(tile)) {
         Engine.collisions.add(x,y,1);
         if(Engine.debugCollisions) Engine.scene.add.rectangle((x*32)+16,(y*32)+16, 32,32, 0xee0000).setAlpha(0.7);
     }
-};
+};*/
 
 // Check if a non-walkable tile is at a given position or not
 Engine.checkCollision = function(x,y){
@@ -1902,9 +1909,9 @@ Engine.checkResource = function(x,y){
 };
 
 // Check if a given tile type is walkable or not
-Engine.isColliding = function(tile){ // tile is the index of the tile in the tileset
+/*Engine.isColliding = function(tile){ // tile is the index of the tile in the tileset
     return Engine.collidingTiles.includes(tile);
-};
+};*/
 
 Engine.handleKeyboard = function(event){
     //console.log(event);

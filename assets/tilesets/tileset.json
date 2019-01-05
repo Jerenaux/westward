@@ -1,5 +1,5 @@
 {
-  "data":{
+  "config":{
       "grassPrefix": "newgrass",
       "grassSize": 3,
       "waterPrefix": ""

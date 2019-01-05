@@ -2,7 +2,50 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 22-12-18.
  */
 
-var DRAW_IMAGES = true;
+Chunk.prototype.postDrawTile = function(x,y,tile,sprite){
+    this.tilesMap.add(x-this.x,y-this.y,sprite);
+    if(COLL == 'client'){
+        sprite.collides = !!this.getAtlasData(tile,'collides',true);
+        if(sprite.collides) Editor.collisions.add(x,y);
+    }else{
+        sprite.collides = !!Editor.collisions.get(x,y);
+    }
+    this.tintSprite(sprite);
+    sprite.setInteractive();
+    sprite.on('pointerover',function(){
+        document.getElementById('debug').innerHTML = tile+' '+this.ground.get(x-this.x,y-this.y);
+        document.getElementById('tx').innerHTML = x;
+        document.getElementById('ty').innerHTML = y;
+        document.getElementById('aoi').innerHTML = this.id;
+        sprite.setTint(0xaaaaaa);
+    }.bind(this));
+    sprite.on('pointerout',function(){
+        this.tintSprite(sprite);
+    }.bind(this));
+    sprite.on('pointerdown',function(){
+        Editor.centerCamera(x,y,this.id);
+    }.bind(this));
+};
+
+Chunk.prototype.tintSprite = function(sprite){ // TODO: remove in game
+    sprite.setTint((sprite.collides ? 0xff0000 : 0xffffff));
+};
+
+Chunk.prototype.getTile = function(x,y){
+    var cx = x - this.x;
+    var cy = y - this.y;
+    return this.tilesMap.get(cx,cy);
+};
+
+Chunk.prototype.addCollision = function(cx,cy){
+    if (COLL == 'client') Editor.collisions.add(cx, cy, 1);
+    var tile = this.getTile(cx, cy);
+    if(tile) { // Will sometimes be null for tiles of images overlapping AOIs
+        tile.collides = true;
+        this.tintSprite(tile);
+    }
+};
+
 var BLIT = false;
 var COLL = 'client';
 
@@ -17,6 +60,8 @@ var Editor = {
     zoomIndex: 1
 };
 
+var tilesetData = {};
+
 Editor.preload = function(){
     this.load.json('master','../maps/master.json');
     this.load.json('collisions','../maps/collisions.json');
@@ -26,17 +71,15 @@ Editor.preload = function(){
 Editor.create = function(){
     Editor.scene = this.scene.scene;
     World.readMasterData(this.cache.json.get('master'));
-    Editor.atlas = this.cache.json.get('tileset').frames;
-    Editor.tilesetData = this.cache.json.get('tileset').data;
-    Editor.shorthands = this.cache.json.get('tileset').shorthands;
+    tilesetData.atlas = this.cache.json.get('tileset').frames;
+    tilesetData.config = this.cache.json.get('tileset').config;
+    tilesetData.shorthands = this.cache.json.get('tileset').shorthands;
     Editor.collisions = new SpaceMap();
     if(COLL == 'server') Editor.collisions.fromList(this.cache.json.get('collisions'));
     console.log(Editor.tilesetData);
     Editor.camera = Editor.scene.cameras.main;
     Editor.camera.setBounds(0,0,World.worldWidth*TILE_WIDTH,World.worldHeight*TILE_HEIGHT);
 
-    /*var pos = Utils.AOItoTile(Editor.focusChunk);
-    Editor.centerCamera(pos.x,pos.y,Editor.focusChunk);*/
     Editor.updateEnvironment();
 
     if(BLIT) Editor.ground = Editor.scene.add.blitter(0,0,'tileset');
@@ -84,7 +127,7 @@ Editor.updateEnvironment = function(){
     console.log('Displaying',newChunks.length,'/',chunks.length,'chunks');
 
     for (var i = 0; i < oldChunks.length; i++) {
-        //Editor.removeChunk(oldChunks[i]);
+        Editor.removeChunk(oldChunks[i]);
     }
 
     for(var j = 0; j < newChunks.length; j++){
@@ -143,164 +186,7 @@ Editor.zoom = function(coef){
     Editor.updateEnvironment();
 };
 
-function Chunk(data){
-    this.id = data.id;
-    this.x = parseInt(data.x);
-    this.y = parseInt(data.y);
-    this.defaultTile = data.default;
-    this.layers = data.layers;
-    this.decor = data.decor;
-    this.ground = new SpaceMap();
-    this.ground.fromList(this.layers[0],true); // true = compact list
-    this.tiles = [];
-    this.tilesMap = new SpaceMap(); // TODO: remove in prod?
-    this.images = [];
-    this.displayed = false;
-    this.draw();
-}
-
-Chunk.prototype.draw = function(){
-    // Ground
-    for(var x_ = 0; x_ < World.chunkWidth; x_++){
-        for(var y_ = 0; y_ < World.chunkHeight; y_++) {
-            var tx = this.x + x_;
-            var ty = this.y + y_;
-            if(this.hasWater(tx,ty)) continue;
-            if(this.defaultTile == 'grass') {
-                var gs = Editor.tilesetData.grassSize;
-                var t = (tx % gs) + (ty % gs) * gs;
-                this.drawTile(tx,ty,Editor.tilesetData.grassPrefix+'_'+t);
-            }
-        }
-    }
-    // Layers
-    this.layers.forEach(function(layer){
-        layer.forEach(function(data){
-            var tile = data[2];
-            if(tile === undefined) return;
-            var x = this.x + parseInt(data[0]);
-            var y = this.y + parseInt(data[1]);
-            var name = Editor.shorthands[tile];
-            if(!(tile in Editor.shorthands)) return; // TODO: remove in editor
-            if(name && name.indexOf('water') != -1) name = Editor.tilesetData.waterPrefix+name;
-            this.drawTile(x, y, name);
-        },this);
-    },this);
-    if(this.tiles.length > 700) console.warn(this.tiles.length);
-
-    if(DRAW_IMAGES) {
-        this.decor.forEach(function (data) {
-            var x = this.x + parseInt(data[0]);
-            var y = this.y + parseInt(data[1]);
-            this.drawImage(x, y, data[2]);
-        }, this);
-    }
-
-    this.displayed = true;
-};
-
-Chunk.prototype.has = function(x,y,v){
-    var cx = x - this.x;
-    var cy = y - this.y;
-    return (this.ground.get(cx,cy) == v);
-};
-
-Chunk.prototype.getTile = function(x,y){
-    var cx = x - this.x;
-    var cy = y - this.y;
-    return this.tilesMap.get(cx,cy);
-};
-
-Chunk.prototype.hasWater = function(x,y){
-    return this.has(x,y,'w');
-};
-
-Chunk.prototype.tintSprite = function(sprite){ // TODO: remove in game
-    //if(!sprite.hasServerCollision && !sprite.hasServerCollision) return;
-    //sprite.setTint((sprite.hasServerCollision ? 0xff0000 : 0xffff),(sprite.hasServerCollision ? 0xff0000 : 0xffff),(sprite.hasClientCollision ? 0x0000ff : 0xffff),(sprite.hasClientCollision ? 0x0000ff : 0xffff));
-    //sprite.setTint((sprite.hasServerCollision ? 0xff0000 : 0xffffff));
-    /*if(COLL == 'client'){
-        sprite.setTint((sprite.hasClientCollision ? 0xff0000 : 0xffffff));
-    }else{
-        sprite.setTint((sprite.hasServerCollision ? 0xff0000 : 0xffffff));
-    }*/
-    sprite.setTint((sprite.collides ? 0xff0000 : 0xffffff));
-};
-
-Chunk.prototype.drawTile = function(x,y,tile){
-    if(BLIT){
-        Editor.ground.create(x * World.tileWidth, y * World.tileHeight, tile);
-        return;
-    }
-    var sprite = Editor.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',tile);
-    // TODO: remove in game
-    //sprite.hasServerCollision = !!Editor.collisions.get(x,y);
-    //sprite.hasClientCollision = !!this.getAtlasData(tile,'collides',true);
-    if(COLL == 'client'){
-        sprite.collides = !!this.getAtlasData(tile,'collides',true);
-        if(sprite.collides) Editor.collisions.add(x,y);
-    }else{
-        sprite.collides = !!Editor.collisions.get(x,y);
-    }
-    //if(sprite.hasServerCollision != sprite.hasClientCollision) console.warn('inconsistent collision data for tile',tile,sprite.hasClientCollision,sprite.hasServerCollision);
-    this.tintSprite(sprite);
-    sprite.setInteractive();
-    sprite.on('pointerover',function(){
-        var dbg = tile+' '+this.ground.get(x-this.x,y-this.y);
-        document.getElementById('debug').innerHTML = dbg;
-        document.getElementById('tx').innerHTML = x;
-        document.getElementById('ty').innerHTML = y;
-        document.getElementById('aoi').innerHTML = this.id;
-        sprite.setTint(0xaaaaaa);
-    }.bind(this));
-    sprite.on('pointerout',function(){
-        this.tintSprite(sprite);
-        //sprite.setTint(sprite.hasCollision ? 0xff0000 : 0xffffff);
-    }.bind(this));
-    sprite.on('pointerdown',function(){
-        Editor.centerCamera(x,y,this.id);
-    }.bind(this));
-    // -------------------
-    sprite.setDisplayOrigin(0,0);
-    sprite.tileID = tile;
-    this.tiles.push(sprite);
-    this.tilesMap.add(x-this.x,y-this.y,sprite);
-};
-
-Chunk.prototype.getAtlasData = function(image,data,longname){
-    //console.log(image,Editor.shorthands[image]);
-    if(longname){
-        return Editor.atlas[image][data];
-    }else {
-        if (!(image in Editor.shorthands)) return false;
-        return Editor.atlas[Editor.shorthands[image]][data];
-    }
-};
-
-Chunk.prototype.drawImage = function(x,y,image){
-    var img = Editor.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',Editor.shorthands[image]);
-    img.setDepth(y);
-    var anchor = this.getAtlasData(image,'anchor');
-    img.setOrigin(anchor.x,anchor.y);
-    var collisions = this.getAtlasData(image,'collisions');
-    if(collisions) {
-        collisions.forEach(function (coll) {
-            var cx = x + coll[0];
-            var cy = y + coll[1];
-            if (COLL == 'client') Editor.collisions.add(cx, cy, 1);
-            var tile = this.getTile(cx, cy);
-            if(tile) { // Will sometimes be null for tiles of images overlapping AOIs
-                tile.collides = true;
-                this.tintSprite(tile);
-            }
-        }, this);
-    }
-    this.images.push(img);
-};
-
-Chunk.prototype.erase = function(){
-    //TODO: destroy tiles and images
-};
+var Engine = Editor;
 
 function add(x,y,image){
     var id = Utils.tileToAOI({x:x,y:y});

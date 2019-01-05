@@ -23,7 +23,7 @@ var Boot = new Phaser.Class({
         Client.getBootParameters();
 
         var masterData = this.cache.json.get(Boot.masterKey);
-        Boot.tilesets = masterData.tilesets;
+        //Boot.tilesets = masterData.tilesets;
         Boot.masterData = masterData;
 
         Boot.background = this.add.image(0,0,'background').setOrigin(0);
