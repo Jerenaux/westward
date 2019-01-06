@@ -54,7 +54,7 @@ SpaceMap.prototype.getFirst = function(){
     return this.toList()[0].v;
 };
 
-SpaceMap.prototype.toList = function(compact){ // serialize to a list representation
+SpaceMap.prototype.toList = function(compact,skipv){ // serialize to a list representation
     var list = [];
     for(var x in this){
         if(this.hasOwnProperty(x)){
@@ -63,11 +63,18 @@ SpaceMap.prototype.toList = function(compact){ // serialize to a list representa
                     if(compact){
                         list.push([x,y,this[x][y]])
                     }else {
-                        list.push({
-                            x: x,
-                            y: y,
-                            v: this[x][y]
-                        });
+                        if(skipv){
+                            list.push({
+                                x: x,
+                                y: y
+                            });
+                        }else {
+                            list.push({
+                                x: x,
+                                y: y,
+                                v: this[x][y]
+                            });
+                        }
                     }
                 }
             }

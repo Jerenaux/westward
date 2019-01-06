@@ -27,8 +27,9 @@ Chunk.prototype.postDrawTile = function(x,y,tile,sprite){
     }.bind(this));
 };
 
-Chunk.prototype.tintSprite = function(sprite){ // TODO: remove in game
-    sprite.setTint((sprite.collides ? 0xff0000 : 0xffffff));
+Chunk.prototype.tintSprite = function(sprite){
+    //sprite.setTint((sprite.collides ? 0xff0000 : 0xffffff));
+    sprite.setTint(0xffffff);
 };
 
 Chunk.prototype.getTile = function(x,y){

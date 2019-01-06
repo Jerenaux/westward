@@ -99,9 +99,10 @@ function makeWorld(odir,blueprint){
 
     tileset = JSON.parse(fs.readFileSync(path.join(__dirname,'..','assets','tilesets','tileset.json')).toString());
 
-    var mapsPath = config.get('dev.mapsPath');
+    /*var mapsPath = config.get('dev.mapsPath');
     outdir = (odir ? path.join(__dirname,mapsPath,odir) : path.join(__dirname,mapsPath,'chunks'));
-    if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);
+    if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);*/
+    outdir = path.join(__dirname,'..','maps'); // TODO: remove dev.mapsPath etc?
     console.log('Writing to',outdir);
 
     var existing = fs.readdirSync(outdir);
@@ -147,12 +148,20 @@ function collectPixels(image){
         var green = this.bitmap.data[idx + 1];
         var blue = this.bitmap.data[idx + 2];
 
-        if (red == 203 && green == 230 && blue == 163) greenpixels.push({x: x, y: y});
-        if (red == 255 && green == 255 && blue == 255) whitepixels.push({x: x, y: y});
+        if(red == 203 && green == 230 && blue == 163) greenpixels.push({x: x, y: y});
+        if(red == 255 && green == 255 && blue == 255) whitepixels.push({x: x, y: y});
+
+        // Keep track of pixels that have also been mapped to land
+        // Due to space distortion, multiple pixels, black and white, can be mapped to the same tile!
+        if(red == 0 && green == 0 && blue == 0){
+            var g = pixelToTile({x: x, y: y},image.bitmap.width,image.bitmap.height);
+            land.add(g.x,g.y,1);
+        }
     });
 
-    createForests(greenpixels,image.bitmap.width,image.bitmap.height);
-    // createLakes(whitepixels);
+    //createForests(greenpixels,image.bitmap.width,image.bitmap.height);
+    createLakes(whitepixels,image.bitmap.width,image.bitmap.height);
+    drawShore();
 
     for(var id in chunks){
         chunks[id].write(outdir);
@@ -162,8 +171,15 @@ function collectPixels(image){
     writeCollisions();
 }
 
+function pixelToTile(px,imgw,imgh){
+    return {
+        x: Math.round(px.x * (nbHoriz * chunkWidth / imgw)),
+        y: Math.round(px.y * (nbVert * chunkHeight / imgh))
+    };
+}
+
 function createForests(greenpixels,imgw,imgh){
-    console.log('Creating forest ...');
+    console.log('Creating forests ...');
     var poles = [Math.floor(World.worldHeight/2),World.worldHeight,0]; // Pole for tree 1, 2 and 3 respectively
 
     var xRandRange = 7;
@@ -172,15 +188,16 @@ function createForests(greenpixels,imgw,imgh){
     console.log(greenpixels.length,'green pixels');
     for (var i = 0; i < greenpixels.length; i++) {
         var px = greenpixels[i];
-        var gx = Math.round(px.x * (nbHoriz * chunkWidth / imgw));
-        var gy = Math.round(px.y * (nbVert * chunkHeight / imgh));
-        gx += Utils.randomInt(-xRandRange, xRandRange + 1);
-        gy += Utils.randomInt(-yRandRange, yRandRange + 1);
+        //var gx = Math.round(px.x * (nbHoriz * chunkWidth / imgw));
+        //var gy = Math.round(px.y * (nbVert * chunkHeight / imgh));
+        var g = pixelToTile(px,imgw,imgh);
+        g.x += Utils.randomInt(-xRandRange, xRandRange + 1);
+        g.y += Utils.randomInt(-yRandRange, yRandRange + 1);
 
         var dists = [];
         var distsum = 0;
         poles.forEach(function(p){
-            var d = Math.abs(gy-p);
+            var d = Math.abs(g.y-p);
             if(d == 0) d = 0.1;
             d *= d; // Polarizes more
             dists.push(d);
@@ -198,7 +215,7 @@ function createForests(greenpixels,imgw,imgh){
             return {weight: w, id: i+1};
         });
         var tree = 't'+(Utils.randomInt(1,101) <= 1 ? 'd' : rwc(table));
-        if(plantTree(gx,gy,tree)) nbtrees++;
+        if(plantTree(g.x,g.y,tree)) nbtrees++;
     }
     console.log(nbtrees + ' trees drawn');
 }
@@ -228,6 +245,30 @@ function plantTree(x,y,tree){
     return true;
 }
 
+function createLakes(whitepixels,imgw,imgh){
+    console.log('Creating lakes ...');
+    console.log(whitepixels.length,'white pixels');
+    var nblakes = 0;
+    for(var i = 0; i < whitepixels.length; i++){
+        var px = whitepixels[i];
+        var g = pixelToTile(px,imgw,imgh);
+        var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
+        var ok = true;
+        for(var j = 0; j < contour.length; j++){
+            if(land.has(g.x+contour[j][0],g.y+contour[j][1])){
+                ok = false;
+                break;
+            }
+        }
+        if(ok){
+            var surface = fill(g);
+            //if(surface) console.log(surface,px,g);
+            if(surface) nblakes++;
+        }
+    }
+    console.log(nblakes,'lakes created');
+}
+
 function applyBlueprint(blueprint){
     var parser = new xml2js.Parser();
     var blueprint = fs.readFileSync(path.join(__dirname,'blueprints',blueprint)).toString();
@@ -235,7 +276,6 @@ function applyBlueprint(blueprint){
         if(err) throw err;
         var read = readPath(result);
         var paths = read.allPts; // array of arrays ; list of paths in the blueprint
-        //var fillNodes = read.fillNodes; // TODO: remove it from readPath
 
         for(var i = 0; i < paths.length; i++) {
             var pts = paths[i];
@@ -254,11 +294,6 @@ function applyBlueprint(blueprint){
             tiles = Geometry.backwardSmoothPass(tiles);
             if(tiles.length > 1) addShore(tiles);
         }
-
-        /*for (var k = 0; k < fillNodes.length; k++) {
-            fill(fillNodes[k]);
-        }*/
-        drawShore();
 
         // TODO: Prune chunks / set default tile as water
         /*var visible = new Set();
@@ -289,17 +324,13 @@ function applyBlueprint(blueprint){
     });
 }
 
-function pixelToTile(){
-    //TODO: use in readPath
-}
-
 function readPath(result){
     var viewbox = result.svg.$.viewBox.split(" ");
     var curveW = parseInt(viewbox[2]);
     var curveH = parseInt(viewbox[3]);
     var path = result.svg.path[0].$.d;
     path = path.replace(/\s\s+/g, ' ');
-    var fillNodes = [];
+    /*var fillNodes = [];
     if(result.svg.hasOwnProperty('fill')) {
         var nodes = result.svg.fill[0].$.nodes.split(",");
         for(var k = 0; k < nodes.length; k++) {
@@ -314,7 +345,7 @@ function readPath(result){
         }
     }else{
         console.log('NOTICE: No fill nodes');
-    }
+    }*/
 
     var curves = path.split("M");
     curves.shift(); // remove initial blank
@@ -355,7 +386,7 @@ function readPath(result){
     //pts.forEach(item => console.log(item))
     return {
         allPts: allPts,
-        fillNodes: fillNodes
+        fillNodes: [] // TODO: remove?
     };
 }
 
@@ -400,12 +431,10 @@ function getTile(x,y){
 }
 
 function fill(fillNode,stop){ // fills the world with water, but stops at coastlines
-    console.log('Filling ...');
-    //if(fillNode.x < 0 || fillNode.x > 1 || fillNode.y < 0 || fillNode.y > 0) console.warn('Wrong fillNode coordinates');
+    if(isBusy(fillNode)) return;
     var stoppingCritetion = stop || 1000000;
     var queue = [];
     queue.push(fillNode);
-    var fillTiles = [];
     var counter = 0;
     var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
     while(queue.length > 0){
@@ -431,6 +460,7 @@ function fill(fillNode,stop){ // fills the world with water, but stops at coastl
             break;
         }
     }
+    return counter;
 }
 
 function addShore(tiles){
@@ -458,7 +488,6 @@ function hasWater(x,y){
 function drawShore(){
     console.log('Drawing shore ...');
     coasts.forEach(function(coast){
-        var undef = false;
         coast.forEach(function(c){
             var x = c.x;
             var y = c.y;
@@ -479,14 +508,37 @@ function drawShore(){
             if(tile === undefined){
                 //console.warn('undefined at',x,y);
                 //removeTile(c);
-                undef = true;
             }else{
                 addTile(c,tile); // Will replace any 'c'
                 if(collides(tile)) collisions.add(x,y,1);
+                if(ML){
+                    var line = getNeighborhood(x,y);
+                    line.push(tile);
+                    lines.push(line);
+                    //console.log(x,y,line.join(';'));
+                }
             }
         });
-        //if(undef) console.warn('issue with path from',coast[0],'to',coast[coast.length-2]);
     });
+
+    if(ML){
+        fs.writeFile(path.join(outdir,'training.csv'),lines.join("\n"),function(err){
+            if(err) throw err;
+            console.log('Training set written');
+        });
+    }
+}
+
+function getNeighborhood(x,y){
+    var res = [];
+    var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
+    for(var j = 0; j < contour.length; j++){
+        var v = 'g';
+        if(hasCoast(x+contour[j][0],y+contour[j][1])) v = 'c';
+        if(hasWater(x+contour[j][0],y+contour[j][1])) v = 'w';
+        res.push(v);
+    }
+    return res;
 }
 
 function collides(tile){
@@ -524,12 +576,15 @@ coasts = [];
 trees = new SpaceMap();
 collisions = new SpaceMap();
 tileset = null;
+land = new SpaceMap();
 nbHoriz = myArgs.nbhoriz;
 nbVert = myArgs.nbvert;
 chunkWidth = myArgs.chunkw;
 chunkHeight = myArgs.chunkh;
 tileWidth = myArgs.tilew;
 tileHeight = myArgs.tileh;
+ML = true;
+lines = [];
 
 
 makeWorld(myArgs.outdir,myArgs.blueprint);
