@@ -55,13 +55,6 @@ var Building = new Phaser.Class({
         this.setBuilt(data.built);
         this.resetDepth();
 
-        /*if(buildingData.shape) {
-            var shape = new Phaser.Geom.Polygon(buildingData.shape);
-            this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
-            this.input.hitArea = shape; // will override previous interactive zone, if any (e.g. if object recycled from pool)
-
-            //this.on('pointerover',this.handleOver.bind(this));
-        }*/
         this.setInteractive();
 
         this.setCollisions();
@@ -70,7 +63,8 @@ var Building = new Phaser.Class({
     },
 
     resetDepth: function(){
-        this.setDepth(Engine.buildingsDepth + (this.ty - this.depthOffset)/1000);
+        //this.setDepth(Engine.buildingsDepth + (this.ty - this.depthOffset)/1000);
+        this.setDepth(this.ty);
     },
 
     build: function () {

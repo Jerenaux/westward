@@ -67,7 +67,8 @@ var Moving = new Phaser.Class({
     },
 
     updateDepth: function(){
-        this.setDepth(Engine.playersDepth + this.tileY / 1000);
+        //this.setDepth(Engine.playersDepth + this.tileY / 1000);
+        this.setDepth(this.tileY+0.1);
     },
 
     updateChunk: function(){

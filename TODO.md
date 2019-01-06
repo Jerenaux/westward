@@ -1,3 +1,11 @@
+On deploy:
+- Test a fight
+- Test picking up objects
+- Test selling and buying in a store
+- Test equiping object
+=> Automate these eventually
+
+
 Admin
 Analytics
 Cleaning
@@ -557,15 +565,7 @@ Testing:
 World building:
 --------------
 1/ World creation:
-Multilayer image:
-- One layer for coastlines; trace SVG path, modify manually and then recompute and export path as blueprint
-+ fill nodes
-- One layer for forests, based on color detection; consider saving trees in separate data structure (and displaying them as single images like buildings)
-Creation:
-- One script reads blueprints, create chunks with coastlines, fill water
-- (If tiled-trees: one script to apply them)
-NB: trees as images opens the way for ecology dynamics: trees disppearing with time, timber supply
-diminishing, ...
+- Add missing lakes 
 
 2/ Cartography
 - Has to come from actual in-game world
@@ -581,7 +581,6 @@ diminishing, ...
 -> Manage trees?
 -> Integrate with admin to display and modify settlement data (+ events etc.) 
 
-4/Chunk editor: used Tiled in world mode
 5/Building editor (visually define shape, collisons, etc.)
 --
 Custom chunk/world editor:

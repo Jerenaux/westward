@@ -237,13 +237,9 @@ Engine.create = function(){
 
     var masterData = Boot.masterData;
     World.readMasterData(masterData);
-    Engine.nbLayers = masterData.nbLayers;
-    if(!Engine.nbLayers) console.warn('falsy number of layers : '+console.log(Engine.nbLayers));
     Engine.mapDataLocation = Boot.mapDataLocation;
     console.log('Master file read, setting up world of size '+World.worldWidth+' x '+World.worldHeight+' with '+Engine.nbLayers+' layers');
 
-    //Engine.tilesets = masterData.tilesets;
-    //Engine.tilesetMap = {}; // maps tiles to tilesets;
     tilesetData.atlas = Engine.scene.cache.json.get('tileset').frames;
     tilesetData.config = Engine.scene.cache.json.get('tileset').config;
     tilesetData.shorthands = Engine.scene.cache.json.get('tileset').shorthands;
@@ -1874,13 +1870,13 @@ Engine.drawChunk = function(mapData,id){
     var chunk = new Chunk(mapData, id, 1);
     Engine.chunks[chunk.id] = chunk;
     if (!Engine.mapDataCache[chunk.id]) Engine.mapDataCache[chunk.id] = mapData;
-    chunk.drawLayers();
+    //chunk.drawLayers();
     Engine.displayedChunks.push(chunk.id);
 };
 
 Engine.removeChunk = function(id){
     if(Engine.useBlitters) return; // todo: hack
-    Engine.chunks[id].removeLayers();
+    Engine.chunks[id].erase();
     Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
 };
 

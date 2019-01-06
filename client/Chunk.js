@@ -85,7 +85,9 @@ Chunk.prototype.getAtlasData = function(image,data,longname){
 
 Chunk.prototype.drawImage = function(x,y,image){
     var img = Engine.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',tilesetData.shorthands[image]);
-    img.setDepth(y);
+    var offset = this.getAtlasData(image,'depthOffset') || 0;
+    img.setDepth(y+offset);
+    //console.log(y,this.getAtlasData(image,'depthOffset'),img.depth);
     var anchor = this.getAtlasData(image,'anchor');
     img.setOrigin(anchor.x,anchor.y);
     var collisions = this.getAtlasData(image,'collisions');

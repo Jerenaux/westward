@@ -89,7 +89,8 @@
       "collides": true
     },
     "newwater":{
-      "frame": {"x":192,"y":192,"w":32,"h":32}
+      "frame": {"x":192,"y":192,"w":32,"h":32},
+      "collides": true
     },
     "newwater_bottom":{
       "frame": {"x":192,"y":224,"w":32,"h":32}

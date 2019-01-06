@@ -8,7 +8,7 @@ var OrientationPin = new Phaser.Class({
 
     initialize: function OrientationPin(type,iconAtlas,iconFrame) {
         CustomSprite.call(this, UI.scene, 0, 0,'orientation');
-        //this.setDepth(5);
+        //TODO: fuse icon an pin in a rendertexture to avoid depth issues
 
         this.type = type;
         if(this.type == 'animal') {

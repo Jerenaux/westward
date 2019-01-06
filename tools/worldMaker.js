@@ -75,7 +75,7 @@ Chunk.prototype.write = function(chunkpath){
     });
 };
 
-function makeWorld(outdir,blueprint){
+function makeWorld(odir,blueprint){
     // Default values
     var defChunkW = 30;
     var defChunkH = 20;
@@ -100,7 +100,7 @@ function makeWorld(outdir,blueprint){
     tileset = JSON.parse(fs.readFileSync(path.join(__dirname,'..','assets','tilesets','tileset.json')).toString());
 
     var mapsPath = config.get('dev.mapsPath');
-    outdir = (outdir ? path.join(__dirname,mapsPath,outdir) : path.join(__dirname,mapsPath,'chunks'));
+    outdir = (odir ? path.join(__dirname,mapsPath,odir) : path.join(__dirname,mapsPath,'chunks'));
     if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);
     console.log('Writing to',outdir);
 
@@ -126,19 +126,17 @@ function makeWorld(outdir,blueprint){
     // TODO: rename (bluepirnts actually pertain to shores and water, ...) + make clean sucession of functions, not nested (use promises?)
     applyBlueprint(blueprint);
 
-    var img = blueprint.split('.')[0]+'.png';
+    var img = blueprint.split('.')[0]+'.png'; // TODO: fix args instead
     console.log('Scanning image ',img);
     Jimp.read(path.join(__dirname,'blueprints',img), function (err, image) {
         if (err) throw err;
-        createForests(image,outdir);
+        collectPixels(image);
     });
 }
 
-function createForests(image,outdir){
-    console.log('Creating forest ...');
-    var poles = [Math.floor(World.worldHeight/2),World.worldHeight,0]; // Pole for tree 1, 2 and 3 respectively
-
+function collectPixels(image){
     var greenpixels = [];
+    var whitepixels = [];
     image.scan(0, 0, image.bitmap.width, image.bitmap.height, function (x, y, idx) {
         //if(done) return;
         // x, y is the position of this pixel on the image
@@ -150,13 +148,23 @@ function createForests(image,outdir){
         var blue = this.bitmap.data[idx + 2];
 
         if (red == 203 && green == 230 && blue == 163) greenpixels.push({x: x, y: y});
+        if (red == 255 && green == 255 && blue == 255) whitepixels.push({x: x, y: y});
     });
 
-    /*greenpixels.sort(function (a, b) { //TODO: remove?
-        if (a.y < b.y) return -1;
-        if (a.y == b.y) return 0;
-        if (a.y > b.y) return 1;
-    });*/
+    createForests(greenpixels,image.bitmap.width,image.bitmap.height);
+    // createLakes(whitepixels);
+
+    for(var id in chunks){
+        chunks[id].write(outdir);
+    }
+
+    writeMasterFile();
+    writeCollisions();
+}
+
+function createForests(greenpixels,imgw,imgh){
+    console.log('Creating forest ...');
+    var poles = [Math.floor(World.worldHeight/2),World.worldHeight,0]; // Pole for tree 1, 2 and 3 respectively
 
     var xRandRange = 7;
     var yRandRange = 7;
@@ -164,8 +172,8 @@ function createForests(image,outdir){
     console.log(greenpixels.length,'green pixels');
     for (var i = 0; i < greenpixels.length; i++) {
         var px = greenpixels[i];
-        var gx = Math.round(px.x * (nbHoriz * chunkWidth / image.bitmap.width));
-        var gy = Math.round(px.y * (nbVert * chunkHeight / image.bitmap.height));
+        var gx = Math.round(px.x * (nbHoriz * chunkWidth / imgw));
+        var gy = Math.round(px.y * (nbVert * chunkHeight / imgh));
         gx += Utils.randomInt(-xRandRange, xRandRange + 1);
         gy += Utils.randomInt(-yRandRange, yRandRange + 1);
 
@@ -185,7 +193,7 @@ function createForests(image,outdir){
             return w;
         });
         var table = weights.map(function(w,i){
-            var w = Math.round((w/sumweights)*10); // Normalization
+            w = Math.round((w/sumweights)*10); // Normalization
             if(w <= 2) w = 0;
             return {weight: w, id: i+1};
         });
@@ -193,18 +201,6 @@ function createForests(image,outdir){
         if(plantTree(gx,gy,tree)) nbtrees++;
     }
     console.log(nbtrees + ' trees drawn');
-
-    /*fs.writeFile(path.join(__dirname,'blueprints','trees.json'),JSON.stringify(greenPixels),function(err){
-        if(err) throw err;
-        console.log('Green pixels written');
-    });*/
-
-    for(var id in chunks){
-        chunks[id].write(outdir);
-    }
-
-    writeMasterFile(outdir);
-    writeCollisions(outdir); //TODO: listCollisions instead
 }
 
 function plantTree(x,y,tree){
@@ -239,12 +235,7 @@ function applyBlueprint(blueprint){
         if(err) throw err;
         var read = readPath(result);
         var paths = read.allPts; // array of arrays ; list of paths in the blueprint
-        var fillNodes = read.fillNodes;
-
-        /*paths.sort(function(a,b){ // TODO: remove?
-            if(a.length >= b.length) return -1;
-            return 1;
-        });*/
+        //var fillNodes = read.fillNodes; // TODO: remove it from readPath
 
         for(var i = 0; i < paths.length; i++) {
             var pts = paths[i];
@@ -264,11 +255,9 @@ function applyBlueprint(blueprint){
             if(tiles.length > 1) addShore(tiles);
         }
 
-        if(doFill) {
-            for (var k = 0; k < fillNodes.length; k++) {
-                fill(fillNodes[k]);
-            }
-        }
+        /*for (var k = 0; k < fillNodes.length; k++) {
+            fill(fillNodes[k]);
+        }*/
         drawShore();
 
         // TODO: Prune chunks / set default tile as water
@@ -504,7 +493,7 @@ function collides(tile){
     return tileset.frames[tileset.shorthands[tile]].collides;
 }
 
-function writeMasterFile(outdir){
+function writeMasterFile(){
     // Write master file
     var master = {
         //tilesets : tilesetsData.tilesets,
@@ -519,7 +508,7 @@ function writeMasterFile(outdir){
     });
 }
 
-function writeCollisions(outdir){
+function writeCollisions(){
     // Write master file
     var colls = trees.toList().concat(collisions.toList());
     fs.writeFile(path.join(outdir,'collisions.json'),JSON.stringify(colls),function(err){
@@ -529,6 +518,7 @@ function writeCollisions(outdir){
 }
 
 var myArgs = require('optimist').argv;
+outdir = '';
 chunks = {};
 coasts = [];
 trees = new SpaceMap();
@@ -540,8 +530,6 @@ chunkWidth = myArgs.chunkw;
 chunkHeight = myArgs.chunkh;
 tileWidth = myArgs.tilew;
 tileHeight = myArgs.tileh;
-doFill = myArgs.fill;
-write = myArgs.write;
 
 
 makeWorld(myArgs.outdir,myArgs.blueprint);
