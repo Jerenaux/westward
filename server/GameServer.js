@@ -302,7 +302,7 @@ GameServer.addItem = function(x,y,type){
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
-    GameServer.addItem(1205,161,3);
+    GameServer.addAnimal(517,653,0);
 };
 
 GameServer.setUpdateLoops = function(){
@@ -589,25 +589,31 @@ GameServer.pickUpItem = function(player,itemID){
     GameServer.removeEntity(item);
 };
 
-GameServer.handleBattle = function(player,target,aggro){
+// Called by player clicks or by NPC.checkForAggro()
+GameServer.handleBattle = function(attacker,attacked){
     if(!GameServer.enableBattles){
-        if(!aggro) player.addMsg('Battles are disabled at the moment');
+        if(attacker.isPlayer) attacker.addMsg('Battles are disabled at the moment');
         return false;
     }
-    if(!player.isAvailableForFight() || player.isInFight() || !target.isAvailableForFight() || target.isInFight()) return;
+    if(!attacker.isAvailableForFight() || attacker.isInFight() || !attacked.isAvailableForFight() || attacked.isInFight()) return;
     // TODO: check for proximity
-    var area = GameServer.computeBattleArea(player,target);
+    var area = GameServer.computeBattleArea(attacker,attacked);
     if(!area){
-        if(!aggro) player.addMsg('There is an obstacle in the way!');
+        if(attacker.isPlayer) player.addMsg('There is an obstacle in the way!');
         return false;
     }
     var battle = GameServer.checkBattleOverlap(area);
     if(!battle) battle = new Battle();
-    battle.addFighter(player);
-    battle.addFighter(target);
-    //battle.addArea(area);
+    battle.addFighter(attacker);
+    battle.addFighter(attacked);
     GameServer.addBattleArea(area,battle);
     battle.start();
+    console.warn(attacker.isPlayer,attacked.isPlayer);
+    if(attacker.isPlayer || attacked.isPlayer){
+        var player = (attacker.isPlayer ? attacker : attacked);
+        var foe = (attacker.isPlayer ? attacked : attacker);
+        Prism.logEvent(player,'battle',{category:foe.entityCategory,type:foe.type});
+    }
     return true;
 };
 
@@ -886,6 +892,7 @@ GameServer.handleUse = function(data,socketID){
         player.applyEffects(item,1,true);
         player.takeItem(item,1,true);
     }
+    Prism.logEvent(player,'use',{item:item});
 };
 
 GameServer.handleUnequip = function(data,socketID) {

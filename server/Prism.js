@@ -30,6 +30,14 @@ var TradeEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var UseEvent = Event.discriminator(
+    'UseEvent',
+    new mongoose.Schema({
+        item: Number
+    }),
+    {discriminatorKey: 'kind'}
+);
+
 var ExploreEvent = Event.discriminator(
     'ExploreEvent',
     new mongoose.Schema({
@@ -52,6 +60,15 @@ var NewBuildingEvent = Event.discriminator(
         building: Number,
         x: Number,
         y: Number
+    }),
+    {discriminatorKey: 'kind'}
+);
+
+var BattleEvent = Event.discriminator(
+    'BattleEvent',
+    new mongoose.Schema({
+        category: String,
+        type: Number
     }),
     {discriminatorKey: 'kind'}
 );
@@ -87,6 +104,7 @@ Prism.logEvent = function(player,action,data){
     data.pname = (player ? player.name : null);
 
     var map = {
+        'battle': BattleEvent,
         'building': BuildingEvent,
         'buy': TradeEvent,
         'connect': ConnectEvent,
@@ -94,7 +112,8 @@ Prism.logEvent = function(player,action,data){
         'explore': ExploreEvent,
         'newbuilding': NewBuildingEvent,
         'sell': TradeEvent,
-        'server-start': ServerStartEvent
+        'server-start': ServerStartEvent,
+        'use': UseEvent
     };
     if(!(action in map)){
         console.warn('PRISM: Unrecognized event');
