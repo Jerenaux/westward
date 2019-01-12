@@ -155,11 +155,11 @@ Secure
 
 Analytics:
 ---------
-- Pretty print events in admin: add player names, returning players, new buildings, menu opens?, fights, item uses
+- Pretty print events in admin: new buildings, menu opens?, fights, item uses
+- Button to flush events
 - Session duration stats
 - Bundle events from one player into sessions
 - Log session-wide stats: how many players visit a building during session, do this, do that...
-- Button to flush events
 - Push desktop notifications for player connects
 - Look for nice statistical library
 - Log drains and faucets
