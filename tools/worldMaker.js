@@ -487,40 +487,61 @@ function hasWater(x,y){
 
 function drawShore(){
     console.log('Drawing shore ...');
+    var lines = [];
+    var coefs = [[-1.00149414,0.68496582,3.04691306,0.5014638,-0.47957752,-1.08163528,-1.6805485,-0.65577338],[-1.18034148,-0.97120158,-1.02270556,2.19730636,-1.35556793,-0.64800433,-1.20288996,-0.88844011],[-0.59961815,1.52724676,-1.05945576,-0.63883887,-1.92526716,-0.97111468,-1.50113609,-0.766991],[-1.68062192,-0.628117,-1.58361862,-1.24935879,-1.43846217,2.19097966,-1.6280854,-0.98653618],[-0.64050834,-0.77986822,-0.97961626,-1.0229846,-0.98478376,-1.04827064,-0.87513198,1.73487522],[2.05543701,0.58888962,0.28174655,-0.77466213,-0.24981304,0.66069305,1.92630583,1.14939437],[0.14453872,-1.01698762,0.40898086,0.63119802,2.8261066,0.85278679,3.0243602,0.88989568],[2.12487554,1.14065339,1.6433754,0.87474724,-0.04338155,-1.54641993,0.58378096,0.25800047],[0.2312218,0.48422296,2.93248781,0.99433863,2.19769155,0.90832711,-0.00998735,-0.97608286],[-1.40664927,-0.6471684,-1.13423411,0.26974372,3.76192969,0.45093339,-1.43363476,-0.73699075],[2.26370068,0.58948156,-0.55683667,-0.91623906,-0.84939207,-0.67252883,-0.67602575,0.76152874],[-0.31054046,-0.97211729,-1.9770367,-0.86671432,-1.45948263,0.9042537,3.47299281,0.21711981]];
+    var intercepts = [0.15226048,0.96440027,0.63812295,0.81124231,0.9541958,-0.6510558,-1.65209348,-0.77021691,-1.27293538,0.29140327,0.82693714,-0.29226066];
+    var tiles = ['wb', 'wbbl', 'wbbr', 'wbtl', 'wbtr', 'wcbl', 'wcbr', 'wctl', 'wctr', 'wl', 'wr', 'wt','none'];
+
     coasts.forEach(function(coast){
         coast.forEach(function(c){
             var x = c.x;
             var y = c.y;
             var tile;
-            if(hasCoast(x-1,y) && hasCoast(x+1,y)  && (hasWater(x,y-1) || hasWater(x,y+1))){ // Horizontal edge
-                tile = (hasWater(x,y-1) ? 'wb' : 'wt');
-            }else if(hasCoast(x,y-1) && hasCoast(x,y+1) && (hasWater(x+1,y) || hasWater(x-1,y))) { // Vertical edge
-                tile = (hasWater(x-1,y) ? 'wr' : 'wl');
-            }else if(hasCoast(x,y+1) && hasCoast(x+1,y) && (hasWater(x+1,y+1) || hasWater(x-1,y-1)) ) { // tl
-                tile = (hasWater(x+1,y+1) ? 'wbtl' : 'wctl');
-            }else if(hasCoast(x-1,y) && hasCoast(x,y+1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // tr
-                tile = (hasWater(x-1,y+1) ? 'wbtr' : 'wctr');
-            }else if(hasCoast(x,y-1) && hasCoast(x-1,y) && (hasWater(x+1,y+1) || hasWater(x-1,y-1))) { // br
-                tile = (hasWater(x-1,y-1) ? 'wbbr' : 'wcbr');
-            }else if(hasCoast(x+1,y) && hasCoast(x,y-1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // bl
-                tile = (hasWater(x+1,y-1) ? 'wbbl' : 'wcbl');
+            var nbrh = getNeighborhood(x,y);
+            if(MLpred){
+                var scores = [];
+                for(var cl = 0; cl < coefs.length; cl++){
+                    var score = intercepts[cl];
+                    for(var cf = 0; cf < coefs[0].length; cf++){
+                        score += coefs[cl][cf]*nbrh[cf];
+                    }
+                    scores.push(sigmoid(score));
+                }
+                tile = tiles[Utils.indexOfMax(scores)];
+            }else{
+                if(hasCoast(x-1,y) && hasCoast(x+1,y)  && (hasWater(x,y-1) || hasWater(x,y+1))){ // Horizontal edge
+                    tile = (hasWater(x,y-1) ? 'wb' : 'wt');
+                }else if(hasCoast(x,y-1) && hasCoast(x,y+1) && (hasWater(x+1,y) || hasWater(x-1,y))) { // Vertical edge
+                    tile = (hasWater(x-1,y) ? 'wr' : 'wl');
+                }else if(hasCoast(x,y+1) && hasCoast(x+1,y) && (hasWater(x+1,y+1) || hasWater(x-1,y-1)) ) { // tl
+                    tile = (hasWater(x+1,y+1) ? 'wbtl' : 'wctl');
+                }else if(hasCoast(x-1,y) && hasCoast(x,y+1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // tr
+                    tile = (hasWater(x-1,y+1) ? 'wbtr' : 'wctr');
+                }else if(hasCoast(x,y-1) && hasCoast(x-1,y) && (hasWater(x+1,y+1) || hasWater(x-1,y-1))) { // br
+                    tile = (hasWater(x-1,y-1) ? 'wbbr' : 'wcbr');
+                }else if(hasCoast(x+1,y) && hasCoast(x,y-1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // bl
+                    tile = (hasWater(x+1,y-1) ? 'wbbl' : 'wcbl');
+                }
             }
             if(tile === undefined){
                 //console.warn('undefined at',x,y);
                 //removeTile(c);
+                tile='none';
             }else{
                 addTile(c,tile); // Will replace any 'c'
                 if(collides(tile)) collisions.add(x,y,1);
-                if(ML){
-                    var line = getNeighborhood(x,y);
-                    line.push(tile);
-                    lines.push(line);
-                    //console.log(x,y,line.join(';'));
-                }
+            }
+            if(ML){
+                tile = tiles.indexOf(tile);
+                var line = [];
+                line = line.concat([x,y]);
+                line = line.concat(nbrh);
+                line = line.concat([+(x == 0),+(y == 0)]);
+                line = line.concat([tile]);
+                lines.push(line);
             }
         });
     });
-
     if(ML){
         fs.writeFile(path.join(outdir,'training.csv'),lines.join("\n"),function(err){
             if(err) throw err;
@@ -529,13 +550,17 @@ function drawShore(){
     }
 }
 
+function sigmoid(t) {
+    return 1/(1+Math.pow(Math.E, -t));
+}
+
 function getNeighborhood(x,y){
     var res = [];
     var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
     for(var j = 0; j < contour.length; j++){
-        var v = 'g';
-        if(hasCoast(x+contour[j][0],y+contour[j][1])) v = 'c';
-        if(hasWater(x+contour[j][0],y+contour[j][1])) v = 'w';
+        var v = -1; // g
+        if(hasCoast(x+contour[j][0],y+contour[j][1])) v = 0; // c
+        if(hasWater(x+contour[j][0],y+contour[j][1])) v = 1; // w
         res.push(v);
     }
     return res;
@@ -584,6 +609,7 @@ chunkHeight = myArgs.chunkh;
 tileWidth = myArgs.tilew;
 tileHeight = myArgs.tileh;
 ML = true;
+MLpred = false;
 lines = [];
 
 
