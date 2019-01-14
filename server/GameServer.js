@@ -416,7 +416,7 @@ GameServer.addNewPlayer = function(socket,data){
     //console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
     player.setStartingInventory();
-    player.setSettlement(data.selectedSettlement);
+    player.setSettlement(region);
     player.setName(data.characterName);
     player.id = ++GameServer.lastPlayerID;
     //player.classLvlUp(data.selectedClass,false);

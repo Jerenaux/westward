@@ -552,6 +552,7 @@ Testing:
 - https://hackernoon.com/testing-node-js-in-2018-10a04dd77391
 - Mocha + Chai :https://hackernoon.com/a-crash-course-on-testing-with-node-js-6c7428d3da02
 - Sinon: https://www.sitepoint.com/sinon-tutorial-javascript-testing-mocks-spies-stubs/
+- https://semaphoreci.com/community/tutorials/best-practices-for-spies-stubs-and-mocks-in-sinon-js
 - Use Jasmine for client-side tests? Selenium for visual ones?
 - Make lists of bugs happening and think about tests to make to catch them, at the finest granularity possible
 - Tests on inventory manipulations, proper display of stats in items (w.r.t names used in Stats)
