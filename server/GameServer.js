@@ -405,6 +405,19 @@ GameServer.dummyPlayer = function(x,y) {
     return player;
 };
 
+// TODO: remove eventually
+GameServer.testMethodB = function(b){
+    console.log('B');
+    return b;
+};
+
+GameServer.testMethodA = function(a){
+    console.log('A');
+    GameServer.testMethodB(a);
+    return a;
+    //return GameServer.testMethodB(a);
+};
+
 GameServer.addNewPlayer = function(socket,data){
     //if(data.selectedClass == undefined) data.selectedClass = 1;
 
