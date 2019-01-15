@@ -4,6 +4,7 @@
 var expect = require('chai').expect;
 var request = require('request');
 var io = require('socket.io-client');
+var sinon = require('sinon');
 
 var gs = require('../server/GameServer.js').GameServer;
 
@@ -44,12 +45,21 @@ describe('Server', function () {
                 expect(nbErrs).to.equal(nbEvts);
                 done();
             }
-            onevent.call(this, packet);    // original call
+            //onevent.call(this, packet);    // original call
         };
         errInputs.forEach(function(input){
             client.emit('init-world',input);
         });
     });
+
+    /*it('io-init-world-newplayer',function(done) {
+        var onevent = client.onevent;
+        client.onevent = function (packet) {
+            expect(packet.data[0]).to.equal('pid');
+            done();
+        };
+        client.emit('init-world',{});
+    });*/
 });
 
 
