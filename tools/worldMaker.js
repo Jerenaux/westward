@@ -99,9 +99,6 @@ function makeWorld(odir,blueprint){
 
     tileset = JSON.parse(fs.readFileSync(path.join(__dirname,'..','assets','tilesets','tileset.json')).toString());
 
-    /*var mapsPath = config.get('dev.mapsPath');
-    outdir = (odir ? path.join(__dirname,mapsPath,odir) : path.join(__dirname,mapsPath,'chunks'));
-    if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);*/
     outdir = path.join(__dirname,'..','maps'); // TODO: remove dev.mapsPath etc?
     console.log('Writing to',outdir);
 
@@ -532,11 +529,11 @@ function drawShore(){
                 if(collides(tile)) collisions.add(x,y,1);
             }
             if(ML){
-                tile = tiles.indexOf(tile);
+                //tile = tiles.indexOf(tile);
                 var line = [];
-                line = line.concat([x,y]);
+                //line = line.concat([x,y]);
                 line = line.concat(nbrh);
-                line = line.concat([+(x == 0),+(y == 0)]);
+                //line = line.concat([+(x == 0),+(y == 0)]);
                 line = line.concat([tile]);
                 lines.push(line);
             }
@@ -558,9 +555,9 @@ function getNeighborhood(x,y){
     var res = [];
     var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
     for(var j = 0; j < contour.length; j++){
-        var v = g; // -1
-        if(hasCoast(x+contour[j][0],y+contour[j][1])) v = c; // 0
-        if(hasWater(x+contour[j][0],y+contour[j][1])) v = w; // 1
+        var v = 'g'; // -1
+        if(hasCoast(x+contour[j][0],y+contour[j][1])) v = 'c'; // 0
+        if(hasWater(x+contour[j][0],y+contour[j][1])) v = 'w'; // 1
         res.push(v);
     }
     return res;
