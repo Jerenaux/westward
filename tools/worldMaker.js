@@ -558,9 +558,9 @@ function getNeighborhood(x,y){
     var res = [];
     var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
     for(var j = 0; j < contour.length; j++){
-        var v = -1; // g
-        if(hasCoast(x+contour[j][0],y+contour[j][1])) v = 0; // c
-        if(hasWater(x+contour[j][0],y+contour[j][1])) v = 1; // w
+        var v = g; // -1
+        if(hasCoast(x+contour[j][0],y+contour[j][1])) v = c; // 0
+        if(hasWater(x+contour[j][0],y+contour[j][1])) v = w; // 1
         res.push(v);
     }
     return res;
