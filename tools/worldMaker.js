@@ -490,6 +490,7 @@ function drawShore(){
     //var intercepts = [0.15226048,0.96440027,0.63812295,0.81124231,0.9541958,-0.6510558,-1.65209348,-0.77021691,-1.27293538,0.29140327,0.82693714,-0.29226066];
     var tiles = ['wb', 'wbbl', 'wbbr', 'wbtl', 'wbtr', 'wcbl', 'wcbr', 'wctl', 'wctr', 'wl', 'wr', 'wt','none'];
 
+    var undef = 0;
     coasts.forEach(function(coast){
         coast.forEach(function(c){
             var x = c.x;
@@ -507,6 +508,10 @@ function drawShore(){
                 }
                 tile = tiles[Utils.indexOfMax(scores)];*/
                 tile = patterns[nbrh.join('')];
+                if(tile === undefined) {
+                    console.log(x,y,nbrh.join(''));
+                    undef++;
+                }
             }else{
                 if(hasCoast(x-1,y) && hasCoast(x+1,y)  && (hasWater(x,y-1) || hasWater(x,y+1))){ // Horizontal edge
                     tile = (hasWater(x,y-1) ? 'wb' : 'wt');
@@ -541,6 +546,7 @@ function drawShore(){
             }
         });
     });
+    console.log(undef,'undef');
     if(ML){
         fs.writeFile(path.join(outdir,'training.csv'),lines.join("\n"),function(err){
             if(err) throw err;
