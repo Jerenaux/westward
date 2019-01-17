@@ -302,7 +302,6 @@ GameServer.addItem = function(x,y,type){
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
-    GameServer.addItem(1205,161,3);
 };
 
 GameServer.setUpdateLoops = function(){

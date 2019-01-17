@@ -143,7 +143,7 @@ if(process.env.DEV == 1) {
     });
 }
 
-server.listen(process.env.PORT || 8081,function(){
+server.listen(process.env.PORT || myArgs.port || 8081,function(){
     console.log('Listening on '+server.address().port);
     mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward');
     var db = mongoose.connection;
