@@ -29,6 +29,7 @@ SpaceMap.prototype.increment = function(x,y){
     if(!this.hasOwnProperty(x))this[x] = {};
     if(!this[x].hasOwnProperty(y)) this[x][y] = 0;
     this[x][y]++;
+    return this[x][y];
 };
 
 // Works also by calling mySpaceMap[x][y]

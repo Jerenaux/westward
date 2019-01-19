@@ -174,6 +174,7 @@ Editor.drawChunks = function(){
 };
 
 Editor.removeChunk = function(id){
+    if(!(id in Editor.chunks)) return;
     Editor.chunks[id].erase();
     Editor.displayedChunks.splice(Editor.displayedChunks.indexOf(id),1);
     delete Editor.chunks[id];
