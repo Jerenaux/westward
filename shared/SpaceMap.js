@@ -29,6 +29,7 @@ SpaceMap.prototype.increment = function(x,y){
     if(!this.hasOwnProperty(x))this[x] = {};
     if(!this[x].hasOwnProperty(y)) this[x][y] = 0;
     this[x][y]++;
+    return this[x][y];
 };
 
 // Works also by calling mySpaceMap[x][y]
@@ -54,7 +55,7 @@ SpaceMap.prototype.getFirst = function(){
     return this.toList()[0].v;
 };
 
-SpaceMap.prototype.toList = function(compact){ // serialize to a list representation
+SpaceMap.prototype.toList = function(compact,skipv){ // serialize to a list representation
     var list = [];
     for(var x in this){
         if(this.hasOwnProperty(x)){
@@ -63,11 +64,18 @@ SpaceMap.prototype.toList = function(compact){ // serialize to a list representa
                     if(compact){
                         list.push([x,y,this[x][y]])
                     }else {
-                        list.push({
-                            x: x,
-                            y: y,
-                            v: this[x][y]
-                        });
+                        if(skipv){
+                            list.push({
+                                x: x,
+                                y: y
+                            });
+                        }else {
+                            list.push({
+                                x: x,
+                                y: y,
+                                v: this[x][y]
+                            });
+                        }
                     }
                 }
             }
