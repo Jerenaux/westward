@@ -157,9 +157,9 @@ function collectPixels(image){
         }
     });
 
-    createForests(greenpixels,image.bitmap.width,image.bitmap.height);
     createLakes(whitepixels,image.bitmap.width,image.bitmap.height);
     drawShore();
+    createForests(greenpixels,image.bitmap.width,image.bitmap.height);
 
     for(var id in chunks){
         chunks[id].write(outdir);
@@ -197,14 +197,14 @@ function createForests(greenpixels,imgw,imgh){
         pos.forEach(function(p){
             trees.add(p[0],p[1],1);
         });
-        addDecor(g, tree);
+        addDecor(g, 't'+tree);
         nbtrees++;
     }
     console.log(nbtrees + ' trees drawn');
 }
 
 function getTreeType(x,y){
-    var poles = [Math.floor(World.worldHeight/2),World.worldHeight,0]; // Pole for tree 1, 2 and 3 respectively
+    var poles = [Math.floor(World.worldHeight/2),World.worldHeight,0,Math.floor(World.worldHeight/4)]; // Pole for tree 1, 2, 3, 4 respectively
     var dists = [];
     var distsum = 0;
     poles.forEach(function(p){
@@ -225,7 +225,8 @@ function getTreeType(x,y){
         if(w <= 2) w = 0;
         return {weight: w, id: i+1};
     });
-    return 't'+(Utils.randomInt(1,101) <= 1 ? 'd' : rwc(table));
+    var id = (Utils.randomInt(1,101) <= 1 ? 'd' : rwc(table));
+    return id;
 }
 
 function checkPositions(x,y){
@@ -475,7 +476,7 @@ function hasWater(x,y){
 function drawShore(){
     console.log('Drawing shore ...');
     var lines = [];
-     var tiles = ['wb', 'wbbl', 'wbbr', 'wbtl', 'wbtr', 'wcbl', 'wcbr', 'wctl', 'wctr', 'wl', 'wr', 'wt','none'];
+    //var tiles = ['wb', 'wbbl', 'wbbr', 'wbtl', 'wbtr', 'wcbl', 'wcbr', 'wctl', 'wctr', 'wl', 'wr', 'wt','none'];
 
     var undef = 0;
     coasts.forEach(function(coast){
@@ -484,27 +485,12 @@ function drawShore(){
             var y = c.y;
             var tile;
             var nbrh = getNeighborhood(x,y);
-            if(MLpred){
-                tile = patterns[nbrh.join('')];
-                if(tile === undefined) {
-                    //console.log(x,y,nbrh.join(''));
-                    undef++;
-                }
-            }else{
-                if(hasCoast(x-1,y) && hasCoast(x+1,y)  && (hasWater(x,y-1) || hasWater(x,y+1))){ // Horizontal edge
-                    tile = (hasWater(x,y-1) ? 'wb' : 'wt');
-                }else if(hasCoast(x,y-1) && hasCoast(x,y+1) && (hasWater(x+1,y) || hasWater(x-1,y))) { // Vertical edge
-                    tile = (hasWater(x-1,y) ? 'wr' : 'wl');
-                }else if(hasCoast(x,y+1) && hasCoast(x+1,y) && (hasWater(x+1,y+1) || hasWater(x-1,y-1)) ) { // tl
-                    tile = (hasWater(x+1,y+1) ? 'wbtl' : 'wctl');
-                }else if(hasCoast(x-1,y) && hasCoast(x,y+1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // tr
-                    tile = (hasWater(x-1,y+1) ? 'wbtr' : 'wctr');
-                }else if(hasCoast(x,y-1) && hasCoast(x-1,y) && (hasWater(x+1,y+1) || hasWater(x-1,y-1))) { // br
-                    tile = (hasWater(x-1,y-1) ? 'wbbr' : 'wcbr');
-                }else if(hasCoast(x+1,y) && hasCoast(x,y-1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // bl
-                    tile = (hasWater(x+1,y-1) ? 'wbbl' : 'wcbl');
-                }
+            tile = patterns[nbrh.join('')];
+            if(tile === undefined) {
+                //console.log(x,y,nbrh.join(''));
+                undef++;
             }
+
             if(tile === undefined || tile == 'none'){
                 //console.warn('undefined at',x,y);
                 //removeTile(c);
@@ -513,7 +499,7 @@ function drawShore(){
                 addTile(c,tile); // Will replace any 'c'
                 if(collides(tile)) collisions.add(x,y,1);
             }
-            if(ML){
+            /*if(ML){
                 //tile = tiles.indexOf(tile);
                 var line = [];
                 //line = line.concat([x,y]);
@@ -521,16 +507,16 @@ function drawShore(){
                 //line = line.concat([+(x == 0),+(y == 0)]);
                 line = line.concat([tile]);
                 lines.push(line);
-            }
+            }*/
         });
     });
     console.log(undef,'undef');
-    if(ML){
+    /*if(ML){
         fs.writeFile(path.join(outdir,'training.csv'),lines.join("\n"),function(err){
             if(err) throw err;
             console.log('Training set written');
         });
-    }
+    }*/
 }
 
 function sigmoid(t) {
@@ -593,7 +579,6 @@ chunkHeight = myArgs.chunkh;
 tileWidth = myArgs.tilew;
 tileHeight = myArgs.tileh;
 ML = false;
-MLpred = true;
 lines = [];
 
 

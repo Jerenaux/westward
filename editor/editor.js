@@ -27,6 +27,20 @@ Chunk.prototype.postDrawTile = function(x,y,tile,sprite){
     }.bind(this));
 };
 
+
+Chunk.prototype.postDrawImage = function(x,y,image,sprite){
+    sprite.setInteractive();
+    sprite.on('pointerover',function(){
+        document.getElementById('debug').innerHTML = image;
+        document.getElementById('tx').innerHTML = x;
+        document.getElementById('ty').innerHTML = y;
+        sprite.setTint(0xaaaaaa);
+    }.bind(this));
+    sprite.on('pointerout',function(){
+        sprite.setTint(0xffffff);
+    }.bind(this));
+};
+
 Chunk.prototype.tintSprite = function(sprite){
     //sprite.setTint((sprite.collides ? 0xff0000 : 0xffffff));
     sprite.setTint(0xffffff);
@@ -192,9 +206,10 @@ var Engine = Editor;
 
 function add(x,y,image){
     var id = Utils.tileToAOI({x:x,y:y});
+    console.log(id);
     var chunk = Editor.chunks[id];
-    x -= chunk.x;
-    y -= chunk.y;
+    //x -= chunk.x;
+    //y -= chunk.y;
     chunk.drawImage(x,y,image);
 }
 

@@ -43,6 +43,7 @@ Chunk.prototype.draw = function(){
     },this);
     if(this.tiles.length > 700) console.warn(this.tiles.length); // TODO: remove eventually
 
+    // Decor
     this.decor.forEach(function (data) {
         var x = this.x + parseInt(data[0]);
         var y = this.y + parseInt(data[1]);
@@ -97,6 +98,7 @@ Chunk.prototype.drawImage = function(x,y,image){
         },this);
     }
     this.images.push(img);
+    this.postDrawImage(x,y,image,img);
 };
 
 Chunk.prototype.addCollision = function(cx,cy){
@@ -113,3 +115,4 @@ Chunk.prototype.erase = function(){
 };
 
 Chunk.prototype.postDrawTile = function(){}; // Used in editor
+Chunk.prototype.postDrawImage = function(){};
