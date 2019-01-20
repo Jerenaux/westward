@@ -302,7 +302,6 @@ GameServer.addItem = function(x,y,type){
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
-    GameServer.addItem(1205,161,3);
 };
 
 GameServer.setUpdateLoops = function(){
@@ -757,6 +756,7 @@ GameServer.handleBuild = function(data,socketID) {
     var buildPermit = GameServer.canBuild(bid, tile);
     if (buildPermit == 1) {
         GameServer.build(player, bid, tile);
+        Prism.logEvent(player,'newbuilding',{x:tile.x,y:tile.y,building:bid});
     } else if(buildPermit == -1) {
         player.addMsg('I can\'t build there!');
     }else if(buildPermit == -2){

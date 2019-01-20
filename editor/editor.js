@@ -2,11 +2,70 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 22-12-18.
  */
 
-var DRAW_IMAGES = true;
+Chunk.prototype.postDrawTile = function(x,y,tile,sprite){
+    this.tilesMap.add(x-this.x,y-this.y,sprite);
+    if(COLL == 'client'){
+        sprite.collides = !!this.getAtlasData(tile,'collides',true);
+        if(sprite.collides) Editor.collisions.add(x,y);
+    }else{
+        sprite.collides = !!Editor.collisions.get(x,y);
+    }
+    this.tintSprite(sprite);
+    sprite.setInteractive();
+    sprite.on('pointerover',function(){
+        document.getElementById('debug').innerHTML = tile+' '+this.ground.get(x-this.x,y-this.y);
+        document.getElementById('tx').innerHTML = x;
+        document.getElementById('ty').innerHTML = y;
+        document.getElementById('aoi').innerHTML = this.id;
+        sprite.setTint(0xaaaaaa);
+    }.bind(this));
+    sprite.on('pointerout',function(){
+        this.tintSprite(sprite);
+    }.bind(this));
+    sprite.on('pointerdown',function(){
+        Editor.centerCamera(x,y,this.id);
+    }.bind(this));
+};
+
+
+Chunk.prototype.postDrawImage = function(x,y,image,sprite){
+    sprite.setInteractive();
+    sprite.on('pointerover',function(){
+        document.getElementById('debug').innerHTML = image;
+        document.getElementById('tx').innerHTML = x;
+        document.getElementById('ty').innerHTML = y;
+        sprite.setTint(0xaaaaaa);
+    }.bind(this));
+    sprite.on('pointerout',function(){
+        sprite.setTint(0xffffff);
+    }.bind(this));
+};
+
+Chunk.prototype.tintSprite = function(sprite){
+    //sprite.setTint((sprite.collides ? 0xff0000 : 0xffffff));
+    sprite.setTint(0xffffff);
+};
+
+Chunk.prototype.getTile = function(x,y){
+    var cx = x - this.x;
+    var cy = y - this.y;
+    return this.tilesMap.get(cx,cy);
+};
+
+Chunk.prototype.addCollision = function(cx,cy){
+    if (COLL == 'client') Editor.collisions.add(cx, cy, 1);
+    var tile = this.getTile(cx, cy);
+    if(tile) { // Will sometimes be null for tiles of images overlapping AOIs
+        tile.collides = true;
+        this.tintSprite(tile);
+    }
+};
+
 var BLIT = false;
+var COLL = 'client';
 
 var Editor = {
-    focusChunk: 0,
+    focusTile: {x:0,y:0},
     mapDataCache: {},
     displayedChunks: [],
     chunks: {},
@@ -15,6 +74,8 @@ var Editor = {
     zoomScales: [2,1,0.75,0.5,0.25,0.1],// 0.05,0.025,0.01
     zoomIndex: 1
 };
+
+var tilesetData = {};
 
 Editor.preload = function(){
     this.load.json('master','../maps/master.json');
@@ -25,18 +86,16 @@ Editor.preload = function(){
 Editor.create = function(){
     Editor.scene = this.scene.scene;
     World.readMasterData(this.cache.json.get('master'));
-    Editor.atlas = this.cache.json.get('tileset').frames;
-    Editor.tilesetData = this.cache.json.get('tileset').data;
-    Editor.shorthands = this.cache.json.get('tileset').shorthands;
+    tilesetData.atlas = this.cache.json.get('tileset').frames;
+    tilesetData.config = this.cache.json.get('tileset').config;
+    tilesetData.shorthands = this.cache.json.get('tileset').shorthands;
     Editor.collisions = new SpaceMap();
-    Editor.collisions.fromList(this.cache.json.get('collisions'));
+    if(COLL == 'server') Editor.collisions.fromList(this.cache.json.get('collisions'));
     console.log(Editor.tilesetData);
     Editor.camera = Editor.scene.cameras.main;
     Editor.camera.setBounds(0,0,World.worldWidth*TILE_WIDTH,World.worldHeight*TILE_HEIGHT);
 
-    var pos = Utils.AOItoTile(Editor.focusChunk);
-    Editor.centerCamera(pos.x,pos.y,Editor.focusChunk);
-    //Editor.updateEnvironment();
+    Editor.updateEnvironment();
 
     if(BLIT) Editor.ground = Editor.scene.add.blitter(0,0,'tileset');
 };
@@ -44,7 +103,7 @@ Editor.create = function(){
 Editor.centerCamera = function(x,y,id){
     //console.log(x,y,id);
     Editor.camera.centerOn(x*TILE_WIDTH,y*TILE_HEIGHT);
-    Editor.focusChunk = id;
+    Editor.focusTile = {x:x,y:y};
     Editor.updateEnvironment();
 };
 
@@ -60,20 +119,20 @@ Editor.getMouseCoordinates = function(pointer){
 };
 
 Editor.updateEnvironment = function(){
-    var cpos = Utils.AOItoTile(Editor.focusChunk);
-    cpos.x /= World.chunkWidth;
-    cpos.y /= World.chunkHeight;
-    var vizW = Math.ceil((VIEW_WIDTH/Editor.zoomScale)/World.chunkWidth);
-    var vizH = Math.ceil((VIEW_HEIGHT/Editor.zoomScale)/World.chunkHeight);
-    var vizL = Math.min(Math.floor(vizW/2),cpos.x);
-    var vizR = Math.min(vizW-vizL,World.nbChunksHorizontal);
-    var vizT = Math.min(Math.floor(vizH/2),cpos.y);
-    var vizB = Math.min(vizH-vizT,World.nbChunksVertical);
+    var vizW = Math.ceil(VIEW_WIDTH/Editor.zoomScale);
+    var vizH = Math.ceil(VIEW_HEIGHT/Editor.zoomScale);
+    var vizL = Math.min(Math.floor(vizW/2),Editor.focusTile.x);
+    var vizR = Math.min(vizW-vizL,World.worldWidth);
+    var vizT = Math.min(Math.floor(vizH/2),Editor.focusTile.y);
+    var vizB = Math.min(vizH-vizT,World.worldHeight);
 
     var chunks = new Set();
     for(var x = -vizL; x < vizR; x++){
-        for(var y = -(vizT*World.nbChunksHorizontal); y < (vizB*World.nbChunksHorizontal); y+=World.nbChunksHorizontal){
-            chunks.add(Editor.focusChunk+x+y);
+        for(var y = -vizT; y < vizB; y++){
+            var tile = {x:0,y:0};
+            tile.x = Editor.focusTile.x + x;
+            tile.y += Editor.focusTile.y + y;
+            chunks.add(Utils.tileToAOI(tile));
         }
     }
     chunks = Array.from(chunks);
@@ -83,7 +142,7 @@ Editor.updateEnvironment = function(){
     console.log('Displaying',newChunks.length,'/',chunks.length,'chunks');
 
     for (var i = 0; i < oldChunks.length; i++) {
-        //Editor.removeChunk(oldChunks[i]);
+        Editor.removeChunk(oldChunks[i]);
     }
 
     for(var j = 0; j < newChunks.length; j++){
@@ -129,6 +188,7 @@ Editor.drawChunks = function(){
 };
 
 Editor.removeChunk = function(id){
+    if(!(id in Editor.chunks)) return;
     Editor.chunks[id].erase();
     Editor.displayedChunks.splice(Editor.displayedChunks.indexOf(id),1);
     delete Editor.chunks[id];
@@ -142,120 +202,16 @@ Editor.zoom = function(coef){
     Editor.updateEnvironment();
 };
 
-function Chunk(data){
-    this.id = data.id;
-    this.x = parseInt(data.x);
-    this.y = parseInt(data.y);
-    this.defaultTile = data.default;
-    this.layers = data.layers;
-    this.decor = data.decor;
-    this.ground = new SpaceMap();
-    this.ground.fromList(this.layers[0],true); // true = compact list
-    this.tiles = [];
-    this.images = [];
-    this.displayed = false;
-    this.draw();
+var Engine = Editor;
+
+function add(x,y,image){
+    var id = Utils.tileToAOI({x:x,y:y});
+    console.log(id);
+    var chunk = Editor.chunks[id];
+    //x -= chunk.x;
+    //y -= chunk.y;
+    chunk.drawImage(x,y,image);
 }
-
-Chunk.prototype.draw = function(){
-    // Ground
-    for(var x_ = 0; x_ < World.chunkWidth; x_++){
-        for(var y_ = 0; y_ < World.chunkHeight; y_++) {
-            var tx = this.x + x_;
-            var ty = this.y + y_;
-            if(this.hasWater(tx,ty)) continue;
-            if(this.defaultTile == 'grass') {
-                var gs = Editor.tilesetData.grassSize;
-                var t = (tx % gs) + (ty % gs) * gs;
-                this.drawTile(tx,ty,Editor.tilesetData.grassPrefix+'_'+t);
-            }
-        }
-    }
-    // Layers
-    this.layers.forEach(function(layer){
-        layer.forEach(function(data){
-            var tile = data[2];
-            if(tile === undefined) return;
-            var x = this.x + parseInt(data[0]);
-            var y = this.y + parseInt(data[1]);
-            var name = Editor.shorthands[tile];
-            if(!(tile in Editor.shorthands)) return; // TODO: remove in editor
-            if(name && name.indexOf('water') != -1) name = Editor.tilesetData.waterPrefix+name;
-            this.drawTile(x, y, name);
-            //if(Engine) Engine.addCollision(x,y,tile); // TODO: add to Editor as well for visualisation
-        },this);
-    },this);
-    if(this.tiles.length > 700) console.warn(this.tiles.length);
-
-    if(DRAW_IMAGES) {
-        this.decor.forEach(function (data) {
-            var x = this.x + parseInt(data[0]);
-            var y = this.y + parseInt(data[1]);
-            this.drawImage(x, y, data[2]);
-        }, this);
-    }
-
-    this.displayed = true;
-};
-
-Chunk.prototype.has = function(x,y,v){
-    var cx = x - this.x;
-    var cy = y - this.y;
-    if(cy >= World.chunkHeight || cx >= World.chunkWidth || cx < 0 || cy < 0) return this.neighborHas(x,y,v);
-    return (this.ground.get(cx,cy) == v);
-};
-
-Chunk.prototype.hasWater = function(x,y){
-    return this.has(x,y,'w');
-};
-
-Chunk.prototype.drawTile = function(x,y,tile){
-    if(BLIT){
-        Editor.ground.create(x * World.tileWidth, y * World.tileHeight, tile);
-        return;
-    }
-    var sprite = Editor.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',tile);
-    // TODO: remove in game
-    if(Editor.collisions.get(x,y)){
-        sprite.hasCollision = true;
-        sprite.setTint(0xff0000);
-    }
-    sprite.setInteractive();
-    sprite.on('pointerover',function(){
-        var dbg = tile+' '+this.ground.get(x-this.x,y-this.y);
-        document.getElementById('debug').innerHTML = dbg;
-        document.getElementById('tx').innerHTML = x;
-        document.getElementById('ty').innerHTML = y;
-        document.getElementById('aoi').innerHTML = this.id;
-        sprite.setTint(0xaaaaaa);
-    }.bind(this));
-    sprite.on('pointerout',function(){
-        sprite.setTint(sprite.hasCollision ? 0xff0000 : 0xffffff);
-    });
-    sprite.on('pointerdown',function(){
-        Editor.centerCamera(x,y,this.id);
-    }.bind(this));
-    // -------------------
-    sprite.setDisplayOrigin(0,0);
-    sprite.tileID = tile;
-    this.tiles.push(sprite);
-};
-
-Chunk.prototype.getAtlasData = function(image,data){
-    return Editor.atlas[Editor.shorthands[image]][data];
-};
-
-Chunk.prototype.drawImage = function(x,y,image){
-    var img = Editor.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',Editor.shorthands[image]);
-    img.setDepth(y);
-    var anchor = this.getAtlasData(image,'anchor');
-    img.setOrigin(anchor.x,anchor.y);
-    this.images.push(img);
-};
-
-Chunk.prototype.erase = function(){
-    //TODO: destroy tiles and images
-};
 
 var VIEW_WIDTH = 30;
 var VIEW_HEIGHT = 20;

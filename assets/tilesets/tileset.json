@@ -1,5 +1,5 @@
 {
-  "data":{
+  "config":{
       "grassPrefix": "newgrass",
       "grassSize": 3,
       "waterPrefix": ""
@@ -51,7 +51,8 @@
       "frame": {"x":192,"y":96,"w":32,"h":32}
     },
     "water_top":{
-      "frame": {"x":192,"y":32,"w":32,"h":32}
+      "frame": {"x":192,"y":32,"w":32,"h":32},
+      "collides": true
     },
     "water_left":{
       "frame": {"x":160,"y":64,"w":32,"h":32}
@@ -72,26 +73,31 @@
       "frame": {"x":224,"y":96,"w":32,"h":32}
     },
     "water_corner_tl":{
-      "frame": {"x":288,"y":32,"w":32,"h":32}
-    },
-    "water_corner_bl":{
-      "frame": {"x":288,"y":64,"w":32,"h":32}
-    },
-    "water_corner_tr":{
-      "frame": {"x":320,"y":32,"w":32,"h":32}
-    },
-    "water_corner_br":{
-      "frame": {"x":320,"y":64,"w":32,"h":32}
-    },
-    "newwater":{
-      "frame": {"x":192,"y":192,"w":32,"h":32}
-    },
-    "newwater_bottom":{
-      "frame": {"x":192,"y":224,"w":32,"h":32},
+      "frame": {"x":288,"y":32,"w":32,"h":32},
       "collides": true
     },
+    "water_corner_bl":{
+      "frame": {"x":288,"y":64,"w":32,"h":32},
+      "collides": true
+    },
+    "water_corner_tr":{
+      "frame": {"x":320,"y":32,"w":32,"h":32},
+      "collides": true
+    },
+    "water_corner_br":{
+      "frame": {"x":320,"y":64,"w":32,"h":32},
+      "collides": true
+    },
+    "newwater":{
+      "frame": {"x":192,"y":192,"w":32,"h":32},
+      "collides": true
+    },
+    "newwater_bottom":{
+      "frame": {"x":192,"y":224,"w":32,"h":32}
+    },
     "newwater_top":{
-      "frame": {"x":192,"y":160,"w":32,"h":32}
+      "frame": {"x":192,"y":160,"w":32,"h":32},
+      "collides": true
     },
     "newwater_left":{
       "frame": {"x":160,"y":192,"w":32,"h":32}
@@ -112,36 +118,70 @@
       "frame": {"x":224,"y":224,"w":32,"h":32}
     },
     "newwater_corner_tl":{
-      "frame": {"x":288,"y":160,"w":32,"h":32}
+      "frame": {"x":288,"y":160,"w":32,"h":32},
+      "collides": true
     },
     "newwater_corner_bl":{
-      "frame": {"x":288,"y":192,"w":32,"h":32}
+      "frame": {"x":288,"y":192,"w":32,"h":32},
+      "collides": true
     },
     "newwater_corner_tr":{
-      "frame": {"x":320,"y":160,"w":32,"h":32}
+      "frame": {"x":320,"y":160,"w":32,"h":32},
+      "collides": true
     },
     "newwater_corner_br":{
-      "frame": {"x":320,"y":192,"w":32,"h":32}
+      "frame": {"x":320,"y":192,"w":32,"h":32},
+      "collides": true
     },
     "tree_1":{
       "frame": {"x":5,"y":298,"w":126,"h":150},
-      "anchor": {"x":0.21,"y":0.8}
+      "anchor": {"x":0.21,"y":0.8},
+      "collisions": [[0,0],[0,-1],[1,-1],[1,0]]
     },
     "tree_2":{
       "frame": {"x":132,"y":284,"w":128,"h":164},
-      "anchor": {"x":0.25,"y":0.8}
+      "anchor": {"x":0.25,"y":0.8},
+      "collisions": [[0,0],[0,-1],[1,-1],[1,0]]
     },
     "tree_3":{
       "frame": {"x":260,"y":279,"w":151,"h":169},
-      "anchor": {"x":0.18,"y":0.8}
+      "anchor": {"x":0.18,"y":0.8},
+      "collisions": [[0,0],[0,-1],[1,-1],[1,0]]
+    },
+    "tree_4":{
+      "frame": {"x":482,"y":4,"w":157,"h":164},
+      "anchor": {"x":0.18,"y":0.8},
+      "collisions": [[0,0],[0,-1],[1,-1],[1,0]]
     },
     "tree_dead":{
       "frame": {"x":378,"y":128,"w":134,"h":151},
-      "anchor": {"x":0.04,"y":0.8}
+      "anchor": {"x":0.04,"y":0.8},
+      "collisions": [[0,0],[0,-1],[1,-1],[1,0]]
     },
     "stump":{
       "frame": {"x":10,"y":449,"w":74,"h":63},
-      "anchor": {"x":0,"y":0.5}
+      "anchor": {"x":0,"y":0.5},
+      "collisions": [[0,0],[0,-1],[1,-1],[1,0]]
+    },
+    "bush_1":{
+      "frame": {"x":393,"y":6,"w":34,"h":36},
+      "anchor": {"x":0,"y":0},
+      "collisions": [[0,0]]
+    },
+    "bush_2":{
+      "frame": {"x":433,"y":10,"w":32,"h":32},
+      "anchor": {"x":0,"y":0},
+      "collisions": [[0,0]]
+    },
+    "bush_3":{
+      "frame": {"x":392,"y":53,"w":37,"h":40},
+      "anchor": {"x":0,"y":0},
+      "collisions": [[0,0]]
+    },
+    "bush_lit":{
+      "frame": {"x":433,"y":52,"w":37,"h":40},
+      "anchor": {"x":0,"y":0},
+      "collisions": [[0,0]]
     }
   },
   "shorthands" : {
@@ -161,6 +201,9 @@
     "t1":"tree_1",
     "t2":"tree_2",
     "t3":"tree_3",
-    "td":"tree_dead"
+    "t4":"tree_4",
+    "td":"tree_dead",
+    "b1":"bush_1",
+    "b2":"bush_2"
   }
 }

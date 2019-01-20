@@ -1,109 +1,118 @@
-var layerDepth = { // maps layer id to depth
-    0: 0, // ground
-    1: 1, // terrain
-    2: 2, // stuff
-    3: 5, // canopy
-    4: 6, // overlap
-    5: 7,
-    6: 8
-};
-
-function Chunk(mapData,id,z){
-    this.fromFile = (mapData !== null);
-    //console.log(mapData);
-    this.id = id;
-    this.z = z;
-    var origin = Utils.AOItoTile(this.id);
-    this.x = origin.x;
-    this.y = origin.y;
-    this.width = mapData.width || Engine.chunkWidth;
-    this.height = mapData.height || Engine.chunkHeight;
-    this.layers = [];
-    this.layerData = [];
-
-    for(var i = 0; i < mapData.layers.length; i++){
-        if(mapData.layers[i].type == 'objectgroup'){
-            mapData.layers[i].objects.forEach(function(o){
-                Engine.addResource(origin,o);
-            });
-            continue;
-        }
-        var data = this.fromFile ? mapData.layers[i].data : null ;
-        this.layers.push([]); // will contain the tile sprites
-        this.layerData.push(data); // contains the tiles ID
-    }
+function Chunk(data){
+    this.id = data.id;
+    this.x = parseInt(data.x);
+    this.y = parseInt(data.y);
+    this.defaultTile = data.default;
+    this.layers = data.layers;
+    this.decor = data.decor;
+    this.ground = new SpaceMap();
+    this.ground.fromList(this.layers[0],true); // true = compact list
+    this.tiles = [];
+    this.tilesMap = new SpaceMap();
+    this.images = [];
+    this.displayed = false;
+    this.draw();
 }
 
-Chunk.prototype.drawLayers = function(){
-    var grass = [258,259,274,275];
-    if(Engine.skipGrass) this.grass = Engine.scene.add.image(this.x*32,this.y*32,'grass'); // TODO: pool of grass
-    for(var l = 0; l < this.layers.length; l++) {
-        var layer = this.layers[l];
-        var data = this.layerData[l];
-        for (var i = 0; i < data.length; i++) {
-            var tile = data[i];
-            if (tile == 0 || tile == null) continue;
-            var coord = Utils.lineToGrid(i,this.width);
-            if(tile >= 322 && tile <= 357){
-                tile = 241+17+(coord.x%2)+(coord.y%2)*16;
+Chunk.prototype.draw = function(){
+    // Ground
+    for(var x_ = 0; x_ < World.chunkWidth; x_++){
+        for(var y_ = 0; y_ < World.chunkHeight; y_++) {
+            var tx = this.x + x_;
+            var ty = this.y + y_;
+            if(this.hasWater(tx,ty)) continue;
+            if(this.defaultTile == 'grass') {
+                var gs = tilesetData.config.grassSize;
+                var t = (tx % gs) + (ty % gs) * gs;
+                this.drawTile(tx,ty,tilesetData.config.grassPrefix+'_'+t);
             }
-            var x = this.x + coord.x;
-            var y = this.y + coord.y;
-            var sprite = this.drawTile(x,y,tile,l);
-            layer.push(sprite);
-            Engine.addCollision(x,y,tile);
         }
     }
+    // Layers
+    this.layers.forEach(function(layer){
+        layer.forEach(function(data){
+            var tile = data[2];
+            if(tile === undefined) return;
+            var x = this.x + parseInt(data[0]);
+            var y = this.y + parseInt(data[1]);
+            var name = tilesetData.shorthands[tile];
+            if(!(tile in tilesetData.shorthands)) return;
+            if(name && name.indexOf('water') != -1) name = tilesetData.config.waterPrefix+name;
+            this.drawTile(x, y, name);
+        },this);
+    },this);
+    if(this.tiles.length > 700) console.warn(this.tiles.length); // TODO: remove eventually
+
+    // Decor
+    this.decor.forEach(function (data) {
+        var x = this.x + parseInt(data[0]);
+        var y = this.y + parseInt(data[1]);
+        this.drawImage(x, y, data[2]);
+    }, this);
+
+    this.displayed = true;
 };
 
-Chunk.prototype.removeLayers = function(){
-    for(var l = 0; l < this.layers.length; l++) {
-        var layer = this.layers[l];
-        for(var i = 0; i < layer.length; i++){
-            layer[i].destroy();
-        }
-    }
-    if(Engine.skipGrass) this.grass.destroy();
+Chunk.prototype.has = function(x,y,v){
+    var cx = x - this.x;
+    var cy = y - this.y;
+    return (this.ground.get(cx,cy) == v);
 };
 
-Chunk.prototype.addTile = function(x,y,tile,layer){
-    if(this.fromFile) return; // original chunks cannot be tampered with
-    this.children[layer].data.add(x,y,tile);
+Chunk.prototype.hasWater = function(x,y){
+    return this.has(x,y,'w');
 };
 
-Chunk.prototype.orderTiles = function(){
-    for(var l = 0; l < this.children.length; l++) {
-        this.children[l].children.sort(function(a,b){
-            return a.tileID < b.tileID;
-        });
-    }
+Chunk.prototype.drawTile = function(x,y,tile){
+    /*if(BLIT){ // TODO: remove?
+        Editor.ground.create(x * World.tileWidth, y * World.tileHeight, tile);
+        return;
+    }*/
+    var sprite = Engine.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',tile);
+    sprite.setDisplayOrigin(0,0);
+    sprite.tileID = tile;
+    this.tiles.push(sprite);
+    this.postDrawTile(x,y,tile,sprite);
 };
 
-Chunk.prototype.drawTile = function(x,y,tile,layer){
-    if(x < 0 || y < 0) return;
-    if(!tile) return;
-    var tilesetID = Engine.getTilesetFromTile(tile);
-    var tileset = Engine.tilesets[tilesetID];
-    if(tileset === undefined) console.log('wrong',tile,tilesetID,x,y);
-    tile -= tileset.firstgid;
-    var sprite;
-
-    if(Engine.useBlitters) {
-        var blitter;
-        if (tilesetID == 1) blitter = Engine.blitters[0];
-        if (tilesetID == 2 && layer == 1) blitter = Engine.blitters[1];
-        if (tilesetID == 2 && layer > 1) blitter = Engine.blitters[2];
-        sprite = blitter.create(x * Engine.tileWidth, y * Engine.tileHeight, tile);
+Chunk.prototype.getAtlasData = function(image,data,longname){
+    if(longname){
+        return tilesetData.atlas[image][data];
     }else {
-        sprite = Engine.scene.add.image(x*Engine.tileWidth,y*Engine.tileHeight,tileset.name,tile);
-        sprite.setDisplayOrigin(0,0);
-        sprite.tileID = tile;
-        //sprite.depth = layerDepth[layer];
-        if(layer >= 3){
-            sprite.setDepth(2+(y+layer)/1000);
-        }else{
-            sprite.setDepth(layerDepth[layer]);
-        }
+        if (!(image in tilesetData.shorthands)) return false;
+        return tilesetData.atlas[tilesetData.shorthands[image]][data];
     }
-    return sprite;
 };
+
+Chunk.prototype.drawImage = function(x,y,image){
+    var img = Engine.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',tilesetData.shorthands[image]);
+    var offset = this.getAtlasData(image,'depthOffset') || 0;
+    img.setDepth(y+offset);
+    //console.log(y,this.getAtlasData(image,'depthOffset'),img.depth);
+    var anchor = this.getAtlasData(image,'anchor');
+    img.setOrigin(anchor.x,anchor.y);
+    var collisions = this.getAtlasData(image,'collisions');
+    if(collisions) {
+        collisions.forEach(function(coll){
+            this.addCollision(x+coll[0],y+coll[1]);
+        },this);
+    }
+    this.images.push(img);
+    this.postDrawImage(x,y,image,img);
+};
+
+Chunk.prototype.addCollision = function(cx,cy){
+    Engine.collisions.add(cx, cy, 1);
+};
+
+Chunk.prototype.erase = function(){
+    this.tiles.forEach(function(tile){
+        tile.destroy();
+    });
+    this.images.forEach(function(image){
+        image.destroy();
+    });
+};
+
+Chunk.prototype.postDrawTile = function(){}; // Used in editor
+Chunk.prototype.postDrawImage = function(){};

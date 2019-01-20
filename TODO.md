@@ -1,3 +1,11 @@
+On deploy:
+- Test a fight
+- Test picking up objects
+- Test selling and buying in a store
+- Test equiping object
+=> Automate these eventually
+
+
 Admin
 Analytics
 Cleaning
@@ -34,15 +42,13 @@ Misc:
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
 
-Move away from tiles:
+World building: move away from tiles:
 [x] Zoom
-[ ] Panning
+[x] Panning
 [x] 96x96 grass chunks, loaded positionnally
 [x] Tiles only for other terrain elements (water, dirt, ...)
-[ ] Everything on top are single-image objects (possibly rendered in multiple parts with different depths)
-(What about objects spanning more than 2 AOIs?)
+[x] Everything on top are single-image objects (possibly rendered in multiple parts with different depths)
 [x] Test trees overlaps
-[ ] Visualize collisions
 [x] Sparse format, declarative (grass, water, ...)
 [x] Specific tiles (e.g. water joints) computed positionnally
 [x] Default filler tile for empty ones, on layer 0
@@ -51,13 +57,20 @@ Move away from tiles:
 [ ] Inexistant chunks filled by water
 [ ] Add decor elements via editor
 [ ] Store and edit game data (resources, spawn zones, civs logic...)
+[x] Visualize collisions
 [x] Collisions listed from tileset
 [x] Collisions digest for server, displayed in editor
-[ ] Collisions fetched from tileset for client, no digest 
+[x] Collisions fetched from tileset for client, no digest 
 [ ] Built-in exploration, to test collisions and depths
 [ ] Re-enable blitters, at least for ground and water?
 [ ] Remove legacy tiles after a while (from png and json) + old tileset files
 
+
+Crafting:
+Requirements:
+- Display recipes + ingredients (after selection?)
+- Display self inventory?
+- Display bld inventory
 
 
 ##Tutorial:##
@@ -155,11 +168,11 @@ Secure
 
 Analytics:
 ---------
-- Pretty print events in admin: new buildings, menu opens?, fights, item uses
-- Button to flush events
+- Pretty print events in admin: new buildings, returning players,  menu opens?, fights, item uses
 - Session duration stats
 - Bundle events from one player into sessions
 - Log session-wide stats: how many players visit a building during session, do this, do that...
+- Button to flush events
 - Push desktop notifications for player connects
 - Look for nice statistical library
 - Log drains and faucets
@@ -478,7 +491,7 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-- Tool to automate db interactions when deploying (flushing sth, ...)
+- Tool to automate db interactions when deploying (SYNC, flushing sth, ...)
 - Tool to gather, uglify and compress all relevant source files 
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?
@@ -552,15 +565,7 @@ Testing:
 World building:
 --------------
 1/ World creation:
-Multilayer image:
-- One layer for coastlines; trace SVG path, modify manually and then recompute and export path as blueprint
-+ fill nodes
-- One layer for forests, based on color detection; consider saving trees in separate data structure (and displaying them as single images like buildings)
-Creation:
-- One script reads blueprints, create chunks with coastlines, fill water
-- (If tiled-trees: one script to apply them)
-NB: trees as images opens the way for ecology dynamics: trees disppearing with time, timber supply
-diminishing, ...
+- Add missing lakes 
 
 2/ Cartography
 - Has to come from actual in-game world
@@ -576,7 +581,6 @@ diminishing, ...
 -> Manage trees?
 -> Integrate with admin to display and modify settlement data (+ events etc.) 
 
-4/Chunk editor: used Tiled in world mode
 5/Building editor (visually define shape, collisons, etc.)
 --
 Custom chunk/world editor:

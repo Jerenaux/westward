@@ -10,8 +10,9 @@ var mongoose = require('mongoose');
 
 var eventSchema = new mongoose.Schema({
     pid: {type: Number, min: 0},
+    pname: String,
     time: { type: Date, default: Date.now },
-    action: {type: String}
+    action: {type: String} // Also used in admin
 });
 var Event = mongoose.model('Event', eventSchema);
 
@@ -45,11 +46,22 @@ var BuildingEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var NewBuildingEvent = Event.discriminator(
+    'NewBuildingEvent',
+    new mongoose.Schema({
+        building: Number,
+        x: Number,
+        y: Number
+    }),
+    {discriminatorKey: 'kind'}
+);
+
 
 var ConnectEvent = Event.discriminator(
     'ConnectEvent',
     new mongoose.Schema({
-        stl: Number
+        stl: Number,
+        name: String
     }),
     {discriminatorKey: 'kind'}
 );
@@ -72,6 +84,7 @@ Prism.logEvent = function(player,action,data){
     data = data || {};
     data.action = action;
     data.pid = (player ? player.id : null);
+    data.pname = (player ? player.name : null);
 
     var map = {
         'building': BuildingEvent,
@@ -79,6 +92,7 @@ Prism.logEvent = function(player,action,data){
         'connect': ConnectEvent,
         'disconnect': DisconnectEvent,
         'explore': ExploreEvent,
+        'newbuilding': NewBuildingEvent,
         'sell': TradeEvent,
         'server-start': ServerStartEvent
     };
