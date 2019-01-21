@@ -176,7 +176,7 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.clientParameters = config.get('client');
 
     GameServer.collisions = new SpaceMap();
-    GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()));
+    GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()),true); // true = compact
     GameServer.pathFinder = new Pathfinder(GameServer.collisions,GameServer.PFParameters.maxPathLength);
 
     GameServer.positions = new SpaceMapList(); // positions occupied by moving entities and buildings

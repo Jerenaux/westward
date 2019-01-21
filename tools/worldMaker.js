@@ -178,7 +178,6 @@ function pixelToTile(px,imgw,imgh){
 
 function createForests(greenpixels,imgw,imgh){
     console.log('Creating forests ...');
-    console.log(isBusy({x:141,y:32}));
     var xRandRange = 7;
     var yRandRange = 7;
     var nbtrees = 0;
@@ -433,6 +432,7 @@ function fill(fillNode,stop){ // fills the world with water, but stops at coastl
         if(isBusy(node)) continue;
         // put a tile at location
         addTile(node,'w');
+        collisions.add(node.x,node.y,1);
         //lake.add(node.x,node.y);
         // expand
         for(var i = 0; i < contour.length; i++){
@@ -556,7 +556,7 @@ function writeMasterFile(){
 
 function writeCollisions(){
     // Write master file
-    var colls = trees.toList().concat(collisions.toList());
+    var colls = trees.toList().concat(collisions.toList(true));
     fs.writeFile(path.join(outdir,'collisions.json'),JSON.stringify(colls),function(err){
         if(err) throw err;
         console.log('Collisions written');
