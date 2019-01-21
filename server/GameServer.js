@@ -302,7 +302,6 @@ GameServer.addItem = function(x,y,type){
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
-    GameServer.addAnimal(517,653,0);
 };
 
 GameServer.setUpdateLoops = function(){
@@ -457,7 +456,7 @@ GameServer.loadPlayer = function(socket,id){
             if (err) return console.warn(err);
             if(!doc) {
                 console.log('ERROR : no matching document');
-                GameServer.addNewPlayer(socket, {});
+                //GameServer.addNewPlayer(socket, {});
                 return;
             }
             var player = new Player();

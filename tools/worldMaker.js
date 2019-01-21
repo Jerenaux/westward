@@ -157,9 +157,11 @@ function collectPixels(image){
         }
     });
 
-    createLakes(whitepixels,image.bitmap.width,image.bitmap.height);
+    //createLakes(whitepixels,image.bitmap.width,image.bitmap.height);
     drawShore();
-    createForests(greenpixels,image.bitmap.width,image.bitmap.height);
+    //createForests(greenpixels,image.bitmap.width,image.bitmap.height);
+    addDecor({x:21,y:16},'b3');
+    addDecor({x:24,y:13}, 't2');
 
     for(var id in chunks){
         chunks[id].write(outdir);

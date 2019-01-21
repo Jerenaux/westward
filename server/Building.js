@@ -25,8 +25,8 @@ function Building(data){
         this.id = ++GameServer.lastBuildingID;
     }
 
-    this.x = data.x;
-    this.y = data.y;
+    this.x = Utils.clamp(data.x,0,World.worldWidth-1);
+    this.y = Utils.clamp(data.y,0,World.worldHeight-1);
 
     this.type = data.type;
     var buildingData = GameServer.buildingsData[this.type];

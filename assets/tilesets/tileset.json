@@ -176,9 +176,10 @@
     "bush_3":{
       "frame": {"x":392,"y":53,"w":37,"h":40},
       "anchor": {"x":0,"y":0},
-      "collisions": [[0,0]]
+      "collisions": [[0,0]],
+      "hover": "bush3_lit"
     },
-    "bush_lit":{
+    "bush3_lit":{
       "frame": {"x":433,"y":52,"w":37,"h":40},
       "anchor": {"x":0,"y":0},
       "collisions": [[0,0]]
@@ -204,6 +205,7 @@
     "t4":"tree_4",
     "td":"tree_dead",
     "b1":"bush_1",
-    "b2":"bush_2"
+    "b2":"bush_2",
+    "b3":"bush_3"
   }
 }

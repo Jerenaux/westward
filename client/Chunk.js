@@ -119,4 +119,16 @@ Chunk.prototype.erase = function(){
 };
 
 Chunk.prototype.postDrawTile = function(){}; // Used in editor
-Chunk.prototype.postDrawImage = function(){};
+Chunk.prototype.postDrawImage = function(x,y,image,sprite){
+    var hover = this.getAtlasData(image,'hover');
+    if(!hover) return;
+    sprite.setInteractive();
+    sprite.on('pointerover',function(){
+        console.log(sprite.frame);
+        sprite.formerFrame = sprite.frame.name;
+        sprite.setFrame(hover);
+    });
+    sprite.on('pointerout',function(){
+        sprite.setFrame(sprite.formerFrame);
+    });
+};

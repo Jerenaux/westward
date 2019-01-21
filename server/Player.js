@@ -607,8 +607,8 @@ Player.prototype.getDataFromDb = function(data){
     // eg. inBuilding (how to retrieve proper building if server went down since), commitment...
     this.id = data.id;
     this.name = data.name;
-    this.x = data.x;
-    this.y = data.y;
+    this.x = Utils.clamp(data.x,0,World.worldWidth-1);
+    this.y = Utils.clamp(data.y,0,World.worldHeight-1);
     this.civiclvl = data.civiclvl;
     this.civicxp = data.civicxp;
     this.classxp = data.classxp;
