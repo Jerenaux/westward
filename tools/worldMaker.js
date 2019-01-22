@@ -487,7 +487,7 @@ function drawShore(){
             var nbrh = getNeighborhood(x,y);
             tile = patterns[nbrh.join('')];
             if(tile === undefined) {
-                //console.log(x,y,nbrh.join(''));
+                console.log(x,y,nbrh.join(''));
                 undef++;
             }
 
