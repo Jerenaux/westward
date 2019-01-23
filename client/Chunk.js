@@ -127,8 +127,12 @@ Chunk.prototype.postDrawImage = function(x,y,image,sprite){
         console.log(sprite.frame);
         sprite.formerFrame = sprite.frame.name;
         sprite.setFrame(hover);
+        Engine.hideMarker();
+        UI.setCursor('item'); // TODO: use UI.manageCursor() instead?
     });
     sprite.on('pointerout',function(){
         sprite.setFrame(sprite.formerFrame);
+        Engine.showMarker();
+        UI.setCursor();
     });
 };
