@@ -5,47 +5,72 @@
 var fs = require('fs');
 var path = require('path');
 var Jimp = require("jimp");
+var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 
-function px(x,y){
+
+function Px(x,y){
     this.x = x;
     this.y = y;
+}
+
+Px.prototype.getNext = function(image){
+    for(var i = 0; i < contour.length; i++){
+        var c = {x:contour[0],y:contour[1]};
+        var x = this.x + c.x;
+        var y = this.y + c.y;
+        if(x < 0 || y < 0 || x >= image.bitmap.width || y >= image.bitmap.height) continue;
+        if(isBlack(image,x,y) && hasWhiteNb(image,x,y) && !isExplored(x,y)) return Px(x,y);
+    }
+    return null;
+}
+
+var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
+var explored = new SpaceMap();
+
+function isBlack(image,x,y){
+    return (image.getPixelColor(x, y) == 0xffffff);
+}
+
+function isExplored(x,y){
+    return explored.has(x,y);
+}
+
+function hasWhiteNb(image,x,y){
+    for(var i = 0; i < contour.length; i++){
+        var c = {x:contour[0],y:contour[1]};
+        if(image.getPixelColor(x+c.x, y+c.y) == 0x000000) return true;
+    }
+    return false;
 }
 
 Jimp.read(path.join(__dirname,'test.png'), function (err, image) {
     if (err) throw err;
 
-    // Find starting point: has to be adjacent to a white pixel
+    // Find starting points
     var node;
     for(var x = 0; x < image.bitmap.width; x++){
         for(var y = 0; y < image.bitmap.height; y++){
-            if(image.getPixelColor(x, y) == 0xffffff) start = px(x,y);
+            if(isBlack(image,x,y) && hasWhiteNb(image,x,y) && !isExplored(x,y)) followUp(image,x,y);
         }
     }
+});
 
+function followUp(image,x,y){
     // Travel along neighbors until meeting start node or image boundaries
-    var queue = [];
-    queue.push(fillNode);
+
     var counter = 0;
-    var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
+    var start = Px(x,y);
+    var node = Px(x,y);
+    var path = [node];
     while(true){
-        var node = queue.shift();
-        if(isBusy(node)) continue;
-        // put a tile at location
-        addTile(node,'w');
-        collisions.add(node.x,node.y,1);
-        //lake.add(node.x,node.y);
-        // expand
-        for(var i = 0; i < contour.length; i++){
-            var candidate = {
-                x: node.x + contour[i][0],
-                y: node.y + contour[i][1]
-            };
-            if(!isInWorldBounds(candidate.x,candidate.y)) continue;
-            //if(lake.has(candidate.x,candidate.y)) continue;
-            if(!isBusy(candidate)) queue.push(candidate);
+        node = node.getNext();
+        if(node){
+            path.push(node);
+        }else{
+            return path;
         }
 
         counter++;
         if(counter >=  image.bitmap.width*image.bitmap.height) break;
     }
-});
+}
