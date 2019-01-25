@@ -38,6 +38,7 @@ function isExplored(x,y){
 function hasWhiteNb(image,x,y){
     for(var i = 0; i < contour.length; i++){
         var c = {x:contour[i][0],y:contour[i][1]};
+        // console.log(x+c.x,y+c.y,image.getPixelColor(x+c.x, y+c.y));
         if(image.getPixelColor(x+c.x, y+c.y) == 4294967295) return true;
     }
     return false;
@@ -45,13 +46,15 @@ function hasWhiteNb(image,x,y){
 
 Jimp.read(path.join(__dirname,'test.png'), function (err, image) {
     if (err) throw err;
-    console.log(hasWhiteNb(image,83,41));
-    return;
     // Find starting points
     var node;
     for(var x = 0; x < image.bitmap.width; x++){
         for(var y = 0; y < image.bitmap.height; y++){
-            if(isBlack(image,x,y) && hasWhiteNb(image,x,y) && !isExplored(x,y)) followUp(image,x,y);
+            if(isBlack(image,x,y) && hasWhiteNb(image,x,y) && !isExplored(x,y)){
+                var path = followUp(image,x,y);
+                console.log(path);
+                // return;
+            }
         }
     }
     console.log('Done.');
@@ -59,14 +62,16 @@ Jimp.read(path.join(__dirname,'test.png'), function (err, image) {
 
 function followUp(image,x,y){
     // Travel along neighbors until meeting start node or image boundaries
-    console.log('starting at',x,y);
+    // console.log('starting at',x,y);
     var counter = 0;
-    var start = new Px(x,y);
+    explored.add(x,y);
     var node = new Px(x,y);
     var path = [node];
     while(true){
         node = node.getNext(image);
-        if(node && node.x != start.x && node.y != start.y){
+        // console.log(node)
+        if(node){  
+            explored.add(node.x,node.y);
             path.push(node);
         }else{
             return path;
@@ -75,5 +80,16 @@ function followUp(image,x,y){
         counter++;
         if(counter >=  image.bitmap.width*image.bitmap.height) break;
     }
-    console.log(path);
+}
+
+function extractLines(path){
+    var lines = [];
+    var corner = path[0];
+    var bearing = {x:0,y:0}
+    for(var i = 1; i < path.length-1; i++){
+        var a = path[i-1];
+        var b = path[i]
+        var c = path[i+1];
+        var dir = {x:b.x-a.x,y:b.y-a.y};
+    }
 }
