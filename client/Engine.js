@@ -3,8 +3,6 @@
  */
 var Engine = {
     // TODO: Move to conf?
-    baseViewWidth: 32,
-    baseViewHeight: 18,
     tileWidth: 32,
     tileHeight: 32,
 
@@ -23,16 +21,14 @@ var Engine = {
     tooltipTextDepth: 18,
 
     // TODO: Move to conf
-    craftInvSize: 5, // max number of ingredients for crafting
     maxPathLength: 36,
 
     debugMarker: true,
     debugCollisions: false,
     dummyUI: false,
-    skipGrass: false,
 
     key: 'game', // key of the scene, for Phaser
-    plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager','LightsPlugin'],
+    plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager'], // 'LightsPlugin'
     playerIsInitialized: false
 };
 
