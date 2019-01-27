@@ -31,6 +31,10 @@ Px.prototype.getNext = function(image){
     return null;
 };
 
+Px.prototype.toList = function(){
+    return [this.x,this.y];
+};
+
 var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
 var explored = new SpaceMap();
 
@@ -56,25 +60,33 @@ function hasWhiteNb(image,x,y,min){
     return false;
 }
 
-// var navgrid = new SpaceMap();
-Jimp.read(path.join(__dirname,'test.png'), function (err, image) {
-    if (err) throw err;
-    // Find starting points
-    // World.worldWidth = image.bitmap.width;
-    // World.worldHeight = image.bitmap.height;
-    var node;
-    for(var x = 0; x < image.bitmap.width; x++){
-        for(var y = 0; y < image.bitmap.height; y++){
-            if(isBlack(image,x,y) && hasWhiteNb(image,x,y) && !isExplored(x,y)){
-                var path = followUp(image,x,y);
-                // console.log(path);
-                if(path && path.length > 2) extractLines(path);
-                // return;
+function readImage(blueprint){
+    return new Promise(function(resolve,reject){
+        console.log('Reading',blueprint);
+        Jimp.read(path.join(__dirname,'blueprints',blueprint), function (err, image) {
+            if (err) reject(err);
+            resolve(image);
+        });
+    });
+}
+
+function getContours(image) {
+    var lines = [];
+    for (var x = 0; x < image.bitmap.width; x++) {
+        for (var y = 0; y < image.bitmap.height; y++) {
+            if (isBlack(image, x, y) && hasWhiteNb(image, x, y) && !isExplored(x, y)) {
+                var path = followUp(image, x, y);
+                if (path && path.length > 2) {
+                    var l = extractLines(path);
+                    console.log(l);
+                    lines.push(l);
+                }
             }
-            // if(isBlack(image,x,y) && hasWhiteNb(image,x,y)) navgrid.add(x,y);
         }
     }
-});
+    console.log('!',lines);
+    return lines;
+}
 
 
 // function explore(){
@@ -112,12 +124,12 @@ function addLine(c,p,lines){
     // if(q.x > c.x) q.x++;
     // if(q.y > c.y) q.y++;
     // lines.push([c,q]);
-    lines.push(q);
+    lines.push(q.toList());
 }
 
 function extractLines(path){
     var c = path[0];
-    var lines = [c];
+    var lines = [c.toList()];
     var bearing = undefined;
     for(var i = 0; i < path.length; i++){
         var p = path[i];
@@ -133,5 +145,12 @@ function extractLines(path){
         }
     }
     addLine(c,path[path.length-1],lines);
-    console.log(lines);
+    // console.log(lines);
+    return lines;
 }
+
+readImage('test.png').then(getContours);
+
+module.exports.getContours = getContours;
+module.exports.readImage = readImage;
+
