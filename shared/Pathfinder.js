@@ -11,9 +11,10 @@ if(onServer){
 function Pathfinder(navGrid,maxLength,allowDiagonal,cutCorners,reverseWalkable){
     this.grid = navGrid;
     this.maxLength = maxLength || 50;
+    if(maxLength == -1) this.maxLength = 999999;
     this.allowDiagonal = allowDiagonal || false;
     this.cutCorners = cutCorners || false;
-    this.reverseWalkable = reverseWalkable || false;
+    this.reverseWalkable = reverseWalkable || false; // 1's in navgrid are walable
 }
 
 Pathfinder.prototype.setCallbacks = function(openCb, closeCb, backtrackCb){
@@ -46,6 +47,8 @@ Pathfinder.prototype.findPath = function(from,to,seek){
         //log('log1','Considering '+minFNode.toString(),true);
         if(minFNode.equals(end)) return this.backtrack(minFNode);
 
+        // Seeking behavior: return the best path towards target even if too short
+        // Non-seeking: if not path found within length, give up
         if(minFNode.g > this.maxLength){
             if(seek) return this.backtrack(minFNode);
             break;

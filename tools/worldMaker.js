@@ -12,7 +12,7 @@ var rwc = require('random-weighted-choice');
 var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
-var Geometry = require('../studio/Geometry.js').Geometry;
+var Geometry = require('./Geometry.js').Geometry;
 
 var counter = 0;
 var total = 0;
