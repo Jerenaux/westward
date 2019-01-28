@@ -60,17 +60,23 @@ function hasWhiteNb(image,x,y,min){
     return false;
 }
 
-function readImage(blueprint){
-    return new Promise(function(resolve,reject){
-        console.log('Reading',blueprint);
-        Jimp.read(path.join(__dirname,'blueprints',blueprint), function (err, image) {
-            if (err) reject(err);
-            resolve(image);
-        });
+function readImage(blueprint,cb){
+    // return new Promise(function(resolve,reject){
+    //     console.log('Reading',blueprint);
+    //     Jimp.read(path.join(__dirname,'blueprints',blueprint), function (err, image) {
+    //         if (err) reject(err);
+    //         resolve(image);
+    //     });
+    // });
+    Jimp.read(path.join(__dirname,'blueprints',blueprint), function (err, image) {
+        if (err) throw err;
+        cb(image);
     });
 }
 
 function getContours(image) {
+    console.log('Getting contour ...');
+    // console.trace();
     var lines = [];
     for (var x = 0; x < image.bitmap.width; x++) {
         for (var y = 0; y < image.bitmap.height; y++) {
@@ -78,13 +84,11 @@ function getContours(image) {
                 var path = followUp(image, x, y);
                 if (path && path.length > 2) {
                     var l = extractLines(path);
-                    console.log(l);
                     lines.push(l);
                 }
             }
         }
     }
-    console.log('!',lines);
     return lines;
 }
 
@@ -149,7 +153,7 @@ function extractLines(path){
     return lines;
 }
 
-readImage('test.png').then(getContours);
+// readImage('test.png').then(getContours);
 
 module.exports.getContours = getContours;
 module.exports.readImage = readImage;

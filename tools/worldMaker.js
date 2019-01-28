@@ -18,14 +18,6 @@ var autopath = require('./autopath');
 var counter = 0;
 var total = 0;
 
-/*
-* README: //TODO: update
-* - Shores are first populated with 'c' tiles based on blueprint (applyBlueprint)
-* - Then the seas are filled, using 'c' tiles as stop tiles (fill)
-* - Then the shores are actually drawn, replacing 'c' based on neighbors (drawShore)
-* - Then forests are added
-* */
-
 function Chunk(id){
     this.id = id;
     var origin = Utils.AOItoTile(this.id);
@@ -131,20 +123,39 @@ WorldMaker.prototype.run = function(){
     }
     console.log(total+' chunks created ('+this.nbHoriz+' x '+this.nbVert+')');
 
-    autopath.readImage(this.blueprint).then(this.create.bind(this),this.handleError);
+    /*
+    * README: //TODO: update
+    * - Shores are first populated with 'c' tiles based on blueprint (applyBlueprint)
+    * - Then the seas are filled, using 'c' tiles as stop tiles (fill)
+    * - Then the shores are actually drawn, replacing 'c' based on neighbors (drawShore)
+    * - Then forests are added
+    * */
+    /*this.steps = {
+        'shape_world': this.shapeWorld, // Puts 'c' tiles on contours
+    }
+    this.stepsNames = this.steps.keys();
+    this.step = -1;*/
+
+    autopath.readImage(this.blueprint,this.storeImage.bind(this));
 };
 
-WorldMaker.prototype.handleError = function(err){throw err;};
+/*WorldMaker.prototype.proceed = function(){
+    if(++this.step >= this.stepsNames.length) return;
+    this.stepsNames
+};*/
 
-WorldMaker.prototype.create = function(image){
-    var contours = autopath.getContours(image);
-    console.log('#',contours);
+Worker.prototype.storeImage = function(image){
+    this.image = image;
+    this.create();
+}
+
+WorldMaker.prototype.create = function(){
+    var contours = autopath.getContours(this.image);
     this.shapeWorld(contours);
     // this.collectPixels(image);
 };
 
 WorldMaker.prototype.shapeWorld = function(contours){
-    console.log(contours);
     for(var i = 0; i < contours.length; i++) {
         var lines = contours[i];
         var nbPts = lines.length;
@@ -164,6 +175,7 @@ WorldMaker.prototype.shapeWorld = function(contours){
         tiles = Geometry.backwardSmoothPass(tiles);
         if(tiles.length > 1) this.addCoastTiles(tiles);
     }
+    this.collectPixels();
 };
 
 function isBusy(node){
@@ -194,7 +206,7 @@ WorldMaker.prototype.addDecor = function(tile,decor){
 WorldMaker.prototype.addTile = function(tile,value){
     var id = Utils.tileToAOI(tile);
     if(!(id in this.chunks)) return;
-    var chunk = chunks[id];
+    var chunk = this.chunks[id];
     chunk.add(tile.x-chunk.x,tile.y-chunk.y,value);
 };
 
@@ -208,28 +220,25 @@ WorldMaker.prototype.getTile = function(x,y){
 WorldMaker.prototype.addCoastTiles = function(tiles){
     var coast = [];
     tiles.forEach(function(t) {
-        //if(t.x == 0 || t.y == 0) return;
         if(!isInWorldBounds(t.x,t.y)) return;
         this.addTile(t,'c');
-        //console.log('adding shore at',t);
         coast.push(t);
-    });
+    },this);
     this.coasts.push(coast);
 };
 
-function collectPixels(image){
+WorldMaker.prototype.collectPixels = function(){
     var greenpixels = [];
     var whitepixels = [];
-    console.log(image);
-    image.scan(0, 0, image.bitmap.width, image.bitmap.height, function (x, y, idx) {
+    this.image.scan(0, 0, this.image.bitmap.width, this.image.bitmap.height, function (x, y, idx) {
         //if(done) return;
         // x, y is the position of this pixel on the image
         // idx is the position start position of this rgba tuple in the bitmap Buffer
         // this is the image
 
-        var red = this.bitmap.data[idx + 0];
-        var green = this.bitmap.data[idx + 1];
-        var blue = this.bitmap.data[idx + 2];
+        var red = this.image.bitmap.data[idx + 0];
+        var green = this.image.bitmap.data[idx + 1];
+        var blue = this.image.bitmap.data[idx + 2];
 
         if(red == 203 && green == 230 && blue == 163) greenpixels.push({x: x, y: y});
         if(red == 255 && green == 255 && blue == 255) whitepixels.push({x: x, y: y});
@@ -237,8 +246,8 @@ function collectPixels(image){
         // Keep track of pixels that have also been mapped to land
         // Due to space distortion, multiple pixels, black and white, can be mapped to the same tile!
         if(red == 0 && green == 0 && blue == 0){
-            var g = pixelToTile({x: x, y: y},image.bitmap.width,image.bitmap.height);
-            land.add(g.x,g.y,1);
+            var g = pixelToTile({x: x, y: y},this.image.bitmap.width,this.image.bitmap.height);
+            this.land.add(g.x,g.y,1);
         }
     });
 
