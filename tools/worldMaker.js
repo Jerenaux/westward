@@ -144,7 +144,7 @@ WorldMaker.prototype.run = function(){
     this.stepsNames
 };*/
 
-Worker.prototype.storeImage = function(image){
+WorldMaker.prototype.storeImage = function(image){
     this.image = image;
     this.create();
 }
@@ -152,7 +152,17 @@ Worker.prototype.storeImage = function(image){
 WorldMaker.prototype.create = function(){
     var contours = autopath.getContours(this.image);
     this.shapeWorld(contours);
-    // this.collectPixels(image);
+    this.collectPixels();
+    this.createLakes();
+    // this.drawShore();
+    // this.createForests();
+
+    // for(var id in this.chunks){
+    //     this.chunks[id].write(outdir);
+    // }
+
+    // this.writeMasterFile();
+    // this.writeCollisions();
 };
 
 WorldMaker.prototype.shapeWorld = function(contours){
@@ -175,7 +185,6 @@ WorldMaker.prototype.shapeWorld = function(contours){
         tiles = Geometry.backwardSmoothPass(tiles);
         if(tiles.length > 1) this.addCoastTiles(tiles);
     }
-    this.collectPixels();
 };
 
 function isBusy(node){
@@ -228,47 +237,37 @@ WorldMaker.prototype.addCoastTiles = function(tiles){
 };
 
 WorldMaker.prototype.collectPixels = function(){
-    var greenpixels = [];
-    var whitepixels = [];
+    this.greenpixels = [];
+    this.whitepixels = [];
+    var wm = this;
     this.image.scan(0, 0, this.image.bitmap.width, this.image.bitmap.height, function (x, y, idx) {
         //if(done) return;
         // x, y is the position of this pixel on the image
         // idx is the position start position of this rgba tuple in the bitmap Buffer
         // this is the image
 
-        var red = this.image.bitmap.data[idx + 0];
-        var green = this.image.bitmap.data[idx + 1];
-        var blue = this.image.bitmap.data[idx + 2];
+        var red = this.bitmap.data[idx + 0];
+        var green = this.bitmap.data[idx + 1];
+        var blue = this.bitmap.data[idx + 2];
 
-        if(red == 203 && green == 230 && blue == 163) greenpixels.push({x: x, y: y});
-        if(red == 255 && green == 255 && blue == 255) whitepixels.push({x: x, y: y});
+        if(red == 203 && green == 230 && blue == 163) this.greenpixels.push({x: x, y: y});
+        if(red == 255 && green == 255 && blue == 255) this.whitepixels.push({x: x, y: y});
 
         // Keep track of pixels that have also been mapped to land
         // Due to space distortion, multiple pixels, black and white, can be mapped to the same tile!
         if(red == 0 && green == 0 && blue == 0){
-            var g = pixelToTile({x: x, y: y},this.image.bitmap.width,this.image.bitmap.height);
-            this.land.add(g.x,g.y,1);
+            var g = wm.pixelToTile({x: x, y: y},wm.image.bitmap.width,wm.image.bitmap.height);
+            wm.land.add(g.x,g.y,1);
         }
     });
-
-    createLakes(whitepixels,image.bitmap.width,image.bitmap.height);
-    drawShore();
-    createForests(greenpixels,image.bitmap.width,image.bitmap.height);
-
-    for(var id in chunks){
-        chunks[id].write(outdir);
-    }
-
-    writeMasterFile();
-    writeCollisions();
 }
 
-function pixelToTile(px,imgw,imgh){
+WorldMaker.prototype.pixelToTile = function(px,imgw,imgh){
     return {
-        x: Math.round(px.x * (nbHoriz * chunkWidth / imgw)),
-        y: Math.round(px.y * (nbVert * chunkHeight / imgh))
+        x: Math.round(px.x * (this.nbHoriz * this.chunkWidth / imgw)),
+        y: Math.round(px.y * (this.nbVert * this.chunkHeight / imgh))
     };
-}
+};
 
 function createForests(greenpixels,imgw,imgh){
     console.log('Creating forests ...');
@@ -342,135 +341,31 @@ function checkPositions(x,y){
     return pos;
 }
 
-function createLakes(whitepixels,imgw,imgh){
+function createLakes(){
     console.log('Creating lakes ...');
-    console.log(whitepixels.length,'white pixels');
+    // console.log(whitepixels.length,'white pixels');
+    var imgw = this.image.bitmap.width;
+    var imgh = this.image.bitmap.height;
     var nblakes = 0;
-    for(var i = 0; i < whitepixels.length; i++){
-        var px = whitepixels[i];
-        var g = pixelToTile(px,imgw,imgh);
-        if(land.has(g.x,g.y)) continue;
+    for(var i = 0; i < this.whitepixels.length; i++){
+        var px = this.whitepixels[i];
+        var g = this.pixelToTile(px,imgw,imgh);
+        if(this.land.has(g.x,g.y)) continue;
         var ok = true;
         var contour = [[-1,0],[0,-1],[1,-1],[1,0],[0,1],[-1,1]];
         for(var j = 0; j < contour.length; j++){
-            if(land.has(g.x+contour[j][0],g.y+contour[j][1]) || hasCoast(g.x+contour[j][0],g.y+contour[j][1])){
+            if(this.land.has(g.x+contour[j][0],g.y+contour[j][1]) || hasCoast(g.x+contour[j][0],g.y+contour[j][1])){
                 ok = false;
                 break;
             }
         }
         if(ok){
-                var surface = fill(g);
+                var surface = this.fill(g);
                 if(surface > 100000) console.log(surface,px,g);
                 if (surface) nblakes++;
         }
     }
     console.log(nblakes,'lakes created');
-}
-
-
-/*function applyBlueprint(blueprint){
-    var parser = new xml2js.Parser();
-    var blueprint = fs.readFileSync(path.join(__dirname,'blueprints',blueprint)).toString();
-    parser.parseString(blueprint, function (err, result) {
-        if(err) throw err;
-        var read = readPath(result);
-        var paths = read.allPts; // array of arrays ; list of paths in the blueprint
-
-        for(var i = 0; i < paths.length; i++) {
-            var pts = paths[i];
-            var nbPts = pts.length;
-            //console.log('processing curve '+i+' of length '+nbPts);
-            var tiles = [];
-            for (var j = 0; j <= nbPts - 1; j++) {
-                var s = pts[j];
-                var e = (j == nbPts - 1 ? pts[0] : pts[j + 1]);
-                var addTiles = Geometry.addCorners(Geometry.straightLine(s, e));
-                if (j > 0) addTiles.shift();
-                tiles = tiles.concat(addTiles);
-            }
-
-            tiles = Geometry.forwardSmoothPass(tiles);
-            tiles = Geometry.backwardSmoothPass(tiles);
-            if(tiles.length > 1) addShore(tiles);
-        }
-
-        // TODO: Prune chunks / set default tile as water
-        /!*var visible = new Set();
-        var ids = Object.keys(WorldEditor.chunks);
-        for(var i = 0; i < ids.length; i++){
-            var id = ids[i];
-            if(!WorldEditor.isOnlyWater(WorldEditor.chunks[id])) {
-                var adjacent = Utils.listAdjacentAOIs(id);
-                for(var j = 0; j < adjacent.length; j++){
-                    visible.add(adjacent[j]);
-                }
-            }
-        }
-        for(var i = 0; i < ids.length; i++) {
-            var id = ids[i];
-            if(!visible.has(id)){
-                WorldEditor.chunks[id] = null;
-                continue;
-            }
-            for(var j = 0; j < WorldEditor.chunks[id].layers.length; j++){
-                var l = WorldEditor.chunks[id].layers[j];
-                for(var k = 0; l.data.length; k++){
-                    if(l.data[k] === null) console.log('ALERT: null values in layer'+id);
-                    continue;
-                }
-            }
-        }*!/
-    });
-}*/
-
-function readPath(result){
-    var viewbox = result.svg.$.viewBox.split(" ");
-    var curveW = parseInt(viewbox[2]);
-    var curveH = parseInt(viewbox[3]);
-    var path = result.svg.path[0].$.d;
-    path = path.replace(/\s\s+/g, ' ');
-
-    var curves = path.split("M");
-    curves.shift(); // remove initial blank
-
-    var finalCurves = [];
-    for(var i = 0; i < curves.length; i++){
-        var c = curves[i].split("C");
-        finalCurves.push(c[1]);
-    }
-    console.log(finalCurves.length+' final curves');
-
-    // Generate list of points from blueprint
-    var tally = 0;
-    var allPts = [];
-    for(var i = 0; i < finalCurves.length; i++){
-        var pts = [];
-        var arr = finalCurves[i].split(" ");
-        arr.shift();
-        arr.pop();
-        arr.pop();
-        for(var j = 0; j < arr.length; j++){
-            var e = arr[j];
-            var coords = e.split(",");
-            // wX and wY are *pixel* coordinates in new world
-            var wX = Math.floor((parseInt(coords[0])/curveW)*World.worldWidth);
-            var wY = Math.floor((parseInt(coords[1])/curveH)*World.worldHeight);
-            if(pts.length > 0 && pts[pts.length-1].x == wX && pts[pts.length-1].y == wY) continue;
-            pts.push({
-                x: wX,
-                y: wY
-            });
-        }
-        tally += pts.length;
-        allPts.push(pts);
-    }
-
-    console.log(allPts.length+' curves in blueprint, totalling '+tally+' nodes');
-    //pts.forEach(item => console.log(item))
-    return {
-        allPts: allPts,
-        fillNodes: [] // TODO: remove?
-    };
 }
 
 function fill(fillNode,stop){ // fills the world with water, but stops at coastlines
