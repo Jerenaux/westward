@@ -123,13 +123,6 @@ WorldMaker.prototype.run = function(){
     }
     console.log(total+' chunks created ('+this.nbHoriz+' x '+this.nbVert+')');
 
-    /*
-    * README: //TODO: update
-    * - Shores are first populated with 'c' tiles based on blueprint (applyBlueprint)
-    * - Then the seas are filled, using 'c' tiles as stop tiles (fill)
-    * - Then the shores are actually drawn, replacing 'c' based on neighbors (drawShore)
-    * - Then forests are added
-    * */
     /*this.steps = {
         'shape_world': this.shapeWorld, // Puts 'c' tiles on contours
     }
@@ -150,6 +143,13 @@ WorldMaker.prototype.storeImage = function(image){
 }
 
 WorldMaker.prototype.create = function(){
+    /*
+    * README: 
+    * - Shores are first populated with 'c' tiles based on blueprint (shapeWorld)
+    * - Then the seas are filled, using 'c' tiles as stop tiles (createLakes)
+    * - Then the shores are actually drawn, replacing 'c' based on neighbors (drawShore)
+    * - Then forests are added (createForests)
+    * */
     var contours = autopath.getContours(this.image);
     this.shapeWorld(contours);
     this.collectPixels();
@@ -157,12 +157,12 @@ WorldMaker.prototype.create = function(){
     // this.drawShore();
     // this.createForests();
 
-    // for(var id in this.chunks){
-    //     this.chunks[id].write(outdir);
-    // }
+    for(var id in this.chunks){
+        this.chunks[id].write(outdir);
+    }
 
-    // this.writeMasterFile();
-    // this.writeCollisions();
+    this.writeMasterFile();
+    this.writeCollisions();
 };
 
 WorldMaker.prototype.shapeWorld = function(contours){
@@ -187,7 +187,7 @@ WorldMaker.prototype.shapeWorld = function(contours){
     }
 };
 
-function isBusy(node){
+WorldMaker.prototype.isBusy = function(node){
     if(!isInWorldBounds(node.x,node.y)) return true;
     var id = Utils.tileToAOI(node);
     var chunk = this.chunks[id];
@@ -222,7 +222,7 @@ WorldMaker.prototype.addTile = function(tile,value){
 WorldMaker.prototype.getTile = function(x,y){
     var id = Utils.tileToAOI({x:x,y:y});
     if(!(id in this.chunks)) return;
-    var chunk = chunks[id];
+    var chunk = this.chunks[id];
     return chunk.get(x-chunk.x,y-chunk.y);
 };
 
@@ -250,8 +250,8 @@ WorldMaker.prototype.collectPixels = function(){
         var green = this.bitmap.data[idx + 1];
         var blue = this.bitmap.data[idx + 2];
 
-        if(red == 203 && green == 230 && blue == 163) this.greenpixels.push({x: x, y: y});
-        if(red == 255 && green == 255 && blue == 255) this.whitepixels.push({x: x, y: y});
+        if(red == 203 && green == 230 && blue == 163) wm.greenpixels.push({x: x, y: y});
+        if(red == 255 && green == 255 && blue == 255) wm.whitepixels.push({x: x, y: y});
 
         // Keep track of pixels that have also been mapped to land
         // Due to space distortion, multiple pixels, black and white, can be mapped to the same tile!
@@ -268,6 +268,73 @@ WorldMaker.prototype.pixelToTile = function(px,imgw,imgh){
         y: Math.round(px.y * (this.nbVert * this.chunkHeight / imgh))
     };
 };
+
+WorldMaker.prototype.createLakes = function(){
+    console.log('Creating lakes ...');
+    // console.log(whitepixels.length,'white pixels');
+    var imgw = this.image.bitmap.width;
+    var imgh = this.image.bitmap.height;
+    var nblakes = 0;
+    for(var i = 0; i < this.whitepixels.length; i++){
+        var px = this.whitepixels[i];
+        var g = this.pixelToTile(px,imgw,imgh);
+        if(this.land.has(g.x,g.y)) continue;
+        var ok = true;
+        var contour = [[-1,0],[0,-1],[1,-1],[1,0],[0,1],[-1,1]];
+        for(var j = 0; j < contour.length; j++){
+            if(this.land.has(g.x+contour[j][0],g.y+contour[j][1]) || this.hasCoast(g.x+contour[j][0],g.y+contour[j][1])){
+                ok = false;
+                break;
+            }
+        }
+        if(ok){
+                var surface = this.fill(g);
+                if(surface > 100000) console.log(surface,px,g);
+                if (surface) nblakes++;
+        }
+    }
+    console.log(nblakes,'lakes created');
+}
+
+WorldMaker.prototype.fill = function(fillNode,stop){ // fills the world with water, but stops at coastlines
+    if(this.isBusy(fillNode)) return;
+    var stoppingCritetion = stop || 1000000;
+    var queue = [];
+    queue.push(fillNode);
+    var counter = 0;
+    var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
+    while(queue.length > 0){
+        var node = queue.shift();
+        if(this.isBusy(node)) continue;
+        // put a tile at location
+        this.addTile(node,'w');
+        this.collisions.add(node.x,node.y,1);
+        // expand
+        for(var i = 0; i < contour.length; i++){
+            var candidate = {
+                x: node.x + contour[i][0],
+                y: node.y + contour[i][1]
+            };
+            if(!isInWorldBounds(candidate.x,candidate.y)) continue;
+            //if(lake.has(candidate.x,candidate.y)) continue;
+            if(!this.isBusy(candidate)) queue.push(candidate);
+        }
+
+        counter++;
+        if(counter >= stoppingCritetion) break;
+    }
+    return counter;
+}
+
+WorldMaker.prototype.hasCoast = function(x,y){
+    if(!isInWorldBounds(x,y)) return true; // When looking for a neighbor out of bounds, assume it's present; allows seamless connections with borders
+    var t = this.getTile(x,y);
+    return !(!t || t == 'w');
+}
+
+WorldMaker.prototype.hasWater = function(x,y){
+    return this.getTile(x,y) == 'w';
+}
 
 function createForests(greenpixels,imgw,imgh){
     console.log('Creating forests ...');
@@ -341,76 +408,6 @@ function checkPositions(x,y){
     return pos;
 }
 
-function createLakes(){
-    console.log('Creating lakes ...');
-    // console.log(whitepixels.length,'white pixels');
-    var imgw = this.image.bitmap.width;
-    var imgh = this.image.bitmap.height;
-    var nblakes = 0;
-    for(var i = 0; i < this.whitepixels.length; i++){
-        var px = this.whitepixels[i];
-        var g = this.pixelToTile(px,imgw,imgh);
-        if(this.land.has(g.x,g.y)) continue;
-        var ok = true;
-        var contour = [[-1,0],[0,-1],[1,-1],[1,0],[0,1],[-1,1]];
-        for(var j = 0; j < contour.length; j++){
-            if(this.land.has(g.x+contour[j][0],g.y+contour[j][1]) || hasCoast(g.x+contour[j][0],g.y+contour[j][1])){
-                ok = false;
-                break;
-            }
-        }
-        if(ok){
-                var surface = this.fill(g);
-                if(surface > 100000) console.log(surface,px,g);
-                if (surface) nblakes++;
-        }
-    }
-    console.log(nblakes,'lakes created');
-}
-
-function fill(fillNode,stop){ // fills the world with water, but stops at coastlines
-    if(isBusy(fillNode)) return;
-    var stoppingCritetion = stop || 1000000;
-    //var lake = new SpaceMap();
-    //lake.add(fillNode.x,fillNode);
-    var queue = [];
-    queue.push(fillNode);
-    var counter = 0;
-    var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
-    while(queue.length > 0){
-        var node = queue.shift();
-        if(isBusy(node)) continue;
-        // put a tile at location
-        addTile(node,'w');
-        collisions.add(node.x,node.y,1);
-        //lake.add(node.x,node.y);
-        // expand
-        for(var i = 0; i < contour.length; i++){
-            var candidate = {
-                x: node.x + contour[i][0],
-                y: node.y + contour[i][1]
-            };
-            if(!isInWorldBounds(candidate.x,candidate.y)) continue;
-            //if(lake.has(candidate.x,candidate.y)) continue;
-            if(!isBusy(candidate)) queue.push(candidate);
-        }
-
-        counter++;
-        if(counter >= stoppingCritetion) break;
-    }
-    return counter;
-}
-
-function hasCoast(x,y){
-    if(!isInWorldBounds(x,y)) return true; // When looking for a neighbor out of bounds, assume it's present; allows seamless connections with borders
-    var t = getTile(x,y);
-    return !(!t || t == 'w');
-}
-
-function hasWater(x,y){
-    return getTile(x,y) == 'w';
-}
-
 function drawShore(){
     console.log('Drawing shore ...');
     var lines = [];
@@ -477,25 +474,25 @@ function collides(tile){
     return tileset.frames[tileset.shorthands[tile]].collides;
 }
 
-function writeMasterFile(){
+WorldMaker.prototype.writeMasterFile = function(){
     // Write master file
     var master = {
         //tilesets : tilesetsData.tilesets,
-        chunkWidth: chunkWidth,
-        chunkHeight: chunkHeight,
-        nbChunksHoriz: nbHoriz,
-        nbChunksVert: nbVert
+        chunkWidth: this.chunkWidth,
+        chunkHeight: this.chunkHeight,
+        nbChunksHoriz: this.nbHoriz,
+        nbChunksVert: this.nbVert
     };
-    fs.writeFile(path.join(outdir,'master.json'),JSON.stringify(master),function(err){
+    fs.writeFile(path.join(this.outdir,'master.json'),JSON.stringify(master),function(err){
         if(err) throw err;
         console.log('Master written');
     });
 }
 
-function writeCollisions(){
+WorldMaker.prototype.writeCollisions  function(){
     // Write master file
-    var colls = trees.toList().concat(collisions.toList(true));
-    fs.writeFile(path.join(outdir,'collisions.json'),JSON.stringify(colls),function(err){
+    var colls = trees.toList().concat(this.collisions.toList(true));
+    fs.writeFile(path.join(this.outdir,'collisions.json'),JSON.stringify(colls),function(err){
         if(err) throw err;
         console.log('Collisions written');
     });
