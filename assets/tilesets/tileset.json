@@ -185,6 +185,7 @@
     }
   },
   "shorthands" : {
+    "c":"newwater",
     "w":"newwater",
     "wt":"newwater_top",
     "wb":"newwater_bottom",

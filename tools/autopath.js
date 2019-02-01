@@ -7,26 +7,47 @@ var path = require('path');
 var Jimp = require("jimp");
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var Geometry = require('./Geometry.js').Geometry;
-// var Pathfinder =  require('../shared/Pathfinder.js').Pathfinder;
 
-// World = {
-//     worldHeight: 0,
-//     worldWidht: 0
-// };
 
 function Px(x,y){
     this.x = x;
     this.y = y;
 }
 
+Px.prototype.neighbors = function*(){
+    for(var i = 0; i < contour.length; i++) {
+        var c = {x: contour[i][0], y: contour[i][1]};
+        yield {x:this.x + c.x,y:this.y + c.y};
+    }
+};
+
 Px.prototype.getNext = function(image){
-    for(var i = 0; i < contour.length; i++){
+    /*for(var i = 0; i < contour.length; i++){
         var c = {x:contour[i][0],y:contour[i][1]};
         var x = this.x + c.x;
         var y = this.y + c.y;
         if(x < 0 || y < 0 || x >= image.bitmap.width || y >= image.bitmap.height) continue;
         // Enforcing a minimum in hasWhiteNb reduces the number of hard cornes and makes for more natural contours
-        if(isBlack(image,x,y) && hasWhiteNb(image,x,y,2) && !isExplored(x,y)) return new Px(x,y);
+        if(isBlack(image,x,y) && hasWhiteNb(image,x,y,1) && !isExplored(x,y)) return new Px(x,y);
+    }
+    return null;*/
+    var clocked = false;
+    for(var nbr of this.neighbors()){
+        if(image.getPixelColor(nbr.x, nbr.y) == 4294967295) return new Px(nbr.x,nbr.y);
+    }
+    return null;
+};
+
+/*Px.prototype.hasWhiteNbr = function(image){
+    for(var nbr of this.neighbors()){
+        if(image.getPixelColor(nbr.x, nbr.y) == 4294967295) return true;
+    }
+    return false;
+};*/
+
+Px.prototype.getFirstWhiteNbr = function(){
+    for(var nbr of this.neighbors()){
+        if(image.getPixelColor(nbr.x, nbr.y) == 4294967295) return new Px(nbr.x,nbr.y);
     }
     return null;
 };
@@ -61,13 +82,6 @@ function hasWhiteNb(image,x,y,min){
 }
 
 function readImage(blueprint,cb){
-    // return new Promise(function(resolve,reject){
-    //     console.log('Reading',blueprint);
-    //     Jimp.read(path.join(__dirname,'blueprints',blueprint), function (err, image) {
-    //         if (err) reject(err);
-    //         resolve(image);
-    //     });
-    // });
     Jimp.read(path.join(__dirname,'blueprints',blueprint), function (err, image) {
         if (err) throw err;
         cb(image);
@@ -81,9 +95,9 @@ function getContours(image) {
     for (var x = 0; x < image.bitmap.width; x++) {
         for (var y = 0; y < image.bitmap.height; y++) {
             if (isBlack(image, x, y) && hasWhiteNb(image, x, y) && !isExplored(x, y)) {
-                var path = followUp(image, x, y);
+                var path = trace(image, x, y);
                 if (path && path.length > 2) {
-                    var l = extractLines(path);
+                    var l = getSegments(path);
                     lines.push(l);
                 }
             }
@@ -92,18 +106,33 @@ function getContours(image) {
     return lines;
 }
 
+function trace(image,x,y){
+    // Travel along neighbors until meeting start node or image boundaries
+    //http://www.imageprocessingplace.com/downloads_V3/root_downloads/tutorials/contour_tracing_Abeer_George_Ghuneim/moore.html    explored.add(x,y);
+    var B = []; // boundary
+    var p = new Px(x,y); //current boundary pixel
+    var back = p.getFirstWhiteNbr(); // backtracked white px from p
+    if(!back) return;
+    var dir = {x:p.x-back.x,y:p.y-back.y};
+    var c = p.getNext(image,dir); //pixel under consideration
+    while(true){
+        node = node.getNext(image);
+        // console.log(node)
+        if(node){
+            explored.add(node.x,node.y);
+            path.push(node);
+        }else{
+            path.push(path[0]);
+            return path;
+        }
 
-// function explore(){
-//     console.log(navgrid.toList(true,true));
-//     var pf = new Pathfinder(navgrid,-1,true,true,true);
-//     var path = pf.findPath({x:14,y:17},{x:13,y:18});
-//     console.log(path);
-// }
+        counter++;
+    }
+}
 
-function followUp(image,x,y){
+/*function trace(image,x,y){
     // Travel along neighbors until meeting start node or image boundaries
     // console.log('starting at',x,y);
-    var counter = 0;
     explored.add(x,y);
     var node = new Px(x,y);
     var path = [node];
@@ -119,9 +148,8 @@ function followUp(image,x,y){
         }
 
         counter++;
-        if(counter >=  image.bitmap.width*image.bitmap.height) break;
     }
-}
+}*/
 
 function addLine(c,p,lines){
     var q = new Px(p.x,p.y);
@@ -131,7 +159,7 @@ function addLine(c,p,lines){
     lines.push(q.toList());
 }
 
-function extractLines(path){
+function getSegments(path){
     var c = path[0];
     var lines = [c.toList()];
     var bearing = undefined;
