@@ -204,7 +204,7 @@ function isInWorldBounds(x,y){
 WorldMaker.prototype.addDecor = function(tile,decor){
     var id = Utils.tileToAOI(tile);
     if(!(id in this.chunks)) return;
-    var chunk = chunks[id];
+    var chunk = this.chunks[id];
     chunk.addDecor(tile.x-chunk.x,tile.y-chunk.y,decor);
 };
 
@@ -351,13 +351,11 @@ WorldMaker.prototype.drawShore = function(){
             var nbrh = this.getNeighborhood(x,y);
             tile = this.patterns[nbrh.join('')];
             if(tile === undefined) {
-                console.log(x,y,nbrh.join(''));
+                //console.log(x,y,nbrh.join(''));
                 undef++;
             }
 
             if(tile === undefined || tile == 'none'){
-                //console.warn('undefined at',x,y);
-                //removeTile(c);
                 tile='none';
             }else{
                 this.addTile(c,tile); // Will replace any 'c'
@@ -402,9 +400,9 @@ WorldMaker.prototype.createForests = function(){
         // TODO: move that up, to use tree type in positions computation
         var tree = getTreeType(g.x,g.y);
         pos.forEach(function(p){
-            trees.add(p[0],p[1],1);
-        });
-        addDecor(g, 't'+tree);
+            this.trees.add(p[0],p[1],1);
+        },this);
+        this.addDecor(g, 't'+tree);
         nbtrees++;
     }
     console.log(nbtrees + ' trees drawn');
