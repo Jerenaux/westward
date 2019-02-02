@@ -143,29 +143,7 @@ WorldMaker.prototype.storeImage = function(image){
 };
 
 WorldMaker.prototype.create = function(){
-    //var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
-    // 0,1;-1,1;-1,0;1,0;1,-1;0,-1;0,1;-1,1;-1,0;1,0;1,-1;0,-1;0,1
-    function *mooreGenerator(s) {
-        var c = 0;
-        var i = 0;
-        var pt = [s[0],s[1]];
-        for(var iter = 0; iter < 10; iter++) {
-            pt[c] += i;
-            if(pt[0] == pt[1]){
-                c = +!c;
-            }else if(pt[0]+pt[1] == 0){
-                c = +!c;
-            }
-            //c = (pt[0]+pt[1] == 0 ? 0 : 1); // In tr and bl corners, start iterating over x coordinate, else y
-            i = (pt[c] >= 0 ? -1 : 1);
-            yield pt;
-        }
-    }
-    var gen = mooreGenerator([-1,0]);
-    for(var v of gen){
-        console.log(v);
-    }
-    return;
+
     /*
     * README: 
     * - Shores are first populated with 'c' tiles based on blueprint (shapeWorld)
@@ -175,10 +153,10 @@ WorldMaker.prototype.create = function(){
     * */
     var contours = autopath.getContours(this.image);
     this.shapeWorld(contours);
-    /*this.collectPixels();
+    this.collectPixels();
     this.createLakes();
     this.drawShore();
-    this.createForests();*/
+    this.createForests();
 
     for(var id in this.chunks){
         this.chunks[id].write(this.outdir);
@@ -192,7 +170,6 @@ WorldMaker.prototype.shapeWorld = function(contours){
     // console.log(contours)
     for(var i = 0; i < contours.length; i++) {
         var lines = contours[i];
-        console.log('!',lines);
         var nbPts = lines.length;
         //console.log('processing curve '+i+' of length '+nbPts);
         var tiles = [];
@@ -208,7 +185,6 @@ WorldMaker.prototype.shapeWorld = function(contours){
             if (j > 0) addTiles.shift();
             tiles = tiles.concat(addTiles);
         }
-        return;
         tiles = Geometry.forwardSmoothPass(tiles);
         tiles = Geometry.backwardSmoothPass(tiles);
         if(tiles.length > 1) this.addCoastTiles(tiles);
@@ -376,7 +352,7 @@ WorldMaker.prototype.drawShore = function(){
             var nbrh = this.getNeighborhood(x,y);
             tile = this.patterns[nbrh.join('')];
             if(tile === undefined) {
-                //console.log(x,y,nbrh.join(''));
+                console.log(x,y,nbrh.join(''));
                 undef++;
             }
 

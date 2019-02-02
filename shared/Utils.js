@@ -365,4 +365,13 @@ Array.prototype.last = function(){
     return this[this.length-1];
 };
 
+Array.prototype.rotate = function( n ) {
+    this.unshift.apply( this, this.splice( n, this.length ) );
+    return this;
+};
+
+Array.prototype.previous = function(i){
+    return (i > 0 ? this[i-1] : this.last());
+};
+
 if (onServer) module.exports.Utils = Utils;

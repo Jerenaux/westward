@@ -8,7 +8,6 @@ var Jimp = require("jimp");
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var Geometry = require('./Geometry.js').Geometry;
 
-
 function Px(x,y){
     this.x = x;
     this.y = y;
@@ -21,32 +20,27 @@ Px.prototype.neighbors = function*(){
     }
 };
 
-Px.prototype.getNext = function(image){
-    /*for(var i = 0; i < contour.length; i++){
-        var c = {x:contour[i][0],y:contour[i][1]};
-        var x = this.x + c.x;
-        var y = this.y + c.y;
-        if(x < 0 || y < 0 || x >= image.bitmap.width || y >= image.bitmap.height) continue;
-        // Enforcing a minimum in hasWhiteNb reduces the number of hard cornes and makes for more natural contours
-        if(isBlack(image,x,y) && hasWhiteNb(image,x,y,1) && !isExplored(x,y)) return new Px(x,y);
+Px.prototype.clockwiseMoore = function*(image,s) {
+    var moore = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
+    var idx = moore.findIndex(function(e){
+        return (e[0] == s.x && e[1] == s.y);
+    });
+    if(idx == -1) console.warn('WARNING: direction not found');
+    moore = moore.rotate(idx+1);
+    for(var i = 0; i < moore.length; i++){
+        var c = {x:moore[i][0],y:moore[i][1]};
+        var p = {x:this.x+c.x,y:this.y+c.y};
+        if(p.x < 0 || p.y < 0 || p.x >= image.bitmap.width || p.y >= image.bitmap.height) continue;
+        var c_ = {x:moore.previous(i)[0],y:moore.previous(i)[1]};
+        var p_ = {x:this.x+c_.x,y:this.y+c_.y};
+        var dir = {x:p.x-p_.x,y:p.y-p_.y};
+        yield {p:new Px(p.x,p.y),dir:dir};
     }
-    return null;*/
-    var clocked = false;
-    for(var nbr of this.neighbors()){
-        if(image.getPixelColor(nbr.x, nbr.y) == 4294967295) return new Px(nbr.x,nbr.y);
-    }
-    return null;
 };
 
-/*Px.prototype.hasWhiteNbr = function(image){
+Px.prototype.getFirstWhiteNbr = function(image){
     for(var nbr of this.neighbors()){
-        if(image.getPixelColor(nbr.x, nbr.y) == 4294967295) return true;
-    }
-    return false;
-};*/
-
-Px.prototype.getFirstWhiteNbr = function(){
-    for(var nbr of this.neighbors()){
+        if(nbr.x < 0 || nbr.y < 0 || nbr.x >= image.bitmap.width || nbr.y >= image.bitmap.height) continue;
         if(image.getPixelColor(nbr.x, nbr.y) == 4294967295) return new Px(nbr.x,nbr.y);
     }
     return null;
@@ -67,16 +61,12 @@ function isExplored(x,y){
     return explored.has(x,y);
 }
 
-function hasWhiteNb(image,x,y,min){
-    min = min || 0;
-    var nb = 0;
+function hasWhiteNb(image,x,y,diags){
     for(var i = 0; i < contour.length; i++){
         var c = {x:contour[i][0],y:contour[i][1]};
+        if(!diags && Math.abs(c.x + c.y) != 1) continue; // skip diagonals
         // console.log(x+c.x,y+c.y,image.getPixelColor(x+c.x, y+c.y));
-        if(image.getPixelColor(x+c.x, y+c.y) == 4294967295){
-            nb++;
-            if(nb >= min) return true;
-        }
+        if(image.getPixelColor(x+c.x, y+c.y) == 4294967295) return true;
     }
     return false;
 }
@@ -94,12 +84,11 @@ function getContours(image) {
     var lines = [];
     for (var x = 0; x < image.bitmap.width; x++) {
         for (var y = 0; y < image.bitmap.height; y++) {
-            if (isBlack(image, x, y) && hasWhiteNb(image, x, y) && !isExplored(x, y)) {
+            if (isBlack(image, x, y) && hasWhiteNb(image, x, y,false) && !isExplored(x, y)) {
+                // console.log('starting at',x,y);
                 var path = trace(image, x, y);
-                if (path && path.length > 2) {
-                    var l = getSegments(path);
-                    lines.push(l);
-                }
+                // console.log(path);
+                if (path && path.length > 2)lines.push(getSegments(path));
             }
         }
     }
@@ -110,73 +99,68 @@ function trace(image,x,y){
     // Travel along neighbors until meeting start node or image boundaries
     //http://www.imageprocessingplace.com/downloads_V3/root_downloads/tutorials/contour_tracing_Abeer_George_Ghuneim/moore.html    explored.add(x,y);
     var B = []; // boundary
+    var s = new Px(x,y); // start
+    B.push([x,y]);
     var p = new Px(x,y); //current boundary pixel
-    var back = p.getFirstWhiteNbr(); // backtracked white px from p
-    if(!back) return;
-    var dir = {x:p.x-back.x,y:p.y-back.y};
-    var c = p.getNext(image,dir); //pixel under consideration
+    var on = p.getFirstWhiteNbr(image); // backtracked white px from p
+    // console.log('now on',on);
+    var dir = {x:on.x-p.x,y:on.y-p.y};
+    var stop = false;
     while(true){
-        node = node.getNext(image);
-        // console.log(node)
-        if(node){
-            explored.add(node.x,node.y);
-            path.push(node);
-        }else{
-            path.push(path[0]);
-            return path;
+        // console.log('Swiping around',p,'from dir',dir);
+        for(var step of p.clockwiseMoore(image,dir)){
+            on.x = step.p.x;
+            on.y = step.p.y;
+            // if(isExplored(on.x,on.y)) return [];
+            // console.log('now on',on);
+            // TODO: Jacob's stopping criterion?
+            if(on.x == x && on.y == y) stop = true;
+            if(isBlack(image,on.x,on.y)){
+                if(isNaN(step.dir.x) || isNaN(step.dir.y)) console.warn('WARNING: NaN direction');
+                // console.log(on,'is black, entered from',step.dir);
+                // console.log(on);
+                B.push([on.x,on.y]);
+                explored.add(on.x,on.y);
+                p = new Px(on.x,on.y);
+                dir.x = (step.dir.x == 0 ? 0 : -step.dir.x);
+                dir.y = (step.dir.y == 0 ? 0 : -step.dir.y);
+                break;
+            }
         }
-
-        counter++;
+        if(stop) break;
     }
+    // console.log(B);
+    return B;
 }
 
-/*function trace(image,x,y){
-    // Travel along neighbors until meeting start node or image boundaries
-    // console.log('starting at',x,y);
-    explored.add(x,y);
-    var node = new Px(x,y);
-    var path = [node];
-    while(true){
-        node = node.getNext(image);
-        // console.log(node)
-        if(node){  
-            explored.add(node.x,node.y);
-            path.push(node);
-        }else{
-            path.push(path[0]);
-            return path;
-        }
-
-        counter++;
-    }
-}*/
-
-function addLine(c,p,lines){
+/*function addLine(c,p,lines){
     var q = new Px(p.x,p.y);
     // if(q.x > c.x) q.x++;
     // if(q.y > c.y) q.y++;
     // lines.push([c,q]);
     lines.push(q.toList());
-}
+}*/
 
 function getSegments(path){
     var c = path[0];
-    var lines = [c.toList()];
+    var lines = [c];
     var bearing = undefined;
     for(var i = 0; i < path.length; i++){
         var p = path[i];
-        if(p.x == c.x && p.y == c.y) continue;
-        var dir = Geometry.computeAngle(p,c);
+        if(p[0] == c[0] && p[1] == c[1]) continue;
+        var dir = Geometry.computeAngle({x:p[0],y:p[1]},{x:c[0],y:c[1]});
         if(bearing == undefined) bearing = dir;
         // console.log(p,c,dir,bearing);
         if(bearing != dir){
-            addLine(c,path[i-1],lines);
+            // addLine(c,path[i-1],lines);
+            lines.push(path[i-1]);
             c = path[i-1];
             bearing = undefined;
             i--;
         }
     }
-    addLine(c,path[path.length-1],lines);
+    //addLine(c,path[path.length-1],lines);
+    lines.push(path.last());
     // console.log(lines);
     return lines;
 }
