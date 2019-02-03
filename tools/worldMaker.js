@@ -381,7 +381,7 @@ WorldMaker.prototype.getNeighborhood = function(x,y){
 
 WorldMaker.prototype.collides = function(tile){
     return this.tileset.frames[this.tileset.shorthands[tile]].collides;
-}
+};
 
 WorldMaker.prototype.createForests = function(){
     console.log('Creating forests ...');

@@ -13,17 +13,18 @@ function Px(x,y){
     this.y = y;
 }
 
-Px.prototype.neighbors = function*(){
+Px.prototype.neighbors = function*(skipDiag){
     for(var i = 0; i < contour.length; i++) {
         var c = {x: contour[i][0], y: contour[i][1]};
+        if(skipDiag && c.x != 0 && c.y != 0) continue;
         yield {x:this.x + c.x,y:this.y + c.y};
     }
 };
 
-Px.prototype.clockwiseMoore = function*(image,s) {
+Px.prototype.clockwiseMoore = function*(image,sdir) {
     var moore = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
     var idx = moore.findIndex(function(e){
-        return (e[0] == s.x && e[1] == s.y);
+        return (e[0] == sdir[0] && e[1] == sdir[1]);
     });
     if(idx == -1) console.warn('WARNING: direction not found');
     moore = moore.rotate(idx+1);
@@ -33,13 +34,13 @@ Px.prototype.clockwiseMoore = function*(image,s) {
         if(p.x < 0 || p.y < 0 || p.x >= image.bitmap.width || p.y >= image.bitmap.height) continue;
         var c_ = {x:moore.previous(i)[0],y:moore.previous(i)[1]};
         var p_ = {x:this.x+c_.x,y:this.y+c_.y};
-        var dir = {x:p.x-p_.x,y:p.y-p_.y};
+        var dir = [p.x-p_.x,p.y-p_.y];
         yield {p:new Px(p.x,p.y),dir:dir};
     }
 };
 
 Px.prototype.getFirstWhiteNbr = function(image){
-    for(var nbr of this.neighbors()){
+    for(var nbr of this.neighbors(true)){
         if(nbr.x < 0 || nbr.y < 0 || nbr.x >= image.bitmap.width || nbr.y >= image.bitmap.height) continue;
         if(image.getPixelColor(nbr.x, nbr.y) == 4294967295) return new Px(nbr.x,nbr.y);
     }
@@ -54,7 +55,11 @@ var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
 var explored = new SpaceMap();
 
 function isBlack(image,x,y){
-    return (image.getPixelColor(x, y) == 255);
+    return (image.getPixelColor(x, y) != 4294967295) // == 255;
+}
+
+function isWhite(image,x,y){
+    return (image.getPixelColor(x, y) == 4294967295);
 }
 
 function isExplored(x,y){
@@ -66,7 +71,7 @@ function hasWhiteNb(image,x,y,diags){
         var c = {x:contour[i][0],y:contour[i][1]};
         if(!diags && Math.abs(c.x + c.y) != 1) continue; // skip diagonals
         // console.log(x+c.x,y+c.y,image.getPixelColor(x+c.x, y+c.y));
-        if(image.getPixelColor(x+c.x, y+c.y) == 4294967295) return true;
+        if(isWhite(image,x+c.x, y+c.y)) return true;
     }
     return false;
 }
@@ -85,7 +90,7 @@ function getContours(image) {
     for (var x = 0; x < image.bitmap.width; x++) {
         for (var y = 0; y < image.bitmap.height; y++) {
             if (isBlack(image, x, y) && hasWhiteNb(image, x, y,false) && !isExplored(x, y)) {
-                // console.log('starting at',x,y);
+                // console.warn('starting at',x,y);
                 var path = trace(image, x, y);
                 // console.log(path);
                 if (path && path.length > 2)lines.push(getSegments(path));
@@ -104,30 +109,33 @@ function trace(image,x,y){
     var p = new Px(x,y); //current boundary pixel
     var on = p.getFirstWhiteNbr(image); // backtracked white px from p
     // console.log('now on',on);
-    var dir = {x:on.x-p.x,y:on.y-p.y};
+    // var dir = {x:on.x-p.x,y:on.y-p.y};
+    var dir = [on.x-p.x,on.y-p.y];
     var stop = false;
     while(true){
         // console.log('Swiping around',p,'from dir',dir);
+        var exhausted = true;
         for(var step of p.clockwiseMoore(image,dir)){
             on.x = step.p.x;
             on.y = step.p.y;
             // if(isExplored(on.x,on.y)) return [];
             // console.log('now on',on);
             // TODO: Jacob's stopping criterion?
-            if(on.x == x && on.y == y) stop = true;
             if(isBlack(image,on.x,on.y)){
-                if(isNaN(step.dir.x) || isNaN(step.dir.y)) console.warn('WARNING: NaN direction');
+                if(isNaN(step.dir[0]) || isNaN(step.dir[1])) console.warn('WARNING: NaN direction');
                 // console.log(on,'is black, entered from',step.dir);
-                // console.log(on);
                 B.push([on.x,on.y]);
                 explored.add(on.x,on.y);
                 p = new Px(on.x,on.y);
-                dir.x = (step.dir.x == 0 ? 0 : -step.dir.x);
-                dir.y = (step.dir.y == 0 ? 0 : -step.dir.y);
+                // dir = step.dir;
+                dir[0] = (step.dir[0] == 0 ? 0 : -step.dir[0]);
+                dir[1] = (step.dir[1] == 0 ? 0 : -step.dir[1]);
+                exhausted = false;
+                if(on.x == x && on.y == y) stop = true;
                 break;
             }
         }
-        if(stop) break;
+        if(stop || exhausted) break;
     }
     // console.log(B);
     return B;

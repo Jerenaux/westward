@@ -144,7 +144,7 @@ GameServer.readMap = function(mapsPath,test){
     var masterData = JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'master.json')).toString());
     World.readMasterData(masterData);
 
-    GameServer.AOIs = []; // Maps AOI id to AOI object
+    GameServer.AOIs = []; // Maps AOI id to AOI object; it's not a map but sice they are stored in order, their position in the array map to them
     GameServer.dirtyAOIs = new Set(); // Set of AOI's whose update package have changes since last update; used to avoid iterating through all AOIs when clearing them
 
     for(var i = 0; i <= World.lastChunkID; i++){
@@ -586,8 +586,8 @@ GameServer.lootNPC = function(player,type,ID){
     if(NPC.loot.isEmpty()) return;
     for(var item in NPC.loot.items){
         // TODO: take harvesting ability into consideration
-        player.giveItem(item,NPC.loot.items[item]);
-        player.addNotif('+'+NPC.loot.items[item]+' '+GameServer.itemsData[item].name);
+        player.giveItem(item,NPC.loot.items[item],notify);
+        // player.addNotif('+'+NPC.loot.items[item]+' '+GameServer.itemsData[item].name);
     }
     GameServer.removeEntity(NPC); // TODO: handle differently, leave carcasses
 };

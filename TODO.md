@@ -202,6 +202,8 @@ Performance:
 - Dont send full building inventories when buying/selling (send arrays of deltas)
 - Look into gzipping maps
 Order:
+- Display sprites in text: http://sbcgames.io/add-sprites-into-font-as-characters/
+- Auto pack tileset.png
 - Clean all tutorial stuff
 - Store buildings data in separate files for the rendering stuff and the economic stuff;
 -> At least for economuc stuff, do it in json5

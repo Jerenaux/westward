@@ -44,7 +44,7 @@ Pathfinder.prototype.findPath = function(from,to,seek){
         this.considered++;
 
         var minFNode = this.getMinFNode();
-        console.log('Considering ',minFNode.toString());
+        // console.log('Considering ',minFNode.toString());
         if(minFNode.equals(end)) return this.backtrack(minFNode);
 
         // Seeking behavior: return the best path towards target even if too short

@@ -438,7 +438,7 @@ var Map = new Phaser.Class({
         this.setInputArea();
         this.positionToponyms();
         this.computeDragLimits();
-        if(!this.minimap) this.applyFogOfWar();
+        //if(!this.minimap) this.applyFogOfWar();
 
         if(this.target == 'player') { // TODO: remove, always the case if no fort
             this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');

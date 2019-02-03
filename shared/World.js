@@ -20,7 +20,6 @@ World.readMasterData = function(data){
     World.setUp(
         data.nbChunksHoriz,data.nbChunksVert,
         data.chunkWidth,data.chunkHeight,
-        //data.tilesets[0].tilewidth, data.tilesets[0].tileheight
     );
 };
 

@@ -230,7 +230,6 @@ Engine.create = function(){
     var masterData = Boot.masterData;
     World.readMasterData(masterData);
     Engine.mapDataLocation = Boot.mapDataLocation;
-    console.log('Master file read, setting up world of size '+World.worldWidth+' x '+World.worldHeight+' with '+Engine.nbLayers+' layers');
 
     tilesetData.atlas = Engine.scene.cache.json.get('tileset').frames;
     tilesetData.config = Engine.scene.cache.json.get('tileset').config;

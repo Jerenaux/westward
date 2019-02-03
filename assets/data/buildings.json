@@ -65,7 +65,7 @@
       "width": 3,
       "height": 3
     },
-    "locationConstrained": true,
+    "locationConstrained": false,
     "icon": "lumbercamp",
     "sprite": "lumbercamp",
     "foundations": false,
