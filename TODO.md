@@ -169,10 +169,9 @@ Secure
 Analytics:
 ---------
 - Log: menu opens?, fights (+ print types), kills
-- Session duration stats
-- Bundle events from one player into sessions
-- Log session-wide stats: how many players visit a building during session, do this, do that...
 - Button to flush events
+- Bundle events from one player into sessions
+- Log session-wide stats: duration, how many players visit a building during session, do this, do that...
 - Push desktop notifications for player connects
 - Look for nice statistical library
 - Log drains and faucets

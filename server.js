@@ -81,7 +81,7 @@ app.get('/editor',function(req,res){
 });
 
 var GEThandlers = {
-    //'buildings': gs.getBuildings,
+    'buildings': gs.getBuildings,
     'events': gs.getEvents,
     'screenshots': gs.getScreenshots
 };

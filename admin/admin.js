@@ -17,14 +17,6 @@ app.controller("mainCtrl", [
             $http.get("/assets/data/"+category+".json").then(function(res) {
                 if(res.status == 200){
                     Data[category+'Data'] = res.data;
-                    /*$scope.data[category+'List'] = [];
-                    for(var key in res.data){
-                        if(!res.data.hasOwnProperty(key)) continue;
-                        var entry = res.data[key];
-                        entry.id = key;
-                        $scope.data[category+'List'].push(entry);
-                    }
-                    $scope.data[category] = Data[category+'Data'];*/
                     Data.counter++;
                     if(Data.counter == Data.categories.length) getAllData();
                 }
@@ -36,13 +28,14 @@ app.controller("mainCtrl", [
             $scope[category] = [];
             $http.get("/admin/"+category+"/").then(function(res) {
                 if(res.status == 200) $scope[category] = res.data;
+                console.log(res.data);
             },function(err){});
         };
 
         getAllData = function(){
             getData('events');
             getData('screenshots');
-            //getData('buildings');
+            getData('buildings');
             console.log(Data.buildingsData);
         };
 
@@ -66,8 +59,14 @@ function prefix(txt,time,name){
     return tokens.join(" ");
 }
 
+app.filter('buildingName',function(){
+    return function(id){
+        return Data.buildingsData[id].name
+    }
+});
+
 app.filter('eventFilter',function(){
-    return function(event,scope){
+    return function(event){
         
         switch(event.action){
             case 'battle':

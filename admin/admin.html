@@ -11,6 +11,47 @@
 <h1>Westward admin</h1>
 <div ng-app="admin" ng-controller="mainCtrl">
 
+
+    <table class="table table-bordered table-striped">
+        <!--
+        https://codepen.io/chrisoncode/pen/AmFLE
+        <thead>
+        <tr>
+            <td>
+                <a href="#" ng-click="sortType = 'name'; sortReverse = !sortReverse">
+                    Sushi Roll
+                    <span ng-show="sortType == 'name' && !sortReverse" class="fa fa-caret-down"></span>
+                    <span ng-show="sortType == 'name' && sortReverse" class="fa fa-caret-up"></span>
+                </a>
+            </td>
+            <td>
+                <a href="#" ng-click="sortType = 'fish'; sortReverse = !sortReverse">
+                    Fish Type
+                    <span ng-show="sortType == 'fish' && !sortReverse" class="fa fa-caret-down"></span>
+                    <span ng-show="sortType == 'fish' && sortReverse" class="fa fa-caret-up"></span>
+                </a>
+            </td>
+            <td>
+                <a href="#" ng-click="sortType = 'tastiness'; sortReverse = !sortReverse">
+                    Taste Level
+                    <span ng-show="sortType == 'tastiness' && !sortReverse" class="fa fa-caret-down"></span>
+                    <span ng-show="sortType == 'tastiness' && sortReverse" class="fa fa-caret-up"></span>
+                </a>
+            </td>
+        </tr>
+        </thead>-->
+
+        <tbody>
+        <tr ng-repeat="bld in buildings"> <!-- | orderBy:sortType:sortReverse | filter:searchFish -->
+            <td>[{{bld.x}},{{bld.y}}]</td>
+            <td>{{ bld.id | buildingName}}</td>
+            <td>{{ bld.owner }}</td>
+        </tr>
+        </tbody>
+
+    </table>
+
+
     <div class="panel panel-default" ng-repeat="screenshot in screenshots">
         <div class="panel-heading">
             {{screenshot.stamp | date}} @ ({{screenshot.player.x}}, {{screenshot.player.y}}) | {{screenshot.browser}}

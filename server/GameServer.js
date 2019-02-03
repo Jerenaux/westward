@@ -1082,14 +1082,6 @@ GameServer.handleScreenshot = function(data,socketID){
     player.addMsg('Bug reported! Thanks!');
 };
 
-GameServer.getBuildings = function(){
-    var list = [];
-    for(var id in GameServer.buildings){
-        list.push(GameServer.buildings[id].trim());
-    }
-    return list;
-};
-
 GameServer.listCamps = function(){
     return GameServer.camps.map(function(c){
         return {
@@ -1174,15 +1166,24 @@ GameServer.toggleBuild = function(data){
     return true;
 };
 
-GameServer.getScreenshots = function(cb){
-    GameServer.server.db.collection('screenshots').find({}).toArray(function(err,docs){
+
+GameServer.getBuildings = function(cb){
+    var list = [];
+    for(var id in GameServer.buildings){
+        list.push(GameServer.buildings[id].trim());
+    }
+    cb(list);
+};
+
+GameServer.getEvents = function(cb){
+    GameServer.server.db.collection('events').find({}).toArray(function(err,docs){
         if(err) throw err;
         cb(docs);
     });
 };
 
-GameServer.getEvents = function(cb){
-    GameServer.server.db.collection('events').find({}).toArray(function(err,docs){
+GameServer.getScreenshots = function(cb){
+    GameServer.server.db.collection('screenshots').find({}).toArray(function(err,docs){
         if(err) throw err;
         cb(docs);
     });
