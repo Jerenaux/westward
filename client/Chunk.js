@@ -72,6 +72,7 @@ Chunk.prototype.drawTile = function(x,y,tile){
     sprite.setDisplayOrigin(0,0);
     sprite.tileID = tile;
     this.tiles.push(sprite);
+    if(this.getAtlasData(tile,'collides',true)) this.addCollision(x,y);
     this.postDrawTile(x,y,tile,sprite);
 };
 
@@ -79,7 +80,10 @@ Chunk.prototype.getAtlasData = function(image,data,longname){
     if(longname){
         return tilesetData.atlas[image][data];
     }else {
-        if (!(image in tilesetData.shorthands)) return false;
+        if (!(image in tilesetData.shorthands)){
+            console.warn('Unknown shorthand',image);
+            return false;
+        }
         return tilesetData.atlas[tilesetData.shorthands[image]][data];
     }
 };

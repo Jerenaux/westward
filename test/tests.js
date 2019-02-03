@@ -4,13 +4,31 @@
 var expect = require('chai').expect;
 var request = require('request');
 var io = require('socket.io-client');
+var sinon = require('sinon');
 
 var gs = require('../server/GameServer.js').GameServer;
 
 var PORT = 8081; //TODO: read from conf file?
 
-describe('Server', function () {
+describe('test', function(){
+    /*The stub essentially suppresses the call to a method, while allowing to check if it was called
+    * and with what arguments. It doesn't provide a mock return value!*/
+    it('stub-test',function() {
+        var methodB = sinon.stub(gs, 'testMethodB');
+        var input = 5;
+        var output = gs.testMethodA(input);
+        expect(output).to.equal(input);
+        methodB.restore();
+        sinon.assert.calledWith(methodB, input);
+    });
 
+    it('mock-test',function() {
+
+    });
+});
+
+describe('Server', function () {
+    return;
     /*var client;
     before('socket-client',function(){
         client = io('http://localhost:'+PORT); // https://github.com/agconti/socket.io.tests/blob/master/test/test.js
@@ -44,13 +62,14 @@ describe('Server', function () {
                 expect(nbErrs).to.equal(nbEvts);
                 done();
             }
-            onevent.call(this, packet);    // original call
+            //onevent.call(this, packet);    // original call
         };
         errInputs.forEach(function(input){
             client.emit('init-world',input);
         });
     });
 });
+
 
 
 // 1. ARRANGE

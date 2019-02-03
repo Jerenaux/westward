@@ -62,7 +62,11 @@ SpaceMap.prototype.toList = function(compact,skipv){ // serialize to a list repr
             for(var y in this[x]){
                 if(this[x].hasOwnProperty(y)){
                     if(compact){
-                        list.push([x,y,this[x][y]])
+                        if(skipv){
+                            list.push([parseInt(x), parseInt(y)]);
+                        }else {
+                            list.push([parseInt(x), parseInt(y), this[x][y]]);
+                        }
                     }else {
                         if(skipv){
                             list.push({

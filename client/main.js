@@ -1,4 +1,4 @@
-
+// TODO: move in conf?
 var VIEW_WIDTH = 32;
 var VIEW_HEIGHT = 18;
 var TILE_WIDTH = 32;

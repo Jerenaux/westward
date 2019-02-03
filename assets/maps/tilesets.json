@@ -1,8 +1,0 @@
-{
-  "tilesets":[
-    {"image":"Cliff_tileset(1).png","imageheight":518,"imagewidth":503,"name":"Cliff","collisions":[2,3,4,5,16,17,20,21,31,36,46,51,61,66,76,77,78,79,80,81,82,83,91,92,93,94,95]},
-    {"image":"ground_tiles.png","imageheight":256,"imagewidth":512,"name":"ground_tiles","collisions":[21,24,25,37,38,40,41,56]},
-    {"image":"trees.png","imageheight":192,"imagewidth":672,"name":"trees","collisions":[85,86,89,90,93,94,97,98,101,106,107,110,111,114,115,118,119,121,122]},
-    {"image":"object- layer.png","imageheight":219,"imagewidth":477,"name":"object-layer","collisions":[24,37,38,39,40]}
-  ]
-}

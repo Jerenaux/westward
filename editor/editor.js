@@ -23,7 +23,7 @@ Chunk.prototype.postDrawTile = function(x,y,tile,sprite){
         this.tintSprite(sprite);
     }.bind(this));
     sprite.on('pointerdown',function(){
-        Editor.centerCamera(x,y,this.id);
+        Editor.centerCamera(x,y);
     }.bind(this));
 };
 
@@ -100,7 +100,7 @@ Editor.create = function(){
     if(BLIT) Editor.ground = Editor.scene.add.blitter(0,0,'tileset');
 };
 
-Editor.centerCamera = function(x,y,id){
+Editor.centerCamera = function(x,y){
     //console.log(x,y,id);
     Editor.camera.centerOn(x*TILE_WIDTH,y*TILE_HEIGHT);
     Editor.focusTile = {x:x,y:y};
@@ -203,6 +203,10 @@ Editor.zoom = function(coef){
 };
 
 var Engine = Editor;
+
+function f(x,y){
+    Editor.centerCamera(x,y);
+}
 
 function add(x,y,image){
     var id = Utils.tileToAOI({x:x,y:y});

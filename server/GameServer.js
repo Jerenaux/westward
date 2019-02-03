@@ -144,7 +144,7 @@ GameServer.readMap = function(mapsPath,test){
     var masterData = JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'master.json')).toString());
     World.readMasterData(masterData);
 
-    GameServer.AOIs = []; // Maps AOI id to AOI object
+    GameServer.AOIs = []; // Maps AOI id to AOI object; it's not a map but sice they are stored in order, their position in the array map to them
     GameServer.dirtyAOIs = new Set(); // Set of AOI's whose update package have changes since last update; used to avoid iterating through all AOIs when clearing them
 
     for(var i = 0; i <= World.lastChunkID; i++){
@@ -176,7 +176,7 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.clientParameters = config.get('client');
 
     GameServer.collisions = new SpaceMap();
-    GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()));
+    GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()),true); // true = compact
     GameServer.pathFinder = new Pathfinder(GameServer.collisions,GameServer.PFParameters.maxPathLength);
 
     GameServer.positions = new SpaceMapList(); // positions occupied by moving entities and buildings
@@ -404,6 +404,19 @@ GameServer.dummyPlayer = function(x,y) {
     return player;
 };
 
+// TODO: remove eventually
+GameServer.testMethodB = function(b){
+    console.log('B');
+    return b;
+};
+
+GameServer.testMethodA = function(a){
+    console.log('A');
+    GameServer.testMethodB(a);
+    return a;
+    //return GameServer.testMethodB(a);
+};
+
 GameServer.addNewPlayer = function(socket,data){
     //if(data.selectedClass == undefined) data.selectedClass = 1;
 
@@ -415,7 +428,7 @@ GameServer.addNewPlayer = function(socket,data){
     //console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
     player.setStartingInventory();
-    player.setSettlement(data.selectedSettlement);
+    player.setSettlement(region);
     player.setName(data.characterName);
     player.id = ++GameServer.lastPlayerID;
     //player.classLvlUp(data.selectedClass,false);
@@ -573,8 +586,8 @@ GameServer.lootNPC = function(player,type,ID){
     if(NPC.loot.isEmpty()) return;
     for(var item in NPC.loot.items){
         // TODO: take harvesting ability into consideration
-        player.giveItem(item,NPC.loot.items[item]);
-        player.addNotif('+'+NPC.loot.items[item]+' '+GameServer.itemsData[item].name);
+        player.giveItem(item,NPC.loot.items[item],notify);
+        // player.addNotif('+'+NPC.loot.items[item]+' '+GameServer.itemsData[item].name);
     }
     GameServer.removeEntity(NPC); // TODO: handle differently, leave carcasses
 };
@@ -588,25 +601,31 @@ GameServer.pickUpItem = function(player,itemID){
     GameServer.removeEntity(item);
 };
 
-GameServer.handleBattle = function(player,target,aggro){
+// Called by player clicks or by NPC.checkForAggro()
+GameServer.handleBattle = function(attacker,attacked){
     if(!GameServer.enableBattles){
-        if(!aggro) player.addMsg('Battles are disabled at the moment');
+        if(attacker.isPlayer) attacker.addMsg('Battles are disabled at the moment');
         return false;
     }
-    if(!player.isAvailableForFight() || player.isInFight() || !target.isAvailableForFight() || target.isInFight()) return;
+    if(!attacker.isAvailableForFight() || attacker.isInFight() || !attacked.isAvailableForFight() || attacked.isInFight()) return;
     // TODO: check for proximity
-    var area = GameServer.computeBattleArea(player,target);
+    var area = GameServer.computeBattleArea(attacker,attacked);
     if(!area){
-        if(!aggro) player.addMsg('There is an obstacle in the way!');
+        if(attacker.isPlayer) player.addMsg('There is an obstacle in the way!');
         return false;
     }
     var battle = GameServer.checkBattleOverlap(area);
     if(!battle) battle = new Battle();
-    battle.addFighter(player);
-    battle.addFighter(target);
-    //battle.addArea(area);
+    battle.addFighter(attacker);
+    battle.addFighter(attacked);
     GameServer.addBattleArea(area,battle);
     battle.start();
+    console.warn(attacker.isPlayer,attacked.isPlayer);
+    if(attacker.isPlayer || attacked.isPlayer){
+        var player = (attacker.isPlayer ? attacker : attacked);
+        var foe = (attacker.isPlayer ? attacked : attacker);
+        Prism.logEvent(player,'battle',{category:foe.entityCategory,type:foe.type});
+    }
     return true;
 };
 
@@ -885,6 +904,7 @@ GameServer.handleUse = function(data,socketID){
         player.applyEffects(item,1,true);
         player.takeItem(item,1,true);
     }
+    Prism.logEvent(player,'use',{item:item});
 };
 
 GameServer.handleUnequip = function(data,socketID) {

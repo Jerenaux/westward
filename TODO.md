@@ -168,7 +168,7 @@ Secure
 
 Analytics:
 ---------
-- Pretty print events in admin: new buildings, returning players,  menu opens?, fights, item uses
+- Log: menu opens?, fights (+ print types), kills
 - Session duration stats
 - Bundle events from one player into sessions
 - Log session-wide stats: how many players visit a building during session, do this, do that...
@@ -200,14 +200,10 @@ Performance:
 - Fix "already existing/non-existing" bugs
 - Pathmaking instead of pahfinding?
 - Dont send full building inventories when buying/selling (send arrays of deltas)
-- Fix null values in left-fringe chunks (fixed?)
-->nulls in corrupted chunks likely arise from "undefined" values being converted to null by JSON.stringify
--> Happens on the fringe -> because for these drawShore returns undefined?!
-- listCollisions: don't store water tiles, only shore etc. (! beware of impact on trailblazer)
-- Flattening: second pass to delete water-only chunks based on visibility
-- Flattening based on transparency
 - Look into gzipping maps
 Order:
+- Display sprites in text: http://sbcgames.io/add-sprites-into-font-as-characters/
+- Auto pack tileset.png
 - Clean all tutorial stuff
 - Store buildings data in separate files for the rendering stuff and the economic stuff;
 -> At least for economuc stuff, do it in json5
@@ -217,14 +213,12 @@ Order:
 --> Send only useful fields
 --> Move to JSON5 
 - Look up and put as many parameters as possible in conf
-- Inyegrate battle.processAttack & battle.processAoE?
+- Integrate battle.processAttack & battle.processAoE?
 - Proper initial cursor (using continuous polling or sth?)
 - Central shared list of entities
 - Remove global engine hover/out events, use local ones in animals, buildings...
 - From 10.0: use pointer.worldX and worldY to handle location clicks
-- Add as much stuff as possible to config file
 - Deal differently with net updates when visibility lost (https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
-- Reimplement maps using containers
 - Use containers
 - Clean schemas
 - Use data registry for data exchange between scenes (see Phaser World 119)
@@ -237,10 +231,7 @@ Order:
 - Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
 - Remove "longslot" stuff intended for stretching longslots vertically?
 - Find out how to generate graphics objects (grid tiles, gradients...) programmatically for various uses
-- One clean, central way to manage tilesets, config variables, depth, blitters... (blitter selection in client/Chunk, "mawLayer" field in WorldEditor ...)
 - Give toString method to custom objects to replace [this.constructor.name this.id] ...
-- Decide what to do with assets/maps folder, both for dev and prod
-- Split server in two (game and dev server)
 
 Content:
 -------
@@ -552,6 +543,7 @@ Testing:
 - https://hackernoon.com/testing-node-js-in-2018-10a04dd77391
 - Mocha + Chai :https://hackernoon.com/a-crash-course-on-testing-with-node-js-6c7428d3da02
 - Sinon: https://www.sitepoint.com/sinon-tutorial-javascript-testing-mocks-spies-stubs/
+- https://semaphoreci.com/community/tutorials/best-practices-for-spies-stubs-and-mocks-in-sinon-js
 - Use Jasmine for client-side tests? Selenium for visual ones?
 - Make lists of bugs happening and think about tests to make to catch them, at the finest granularity possible
 - Tests on inventory manipulations, proper display of stats in items (w.r.t names used in Stats)

@@ -95,16 +95,6 @@
             chatTimeout: 5000, //ms
             notificationTimeout: 3000, //ms ; TODO: adapt based on length?
             hearingDistance: 30, // tiles
-            /*starting: { // TODO: sync to db
-                0: {
-                    x: 1203,
-                    y: 154
-                },
-                1: {
-                    x: 512,
-                    y: 654
-                }
-            }*/
         }
     }
 }

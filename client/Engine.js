@@ -3,8 +3,6 @@
  */
 var Engine = {
     // TODO: Move to conf?
-    baseViewWidth: 32,
-    baseViewHeight: 18,
     tileWidth: 32,
     tileHeight: 32,
 
@@ -23,16 +21,14 @@ var Engine = {
     tooltipTextDepth: 18,
 
     // TODO: Move to conf
-    craftInvSize: 5, // max number of ingredients for crafting
     maxPathLength: 36,
 
     debugMarker: true,
     debugCollisions: false,
     dummyUI: false,
-    skipGrass: false,
 
     key: 'game', // key of the scene, for Phaser
-    plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager','LightsPlugin'],
+    plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager'], // 'LightsPlugin'
     playerIsInitialized: false
 };
 
@@ -48,14 +44,10 @@ Engine.preload = function() {
     this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('wolves', 'assets/sprites/animals/wolves.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bears', 'assets/sprites/animals/bears2.png',{frameWidth:56,frameHeight:56});
-    this.load.spritesheet('toadmen', 'assets/sprites/animals/toadmen.png',{frameWidth:48,frameHeight:48});
-
-    // ###### dummy
-    //this.load.atlas('dummy', 'assets/sprites/dummy.png', 'assets/sprites/dummy.json');
+    // this.load.spritesheet('toadmen', 'assets/sprites/animals/toadmen.png',{frameWidth:48,frameHeight:48});
 
     // #################""
 
-    //this.load.image('grass', 'assets/sprites/grassbg.png');
     // Misc
     this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
@@ -238,7 +230,6 @@ Engine.create = function(){
     var masterData = Boot.masterData;
     World.readMasterData(masterData);
     Engine.mapDataLocation = Boot.mapDataLocation;
-    console.log('Master file read, setting up world of size '+World.worldWidth+' x '+World.worldHeight+' with '+Engine.nbLayers+' layers');
 
     tilesetData.atlas = Engine.scene.cache.json.get('tileset').frames;
     tilesetData.config = Engine.scene.cache.json.get('tileset').config;
