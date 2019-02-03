@@ -2,6 +2,7 @@
   "name": "westward",
   "version": "1.0.0",
   "description": "Westward, a collaborative MMO",
+  "private": true,
   "main": "server.js",
   "directories": {
     "test": "test"
@@ -25,6 +26,8 @@
     "sinon": "^7.1.1",
     "spritesmith": "^3.1.1",
     "uglify-js": "^3.1.9",
+    "webpack": "^4.29.0",
+    "webpack-cli": "^3.2.1",
     "xml2js": "^0.4.19"
   },
   "dependencies": {

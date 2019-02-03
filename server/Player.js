@@ -32,7 +32,6 @@ function Player(){
     this.settlement = null;
     this.gold = 0;
     this.inBuilding = -1;
-    this.commitSlots = this.getCommitSlotsShell();
     this.civiclvl = 0;
     this.civicxp = 0;
     this.classxp = {
@@ -69,13 +68,6 @@ function Player(){
 
 Player.prototype = Object.create(MovingEntity.prototype);
 Player.prototype.constructor = Player;
-
-Player.prototype.getCommitSlotsShell = function(){
-    return {
-        slots: [],
-        max: GameServer.characterParameters.variables.commitSlots
-    }
-};
 
 Player.prototype.setIDs = function(dbID,socketID){
     //this.id = GameServer.lastPlayerID++;
@@ -133,9 +125,13 @@ Player.prototype.setName = function(name){
     this.name = name;
 };
 
-Player.prototype.setSettlement = function(sid){
+Player.prototype.setRegion = function(sid){
     this.sid = sid;
-    this.settlement = GameServer.settlements[this.sid];
+    this.region = GameServer.regions[this.sid];
+    this.respawnLocation = {
+        x: this.region.x,
+        y: thi.region.y
+    }
 };
 
 Player.prototype.setStartingInventory = function(){
@@ -189,9 +185,8 @@ Player.prototype.die = function(){
 };
 
 Player.prototype.spawn = function(x,y){ // todo: remove args
-    var respawnLocation = this.settlement.respawnLocation;
-    x = x || respawnLocation.x;
-    y = y || respawnLocation.y;
+    x = x || this.respawnLocation.x;
+    y = y || this.respawnLocation.y;
     this.setProperty('x', x);
     this.setProperty('y', y);
     this.updatePacket.x = x;

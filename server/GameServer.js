@@ -128,9 +128,8 @@ GameServer.readMap = function(mapsPath,test){
         GameServer.initializationMethods = {
             'static_data': null,
             'player_data': GameServer.readPlayersData,
-            'settlements': GameServer.loadSettlements,
+            'regions': GameServer.loadRegions,
             'buildings': GameServer.loadBuildings,
-            'settlementsSetup': GameServer.setUpSettlements,
             'spawn_zones': GameServer.setUpSpawnZones,
             'camps': GameServer.setUpCamps
         };
@@ -221,15 +220,9 @@ GameServer.readPlayersData = function(){
     });
 };
 
-GameServer.loadSettlements = function(){
-    GameServer.SettlementModel.find(function (err, settlements) {
-        if (err) return console.log(err);
-        settlements.forEach(function(data){
-            var settlement = new Settlement(data);
-            settlement.setModel(data);
-        });
-        GameServer.updateStatus();
-    });
+GameServer.loadRegions = function(){
+    GameServer.regions = JSON.parse(fs.readFileSync('./assets/data/regions.json').toString());
+    GameServer.updateStatus();
 };
 
 GameServer.addBuilding = function(data){
@@ -422,13 +415,13 @@ GameServer.addNewPlayer = function(socket,data){
 
     if(!data.characterName){
         GameServer.server.sendError(socket); // TODO: make a dict of errors somewhere
-        return;
+        return null;
     }
     var region = data.selectedSettlement || 0;
     //console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
     player.setStartingInventory();
-    player.setSettlement(region);
+    player.setRegion(region);
     player.setName(data.characterName);
     player.id = ++GameServer.lastPlayerID;
     //player.classLvlUp(data.selectedClass,false);
@@ -436,7 +429,11 @@ GameServer.addNewPlayer = function(socket,data){
 
     var document = new GameServer.PlayerModel(player);
     player.setModel(document);
+    GameServer.saveNewPlayerToDb(socket,player,document);
+    return player;
+};
 
+GameServer.saveNewPlayerToDb = function(socket,player,document){
     document.save(function (err,doc) {
         if (err) return console.error(err);
         console.log('New player created');
@@ -445,7 +442,6 @@ GameServer.addNewPlayer = function(socket,data){
         GameServer.finalizePlayer(socket,player);
         GameServer.server.sendID(socket,mongoID);
     });
-    return player;
 };
 
 GameServer.loadPlayer = function(socket,id){
@@ -1060,13 +1056,6 @@ GameServer.updateNPC = function(){
         var a = GameServer.civs[key];
         a.updateBehavior();
     });
-};
-
-GameServer.setUpSettlements = function(){
-    Object.keys(GameServer.settlements).forEach(function(key){
-        GameServer.settlements[key].computeFoodSurplus();
-    });
-    GameServer.updateStatus();
 };
 
 // #############################

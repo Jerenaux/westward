@@ -151,6 +151,7 @@ server.listen(process.env.PORT || myArgs.port || 8081,function(){
     db.once('open', function() {
         server.db = db;
         console.log('Connection to db established');
+        // TODO: check arg first, then config, then default
         gs.readMap(myArgs.maps || path.join(__dirname,'/maps'),myArgs.test);
     });
 });
