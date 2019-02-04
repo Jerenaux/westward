@@ -87,6 +87,8 @@ function WorldMaker(args){
     this.tileWidth = args.tilew || 32;
     this.tileHeight = args.tileh || 32;
     this.blueprint = args.blueprint;
+
+    this.treeSource = args.treesource;
 }
 
 WorldMaker.prototype.run = function(){
@@ -385,9 +387,14 @@ WorldMaker.prototype.collides = function(tile){
 
 WorldMaker.prototype.createForests = function(){
     console.log('Creating forests ...');
+    if(this.treeSource){
+        this.restoreForest();
+        return;
+    }
     var xRandRange = 7;
     var yRandRange = 7;
     var nbtrees = 0;
+    savedTrees = new SpaceMap();
     console.log(this.greenpixels.length,'green pixels');
     for (var i = 0; i < this.greenpixels.length; i++) {
         var px = this.greenpixels[i];
@@ -399,14 +406,34 @@ WorldMaker.prototype.createForests = function(){
         if(pos.length == 0) continue;
 
         // TODO: move that up, to use tree type in positions computation
-        var tree = getTreeType(g.x,g.y);
-        pos.forEach(function(p){
-            this.trees.add(p[0],p[1],1);
-        },this);
-        this.addDecor(g, 't'+tree);
+        var type = getTreeType(g.x,g.y);
+        this.plantTree(g,pos,type);
+        savedTrees.add(g.x,g.y,type);
         nbtrees++;
     }
-    console.log(nbtrees + ' trees drawn');
+    console.log(nbtrees + ' trees planted');
+    fs.writeFile(path.join(__dirname,'blueprints','trees.json'),JSON.stringify(savedTrees.toList()),function(err){
+        if(err) throw err;
+        console.log('Trees saved');
+    });
+}
+
+WorldMaker.prototype.plantTree = function(g,pos,type){
+    pos.forEach(function(p){
+        this.trees.add(p[0],p[1],1);
+    },this);
+    this.addDecor(g, 't'+type);
+};
+
+WorldMaker.prototype.restoreForest = function(){
+    console.log('Restoring existing forest...');
+    nbtrees = 0;
+    var trees = JSON.parse(fs.readFileSync(path.join(__dirname,'blueprints','trees.json')).toString());
+    trees.forEach(function(t){
+        this.plantTree(t,this.checkPositions(t.x,t.y),t.v);
+        nbtrees++;
+    });
+    console.log(nbtrees + ' trees planted');
 }
 
 function getTreeType(x,y){
@@ -454,7 +481,6 @@ WorldMaker.prototype.checkPositions = function(x,y){
     if(!free) return [];
     return pos;
 }
-
 
 WorldMaker.prototype.writeMasterFile = function(){
     // Write master file
