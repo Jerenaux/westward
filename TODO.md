@@ -66,11 +66,12 @@ World building: move away from tiles:
 [ ] Remove legacy tiles after a while (from png and json) + old tileset files
 
 
-Crafting:
-Requirements:
-- Display recipes + ingredients (after selection?)
-- Display self inventory?
-- Display bld inventory
+Shop & workshop interfaces
+Automatically create areas for lumber camps
+Clickable bushes
+Minimap w/ buildings + settlement screen map
+Check building limits are enforced
+Make big rock formations
 
 
 ##Tutorial:##
