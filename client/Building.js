@@ -63,8 +63,7 @@ var Building = new Phaser.Class({
     },
 
     resetDepth: function(){
-        //this.setDepth(Engine.buildingsDepth + (this.ty - this.depthOffset)/1000);
-        this.setDepth(this.ty);
+        this.setDepth(this.ty-1);
     },
 
     build: function () {

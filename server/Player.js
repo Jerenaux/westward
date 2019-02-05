@@ -130,7 +130,7 @@ Player.prototype.setRegion = function(sid){
     this.region = GameServer.regions[this.sid];
     this.respawnLocation = {
         x: this.region.x,
-        y: thi.region.y
+        y: this.region.y
     }
 };
 
@@ -219,63 +219,6 @@ Player.prototype.applyFoodModifier = function(foodSurplus){ // %
     },this);
     this.foodModifier = foodModifier;
     this.updatePacket.foodSurplus = foodSurplus;
-};
-
-Player.prototype.hasFreeCommitSlot = function(){
-    return this.getSlots().length < this.commitSlots.max;
-};
-
-Player.prototype.takeCommitmentSlot = function(buildingID,notify){
-    this.addToSlots({
-        id: buildingID,
-        type: GameServer.buildings[buildingID].type,
-        stamp: 1
-    });
-    this.syncCommitSlots();
-    if(notify) this.addNotif('Committed to '+GameServer.buildings[buildingID].name);
-};
-
-Player.prototype.updateCommitment = function(){
-    if(!GameServer.isTimeToUpdate('commitment')) return false;
-
-    var slots = this.getSlots();
-    if(slots.length = 0) return;
-    slots.forEach(function(slot){ // Assumes a duration of 1 turn for now
-        this.addNotif('Commitment to '+GameServer.buildings[slot.building].name+' ended');
-    },this);
-
-    this.commitSlots.slots = [];
-    this.syncCommitSlots();
-};
-
-Player.prototype.trimCommitSlots = function(){
-    var slots = [];
-    this.getSlots().forEach(function(slot){
-        //slots.push(GameServer.buildings[slot.building].type);
-        slots.push({
-            type: slot.type,
-            id: slot.id
-        });
-    });
-    var trimmed = this.getCommitSlotsShell();
-    trimmed.slots = slots;
-    return trimmed;
-};
-
-Player.prototype.syncCommitSlots = function(){
-    this.updatePacket.commitSlots = this.trimCommitSlots();
-};
-
-Player.prototype.addToSlots = function(data){
-    this.commitSlots.slots.push(data);
-};
-
-Player.prototype.removeSlot = function(){
-    return this.commitSlots.slots.shift();
-};
-
-Player.prototype.getSlots = function(){
-    return this.commitSlots.slots;
 };
 
 Player.prototype.gainCivicXP = function(inc,notify){
@@ -630,8 +573,7 @@ Player.prototype.getDataFromDb = function(data){
     data.inventory.forEach(function(i){
          this.giveItem(i[0],i[1]);
     },this);
-    this.setSettlement(data.sid);
-    //this.commitSlots = data.commitSlots;
+    this.setRegion(data.sid);
     this.giveGold(data.gold);
 };
 
@@ -719,9 +661,7 @@ Player.prototype.getIndividualUpdatePackage = function(){
     return pkg;
 };
 
-Player.prototype.update = function() {
-    this.updateCommitment();
-};
+Player.prototype.update = function() {};
 
 Player.prototype.remove = function(){
     console.log('removing player');

@@ -481,7 +481,7 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-- Tool to automate db interactions when deploying (SYNC, flushing sth, ...)
+- Tool to sync client buildings with server buildings
 - Tool to gather, uglify and compress all relevant source files 
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?

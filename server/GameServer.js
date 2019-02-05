@@ -351,7 +351,7 @@ GameServer.economyTurn = function(){
         GameServer.settlements[sid].refreshListing();
     }
 
-    GameServer.updateEconomicEntities(GameServer.players); // commit
+    //GameServer.updateEconomicEntities(GameServer.players); // commit
     if(GameServer.elapsedTurns == GameServer.maxTurns) GameServer.elapsedTurns = 0;
 };
 

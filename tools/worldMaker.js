@@ -432,9 +432,9 @@ WorldMaker.prototype.restoreForest = function(){
     trees.forEach(function(t){
         this.plantTree(t,this.checkPositions(t.x,t.y),t.v);
         nbtrees++;
-    });
+    },this);
     console.log(nbtrees + ' trees planted');
-}
+};
 
 function getTreeType(x,y){
     var poles = [Math.floor(World.worldHeight/2),World.worldHeight,0,Math.floor(World.worldHeight/4)]; // Pole for tree 1, 2, 3, 4 respectively
