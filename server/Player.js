@@ -666,7 +666,6 @@ Player.prototype.update = function() {};
 Player.prototype.remove = function(){
     console.log('removing player');
     if(this.battle) this.battle.removeFighter(this);
-    this.settlement.removePlayer(this);
     this.onRemoveAtLocation();
     delete GameServer.players[this.id];
     GameServer.updateVision();
