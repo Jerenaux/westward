@@ -340,12 +340,12 @@ UI.selectClass = function(id){
 UI.displayNameBox = function(){
     var panel = new NamePanel(362,150,300,120,'Character name');
     panel.addText(10,20,'Enter the name of your character.');
-    panel.addBigButton('Next',UI.displaySettlementSelectionMenu);
+    panel.addBigButton('Next',UI.displayRegionSelectionMenu);
     panel.display();
     UI.namePanel = panel;
 };
 
-UI.displaySettlementSelectionMenu =  function(){
+UI.displayRegionSelectionMenu =  function(){
     if(UI.namePanel){
         UI.characterName = UI.namePanel.getValue();
         if(!UI.characterName) return;
@@ -370,7 +370,7 @@ UI.displaySettlementSelectionMenu =  function(){
 
     UI.SSmap = map;
     UI.SScontent = content;
-    Client.requestSettlementData();
+    Client.requestRegionsData();
     //Client.requestCampsData();
 
     var w = 400;
@@ -383,15 +383,15 @@ UI.displaySettlementSelectionMenu =  function(){
 
 };
 
-UI.displaySettlements = function(list){
-    list.forEach(function(e){
-        UI.displaySettlement(e);
-    });
+UI.displayRegions = function(list){
+    for(var e in list.regions){
+        UI.displayRegion(list.regions[e],list.world);
+    }
 };
 
-UI.displaySettlement = function(data){
-    var x = data.x*UI.SSmap.width - 50;
-    var y = data.y*UI.SSmap.height;
+UI.displayRegion = function(data,world){
+    var x = (data.x/world.width)*UI.SSmap.width - 100; // why offset?
+    var y = (data.y/world.height)*UI.SSmap.height;
     var icon = UI.scene.add.image(x,y,'setldiamond');
     icon.setOrigin(0.5,1);
     icon.setInteractive();

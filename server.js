@@ -225,11 +225,11 @@ io.on('connection',function(socket){
        });*/
     });
 
-    socket.on('settlement-data',function(){
-        socket.emit('settlement-data',gs.listSettlements('selectionTrim'));
+    socket.on('region-data',function(){
+        socket.emit('region-data',gs.listRegions());
     });
 
-    socket.on('camps-data',function(){
+    socket.on('camps-data',function(){ge
         socket.emit('camps-data',gs.listCamps());
     });
 

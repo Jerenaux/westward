@@ -1,4 +1,5 @@
 On deploy:
+- Test new player
 - Test a fight
 - Test picking up objects
 - Test selling and buying in a store

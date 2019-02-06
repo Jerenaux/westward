@@ -1082,19 +1082,15 @@ GameServer.listCamps = function(){
     //trimmed.y = (this.fort.y-10)/World.worldHeight;
 };
 
-// List settlements for selection screen
-GameServer.listSettlements = function(trimCallback){
-    trimCallback = trimCallback || 'trim';
-    var settlements = [];
-    for(var id in GameServer.settlements){
-        settlements.push(GameServer.settlements[id][trimCallback]());
-    }
-    return settlements;
-};
-
-// TODO: remove
-GameServer.getSettlements = function(){
-    return GameServer.listSettlements();
+// List settlements for selection screen + to get list of toponyms
+GameServer.listRegions = function(){
+    return {
+        regions: GameServer.regions,
+        world: {
+            width: World.worldWidth,
+            height: World.worldHeight
+        }
+    };
 };
 
 GameServer.insertNewBuilding = function(data){

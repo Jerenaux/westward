@@ -115,11 +115,12 @@ WorldMaker.prototype.run = function(){
     this.outdir = path.join(__dirname,'..','maps'); // TODO: remove dev.mapsPath etc?
     console.log('Writing to',this.outdir);
 
-    var existing = fs.readdirSync(this.outdir);
-    if (existing.length > 0 ){
+    if(!fs.existsSync(this.outdir)) fs.mkdirSync(this.outdir);
+    var content = fs.readdirSync(this.outdir);
+    if (content.length > 0 ){
         console.warn('Deleting existing world');
-        for(var i = 0; i < existing.length; i++){
-            fs.unlinkSync(path.join(this.outdir,existing[i]));
+        for(var i = 0; i < content.length; i++){
+            fs.unlinkSync(path.join(this.outdir,content[i]));
         }
     }
 
@@ -429,7 +430,7 @@ WorldMaker.prototype.createForests = function(){
         if(err) throw err;
         console.log('Trees saved');
     });
-}
+};
 
 WorldMaker.prototype.plantTree = function(g,pos,type){
     // g is {x,y} location
@@ -439,8 +440,8 @@ WorldMaker.prototype.plantTree = function(g,pos,type){
     //TODO: adjust ranges
     for(var x = -3; x < 5; x++){
         for(var y = -3; y < 3; y++){
-            this.woodland.add(g.x+x,g.y+y);
-            this.addResource(g.x,g.y,'wood');
+            this.woodland.add(parseInt(g.x)+x,parseInt(g.y)+y);
+            this.addResource(parseInt(g.x)+x,parseInt(g.y)+y,'wood');
         }
     }
     this.addDecor(g, 't'+type);

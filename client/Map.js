@@ -443,13 +443,13 @@ var Map = new Phaser.Class({
         if(this.target == 'player') { // TODO: remove, always the case if no fort
             this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
             //this.positionCross.setDepth(this.positionCross.depth+1);
-            Engine.player.markers.forEach(function(data){
+            /*Engine.player.markers.forEach(function(data){
                 this.addPin(data.x,data.y,
                     Engine.buildingsData[data.type].name,
                     Engine.buildingsData[data.type].mapicon,
                     Engine.buildingsData[data.type].mapbg
                 );
-            },this);
+            },this);*/
         }
 
         this.setVisible(true);
