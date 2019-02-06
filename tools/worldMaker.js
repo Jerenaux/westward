@@ -26,13 +26,18 @@ function Chunk(id){
     this.defaultTile = 'grass';
     this.layers = [new SpaceMap()];
     this.decor = [];
+    this.wood = new SpaceMap();
 }
 
 Chunk.prototype.addDecor = function(x,y,v){
     this.decor.push([x,y,v]);
 };
 
-Chunk.prototype.add = function(x,y,v){
+Chunk.prototype.addResource = function(x,y,r){
+    if(r == 'wood') this.wood.add(x,y);
+};
+
+Chunk.prototype.add = function(x,y,v){ // Add tile
     this.layers[0].add(x,y,v);
 };
 
@@ -55,7 +60,8 @@ Chunk.prototype.trim = function(){
         y: this.y,
         default: this.defaultTile,
         layers: layers,
-        decor: this.decor
+        decor: this.decor,
+        wood: this.wood.toList(true)
     };
 };
 
@@ -164,8 +170,7 @@ WorldMaker.prototype.create = function(){
         this.chunks[id].write(this.outdir);
     }
 
-    this.writeMasterFile();
-    this.writeCollisions();
+    this.writeDataFiles();
 };
 
 WorldMaker.prototype.shapeWorld = function(contours){
@@ -209,6 +214,13 @@ WorldMaker.prototype.addDecor = function(tile,decor){
     if(!(id in this.chunks)) return;
     var chunk = this.chunks[id];
     chunk.addDecor(tile.x-chunk.x,tile.y-chunk.y,decor);
+};
+
+WorldMaker.prototype.addResource = function(x,y,resource){
+    var id = Utils.tileToAOI({x,y});
+    if(!(id in this.chunks)) return;
+    var chunk = this.chunks[id];
+    chunk.addResource(x-chunk.x,y-chunk.y,resource);
 };
 
 /*function removeTile(tile){
@@ -387,6 +399,7 @@ WorldMaker.prototype.collides = function(tile){
 
 WorldMaker.prototype.createForests = function(){
     console.log('Creating forests ...');
+    this.woodland = new SpaceMap();
     if(this.treeSource){
         this.restoreForest();
         return;
@@ -419,9 +432,17 @@ WorldMaker.prototype.createForests = function(){
 }
 
 WorldMaker.prototype.plantTree = function(g,pos,type){
+    // g is {x,y} location
     pos.forEach(function(p){
         this.trees.add(p[0],p[1],1);
     },this);
+    //TODO: adjust ranges
+    for(var x = -3; x < 5; x++){
+        for(var y = -3; y < 3; y++){
+            this.woodland.add(g.x+x,g.y+y);
+            this.addResource(g.x,g.y,'wood');
+        }
+    }
     this.addDecor(g, 't'+type);
 };
 
@@ -482,10 +503,9 @@ WorldMaker.prototype.checkPositions = function(x,y){
     return pos;
 }
 
-WorldMaker.prototype.writeMasterFile = function(){
+WorldMaker.prototype.writeDataFiles = function(){
     // Write master file
     var master = {
-        //tilesets : tilesetsData.tilesets,
         chunkWidth: this.chunkWidth,
         chunkHeight: this.chunkHeight,
         nbChunksHoriz: this.nbHoriz,
@@ -495,16 +515,18 @@ WorldMaker.prototype.writeMasterFile = function(){
         if(err) throw err;
         console.log('Master written');
     });
-}
-
-WorldMaker.prototype.writeCollisions = function(){
-    // Write master file
+    // Write collisions
     var colls = this.trees.toList().concat(this.collisions.toList(true));
     fs.writeFile(path.join(this.outdir,'collisions.json'),JSON.stringify(colls),function(err){
         if(err) throw err;
         console.log('Collisions written');
     });
-}
+    // Write resources
+    fs.writeFile(path.join(this.outdir,'woodland.json'),JSON.stringify(this.woodland.toList(true)),function(err){
+        if(err) throw err;
+        console.log('Woodland written');
+    });
+};
 
 var args = require('optimist').argv;
 

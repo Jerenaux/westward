@@ -7,6 +7,7 @@ function Chunk(data){
     this.decor = data.decor;
     this.ground = new SpaceMap();
     this.ground.fromList(this.layers[0],true); // true = compact list
+    this.wood = data.wood;
     this.tiles = [];
     this.tilesMap = new SpaceMap();
     this.images = [];
@@ -15,6 +16,9 @@ function Chunk(data){
 }
 
 Chunk.prototype.draw = function(){
+    this.wood.forEach(function(w){
+        this.addResource(this.x+w[0],this.y+w[1]);
+    },this);
     // Ground
     for(var x_ = 0; x_ < World.chunkWidth; x_++){
         for(var y_ = 0; y_ < World.chunkHeight; y_++) {
@@ -107,6 +111,10 @@ Chunk.prototype.drawImage = function(x,y,image){
 
 Chunk.prototype.addCollision = function(cx,cy){
     Engine.collisions.add(cx, cy, 1);
+};
+
+Chunk.prototype.addResource = function(x,y){
+    Engine.resources.add(x,y);
 };
 
 Chunk.prototype.erase = function(){

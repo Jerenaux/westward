@@ -61,6 +61,8 @@ Chunk.prototype.addCollision = function(cx,cy){
     }
 };
 
+Chunk.prototype.addResource = function(x,y){}
+
 var BLIT = false;
 var COLL = 'client';
 

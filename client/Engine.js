@@ -1871,34 +1871,14 @@ Engine.removeChunk = function(id){
     Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
 };
 
-Engine.addResource = function(origin,shape){
-    for(var x = shape.x/32; x < (shape.x+shape.width)/32; x++){
-        for(var y = shape.y/32; y < (shape.y+shape.height)/32; y++) {
-            Engine.resources.add(origin.x+x,origin.y+y,1);
-        }
-    }
-};
-
-/*Engine.addCollision = function(x,y,tile){
-    if(Engine.isColliding(tile)) {
-        Engine.collisions.add(x,y,1);
-        if(Engine.debugCollisions) Engine.scene.add.rectangle((x*32)+16,(y*32)+16, 32,32, 0xee0000).setAlpha(0.7);
-    }
-};*/
-
 // Check if a non-walkable tile is at a given position or not
-Engine.checkCollision = function(x,y){
-    return !!Engine.collisions.get(x,y);
+Engine.checkCollision = function(x,y){ // returns true if tile is not walkable
+    return Engine.collisions.has(x,y);
 };
 
 Engine.checkResource = function(x,y){
-    return !!Engine.resources.get(x,y);
+    return Engine.resources.has(x,y);
 };
-
-// Check if a given tile type is walkable or not
-/*Engine.isColliding = function(tile){ // tile is the index of the tile in the tileset
-    return Engine.collidingTiles.includes(tile);
-};*/
 
 Engine.handleKeyboard = function(event){
     //console.log(event);
