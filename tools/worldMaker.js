@@ -79,7 +79,6 @@ function WorldMaker(args){
     this.chunks = {};
     this.coasts = [];
     
-    this.trees = new SpaceMap();
     this.land = new SpaceMap();
     this.collisions = new SpaceMap();
     
@@ -166,6 +165,7 @@ WorldMaker.prototype.create = function(){
     this.createLakes();
     this.drawShore();
     this.createForests();
+    this.makeSpawnZones();
 
     for(var id in this.chunks){
         this.chunks[id].write(this.outdir);
@@ -201,9 +201,10 @@ WorldMaker.prototype.shapeWorld = function(contours){
 
 WorldMaker.prototype.isBusy = function(node){
     if(!isInWorldBounds(node.x,node.y)) return true;
-    var id = Utils.tileToAOI(node);
-    var chunk = this.chunks[id];
-    return !!chunk.get(node.x-chunk.x,node.y-chunk.y);
+    return this.collisions.has(node.x,node.y);
+    // var id = Utils.tileToAOI(node);
+    // var chunk = this.chunks[id];
+    // return !!chunk.get(node.x-chunk.x,node.y-chunk.y);
 }
 
 function isInWorldBounds(x,y){
@@ -400,6 +401,7 @@ WorldMaker.prototype.collides = function(tile){
 
 WorldMaker.prototype.createForests = function(){
     console.log('Creating forests ...');
+    this.trees = new SpaceMap();
     this.woodland = new SpaceMap();
     if(this.treeSource){
         this.restoreForest();
@@ -408,7 +410,7 @@ WorldMaker.prototype.createForests = function(){
     var xRandRange = 7;
     var yRandRange = 7;
     var nbtrees = 0;
-    savedTrees = new SpaceMap();
+    // savedTrees = new SpaceMap();
     console.log(this.greenpixels.length,'green pixels');
     for (var i = 0; i < this.greenpixels.length; i++) {
         var px = this.greenpixels[i];
@@ -422,11 +424,11 @@ WorldMaker.prototype.createForests = function(){
         // TODO: move that up, to use tree type in positions computation
         var type = getTreeType(g.x,g.y);
         this.plantTree(g,pos,type);
-        savedTrees.add(g.x,g.y,type);
+        // savedTrees.add(g.x,g.y,type);
         nbtrees++;
     }
     console.log(nbtrees + ' trees planted');
-    fs.writeFile(path.join(__dirname,'blueprints','trees.json'),JSON.stringify(savedTrees.toList()),function(err){
+    fs.writeFile(path.join(__dirname,'blueprints','trees.json'),JSON.stringify(this.trees.toList()),function(err){
         if(err) throw err;
         console.log('Trees saved');
     });
@@ -435,7 +437,7 @@ WorldMaker.prototype.createForests = function(){
 WorldMaker.prototype.plantTree = function(g,pos,type){
     // g is {x,y} location
     pos.forEach(function(p){
-        this.trees.add(p[0],p[1],1);
+        this.collisions.add(p[0],p[1],1);
     },this);
     //TODO: adjust ranges
     for(var x = -3; x < 5; x++){
@@ -444,6 +446,7 @@ WorldMaker.prototype.plantTree = function(g,pos,type){
             this.addResource(parseInt(g.x)+x,parseInt(g.y)+y,'wood');
         }
     }
+    this.trees.add(g.x,g.y,type);
     this.addDecor(g, 't'+type);
 };
 
@@ -495,13 +498,31 @@ WorldMaker.prototype.checkPositions = function(x,y){
             var ry = y-yi;
             pos.push([rx,ry]);
             if(this.isBusy({x:rx,y:ry})) free = false;
-            if(this.trees.get(rx,ry)) free = false;
+            // if(this.trees.has(rx,ry)) free = false;
             if(!free) break;
         }
         if(!free) break;
     }
     if(!free) return [];
     return pos;
+}
+
+WorldMaker.prototype.makeSpawnZones = function(){
+    var nbzones = 100;
+    for(var i = 0; i < nbzones; i++){
+        var x = Utils.randomInt(0,World.worldWidth);
+        var y = Utils.randomInt(0,World.worldHeight);
+        var w = Utils.randomInt(5,World.chunkWidth);
+        var h = Utils.randomInt(5,World.chunkHeight);
+        for(var u = 0; u < w; u++){
+            for(var v = 0; v < h; v++){
+                var tree = this.trees.get(x+u,y+v);
+                if(tree){
+                    this.addDecor({x:x+u,y:y+v+1}, 'b1');
+                }
+            }
+        }
+    }
 }
 
 WorldMaker.prototype.writeDataFiles = function(){
@@ -517,7 +538,8 @@ WorldMaker.prototype.writeDataFiles = function(){
         console.log('Master written');
     });
     // Write collisions
-    var colls = this.trees.toList().concat(this.collisions.toList(true));
+    // var colls = this.trees.toList().concat(this.collisions.toList(true));
+    var colls = this.collisions.toList(true);
     fs.writeFile(path.join(this.outdir,'collisions.json'),JSON.stringify(colls),function(err){
         if(err) throw err;
         console.log('Collisions written');
