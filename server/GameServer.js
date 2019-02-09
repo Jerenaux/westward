@@ -48,6 +48,7 @@ var SpawnZone = require('./SpawnZone.js').SpawnZone;
 var Camp = require('./Camp.js').Camp;
 var Pathfinder =  require('../shared/Pathfinder.js').Pathfinder;
 var Prism = require('./Prism.js').Prism;
+var Schemas = require('./schemas.js');
 
 GameServer.updateStatus = function(){
     console.log('Successful initialization step:',GameServer.initializationSequence[GameServer.initializationStep++]);
@@ -69,53 +70,9 @@ GameServer.updateStatus = function(){
 };
 
 GameServer.createModels = function(){
-    var settlementSchema = mongoose.Schema({
-        id: {type: Number, min: 0, required: true},
-        name: {type: String, required: true},
-        description: String,
-        population: {type: Number, min: 0, required: true},
-        level: {type: Number, min: 0, required: true},
-        x: {type: Number, min: 0, required: true},
-        y: {type: Number, min: 0, required: true}
-    });
-    var buildingSchema = mongoose.Schema({
-        id: {type: Number, min: 0, required: true},
-        x: {type: Number, min: 0, required: true},
-        y: {type: Number, min: 0, required: true},
-        type: {type: Number, min: 0, required: true},
-        //sid: {type: Number, min: 0, required: true},
-        owner: {type: Number, min: 0},
-        ownerName: {type: String},
-        inventory: {type: [[]], set:function(inventory){
-                return inventory.toList(true); // true: filter zeroes
-            }},
-        prices: mongoose.Schema.Types.Mixed,
-        gold: {type: Number, min: 0},
-        built: Boolean,
-        health: {type: Number, min: 0}
-    });
-    var playerSchema = mongoose.Schema({
-        id: {type: Number, min: 0, required: true},
-        name: {type: String, required: true},
-        x: {type: Number, min: 0, required: true},
-        y: {type: Number, min: 0, required: true},
-        gold: {type: Number, min: 0},
-        civiclvl: {type: Number, min: 0},
-        civicxp: {type: Number, min: 0},
-        classxp: mongoose.Schema.Types.Mixed,
-        classlvl: mongoose.Schema.Types.Mixed,
-        ap: mongoose.Schema.Types.Mixed,
-        equipment: mongoose.Schema.Types.Mixed,
-        commitSlots: mongoose.Schema.Types.Mixed,
-        sid: {type: Number, min: 0, required: true},
-        inventory: {type: [[]], set:function(inventory){
-                return inventory.toList(true); // true: filter zeroes
-            }}
-        // stats are NOT saved, as they only consist in base values + modifiers; modifiers are re-applied contextually, not saved
-    });
-    GameServer.SettlementModel = mongoose.model('Settlement', settlementSchema);
-    GameServer.BuildingModel = mongoose.model('Building', buildingSchema);
-    GameServer.PlayerModel = mongoose.model('Player', playerSchema);
+    GameServer.SettlementModel = mongoose.model('Settlement', Schemas.settlementSchema);
+    GameServer.BuildingModel = mongoose.model('Building', Schemas.buildingSchema);
+    GameServer.PlayerModel = mongoose.model('Player', Schemas.playerSchema);
 };
 
 GameServer.readMap = function(mapsPath,test){
