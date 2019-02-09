@@ -65,10 +65,13 @@ Bubble.prototype.shift = function(dx,dy){
     this.y += dy;
 };
 
-Bubble.prototype.updatePosition = function(nx,ny){
+Bubble.prototype.updatePosition = function(nx,ny,depth){
     var dx = nx - this.x;
     var dy = ny - this.y;
     this.shift(dx,dy);
+    this.container.forEach(function(c){
+        c.setDepth(depth);
+    })
 };
 
 Bubble.prototype.finalize = function(){

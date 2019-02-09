@@ -68,8 +68,9 @@ World building: move away from tiles:
 
 
 Shop & workshop interfaces
-Clickable bushes
+Clickable bushes, pins
 Minimap w/ buildings + settlement screen map
+Fog of war
 Check building limits are enforced
 Make big rock formations
 
@@ -169,7 +170,7 @@ Secure
 
 Analytics:
 ---------
-- Log: menu opens?, fights (+ print types), kills
+- Log: tutorial begins, progress (each step) and ends, menu opens?, fights (+ print types), kills
 - Button to flush events
 - Bundle events from one player into sessions
 - Log session-wide stats: duration, how many players visit a building during session, do this, do that...

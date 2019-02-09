@@ -1937,15 +1937,15 @@ Engine.moveToClick = function(pointer){
     Engine.computePath(Engine.getMouseCoordinates(pointer).tile);
 };
 
-Engine.computePath = function(position){
-    //console.log('going to ',position);
+Engine.computePath = function(position,nextTo){
+    console.log('going to ',position);
     var x = position.x;
     var y = position.y;
-    if(Engine.checkCollision(x,y)) return;
+    // if(!nextTo && Engine.checkCollision(x,y)) return;
     var start = Engine.player.getPFstart();
     if(Engine.player.moving) Engine.player.stop();
 
-    var path = Engine.pathFinder.findPath(start,{x:x,y:y});
+    var path = Engine.pathFinder.findPath(start,{x:x,y:y},false,true); // seek = false, nextTo = true
     if(!path) {
         Engine.player.talk('It\'s too far!');
         return;
@@ -2255,10 +2255,10 @@ Engine.processNPCClick = function(target){
     }
 };
 
-Engine.processItemClick = function(target){
+Engine.processItemClick = function(target,nextTo){
     if(Engine.inPanel) return;
     Engine.player.setDestinationAction(3,target.id,target.tx,target.ty); // 3 for item
-    Engine.computePath({x:target.tx,y:target.ty});
+    Engine.computePath({x:target.tx,y:target.ty},nextTo);
 };
 
 Engine.requestBattleAttack = function(target){

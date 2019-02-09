@@ -67,6 +67,7 @@ var UI = {
         UI.setCursor();
 
         UI.hovering = [];
+        UI.hoverFlower = 0;
 
         this.input.setTopOnly(false);
         this.input.on('pointermove',function(event){

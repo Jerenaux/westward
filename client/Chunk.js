@@ -148,17 +148,26 @@ Chunk.prototype.postDrawTile = function(){}; // Used in editor
 Chunk.prototype.postDrawImage = function(x,y,image,sprite){
     var hover = this.getAtlasData(image,'hover');
     if(!hover) return;
+    this.id = 0;
+    this.tx = Math.floor(x);
+    this.ty = Math.floor(y);
     sprite.setInteractive();
     sprite.on('pointerover',function(){
-        console.log(sprite.frame);
+        UI.hoverFlower++;
         sprite.formerFrame = sprite.frame.name;
         sprite.setFrame(hover);
         Engine.hideMarker();
         UI.setCursor('item'); // TODO: use UI.manageCursor() instead?
     });
     sprite.on('pointerout',function(){
+        UI.hoverFlower--;
         sprite.setFrame(sprite.formerFrame);
-        Engine.showMarker();
-        UI.setCursor();
+        if(UI.hoverFlower <= 0) {
+            Engine.showMarker();
+            UI.setCursor();
+        }
     });
+    sprite.on('pointerdown',function(){
+        if(!BattleManager.inBattle) Engine.processItemClick(this,true);
+    }.bind(this));
 };

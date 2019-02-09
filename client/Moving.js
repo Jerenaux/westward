@@ -138,7 +138,7 @@ var Moving = new Phaser.Class({
     },
 
     frameByFrameUpdate: function(){
-        if(this.bubble) this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
+        if(this.bubble) this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY,this.depth);
     },
 
     computeOrientation: function(fromX,fromY,toX,toY){

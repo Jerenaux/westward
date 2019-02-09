@@ -165,6 +165,7 @@ WorldMaker.prototype.create = function(){
     this.createLakes();
     this.drawShore();
     this.createForests();
+    this.addMisc();
     this.makeSpawnZones();
 
     for(var id in this.chunks){
@@ -503,27 +504,45 @@ WorldMaker.prototype.checkPositions = function(x,y){
     return pos;
 };
 
+WorldMaker.prototype.addMisc = function(){
+    var nbrocks = 11200; //TODO: conf
+    for(var i = 0; i < nbrocks; i++){
+        // console.log('zone');
+        var x = Utils.randomInt(0,World.worldWidth);
+        var y = Utils.randomInt(0,World.worldHeight);
+        if(!this.isBusy({x,y})) {
+            // console.log('rock at',x,y);
+            this.addDecor({x,y},'r'+Utils.randomInt(1,4)); // TODO: upper bound conf
+        }
+    }
+};
+
 WorldMaker.prototype.makeSpawnZones = function(){
     var nbzones = 100; // TODO: conf
-    var nbbush = 4; // TODO: conf
-    var contour = [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1],[2,-1]];
     for(var i = 0; i < nbzones; i++){
         // console.log('zone');
         var x = Utils.randomInt(0,World.worldWidth);
         var y = Utils.randomInt(0,World.worldHeight);
         var w = Utils.randomInt(5,World.chunkWidth);
         var h = Utils.randomInt(5,World.chunkHeight);
-        for(var u = 0; u < w; u++){
-            for(var v = 0; v < h; v++){
-                var tree = this.trees.get(x+u,y+v);
-                if(tree){
-                    Utils.shuffle(contour);
-                    for(var j = 0; j < nbbush; j++){
-                        var c = contour[j];
-                        var loc = {x:x+u+c[0],y:y+v+c[1]};
-                        this.addDecor(loc, 'b3');
-                        // console.log('bush at',loc);
-                    }
+        this.makeFloraZone(x,y,w,h);
+    }
+    this.makeFloraZone(477,665,26,15);
+};
+
+WorldMaker.prototype.makeFloraZone = function(x,y,w,h){
+    var nbbush = 4; // TODO: conf
+    var contour = [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1],[2,-1]];
+    for(var u = 0; u < w; u++){
+        for(var v = 0; v < h; v++){
+            var tree = this.trees.get(x+u,y+v);
+            if(tree){
+                Utils.shuffle(contour);
+                for(var j = 0; j < nbbush; j++){
+                    var c = contour[j];
+                    var loc = {x:x+u+c[0],y:y+v+c[1]};
+                    this.addDecor(loc, 'b3');
+                    // console.log('bush at',loc);
                 }
             }
         }

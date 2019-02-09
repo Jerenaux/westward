@@ -143,19 +143,23 @@
     },
     "rock_1":{
       "frame": {"x":0,"y":32,"w":32,"h":32},
-      "anchor": {"x":0,"y":0}
+      "anchor": {"x":0,"y":0},
+      "collisions": [[0,0]]
     },
     "rock_2":{
       "frame": {"x":32,"y":32,"w":32,"h":32},
-      "anchor": {"x":0,"y":0}
+      "anchor": {"x":0,"y":0},
+      "collisions": [[0,0]]
     },
     "rock_3":{
       "frame": {"x":64,"y":32,"w":32,"h":32},
-      "anchor": {"x":0,"y":0}
+      "anchor": {"x":0,"y":0},
+      "collisions": [[0,0]]
     },
     "rock_4":{
       "frame": {"x":96,"y":32,"w":32,"h":32},
-      "anchor": {"x":0,"y":0}
+      "anchor": {"x":0,"y":0},
+      "collisions": [[0,0]]
     }
   },
   "shorthands" : {
