@@ -183,12 +183,9 @@ WorldMaker.prototype.shapeWorld = function(contours){
         var tiles = [];
         for (var j = 0; j < nbPts - 1; j++) {
             var s = lines[j];
-            //var e = (j == nbPts - 1 ? lines[0] : lines[j + 1]);
             var e = lines[j+1];
-            // console.log(s,e);
             s = this.pixelToTile({x:s[0],y:s[1]});
             e = this.pixelToTile({x:e[0],y:e[1]});
-            // console.log(s,e);
             var addTiles = Geometry.addCorners(Geometry.straightLine(s, e));
             if (j > 0) addTiles.shift();
             tiles = tiles.concat(addTiles);
@@ -205,7 +202,7 @@ WorldMaker.prototype.isBusy = function(node){
     // var id = Utils.tileToAOI(node);
     // var chunk = this.chunks[id];
     // return !!chunk.get(node.x-chunk.x,node.y-chunk.y);
-}
+};
 
 function isInWorldBounds(x,y){
     return !(x < 0 || y < 0 || x >= World.worldWidth || y >= World.worldHeight);
@@ -251,6 +248,7 @@ WorldMaker.prototype.addCoastTiles = function(tiles){
     tiles.forEach(function(t) {
         if(!isInWorldBounds(t.x,t.y)) return;
         this.addTile(t,'c');
+        this.collisions.add(t.x,t.y);
         coast.push(t);
     },this);
     this.coasts.push(coast);
@@ -312,7 +310,7 @@ WorldMaker.prototype.createLakes = function(){
         }
     }
     console.log(nblakes,'lakes created');
-}
+};
 
 WorldMaker.prototype.fill = function(fillNode,stop){ // fills the world with water, but stops at coastlines
     if(this.isBusy(fillNode)) return;
@@ -334,7 +332,6 @@ WorldMaker.prototype.fill = function(fillNode,stop){ // fills the world with wat
                 y: node.y + contour[i][1]
             };
             if(!isInWorldBounds(candidate.x,candidate.y)) continue;
-            //if(lake.has(candidate.x,candidate.y)) continue;
             if(!this.isBusy(candidate)) queue.push(candidate);
         }
 
@@ -342,7 +339,7 @@ WorldMaker.prototype.fill = function(fillNode,stop){ // fills the world with wat
         if(counter >= stoppingCritetion) break;
     }
     return counter;
-}
+};
 
 WorldMaker.prototype.hasCoast = function(x,y){
     if(!isInWorldBounds(x,y)) return true; // When looking for a neighbor out of bounds, assume it's present; allows seamless connections with borders
@@ -505,7 +502,7 @@ WorldMaker.prototype.checkPositions = function(x,y){
     }
     if(!free) return [];
     return pos;
-}
+};
 
 WorldMaker.prototype.makeSpawnZones = function(){
     var nbzones = 100;

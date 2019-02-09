@@ -492,8 +492,7 @@ Deployment:
 
 Design document:
 ---------------
-- Use stumps for depleting forests
-- Re-read every month (last: ?, read up to "commitment")
+- Re-read every month (last: done with "crafting")
 - Decide list of buildings, items, ...
 - Make Excel tables (crafting, inventory, bestiary, ...)
 - Make powerpoint
