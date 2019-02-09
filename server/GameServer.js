@@ -409,7 +409,7 @@ GameServer.loadPlayer = function(socket,id){
             if (err) return console.warn(err);
             if(!doc) {
                 console.log('ERROR : no matching document');
-                GameServer.addNewPlayer(socket, {});
+                //GameServer.addNewPlayer(socket, {});
                 return;
             }
             var player = new Player();

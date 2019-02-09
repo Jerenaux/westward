@@ -78,13 +78,13 @@ function WorldMaker(args){
     this.outdir = '';
     this.chunks = {};
     this.coasts = [];
-    
+
     this.land = new SpaceMap();
     this.collisions = new SpaceMap();
-    
+
     this.tileset = null;
     this.patterns = null;
-    
+
     this.nbHoriz = args.nbhoriz;
     this.nbVert = args.nbvert;
     this.chunkWidth = args.chunkw || 30;
@@ -153,7 +153,7 @@ WorldMaker.prototype.storeImage = function(image){
 WorldMaker.prototype.create = function(){
 
     /*
-    * README: 
+    * README:
     * - Shores are first populated with 'c' tiles based on blueprint (shapeWorld)
     * - Then the seas are filled, using 'c' tiles as stop tiles (createLakes)
     * - Then the shores are actually drawn, replacing 'c' based on neighbors (drawShore)
