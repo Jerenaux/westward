@@ -421,7 +421,6 @@ WorldMaker.prototype.createForests = function(){
         // TODO: move that up, to use tree type in positions computation
         var type = getTreeType(g.x,g.y);
         this.plantTree(g,pos,type);
-        // savedTrees.add(g.x,g.y,type);
         nbtrees++;
     }
     console.log(nbtrees + ' trees planted');
@@ -437,8 +436,8 @@ WorldMaker.prototype.plantTree = function(g,pos,type){
         this.collisions.add(p[0],p[1],1);
     },this);
     //TODO: adjust ranges
-    for(var x = -3; x < 5; x++){
-        for(var y = -3; y < 3; y++){
+    for(var x = -4; x < 6; x++){
+        for(var y = -6; y < 5; y++){
             this.woodland.add(parseInt(g.x)+x,parseInt(g.y)+y);
             this.addResource(parseInt(g.x)+x,parseInt(g.y)+y,'wood');
         }
@@ -505,8 +504,11 @@ WorldMaker.prototype.checkPositions = function(x,y){
 };
 
 WorldMaker.prototype.makeSpawnZones = function(){
-    var nbzones = 100;
+    var nbzones = 100; // TODO: conf
+    var nbbush = 4; // TODO: conf
+    var contour = [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1],[2,-1]];
     for(var i = 0; i < nbzones; i++){
+        // console.log('zone');
         var x = Utils.randomInt(0,World.worldWidth);
         var y = Utils.randomInt(0,World.worldHeight);
         var w = Utils.randomInt(5,World.chunkWidth);
@@ -515,12 +517,18 @@ WorldMaker.prototype.makeSpawnZones = function(){
             for(var v = 0; v < h; v++){
                 var tree = this.trees.get(x+u,y+v);
                 if(tree){
-                    this.addDecor({x:x+u,y:y+v+1}, 'b1');
+                    Utils.shuffle(contour);
+                    for(var j = 0; j < nbbush; j++){
+                        var c = contour[j];
+                        var loc = {x:x+u+c[0],y:y+v+c[1]};
+                        this.addDecor(loc, 'b3');
+                        // console.log('bush at',loc);
+                    }
                 }
             }
         }
     }
-}
+};
 
 WorldMaker.prototype.writeDataFiles = function(){
     // Write master file

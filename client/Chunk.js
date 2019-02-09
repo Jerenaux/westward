@@ -12,6 +12,7 @@ function Chunk(data){
     this.tilesMap = new SpaceMap();
     this.images = [];
     this.displayed = false;
+    this.leavesPos = [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1],[2,-1]];
     this.draw();
 }
 
@@ -41,7 +42,7 @@ Chunk.prototype.draw = function(){
             var y = this.y + parseInt(data[1]);
             var name = tilesetData.shorthands[tile];
             if(!(tile in tilesetData.shorthands)) return;
-            if(name && name.indexOf('water') != -1) name = tilesetData.config.waterPrefix+name;
+            // if(name && name.indexOf('water') != -1) name = tilesetData.config.waterPrefix+name;
             this.drawTile(x, y, name);
         },this);
     },this);
@@ -93,9 +94,14 @@ Chunk.prototype.getAtlasData = function(image,data,longname){
 };
 
 Chunk.prototype.drawImage = function(x,y,image){
+    var offset = this.getAtlasData(image,'offset');
+    if(offset){
+        x += offset.x;
+        y += offset.y;
+    }
     var img = Engine.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',tilesetData.shorthands[image]);
-    var offset = this.getAtlasData(image,'depthOffset') || 0;
-    img.setDepth(y+offset);
+    var depthOffset = this.getAtlasData(image,'depthOffset') || 0;
+    img.setDepth(y+depthOffset);
     //console.log(y,this.getAtlasData(image,'depthOffset'),img.depth);
     var anchor = this.getAtlasData(image,'anchor');
     img.setOrigin(anchor.x,anchor.y);
@@ -104,6 +110,18 @@ Chunk.prototype.drawImage = function(x,y,image){
         collisions.forEach(function(coll){
             this.addCollision(x+coll[0],y+coll[1]);
         },this);
+    }
+    if(image[0] == 't' && Utils.randomInt(1,10) > 6){ // TODO: conf
+        var nbleaves = 5; //TODO: conf
+        Utils.shuffle(this.leavesPos);
+        for(var j = 0; j < nbleaves; j++) {
+            var c = this.leavesPos[j];
+            var type = Utils.randomInt(1,3);
+            var lx = x+c[0];
+            var ly = y+c[1];
+            this.drawImage(lx,ly,'l'+type);
+            if(this.hasWater(lx,ly)) console.warn('on water');
+        }
     }
     this.images.push(img);
     this.postDrawImage(x,y,image,img);

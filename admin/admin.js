@@ -53,7 +53,7 @@ app.filter('processImg',function(){
 
 function prefix(txt,time,name){
     var t = new Date(time);
-    var dateStr = "["+t.getDate()+"/"+(t.getMonth()+1)+" "+t.getHours()+":"+t.getMinutes()+":"+t.getSeconds()+"]"; 
+    var dateStr = "["+t.getDate()+"/"+(t.getMonth()+1)+" "+t.getHours()+":"+("0"+t.getMinutes()).slice(-2)+":"+("0"+t.getSeconds()).slice(-2)+"]"; // Slice: to ensure 0 padding
     var tokens = [dateStr,txt];
     if(name) tokens.splice(1,0,'['+name+']');
     return tokens.join(" ");

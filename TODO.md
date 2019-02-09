@@ -68,7 +68,6 @@ World building: move away from tiles:
 
 
 Shop & workshop interfaces
-Automatically create areas for lumber camps
 Clickable bushes
 Minimap w/ buildings + settlement screen map
 Check building limits are enforced
