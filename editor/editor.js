@@ -219,6 +219,12 @@ function add(x,y,image){
     chunk.drawImage(x,y,image);
 }
 
+function snap (){
+    game.renderer.snapshot(function(img){
+        document.getElementById("render").src = img.src;
+    });
+}
+
 var VIEW_WIDTH = 30;
 var VIEW_HEIGHT = 20;
 var TILE_WIDTH = 32;

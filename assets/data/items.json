@@ -131,6 +131,8 @@
   "14":{
     "atlas": "items2",
     "frame":"sunflower",
+    "isPlant": true,
+    "bushFrame": "bush_3",
     "name": "Butterflower",
     "desc": "Flower with regenerative properties used to brew potions.",
     "isMaterial": true,

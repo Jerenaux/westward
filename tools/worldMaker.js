@@ -589,6 +589,11 @@ WorldMaker.prototype.writeDataFiles = function(){
         if(err) throw err;
         console.log('Woodland written');
     });
+    // Items
+    fs.writeFile(path.join(this.outdir,'items.json'),JSON.stringify(this.items.toList(true)),function(err){
+        if(err) throw err;
+        console.log('Items written');
+    });
 };
 
 var args = require('optimist').argv;

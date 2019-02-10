@@ -69,7 +69,6 @@ World building: move away from tiles:
 
 
 Shop & workshop interfaces
-Clickable bushes, pins
 Minimap w/ buildings + settlement screen map
 Fog of war
 Check building limits are enforced

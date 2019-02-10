@@ -7,24 +7,25 @@ var Item = new Phaser.Class({
 
     initialize: function Item() {
         CustomSprite.call(this, Engine.scene, 0, 0);
-        this.setDepth(2);
-        //this.setOrigin(-0.3);
         this.setInteractive();
         this.entityType = 'item';
     },
 
     setUp: function(data){
         var itemData = Engine.itemsData[data.type];
-        this.setTexture(itemData.atlas);
-        this.setFrame(itemData.frame);
+        var atlas = (itemData.isPlant ? 'tileset' : itemData.atlas);
+        var frame = (itemData.isPlant ? itemData.bushFrame : itemData.frame);
+        this.setTexture(atlas);
+        this.setFrame(frame);
         this.setVisible(true);
         this.orientationPin = new OrientationPin('item',itemData.atlas,itemData.frame);
 
         this.setTilePosition(data.x,data.y,true);
+        this.setDepth(this.ty+0.5); // for e.g. when wood spawns on the roots of a tree
+
         this.x += World.tileWidth/2;
         this.y += World.tileHeight/2;
         this.setID(data.id);
-
         this.name = itemData.name;
         Engine.items[this.id] = this;
         Engine.entityManager.addToDisplayList(this);
@@ -62,6 +63,7 @@ var Item = new Phaser.Class({
 
     handleOver: function(){
         UI.manageCursor(1,'item',this);
+        // console.log(this.depth);
     },
 
     handleOut: function(){

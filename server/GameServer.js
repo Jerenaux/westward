@@ -87,6 +87,7 @@ GameServer.readMap = function(mapsPath,test){
             'player_data': GameServer.readPlayersData,
             'regions': GameServer.loadRegions,
             'buildings': GameServer.loadBuildings,
+            'items': GameServer.loadItems,
             'spawn_zones': GameServer.setUpSpawnZones,
             'camps': GameServer.setUpCamps
         };
@@ -178,7 +179,7 @@ GameServer.readPlayersData = function(){
 };
 
 GameServer.loadRegions = function(){
-    GameServer.regions = JSON.parse(fs.readFileSync('./assets/data/regions.json').toString());
+    GameServer.regions = JSON.parse(fs.readFileSync(pathmodule.join('assets','data','regions.json')).toString());
     GameServer.updateStatus();
 };
 
@@ -202,9 +203,24 @@ GameServer.loadBuildings = function(){
     });
 };
 
+GameServer.loadItems = function(){
+    var path = pathmodule.join(GameServer.mapsPath,'items.json');
+    /*TODO eventually:
+    * - On server start, check if items.json exist. If yes, read it, create items from it and store in db, then delete file.
+    * - If not, fetch items data from db.
+    * - For now, server restars daily, it will re-read items.json and recreate items, thus
+    * acting as a simili "respawn" mechanism, good enough for now
+    * */
+    //if(!fs.existsSync(path)) return;
+    var items = JSON.parse(fs.readFileSync(path).toString());
+    items.forEach(function(item){
+        GameServer.addItem(item[0], item[1], item[2]);
+    },this);
+    GameServer.updateStatus();
+};
 
 GameServer.setUpSpawnZones = function(){
-    GameServer.spawnZonesData = JSON.parse(fs.readFileSync('./assets/data/spawnzones.json').toString());
+    GameServer.spawnZonesData = JSON.parse(fs.readFileSync(pathmodule.join('assets','data','spawnzones.json')).toString());
     GameServer.spawnZones = [];
 
     if(!config.get('wildlife.nolife')) {
