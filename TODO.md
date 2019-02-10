@@ -69,6 +69,7 @@ World building: move away from tiles:
 
 
 Shop & workshop interfaces
+Quid feathers spawn?
 Minimap w/ buildings + settlement screen map
 Fog of war
 Check building limits are enforced
