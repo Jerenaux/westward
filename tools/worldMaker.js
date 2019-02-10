@@ -81,6 +81,7 @@ function WorldMaker(args){
 
     this.land = new SpaceMap();
     this.collisions = new SpaceMap();
+    this.items = new SpaceMap();
 
     this.tileset = null;
     this.patterns = null;
@@ -151,7 +152,6 @@ WorldMaker.prototype.storeImage = function(image){
 };
 
 WorldMaker.prototype.create = function(){
-
     /*
     * README:
     * - Shores are first populated with 'c' tiles based on blueprint (shapeWorld)
@@ -408,7 +408,6 @@ WorldMaker.prototype.createForests = function(){
     var xRandRange = 7;
     var yRandRange = 7;
     var nbtrees = 0;
-    // savedTrees = new SpaceMap();
     console.log(this.greenpixels.length,'green pixels');
     for (var i = 0; i < this.greenpixels.length; i++) {
         var px = this.greenpixels[i];
@@ -436,7 +435,7 @@ WorldMaker.prototype.plantTree = function(g,pos,type){
     pos.forEach(function(p){
         this.collisions.add(p[0],p[1],1);
     },this);
-    //TODO: adjust ranges
+    //TODO: adjust ranges / conf
     for(var x = -4; x < 6; x++){
         for(var y = -6; y < 5; y++){
             this.woodland.add(parseInt(g.x)+x,parseInt(g.y)+y);
@@ -445,6 +444,7 @@ WorldMaker.prototype.plantTree = function(g,pos,type){
     }
     this.trees.add(g.x,g.y,type);
     this.addDecor(g, 't'+type);
+    this.addRandomItem(g.x,g.y,'tree');
 };
 
 WorldMaker.prototype.restoreForest = function(){
@@ -486,16 +486,15 @@ function getTreeType(x,y){
 
 WorldMaker.prototype.checkPositions = function(x,y){
     var free = true;
-    var xspan = 3;
+    var xspan = 3; //TODO: conf
     var yspan = 2;
     var pos = [];
     for(var xi = 0; xi < xspan; xi++){
         for(var yi = 0; yi < yspan; yi++){
-            var rx = x+xi;
-            var ry = y-yi;
+            var rx = parseInt(x)+xi;
+            var ry = parseInt(y)-yi;
             pos.push([rx,ry]);
             if(this.isBusy({x:rx,y:ry})) free = false;
-            // if(this.trees.has(rx,ry)) free = false;
             if(!free) break;
         }
         if(!free) break;
@@ -510,9 +509,11 @@ WorldMaker.prototype.addMisc = function(){
         // console.log('zone');
         var x = Utils.randomInt(0,World.worldWidth);
         var y = Utils.randomInt(0,World.worldHeight);
-        if(!this.isBusy({x,y})) {
+        if(!this.isBusy({x:x,y:y})) {
             // console.log('rock at',x,y);
             this.addDecor({x,y},'r'+Utils.randomInt(1,4)); // TODO: upper bound conf
+            this.collisions.add(x,y);
+            this.addRandomItem(x,y,'stone');
         }
     }
 };
@@ -542,10 +543,25 @@ WorldMaker.prototype.makeFloraZone = function(x,y,w,h){
                     var c = contour[j];
                     var loc = {x:x+u+c[0],y:y+v+c[1]};
                     this.addDecor(loc, 'b3');
+                    this.items.add(loc.x,loc.y,14); // butterflower
                     // console.log('bush at',loc);
                 }
             }
         }
+    }
+};
+
+WorldMaker.prototype.addRandomItem = function(x,y,decor){
+    var cnt = (decor == 'tree'
+        ? [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1],[2,-1]]
+        : [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]]);
+    var item = (decor == 'tree' ? 7 : 26); // wood or stone
+    if(Utils.randomInt(1,10) > 8){ // TODO: adjust
+        var c = Utils.randomElement(cnt);
+        var ix = parseInt(x)+c[0];
+        var iy = parseInt(y)+c[1];
+        this.items.add(ix,iy,item);
+        // console.log('adding',item,'at',ix,iy);
     }
 };
 

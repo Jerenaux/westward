@@ -148,9 +148,9 @@ Chunk.prototype.postDrawTile = function(){}; // Used in editor
 Chunk.prototype.postDrawImage = function(x,y,image,sprite){
     var hover = this.getAtlasData(image,'hover');
     if(!hover) return;
-    this.id = 0;
-    this.tx = Math.floor(x);
-    this.ty = Math.floor(y);
+    sprite.id = 0;
+    sprite.tx = Math.floor(x);
+    sprite.ty = Math.floor(y);
     sprite.setInteractive();
     sprite.on('pointerover',function(){
         UI.hoverFlower++;
@@ -168,6 +168,6 @@ Chunk.prototype.postDrawImage = function(x,y,image,sprite){
         }
     });
     sprite.on('pointerdown',function(){
-        if(!BattleManager.inBattle) Engine.processItemClick(this,true);
-    }.bind(this));
+        if(!BattleManager.inBattle) Engine.processItemClick(sprite,true);
+    });
 };

@@ -17,6 +17,7 @@ Testing
 World Building
 
 Misc:
+- Split trees in two images with different depths
 - Adapt animations and delays for firearms
 - findcell in battle doesn't take path to get there into accoung (may be within radius but require to go around an obstacle!)
 - Change battle priority when player joins fight
@@ -170,7 +171,7 @@ Secure
 
 Analytics:
 ---------
-- Log: tutorial begins, progress (each step) and ends, menu opens?, fights (+ print types), kills
+- Log: tutorial begins, progress (each step) and ends, item pick ups/loot, menu opens?, fights (+ print types), kills
 - Button to flush events
 - Bundle events from one player into sessions
 - Log session-wide stats: duration, how many players visit a building during session, do this, do that...
