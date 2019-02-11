@@ -82,6 +82,7 @@ function WorldMaker(args){
     this.land = new SpaceMap();
     this.collisions = new SpaceMap();
     this.items = new SpaceMap();
+    this.mapPixels = new SpaceMap();
 
     this.tileset = null;
     this.patterns = null;
@@ -173,6 +174,7 @@ WorldMaker.prototype.create = function(){
     }
 
     this.writeDataFiles();
+    this.makeWorldmap();
 };
 
 WorldMaker.prototype.shapeWorld = function(contours){
@@ -326,6 +328,7 @@ WorldMaker.prototype.fill = function(fillNode,stop){ // fills the world with wat
         // put a tile at location
         this.addTile(node,'w');
         this.collisions.add(node.x,node.y,1);
+        this.mapPixels.add(node.x,node.y,'w');
         // expand
         for(var i = 0; i < contour.length; i++){
             var candidate = {
@@ -375,6 +378,7 @@ WorldMaker.prototype.drawShore = function(){
             }else{
                 this.addTile(c,tile); // Will replace any 'c'
                 if(this.collides(tile)) this.collisions.add(x,y,1);
+                this.mapPixels.add(tile.x,tile.y,'c');
             }
         },this);
     },this);
@@ -593,6 +597,20 @@ WorldMaker.prototype.writeDataFiles = function(){
     fs.writeFile(path.join(this.outdir,'items.json'),JSON.stringify(this.items.toList(true)),function(err){
         if(err) throw err;
         console.log('Items written');
+    });
+};
+
+WorldMaker.prototype.makeWorldmap = function(){
+    var wm = this;
+    var hexes  = {
+        'c': Jimp.rgbaToInt(0, 0, 0, 0),
+        'w': Jimp.rgbaToInt(13, 59, 89, 0)
+    }
+    var map = new Jimp(World.worldWidth, World.worldHeight, Jimp.rgbaToInt(255, 255, 255, 1), function (err, image) { // 0x0, 
+        wm.mapPixels.toList(true).forEach(function(px){
+            image.setPixelColor(hexes[px[2]], px[0], px[1]); // sets the colour of that pixel
+        });
+        image.write(path.join(wm.outdir,'worldmap.png'));
     });
 };
 
