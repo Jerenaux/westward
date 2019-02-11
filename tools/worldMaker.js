@@ -378,7 +378,7 @@ WorldMaker.prototype.drawShore = function(){
             }else{
                 this.addTile(c,tile); // Will replace any 'c'
                 if(this.collides(tile)) this.collisions.add(x,y,1);
-                this.mapPixels.add(tile.x,tile.y,'c');
+                this.mapPixels.add(x,y,'c');
             }
         },this);
     },this);
@@ -602,13 +602,22 @@ WorldMaker.prototype.writeDataFiles = function(){
 
 WorldMaker.prototype.makeWorldmap = function(){
     var wm = this;
-    var hexes  = {
-        'c': Jimp.rgbaToInt(0, 0, 0, 0),
-        'w': Jimp.rgbaToInt(13, 59, 89, 0)
-    }
-    var map = new Jimp(World.worldWidth, World.worldHeight, Jimp.rgbaToInt(255, 255, 255, 1), function (err, image) { // 0x0, 
+    var hexes  = {     // last two characters: ff = visible, 00 = not
+        'c': 0x000000ff,
+        'w': 0x68b89fff,
+        't': 0x7e5d2eff
+    };
+    new Jimp(World.worldWidth, World.worldHeight, 0xf9de99ff, function (err, image) { // 0x0,
         wm.mapPixels.toList(true).forEach(function(px){
-            image.setPixelColor(hexes[px[2]], px[0], px[1]); // sets the colour of that pixel
+            image.setPixelColor(hexes[px[2]], px[0], px[1]); // sets the colour of that pixel hexes[px[2]]
+        });
+        wm.trees.toList(true).forEach(function(t){
+            var x = t[0];
+            var y = t[1];
+            image.setPixelColor(hexes['t'], x, y);
+            image.setPixelColor(hexes['t'], x+1, y);
+            image.setPixelColor(hexes['t'], x, y-1);
+            image.setPixelColor(hexes['t'], x+1, y-1);
         });
         image.write(path.join(wm.outdir,'worldmap.png'));
     });
