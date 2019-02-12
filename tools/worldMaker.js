@@ -546,7 +546,7 @@ WorldMaker.prototype.makeFloraZone = function(x,y,w,h){
                 for(var j = 0; j < nbbush; j++){
                     var c = contour[j];
                     var loc = {x:x+u+c[0],y:y+v+c[1]};
-                    this.addDecor(loc, 'b3');
+                    this.addDecor(loc, 'b4');
                     this.items.add(loc.x,loc.y,14); // butterflower
                     // console.log('bush at',loc);
                 }

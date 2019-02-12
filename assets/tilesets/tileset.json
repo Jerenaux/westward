@@ -129,6 +129,12 @@
       "anchor": {"x":0.5,"y":0.5},
       "collisions": [[0,0]]
     },
+    "bush_4":{
+      "frame": {"x":5,"y":68,"w":34,"h":37},
+      "offset": {"x":0.5,"y":0.5},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
     "leaves_1":{
       "frame": {"x":0,"y":0,"w":32,"h":32},
       "anchor": {"x":0,"y":0}
@@ -184,6 +190,7 @@
     "b1":"bush_1",
     "b2":"bush_2",
     "b3":"bush_3",
+    "b4":"bush_4",
     "l1":"leaves_1",
     "l2":"leaves_2",
     "l3":"leaves_3",

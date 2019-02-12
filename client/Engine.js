@@ -1938,7 +1938,7 @@ Engine.moveToClick = function(pointer){
 };
 
 Engine.computePath = function(position,nextTo){
-    console.log('going to ',position);
+    // console.log('going to ',position);
     var x = position.x;
     var y = position.y;
     // if(!nextTo && Engine.checkCollision(x,y)) return;

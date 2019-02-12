@@ -220,6 +220,7 @@ GameServer.loadItems = function(){
     items.forEach(function(item){
         GameServer.addItem(item[0], item[1], item[2]);
     },this);
+    // GameServer.addItem(474,682,14);
     GameServer.updateStatus();
 };
 

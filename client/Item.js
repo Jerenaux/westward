@@ -21,7 +21,7 @@ var Item = new Phaser.Class({
         this.orientationPin = new OrientationPin('item',itemData.atlas,itemData.frame);
 
         this.setTilePosition(data.x,data.y,true);
-        this.setDepth(this.ty+0.5); // for e.g. when wood spawns on the roots of a tree
+        this.setDepth(this.ty+1); // for e.g. when wood spawns on the roots of a tree
 
         this.x += World.tileWidth/2;
         this.y += World.tileHeight/2;
