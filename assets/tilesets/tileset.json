@@ -166,6 +166,12 @@
       "frame": {"x":96,"y":32,"w":32,"h":32},
       "anchor": {"x":0,"y":0},
       "collisions": [[0,0]]
+    },
+    "clovers":{
+      "frame": {"x":80,"y":70,"w":32,"h":29},
+      "offset": {"x":0.5,"y":0.5},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
     }
   },
   "shorthands" : {
@@ -197,6 +203,7 @@
     "r1":"rock_1",
     "r2":"rock_2",
     "r3":"rock_3",
-    "r4":"rock_4"
+    "r4":"rock_4",
+    "cl":"clovers"
   }
 }
