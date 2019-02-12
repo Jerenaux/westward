@@ -59,6 +59,7 @@ GameServer.updateStatus = function(){
             GameServer.setUpdateLoops();
             GameServer.onInitialized();
             GameServer.startEconomy();
+            if(GameServer.testcb) GameServer.testcb.call();
         } else {
             var next = GameServer.initializationSequence[GameServer.initializationStep];
             console.log('Moving on to next step:', next);
@@ -75,7 +76,7 @@ GameServer.createModels = function(){
     GameServer.PlayerModel = mongoose.model('Player', Schemas.playerSchema);
 };
 
-GameServer.readMap = function(mapsPath,test){
+GameServer.readMap = function(mapsPath,test,cb){
     if(test){
         GameServer.initializationMethods = {
             'static_data': null,
@@ -92,6 +93,7 @@ GameServer.readMap = function(mapsPath,test){
             'camps': GameServer.setUpCamps
         };
     }
+    GameServer.testcb = cb;
     GameServer.initializationSequence = Object.keys(GameServer.initializationMethods);
     //console.log(GameServer.initializationSequence);
 
@@ -168,8 +170,10 @@ GameServer.getBootParams = function(socket,data){
 };
 
 GameServer.readPlayersData = function(){
+    console.log('Reading player data ...');
     GameServer.PlayerModel.find(function(err,players){
         if (err) return console.log(err);
+        console.log('Players data fetched');
         players.forEach(function(data){
             if(data.id > GameServer.lastPlayerID) GameServer.lastPlayerID = data.id;
         });

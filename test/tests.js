@@ -6,6 +6,7 @@ var request = require('request');
 var io = require('socket.io-client');
 var path = require('path');
 var sinon = require('sinon');
+var mongoose = require('mongoose');
 
 var mapsDir = path.join(__dirname,'..','maps');
 var gs = require('../server/GameServer.js').GameServer;
@@ -31,12 +32,19 @@ describe('test', function(){
 
 describe('GameServer',function(){
     var stubs = [];
-    beforeEach(function() {
-        // TODO: stub the async calls in initialization sequence?
-         gs.readMap(mapsDir); // TODO: read from config
-         gs.server = {
-             sendError: function(){}
-         };
+    before(function(done) {
+        this.timeout(3000);
+        mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward');
+        var db = mongoose.connection;
+        db.on('error', console.error.bind(console, 'connection error:'));
+        db.once('open', function() {
+            console.log('Connection to db established');
+            // TODO: read from config
+            gs.readMap(mapsDir,false,done); 
+            gs.server = {
+                sendError: function(){}
+            };
+        });
     });
 
     it('addNewPlayer',function(){
