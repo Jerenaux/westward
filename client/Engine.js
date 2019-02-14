@@ -80,10 +80,10 @@ Engine.preload = function() {
     this.load.image('longscroll', 'assets/sprites/longscroll.png');
     this.load.image('radial3', 'assets/sprites/scroll_mask.png');
     this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
-    this.load.image('fullmap', 'assets/sprites/fortmap.png');
+    /*this.load.image('fullmap', 'assets/sprites/fortmap.png');
     this.load.image('fullmap_zoomed', 'assets/sprites/fortmap_01.png');
-    this.load.image('minimap', 'assets/sprites/minimap2s.png');
-    //this.load.image('mapring', 'assets/sprites/ring.png');
+    this.load.image('minimap', 'assets/sprites/minimap2s.png');*/
+    this.load.image('worldmap', 'maps/worldmap.jpg');
 
     // SFX
     Engine.audioFiles = [];
@@ -127,33 +127,6 @@ Engine.preload = function() {
     this.load.json('civs', 'assets/data/civs.json');
 
     if(Client.tutorial) this.load.json('tutorials', 'assets/data/tutorials.json');
-
-    /*Engine.collidingTiles = []; // list of tile ids that collide (from tilesets.json)
-    Engine.tilesheets = [];
-
-    for(var i = 0, firstgid = 1; i < Boot.tilesets.length; i++){
-        var tileset = Boot.tilesets[i];
-        var absolutePath = tileset.image;
-        var tokens = absolutePath.split('\\');
-        var img = tokens[tokens.length-1];
-        var path = 'assets/tilesets/'+img;
-
-        if(Engine.useTilemaps){
-            this.load.image(tileset.name, path);
-        }else{
-            this.load.spritesheet(tileset.name, path,{frameWidth:tileset.tilewidth,frameHeight:tileset.tileheight});
-        }
-        Engine.tilesheets.push(tileset.name);
-        //console.log(tileset.name,firstgid);
-
-        var columns = Math.floor(tileset.imagewidth/Engine.tileWidth);
-        var tilecount = columns * Math.floor(tileset.imageheight/Engine.tileHeight);
-        // Add to the list of collidingTiles the colliding tiles in the tileset
-        Engine.collidingTiles = Engine.collidingTiles.concat(tileset.collisions.map(function(tile){
-            return tile+firstgid;
-        }));
-        firstgid += tilecount;
-    }*/
 };
 
 Engine.entityManager = {
@@ -901,12 +874,10 @@ Engine.makeUI = function(){
         'character': Engine.makeCharacterMenu(),
         'construction': Engine.makeConstructionMenu(),
         'crafting': Engine.makeCraftingMenu(),
-        //'fort': Engine.makeFortMenu(),
         'inventory': Engine.makeInventory(statsPanel),
         'map': Engine.makeMapMenu(),
         //'messages': Engine.makeMessagesMenu(),
         'production': Engine.makeProductionMenu(),
-        //'staff': Engine.makeStaffMenu(),
         'trade': Engine.makeTradeMenu(),
         'wip': Engine.makeWipMenu()
     };

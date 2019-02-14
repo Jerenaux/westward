@@ -70,10 +70,12 @@ World building: move away from tiles:
 
 Shop & workshop interfaces
 Quid feathers spawn?
-Minimap w/ buildings + settlement screen map
+Update region selection map
+Display buildings on map
+Sync & display resources on map
 Fog of war
 Check building limits are enforced
-
+ 
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.

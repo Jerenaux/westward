@@ -7,7 +7,7 @@ var Map = new Phaser.Class({
     //Extends: Phaser.GameObjects.RenderTexture,
 
     initialize: function Map(x, y, viewW, viewH, dragWidth, dragHeight, target, showToponyms) {
-        CustomSprite.call(this, UI.scene, x, y, 'fullmap');
+        CustomSprite.call(this, UI.scene, x, y, 'worldmap');
         //Phaser.GameObjects.RenderTexture.call(this, UI.scene, x, y, 2400,1824);
         //UI.scene.add.displayList.add(this);
         //this.draw('fullmap',0,0);
@@ -15,6 +15,7 @@ var Map = new Phaser.Class({
         this.setDepth(2);
         this.setScrollFactor(0);
         this.setVisible(false);
+        this.setScale(0.5);
 
         /*this.container = UI.scene.add.container(x,y);
         this.container.setDepth(2);
@@ -222,12 +223,12 @@ var Map = new Phaser.Class({
     },
 
     zoomIn: function(){
-        this.setTexture('fullmap_zoomed');
+        this.setScale(1);
         this.zoom();
     },
 
     zoomOut: function(){
-        this.setTexture('fullmap');
+        this.setScale(0.5);
         this.zoom();
     },
 

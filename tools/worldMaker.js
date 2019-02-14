@@ -610,7 +610,8 @@ WorldMaker.prototype.makeWorldmap = function(){
     var hexes  = {     // last two characters: ff = visible, 00 = not
         'c': 0x000000ff,
         'w': 0x68b89fff,
-        't': 0x7e5d2eff
+        't': 0x7e5d2eff,
+        'g': 0x809c3bff
     };
     new Jimp(World.worldWidth*2, World.worldHeight*2, 0xf9de99ff, function (err, image) { // 0x0,
         wm.mapPixels.toList(true).forEach(function(px){
@@ -622,15 +623,23 @@ WorldMaker.prototype.makeWorldmap = function(){
             image.setPixelColor(color, x, y+1); 
             image.setPixelColor(color, x+1, y+1); 
         });
-        // wm.trees.toList(true).forEach(function(t){
-        //     var x = t[0];
-        //     var y = t[1];
-        //     image.setPixelColor(hexes['t'], x, y);
-        //     image.setPixelColor(hexes['t'], x+1, y);
-        //     image.setPixelColor(hexes['t'], x, y-1);
-        //     image.setPixelColor(hexes['t'], x+1, y-1);
-        // });
-        image.write(path.join(wm.outdir,'worldmap.png'));
+        wm.trees.toList(true).forEach(function(t){
+            var x = t[0]*2;
+            var y = t[1]*2;
+            for(var xi = 0; xi < 4; xi++){
+                for(var yi = 0; yi > -4; yi--){
+                    image.setPixelColor(hexes['t'], x+xi, y+yi);
+                }
+            }
+            x -= 2;
+            y -= 10;
+            for(var xi = 0; xi < 8; xi++){
+                for(var yi = 0; yi < 8; yi++){
+                    image.setPixelColor(hexes['g'], x+xi, y+yi);
+                }
+            }
+        });
+        image.write(path.join(wm.outdir,'worldmap.jpg'));
     });
 };
 
