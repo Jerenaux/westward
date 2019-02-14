@@ -536,7 +536,7 @@ WorldMaker.prototype.makeSpawnZones = function(){
             var h = Utils.randomInt(5,World.chunkHeight);
             this.makeFloraZone(x,y,w,h,item.item,item.decor);
         }
-    });
+    },this);
     this.makeFloraZone(477,665,26,15);
 };
 
@@ -612,18 +612,24 @@ WorldMaker.prototype.makeWorldmap = function(){
         'w': 0x68b89fff,
         't': 0x7e5d2eff
     };
-    new Jimp(World.worldWidth, World.worldHeight, 0xf9de99ff, function (err, image) { // 0x0,
+    new Jimp(World.worldWidth*2, World.worldHeight*2, 0xf9de99ff, function (err, image) { // 0x0,
         wm.mapPixels.toList(true).forEach(function(px){
-            image.setPixelColor(hexes[px[2]], px[0], px[1]); // sets the colour of that pixel hexes[px[2]]
+            var x = px[0]*2
+            var y = px[1]*2
+            var color = hexes[px[2]]
+            image.setPixelColor(color, x, y); 
+            image.setPixelColor(color, x+1, y); 
+            image.setPixelColor(color, x, y+1); 
+            image.setPixelColor(color, x+1, y+1); 
         });
-        wm.trees.toList(true).forEach(function(t){
-            var x = t[0];
-            var y = t[1];
-            image.setPixelColor(hexes['t'], x, y);
-            image.setPixelColor(hexes['t'], x+1, y);
-            image.setPixelColor(hexes['t'], x, y-1);
-            image.setPixelColor(hexes['t'], x+1, y-1);
-        });
+        // wm.trees.toList(true).forEach(function(t){
+        //     var x = t[0];
+        //     var y = t[1];
+        //     image.setPixelColor(hexes['t'], x, y);
+        //     image.setPixelColor(hexes['t'], x+1, y);
+        //     image.setPixelColor(hexes['t'], x, y-1);
+        //     image.setPixelColor(hexes['t'], x+1, y-1);
+        // });
         image.write(path.join(wm.outdir,'worldmap.png'));
     });
 };

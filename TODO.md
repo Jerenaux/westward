@@ -73,7 +73,6 @@ Quid feathers spawn?
 Minimap w/ buildings + settlement screen map
 Fog of war
 Check building limits are enforced
-Make big rock formations
 
 
 ##Tutorial:##
