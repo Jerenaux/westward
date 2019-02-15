@@ -70,6 +70,8 @@ World building: move away from tiles:
 
 Shop & workshop interfaces
 Quid feathers spawn?
+!! collisions with stone items
+Random stone frames (before and not after)
 Minimap w/ buildings + settlement screen map
 Fog of war
 Check building limits are enforced

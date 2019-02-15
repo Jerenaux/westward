@@ -13,13 +13,18 @@ var Item = new Phaser.Class({
 
     setUp: function(data){
         var itemData = Engine.itemsData[data.type];
-        var atlas = (itemData.isPlant ? 'tileset' : itemData.atlas);
+        /*var atlas = (itemData.isPlant ? 'tileset' : itemData.atlas);
         var frame = (itemData.isPlant ? itemData.bushFrames[0] : itemData.frame);
         if(itemData.isPlant){
             this.isPlant = true;
             this.outFrame = itemData.bushFrames[0];
             this.inFrame = itemData.bushFrames[1];
-        }
+        }*/
+        var atlas = 'tileset';
+        var frame = Utils.randomElement(itemData.envFrames);
+        this.outFrame = frame;
+        this.inFrame = frame+'_lit';
+
         this.setTexture(atlas);
         this.setFrame(frame);
         this.setVisible(true);
@@ -68,7 +73,8 @@ var Item = new Phaser.Class({
 
     handleOver: function(){
         UI.manageCursor(1,'item',this);
-        if(this.isPlant) this.setFrame(this.inFrame);
+        //if(this.isPlant) this.setFrame(this.inFrame);
+        this.setFrame(this.inFrame);
         // console.log(this.depth);
     },
 
@@ -76,6 +82,7 @@ var Item = new Phaser.Class({
         UI.manageCursor(0,'item');
         //UI.setCursor();
         UI.tooltip.hide();
-        if(this.isPlant) this.setFrame(this.outFrame);
+        //if(this.isPlant) this.setFrame(this.outFrame);
+        this.setFrame(this.outFrame);
     }
 });

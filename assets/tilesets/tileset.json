@@ -121,16 +121,21 @@
       "frame": {"x":392,"y":53,"w":37,"h":40},
       "offset": {"x":0.5,"y":0.5},
       "anchor": {"x":0.5,"y":0.5},
-      "collisions": [[0,0]],
-      "hover": "bush3_lit"
+      "collisions": [[0,0]]
     },
-    "bush3_lit":{
+    "bush_3_lit":{
       "frame": {"x":433,"y":52,"w":37,"h":42},
       "anchor": {"x":0.5,"y":0.5},
       "collisions": [[0,0]]
     },
     "bush_4":{
       "frame": {"x":5,"y":68,"w":34,"h":37},
+      "offset": {"x":0.5,"y":0.5},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
+    "bush_5":{
+      "frame": {"x":10,"y":253,"w":32,"h":32},
       "offset": {"x":0.5,"y":0.5},
       "anchor": {"x":0.5,"y":0.5},
       "collisions": [[0,0]]

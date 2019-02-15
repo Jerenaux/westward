@@ -515,9 +515,10 @@ WorldMaker.prototype.addMisc = function(){
         var y = Utils.randomInt(0,World.worldHeight);
         if(!this.isBusy({x:x,y:y})) {
             // console.log('rock at',x,y);
-            this.addDecor({x,y},'r'+Utils.randomInt(1,4)); // TODO: upper bound conf
+            // this.addDecor({x,y},'r'+Utils.randomInt(1,4)); // TODO: upper bound conf
             this.collisions.add(x,y);
-            this.addRandomItem(x,y,'stone');
+            // this.addRandomItem(x,y,'stone');
+            this.items.add(x,y,26);
         }
     }
 };
@@ -525,22 +526,24 @@ WorldMaker.prototype.addMisc = function(){
 WorldMaker.prototype.makeSpawnZones = function(){
     var items = [ // TODO: conf
         {item:14,decor:'b4',nbzones:100},
-        {item:18,decor:null,nbzones:100}
+        {item:18,decor:null,nbzones:100},
+        {item:8,decor:null,nbzones:100}
     ];
     items.forEach(function(item){
         for(var i = 0; i < item.nbzones; i++){
             // console.log('zone');
-            var x = Utils.randomInt(0,World.worldWidth);
-            var y = Utils.randomInt(0,World.worldHeight);
+            var x = Utils.randomInt(0,World.worldWidth-1);
+            var y = Utils.randomInt(0,World.worldHeight-1);
             var w = Utils.randomInt(5,World.chunkWidth);
             var h = Utils.randomInt(5,World.chunkHeight);
-            this.makeFloraZone(x,y,w,h,item.item,item.decor);
+            this.makeFloraZone(x,y,w,h,item);
         }
-    });
-    this.makeFloraZone(477,665,26,15);
+    },this);
+    this.makeFloraZone(477,665,26,15,items[0]);
+    this.makeFloraZone(498,697,26,15,items[2]);
 };
 
-WorldMaker.prototype.makeFloraZone = function(x,y,w,h,item,decor){
+WorldMaker.prototype.makeFloraZone = function(x,y,w,h,data){
     var nbbush = 4; // TODO: conf
     var contour = [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1],[2,-1]];
     for(var u = 0; u < w; u++){
@@ -551,8 +554,8 @@ WorldMaker.prototype.makeFloraZone = function(x,y,w,h,item,decor){
                 for(var j = 0; j < nbbush; j++){
                     var c = contour[j];
                     var loc = {x:x+u+c[0],y:y+v+c[1]};
-                    if(decor) this.addDecor(loc, decor);
-                    this.items.add(loc.x,loc.y,item); // butterflower
+                    if(data.decor) this.addDecor(loc, data.decor);
+                    this.items.add(loc.x,loc.y,data.item);
                     // console.log('bush at',loc);
                 }
             }
@@ -562,7 +565,7 @@ WorldMaker.prototype.makeFloraZone = function(x,y,w,h,item,decor){
 
 WorldMaker.prototype.addRandomItem = function(x,y,decor){
     var cnt = (decor == 'tree'
-        ? [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1],[2,-1]]
+        ? [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1]]
         : [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]]);
     var item = (decor == 'tree' ? 7 : 26); // wood or stone
     if(Utils.randomInt(1,10) > 8){ // TODO: adjust
