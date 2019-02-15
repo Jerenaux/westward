@@ -8,6 +8,7 @@ var xml2js = require('xml2js');
 var config = require('config');
 var Jimp = require("jimp");
 var rwc = require('random-weighted-choice');
+var quickselect = require('quickselect');
 
 var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
@@ -369,7 +370,7 @@ WorldMaker.prototype.drawShore = function(){
             var nbrh = this.getNeighborhood(x,y);
             tile = this.patterns[nbrh.join('')];
             if(tile === undefined) {
-                console.log(x,y,nbrh.join(''));
+                // console.log(x,y,nbrh.join(''));
                 undef++;
             }
 
@@ -613,22 +614,80 @@ WorldMaker.prototype.makeWorldmap = function(){
     var hexes  = {     // last two characters: ff = visible, 00 = not
         'c': 0x000000ff,
         'w': 0x68b89fff,
-        't': 0x7e5d2eff
+        't': 0x7e5d2eff,
+        'g': 0x809c3bff
     };
-    new Jimp(World.worldWidth, World.worldHeight, 0xf9de99ff, function (err, image) { // 0x0,
+    new Jimp(World.worldWidth*2, World.worldHeight*2, 0xf9de99ff, function (err, image) { // 0x0,
         wm.mapPixels.toList(true).forEach(function(px){
-            image.setPixelColor(hexes[px[2]], px[0], px[1]); // sets the colour of that pixel hexes[px[2]]
+            var x = px[0]*2
+            var y = px[1]*2
+            var color = hexes[px[2]]
+            image.setPixelColor(color, x, y);
+            image.setPixelColor(color, x+1, y);
+            image.setPixelColor(color, x, y+1);
+            image.setPixelColor(color, x+1, y+1);
         });
         wm.trees.toList(true).forEach(function(t){
-            var x = t[0];
-            var y = t[1];
-            image.setPixelColor(hexes['t'], x, y);
-            image.setPixelColor(hexes['t'], x+1, y);
-            image.setPixelColor(hexes['t'], x, y-1);
-            image.setPixelColor(hexes['t'], x+1, y-1);
+            var x = t[0]*2;
+            var y = t[1]*2;
+            for(var xi = 0; xi < 4; xi++){
+                for(var yi = 0; yi > -4; yi--){
+                    image.setPixelColor(hexes['t'], x+xi, y+yi);
+                }
+            }
+            x -= 2;
+            y -= 10;
+            for(var xi = 0; xi < 8; xi++){
+                for(var yi = 0; yi < 8; yi++){
+                    image.setPixelColor(hexes['g'], x+xi, y+yi);
+                }
+            }
         });
         image.write(path.join(wm.outdir,'worldmap.png'));
+        image = wm.medianBlur(image,'worldmap2.png');
     });
+};
+
+WorldMaker.prototype.medianBlur = function(image,name){
+    var wm = this;
+    var iw = image.bitmap.width*4; // because each "px"is 4 values
+    var ih = image.bitmap.height*4;
+    new Jimp(image.bitmap.width, image.bitmap.height, 0xf9de99ff, function (err, newimage) {
+        image.scan(0, 0, image.bitmap.width, image.bitmap.height, function (x, y, idx) {
+            if (x == image.bitmap.width - 1 && y == image.bitmap.height - 1) {
+                // image scan finished, do your stuff
+                newimage.write(path.join(wm.outdir,name));
+                return;
+              }
+            // idx is the position start position of this rgba tuple in the bitmap Buffer
+            var r = wm.colorMedian(iw,ih,this.bitmap.data,idx,0); //this.bitmap.data[idx + 0];
+            var g = wm.colorMedian(iw,ih,this.bitmap.data,idx,1); //this.bitmap.data[idx + 1];
+            var b = wm.colorMedian(iw,ih,this.bitmap.data,idx,2); // this.bitmap.data[idx + 2];
+            var a = this.bitmap.data[idx + 3];
+            // color = image.getPixelColor(x,y)
+            color = Jimp.rgbaToInt(r, g, b, a);
+            newimage.setPixelColor(color, x,y);
+        });
+    });
+}
+
+WorldMaker.prototype.colorMedian = function(w,h,data,idx,offset){
+    var idcs = Utils.listNeighborsInGrid(idx,w,h,4);
+
+    var px = []
+    idcs.forEach(function(i){
+        px.push(data[i+offset]);
+    });
+
+    var  l = px.length;
+    var n = (l%2 == 0 ? (l/2)-1 : (l-1)/2);
+    quickselect(px,n);
+    // console.log(w,h);
+    // console.log(idx)
+    // console.log(idcs)
+    // console.log(px)
+    // console.log(px[n]);
+    return px[n];
 };
 
 var args = require('optimist').argv;

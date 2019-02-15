@@ -70,13 +70,13 @@ World building: move away from tiles:
 
 Shop & workshop interfaces
 Quid feathers spawn?
-!! collisions with stone items
-Random stone frames (before and not after)
-Minimap w/ buildings + settlement screen map
+!! collisions with stones
+Update region selection map
+Display buildings on map
+Sync & display resources on map
 Fog of war
 Check building limits are enforced
-Make big rock formations
-
+ 
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.
