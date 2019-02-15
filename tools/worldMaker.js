@@ -639,8 +639,34 @@ WorldMaker.prototype.makeWorldmap = function(){
                 }
             }
         });
-        image.write(path.join(wm.outdir,'worldmap.jpg'));
+        image.write(path.join(wm.outdir,'worldmap.png'));
+        image = wm.medianBlur(image,'worldmap2.png');
     });
+};
+
+WorldMaker.prototype.medianBlur = function(image,name){
+    var wm = this;
+    new Jimp(image.bitmap.width, image.bitmap.height, 0xf9de99ff, function (err, newimage) {
+        image.scan(0, 0, image.bitmap.width, image.bitmap.height, function (x, y, idx) {
+            if (x == image.bitmap.width - 1 && y == image.bitmap.height - 1) {
+                // image scan finished, do your stuff
+                newimage.write(path.join(wm.outdir,name));
+                return;
+              }
+            // idx is the position start position of this rgba tuple in the bitmap Buffer
+            var r = this.bitmap.data[idx + 0];
+            var g = this.bitmap.data[idx + 1];
+            var b = this.bitmap.data[idx + 2];
+            var a = this.bitmap.data[idx + 3];
+            // color = image.getPixelColor(x,y)
+            color = Jimp.rgbaToInt(r, g, b, a); 
+            newimage.setPixelColor(color, x,y);
+        });
+    });
+}
+
+WorldMaker.prototype.colorMedian = function(data,idx){
+
 };
 
 var args = require('optimist').argv;

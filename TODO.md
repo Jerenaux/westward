@@ -70,6 +70,8 @@ World building: move away from tiles:
 
 Shop & workshop interfaces
 Quid feathers spawn?
+!! collisions with stones
+Finish listNeighborsInGrid
 Update region selection map
 Display buildings on map
 Sync & display resources on map

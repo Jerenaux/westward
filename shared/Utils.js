@@ -185,6 +185,24 @@ Utils.listAdjacentAOIs = function(current){
     return AOIs;
 };
 
+Utils.listNeighborsInGrid = function(idx,width,height){
+    var nbh = [];
+    var isAtTop = (current < width);
+    var isAtBottom = (current > World.lastChunkID - width);
+    var isAtLeft = (current%width == 0);
+    var isAtRight = (current%width == width-1);
+    AOIs.push(current);
+    if(!isAtTop) AOIs.push(current - World.nbChunksHorizontal);
+    if(!isAtBottom) AOIs.push(current + World.nbChunksHorizontal);
+    if(!isAtLeft) AOIs.push(current-1);
+    if(!isAtRight) AOIs.push(current+1);
+    if(!isAtTop && !isAtLeft) AOIs.push(current-1-World.nbChunksHorizontal);
+    if(!isAtTop && !isAtRight) AOIs.push(current+1-World.nbChunksHorizontal);
+    if(!isAtBottom && !isAtLeft) AOIs.push(current-1+World.nbChunksHorizontal);
+    if(!isAtBottom && !isAtRight) AOIs.push(current+1+World.nbChunksHorizontal);
+    return nbh;
+}
+
 Utils.formatMoney = function(nb){
     return 'coin'+(nb > 1 ? 's' : '');
 };
