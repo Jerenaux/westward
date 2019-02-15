@@ -8,6 +8,7 @@ var xml2js = require('xml2js');
 var config = require('config');
 var Jimp = require("jimp");
 var rwc = require('random-weighted-choice');
+var quickselect = require('quickselect'); 
 
 var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
@@ -369,7 +370,7 @@ WorldMaker.prototype.drawShore = function(){
             var nbrh = this.getNeighborhood(x,y);
             tile = this.patterns[nbrh.join('')];
             if(tile === undefined) {
-                console.log(x,y,nbrh.join(''));
+                // console.log(x,y,nbrh.join(''));
                 undef++;
             }
 
@@ -646,6 +647,8 @@ WorldMaker.prototype.makeWorldmap = function(){
 
 WorldMaker.prototype.medianBlur = function(image,name){
     var wm = this;
+    var iw = image.bitmap.width*4; // because each "px"is 4 values
+    var ih = image.bitmap.height*4;
     new Jimp(image.bitmap.width, image.bitmap.height, 0xf9de99ff, function (err, newimage) {
         image.scan(0, 0, image.bitmap.width, image.bitmap.height, function (x, y, idx) {
             if (x == image.bitmap.width - 1 && y == image.bitmap.height - 1) {
@@ -654,9 +657,9 @@ WorldMaker.prototype.medianBlur = function(image,name){
                 return;
               }
             // idx is the position start position of this rgba tuple in the bitmap Buffer
-            var r = this.bitmap.data[idx + 0];
-            var g = this.bitmap.data[idx + 1];
-            var b = this.bitmap.data[idx + 2];
+            var r = wm.colorMedian(iw,ih,this.bitmap.data,idx,0); //this.bitmap.data[idx + 0];
+            var g = wm.colorMedian(iw,ih,this.bitmap.data,idx,1); //this.bitmap.data[idx + 1];
+            var b = wm.colorMedian(iw,ih,this.bitmap.data,idx,2); // this.bitmap.data[idx + 2];
             var a = this.bitmap.data[idx + 3];
             // color = image.getPixelColor(x,y)
             color = Jimp.rgbaToInt(r, g, b, a); 
@@ -665,8 +668,23 @@ WorldMaker.prototype.medianBlur = function(image,name){
     });
 }
 
-WorldMaker.prototype.colorMedian = function(data,idx){
-
+WorldMaker.prototype.colorMedian = function(w,h,data,idx,offset){
+    var idcs = Utils.listNeighborsInGrid(idx,w,h,4);
+   
+    var px = []
+    idcs.forEach(function(i){
+        px.push(data[i+offset]);
+    });
+ 
+    var  l = px.length;
+    var n = (l%2 == 0 ? (l/2)-1 : (l-1)/2);
+    quickselect(px,n);
+    // console.log(w,h);
+    // console.log(idx)
+    // console.log(idcs)
+    // console.log(px)
+    // console.log(px[n]);
+    return px[n];
 };
 
 var args = require('optimist').argv;

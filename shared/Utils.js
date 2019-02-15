@@ -185,21 +185,21 @@ Utils.listAdjacentAOIs = function(current){
     return AOIs;
 };
 
-Utils.listNeighborsInGrid = function(idx,width,height){
-    var nbh = [];
+Utils.listNeighborsInGrid = function(current,width,height,offset){
+    offset = (offset || 1);
+    var nbh = [current];
     var isAtTop = (current < width);
-    var isAtBottom = (current > World.lastChunkID - width);
+    var isAtBottom = (current > ((width*height)-1) - width);
     var isAtLeft = (current%width == 0);
     var isAtRight = (current%width == width-1);
-    AOIs.push(current);
-    if(!isAtTop) AOIs.push(current - World.nbChunksHorizontal);
-    if(!isAtBottom) AOIs.push(current + World.nbChunksHorizontal);
-    if(!isAtLeft) AOIs.push(current-1);
-    if(!isAtRight) AOIs.push(current+1);
-    if(!isAtTop && !isAtLeft) AOIs.push(current-1-World.nbChunksHorizontal);
-    if(!isAtTop && !isAtRight) AOIs.push(current+1-World.nbChunksHorizontal);
-    if(!isAtBottom && !isAtLeft) AOIs.push(current-1+World.nbChunksHorizontal);
-    if(!isAtBottom && !isAtRight) AOIs.push(current+1+World.nbChunksHorizontal);
+    if(!isAtTop) nbh.push(current - width);
+    if(!isAtBottom) nbh.push(current + width);
+    if(!isAtLeft) nbh.push(current-(1*offset));
+    if(!isAtRight) nbh.push(current+(1*offset));
+    if(!isAtTop && !isAtLeft) nbh.push(current-(1*offset)-width);
+    if(!isAtTop && !isAtRight) nbh.push(current+(1*offset)-width);
+    if(!isAtBottom && !isAtLeft) nbh.push(current-(1*offset)+width);
+    if(!isAtBottom && !isAtRight) nbh.push(current+(1*offset)+width);
     return nbh;
 }
 
