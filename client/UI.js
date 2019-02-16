@@ -24,7 +24,8 @@ var UI = {
         if(Client.isNewPlayer()) {
             this.load.image('bigbg', 'assets/sprites/bigbg.png');
             this.load.image('bigbg_mask', 'assets/sprites/bigbg_mask.png');
-            this.load.image('worldmap', 'assets/sprites/worldmap.png');
+            // this.load.image('worldmap', 'assets/sprites/worldmap.png');
+            this.load.image('worldmap', 'maps/worldmap.png');
             this.load.image('campdiamond', 'assets/sprites/camp_diamond.png');
             this.load.image('setldiamond', 'assets/sprites/setl_diamond.png');
             this.load.image('wood', 'assets/sprites/wood.jpg');
@@ -359,7 +360,8 @@ UI.displayRegionSelectionMenu =  function(){
     var map = UI.scene.add.image(UI.getGameWidth()/2,UI.getGameHeight()/2,'worldmap');
     content.push(map);
     //map.x += 50;
-    map.y += 150;
+    map.y += 120;
+    map.setScale(0.4);
 
     if(Boot.WEBGL){
         var mask = UI.scene.add.sprite(scroll.x,scroll.y,'bigbg_mask');
@@ -391,8 +393,10 @@ UI.displayRegions = function(list){
 };
 
 UI.displayRegion = function(data,world){
-    var x = (data.x/world.width)*UI.SSmap.width - 100; // why offset?
-    var y = (data.y/world.height)*UI.SSmap.height;
+    var x = (data.x/world.width)*UI.SSmap.width*UI.SSmap.scaleX - 90; // why offset?
+    var y = (data.y/world.height)*UI.SSmap.height*UI.SSmap.scaleY - 50;
+    console.log(data.x,world.width,UI.SSmap.width);
+    console.log(data.y,world.height,UI.SSmap.height);
     var icon = UI.scene.add.image(x,y,'setldiamond');
     icon.setOrigin(0.5,1);
     icon.setInteractive();

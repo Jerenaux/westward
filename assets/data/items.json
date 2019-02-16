@@ -247,6 +247,7 @@
     "frame":"stone",
     "name": "Stone",
     "envFrames": ["rock_1","rock_2","rock_3","rock_4"],
+    "collides": true,
     "desc": "Crafting material used to make primitive weapons.",
     "sound": "equip"
   },

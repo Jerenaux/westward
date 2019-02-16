@@ -80,10 +80,7 @@ Engine.preload = function() {
     this.load.image('longscroll', 'assets/sprites/longscroll.png');
     this.load.image('radial3', 'assets/sprites/scroll_mask.png');
     this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
-    /*this.load.image('fullmap', 'assets/sprites/fortmap.png');
-    this.load.image('fullmap_zoomed', 'assets/sprites/fortmap_01.png');
-    this.load.image('minimap', 'assets/sprites/minimap2s.png');*/
-    this.load.image('worldmap', 'maps/worldmap.jpg');
+    this.load.image('worldmap', 'maps/worldmap.png');
 
     // SFX
     Engine.audioFiles = [];

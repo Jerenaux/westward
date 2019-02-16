@@ -136,6 +136,11 @@ Chunk.prototype.addResource = function(x,y){
 };
 
 Chunk.prototype.erase = function(){
+    for(var x = this.x; x < this.x + World.chunkWidth; x++){
+        for(var y = this.y; y < this.y + World.chunkHeight; y++){
+            Engine.collisions.delete(x,y);
+        }
+    }
     this.tiles.forEach(function(tile){
         tile.destroy();
     });

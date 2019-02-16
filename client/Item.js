@@ -13,17 +13,14 @@ var Item = new Phaser.Class({
 
     setUp: function(data){
         var itemData = Engine.itemsData[data.type];
-        /*var atlas = (itemData.isPlant ? 'tileset' : itemData.atlas);
-        var frame = (itemData.isPlant ? itemData.bushFrames[0] : itemData.frame);
-        if(itemData.isPlant){
-            this.isPlant = true;
-            this.outFrame = itemData.bushFrames[0];
-            this.inFrame = itemData.bushFrames[1];
-        }*/
         var atlas = 'tileset';
         var frame = Utils.randomElement(itemData.envFrames);
         this.outFrame = frame;
         this.inFrame = frame+'_lit';
+        if(itemData.collides) {
+            this.collides = true;
+            Engine.collisions.add(this.tx,this.ty);
+        }
 
         this.setTexture(atlas);
         this.setFrame(frame);
@@ -45,14 +42,13 @@ var Item = new Phaser.Class({
 
     remove: function(){
         CustomSprite.prototype.remove.call(this);
+        if(this.collides) Engine.collisions.delete(this.tx,this.ty);
         this.orientationPin.hide();
         delete Engine.items[this.id];
     },
 
     manageOrientationPin: function(){
-        //return; // enable based on explorer abilities
-        var inCamera = Engine.camera.worldView.contains(this.x,this.y);
-        if(inCamera) {
+        if(Engine.camera.worldView.contains(this.x,this.y)) {
             this.orientationPin.hide();
         }else{
             this.orientationPin.update(this.tx,this.ty);

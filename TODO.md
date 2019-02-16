@@ -71,7 +71,10 @@ World building: move away from tiles:
 Shop & workshop interfaces
 Quid feathers spawn?
 !! collisions with stones
-Update region selection map
+-> Need to add local collision when displaying stone
+-> Noot to remove local collision when picked
+-> Need to remove server collision when picked
+Test: pick stone, move away, come back, shoudl not collide
 Display buildings on map
 Sync & display resources on map
 Fog of war
@@ -495,10 +498,8 @@ Deployment:
 
 Design document:
 ---------------
-- Re-read every month (last: done with "crafting")
-- Decide list of buildings, items, ...
-- Make Excel tables (crafting, inventory, bestiary, ...)
-- Make powerpoint
+- Re-read regularly (last: busy with "abilities")
+- Make Excel tables (crafting, inventory, bestiary, abilities ...)
 - Make feature matrix
 - Consequence graphs
 - Tidy up (charts, tables, Latex formulas...)

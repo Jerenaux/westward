@@ -97,6 +97,7 @@ function WorldMaker(args){
     this.blueprint = args.blueprint;
 
     this.treeSource = args.treesource;
+    this.notreesave = args.notreesave;
 }
 
 WorldMaker.prototype.run = function(){
@@ -429,6 +430,7 @@ WorldMaker.prototype.createForests = function(){
         nbtrees++;
     }
     console.log(nbtrees + ' trees planted');
+    if(this.notreesave) return;
     fs.writeFile(path.join(__dirname,'blueprints','trees.json'),JSON.stringify(this.trees.toList()),function(err){
         if(err) throw err;
         console.log('Trees saved');
@@ -516,9 +518,7 @@ WorldMaker.prototype.addMisc = function(){
         var y = Utils.randomInt(0,World.worldHeight);
         if(!this.isBusy({x:x,y:y})) {
             // console.log('rock at',x,y);
-            // this.addDecor({x,y},'r'+Utils.randomInt(1,4)); // TODO: upper bound conf
             this.collisions.add(x,y);
-            // this.addRandomItem(x,y,'stone');
             this.items.add(x,y,26);
         }
     }
@@ -643,8 +643,8 @@ WorldMaker.prototype.makeWorldmap = function(){
                 }
             }
         });
-        image.write(path.join(wm.outdir,'worldmap.png'));
-        image = wm.medianBlur(image,'worldmap2.png');
+        // image.write(path.join(wm.outdir,'worldmap.png'));
+        image = wm.medianBlur(image,'worldmap.png');
     });
 };
 
@@ -664,19 +664,19 @@ WorldMaker.prototype.medianBlur = function(image,name){
             var g = wm.colorMedian(iw,ih,this.bitmap.data,idx,1); //this.bitmap.data[idx + 1];
             var b = wm.colorMedian(iw,ih,this.bitmap.data,idx,2); // this.bitmap.data[idx + 2];
             var a = this.bitmap.data[idx + 3];
-            // color = image.getPixelColor(x,y)
-            color = Jimp.rgbaToInt(r, g, b, a);
+            // color = image.getPixelColor(x,y);
+            var color = Jimp.rgbaToInt(r, g, b, a);
             newimage.setPixelColor(color, x,y);
         });
     });
-}
+};
 
 WorldMaker.prototype.colorMedian = function(w,h,data,idx,offset){
     var idcs = Utils.listNeighborsInGrid(idx,w,h,4);
 
-    var px = []
+    var px = [];
     idcs.forEach(function(i){
-        px.push(data[i+offset]);
+        if(data[i+offset] != undefined) px.push(data[i+offset]);
     });
 
     var  l = px.length;
@@ -686,7 +686,7 @@ WorldMaker.prototype.colorMedian = function(w,h,data,idx,offset){
     // console.log(idx)
     // console.log(idcs)
     // console.log(px)
-    // console.log(px[n]);
+    // console.log('result:',px[n]);
     return px[n];
 };
 
