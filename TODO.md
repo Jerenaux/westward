@@ -30,17 +30,22 @@ Misc:
 - Clicks close to minimap fail
 - Display/hide/display map leads to warnings overflow
 - Still slow (make bick grass background on a blitter?)
-- Items spawn on top of each other
-- Slow Fort? Make rendertextures out of longslots?
 - Spawning in battle area, moving: doesn't stop movement
 - Stop walk when opening menu
 - Camera bounds (test with northernmost camp)
 - Minimap cross stop moving below a certain y?
 - Northernmost camp not really visible on map
 - Poll at regular interval the sprite below mouse
--> Need to display hunger and fatigue
--> Keep class quests (+ "smart quests" based on settlement situation?)
--> Menu to list buildings (but on-site management)
+- Make rendertextures out of pins
+Shop & workshop interfaces
+Quid feathers spawn?
+Update buolding markers when built
+Update map drag limts
+Sync & display resources on map
+New movement system
+Fog of war
+Check building limits are enforced
+
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
 
@@ -67,18 +72,6 @@ World building: move away from tiles:
 [ ] Re-enable blitters, at least for ground and water?
 [x] Remove legacy tiles after a while (from png and json) + old tileset files
 
-
-Shop & workshop interfaces
-Quid feathers spawn?
-!! collisions with stones
--> Need to add local collision when displaying stone
--> Noot to remove local collision when picked
--> Need to remove server collision when picked
-Test: pick stone, move away, come back, shoudl not collide
-Display buildings on map
-Sync & display resources on map
-Fog of war
-Check building limits are enforced
  
 
 ##Tutorial:##

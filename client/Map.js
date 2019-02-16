@@ -6,7 +6,14 @@ var Map = new Phaser.Class({
     Extends: CustomSprite,
     //Extends: Phaser.GameObjects.RenderTexture,
 
-    initialize: function Map(x, y, viewW, viewH, dragWidth, dragHeight, target, showToponyms) {
+    /*
+    * README:
+    * - The point on the screen where the focus should be is stored in this.center (typically, center of screen)
+    * - centerMap() changes the pivot of the map, and positions that pivot on this.center
+    * - dragMap() repositions the elements of the map when it has moved
+    * */
+
+    initialize: function Map(x, y, viewW, viewH, dragWidth, dragHeight, showToponyms) {
         CustomSprite.call(this, UI.scene, x, y, 'worldmap');
         //Phaser.GameObjects.RenderTexture.call(this, UI.scene, x, y, 2400,1824);
         //UI.scene.add.displayList.add(this);
@@ -28,15 +35,21 @@ var Map = new Phaser.Class({
         this.viewRect = new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH);
 
         this.minOrigin = {
-            x: (this.viewRect.width/2)/this.width,
-            y: (this.viewRect.height/2)/this.height
+            // Pct (origin)
+            // x: (this.viewRect.width/2)/this.width,
+            // y: (this.viewRect.height/2)/this.height
+            // Px (displayOrigin)
+            x: (this.viewRect.width/2)*2,
+            y: (this.viewRect.height/2)*2
         };
         this.maxOrigin = {
-            x: (this.width - this.viewRect.width/2)/this.width,
-            y: (this.height - this.viewRect.height/2)/this.height
+            // x: (this.width - this.viewRect.width/2)/this.width,
+            // y: (this.height - this.viewRect.height/2)/this.height
+            x: (World.worldWidth-this.viewRect.width/2)*2,
+            y: (World.worldHeight-this.viewRect.height/2)*2
         };
+        console.log(this.minOrigin,this.maxOrigin);
 
-        this.target = target;
         this.toponyms = [];
         /*if(showToponyms) {
             Engine.settlementsData.forEach(function (s) {
@@ -114,6 +127,7 @@ var Map = new Phaser.Class({
     },
 
     handleDrag: function(pointer,x,y){
+        console.log(this.x,this.y,x,y);
         // TODO: check for Phaser way of restricting distance
         if(x < this.minX) return;
         if(x > this.maxX) return;
@@ -134,14 +148,14 @@ var Map = new Phaser.Class({
     },
 
     follow: function(){
-        var pos = {x:Engine.player.tileX,y:Engine.player.tileY};
+        var pos = Engine.player.getTilePosition();
         var ox = this.displayOriginX;
         var oy = this.displayOriginY;
         this.centerMap(pos);
         if(this.positionCross) this.positionCross.setPosition(this.center.x,this.center.y);
         var dx = this.displayOriginX - ox;
         var dy = this.displayOriginY - oy;
-        this.dragMap(dx,dy,false);
+        this.dragMap(dx/2,dy/2,false);
     },
 
     dragMap: function(dx,dy,tween){ // x and y are destination coordinates
@@ -200,13 +214,19 @@ var Map = new Phaser.Class({
 
     // Maps a tile coordinate to px coordinate on the map
     computeMapLocation: function(tx,ty){
-        var pct = Utils.tileToPct(tx,ty);
+        /*var pct = Utils.tileToPct(tx,ty);
         var dx = (pct.x - this.originX)*this.width;
         var dy = (pct.y - this.originY)*this.height;
         return {
             x: Math.round(this.x+dx),
             y: Math.round(this.y+dy)
-        }
+        }*/
+        var dx = (tx*2 - this.displayOriginX)*this.scaleX;
+        var dy = (ty*2 - this.displayOriginY)*this.scaleY;
+        return {
+            x: this.x + dx,
+            y: this.y + dy
+        };
     },
 
     addPin: function(x,y,name,frame,bg){
@@ -253,8 +273,13 @@ var Map = new Phaser.Class({
     },
 
     centerMap: function(tile){ // Adjusts the anchor, then position it in the center of the screen
-        var o = Utils.tileToPct(tile.x,tile.y);
-        this.setOrigin(Utils.clamp(o.x,this.minOrigin.x,this.maxOrigin.x),Utils.clamp(o.y,this.minOrigin.y,this.maxOrigin.y));
+        // var o = Utils.tileToPct(tile.x,tile.y);
+        var o = {
+            x: tile.x*2,
+            y: tile.y*2
+        };
+        // this.setOrigin(Utils.clamp(o.x,this.minOrigin.x,this.maxOrigin.x),Utils.clamp(o.y,this.minOrigin.y,this.maxOrigin.y));
+        this.setDisplayOrigin(Utils.clamp(o.x,this.minOrigin.x,this.maxOrigin.x),Utils.clamp(o.y,this.minOrigin.y,this.maxOrigin.y));
         this.setPosition(this.center.x,this.center.y);
     },
 
@@ -270,11 +295,14 @@ var Map = new Phaser.Class({
         this.maxY = this.y + this.displayOriginY - this.viewRect.height/2;
         this.minX = this.x - (this.width-this.displayOriginX) + this.viewRect.width/2;
         this.maxX = this.x + this.displayOriginX - this.viewRect.width/2;
+        console.warn(this.minX);
 
         this.minX = Math.max(this.minX,this.x-this.dragWidth);
         this.maxX = Math.min(this.maxX,this.x+this.dragWidth);
         this.minY = Math.max(this.minY,this.y-this.dragHeight);
         this.maxY = Math.min(this.maxY,this.y+this.dragHeight);
+
+        console.warn(this.minX);
     },
 
     applyFogOfWar: function(){
@@ -428,30 +456,23 @@ var Map = new Phaser.Class({
     },
 
     display: function(){
-        var tile;
-        if(this.target == 'building'){
-            tile = Engine.currentBuiling.getTilePosition();
-        }else{
-            tile = Engine.player.getTilePosition();
-        }
-
+        var tile = Engine.player.getTilePosition();
         this.centerMap(tile);
         this.setInputArea();
         this.positionToponyms();
         this.computeDragLimits();
         //if(!this.minimap) this.applyFogOfWar();
 
-        if(this.target == 'player') { // TODO: remove, always the case if no fort
-            this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
-            //this.positionCross.setDepth(this.positionCross.depth+1);
-            /*Engine.player.markers.forEach(function(data){
-                this.addPin(data.x,data.y,
-                    Engine.buildingsData[data.type].name,
-                    Engine.buildingsData[data.type].mapicon,
-                    Engine.buildingsData[data.type].mapbg
-                );
-            },this);*/
-        }
+        this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
+        Engine.player.markers.forEach(function(data){
+            this.addPin(data.x,data.y,
+                Engine.buildingsData[data.type].name,
+                'bld'
+                // Engine.buildingsData[data.type].mapicon,
+                // Engine.buildingsData[data.type].mapbg
+            );
+        },this);
+
 
         this.setVisible(true);
     },
@@ -501,15 +522,13 @@ var Pin = new Phaser.Class({
     },
 
     setUp: function(tileX,tileY,x,y,name,frame,bgframe){
-        if(frame == 'x'){
-            this.setOrigin(0.2,0.5);
-        }else{
-            this.setOrigin(0.5,1);
-        }
+        this.setOrigin(0.5);
+
         // Phaser 3.12:
-        var bg = bgframe ? 'bg'+bgframe : 'bg';
-        if(frame != 'x') this.drawFrame('mapicons',bg,0,0);
+        // var bg = bgframe ? 'bg'+bgframe : 'bg';
+        // if(frame != 'x') this.drawFrame('mapicons',bg,0,0);
         this.drawFrame('mapicons',frame,0,0);
+
         // Phaser 3.11:
         /*var icon = Engine.scene.add.sprite(0,0,'mapicons',frame);
         var bg = bgframe ? 'bg'+bgframe : 'bg';
@@ -519,7 +538,7 @@ var Pin = new Phaser.Class({
 
         this.tileX = tileX;
         this.tileY = tileY;
-        this.setDepth(this.depth + this.tileY/1000);
+        this.setDepth(this.depth + this.tileY/1000); // /1000 to avoid appearing above tooltip
         this.setPosition(x,y);
         this.name = name;
         this.setVisible(true);
@@ -546,6 +565,7 @@ var Pin = new Phaser.Class({
         if(!this.parentMap.viewRect.contains(this.x,this.y)) return;
         UI.tooltip.updateInfo(this.name);
         UI.tooltip.display();
+        console.log(this.x,this.y);
     },
 
     handleOut: function(){

@@ -1382,7 +1382,7 @@ Engine.makeMapMenu = function(){
     map.setSound(Engine.scene.sound.add('page_turn2'));
     var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
     mapPanel.addBackground('longscroll');
-    var mapInstance = mapPanel.addMap('player','radiallongrect',1000,380,-1,-1);
+    var mapInstance = mapPanel.addMap('radiallongrect',1000,380,-1,-1);
     mapPanel.addButton(953, -2, 'blue','help',null,'',UI.textsData['self_map_help']);
     // TODO: move in Map.js, method addZoom, positions buttons based on viewWidt/height and
     // controls enable/disable of buttons based on zoom flag

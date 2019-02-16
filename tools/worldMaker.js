@@ -511,7 +511,7 @@ WorldMaker.prototype.checkPositions = function(x,y){
 };
 
 WorldMaker.prototype.addMisc = function(){
-    var nbrocks = 11200; //TODO: conf
+    var nbrocks = 10000; //TODO: conf
     for(var i = 0; i < nbrocks; i++){
         // console.log('zone');
         var x = Utils.randomInt(0,World.worldWidth);

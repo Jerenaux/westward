@@ -19,7 +19,7 @@ function MiniMap(margin){
     this.ring.setScrollFactor(0);
     this.ring.setVisible(false);
 
-    this.map = new Map(x,y,r,r,0,0,'player',false);
+    this.map = new Map(x,y,r,r,0,0,false);
     this.map.minimap = true;
     this.map.addMask(null,{
         type: 'circle',

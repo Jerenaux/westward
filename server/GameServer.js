@@ -572,6 +572,7 @@ GameServer.pickUpItem = function(player,itemID){
     // TODO: check for proximity
     var nb = 1;
     player.giveItem(item.type,nb,true);
+    if(GameServer.itemsData[item.type].collides) GameServer.collisions.delete(item.x,item.y);
     GameServer.removeEntity(item);
 };
 
