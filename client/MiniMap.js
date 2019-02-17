@@ -2,9 +2,9 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 27-05-18.
  */
 
-function MiniMap(margin){
-    var r = 150;
-    margin = margin || 20;
+function MiniMap(){
+    var r = 65;
+    var margin = 45;
 
     var x = Engine.getGameConfig().width - r/2 - margin;
     var y = r/2 + margin;
@@ -19,8 +19,7 @@ function MiniMap(margin){
     this.ring.setScrollFactor(0);
     this.ring.setVisible(false);
 
-    this.map = new Map(x,y,r,r,0,0,false);
-    this.map.minimap = true;
+    this.map = new Map(x,y,r,r,0,0,false,true);
     this.map.addMask(null,{
         type: 'circle',
         x: x,

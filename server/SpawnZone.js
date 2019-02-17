@@ -70,6 +70,10 @@ SpawnZone.prototype.spawn = function(AOIs,type,id,nb){
     //console.log('Spawning',nb,data.name);
 
     var AOI = Utils.randomElement(AOIs);
+    if(AOI === undefined){
+        console.warn('undefined AOI in SpawZone.spawn()');
+        return;
+    }
     var cx = Utils.randomInt(AOI.x,AOI.x+World.chunkWidth);
     var cy = Utils.randomInt(AOI.y,AOI.y+World.chunkHeight);
 

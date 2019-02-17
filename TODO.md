@@ -10,7 +10,7 @@ On deploy:
 Admin
 Analytics
 Cleaning
-Packaging
+Commenting
 Deployment
 Design document
 Testing
@@ -39,7 +39,6 @@ Misc:
 - Make rendertextures out of pins
 Shop & workshop interfaces
 Quid feathers spawn?
-Click on map to center (no more dragging)
 New movement system
 Fog of war
 Check building limits are enforced

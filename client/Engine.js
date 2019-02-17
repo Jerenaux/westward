@@ -829,7 +829,7 @@ Engine.makeUI = function(){
     });
     bug.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
 
-    Engine.miniMap = new MiniMap(2);
+    Engine.miniMap = new MiniMap();
     Engine.setlCapsule = new SettlementCapsule(950,3);
     //Engine.foodCapsule = new SettlementCapsule(950,30);
     //Engine.foodCapsule.setText('Famine');
@@ -881,9 +881,9 @@ Engine.makeUI = function(){
 
     Engine.menuIcons = [];
     //Engine.addMenu(1004,140,'menu_crow',Engine.menus.messages,895,73);
-    Engine.addMenu(967,159,'menu_map',Engine.menus.map,855,73);
-    Engine.addMenu(922,159,'menu_backpack',Engine.menus.inventory,815,73);
-    Engine.addMenu(884,136,'menu_dude',Engine.menus.character,775,73);
+    Engine.addMenu(967,150,'menu_map',Engine.menus.map,855,73);
+    Engine.addMenu(922,150,'menu_backpack',Engine.menus.inventory,815,73);
+    Engine.addMenu(884,130,'menu_dude',Engine.menus.character,775,73);
     //Engine.addMenu(863,95,'menu_flag',Engine.menus.inventory,735,73);
     Engine.addMenu(20,60,'shovel',Engine.menus.build,-100,60);
 
@@ -1382,7 +1382,7 @@ Engine.makeMapMenu = function(){
     map.setSound(Engine.scene.sound.add('page_turn2'));
     var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
     mapPanel.addBackground('longscroll');
-    var mapInstance = mapPanel.addMap('radiallongrect',1000,380,-1,-1);
+    var mapInstance = mapPanel.addMap('radiallongrect',900,380,-1,-1);
     mapPanel.addButton(953, -2, 'blue','help',null,'',UI.textsData['self_map_help']);
     // TODO: move in Map.js, method addZoom, positions buttons based on viewWidt/height and
     // controls enable/disable of buttons based on zoom flag

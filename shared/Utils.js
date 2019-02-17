@@ -83,14 +83,12 @@ Utils.pctToTile = function(x,y){
 };
 
 Utils.screenToMap = function(x,y,map){
-    var tlx = map.x - map.originX*map.width;
-    var tly = map.y - map.originY*map.height;
-    var pctx = (x-tlx)/map.width;
-    var pcty = (y-tly)/map.height;
-    var tile = Utils.pctToTile(pctx,pcty);
+    var tlx = map.x - map.displayOriginX; // top left of map
+    var tly = map.y - map.displayOriginY;
+    console.log(x,y,tlx,tly);
     return {
-        x: Math.ceil(tile.x),
-        y: Math.ceil(tile.y)
+        x: x - tlx,
+        y: y - tly
     }
 };
 

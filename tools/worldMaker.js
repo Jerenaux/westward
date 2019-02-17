@@ -511,6 +511,7 @@ WorldMaker.prototype.checkPositions = function(x,y){
 };
 
 WorldMaker.prototype.addMisc = function(){
+    console.log('Adding misc ...');
     var nbrocks = 5000; //TODO: conf
     for(var i = 0; i < nbrocks; i++){
         // console.log('zone');
@@ -623,14 +624,18 @@ WorldMaker.prototype.makeWorldmap = function(){
     var hexes  = {     // last two characters: ff = visible, 00 = not
         'c': 0x000000ff,
         'w': 0x68b89fff,
-        't': 0x7e5d2eff,
-        'g': 0x809c3bff
+        'trunk': 0x7e5d2eff,
+        't1': 0x91a54aff,
+        't2': 0x9dbf48ff, //0x809c3bff,
+        't3': 0x7f9b75ff,
+        't4': 0x375b44ff,
+        // 'g': 0x809c3bff
     };
     new Jimp(World.worldWidth*2, World.worldHeight*2, 0xf9de99ff, function (err, image) { // 0x0,
         wm.mapPixels.toList(true).forEach(function(px){
-            var x = px[0]*2
-            var y = px[1]*2
-            var color = hexes[px[2]]
+            var x = px[0]*2;
+            var y = px[1]*2;
+            var color = hexes[px[2]];
             image.setPixelColor(color, x, y);
             image.setPixelColor(color, x+1, y);
             image.setPixelColor(color, x, y+1);
@@ -641,14 +646,15 @@ WorldMaker.prototype.makeWorldmap = function(){
             var y = t[1]*2;
             for(var xi = 0; xi < 4; xi++){
                 for(var yi = 0; yi > -4; yi--){
-                    image.setPixelColor(hexes['t'], x+xi, y+yi);
+                    image.setPixelColor(hexes['trunk'], x+xi, y+yi);
                 }
             }
+            if(t[2] == 'd') return;
             x -= 2;
             y -= 10;
             for(var xi = 0; xi < 8; xi++){
                 for(var yi = 0; yi < 8; yi++){
-                    image.setPixelColor(hexes['g'], x+xi, y+yi);
+                    image.setPixelColor(hexes['t'+t[2]], x+xi, y+yi);
                 }
             }
         });

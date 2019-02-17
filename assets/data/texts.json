@@ -3,7 +3,7 @@
 
   "inventory_help": "This is your inventory. Click on an item to see what you can do with it. Some pieces of equipment can increase your inventory size. The capsule at the top of the panel is your amount of money.",
   "equipment_help": "This is your equipment. Click on a piece of equipment to unequip it. You cannot equip a ranged weapon and a melee weapon at the same time. You must equip an ammo container (e.g. quiver) before equipping the corresponding ammunition (e.g. arrows).",
-  "self_map_help": "Drag the map to have a look at the entire know world. The red cross is your current position",
+  "self_map_help": "Click on the map to center it elsewhere. The red cross is your current position. The blue dots are buildings. The leaves icons indicate the location of plants.",
   "stats_help": "These are you character stats. Their values influence the success and impact of various actions. Most of them can be increased by specific pieces of equipment.",
   "recipes_help": "The list of items that you know how to craft. Click on an item to start crafting it. ",
   "combi_help": "After selecting an item to craft in the \"recipes\" panel, the list of ingredients will appear below. The '+' and '-' buttons allow you to select how many items to craft. If you or the workshop has all the necessary ingredients, click on the green button to craft the item.",
@@ -20,7 +20,6 @@
   "resources_help": "The stockpile of resources of the settlement, gathered by resource buildings or moved from the Trade Post. The capsule above indicates the amount of currency in the coffers of the Fort.",
   "setstatus_help": "Basic information about the settlement. The food surplus or deficit corresponds to the excess (or lack thereof) of food with respect to the amount that must be maintained at all times to feed the current population. Food surplus or deficit increases or decreases, respectively, the productivity of buildings and the stats of the citizens.",
   "devlvl_help": "The list of goals to meet for the settlement to be able to reach the next development level. Development levels unlock new buildings, access to new resources and many other useful things.",
-  "map_help": "Represents the area around the settlement. Drag the map to have a look at the surroundings. The pins indicate buildings. The skulls indicate danger.",
   "productivity_help": "Indicates all the factors that are affecting the productivity of this building, and how. The higher the productivity, the faster the building will be built, or the more resources it will produce. Food surplus is achieved by storing enough food at the fort. Commitment indicates how many citizens are committing themselves to this building at the moment. ",
   "progress_help": "This building is under construction. You can see the progress and the construction materials that are missing.",
   "sell_help": "This panel displays the items that you own. Grayed items are not accepted by the shop you are visitting. Click on a non-grayed item to start selling it. The capsule at the top of the panel indicates your amount of money. If you own that building, you can give items to it by clicking on the items in this panel.",

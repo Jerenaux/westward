@@ -13,12 +13,15 @@ var Map = new Phaser.Class({
     * - dragMap() repositions the elements of the map when it has moved (useful for follow behavior, even if actual drag by player is disabled)
     * */
 
-    initialize: function Map(x, y, viewW, viewH, dragWidth, dragHeight, showToponyms) {
+    initialize: function Map(x, y, viewW, viewH, dragWidth, dragHeight, showToponyms, minimap) {
+        // viewW is either a radius or a rect width; controls the size of area in which pins will appear
+        // (it is dissociated from the mask size, which depends on the size of the image used for masking)
         CustomSprite.call(this, UI.scene, x, y, 'worldmap');
         //Phaser.GameObjects.RenderTexture.call(this, UI.scene, x, y, 2400,1824);
         //UI.scene.add.displayList.add(this);
         //this.draw('fullmap',0,0);
 
+        this.minimap = minimap;
         this.setDepth(2);
         this.setScrollFactor(0);
         this.setVisible(false);
@@ -32,39 +35,54 @@ var Map = new Phaser.Class({
             x: x,
             y: y
         };
-        this.viewRect = new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH);
+        // unmasked area on screen
+        this.viewRect = (this.minimap ?
+             new Phaser.Geom.Circle(this.x,this.y,viewW)
+            :new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH)
+            );
+        console.log(this.viewRect);
 
+        var wcoord = (this.minimap ? 'radius' : 'width');
+        var hcoord = (this.minimap ? 'radius' : 'height');
+
+        // Used to make sur that the map won't be centered in a position that allows to see the edges
         this.minOrigin = {
-            // Pct (origin)
-            // x: (this.viewRect.width/2)/this.width,
-            // y: (this.viewRect.height/2)/this.height
-            // Px (displayOrigin)
-            x: (this.viewRect.width/2)*2,
-            y: (this.viewRect.height/2)*2
+            x: (this.viewRect[wcoord]/2)*(1/this.scaleX),
+            y: (this.viewRect[hcoord]/2)*(1/this.scaleY),
+            xOffset: 0
         };
-        this.maxOrigin = {
-            // x: (this.width - this.viewRect.width/2)/this.width,
-            // y: (this.height - this.viewRect.height/2)/this.height
-            x: (World.worldWidth-this.viewRect.width/2)*2,
-            y: (World.worldHeight-this.viewRect.height/2)*2
+        this.maxOrigin =  {
+            x: (World.worldWidth-this.viewRect[wcoord]/2)*(1/this.scaleX),
+            y: (World.worldHeight-this.viewRect[hcoord]/2)*(1/this.scaleY),
+            xOffset: 0
         };
+
+        if(!this.minimap){
+            this.minOrigin.xOffset = 70;
+            this.maxOrigin.xOffset = -60;
+        }
 
         this.toponyms = [];
+
         /*if(showToponyms) {
             Engine.settlementsData.forEach(function (s) {
                 this.addText(s);
             }, this);
         }*/
 
-        /*this.setInteractive();
-        UI.scene.input.setDraggable(this);
+        if(!this.minimap) {
+            this.offZone = new Phaser.Geom.Rectangle(932,418,60,50);
+            this.setInteractive({ pixelPerfect: true });
+            this.on('pointerdown', this.handleClick.bind(this));
+        }
+        /*UI.scene.input.setDraggable(this);
         this.dragWidth = (dragWidth > -1 ? dragWidth : 999999);
         this.dragHeight = (dragHeight > -1 ? dragHeight : 999999);
         this.draggedX = 0;
         this.draggedY = 0;
 
         this.on('drag',this.handleDrag.bind(this));
-        this.on('pointerup',this.handleClick.bind(this));*/
+        */
 
         this.pins = [];
         this.resetCounter();
@@ -138,10 +156,12 @@ var Map = new Phaser.Class({
     },
 
     focus: function(x,y){
-        var dx = x - (this.x + this.draggedX);
-        var dy = y - (this.y + this.draggedY);
-        // The map has to move in the opposite direction of the drag (w.r.t. center)
-        this.dragMap(dx,dy,true);
+        var ox = this.displayOriginX;
+        var oy = this.displayOriginY;
+        this.centerMap({x:x/2,y:y/2});
+        var dx = this.displayOriginX - ox;
+        var dy = this.displayOriginY - oy;
+        this.dragMap(dx*this.scaleX,dy*this.scaleY,false);
     },
 
     follow: function(){
@@ -152,7 +172,7 @@ var Map = new Phaser.Class({
         if(this.positionCross) this.positionCross.setPosition(this.center.x,this.center.y);
         var dx = this.displayOriginX - ox;
         var dy = this.displayOriginY - oy;
-        this.dragMap(dx/2,dy/2,false);
+        this.dragMap(dx*this.scaleX,dy*this.scaleY,false);
     },
 
     dragMap: function(dx,dy,tween){ // x and y are destination coordinates
@@ -176,8 +196,8 @@ var Map = new Phaser.Class({
                 duration: duration
             });*/
         }else {
-            this.input.hitArea.x += dx;
-            this.input.hitArea.y += dy;
+            // this.input.hitArea.x += dx;
+            // this.input.hitArea.y += dy;
             //this.fow.x -= dx;
             //this.fow.y -= dy;
             this.moveTexts(dx,dy);
@@ -189,6 +209,7 @@ var Map = new Phaser.Class({
         this.displayedPins.forEach(function(p){
             p.x -= dx;
             p.y -= dy;
+            p.setVisibility();
         });
     },
 
@@ -199,9 +220,9 @@ var Map = new Phaser.Class({
         });
     },
 
-    handleClick: function(pointer){
-        if(pointer.downX != pointer.upX || pointer.downY != pointer.upY) return; // drag
-        console.log(Utils.screenToMap(pointer.x,pointer.y,this));
+    handleClick: function(pointer,x,y){
+        if(this.offZone.contains(pointer.x,pointer.y)) return;
+        this.focus(x,y);
     },
 
     getNextPin: function(){
@@ -250,15 +271,12 @@ var Map = new Phaser.Class({
     },
 
     zoom: function(){
+        this.centerMap(); // center on current center ; must be called before positioning pins
         this.displayedPins.forEach(function(pin){
             pin.reposition();
         });
-        // this.setInputArea();
         this.positionToponyms();
-        this.computeDragLimits();
-
-        //console.log(this.x+this.draggedX,this.minX,this.maxX);
-        //console.log(this.y+this.draggedY,this.minY,this.maxY);
+        // this.computeDragLimits();
     },
 
     positionToponyms: function(){
@@ -270,13 +288,15 @@ var Map = new Phaser.Class({
     },
 
     centerMap: function(tile){ // Adjusts the anchor, then position it in the center of the screen
-        // var o = Utils.tileToPct(tile.x,tile.y);
+        // tile is world coordinates, not map px ; if tile is undefined, then it means recenter on whatever current center (used when zooming)
         var o = {
-            x: tile.x*2,
-            y: tile.y*2
+            x: tile ? tile.x * 2 : this.displayOriginX,
+            y: tile ? tile.y * 2 : this.displayOriginY
         };
-        // this.setOrigin(Utils.clamp(o.x,this.minOrigin.x,this.maxOrigin.x),Utils.clamp(o.y,this.minOrigin.y,this.maxOrigin.y));
-        this.setDisplayOrigin(Utils.clamp(o.x,this.minOrigin.x,this.maxOrigin.x),Utils.clamp(o.y,this.minOrigin.y,this.maxOrigin.y));
+        this.setDisplayOrigin(
+            Utils.clamp(o.x,(this.minOrigin.x+this.minOrigin.xOffset)/(this.scaleX*2),this.maxOrigin.x+this.maxOrigin.xOffset),
+            Utils.clamp(o.y,this.minOrigin.y/(this.scaleY*2),this.maxOrigin.y)
+        );
         this.setPosition(this.center.x,this.center.y);
     },
 
@@ -505,13 +525,13 @@ var Map = new Phaser.Class({
 
 var Pin = new Phaser.Class({
 
-    //Extends: CustomSprite,
-    Extends: Phaser.GameObjects.RenderTexture,
+    Extends: CustomSprite,
+    // Extends: Phaser.GameObjects.RenderTexture,
 
     initialize: function Pin (map,mask) {
-        //CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
-        Phaser.GameObjects.RenderTexture.call(this, UI.scene, 0, 0, 16,16);
-        UI.scene.add.displayList.add(this);
+        CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
+        // Phaser.GameObjects.RenderTexture.call(this, UI.scene, 0, 0, 16,16);
+        // UI.scene.add.displayList.add(this);
         //UI.scene.add.updateList.add(this);
 
         this.setDepth(2);
@@ -523,7 +543,7 @@ var Pin = new Phaser.Class({
                 : new Phaser.Display.Masks.GeometryMask(UI.scene,mask)
         );*/
         this.parentMap = map;
-        this.setMask(this.parentMap.mask);
+        // this.setMask(this.parentMap.mask);
         //this.parentMap.container.add(this);
         this.on('pointerover',this.handleOver.bind(this));
         this.on('pointerout',this.handleOut.bind(this));
@@ -535,7 +555,9 @@ var Pin = new Phaser.Class({
         // Phaser 3.12:
         // var bg = bgframe ? 'bg'+bgframe : 'bg';
         // if(frame != 'x') this.drawFrame('mapicons',bg,0,0);
-        this.drawFrame('mapicons',frame,0,0);
+
+        // this.drawFrame('mapicons',frame,0,0);
+        this.setFrame(frame);
 
         // Phaser 3.11:
         /*var icon = Engine.scene.add.sprite(0,0,'mapicons',frame);
@@ -549,7 +571,11 @@ var Pin = new Phaser.Class({
         this.setDepth(this.depth + this.tileY/1000); // /1000 to avoid appearing above tooltip
         this.setPosition(x,y);
         this.name = name;
-        this.setVisible(true);
+        this.setVisibility();
+    },
+
+    setVisibility: function(){
+        this.setVisible(this.parentMap.viewRect.contains(this.x,this.y));
     },
 
     highlight: function(){
@@ -567,13 +593,14 @@ var Pin = new Phaser.Class({
     reposition: function(){
         var location = this.parentMap.computeMapLocation(this.tileX,this.tileY);
         this.setPosition(location.x,location.y);
+        this.setVisibility();
     },
 
     handleOver: function(){
         if(!this.parentMap.viewRect.contains(this.x,this.y)) return;
         UI.tooltip.updateInfo(this.name);
         UI.tooltip.display();
-        console.log(this.x,this.y);
+        // console.log(this.x,this.y);
     },
 
     handleOut: function(){
