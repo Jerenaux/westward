@@ -25,6 +25,7 @@ var GameServer = {
     socketMap: {}, // socket.id -> player.id
     vision: new Set(), // set of AOIs potentially seen by at least one player
     nbConnectedChanged: false,
+    buildingsChanged: false,
     initializationStep: 0,
     initialized: false
 };
@@ -220,7 +221,8 @@ GameServer.loadItems = function(){
     items.forEach(function(item){
         GameServer.addItem(item[0], item[1], item[2]);
     },this);
-    // GameServer.addItem(474,682,14);
+    path = pathmodule.join(GameServer.mapsPath,'resourceMarkers.json');
+    GameServer.resourceMarkers = JSON.parse(fs.readFileSync(path).toString());
     GameServer.updateStatus();
 };
 
@@ -780,7 +782,6 @@ GameServer.build = function(player,bid,tile){
         ownerName: player.name,
         built: false
     };
-    console.warn(data);
     var building = new Building(data);
     var document = new GameServer.BuildingModel(building);
     building.setModel(document); // ref to model is needed at least to get _id
@@ -789,8 +790,17 @@ GameServer.build = function(player,bid,tile){
         if (err) return console.error(err);
         console.log('Build successfull');
         building.embed();
-        player.listBuildings();
+        GameServer.buildingsChanged = true;
+        player.listBuildings(); // update list of buildable buildings by player
     });
+};
+
+GameServer.listBuildingMarkers = function(){
+    var list = [];
+    for(var bid in GameServer.buildings){
+        list.push(GameServer.buildings[bid].mapTrim());
+    }
+    return list;
 };
 
 GameServer.handleRespawn = function(data,socketID){

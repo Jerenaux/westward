@@ -10,7 +10,7 @@ var Map = new Phaser.Class({
     * README:
     * - The point on the screen where the focus should be is stored in this.center (typically, center of screen)
     * - centerMap() changes the pivot of the map, and positions that pivot on this.center
-    * - dragMap() repositions the elements of the map when it has moved
+    * - dragMap() repositions the elements of the map when it has moved (useful for follow behavior, even if actual drag by player is disabled)
     * */
 
     initialize: function Map(x, y, viewW, viewH, dragWidth, dragHeight, showToponyms) {
@@ -48,7 +48,6 @@ var Map = new Phaser.Class({
             x: (World.worldWidth-this.viewRect.width/2)*2,
             y: (World.worldHeight-this.viewRect.height/2)*2
         };
-        console.log(this.minOrigin,this.maxOrigin);
 
         this.toponyms = [];
         /*if(showToponyms) {
@@ -57,7 +56,7 @@ var Map = new Phaser.Class({
             }, this);
         }*/
 
-        this.setInteractive();
+        /*this.setInteractive();
         UI.scene.input.setDraggable(this);
         this.dragWidth = (dragWidth > -1 ? dragWidth : 999999);
         this.dragHeight = (dragHeight > -1 ? dragHeight : 999999);
@@ -65,7 +64,7 @@ var Map = new Phaser.Class({
         this.draggedY = 0;
 
         this.on('drag',this.handleDrag.bind(this));
-        this.on('pointerup',this.handleClick.bind(this));
+        this.on('pointerup',this.handleClick.bind(this));*/
 
         this.pins = [];
         this.resetCounter();
@@ -127,8 +126,6 @@ var Map = new Phaser.Class({
     },
 
     handleDrag: function(pointer,x,y){
-        console.log(this.x,this.y,x,y);
-        // TODO: check for Phaser way of restricting distance
         if(x < this.minX) return;
         if(x > this.maxX) return;
         if(y < this.minY) return;
@@ -172,12 +169,12 @@ var Map = new Phaser.Class({
                     y: '-='+dy,
                     duration: duration
                 });
-            UI.scene.tweens.add({
+            /*UI.scene.tweens.add({
                 targets: this.input.hitArea,
                 x: '+='+dx,
                 y: '+='+dy,
                 duration: duration
-            });
+            });*/
         }else {
             this.input.hitArea.x += dx;
             this.input.hitArea.y += dy;
@@ -256,7 +253,7 @@ var Map = new Phaser.Class({
         this.displayedPins.forEach(function(pin){
             pin.reposition();
         });
-        this.setInputArea();
+        // this.setInputArea();
         this.positionToponyms();
         this.computeDragLimits();
 
@@ -284,6 +281,7 @@ var Map = new Phaser.Class({
     },
 
     setInputArea: function(){
+        if(!this.minimap) return; // disabled for simplicity, it's ok if we can drag the map from outside of the scroll...
         // TODO: remove draggedX,Y once enable re-centering upon zoom?
         var rectx = this.displayOriginX + this.draggedX -(this.viewRect.width/2);
         var recty = this.displayOriginY + this.draggedY -(this.viewRect.height/2);
@@ -291,18 +289,15 @@ var Map = new Phaser.Class({
     },
 
     computeDragLimits: function(){
-        this.minY = this.y - (this.height-this.displayOriginY) + this.viewRect.height/2;
-        this.maxY = this.y + this.displayOriginY - this.viewRect.height/2;
-        this.minX = this.x - (this.width-this.displayOriginX) + this.viewRect.width/2;
-        this.maxX = this.x + this.displayOriginX - this.viewRect.width/2;
-        console.warn(this.minX);
+        this.minY = this.y - (this.height-this.displayOriginY)/(1/this.scaleY) + this.viewRect.height/2;
+        this.maxY = this.y + this.displayOriginY/(1/this.scaleY) - this.viewRect.height/2;
+        this.minX = this.x - (this.width-this.displayOriginX)/(1/this.scaleX) + this.viewRect.width/2;
+        this.maxX = this.x + this.displayOriginX/(1/this.scaleX) - this.viewRect.width/2;
 
         this.minX = Math.max(this.minX,this.x-this.dragWidth);
-        this.maxX = Math.min(this.maxX,this.x+this.dragWidth);
         this.minY = Math.max(this.minY,this.y-this.dragHeight);
+        this.maxX = Math.min(this.maxX,this.x+this.dragWidth);
         this.maxY = Math.min(this.maxY,this.y+this.dragHeight);
-
-        console.warn(this.minX);
     },
 
     applyFogOfWar: function(){
@@ -456,15 +451,20 @@ var Map = new Phaser.Class({
     },
 
     display: function(){
-        var tile = Engine.player.getTilePosition();
-        this.centerMap(tile);
-        this.setInputArea();
+        this.centerMap(Engine.player.getTilePosition());
+        // this.setInputArea();
         this.positionToponyms();
         this.computeDragLimits();
         //if(!this.minimap) this.applyFogOfWar();
 
+        this.displayPins();
+        this.setVisible(true);
+    },
+
+    displayPins: function(){
+        var tile = Engine.player.getTilePosition();
         this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
-        Engine.player.markers.forEach(function(data){
+        Engine.player.buildingMarkers.forEach(function(data){
             this.addPin(data.x,data.y,
                 Engine.buildingsData[data.type].name,
                 'bld'
@@ -472,9 +472,17 @@ var Map = new Phaser.Class({
                 // Engine.buildingsData[data.type].mapbg
             );
         },this);
+        Engine.player.resourceMarkers.forEach(function(data){
+            this.addPin(data[0],data[1],
+                Engine.itemsData[data[2]].name,
+                'herb'
+            );
+        },this);
+    },
 
-
-        this.setVisible(true);
+    updatePins: function(){
+        this.hidePins();
+        this.displayPins();
     },
 
     hide: function(){

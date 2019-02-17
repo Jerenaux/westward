@@ -511,7 +511,7 @@ WorldMaker.prototype.checkPositions = function(x,y){
 };
 
 WorldMaker.prototype.addMisc = function(){
-    var nbrocks = 10000; //TODO: conf
+    var nbrocks = 5000; //TODO: conf
     for(var i = 0; i < nbrocks; i++){
         // console.log('zone');
         var x = Utils.randomInt(0,World.worldWidth);
@@ -525,6 +525,7 @@ WorldMaker.prototype.addMisc = function(){
 };
 
 WorldMaker.prototype.makeSpawnZones = function(){
+    this.resourceMarkers = [];
     var items = [ // TODO: conf
         {item:14,decor:'b4',nbzones:100},
         {item:18,decor:null,nbzones:100},
@@ -537,7 +538,7 @@ WorldMaker.prototype.makeSpawnZones = function(){
             var y = Utils.randomInt(0,World.worldHeight-1);
             var w = Utils.randomInt(5,World.chunkWidth);
             var h = Utils.randomInt(5,World.chunkHeight);
-            this.makeFloraZone(x,y,w,h,item);
+            var nb = this.makeFloraZone(x,y,w,h,item);
         }
     },this);
     this.makeFloraZone(477,665,26,15,items[0]);
@@ -547,6 +548,7 @@ WorldMaker.prototype.makeSpawnZones = function(){
 WorldMaker.prototype.makeFloraZone = function(x,y,w,h,data){
     var nbbush = 4; // TODO: conf
     var contour = [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1],[2,-1]];
+    var nb = 0;
     for(var u = 0; u < w; u++){
         for(var v = 0; v < h; v++){
             var tree = this.trees.get(x+u,y+v);
@@ -557,11 +559,13 @@ WorldMaker.prototype.makeFloraZone = function(x,y,w,h,data){
                     var loc = {x:x+u+c[0],y:y+v+c[1]};
                     if(data.decor) this.addDecor(loc, data.decor);
                     this.items.add(loc.x,loc.y,data.item);
+                    nb++;
                     // console.log('bush at',loc);
                 }
             }
         }
     }
+    if(nb) this.resourceMarkers.push([Math.floor(x+w/2),Math.floor(y+h/2),data.item]);
 };
 
 WorldMaker.prototype.addRandomItem = function(x,y,decor){
@@ -601,6 +605,11 @@ WorldMaker.prototype.writeDataFiles = function(){
     fs.writeFile(path.join(this.outdir,'woodland.json'),JSON.stringify(this.woodland.toList(true)),function(err){
         if(err) throw err;
         console.log('Woodland written');
+    });
+    // Write resource markers
+    fs.writeFile(path.join(this.outdir,'resourceMarkers.json'),JSON.stringify(this.resourceMarkers),function(err){
+        if(err) throw err;
+        console.log('Resource markers written');
     });
     // Items
     fs.writeFile(path.join(this.outdir,'items.json'),JSON.stringify(this.items.toList(true)),function(err){

@@ -70,7 +70,6 @@ var Item = new Phaser.Class({
 
     handleOver: function(){
         UI.manageCursor(1,'item',this);
-        //if(this.isPlant) this.setFrame(this.inFrame);
         this.setFrame(this.inFrame);
         // console.log(this.depth);
     },

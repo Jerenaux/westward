@@ -23,7 +23,8 @@ var Hero = new Phaser.Class({
         Player.prototype.setUp.call(this,data);
 
         this.settlement = data.settlement;
-        this.markers = data.markers;
+        this.buildingMarkers = data.buildingMarkers;
+        this.resourceMarkers = data.resourceMarkers;
         this.unread = 1;
         this.inventory = new Inventory();
         this.stats = new StatsContainer();
@@ -46,12 +47,12 @@ var Hero = new Phaser.Class({
             'civiclvl': this.updateCivicLvl,
             'classlvl': this.updateClassLvl,
             'classxp': this.updateClassXP,
-            //'commitSlots': this.updateCommitSlots,
             'dead': this.handleDeath,
             'equipment': this.updateEquipment,
             'foodSurplus': this.updateFoodSurplus,
             'gold': this.updateGold,
             'items': this.updateInventory,
+            'buildingMarkers': this.updateMarkers,
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
             'resetTurn': BattleManager.resetTurn,
@@ -244,6 +245,11 @@ var Hero = new Phaser.Class({
                 if(sound) Engine.scene.sound.add(sound).play();
             });
         }
+    },
+
+    updateMarkers: function(markers){
+        this.buildingMarkers = markers;
+        if(Engine.miniMap) Engine.miniMap.map.updatePins();
     },
 
     updateStats: function(stats){

@@ -39,9 +39,7 @@ Misc:
 - Make rendertextures out of pins
 Shop & workshop interfaces
 Quid feathers spawn?
-Update buolding markers when built
-Update map drag limts
-Sync & display resources on map
+Click on map to center (no more dragging)
 New movement system
 Fog of war
 Check building limits are enforced

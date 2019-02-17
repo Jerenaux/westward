@@ -511,10 +511,8 @@ Player.prototype.initTrim = function(){
     trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    trimmed.markers = [];
-    for(var bid in GameServer.buildings){
-        trimmed.markers.push(GameServer.buildings[bid].mapTrim());
-    }
+    trimmed.buildingMarkers = GameServer.listBuildingMarkers();
+    trimmed.resourceMarkers = GameServer.resourceMarkers;
     return trimmed;
 };
 
@@ -651,6 +649,7 @@ Player.prototype.getIndividualUpdatePackage = function(){
     if(this.updatePacket.isEmpty()) return null;
     var pkg = this.updatePacket;
     this.updatePacket = new PersonalUpdatePacket();
+    if(GameServer.buildingsChanged) pkg.buildingMarkers = GameServer.listBuildingMarkers();
     return pkg;
 };
 
