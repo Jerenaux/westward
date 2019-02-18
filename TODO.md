@@ -16,7 +16,7 @@ Design document
 Testing
 World Building
 
-Misc:
+
 - Split trees in two images with different depths
 - Adapt animations and delays for firearms
 - findcell in battle doesn't take path to get there into accoung (may be within radius but require to go around an obstacle!)
@@ -35,6 +35,7 @@ Misc:
 - Poll at regular interval the sprite below mouse
 - Server crash during battles? (try two types of enemies, ...)
 - Fix "orientation pins blast" when spawning
+- Test log of pickups, loot, chat
 Shop & workshop interfaces
 Quid feathers spawn?
 New movement system
@@ -156,15 +157,13 @@ List buildings, players
 Make cmd line system
 Edit buildings stock
 Push desktop notifications for player connects
-Import db
--> Iterate over import object, if matching id in db, update fields, if not, insert new entry 
 Set coordinates
 Maintenance mode
 Secure
 
 Analytics:
 ---------
-- Log: tutorial begins, progress (each step) and ends, item pick ups/loot, menu opens?, fights (+ print types), kills
+- Log: tutorial begins, progress (each step) and ends, menu opens?, crafting, respawn, kills
 - Button to flush events
 - Bundle events from one player into sessions
 - Log session-wide stats: duration, how many players visit a building during session, do this, do that...

@@ -506,7 +506,8 @@ GameServer.removeFromLocation = function(entity){
 
 GameServer.handleChat = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
-    player.setChat(data);
+    player.setChat(data); // in MovingEntity
+    Prism.logEvent(player,'chat',{txt:data});
 };
 
 GameServer.checkCollision = function(x,y){ // true = collision
@@ -563,9 +564,9 @@ GameServer.lootNPC = function(player,type,ID){
     for(var item in NPC.loot.items){
         // TODO: take harvesting ability into consideration
         player.giveItem(item,NPC.loot.items[item],notify);
-        // player.addNotif('+'+NPC.loot.items[item]+' '+GameServer.itemsData[item].name);
     }
     GameServer.removeEntity(NPC); // TODO: handle differently, leave carcasses
+    Prism.logEvent(player,'loot',{name:NPC.name});
 };
 
 GameServer.pickUpItem = function(player,itemID){
@@ -576,6 +577,7 @@ GameServer.pickUpItem = function(player,itemID){
     player.giveItem(item.type,nb,true);
     if(GameServer.itemsData[item.type].collides) GameServer.collisions.delete(item.x,item.y);
     GameServer.removeEntity(item);
+    Prism.logEvent(player,'pickup',{item:itemID});
 };
 
 // Called by player clicks or by NPC.checkForAggro()

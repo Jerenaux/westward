@@ -38,6 +38,22 @@ var UseEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var PickUpEvent = Event.discriminator(
+    'PickUpEvent',
+    new mongoose.Schema({
+        item: Number
+    }),
+    {discriminatorKey: 'kind'}
+);
+
+var LootEvent = Event.discriminator(
+    'LootEvent',
+    new mongoose.Schema({
+        name: String
+    }),
+    {discriminatorKey: 'kind'}
+);
+
 var ExploreEvent = Event.discriminator(
     'ExploreEvent',
     new mongoose.Schema({
@@ -73,6 +89,13 @@ var BattleEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var ChatEvent = Event.discriminator(
+    'ChatEvent',
+    new mongoose.Schema({
+        txt: String
+    }),
+    {discriminatorKey: 'kind'}
+);
 
 var ConnectEvent = Event.discriminator(
     'ConnectEvent',
@@ -107,10 +130,13 @@ Prism.logEvent = function(player,action,data){
         'battle': BattleEvent,
         'building': BuildingEvent,
         'buy': TradeEvent,
+        'chat': ChatEvent,
         'connect': ConnectEvent,
         'disconnect': DisconnectEvent,
         'explore': ExploreEvent,
+        'loot': LootEvent,
         'newbuilding': NewBuildingEvent,
+        'pickup': PickUpEvent,
         'sell': TradeEvent,
         'server-start': ServerStartEvent,
         'use': UseEvent
