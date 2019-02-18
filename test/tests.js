@@ -55,9 +55,7 @@ describe('GameServer',function(){
         });
 
         var result = gs.addNewPlayer(null,{characterName:'Test'});
-        expect(result.sid).to.equal(0);
         expect(result.name).to.equal('Test');
-        expect(result.id).to.equal(0);
     });
 
     afterEach(function(){
