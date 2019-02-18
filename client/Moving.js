@@ -88,14 +88,8 @@ var Moving = new Phaser.Class({
             return;
         }
 
-        var worldView = Engine.camera.worldView;
-        if(worldView.x == 0 && worldView.y == 0){ // small hack, worldView not updated yet
-            this.orientationPin.hide();
-            return;
-        }
         var c = this.getCenter();
-        var inCamera = worldView.contains(c.x*32,c.y*32);
-        if(inCamera) {
+        if(Engine.isInView(c.x,c.y)) {
             this.orientationPin.hide();
         }else{
             this.orientationPin.update(this.tileX,this.tileY);
@@ -138,7 +132,11 @@ var Moving = new Phaser.Class({
     },
 
     frameByFrameUpdate: function(){
-        if(this.bubble) this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY,this.depth);
+        if(this.bubble) this.updateBubblePosition();
+    },
+
+    updateBubblePosition: function(){
+        this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY,this.depth);
     },
 
     computeOrientation: function(fromX,fromY,toX,toY){
@@ -337,6 +335,7 @@ var Moving = new Phaser.Class({
 
     talk: function(text){
         //if(this.isHero) return;
+        this.updateBubblePosition();
         this.bubble.update(text);
         this.bubble.display();
         Engine.scene.sound.add('speech').play();

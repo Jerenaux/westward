@@ -40,7 +40,6 @@ var Map = new Phaser.Class({
              new Phaser.Geom.Circle(this.x,this.y,viewW)
             :new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH)
             );
-        console.log(this.viewRect);
 
         var wcoord = (this.minimap ? 'radius' : 'width');
         var hcoord = (this.minimap ? 'radius' : 'height');

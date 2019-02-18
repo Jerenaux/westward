@@ -199,7 +199,6 @@ Client.sendCommit = function(){
 };
 
 Client.sendChat = function(text){
-    console.log('sending',text);
     Client.socket.emit('chat',text);
 };
 

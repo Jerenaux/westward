@@ -28,15 +28,11 @@ World Building
 - Feather tufts
 - Introduce new wood ingredient obtained from timber, crafting wood, made in bulk (but then tune down timber prod)
 -> For shield, guns...?
-- Clicks close to minimap fail
-- Display/hide/display map leads to warnings overflow
 - Spawning in battle area, moving: doesn't stop movement
 - Stop walk when opening menu
 - Camera bounds (test with northernmost camp)
 - Poll at regular interval the sprite below mouse
-- Server crash during battles? (try two types of enemies, ...)
-- Fix "orientation pins blast" when spawning
-- Test log of pickups, loot, chat, menus
+- Better notifs cascading
 Shop & workshop interfaces
 Quid feathers spawn?
 New movement system

@@ -563,7 +563,7 @@ GameServer.lootNPC = function(player,type,ID){
     if(NPC.loot.isEmpty()) return;
     for(var item in NPC.loot.items){
         // TODO: take harvesting ability into consideration
-        player.giveItem(item,NPC.loot.items[item],notify);
+        player.giveItem(item,NPC.loot.items[item],true);
     }
     GameServer.removeEntity(NPC); // TODO: handle differently, leave carcasses
     Prism.logEvent(player,'loot',{name:NPC.name});
@@ -577,7 +577,7 @@ GameServer.pickUpItem = function(player,itemID){
     player.giveItem(item.type,nb,true);
     if(GameServer.itemsData[item.type].collides) GameServer.collisions.delete(item.x,item.y);
     GameServer.removeEntity(item);
-    Prism.logEvent(player,'pickup',{item:itemID});
+    Prism.logEvent(player,'pickup',{item:item.type});
 };
 
 // Called by player clicks or by NPC.checkForAggro()

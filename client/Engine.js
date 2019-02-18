@@ -1972,6 +1972,14 @@ Engine.getMouseCoordinates = function(pointer){
     };
 };
 
+Engine.isInView = function(x,y){
+    if(x < Engine.player.tileX - VIEW_WIDTH/2) return false;
+    if(x >= Engine.player.tileX + VIEW_WIDTH/2) return false;
+    if(y < Engine.player.tileY - VIEW_HEIGHT/2) return false;
+    if(y >= Engine.player.tileY + VIEW_HEIGHT/2) return false;
+    return true;
+};
+
 Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
     if(Engine.player) Engine.updateMarker(position.tile);
