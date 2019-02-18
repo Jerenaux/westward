@@ -35,7 +35,7 @@ World Building
 - Poll at regular interval the sprite below mouse
 - Server crash during battles? (try two types of enemies, ...)
 - Fix "orientation pins blast" when spawning
-- Test log of pickups, loot, chat
+- Test log of pickups, loot, chat, menus
 Shop & workshop interfaces
 Quid feathers spawn?
 New movement system
@@ -163,12 +163,13 @@ Secure
 
 Analytics:
 ---------
-- Log: tutorial begins, progress (each step) and ends, menu opens?, crafting, respawn, kills
+- Log: tutorial begins, progress (each step) and ends, kills
 - Button to flush events
 - Bundle events from one player into sessions
 - Log session-wide stats: duration, how many players visit a building during session, do this, do that...
 - Push desktop notifications for player connects
-- Look for nice statistical library
+- Look for nice statistical library (https://dzone.com/articles/4-useful-javascript-libraries-for-data-analysis-an)
+-> Or export as CSV and explore in SPSS?
 - Log drains and faucets
 - Log where items are bought/sold
 - Log pathfinding destinations, consider making heatmap in the long term

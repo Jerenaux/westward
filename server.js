@@ -149,6 +149,7 @@ io.on('connection',function(socket){
             'commit': gs.handleCommit,
             'craft': gs.handleCraft,
             'exit': gs.handleExit,
+            'menu': gs.logMenu,
             'NPCClick': gs.handleNPCClick,
             'path': gs.handlePath,
             'respawn': gs.handleRespawn,

@@ -1379,6 +1379,7 @@ Engine.makeStaffMenu = function(){
 
 Engine.makeMapMenu = function(){
     var map = new Menu('World Map');
+    map.log = true;
     map.setSound(Engine.scene.sound.add('page_turn2'));
     var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
     mapPanel.addBackground('longscroll');
@@ -1643,6 +1644,7 @@ Engine.updateBldRect = function(){
 Engine.makeInventory = function(statsPanel){
     // ## Inventories are only displayed if a trigger calls onUpdateInventory; TODO change that!!
     var inventory = new Menu('Inventory');
+    inventory.log = true;
     inventory.setSound(Engine.scene.sound.add('inventory'));
 
     var items = inventory.addPanel('items',new InventoryPanel(40,100,600,380,'Items'));
@@ -1680,6 +1682,7 @@ Engine.makeAbilitiesMenu = function(){
 
 Engine.makeCharacterMenu = function(){
     var menu = new Menu('Character');
+    menu.log = true;
     menu.setSound(Engine.scene.sound.add('page_turn'));
 
     var citizenx = 40;

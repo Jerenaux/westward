@@ -30,6 +30,15 @@ var TradeEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var CraftEvent = Event.discriminator(
+    'CraftEvent',
+    new mongoose.Schema({
+        item: Number,
+        nb: Number,
+    }),
+    {discriminatorKey: 'kind'}
+);
+
 var UseEvent = Event.discriminator(
     'UseEvent',
     new mongoose.Schema({
@@ -97,6 +106,14 @@ var ChatEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var MenuEvent = Event.discriminator(
+    'MenuEvent',
+    new mongoose.Schema({
+        menu: String
+    }),
+    {discriminatorKey: 'kind'}
+);
+
 var ConnectEvent = Event.discriminator(
     'ConnectEvent',
     new mongoose.Schema({
@@ -108,6 +125,12 @@ var ConnectEvent = Event.discriminator(
 
 var DisconnectEvent = Event.discriminator(
     'DisconnectEvent',
+    new mongoose.Schema(),
+    {discriminatorKey: 'kind'}
+);
+
+var RespawnEvent = Event.discriminator(
+    'RespawnEvent',
     new mongoose.Schema(),
     {discriminatorKey: 'kind'}
 );
@@ -132,11 +155,14 @@ Prism.logEvent = function(player,action,data){
         'buy': TradeEvent,
         'chat': ChatEvent,
         'connect': ConnectEvent,
+        'craft': CraftEvent,
         'disconnect': DisconnectEvent,
         'explore': ExploreEvent,
         'loot': LootEvent,
+        'menu': MenuEvent,
         'newbuilding': NewBuildingEvent,
         'pickup': PickUpEvent,
+        'respawn': RespawnEvent,
         'sell': TradeEvent,
         'server-start': ServerStartEvent,
         'use': UseEvent

@@ -207,6 +207,10 @@ Client.sendRespawn = function(){
     Client.socket.emit('respawn');
 };
 
+Client.logMenu = function(menu){
+    Client.socket.emit('menu',menu);
+};
+
 // ####################"
 
 Client.sendMapData = function(id,data){

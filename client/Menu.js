@@ -81,6 +81,8 @@ Menu.prototype.display = function(){
     UI.setCursor();
     this.displayed = true;
 
+    if(this.log) Client.logMenu(this.name);
+
     if(Client.tutorial && this.hook) Engine.tutorialHook(this.hook);
 };
 

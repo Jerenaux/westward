@@ -809,6 +809,12 @@ GameServer.handleRespawn = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     if(!player.dead) return;
     player.respawn();
+    Prism.logEvent(player,'respawn');
+};
+
+GameServer.logMenu = function(menu,socketID){
+    var player = GameServer.getPlayer(socketID);
+    Prism.logEvent(player,'menu',{menu:menu});
 };
 
 GameServer.handleCommit = function(data,socketID){ // keep data argument
@@ -845,6 +851,7 @@ GameServer.handleCraft = function(data,socketID){
     if(!GameServer.allIngredientsOwned(recipient,recipe,nb)) return;
     GameServer.operateCraft(recipient, recipe, targetItem, nb);
     player.gainClassXP(GameServer.classes.craftsman,5*nb,true); // TODO: vary based on multiple factors
+    Prism.logEvent(player,'craft',{item:targetItem,nb:nb});
 };
 
 GameServer.allIngredientsOwned = function(entity,recipe,nb){
