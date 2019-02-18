@@ -29,14 +29,12 @@ Misc:
 -> For shield, guns...?
 - Clicks close to minimap fail
 - Display/hide/display map leads to warnings overflow
-- Still slow (make bick grass background on a blitter?)
 - Spawning in battle area, moving: doesn't stop movement
 - Stop walk when opening menu
 - Camera bounds (test with northernmost camp)
-- Minimap cross stop moving below a certain y?
-- Northernmost camp not really visible on map
 - Poll at regular interval the sprite below mouse
-- Make rendertextures out of pins
+- Server crash during battles? (try two types of enemies, ...)
+- Fix "orientation pins blast" when spawning
 Shop & workshop interfaces
 Quid feathers spawn?
 New movement system

@@ -49,6 +49,7 @@ var Item = new Phaser.Class({
     },
 
     manageOrientationPin: function(){
+        // console.log(Engine.camera.worldView);
         if(Engine.camera.worldView.contains(this.x,this.y)) {
             this.orientationPin.hide();
         }else{

@@ -484,7 +484,7 @@ Engine.initWorld = function(data){
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
     if(Engine.miniMap) Engine.miniMap.display();
-    Engine.updateAllOrientationPins();
+    // Engine.updateAllOrientationPins();
 
     if(Client.isNewPlayer() && !Client.tutorial) {
         var w = 400;

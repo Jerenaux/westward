@@ -529,7 +529,7 @@ WorldMaker.prototype.makeSpawnZones = function(){
     this.resourceMarkers = [];
     var items = [ // TODO: conf
         {item:14,decor:'b4',nbzones:100},
-        {item:18,decor:null,nbzones:100},
+        //{item:18,decor:null,nbzones:100},
         {item:8,decor:null,nbzones:100}
     ];
     items.forEach(function(item){

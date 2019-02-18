@@ -74,6 +74,8 @@ var Hero = new Phaser.Class({
         if(data.remainingTime) BattleManager.setCounter(data.remainingTime);
         if(data.activeID) BattleManager.manageTurn(data.activeID);
         if(data.x >= 0 && data.y >= 0) this.teleport(data.x,data.y);
+       
+        Engine.updateAllOrientationPins(); 
 
         Engine.firstSelfUpdate = false;
     },
