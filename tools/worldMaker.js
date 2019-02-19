@@ -529,8 +529,8 @@ WorldMaker.prototype.makeSpawnZones = function(){
     this.resourceMarkers = [];
     var items = [ // TODO: conf
         {item:14,decor:'b4',nbzones:100},
+        {item:8,decor:null,nbzones:100},
         //{item:18,decor:null,nbzones:100},
-        {item:8,decor:null,nbzones:100}
     ];
     items.forEach(function(item){
         for(var i = 0; i < item.nbzones; i++){
@@ -543,7 +543,7 @@ WorldMaker.prototype.makeSpawnZones = function(){
         }
     },this);
     this.makeFloraZone(477,665,26,15,items[0]);
-    this.makeFloraZone(498,697,26,15,items[2]);
+    this.makeFloraZone(498,697,26,15,items[1]);
 };
 
 WorldMaker.prototype.makeFloraZone = function(x,y,w,h,data){
