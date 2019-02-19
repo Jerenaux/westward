@@ -51,6 +51,9 @@ var Pathfinder =  require('../shared/Pathfinder.js').Pathfinder;
 var Prism = require('./Prism.js').Prism;
 var Schemas = require('./schemas.js');
 
+/**
+ * Progresses through the initialization sequence of the server, in a serial way (even for async steps).
+ */
 GameServer.updateStatus = function(){
     console.log('Successful initialization step:',GameServer.initializationSequence[GameServer.initializationStep++]);
     try {
@@ -71,12 +74,22 @@ GameServer.updateStatus = function(){
     }
 };
 
+/**
+ * Creates Mongoose models based on schemas
+ */
 GameServer.createModels = function(){
     GameServer.SettlementModel = mongoose.model('Settlement', Schemas.settlementSchema);
     GameServer.BuildingModel = mongoose.model('Building', Schemas.buildingSchema);
     GameServer.PlayerModel = mongoose.model('Player', Schemas.playerSchema);
 };
 
+/**
+ * Reads all the map and world data in order to create and run the game world.
+ * Called by server.js once the connection to the database is made.
+ * @param {string} mapsPath - Path to the directory containing the chunk files and world-specific data (collisions, items locations...)
+ * @param {boolean} [test] - Whether to run the game in "test" mode or not (debug/test only)
+ * @param {function} [cb] - Callback to call when the initialization sequence is finished (only used for tests)
+ */
 GameServer.readMap = function(mapsPath,test,cb){
     if(test){
         GameServer.initializationMethods = {
@@ -99,7 +112,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     //console.log(GameServer.initializationSequence);
 
     GameServer.createModels();
-    GameServer.mapsPath = mapsPath; // TODO remove, useless, debug
+    GameServer.mapsPath = mapsPath;
     console.log('Loading map data from '+mapsPath);
     var masterData = JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'master.json')).toString());
     World.readMasterData(masterData);
@@ -147,6 +160,12 @@ GameServer.readMap = function(mapsPath,test,cb){
     Prism.logEvent(null,'server-start');
 };
 
+/**
+ * Creates an object containing the boot parameters to send to the client (fetched from configuration file).
+ * Called by an event sent by the client in boot.create()
+ * @param {Object} socket - Socket to which to send the parameters
+ * @param {Object} data - Data sent by the client when requesting boot params, e.g. the player ID to check if he exists in database or not
+ */
 GameServer.getBootParams = function(socket,data){
     var playerID = data.id;
     var pkg = clone(GameServer.clientParameters,false);
@@ -170,6 +189,11 @@ GameServer.getBootParams = function(socket,data){
     );
 };
 
+/**
+ * Figure out what is the highest in-use player ID, to use as a
+ * starting point to assign new player IDs.
+ * Called by the initialization sequence.
+ */
 GameServer.readPlayersData = function(){
     console.log('Reading player data ...');
     GameServer.PlayerModel.find(function(err,players){
@@ -183,6 +207,10 @@ GameServer.readPlayersData = function(){
     });
 };
 
+/**
+ * Load regions data.
+ * Called by the initialization sequence.
+ */
 GameServer.loadRegions = function(){
     GameServer.regions = JSON.parse(fs.readFileSync(pathmodule.join('assets','data','regions.json')).toString());
     GameServer.updateStatus();
