@@ -33,6 +33,7 @@ World Building
 - Camera bounds (test with northernmost camp)
 - Poll at regular interval the sprite below mouse
 - Better notifs cascading
+- New test: GameServer.lootNPC
 Shop & workshop interfaces
 Quid feathers spawn?
 New movement system
