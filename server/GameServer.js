@@ -586,7 +586,7 @@ GameServer.lootNPC = function(player,type,ID){
     if(NPC.loot.isEmpty()) return;
     for(var item in NPC.loot.items){
         // TODO: take harvesting ability into consideration
-        player.giveItem(item,NPC.loot.items[item],notify);
+        player.giveItem(item,NPC.loot.items[item],true);
         // player.addNotif('+'+NPC.loot.items[item]+' '+GameServer.itemsData[item].name);
     }
     GameServer.removeEntity(NPC); // TODO: handle differently, leave carcasses
