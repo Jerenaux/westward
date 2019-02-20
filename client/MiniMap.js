@@ -9,10 +9,10 @@ function MiniMap(){
     var x = Engine.getGameConfig().width - r/2 - margin;
     var y = r/2 + margin;
 
-    this.bg = UI.scene.add.sprite(x,y,'minimap');
+    /*this.bg = UI.scene.add.sprite(x,y,'minimap');
     this.bg.setDepth(1);
     this.bg.setScrollFactor(0);
-    this.bg.setVisible(false);
+    this.bg.setVisible(false);*/
 
     this.ring = UI.scene.add.sprite(x,y,'UI','mapring');
     this.ring.setDepth(1);
@@ -28,13 +28,13 @@ function MiniMap(){
     });
     //this.map.addMask('minimap');
 
-    this.bg.setInteractive();
+    /*this.bg.setInteractive();
     this.bg.on('pointerover',function(){
         UI.manageCursor(1,'UI');
     });
     this.bg.on('pointerout',function(){
         UI.manageCursor(0,'UI');
-    });
+    });*/
 }
 
 MiniMap.prototype.follow = function(){
@@ -42,13 +42,13 @@ MiniMap.prototype.follow = function(){
 };
 
 MiniMap.prototype.display = function(){
-    if(this.bg) this.bg.setVisible(true);
+    //if(this.bg) this.bg.setVisible(true);
     this.ring.setVisible(true);
     this.map.display();
 };
 
 MiniMap.prototype.hide = function(){
-    if(this.bg) this.bg.setVisible(false);
+    //if(this.bg) this.bg.setVisible(false);
     this.ring.setVisible(false);
     this.map.hide();
 };

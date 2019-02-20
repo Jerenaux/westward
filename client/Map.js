@@ -3,8 +3,8 @@
  */
 var Map = new Phaser.Class({
 
-    Extends: CustomSprite,
-    //Extends: Phaser.GameObjects.RenderTexture,
+    // Extends: CustomSprite,
+    Extends: Phaser.GameObjects.RenderTexture,
 
     /*
     * README:
@@ -16,16 +16,19 @@ var Map = new Phaser.Class({
     initialize: function Map(x, y, viewW, viewH, dragWidth, dragHeight, showToponyms, minimap) {
         // viewW is either a radius or a rect width; controls the size of area in which pins will appear
         // (it is dissociated from the mask size, which depends on the size of the image used for masking)
-        CustomSprite.call(this, UI.scene, x, y, 'worldmap');
-        //Phaser.GameObjects.RenderTexture.call(this, UI.scene, x, y, 2400,1824);
-        //UI.scene.add.displayList.add(this);
-        //this.draw('fullmap',0,0);
+        
+        // CustomSprite.call(this, UI.scene, x, y, 'worldmap');
+        Phaser.GameObjects.RenderTexture.call(this, UI.scene, x, y, 1500, 600);
+        UI.scene.add.displayList.add(this);
+        this.draw('worldmap');
+        this.setOrigin(0.5);
 
         this.minimap = minimap;
         this.setDepth(2);
         this.setScrollFactor(0);
         this.setVisible(false);
         this.setScale(0.5);
+        console.log(this);
 
         /*this.container = UI.scene.add.container(x,y);
         this.container.setDepth(2);
@@ -470,7 +473,7 @@ var Map = new Phaser.Class({
     },
 
     display: function(){
-        this.centerMap(Engine.player.getTilePosition());
+        // this.centerMap(Engine.player.getTilePosition());
         // this.setInputArea();
         this.positionToponyms();
         this.computeDragLimits();
