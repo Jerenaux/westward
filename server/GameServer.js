@@ -216,6 +216,12 @@ GameServer.loadRegions = function(){
     GameServer.updateStatus();
 };
 
+/**
+ * Add a building to the game world.
+ * Mainly called by GameServer.loadBuildings().
+ * @param {Object} data - All the parameters of the building.
+ * @returns {Object} The created Building object
+ */
 GameServer.addBuilding = function(data){
     var building = new Building(data);
     building.setModel(data);
@@ -224,6 +230,10 @@ GameServer.addBuilding = function(data){
     return building;
 };
 
+/**
+ * Fetch the buildings from the database.
+ * Called during the initialization sequence.
+ */
 GameServer.loadBuildings = function(){
     if(config.get('buildings.nobuildings')){
         GameServer.updateStatus();
@@ -236,6 +246,10 @@ GameServer.loadBuildings = function(){
     });
 };
 
+/**
+ * Read the item spawn locations from data file items.json.
+ * Called during the initialization sequence.
+ */
 GameServer.loadItems = function(){
     var path = pathmodule.join(GameServer.mapsPath,'items.json');
     /*TODO eventually:
@@ -254,6 +268,10 @@ GameServer.loadItems = function(){
     GameServer.updateStatus();
 };
 
+/**
+ * Create Spawn Zones based on the spawnzones.json data file.
+ * Called during the initialization sequence.
+ */
 GameServer.setUpSpawnZones = function(){
     GameServer.spawnZonesData = JSON.parse(fs.readFileSync(pathmodule.join('assets','data','spawnzones.json')).toString());
     GameServer.spawnZones = [];
@@ -269,6 +287,10 @@ GameServer.setUpSpawnZones = function(){
     GameServer.updateStatus();
 };
 
+/**
+ * Create Civ camps based on the camps.json data file.
+ * Called during the initialization sequence.
+ */
 GameServer.setUpCamps = function(){
     GameServer.campsData = JSON.parse(fs.readFileSync('./assets/data/camps.json').toString());
     GameServer.camps = [];
@@ -281,6 +303,13 @@ GameServer.setUpCamps = function(){
     GameServer.updateStatus();
 };
 
+/**
+ * Add a Civ to the game world.
+ * Called by Camp.update().
+ * @param {number} x - x tile coordinate of the civ.
+ * @param {number} y - y tile coordinate of the civ.
+ * @returns {Object} The created Civ object.
+ */
 GameServer.addCiv = function(x,y){
     console.log('Spawning civ at',x,y);
     var npc = new Civ(x,y,0);
@@ -288,23 +317,46 @@ GameServer.addCiv = function(x,y){
     return npc;
 };
 
+/**
+ * Add an Animal to the game world.
+ * Called by SpawnZone.spawn().
+ * @param {number} x - x tile coordinate of the animal.
+ * @param {number} y - y tile coordinate of the animal.
+ * @param {number} type - The type of animal (foreign key with a match in GameServer.animalsData)
+ * @returns {Object} The created Animal object.
+ */
 GameServer.addAnimal = function(x,y,type){
     var animal = new Animal(x,y,type);
     GameServer.animals[animal.id] = animal;
     return animal;
 };
 
+/**
+ * Add an Item to the game world.
+ * Called by GameServer.loadItems().
+ * @param {number} x - x tile coordinate of the item.
+ * @param {number} y - y tile coordinate of the item.
+ * @param {number} type - The type of item (foreign key with a match in GameServer.itemsData)
+ * @returns {Object} The created Item object.
+ */
 GameServer.addItem = function(x,y,type){
     var item = new Item(x,y,type);
     GameServer.items[item.id] = item;
     return item;
 };
 
+/**
+ * Perform tasks once the initialization sequence is over. Mostly used for testing.
+ */
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
 };
 
+/**
+ * Start several loops needed for game logic.
+ * Called one the initialization sequence is over.
+ */
 GameServer.setUpdateLoops = function(){
     console.log('Setting up loops...');
 
@@ -324,6 +376,10 @@ GameServer.setUpdateLoops = function(){
     console.log('Loops set');
 };
 
+/**
+ * Start the main economic loop that counts the economic turns.
+ * Called one the initialization sequence is over.
+ */
 GameServer.startEconomy = function(){
     GameServer.economyTurns = config.get('economyCycles.turns');
     GameServer.elapsedTurns = 0;
@@ -340,6 +396,10 @@ GameServer.startEconomy = function(){
     setInterval(GameServer.economyTurn,GameServer.turnDuration*1000);
 };
 
+/**
+ * Trigger all the updates that must take place at each economic turn.
+ * Recurring call started in `GameServer.startEconomy()`
+ */
 GameServer.economyTurn = function(){
     GameServer.elapsedTurns++;
     console.log('Turn',GameServer.elapsedTurns);
@@ -363,6 +423,10 @@ GameServer.economyTurn = function(){
     if(GameServer.elapsedTurns == GameServer.maxTurns) GameServer.elapsedTurns = 0;
 };
 
+/**
+ * Generic method that calls `update()` on all objects of the provided array.
+ * @param {array} entities - Array of game entities to update.
+ */
 GameServer.updateEconomicEntities = function(entities){
     for(var key in entities){
         entities[key].update();
