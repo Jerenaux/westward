@@ -24,6 +24,7 @@ var Item = new Phaser.Class({
         this.orientationPin = new OrientationPin('item',itemData.atlas,itemData.frame);
 
         this.setTilePosition(data.x,data.y,true);
+        // this.setOrigin(0.5);
         this.setDepth(this.ty+1); // for e.g. when wood spawns on the roots of a tree
 
         if(itemData.collides) {
@@ -71,6 +72,7 @@ var Item = new Phaser.Class({
     handleOver: function(){
         UI.manageCursor(1,'item',this);
         this.setFrame(this.inFrame);
+        Engine.hideMarker();
         // console.log(this.depth);
     },
 
@@ -78,7 +80,7 @@ var Item = new Phaser.Class({
         UI.manageCursor(0,'item');
         //UI.setCursor();
         UI.tooltip.hide();
-        //if(this.isPlant) this.setFrame(this.outFrame);
         this.setFrame(this.outFrame);
+        Engine.showMarker();
     }
 });

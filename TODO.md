@@ -35,14 +35,15 @@ World Building
 - Better notifs cascading
 - New test: GameServer.lootNPC
 Shop & workshop interfaces
-Quid feathers spawn?
 New movement system
 Fog of war
 -> Display map, apply shader, create camera 2 that sees map (main ignores map), draw camera 2 to rendertexture
 -> Test if possible to draw camera to rt; if possible to ignore all 
 Check building limits are enforced
 
-
+Art:
+- Wood lit
+- Feathers tuft
 
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
@@ -156,6 +157,8 @@ V1 level:
 Admin
 -----
 List buildings, players
+List how many of each item is owned by a player or building in world
++ compute a per capita count (to tune scarcity)
 Make cmd line system
 Edit buildings stock
 Push desktop notifications for player connects

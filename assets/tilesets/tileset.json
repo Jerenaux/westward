@@ -153,23 +153,33 @@
       "anchor": {"x":0,"y":0}
     },
     "rock_1":{
-      "frame": {"x":0,"y":32,"w":32,"h":32},
-      "anchor": {"x":0,"y":0},
+      "frame": {"x":0,"y":32,"w":33,"h":33},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
+    "rock_1_lit":{
+      "frame": {"x":128,"y":1,"w":33,"h":33},
+      "anchor": {"x":0.5,"y":0.5},
       "collisions": [[0,0]]
     },
     "rock_2":{
-      "frame": {"x":32,"y":32,"w":32,"h":32},
-      "anchor": {"x":0,"y":0},
+      "frame": {"x":32,"y":32,"w":33,"h":33},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
+    "rock_2_lit":{
+      "frame": {"x":162,"y":1,"w":33,"h":33},
+      "anchor": {"x":0.5,"y":0.5},
       "collisions": [[0,0]]
     },
     "rock_3":{
       "frame": {"x":64,"y":32,"w":32,"h":32},
-      "anchor": {"x":0,"y":0},
+      "anchor": {"x":0.5,"y":0.5},
       "collisions": [[0,0]]
     },
-    "rock_4":{
-      "frame": {"x":96,"y":32,"w":32,"h":32},
-      "anchor": {"x":0,"y":0},
+    "rock_3_lit":{
+      "frame": {"x":200,"y":0,"w":33,"h":33},
+      "anchor": {"x":0.5,"y":0.5},
       "collisions": [[0,0]]
     },
     "clovers":{
@@ -177,6 +187,10 @@
       "offset": {"x":0.5,"y":0.5},
       "anchor": {"x":0.5,"y":0.5},
       "collisions": [[0,0]]
+    },
+    "wood":{
+      "frame": {"x":397,"y":91,"w":32,"h":32},
+      "anchor": {"x":0,"y":0}
     }
   },
   "shorthands" : {
