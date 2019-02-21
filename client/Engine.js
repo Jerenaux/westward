@@ -517,6 +517,15 @@ Engine.initWorld = function(data){
         }
     },1000);
 
+    // var rect = UI.scene.add.rectangle(300,10,100,100,0xffffff);
+    // rect.setScrollFactor(0);
+    // rect.setOrigin(0);
+    // var rt = UI.scene.add.renderTexture(0,0,1024,576);
+    // rt.setOrigin(0);
+    // rt.setScrollFactor(0);
+    // rt.fill(0x000000);
+    // rt.erase(rect);
+
     return;
     // todo: move all to dedicated sound manager
     Engine.lastOrientationSound = 0;
@@ -1381,15 +1390,14 @@ Engine.makeMapMenu = function(){
     var map = new Menu('World Map');
     map.log = true;
     map.setSound(Engine.scene.sound.add('page_turn2'));
-    var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
+    var mapPanel = map.addPanel('map',new MapPanel(10,100,1000,380,'',true)); // true = invisible
     mapPanel.addBackground('longscroll');
     var mapInstance = mapPanel.addMap('radiallongrect',900,380,-1,-1);
     mapPanel.addButton(953, -2, 'blue','help',null,'',UI.textsData['self_map_help']);
     // TODO: move in Map.js, method addZoom, positions buttons based on viewWidt/height and
     // controls enable/disable of buttons based on zoom flag
-    mapPanel.addButton(940, 320, 'blue','plus',mapInstance.zoomIn.bind(mapInstance),'Zoom in');
-    mapPanel.addButton(930, 350, 'blue','minus',mapInstance.zoomOut.bind(mapInstance),'Zoom out');
-    map.addPanel('map',mapPanel);
+    mapPanel.zoomInBtn = mapPanel.addButton(940, 320, 'blue','plus',mapInstance.zoomIn.bind(mapInstance),'Zoom in');
+    mapPanel.zoomOutBtn = mapPanel.addButton(930, 350, 'blue','minus',mapInstance.zoomOut.bind(mapInstance),'Zoom out');
     return map;
 };
 

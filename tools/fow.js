@@ -22,7 +22,7 @@ function preload ()
 function create ()
 {
     var volcano = this.add.image(400, 300, 'volcano');
-    var hd = this.add.image(250, 100, 'hotdog')
+    var hd = this.add.image(250, 100, 'hotdog');
 
     var rt = this.add.renderTexture(0,0,800,600);
     rt.fill(0x000000);

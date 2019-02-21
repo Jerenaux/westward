@@ -21,6 +21,7 @@ MapPanel.prototype.addBackground = function(texture){
 
 MapPanel.prototype.addMap = function(texture,w,h,dragX,dragY){
     this.map = new Map(this.mapx,this.mapy,w,h,dragX,dragY,true);
+    this.map.panel = this;
     this.map.addMask(texture);
     this.content.push(this.map);
     return this.map;

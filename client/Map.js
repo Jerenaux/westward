@@ -18,7 +18,7 @@ var Map = new Phaser.Class({
         // (it is dissociated from the mask size, which depends on the size of the image used for masking)
         
         // CustomSprite.call(this, UI.scene, x, y, 'worldmap');
-        Phaser.GameObjects.RenderTexture.call(this, UI.scene, x, y, 1500, 600);
+        Phaser.GameObjects.RenderTexture.call(this, UI.scene, x, y, 3000, 2280);
         UI.scene.add.displayList.add(this);
         this.draw('worldmap');
         this.setOrigin(0.5);
@@ -28,11 +28,6 @@ var Map = new Phaser.Class({
         this.setScrollFactor(0);
         this.setVisible(false);
         this.setScale(0.5);
-        console.log(this);
-
-        /*this.container = UI.scene.add.container(x,y);
-        this.container.setDepth(2);
-        this.container.add(this);*/
 
         this.center = { // position of map sprite on screen
             x: x,
@@ -74,7 +69,7 @@ var Map = new Phaser.Class({
 
         if(!this.minimap) {
             this.offZone = new Phaser.Geom.Rectangle(932,418,60,50);
-            this.setInteractive({ pixelPerfect: true });
+            this.setInteractive(); // { pixelPerfect: true } // not needed anymore with rendertexture apparently
             this.on('pointerdown', this.handleClick.bind(this));
         }
         /*UI.scene.input.setDraggable(this);
@@ -200,8 +195,10 @@ var Map = new Phaser.Class({
         }else {
             // this.input.hitArea.x += dx;
             // this.input.hitArea.y += dy;
-            //this.fow.x -= dx;
-            //this.fow.y -= dy;
+            if(this.fow){
+                this.fow.x -= dx;
+                this.fow.y -= dy;
+            }
             this.moveTexts(dx,dy);
             this.movePins(dx, dy);
         }
@@ -234,13 +231,6 @@ var Map = new Phaser.Class({
 
     // Maps a tile coordinate to px coordinate on the map
     computeMapLocation: function(tx,ty){
-        /*var pct = Utils.tileToPct(tx,ty);
-        var dx = (pct.x - this.originX)*this.width;
-        var dy = (pct.y - this.originY)*this.height;
-        return {
-            x: Math.round(this.x+dx),
-            y: Math.round(this.y+dy)
-        }*/
         var dx = (tx*2 - this.displayOriginX)*this.scaleX;
         var dy = (ty*2 - this.displayOriginY)*this.scaleY;
         return {
@@ -251,6 +241,7 @@ var Map = new Phaser.Class({
 
     addPin: function(x,y,name,frame,bg){
         var location = this.computeMapLocation(x,y);
+        // console.log(x,y,location);
         var pin = this.getNextPin();
         pin.setUp(x,y,location.x,location.y,name,frame,bg);
         this.displayedPins.push(pin);
@@ -262,14 +253,23 @@ var Map = new Phaser.Class({
         this.displayedPins = [];
     },
 
+    getZoomBtn: function(mode){
+        var btnID = (mode == 'in' ? 1 : 2);
+        return this.panel.buttons[btnID].btn;
+    },
+
     zoomIn: function(){
         this.setScale(1);
         this.zoom();
+        this.getZoomBtn('in').disable();
+        this.getZoomBtn('out').enable();
     },
 
     zoomOut: function(){
         this.setScale(0.5);
         this.zoom();
+        this.getZoomBtn('in').enable();
+        this.getZoomBtn('out').disable();
     },
 
     zoom: function(){
@@ -355,10 +355,6 @@ var Map = new Phaser.Class({
         };
 
         function link(pts){ // link together all points in list
-            /*console.log('link candidates:');
-            pts.forEach(function(pt){
-                console.log(pt.ts());
-            });*/
             for(var i = 0; i < pts.length; i++){
                 for(var j = i; j < pts.length; j++){
                     var a = pts[i];
@@ -381,10 +377,6 @@ var Map = new Phaser.Class({
         }
 
         function lint(pts){ // remove side-by-side duplicate neighbors
-            /*console.log("linting");
-            pts.forEach(function(pt){
-                console.log(pt.ts());
-            });*/
             for(var i = pts.length-2; i >= 0; i--){
                 if(i == pts.length-1) continue; // needed when there are 4 duplicates in a row
                 if(pts[i].equal(pts[i+1])){
@@ -453,14 +445,28 @@ var Map = new Phaser.Class({
             i++;
         }
 
+        console.warn(path);
+
         path = path.map(function(pt){
             return this.computeMapLocation(pt.x,pt.y);
         },this);
 
-        this.fow = UI.scene.add.polygon(0,0,path,0x000000,1);
+        console.warn(path);
+
+        this.fow = UI.scene.add.polygon(0,0,path,0xffffff,1);
         this.fow.setOrigin(0);
         this.fow.setDepth(this.depth+1);
         this.fow.setScrollFactor(0);
+
+        /*var gl = UI.scene.sys.game.renderer.gl;
+        var renderer = UI.scene.sys.game.renderer;
+
+        var modeIndex = renderer.addBlendMode([ gl.ZERO, gl.SRC_COLOR ], gl.FUNC_ADD);
+        this.setBlendMode(modeIndex);*/
+
+        // this.erase('tileset',500,500);
+
+
         //this.fow.setVisible(false);
         //this.setMask(new Phaser.Display.Masks.BitmapMask(UI.scene,this.fow));
 
@@ -473,14 +479,15 @@ var Map = new Phaser.Class({
     },
 
     display: function(){
-        // this.centerMap(Engine.player.getTilePosition());
+        this.centerMap(Engine.player.getTilePosition());
         // this.setInputArea();
         this.positionToponyms();
         this.computeDragLimits();
-        //if(!this.minimap) this.applyFogOfWar();
+        // if(!this.minimap) this.applyFogOfWar();
 
         this.displayPins();
         this.setVisible(true);
+        if(!this.minimap) this.getZoomBtn('out').disable();
     },
 
     displayPins: function(){
@@ -602,7 +609,7 @@ var Pin = new Phaser.Class({
         if(!this.parentMap.viewRect.contains(this.x,this.y)) return;
         UI.tooltip.updateInfo(this.name);
         UI.tooltip.display();
-        // console.log(this.x,this.y);
+        console.log(this.tileX,this.tileY);
     },
 
     handleOut: function(){
