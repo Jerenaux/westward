@@ -40,7 +40,9 @@ app.get('/editor',function(req,res){
 
 var GEThandlers = {
     'buildings': gs.getBuildings,
+    'countItems': gs.countItems,
     'events': gs.getEvents,
+    'players': gs.getPlayers,
     'screenshots': gs.getScreenshots
 };
 var categories = Object.keys(GEThandlers);

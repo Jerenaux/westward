@@ -34,6 +34,7 @@ World Building
 - Poll at regular interval the sprite below mouse
 - Better notifs cascading
 - New test: GameServer.lootNPC
+- Test itemCounts in admin
 Shop & workshop interfaces
 New movement system
 Fog of war

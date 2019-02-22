@@ -11,7 +11,7 @@
 <h1>Westward admin</h1>
 <div ng-app="admin" ng-controller="mainCtrl">
 
-
+    <h3>Buildings</h3>
     <table class="table table-bordered table-striped">
         <!--
         https://codepen.io/chrisoncode/pen/AmFLE
@@ -51,7 +51,12 @@
 
     </table>
 
+    <h3>Items in circulation</h3>
+    <div ng-repeat="item in items">
+        {{item[1]}} {{item[0] | itemName}}
+    </div>
 
+    <h3>Screenshots</h3>
     <div class="panel panel-default" ng-repeat="screenshot in screenshots">
         <div class="panel-heading">
             {{screenshot.stamp | date}} @ ({{screenshot.player.x}}, {{screenshot.player.y}}) | {{screenshot.browser}}
@@ -61,6 +66,7 @@
         </div>
     </div>
 
+    <h3>Events</h3>
     <div ng-repeat="event in events">
         <!--- ":this" means that a second argument is sent to the filter, which is a reference to the whole scope -->
         {{event | eventFilter:this}}

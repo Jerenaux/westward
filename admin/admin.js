@@ -23,7 +23,6 @@ app.controller("mainCtrl", [
             },function(err){});
         };
 
-
         getData = function(category){
             $scope[category] = [];
             $http.get("/admin/"+category+"/").then(function(res) {
@@ -32,11 +31,24 @@ app.controller("mainCtrl", [
             },function(err){});
         };
 
+        countItems = function(category){
+            $http.get("/admin/countItems/").then(function(res) {
+                if(res.status == 200) {
+                    console.log(res.data);
+                    $scope['items'] = [];
+                    for(var item in res.data){
+                        $scope['items'].push([item,res.data[item]]);
+                    }
+                    console.log($scope['items']);
+                }
+            },function(err){});
+        };
+
         getAllData = function(){
             getData('events');
             getData('screenshots');
             getData('buildings');
-            console.log(Data.buildingsData);
+            countItems();
         };
 
         Data.categories.forEach(function(category){
@@ -67,6 +79,12 @@ function prefix(txt,time,name){
 app.filter('buildingName',function(){
     return function(id){
         return Data.buildingsData[id].name
+    }
+});
+
+app.filter('itemName',function(){
+    return function(id){
+        return Data.itemsData[id].name
     }
 });
 
