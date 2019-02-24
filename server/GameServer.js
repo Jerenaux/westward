@@ -1241,6 +1241,27 @@ GameServer.toggleBuild = function(data){
     return true;
 };
 
+GameServer.countItems = function(cb){
+    var items = {}
+    for(var id in GameServer.buildings){
+        var bld = GameServer.buildings[id];
+        var inv = bld.listItems();
+        for(var itemID in inv){
+            if(!items.hasOwnProperty(itemID)) items[itemID] = 0;
+            items[itemID] += inv[itemID];
+        }
+    }
+    GameServer.PlayerModel.find(function(err,players){
+        if (err) return console.log(err);
+        players.forEach(function(data){
+            data.inventory.forEach(function(itm){
+                if(!items.hasOwnProperty(itm[0])) items[itm[0]] = 0; 
+                items[itm[0]] += itm[1];
+            });
+        });
+        cb(items);
+    });
+};
 
 GameServer.getBuildings = function(cb){
     var list = [];
@@ -1261,6 +1282,13 @@ GameServer.getScreenshots = function(cb){
     GameServer.server.db.collection('screenshots').find({}).toArray(function(err,docs){
         if(err) throw err;
         cb(docs);
+    });
+};
+
+GameServer.getPlayers = function(cb){
+    GameServer.PlayerModel.find(function(err,players){
+        if (err) return console.log(err);
+        cb(players);
     });
 };
 

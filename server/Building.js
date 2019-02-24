@@ -271,6 +271,10 @@ Building.prototype.canSell = function(item,nb,isFinancial){
     return true;
 };
 
+Building.prototype.listItems = function(){
+    return this.inventory.items;
+};
+
 Building.prototype.getItemNb = function(item){
     return this.inventory.getNb(item);
 };

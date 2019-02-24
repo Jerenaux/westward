@@ -38,6 +38,7 @@ World Building
 - Don't disable walk with build panel
 - Multiple clicks on "give" repeat the action
 - Closing panels make player walk there
+- Test itemCounts in admin
 Shop & workshop interfaces
 New movement system
 Fog of war
