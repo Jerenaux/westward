@@ -34,6 +34,10 @@ World Building
 - Poll at regular interval the sprite below mouse
 - Better notifs cascading
 - New test: GameServer.lootNPC
+- Positions not saved often enough?
+- Don't disable walk with build panel
+- Multiple clicks on "give" repeat the action
+- Closing panels make player walk there
 Shop & workshop interfaces
 New movement system
 Fog of war
