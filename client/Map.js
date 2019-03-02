@@ -48,6 +48,7 @@ var Map = new Phaser.Class({
             y: (this.viewRect[hcoord]/2)*(1/this.scaleY),
             xOffset: 0
         };
+        if(this.minimap) this.minOrigin.y *= 2; // quick fix
         this.maxOrigin =  {
             x: (World.worldWidth-this.viewRect[wcoord]/2)*(1/this.scaleX),
             y: (World.worldHeight-this.viewRect[hcoord]/2)*(1/this.scaleY),
@@ -300,6 +301,7 @@ var Map = new Phaser.Class({
             Utils.clamp(o.y,this.minOrigin.y/(this.scaleY*2),this.maxOrigin.y)
         );
         this.setPosition(this.center.x,this.center.y);
+        console.log(this.minOrigin.y);
     },
 
     setInputArea: function(){

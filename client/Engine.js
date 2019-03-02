@@ -238,6 +238,7 @@ Engine.create = function(){
     Engine.showGrid = false;
 
     Engine.camera = Engine.scene.cameras.main;
+    Engine.camera.setBounds(0,0,Engine.worldWidth*TILE_WIDTH,Engine.worldHeight*TILE_HEIGHT);
 
     Engine.buildingsData = Engine.scene.cache.json.get('buildings');
     Engine.animalsData = Engine.scene.cache.json.get('animals');

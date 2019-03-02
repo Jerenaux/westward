@@ -38,6 +38,7 @@ World Building
 - Don't disable walk with build panel
 - Multiple clicks on "give" repeat the action
 - Closing panels make player walk there
+- Red cross hits an invisible wall
 - Test itemCounts in admin
 Shop & workshop interfaces
 New movement system
@@ -46,9 +47,6 @@ Fog of war
 -> Test if possible to draw camera to rt; if possible to ignore all 
 Check building limits are enforced
 
-Art:
-- Wood lit
-- Feathers tuft
 
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)

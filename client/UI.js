@@ -393,10 +393,9 @@ UI.displayRegions = function(list){
 };
 
 UI.displayRegion = function(data,world){
+    console.log(data);
     var x = (data.x/world.width)*UI.SSmap.width*UI.SSmap.scaleX - 90; // why offset?
     var y = (data.y/world.height)*UI.SSmap.height*UI.SSmap.scaleY - 50;
-    console.log(data.x,world.width,UI.SSmap.width);
-    console.log(data.y,world.height,UI.SSmap.height);
     var icon = UI.scene.add.image(x,y,'setldiamond');
     icon.setOrigin(0.5,1);
     icon.setInteractive();
