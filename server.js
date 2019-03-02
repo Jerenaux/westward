@@ -157,6 +157,7 @@ io.on('connection',function(socket){
             'respawn': gs.handleRespawn,
             'screenshot': gs.handleScreenshot,
             'shop': gs.handleShop,
+            'tutorial-start': gs.handleTutorialStart,
             'unequip': gs.handleUnequip,
             'use': gs.handleUse,
 

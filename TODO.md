@@ -39,7 +39,6 @@ World Building
 - Multiple clicks on "give" repeat the action
 - Closing panels make player walk there
 - Red cross hits an invisible wall
-- Test itemCounts in admin
 Shop & workshop interfaces
 New movement system
 Fog of war
@@ -159,8 +158,8 @@ V1 level:
 
 Admin
 -----
-Improv admin tables
-Compute "concentration" stat of items
+Improve admin tables
+Flush screenshots
 Make cmd line system
 Edit buildings stock
 Push desktop notifications for player connects
@@ -177,6 +176,7 @@ Analytics:
 - Push desktop notifications for player connects
 - Look for nice statistical library (https://dzone.com/articles/4-useful-javascript-libraries-for-data-analysis-an)
 -> Or export as CSV and explore in SPSS?
+- Compute "concentration" stat of items
 - Log drains and faucets
 - Log where items are bought/sold
 - Log pathfinding destinations, consider making heatmap in the long term

@@ -141,6 +141,12 @@ var ServerStartEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var TutorialStartEvent = Event.discriminator(
+    'TutorialStartEvent',
+    new mongoose.Schema(),
+    {discriminatorKey: 'kind'}
+);
+
 var Prism = {};
 
 Prism.logEvent = function(player,action,data){
@@ -165,6 +171,7 @@ Prism.logEvent = function(player,action,data){
         'respawn': RespawnEvent,
         'sell': TradeEvent,
         'server-start': ServerStartEvent,
+        'tutorial-start': TutorialStartEvent,
         'use': UseEvent
     };
     if(!(action in map)){

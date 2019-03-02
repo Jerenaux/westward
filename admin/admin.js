@@ -125,6 +125,8 @@ app.filter('eventFilter',function(){
                 return prefix("Sold "+event.nb+ " "+Data.itemsData[event.item].name+" for "+event.price+" each "+Data.buildingsData[event.building].name,event.time,event.pname);
             case 'server-start':
                 return prefix(" SERVER RESTART",event.time);
+            case 'tutorial-start':
+                return prefix('-- A player started the tutorial --',event.time);
             case 'use':
                 return prefix("Used "+Data.itemsData[event.item].name,event.time,event.pname);
             default:

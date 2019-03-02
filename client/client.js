@@ -210,6 +210,10 @@ Client.logMenu = function(menu){
     Client.socket.emit('menu',menu);
 };
 
+Client.sendTutorialStart = function(){
+    Client.socket.emit('tutorial-start');
+};
+
 // ####################"
 
 Client.sendMapData = function(id,data){

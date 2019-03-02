@@ -23,8 +23,8 @@ var Hero = new Phaser.Class({
         Player.prototype.setUp.call(this,data);
 
         this.settlement = data.settlement;
-        this.buildingMarkers = data.buildingMarkers;
-        this.resourceMarkers = data.resourceMarkers;
+        this.buildingMarkers = data.buildingMarkers || [];
+        this.resourceMarkers = data.resourceMarkers || [];
         this.unread = 1;
         this.inventory = new Inventory();
         this.stats = new StatsContainer();
