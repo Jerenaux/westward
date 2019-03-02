@@ -11,7 +11,17 @@
 <h1>Westward admin</h1>
 <div ng-app="admin" ng-controller="mainCtrl">
 
-    <h3>Buildings</h3>
+    <h3>Players ({{players.length}})</h3>
+    <table class="table table-bordered table-striped">
+        <tbody>
+        <tr ng-repeat="pl in players">
+            <td>{{pl.name}}</td>
+        </tr>
+        </tbody>
+
+    </table>
+
+    <h3>Buildings ({{buildings.length}})</h3>
     <table class="table table-bordered table-striped">
         <!--
         https://codepen.io/chrisoncode/pen/AmFLE
@@ -41,20 +51,38 @@
         </tr>
         </thead>-->
 
+        <thead>
+            <tr>
+                <td>Position</td>
+                <td>Name</td>
+            </tr>
+        </thead>
         <tbody>
-        <tr ng-repeat="bld in buildings"> <!-- | orderBy:sortType:sortReverse | filter:searchFish -->
+        <tr ng-repeat="bld in buildings "> <!--  | orderBy:bldSortType:bldSortReverse | filter:bldFilter-->
             <td>[{{bld.x}},{{bld.y}}]</td>
-            <td>{{ bld.id | buildingName}}</td>
-            <td>{{ bld.owner }}</td>
+            <td>{{ bld.type | buildingName}}</td>
         </tr>
         </tbody>
 
     </table>
 
     <h3>Items in circulation</h3>
-    <div ng-repeat="item in items">
-        {{item[1]}} {{item[0] | itemName}}
-    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <td>Name</td>
+            <td>Number</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in items">
+            <td>{{item[0] | itemName}}</td>
+            <td>{{item[1]}} </td>
+        </tr>
+        </tbody>
+
+    </table>
 
     <h3>Screenshots</h3>
     <div class="panel panel-default" ng-repeat="screenshot in screenshots">

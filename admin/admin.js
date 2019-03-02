@@ -45,20 +45,22 @@ app.controller("mainCtrl", [
         };
 
         getAllData = function(){
+
+            $scope.bldSortType = 'name';
+            $scope.bldSortReverse = false;
+            $scope.bldFilter = null;
+
             getData('events');
             getData('screenshots');
             getData('buildings');
+            getData('players');
             countItems();
         };
 
+        // Read all JSON data files and when it's done, get all data from DB
         Data.categories.forEach(function(category){
             getJSON(category);
         });
-
-        flushEvents = function(){
-            console.log('flushing');
-        };
-
     }
     ]);
 
@@ -78,6 +80,7 @@ function prefix(txt,time,name){
 
 app.filter('buildingName',function(){
     return function(id){
+        console.log(id);
         return Data.buildingsData[id].name
     }
 });

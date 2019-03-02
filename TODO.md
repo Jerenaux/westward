@@ -159,9 +159,8 @@ V1 level:
 
 Admin
 -----
-List buildings, players
-List how many of each item is owned by a player or building in world
-+ compute a per capita count (to tune scarcity)
+Improv admin tables
+Compute "concentration" stat of items
 Make cmd line system
 Edit buildings stock
 Push desktop notifications for player connects
