@@ -18,7 +18,6 @@ Testing
 World Building
 
 
-- Split trees in two images with different depths
 - Adapt animations and delays for firearms
 - findcell in battle doesn't take path to get there into accoung (may be within radius but require to go around an obstacle!)
 - Change battle priority when player joins fight
@@ -34,11 +33,10 @@ World Building
 - Poll at regular interval the sprite below mouse
 - Better notifs cascading
 - New test: GameServer.lootNPC
+- New test: GameServer.handleBattle (when and area can and cannot be computed)
 - Positions not saved often enough?
 - Don't disable walk with build panel
 - Multiple clicks on "give" repeat the action
-- Closing panels make player walk there
-- Red cross hits an invisible wall
 Shop & workshop interfaces
 New movement system
 Fog of war

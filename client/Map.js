@@ -167,7 +167,11 @@ var Map = new Phaser.Class({
         var ox = this.displayOriginX;
         var oy = this.displayOriginY;
         this.centerMap(pos);
-        if(this.positionCross) this.positionCross.setPosition(this.center.x,this.center.y);
+        // if(this.positionCross) this.positionCross.setPosition(this.center.x,this.center.y);
+        if(this.positionCross){
+            var loc = this.computeMapLocation(pos.x,pos.y);
+            this.positionCross.setPosition(loc.x,loc.y);
+        }
         var dx = this.displayOriginX - ox;
         var dy = this.displayOriginY - oy;
         this.dragMap(dx*this.scaleX,dy*this.scaleY,false);
@@ -301,7 +305,6 @@ var Map = new Phaser.Class({
             Utils.clamp(o.y,this.minOrigin.y/(this.scaleY*2),this.maxOrigin.y)
         );
         this.setPosition(this.center.x,this.center.y);
-        console.log(this.minOrigin.y);
     },
 
     setInputArea: function(){

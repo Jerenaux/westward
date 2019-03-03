@@ -52,7 +52,7 @@ Chunk.prototype.draw = function(){
     this.decor.forEach(function (data) {
         var x = this.x + parseInt(data[0]);
         var y = this.y + parseInt(data[1]);
-        this.drawImage(x, y, data[2]);
+        this.addImage(x, y, data[2]);
     }, this);
 
     this.displayed = true;
@@ -93,25 +93,42 @@ Chunk.prototype.getAtlasData = function(image,data,longname){
     }
 };
 
-Chunk.prototype.drawImage = function(x,y,image){
+Chunk.prototype.drawImage = function(x,y,image,depth,crop){
     var offset = this.getAtlasData(image,'offset');
     if(offset){
         x += offset.x;
         y += offset.y;
     }
     var img = Engine.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',tilesetData.shorthands[image]);
+    if(crop) img.setCrop(crop);
     var depthOffset = this.getAtlasData(image,'depthOffset') || 0;
-    img.setDepth(y+depthOffset);
-    //console.log(y,this.getAtlasData(image,'depthOffset'),img.depth);
+    depth = depth || y;
+    img.setDepth(depth+depthOffset);
     var anchor = this.getAtlasData(image,'anchor');
     img.setOrigin(anchor.x,anchor.y);
+    this.images.push(img);
+    this.postDrawImage(x,y,image,img);
+};
+
+Chunk.prototype.addImage = function(x,y,image){
+    var isTree = (image[0] == 't');
+    if(isTree){
+        var frame = this.getAtlasData(image,'frame');
+        var ycutoff = frame.h*0.5;
+        this.drawImage(x,y,image, y, new Phaser.Geom.Rectangle(0,0,frame.w,ycutoff));
+        this.drawImage(x,y,image, y+1, new Phaser.Geom.Rectangle(0,ycutoff,frame.w,frame.h-ycutoff));
+    }else{
+        this.drawImage(x,y,image);
+    }
+    // Manage collisions
     var collisions = this.getAtlasData(image,'collisions');
     if(collisions) {
         collisions.forEach(function(coll){
             this.addCollision(x+coll[0],y+coll[1]);
         },this);
     }
-    if(image[0] == 't' && Utils.randomInt(1,10) > 6){ // TODO: conf
+    // Draw dead leaves on the ground
+    if(isTree && Utils.randomInt(1,10) > 6){ // TODO: conf
         var nbleaves = 5; //TODO: conf
         Utils.shuffle(this.leavesPos);
         for(var j = 0; j < nbleaves; j++) {
@@ -120,11 +137,13 @@ Chunk.prototype.drawImage = function(x,y,image){
             var lx = x+c[0];
             var ly = y+c[1];
             this.drawImage(lx,ly,'l'+type);
-            if(this.hasWater(lx,ly)) console.warn('on water');
+            // if(this.hasWater(lx,ly)) console.warn('on water');
         }
     }
-    this.images.push(img);
-    this.postDrawImage(x,y,image,img);
+    // Add ivy
+    if(isTree && (image[1] == 1 || image[1] == 2) && Utils.randomInt(1,10) > 6){ // TODO: conf
+        this.drawImage(x+1,y-1,'i'+Utils.randomInt(1,2),y+1);
+    }
 };
 
 Chunk.prototype.addCollision = function(cx,cy){

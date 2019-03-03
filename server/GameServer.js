@@ -682,7 +682,7 @@ GameServer.handleBattle = function(attacker,attacked){
     // TODO: check for proximity
     var area = GameServer.computeBattleArea(attacker,attacked);
     if(!area){
-        if(attacker.isPlayer) player.addMsg('There is an obstacle in the way!');
+        if(attacker.isPlayer) attacker.addMsg('There is an obstacle in the way!');
         return false;
     }
     var battle = GameServer.checkBattleOverlap(area);
