@@ -17,7 +17,7 @@ Design document
 Testing
 World Building
 
-
+Misc:
 - Adapt animations and delays for firearms
 - findcell in battle doesn't take path to get there into accoung (may be within radius but require to go around an obstacle!)
 - Change battle priority when player joins fight
