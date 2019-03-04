@@ -9,7 +9,7 @@
   },
   "nodemonConfig": {
     "watch": [
-      "server", "client", "index.html", "admin"
+      "server", "shared", "index.html", "admin"
     ],
     "ext": "ts,js,html",
     "ignore": ["test/*", "docs/*", "node_modules"]
@@ -17,7 +17,8 @@
   "scripts": {
     "test": "mocha test",
     "start": "node server.js",
-    "watch": "nodemon"
+    "watch": "nodemon",
+    "watch-client": "browser-sync start --config bs-config.js"
   },
   "engines": {
     "npm": "^5.7.1"

@@ -16,7 +16,7 @@ module.exports = {
     "ui": {
         "port": 3001
     },
-    "files": "client/*.js",
+    "files": "client/*.js,shared/*.js,index.html",
     "watchEvents": [
         "change"
     ],
@@ -27,7 +27,10 @@ module.exports = {
         "ignoreInitial": true
     },
     "server": false,
-    "proxy": "localhost:8081",
+    "proxy":{
+        target: "http://localhost:8081",
+        ws: true
+    },
     "port": 3000,
     "middleware": false,
     "serveStatic": [],
