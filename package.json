@@ -7,9 +7,17 @@
   "directories": {
     "test": "test"
   },
+  "nodemonConfig": {
+    "watch": [
+      "server", "client", "index.html", "admin"
+    ],
+    "ext": "ts,js,html",
+    "ignore": ["test/*", "docs/*", "node_modules"]
+  },
   "scripts": {
     "test": "mocha test",
-    "start": "node server.js"
+    "start": "node server.js",
+    "watch": "nodemon"
   },
   "engines": {
     "npm": "^5.7.1"
@@ -39,6 +47,7 @@
     "jsonwebtoken": "^8.4.0",
     "mongodb": "^2.2.31",
     "mongoose": "^5.0.9",
+    "npm-watch": "^0.6.0",
     "optimist": "^0.6.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
