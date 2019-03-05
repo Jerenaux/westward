@@ -26,6 +26,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 if(process.env.DEV == 1) app.use('/studio',express.static(__dirname + '/studio'));
 
+app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    next();
+});
+
 app.get('/',function(req,res){
     res.sendFile(path.join(__dirname,'index.html'));
 });
@@ -55,6 +61,8 @@ categories.forEach(function(cat){
             if (data.length == 0) {
                 res.status(204).end();
             } else {
+                // res.setHeader('Access-Control-Allow-Origin', '*');
+                // res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
                 res.setHeader('Content-Type', 'application/json');
                 res.status(200).send(data).end();
             }
