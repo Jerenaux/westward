@@ -1,6 +1,54 @@
 /**
  * Created by Jerome on 12-01-18.
  */
+
+var FoWPipeline = new Phaser.Class({
+
+    Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
+
+    initialize:
+        function FoWPipeline(game,nbr) {
+            Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline.call(this, {
+                game: game,
+                renderer: game.renderer,
+                fragShader:
+                `precision mediump float;
+                varying vec2 outTexCoord;
+                uniform sampler2D uMainSampler;
+                uniform float rects[`+nbr+`];
+                
+                vec3 makeRect(vec2 st,vec4 coords, vec3 col){
+                    vec2 blur = vec2(0.1);
+                    // bottom-left
+                    vec2 ps = vec2(coords.x,coords.y);
+                    vec2 bl = smoothstep(ps,ps+blur,st);
+                    float pct = bl.x * bl.y;
+                    // top-right
+                    ps = vec2(coords.z,coords.w);
+                    vec2 tr = 1.0-smoothstep(ps,ps+blur,st);
+                    pct *= tr.x * tr.y;
+                    return vec3(pct)*col;
+                }
+                vec3 mr(vec2 st,vec4 coords, vec3 col){
+                    return vec3(st.x);
+                }
+                void main(){
+                    vec2 st = outTexCoord;
+                    
+                    vec3 color = vec3(0.0);
+                    const int nbr = `+nbr+`;
+                    for(int i = 0; i < nbr; i+=4){
+                        vec4 r = vec4(rects[i],rects[i+1],rects[i+2],rects[i+3]);
+                       color += makeRect(st,r,vec3(1.0)); 
+                    }
+                vec4 fcolor = texture2D(uMainSampler, outTexCoord);
+                    gl_FragColor = fcolor*vec4(color,1.0);
+                }`
+            });
+        }
+
+});
+
 var Map = new Phaser.Class({
 
     // Extends: CustomSprite,
@@ -391,7 +439,9 @@ var Map = new Phaser.Class({
             }
         }
 
-        var aois = [341,389,390,391,438,439,440,490];
+        // var aois = [341,389,390,391,438,439,440,490];
+        var aois = Utils.listAdjacentAOIs(Engine.player.chunk);
+        console.log(aois);
         var space = new SpaceMap();
         aois.forEach(function(aoi){
             var corners = Utils.getAOIcorners(aoi);
@@ -452,35 +502,31 @@ var Map = new Phaser.Class({
 
         console.warn(path);
 
+        var relpath = [];
+        path.forEach(function(p){
+            relpath.push(p.x/this.width);
+            relpath.push(p.y/this.height);
+        },this);
+
+        console.warn(relpath);
+
+        var game = Engine.getGameInstance();
+        var customPipeline = game.renderer.addPipeline('FoW', new FoWPipeline(game,relpath.length));
+        customPipeline.setFloat1v('rects', relpath);
+
+        this.setPipeline('FoW');
+
+        // Compute where to display polygon on screen, based on map location on screen
         path = path.map(function(pt){
             return this.computeMapLocation(pt.x,pt.y);
         },this);
 
-        console.warn(path);
+        // console.warn(path);
 
-        this.fow = UI.scene.add.polygon(0,0,path,0xffffff,1);
+        /*this.fow = UI.scene.add.polygon(0,0,path,0xffffff,1);
         this.fow.setOrigin(0);
         this.fow.setDepth(this.depth+1);
-        this.fow.setScrollFactor(0);
-
-        /*var gl = UI.scene.sys.game.renderer.gl;
-        var renderer = UI.scene.sys.game.renderer;
-
-        var modeIndex = renderer.addBlendMode([ gl.ZERO, gl.SRC_COLOR ], gl.FUNC_ADD);
-        this.setBlendMode(modeIndex);*/
-
-        // this.erase('tileset',500,500);
-
-
-        //this.fow.setVisible(false);
-        //this.setMask(new Phaser.Display.Masks.BitmapMask(UI.scene,this.fow));
-
-        /*console.log(this);
-        var msk = this.mask.bitmapMask;
-        //this.fog = UI.scene.add.rectangle(this.x,this.y,msk.width,msk.height,0x000000,0.7);
-        this.fog = UI.scene.add.render
-        this.fog.setDepth(this.depth+2);
-        this.fog.setScrollFactor(0);*/
+        this.fow.setScrollFactor(0);*/
     },
 
     display: function(){
@@ -488,7 +534,7 @@ var Map = new Phaser.Class({
         // this.setInputArea();
         this.positionToponyms();
         this.computeDragLimits();
-        // if(!this.minimap) this.applyFogOfWar();
+        if(!this.minimap) this.applyFogOfWar();
 
         this.displayPins();
         this.setVisible(true);
