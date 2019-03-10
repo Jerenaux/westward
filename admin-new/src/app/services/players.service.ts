@@ -32,5 +32,4 @@ export class PlayersService {
     return this.http.get<Cat[]>('http://localhost:8081/admin/screenshots');
   }
 
-
 }
