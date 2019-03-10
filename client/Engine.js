@@ -472,6 +472,8 @@ Engine.initWorld = function(data){
     //Engine.settlementsData = data.settlements;
     Engine.makeRecipesLists();
     Engine.addHero(data);
+    Engine.playerIsInitialized = true;
+    Engine.updateEnvironment();
 
     Engine.makeUI();
 
@@ -482,7 +484,6 @@ Engine.initWorld = function(data){
     };
     Engine.setlCapsule.setText(settlements[data.settlement].name);
 
-    Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
     if(Engine.miniMap) Engine.miniMap.display();
@@ -1803,6 +1804,7 @@ Engine.addHero = function(data){
 };
 
 Engine.updateEnvironment = function(){
+    if(!Engine.playerIsInitialized) return;
     var chunks = Utils.listAdjacentAOIs(Engine.player.chunk);
     var newChunks = chunks.diff(Engine.displayedChunks);
     var oldChunks = Engine.displayedChunks.diff(chunks);
@@ -1922,6 +1924,7 @@ Engine.computePath = function(position,nextTo){
     // console.log('going to ',position);
     var x = position.x;
     var y = position.y;
+    if(x === undefined || y === undefined) console.warn('Pathfiding to undefined coordinates');
     // if(!nextTo && Engine.checkCollision(x,y)) return;
     var start = Engine.player.getPFstart();
     if(Engine.player.moving) Engine.player.stop();
@@ -2246,8 +2249,8 @@ Engine.processNPCClick = function(target){
 
 Engine.processItemClick = function(target){
     if(Engine.inPanel) return;
-    Engine.player.setDestinationAction(3,target.id,target.tx,target.ty); // 3 for item
-    Engine.computePath({x:target.tx,y:target.ty},true);
+    Engine.player.setDestinationAction(3,target.id,target.tileX,target.tileY); // 3 for item
+    Engine.computePath({x:target.tileX,y:target.tileY},true);
 };
 
 Engine.requestBattleAttack = function(target){

@@ -10,7 +10,6 @@ var GameServer = require('./GameServer.js').GameServer;
 function GameObject(){}
 
 GameObject.prototype.getShortID = function(){
-    //return this.constructor.name[0]+this.id;
     return this.entityCategory[0]+this.id;
 };
 

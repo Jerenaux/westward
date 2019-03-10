@@ -25,11 +25,11 @@ var Item = new Phaser.Class({
 
         this.setTilePosition(data.x,data.y,true);
         // this.setOrigin(0.5);
-        this.setDepth(this.ty+1); // for e.g. when wood spawns on the roots of a tree
+        this.setDepth(this.tileY+1); // for e.g. when wood spawns on the roots of a tree
 
         if(itemData.collides) {
             this.collides = true;
-            Engine.collisions.add(this.tx,this.ty);
+            Engine.collisions.add(this.tileX,this.tileY);
         }
 
         this.x += World.tileWidth/2;
@@ -44,16 +44,16 @@ var Item = new Phaser.Class({
 
     remove: function(){
         CustomSprite.prototype.remove.call(this);
-        if(this.collides) Engine.collisions.delete(this.tx,this.ty);
+        if(this.collides) Engine.collisions.delete(this.tileX,this.tileY);
         this.orientationPin.hide();
         delete Engine.items[this.id];
     },
 
     manageOrientationPin: function(){
-        if(Engine.isInView(this.tx,this.ty)) {
+        if(Engine.isInView(this.tileX,this.tileY)) {
             this.orientationPin.hide();
         }else{
-            this.orientationPin.update(this.tx,this.ty);
+            this.orientationPin.update(this.tileX,this.tileY);
             this.orientationPin.display();
         }
     },

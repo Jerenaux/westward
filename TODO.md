@@ -196,7 +196,6 @@ Performance:
 - Make audio sprite
 - Remove unnecessary files
 - Use pool for notifications
-- Avoid duplicate pins in maps, danger pins etc.
 - Fix "already existing/non-existing" bugs
 - Pathmaking instead of pahfinding?
 - Dont send full building inventories when buying/selling (send arrays of deltas)
@@ -213,7 +212,6 @@ Order:
 --> Send only useful fields
 --> Move to JSON5 
 - Look up and put as many parameters as possible in conf
-- Integrate battle.processAttack & battle.processAoE?
 - Proper initial cursor (using continuous polling or sth?)
 - Central shared list of entities
 - Remove global engine hover/out events, use local ones in animals, buildings...
@@ -221,17 +219,12 @@ Order:
 - Deal differently with net updates when visibility lost (https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
 - Use containers
 - Clean schemas
-- Use data registry for data exchange between scenes (see Phaser World 119)
-- Client-side, GameObject use tx and ty while Moving use tileX and tileY (and they both have a setPosition method)
-=> fix in processItemClick, etc, test a lot
 - Move UI stuff from Engine to UI
 - Rework longslot system
 - Setters/getters everywhere
 - Centralize all texts (incl. stats, equip, and even item descriptions)
 - Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
 - Remove "longslot" stuff intended for stretching longslots vertically?
-- Find out how to generate graphics objects (grid tiles, gradients...) programmatically for various uses
-- Give toString method to custom objects to replace [this.constructor.name this.id] ...
 
 Content:
 -------

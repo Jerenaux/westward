@@ -592,7 +592,6 @@ Player.prototype.onAOItransition = function(newAOI,previousAOI){
 };
 
 Player.prototype.onEndOfPath = function(){
-    //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
     MovingEntity.prototype.onEndOfPath.call(this);
     if(this.inFight) return;
     if(!this.action) return;

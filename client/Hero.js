@@ -185,14 +185,13 @@ var Hero = new Phaser.Class({
         },this);
     },
 
-    updateCivicLvl: function(civiclvl){
-        this.civiclvl = civiclvl;
-        this.updateEvents.add('citizen');
-        // TODO: add sound effect
+    postChunkUpdate: function(){
+        if(this.chunk != this.previousChunk) Engine.updateEnvironment();
+        this.previousChunk = this.chunk;
     },
 
-    updateCivicXP: function(civicxp){
-        this.civicxp = civicxp;
+    updateCivicLvl: function(civiclvl){
+        this.civiclvl = civiclvl;
         this.updateEvents.add('citizen');
         // TODO: add sound effect
     },
@@ -206,15 +205,6 @@ var Hero = new Phaser.Class({
     updateClassXP: function(classxp){
         this.classxp = classxp;
         this.updateEvents.add('character');
-        // TODO: add sound effect
-    },
-
-    updateCommitSlots: function(commitSlots){
-        //this.commitSlots.clear();
-        this.commitTypes.clear();
-        this.commitIDs = [];
-        this.setCommitSlots(commitSlots);
-        this.updateEvents.add('commit');
         // TODO: add sound effect
     },
 
