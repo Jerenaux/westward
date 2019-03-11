@@ -29,7 +29,9 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": [],
+            "scripts": [
+              "./node_modules/keycloak-js/dist/keycloak.min.js"
+            ],
             "es5BrowserSupport": true
           },
           "configurations": {
