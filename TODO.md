@@ -37,6 +37,7 @@ Misc:
 - Positions not saved often enough?
 - Don't disable walk with build panel
 - Multiple clicks on "give" repeat the action
+- Reset zoom when closing map
 Shop & workshop interfaces
 New movement system
 Fog of war

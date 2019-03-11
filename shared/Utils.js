@@ -42,6 +42,7 @@ Utils.AOItoTile = function(aoi){
 };
 
 Utils.getAOIcorners = function(aoi){
+    // Returns in order: tl, tr, br, bl
     var l = [];
     var o = Utils.AOItoTile(aoi);
     l.push(o);

@@ -18,12 +18,12 @@ var FoWPipeline = new Phaser.Class({
                 uniform float rects[`+nbr+`];
                 
                 vec3 makeRect(vec2 st,vec4 coords, vec3 col){
-                    vec2 blur = vec2(0.1);
-                    // bottom-left
+                    vec2 blur = vec2(0.01);
+                    // top-left
                     vec2 ps = vec2(coords.x,coords.y);
                     vec2 bl = smoothstep(ps,ps+blur,st);
                     float pct = bl.x * bl.y;
-                    // top-right
+                    // bottom-right
                     ps = vec2(coords.z,coords.w);
                     vec2 tr = 1.0-smoothstep(ps,ps+blur,st);
                     pct *= tr.x * tr.y;
@@ -504,15 +504,29 @@ var Map = new Phaser.Class({
 
         var relpath = [];
         path.forEach(function(p){
-            relpath.push(p.x/this.width);
-            relpath.push(p.y/this.height);
+            relpath.push(p.x/(this.width*this.scaleX));
+            relpath.push(p.y/(this.height*this.scaleY));
         },this);
 
         console.warn(relpath);
 
+
+        rects = [];
+        aois.forEach(function(aoi){
+            var corners = Utils.getAOIcorners(aoi);
+            console.log(corners);
+            rects.push(corners[3].x/(this.width*this.scaleX));
+            rects.push(corners[3].y/(this.height*this.scaleY));
+            rects.push(corners[1].x/(this.width*this.scaleX));
+            rects.push(corners[1].y/(this.height*this.scaleY));
+        },this);
+
+        rects = [450/(this.width*this.scaleX),640/(this.height*this.scaleY),540/(this.width*this.scaleX),700/(this.height*this.scaleY)]
+        console.warn(rects);
+
         var game = Engine.getGameInstance();
-        var customPipeline = game.renderer.addPipeline('FoW', new FoWPipeline(game,relpath.length));
-        customPipeline.setFloat1v('rects', relpath);
+        var customPipeline = game.renderer.addPipeline('FoW', new FoWPipeline(game,rects.length));
+        customPipeline.setFloat1v('rects', rects);
 
         this.setPipeline('FoW');
 

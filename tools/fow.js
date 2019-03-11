@@ -71,6 +71,7 @@ function preload() {
 function create() {
     var volcano = this.add.sprite(400, 300, 'volcano');
     var hotdog = this.add.image(400, 300, 'hotdog').setScrollFactor(0);
+
     volcano.setInteractive({draggable:true});
     volcano.on('drag',function (pointer, dragX, dragY) {
 
@@ -79,7 +80,16 @@ function create() {
 
     });
 
-    var rects =  [0.1,0.1,0.3,0.3,0.1,0.3,0.3,0.5,0.3,0.3,0.5,0.5];
+    var rects = [115, 80,295,195];
+    for(var i = 0; i < rects.length; i+=2){
+        rects[i] /= 800;
+    }
+    for(var i = 1; i < rects.length; i+=2){
+        rects[i] /= 600;
+    }
+    // var rects =  [0.1,0.1,0.3,0.3,0.1,0.3,0.3,0.5,0.3,0.3,0.5,0.5];
+    // var rects =  [0.1,0.1,0.3,0.3];
+    console.log(rects);
     var customPipeline = game.renderer.addPipeline('Custom', new CustomPipeline(game,rects.length));
     customPipeline.setFloat1v('rects', rects);
 
