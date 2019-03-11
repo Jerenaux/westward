@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2018 Red Hat, Inc. and/or its affiliates
+  ~ and other contributors as indicated by the @author tags.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<module name="org.wildfly.microprofile.opentracing-smallrye" xmlns="urn:jboss:module:1.8">
+    <properties>
+        <property name="jboss.api" value="private"/>
+    </properties>
+
+    <resources>
+        <resource-root path="wildfly-microprofile-opentracing-smallrye-15.0.1.Final.jar"/>
+    </resources>
+
+    <dependencies>
+        <module name="javax.api"/> <!-- for javax.naming -->
+
+        <module name="javax.annotation.api"/>
+        <module name="javax.enterprise.api"/>
+        <module name="javax.enterprise.concurrent.api"/>
+        <module name="javax.inject.api"/>
+        <module name="javax.interceptor.api"/>
+        <module name="javax.servlet.api"/>
+        <module name="javax.ws.rs.api"/>
+
+        <module name="io.jaegertracing.jaeger"/>
+        <module name="io.opentracing.opentracing-api"/>
+        <module name="io.opentracing.opentracing-noop"/>
+        <module name="io.opentracing.opentracing-util"/>
+        <module name="io.opentracing.contrib.opentracing-concurrent"/>
+        <module name="io.opentracing.contrib.opentracing-jaxrs2"/>
+        <module name="io.opentracing.contrib.opentracing-tracerresolver"/>
+        <module name="io.opentracing.contrib.opentracing-web-servlet-filter"/>
+        <module name="io.smallrye.opentracing"/>
+
+        <module name="org.eclipse.microprofile.opentracing"/>
+        <module name="org.jboss.logging"/>
+        <module name="org.jboss.resteasy.resteasy-jaxrs"/>
+    </dependencies>
+</module>

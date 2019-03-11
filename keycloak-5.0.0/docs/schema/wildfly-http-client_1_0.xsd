@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ JBoss, Home of Professional Open Source.
+  ~ Copyright 2017 Red Hat, Inc., and individual contributors
+  ~ as indicated by the @author tags.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="urn:wildfly-http-client:1.0"
+            xmlns="urn:wildfly-http-client:1.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified"
+            version="1.0">
+
+    <xs:element name="http-client" type="http-client-type"/>
+
+    <xs:complexType name="http-client-type">
+        <xs:all minOccurs="0" maxOccurs="1">
+            <xs:element name="configs" type="configs-type" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="defaults" type="defaults-type" minOccurs="0" maxOccurs="1"/>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="configs-type">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="config" type="config-type"/>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="config-type">
+        <xs:sequence>
+            <xs:element name="idle-timeout" minOccurs="0" maxOccurs="1" type="idle-timeout-type" />
+            <xs:element name="max-connections" minOccurs="0" maxOccurs="1" type="max-connections-type" />
+            <xs:element name="max-streams-per-connection" minOccurs="0" maxOccurs="1" type="max-streams-type"  />
+            <xs:element name="eagerly-acquire-session" minOccurs="0" maxOccurs="1" type="eager-session-type" />
+            <xs:element name="enable-http2" minOccurs="0" maxOccurs="1" type="enable-http2-type" />
+            <xs:element name="bind-address" type="bind-address-type" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="uri" type="xs:string" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="defaults-type">
+        <xs:all>
+            <xs:element name="idle-timeout" minOccurs="0" maxOccurs="1" type="idle-timeout-type" />
+            <xs:element name="max-connections" minOccurs="0" maxOccurs="1" type="max-connections-type" />
+            <xs:element name="max-streams-per-connection" minOccurs="0" maxOccurs="1" type="max-streams-type"  />
+            <xs:element name="eagerly-acquire-session" minOccurs="0" maxOccurs="1" type="eager-session-type" />
+            <xs:element name="enable-http2" minOccurs="0" maxOccurs="1" type="enable-http2-type" />
+            <xs:element name="bind-address" type="bind-address-type" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="buffer-pool" type="buffer-pool-type" minOccurs="0" maxOccurs="1"/>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="buffer-pool-type">
+        <xs:attribute name="buffer-size" type="xs:int" use="required" />
+        <xs:attribute name="direct" type="xs:boolean" use="optional" />
+        <xs:attribute name="max-size" type="xs:int" use="optional" />
+        <xs:attribute name="thread-local-size" type="xs:int" use="optional" />
+    </xs:complexType>
+
+    <xs:complexType name="bind-address-type">
+        <xs:attribute name="address" use="required" type="xs:string"/>
+        <xs:attribute name="port" use="optional" type="port-type"/>
+    </xs:complexType>
+
+    <xs:simpleType name="port-type">
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="65535"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="idle-timeout-type">
+        <xs:attribute name="value" type="xs:long" use="required" /> 
+    </xs:complexType>
+    <xs:complexType name="max-connections-type">
+        <xs:attribute name="value" type="xs:int" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="max-streams-type">
+        <xs:attribute name="value" type="xs:int" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="eager-session-type">
+        <xs:attribute name="value" type="xs:boolean" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="enable-http2-type">
+        <xs:attribute name="value" type="xs:boolean" use="required"/>
+    </xs:complexType>
+</xs:schema>
