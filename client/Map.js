@@ -2,6 +2,7 @@
  * Created by Jerome on 12-01-18.
  */
 
+var fowID = 0;
 var FoWPipeline = new Phaser.Class({
 
     Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
@@ -18,16 +19,17 @@ var FoWPipeline = new Phaser.Class({
                 uniform float rects[`+nbr+`];
                 
                 vec3 makeRect(vec2 st,vec4 coords, vec3 col){
-                    vec2 blur = vec2(0.01);
+                    vec2 blur = vec2(0.05);
                     // top-left
-                    vec2 ps = vec2(coords.x,coords.y);
+                    vec2 ps = vec2(coords.x,coords.y) - blur;
                     vec2 bl = smoothstep(ps,ps+blur,st);
                     float pct = bl.x * bl.y;
                     // bottom-right
                     ps = vec2(coords.z,coords.w);
                     vec2 tr = 1.0-smoothstep(ps,ps+blur,st);
                     pct *= tr.x * tr.y;
-                    return vec3(pct)*col;
+                    vec3 newcol = vec3(pct)*col; 
+                    return newcol;
                 }
                 vec3 mr(vec2 st,vec4 coords, vec3 col){
                     return vec3(st.x);
@@ -38,11 +40,14 @@ var FoWPipeline = new Phaser.Class({
                     vec3 color = vec3(0.0);
                     const int nbr = `+nbr+`;
                     for(int i = 0; i < nbr; i+=4){
-                        vec4 r = vec4(rects[i],rects[i+1],rects[i+2],rects[i+3]);
+                       vec4 r = vec4(rects[i],rects[i+1],rects[i+2],rects[i+3]);
                        color += makeRect(st,r,vec3(1.0)); 
                     }
-                vec4 fcolor = texture2D(uMainSampler, outTexCoord);
-                    gl_FragColor = fcolor*vec4(color,1.0);
+                    
+                    vec4 fcolor = texture2D(uMainSampler, outTexCoord);
+                    
+                    //gl_FragColor = fcolor*vec4(color,1.0);
+                    gl_FragColor = min(fcolor,fcolor*vec4(color,1.0)); // avoids overlapping rects to create bright stripes
                 }`
             });
         }
@@ -376,164 +381,37 @@ var Map = new Phaser.Class({
     },
 
     applyFogOfWar: function(){
-        function Pt(x,y){
-            this.x = x;
-            this.y = y;
-            this.c = 1; // count
-            this.nbors = [];
-        }
 
-        Pt.prototype.link = function(pt){
-            this.nbors.push(pt);
-        };
 
-        Pt.prototype.unlink = function(pt){
-            var idx = this.nbors.findIndex(function(e){
-                return (e.x == pt.x && e.y == pt.y);
-            });
-            this.nbors.splice(idx,1);
-        };
-
-        Pt.prototype.equal = function(pt){
-            if(pt === null) return false;
-            return (this.x == pt.x && this.y == pt.y);
-        };
-
-        Pt.prototype.ts = function(){
-            return "("+this.x+","+this.y+")";
-        };
-
-        Pt.prototype.debug = function(){
-            console.log(this.ts(),"has",this.nbors.length,"neighbors and a count of",this.c);
-        };
-
-        function link(pts){ // link together all points in list
-            for(var i = 0; i < pts.length; i++){
-                for(var j = i; j < pts.length; j++){
-                    var a = pts[i];
-                    var b = pts[j];
-                    var dx = Math.abs(a.x-b.x);
-                    var dy = Math.abs(a.y-b.y);
-                    if( dx ? !dy : dy ) { // xor, equivalent to avoiding diagonals
-                        //console.log("Linking",a.ts(),"to",b.ts());
-                        a.link(b);
-                        b.link(a);
-                    }
-                }
-            }
-        }
-
-        function unlink(pt){ // unlink a point from all its neighbors
-            pt.nbors.forEach(function(nb){
-                nb.unlink(pt);
-            });
-        }
-
-        function lint(pts){ // remove side-by-side duplicate neighbors
-            for(var i = pts.length-2; i >= 0; i--){
-                if(i == pts.length-1) continue; // needed when there are 4 duplicates in a row
-                if(pts[i].equal(pts[i+1])){
-                    pts.splice(i+1,1);
-                    pts.splice(i,1);
-                }
-            }
-        }
-
-        // var aois = [341,389,390,391,438,439,440,490];
-        var aois = Utils.listAdjacentAOIs(Engine.player.chunk);
-        console.log(aois);
-        var space = new SpaceMap();
+        // Maps rects to one single flat list of top-left and bottom-right coordinates,
+        // for use by the shader
+        var rects = [];
+        var aois = [341,389,390,391,438,439,440,490];
         aois.forEach(function(aoi){
             var corners = Utils.getAOIcorners(aoi);
-            var pts = [];
-            corners.forEach(function(corner){
-                var pt = space.get(corner.x,corner.y);
-                if(pt){
-                    pt.c++;
-                }else{
-                    pt = new Pt(corner.x,corner.y);
-                    space.add(pt.x,pt.y,pt);
-                }
-                pts.push(pt);
-            });
-            link(pts);
-        });
-
-        /*space.toList().forEach(function(pt){
-            pt.v.debug();
+            rects.push(corners[0].x/(this.width*this.scaleX));
+            rects.push(corners[0].y/(this.height*this.scaleY));
+            rects.push(corners[2].x/(this.width*this.scaleX));
+            rects.push(corners[2].y/(this.height*this.scaleY));
+        },this);
+        /*Engine.player.mapVision.forEach(function(rect){
+            rects.push(rect.x/(this.width*this.scaleX));
+            rects.push(rect.y/(this.height*this.scaleY));
+            rects.push((rect.x+rect.width)/(this.width*this.scaleX));
+            rects.push((rect.y+rect.height)/(this.height*this.scaleY));
         });*/
 
-        space.toList().forEach(function(entry){
-            var pt = entry.v;
-            if(pt.c%2 == 0){ // redundant points have the property of having even counts
-                unlink(pt);
-                link(pt.nbors);
-                space.delete(pt.x,pt.y);
-            }
-        });
-
-        var l = space.toList();
-        l.forEach(function(entry){
-            var pt = entry.v;
-            lint(pt.nbors);
-        });
-
-        var s = space.getFirst();
-        var path = [s];
-        var i = 0;
-        while(true){
-            if(i > 10000) break; //TODO: remove
-            var pt = path[0];
-            var pv = null;
-            if(path.length > 1) pv = path[1];
-            var nt = null;
-            for(var j = 0; j < pt.nbors.length; j++){ // Find next neighbor to travel to
-                var nb = pt.nbors[j];
-                if(!nb.equal(pv)){
-                    nt = nb;
-                    break;
-                }
-            }
-            //if(nt === null) console.warn('no next for pt',pt.x,pt.y);
-            if(nt.equal(s)) break;
-            path.unshift(nt);
-            i++;
-        }
-
-        console.warn(path);
-
-        var relpath = [];
-        path.forEach(function(p){
-            relpath.push(p.x/(this.width*this.scaleX));
-            relpath.push(p.y/(this.height*this.scaleY));
-        },this);
-
-        console.warn(relpath);
-
-
-        rects = [];
-        aois.forEach(function(aoi){
-            var corners = Utils.getAOIcorners(aoi);
-            console.log(corners);
-            rects.push(corners[3].x/(this.width*this.scaleX));
-            rects.push(corners[3].y/(this.height*this.scaleY));
-            rects.push(corners[1].x/(this.width*this.scaleX));
-            rects.push(corners[1].y/(this.height*this.scaleY));
-        },this);
-
-        rects = [450/(this.width*this.scaleX),640/(this.height*this.scaleY),540/(this.width*this.scaleX),700/(this.height*this.scaleY)]
-        console.warn(rects);
 
         var game = Engine.getGameInstance();
-        var customPipeline = game.renderer.addPipeline('FoW', new FoWPipeline(game,rects.length));
+        var customPipeline = game.renderer.addPipeline('FoW'+fowID, new FoWPipeline(game,rects.length));
         customPipeline.setFloat1v('rects', rects);
 
-        this.setPipeline('FoW');
+        this.setPipeline('FoW'+fowID++); // ugly hack
 
         // Compute where to display polygon on screen, based on map location on screen
-        path = path.map(function(pt){
+        /*path = path.map(function(pt){
             return this.computeMapLocation(pt.x,pt.y);
-        },this);
+        },this);*/
 
         // console.warn(path);
 
