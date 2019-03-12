@@ -645,13 +645,12 @@ Player.prototype.addNotif = function(msg){
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){
-    if(this.updatePacket.isEmpty()) return null;
+    // console.log(this.updatePacket,this.updatePacket.isEmpty());
     var pkg = this.updatePacket;
-    this.updatePacket = new PersonalUpdatePacket();
     if(GameServer.buildingsChanged) pkg.buildingMarkers = GameServer.listBuildingMarkers();
-    if(GameServer.visionChanged) finalPackage.vision = GameServer.getVision();
-    GameServer.visionChanged = false;
-    GameServer.buildingsChanged  = false;
+    if(GameServer.visionChanged) pkg.vision = GameServer.getVision();
+    if(pkg.isEmpty()) return null;
+    this.updatePacket = new PersonalUpdatePacket();
     return pkg;
 };
 

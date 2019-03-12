@@ -1025,10 +1025,7 @@ GameServer.handleAOItransition = function(entity,previous){
     }
 
     if(entity.setFieldOfVision) entity.setFieldOfVision(AOIs);
-    if(entity.isPlayer) {
-        console.log('Vision AOIs:',AOIs,entity.fieldOfVision);
-        GameServer.updateVision();
-    }
+    if(entity.isPlayer) GameServer.updateVision();
     newAOIs.forEach(function(aoi){
         if(entity.isPlayer) entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
         GameServer.addObjectToAOI(aoi,entity);
@@ -1049,13 +1046,19 @@ GameServer.updateVision = function(){
            GameServer.vision.add(aoi);
         });
     }
-    GameServer.visionChanged = false;
-    //console.log('VISION:',GameServer.vision);
+    for(var bid in GameServer.buildings){
+        var building = GameServer.buildings[bid];
+        Utils.listAdjacentAOIs(building.aoi).forEach(function(aoi){
+            GameServer.vision.add(aoi);
+        });
+    }
+    GameServer.visionChanged = true;
+    console.log('VISION:',GameServer.vision);
 };
 
 GameServer.getVision = function(){
     return Array.from(GameServer.vision);
-}
+};
 
 GameServer.updateClients = function(){ //Function responsible for setting up and sending update packets to clients
     Object.keys(GameServer.players).forEach(function(key) {
@@ -1068,11 +1071,18 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
             individualGlobalPkg.synchronize(GameServer.AOIs[aoi]); // fetch entities from the new AOIs
         });
         player.oldAOIs.forEach(function(aoi){
-            individualGlobalPkg.desync(GameServer.AOIs[aoi]); // fortget entities from old AOIs
+            individualGlobalPkg.desync(GameServer.AOIs[aoi]); // forget entities from old AOIs
         });
         individualGlobalPkg.removeEcho(player.id); // remove redundant information from multiple update sources
         if(individualGlobalPkg.isEmpty()) individualGlobalPkg = null;
-        if(individualGlobalPkg === null && localPkg === null && !GameServer.nbConnectedChanged) return;
+
+        if(individualGlobalPkg === null
+            && localPkg === null
+            && !GameServer.nbConnectedChanged
+            && !GameServer.visionChanged){
+                return;
+            }
+
         var finalPackage = {};
         if(individualGlobalPkg) finalPackage.global = individualGlobalPkg.clean();
         if(localPkg) finalPackage.local = localPkg.clean();
@@ -1081,8 +1091,11 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         GameServer.server.sendUpdate(player.socketID,finalPackage);
         player.newAOIs = [];
         player.oldAOIs = [];
+        // console.log(finalPackage.local);
     });
     GameServer.nbConnectedChanged = false;
+    GameServer.visionChanged = false;
+    GameServer.buildingsChanged  = false;
     GameServer.clearAOIs(); // erase the update content of all AOIs that had any
 };
 
