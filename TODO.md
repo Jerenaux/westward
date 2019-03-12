@@ -37,12 +37,9 @@ Misc:
 - Positions not saved often enough?
 - Don't disable walk with build panel
 - Multiple clicks on "give" repeat the action
-- Reset zoom when closing map
 Shop & workshop interfaces
 New movement system
 Fog of war
--> Display map, apply shader, create camera 2 that sees map (main ignores map), draw camera 2 to rendertexture
--> Test if possible to draw camera to rt; if possible to ignore all 
 Check building limits are enforced
 
 

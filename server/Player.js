@@ -23,7 +23,6 @@ function Player(){
     this.schemaModel = GameServer.PlayerModel;
     this.battlePriority = 1;
 
-
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.oldAOIs = [];
     this.action = null;
@@ -513,6 +512,7 @@ Player.prototype.initTrim = function(){
     trimmed.y = parseInt(this.y);
     trimmed.buildingMarkers = GameServer.listBuildingMarkers();
     trimmed.resourceMarkers = GameServer.resourceMarkers;
+    trimmed.vision = GameServer.getVision();
     return trimmed;
 };
 
@@ -649,6 +649,9 @@ Player.prototype.getIndividualUpdatePackage = function(){
     var pkg = this.updatePacket;
     this.updatePacket = new PersonalUpdatePacket();
     if(GameServer.buildingsChanged) pkg.buildingMarkers = GameServer.listBuildingMarkers();
+    if(GameServer.visionChanged) finalPackage.vision = GameServer.getVision();
+    GameServer.visionChanged = false;
+    GameServer.buildingsChanged  = false;
     return pkg;
 };
 

@@ -1049,8 +1049,13 @@ GameServer.updateVision = function(){
            GameServer.vision.add(aoi);
         });
     }
+    GameServer.visionChanged = false;
     //console.log('VISION:',GameServer.vision);
 };
+
+GameServer.getVision = function(){
+    return Array.from(GameServer.vision);
+}
 
 GameServer.updateClients = function(){ //Function responsible for setting up and sending update packets to clients
     Object.keys(GameServer.players).forEach(function(key) {

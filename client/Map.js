@@ -381,26 +381,15 @@ var Map = new Phaser.Class({
     },
 
     applyFogOfWar: function(){
-
-
         // Maps rects to one single flat list of top-left and bottom-right coordinates,
         // for use by the shader
         var rects = [];
-        var aois = [341,389,390,391,438,439,440,490];
-        aois.forEach(function(aoi){
-            var corners = Utils.getAOIcorners(aoi);
-            rects.push(corners[0].x/(this.width*this.scaleX));
-            rects.push(corners[0].y/(this.height*this.scaleY));
-            rects.push(corners[2].x/(this.width*this.scaleX));
-            rects.push(corners[2].y/(this.height*this.scaleY));
-        },this);
-        /*Engine.player.mapVision.forEach(function(rect){
+        Engine.player.mapVision.forEach(function(rect){
             rects.push(rect.x/(this.width*this.scaleX));
             rects.push(rect.y/(this.height*this.scaleY));
             rects.push((rect.x+rect.width)/(this.width*this.scaleX));
             rects.push((rect.y+rect.height)/(this.height*this.scaleY));
-        });*/
-
+        },this);
 
         var game = Engine.getGameInstance();
         var customPipeline = game.renderer.addPipeline('FoW'+fowID, new FoWPipeline(game,rects.length));
@@ -422,6 +411,7 @@ var Map = new Phaser.Class({
     },
 
     display: function(){
+        if(!this.mimnimap && this.scaleX > 0.5) this.zoomOut();
         this.centerMap(Engine.player.getTilePosition());
         // this.setInputArea();
         this.positionToponyms();
@@ -527,7 +517,22 @@ var Pin = new Phaser.Class({
     },
 
     setVisibility: function(){
-        this.setVisible(this.parentMap.viewRect.contains(this.x,this.y));
+        if(this.parentMap.viewRect.contains(this.x,this.y)){
+            if(this.parentMap.minimap){
+                this.setVisible(true);
+            }else{
+                for(var i = 0; i < Engine.player.mapVision.length; i++){
+                    var rect = Engine.player.mapVision[i];
+                    if(rect.contains(this.tileX,this.tileY)){
+                        this.setVisible(true);
+                        return;
+                    }
+                }
+                this.setVisible(false);
+            }
+        }else{
+            this.setVisible(false);
+        }
     },
 
     highlight: function(){

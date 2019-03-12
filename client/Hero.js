@@ -271,11 +271,12 @@ var Hero = new Phaser.Class({
     },
 
     setMapVision: function(){
-        var aois = [341,389,390,391,438,439,440,490];
+        var aois = [331,341,389,390,391,438,439,440,490];
         this.mapVision = [];
         aois.forEach(function(aoi){
             var origin = Utils.AOItoTile(aoi);
             this.mapVision.push(new Phaser.Geom.Rectangle(origin.x,origin.y,World.chunkWidth,World.chunkHeight));
         },this);
+
     }
 });
