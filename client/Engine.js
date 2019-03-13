@@ -80,10 +80,7 @@ Engine.preload = function() {
     this.load.image('longscroll', 'assets/sprites/longscroll.png');
     this.load.image('radial3', 'assets/sprites/scroll_mask.png');
     this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
-    this.load.image('fullmap', 'assets/sprites/fortmap.png');
-    this.load.image('fullmap_zoomed', 'assets/sprites/fortmap_01.png');
-    this.load.image('minimap', 'assets/sprites/minimap2s.png');
-    //this.load.image('mapring', 'assets/sprites/ring.png');
+    this.load.image('worldmap', 'maps/worldmap.png');
 
     // SFX
     Engine.audioFiles = [];
@@ -127,33 +124,6 @@ Engine.preload = function() {
     this.load.json('civs', 'assets/data/civs.json');
 
     if(Client.tutorial) this.load.json('tutorials', 'assets/data/tutorials.json');
-
-    /*Engine.collidingTiles = []; // list of tile ids that collide (from tilesets.json)
-    Engine.tilesheets = [];
-
-    for(var i = 0, firstgid = 1; i < Boot.tilesets.length; i++){
-        var tileset = Boot.tilesets[i];
-        var absolutePath = tileset.image;
-        var tokens = absolutePath.split('\\');
-        var img = tokens[tokens.length-1];
-        var path = 'assets/tilesets/'+img;
-
-        if(Engine.useTilemaps){
-            this.load.image(tileset.name, path);
-        }else{
-            this.load.spritesheet(tileset.name, path,{frameWidth:tileset.tilewidth,frameHeight:tileset.tileheight});
-        }
-        Engine.tilesheets.push(tileset.name);
-        //console.log(tileset.name,firstgid);
-
-        var columns = Math.floor(tileset.imagewidth/Engine.tileWidth);
-        var tilecount = columns * Math.floor(tileset.imageheight/Engine.tileHeight);
-        // Add to the list of collidingTiles the colliding tiles in the tileset
-        Engine.collidingTiles = Engine.collidingTiles.concat(tileset.collisions.map(function(tile){
-            return tile+firstgid;
-        }));
-        firstgid += tilecount;
-    }*/
 };
 
 Engine.entityManager = {
@@ -268,6 +238,7 @@ Engine.create = function(){
     Engine.showGrid = false;
 
     Engine.camera = Engine.scene.cameras.main;
+    Engine.camera.setBounds(0,0,Engine.worldWidth*TILE_WIDTH,Engine.worldHeight*TILE_HEIGHT);
 
     Engine.buildingsData = Engine.scene.cache.json.get('buildings');
     Engine.animalsData = Engine.scene.cache.json.get('animals');
@@ -490,6 +461,7 @@ Engine.bootTutorial = function(part){
     Engine.tutorialData = Engine.scene.cache.json.get('tutorials')[part];
     Engine.nextTutorial = 0;
     Engine.displayTutorial();
+    Client.sendTutorialStart();
 };
 
 Engine.initWorld = function(data){
@@ -500,6 +472,8 @@ Engine.initWorld = function(data){
     //Engine.settlementsData = data.settlements;
     Engine.makeRecipesLists();
     Engine.addHero(data);
+    Engine.playerIsInitialized = true;
+    Engine.updateEnvironment();
 
     Engine.makeUI();
 
@@ -510,11 +484,10 @@ Engine.initWorld = function(data){
     };
     Engine.setlCapsule.setText(settlements[data.settlement].name);
 
-    Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
     if(Engine.miniMap) Engine.miniMap.display();
-    Engine.updateAllOrientationPins();
+    // Engine.updateAllOrientationPins();
 
     if(Client.isNewPlayer() && !Client.tutorial) {
         var w = 400;
@@ -546,6 +519,15 @@ Engine.initWorld = function(data){
             }
         }
     },1000);
+
+    // var rect = UI.scene.add.rectangle(300,10,100,100,0xffffff);
+    // rect.setScrollFactor(0);
+    // rect.setOrigin(0);
+    // var rt = UI.scene.add.renderTexture(0,0,1024,576);
+    // rt.setOrigin(0);
+    // rt.setScrollFactor(0);
+    // rt.fill(0x000000);
+    // rt.erase(rect);
 
     return;
     // todo: move all to dedicated sound manager
@@ -859,7 +841,7 @@ Engine.makeUI = function(){
     });
     bug.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
 
-    Engine.miniMap = new MiniMap(2);
+    Engine.miniMap = new MiniMap();
     Engine.setlCapsule = new SettlementCapsule(950,3);
     //Engine.foodCapsule = new SettlementCapsule(950,30);
     //Engine.foodCapsule.setText('Famine');
@@ -901,21 +883,19 @@ Engine.makeUI = function(){
         'character': Engine.makeCharacterMenu(),
         'construction': Engine.makeConstructionMenu(),
         'crafting': Engine.makeCraftingMenu(),
-        //'fort': Engine.makeFortMenu(),
         'inventory': Engine.makeInventory(statsPanel),
         'map': Engine.makeMapMenu(),
         //'messages': Engine.makeMessagesMenu(),
         'production': Engine.makeProductionMenu(),
-        //'staff': Engine.makeStaffMenu(),
         'trade': Engine.makeTradeMenu(),
         'wip': Engine.makeWipMenu()
     };
 
     Engine.menuIcons = [];
     //Engine.addMenu(1004,140,'menu_crow',Engine.menus.messages,895,73);
-    Engine.addMenu(967,159,'menu_map',Engine.menus.map,855,73);
-    Engine.addMenu(922,159,'menu_backpack',Engine.menus.inventory,815,73);
-    Engine.addMenu(884,136,'menu_dude',Engine.menus.character,775,73);
+    Engine.addMenu(967,150,'menu_map',Engine.menus.map,855,73);
+    Engine.addMenu(922,150,'menu_backpack',Engine.menus.inventory,815,73);
+    Engine.addMenu(884,130,'menu_dude',Engine.menus.character,775,73);
     //Engine.addMenu(863,95,'menu_flag',Engine.menus.inventory,735,73);
     Engine.addMenu(20,60,'shovel',Engine.menus.build,-100,60);
 
@@ -1411,16 +1391,16 @@ Engine.makeStaffMenu = function(){
 
 Engine.makeMapMenu = function(){
     var map = new Menu('World Map');
+    map.log = true;
     map.setSound(Engine.scene.sound.add('page_turn2'));
-    var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
+    var mapPanel = map.addPanel('map',new MapPanel(10,100,1000,380,'',true)); // true = invisible
     mapPanel.addBackground('longscroll');
-    var mapInstance = mapPanel.addMap('player','radiallongrect',1000,380,-1,-1);
+    var mapInstance = mapPanel.addMap('radiallongrect',900,380,-1,-1);
     mapPanel.addButton(953, -2, 'blue','help',null,'',UI.textsData['self_map_help']);
     // TODO: move in Map.js, method addZoom, positions buttons based on viewWidt/height and
     // controls enable/disable of buttons based on zoom flag
-    mapPanel.addButton(940, 320, 'blue','plus',mapInstance.zoomIn.bind(mapInstance),'Zoom in');
-    mapPanel.addButton(930, 350, 'blue','minus',mapInstance.zoomOut.bind(mapInstance),'Zoom out');
-    map.addPanel('map',mapPanel);
+    mapPanel.zoomInBtn = mapPanel.addButton(940, 320, 'blue','plus',mapInstance.zoomIn.bind(mapInstance),'Zoom in');
+    mapPanel.zoomOutBtn = mapPanel.addButton(930, 350, 'blue','minus',mapInstance.zoomOut.bind(mapInstance),'Zoom out');
     return map;
 };
 
@@ -1675,6 +1655,7 @@ Engine.updateBldRect = function(){
 Engine.makeInventory = function(statsPanel){
     // ## Inventories are only displayed if a trigger calls onUpdateInventory; TODO change that!!
     var inventory = new Menu('Inventory');
+    inventory.log = true;
     inventory.setSound(Engine.scene.sound.add('inventory'));
 
     var items = inventory.addPanel('items',new InventoryPanel(40,100,600,380,'Items'));
@@ -1712,6 +1693,7 @@ Engine.makeAbilitiesMenu = function(){
 
 Engine.makeCharacterMenu = function(){
     var menu = new Menu('Character');
+    menu.log = true;
     menu.setSound(Engine.scene.sound.add('page_turn'));
 
     var citizenx = 40;
@@ -1822,6 +1804,7 @@ Engine.addHero = function(data){
 };
 
 Engine.updateEnvironment = function(){
+    if(!Engine.playerIsInitialized) return;
     var chunks = Utils.listAdjacentAOIs(Engine.player.chunk);
     var newChunks = chunks.diff(Engine.displayedChunks);
     var oldChunks = Engine.displayedChunks.diff(chunks);
@@ -1871,34 +1854,14 @@ Engine.removeChunk = function(id){
     Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
 };
 
-Engine.addResource = function(origin,shape){
-    for(var x = shape.x/32; x < (shape.x+shape.width)/32; x++){
-        for(var y = shape.y/32; y < (shape.y+shape.height)/32; y++) {
-            Engine.resources.add(origin.x+x,origin.y+y,1);
-        }
-    }
-};
-
-/*Engine.addCollision = function(x,y,tile){
-    if(Engine.isColliding(tile)) {
-        Engine.collisions.add(x,y,1);
-        if(Engine.debugCollisions) Engine.scene.add.rectangle((x*32)+16,(y*32)+16, 32,32, 0xee0000).setAlpha(0.7);
-    }
-};*/
-
 // Check if a non-walkable tile is at a given position or not
-Engine.checkCollision = function(x,y){
-    return !!Engine.collisions.get(x,y);
+Engine.checkCollision = function(x,y){ // returns true if tile is not walkable
+    return Engine.collisions.has(x,y);
 };
 
 Engine.checkResource = function(x,y){
-    return !!Engine.resources.get(x,y);
+    return Engine.resources.has(x,y);
 };
-
-// Check if a given tile type is walkable or not
-/*Engine.isColliding = function(tile){ // tile is the index of the tile in the tileset
-    return Engine.collidingTiles.includes(tile);
-};*/
 
 Engine.handleKeyboard = function(event){
     //console.log(event);
@@ -1954,18 +1917,19 @@ Engine.handleDrag = function(pointer,object,dragX,dragY){
 
 Engine.moveToClick = function(pointer){
     Engine.player.setDestinationAction(0);
-    Engine.computePath(Engine.getMouseCoordinates(pointer).tile);
+    Engine.computePath(Engine.getMouseCoordinates(pointer).tile,false);
 };
 
-Engine.computePath = function(position){
-    //console.log('going to ',position);
+Engine.computePath = function(position,nextTo){
+    // console.log('going to ',position);
     var x = position.x;
     var y = position.y;
-    if(Engine.checkCollision(x,y)) return;
+    if(x === undefined || y === undefined) console.warn('Pathfiding to undefined coordinates');
+    // if(!nextTo && Engine.checkCollision(x,y)) return;
     var start = Engine.player.getPFstart();
     if(Engine.player.moving) Engine.player.stop();
 
-    var path = Engine.pathFinder.findPath(start,{x:x,y:y});
+    var path = Engine.pathFinder.findPath(start,{x:x,y:y},false,nextTo); // seek = false, nextTo = true
     if(!path) {
         Engine.player.talk('It\'s too far!');
         return;
@@ -2019,6 +1983,14 @@ Engine.getMouseCoordinates = function(pointer){
         tile:{x:tileX,y:tileY},
         pixel:{x:pxX,y:pxY}
     };
+};
+
+Engine.isInView = function(x,y){
+    if(x < Engine.player.tileX - VIEW_WIDTH/2) return false;
+    if(x >= Engine.player.tileX + VIEW_WIDTH/2) return false;
+    if(y < Engine.player.tileY - VIEW_HEIGHT/2) return false;
+    if(y >= Engine.player.tileY + VIEW_HEIGHT/2) return false;
+    return true;
 };
 
 Engine.trackMouse = function(event){
@@ -2277,8 +2249,8 @@ Engine.processNPCClick = function(target){
 
 Engine.processItemClick = function(target){
     if(Engine.inPanel) return;
-    Engine.player.setDestinationAction(3,target.id,target.tx,target.ty); // 3 for item
-    Engine.computePath({x:target.tx,y:target.ty});
+    Engine.player.setDestinationAction(3,target.id,target.tileX,target.tileY); // 3 for item
+    Engine.computePath({x:target.tileX,y:target.tileY},true);
 };
 
 Engine.requestBattleAttack = function(target){

@@ -1,57 +1,139 @@
 /**
  * Created by Jerome on 12-01-18.
  */
+
+var fowID = 0;
+var FoWPipeline = new Phaser.Class({
+
+    Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
+
+    initialize:
+        function FoWPipeline(game,nbr) {
+            Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline.call(this, {
+                game: game,
+                renderer: game.renderer,
+                fragShader:
+                `precision mediump float;
+                varying vec2 outTexCoord;
+                uniform sampler2D uMainSampler;
+                uniform float rects[`+nbr+`];
+                
+                vec3 makeRect(vec2 st,vec4 coords, vec3 col){
+                    vec2 blur = vec2(0.05);
+                    // top-left
+                    vec2 ps = vec2(coords.x,coords.y) - blur;
+                    vec2 bl = smoothstep(ps,ps+blur,st);
+                    float pct = bl.x * bl.y;
+                    // bottom-right
+                    ps = vec2(coords.z,coords.w);
+                    vec2 tr = 1.0-smoothstep(ps,ps+blur,st);
+                    pct *= tr.x * tr.y;
+                    vec3 newcol = vec3(pct)*col; 
+                    return newcol;
+                }
+                vec3 mr(vec2 st,vec4 coords, vec3 col){
+                    return vec3(st.x);
+                }
+                void main(){
+                    vec2 st = outTexCoord;
+                    
+                    vec3 color = vec3(0.0);
+                    const int nbr = `+nbr+`;
+                    for(int i = 0; i < nbr; i+=4){
+                       vec4 r = vec4(rects[i],rects[i+1],rects[i+2],rects[i+3]);
+                       color += makeRect(st,r,vec3(1.0)); 
+                    }
+                    
+                    vec4 fcolor = texture2D(uMainSampler, outTexCoord);
+                    
+                    //gl_FragColor = fcolor*vec4(color,1.0);
+                    gl_FragColor = min(fcolor,fcolor*vec4(color,1.0)); // avoids overlapping rects to create bright stripes
+                }`
+            });
+        }
+
+});
+
 var Map = new Phaser.Class({
 
-    Extends: CustomSprite,
-    //Extends: Phaser.GameObjects.RenderTexture,
+    // Extends: CustomSprite,
+    Extends: Phaser.GameObjects.RenderTexture,
 
-    initialize: function Map(x, y, viewW, viewH, dragWidth, dragHeight, target, showToponyms) {
-        CustomSprite.call(this, UI.scene, x, y, 'fullmap');
-        //Phaser.GameObjects.RenderTexture.call(this, UI.scene, x, y, 2400,1824);
-        //UI.scene.add.displayList.add(this);
-        //this.draw('fullmap',0,0);
+    /*
+    * README:
+    * - The point on the screen where the focus should be is stored in this.center (typically, center of screen)
+    * - centerMap() changes the pivot of the map, and positions that pivot on this.center
+    * - dragMap() repositions the elements of the map when it has moved (useful for follow behavior, even if actual drag by player is disabled)
+    * */
 
+    initialize: function Map(x, y, viewW, viewH, dragWidth, dragHeight, showToponyms, minimap) {
+        // viewW is either a radius or a rect width; controls the size of area in which pins will appear
+        // (it is dissociated from the mask size, which depends on the size of the image used for masking)
+        
+        // CustomSprite.call(this, UI.scene, x, y, 'worldmap');
+        Phaser.GameObjects.RenderTexture.call(this, UI.scene, x, y, 3000, 2280);
+        UI.scene.add.displayList.add(this);
+        this.draw('worldmap');
+        this.setOrigin(0.5);
+
+        this.minimap = minimap;
         this.setDepth(2);
         this.setScrollFactor(0);
         this.setVisible(false);
-
-        /*this.container = UI.scene.add.container(x,y);
-        this.container.setDepth(2);
-        this.container.add(this);*/
+        this.setScale(0.5);
 
         this.center = { // position of map sprite on screen
             x: x,
             y: y
         };
-        this.viewRect = new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH);
+        // unmasked area on screen
+        this.viewRect = (this.minimap ?
+             new Phaser.Geom.Circle(this.x,this.y,viewW)
+            :new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH)
+            );
 
+        var wcoord = (this.minimap ? 'radius' : 'width');
+        var hcoord = (this.minimap ? 'radius' : 'height');
+
+        // Used to make sur that the map won't be centered in a position that allows to see the edges
         this.minOrigin = {
-            x: (this.viewRect.width/2)/this.width,
-            y: (this.viewRect.height/2)/this.height
+            x: (this.viewRect[wcoord]/2)*(1/this.scaleX),
+            y: (this.viewRect[hcoord]/2)*(1/this.scaleY),
+            xOffset: 0
         };
-        this.maxOrigin = {
-            x: (this.width - this.viewRect.width/2)/this.width,
-            y: (this.height - this.viewRect.height/2)/this.height
+        if(this.minimap) this.minOrigin.y *= 2; // quick fix
+        this.maxOrigin =  {
+            x: (World.worldWidth-this.viewRect[wcoord]/2)*(1/this.scaleX),
+            y: (World.worldHeight-this.viewRect[hcoord]/2)*(1/this.scaleY),
+            xOffset: 0
         };
 
-        this.target = target;
+        if(!this.minimap){
+            this.minOrigin.xOffset = 70;
+            this.maxOrigin.xOffset = -60;
+        }
+
         this.toponyms = [];
+
         /*if(showToponyms) {
             Engine.settlementsData.forEach(function (s) {
                 this.addText(s);
             }, this);
         }*/
 
-        this.setInteractive();
-        UI.scene.input.setDraggable(this);
+        if(!this.minimap) {
+            this.offZone = new Phaser.Geom.Rectangle(932,418,60,50);
+            this.setInteractive(); // { pixelPerfect: true } // not needed anymore with rendertexture apparently
+            this.on('pointerdown', this.handleClick.bind(this));
+        }
+        /*UI.scene.input.setDraggable(this);
         this.dragWidth = (dragWidth > -1 ? dragWidth : 999999);
         this.dragHeight = (dragHeight > -1 ? dragHeight : 999999);
         this.draggedX = 0;
         this.draggedY = 0;
 
         this.on('drag',this.handleDrag.bind(this));
-        this.on('pointerup',this.handleClick.bind(this));
+        */
 
         this.pins = [];
         this.resetCounter();
@@ -113,7 +195,6 @@ var Map = new Phaser.Class({
     },
 
     handleDrag: function(pointer,x,y){
-        // TODO: check for Phaser way of restricting distance
         if(x < this.minX) return;
         if(x > this.maxX) return;
         if(y < this.minY) return;
@@ -126,21 +207,27 @@ var Map = new Phaser.Class({
     },
 
     focus: function(x,y){
-        var dx = x - (this.x + this.draggedX);
-        var dy = y - (this.y + this.draggedY);
-        // The map has to move in the opposite direction of the drag (w.r.t. center)
-        this.dragMap(dx,dy,true);
+        var ox = this.displayOriginX;
+        var oy = this.displayOriginY;
+        this.centerMap({x:x/2,y:y/2});
+        var dx = this.displayOriginX - ox;
+        var dy = this.displayOriginY - oy;
+        this.dragMap(dx*this.scaleX,dy*this.scaleY,false);
     },
 
     follow: function(){
-        var pos = {x:Engine.player.tileX,y:Engine.player.tileY};
+        var pos = Engine.player.getTilePosition();
         var ox = this.displayOriginX;
         var oy = this.displayOriginY;
         this.centerMap(pos);
-        if(this.positionCross) this.positionCross.setPosition(this.center.x,this.center.y);
+        // if(this.positionCross) this.positionCross.setPosition(this.center.x,this.center.y);
+        if(this.positionCross){
+            var loc = this.computeMapLocation(pos.x,pos.y);
+            this.positionCross.setPosition(loc.x,loc.y);
+        }
         var dx = this.displayOriginX - ox;
         var dy = this.displayOriginY - oy;
-        this.dragMap(dx,dy,false);
+        this.dragMap(dx*this.scaleX,dy*this.scaleY,false);
     },
 
     dragMap: function(dx,dy,tween){ // x and y are destination coordinates
@@ -157,17 +244,19 @@ var Map = new Phaser.Class({
                     y: '-='+dy,
                     duration: duration
                 });
-            UI.scene.tweens.add({
+            /*UI.scene.tweens.add({
                 targets: this.input.hitArea,
                 x: '+='+dx,
                 y: '+='+dy,
                 duration: duration
-            });
+            });*/
         }else {
-            this.input.hitArea.x += dx;
-            this.input.hitArea.y += dy;
-            //this.fow.x -= dx;
-            //this.fow.y -= dy;
+            // this.input.hitArea.x += dx;
+            // this.input.hitArea.y += dy;
+            if(this.fow){
+                this.fow.x -= dx;
+                this.fow.y -= dy;
+            }
             this.moveTexts(dx,dy);
             this.movePins(dx, dy);
         }
@@ -177,6 +266,7 @@ var Map = new Phaser.Class({
         this.displayedPins.forEach(function(p){
             p.x -= dx;
             p.y -= dy;
+            p.setVisibility();
         });
     },
 
@@ -187,9 +277,9 @@ var Map = new Phaser.Class({
         });
     },
 
-    handleClick: function(pointer){
-        if(pointer.downX != pointer.upX || pointer.downY != pointer.upY) return; // drag
-        console.log(Utils.screenToMap(pointer.x,pointer.y,this));
+    handleClick: function(pointer,x,y){
+        if(this.offZone.contains(pointer.x,pointer.y)) return;
+        this.focus(x,y);
     },
 
     getNextPin: function(){
@@ -199,17 +289,17 @@ var Map = new Phaser.Class({
 
     // Maps a tile coordinate to px coordinate on the map
     computeMapLocation: function(tx,ty){
-        var pct = Utils.tileToPct(tx,ty);
-        var dx = (pct.x - this.originX)*this.width;
-        var dy = (pct.y - this.originY)*this.height;
+        var dx = (tx*2 - this.displayOriginX)*this.scaleX;
+        var dy = (ty*2 - this.displayOriginY)*this.scaleY;
         return {
-            x: Math.round(this.x+dx),
-            y: Math.round(this.y+dy)
-        }
+            x: this.x + dx,
+            y: this.y + dy
+        };
     },
 
     addPin: function(x,y,name,frame,bg){
         var location = this.computeMapLocation(x,y);
+        // console.log(x,y,location);
         var pin = this.getNextPin();
         pin.setUp(x,y,location.x,location.y,name,frame,bg);
         this.displayedPins.push(pin);
@@ -221,26 +311,32 @@ var Map = new Phaser.Class({
         this.displayedPins = [];
     },
 
+    getZoomBtn: function(mode){
+        var btnID = (mode == 'in' ? 1 : 2);
+        return this.panel.buttons[btnID].btn;
+    },
+
     zoomIn: function(){
-        this.setTexture('fullmap_zoomed');
+        this.setScale(1);
         this.zoom();
+        this.getZoomBtn('in').disable();
+        this.getZoomBtn('out').enable();
     },
 
     zoomOut: function(){
-        this.setTexture('fullmap');
+        this.setScale(0.5);
         this.zoom();
+        this.getZoomBtn('in').enable();
+        this.getZoomBtn('out').disable();
     },
 
     zoom: function(){
+        this.centerMap(); // center on current center ; must be called before positioning pins
         this.displayedPins.forEach(function(pin){
             pin.reposition();
         });
-        this.setInputArea();
         this.positionToponyms();
-        this.computeDragLimits();
-
-        //console.log(this.x+this.draggedX,this.minX,this.maxX);
-        //console.log(this.y+this.draggedY,this.minY,this.maxY);
+        // this.computeDragLimits();
     },
 
     positionToponyms: function(){
@@ -252,12 +348,20 @@ var Map = new Phaser.Class({
     },
 
     centerMap: function(tile){ // Adjusts the anchor, then position it in the center of the screen
-        var o = Utils.tileToPct(tile.x,tile.y);
-        this.setOrigin(Utils.clamp(o.x,this.minOrigin.x,this.maxOrigin.x),Utils.clamp(o.y,this.minOrigin.y,this.maxOrigin.y));
+        // tile is world coordinates, not map px ; if tile is undefined, then it means recenter on whatever current center (used when zooming)
+        var o = {
+            x: tile ? tile.x * 2 : this.displayOriginX,
+            y: tile ? tile.y * 2 : this.displayOriginY
+        };
+        this.setDisplayOrigin(
+            Utils.clamp(o.x,(this.minOrigin.x+this.minOrigin.xOffset)/(this.scaleX*2),this.maxOrigin.x+this.maxOrigin.xOffset),
+            Utils.clamp(o.y,this.minOrigin.y/(this.scaleY*2),this.maxOrigin.y)
+        );
         this.setPosition(this.center.x,this.center.y);
     },
 
     setInputArea: function(){
+        if(!this.minimap) return; // disabled for simplicity, it's ok if we can drag the map from outside of the scroll...
         // TODO: remove draggedX,Y once enable re-centering upon zoom?
         var rectx = this.displayOriginX + this.draggedX -(this.viewRect.width/2);
         var recty = this.displayOriginY + this.draggedY -(this.viewRect.height/2);
@@ -265,194 +369,82 @@ var Map = new Phaser.Class({
     },
 
     computeDragLimits: function(){
-        this.minY = this.y - (this.height-this.displayOriginY) + this.viewRect.height/2;
-        this.maxY = this.y + this.displayOriginY - this.viewRect.height/2;
-        this.minX = this.x - (this.width-this.displayOriginX) + this.viewRect.width/2;
-        this.maxX = this.x + this.displayOriginX - this.viewRect.width/2;
+        this.minY = this.y - (this.height-this.displayOriginY)/(1/this.scaleY) + this.viewRect.height/2;
+        this.maxY = this.y + this.displayOriginY/(1/this.scaleY) - this.viewRect.height/2;
+        this.minX = this.x - (this.width-this.displayOriginX)/(1/this.scaleX) + this.viewRect.width/2;
+        this.maxX = this.x + this.displayOriginX/(1/this.scaleX) - this.viewRect.width/2;
 
         this.minX = Math.max(this.minX,this.x-this.dragWidth);
-        this.maxX = Math.min(this.maxX,this.x+this.dragWidth);
         this.minY = Math.max(this.minY,this.y-this.dragHeight);
+        this.maxX = Math.min(this.maxX,this.x+this.dragWidth);
         this.maxY = Math.min(this.maxY,this.y+this.dragHeight);
     },
 
     applyFogOfWar: function(){
-        function Pt(x,y){
-            this.x = x;
-            this.y = y;
-            this.c = 1; // count
-            this.nbors = [];
-        }
-
-        Pt.prototype.link = function(pt){
-            this.nbors.push(pt);
-        };
-
-        Pt.prototype.unlink = function(pt){
-            var idx = this.nbors.findIndex(function(e){
-                return (e.x == pt.x && e.y == pt.y);
-            });
-            this.nbors.splice(idx,1);
-        };
-
-        Pt.prototype.equal = function(pt){
-            if(pt === null) return false;
-            return (this.x == pt.x && this.y == pt.y);
-        };
-
-        Pt.prototype.ts = function(){
-            return "("+this.x+","+this.y+")";
-        };
-
-        Pt.prototype.debug = function(){
-            console.log(this.ts(),"has",this.nbors.length,"neighbors and a count of",this.c);
-        };
-
-        function link(pts){ // link together all points in list
-            /*console.log('link candidates:');
-            pts.forEach(function(pt){
-                console.log(pt.ts());
-            });*/
-            for(var i = 0; i < pts.length; i++){
-                for(var j = i; j < pts.length; j++){
-                    var a = pts[i];
-                    var b = pts[j];
-                    var dx = Math.abs(a.x-b.x);
-                    var dy = Math.abs(a.y-b.y);
-                    if( dx ? !dy : dy ) { // xor, equivalent to avoiding diagonals
-                        //console.log("Linking",a.ts(),"to",b.ts());
-                        a.link(b);
-                        b.link(a);
-                    }
-                }
-            }
-        }
-
-        function unlink(pt){ // unlink a point from all its neighbors
-            pt.nbors.forEach(function(nb){
-                nb.unlink(pt);
-            });
-        }
-
-        function lint(pts){ // remove side-by-side duplicate neighbors
-            /*console.log("linting");
-            pts.forEach(function(pt){
-                console.log(pt.ts());
-            });*/
-            for(var i = pts.length-2; i >= 0; i--){
-                if(i == pts.length-1) continue; // needed when there are 4 duplicates in a row
-                if(pts[i].equal(pts[i+1])){
-                    pts.splice(i+1,1);
-                    pts.splice(i,1);
-                }
-            }
-        }
-
-        var aois = [341,389,390,391,438,439,440,490];
-        var space = new SpaceMap();
-        aois.forEach(function(aoi){
-            var corners = Utils.getAOIcorners(aoi);
-            var pts = [];
-            corners.forEach(function(corner){
-                var pt = space.get(corner.x,corner.y);
-                if(pt){
-                    pt.c++;
-                }else{
-                    pt = new Pt(corner.x,corner.y);
-                    space.add(pt.x,pt.y,pt);
-                }
-                pts.push(pt);
-            });
-            link(pts);
-        });
-
-        /*space.toList().forEach(function(pt){
-            pt.v.debug();
-        });*/
-
-        space.toList().forEach(function(entry){
-            var pt = entry.v;
-            if(pt.c%2 == 0){ // redundant points have the property of having even counts
-                unlink(pt);
-                link(pt.nbors);
-                space.delete(pt.x,pt.y);
-            }
-        });
-
-        var l = space.toList();
-        l.forEach(function(entry){
-            var pt = entry.v;
-            lint(pt.nbors);
-        });
-
-        var s = space.getFirst();
-        var path = [s];
-        var i = 0;
-        while(true){
-            if(i > 10000) break; //TODO: remove
-            var pt = path[0];
-            var pv = null;
-            if(path.length > 1) pv = path[1];
-            var nt = null;
-            for(var j = 0; j < pt.nbors.length; j++){ // Find next neighbor to travel to
-                var nb = pt.nbors[j];
-                if(!nb.equal(pv)){
-                    nt = nb;
-                    break;
-                }
-            }
-            //if(nt === null) console.warn('no next for pt',pt.x,pt.y);
-            if(nt.equal(s)) break;
-            path.unshift(nt);
-            i++;
-        }
-
-        path = path.map(function(pt){
-            return this.computeMapLocation(pt.x,pt.y);
+        // Maps rects to one single flat list of top-left and bottom-right coordinates,
+        // for use by the shader
+        var rects = [];
+        Engine.player.mapVision.forEach(function(rect){
+            rects.push(rect.x/(this.width*this.scaleX));
+            rects.push(rect.y/(this.height*this.scaleY));
+            rects.push((rect.x+rect.width)/(this.width*this.scaleX));
+            rects.push((rect.y+rect.height)/(this.height*this.scaleY));
         },this);
 
-        this.fow = UI.scene.add.polygon(0,0,path,0x000000,1);
+        var game = Engine.getGameInstance();
+        var customPipeline = game.renderer.addPipeline('FoW'+fowID, new FoWPipeline(game,rects.length));
+        customPipeline.setFloat1v('rects', rects);
+
+        this.setPipeline('FoW'+fowID++); // ugly hack
+
+        // Compute where to display polygon on screen, based on map location on screen
+        /*path = path.map(function(pt){
+            return this.computeMapLocation(pt.x,pt.y);
+        },this);*/
+
+        // console.warn(path);
+
+        /*this.fow = UI.scene.add.polygon(0,0,path,0xffffff,1);
         this.fow.setOrigin(0);
         this.fow.setDepth(this.depth+1);
-        this.fow.setScrollFactor(0);
-        //this.fow.setVisible(false);
-        //this.setMask(new Phaser.Display.Masks.BitmapMask(UI.scene,this.fow));
-
-        /*console.log(this);
-        var msk = this.mask.bitmapMask;
-        //this.fog = UI.scene.add.rectangle(this.x,this.y,msk.width,msk.height,0x000000,0.7);
-        this.fog = UI.scene.add.render
-        this.fog.setDepth(this.depth+2);
-        this.fog.setScrollFactor(0);*/
+        this.fow.setScrollFactor(0);*/
     },
 
     display: function(){
-        var tile;
-        if(this.target == 'building'){
-            tile = Engine.currentBuiling.getTilePosition();
-        }else{
-            tile = Engine.player.getTilePosition();
-        }
-
-        this.centerMap(tile);
-        this.setInputArea();
+        if(!this.mimnimap && this.scaleX > 0.5) this.zoomOut();
+        this.centerMap(Engine.player.getTilePosition());
+        // this.setInputArea();
         this.positionToponyms();
         this.computeDragLimits();
-        //if(!this.minimap) this.applyFogOfWar();
+        if(!this.minimap) this.applyFogOfWar();
 
-        if(this.target == 'player') { // TODO: remove, always the case if no fort
-            this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
-            //this.positionCross.setDepth(this.positionCross.depth+1);
-            Engine.player.markers.forEach(function(data){
-                this.addPin(data.x,data.y,
-                    Engine.buildingsData[data.type].name,
-                    Engine.buildingsData[data.type].mapicon,
-                    Engine.buildingsData[data.type].mapbg
-                );
-            },this);
-        }
-
+        this.displayPins();
         this.setVisible(true);
+        if(!this.minimap) this.getZoomBtn('out').disable();
+    },
+
+    displayPins: function(){
+        var tile = Engine.player.getTilePosition();
+        this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
+        Engine.player.buildingMarkers.forEach(function(data){
+            this.addPin(data.x,data.y,
+                Engine.buildingsData[data.type].name,
+                'bld'
+                // Engine.buildingsData[data.type].mapicon,
+                // Engine.buildingsData[data.type].mapbg
+            );
+        },this);
+        Engine.player.resourceMarkers.forEach(function(data){
+            this.addPin(data[0],data[1],
+                Engine.itemsData[data[2]].name,
+                'herb'
+            );
+        },this);
+    },
+
+    updatePins: function(){
+        this.hidePins();
+        this.displayPins();
     },
 
     hide: function(){
@@ -475,13 +467,13 @@ var Map = new Phaser.Class({
 
 var Pin = new Phaser.Class({
 
-    //Extends: CustomSprite,
-    Extends: Phaser.GameObjects.RenderTexture,
+    Extends: CustomSprite,
+    // Extends: Phaser.GameObjects.RenderTexture,
 
     initialize: function Pin (map,mask) {
-        //CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
-        Phaser.GameObjects.RenderTexture.call(this, UI.scene, 0, 0, 16,16);
-        UI.scene.add.displayList.add(this);
+        CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
+        // Phaser.GameObjects.RenderTexture.call(this, UI.scene, 0, 0, 16,16);
+        // UI.scene.add.displayList.add(this);
         //UI.scene.add.updateList.add(this);
 
         this.setDepth(2);
@@ -493,22 +485,22 @@ var Pin = new Phaser.Class({
                 : new Phaser.Display.Masks.GeometryMask(UI.scene,mask)
         );*/
         this.parentMap = map;
-        this.setMask(this.parentMap.mask);
+        // this.setMask(this.parentMap.mask);
         //this.parentMap.container.add(this);
         this.on('pointerover',this.handleOver.bind(this));
         this.on('pointerout',this.handleOut.bind(this));
     },
 
     setUp: function(tileX,tileY,x,y,name,frame,bgframe){
-        if(frame == 'x'){
-            this.setOrigin(0.2,0.5);
-        }else{
-            this.setOrigin(0.5,1);
-        }
+        this.setOrigin(0.5);
+
         // Phaser 3.12:
-        var bg = bgframe ? 'bg'+bgframe : 'bg';
-        if(frame != 'x') this.drawFrame('mapicons',bg,0,0);
-        this.drawFrame('mapicons',frame,0,0);
+        // var bg = bgframe ? 'bg'+bgframe : 'bg';
+        // if(frame != 'x') this.drawFrame('mapicons',bg,0,0);
+
+        // this.drawFrame('mapicons',frame,0,0);
+        this.setFrame(frame);
+
         // Phaser 3.11:
         /*var icon = Engine.scene.add.sprite(0,0,'mapicons',frame);
         var bg = bgframe ? 'bg'+bgframe : 'bg';
@@ -518,10 +510,29 @@ var Pin = new Phaser.Class({
 
         this.tileX = tileX;
         this.tileY = tileY;
-        this.setDepth(this.depth + this.tileY/1000);
+        this.setDepth(this.depth + this.tileY/1000); // /1000 to avoid appearing above tooltip
         this.setPosition(x,y);
         this.name = name;
-        this.setVisible(true);
+        this.setVisibility();
+    },
+
+    setVisibility: function(){
+        if(this.parentMap.viewRect.contains(this.x,this.y)){
+            if(this.parentMap.minimap){
+                this.setVisible(true);
+            }else{
+                for(var i = 0; i < Engine.player.mapVision.length; i++){
+                    var rect = Engine.player.mapVision[i];
+                    if(rect.contains(this.tileX,this.tileY)){
+                        this.setVisible(true);
+                        return;
+                    }
+                }
+                this.setVisible(false);
+            }
+        }else{
+            this.setVisible(false);
+        }
     },
 
     highlight: function(){
@@ -539,12 +550,14 @@ var Pin = new Phaser.Class({
     reposition: function(){
         var location = this.parentMap.computeMapLocation(this.tileX,this.tileY);
         this.setPosition(location.x,location.y);
+        this.setVisibility();
     },
 
     handleOver: function(){
         if(!this.parentMap.viewRect.contains(this.x,this.y)) return;
         UI.tooltip.updateInfo(this.name);
         UI.tooltip.display();
+        console.log(this.tileX,this.tileY);
     },
 
     handleOut: function(){

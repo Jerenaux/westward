@@ -44,17 +44,17 @@ var Moving = new Phaser.Class({
         this.updatePosition(x,y);
     },
 
-    setTilePosition: function(x,y){
+    /*setTilePosition: function(x,y){
         this.tileX = x;
         this.tileY = y;
-    },
+    },*/
 
     // Updates the position; primarily called as the entity moves around and has moved by at least 1 tile
     updatePosition: function(x,y){ // x and y are tile cordinates
         this.updatePreviousPosition();
         this.setTilePosition(x,y);
         this.updateDepth();
-        this.updateChunk();
+        // this.updateChunk();
     },
 
     updatePreviousPosition: function(){
@@ -68,15 +68,7 @@ var Moving = new Phaser.Class({
 
     updateDepth: function(){
         //this.setDepth(Engine.playersDepth + this.tileY / 1000);
-        this.setDepth(this.tileY+0.1);
-    },
-
-    updateChunk: function(){
-        this.chunk = Utils.tileToAOI({x:this.tileX,y:this.tileY});
-        if(this.isHero) {
-            if(this.chunk != this.previousChunk) Engine.updateEnvironment();
-            this.previousChunk = this.chunk;
-        }
+        this.setDepth(this.tileY+1);
     },
 
     manageOrientationPin: function(){
@@ -88,14 +80,8 @@ var Moving = new Phaser.Class({
             return;
         }
 
-        var worldView = Engine.camera.worldView;
-        if(worldView.x == 0 && worldView.y == 0){ // small hack, worldView not updated yet
-            this.orientationPin.hide();
-            return;
-        }
         var c = this.getCenter();
-        var inCamera = worldView.contains(c.x*32,c.y*32);
-        if(inCamera) {
+        if(Engine.isInView(c.x,c.y)) {
             this.orientationPin.hide();
         }else{
             this.orientationPin.update(this.tileX,this.tileY);
@@ -138,7 +124,11 @@ var Moving = new Phaser.Class({
     },
 
     frameByFrameUpdate: function(){
-        if(this.bubble) this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
+        if(this.bubble) this.updateBubblePosition();
+    },
+
+    updateBubblePosition: function(){
+        this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY,this.depth);
     },
 
     computeOrientation: function(fromX,fromY,toX,toY){
@@ -332,11 +322,12 @@ var Moving = new Phaser.Class({
     },
 
     playSound: function(){
-        Engine.playLocalizedSound('footsteps',5,{x:this.tileX,y:this.tileY});
+        Engine.playLocalizedSound('footsteps',2,{x:this.tileX,y:this.tileY});
     },
 
     talk: function(text){
         //if(this.isHero) return;
+        this.updateBubblePosition();
         this.bubble.update(text);
         this.bubble.display();
         Engine.scene.sound.add('speech').play();

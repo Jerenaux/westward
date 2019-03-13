@@ -24,7 +24,8 @@ var UI = {
         if(Client.isNewPlayer()) {
             this.load.image('bigbg', 'assets/sprites/bigbg.png');
             this.load.image('bigbg_mask', 'assets/sprites/bigbg_mask.png');
-            this.load.image('worldmap', 'assets/sprites/worldmap.png');
+            // this.load.image('worldmap', 'assets/sprites/worldmap.png');
+            this.load.image('worldmap', 'maps/worldmap.png');
             this.load.image('campdiamond', 'assets/sprites/camp_diamond.png');
             this.load.image('setldiamond', 'assets/sprites/setl_diamond.png');
             this.load.image('wood', 'assets/sprites/wood.jpg');
@@ -67,6 +68,7 @@ var UI = {
         UI.setCursor();
 
         UI.hovering = [];
+        UI.hoverFlower = 0;
 
         this.input.setTopOnly(false);
         this.input.on('pointermove',function(event){
@@ -340,12 +342,12 @@ UI.selectClass = function(id){
 UI.displayNameBox = function(){
     var panel = new NamePanel(362,150,300,120,'Character name');
     panel.addText(10,20,'Enter the name of your character.');
-    panel.addBigButton('Next',UI.displaySettlementSelectionMenu);
+    panel.addBigButton('Next',UI.displayRegionSelectionMenu);
     panel.display();
     UI.namePanel = panel;
 };
 
-UI.displaySettlementSelectionMenu =  function(){
+UI.displayRegionSelectionMenu =  function(){
     if(UI.namePanel){
         UI.characterName = UI.namePanel.getValue();
         if(!UI.characterName) return;
@@ -358,7 +360,8 @@ UI.displaySettlementSelectionMenu =  function(){
     var map = UI.scene.add.image(UI.getGameWidth()/2,UI.getGameHeight()/2,'worldmap');
     content.push(map);
     //map.x += 50;
-    map.y += 150;
+    map.y += 120;
+    map.setScale(0.4);
 
     if(Boot.WEBGL){
         var mask = UI.scene.add.sprite(scroll.x,scroll.y,'bigbg_mask');
@@ -370,7 +373,7 @@ UI.displaySettlementSelectionMenu =  function(){
 
     UI.SSmap = map;
     UI.SScontent = content;
-    Client.requestSettlementData();
+    Client.requestRegionsData();
     //Client.requestCampsData();
 
     var w = 400;
@@ -383,15 +386,16 @@ UI.displaySettlementSelectionMenu =  function(){
 
 };
 
-UI.displaySettlements = function(list){
-    list.forEach(function(e){
-        UI.displaySettlement(e);
-    });
+UI.displayRegions = function(list){
+    for(var e in list.regions){
+        UI.displayRegion(list.regions[e],list.world);
+    }
 };
 
-UI.displaySettlement = function(data){
-    var x = data.x*UI.SSmap.width - 50;
-    var y = data.y*UI.SSmap.height;
+UI.displayRegion = function(data,world){
+    console.log(data);
+    var x = (data.x/world.width)*UI.SSmap.width*UI.SSmap.scaleX - 90; // why offset?
+    var y = (data.y/world.height)*UI.SSmap.height*UI.SSmap.scaleY - 50;
     var icon = UI.scene.add.image(x,y,'setldiamond');
     icon.setOrigin(0.5,1);
     icon.setInteractive();

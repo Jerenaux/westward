@@ -7,24 +7,34 @@ var Item = new Phaser.Class({
 
     initialize: function Item() {
         CustomSprite.call(this, Engine.scene, 0, 0);
-        this.setDepth(2);
-        //this.setOrigin(-0.3);
         this.setInteractive();
         this.entityType = 'item';
     },
 
     setUp: function(data){
         var itemData = Engine.itemsData[data.type];
-        this.setTexture(itemData.atlas);
-        this.setFrame(itemData.frame);
+        var atlas = 'tileset';
+        var frame = Utils.randomElement(itemData.envFrames);
+        this.outFrame = frame;
+        this.inFrame = frame+'_lit';
+
+        this.setTexture(atlas);
+        this.setFrame(frame);
         this.setVisible(true);
         this.orientationPin = new OrientationPin('item',itemData.atlas,itemData.frame);
 
         this.setTilePosition(data.x,data.y,true);
+        // this.setOrigin(0.5);
+        this.setDepth(this.tileY+1); // for e.g. when wood spawns on the roots of a tree
+
+        if(itemData.collides) {
+            this.collides = true;
+            Engine.collisions.add(this.tileX,this.tileY);
+        }
+
         this.x += World.tileWidth/2;
         this.y += World.tileHeight/2;
         this.setID(data.id);
-
         this.name = itemData.name;
         Engine.items[this.id] = this;
         Engine.entityManager.addToDisplayList(this);
@@ -34,28 +44,22 @@ var Item = new Phaser.Class({
 
     remove: function(){
         CustomSprite.prototype.remove.call(this);
+        if(this.collides) Engine.collisions.delete(this.tileX,this.tileY);
         this.orientationPin.hide();
         delete Engine.items[this.id];
     },
 
     manageOrientationPin: function(){
-        //return; // enable based on explorer abilities
-        var inCamera = Engine.camera.worldView.contains(this.x,this.y);
-        if(inCamera) {
+        if(Engine.isInView(this.tileX,this.tileY)) {
             this.orientationPin.hide();
         }else{
-            this.orientationPin.update(this.tx,this.ty);
+            this.orientationPin.update(this.tileX,this.tileY);
             this.orientationPin.display();
         }
     },
 
-    /*handleDown: function(){
-        UI.setCursor(UI.handCursor2);
-    },*/
-
     handleClick: function(){
         if(!BattleManager.inBattle) Engine.processItemClick(this);
-        //UI.setCursor(UI.handCursor);
     },
 
     setCursor: function(){
@@ -67,11 +71,16 @@ var Item = new Phaser.Class({
 
     handleOver: function(){
         UI.manageCursor(1,'item',this);
+        this.setFrame(this.inFrame);
+        Engine.hideMarker();
+        // console.log(this.depth);
     },
 
     handleOut: function(){
         UI.manageCursor(0,'item');
         //UI.setCursor();
         UI.tooltip.hide();
+        this.setFrame(this.outFrame);
+        Engine.showMarker();
     }
 });

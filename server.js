@@ -9,49 +9,7 @@ var path = require('path');
 var quickselect = require('quickselect'); // Used to compute the median for latency
 var mongo = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
-var crypto = require('crypto');
-var jwt = require('jsonwebtoken');
 var myArgs = require('optimist').argv;
-
-// TODO: move to separate file
-var userSchema = mongoose.Schema({
-    name: {type: String, required: true},
-    hash: {type: String, required: true},
-    salt: {type: String, required: true}
-});
-
-userSchema.methods.setPassword = function(password){
-    this.salt = crypto.randomBytes(16).toString('hex');
-    this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
-};
-
-userSchema.methods.validatePassword = function(password) {
-    var hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
-    return this.hash === hash;
-};
-
-userSchema.methods.generateJWT = function() {
-    var today = new Date();
-    var expirationDate = new Date(today);
-    expirationDate.setDate(today.getDate() + 60);
-
-    return jwt.sign({
-        name: this.name,
-        id: this._id,
-        exp: parseInt(expirationDate.getTime() / 1000, 10)
-    }, 'secret');
-};
-
-userSchema.methods.toAuthJSON = function() {
-    return {
-        _id: this._id,
-        name: this.name,
-        token: this.generateJWT()
-    };
-};
-
-mongoose.model('User', userSchema);
-require('./config/passport');
 
 var gs = require('./server/GameServer.js').GameServer;
 gs.server = server;
@@ -81,8 +39,10 @@ app.get('/editor',function(req,res){
 });
 
 var GEThandlers = {
-    //'buildings': gs.getBuildings,
+    'buildings': gs.getBuildings,
+    'countItems': gs.countItems,
     'events': gs.getEvents,
+    'players': gs.getPlayers,
     'screenshots': gs.getScreenshots
 };
 var categories = Object.keys(GEThandlers);
@@ -151,6 +111,7 @@ server.listen(process.env.PORT || myArgs.port || 8081,function(){
     db.once('open', function() {
         server.db = db;
         console.log('Connection to db established');
+        // TODO: check arg first, then config, then default
         gs.readMap(myArgs.maps || path.join(__dirname,'/maps'),myArgs.test);
     });
 });
@@ -190,11 +151,13 @@ io.on('connection',function(socket){
             'commit': gs.handleCommit,
             'craft': gs.handleCraft,
             'exit': gs.handleExit,
+            'menu': gs.logMenu,
             'NPCClick': gs.handleNPCClick,
             'path': gs.handlePath,
             'respawn': gs.handleRespawn,
             'screenshot': gs.handleScreenshot,
             'shop': gs.handleShop,
+            'tutorial-start': gs.handleTutorialStart,
             'unequip': gs.handleUnequip,
             'use': gs.handleUse,
 
@@ -224,11 +187,11 @@ io.on('connection',function(socket){
        });*/
     });
 
-    socket.on('settlement-data',function(){
-        socket.emit('settlement-data',gs.listSettlements('selectionTrim'));
+    socket.on('region-data',function(){
+        socket.emit('region-data',gs.listRegions());
     });
 
-    socket.on('camps-data',function(){
+    socket.on('camps-data',function(){ge
         socket.emit('camps-data',gs.listCamps());
     });
 

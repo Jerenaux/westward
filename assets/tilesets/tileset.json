@@ -1,135 +1,79 @@
 {
   "config":{
-      "grassPrefix": "newgrass",
+      "grassPrefix": "grass",
       "grassSize": 3,
       "waterPrefix": ""
   },
   "frames": {
     "grass_0":{
-      "frame": {"x":32,"y":32,"w":32,"h":32}
-    },
-    "grass_1":{
-      "frame": {"x":64,"y":32,"w":32,"h":32}
-    },
-    "grass_2":{
-      "frame": {"x":32,"y":64,"w":32,"h":32}
-    },
-    "grass_3":{
-      "frame": {"x":64,"y":64,"w":32,"h":32}
-    },
-    "newgrass_0":{
       "frame": {"x":32,"y":128,"w":32,"h":32}
     },
-    "newgrass_1":{
+    "grass_1":{
       "frame": {"x":64,"y":128,"w":32,"h":32}
     },
-    "newgrass_2":{
+    "grass_2":{
       "frame": {"x":96,"y":128,"w":32,"h":32}
     },
-    "newgrass_3":{
+    "grass_3":{
       "frame": {"x":32,"y":160,"w":32,"h":32}
     },
-    "newgrass_4":{
+    "grass_4":{
       "frame": {"x":64,"y":160,"w":32,"h":32}
     },
-    "newgrass_5":{
+    "grass_5":{
       "frame": {"x":96,"y":160,"w":32,"h":32}
     },
-    "newgrass_6":{
+    "grass_6":{
       "frame": {"x":32,"y":192,"w":32,"h":32}
     },
-    "newgrass_7":{
+    "grass_7":{
       "frame": {"x":64,"y":192,"w":32,"h":32}
     },
-    "newgrass_8":{
+    "grass_8":{
       "frame": {"x":96,"y":192,"w":32,"h":32}
     },
     "water":{
-      "frame": {"x":192,"y":64,"w":32,"h":32}
-    },
-    "water_bottom":{
-      "frame": {"x":192,"y":96,"w":32,"h":32}
-    },
-    "water_top":{
-      "frame": {"x":192,"y":32,"w":32,"h":32},
-      "collides": true
-    },
-    "water_left":{
-      "frame": {"x":160,"y":64,"w":32,"h":32}
-    },
-    "water_right":{
-      "frame": {"x":224,"y":64,"w":32,"h":32}
-    },
-    "water_bend_tl":{
-      "frame": {"x":160,"y":32,"w":32,"h":32}
-    },
-    "water_bend_bl":{
-      "frame": {"x":160,"y":96,"w":32,"h":32}
-    },
-    "water_bend_tr":{
-      "frame": {"x":224,"y":32,"w":32,"h":32}
-    },
-    "water_bend_br":{
-      "frame": {"x":224,"y":96,"w":32,"h":32}
-    },
-    "water_corner_tl":{
-      "frame": {"x":288,"y":32,"w":32,"h":32},
-      "collides": true
-    },
-    "water_corner_bl":{
-      "frame": {"x":288,"y":64,"w":32,"h":32},
-      "collides": true
-    },
-    "water_corner_tr":{
-      "frame": {"x":320,"y":32,"w":32,"h":32},
-      "collides": true
-    },
-    "water_corner_br":{
-      "frame": {"x":320,"y":64,"w":32,"h":32},
-      "collides": true
-    },
-    "newwater":{
       "frame": {"x":192,"y":192,"w":32,"h":32},
       "collides": true
     },
-    "newwater_bottom":{
+    "water_bottom":{
       "frame": {"x":192,"y":224,"w":32,"h":32}
     },
-    "newwater_top":{
+    "water_top":{
       "frame": {"x":192,"y":160,"w":32,"h":32},
       "collides": true
     },
-    "newwater_left":{
+    "water_left":{
       "frame": {"x":160,"y":192,"w":32,"h":32}
     },
-    "newwater_right":{
+    "water_right":{
       "frame": {"x":224,"y":192,"w":32,"h":32}
     },
-    "newwater_bend_tl":{
+    "water_bend_tl":{
       "frame": {"x":160,"y":160,"w":32,"h":32}
     },
-    "newwater_bend_bl":{
+    "water_bend_bl":{
       "frame": {"x":160,"y":224,"w":32,"h":32}
     },
-    "newwater_bend_tr":{
+    "water_bend_tr":{
       "frame": {"x":224,"y":160,"w":32,"h":32}
     },
-    "newwater_bend_br":{
+    "water_bend_br":{
       "frame": {"x":224,"y":224,"w":32,"h":32}
     },
-    "newwater_corner_tl":{
+    "water_corner_tl":{
       "frame": {"x":288,"y":160,"w":32,"h":32},
       "collides": true
     },
-    "newwater_corner_bl":{
+    "water_corner_bl":{
       "frame": {"x":288,"y":192,"w":32,"h":32},
       "collides": true
     },
-    "newwater_corner_tr":{
+    "water_corner_tr":{
       "frame": {"x":320,"y":160,"w":32,"h":32},
       "collides": true
     },
-    "newwater_corner_br":{
+    "water_corner_br":{
       "frame": {"x":320,"y":192,"w":32,"h":32},
       "collides": true
     },
@@ -175,35 +119,130 @@
     },
     "bush_3":{
       "frame": {"x":392,"y":53,"w":37,"h":40},
-      "anchor": {"x":0,"y":0},
+      "offset": {"x":0.5,"y":0.5},
+      "anchor": {"x":0.5,"y":0.5},
       "collisions": [[0,0]]
     },
-    "bush_lit":{
-      "frame": {"x":433,"y":52,"w":37,"h":40},
-      "anchor": {"x":0,"y":0},
+    "bush_3_lit":{
+      "frame": {"x":433,"y":52,"w":37,"h":42},
+      "anchor": {"x":0.5,"y":0.5},
       "collisions": [[0,0]]
+    },
+    "bush_4":{
+      "frame": {"x":5,"y":68,"w":34,"h":37},
+      "offset": {"x":0.5,"y":0.5},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
+    "bush_5":{
+      "frame": {"x":10,"y":253,"w":32,"h":32},
+      "offset": {"x":0.5,"y":0.5},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
+    "bush_5_lit":{
+      "frame": {"x":50,"y":249,"w":32,"h":36},
+      "offset": {"x":0.5,"y":0.5},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
+    "leaves_1":{
+      "frame": {"x":0,"y":0,"w":32,"h":32},
+      "anchor": {"x":0,"y":0}
+    },
+    "leaves_2":{
+      "frame": {"x":32,"y":0,"w":32,"h":32},
+      "anchor": {"x":0,"y":0}
+    },
+    "leaves_3":{
+      "frame": {"x":64,"y":0,"w":32,"h":32},
+      "anchor": {"x":0,"y":0}
+    },
+    "rock_1":{
+      "frame": {"x":0,"y":32,"w":33,"h":33},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
+    "rock_1_lit":{
+      "frame": {"x":128,"y":1,"w":33,"h":33},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
+    "rock_2":{
+      "frame": {"x":32,"y":32,"w":33,"h":33},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
+    "rock_2_lit":{
+      "frame": {"x":162,"y":1,"w":33,"h":33},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
+    "rock_3":{
+      "frame": {"x":64,"y":32,"w":32,"h":32},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
+    "rock_3_lit":{
+      "frame": {"x":200,"y":0,"w":33,"h":33},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
+    "clovers":{
+      "frame": {"x":80,"y":70,"w":32,"h":29},
+      "offset": {"x":0.5,"y":0.5},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
+    "wood":{
+      "frame": {"x":397,"y":91,"w":32,"h":32},
+      "anchor": {"x":0,"y":0}
+    },
+    "wood_lit":{
+      "frame": {"x":441,"y":96,"w":32,"h":32},
+      "anchor": {"x":0,"y":0}
+    },
+    "ivy_1":{
+      "frame": {"x":140,"y":44,"w":47,"h":48},
+      "anchor": {"x":0.4,"y":-0.3}
+    },
+    "ivy_2":{
+      "frame": {"x":209,"y":45,"w":50,"h":43},
+      "anchor": {"x":0.4,"y":-0.3}
     }
   },
   "shorthands" : {
-    "w":"newwater",
-    "wt":"newwater_top",
-    "wb":"newwater_bottom",
-    "wl":"newwater_left",
-    "wr":"newwater_right",
-    "wbtl":"newwater_bend_tl",
-    "wctl":"newwater_corner_tl",
-    "wbtr":"newwater_bend_tr",
-    "wctr":"newwater_corner_tr",
-    "wbbr":"newwater_bend_br",
-    "wcbr":"newwater_corner_br",
-    "wbbl":"newwater_bend_bl",
-    "wcbl":"newwater_corner_bl",
+    "w":"water",
+    "wt":"water_top",
+    "wb":"water_bottom",
+    "wl":"water_left",
+    "wr":"water_right",
+    "wbtl":"water_bend_tl",
+    "wctl":"water_corner_tl",
+    "wbtr":"water_bend_tr",
+    "wctr":"water_corner_tr",
+    "wbbr":"water_bend_br",
+    "wcbr":"water_corner_br",
+    "wbbl":"water_bend_bl",
+    "wcbl":"water_corner_bl",
     "t1":"tree_1",
     "t2":"tree_2",
     "t3":"tree_3",
     "t4":"tree_4",
     "td":"tree_dead",
     "b1":"bush_1",
-    "b2":"bush_2"
+    "b2":"bush_2",
+    "b3":"bush_3",
+    "b4":"bush_4",
+    "l1":"leaves_1",
+    "l2":"leaves_2",
+    "l3":"leaves_3",
+    "r1":"rock_1",
+    "r2":"rock_2",
+    "r3":"rock_3",
+    "r4":"rock_4",
+    "cl":"clovers",
+    "i1":"ivy_1",
+    "i2":"ivy_2"
   }
 }

@@ -26,7 +26,7 @@ function SpawnZone(aois,animalsData,itemsData){
         },this);
     }
 
-    if(itemsData){
+    /*if(itemsData){
         itemsData.forEach(function(data){
             var itemID = data[0];
             var min = data[1];
@@ -37,7 +37,7 @@ function SpawnZone(aois,animalsData,itemsData){
                 min: min
             }
         },this);
-    }
+    }*/
 }
 
 SpawnZone.prototype.update = function(){
@@ -50,7 +50,7 @@ SpawnZone.prototype.update = function(){
     });
 
     this.computeDelta(this.animalsData,this.population,'animal',freeAOIs);
-    this.computeDelta(this.itemsData,this.items,'item',freeAOIs);
+    // this.computeDelta(this.itemsData,this.items,'item',freeAOIs);
 };
 
 SpawnZone.prototype.computeDelta = function(map,countMap,type,freeAOIs){
@@ -70,6 +70,10 @@ SpawnZone.prototype.spawn = function(AOIs,type,id,nb){
     //console.log('Spawning',nb,data.name);
 
     var AOI = Utils.randomElement(AOIs);
+    if(AOI === undefined){
+        console.warn('undefined AOI in SpawZone.spawn()');
+        return;
+    }
     var cx = Utils.randomInt(AOI.x,AOI.x+World.chunkWidth);
     var cy = Utils.randomInt(AOI.y,AOI.y+World.chunkHeight);
 

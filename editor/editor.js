@@ -61,6 +61,8 @@ Chunk.prototype.addCollision = function(cx,cy){
     }
 };
 
+Chunk.prototype.addResource = function(x,y){}
+
 var BLIT = false;
 var COLL = 'client';
 
@@ -215,6 +217,12 @@ function add(x,y,image){
     //x -= chunk.x;
     //y -= chunk.y;
     chunk.drawImage(x,y,image);
+}
+
+function snap (){
+    game.renderer.snapshot(function(img){
+        document.getElementById("render").src = img.src;
+    });
 }
 
 var VIEW_WIDTH = 30;

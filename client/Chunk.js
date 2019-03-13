@@ -7,14 +7,19 @@ function Chunk(data){
     this.decor = data.decor;
     this.ground = new SpaceMap();
     this.ground.fromList(this.layers[0],true); // true = compact list
+    this.wood = data.wood;
     this.tiles = [];
     this.tilesMap = new SpaceMap();
     this.images = [];
     this.displayed = false;
+    this.leavesPos = [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1],[2,-1]];
     this.draw();
 }
 
 Chunk.prototype.draw = function(){
+    this.wood.forEach(function(w){
+        this.addResource(this.x+w[0],this.y+w[1]);
+    },this);
     // Ground
     for(var x_ = 0; x_ < World.chunkWidth; x_++){
         for(var y_ = 0; y_ < World.chunkHeight; y_++) {
@@ -37,7 +42,7 @@ Chunk.prototype.draw = function(){
             var y = this.y + parseInt(data[1]);
             var name = tilesetData.shorthands[tile];
             if(!(tile in tilesetData.shorthands)) return;
-            if(name && name.indexOf('water') != -1) name = tilesetData.config.waterPrefix+name;
+            // if(name && name.indexOf('water') != -1) name = tilesetData.config.waterPrefix+name;
             this.drawTile(x, y, name);
         },this);
     },this);
@@ -47,7 +52,7 @@ Chunk.prototype.draw = function(){
     this.decor.forEach(function (data) {
         var x = this.x + parseInt(data[0]);
         var y = this.y + parseInt(data[1]);
-        this.drawImage(x, y, data[2]);
+        this.addImage(x, y, data[2]);
     }, this);
 
     this.displayed = true;
@@ -88,28 +93,73 @@ Chunk.prototype.getAtlasData = function(image,data,longname){
     }
 };
 
-Chunk.prototype.drawImage = function(x,y,image){
+Chunk.prototype.drawImage = function(x,y,image,depth,crop){
+    var offset = this.getAtlasData(image,'offset');
+    if(offset){
+        x += offset.x;
+        y += offset.y;
+    }
     var img = Engine.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',tilesetData.shorthands[image]);
-    var offset = this.getAtlasData(image,'depthOffset') || 0;
-    img.setDepth(y+offset);
-    //console.log(y,this.getAtlasData(image,'depthOffset'),img.depth);
+    if(crop) img.setCrop(crop);
+    var depthOffset = this.getAtlasData(image,'depthOffset') || 0;
+    depth = depth || y;
+    img.setDepth(depth+depthOffset);
     var anchor = this.getAtlasData(image,'anchor');
     img.setOrigin(anchor.x,anchor.y);
+    this.images.push(img);
+    this.postDrawImage(x,y,image,img);
+};
+
+Chunk.prototype.addImage = function(x,y,image){
+    var isTree = (image[0] == 't');
+    if(isTree){
+        var frame = this.getAtlasData(image,'frame');
+        var ycutoff = frame.h*0.5;
+        this.drawImage(x,y,image, y, new Phaser.Geom.Rectangle(0,0,frame.w,ycutoff));
+        this.drawImage(x,y,image, y+1, new Phaser.Geom.Rectangle(0,ycutoff,frame.w,frame.h-ycutoff));
+    }else{
+        this.drawImage(x,y,image);
+    }
+    // Manage collisions
     var collisions = this.getAtlasData(image,'collisions');
     if(collisions) {
         collisions.forEach(function(coll){
             this.addCollision(x+coll[0],y+coll[1]);
         },this);
     }
-    this.images.push(img);
-    this.postDrawImage(x,y,image,img);
+    // Draw dead leaves on the ground
+    if(isTree && Utils.randomInt(1,10) > 6){ // TODO: conf
+        var nbleaves = 5; //TODO: conf
+        Utils.shuffle(this.leavesPos);
+        for(var j = 0; j < nbleaves; j++) {
+            var c = this.leavesPos[j];
+            var type = Utils.randomInt(1,3);
+            var lx = x+c[0];
+            var ly = y+c[1];
+            this.drawImage(lx,ly,'l'+type);
+            // if(this.hasWater(lx,ly)) console.warn('on water');
+        }
+    }
+    // Add ivy
+    if(isTree && (image[1] == 1 || image[1] == 2) && Utils.randomInt(1,10) > 6){ // TODO: conf
+        this.drawImage(x+1,y-1,'i'+Utils.randomInt(1,2),y+1);
+    }
 };
 
 Chunk.prototype.addCollision = function(cx,cy){
     Engine.collisions.add(cx, cy, 1);
 };
 
+Chunk.prototype.addResource = function(x,y){
+    Engine.resources.add(x,y);
+};
+
 Chunk.prototype.erase = function(){
+    for(var x = this.x; x < this.x + World.chunkWidth; x++){
+        for(var y = this.y; y < this.y + World.chunkHeight; y++){
+            Engine.collisions.delete(x,y);
+        }
+    }
     this.tiles.forEach(function(tile){
         tile.destroy();
     });
@@ -119,4 +169,29 @@ Chunk.prototype.erase = function(){
 };
 
 Chunk.prototype.postDrawTile = function(){}; // Used in editor
-Chunk.prototype.postDrawImage = function(){};
+Chunk.prototype.postDrawImage = function(x,y,image,sprite){
+    var hover = this.getAtlasData(image,'hover');
+    if(!hover) return;
+    sprite.id = 0;
+    sprite.tx = Math.floor(x);
+    sprite.ty = Math.floor(y);
+    sprite.setInteractive();
+    sprite.on('pointerover',function(){
+        UI.hoverFlower++;
+        sprite.formerFrame = sprite.frame.name;
+        sprite.setFrame(hover);
+        Engine.hideMarker();
+        UI.setCursor('item'); // TODO: use UI.manageCursor() instead?
+    });
+    sprite.on('pointerout',function(){
+        UI.hoverFlower--;
+        sprite.setFrame(sprite.formerFrame);
+        if(UI.hoverFlower <= 0) {
+            Engine.showMarker();
+            UI.setCursor();
+        }
+    });
+    sprite.on('pointerdown',function(){
+        if(!BattleManager.inBattle) Engine.processItemClick(sprite,true);
+    });
+};

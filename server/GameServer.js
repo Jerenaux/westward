@@ -25,6 +25,7 @@ var GameServer = {
     socketMap: {}, // socket.id -> player.id
     vision: new Set(), // set of AOIs potentially seen by at least one player
     nbConnectedChanged: false,
+    buildingsChanged: false,
     initializationStep: 0,
     initialized: false
 };
@@ -48,7 +49,11 @@ var SpawnZone = require('./SpawnZone.js').SpawnZone;
 var Camp = require('./Camp.js').Camp;
 var Pathfinder =  require('../shared/Pathfinder.js').Pathfinder;
 var Prism = require('./Prism.js').Prism;
+var Schemas = require('./schemas.js');
 
+/**
+ * Progresses through the initialization sequence of the server, in a serial way (even for async steps).
+ */
 GameServer.updateStatus = function(){
     console.log('Successful initialization step:',GameServer.initializationSequence[GameServer.initializationStep++]);
     try {
@@ -58,6 +63,7 @@ GameServer.updateStatus = function(){
             GameServer.setUpdateLoops();
             GameServer.onInitialized();
             GameServer.startEconomy();
+            if(GameServer.testcb) GameServer.testcb.call();
         } else {
             var next = GameServer.initializationSequence[GameServer.initializationStep];
             console.log('Moving on to next step:', next);
@@ -68,57 +74,23 @@ GameServer.updateStatus = function(){
     }
 };
 
+/**
+ * Creates Mongoose models based on schemas
+ */
 GameServer.createModels = function(){
-    var settlementSchema = mongoose.Schema({
-        id: {type: Number, min: 0, required: true},
-        name: {type: String, required: true},
-        description: String,
-        population: {type: Number, min: 0, required: true},
-        level: {type: Number, min: 0, required: true},
-        x: {type: Number, min: 0, required: true},
-        y: {type: Number, min: 0, required: true}
-    });
-    var buildingSchema = mongoose.Schema({
-        id: {type: Number, min: 0, required: true},
-        x: {type: Number, min: 0, required: true},
-        y: {type: Number, min: 0, required: true},
-        type: {type: Number, min: 0, required: true},
-        //sid: {type: Number, min: 0, required: true},
-        owner: {type: Number, min: 0},
-        ownerName: {type: String},
-        inventory: {type: [[]], set:function(inventory){
-                return inventory.toList(true); // true: filter zeroes
-            }},
-        prices: mongoose.Schema.Types.Mixed,
-        gold: {type: Number, min: 0},
-        built: Boolean,
-        health: {type: Number, min: 0}
-    });
-    var playerSchema = mongoose.Schema({
-        id: {type: Number, min: 0, required: true},
-        name: {type: String, required: true},
-        x: {type: Number, min: 0, required: true},
-        y: {type: Number, min: 0, required: true},
-        gold: {type: Number, min: 0},
-        civiclvl: {type: Number, min: 0},
-        civicxp: {type: Number, min: 0},
-        classxp: mongoose.Schema.Types.Mixed,
-        classlvl: mongoose.Schema.Types.Mixed,
-        ap: mongoose.Schema.Types.Mixed,
-        equipment: mongoose.Schema.Types.Mixed,
-        commitSlots: mongoose.Schema.Types.Mixed,
-        sid: {type: Number, min: 0, required: true},
-        inventory: {type: [[]], set:function(inventory){
-                return inventory.toList(true); // true: filter zeroes
-            }}
-        // stats are NOT saved, as they only consist in base values + modifiers; modifiers are re-applied contextually, not saved
-    });
-    GameServer.SettlementModel = mongoose.model('Settlement', settlementSchema);
-    GameServer.BuildingModel = mongoose.model('Building', buildingSchema);
-    GameServer.PlayerModel = mongoose.model('Player', playerSchema);
+    GameServer.SettlementModel = mongoose.model('Settlement', Schemas.settlementSchema);
+    GameServer.BuildingModel = mongoose.model('Building', Schemas.buildingSchema);
+    GameServer.PlayerModel = mongoose.model('Player', Schemas.playerSchema);
 };
 
-GameServer.readMap = function(mapsPath,test){
+/**
+ * Reads all the map and world data in order to create and run the game world.
+ * Called by server.js once the connection to the database is made.
+ * @param {string} mapsPath - Path to the directory containing the chunk files and world-specific data (collisions, items locations...)
+ * @param {boolean} [test] - Whether to run the game in "test" mode or not (debug/test only)
+ * @param {function} [cb] - Callback to call when the initialization sequence is finished (only used for tests)
+ */
+GameServer.readMap = function(mapsPath,test,cb){
     if(test){
         GameServer.initializationMethods = {
             'static_data': null,
@@ -128,18 +100,19 @@ GameServer.readMap = function(mapsPath,test){
         GameServer.initializationMethods = {
             'static_data': null,
             'player_data': GameServer.readPlayersData,
-            'settlements': GameServer.loadSettlements,
+            'regions': GameServer.loadRegions,
             'buildings': GameServer.loadBuildings,
-            'settlementsSetup': GameServer.setUpSettlements,
+            'items': GameServer.loadItems,
             'spawn_zones': GameServer.setUpSpawnZones,
             'camps': GameServer.setUpCamps
         };
     }
+    GameServer.testcb = cb;
     GameServer.initializationSequence = Object.keys(GameServer.initializationMethods);
     //console.log(GameServer.initializationSequence);
 
     GameServer.createModels();
-    GameServer.mapsPath = mapsPath; // TODO remove, useless, debug
+    GameServer.mapsPath = mapsPath;
     console.log('Loading map data from '+mapsPath);
     var masterData = JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'master.json')).toString());
     World.readMasterData(masterData);
@@ -182,11 +155,19 @@ GameServer.readMap = function(mapsPath,test){
     GameServer.positions = new SpaceMapList(); // positions occupied by moving entities and buildings
     GameServer.itemPositions = new SpaceMapList();
 
+    GameServer.fogOfWar = new SpaceMap();
+
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
     Prism.logEvent(null,'server-start');
 };
 
+/**
+ * Creates an object containing the boot parameters to send to the client (fetched from configuration file).
+ * Called by an event sent by the client in boot.create()
+ * @param {Object} socket - Socket to which to send the parameters
+ * @param {Object} data - Data sent by the client when requesting boot params, e.g. the player ID to check if he exists in database or not
+ */
 GameServer.getBootParams = function(socket,data){
     var playerID = data.id;
     var pkg = clone(GameServer.clientParameters,false);
@@ -210,9 +191,16 @@ GameServer.getBootParams = function(socket,data){
     );
 };
 
+/**
+ * Figure out what is the highest in-use player ID, to use as a
+ * starting point to assign new player IDs.
+ * Called by the initialization sequence.
+ */
 GameServer.readPlayersData = function(){
+    console.log('Reading player data ...');
     GameServer.PlayerModel.find(function(err,players){
         if (err) return console.log(err);
+        console.log('Players data fetched');
         players.forEach(function(data){
             if(data.id > GameServer.lastPlayerID) GameServer.lastPlayerID = data.id;
         });
@@ -221,17 +209,21 @@ GameServer.readPlayersData = function(){
     });
 };
 
-GameServer.loadSettlements = function(){
-    GameServer.SettlementModel.find(function (err, settlements) {
-        if (err) return console.log(err);
-        settlements.forEach(function(data){
-            var settlement = new Settlement(data);
-            settlement.setModel(data);
-        });
-        GameServer.updateStatus();
-    });
+/**
+ * Load regions data.
+ * Called by the initialization sequence.
+ */
+GameServer.loadRegions = function(){
+    GameServer.regions = JSON.parse(fs.readFileSync(pathmodule.join('assets','data','regions.json')).toString());
+    GameServer.updateStatus();
 };
 
+/**
+ * Add a building to the game world.
+ * Mainly called by GameServer.loadBuildings().
+ * @param {Object} data - All the parameters of the building.
+ * @returns {Object} The created Building object
+ */
 GameServer.addBuilding = function(data){
     var building = new Building(data);
     building.setModel(data);
@@ -240,6 +232,10 @@ GameServer.addBuilding = function(data){
     return building;
 };
 
+/**
+ * Fetch the buildings from the database.
+ * Called during the initialization sequence.
+ */
 GameServer.loadBuildings = function(){
     if(config.get('buildings.nobuildings')){
         GameServer.updateStatus();
@@ -252,9 +248,34 @@ GameServer.loadBuildings = function(){
     });
 };
 
+/**
+ * Read the item spawn locations from data file items.json.
+ * Called during the initialization sequence.
+ */
+GameServer.loadItems = function(){
+    var path = pathmodule.join(GameServer.mapsPath,'items.json');
+    /*TODO eventually:
+    * - On server start, check if items.json exist. If yes, read it, create items from it and store in db, then delete file.
+    * - If not, fetch items data from db.
+    * - For now, server restars daily, it will re-read items.json and recreate items, thus
+    * acting as a simili "respawn" mechanism, good enough for now
+    * */
+    //if(!fs.existsSync(path)) return;
+    var items = JSON.parse(fs.readFileSync(path).toString());
+    items.forEach(function(item){
+        GameServer.addItem(item[0], item[1], item[2]);
+    },this);
+    path = pathmodule.join(GameServer.mapsPath,'resourceMarkers.json');
+    GameServer.resourceMarkers = JSON.parse(fs.readFileSync(path).toString());
+    GameServer.updateStatus();
+};
 
+/**
+ * Create Spawn Zones based on the spawnzones.json data file.
+ * Called during the initialization sequence.
+ */
 GameServer.setUpSpawnZones = function(){
-    GameServer.spawnZonesData = JSON.parse(fs.readFileSync('./assets/data/spawnzones.json').toString());
+    GameServer.spawnZonesData = JSON.parse(fs.readFileSync(pathmodule.join('assets','data','spawnzones.json')).toString());
     GameServer.spawnZones = [];
 
     if(!config.get('wildlife.nolife')) {
@@ -268,6 +289,10 @@ GameServer.setUpSpawnZones = function(){
     GameServer.updateStatus();
 };
 
+/**
+ * Create Civ camps based on the camps.json data file.
+ * Called during the initialization sequence.
+ */
 GameServer.setUpCamps = function(){
     GameServer.campsData = JSON.parse(fs.readFileSync('./assets/data/camps.json').toString());
     GameServer.camps = [];
@@ -280,6 +305,13 @@ GameServer.setUpCamps = function(){
     GameServer.updateStatus();
 };
 
+/**
+ * Add a Civ to the game world.
+ * Called by Camp.update().
+ * @param {number} x - x tile coordinate of the civ.
+ * @param {number} y - y tile coordinate of the civ.
+ * @returns {Object} The created Civ object.
+ */
 GameServer.addCiv = function(x,y){
     console.log('Spawning civ at',x,y);
     var npc = new Civ(x,y,0);
@@ -287,23 +319,46 @@ GameServer.addCiv = function(x,y){
     return npc;
 };
 
+/**
+ * Add an Animal to the game world.
+ * Called by SpawnZone.spawn().
+ * @param {number} x - x tile coordinate of the animal.
+ * @param {number} y - y tile coordinate of the animal.
+ * @param {number} type - The type of animal (foreign key with a match in GameServer.animalsData)
+ * @returns {Object} The created Animal object.
+ */
 GameServer.addAnimal = function(x,y,type){
     var animal = new Animal(x,y,type);
     GameServer.animals[animal.id] = animal;
     return animal;
 };
 
+/**
+ * Add an Item to the game world.
+ * Called by GameServer.loadItems().
+ * @param {number} x - x tile coordinate of the item.
+ * @param {number} y - y tile coordinate of the item.
+ * @param {number} type - The type of item (foreign key with a match in GameServer.itemsData)
+ * @returns {Object} The created Item object.
+ */
 GameServer.addItem = function(x,y,type){
     var item = new Item(x,y,type);
     GameServer.items[item.id] = item;
     return item;
 };
 
+/**
+ * Perform tasks once the initialization sequence is over. Mostly used for testing.
+ */
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
 };
 
+/**
+ * Start several loops needed for game logic.
+ * Called one the initialization sequence is over.
+ */
 GameServer.setUpdateLoops = function(){
     console.log('Setting up loops...');
 
@@ -323,6 +378,10 @@ GameServer.setUpdateLoops = function(){
     console.log('Loops set');
 };
 
+/**
+ * Start the main economic loop that counts the economic turns.
+ * Called one the initialization sequence is over.
+ */
 GameServer.startEconomy = function(){
     GameServer.economyTurns = config.get('economyCycles.turns');
     GameServer.elapsedTurns = 0;
@@ -339,6 +398,10 @@ GameServer.startEconomy = function(){
     setInterval(GameServer.economyTurn,GameServer.turnDuration*1000);
 };
 
+/**
+ * Trigger all the updates that must take place at each economic turn.
+ * Recurring call started in `GameServer.startEconomy()`
+ */
 GameServer.economyTurn = function(){
     GameServer.elapsedTurns++;
     console.log('Turn',GameServer.elapsedTurns);
@@ -358,10 +421,14 @@ GameServer.economyTurn = function(){
         GameServer.settlements[sid].refreshListing();
     }
 
-    GameServer.updateEconomicEntities(GameServer.players); // commit
+    //GameServer.updateEconomicEntities(GameServer.players); // commit
     if(GameServer.elapsedTurns == GameServer.maxTurns) GameServer.elapsedTurns = 0;
 };
 
+/**
+ * Generic method that calls `update()` on all objects of the provided array.
+ * @param {array} entities - Array of game entities to update.
+ */
 GameServer.updateEconomicEntities = function(entities){
     for(var key in entities){
         entities[key].update();
@@ -422,13 +489,13 @@ GameServer.addNewPlayer = function(socket,data){
 
     if(!data.characterName){
         GameServer.server.sendError(socket); // TODO: make a dict of errors somewhere
-        return;
+        return null;
     }
     var region = data.selectedSettlement || 0;
     //console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
     player.setStartingInventory();
-    player.setSettlement(region);
+    player.setRegion(region);
     player.setName(data.characterName);
     player.id = ++GameServer.lastPlayerID;
     //player.classLvlUp(data.selectedClass,false);
@@ -436,7 +503,11 @@ GameServer.addNewPlayer = function(socket,data){
 
     var document = new GameServer.PlayerModel(player);
     player.setModel(document);
+    GameServer.saveNewPlayerToDb(socket,player,document);
+    return player;
+};
 
+GameServer.saveNewPlayerToDb = function(socket,player,document){
     document.save(function (err,doc) {
         if (err) return console.error(err);
         console.log('New player created');
@@ -445,7 +516,6 @@ GameServer.addNewPlayer = function(socket,data){
         GameServer.finalizePlayer(socket,player);
         GameServer.server.sendID(socket,mongoID);
     });
-    return player;
 };
 
 GameServer.loadPlayer = function(socket,id){
@@ -456,7 +526,7 @@ GameServer.loadPlayer = function(socket,id){
             if (err) return console.warn(err);
             if(!doc) {
                 console.log('ERROR : no matching document');
-                GameServer.addNewPlayer(socket, {});
+                //GameServer.addNewPlayer(socket, {});
                 return;
             }
             var player = new Player();
@@ -530,7 +600,8 @@ GameServer.removeFromLocation = function(entity){
 
 GameServer.handleChat = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
-    player.setChat(data);
+    player.setChat(data); // in MovingEntity
+    Prism.logEvent(player,'chat',{txt:data});
 };
 
 GameServer.checkCollision = function(x,y){ // true = collision
@@ -587,9 +658,9 @@ GameServer.lootNPC = function(player,type,ID){
     for(var item in NPC.loot.items){
         // TODO: take harvesting ability into consideration
         player.giveItem(item,NPC.loot.items[item],true);
-        // player.addNotif('+'+NPC.loot.items[item]+' '+GameServer.itemsData[item].name);
     }
     GameServer.removeEntity(NPC); // TODO: handle differently, leave carcasses
+    Prism.logEvent(player,'loot',{name:NPC.name});
 };
 
 GameServer.pickUpItem = function(player,itemID){
@@ -598,7 +669,9 @@ GameServer.pickUpItem = function(player,itemID){
     // TODO: check for proximity
     var nb = 1;
     player.giveItem(item.type,nb,true);
+    if(GameServer.itemsData[item.type].collides) GameServer.collisions.delete(item.x,item.y);
     GameServer.removeEntity(item);
+    Prism.logEvent(player,'pickup',{item:item.type});
 };
 
 // Called by player clicks or by NPC.checkForAggro()
@@ -611,7 +684,7 @@ GameServer.handleBattle = function(attacker,attacked){
     // TODO: check for proximity
     var area = GameServer.computeBattleArea(attacker,attacked);
     if(!area){
-        if(attacker.isPlayer) player.addMsg('There is an obstacle in the way!');
+        if(attacker.isPlayer) attacker.addMsg('There is an obstacle in the way!');
         return false;
     }
     var battle = GameServer.checkBattleOverlap(area);
@@ -805,7 +878,6 @@ GameServer.build = function(player,bid,tile){
         ownerName: player.name,
         built: false
     };
-    console.warn(data);
     var building = new Building(data);
     var document = new GameServer.BuildingModel(building);
     building.setModel(document); // ref to model is needed at least to get _id
@@ -814,14 +886,29 @@ GameServer.build = function(player,bid,tile){
         if (err) return console.error(err);
         console.log('Build successfull');
         building.embed();
-        player.listBuildings();
+        GameServer.buildingsChanged = true;
+        player.listBuildings(); // update list of buildable buildings by player
     });
+};
+
+GameServer.listBuildingMarkers = function(){
+    var list = [];
+    for(var bid in GameServer.buildings){
+        list.push(GameServer.buildings[bid].mapTrim());
+    }
+    return list;
 };
 
 GameServer.handleRespawn = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     if(!player.dead) return;
     player.respawn();
+    Prism.logEvent(player,'respawn');
+};
+
+GameServer.logMenu = function(menu,socketID){
+    var player = GameServer.getPlayer(socketID);
+    Prism.logEvent(player,'menu',{menu:menu});
 };
 
 GameServer.handleCommit = function(data,socketID){ // keep data argument
@@ -858,6 +945,7 @@ GameServer.handleCraft = function(data,socketID){
     if(!GameServer.allIngredientsOwned(recipient,recipe,nb)) return;
     GameServer.operateCraft(recipient, recipe, targetItem, nb);
     player.gainClassXP(GameServer.classes.craftsman,5*nb,true); // TODO: vary based on multiple factors
+    Prism.logEvent(player,'craft',{item:targetItem,nb:nb});
 };
 
 GameServer.allIngredientsOwned = function(entity,recipe,nb){
@@ -918,6 +1006,10 @@ GameServer.handleExit = function(data,socketID){
     player.exitBuilding();
 };
 
+GameServer.handleTutorialStart = function(){
+    Prism.logEvent(null,'tutorial-start');
+};
+
 GameServer.handleAOItransition = function(entity,previous){
     // When something moves from one AOI to another (or appears inside an AOI), identify which AOIs should be notified and update them
     // Model: update many, fetch one
@@ -935,10 +1027,7 @@ GameServer.handleAOItransition = function(entity,previous){
     }
 
     if(entity.setFieldOfVision) entity.setFieldOfVision(AOIs);
-    if(entity.isPlayer) {
-        console.log('Vision AOIs:',AOIs,entity.fieldOfVision);
-        GameServer.updateVision();
-    }
+    if(entity.isPlayer) GameServer.updateVision();
     newAOIs.forEach(function(aoi){
         if(entity.isPlayer) entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
         GameServer.addObjectToAOI(aoi,entity);
@@ -959,7 +1048,18 @@ GameServer.updateVision = function(){
            GameServer.vision.add(aoi);
         });
     }
-    //console.log('VISION:',GameServer.vision);
+    for(var bid in GameServer.buildings){
+        var building = GameServer.buildings[bid];
+        Utils.listAdjacentAOIs(building.aoi).forEach(function(aoi){
+            GameServer.vision.add(aoi);
+        });
+    }
+    GameServer.visionChanged = true;
+    console.log('VISION:',GameServer.vision);
+};
+
+GameServer.getVision = function(){
+    return Array.from(GameServer.vision);
 };
 
 GameServer.updateClients = function(){ //Function responsible for setting up and sending update packets to clients
@@ -973,11 +1073,18 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
             individualGlobalPkg.synchronize(GameServer.AOIs[aoi]); // fetch entities from the new AOIs
         });
         player.oldAOIs.forEach(function(aoi){
-            individualGlobalPkg.desync(GameServer.AOIs[aoi]); // fortget entities from old AOIs
+            individualGlobalPkg.desync(GameServer.AOIs[aoi]); // forget entities from old AOIs
         });
         individualGlobalPkg.removeEcho(player.id); // remove redundant information from multiple update sources
         if(individualGlobalPkg.isEmpty()) individualGlobalPkg = null;
-        if(individualGlobalPkg === null && localPkg === null && !GameServer.nbConnectedChanged) return;
+
+        if(individualGlobalPkg === null
+            && localPkg === null
+            && !GameServer.nbConnectedChanged
+            && !GameServer.visionChanged){
+                return;
+            }
+
         var finalPackage = {};
         if(individualGlobalPkg) finalPackage.global = individualGlobalPkg.clean();
         if(localPkg) finalPackage.local = localPkg.clean();
@@ -986,8 +1093,11 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         GameServer.server.sendUpdate(player.socketID,finalPackage);
         player.newAOIs = [];
         player.oldAOIs = [];
+        // console.log(finalPackage.local);
     });
     GameServer.nbConnectedChanged = false;
+    GameServer.visionChanged = false;
+    GameServer.buildingsChanged  = false;
     GameServer.clearAOIs(); // erase the update content of all AOIs that had any
 };
 
@@ -1062,13 +1172,6 @@ GameServer.updateNPC = function(){
     });
 };
 
-GameServer.setUpSettlements = function(){
-    Object.keys(GameServer.settlements).forEach(function(key){
-        GameServer.settlements[key].computeFoodSurplus();
-    });
-    GameServer.updateStatus();
-};
-
 // #############################
 
 GameServer.handleScreenshot = function(data,socketID){
@@ -1082,14 +1185,6 @@ GameServer.handleScreenshot = function(data,socketID){
     player.addMsg('Bug reported! Thanks!');
 };
 
-GameServer.getBuildings = function(){
-    var list = [];
-    for(var id in GameServer.buildings){
-        list.push(GameServer.buildings[id].trim());
-    }
-    return list;
-};
-
 GameServer.listCamps = function(){
     return GameServer.camps.map(function(c){
         return {
@@ -1101,19 +1196,15 @@ GameServer.listCamps = function(){
     //trimmed.y = (this.fort.y-10)/World.worldHeight;
 };
 
-// List settlements for selection screen
-GameServer.listSettlements = function(trimCallback){
-    trimCallback = trimCallback || 'trim';
-    var settlements = [];
-    for(var id in GameServer.settlements){
-        settlements.push(GameServer.settlements[id][trimCallback]());
-    }
-    return settlements;
-};
-
-// TODO: remove
-GameServer.getSettlements = function(){
-    return GameServer.listSettlements();
+// List settlements for selection screen + to get list of toponyms
+GameServer.listRegions = function(){
+    return {
+        regions: GameServer.regions,
+        world: {
+            width: World.worldWidth,
+            height: World.worldHeight
+        }
+    };
 };
 
 GameServer.insertNewBuilding = function(data){
@@ -1174,6 +1265,43 @@ GameServer.toggleBuild = function(data){
     return true;
 };
 
+GameServer.countItems = function(cb){
+    var items = {}
+    for(var id in GameServer.buildings){
+        var bld = GameServer.buildings[id];
+        var inv = bld.listItems();
+        for(var itemID in inv){
+            if(!items.hasOwnProperty(itemID)) items[itemID] = 0;
+            items[itemID] += inv[itemID];
+        }
+    }
+    GameServer.PlayerModel.find(function(err,players){
+        if (err) return console.log(err);
+        players.forEach(function(data){
+            data.inventory.forEach(function(itm){
+                if(!items.hasOwnProperty(itm[0])) items[itm[0]] = 0;
+                items[itm[0]] += itm[1];
+            });
+        });
+        cb(items);
+    });
+};
+
+GameServer.getBuildings = function(cb){
+    var list = [];
+    for(var id in GameServer.buildings){
+        list.push(GameServer.buildings[id].trim());
+    }
+    cb(list);
+};
+
+GameServer.getEvents = function(cb){
+    GameServer.server.db.collection('events').find({}).toArray(function(err,docs){
+        if(err) throw err;
+        cb(docs);
+    });
+};
+
 GameServer.getScreenshots = function(cb){
     GameServer.server.db.collection('screenshots').find({}).toArray(function(err,docs){
         if(err) throw err;
@@ -1181,10 +1309,10 @@ GameServer.getScreenshots = function(cb){
     });
 };
 
-GameServer.getEvents = function(cb){
-    GameServer.server.db.collection('events').find({}).toArray(function(err,docs){
-        if(err) throw err;
-        cb(docs);
+GameServer.getPlayers = function(cb){
+    GameServer.PlayerModel.find(function(err,players){
+        if (err) return console.log(err);
+        cb(players);
     });
 };
 

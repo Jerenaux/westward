@@ -1,15 +1,17 @@
 On deploy:
+- Test new player
 - Test a fight
 - Test picking up objects
 - Test selling and buying in a store
 - Test equiping object
 => Automate these eventually
+=> After bug, systematically create test!
 
 
 Admin
 Analytics
 Cleaning
-Packaging
+Commenting
 Deployment
 Design document
 Testing
@@ -25,20 +27,22 @@ Misc:
 - Feather tufts
 - Introduce new wood ingredient obtained from timber, crafting wood, made in bulk (but then tune down timber prod)
 -> For shield, guns...?
-- Clicks close to minimap fail
-- Display/hide/display map leads to warnings overflow
-- Still slow (make bick grass background on a blitter?)
-- Items spawn on top of each other
-- Slow Fort? Make rendertextures out of longslots?
 - Spawning in battle area, moving: doesn't stop movement
 - Stop walk when opening menu
 - Camera bounds (test with northernmost camp)
-- Minimap cross stop moving below a certain y?
-- Northernmost camp not really visible on map
 - Poll at regular interval the sprite below mouse
--> Need to display hunger and fatigue
--> Keep class quests (+ "smart quests" based on settlement situation?)
--> Menu to list buildings (but on-site management)
+- Better notifs cascading
+- New test: GameServer.lootNPC
+- New test: GameServer.handleBattle (when and area can and cannot be computed)
+- Positions not saved often enough?
+- Don't disable walk with build panel
+- Multiple clicks on "give" repeat the action
+Shop & workshop interfaces
+New movement system
+Add a zoom level to map
+Check building limits are enforced
+
+
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
 
@@ -63,15 +67,9 @@ World building: move away from tiles:
 [x] Collisions fetched from tileset for client, no digest 
 [ ] Built-in exploration, to test collisions and depths
 [ ] Re-enable blitters, at least for ground and water?
-[ ] Remove legacy tiles after a while (from png and json) + old tileset files
+[x] Remove legacy tiles after a while (from png and json) + old tileset files
 
-
-Crafting:
-Requirements:
-- Display recipes + ingredients (after selection?)
-- Display self inventory?
-- Display bld inventory
-
+ 
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.
@@ -156,25 +154,25 @@ V1 level:
 
 Admin
 -----
-List buildings, players
+Improve admin tables
+Flush screenshots
 Make cmd line system
 Edit buildings stock
 Push desktop notifications for player connects
-Import db
--> Iterate over import object, if matching id in db, update fields, if not, insert new entry 
 Set coordinates
 Maintenance mode
 Secure
 
 Analytics:
 ---------
-- Log: menu opens?, fights (+ print types), kills
-- Session duration stats
-- Bundle events from one player into sessions
-- Log session-wide stats: how many players visit a building during session, do this, do that...
+- Log: tutorial begins, progress (each step) and ends, kills
 - Button to flush events
+- Bundle events from one player into sessions
+- Log session-wide stats: duration, how many players visit a building during session, do this, do that...
 - Push desktop notifications for player connects
-- Look for nice statistical library
+- Look for nice statistical library (https://dzone.com/articles/4-useful-javascript-libraries-for-data-analysis-an)
+-> Or export as CSV and explore in SPSS?
+- Compute "concentration" stat of items
 - Log drains and faucets
 - Log where items are bought/sold
 - Log pathfinding destinations, consider making heatmap in the long term
@@ -196,7 +194,6 @@ Performance:
 - Make audio sprite
 - Remove unnecessary files
 - Use pool for notifications
-- Avoid duplicate pins in maps, danger pins etc.
 - Fix "already existing/non-existing" bugs
 - Pathmaking instead of pahfinding?
 - Dont send full building inventories when buying/selling (send arrays of deltas)
@@ -213,7 +210,6 @@ Order:
 --> Send only useful fields
 --> Move to JSON5 
 - Look up and put as many parameters as possible in conf
-- Integrate battle.processAttack & battle.processAoE?
 - Proper initial cursor (using continuous polling or sth?)
 - Central shared list of entities
 - Remove global engine hover/out events, use local ones in animals, buildings...
@@ -221,17 +217,12 @@ Order:
 - Deal differently with net updates when visibility lost (https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
 - Use containers
 - Clean schemas
-- Use data registry for data exchange between scenes (see Phaser World 119)
-- Client-side, GameObject use tx and ty while Moving use tileX and tileY (and they both have a setPosition method)
-=> fix in processItemClick, etc, test a lot
 - Move UI stuff from Engine to UI
 - Rework longslot system
 - Setters/getters everywhere
 - Centralize all texts (incl. stats, equip, and even item descriptions)
 - Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
 - Remove "longslot" stuff intended for stretching longslots vertically?
-- Find out how to generate graphics objects (grid tiles, gradients...) programmatically for various uses
-- Give toString method to custom objects to replace [this.constructor.name this.id] ...
 
 Content:
 -------
@@ -482,7 +473,7 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-- Tool to automate db interactions when deploying (SYNC, flushing sth, ...)
+- Tool to sync client buildings with server buildings
 - Tool to gather, uglify and compress all relevant source files 
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?
@@ -491,11 +482,8 @@ Deployment:
 
 Design document:
 ---------------
-- Use stumps for depleting forests
-- Re-read every month (last: ?, read up to "commitment")
-- Decide list of buildings, items, ...
-- Make Excel tables (crafting, inventory, bestiary, ...)
-- Make powerpoint
+- Re-read regularly (last: busy with "abilities")
+- Make Excel tables (crafting, inventory, bestiary, abilities ...)
 - Make feature matrix
 - Consequence graphs
 - Tidy up (charts, tables, Latex formulas...)

@@ -67,13 +67,16 @@
     "atlas": "items",
     "frame":"wood",
     "name": "Wood",
+    "envFrames": ["wood"],
     "desc": "Crafting material used to make wooden weapons or to make charcoal.",
-    "sound": "woodsmall"
+    "sound": "woodsmall",
+    "isMaterial": true
   },
   "8":{
     "atlas": "items2",
     "frame":"thickgrass",
     "name": "Thick Grass",
+    "envFrames": ["bush_5"],
     "desc": "Crafting material used to make string.",
     "sound": "soft"
   },
@@ -131,6 +134,7 @@
   "14":{
     "atlas": "items2",
     "frame":"sunflower",
+    "envFrames": ["bush_3"],
     "name": "Butterflower",
     "desc": "Flower with regenerative properties used to brew potions.",
     "isMaterial": true,
@@ -168,6 +172,7 @@
     "atlas": "items2",
     "frame":"clover",
     "name": "Clover",
+    "envFrames": ["clovers"],
     "desc": "Plant used as alchemical ingredient for brewing health potions.",
     "isMaterial": true,
     "sound": "soft"
@@ -242,6 +247,8 @@
     "atlas": "items2",
     "frame":"stone",
     "name": "Stone",
+    "envFrames": ["rock_1","rock_2","rock_3"],
+    "collides": true,
     "desc": "Crafting material used to make primitive weapons.",
     "sound": "equip"
   },

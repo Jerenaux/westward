@@ -23,7 +23,6 @@ function Player(){
     this.schemaModel = GameServer.PlayerModel;
     this.battlePriority = 1;
 
-
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.oldAOIs = [];
     this.action = null;
@@ -32,7 +31,6 @@ function Player(){
     this.settlement = null;
     this.gold = 0;
     this.inBuilding = -1;
-    this.commitSlots = this.getCommitSlotsShell();
     this.civiclvl = 0;
     this.civicxp = 0;
     this.classxp = {
@@ -69,13 +67,6 @@ function Player(){
 
 Player.prototype = Object.create(MovingEntity.prototype);
 Player.prototype.constructor = Player;
-
-Player.prototype.getCommitSlotsShell = function(){
-    return {
-        slots: [],
-        max: GameServer.characterParameters.variables.commitSlots
-    }
-};
 
 Player.prototype.setIDs = function(dbID,socketID){
     //this.id = GameServer.lastPlayerID++;
@@ -133,9 +124,13 @@ Player.prototype.setName = function(name){
     this.name = name;
 };
 
-Player.prototype.setSettlement = function(sid){
+Player.prototype.setRegion = function(sid){
     this.sid = sid;
-    this.settlement = GameServer.settlements[this.sid];
+    this.region = GameServer.regions[this.sid];
+    this.respawnLocation = {
+        x: this.region.x,
+        y: this.region.y
+    }
 };
 
 Player.prototype.setStartingInventory = function(){
@@ -189,9 +184,8 @@ Player.prototype.die = function(){
 };
 
 Player.prototype.spawn = function(x,y){ // todo: remove args
-    var respawnLocation = this.settlement.respawnLocation;
-    x = x || respawnLocation.x;
-    y = y || respawnLocation.y;
+    x = x || this.respawnLocation.x;
+    y = y || this.respawnLocation.y;
     this.setProperty('x', x);
     this.setProperty('y', y);
     this.updatePacket.x = x;
@@ -224,63 +218,6 @@ Player.prototype.applyFoodModifier = function(foodSurplus){ // %
     },this);
     this.foodModifier = foodModifier;
     this.updatePacket.foodSurplus = foodSurplus;
-};
-
-Player.prototype.hasFreeCommitSlot = function(){
-    return this.getSlots().length < this.commitSlots.max;
-};
-
-Player.prototype.takeCommitmentSlot = function(buildingID,notify){
-    this.addToSlots({
-        id: buildingID,
-        type: GameServer.buildings[buildingID].type,
-        stamp: 1
-    });
-    this.syncCommitSlots();
-    if(notify) this.addNotif('Committed to '+GameServer.buildings[buildingID].name);
-};
-
-Player.prototype.updateCommitment = function(){
-    if(!GameServer.isTimeToUpdate('commitment')) return false;
-
-    var slots = this.getSlots();
-    if(slots.length = 0) return;
-    slots.forEach(function(slot){ // Assumes a duration of 1 turn for now
-        this.addNotif('Commitment to '+GameServer.buildings[slot.building].name+' ended');
-    },this);
-
-    this.commitSlots.slots = [];
-    this.syncCommitSlots();
-};
-
-Player.prototype.trimCommitSlots = function(){
-    var slots = [];
-    this.getSlots().forEach(function(slot){
-        //slots.push(GameServer.buildings[slot.building].type);
-        slots.push({
-            type: slot.type,
-            id: slot.id
-        });
-    });
-    var trimmed = this.getCommitSlotsShell();
-    trimmed.slots = slots;
-    return trimmed;
-};
-
-Player.prototype.syncCommitSlots = function(){
-    this.updatePacket.commitSlots = this.trimCommitSlots();
-};
-
-Player.prototype.addToSlots = function(data){
-    this.commitSlots.slots.push(data);
-};
-
-Player.prototype.removeSlot = function(){
-    return this.commitSlots.slots.shift();
-};
-
-Player.prototype.getSlots = function(){
-    return this.commitSlots.slots;
 };
 
 Player.prototype.gainCivicXP = function(inc,notify){
@@ -573,17 +510,9 @@ Player.prototype.initTrim = function(){
     trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    //trimmed.commitSlots = this.trimCommitSlots();
-    trimmed.settlements = GameServer.listSettlements('mapTrim'); // to have data to display toponyms on map
-
-    var markers = [];
-    Object.keys(GameServer.settlements).forEach(function(key){
-       markers = markers.concat(GameServer.settlements[key].getBuildingMarkers());
-    });
-    Object.keys(GameServer.camps).forEach(function(key){
-        markers = markers.concat(GameServer.camps[key].getBuildingMarkers());
-    });
-    trimmed.markers = markers;
+    trimmed.buildingMarkers = GameServer.listBuildingMarkers();
+    trimmed.resourceMarkers = GameServer.resourceMarkers;
+    trimmed.vision = GameServer.getVision();
     return trimmed;
 };
 
@@ -607,8 +536,8 @@ Player.prototype.getDataFromDb = function(data){
     // eg. inBuilding (how to retrieve proper building if server went down since), commitment...
     this.id = data.id;
     this.name = data.name;
-    this.x = data.x;
-    this.y = data.y;
+    this.x = Utils.clamp(data.x,0,World.worldWidth-1);
+    this.y = Utils.clamp(data.y,0,World.worldHeight-1);
     this.civiclvl = data.civiclvl;
     this.civicxp = data.civicxp;
     this.classxp = data.classxp;
@@ -635,8 +564,7 @@ Player.prototype.getDataFromDb = function(data){
     data.inventory.forEach(function(i){
          this.giveItem(i[0],i[1]);
     },this);
-    this.setSettlement(data.sid);
-    //this.commitSlots = data.commitSlots;
+    this.setRegion(data.sid);
     this.giveGold(data.gold);
 };
 
@@ -664,7 +592,6 @@ Player.prototype.onAOItransition = function(newAOI,previousAOI){
 };
 
 Player.prototype.onEndOfPath = function(){
-    //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
     MovingEntity.prototype.onEndOfPath.call(this);
     if(this.inFight) return;
     if(!this.action) return;
@@ -718,20 +645,20 @@ Player.prototype.addNotif = function(msg){
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){
-    if(this.updatePacket.isEmpty()) return null;
+    // console.log(this.updatePacket,this.updatePacket.isEmpty());
     var pkg = this.updatePacket;
+    if(GameServer.buildingsChanged) pkg.buildingMarkers = GameServer.listBuildingMarkers();
+    if(GameServer.visionChanged) pkg.vision = GameServer.getVision();
+    if(pkg.isEmpty()) return null;
     this.updatePacket = new PersonalUpdatePacket();
     return pkg;
 };
 
-Player.prototype.update = function() {
-    this.updateCommitment();
-};
+Player.prototype.update = function() {};
 
 Player.prototype.remove = function(){
     console.log('removing player');
     if(this.battle) this.battle.removeFighter(this);
-    this.settlement.removePlayer(this);
     this.onRemoveAtLocation();
     delete GameServer.players[this.id];
     GameServer.updateVision();

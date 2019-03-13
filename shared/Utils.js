@@ -42,6 +42,7 @@ Utils.AOItoTile = function(aoi){
 };
 
 Utils.getAOIcorners = function(aoi){
+    // Returns in order: tl, tr, br, bl
     var l = [];
     var o = Utils.AOItoTile(aoi);
     l.push(o);
@@ -83,14 +84,12 @@ Utils.pctToTile = function(x,y){
 };
 
 Utils.screenToMap = function(x,y,map){
-    var tlx = map.x - map.originX*map.width;
-    var tly = map.y - map.originY*map.height;
-    var pctx = (x-tlx)/map.width;
-    var pcty = (y-tly)/map.height;
-    var tile = Utils.pctToTile(pctx,pcty);
+    var tlx = map.x - map.displayOriginX; // top left of map
+    var tly = map.y - map.displayOriginY;
+    console.log(x,y,tlx,tly);
     return {
-        x: Math.ceil(tile.x),
-        y: Math.ceil(tile.y)
+        x: x - tlx,
+        y: y - tly
     }
 };
 
@@ -184,6 +183,24 @@ Utils.listAdjacentAOIs = function(current){
     if(!isAtBottom && !isAtRight) AOIs.push(current+1+World.nbChunksHorizontal);
     return AOIs;
 };
+
+Utils.listNeighborsInGrid = function(current,width,height,offset){
+    offset = (offset || 1);
+    var nbh = [current];
+    var isAtTop = (current < width);
+    var isAtBottom = (current > ((width*height)-1) - width);
+    var isAtLeft = (current%width == 0);
+    var isAtRight = (current%width == width-1);
+    if(!isAtTop) nbh.push(current - width);
+    if(!isAtBottom) nbh.push(current + width);
+    if(!isAtLeft) nbh.push(current-(1*offset));
+    if(!isAtRight) nbh.push(current+(1*offset));
+    if(!isAtTop && !isAtLeft) nbh.push(current-(1*offset)-width);
+    if(!isAtTop && !isAtRight) nbh.push(current+(1*offset)-width);
+    if(!isAtBottom && !isAtLeft) nbh.push(current-(1*offset)+width);
+    if(!isAtBottom && !isAtRight) nbh.push(current+(1*offset)+width);
+    return nbh;
+}
 
 Utils.formatMoney = function(nb){
     return 'coin'+(nb > 1 ? 's' : '');

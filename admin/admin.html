@@ -11,6 +11,80 @@
 <h1>Westward admin</h1>
 <div ng-app="admin" ng-controller="mainCtrl">
 
+    <h3>Players ({{players.length}})</h3>
+    <table class="table table-bordered table-striped">
+        <tbody>
+        <tr ng-repeat="pl in players">
+            <td>{{pl.name}}</td>
+        </tr>
+        </tbody>
+
+    </table>
+
+    <h3>Buildings ({{buildings.length}})</h3>
+    <table class="table table-bordered table-striped">
+        <!--
+        https://codepen.io/chrisoncode/pen/AmFLE
+        <thead>
+        <tr>
+            <td>
+                <a href="#" ng-click="sortType = 'name'; sortReverse = !sortReverse">
+                    Sushi Roll
+                    <span ng-show="sortType == 'name' && !sortReverse" class="fa fa-caret-down"></span>
+                    <span ng-show="sortType == 'name' && sortReverse" class="fa fa-caret-up"></span>
+                </a>
+            </td>
+            <td>
+                <a href="#" ng-click="sortType = 'fish'; sortReverse = !sortReverse">
+                    Fish Type
+                    <span ng-show="sortType == 'fish' && !sortReverse" class="fa fa-caret-down"></span>
+                    <span ng-show="sortType == 'fish' && sortReverse" class="fa fa-caret-up"></span>
+                </a>
+            </td>
+            <td>
+                <a href="#" ng-click="sortType = 'tastiness'; sortReverse = !sortReverse">
+                    Taste Level
+                    <span ng-show="sortType == 'tastiness' && !sortReverse" class="fa fa-caret-down"></span>
+                    <span ng-show="sortType == 'tastiness' && sortReverse" class="fa fa-caret-up"></span>
+                </a>
+            </td>
+        </tr>
+        </thead>-->
+
+        <thead>
+            <tr>
+                <td>Position</td>
+                <td>Name</td>
+            </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="bld in buildings "> <!--  | orderBy:bldSortType:bldSortReverse | filter:bldFilter-->
+            <td>[{{bld.x}},{{bld.y}}]</td>
+            <td>{{ bld.type | buildingName}}</td>
+        </tr>
+        </tbody>
+
+    </table>
+
+    <h3>Items in circulation</h3>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <td>Name</td>
+            <td>Number</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in items">
+            <td>{{item[0] | itemName}}</td>
+            <td>{{item[1]}} </td>
+        </tr>
+        </tbody>
+
+    </table>
+
+    <h3>Screenshots</h3>
     <div class="panel panel-default" ng-repeat="screenshot in screenshots">
         <div class="panel-heading">
             {{screenshot.stamp | date}} @ ({{screenshot.player.x}}, {{screenshot.player.y}}) | {{screenshot.browser}}
@@ -20,6 +94,7 @@
         </div>
     </div>
 
+    <h3>Events</h3>
     <div ng-repeat="event in events">
         <!--- ":this" means that a second argument is sent to the filter, which is a reference to the whole scope -->
         {{event | eventFilter:this}}

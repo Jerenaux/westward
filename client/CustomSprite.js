@@ -25,9 +25,11 @@ var CustomSprite = new Phaser.Class({
     },
 
     setTilePosition: function(x,y,setPixelPosition){
-        this.tx = x;
-        this.ty = y;
-        this.chunk = Utils.tileToAOI({x: this.tx, y: this.ty});
-        if(setPixelPosition) this.setPosition(this.tx * Engine.tileWidth, this.ty * Engine.tileHeight);
+        this.tileX = x;
+        this.tileY = y;
+        this.chunk = Utils.tileToAOI({x: this.tileX, y: this.tileY});
+        if(this.postChunkUpdate) this.postChunkUpdate();
+        if(setPixelPosition) this.setPosition(this.tileX * Engine.tileWidth, this.tileY * Engine.tileHeight);
+        if(isNaN(this.tileX) || isNaN(this.tileY) || isNaN(this.x) || isNaN(this.y)) console.warn('Warning: NaN coordinates for ',this.entityType,this.id);
     }
 });

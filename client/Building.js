@@ -44,12 +44,12 @@ var Building = new Phaser.Class({
         this.name = buildingData.name;//+' '+this.id;
         this.prices = {};
         this.built = false;
-        if(buildingData.entrance) {
+        /*if(buildingData.entrance) {
             this.entrance = {
-                x: this.tx + buildingData.entrance.x,
-                y: this.ty + buildingData.entrance.y
+                x: this.tileX + buildingData.entrance.x,
+                y: this.tileY + buildingData.entrance.y
             };
-        }
+        }*/
 
         this.depthOffset = buildingData.depthOffset;
         this.setBuilt(data.built);
@@ -63,8 +63,7 @@ var Building = new Phaser.Class({
     },
 
     resetDepth: function(){
-        //this.setDepth(Engine.buildingsDepth + (this.ty - this.depthOffset)/1000);
-        this.setDepth(this.ty);
+        this.setDepth(this.tileY-1);
     },
 
     build: function () {
@@ -160,8 +159,7 @@ var Building = new Phaser.Class({
     },
 
     setCollisions: function () {
-        //PFUtils.buildingCollisions(this.tx,this.ty,data,Engine.collisions);
-        PFUtils.buildingCollisions(this.tx,this.ty-this.cellsHeight,this.cellsWidth,this.cellsHeight,Engine.collisions);
+        PFUtils.buildingCollisions(this.tileX,this.tileY-this.cellsHeight,this.cellsWidth,this.cellsHeight,Engine.collisions);
     },
 
     setCommitted: function(committed){
@@ -249,8 +247,8 @@ var Building = new Phaser.Class({
 
     getRect: function(){
         return {
-            x: this.tx + this.coll.x,
-            y: this.ty - this.cellsHeight,
+            x: this.tileX + this.coll.x,
+            y: this.tileY - this.cellsHeight,
             w: this.cellsWidth,
             h: this.cellsHeight
         }
@@ -279,8 +277,8 @@ var Building = new Phaser.Class({
 
     getTilePosition: function(){
         return {
-            x: this.tx,
-            y: this.ty
+            x: this.tileX,
+            y: this.tileY
         }
     },
 
@@ -312,8 +310,8 @@ var Building = new Phaser.Class({
         var minSelfDist = Infinity;
         for(var x = -1; x <= this.cellsWidth+1; x++){
             for(var y = -1; y < this.cellsHeight + 1; y++){
-                var cx = this.tx+x;
-                var cy = this.ty-this.cellsHeight+y;
+                var cx = this.tileX+x;
+                var cy = this.tileY-this.cellsHeight+y;
                 var cell = {x:cx,y:cy};
                 if(Engine.checkCollision(cx,cy)) continue;
                 var d = Utils.euclidean({x:Engine.player.tileX,y:Engine.player.tileY},cell);

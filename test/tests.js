@@ -4,8 +4,11 @@
 var expect = require('chai').expect;
 var request = require('request');
 var io = require('socket.io-client');
+var path = require('path');
 var sinon = require('sinon');
+var mongoose = require('mongoose');
 
+var mapsDir = path.join(__dirname,'..','maps');
 var gs = require('../server/GameServer.js').GameServer;
 
 var PORT = 8081; //TODO: read from conf file?
@@ -22,17 +25,53 @@ describe('test', function(){
         sinon.assert.calledWith(methodB, input);
     });
 
-    it('mock-test',function() {
+    /*it('mock-test',function() {
 
+    });*/
+});
+
+describe('GameServer',function(){
+    var stubs = [];
+    before(function(done) {
+        this.timeout(3000);
+        mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward');
+        var db = mongoose.connection;
+        db.on('error', console.error.bind(console, 'connection error:'));
+        db.once('open', function() {
+            console.log('Connection to db established');
+            // TODO: read from config
+            gs.readMap(mapsDir,false,done); 
+            gs.server = {
+                sendError: function(){}
+            };
+        });
+    });
+
+    it('addNewPlayer',function(){
+        var errInputs = [{},{new:true}];
+        errInputs.forEach(function(input){
+            var result = gs.addNewPlayer(null,input);
+            expect(result).to.equal(null);
+        });
+
+        var result = gs.addNewPlayer(null,{characterName:'Test'});
+        expect(result.name).to.equal('Test');
+    });
+
+    afterEach(function(){
+        stubs.forEach(function(stub){
+            stub.restore();
+        })
     });
 });
 
+/*
 describe('Server', function () {
     return;
-    /*var client;
+    /!*var client;
     before('socket-client',function(){
         client = io('http://localhost:'+PORT); // https://github.com/agconti/socket.io.tests/blob/master/test/test.js
-    });*/
+    });*!/
 
     it('Run', function (done) {
         request('http://localhost:'+PORT, function(error, response, body) {
@@ -68,17 +107,4 @@ describe('Server', function () {
             client.emit('init-world',input);
         });
     });
-});
-
-
-
-// 1. ARRANGE
-/*var x = 5;
-var y = 1;
-var sum1 = x + y;
-
-// 2. ACT
-var sum2 = x+y;
-
-// 3. ASSERT
-expect(sum2).to.be.equal(sum1);*/
+});*/

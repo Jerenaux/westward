@@ -24,7 +24,7 @@ Pathfinder.prototype.setCallbacks = function(openCb, closeCb, backtrackCb){
     this.backtrackCb = backtrackCb;
 };
 
-Pathfinder.prototype.findPath = function(from,to,seek){
+Pathfinder.prototype.findPath = function(from,to,seek,nextTo){
     // todo: replac with 'closed' flag?
     var closedSet = new SpaceMap(); // Set of nodes already evaluated
     this.openSet = []; // The list of currently discovered nodes that are not evaluated yet
@@ -33,6 +33,8 @@ Pathfinder.prototype.findPath = function(from,to,seek){
     this.nodes = new SpaceMap();
     this.considered = 0;
 
+    this.nextTo = nextTo;
+    this.destination = this.getNode(to.x,to.y);
     var start = this.getNode(from.x,from.y);
     var end = this.getNode(to.x,to.y);
 
@@ -140,6 +142,10 @@ Pathfinder.prototype.generateNeighbors = function(node){
 
     offsets.forEach(function(o,i){
         var n = this.getNode(node.x+o[0],node.y+o[1]);
+        if(this.nextTo && n.equals(this.destination)){
+            neighbors.push(n);
+            return;
+        }
         // console.log(n,this.isWalkable(n));
         if(!this.isWalkable(n)) return;
         if(this.allowDiagonal && !this.cutCorners && i%2 != 0){ // because corners are at odd positions in offsets array

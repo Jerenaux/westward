@@ -2,13 +2,23 @@
   "name": "westward",
   "version": "1.0.0",
   "description": "Westward, a collaborative MMO",
+  "private": true,
   "main": "server.js",
   "directories": {
     "test": "test"
   },
+  "nodemonConfig": {
+    "watch": [
+      "server", "shared", "index.html", "admin"
+    ],
+    "ext": "ts,js,html",
+    "ignore": ["test/*", "docs/*", "node_modules"]
+  },
   "scripts": {
     "test": "mocha test",
-    "start": "node server.js"
+    "start": "node server.js",
+    "watch": "nodemon",
+    "watch-client": "browser-sync start --config bs-config.js"
   },
   "engines": {
     "npm": "^5.7.1"
@@ -25,6 +35,8 @@
     "sinon": "^7.1.1",
     "spritesmith": "^3.1.1",
     "uglify-js": "^3.1.9",
+    "webpack": "^4.29.0",
+    "webpack-cli": "^3.2.1",
     "xml2js": "^0.4.19"
   },
   "dependencies": {
@@ -36,6 +48,7 @@
     "jsonwebtoken": "^8.4.0",
     "mongodb": "^2.2.31",
     "mongoose": "^5.0.9",
+    "npm-watch": "^0.6.0",
     "optimist": "^0.6.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",

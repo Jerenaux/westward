@@ -99,8 +99,8 @@ Client.socket.on('wait',function(){
     setTimeout(Client.requestData, 500); // Just try again in 500ms
 });
 
-Client.socket.on('settlement-data',function(data){
-    UI.displaySettlements(data);
+Client.socket.on('region-data',function(data){
+    UI.displayRegions(data);
 });
 
 Client.socket.on('camps-data',function(data){
@@ -141,8 +141,8 @@ Client.setLocalData = function(id){ // store the player ID in localStorage
 
 /// ##### SENDERS ######
 
-Client.requestSettlementData = function(){
-    Client.socket.emit('settlement-data');
+Client.requestRegionsData = function(){
+    Client.socket.emit('region-data');
 };
 
 Client.requestCampsData = function(){
@@ -199,12 +199,19 @@ Client.sendCommit = function(){
 };
 
 Client.sendChat = function(text){
-    console.log('sending',text);
     Client.socket.emit('chat',text);
 };
 
 Client.sendRespawn = function(){
     Client.socket.emit('respawn');
+};
+
+Client.logMenu = function(menu){
+    Client.socket.emit('menu',menu);
+};
+
+Client.sendTutorialStart = function(){
+    Client.socket.emit('tutorial-start');
 };
 
 // ####################"

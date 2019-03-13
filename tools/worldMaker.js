@@ -8,6 +8,7 @@ var xml2js = require('xml2js');
 var config = require('config');
 var Jimp = require("jimp");
 var rwc = require('random-weighted-choice');
+var quickselect = require('quickselect');
 
 var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
@@ -26,13 +27,18 @@ function Chunk(id){
     this.defaultTile = 'grass';
     this.layers = [new SpaceMap()];
     this.decor = [];
+    this.wood = new SpaceMap();
 }
 
 Chunk.prototype.addDecor = function(x,y,v){
     this.decor.push([x,y,v]);
 };
 
-Chunk.prototype.add = function(x,y,v){
+Chunk.prototype.addResource = function(x,y,r){
+    if(r == 'wood') this.wood.add(x,y);
+};
+
+Chunk.prototype.add = function(x,y,v){ // Add tile
     this.layers[0].add(x,y,v);
 };
 
@@ -55,7 +61,8 @@ Chunk.prototype.trim = function(){
         y: this.y,
         default: this.defaultTile,
         layers: layers,
-        decor: this.decor
+        decor: this.decor,
+        wood: this.wood.toList(true)
     };
 };
 
@@ -72,14 +79,15 @@ function WorldMaker(args){
     this.outdir = '';
     this.chunks = {};
     this.coasts = [];
-    
-    this.trees = new SpaceMap();
+
     this.land = new SpaceMap();
     this.collisions = new SpaceMap();
-    
+    this.items = new SpaceMap();
+    this.mapPixels = new SpaceMap();
+
     this.tileset = null;
     this.patterns = null;
-    
+
     this.nbHoriz = args.nbhoriz;
     this.nbVert = args.nbvert;
     this.chunkWidth = args.chunkw || 30;
@@ -87,6 +95,9 @@ function WorldMaker(args){
     this.tileWidth = args.tilew || 32;
     this.tileHeight = args.tileh || 32;
     this.blueprint = args.blueprint;
+
+    this.treeSource = args.treesource;
+    this.notreesave = args.notreesave;
 }
 
 WorldMaker.prototype.run = function(){
@@ -107,11 +118,12 @@ WorldMaker.prototype.run = function(){
     this.outdir = path.join(__dirname,'..','maps'); // TODO: remove dev.mapsPath etc?
     console.log('Writing to',this.outdir);
 
-    var existing = fs.readdirSync(this.outdir);
-    if (existing.length > 0 ){
+    if(!fs.existsSync(this.outdir)) fs.mkdirSync(this.outdir);
+    var content = fs.readdirSync(this.outdir);
+    if (content.length > 0 ){
         console.warn('Deleting existing world');
-        for(var i = 0; i < existing.length; i++){
-            fs.unlinkSync(path.join(this.outdir,existing[i]));
+        for(var i = 0; i < content.length; i++){
+            fs.unlinkSync(path.join(this.outdir,content[i]));
         }
     }
 
@@ -143,9 +155,8 @@ WorldMaker.prototype.storeImage = function(image){
 };
 
 WorldMaker.prototype.create = function(){
-
     /*
-    * README: 
+    * README:
     * - Shores are first populated with 'c' tiles based on blueprint (shapeWorld)
     * - Then the seas are filled, using 'c' tiles as stop tiles (createLakes)
     * - Then the shores are actually drawn, replacing 'c' based on neighbors (drawShore)
@@ -157,13 +168,15 @@ WorldMaker.prototype.create = function(){
     this.createLakes();
     this.drawShore();
     this.createForests();
+    this.addMisc();
+    this.makeSpawnZones();
 
     for(var id in this.chunks){
         this.chunks[id].write(this.outdir);
     }
 
-    this.writeMasterFile();
-    this.writeCollisions();
+    this.writeDataFiles();
+    this.makeWorldmap();
 };
 
 WorldMaker.prototype.shapeWorld = function(contours){
@@ -175,12 +188,9 @@ WorldMaker.prototype.shapeWorld = function(contours){
         var tiles = [];
         for (var j = 0; j < nbPts - 1; j++) {
             var s = lines[j];
-            //var e = (j == nbPts - 1 ? lines[0] : lines[j + 1]);
             var e = lines[j+1];
-            // console.log(s,e);
             s = this.pixelToTile({x:s[0],y:s[1]});
             e = this.pixelToTile({x:e[0],y:e[1]});
-            // console.log(s,e);
             var addTiles = Geometry.addCorners(Geometry.straightLine(s, e));
             if (j > 0) addTiles.shift();
             tiles = tiles.concat(addTiles);
@@ -193,10 +203,11 @@ WorldMaker.prototype.shapeWorld = function(contours){
 
 WorldMaker.prototype.isBusy = function(node){
     if(!isInWorldBounds(node.x,node.y)) return true;
-    var id = Utils.tileToAOI(node);
-    var chunk = this.chunks[id];
-    return !!chunk.get(node.x-chunk.x,node.y-chunk.y);
-}
+    return this.collisions.has(node.x,node.y);
+    // var id = Utils.tileToAOI(node);
+    // var chunk = this.chunks[id];
+    // return !!chunk.get(node.x-chunk.x,node.y-chunk.y);
+};
 
 function isInWorldBounds(x,y){
     return !(x < 0 || y < 0 || x >= World.worldWidth || y >= World.worldHeight);
@@ -207,6 +218,13 @@ WorldMaker.prototype.addDecor = function(tile,decor){
     if(!(id in this.chunks)) return;
     var chunk = this.chunks[id];
     chunk.addDecor(tile.x-chunk.x,tile.y-chunk.y,decor);
+};
+
+WorldMaker.prototype.addResource = function(x,y,resource){
+    var id = Utils.tileToAOI({x,y});
+    if(!(id in this.chunks)) return;
+    var chunk = this.chunks[id];
+    chunk.addResource(x-chunk.x,y-chunk.y,resource);
 };
 
 /*function removeTile(tile){
@@ -235,6 +253,7 @@ WorldMaker.prototype.addCoastTiles = function(tiles){
     tiles.forEach(function(t) {
         if(!isInWorldBounds(t.x,t.y)) return;
         this.addTile(t,'c');
+        this.collisions.add(t.x,t.y);
         coast.push(t);
     },this);
     this.coasts.push(coast);
@@ -296,7 +315,7 @@ WorldMaker.prototype.createLakes = function(){
         }
     }
     console.log(nblakes,'lakes created');
-}
+};
 
 WorldMaker.prototype.fill = function(fillNode,stop){ // fills the world with water, but stops at coastlines
     if(this.isBusy(fillNode)) return;
@@ -311,6 +330,7 @@ WorldMaker.prototype.fill = function(fillNode,stop){ // fills the world with wat
         // put a tile at location
         this.addTile(node,'w');
         this.collisions.add(node.x,node.y,1);
+        this.mapPixels.add(node.x,node.y,'w');
         // expand
         for(var i = 0; i < contour.length; i++){
             var candidate = {
@@ -318,7 +338,6 @@ WorldMaker.prototype.fill = function(fillNode,stop){ // fills the world with wat
                 y: node.y + contour[i][1]
             };
             if(!isInWorldBounds(candidate.x,candidate.y)) continue;
-            //if(lake.has(candidate.x,candidate.y)) continue;
             if(!this.isBusy(candidate)) queue.push(candidate);
         }
 
@@ -326,7 +345,7 @@ WorldMaker.prototype.fill = function(fillNode,stop){ // fills the world with wat
         if(counter >= stoppingCritetion) break;
     }
     return counter;
-}
+};
 
 WorldMaker.prototype.hasCoast = function(x,y){
     if(!isInWorldBounds(x,y)) return true; // When looking for a neighbor out of bounds, assume it's present; allows seamless connections with borders
@@ -361,6 +380,7 @@ WorldMaker.prototype.drawShore = function(){
             }else{
                 this.addTile(c,tile); // Will replace any 'c'
                 if(this.collides(tile)) this.collisions.add(x,y,1);
+                this.mapPixels.add(x,y,'c');
             }
         },this);
     },this);
@@ -385,6 +405,12 @@ WorldMaker.prototype.collides = function(tile){
 
 WorldMaker.prototype.createForests = function(){
     console.log('Creating forests ...');
+    this.trees = new SpaceMap();
+    this.woodland = new SpaceMap();
+    if(this.treeSource){
+        this.restoreForest();
+        return;
+    }
     var xRandRange = 7;
     var yRandRange = 7;
     var nbtrees = 0;
@@ -399,15 +425,45 @@ WorldMaker.prototype.createForests = function(){
         if(pos.length == 0) continue;
 
         // TODO: move that up, to use tree type in positions computation
-        var tree = getTreeType(g.x,g.y);
-        pos.forEach(function(p){
-            this.trees.add(p[0],p[1],1);
-        },this);
-        this.addDecor(g, 't'+tree);
+        var type = getTreeType(g.x,g.y);
+        this.plantTree(g,pos,type);
         nbtrees++;
     }
-    console.log(nbtrees + ' trees drawn');
-}
+    console.log(nbtrees + ' trees planted');
+    if(this.notreesave) return;
+    fs.writeFile(path.join(__dirname,'blueprints','trees.json'),JSON.stringify(this.trees.toList()),function(err){
+        if(err) throw err;
+        console.log('Trees saved');
+    });
+};
+
+WorldMaker.prototype.plantTree = function(g,pos,type){
+    // g is {x,y} location
+    pos.forEach(function(p){
+        this.collisions.add(p[0],p[1],1);
+    },this);
+    //TODO: adjust ranges / conf
+    for(var x = -4; x < 6; x++){
+        for(var y = -6; y < 5; y++){
+            this.woodland.add(parseInt(g.x)+x,parseInt(g.y)+y);
+            this.addResource(parseInt(g.x)+x,parseInt(g.y)+y,'wood');
+        }
+    }
+    this.trees.add(g.x,g.y,type);
+    this.addDecor(g, 't'+type);
+    this.addRandomItem(g.x,g.y,'tree');
+};
+
+WorldMaker.prototype.restoreForest = function(){
+    console.log('Restoring existing forest...');
+    nbtrees = 0;
+    var trees = JSON.parse(fs.readFileSync(path.join(__dirname,'blueprints','trees.json')).toString());
+    trees.forEach(function(t){
+        this.plantTree(t,this.checkPositions(t.x,t.y),t.v);
+        nbtrees++;
+    },this);
+    console.log(nbtrees + ' trees planted');
+};
 
 function getTreeType(x,y){
     var poles = [Math.floor(World.worldHeight/2),World.worldHeight,0,Math.floor(World.worldHeight/4)]; // Pole for tree 1, 2, 3, 4 respectively
@@ -437,29 +493,99 @@ function getTreeType(x,y){
 
 WorldMaker.prototype.checkPositions = function(x,y){
     var free = true;
-    var xspan = 3;
+    var xspan = 3; //TODO: conf
     var yspan = 2;
     var pos = [];
     for(var xi = 0; xi < xspan; xi++){
         for(var yi = 0; yi < yspan; yi++){
-            var rx = x+xi;
-            var ry = y-yi;
+            var rx = parseInt(x)+xi;
+            var ry = parseInt(y)-yi;
             pos.push([rx,ry]);
             if(this.isBusy({x:rx,y:ry})) free = false;
-            if(this.trees.get(rx,ry)) free = false;
             if(!free) break;
         }
         if(!free) break;
     }
     if(!free) return [];
     return pos;
-}
+};
 
+WorldMaker.prototype.addMisc = function(){
+    console.log('Adding misc ...');
+    var nbrocks = 5000; //TODO: conf
+    for(var i = 0; i < nbrocks; i++){
+        // console.log('zone');
+        var x = Utils.randomInt(0,World.worldWidth);
+        var y = Utils.randomInt(0,World.worldHeight);
+        if(!this.isBusy({x:x,y:y})) {
+            // console.log('rock at',x,y);
+            this.collisions.add(x,y);
+            this.items.add(x,y,26);
+        }
+    }
+};
 
-WorldMaker.prototype.writeMasterFile = function(){
+WorldMaker.prototype.makeSpawnZones = function(){
+    this.resourceMarkers = [];
+    var items = [ // TODO: conf
+        {item:14,decor:'b4',nbzones:100},
+        {item:8,decor:null,nbzones:100},
+        //{item:18,decor:null,nbzones:100},
+    ];
+    items.forEach(function(item){
+        for(var i = 0; i < item.nbzones; i++){
+            // console.log('zone');
+            var x = Utils.randomInt(0,World.worldWidth-1);
+            var y = Utils.randomInt(0,World.worldHeight-1);
+            var w = Utils.randomInt(5,World.chunkWidth);
+            var h = Utils.randomInt(5,World.chunkHeight);
+            var nb = this.makeFloraZone(x,y,w,h,item);
+        }
+    },this);
+    this.makeFloraZone(477,665,26,15,items[0]);
+    this.makeFloraZone(498,697,26,15,items[1]);
+};
+
+WorldMaker.prototype.makeFloraZone = function(x,y,w,h,data){
+    var nbbush = 4; // TODO: conf
+    var contour = [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1],[2,-1]];
+    var nb = 0;
+    for(var u = 0; u < w; u++){
+        for(var v = 0; v < h; v++){
+            var tree = this.trees.get(x+u,y+v);
+            if(tree){
+                Utils.shuffle(contour);
+                for(var j = 0; j < nbbush; j++){
+                    var c = contour[j];
+                    var loc = {x:x+u+c[0],y:y+v+c[1]};
+                    if(data.decor) this.addDecor(loc, data.decor);
+                    this.items.add(loc.x,loc.y,data.item);
+                    nb++;
+                    // console.log('bush at',loc);
+                }
+            }
+        }
+    }
+    if(nb) this.resourceMarkers.push([Math.floor(x+w/2),Math.floor(y+h/2),data.item]);
+};
+
+WorldMaker.prototype.addRandomItem = function(x,y,decor){
+    var cnt = (decor == 'tree'
+        ? [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1]]
+        : [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]]);
+    var item = (decor == 'tree' ? 7 : 26); // wood or stone
+    if(Utils.randomInt(1,10) > 8){ // TODO: adjust
+        var c = Utils.randomElement(cnt);
+        var ix = parseInt(x)+c[0];
+        var iy = parseInt(y)+c[1];
+        this.items.add(ix,iy,item);
+        // console.log('adding',item,'at',ix,iy);
+    }
+};
+
+WorldMaker.prototype.writeDataFiles = function(){
     // Write master file
     var master = {
-        //tilesets : tilesetsData.tilesets,
         chunkWidth: this.chunkWidth,
         chunkHeight: this.chunkHeight,
         nbChunksHoriz: this.nbHoriz,
@@ -469,16 +595,115 @@ WorldMaker.prototype.writeMasterFile = function(){
         if(err) throw err;
         console.log('Master written');
     });
-}
-
-WorldMaker.prototype.writeCollisions = function(){
-    // Write master file
-    var colls = this.trees.toList().concat(this.collisions.toList(true));
+    // Write collisions
+    // var colls = this.trees.toList().concat(this.collisions.toList(true));
+    var colls = this.collisions.toList(true);
     fs.writeFile(path.join(this.outdir,'collisions.json'),JSON.stringify(colls),function(err){
         if(err) throw err;
         console.log('Collisions written');
     });
-}
+    // Write resources
+    fs.writeFile(path.join(this.outdir,'woodland.json'),JSON.stringify(this.woodland.toList(true)),function(err){
+        if(err) throw err;
+        console.log('Woodland written');
+    });
+    // Write resource markers
+    fs.writeFile(path.join(this.outdir,'resourceMarkers.json'),JSON.stringify(this.resourceMarkers),function(err){
+        if(err) throw err;
+        console.log('Resource markers written');
+    });
+    // Items
+    fs.writeFile(path.join(this.outdir,'items.json'),JSON.stringify(this.items.toList(true)),function(err){
+        if(err) throw err;
+        console.log('Items written');
+    });
+};
+
+WorldMaker.prototype.makeWorldmap = function(){
+    var wm = this;
+    var hexes  = {     // last two characters: ff = visible, 00 = not
+        'c': 0x000000ff,
+        'w': 0x68b89fff,
+        'trunk': 0x7e5d2eff,
+        't1': 0x91a54aff,
+        't2': 0x9dbf48ff, //0x809c3bff,
+        't3': 0x7f9b75ff,
+        't4': 0x375b44ff,
+        // 'g': 0x809c3bff
+    };
+    new Jimp(World.worldWidth*2, World.worldHeight*2, 0xf9de99ff, function (err, image) { // 0x0,
+        wm.mapPixels.toList(true).forEach(function(px){
+            var x = px[0]*2;
+            var y = px[1]*2;
+            var color = hexes[px[2]];
+            image.setPixelColor(color, x, y);
+            image.setPixelColor(color, x+1, y);
+            image.setPixelColor(color, x, y+1);
+            image.setPixelColor(color, x+1, y+1);
+        });
+        wm.trees.toList(true).forEach(function(t){
+            var x = t[0]*2;
+            var y = t[1]*2;
+            for(var xi = 0; xi < 4; xi++){
+                for(var yi = 0; yi > -4; yi--){
+                    image.setPixelColor(hexes['trunk'], x+xi, y+yi);
+                }
+            }
+            if(t[2] == 'd') return;
+            x -= 2;
+            y -= 10;
+            for(var xi = 0; xi < 8; xi++){
+                for(var yi = 0; yi < 8; yi++){
+                    image.setPixelColor(hexes['t'+t[2]], x+xi, y+yi);
+                }
+            }
+        });
+        // image.write(path.join(wm.outdir,'worldmap.png'));
+        image = wm.medianBlur(image,'worldmap.png');
+    });
+};
+
+WorldMaker.prototype.medianBlur = function(image,name){
+    var wm = this;
+    var iw = image.bitmap.width*4; // because each "px"is 4 values
+    var ih = image.bitmap.height*4;
+    new Jimp(image.bitmap.width, image.bitmap.height, 0xf9de99ff, function (err, newimage) {
+        image.scan(0, 0, image.bitmap.width, image.bitmap.height, function (x, y, idx) {
+            if (x == image.bitmap.width - 1 && y == image.bitmap.height - 1) {
+                // image scan finished, do your stuff
+                newimage.write(path.join(wm.outdir,name));
+                return;
+              }
+            // idx is the position start position of this rgba tuple in the bitmap Buffer
+            var r = wm.colorMedian(iw,ih,this.bitmap.data,idx,0); //this.bitmap.data[idx + 0];
+            var g = wm.colorMedian(iw,ih,this.bitmap.data,idx,1); //this.bitmap.data[idx + 1];
+            var b = wm.colorMedian(iw,ih,this.bitmap.data,idx,2); // this.bitmap.data[idx + 2];
+            var a = this.bitmap.data[idx + 3];
+            // color = image.getPixelColor(x,y);
+            var color = Jimp.rgbaToInt(r, g, b, a);
+            newimage.setPixelColor(color, x,y);
+        });
+    });
+};
+
+WorldMaker.prototype.colorMedian = function(w,h,data,idx,offset){
+    var idcs = Utils.listNeighborsInGrid(idx,w,h,4);
+
+    var px = [];
+    idcs.forEach(function(i){
+        if(data[i+offset] != undefined) px.push(data[i+offset]);
+    });
+
+    var  l = px.length;
+    var n = (l%2 == 0 ? (l/2)-1 : (l-1)/2);
+    quickselect(px,n);
+    // console.log(w,h);
+    // console.log(idx)
+    // console.log(idcs)
+    // console.log(px)
+    // console.log('result:',px[n]);
+    return px[n];
+};
 
 var args = require('optimist').argv;
 

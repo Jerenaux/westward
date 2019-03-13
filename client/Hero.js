@@ -23,7 +23,8 @@ var Hero = new Phaser.Class({
         Player.prototype.setUp.call(this,data);
 
         this.settlement = data.settlement;
-        this.markers = data.markers;
+        this.buildingMarkers = data.buildingMarkers || [];
+        this.resourceMarkers = data.resourceMarkers || [];
         this.unread = 1;
         this.inventory = new Inventory();
         this.stats = new StatsContainer();
@@ -46,16 +47,17 @@ var Hero = new Phaser.Class({
             'civiclvl': this.updateCivicLvl,
             'classlvl': this.updateClassLvl,
             'classxp': this.updateClassXP,
-            //'commitSlots': this.updateCommitSlots,
             'dead': this.handleDeath,
             'equipment': this.updateEquipment,
             'foodSurplus': this.updateFoodSurplus,
             'gold': this.updateGold,
             'items': this.updateInventory,
+            'buildingMarkers': this.updateMarkers,
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
             'resetTurn': BattleManager.resetTurn,
-            'stats': this.updateStats
+            'stats': this.updateStats,
+            'vision': this.updateVision
         };
 
         this.updateEvents = new Set();
@@ -73,6 +75,8 @@ var Hero = new Phaser.Class({
         if(data.remainingTime) BattleManager.setCounter(data.remainingTime);
         if(data.activeID) BattleManager.manageTurn(data.activeID);
         if(data.x >= 0 && data.y >= 0) this.teleport(data.x,data.y);
+       
+        Engine.updateAllOrientationPins(); 
 
         Engine.firstSelfUpdate = false;
     },
@@ -182,14 +186,13 @@ var Hero = new Phaser.Class({
         },this);
     },
 
-    updateCivicLvl: function(civiclvl){
-        this.civiclvl = civiclvl;
-        this.updateEvents.add('citizen');
-        // TODO: add sound effect
+    postChunkUpdate: function(){
+        if(this.chunk != this.previousChunk) Engine.updateEnvironment();
+        this.previousChunk = this.chunk;
     },
 
-    updateCivicXP: function(civicxp){
-        this.civicxp = civicxp;
+    updateCivicLvl: function(civiclvl){
+        this.civiclvl = civiclvl;
         this.updateEvents.add('citizen');
         // TODO: add sound effect
     },
@@ -203,15 +206,6 @@ var Hero = new Phaser.Class({
     updateClassXP: function(classxp){
         this.classxp = classxp;
         this.updateEvents.add('character');
-        // TODO: add sound effect
-    },
-
-    updateCommitSlots: function(commitSlots){
-        //this.commitSlots.clear();
-        this.commitTypes.clear();
-        this.commitIDs = [];
-        this.setCommitSlots(commitSlots);
-        this.updateEvents.add('commit');
         // TODO: add sound effect
     },
 
@@ -246,6 +240,11 @@ var Hero = new Phaser.Class({
         }
     },
 
+    updateMarkers: function(markers){
+        this.buildingMarkers = markers;
+        if(Engine.miniMap) Engine.miniMap.map.updatePins();
+    },
+
     updateStats: function(stats){
         for(var i = 0; i < stats.length; i++){
             this.updateStat(stats[i].k,stats[i]);
@@ -269,5 +268,14 @@ var Hero = new Phaser.Class({
                 statObj.absoluteModifiers.push(m);
             })
         }
+    },
+
+    updateVision: function(aois){
+        // var aois = [331,341,389,390,391,438,439,440,490];
+        this.mapVision = [];
+        aois.forEach(function(aoi){
+            var origin = Utils.AOItoTile(aoi);
+            this.mapVision.push(new Phaser.Geom.Rectangle(origin.x,origin.y,World.chunkWidth,World.chunkHeight));
+        },this);
     }
 });
