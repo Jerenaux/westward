@@ -155,6 +155,8 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.positions = new SpaceMapList(); // positions occupied by moving entities and buildings
     GameServer.itemPositions = new SpaceMapList();
 
+    GameServer.fogOfWar = new SpaceMap();
+
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
     Prism.logEvent(null,'server-start');

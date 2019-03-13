@@ -39,7 +39,7 @@ Misc:
 - Multiple clicks on "give" repeat the action
 Shop & workshop interfaces
 New movement system
-Fog of war
+Add a zoom level to map
 Check building limits are enforced
 
 
