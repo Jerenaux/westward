@@ -1050,9 +1050,10 @@ GameServer.updateVision = function(){
     }
     for(var bid in GameServer.buildings){
         var building = GameServer.buildings[bid];
-        Utils.listAdjacentAOIs(building.aoi).forEach(function(aoi){
+        /*Utils.listAdjacentAOIs(building.aoi).forEach(function(aoi){
             GameServer.vision.add(aoi);
-        });
+        });*/
+        GameServer.vision.add(building.aoi);
     }
     GameServer.visionChanged = true;
     console.log('VISION:',GameServer.vision);

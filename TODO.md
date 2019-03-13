@@ -37,9 +37,9 @@ Misc:
 - Positions not saved often enough?
 - Don't disable walk with build panel
 - Multiple clicks on "give" repeat the action
+- Add a zoom level to map
 Shop & workshop interfaces
 New movement system
-Add a zoom level to map
 Check building limits are enforced
 
 
