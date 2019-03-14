@@ -80,6 +80,8 @@ var Map = new Phaser.Class({
         this.setDepth(2);
         this.setScrollFactor(0);
         this.setVisible(false);
+
+        this.scales = [0.25, 0.5, 1]
         this.setScale(0.5);
 
         this.center = { // position of map sprite on screen
@@ -317,17 +319,21 @@ var Map = new Phaser.Class({
     },
 
     zoomIn: function(){
-        this.setScale(1);
+        var idx  = Utils.clamp(this.scales.indexOf(this.scaleX)+1,0,this.scales.length-1);
+        var newscale = this.scales[idx];
+        this.setScale(newscale);
         this.zoom();
-        this.getZoomBtn('in').disable();
-        this.getZoomBtn('out').enable();
+        if(idx == this.scales.length-1) this.getZoomBtn('in').disable();
+        if(idx > 0) this.getZoomBtn('out').enable();
     },
 
     zoomOut: function(){
-        this.setScale(0.5);
+        var idx  = Utils.clamp(this.scales.indexOf(this.scaleX)-1,0,this.scales.length-1);
+        var newscale = this.scales[idx];        
+        this.setScale(newscale);
         this.zoom();
-        this.getZoomBtn('in').enable();
-        this.getZoomBtn('out').disable();
+        if(idx < this.scales.length-1) this.getZoomBtn('in').enable();
+        if(idx == 0) this.getZoomBtn('out').disable();
     },
 
     zoom: function(){

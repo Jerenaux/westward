@@ -11,18 +11,20 @@
 <body>
     <div class="fontPreload">.</div> <!-- don't forget the dot, the div cannot be empty-->
     <div class="fontPreloadTreamd">.</div>
-    <center><div id='game'>
+    <div id='game' style='text-align: center;'>
         <input type="text" class="chat" id="chat" maxlength="40"/>
         <input type="text" class="chat" id="name" maxlength="20"/>
     </div>
-    <div id="browser" class="danger"></div>
-    <div id="danger" class="danger"></div>
-    <div class="info">
-        Tile: <span id="tx">0</span>,<span id="ty">0</span>&nbsp;
-        AOI: <span id="aoi">0</span>
-        <!-- Pixel: <span id="pxx">0</span>,<span id="pxy">0</span><br/> -->
+    <div style='text-align: center;'>
+        <div id="browser" class="danger"></div>
+        <div id="danger" class="danger"></div>
+        <div class="info">
+            Tile: <span id="tx">0</span>,<span id="ty">0</span>&nbsp;
+            AOI: <span id="aoi">0</span>
+            <!-- Pixel: <span id="pxx">0</span>,<span id="pxy">0</span><br/> -->
+        </div>
     </div>
-    </center>
+    
     <div id="disqus_thread"></div>
 <script>
     if (!(location.hostname === "localhost" || location.hostname === "127.0.0.1")){

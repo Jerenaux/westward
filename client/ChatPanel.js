@@ -12,8 +12,10 @@ ChatPanel.prototype.constructor = ChatPanel;
 
 ChatPanel.prototype.addInterface = function(){
     this.input = document.getElementById("chat");
-    this.input.style.left = (this.x+20)+"px";
-    this.input.style.top = (this.y+30)+"px";
+    var canvasx = UI.scene.game.canvas.offsetLeft;
+    var canvasy = UI.scene.game.canvas.offsetTop;
+    this.input.style.left = (canvasx+this.x+10)+"px";
+    this.input.style.top = (canvasy+this.y+20)+"px";
 };
 
 ChatPanel.prototype.handleInput = function(){
@@ -57,8 +59,10 @@ NamePanel.prototype.constructor = NamePanel;
 
 NamePanel.prototype.addInterface = function(){
     this.input = document.getElementById("name");
-    this.input.style.left = (this.x+50)+"px";
-    this.input.style.top = (this.y+60)+"px";
+    var canvasx = UI.scene.game.canvas.offsetLeft;
+    var canvasy = UI.scene.game.canvas.offsetTop;
+    this.input.style.left = (canvasx+this.x+40)+"px";
+    this.input.style.top = (canvasy+this.y+50)+"px";
 };
 
 NamePanel.prototype.getValue = function(){
