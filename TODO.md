@@ -38,8 +38,7 @@ Misc:
 - Don't disable walk with build panel
 - Multiple clicks on "give" repeat the action
 - Fix positioning with different zoom levels
-- Enable zoom-out button when opening map
-Shop & workshop interfaces
+- Enable zoom-out button when opening mapShop & workshop interfaces
 New movement system
 Check building limits are enforced
 
