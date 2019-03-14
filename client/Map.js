@@ -81,7 +81,7 @@ var Map = new Phaser.Class({
         this.setScrollFactor(0);
         this.setVisible(false);
 
-        this.scales = [0.25, 0.5, 1]
+        this.scales = [0.35, 0.5, 1];
         this.setScale(0.5);
 
         this.center = { // position of map sprite on screen
@@ -120,6 +120,7 @@ var Map = new Phaser.Class({
         /*if(showToponyms) {
             Engine.settlementsData.forEach(function (s) {
                 this.addText(s);
+            }, this);
             }, this);
         }*/
 
@@ -401,7 +402,7 @@ var Map = new Phaser.Class({
         var customPipeline = game.renderer.addPipeline('FoW'+fowID, new FoWPipeline(game,rects.length));
         customPipeline.setFloat1v('rects', rects);
 
-        this.setPipeline('FoW'+fowID++); // ugly hack
+        // this.setPipeline('FoW'+fowID++); // ugly hack
 
         // Compute where to display polygon on screen, based on map location on screen
         /*path = path.map(function(pt){
@@ -417,7 +418,8 @@ var Map = new Phaser.Class({
     },
 
     display: function(){
-        if(!this.mimnimap && this.scaleX > 0.5) this.zoomOut();
+        if(!this.minimap && this.scaleX > 0.5) this.zoomOut();
+        if(!this.minimap && this.scaleX < 0.5) this.zoomIn();
         this.centerMap(Engine.player.getTilePosition());
         // this.setInputArea();
         this.positionToponyms();
@@ -426,7 +428,7 @@ var Map = new Phaser.Class({
 
         this.displayPins();
         this.setVisible(true);
-        if(!this.minimap) this.getZoomBtn('out').disable();
+        // if(!this.minimap) this.getZoomBtn('out').disable();
     },
 
     displayPins: function(){
