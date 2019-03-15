@@ -342,7 +342,6 @@ var Map = new Phaser.Class({
             x: tile ? tile.x * 2 : this.displayOriginX,
             y: tile ? tile.y * 2 : this.displayOriginY
         };
-        console.log(o.x);
         var xSpan = (this.minimap ? 250 : 500)/this.scaleX;
         var ySpan = (this.minimap ? 70 : 190)/this.scaleY;
         this.setDisplayOrigin(
@@ -357,7 +356,6 @@ var Map = new Phaser.Class({
                 this.height - ySpan
             )
         );
-        console.log(this.displayOriginX);
         this.setPosition(this.center.x,this.center.y);
     },
 
@@ -396,7 +394,7 @@ var Map = new Phaser.Class({
         var customPipeline = game.renderer.addPipeline('FoW'+fowID, new FoWPipeline(game,rects.length));
         customPipeline.setFloat1v('rects', rects);
 
-        // this.setPipeline('FoW'+fowID++); // ugly hack
+        this.setPipeline('FoW'+fowID++); // ugly hack
 
         // Compute where to display polygon on screen, based on map location on screen
         /*path = path.map(function(pt){

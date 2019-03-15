@@ -1471,6 +1471,50 @@ Engine.makeFortMenu = function(){
 
 Engine.makeTradeMenu = function(){
     var trade = new Menu('Trade');
+    trade.setTitlePos(10);
+    var y = 80;
+    var w = 400;
+    var h = 400;
+    var space = 15;
+    var center = Engine.getGameConfig().width/2;
+    var client = trade.addPanel('client',new ShopInventoryPanel(center-w-space,y,w,h,'Sell'));
+    // client.setInventory(Engine.player.inventory,7,true,Engine.sellClick);
+    // client.filterItems = true;
+    client.addCapsule('gold',150,-9,'999','gold');
+    client.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['sell_help']);
+    var shop =  trade.addPanel('shop',new ShopInventoryPanel(center+space,y,w,h,'Buy'));
+    // shop.setInventory(new Inventory(20),7,true,Engine.buyClick);
+    // shop.filterItems = true;
+    shop.addCapsule('gold',100,-9,'999','gold');
+    shop.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help']);
+    w = 300;
+    var x = (Engine.getGameConfig().width-w)/2;
+    // var action = new ShopPanel(x,420,w,100,'Buy/Sell');
+    // trade.addPanel('action',action);
+    var prices = trade.addPanel('prics',new PricesPanel(670,420,200,100,'Set prices'),true);
+
+    trade.addEvent('onUpdateInventory',function(){
+        // client.updateInventory();
+        // action.update();
+    });
+    trade.addEvent('onUpdateShop',function(){
+        // shop.updateInventory();
+        // action.update();
+    });
+    trade.addEvent('onUpdateGold',function(){
+        client.updateCapsule('gold',Engine.player.gold);
+        Engine.scene.sound.add('sellbuy').play();
+        // action.update();
+    });
+    trade.addEvent('onUpdateShopGold',function(){
+        shop.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+        // action.update();
+    });
+    return trade;
+};
+
+/*Engine.makeTradeMenu = function(){
+    var trade = new Menu('Trade');
     trade.setTitlePos(90);
     var y = 150;
     var client = trade.addPanel('client',new InventoryPanel(212,y,300,300,'Your items'));
@@ -1507,7 +1551,7 @@ Engine.makeTradeMenu = function(){
         action.update();
     });
     return trade;
-};
+};*/
 
 Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
@@ -2170,7 +2214,7 @@ Engine.enterBuilding = function(id){
 
     //TODO: rework
     var menu = mainMenu;
-    if(menu.panels['shop']) {
+    /*if(menu.panels['shop']) {
         menu.panels['shop'].modifyInventory(building.inventory);
         if( menu.panels['shop'].filterItems) {
             menu.panels['shop'].modifyFilter({
@@ -2193,7 +2237,7 @@ Engine.enterBuilding = function(id){
             }
             menu.panels['client'].updateInventory();
         }
-    }
+    }*/
 
     Engine.buildingTitle.setText(buildingData.name);
     var owner = Engine.currentBuiling.ownerName || 'Player';
