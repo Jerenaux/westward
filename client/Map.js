@@ -94,26 +94,8 @@ var Map = new Phaser.Class({
             :new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH)
             );
 
-        var wcoord = (this.minimap ? 'radius' : 'width');
-        var hcoord = (this.minimap ? 'radius' : 'height');
-
-        // Used to make sur that the map won't be centered in a position that allows to see the edges
-        this.minOrigin = {
-            x: (this.viewRect[wcoord]/2)*(1/this.scaleX),
-            y: (this.viewRect[hcoord]/2)*(1/this.scaleY),
-            xOffset: 0
-        };
-        if(this.minimap) this.minOrigin.y *= 2; // quick fix
-        this.maxOrigin =  {
-            x: (World.worldWidth-this.viewRect[wcoord]/2)*(1/this.scaleX),
-            y: (World.worldHeight-this.viewRect[hcoord]/2)*(1/this.scaleY),
-            xOffset: 0
-        };
-
-        if(!this.minimap){
-            this.minOrigin.xOffset = 70;
-            this.maxOrigin.xOffset = -60;
-        }
+        // var wcoord = (this.minimap ? 'radius' : 'width');
+        // var hcoord = (this.minimap ? 'radius' : 'height');
 
         this.toponyms = [];
 
@@ -360,10 +342,22 @@ var Map = new Phaser.Class({
             x: tile ? tile.x * 2 : this.displayOriginX,
             y: tile ? tile.y * 2 : this.displayOriginY
         };
+        console.log(o.x);
+        var xSpan = (this.minimap ? 250 : 500)/this.scaleX;
+        var ySpan = (this.minimap ? 70 : 190)/this.scaleY;
         this.setDisplayOrigin(
-            Utils.clamp(o.x,(this.minOrigin.x+this.minOrigin.xOffset)/(this.scaleX*2),this.maxOrigin.x+this.maxOrigin.xOffset),
-            Utils.clamp(o.y,this.minOrigin.y/(this.scaleY*2),this.maxOrigin.y)
+            Utils.clamp(
+                o.x,
+                xSpan,
+                this.width - xSpan
+            ),
+            Utils.clamp(
+                o.y,
+                ySpan,
+                this.height - ySpan
+            )
         );
+        console.log(this.displayOriginX);
         this.setPosition(this.center.x,this.center.y);
     },
 

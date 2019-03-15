@@ -37,7 +37,6 @@ Misc:
 - Positions not saved often enough?
 - Don't disable walk with build panel
 - Multiple clicks on "give" repeat the action
-- Fix positioning with different zoom levels
 New movement system
 Check building limits are enforced
 
