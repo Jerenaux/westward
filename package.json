@@ -9,10 +9,17 @@
   },
   "nodemonConfig": {
     "watch": [
-      "server", "shared", "index.html", "admin"
+      "server",
+      "shared",
+      "index.html",
+      "admin"
     ],
     "ext": "ts,js,html",
-    "ignore": ["test/*", "docs/*", "node_modules"]
+    "ignore": [
+      "test/*",
+      "docs/*",
+      "node_modules"
+    ]
   },
   "scripts": {
     "test": "mocha test",

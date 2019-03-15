@@ -9,7 +9,7 @@ export class KeycloakService {
   constructor() {
   }
 
-  private keycloakAuth: any;
+  public keycloakAuth: any;
 
   init(): Promise<any> {
     return new Promise((resolve, reject) => {
