@@ -1474,15 +1474,17 @@ Engine.makeTradeMenu = function(){
     trade.setTitlePos(10);
     var y = 80;
     var w = 400;
-    var h = 400;
+    var h = 480;
     var space = 15;
     var center = Engine.getGameConfig().width/2;
     var client = trade.addPanel('client',new ShopInventoryPanel(center-w-space,y,w,h,'Sell'));
+    client.setInventory('player');
     // client.setInventory(Engine.player.inventory,7,true,Engine.sellClick);
     // client.filterItems = true;
     client.addCapsule('gold',150,-9,'999','gold');
     client.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['sell_help']);
     var shop =  trade.addPanel('shop',new ShopInventoryPanel(center+space,y,w,h,'Buy'));
+    shop.setInventory('building');
     // shop.setInventory(new Inventory(20),7,true,Engine.buyClick);
     // shop.filterItems = true;
     shop.addCapsule('gold',100,-9,'999','gold');

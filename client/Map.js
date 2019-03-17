@@ -383,7 +383,7 @@ var Map = new Phaser.Class({
         // Maps rects to one single flat list of top-left and bottom-right coordinates,
         // for use by the shader
         var rects = [];
-        Engine.player.mapVision.forEach(function(rect){
+        Engine.player.FoW.forEach(function(rect){
             rects.push(rect.x/(this.width*this.scaleX));
             rects.push(rect.y/(this.height*this.scaleY));
             rects.push((rect.x+rect.width)/(this.width*this.scaleX));
@@ -521,8 +521,8 @@ var Pin = new Phaser.Class({
             if(this.parentMap.minimap){
                 this.setVisible(true);
             }else{
-                for(var i = 0; i < Engine.player.mapVision.length; i++){
-                    var rect = Engine.player.mapVision[i];
+                for(var i = 0; i < Engine.player.FoW.length; i++){
+                    var rect = Engine.player.FoW[i];
                     if(rect.contains(this.tileX,this.tileY)){
                         this.setVisible(true);
                         return;

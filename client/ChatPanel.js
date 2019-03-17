@@ -16,6 +16,7 @@ ChatPanel.prototype.addInterface = function(){
     var canvasy = UI.scene.game.canvas.offsetTop;
     this.input.style.left = (canvasx+this.x+10)+"px";
     this.input.style.top = (canvasy+this.y+20)+"px";
+    this.input.style.display = "none";
 };
 
 ChatPanel.prototype.handleInput = function(){

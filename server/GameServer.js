@@ -155,7 +155,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.positions = new SpaceMapList(); // positions occupied by moving entities and buildings
     GameServer.itemPositions = new SpaceMapList();
 
-    GameServer.fogOfWar = new SpaceMap();
+    GameServer.fogOfWar = {};
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
@@ -888,6 +888,7 @@ GameServer.build = function(player,bid,tile){
         building.embed();
         GameServer.buildingsChanged = true;
         player.listBuildings(); // update list of buildable buildings by player
+        GameServer.updateFoW();
     });
 };
 
@@ -1027,7 +1028,10 @@ GameServer.handleAOItransition = function(entity,previous){
     }
 
     if(entity.setFieldOfVision) entity.setFieldOfVision(AOIs);
-    if(entity.isPlayer) GameServer.updateVision();
+    if(entity.isPlayer) {
+        GameServer.updateVision();
+        GameServer.updateFoW();
+    }
     newAOIs.forEach(function(aoi){
         if(entity.isPlayer) entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
         GameServer.addObjectToAOI(aoi,entity);
@@ -1040,6 +1044,10 @@ GameServer.handleAOItransition = function(entity,previous){
     // (e.g. back and forth random path) because the update frequency is higher than the movement time
 };
 
+/*
+Vision = set of AOIs visible by all players; impact where animals can spawn
+Fog of War = set of AOIs where there is no FoW at the moment
+* */
 GameServer.updateVision = function(){
     GameServer.vision = new Set();
     for(var pid in GameServer.players){
@@ -1048,19 +1056,38 @@ GameServer.updateVision = function(){
            GameServer.vision.add(aoi);
         });
     }
+    // console.log('VISION:',GameServer.vision);
+};
+
+GameServer.updateFoW = function(){
+    for(var pid in GameServer.players){
+        var player = GameServer.players[pid];
+        player.fieldOfVision.forEach(function(aoi){
+            GameServer.fogOfWar[aoi] = Date.now();
+        });
+    }
     for(var bid in GameServer.buildings){
         var building = GameServer.buildings[bid];
         /*Utils.listAdjacentAOIs(building.aoi).forEach(function(aoi){
             GameServer.vision.add(aoi);
         });*/
-        GameServer.vision.add(building.aoi);
+        GameServer.fogOfWar[building.aoi] = Date.now();
     }
-    GameServer.visionChanged = true;
-    console.log('VISION:',GameServer.vision);
+    GameServer.fowChanged = true;
 };
 
-GameServer.getVision = function(){
-    return Array.from(GameServer.vision);
+GameServer.getFoW = function(){
+    var fow = [];
+    for(var aoi in GameServer.fogOfWar){
+        var t = GameServer.fogOfWar[aoi];
+        // TODO: conf
+        if(t - Date.now() > 60*1000){
+            delete GameServer.fogOfWar[aoi];
+            continue;
+        }
+        fow.push(aoi);
+    }
+    return fow;
 };
 
 GameServer.updateClients = function(){ //Function responsible for setting up and sending update packets to clients
@@ -1082,7 +1109,7 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         if(individualGlobalPkg === null
             && localPkg === null
             && !GameServer.nbConnectedChanged
-            && !GameServer.visionChanged){
+            && !GameServer.fowChanged){
                 return;
             }
 
@@ -1097,7 +1124,7 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         // console.log(finalPackage.local);
     });
     GameServer.nbConnectedChanged = false;
-    GameServer.visionChanged = false;
+    GameServer.fowChanged = false;
     GameServer.buildingsChanged  = false;
     GameServer.clearAOIs(); // erase the update content of all AOIs that had any
 };

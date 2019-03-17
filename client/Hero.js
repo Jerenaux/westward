@@ -25,6 +25,7 @@ var Hero = new Phaser.Class({
         this.settlement = data.settlement;
         this.buildingMarkers = data.buildingMarkers || [];
         this.resourceMarkers = data.resourceMarkers || [];
+        this.FoW = [];
         this.unread = 1;
         this.inventory = new Inventory();
         this.stats = new StatsContainer();
@@ -57,7 +58,7 @@ var Hero = new Phaser.Class({
             'notifs': this.handleNotifs,
             'resetTurn': BattleManager.resetTurn,
             'stats': this.updateStats,
-            'vision': this.updateVision
+            'fow': this.updateFoW
         };
 
         this.updateEvents = new Set();
@@ -270,12 +271,12 @@ var Hero = new Phaser.Class({
         }
     },
 
-    updateVision: function(aois){
+    updateFoW: function(aois){
         // var aois = [331,341,389,390,391,438,439,440,490];
-        this.mapVision = [];
+        this.FoW = [];
         aois.forEach(function(aoi){
             var origin = Utils.AOItoTile(aoi);
-            this.mapVision.push(new Phaser.Geom.Rectangle(origin.x,origin.y,World.chunkWidth,World.chunkHeight));
+            this.FoW.push(new Phaser.Geom.Rectangle(origin.x,origin.y,World.chunkWidth,World.chunkHeight));
         },this);
     }
 });
