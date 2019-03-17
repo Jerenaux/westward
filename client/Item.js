@@ -13,8 +13,8 @@ var Item = new Phaser.Class({
 
     setUp: function(data){
         var itemData = Engine.itemsData[data.type];
-        var atlas = 'tileset';
-        var frame = Utils.randomElement(itemData.envFrames);
+        var atlas = (itemData.envFrames ? 'tileset' : itemData.atlas);
+        var frame = (itemData.envFrames ? Utils.randomElement(itemData.envFrames) : itemData.frame);
         this.outFrame = frame;
         this.inFrame = frame+'_lit';
 

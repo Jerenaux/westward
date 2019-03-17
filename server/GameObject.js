@@ -61,6 +61,10 @@ GameObject.prototype.save = function(){
     var _document = this;
     this.schemaModel.findById(this.model._id, function (err, doc) {
         if (err) throw err;
+        if(doc === null){
+            console.warn('Cannot save game object');
+            return;
+        }
 
         doc.set(_document);
         doc.save(function (err) {

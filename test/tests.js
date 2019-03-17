@@ -47,6 +47,7 @@ describe('GameServer',function(){
         });
     });
 
+    var player;
     it('addNewPlayer',function(){
         var errInputs = [{},{new:true}];
         errInputs.forEach(function(input){
@@ -54,8 +55,36 @@ describe('GameServer',function(){
             expect(result).to.equal(null);
         });
 
-        var result = gs.addNewPlayer(null,{characterName:'Test'});
-        expect(result.name).to.equal('Test');
+        var name = 'Test';
+        player = gs.addNewPlayer(null,{characterName:name});
+        expect(player.name).to.equal(name);
+    });
+
+    var animal;
+    it('addAnimal', function(){
+        var x = 0;
+        var y = 0;
+        var type = 0;
+        animal = gs.addAnimal(x,y,type);
+        expect(animal.x).to.equal(x);
+        expect(animal.y).to.equal(y);
+        expect(animal.type).to.equal(type);
+    });
+
+    it('handleBattle',function(){
+        var result = gs.handleBattle(player,animal);
+        expect(result).to.equal(true);
+    });
+
+    it('animalDie',function(){
+       animal.die();
+        expect(animal.idle).to.equal(false);
+        expect(animal.dead).to.equal(true);
+    });
+
+    it('lootNPC',function(){
+        var result = gs.lootNPC(player,'animal',animal.id);
+        expect(result).to.equal(true);
     });
 
     afterEach(function(){

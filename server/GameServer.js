@@ -353,6 +353,7 @@ GameServer.addItem = function(x,y,type){
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
+    GameServer.addItem(1210,159,11);
 };
 
 /**
@@ -508,6 +509,7 @@ GameServer.addNewPlayer = function(socket,data){
 };
 
 GameServer.saveNewPlayerToDb = function(socket,player,document){
+    if(!socket) return;
     document.save(function (err,doc) {
         if (err) return console.error(err);
         console.log('New player created');
@@ -661,6 +663,7 @@ GameServer.lootNPC = function(player,type,ID){
     }
     GameServer.removeEntity(NPC); // TODO: handle differently, leave carcasses
     Prism.logEvent(player,'loot',{name:NPC.name});
+    return true; // return value for the unit tests
 };
 
 GameServer.pickUpItem = function(player,itemID){
