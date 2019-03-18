@@ -56,6 +56,7 @@ ShopInventoryPanel.prototype.hide = function(){
     this.slots.forEach(function(slot){
         slot.hide();
     })
+    this.slotsCounter = 0;
 };
 
 // -----------------------

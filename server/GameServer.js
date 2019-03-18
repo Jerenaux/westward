@@ -436,31 +436,39 @@ GameServer.updateEconomicEntities = function(entities){
     }
 };
 
-GameServer.getCommitmentDuration = function(){
-    return GameServer.economyTurns.commitment;
-};
-
+/**
+ * Check if enough turns have elapsed to trigger a specific update event. Called by the `update`
+ * methods of several entities who need to perform updates every x turns.
+ * @param {string} event - Name of the event to chec for, used to check the corresponding
+ * number of turns in `GameServer.economyTurns`.
+ * @returns {boolean} Whether or not enough turns have elapsed.
+ * */
+// TODO: deprecated? Remove?
 GameServer.isTimeToUpdate = function(event){
     return (GameServer.elapsedTurns%GameServer.economyTurns[event] == 0);
 };
 
+/**
+ * Check if a specific number of turns has elapsed. Called by the `updateProd`
+ * method of buildings.
+ * @param {number} nb - Name of turns to check for.
+ * @returns {boolean} Whether or not enough turns have elapsed.
+ * */
 GameServer.haveNbTurnsElapsed = function(nb){
     return (GameServer.elapsedTurns%nb == 0);
 };
 
+/**
+ * Fetch the Player object corresponding to a given socket ID. Called by all the
+ * methods who receive instructions from the client.
+ * @param {string} socketID - String id of the socket.
+ * @returns {Player} The Player object corresponding to the socket.
+ */
 GameServer.getPlayer = function(socketID){
     return GameServer.socketMap.hasOwnProperty(socketID) ? GameServer.players[GameServer.socketMap[socketID]] : null;
 };
 
-/*GameServer.checkSocketID = function(id){ // check if no other player is using same socket ID
-    return (GameServer.getPlayerID(id) === undefined);
-};
-
-GameServer.checkPlayerID = function(id){ // check if no other player is using same player ID
-    return (GameServer.players[id] === undefined);
-};*/
-
-
+// Used for testing, will be removed at some point
 GameServer.dummyPlayer = function(x,y) {
     var player = new Player();
     player.setSettlement(0);
@@ -485,9 +493,13 @@ GameServer.testMethodA = function(a){
     //return GameServer.testMethodB(a);
 };
 
+/**
+ * Add a new player to the game.
+ * @param {Socket} socket - The socket of the connection to the client creating the new player.
+ * @param {Object} data - Object containing the data sent by the client (e.g. name, region ...)
+ * @returns {Player} The creatd Player object.
+ */
 GameServer.addNewPlayer = function(socket,data){
-    //if(data.selectedClass == undefined) data.selectedClass = 1;
-
     if(!data.characterName){
         GameServer.server.sendError(socket); // TODO: make a dict of errors somewhere
         return null;
@@ -508,6 +520,12 @@ GameServer.addNewPlayer = function(socket,data){
     return player;
 };
 
+/**
+ * Save a newly created Player object to the database.
+ * @param {Socket} socket - The socket of the connection to the client creating the new player.
+ * @param {Player} player - The associated Player object.
+ * @param document - The mongoose document representing the player to save.
+ */
 GameServer.saveNewPlayerToDb = function(socket,player,document){
     if(!socket) return;
     document.save(function (err,doc) {
@@ -520,6 +538,12 @@ GameServer.saveNewPlayerToDb = function(socket,player,document){
     });
 };
 
+/**
+ * Fetch from the database the Player object of a returning user.
+ * @param {Socket} socket - The socket of the connection to the client.
+ * @param {string} id - The mongoDB id stored on the client side, sent by the client to
+ * fetch the right document from the database.
+ */
 GameServer.loadPlayer = function(socket,id){
     console.log('Loading player',id);
     GameServer.PlayerModel.findOne(
@@ -541,6 +565,13 @@ GameServer.loadPlayer = function(socket,id){
     );
 };
 
+/**
+ * After creating a new player or loading an existing one, insert it
+ * in the game world by updating all necessary data structures and fields
+ * and send the initialization update packet to the client.
+ * @param {Socket} socket - The socket of the connection to the client.
+ * @param {Player} player - The created/retrieved Player object.
+ */
 GameServer.finalizePlayer = function(socket,player){
     GameServer.players[player.id] = player;
     GameServer.socketMap[socket.id] = player.id;
@@ -552,6 +583,14 @@ GameServer.finalizePlayer = function(socket,player){
     Prism.logEvent(player,'connect',{stl:player.sid});
 };
 
+/**
+ * Create the initialization packet to send to a player when he starts
+ * the game. This contains basic information to get the game started,
+ * mostly about the player character itself (see `Player.initTrim()` for
+ * more details.
+ * @param {number} playerID - The numeric id of the player.
+ * @returns {Object} An update object containing initialization information.
+ */
 GameServer.createInitializationPacket = function(playerID){
     // Create the packet that the client will receive from the server in order to initialize the game
     return {
