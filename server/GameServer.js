@@ -207,6 +207,15 @@ GameServer.readPlayersData = function(){
             data.inventory.forEach(function(itm){
                 GameServer.createItem(itm[0],itm[1]);
             });
+            for(var label in data.equipment.slots){
+                if(data.equipment.slots[label] > -1) GameServer.createItem(data.equipment.slots[label],1);
+            }
+            for(var label in data.equipment.containers){
+                if(data.equipment.containers[label] > -1) GameServer.createItem(data.equipment.containers[label],1);
+            }
+            for(var label in data.equipment.ammo){
+                if(data.equipment.ammo[label].id > -1) GameServer.createItem(data.equipment.ammo[label].id,data.equipment.ammo[label].nb);
+            }
         });
         console.log('Last player ID:',GameServer.lastPlayerID);
         GameServer.updateStatus();

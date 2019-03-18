@@ -16,7 +16,7 @@ function PricesPanel(x,y,width,height,title){
     this.input.style.width = w+'px';
     this.input.style.left = (center-(w/2))+'px';
     this.input.style.top = (this.y+100)+'px';
-    this.input.style.background = 'red';
+    // this.input.style.background = 'red';
     this.input.style.display = "none";
 
     this.input.onkeyup = function(){
@@ -48,14 +48,15 @@ PricesPanel.prototype.getNextSlot = function(x,y){
 PricesPanel.prototype.refreshContent = function(hits){
     console.log(hits);
     hits.forEach(function(item,i){
-        var slot = this.getNextSlot(this.x+20,this.starty+(i*90));
+        var slot = this.getNextSlot(this.x+20,this.y+200+(i*90));
         slot.setUp(item);
+        slot.moveUp(4);
         slot.display();
     },this);
 };
 
 PricesPanel.prototype.display = function(){
-    // Panel.prototype.display.call(this);
+    Panel.prototype.display.call(this);
     this.input.style.display = "inline";
     this.input.focus();
 };
@@ -95,7 +96,7 @@ function PriceSlot(x,y,width,height){
     this.content = [this.icon];
     this.content.forEach(function(c){
         c.setScrollFactor(0);
-        c.setDepth(100);
+        c.setDepth(1);
     });
 }
 
@@ -104,7 +105,7 @@ PriceSlot.prototype.constructor = PriceSlot;
 
 PriceSlot.prototype.setUp = function(item){
     var itemData = Engine.itemsData[item];
-    console.log(itemData);
+    // console.log(itemData);
     this.icon.setTexture(itemData.atlas,itemData.frame);
     // this.name.setText(itemData.name);
     // this.nb.setText(nb);

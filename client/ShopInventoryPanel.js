@@ -126,7 +126,6 @@ ShopSlot.prototype.setUp = function(action,item,nb){
         2: 'Common',
         3: 'Very common'
     };
-    console.warn(item,Engine.rarity[item]);
     this.rarity.setText(rarityMap[Engine.rarity[item]]);
     this.rarity.setFill((Engine.rarity[item] <= 1 ? Utils.colors.gold : Utils.colors.white));
 
@@ -144,7 +143,6 @@ ShopSlot.prototype.setUp = function(action,item,nb){
             this.effect.setText(stattext);
 
             var equipped = Engine.player.getEquipped(itemData.equipment);
-            console.log(equipped);
             if(equipped > 0) {
                 var current = Engine.itemsData[equipped].effects[stat];
                 if(current > effect){
