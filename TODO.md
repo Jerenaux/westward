@@ -39,6 +39,7 @@ Misc:
 - Identify own buildings (on map and in-game)
 - Show countdowns in production panel + set up notifications!
 - Reduce amount of orientation pins
+- Add equipment check for rarity
 New movement system
 Check building limits are enforced
 Make sure owneship is enforced (remove isFinancial = false in gs.handleShop)
