@@ -12,14 +12,22 @@ ShopInventoryPanel.prototype.constructor = ShopInventoryPanel;
 
 ShopInventoryPanel.prototype.setInventory = function(inventory){
     this.inventory = inventory;
+    this.starty = this.y+20;
+
+    if(this.inventory == 'building'){
+        this.pricesBtn = new BigButton(this.x+70,this.starty+15,'Set prices',function(){
+            Engine.currentMenu.panels['prices'].display();
+        });
+        this.starty += 35;
+    }
 };
 
 ShopInventoryPanel.prototype.listItems = function(){
     var items = [];
     if(this.inventory == 'player'){
-        items = Engine.player.inventory.toList();
+        items = Engine.player.inventory.toList(true); // true = filter out zeroes
     }else{
-        items = Engine.currentBuiling.inventory.toList();
+        items = Engine.currentBuiling.inventory.toList(true);
     }
     items.sort(function(a,b){
         if(Engine.itemsData[a[0]].name < Engine.itemsData[b[0]].name) return -1;
@@ -36,11 +44,16 @@ ShopInventoryPanel.prototype.getNextSlot = function(x,y){
     return this.slots[this.slotsCounter++];
 };
 
+ShopInventoryPanel.prototype.updateContent = function(){
+    this.hideContent();
+    this.refreshContent();
+};
+
 ShopInventoryPanel.prototype.refreshContent = function(){
     this.listItems().forEach(function(item,i){
-        var slot = this.getNextSlot(this.x+20,this.y+20+(i*90));
-        // slot.setPosition();
-        slot.setUp(item[0],item[1]);
+        var slot = this.getNextSlot(this.x+20,this.starty+(i*90));
+        var action = (this.inventory == 'player' ? 'sell' : 'buy');
+        slot.setUp(action,item[0],item[1]);
         slot.display();
     },this);
 };
@@ -48,14 +61,20 @@ ShopInventoryPanel.prototype.refreshContent = function(){
 ShopInventoryPanel.prototype.display = function(){
     if(this.displayed) return;
     Panel.prototype.display.call(this);
+    if(this.pricesBtn) this.pricesBtn.display();
     this.refreshContent();
 };
 
 ShopInventoryPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
+    if(this.pricesBtn) this.pricesBtn.hide();
+    this.hideContent();
+};
+
+ShopInventoryPanel.prototype.hideContent = function(){
     this.slots.forEach(function(slot){
         slot.hide();
-    })
+    });
     this.slotsCounter = 0;
 };
 
@@ -71,9 +90,22 @@ function ShopSlot(x,y,width,height){
     this.name = UI.scene.add.text(this.x + 60, this.y + 10, '', { font: '16px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     this.nb = UI.scene.add.text(this.x + 24, this.y + height - 22, '999', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     this.effect = UI.scene.add.text(this.x + 88, this.y + 35, '', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.rarity = UI.scene.add.text(this.x + 60, this.y + 60, '', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
 
-    var content = [this.icon, this.bagicon, this.name, this.nb];
-    content.forEach(function(c){
+    this.zone = UI.scene.add.zone(this.x,this.y,width,height);
+    // this.zone.setDepth(10);
+    this.zone.setInteractive();
+    this.zone.setOrigin(0);
+    this.zone.on('pointerover',function(){
+        UI.setCursor('item');
+    });
+    this.zone.on('pointerout',function(){
+        UI.setCursor();
+    });
+
+    this.content = [this.icon, this.bagicon, this.staticon, this.name, this.nb, this.effect, this.rarity,
+    this.zone];
+    this.content.forEach(function(c){
         c.setScrollFactor(0);
         c.setDepth(1);
     });
@@ -82,13 +114,27 @@ function ShopSlot(x,y,width,height){
 ShopSlot.prototype = Object.create(Frame.prototype);
 ShopSlot.prototype.constructor = ShopSlot;
 
-ShopSlot.prototype.setUp = function(item,nb){
+ShopSlot.prototype.setUp = function(action,item,nb){
     var itemData = Engine.itemsData[item];
     this.icon.setTexture(itemData.atlas,itemData.frame);
     this.name.setText(itemData.name);
     this.nb.setText(nb);
 
+    var rarityMap = {
+        0: 'Unique',
+        1: 'Rare',
+        2: 'Common',
+        3: 'Very common'
+    };
+    this.rarity.setText(rarityMap[Engine.rarity[item]]);
+    this.rarity.setFill((Engine.rarity[item] <= 1 ? Utils.colors.gold : Utils.colors.white));
+
+    this.zone.on('pointerup',function(){
+        Engine.currentMenu.panels['action'].setUp(item,action);
+    });
+
     if(itemData.hasOwnProperty('effects')) {
+        this.hasEffect = true;
         for (var stat in itemData.effects) {
             this.staticon.setFrame(Stats[stat].frame);
             var effect = itemData.effects[stat];
@@ -112,21 +158,24 @@ ShopSlot.prototype.setUp = function(item,nb){
             }
         }
     }else{
-        this.staticon.setVisible(false);
-        this.effect.setVisible(false);
+        this.hasEffect = false;
     }
 };
 
 ShopSlot.prototype.display = function(){
     Frame.prototype.display.call(this);
+    this.content.forEach(function(c){
+        c.setVisible(true);
+    });
+    if(!this.hasEffect) {
+        this.staticon.setVisible(false);
+        this.effect.setVisible(false);
+    }
 };
 
 ShopSlot.prototype.hide = function(){
     Frame.prototype.hide.call(this);
-    this.icon.setVisible(false);
-    this.name.setVisible(false);
-    this.nb.setVisible(false);
-    this.bagicon.setVisible(false);
-    this.staticon.setVisible(false);
-    this.effect.setVisible(false);
+    this.content.forEach(function(c){
+        c.setVisible(false);
+    });
 };

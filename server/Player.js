@@ -513,6 +513,7 @@ Player.prototype.initTrim = function(){
     trimmed.buildingMarkers = GameServer.listBuildingMarkers();
     trimmed.resourceMarkers = GameServer.resourceMarkers;
     trimmed.fow = GameServer.getFoW();
+    trimmed.rarity = GameServer.getRarity();
     return trimmed;
 };
 

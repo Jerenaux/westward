@@ -38,6 +38,8 @@ var Hero = new Phaser.Class({
         this.classlvl = data.classlvl || new classDataShell();
         this.ap = data.ap || new classDataShell();
         this.name = data.name;
+
+        this.updateRarity(data.rarity);
     },
 
     updateData: function(data){ // don't call this 'update' or else conflict with Player.update() for other player updates
@@ -51,14 +53,14 @@ var Hero = new Phaser.Class({
             'dead': this.handleDeath,
             'equipment': this.updateEquipment,
             'foodSurplus': this.updateFoodSurplus,
+            'fow': this.updateFoW,
             'gold': this.updateGold,
             'items': this.updateInventory,
             'buildingMarkers': this.updateMarkers,
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
             'resetTurn': BattleManager.resetTurn,
-            'stats': this.updateStats,
-            'fow': this.updateFoW
+            'stats': this.updateStats
         };
 
         this.updateEvents = new Set();
@@ -223,6 +225,15 @@ var Hero = new Phaser.Class({
         this.updateEvents.add('character');
     },
 
+    updateFoW: function(aois){
+        // var aois = [331,341,389,390,391,438,439,440,490];
+        this.FoW = [];
+        aois.forEach(function(aoi){
+            var origin = Utils.AOItoTile(aoi);
+            this.FoW.push(new Phaser.Geom.Rectangle(origin.x,origin.y,World.chunkWidth,World.chunkHeight));
+        },this);
+    },
+
     updateGold: function(gold){
         this.gold = gold;
         this.updateEvents.add('gold');
@@ -244,6 +255,13 @@ var Hero = new Phaser.Class({
     updateMarkers: function(markers){
         this.buildingMarkers = markers;
         if(Engine.miniMap) Engine.miniMap.map.updatePins();
+    },
+
+    updateRarity: function(rarity){
+        Engine.rarity = {};
+        rarity.forEach(function(itm){
+            Engine.rarity[itm[0]] = itm[1];
+        });
     },
 
     updateStats: function(stats){
@@ -269,14 +287,5 @@ var Hero = new Phaser.Class({
                 statObj.absoluteModifiers.push(m);
             })
         }
-    },
-
-    updateFoW: function(aois){
-        // var aois = [331,341,389,390,391,438,439,440,490];
-        this.FoW = [];
-        aois.forEach(function(aoi){
-            var origin = Utils.AOItoTile(aoi);
-            this.FoW.push(new Phaser.Geom.Rectangle(origin.x,origin.y,World.chunkWidth,World.chunkHeight));
-        },this);
     }
 });

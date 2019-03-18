@@ -1477,13 +1477,13 @@ Engine.makeTradeMenu = function(){
     var h = 480;
     var space = 15;
     var center = Engine.getGameConfig().width/2;
-    var client = trade.addPanel('client',new ShopInventoryPanel(center-w-space,y,w,h,'Sell'));
+    var client = trade.addPanel('client',new ShopInventoryPanel(center-w-space,y,w,h,'You'));
     client.setInventory('player');
     // client.setInventory(Engine.player.inventory,7,true,Engine.sellClick);
     // client.filterItems = true;
-    client.addCapsule('gold',150,-9,'999','gold');
+    client.addCapsule('gold',120,-9,'999','gold');
     client.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['sell_help']);
-    var shop =  trade.addPanel('shop',new ShopInventoryPanel(center+space,y,w,h,'Buy'));
+    var shop =  trade.addPanel('shop',new ShopInventoryPanel(center+space,y,w,h,'Shop'));
     shop.setInventory('building');
     // shop.setInventory(new Inventory(20),7,true,Engine.buyClick);
     // shop.filterItems = true;
@@ -1491,26 +1491,29 @@ Engine.makeTradeMenu = function(){
     shop.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help']);
     w = 300;
     var x = (Engine.getGameConfig().width-w)/2;
-    // var action = new ShopPanel(x,420,w,100,'Buy/Sell');
-    // trade.addPanel('action',action);
-    var prices = trade.addPanel('prics',new PricesPanel(670,420,200,100,'Set prices'),true);
+    var action = new ShopPanel(x,420,w,100,'Buy/Sell');
+    trade.addPanel('action',action);
+    var pricesw = (w*2)+space;
+    var prices = trade.addPanel('prices',new PricesPanel(center-w-space,y,pricesw,h,'Prices'),true);
+    prices.addButton(pricesw-16,-8,'red','close',prices.hide.bind(prices),'Close');
+    prices.moveUp(4);
 
     trade.addEvent('onUpdateInventory',function(){
-        // client.updateInventory();
-        // action.update();
+        client.updateContent();
+        action.update();
     });
     trade.addEvent('onUpdateShop',function(){
-        // shop.updateInventory();
-        // action.update();
+        shop.updateContent();
+        action.update();
     });
     trade.addEvent('onUpdateGold',function(){
         client.updateCapsule('gold',Engine.player.gold);
         Engine.scene.sound.add('sellbuy').play();
-        // action.update();
+        action.update();
     });
     trade.addEvent('onUpdateShopGold',function(){
         shop.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
-        // action.update();
+        action.update();
     });
     return trade;
 };

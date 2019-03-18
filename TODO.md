@@ -41,6 +41,7 @@ Misc:
 - Reduce amount of orientation pins
 New movement system
 Check building limits are enforced
+Make sure owneship is enforced (remove isFinancial = false in gs.handleShop)
 
 
 

@@ -16,7 +16,7 @@ var Item = new Phaser.Class({
         var atlas = (itemData.envFrames ? 'tileset' : itemData.atlas);
         var frame = (itemData.envFrames ? Utils.randomElement(itemData.envFrames) : itemData.frame);
         this.outFrame = frame;
-        this.inFrame = frame+'_lit';
+        this.inFrame = (itemData.envFrames ? frame+'_lit' : frame);
 
         this.setTexture(atlas);
         this.setFrame(frame);

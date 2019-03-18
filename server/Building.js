@@ -60,6 +60,11 @@ function Building(data){
     if(!this.civBuilding) this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(GameServer.buildingParameters.inventorySize);
     if(data.inventory) this.inventory.fromList(data.inventory);
+
+    this.inventory.toList().forEach(function(itm){
+        GameServer.createItem(itm[0],itm[1]);
+    });
+
     this.prices = data.prices || {};
     this.setGold(data.gold || 0);
     this.built = !!data.built;
