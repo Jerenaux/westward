@@ -43,7 +43,7 @@ Shop UI:
 - Test and fix prices form position
 - Add help to new UI
 - pagination
-- Give/take gold
+- Add item slot frames
 - Default prices
 - Make sure owneship is enforced (remove isFinancial = false in gs.handleShop; 
 uncomment line in setBldPrics and handleGold)

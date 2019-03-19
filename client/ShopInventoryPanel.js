@@ -34,6 +34,13 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
 
         this.starty += 35;
     }
+
+    this.pagetxts = this.addPolyText((this.width/2)-50,this.starty-this.y+5,['Page','1','/','10']);
+    this.pagetxts[1].setText(1);
+    // this.pagetxts[1].setOrigin(1,0);
+    this.pagetxts.forEach(function(t){
+       t.setVisible(false);
+    });
 };
 
 ShopInventoryPanel.prototype.listItems = function(){
@@ -63,8 +70,19 @@ ShopInventoryPanel.prototype.updateContent = function(){
     this.refreshContent();
 };
 
+ShopInventoryPanel.prototype.showPagination = function(nb){
+    this.nbpages = Math.ceil(nb/4);
+    this.pagetxts[3].setText(this.nbpages);
+    this.pagetxts.forEach(function(t){
+        t.setVisible(true);
+    });
+    this.starty += 35;
+};
+
 ShopInventoryPanel.prototype.refreshContent = function(){
-    this.listItems().forEach(function(item,i){
+    var items = this.listItems();
+    if(items.length > 4) this.showPagination(items.length);
+    items.forEach(function(item,i){
         var slot = this.getNextSlot(this.x+20,this.starty+(i*90));
         var action = (this.inventory == 'player' ? 'sell' : 'buy');
         slot.setUp(action,item[0],item[1]);
@@ -98,6 +116,9 @@ ShopInventoryPanel.prototype.hideContent = function(){
         slot.hide();
     });
     this.slotsCounter = 0;
+    this.pagetxts.forEach(function(t){
+        t.setVisible(false);
+    });
 };
 
 // -----------------------
@@ -130,7 +151,7 @@ function ShopSlot(x,y,width,height){
     });
 
     this.content = [this.icon, this.bagicon, this.staticon, this.name, this.nb, this.effect, this.rarity,
-    this.zone, this.goldicon];
+    this.zone, this.goldicon, this.price];
     this.content.forEach(function(c){
         c.setScrollFactor(0);
         c.setDepth(1);

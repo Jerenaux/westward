@@ -555,6 +555,10 @@
     {
       "filename": "positionCross",
       "frame": {"x":484,"y":448,"w":10,"h":13}
+    },
+    {
+      "filename": "nextpage",
+      "frame": {"x":17,"y":622,"w":31,"h":14}
     }
   ]
 }

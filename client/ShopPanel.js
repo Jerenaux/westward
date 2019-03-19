@@ -164,6 +164,8 @@ ShopPanel.prototype.manageButtons = function(){
     var okBtn = this.buttons[0].btn;
     var plusBtn = this.buttons[1].btn;
     var minusBtn = this.buttons[2].btn;
+    var closeBtn = this.buttons[3].btn;
+    closeBtn.enable();
 
     if(this.shopItem.count <= 1){
         minusBtn.disable();
@@ -314,6 +316,8 @@ ShopGoldPanel.prototype.update = function(){
 
 ShopGoldPanel.prototype.manageButtons = function(){
     var okBtn = this.buttons[0].btn;
+    var closeBtn = this.buttons[1].btn;
+    closeBtn.enable();
 
     var value = this.input.value;
     if(value < 0) okBtn.disable();

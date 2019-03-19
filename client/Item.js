@@ -25,7 +25,7 @@ var Item = new Phaser.Class({
 
         this.setTilePosition(data.x,data.y,true);
         // this.setOrigin(0.5);
-        this.setDepth(this.tileY+1); // for e.g. when wood spawns on the roots of a tree
+        this.setDepth(this.tileY+1.5); // for e.g. when wood spawns on the roots of a tree
 
         if(itemData.collides) {
             this.collides = true;

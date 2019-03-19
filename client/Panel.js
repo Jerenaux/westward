@@ -77,9 +77,11 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
 };
 
 Panel.prototype.addPolyText = function(x,y,texts,colors,size){
-    if(texts.length != colors.length) return;
+    if(!colors) colors = [];
+    if(colors.length && texts.length != colors.length) return;
     var txts = [];
     for(var i = 0; i < texts.length; i++){
+        var color = (i < colors.length ? colors[i] : Utils.colors.white);
         var t = this.addText(x,y,texts[i],colors[i],size); // addText() pushed to this.texts
         x += t.width;
         txts.push(t);

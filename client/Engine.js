@@ -1492,9 +1492,11 @@ Engine.makeTradeMenu = function(){
     w = 300;
     var x = (Engine.getGameConfig().width-w)/2;
     var action = trade.addPanel('action',new ShopPanel(x,420,w,100,'Buy/Sell'),true);
-    action.moveUp(1);
+    action.addButton(w-16,-8,'red','close',action.hide.bind(action),'Close');
+    action.moveUp(2);
     var goldaction = trade.addPanel('goldaction',new ShopGoldPanel(x,420,w,100,'Buy/Sell'),true);
-    goldaction.moveUp(1);
+    goldaction.addButton(w-16,-8,'red','close',goldaction.hide.bind(goldaction),'Close');
+    goldaction.moveUp(2);
     var pricesw = (w*2)+space;
     var prices = trade.addPanel('prices',new PricesPanel(center-w-space,y,pricesw,h,'Prices'),true);
     prices.addButton(pricesw-16,-8,'red','close',prices.hide.bind(prices),'Close');
