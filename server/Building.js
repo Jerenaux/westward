@@ -242,8 +242,7 @@ Building.prototype.updateBuildings = function(){
 };
 
 Building.prototype.getPrice = function(item,nb,action){
-    var key = (action == 'sell' ? 0 : 1);
-    return parseInt(this.prices[item][key])*nb;
+    return parseInt(this.prices[item][action])*nb;
 };
 
 Building.prototype.canBuy = function(item,nb,isFinancial){ // check if building has gold and room
@@ -252,7 +251,7 @@ Building.prototype.canBuy = function(item,nb,isFinancial){ // check if building 
         return false;
     }
     if(isFinancial == false) return true;
-    if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item][0]) == 0){
+    if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item].buy) == 0){
         console.log('Error: building does not buy this item');
         return false;
     }
@@ -269,7 +268,7 @@ Building.prototype.canSell = function(item,nb,isFinancial){
         return false;
     }
     if(!isFinancial) return true;
-    if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item][1]) == 0){
+    if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item].sell) == 0){
         console.log('Error: building does not sell this item');
         return false;
     }
@@ -308,7 +307,8 @@ Building.prototype.setItem = function(item,nb){
 };
 
 Building.prototype.setPrices = function(item,buy,sell){
-    this.prices[item] = [parseInt(buy),parseInt(sell)];
+    this.prices[item] = {buy:parseInt(buy),sell:parseInt(sell)};
+    this.setProperty('prices',this.prices);
 };
 
 Building.prototype.getGold = function(){

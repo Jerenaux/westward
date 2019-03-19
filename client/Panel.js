@@ -102,6 +102,21 @@ Panel.prototype.addText = function(x,y,text,color,size,font){
     return t;
 };
 
+Panel.prototype.addInput = function(width,x,y){
+    var input = document.createElement("input");
+    input.className = 'game_input';
+    input.type = "text";
+    input.style.width = width+'px';
+    x = UI.scene.game.canvas.offsetLeft+this.x+x;
+    y = UI.scene.game.canvas.offsetTop+this.y+y;
+    input.style.left = x+'px';
+    input.style.top = y+'px';
+    input.style.background = 'rgba(0,0,0,0.5)';
+    input.style.display = "none";
+    document.getElementById('game').appendChild(input);
+    return input;
+};
+
 Panel.prototype.makeScrollable = function(){
     if(this.scrollable) return;
     this.scrollable = true;
@@ -244,6 +259,15 @@ Panel.prototype.hide = function(){
     if(this.scrollable) this.scroll(-this.scrolled);
     if(this.button) this.button.hide(); // big button
     Engine.inPanel = false;
+};
+
+Panel.prototype.hideButtons = function(){
+    this.buttons.forEach(function(b){
+        b.btn.setVisible(false);
+        b.symbol.setVisible(false);
+        b.ring.setVisible(false);
+        b.zone.setVisible(false);
+    });
 };
 
 function Capsule(x,y,iconAtlas,iconFrame,container){

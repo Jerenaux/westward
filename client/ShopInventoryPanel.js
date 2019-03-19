@@ -17,6 +17,7 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
     if(this.inventory == 'building'){
         this.pricesBtn = new BigButton(this.x+70,this.starty+15,'Set prices',function(){
             Engine.currentMenu.panels['prices'].display();
+            Engine.currentMenu.panels['action'].hide();
         });
         this.starty += 35;
     }
@@ -85,26 +86,30 @@ function ShopSlot(x,y,width,height){
 
     this.icon = UI.scene.add.sprite(this.x + 30, this.y + height/2);
     this.bagicon = UI.scene.add.sprite(this.x + 14, this.y + height - 12, 'UI','smallpack');
+    this.goldicon = UI.scene.add.sprite(this.x + width - 12, this.y + 14, 'UI','gold');
     this.staticon = UI.scene.add.sprite(this.x + 70, this.y + 45, 'icons2');
 
     this.name = UI.scene.add.text(this.x + 60, this.y + 10, '', { font: '16px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     this.nb = UI.scene.add.text(this.x + 24, this.y + height - 22, '999', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     this.effect = UI.scene.add.text(this.x + 88, this.y + 35, '', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     this.rarity = UI.scene.add.text(this.x + 60, this.y + 60, '', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.price = UI.scene.add.text(this.x + width - 22, this.y + 6, '', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.price.setOrigin(1,0);
 
     this.zone = UI.scene.add.zone(this.x,this.y,width,height);
-    // this.zone.setDepth(10);
     this.zone.setInteractive();
     this.zone.setOrigin(0);
     this.zone.on('pointerover',function(){
+        if(Engine.currentMenu.panels['prices'].displayed) return;
         UI.setCursor('item');
     });
     this.zone.on('pointerout',function(){
+        if(Engine.currentMenu.panels['prices'].displayed) return;
         UI.setCursor();
     });
 
     this.content = [this.icon, this.bagicon, this.staticon, this.name, this.nb, this.effect, this.rarity,
-    this.zone];
+    this.zone, this.goldicon];
     this.content.forEach(function(c){
         c.setScrollFactor(0);
         c.setDepth(1);
@@ -129,7 +134,18 @@ ShopSlot.prototype.setUp = function(action,item,nb){
     this.rarity.setText(rarityMap[Engine.rarity[item]]);
     this.rarity.setFill((Engine.rarity[item] <= 1 ? Utils.colors.gold : Utils.colors.white));
 
+    var priceaction = (action == 'buy' ? 'sell' : 'buy');
+    var price = Engine.currentBuiling.getPrice(item,priceaction);
+    this.price.setText(price);
+    if(action == 'sell'){
+        this.price.setFill((price > Engine.currentBuiling.gold ? Utils.colors.red : Utils.colors.white));
+    }else{
+        this.price.setFill((price > Engine.player.gold ? Utils.colors.red : Utils.colors.white));
+    }
+
     this.zone.on('pointerup',function(){
+        if(Engine.currentMenu.panels['prices'].displayed) return;
+        Engine.currentMenu.panels['action'].display();
         Engine.currentMenu.panels['action'].setUp(item,action);
     });
 

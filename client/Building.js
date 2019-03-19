@@ -267,9 +267,8 @@ var Building = new Phaser.Class({
     },
 
     getPrice: function (id, action) {
-        var key = (action == 'sell' ? 0 : 1);
         if(!(id in this.prices)) return 0;
-        return this.prices[id][key];
+        return this.prices[id][action];
     },
 
     getItemNb: function (item) {

@@ -154,7 +154,10 @@ ShopPanel.prototype.isAtMax = function(){
 };
 
 ShopPanel.prototype.getPrice = function(id){
-    return Engine.currentBuiling.getPrice(id,this.shopItem.action);
+    // Need to reverse the action, since prices are from point of view of shop
+    var action = 'buy';
+    if(this.shopItem.action == 'buy') action = 'sell';
+    return Engine.currentBuiling.getPrice(id,action);
 };
 
 ShopPanel.prototype.manageButtons = function(){

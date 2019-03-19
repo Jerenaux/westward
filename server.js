@@ -153,6 +153,7 @@ io.on('connection',function(socket){
             'exit': gs.handleExit,
             'menu': gs.logMenu,
             'NPCClick': gs.handleNPCClick,
+            'prices': gs.setBuildingPrice,
             'path': gs.handlePath,
             'respawn': gs.handleRespawn,
             'screenshot': gs.handleScreenshot,

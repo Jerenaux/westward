@@ -1491,7 +1491,7 @@ Engine.makeTradeMenu = function(){
     shop.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help']);
     w = 300;
     var x = (Engine.getGameConfig().width-w)/2;
-    var action = trade.addPanel('action',new ShopPanel(x,420,w,100,'Buy/Sell'));
+    var action = trade.addPanel('action',new ShopPanel(x,420,w,100,'Buy/Sell'),true);
     action.moveUp(1);
     var pricesw = (w*2)+space;
     var prices = trade.addPanel('prices',new PricesPanel(center-w-space,y,pricesw,h,'Prices'),true);

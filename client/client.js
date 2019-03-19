@@ -194,8 +194,8 @@ Client.sendBuild = function(id,tile){
     Client.socket.emit('build',{id:id,tile:tile});
 };
 
-Client.sendCommit = function(){
-    Client.socket.emit('commit');
+Client.setPrices = function(id,buy,sell){
+    Client.socket.emit('prices',{item:id,buy:buy,sell:sell});
 };
 
 Client.sendChat = function(text){

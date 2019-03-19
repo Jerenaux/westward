@@ -39,10 +39,16 @@ Misc:
 - Identify own buildings (on map and in-game)
 - Show countdowns in production panel + set up notifications!
 - Reduce amount of orientation pins
-- Add equipment check for rarity
+Shop UI:
+- Test and fix prices form position
+- Add help to new UI
+- -- when price == 0
+- pagination
+- Give/take gold
+- Make sure owneship is enforced (remove isFinancial = false in gs.handleShop; uncomment line in setBldPrics)
+- Test
 New movement system
 Check building limits are enforced
-Make sure owneship is enforced (remove isFinancial = false in gs.handleShop)
 
 
 

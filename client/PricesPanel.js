@@ -10,13 +10,16 @@ function PricesPanel(x,y,width,height,title){
     var center = Engine.getGameConfig().width/2;
     var w = 200;
 
+    this.title = this.addText(width/2,70,'Enter item name:');
+    this.title.setOrigin(0.5);
+
     this.input = document.createElement("input");
     this.input.className = 'game_input';
     this.input.type = "text";
     this.input.style.width = w+'px';
     this.input.style.left = (center-(w/2))+'px';
     this.input.style.top = (this.y+100)+'px';
-    // this.input.style.background = 'red';
+    this.input.style.background = 'rgba(0,0,0,0.5)';
     this.input.style.display = "none";
 
     this.input.onkeyup = function(){
@@ -37,33 +40,45 @@ function PricesPanel(x,y,width,height,title){
 PricesPanel.prototype = Object.create(Panel.prototype);
 PricesPanel.prototype.constructor = PricesPanel;
 
-PricesPanel.prototype.getNextSlot = function(x,y){
+PricesPanel.prototype.getNextSlot = function(y){
+    var w = 250;
+    var x = 1024/2 - w/2;
     if(this.slotsCounter >= this.slots.length){
-        this.slots.push(new PriceSlot(x,y,500,80));
+        this.slots.push(new PriceSlot(x,y,w,90));
     }
 
     return this.slots[this.slotsCounter++];
 };
 
 PricesPanel.prototype.refreshContent = function(hits){
-    console.log(hits);
+    this.hideContent();
     hits.forEach(function(item,i){
-        var slot = this.getNextSlot(this.x+20,this.y+200+(i*90));
+        var slot = this.getNextSlot(this.y+150+(i*100));
         slot.setUp(item);
-        slot.moveUp(4);
+        slot.moveUp(6);
         slot.display();
     },this);
 };
 
 PricesPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
+    this.displayTexts();
     this.input.style.display = "inline";
     this.input.focus();
 };
 
 PricesPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
+    this.input.value = '';
     this.input.style.display = "none";
+    this.hideContent();
+};
+
+
+PricesPanel.prototype.hideContent = function(){
+    this.slots.forEach(function(slot){
+        slot.hide();
+    });
     this.slotsCounter = 0;
 };
 
@@ -71,56 +86,56 @@ PricesPanel.prototype.hide = function(){
 // -----------------------
 
 function PriceSlot(x,y,width,height){
-    Frame.call(this,x,y,width,height);
+    Panel.call(this,x,y,width,height);
 
     this.icon = UI.scene.add.sprite(this.x + 30, this.y + height/2);
-    /*this.bagicon = UI.scene.add.sprite(this.x + 14, this.y + height - 12, 'UI','smallpack');
-    this.staticon = UI.scene.add.sprite(this.x + 70, this.y + 45, 'icons2');
-
     this.name = UI.scene.add.text(this.x + 60, this.y + 10, '', { font: '16px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.nb = UI.scene.add.text(this.x + 24, this.y + height - 22, '999', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.effect = UI.scene.add.text(this.x + 88, this.y + 35, '', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.rarity = UI.scene.add.text(this.x + 60, this.y + 60, '', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.buyText = UI.scene.add.text(this.x + 60, this.y + 40, 'Buy for:', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.sellText = UI.scene.add.text(this.x + 60, this.y + 65, 'Sell for:', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
 
-    this.zone = UI.scene.add.zone(this.x,this.y,width,height);
-    // this.zone.setDepth(10);
-    this.zone.setInteractive();
-    this.zone.setOrigin(0);
-    this.zone.on('pointerover',function(){
-        UI.setCursor('item');
-    });
-    this.zone.on('pointerout',function(){
-        UI.setCursor();
-    });*/
+    this.buy = this.addInput(50,120,41);
+    this.sell = this.addInput(50,120,66);
 
-    this.content = [this.icon];
+    this.addButton(width-20,height-20,'green','ok',function(){
+        console.log(this.itemID);
+        Client.setPrices(this.itemID,this.buy.value,this.sell.value);
+    }.bind(this),'Confirm');
+
+    this.content = [this.icon, this.name, this.buyText, this.sellText];
     this.content.forEach(function(c){
         c.setScrollFactor(0);
         c.setDepth(1);
     });
 }
 
-PriceSlot.prototype = Object.create(Frame.prototype);
+PriceSlot.prototype = Object.create(Panel.prototype);
 PriceSlot.prototype.constructor = PriceSlot;
 
 PriceSlot.prototype.setUp = function(item){
     var itemData = Engine.itemsData[item];
     // console.log(itemData);
     this.icon.setTexture(itemData.atlas,itemData.frame);
-    // this.name.setText(itemData.name);
-    // this.nb.setText(nb);
+    this.name.setText(itemData.name);
+    this.buy.value = (item in Engine.currentBuiling.prices ? Engine.currentBuiling.prices[item].buy : 0);
+    this.sell.value = (item in Engine.currentBuiling.prices ? Engine.currentBuiling.prices[item].sell : 0);
+    this.itemID = item;
 };
 
 PriceSlot.prototype.display = function(){
-    Frame.prototype.display.call(this);
+    Panel.prototype.display.call(this);
     this.content.forEach(function(c){
         c.setVisible(true);
     });
+    this.buy.style.display = "inline";
+    this.sell.style.display = "inline";
 };
 
 PriceSlot.prototype.hide = function(){
-    Frame.prototype.hide.call(this);
+    Panel.prototype.hide.call(this);
     this.content.forEach(function(c){
         c.setVisible(false);
     });
+    this.buy.style.display = "none";
+    this.sell.style.display = "none";
+    this.hideButtons();
 };
