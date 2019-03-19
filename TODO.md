@@ -42,7 +42,7 @@ Misc:
 Shop UI:
 - Test and fix prices form position
 - Add help to new UI
-- pagination
+- Fix pagination
 - Add item slot frames
 - Default prices
 - Make sure owneship is enforced (remove isFinancial = false in gs.handleShop; 

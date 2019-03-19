@@ -1,10 +1,14 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 15-03-19.
  */
+
+var NB_PER_PAGE = 4;
+
 function ShopInventoryPanel(x,y,width,height,title,invisible){
     Panel.call(this,x,y,width,height,title,invisible);
     this.slotsCounter = 0;
     this.slots = [];
+    this.currentPage = 0;
 }
 
 ShopInventoryPanel.prototype = Object.create(Panel.prototype);
@@ -13,6 +17,7 @@ ShopInventoryPanel.prototype.constructor = ShopInventoryPanel;
 ShopInventoryPanel.prototype.setInventory = function(inventory){
     this.inventory = inventory;
     this.starty = this.y+20;
+    console.log(this.name,'set to',this.starty);
 
     if(this.inventory == 'building'){
         this.pricesBtn = new BigButton(this.x+70,this.starty+15,'Set prices',function(){
@@ -37,10 +42,30 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
 
     this.pagetxts = this.addPolyText((this.width/2)-50,this.starty-this.y+5,['Page','1','/','10']);
     this.pagetxts[1].setText(1);
-    // this.pagetxts[1].setOrigin(1,0);
-    this.pagetxts.forEach(function(t){
-       t.setVisible(false);
-    });
+    // this.pagetxts.forEach(function(t){
+    //    t.setVisible(false);
+    // });
+
+    this.previousPage = UI.scene.add.sprite(this.pagetxts[0].x-45, this.starty+8,'UI','nextpage');
+    this.nextPage = UI.scene.add.sprite(this.pagetxts[3].x+this.pagetxts[3].width + 5, this.starty+8,'UI','nextpage');
+
+    this.nextPage.setInteractive();
+    this.nextPage.on('pointerup',function(){
+         this.currentPage = Utils.clamp(this.currentPage+1,0,this.nbpages);
+         this.updateContent();
+    }.bind(this));
+
+    this.previousPage.setInteractive();
+    this.previousPage.on('pointerup',function(){
+        this.currentPage = Utils.clamp(this.currentPage-1,0,this.nbpages);
+        this.updateContent();
+    }.bind(this));
+
+    this.nextPage.setVisible(false);
+    this.previousPage.setVisible(false);
+    this.nextPage.setOrigin(0);
+    this.previousPage.setOrigin(0);
+    this.starty += 35;
 };
 
 ShopInventoryPanel.prototype.listItems = function(){
@@ -66,27 +91,35 @@ ShopInventoryPanel.prototype.getNextSlot = function(x,y){
 };
 
 ShopInventoryPanel.prototype.updateContent = function(){
+    this.nbpages = Math.ceil(this.listItems().length/NB_PER_PAGE);
+    this.currentPage = Utils.clamp(this.currentPage,0,this.nbpages);
     this.hideContent();
     this.refreshContent();
 };
 
-ShopInventoryPanel.prototype.showPagination = function(nb){
-    this.nbpages = Math.ceil(nb/4);
-    this.pagetxts[3].setText(this.nbpages);
+ShopInventoryPanel.prototype.refreshPagination = function(){
     this.pagetxts.forEach(function(t){
         t.setVisible(true);
     });
-    this.starty += 35;
+    this.pagetxts[3].setText(this.nbpages);
+    this.pagetxts[1].setText(this.currentPage+1);
+    if(this.currentPage+1 < this.nbpages) this.nextPage.setVisible(true);
+    if(this.currentPage > 0) this.previousPage.setVisible(true);
 };
 
 ShopInventoryPanel.prototype.refreshContent = function(){
     var items = this.listItems();
-    if(items.length > 4) this.showPagination(items.length);
+    this.refreshPagination();
+    var yOffset = 0;
     items.forEach(function(item,i){
-        var slot = this.getNextSlot(this.x+20,this.starty+(i*90));
+        console.log(this.name,this.starty);
+        if(i < this.currentPage*NB_PER_PAGE) return;
+        if(i >= (this.currentPage+1)*NB_PER_PAGE) return;
+        var slot = this.getNextSlot(this.x+20,this.starty+yOffset);
         var action = (this.inventory == 'player' ? 'sell' : 'buy');
         slot.setUp(action,item[0],item[1]);
         slot.display();
+        yOffset += 90;
     },this);
 };
 
@@ -108,6 +141,7 @@ ShopInventoryPanel.prototype.hide = function(){
         this.ggBtn.hide();
         this.tgBtn.hide();
     }
+    this.currentPage = 0;
     this.hideContent();
 };
 
@@ -119,6 +153,8 @@ ShopInventoryPanel.prototype.hideContent = function(){
     this.pagetxts.forEach(function(t){
         t.setVisible(false);
     });
+    this.nextPage.setVisible(false);
+    this.previousPage.setVisible(false);
 };
 
 // -----------------------
