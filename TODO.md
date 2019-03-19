@@ -42,10 +42,12 @@ Misc:
 Shop UI:
 - Test and fix prices form position
 - Add help to new UI
-- -- when price == 0
 - pagination
 - Give/take gold
-- Make sure owneship is enforced (remove isFinancial = false in gs.handleShop; uncomment line in setBldPrics)
+- Default prices
+- Make sure owneship is enforced (remove isFinancial = false in gs.handleShop; 
+uncomment line in setBldPrics and handleGold)
+- Disable sell/buy when price = 0
 - Test
 New movement system
 Check building limits are enforced

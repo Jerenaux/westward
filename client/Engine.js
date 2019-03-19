@@ -1493,6 +1493,8 @@ Engine.makeTradeMenu = function(){
     var x = (Engine.getGameConfig().width-w)/2;
     var action = trade.addPanel('action',new ShopPanel(x,420,w,100,'Buy/Sell'),true);
     action.moveUp(1);
+    var goldaction = trade.addPanel('goldaction',new ShopGoldPanel(x,420,w,100,'Buy/Sell'),true);
+    goldaction.moveUp(1);
     var pricesw = (w*2)+space;
     var prices = trade.addPanel('prices',new PricesPanel(center-w-space,y,pricesw,h,'Prices'),true);
     prices.addButton(pricesw-16,-8,'red','close',prices.hide.bind(prices),'Close');
@@ -1510,10 +1512,12 @@ Engine.makeTradeMenu = function(){
         client.updateCapsule('gold',Engine.player.gold);
         Engine.scene.sound.add('sellbuy').play();
         action.update();
+        goldaction.update();
     });
     trade.addEvent('onUpdateShopGold',function(){
         shop.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
         action.update();
+        goldaction.update();
     });
     return trade;
 };

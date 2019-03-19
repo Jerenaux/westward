@@ -19,6 +19,19 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
             Engine.currentMenu.panels['prices'].display();
             Engine.currentMenu.panels['action'].hide();
         });
+
+        this.ggBtn = new BigButton(this.x+180,this.starty+15,'Give gold',function(){
+            Engine.currentMenu.panels['action'].hide();
+            Engine.currentMenu.panels['goldaction'].display();
+            Engine.currentMenu.panels['goldaction'].setUp('sell');
+        });
+
+        this.tgBtn = new BigButton(this.x+290,this.starty+15,'Take gold',function(){
+            Engine.currentMenu.panels['action'].hide();
+            Engine.currentMenu.panels['goldaction'].display();
+            Engine.currentMenu.panels['goldaction'].setUp('buy');
+        });
+
         this.starty += 35;
     }
 };
@@ -62,13 +75,21 @@ ShopInventoryPanel.prototype.refreshContent = function(){
 ShopInventoryPanel.prototype.display = function(){
     if(this.displayed) return;
     Panel.prototype.display.call(this);
-    if(this.pricesBtn) this.pricesBtn.display();
+    if(this.pricesBtn){
+        this.pricesBtn.display();
+        this.ggBtn.display();
+        this.tgBtn.display();
+    }
     this.refreshContent();
 };
 
 ShopInventoryPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
-    if(this.pricesBtn) this.pricesBtn.hide();
+    if(this.pricesBtn){
+        this.pricesBtn.hide();
+        this.ggBtn.hide();
+        this.tgBtn.hide();
+    }
     this.hideContent();
 };
 
@@ -86,7 +107,7 @@ function ShopSlot(x,y,width,height){
 
     this.icon = UI.scene.add.sprite(this.x + 30, this.y + height/2);
     this.bagicon = UI.scene.add.sprite(this.x + 14, this.y + height - 12, 'UI','smallpack');
-    this.goldicon = UI.scene.add.sprite(this.x + width - 12, this.y + 14, 'UI','gold');
+    this.goldicon = UI.scene.add.sprite(this.x + width - 12, this.y + 16, 'UI','gold');
     this.staticon = UI.scene.add.sprite(this.x + 70, this.y + 45, 'icons2');
 
     this.name = UI.scene.add.text(this.x + 60, this.y + 10, '', { font: '16px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
@@ -136,15 +157,21 @@ ShopSlot.prototype.setUp = function(action,item,nb){
 
     var priceaction = (action == 'buy' ? 'sell' : 'buy');
     var price = Engine.currentBuiling.getPrice(item,priceaction);
-    this.price.setText(price);
-    if(action == 'sell'){
-        this.price.setFill((price > Engine.currentBuiling.gold ? Utils.colors.red : Utils.colors.white));
+    if(price == 0) {
+        this.price.setText('--');
+        this.price.setFill(Utils.colors.white);
     }else{
-        this.price.setFill((price > Engine.player.gold ? Utils.colors.red : Utils.colors.white));
+        this.price.setText(price);
+        if (action == 'sell') {
+            this.price.setFill((price > Engine.currentBuiling.gold ? Utils.colors.red : Utils.colors.white));
+        } else {
+            this.price.setFill((price > Engine.player.gold ? Utils.colors.red : Utils.colors.white));
+        }
     }
 
     this.zone.on('pointerup',function(){
         if(Engine.currentMenu.panels['prices'].displayed) return;
+        Engine.currentMenu.panels['goldaction'].hide();
         Engine.currentMenu.panels['action'].display();
         Engine.currentMenu.panels['action'].setUp(item,action);
     });

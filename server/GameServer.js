@@ -862,6 +862,22 @@ GameServer.setBuildingPrice = function(data,socketID){
     player.addNotif('Price updated');
 };
 
+GameServer.handleGold = function(data,socketID){
+    // if(!building.isOwnedBy(player)) return; // TODO: uncomment
+    var player = GameServer.getPlayer(socketID);
+    var building = GameServer.buildings[player.inBuilding];
+    var amount = data.nb;
+    if(amount < 0){
+        amount = Utils.clamp(-amount,0,building.gold);
+        building.takeGold(amount);
+        player.giveGold(amount,true);
+    }else{
+        amount = Utils.clamp(amount,0,player.gold);
+        player.takeGold(amount,true);
+        building.giveGold(amount);
+    }
+};
+
 GameServer.handleShop = function(data,socketID) {
     var player = GameServer.getPlayer(socketID);
     var item = data.id;

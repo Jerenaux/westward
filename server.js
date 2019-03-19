@@ -151,6 +151,7 @@ io.on('connection',function(socket){
             'commit': gs.handleCommit,
             'craft': gs.handleCraft,
             'exit': gs.handleExit,
+            'gold': gs.handleGold,
             'menu': gs.logMenu,
             'NPCClick': gs.handleNPCClick,
             'prices': gs.setBuildingPrice,

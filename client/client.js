@@ -198,6 +198,10 @@ Client.setPrices = function(id,buy,sell){
     Client.socket.emit('prices',{item:id,buy:buy,sell:sell});
 };
 
+Client.exchangeGold = function(nb){
+    Client.socket.emit('gold',{nb:nb});
+};
+
 Client.sendChat = function(text){
     Client.socket.emit('chat',text);
 };
