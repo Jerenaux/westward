@@ -81,10 +81,10 @@
     "desc": "A place to rest.",
     "base":{
       "width": 4,
-      "height": 3
+      "height": 5
     },
     "recipe": {"3":10},
-    "padding": 11,
+    "padding": 0,
     "icon": "shack",
     "foundations": "foundations_1",
     "sprite": "shack",

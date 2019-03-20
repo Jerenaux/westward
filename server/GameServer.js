@@ -856,14 +856,14 @@ GameServer.handleBattleAction = function(data,socketID){
 GameServer.setBuildingPrice = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var building = GameServer.buildings[player.inBuilding];
-    // if(!building.isOwnedBy(player)) return; // TODO: uncomment
+    if(!building.isOwnedBy(player)) return;
     building.setPrices(data.item,data.buy,data.sell);
     building.save();
     player.addNotif('Price updated');
 };
 
 GameServer.handleGold = function(data,socketID){
-    // if(!building.isOwnedBy(player)) return; // TODO: uncomment
+    if(!building.isOwnedBy(player)) return;
     var player = GameServer.getPlayer(socketID);
     var building = GameServer.buildings[player.inBuilding];
     var amount = data.nb;
@@ -886,7 +886,6 @@ GameServer.handleShop = function(data,socketID) {
     if(!player.isInBuilding()) return;
     var building = GameServer.buildings[player.inBuilding];
     var isFinancial = (!building.isOwnedBy(player));
-    isFinancial = false; // TODO remove
     if(action == 'buy'){ // or take
         if(!building.canSell(item,nb,isFinancial)) return;
         if(isFinancial) {

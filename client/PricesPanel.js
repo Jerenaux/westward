@@ -13,15 +13,7 @@ function PricesPanel(x,y,width,height,title){
     this.title = this.addText(width/2,70,'Enter item name:');
     this.title.setOrigin(0.5);
 
-    this.input = document.createElement("input");
-    this.input.className = 'game_input';
-    this.input.type = "text";
-    this.input.style.width = w+'px';
-    this.input.style.left = (center-(w/2))+'px';
-    this.input.style.top = (this.y+100)+'px';
-    this.input.style.background = 'rgba(0,0,0,0.5)';
-    this.input.style.display = "none";
-
+    this.input = this.addInput(w,(width-w)/2,100);
     this.input.onkeyup = function(){
         var value = this.input.value.toLowerCase();
         if(value.length >= 3){

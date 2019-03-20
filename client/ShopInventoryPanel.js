@@ -92,7 +92,7 @@ ShopInventoryPanel.prototype.getNextSlot = function(x,y){
 
 ShopInventoryPanel.prototype.updateContent = function(){
     this.nbpages = Math.ceil(this.listItems().length/NB_PER_PAGE);
-    this.currentPage = Utils.clamp(this.currentPage,0,this.nbpages);
+    this.currentPage = Utils.clamp(this.currentPage,0,this.nbpages-1);
     this.hideContent();
     this.refreshContent();
 };
@@ -112,7 +112,6 @@ ShopInventoryPanel.prototype.refreshContent = function(){
     this.refreshPagination();
     var yOffset = 0;
     items.forEach(function(item,i){
-        console.log(this.name,this.starty);
         if(i < this.currentPage*NB_PER_PAGE) return;
         if(i >= (this.currentPage+1)*NB_PER_PAGE) return;
         var slot = this.getNextSlot(this.x+20,this.starty+yOffset);
@@ -162,6 +161,7 @@ ShopInventoryPanel.prototype.hideContent = function(){
 function ShopSlot(x,y,width,height){
     Frame.call(this,x,y,width,height);
 
+    this.slot = UI.scene.add.sprite(this.x + 30,this.y+height/2,'UI','equipment-slot');
     this.icon = UI.scene.add.sprite(this.x + 30, this.y + height/2);
     this.bagicon = UI.scene.add.sprite(this.x + 14, this.y + height - 12, 'UI','smallpack');
     this.goldicon = UI.scene.add.sprite(this.x + width - 12, this.y + 16, 'UI','gold');
@@ -187,7 +187,7 @@ function ShopSlot(x,y,width,height){
     });
 
     this.content = [this.icon, this.bagicon, this.staticon, this.name, this.nb, this.effect, this.rarity,
-    this.zone, this.goldicon, this.price];
+    this.zone, this.goldicon, this.price, this.slot];
     this.content.forEach(function(c){
         c.setScrollFactor(0);
         c.setDepth(1);

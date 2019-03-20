@@ -40,14 +40,10 @@ Misc:
 - Show countdowns in production panel + set up notifications!
 - Reduce amount of orientation pins
 Shop UI:
-- Test and fix prices form position
 - Add help to new UI
-- Fix pagination
-- Add item slot frames
 - Default prices
-- Make sure owneship is enforced (remove isFinancial = false in gs.handleShop; 
-uncomment line in setBldPrics and handleGold)
 - Disable sell/buy when price = 0
+- Test and enforce ownership
 - Test
 New movement system
 Check building limits are enforced
