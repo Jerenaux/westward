@@ -135,7 +135,7 @@
     "atlas": "items2",
     "frame":"sunflower",
     "envFrames": ["bush_3"],
-    "name": "Butterflower",
+    "name": "Sunstreak",
     "desc": "Flower with regenerative properties used to brew potions.",
     "isMaterial": true,
     "sound": "soft"
