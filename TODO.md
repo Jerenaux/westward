@@ -4,6 +4,7 @@ On deploy:
 - Test picking up objects
 - Test selling and buying in a store
 - Test equiping object
+- Test gs.handleGold()
 => Automate these eventually
 => After bug, systematically create test!
 
@@ -41,9 +42,7 @@ Misc:
 Shop UI:
 - Add help to new UI
 - Default prices
-- Disable sell/buy when price = 0
-- Test and enforce ownership
-- Test
+- Fix "call events on display" issue
 New movement system
 Check building limits are enforced
 

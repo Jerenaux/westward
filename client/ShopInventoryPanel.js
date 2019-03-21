@@ -37,14 +37,11 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
             Engine.currentMenu.panels['goldaction'].setUp('buy');
         });
 
-        this.starty += 35;
+        // this.starty += 35;
     }
 
     this.pagetxts = this.addPolyText((this.width/2)-50,this.starty-this.y+5,['Page','1','/','10']);
     this.pagetxts[1].setText(1);
-    // this.pagetxts.forEach(function(t){
-    //    t.setVisible(false);
-    // });
 
     this.previousPage = UI.scene.add.sprite(this.pagetxts[0].x-45, this.starty+8,'UI','nextpage');
     this.nextPage = UI.scene.add.sprite(this.pagetxts[3].x+this.pagetxts[3].width + 5, this.starty+8,'UI','nextpage');
@@ -100,7 +97,8 @@ ShopInventoryPanel.prototype.updateContent = function(){
 ShopInventoryPanel.prototype.refreshPagination = function(){
     this.pagetxts.forEach(function(t){
         t.setVisible(true);
-    });
+        t.y = this.starty+5;
+    },this);
     this.pagetxts[3].setText(this.nbpages);
     this.pagetxts[1].setText(this.currentPage+1);
     if(this.currentPage+1 < this.nbpages) this.nextPage.setVisible(true);
@@ -108,12 +106,20 @@ ShopInventoryPanel.prototype.refreshPagination = function(){
 };
 
 ShopInventoryPanel.prototype.refreshContent = function(){
+    console.log('-----');
+    if(this.inventory == 'building' && Engine.currentBuiling.isOwned()) {
+        this.tgBtn.display();
+        this.ggBtn.display();
+        this.pricesBtn.display();
+        this.starty += 35;
+    }
     var items = this.listItems();
     this.refreshPagination();
     var yOffset = 0;
     items.forEach(function(item,i){
         if(i < this.currentPage*NB_PER_PAGE) return;
         if(i >= (this.currentPage+1)*NB_PER_PAGE) return;
+        console.log(this.name,this.starty,yOffset,this.starty+yOffset);
         var slot = this.getNextSlot(this.x+20,this.starty+yOffset);
         var action = (this.inventory == 'player' ? 'sell' : 'buy');
         slot.setUp(action,item[0],item[1]);
@@ -125,11 +131,6 @@ ShopInventoryPanel.prototype.refreshContent = function(){
 ShopInventoryPanel.prototype.display = function(){
     if(this.displayed) return;
     Panel.prototype.display.call(this);
-    if(this.pricesBtn){
-        this.pricesBtn.display();
-        this.ggBtn.display();
-        this.tgBtn.display();
-    }
     this.refreshContent();
 };
 
@@ -152,6 +153,7 @@ ShopInventoryPanel.prototype.hideContent = function(){
     this.pagetxts.forEach(function(t){
         t.setVisible(false);
     });
+    this.starty = this.y+20;
     this.nextPage.setVisible(false);
     this.previousPage.setVisible(false);
 };

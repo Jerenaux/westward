@@ -181,43 +181,24 @@ Building.prototype.updateProd = function(){
     return (produced > 0);
 };
 
-/*Building.prototype.updateBuild = function(){
-    if(!GameServer.isTimeToUpdate('build')) return false;
-    var rate = GameServer.buildingsData[this.type].buildRate; // Base progress increase per turn, before factoring productivity in
-    if(!rate) return;
-    var increment = Formulas.computeBuildIncrement(Formulas.pctToDecimal(this.productivity),rate);
-    console.log('Building ',increment,'%');
-    this.setProperty('progress',Utils.clamp(this.progress+increment,this.progress,100));
-    if(this.progress == 100) this.setProperty('built',true);
-};*/
-
 Building.prototype.updateBuild = function(){
     if(this.built) return;
     var buildingData = GameServer.buildingsData[this.type];
     var recipe = buildingData.recipe;
     for(var item in recipe){
-        //console.log(this.hasItem(item,recipe[item]));
         if(!this.hasItem(item,recipe[item])) return false;
     }
-    this.setProperty('built',true);
     for(var item in recipe){
         this.takeItem(item,recipe[item]);
     }
+    this.setBuilt();
     return true;
 };
 
-/*Building.prototype.repair = function(){
-    if(!GameServer.isTimeToUpdate('build')) return;
-    var maxHealth = this.getStat('hpmax').getValue();
-    var health = this.getStat('hp').getValue();
-    if(health == maxHealth) return;
-    var rate = GameServer.buildingsData[this.type].buildRate; // Base progress increase per turn, before factoring productivity in
-    if(!rate) return;
-    var increment = Formulas.computeBuildIncrement(Formulas.pctToDecimal(this.productivity),rate);
-    increment = Math.round((increment/100)*maxHealth);
-    var newHealth = Utils.clamp(health+increment,health,maxHealth);
-    this.getStat('hp').setBaseValue(newHealth);
-};*/
+Building.prototype.setBuilt = function(){
+    this.setProperty('built',true);
+    this.save();
+};
 
 Building.prototype.toggleBuild = function(){
     this.setProperty('built',!this.built);

@@ -868,10 +868,11 @@ GameServer.setBuildingPrice = function(data,socketID){
 };
 
 GameServer.handleGold = function(data,socketID){
-    if(!building.isOwnedBy(player)) return;
+    var amount = data.nb;
+    if(amount == 0) return;
     var player = GameServer.getPlayer(socketID);
     var building = GameServer.buildings[player.inBuilding];
-    var amount = data.nb;
+    if(!building.isOwnedBy(player)) return;
     if(amount < 0){
         amount = Utils.clamp(-amount,0,building.gold);
         building.takeGold(amount);
@@ -895,6 +896,7 @@ GameServer.handleShop = function(data,socketID) {
         if(!building.canSell(item,nb,isFinancial)) return;
         if(isFinancial) {
             var price = building.getPrice(item, nb, 'buy');
+            if(price == 0) return;
             if (!player.canBuy(price)) return;
             player.takeGold(price, true);
             building.giveGold(price);
@@ -906,6 +908,7 @@ GameServer.handleShop = function(data,socketID) {
         if(!building.canBuy(item,nb,isFinancial)) return;
         if(isFinancial) {
             var price = building.getPrice(item, nb, 'sell');
+            if(price == 0) return;
             player.giveGold(price, true);
             building.takeGold(price);
             player.gainClassXP(GameServer.classes.merchant,Math.floor(price/10), true); // TODO: factor in class level
@@ -966,6 +969,7 @@ GameServer.build = function(player,bid,tile){
         GameServer.buildingsChanged = true;
         player.listBuildings(); // update list of buildable buildings by player
         GameServer.updateFoW();
+        if(GameServer.buildingParameters.autobuild) building.setBuilt();
     });
 };
 

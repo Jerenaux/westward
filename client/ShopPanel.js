@@ -179,7 +179,7 @@ ShopPanel.prototype.manageButtons = function(){
         plusBtn.enable();
     }
 
-    if(this.canBuy() && !this.isAtZero()){
+    if(this.canBuy() && !this.isAtZero() && (!this.isFinancial() || this.shopItem.price > 0)){
         okBtn.enable();
     }else{
         okBtn.disable();

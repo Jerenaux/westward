@@ -1513,11 +1513,13 @@ Engine.makeTradeMenu = function(){
     trade.addEvent('onUpdateGold',function(){
         client.updateCapsule('gold',Engine.player.gold);
         Engine.scene.sound.add('sellbuy').play();
+        shop.updateContent();
         action.update();
         goldaction.update();
     });
     trade.addEvent('onUpdateShopGold',function(){
         shop.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+        client.updateContent();
         action.update();
         goldaction.update();
     });
