@@ -1,3 +1,0 @@
-JBoss-Product-Release-Name: Keycloak
-JBoss-Product-Release-Version: 5.0.0
-JBoss-Product-Console-Slot: main
