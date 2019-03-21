@@ -704,11 +704,11 @@ GameServer.handleNPCClick = function(data,socketID){
 
 GameServer.lootNPC = function(player,type,ID){
     var map = (type == 'animal' ? GameServer.animals : GameServer.civs);
-    if(!map.hasOwnProperty(ID)) return;
+    if(!map.hasOwnProperty(ID)) return false;
     var NPC = map[ID];
     // TODO: check for proximity
-    if(!NPC.isDead()) return;
-    if(NPC.loot.isEmpty()) return;
+    if(!NPC.isDead()) return false;
+    if(NPC.loot.isEmpty()) return false;
     for(var item in NPC.loot.items){
         // TODO: take harvesting ability into consideration
         var nb = NPC.loot.items[item];
@@ -721,7 +721,7 @@ GameServer.lootNPC = function(player,type,ID){
 };
 
 GameServer.pickUpItem = function(player,itemID){
-    if(!GameServer.items.hasOwnProperty(itemID)) return;
+    if(!GameServer.items.hasOwnProperty(itemID)) return false;
     var item = GameServer.items[itemID];
     // TODO: check for proximity
     var nb = 1;
@@ -730,6 +730,7 @@ GameServer.pickUpItem = function(player,itemID){
     GameServer.removeEntity(item);
     Prism.logEvent(player,'pickup',{item:item.type});
     GameServer.createItem(item,nb,'pickup');
+    return true;
 };
 
 GameServer.createItem = function(item,nb,source){
@@ -748,11 +749,15 @@ GameServer.handleBattle = function(attacker,attacked){
         if(attacker.isPlayer) attacker.addMsg('Battles are disabled at the moment');
         return false;
     }
-    if(!attacker.isAvailableForFight() || attacker.isInFight() || !attacked.isAvailableForFight() || attacked.isInFight()) return;
+    if(!attacker.isAvailableForFight() || attacker.isInFight() 
+    || !attacked.isAvailableForFight() || attacked.isInFight()){
+        return false;
+    }
     // TODO: check for proximity
     var area = GameServer.computeBattleArea(attacker,attacked);
     if(!area){
         if(attacker.isPlayer) attacker.addMsg('There is an obstacle in the way!');
+        console.log('obstacle')
         return false;
     }
     var battle = GameServer.checkBattleOverlap(area);

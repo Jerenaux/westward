@@ -32,7 +32,6 @@ Misc:
 - Camera bounds (test with northernmost camp)
 - Poll at regular interval the sprite below mouse
 - Better notifs cascading
-- New test: GameServer.handleBattle (when and area can and cannot be computed)
 - Positions not saved often enough?
 - Don't disable walk with build panel
 - Multiple clicks on "give" repeat the action

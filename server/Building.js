@@ -29,16 +29,9 @@ function Building(data){
     this.y = Utils.clamp(data.y,0,World.worldHeight-1);
 
     this.type = data.type;
+    if(this.type === undefined) console.warn('Undefined building type');
     var buildingData = GameServer.buildingsData[this.type];
-    //this.width = Math.ceil(buildingData.width/World.tileWidth);
-    //this.height = Math.ceil(buildingData.height/World.tileHeight);
 
-    /*var coll = buildingData.collisions;
-    this.coll = coll;
-    this.xoffset = coll.x;
-    this.entrance = buildingData.entrance;
-    this.cellsWidth = coll.w;
-    this.cellsHeight = coll.h;*/
     this.cellsWidth = buildingData.base.width;
     this.cellsHeight = buildingData.base.height;
     this.coll = {
