@@ -9,6 +9,7 @@ function ShopInventoryPanel(x,y,width,height,title,invisible){
     this.slotsCounter = 0;
     this.slots = [];
     this.currentPage = 0;
+    this.starty = this.y+20;
 }
 
 ShopInventoryPanel.prototype = Object.create(Panel.prototype);
@@ -16,8 +17,6 @@ ShopInventoryPanel.prototype.constructor = ShopInventoryPanel;
 
 ShopInventoryPanel.prototype.setInventory = function(inventory){
     this.inventory = inventory;
-    this.starty = this.y+20;
-    console.log(this.name,'set to',this.starty);
 
     if(this.inventory == 'building'){
         this.pricesBtn = new BigButton(this.x+70,this.starty+15,'Set prices',function(){
@@ -36,15 +35,16 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
             Engine.currentMenu.panels['goldaction'].display();
             Engine.currentMenu.panels['goldaction'].setUp('buy');
         });
-
-        // this.starty += 35;
     }
 
-    this.pagetxts = this.addPolyText((this.width/2)-50,this.starty-this.y+5,['Page','1','/','10']);
+    this.nothingTxt = this.addText(20,0,'The inventory of this shop is empty. Come back later!');
+    this.nothingTxt.setVisible(false);
+
+    this.pagetxts = this.addPolyText((this.width/2)-50,0,['Page','1','/','10']);
     this.pagetxts[1].setText(1);
 
-    this.previousPage = UI.scene.add.sprite(this.pagetxts[0].x-45, this.starty+8,'UI','nextpage');
-    this.nextPage = UI.scene.add.sprite(this.pagetxts[3].x+this.pagetxts[3].width + 5, this.starty+8,'UI','nextpage');
+    this.previousPage = UI.scene.add.sprite(this.pagetxts[0].x-45, 0,'UI','nextpage');
+    this.nextPage = UI.scene.add.sprite(this.pagetxts[3].x+this.pagetxts[3].width + 5, 0,'UI','nextpage');
 
     this.nextPage.setInteractive();
     this.nextPage.on('pointerup',function(){
@@ -62,7 +62,6 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
     this.previousPage.setVisible(false);
     this.nextPage.setOrigin(0);
     this.previousPage.setOrigin(0);
-    this.starty += 35;
 };
 
 ShopInventoryPanel.prototype.listItems = function(){
@@ -88,39 +87,43 @@ ShopInventoryPanel.prototype.getNextSlot = function(x,y){
 };
 
 ShopInventoryPanel.prototype.updateContent = function(){
-    this.nbpages = Math.ceil(this.listItems().length/NB_PER_PAGE);
+    this.nbpages = Math.max(1,Math.ceil(this.listItems().length/NB_PER_PAGE));
     this.currentPage = Utils.clamp(this.currentPage,0,this.nbpages-1);
     this.hideContent();
     this.refreshContent();
 };
 
 ShopInventoryPanel.prototype.refreshPagination = function(){
+    var py = (this.inventory == 'building' && Engine.currentBuiling.isOwned() ? this.y + 55 : this.y + 20);
     this.pagetxts.forEach(function(t){
         t.setVisible(true);
-        t.y = this.starty+5;
+        t.y = py + 10;
     },this);
     this.pagetxts[3].setText(this.nbpages);
     this.pagetxts[1].setText(this.currentPage+1);
+    this.nextPage.y = py + 10;
+    this.previousPage.y = py + 10;
     if(this.currentPage+1 < this.nbpages) this.nextPage.setVisible(true);
     if(this.currentPage > 0) this.previousPage.setVisible(true);
+    this.nothingTxt.y = py + 35;
 };
 
 ShopInventoryPanel.prototype.refreshContent = function(){
-    console.log('-----');
+    var sloty = this.y + 55;
     if(this.inventory == 'building' && Engine.currentBuiling.isOwned()) {
         this.tgBtn.display();
         this.ggBtn.display();
         this.pricesBtn.display();
-        this.starty += 35;
+        sloty = this.y + 90;
     }
     var items = this.listItems();
     this.refreshPagination();
+    this.nothingTxt.setVisible(items.length == 0);
     var yOffset = 0;
     items.forEach(function(item,i){
         if(i < this.currentPage*NB_PER_PAGE) return;
         if(i >= (this.currentPage+1)*NB_PER_PAGE) return;
-        console.log(this.name,this.starty,yOffset,this.starty+yOffset);
-        var slot = this.getNextSlot(this.x+20,this.starty+yOffset);
+        var slot = this.getNextSlot(this.x+20,sloty+yOffset);
         var action = (this.inventory == 'player' ? 'sell' : 'buy');
         slot.setUp(action,item[0],item[1]);
         slot.display();
@@ -153,7 +156,7 @@ ShopInventoryPanel.prototype.hideContent = function(){
     this.pagetxts.forEach(function(t){
         t.setVisible(false);
     });
-    this.starty = this.y+20;
+    // this.starty = this.y+20;
     this.nextPage.setVisible(false);
     this.previousPage.setVisible(false);
 };

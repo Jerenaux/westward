@@ -40,7 +40,6 @@ Misc:
 - Show countdowns in production panel + set up notifications!
 - Reduce amount of orientation pins
 Shop UI:
-- Add help to new UI
 - Default prices
 - Fix "call events on display" issue
 New movement system
