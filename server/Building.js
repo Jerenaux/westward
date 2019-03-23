@@ -58,7 +58,14 @@ function Building(data){
         GameServer.createItem(itm[0],itm[1]);
     });
 
-    this.prices = data.prices || {};
+    this.prices = data.prices;
+    var nbitems = 0;
+    for(var item in this.prices){
+        GameServer.marketPrices.add(item,this.prices[item].sell);
+        nbitems++;
+    }
+    if(nbitems == 0 && this.type == 4) this.prices = GameServer.getDefaultPrices();
+
     this.setGold(data.gold || 0);
     this.built = !!data.built;
     this.progress = data.progress || 0;

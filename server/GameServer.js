@@ -35,6 +35,7 @@ module.exports.GameServer = GameServer;
 var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
+var ListMap = require('../shared/ListMap.js').ListMap;
 var SpaceMapList = require('../shared/SpaceMap.js').SpaceMapList;
 var AOI = require('./AOI.js').AOI;
 var Player = require('./Player.js').Player;
@@ -157,6 +158,7 @@ GameServer.readMap = function(mapsPath,test,cb){
 
     GameServer.fogOfWar = {};
     GameServer.itemCounts = {};
+    GameServer.marketPrices = new ListMap();
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
@@ -240,7 +242,6 @@ GameServer.loadRegions = function(){
 GameServer.addBuilding = function(data){
     var building = new Building(data);
     building.setModel(data);
-    //GameServer.buildings[building.id] = building;
     building.embed();
     return building;
 };
@@ -257,6 +258,7 @@ GameServer.loadBuildings = function(){
     GameServer.BuildingModel.find(function (err, buildings) {
         if (err) return console.log(err);
         buildings.forEach(GameServer.addBuilding);
+        console.warn(GameServer.marketPrices);
         GameServer.updateStatus();
     });
 };
@@ -671,6 +673,21 @@ GameServer.findPath = function(from,to,seek){
 
 GameServer.isWithinAggroDist = function(a,b){
     return Utils.boxesDistance(a.getRect(),b.getRect()) <= GameServer.battleParameters.aggroRange;
+};
+
+GameServer.getDefaultPrices = function(){
+    var defaultItems = [1,3,7,8,9,14,18,22,24,25,26,43]; //TODO: conf
+    var prices = {};
+    defaultItems.forEach(function(item){
+        var prices = GameServer.marketPrices.get(item);
+        var average = 10;
+        if(prices.length) average = prices.reduce(function(total,num){return total+num;})/prices.length;
+        prices[item] = {
+            buy: average/2,
+            sell: average
+        }
+    });
+    return prices;
 };
 
 GameServer.handleBuildingClick = function(data,socketID){
@@ -1390,25 +1407,6 @@ GameServer.toggleBuild = function(data){
 };
 
 GameServer.countItems = function(cb){
-    /*var items = {};
-    for(var id in GameServer.buildings){
-        var bld = GameServer.buildings[id];
-        var inv = bld.listItems();
-        for(var itemID in inv){
-            if(!items.hasOwnProperty(itemID)) items[itemID] = 0;
-            items[itemID] += inv[itemID];
-        }
-    }
-    GameServer.PlayerModel.find(function(err,players){
-        if (err) return console.log(err);
-        players.forEach(function(data){
-            data.inventory.forEach(function(itm){
-                if(!items.hasOwnProperty(itm[0])) items[itm[0]] = 0; 
-                items[itm[0]] += itm[1];
-            });
-        });
-        if(cb) cb(items);
-    });*/
     cb(GameServer.itemCounts);
 };
 

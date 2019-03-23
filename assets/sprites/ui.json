@@ -557,8 +557,16 @@
       "frame": {"x":484,"y":448,"w":10,"h":13}
     },
     {
-      "filename": "nextpage",
-      "frame": {"x":17,"y":622,"w":31,"h":14}
+      "filename": "arrow",
+      "frame": {"x":11,"y":615,"w":19,"h":17}
+    },
+    {
+      "filename": "arrow_lit",
+      "frame": {"x":42,"y":614,"w":19,"h":17}
+    },
+    {
+      "filename": "arrow_pressed",
+      "frame": {"x":77,"y":614,"w":19,"h":17}
     }
   ]
 }

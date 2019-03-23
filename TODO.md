@@ -168,7 +168,8 @@ Secure
 
 Analytics:
 ---------
-- Log: tutorial begins, progress (each step) and ends, kills
+- Log: price setting, handleShop, handleGold, tutorial begins, progress (each step) and ends
+- Display market prices
 - Button to flush events
 - Bundle events from one player into sessions
 - Log session-wide stats: duration, how many players visit a building during session, do this, do that...

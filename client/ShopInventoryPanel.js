@@ -43,18 +43,39 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
     this.pagetxts = this.addPolyText((this.width/2)-50,0,['Page','1','/','10']);
     this.pagetxts[1].setText(1);
 
-    this.previousPage = UI.scene.add.sprite(this.pagetxts[0].x-45, 0,'UI','nextpage');
-    this.nextPage = UI.scene.add.sprite(this.pagetxts[3].x+this.pagetxts[3].width + 5, 0,'UI','nextpage');
+    this.previousPage = UI.scene.add.sprite(this.pagetxts[0].x-30, 0,'UI','arrow');
+    this.previousPage.flipX = true;
+    this.nextPage = UI.scene.add.sprite(this.pagetxts[3].x+this.pagetxts[3].width+3, 0,'UI','arrow');
 
     this.nextPage.setInteractive();
+    this.nextPage.on('pointerover',function(){
+        this.nextPage.setFrame('arrow_lit');
+    }.bind(this));
+    this.nextPage.on('pointerout',function(){
+        this.nextPage.setFrame('arrow');
+    }.bind(this));
+    this.nextPage.on('pointerdown',function(){
+        this.nextPage.setFrame('arrow_pressed');
+    }.bind(this));
     this.nextPage.on('pointerup',function(){
          this.currentPage = Utils.clamp(this.currentPage+1,0,this.nbpages);
+         this.nextPage.setFrame('arrow');
          this.updateContent();
     }.bind(this));
 
     this.previousPage.setInteractive();
+    this.previousPage.on('pointerover',function(){
+        this.previousPage.setFrame('arrow_lit');
+    }.bind(this));
+    this.previousPage.on('pointerout',function(){
+        this.previousPage.setFrame('arrow');
+    }.bind(this));
+    this.previousPage.on('pointerdown',function(){
+        this.previousPage.setFrame('arrow_pressed');
+    }.bind(this));
     this.previousPage.on('pointerup',function(){
         this.currentPage = Utils.clamp(this.currentPage-1,0,this.nbpages);
+        this.previousPage.setFrame('arrow');
         this.updateContent();
     }.bind(this));
 
@@ -101,8 +122,8 @@ ShopInventoryPanel.prototype.refreshPagination = function(){
     },this);
     this.pagetxts[3].setText(this.nbpages);
     this.pagetxts[1].setText(this.currentPage+1);
-    this.nextPage.y = py + 10;
-    this.previousPage.y = py + 10;
+    this.nextPage.y = py + 12;
+    this.previousPage.y = py + 12;
     if(this.currentPage+1 < this.nbpages) this.nextPage.setVisible(true);
     if(this.currentPage > 0) this.previousPage.setVisible(true);
     this.nothingTxt.y = py + 35;
