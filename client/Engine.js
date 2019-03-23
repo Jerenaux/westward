@@ -475,9 +475,9 @@ Engine.initWorld = function(data){
     Engine.playerIsInitialized = true;
     Engine.updateEnvironment();
 
-    Engine.currentBuiling = {
+    /*Engine.currentBuiling = {
         inventory: new Inventory(5)
-    };
+    };*/
     Engine.makeUI();
 
     // TODO: move
@@ -1444,6 +1444,7 @@ Engine.makeTradeMenu = function(){
     var pricesw = (w*2)+space;
     var prices = trade.addPanel('prices',new PricesPanel(center-w-space,y,pricesw,h,'Prices'),true);
     prices.addButton(pricesw-16,-8,'red','close',prices.hide.bind(prices),'Close');
+    prices.addButton(pricesw-40, 8, 'blue','help',null,'',UI.textsData['prices_help']);
     prices.moveUp(4);
 
     trade.addEvent('onUpdateInventory',function(){
@@ -1560,7 +1561,7 @@ Engine.makeBuildMenu = function(){
     var buildings = build.addPanel('build',new InventoryPanel(30,40,w,150,'Buildings'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
     // buildings.setInventory(Engine.player.buildRecipes,5,false,Engine.bldClick);
-    buildings.setInventory('player',5,false,Engine.bldClick);
+    buildings.setInventory('buildRecipes',5,false,Engine.bldClick);
     buildings.setDataMap(Engine.buildingIconsData);
     build.addEvent('onDisplay',buildings.updateInventory.bind(buildings));
     return build;

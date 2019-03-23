@@ -120,16 +120,20 @@ InventoryPanel.prototype.hasSoftFilter = function(){
 };
 
 InventoryPanel.prototype.getInventory = function(){
-    return (this.inventory == 'player' ? Engine.player.inventory : Engine.currentBuiling.inventory);
+    if(this.inventory == 'player'){
+        return Engine.player.inventory;
+    }else if(this.inventory == 'building'){
+        return (Engine.currentBuiling ? Engine.currentBuiling.inventory : new Inventory(5));
+    }else if(this.inventory == 'buildRecipes'){
+        return Engine.player.buildRecipes;
+    }else{
+        console.warn('Unidentified inventory');
+        return new Inventory(5);
+    }
 };
 
 InventoryPanel.prototype.listItems = function(){
-    var items = [];
-    if(this.inventory == 'player'){
-        items = Engine.player.inventory.toList(true); // true = filter out zeroes
-    }else{
-        items = Engine.currentBuiling.inventory.toList(true);
-    }
+    var items = this.getInventory().toList(true);
     items.sort(function(a,b){
         if(Engine.itemsData[a[0]].name < Engine.itemsData[b[0]].name) return -1;
         return 1;
