@@ -164,8 +164,7 @@ ShopPanel.prototype.manageButtons = function(){
     var okBtn = this.buttons[0].btn;
     var plusBtn = this.buttons[1].btn;
     var minusBtn = this.buttons[2].btn;
-    var closeBtn = this.buttons[3].btn;
-    closeBtn.enable();
+    if(this.buttons.length > 3) this.buttons[3].btn.enable();
 
     if(this.shopItem.count <= 1){
         minusBtn.disable();

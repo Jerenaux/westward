@@ -475,6 +475,9 @@ Engine.initWorld = function(data){
     Engine.playerIsInitialized = true;
     Engine.updateEnvironment();
 
+    Engine.currentBuiling = {
+        inventory: new Inventory(5)
+    };
     Engine.makeUI();
 
     // TODO: move
@@ -506,7 +509,7 @@ Engine.initWorld = function(data){
         panel.display();
     }
 
-    setInterval(function(){
+    /*setInterval(function(){
         if(Engine.currentBuiling){
             var buildingTypeData = Engine.buildingsData[Engine.currentBuiling.buildingType];
             var production = buildingTypeData.production;
@@ -518,7 +521,7 @@ Engine.initWorld = function(data){
                 console.log(remainder);
             }
         }
-    },1000);
+    },1000);*/
 
     // var rect = UI.scene.add.rectangle(300,10,100,100,0xffffff);
     // rect.setScrollFactor(0);
@@ -1211,7 +1214,8 @@ Engine.makeBattleMenu = function(){
     equipment.addButton(140, 8, 'blue','help',null,'',UI.textsData['battleitems_help']);
     battle.addPanel('equipment',equipment);
     var items = battle.addPanel('items',new InventoryPanel(alignx,220,170,225,'Items'));
-    items.setInventory(Engine.player.inventory,4,true,BattleManager.processInventoryClick);
+    // items.setInventory(Engine.player.inventory,4,true,BattleManager.processInventoryClick);
+    items.setInventory('player',4,true,BattleManager.processInventoryClick);
     items.modifyFilter({
         type: 'property',
         property: 'useInBattle',
@@ -1263,12 +1267,13 @@ Engine.makeProductionMenu = function(){
     //productivity.addButton(prodw-30, 8, 'blue','help',null,'',UI.textsData['productivity_help']);
     //production.addPanel('productivity',productivity);
     var stock = production.addPanel('shop',new InventoryPanel(prodx,prody,prodw,prodh,'Stock'));
-    stock.setInventory(new Inventory(5),5,true,Engine.takeClick);
+    // stock.setInventory(new Inventory(5),5,true,Engine.takeClick);
+    stock.setInventory('building',5,true,Engine.takeClick);
 
     var action = new ShopPanel(212,420,300,100,'Take',true); // true = not shop, hack
     production.addPanel('action',action,true);
 
-    production.addEvent('onDisplay',stock.updateInventory.bind(stock));
+    // production.addEvent('onDisplay',stock.updateInventory.bind(stock));
 
     production.addEvent('onUpdateShop',function(){
         stock.updateInventory();
@@ -1276,6 +1281,10 @@ Engine.makeProductionMenu = function(){
     });
     //production.addEvent('onUpdateProductivity',productivity.update.bind(productivity));
     //production.addEvent('onUpdateCommit',productionPanel.update.bind(productionPanel));
+    production.addEvent('onOpen',function(){
+        stock.updateInventory();
+        action.update();
+    });
     return production;
 };
 
@@ -1302,6 +1311,10 @@ Engine.makeConstructionMenu = function(){
     constr.addPanel('action',action,true);
 
     constr.addEvent('onUpdateShop',function(){
+        progress.update();
+        action.update();
+    });
+    constr.addEvent('onOpen',function(){
         progress.update();
         action.update();
     });
@@ -1404,71 +1417,6 @@ Engine.makeMapMenu = function(){
     return map;
 };
 
-Engine.makeFortMenu = function(){
-    var padding = 10;
-    var mapx = 10;
-    var mapy = 90;
-    var mapw = 443;
-    var maph = 420;
-
-    var buildx = mapx+mapw+padding;
-    var buildy = 100;
-    var buildw = 250;
-    var buildh = 390;
-
-    var resx = mapx+mapw+buildw+(padding*2);
-    var resy = buildy;
-    var resw = Engine.getGameConfig().width - padding - resx;
-    var resh = 90;
-
-    var statx = resx;
-    var staty = resy + resh;
-    var statw = resw;
-    var stath = 150;
-
-    var lvlx = resx;
-    var lvly = staty + stath;
-    var lvlw = resw;
-    var lvlh = 150;
-
-    var fort = new Menu('Fort');
-
-    var mapPanel = new MapPanel(mapx,mapy,mapw,maph,'',true); // true = invisible
-    mapPanel.addBackground('scrollbgh');
-    mapPanel.addMap('building','radial3',400,400,300,300);
-    mapPanel.addButton(mapw-30, 8, 'blue','help',null,'',UI.textsData['map_help']);
-    fort.addPanel('map',mapPanel);
-    fort.addEvent('onUpdateMap',mapPanel.update.bind(mapPanel));
-
-    var buildings = new BuildingsPanel(buildx,buildy,buildw,buildh,'Buildings');
-    buildings.addButton(130, -9, 'blue','help',null,'',UI.textsData['buildings_help']);
-    //buildings.makeScrollable();
-    fort.addPanel('buildings',buildings);
-    fort.addEvent('onUpdateBuildings',buildings.updateListing.bind(buildings));
-
-    var resources = fort.addPanel('resources',new InventoryPanel(resx,resy,resw,resh,'Resources'));
-    resources.addCapsule('gold',150,-9,'999','gold');
-    resources.addButton(resw-30, 8, 'blue','help',null,'',UI.textsData['resources_help']);
-    resources.setInventory(new Inventory(7),7,true);
-    var status = new SettlementStatusPanel(statx,staty,statw,stath,'Status');
-    status.addButton(statw-30, 8, 'blue','help',null,'',UI.textsData['setstatus_help']);
-    fort.addPanel('status',status);
-    var devlvl = new DevLevelPanel(lvlx,lvly,lvlw,lvlh,'Next level requirements');
-    devlvl.addButton(lvlw-30, 8, 'blue','help',null,'',UI.textsData['devlvl_help']);
-    fort.addPanel('devlvl',devlvl);
-
-    fort.addEvent('onUpdateShop',function(){
-        resources.modifyInventory(Engine.currentBuiling.inventory.items);
-        resources.updateInventory();
-        devlvl.update();
-    });
-    fort.addEvent('onUpdateShopGold',function(){
-        resources.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
-    });
-    fort.addEvent('onUpdateSettlementStatus',status.update.bind(status));
-    return fort;
-};
-
 Engine.makeTradeMenu = function(){
     var trade = new Menu('Trade');
     trade.setTitlePos(10);
@@ -1479,14 +1427,10 @@ Engine.makeTradeMenu = function(){
     var center = Engine.getGameConfig().width/2;
     var client = trade.addPanel('client',new ShopInventoryPanel(center-w-space,y,w,h,'You'));
     client.setInventory('player');
-    // client.setInventory(Engine.player.inventory,7,true,Engine.sellClick);
-    // client.filterItems = true;
     client.addCapsule('gold',120,-9,'999','gold');
     client.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['sell_help']);
     var shop =  trade.addPanel('shop',new ShopInventoryPanel(center+space,y,w,h,'Shop'));
     shop.setInventory('building');
-    // shop.setInventory(new Inventory(20),7,true,Engine.buyClick);
-    // shop.filterItems = true;
     shop.addCapsule('gold',100,-9,'999','gold');
     shop.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help']);
     w = 300;
@@ -1523,6 +1467,14 @@ Engine.makeTradeMenu = function(){
         action.update();
         goldaction.update();
     });
+    trade.addEvent('onOpen',function(){
+        client.updateCapsule('gold',Engine.player.gold);
+        shop.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+        client.updateContent();
+        shop.updateContent();
+        action.update();
+        goldaction.update();
+    });
     return trade;
 };
 
@@ -1544,7 +1496,8 @@ Engine.makeCraftingMenu = function(){
     var categories = ['equipment','ingredients'];
     categories.forEach(function(cat){
         var inv = crafting.addPanel(cat+'_cat',new InventoryPanel(710, y, 280, h,Utils.capitalizeFirstLetter(cat)));
-        inv.setInventory(Engine[cat+'Recipes'],6,false,Engine.recipeClick);
+        // inv.setInventory(Engine[cat+'Recipes'],6,false,Engine.recipeClick);
+        inv.setInventory('player',6,false,Engine.recipeClick);
         y += (h+gap);
     });
 
@@ -1552,18 +1505,23 @@ Engine.makeCraftingMenu = function(){
     combi.addButton(210, 8, 'blue','help',null,'',UI.textsData['combi_help']);
 
     var ingredients = crafting.addPanel('ingredients',new InventoryPanel(450,yg+200,240,380,'',true)); // true = invisible
-    ingredients.setInventory(new Inventory(5),5,true,null,Engine.player.inventory);
+    // ingredients.setInventory(new Inventory(5),5,true,null,Engine.player.inventory);
+    ingredients.setInventory('player',5,true,null,Engine.player.inventory);
 
     var items = crafting.addPanel('items',new InventoryPanel(40,yg,390,185,'Your items'));
     items.addButton(360, 8, 'blue','help',null,'',UI.textsData['craftitems_help']);
-    items.setInventory(Engine.player.inventory,9,true);
+    // items.setInventory(Engine.player.inventory,9,true);
+    items.setInventory('player',9,true);
+
     items.button = new BigButton(items.x+(items.width/2),items.y+items.height-20,
         'Use this inventory',function(){
             Engine.toggleStock(1);
         });
 
     var stock = crafting.addPanel('stock',new InventoryPanel(40,yg+190,390,185,'Workshop stock'));
-    stock.setInventory(new Inventory(20),9,true);
+    // stock.setInventory(new Inventory(20),9,true);
+    stock.setInventory('building',9,true);
+
     //stock.addButton(270, 8, 'blue','help',null,'',UI.textsData['buy_help']);
     stock.button = new BigButton(stock.x+(stock.width/2),stock.y+stock.height-20,
         'Use this inventory',function(){
@@ -1601,7 +1559,8 @@ Engine.makeBuildMenu = function(){
     var w = 200;
     var buildings = build.addPanel('build',new InventoryPanel(30,40,w,150,'Buildings'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
-    buildings.setInventory(Engine.player.buildRecipes,5,false,Engine.bldClick);
+    // buildings.setInventory(Engine.player.buildRecipes,5,false,Engine.bldClick);
+    buildings.setInventory('player',5,false,Engine.bldClick);
     buildings.setDataMap(Engine.buildingIconsData);
     build.addEvent('onDisplay',buildings.updateInventory.bind(buildings));
     return build;
@@ -1676,7 +1635,9 @@ Engine.makeInventory = function(statsPanel){
     inventory.setSound(Engine.scene.sound.add('inventory'));
 
     var items = inventory.addPanel('items',new InventoryPanel(40,100,600,380,'Items'));
-    items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
+    // items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
+    items.setInventory('player',15,true,Engine.inventoryClick);
+
     items.addCapsule('gold',100,-9,'999','gold');
     items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help']);
 
@@ -1696,6 +1657,12 @@ Engine.makeInventory = function(statsPanel){
     inventory.addEvent('onUpdateInventory',items.updateInventory.bind(items));
     inventory.addEvent('onUpdateStats',statsPanel.updateStats.bind(statsPanel));
     inventory.addEvent('onUpdateGold',function(){
+        items.updateCapsule('gold',Engine.player.gold);
+    });
+    inventory.addEvent('onOpen',function(){
+        equipment.updateEquipment();
+        items.updateInventory();
+        statsPanel.updateStats();
         items.updateCapsule('gold',Engine.player.gold);
     });
     return inventory;
@@ -2184,33 +2151,6 @@ Engine.enterBuilding = function(id){
 
     mainMenu.display();
     building.handleOut();
-
-    //TODO: rework
-    var menu = mainMenu;
-    /*if(menu.panels['shop']) {
-        menu.panels['shop'].modifyInventory(building.inventory);
-        if( menu.panels['shop'].filterItems) {
-            menu.panels['shop'].modifyFilter({
-                type: 'prices',
-                items: building.prices,
-                key: 1,
-                hard: false//!buildingData.workshop
-            });
-        }
-        menu.panels['shop'].updateInventory();
-
-        if(menu.panels['client']) {
-            if( menu.panels['client'].filterItems) {
-                menu.panels['client'].modifyFilter({
-                    type: 'prices',
-                    items: building.prices,
-                    key: 0,
-                    hard: false
-                });
-            }
-            menu.panels['client'].updateInventory();
-        }
-    }*/
 
     Engine.buildingTitle.setText(buildingData.name);
     var owner = Engine.currentBuiling.ownerName || 'Player';

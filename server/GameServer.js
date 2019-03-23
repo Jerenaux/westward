@@ -259,6 +259,7 @@ GameServer.loadBuildings = function(){
         if (err) return console.log(err);
         buildings.forEach(GameServer.addBuilding);
         console.warn(GameServer.marketPrices);
+        console.warn(GameServer.getDefaultPrices());
         GameServer.updateStatus();
     });
 };
@@ -975,6 +976,8 @@ GameServer.build = function(player,bid,tile){
         ownerName: player.name,
         built: false
     };
+    if(data.type == 4) data.prices = GameServer.getDefaultPrices();
+    console.warn(data.prices);
     var building = new Building(data);
     var document = new GameServer.BuildingModel(building);
     building.setModel(document); // ref to model is needed at least to get _id

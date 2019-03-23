@@ -59,12 +59,9 @@ function Building(data){
     });
 
     this.prices = data.prices;
-    var nbitems = 0;
     for(var item in this.prices){
         GameServer.marketPrices.add(item,this.prices[item].sell);
-        nbitems++;
     }
-    if(nbitems == 0 && this.type == 4) this.prices = GameServer.getDefaultPrices();
 
     this.setGold(data.gold || 0);
     this.built = !!data.built;

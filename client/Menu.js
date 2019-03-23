@@ -70,10 +70,11 @@ Menu.prototype.display = function(){
         if(!this.hideOnOpen[p]) this.panels[p].display();
     }
 
-    for(var event in this.events){
+    /*for(var event in this.events){
         if(!this.events.hasOwnProperty(event)) continue;
         this.trigger(event);
-    }
+    }*/
+    this.trigger('onOpen');
 
     Engine.inMenu = true;
     Engine.hideMarker();

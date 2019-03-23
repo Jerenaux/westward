@@ -39,9 +39,11 @@ Misc:
 - Identify own buildings (on map and in-game)
 - Show countdowns in production panel + set up notifications!
 - Reduce amount of orientation pins
+- Display death and conflict markers
 Shop UI:
-- Default prices
 - Fix "call events on display" issue
+- Add help to prices panel
+- Fix building menu "inventory"
 New movement system
 Check building limits are enforced
 
