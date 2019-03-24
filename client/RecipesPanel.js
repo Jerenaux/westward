@@ -11,7 +11,7 @@ RecipesPanel.prototype.constructor = RecipesPanel;
 
 RecipesPanel.prototype.getNextSlot = function(x,y){
     if(this.slotsCounter >= this.slots.length){
-        this.slots.push(new RecipeSlot(x,y,320,80));
+        this.slots.push(new RecipeSlot(x,y,360,80));
     }
 
     return this.slots[this.slotsCounter++];
@@ -20,15 +20,34 @@ RecipesPanel.prototype.getNextSlot = function(x,y){
 // -------------------------------------
 
 function RecipeSlot(x,y,width,height){
-    ShopSlot.call(this,x,y,width,height);
+    ItemSlot.call(this,x,y,width,height);
+
+    this.addIngredients();
+
+    this.content.forEach(function(c){
+        c.setScrollFactor(0);
+        c.setDepth(1);
+    });
 }
 
-RecipeSlot.prototype = Object.create(ShopSlot.prototype);
+RecipeSlot.prototype = Object.create(ItemSlot.prototype);
 RecipeSlot.prototype.constructor = RecipeSlot;
 
-RecipeSlot.prototype.addSpecificContent = function(width, height){
-    this.bagicon = UI.scene.add.sprite(this.x + width - 14, this.y + height - 12, 'UI','smallpack');
-    this.ingredients = UI.scene.add.text(this.x + width - 64, this.y + height - 22, '3/4', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.content.push(this.bagicon);
+RecipeSlot.prototype.addIngredients = function(){
+    this.ingredients = UI.scene.add.text(this.x + this.width - 10, this.y + this.height - 25, '0/4', { font: '16px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.ingredients.setOrigin(1,0);
     this.content.push(this.ingredients);
+};
+
+RecipeSlot.prototype.setUp = function(action,item,nb){
+    ItemSlot.prototype.setUp.call(this,action,item,nb);
+
+    var status = Engine.player.needsToCraft(item);
+    this.ingredients.setText(status[0]+'/'+status[1]);
+    this.ingredients.setFill(status[0] == status[1] ? Utils.colors.green : Utils.colors.red);
+
+    this.zone.on('pointerup',function(){
+        if(this.checkForPanelOnTop()) return;
+        Engine.currentMenu.panels['combi'].setUp(item);
+    }.bind(this));
 };

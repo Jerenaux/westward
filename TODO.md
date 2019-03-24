@@ -44,6 +44,11 @@ Misc:
 New movement system
 Check building limits are enforced
 
+UI:
+- Bag icon: always displayed & set to player inventory
+- Add chest icon to shops, set to local inventory
+- Factor in "output" aspect (in craftingpanel.setup)
+- Test with own workshop
 
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)

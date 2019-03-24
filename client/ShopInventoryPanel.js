@@ -111,7 +111,7 @@ ShopInventoryPanel.prototype.listItems = function(){
 
 ShopInventoryPanel.prototype.getNextSlot = function(x,y){
     if(this.slotsCounter >= this.slots.length){
-        this.slots.push(new ShopSlot(x,y,320,80));
+        this.slots.push(new ShopSlot(x,y,360,80));
     }
 
     return this.slots[this.slotsCounter++];
@@ -195,38 +195,7 @@ ShopInventoryPanel.prototype.hideContent = function(){
 // -----------------------
 
 function ShopSlot(x,y,width,height){
-    Frame.call(this,x,y,width,height);
-
-    this.slot = UI.scene.add.sprite(this.x + 30,this.y+height/2,'UI','equipment-slot');
-    this.icon = UI.scene.add.sprite(this.x + 30, this.y + height/2);
-    this.goldicon = UI.scene.add.sprite(this.x + width - 12, this.y + 16, 'UI','gold');
-    this.staticon = UI.scene.add.sprite(this.x + 70, this.y + 45, 'icons2');
-
-    this.name = UI.scene.add.text(this.x + 60, this.y + 10, '', { font: '16px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.effect = UI.scene.add.text(this.x + 88, this.y + 35, '', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.rarity = UI.scene.add.text(this.x + 60, this.y + 60, '', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.price = UI.scene.add.text(this.x + width - 22, this.y + 6, '', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.price.setOrigin(1,0);
-
-    this.zone = UI.scene.add.zone(this.x,this.y,width,height);
-    this.zone.setInteractive();
-    this.zone.setOrigin(0);
-    this.zone.on('pointerover',function(){
-        if(this.checkForPanelOnTop()) return;
-        UI.tooltip.updateInfo(this.name.text,this.desc,this.itemID);
-        UI.tooltip.display();
-        UI.setCursor('item');
-    }.bind(this));
-    this.zone.on('pointerout',function(){
-        if(this.checkForPanelOnTop()) return;
-        UI.tooltip.hide();
-        UI.setCursor();
-    }.bind(this));
-
-    this.content = [this.icon, this.staticon, this.name, this.effect, this.rarity,
-    this.zone, this.goldicon, this.price, this.slot];
-
-    this.addSpecificContent(width, height);
+    ItemSlot.call(this,x,y,width,height);
 
     this.content.forEach(function(c){
         c.setScrollFactor(0);
@@ -234,103 +203,19 @@ function ShopSlot(x,y,width,height){
     });
 }
 
-ShopSlot.prototype = Object.create(Frame.prototype);
+ShopSlot.prototype = Object.create(ItemSlot.prototype);
 ShopSlot.prototype.constructor = ShopSlot;
 
-ShopSlot.prototype.addSpecificContent = function(widt, height){
-    this.bagicon = UI.scene.add.sprite(this.x + 14, this.y + height - 12, 'UI','smallpack');
-    this.nb = UI.scene.add.text(this.x + 24, this.y + height - 22, '999', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.content.push(this.bagicon);
-    this.content.push(this.nb);
-};
-
-ShopSlot.prototype.checkForPanelOnTop = function(){
-    return (Engine.currentMenu.panels.hasOwnProperty('prices') &&
-        Engine.currentMenu.panels['prices'].displayed);
-};
-
 ShopSlot.prototype.setUp = function(action,item,nb){
-    var itemData = Engine.itemsData[item];
-    this.icon.setTexture(itemData.atlas,itemData.frame);
-    this.name.setText(itemData.name);
-    this.desc = itemData.desc;
-    this.itemID = item;
-    if(this.nb) this.nb.setText(nb);
-
-    var rarityMap = {
-        0: 'Unique',
-        1: 'Rare',
-        2: 'Common',
-        3: 'Very common'
-    };
-    this.rarity.setText(rarityMap[Engine.rarity[item]]);
-    this.rarity.setFill((Engine.rarity[item] <= 1 ? Utils.colors.gold : Utils.colors.white));
-
-    var priceaction = (action == 'buy' ? 'sell' : 'buy');
-    var price = Engine.currentBuiling.getPrice(item,priceaction);
-    if(price == 0) {
-        this.price.setText('--');
-        this.price.setFill(Utils.colors.white);
-    }else{
-        this.price.setText(price);
-        if (action == 'sell') {
-            this.price.setFill((price > Engine.currentBuiling.gold ? Utils.colors.red : Utils.colors.white));
-        } else {
-            this.price.setFill((price > Engine.player.gold ? Utils.colors.red : Utils.colors.white));
-        }
-    }
+    ItemSlot.prototype.setUp.call(this,action,item,nb);
 
     this.zone.on('pointerup',function(){
-        if(Engine.currentMenu.panels['prices'].displayed) return;
+        // if(Engine.currentMenu.panels['prices'].displayed) return;
+        if(this.checkForPanelOnTop()) return;
         Engine.currentMenu.panels['goldaction'].hide();
         Engine.currentMenu.panels['action'].display();
         Engine.currentMenu.panels['action'].setUp(item,action);
-    });
-
-    if(itemData.hasOwnProperty('effects')) {
-        this.hasEffect = true;
-        for (var stat in itemData.effects) {
-            this.staticon.setFrame(Stats[stat].frame);
-            var effect = itemData.effects[stat];
-            var stattext = effect;
-            if(effect > 0) stattext = '+'+stattext;
-            this.effect.setText(stattext);
-
-            var equipped = Engine.player.getEquipped(itemData.equipment);
-            if(equipped > 0) {
-                var current = Engine.itemsData[equipped].effects[stat];
-                if(current > effect){
-                    this.effect.setFill(Utils.colors.red);
-                }else if(current < effect){
-                    this.effect.setFill(Utils.colors.green);
-                }else{
-                    this.effect.setFill(Utils.colors.gold);
-                }
-            }else{
-                this.effect.setFill(Utils.colors.green);
-            }
-        }
-    }else{
-        this.hasEffect = false;
-    }
-};
-
-ShopSlot.prototype.display = function(){
-    Frame.prototype.display.call(this);
-    this.content.forEach(function(c){
-        c.setVisible(true);
-    });
-    if(!this.hasEffect) {
-        this.staticon.setVisible(false);
-        this.effect.setVisible(false);
-    }
-};
-
-ShopSlot.prototype.hide = function(){
-    Frame.prototype.hide.call(this);
-    this.content.forEach(function(c){
-        c.setVisible(false);
-    });
+    }.bind(this));
 };
 
 // -------------------------------------------

@@ -90,25 +90,23 @@ var Hero = new Phaser.Class({
         Engine.firstSelfUpdate = false;
     },
 
-    setCommitSlots: function(commitSlots){
-        // Data structures are cleared in updateCommitSlots
-        if(!this.commitTypes) this.commitTypes = new Inventory(commitSlots.max);
-        if(!this.commitIDs) this.commitIDs = [];
-        this.maxCommitSlots = commitSlots.max;
-
-        commitSlots.slots.forEach(function(s){
-            this.commitTypes.add(s.type,1);
-            this.commitIDs.push(s.id);
-        },this);
+    needsToCraft: function(item){
+        var required = 0;
+        var owned = 0;
+        var recipe = Engine.itemsData[item].recipe;
+        for(var itm in recipe){
+            required++;
+            if(this.hasItem(itm,recipe[itm])) owned++;
+        }
+        return [owned,required];
     },
 
-    canCommit: function(){
-        if(!this.hasFreeCommitSlot()) return;
-        return !this.commitIDs.includes(Engine.currentBuiling.id);
-    },
-
-    hasFreeCommitSlot: function(){
-        return (this.commitIDs.length != this.maxCommitSlots);
+    canCraft: function(item){
+        var recipe = Engine.itemsData[item].recipe;
+        for(var itm in recipe){
+            if(!this.hasItem(itm,recipe[itm])) return false;
+        }
+        return true;
     },
 
 

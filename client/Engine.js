@@ -1484,19 +1484,25 @@ Engine.makeCraftingMenu = function(){
     crafting.setSound(Engine.scene.sound.add('crafting'));
     crafting.setExitPos(885);
 
+    var combix = 20;
+    var combiw = 550;
     var y = 80;
-    var w = 400;
+    var recipesw = 400;
     var h = 480;
     var space = 15;
     var center = Engine.getGameConfig().width/2;
 
-    var recipes = crafting.addPanel('shop',new RecipesPanel(center+space,y,w,h,'Recipes'));
+    var recipes = crafting.addPanel('shop',new RecipesPanel(combix+combiw+space,y,recipesw,h,'Recipes'));
     recipes.setInventory('crafting');
-    // recipes.addCapsule('gold',100,-9,'999','gold');
     // recipes.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help']);
+
+    var combi = crafting.addPanel('combi',new CraftingPanel(combix,y,combiw,h,'Crafting'));
+    combi.addButton(combiw-30, 8, 'blue','help',null,'',UI.textsData['combi_help']);
+    combi.addCapsule('gold',120,-9,'999','gold');
 
     crafting.addEvent('onOpen',function(){
         recipes.updateContent();
+        combi.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
         /*client.updateCapsule('gold',Engine.player.gold);
         shop.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
         client.updateContent();

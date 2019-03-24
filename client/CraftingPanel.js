@@ -13,7 +13,13 @@ CraftingPanel.prototype = Object.create(Panel.prototype);
 CraftingPanel.prototype.constructor = CraftingPanel;
 
 CraftingPanel.prototype.addInterface = function(){
-    var ringy = 100;
+    this.craftSlot = new RecipeSlot(115,130,320,80);
+    this.craftSlot.hide();
+
+    this.noitem = this.addText(225,80,'Select a recipe to begin',Utils.colors.white,16);
+    this.noitem.setOrigin(0.5);
+
+    /*var ringy = 100;
     var ring = UI.scene.add.image(this.x+(this.width/2),this.y+ringy,'UI','craftring');
     ring.setScrollFactor(0);
     ring.setDepth(1);
@@ -23,13 +29,13 @@ CraftingPanel.prototype.addInterface = function(){
     var ringw = ring.frame.width;
     var ringh = ring.frame.height;
 
-    var x = ring.x-(ringw/2)-this.x;
+    /*var x = ring.x-(ringw/2)-this.x;
     var y = ring.y - (ringh/2)-this.y;
     this.addButton(x+92,y+13,'green','ok',this.requestCraft.bind(this),'Craft');
     this.addButton(x+5,y+82,'blue','plus',this.increaseAmount.bind(this),'Increase by 1');
-    this.addButton(x+22,y+99,'blue','minus',this.decreaseAmount.bind(this),'Decrease by 1');
+    this.addButton(x+22,y+99,'blue','minus',this.decreaseAmount.bind(this),'Decrease by 1');*/
 
-    var item = new ItemSprite();
+    /*var item = new ItemSprite();
     item.setPosition(this.x+x+(ringw/2)+5,this.y+y+(ringh/2));
     item.showTooltip = false;
     this.content.push(item);
@@ -39,14 +45,14 @@ CraftingPanel.prototype.addInterface = function(){
     count.setVisible(false);
     count.setDepth(2);
     count.setScrollFactor(0);
-    this.content.push(count);
+    this.content.push(count);*/
 
     this.craftItem = {
         id: -1,
         count: 0,
         recipe: null,
-        item: item,
-        countText: count
+        // item: item,
+        // countText: count
     };
 };
 
@@ -56,27 +62,31 @@ CraftingPanel.prototype.display = function(){
 };
 
 CraftingPanel.prototype.displayInterface = function(){
-     this.ring.setVisible(true);
-     this.buttons.forEach(function(b){
+     // this.ring.setVisible(true);
+     /*this.buttons.forEach(function(b){
          b.btn.disable();
      });
-     this.buttons[3].btn.enable(); // enable help button
+     this.buttons[3].btn.enable(); // enable help button*/
+     // this.craftSlot.display();
+    this.noitem.setVisible(true);
 };
 
 CraftingPanel.prototype.setUp = function(itemID){
     var data = Engine.itemsData[itemID];
     this.craftItem.id = itemID;
-    this.craftItem.item.setUp(itemID,data);
     this.craftItem.count = 1;
-    var output = (Engine.itemsData[this.craftItem.id].output || 1);
-    this.craftItem.countText.setText(this.craftItem.count*output);
     this.craftItem.recipe = data.recipe;
-    this.craftItem.item.setVisible(true);
-    this.craftItem.countText.setVisible(true);
 
-    Engine.getIngredientsPanel().modifyInventory(this.makeIngredientsList(data.recipe,1));
-    Engine.getIngredientsPanel().updateInventory();
-    this.manageButtons();
+    this.craftSlot.setUp('buy',itemID,1);
+    this.craftSlot.display();
+    this.noitem.setVisible(false);
+
+    /*var output = (Engine.itemsData[this.craftItem.id].output || 1);
+    this.craftItem.countText.setText(this.craftItem.count*output);
+    this.craftItem.item.setVisible(true);
+    this.craftItem.countText.setVisible(true);*/
+
+    // this.manageButtons();
 };
 
 CraftingPanel.prototype.manageButtons = function(){
@@ -148,6 +158,7 @@ CraftingPanel.prototype.makeIngredientsList = function(recipe,amount){
 
 CraftingPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
+    this.craftSlot.hide();
     this.reset();
 };
 
@@ -155,7 +166,6 @@ CraftingPanel.prototype.reset = function(){
     this.craftItem.id = -1;
     this.craftItem.count = 0;
     this.craftItem.recipe = null;
-    Engine.getIngredientsPanel().modifyInventory(new Inventory(5));
 };
 
 CraftingPanel.prototype.requestCraft = function(){
