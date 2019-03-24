@@ -24,6 +24,10 @@ Menu.prototype.setTitlePos = function(y){
     this.titleY = y;
 };
 
+Menu.prototype.setExitPos = function(x){
+    this.exitX = x;
+};
+
 Menu.prototype.setSound = function(sound){
     this.sound = sound;
 };
@@ -158,7 +162,8 @@ function BuildingTitle(x,y){
         });*/
     },this);
 
-    this.exit = UI.scene.add.sprite(xr+10,yr+10,'UI','exit_icon');
+    // this.exit = UI.scene.add.sprite(xr+10,yr+10,'UI','exit_icon');
+    this.exit = UI.scene.add.sprite(0,yr+10,'UI','exit_icon');
     this.exit.setDepth(this.depth+1);
     this.exit.setScrollFactor(0);
     this.exit.setVisible(false);
@@ -222,6 +227,7 @@ BuildingTitle.prototype.display = function(){
         e.setVisible(true);
     });
     this.text.setVisible(true);
+    this.exit.x = Engine.currentMenu.exitX;
     this.exit.setVisible(true);
     this.capsule.display();
 };

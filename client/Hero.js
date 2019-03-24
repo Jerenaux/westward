@@ -16,6 +16,7 @@ var Hero = new Phaser.Class({
         this.isHero = true;
 
         this.buildRecipes = new Inventory(7);
+        this.craftRecipes = new Inventory(100);
     },
 
     setUp: function(data){
@@ -40,6 +41,11 @@ var Hero = new Phaser.Class({
         this.name = data.name;
 
         this.updateRarity(data.rarity);
+
+        for(var item in Engine.itemsData){
+            var data = Engine.itemsData[item];
+            if(data.basicRecipe) this.craftRecipes.add(item,1);
+        }
     },
 
     updateData: function(data){ // don't call this 'update' or else conflict with Player.update() for other player updates

@@ -22,7 +22,8 @@
     "recipe": {"7":1,"21":1},
     "useInBattle": true,
     "sound": "cloth",
-    "isCrafted": true
+    "isCrafted": true,
+    "basicRecipe": true
   },
   "3":{
     "atlas": "items2",
@@ -53,7 +54,7 @@
   "6":{
     "atlas": "items2",
     "frame":"flask",
-    "name": "Cradle",
+    "name": "Dawn",
     "desc": "Bitter potion made of daybreak and clover, regenerates a lot of health.",
     "isPotion": true,
     "recipe": {"17":1,"18":1},
@@ -199,7 +200,8 @@
     "useInBattle": true,
     "sound": "woodsmall",
     "isCrafted": true,
-    "recipe":{"7":1,"24":1,"30":1}
+    "recipe":{"7":1,"24":1,"30":1},
+    "basicRecipe": true
   },
   "21":{
     "atlas": "items",
@@ -209,7 +211,8 @@
     "isCrafted": true,
     "isMaterial": true,
     "recipe":{"8":3},
-    "sound": "cloth"
+    "sound": "cloth",
+    "basicRecipe": true
   },
   "22":{
     "atlas": "items2",
@@ -269,7 +272,8 @@
     "equipment": "meleew",
     "effects":{"dmg":5},
     "useInBattle": true,
-    "sound": "equip"
+    "sound": "equip",
+    "basicRecipe": true
   },
   "29":{
     "atlas": "items",
@@ -283,7 +287,8 @@
     "isCrafted": true,
     "crafTier": 1,
     "recipe":{"7":1,"27":1,"30":4},
-    "sound": "woodsmall"
+    "sound": "woodsmall",
+    "basicRecipe": true
   },
   "30":{
     "atlas": "items2",
@@ -440,23 +445,5 @@
     "sound": "cloth",
     "stickMouse": true,
     "useInBattle": true
-  },
-  "45":{
-    "atlas": "items2",
-    "frame":"timber",
-    "name": "Shack",
-    "desc": "A small dwelling where you can rest."
-  },
-  "46":{
-    "atlas": "items2",
-    "frame":"timber",
-    "name": "Lumber camp",
-    "desc": "This small camp produces a little bit of timber."
-  },
-  "47":{
-    "atlas": "items2",
-    "frame":"timber",
-    "name": "Defense tower",
-    "desc": "A wooden tower which can shoot at enemies."
   }
 }

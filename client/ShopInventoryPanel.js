@@ -85,13 +85,23 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
     this.previousPage.setOrigin(0);
 };
 
-ShopInventoryPanel.prototype.listItems = function(){
-    var items = [];
+ShopInventoryPanel.prototype.getInventory = function(){
     if(this.inventory == 'player'){
-        items = Engine.player.inventory.toList(true); // true = filter out zeroes
+        return Engine.player.inventory;
+    }else if(this.inventory == 'building'){
+        return (Engine.currentBuiling ? Engine.currentBuiling.inventory : new Inventory(5));
+    }else if(this.inventory == 'buildRecipes') {
+        return Engine.player.buildRecipes;
+    }else if(this.inventory == 'crafting'){
+        return Engine.player.craftRecipes;
     }else{
-        items = Engine.currentBuiling.inventory.toList(true);
+        console.warn('Unidentified inventory');
+        return new Inventory(5);
     }
+};
+
+ShopInventoryPanel.prototype.listItems = function(){
+    items = this.getInventory().toList(true); // true = filter out zeroes
     items.sort(function(a,b){
         if(Engine.itemsData[a[0]].name < Engine.itemsData[b[0]].name) return -1;
         return 1;
@@ -189,12 +199,10 @@ function ShopSlot(x,y,width,height){
 
     this.slot = UI.scene.add.sprite(this.x + 30,this.y+height/2,'UI','equipment-slot');
     this.icon = UI.scene.add.sprite(this.x + 30, this.y + height/2);
-    this.bagicon = UI.scene.add.sprite(this.x + 14, this.y + height - 12, 'UI','smallpack');
     this.goldicon = UI.scene.add.sprite(this.x + width - 12, this.y + 16, 'UI','gold');
     this.staticon = UI.scene.add.sprite(this.x + 70, this.y + 45, 'icons2');
 
     this.name = UI.scene.add.text(this.x + 60, this.y + 10, '', { font: '16px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.nb = UI.scene.add.text(this.x + 24, this.y + height - 22, '999', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     this.effect = UI.scene.add.text(this.x + 88, this.y + 35, '', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     this.rarity = UI.scene.add.text(this.x + 60, this.y + 60, '', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     this.price = UI.scene.add.text(this.x + width - 22, this.y + 6, '', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
@@ -204,16 +212,22 @@ function ShopSlot(x,y,width,height){
     this.zone.setInteractive();
     this.zone.setOrigin(0);
     this.zone.on('pointerover',function(){
-        if(Engine.currentMenu.panels['prices'].displayed) return;
+        if(this.checkForPanelOnTop()) return;
+        UI.tooltip.updateInfo(this.name.text,this.desc,this.itemID);
+        UI.tooltip.display();
         UI.setCursor('item');
-    });
+    }.bind(this));
     this.zone.on('pointerout',function(){
-        if(Engine.currentMenu.panels['prices'].displayed) return;
+        if(this.checkForPanelOnTop()) return;
+        UI.tooltip.hide();
         UI.setCursor();
-    });
+    }.bind(this));
 
-    this.content = [this.icon, this.bagicon, this.staticon, this.name, this.nb, this.effect, this.rarity,
+    this.content = [this.icon, this.staticon, this.name, this.effect, this.rarity,
     this.zone, this.goldicon, this.price, this.slot];
+
+    this.addSpecificContent(width, height);
+
     this.content.forEach(function(c){
         c.setScrollFactor(0);
         c.setDepth(1);
@@ -223,11 +237,25 @@ function ShopSlot(x,y,width,height){
 ShopSlot.prototype = Object.create(Frame.prototype);
 ShopSlot.prototype.constructor = ShopSlot;
 
+ShopSlot.prototype.addSpecificContent = function(widt, height){
+    this.bagicon = UI.scene.add.sprite(this.x + 14, this.y + height - 12, 'UI','smallpack');
+    this.nb = UI.scene.add.text(this.x + 24, this.y + height - 22, '999', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.content.push(this.bagicon);
+    this.content.push(this.nb);
+};
+
+ShopSlot.prototype.checkForPanelOnTop = function(){
+    return (Engine.currentMenu.panels.hasOwnProperty('prices') &&
+        Engine.currentMenu.panels['prices'].displayed);
+};
+
 ShopSlot.prototype.setUp = function(action,item,nb){
     var itemData = Engine.itemsData[item];
     this.icon.setTexture(itemData.atlas,itemData.frame);
     this.name.setText(itemData.name);
-    this.nb.setText(nb);
+    this.desc = itemData.desc;
+    this.itemID = item;
+    if(this.nb) this.nb.setText(nb);
 
     var rarityMap = {
         0: 'Unique',
@@ -304,3 +332,5 @@ ShopSlot.prototype.hide = function(){
         c.setVisible(false);
     });
 };
+
+// -------------------------------------------

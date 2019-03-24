@@ -40,8 +40,7 @@ Misc:
 - Show countdowns in production panel + set up notifications!
 - Reduce amount of orientation pins
 - Display death and conflict markers
-Shop UI:
-- Fix building menu "inventory"
+- add esc shortcut
 New movement system
 Check building limits are enforced
 
@@ -225,7 +224,6 @@ Order:
 - Rework longslot system
 - Setters/getters everywhere
 - Centralize all texts (incl. stats, equip, and even item descriptions)
-- Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
 - Remove "longslot" stuff intended for stretching longslots vertically?
 
 Content:

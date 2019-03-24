@@ -446,7 +446,7 @@ Engine.bootTutorial = function(part){
     data = {
         gold: 100,
         stats: [{k:'hpmax',v:300},{k:'hp',v:300}],
-        bldRecipes: [11,6,2,3,4]
+        bldRecipes: [11,6,3,4]
     };
     Engine.player.updateData(data);
     data = {
@@ -470,14 +470,10 @@ Engine.initWorld = function(data){
 
     console.log(data);
     //Engine.settlementsData = data.settlements;
-    Engine.makeRecipesLists();
     Engine.addHero(data);
     Engine.playerIsInitialized = true;
     Engine.updateEnvironment();
 
-    /*Engine.currentBuiling = {
-        inventory: new Inventory(5)
-    };*/
     Engine.makeUI();
 
     // TODO: move
@@ -1251,6 +1247,7 @@ Engine.makeBattleMenu = function(){
 Engine.makeProductionMenu = function(){
     var production = new Menu('Production');
     production.setTitlePos(100);
+    production.setExitPos(680);
     var w = 400;
     var h = 330;
     var x = (Engine.getGameConfig().width-w)/2;
@@ -1302,6 +1299,7 @@ Engine.makeConstructionMenu = function(){
 
     var constr = new Menu('Construction');
     constr.setTitlePos(100);
+    constr.setExitPos(720);
     var progress = new ConstructionPanel(x,progressy,w,progressh);
     progress.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['progress_help']);
     constr.addPanel('progress',progress);
@@ -1420,6 +1418,7 @@ Engine.makeMapMenu = function(){
 Engine.makeTradeMenu = function(){
     var trade = new Menu('Trade');
     trade.setTitlePos(10);
+    trade.setExitPos(885);
     var y = 80;
     var w = 400;
     var h = 480;
@@ -1481,12 +1480,34 @@ Engine.makeTradeMenu = function(){
 
 Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
-    crafting.setTitlePos(90);
+    crafting.setTitlePos(10);
     crafting.setSound(Engine.scene.sound.add('crafting'));
+    crafting.setExitPos(885);
+
+    var y = 80;
+    var w = 400;
+    var h = 480;
+    var space = 15;
+    var center = Engine.getGameConfig().width/2;
+
+    var recipes = crafting.addPanel('shop',new RecipesPanel(center+space,y,w,h,'Recipes'));
+    recipes.setInventory('crafting');
+    // recipes.addCapsule('gold',100,-9,'999','gold');
+    // recipes.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help']);
+
+    crafting.addEvent('onOpen',function(){
+        recipes.updateContent();
+        /*client.updateCapsule('gold',Engine.player.gold);
+        shop.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+        client.updateContent();
+        shop.updateContent();
+        action.update();
+        goldaction.update();*/
+    });
 
     //var recipes = new InventoryPanel(765,100,235,380,'Recipes');
     //recipes.setInventory(Engine.workshopRecipes,4,false,Engine.recipeClick);
-    var yg = 150;
+    /*var yg = 150;
     var recipes = new Panel(700,yg,300,380,'Recipes');
     recipes.addButton(270, 8, 'blue','help',null,'',UI.textsData['recipes_help']);
     crafting.addPanel('recipes',recipes);
@@ -1548,7 +1569,7 @@ Engine.makeCraftingMenu = function(){
 
     crafting.addEvent('onDisplay',function(){
         Engine.toggleStock(1);
-    });
+    });*/
     return crafting;
 };
 
@@ -1563,7 +1584,7 @@ Engine.makeBuildMenu = function(){
     // buildings.setInventory(Engine.player.buildRecipes,5,false,Engine.bldClick);
     buildings.setInventory('buildRecipes',5,false,Engine.bldClick);
     buildings.setDataMap(Engine.buildingIconsData);
-    build.addEvent('onDisplay',buildings.updateInventory.bind(buildings));
+    build.addEvent('onOpen',buildings.updateInventory.bind(buildings));
     return build;
 };
 
@@ -1733,44 +1754,6 @@ Engine.makeCharacterMenu = function(){
 
 Engine.getIngredientsPanel = function(){
     return Engine.menus['crafting'].panels['ingredients'];
-};
-
-Engine.makeRecipesLists = function(){
-
-    // TODO: put in conf somewhere; better: derive it from items file
-    var equipmentRecipes = [28,11,10,13,15,16,2,19,29,20,12,40,42,39,4,44,6];
-    var ingredientsRecipes = [22,23,32,33,38,35,41,17,21,43];
-
-    /*for(var key in Engine.itemsData){
-        // TODO: standardize flags (isWeapon, ...)
-        var item = Engine.itemsData[key];
-        if(item.isCrafted){
-            if(item.equipment){
-                equipmentRecipes.push(key);
-            }
-            if(item.isPotion) equipmentRecipes.push(key);
-            if(item.isWeapon) equipmentRecipes.push(key);
-            if(item.isMaterial) ingredientsRecipes.push(key);
-        }
-    }*/
-
-    //console.log("w",weaponsRecipes);
-    //console.log("eq",equipmentRecipes);
-    //console.log("ingredients",ingredientsRecipes);
-    //console.log("potions",potionRecipes);
-
-
-    //Engine.weaponsRecipes = new Inventory(12);
-    Engine.equipmentRecipes = new Inventory(18);
-    Engine.ingredientsRecipes = new Inventory(18);
-    //Engine.potionsRecipes = new Inventory(12);
-
-    equipmentRecipes.forEach(function(w){
-        Engine.equipmentRecipes.add(w,1);
-    });
-    ingredientsRecipes.forEach(function(w){
-        Engine.ingredientsRecipes.add(w,1);
-    });
 };
 
 Engine.addHero = function(data){

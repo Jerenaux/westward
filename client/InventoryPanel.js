@@ -146,10 +146,7 @@ InventoryPanel.prototype.displayInventory = function(){
         s.setVisible(true);
     });
     var nbDisplayed = 0;
-    // this.inventory.order.forEach(function(item){
     this.listItems().forEach(function(itm){
-        // if(!this.inventory.items.hasOwnProperty(item)) return;
-        // var amount = this.inventory.getNb(item);
         var item = itm[0];
         var amount = itm[1];
         if(amount == 0) return;
