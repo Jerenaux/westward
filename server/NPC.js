@@ -272,7 +272,6 @@ NPC.prototype.isAvailableForFight = function(){
 // ### Wander ###
 
 NPC.prototype.onEndOfPath = function(){
-    //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
     MovingEntity.prototype.onEndOfPath.call(this);
     if(this.inFight) return;
     this.setIdle();

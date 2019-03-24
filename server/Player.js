@@ -23,7 +23,6 @@ function Player(){
     this.schemaModel = GameServer.PlayerModel;
     this.battlePriority = 1;
 
-
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.oldAOIs = [];
     this.action = null;
@@ -513,6 +512,7 @@ Player.prototype.initTrim = function(){
     trimmed.y = parseInt(this.y);
     trimmed.buildingMarkers = GameServer.listBuildingMarkers();
     trimmed.resourceMarkers = GameServer.resourceMarkers;
+    trimmed.vision = GameServer.getVision();
     return trimmed;
 };
 
@@ -592,7 +592,6 @@ Player.prototype.onAOItransition = function(newAOI,previousAOI){
 };
 
 Player.prototype.onEndOfPath = function(){
-    //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
     MovingEntity.prototype.onEndOfPath.call(this);
     if(this.inFight) return;
     if(!this.action) return;
@@ -646,10 +645,12 @@ Player.prototype.addNotif = function(msg){
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){
-    if(this.updatePacket.isEmpty()) return null;
+    // console.log(this.updatePacket,this.updatePacket.isEmpty());
     var pkg = this.updatePacket;
-    this.updatePacket = new PersonalUpdatePacket();
     if(GameServer.buildingsChanged) pkg.buildingMarkers = GameServer.listBuildingMarkers();
+    if(GameServer.visionChanged) pkg.vision = GameServer.getVision();
+    if(pkg.isEmpty()) return null;
+    this.updatePacket = new PersonalUpdatePacket();
     return pkg;
 };
 

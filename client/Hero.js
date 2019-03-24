@@ -56,7 +56,8 @@ var Hero = new Phaser.Class({
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
             'resetTurn': BattleManager.resetTurn,
-            'stats': this.updateStats
+            'stats': this.updateStats,
+            'vision': this.updateVision
         };
 
         this.updateEvents = new Set();
@@ -185,14 +186,13 @@ var Hero = new Phaser.Class({
         },this);
     },
 
-    updateCivicLvl: function(civiclvl){
-        this.civiclvl = civiclvl;
-        this.updateEvents.add('citizen');
-        // TODO: add sound effect
+    postChunkUpdate: function(){
+        if(this.chunk != this.previousChunk) Engine.updateEnvironment();
+        this.previousChunk = this.chunk;
     },
 
-    updateCivicXP: function(civicxp){
-        this.civicxp = civicxp;
+    updateCivicLvl: function(civiclvl){
+        this.civiclvl = civiclvl;
         this.updateEvents.add('citizen');
         // TODO: add sound effect
     },
@@ -206,15 +206,6 @@ var Hero = new Phaser.Class({
     updateClassXP: function(classxp){
         this.classxp = classxp;
         this.updateEvents.add('character');
-        // TODO: add sound effect
-    },
-
-    updateCommitSlots: function(commitSlots){
-        //this.commitSlots.clear();
-        this.commitTypes.clear();
-        this.commitIDs = [];
-        this.setCommitSlots(commitSlots);
-        this.updateEvents.add('commit');
         // TODO: add sound effect
     },
 
@@ -277,5 +268,14 @@ var Hero = new Phaser.Class({
                 statObj.absoluteModifiers.push(m);
             })
         }
+    },
+
+    updateVision: function(aois){
+        // var aois = [331,341,389,390,391,438,439,440,490];
+        this.mapVision = [];
+        aois.forEach(function(aoi){
+            var origin = Utils.AOItoTile(aoi);
+            this.mapVision.push(new Phaser.Geom.Rectangle(origin.x,origin.y,World.chunkWidth,World.chunkHeight));
+        },this);
     }
 });

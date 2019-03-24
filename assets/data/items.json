@@ -69,7 +69,8 @@
     "name": "Wood",
     "envFrames": ["wood"],
     "desc": "Crafting material used to make wooden weapons or to make charcoal.",
-    "sound": "woodsmall"
+    "sound": "woodsmall",
+    "isMaterial": true
   },
   "8":{
     "atlas": "items2",

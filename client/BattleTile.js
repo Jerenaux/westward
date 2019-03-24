@@ -27,14 +27,14 @@ var BattleTile = new Phaser.Class({
     setUp: function(data){
         this.id = data.id;
         this.setPosition(data.x*32,data.y*32);
-        this.tx = data.x;
-        this.ty = data.y;
-        this.chunk = Utils.tileToAOI({x:this.tx,y:this.ty});
+        this.tileX = data.x;
+        this.tileY = data.y;
+        this.chunk = Utils.tileToAOI({x:this.tileX,y:this.tileY});
         this.setVisible(true);
         this.update();
 
         Engine.battleCells[this.id] = this;
-        Engine.battleCellsMap.add(this.tx,this.ty,this);
+        Engine.battleCellsMap.add(this.tileX,this.tileY,this);
         Engine.entityManager.addToDisplayList(this);
     },
 
@@ -48,8 +48,8 @@ var BattleTile = new Phaser.Class({
             }
 
             this.dist = Utils.euclidean({
-                x: this.tx,
-                y: this.ty
+                x: this.tileX,
+                y: this.tileY
             }, {
                 x: Engine.player.tileX,
                 y: Engine.player.tileY
@@ -78,12 +78,12 @@ var BattleTile = new Phaser.Class({
 
     remove: function(){
         CustomSprite.prototype.remove.call(this);
-        Engine.battleCellsMap.delete(this.tx,this.ty);
+        Engine.battleCellsMap.delete(this.tileX,this.tileY);
         delete Engine.battleCells[this.id];
     },
 
     hash: function(){
-        return this.tx+"_"+this.ty;
+        return this.tileX+"_"+this.tileY;
     },
 
     // ### INPUT ###

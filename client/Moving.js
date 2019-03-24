@@ -44,17 +44,17 @@ var Moving = new Phaser.Class({
         this.updatePosition(x,y);
     },
 
-    setTilePosition: function(x,y){
+    /*setTilePosition: function(x,y){
         this.tileX = x;
         this.tileY = y;
-    },
+    },*/
 
     // Updates the position; primarily called as the entity moves around and has moved by at least 1 tile
     updatePosition: function(x,y){ // x and y are tile cordinates
         this.updatePreviousPosition();
         this.setTilePosition(x,y);
         this.updateDepth();
-        this.updateChunk();
+        // this.updateChunk();
     },
 
     updatePreviousPosition: function(){
@@ -69,14 +69,6 @@ var Moving = new Phaser.Class({
     updateDepth: function(){
         //this.setDepth(Engine.playersDepth + this.tileY / 1000);
         this.setDepth(this.tileY+1);
-    },
-
-    updateChunk: function(){
-        this.chunk = Utils.tileToAOI({x:this.tileX,y:this.tileY});
-        if(this.isHero) {
-            if(this.chunk != this.previousChunk) Engine.updateEnvironment();
-            this.previousChunk = this.chunk;
-        }
     },
 
     manageOrientationPin: function(){
