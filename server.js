@@ -113,15 +113,22 @@ if(process.env.DEV == 1) {
 
 server.listen(process.env.PORT || myArgs.port || 8081,function(){
     console.log('Listening on '+server.address().port);
-    mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward');
+
+    mongodbAuth = {}
+    console.log('Check for mongodb Auth');
+    if (process.env.MONGODB_AUTH) {
+        console.log('Create auth object with user, pass, client');
+        mongodbAuth = {
+            "user": process.env.MONGODB_USERNAME || 'root',
+            "pass": process.env.MONGODB_PASSWORD || 'password',
+            "useMongoClient": true
+        };
+    }
+
+    mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward', mongodbAuth);
     var db = mongoose.connection;
 
-    if (process.env.MONGODB_AUTH) {
-        db.auth(
-            process.env.MONGODB_USERNAME || 'root',
-            process.env.MONGODB_PASSWORD || 'password'
-        );
-    }
+
 
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function() {

@@ -19,7 +19,7 @@ services:
       - mongo
     environment:
       MONGODB_URI: mongodb://mongo:27017/westward
-      MONGODB_AUTH: true
+      MONGODB_AUTH: 1
       MONGODB_USERNAME: root
       MONGODB_PASSWORD: password
   # westward-admin:
