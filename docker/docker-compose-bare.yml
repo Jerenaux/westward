@@ -8,16 +8,20 @@ services:
       - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_ROOT_PASSWORD: password
 
-  # westward:
-  #   image: westward:latest
-  #   restart: unless-stopped
-  #   ports:
-  #     - "80:80"    
-  #   links:
-  #     - mongo
-
+  westward:
+    image: westward:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - mongo
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/westward
+      MONGODB_AUTH: true
+      MONGODB_USERNAME: root
+      MONGODB_PASSWORD: password
   # westward-admin:
   #   image: westward-admin:latest
   #   restart: unless-stopped
