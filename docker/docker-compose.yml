@@ -1,0 +1,103 @@
+version: '3.7'
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "4200:4200"
+      - "443:443"
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - nginx.certs:/etc/nginx/certs:ro
+      - nginx.vhost.d:/etc/nginx/vhost.d
+      - nginx.html:/usr/share/nginx/html
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+
+  nginx-proxy-companion:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    depends_on:
+      - "nginx-proxy"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nginx.certs:/etc/nginx/certs:rw
+      - nginx.vhost.d:/etc/nginx/vhost.d
+      - nginx.html:/usr/share/nginx/html
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+
+  localhost:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  westward:
+    image: westward:latest
+    restart: unless-stopped
+    depends_on:
+      - "nginx-proxy"
+    expose:
+      - "443"
+      - "80"
+      - "8080"
+      - "2368"
+    environment:
+      - VIRTUAL_HOST=westward.local
+      - LETSENCRYPT_HOST=westward.local
+    links:
+      - mongo
+
+  westward-admin:
+    image: westward-admin:latest
+    restart: unless-stopped
+    depends_on:
+      - "nginx-proxy"
+    expose:
+      - "443"
+      - "80"
+      - "8080"
+      - "2368"
+      - "4300"
+    environment:
+      - VIRTUAL_HOST=westward-admin.local
+      - LETSENCRYPT_HOST=westward-admin.local
+    links:
+      - westward
+
+  westward-keycloak:
+    image: jboss/keycloak:latest
+    restart: unless-stopped
+    depends_on:
+      - "nginx-proxy"
+    volumes:
+        - D:\Work\WestWard\westward-keycloak\config\realm-export.json:/tmp/realm-export.json
+    ports:
+      - "8080:8080"
+    expose:
+      - "443"
+      - "80"
+      - "8080"
+      - "2368"
+    environment:
+      - VIRTUAL_HOST=westward-keycloak.local
+      - LETSENCRYPT_HOST=westward-keycloak.local
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - KEYCLOAK_IMPORT=/tmp/realm-export.json
+    links:
+      - westward-admin
+
+volumes:
+  nginx.vhost.d:
+  nginx.html:
+  nginx.certs:
+  jenkins-data:
+  ssh-data:

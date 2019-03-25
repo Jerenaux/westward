@@ -1,0 +1,53 @@
+version: '3.7'
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  # westward:
+  #   image: westward:latest
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"    
+  #   links:
+  #     - mongo
+
+  # westward-admin:
+  #   image: westward-admin:latest
+  #   restart: unless-stopped
+  #   expose:
+  #     - "443"
+  #     - "80"
+  #     - "8080"
+  #     - "2368"
+  #     - "4300"
+  #   links:
+  #     - westward
+
+  # westward-keycloak:
+  #   image: jboss/keycloak:latest
+  #   restart: unless-stopped
+  #   volumes:
+  #       - D:\Work\WestWard\westward-keycloak\config\realm-export.json:/tmp/realm-export.json
+  #   ports:
+  #     - "8080:8080"
+  #   expose:
+  #     - "443"
+  #     - "80"
+  #     - "8080"
+  #     - "2368"
+  #   environment:
+  #     - KEYCLOAK_USER=admin
+  #     - KEYCLOAK_PASSWORD=admin
+  #     - KEYCLOAK_IMPORT=/tmp/realm-export.json
+  #   links:
+  #     - westward-admin
+
+volumes:
+  ssh-data:
