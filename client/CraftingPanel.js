@@ -166,7 +166,7 @@ CraftingPanel.prototype.hide = function(){
     this.craftSlot.hide();
     this.ingredientSlots.forEach(function(slot){
         slot.hide();
-    })
+    });
     this.reset();
 };
 

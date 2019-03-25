@@ -41,8 +41,11 @@ Misc:
 - Reduce amount of orientation pins
 - Display death and conflict markers
 - add esc shortcut
+- Don't spawn on busy location
+- Check building limits are enforced
+- Align bag icon
 New movement system
-Check building limits are enforced
+
 
 UI:
 - Bag icon: always displayed & set to player inventory
