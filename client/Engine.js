@@ -1490,7 +1490,6 @@ Engine.makeCraftingMenu = function(){
     var recipesw = 400;
     var h = 480;
     var space = 15;
-    var center = Engine.getGameConfig().width/2;
 
     var recipes = crafting.addPanel('shop',new RecipesPanel(combix+combiw+space,y,recipesw,h,'Recipes'));
     recipes.setInventory('crafting');
@@ -1499,6 +1498,18 @@ Engine.makeCraftingMenu = function(){
     var combi = crafting.addPanel('combi',new CraftingPanel(combix,y,combiw,h,'Crafting'));
     combi.addButton(combiw-30, 8, 'blue','help',null,'',UI.textsData['combi_help']);
     combi.addCapsule('gold',120,-9,'999','gold');
+
+    crafting.addEvent('onUpdateShopGold',function(){
+        combi.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+    });
+    
+    crafting.addEvent('onUpdateRecipes',function(){
+        recipes.updateContent();
+    });
+
+    crafting.addEvent('onUpdateInventory',function(){
+        combi.updateIngredients();
+    });
 
     crafting.addEvent('onOpen',function(){
         recipes.updateContent();
@@ -1568,10 +1579,6 @@ Engine.makeCraftingMenu = function(){
         stock.updateInventory();
     });
 
-    crafting.addEvent('onUpdateInventory',function(){
-        items.updateInventory();
-        ingredients.updateInventory();
-    });
 
     crafting.addEvent('onDisplay',function(){
         Engine.toggleStock(1);

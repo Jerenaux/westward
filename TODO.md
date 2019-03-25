@@ -47,7 +47,6 @@ Check building limits are enforced
 UI:
 - Bag icon: always displayed & set to player inventory
 - Add chest icon to shops, set to local inventory
-- Factor in "output" aspect (in craftingpanel.setup)
 - Test with own workshop
 
 

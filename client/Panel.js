@@ -237,12 +237,7 @@ Panel.prototype.display = function(){
         this.capsules[capsule].display();
     }
 
-    this.buttons.forEach(function(b){
-        b.btn.setVisible(true);
-        b.symbol.setVisible(true);
-        b.ring.setVisible(true);
-        b.zone.setVisible(true);
-    });
+    this.displayButtons();
 
     if(this.button) this.button.display(); // big button
 
@@ -261,6 +256,15 @@ Panel.prototype.hide = function(){
     if(this.scrollable) this.scroll(-this.scrolled);
     if(this.button) this.button.hide(); // big button
     Engine.inPanel = false;
+};
+
+Panel.prototype.displayButtons = function(){
+    this.buttons.forEach(function(b){
+        b.btn.setVisible(true);
+        b.symbol.setVisible(true);
+        b.ring.setVisible(true);
+        b.zone.setVisible(true);
+    });
 };
 
 Panel.prototype.hideButtons = function(){

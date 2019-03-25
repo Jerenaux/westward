@@ -30,11 +30,6 @@ function ItemSlot(x,y,width,height){
     this.addRarity();
     this.addInventoryCount();
     this.addEffect();
-
-    /*this.content.forEach(function(c){
-        c.setScrollFactor(0);
-        c.setDepth(1);
-    });*/
 }
 
 ItemSlot.prototype = Object.create(Frame.prototype);
@@ -80,6 +75,7 @@ ItemSlot.prototype.checkForPanelOnTop = function(){
 };
 
 ItemSlot.prototype.setUp = function(action,item,nb){
+    if(!this.displayed) console.warn('Setting up slot before displaying it');
     var itemData = Engine.itemsData[item];
     this.icon.setTexture(itemData.atlas,itemData.frame);
     this.name.setText(itemData.name);
@@ -137,6 +133,11 @@ ItemSlot.prototype.setUp = function(action,item,nb){
     }else{
         this.hasEffect = false;
     }
+    
+    if(!this.hasEffect) {
+        this.staticon.setVisible(false);
+        this.effect.setVisible(false);
+    }
 };
 
 ItemSlot.prototype.display = function(){
@@ -144,10 +145,6 @@ ItemSlot.prototype.display = function(){
     this.content.forEach(function(c){
         c.setVisible(true);
     });
-    if(!this.hasEffect) {
-        this.staticon.setVisible(false);
-        this.effect.setVisible(false);
-    }
 };
 
 ItemSlot.prototype.hide = function(){

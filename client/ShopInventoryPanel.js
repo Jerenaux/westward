@@ -156,8 +156,8 @@ ShopInventoryPanel.prototype.refreshContent = function(){
         if(i >= (this.currentPage+1)*NB_PER_PAGE) return;
         var slot = this.getNextSlot(this.x+20,sloty+yOffset);
         var action = (this.inventory == 'player' ? 'sell' : 'buy');
-        slot.setUp(action,item[0],item[1]);
         slot.display();
+        slot.setUp(action,item[0],item[1]);
         yOffset += 90;
     },this);
 };
@@ -209,6 +209,7 @@ ShopSlot.prototype.constructor = ShopSlot;
 ShopSlot.prototype.setUp = function(action,item,nb){
     ItemSlot.prototype.setUp.call(this,action,item,nb);
 
+    this.zone.off('pointerup');
     this.zone.on('pointerup',function(){
         // if(Engine.currentMenu.panels['prices'].displayed) return;
         if(this.checkForPanelOnTop()) return;
@@ -217,5 +218,3 @@ ShopSlot.prototype.setUp = function(action,item,nb){
         Engine.currentMenu.panels['action'].setUp(item,action);
     }.bind(this));
 };
-
-// -------------------------------------------
