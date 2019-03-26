@@ -101,10 +101,10 @@ var Hero = new Phaser.Class({
         return [owned,required];
     },
 
-    canCraft: function(item){
+    canCraft: function(item, nb){
         var recipe = Engine.itemsData[item].recipe;
         for(var itm in recipe){
-            if(!this.hasItem(itm,recipe[itm])) return false;
+            if(!this.hasItem(itm,recipe[itm]*nb)) return false;
         }
         return true;
     },

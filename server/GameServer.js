@@ -1034,33 +1034,30 @@ GameServer.handleCommit = function(data,socketID){ // keep data argument
 };
 
 GameServer.handleCraft = function(data,socketID){
-    if(data.id == -1) return;
+    if(data.id == -1) {
+        console.log('No ID');
+        return;
+    }
     var player = GameServer.getPlayer(socketID);
     var buildingID = player.inBuilding;
     var building = GameServer.buildings[buildingID];
     var targetItem = data.id;
     var nb = data.nb;
     var stock = data.stock;
-    if(!targetItem) return;
-    var recipient = (stock == 1 ? player : building);
+    // var recipient = (stock == 1 ? player : building);
     var recipe = GameServer.itemsData[targetItem].recipe;
-    if(!GameServer.allIngredientsOwned(recipient,recipe,nb)) return;
-    GameServer.operateCraft(recipient, recipe, targetItem, nb);
+    if(!player.canCraft(targetItem,nb)) {
+        console.log('All ingredients not owned');
+        return;
+    }
+    GameServer.operateCraft(player, targetItem, nb);
     player.gainClassXP(GameServer.classes.craftsman,5*nb,true); // TODO: vary based on multiple factors
     Prism.logEvent(player,'craft',{item:targetItem,nb:nb});
 };
 
-GameServer.allIngredientsOwned = function(entity,recipe,nb){
-    for(var item in recipe){
-        if(!recipe.hasOwnProperty(item)) continue;
-        if(!entity.hasItem(item,recipe[item]*nb)) return false;
-    }
-    return true;
-};
-
-GameServer.operateCraft = function(recipient,recipe,targetItem,nb){
+GameServer.operateCraft = function(recipient,targetItem,nb){
+    var recipe = GameServer.itemsData[targetItem].recipe;
     for(var item in recipe) {
-        if (!recipe.hasOwnProperty(item)) continue;
         recipient.takeItem(item,recipe[item]*nb,true);
         GameServer.destroyItem(item,recipe[item]*nb,'craft');
     }

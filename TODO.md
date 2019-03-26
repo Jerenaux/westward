@@ -42,8 +42,10 @@ Misc:
 - Display death and conflict markers
 - add esc shortcut
 - Don't spawn on busy location
+- Wrong interactive surface above buildings?
 - Check building limits are enforced
-- Align bag icon
+- Update craft help
+- Monetary aspect of crafting + set prices (filter search on craftable flag)
 New movement system
 
 

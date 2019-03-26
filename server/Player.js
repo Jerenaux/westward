@@ -301,6 +301,14 @@ Player.prototype.canBuy = function(price){ // check if building has gold and roo
     return true;
 };
 
+Player.prototype.canCraft = function(item, nb){
+    var recipe = GameServer.itemsData[item].recipe;
+    for(var itm in recipe){
+        if(!this.hasItem(itm,recipe[itm]*nb)) return false;
+    }
+    return true;
+},
+
 Player.prototype.hasItem = function(item,nb){
     return (this.inventory.getNb(item) >= nb);
 };

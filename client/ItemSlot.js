@@ -43,8 +43,8 @@ ItemSlot.prototype.addItem = function(){
 };
 
 ItemSlot.prototype.addInventoryCount = function(){
-    this.bagicon = UI.scene.add.sprite(this.x + 14, this.y + this.height - 12, 'UI','smallpack');
-    this.nb = UI.scene.add.text(this.x + 24, this.y + this.height - 22, '999', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.bagicon = UI.scene.add.sprite(this.x + 19, this.y + this.height - 12, 'UI','smallpack');
+    this.nb = UI.scene.add.text(this.x + 29, this.y + this.height - 22, '999', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     this.content.push(this.bagicon);
     this.content.push(this.nb);
 };
@@ -81,7 +81,7 @@ ItemSlot.prototype.setUp = function(action,item,nb){
     this.name.setText(itemData.name);
     this.desc = itemData.desc;
     this.itemID = item;
-    if(this.nb) this.nb.setText(nb);
+    this.nb.setText(Engine.player.getItemNb(item));
 
     var rarityMap = {
         0: 'Unique',

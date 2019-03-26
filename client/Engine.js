@@ -1508,6 +1508,7 @@ Engine.makeCraftingMenu = function(){
     });
 
     crafting.addEvent('onUpdateInventory',function(){
+        recipes.updateContent();
         combi.updateIngredients();
     });
 
