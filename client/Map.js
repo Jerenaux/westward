@@ -427,12 +427,13 @@ var Map = new Phaser.Class({
         var tile = Engine.player.getTilePosition();
         this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
         Engine.player.buildingMarkers.forEach(function(data){
-            this.addPin(data.x,data.y,
+            var pin = this.addPin(data.x,data.y,
                 Engine.buildingsData[data.type].name,
                 'bld'
                 // Engine.buildingsData[data.type].mapicon,
                 // Engine.buildingsData[data.type].mapbg
             );
+            if(data.owner == Engine.player.id) pin.setTintFill(0xffff00);
         },this);
         Engine.player.resourceMarkers.forEach(function(data){
             this.addPin(data[0],data[1],
@@ -468,45 +469,21 @@ var Map = new Phaser.Class({
 var Pin = new Phaser.Class({
 
     Extends: CustomSprite,
-    // Extends: Phaser.GameObjects.RenderTexture,
 
-    initialize: function Pin (map,mask) {
+    initialize: function Pin (map) {
         CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
-        // Phaser.GameObjects.RenderTexture.call(this, UI.scene, 0, 0, 16,16);
-        // UI.scene.add.displayList.add(this);
-        //UI.scene.add.updateList.add(this);
-
         this.setDepth(2);
         this.setScrollFactor(0);
         this.setVisible(false);
         this.setInteractive();
-        /*if(mask) this.mask = (Boot.WEBGL
-                ? new Phaser.Display.Masks.BitmapMask(UI.scene,mask)
-                : new Phaser.Display.Masks.GeometryMask(UI.scene,mask)
-        );*/
         this.parentMap = map;
-        // this.setMask(this.parentMap.mask);
-        //this.parentMap.container.add(this);
         this.on('pointerover',this.handleOver.bind(this));
         this.on('pointerout',this.handleOut.bind(this));
     },
 
     setUp: function(tileX,tileY,x,y,name,frame,bgframe){
         this.setOrigin(0.5);
-
-        // Phaser 3.12:
-        // var bg = bgframe ? 'bg'+bgframe : 'bg';
-        // if(frame != 'x') this.drawFrame('mapicons',bg,0,0);
-
-        // this.drawFrame('mapicons',frame,0,0);
         this.setFrame(frame);
-
-        // Phaser 3.11:
-        /*var icon = Engine.scene.add.sprite(0,0,'mapicons',frame);
-        var bg = bgframe ? 'bg'+bgframe : 'bg';
-        var bg = Engine.scene.add.sprite(0,0,'mapicons',bg);
-        if(frame != 'x') this.draw(bg.texture,bg.frame,0,0);
-        this.draw(icon.texture,icon.frame,0,0);*/
 
         this.tileX = tileX;
         this.tileY = tileY;

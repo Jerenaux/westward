@@ -518,9 +518,9 @@ Player.prototype.initTrim = function(){
     trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
+    trimmed.fow = GameServer.fowList;
     trimmed.buildingMarkers = GameServer.listBuildingMarkers();
     trimmed.resourceMarkers = GameServer.resourceMarkers;
-    trimmed.fow = GameServer.getFoW();
     trimmed.rarity = GameServer.getRarity();
     return trimmed;
 };
@@ -656,8 +656,8 @@ Player.prototype.addNotif = function(msg){
 Player.prototype.getIndividualUpdatePackage = function(){
     // console.log(this.updatePacket,this.updatePacket.isEmpty());
     var pkg = this.updatePacket;
+    if(GameServer.fowChanged) pkg.fow = GameServer.fowList;
     if(GameServer.buildingsChanged) pkg.buildingMarkers = GameServer.listBuildingMarkers();
-    if(GameServer.fowChanged) pkg.fow = GameServer.getFoW();
     if(pkg.isEmpty()) return null;
     this.updatePacket = new PersonalUpdatePacket();
     return pkg;

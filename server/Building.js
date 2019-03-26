@@ -343,7 +343,7 @@ Building.prototype.listingTrim = function(){
 // Returns an object containing only the fields relevant to display on map
 Building.prototype.mapTrim = function(){
     var trimmed = {};
-    var broadcastProperties = ['type'];
+    var broadcastProperties = ['type','owner','ownerName'];
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

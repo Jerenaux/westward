@@ -157,6 +157,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.itemPositions = new SpaceMapList();
 
     GameServer.fogOfWar = {};
+    GameServer.fowList = [];
     GameServer.itemCounts = {};
     GameServer.marketPrices = new ListMap();
 
@@ -996,7 +997,8 @@ GameServer.build = function(player,bid,tile){
 GameServer.listBuildingMarkers = function(){
     var list = [];
     for(var bid in GameServer.buildings){
-        list.push(GameServer.buildings[bid].mapTrim());
+        var bld = GameServer.buildings[bid].mapTrim();
+        list.push(bld);
     }
     return list;
 };
@@ -1174,9 +1176,10 @@ GameServer.updateFoW = function(){
         GameServer.fogOfWar[building.aoi] = Date.now();
     }
     GameServer.fowChanged = true;
+    GameServer.fowList = GameServer.computeFoW();
 };
 
-GameServer.getFoW = function(){
+GameServer.computeFoW = function(){
     var fow = [];
     for(var aoi in GameServer.fogOfWar){
         var t = GameServer.fogOfWar[aoi];

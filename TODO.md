@@ -5,6 +5,7 @@ On deploy:
 - Test selling and buying in a store
 - Test equiping object
 - Test gs.handleGold()
+- Test handleCraft
 => Automate these eventually
 => After bug, systematically create test!
 

@@ -44,11 +44,11 @@
     "name": "Shop",
     "desc": "Allows to sell or buy items to and from other players.",
     "base":{
-      "width": 5,
+      "width": 4,
       "height": 4
     },
     "recipe": {"3":15},
-    "padding": 11,
+    "padding": 0,
     "icon": "shop",
     "foundations": "foundations_1",
     "sprite": "shop",
