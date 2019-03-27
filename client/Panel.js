@@ -36,7 +36,7 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
     ring.setVisible(false);
     this.content.push(ring);
 
-    var zone = UI.scene.add.zone(x,y,24,24);
+    var zone = UI.scene.add.zone(x,y,30,30);
     zone.setDepth(10);
     zone.setScrollFactor(0);
     zone.setInteractive();
@@ -57,6 +57,9 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
     this.content.push(btn);
     x += 3;
     y += 3;
+
+    // zone.on('pointerdown',btn.handleDown.bind(btn));
+    // zone.on('pointerup',btn.handleClick.bind(btn));
 
     var s = UI.scene.add.sprite(x,y,'UI',symbol);
     s.setDepth(3);

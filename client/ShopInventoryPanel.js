@@ -15,25 +15,30 @@ function ShopInventoryPanel(x,y,width,height,title,invisible){
 ShopInventoryPanel.prototype = Object.create(Panel.prototype);
 ShopInventoryPanel.prototype.constructor = ShopInventoryPanel;
 
+ShopInventoryPanel.prototype.hadAdminButtons = function(){
+    return (this.inventory == 'building' || this.inventory == 'crafting')
+};
+
 ShopInventoryPanel.prototype.setInventory = function(inventory){
     this.inventory = inventory;
 
-    if(this.inventory == 'building'){
+    if(this.hadAdminButtons()){
         this.pricesBtn = new BigButton(this.x+70,this.starty+15,'Set prices',function(){
-            Engine.currentMenu.panels['prices'].display();
-            Engine.currentMenu.panels['action'].hide();
+            Engine.currentMenu.displayPanel('prices');
+            Engine.currentMenu.hidePanel('action');
+            Engine.currentMenu.hidePanel('goldaction');
         });
 
         this.ggBtn = new BigButton(this.x+180,this.starty+15,'Give gold',function(){
-            Engine.currentMenu.panels['action'].hide();
-            Engine.currentMenu.panels['goldaction'].display();
-            Engine.currentMenu.panels['goldaction'].setUp('sell');
+            Engine.currentMenu.hidePanel('action');
+            var ga = Engine.currentMenu.displayPanel('goldaction');
+            ga.setUp('sell');
         });
 
         this.tgBtn = new BigButton(this.x+290,this.starty+15,'Take gold',function(){
-            Engine.currentMenu.panels['action'].hide();
-            Engine.currentMenu.panels['goldaction'].display();
-            Engine.currentMenu.panels['goldaction'].setUp('buy');
+            Engine.currentMenu.hidePanel('action');
+            var ga = Engine.currentMenu.displayPanel('goldaction');
+            ga.setUp('buy');
         });
     }
 
@@ -125,7 +130,7 @@ ShopInventoryPanel.prototype.updateContent = function(){
 };
 
 ShopInventoryPanel.prototype.refreshPagination = function(){
-    var py = (this.inventory == 'building' && Engine.currentBuiling.isOwned() ? this.y + 55 : this.y + 20);
+    var py = (this.hadAdminButtons() && Engine.currentBuiling.isOwned() ? this.y + 55 : this.y + 20);
     this.pagetxts.forEach(function(t){
         t.setVisible(true);
         t.y = py + 10;
@@ -141,7 +146,7 @@ ShopInventoryPanel.prototype.refreshPagination = function(){
 
 ShopInventoryPanel.prototype.refreshContent = function(){
     var sloty = this.y + 55;
-    if(this.inventory == 'building' && Engine.currentBuiling.isOwned()) {
+    if(this.hadAdminButtons() && Engine.currentBuiling.isOwned()) {
         this.tgBtn.display();
         this.ggBtn.display();
         this.pricesBtn.display();

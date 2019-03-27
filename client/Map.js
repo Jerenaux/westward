@@ -429,11 +429,10 @@ var Map = new Phaser.Class({
         Engine.player.buildingMarkers.forEach(function(data){
             var pin = this.addPin(data.x,data.y,
                 Engine.buildingsData[data.type].name,
-                'bld'
+                (data.owner == Engine.player.id ? 'bld2own' : 'bld2')
                 // Engine.buildingsData[data.type].mapicon,
                 // Engine.buildingsData[data.type].mapbg
             );
-            if(data.owner == Engine.player.id) pin.setTintFill(0xffff00);
         },this);
         Engine.player.resourceMarkers.forEach(function(data){
             this.addPin(data[0],data[1],

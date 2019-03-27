@@ -37,7 +37,6 @@ Misc:
 - Positions not saved often enough?
 - Don't disable walk with build panel
 - Multiple clicks on "give" repeat the action
-- Identify own buildings (on map and in-game)
 - Show countdowns in production panel + set up notifications!
 - Reduce amount of orientation pins
 - Display death and conflict markers

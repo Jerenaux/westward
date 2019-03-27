@@ -70,8 +70,9 @@ ItemSlot.prototype.addRarity = function(){
 };
 
 ItemSlot.prototype.checkForPanelOnTop = function(){
-    return (Engine.currentMenu.panels.hasOwnProperty('prices') &&
-        Engine.currentMenu.panels['prices'].displayed);
+    return Engine.currentMenu.isPanelDisplayed('prices') || Engine.currentMenu.isPanelDisplayed('goldaction');
+    // return (Engine.currentMenu.panels.hasOwnProperty('prices') &&
+    //     Engine.currentMenu.panels['prices'].displayed);
 };
 
 ItemSlot.prototype.setUp = function(action,item,nb){

@@ -39,6 +39,21 @@ Menu.prototype.addPanel = function(name,panel,hideOnOpen){
     return panel;
 };
 
+Menu.prototype.displayPanel = function(name){
+    if(!this.panels.hasOwnProperty(name)) return;
+    this.panels[name].display();
+    return this.panels[name];
+};
+
+Menu.prototype.isPanelDisplayed = function(name){
+    if(!this.panels.hasOwnProperty(name)) return false;
+    return this.panels[name].displayed;
+};
+Menu.prototype.hidePanel = function(name){
+    if(!this.panels.hasOwnProperty(name)) return;
+    this.panels[name].hide();
+};
+
 Menu.prototype.addEvent = function(name,callback){
     this.events[name] = callback;
 };

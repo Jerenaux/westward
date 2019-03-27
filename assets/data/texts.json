@@ -3,7 +3,7 @@
 
   "inventory_help": "This is your inventory. Click on an item to see what you can do with it. Some pieces of equipment can increase your inventory size. The capsule at the top of the panel is your amount of money.",
   "equipment_help": "This is your equipment. Click on a piece of equipment to unequip it. You cannot equip a ranged weapon and a melee weapon at the same time. You must equip an ammo container (e.g. quiver) before equipping the corresponding ammunition (e.g. arrows).",
-  "self_map_help": "Click on the map to center it elsewhere. The red cross is your current position. The blue dots are buildings. The leaves icons indicate the location of plants.",
+  "self_map_help": "Click on the map to center it elsewhere. The red cross is your current position.",
   "stats_help": "These are you character stats. Their values influence the success and impact of various actions. Most of them can be increased by specific pieces of equipment.",
   "recipes_help": "The list of items that you know how to craft. Click on an item to start crafting it. ",
   "combi_help": "After selecting an item to craft in the \"recipes\" panel, the list of ingredients will appear below. The '+' and '-' buttons allow you to select how many items to craft. If you or the workshop has all the necessary ingredients, click on the green button to craft the item.",

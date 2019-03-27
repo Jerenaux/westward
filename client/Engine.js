@@ -1406,6 +1406,7 @@ Engine.makeMapMenu = function(){
     map.setSound(Engine.scene.sound.add('page_turn2'));
     var mapPanel = map.addPanel('map',new MapPanel(10,100,1000,380,'',true)); // true = invisible
     mapPanel.addBackground('longscroll');
+    mapPanel.addLegend();
     var mapInstance = mapPanel.addMap('radiallongrect',900,380,-1,-1);
     mapPanel.addButton(953, -2, 'blue','help',null,'',UI.textsData['self_map_help']);
     // TODO: move in Map.js, method addZoom, positions buttons based on viewWidt/height and
@@ -1493,14 +1494,27 @@ Engine.makeCraftingMenu = function(){
 
     var recipes = crafting.addPanel('shop',new RecipesPanel(combix+combiw+space,y,recipesw,h,'Recipes'));
     recipes.setInventory('crafting');
+    recipes.addCapsule('gold',120,-9,'999','gold');
     // recipes.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help']);
 
     var combi = crafting.addPanel('combi',new CraftingPanel(combix,y,combiw,h,'Crafting'));
     combi.addButton(combiw-30, 8, 'blue','help',null,'',UI.textsData['combi_help']);
-    combi.addCapsule('gold',120,-9,'999','gold');
+
+    var center = Engine.getGameConfig().width/2;
+    var prices = crafting.addPanel('prices',new PricesPanel(center-415,80,815,480,'Prices'),true);
+    prices.craft = true;
+    prices.addButton(800-16,-8,'red','close',prices.hide.bind(prices),'Close');
+    prices.addButton(800-40, 8, 'blue','help',null,'',UI.textsData['prices_help']);
+    prices.moveUp(4);
+
+    var x = (Engine.getGameConfig().width-300)/2;
+    var goldaction = crafting.addPanel('goldaction',new ShopGoldPanel(x,420,300,100,'Buy/Sell'),true);
+    goldaction.addButton(300-16,-8,'red','close',goldaction.hide.bind(goldaction),'Close');
+    goldaction.moveUp(2);
 
     crafting.addEvent('onUpdateShopGold',function(){
-        combi.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+        recipes.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+        goldaction.update();
     });
     
     crafting.addEvent('onUpdateRecipes',function(){
@@ -1514,76 +1528,9 @@ Engine.makeCraftingMenu = function(){
 
     crafting.addEvent('onOpen',function(){
         recipes.updateContent();
-        combi.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
-        /*client.updateCapsule('gold',Engine.player.gold);
-        shop.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
-        client.updateContent();
-        shop.updateContent();
-        action.update();
-        goldaction.update();*/
+        recipes.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
     });
 
-    //var recipes = new InventoryPanel(765,100,235,380,'Recipes');
-    //recipes.setInventory(Engine.workshopRecipes,4,false,Engine.recipeClick);
-    /*var yg = 150;
-    var recipes = new Panel(700,yg,300,380,'Recipes');
-    recipes.addButton(270, 8, 'blue','help',null,'',UI.textsData['recipes_help']);
-    crafting.addPanel('recipes',recipes);
-
-    var y = yg+35;
-    var h = 155;
-    var gap = 20;
-    var categories = ['equipment','ingredients'];
-    categories.forEach(function(cat){
-        var inv = crafting.addPanel(cat+'_cat',new InventoryPanel(710, y, 280, h,Utils.capitalizeFirstLetter(cat)));
-        // inv.setInventory(Engine[cat+'Recipes'],6,false,Engine.recipeClick);
-        inv.setInventory('player',6,false,Engine.recipeClick);
-        y += (h+gap);
-    });
-
-    var combi = crafting.addPanel('combi',new CraftingPanel(450,yg,240,380,'Combination'));
-    combi.addButton(210, 8, 'blue','help',null,'',UI.textsData['combi_help']);
-
-    var ingredients = crafting.addPanel('ingredients',new InventoryPanel(450,yg+200,240,380,'',true)); // true = invisible
-    // ingredients.setInventory(new Inventory(5),5,true,null,Engine.player.inventory);
-    ingredients.setInventory('player',5,true,null,Engine.player.inventory);
-
-    var items = crafting.addPanel('items',new InventoryPanel(40,yg,390,185,'Your items'));
-    items.addButton(360, 8, 'blue','help',null,'',UI.textsData['craftitems_help']);
-    // items.setInventory(Engine.player.inventory,9,true);
-    items.setInventory('player',9,true);
-
-    items.button = new BigButton(items.x+(items.width/2),items.y+items.height-20,
-        'Use this inventory',function(){
-            Engine.toggleStock(1);
-        });
-
-    var stock = crafting.addPanel('stock',new InventoryPanel(40,yg+190,390,185,'Workshop stock'));
-    // stock.setInventory(new Inventory(20),9,true);
-    stock.setInventory('building',9,true);
-
-    //stock.addButton(270, 8, 'blue','help',null,'',UI.textsData['buy_help']);
-    stock.button = new BigButton(stock.x+(stock.width/2),stock.y+stock.height-20,
-        'Use this inventory',function(){
-            Engine.toggleStock(2);
-        });
-
-    crafting.addEvent('onUpdateRecipes',function(){
-        //recipes.updateInventory();
-        categories.forEach(function(cat){
-            crafting.panels[cat+'_cat'].updateInventory();
-        });
-    });
-
-    crafting.addEvent('onUpdateShop',function(){
-        stock.modifyInventory(Engine.currentBuiling.inventory);
-        stock.updateInventory();
-    });
-
-
-    crafting.addEvent('onDisplay',function(){
-        Engine.toggleStock(1);
-    });*/
     return crafting;
 };
 
@@ -2151,8 +2098,8 @@ Engine.enterBuilding = function(id){
     building.handleOut();
 
     Engine.buildingTitle.setText(buildingData.name);
-    var owner = Engine.currentBuiling.ownerName || 'Player';
-    Engine.buildingTitle.capsule.setText(owner+'\'s');
+    var owner = Engine.currentBuiling.isOwned() ? 'Your' : (Engine.currentBuiling.ownerName || 'Player')+'\'s';
+    Engine.buildingTitle.capsule.setText(owner);
     //Engine.settlementTitle.setText(settlementData.name);
     //if(Engine.buildingTitle.width < Engine.settlementTitle.width) Engine.buildingTitle.resize(Engine.settlementTitle.width);
     Engine.buildingTitle.move(Engine.currentMenu.titleY);
