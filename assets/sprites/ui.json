@@ -567,6 +567,10 @@
     {
       "filename": "arrow_pressed",
       "frame": {"x":77,"y":614,"w":19,"h":17}
+    },
+    {
+      "filename": "chest",
+      "frame": {"x":482,"y":444,"w":13,"h":11}
     }
   ]
 }

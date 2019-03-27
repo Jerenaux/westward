@@ -91,8 +91,7 @@ function PriceSlot(x,y,width,height,craft){
     if(!craft) this.sell = this.addInput(50,120,66);
 
     this.addButton(width-20,height-20,'green','ok',function(){
-        console.log(this.itemID);
-        Client.setPrices(this.itemID,this.buy.value,this.sell.value);
+        Client.setPrices(this.itemID,this.buy.value,(this.sell ? this.sell.value : -1));
     }.bind(this),'Confirm');
 
     this.content = [this.icon, this.name, this.buyText];

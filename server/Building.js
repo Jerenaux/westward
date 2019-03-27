@@ -58,7 +58,7 @@ function Building(data){
         GameServer.createItem(itm[0],itm[1]);
     });
 
-    this.prices = data.prices;
+    this.prices = data.prices || {};
     for(var item in this.prices){
         GameServer.marketPrices.add(item,this.prices[item].sell);
     }
@@ -285,7 +285,9 @@ Building.prototype.setItem = function(item,nb){
 };
 
 Building.prototype.setPrices = function(item,buy,sell){
-    this.prices[item] = {buy:parseInt(buy),sell:parseInt(sell)};
+    buy = Utils.clamp(parseInt(buy),0,999);
+    sell = Utils.clamp(parseInt(sell),0,999);
+    this.prices[item] = {buy:buy,sell:sell};
     this.setProperty('prices',this.prices);
 };
 

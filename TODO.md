@@ -6,6 +6,7 @@ On deploy:
 - Test equiping object
 - Test gs.handleGold()
 - Test handleCraft
+- Test setPrices
 => Automate these eventually
 => After bug, systematically create test!
 
@@ -45,7 +46,8 @@ Misc:
 - Wrong interactive surface above buildings?
 - Check building limits are enforced
 - Update craft help
-- Monetary aspect of crafting + set prices (filter search on craftable flag)
+- Crafting prices: filter search on craftable flag
+- Reexamine default prices in Building constructor + check for craftint
 New movement system
 
 

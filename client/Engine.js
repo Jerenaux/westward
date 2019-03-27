@@ -1435,7 +1435,7 @@ Engine.makeTradeMenu = function(){
     shop.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help']);
     w = 300;
     var x = (Engine.getGameConfig().width-w)/2;
-    var action = trade.addPanel('action',new ShopPanel(x,420,w,100,'Buy/Sell'),true);
+    var action = trade.addPanel('action',new ShopPanel(x,440,w,100,'Buy/Sell'),true);
     action.addButton(w-16,-8,'red','close',action.hide.bind(action),'Close');
     action.moveUp(2);
     var goldaction = trade.addPanel('goldaction',new ShopGoldPanel(x,420,w,100,'Buy/Sell'),true);

@@ -202,6 +202,8 @@ ShopInventoryPanel.prototype.hideContent = function(){
 function ShopSlot(x,y,width,height){
     ItemSlot.call(this,x,y,width,height);
 
+    this.addChest();
+
     this.content.forEach(function(c){
         c.setScrollFactor(0);
         c.setDepth(1);
@@ -211,8 +213,17 @@ function ShopSlot(x,y,width,height){
 ShopSlot.prototype = Object.create(ItemSlot.prototype);
 ShopSlot.prototype.constructor = ShopSlot;
 
+ShopSlot.prototype.addChest = function(){
+    this.chesticon = UI.scene.add.sprite(this.x + 20, this.y + 13, 'UI','chest');
+    this.stocknb = UI.scene.add.text(this.x + 29, this.y+4, '999', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.content.push(this.chesticon);
+    this.content.push(this.stocknb);
+};
+
 ShopSlot.prototype.setUp = function(action,item,nb){
     ItemSlot.prototype.setUp.call(this,action,item,nb);
+
+    this.stocknb.setText(Engine.currentBuiling.getItemNb(item));
 
     this.zone.off('pointerup');
     this.zone.on('pointerup',function(){
