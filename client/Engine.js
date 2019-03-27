@@ -1516,6 +1516,11 @@ Engine.makeCraftingMenu = function(){
         recipes.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
         goldaction.update();
     });
+
+    crafting.addEvent('onUpdateShop',function(){
+        recipes.updateContent();
+        combi.updateIngredients();
+    });
     
     crafting.addEvent('onUpdateRecipes',function(){
         recipes.updateContent();

@@ -82,20 +82,20 @@ function PriceSlot(x,y,width,height,craft){
 
     this.icon = UI.scene.add.sprite(this.x + 30, this.y + height/2);
     this.name = UI.scene.add.text(this.x + 60, this.y + 10, '', { font: '16px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    var buytxt = (craft ? 'Craft for:' : 'Buy for:');
-    this.buyText = UI.scene.add.text(this.x + 60, this.y + 40, buytxt, { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    if(!craft) this.sellText = UI.scene.add.text(this.x + 60, this.y + 65, 'Sell for:', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    var selltxt = (craft ? 'Craft for:' : 'Buy for:');
+    if(!craft)  this.buyText = UI.scene.add.text(this.x + 60, this.y + 40, 'Buy for:', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.sellText = UI.scene.add.text(this.x + 60, this.y + 65, selltxt, { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
 
-    var buyx = (craft ? 135 : 120);
-    this.buy = this.addInput(50,buyx,41);
-    if(!craft) this.sell = this.addInput(50,120,66);
+    var sellx = (craft ? 135 : 120);
+    if(!craft) this.buy = this.addInput(50,120,41);
+    this.sell = this.addInput(50,sellx,66);
 
     this.addButton(width-20,height-20,'green','ok',function(){
-        Client.setPrices(this.itemID,this.buy.value,(this.sell ? this.sell.value : -1));
+        Client.setPrices(this.itemID,(this.buy ? this.buy.value : -1),(this.sell ? this.sell.value : -1));
     }.bind(this),'Confirm');
 
-    this.content = [this.icon, this.name, this.buyText];
-    if(!craft) this.content.push(this.sellText);
+    this.content = [this.icon, this.name, this.sellText];
+    if(!craft) this.content.push(this.buyText);
     this.content.forEach(function(c){
         c.setScrollFactor(0);
         c.setDepth(1);
@@ -110,7 +110,7 @@ PriceSlot.prototype.setUp = function(item){
     // console.log(itemData);
     this.icon.setTexture(itemData.atlas,itemData.frame);
     this.name.setText(itemData.name);
-    this.buy.value = (item in Engine.currentBuiling.prices ? Engine.currentBuiling.prices[item].buy : 0);
+    if(this.buy) this.buy.value = (item in Engine.currentBuiling.prices ? Engine.currentBuiling.prices[item].buy : 0);
     if(this.sell) this.sell.value = (item in Engine.currentBuiling.prices ? Engine.currentBuiling.prices[item].sell : 0);
     this.itemID = item;
 };
@@ -120,7 +120,7 @@ PriceSlot.prototype.display = function(){
     this.content.forEach(function(c){
         c.setVisible(true);
     });
-    this.buy.style.display = "inline";
+    if(this.buy) this.buy.style.display = "inline";
     if(this.sell) this.sell.style.display = "inline";
 };
 
@@ -129,7 +129,7 @@ PriceSlot.prototype.hide = function(){
     this.content.forEach(function(c){
         c.setVisible(false);
     });
-    this.buy.style.display = "none";
+    if(this.buy) this.buy.style.display = "none";
     if(this.sell) this.sell.style.display = "none";
     this.hideButtons();
 };

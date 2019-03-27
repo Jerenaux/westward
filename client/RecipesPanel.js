@@ -76,7 +76,7 @@ IngredientSlot.prototype.addIngredients = function(){
 };
 
 IngredientSlot.prototype.setUp = function(item,nb){
-    ItemSlot.prototype.setUp.call(this,null,item,Engine.player.getItemNb(item));
+    ItemSlot.prototype.setUp.call(this,'buy',item,Engine.player.getItemNb(item));
 
     if(nb > -1){
         this.ingredients.setText(Engine.player.getItemNb(item)+'/'+nb);

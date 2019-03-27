@@ -901,6 +901,7 @@ GameServer.handleGold = function(data,socketID){
         player.takeGold(amount,true);
         building.giveGold(amount);
     }
+    building.save();
 };
 
 GameServer.handleShop = function(data,socketID) {
