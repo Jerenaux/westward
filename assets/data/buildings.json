@@ -50,7 +50,7 @@
     "recipe": {"3":15},
     "padding": 0,
     "icon": "shop",
-    "foundations": "foundations_1",
+    "foundations": "foundations_3",
     "sprite": "shop",
     "mapicon": "workshop",
     "mainMenu": "trade",

@@ -571,6 +571,10 @@
     {
       "filename": "chest",
       "frame": {"x":482,"y":444,"w":13,"h":11}
+    },
+    {
+      "filename": "goldenheart",
+      "frame": {"x":506,"y":442,"w":13,"h":12}
     }
   ]
 }
