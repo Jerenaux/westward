@@ -43,11 +43,7 @@ Misc:
 - Display death and conflict markers
 - add esc shortcut
 - Don't spawn on busy location
-- Wrong interactive surface above buildings?
-- Check building limits are enforced
-- Update craft help
-- Crafting prices: filter search on craftable flag
-- Reexamine default prices in Building constructor + check for craftint
+- Wrong interactive surface above buildings after built
 New movement system
 
 

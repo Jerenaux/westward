@@ -1495,14 +1495,14 @@ Engine.makeCraftingMenu = function(){
     var recipes = crafting.addPanel('shop',new RecipesPanel(combix+combiw+space,y,recipesw,h,'Recipes'));
     recipes.setInventory('crafting');
     recipes.addCapsule('gold',120,-9,'999','gold');
-    // recipes.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help']);
+    recipes.addButton(recipesw-30, 8, 'blue','help',null,'',UI.textsData['recipes_help']);
 
     var combi = crafting.addPanel('combi',new CraftingPanel(combix,y,combiw,h,'Crafting'));
     combi.addButton(combiw-30, 8, 'blue','help',null,'',UI.textsData['combi_help']);
 
     var center = Engine.getGameConfig().width/2;
     var prices = crafting.addPanel('prices',new PricesPanel(center-415,80,815,480,'Prices'),true);
-    prices.craft = true;
+    prices.limitToCrafting();
     prices.addButton(800-16,-8,'red','close',prices.hide.bind(prices),'Close');
     prices.addButton(800-40, 8, 'blue','help',null,'',UI.textsData['prices_help']);
     prices.moveUp(4);

@@ -75,7 +75,7 @@ ItemSlot.prototype.checkForPanelOnTop = function(){
     //     Engine.currentMenu.panels['prices'].displayed);
 };
 
-ItemSlot.prototype.setUp = function(action,item,nb){
+ItemSlot.prototype.setUp = function(action,item){
     if(!this.displayed) console.warn('Setting up slot before displaying it');
     var itemData = Engine.itemsData[item];
     this.icon.setTexture(itemData.atlas,itemData.frame);

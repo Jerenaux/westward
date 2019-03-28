@@ -46,6 +46,8 @@ RecipeSlot.prototype.setUp = function(action,item,nb){
     this.ingredients.setText(status[0]+'/'+status[1]);
     this.ingredients.setFill(status[0] == status[1] ? Utils.colors.green : Utils.colors.red);
 
+    this.price.setText(Engine.currentBuiling.getPrice(item,'sell'));
+
     this.zone.off('pointerup');
     this.zone.on('pointerup',function(){
         if(this.checkForPanelOnTop()) return;
@@ -55,10 +57,11 @@ RecipeSlot.prototype.setUp = function(action,item,nb){
 
 // -------------------------------------
 
-function IngredientSlot(x,y,width,height){
+function IngredientSlot(x,y,width,height,showprice){
     ItemSlot.call(this,x,y,width,height);
 
     this.addIngredients();
+    this.showprice = showprice;
 
     this.content.forEach(function(c){
         c.setScrollFactor(0);
@@ -77,6 +80,13 @@ IngredientSlot.prototype.addIngredients = function(){
 
 IngredientSlot.prototype.setUp = function(item,nb){
     ItemSlot.prototype.setUp.call(this,'buy',item,Engine.player.getItemNb(item));
+    
+    if(this.showprice){
+        this.price.setText(Engine.currentBuiling.getPrice(item,'sell'));
+    }else{
+        this.goldicon.setVisible(false);
+        this.price.setVisible(false);
+    }
 
     if(nb > -1){
         this.ingredients.setText(Engine.player.getItemNb(item)+'/'+nb);

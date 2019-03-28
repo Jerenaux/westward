@@ -62,6 +62,12 @@ function Building(data){
     for(var item in this.prices){
         GameServer.marketPrices.add(item,this.prices[item].sell);
     }
+    if(this.type == 4){
+        var defaultPrices = GameServer.getDefaultPrices();
+        for(var item in defaultPrices){
+            if(!this.prices.hasOwnProperty(item)) this.prices[item] = defaultPrices[item];
+        }
+    }
 
     this.setGold(data.gold || 0);
     this.built = !!data.built;
@@ -285,8 +291,8 @@ Building.prototype.setItem = function(item,nb){
 };
 
 Building.prototype.setPrices = function(item,buy,sell){
-    buy = Utils.clamp(parseInt(buy),0,999);
-    sell = Utils.clamp(parseInt(sell),0,999);
+    buy = Utils.clamp(parseInt(buy),0,999) || 0;
+    sell = Utils.clamp(parseInt(sell),0,999) || 0;
     this.prices[item] = {buy:buy,sell:sell};
     this.setProperty('prices',this.prices);
 };

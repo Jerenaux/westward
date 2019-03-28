@@ -679,17 +679,17 @@ GameServer.isWithinAggroDist = function(a,b){
 
 GameServer.getDefaultPrices = function(){
     var defaultItems = [1,3,7,8,9,14,18,22,24,25,26,43]; //TODO: conf
-    var prices = {};
+    var defaultPrices = {};
     defaultItems.forEach(function(item){
         var prices = GameServer.marketPrices.get(item);
         var average = 10;
         if(prices.length) average = prices.reduce(function(total,num){return total+num;})/prices.length;
-        prices[item] = {
+        defaultPrices[item] = {
             buy: average/2,
             sell: average
         }
     });
-    return prices;
+    return defaultPrices;
 };
 
 GameServer.handleBuildingClick = function(data,socketID){
@@ -945,6 +945,11 @@ GameServer.handleBuild = function(data,socketID) {
     var bid = data.id;
     var tile = data.tile;
     var player = GameServer.getPlayer(socketID);
+    if(!player.bldRecipes.includes(parseInt(bid))){
+        console.log(bid,player.bldRecipes);
+        console.log('Building type already owned');
+        return false;
+    }
     var buildPermit = GameServer.canBuild(bid, tile);
     if (buildPermit == 1) {
         GameServer.build(player, bid, tile);
@@ -1016,26 +1021,6 @@ GameServer.logMenu = function(menu,socketID){
     Prism.logEvent(player,'menu',{menu:menu});
 };
 
-GameServer.handleCommit = function(data,socketID){ // keep data argument
-    var player = GameServer.getPlayer(socketID);
-    if(!player.isInBuilding()) return;
-    if(!player.hasFreeCommitSlot()) return;
-    var buildingID = player.inBuilding;
-    var building = GameServer.buildings[buildingID];
-    player.takeCommitmentSlot(buildingID,true);
-    building.addCommit();
-    var gain = 20;
-    player.gainCivicXP(gain,true);
-    // TODO: increment change based on civic level?
-    // TODO: xp reward change based on building?
-    var fortGold = building.settlement.getFortGold();
-    var reward = Math.min(20,fortGold); // TODO: adapt as well
-    if(reward) {
-        building.settlement.takeFortGold(reward);
-        player.giveGold(reward, true);
-    }
-};
-
 GameServer.handleCraft = function(data,socketID){
     if(data.id == -1) {
         console.log('No ID');
@@ -1044,6 +1029,7 @@ GameServer.handleCraft = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var buildingID = player.inBuilding;
     var building = GameServer.buildings[buildingID];
+    var isFinancial = (!building.isOwnedBy(player));
     var targetItem = data.id;
     var nb = data.nb;
     var stock = data.stock;
@@ -1053,7 +1039,13 @@ GameServer.handleCraft = function(data,socketID){
         console.log('All ingredients not owned');
         return;
     }
+    var price = building.getPrice(targetItem, nb, 'sell');
+    if(isFinancial && player.gold < price){
+        console.log('Not enough gold');
+        return;
+    }
     GameServer.operateCraft(player, targetItem, nb);
+    building.giveGold(player.takeGold(price));
     player.gainClassXP(GameServer.classes.craftsman,5*nb,true); // TODO: vary based on multiple factors
     Prism.logEvent(player,'craft',{item:targetItem,nb:nb});
 };

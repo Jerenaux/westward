@@ -184,10 +184,8 @@ var Hero = new Phaser.Class({
     },
 
     updateBuildRecipes: function(bldRecipes){
-        if(bldRecipes.length == 1 && bldRecipes[0] == -1){
-            this.buildRecipes.clear();
-            return;
-        }
+        this.buildRecipes.clear();
+        if(bldRecipes.length == 1 && bldRecipes[0] == -1) return;
         bldRecipes.forEach(function(w){
             this.buildRecipes.add(w,1);
         },this);

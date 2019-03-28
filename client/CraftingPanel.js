@@ -12,8 +12,12 @@ function CraftingPanel(x,y,width,height,title){
 CraftingPanel.prototype = Object.create(Panel.prototype);
 CraftingPanel.prototype.constructor = CraftingPanel;
 
+CraftingPanel.prototype.isFinancial = function(){
+    return !Engine.currentBuiling.isOwned();
+};
+
 CraftingPanel.prototype.addInterface = function(){
-    this.craftSlot = new IngredientSlot(this.x+115,this.y+30,320,80);
+    this.craftSlot = new IngredientSlot(this.x+115,this.y+30,320,80,true); // true = show price
     this.craftSlot.hide();
 
     this.noitem = this.addText(this.width/2,80,'Select a recipe to begin',Utils.colors.white,16);
@@ -47,6 +51,7 @@ CraftingPanel.prototype.addInterface = function(){
     this.craftItem = {
         id: -1,
         count: 0,
+        price: 0,
         recipe: null
     };
 };
@@ -64,11 +69,16 @@ CraftingPanel.prototype.displayInterface = function(){
     this.noitem.setVisible(true);
 };
 
+CraftingPanel.prototype.getPrice = function(){
+    return Engine.currentBuiling.getPrice(this.craftItem.id, 'sell');
+};
+
 CraftingPanel.prototype.setUp = function(itemID){
     var data = Engine.itemsData[itemID];
     this.craftItem.id = itemID;
     this.craftItem.count = 1;
     this.craftItem.recipe = data.recipe;
+    this.craftItem.price = this.getPrice();
     
     this.craftSlot.display();
     this.craftSlot.setUp(itemID,-1);
@@ -88,6 +98,7 @@ CraftingPanel.prototype.setUp = function(itemID){
 };
 
 CraftingPanel.prototype.updateIngredients = function(){
+    if(this.craftItem.id == -1) return;
     this.craftSlot.setUp(this.craftItem.id,-1);
 
     var data = Engine.itemsData[this.craftItem.id];
@@ -101,6 +112,9 @@ CraftingPanel.prototype.updateIngredients = function(){
         slot.display();
         slot.setUp(ing,data.recipe[ing]*this.craftItem.count);
     }
+   
+    this.craftItem.price = this.craftItem.count*this.getPrice();
+    this.manageButtons();
 };
 
 CraftingPanel.prototype.manageButtons = function(){
@@ -117,7 +131,8 @@ CraftingPanel.prototype.manageButtons = function(){
         this.plusBtn.enable();
     }
 
-    if(Engine.player.canCraft(this.craftItem.id, this.craftItem.count)){
+    if(Engine.player.canCraft(this.craftItem.id, this.craftItem.count)
+    && (!this.isFinancial() || Engine.player.gold >= this.craftItem.price)){
         this.okBtn.enable();
     }else{
         this.okBtn.disable();
@@ -137,6 +152,7 @@ CraftingPanel.prototype.decreaseAmount = function(){
 CraftingPanel.prototype.changeAmount = function(inc){
     var output = (Engine.itemsData[this.craftItem.id].output || 1);
     this.craftItem.count = Utils.clamp(this.craftItem.count+inc,1,999);
+    this.craftItem.price = this.craftItem.count*this.getPrice();
     this.countText.setText(this.craftItem.count*output);
     this.updateIngredients();
     this.manageButtons();

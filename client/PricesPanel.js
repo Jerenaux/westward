@@ -19,6 +19,7 @@ function PricesPanel(x,y,width,height,title){
         if(value.length >= 3){
             var hits = [];
             for(var id in Engine.itemsData) {
+                if(this.craft && !Engine.itemsData[id].isCrafted) continue;
                 var name = Engine.itemsData[id].name.toLowerCase();
                 if(name.includes(value)) hits.push(id);
                 if(hits.length >= 3) break;
@@ -31,6 +32,10 @@ function PricesPanel(x,y,width,height,title){
 
 PricesPanel.prototype = Object.create(Panel.prototype);
 PricesPanel.prototype.constructor = PricesPanel;
+
+PricesPanel.prototype.limitToCrafting = function(){
+    this.craft = true;
+};
 
 PricesPanel.prototype.getNextSlot = function(y){
     var w = 250;
