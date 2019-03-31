@@ -56,7 +56,7 @@ NamePanel.prototype = Object.create(Panel.prototype);
 NamePanel.prototype.constructor = NamePanel;
 
 NamePanel.prototype.addInterface = function(){
-    this.input = this.addInput(130,40,50);
+    this.input = this.addInput(220,40,50);
     this.input.background = 'transparent';
     this.input.id = 'name';
 };

@@ -12,6 +12,7 @@ function LongSlot(width,mask){
     var y = 0;
     this.slices = [];
     this.texts = [];
+    this.images = [];
     this.textCounter = 0;
     var sw = 8;
     var bw = width;
@@ -92,6 +93,13 @@ LongSlot.prototype.addText = function(x,y,text,color,size){
     return t;
 };
 
+LongSlot.prototype.addImage = function(x,y,atlas,frame){
+    var img = UI.scene.add.sprite(this.x + x, this.y + y, atlas, frame);
+    img.setScrollFactor(0);
+    img.setDepth(2);
+    this.images.push(img);
+};
+
 LongSlot.prototype.addProgressBar = function(x,y,level,max,color,width){
     width = width || 0.8*this.width;
     this.bar = new MiniProgressBar(this.x+x,this.y+y,width,color,this.mask);
@@ -133,6 +141,9 @@ LongSlot.prototype.display = function(){
     this.texts.forEach(function(s){
         s.setVisible(true);
     });
+    this.images.forEach(function(s){
+        s.setVisible(true);
+    });
     if(this.bar) this.bar.display();
     if(this.icon) this.icon.setVisible(true);
     this.zone.setVisible(true);
@@ -155,6 +166,9 @@ LongSlot.prototype.hideTexts = function(){
 
 LongSlot.prototype.hide = function(){
     this.slices.forEach(function(s){
+        s.setVisible(false);
+    });
+    this.images.forEach(function(s){
         s.setVisible(false);
     });
     this.clear();

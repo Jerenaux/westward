@@ -227,10 +227,11 @@ ShopSlot.prototype.setUp = function(action,item,nb){
 
     this.zone.off('pointerup');
     this.zone.on('pointerup',function(){
-        // if(Engine.currentMenu.panels['prices'].displayed) return;
         if(this.checkForPanelOnTop()) return;
-        Engine.currentMenu.panels['goldaction'].hide();
-        Engine.currentMenu.panels['action'].display();
+        // Engine.currentMenu.panels['goldaction'].hide();
+        Engine.currentMenu.hidePanel('goldaction');
+        Engine.currentMenu.displayPanel('action');
+        // Engine.currentMenu.panels['action'].display();
         Engine.currentMenu.panels['action'].setUp(item,action);
     }.bind(this));
 };

@@ -44,7 +44,7 @@ Misc:
 - add esc shortcut
 - Don't spawn on busy location
 - Wrong interactive surface above buildings after built
-- Re-enable taking from production stock
+- Allow give stock when non-owner
 New movement system
 
 
