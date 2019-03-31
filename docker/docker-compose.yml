@@ -1,5 +1,10 @@
 version: '3.7'
 
+volumes:
+  ssh-data:
+  postgres_data:
+    driver: local
+
 services:
 #  mongo:
 #    image: mongo
@@ -70,6 +75,3 @@ services:
 #    depends_on:
 #      - westward
 #      - westward-keycloak
-
-volumes:
-  ssh-data:
