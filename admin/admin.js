@@ -32,7 +32,7 @@ app.controller("mainCtrl", [
         };
 
         countItems = function(category){
-            $http.get("/admin/countItems/").then(function(res) {
+            $http.get("/admin/count-items/").then(function(res) {
                 if(res.status == 200) {
                     console.log(res.data);
                     $scope['items'] = [];

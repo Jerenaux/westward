@@ -51,7 +51,7 @@ app.get('/editor',function(req,res){
 
 var GEThandlers = {
     'buildings': gs.getBuildings,
-    'countItems': gs.countItems,
+    'count-items': gs.countItems,
     'events': gs.getEvents,
     'players': gs.getPlayers,
     'screenshots': gs.getScreenshots
@@ -59,6 +59,20 @@ var GEThandlers = {
 var categories = Object.keys(GEThandlers);
 
 categories.forEach(function(cat){
+    app.get('/api/' + cat, function (req, res) {
+        console.log('[ADMIN] requesting ' + cat);
+        if(!(cat in GEThandlers)) return;
+        GEThandlers[cat](function(data){
+            if (data.length == 0) {
+                res.status(204).end();
+            } else {
+                // res.setHeader('Access-Control-Allow-Origin', '*');
+                // res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200).send(data).end();
+            }
+        });
+    });
     app.get('/admin/' + cat, function (req, res) {
         console.log('[ADMIN] requesting ' + cat);
         if(!(cat in GEThandlers)) return;
