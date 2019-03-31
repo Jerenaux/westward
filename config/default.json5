@@ -16,6 +16,7 @@
         rangedAtkDelay: 500
    },
    buildings: {
+        autobuild: false,
         canfight: false,
         nobuildings: false,
         inventorySize: 100,

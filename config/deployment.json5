@@ -4,6 +4,7 @@
         freezeNPC: false,
    },
    buildings: {
+        autobuild: false,
         canfight: true,
         nobuildings: false
    },

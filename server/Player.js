@@ -52,7 +52,7 @@ function Player(){
         3: 0,
         4: 0 // civic AP
     };
-    this.baseBldrecipes = [11,6,2,3,4]; //TODO: conf
+    this.baseBldrecipes = [11,6,3,4]; //TODO: conf
     this.bldRecipes = [];
 
     this.cellsWidth = 1;
@@ -78,7 +78,6 @@ Player.prototype.setAppearance = function(appearance){
     this.setProperty('appearance',appearance);
 };
 
-// Called by finalizePlayer
 Player.prototype.updateBldRecipes = function(){
     this.bldRecipes = [];
     this.baseBldrecipes.forEach(function(b){
@@ -89,6 +88,7 @@ Player.prototype.updateBldRecipes = function(){
     this.updatePacket.bldRecipes = this.bldRecipes;
 };
 
+// Called by finalizePlayer
 Player.prototype.listBuildings = function(){
     this.buildings = [];
     for(var bid in GameServer.buildings){
@@ -287,6 +287,7 @@ Player.prototype.takeGold = function(nb,notify){
         this.addNotif('-'+nb+' '+Utils.formatMoney(nb));
         this.save();
     }
+    return nb;
 };
 
 Player.prototype.canBuy = function(price){ // check if building has gold and room
@@ -300,6 +301,14 @@ Player.prototype.canBuy = function(price){ // check if building has gold and roo
     }
     return true;
 };
+
+Player.prototype.canCraft = function(item, nb){
+    var recipe = GameServer.itemsData[item].recipe;
+    for(var itm in recipe){
+        if(!this.hasItem(itm,recipe[itm]*nb)) return false;
+    }
+    return true;
+},
 
 Player.prototype.hasItem = function(item,nb){
     return (this.inventory.getNb(item) >= nb);
@@ -510,9 +519,10 @@ Player.prototype.initTrim = function(){
     trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
+    trimmed.fow = GameServer.fowList;
     trimmed.buildingMarkers = GameServer.listBuildingMarkers();
     trimmed.resourceMarkers = GameServer.resourceMarkers;
-    trimmed.vision = GameServer.getVision();
+    trimmed.rarity = GameServer.getRarity();
     return trimmed;
 };
 
@@ -607,10 +617,6 @@ Player.prototype.enterBuilding = function(id){
     // TODO: add to a list of people in the building object
     this.setProperty('inBuilding', id);
 
-    /*if(this.settlement.fort.id == id){
-        console.log('Came back to fort');
-        this.visitedAOIs.clear();
-    }*/
     Prism.logEvent(this,'building',{building:GameServer.buildings[id].type});
 };
 
@@ -647,8 +653,8 @@ Player.prototype.addNotif = function(msg){
 Player.prototype.getIndividualUpdatePackage = function(){
     // console.log(this.updatePacket,this.updatePacket.isEmpty());
     var pkg = this.updatePacket;
+    if(GameServer.fowChanged) pkg.fow = GameServer.fowList;
     if(GameServer.buildingsChanged) pkg.buildingMarkers = GameServer.listBuildingMarkers();
-    if(GameServer.visionChanged) pkg.vision = GameServer.getVision();
     if(pkg.isEmpty()) return null;
     this.updatePacket = new PersonalUpdatePacket();
     return pkg;

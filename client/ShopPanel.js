@@ -154,13 +154,17 @@ ShopPanel.prototype.isAtMax = function(){
 };
 
 ShopPanel.prototype.getPrice = function(id){
-    return Engine.currentBuiling.getPrice(id,this.shopItem.action);
+    // Need to reverse the action, since prices are from point of view of shop
+    var action = 'buy';
+    if(this.shopItem.action == 'buy') action = 'sell';
+    return Engine.currentBuiling.getPrice(id,action);
 };
 
 ShopPanel.prototype.manageButtons = function(){
     var okBtn = this.buttons[0].btn;
     var plusBtn = this.buttons[1].btn;
     var minusBtn = this.buttons[2].btn;
+    if(this.buttons.length > 3) this.buttons[3].btn.enable();
 
     if(this.shopItem.count <= 1){
         minusBtn.disable();
@@ -174,7 +178,7 @@ ShopPanel.prototype.manageButtons = function(){
         plusBtn.enable();
     }
 
-    if(this.canBuy() && !this.isAtZero()){
+    if(this.canBuy() && !this.isAtZero() && (!this.isFinancial() || this.shopItem.price > 0)){
         okBtn.enable();
     }else{
         okBtn.disable();
@@ -243,5 +247,118 @@ ShopPanel.prototype.requestPurchase = function(){
             Engine.tutorialStock(verb,this.shopItem.id,this.shopItem.count);
         }
     }*/
+    this.lastPurchase = Date.now();
+};
+
+// ------------
+
+function ShopGoldPanel(x,y,width,height,title,notShop){
+    Panel.call(this,x,y,width,height,title);
+    this.buttons = [];
+    this.lastPurchase = Date.now();
+    this.isShop = !notShop;
+    this.addInterface();
+}
+
+ShopGoldPanel.prototype = Object.create(Panel.prototype);
+ShopGoldPanel.prototype.constructor = ShopGoldPanel;
+
+ShopGoldPanel.prototype.addInterface = function(){
+    var slot = UI.scene.add.sprite(this.x+35,this.y+45,'UI','equipment-slot');
+    slot.setDepth(1);
+    slot.setScrollFactor(0);
+    // slot.setDisplayOrigin(0,0);
+    slot.setVisible(false);
+    this.content.push(slot);
+    this.slot = slot;
+
+    var gold = UI.scene.add.sprite(this.x + 35, this.y + 45, 'items2', 'gold-pile');
+    gold.setScale(1.5);
+    gold.setDepth(1);
+    gold.setScrollFactor(0);
+    // gold.setDisplayOrigin(0, 0);
+    gold.setVisible(false);
+    this.content.push(gold);
+    this.gold = gold;
+
+    var name = Engine.scene.add.text(this.x+65,this.y+25, 'Gold',  { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    name.setVisible(false);
+    name.setDepth(2);
+    name.setScrollFactor(0);
+    this.content.push(name);
+
+    this.input = this.addInput(50,60,45);
+    this.input.value = 0;
+    this.input.onkeyup = this.manageButtons.bind(this);
+
+    this.addButton(125,40,'green','ok',this.requestPurchase.bind(this),'Confirm');
+};
+
+ShopGoldPanel.prototype.getTitle = function(action){
+    return (action == 'buy' ? 'Take gold' : 'Give gold');
+};
+
+ShopGoldPanel.prototype.getDefaultTitle = function(){
+    return 'Give/Take';
+};
+
+ShopGoldPanel.prototype.setUp = function(action){
+    this.capsules['title'].setText(this.getTitle(action));
+    this.action = action;
+    this.manageButtons();
+};
+
+ShopGoldPanel.prototype.update = function(){
+    if(!this.displayed) return;
+    this.manageButtons();
+};
+
+ShopGoldPanel.prototype.manageButtons = function(){
+    var okBtn = this.buttons[0].btn;
+    var closeBtn = this.buttons[1].btn;
+    closeBtn.enable();
+
+    var value = this.input.value;
+    if(value < 0) okBtn.disable();
+
+    if(this.action == 'sell'){
+        if(value > Engine.player.gold){
+            okBtn.disable();
+        }else{
+            okBtn.enable();
+        }
+    }else{
+        if(value > Engine.currentBuiling.gold){
+            okBtn.disable();
+        }else{
+            okBtn.enable();
+        }
+    }
+};
+
+ShopGoldPanel.prototype.displayInterface = function(){
+    this.slot.setVisible(true);
+    this.gold.setVisible(true);
+    this.manageButtons();
+};
+
+ShopGoldPanel.prototype.display = function(){
+    Panel.prototype.display.call(this);
+    this.input.style.display = "inline";
+    this.displayInterface();
+};
+
+ShopGoldPanel.prototype.hide = function(){
+    Panel.prototype.hide.call(this);
+    this.input.style.display = "none";
+};
+
+ShopGoldPanel.prototype.requestPurchase = function(){
+    if(Date.now() - this.lastPurchase < 200) return;
+
+    var nb = this.input.value;
+    if(this.action == 'buy') nb = -nb;
+    Client.exchangeGold(nb);
+
     this.lastPurchase = Date.now();
 };

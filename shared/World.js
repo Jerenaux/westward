@@ -19,7 +19,7 @@ World.setUp = function(nbHoriz,nbVert,chunkW,chunkH,tileW,tileH){
 World.readMasterData = function(data){
     World.setUp(
         data.nbChunksHoriz,data.nbChunksVert,
-        data.chunkWidth,data.chunkHeight,
+        data.chunkWidth,data.chunkHeight
     );
 };
 

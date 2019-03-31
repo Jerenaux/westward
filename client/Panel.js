@@ -36,7 +36,7 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
     ring.setVisible(false);
     this.content.push(ring);
 
-    var zone = UI.scene.add.zone(x,y,24,24);
+    var zone = UI.scene.add.zone(x,y,30,30);
     zone.setDepth(10);
     zone.setScrollFactor(0);
     zone.setInteractive();
@@ -58,6 +58,9 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
     x += 3;
     y += 3;
 
+    // zone.on('pointerdown',btn.handleDown.bind(btn));
+    // zone.on('pointerup',btn.handleClick.bind(btn));
+
     var s = UI.scene.add.sprite(x,y,'UI',symbol);
     s.setDepth(3);
     s.setScrollFactor(0);
@@ -77,9 +80,11 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
 };
 
 Panel.prototype.addPolyText = function(x,y,texts,colors,size){
-    if(texts.length != colors.length) return;
+    if(!colors) colors = [];
+    if(colors.length && texts.length != colors.length) return;
     var txts = [];
     for(var i = 0; i < texts.length; i++){
+        var color = (i < colors.length ? colors[i] : Utils.colors.white);
         var t = this.addText(x,y,texts[i],colors[i],size); // addText() pushed to this.texts
         x += t.width;
         txts.push(t);
@@ -100,6 +105,21 @@ Panel.prototype.addText = function(x,y,text,color,size,font){
     this.texts.push(t);
     this.content.push(t);
     return t;
+};
+
+Panel.prototype.addInput = function(width,x,y){
+    var input = document.createElement("input");
+    input.className = 'game_input';
+    input.type = "text";
+    input.style.width = width+'px';
+    x = UI.scene.game.canvas.offsetLeft+this.x+x;
+    y = UI.scene.game.canvas.offsetTop+this.y+y;
+    input.style.left = x+'px';
+    input.style.top = y+'px';
+    input.style.background = 'rgba(0,0,0,0.5)';
+    input.style.display = "none";
+    document.getElementById('game').appendChild(input);
+    return input;
 };
 
 Panel.prototype.makeScrollable = function(){
@@ -220,12 +240,7 @@ Panel.prototype.display = function(){
         this.capsules[capsule].display();
     }
 
-    this.buttons.forEach(function(b){
-        b.btn.setVisible(true);
-        b.symbol.setVisible(true);
-        b.ring.setVisible(true);
-        b.zone.setVisible(true);
-    });
+    this.displayButtons();
 
     if(this.button) this.button.display(); // big button
 
@@ -244,6 +259,24 @@ Panel.prototype.hide = function(){
     if(this.scrollable) this.scroll(-this.scrolled);
     if(this.button) this.button.hide(); // big button
     Engine.inPanel = false;
+};
+
+Panel.prototype.displayButtons = function(){
+    this.buttons.forEach(function(b){
+        b.btn.setVisible(true);
+        b.symbol.setVisible(true);
+        b.ring.setVisible(true);
+        b.zone.setVisible(true);
+    });
+};
+
+Panel.prototype.hideButtons = function(){
+    this.buttons.forEach(function(b){
+        b.btn.setVisible(false);
+        b.symbol.setVisible(false);
+        b.ring.setVisible(false);
+        b.zone.setVisible(false);
+    });
 };
 
 function Capsule(x,y,iconAtlas,iconFrame,container){

@@ -13,10 +13,10 @@ var Item = new Phaser.Class({
 
     setUp: function(data){
         var itemData = Engine.itemsData[data.type];
-        var atlas = 'tileset';
-        var frame = Utils.randomElement(itemData.envFrames);
+        var atlas = (itemData.envFrames ? 'tileset' : itemData.atlas);
+        var frame = (itemData.envFrames ? Utils.randomElement(itemData.envFrames) : itemData.frame);
         this.outFrame = frame;
-        this.inFrame = frame+'_lit';
+        this.inFrame = (itemData.envFrames ? frame+'_lit' : frame);
 
         this.setTexture(atlas);
         this.setFrame(frame);
@@ -25,7 +25,7 @@ var Item = new Phaser.Class({
 
         this.setTilePosition(data.x,data.y,true);
         // this.setOrigin(0.5);
-        this.setDepth(this.tileY+1); // for e.g. when wood spawns on the roots of a tree
+        this.setDepth(this.tileY+1.5); // for e.g. when wood spawns on the roots of a tree
 
         if(itemData.collides) {
             this.collides = true;

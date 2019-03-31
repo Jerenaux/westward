@@ -78,6 +78,7 @@ var UI = {
 
         console.log('UI scene created');
         this.scene.get('boot').updateReadyTick();
+
     },
 
     makeBattleTutorialPanel: function(){

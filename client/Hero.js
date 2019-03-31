@@ -16,6 +16,7 @@ var Hero = new Phaser.Class({
         this.isHero = true;
 
         this.buildRecipes = new Inventory(7);
+        this.craftRecipes = new Inventory(100);
     },
 
     setUp: function(data){
@@ -25,6 +26,7 @@ var Hero = new Phaser.Class({
         this.settlement = data.settlement;
         this.buildingMarkers = data.buildingMarkers || [];
         this.resourceMarkers = data.resourceMarkers || [];
+        this.FoW = [];
         this.unread = 1;
         this.inventory = new Inventory();
         this.stats = new StatsContainer();
@@ -37,6 +39,13 @@ var Hero = new Phaser.Class({
         this.classlvl = data.classlvl || new classDataShell();
         this.ap = data.ap || new classDataShell();
         this.name = data.name;
+
+        this.updateRarity(data.rarity);
+
+        for(var item in Engine.itemsData){
+            var data = Engine.itemsData[item];
+            if(data.basicRecipe) this.craftRecipes.add(item,1);
+        }
     },
 
     updateData: function(data){ // don't call this 'update' or else conflict with Player.update() for other player updates
@@ -50,14 +59,14 @@ var Hero = new Phaser.Class({
             'dead': this.handleDeath,
             'equipment': this.updateEquipment,
             'foodSurplus': this.updateFoodSurplus,
+            'fow': this.updateFoW,
             'gold': this.updateGold,
             'items': this.updateInventory,
             'buildingMarkers': this.updateMarkers,
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
             'resetTurn': BattleManager.resetTurn,
-            'stats': this.updateStats,
-            'vision': this.updateVision
+            'stats': this.updateStats
         };
 
         this.updateEvents = new Set();
@@ -81,25 +90,23 @@ var Hero = new Phaser.Class({
         Engine.firstSelfUpdate = false;
     },
 
-    setCommitSlots: function(commitSlots){
-        // Data structures are cleared in updateCommitSlots
-        if(!this.commitTypes) this.commitTypes = new Inventory(commitSlots.max);
-        if(!this.commitIDs) this.commitIDs = [];
-        this.maxCommitSlots = commitSlots.max;
-
-        commitSlots.slots.forEach(function(s){
-            this.commitTypes.add(s.type,1);
-            this.commitIDs.push(s.id);
-        },this);
+    needsToCraft: function(item){
+        var required = 0;
+        var owned = 0;
+        var recipe = Engine.itemsData[item].recipe;
+        for(var itm in recipe){
+            required++;
+            if(this.hasItem(itm,recipe[itm])) owned++;
+        }
+        return [owned,required];
     },
 
-    canCommit: function(){
-        if(!this.hasFreeCommitSlot()) return;
-        return !this.commitIDs.includes(Engine.currentBuiling.id);
-    },
-
-    hasFreeCommitSlot: function(){
-        return (this.commitIDs.length != this.maxCommitSlots);
+    canCraft: function(item, nb){
+        var recipe = Engine.itemsData[item].recipe;
+        for(var itm in recipe){
+            if(!this.hasItem(itm,recipe[itm]*nb)) return false;
+        }
+        return true;
     },
 
 
@@ -177,10 +184,8 @@ var Hero = new Phaser.Class({
     },
 
     updateBuildRecipes: function(bldRecipes){
-        if(bldRecipes.length == 1 && bldRecipes[0] == -1){
-            this.buildRecipes.clear();
-            return;
-        }
+        this.buildRecipes.clear();
+        if(bldRecipes.length == 1 && bldRecipes[0] == -1) return;
         bldRecipes.forEach(function(w){
             this.buildRecipes.add(w,1);
         },this);
@@ -222,6 +227,15 @@ var Hero = new Phaser.Class({
         this.updateEvents.add('character');
     },
 
+    updateFoW: function(aois){
+        // var aois = [331,341,389,390,391,438,439,440,490];
+        this.FoW = [];
+        aois.forEach(function(aoi){
+            var origin = Utils.AOItoTile(aoi);
+            this.FoW.push(new Phaser.Geom.Rectangle(origin.x,origin.y,World.chunkWidth,World.chunkHeight));
+        },this);
+    },
+
     updateGold: function(gold){
         this.gold = gold;
         this.updateEvents.add('gold');
@@ -243,6 +257,13 @@ var Hero = new Phaser.Class({
     updateMarkers: function(markers){
         this.buildingMarkers = markers;
         if(Engine.miniMap) Engine.miniMap.map.updatePins();
+    },
+
+    updateRarity: function(rarity){
+        Engine.rarity = {};
+        rarity.forEach(function(itm){
+            Engine.rarity[itm[0]] = itm[1];
+        });
     },
 
     updateStats: function(stats){
@@ -268,14 +289,5 @@ var Hero = new Phaser.Class({
                 statObj.absoluteModifiers.push(m);
             })
         }
-    },
-
-    updateVision: function(aois){
-        // var aois = [331,341,389,390,391,438,439,440,490];
-        this.mapVision = [];
-        aois.forEach(function(aoi){
-            var origin = Utils.AOItoTile(aoi);
-            this.mapVision.push(new Phaser.Geom.Rectangle(origin.x,origin.y,World.chunkWidth,World.chunkHeight));
-        },this);
     }
 });

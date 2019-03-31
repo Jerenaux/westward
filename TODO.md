@@ -4,6 +4,9 @@ On deploy:
 - Test picking up objects
 - Test selling and buying in a store
 - Test equiping object
+- Test gs.handleGold()
+- Test handleCraft
+- Test setPrices
 => Automate these eventually
 => After bug, systematically create test!
 
@@ -32,16 +35,23 @@ Misc:
 - Camera bounds (test with northernmost camp)
 - Poll at regular interval the sprite below mouse
 - Better notifs cascading
-- New test: GameServer.lootNPC
-- New test: GameServer.handleBattle (when and area can and cannot be computed)
 - Positions not saved often enough?
 - Don't disable walk with build panel
 - Multiple clicks on "give" repeat the action
-Shop & workshop interfaces
+- Show countdowns in production panel + set up notifications!
+- Reduce amount of orientation pins
+- Display death and conflict markers
+- add esc shortcut
+- Don't spawn on busy location
+- Wrong interactive surface above buildings after built
+- Re-enable taking from production stock
 New movement system
-Add a zoom level to map
-Check building limits are enforced
 
+
+UI:
+- Bag icon: always displayed & set to player inventory
+- Add chest icon to shops, set to local inventory
+- Test with own workshop
 
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
@@ -165,7 +175,8 @@ Secure
 
 Analytics:
 ---------
-- Log: tutorial begins, progress (each step) and ends, kills
+- Log: price setting, handleShop, handleGold, tutorial begins, progress (each step) and ends
+- Display market prices
 - Button to flush events
 - Bundle events from one player into sessions
 - Log session-wide stats: duration, how many players visit a building during session, do this, do that...
@@ -221,7 +232,6 @@ Order:
 - Rework longslot system
 - Setters/getters everywhere
 - Centralize all texts (incl. stats, equip, and even item descriptions)
-- Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
 - Remove "longslot" stuff intended for stretching longslots vertically?
 
 Content:

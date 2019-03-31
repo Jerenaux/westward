@@ -267,8 +267,8 @@ var Building = new Phaser.Class({
     },
 
     getPrice: function (id, action) {
-        var key = (action == 'sell' ? 0 : 1);
-        return this.prices[id][key];
+        if(!(id in this.prices)) return 0;
+        return this.prices[id][action];
     },
 
     getItemNb: function (item) {
@@ -354,7 +354,8 @@ var Building = new Phaser.Class({
             }
         }
         if(cursor) UI.setCursor(cursor);
-        UI.tooltip.updateInfo(this.name);
+        var owner = this.isOwned() ? 'Your' : this.ownerName+'\'s';
+        UI.tooltip.updateInfo(owner+' '+this.name);
         UI.tooltip.display();
     },
 
