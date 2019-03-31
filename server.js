@@ -21,6 +21,7 @@ app.use('/server',express.static(__dirname + '/server'));
 app.use('/shared',express.static(__dirname + '/shared'));
 app.use('/maps',express.static(myArgs.maps || path.join(__dirname,'/maps')));
 app.use('/admin',express.static(path.join(__dirname,'admin')));
+app.use('/api',express.static(path.join(__dirname,'admin')));
 app.use('/editor',express.static(path.join(__dirname,'editor')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -37,6 +38,10 @@ app.get('/',function(req,res){
 });
 
 app.get('/admin',function(req,res){
+    res.sendFile(path.join(__dirname,'admin','admin.html'));
+});
+
+app.get('/api',function(req,res){
     res.sendFile(path.join(__dirname,'admin','admin.html'));
 });
 
