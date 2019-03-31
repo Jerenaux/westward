@@ -619,6 +619,11 @@ GameServer.createInitializationPacket = function(playerID){
     // and add them to the "newplayers" array of the next update packet
 };
 
+/**
+ * Remove a player from the game world when he disconnects (detected by
+ * receiving the disconnect event from socket.io)
+ * @param {string} socketID - String id of the socket.
+ */
 GameServer.handleDisconnect = function(socketID){
     console.log('disconnect');
     var player = GameServer.getPlayer(socketID);
@@ -629,6 +634,13 @@ GameServer.handleDisconnect = function(socketID){
     GameServer.nbConnectedChanged = true;
 };
 
+/**
+ * Remove an entity from the game world. An entity can be a Player
+ * (remove when disconnecting), an NPC (removed when killed), a building
+ * (removed when destroyed), an Item (removed when picked up), or even
+ * a battle cell (removed when the battle ends).
+ * @param {GameObject} entity - the entity to remove
+ */
 GameServer.removeEntity = function(entity){
     GameServer.removeFromLocation(entity);
     var AOIs = Utils.listAdjacentAOIs(entity.aoi);
@@ -638,45 +650,83 @@ GameServer.removeEntity = function(entity){
     if(entity.remove) entity.remove();
 };
 
-GameServer.getAOIAt = function(x,y){
-    return GameServer.AOIs[Utils.tileToAOI({x:x,y:y})];
-};
-
+/**
+ * Add an entity (Player, NPC, Building...) to all the data structures
+ * related to position (e.g. the AOI). Called when an entity is created.
+ * @param {GameObject} entity - the entity to add
+ */
 GameServer.addAtLocation = function(entity){
-    // Add some entity to all the data structures related to position (e.g. the AOI)
     GameServer.AOIs[entity.aoi].addEntity(entity);
     // the "entities" of an AOI list what entities are present in it; it's distinct from adding and object to an AOI
     // using GameServer.addObjectToAOI(), which actually adds the object to the update packages so that it can be created by
     // the clients (addObjectToAOI is called by GameServer.handleAOItransition)
-    // Entities are needed when moving and new AOIs are added to neighborhood
+    // The ´entities´ list is needed when moving and new AOIs are added to neighborhood
 };
 
+/**
+ * Remove an entity from all data structures related to position (spaceMap and AOI)
+ * @param {GameObject} entity - the entity to remove
+ */
 GameServer.removeFromLocation = function(entity){
-    // Remove an entity from all data structures related to position (spaceMap and AOI)
     GameServer.AOIs[entity.aoi].deleteEntity(entity);
 };
 
-GameServer.handleChat = function(data,socketID){
+/**
+ * Handle incoming chat messages from players.
+ * @param {string } text - the chat message sent.
+ * @param {string} socketID - ID of the socket of the player.
+ */
+GameServer.handleChat = function(text,socketID){
     var player = GameServer.getPlayer(socketID);
-    player.setChat(data); // in MovingEntity
-    Prism.logEvent(player,'chat',{txt:data});
+    player.setChat(data); // declared in MovingEntity
+    Prism.logEvent(player,'chat',{txt:text});
 };
 
-GameServer.checkCollision = function(x,y){ // true = collision
+/**
+ * Check if a tile in the world is walkable or not.
+ * @param {number} x - x coordinate of the tile to check.
+ * @param {number} y - y coordinate of the tile to check.
+ * @returns {boolean} - True if the tile is *not* walkable (there is a collision),
+ * false otherwise
+ */
+GameServer.checkCollision = function(x,y){
     if(x < 0  || y < 0) return true;
     if(x >= World.worldWidth || y > World.worldHeight) return true;
     return !!GameServer.collisions.get(x,y);
 };
 
+/**
+ * Call the pathFinder to find a path from `from` to `to`.
+ * @param {Object} from - {x,y} object representing the starting tile of the path to compute.
+ * @param {Object} to - {x,y} object representing the destination tile of the path to compute.
+ * @param {boolean} seek - If true, the best path towards the destination will be returned, even
+ * if it's incomplete (e.g. the path is too short because the destination is far). If false,
+ * will only return a path if a complete path between `from` and `to` can be found.
+ * (NPCs use the `seek` behavior to travel the game world without computing enormous paths).
+ * @returns {Array[Object]} - The array of tile coordinates along the calculated path.
+ */
 GameServer.findPath = function(from,to,seek){
     if(GameServer.checkCollision(to.x,to.y)) return null;
     return GameServer.pathFinder.findPath(from,to,seek);
 };
 
+/**
+ * Check if the bounding boxes of two entities (Player, NPC...) are close enough
+ * to trigger a battle.
+ * @param {GameObject} a - One of the two entities.
+ * @param {GameObject} b - The other entity.
+ * @returns {boolean} - Are the two entities within range or not.
+ */
 GameServer.isWithinAggroDist = function(a,b){
     return Utils.boxesDistance(a.getRect(),b.getRect()) <= GameServer.battleParameters.aggroRange;
 };
 
+/**
+ * Compute default prices for a bunch of basic items in order to populate the
+ * price listings of newly crated shops. These default prices are computed as the
+ * average price of each item in the world (or set to a default of 10).
+ * @returns {Object} - Map mapping itemID to {buy,sell} object of prices.
+ */
 GameServer.getDefaultPrices = function(){
     var defaultItems = [1,3,7,8,9,14,18,22,24,25,26,43]; //TODO: conf
     var defaultPrices = {};
