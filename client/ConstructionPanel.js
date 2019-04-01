@@ -80,20 +80,21 @@ ConstructionPanel.prototype.displayInterface = function(){
 
         var btn = new BigButton(this.x+270,y+20,'Give '+itemData.name);
         btn.item = item;
-        /*btn.callback = function(){
-            Engine.giveClick(this.item);
-        }.bind(btn);*/
         btn.callback = function(){
             if(this.checkForPanelOnTop()) return;
             Engine.currentMenu.displayPanel('action');
-            Engine.currentMenu.panels['action'].setUp(item,'sell');
+            Engine.currentMenu.panels['action'].setUp(item,'sell',false); // false = force non-financial
         }.bind(this);
         btn.display();
         this.bigbuttons.push(btn);
 
         if(!Engine.currentBuiling.isOwned() && price > 0) {
             var btn = new BigButton(this.x + 410, y + 20, 'Sell ' + itemData.name);
-            btn.disable();
+            btn.callback = function(){
+                if(this.checkForPanelOnTop()) return;
+                Engine.currentMenu.displayPanel('action');
+                Engine.currentMenu.panels['action'].setUp(item,'sell',true); // true = force financial
+            }.bind(this);
             btn.display();
             this.bigbuttons.push(btn);
         }
@@ -106,6 +107,9 @@ ConstructionPanel.prototype.displayInterface = function(){
 
 ConstructionPanel.prototype.update = function(){
     this.hideLongSlots();
+    this.bigbuttons.forEach(function(btn){
+        btn.hide();
+    });
     this.displayInterface();
 };
 

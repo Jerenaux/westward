@@ -43,8 +43,7 @@ Misc:
 - Display death and conflict markers
 - add esc shortcut
 - Don't spawn on busy location
-- Wrong interactive surface above buildings after built
-- Allow give stock when non-owner
+- Test building creation sync
 New movement system
 
 

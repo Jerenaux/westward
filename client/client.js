@@ -170,8 +170,8 @@ Client.sendCraft = function(id,nb,stock){
     Client.socket.emit('craft',{id:id,nb:nb,stock:stock});
 };
 
-Client.sendPurchase = function(id,nb, action){
-    Client.socket.emit('shop',{id:id,nb:nb,action:action});
+Client.sendPurchase = function(id,nb, action, financial){
+    Client.socket.emit('shop',{id:id,nb:nb,action:action,financial:financial});
 };
 
 Client.sendStock  = function(item,nb,building,action){

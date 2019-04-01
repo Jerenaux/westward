@@ -291,6 +291,7 @@ var Building = new Phaser.Class({
     },
 
     isOwned: function(){ // by the player
+        // return false;
         return this.owner == Engine.player.id;
     },
 

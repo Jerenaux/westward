@@ -959,13 +959,16 @@ GameServer.handleShop = function(data,socketID) {
     var item = data.id;
     var nb = data.nb;
     var action = data.action;
-    if(!player.isInBuilding()) return;
+    if(!player.isInBuilding()){
+        console.log('player not in building');
+        return;
+    }
     var building = GameServer.buildings[player.inBuilding];
-    var isFinancial = (!building.isOwnedBy(player));
+    var isFinancial = ('financial' in data ? data.financial : (!building.isOwnedBy(player)));
     if(action == 'buy'){ // or take
         if(!building.canSell(item,nb,isFinancial)) return;
         if(isFinancial) {
-            var price = building.getPrice(item, nb, 'buy');
+            var price = building.getPrice(item, nb, 'sell');
             if(price == 0) return;
             if (!player.canBuy(price)) return;
             player.takeGold(price, true);
@@ -974,16 +977,23 @@ GameServer.handleShop = function(data,socketID) {
         player.giveItem(item,nb,true);
         building.takeItem(item,nb);
     }else{ // sell or give
-        if(!player.hasItem(item,nb)) return;
-        if(!building.canBuy(item,nb,isFinancial)) return;
+        if(!player.hasItem(item,nb)){
+            console.log('Player does not have item');
+            return;
+        }
+        if(!building.canBuy(item,nb,isFinancial)){
+            console.log('Building cannot buy');
+            return;
+        }
         if(isFinancial) {
-            var price = building.getPrice(item, nb, 'sell');
+            var price = building.getPrice(item, nb, 'buy');
+            console.log(building.prices[item]);
             if(price == 0) return;
             player.giveGold(price, true);
             building.takeGold(price);
             player.gainClassXP(GameServer.classes.merchant,Math.floor(price/10), true); // TODO: factor in class level
         }
-        player.takeItem(item, nb, true);
+        player.takeItem(item, nb, true); // true = notify
         building.giveItem(item,nb,true); // true = remember
         building.updateBuild();
     }

@@ -1260,9 +1260,6 @@ Engine.makeProductionMenu = function(){
     var productionPanel = new ProductionPanel(x,y,w,h);
     productionPanel.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['prod_help']);
     production.addPanel('production',productionPanel);
-    //var productivity = new ProductivityPanel(prodx,prody,prodw,prodh,'Productivity modifiers');
-    //productivity.addButton(prodw-30, 8, 'blue','help',null,'',UI.textsData['productivity_help']);
-    //production.addPanel('productivity',productivity);
     var stock = production.addPanel('shop',new InventoryPanel(prodx,prody,prodw,prodh,'Stock'));
     stock.setInventory('building',5,true,Engine.takeClick);
 
@@ -1334,6 +1331,7 @@ Engine.makeConstructionMenu = function(){
 Engine.makeWipMenu = function(){
     var menu = new Menu();
     menu.setTitlePos(100);
+    menu.setExitPos(730 );
     var w = 500;
     var x = (Engine.getGameConfig().width-w)/2;
 
