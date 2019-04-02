@@ -577,6 +577,7 @@ GameServer.loadPlayer = function(socket,id){
             player.setIDs(mongoID,socket.id);
             player.getDataFromDb(doc);
             player.setModel(doc);
+            player.spawn(player.x, player.y);
             GameServer.finalizePlayer(socket,player);
         }
     );

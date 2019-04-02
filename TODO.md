@@ -42,8 +42,8 @@ Misc:
 - Reduce amount of orientation pins
 - Display death and conflict markers
 - add esc shortcut
-- Don't spawn on busy location
 - Set default prices for construction material
+- Prevent building at player location
 New movement system
 
 

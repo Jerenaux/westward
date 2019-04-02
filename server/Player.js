@@ -183,9 +183,13 @@ Player.prototype.die = function(){
     this.updatePacket.dead = true;
 };
 
-Player.prototype.spawn = function(x,y){ // todo: remove args
+Player.prototype.spawn = function(x,y){
     x = x || this.respawnLocation.x;
     y = y || this.respawnLocation.y;
+    console.log('aiming at',x,y);
+    var pos = this.findNextFreeCell(x,y);
+    x = pos.x;
+    y = pos.y;
     this.setProperty('x', x);
     this.setProperty('y', y);
     this.updatePacket.x = x;
