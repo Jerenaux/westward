@@ -2083,7 +2083,7 @@ Engine.enterBuilding = function(id){
     Engine.currentBuiling = building; // used to keep track of which building is displayed in menus
     var buildingData = Engine.buildingsData[building.buildingType];
     //var settlementData = Engine.settlementsData[building.settlement];
-
+    console.log('owner:',Engine.currentBuiling.owner);
     var menus = [];
     var mainMenu;
     if(building.built == true) {

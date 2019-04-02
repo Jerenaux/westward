@@ -26,10 +26,10 @@
     "name": "Workshop",
     "desc": "Allows to perform crafting.",
     "base":{
-      "width": 4,
+      "width": 6,
       "height": 4
     },
-    "recipe": {"3":25},
+    "recipe": {"3":20,"26":20},
     "padding": 11,
     "icon": "workshop",
     "foundations": "foundations_1",
@@ -81,7 +81,7 @@
     "desc": "A place to rest.",
     "base":{
       "width": 4,
-      "height": 5
+      "height": 4
     },
     "recipe": {"3":10},
     "padding": 0,

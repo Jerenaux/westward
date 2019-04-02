@@ -43,7 +43,7 @@ Misc:
 - Display death and conflict markers
 - add esc shortcut
 - Don't spawn on busy location
-- Test building creation sync
+- Set default prices for construction material
 New movement system
 
 
