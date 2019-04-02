@@ -14,7 +14,22 @@ var myArgs = require('optimist').argv;
 var gs = require('./server/GameServer.js').GameServer;
 gs.server = server;
 
-app.use('/assets',express.static(__dirname + '/assets'));
+app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    next();
+});
+
+const corssss =  function (res, path) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With");
+        res.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+        res.setHeader("X-Powered-By", ' 3.2.1')
+        res.type("application/json");
+        res.type("jpg");
+};
+
+app.use('/assets',express.static(__dirname + '/assets', corssss));
 app.use('/client',express.static(__dirname + '/client'));
 app.use('/lib',express.static(__dirname + '/lib'));
 app.use('/server',express.static(__dirname + '/server'));
@@ -23,15 +38,33 @@ app.use('/maps',express.static(myArgs.maps || path.join(__dirname,'/maps')));
 app.use('/admin',express.static(path.join(__dirname,'admin')));
 app.use('/api',express.static(path.join(__dirname,'admin')));
 app.use('/editor',express.static(path.join(__dirname,'editor')));
-app.use(bodyParser.urlencoded({ extended: false }));
+
+// app.use((req, res, next) => { //change app.all to app.use here and remove '*', i.e. the first parameter part
+//     res.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
+//     res.setHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With");
+//     res.setHeader("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+//     res.setHeader("X-Powered-By",' 3.2.1')
+//     res.type("application/json");
+//     res.type("jpg");
+//     next();
+// });
+
+// app.use('/assets', express.static('upload', {
+//     setHeaders: function(res, path) {
+//         res.set("Access-Control-Allow-Origin", "*");
+//         res.set("Access-Control-Allow-Headers", "Content-Type,X-Requested-With");
+//         res.set("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+//         res.set("X-Powered-By",' 3.2.1')
+//         res.type("application/json");
+//         res.type("jpg");
+//     }
+// }));
+
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
 if(process.env.DEV == 1) app.use('/studio',express.static(__dirname + '/studio'));
 
-app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    next();
-});
 
 app.get('/',function(req,res){
     res.sendFile(path.join(__dirname,'index.html'));
@@ -42,6 +75,12 @@ app.get('/admin',function(req,res){
 });
 
 app.get('/api',function(req,res){
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With");
+    res.setHeader("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+    res.setHeader("X-Powered-By",' 3.2.1');
+    res.type("application/json");
+    res.type("jpg");
     res.sendFile(path.join(__dirname,'admin','admin.html'));
 });
 

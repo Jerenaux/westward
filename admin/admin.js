@@ -9,6 +9,8 @@ var Data = {
     categories: ['buildings','items','animals']
 };
 
+
+
 app.controller("mainCtrl", [
     '$scope','$http',
     function($scope,$http) {
