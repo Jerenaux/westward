@@ -40,7 +40,7 @@ var Hero = new Phaser.Class({
         this.ap = data.ap || new classDataShell();
         this.name = data.name;
 
-        this.updateRarity(data.rarity);
+        this.updateRarity(data.rarity || []);
 
         for(var item in Engine.itemsData){
             var data = Engine.itemsData[item];
