@@ -8,6 +8,8 @@ var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
+var StatsContainer = require('../shared/Stats.js').StatsContainer;
+var Models = require('../shared/models.js');
 
 function Building(data){
     this.isBuilding = true;
@@ -324,10 +326,13 @@ Building.prototype.save = function(){
 // Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){
     var trimmed = {};
-    var broadcastProperties =
+    /*var broadcastProperties =
         ['id','type','gold','prices','built','productivity','owner','ownerName']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
+    }*/
+    for(var field in Models.BuildingModel){
+        trimmed[field] = this[field];
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);

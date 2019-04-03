@@ -87,7 +87,7 @@ function PriceSlot(x,y,width,height,craft){
 
     this.icon = UI.scene.add.sprite(this.x + 30, this.y + height/2);
     this.name = UI.scene.add.text(this.x + 60, this.y + 10, '', { font: '16px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    var selltxt = (craft ? 'Craft for:' : 'Buy for:');
+    var selltxt = (craft ? 'Craft for:' : 'Sell for:');
     if(!craft)  this.buyText = UI.scene.add.text(this.x + 60, this.y + 40, 'Buy for:', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     this.sellText = UI.scene.add.text(this.x + 60, this.y + 65, selltxt, { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
 

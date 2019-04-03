@@ -77,7 +77,7 @@ ShopPanel.prototype.addInterface = function(){
 };
 
 ShopPanel.prototype.isFinancial = function(){
-    if(!this.isShop) return false;
+    if(this.financial !== undefined) return this.financial;
     return !Engine.currentBuiling.isOwned();
 };
 
@@ -93,8 +93,9 @@ ShopPanel.prototype.getDefaultTitle = function(){
     return this.isFinancial() ? 'Buy/Sell' : 'Give/Take';
 };
 
-ShopPanel.prototype.setUp = function(id,action){
+ShopPanel.prototype.setUp = function(id,action,financial){
     var data = Engine.itemsData[id];
+    this.financial = financial;
     this.shopItem.id = id;
     this.shopItem.count = 1;
     this.shopItem.action = action;
@@ -232,21 +233,13 @@ ShopPanel.prototype.requestPurchase = function(){
     var stock = Engine.currentBuiling.getItemNb(this.shopItem.id);
     if(this.shopItem.action == 'buy' && this.shopItem.count > stock) this.shopItem.count = stock;
 
-    Client.sendPurchase(this.shopItem.id, this.shopItem.count, this.shopItem.action);
+    Client.sendPurchase(this.shopItem.id, this.shopItem.count, this.shopItem.action, this.financial);
+
     if(!this.isShop && Client.tutorial){
         var verb = (this.shopItem.action == 'buy' ? 'take' : 'give');
         Engine.tutorialStock(verb,this.shopItem.id,this.shopItem.count);
     }
-
-    /*if(this.isShop) { // When actually buying and selling
-        Client.sendPurchase(this.shopItem.id, this.shopItem.count, this.shopItem.action);
-    }else{ // When taking and giving stock
-        Client.sendStock(this.shopItem.id,this.shopItem.count,Engine.currentBuiling.id,this.shopItem.action);
-        if(Client.tutorial){
-            var verb = (this.shopItem.action == 'buy' ? 'take' : 'give');
-            Engine.tutorialStock(verb,this.shopItem.id,this.shopItem.count);
-        }
-    }*/
+    
     this.lastPurchase = Date.now();
 };
 
