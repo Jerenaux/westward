@@ -758,7 +758,6 @@ GameServer.handleBuildingClick = function(data,socketID){
 };
 
 GameServer.handleNPCClick = function(data,socketID){
-    console.warn('handle npc click');
     var targetID = data.id;
     var player = GameServer.getPlayer(socketID);
     var target = (data.type == 0 ? GameServer.animals[targetID] : GameServer.civs[targetID]);
