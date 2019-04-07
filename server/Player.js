@@ -130,6 +130,10 @@ Player.prototype.setRegion = function(sid){
     }
 };
 
+Player.prototype.getRegionName = function(){
+    return this.region.name;
+};
+
 Player.prototype.setStartingInventory = function(){
     // TODO: move to some config file
     /*this.giveItem(2,1);
@@ -657,10 +661,10 @@ Player.prototype.addMsg = function(msg){
 
 Player.prototype.addNotif = function(msg){
     this.updatePacket.addNotif(msg);
-    this.history.unshift(msg);
+    this.history.unshift([Date.now(),msg]);
     var MAX_LENGTH = 20; // TODO: max limit in conf
     if(this.history.length > MAX_LENGTH) this.history.splice(MAX_LENGTH,this.history.length-MAX_LENGTH);
-    this.updatePacket.history = this.history.slice(0);
+    // this.updatePacket.history = this.history.slice(0);
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){

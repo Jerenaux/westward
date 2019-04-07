@@ -168,7 +168,7 @@ var Hero = new Phaser.Class({
     handleNotifs: function(notifs){
         UI.handleNotifications(notifs);
         notifs.forEach(function(notif){
-            this.history.unshift(notif);
+            this.history.unshift([Date.now(),notif]);
         },this);
         this.updateEvents.add('history');
     },
@@ -249,6 +249,9 @@ var Hero = new Phaser.Class({
 
     updateHistory: function(history){
         this.history = history;
+        for(var i = 0; i < this.history.length; i++){
+            this.history[i][0] -= Client.serverTimeDelta;
+        }
     },
 
     updateInventory: function(items){

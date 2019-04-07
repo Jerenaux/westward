@@ -27,12 +27,43 @@ JournalPanel.prototype.getNextText = function() {
     return this.texts[this.textsCounter++];
 };
 
+JournalPanel.prototype.formatTime = function(stamp){
+    var delta = Date.now() - stamp;
+    var minute = 1000*60;
+    var hour = minute*60;
+    var day = hour*24;
+    if(delta > 2*day){
+        var d = Math.ceil(delta/day);
+        return d+' day'+(d > 1 ? 's' : '')+' ago';
+    }else if(delta > hour){
+        var d  = Math.ceil(delta/hour);
+        return d+' hour'+(d > 1 ? 's' : '')+' ago';
+    }else if(delta > minute*5){
+        return (Math.ceil(delta/(minute*5))*5)+' minutes ago';
+    }else{
+        return 'Just now';
+    }
+};
+
 JournalPanel.prototype.update = function(){
-    Engine.player.history.forEach(function(hist,i){
-        var t = this.getNextText();
-        t.setText(hist);
-        t.x = this.x + 20;
-        t.y = this.y + 20 + i*20;
+    this.hideContent();
+
+    Engine.player.history.forEach(function(data,i){
+        var time_txt = this.getNextText();
+        var event_txt = this.getNextText();
+        var time = data[0];
+        var event = data[1];
+        time_txt.setText('['+this.formatTime(time)+']');
+        time_txt.setFill(Utils.colors.gold);
+        event_txt.setText(event);
+        event_txt.setFill(Utils.colors.white);
+        var y = this.y + 20 + i*20;
+        time_txt.x = this.x + 20;
+        time_txt.y = y;
+        event_txt.x = this.x + 140;
+        event_txt.y = y;
+        time_txt.setVisible(true);
+        event_txt.setVisible(true);
     },this);
 };
 

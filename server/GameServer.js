@@ -552,6 +552,8 @@ GameServer.saveNewPlayerToDb = function(socket,player,document){
         player.setIDs(mongoID,socket.id);
         GameServer.finalizePlayer(socket,player);
         GameServer.server.sendID(socket,mongoID);
+        player.addNotif('You arrived in '+player.getRegionName());
+        player.save();
     });
 };
 
@@ -614,7 +616,8 @@ GameServer.createInitializationPacket = function(playerID){
     return {
         //config: config.get('client.config'),
         nbconnected: GameServer.server.getNbConnected(),
-        player: GameServer.players[playerID].initTrim() // info about the player
+        player: GameServer.players[playerID].initTrim(), // info about the player
+        refTime: Date.now()
     };
     // No need to send list of existing players, GameServer.handleAOItransition() will look for players in adjacent AOIs
     // and add them to the "newplayers" array of the next update packet

@@ -172,7 +172,7 @@ if(process.env.DEV == 1) {
 server.listen(process.env.PORT || myArgs.port || 8081,function(){
     console.log('Listening on '+server.address().port);
 
-    mongodbAuth = {}
+    mongodbAuth = {};
     console.log('Check for mongodb Auth');
     if (process.env.MONGODB_AUTH) {
         console.log('Create auth object with user, pass, client');
@@ -185,8 +185,6 @@ server.listen(process.env.PORT || myArgs.port || 8081,function(){
 
     mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward', mongodbAuth);
     var db = mongoose.connection;
-
-
 
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function() {

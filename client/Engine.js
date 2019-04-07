@@ -464,7 +464,7 @@ Engine.bootTutorial = function(part){
     Client.sendTutorialStart();
 };
 
-Engine.initWorld = function(data){
+Engine.initWorld = function(data){ // data = initialization packet sent by server
     //Engine.animalUpdates = new ListMap(); // debug purpose, remove
     Engine.firstSelfUpdate = true;
 

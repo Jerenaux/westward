@@ -39,10 +39,11 @@ Misc:
 - Don't disable walk with build panel
 - Multiple clicks on "give" repeat the action
 - Prevent building at player location
-- Show countdowns in production panel + set up notifications!
 - Reduce amount of orientation pins
 - Display death and conflict markers
 - add esc shortcut
+- Show countdowns in production panel
+- Save notifications for disconnected players
 New movement system
 
 
