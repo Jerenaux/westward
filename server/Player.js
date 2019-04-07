@@ -60,6 +60,7 @@ function Player(){
 
     this.setUpStats();
     this.equipment = new EquipmentManager();
+    this.history = [];
     this.fieldOfVision = [];
     this.visitedAOIs = new Set(); // List of AOIs visitted since last fort debrief
     MovingEntity.call(this);
@@ -72,10 +73,6 @@ Player.prototype.setIDs = function(dbID,socketID){
     //this.id = GameServer.lastPlayerID++;
     this.dbID = dbID;
     this.socketID = socketID;
-};
-
-Player.prototype.setAppearance = function(appearance){
-    this.setProperty('appearance',appearance);
 };
 
 Player.prototype.updateBldRecipes = function(){
@@ -513,10 +510,15 @@ Player.prototype.applyEffect = function(stat,delta,notify){
     }
 };
 
+/**
+ * Create a smaller object containing the properties needed to initialize
+ * the player character on the client-side.
+ * @returns {{}}
+ */
 Player.prototype.initTrim = function(){
-    // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','gold','civicxp','civiclvl','classxp','classlvl','ap','name']; // list of properties relevant for the client
+    var broadcastProperties = ['id','gold','civicxp','civiclvl','classxp','classlvl','ap',
+        'name','history']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -530,14 +532,18 @@ Player.prototype.initTrim = function(){
     return trimmed;
 };
 
+/**
+ * Create a smaller object containing the properties needed for the *other clients*
+ * (Properties needed by the player itself are put into his individualUpdatePacjage)
+ * @returns {{}}
+ */
 Player.prototype.trim = function(){
-    // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
     var broadcastProperties = ['id','path','inFight','inBuilding','chat',
-        'battlezone','dead','appearance']; // list of properties relevant for the client
-    for(var p = 0; p < broadcastProperties.length; p++){
-        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
-    }
+        'battlezone','dead']; // list of properties relevant for the client
+    broadcastProperties.forEach(function(field){
+        trimmed[field] = this[field];
+    },this);
     trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
@@ -546,8 +552,6 @@ Player.prototype.trim = function(){
 };
 
 Player.prototype.getDataFromDb = function(data){
-    // TODO: think about how to handle references to other entities
-    // eg. inBuilding (how to retrieve proper building if server went down since), commitment...
     this.id = data.id;
     this.name = data.name;
     this.x = Utils.clamp(data.x,0,World.worldWidth-1);
@@ -580,6 +584,7 @@ Player.prototype.getDataFromDb = function(data){
     },this);
     this.setRegion(data.sid);
     this.giveGold(data.gold);
+    this.history = data.history;
 };
 
 Player.prototype.setAction = function(action){
@@ -652,6 +657,10 @@ Player.prototype.addMsg = function(msg){
 
 Player.prototype.addNotif = function(msg){
     this.updatePacket.addNotif(msg);
+    this.history.unshift(msg);
+    var MAX_LENGTH = 20; // TODO: max limit in conf
+    if(this.history.length > MAX_LENGTH) this.history.splice(MAX_LENGTH,this.history.length-MAX_LENGTH);
+    this.updatePacket.history = this.history.slice(0);
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){

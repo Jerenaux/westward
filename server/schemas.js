@@ -47,7 +47,8 @@ let Schemas = {
         sid: {type: Number, min: 0, required: true},
         inventory: {type: [[]], set:function(inventory){
                 return inventory.toList(true); // true: filter zeroes
-            }}
+            }},
+        history: {type: []}
         // stats are NOT saved, as they only consist in base values + modifiers; modifiers are re-applied contextually, not saved
     })
 };

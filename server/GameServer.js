@@ -1043,8 +1043,7 @@ GameServer.build = function(player,bid,tile){
         ownerName: player.name,
         built: false
     };
-    if(data.type == 4) data.prices = GameServer.getDefaultPrices();
-    console.warn(data.prices);
+    data.prices = GameServer.getDefaultPrices();
     var building = new Building(data);
     var document = new GameServer.BuildingModel(building);
     building.setModel(document); // ref to model is needed at least to get _id
@@ -1265,6 +1264,17 @@ GameServer.getRarity = function(){
         rarity.push([item,computeRarity(GameServer.itemCounts[item])]);
     }
     return rarity;
+};
+
+GameServer.notifyProduction = function(playerID,msg){
+    console.log(playerID);
+    console.log(Object.keys(GameServer.players));
+    if(playerID in GameServer.players){
+        var player = GameServer.players[playerID];
+        player.addNotif(msg);
+    }else{
+        console.warn('player not connected');
+    }
 };
 
 GameServer.updateClients = function(){ //Function responsible for setting up and sending update packets to clients

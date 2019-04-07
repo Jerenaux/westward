@@ -38,12 +38,11 @@ Misc:
 - Positions not saved often enough?
 - Don't disable walk with build panel
 - Multiple clicks on "give" repeat the action
+- Prevent building at player location
 - Show countdowns in production panel + set up notifications!
 - Reduce amount of orientation pins
 - Display death and conflict markers
 - add esc shortcut
-- Set default prices for construction material
-- Prevent building at player location
 New movement system
 
 

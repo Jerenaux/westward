@@ -41,6 +41,7 @@ var Hero = new Phaser.Class({
         this.name = data.name;
 
         this.updateRarity(data.rarity || []);
+        this.updateHistory(data.history);
 
         for(var item in Engine.itemsData){
             var data = Engine.itemsData[item];
@@ -166,6 +167,10 @@ var Hero = new Phaser.Class({
 
     handleNotifs: function(notifs){
         UI.handleNotifications(notifs);
+        notifs.forEach(function(notif){
+            this.history.unshift(notif);
+        },this);
+        this.updateEvents.add('history');
     },
 
     updateAmmo: function(ammo){
@@ -240,6 +245,10 @@ var Hero = new Phaser.Class({
         this.gold = gold;
         this.updateEvents.add('gold');
         // TODO: move sound effect
+    },
+
+    updateHistory: function(history){
+        this.history = history;
     },
 
     updateInventory: function(items){

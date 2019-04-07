@@ -1687,7 +1687,7 @@ Engine.makeCharacterMenu = function(){
     var logh = 380 - citizenh;
 
     //var citizen = menu.addPanel('citizen', new CitizenPanel(citizenx,citizeny,citizenw,citizenh,'Civic status'));
-    var log = menu.addPanel('log', new Panel(citizenx,citizeny,citizenw,logh+citizenh,'Events log'));
+    var log = menu.addPanel('log', new JournalPanel(citizenx,citizeny,citizenw,logh+citizenh,'Journal'));
 
     var classpanel = menu.addPanel('class', new CharacterPanel(classx,classy,classw,classh,'Multi-Class status'));
     var sx = classx + 15;
@@ -1716,6 +1716,8 @@ Engine.makeCharacterMenu = function(){
     //menu.addPanel('abilities',new Panel(citizenx,citizeny,citizenw,citizenh),true);
 
     menu.addEvent('onUpdateCharacter',classpanel.update.bind(classpanel));
+    menu.addEvent('onUpdateHistory',log.update.bind(log));
+    menu.addEvent('onOpen',log.update.bind(log));
     //menu.addEvent('onUpdateCitizen',citizen.update.bind(citizen));
     //menu.addEvent('onUpdateCommit',commit.updateInventory.bind(commit));
 
@@ -2032,6 +2034,7 @@ Engine.updateMenus = function(category){
         'commit': 'onUpdateCommit',
         'equip': 'onUpdateEquipment',
         'gold': 'onUpdateGold',
+        'history': 'onUpdateHistory',
         'inv': 'onUpdateInventory',
         'productivity':'onUpdateProductivity',
         'stats': 'onUpdateStats'

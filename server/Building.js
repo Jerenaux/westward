@@ -187,6 +187,8 @@ Building.prototype.updateProd = function(){
         var actualNb = Math.min(increment,cap-current);
         if(actualNb) {
             this.giveItem(item,actualNb);
+            var msg = actualNb+''+GameServer.itemsData[item].name+' was produced';
+            GameServer.notifyProduction(this.owner,msg);
             produced += actualNb;
         }
     }
@@ -326,11 +328,6 @@ Building.prototype.save = function(){
 // Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){
     var trimmed = {};
-    /*var broadcastProperties =
-        ['id','type','gold','prices','built','productivity','owner','ownerName']; // list of properties relevant for the client
-    for(var p = 0; p < broadcastProperties.length; p++){
-        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
-    }*/
     for(var field in Models.BuildingModel){
         trimmed[field] = this[field];
     }

@@ -87,7 +87,7 @@ NPC.prototype.goToDestination = function(dest){
     if(!path || path.length <= 1) return false;
 
     var trim = PFUtils.trimPath(path,GameServer.battleCells);
-    path = trim.path;fin
+    path = trim.path;
     this.idle = false;
     this.setPath(path);
     return true;
