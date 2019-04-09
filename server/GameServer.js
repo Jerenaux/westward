@@ -552,7 +552,7 @@ GameServer.saveNewPlayerToDb = function(socket,player,document){
         player.setIDs(mongoID,socket.id);
         GameServer.finalizePlayer(socket,player);
         GameServer.server.sendID(socket,mongoID);
-        player.addNotif('You arrived in '+player.getRegionName());
+        player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
         player.save();
     });
 };
@@ -976,8 +976,12 @@ GameServer.handleShop = function(data,socketID) {
             if (!player.canBuy(price)) return;
             player.takeGold(price, true);
             building.giveGold(price);
+            var phrase = [player.name,'bought',nb,GameServer.itemsData[item].name,'for',price,Utils.formatMoney(price),'in my shop'];
+            var msg = phrase.join(' ');
+            GameServer.notifyPlayer(building.owner,msg);
         }
-        player.giveItem(item,nb,true);
+        var verb = (isFinancial ? 'Bought' : 'Took');
+        player.giveItem(item,nb,true,verb);
         building.takeItem(item,nb);
     }else{ // sell or give
         if(!player.hasItem(item,nb)){
@@ -996,8 +1000,22 @@ GameServer.handleShop = function(data,socketID) {
             building.takeGold(price);
             player.gainClassXP(GameServer.classes.merchant,Math.floor(price/10), true); // TODO: factor in class level
         }
-        player.takeItem(item, nb, true); // true = notify
+        var verb = (isFinancial ? 'Sold' : 'Gave');
+        player.takeItem(item, nb, true, verb); // true = notify
         building.giveItem(item,nb,true); // true = remember
+        if(!building.isOwnedBy(player)) {
+            var verb = (isFinancial ? 'sold' : 'gave');
+            var phrase = [player.name, verb, nb, GameServer.itemsData[item].name];
+            if (isFinancial) {
+                phrase.push('for');
+                phrase.push(price);
+                phrase.push(Utils.formatMoney(price));
+            }
+            phrase.push('in my');
+            phrase.push(GameServer.buildingsData[building.type].name);
+            var msg = phrase.join(' ');
+            GameServer.notifyPlayer(building.owner, msg);
+        }
         building.updateBuild();
     }
     building.save();
@@ -1016,7 +1034,7 @@ GameServer.handleBuild = function(data,socketID) {
     var buildPermit = GameServer.canBuild(bid, tile);
     if (buildPermit == 1) {
         GameServer.build(player, bid, tile);
-        player.addNotif('You built a '+GameServer.buildingsData[bid].name);
+        player.addNotif('Built a '+GameServer.buildingsData[bid].name);
         Prism.logEvent(player,'newbuilding',{x:tile.x,y:tile.y,building:bid});
     } else if(buildPermit == -1) {
         player.addMsg('I can\'t build there!');
@@ -1110,6 +1128,11 @@ GameServer.handleCraft = function(data,socketID){
     GameServer.operateCraft(player, targetItem, nb);
     building.giveGold(player.takeGold(price));
     player.gainClassXP(GameServer.classes.craftsman,5*nb,true); // TODO: vary based on multiple factors
+    if(!building.isOwnedBy(player)) {
+        var phrase = [player.name,'crafted',nb,GameServer.itemsData[targetItem].name,'for',price,Utils.formatMoney(price),'in my Workshop'];
+        var msg = phrase.join(' ');
+        GameServer.notifyPlayer(building.owner, msg);
+    }
     Prism.logEvent(player,'craft',{item:targetItem,nb:nb});
 };
 
@@ -1270,17 +1293,16 @@ GameServer.getRarity = function(){
     return rarity;
 };
 
-GameServer.notifyProduction = function(playerID,msg){
-    console.log(playerID);
-    console.log(Object.keys(GameServer.players));
+GameServer.notifyPlayer = function(playerID,msg){
+    // console.log(playerID);
+    // console.log(Object.keys(GameServer.players));
     if(playerID in GameServer.players){
         var player = GameServer.players[playerID];
         player.addNotif(msg);
         player.save();
     }else{
-        console.warn('player not connected');
+        // console.warn('player not connected');
         var notif = [Date.now(),msg];
-        console.log(notif);
         // {$each: ['value'], $position: 0 }
         // GameServer.PlayerModel.findOneAndUpdate({'id':playerID},{$push:{'history':notif}},function(err, doc){
         GameServer.PlayerModel.findOneAndUpdate(

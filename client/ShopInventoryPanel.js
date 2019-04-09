@@ -42,7 +42,9 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
         });
     }
 
-    this.nothingTxt = this.addText(20,0,'The inventory of this shop is empty. Come back later!');
+    var emptyMsg = (this.inventory == 'player' ? 'You don\' have any items' : 'The inventory of this shop is empty. Come back later!');
+    this.nothingTxt = this.addText(this.width/2,0,emptyMsg);
+    this.nothingTxt.setOrigin(0.5,0);
     this.nothingTxt.setVisible(false);
 
     this.pagetxts = this.addPolyText((this.width/2)-50,0,['Page','1','/','10']);

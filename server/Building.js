@@ -197,7 +197,7 @@ Building.prototype.updateProd = function(){
         if(actualNb) {
             this.giveItem(item,actualNb);
             var msg = actualNb+' '+GameServer.itemsData[item].name+' was produced';
-            GameServer.notifyProduction(this.owner,msg);
+            GameServer.notifyPlayer(this.owner,msg);
             produced += actualNb;
         }
     }

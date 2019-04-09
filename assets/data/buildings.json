@@ -32,7 +32,7 @@
     "recipe": {"3":20,"26":20},
     "padding": 11,
     "icon": "workshop",
-    "foundations": "foundations_1",
+    "foundations": "foundations_4",
     "sprite": "workshop",
     "mapicon": "workshop",
     "mainMenu": "crafting",

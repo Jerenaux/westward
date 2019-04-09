@@ -144,6 +144,8 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(4,2);*/
     //this.giveItem(4,3);
     this.giveItem(28,1);
+    this.giveItem(7,1);
+    this.giveItem(21,1);
 
     this.giveGold(300);
 };
@@ -280,7 +282,7 @@ Player.prototype.giveGold = function(nb,notify){
     this.gold = Utils.clamp(this.gold+nb,0,GameServer.characterParameters.maxGold);
     this.updatePacket.updateGold(this.gold);
     if(notify){
-        this.addNotif('+'+nb+' '+Utils.formatMoney(nb));
+        this.addNotif('Received '+nb+' '+Utils.formatMoney(nb));
         this.save();
     }
 };
@@ -289,7 +291,7 @@ Player.prototype.takeGold = function(nb,notify){
     this.gold = Utils.clamp(this.gold-nb,0,GameServer.characterParameters.maxGold);
     this.updatePacket.updateGold(this.gold);
     if(notify){
-        this.addNotif('-'+nb+' '+Utils.formatMoney(nb));
+        this.addNotif('Gave '+nb+' '+Utils.formatMoney(nb));
         this.save();
     }
     return nb;
@@ -319,20 +321,23 @@ Player.prototype.hasItem = function(item,nb){
     return (this.inventory.getNb(item) >= nb);
 };
 
-Player.prototype.giveItem = function(item,nb,notify){
+Player.prototype.giveItem = function(item,nb,notify,verb){
     this.inventory.add(item,nb);
     this.updatePacket.addItem(item,this.inventory.getNb(item));
     if(notify){
-        this.addNotif('+'+nb+' '+GameServer.itemsData[item].name);
+        // this.addNotif('+'+nb+' '+GameServer.itemsData[item].name);
+        verb = verb || 'Received';
+        this.addNotif(verb+' '+nb+' '+GameServer.itemsData[item].name);
         this.save();
     }
 };
 
-Player.prototype.takeItem = function(item,nb,notify){
+Player.prototype.takeItem = function(item,nb,notify,verb){
     this.inventory.take(item,nb);
     this.updatePacket.addItem(item,this.inventory.getNb(item));
     if(notify){
-        this.addNotif('-'+nb+' '+GameServer.itemsData[item].name);
+        verb = verb || 'Sold';
+        this.addNotif(verb+' '+nb+' '+GameServer.itemsData[item].name);
         this.save();
     }
 };
@@ -629,12 +634,25 @@ Player.prototype.enterBuilding = function(id){
     // TODO: check for proximity
     // TODO: add to a list of people in the building object
     this.setProperty('inBuilding', id);
-
-    Prism.logEvent(this,'building',{building:GameServer.buildings[id].type});
+    var building = GameServer.buildings[id];
+    var type = building.type;
+    var bldname = GameServer.buildingsData[type].name;
+    var phrase = ['Entered',(building.isOwnedBy(this) ? 'my' : building.ownerName),bldname];
+    this.addNotif(phrase.join(' '),true); //true = silent
+    if(!building.isOwnedBy(this)) {
+        var phrase = [this.name, 'visitted my', bldname];
+        GameServer.notifyPlayer(building.owner, phrase.join(' '));
+    }
+    Prism.logEvent(this,'building',{building:type});
 };
 
 Player.prototype.exitBuilding = function(){
     // TODO: check if in building first
+    var building = GameServer.buildings[this.inBuilding];
+    var type = building.type;
+    var bldname = GameServer.buildingsData[type].name;
+    var phrase = ['Left',(building.isOwnedBy(this) ? 'my' : building.ownerName),bldname];
+    this.addNotif(phrase.join(' '),true); // true = silent
     this.setProperty('inBuilding', -1);
 };
 
@@ -659,8 +677,8 @@ Player.prototype.addMsg = function(msg){
     this.updatePacket.addMsg(msg);
 };
 
-Player.prototype.addNotif = function(msg){
-    this.updatePacket.addNotif(msg);
+Player.prototype.addNotif = function(msg,silent){
+    if(!silent) this.updatePacket.addNotif(msg);
     this.history.push([Date.now(),msg]);
     var MAX_LENGTH = 20; // TODO: max limit in conf
     // if(this.history.length > MAX_LENGTH) this.history.splice(MAX_LENGTH,this.history.length-MAX_LENGTH);

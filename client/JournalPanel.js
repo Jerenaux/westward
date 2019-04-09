@@ -22,6 +22,7 @@ JournalPanel.prototype.getNextText = function() {
         t.setDisplayOrigin(0, 0);
         t.setScrollFactor(0);
         t.setDepth(1);
+        t.setWordWrapWidth(this.width-150,false);
         this.texts.push(t);
     }
     return this.texts[this.textsCounter++];
@@ -39,7 +40,8 @@ JournalPanel.prototype.formatTime = function(stamp){
         var d  = Math.ceil(delta/hour);
         return d+' hour'+(d > 1 ? 's' : '')+' ago';
     }else if(delta > minute*5){
-        return (Math.ceil(delta/(minute*5))*5)+' minutes ago';
+        // return (Math.ceil(delta/(minute*5))*5)+' min. ago';
+        return 'Recently'
     }else{
         return 'Just now';
     }
@@ -48,9 +50,9 @@ JournalPanel.prototype.formatTime = function(stamp){
 JournalPanel.prototype.update = function(){
     this.hideContent();
 
-    var LIMIT = 18;
-    Engine.player.history.forEach(function(data,i){
-        if(i >= LIMIT) continue;
+    var y = this.y + 20;
+    for(var i = 0; i < Engine.player.history.length; i++){
+        var data = Engine.player.history[i];
         var time_txt = this.getNextText();
         var event_txt = this.getNextText();
         var time = data[0];
@@ -59,14 +61,17 @@ JournalPanel.prototype.update = function(){
         time_txt.setFill(Utils.colors.gold);
         event_txt.setText(event);
         event_txt.setFill(Utils.colors.white);
-        var y = this.y + 20 + i*20;
-        time_txt.x = this.x + 20;
+        // var y = this.y + 20 + i*20;
+        time_txt.x = this.x + 15;
         time_txt.y = y;
-        event_txt.x = this.x + 140;
+        event_txt.x = this.x + 115;
         event_txt.y = y;
         time_txt.setVisible(true);
         event_txt.setVisible(true);
-    },this);
+
+        y += event_txt.height;
+        if(y > this.y + this.height - 20) break;
+    }
 };
 
 
