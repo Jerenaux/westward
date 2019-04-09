@@ -48,7 +48,9 @@ JournalPanel.prototype.formatTime = function(stamp){
 JournalPanel.prototype.update = function(){
     this.hideContent();
 
+    var LIMIT = 18;
     Engine.player.history.forEach(function(data,i){
+        if(i >= LIMIT) continue;
         var time_txt = this.getNextText();
         var event_txt = this.getNextText();
         var time = data[0];

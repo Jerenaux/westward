@@ -42,8 +42,6 @@ Misc:
 - Reduce amount of orientation pins
 - Display death and conflict markers
 - add esc shortcut
-- Show countdowns in production panel
-- Save notifications for disconnected players
 New movement system
 
 

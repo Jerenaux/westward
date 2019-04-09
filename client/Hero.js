@@ -252,6 +252,7 @@ var Hero = new Phaser.Class({
         for(var i = 0; i < this.history.length; i++){
             this.history[i][0] -= Client.serverTimeDelta;
         }
+        this.history.reverse();
     },
 
     updateInventory: function(items){

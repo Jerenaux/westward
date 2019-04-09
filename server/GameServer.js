@@ -1016,6 +1016,7 @@ GameServer.handleBuild = function(data,socketID) {
     var buildPermit = GameServer.canBuild(bid, tile);
     if (buildPermit == 1) {
         GameServer.build(player, bid, tile);
+        player.addNotif('You built a '+GameServer.buildingsData[bid].name);
         Prism.logEvent(player,'newbuilding',{x:tile.x,y:tile.y,building:bid});
     } else if(buildPermit == -1) {
         player.addMsg('I can\'t build there!');
@@ -1275,8 +1276,20 @@ GameServer.notifyProduction = function(playerID,msg){
     if(playerID in GameServer.players){
         var player = GameServer.players[playerID];
         player.addNotif(msg);
+        player.save();
     }else{
         console.warn('player not connected');
+        var notif = [Date.now(),msg];
+        console.log(notif);
+        // {$each: ['value'], $position: 0 }
+        // GameServer.PlayerModel.findOneAndUpdate({'id':playerID},{$push:{'history':notif}},function(err, doc){
+        GameServer.PlayerModel.findOneAndUpdate(
+            {'id':playerID},
+            {$push:{'history':[notif]}},
+            function(err, doc){
+                if(err) throw err;
+            }
+        );
     }
 };
 

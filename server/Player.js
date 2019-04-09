@@ -661,10 +661,10 @@ Player.prototype.addMsg = function(msg){
 
 Player.prototype.addNotif = function(msg){
     this.updatePacket.addNotif(msg);
-    this.history.unshift([Date.now(),msg]);
+    this.history.push([Date.now(),msg]);
     var MAX_LENGTH = 20; // TODO: max limit in conf
-    if(this.history.length > MAX_LENGTH) this.history.splice(MAX_LENGTH,this.history.length-MAX_LENGTH);
-    // this.updatePacket.history = this.history.slice(0);
+    // if(this.history.length > MAX_LENGTH) this.history.splice(MAX_LENGTH,this.history.length-MAX_LENGTH);
+    if(this.history.length > MAX_LENGTH) this.history.splice(0,this.history.length-MAX_LENGTH);
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){

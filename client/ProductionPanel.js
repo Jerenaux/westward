@@ -129,7 +129,8 @@ ProdSlot.prototype.setUp = function(item, cap, turns, remaining, output){
     var nb = Engine.currentBuiling.getItemNb(item);
     this.countText.setText(nb+'/'+cap);
     this.countText.setFill((nb == cap ? Utils.colors.gold : Utils.colors.white));
-    this.bar.setLevel(( nb == cap ? turns : turns-remaining), turns, (remaining == turns));
+    var newlevel = ( nb == cap ? turns : turns-remaining);
+    this.bar.setLevel(newlevel, turns, (newlevel < this.bar.level));
     this.prodtext.setText('+'+output);
 
     if(Engine.currentBuiling.isOwned()){
