@@ -16,7 +16,7 @@ ProductionPanel.prototype.constructor = ProductionPanel;
 
 ProductionPanel.prototype.getNextSlot = function(x,y){
     if(this.slotsCounter >= this.slots.length){
-        this.slots.push(new ProdSlot(x,y,360,80));
+        this.slots.push(new ProdSlot(x,y,360,70));
     }
 
     return this.slots[this.slotsCounter++];
@@ -36,7 +36,7 @@ ProductionPanel.prototype.displayInterface = function(){
         var output = prod[1];
         var nbturns = prod[2];
         var cap = prod[3] ;
-        slot.setUp(item,cap);
+        slot.setUp(item,cap, nbturns, data.countdowns[item], output);
         yOffset += 90;
     }, this);
 };
@@ -70,19 +70,17 @@ ProductionPanel.prototype.hide = function(){
 function ProdSlot(x,y,width,height){
     Frame.call(this,x,y,width,height);
 
-    this.name = UI.scene.add.text(this.x + 60, this.y + 10, '', { font: '16px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.name = UI.scene.add.text(this.x + 60, this.y + 15, '', { font: '16px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
 
     this.zone = UI.scene.add.zone(this.x,this.y,width,height);
     this.zone.setInteractive();
     this.zone.setOrigin(0);
     this.zone.on('pointerover',function(){
-        if(this.checkForPanelOnTop()) return;
         UI.tooltip.updateInfo(this.name.text,this.desc,this.itemID);
         UI.tooltip.display();
         UI.setCursor('item');
     }.bind(this));
     this.zone.on('pointerout',function(){
-        if(this.checkForPanelOnTop()) return;
         UI.tooltip.hide();
         UI.setCursor();
     }.bind(this));
@@ -91,10 +89,18 @@ function ProdSlot(x,y,width,height){
 
     this.addItem();
     this.addCount();
+    this.addBar();
 }
 
 ProdSlot.prototype = Object.create(Frame.prototype);
 ProdSlot.prototype.constructor = ProdSlot;
+
+ProdSlot.prototype.addBar = function(){
+    this.prodtext = UI.scene.add.text(this.x + 55, this.y + 35, '+1', { font: '12px '+Utils.fonts.fancy, fill: Utils.colors.gold, stroke: '#000000', strokeThickness: 3 });
+    this.content.push(this.prodtext);
+    this.bar = new MiniProgressBar(this.x+80,this.y+38,100,'gold');
+    this.bar.setLevel(0,100);
+};
 
 ProdSlot.prototype.addItem = function(){
     this.slot = UI.scene.add.sprite(this.x + 30,this.y+this.height/2,'UI','equipment-slot');
@@ -110,17 +116,30 @@ ProdSlot.prototype.addCount = function(){
 };
 
 ProdSlot.prototype.checkForPanelOnTop = function(){
-    return Engine.currentMenu.isPanelDisplayed('prices') || Engine.currentMenu.isPanelDisplayed('goldaction');
+    return Engine.currentMenu.isPanelDisplayed('action');
 };
 
-ProdSlot.prototype.setUp = function(item, cap){
+ProdSlot.prototype.setUp = function(item, cap, turns, remaining, output){
     if(!this.displayed) console.warn('Setting up slot before displaying it');
     var itemData = Engine.itemsData[item];
     this.icon.setTexture(itemData.atlas,itemData.frame);
     this.name.setText(itemData.name);
     this.desc = itemData.desc;
     this.itemID = item;
-    this.countText.setText(Engine.currentBuiling.getItemNb(item)+'/'+cap);
+    var nb = Engine.currentBuiling.getItemNb(item);
+    this.countText.setText(nb+'/'+cap);
+    this.countText.setFill((nb == cap ? Utils.colors.gold : Utils.colors.white));
+    this.bar.setLevel(( nb == cap ? turns : turns-remaining), turns, (remaining == turns));
+    this.prodtext.setText('+'+output);
+
+    if(Engine.currentBuiling.isOwned()){
+        this.zone.off('pointerup');
+        this.zone.on('pointerup',function(){
+            if(this.checkForPanelOnTop()) return;
+            Engine.currentMenu.displayPanel('action');
+            Engine.currentMenu.panels['action'].setUp(item,'buy');
+        }.bind(this));
+    }
 };
 
 ProdSlot.prototype.display = function(){
@@ -128,6 +147,7 @@ ProdSlot.prototype.display = function(){
     this.content.forEach(function(c){
         c.setVisible(true);
     });
+    this.bar.display();
 };
 
 ProdSlot.prototype.hide = function(){
@@ -135,4 +155,5 @@ ProdSlot.prototype.hide = function(){
     this.content.forEach(function(c){
         c.setVisible(false);
     });
+    this.bar.hide();
 };

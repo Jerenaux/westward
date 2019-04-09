@@ -63,7 +63,7 @@ ProgressBar.prototype.setCallback = function(callback){
     this.completionCallback = callback;
 };
 
-ProgressBar.prototype.setLevel = function(level,max,duration){
+ProgressBar.prototype.setLevel = function(level,max,duration,skipTween){
     if(max) this.max = max;
     var direction = Math.sign(this.level-level);
     var delta = Math.abs(this.level-level)/this.max; // Used to compute duration of tween
@@ -73,7 +73,7 @@ ProgressBar.prototype.setLevel = function(level,max,duration){
     var dw = this.barBody.width - newLength;
 
     if(dw == 0) return;
-    if(this.displayed){
+    if(this.displayed && !skipTween){
         var duration = duration || Math.max((delta * 2000),1);
         var _head = this.head;
         var _tail = this.tail;

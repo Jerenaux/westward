@@ -188,7 +188,7 @@ Building.prototype.updateProd = function(){
         var turns = production[i][2];
         var cap = production[i][3];
         var remainingTurns = GameServer.elapsedTurns%turns;
-        this.prodCountdowns[item] = (turns - remainingTurns)*GameServer.turnDuration;
+        this.prodCountdowns[item] = (turns - remainingTurns)//*GameServer.turnDuration;
         if(remainingTurns > 0)continue;
         var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
         var current = this.getItemNb(item);
@@ -344,6 +344,7 @@ Building.prototype.trim = function(){
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     if(this.inventory.size > 0) trimmed.inventory = this.inventory.toList();
+    trimmed.prodCountdowns = this.prodCountdowns;
     return trimmed;
 };
 
