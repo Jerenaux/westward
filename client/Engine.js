@@ -1260,20 +1260,17 @@ Engine.makeProductionMenu = function(){
     var productionPanel = new ProductionPanel(x,y,w,h);
     productionPanel.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['prod_help']);
     production.addPanel('production',productionPanel);
-    var stock = production.addPanel('shop',new InventoryPanel(prodx,prody,prodw,prodh,'Stock'));
-    stock.setInventory('building',5,true,Engine.takeClick);
 
     var action = new ShopPanel(212,420,300,100,'Take',true); // true = not shop, hack
     production.addPanel('action',action,true);
 
-
     production.addEvent('onUpdateShop',function(){
-        stock.updateInventory();
+        productionPanel.update();
         action.update();
     });
 
     production.addEvent('onOpen',function(){
-        stock.updateInventory();
+        productionPanel.update();
         action.update();
     });
     return production;

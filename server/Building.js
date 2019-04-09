@@ -76,6 +76,15 @@ function Building(data){
     this.progress = data.progress || 0;
     this.isWorkshop = buildingData.workshop;
 
+    var production = GameServer.buildingsData[this.type].production;
+    if(production){
+        this.prodCountdowns = {}
+        for(var i = 0; i < production.length; i++){
+            var item = production[i][0];
+            this.prodCountdowns[item] = 0;
+        }
+    }
+
     this.newitems = new Inventory(GameServer.buildingParameters.inventorySize);
 
     this.inFight = false;
@@ -87,8 +96,6 @@ function Building(data){
     this.stats['acc'].setBaseValue(1000);
     this.stats['dmg'].setBaseValue(buildingData.dmg || 0);
     this.productivity = 100;
-    this.committed = 0;
-    this.commitStamps = data.commitStamps || [];
 }
 
 Building.prototype = Object.create(GameObject.prototype);
@@ -180,7 +187,9 @@ Building.prototype.updateProd = function(){
         var baseNb = production[i][1];
         var turns = production[i][2];
         var cap = production[i][3];
-        if(!GameServer.haveNbTurnsElapsed(turns)) continue;
+        var remainingTurns = GameServer.elapsedTurns%turns;
+        this.prodCountdowns[item] = (turns - remainingTurns)*GameServer.turnDuration;
+        if(remainingTurns > 0)continue;
         var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
         var current = this.getItemNb(item);
         if(current >= cap) continue;
@@ -192,6 +201,7 @@ Building.prototype.updateProd = function(){
             produced += actualNb;
         }
     }
+    this.setProperty('prodCountdowns',this.prodCountdowns);
     return (produced > 0);
 };
 

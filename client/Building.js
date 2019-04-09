@@ -104,7 +104,6 @@ var Building = new Phaser.Class({
             'animation': Engine.handleBattleAnimation,
             'buildings': this.setBuildingsListing,
             'built': this.setBuilt,
-            'committed': this.setCommitted,
             'danger': this.setDangerIcons,
             'devlevel': this.setDevLevel,
             'foodsurplus': this.setFoodSurplus,
@@ -114,6 +113,7 @@ var Building = new Phaser.Class({
             'items': this.updateInventory, // update individual entries in inventory
             'population': this.setPopulation,
             'prices': this.setPrices,
+            'prodCountdowns': this.setCountdowns,
             'productivity': this.setProductivity,
             'progress': this.setProgress,
             'ranged_atk': this.processRangedAttack,
@@ -162,9 +162,9 @@ var Building = new Phaser.Class({
         PFUtils.buildingCollisions(this.tileX,this.tileY-this.cellsHeight,this.cellsWidth,this.cellsHeight,Engine.collisions);
     },
 
-    setCommitted: function(committed){
-        this.committed = committed;
-        this.updateEvents.add('onUpdateProductivity');
+    setCountdowns: function(countdowns){
+        this.countdowns = countdowns;
+        this.updateEvents.add('onUpdateShop');
     },
 
     setDangerIcons: function(danger){

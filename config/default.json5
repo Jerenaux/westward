@@ -43,7 +43,7 @@
    },
    economyCycles: {
         // Unit: seconds
-        turnDuration: 1,
+        turnDuration: 60,
         // Unit: turns
         turns: {
             build: 10,

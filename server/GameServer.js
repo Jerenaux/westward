@@ -469,10 +469,10 @@ GameServer.isTimeToUpdate = function(event){
  * Check if a specific number of turns has elapsed. Called by the `updateProd`
  * method of buildings.
  * @param {number} nb - Name of turns to check for.
- * @returns {boolean} Whether or not enough turns have elapsed.
+ * @returns {number} Whether or not enough turns have elapsed.
  * */
 GameServer.haveNbTurnsElapsed = function(nb){
-    return (GameServer.elapsedTurns%nb == 0);
+    return (GameServer.elapsedTurns%nb);
 };
 
 /**
