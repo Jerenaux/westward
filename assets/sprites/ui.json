@@ -575,6 +575,10 @@
     {
       "filename": "goldenheart",
       "frame": {"x":506,"y":442,"w":13,"h":12}
+    },
+    {
+      "filename": "invisible",
+      "frame": {"x":865,"y":9,"w":150,"h":150}
     }
   ]
 }

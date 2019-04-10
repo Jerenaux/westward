@@ -44,9 +44,6 @@ Misc:
 - add esc shortcut
 - "new" marker
 - Events formatting
-- Test in/out messages
-- Fix issue with exit button
-- Make north/south variants of some items
 New movement system
 
 

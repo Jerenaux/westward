@@ -70,7 +70,7 @@ JournalPanel.prototype.update = function(){
         event_txt.setVisible(true);
 
         y += event_txt.height;
-        if(y > this.y + this.height - 20) break;
+        if(y > this.y + this.height - 40) break;
     }
 };
 

@@ -898,36 +898,6 @@ Engine.makeUI = function(){
     //Engine.addMenu(863,95,'menu_flag',Engine.menus.inventory,735,73);
     Engine.addMenu(20,60,'shovel',Engine.menus.build,-100,60);
 
-    /*var coords = [[1004,140,'menu_letter'],[967,159,'menu_map'],[922,159,'menu_map'],[884,136,'menu_map'],[863,95,'menu_map']];
-    coords.forEach(function(c){
-        Engine.addHolder(c[0],c[1],c[2]);
-    });*/
-
-    /*var UIelements = [];
-    var gap = 50;
-    var x = 960;
-    var y = 530;
-    var letter = new UIElement(x,y,Engine.menus.messages,'envelope');
-    UIelements.push(letter);
-    x -= gap;
-    UIelements.push(new UIElement(x,y,Engine.menus.map,'self_map'));
-    x -= gap;
-    UIelements.push(new UIElement(x,y,Engine.menus.character,'scroll'));
-    x -= gap;
-    UIelements.push(new UIElement(x,y,Engine.menus.inventory,'backpack'));
-    x -= gap;
-    Engine.nbBasicUIEelements = UIelements.length;
-    Engine.UIelements = UIelements;
-    Engine.UIHolder.resize(Engine.getHolderSize());
-
-    Engine.addMenuIcon(x,y,'coin',Engine.menus.trade);
-    Engine.addMenuIcon(x,y,'map',Engine.menus.fort);
-    Engine.addMenuIcon(x,y,'cogs',Engine.menus.construction);
-    Engine.addMenuIcon(x,y,'cogs',Engine.menus.production);
-    x -= gap;
-    Engine.addMenuIcon(x,y,'tools',Engine.menus.crafting);
-    Engine.addMenuIcon(x,y,'staff',Engine.menus.staff);*/
-
     Engine.makeBattleUI();
     //Engine.displayUI();
 
@@ -959,6 +929,8 @@ menuIcon = function(x,y,icon,menu,tox,toy){
     this.toy = toy;
     this.bg = UI.scene.add.sprite(x,y,'UI','holder').setScrollFactor(0).setDepth(2).setInteractive();
     this.icon = UI.scene.add.sprite(x,y,'items2',icon).setScrollFactor(0).setDepth(2); // bubble down to bg
+    this.bg.setDepth(4);
+    this.icon.setDepth(5);
     this.bg.on('pointerdown',function(){
         menu.toggle();
         if(Engine.bldRect) Engine.bldUnclick(true);
@@ -1024,13 +996,6 @@ menuIcon.prototype.fullhide = function(){
 Engine.addMenu = function(x,y,icon,menu,tox,toy){
     Engine.menuIcons.push(new menuIcon(x,y,icon,menu,tox,toy));
 };
-
-/*Engine.addMenuIcon = function(x,y,frame,menu){
-    var icon = new UIElement(x,y,menu,frame);
-    icon.setVisible(false);
-    Engine.UIelements.push(icon);
-    menu.setIcon(icon);
-};*/
 
 Engine.makeBattleUI = function(){
     Engine.fightText = UI.scene.add.text(Engine.getGameConfig().width/2,50, 'Fight!',  { font: '45px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });

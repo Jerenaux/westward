@@ -637,8 +637,8 @@ Player.prototype.enterBuilding = function(id){
     var building = GameServer.buildings[id];
     var type = building.type;
     var bldname = GameServer.buildingsData[type].name;
-    var phrase = ['Entered',(building.isOwnedBy(this) ? 'my' : building.ownerName),bldname];
-    this.addNotif(phrase.join(' '),true); //true = silent
+    var phrase = ['Entered',(building.isOwnedBy(this) ? 'my' : building.ownerName+'\'s'),bldname];
+    this.addNotif(phrase.join(' ')); //true = silent
     if(!building.isOwnedBy(this)) {
         var phrase = [this.name, 'visitted my', bldname];
         GameServer.notifyPlayer(building.owner, phrase.join(' '));
@@ -651,8 +651,8 @@ Player.prototype.exitBuilding = function(){
     var building = GameServer.buildings[this.inBuilding];
     var type = building.type;
     var bldname = GameServer.buildingsData[type].name;
-    var phrase = ['Left',(building.isOwnedBy(this) ? 'my' : building.ownerName),bldname];
-    this.addNotif(phrase.join(' '),true); // true = silent
+    var phrase = ['Left',(building.isOwnedBy(this) ? 'my' : building.ownerName+'\'s'),bldname];
+    this.addNotif(phrase.join(' ')); // true = silent
     this.setProperty('inBuilding', -1);
 };
 
