@@ -797,7 +797,7 @@ GameServer.pickUpItem = function(player,itemID){
     var item = GameServer.items[itemID];
     // TODO: check for proximity
     var nb = 1;
-    player.giveItem(item.type,nb,true);
+    player.giveItem(item.type,nb,true,'Picked');
     if(GameServer.itemsData[item.type].collides) GameServer.collisions.delete(item.x,item.y);
     GameServer.removeEntity(item);
     Prism.logEvent(player,'pickup',{item:item.type});
@@ -829,7 +829,7 @@ GameServer.handleBattle = function(attacker,attacked){
     var area = GameServer.computeBattleArea(attacker,attacked);
     if(!area){
         if(attacker.isPlayer) attacker.addMsg('There is an obstacle in the way!');
-        console.log('obstacle')
+        console.log('Obstacle in the way');
         return false;
     }
     var battle = GameServer.checkBattleOverlap(area);
@@ -838,7 +838,7 @@ GameServer.handleBattle = function(attacker,attacked){
     battle.addFighter(attacked);
     GameServer.addBattleArea(area,battle);
     battle.start();
-    console.warn(attacker.isPlayer,attacked.isPlayer);
+    // console.warn(attacker.isPlayer,attacked.isPlayer);
     if(attacker.isPlayer || attacked.isPlayer){
         var player = (attacker.isPlayer ? attacker : attacked);
         var foe = (attacker.isPlayer ? attacked : attacker);
@@ -1139,11 +1139,11 @@ GameServer.handleCraft = function(data,socketID){
 GameServer.operateCraft = function(recipient,targetItem,nb){
     var recipe = GameServer.itemsData[targetItem].recipe;
     for(var item in recipe) {
-        recipient.takeItem(item,recipe[item]*nb,true);
+        recipient.takeItem(item,recipe[item]*nb,true,'Consumed');
         GameServer.destroyItem(item,recipe[item]*nb,'craft');
     }
     var output = GameServer.itemsData[targetItem].output || 1;
-    recipient.giveItem(targetItem, nb * output, true); // true to notify player (if player) or rememeber transaction (if building)
+    recipient.giveItem(targetItem, nb * output, true,'Crafted'); // true to notify player (if player) or rememeber transaction (if building)
     GameServer.createItem(targetItem,nb*output,'craft');
 };
 

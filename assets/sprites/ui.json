@@ -577,6 +577,10 @@
       "frame": {"x":506,"y":442,"w":13,"h":12}
     },
     {
+      "filename": "bread",
+      "frame": {"x":528,"y":425,"w":9,"h":12}
+    },
+    {
       "filename": "invisible",
       "frame": {"x":865,"y":9,"w":150,"h":150}
     }

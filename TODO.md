@@ -5,7 +5,7 @@ On deploy:
 - Test selling and buying in a store
 - Test equiping object
 - Test gs.handleGold()
-- Test handleCraft
+- Test handleCraft (normal + when a price is undefined)
 - Test setPrices
 => Automate these eventually
 => After bug, systematically create test!
@@ -482,7 +482,7 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-- Tool to sync client buildings with server buildings
+- Tool to sync client buildings with server buildings (update code with DO database)
 - Tool to gather, uglify and compress all relevant source files 
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?

@@ -863,12 +863,26 @@ Engine.makeUI = function(){
         this.setText(Engine.player.gold); // TODO: add max
     };
 
-    Engine.bagCapsule = new Capsule(225,3,'UI','smallpack');
+    Engine.bagCapsule = new Capsule(228,3,'UI','smallpack');
     Engine.bagCapsule.display();
     Engine.bagCapsule.update = function(){
         this.setText(Engine.player.inventory.size+'/'+Engine.player.inventory.maxSize);
     };
     Engine.bagCapsule.update();
+
+    Engine.vigorCapsule = new Capsule(50,30,'UI','goldenheart');
+    Engine.vigorCapsule.display();
+    Engine.vigorCapsule.update = function(){
+        this.setText('100%'); // TODO: add max
+    };
+    Engine.vigorCapsule.update();
+
+    Engine.foodCapsule = new Capsule(140,30,'UI','bread');
+    Engine.foodCapsule.display();
+    Engine.foodCapsule.update = function(){
+        this.setText('100%'); // TODO: add max
+    };
+    Engine.foodCapsule.update();
 
     Engine.makeBuildingTitle();
 

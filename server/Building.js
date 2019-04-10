@@ -240,6 +240,7 @@ Building.prototype.updateBuildings = function(){
 };
 
 Building.prototype.getPrice = function(item,nb,action){
+    if(!this.prices.hasOwnProperty(item)) return 0;
     return parseInt(this.prices[item][action])*nb;
 };
 

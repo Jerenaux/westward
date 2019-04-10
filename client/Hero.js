@@ -248,7 +248,7 @@ var Hero = new Phaser.Class({
     },
 
     updateHistory: function(history){
-        this.history = history;
+        this.history = history || [];
         for(var i = 0; i < this.history.length; i++){
             this.history[i][0] -= Client.serverTimeDelta;
         }

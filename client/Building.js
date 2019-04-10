@@ -137,6 +137,7 @@ var Building = new Phaser.Class({
     remove: function(){
         // TODO: remove collisions
         if(this.accessory) this.accessory.destroy();
+        this.removeInteractive();
         CustomSprite.prototype.remove.call(this);
         delete Engine.buildings[this.id];
     },
