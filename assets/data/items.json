@@ -294,8 +294,8 @@
   },
   "30":{
     "atlas": "items2",
-    "frame":"feather",
-    "name": "Feather",
+    "frame":"feathers",
+    "name": "Tuft of feathers",
     "desc": "Crafting material used to make arrows.",
     "isMaterial": true,
     "sound": "soft"

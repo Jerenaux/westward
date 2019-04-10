@@ -1034,7 +1034,7 @@ GameServer.handleBuild = function(data,socketID) {
     var buildPermit = GameServer.canBuild(bid, tile);
     if (buildPermit == 1) {
         GameServer.build(player, bid, tile);
-        player.addNotif('Built a '+GameServer.buildingsData[bid].name);
+        player.addNotif('Started building a '+GameServer.buildingsData[bid].name);
         Prism.logEvent(player,'newbuilding',{x:tile.x,y:tile.y,building:bid});
     } else if(buildPermit == -1) {
         player.addMsg('I can\'t build there!');
@@ -1072,7 +1072,6 @@ GameServer.build = function(player,bid,tile){
 
     document.save(function (err) {
         if (err) return console.error(err);
-        console.log('Build successfull');
         building.embed();
         GameServer.buildingsChanged = true;
         player.listBuildings(); // update list of buildable buildings by player

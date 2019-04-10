@@ -800,11 +800,6 @@ SettlementCapsule.prototype.hide = function(){
     this.text.setVisible(false);
 };
 
-/*Engine.addHolder = function(x,y,icon){
-    Engine.holders.push(UI.scene.add.sprite(x,y,'UI','holder').setScrollFactor(0).setDepth(2));
-    Engine.menuIcons.push(UI.scene.add.sprite(x,y,'items2',icon).setScrollFactor(0).setDepth(2));
-};*/
-
 Engine.toggleMenuIcons = function(){
     Engine.menuIcons.forEach(function(i){
         i.toggle();

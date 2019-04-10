@@ -85,6 +85,10 @@
       "frame": {"x":24,"y":504,"w":24,"h":24}
     },
     {
+      "filename": "feathers",
+      "frame": {"x":144,"y":802,"w":25,"h":24}
+    },
+    {
       "filename": "sunflower",
       "frame": {"x":312,"y":288,"w":24,"h":24}
     },

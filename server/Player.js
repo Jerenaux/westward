@@ -31,6 +31,7 @@ function Player(){
     this.settlement = null;
     this.gold = 0;
     this.vigor = 100;
+    this.food = 100;
     this.inBuilding = -1;
     this.civiclvl = 0;
     this.civicxp = 0;
@@ -595,6 +596,7 @@ Player.prototype.getDataFromDb = function(data){
     this.setRegion(data.sid);
     this.giveGold(data.gold);
     this.vigor = data.vigor || 100;
+    this.food = data.food || 100;
     this.history = data.history;
 };
 

@@ -222,6 +222,8 @@ Building.prototype.updateBuild = function(){
 Building.prototype.setBuilt = function(){
     this.setProperty('built',true);
     this.save();
+    var phrase = ['Construction of ',GameServer.buildingsData[this.type].name,' finished'];
+    GameServer.notifyPlayer(this.owner,phrase.join(' '));
 };
 
 Building.prototype.toggleBuild = function(){

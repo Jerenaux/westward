@@ -38,6 +38,7 @@ let Schemas = {
         y: {type: Number, min: 0, required: true},
         gold: {type: Number, min: 0, default: 0},
         vigor: {type: Number, min: 0, max: 100, default: 100},
+        food: {type: Number, min: 0, max: 100, default: 100},
         civiclvl: {type: Number, min: 0, default: 0},
         civicxp: {type: Number, min: 0, default: 0},
         classxp: mongoose.Schema.Types.Mixed,
