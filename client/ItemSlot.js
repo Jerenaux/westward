@@ -89,6 +89,7 @@ ItemSlot.prototype.setUp = function(action,item){
         3: 'Very common'
     };
 
+    console.log(item,Engine.rarity[item],rarityMap[Engine.rarity[item]]);
     this.rarity.setText(rarityMap[Engine.rarity[item]]);
     this.rarity.setFill((Engine.rarity[item] <= 1 ? Utils.colors.gold : Utils.colors.white));
 

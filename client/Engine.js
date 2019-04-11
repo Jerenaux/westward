@@ -1184,7 +1184,6 @@ Engine.makeBattleMenu = function(){
     equipment.addButton(140, 8, 'blue','help',null,'',UI.textsData['battleitems_help']);
     battle.addPanel('equipment',equipment);
     var items = battle.addPanel('items',new InventoryPanel(alignx,220,170,225,'Items'));
-    // items.setInventory(Engine.player.inventory,4,true,BattleManager.processInventoryClick);
     items.setInventory('player',4,true,BattleManager.processInventoryClick);
     items.modifyFilter({
         type: 'property',
@@ -1604,7 +1603,7 @@ Engine.makeInventory = function(statsPanel){
     items.addCapsule('gold',100,-9,'999','gold');
     items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help']);
 
-    inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,100),true);
+    inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,120),true);
 
     var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
     equipment.addButton(300, 8, 'blue','help',null,'',UI.textsData['equipment_help']);

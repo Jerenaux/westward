@@ -48,8 +48,7 @@ Misc:
 - Buildings appearance bug
 - Player aggro
 - Life and equipment in battle system
-- Recompute rarity at regular intervals
-- Unable to equip arrows
+- Fix rarity update
 New movement system
 
 

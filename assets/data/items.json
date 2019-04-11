@@ -192,7 +192,8 @@
     "useInBattle": true,
     "sound": "cloth",
     "isCrafted": true,
-    "recipe": {"43":3,"21":1}
+    "recipe": {"43":3,"21":1},
+    "basicRecipe": true
   },
   "20":{
     "atlas": "items",
@@ -200,6 +201,7 @@
     "name": "Arrow",
     "equipment": "arrows",
     "effects":{"dmg":12},
+    "isAmmo": true,
     "ammo": "quiver",
     "useInBattle": true,
     "sound": "woodsmall",
@@ -286,6 +288,7 @@
     "name": "Bone arrow",
     "equipment": "arrows",
     "effects":{"dmg":6},
+    "isAmmo": true,
     "ammo": "quiver",
     "useInBattle": true,
     "isEquipment": true,
@@ -390,6 +393,7 @@
     "output": 5,
     "equipment": "bullets",
     "effects":{"dmg":60},
+    "isAmmo": true,
     "ammo": "ammo_pouch",
     "useInBattle": true,
     "sound": "clank"
@@ -438,7 +442,8 @@
     "isMaterial": true,
     "recipe":{"9":1},
     "output": 5,
-    "sound": "cloth"
+    "sound": "cloth",
+    "basicRecipe": true
   },
   "44":{
     "atlas": "items2",
