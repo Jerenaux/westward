@@ -79,7 +79,9 @@
     "name": "Thick Grass",
     "envFrames": ["bush_5"],
     "desc": "Crafting material used to make string.",
-    "sound": "soft"
+    "sound": "soft",
+    "nbBushes": 1,
+    "yield": 3
   },
   "9":{
     "atlas": "items2",
@@ -139,7 +141,9 @@
     "name": "Sunstreak",
     "desc": "Flower with regenerative properties used to brew potions.",
     "isMaterial": true,
-    "sound": "soft"
+    "sound": "soft",
+    "nbBushes": 2,
+    "yield": 2
   },
   "15":{
     "atlas": "items2",
@@ -288,13 +292,14 @@
     "isCrafted": true,
     "crafTier": 1,
     "output": 5,
-    "recipe":{"7":1,"27":1,"30":4},
+    "recipe":{"7":1,"27":1,"30":1},
     "sound": "woodsmall",
     "basicRecipe": true
   },
   "30":{
     "atlas": "items2",
     "frame":"feathers",
+    "envFrames": ["feathers"],
     "name": "Feathers tuft",
     "desc": "Crafting material used to make arrows.",
     "isMaterial": true,

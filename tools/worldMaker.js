@@ -114,6 +114,8 @@ WorldMaker.prototype.run = function(){
 
     this.tileset = JSON.parse(fs.readFileSync(path.join(__dirname,'..','assets','tilesets','tileset.json')).toString());
     this.patterns = JSON.parse(fs.readFileSync(path.join(__dirname,'patterns.json')).toString());
+    var dataAssets = path.join(__dirname,'..','assets','data');
+    this.itemsData = JSON.parse(fs.readFileSync(path.join(dataAssets,'items.json')).toString());
 
     this.outdir = path.join(__dirname,'..','maps'); // TODO: remove dev.mapsPath etc?
     console.log('Writing to',this.outdir);
@@ -528,9 +530,9 @@ WorldMaker.prototype.addMisc = function(){
 WorldMaker.prototype.makeSpawnZones = function(){
     this.resourceMarkers = [];
     var items = [ // TODO: conf
-        {item:14,decor:'b4',nbzones:100},
-        {item:8,decor:null,nbzones:100},
-        //{item:18,decor:null,nbzones:100},
+        {item:14,decor:'b4',nbzones:100}, // Sunstrak
+        {item:8,decor:null,nbzones:100}, // Thick grass
+        //{item:18,decor:null,nbzones:100}, // clover
     ];
     items.forEach(function(item){
         for(var i = 0; i < item.nbzones; i++){
@@ -539,23 +541,21 @@ WorldMaker.prototype.makeSpawnZones = function(){
             var y = Utils.randomInt(0,World.worldHeight-1);
             var w = Utils.randomInt(5,World.chunkWidth);
             var h = Utils.randomInt(5,World.chunkHeight);
-            var nb = this.makeFloraZone(x,y,w,h,item);
+            this.makeFloraZone(x,y,w,h,item);
         }
     },this);
-    this.makeFloraZone(477,665,26,15,items[0]);
-    this.makeFloraZone(498,697,26,15,items[1]);
 };
 
 WorldMaker.prototype.makeFloraZone = function(x,y,w,h,data){
-    var nbbush = 4; // TODO: conf
     var contour = [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1],[2,-1]];
     var nb = 0;
+    var nbbushes = this.itemsData[data.item].nbBushes || 4;
     for(var u = 0; u < w; u++){
         for(var v = 0; v < h; v++){
             var tree = this.trees.get(x+u,y+v);
             if(tree){
                 Utils.shuffle(contour);
-                for(var j = 0; j < nbbush; j++){
+                for(var j = 0; j < nbbushes; j++){
                     var c = contour[j];
                     var loc = {x:x+u+c[0],y:y+v+c[1]};
                     if(data.decor) this.addDecor(loc, data.decor);

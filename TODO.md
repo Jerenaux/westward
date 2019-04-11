@@ -38,12 +38,18 @@ Misc:
 - Positions not saved often enough?
 - Don't disable walk with build panel
 - Multiple clicks on "give" repeat the action
-- Prevent building at player location
+- Prevent building at player location\
 - Reduce amount of orientation pins
 - Display death and conflict markers
 - add esc shortcut
 - "new" marker
 - Events formatting
+- Stone arrows?
+- Buildings appearance bug
+- Player aggro
+- Life and equipment in battle system
+- Recompute rarity at regular intervals
+- Unable to equip arrows
 New movement system
 
 
@@ -416,7 +422,7 @@ or
 - Cheat-proof: proper auth system, lock admin
 https://medium.freecodecamp.org/learn-how-to-handle-authentication-with-node-using-passport-js-4a56ed18e81e
 https://w3layouts.com/validate-login-register-forms-flat-responsive-widget-template/
-- Automate standalone app build (as part of deployment)
+- Automate standalone app build (as part of e)
 * Settlement defense
 - Enable commander to build towers
 - Buildings health

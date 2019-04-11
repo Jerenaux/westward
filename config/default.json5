@@ -79,7 +79,7 @@
         raidMinimum: 8
     },
     wildlife: {
-        aggro: false,
+        aggro: true,
         nolife: false,
         wander: true,
         wanderRange: 5,

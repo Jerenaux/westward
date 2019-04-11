@@ -126,11 +126,13 @@ GameServer.readMap = function(mapsPath,test,cb){
     }
 
     GameServer.battleCells = new SpaceMap();
-    GameServer.textData = JSON.parse(fs.readFileSync('./assets/data/texts.json').toString());
-    GameServer.itemsData = JSON.parse(fs.readFileSync('./assets/data/items.json').toString());
-    GameServer.animalsData = JSON.parse(fs.readFileSync('./assets/data/animals.json').toString());
-    GameServer.civsData = JSON.parse(fs.readFileSync('./assets/data/civs.json').toString());
-    GameServer.buildingsData = JSON.parse(fs.readFileSync('./assets/data/buildings.json').toString());
+    var dataAssets = pathmodule.join('assets','data');
+    GameServer.textData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'texts.json')).toString()); // './assets/data/texts.json'
+    GameServer.itemsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'items.json')).toString()); // './assets/data/items.json'
+    GameServer.animalsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'animals.json')).toString()); // './assets/data/animals.json'
+    GameServer.civsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'civs.json')).toString()); // './assets/data/civs.json'
+    GameServer.buildingsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'buildings.json')).toString()); // './assets/data/buildings.json'
+    GameServer.classData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'classes.json')).toString()); // './assets/data/classes.json'
 
     GameServer.enableAnimalWander = config.get('wildlife.wander');
     GameServer.enableCivWander = config.get('civs.wander');
@@ -138,7 +140,6 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.enableCivAggro = config.get('civs.aggro');
     GameServer.enableBattles = config.get('battle.enabled');
     GameServer.classes = config.get('classes');
-    GameServer.classData = JSON.parse(fs.readFileSync('./assets/data/classes.json').toString());
     GameServer.battleParameters = config.get('battle');
     GameServer.buildingParameters = config.get('buildings');
     GameServer.characterParameters = config.get('character');
@@ -766,6 +767,8 @@ GameServer.handleNPCClick = function(data,socketID){
         }else{
             player.addMsg('I must get closer!');
         }
+    }else{
+        console.log('Dead of in fight');
     }
 };
 
@@ -779,7 +782,7 @@ GameServer.lootNPC = function(player,type,ID){
     for(var item in NPC.loot.items){
         // TODO: take harvesting ability into consideration
         var nb = NPC.loot.items[item];
-        player.giveItem(item,nb,true);
+        player.giveItem(item,nb,true,'Scavenged');
         GameServer.createItem(item,nb,'loot');
     }
     GameServer.removeEntity(NPC); // TODO: handle differently, leave carcasses
@@ -804,7 +807,7 @@ GameServer.pickUpItem = function(player,itemID){
     if(!GameServer.items.hasOwnProperty(itemID)) return false;
     var item = GameServer.items[itemID];
     // TODO: check for proximity
-    var nb = 1;
+    var nb = GameServer.itemsData[item.type].yield || 1;
     player.giveItem(item.type,nb,true,'Picked');
     if(GameServer.itemsData[item.type].collides) GameServer.collisions.delete(item.x,item.y);
     GameServer.removeEntity(item);
