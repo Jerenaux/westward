@@ -271,17 +271,11 @@ GameServer.loadBuildings = function(){
  */
 GameServer.loadItems = function(){
     var path = pathmodule.join(GameServer.mapsPath,'items.json');
-    /*TODO eventually:
-    * - On server start, check if items.json exist. If yes, read it, create items from it and store in db, then delete file.
-    * - If not, fetch items data from db.
-    * - For now, server restars daily, it will re-read items.json and recreate items, thus
-    * acting as a simili "respawn" mechanism, good enough for now
-    * */
-    //if(!fs.existsSync(path)) return;
     var items = JSON.parse(fs.readFileSync(path).toString());
     items.forEach(function(item){
         GameServer.addItem(item[0], item[1], item[2]);
     },this);
+
     path = pathmodule.join(GameServer.mapsPath,'resourceMarkers.json');
     GameServer.resourceMarkers = JSON.parse(fs.readFileSync(path).toString());
     GameServer.updateStatus();
@@ -410,10 +404,11 @@ GameServer.startEconomy = function(){
     }
     GameServer.maxTurns = Math.max(maxDuration,300);
 
-    // TODO: compute turns elapsed during server shutdown?
     GameServer.economyTurn();
     GameServer.turnDuration = config.get('economyCycles.turnDuration');
     setInterval(GameServer.economyTurn,GameServer.turnDuration*1000);
+
+    setInterval(GameServer.respawnItems,config.get('economyCycles.itemsRespawnInterval')*3600*1000);
 };
 
 /**
@@ -792,6 +787,19 @@ GameServer.lootNPC = function(player,type,ID){
     return true; // return value for the unit tests
 };
 
+GameServer.respawnItems = function(){
+    var path = pathmodule.join(GameServer.mapsPath,'items.json');
+    var items = JSON.parse(fs.readFileSync(path).toString());
+    items.forEach(function(item){
+        var x = item[0];
+        var y = item[1];
+        var type = item[2];
+        if(!GameServer.itemPositions.get(x,y)){
+            if(Utils.randomInt(1,10) > 5) GameServer.addItem(x,y,type);
+        }
+    },this);
+};
+
 GameServer.pickUpItem = function(player,itemID){
     if(!GameServer.items.hasOwnProperty(itemID)) return false;
     var item = GameServer.items[itemID];
@@ -805,6 +813,9 @@ GameServer.pickUpItem = function(player,itemID){
     return true;
 };
 
+/**
+ * Keep track of all items owned by a player (or a building) in the world
+ */
 GameServer.createItem = function(item,nb,source){
     if(!GameServer.itemCounts.hasOwnProperty(item)) GameServer.itemCounts[item] = 0;
     GameServer.itemCounts[item] += nb;

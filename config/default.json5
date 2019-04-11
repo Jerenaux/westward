@@ -42,6 +42,8 @@
         maxGold: 100000
    },
    economyCycles: {
+        // Unit: hours
+        itemsRespawnInterval: 24,
         // Unit: seconds
         turnDuration: 60,
         // Unit: turns

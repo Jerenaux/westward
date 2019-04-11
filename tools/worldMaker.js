@@ -573,7 +573,8 @@ WorldMaker.prototype.addRandomItem = function(x,y,decor){
     var cnt = (decor == 'tree'
         ? [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1]]
         : [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]]);
-    var item = (decor == 'tree' ? 7 : 26); // wood or stone
+    // var item = (decor == 'tree' ? 7 : 26); // wood or stone
+    var item = Utils.randomElement([7,7,7,30]); // wood or feathers TODO config
     if(Utils.randomInt(1,10) > 8){ // TODO: adjust
         var c = Utils.randomElement(cnt);
         var ix = parseInt(x)+c[0];

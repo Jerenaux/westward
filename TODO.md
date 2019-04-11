@@ -44,7 +44,6 @@ Misc:
 - add esc shortcut
 - "new" marker
 - Events formatting
-- Items respawn
 New movement system
 
 
