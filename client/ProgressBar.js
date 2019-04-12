@@ -110,7 +110,8 @@ ProgressBar.prototype.setLevel = function(level,max,duration,skipTween){
         }
     }else {
         this.barBody.width = newLength;
-        if(this.head) this.head.x -= dw;
+        // if(this.head) this.head.x -= dw;
+        if(this.head) this.head.x = this.zeroX + newLength;
     }
 };
 

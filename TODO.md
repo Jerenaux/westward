@@ -26,8 +26,6 @@ Misc:
 - Change battle priority when player joins fight
 - In battle against NPC, have players have turns much more often
 - Make tiles above battle tiles transparent; same with buildings in fight?
-- Make arrows in bulk?
-- Feather tufts
 - Introduce new wood ingredient obtained from timber, crafting wood, made in bulk (but then tune down timber prod)
 -> For shield, guns...?
 - Spawning in battle area, moving: doesn't stop movement
@@ -37,19 +35,14 @@ Misc:
 - Better notifs cascading
 - Positions not saved often enough?
 - Don't disable walk with build panel
-- Multiple clicks on "give" repeat the action
+- New movement system
 - Prevent building at player location\
 - Reduce amount of orientation pins
 - Display death and conflict markers
 - add esc shortcut
 - "new" marker
 - Events formatting
-- Stone arrows?
-- Buildings appearance bug
-- Player aggro
-- Life and equipment in battle system
-- Fix rarity update
-New movement system
+
 
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)

@@ -82,16 +82,16 @@ ItemSlot.prototype.setUp = function(action,item){
     this.itemID = item;
     this.nb.setText(Engine.player.getItemNb(item));
 
-    var rarityMap = {
-        0: 'Unique',
+    var rarityMap = { //TODO: conf
+        0: 'Extremely rare',
         1: 'Rare',
         2: 'Common',
-        3: 'Very common'
+        3: 'Extremely common'
     };
 
-    console.log(item,Engine.rarity[item],rarityMap[Engine.rarity[item]]);
-    this.rarity.setText(rarityMap[Engine.rarity[item]]);
-    this.rarity.setFill((Engine.rarity[item] <= 1 ? Utils.colors.gold : Utils.colors.white));
+    var rarity = Engine.rarity[item] || 0;
+    this.rarity.setText(rarityMap[rarity]);
+    this.rarity.setFill((rarity <= 1 ? Utils.colors.gold : Utils.colors.white));
 
     var priceaction = (action == 'buy' ? 'sell' : 'buy');
     var price = Engine.currentBuiling.getPrice(item,priceaction);

@@ -1213,7 +1213,11 @@ Engine.makeBattleMenu = function(){
         bar.setLevel(Engine.getPlayerHealth(),Engine.getPlayerMaxHealth());
     });
 
-    battle.addEvent('onStart',items.updateInventory.bind(items));
+    battle.addEvent('onOpen',function(){
+        items.updateInventory();
+        equipment.updateEquipment();
+        bar.setLevel(Engine.getPlayerHealth(),Engine.getPlayerMaxHealth(),0,true); // true = skip tween
+    });
     return battle;
 };
 
@@ -1597,7 +1601,6 @@ Engine.makeInventory = function(statsPanel){
     inventory.setSound(Engine.scene.sound.add('inventory'));
 
     var items = inventory.addPanel('items',new InventoryPanel(40,100,600,380,'Items'));
-    // items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
     items.setInventory('player',15,true,Engine.inventoryClick);
 
     items.addCapsule('gold',100,-9,'999','gold');

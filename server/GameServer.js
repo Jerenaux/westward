@@ -365,7 +365,7 @@ GameServer.addItem = function(x,y,type){
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
-    GameServer.addItem(1210,159,11);
+    GameServer.addAnimal(506,652,0);
 };
 
 /**
@@ -1126,9 +1126,7 @@ GameServer.handleCraft = function(data,socketID){
     var isFinancial = (!building.isOwnedBy(player));
     var targetItem = data.id;
     var nb = data.nb;
-    var stock = data.stock;
     // var recipient = (stock == 1 ? player : building);
-    var recipe = GameServer.itemsData[targetItem].recipe;
     if(!player.canCraft(targetItem,nb)) {
         console.log('All ingredients not owned');
         return;
@@ -1139,7 +1137,7 @@ GameServer.handleCraft = function(data,socketID){
         return;
     }
     GameServer.operateCraft(player, targetItem, nb);
-    building.giveGold(player.takeGold(price));
+    if(isFinancial) building.giveGold(player.takeGold(price));
     player.gainClassXP(GameServer.classes.craftsman,5*nb,true); // TODO: vary based on multiple factors
     if(!building.isOwnedBy(player)) {
         var phrase = [player.name,'crafted',nb,GameServer.itemsData[targetItem].name,'for',price,Utils.formatMoney(price),'in my Workshop'];
@@ -1285,11 +1283,15 @@ GameServer.computeFoW = function(){
     return fow;
 };
 
+/**
+ * Compute the degree of rarity of the items in the world.
+ * Called by player.initTrim();
+ * */
 GameServer.getRarity = function(){
     var rarity = [];
     // TODO: conf
     function computeRarity(count){
-        if(count == 1){
+        if(count <= 1){
             return 0;
         }else if(count <= 10){
             return 1;
@@ -1301,6 +1303,7 @@ GameServer.getRarity = function(){
     }
 
     for(var item in GameServer.itemCounts){
+        // console.warn(item,GameServer.itemCounts[item],computeRarity(GameServer.itemCounts[item]));
         rarity.push([item,computeRarity(GameServer.itemCounts[item])]);
     }
     return rarity;
