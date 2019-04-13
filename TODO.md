@@ -1,9 +1,4 @@
 On deploy:
-- Test new player
-- Test a fight
-- Test picking up objects
-- Test selling and buying in a store
-- Test equiping object
 - Test gs.handleGold()
 - Test handleCraft (normal + when a price is undefined)
 - Test setPrices

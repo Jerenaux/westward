@@ -989,16 +989,16 @@ GameServer.handleShop = function(data,socketID) {
     var action = data.action;
     if(!player.isInBuilding()){
         console.log('player not in building');
-        return;
+        return false;
     }
     var building = GameServer.buildings[player.inBuilding];
     var isFinancial = ('financial' in data ? data.financial : (!building.isOwnedBy(player)));
     if(action == 'buy'){ // or take
-        if(!building.canSell(item,nb,isFinancial)) return;
+        if(!building.canSell(item,nb,isFinancial)) return false;
         if(isFinancial) {
             var price = building.getPrice(item, nb, 'sell');
-            if(price == 0) return;
-            if (!player.canBuy(price)) return;
+            if(price == 0) return false;
+            if (!player.canBuy(price)) return false;
             player.takeGold(price, true);
             building.giveGold(price);
             var phrase = [player.name,'bought',nb,GameServer.itemsData[item].name,'for',price,Utils.formatMoney(price),'in my shop'];
@@ -1011,16 +1011,16 @@ GameServer.handleShop = function(data,socketID) {
     }else{ // sell or give
         if(!player.hasItem(item,nb)){
             console.log('Player does not have item');
-            return;
+            return false;
         }
         if(!building.canBuy(item,nb,isFinancial)){
             console.log('Building cannot buy');
-            return;
+            return false;
         }
         if(isFinancial) {
             var price = building.getPrice(item, nb, 'buy');
             console.log(building.prices[item]);
-            if(price == 0) return;
+            if(price == 0) return false;
             player.giveGold(price, true);
             building.takeGold(price);
             player.gainClassXP(GameServer.classes.merchant,Math.floor(price/10), true); // TODO: factor in class level
@@ -1194,13 +1194,15 @@ GameServer.handleUse = function(data,socketID){
         player.battle.setEndOfTurn(500);
     }
     var itemData = GameServer.itemsData[item];
+    var result;
     if(itemData.equipment) {
-        player.equip(itemData.equipment, item, false); // false: not from DB
+        result = player.equip(itemData.equipment, item, false); // false: not from DB
     }else  if(itemData.effects){
-        player.applyEffects(item,1,true);
+        result = player.applyEffects(item,1,true);
         player.takeItem(item,1,true);
     }
     Prism.logEvent(player,'use',{item:item});
+    return result;
 };
 
 GameServer.handleUnequip = function(data,socketID) {

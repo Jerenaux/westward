@@ -82,7 +82,6 @@ describe('GameServer',function(){
         expect(animal.type).to.equal(type);
     });
 
-    
     it('handleBattle_faraway',function(){
         var result = gs.handleBattle(player,animalFarAway);
         expect(result).to.equal(false);
@@ -143,17 +142,32 @@ describe('GameServer',function(){
         expect(building.type).to.equal(data.type);
     });
 
-    /*it('handleShop', function(){
-        var errInputs = [{},{new:true}];
-        errInputs.forEach(function(input){
-            var result = gs.addNewPlayer(null,input);
-            expect(result).to.equal(null);
-        });
+    it('handleShop_out', function(){
+        // Should fail because the player is not in the building
+        var result = gs.handleShop({},player.socketID);
+        expect(result).to.equal(false);
+    });
 
-        var name = 'Test';
-        player = gs.addNewPlayer(null,{characterName:name});
-        expect(player.name).to.equal(name);
-    });*/
+    it('enterBuilding',function(){
+        var result = player.enterBuilding(building.id);
+        expect(result).to.equal(true);
+    });
+
+    it('handleShop', function(){
+        // TODO: expand test caes
+        var testCases = [
+            {in: {action:'buy',id:10,nb:1},out:false},
+            {in: {action:'sell',id:10,nb:1},out:false}
+        ];
+        testCases.forEach(function(testcase){
+            var result = gs.handleShop(testcase.in,player.socketID);
+            expect(result).to.equal(testcase.out);
+        });
+    });
+
+    it('handleUse_equip', function(){
+        var result = gs.handleUse({item:28},player.socketID);
+    });
 
     afterEach(function(){
         stubs.forEach(function(stub){

@@ -363,7 +363,7 @@ Player.prototype.canEquip = function(slot,item){
 };
 
 Player.prototype.equip = function(slot,item,fromDB){
-    if(!fromDB && !this.canEquip(slot,item)) return;
+    if(!fromDB && !this.canEquip(slot,item)) return false;
     var slotData = Equipment.getData(slot);
     var itemData = GameServer.itemsData[item];
 
@@ -391,6 +391,7 @@ Player.prototype.equip = function(slot,item,fromDB){
         this.takeItem(item, nb);
         this.save();
     }
+    return true;
 };
 
 Player.prototype.unequip = function(slot,notify){
@@ -503,11 +504,12 @@ Player.prototype.canRange = function(){
 Player.prototype.applyEffects = function(item,coef,notify){
     var coef = coef || 1;
     var itemData = GameServer.itemsData[item];
-    if(!itemData.effects) return;
+    if(!itemData.effects) return false;
     for (var stat in itemData.effects) {
         if (!itemData.effects.hasOwnProperty(stat)) continue;
         this.applyEffect(stat, coef*itemData.effects[stat],notify);
     }
+    return true;
 };
 
 // Apply effect of consumable object
@@ -648,6 +650,7 @@ Player.prototype.enterBuilding = function(id){
         GameServer.notifyPlayer(building.owner, phrase.join(' '));
     }
     Prism.logEvent(this,'building',{building:type});
+    return true;
 };
 
 Player.prototype.exitBuilding = function(){
