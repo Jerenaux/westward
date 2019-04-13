@@ -748,6 +748,14 @@ GameServer.getDefaultPrices = function(){
     return defaultPrices;
 };
 
+/**
+ * Determine what to do in reaction to a player clicking on
+ * an enemy building (trigger battle or perform attack if
+ * battle already ongoing). Clicks on player buildings are
+ * handled differently.
+ * @param {string} socketID - ID of the socket of the player.
+ * @param {Object} data - Data from the client (mostly building ID)
+ * */
 GameServer.handleBuildingClick = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var target = GameServer.buildings[data.id];
@@ -762,6 +770,13 @@ GameServer.handleBuildingClick = function(data,socketID){
     }
 };
 
+/**
+ * Determine what to do in reaction to a player clicking on
+ * a living NPC (Animal or Civ) (trigger battle or perform attack if
+ * battle already ongoing). Clicks on dead NPC trigger GameServer.lootNPC().
+ * @param {string} socketID - ID of the socket of the player.
+ * @param {Object} data - Data from the client (mostly NPC ID and type)
+ * */
 GameServer.handleNPCClick = function(data,socketID){
     var targetID = data.id;
     var player = GameServer.getPlayer(socketID);
@@ -778,6 +793,14 @@ GameServer.handleNPCClick = function(data,socketID){
     }
 };
 
+/**
+ * Add some items to the playe's inventory and remove dead NPC from
+ * the game. Called when a player reaches the end of a path computed
+ * towards a dead NPC.
+ * @param {Player} player - The Player performing the looting.
+ * @param {string} type - Type of NPC: animal or civ.
+ * @param {number} ID - ID of the looted NPC.
+ * */
 GameServer.lootNPC = function(player,type,ID){
     var map = (type == 'animal' ? GameServer.animals : GameServer.civs);
     if(!map.hasOwnProperty(ID)) return false;
@@ -796,6 +819,11 @@ GameServer.lootNPC = function(player,type,ID){
     return true; // return value for the unit tests
 };
 
+/**
+ * Make the items that can be picked up in the environment (plants, ...)
+ * reappear. Called at regular interval to maintain a proper supply
+ * of materials.
+ * */
 GameServer.respawnItems = function(){
     var path = pathmodule.join(GameServer.mapsPath,'items.json');
     var items = JSON.parse(fs.readFileSync(path).toString());
@@ -809,6 +837,13 @@ GameServer.respawnItems = function(){
     },this);
 };
 
+/**
+ * Add some item to the playe's inventory and remove it from
+ * the game. Called when a player reaches the end of a path computed
+ * towards an item on the ground.
+ * @param {Player} player - The Player performing the picking up.
+ * @param {number} itemID - ID of the picked item.
+ * */
 GameServer.pickUpItem = function(player,itemID){
     if(!GameServer.items.hasOwnProperty(itemID)) return false;
     var item = GameServer.items[itemID];
