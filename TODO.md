@@ -42,6 +42,7 @@ Misc:
 - add esc shortcut
 - "new" marker
 - Events formatting
+- Add other plants
 
 
 

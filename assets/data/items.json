@@ -55,14 +55,15 @@
     "atlas": "items2",
     "frame":"flask",
     "name": "Dawn",
-    "desc": "Bitter potion made of daybreak and clover, regenerates a lot of health.",
+    "desc": "Bitter potion made of daybreak, regenerates a lot of health.",
     "isPotion": true,
-    "recipe": {"17":1,"18":1},
+    "recipe": {"17":1},
     "effects":{"hp":100},
     "useInBattle": true,
     "isCrafted": true,
     "craftTier": 2,
-    "sound": "alchemy"
+    "sound": "alchemy",
+    "basicRecipe": true
   },
   "7":{
     "atlas": "items",
@@ -98,7 +99,8 @@
     "isCrafted": true,
     "recipe":{"43":8},
     "effects":{"def":4},
-    "sound": "cloth"
+    "sound": "cloth",
+    "basicRecipe": true
   },
   "11":{
     "atlas": "items2",
@@ -167,11 +169,12 @@
     "frame":"yellowpowder",
     "name": "Daybreak",
     "desc": "Alchemical substance used to brew healing potions.",
-    "recipe":{"14":2,"5":1},
+    "recipe":{"14":2,"27":1},
     "isCrafted": true,
     "craftTier": 1,
     "isMaterial": true,
-    "sound": "powder"
+    "sound": "powder",
+    "basicRecipe": true
   },
   "18":{
     "atlas": "items2",

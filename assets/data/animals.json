@@ -17,8 +17,8 @@
     "stats": {
       "hpmax": 100,
       "hp": 100,
-      "def": 5,
-      "dmg": 2
+      "def": 6,
+      "dmg": 4
     },
     "xp": 10,
     "loot":{
