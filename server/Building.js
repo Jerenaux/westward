@@ -178,7 +178,7 @@ Building.prototype.dispatchStock = function(){
     this.newitems.clear();
 };
 
-Building.prototype.updateProd = function(){
+Building.prototype.updateProd = function(justBuilt){
     var production = GameServer.buildingsData[this.type].production;
     if(!production) return false;
     var produced = 0;
@@ -188,8 +188,8 @@ Building.prototype.updateProd = function(){
         var turns = production[i][2];
         var cap = production[i][3];
         var remainingTurns = GameServer.elapsedTurns%turns;
-        this.prodCountdowns[item] = (turns - remainingTurns)//*GameServer.turnDuration;
-        if(remainingTurns > 0)continue;
+        this.prodCountdowns[item] = (turns - remainingTurns);//*GameServer.turnDuration;
+        if(remainingTurns > 0 || justBuilt) continue;
         var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
         var current = this.getItemNb(item);
         if(current >= cap) continue;
@@ -221,6 +221,7 @@ Building.prototype.updateBuild = function(){
 
 Building.prototype.setBuilt = function(){
     this.setProperty('built',true);
+    this.updateProd(true); //true = just built
     this.save();
     var phrase = ['Construction of ',GameServer.buildingsData[this.type].name,' finished'];
     GameServer.notifyPlayer(this.owner,phrase.join(' '));

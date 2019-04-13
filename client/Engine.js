@@ -528,9 +528,8 @@ Engine.initWorld = function(data){ // data = initialization packet sent by serve
     // rt.fill(0x000000);
     // rt.erase(rect);
 
-    return;
     // todo: move all to dedicated sound manager
-    Engine.lastOrientationSound = 0;
+    /*Engine.lastOrientationSound = 0;
     // todo: move to JSON file (+ config for delay)
     Engine.ambientSounds([
         {name:'birds1',volume:1},
@@ -543,7 +542,7 @@ Engine.initWorld = function(data){ // data = initialization packet sent by serve
         {name:'wind1',volume:1},
         {name:'wind2',volume:1},
         {name:'wind3',volume:1}
-    ],17000);
+    ],17000);*/
 };
 
 Engine.ambientSounds = function(sounds,interval){
@@ -1392,9 +1391,9 @@ Engine.makeMapMenu = function(){
 };
 
 Engine.makePricesPanel = function(){
-    var w = 815;
+    var w = 415;
     var h = 480;
-    var prices = new PricesPanel(97,80,w,h,'Prices');
+    var prices = new PricesPanel(Math.round((1024-w)/2),80,w,h,'Prices');
     prices.addButton(w-16,-8,'red','close',prices.hide.bind(prices),'Close');
     prices.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['prices_help']);
     prices.moveUp(4);
@@ -1528,6 +1527,7 @@ Engine.makeBuildMenu = function(){
     // buildings.setInventory(Engine.player.buildRecipes,5,false,Engine.bldClick);
     buildings.setInventory('buildRecipes',5,false,Engine.bldClick);
     buildings.setDataMap(Engine.buildingIconsData);
+    buildings.moveUp(2);
     build.addEvent('onOpen',buildings.updateInventory.bind(buildings));
     return build;
 };
@@ -1551,7 +1551,7 @@ Engine.bldUnclick = function(shutdown){
         //var bld = Engine.buildingsData[id];
         var pos = Engine.bldRect.getBottomLeft();
         pos.x = pos.x / 32;
-        pos.y = (pos.y / 32);
+        pos.y = (pos.y / 32) - 1;
         console.log("Building at ", (pos.x), ",", (pos.y));
         if(Client.tutorial){
             Engine.tutorialHook('bldunselect:'+id);

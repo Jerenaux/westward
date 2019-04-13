@@ -75,7 +75,6 @@ Client.getPlayerID = function(){
 };
 
 Client.isFirstBattle = function(){
-    return true;
     return !localStorage.getItem('firstBattle');
 };
 

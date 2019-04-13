@@ -365,7 +365,9 @@ GameServer.addItem = function(x,y,type){
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
-    // GameServer.addAnimal(506,652,0);
+    GameServer.addAnimal(504,678,0);
+    GameServer.addAnimal(502,681,0);
+    GameServer.addAnimal(500,679,0);
 };
 
 /**
@@ -404,6 +406,10 @@ GameServer.startEconomy = function(){
         if(duration > maxDuration) maxDuration = duration;
     }
     GameServer.maxTurns = Math.max(maxDuration,300);
+
+    GameServer.spawnZones.forEach(function(zone){
+        zone.update();
+    });
 
     GameServer.economyTurn();
     GameServer.turnDuration = config.get('economyCycles.turnDuration');
@@ -837,6 +843,7 @@ GameServer.handleBattle = function(attacker,attacked){
     }
     if(!attacker.isAvailableForFight() || attacker.isInFight() 
     || !attacked.isAvailableForFight() || attacked.isInFight()){
+        console.log('Availability issue');
         return false;
     }
     // TODO: check for proximity
@@ -865,14 +872,18 @@ GameServer.computeBattleArea = function(f1,f2){
     var cells = new SpaceMap();
     var fs = [f1,f2];
     fs.forEach(function(f){
-        cells = f.getBattleAreaAround(cells);
+        cells = f.getBattleAreaAround(cells); // Appends to passed SpaceMap
     });
 
-    // TODO: add previous cells to queue, to have them spawn children too?
     var queue = [];
 
     var path = GameServer.findPath(f1.getCenter(),f2.getCenter());  // Reminder: a default length limit is built-in the pathfinder
-    if(!path || path.length == 0) return null;
+    if(!path || path.length == 0) {
+        console.log('No path to target');
+        console.log(f1.getCenter());
+        console.log(f2.getCenter());
+        return null;
+    }
     path.forEach(function(cell){
         cells.add(cell[0],cell[1]);
         queue.push({x:cell[0],y:cell[1],d:0});
@@ -1050,7 +1061,7 @@ GameServer.handleBuild = function(data,socketID) {
         GameServer.build(player, bid, tile);
         player.addNotif('Started building a '+GameServer.buildingsData[bid].name);
         Prism.logEvent(player,'newbuilding',{x:tile.x,y:tile.y,building:bid});
-    } else if(buildPermit == -1) {
+    } else if(buildPermit == -1) { // collision
         player.addMsg('I can\'t build there!');
     }else if(buildPermit == -2){
         player.addMsg('There is something in the way!');
@@ -1062,7 +1073,11 @@ GameServer.canBuild = function(bid,tile){
     for(var x = 0; x < data.base.width; x++){
         for(var y = 0; y < data.base.height; y++) {
             // ! minus sign
-            if(GameServer.checkCollision(tile.x+x,tile.y-y)) return -1;
+            // console.log('checking ',tile.x+x,tile.y-y);
+            if(GameServer.checkCollision(tile.x+x,tile.y-y)) {
+                console.log('Collision at ',tile.x+x,tile.y-y);
+                return -1;
+            }
             if(GameServer.positions.get(tile.x+x,tile.y-y).length > 0 ||
                 GameServer.itemPositions.get(tile.x+x,tile.y-y).length > 0) return -2;
         }
@@ -1073,7 +1088,7 @@ GameServer.canBuild = function(bid,tile){
 GameServer.build = function(player,bid,tile){
     var data = {
         x: tile.x,
-        y: tile.y,
+        y: tile.y+1,
         type: bid,
         owner: player.id,
         ownerName: player.name,

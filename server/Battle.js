@@ -135,7 +135,6 @@ Battle.prototype.newTurn = function(){
         }
     },this);
 
-    console.log('Is ',activeFighter.getShortID(),'frozen: ',activeFighter.skipBattleTurn);
     if(activeFighter.skipBattleTurn){
         this.newTurn();
         return;

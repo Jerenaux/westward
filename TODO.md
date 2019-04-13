@@ -43,6 +43,8 @@ Misc:
 - "new" marker
 - Events formatting
 - Add other plants
+- Aggro issue
+- In battle, items appear on top of fighters
 
 
 
