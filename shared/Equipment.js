@@ -201,6 +201,20 @@ EquipmentManager.prototype.setAmmo = function(ammo,nb){
     this.ammo[ammo].nb = nb;
 };
 
+EquipmentManager.prototype.listItems = function(){
+    var items = [];
+    for(var label in this.slots){
+        if(this.slots[label] > -1) items.push(this.slots[label]);
+    }
+    for(var label in this.containers){
+        if(this.containers[label] > -1) items.push(this.containers[label]);
+    }
+    for(var label in this.ammo){
+        if(this.ammo[label].id > -1) items.push(this.ammo[label]);
+    }
+    return items;
+};
+
 // re-enable equip from db
 
 if (onServer){

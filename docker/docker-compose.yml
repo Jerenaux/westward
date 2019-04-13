@@ -1,0 +1,79 @@
+version: '3.7'
+
+volumes:
+  ssh-data:
+  postgres_data:
+    driver: local
+
+services:
+#  mongo:
+#    image: mongo
+#    restart: always
+#    ports:
+#      - "27017:27017"
+#    # environment:
+#    #   MONGO_INITDB_ROOT_USERNAME: root
+#    #   MONGO_INITDB_ROOT_PASSWORD: password
+#
+#  westward:
+#    image: westward:latest
+#    restart: unless-stopped
+#    ports:
+#      - "80:8081"
+#    depends_on:
+#      - mongo
+#    environment:
+#      MONGODB_URI: mongodb://mongo:27017/westward
+#      # MONGODB_AUTH: 1
+#      # MONGODB_USERNAME: root
+#      # MONGODB_PASSWORD: password
+
+#  postgres:
+#    image: postgres
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#    ports:
+#      - "5432:5432"
+#    environment:
+#      POSTGRES_DB: keycloak
+#      POSTGRES_USER: keycloak
+#      POSTGRES_PASSWORD: password
+#
+#  westward-keycloak:
+#    image: jboss/keycloak:latest
+#    restart: unless-stopped
+#    volumes:
+#      - /home/westward/westward-keycloak/config/realm-export.json:/tmp/realm-export.json
+#    #      - C:\Work\WestWard\westward-keycloak\realm-export.json:/tmp/realm-export.json
+#    #      - D:\Work\WestWard\westward-keycloak\config\realm-export.json:/tmp/realm-export.json
+#    ports:
+#      - "8686:8080"
+#    expose:
+#      - "443"
+#      - "80"
+#      - "8080"
+#    depends_on:
+#      - postgres
+#    environment:
+#      DB_VENDOR: POSTGRES
+#      DB_ADDR: postgres
+#      DB_DATABASE: keycloak
+#      DB_USER: keycloak
+#      DB_SCHEMA: public
+#      DB_PASSWORD: password
+#      KEYCLOAK_USER: "admin"
+#      KEYCLOAK_PASSWORD: "admin"
+#      KEYCLOAK_IMPORT: "/tmp/realm-export.json"
+
+#  westward-admin:
+#    image: westward-admin:latest
+#    restart: unless-stopped
+#    ports:
+#      - "4200:4200"
+#    expose:
+#      - "443"
+#      - "80"
+#      - "4200"
+#    depends_on:
+#      - westward
+#      - westward-keycloak

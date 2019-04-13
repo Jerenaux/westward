@@ -88,9 +88,17 @@ Frame.prototype.setTweens = function(sx,sy,ex,ey,duration){
     });
 };
 
+Frame.prototype.setPosition = function(x,y){
+    this.x_ = x;
+    this.y_ = y;
+    console.log('positioning at',x,y);
+    this.updatePosition();
+};
+
 Frame.prototype.updatePosition = function(){
     var dx = this.x - this.x_;
     var dy = this.y - this.y_;
+    console.log(dx,dy);
     if(dx == 0 && dy == 0) return;
     this.slices.forEach(function(e){
         e.x += dx;
@@ -154,4 +162,10 @@ Frame.prototype.moveUp = function(nb){
         e.setDepth(e.depth+nb);
     });
     if(this.button) this.button.moveUp(nb);
+    this.buttons.forEach(function(b){
+        b.btn.setDepth(b.btn.depth+nb);
+        b.symbol.setDepth(b.symbol.depth+nb);
+        b.ring.setDepth(b.ring.depth+nb);
+        b.zone.setDepth(b.zone.depth+nb);
+    });
 };

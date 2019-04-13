@@ -83,6 +83,10 @@
     {
       "filename": "leather",
       "frame": {"x":352,"y":448,"w":32,"h":32}
+    },
+    {
+      "filename": "stone_arrow",
+      "frame": {"x":192,"y":224,"w":32,"h":32}
     }
   ]
 }

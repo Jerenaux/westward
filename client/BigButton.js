@@ -106,17 +106,21 @@ BigButton.prototype.handleOut = function(){
     this.resetSize();
 };
 
+
+BigButton.prototype.enable = function(){
+    this.slices[0].setFrame(this.bt+'_left');
+    this.slices[1].setFrame(this.bt+'_middle');
+    this.slices[2].setFrame(this.bt+'_right');
+    this.resetSize();
+    this.enabled = true;
+};
+
 BigButton.prototype.disable = function(){
     this.slices[0].setFrame(this.bt+'_left_gray');
     this.slices[1].setFrame(this.bt+'_middle_gray');
     this.slices[2].setFrame(this.bt+'_right_gray');
     this.resetSize();
     this.enabled = false;
-    /*this.slices.forEach(function(s){
-        s.removeAllListeners();
-        s.off('pointerover');
-        //s.setInteractive(false);
-    });*/
 };
 
 BigButton.prototype.resetSize = function(){

@@ -17,6 +17,7 @@ var Utils = {
 Utils.colors.white = '#ffffff';
 Utils.colors.gold = '#ffd700';
 Utils.colors.red = '#ff0000';
+Utils.colors.lightred = '#ff3b3b';
 Utils.colors.blue = '#558fff';
 Utils.strokes.red = '#331111';
 Utils.colors.green = '#11ee11';

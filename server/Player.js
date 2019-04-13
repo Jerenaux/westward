@@ -30,6 +30,8 @@ function Player(){
     this.sid = 0;
     this.settlement = null;
     this.gold = 0;
+    this.vigor = 100;
+    this.food = 100;
     this.inBuilding = -1;
     this.civiclvl = 0;
     this.civicxp = 0;
@@ -52,7 +54,7 @@ function Player(){
         3: 0,
         4: 0 // civic AP
     };
-    this.baseBldrecipes = [11,6,2,3,4]; //TODO: conf
+    this.baseBldrecipes = [11,6,3,4]; //TODO: conf
     this.bldRecipes = [];
 
     this.cellsWidth = 1;
@@ -60,6 +62,7 @@ function Player(){
 
     this.setUpStats();
     this.equipment = new EquipmentManager();
+    this.history = [];
     this.fieldOfVision = [];
     this.visitedAOIs = new Set(); // List of AOIs visitted since last fort debrief
     MovingEntity.call(this);
@@ -74,11 +77,6 @@ Player.prototype.setIDs = function(dbID,socketID){
     this.socketID = socketID;
 };
 
-Player.prototype.setAppearance = function(appearance){
-    this.setProperty('appearance',appearance);
-};
-
-// Called by finalizePlayer
 Player.prototype.updateBldRecipes = function(){
     this.bldRecipes = [];
     this.baseBldrecipes.forEach(function(b){
@@ -89,6 +87,7 @@ Player.prototype.updateBldRecipes = function(){
     this.updatePacket.bldRecipes = this.bldRecipes;
 };
 
+// Called by finalizePlayer
 Player.prototype.listBuildings = function(){
     this.buildings = [];
     for(var bid in GameServer.buildings){
@@ -133,6 +132,10 @@ Player.prototype.setRegion = function(sid){
     }
 };
 
+Player.prototype.getRegionName = function(){
+    return this.region.name;
+};
+
 Player.prototype.setStartingInventory = function(){
     // TODO: move to some config file
     /*this.giveItem(2,1);
@@ -143,6 +146,8 @@ Player.prototype.setStartingInventory = function(){
     this.giveItem(4,2);*/
     //this.giveItem(4,3);
     this.giveItem(28,1);
+    this.giveItem(7,1);
+    this.giveItem(21,1);
 
     this.giveGold(300);
 };
@@ -183,9 +188,13 @@ Player.prototype.die = function(){
     this.updatePacket.dead = true;
 };
 
-Player.prototype.spawn = function(x,y){ // todo: remove args
+Player.prototype.spawn = function(x,y){
     x = x || this.respawnLocation.x;
     y = y || this.respawnLocation.y;
+    console.log('aiming at',x,y);
+    var pos = this.findNextFreeCell(x,y);
+    x = pos.x;
+    y = pos.y;
     this.setProperty('x', x);
     this.setProperty('y', y);
     this.updatePacket.x = x;
@@ -275,7 +284,7 @@ Player.prototype.giveGold = function(nb,notify){
     this.gold = Utils.clamp(this.gold+nb,0,GameServer.characterParameters.maxGold);
     this.updatePacket.updateGold(this.gold);
     if(notify){
-        this.addNotif('+'+nb+' '+Utils.formatMoney(nb));
+        this.addNotif('Received '+nb+' '+Utils.formatMoney(nb));
         this.save();
     }
 };
@@ -284,9 +293,10 @@ Player.prototype.takeGold = function(nb,notify){
     this.gold = Utils.clamp(this.gold-nb,0,GameServer.characterParameters.maxGold);
     this.updatePacket.updateGold(this.gold);
     if(notify){
-        this.addNotif('-'+nb+' '+Utils.formatMoney(nb));
+        this.addNotif('Gave '+nb+' '+Utils.formatMoney(nb));
         this.save();
     }
+    return nb;
 };
 
 Player.prototype.canBuy = function(price){ // check if building has gold and room
@@ -301,24 +311,35 @@ Player.prototype.canBuy = function(price){ // check if building has gold and roo
     return true;
 };
 
+Player.prototype.canCraft = function(item, nb){
+    var recipe = GameServer.itemsData[item].recipe;
+    for(var itm in recipe){
+        if(!this.hasItem(itm,recipe[itm]*nb)) return false;
+    }
+    return true;
+},
+
 Player.prototype.hasItem = function(item,nb){
     return (this.inventory.getNb(item) >= nb);
 };
 
-Player.prototype.giveItem = function(item,nb,notify){
+Player.prototype.giveItem = function(item,nb,notify,verb){
     this.inventory.add(item,nb);
     this.updatePacket.addItem(item,this.inventory.getNb(item));
     if(notify){
-        this.addNotif('+'+nb+' '+GameServer.itemsData[item].name);
+        // this.addNotif('+'+nb+' '+GameServer.itemsData[item].name);
+        verb = verb || 'Received';
+        this.addNotif(verb+' '+nb+' '+GameServer.itemsData[item].name);
         this.save();
     }
 };
 
-Player.prototype.takeItem = function(item,nb,notify){
+Player.prototype.takeItem = function(item,nb,notify,verb){
     this.inventory.take(item,nb);
     this.updatePacket.addItem(item,this.inventory.getNb(item));
     if(notify){
-        this.addNotif('-'+nb+' '+GameServer.itemsData[item].name);
+        verb = verb || 'Sold';
+        this.addNotif(verb+' '+nb+' '+GameServer.itemsData[item].name);
         this.save();
     }
 };
@@ -500,30 +521,40 @@ Player.prototype.applyEffect = function(stat,delta,notify){
     }
 };
 
+/**
+ * Create a smaller object containing the properties needed to initialize
+ * the player character on the client-side.
+ * @returns {{}}
+ */
 Player.prototype.initTrim = function(){
-    // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
-    var broadcastProperties = ['id','gold','civicxp','civiclvl','classxp','classlvl','ap','name']; // list of properties relevant for the client
+    var broadcastProperties = ['id','gold','civicxp','civiclvl','classxp','classlvl','ap',
+        'name','history']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
     trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
+    trimmed.fow = GameServer.fowList;
     trimmed.buildingMarkers = GameServer.listBuildingMarkers();
     trimmed.resourceMarkers = GameServer.resourceMarkers;
-    trimmed.vision = GameServer.getVision();
+    trimmed.rarity = GameServer.getRarity();
     return trimmed;
 };
 
+/**
+ * Create a smaller object containing the properties needed for the *other clients*
+ * (Properties needed by the player itself are put into his individualUpdatePacjage)
+ * @returns {{}}
+ */
 Player.prototype.trim = function(){
-    // Return a smaller object, containing a subset of the initial properties, to be sent to the client
     var trimmed = {};
     var broadcastProperties = ['id','path','inFight','inBuilding','chat',
-        'battlezone','dead','appearance']; // list of properties relevant for the client
-    for(var p = 0; p < broadcastProperties.length; p++){
-        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
-    }
+        'battlezone','dead']; // list of properties relevant for the client
+    broadcastProperties.forEach(function(field){
+        trimmed[field] = this[field];
+    },this);
     trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
@@ -532,8 +563,6 @@ Player.prototype.trim = function(){
 };
 
 Player.prototype.getDataFromDb = function(data){
-    // TODO: think about how to handle references to other entities
-    // eg. inBuilding (how to retrieve proper building if server went down since), commitment...
     this.id = data.id;
     this.name = data.name;
     this.x = Utils.clamp(data.x,0,World.worldWidth-1);
@@ -566,6 +595,9 @@ Player.prototype.getDataFromDb = function(data){
     },this);
     this.setRegion(data.sid);
     this.giveGold(data.gold);
+    this.vigor = data.vigor || 100;
+    this.food = data.food || 100;
+    this.history = data.history;
 };
 
 Player.prototype.setAction = function(action){
@@ -606,16 +638,25 @@ Player.prototype.enterBuilding = function(id){
     // TODO: check for proximity
     // TODO: add to a list of people in the building object
     this.setProperty('inBuilding', id);
-
-    /*if(this.settlement.fort.id == id){
-        console.log('Came back to fort');
-        this.visitedAOIs.clear();
-    }*/
-    Prism.logEvent(this,'building',{building:GameServer.buildings[id].type});
+    var building = GameServer.buildings[id];
+    var type = building.type;
+    var bldname = GameServer.buildingsData[type].name;
+    var phrase = ['Entered',(building.isOwnedBy(this) ? 'my' : building.ownerName+'\'s'),bldname];
+    this.addNotif(phrase.join(' ')); //true = silent
+    if(!building.isOwnedBy(this)) {
+        var phrase = [this.name, 'visitted my', bldname];
+        GameServer.notifyPlayer(building.owner, phrase.join(' '));
+    }
+    Prism.logEvent(this,'building',{building:type});
 };
 
 Player.prototype.exitBuilding = function(){
     // TODO: check if in building first
+    var building = GameServer.buildings[this.inBuilding];
+    var type = building.type;
+    var bldname = GameServer.buildingsData[type].name;
+    var phrase = ['Left',(building.isOwnedBy(this) ? 'my' : building.ownerName+'\'s'),bldname];
+    this.addNotif(phrase.join(' ')); // true = silent
     this.setProperty('inBuilding', -1);
 };
 
@@ -640,15 +681,19 @@ Player.prototype.addMsg = function(msg){
     this.updatePacket.addMsg(msg);
 };
 
-Player.prototype.addNotif = function(msg){
-    this.updatePacket.addNotif(msg);
+Player.prototype.addNotif = function(msg,silent){
+    if(!silent) this.updatePacket.addNotif(msg);
+    this.history.push([Date.now(),msg]);
+    var MAX_LENGTH = 20; // TODO: max limit in conf
+    // if(this.history.length > MAX_LENGTH) this.history.splice(MAX_LENGTH,this.history.length-MAX_LENGTH);
+    if(this.history.length > MAX_LENGTH) this.history.splice(0,this.history.length-MAX_LENGTH);
 };
 
 Player.prototype.getIndividualUpdatePackage = function(){
     // console.log(this.updatePacket,this.updatePacket.isEmpty());
     var pkg = this.updatePacket;
+    if(GameServer.fowChanged) pkg.fow = GameServer.fowList;
     if(GameServer.buildingsChanged) pkg.buildingMarkers = GameServer.listBuildingMarkers();
-    if(GameServer.visionChanged) pkg.vision = GameServer.getVision();
     if(pkg.isEmpty()) return null;
     this.updatePacket = new PersonalUpdatePacket();
     return pkg;

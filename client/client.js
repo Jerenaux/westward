@@ -89,8 +89,10 @@ Client.socket.on(Client.initEventName,function(data){ // This event triggers whe
     console.log('Init packet received');
     //if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.initializationSchema); // if in binary format, decode first
     Client.socket.emit('ponq',data.stamp); // send back a pong stamp to compute latency
+    Client.serverTimeDelta = data.refTime - Date.now();
     Engine.initWorld(data.player);
     //Game.updateNbConnected(data.nbconnected);
+    console.log(Client.serverTimeDelta,'time delta');
 });
 
 Client.socket.on('wait',function(){
@@ -170,8 +172,8 @@ Client.sendCraft = function(id,nb,stock){
     Client.socket.emit('craft',{id:id,nb:nb,stock:stock});
 };
 
-Client.sendPurchase = function(id,nb, action){
-    Client.socket.emit('shop',{id:id,nb:nb,action:action});
+Client.sendPurchase = function(id,nb, action, financial){
+    Client.socket.emit('shop',{id:id,nb:nb,action:action,financial:financial});
 };
 
 Client.sendStock  = function(item,nb,building,action){
@@ -194,8 +196,12 @@ Client.sendBuild = function(id,tile){
     Client.socket.emit('build',{id:id,tile:tile});
 };
 
-Client.sendCommit = function(){
-    Client.socket.emit('commit');
+Client.setPrices = function(id,buy,sell){
+    Client.socket.emit('prices',{item:id,buy:buy,sell:sell});
+};
+
+Client.exchangeGold = function(nb){
+    Client.socket.emit('gold',{nb:nb});
 };
 
 Client.sendChat = function(text){

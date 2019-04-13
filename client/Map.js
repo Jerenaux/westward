@@ -80,6 +80,8 @@ var Map = new Phaser.Class({
         this.setDepth(2);
         this.setScrollFactor(0);
         this.setVisible(false);
+
+        this.scales = [0.35, 0.5, 1];
         this.setScale(0.5);
 
         this.center = { // position of map sprite on screen
@@ -92,32 +94,15 @@ var Map = new Phaser.Class({
             :new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH)
             );
 
-        var wcoord = (this.minimap ? 'radius' : 'width');
-        var hcoord = (this.minimap ? 'radius' : 'height');
-
-        // Used to make sur that the map won't be centered in a position that allows to see the edges
-        this.minOrigin = {
-            x: (this.viewRect[wcoord]/2)*(1/this.scaleX),
-            y: (this.viewRect[hcoord]/2)*(1/this.scaleY),
-            xOffset: 0
-        };
-        if(this.minimap) this.minOrigin.y *= 2; // quick fix
-        this.maxOrigin =  {
-            x: (World.worldWidth-this.viewRect[wcoord]/2)*(1/this.scaleX),
-            y: (World.worldHeight-this.viewRect[hcoord]/2)*(1/this.scaleY),
-            xOffset: 0
-        };
-
-        if(!this.minimap){
-            this.minOrigin.xOffset = 70;
-            this.maxOrigin.xOffset = -60;
-        }
+        // var wcoord = (this.minimap ? 'radius' : 'width');
+        // var hcoord = (this.minimap ? 'radius' : 'height');
 
         this.toponyms = [];
 
         /*if(showToponyms) {
             Engine.settlementsData.forEach(function (s) {
                 this.addText(s);
+            }, this);
             }, this);
         }*/
 
@@ -317,17 +302,21 @@ var Map = new Phaser.Class({
     },
 
     zoomIn: function(){
-        this.setScale(1);
+        var idx  = Utils.clamp(this.scales.indexOf(this.scaleX)+1,0,this.scales.length-1);
+        var newscale = this.scales[idx];
+        this.setScale(newscale);
         this.zoom();
-        this.getZoomBtn('in').disable();
-        this.getZoomBtn('out').enable();
+        if(idx == this.scales.length-1) this.getZoomBtn('in').disable();
+        if(idx > 0) this.getZoomBtn('out').enable();
     },
 
     zoomOut: function(){
-        this.setScale(0.5);
+        var idx  = Utils.clamp(this.scales.indexOf(this.scaleX)-1,0,this.scales.length-1);
+        var newscale = this.scales[idx];        
+        this.setScale(newscale);
         this.zoom();
-        this.getZoomBtn('in').enable();
-        this.getZoomBtn('out').disable();
+        if(idx < this.scales.length-1) this.getZoomBtn('in').enable();
+        if(idx == 0) this.getZoomBtn('out').disable();
     },
 
     zoom: function(){
@@ -353,9 +342,19 @@ var Map = new Phaser.Class({
             x: tile ? tile.x * 2 : this.displayOriginX,
             y: tile ? tile.y * 2 : this.displayOriginY
         };
+        var xSpan = (this.minimap ? 250 : 500)/this.scaleX;
+        var ySpan = (this.minimap ? 70 : 190)/this.scaleY;
         this.setDisplayOrigin(
-            Utils.clamp(o.x,(this.minOrigin.x+this.minOrigin.xOffset)/(this.scaleX*2),this.maxOrigin.x+this.maxOrigin.xOffset),
-            Utils.clamp(o.y,this.minOrigin.y/(this.scaleY*2),this.maxOrigin.y)
+            Utils.clamp(
+                o.x,
+                xSpan,
+                this.width - xSpan
+            ),
+            Utils.clamp(
+                o.y,
+                ySpan,
+                this.height - ySpan
+            )
         );
         this.setPosition(this.center.x,this.center.y);
     },
@@ -384,7 +383,7 @@ var Map = new Phaser.Class({
         // Maps rects to one single flat list of top-left and bottom-right coordinates,
         // for use by the shader
         var rects = [];
-        Engine.player.mapVision.forEach(function(rect){
+        Engine.player.FoW.forEach(function(rect){
             rects.push(rect.x/(this.width*this.scaleX));
             rects.push(rect.y/(this.height*this.scaleY));
             rects.push((rect.x+rect.width)/(this.width*this.scaleX));
@@ -411,7 +410,8 @@ var Map = new Phaser.Class({
     },
 
     display: function(){
-        if(!this.mimnimap && this.scaleX > 0.5) this.zoomOut();
+        if(!this.minimap && this.scaleX > 0.5) this.zoomOut();
+        if(!this.minimap && this.scaleX < 0.5) this.zoomIn();
         this.centerMap(Engine.player.getTilePosition());
         // this.setInputArea();
         this.positionToponyms();
@@ -420,16 +420,16 @@ var Map = new Phaser.Class({
 
         this.displayPins();
         this.setVisible(true);
-        if(!this.minimap) this.getZoomBtn('out').disable();
+        // if(!this.minimap) this.getZoomBtn('out').disable();
     },
 
     displayPins: function(){
         var tile = Engine.player.getTilePosition();
         this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
         Engine.player.buildingMarkers.forEach(function(data){
-            this.addPin(data.x,data.y,
+            var pin = this.addPin(data.x,data.y,
                 Engine.buildingsData[data.type].name,
-                'bld'
+                (data.owner == Engine.player.id ? 'bld2own' : 'bld2')
                 // Engine.buildingsData[data.type].mapicon,
                 // Engine.buildingsData[data.type].mapbg
             );
@@ -468,45 +468,21 @@ var Map = new Phaser.Class({
 var Pin = new Phaser.Class({
 
     Extends: CustomSprite,
-    // Extends: Phaser.GameObjects.RenderTexture,
 
-    initialize: function Pin (map,mask) {
+    initialize: function Pin (map) {
         CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
-        // Phaser.GameObjects.RenderTexture.call(this, UI.scene, 0, 0, 16,16);
-        // UI.scene.add.displayList.add(this);
-        //UI.scene.add.updateList.add(this);
-
         this.setDepth(2);
         this.setScrollFactor(0);
         this.setVisible(false);
         this.setInteractive();
-        /*if(mask) this.mask = (Boot.WEBGL
-                ? new Phaser.Display.Masks.BitmapMask(UI.scene,mask)
-                : new Phaser.Display.Masks.GeometryMask(UI.scene,mask)
-        );*/
         this.parentMap = map;
-        // this.setMask(this.parentMap.mask);
-        //this.parentMap.container.add(this);
         this.on('pointerover',this.handleOver.bind(this));
         this.on('pointerout',this.handleOut.bind(this));
     },
 
     setUp: function(tileX,tileY,x,y,name,frame,bgframe){
         this.setOrigin(0.5);
-
-        // Phaser 3.12:
-        // var bg = bgframe ? 'bg'+bgframe : 'bg';
-        // if(frame != 'x') this.drawFrame('mapicons',bg,0,0);
-
-        // this.drawFrame('mapicons',frame,0,0);
         this.setFrame(frame);
-
-        // Phaser 3.11:
-        /*var icon = Engine.scene.add.sprite(0,0,'mapicons',frame);
-        var bg = bgframe ? 'bg'+bgframe : 'bg';
-        var bg = Engine.scene.add.sprite(0,0,'mapicons',bg);
-        if(frame != 'x') this.draw(bg.texture,bg.frame,0,0);
-        this.draw(icon.texture,icon.frame,0,0);*/
 
         this.tileX = tileX;
         this.tileY = tileY;
@@ -521,8 +497,8 @@ var Pin = new Phaser.Class({
             if(this.parentMap.minimap){
                 this.setVisible(true);
             }else{
-                for(var i = 0; i < Engine.player.mapVision.length; i++){
-                    var rect = Engine.player.mapVision[i];
+                for(var i = 0; i < Engine.player.FoW.length; i++){
+                    var rect = Engine.player.FoW[i];
                     if(rect.contains(this.tileX,this.tileY)){
                         this.setVisible(true);
                         return;

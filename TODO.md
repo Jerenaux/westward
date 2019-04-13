@@ -4,6 +4,9 @@ On deploy:
 - Test picking up objects
 - Test selling and buying in a store
 - Test equiping object
+- Test gs.handleGold()
+- Test handleCraft (normal + when a price is undefined)
+- Test setPrices
 => Automate these eventually
 => After bug, systematically create test!
 
@@ -23,8 +26,6 @@ Misc:
 - Change battle priority when player joins fight
 - In battle against NPC, have players have turns much more often
 - Make tiles above battle tiles transparent; same with buildings in fight?
-- Make arrows in bulk?
-- Feather tufts
 - Introduce new wood ingredient obtained from timber, crafting wood, made in bulk (but then tune down timber prod)
 -> For shield, guns...?
 - Spawning in battle area, moving: doesn't stop movement
@@ -32,16 +33,17 @@ Misc:
 - Camera bounds (test with northernmost camp)
 - Poll at regular interval the sprite below mouse
 - Better notifs cascading
-- New test: GameServer.lootNPC
-- New test: GameServer.handleBattle (when and area can and cannot be computed)
 - Positions not saved often enough?
 - Don't disable walk with build panel
-- Multiple clicks on "give" repeat the action
-Shop & workshop interfaces
-New movement system
-Add a zoom level to map
-Check building limits are enforced
-// 
+- New movement system
+- Prevent building at player location\
+- Reduce amount of orientation pins
+- Display death and conflict markers
+- add esc shortcut
+- "new" marker
+- Events formatting
+- Add other plants
+
 
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
@@ -165,7 +167,8 @@ Secure
 
 Analytics:
 ---------
-- Log: tutorial begins, progress (each step) and ends, kills
+- Log: price setting, handleShop, handleGold, tutorial begins, progress (each step) and ends
+- Display market prices
 - Button to flush events
 - Bundle events from one player into sessions
 - Log session-wide stats: duration, how many players visit a building during session, do this, do that...
@@ -221,7 +224,6 @@ Order:
 - Rework longslot system
 - Setters/getters everywhere
 - Centralize all texts (incl. stats, equip, and even item descriptions)
-- Remove the shop-specific code from enterBuilding (use onEnter event if need be, manage inventory filters properly)
 - Remove "longslot" stuff intended for stretching longslots vertically?
 
 Content:
@@ -413,7 +415,7 @@ or
 - Cheat-proof: proper auth system, lock admin
 https://medium.freecodecamp.org/learn-how-to-handle-authentication-with-node-using-passport-js-4a56ed18e81e
 https://w3layouts.com/validate-login-register-forms-flat-responsive-widget-template/
-- Automate standalone app build (as part of deployment)
+- Automate standalone app build (as part of e)
 * Settlement defense
 - Enable commander to build towers
 - Buildings health
@@ -473,7 +475,7 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-- Tool to sync client buildings with server buildings
+- Tool to sync client buildings with server buildings (update code with DO database)
 - Tool to gather, uglify and compress all relevant source files 
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?

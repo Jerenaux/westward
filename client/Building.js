@@ -104,7 +104,6 @@ var Building = new Phaser.Class({
             'animation': Engine.handleBattleAnimation,
             'buildings': this.setBuildingsListing,
             'built': this.setBuilt,
-            'committed': this.setCommitted,
             'danger': this.setDangerIcons,
             'devlevel': this.setDevLevel,
             'foodsurplus': this.setFoodSurplus,
@@ -114,6 +113,7 @@ var Building = new Phaser.Class({
             'items': this.updateInventory, // update individual entries in inventory
             'population': this.setPopulation,
             'prices': this.setPrices,
+            'prodCountdowns': this.setCountdowns,
             'productivity': this.setProductivity,
             'progress': this.setProgress,
             'ranged_atk': this.processRangedAttack,
@@ -137,6 +137,7 @@ var Building = new Phaser.Class({
     remove: function(){
         // TODO: remove collisions
         if(this.accessory) this.accessory.destroy();
+        this.removeInteractive();
         CustomSprite.prototype.remove.call(this);
         delete Engine.buildings[this.id];
     },
@@ -162,9 +163,9 @@ var Building = new Phaser.Class({
         PFUtils.buildingCollisions(this.tileX,this.tileY-this.cellsHeight,this.cellsWidth,this.cellsHeight,Engine.collisions);
     },
 
-    setCommitted: function(committed){
-        this.committed = committed;
-        this.updateEvents.add('onUpdateProductivity');
+    setCountdowns: function(countdowns){
+        this.countdowns = countdowns;
+        this.updateEvents.add('onUpdateShop');
     },
 
     setDangerIcons: function(danger){
@@ -267,8 +268,8 @@ var Building = new Phaser.Class({
     },
 
     getPrice: function (id, action) {
-        var key = (action == 'sell' ? 0 : 1);
-        return this.prices[id][key];
+        if(!(id in this.prices)) return 0;
+        return this.prices[id][action];
     },
 
     getItemNb: function (item) {
@@ -291,6 +292,7 @@ var Building = new Phaser.Class({
     },
 
     isOwned: function(){ // by the player
+        // return false;
         return this.owner == Engine.player.id;
     },
 
@@ -354,7 +356,8 @@ var Building = new Phaser.Class({
             }
         }
         if(cursor) UI.setCursor(cursor);
-        UI.tooltip.updateInfo(this.name);
+        var owner = this.isOwned() ? 'Your' : this.ownerName+'\'s';
+        UI.tooltip.updateInfo(owner+' '+this.name);
         UI.tooltip.display();
     },
 

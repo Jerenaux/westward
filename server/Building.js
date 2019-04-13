@@ -8,6 +8,8 @@ var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
+var StatsContainer = require('../shared/Stats.js').StatsContainer;
+var Models = require('../shared/models.js');
 
 function Building(data){
     this.isBuilding = true;
@@ -29,16 +31,9 @@ function Building(data){
     this.y = Utils.clamp(data.y,0,World.worldHeight-1);
 
     this.type = data.type;
+    if(this.type === undefined) console.warn('Undefined building type');
     var buildingData = GameServer.buildingsData[this.type];
-    //this.width = Math.ceil(buildingData.width/World.tileWidth);
-    //this.height = Math.ceil(buildingData.height/World.tileHeight);
 
-    /*var coll = buildingData.collisions;
-    this.coll = coll;
-    this.xoffset = coll.x;
-    this.entrance = buildingData.entrance;
-    this.cellsWidth = coll.w;
-    this.cellsHeight = coll.h;*/
     this.cellsWidth = buildingData.base.width;
     this.cellsHeight = buildingData.base.height;
     this.coll = {
@@ -60,11 +55,35 @@ function Building(data){
     if(!this.civBuilding) this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(GameServer.buildingParameters.inventorySize);
     if(data.inventory) this.inventory.fromList(data.inventory);
+
+    this.inventory.toList().forEach(function(itm){
+        GameServer.createItem(itm[0],itm[1]);
+    });
+
     this.prices = data.prices || {};
+    for(var item in this.prices){
+        GameServer.marketPrices.add(item,this.prices[item].sell);
+    }
+    if(this.type == 4){
+        var defaultPrices = GameServer.getDefaultPrices();
+        for(var item in defaultPrices){
+            if(!this.prices.hasOwnProperty(item)) this.prices[item] = defaultPrices[item];
+        }
+    }
+
     this.setGold(data.gold || 0);
     this.built = !!data.built;
     this.progress = data.progress || 0;
     this.isWorkshop = buildingData.workshop;
+
+    var production = GameServer.buildingsData[this.type].production;
+    if(production){
+        this.prodCountdowns = {}
+        for(var i = 0; i < production.length; i++){
+            var item = production[i][0];
+            this.prodCountdowns[item] = 0;
+        }
+    }
 
     this.newitems = new Inventory(GameServer.buildingParameters.inventorySize);
 
@@ -77,8 +96,6 @@ function Building(data){
     this.stats['acc'].setBaseValue(1000);
     this.stats['dmg'].setBaseValue(buildingData.dmg || 0);
     this.productivity = 100;
-    this.committed = 0;
-    this.commitStamps = data.commitStamps || [];
 }
 
 Building.prototype = Object.create(GameObject.prototype);
@@ -170,56 +187,44 @@ Building.prototype.updateProd = function(){
         var baseNb = production[i][1];
         var turns = production[i][2];
         var cap = production[i][3];
-        if(!GameServer.haveNbTurnsElapsed(turns)) continue;
+        var remainingTurns = GameServer.elapsedTurns%turns;
+        this.prodCountdowns[item] = (turns - remainingTurns)//*GameServer.turnDuration;
+        if(remainingTurns > 0)continue;
         var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
         var current = this.getItemNb(item);
         if(current >= cap) continue;
         var actualNb = Math.min(increment,cap-current);
         if(actualNb) {
             this.giveItem(item,actualNb);
+            var msg = actualNb+' '+GameServer.itemsData[item].name+' was produced';
+            GameServer.notifyPlayer(this.owner,msg);
             produced += actualNb;
         }
     }
+    this.setProperty('prodCountdowns',this.prodCountdowns);
     return (produced > 0);
 };
-
-/*Building.prototype.updateBuild = function(){
-    if(!GameServer.isTimeToUpdate('build')) return false;
-    var rate = GameServer.buildingsData[this.type].buildRate; // Base progress increase per turn, before factoring productivity in
-    if(!rate) return;
-    var increment = Formulas.computeBuildIncrement(Formulas.pctToDecimal(this.productivity),rate);
-    console.log('Building ',increment,'%');
-    this.setProperty('progress',Utils.clamp(this.progress+increment,this.progress,100));
-    if(this.progress == 100) this.setProperty('built',true);
-};*/
 
 Building.prototype.updateBuild = function(){
     if(this.built) return;
     var buildingData = GameServer.buildingsData[this.type];
     var recipe = buildingData.recipe;
     for(var item in recipe){
-        //console.log(this.hasItem(item,recipe[item]));
         if(!this.hasItem(item,recipe[item])) return false;
     }
-    this.setProperty('built',true);
     for(var item in recipe){
         this.takeItem(item,recipe[item]);
     }
+    this.setBuilt();
     return true;
 };
 
-/*Building.prototype.repair = function(){
-    if(!GameServer.isTimeToUpdate('build')) return;
-    var maxHealth = this.getStat('hpmax').getValue();
-    var health = this.getStat('hp').getValue();
-    if(health == maxHealth) return;
-    var rate = GameServer.buildingsData[this.type].buildRate; // Base progress increase per turn, before factoring productivity in
-    if(!rate) return;
-    var increment = Formulas.computeBuildIncrement(Formulas.pctToDecimal(this.productivity),rate);
-    increment = Math.round((increment/100)*maxHealth);
-    var newHealth = Utils.clamp(health+increment,health,maxHealth);
-    this.getStat('hp').setBaseValue(newHealth);
-};*/
+Building.prototype.setBuilt = function(){
+    this.setProperty('built',true);
+    this.save();
+    var phrase = ['Construction of ',GameServer.buildingsData[this.type].name,' finished'];
+    GameServer.notifyPlayer(this.owner,phrase.join(' '));
+};
 
 Building.prototype.toggleBuild = function(){
     this.setProperty('built',!this.built);
@@ -237,8 +242,8 @@ Building.prototype.updateBuildings = function(){
 };
 
 Building.prototype.getPrice = function(item,nb,action){
-    var key = (action == 'sell' ? 0 : 1);
-    return parseInt(this.prices[item][key])*nb;
+    if(!this.prices.hasOwnProperty(item)) return 0;
+    return parseInt(this.prices[item][action])*nb;
 };
 
 Building.prototype.canBuy = function(item,nb,isFinancial){ // check if building has gold and room
@@ -247,7 +252,7 @@ Building.prototype.canBuy = function(item,nb,isFinancial){ // check if building 
         return false;
     }
     if(isFinancial == false) return true;
-    if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item][0]) == 0){
+    if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item].buy) == 0){
         console.log('Error: building does not buy this item');
         return false;
     }
@@ -264,7 +269,7 @@ Building.prototype.canSell = function(item,nb,isFinancial){
         return false;
     }
     if(!isFinancial) return true;
-    if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item][1]) == 0){
+    if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item].sell) == 0){
         console.log('Error: building does not sell this item');
         return false;
     }
@@ -303,7 +308,10 @@ Building.prototype.setItem = function(item,nb){
 };
 
 Building.prototype.setPrices = function(item,buy,sell){
-    this.prices[item] = [parseInt(buy),parseInt(sell)];
+    buy = Utils.clamp(parseInt(buy),0,999) || 0;
+    sell = Utils.clamp(parseInt(sell),0,999) || 0;
+    this.prices[item] = {buy:buy,sell:sell};
+    this.setProperty('prices',this.prices);
 };
 
 Building.prototype.getGold = function(){
@@ -333,14 +341,13 @@ Building.prototype.save = function(){
 // Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){
     var trimmed = {};
-    var broadcastProperties =
-        ['id','type','gold','prices','built','productivity','owner','ownerName']; // list of properties relevant for the client
-    for(var p = 0; p < broadcastProperties.length; p++){
-        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
+    for(var field in Models.BuildingModel){
+        trimmed[field] = this[field];
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     if(this.inventory.size > 0) trimmed.inventory = this.inventory.toList();
+    trimmed.prodCountdowns = this.prodCountdowns;
     return trimmed;
 };
 
@@ -360,7 +367,7 @@ Building.prototype.listingTrim = function(){
 // Returns an object containing only the fields relevant to display on map
 Building.prototype.mapTrim = function(){
     var trimmed = {};
-    var broadcastProperties = ['type'];
+    var broadcastProperties = ['type','owner','ownerName'];
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

@@ -9,13 +9,8 @@ function MiniMap(){
     var x = Engine.getGameConfig().width - r/2 - margin;
     var y = r/2 + margin;
 
-    /*this.bg = UI.scene.add.sprite(x,y,'minimap');
-    this.bg.setDepth(1);
-    this.bg.setScrollFactor(0);
-    this.bg.setVisible(false);*/
-
     this.ring = UI.scene.add.sprite(x,y,'UI','mapring');
-    this.ring.setDepth(1);
+    this.ring.setDepth(3);
     this.ring.setScrollFactor(0);
     this.ring.setVisible(false);
 
@@ -26,15 +21,13 @@ function MiniMap(){
         y: y,
         w: 133
     });
-    //this.map.addMask('minimap');
 
-    /*this.bg.setInteractive();
-    this.bg.on('pointerover',function(){
-        UI.manageCursor(1,'UI');
-    });
-    this.bg.on('pointerout',function(){
-        UI.manageCursor(0,'UI');
-    });*/
+    var w = 150;
+    // var rect = UI.scene.add.rectangle(1024-w,0,w,w,0xffffff);
+    var rect = UI.scene.add.image(1024-w,0,'UI','invisible');
+    rect.setInteractive();
+    rect.setScrollFactor(0);
+    rect.setOrigin(0);
 }
 
 MiniMap.prototype.follow = function(){

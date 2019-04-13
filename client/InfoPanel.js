@@ -4,9 +4,6 @@
 
 function InfoPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title,false);
-    /*this.slices.forEach(function(s){
-        s.setDepth(0.5);
-    })*/
 }
 
 InfoPanel.prototype = Object.create(Panel.prototype);

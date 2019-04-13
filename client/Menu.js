@@ -24,6 +24,10 @@ Menu.prototype.setTitlePos = function(y){
     this.titleY = y;
 };
 
+Menu.prototype.setExitPos = function(x){
+    this.exitX = x;
+};
+
 Menu.prototype.setSound = function(sound){
     this.sound = sound;
 };
@@ -33,6 +37,21 @@ Menu.prototype.addPanel = function(name,panel,hideOnOpen){
     panel.name = name;
     this.hideOnOpen[name] = !!hideOnOpen;
     return panel;
+};
+
+Menu.prototype.displayPanel = function(name){
+    if(!this.panels.hasOwnProperty(name)) return;
+    this.panels[name].display();
+    return this.panels[name];
+};
+
+Menu.prototype.isPanelDisplayed = function(name){
+    if(!this.panels.hasOwnProperty(name)) return false;
+    return this.panels[name].displayed;
+};
+Menu.prototype.hidePanel = function(name){
+    if(!this.panels.hasOwnProperty(name)) return;
+    this.panels[name].hide();
 };
 
 Menu.prototype.addEvent = function(name,callback){
@@ -70,10 +89,11 @@ Menu.prototype.display = function(){
         if(!this.hideOnOpen[p]) this.panels[p].display();
     }
 
-    for(var event in this.events){
+    /*for(var event in this.events){
         if(!this.events.hasOwnProperty(event)) continue;
         this.trigger(event);
-    }
+    }*/
+    this.trigger('onOpen');
 
     Engine.inMenu = true;
     Engine.hideMarker();
@@ -157,7 +177,8 @@ function BuildingTitle(x,y){
         });*/
     },this);
 
-    this.exit = UI.scene.add.sprite(xr+10,yr+10,'UI','exit_icon');
+    // this.exit = UI.scene.add.sprite(xr+10,yr+10,'UI','exit_icon');
+    this.exit = UI.scene.add.sprite(0,yr+10,'UI','exit_icon');
     this.exit.setDepth(this.depth+1);
     this.exit.setScrollFactor(0);
     this.exit.setVisible(false);
@@ -221,6 +242,7 @@ BuildingTitle.prototype.display = function(){
         e.setVisible(true);
     });
     this.text.setVisible(true);
+    this.exit.x = Engine.currentMenu.exitX;
     this.exit.setVisible(true);
     this.capsule.display();
 };

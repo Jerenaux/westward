@@ -16,6 +16,7 @@
         rangedAtkDelay: 500
    },
    buildings: {
+        autobuild: false,
         canfight: false,
         nobuildings: false,
         inventorySize: 100,
@@ -41,6 +42,8 @@
         maxGold: 100000
    },
    economyCycles: {
+        // Unit: hours
+        itemsRespawnInterval: 24,
         // Unit: seconds
         turnDuration: 60,
         // Unit: turns
@@ -76,7 +79,7 @@
         raidMinimum: 8
     },
     wildlife: {
-        aggro: false,
+        aggro: true,
         nolife: false,
         wander: true,
         wanderRange: 5,

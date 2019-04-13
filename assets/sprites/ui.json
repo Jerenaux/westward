@@ -555,6 +555,34 @@
     {
       "filename": "positionCross",
       "frame": {"x":484,"y":448,"w":10,"h":13}
+    },
+    {
+      "filename": "arrow",
+      "frame": {"x":11,"y":615,"w":19,"h":17}
+    },
+    {
+      "filename": "arrow_lit",
+      "frame": {"x":42,"y":614,"w":19,"h":17}
+    },
+    {
+      "filename": "arrow_pressed",
+      "frame": {"x":77,"y":614,"w":19,"h":17}
+    },
+    {
+      "filename": "chest",
+      "frame": {"x":482,"y":444,"w":13,"h":11}
+    },
+    {
+      "filename": "goldenheart",
+      "frame": {"x":506,"y":442,"w":13,"h":12}
+    },
+    {
+      "filename": "bread",
+      "frame": {"x":528,"y":425,"w":9,"h":12}
+    },
+    {
+      "filename": "invisible",
+      "frame": {"x":865,"y":9,"w":150,"h":150}
     }
   ]
 }

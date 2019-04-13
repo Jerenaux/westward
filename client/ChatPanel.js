@@ -11,9 +11,9 @@ ChatPanel.prototype = Object.create(Panel.prototype);
 ChatPanel.prototype.constructor = ChatPanel;
 
 ChatPanel.prototype.addInterface = function(){
-    this.input = document.getElementById("chat");
-    this.input.style.left = (this.x+20)+"px";
-    this.input.style.top = (this.y+30)+"px";
+    this.input = this.addInput(180,10,20);
+    this.input.background = 'transparent';
+    this.input.id = 'chat';
 };
 
 ChatPanel.prototype.handleInput = function(){
@@ -56,9 +56,9 @@ NamePanel.prototype = Object.create(Panel.prototype);
 NamePanel.prototype.constructor = NamePanel;
 
 NamePanel.prototype.addInterface = function(){
-    this.input = document.getElementById("name");
-    this.input.style.left = (this.x+50)+"px";
-    this.input.style.top = (this.y+60)+"px";
+    this.input = this.addInput(220,40,50);
+    this.input.background = 'transparent';
+    this.input.id = 'name';
 };
 
 NamePanel.prototype.getValue = function(){

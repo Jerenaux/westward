@@ -33,7 +33,7 @@ describe('test', function(){
 describe('GameServer',function(){
     var stubs = [];
     before(function(done) {
-        this.timeout(3000);
+        this.timeout(5000);
         mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward');
         var db = mongoose.connection;
         db.on('error', console.error.bind(console, 'connection error:'));
@@ -42,11 +42,15 @@ describe('GameServer',function(){
             // TODO: read from config
             gs.readMap(mapsDir,false,done); 
             gs.server = {
-                sendError: function(){}
+                getNbConnected: function(){},
+                sendError: function(){},
+                sendInitializationPacket: function(){},
+                sendUpdate: function(){}
             };
         });
     });
 
+    var player;
     it('addNewPlayer',function(){
         var errInputs = [{},{new:true}];
         errInputs.forEach(function(input){
@@ -54,9 +58,102 @@ describe('GameServer',function(){
             expect(result).to.equal(null);
         });
 
-        var result = gs.addNewPlayer(null,{characterName:'Test'});
-        expect(result.name).to.equal('Test');
+        var name = 'Test';
+        var dummySocket = {id:'socket123'};
+        player = gs.addNewPlayer(null,{characterName:name});
+        player.setIDs('',dummySocket.id);
+        gs.finalizePlayer(dummySocket,player);
+        player.spawn(20,20);
+        expect(gs.getPlayer(dummySocket.id).id).to.equal(player.id);
+        expect(player.socketID).to.equal(dummySocket.id);
+        expect(player.name).to.equal(name);
     });
+
+    var animal;
+    var animalFarAway;
+    it('addAnimal', function(){
+        var x = player.x + 3;
+        var y = player.y + 3;
+        var type = 0;
+        animal = gs.addAnimal(x,y,type);
+        animalFarAway = gs.addAnimal(0,0,0);
+        expect(animal.x).to.equal(x);
+        expect(animal.y).to.equal(y);
+        expect(animal.type).to.equal(type);
+    });
+
+    
+    it('handleBattle_faraway',function(){
+        var result = gs.handleBattle(player,animalFarAway);
+        expect(result).to.equal(false);
+    });
+
+    it('handleBattle_alive',function(){
+        var result = gs.handleBattle(player,animal);
+        expect(result).to.equal(true);
+    });
+
+    it('lootNPC_alive',function(){
+        var result = gs.lootNPC(player,'animal',animal.id);
+        expect(result).to.equal(false);
+    });
+
+    it('animalDie',function(){
+       animal.die();
+        expect(animal.idle).to.equal(false);
+        expect(animal.dead).to.equal(true);
+    });
+
+    it('handleBattle_dead',function(){
+        var result = gs.handleBattle(player,animal);
+        expect(result).to.equal(false);
+    });
+
+    it('lootNPC_dead',function(){
+        var result = gs.lootNPC(player,'animal',animal.id);
+        expect(result).to.equal(true);
+    });
+
+    var item;
+    it('addItem', function(){
+        var x = player.x + 3;
+        var y = player.y - 3;
+        var type = 1;
+        item = gs.addItem(x,y,type);
+        expect(item.x).to.equal(x);
+        expect(item.y).to.equal(y);
+        expect(item.type).to.equal(type);
+    });
+
+    it('pickUpItem', function(){
+        var result = gs.pickUpItem(player,item.id);
+        expect(result).to.equal(true);
+    });
+
+    var building;
+    it('addBuilding', function(){
+        var data = {
+            x: player.x - 10,
+            y: player.y - 10,
+            type: 4
+        };
+        building = gs.addBuilding(data);
+        expect(building.x).to.equal(data.x);
+        expect(building.y).to.equal(data.y);
+        expect(building.type).to.equal(data.type);
+    });
+
+    /*it('handleShop', function(){
+        var errInputs = [{},{new:true}];
+        errInputs.forEach(function(input){
+            var result = gs.addNewPlayer(null,input);
+            expect(result).to.equal(null);
+        });
+
+        var name = 'Test';
+        player = gs.addNewPlayer(null,{characterName:name});
+        expect(player.name).to.equal(name);
+    });*/
 
     afterEach(function(){
         stubs.forEach(function(stub){

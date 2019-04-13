@@ -22,7 +22,8 @@
     "recipe": {"7":1,"21":1},
     "useInBattle": true,
     "sound": "cloth",
-    "isCrafted": true
+    "isCrafted": true,
+    "basicRecipe": true
   },
   "3":{
     "atlas": "items2",
@@ -53,15 +54,16 @@
   "6":{
     "atlas": "items2",
     "frame":"flask",
-    "name": "Cradle",
-    "desc": "Bitter potion made of daybreak and clover, regenerates a lot of health.",
+    "name": "Dawn",
+    "desc": "Bitter potion made of daybreak, regenerates a lot of health.",
     "isPotion": true,
-    "recipe": {"17":1,"18":1},
+    "recipe": {"17":1},
     "effects":{"hp":100},
     "useInBattle": true,
     "isCrafted": true,
     "craftTier": 2,
-    "sound": "alchemy"
+    "sound": "alchemy",
+    "basicRecipe": true
   },
   "7":{
     "atlas": "items",
@@ -78,7 +80,9 @@
     "name": "Thick Grass",
     "envFrames": ["bush_5"],
     "desc": "Crafting material used to make string.",
-    "sound": "soft"
+    "sound": "soft",
+    "nbBushes": 1,
+    "yield": 3
   },
   "9":{
     "atlas": "items2",
@@ -95,7 +99,8 @@
     "isCrafted": true,
     "recipe":{"43":8},
     "effects":{"def":4},
-    "sound": "cloth"
+    "sound": "cloth",
+    "basicRecipe": true
   },
   "11":{
     "atlas": "items2",
@@ -135,10 +140,12 @@
     "atlas": "items2",
     "frame":"sunflower",
     "envFrames": ["bush_3"],
-    "name": "Butterflower",
+    "name": "Sunstreak",
     "desc": "Flower with regenerative properties used to brew potions.",
     "isMaterial": true,
-    "sound": "soft"
+    "sound": "soft",
+    "nbBushes": 2,
+    "yield": 2
   },
   "15":{
     "atlas": "items2",
@@ -162,11 +169,12 @@
     "frame":"yellowpowder",
     "name": "Daybreak",
     "desc": "Alchemical substance used to brew healing potions.",
-    "recipe":{"14":2,"5":1},
+    "recipe":{"14":2,"27":1},
     "isCrafted": true,
     "craftTier": 1,
     "isMaterial": true,
-    "sound": "powder"
+    "sound": "powder",
+    "basicRecipe": true
   },
   "18":{
     "atlas": "items2",
@@ -187,7 +195,8 @@
     "useInBattle": true,
     "sound": "cloth",
     "isCrafted": true,
-    "recipe": {"43":3,"21":1}
+    "recipe": {"43":3,"21":1},
+    "basicRecipe": true
   },
   "20":{
     "atlas": "items",
@@ -195,11 +204,14 @@
     "name": "Arrow",
     "equipment": "arrows",
     "effects":{"dmg":12},
+    "isAmmo": true,
     "ammo": "quiver",
     "useInBattle": true,
     "sound": "woodsmall",
     "isCrafted": true,
-    "recipe":{"7":1,"24":1,"30":1}
+    "recipe":{"7":1,"24":1,"30":1},
+    "basicRecipe": true,
+    "output": 5
   },
   "21":{
     "atlas": "items",
@@ -209,7 +221,8 @@
     "isCrafted": true,
     "isMaterial": true,
     "recipe":{"8":3},
-    "sound": "cloth"
+    "sound": "cloth",
+    "basicRecipe": true
   },
   "22":{
     "atlas": "items2",
@@ -269,7 +282,8 @@
     "equipment": "meleew",
     "effects":{"dmg":5},
     "useInBattle": true,
-    "sound": "equip"
+    "sound": "equip",
+    "basicRecipe": true
   },
   "29":{
     "atlas": "items",
@@ -277,18 +291,22 @@
     "name": "Bone arrow",
     "equipment": "arrows",
     "effects":{"dmg":6},
+    "isAmmo": true,
     "ammo": "quiver",
     "useInBattle": true,
     "isEquipment": true,
     "isCrafted": true,
     "crafTier": 1,
-    "recipe":{"7":1,"27":1,"30":4},
-    "sound": "woodsmall"
+    "output": 5,
+    "recipe":{"7":1,"27":1,"30":1},
+    "sound": "woodsmall",
+    "basicRecipe": true
   },
   "30":{
     "atlas": "items2",
-    "frame":"feather",
-    "name": "Feather",
+    "frame":"feathers",
+    "envFrames": ["feathers"],
+    "name": "Feathers tuft",
     "desc": "Crafting material used to make arrows.",
     "isMaterial": true,
     "sound": "soft"
@@ -355,7 +373,7 @@
     "desc": "Flower with cleansing properties used to brew potions.",
     "isMaterial": true
   },
-    "38":{
+  "38":{
     "atlas": "items",
     "frame":"gold_ingot",
     "name": "Gold ingot",
@@ -378,6 +396,7 @@
     "output": 5,
     "equipment": "bullets",
     "effects":{"dmg":60},
+    "isAmmo": true,
     "ammo": "ammo_pouch",
     "useInBattle": true,
     "sound": "clank"
@@ -426,7 +445,8 @@
     "isMaterial": true,
     "recipe":{"9":1},
     "output": 5,
-    "sound": "cloth"
+    "sound": "cloth",
+    "basicRecipe": true
   },
   "44":{
     "atlas": "items2",
@@ -442,21 +462,20 @@
     "useInBattle": true
   },
   "45":{
-    "atlas": "items2",
-    "frame":"timber",
-    "name": "Shack",
-    "desc": "A small dwelling where you can rest."
-  },
-  "46":{
-    "atlas": "items2",
-    "frame":"timber",
-    "name": "Lumber camp",
-    "desc": "This small camp produces a little bit of timber."
-  },
-  "47":{
-    "atlas": "items2",
-    "frame":"timber",
-    "name": "Defense tower",
-    "desc": "A wooden tower which can shoot at enemies."
+    "atlas": "items",
+    "frame":"stone_arrow",
+    "name": "Stone arrow",
+    "equipment": "arrows",
+    "effects":{"dmg":3},
+    "isAmmo": true,
+    "ammo": "quiver",
+    "useInBattle": true,
+    "isEquipment": true,
+    "isCrafted": true,
+    "crafTier": 1,
+    "output": 5,
+    "recipe":{"7":1,"26":1,"30":1},
+    "sound": "woodsmall",
+    "basicRecipe": true
   }
 }

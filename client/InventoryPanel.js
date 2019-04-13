@@ -57,7 +57,7 @@ InventoryPanel.prototype.getNextSlot = function(){
 InventoryPanel.prototype.addSlots = function(){
     var padx = Math.floor((this.width - this.config.maxwidth*36)/2);
     var pady = 30;
-    for(var i = 0; i < this.inventory.maxSize; i++){
+    for(var i = 0; i < this.getInventory().maxSize; i++){
         var slot = this.getNextSlot();
         var row = Math.floor(i/this.config.maxwidth);
         var col = i%this.config.maxwidth;
@@ -81,9 +81,9 @@ InventoryPanel.prototype.setSlotFrame = function(slot,row,col,i){
     var initialName = 'slots-';
     var frame = initialName;
     if(i < this.config.maxwidth) frame += 'top';
-    if(i + this.config.maxwidth >= this.inventory.maxSize) frame += 'bottom';
+    if(i + this.config.maxwidth >= this.getInventory().maxSize) frame += 'bottom';
     if(col == 0) frame += 'left';
-    if(col == this.config.maxwidth-1 || i == this.inventory.maxSize-1) frame += 'right';
+    if(col == this.config.maxwidth-1 || i == this.getInventory().maxSize-1) frame += 'right';
     if(frame == initialName) frame += 'middle';
     slot.setFrame(frame);
     if(col == 0) slot.fringeSlot = true;
@@ -119,14 +119,36 @@ InventoryPanel.prototype.hasSoftFilter = function(){
     return this.config.filter && !this.config.hardFilter;
 };
 
+InventoryPanel.prototype.getInventory = function(){
+    if(this.inventory == 'player'){
+        return Engine.player.inventory;
+    }else if(this.inventory == 'building'){
+        return (Engine.currentBuiling ? Engine.currentBuiling.inventory : new Inventory(5));
+    }else if(this.inventory == 'buildRecipes'){
+        return Engine.player.buildRecipes;
+    }else{
+        console.warn('Unidentified inventory');
+        return new Inventory(5);
+    }
+};
+
+InventoryPanel.prototype.listItems = function(){
+    var items = this.getInventory().toList(true);
+    items.sort(function(a,b){
+        if(Engine.itemsData[a[0]].name < Engine.itemsData[b[0]].name) return -1;
+        return 1;
+    });
+    return items;
+};
+
 InventoryPanel.prototype.displayInventory = function(){
     this.slots.forEach(function(s){
         s.setVisible(true);
     });
     var nbDisplayed = 0;
-    this.inventory.order.forEach(function(item){
-        if(!this.inventory.items.hasOwnProperty(item)) return;
-        var amount = this.inventory.getNb(item);
+    this.listItems().forEach(function(itm){
+        var item = itm[0];
+        var amount = itm[1];
         if(amount == 0) return;
         if(this.hasHardFilter()){
             if(!this.applyFilter(item)) return;
@@ -192,9 +214,9 @@ InventoryPanel.prototype.setUpZone = function(nbDisplayed){
     this.zone.input.hitArea = polygon;
 };
 
-InventoryPanel.prototype.modifyInventory = function(inv){
+/*InventoryPanel.prototype.modifyInventory = function(inv){
     this.inventory = inv;
-};
+};*/
 
 InventoryPanel.prototype.setFilter = function(filter){
     this.config.filter = true;
