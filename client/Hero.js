@@ -33,6 +33,8 @@ var Hero = new Phaser.Class({
         this.equipment = new EquipmentManager();
 
         this.gold = data.gold;
+        this.vigor = data.vigor;
+        this.food = data.food;
         this.civiclvl = data.civiclvl;
         this.civicxp = data.civicxp;
         this.classxp = data.classxp || new classDataShell();
@@ -59,7 +61,7 @@ var Hero = new Phaser.Class({
             'classxp': this.updateClassXP,
             'dead': this.handleDeath,
             'equipment': this.updateEquipment,
-            'foodSurplus': this.updateFoodSurplus,
+            'food': this.updateFood,
             'fow': this.updateFoW,
             'gold': this.updateGold,
             'items': this.updateInventory,
@@ -67,7 +69,8 @@ var Hero = new Phaser.Class({
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
             'resetTurn': BattleManager.resetTurn,
-            'stats': this.updateStats
+            'stats': this.updateStats,
+            'vigor': this.updateVigor,
         };
 
         this.updateEvents = new Set();
@@ -227,9 +230,9 @@ var Hero = new Phaser.Class({
         this.updateEvents.add('equip');
     },
 
-    updateFoodSurplus: function(foodSurplus){
-        this.foodSurplus = foodSurplus;
-        this.updateEvents.add('character');
+    updateFood: function(food){
+        this.food = food;
+        this.updateEvents.add('food');
     },
 
     updateFoW: function(aois){
@@ -302,5 +305,10 @@ var Hero = new Phaser.Class({
                 statObj.absoluteModifiers.push(m);
             })
         }
+    },
+
+    updateVigor: function(vigor){
+        this.vigor = vigor;
+        this.updateEvents.add('vigor');
     }
 });

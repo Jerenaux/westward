@@ -65,6 +65,7 @@ function Player(){
     this.history = [];
     this.fieldOfVision = [];
     this.visitedAOIs = new Set(); // List of AOIs visitted since last fort debrief
+    this.steps = 0;
     MovingEntity.call(this);
 }
 
@@ -136,18 +137,47 @@ Player.prototype.getRegionName = function(){
     return this.region.name;
 };
 
+Player.prototype.updateSteps = function(){
+    this.steps++;
+    var limit = 1000; // arbitrary limit to avoid overflows
+    if(this.steps > limit) this.steps -= limit;
+
+    //TODO: conf
+    if(this.steps%10 == 0) this.updateVigor(-10);
+};
+
+Player.prototype.updateVigor = function(inc){
+    inc *= 1+((1000-this.food)/1000);
+    // console.warn('Updating vigor by',inc);
+    this.vigor = Utils.clamp(this.vigor+inc,0,1000);
+    this.updatePacket.vigor = this.getVigor();
+};
+
+Player.prototype.updateFood = function(inc){
+    this.food = Utils.clamp(this.food+inc,0,1000);
+    this.updatePacket.food = this.getFood();
+};
+
+Player.prototype.getVigor = function(){
+    return  Math.round(this.vigor/10);
+};
+
+Player.prototype.getFood = function(){
+    return  Math.round(this.food/10);
+};
+
 Player.prototype.setStartingInventory = function(){
     // TODO: move to some config file
-    /*this.giveItem(2,1);
-    this.giveItem(19,1);
-    this.giveItem(20,5);
-    this.giveItem(6,2);
-    this.giveItem(28,1);
-    this.giveItem(4,2);*/
-    //this.giveItem(4,3);
-    this.giveItem(28,1);
-    this.giveItem(7,1);
-    this.giveItem(21,1);
+    var list = [
+        [28,1],
+        [7,1],
+        [21,1]
+    ];
+
+    list.forEach(function(l){
+        this.giveItem(l[0],l[1]);
+        GameServer.createItem(l[0],l[1],'start');
+    }, this);
 
     this.giveGold(300);
 };
@@ -542,6 +572,8 @@ Player.prototype.initTrim = function(){
     trimmed.buildingMarkers = GameServer.listBuildingMarkers();
     trimmed.resourceMarkers = GameServer.resourceMarkers;
     trimmed.rarity = GameServer.getRarity();
+    trimmed.food = this.getFood();
+    trimmed.vigor = this.getVigor();
     return trimmed;
 };
 
@@ -597,8 +629,8 @@ Player.prototype.getDataFromDb = function(data){
     },this);
     this.setRegion(data.sid);
     this.giveGold(data.gold);
-    this.vigor = data.vigor || 100;
-    this.food = data.food || 100;
+    this.vigor = data.vigor || 1000;
+    this.food = data.food || 1000;
     this.history = data.history;
 };
 
@@ -702,7 +734,10 @@ Player.prototype.getIndividualUpdatePackage = function(){
     return pkg;
 };
 
-Player.prototype.update = function() {};
+Player.prototype.update = function() {
+    if(!GameServer.isTimeToUpdate('foodConsumption')) return;
+    this.updateFood(-15); // TODO: conf
+};
 
 Player.prototype.remove = function(){
     console.log('removing player');

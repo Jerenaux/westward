@@ -24,7 +24,7 @@ const corssss =  function (res, path) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With");
         res.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
-        res.setHeader("X-Powered-By", ' 3.2.1')
+        res.setHeader("X-Powered-By", ' 3.2.1');
         res.type("application/json");
         res.type("jpg");
 };

@@ -68,7 +68,7 @@ var Moving = new Phaser.Class({
 
     updateDepth: function(){
         //this.setDepth(Engine.playersDepth + this.tileY / 1000);
-        this.setDepth(this.tileY+1);
+        this.setDepth(this.tileY+1.6); // 1.6 to be greatet than Item's 1.5
     },
 
     manageOrientationPin: function(){

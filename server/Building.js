@@ -142,22 +142,6 @@ Building.prototype.setGold = function(gold){
     this.gold = gold;
 };
 
-Building.prototype.addCommit = function(){
-    this.commitStamps.push(1);
-    this.updateNbCommitted();
-};
-
-Building.prototype.updateCommitment = function(){
-    if(!GameServer.isTimeToUpdate('commitment')) return false;
-    this.commitStamps = [];
-    this.updateNbCommitted();
-};
-
-Building.prototype.updateNbCommitted = function(){
-    this.setProperty('committed',this.commitStamps.length);
-    this.computeProductivity();
-};
-
 Building.prototype.update = function(){
     if(this.civBuilding) return;
     if(this.built){

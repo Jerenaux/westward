@@ -114,7 +114,7 @@ Chunk.prototype.addImage = function(x,y,image){
     var isTree = (image[0] == 't');
     if(isTree){
         var frame = this.getAtlasData(image,'frame');
-        var ycutoff = frame.h*0.5;
+        var ycutoff = frame.h*0.4;
         this.drawImage(x,y,image, y, new Phaser.Geom.Rectangle(0,0,frame.w,ycutoff));
         this.drawImage(x,y,image, y+1, new Phaser.Geom.Rectangle(0,ycutoff,frame.w,frame.h-ycutoff));
     }else{

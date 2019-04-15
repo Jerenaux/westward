@@ -464,7 +464,10 @@ Engine.bootTutorial = function(part){
     Client.sendTutorialStart();
 };
 
-Engine.initWorld = function(data){ // data = initialization packet sent by server
+Engine.initWorld = function(data){
+    /* data = initialization packet sent by server, contains the data from
+    Player.initTrim() used in Hero.setUp()
+    */
     //Engine.animalUpdates = new ListMap(); // debug purpose, remove
     Engine.firstSelfUpdate = true;
 
@@ -817,6 +820,7 @@ Engine.displayHUD = function(){
     Engine.toggleMenuIcons();
 };
 
+// Called after the Hero is set up
 Engine.makeUI = function(){
     // TODO: make a zone with onpointerover = cursor is over UI, and make slices not interactive anymore
     //Engine.UIHolder = new UIHolder(1000,500,'right');
@@ -867,14 +871,14 @@ Engine.makeUI = function(){
     Engine.vigorCapsule = new Capsule(50,30,'UI','goldenheart');
     Engine.vigorCapsule.display();
     Engine.vigorCapsule.update = function(){
-        this.setText('100%'); // TODO: add max
+        this.setText(Engine.player.vigor+'%');
     };
     Engine.vigorCapsule.update();
 
     Engine.foodCapsule = new Capsule(140,30,'UI','bread');
     Engine.foodCapsule.display();
     Engine.foodCapsule.update = function(){
-        this.setText('100%'); // TODO: add max
+        this.setText(Engine.player.food+'%');
     };
     Engine.foodCapsule.update();
 
@@ -2017,9 +2021,11 @@ Engine.updateMenus = function(category){
     if(Engine.currentMenu) Engine.currentMenu.trigger(event);
 
     var capsulesMap = {
+        'food': Engine.foodCapsule,
         'gold': Engine.goldCapsule,
         'inv': Engine.bagCapsule,
-        'stats': Engine.lifeCapsule
+        'stats': Engine.lifeCapsule,
+        'vigor': Engine.vigorCapsule
     };
     if(category in capsulesMap) capsulesMap[category].update();
 };

@@ -436,12 +436,12 @@ GameServer.economyTurn = function(){
 
     GameServer.updateEconomicEntities(GameServer.settlements); // food surplus
     GameServer.updateEconomicEntities(GameServer.buildings); // prod, build, commit ...
+    GameServer.updateEconomicEntities(GameServer.players); // food
 
     for(var sid in GameServer.settlements){
         GameServer.settlements[sid].refreshListing();
     }
 
-    //GameServer.updateEconomicEntities(GameServer.players); // commit
     if(GameServer.elapsedTurns == GameServer.maxTurns) GameServer.elapsedTurns = 0;
 };
 
@@ -853,7 +853,7 @@ GameServer.pickUpItem = function(player,itemID){
     if(GameServer.itemsData[item.type].collides) GameServer.collisions.delete(item.x,item.y);
     GameServer.removeEntity(item);
     Prism.logEvent(player,'pickup',{item:item.type});
-    GameServer.createItem(item,nb,'pickup');
+    GameServer.createItem(item.type,nb,'pickup');
     return true;
 };
 

@@ -100,6 +100,7 @@ ShopInventoryPanel.prototype.getInventory = function(){
     }else if(this.inventory == 'buildRecipes') {
         return Engine.player.buildRecipes;
     }else if(this.inventory == 'crafting'){
+        // TODO: update clickable ingredients when adding owner recipes to this
         return Engine.player.craftRecipes;
     }else{
         console.warn('Unidentified inventory');
@@ -108,12 +109,16 @@ ShopInventoryPanel.prototype.getInventory = function(){
 };
 
 ShopInventoryPanel.prototype.listItems = function(){
-    items = this.getInventory().toList(true); // true = filter out zeroes
+    var items = this.getInventory().toList(true); // true = filter out zeroes
     items.sort(function(a,b){
         if(Engine.itemsData[a[0]].name < Engine.itemsData[b[0]].name) return -1;
         return 1;
     });
     return items;
+};
+
+ShopInventoryPanel.prototype.hasItem = function(item){
+    return this.getInventory().hasItem(item);
 };
 
 ShopInventoryPanel.prototype.getNextSlot = function(x,y){

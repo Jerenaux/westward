@@ -87,6 +87,8 @@ MovingEntity.prototype.updateWalk = function(){
         var y = this.path[0][1];
         this.updatePosition(x,y);
 
+        if(this.updateSteps) this.updateSteps();
+
         if(this.path.length > 1 && !this.flagToStop) {
             this.updatePathTick();
         }else{

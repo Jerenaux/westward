@@ -37,10 +37,15 @@ Misc:
 - add esc shortcut
 - "new" marker
 - Events formatting
-- Add other plants
+- Add other plants, edible berries ...
 - Aggro issue
-- In battle, items appear on top of fighters
 
+- Upon login, compute food consumption
+- Fatigue maluses to battle stats
+- Make food edible
+- Make vigor potion
+- Enable rest effect of shacks (upon login, compute vigor increase)
+- Allow food to be given to buildings + compute and apply productivity
 
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
@@ -153,6 +158,7 @@ V1 level:
 
 Admin
 -----
+Look into push notificatins server
 Improve admin tables
 Flush screenshots
 Make cmd line system
