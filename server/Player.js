@@ -347,7 +347,11 @@ Player.prototype.canCraft = function(item, nb){
         if(!this.hasItem(itm,recipe[itm]*nb)) return false;
     }
     return true;
-},
+};
+
+Player.prototype.getItemNb = function(item){
+    return this.inventory.getNb(item);
+};
 
 Player.prototype.hasItem = function(item,nb){
     return (this.inventory.getNb(item) >= nb);

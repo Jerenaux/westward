@@ -1,7 +1,6 @@
 On deploy:
 - Test gs.handleGold()
 - Test handleCraft (normal + when a price is undefined)
-- Test setPrices
 => Automate these eventually
 => After bug, systematically create test!
 

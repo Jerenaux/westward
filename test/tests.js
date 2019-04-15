@@ -109,8 +109,12 @@ describe('GameServer',function(){
     });
 
     it('lootNPC_dead',function(){
-        var result = gs.lootNPC(player,'animal',animal.id);
-        expect(result).to.equal(true);
+        var lootTable = gs.animalsData[animal.type].loot;
+        var itemID = Object.keys(lootTable)[0];
+        var nb = lootTable[itemID];
+        var initNb = player.getItemNb(itemID);
+        gs.lootNPC(player,'animal',animal.id);
+        expect(player.getItemNb(itemID)).to.equal(initNb+nb);
     });
 
     var item;
@@ -125,8 +129,9 @@ describe('GameServer',function(){
     });
 
     it('pickUpItem', function(){
-        var result = gs.pickUpItem(player,item.id);
-        expect(result).to.equal(true);
+        var initNb = player.getItemNb(item.type);
+        gs.pickUpItem(player,item.id);
+        expect(player.getItemNb(item.type)).to.equal(initNb+1);
     });
 
     var building;
@@ -153,11 +158,30 @@ describe('GameServer',function(){
         expect(result).to.equal(true);
     });
 
+    it('building_giveItem',function(){
+        var itemID = 1;
+        var nb = 3;
+        var initNb = building.getItemNb(itemID);
+        building.giveItem(itemID,nb);
+        expect(building.getItemNb(itemID)).to.equal(initNb+nb);
+    });
+
+    it('setBuildingPrices',function(){
+        building.owner = player.id;
+        var itemID = 1;
+        var buy = 10;
+        var sell = 20;
+        gs.setBuildingPrice({item:itemID,buy:buy,sell:sell},player.socketID);
+        expect(building.getPrice(itemID,1,'buy')).to.equal(buy);
+        expect(building.getPrice(itemID,1,'sell')).to.equal(sell);
+    });
+
     it('handleShop', function(){
-        // TODO: expand test caes
+        // TODO: expand test cases
+        building.giveItem(15,1);
         var testCases = [
             {in: {action:'buy',id:10,nb:1},out:false},
-            {in: {action:'sell',id:10,nb:1},out:false}
+            {in: {action:'sell',id:10,nb:1},out:false},
         ];
         testCases.forEach(function(testcase){
             var result = gs.handleShop(testcase.in,player.socketID);
@@ -167,7 +191,18 @@ describe('GameServer',function(){
 
     it('handleUse_equip', function(){
         var result = gs.handleUse({item:28},player.socketID);
+        expect(result).to.equal(true);
+        // TODO: test player equipment instead
     });
+
+    // TODO: expand test cases + test results with gs methods for all tests
+
+    /*it('handleGold', function(){
+        var result = gs.handleUse({nb:10},player.socketID);
+        expect(result).to.equal(true);
+        result = gs.handleUse({nb:-10},player.socketID);
+        expect(result).to.equal(true);
+    });*/
 
     afterEach(function(){
         stubs.forEach(function(stub){

@@ -1001,10 +1001,10 @@ GameServer.setBuildingPrice = function(data,socketID){
 
 GameServer.handleGold = function(data,socketID){
     var amount = data.nb;
-    if(amount == 0) return;
+    if(amount == 0) return false;
     var player = GameServer.getPlayer(socketID);
     var building = GameServer.buildings[player.inBuilding];
-    if(!building.isOwnedBy(player)) return;
+    if(!building.isOwnedBy(player)) return false;
     if(amount < 0){
         amount = Utils.clamp(-amount,0,building.gold);
         building.takeGold(amount);
@@ -1015,6 +1015,7 @@ GameServer.handleGold = function(data,socketID){
         building.giveGold(amount);
     }
     building.save();
+    return true;
 };
 
 GameServer.handleShop = function(data,socketID) {
@@ -1080,6 +1081,7 @@ GameServer.handleShop = function(data,socketID) {
     }
     building.save();
     Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type});
+    return true;
 };
 
 GameServer.handleBuild = function(data,socketID) {
