@@ -1014,6 +1014,7 @@ GameServer.handleGold = function(data,socketID){
         player.takeGold(amount,true);
         building.giveGold(amount);
     }
+    Prism.logEvent(player,'gold',{amount:amount,building:building.type});
     building.save();
     return true;
 };

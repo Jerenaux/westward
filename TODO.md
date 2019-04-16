@@ -169,7 +169,7 @@ Secure
 
 Analytics:
 ---------
-- Log: price setting, handleShop, handleGold, tutorial begins, progress (each step) and ends
+- Log: price setting, handleGold, tutorial begins, progress (each step) and ends
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions

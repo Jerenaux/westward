@@ -71,6 +71,15 @@ var ExploreEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var GoldEvent = Event.discriminator(
+    'GoldEvent',
+    new mongoose.Schema({
+        amount: Number,
+        building: Number
+    }),
+    {discriminatorKey: 'kind'}
+);
+
 var BuildingEvent = Event.discriminator(
     'BuildingEvent',
     new mongoose.Schema({
@@ -164,6 +173,7 @@ Prism.logEvent = function(player,action,data){
         'craft': CraftEvent,
         'disconnect': DisconnectEvent,
         'explore': ExploreEvent,
+        'gold': GoldEvent,
         'loot': LootEvent,
         'menu': MenuEvent,
         'newbuilding': NewBuildingEvent,
