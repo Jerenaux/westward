@@ -14,6 +14,10 @@ var EquipmentManager = require('../shared/Equipment.js').EquipmentManager;
 var Formulas = require('../shared/Formulas.js').Formulas;
 var Prism = require('./Prism.js').Prism;
 
+//TODO: conf
+var FOOD_MAX = 1000;
+var VIGOR_MAX = 1000;
+
 function Player(){
     this.updatePacket = new PersonalUpdatePacket();
     this.isPlayer = true;
@@ -30,8 +34,8 @@ function Player(){
     this.sid = 0;
     this.settlement = null;
     this.gold = 0;
-    this.vigor = 100;
-    this.food = 100;
+    this.vigor = VIGOR_MAX;
+    this.food = FOOD_MAX;
     this.inBuilding = -1;
     this.civiclvl = 0;
     this.civicxp = 0;
@@ -143,18 +147,19 @@ Player.prototype.updateSteps = function(){
     if(this.steps > limit) this.steps -= limit;
 
     //TODO: conf
-    if(this.steps%10 == 0) this.updateVigor(-10);
+    if(this.steps%100 == 0) this.updateVigor(-10);
 };
 
 Player.prototype.updateVigor = function(inc){
-    inc *= 1+((1000-this.food)/1000);
+    inc *= 1+((VIGOR_MAX-this.food)/VIGOR_MAX);
     // console.warn('Updating vigor by',inc);
-    this.vigor = Utils.clamp(this.vigor+inc,0,1000);
+    this.vigor = Utils.clamp(this.vigor+inc,0,VIGOR_MAX);
     this.updatePacket.vigor = this.getVigor();
+    this.applyVigorModifier();
 };
 
 Player.prototype.updateFood = function(inc){
-    this.food = Utils.clamp(this.food+inc,0,1000);
+    this.food = Utils.clamp(this.food+inc,0,FOOD_MAX);
     this.updatePacket.food = this.getFood();
 };
 
@@ -244,43 +249,17 @@ Player.prototype.respawn = function(){
     // TODO: loose loot
 };
 
-Player.prototype.applyFoodModifier = function(foodSurplus){ // %
-    if(isNaN(foodSurplus)) return; // Could happen if no fort
-    var foodModifier = Formulas.decimalToPct(Formulas.computePlayerFoodModifier(Formulas.pctToDecimal(foodSurplus)));
-    if(foodModifier == this.foodModifier) return;
+Player.prototype.applyVigorModifier = function(){
+    var delta = VIGOR_MAX/10 - this.getVigor();
+    var malus = Utils.clamp(delta-30,0,VIGOR_MAX/10);
+    if(malus == 0) return;
     this.getStats().forEach(function(stat){
         if(Stats[stat].noModifier) return;
         var statObj = this.getStat(stat);
-        if(this.foodModifier !== null) statObj.removeRelativeModifier(this.foodModifier);
-        statObj.addRelativeModifier(foodModifier);
+        statObj.clearRelativeModifiers();
+        statObj.addRelativeModifier(-malus);
         this.refreshStat(stat);
     },this);
-    this.foodModifier = foodModifier;
-    this.updatePacket.foodSurplus = foodSurplus;
-};
-
-Player.prototype.gainCivicXP = function(inc,notify){
-    if(notify) this.addNotif('+'+inc+' Civic XP');
-    var max = Formulas.computeMaxCivicXP(this.civiclvl);
-    this.civicxp = Utils.clamp(this.civicxp+inc,0,GameServer.characterParameters.maxCivicXP);
-    if(this.civicxp >= max){
-        if(this.civiclvl == GameServer.characterParameters.maxCivicLvl){
-            this.civicxp = max;
-        }else{
-            this.civicxp -= max;
-            this.civiclvl++;
-            var nb = 3;
-            this.ap[4] += nb; // TODO: vary number
-            this.updatePacket.ap = this.ap;
-            this.updatePacket.civiclvl = this.civiclvl;
-            if(notify) {
-                this.addNotif('Reached Civic level '+this.civiclvl+'!');
-                this.addNotif('Earned '+nb+' AP!');
-            }
-
-        }
-    }
-    this.updatePacket.civicxp = this.civicxp;
 };
 
 Player.prototype.gainClassXP = function(classID,inc,notify){
@@ -633,8 +612,8 @@ Player.prototype.getDataFromDb = function(data){
     },this);
     this.setRegion(data.sid);
     this.giveGold(data.gold);
-    this.vigor = data.vigor || 1000;
-    this.food = data.food || 1000;
+    this.vigor = data.vigor || VIGOR_MAX;
+    this.food = data.food || FOOD_MAX;
     this.history = data.history;
 };
 

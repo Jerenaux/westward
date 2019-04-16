@@ -47,17 +47,18 @@
   "5":{
     "atlas": "items2",
     "frame":"root",
-    "name": "Root",
-    "desc": "Root of a common plant all over the Continent. Crafting material involved in the brewing of several types of potions.",
-    "isMaterial": true
+    "name": "Sunstreak root",
+    "desc": "Crafting material involved in the brewing of several types of potions.",
+    "isMaterial": true,
+    "yield": 2
   },
   "6":{
     "atlas": "items2",
     "frame":"flask",
     "name": "Dawn",
-    "desc": "Bitter potion made of daybreak, regenerates a lot of health.",
+    "desc": "Bitter potion, regenerates a lot of health.",
     "isPotion": true,
-    "recipe": {"17":1},
+    "recipe": {"17":1,"18":4},
     "effects":{"hp":100},
     "useInBattle": true,
     "isCrafted": true,
@@ -145,7 +146,8 @@
     "isMaterial": true,
     "sound": "soft",
     "nbBushes": 2,
-    "yield": 2
+    "yield": 2,
+    "coitems": [5]
   },
   "15":{
     "atlas": "items2",
@@ -179,11 +181,13 @@
   "18":{
     "atlas": "items2",
     "frame":"clover",
-    "name": "Clover",
-    "envFrames": ["clovers"],
+    "name": "Daydream",
+    "envFrames": ["clovers_1","clovers_2","clovers_3"],
     "desc": "Plant used as alchemical ingredient for brewing health potions.",
     "isMaterial": true,
-    "sound": "soft"
+    "sound": "soft",
+    "nbBushes": 4,
+    "yield": 5
   },
   "19":{
     "atlas": "items",
@@ -476,6 +480,20 @@
     "output": 5,
     "recipe":{"7":1,"26":1,"30":1},
     "sound": "woodsmall",
+    "basicRecipe": true
+  },
+  "46":{
+    "atlas": "items2",
+    "frame":"duskflask",
+    "name": "Dusk",
+    "desc": "Sweet potion, regenerates vigor.",
+    "isPotion": true,
+    "recipe": {"5":1},
+    "effects":{"vigor":30},
+    "useInBattle": true,
+    "isCrafted": true,
+    "craftTier": 1,
+    "sound": "alchemy",
     "basicRecipe": true
   }
 }

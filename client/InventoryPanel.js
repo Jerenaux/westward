@@ -11,6 +11,7 @@ function InventoryPanel(x,y,width,height,title,invisible){
     this.slotsAdded = false;
     this.zone = this.createZone();
     this.dataMap = Engine.itemsData;
+    this.depth = 2;
 }
 
 InventoryPanel.prototype = Object.create(Panel.prototype);

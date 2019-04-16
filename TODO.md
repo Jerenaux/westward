@@ -39,11 +39,12 @@ Misc:
 - Add other plants, edible berries ...
 - Aggro issue
 
+
+- Make vigor potion (allow items to affect vigor & food)
+- Make food edible (restore health?)
+- Add berries
 - Upon login, compute food consumption
-- Fatigue maluses to battle stats
-- Make food edible
-- Make vigor potion
-- Enable rest effect of shacks (upon login, compute vigor increase)
+- Enable rest effects (vigor & health?) of shacks (upon login, compute vigor increase)
 - Allow food to be given to buildings + compute and apply productivity
 
 

@@ -155,6 +155,10 @@ Stat.prototype.removeRelativeModifier = function(modifier){
     if(idx > -1) this.relativeModifiers.splice(idx,1);
 };
 
+Stat.prototype.clearRelativeModifiers = function(){
+    this.relativeModifiers = [];
+};
+
 Stat.prototype.trim = function(){
       var obj = {
           k: this.key,

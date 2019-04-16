@@ -848,13 +848,23 @@ GameServer.pickUpItem = function(player,itemID){
     if(!GameServer.items.hasOwnProperty(itemID)) return false;
     var item = GameServer.items[itemID];
     // TODO: check for proximity
-    var nb = GameServer.itemsData[item.type].yield || 1;
-    player.giveItem(item.type,nb,true,'Picked');
+    GameServer.forage(player,item.type);
+    if(GameServer.itemsData[item.type].coitems){
+        GameServer.itemsData[item.type].coitems.forEach(function(cotype){
+            GameServer.forage(player,cotype);
+        });
+    }
     if(GameServer.itemsData[item.type].collides) GameServer.collisions.delete(item.x,item.y);
     GameServer.removeEntity(item);
-    Prism.logEvent(player,'pickup',{item:item.type});
-    GameServer.createItem(item.type,nb,'pickup');
     return true;
+};
+
+GameServer.forage = function(player, type){
+    var nb = GameServer.itemsData[type].yield || 1;
+    player.giveItem(type,nb,true,'Picked');
+    Prism.logEvent(player,'pickup',{item:type});
+    GameServer.createItem(type,nb,'pickup');
+
 };
 
 /**

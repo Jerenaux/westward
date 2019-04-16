@@ -101,6 +101,10 @@
       "frame": {"x":288,"y":312,"w":24,"h":24}
     },
     {
+      "filename": "duskflask",
+      "frame": {"x":192,"y":312,"w":24,"h":24}
+    },
+    {
       "filename": "stingleaf",
       "frame": {"x":120,"y":456,"w":24,"h":24}
     },
