@@ -58,8 +58,8 @@ ItemSlot.prototype.addPrice = function(){
 };
 
 ItemSlot.prototype.addEffect = function(){
-    this.staticon = UI.scene.add.sprite(this.x + 70, this.y + 45, 'icons2');
-    this.effect = UI.scene.add.text(this.x + 88, this.y + 35, '', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.staticon = UI.scene.add.sprite(this.x + 70, this.y + 45, 'UI');
+    this.effect = UI.scene.add.text(this.x + 83, this.y + 35, '', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
     this.content.push(this.staticon);
     this.content.push(this.effect);
 };

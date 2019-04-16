@@ -29,8 +29,7 @@
         explorer: 3
    },
    character: {
-        variables: {
-            commitSlots: 2,
+        variables: { // Default starting values
             def: 7,
             dmg: 19,
             hpmax: 300

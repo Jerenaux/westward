@@ -871,16 +871,25 @@ Engine.makeUI = function(){
     Engine.vigorCapsule = new Capsule(50,30,'UI','goldenheart');
     Engine.vigorCapsule.display();
     Engine.vigorCapsule.update = function(){
-        this.setText(Engine.player.vigor+'%');
+        // this.setText(Engine.player.vigor+'%');
+        this.setText(Engine.player.getStatValue('vigor')+'%');
     };
-    Engine.vigorCapsule.update();
 
     Engine.foodCapsule = new Capsule(140,30,'UI','bread');
     Engine.foodCapsule.display();
     Engine.foodCapsule.update = function(){
-        this.setText(Engine.player.food+'%');
+        // this.setText(Engine.player.food+'%');
+        this.setText(Engine.player.getStatValue('food')+'%');
     };
-    Engine.foodCapsule.update();
+
+    Engine.capsules = {
+        update: function(){
+            Engine.lifeCapsule.update();
+            Engine.foodCapsule.update();
+            Engine.vigorCapsule.update();
+        }
+    };
+    Engine.capsules.update();
 
     Engine.makeBuildingTitle();
 
@@ -2021,11 +2030,11 @@ Engine.updateMenus = function(category){
     if(Engine.currentMenu) Engine.currentMenu.trigger(event);
 
     var capsulesMap = {
-        'food': Engine.foodCapsule,
+        // 'food': Engine.foodCapsule,
         'gold': Engine.goldCapsule,
         'inv': Engine.bagCapsule,
-        'stats': Engine.lifeCapsule,
-        'vigor': Engine.vigorCapsule
+        'stats': Engine.capsules,
+        // 'vigor': Engine.vigorCapsule
     };
     if(category in capsulesMap) capsulesMap[category].update();
 };

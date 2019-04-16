@@ -71,7 +71,7 @@ Tooltip.prototype.makeStatsIcons = function(){
         }
         var x = this.x+15;
         var y = this.y+(30*(i + 1));
-        var icon = UI.scene.add.sprite(x,y,'icons2', statData.frame);
+        var icon = UI.scene.add.sprite(x,y,'UI', statData.frame);
         var text = UI.scene.add.text(x+30,y+2, '100',
             { font: '12px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
         );

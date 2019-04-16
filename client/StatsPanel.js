@@ -32,9 +32,9 @@ StatsPanel.prototype.addStats = function(){
 StatsPanel.prototype.addStat = function(x,y,s){
     var stat = Stats[s];
     var statObj = {};
-    var icon = UI.scene.add.sprite(x,y,'icons2',stat.frame);
+    var icon = UI.scene.add.sprite(x+18,y+11,'UI',stat.frame);
     icon.setScrollFactor(0);
-    icon.setDisplayOrigin(0,0);
+    // icon.setDisplayOrigin(0,0);
     icon.setDepth(1);
     icon.setVisible(false);
     statObj.icon = icon;
@@ -48,9 +48,10 @@ StatsPanel.prototype.addStat = function(x,y,s){
     statObj.text = text;
     this.content.push(text);
 
-    var zone = UI.scene.add.zone(x,y,70,30);
+    var zone = UI.scene.add.zone(x,y,100,30);
     zone.setDepth(10);
     zone.setScrollFactor(0);
+    zone.setOrigin(0);
     zone.setVisible(false);
     zone.setInteractive();
     zone.on('pointerover',function(){

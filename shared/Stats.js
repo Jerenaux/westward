@@ -16,44 +16,55 @@ var Stats = {
         hidden: true
     },
     hp: {
-        name: 'Health',
-        desc: 'If it gets to 0, you die. Potions can replenish it.',
+        name: 'Vitality',
+        desc: 'Represents how healthy you are. If it gets to 0, you die. Look for medicine to replenish.',
         min: 0,
         max: 10000,
-        frame: 1,
+        frame: 'heart',
         hasMax: 'hpmax',
         noModifier: true
     },
-    /*fat: {
-        name: 'Fatigue',
-        desc: 'Fatigue increases as you perform actions and can impact your other stats negatively past a certain point. Rest and some potions can reduce it.',
+    vigor: {
+        name: 'Vigor',
+        desc: 'Decreases as you perform actions and become tired. If it gets too low, it will negatively impact your other stats and disable most of your abilities. Look for shelter to replenish.',
         min: 0,
         max: 100,
-        start: 0,
-        frame: 0,
+        default: 100,
+        noModifier: true,
+        frame: 'goldenheart',
         suffix: '%'
-    },*/
+    },
+    food: {
+        name: 'Food',
+        desc: 'Decreases over time. As it gets lower, your vigor will decrease faster and faster. Look for food to replenish.',
+        min: 0,
+        max: 100,
+        default: 100,
+        noModifier: true,
+        frame: 'bread',
+        suffix: '%'
+    },
     dmg: {
         name: 'Damage',
         desc: 'Offensive power of your attacks. Depends on the currently equipped weapon (melee or ranged).',
         min: 0,
         max: 1000,
-        frame: 3
+        frame: 'sword'
     },
     def: {
         name: 'Defense',
         desc: 'Resistance to all types of damage. Can be increased by several pieces of equipment.',
         min: 0,
         max: 1000,
-        frame:4
+        frame: 'armor'
     },
     acc: {
         name: 'Accuracy',
-        desc: 'Indicates your base chances to hit a target with a ranged weapon. It depends on the currently equipped ranged weapon. In battle, this number decreases based on the distance to the target.',
+        desc: 'Base chances to hit a target with a ranged weapon. Depends on the currently equipped ranged weapon. In battle, this number decreases based on the distance to the target.',
         min: 0,
         max: 100,
         default: 50,
-        frame: 2,
+        frame: 'bullseye',
         suffix: '%'
     }
 };
@@ -67,16 +78,14 @@ function StatsContainer(){
     }
 }
 
-/*function getStatsShell(){
-    var shell = {};
+StatsContainer.prototype.toList = function(){
+    var list = [];
     for(var statKey in Stats){
         if(!Stats.hasOwnProperty(statKey)) return;
-        var statData = Stats[statKey];
-        var max = (statData.hasMax ? shell[statData.hasMax] : null);
-        shell[statKey] = new Stat(statKey,statData.default,max);
+        list.push({stat:statKey,value:this[statKey].getBaseValue()});
     }
-    return shell;
-}*/
+    return list;
+};
 
 if (onServer){
     module.exports.Stats = Stats;

@@ -37,8 +37,6 @@ let Schemas = {
         x: {type: Number, min: 0, required: true},
         y: {type: Number, min: 0, required: true},
         gold: {type: Number, min: 0, default: 0},
-        vigor: {type: Number, min: 0, max: 999999, default: 1000},
-        food: {type: Number, min: 0, max: 999999, default: 1000},
         civiclvl: {type: Number, min: 0, default: 0},
         civicxp: {type: Number, min: 0, default: 0},
         classxp: mongoose.Schema.Types.Mixed,
@@ -50,8 +48,10 @@ let Schemas = {
         inventory: {type: [[]], set:function(inventory){
                 return inventory.toList(true); // true: filter zeroes
             }},
+        stats: {type: [], set:function(stats){
+                return stats.toList();
+            }},
         history: {type: []}
-        // stats are NOT saved, as they only consist in base values + modifiers; modifiers are re-applied contextually, not saved
     })
 };
 

@@ -38,8 +38,9 @@ Misc:
 - Events formatting
 - Add other plants, edible berries ...
 - Aggro issue
+- Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
 
-
+- Fix stats saving
 - Make vigor potion (allow items to affect vigor & food)
 - Make food edible (restore health?)
 - Add berries

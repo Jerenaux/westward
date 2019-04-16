@@ -13,7 +13,6 @@ var UI = {
 
         this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
         this.load.atlas('banners', 'assets/sprites/stlbanner.png', 'assets/sprites/stlbanner.json');
-        this.load.spritesheet('icons2', 'assets/sprites/icons.png',{frameWidth:25,frameHeight:24});
 
         this.load.json('texts', 'assets/data/texts.json');
         this.load.json('classes', 'assets/data/classes.json');

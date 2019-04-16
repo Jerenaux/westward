@@ -147,28 +147,42 @@ Player.prototype.updateSteps = function(){
     if(this.steps > limit) this.steps -= limit;
 
     //TODO: conf
-    if(this.steps%100 == 0) this.updateVigor(-10);
+    if(this.steps%10 == 0) this.updateVigor(-1);
 };
 
 Player.prototype.updateVigor = function(inc){
-    inc *= 1+((VIGOR_MAX-this.food)/VIGOR_MAX);
+    /*inc *= 1+((VIGOR_MAX-this.food)/VIGOR_MAX);
     // console.warn('Updating vigor by',inc);
     this.vigor = Utils.clamp(this.vigor+inc,0,VIGOR_MAX);
-    this.updatePacket.vigor = this.getVigor();
+    this.updatePacket.vigor = this.getVigor();*/
+
+    var food = this.getStat('food');
+    var vigor = this.getStat('vigor');
+    inc *= 1+((food.getCap()-food.getValue())/food.getCap());
+    vigor.increment(inc);
+    this.refreshStat('vigor');
     this.applyVigorModifier();
 };
 
 Player.prototype.updateFood = function(inc){
-    this.food = Utils.clamp(this.food+inc,0,FOOD_MAX);
-    this.updatePacket.food = this.getFood();
+    // this.food = Utils.clamp(this.food+inc,0,FOOD_MAX);
+    // this.updatePacket.food = this.getFood();
+    this.getStat('food').increment(inc);
+    this.refreshStat('food');
 };
 
-Player.prototype.getVigor = function(){
-    return  Math.round(this.vigor/10);
-};
-
-Player.prototype.getFood = function(){
-    return  Math.round(this.food/10);
+Player.prototype.applyVigorModifier = function(){
+    var vigor = this.getStat('vigor');
+    var delta = vigor.getCap()- vigor.getValue();
+    var malus = Utils.clamp(delta-30,0,vigor.getCap());
+    if(malus == 0) return;
+    this.getStats().forEach(function(stat){
+        if(Stats[stat].noModifier) return;
+        var statObj = this.getStat(stat);
+        statObj.clearRelativeModifiers();
+        statObj.addRelativeModifier(-malus);
+        this.refreshStat(stat);
+    },this);
 };
 
 Player.prototype.setStartingInventory = function(){
@@ -195,7 +209,6 @@ Player.prototype.setUpStats = function(){
         this.setStat(s,v[s]);
     },this);
     this.maxStat('hp');
-    this.foodModifier = null;
 };
 
 Player.prototype.maxStat = function(key){
@@ -247,19 +260,6 @@ Player.prototype.respawn = function(){
     this.setOrUpdateAOI();
     this.save();
     // TODO: loose loot
-};
-
-Player.prototype.applyVigorModifier = function(){
-    var delta = VIGOR_MAX/10 - this.getVigor();
-    var malus = Utils.clamp(delta-30,0,VIGOR_MAX/10);
-    if(malus == 0) return;
-    this.getStats().forEach(function(stat){
-        if(Stats[stat].noModifier) return;
-        var statObj = this.getStat(stat);
-        statObj.clearRelativeModifiers();
-        statObj.addRelativeModifier(-malus);
-        this.refreshStat(stat);
-    },this);
 };
 
 Player.prototype.gainClassXP = function(classID,inc,notify){
@@ -555,8 +555,8 @@ Player.prototype.initTrim = function(){
     trimmed.buildingMarkers = GameServer.listBuildingMarkers();
     trimmed.resourceMarkers = GameServer.resourceMarkers;
     trimmed.rarity = GameServer.getRarity();
-    trimmed.food = this.getFood();
-    trimmed.vigor = this.getVigor();
+    // trimmed.food = this.getFood();
+    // trimmed.vigor = this.getVigor();
     return trimmed;
 };
 
@@ -588,7 +588,15 @@ Player.prototype.getDataFromDb = function(data){
     this.civicxp = data.civicxp;
     this.classxp = data.classxp;
     this.classlvl = data.classlvl;
-    // stats are not saved, see schema
+
+    if(!data.stats) data.stats = [];
+    console.warn(data.stats);
+    data.stats.forEach(function(stat){
+        console.log(stat);
+        console.log(this.getStat(stat.stat));
+        this.getStat(stat.stat).setBaseValue(stat.value);
+    },this);
+    this.applyVigorModifier();
 
     for(var slot in data.equipment.slots){
         var item = data.equipment.slots[slot];
@@ -612,8 +620,8 @@ Player.prototype.getDataFromDb = function(data){
     },this);
     this.setRegion(data.sid);
     this.giveGold(data.gold);
-    this.vigor = data.vigor || VIGOR_MAX;
-    this.food = data.food || FOOD_MAX;
+    // this.vigor = data.vigor || VIGOR_MAX;
+    // this.food = data.food || FOOD_MAX;
     this.history = data.history;
 };
 

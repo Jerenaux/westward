@@ -581,6 +581,18 @@
       "frame": {"x":528,"y":425,"w":9,"h":12}
     },
     {
+      "filename": "armor",
+      "frame": {"x":526,"y":440,"w":14,"h":15}
+    },
+    {
+      "filename": "bullseye",
+      "frame": {"x":503,"y":457,"w":15,"h":14}
+    },
+    {
+      "filename": "sword",
+      "frame": {"x":524,"y":459,"w":17,"h":16}
+    },
+    {
       "filename": "invisible",
       "frame": {"x":865,"y":9,"w":150,"h":150}
     }

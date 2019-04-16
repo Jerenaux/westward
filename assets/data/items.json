@@ -494,6 +494,6 @@
     "isCrafted": true,
     "craftTier": 1,
     "sound": "alchemy",
-    "basicRecipe": true
+    "basicRecipe": false
   }
 }

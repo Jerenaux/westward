@@ -33,8 +33,8 @@ var Hero = new Phaser.Class({
         this.equipment = new EquipmentManager();
 
         this.gold = data.gold;
-        this.vigor = data.vigor;
-        this.food = data.food;
+        // this.vigor = data.vigor;
+        // this.food = data.food;
         this.civiclvl = data.civiclvl;
         this.civicxp = data.civicxp;
         this.classxp = data.classxp || new classDataShell();
@@ -61,7 +61,7 @@ var Hero = new Phaser.Class({
             'classxp': this.updateClassXP,
             'dead': this.handleDeath,
             'equipment': this.updateEquipment,
-            'food': this.updateFood,
+            // 'food': this.updateFood,
             'fow': this.updateFoW,
             'gold': this.updateGold,
             'items': this.updateInventory,
@@ -70,7 +70,7 @@ var Hero = new Phaser.Class({
             'notifs': this.handleNotifs,
             'resetTurn': BattleManager.resetTurn,
             'stats': this.updateStats,
-            'vigor': this.updateVigor,
+            // 'vigor': this.updateVigor,
         };
 
         this.updateEvents = new Set();
