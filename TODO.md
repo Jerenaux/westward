@@ -40,9 +40,7 @@ Misc:
 - Aggro issue
 - Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
 
-- Fix stats saving
-- Make vigor potion (allow items to affect vigor & food)
-- Make food edible (restore health?)
+- Make battle actions decrease vigor
 - Add berries
 - Upon login, compute food consumption
 - Enable rest effects (vigor & health?) of shacks (upon login, compute vigor increase)
@@ -159,7 +157,7 @@ V1 level:
 
 Admin
 -----
-Look into push notificatins server
+Look into push notificatins server (https://www.pushsafer.com/dashboard)
 Improve admin tables
 Flush screenshots
 Make cmd line system

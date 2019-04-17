@@ -71,10 +71,12 @@ Tooltip.prototype.makeStatsIcons = function(){
         }
         var x = this.x+15;
         var y = this.y+(30*(i + 1));
-        var icon = UI.scene.add.sprite(x,y,'UI', statData.frame);
-        var text = UI.scene.add.text(x+30,y+2, '100',
+        var icon = UI.scene.add.sprite(x+3,y,'UI', statData.frame);
+        icon.setOrigin(0.5);
+        var text = UI.scene.add.text(x+20,y+2, '100',
             { font: '12px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
         );
+        text.setOrigin(0,0.5);
         icon.dontDisplay = true;
         text.dontDisplay = true;
         this.icons.push(icon);
@@ -143,18 +145,20 @@ Tooltip.prototype.displayStats = function(effects,nbEffects){
                 continue;
             }
             if(val > 0) val = "+"+val;
-            if(statData.suffix) val = val+statData.suffix;
+            // if(statData.suffix) val = val+statData.suffix;
             var icon = this.icons[i];
             var text = this.iconsTexts[i];
-            icon.y = this.y + descH + (30*(i + 1));
-            text.y = this.y + descH+ (30*(i + 1)) + 2;
             icon.setFrame(statData.frame);
             text.setText(val);
+            var y = this.y + descH + (32*(i + 1));
+            icon.y = y+2;
+            text.y = y;
         }
         i++;
     }
 };
 
+// When hovering stats in StatsPanel
 Tooltip.prototype.displayModifiers = function(stat){
     var statObj = Engine.player.getStat(stat);
     var y = this.y + 5;

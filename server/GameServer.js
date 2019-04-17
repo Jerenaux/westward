@@ -368,6 +368,7 @@ GameServer.onInitialized = function(){
     GameServer.addAnimal(504,678,0);
     GameServer.addAnimal(502,681,0);
     GameServer.addAnimal(500,679,0);
+    GameServer.addItem(1199,148,46);
 };
 
 /**
@@ -582,7 +583,7 @@ GameServer.loadPlayer = function(socket,id){
             player.getDataFromDb(doc);
             player.setModel(doc);
             player.spawn(player.x, player.y);
-            GameServer.finalizePlayer(socket,player);
+            GameServer.finalizePlayer(socket,player); // sends the init packet
         }
     );
 };
@@ -1048,6 +1049,7 @@ GameServer.handleShop = function(data,socketID) {
             if (!player.canBuy(price)) return false;
             player.takeGold(price, true);
             building.giveGold(price);
+            player.updateVigor(-3); // TODO: vary + conf
             var phrase = [player.name,'bought',nb,GameServer.itemsData[item].name,'for',price,Utils.formatMoney(price),'in my shop'];
             var msg = phrase.join(' ');
             GameServer.notifyPlayer(building.owner,msg);
@@ -1070,6 +1072,7 @@ GameServer.handleShop = function(data,socketID) {
             if(price == 0) return false;
             player.giveGold(price, true);
             building.takeGold(price);
+            player.updateVigor(-3); // TODO: vary + conf
             player.gainClassXP(GameServer.classes.merchant,Math.floor(price/10), true); // TODO: factor in class level
         }
         var verb = (isFinancial ? 'Sold' : 'Gave');
@@ -1201,6 +1204,7 @@ GameServer.handleCraft = function(data,socketID){
     }
     GameServer.operateCraft(player, targetItem, nb);
     if(isFinancial) building.giveGold(player.takeGold(price));
+    player.updateVigor(-3*nb); // TODO: vary + conf
     player.gainClassXP(GameServer.classes.craftsman,5*nb,true); // TODO: vary based on multiple factors
     if(!building.isOwnedBy(player)) {
         var phrase = [player.name,'crafted',nb,GameServer.itemsData[targetItem].name,'for',price,Utils.formatMoney(price),'in my Workshop'];

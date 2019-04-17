@@ -34,11 +34,8 @@ function Player(){
     this.sid = 0;
     this.settlement = null;
     this.gold = 0;
-    this.vigor = VIGOR_MAX;
-    this.food = FOOD_MAX;
     this.inBuilding = -1;
-    this.civiclvl = 0;
-    this.civicxp = 0;
+
     this.classxp = {
         0: 0,
         1: 0,
@@ -147,7 +144,7 @@ Player.prototype.updateSteps = function(){
     if(this.steps > limit) this.steps -= limit;
 
     //TODO: conf
-    if(this.steps%10 == 0) this.updateVigor(-1);
+    if(this.steps%50 == 0) this.updateVigor(-1);
 };
 
 Player.prototype.updateVigor = function(inc){
@@ -543,7 +540,7 @@ Player.prototype.applyEffect = function(stat,delta,notify){
  */
 Player.prototype.initTrim = function(){
     var trimmed = {};
-    var broadcastProperties = ['id','gold','civicxp','civiclvl','classxp','classlvl','ap',
+    var broadcastProperties = ['id','gold','classxp','classlvl','ap',
         'name','history']; // list of properties relevant for the client
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
@@ -555,8 +552,6 @@ Player.prototype.initTrim = function(){
     trimmed.buildingMarkers = GameServer.listBuildingMarkers();
     trimmed.resourceMarkers = GameServer.resourceMarkers;
     trimmed.rarity = GameServer.getRarity();
-    // trimmed.food = this.getFood();
-    // trimmed.vigor = this.getVigor();
     return trimmed;
 };
 
@@ -584,8 +579,6 @@ Player.prototype.getDataFromDb = function(data){
     this.name = data.name;
     this.x = Utils.clamp(data.x,0,World.worldWidth-1);
     this.y = Utils.clamp(data.y,0,World.worldHeight-1);
-    this.civiclvl = data.civiclvl;
-    this.civicxp = data.civicxp;
     this.classxp = data.classxp;
     this.classlvl = data.classlvl;
 
@@ -593,8 +586,8 @@ Player.prototype.getDataFromDb = function(data){
     console.warn(data.stats);
     data.stats.forEach(function(stat){
         console.log(stat);
-        console.log(this.getStat(stat.stat));
         this.getStat(stat.stat).setBaseValue(stat.value);
+        this.refreshStat(stat.stat);
     },this);
     this.applyVigorModifier();
 
@@ -620,8 +613,6 @@ Player.prototype.getDataFromDb = function(data){
     },this);
     this.setRegion(data.sid);
     this.giveGold(data.gold);
-    // this.vigor = data.vigor || VIGOR_MAX;
-    // this.food = data.food || FOOD_MAX;
     this.history = data.history;
 };
 

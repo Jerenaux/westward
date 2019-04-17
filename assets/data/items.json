@@ -9,7 +9,8 @@
     "atlas": "items",
     "frame":"food",
     "name": "Food",
-    "desc": "Can be used to boost the productivity of buildings, as well as to feed troops.",
+    "desc": "Can be used to nourish yourself, boost the productivity of buildings and feed troops.",
+    "effects":{"food":15},
     "isResource": true
   },
   "2":{
@@ -494,6 +495,6 @@
     "isCrafted": true,
     "craftTier": 1,
     "sound": "alchemy",
-    "basicRecipe": false
+    "basicRecipe": true
   }
 }
