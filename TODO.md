@@ -40,7 +40,6 @@ Misc:
 - Aggro issue
 - Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
 
-- Make battle actions decrease vigor
 - Add berries
 - Upon login, compute food consumption
 - Enable rest effects (vigor & health?) of shacks (upon login, compute vigor increase)

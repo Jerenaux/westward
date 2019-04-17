@@ -636,6 +636,7 @@ GameServer.handleDisconnect = function(socketID){
     var player = GameServer.getPlayer(socketID);
     if(!player) return;
     Prism.logEvent(player,'disconnect');
+    player.save();
     GameServer.removeEntity(player);
     delete GameServer.socketMap[socketID];
     GameServer.nbConnectedChanged = true;
@@ -890,6 +891,10 @@ GameServer.handleBattle = function(attacker,attacked){
     if(!attacker.isAvailableForFight() || attacker.isInFight() 
     || !attacked.isAvailableForFight() || attacked.isInFight()){
         console.log('Availability issue');
+        console.log('attacker avilable:',attacker.isAvailableForFight() );
+        console.log('attacked avilable:',attacked.isAvailableForFight() );
+        console.log('attacker in fight:',attacker.isInFight() );
+        console.log('attacked in fight:',attacked.isInFight() );
         return false;
     }
     // TODO: check for proximity

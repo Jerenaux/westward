@@ -189,10 +189,10 @@ Prism.logEvent = function(player,action,data){
         return;
     }
     var event = new map[action](data);
-    console.log('event : ',event);
+    // console.log('event : ',event);
     event.save(function(err){
         if(err) throw err;
-        console.log('Event logged');
+        // console.log('Event logged');
     });
 };
 

@@ -38,7 +38,8 @@
         maxCivicXP: 99999,
         maxClassLvl: 100,
         maxClassXP: 999999,
-        maxGold: 100000
+        maxGold: 100000,
+        foodConsumption: 15
    },
    economyCycles: {
         // Unit: hours
@@ -49,9 +50,7 @@
         turns: {
             build: 10,
             camps: 5,
-            commitment: 1,
-            foodConsumption: 10,
-            harvesting: 300,
+            foodConsumptionRate: 10,
             settlements: 1,
             spawnZones: 5
         }

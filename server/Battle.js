@@ -198,7 +198,10 @@ Battle.prototype.processAction = function(f,data){
             };
             break;
     }
-    if(result && result.success) this.setEndOfTurn(result.delay);
+    if(result){
+        if(f.isPlayer && result.vigor) f.updateVigor(-result.vigor);
+        if(result.success) this.setEndOfTurn(result.delay);
+    }
 };
 
 Battle.prototype.setEndOfTurn = function(delay){
@@ -208,7 +211,7 @@ Battle.prototype.setEndOfTurn = function(delay){
 
 Battle.prototype.processMove = function(f){
     //this.removeFromPosition(f);
-    var pos = f.getEndOfPath();
+    // var pos = f.getEndOfPath();
     //this.addAtPosition(f);
     return {
         success: true,
@@ -340,7 +343,8 @@ Battle.prototype.processAoE = function(f,tx,ty){
     }.bind(this),delay);
     return {
         success: true,
-        delay: delay
+        delay: delay,
+        vigor: 1 // TODO: conf + vary
     };
 };
 
@@ -413,7 +417,8 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
     }.bind(this),delay);
     return {
         success: true,
-        delay: delay
+        delay: delay,
+        vigor: 1 // TODO: conf + vary
     };
 };
 

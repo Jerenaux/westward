@@ -4,6 +4,7 @@
 
 var Utils = require('../shared/Utils.js').Utils;
 var PersonalUpdatePacket = require('./PersonalUpdatePacket.js').PersonalUpdatePacket;
+var GameObject = require('./GameObject.js').GameObject;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var GameServer = require('./GameServer.js').GameServer;
 var Inventory = require('../shared/Inventory.js').Inventory;
@@ -583,9 +584,7 @@ Player.prototype.getDataFromDb = function(data){
     this.classlvl = data.classlvl;
 
     if(!data.stats) data.stats = [];
-    console.warn(data.stats);
     data.stats.forEach(function(stat){
-        console.log(stat);
         this.getStat(stat.stat).setBaseValue(stat.value);
         this.refreshStat(stat.stat);
     },this);
@@ -614,6 +613,16 @@ Player.prototype.getDataFromDb = function(data){
     this.setRegion(data.sid);
     this.giveGold(data.gold);
     this.history = data.history;
+
+    var delta = (Date.now() - data.savestamp) || 1000*3600*24;
+    var deltaturns = Math.floor(delta/(GameServer.turnDuration*1000));
+    console.warn('delta since last time:',delta,deltaturns);
+    this.fastForward(deltaturns);
+};
+
+Player.prototype.save = function(){
+    this.savestamp = Date.now();
+    GameObject.prototype.save.call(this);
 };
 
 Player.prototype.setAction = function(action){
@@ -625,15 +634,6 @@ Player.prototype.onAOItransition = function(newAOI,previousAOI){
         this.visitedAOIs.add(newAOI);
         if(previousAOI){ // if previousAOI: don't grant XP for spawning in fort
             Prism.logEvent(this,'explore',{aoi:newAOI});
-
-            /*var A = Utils.lineToGrid(this.settlement.fort.aoi,World.nbChunksHorizontal);
-            var B = Utils.lineToGrid(newAOI,World.nbChunksHorizontal);
-            var dist = Math.max(Math.abs(A.x-B.x),Math.abs(A.y-B.y));
-            if(dist > 2) { // todo: make depend on dev level
-                this.addNotif('New area visited');
-                this.gainClassXP(GameServer.classes.explorer,dist * 5, true); // TODO: facotr in class level
-            }*/
-
             this.save();
         }
     }
@@ -716,9 +716,19 @@ Player.prototype.getIndividualUpdatePackage = function(){
     return pkg;
 };
 
+Player.prototype.fastForward = function(nbturns){
+    var foodDelay = GameServer.economyTurns['foodConsumptionRate'];
+    this.starve(Math.floor(nbturns/foodDelay));
+};
+
 Player.prototype.update = function() {
-    if(!GameServer.isTimeToUpdate('foodConsumption')) return;
-    this.updateFood(-15); // TODO: conf
+    if(!GameServer.isTimeToUpdate('foodConsumptionRate')) return;
+    this.starve(1);
+};
+
+Player.prototype.starve = function(nb){
+    console.log('Starving for',nb,'cycles');
+    this.updateFood(-(nb*GameServer.characterParameters.foodConsumption));
 };
 
 Player.prototype.remove = function(){
