@@ -839,8 +839,9 @@ GameServer.respawnItems = function(){
 };
 
 /**
- * Add some item to the playe's inventory and remove it from
- * the game. Called when a player reaches the end of a path computed
+ * Identify which items to forage when a player click on a environment
+ * item and update the related data structures.
+ * Called when a player reaches the end of a path computed
  * towards an item on the ground.
  * @param {Player} player - The Player performing the picking up.
  * @param {number} itemID - ID of the picked item.
@@ -860,16 +861,29 @@ GameServer.pickUpItem = function(player,itemID){
     return true;
 };
 
+/**
+ * Add an item to a player's inventory, notify him and
+ * keep track of it in the game's economy. Called by
+ * GameServer.pickUpItem().
+ * @param {Player} player - The Player performing the picking up.
+ * @param {number} type - type of the picked item.
+ * */
 GameServer.forage = function(player, type){
     var nb = GameServer.itemsData[type].yield || 1;
     player.giveItem(type,nb,true,'Picked');
     Prism.logEvent(player,'pickup',{item:type});
     GameServer.createItem(type,nb,'pickup');
-
 };
 
 /**
- * Keep track of all items owned by a player (or a building) in the world
+ * Keep track of all items owned by player (and buildings) in the world.
+ * Used mainly to compute the rarity of items. Called when an item
+ * is picked, looted or crafted, as well as when the server starts and
+ * reads the player and building inventories.
+ * @param {number} item - type of the item added to the world.
+ * @param {number} nb - amount of items added.
+ * @param {string} source - which process led to the creation of the item
+ * (crafting, loot...)
  */
 GameServer.createItem = function(item,nb,source){
     if(!GameServer.itemCounts.hasOwnProperty(item)) GameServer.itemCounts[item] = 0;
@@ -877,11 +891,25 @@ GameServer.createItem = function(item,nb,source){
     // TODO: log sources
 };
 
+/**
+ * Opposite of GameServer.createItem(). Called when items
+ * are consumed in the crafting process.
+ * @param {number} item - type of the item removed from the world.
+ * @param {number} nb - amount of items removed.
+ * @param {string} source - which process led to the destruction of the item.
+ * */
 GameServer.destroyItem = function(item,nb,source){
     GameServer.itemCounts[item] -= nb;
 };
 
-// Called by player clicks or by NPC.checkForAggro()
+/**
+ * Determine if a battle can be started, compute the battle area
+ * and starts the battle.
+ * Called when a player clicks on a hostile NPC, or when a NPC detects
+ * and attacks the player (logic in NPC.checkForAggro()).
+ * @param {Player|NPC} attacker - One of the two entities starting the battle.
+ * @param {Player|NPC} attacked - The other entity starting the battle.
+ */
 GameServer.handleBattle = function(attacker,attacked){
     if(!GameServer.enableBattles){
         if(attacker.isPlayer) attacker.addMsg('Battles are disabled at the moment');
@@ -918,6 +946,14 @@ GameServer.handleBattle = function(attacker,attacked){
     return true;
 };
 
+/**
+ * Generate a list of battle cells on which the fighters will be able
+ * to move during a fight. The area must be continuous, ecompass both fighters
+ * and ideally have an irregular shape. Called by GameServer.handleBattle().
+ * @param {Player|NPC} f1 - One of the two fighters.
+ * @param {Player|NPC} f2 - The other fighter.
+ * @returns {Array} The list of battle cells coordinates ({x,y} objects)
+ */
 GameServer.computeBattleArea = function(f1,f2){
     var cells = new SpaceMap();
     var fs = [f1,f2];
@@ -961,7 +997,13 @@ GameServer.computeBattleArea = function(f1,f2){
     return cells.toList();
 };
 
-// Check if a battle area overlaps with another battel's area
+/**
+ * Check if a battle area overlaps with another already existing one
+ * (from another battle). If that's the case, both battles will be merged.
+ * Called by GameServer.handleBattle().
+ * @param {Array} area - List of battle cells coordinate of the candidate are ({x,y} objects).
+ * @returns {Battle|null} - An overlapping Battle if any, otherwise null.
+ */
 GameServer.checkBattleOverlap = function(area){
     area.forEach(function(c){
         var cell = GameServer.battleCells.get(c.x,c.y);
@@ -970,12 +1012,24 @@ GameServer.checkBattleOverlap = function(area){
     return null;
 };
 
+/**
+ * When an entity steps into an active battle area, it is sucked
+ * into the battle and the tiles around it become battle cells of
+ * that battle.
+ * @param {Battle} battle - The Battle the entity stepped in.
+ * @param {Player|NPC} f - The entity who stepped in the Battle.
+ */
 GameServer.expandBattle = function(battle,f){
     var area = f.getBattleAreaAround();
     battle.addFighter(f);
     GameServer.addBattleArea(area.toList(),battle);
 };
 
+/**
+ * Add a battle area to an existing Battle by calling GameServer.addBattleCell().
+ * @param {Array} area - Array of battle cells coordinates.
+ * @param {Battle} battle - Battle to which the area must be added.
+ */
 GameServer.addBattleArea = function(area,battle){ // area should be a list
     area.forEach(function(c){
         GameServer.addBattleCell(battle,c.x,c.y);

@@ -326,6 +326,10 @@ Player.prototype.canCraft = function(item, nb){
     return true;
 };
 
+Player.prototype.getGold = function(){
+    return this.gold;
+};
+
 Player.prototype.getItemNb = function(item){
     return this.inventory.getNb(item);
 };
