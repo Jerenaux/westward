@@ -416,7 +416,7 @@ GameServer.startEconomy = function(){
     GameServer.turnDuration = config.get('economyCycles.turnDuration');
     setInterval(GameServer.economyTurn,GameServer.turnDuration*1000);
 
-    setInterval(GameServer.respawnItems,config.get('economyCycles.itemsRespawnInterval')*3600*1000);
+    setInterval(GameServer.respawnItems,config.get('economyCycles.itemsRespawnInterval')*1000);
 };
 
 /**
@@ -435,9 +435,8 @@ GameServer.economyTurn = function(){
         camp.update();
     });
 
-    GameServer.updateEconomicEntities(GameServer.settlements); // food surplus
-    GameServer.updateEconomicEntities(GameServer.buildings); // prod, build, commit ...
-    GameServer.updateEconomicEntities(GameServer.players); // food
+    GameServer.updateEconomicEntities(GameServer.buildings); // prod, build, ...
+    GameServer.updateEconomicEntities(GameServer.players); // food, shelter ...
 
     for(var sid in GameServer.settlements){
         GameServer.settlements[sid].refreshListing();
@@ -833,7 +832,7 @@ GameServer.respawnItems = function(){
         var x = item[0];
         var y = item[1];
         var type = item[2];
-        if(!GameServer.itemPositions.get(x,y)){
+        if(GameServer.itemPositions.get(x,y).length == 0){
             if(Utils.randomInt(1,10) > 5) GameServer.addItem(x,y,type);
         }
     },this);
@@ -1256,7 +1255,7 @@ GameServer.handleUse = function(data,socketID){
         result = player.equip(itemData.equipment, item, false); // false: not from DB
     }else  if(itemData.effects){
         result = player.applyEffects(item,1,true);
-        player.takeItem(item,1,true);
+        player.takeItem(item,1,true,(itemData.verb || 'Used'));
     }
     Prism.logEvent(player,'use',{item:item});
     return result;

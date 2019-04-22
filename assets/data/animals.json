@@ -85,9 +85,10 @@
       "right": 33
     },
     "stats": {
-      "hp": 300,
-      "def": 16,
-      "dmg": 5
+      "hpmax": 150,
+      "hp": 150,
+      "def": 8,
+      "dmg": 6
     },
     "xp": 30,
     "loot":{

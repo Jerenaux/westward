@@ -193,6 +193,11 @@ function BuildingTitle(x,y){
         exit_.setFrame('exit_icon');
     });
 
+    this.invrect = UI.scene.add.image(1024,0,'UI','invisible');
+    this.invrect.setInteractive();
+    this.invrect.setScrollFactor(0);
+    this.invrect.setOrigin(0.5);
+
     this.text.setDepth(this.depth+1);
     this.text.setScrollFactor(0);
     /*if(this.align == 'right'){
@@ -244,6 +249,7 @@ BuildingTitle.prototype.display = function(){
     this.text.setVisible(true);
     this.exit.x = Engine.currentMenu.exitX;
     this.exit.setVisible(true);
+    this.invrect.setPosition(this.exit.x,this.exit.y);
     this.capsule.display();
 };
 

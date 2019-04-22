@@ -193,13 +193,28 @@
       "offset": {"x":0.5,"y":0.5},
       "anchor": {"x":0.5,"y":0.5}
     },
+    "clovers_1_lit":{
+      "frame": {"x":273,"y":79,"w":32,"h":32},
+      "offset": {"x":0.5,"y":0.5},
+      "anchor": {"x":0.5,"y":0.5}
+    },
     "clovers_2":{
       "frame": {"x":312,"y":43,"w":32,"h":32},
       "offset": {"x":0.5,"y":0.5},
       "anchor": {"x":0.5,"y":0.5}
     },
+    "clovers_2_lit":{
+      "frame": {"x":314,"y":82,"w":32,"h":32},
+      "offset": {"x":0.5,"y":0.5},
+      "anchor": {"x":0.5,"y":0.5}
+    },
     "clovers_3":{
       "frame": {"x":352,"y":43,"w":32,"h":32},
+      "offset": {"x":0.5,"y":0.5},
+      "anchor": {"x":0.5,"y":0.5}
+    },
+    "clovers_3_lit":{
+      "frame": {"x":352,"y":82,"w":32,"h":32},
       "offset": {"x":0.5,"y":0.5},
       "anchor": {"x":0.5,"y":0.5}
     },
@@ -226,6 +241,17 @@
     "ivy_2":{
       "frame": {"x":209,"y":45,"w":50,"h":43},
       "anchor": {"x":0.4,"y":-0.3}
+    },
+    "berriesbush":{
+      "frame": {"x":528,"y":181,"w":36,"h":39},
+      "offset": {"x":0.5,"y":0.5},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
+    },
+    "berriesbush_lit":{
+      "frame": {"x":564,"y":181,"w":36,"h":39},
+      "anchor": {"x":0.5,"y":0.5},
+      "collisions": [[0,0]]
     }
   },
   "shorthands" : {
@@ -251,6 +277,7 @@
     "b2":"bush_2",
     "b3":"bush_3",
     "b4":"bush_4",
+    "bb":"berriesbush",
     "l1":"leaves_1",
     "l2":"leaves_2",
     "l3":"leaves_3",

@@ -582,15 +582,15 @@
     },
     {
       "filename": "armor",
-      "frame": {"x":526,"y":440,"w":14,"h":15}
+      "frame": {"x":527,"y":442,"w":11,"h":12}
     },
     {
       "filename": "bullseye",
-      "frame": {"x":503,"y":457,"w":15,"h":14}
+      "frame": {"x":506,"y":458,"w":14,"h":13}
     },
     {
       "filename": "sword",
-      "frame": {"x":524,"y":459,"w":17,"h":16}
+      "frame": {"x":525,"y":458,"w":13,"h":12}
     },
     {
       "filename": "invisible",

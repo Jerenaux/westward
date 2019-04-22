@@ -92,6 +92,9 @@
     "mainMenu": "wip",
     "depthOffset": 2,
     "canFight": false,
-    "health": 50
+    "health": 50,
+    "shelter": true,
+    "restVigorAmount": 1,
+    "restHealthAmount": 2
   }
 }

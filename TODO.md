@@ -1,6 +1,8 @@
 On deploy:
 - Test gs.handleGold()
 - Test handleCraft (normal + when a price is undefined)
+- Test handleChat (with text and also empty input)
+- Find a way to test itemsRespaw and other time-related aspects
 => Automate these eventually
 => After bug, systematically create test!
 
@@ -40,10 +42,11 @@ Misc:
 - Aggro issue
 - Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
 
-- Add berries
-- Upon login, compute food consumption
-- Enable rest effects (vigor & health?) of shacks (upon login, compute vigor increase)
+- Don't respawn items in field of vision
+- Buying or not buying from prod buildings? Decide and test
+- Update shack menu
 - Allow food to be given to buildings + compute and apply productivity
+- Test rest and food upon login
 
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)

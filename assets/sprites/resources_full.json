@@ -159,6 +159,10 @@
     {
       "filename": "shovel",
       "frame": {"x":120,"y":408,"w":24,"h":24}
+    },
+    {
+      "filename": "berries",
+      "frame": {"x":336,"y":432,"w":24,"h":24}
     }
   ]
 }

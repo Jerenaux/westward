@@ -614,7 +614,7 @@ Player.prototype.getDataFromDb = function(data){
     this.giveGold(data.gold);
     this.history = data.history;
 
-    var delta = (Date.now() - data.savestamp) || 1000*3600*24;
+    var delta = (Date.now() - data.savestamp);
     var deltaturns = Math.floor(delta/(GameServer.turnDuration*1000));
     console.warn('delta since last time:',delta,deltaturns);
     this.fastForward(deltaturns);
@@ -717,18 +717,30 @@ Player.prototype.getIndividualUpdatePackage = function(){
 };
 
 Player.prototype.fastForward = function(nbturns){
-    var foodDelay = GameServer.economyTurns['foodConsumptionRate'];
-    this.starve(Math.floor(nbturns/foodDelay));
+    var foodRate = GameServer.economyTurns['foodConsumptionRate'];
+    var restRate = GameServer.economyTurns['foodConsumptionRate'];
+    this.starve(Math.floor(nbturns/foodRate));
+    this.rest(Math.floor(nbturns/restRate));
 };
 
 Player.prototype.update = function() {
-    if(!GameServer.isTimeToUpdate('foodConsumptionRate')) return;
-    this.starve(1);
+    if(GameServer.isTimeToUpdate('foodConsumptionRate')) this.starve(1);
+    if(GameServer.isTimeToUpdate('restRate') && this.inBuilding > -1) this.rest(1);
 };
 
 Player.prototype.starve = function(nb){
     console.log('Starving for',nb,'cycles');
     this.updateFood(-(nb*GameServer.characterParameters.foodConsumption));
+};
+
+Player.prototype.rest = function(nb){
+    var building = GameServer.buildings[this.inBuilding];
+    if(!building) return;
+    var buildingData = GameServer.buildingsData[building.type];
+    if(!buildingData.shelter) return;
+    console.log('Resting for',nb,'cycles');
+    this.updateVigor(buildingData.restVigorAmount);
+    this.getStat('hp').increment(buildingData.restHealthAmount);
 };
 
 Player.prototype.remove = function(){

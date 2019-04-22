@@ -11,7 +11,8 @@
     "name": "Food",
     "desc": "Can be used to nourish yourself, boost the productivity of buildings and feed troops.",
     "effects":{"food":15},
-    "isResource": true
+    "isResource": true,
+    "verb": "Ate"
   },
   "2":{
     "atlas": "items",
@@ -65,7 +66,8 @@
     "isCrafted": true,
     "craftTier": 2,
     "sound": "alchemy",
-    "basicRecipe": true
+    "basicRecipe": true,
+    "verb": "Drank"
   },
   "7":{
     "atlas": "items",
@@ -495,6 +497,20 @@
     "isCrafted": true,
     "craftTier": 1,
     "sound": "alchemy",
-    "basicRecipe": true
+    "basicRecipe": true,
+    "verb": "Drank"
+  },
+  "47":{
+    "atlas": "items2",
+    "frame":"berries",
+    "name": "Caor berries",
+    "desc": "Low nutritious value, only usable to nourish oneself a little.",
+    "effects":{"food":2},
+    "isResource": true,
+    "envFrames": ["berriesbush"],
+    "sound": "soft",
+    "nbBushes": 4,
+    "yield": 5,
+    "verb": "Ate"
   }
 }

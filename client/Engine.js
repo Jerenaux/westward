@@ -701,10 +701,7 @@ Engine.updateAllOrientationPins = function(){
 };
 
 Engine.makeBuildingTitle = function(){
-    //Engine.buildingTitle = new UIHolder(512,10,'center');
     Engine.buildingTitle = new BuildingTitle(512,10);
-    //Engine.buildingTitle.setButton(Engine.leaveBuilding);
-    //Engine.settlementTitle = new UIHolder(512,55,'center','small');
 };
 
 // #############################
@@ -840,8 +837,6 @@ Engine.makeUI = function(){
 
     Engine.miniMap = new MiniMap();
     Engine.setlCapsule = new SettlementCapsule(950,3);
-    //Engine.foodCapsule = new SettlementCapsule(950,30);
-    //Engine.foodCapsule.setText('Famine');
 
     var x = 23;
     var y = 19;
@@ -2067,32 +2062,18 @@ Engine.getTilesetFromTile = function(tile){
 };
 
 Engine.enterBuilding = function(id){
-    console.log('Entering',id);
     Engine.player.setVisible(false);
     var building = Engine.buildings[id];
     Engine.inBuilding = true;
     Engine.currentBuiling = building; // used to keep track of which building is displayed in menus
     var buildingData = Engine.buildingsData[building.buildingType];
-    //var settlementData = Engine.settlementsData[building.settlement];
-    console.log('owner:',Engine.currentBuiling.owner);
-    var menus = [];
+
     var mainMenu;
     if(building.built == true) {
-        // Displays the tray icons based on flags in the building data
-        if (buildingData.fort) menus.push(Engine.menus.fort);
-        if (buildingData.trade) menus.push(Engine.menus.trade);
-        if (buildingData.workshop) menus.push(Engine.menus.crafting);
-        if (buildingData.production) menus.push(Engine.menus.production);
-        if (buildingData.staff) menus.push(Engine.menus.staff);
         mainMenu = Engine.menus[buildingData.mainMenu];
     }else{
-        menus.push(Engine.menus.construction);
         mainMenu = Engine.menus.construction;
     }
-
-    menus.forEach(function(m){
-        m.displayIcon();
-    });
 
     mainMenu.display();
     building.handleOut();
@@ -2100,14 +2081,10 @@ Engine.enterBuilding = function(id){
     Engine.buildingTitle.setText(buildingData.name);
     var owner = Engine.currentBuiling.isOwned() ? 'Your' : (Engine.currentBuiling.ownerName || 'Player')+'\'s';
     Engine.buildingTitle.capsule.setText(owner);
-    //Engine.settlementTitle.setText(settlementData.name);
-    //if(Engine.buildingTitle.width < Engine.settlementTitle.width) Engine.buildingTitle.resize(Engine.settlementTitle.width);
     Engine.buildingTitle.move(Engine.currentMenu.titleY);
     Engine.buildingTitle.display();
-    //Engine.settlementTitle.display();
 
     if(Client.tutorial) Engine.tutorialHook('bld:'+id);
-    //Engine.UIHolder.resize(Engine.getHolderSize());
 };
 
 Engine.exitBuilding = function(){

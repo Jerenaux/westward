@@ -36,6 +36,7 @@ let Schemas = {
         name: {type: String, required: true},
         x: {type: Number, min: 0, required: true},
         y: {type: Number, min: 0, required: true},
+        inBuilding: {type: Number, min:-1, default: -1},
         savestamp: {type : Date, default: Date.now },
         gold: {type: Number, min: 0, default: 0},
         classxp: mongoose.Schema.Types.Mixed,

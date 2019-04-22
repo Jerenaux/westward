@@ -533,6 +533,7 @@ WorldMaker.prototype.makeSpawnZones = function(){
         {item:14,decor:'b4',nbzones:100}, // Sunstrak
         {item:8,decor:null,nbzones:100}, // Thick grass
         {item:18,decor:null,nbzones:100}, // clover
+        {item:47,decor:'b4',nbzones:100} // berries
     ];
     items.forEach(function(item){
         for(var i = 0; i < item.nbzones; i++){
