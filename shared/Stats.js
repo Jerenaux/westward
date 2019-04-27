@@ -130,13 +130,13 @@ Stat.prototype.getValue = function(){
 
 Stat.prototype.setBaseValue = function(value){
     var v = this.clamp(value);
-    //console.warn('!',this.key,v);
     this.baseValue = v;
 };
 
 Stat.prototype.increment = function(inc){
     var base = this.clamp(this.getBaseValue());
     this.setBaseValue(base+inc);
+    return (this.getBaseValue() != base); // has the value actually changed or not
 };
 
 Stat.prototype.addAbsoluteModifier = function(modifier){

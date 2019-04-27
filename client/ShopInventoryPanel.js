@@ -23,23 +23,9 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
     this.inventory = inventory;
 
     if(this.hadAdminButtons()){
-        this.pricesBtn = new BigButton(this.x+70,this.starty+15,'Set prices',function(){
-            Engine.currentMenu.displayPanel('prices');
-            Engine.currentMenu.hidePanel('action');
-            Engine.currentMenu.hidePanel('goldaction');
-        });
-
-        this.ggBtn = new BigButton(this.x+180,this.starty+15,'Give gold',function(){
-            Engine.currentMenu.hidePanel('action');
-            var ga = Engine.currentMenu.displayPanel('goldaction');
-            ga.setUp('sell');
-        });
-
-        this.tgBtn = new BigButton(this.x+290,this.starty+15,'Take gold',function(){
-            Engine.currentMenu.hidePanel('action');
-            var ga = Engine.currentMenu.displayPanel('goldaction');
-            ga.setUp('buy');
-        });
+        var btnsx = this.x + 70;
+        var btnsy = this.starty+15;
+        Engine.addAdminButtons(this,btnsx,btnsy);
     }
 
     var emptyMsg = (this.inventory == 'player' ? 'You don\' have any items' : 'The inventory of this shop is empty. Come back later!');

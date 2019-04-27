@@ -56,21 +56,20 @@ var Hero = new Phaser.Class({
             'ammo': this.updateAmmo,
             'ap': this.updateAP,
             'bldRecipes': this.updateBuildRecipes,
+            'buildingMarkers': this.updateMarkers,
             'civiclvl': this.updateCivicLvl,
             'classlvl': this.updateClassLvl,
             'classxp': this.updateClassXP,
             'dead': this.handleDeath,
             'equipment': this.updateEquipment,
-            // 'food': this.updateFood,
             'fow': this.updateFoW,
             'gold': this.updateGold,
+            'inBuilding': this.updateBuilding,
             'items': this.updateInventory,
-            'buildingMarkers': this.updateMarkers,
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
             'resetTurn': BattleManager.resetTurn,
-            'stats': this.updateStats,
-            // 'vigor': this.updateVigor,
+            'stats': this.updateStats
         };
 
         this.updateEvents = new Set();
@@ -248,6 +247,10 @@ var Hero = new Phaser.Class({
         this.gold = gold;
         this.updateEvents.add('gold');
         // TODO: move sound effect
+    },
+
+    updateBuilding: function(buildingID){
+        this.inBuilding = buildingID;
     },
 
     updateHistory: function(history){

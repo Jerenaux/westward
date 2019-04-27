@@ -38,15 +38,15 @@ Misc:
 - add esc shortcut
 - "new" marker
 - Events formatting
-- Add other plants, edible berries ...
+- Add other plants
 - Aggro issue
 - Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
 
-- Don't respawn items in field of vision
 - Buying or not buying from prod buildings? Decide and test
+- Allow food to be given and sold to buildings + compute and apply productivity
+- Make both rest and production visually fast
 - Update shack menu
-- Allow food to be given to buildings + compute and apply productivity
-- Test rest and food upon login
+
 
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)

@@ -1248,6 +1248,9 @@ Engine.makeProductionMenu = function(){
     var action = new ShopPanel(212,420,300,100,'Take',true); // true = not shop, hack
     production.addPanel('action',action,true);
 
+    var prices = production.addPanel('prices',Engine.makePricesPanel(),true);
+    prices.limitToCrafting();
+
     production.addEvent('onUpdateShop',function(){
         productionPanel.update();
         action.update();
@@ -1263,13 +1266,8 @@ Engine.makeProductionMenu = function(){
 Engine.makeConstructionMenu = function(){
     var w = 500;
     var x = (Engine.getGameConfig().width-w)/2;
-    var padding = 0;
     var progressh = 300;
     var progressy = 150;
-    var invy = progressy+progressh+padding;
-    var prody = progressy+140;
-    var prodw = 250;
-    var prodx = (Engine.getGameConfig().width-prodw)/2;
 
     var constr = new Menu('Construction');
     constr.setTitlePos(100);
@@ -1406,6 +1404,27 @@ Engine.makePricesPanel = function(){
     prices.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['prices_help']);
     prices.moveUp(4);
     return prices;
+};
+
+Engine.addAdminButtons = function(panel,x,y){
+
+    panel.pricesBtn = new BigButton(x,y,'Set prices',function(){
+        Engine.currentMenu.displayPanel('prices');
+        Engine.currentMenu.hidePanel('action');
+        Engine.currentMenu.hidePanel('goldaction');
+    });
+
+    panel.ggBtn = new BigButton(x + 110,y,'Give gold',function(){
+        Engine.currentMenu.hidePanel('action');
+        var ga = Engine.currentMenu.displayPanel('goldaction');
+        ga.setUp('sell');
+    });
+
+    panel.tgBtn = new BigButton(x + 220,y,'Take gold',function(){
+        Engine.currentMenu.hidePanel('action');
+        var ga = Engine.currentMenu.displayPanel('goldaction');
+        ga.setUp('buy');
+    });
 };
 
 Engine.makeTradeMenu = function(){
@@ -2062,6 +2081,7 @@ Engine.getTilesetFromTile = function(tile){
 };
 
 Engine.enterBuilding = function(id){
+    if(id == -1) return;
     Engine.player.setVisible(false);
     var building = Engine.buildings[id];
     Engine.inBuilding = true;
@@ -2093,12 +2113,10 @@ Engine.exitBuilding = function(){
     Engine.currentBuiling = null;
     Engine.currentMenu.hide();
     Engine.buildingTitle.hide();
-    //Engine.settlementTitle.hide();
     for(var m in Engine.menus){
         if(!Engine.menus.hasOwnProperty(m)) continue;
         Engine.menus[m].hideIcon();
     }
-    //Engine.UIHolder.resize(Engine.getHolderSize());
     if(Engine.miniMap)  Engine.miniMap.follow();
     if(Client.tutorial) Engine.tutorialHook('exit');
 };

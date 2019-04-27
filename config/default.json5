@@ -16,7 +16,7 @@
         rangedAtkDelay: 500
    },
    buildings: {
-        autobuild: true,
+        autobuild: false,
         canfight: false,
         nobuildings: false,
         inventorySize: 100,
@@ -39,19 +39,20 @@
         maxClassLvl: 100,
         maxClassXP: 999999,
         maxGold: 100000,
-        foodConsumption: 1.5
+        foodConsumption: 1.5,
+        steps: 50, //number of steps to make to lose `stepLoss` points of vigor
+        stepsLoss: 1 // amount of vigor lost after walking `steps` steps
    },
    economyCycles: {
         // Unit: seconds
         turnDuration: 60,
-        itemsRespawnInterval: 86400, // 86400 = 24h
         // Unit: turns
         turns: {
             build: 10,
             camps: 5,
-            foodConsumptionRate: 10, // rate at which food levels of players are decreased
-            restRate: 1, // rate at which vigor levels of players are increased when sheltered
-            settlements: 1,
+            foodConsumptionRate: 10, // rate at which food levels of players are decreased ; amount in character.foodConsumption
+            itemsRespawn: 1440, // 1440
+            restRate: 1, // rate at which vigor levels of players are increased when sheltered ; amount in buildings.json
             spawnZones: 5
         }
     },

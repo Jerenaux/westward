@@ -361,7 +361,6 @@ WorldMaker.prototype.hasWater = function(x,y){
 
 WorldMaker.prototype.drawShore = function(){
     console.log('Drawing shore ...');
-    var lines = [];
     //var tiles = ['wb', 'wbbl', 'wbbr', 'wbtl', 'wbtr', 'wcbl', 'wcbr', 'wctl', 'wctr', 'wl', 'wr', 'wt','none'];
 
     var undef = 0;
@@ -399,10 +398,11 @@ WorldMaker.prototype.getNeighborhood = function(x,y){
         res.push(v);
     }
     return res;
-}
+};
 
 WorldMaker.prototype.collides = function(tile){
-    return this.tileset.frames[this.tileset.shorthands[tile]].collides;
+    var longhand = this.tileset.shorthands[tile];
+    return this.tileset.frames[longhand].collides;
 };
 
 WorldMaker.prototype.createForests = function(){

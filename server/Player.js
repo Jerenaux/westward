@@ -86,8 +86,7 @@ Player.prototype.updateBldRecipes = function(){
         if(this.countOwnedBuildings(b) < 1) this.bldRecipes.push(b);
     },this);
     if(this.bldRecipes.length == 0) this.bldRecipes = [-1];
-    console.log('Bld recipes list:',this.bldRecipes);
-    this.updatePacket.bldRecipes = this.bldRecipes;
+    this.setOwnProperty('bldRecipes',this.bldRecipes);
 };
 
 // Called by finalizePlayer
@@ -97,7 +96,7 @@ Player.prototype.listBuildings = function(){
         var building = GameServer.buildings[bid];
         if(building.owner == this.id) this.buildings.push(building);
     }
-    console.log('Player owns',this.buildings.length,'buildings');
+    // console.log('Player owns',this.buildings.length,'buildings');
     this.updateBldRecipes();
 };
 
@@ -144,29 +143,25 @@ Player.prototype.updateSteps = function(){
     var limit = 1000; // arbitrary limit to avoid overflows
     if(this.steps > limit) this.steps -= limit;
 
-    //TODO: conf
-    if(this.steps%50 == 0) this.updateVigor(-1);
+    if(this.steps%GameServer.characterParameters.steps == 0) this.updateVigor(-GameServer.characterParameters.stepsLoss);
 };
 
-Player.prototype.updateVigor = function(inc){
-    /*inc *= 1+((VIGOR_MAX-this.food)/VIGOR_MAX);
-    // console.warn('Updating vigor by',inc);
-    this.vigor = Utils.clamp(this.vigor+inc,0,VIGOR_MAX);
-    this.updatePacket.vigor = this.getVigor();*/
-
-    var food = this.getStat('food');
+Player.prototype.updateVigor = function(inc,ignoreFood){
     var vigor = this.getStat('vigor');
-    inc *= 1+((food.getCap()-food.getValue())/food.getCap());
-    vigor.increment(inc);
-    this.refreshStat('vigor');
-    this.applyVigorModifier();
+    if(!ignoreFood) { // e.g. when regaining vigor through rest
+        var food = this.getStat('food');
+        inc *= 1 + ((food.getCap() - food.getValue()) / food.getCap());
+    }
+    var changed = vigor.increment(inc);
+    if(changed) {
+        this.refreshStat('vigor');
+        this.applyVigorModifier();
+    }
 };
 
 Player.prototype.updateFood = function(inc){
-    // this.food = Utils.clamp(this.food+inc,0,FOOD_MAX);
-    // this.updatePacket.food = this.getFood();
-    this.getStat('food').increment(inc);
-    this.refreshStat('food');
+    var changed = this.getStat('food').increment(inc);
+    if(changed) this.refreshStat('food');
 };
 
 Player.prototype.applyVigorModifier = function(){
@@ -231,27 +226,30 @@ Player.prototype.applyDamage = function(dmg){
 
 Player.prototype.die = function(){
     MovingEntity.prototype.die.call(this);
-    this.updatePacket.dead = true;
+    // this.updatePacket.dead = true;
+    this.setOwnProperty('dead',true);
 };
 
 Player.prototype.spawn = function(x,y){
-    x = x || this.respawnLocation.x;
-    y = y || this.respawnLocation.y;
-    console.log('aiming at',x,y);
-    var pos = this.findNextFreeCell(x,y);
+    var xpos = x || this.respawnLocation.x;
+    var ypos = y || this.respawnLocation.y;
+    var pos = this.findNextFreeCell(xpos,ypos);
     x = pos.x;
     y = pos.y;
     this.setProperty('x', x);
     this.setProperty('y', y);
-    this.updatePacket.x = x;
-    this.updatePacket.y = y;
+    this.setOwnProperty('x',x);
+    this.setOwnProperty('y',y);
+    // this.updatePacket.x = x;
+    // this.updatePacket.y = y;
     this.onAddAtLocation();
-    console.log('spawning at ',this.x,this.y);
+    console.log('spawning at ',this.x,this.y,'(aiming at',xpos,ypos,')');
 };
 
 Player.prototype.respawn = function(){
     this.setProperty('dead',false);
-    this.updatePacket.dead = false;
+    // this.updatePacket.dead = false;
+    this.setOwnProperty('dead',false);
     this.setStat('hp',10); // TODO: adapt remaining health
     this.onRemoveAtLocation();
     this.spawn();
@@ -272,15 +270,18 @@ Player.prototype.gainClassXP = function(classID,inc,notify){
             this.classLvlUp(classID,notify);
         }
     }
-    this.updatePacket.classxp = this.classxp;
+    // this.updatePacket.classxp = this.classxp;
+    this.setOwnProperty('clasxp',this.classxp);
 };
 
 Player.prototype.classLvlUp = function(classID, notify){
     this.classlvl[classID]++;
     var nb = 3; // TODO: vary number
     this.ap[classID] += nb;
-    this.updatePacket.classlvl = this.classlvl;
-    this.updatePacket.ap = this.ap;
+    // this.updatePacket.classlvl = this.classlvl;
+    // this.updatePacket.ap = this.ap;
+    this.setOwnProperty('classlvl',this.classlvl);
+    this.setOwnProperty('ap',this.ap);
     if(notify) {
         this.addNotif('Reached '+GameServer.classData[classID].name+' level '+this.classlvl[classID]+'!');
         this.addNotif('Earned '+nb+' AP!');
@@ -288,8 +289,9 @@ Player.prototype.classLvlUp = function(classID, notify){
 };
 
 Player.prototype.giveGold = function(nb,notify){
-    this.gold = Utils.clamp(this.gold+nb,0,GameServer.characterParameters.maxGold);
-    this.updatePacket.updateGold(this.gold);
+    // this.gold = Utils.clamp(this.gold+nb,0,GameServer.characterParameters.maxGold);
+    // this.updatePacket.updateGold(this.gold);
+    this.setOwnProperty('gold',Utils.clamp(this.gold+nb,0,GameServer.characterParameters.maxGold));
     if(notify){
         this.addNotif('Received '+nb+' '+Utils.formatMoney(nb));
         this.save();
@@ -297,8 +299,9 @@ Player.prototype.giveGold = function(nb,notify){
 };
 
 Player.prototype.takeGold = function(nb,notify){
-    this.gold = Utils.clamp(this.gold-nb,0,GameServer.characterParameters.maxGold);
-    this.updatePacket.updateGold(this.gold);
+    // this.gold = Utils.clamp(this.gold-nb,0,GameServer.characterParameters.maxGold);
+    // this.updatePacket.updateGold(this.gold);
+    this.setOwnProperty('gold',Utils.clamp(this.gold-nb,0,GameServer.characterParameters.maxGold));
     if(notify){
         this.addNotif('Gave '+nb+' '+Utils.formatMoney(nb));
         this.save();
@@ -504,14 +507,16 @@ Player.prototype.canRange = function(){
     var weapon = this.getRangedWeapon();
     if(weapon == -1) {
         this.addMsg('I don\'t have a ranged weapon equipped!');
-        this.updatePacket.resetTurn = true;
+        // this.updatePacket.resetTurn = true;
+        this.setOwnProperty('resetTurn',true);
         return false;
     }
     if(this.getAmmo(this.getRangedContainer(weapon)) > 0){
         return true;
     }else{
         this.addMsg('I\'m out of ammo!');
-        this.updatePacket.resetTurn = true;
+        // this.updatePacket.resetTurn = true;
+        this.setOwnProperty('resetTurn',true);
         return false;
     }
 };
@@ -579,6 +584,17 @@ Player.prototype.trim = function(){
     return trimmed;
 };
 
+/**
+ * Update a property and simultaneously add it to the list of changes
+ * to be sent to the client.
+ * @param {string} property - Name of the field to modify.
+ * @param value - Value to assign.
+ */
+Player.prototype.setOwnProperty = function(property, value){
+    this[property] = value;
+    this.updatePacket[property] = value;
+};
+
 Player.prototype.getDataFromDb = function(data){
     this.id = data.id;
     this.name = data.name;
@@ -586,6 +602,7 @@ Player.prototype.getDataFromDb = function(data){
     this.y = Utils.clamp(data.y,0,World.worldHeight-1);
     this.classxp = data.classxp;
     this.classlvl = data.classlvl;
+    this.setOwnProperty('inBuilding',data.inBuilding);
 
     if(!data.stats) data.stats = [];
     data.stats.forEach(function(stat){
@@ -620,7 +637,6 @@ Player.prototype.getDataFromDb = function(data){
 
     var delta = (Date.now() - data.savestamp);
     var deltaturns = Math.floor(delta/(GameServer.turnDuration*1000));
-    console.warn('delta since last time:',delta,deltaturns);
     this.fastForward(deltaturns);
 };
 
@@ -672,13 +688,14 @@ Player.prototype.enterBuilding = function(id){
 };
 
 Player.prototype.exitBuilding = function(){
-    // TODO: check if in building first
-    var building = GameServer.buildings[this.inBuilding];
+    if(!this.isInBuilding()) return;
+    /*var building = GameServer.buildings[this.inBuilding];
     var type = building.type;
     var bldname = GameServer.buildingsData[type].name;
     var phrase = ['Left',(building.isOwnedBy(this) ? 'my' : building.ownerName+'\'s'),bldname];
-    this.addNotif(phrase.join(' ')); // true = silent
+    this.addNotif(phrase.join(' ')); // true = silent*/
     this.setProperty('inBuilding', -1);
+    this.setOwnProperty('inBuilding', -1);
 };
 
 Player.prototype.endFight = function(alive){
@@ -692,6 +709,10 @@ Player.prototype.isAvailableForFight = function(){
 
 Player.prototype.isInBuilding = function(){
     return this.inBuilding > -1;
+};
+
+Player.prototype.isInside = function(buildingID){
+    return this.inBuilding == buildingID;
 };
 
 Player.prototype.notifyFight = function(flag){
@@ -721,10 +742,15 @@ Player.prototype.getIndividualUpdatePackage = function(){
 };
 
 Player.prototype.fastForward = function(nbturns){
+    console.warn('Fast forward',nbturns,'turns');
     var foodRate = GameServer.economyTurns['foodConsumptionRate'];
-    var restRate = GameServer.economyTurns['foodConsumptionRate'];
-    this.starve(Math.floor(nbturns/foodRate));
-    this.rest(Math.floor(nbturns/restRate));
+    var restRate = GameServer.economyTurns['restRate'];
+    var nbStarvationTurns = Math.floor(nbturns/foodRate);
+    var nbRestTurns = Math.floor(nbturns/restRate);
+    this.starve(nbStarvationTurns);
+    this.rest(nbRestTurns);
+    this.save();
+    console.warn('----');
 };
 
 Player.prototype.update = function() {
@@ -739,12 +765,19 @@ Player.prototype.starve = function(nb){
 
 Player.prototype.rest = function(nb){
     var building = GameServer.buildings[this.inBuilding];
-    if(!building) return;
+    if(!building) {
+        console.log('Not in a building');
+        return;
+    }
     var buildingData = GameServer.buildingsData[building.type];
-    if(!buildingData.shelter) return;
+    if(!buildingData.shelter){
+        console.log('Building doesn\'t offer shelter');
+        return;
+    }
     console.log('Resting for',nb,'cycles');
-    this.updateVigor(buildingData.restVigorAmount);
-    this.getStat('hp').increment(buildingData.restHealthAmount);
+    this.updateVigor(nb*buildingData.restVigorAmount,true); // true = ignore food level
+    var changed = this.getStat('hp').increment(nb*buildingData.restHealthAmount);
+    if(changed) this.refreshStat('hp');
 };
 
 Player.prototype.remove = function(){

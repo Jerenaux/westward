@@ -184,7 +184,7 @@ function BuildingTitle(x,y){
     this.exit.setVisible(false);
     this.exit.setInteractive();
     this.exit.setOrigin(0);
-    this.exit.on('pointerdown',Engine.exitBuilding);
+    this.exit.on('pointerdown',Engine.leaveBuilding);
     var exit_ = this.exit;
     this.exit.on('pointerover',function(){
         exit_.setFrame('exit_icon_on');

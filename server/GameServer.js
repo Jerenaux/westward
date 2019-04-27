@@ -416,7 +416,7 @@ GameServer.startEconomy = function(){
     GameServer.turnDuration = config.get('economyCycles.turnDuration');
     setInterval(GameServer.economyTurn,GameServer.turnDuration*1000);
 
-    setInterval(GameServer.respawnItems,config.get('economyCycles.itemsRespawnInterval')*1000);
+    // setInterval(GameServer.respawnItems,config.get('economyCycles.itemsRespawnInterval')*1000);
 };
 
 /**
@@ -438,9 +438,8 @@ GameServer.economyTurn = function(){
     GameServer.updateEconomicEntities(GameServer.buildings); // prod, build, ...
     GameServer.updateEconomicEntities(GameServer.players); // food, shelter ...
 
-    for(var sid in GameServer.settlements){
-        GameServer.settlements[sid].refreshListing();
-    }
+    if(GameServer.isTimeToUpdate('itemsRespawn')) GameServer.respawnItems();
+
 
     if(GameServer.elapsedTurns == GameServer.maxTurns) GameServer.elapsedTurns = 0;
 };
@@ -826,12 +825,15 @@ GameServer.lootNPC = function(player,type,ID){
  * of materials.
  * */
 GameServer.respawnItems = function(){
+    console.log('Respawning items ...');
     var path = pathmodule.join(GameServer.mapsPath,'items.json');
     var items = JSON.parse(fs.readFileSync(path).toString());
     items.forEach(function(item){
         var x = item[0];
         var y = item[1];
         var type = item[2];
+        var aoi = Utils.tileToAOI({x:x,y:y});
+        if(GameServer.vision.has(aoi)) return;
         if(GameServer.itemPositions.get(x,y).length == 0){
             if(Utils.randomInt(1,10) > 5) GameServer.addItem(x,y,type);
         }
