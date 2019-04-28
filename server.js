@@ -238,11 +238,10 @@ io.on('connection',function(socket){
             'respawn': gs.handleRespawn,
             'screenshot': gs.handleScreenshot,
             'shop': gs.handleShop,
-            'tutorial-start': gs.handleTutorialStart,
             'unequip': gs.handleUnequip,
             'use': gs.handleUse,
 
-            'ss': gs.startScript
+            //'ss': gs.startScript
         };
 
         var handler = socket.onevent;
@@ -266,34 +265,21 @@ io.on('connection',function(socket){
            if(socket.pings.length > 20) socket.pings.shift(); // keep the size down to 20
            socket.latency = server.quickMedian(socket.pings.slice(0)); // quickMedian used the quickselect algorithm to compute the median of a list of values
        });*/
-    });
+    }); // end of on init-world
+
+    socket.on('tutorial-start', gs.handleTutorialStart);
 
     socket.on('region-data',function(){
         socket.emit('region-data',gs.listRegions());
     });
 
-    socket.on('camps-data',function(){ge
+    socket.on('camps-data',function(){
         socket.emit('camps-data',gs.listCamps());
     });
 
     socket.on('disconnect',function(){
         gs.handleDisconnect(socket.id);
     });
-
-    // #########################
-
-
-    // #########################
-    /*if(process.env.DEV == 1) {
-        socket.on('mapdata',function(data){
-            console.log('Saving changes to chunk '+data.id+'...');
-            var dir = __dirname+'/assets/maps/chunks/'; // Replace by env variable
-            fs.writeFile(dir+'chunk'+data.id+'.json',JSON.stringify(data.data),function(err){
-                if(err) throw err;
-                console.log('done'); // replace by counter
-            });
-        });
-    }*/
 });
 
 server.sendInitializationPacket = function(socket,packet){

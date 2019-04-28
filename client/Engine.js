@@ -298,7 +298,7 @@ Engine.create = function(){
     Engine.created = true;
     Engine.configEngine();
     if(Client.tutorial){
-        Engine.bootTutorial('part1');
+        TutorialManager.boot('part1');
     }else{
         Client.requestData();
     }
@@ -324,144 +324,6 @@ Engine.createMarker = function(){
 
 Engine.configEngine = function(){
     Engine.config = Client.gameConfig.config;
-};
-
-Engine.nextTut = function(){
-    Engine.currentTutorialPanel.hide();
-    Engine.displayTutorial();
-};
-
-Engine.displayTutorial = function(){
-    var i = Engine.nextTutorial++;
-
-    if(i >= Engine.tutorialData.length){
-        Engine.currentTutorialPanel.hide();
-        return;
-    }
-
-    var specs = Engine.tutorialData;
-    var spec = specs[i];
-    var pos = spec.pos;
-    var j = 0;
-    while(pos === null){
-        pos = specs[i-j++].pos;
-    }
-
-    if(spec.camera) {
-        if(spec.camera == 'keep'){
-
-        }else {
-            Engine.camera.stopFollow();
-            Engine.camera.pan(spec.camera[0] * 32, spec.camera[1] * 32);
-        }
-    }else if(!spec.camera && i > 0 && specs[i-1].camera){
-        Engine.camera.pan(Engine.player.x,Engine.player.y,1000,'Linear',false,function(camera,progress){
-            if(progress == 1) Engine.camera.startFollow(Engine.player);
-        });
-    }
-
-    var x = pos[0];
-    var y = pos[1];
-    var w = pos[2];
-    var h = pos[3];
-    if(x == 'c') x = (UI.getGameWidth() - w) / 2;
-    if(y == 'c') y = (UI.getGameHeight() - h) / 2;
-    var panel = new InfoPanel(x, y, w, h, 'Tutorial');
-    panel.setWrap(30);
-
-    var x = 15;
-    var y = 20;
-    panel.addText(x,y,spec.txt);
-
-    if(spec.hook){
-        Engine.tutHook = spec.hook;
-    }else{
-        panel.addBigButton('Next', Engine.nextTut);
-        Engine.tutHook = null;
-    }
-    panel.display();
-    panel.moveUp(5);
-    Engine.currentTutorialPanel = panel;
-    Engine.inPanel = false;
-
-    if(Engine.checkHook()) Engine.nextTut();
-};
-
-Engine.checkHook = function(){
-      if(!Engine.tutHook) return false;
-      var info = Engine.tutHook.split(':');
-      if(info[0] == 'stock'){
-          if(Engine.buildings[info[1]].getItemNb(info[2]) == info[3]) return true;
-      }
-      return false;
-};
-
-Engine.tutorialHook = function(hook){
-    if(Engine.tutHook == hook) Engine.nextTut();
-};
-
-Engine.tutorialBld = function(x,y,bldID){
-    var items = [];
-    if(bldID == 6) items.push([3,5]);
-    Engine.updateWorld({newbuildings:[{id:4,type:6,built:true,x:x,y:y,items:items,owner:Engine.player.id}]});
-};
-
-Engine.tutorialStock = function(action,item,nb){
-    // TODO: Make all this much more declarative
-    if(action == 'give') nb *= -1;
-    var newnb = Engine.currentBuiling.getItemNb(item)-nb;
-    var items = [[parseInt(item),newnb]];
-    var updt = {buildings:{}};
-    updt.buildings[Engine.currentBuiling.id] = {items:items};
-    Engine.updateWorld(updt);
-    items = [];
-    items.push([parseInt(item),Engine.player.getItemNb(item)+nb]);
-    var sign = (nb > 0 ? '+' : '');
-    Engine.player.updateData(
-        {items:items,
-        notifs:[sign+nb+' '+Engine.itemsData[item].name]} // TODO: centralize notifs
-    );
-    //if(newnb == 0) Engine.tutorialHook('empty:'+Engine.currentBuiling.id+':'+item);
-    Engine.tutorialHook('stock:'+Engine.currentBuiling.id+':'+item+':'+newnb);
-    if(action == 'give'){
-       var recipe = Engine.buildingsData[Engine.currentBuiling.buildingType].recipe;
-       if(newnb >= recipe[item]){
-           var updt = {buildings:{}};
-           updt.buildings[Engine.currentBuiling.id] = {built:true};
-           Engine.updateWorld(updt);
-       }
-    }
-}
-;
-
-Engine.bootTutorial = function(part){
-    var data = { // TODO: move to conf
-        id: 0,
-        x: 1211,
-        y: 160,
-        settlement: 1,
-        markers: []
-    };
-    Engine.initWorld(data);
-    data = {
-        gold: 100,
-        stats: [{k:'hpmax',v:300},{k:'hp',v:300}],
-        bldRecipes: [11,6,3,4]
-    };
-    Engine.player.updateData(data);
-    data = {
-        'newbuildings':[
-            {id:0,type:11,x:1203,y:156,built:true,ownerName:'Roger'},
-            {id:1,type:11,x:1199,y:153,built:true,ownerName:'Tom'},
-            {id:2,type:3,x:1189,y:159,built:false,items:[[3,20]],ownerName:'Joe'}
-        ]
-    };
-    Engine.updateWorld(data);
-
-    Engine.tutorialData = Engine.scene.cache.json.get('tutorials')[part];
-    Engine.nextTutorial = 0;
-    Engine.displayTutorial();
-    Client.sendTutorialStart();
 };
 
 Engine.initWorld = function(data){
@@ -1597,7 +1459,7 @@ Engine.bldClick = function(){
     Engine.bldRect.locationConstrained = bld.locationConstrained;
     Engine.updateBldRect();
 
-    if(Client.tutorial) Engine.tutorialHook('bldselect:'+this.itemID);
+    if(Client.tutorial) TutorialManager.triggerHook('bldselect:'+this.itemID);
 };
 
 Engine.bldUnclick = function(shutdown){
@@ -1609,8 +1471,8 @@ Engine.bldUnclick = function(shutdown){
         pos.y = (pos.y / 32) - 1;
         console.log("Building at ", (pos.x), ",", (pos.y));
         if(Client.tutorial){
-            Engine.tutorialHook('bldunselect:'+id);
-            Engine.tutorialBld(pos.x,pos.y,id);
+            TutorialManager.triggerHook('bldunselect:'+id);
+            TutorialManager.build(pos.x,pos.y,id);
         }else{
             Client.sendBuild(id, pos);
         }
@@ -1777,8 +1639,10 @@ Engine.updateEnvironment = function(){
     var newChunks = chunks.diff(Engine.displayedChunks);
     var oldChunks = Engine.displayedChunks.diff(chunks);
 
-    for (var i = 0; i < oldChunks.length; i++) {
-        Engine.removeChunk(oldChunks[i]);
+    if(!Client.tutorial) {
+        for (var i = 0; i < oldChunks.length; i++) {
+            Engine.removeChunk(oldChunks[i]);
+        }
     }
 
     for(var j = 0; j < newChunks.length; j++){

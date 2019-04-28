@@ -40,7 +40,7 @@
         maxClassXP: 999999,
         maxGold: 100000,
         foodConsumption: 1.5,
-        steps: 1, // 50 ; number of steps to make to lose `stepLoss` points of vigor
+        steps: 50, // number of steps to make to lose `stepLoss` points of vigor
         stepsLoss: 1 // amount of vigor lost after walking `steps` steps
    },
    economyCycles: {
