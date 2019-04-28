@@ -40,20 +40,19 @@
         maxClassXP: 999999,
         maxGold: 100000,
         foodConsumption: 1.5,
-        steps: 50, //number of steps to make to lose `stepLoss` points of vigor
+        steps: 1, // 50 ; number of steps to make to lose `stepLoss` points of vigor
         stepsLoss: 1 // amount of vigor lost after walking `steps` steps
    },
    economyCycles: {
         // Unit: seconds
-        turnDuration: 60,
+        turnDuration: 1,
         // Unit: turns
         turns: {
-            build: 10,
             camps: 5,
-            foodConsumptionRate: 10, // rate at which food levels of players are decreased ; amount in character.foodConsumption
-            itemsRespawn: 1440, // 1440
+            foodConsumptionRate: 600, // rate at which food levels of players are decreased ; amount in character.foodConsumption
+            itemsRespawn: 86400, // 86400sec = 24h
             restRate: 1, // rate at which vigor levels of players are increased when sheltered ; amount in buildings.json
-            spawnZones: 5
+            spawnZones: 300
         }
     },
     misc: {

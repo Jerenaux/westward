@@ -28,6 +28,9 @@ function ProductionPanel(x,y,width,height,title){
     this.foodcontent.push(this.goldicon);
     this.foodcontent.push(this.goldtxt);
     this.foodcontent = this.foodcontent.concat(this.foodtexts);
+    this.foodcontent.forEach(function(c){
+        c.setVisible(false);
+    });
 
     var panel_ = this;
     var btnx = x + 75;
@@ -219,8 +222,8 @@ ProdSlot.prototype.setUp = function(item, cap, turns, remaining, output){
     this.itemID = item;
     var nb = Engine.currentBuiling.getItemNb(item);
     this.countText.setText(nb+'/'+cap);
-    this.countText.setFill((nb == cap ? Utils.colors.gold : Utils.colors.white));
-    var newlevel = ( nb == cap ? turns : turns-remaining);
+    this.countText.setFill((nb >= cap ? Utils.colors.gold : Utils.colors.white));
+    var newlevel = ( nb >= cap ? turns : turns-remaining);
     this.bar.setLevel(newlevel, turns, (newlevel < this.bar.level));
     this.prodtext.setText('+'+output);
 

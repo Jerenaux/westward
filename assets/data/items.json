@@ -50,8 +50,9 @@
     "atlas": "items2",
     "frame":"root",
     "name": "Sunstreak root",
-    "desc": "Crafting material involved in the brewing of several types of potions.",
+    "desc": "Crafting material involved in the brewing of several types of potions. Poisonous if consumed raw.",
     "isMaterial": true,
+    "effects":{"hp":-50},
     "yield": 2
   },
   "6":{

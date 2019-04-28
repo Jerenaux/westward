@@ -167,20 +167,27 @@ Building.prototype.updateProd = function(justBuilt){
     var production = GameServer.buildingsData[this.type].production;
     if(!production) return false;
     var produced = 0;
+    var updateCountdowns = false;
     for(var i = 0; i < production.length; i++){
         var item = production[i][0];
         var baseNb = production[i][1];
         var turns = production[i][2];
         var cap = production[i][3];
         var remainingTurns = GameServer.elapsedTurns%turns;
-        this.prodCountdowns[item] = (turns - remainingTurns);//*GameServer.turnDuration;
+        var current = this.getItemNb(item);
+
+        var countdown = (current < cap ? turns - remainingTurns : 0);
+        if(this.prodCountdowns[item] != countdown){
+            this.prodCountdowns[item] = countdown;
+            updateCountdowns = true;
+        }
+
         if(remainingTurns > 0 || justBuilt) continue;
 
         // var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
         var increment = baseNb;
         if(this.getItemNb(1) > 0) increment *= 2;
 
-        var current = this.getItemNb(item);
         if(current >= cap) continue;
         var actualNb = Math.min(increment,cap-current);
         if(actualNb) {
@@ -191,8 +198,9 @@ Building.prototype.updateProd = function(justBuilt){
             this.takeItem(1,1);
             GameServer.destroyItem(1,1,'building food consumption');
         }
+
     }
-    this.setProperty('prodCountdowns',this.prodCountdowns);
+    if(updateCountdowns) this.setProperty('prodCountdowns',this.prodCountdowns);
     return (produced > 0);
 };
 

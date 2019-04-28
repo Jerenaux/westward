@@ -72,7 +72,7 @@
     "mapicon": "wood",
     "mainMenu": "production",
     "depthOffset": 2,
-    "production": [[3,1,10,20],[7,5,10,20]],
+    "production": [[3,1,60,5],[7,5,60,5]],
     "canFight": false,
     "health": 50
   },
@@ -89,12 +89,12 @@
     "foundations": "foundations_1",
     "sprite": "shack",
     "mapicon": "wood",
-    "mainMenu": "wip",
+    "mainMenu": "rest",
     "depthOffset": 2,
     "canFight": false,
     "health": 50,
     "shelter": true,
-    "restVigorAmount": 1,
-    "restHealthAmount": 2
+    "restVigorAmount": 0.5,
+    "restHealthAmount": 0.5
   }
 }

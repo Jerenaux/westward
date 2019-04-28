@@ -368,7 +368,7 @@ GameServer.onInitialized = function(){
     GameServer.addAnimal(504,678,0);
     GameServer.addAnimal(502,681,0);
     GameServer.addAnimal(500,679,0);
-    GameServer.addItem(1199,148,46);
+    GameServer.addItem(1193,171,5);
 };
 
 /**
@@ -425,7 +425,7 @@ GameServer.startEconomy = function(){
  */
 GameServer.economyTurn = function(){
     GameServer.elapsedTurns++;
-    console.log('Turn',GameServer.elapsedTurns);
+    if(!GameServer.elapsedTurns%10) console.log('Turn',GameServer.elapsedTurns);
 
     GameServer.spawnZones.forEach(function(zone){
         zone.update();

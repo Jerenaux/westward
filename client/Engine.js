@@ -902,6 +902,7 @@ Engine.makeUI = function(){
         'map': Engine.makeMapMenu(),
         //'messages': Engine.makeMessagesMenu(),
         'production': Engine.makeProductionMenu(),
+        'rest': Engine.makeRestMenu(),
         'trade': Engine.makeTradeMenu(),
         'wip': Engine.makeWipMenu()
     };
@@ -1247,6 +1248,7 @@ Engine.makeProductionMenu = function(){
     production.addPanel('production',productionPanel);
 
     var action = new ShopPanel(212,420,300,100,'Take',true); // true = not shop, hack
+    action.addButton(300-16,-8,'red','close',action.hide.bind(action),'Close');
     action.moveUp(2);
     production.addPanel('action',action,true);
 
@@ -1328,6 +1330,20 @@ Engine.makeWipMenu = function(){
 
     var panel = menu.addPanel('main',new InfoPanel(x,150,w,300));
     var txt = panel.addText(110,150,'Nothing to do here (yet)',null,24);
+
+    return menu;
+};
+
+Engine.makeRestMenu = function(){
+    var menu = new Menu();
+    menu.setTitlePos(100);
+    menu.setExitPos(670);
+    var w = 400;
+    var x = (Engine.getGameConfig().width-w)/2;
+
+    var panel = menu.addPanel('main',new RestPanel(x,150,w,200));
+    panel.addButton(w - 30, 8, 'blue','help',null,'',UI.textsData['shack_help']);
+    menu.addEvent('onUpdateStats',panel.update.bind(panel));
 
     return menu;
 };

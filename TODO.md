@@ -42,8 +42,7 @@ Misc:
 - Aggro issue
 - Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
 
-- Make both rest and production visually fast
-- Update shack menu
+- Update help inform about food in prod help
 - Test setting prices in shop
 
 

@@ -771,7 +771,7 @@ Player.prototype.rest = function(nb){
     }
     var buildingData = GameServer.buildingsData[building.type];
     if(!buildingData.shelter){
-        console.log('Building doesn\'t offer shelter');
+        // console.log('Building doesn\'t offer shelter');
         return;
     }
     console.log('Resting for',nb,'cycles');
