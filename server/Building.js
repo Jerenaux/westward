@@ -78,12 +78,13 @@ function Building(data){
 
     var production = GameServer.buildingsData[this.type].production;
     if(production){
-        this.prodCountdowns = {}
+        this.prodCountdowns = {};
         for(var i = 0; i < production.length; i++){
             var item = production[i][0];
             this.prodCountdowns[item] = 0;
         }
     }
+    this.setProperty('prodCountdowns',this.prodCountdowns);
 
     this.newitems = new Inventory(GameServer.buildingParameters.inventorySize);
 
@@ -174,7 +175,11 @@ Building.prototype.updateProd = function(justBuilt){
         var remainingTurns = GameServer.elapsedTurns%turns;
         this.prodCountdowns[item] = (turns - remainingTurns);//*GameServer.turnDuration;
         if(remainingTurns > 0 || justBuilt) continue;
-        var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
+
+        // var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
+        var increment = baseNb;
+        if(this.getItemNb(1) > 0) increment *= 2;
+
         var current = this.getItemNb(item);
         if(current >= cap) continue;
         var actualNb = Math.min(increment,cap-current);
@@ -183,6 +188,8 @@ Building.prototype.updateProd = function(justBuilt){
             var msg = actualNb+' '+GameServer.itemsData[item].name+' was produced';
             GameServer.notifyPlayer(this.owner,msg);
             produced += actualNb;
+            this.takeItem(1,1);
+            GameServer.destroyItem(1,1,'building food consumption');
         }
     }
     this.setProperty('prodCountdowns',this.prodCountdowns);

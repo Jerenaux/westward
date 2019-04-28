@@ -1041,6 +1041,10 @@ Engine.tweenFighText = function(){
     );
 };
 
+Engine.isProduced = function(item){
+    return Engine.currentBuiling.produced.includes(parseInt(item));
+};
+
 Engine.handleBattleAnimation = function(data){
     var sprite = Engine.animationsPools[data.name].getNext();
     sprite.setVisible(false);
@@ -1233,32 +1237,40 @@ Engine.makeProductionMenu = function(){
     production.setTitlePos(100);
     production.setExitPos(680);
     var w = 400;
-    var h = 330;
+    var h = 350;
     var x = (Engine.getGameConfig().width-w)/2;
     var y = 150;
-    var prodw = 250;
-    var prodh = 100;
-    var prody = y + 160;
-    var prodx = (Engine.getGameConfig().width-prodw)/2;
 
     var productionPanel = new ProductionPanel(x,y,w,h);
     productionPanel.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['prod_help']);
+    productionPanel.addCapsule('gold',20,20,'999','gold');
     production.addPanel('production',productionPanel);
 
     var action = new ShopPanel(212,420,300,100,'Take',true); // true = not shop, hack
+    action.moveUp(2);
     production.addPanel('action',action,true);
 
     var prices = production.addPanel('prices',Engine.makePricesPanel(),true);
-    prices.limitToCrafting();
+    prices.limitToProduction();
+
+    var aw = 300;
+    var goldaction = production.addPanel('goldaction',new ShopGoldPanel(212,390,aw,100,'Buy/Sell'),true);
+    goldaction.addButton(aw-16,-8,'red','close',goldaction.hide.bind(goldaction),'Close');
+    goldaction.moveUp(2);
 
     production.addEvent('onUpdateShop',function(){
         productionPanel.update();
         action.update();
     });
 
+    production.addEvent('onUpdateShopGold',function(){
+        productionPanel.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+    });
+
     production.addEvent('onOpen',function(){
         productionPanel.update();
         action.update();
+        productionPanel.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
     });
     return production;
 };

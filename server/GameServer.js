@@ -895,7 +895,7 @@ GameServer.createItem = function(item,nb,source){
 
 /**
  * Opposite of GameServer.createItem(). Called when items
- * are consumed in the crafting process.
+ * are consumed in the crafting process or used by players.
  * @param {number} item - type of the item removed from the world.
  * @param {number} nb - amount of items removed.
  * @param {string} source - which process led to the destruction of the item.
@@ -1110,7 +1110,7 @@ GameServer.handleShop = function(data,socketID) {
             player.takeGold(price, true);
             building.giveGold(price);
             player.updateVigor(-3); // TODO: vary + conf
-            var phrase = [player.name,'bought',nb,GameServer.itemsData[item].name,'for',price,Utils.formatMoney(price),'in my shop'];
+            var phrase = [player.name,'bought',nb,GameServer.itemsData[item].name,'for',price,Utils.formatMoney(price)];
             var msg = phrase.join(' ');
             GameServer.notifyPlayer(building.owner,msg);
         }
@@ -1309,9 +1309,11 @@ GameServer.handleUse = function(data,socketID){
     var result;
     if(itemData.equipment) {
         result = player.equip(itemData.equipment, item, false); // false: not from DB
-    }else  if(itemData.effects){
-        result = player.applyEffects(item,1,true);
-        player.takeItem(item,1,true,(itemData.verb || 'Used'));
+    }else if(itemData.effects){
+        var nb = 1;
+        result = player.applyEffects(item,nb,true);
+        player.takeItem(item,nb,true,(itemData.verb || 'Used'));
+        GameServer.destroyItem(item,nb,'use'); // If non-equipment, then consumable item
     }
     Prism.logEvent(player,'use',{item:item});
     return result;

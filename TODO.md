@@ -42,10 +42,9 @@ Misc:
 - Aggro issue
 - Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
 
-- Buying or not buying from prod buildings? Decide and test
-- Allow food to be given and sold to buildings + compute and apply productivity
 - Make both rest and production visually fast
 - Update shack menu
+- Test setting prices in shop
 
 
 

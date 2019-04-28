@@ -19,7 +19,9 @@ function PricesPanel(x,y,width,height,title){
         if(value.length >= 3){
             var hits = [];
             for(var id in Engine.itemsData) {
-                if(this.craft && !Engine.itemsData[id].isCrafted) continue;
+                if(this.craftingOnly && !Engine.itemsData[id].isCrafted) continue;
+                if(id != 1 && this.prodOnly && !Engine.isProduced(id)) continue;
+
                 var name = Engine.itemsData[id].name.toLowerCase();
                 if(name.includes(value)) hits.push(id);
                 if(hits.length >= 3) break;
@@ -28,20 +30,29 @@ function PricesPanel(x,y,width,height,title){
         }
     }.bind(this);
     document.getElementById('game').appendChild(this.input);
+
+    this.buyText = 'Buy';
+    this.sellText = 'Sell';
 }
 
 PricesPanel.prototype = Object.create(Panel.prototype);
 PricesPanel.prototype.constructor = PricesPanel;
 
 PricesPanel.prototype.limitToCrafting = function(){
-    this.craft = true;
+    this.craftingOnly = true;
+    this.buyText = '';
+    this.sellText = 'Craft';
+};
+
+PricesPanel.prototype.limitToProduction = function(){
+    this.prodOnly = true;
 };
 
 PricesPanel.prototype.getNextSlot = function(y){
     var w = 250;
     var x = 1024/2 - w/2;
     if(this.slotsCounter >= this.slots.length){
-        this.slots.push(new PriceSlot(x,y,w,90,this.craft));
+        this.slots.push(new PriceSlot(x,y,w,90,this.buyText,this.sellText));
     }
 
     return this.slots[this.slotsCounter++];
@@ -82,25 +93,33 @@ PricesPanel.prototype.hideContent = function(){
 
 // -----------------------
 
-function PriceSlot(x,y,width,height,craft){
+function PriceSlot(x,y,width,height,buyLabel,sellLabel){
     Panel.call(this,x,y,width,height);
 
     this.icon = UI.scene.add.sprite(this.x + 30, this.y + height/2);
     this.name = UI.scene.add.text(this.x + 60, this.y + 10, '', { font: '16px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    var selltxt = (craft ? 'Craft for:' : 'Sell for:');
-    if(!craft)  this.buyText = UI.scene.add.text(this.x + 60, this.y + 40, 'Buy for:', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.sellText = UI.scene.add.text(this.x + 60, this.y + 65, selltxt, { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
 
-    var sellx = (craft ? 135 : 120);
-    if(!craft) this.buy = this.addInput(50,120,41);
-    this.sell = this.addInput(50,sellx,66);
+    var labely = 41;
+    if(buyLabel) {
+        this.buyText = UI.scene.add.text(this.x + 60, this.y + labely, buyLabel+' for:', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+        this.buy = this.addInput(50,120,labely);
+        labely += 25;
+    }
+    if(sellLabel){
+        this.sellText = UI.scene.add.text(this.x + 60, this.y + labely, sellLabel+' for:', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+        var sellx = (buyLabel ? 120 : 135);
+        this.sell = this.addInput(50,sellx,labely);
+    }
+
 
     this.addButton(width-20,height-20,'green','ok',function(){
         Client.setPrices(this.itemID,(this.buy ? this.buy.value : -1),(this.sell ? this.sell.value : -1));
     }.bind(this),'Confirm');
 
-    this.content = [this.icon, this.name, this.sellText];
-    if(!craft) this.content.push(this.buyText);
+    this.content = [this.icon, this.name];
+    if(buyLabel) this.content.push(this.buyText);
+    if(sellLabel) this.content.push(this.sellText);
+
     this.content.forEach(function(c){
         c.setScrollFactor(0);
         c.setDepth(1);

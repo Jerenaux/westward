@@ -41,6 +41,7 @@ var Building = new Phaser.Class({
         this.ownerName = data.ownerName;
         this.civBuilding = (this.settlement == -1);
         this.inventory = new Inventory(100);
+        this.countdowns = data.prodCountdowns;
         this.name = buildingData.name;//+' '+this.id;
         this.prices = {};
         this.built = false;
@@ -56,8 +57,15 @@ var Building = new Phaser.Class({
         this.resetDepth();
 
         this.setInteractive();
-
         this.setCollisions();
+
+        var production = buildingData.production;
+        this.produced = [];
+        if(production){
+            production.forEach(function(prod){
+                this.produced.push(parseInt(prod[0]));
+            },this);
+        }
 
         if(Engine.debugCollisions) this.setAlpha(0.1);
 

@@ -292,6 +292,8 @@ UI.makeClassPanel = function(menu,classID,x,y,classw,classh){
 };
 
 UI.launchGameMode = function(){
+    if(UI.gameLaunched) return;
+    UI.gameLaunched = true;
     Boot.buttons.forEach(function(b){
         b.hide();
     });
