@@ -43,7 +43,7 @@ Misc:
 - Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
 
 - Test setting prices in shop
-- Don't destroy chunks in tutorial mode
+- Lock shacks
 
 Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
 
