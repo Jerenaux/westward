@@ -12,6 +12,7 @@ var Stats = {
     hpmax: {
         min: 0,
         max: 10000,
+        default: 100,
         noModifier: true,
         hidden: true
     },
@@ -20,6 +21,7 @@ var Stats = {
         desc: 'Represents how healthy you are. If it gets to 0, you die. Look for medicine to replenish.',
         min: 0,
         max: 10000,
+        default: 100,
         frame: 'heart',
         hasMax: 'hpmax',
         noModifier: true

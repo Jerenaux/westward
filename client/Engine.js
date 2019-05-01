@@ -298,7 +298,7 @@ Engine.create = function(){
     Engine.created = true;
     Engine.configEngine();
     if(Client.tutorial){
-        TutorialManager.boot('part1');
+        TutorialManager.boot(2);
     }else{
         Client.requestData();
     }
@@ -322,6 +322,7 @@ Engine.createMarker = function(){
     Engine.hideMarker();
 };
 
+// Called at the end of create(), data is received before the Engine scene starts
 Engine.configEngine = function(){
     Engine.config = Client.gameConfig.config;
 };
@@ -346,7 +347,7 @@ Engine.initWorld = function(data){
         0: {name:'New Beginnng'},
         1: {name:'Hope'}
     };
-    Engine.setlCapsule.setText(settlements[data.settlement].name);
+    Engine.setlCapsule.setText(settlements[Engine.player.settlement].name);
 
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
@@ -715,8 +716,9 @@ Engine.makeUI = function(){
     Engine.goldCapsule = new Capsule(152,3,'UI','gold');
     Engine.goldCapsule.display();
     Engine.goldCapsule.update = function(){
-        this.setText(Engine.player.gold); // TODO: add max
+        this.setText(Engine.player.gold || 0); // TODO: add max
     };
+    Engine.goldCapsule.update();
 
     Engine.bagCapsule = new Capsule(228,3,'UI','smallpack');
     Engine.bagCapsule.display();

@@ -5,34 +5,15 @@
 var TutorialManager = {};
 
 TutorialManager.boot = function(part){
-    // Data to simulate init package from server
-    var initData = { // TODO: move to conf
-        id: 0,
-        x: 1211,
-        y: 160,
-        settlement: 1
-    };
-    // Data to simulate player setup
-    var playerData = { // TODO: conf
-        gold: 100,
-        stats: [{k:'hpmax',v:300},{k:'hp',v:300}],
-        bldRecipes: [11,6,3,4]
-    };
-    // Data to create tutorial world
-    var worldData = {
-        'newbuildings':[
-            {id:0,type:11,x:1203,y:156,built:true,ownerName:'Roger'},
-            {id:1,type:11,x:1199,y:153,built:true,ownerName:'Tom'},
-            {id:2,type:3,x:1189,y:159,built:false,items:[[3,15],[26,10]],ownerName:'Joe'}
-        ]
-    };
+    for(var p = 1; p <= part; p++) {
+        TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part' + part];
 
-    Engine.initWorld(initData);
-    Engine.player.updateData(playerData);
-    Engine.updateWorld(worldData);
+        Engine.initWorld(TutorialManager.tutorialData.initData); // Data to simulate init package from server
+        Engine.player.updateData(TutorialManager.tutorialData.playerData); // Data to simulate player setup
+        Engine.updateWorld(TutorialManager.tutorialData.worldData);     // Data to create tutorial world
+    }
 
-    TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')[part];
-    TutorialManager.nextTutorial = 15;
+    TutorialManager.nextTutorial = 0;
     TutorialManager.currentHook = null;
     TutorialManager.displayNext();
     Client.sendTutorialStart();
@@ -45,25 +26,25 @@ TutorialManager.displayNext = function(){
     if(i >= TutorialManager.tutorialData.length) return;
     TutorialManager.currentHook = null;
 
-    var specs = TutorialManager.tutorialData;
-    var spec = specs[i];
-    var pos = spec.pos;
+    var steps = TutorialManager.tutorialData.steps;
+    var step = steps[i];
+    var pos = step.pos;
     var j = 0;
     // If the current spec doesn't indicate a position, loop backwards until you find one
     while(pos === null){
-        pos = specs[i-j++].pos;
+        pos = steps[i-j++].pos;
     }
 
-    if(spec.hook) TutorialManager.currentHook = spec.hook;
+    if(step.hook) TutorialManager.currentHook = step.hook;
     if(TutorialManager.isHookTriggered()){
         TutorialManager.displayNext();
         return;
     }
 
-    if(spec.camera && spec.camera != 'keep') {
+    if(step.camera && step.camera != 'keep') {
         Engine.camera.stopFollow();
-        Engine.camera.pan(spec.camera[0] * 32, spec.camera[1] * 32);
-    }else if(!spec.camera && i > 0 && specs[i-1].camera){
+        Engine.camera.pan(step.camera[0] * 32, step.camera[1] * 32);
+    }else if(!step.camera && i > 0 && step[i-1].camera){
         Engine.camera.pan(Engine.player.x,Engine.player.y,1000,'Linear',false,function(camera,progress){
             if(progress == 1) Engine.camera.startFollow(Engine.player);
         });
@@ -80,9 +61,9 @@ TutorialManager.displayNext = function(){
 
     var x = 15;
     var y = 20;
-    panel.addText(x,y,spec.txt);
+    panel.addText(x,y,step.txt);
 
-    if(!spec.hook){
+    if(!step.hook){
         panel.addBigButton('Next', TutorialManager.displayNext);
         panel.handleKeyboard = function(event){
             if(['Enter',' '].includes(event.key)) panel.button.handleClick();

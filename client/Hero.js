@@ -23,18 +23,15 @@ var Hero = new Phaser.Class({
         // data comes from Player.initTrim() server-side
         Player.prototype.setUp.call(this,data);
 
-        this.settlement = data.settlement;
+        this.settlement = data.settlement || 0;
         this.buildingMarkers = data.buildingMarkers || [];
         this.resourceMarkers = data.resourceMarkers || [];
         this.FoW = [];
-        this.unread = 1;
         this.inventory = new Inventory();
         this.stats = new StatsContainer();
         this.equipment = new EquipmentManager();
 
-        this.gold = data.gold;
-        // this.vigor = data.vigor;
-        // this.food = data.food;
+        this.gold = data.gold || 0;
         this.civiclvl = data.civiclvl;
         this.civicxp = data.civicxp;
         this.classxp = data.classxp || new classDataShell();
@@ -44,6 +41,9 @@ var Hero = new Phaser.Class({
 
         this.updateRarity(data.rarity || []);
         this.updateHistory(data.history);
+        this.updateFoW();
+
+        this.buildRecipes.fromList(Engine.config.defaultBuildRecipes);
 
         for(var item in Engine.itemsData){
             var data = Engine.itemsData[item];
@@ -235,8 +235,8 @@ var Hero = new Phaser.Class({
     },
 
     updateFoW: function(aois){
-        // var aois = [331,341,389,390,391,438,439,440,490];
         this.FoW = [];
+        if(!aois) aois = [Engine.player.chunk];
         aois.forEach(function(aoi){
             var origin = Utils.AOItoTile(aoi);
             this.FoW.push(new Phaser.Geom.Rectangle(origin.x,origin.y,World.chunkWidth,World.chunkHeight));

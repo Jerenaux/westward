@@ -44,33 +44,7 @@ Misc:
 
 - Test setting prices in shop
 - Indigo
-
-Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
-
-World building: move away from tiles:
-[x] Zoom
-[x] Panning
-[x] 96x96 grass chunks, loaded positionnally
-[x] Tiles only for other terrain elements (water, dirt, ...)
-[x] Everything on top are single-image objects (possibly rendered in multiple parts with different depths)
-[x] Test trees overlaps
-[x] Sparse format, declarative (grass, water, ...)
-[x] Specific tiles (e.g. water joints) computed positionnally
-[x] Default filler tile for empty ones, on layer 0
-[x] Store tilesets and images as atlases
-[x] World maker: store coasts
-[ ] Inexistant chunks filled by water
-[ ] Add decor elements via editor
-[ ] Store and edit game data (resources, spawn zones, civs logic...)
-[x] Visualize collisions
-[x] Collisions listed from tileset
-[x] Collisions digest for server, displayed in editor
-[x] Collisions fetched from tileset for client, no digest 
-[ ] Built-in exploration, to test collisions and depths
-[ ] Re-enable blitters, at least for ground and water?
-[x] Remove legacy tiles after a while (from png and json) + old tileset files
-
- 
+- Test new player
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.

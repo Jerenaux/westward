@@ -56,7 +56,7 @@ function Player(){
         3: 0,
         4: 0 // civic AP
     };
-    this.baseBldrecipes = [11,6,3,4]; //TODO: conf
+    this.baseBldrecipes = GameServer.clientParameters.config.defaultBuildRecipes;
     this.bldRecipes = [];
 
     this.cellsWidth = 1;
