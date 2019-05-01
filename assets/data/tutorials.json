@@ -21,7 +21,7 @@
     {"pos": null,"hook":"stock:4:3:0","txt":"Since you own this building, you can take anything from it's stock. Click on the timber icon and take it all."},
     {"pos": null,"hook":"bld:2","txt":"Now exit your building and go to the Wokshop under construction."},
     {"pos":null,"txt":"You can contribute to a building's construction by giving material freely, or by selling it for money."},
-    {"pos":null,"hook":"stock:2:3:25","txt":"Let's be altruistic for now. Click on the button to give all your timber."},
+    {"pos":null,"hook":"stock:2:3:20","txt":"Let's be altruistic for now. Click on the button to give all your timber."},
     {"pos":null,"txt":"Great! The Workshop has been built! It'll be essential to the local community's survival."},
     {"pos":null,"txt":"As you can see, players can complement and help each other, freely or for gold, to create settlements that will help them survive."},
     {"pos":null,"txt":"This is the end of this tutorial, feel free to leave and explore the real game now!"}

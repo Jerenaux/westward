@@ -89,21 +89,17 @@ Menu.prototype.display = function(){
         if(!this.hideOnOpen[p]) this.panels[p].display();
     }
 
-    /*for(var event in this.events){
-        if(!this.events.hasOwnProperty(event)) continue;
-        this.trigger(event);
-    }*/
     this.trigger('onOpen');
 
     Engine.inMenu = true;
-    Engine.hideMarker();
+    if(!this.allowWalk) Engine.hideMarker();
     if(!this.keepHUD) Engine.hideHUD();
     UI.setCursor();
     this.displayed = true;
 
     if(this.log) Client.logMenu(this.name);
 
-    if(Client.tutorial && this.hook) Engine.tutorialHook(this.hook);
+    if(Client.tutorial && this.hook) TutorialManager.triggerHook(this.hook);
 };
 
 Menu.prototype.hide = function(){

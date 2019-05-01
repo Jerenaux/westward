@@ -45,12 +45,7 @@ var Building = new Phaser.Class({
         this.name = buildingData.name;//+' '+this.id;
         this.prices = {};
         this.built = false;
-        /*if(buildingData.entrance) {
-            this.entrance = {
-                x: this.tileX + buildingData.entrance.x,
-                y: this.tileY + buildingData.entrance.y
-            };
-        }*/
+       this.locked = buildingData.locked;
 
         this.depthOffset = buildingData.depthOffset;
         this.setBuilt(data.built);
@@ -345,7 +340,10 @@ var Building = new Phaser.Class({
             if(this.civBuilding){
                 Client.buildingClick(this.id);
             }else {
-                //if (!this.entrance) return;
+                if(this.locked && !this.isOwned()){
+                    Engine.player.talk('That building is locked');
+                    return;
+                }
                 var entrance = this.findEntrance();
                 Engine.player.setDestinationAction(1, this.id, entrance.x, entrance.y); // 1 for building
                 Engine.computePath(entrance);

@@ -67,6 +67,7 @@ ProductionPanel.prototype.getNextSlot = function(x,y){
 
 ProductionPanel.prototype.displayInterface = function(){
     var data = Engine.currentBuiling;
+
     var buildingTypeData = Engine.buildingsData[data.buildingType];
     var production = buildingTypeData.production;
     var sloty = this.y + 55;
@@ -81,7 +82,8 @@ ProductionPanel.prototype.displayInterface = function(){
         if(food > 0) output *= 2;
         var nbturns = prod[2];
         var cap = prod[3] ;
-        slot.setUp(item,cap, nbturns, data.countdowns[item], output);
+        var cnt = (data.countdowns ? data.countdowns[item] : 0);
+        slot.setUp(item,cap, nbturns, cnt, output);
         yOffset += 90;
     }, this);
 

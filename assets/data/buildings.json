@@ -94,6 +94,7 @@
     "canFight": false,
     "health": 50,
     "shelter": true,
+    "locked":true,
     "restVigorAmount": 0.5,
     "restHealthAmount": 0.5
   }

@@ -98,10 +98,12 @@ Tooltip.prototype.updateInfo = function(title, text, itemID, stat){
     var nbLines = 0;
     var nbEffects = 0;
     if(itemID > -1){
-        var effects = Engine.itemsData[itemID].effects || {};
-        nbEffects = Object.keys(effects).length;
-        this.displayStats(effects,nbEffects);
-        nbLines += nbEffects;
+        if(Engine.itemsData[itemID].name == title) { // quick hack to avoid displaying 'stat' when items are in fact buildings
+            var effects = Engine.itemsData[itemID].effects || {};
+            nbEffects = Object.keys(effects).length;
+            this.displayStats(effects, nbEffects);
+            nbLines += nbEffects;
+        }
     }
     if(stat) {
         this.displayModifiers(stat);

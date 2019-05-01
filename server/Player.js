@@ -774,6 +774,7 @@ Player.prototype.rest = function(nb){
         // console.log('Building doesn\'t offer shelter');
         return;
     }
+    if(!building.isOwnedBy(this)) return;
     console.log('Resting for',nb,'cycles');
     this.updateVigor(nb*buildingData.restVigorAmount,true); // true = ignore food level
     var changed = this.getStat('hp').increment(nb*buildingData.restHealthAmount);

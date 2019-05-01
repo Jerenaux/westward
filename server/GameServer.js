@@ -369,6 +369,7 @@ GameServer.onInitialized = function(){
     GameServer.addAnimal(502,681,0);
     GameServer.addAnimal(500,679,0);
     GameServer.addItem(1193,171,5);
+    console.log('---done---');
 };
 
 /**

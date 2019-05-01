@@ -1436,14 +1436,15 @@ Engine.makeCraftingMenu = function(){
 Engine.makeBuildMenu = function(){
     var build = new Menu();
     build.keepHUD = true;
+    build.allowWalk = true;
     build.name = 'Build something'; // Allows to have a hover name without a menu title
     build.hook = 'buildmenu';
     var w = 200;
     var buildings = build.addPanel('build',new InventoryPanel(30,40,w,150,'Buildings'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
-    // buildings.setInventory(Engine.player.buildRecipes,5,false,Engine.bldClick);
     buildings.setInventory('buildRecipes',5,false,Engine.bldClick);
     buildings.setDataMap(Engine.buildingIconsData);
+    buildings.hideEffects = true;
     buildings.moveUp(2);
     build.addEvent('onOpen',buildings.updateInventory.bind(buildings));
     return build;
@@ -1697,6 +1698,10 @@ Engine.checkResource = function(x,y){
 
 Engine.handleKeyboard = function(event){
     //console.log(event);
+    if(Engine.currentTutorialPanel && Engine.currentTutorialPanel.handleKeyboard){
+        Engine.currentTutorialPanel.handleKeyboard(event);
+        return;
+    }
     if(event.key == 'Enter') Engine.toggleChatBar();
 };
 
@@ -1712,10 +1717,11 @@ Engine.handleClick = function(pointer,objects){
             if(objects[i].handleClick) objects[i].handleClick(pointer);
         }
     }else{
-        if(!Engine.inPanel && !Engine.inMenu && !BattleManager.inBattle && !Engine.dead) {
+        if(!BattleManager.inBattle && !Engine.dead) {
             if(Engine.bldRect){
                 Engine.bldUnclick();
             }else {
+                if(Engine.inMenu && !Engine.currentMenu.allowWalk) return;
                 Engine.moveToClick(pointer);
             }
         }
@@ -1763,7 +1769,8 @@ Engine.computePath = function(position,nextTo){
 
     var path = Engine.pathFinder.findPath(start,{x:x,y:y},false,nextTo); // seek = false, nextTo = true
     if(!path) {
-        Engine.player.talk('It\'s too far!');
+        if(!Engine.checkCollision(x,y)) Engine.player.talk('It\'s too far!');
+        // Engine.player.talk('I can\'t go there!');
         return;
     }
 
@@ -1996,7 +2003,7 @@ Engine.enterBuilding = function(id){
     Engine.buildingTitle.move(Engine.currentMenu.titleY);
     Engine.buildingTitle.display();
 
-    if(Client.tutorial) Engine.tutorialHook('bld:'+id);
+    if(Client.tutorial) TutorialManager.triggerHook('bld:'+id);
 };
 
 Engine.exitBuilding = function(){
@@ -2010,7 +2017,7 @@ Engine.exitBuilding = function(){
         Engine.menus[m].hideIcon();
     }
     if(Engine.miniMap)  Engine.miniMap.follow();
-    if(Client.tutorial) Engine.tutorialHook('exit');
+    if(Client.tutorial) TutorialManager.triggerHook('exit');
 };
 
 Engine.getHolderSize = function(){

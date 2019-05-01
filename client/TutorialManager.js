@@ -23,7 +23,7 @@ TutorialManager.boot = function(part){
         'newbuildings':[
             {id:0,type:11,x:1203,y:156,built:true,ownerName:'Roger'},
             {id:1,type:11,x:1199,y:153,built:true,ownerName:'Tom'},
-            {id:2,type:3,x:1189,y:159,built:false,items:[[3,20]],ownerName:'Joe'}
+            {id:2,type:3,x:1189,y:159,built:false,items:[[3,15],[26,10]],ownerName:'Joe'}
         ]
     };
 
@@ -32,7 +32,7 @@ TutorialManager.boot = function(part){
     Engine.updateWorld(worldData);
 
     TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')[part];
-    TutorialManager.nextTutorial = 0;
+    TutorialManager.nextTutorial = 15;
     TutorialManager.currentHook = null;
     TutorialManager.displayNext();
     Client.sendTutorialStart();
@@ -43,6 +43,7 @@ TutorialManager.displayNext = function(){
 
     var i = TutorialManager.nextTutorial++;
     if(i >= TutorialManager.tutorialData.length) return;
+    TutorialManager.currentHook = null;
 
     var specs = TutorialManager.tutorialData;
     var spec = specs[i];
@@ -53,13 +54,7 @@ TutorialManager.displayNext = function(){
         pos = specs[i-j++].pos;
     }
 
-    if(spec.hook){
-        TutorialManager.currentHook = spec.hook;
-    }else{
-        panel.addBigButton('Next', TutorialManager.displayNext);
-        TutorialManager.currentHook = null;
-    }
-
+    if(spec.hook) TutorialManager.currentHook = spec.hook;
     if(TutorialManager.isHookTriggered()){
         TutorialManager.displayNext();
         return;
@@ -86,6 +81,13 @@ TutorialManager.displayNext = function(){
     var x = 15;
     var y = 20;
     panel.addText(x,y,spec.txt);
+
+    if(!spec.hook){
+        panel.addBigButton('Next', TutorialManager.displayNext);
+        panel.handleKeyboard = function(event){
+            if(['Enter',' '].includes(event.key)) panel.button.handleClick();
+        };
+    }
 
     panel.display();
     panel.moveUp(5);

@@ -156,7 +156,7 @@ InventoryPanel.prototype.displayInventory = function(){
             if(!this.applyFilter(item)) return;
         }
         var sprite = this.getNextSprite();
-        sprite.item.setUp(item,this.dataMap[item],this.itemCallback);
+        sprite.item.setUp(item,this.dataMap[item],this.itemCallback,this.hideEffects);
         var slot = this.slots[nbDisplayed];
         if(slot.fringeSlot){
             sprite.item.setOrigin(sprite.item.originX-0.1,sprite.item.originY);
