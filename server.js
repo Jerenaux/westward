@@ -268,6 +268,7 @@ io.on('connection',function(socket){
     }); // end of on init-world
 
     socket.on('tutorial-start', gs.handleTutorialStart);
+    socket.on('tutorial-end', gs.handleTutorialEnd);
 
     socket.on('region-data',function(){
         socket.emit('region-data',gs.listRegions());

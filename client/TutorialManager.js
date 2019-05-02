@@ -4,18 +4,27 @@
 
 var TutorialManager = {};
 
-TutorialManager.boot = function(part){
-    TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part1'];
-    Engine.initWorld(TutorialManager.tutorialData.initData); // Data to simulate init package from server
+TutorialManager.update = function(){
+    Engine.player.updateData(TutorialManager.tutorialData.playerData); // Data to simulate player setup
+    Engine.updateWorld(TutorialManager.tutorialData.worldData);     // Data to create tutorial world
+}
 
-    for(var p = 1; p <= part; p++) {
-        console.log('Setting part'+p);
+TutorialManager.boot = function(part,chaining){
+    if(!Engine.scene.cache.json.get('tutorials').hasOwnProperty('part'+p)) return;
+    if(chaining){
         TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part' + p];
+        TutorialManager.update();
+    }else{
+        TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part1'];
+        Engine.initWorld(TutorialManager.tutorialData.initData); // Data to simulate init package from server
 
-        Engine.player.updateData(TutorialManager.tutorialData.playerData); // Data to simulate player setup
-        Engine.updateWorld(TutorialManager.tutorialData.worldData);     // Data to create tutorial world
+        for(var p = 1; p <= part; p++) {
+            TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part' + p];
+            TutorialManager.update();
+        }
     }
 
+    TutorialManager.currentPart = part;
     TutorialManager.nextTutorial = 0;
     TutorialManager.currentHook = null;
     TutorialManager.displayNext();
@@ -26,7 +35,11 @@ TutorialManager.displayNext = function(){
     if(Engine.currentTutorialPanel) Engine.currentTutorialPanel.hide();
 
     var i = TutorialManager.nextTutorial++;
-    if(i >= TutorialManager.tutorialData.length) return;
+    if(i >= TutorialManager.tutorialData.length){
+        Client.sendTutorialEnd(TutorialManager.currentPart);
+        TutorialManager.boot(TutorialManager.currentPart+1,true);
+        return;
+    };
     TutorialManager.currentHook = null;
 
     var steps = TutorialManager.tutorialData.steps;

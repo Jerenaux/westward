@@ -135,6 +135,8 @@ app.filter('eventFilter',function(){
                 return prefix(txt,event.time,event.pname);
             case 'server-start':
                 return prefix(" SERVER RESTART",event.time);
+            case 'tutorial-end':
+                return prefix('-- A player finished the tutorial --',event.time);
             case 'tutorial-start':
                 return prefix('-- A player started the tutorial --',event.time);
             case 'use':

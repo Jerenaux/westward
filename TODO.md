@@ -3,7 +3,6 @@ On deploy:
 - Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
 - Find a way to test itemsRespaw and other time-related aspects
-=> Automate these eventually
 => After bug, systematically create test!
 
 
@@ -145,7 +144,8 @@ Secure
 
 Analytics:
 ---------
-- Log: price setting, handleGold, tutorial begins, progress (each step) and ends
+- Log: price setting, handleGold
+- Flag returning players
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions

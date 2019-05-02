@@ -6,7 +6,14 @@ var GameServer = require('./GameServer.js').GameServer;
 var mongoose = require('mongoose');
 
 // All events correspond to *actions* performed by *players*
-// Frequency tables and means don't need logging
+
+var sessionSchema = new mongoose.Schema({
+    pid: {type: Number, min: 0},
+    pname: String,
+    start: { type: Date, default: Date.now },
+    end: { type: Date, default: Date.now }
+});
+var Session = mongoose.model('Session', sessionSchema);
 
 var eventSchema = new mongoose.Schema({
     pid: {type: Number, min: 0},
@@ -156,6 +163,12 @@ var TutorialStartEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var TutorialEndEvent = Event.discriminator(
+    'TutorialEndEvent',
+    new mongoose.Schema(),
+    {discriminatorKey: 'kind'}
+);
+
 var Prism = {};
 
 Prism.logEvent = function(player,action,data){
@@ -181,6 +194,7 @@ Prism.logEvent = function(player,action,data){
         'respawn': RespawnEvent,
         'sell': TradeEvent,
         'server-start': ServerStartEvent,
+        'tutorial-end': TutorialEndEvent,
         'tutorial-start': TutorialStartEvent,
         'use': UseEvent
     };

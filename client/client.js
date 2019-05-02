@@ -219,6 +219,9 @@ Client.sendTutorialStart = function(){
     Client.socket.emit('tutorial-start');
 };
 
+Client.sendTutorialEnd = function(){
+    Client.socket.emit('tutorial-end');
+};
 // ####################"
 
 Client.sendMapData = function(id,data){

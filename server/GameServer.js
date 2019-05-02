@@ -1335,6 +1335,10 @@ GameServer.handleTutorialStart = function(){
     Prism.logEvent(null,'tutorial-start');
 };
 
+GameServer.handleTutorialEnd = function(){
+    Prism.logEvent(null,'tutorial-end');
+};
+
 GameServer.handleAOItransition = function(entity,previous){
     // When something moves from one AOI to another (or appears inside an AOI), identify which AOIs should be notified and update them
     // Model: update many, fetch one
