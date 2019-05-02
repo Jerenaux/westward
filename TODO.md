@@ -63,11 +63,12 @@ Part 2: exploration, crafting, trade and wildlife
 - Prompt to go craft potion, point out that a specific ingredient is missing
 - Buy one in shop
 - Prompt to go explore fog of war in a certain area (explain fog of war) + map tuto
-- On the way, attack by wildlife, battle tuto
-- food tuto (mention use for boosting production as well)
 - When resource found, tuto about pick up resources and ecology
+- Once picked, ambush, attack by wildlife, battle tuto
+- food tuto (mention use for boosting production as well)
 - Go back, sell and craft (trade & craft tuto)
-- Talk about fatigue + prompt to build a shack (go back to lumber camp to get more timber)
+- Talk about fatigue + prompt to build a shack (go back to lumber camp to get more timber,
+added when part 2 boots)
 
 Part 3: enemy civ
 - Point out that lumber camp is exposed, need to build a tower
