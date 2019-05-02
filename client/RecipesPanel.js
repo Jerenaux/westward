@@ -52,6 +52,7 @@ RecipeSlot.prototype.setUp = function(action,item,nb){
     this.zone.on('pointerup',function(){
         if(this.checkForPanelOnTop()) return;
         Engine.currentMenu.panels['combi'].setUp(item);
+        if(Client.tutorial) TutorialManager.triggerHook('recipe:'+item);
     }.bind(this));
 };
 

@@ -47,7 +47,7 @@
       "width": 4,
       "height": 4
     },
-    "recipe": {"3":15},
+    "recipe": {"3":10},
     "padding": 0,
     "icon": "shop",
     "foundations": "foundations_3",
@@ -83,7 +83,7 @@
       "width": 4,
       "height": 4
     },
-    "recipe": {"3":10},
+    "recipe": {"3":5},
     "padding": 0,
     "icon": "shack",
     "foundations": "foundations_1",

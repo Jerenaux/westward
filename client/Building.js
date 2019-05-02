@@ -44,8 +44,9 @@ var Building = new Phaser.Class({
         this.countdowns = data.prodCountdowns;
         this.name = buildingData.name;//+' '+this.id;
         this.prices = {};
+        this.gold = 0;
         this.built = false;
-       this.locked = buildingData.locked;
+        this.locked = buildingData.locked;
 
         this.depthOffset = buildingData.depthOffset;
         this.setBuilt(data.built);

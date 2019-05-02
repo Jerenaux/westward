@@ -34,9 +34,7 @@
             dmg: 19,
             hpmax: 300
         },
-        maxCivicLvl: 10,
-        maxCivicXP: 99999,
-        maxClassLvl: 100,
+        maxClassLvl: 101,
         maxClassXP: 999999,
         maxGold: 100000,
         foodConsumption: 1.5,

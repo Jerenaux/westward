@@ -5,10 +5,13 @@
 var TutorialManager = {};
 
 TutorialManager.boot = function(part){
-    for(var p = 1; p <= part; p++) {
-        TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part' + part];
+    TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part1'];
+    Engine.initWorld(TutorialManager.tutorialData.initData); // Data to simulate init package from server
 
-        Engine.initWorld(TutorialManager.tutorialData.initData); // Data to simulate init package from server
+    for(var p = 1; p <= part; p++) {
+        console.log('Setting part'+p);
+        TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part' + p];
+
         Engine.player.updateData(TutorialManager.tutorialData.playerData); // Data to simulate player setup
         Engine.updateWorld(TutorialManager.tutorialData.worldData);     // Data to create tutorial world
     }
@@ -41,10 +44,12 @@ TutorialManager.displayNext = function(){
         return;
     }
 
+    // Keep = keep it centered elsewhere than player
     if(step.camera && step.camera != 'keep') {
         Engine.camera.stopFollow();
         Engine.camera.pan(step.camera[0] * 32, step.camera[1] * 32);
-    }else if(!step.camera && i > 0 && step[i-1].camera){
+    // }else if(!step.camera && i > 0 && step[i-1].camera){
+    }else{
         Engine.camera.pan(Engine.player.x,Engine.player.y,1000,'Linear',false,function(camera,progress){
             if(progress == 1) Engine.camera.startFollow(Engine.player);
         });
@@ -94,7 +99,7 @@ TutorialManager.triggerHook = function(hook){
 TutorialManager.build = function(x,y,type){
     var items = [];
     if(type == 6) items.push([3,5]); //TODO: conf?
-    Engine.updateWorld({newbuildings:[{id:4,type:type,built:true,x:x,y:y,items:items,owner:Engine.player.id}]});
+    Engine.updateWorld({newbuildings:[{id:3,type:type,built:true,x:x,y:y,items:items,owner:Engine.player.id}]});
 };
 
 // Called when a player changes the stock of a building in the tutorial;
@@ -107,7 +112,6 @@ TutorialManager.handleStock = function(action,item,nb){
     var items = [[parseInt(item),newnb]];
     var updt = {buildings:{}};
     updt.buildings[Engine.currentBuiling.id] = {items:items};
-    Engine.updateWorld(updt);
 
     // Update player inventory
     items = [];
@@ -117,6 +121,18 @@ TutorialManager.handleStock = function(action,item,nb){
         {items:items,
             notifs:[sign+nb+' '+Engine.itemsData[item].name]} // TODO: centralize notifs
     );
+
+    // Update gold
+    var price = Engine.currentBuiling.getPrice(item,'sell');
+    if(price){
+        Engine.player.updateData(
+            {gold:Engine.player.gold-price} // TODO: centralize notifs
+        );
+        updt.buildings[Engine.currentBuiling.id]['gold'] = Engine.currentBuiling.gold + price;
+    }
+
+    console.warn(updt);
+    Engine.updateWorld(updt);
 
     TutorialManager.triggerHook('stock:'+Engine.currentBuiling.id+':'+item+':'+newnb);
 

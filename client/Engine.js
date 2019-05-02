@@ -1275,6 +1275,7 @@ Engine.makeStaffMenu = function(){
 Engine.makeMapMenu = function(){
     var map = new Menu('World Map');
     map.log = true;
+    map.hook = 'mapmenu';
     map.setSound(Engine.scene.sound.add('page_turn2'));
     var mapPanel = map.addPanel('map',new MapPanel(10,100,1000,380,'',true)); // true = invisible
     mapPanel.addBackground('longscroll');
