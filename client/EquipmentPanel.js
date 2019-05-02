@@ -122,3 +122,56 @@ EquipmentPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
     this.displaySlots();
 };
+
+// ------------------
+
+function BattleEquipmentPanel(){
+    Panel.call(this,0,0,0,0,'',true); // true = invisible
+
+    var meleex = 950;
+    var meleey = 515;
+    var rangex = 1000;
+    var rangey = 500;
+    var lifex = 1000;
+    var lifey = 550;
+    var lifew = 200;
+    var facebg = UI.scene.add.sprite(lifex,lifey,'UI','facebg');
+    facebg.flipX = true;
+    facebg.flipY = true;
+    var lifebg = UI.scene.add.tileSprite(lifex-22-lifew/2,lifey+4,lifew,24,'UI','capsule-middle');
+    lifebg.flipX = true;
+    lifebg.flipY = true;
+    var lifetip = UI.scene.add.sprite(lifebg.x-lifew/2,lifebg.y,'UI','capsule-left');
+    lifetip.flipY = true;
+    this.content.push(facebg);
+    this.content.push( UI.scene.add.sprite(facebg.x,facebg.y,'faces',0));
+    this.content.push(lifebg);
+    this.content.push(lifetip);
+    this.content.push(UI.scene.add.sprite(lifetip.x+5,lifetip.y,'UI','heart'));
+    this.lifetext = UI.scene.add.text(lifetip.x+15, lifetip.y, '100/100',
+        { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
+    ).setOrigin(0,0.5);
+    this.content.push(this.lifetext);
+    this.bar = new MiniProgressBar(this.lifetext.x+this.lifetext.width+5,lifetip.y-5,100,'red');
+    this.bar.setLevel(100,100);
+    this.bar.display();
+
+    this.content.push(UI.scene.add.sprite(meleex,meleey,'UI','battleholder'));
+    this.content.push(UI.scene.add.sprite(meleex,meleey,'UI','sword-shade').setAlpha(0.6));
+    this.content.push(UI.scene.add.sprite(rangex,rangey,'UI','battleholder'));
+    this.content.push(UI.scene.add.sprite(rangex,rangey,'UI','gun-shade').setAlpha(0.6));
+
+    this.content.forEach(function(c){
+        c.setScrollFactor(0);
+    })
+}
+
+BattleEquipmentPanel.prototype = Object.create(Panel.prototype);
+BattleEquipmentPanel.prototype.constructor = BattleEquipmentPanel;
+
+BattleEquipmentPanel.prototype.display = function(){
+    Panel.prototype.display.call(this);
+    this.content.forEach(function(c){
+        c.setVisible(true);
+    })
+};

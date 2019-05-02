@@ -365,10 +365,7 @@ GameServer.addItem = function(x,y,type){
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
-    GameServer.addAnimal(504,678,0);
-    GameServer.addAnimal(502,681,0);
-    GameServer.addAnimal(500,679,0);
-    GameServer.addItem(1193,171,5);
+    GameServer.addAnimal(1188,222,0);
     console.log('---done---');
 };
 

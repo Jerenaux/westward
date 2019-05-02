@@ -235,7 +235,6 @@ var Hero = new Phaser.Class({
     },
 
     updateFoW: function(aois){
-        console.warn(aois);
         this.FoW = [];
         if(!aois) aois = [Engine.player.chunk];
         aois.forEach(function(aoi){

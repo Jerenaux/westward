@@ -46,6 +46,7 @@ Misc:
 - Test new player
 - Retest tutorial part 1
 - Fix wrong building surfaces (reproducible in tutorial part 2)
+- Defreeze, enable wander and aggro
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.
@@ -453,12 +454,13 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-- Tool to sync client buildings with server buildings (update code with DO database)
+- Desktop app (automated)
+-> https://electronjs.org/docs/tutorial/application-distribution
 - Tool to gather, uglify and compress all relevant source files 
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?
 - Secure chunk access? (check client position before serving)
-- Desktop app (automated)
+
 
 Design document:
 ---------------

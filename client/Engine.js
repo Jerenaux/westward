@@ -1056,19 +1056,24 @@ Engine.makeBattleMenu = function(){
     var alignx = 845;
     var battle = new Menu();
     battle.fullHide = true;
-    var equipment = new EquipmentPanel(alignx,100,170,120,'Equipment',true); // true: battle menu
+
+    var equipment = battle.addPanel('equipment',new BattleEquipmentPanel());
+    /*var equipment = new EquipmentPanel(alignx,100,170,120,'Equipment',true); // true: battle menu
     equipment.addButton(140, 8, 'blue','help',null,'',UI.textsData['battleitems_help']);
-    battle.addPanel('equipment',equipment);
-    var items = battle.addPanel('items',new InventoryPanel(alignx,220,170,225,'Items'));
+    */
+
+    /*var items = battle.addPanel('items',new InventoryPanel(alignx,220,170,225,'Items'));
     items.setInventory('player',4,true,BattleManager.processInventoryClick);
     items.modifyFilter({
         type: 'property',
         property: 'useInBattle',
         hard: true
-    });
-    var bar = new BigProgressBar(alignx,445,170,'red',true);
+    });*/
+    // TODO: add belt
+
+    /*var bar = new BigProgressBar(alignx,445,170,'red',true);
     bar.name = 'health bar';
-    battle.addPanel('bar',bar);
+    battle.addPanel('bar',bar);*/
 
     var timerw = 300;
     var timerh = 60;
@@ -1082,17 +1087,17 @@ Engine.makeBattleMenu = function(){
     var respawn = battle.addPanel('respawn',new RespawnPanel(timerx,respawny,timerw,respawnh),true);
     respawn.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['respawn_help']);
 
-    battle.addEvent('onUpdateInventory',items.updateInventory.bind(items));
-    battle.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
+    // battle.addEvent('onUpdateInventory',items.updateInventory.bind(items));
+    // battle.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
 
-    battle.addEvent('onUpdateStats',function(){
+    /*battle.addEvent('onUpdateStats',function(){
         bar.setLevel(Engine.getPlayerHealth(),Engine.getPlayerMaxHealth());
-    });
+    });*/
 
     battle.addEvent('onOpen',function(){
-        items.updateInventory();
-        equipment.updateEquipment();
-        bar.setLevel(Engine.getPlayerHealth(),Engine.getPlayerMaxHealth(),0,true); // true = skip tween
+        // items.updateInventory();
+        // equipment.updateEquipment();
+        //bar.setLevel(Engine.getPlayerHealth(),Engine.getPlayerMaxHealth(),0,true); // true = skip tween
     });
     return battle;
 };
