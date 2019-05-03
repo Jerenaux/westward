@@ -15,10 +15,6 @@ var EquipmentManager = require('../shared/Equipment.js').EquipmentManager;
 var Formulas = require('../shared/Formulas.js').Formulas;
 var Prism = require('./Prism.js').Prism;
 
-//TODO: conf
-var FOOD_MAX = 1000;
-var VIGOR_MAX = 1000;
-
 function Player(){
     this.updatePacket = new PersonalUpdatePacket();
     this.isPlayer = true;
@@ -78,6 +74,15 @@ Player.prototype.setIDs = function(dbID,socketID){
     //this.id = GameServer.lastPlayerID++;
     this.dbID = dbID;
     this.socketID = socketID;
+};
+
+Player.prototype.setInstance = function(){
+    this.instance = GameServer.nextInstanceID++;
+    if(GameServer.nextInstanceID%100 == 0) GameServer.nextInstanceID = 0;
+};
+
+Player.prototype.isInstanced = function(){
+    return this.instance > -1;
 };
 
 Player.prototype.updateBldRecipes = function(){
@@ -581,7 +586,8 @@ Player.prototype.trim = function(){
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     trimmed.quickSlots = this.equipment.quickslots.nb;
-    return trimmed;
+    // return trimmed;
+    return GameObject.prototype.trim.call(this,trimmed);
 };
 
 /**

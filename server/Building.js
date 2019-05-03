@@ -348,7 +348,8 @@ Building.prototype.trim = function(){
     trimmed.y = parseInt(this.y);
     if(this.inventory.size > 0) trimmed.inventory = this.inventory.toList();
     trimmed.prodCountdowns = this.prodCountdowns;
-    return trimmed;
+    // return trimmed;
+    return GameObject.prototype.trim.call(this,trimmed);
 };
 
 // Returns an object containing only the fields relevant to list buildings

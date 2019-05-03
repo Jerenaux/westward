@@ -42,11 +42,12 @@ Misc:
 - Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
 
 - Test setting prices in shop
-- Indigo
 - Test new player
 - Retest tutorial part 1
 - Fix wrong building surfaces (reproducible in tutorial part 2)
 - Defreeze, enable wander and aggro
+- Instantiate building markers
+- Populate (and later on clean up) instanced worlds
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.

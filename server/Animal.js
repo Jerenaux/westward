@@ -5,6 +5,7 @@
 var Utils = require('../shared/Utils.js').Utils;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var NPC = require('./NPC.js').NPC;
+var GameObject = require('./GameObject.js').GameObject;
 var GameServer = require('./GameServer.js').GameServer;
 var World = require('../shared/World.js').World;
 
@@ -76,7 +77,8 @@ Animal.prototype.trim = function(){
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    return trimmed;
+    // return trimmed;
+    return GameObject.prototype.trim.call(this,trimmed);
 };
 
 Animal.prototype.endFight = function(alive){

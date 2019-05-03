@@ -7,7 +7,9 @@ var GameServer = require('./GameServer.js').GameServer;
 //var Rect = require('./Rect.js').Rect;
 
 // Parent class of all game objects : players, monsters and items (not NPC because they are not processed server-side)
-function GameObject(){}
+function GameObject(){
+    this.instance = -1;
+}
 
 GameObject.prototype.getShortID = function(){
     return this.entityCategory[0]+this.id;
@@ -96,6 +98,11 @@ GameObject.prototype.onRemoveAtLocation = function(){
 
 GameObject.prototype.travelOccupiedCells = function(){
     // empty shell for children who do not implement it
+};
+
+GameObject.prototype.trim = function(trimmed){
+    trimmed.instance = this.instance;
+    return trimmed;
 };
 
 

@@ -16,6 +16,7 @@ var GameServer = {
     lastItemID: 0,
     lastBattleID: 0,
     lastCellID: 0,
+    nextInstanceID: 0,
     players: {}, // player.id -> player
     animals: {}, // animal.id -> animal
     civs: {}, // civ.id -> civ
@@ -517,22 +518,31 @@ GameServer.testMethodA = function(a){
  */
 GameServer.addNewPlayer = function(socket,data){
     if(!data.characterName){
-        GameServer.server.sendError(socket); // TODO: make a dict of errors somewhere
-        return null;
+        if(data.tutorial){
+            data.characterName = 'Newbie';
+        }else{
+            GameServer.server.sendError(socket); // TODO: make a dict of errors somewhere
+            return null;
+        }
     }
-    var region = data.selectedSettlement || 0;
+    var region = data.selectedSettlement || 1;
     //console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
     player.setStartingInventory();
     player.setRegion(region);
     player.setName(data.characterName);
+    if(data.tutorial) player.setInstance();
+    // A read of the db makes sure that `lastPlayerID` doesn't conflict
     player.id = ++GameServer.lastPlayerID;
     //player.classLvlUp(data.selectedClass,false);
     player.spawn();
 
     var document = new GameServer.PlayerModel(player);
     player.setModel(document);
-    GameServer.saveNewPlayerToDb(socket,player,document);
+    if(!player.isInstanced()) GameServer.saveNewPlayerToDb(socket,player,document);
+    GameServer.finalizePlayer(socket,player);
+    player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
+    player.save();
     return player;
 };
 
@@ -549,10 +559,7 @@ GameServer.saveNewPlayerToDb = function(socket,player,document){
         console.log('New player created');
         var mongoID = doc._id.toString();
         player.setIDs(mongoID,socket.id);
-        GameServer.finalizePlayer(socket,player);
         GameServer.server.sendID(socket,mongoID);
-        player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
-        player.save();
     });
 };
 
@@ -1478,6 +1485,7 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
             individualGlobalPkg.desync(GameServer.AOIs[aoi]); // forget entities from old AOIs
         });
         individualGlobalPkg.removeEcho(player.id); // remove redundant information from multiple update sources
+        individualGlobalPkg.filterInstance(player.instance);
         if(individualGlobalPkg.isEmpty()) individualGlobalPkg = null;
 
         if(individualGlobalPkg === null

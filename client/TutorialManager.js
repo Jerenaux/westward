@@ -7,12 +7,12 @@ var TutorialManager = {};
 TutorialManager.update = function(){
     Engine.player.updateData(TutorialManager.tutorialData.playerData); // Data to simulate player setup
     Engine.updateWorld(TutorialManager.tutorialData.worldData);     // Data to create tutorial world
-}
+};
 
 TutorialManager.boot = function(part,chaining){
-    if(!Engine.scene.cache.json.get('tutorials').hasOwnProperty('part'+p)) return;
+    /*if(!Object.keys(Engine.scene.cache.json.get('tutorials')).includes('part'+part)) return;
     if(chaining){
-        TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part' + p];
+        TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part' + part];
         TutorialManager.update();
     }else{
         TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part1'];
@@ -22,8 +22,8 @@ TutorialManager.boot = function(part,chaining){
             TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part' + p];
             TutorialManager.update();
         }
-    }
-
+    }*/
+    TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part' + part];
     TutorialManager.currentPart = part;
     TutorialManager.nextTutorial = 0;
     TutorialManager.currentHook = null;

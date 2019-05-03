@@ -61,7 +61,7 @@
       {"pos":[0,430,350,146],"hook":"recipe:6","txt":"Now let's have a look at crafting. Click on the Dawn recipe in the recipes panel. Dawn is a useful potion to recover vitality."},
       {"pos":null,"hook":"bld:4","txt":"To make Dawn, you need Daybreak and Daydream. Let's see if the nearby shop doesn't sell any of it. Leave the workshop and enter the shop to it's left."},
       {"pos":null,"hook":"stock:4:17:1","txt":"You are in luck, there is Daydream for sale. Click on it and buy it!"},
-      {"pos":null,"hook":"exit","txt":"Now, to find some Daybreak.Exit the building."},
+      {"pos":null,"hook":"exit","txt":"Now, to find some Daybreak. Exit the building."},
       {"pos":[674,200,350,146],"hook":"mapmenu","txt":"Open the world map by clicking on the map icon above."},
       {"pos":["c",430,350,146],"hook":"mapmenu","txt":"Open the world map by clicking on the map icon above."},
       {"pos":null,"txt":"EOT"}

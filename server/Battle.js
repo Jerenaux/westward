@@ -468,6 +468,7 @@ Battle.prototype.getCells = function(){
 module.exports.Battle = Battle;
 
 function BattleCell(x,y,battle){
+    this.instance = -1;
     this.updateCategory = 'cells';
     this.id = GameServer.lastCellID++;
     this.x = x;
@@ -507,7 +508,8 @@ BattleCell.prototype.trim = function(){
     return {
         id: this.id,
         x: this.x,
-        y: this.y
+        y: this.y,
+        instance: this.instance
     };
 };
 

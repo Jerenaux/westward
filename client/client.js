@@ -36,10 +36,17 @@ Client.requestData = function(){ // request the data to be used for initWorld()
 Client.getInitRequest = function(){ // Returns the data object to send to request the initialization data
     // In case of a new player, set new to true and send the name of the player
     // Else, set new to false and send it's id instead to fetch the corresponding data in the database
+    if(Client.tutorial){
+        return {
+            new: true,
+            tutorial:true
+        };
+    }
     if(Client.isNewPlayer()) {
         console.log('Requesting data for new player');
         return {
             new:true,
+            tutorial: false,
             selectedClass: UI.selectedClass,
             selectedSettlement: UI.selectedSettlement,
             characterName: UI.characterName

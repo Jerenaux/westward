@@ -41,7 +41,7 @@ var Hero = new Phaser.Class({
 
         this.updateRarity(data.rarity || []);
         this.updateHistory(data.history);
-        this.updateFoW();
+        this.updateFoW(data.fow);
 
         this.buildRecipes.fromList(Engine.config.defaultBuildRecipes);
 

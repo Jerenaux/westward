@@ -4,6 +4,7 @@
 
 var GameServer = require('./GameServer.js').GameServer;
 var NPC = require('./NPC.js').NPC;
+var GameObject = require('./GameObject.js').GameObject;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Utils = require('../shared/Utils.js').Utils;
@@ -165,7 +166,8 @@ Civ.prototype.trim = function(){
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    return trimmed;
+    // return trimmed;
+    return GameObject.prototype.trim.call(this,trimmed);
 };
 
 module.exports.Civ = Civ;

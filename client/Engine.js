@@ -297,11 +297,12 @@ Engine.create = function(){
 
     Engine.created = true;
     Engine.configEngine();
-    if(Client.tutorial){
+    /*if(Client.tutorial){
         TutorialManager.boot(2);
     }else{
         Client.requestData();
-    }
+    }*/
+    Client.requestData();
 };
 
 Engine.getGameInstance = function(){
@@ -371,29 +372,8 @@ Engine.initWorld = function(data){
         panel.display();
     }
 
-    /*setInterval(function(){
-        if(Engine.currentBuiling){
-            var buildingTypeData = Engine.buildingsData[Engine.currentBuiling.buildingType];
-            var production = buildingTypeData.production;
-            if(!production) return;
-            for(var i = 0; i < production.length; i++){
-                var rate = production[i][2];
-                var rest = Engine.currentTurn%rate;
-                var remainder = rate-rest;
-                console.log(remainder);
-            }
-        }
-    },1000);*/
-
-    // var rect = UI.scene.add.rectangle(300,10,100,100,0xffffff);
-    // rect.setScrollFactor(0);
-    // rect.setOrigin(0);
-    // var rt = UI.scene.add.renderTexture(0,0,1024,576);
-    // rt.setOrigin(0);
-    // rt.setScrollFactor(0);
-    // rt.fill(0x000000);
-    // rt.erase(rect);
-
+    if(Client.tutorial) TutorialManager.boot(2);
+    
     // todo: move all to dedicated sound manager
     /*Engine.lastOrientationSound = 0;
     // todo: move to JSON file (+ config for delay)

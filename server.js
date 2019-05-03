@@ -216,7 +216,7 @@ io.on('connection',function(socket){
         if(!data.stamp || data.stamp < server.resetStamp) data.new = true; // TODO Remove eventually
 
         console.log(data);
-        if(data.new){
+        if(data.new){ // new players OR tutorial
             gs.addNewPlayer(socket,data);
         }else{
             gs.loadPlayer(socket,data.id);

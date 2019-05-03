@@ -35,7 +35,8 @@ Item.prototype.trim = function() {
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    return trimmed;
+    // return trimmed;
+    return GameObject.prototype.trim.call(this,trimmed);
 };
 
 Item.prototype.remove = function(){

@@ -1,10 +1,9 @@
 /**
  * Created by Jerome on 26-12-16.
  */
+var entities = ['animals','buildings','cells','civs','items','players'];
 
 function UpdatePacket(){
-    var entities = ['animals','buildings','cells','civs','items','players'];
-
     entities.forEach(function(e){
         this['new'+e] = [];
         this['removed'+e] = [];
@@ -57,6 +56,22 @@ UpdatePacket.prototype.removeEcho = function(playerID){
         }
     }
 };
+
+UpdatePacket.prototype.filterInstance = function(instance){
+    entities.forEach(function(e){
+        this['new'+e] = this['new'+e].filter(function(element){
+            return (element.instance == instance);
+        });
+        // removed is not cleaned, for simplicity's sake
+        var e = {};
+        for(var id in this[e]){
+            var element = this[e][id];
+            if(element.instance == instance) e[id] = element;
+        }
+        this[e] = e;
+    },this);
+};
+
 // Get updates about all entities present in the list of neighboring AOIs
 UpdatePacket.prototype.synchronize = function(AOI){
     for(var i = 0; i < AOI.entities.length; i++){
