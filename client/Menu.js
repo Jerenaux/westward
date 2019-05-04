@@ -99,7 +99,7 @@ Menu.prototype.display = function(){
 
     if(this.log) Client.logMenu(this.name);
 
-    if(Client.tutorial && this.hook) TutorialManager.triggerHook(this.hook);
+    if(Client.tutorial && this.hook) TutorialManager.triggerHook('menu:'+this.hook);
 };
 
 Menu.prototype.hide = function(){

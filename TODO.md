@@ -46,8 +46,10 @@ Misc:
 - Retest tutorial part 1
 - Fix wrong building surfaces (reproducible in tutorial part 2)
 - Defreeze, enable wander and aggro
-- Populate instanced worlds
 - Update very first text of tutorial
+- Test instance cleanup
+- Test that players don't see tutorial blds appearing
+- Test "already triggered" hooks for all hooks
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.

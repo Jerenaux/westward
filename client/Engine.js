@@ -1426,7 +1426,7 @@ Engine.makeBuildMenu = function(){
     build.keepHUD = true;
     build.allowWalk = true;
     build.name = 'Build something'; // Allows to have a hover name without a menu title
-    build.hook = 'buildmenu';
+    build.hook = 'build';
     var w = 200;
     var buildings = build.addPanel('build',new InventoryPanel(30,40,w,150,'Buildings'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
@@ -1459,12 +1459,13 @@ Engine.bldUnclick = function(shutdown){
         pos.x = pos.x / 32;
         pos.y = (pos.y / 32) - 1;
         console.log("Building at ", (pos.x), ",", (pos.y));
-        if(Client.tutorial){
+        /*if(Client.tutorial){
             TutorialManager.triggerHook('bldunselect:'+id);
             TutorialManager.build(pos.x,pos.y,id);
         }else{
             Client.sendBuild(id, pos);
-        }
+        }*/
+        Client.sendBuild(id, pos);
     }
     Engine.showMarker();
     Engine.bldRect.destroy();
@@ -1882,13 +1883,14 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     });
 };
 
-Engine.createElements = function(arr,entityType){
+Engine.createElements = function(arr,entityType){ // entityType = 'animal', 'building', ...
     var pool = Engine.entityManager.pools[entityType];
     var constructor = Engine.entityManager.constructors[entityType];
     arr.forEach(function(data){
         var e = pool.length > 0 ? pool.shift() : new constructor();
         e.setUp(data);
         e.update(data);
+        if(Client.tutorial) TutorialManager.triggerHook('new'+entityType+':'+data.type);
     });
 };
 

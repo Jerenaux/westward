@@ -1220,12 +1220,22 @@ GameServer.build = function(player,bid,tile){
         type: bid,
         owner: player.id,
         ownerName: player.name,
-        built: false
+        built: false,
+        instance: player.instance
     };
     data.prices = GameServer.getDefaultPrices();
     var building = new Building(data);
     var document = new GameServer.BuildingModel(building);
     building.setModel(document); // ref to model is needed at least to get _id
+
+    if(building.isInstanced()){
+        var buildingData = GameServer.buildingsData[building.type];
+        if(buildingData.production){
+            buildingData.production.forEach(function(prod){
+                building.giveItem(prod[0],prod[3]);
+            });
+        }
+    }
 
     document.save(function (err) {
         if (err) return console.error(err);
@@ -1600,17 +1610,22 @@ GameServer.updateNPC = function(){
 
 GameServer.createInstance = function(player){
     console.warn('Creating instance ...');
-    GameServer.instances[player.instance] = [];
+    GameServer.instances[player.instance] = {
+        entities: [],
+        nextBuildingID: 0
+    };
+    var instance = GameServer.instances[player.instance];
     var playerData = GameServer.tutorialData['playerData'];
     var worldData = GameServer.tutorialData['worldData'];
 
-    if(playerData.gold) player.giveGold(playerData.gold);
+    if(playerData.gold) player.setOwnProperty('gold',playerData.gold);
+    if(playerData.bldRecipes) player.setOwnProperty('bldRecipes',playerData.bldRecipes);
 
     worldData.newbuildings.forEach(function(bld){
         bld.instance = player.instance;
+        bld.id = 't'+instance.nextBuildingID++;
         var building = GameServer.addBuilding(bld);
-        GameServer.instances[player.instance].push(building);
-        console.warn(building.id);
+        instance.entities.push(building);
     });
 
     // Stock up most construction material, except for the first one
@@ -1636,7 +1651,7 @@ GameServer.createInstance = function(player){
 };
 
 GameServer.destroyInstance = function(instance){
-    GameServer.instances[instance].forEach(function(e){
+    GameServer.instances[instance].entities.forEach(function(e){
         GameServer.removeEntity(e);
     });
 };

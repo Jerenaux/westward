@@ -112,18 +112,13 @@ Building.prototype.embed = function(){
     this.updateBuild();
 };
 
+Building.prototype.isInstanced = function(){
+    return this.instance > -1;
+};
+
 Building.prototype.getShortID = function(){
     return 'B'+this.id;
 };
-
-/*Building.prototype.registerBuilding = function(){
-    if(this.civBuilding) return;
-    this.settlement.registerBuilding(this);
-    if(this.type == 0){ // fort
-        this.settlement.registerFort(this);
-        this.refreshListing();
-    }
-};*/
 
 Building.prototype.refreshListing = function(){
     this.buildings = this.settlement.getBuildings();

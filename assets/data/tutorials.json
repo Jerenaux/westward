@@ -5,14 +5,15 @@
   },
   "playerData": {
     "gold": 25,
-    "fow": [338,386,387,388,389,437]
+    "fow": [338,386,387,388,389,437],
+    "bldRecipes": [6]
   },
   "worldData": {
       "newbuildings":[
-        {"id":"t0","type":11,"x":1203,"y":156,"built":true,"ownerName":"Jon"},
-        {"id":"t1","type":11,"x":1199,"y":153,"built":true,"ownerName":"Danny"},
-        {"id":"t2","type":3,"x":1189,"y":159,"built":false,"ownerName":"Tyrion"},
-        {"id":"t4","type":4,"x":1184,"y":159,"built":true, "ownerName":"Arya"}
+        {"type":11,"x":1203,"y":156,"built":true,"ownerName":"Jon"},
+        {"type":11,"x":1199,"y":153,"built":true,"ownerName":"Danny"},
+        {"type":3,"x":1189,"y":159,"built":false,"ownerName":"Tyrion"},
+        {"type":4,"x":1184,"y":159,"built":true, "ownerName":"Arya"}
       ],
     "partialbuild": ["t2"],
     "sell": [
@@ -27,14 +28,14 @@
     {"pos": null, "camera":[1206,156],"txt":"See these shacks? They have been built by other players. Apparently, you are not alone around here."},
     {"pos": null, "camera":"keep","txt":"In Westward, players can build various buildings more or less anywhere to fulfill their needs and help them survive."},
     {"pos": null, "camera":[1196,160],"txt":"This is a construction site. Looks like someone is building a Workshop. That will be very useful to craft important items."},
-    {"pos": [724,"c",300,120], "hook":"bld:2","txt":"Let's see how the construction is going. Click on the construction site to enter it."},
+    {"pos": [724,"c",300,120], "hook":"bld:t2","txt":"Let's see how the construction is going. Click on the construction site to enter it."},
     {"pos": null,"txt":"Buildings are built by bringing construction material to them."},
     {"pos": null, "hook": "exit","txt":"Looks like timber is needed. Perhaps you could help? Exit the building by clicking on the door icon."},
     {"pos": null,"txt":"You can acquire timber by building a lumber camp. It'll generate timber for you automatically at regular intervals."},
     {"pos": [724,"c",300,140],"txt":"The resources of the land deplete as players extract them, hence the continuous march Westward to keep finding new ones and expanding!"},
-    {"pos": [50,50,300,120],"hook": "buildmenu","txt":"To build a building, first open the 'Build' menu by clicking on the shovel icon, here on the left."},
+    {"pos": [50,50,300,120],"hook": "menu:build","txt":"To build a building, first open the 'Build' menu by clicking on the shovel icon, here on the left."},
     {"pos": [280,50,300,120],"hook": "bldselect:6","txt":"Hover a building icon to see its name. Find the lumber camp icon and click on it."},
-    {"pos": [280,50,300,125],"hook": "bldunselect:6","txt":"Now pick a location to build it. It will only be possible next to a forest; get closer to the forest to the east and build it there. (Click back on the shovel to cancel)"},
+    {"pos": [280,50,300,125],"hook": "newbuilding:6","txt":"Now pick a location to build it. It will only be possible next to a forest; get closer to the forest to the east and build it there. (Click back on the shovel to cancel)"},
     {"pos": null,"txt":"Contrary to the Workshop you visited, this building doesn't require construction material, so it's built immediately!"},
     {"pos": null, "hook":"bld:3","txt":"Enter your lumber camp by clicking on it."},
     {"pos": [10,50,300,140],"txt":"Production normally takes a bit of time, but for the sake of the tutorial, your building has magically produced timber in an instant!"},

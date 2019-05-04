@@ -97,8 +97,18 @@ TutorialManager.displayNext = function(){
 TutorialManager.isHookTriggered = function(){
     if(!TutorialManager.currentHook) return false;
     var info = TutorialManager.currentHook.split(':');
-    if(info[0] == 'stock'){
-        if(Engine.buildings[info[1]].getItemNb(info[2]) == info[3]) return true;
+    switch(info[0]){
+        case 'exit':
+            return Engine.player.inBuilding == -1;
+        case 'bld':
+            return Engine.player.inBuilding == info[1];
+            break;
+        case 'menu':
+            return (Engine.currentMenu && Engine.currentMenu.hook == info[1])
+            break;
+        case 'stock':
+            return (Engine.buildings[info[1]].getItemNb(info[2]) == info[3]);
+            break;
     }
     return false;
 };
@@ -107,12 +117,6 @@ TutorialManager.triggerHook = function(hook){
     if(TutorialManager.currentHook == hook) TutorialManager.displayNext();
 };
 
-// Called when a player builds something in the tutorial
-TutorialManager.build = function(x,y,type){
-    var items = [];
-    if(type == 6) items.push([3,5]); //TODO: conf?
-    Engine.updateWorld({newbuildings:[{id:3,type:type,built:true,x:x,y:y,items:items,owner:Engine.player.id}]});
-};
 
 // Called when a player changes the stock of a building in the tutorial;
 // mimicks what the server would do
