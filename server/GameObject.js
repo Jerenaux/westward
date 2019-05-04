@@ -44,6 +44,10 @@ GameObject.prototype.updateAOIs = function(property,value){
     },this);
 };
 
+GameObject.prototype.isOfInstance = function(instance){
+    return this.instance == instance;
+};
+
 GameObject.prototype.getAOI = function(){
     return this.aoi;
 };
@@ -59,6 +63,7 @@ GameObject.prototype.getModel = function() {
 GameObject.prototype.save = function(){
     if(!this.model) return;
     if(this.dblocked) return;
+    if(!this.isOfInstance(-1)) return;
     this.dblocked = true;
     var _document = this;
     this.schemaModel.findById(this.model._id, function (err, doc) {

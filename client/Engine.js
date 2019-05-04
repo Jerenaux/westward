@@ -372,7 +372,7 @@ Engine.initWorld = function(data){
         panel.display();
     }
 
-    if(Client.tutorial) TutorialManager.boot(2);
+    if(Client.tutorial) TutorialManager.boot(1);
     
     // todo: move all to dedicated sound manager
     /*Engine.lastOrientationSound = 0;
@@ -1907,7 +1907,7 @@ Engine.updateElements = function(obj,table){
 Engine.removeElements = function(arr,table){
     arr.forEach(function(id){
         if(!table.hasOwnProperty(id)) {
-            if(Engine.debug) console.warn('Attempt to remove non-existing element with ID',id);
+            // if(Engine.debug) console.warn('Attempt to remove non-existing element with ID',id);
             return;
         }
         table[id].remove();

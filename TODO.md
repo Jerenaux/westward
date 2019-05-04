@@ -46,8 +46,8 @@ Misc:
 - Retest tutorial part 1
 - Fix wrong building surfaces (reproducible in tutorial part 2)
 - Defreeze, enable wander and aggro
-- Instantiate building markers
-- Populate (and later on clean up) instanced worlds
+- Populate instanced worlds
+- Update very first text of tutorial
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.
@@ -146,7 +146,7 @@ Secure
 
 Analytics:
 ---------
-- Log: price setting, handleGold
+- Log: tutorial step when disconnecting, price setting, handleGold
 - Flag returning players
 - Display market prices
 - Button to flush events

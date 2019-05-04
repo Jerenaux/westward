@@ -134,6 +134,8 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.civsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'civs.json')).toString()); // './assets/data/civs.json'
     GameServer.buildingsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'buildings.json')).toString()); // './assets/data/buildings.json'
     GameServer.classData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'classes.json')).toString()); // './assets/data/classes.json'
+    GameServer.tutorialData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'tutorials.json')).toString()); // './assets/data/texts.json'
+    GameServer.instances = {};
 
     GameServer.enableAnimalWander = config.get('wildlife.wander');
     GameServer.enableCivWander = config.get('civs.wander');
@@ -531,18 +533,27 @@ GameServer.addNewPlayer = function(socket,data){
     player.setStartingInventory();
     player.setRegion(region);
     player.setName(data.characterName);
-    if(data.tutorial) player.setInstance();
-    // A read of the db makes sure that `lastPlayerID` doesn't conflict
-    player.id = ++GameServer.lastPlayerID;
-    //player.classLvlUp(data.selectedClass,false);
-    player.spawn();
+    player.id = ++GameServer.lastPlayerID;     // A read of the db makes sure that `lastPlayerID` doesn't conflict
+
+    if(data.tutorial) {
+        player.setInstance();
+        var info = GameServer.tutorialData['initData'];
+        player.spawn(info.x,info.y);
+    }else{
+        player.spawn();
+    }
 
     var document = new GameServer.PlayerModel(player);
     player.setModel(document);
-    if(!player.isInstanced()) GameServer.saveNewPlayerToDb(socket,player,document);
+    if(player.isInstanced()) {
+        player.setIDs(null,socket.id);
+    }else{
+        GameServer.saveNewPlayerToDb(socket,player,document);
+    }
     GameServer.finalizePlayer(socket,player);
     player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
     player.save();
+    if(data.tutorial) GameServer.createInstance(player);
     return player;
 };
 
@@ -640,6 +651,7 @@ GameServer.handleDisconnect = function(socketID){
     if(!player) return;
     Prism.logEvent(player,'disconnect');
     player.save();
+    if(player.isInstanced()) GameServer.destroyInstance(player.instance);
     GameServer.removeEntity(player);
     delete GameServer.socketMap[socketID];
     GameServer.nbConnectedChanged = true;
@@ -1225,10 +1237,12 @@ GameServer.build = function(player,bid,tile){
     });
 };
 
-GameServer.listBuildingMarkers = function(){
+GameServer.listBuildingMarkers = function(instance){
     var list = [];
     for(var bid in GameServer.buildings){
-        var bld = GameServer.buildings[bid].mapTrim();
+        var building = GameServer.buildings[bid];
+        if(!building.isOfInstance(instance)) continue;
+        var bld = building.mapTrim();
         list.push(bld);
     }
     return list;
@@ -1500,6 +1514,8 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         if(localPkg) finalPackage.local = localPkg.clean();
         if(GameServer.nbConnectedChanged) finalPackage.nbconnected = GameServer.server.getNbConnected();
         finalPackage.turn = GameServer.elapsedTurns;
+        // console.warn(finalPackage);
+        // console.warn('#####################');
         GameServer.server.sendUpdate(player.socketID,finalPackage);
         player.newAOIs = [];
         player.oldAOIs = [];
@@ -1579,6 +1595,49 @@ GameServer.updateNPC = function(){
     Object.keys(GameServer.civs).forEach(function(key) {
         var a = GameServer.civs[key];
         a.updateBehavior();
+    });
+};
+
+GameServer.createInstance = function(player){
+    console.warn('Creating instance ...');
+    GameServer.instances[player.instance] = [];
+    var playerData = GameServer.tutorialData['playerData'];
+    var worldData = GameServer.tutorialData['worldData'];
+
+    if(playerData.gold) player.giveGold(playerData.gold);
+
+    worldData.newbuildings.forEach(function(bld){
+        bld.instance = player.instance;
+        var building = GameServer.addBuilding(bld);
+        GameServer.instances[player.instance].push(building);
+        console.warn(building.id);
+    });
+
+    // Stock up most construction material, except for the first one
+    worldData.partialbuild.forEach(function(bldid){
+        var building = GameServer.buildings[bldid];
+        var buildingData = GameServer.buildingsData[building.type];
+
+        var i = 0;
+        for(var item in buildingData.recipe){
+            var minus = (i++ == 0 ? 5 : 0);
+            building.giveItem(item,buildingData.recipe[item] - minus);
+        }
+    });
+
+    worldData.sell.forEach(function(data){
+        var building = GameServer.buildings[data[0]];
+
+        data[1].forEach(function(itemdata){
+            building.giveItem(itemdata[0],1);
+            building.setPrices(itemdata[0],0,itemdata[1]);
+        });
+    });
+};
+
+GameServer.destroyInstance = function(instance){
+    GameServer.instances[instance].forEach(function(e){
+        GameServer.removeEntity(e);
     });
 };
 

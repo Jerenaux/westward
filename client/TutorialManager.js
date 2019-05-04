@@ -9,7 +9,7 @@ TutorialManager.update = function(){
     Engine.updateWorld(TutorialManager.tutorialData.worldData);     // Data to create tutorial world
 };
 
-TutorialManager.boot = function(part,chaining){
+TutorialManager.boot = function(part){
     /*if(!Object.keys(Engine.scene.cache.json.get('tutorials')).includes('part'+part)) return;
     if(chaining){
         TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part' + part];
@@ -23,7 +23,7 @@ TutorialManager.boot = function(part,chaining){
             TutorialManager.update();
         }
     }*/
-    TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part' + part];
+    TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials');
     TutorialManager.currentPart = part;
     TutorialManager.nextTutorial = 0;
     TutorialManager.currentHook = null;
@@ -35,11 +35,10 @@ TutorialManager.displayNext = function(){
     if(Engine.currentTutorialPanel) Engine.currentTutorialPanel.hide();
 
     var i = TutorialManager.nextTutorial++;
-    if(i >= TutorialManager.tutorialData.length){
-        Client.sendTutorialEnd(TutorialManager.currentPart);
-        TutorialManager.boot(TutorialManager.currentPart+1,true);
+    if(i >= TutorialManager.tutorialData.steps.length){
+        Client.sendTutorialEnd();
         return;
-    };
+    }
     TutorialManager.currentHook = null;
 
     var steps = TutorialManager.tutorialData.steps;

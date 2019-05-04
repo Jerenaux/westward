@@ -19,10 +19,11 @@ function Building(data){
     this.schemaModel = GameServer.BuildingModel;
     this.battlePriority = 3;
 
+    if(data.instance > -1) this.instance = data.instance;
     this.id = -1;
-    if(data.id > -1){
+    if(data.id !== undefined){
         this.id = data.id;
-        GameServer.lastBuildingID = Math.max(GameServer.lastBuildingID,this.id);
+        if(this.id[0] != "t") GameServer.lastBuildingID = Math.max(GameServer.lastBuildingID,this.id);
     }else{
         this.id = ++GameServer.lastBuildingID;
     }
@@ -329,7 +330,6 @@ Building.prototype.takeGold = function(nb){
 Building.prototype.remove = function(){
     // TODO: keep track of players inside, and make them leave first
     delete GameServer.buildings[this.id];
-    this.settlement.removeBuilding(this);
 };
 
 // Save changes to DB
