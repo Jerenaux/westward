@@ -29,9 +29,10 @@ UpdatePacket.prototype.removeObject = function(object){
     arr.push(object.id);
 };
 
-UpdatePacket.prototype.updateProperty = function(type,id,property,value){
+UpdatePacket.prototype.updateProperty = function(type,id,instance,property,value){
     var map = this[type];
-    if(!map.hasOwnProperty(id)) map[id] = {};
+    if(!map.hasOwnProperty(id)) map[id] = {instance:instance};
+    // console.warn(type,id,map[id]);
     if(map[id][property] != value) map[id][property] = value;
 };
 
@@ -63,12 +64,12 @@ UpdatePacket.prototype.filterInstance = function(instance){
             return (element.instance == instance);
         });
         // removed is not cleaned, for simplicity's sake
-        var e = {};
+        var elements = {};
         for(var id in this[e]){
             var element = this[e][id];
-            if(element.instance == instance) e[id] = element;
+            if(element.instance == instance) elements[id] = element;
         }
-        this[e] = e;
+        this[e] = elements;
     },this);
 };
 

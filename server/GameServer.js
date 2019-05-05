@@ -1531,6 +1531,7 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         individualGlobalPkg.removeEcho(player.id); // remove redundant information from multiple update sources
         individualGlobalPkg.filterInstance(player.instance);
         if(individualGlobalPkg.isEmpty()) individualGlobalPkg = null;
+        // if(individualGlobalPkg) console.warn(individualGlobalPkg.buildings);
 
         if(individualGlobalPkg === null
             && localPkg === null
@@ -1574,9 +1575,9 @@ GameServer.removeObjectFromAOI = function(aoi,entity) {
     GameServer.dirtyAOIs.add(aoi);
 };
 
-GameServer.updateAOIproperty = function(aoi,category,id,property,value) {
+GameServer.updateAOIproperty = function(aoi,category,id,instance,property,value) {
     if(aoi === undefined ||  isNaN(aoi)) return; // Can happen when initializing new player for example
-    GameServer.AOIs[aoi].updatePacket.updateProperty(category, id, property, value);
+    GameServer.AOIs[aoi].updatePacket.updateProperty(category, id, instance, property, value);
     GameServer.dirtyAOIs.add(aoi);
 };
 
@@ -1629,7 +1630,7 @@ GameServer.updateNPC = function(){
 };
 
 GameServer.createInstance = function(player){
-    console.warn('Creating instance ...');
+    console.warn('Creating instance for player ',player.id,'...');
     GameServer.instances[player.instance] = {
         entities: [],
         nextBuildingID: 0

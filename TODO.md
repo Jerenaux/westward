@@ -51,6 +51,10 @@ Misc:
 - Retest instance cleanup
 - Test that players don't see tutorial blds appearing
 - Test "already triggered" hooks for all hooks
+- Test actual game updates
+- Reset tutorial start
+- Reread all tutorial texts and check regexp
+- Apply building name regexps
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.

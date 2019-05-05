@@ -40,7 +40,7 @@ GameObject.prototype.updateAOIs = function(property,value){
     // When something changes, all the AOI around the affected entity are updated
     var AOIs = Utils.listAdjacentAOIs(this.aoi);
     AOIs.forEach(function(aoi){
-        GameServer.updateAOIproperty(aoi,this.updateCategory,this.id,property,value);
+        GameServer.updateAOIproperty(aoi,this.updateCategory,this.id,this.instance,property,value);
     },this);
 };
 

@@ -10,22 +10,9 @@ TutorialManager.update = function(){
 };
 
 TutorialManager.boot = function(part){
-    /*if(!Object.keys(Engine.scene.cache.json.get('tutorials')).includes('part'+part)) return;
-    if(chaining){
-        TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part' + part];
-        TutorialManager.update();
-    }else{
-        TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part1'];
-        Engine.initWorld(TutorialManager.tutorialData.initData); // Data to simulate init package from server
-
-        for(var p = 1; p <= part; p++) {
-            TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials')['part' + p];
-            TutorialManager.update();
-        }
-    }*/
     TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials');
     TutorialManager.currentPart = part;
-    TutorialManager.nextTutorial = 0;
+    TutorialManager.nextTutorial = 25;
     TutorialManager.currentHook = null;
     Client.sendTutorialStart();
     TutorialManager.displayNext();
@@ -58,8 +45,8 @@ TutorialManager.displayNext = function(){
     if(step.camera && step.camera != 'keep') {
         Engine.camera.stopFollow();
         Engine.camera.pan(step.camera[0] * 32, step.camera[1] * 32);
-    // }else if(!step.camera && i > 0 && step[i-1].camera){
-    }else{
+    }else if(!step.camera && i > 0 && steps[i-1].camera){
+    // }else{
         Engine.camera.pan(Engine.player.x,Engine.player.y,1000,'Linear',false,function(camera,progress){
             if(progress == 1) Engine.camera.startFollow(Engine.player);
         });
@@ -76,7 +63,14 @@ TutorialManager.displayNext = function(){
 
     var x = 15;
     var y = 20;
-    panel.addText(x,y,step.txt);
+
+    var text = step.txt;
+    var itemMatch = text.matchAll(/\[I([0-9]+)\]/g);
+    for(var match of itemMatch){
+        text = text.replace(/\[I[0-9]+\]/,Engine.itemsData[match[1]].name);
+    }
+
+    panel.addText(x,y,text);
 
     if(!step.hook){
         panel.addBigButton('Next', TutorialManager.displayNext);
@@ -103,6 +97,8 @@ TutorialManager.isHookTriggered = function(hook){
             return (Engine.currentBuiling && Engine.currentBuiling.id == info[1]);
         case 'bldselect':
             return TutorialManager.isHookTriggered('newbuilding:'+hook[1]);
+        case 'built':
+            return Engine.buildings[info[1]].isBuilt();
         case 'inventory':
             return Engine.player.getItemNb(info[1]) >= info[2];
         case 'menu':

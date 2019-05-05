@@ -12,6 +12,7 @@ var StatsContainer = require('../shared/Stats.js').StatsContainer;
 var Models = require('../shared/models.js');
 
 function Building(data){
+    GameObject.call(this);
     this.isBuilding = true;
     this.battleTeam = 'Player';
     this.entityCategory = 'Building';
@@ -19,7 +20,7 @@ function Building(data){
     this.schemaModel = GameServer.BuildingModel;
     this.battlePriority = 3;
 
-    if(data.instance > -1) this.instance = data.instance;
+    this.instance = data.instance > -1 ? data.instance : -1;
 
     this.id = -1;
     if(data.id !== undefined){

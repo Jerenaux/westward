@@ -163,6 +163,7 @@ var Building = new Phaser.Class({
             Engine.exitBuilding();
             Engine.enterBuilding(this.id);
         }
+        if(Client.tutorial && flag == true) TutorialManager.triggerHook('built:'+this.id);
     },
 
     setCollisions: function () {

@@ -1991,6 +1991,7 @@ Engine.enterBuilding = function(id){
 
 Engine.exitBuilding = function(){
     Engine.player.setVisible(true);
+    Engine.camera.startFollow(Engine.player);
     Engine.inBuilding = false;
     Engine.currentBuiling = null;
     Engine.currentMenu.hide();
