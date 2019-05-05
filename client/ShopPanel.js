@@ -235,8 +235,6 @@ ShopPanel.prototype.requestPurchase = function(){
 
     Client.sendPurchase(this.shopItem.id, this.shopItem.count, this.shopItem.action, this.financial);
 
-    if(Client.tutorial) TutorialManager.handleStock(this.shopItem.action,this.shopItem.id,this.shopItem.count);
-    
     this.lastPurchase = Date.now();
 };
 

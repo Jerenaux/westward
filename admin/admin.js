@@ -108,7 +108,7 @@ app.filter('eventFilter',function(){
             case 'chat':
                 return prefix("Said: \""+event.txt+"\"", event.time,event.pname);
             case 'connect':
-                return prefix("Connected in settlement "+event.stl, event.time,event.pname);
+                return prefix("Connected in settlement "+event.stl+" ("+(event.re ? 'Returning' : 'New')+" player)", event.time,event.pname);
             case 'craft':
                 return prefix("Crafted "+event.nb+ " "+Data.itemsData[event.item].name, event.time,event.pname);
             case 'disconnect':
@@ -126,6 +126,8 @@ app.filter('eventFilter',function(){
                 return prefix("Built "+Data.buildingsData[event.building].name+" at "+event.x+", "+event.y,event.time,event.pname);
             case 'pickup':
                 return prefix("Picked up "+Data.itemsData[event.item].name,event.time,event.pname);
+            case 'prices':
+                return prefix("Set prices of "+Data.itemsData[event.item].name+" to "+event.buy+"/"+event.sell,event.time,event.pname);
             case 'respawn':
                 return prefix("Respawned", event.time,event.pname);
             case 'sell':
@@ -136,7 +138,7 @@ app.filter('eventFilter',function(){
             case 'server-start':
                 return prefix(" SERVER RESTART",event.time);
             case 'tutorial-end':
-                return prefix('-- A player finished the tutorial --',event.time);
+                return prefix('-- A player finished the tutorial at step '+event.step+'--',event.time);
             case 'tutorial-start':
                 return prefix('-- A player started the tutorial --',event.time);
             case 'use':

@@ -226,6 +226,10 @@ Client.sendTutorialStart = function(){
     Client.socket.emit('tutorial-start');
 };
 
+Client.sendTutorialStep = function(step){
+    Client.socket.emit('tutorial-step',step);
+};
+
 Client.sendTutorialEnd = function(){
     Client.socket.emit('tutorial-end');
 };

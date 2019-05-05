@@ -550,7 +550,7 @@ GameServer.addNewPlayer = function(socket,data){
     }else{
         GameServer.saveNewPlayerToDb(socket,player,document);
     }
-    GameServer.finalizePlayer(socket,player);
+    GameServer.finalizePlayer(socket,player,false); // false = new player
     player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
     player.save();
     if(data.tutorial) GameServer.createInstance(player);
@@ -597,7 +597,7 @@ GameServer.loadPlayer = function(socket,id){
             player.getDataFromDb(doc);
             player.setModel(doc);
             player.spawn(player.x, player.y);
-            GameServer.finalizePlayer(socket,player); // sends the init packet
+            GameServer.finalizePlayer(socket,player,true); // sends the init packet ; true = returning player
         }
     );
 };
@@ -609,7 +609,7 @@ GameServer.loadPlayer = function(socket,id){
  * @param {Socket} socket - The socket of the connection to the client.
  * @param {Player} player - The created/retrieved Player object.
  */
-GameServer.finalizePlayer = function(socket,player){
+GameServer.finalizePlayer = function(socket,player,returning){
     GameServer.players[player.id] = player;
     GameServer.socketMap[socket.id] = player.id;
     GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
@@ -617,7 +617,7 @@ GameServer.finalizePlayer = function(socket,player){
     player.setOrUpdateAOI(); // takes care of adding to the world as well
     player.listBuildings();
     //console.log(GameServer.server.getNbConnected()+' connected');
-    Prism.logEvent(player,'connect',{stl:player.sid});
+    Prism.logEvent(player,'connect',{stl:player.sid,re:returning});
 };
 
 /**
@@ -651,7 +651,10 @@ GameServer.handleDisconnect = function(socketID){
     if(!player) return;
     Prism.logEvent(player,'disconnect');
     player.save();
-    if(player.isInstanced()) GameServer.destroyInstance(player.instance);
+    if(player.isInstanced()){
+        Prism.logEvent(player,'tutorial-end',{step:player.tutorialStep});
+        GameServer.destroyInstance(player.instance);
+    }
     GameServer.removeEntity(player);
     delete GameServer.socketMap[socketID];
     GameServer.nbConnectedChanged = true;
@@ -1085,6 +1088,7 @@ GameServer.setBuildingPrice = function(data,socketID){
     building.setPrices(data.item,data.buy,data.sell);
     building.save();
     player.addNotif('Price updated');
+    Prism.logEvent(player,'prices',{item:data.item,buy:data.buy,sell:data.sell});
 };
 
 GameServer.handleGold = function(data,socketID){
@@ -1113,7 +1117,7 @@ GameServer.handleShop = function(data,socketID) {
     var nb = data.nb;
     var action = data.action;
     if(!player.isInBuilding()){
-        console.log('player not in building');
+        console.log('player not in a building');
         return false;
     }
     var building = GameServer.buildings[player.inBuilding];
@@ -1185,6 +1189,7 @@ GameServer.handleBuild = function(data,socketID) {
         return false;
     }
     var buildPermit = GameServer.canBuild(bid, tile);
+    if(player.isInstanced()) buildPermit = 1; //hack
     if (buildPermit == 1) {
         GameServer.build(player, bid, tile);
         player.addNotif('Started building a '+GameServer.buildingsData[bid].name);
@@ -1223,28 +1228,38 @@ GameServer.build = function(player,bid,tile){
         built: false,
         instance: player.instance
     };
+    if(player.isInstanced()) data.id = 't'+player.getInstance().nextBuildingID++;
     data.prices = GameServer.getDefaultPrices();
     var building = new Building(data);
     var document = new GameServer.BuildingModel(building);
     building.setModel(document); // ref to model is needed at least to get _id
 
+
     if(building.isInstanced()){
+        player.getInstance().entities.push(building);
+
         var buildingData = GameServer.buildingsData[building.type];
         if(buildingData.production){
             buildingData.production.forEach(function(prod){
                 building.giveItem(prod[0],prod[3]);
             });
         }
-    }
 
-    document.save(function (err) {
-        if (err) return console.error(err);
-        building.embed();
-        GameServer.buildingsChanged = true;
-        player.listBuildings(); // update list of buildable buildings by player
-        GameServer.updateFoW();
-        if(GameServer.buildingParameters.autobuild) building.setBuilt();
-    });
+        GameServer.finalizeBuilding(player,building);
+    }else{
+        document.save(function (err) {
+            if (err) return console.error(err);
+            GameServer.finalizeBuilding(player,building);
+        });
+    }
+};
+
+GameServer.finalizeBuilding = function(player,building){
+    building.embed();
+    GameServer.buildingsChanged = true;
+    if(!player.isInstanced()) player.listBuildings(); // update list of buildable buildings by player
+    GameServer.updateFoW();
+    if(GameServer.buildingParameters.autobuild) building.setBuilt();
 };
 
 GameServer.listBuildingMarkers = function(instance){
@@ -1365,6 +1380,11 @@ GameServer.handleTutorialStart = function(){
 
 GameServer.handleTutorialEnd = function(){
     Prism.logEvent(null,'tutorial-end');
+};
+
+GameServer.handleTutorialStep = function(step,socketID){
+    var player = GameServer.getPlayer(socketID);
+    player.tutorialStep = step;
 };
 
 GameServer.handleAOItransition = function(entity,previous){

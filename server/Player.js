@@ -85,6 +85,10 @@ Player.prototype.isInstanced = function(){
     return this.instance > -1;
 };
 
+Player.prototype.getInstance = function(){
+    return GameServer.instances[this.instance];
+};
+
 Player.prototype.updateBldRecipes = function(){
     this.bldRecipes = [];
     this.baseBldrecipes.forEach(function(b){
@@ -714,7 +718,7 @@ Player.prototype.isAvailableForFight = function(){
 };
 
 Player.prototype.isInBuilding = function(){
-    return this.inBuilding > -1;
+    return this.inBuilding != -1;
 };
 
 Player.prototype.isInside = function(buildingID){

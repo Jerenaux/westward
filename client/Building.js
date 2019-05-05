@@ -223,6 +223,7 @@ var Building = new Phaser.Class({
     updateInventory: function(items){
         this.inventory.updateItems(items);
         this.updateEvents.add('onUpdateShop');
+        if(Client.tutorial) TutorialManager.checkHook();
     },
 
     getHPposition: function(){

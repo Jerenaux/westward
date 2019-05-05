@@ -1260,7 +1260,7 @@ Engine.makeStaffMenu = function(){
 Engine.makeMapMenu = function(){
     var map = new Menu('World Map');
     map.log = true;
-    map.hook = 'mapmenu';
+    map.hook = 'map';
     map.setSound(Engine.scene.sound.add('page_turn2'));
     var mapPanel = map.addPanel('map',new MapPanel(10,100,1000,380,'',true)); // true = invisible
     mapPanel.addBackground('longscroll');
@@ -1458,13 +1458,6 @@ Engine.bldUnclick = function(shutdown){
         var pos = Engine.bldRect.getBottomLeft();
         pos.x = pos.x / 32;
         pos.y = (pos.y / 32) - 1;
-        console.log("Building at ", (pos.x), ",", (pos.y));
-        /*if(Client.tutorial){
-            TutorialManager.triggerHook('bldunselect:'+id);
-            TutorialManager.build(pos.x,pos.y,id);
-        }else{
-            Client.sendBuild(id, pos);
-        }*/
         Client.sendBuild(id, pos);
     }
     Engine.showMarker();
@@ -1616,7 +1609,7 @@ Engine.addHero = function(data){
     //Engine.camera.setDeadzone(7*32,5*32);
     Engine.camera.setLerp(0.1);
     /*var graphics = Engine.scene.add.graphics().setScrollFactor(0);
-    graphics.lineStyle(2, 0x00ff00, 1);
+    // graphics.lineStyle(2, 0x00ff00, 1);
     var w = Engine.camera.deadzone.width;
     var h = Engine.camera.deadzone.height;
     graphics.strokeRect(Engine.camera.centerX-(w/2), Engine.camera.centerY-(h/2), w, h);
@@ -1899,7 +1892,7 @@ Engine.createElements = function(arr,entityType){ // entityType = 'animal', 'bui
 Engine.updateElements = function(obj,table){
     Object.keys(obj).forEach(function (key) {
         if(!table.hasOwnProperty(key)) {
-            if(Engine.debug) console.warn('Attempt to update non-existing element with ID',key);
+            // if(Engine.debug) console.warn('Attempt to update non-existing element with ID',key);
             return;
         }
         table[key].update(obj[key]);

@@ -227,7 +227,6 @@ io.on('connection',function(socket){
             'buildingClick': gs.handleBuildingClick,
             'build': gs.handleBuild,
             'chat': gs.handleChat,
-            'commit': gs.handleCommit,
             'craft': gs.handleCraft,
             'exit': gs.handleExit,
             'gold': gs.handleGold,
@@ -238,6 +237,9 @@ io.on('connection',function(socket){
             'respawn': gs.handleRespawn,
             'screenshot': gs.handleScreenshot,
             'shop': gs.handleShop,
+            'tutorial-end': gs.handleTutorialEnd,
+            'tutorial-start': gs.handleTutorialStart,
+            'tutorial-step': gs.handleTutorialStep,
             'unequip': gs.handleUnequip,
             'use': gs.handleUse,
 
@@ -266,9 +268,6 @@ io.on('connection',function(socket){
            socket.latency = server.quickMedian(socket.pings.slice(0)); // quickMedian used the quickselect algorithm to compute the median of a list of values
        });*/
     }); // end of on init-world
-
-    socket.on('tutorial-start', gs.handleTutorialStart);
-    socket.on('tutorial-end', gs.handleTutorialEnd);
 
     socket.on('region-data',function(){
         socket.emit('region-data',gs.listRegions());

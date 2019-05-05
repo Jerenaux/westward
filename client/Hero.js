@@ -264,6 +264,7 @@ var Hero = new Phaser.Class({
     updateInventory: function(items){
         this.inventory.updateItems(items);
         this.updateEvents.add('inv');
+        if(Client.tutorial) TutorialManager.checkHook();
 
         if(!Engine.firstSelfUpdate) {
             items.forEach(function (item) {

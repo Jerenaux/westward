@@ -22,7 +22,7 @@ function ProductionPanel(x,y,width,height,title){
     this.goldicon = UI.scene.add.sprite(x-15,y+30, 'UI','gold');
     this.goldtxt = this.addText(x - this.x - 7,y+20-this.y, '200',null,12);
     this.goldtxt.setOrigin(0);
-    this.foodtexts = this.addPolyText(this.slot.x - this.x + 30,this.slot.y - this.y - 15,['99','Food - Productivity ','x1'],[null,null,null]);
+    this.foodtexts = this.addPolyText(this.slot.x - this.x + 30,this.slot.y - this.y - 15,['99','Food  -  Productivity ','x1'],[null,null,null]);
     this.foodcontent.push(this.slot);
     this.foodcontent.push(this.icon);
     this.foodcontent.push(this.goldicon);

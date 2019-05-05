@@ -20,6 +20,7 @@ function Building(data){
     this.battlePriority = 3;
 
     if(data.instance > -1) this.instance = data.instance;
+
     this.id = -1;
     if(data.id !== undefined){
         this.id = data.id;

@@ -27,18 +27,16 @@ TutorialManager.boot = function(part){
     TutorialManager.currentPart = part;
     TutorialManager.nextTutorial = 0;
     TutorialManager.currentHook = null;
-    TutorialManager.displayNext();
     Client.sendTutorialStart();
+    TutorialManager.displayNext();
 };
 
 TutorialManager.displayNext = function(){
     if(Engine.currentTutorialPanel) Engine.currentTutorialPanel.hide();
 
     var i = TutorialManager.nextTutorial++;
-    if(i >= TutorialManager.tutorialData.steps.length){
-        Client.sendTutorialEnd();
-        return;
-    }
+    Client.sendTutorialStep(i);
+    if(i >= TutorialManager.tutorialData.steps.length) return;
     TutorialManager.currentHook = null;
 
     var steps = TutorialManager.tutorialData.steps;
@@ -94,32 +92,44 @@ TutorialManager.displayNext = function(){
 };
 
 // Check if the current hook is already triggered
-TutorialManager.isHookTriggered = function(){
-    if(!TutorialManager.currentHook) return false;
-    var info = TutorialManager.currentHook.split(':');
+TutorialManager.isHookTriggered = function(hook){
+    hook = hook || TutorialManager.currentHook;
+    if(!hook) return false;
+    var info = hook.split(':');
     switch(info[0]){
         case 'exit':
-            return Engine.player.inBuilding == -1;
+            return Engine.currentBuiling == null;
         case 'bld':
-            return Engine.player.inBuilding == info[1];
-            break;
+            return (Engine.currentBuiling && Engine.currentBuiling.id == info[1]);
+        case 'bldselect':
+            return TutorialManager.isHookTriggered('newbuilding:'+hook[1]);
+        case 'inventory':
+            return Engine.player.getItemNb(info[1]) >= info[2];
         case 'menu':
-            return (Engine.currentMenu && Engine.currentMenu.hook == info[1])
-            break;
+            return (Engine.currentMenu && Engine.currentMenu.hook == info[1]);
+        case 'newbuilding':
+            for(var bldid in Engine.buildings){
+                var building = Engine.buildings[bldid];
+                if(building.buildingType == info[1] && building.isOwned()) return true;
+            }
+            return false;
         case 'stock':
             return (Engine.buildings[info[1]].getItemNb(info[2]) == info[3]);
-            break;
     }
     return false;
+};
+
+TutorialManager.checkHook = function(){
+    if(TutorialManager.isHookTriggered()) TutorialManager.displayNext();
 };
 
 TutorialManager.triggerHook = function(hook){
     if(TutorialManager.currentHook == hook) TutorialManager.displayNext();
 };
 
-
 // Called when a player changes the stock of a building in the tutorial;
 // mimicks what the server would do
+/*
 TutorialManager.handleStock = function(action,item,nb){
     // TODO: Make all this much more declarative
     // Update the building stock
@@ -162,3 +172,4 @@ TutorialManager.handleStock = function(action,item,nb){
         }
     }
 };
+*/

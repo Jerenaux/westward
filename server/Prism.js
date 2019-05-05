@@ -62,6 +62,16 @@ var PickUpEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var PricesEvent = Event.discriminator(
+    'PricesEvent',
+    new mongoose.Schema({
+        item: Number,
+        buy: Number,
+        sell: Number
+    }),
+    {discriminatorKey: 'kind'}
+);
+
 var LootEvent = Event.discriminator(
     'LootEvent',
     new mongoose.Schema({
@@ -134,7 +144,8 @@ var ConnectEvent = Event.discriminator(
     'ConnectEvent',
     new mongoose.Schema({
         stl: Number,
-        name: String
+        name: String,
+        re: Boolean
     }),
     {discriminatorKey: 'kind'}
 );
@@ -165,7 +176,9 @@ var TutorialStartEvent = Event.discriminator(
 
 var TutorialEndEvent = Event.discriminator(
     'TutorialEndEvent',
-    new mongoose.Schema(),
+    new mongoose.Schema({
+        step: Number
+    }),
     {discriminatorKey: 'kind'}
 );
 
@@ -191,6 +204,7 @@ Prism.logEvent = function(player,action,data){
         'menu': MenuEvent,
         'newbuilding': NewBuildingEvent,
         'pickup': PickUpEvent,
+        'prices': PricesEvent,
         'respawn': RespawnEvent,
         'sell': TradeEvent,
         'server-start': ServerStartEvent,

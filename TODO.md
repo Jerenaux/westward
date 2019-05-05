@@ -47,7 +47,8 @@ Misc:
 - Fix wrong building surfaces (reproducible in tutorial part 2)
 - Defreeze, enable wander and aggro
 - Update very first text of tutorial
-- Test instance cleanup
+- Test building new buildings in actual game
+- Retest instance cleanup
 - Test that players don't see tutorial blds appearing
 - Test "already triggered" hooks for all hooks
 
@@ -148,8 +149,7 @@ Secure
 
 Analytics:
 ---------
-- Log: tutorial step when disconnecting, price setting, handleGold
-- Flag returning players
+- Log: /
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions
@@ -162,7 +162,7 @@ Analytics:
 - Log where items are bought/sold
 - Log pathfinding destinations, consider making heatmap in the long term
 - Log as many things as possible: session duration, distance travelled per session, time spent in settlement per session, in nature per session,
-interactions with buildings, time spent in each individual menu, etc.
+interactions with buildings, time spent in each individual menu, step at which tutorial is most often finished, etc.
 - Cluster "heavy" players vs "small-time" players and look for differences between the two
 - Analyze sessions of one-time players who never come back
 - Find other meaningful clusters (maybe in unsupervized fashion)
