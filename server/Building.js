@@ -109,8 +109,7 @@ Building.prototype.embed = function(){
     GameServer.buildings[this.id] = this;
     this.onAddAtLocation();
     this.setOrUpdateAOI();
-    this.addCollisions();
-    //this.registerBuilding();
+    this.setCollisions('add');
     this.updateBuild();
 };
 
@@ -224,6 +223,10 @@ Building.prototype.setBuilt = function(){
     GameServer.notifyPlayer(this.owner,phrase.join(' '));
 };
 
+Building.prototype.isBuilt = function(){
+    return this.built;
+};
+
 Building.prototype.toggleBuild = function(){
     this.setProperty('built',!this.built);
     this.setProperty('progress',(this.built ? 100 : 0));
@@ -326,6 +329,7 @@ Building.prototype.takeGold = function(nb){
 
 Building.prototype.remove = function(){
     // TODO: keep track of players inside, and make them leave first
+    this.setCollisions('remove');
     delete GameServer.buildings[this.id];
 };
 
@@ -374,10 +378,10 @@ Building.prototype.mapTrim = function(){
     return trimmed;
 };
 
-Building.prototype.addCollisions = function(){
-    //PFUtils.buildingCollisions(this.x,this.y,GameServer.buildingsData[this.type],GameServer.collisions);
-    PFUtils.buildingCollisions(this.x,this.y-this.cellsHeight,this.cellsWidth,this.cellsHeight,GameServer.collisions);
+Building.prototype.setCollisions = function(flag){
+    PFUtils.buildingCollisions(this.x,this.y-this.cellsHeight,this.cellsWidth,this.cellsHeight,GameServer.collisions,flag);
 };
+
 
 Building.prototype.travelOccupiedCells = function(action){
     for(var x = -1; x <= this.cellsWidth; x++){

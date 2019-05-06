@@ -26,7 +26,7 @@ var GameServer = {
     socketMap: {}, // socket.id -> player.id
     vision: new Set(), // set of AOIs potentially seen by at least one player
     nbConnectedChanged: false,
-    buildingsChanged: false,
+    buildingsChanged: false, // flag to know when to send list of building markers to clients
     initializationStep: 0,
     initialized: false
 };
@@ -759,7 +759,7 @@ GameServer.getDefaultPrices = function(){
     defaultItems.forEach(function(item){
         var prices = GameServer.marketPrices.get(item);
         var average = 10;
-        if(prices.length) average = prices.reduce(function(total,num){return total+num;})/prices.length;
+        if(prices.length) average = Math.ceil(prices.reduce(function(total,num){return total+num;})/prices.length);
         defaultPrices[item] = {
             buy: average/2,
             sell: average
@@ -1648,6 +1648,7 @@ GameServer.createInstance = function(player){
         var building = GameServer.addBuilding(bld);
         instance.entities.push(building);
     });
+    GameServer.buildingsChanged = true;
 
     // Stock up most construction material, except for the first one
     worldData.partialbuild.forEach(function(bldid){

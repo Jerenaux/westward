@@ -12,7 +12,7 @@ TutorialManager.update = function(){
 TutorialManager.boot = function(part){
     TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials');
     TutorialManager.currentPart = part;
-    TutorialManager.nextTutorial = 25;
+    TutorialManager.nextTutorial = 0; //27;
     TutorialManager.currentHook = null;
     Client.sendTutorialStart();
     TutorialManager.displayNext();
@@ -66,8 +66,12 @@ TutorialManager.displayNext = function(){
 
     var text = step.txt;
     var itemMatch = text.matchAll(/\[I([0-9]+)\]/g);
+    var buildingMatch = text.matchAll(/\[B([0-9]+)\]/g);
     for(var match of itemMatch){
         text = text.replace(/\[I[0-9]+\]/,Engine.itemsData[match[1]].name);
+    }
+    for(var match of buildingMatch){
+        text = text.replace(/\[B[0-9]+\]/,Engine.buildingsData[match[1]].name);
     }
 
     panel.addText(x,y,text);

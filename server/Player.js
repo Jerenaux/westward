@@ -779,6 +779,7 @@ Player.prototype.rest = function(nb){
         console.log('Not in a building');
         return;
     }
+    if(!building.isBuilt()) return;
     var buildingData = GameServer.buildingsData[building.type];
     if(!buildingData.shelter){
         // console.log('Building doesn\'t offer shelter');

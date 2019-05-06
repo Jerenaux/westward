@@ -167,7 +167,7 @@ var Building = new Phaser.Class({
     },
 
     setCollisions: function () {
-        PFUtils.buildingCollisions(this.tileX,this.tileY-this.cellsHeight,this.cellsWidth,this.cellsHeight,Engine.collisions);
+        PFUtils.buildingCollisions(this.tileX,this.tileY-this.cellsHeight,this.cellsWidth,this.cellsHeight,Engine.collisions,'add');
     },
 
     setCountdowns: function(countdowns){
@@ -343,7 +343,7 @@ var Building = new Phaser.Class({
             if(this.civBuilding){
                 Client.buildingClick(this.id);
             }else {
-                if(this.locked && !this.isOwned()){
+                if(this.locked && !this.isOwned() && this.isBuilt()){
                     Engine.player.talk('That building is locked');
                     return;
                 }

@@ -1725,7 +1725,7 @@ Engine.handleOut = function(pointer,objects){
     if(objects.length > 0) {
         for(var i = 0; i < Math.min(objects.length,2); i++) { // disallow bubbling too deep, only useful in menus (i.e. shallow)
             var obj = objects[i];
-            if(obj.constructor.name == 'Building' && !Engine.inMenu) Engine.showMarker();
+            if(obj.constructor.name == 'Building' && (!Engine.inMenu || Engine.currentMenu.allowWalk)) Engine.showMarker();
             if(obj.handleOut) obj.handleOut();
         }
     }
