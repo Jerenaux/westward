@@ -18,7 +18,8 @@
     "partialbuild": ["t2"],
     "sell": [
       ["t3",[[17,25],[11,500]]]
-    ]
+    ],
+    "plant": [[18,1121,168]]
   },
   "steps": [
     {"pos":["c","c",350,146],"txt":"Welcome to Westward's tutorial. We'll cover building, trading, crafting, foraging and fighting. These activities are only a part of what you can do in the game, but that should get you started! "},
@@ -51,6 +52,8 @@
     {"pos":null,"hook":"inventory:17:1","txt":"You are in luck, there is [I17] for sale. This means a player crafted it somewhere else and sold it here. Click on it and buy it!"},
     {"pos":null,"hook":"exit","txt":"Now, to find some [I18]. Exit the building."},
     {"pos":[674,200,350,146],"hook":"menu:map","txt":"Open the world map by clicking on the map icon above."},
+    {"pos":[674,200,350,146],"txt":"The red cross indicates your position. Only the parts of the world that other players have recently explored are visible; the rest is covered in fog of war."},
+    {"pos":[674,200,350,146],"hook":"area:1101:158:20:20","txt":"Leaf icons on the map indicate where some plants can be picked up. Using your map, try to find and go to a location where some [I18] grows!"},
     {"pos":null,"txt":"EOT"}
   ]
 }

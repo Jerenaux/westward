@@ -65,6 +65,8 @@ function Player(){
     this.visitedAOIs = new Set(); // List of AOIs visitted since last fort debrief
     this.steps = 0;
     MovingEntity.call(this);
+
+    this.extraMarkers = [];
 }
 
 Player.prototype = Object.create(MovingEntity.prototype);
@@ -554,7 +556,7 @@ Player.prototype.applyEffect = function(stat,delta,notify){
 
 /**
  * Create a smaller object containing the properties needed to initialize
- * the player character on the client-side.
+ * the player character on the client-side. Called in `gs.createInitializationPacket()`
  * @returns {{}}
  */
 Player.prototype.initTrim = function(){
@@ -569,7 +571,7 @@ Player.prototype.initTrim = function(){
     trimmed.y = parseInt(this.y);
     trimmed.fow = GameServer.fowList;
     trimmed.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
-    trimmed.resourceMarkers = GameServer.resourceMarkers;
+    trimmed.resourceMarkers = GameServer.listResourceMarkers(this.instance).concat(this.extraMarkers);
     trimmed.rarity = GameServer.getRarity();
     return trimmed;
 };

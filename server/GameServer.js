@@ -539,6 +539,7 @@ GameServer.addNewPlayer = function(socket,data){
         player.setInstance();
         var info = GameServer.tutorialData['initData'];
         player.spawn(info.x,info.y);
+        if(data.tutorial) GameServer.createInstance(player);
     }else{
         player.spawn();
     }
@@ -553,7 +554,6 @@ GameServer.addNewPlayer = function(socket,data){
     GameServer.finalizePlayer(socket,player,false); // false = new player
     player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
     player.save();
-    if(data.tutorial) GameServer.createInstance(player);
     return player;
 };
 
@@ -1262,6 +1262,10 @@ GameServer.finalizeBuilding = function(player,building){
     if(GameServer.buildingParameters.autobuild) building.setBuilt();
 };
 
+GameServer.listResourceMarkers = function(instance){
+    return GameServer.resourceMarkers;
+};
+
 GameServer.listBuildingMarkers = function(instance){
     var list = [];
     for(var bid in GameServer.buildings){
@@ -1435,19 +1439,18 @@ GameServer.updateVision = function(){
     // console.log('VISION:',GameServer.vision);
 };
 
+GameServer.dissipateFoW = function(aoi){
+    GameServer.fogOfWar[aoi] = Date.now();
+};
+
 GameServer.updateFoW = function(){
     for(var pid in GameServer.players){
         var player = GameServer.players[pid];
-        player.fieldOfVision.forEach(function(aoi){
-            GameServer.fogOfWar[aoi] = Date.now();
-        });
+        player.fieldOfVision.forEach(GameServer.dissipateFoW);
     }
     for(var bid in GameServer.buildings){
         var building = GameServer.buildings[bid];
-        /*Utils.listAdjacentAOIs(building.aoi).forEach(function(aoi){
-            GameServer.vision.add(aoi);
-        });*/
-        GameServer.fogOfWar[building.aoi] = Date.now();
+        GameServer.dissipateFoW(building.aoi);
     }
     GameServer.fowChanged = true;
     GameServer.fowList = GameServer.computeFoW();
@@ -1669,6 +1672,19 @@ GameServer.createInstance = function(player){
             building.giveItem(itemdata[0],1);
             building.setPrices(itemdata[0],0,itemdata[1]);
         });
+    });
+
+    worldData.plant.forEach(function(data){
+        var type = data[0];
+        var x = data[1];
+        var y = data[2];
+        for(var i = 0; i < 5; i++){
+            var rx = x + Utils.randomInt(-4,4);
+            var ry = y + Utils.randomInt(-4,4);
+            if(!GameServer.checkCollision(rx,ry)) GameServer.addItem(type,rx,ry);
+        }
+        player.extraMarkers.push([x,y,type]);
+        GameServer.dissipateFoW(Utils.tileToAOI(x,y));
     });
 };
 

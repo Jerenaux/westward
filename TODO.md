@@ -46,6 +46,7 @@ Misc:
 - Fix wrong building surfaces (reproducible in tutorial part 2)
 - Defreeze, enable wander and aggro
 - Reset tutorial start
+- Test resource makers ingame
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.
