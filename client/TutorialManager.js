@@ -12,7 +12,7 @@ TutorialManager.update = function(){
 TutorialManager.boot = function(part){
     TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials');
     TutorialManager.currentPart = part;
-    TutorialManager.nextTutorial = 27;
+    TutorialManager.nextTutorial = 29;
     TutorialManager.currentHook = null;
     Client.sendTutorialStart();
     TutorialManager.displayNext();
@@ -97,7 +97,7 @@ TutorialManager.isHookTriggered = function(hook){
     var info = hook.split(':');
     switch(info[0]){
         case 'area':
-            var area = new Phaser.Geom.Rectangle(info[1],info[2],info[3],info[4]);
+            var area = new Phaser.Geom.Rectangle(parseInt(info[1]),parseInt(info[2]),parseInt(info[3]),parseInt(info[4]));
             return area.contains(Engine.player.tileX,Engine.player.tileY);
         case 'bld':
             return (Engine.currentBuiling && Engine.currentBuiling.id == info[1]);

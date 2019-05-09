@@ -356,8 +356,10 @@ GameServer.addAnimal = function(x,y,type){
  * @param {number} type - The type of item (foreign key with a match in GameServer.itemsData)
  * @returns {Object} The created Item object.
  */
-GameServer.addItem = function(x,y,type){
+GameServer.addItem = function(x,y,type,instance){
+    if(instance === undefined) instance = -1;
     var item = new Item(x,y,type);
+    item.instance = instance;
     GameServer.items[item.id] = item;
     return item;
 };
@@ -1389,6 +1391,7 @@ GameServer.handleTutorialEnd = function(){
 GameServer.handleTutorialStep = function(step,socketID){
     var player = GameServer.getPlayer(socketID);
     player.tutorialStep = step;
+    GameServer.checkInstanceEvent(player.instance,step);
 };
 
 GameServer.handleAOItransition = function(entity,previous){
@@ -1681,11 +1684,21 @@ GameServer.createInstance = function(player){
         for(var i = 0; i < 5; i++){
             var rx = x + Utils.randomInt(-4,4);
             var ry = y + Utils.randomInt(-4,4);
-            if(!GameServer.checkCollision(rx,ry)) GameServer.addItem(type,rx,ry);
+            if(!GameServer.checkCollision(rx,ry)){
+                var item = GameServer.addItem(rx,ry,type,player.instance);
+                // console.warn(item);
+            }
         }
         player.extraMarkers.push([x,y,type]);
         GameServer.dissipateFoW(Utils.tileToAOI(x,y));
     });
+};
+
+GameServer.checkInstanceEvent = function(instance,step){
+    var eventsData = GameServer.tutorialData['events'];
+    if(eventsData.hasOwnProperty(step)){
+        
+    }
 };
 
 GameServer.destroyInstance = function(instance){
