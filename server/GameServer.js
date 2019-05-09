@@ -342,8 +342,8 @@ GameServer.addCiv = function(x,y){
  * @param {number} type - The type of animal (foreign key with a match in GameServer.animalsData)
  * @returns {Object} The created Animal object.
  */
-GameServer.addAnimal = function(x,y,type){
-    var animal = new Animal(x,y,type);
+GameServer.addAnimal = function(x,y,type,instance){
+    var animal = new Animal(x,y,type,instance);
     GameServer.animals[animal.id] = animal;
     return animal;
 };
@@ -357,9 +357,7 @@ GameServer.addAnimal = function(x,y,type){
  * @returns {Object} The created Item object.
  */
 GameServer.addItem = function(x,y,type,instance){
-    if(instance === undefined) instance = -1;
-    var item = new Item(x,y,type);
-    item.instance = instance;
+    var item = new Item(x,y,type,instance);
     GameServer.items[item.id] = item;
     return item;
 };
@@ -1639,7 +1637,9 @@ GameServer.createInstance = function(player){
     console.warn('Creating instance for player ',player.id,'...');
     GameServer.instances[player.instance] = {
         entities: [],
-        nextBuildingID: 0
+        player: player,
+        nextBuildingID: 0,
+        nextAnimalID: 0
     };
     var instance = GameServer.instances[player.instance];
     var playerData = GameServer.tutorialData['playerData'];
@@ -1681,9 +1681,9 @@ GameServer.createInstance = function(player){
         var type = data[0];
         var x = data[1];
         var y = data[2];
-        for(var i = 0; i < 5; i++){
-            var rx = x + Utils.randomInt(-4,4);
-            var ry = y + Utils.randomInt(-4,4);
+        for(var i = 0; i < 6; i++){
+            var rx = x + Utils.randomInt(-3,3);
+            var ry = y + Utils.randomInt(-3,3);
             if(!GameServer.checkCollision(rx,ry)){
                 var item = GameServer.addItem(rx,ry,type,player.instance);
                 // console.warn(item);
@@ -1695,9 +1695,19 @@ GameServer.createInstance = function(player){
 };
 
 GameServer.checkInstanceEvent = function(instance,step){
-    var eventsData = GameServer.tutorialData['events'];
-    if(eventsData.hasOwnProperty(step)){
-        
+    var event = GameServer.tutorialData['steps'][step]['event'];
+    console.log('Checking event for step ',step,' event ',event);
+    if(event){
+        var eventsData = GameServer.tutorialData['events'][event];
+        console.log(eventsData);
+        eventsData['newanimals'].forEach(function(anl){
+            console.warn(anl);
+            var animal = GameServer.addAnimal(anl.x,anl.y,anl.type,instance);
+            console.warn(animal);
+        });
+        eventsData['attack'].forEach(function(id){
+            GameServer.animals[id].setTrackedTarget(GameServer.instances[instance].player);
+        });
     }
 };
 

@@ -12,7 +12,7 @@ TutorialManager.update = function(){
 TutorialManager.boot = function(part){
     TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials');
     TutorialManager.currentPart = part;
-    TutorialManager.nextTutorial = 29;
+    TutorialManager.nextTutorial = 31;
     TutorialManager.currentHook = null;
     Client.sendTutorialStart();
     TutorialManager.displayNext();

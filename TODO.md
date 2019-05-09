@@ -47,6 +47,7 @@ Misc:
 - Defreeze, enable wander and aggro
 - Reset tutorial start
 - Test resource markers ingame
+- Test wandering of animals
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.

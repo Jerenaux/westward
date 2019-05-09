@@ -11,8 +11,13 @@ var World = require('../shared/World.js').World;
 
 var debug = false;
 
-function Animal(x,y,type){
-    this.id = GameServer.lastAnimalID++;
+function Animal(x,y,type,instance){
+    this.instance = (instance > -1 ? instance : -1);
+    if(this.instance > -1){
+        this.id = 't'+GameServer.instances[this.instance].nextAnimalID++;
+    }else{
+        this.id = GameServer.lastAnimalID++;
+    }
     this.isAnimal = true;
     this.battleTeam = 'Animal';
     this.entityCategory = 'Animal';

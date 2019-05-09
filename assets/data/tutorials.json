@@ -22,12 +22,12 @@
     "plant": [[18,1121,168]]
   },
   "events":{
-    "33":{
+    "1":{
       "newanimals":[
         {"type":0,"x":1126,"y":157},
         {"type":0,"x":1123,"y":156}
       ],
-      "attack":["a0","a1"]
+      "attack":["t0","t1"]
     }
   },
   "steps": [
@@ -63,7 +63,7 @@
     {"pos":[674,200,350,146],"hook":"menu:map","txt":"Open the world map by clicking on the map icon above."},
     {"pos":["c",430,350,146],"txt":"The red cross indicates your position. Only the parts of the world that other players have recently explored are visible; the rest is covered in fog of war."},
     {"pos":null,"hook":"area:1111:158:20:20","txt":"Leaf icons on the map indicate where some plants can be picked up. Using your map, try to find and go to a location where some [I18] grows!"},
-    {"pos":null,"hook":"inventory:18:4","txt":"You found some! Click on the [18] on the ground to pick it!"},
+    {"pos":null,"event":1,"hook":"inventory:18:4","txt":"You found some! Click on the [I18] on the ground to pick it!"},
     {"pos":null,"txt":"EOT"}
   ]
 }
