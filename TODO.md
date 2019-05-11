@@ -3,6 +3,8 @@ On deploy:
 - Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
 - Find a way to test itemsRespaw and other time-related aspects
+- Test tutorial
+- Test new player
 => After bug, systematically create test!
 
 
@@ -41,13 +43,10 @@ Misc:
 - Aggro issue
 - Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
 
-- Test setting prices in shop
-- Test new player
 - Fix wrong building surfaces (reproducible in tutorial part 2)
-- Defreeze, enable wander and aggro
-- Reset tutorial start
-- Test resource markers ingame
 - Test wandering of animals
+- CLick map problem
+- Fringe resource icons
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.

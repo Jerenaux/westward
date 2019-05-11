@@ -110,6 +110,8 @@ Menu.prototype.hide = function(){
         this.panels[panel].hide();
     }
 
+    this.trigger('onClose');
+
     Engine.inMenu = false;
     Engine.currentMenu = null;
     Engine.showMarker();

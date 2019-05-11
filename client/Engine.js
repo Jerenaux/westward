@@ -660,6 +660,26 @@ Engine.displayHUD = function(){
     Engine.toggleMenuIcons();
 };
 
+Engine.hideCapsules = function(){
+    Engine.lifeCapsule.hide();
+    Engine.goldCapsule.hide();
+    Engine.bagCapsule.hide();
+    Engine.vigorCapsule.hide();
+    Engine.foodCapsule.hide();
+    Engine.face.setVisible(false);
+    Engine.faceHolder.setVisible(false);
+};
+
+Engine.displayCapsules = function(){
+    Engine.lifeCapsule.display();
+    Engine.goldCapsule.display();
+    Engine.bagCapsule.display();
+    Engine.vigorCapsule.display();
+    Engine.foodCapsule.display();
+    Engine.face.setVisible(true);
+    Engine.faceHolder.setVisible(true);
+};
+
 // Called after the Hero is set up
 Engine.makeUI = function(){
     // TODO: make a zone with onpointerover = cursor is over UI, and make slices not interactive anymore
@@ -683,8 +703,8 @@ Engine.makeUI = function(){
 
     var x = 23;
     var y = 19;
-    UI.scene.add.sprite(x,y,'UI','facebg').setScrollFactor(0);
-    UI.scene.add.sprite(x,y,'faces',0).setScrollFactor(0);
+    Engine.face = UI.scene.add.sprite(x,y,'UI','facebg').setScrollFactor(0);
+    Engine.faceHolder = UI.scene.add.sprite(x,y,'faces',0).setScrollFactor(0);
 
     Engine.lifeCapsule = new Capsule(37,3,'UI','heart');
     Engine.lifeCapsule.removeLeft();
@@ -1038,9 +1058,6 @@ Engine.makeBattleMenu = function(){
     battle.fullHide = true;
 
     var equipment = battle.addPanel('equipment',new BattleEquipmentPanel());
-    /*var equipment = new EquipmentPanel(alignx,100,170,120,'Equipment',true); // true: battle menu
-    equipment.addButton(140, 8, 'blue','help',null,'',UI.textsData['battleitems_help']);
-    */
 
     /*var items = battle.addPanel('items',new InventoryPanel(alignx,220,170,225,'Items'));
     items.setInventory('player',4,true,BattleManager.processInventoryClick);
@@ -1050,10 +1067,6 @@ Engine.makeBattleMenu = function(){
         hard: true
     });*/
     // TODO: add belt
-
-    /*var bar = new BigProgressBar(alignx,445,170,'red',true);
-    bar.name = 'health bar';
-    battle.addPanel('bar',bar);*/
 
     var timerw = 300;
     var timerh = 60;
@@ -1068,17 +1081,20 @@ Engine.makeBattleMenu = function(){
     respawn.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['respawn_help']);
 
     // battle.addEvent('onUpdateInventory',items.updateInventory.bind(items));
-    // battle.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
-
-    /*battle.addEvent('onUpdateStats',function(){
-        bar.setLevel(Engine.getPlayerHealth(),Engine.getPlayerMaxHealth());
-    });*/
+    battle.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
+    battle.addEvent('onUpdateStats',equipment.updateStats.bind(equipment));
 
     battle.addEvent('onOpen',function(){
         // items.updateInventory();
-        // equipment.updateEquipment();
-        //bar.setLevel(Engine.getPlayerHealth(),Engine.getPlayerMaxHealth(),0,true); // true = skip tween
+        equipment.updateEquipment();
+        equipment.updateStats();
+        Engine.hideCapsules();
     });
+
+    battle.addEvent('onClose',function(){
+        Engine.displayCapsules();
+    });
+
     return battle;
 };
 

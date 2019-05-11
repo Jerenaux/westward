@@ -373,6 +373,13 @@ GameServer.onInitialized = function(){
     console.log('---done---');
 };
 
+GameServer.onNewPlayer = function(player){
+    if(!config.get('misc.performInit')) return;
+    player.giveItem(2,1);
+    player.giveItem(20,5);
+    player.giveItem(19,1);
+};
+
 /**
  * Start several loops needed for game logic.
  * Called one the initialization sequence is over.
@@ -619,6 +626,7 @@ GameServer.finalizePlayer = function(socket,player,returning){
     player.listBuildings();
     //console.log(GameServer.server.getNbConnected()+' connected');
     Prism.logEvent(player,'connect',{stl:player.sid,re:returning});
+    GameServer.onNewPlayer(player);
 };
 
 /**
@@ -733,7 +741,6 @@ GameServer.checkCollision = function(x,y){
  * @returns {Array[Object]} - The array of tile coordinates along the calculated path.
  */
 GameServer.findPath = function(from,to,seek){
-    console.warn('findPath : ',to.x,to.y,GameServer.checkCollision(to.x,to.y));
     if(GameServer.checkCollision(to.x,to.y)) return null;
     return GameServer.pathFinder.findPath(from,to,seek);
 };
@@ -800,11 +807,6 @@ GameServer.handleBuildingClick = function(data,socketID){
  * @param {Object} data - Data from the client (mostly NPC ID and type)
  * */
 GameServer.handleNPCClick = function(data,socketID){
-    console.warn(GameServer.checkCollision(1206,134));
-    console.warn(GameServer.checkCollision(1205,134));
-    console.warn(GameServer.checkCollision(1207,133));
-    console.warn(GameServer.checkCollision(1205,135));
-
     var targetID = data.id;
     var player = GameServer.getPlayer(socketID);
     var target = (data.type == 0 ? GameServer.animals[targetID] : GameServer.civs[targetID]);
@@ -1653,7 +1655,8 @@ GameServer.createInstance = function(player){
     var worldData = GameServer.tutorialData['worldData'];
 
     if(playerData.gold) player.setOwnProperty('gold',playerData.gold);
-    if(playerData.bldRecipes) player.setOwnProperty('bldRecipes',playerData.bldRecipes);
+    // if(playerData.bldRecipes) player.setOwnProperty('bldRecipes',playerData.bldRecipes);
+    if(playerData.bldRecipes) player.baseBldrecipes = playerData.bldRecipes;
 
     worldData.newbuildings.forEach(function(bld){
         bld.instance = player.instance;

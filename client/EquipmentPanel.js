@@ -128,10 +128,20 @@ EquipmentPanel.prototype.display = function(){
 function BattleEquipmentPanel(){
     Panel.call(this,0,0,0,0,'',true); // true = invisible
 
-    var meleex = 950;
-    var meleey = 515;
-    var rangex = 1000;
-    var rangey = 500;
+    this.addLifeBar();
+    this.melee = this.addEquipmentHolder(950,515);
+    this.range = this.addEquipmentHolder(1000,500,true);
+
+    this.content.forEach(function(c){
+        c.setScrollFactor(0);
+        c.setVisible(false);
+    });
+}
+
+BattleEquipmentPanel.prototype = Object.create(Panel.prototype);
+BattleEquipmentPanel.prototype.constructor = BattleEquipmentPanel;
+
+BattleEquipmentPanel.prototype.addLifeBar = function(){
     var lifex = 1000;
     var lifey = 550;
     var lifew = 200;
@@ -154,24 +164,64 @@ function BattleEquipmentPanel(){
     this.content.push(this.lifetext);
     this.bar = new MiniProgressBar(this.lifetext.x+this.lifetext.width+5,lifetip.y-5,100,'red');
     this.bar.setLevel(100,100);
-    this.bar.display();
+};
 
-    this.content.push(UI.scene.add.sprite(meleex,meleey,'UI','battleholder'));
-    this.content.push(UI.scene.add.sprite(meleex,meleey,'UI','sword-shade').setAlpha(0.6));
-    this.content.push(UI.scene.add.sprite(rangex,rangey,'UI','battleholder'));
-    this.content.push(UI.scene.add.sprite(rangex,rangey,'UI','gun-shade').setAlpha(0.6));
+BattleEquipmentPanel.prototype.addEquipmentHolder = function(x,y,addText){
+    var holder = UI.scene.add.sprite(x,y,'UI','battleholder');
+    holder.setInteractive();
+    holder.on('pointerover',UI.tooltip.display.bind(UI.tooltip));
+    holder.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
+    var icon = new ItemSprite(x,y);
 
-    this.content.forEach(function(c){
-        c.setScrollFactor(0);
-    })
-}
+    if(addText){
+        icon.countText = UI.scene.add.text(holder.x+5, holder.y+5, '0',
+            { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
+        );
+        icon.countText.setVisible(false);
+    }
 
-BattleEquipmentPanel.prototype = Object.create(Panel.prototype);
-BattleEquipmentPanel.prototype.constructor = BattleEquipmentPanel;
+    this.content.push(holder);
+    this.content.push(icon);
+    return icon;
+};
+
+BattleEquipmentPanel.prototype.updateStats = function(){
+    var hp = Engine.player.getStatValue('hp');
+    var hpmax = Engine.player.getStatValue('hpmax');
+    this.lifetext.setText(hp+'/'+hpmax);
+    this.bar.setLevel(hp,hpmax);
+};
+
+BattleEquipmentPanel.prototype.updateEquipment = function(){
+    var melee = Engine.player.getEquipped('meleew');
+    var range = Engine.player.getEquipped('rangedw');
+    var meleeData = {id: -1, atlas: 'UI', frame: 'sword-shade', name: 'Melee weapon'};
+    var rangeData = {id: -1, atlas: 'UI', frame: 'gun-shade', name: 'Ranged weapon'};
+
+    if(melee > -1) meleeData = Engine.itemsData[melee];
+    if(range > -1) {
+        rangeData = Engine.itemsData[range];
+        var ammo = Engine.player.getNbAnyAmmo();
+        this.range.countText.setText(ammo);
+    }
+
+    this.melee.setUp(-1,meleeData);
+    this.range.setUp(-1,rangeData);
+    this.range.countText.setVisible(range > -1);
+};
 
 BattleEquipmentPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
     this.content.forEach(function(c){
         c.setVisible(true);
-    })
+    });
+    this.bar.display();
+};
+
+BattleEquipmentPanel.prototype.hide = function(){
+    Panel.prototype.hide.call(this);
+    this.content.forEach(function(c){
+        c.setVisible(false);
+    });
+    this.bar.hide();
 };

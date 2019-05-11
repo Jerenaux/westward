@@ -128,6 +128,13 @@ var Hero = new Phaser.Class({
         return this.equipment.getNbAmmo(slot);
     },
 
+    getNbAnyAmmo: function(){
+        var rangedW = this.getEquipped('rangedw');
+        var container = Engine.itemsData[rangedW].ammo;
+        var ammoType = this.equipment.getAmmoType(container);
+        return this.getNbAmmo(ammoType);
+    },
+
     getRangedCursor: function(){
         var rangedw = this.getEquipped('rangedw');
         if(rangedw == -1) return 'bow';
