@@ -12,7 +12,7 @@ TutorialManager.update = function(){
 TutorialManager.boot = function(part){
     TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials');
     TutorialManager.currentPart = part;
-    TutorialManager.nextTutorial = 0; //27;
+    TutorialManager.nextTutorial = 31;
     TutorialManager.currentHook = null;
     Client.sendTutorialStart();
     TutorialManager.displayNext();
@@ -65,12 +65,13 @@ TutorialManager.displayNext = function(){
     var y = 20;
 
     var text = step.txt;
-    var itemMatch = text.matchAll(/\[I([0-9]+)\]/g);
-    var buildingMatch = text.matchAll(/\[B([0-9]+)\]/g);
-    for(var match of itemMatch){
+
+    var itemRe = /\[I([0-9]+)\]/g;
+    var buildingRe = /\[B([0-9]+)\]/g;
+    while((match = itemRe.exec(text)) !== null){
         text = text.replace(/\[I[0-9]+\]/,Engine.itemsData[match[1]].name);
     }
-    for(var match of buildingMatch){
+    while((match = buildingRe.exec(text)) !== null){
         text = text.replace(/\[B[0-9]+\]/,Engine.buildingsData[match[1]].name);
     }
 
@@ -95,14 +96,17 @@ TutorialManager.isHookTriggered = function(hook){
     if(!hook) return false;
     var info = hook.split(':');
     switch(info[0]){
-        case 'exit':
-            return Engine.currentBuiling == null;
+        case 'area':
+            var area = new Phaser.Geom.Rectangle(parseInt(info[1]),parseInt(info[2]),parseInt(info[3]),parseInt(info[4]));
+            return area.contains(Engine.player.tileX,Engine.player.tileY);
         case 'bld':
             return (Engine.currentBuiling && Engine.currentBuiling.id == info[1]);
         case 'bldselect':
             return TutorialManager.isHookTriggered('newbuilding:'+hook[1]);
         case 'built':
             return Engine.buildings[info[1]].isBuilt();
+        case 'exit':
+            return Engine.currentBuiling == null;
         case 'inventory':
             return Engine.player.getItemNb(info[1]) >= info[2];
         case 'menu':
@@ -126,50 +130,3 @@ TutorialManager.checkHook = function(){
 TutorialManager.triggerHook = function(hook){
     if(TutorialManager.currentHook == hook) TutorialManager.displayNext();
 };
-
-// Called when a player changes the stock of a building in the tutorial;
-// mimicks what the server would do
-/*
-TutorialManager.handleStock = function(action,item,nb){
-    // TODO: Make all this much more declarative
-    // Update the building stock
-    if(action == 'give') nb *= -1;
-    var newnb = Engine.currentBuiling.getItemNb(item)-nb;
-    var items = [[parseInt(item),newnb]];
-    var updt = {buildings:{}};
-    updt.buildings[Engine.currentBuiling.id] = {items:items};
-
-    // Update player inventory
-    items = [];
-    items.push([parseInt(item),Engine.player.getItemNb(item)+nb]);
-    var sign = (nb > 0 ? '+' : '');
-    Engine.player.updateData(
-        {items:items,
-            notifs:[sign+nb+' '+Engine.itemsData[item].name]} // TODO: centralize notifs
-    );
-
-    // Update gold
-    var price = Engine.currentBuiling.getPrice(item,'sell');
-    if(price){
-        Engine.player.updateData(
-            {gold:Engine.player.gold-price} // TODO: centralize notifs
-        );
-        updt.buildings[Engine.currentBuiling.id]['gold'] = Engine.currentBuiling.gold + price;
-    }
-
-    console.warn(updt);
-    Engine.updateWorld(updt);
-
-    TutorialManager.triggerHook('stock:'+Engine.currentBuiling.id+':'+item+':'+newnb);
-
-    if(action == 'give'){
-        // TODO: call a Building method to check if building ready to build or not
-        var recipe = Engine.buildingsData[Engine.currentBuiling.buildingType].recipe;
-        if(newnb >= recipe[item]){
-            var updt = {buildings:{}};
-            updt.buildings[Engine.currentBuiling.id] = {built:true};
-            Engine.updateWorld(updt);
-        }
-    }
-};
-*/

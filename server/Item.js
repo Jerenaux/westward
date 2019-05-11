@@ -5,7 +5,8 @@
 var GameObject = require('./GameObject.js').GameObject;
 var GameServer = require('./GameServer.js').GameServer;
 
-function Item(x,y,type){
+function Item(x,y,type,instance){
+    this.instance = (instance > -1 ? instance : -1);
     this.updateCategory = 'items';
     this.entityCategory = 'Item';
     this.id = GameServer.lastItemID++;

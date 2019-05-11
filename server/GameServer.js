@@ -342,8 +342,8 @@ GameServer.addCiv = function(x,y){
  * @param {number} type - The type of animal (foreign key with a match in GameServer.animalsData)
  * @returns {Object} The created Animal object.
  */
-GameServer.addAnimal = function(x,y,type){
-    var animal = new Animal(x,y,type);
+GameServer.addAnimal = function(x,y,type,instance){
+    var animal = new Animal(x,y,type,instance);
     GameServer.animals[animal.id] = animal;
     return animal;
 };
@@ -356,8 +356,8 @@ GameServer.addAnimal = function(x,y,type){
  * @param {number} type - The type of item (foreign key with a match in GameServer.itemsData)
  * @returns {Object} The created Item object.
  */
-GameServer.addItem = function(x,y,type){
-    var item = new Item(x,y,type);
+GameServer.addItem = function(x,y,type,instance){
+    var item = new Item(x,y,type,instance);
     GameServer.items[item.id] = item;
     return item;
 };
@@ -540,6 +540,7 @@ GameServer.addNewPlayer = function(socket,data){
         player.setInstance();
         var info = GameServer.tutorialData['initData'];
         player.spawn(info.x,info.y);
+        if(data.tutorial) GameServer.createInstance(player);
     }else{
         player.spawn();
     }
@@ -554,7 +555,6 @@ GameServer.addNewPlayer = function(socket,data){
     GameServer.finalizePlayer(socket,player,false); // false = new player
     player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
     player.save();
-    if(data.tutorial) GameServer.createInstance(player);
     return player;
 };
 
@@ -1269,6 +1269,10 @@ GameServer.finalizeBuilding = function(player,building){
     if(GameServer.buildingParameters.autobuild) building.setBuilt();
 };
 
+GameServer.listResourceMarkers = function(instance){
+    return GameServer.resourceMarkers;
+};
+
 GameServer.listBuildingMarkers = function(instance){
     var list = [];
     for(var bid in GameServer.buildings){
@@ -1392,6 +1396,7 @@ GameServer.handleTutorialEnd = function(){
 GameServer.handleTutorialStep = function(step,socketID){
     var player = GameServer.getPlayer(socketID);
     player.tutorialStep = step;
+    GameServer.checkInstanceEvent(player.instance,step);
 };
 
 GameServer.handleAOItransition = function(entity,previous){
@@ -1442,19 +1447,18 @@ GameServer.updateVision = function(){
     // console.log('VISION:',GameServer.vision);
 };
 
+GameServer.dissipateFoW = function(aoi){
+    GameServer.fogOfWar[aoi] = Date.now();
+};
+
 GameServer.updateFoW = function(){
     for(var pid in GameServer.players){
         var player = GameServer.players[pid];
-        player.fieldOfVision.forEach(function(aoi){
-            GameServer.fogOfWar[aoi] = Date.now();
-        });
+        player.fieldOfVision.forEach(GameServer.dissipateFoW);
     }
     for(var bid in GameServer.buildings){
         var building = GameServer.buildings[bid];
-        /*Utils.listAdjacentAOIs(building.aoi).forEach(function(aoi){
-            GameServer.vision.add(aoi);
-        });*/
-        GameServer.fogOfWar[building.aoi] = Date.now();
+        GameServer.dissipateFoW(building.aoi);
     }
     GameServer.fowChanged = true;
     GameServer.fowList = GameServer.computeFoW();
@@ -1640,7 +1644,9 @@ GameServer.createInstance = function(player){
     console.warn('Creating instance for player ',player.id,'...');
     GameServer.instances[player.instance] = {
         entities: [],
-        nextBuildingID: 0
+        player: player,
+        nextBuildingID: 0,
+        nextAnimalID: 0
     };
     var instance = GameServer.instances[player.instance];
     var playerData = GameServer.tutorialData['playerData'];
@@ -1677,6 +1683,39 @@ GameServer.createInstance = function(player){
             building.setPrices(itemdata[0],0,itemdata[1]);
         });
     });
+
+    worldData.plant.forEach(function(data){
+        var type = data[0];
+        var x = data[1];
+        var y = data[2];
+        for(var i = 0; i < 6; i++){
+            var rx = x + Utils.randomInt(-3,3);
+            var ry = y + Utils.randomInt(-3,3);
+            if(!GameServer.checkCollision(rx,ry)){
+                var item = GameServer.addItem(rx,ry,type,player.instance);
+                // console.warn(item);
+            }
+        }
+        player.extraMarkers.push([x,y,type]);
+        GameServer.dissipateFoW(Utils.tileToAOI(x,y));
+    });
+};
+
+GameServer.checkInstanceEvent = function(instance,step){
+    var event = GameServer.tutorialData['steps'][step]['event'];
+    console.log('Checking event for step ',step,' event ',event);
+    if(event){
+        var eventsData = GameServer.tutorialData['events'][event];
+        console.log(eventsData);
+        eventsData['newanimals'].forEach(function(anl){
+            console.warn(anl);
+            var animal = GameServer.addAnimal(anl.x,anl.y,anl.type,instance);
+            console.warn(animal);
+        });
+        eventsData['attack'].forEach(function(id){
+            GameServer.animals[id].setTrackedTarget(GameServer.instances[instance].player);
+        });
+    }
 };
 
 GameServer.destroyInstance = function(instance){

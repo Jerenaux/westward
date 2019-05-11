@@ -125,23 +125,6 @@ NPC.prototype.decideBattleAction = function(){
     this.battle.processAction(this,data);
 };
 
-/*NPC.prototype.findFreeCell = function(){
-    // TODO: rework, no sorting, use of boxdistance, no call to battle.isPositionFree
-    var pos = {x:this.x,y:this.y};
-    var list = this.battle.getCells(); //{x,y,v} objects
-    list.sort(function(a,b){
-        if(Utils.chebyshev(a,pos) < Utils.chebyshev(b,pos)) return -1;
-        return 1;
-    });
-    for(var i = 0; i < list.length; i++){
-        var cell = list[i];
-        if(this.battle.isPositionFree(cell.x,cell.y)) return this.findBattlePath(cell);
-    }
-    return {
-        action: 'pass'
-    };
-};*/
-
 NPC.prototype.findBattlePath = function(dest){
     var data = {};
     var path = this.battle.findPath({x: this.x, y: this.y}, dest);
@@ -194,19 +177,6 @@ NPC.prototype.selectTarget = function(){
         }
     }
     return target;
-    /*fighters = fighters.filter(function(f){
-        return (!this.isSameTeam(f) && this.aggroAgainst(f));
-    },this);
-    fighters.sort(function(a,b){
-        if(a.battlePriority == b.battlePriority){
-            if(a.getHealth() < b.getHealth()) return -1;
-            return 1;
-        }else{
-            if(a.battlePriority < b.battlePriority) return -1;
-            return 1;
-        }
-    });
-    return fighters[0];*/
 };
 
 //Check if a *moving entity* (no building or anything) other than self is at position
@@ -282,6 +252,15 @@ NPC.prototype.setIdle = function(){
     this.idleTime = Utils.randomInt(GameServer.wildlifeParameters.idleTime[0]*1000,GameServer.wildlifeParameters.idleTime[1]*1000);
 };
 
+NPC.prototype.updateBehavior = function(){
+    if(this.trackedTarget) {
+        this.updateTracking();
+    }else{
+        if(!this.camp) return;
+        this.updateWander();
+    }
+};
+
 NPC.prototype.updateWander = function(){
     if(!this.isInVision()) return;
     if(this.isInFight() || this.isDead() || !this.idle || !this.doesWander()) return;
@@ -298,5 +277,29 @@ NPC.prototype.updateWander = function(){
         if(!foundPath) this.idleTime = GameServer.wildlifeParameters.idleRetry;
     }
 };
+
+NPC.prototype.setTrackedTarget = function(target){
+    this.trackedTarget = target;
+    this.idle = false;
+};
+
+NPC.prototype.updateTracking = function(){
+    if(this.moving || this.isInFight() || this.isDead()) return;
+
+    if(this.x == this.trackedTarget.x && this.y == this.trackedTarget.y){
+        console.log(this.getShortID(),'reached target');
+        this.trackedTarget = null;
+        this.setIdle();
+        return;
+    }
+
+    var path = GameServer.findPath(this,this.trackedTarget,true); // true for seek-path pathfinding
+    if(!path || path.length <= 1) return;
+
+    var trim = PFUtils.trimPath(path,GameServer.battleCells);
+    path = trim.path;
+    this.setPath(path);
+};
+
 
 module.exports.NPC = NPC;

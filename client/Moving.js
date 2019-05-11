@@ -44,11 +44,6 @@ var Moving = new Phaser.Class({
         this.updatePosition(x,y);
     },
 
-    /*setTilePosition: function(x,y){
-        this.tileX = x;
-        this.tileY = y;
-    },*/
-
     // Updates the position; primarily called as the entity moves around and has moved by at least 1 tile
     updatePosition: function(x,y){ // x and y are tile cordinates
         this.updatePreviousPosition();
@@ -142,10 +137,6 @@ var Moving = new Phaser.Class({
             this.orientation = 'down';
         }
     },
-
-    /*setOrientation: function(orientation){
-        this.orientation = orientation;
-    },*/
 
     faceOrientation: function(){
         this.setFrame(this.restingFrames[this.orientation]);
@@ -272,7 +263,10 @@ var Moving = new Phaser.Class({
         this.anims.stop();
         this.setFrame(this.restingFrames[this.orientation]);
 
-        if(this.isHero && Client.tutorial) TutorialManager.triggerHook('move');
+        if(this.isHero && Client.tutorial){
+            TutorialManager.triggerHook('move');
+            TutorialManager.checkHook();
+        }
 
         if(this.queuedPath){
             var _path = this.queuedPath.slice();
