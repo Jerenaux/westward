@@ -369,6 +369,7 @@ GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
     GameServer.addAnimal(1188,222,0);
+    GameServer.addAnimal(1205,133,5);
     console.log('---done---');
 };
 
@@ -732,6 +733,7 @@ GameServer.checkCollision = function(x,y){
  * @returns {Array[Object]} - The array of tile coordinates along the calculated path.
  */
 GameServer.findPath = function(from,to,seek){
+    console.warn('findPath : ',to.x,to.y,GameServer.checkCollision(to.x,to.y));
     if(GameServer.checkCollision(to.x,to.y)) return null;
     return GameServer.pathFinder.findPath(from,to,seek);
 };
@@ -798,6 +800,11 @@ GameServer.handleBuildingClick = function(data,socketID){
  * @param {Object} data - Data from the client (mostly NPC ID and type)
  * */
 GameServer.handleNPCClick = function(data,socketID){
+    console.warn(GameServer.checkCollision(1206,134));
+    console.warn(GameServer.checkCollision(1205,134));
+    console.warn(GameServer.checkCollision(1207,133));
+    console.warn(GameServer.checkCollision(1205,135));
+
     var targetID = data.id;
     var player = GameServer.getPlayer(socketID);
     var target = (data.type == 0 ? GameServer.animals[targetID] : GameServer.civs[targetID]);
