@@ -3,7 +3,7 @@ On deploy:
 - Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
 - Find a way to test itemsRespaw and other time-related aspects
-- Test tutorial
+- Test tutorial (reset start)
 - Test new player
 => After bug, systematically create test!
 
@@ -42,11 +42,11 @@ Misc:
 - Add other plants
 - Aggro issue
 - Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
-
 - Fix wrong building surfaces (reproducible in tutorial part 2)
-- Test wandering of animals
-- CLick map problem
-- Fringe resource icons
+
+- Test tutorial ok even if shack built early
+- Test battle ingame
+- Make size of tutorial boxes adapt to text
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.

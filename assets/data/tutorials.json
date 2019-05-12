@@ -6,7 +6,7 @@
   "playerData": {
     "gold": 25,
     "fow": [338,386,387,388,389,437],
-    "bldRecipes": [6]
+    "bldRecipes": [6,11]
   },
   "worldData": {
       "newbuildings":[
@@ -64,6 +64,14 @@
     {"pos":["c",430,350,146],"txt":"The red cross indicates your position. Only the parts of the world that other players have recently explored are visible; the rest is covered in fog of war."},
     {"pos":null,"hook":"area:1111:158:20:20","txt":"Leaf icons on the map indicate where some plants can be picked up. Using your map, try to find and go to a location where some [I18] grows!"},
     {"pos":null,"hook":"inventory:18:4","txt":"You found some! Click on the [I18] on the ground to pick it!"},
-    {"pos":null,"txt":"EOT"}
+    {"pos":null,"hook":"inventory:6:1","txt":"Now go back to the [B3], and craft one flask of [I6]."},
+    {"pos":null,"txt":"This covers crafting. You helped build a [B3], which in turn allowed you to craft something you needed."},
+    {"pos":null,"txt":"To obtain the ingredients, you went to the shop of another player, and took advantage of the exploration that yet another player had done."},
+    {"pos":[50,65,300,135],"txt":"You must be tired after all that. See the golden heart icon above? It represents your vigor. It decreases when you perform actions."},
+    {"pos":null,"txt":"The lower your vigor, the more you will get maluses to your other stats, making you very vulnerable. The best way to replenish it is to rest somewhere."},
+    {"pos":[0,435,300,135],"hook": "newbuilding:11","txt":"By now your [B6] must have produced enough [I3] for you to build your own [B11]. Go ahead and build one!"},
+    {"pos":null,"hook": "bld:t5","txt":"Now, enter your [B11]"},
+    {"pos":null,"txt":"As you can see, the longer you stay in your [B11], the more you rest. It also works when you are offline!"},
+    {"pos":null,"txt":"This is the end of the tutorial for now. It's not complete yet, other aspects will be covered in the future!"}
   ]
 }

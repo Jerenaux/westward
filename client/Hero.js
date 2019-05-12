@@ -246,7 +246,13 @@ var Hero = new Phaser.Class({
         if(!aois) aois = [Engine.player.chunk];
         aois.forEach(function(aoi){
             var origin = Utils.AOItoTile(aoi);
-            this.FoW.push(new Phaser.Geom.Rectangle(origin.x,origin.y,World.chunkWidth,World.chunkHeight));
+            this.FoW.push(
+                new Phaser.Geom.Rectangle(
+                    origin.x,
+                    origin.y,
+                    World.chunkWidth,
+                    World.chunkHeight)
+            );
         },this);
     },
 

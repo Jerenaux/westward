@@ -68,6 +68,7 @@ NPC.prototype.checkForAggro = function(){
             var entity = aoi.entities[j];
             if(!this.aggroAgainst(entity)) continue;
             if(!entity.isAvailableForFight()) continue;
+            if(entity.instance != this.instance) continue;
             //TODO: vary aggro range?
             if(Utils.chebyshev(this,entity) <= GameServer.battleParameters.aggroRange){
                 if(entity.isInFight()){
