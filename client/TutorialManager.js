@@ -12,7 +12,7 @@ TutorialManager.update = function(){
 TutorialManager.boot = function(part){
     TutorialManager.tutorialData = Engine.scene.cache.json.get('tutorials');
     TutorialManager.currentPart = part;
-    TutorialManager.nextTutorial = 36;
+    TutorialManager.nextTutorial = 0;
     TutorialManager.currentHook = null;
     Client.sendTutorialStart();
     TutorialManager.displayNext();
@@ -100,7 +100,9 @@ TutorialManager.isHookTriggered = function(hook){
             var area = new Phaser.Geom.Rectangle(parseInt(info[1]),parseInt(info[2]),parseInt(info[3]),parseInt(info[4]));
             return area.contains(Engine.player.tileX,Engine.player.tileY);
         case 'bld':
-            return (Engine.currentBuiling && Engine.currentBuiling.id == info[1]);
+            if(!Engine.currentBuiling) return false;
+            if(Engine.currentBuiling.buildingType != info[2]) return false;
+            return (info[1] == 'any' || Engine.currentBuiling.isOwned());
         case 'bldselect':
             return TutorialManager.isHookTriggered('newbuilding:'+hook[1]);
         case 'built':

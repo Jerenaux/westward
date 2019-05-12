@@ -1705,8 +1705,10 @@ GameServer.createInstance = function(player){
 };
 
 GameServer.checkInstanceEvent = function(instance,step){
-    var event = GameServer.tutorialData['steps'][step]['event'];
-    console.log('Checking event for step ',step,' event ',event);
+    var steps = GameServer.tutorialData['steps'];
+    if(step >= steps.length) return;
+    var event = steps[step]['event'];
+    // console.log('Checking event for step ',step,' event ',event);
     if(event){
         var eventsData = GameServer.tutorialData['events'][event];
         console.log(eventsData);

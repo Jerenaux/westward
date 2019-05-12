@@ -2002,7 +2002,7 @@ Engine.enterBuilding = function(id){
     Engine.buildingTitle.move(Engine.currentMenu.titleY);
     Engine.buildingTitle.display();
 
-    if(Client.tutorial) TutorialManager.triggerHook('bld:'+id);
+    if(Client.tutorial) TutorialManager.checkHook();
 };
 
 Engine.exitBuilding = function(){

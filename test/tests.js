@@ -60,9 +60,9 @@ describe('GameServer',function(){
 
         var name = 'Test';
         var dummySocket = {id:'socket123'};
-        player = gs.addNewPlayer(null,{characterName:name});
+        player = gs.addNewPlayer(dummySocket,{characterName:name});
         player.setIDs('',dummySocket.id);
-        gs.finalizePlayer(dummySocket,player);
+        // gs.finalizePlayer(dummySocket,player);
         player.spawn(20,20);
         expect(gs.getPlayer(dummySocket.id).id).to.equal(player.id);
         expect(player.socketID).to.equal(dummySocket.id);
