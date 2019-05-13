@@ -52,6 +52,7 @@ RecipeSlot.prototype.setUp = function(action,item,nb){
     this.zone.on('pointerup',function(){
         if(this.checkForPanelOnTop()) return;
         Engine.currentMenu.panels['combi'].setUp(item);
+        if(Client.tutorial) TutorialManager.triggerHook('recipe:'+item);
     }.bind(this));
 };
 
@@ -93,5 +94,12 @@ IngredientSlot.prototype.setUp = function(item,nb){
         this.ingredients.setFill(Engine.player.getItemNb(item) >= nb ? Utils.colors.green : Utils.colors.red);
     }else{
         this.ingredients.setVisible(false);
-    }   
+    }
+
+    this.zone.off('pointerup');
+    if(Engine.player.craftRecipes.hasItem(item)) {
+        this.zone.on('pointerup', function () {
+            Engine.currentMenu.panels['combi'].setUp(item);
+        }.bind(this));
+    }
 };

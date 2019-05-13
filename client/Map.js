@@ -263,7 +263,8 @@ var Map = new Phaser.Class({
     },
 
     handleClick: function(pointer,x,y){
-        if(this.offZone.contains(pointer.x,pointer.y)) return;
+        if(this.offZone.contains(pointer.downX,pointer.downY)) return;
+        if(!this.viewRect.contains(pointer.downX,pointer.downY)) return;
         this.focus(x,y);
     },
 
@@ -499,7 +500,13 @@ var Pin = new Phaser.Class({
             }else{
                 for(var i = 0; i < Engine.player.FoW.length; i++){
                     var rect = Engine.player.FoW[i];
-                    if(rect.contains(this.tileX,this.tileY)){
+                    var rect_ = new Phaser.Geom.Rectangle(
+                        rect.x - 10,
+                        rect.y - 10,
+                        rect.width + 20,
+                        rect.height + 20
+                    ); // Hack not to miss markers on fringes of fog
+                    if(rect_.contains(this.tileX,this.tileY)){
                         this.setVisible(true);
                         return;
                     }

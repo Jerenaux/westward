@@ -27,10 +27,23 @@ Utils.fonts.fancy = 'belwe';
 
 // ### Coordinates methodes ###
 
-Utils.tileToAOI = function(tile){ // input coords in Tiles
+/**
+ * Return the AOI to which a tile belongs.
+ * @param {Object|number} tile - {x,y} coordinates of tile, or alternatively the x coordinate only.
+ * @param {number} y - The y coordinate of the tile.
+ */
+Utils.tileToAOI = function(tile,y){ // input coords in Tiles
+    var tileX,tileY;
+    if(y !== undefined){
+        tileX = tile;
+        tileY = y;
+    }else{
+        tileX = tile.x;
+        tileY = tile.y;
+    }
     if(!World.nbChunksHorizontal) throw Error('Chunk data not initialized');
-    var top = Math.floor(tile.y/World.chunkHeight);
-    var left = Math.floor(tile.x/World.chunkWidth);
+    var top = Math.floor(tileY/World.chunkHeight);
+    var left = Math.floor(tileX/World.chunkWidth);
     return (top*World.nbChunksHorizontal)+left;
 };
 

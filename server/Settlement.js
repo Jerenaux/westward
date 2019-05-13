@@ -289,15 +289,6 @@ Settlement.prototype.update = function(){
         });
         this.refreshListing();
     }
-    this.spontaneousHarvesting();
-};
-
-Settlement.prototype.spontaneousHarvesting = function(){
-    // TODO: conf + tune down
-    if(!GameServer.isTimeToUpdate('harvesting')) return false;
-    this.addResourceToBuilding(3,7,Utils.randomInt(1,2)); // wood
-    this.addResourceToBuilding(3,26,Utils.randomInt(1,2)); // stone
-    this.addResourceToBuilding(3,27,Utils.randomInt(1,2)); // bone
 };
 
 Settlement.prototype.save = function(){

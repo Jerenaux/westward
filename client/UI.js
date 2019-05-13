@@ -13,10 +13,10 @@ var UI = {
 
         this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
         this.load.atlas('banners', 'assets/sprites/stlbanner.png', 'assets/sprites/stlbanner.json');
-        this.load.spritesheet('icons2', 'assets/sprites/icons.png',{frameWidth:25,frameHeight:24});
 
         this.load.json('texts', 'assets/data/texts.json');
         this.load.json('classes', 'assets/data/classes.json');
+        this.load.json('badwords', 'assets/misc/swearWords.json');
 
         this.load.audio('click','assets/sfx/click.wav');
         this.load.audio('error','assets/sfx/error.wav');
@@ -76,9 +76,11 @@ var UI = {
         });
         if(Client.isNewPlayer()) UI.classMenu = UI.makeClassMenu();
 
+        this.input.keyboard.on('keydown', UI.handleKeyboard);
+        this.currentView = 'title';
+
         console.log('UI scene created');
         this.scene.get('boot').updateReadyTick();
-
     },
 
     makeBattleTutorialPanel: function(){
@@ -89,6 +91,24 @@ var UI = {
         panel.addText(UI.textsData['battle_help']);
         panel.addBigButton('Got it');
         return panel;
+    }
+};
+
+UI.handleKeyboard = function(event){
+    //console.log(event);
+    if(Engine.playerIsInitialized){
+        if(event.key == 'Enter') Engine.toggleChatBar();
+    }else{
+        switch(UI.scene.currentView){
+            case 'title':
+                if(['Enter',' '].includes(event.key)) UI.launchGameMode();
+                break;
+            case 'name':
+                if(event.key == 'Enter') UI.validatePlayerName();
+                break;
+            default:
+                break;
+        }
     }
 };
 
@@ -272,6 +292,8 @@ UI.makeClassPanel = function(menu,classID,x,y,classw,classh){
 };
 
 UI.launchGameMode = function(){
+    if(UI.gameLaunched) return;
+    UI.gameLaunched = true;
     Boot.buttons.forEach(function(b){
         b.hide();
     });
@@ -341,14 +363,26 @@ UI.selectClass = function(id){
 };
 
 UI.displayNameBox = function(){
-    var panel = new NamePanel(362,150,300,120,'Character name');
+    UI.scene.currentView = 'name';
+    var panel = new NamePanel(362,150,300,140,'Character name');
     panel.addText(10,20,'Enter the name of your character.');
-    panel.addBigButton('Next',UI.displayRegionSelectionMenu);
+    panel.addBigButton('Next',UI.validatePlayerName);
     panel.display();
     UI.namePanel = panel;
 };
 
+UI.validatePlayerName = function(){
+    var badwords = UI.scene.cache.json.get('badwords');
+    var name = UI.namePanel.getValue().toLowerCase();
+    if(badwords.includes(name)){
+        UI.namePanel.displayError();
+    }else{
+        UI.displayRegionSelectionMenu();
+    }
+};
+
 UI.displayRegionSelectionMenu =  function(){
+    UI.scene.currentView = 'region';
     if(UI.namePanel){
         UI.characterName = UI.namePanel.getValue();
         if(!UI.characterName) return;

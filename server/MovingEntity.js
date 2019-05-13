@@ -7,6 +7,7 @@ var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 function MovingEntity(){
+    GameObject.call(this);
     this.isMovingEntity = true;
     this.skipBattleTurn = false; // used to distinguish from buildings
     this.moving = false;
@@ -86,6 +87,8 @@ MovingEntity.prototype.updateWalk = function(){
         var x = this.path[0][0];
         var y = this.path[0][1];
         this.updatePosition(x,y);
+
+        if(this.updateSteps) this.updateSteps();
 
         if(this.path.length > 1 && !this.flagToStop) {
             this.updatePathTick();

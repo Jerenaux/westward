@@ -24,7 +24,7 @@ var Equipment = {
             shade: 'sword',
             name: 'Melee weapon',
             desc: 'Weapon used to fight opponents on adjacent battle positions. Influences the Melee damage stat. Not compatible with a ranged weapon.',
-            conflict: 'rangedw',
+            //conflict: 'rangedw',
             showInBattle: true
         },
         rangedw:{
@@ -36,17 +36,17 @@ var Equipment = {
             shade: 'gun',
             name: 'Ranged weapon',
             desc: 'Weapon used to fight opponents on non-adjacent battle positions. Not compatible with a melee weapon. Influences the Accuracy stat. Bows tend to be more accurate than guns, but arrows tend to deal less damage than bullets.',
-            conflict: 'meleew',
+            //conflict: 'meleew',
             showInBattle: true
         },
-        shield:{
+        /*shield:{
             nb: 1,
             x: 200,
             y: 65,
             shade: 'shield',
             name: 'Shield',
             desc: 'Protection automatically used to decrease both melee and ranged damage from opponents. Influences the Defense stat.',
-        },
+        },*/
         armor:{
             nb: 1,
             x: 150,

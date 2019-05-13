@@ -1,29 +1,77 @@
 {
-  "part1": [
-    {"pos":["c","c",350,146],"txt":"Welcome to Westward's tutorial. In this first part, we'll see how buildings can be built and how you can collaborate with other players to do so!"},
+  "initData": {
+    "x": 1211,
+    "y": 160
+  },
+  "playerData": {
+    "gold": 25,
+    "fow": [338,386,387,388,389,437],
+    "bldRecipes": [6,11]
+  },
+  "worldData": {
+      "newbuildings":[
+        {"type":11,"x":1203,"y":156,"built":true,"ownerName":"Jon"},
+        {"type":11,"x":1199,"y":153,"built":true,"ownerName":"Danny"},
+        {"type":3,"x":1199,"y":168,"built":false,"ownerName":"Tyrion"},
+        {"type":4,"x":1190,"y":159,"built":true, "ownerName":"Arya"}
+      ],
+    "partialbuild": ["t2"],
+    "sell": [
+      ["t3",[[17,25],[11,500]]]
+    ],
+    "plant": [[18,1121,168]]
+  },
+  "events":{
+    "1":{
+      "newanimals":[
+        {"type":0,"x":1126,"y":157},
+        {"type":0,"x":1123,"y":156}
+      ],
+      "attack":["t0","t1"]
+    }
+  },
+  "steps": [
+    {"pos":["c","c",350,146],"txt":"Welcome to Westward's tutorial. We'll cover building, trading, crafting, foraging and fighting. These activities are only a part of what you can do in the game, but that should get you started! "},
+    {"pos": null,"txt":"In addition, we'll try to convey how every single of these activities has an essential collaborative aspect to it!"},
     {"pos":[560,"c",300,100],"txt":"But first... that's you, right here, in the middle of the screen. That's your character. "},
     {"pos": null,"hook":"move","txt":"To move, simply click somewhere in the grass. Go ahead, try it!"},
     {"pos": [560,"c",300,120],"txt":"Great! All other actions take place by clicking on things, and will be covered throughout the rest of the tutorial."},
-    {"pos": null, "camera":[1206,156],"txt":"See these shacks? They have been built by other players. Apparently, you are not alone around here."},
+    {"pos": null, "camera":[1206,156],"txt":"See these [B11]s? They have been built by other players. Apparently, you are not alone around here."},
     {"pos": null, "camera":"keep","txt":"In Westward, players can build various buildings more or less anywhere to fulfill their needs and help them survive."},
-    {"pos": null, "camera":[1196,160],"txt":"This is a construction site. Looks like someone is building a Workshop. That will be very useful to craft important items."},
-    {"pos": [724,"c",300,120], "hook":"bld:2","txt":"Let's see how the construction is going. Click on the construction site to enter it."},
+    {"pos": ["c",450,300,120], "camera":[1199,168],"txt":"This is a construction site. Looks like someone is building a [B3]. That will be very useful to craft important items."},
+    {"pos": [724,"c",300,120], "hook":"bld:any:3","txt":"Let's see how the construction is going. Click on the construction site to enter it."},
     {"pos": null,"txt":"Buildings are built by bringing construction material to them."},
-    {"pos": null, "hook": "exit","txt":"Looks like timber is needed. Perhaps you could help? Exit the building by clicking on the door icon."},
-    {"pos": null,"txt":"You can acquire timber by building a lumber camp. It'll generate timber for you automatically at regular intervals."},
+    {"pos": null, "hook": "exit","txt":"Looks like [I3] is needed. Perhaps you could help? Exit the building by clicking on the door icon."},
+    {"pos": null,"txt":"You can acquire [I3] by building a [B6]. It'll generate [I3] for you automatically at regular intervals."},
     {"pos": [724,"c",300,140],"txt":"The resources of the land deplete as players extract them, hence the continuous march Westward to keep finding new ones and expanding!"},
-    {"pos": [50,50,300,120],"hook": "buildmenu","txt":"To build a building, first open the 'Build' menu by clicking on the shovel icon, here on the left."},
-    {"pos": [280,50,300,120],"hook": "bldselect:6","txt":"Hover a building icon to see its name. Find the lumber camp icon and click on it."},
-    {"pos": [280,50,300,125],"hook": "bldunselect:6","txt":"Now pick a location to build it. It will only be possible next to a forest; get closer to the forest to the east and build it there. (Click back on the shovel to cancel)"},
-    {"pos": null,"txt":"Contrary to the Workshop you visited, this building doesn't require construction material, so it's built immediately!"},
-    {"pos": null, "hook":"bld:4","txt":"Enter your lumber camp by clicking on it."},
-    {"pos": [10,50,300,140],"txt":"Production normally takes a bit of time, but for the sake of the tutorial, your building has magically produced timber in an instant!"},
-    {"pos": null,"hook":"stock:4:3:0","txt":"Since you own this building, you can take anything from it's stock. Click on the timber icon and take it all."},
-    {"pos": null,"hook":"bld:2","txt":"Now exit your building and go to the Wokshop under construction."},
+    {"pos": [50,50,300,120],"hook": "menu:build","txt":"To build a building, first open the 'Build' menu by clicking on the shovel icon, here on the left."},
+    {"pos": [280,50,300,120],"hook": "bldselect:6","txt":"Hover a building icon to see its name. Find the [B6] icon and click on it."},
+    {"pos": [280,50,300,125],"hook": "newbuilding:6","txt":"Now pick a location to build it. It will only be possible next to a forest; get closer to the forest to the east and build it there. (Click back on the shovel to cancel)"},
+    {"pos": null,"txt":"Contrary to the [B3] you visited, this building doesn't require construction material, so it's built immediately!"},
+    {"pos": null, "hook":"bld:own:6","txt":"Enter your [B6] by clicking on it."},
+    {"pos": [10,50,300,140],"txt":"Production normally takes a bit of time, but for the sake of the tutorial, your building has magically produced [I3] in an instant!"},
+    {"pos": null,"hook":"stock:t4:3:0","txt":"Since you own this building, you can take anything from it's stock. Click on the [I3] icon and take it all."},
+    {"pos": null,"hook":"bld:any:3","txt":"Now exit your building and go back to the [B3] under construction."},
     {"pos":null,"txt":"You can contribute to a building's construction by giving material freely, or by selling it for money."},
-    {"pos":null,"hook":"stock:2:3:25","txt":"Let's be altruistic for now. Click on the button to give all your timber."},
-    {"pos":null,"txt":"Great! The Workshop has been built! It'll be essential to the local community's survival."},
+    {"pos":null,"hook":"built:t2","txt":"Let's be altruistic for now. Click on the button to give all your [I3]."},
+    {"pos":null,"txt":"Great! The [B3] has been built! It'll be essential to the local community's survival."},
     {"pos":null,"txt":"As you can see, players can complement and help each other, freely or for gold, to create settlements that will help them survive."},
-    {"pos":null,"txt":"This is the end of this tutorial, feel free to leave and explore the real game now!"}
+    {"pos":[0,430,350,146],"hook":"recipe:6","txt":"Now let's have a look at crafting. Click on the Dawn recipe in the recipes panel. Dawn is a useful potion to recover vitality."},
+    {"pos":null,"hook":"bld:any:4","txt":"To make [I6], you need [I17] and [I18]. Let's see if the nearby [B4] doesn't sell any of it. Leave the [B3] and enter the [B4] to the north west of it."},
+    {"pos":null,"hook":"inventory:17:1","txt":"You are in luck, there is [I17] for sale. This means a player crafted it somewhere else and sold it here. Click on it and buy it!"},
+    {"pos":null,"hook":"exit","txt":"Now, to find some [I18]. Exit the building."},
+    {"pos":[674,200,350,146],"hook":"menu:map","txt":"Open the world map by clicking on the map icon above."},
+    {"pos":["c",430,350,146],"txt":"The red cross indicates your position. Only the parts of the world that other players have recently explored are visible; the rest is covered in fog of war."},
+    {"pos":null,"hook":"area:1111:158:20:20","txt":"Leaf icons on the map indicate where some plants can be picked up. Using your map, try to find and go to a location where some [I18] grows!"},
+    {"pos":null,"hook":"inventory:18:4","txt":"You found some! Click on the [I18] on the ground to pick it!"},
+    {"pos":[0,490,350,80],"hook":"inventory:6:1","txt":"Now go back to the [B3], and craft one flask of [I6]."},
+    {"pos":[0,440,350,130],"txt":"This covers crafting. You helped build a [B3], which in turn allowed you to craft something you needed."},
+    {"pos":null,"txt":"To obtain the ingredients, you went to the shop of another player, and took advantage of the exploration that yet another player had done."},
+    {"pos":[50,65,300,135],"txt":"You must be tired after all that. See the golden heart icon above? It represents your vigor. It decreases when you perform actions."},
+    {"pos":null,"txt":"The lower your vigor, the more you will get maluses to your other stats, making you very vulnerable. The best way to replenish it is to rest somewhere."},
+    {"pos":[0,435,300,135],"hook": "newbuilding:11","txt":"By now your [B6] must have produced enough [I3] for you to build your own [B11]. Go ahead and build one!"},
+    {"pos":null,"hook": "bld:own:11","txt":"Enter your [B11]"},
+    {"pos":null,"txt":"As you can see, the longer you stay in your [B11], the more you rest. It also works when you are offline!"},
+    {"pos":null,"txt":"This is the end of the tutorial for now. It's not complete yet, other aspects will be covered in the future!"}
   ]
 }

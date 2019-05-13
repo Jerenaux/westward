@@ -89,21 +89,17 @@ Menu.prototype.display = function(){
         if(!this.hideOnOpen[p]) this.panels[p].display();
     }
 
-    /*for(var event in this.events){
-        if(!this.events.hasOwnProperty(event)) continue;
-        this.trigger(event);
-    }*/
     this.trigger('onOpen');
 
     Engine.inMenu = true;
-    Engine.hideMarker();
+    if(!this.allowWalk) Engine.hideMarker();
     if(!this.keepHUD) Engine.hideHUD();
     UI.setCursor();
     this.displayed = true;
 
     if(this.log) Client.logMenu(this.name);
 
-    if(Client.tutorial && this.hook) Engine.tutorialHook(this.hook);
+    if(Client.tutorial && this.hook) TutorialManager.triggerHook('menu:'+this.hook);
 };
 
 Menu.prototype.hide = function(){
@@ -113,6 +109,8 @@ Menu.prototype.hide = function(){
         if(!this.panels.hasOwnProperty(panel)) continue;
         this.panels[panel].hide();
     }
+
+    this.trigger('onClose');
 
     Engine.inMenu = false;
     Engine.currentMenu = null;
@@ -184,7 +182,7 @@ function BuildingTitle(x,y){
     this.exit.setVisible(false);
     this.exit.setInteractive();
     this.exit.setOrigin(0);
-    this.exit.on('pointerdown',Engine.exitBuilding);
+    this.exit.on('pointerdown',Engine.leaveBuilding);
     var exit_ = this.exit;
     this.exit.on('pointerover',function(){
         exit_.setFrame('exit_icon_on');
@@ -192,6 +190,11 @@ function BuildingTitle(x,y){
     this.exit.on('pointerout',function(){
         exit_.setFrame('exit_icon');
     });
+
+    this.invrect = UI.scene.add.image(1024,0,'UI','invisible');
+    this.invrect.setInteractive();
+    this.invrect.setScrollFactor(0);
+    this.invrect.setOrigin(0.5);
 
     this.text.setDepth(this.depth+1);
     this.text.setScrollFactor(0);
@@ -244,6 +247,7 @@ BuildingTitle.prototype.display = function(){
     this.text.setVisible(true);
     this.exit.x = Engine.currentMenu.exitX;
     this.exit.setVisible(true);
+    this.invrect.setPosition(this.exit.x,this.exit.y);
     this.capsule.display();
 };
 

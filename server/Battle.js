@@ -135,7 +135,6 @@ Battle.prototype.newTurn = function(){
         }
     },this);
 
-    console.log('Is ',activeFighter.getShortID(),'frozen: ',activeFighter.skipBattleTurn);
     if(activeFighter.skipBattleTurn){
         this.newTurn();
         return;
@@ -199,7 +198,10 @@ Battle.prototype.processAction = function(f,data){
             };
             break;
     }
-    if(result && result.success) this.setEndOfTurn(result.delay);
+    if(result){
+        if(f.isPlayer && result.vigor) f.updateVigor(-result.vigor);
+        if(result.success) this.setEndOfTurn(result.delay);
+    }
 };
 
 Battle.prototype.setEndOfTurn = function(delay){
@@ -209,7 +211,7 @@ Battle.prototype.setEndOfTurn = function(delay){
 
 Battle.prototype.processMove = function(f){
     //this.removeFromPosition(f);
-    var pos = f.getEndOfPath();
+    // var pos = f.getEndOfPath();
     //this.addAtPosition(f);
     return {
         success: true,
@@ -341,7 +343,8 @@ Battle.prototype.processAoE = function(f,tx,ty){
     }.bind(this),delay);
     return {
         success: true,
-        delay: delay
+        delay: delay,
+        vigor: 1 // TODO: conf + vary
     };
 };
 
@@ -414,7 +417,8 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
     }.bind(this),delay);
     return {
         success: true,
-        delay: delay
+        delay: delay,
+        vigor: 1 // TODO: conf + vary
     };
 };
 
@@ -464,6 +468,7 @@ Battle.prototype.getCells = function(){
 module.exports.Battle = Battle;
 
 function BattleCell(x,y,battle){
+    this.instance = -1;
     this.updateCategory = 'cells';
     this.id = GameServer.lastCellID++;
     this.x = x;
@@ -503,7 +508,8 @@ BattleCell.prototype.trim = function(){
     return {
         id: this.id,
         x: this.x,
-        y: this.y
+        y: this.y,
+        instance: this.instance
     };
 };
 

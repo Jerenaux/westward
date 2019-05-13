@@ -235,11 +235,6 @@ ShopPanel.prototype.requestPurchase = function(){
 
     Client.sendPurchase(this.shopItem.id, this.shopItem.count, this.shopItem.action, this.financial);
 
-    if(!this.isShop && Client.tutorial){
-        var verb = (this.shopItem.action == 'buy' ? 'take' : 'give');
-        Engine.tutorialStock(verb,this.shopItem.id,this.shopItem.count);
-    }
-    
     this.lastPurchase = Date.now();
 };
 

@@ -341,6 +341,18 @@
       "frame": {"x":327,"y":530,"w":2,"h":8}
     },
     {
+      "filename": "miniprogress_red_left",
+      "frame": {"x":320,"y":505,"w":4,"h":8}
+    },
+    {
+      "filename": "miniprogress_red_right",
+      "frame": {"x":340,"y":505,"w":5,"h":8}
+    },
+    {
+      "filename": "miniprogress_red_middle",
+      "frame": {"x":331,"y":505,"w":2,"h":8}
+    },
+    {
       "filename": "progress_red_middle",
       "frame": {"x":409,"y":40,"w":5,"h":14}
     },
@@ -581,8 +593,24 @@
       "frame": {"x":528,"y":425,"w":9,"h":12}
     },
     {
+      "filename": "armor",
+      "frame": {"x":527,"y":442,"w":11,"h":12}
+    },
+    {
+      "filename": "bullseye",
+      "frame": {"x":506,"y":458,"w":14,"h":13}
+    },
+    {
+      "filename": "sword",
+      "frame": {"x":525,"y":458,"w":13,"h":12}
+    },
+    {
       "filename": "invisible",
       "frame": {"x":865,"y":9,"w":150,"h":150}
+    },
+    {
+    "filename": "battleholder",
+    "frame": {"x":399,"y":566,"w":45,"h":42}
     }
   ]
 }

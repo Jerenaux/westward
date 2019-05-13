@@ -23,16 +23,15 @@ var Hero = new Phaser.Class({
         // data comes from Player.initTrim() server-side
         Player.prototype.setUp.call(this,data);
 
-        this.settlement = data.settlement;
+        this.settlement = data.settlement || 0;
         this.buildingMarkers = data.buildingMarkers || [];
         this.resourceMarkers = data.resourceMarkers || [];
         this.FoW = [];
-        this.unread = 1;
         this.inventory = new Inventory();
         this.stats = new StatsContainer();
         this.equipment = new EquipmentManager();
 
-        this.gold = data.gold;
+        this.gold = data.gold || 0;
         this.civiclvl = data.civiclvl;
         this.civicxp = data.civicxp;
         this.classxp = data.classxp || new classDataShell();
@@ -42,6 +41,9 @@ var Hero = new Phaser.Class({
 
         this.updateRarity(data.rarity || []);
         this.updateHistory(data.history);
+        this.updateFoW(data.fow);
+
+        this.buildRecipes.fromList(Engine.config.defaultBuildRecipes);
 
         for(var item in Engine.itemsData){
             var data = Engine.itemsData[item];
@@ -54,16 +56,16 @@ var Hero = new Phaser.Class({
             'ammo': this.updateAmmo,
             'ap': this.updateAP,
             'bldRecipes': this.updateBuildRecipes,
+            'buildingMarkers': this.updateMarkers,
             'civiclvl': this.updateCivicLvl,
             'classlvl': this.updateClassLvl,
             'classxp': this.updateClassXP,
             'dead': this.handleDeath,
             'equipment': this.updateEquipment,
-            'foodSurplus': this.updateFoodSurplus,
             'fow': this.updateFoW,
             'gold': this.updateGold,
+            'inBuilding': this.updateBuilding,
             'items': this.updateInventory,
-            'buildingMarkers': this.updateMarkers,
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
             'resetTurn': BattleManager.resetTurn,
@@ -124,6 +126,13 @@ var Hero = new Phaser.Class({
 
     getNbAmmo: function(slot){
         return this.equipment.getNbAmmo(slot);
+    },
+
+    getNbAnyAmmo: function(){
+        var rangedW = this.getEquipped('rangedw');
+        var container = Engine.itemsData[rangedW].ammo;
+        var ammoType = this.equipment.getAmmoType(container);
+        return this.getNbAmmo(ammoType);
     },
 
     getRangedCursor: function(){
@@ -227,17 +236,23 @@ var Hero = new Phaser.Class({
         this.updateEvents.add('equip');
     },
 
-    updateFoodSurplus: function(foodSurplus){
-        this.foodSurplus = foodSurplus;
-        this.updateEvents.add('character');
+    updateFood: function(food){
+        this.food = food;
+        this.updateEvents.add('food');
     },
 
     updateFoW: function(aois){
-        // var aois = [331,341,389,390,391,438,439,440,490];
         this.FoW = [];
+        if(!aois) aois = [Engine.player.chunk];
         aois.forEach(function(aoi){
             var origin = Utils.AOItoTile(aoi);
-            this.FoW.push(new Phaser.Geom.Rectangle(origin.x,origin.y,World.chunkWidth,World.chunkHeight));
+            this.FoW.push(
+                new Phaser.Geom.Rectangle(
+                    origin.x,
+                    origin.y,
+                    World.chunkWidth,
+                    World.chunkHeight)
+            );
         },this);
     },
 
@@ -245,6 +260,10 @@ var Hero = new Phaser.Class({
         this.gold = gold;
         this.updateEvents.add('gold');
         // TODO: move sound effect
+    },
+
+    updateBuilding: function(buildingID){
+        this.inBuilding = buildingID;
     },
 
     updateHistory: function(history){
@@ -258,6 +277,7 @@ var Hero = new Phaser.Class({
     updateInventory: function(items){
         this.inventory.updateItems(items);
         this.updateEvents.add('inv');
+        if(Client.tutorial) TutorialManager.checkHook();
 
         if(!Engine.firstSelfUpdate) {
             items.forEach(function (item) {
@@ -302,5 +322,10 @@ var Hero = new Phaser.Class({
                 statObj.absoluteModifiers.push(m);
             })
         }
+    },
+
+    updateVigor: function(vigor){
+        this.vigor = vigor;
+        this.updateEvents.add('vigor');
     }
 });

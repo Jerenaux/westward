@@ -89,7 +89,6 @@ LegendPanel.prototype.display = function(){
 };
 
 LegendPanel.prototype.hide = function(){
-    console.log('hiding');
     Panel.prototype.hide.call(this);
     this.content.forEach(function(c){
         c.setVisible(false);

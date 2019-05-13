@@ -1,13 +1,11 @@
 On deploy:
-- Test new player
-- Test a fight
-- Test picking up objects
-- Test selling and buying in a store
-- Test equiping object
 - Test gs.handleGold()
 - Test handleCraft (normal + when a price is undefined)
-- Test setPrices
-=> Automate these eventually
+- Test handleChat (with text and also empty input)
+- Find a way to test itemsRespaw and other time-related aspects
+- Test tutorial (reset start)
+- Test new player
+- Run all tests
 => After bug, systematically create test!
 
 
@@ -43,35 +41,17 @@ Misc:
 - "new" marker
 - Events formatting
 - Add other plants
+- Aggro issue
+- Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
+- Fix wrong building surfaces (reproducible in tutorial part 2)
+- Make size of tutorial boxes adapt to text
 
-
-
-Consider spine for anims? (reread https://madmimi.com/p/81a31d?fe=1&pact=891641-147784135-9405065146-92563bf2497e7a654b4f394f405f098bd9e6e40a)
-
-World building: move away from tiles:
-[x] Zoom
-[x] Panning
-[x] 96x96 grass chunks, loaded positionnally
-[x] Tiles only for other terrain elements (water, dirt, ...)
-[x] Everything on top are single-image objects (possibly rendered in multiple parts with different depths)
-[x] Test trees overlaps
-[x] Sparse format, declarative (grass, water, ...)
-[x] Specific tiles (e.g. water joints) computed positionnally
-[x] Default filler tile for empty ones, on layer 0
-[x] Store tilesets and images as atlases
-[x] World maker: store coasts
-[ ] Inexistant chunks filled by water
-[ ] Add decor elements via editor
-[ ] Store and edit game data (resources, spawn zones, civs logic...)
-[x] Visualize collisions
-[x] Collisions listed from tileset
-[x] Collisions digest for server, displayed in editor
-[x] Collisions fetched from tileset for client, no digest 
-[ ] Built-in exploration, to test collisions and depths
-[ ] Re-enable blitters, at least for ground and water?
-[x] Remove legacy tiles after a while (from png and json) + old tileset files
-
- 
+- Infra: 15' admin + incorporate spawn zones in worldMaker
+- Move to Phaser 18
+- Ask for free Creature license
+- Find artist
+https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
+https://medium.com/@kestrelm/2d-skeletal-animation-in-phaser-3-tutorial-3ed468fb6bd0
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.
@@ -86,12 +66,14 @@ prompt to go build a lumbercamp at the proper location (building tut + auto reso
 
 Part 2: exploration, crafting, trade and wildlife
 - Prompt to go craft potion, point out that a specific ingredient is missing
+- Buy one in shop
 - Prompt to go explore fog of war in a certain area (explain fog of war) + map tuto
-- On the way, attack by wildlife, battle tuto
-- food tuto (mention use for boosting production as well)
 - When resource found, tuto about pick up resources and ecology
+- Once picked, ambush, attack by wildlife, battle tuto
+- food tuto (mention use for boosting production as well)
 - Go back, sell and craft (trade & craft tuto)
-- Talk about fatigue + prompt to build a shack
+- Talk about fatigue + prompt to build a shack (go back to lumber camp to get more timber,
+added when part 2 boots)
 
 Part 3: enemy civ
 - Point out that lumber camp is exposed, need to build a tower
@@ -156,6 +138,7 @@ V1 level:
 
 Admin
 -----
+Look into push notificatins server (https://www.pushsafer.com/dashboard)
 Improve admin tables
 Flush screenshots
 Make cmd line system
@@ -167,7 +150,7 @@ Secure
 
 Analytics:
 ---------
-- Log: price setting, handleShop, handleGold, tutorial begins, progress (each step) and ends
+- Log: /
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions
@@ -180,7 +163,7 @@ Analytics:
 - Log where items are bought/sold
 - Log pathfinding destinations, consider making heatmap in the long term
 - Log as many things as possible: session duration, distance travelled per session, time spent in settlement per session, in nature per session,
-interactions with buildings, time spent in each individual menu, etc.
+interactions with buildings, time spent in each individual menu, step at which tutorial is most often finished, etc.
 - Cluster "heavy" players vs "small-time" players and look for differences between the two
 - Analyze sessions of one-time players who never come back
 - Find other meaningful clusters (maybe in unsupervized fashion)
@@ -475,12 +458,13 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-- Tool to sync client buildings with server buildings (update code with DO database)
+- Desktop app (automated)
+-> https://electronjs.org/docs/tutorial/application-distribution
 - Tool to gather, uglify and compress all relevant source files 
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?
 - Secure chunk access? (check client position before serving)
-- Desktop app (automated)
+
 
 Design document:
 ---------------
@@ -546,46 +530,10 @@ Testing:
 
 World building:
 --------------
-1/ World creation:
-- Add missing lakes 
-
-2/ Cartography
-- Has to come from actual in-game world
-- Capture whole game map, with trees and all terrain elements
-- Do so at arbitrary zoom levels
-(- split in chunks)
-- Apply post-processing effects to make it look nice
-
-3/ World editor
--> Need to visualize game world at different zoom levels
--> Display and modify buildings
--> Display and modify spawnzones
--> Manage trees?
--> Integrate with admin to display and modify settlement data (+ events etc.) 
-
-5/Building editor (visually define shape, collisons, etc.)
---
-Custom chunk/world editor:
-- Arrows on the fringes of the window allow to move quickly to adjacent chunks
-- See borders of adjacent chunks to match fringe tiles
-- Preserve whatever extra info is in the JSON file (vs Tiled who rewrites it)
-- Versioning of individual chunks (saved in separate folder), for unlimited undos
-- Add random elements (w/ scripts to remove them):
 Building editor (set shapes etc.)
 Manage spawn zones in editor
 Flip trees horizontally to introduce variety
--> Patches of dirt
--> Tree decorations: flowers, stones, bushes
-- Add cliffs in empty areas
--> Add random decorations to cliffs (stones in bends, ...)
-- Compute tree density and spread random trees around accordingly?
-- No tree if busy 3cells to the left? Or when planing tree, log width cells to right as no-go position
-- Fix loops (lakes ...)
-- Plan for more layers in dev
-- Store forests and trees separately (trees.json) during dev?
--> During flattening, read that file and draw trees tile by tile
--> Test high-layers after flattening
-
+Patches of dirt
 
 UI:
 ---

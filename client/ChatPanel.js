@@ -5,6 +5,7 @@
 function ChatPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
     this.addInterface();
+    this.lastToggle = Date.now();
 }
 
 ChatPanel.prototype = Object.create(Panel.prototype);
@@ -25,12 +26,14 @@ ChatPanel.prototype.handleInput = function(){
 };
 
 ChatPanel.prototype.toggle = function(){
+    if(Date.now() - this.lastToggle < 200) return;
     if(this.displayed){
         this.handleInput();
         this.hide();
     }else{
         this.display();
     }
+    this.lastToggle = Date.now();
 };
 
 ChatPanel.prototype.display = function(){
@@ -59,6 +62,12 @@ NamePanel.prototype.addInterface = function(){
     this.input = this.addInput(220,40,50);
     this.input.background = 'transparent';
     this.input.id = 'name';
+    this.warntext = this.addText(this.width/2, 85,'Invalid character name',Utils.colors.lightred,12);
+    this.warntext.setOrigin(0.5);
+};
+
+NamePanel.prototype.displayError = function(){
+    this.warntext.setVisible(true);
 };
 
 NamePanel.prototype.getValue = function(){
@@ -80,6 +89,7 @@ NamePanel.prototype.display = function(){
     this.input.focus();
     this.button.display();
     this.displayTexts();
+    this.warntext.setVisible(false);
 };
 
 NamePanel.prototype.hide = function(){

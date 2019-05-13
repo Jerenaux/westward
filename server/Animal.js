@@ -5,13 +5,19 @@
 var Utils = require('../shared/Utils.js').Utils;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var NPC = require('./NPC.js').NPC;
+var GameObject = require('./GameObject.js').GameObject;
 var GameServer = require('./GameServer.js').GameServer;
 var World = require('../shared/World.js').World;
 
 var debug = false;
 
-function Animal(x,y,type){
-    this.id = GameServer.lastAnimalID++;
+function Animal(x,y,type,instance){
+    this.instance = (instance > -1 ? instance : -1);
+    if(this.instance > -1){
+        this.id = 't'+GameServer.instances[this.instance].nextAnimalID++;
+    }else{
+        this.id = GameServer.lastAnimalID++;
+    }
     this.isAnimal = true;
     this.battleTeam = 'Animal';
     this.entityCategory = 'Animal';
@@ -76,7 +82,8 @@ Animal.prototype.trim = function(){
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    return trimmed;
+    // return trimmed;
+    return GameObject.prototype.trim.call(this,trimmed);
 };
 
 Animal.prototype.endFight = function(alive){

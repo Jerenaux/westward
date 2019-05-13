@@ -7,7 +7,9 @@ var GameServer = require('./GameServer.js').GameServer;
 //var Rect = require('./Rect.js').Rect;
 
 // Parent class of all game objects : players, monsters and items (not NPC because they are not processed server-side)
-function GameObject(){}
+function GameObject(){
+    this.instance = -1;
+}
 
 GameObject.prototype.getShortID = function(){
     return this.entityCategory[0]+this.id;
@@ -38,8 +40,12 @@ GameObject.prototype.updateAOIs = function(property,value){
     // When something changes, all the AOI around the affected entity are updated
     var AOIs = Utils.listAdjacentAOIs(this.aoi);
     AOIs.forEach(function(aoi){
-        GameServer.updateAOIproperty(aoi,this.updateCategory,this.id,property,value);
+        GameServer.updateAOIproperty(aoi,this.updateCategory,this.id,this.instance,property,value);
     },this);
+};
+
+GameObject.prototype.isOfInstance = function(instance){
+    return this.instance == instance;
 };
 
 GameObject.prototype.getAOI = function(){
@@ -57,6 +63,7 @@ GameObject.prototype.getModel = function() {
 GameObject.prototype.save = function(){
     if(!this.model) return;
     if(this.dblocked) return;
+    if(!this.isOfInstance(-1)) return;
     this.dblocked = true;
     var _document = this;
     this.schemaModel.findById(this.model._id, function (err, doc) {
@@ -96,6 +103,11 @@ GameObject.prototype.onRemoveAtLocation = function(){
 
 GameObject.prototype.travelOccupiedCells = function(){
     // empty shell for children who do not implement it
+};
+
+GameObject.prototype.trim = function(trimmed){
+    trimmed.instance = this.instance;
+    return trimmed;
 };
 
 

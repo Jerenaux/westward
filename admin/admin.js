@@ -95,24 +95,29 @@ app.filter('itemName',function(){
 
 app.filter('eventFilter',function(){
     return function(event){
-        
         switch(event.action){
             case 'battle':
                 return prefix("Started a battle against "+event.category+" "+Data.animalsData[event.type].name,event.time,event.pname);
             case 'building':
                 return prefix("Entered building "+Data.buildingsData[event.building].name,event.time,event.pname);
             case 'buy':
-                return prefix("Bought "+event.nb+ " "+Data.itemsData[event.item].name+" for "+event.price+" each at "+Data.buildingsData[event.building].name,event.time,event.pname);
+                var verb = event.price ? 'Bought' : 'Took';
+                var txt = verb+" "+event.nb+ " "+Data.itemsData[event.item].name;
+                if(event.price) txt += " for "+(event.price*event.nb);
+                return prefix(txt,event.time,event.pname);
             case 'chat':
                 return prefix("Said: \""+event.txt+"\"", event.time,event.pname);
             case 'connect':
-                return prefix("Connected in settlement "+event.stl, event.time,event.pname);
+                return prefix("Connected in settlement "+event.stl+" ("+(event.re ? 'Returning' : 'New')+" player)", event.time,event.pname);
             case 'craft':
                 return prefix("Crafted "+event.nb+ " "+Data.itemsData[event.item].name, event.time,event.pname);
             case 'disconnect':
                 return prefix("Disconnected", event.time,event.pname);
             case 'explore':
                 return prefix("Explored AOI "+event.aoi, event.time,event.pname);
+            case 'gold':
+                var verb = event.amount > 0 ? 'Gave' : 'Took';
+                return prefix(verb+" "+event.amount+" gold", event.time,event.pname);
             case 'loot':
                 return prefix("Looted "+event.name, event.time,event.pname);
             case 'menu':
@@ -121,12 +126,19 @@ app.filter('eventFilter',function(){
                 return prefix("Built "+Data.buildingsData[event.building].name+" at "+event.x+", "+event.y,event.time,event.pname);
             case 'pickup':
                 return prefix("Picked up "+Data.itemsData[event.item].name,event.time,event.pname);
+            case 'prices':
+                return prefix("Set prices of "+Data.itemsData[event.item].name+" to "+event.buy+"/"+event.sell,event.time,event.pname);
             case 'respawn':
                 return prefix("Respawned", event.time,event.pname);
             case 'sell':
-                return prefix("Sold "+event.nb+ " "+Data.itemsData[event.item].name+" for "+event.price+" each "+Data.buildingsData[event.building].name,event.time,event.pname);
+                var verb = event.price ? 'Sold' : 'Gave';
+                var txt = verb+" "+event.nb+ " "+Data.itemsData[event.item].name;
+                if(event.price) txt += " for "+(event.price*event.nb);
+                return prefix(txt,event.time,event.pname);
             case 'server-start':
                 return prefix(" SERVER RESTART",event.time);
+            case 'tutorial-end':
+                return prefix('-- A player finished the tutorial at step '+event.step+'--',event.time);
             case 'tutorial-start':
                 return prefix('-- A player started the tutorial --',event.time);
             case 'use':

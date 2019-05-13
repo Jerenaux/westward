@@ -168,4 +168,5 @@ Frame.prototype.moveUp = function(nb){
         b.ring.setDepth(b.ring.depth+nb);
         b.zone.setDepth(b.zone.depth+nb);
     });
+    this.depth = nb;
 };

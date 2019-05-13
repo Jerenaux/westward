@@ -6,7 +6,14 @@ var GameServer = require('./GameServer.js').GameServer;
 var mongoose = require('mongoose');
 
 // All events correspond to *actions* performed by *players*
-// Frequency tables and means don't need logging
+
+var sessionSchema = new mongoose.Schema({
+    pid: {type: Number, min: 0},
+    pname: String,
+    start: { type: Date, default: Date.now },
+    end: { type: Date, default: Date.now }
+});
+var Session = mongoose.model('Session', sessionSchema);
 
 var eventSchema = new mongoose.Schema({
     pid: {type: Number, min: 0},
@@ -55,6 +62,16 @@ var PickUpEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var PricesEvent = Event.discriminator(
+    'PricesEvent',
+    new mongoose.Schema({
+        item: Number,
+        buy: Number,
+        sell: Number
+    }),
+    {discriminatorKey: 'kind'}
+);
+
 var LootEvent = Event.discriminator(
     'LootEvent',
     new mongoose.Schema({
@@ -67,6 +84,15 @@ var ExploreEvent = Event.discriminator(
     'ExploreEvent',
     new mongoose.Schema({
         aoi: Number
+    }),
+    {discriminatorKey: 'kind'}
+);
+
+var GoldEvent = Event.discriminator(
+    'GoldEvent',
+    new mongoose.Schema({
+        amount: Number,
+        building: Number
     }),
     {discriminatorKey: 'kind'}
 );
@@ -118,7 +144,8 @@ var ConnectEvent = Event.discriminator(
     'ConnectEvent',
     new mongoose.Schema({
         stl: Number,
-        name: String
+        name: String,
+        re: Boolean
     }),
     {discriminatorKey: 'kind'}
 );
@@ -147,6 +174,14 @@ var TutorialStartEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var TutorialEndEvent = Event.discriminator(
+    'TutorialEndEvent',
+    new mongoose.Schema({
+        step: Number
+    }),
+    {discriminatorKey: 'kind'}
+);
+
 var Prism = {};
 
 Prism.logEvent = function(player,action,data){
@@ -164,13 +199,16 @@ Prism.logEvent = function(player,action,data){
         'craft': CraftEvent,
         'disconnect': DisconnectEvent,
         'explore': ExploreEvent,
+        'gold': GoldEvent,
         'loot': LootEvent,
         'menu': MenuEvent,
         'newbuilding': NewBuildingEvent,
         'pickup': PickUpEvent,
+        'prices': PricesEvent,
         'respawn': RespawnEvent,
         'sell': TradeEvent,
         'server-start': ServerStartEvent,
+        'tutorial-end': TutorialEndEvent,
         'tutorial-start': TutorialStartEvent,
         'use': UseEvent
     };
@@ -179,10 +217,10 @@ Prism.logEvent = function(player,action,data){
         return;
     }
     var event = new map[action](data);
-    console.log('event : ',event);
+    // console.log('event : ',event);
     event.save(function(err){
         if(err) throw err;
-        console.log('Event logged');
+        // console.log('Event logged');
     });
 };
 

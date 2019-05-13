@@ -13,7 +13,7 @@ ConstructionPanel.prototype = Object.create(Panel.prototype);
 ConstructionPanel.prototype.constructor = ConstructionPanel;
 
 ConstructionPanel.prototype.checkForPanelOnTop = function(){
-    return Engine.currentMenu.isPanelDisplayed('prices') || Engine.currentMenu.isPanelDisplayed('goldaction');
+    return Engine.currentMenu.isPanelDisplayed('prices');// || Engine.currentMenu.isPanelDisplayed('goldaction');
 };
 
 ConstructionPanel.prototype.addInterface = function(){
@@ -25,24 +25,9 @@ ConstructionPanel.prototype.addInterface = function(){
     this.bar = new BigProgressBar(this.x+barx,this.y+50,barw,'gold');
     this.bar.name = 'construction progress bar';
 
+    var btnsx = this.x + this.width - 300;
     var btnsy = this.y + this.height - 25;
-    this.pricesBtn = new BigButton(this.x + this.width - 300,btnsy,'Set prices',function(){
-        Engine.currentMenu.displayPanel('prices');
-        Engine.currentMenu.hidePanel('action');
-        Engine.currentMenu.hidePanel('goldaction');
-    });
-
-    this.ggBtn = new BigButton(this.x + this.width - 190,btnsy,'Give gold',function(){
-        Engine.currentMenu.hidePanel('action');
-        var ga = Engine.currentMenu.displayPanel('goldaction');
-        ga.setUp('sell');
-    });
-
-    this.tgBtn = new BigButton(this.x + this.width - 80,btnsy,'Take gold',function(){
-        Engine.currentMenu.hidePanel('action');
-        var ga = Engine.currentMenu.displayPanel('goldaction');
-        ga.setUp('buy');
-    });
+    Engine.addAdminButtons(this,btnsx,btnsy);
 };
 
 ConstructionPanel.prototype.displayInterface = function(){
@@ -78,10 +63,11 @@ ConstructionPanel.prototype.displayInterface = function(){
         slot.addImage(160, 13, 'UI', 'gold');
         slot.display();
 
+        var panel_ = this;
         var btn = new BigButton(this.x+270,y+20,'Give '+itemData.name);
         btn.item = item;
         btn.callback = function(){
-            // if(this.checkForPanelOnTop()) return;
+            if(panel_.checkForPanelOnTop()) return;
             Engine.currentMenu.displayPanel('action');
             Engine.currentMenu.panels['action'].setUp(this.item,'sell',false); // false = force non-financial
         }.bind(btn);
@@ -92,7 +78,7 @@ ConstructionPanel.prototype.displayInterface = function(){
             var btn = new BigButton(this.x + 410, y + 20, 'Sell ' + itemData.name);
             btn.item = item;
             btn.callback = function(){
-                // if(this.checkForPanelOnTop()) return;
+                if(panel_.checkForPanelOnTop()) return;
                 Engine.currentMenu.displayPanel('action');
                 Engine.currentMenu.panels['action'].setUp(this.item,'sell',true); // true = force financial
             }.bind(btn);

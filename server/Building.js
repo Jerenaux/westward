@@ -12,6 +12,7 @@ var StatsContainer = require('../shared/Stats.js').StatsContainer;
 var Models = require('../shared/models.js');
 
 function Building(data){
+    GameObject.call(this);
     this.isBuilding = true;
     this.battleTeam = 'Player';
     this.entityCategory = 'Building';
@@ -19,10 +20,12 @@ function Building(data){
     this.schemaModel = GameServer.BuildingModel;
     this.battlePriority = 3;
 
+    this.instance = data.instance > -1 ? data.instance : -1;
+
     this.id = -1;
-    if(data.id > -1){
+    if(data.id !== undefined){
         this.id = data.id;
-        GameServer.lastBuildingID = Math.max(GameServer.lastBuildingID,this.id);
+        if(this.id[0] != "t") GameServer.lastBuildingID = Math.max(GameServer.lastBuildingID,this.id);
     }else{
         this.id = ++GameServer.lastBuildingID;
     }
@@ -78,12 +81,13 @@ function Building(data){
 
     var production = GameServer.buildingsData[this.type].production;
     if(production){
-        this.prodCountdowns = {}
+        this.prodCountdowns = {};
         for(var i = 0; i < production.length; i++){
             var item = production[i][0];
             this.prodCountdowns[item] = 0;
         }
     }
+    this.setProperty('prodCountdowns',this.prodCountdowns);
 
     this.newitems = new Inventory(GameServer.buildingParameters.inventorySize);
 
@@ -105,23 +109,17 @@ Building.prototype.embed = function(){
     GameServer.buildings[this.id] = this;
     this.onAddAtLocation();
     this.setOrUpdateAOI();
-    this.addCollisions();
-    //this.registerBuilding();
+    this.setCollisions('add');
     this.updateBuild();
+};
+
+Building.prototype.isInstanced = function(){
+    return this.instance > -1;
 };
 
 Building.prototype.getShortID = function(){
     return 'B'+this.id;
 };
-
-/*Building.prototype.registerBuilding = function(){
-    if(this.civBuilding) return;
-    this.settlement.registerBuilding(this);
-    if(this.type == 0){ // fort
-        this.settlement.registerFort(this);
-        this.refreshListing();
-    }
-};*/
 
 Building.prototype.refreshListing = function(){
     this.buildings = this.settlement.getBuildings();
@@ -140,22 +138,6 @@ Building.prototype.computeProductivity = function(){
 
 Building.prototype.setGold = function(gold){
     this.gold = gold;
-};
-
-Building.prototype.addCommit = function(){
-    this.commitStamps.push(1);
-    this.updateNbCommitted();
-};
-
-Building.prototype.updateCommitment = function(){
-    if(!GameServer.isTimeToUpdate('commitment')) return false;
-    this.commitStamps = [];
-    this.updateNbCommitted();
-};
-
-Building.prototype.updateNbCommitted = function(){
-    this.setProperty('committed',this.commitStamps.length);
-    this.computeProductivity();
 };
 
 Building.prototype.update = function(){
@@ -178,20 +160,31 @@ Building.prototype.dispatchStock = function(){
     this.newitems.clear();
 };
 
-Building.prototype.updateProd = function(){
+Building.prototype.updateProd = function(justBuilt){
     var production = GameServer.buildingsData[this.type].production;
     if(!production) return false;
     var produced = 0;
+    var updateCountdowns = false;
     for(var i = 0; i < production.length; i++){
         var item = production[i][0];
         var baseNb = production[i][1];
         var turns = production[i][2];
         var cap = production[i][3];
         var remainingTurns = GameServer.elapsedTurns%turns;
-        this.prodCountdowns[item] = (turns - remainingTurns)//*GameServer.turnDuration;
-        if(remainingTurns > 0)continue;
-        var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
         var current = this.getItemNb(item);
+
+        var countdown = (current < cap ? turns - remainingTurns : 0);
+        if(this.prodCountdowns[item] != countdown){
+            this.prodCountdowns[item] = countdown;
+            updateCountdowns = true;
+        }
+
+        if(remainingTurns > 0 || justBuilt) continue;
+
+        // var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
+        var increment = baseNb;
+        if(this.getItemNb(1) > 0) increment *= 2;
+
         if(current >= cap) continue;
         var actualNb = Math.min(increment,cap-current);
         if(actualNb) {
@@ -199,9 +192,12 @@ Building.prototype.updateProd = function(){
             var msg = actualNb+' '+GameServer.itemsData[item].name+' was produced';
             GameServer.notifyPlayer(this.owner,msg);
             produced += actualNb;
+            this.takeItem(1,1);
+            GameServer.destroyItem(1,1,'building food consumption');
         }
+
     }
-    this.setProperty('prodCountdowns',this.prodCountdowns);
+    if(updateCountdowns) this.setProperty('prodCountdowns',this.prodCountdowns);
     return (produced > 0);
 };
 
@@ -221,9 +217,14 @@ Building.prototype.updateBuild = function(){
 
 Building.prototype.setBuilt = function(){
     this.setProperty('built',true);
+    this.updateProd(true); //true = just built
     this.save();
     var phrase = ['Construction of ',GameServer.buildingsData[this.type].name,' finished'];
     GameServer.notifyPlayer(this.owner,phrase.join(' '));
+};
+
+Building.prototype.isBuilt = function(){
+    return this.built;
 };
 
 Building.prototype.toggleBuild = function(){
@@ -328,8 +329,8 @@ Building.prototype.takeGold = function(nb){
 
 Building.prototype.remove = function(){
     // TODO: keep track of players inside, and make them leave first
+    this.setCollisions('remove');
     delete GameServer.buildings[this.id];
-    this.settlement.removeBuilding(this);
 };
 
 // Save changes to DB
@@ -348,7 +349,8 @@ Building.prototype.trim = function(){
     trimmed.y = parseInt(this.y);
     if(this.inventory.size > 0) trimmed.inventory = this.inventory.toList();
     trimmed.prodCountdowns = this.prodCountdowns;
-    return trimmed;
+    // return trimmed;
+    return GameObject.prototype.trim.call(this,trimmed);
 };
 
 // Returns an object containing only the fields relevant to list buildings
@@ -376,10 +378,10 @@ Building.prototype.mapTrim = function(){
     return trimmed;
 };
 
-Building.prototype.addCollisions = function(){
-    //PFUtils.buildingCollisions(this.x,this.y,GameServer.buildingsData[this.type],GameServer.collisions);
-    PFUtils.buildingCollisions(this.x,this.y-this.cellsHeight,this.cellsWidth,this.cellsHeight,GameServer.collisions);
+Building.prototype.setCollisions = function(flag){
+    PFUtils.buildingCollisions(this.x,this.y-this.cellsHeight,this.cellsWidth,this.cellsHeight,GameServer.collisions,flag);
 };
+
 
 Building.prototype.travelOccupiedCells = function(action){
     for(var x = -1; x <= this.cellsWidth; x++){

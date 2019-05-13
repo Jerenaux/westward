@@ -11,6 +11,7 @@ function InventoryPanel(x,y,width,height,title,invisible){
     this.slotsAdded = false;
     this.zone = this.createZone();
     this.dataMap = Engine.itemsData;
+    this.depth = 2;
 }
 
 InventoryPanel.prototype = Object.create(Panel.prototype);
@@ -100,9 +101,10 @@ InventoryPanel.prototype.getNextSprite = function(){
         s.text.setOrigin(1,0);
         s.text.setScrollFactor(0);
         s.text.setVisible(false);
-        s.text.setDepth(2);
+        s.text.setDepth(this.depth+2);
         s.text.setPosition(slot.x+36,slot.y+20);
         s.item.setPosition(slot.x+18,slot.y+20);
+        s.item.setDepth(this.depth+2);
         this.sprites.push(s);
         this.content.push(s.item);
         this.content.push(s.text);
@@ -154,7 +156,7 @@ InventoryPanel.prototype.displayInventory = function(){
             if(!this.applyFilter(item)) return;
         }
         var sprite = this.getNextSprite();
-        sprite.item.setUp(item,this.dataMap[item],this.itemCallback);
+        sprite.item.setUp(item,this.dataMap[item],this.itemCallback,this.hideEffects);
         var slot = this.slots[nbDisplayed];
         if(slot.fringeSlot){
             sprite.item.setOrigin(sprite.item.originX-0.1,sprite.item.originY);

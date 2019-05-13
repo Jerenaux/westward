@@ -206,9 +206,6 @@ WorldMaker.prototype.shapeWorld = function(contours){
 WorldMaker.prototype.isBusy = function(node){
     if(!isInWorldBounds(node.x,node.y)) return true;
     return this.collisions.has(node.x,node.y);
-    // var id = Utils.tileToAOI(node);
-    // var chunk = this.chunks[id];
-    // return !!chunk.get(node.x-chunk.x,node.y-chunk.y);
 };
 
 function isInWorldBounds(x,y){
@@ -255,7 +252,7 @@ WorldMaker.prototype.addCoastTiles = function(tiles){
     tiles.forEach(function(t) {
         if(!isInWorldBounds(t.x,t.y)) return;
         this.addTile(t,'c');
-        this.collisions.add(t.x,t.y);
+        // this.collisions.add(t.x,t.y);
         coast.push(t);
     },this);
     this.coasts.push(coast);
@@ -319,8 +316,14 @@ WorldMaker.prototype.createLakes = function(){
     console.log(nblakes,'lakes created');
 };
 
+WorldMaker.prototype.canFill = function(node){
+    var t = this.getTile(node.x,node.y);
+    return !(t == 'c' || t == 'w');
+};
+
 WorldMaker.prototype.fill = function(fillNode,stop){ // fills the world with water, but stops at coastlines
-    if(this.isBusy(fillNode)) return;
+    // if(this.isBusy(fillNode)) return;
+    if(!this.canFill(fillNode)) return;
     var stoppingCritetion = stop || 1000000;
     var queue = [];
     queue.push(fillNode);
@@ -329,6 +332,7 @@ WorldMaker.prototype.fill = function(fillNode,stop){ // fills the world with wat
     while(queue.length > 0){
         var node = queue.shift();
         if(this.isBusy(node)) continue;
+        if(!this.canFill(node)) continue;
         // put a tile at location
         this.addTile(node,'w');
         this.collisions.add(node.x,node.y,1);
@@ -340,7 +344,8 @@ WorldMaker.prototype.fill = function(fillNode,stop){ // fills the world with wat
                 y: node.y + contour[i][1]
             };
             if(!isInWorldBounds(candidate.x,candidate.y)) continue;
-            if(!this.isBusy(candidate)) queue.push(candidate);
+            // if(!this.isBusy(candidate)) queue.push(candidate);
+            if(this.canFill(candidate)) queue.push(candidate);
         }
 
         counter++;
@@ -353,15 +358,14 @@ WorldMaker.prototype.hasCoast = function(x,y){
     if(!isInWorldBounds(x,y)) return true; // When looking for a neighbor out of bounds, assume it's present; allows seamless connections with borders
     var t = this.getTile(x,y);
     return !(!t || t == 'w');
-}
+};
 
 WorldMaker.prototype.hasWater = function(x,y){
     return this.getTile(x,y) == 'w';
-}
+};
 
 WorldMaker.prototype.drawShore = function(){
     console.log('Drawing shore ...');
-    var lines = [];
     //var tiles = ['wb', 'wbbl', 'wbbr', 'wbtl', 'wbtr', 'wcbl', 'wcbr', 'wctl', 'wctr', 'wl', 'wr', 'wt','none'];
 
     var undef = 0;
@@ -387,8 +391,9 @@ WorldMaker.prototype.drawShore = function(){
         },this);
     },this);
     console.log(undef,'undef');
-}
+};
 
+// Create the string of ggccwccw ... or surrounding tiles used to determine current one
 WorldMaker.prototype.getNeighborhood = function(x,y){
     var res = [];
     var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
@@ -399,10 +404,11 @@ WorldMaker.prototype.getNeighborhood = function(x,y){
         res.push(v);
     }
     return res;
-}
+};
 
 WorldMaker.prototype.collides = function(tile){
-    return this.tileset.frames[this.tileset.shorthands[tile]].collides;
+    var longhand = this.tileset.shorthands[tile];
+    return this.tileset.frames[longhand].collides;
 };
 
 WorldMaker.prototype.createForests = function(){
@@ -532,7 +538,8 @@ WorldMaker.prototype.makeSpawnZones = function(){
     var items = [ // TODO: conf
         {item:14,decor:'b4',nbzones:100}, // Sunstrak
         {item:8,decor:null,nbzones:100}, // Thick grass
-        //{item:18,decor:null,nbzones:100}, // clover
+        {item:18,decor:null,nbzones:100}, // clover
+        {item:47,decor:'b4',nbzones:100} // berries
     ];
     items.forEach(function(item){
         for(var i = 0; i < item.nbzones; i++){
@@ -597,7 +604,6 @@ WorldMaker.prototype.writeDataFiles = function(){
         console.log('Master written');
     });
     // Write collisions
-    // var colls = this.trees.toList().concat(this.collisions.toList(true));
     var colls = this.collisions.toList(true);
     fs.writeFile(path.join(this.outdir,'collisions.json'),JSON.stringify(colls),function(err){
         if(err) throw err;

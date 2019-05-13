@@ -4,6 +4,7 @@
 
 var GameServer = require('./GameServer.js').GameServer;
 var NPC = require('./NPC.js').NPC;
+var GameObject = require('./GameObject.js').GameObject;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Utils = require('../shared/Utils.js').Utils;
@@ -59,15 +60,6 @@ Civ.prototype.setCamp = function(camp){
     this.camp = camp;
 };
 
-Civ.prototype.updateBehavior = function(){
-    if(this.trackedTarget) {
-        this.updateTracking();
-    }else{
-        if(!this.camp) return;
-        this.updateWander();
-    }
-};
-
 Civ.prototype.findRandomDestination = function(){
     if(!this.camp){
         console.warn('Civ without camp');
@@ -83,29 +75,6 @@ Civ.prototype.findRandomDestination = function(){
         x: Utils.clamp(this.x + Utils.randomInt(-r,r),xMin,xMax),
         y: Utils.clamp(this.y + Utils.randomInt(-r,r),yMin,yMax)
     };
-};
-
-Civ.prototype.setTrackedTarget = function(target){
-    this.trackedTarget = target;
-    this.idle = false;
-};
-
-Civ.prototype.updateTracking = function(){
-    if(this.moving || this.isInFight() || this.isDead()) return;
-
-    if(this.x == this.trackedTarget.x && this.y == this.trackedTarget.y){
-        console.log(this.getShortID(),'reached target');
-        this.trackedTarget = null;
-        this.setIdle();
-        return;
-    }
-
-    var path = GameServer.findPath(this,this.trackedTarget,true); // true for seek-path pathfinding
-    if(!path || path.length <= 1) return;
-
-    var trim = PFUtils.trimPath(path,GameServer.battleCells);
-    path = trim.path;
-    this.setPath(path);
 };
 
 Civ.prototype.die = function(){
@@ -165,7 +134,8 @@ Civ.prototype.trim = function(){
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    return trimmed;
+    // return trimmed;
+    return GameObject.prototype.trim.call(this,trimmed);
 };
 
 module.exports.Civ = Civ;

@@ -36,10 +36,17 @@ Client.requestData = function(){ // request the data to be used for initWorld()
 Client.getInitRequest = function(){ // Returns the data object to send to request the initialization data
     // In case of a new player, set new to true and send the name of the player
     // Else, set new to false and send it's id instead to fetch the corresponding data in the database
+    if(Client.tutorial){
+        return {
+            new: true,
+            tutorial:true
+        };
+    }
     if(Client.isNewPlayer()) {
         console.log('Requesting data for new player');
         return {
             new:true,
+            tutorial: false,
             selectedClass: UI.selectedClass,
             selectedSettlement: UI.selectedSettlement,
             characterName: UI.characterName
@@ -75,7 +82,6 @@ Client.getPlayerID = function(){
 };
 
 Client.isFirstBattle = function(){
-    return true;
     return !localStorage.getItem('firstBattle');
 };
 
@@ -88,7 +94,7 @@ Client.hadFirstBattle = function(){
 Client.socket.on(Client.initEventName,function(data){ // This event triggers when receiving the initialization packet from the server, to use in Game.initWorld()
     console.log('Init packet received');
     //if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.initializationSchema); // if in binary format, decode first
-    Client.socket.emit('ponq',data.stamp); // send back a pong stamp to compute latency
+    // Client.socket.emit('ponq',data.stamp); // send back a pong stamp to compute latency
     Client.serverTimeDelta = data.refTime - Date.now();
     Engine.initWorld(data.player);
     //Game.updateNbConnected(data.nbconnected);
@@ -220,6 +226,13 @@ Client.sendTutorialStart = function(){
     Client.socket.emit('tutorial-start');
 };
 
+Client.sendTutorialStep = function(step){
+    Client.socket.emit('tutorial-step',step);
+};
+
+Client.sendTutorialEnd = function(){
+    Client.socket.emit('tutorial-end');
+};
 // ####################"
 
 Client.sendMapData = function(id,data){

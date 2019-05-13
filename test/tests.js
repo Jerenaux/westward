@@ -60,9 +60,9 @@ describe('GameServer',function(){
 
         var name = 'Test';
         var dummySocket = {id:'socket123'};
-        player = gs.addNewPlayer(null,{characterName:name});
+        player = gs.addNewPlayer(dummySocket,{characterName:name});
         player.setIDs('',dummySocket.id);
-        gs.finalizePlayer(dummySocket,player);
+        // gs.finalizePlayer(dummySocket,player);
         player.spawn(20,20);
         expect(gs.getPlayer(dummySocket.id).id).to.equal(player.id);
         expect(player.socketID).to.equal(dummySocket.id);
@@ -82,7 +82,6 @@ describe('GameServer',function(){
         expect(animal.type).to.equal(type);
     });
 
-    
     it('handleBattle_faraway',function(){
         var result = gs.handleBattle(player,animalFarAway);
         expect(result).to.equal(false);
@@ -110,8 +109,12 @@ describe('GameServer',function(){
     });
 
     it('lootNPC_dead',function(){
-        var result = gs.lootNPC(player,'animal',animal.id);
-        expect(result).to.equal(true);
+        var lootTable = gs.animalsData[animal.type].loot;
+        var itemID = Object.keys(lootTable)[0];
+        var nb = lootTable[itemID];
+        var initNb = player.getItemNb(itemID);
+        gs.lootNPC(player,'animal',animal.id);
+        expect(player.getItemNb(itemID)).to.equal(initNb+nb);
     });
 
     var item;
@@ -126,8 +129,9 @@ describe('GameServer',function(){
     });
 
     it('pickUpItem', function(){
-        var result = gs.pickUpItem(player,item.id);
-        expect(result).to.equal(true);
+        var initNb = player.getItemNb(item.type);
+        gs.pickUpItem(player,item.id);
+        expect(player.getItemNb(item.type)).to.equal(initNb+1);
     });
 
     var building;
@@ -143,16 +147,100 @@ describe('GameServer',function(){
         expect(building.type).to.equal(data.type);
     });
 
-    /*it('handleShop', function(){
-        var errInputs = [{},{new:true}];
-        errInputs.forEach(function(input){
-            var result = gs.addNewPlayer(null,input);
-            expect(result).to.equal(null);
-        });
+    it('handleShop_out', function(){
+        // Should fail because the player is not in the building
+        var result = gs.handleShop({},player.socketID);
+        expect(result).to.equal(false);
+    });
 
-        var name = 'Test';
-        player = gs.addNewPlayer(null,{characterName:name});
-        expect(player.name).to.equal(name);
+    it('enterBuilding',function(){
+        var result = player.enterBuilding(building.id);
+        expect(result).to.equal(true);
+    });
+
+    it('building_giveItem',function(){
+        var itemID = 1;
+        var nb = 3;
+        var initNb = building.getItemNb(itemID);
+        building.giveItem(itemID,nb);
+        expect(building.getItemNb(itemID)).to.equal(initNb+nb);
+    });
+
+    it('setBuildingPrices',function(){
+        building.owner = player.id;
+        var itemID = 1;
+        var buy = 10;
+        var sell = 20;
+        gs.setBuildingPrice({item:itemID,buy:buy,sell:sell},player.socketID);
+        expect(building.getPrice(itemID,1,'buy')).to.equal(buy);
+        expect(building.getPrice(itemID,1,'sell')).to.equal(sell);
+    });
+
+    it('handleShop_owner', function(){
+        player.inventory.clear();
+        building.inventory.clear();
+        var nonstoredID = 1;
+        var storedID = 5;
+        var nonownedID = 3;
+        var ownedID = 4;
+        building.giveItem(storedID,1);
+        player.giveItem(ownedID,1);
+        var playerGoldBefore = player.getGold();
+        var buildingGoldBefore = building.getGold();
+        var testCases = [
+            {in: {action:'buy',id:nonstoredID,nb:1},out:false},
+            {in: {action:'buy',id:storedID,nb:1},out:true},
+            {in: {action:'sell',id:nonownedID,nb:1},out:false},
+            {in: {action:'sell',id:ownedID,nb:1},out:true},
+        ];
+        testCases.forEach(function(testcase){
+            var result = gs.handleShop(testcase.in,player.socketID);
+            expect(result).to.equal(testcase.out);
+        });
+        expect(player.getItemNb(storedID)).to.equal(1);
+        expect(player.getItemNb(ownedID)).to.equal(0);
+        expect(building.getItemNb(storedID)).to.equal(0);
+        expect(building.getItemNb(ownedID)).to.equal(1);
+        expect(player.getGold()).to.equal(playerGoldBefore);
+        expect(building.getGold()).to.equal(buildingGoldBefore);
+    });
+
+    /*it('handleShop_nonowner', function(){
+        // TODO: expand test cases
+        var buyID = 15;
+        building.giveItem(buyID,1);
+        var testCases = [
+            {in: {action:'buy',id:10,nb:1},out:false},
+            {in: {action:'sell',id:10,nb:1},out:false},
+            {in: {action:'buy',id:buyID,nb:1},out:true},
+        ];
+        testCases.forEach(function(testcase){
+            var result = gs.handleShop(testcase.in,player.socketID);
+            expect(result).to.equal(testcase.out);
+        });
+    });*/
+
+    it('handleUse_equip', function(){
+        var type = 28; // stone hatchet
+        var typeNotOwned = 2; // bow
+        var slot = gs.itemsData[type].equipment;
+        var slotNotOwned = gs.itemsData[typeNotOwned].equipment;
+        player.giveItem(type,1);
+        gs.handleUse({item:type},player.socketID);
+        gs.handleUse({item:typeNotOwned},player.socketID);
+        expect(player.isEquipped(slot)).to.equal(true);
+        expect(player.getEquipped(slot)).to.equal(type);
+        expect(player.isEquipped(slotNotOwned)).to.equal(false);
+        expect(player.getEquipped(slotNotOwned)).to.equal(-1);
+    });
+
+    // TODO: expand test cases + test results with gs methods for all tests
+
+    /*it('handleGold', function(){
+        var result = gs.handleUse({nb:10},player.socketID);
+        expect(result).to.equal(true);
+        result = gs.handleUse({nb:-10},player.socketID);
+        expect(result).to.equal(true);
     });*/
 
     afterEach(function(){

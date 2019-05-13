@@ -48,11 +48,15 @@ PFUtils.trimPath = function(path,map){
     };
 };
 
-PFUtils.buildingCollisions = function(tx,ty,w,h,collisionMap){
+PFUtils.buildingCollisions = function(tx,ty,w,h,collisionMap,flag){
     for(var x = tx; x < tx + w; x++){
         for(var y = ty; y < ty + h; y++){
-            collisionMap.add(x,y);
-            if(!onServer && Engine.debugCollisions) Engine.scene.add.rectangle((x*32)+16,(y*32)+16, 32,32, 0xffa500).setAlpha(0.7).setDepth(100);
+            if(flag == 'add'){
+                collisionMap.add(x,y);
+                if(!onServer && Engine.debugCollisions) Engine.scene.add.rectangle((x*32)+16,(y*32)+16, 32,32, 0xffa500).setAlpha(0.7).setDepth(100);
+            }else{
+                collisionMap.delete(x,y);
+            }
         }
     }
 };

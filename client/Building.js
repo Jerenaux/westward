@@ -41,25 +41,31 @@ var Building = new Phaser.Class({
         this.ownerName = data.ownerName;
         this.civBuilding = (this.settlement == -1);
         this.inventory = new Inventory(100);
+        this.countdowns = data.prodCountdowns;
         this.name = buildingData.name;//+' '+this.id;
         this.prices = {};
+        this.gold = 0;
         this.built = false;
-        /*if(buildingData.entrance) {
-            this.entrance = {
-                x: this.tileX + buildingData.entrance.x,
-                y: this.tileY + buildingData.entrance.y
-            };
-        }*/
+        this.locked = buildingData.locked;
 
         this.depthOffset = buildingData.depthOffset;
         this.setBuilt(data.built);
         this.resetDepth();
 
         this.setInteractive();
-
         this.setCollisions();
 
+        var production = buildingData.production;
+        this.produced = [];
+        if(production){
+            production.forEach(function(prod){
+                this.produced.push(parseInt(prod[0]));
+            },this);
+        }
+
         if(Engine.debugCollisions) this.setAlpha(0.1);
+
+        if(Engine.player.inBuilding == this.id) Engine.enterBuilding(this.id);
     },
 
     resetDepth: function(){
@@ -157,10 +163,11 @@ var Building = new Phaser.Class({
             Engine.exitBuilding();
             Engine.enterBuilding(this.id);
         }
+        if(Client.tutorial && flag == true) TutorialManager.triggerHook('built:'+this.id);
     },
 
     setCollisions: function () {
-        PFUtils.buildingCollisions(this.tileX,this.tileY-this.cellsHeight,this.cellsWidth,this.cellsHeight,Engine.collisions);
+        PFUtils.buildingCollisions(this.tileX,this.tileY-this.cellsHeight,this.cellsWidth,this.cellsHeight,Engine.collisions,'add');
     },
 
     setCountdowns: function(countdowns){
@@ -217,6 +224,7 @@ var Building = new Phaser.Class({
     updateInventory: function(items){
         this.inventory.updateItems(items);
         this.updateEvents.add('onUpdateShop');
+        if(Client.tutorial) TutorialManager.checkHook();
     },
 
     getHPposition: function(){
@@ -335,7 +343,10 @@ var Building = new Phaser.Class({
             if(this.civBuilding){
                 Client.buildingClick(this.id);
             }else {
-                //if (!this.entrance) return;
+                if(this.locked && !this.isOwned() && this.isBuilt()){
+                    Engine.player.talk('That building is locked');
+                    return;
+                }
                 var entrance = this.findEntrance();
                 Engine.player.setDestinationAction(1, this.id, entrance.x, entrance.y); // 1 for building
                 Engine.computePath(entrance);

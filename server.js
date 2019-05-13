@@ -24,7 +24,7 @@ const corssss =  function (res, path) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With");
         res.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
-        res.setHeader("X-Powered-By", ' 3.2.1')
+        res.setHeader("X-Powered-By", ' 3.2.1');
         res.type("application/json");
         res.type("jpg");
 };
@@ -216,7 +216,7 @@ io.on('connection',function(socket){
         if(!data.stamp || data.stamp < server.resetStamp) data.new = true; // TODO Remove eventually
 
         console.log(data);
-        if(data.new){
+        if(data.new){ // new players OR tutorial
             gs.addNewPlayer(socket,data);
         }else{
             gs.loadPlayer(socket,data.id);
@@ -227,7 +227,6 @@ io.on('connection',function(socket){
             'buildingClick': gs.handleBuildingClick,
             'build': gs.handleBuild,
             'chat': gs.handleChat,
-            'commit': gs.handleCommit,
             'craft': gs.handleCraft,
             'exit': gs.handleExit,
             'gold': gs.handleGold,
@@ -238,11 +237,13 @@ io.on('connection',function(socket){
             'respawn': gs.handleRespawn,
             'screenshot': gs.handleScreenshot,
             'shop': gs.handleShop,
+            'tutorial-end': gs.handleTutorialEnd,
             'tutorial-start': gs.handleTutorialStart,
+            'tutorial-step': gs.handleTutorialStep,
             'unequip': gs.handleUnequip,
             'use': gs.handleUse,
 
-            'ss': gs.startScript
+            //'ss': gs.startScript
         };
 
         var handler = socket.onevent;
@@ -266,34 +267,19 @@ io.on('connection',function(socket){
            if(socket.pings.length > 20) socket.pings.shift(); // keep the size down to 20
            socket.latency = server.quickMedian(socket.pings.slice(0)); // quickMedian used the quickselect algorithm to compute the median of a list of values
        });*/
-    });
+    }); // end of on init-world
 
     socket.on('region-data',function(){
         socket.emit('region-data',gs.listRegions());
     });
 
-    socket.on('camps-data',function(){ge
+    socket.on('camps-data',function(){
         socket.emit('camps-data',gs.listCamps());
     });
 
     socket.on('disconnect',function(){
         gs.handleDisconnect(socket.id);
     });
-
-    // #########################
-
-
-    // #########################
-    /*if(process.env.DEV == 1) {
-        socket.on('mapdata',function(data){
-            console.log('Saving changes to chunk '+data.id+'...');
-            var dir = __dirname+'/assets/maps/chunks/'; // Replace by env variable
-            fs.writeFile(dir+'chunk'+data.id+'.json',JSON.stringify(data.data),function(err){
-                if(err) throw err;
-                console.log('done'); // replace by counter
-            });
-        });
-    }*/
 });
 
 server.sendInitializationPacket = function(socket,packet){
