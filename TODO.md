@@ -46,6 +46,7 @@ Misc:
 - Fix wrong building surfaces (reproducible in tutorial part 2)
 - Make size of tutorial boxes adapt to text
 
+Infra: 15' admin + incorporate spawn zones in worldMaker
 - Find artist
 
 ##Tutorial:##
@@ -525,46 +526,10 @@ Testing:
 
 World building:
 --------------
-1/ World creation:
-- Add missing lakes 
-
-2/ Cartography
-- Has to come from actual in-game world
-- Capture whole game map, with trees and all terrain elements
-- Do so at arbitrary zoom levels
-(- split in chunks)
-- Apply post-processing effects to make it look nice
-
-3/ World editor
--> Need to visualize game world at different zoom levels
--> Display and modify buildings
--> Display and modify spawnzones
--> Manage trees?
--> Integrate with admin to display and modify settlement data (+ events etc.) 
-
-5/Building editor (visually define shape, collisons, etc.)
---
-Custom chunk/world editor:
-- Arrows on the fringes of the window allow to move quickly to adjacent chunks
-- See borders of adjacent chunks to match fringe tiles
-- Preserve whatever extra info is in the JSON file (vs Tiled who rewrites it)
-- Versioning of individual chunks (saved in separate folder), for unlimited undos
-- Add random elements (w/ scripts to remove them):
 Building editor (set shapes etc.)
 Manage spawn zones in editor
 Flip trees horizontally to introduce variety
--> Patches of dirt
--> Tree decorations: flowers, stones, bushes
-- Add cliffs in empty areas
--> Add random decorations to cliffs (stones in bends, ...)
-- Compute tree density and spread random trees around accordingly?
-- No tree if busy 3cells to the left? Or when planing tree, log width cells to right as no-go position
-- Fix loops (lakes ...)
-- Plan for more layers in dev
-- Store forests and trees separately (trees.json) during dev?
--> During flattening, read that file and draw trees tile by tile
--> Test high-layers after flattening
-
+Patches of dirt
 
 UI:
 ---
