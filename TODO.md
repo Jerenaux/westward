@@ -46,8 +46,12 @@ Misc:
 - Fix wrong building surfaces (reproducible in tutorial part 2)
 - Make size of tutorial boxes adapt to text
 
-Infra: 15' admin + incorporate spawn zones in worldMaker
+- Infra: 15' admin + incorporate spawn zones in worldMaker
+- Move to Phaser 18
+- Ask for free Creature license
 - Find artist
+https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
+https://medium.com/@kestrelm/2d-skeletal-animation-in-phaser-3-tutorial-3ed468fb6bd0
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.
