@@ -46,7 +46,6 @@ Misc:
 - Fix wrong building surfaces (reproducible in tutorial part 2)
 - Make size of tutorial boxes adapt to text
 
-- Infra: 15' admin + incorporate spawn zones in worldMaker
 - Move to Phaser 18
 - Ask for free Creature license
 - Find artist
@@ -532,6 +531,7 @@ World building:
 --------------
 Building editor (set shapes etc.)
 Manage spawn zones in editor
+->Eventually, delet "spawnzones.json"
 Flip trees horizontally to introduce variety
 Patches of dirt
 
