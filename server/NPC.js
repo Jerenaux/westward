@@ -64,8 +64,7 @@ NPC.prototype.checkForAggro = function(){
 
     var r = GameServer.battleParameters.aggroRange;
     // implies Chebyshev distance
-    // console.warn(GameServer.qt.get({x:0, y: 0, w: 1500, h: 1140}));
-    var neighbors = GameServer.qt.get({x:Math.floor(this.x-r/2), y: Math.floor(this.y-r/2), w: r, h: r});
+    var neighbors = GameServer.getEntitiesAt(Math.floor(this.x-r/2),Math.floor(this.y-r/2),r,r);
     for(var i = 0; i < neighbors.length; i++){
         var entity = neighbors[i];
         if(!this.aggroAgainst(entity)) continue;

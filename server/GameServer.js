@@ -375,6 +375,7 @@ GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
     GameServer.addAnimal(1189,154,0);
+    GameServer.addAnimal(1193,157,0);
     console.log('---done---');
 };
 
@@ -1074,9 +1075,12 @@ GameServer.addBattleCell = function(battle,x,y){
     GameServer.battleCells.add(x,y,cell);
     battle.cells.add(x,y,cell);
 
-    GameServer.positions.get(x,y).forEach(function(e){
+    GameServer.getEntitiesAt(x-1,y-1,3,3).forEach(function(e){
         if(e.canFight() && e.isAvailableForFight()) GameServer.expandBattle(cell.battle,e);
     });
+    /*GameServer.positions.get(x,y).forEach(function(e){
+        if(e.canFight() && e.isAvailableForFight()) GameServer.expandBattle(cell.battle,e);
+    });*/
 };
 
 GameServer.removeBattleCell = function(battle,x,y){
@@ -1089,6 +1093,10 @@ GameServer.removeBattleCell = function(battle,x,y){
 GameServer.handleBattleAction = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     player.battle.processAction(player,data);
+};
+
+GameServer.getEntitiesAt = function(x,y,w,h){
+    return GameServer.qt.get({x:x, y:y, w: w, h: h});
 };
 
 GameServer.setBuildingPrice = function(data,socketID){
@@ -1629,6 +1637,10 @@ GameServer.checkForAggro = function(){
     Object.keys(GameServer.civs).forEach(function(key) {
         GameServer.civs[key].checkForAggro();
     });
+    for(var id in GameServer.buildings){
+        var bld = GameServer.buildings[id];
+        bld.checkForAggro();
+    }
     //TODO: add towers?
 };
 

@@ -37,6 +37,7 @@ function Building(data){
     if(this.type === undefined) console.warn('Undefined building type');
     var buildingData = GameServer.buildingsData[this.type];
 
+    this.aggro = buildingData.aggro;
     this.cellsWidth = buildingData.base.width;
     this.cellsHeight = buildingData.base.height;
     this.w = this.cellsWidth; // For quadtree
@@ -122,6 +123,10 @@ Building.prototype.isInstanced = function(){
 
 Building.prototype.getShortID = function(){
     return 'B'+this.id;
+};
+
+Building.prototype.isAggressive = function(){
+    return this.aggro;
 };
 
 Building.prototype.refreshListing = function(){
@@ -390,8 +395,8 @@ Building.prototype.getBattleAreaAround = function(cells){
 
     for(var x = -1; x <= this.cellsWidth; x++){
         for(var y = -1; y <= this.cellsHeight+1; y++) {
-            var realx = this.x + this.coll.x + x;
-            var realy = this.y + this.coll.y + y;
+            var realx = this.coll.x + x;
+            var realy = this.coll.y + y;
             if(!GameServer.checkCollision(realx,realy)) cells.add(realx,realy);
         }
     }

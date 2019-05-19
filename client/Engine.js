@@ -523,7 +523,7 @@ Engine.manageDeath = function(){
 
 Engine.manageRespawn = function(){
     Engine.showMarker();
-    Engine.displayUI();
+    // Engine.displayUI();
     Engine.dead = false;
     Engine.updateAllOrientationPins();
 };
@@ -780,7 +780,6 @@ Engine.makeUI = function(){
     Engine.addMenu(20,60,'shovel',Engine.menus.build,-100,60);
 
     Engine.makeBattleUI();
-    //Engine.displayUI();
 
     var chatw = 230;
     var chath = 50;

@@ -48,7 +48,9 @@ Misc:
 - Add "resource markers" for wildlife (optimize?)
 - Prevent items spawning on top of buildings
 - Test respawn
-- Use QT for all form of aggro
+- Use QT for tower aggro
+- Tower freeze?
+- Restore arrow anim
 
 - Ask for free Creature license
 - Find artist
