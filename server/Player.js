@@ -57,6 +57,8 @@ function Player(){
 
     this.cellsWidth = 1;
     this.cellsHeight = 1;
+    this.w = this.cellsWidth; // For quadtree
+    this.h = this.cellsHeight;
 
     this.setUpStats();
     this.equipment = new EquipmentManager();
@@ -259,14 +261,13 @@ Player.prototype.spawn = function(x,y){
 
 Player.prototype.respawn = function(){
     this.setProperty('dead',false);
-    // this.updatePacket.dead = false;
     this.setOwnProperty('dead',false);
     this.setStat('hp',10); // TODO: adapt remaining health
-    this.onRemoveAtLocation();
+    this.onRemoveFromLocation();
     this.spawn();
     this.setOrUpdateAOI();
     this.save();
-    // TODO: loose loot
+    // TODO: loose loot?
 };
 
 Player.prototype.gainClassXP = function(classID,inc,notify){
@@ -797,7 +798,7 @@ Player.prototype.rest = function(nb){
 Player.prototype.remove = function(){
     console.log('removing player');
     if(this.battle) this.battle.removeFighter(this);
-    this.onRemoveAtLocation();
+    this.onRemoveFromLocation();
     delete GameServer.players[this.id];
     GameServer.updateVision();
 };

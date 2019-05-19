@@ -39,6 +39,9 @@ function Building(data){
 
     this.cellsWidth = buildingData.base.width;
     this.cellsHeight = buildingData.base.height;
+    this.w = this.cellsWidth; // For quadtree
+    this.h = this.cellsHeight;
+
     this.coll = {
         x: this.x,
         y: this.y - this.cellsHeight,
@@ -380,17 +383,6 @@ Building.prototype.mapTrim = function(){
 
 Building.prototype.setCollisions = function(flag){
     PFUtils.buildingCollisions(this.x,this.y-this.cellsHeight,this.cellsWidth,this.cellsHeight,GameServer.collisions,flag);
-};
-
-
-Building.prototype.travelOccupiedCells = function(action){
-    for(var x = -1; x <= this.cellsWidth; x++){
-        for(var y = 0; y <= this.cellsHeight+1; y++) {
-            var realx = this.x + this.coll.x + x;
-            var realy = this.y + this.coll.y + y;
-            GameServer.positions[action](realx,realy,this);
-        }
-    }
 };
 
 Building.prototype.getBattleAreaAround = function(cells){

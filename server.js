@@ -179,7 +179,7 @@ server.listen(process.env.PORT || myArgs.port || 8081,function(){
         mongodbAuth = {
             "user": process.env.MONGODB_USERNAME || 'root',
             "pass": process.env.MONGODB_PASSWORD || 'password',
-            "useMongoClient": true
+            "useMongoClient": true,
         };
     }
 

@@ -94,15 +94,23 @@ GameObject.prototype.save = function(){
 };
 
 GameObject.prototype.onAddAtLocation = function(){
-    this.travelOccupiedCells('add');
+    GameServer.qt.put(this);
+    /*console.warn('Added ',this.getShortID());
+    var list = GameServer.qt.get({x:this.x-10, y: this.y-10, w: 20, h: 20});
+    list.forEach(function(e){
+        console.warn('ID:',e.getShortID());
+        return true;
+    });*/
 };
 
-GameObject.prototype.onRemoveAtLocation = function(){
-    this.travelOccupiedCells('delete');
+GameObject.prototype.onLocationChange = function(){
+    // It's ok if multiple objects have same ID, it'll
+    // only match and update those with same x,y,w,h
+    GameServer.qt.update(this,'id',{x:this.x,y:this.y});
 };
 
-GameObject.prototype.travelOccupiedCells = function(){
-    // empty shell for children who do not implement it
+GameObject.prototype.onRemoveFromLocation = function(){
+    GameServer.qt.remove(this);
 };
 
 GameObject.prototype.trim = function(trimmed){

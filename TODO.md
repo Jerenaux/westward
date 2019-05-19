@@ -8,7 +8,6 @@ On deploy:
 - Run all tests
 => After bug, systematically create test!
 
-
 Admin
 Analytics
 Cleaning
@@ -19,6 +18,7 @@ Testing
 World Building
 
 Misc:
+- Update Westward main page
 - Adapt animations and delays for firearms
 - findcell in battle doesn't take path to get there into accoung (may be within radius but require to go around an obstacle!)
 - Change battle priority when player joins fight
@@ -40,17 +40,26 @@ Misc:
 - add esc shortcut
 - "new" marker
 - Events formatting
-- Add other plants
-- Aggro issue
 - Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
 - Fix wrong building surfaces (reproducible in tutorial part 2)
 - Make size of tutorial boxes adapt to text
+- Make towers throw stones when no better ammo
+- Test spawning (find them!)
+- Add "resource markers" for wildlife (optimize?)
+- Prevent items spawning on top of buildings
+- Test respawn
+- Use QT for all form of aggro
 
-- Move to Phaser 18
 - Ask for free Creature license
 - Find artist
+
+
+
+
+
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
 https://medium.com/@kestrelm/2d-skeletal-animation-in-phaser-3-tutorial-3ed468fb6bd0
+https://www.npmjs.com/package/quadtree-lib
 
 ##Tutorial:##
 First few words about permanent sandbox, collaborative survival, etc.
@@ -80,6 +89,14 @@ Part 3: enemy civ
 - Tougher fight, better equipment will be needed!
 
 Closing comments about pros and cons of starting in a settled/wild region, ultimate goal of surviving by pushing enemy civ back,
+
+Criteria before going public:
+- Full metal and gunpowder industry
+- Basic abilitiy system
+- Missions menu
+-> Daily quests
+-> Try to come up with something about enemy civ
+-> Leaderboards
 
 
 ##################################################
@@ -529,9 +546,12 @@ Testing:
 
 World building:
 --------------
+Eventually, delete "spawnzones.json"
+Make items belong to spawnzones, for respawn
+Make respawn depend on proximity of cluster to civilization (use quad tree?)
+Set up proximity between related item and animal spawn zones
 Building editor (set shapes etc.)
 Manage spawn zones in editor
-->Eventually, delet "spawnzones.json"
 Flip trees horizontally to introduce variety
 Patches of dirt
 

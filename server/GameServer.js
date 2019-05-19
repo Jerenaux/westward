@@ -7,6 +7,7 @@ var clone = require('clone'); // used to clone objects, essentially used for clo
 var ObjectId = require('mongodb').ObjectID;
 var mongoose = require('mongoose');
 var config = require('config');
+var QuadTree = require('simple-quadtree');
 
 var GameServer = {
     lastPlayerID: 0,
@@ -157,8 +158,10 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()),true); // true = compact
     GameServer.pathFinder = new Pathfinder(GameServer.collisions,GameServer.PFParameters.maxPathLength);
 
+    GameServer.qt = QuadTree(0, 0, World.worldWidth, World.worldHeight);
+    //tODO: remove positions
     GameServer.positions = new SpaceMapList(); // positions occupied by moving entities and buildings
-    GameServer.itemPositions = new SpaceMapList();
+    GameServer.itemPositions = new SpaceMapList(); // used to prevent building where an item is
 
     GameServer.fogOfWar = {};
     GameServer.fowList = [];
@@ -290,16 +293,19 @@ GameServer.loadItems = function(){
  * Called during the initialization sequence.
  */
 GameServer.setUpSpawnZones = function(){
-    GameServer.spawnZonesData = JSON.parse(fs.readFileSync(pathmodule.join('assets','data','spawnzones.json')).toString());
-    GameServer.spawnZones = [];
+    if(config.get('wildlife.nolife')) return;
 
-    if(!config.get('wildlife.nolife')) {
-        for (var key in GameServer.spawnZonesData) {
-            var data = GameServer.spawnZonesData[key];
-            GameServer.spawnZones.push(new SpawnZone(data.aois, data.animals, data.items));
-        }
-        console.log(GameServer.spawnZones.length,'spawn zones created');
-    }
+    GameServer.spawnZones = [];
+    var path = pathmodule.join(GameServer.mapsPath,'animals.json');
+    var animals = JSON.parse(fs.readFileSync(path).toString());
+    animals.forEach(function(animal){
+        var x = animal[0];
+        var y = animal[1];
+        var data = animal[2];
+        var type = data.split(':')[0];
+        var nb = data.split(':')[1];
+        GameServer.spawnZones.push(new SpawnZone(x,y,type,nb));
+    },this);
 
     GameServer.updateStatus();
 };
@@ -368,16 +374,12 @@ GameServer.addItem = function(x,y,type,instance){
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
-    GameServer.addAnimal(1188,222,0);
-    GameServer.addAnimal(1205,133,5);
+    GameServer.addAnimal(1189,154,0);
     console.log('---done---');
 };
 
 GameServer.onNewPlayer = function(player){
     if(!config.get('misc.performInit')) return;
-    player.giveItem(2,1);
-    player.giveItem(20,5);
-    player.giveItem(19,1);
 };
 
 /**
@@ -968,7 +970,6 @@ GameServer.handleBattle = function(attacker,attacked){
     battle.addFighter(attacked);
     GameServer.addBattleArea(area,battle);
     battle.start();
-    // console.warn(attacker.isPlayer,attacked.isPlayer);
     if(attacker.isPlayer || attacked.isPlayer){
         var player = (attacker.isPlayer ? attacker : attacked);
         var foe = (attacker.isPlayer ? attacked : attacker);

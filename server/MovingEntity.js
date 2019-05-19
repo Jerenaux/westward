@@ -46,15 +46,6 @@ MovingEntity.prototype.findNextFreeCell = function(x,y){
     return null;
 };
 
-// Called by onAddAtLocation/onRemoveAtLocation; action = 'add' or 'delete'
-MovingEntity.prototype.travelOccupiedCells = function(action){
-    for(var x = this.x; x < this.x + this.cellsWidth; x++){
-        for(var y = this.y; y < this.y + this.cellsHeight; y++) {
-            GameServer.positions[action](x,y,this);
-        }
-    }
-};
-
 MovingEntity.prototype.setFieldOfVision = function(aois){
     this.fieldOfVision = aois;
 };
@@ -99,11 +90,12 @@ MovingEntity.prototype.updateWalk = function(){
 };
 
 MovingEntity.prototype.updatePosition = function(x,y){
-    this.onRemoveAtLocation();
+    // this.onRemoveAtLocation();
     this.x = x;
     this.y = y;
     this.setOrUpdateAOI();
-    this.onAddAtLocation();
+    // this.onAddAtLocation();
+    this.onLocationChange();
     if(!this.inFight) this.checkForBattle();
 };
 
@@ -263,7 +255,7 @@ MovingEntity.prototype.getRect = function(){
 
 MovingEntity.prototype.remove = function(){
     if(this.battle) this.battle.removeFighter(this);
-    this.onRemoveAtLocation();
+    this.onRemoveFromLocation();
 };
 
 module.exports.MovingEntity = MovingEntity;

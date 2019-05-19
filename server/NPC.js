@@ -60,26 +60,24 @@ NPC.prototype.setStat = function(key,value){
 NPC.prototype.checkForAggro = function(){
     if(!this.isInVision()) return;
     if(!this.isAggressive() || this.isInFight() || !this.isAvailableForFight()) return;
+    console.warn(this.id,'checking for aggro');
 
-    var AOIs = this.fieldOfVision;
-    for(var i = 0; i < AOIs.length; i++){
-        var aoi = GameServer.AOIs[AOIs[i]];
-        for(var j = 0; j < aoi.entities.length; j++) {
-            var entity = aoi.entities[j];
-            if(!this.aggroAgainst(entity)) continue;
-            if(!entity.isAvailableForFight()) continue;
-            if(entity.instance != this.instance) continue;
-            //TODO: vary aggro range?
-            if(Utils.chebyshev(this,entity) <= GameServer.battleParameters.aggroRange){
-                if(entity.isInFight()){
-                    this.goToDestination(entity);
-                }else {
-                    GameServer.handleBattle(this, entity);
-                    if(this.isCiv) this.talk('battle_start');
-                }
-                break;
-            }
+    var r = GameServer.battleParameters.aggroRange;
+    // implies Chebyshev distance
+    // console.warn(GameServer.qt.get({x:0, y: 0, w: 1500, h: 1140}));
+    var neighbors = GameServer.qt.get({x:Math.floor(this.x-r/2), y: Math.floor(this.y-r/2), w: r, h: r});
+    for(var i = 0; i < neighbors.length; i++){
+        var entity = neighbors[i];
+        if(!this.aggroAgainst(entity)) continue;
+        if(!entity.isAvailableForFight()) continue;
+        if(entity.instance != this.instance) continue;
+        if(entity.isInFight()){
+            this.goToDestination(entity);
+        }else {
+            GameServer.handleBattle(this, entity);
+            if(this.isCiv) this.talk('battle_start');
         }
+        break;
     }
 };
 

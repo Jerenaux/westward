@@ -31,6 +31,9 @@ function Animal(x,y,type,instance){
 
     this.cellsWidth = animalData.width || 1;
     this.cellsHeight = animalData.height || 1;
+    this.w = this.cellsWidth; // For quadtree
+    this.h = this.cellsHeight;
+
     this.xpReward = animalData.xp || 0;
     this.name = animalData.name;
     this.setAggressive();
