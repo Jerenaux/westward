@@ -23,10 +23,6 @@ function NPC(){
 NPC.prototype = Object.create(MovingEntity.prototype);
 NPC.prototype.constructor = NPC;
 
-NPC.prototype.isInVision = function(){
-    return GameServer.vision.has(this.aoi);
-};
-
 // ### Equipment ###
 
 NPC.prototype.setLoot = function(loot){
@@ -60,7 +56,6 @@ NPC.prototype.setStat = function(key,value){
 NPC.prototype.checkForAggro = function(){
     if(!this.isInVision()) return;
     if(!this.isAggressive() || this.isInFight() || !this.isAvailableForFight()) return;
-    console.warn(this.id,'checking for aggro');
 
     var r = GameServer.battleParameters.aggroRange;
     // implies Chebyshev distance
