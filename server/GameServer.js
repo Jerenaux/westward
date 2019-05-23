@@ -1641,7 +1641,6 @@ GameServer.checkForAggro = function(){
         var bld = GameServer.buildings[id];
         bld.checkForAggro();
     }
-    //TODO: add towers?
 };
 
 GameServer.updateNPC = function(){

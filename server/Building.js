@@ -129,6 +129,21 @@ Building.prototype.isAggressive = function(){
     return this.aggro;
 };
 
+Building.prototype.checkForAggro = function(){
+    if(!this.isInVision()) return;
+    if(!this.isAggressive() || this.isInFight() || !this.isAvailableForFight()) return;
+
+    var r = GameServer.battleParameters.aggroRange;
+    // implies Chebyshev distance
+    var neighbors = GameServer.getEntitiesAt(Math.floor(this.x-r/2),Math.floor(this.y-r/2),r,r);
+    for(var i = 0; i < neighbors.length; i++){
+        var entity = neighbors[i];
+        if(entity.entityCategory != 'Cell') continue;
+        console.log('Spotted battle',entity.battle.id);
+        break;
+    }
+};
+
 Building.prototype.refreshListing = function(){
     this.buildings = this.settlement.getBuildings();
     this.updateBuildings();

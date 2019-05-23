@@ -470,10 +470,10 @@ module.exports.Battle = Battle;
 function BattleCell(x,y,battle){
     this.instance = -1;
     this.updateCategory = 'cells';
+    this.entityCategory = 'Cell';
     this.id = GameServer.lastCellID++;
     this.x = x;
     this.y = y;
-    //this.aoi = Utils.tileToAOI({x:this.x,y:this.y});
     this.battle = battle;
     this.setOrUpdateAOI();
 }

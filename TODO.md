@@ -48,6 +48,7 @@ Misc:
 - Add "resource markers" for wildlife (optimize?)
 - Prevent items spawning on top of buildings
 - Test respawn
+- Prevent 0HP after respawn
 - Use QT for tower aggro
 - Tower freeze?
 - Restore arrow anim

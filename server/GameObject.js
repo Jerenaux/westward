@@ -28,6 +28,10 @@ GameObject.prototype.setOrUpdateAOI = function(){
     }
 };
 
+GameObject.prototype.isInVision = function(){
+    return GameServer.vision.has(this.aoi);
+};
+
 GameObject.prototype.setProperty = function(property,value){
     // Updates a property of the object and update the AOI's around it
     //console.log(this.id+' sets '+property+' to '+value);
