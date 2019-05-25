@@ -52,9 +52,9 @@ Misc:
 - Use QT for tower aggro
 - Tower freeze?
 - Restore arrow anim
+- Test aggro tower on animals
 
 - Ask for free Creature license
-- Find artist
 
 
 
