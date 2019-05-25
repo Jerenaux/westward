@@ -970,6 +970,7 @@ GameServer.handleBattle = function(attacker,attacked){
     battle.addFighter(attacker);
     battle.addFighter(attacked);
     GameServer.addBattleArea(area,battle);
+    GameServer.addSurroundingFighters(battle);
     battle.start();
     if(attacker.isPlayer || attacked.isPlayer){
         var player = (attacker.isPlayer ? attacker : attacked);
@@ -987,7 +988,8 @@ GameServer.handleBattle = function(attacker,attacked){
  * @param {Player|NPC} f2 - The other fighter.
  * @returns {Array} The list of battle cells coordinates ({x,y} objects)
  */
-GameServer.computeBattleArea = function(f1,f2){
+GameServer.computeBattleArea = function(f1,f2,depth){
+    var MAX_DEPTH = depth || 2;
     var cells = new SpaceMap();
     var fs = [f1,f2];
     fs.forEach(function(f){
@@ -1011,7 +1013,7 @@ GameServer.computeBattleArea = function(f1,f2){
     var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
     while(queue.length > 0){
         var node = queue.shift();
-        if(node.d >= 2) continue; // TODO: set depth in config; or depend on distance?
+        if(node.d >= MAX_DEPTH) continue; // TODO: set depth in config; or depend on distance?
         // TODO: randomize?
         for(var i = 0; i < contour.length; i++){
             var candidate = {
@@ -1019,7 +1021,10 @@ GameServer.computeBattleArea = function(f1,f2){
                 y: node.y + contour[i][1],
                 d: node.d + 1
             };
-            if(!GameServer.checkCollision(candidate.x,candidate.y) && !cells.get(candidate.x,candidate.y)){
+            if(!GameServer.checkCollision(candidate.x,candidate.y)
+                && !cells.get(candidate.x,candidate.y)
+                && !GameServer.battleCells.get(candidate.x,candidate.y)
+            ){
                 cells.add(candidate.x,candidate.y);
                 queue.push(candidate);
             }
@@ -1058,6 +1063,13 @@ GameServer.expandBattle = function(battle,f){
     GameServer.addBattleArea(area.toList(),battle);
 };
 
+GameServer.connectToBattle = function(entity,cell){
+    var battle = cell.battle;
+    var area = GameServer.computeBattleArea(entity,cell,3);
+    battle.addFighter(entity);
+    GameServer.addBattleArea(area,battle);
+};
+
 /**
  * Add a battle area to an existing Battle by calling GameServer.addBattleCell().
  * @param {Array} area - Array of battle cells coordinates.
@@ -1075,10 +1087,7 @@ GameServer.addBattleCell = function(battle,x,y){
     GameServer.battleCells.add(x,y,cell);
     battle.cells.add(x,y,cell);
 
-    GameServer.getEntitiesAt(x-1,y-1,3,3).forEach(function(e){
-        if(e.canFight() && e.isAvailableForFight()) GameServer.expandBattle(cell.battle,e);
-    });
-    /*GameServer.positions.get(x,y).forEach(function(e){
+    /*GameServer.getEntitiesAt(x-1,y-1,3,3).forEach(function(e){
         if(e.canFight() && e.isAvailableForFight()) GameServer.expandBattle(cell.battle,e);
     });*/
 };
@@ -1088,6 +1097,30 @@ GameServer.removeBattleCell = function(battle,x,y){
     GameServer.removeEntity(cell);
     GameServer.battleCells.delete(x,y);
     // No need to remove from battle.cells, since the battle object will disappear soon
+};
+
+GameServer.addSurroundingFighters = function(battle){
+    var center = {
+        x: 0,
+        y: 0
+    };
+    battle.fighters.forEach(function(f){
+        center.x += f.x;
+        center.y += f.y;
+    });
+    center.x = Math.floor(center.x/battle.fighters.length);
+    center.y = Math.floor(center.y/battle.fighters.length);
+    center = GameServer.battleCells.get(center.x,center.y);
+
+    var r = GameServer.battleParameters.aggroRange;
+    // console.warn(Math.floor(center.x-r/2),Math.floor(center.y-r/2),r,r);
+    // implies Chebyshev distance
+    var neighbors = GameServer.getEntitiesAt(Math.floor(center.x-r/2),Math.floor(center.y-r/2),r,r);
+    for(var i = 0; i < neighbors.length; i++){
+        var entity = neighbors[i];
+        // console.warn(entity.getShortID());
+        if(entity.canFight() && entity.isAvailableForFight()) GameServer.connectToBattle(entity,center);
+    }
 };
 
 GameServer.handleBattleAction = function(data,socketID){
@@ -1631,15 +1664,20 @@ GameServer.checkForTracking = function(player){
 };
 
 GameServer.checkForAggro = function(){
-    Object.keys(GameServer.animals).forEach(function(key) {
+    /*Object.keys(GameServer.animals).forEach(function(key) {
         GameServer.animals[key].checkForAggro();
     });
     Object.keys(GameServer.civs).forEach(function(key) {
         GameServer.civs[key].checkForAggro();
-    });
+    });*/
+    for(var id in GameServer.animals){
+        GameServer.animals[id].checkForAggro();
+    }
+    for(var id in GameServer.civs){
+        GameServer.civs[id].checkForAggro();
+    }
     for(var id in GameServer.buildings){
-        var bld = GameServer.buildings[id];
-        bld.checkForAggro();
+        GameServer.buildings[id].checkForAggro();
     }
 };
 

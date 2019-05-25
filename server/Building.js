@@ -103,7 +103,13 @@ function Building(data){
     this.stats['def'].setBaseValue(20);
     this.stats['acc'].setBaseValue(1000);
     this.stats['dmg'].setBaseValue(buildingData.dmg || 0);
-    this.productivity = 100;
+
+    this.aggroMatrix = {
+        'Player': false,
+        'Animal': false,
+        'Civ': true,
+        'PlayerBuilding': true
+    };
 }
 
 Building.prototype = Object.create(GameObject.prototype);
@@ -129,17 +135,27 @@ Building.prototype.isAggressive = function(){
     return this.aggro;
 };
 
+Building.prototype.aggroAgainst = function(f){
+    return this.aggroMatrix[f.entityCategory];
+};
+
+
 Building.prototype.checkForAggro = function(){
     if(!this.isInVision()) return;
     if(!this.isAggressive() || this.isInFight() || !this.isAvailableForFight()) return;
+    // console.warn('Tower checking for aggro');
 
     var r = GameServer.battleParameters.aggroRange;
     // implies Chebyshev distance
+    // console.warn(Math.floor(this.x-r/2),Math.floor(this.y-r/2),r,r);
     var neighbors = GameServer.getEntitiesAt(Math.floor(this.x-r/2),Math.floor(this.y-r/2),r,r);
     for(var i = 0; i < neighbors.length; i++){
         var entity = neighbors[i];
-        if(entity.entityCategory != 'Cell') continue;
-        console.log('Spotted battle',entity.battle.id);
+        if(!this.aggroAgainst(entity)) continue;
+        if(!entity.isAvailableForFight()) continue;
+        if(entity.instance != this.instance) continue;
+        if(entity.isInFight()) continue;
+        GameServer.handleBattle(this, entity);
         break;
     }
 };

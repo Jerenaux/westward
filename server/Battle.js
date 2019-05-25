@@ -474,22 +474,15 @@ function BattleCell(x,y,battle){
     this.id = GameServer.lastCellID++;
     this.x = x;
     this.y = y;
+    this.w = 1; // for quad tree
+    this.h = 1;
     this.battle = battle;
+    this.onAddAtLocation();
     this.setOrUpdateAOI();
 }
 
 BattleCell.prototype = Object.create(GameObject.prototype);
 BattleCell.prototype.constructor = BattleCell;
-
-BattleCell.prototype.countNeighbors = function(){
-    var nb = 0;
-    for(var x = this.x - 1; x <= this.x + 1; x++){
-        for(var y = this.y - 1; y <= this.y + 1; y++){
-            if(GameServer.battleCells.get(x,y)) nb++;
-        }
-    }
-    return nb;
-};
 
 BattleCell.prototype.getRect = function(){
     return {
@@ -513,8 +506,28 @@ BattleCell.prototype.trim = function(){
     };
 };
 
-BattleCell.prototype.canFight = function(){return false;}
-BattleCell.prototype.isAvailableForFight = function(){return false;}
+BattleCell.prototype.getBattleAreaAround = function(cells){
+    cells = cells || new SpaceMap();
+    for(var x = this.x - 1; x <= this.x + this.w; x++){
+        for(var y = this.y - 1; y <= this.y + this.h; y++) {
+            if(!GameServer.checkCollision(x,y)) cells.add(x,y);
+        }
+    }
+    return cells;
+};
 
+BattleCell.prototype.getCenter = function(){
+    return {
+        x: this.x,
+        y: this.y
+    };
+};
+
+BattleCell.prototype.remove = function(){
+    this.onRemoveFromLocation();
+};
+
+BattleCell.prototype.canFight = function(){return false;};
+BattleCell.prototype.isAvailableForFight = function(){return false;};
 
 module.exports.BattleCell = BattleCell;
