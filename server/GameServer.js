@@ -379,6 +379,9 @@ GameServer.onInitialized = function(){
     console.log('---done---');
 };
 
+/**
+ * Perform tasks each time a player joins the game. Mostly used for testing.
+ */
 GameServer.onNewPlayer = function(player){
     if(!config.get('misc.performInit')) return;
 };
@@ -1063,6 +1066,15 @@ GameServer.expandBattle = function(battle,f){
     GameServer.addBattleArea(area.toList(),battle);
 };
 
+
+/**
+ * When an entity is in the vicinity of a battle area, it is sucked
+ * into the battle and the battle area expans to incorporate it.
+ * This is done by computing a new battle area between the entity and
+ * one cell of the battle (e.g. the center cell)
+ * @param {GameObject} entity - The entity to incorporate in the battle.
+ * @param {BattleCell }cell - The battle cell towards which to compute a new battle area.
+ */
 GameServer.connectToBattle = function(entity,cell){
     var battle = cell.battle;
     var area = GameServer.computeBattleArea(entity,cell,3);
@@ -1081,24 +1093,40 @@ GameServer.addBattleArea = function(area,battle){ // area should be a list
     },this);
 };
 
+
+/**
+ * Add a Battle Cell to the game by adding it to all the relevant
+ * data structures. Called by `addBattleArea()` when new battle areas
+ * are computed.
+ * @param {Battle} battle - Battle instance to which the cell belongs.
+ * @param {number} x - x coordinate of the cell in the world.
+ * @param {number} y - y coordinate of the cell in the world.
+ */
 GameServer.addBattleCell = function(battle,x,y){
     if(GameServer.battleCells.get(x,y)) return;
     var cell = new BattleCell(x,y,battle);
     GameServer.battleCells.add(x,y,cell);
     battle.cells.add(x,y,cell);
-
-    /*GameServer.getEntitiesAt(x-1,y-1,3,3).forEach(function(e){
-        if(e.canFight() && e.isAvailableForFight()) GameServer.expandBattle(cell.battle,e);
-    });*/
 };
 
-GameServer.removeBattleCell = function(battle,x,y){
-    var cell = battle.cells.get(x,y);
+/**
+ * Remove a Battle Cell from the world. Called by
+ * `Battle.cleanUp()` when a battle ends.
+ * @param {BattleCell} cell - The BattleCell instance to remove.
+ */
+GameServer.removeBattleCell = function(cell){
+    GameServer.battleCells.delete(cell.x,cell.y);
     GameServer.removeEntity(cell);
-    GameServer.battleCells.delete(x,y);
-    // No need to remove from battle.cells, since the battle object will disappear soon
+    // No need to remove from battle.cells, since the battle object will be garbage collected
 };
 
+/**
+ * When a battle starts, identify its center and find all entities
+ * withn a certain distance of it. The found entities will be included
+ * into the fight if they meet the requirements. Called by
+ * `GameServer.handleBattle()`.
+ * @param {Battle} battle - The Battle instance in which to include surrounding entities.
+ */
 GameServer.addSurroundingFighters = function(battle){
     var center = {
         x: 0,
@@ -1123,11 +1151,26 @@ GameServer.addSurroundingFighters = function(battle){
     }
 };
 
+/**
+ * Relay a battle action sent by a player (attack, use item...)
+ * to the relevant Battle instance.
+ * @param data - Data packet sent by player indicating which action was taken.
+ * @param {String} socketID - ID of the socket of the player.
+ */
 GameServer.handleBattleAction = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     player.battle.processAction(player,data);
 };
 
+/**
+ * Query the QuadTree to find all the entities within a specific rectangular area
+ * in the game world.
+ * @param {number} x - x coordinate of the top-left corner of the area.
+ * @param {number} y - y coordinate of the top-left corner of the area.
+ * @param {number} w - width of the area.
+ * @param {number} h - height of the area.
+ * @returns {Array} - List of entities found.
+ */
 GameServer.getEntitiesAt = function(x,y,w,h){
     return GameServer.qt.get({x:x, y:y, w: w, h: h});
 };

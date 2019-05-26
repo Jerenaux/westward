@@ -463,20 +463,10 @@ Battle.prototype.end = function(){
     console.log('[B'+this.id+'] Ended');
 };
 
-/*Battle.prototype.addArea = function(area){
-    area.forEach(function(c){
-        GameServer.addBattleCell(this,c.x,c.y);
-        //this.spannedAOIs.add(Utils.tileToAOI({x:c.x,y:c.y}));
-    },this);
-
-    //GameServer.checkForFighter(this.spannedAOIs);
-};*/
-
 Battle.prototype.cleanUp = function(){
-    var _battle = this;
-    this.cells.toList().forEach(function(cell){
-        GameServer.removeBattleCell(_battle,cell.x,cell.y);
-    });
+    this.getCells().forEach(function(cell){
+        GameServer.removeBattleCell(cell.v);
+    },this);
 };
 
 Battle.prototype.getCells = function(){
