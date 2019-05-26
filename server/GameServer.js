@@ -578,7 +578,7 @@ GameServer.addNewPlayer = function(socket,data){
  * @param document - The mongoose document representing the player to save.
  */
 GameServer.saveNewPlayerToDb = function(socket,player,document){
-    if(!socket) return;
+    if(!socket || socket.dummy == true) return;
     document.save(function (err,doc) {
         if (err) return console.error(err);
         console.log('New player created');

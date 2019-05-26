@@ -24,10 +24,6 @@ describe('test', function(){
         methodB.restore();
         sinon.assert.calledWith(methodB, input);
     });
-
-    /*it('mock-test',function() {
-
-    });*/
 });
 
 describe('GameServer',function(){
@@ -59,10 +55,9 @@ describe('GameServer',function(){
         });
 
         var name = 'Test';
-        var dummySocket = {id:'socket123'};
+        var dummySocket = {id:'socket123',dummy: true};
         player = gs.addNewPlayer(dummySocket,{characterName:name});
         player.setIDs('',dummySocket.id);
-        // gs.finalizePlayer(dummySocket,player);
         player.spawn(20,20);
         expect(gs.getPlayer(dummySocket.id).id).to.equal(player.id);
         expect(player.socketID).to.equal(dummySocket.id);
@@ -205,22 +200,38 @@ describe('GameServer',function(){
         expect(building.getGold()).to.equal(buildingGoldBefore);
     });
 
-    /*it('handleShop_nonowner', function(){
-        // TODO: expand test cases
-        var buyID = 15;
-        building.giveItem(buyID,1);
+    it('handleShop_nonowner', function(){
+        player.inventory.clear();
+        building.inventory.clear();
+        building.owner = -1;
+        var ownedID = 1;
+        var storedID = 2;
+        var buyPrice = 10;
+        var sellPrice = 15;
+        building.giveItem(storedID,1);
+        player.giveItem(ownedID,1);
+        building.setPrices(storedID,0,sellPrice);
+        building.setPrices(ownedID,buyPrice,0);
+        var playerGoldBefore = player.getGold();
+        var buildingGoldBefore = building.getGold();
         var testCases = [
-            {in: {action:'buy',id:10,nb:1},out:false},
-            {in: {action:'sell',id:10,nb:1},out:false},
-            {in: {action:'buy',id:buyID,nb:1},out:true},
+            {in: {action:'buy',id:storedID,nb:1},out:true},
+            {in: {action:'sell',id:ownedID,nb:1},out:true},
         ];
         testCases.forEach(function(testcase){
             var result = gs.handleShop(testcase.in,player.socketID);
             expect(result).to.equal(testcase.out);
         });
-    });*/
+        expect(player.getItemNb(storedID)).to.equal(1);
+        expect(player.getItemNb(ownedID)).to.equal(0);
+        expect(building.getItemNb(storedID)).to.equal(0);
+        expect(building.getItemNb(ownedID)).to.equal(1);
+        expect(player.getGold()).to.equal(playerGoldBefore-sellPrice+buyPrice);
+        expect(building.getGold()).to.equal(buildingGoldBefore-buyPrice+sellPrice);
+    });
 
     it('handleUse_equip', function(){
+        player.inventory.clear();
         var type = 28; // stone hatchet
         var typeNotOwned = 2; // bow
         var slot = gs.itemsData[type].equipment;
@@ -236,11 +247,23 @@ describe('GameServer',function(){
 
     // TODO: expand test cases + test results with gs methods for all tests
 
-    /*it('handleGold', function(){
-        var result = gs.handleUse({nb:10},player.socketID);
-        expect(result).to.equal(true);
-        result = gs.handleUse({nb:-10},player.socketID);
-        expect(result).to.equal(true);
+    it('handleGold_owner', function(){
+        building.owner = player.id;
+        player.gold = 150;
+        var playerGoldBefore = player.getGold();
+        var buildingGoldBefore = building.getGold();
+        var giveAmount = 10;
+        var takeAmount = -5;
+        gs.handleGold({nb:giveAmount},player.socketID);
+        expect(player.getGold()).to.equal(playerGoldBefore - giveAmount);
+        expect(building.getGold()).to.equal(buildingGoldBefore + giveAmount);
+        gs.handleGold({nb:takeAmount},player.socketID);
+        expect(player.getGold()).to.equal(playerGoldBefore - giveAmount - takeAmount);
+        expect(building.getGold()).to.equal(buildingGoldBefore + giveAmount + takeAmount);
+    });
+
+   /* it('handleGold_nonowner', function(){
+           building.owner = -1;
     });*/
 
     afterEach(function(){
