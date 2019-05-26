@@ -49,10 +49,10 @@ Misc:
 - Prevent items spawning on top of buildings
 - Test respawn
 - Prevent 0HP after respawn
-- Use QT for tower aggro
 - Tower freeze?
 - Restore arrow anim
-- Test aggro tower on animals
+- Bug if spawn in an ongoing fight (test with tower vs animal)
+- Tower included twice in fight?
 
 - Ask for free Creature license
 

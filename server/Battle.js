@@ -82,13 +82,27 @@ Battle.prototype.removeFromPosition = function(f){
 Battle.prototype.addFighter = function(f){
     //console.warn('Adding fighter ',f.getShortID());
     this.fighters.push(f);
+    this.updateOrder();
     //if(f.isMovingEntity) this.checkConflict(f);
     this.updateTeams(f.battleTeam,1);
     f.xpPool = 0; // running total of XP that the fighter will receive at the end of the fight
     f.inFight = true;
     if(f.isMovingEntity) f.stopWalk();
-    if(f.isPlayer) f.notifyFight(true);
     f.battle = this;
+    if(f.isPlayer) f.notifyFight(true);
+};
+
+Battle.prototype.updateOrder = function(){
+    var order = this.getFightersOrder();
+    this.fighters.forEach(function(f){
+        if(f.isPlayer) f.setOwnProperty('fightersOrder',order);
+    })
+};
+
+Battle.prototype.getFightersOrder = function(){
+    return this.fighters.map(function(f){
+        return f.getShortID();
+    });
 };
 
 Battle.prototype.removeFighter = function(f){
@@ -98,6 +112,7 @@ Battle.prototype.removeFighter = function(f){
     f.endFight(false); // false for not alive
     f.die();
     this.fighters.splice(idx,1);
+    this.updateOrder();
     //if(f.isPlayer) this.removeFromPosition(f); // if NPC, leave busy for his body
     if(isTurnOf) this.setEndOfTurn(0);
     if(f.isPlayer) f.notifyFight(false);
@@ -124,14 +139,17 @@ Battle.prototype.reset = function(){
 Battle.prototype.newTurn = function(){
     if(this.ended) return;
     this.fighters.push(this.fighters.shift());
+    this.updateOrder();
     this.reset();
     console.log('[B'+this.id+'] New turn');
 
     var activeFighter = this.getActiveFighter();
     this.fighters.forEach(function(f){
         if(f.isPlayer) {
-            f.updatePacket.remainingTime = this.countdown/1000;
-            f.updatePacket.activeID = activeFighter.getShortID();
+            /*f.updatePacket.remainingTime = this.countdown/1000;
+            f.updatePacket.activeID = activeFighter.getShortID();*/
+            f.setOwnProperty('remainingTime',this.countdown/1000);
+            f.setOwnProperty('activeID',activeFighter.getShortID());
         }
     },this);
 

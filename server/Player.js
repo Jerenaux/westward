@@ -729,7 +729,8 @@ Player.prototype.isInside = function(buildingID){
 };
 
 Player.prototype.notifyFight = function(flag){
-    this.updatePacket.fightNotification(flag);
+    // this.updatePacket.fightNotification(flag);
+    this.setOwnProperty('fighStatus',flag);
 };
 
 Player.prototype.addMsg = function(msg){

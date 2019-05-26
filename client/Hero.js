@@ -83,9 +83,21 @@ var Hero = new Phaser.Class({
             Engine.updateMenus(e);
         }, this);
 
-        if(data.fightStatus !== undefined) BattleManager.handleFightStatus(data.fightStatus);
+        var battleCallbacks = {
+            'activeID': BattleManager.manageTurn,
+            'fightStatus': BattleManager.handleFightStatus,
+            'remainingTime': BattleManager.setCounter
+        };
+
+        for(var field in battleCallbacks){
+            if(!battleCallbacks.hasOwnProperty(field)) continue;
+            if(field in data) battleCallbacks[field].call(this,data[field]);
+        }
+
+        /*if(data.fightStatus !== undefined) BattleManager.handleFightStatus(data.fightStatus);
         if(data.remainingTime) BattleManager.setCounter(data.remainingTime);
-        if(data.activeID) BattleManager.manageTurn(data.activeID);
+        if(data.activeID) BattleManager.manageTurn(data.activeID);*/
+
         if(data.x >= 0 && data.y >= 0) this.teleport(data.x,data.y);
        
         Engine.updateAllOrientationPins(); 

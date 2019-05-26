@@ -66,26 +66,26 @@ BattleManager.manageTurn = function(shortID){
     var timer = timerPanel.bar;
     if(!timerPanel.displayed) timerPanel.display();
 
-    if(this.active) this.active.isActiveFighter = false;
+    if(BattleManager.activeFighter) BattleManager.activeFighter.isActiveFighter = false;
 
-    this.active = BattleManager.getActiveFighter(shortID,false);
+    BattleManager.activeFighter = BattleManager.getActiveFighter(shortID,false);
 
-    if(!this.active) {
+    if(!BattleManager.activeFighter) {
         console.warn('shortID = ',shortID,', 0th = ',shortID[0]);
         BattleManager.getActiveFighter(shortID,true);
     }
 
-    BattleManager.isPlayerTurn = this.active.isHero;
+    BattleManager.isPlayerTurn = BattleManager.activeFighter.isHero;
     if(!BattleManager.isPlayerTurn) UI.manageCursor(0,'sticky'); // remove any sticky
     BattleManager.actionTaken = false;
-    this.active.isActiveFighter = true;
+    BattleManager.activeFighter.isActiveFighter = true;
     Engine.updateGrid();
 
-    timerPanel.updateText(this.active.name,this.active.isHero);
+    timerPanel.updateText(BattleManager.activeFighter.name,BattleManager.activeFighter.isHero);
     timer.reset();
     timer.setLevel(0,100,BattleManager.countdown*1000);
 
-    //if(this.active.isHero) BattleManager.onOwnTurn();
+    //if(BattleManager.activeFighter.isHero) BattleManager.onOwnTurn();
 };
 
 BattleManager.onEndOfMovement = function(){
@@ -139,10 +139,10 @@ BattleManager.processInventoryClick = function(){
 };
 
 BattleManager.isActiveCell = function(cell){
-    if(!this.active) return false;
-    //console.log(this.active.getOccupiedCells());
-    //return this.active.getOccupiedCells(true).includes(cell.hash());
-    return Engine.getOccupiedCells(this.active,true).includes(cell.hash());
+    if(!BattleManager.activeFighter) return false;
+    //console.log(BattleManager.activeFighter.getOccupiedCells());
+    //return BattleManager.activeFighter.getOccupiedCells(true).includes(cell.hash());
+    return Engine.getOccupiedCells(BattleManager.activeFighter,true).includes(cell.hash());
 };
 
 BattleManager.onDeath = function(){
