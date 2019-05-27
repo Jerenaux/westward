@@ -54,6 +54,7 @@ Misc:
 - Bug if spawn in an ongoing fight (test with tower vs animal)
 - Tower included twice in fight?
 - Test battle cleanup
+- Test that lumber camps don't start with stock
 
 - Ask for free Creature license
 
@@ -171,6 +172,7 @@ Secure
 Analytics:
 ---------
 - Log: /
+- Add owner names to building events
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions
