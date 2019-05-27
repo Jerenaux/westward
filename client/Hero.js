@@ -17,6 +17,11 @@ var Hero = new Phaser.Class({
 
         this.buildRecipes = new Inventory(7);
         this.craftRecipes = new Inventory(100);
+
+        this.battleBoxData = {
+            'atlas':'orientation',
+            'frame':'animal_icon'
+        }
     },
 
     setUp: function(data){
@@ -85,6 +90,7 @@ var Hero = new Phaser.Class({
 
         var battleCallbacks = {
             'activeID': BattleManager.manageTurn,
+            'fightersOrder': BattleManager.updateFightersOrder,
             'fightStatus': BattleManager.handleFightStatus,
             'remainingTime': BattleManager.setCounter
         };

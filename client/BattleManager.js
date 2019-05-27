@@ -5,6 +5,7 @@
 var BattleManager = {
     inBattle: false,
     countdown: -1,
+    orderBoxes: [],
     actionTaken: false,
     isPlayerTurn: false
 };
@@ -39,7 +40,7 @@ BattleManager.setCounter = function(seconds){
     BattleManager.countdown = seconds;
 };
 
-BattleManager.getActiveFighter = function(id,debug){
+BattleManager.getFighter = function(id,debug){
     var map;
     switch(id[0]){
         case 'P':
@@ -68,11 +69,11 @@ BattleManager.manageTurn = function(shortID){
 
     if(BattleManager.activeFighter) BattleManager.activeFighter.isActiveFighter = false;
 
-    BattleManager.activeFighter = BattleManager.getActiveFighter(shortID,false);
+    BattleManager.activeFighter = BattleManager.getFighter(shortID,false);
 
     if(!BattleManager.activeFighter) {
         console.warn('shortID = ',shortID,', 0th = ',shortID[0]);
-        BattleManager.getActiveFighter(shortID,true);
+        BattleManager.getFighter(shortID,true);
     }
 
     BattleManager.isPlayerTurn = BattleManager.activeFighter.isHero;
@@ -164,6 +165,24 @@ BattleManager.endFight = function(){
         Engine.displayUI();
         Engine.showMarker();
     }*/
+};
+
+BattleManager.updateFightersOrder = function(order){
+    BattleManager.orderBoxes.forEach(function(b){
+        b.destroy();
+    });
+    BattleManager.orderBoxes = []; // TODO: make pool instead
+    order.forEach(function(fid,i){
+        var square = UI.scene.add.renderTexture(341-(i*36),0,38,38);
+        square.drawFrame('UI','equipment-slot',0,0);
+        var f = BattleManager.getFighter(fid);
+        if(f.isHero){
+            square.drawFrame('faces',0,4,4);
+        }else{
+            square.drawFrame(f.battleBoxData.atlas,f.battleBoxData.frame,4,4);
+        }
+        square.setScrollFactor(0).setOrigin(0);
+    });
 };
 
 // #######################

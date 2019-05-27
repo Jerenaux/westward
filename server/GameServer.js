@@ -948,6 +948,7 @@ GameServer.destroyItem = function(item,nb,source){
  * @param {Player|NPC} attacked - The other entity starting the battle.
  */
 GameServer.handleBattle = function(attacker,attacked){
+    console.warn(attacker.getShortID(),'vs',attacked.getShortID());
     if(!GameServer.enableBattles){
         if(attacker.isPlayer) attacker.addMsg('Battles are disabled at the moment');
         return false;

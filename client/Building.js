@@ -63,6 +63,11 @@ var Building = new Phaser.Class({
             },this);
         }
 
+        this.battleBoxData = {
+            'atlas':'aok',
+            'frame': buildingData.icon
+        };
+
         if(Engine.debugCollisions) this.setAlpha(0.1);
 
         if(Engine.player.inBuilding == this.id) Engine.enterBuilding(this.id);

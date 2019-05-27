@@ -52,7 +52,6 @@ Misc:
 - Tower freeze?
 - Restore arrow anim
 - Bug if spawn in an ongoing fight (test with tower vs animal)
-- Tower included twice in fight?
 - Test battle cleanup
 - Test that lumber camps don't start with stock
 

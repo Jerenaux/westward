@@ -62,6 +62,7 @@ NPC.prototype.checkForAggro = function(){
     var neighbors = GameServer.getEntitiesAt(Math.floor(this.x-r/2),Math.floor(this.y-r/2),r,r);
     for(var i = 0; i < neighbors.length; i++){
         var entity = neighbors[i];
+        if(this.getShortID() == entity.getShortID()) continue;
         if(!this.aggroAgainst(entity)) continue;
         if(!entity.isAvailableForFight()) continue;
         if(entity.instance != this.instance) continue;
