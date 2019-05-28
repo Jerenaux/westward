@@ -82,7 +82,7 @@ Battle.prototype.removeFromPosition = function(f){
 Battle.prototype.addFighter = function(f){
     //console.warn('Adding fighter ',f.getShortID());
     this.fighters.push(f);
-    this.updateOrder();
+    this.updateTimeline();
     //if(f.isMovingEntity) this.checkConflict(f);
     this.updateTeams(f.battleTeam,1);
     f.xpPool = 0; // running total of XP that the fighter will receive at the end of the fight
@@ -92,11 +92,24 @@ Battle.prototype.addFighter = function(f){
     if(f.isPlayer) f.notifyFight(true);
 };
 
-Battle.prototype.updateOrder = function(){
+Battle.prototype.updateTimeline = function(){
     var order = this.getFightersOrder();
+    var activeFighter = this.getActiveFighter();
+
+    var data = {
+        'order': order,
+        'active': activeFighter,
+        'countdown': this.countdown/1000
+    }
+
     this.fighters.forEach(function(f){
-        if(f.isPlayer) f.setOwnProperty('fightersOrder',order);
-    })
+        if(f.isPlayer){
+            // f.setOwnProperty('fightersOrder',order);
+            // f.setOwnProperty('remainingTime',this.countdown/1000);
+            // f.setOwnProperty('activeID',activeFighter.getShortID());
+            f.setOwnProperty('battleData',data);
+        }
+    },this);
 };
 
 Battle.prototype.getFightersOrder = function(){
@@ -112,7 +125,7 @@ Battle.prototype.removeFighter = function(f){
     f.endFight(false); // false for not alive
     f.die();
     this.fighters.splice(idx,1);
-    this.updateOrder();
+    this.updateTimeline();
     //if(f.isPlayer) this.removeFromPosition(f); // if NPC, leave busy for his body
     if(isTurnOf) this.setEndOfTurn(0);
     if(f.isPlayer) f.notifyFight(false);
@@ -139,19 +152,18 @@ Battle.prototype.reset = function(){
 Battle.prototype.newTurn = function(){
     if(this.ended) return;
     this.fighters.push(this.fighters.shift());
-    this.updateOrder();
+    this.updateTimeline();
     this.reset();
     console.log('[B'+this.id+'] New turn');
 
     var activeFighter = this.getActiveFighter();
-    this.fighters.forEach(function(f){
-        if(f.isPlayer) {
-            /*f.updatePacket.remainingTime = this.countdown/1000;
-            f.updatePacket.activeID = activeFighter.getShortID();*/
-            f.setOwnProperty('remainingTime',this.countdown/1000);
-            f.setOwnProperty('activeID',activeFighter.getShortID());
-        }
-    },this);
+    // this.fighters.forEach(function(f){
+    //     if(f.isPlayer) {
+    //         f.setOwnProperty('remainingTime',this.countdown/1000);
+    //         f.setOwnProperty('activeID',activeFighter.getShortID());
+    //     }
+    // },this);
+    this.fighters.forEach(this.updateTimeline,this);
 
     if(activeFighter.skipBattleTurn){
         this.newTurn();

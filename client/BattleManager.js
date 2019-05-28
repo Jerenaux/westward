@@ -1,3 +1,5 @@
+import { Battle } from "../server/Battle";
+
 /**
  * Created by jeren on 23-01-18.
  */
@@ -21,23 +23,13 @@ BattleManager.handleFightStatus = function(status){
 BattleManager.startFight = function(){
     BattleManager.inBattle = true;
     if(Engine.currentMenu) Engine.currentMenu.hide();
-    //Engine.hideHUD();
-    //Engine.hideMarker();
+
     Engine.tweenFighText();
     Engine.updateGrid();
     Engine.menus.battle.display();
     Engine.menus.battle.panels.timer.hide();
 
-    /*if(Client.isFirstBattle()){
-        console.log('first battle');
-        Client.hadFirstBattle();
-    }*/
-
     //BattleManager.onFightStart();
-};
-
-BattleManager.setCounter = function(seconds){
-    BattleManager.countdown = seconds;
 };
 
 BattleManager.getFighter = function(id,debug){
@@ -60,7 +52,7 @@ BattleManager.getFighter = function(id,debug){
     return map[id.slice(1)];
 };
 
-BattleManager.manageTurn = function(shortID){
+BattleManager.updateBattle = function(battleData){
     if(!BattleManager.inBattle) return;
 
     var timerPanel = Engine.currentMenu.panels['timer'];
@@ -69,12 +61,7 @@ BattleManager.manageTurn = function(shortID){
 
     if(BattleManager.activeFighter) BattleManager.activeFighter.isActiveFighter = false;
 
-    BattleManager.activeFighter = BattleManager.getFighter(shortID,false);
-
-    if(!BattleManager.activeFighter) {
-        console.warn('shortID = ',shortID,', 0th = ',shortID[0]);
-        BattleManager.getFighter(shortID,true);
-    }
+    BattleManager.activeFighter = BattleManager.getFighter(battleData.active,false); // false = no debug
 
     BattleManager.isPlayerTurn = BattleManager.activeFighter.isHero;
     if(!BattleManager.isPlayerTurn) UI.manageCursor(0,'sticky'); // remove any sticky
@@ -84,9 +71,30 @@ BattleManager.manageTurn = function(shortID){
 
     timerPanel.updateText(BattleManager.activeFighter.name,BattleManager.activeFighter.isHero);
     timer.reset();
-    timer.setLevel(0,100,BattleManager.countdown*1000);
+    timer.setLevel(0,100,battleData.countdown*1000);
+
+    BattleManager.updateFightersOrder(battleData.order);
 
     //if(BattleManager.activeFighter.isHero) BattleManager.onOwnTurn();
+};
+
+BattleManager.updateFightersOrder = function(order){
+    BattleManager.orderBoxes.forEach(function(b){
+        b.destroy();
+    });
+    BattleManager.orderBoxes = []; // TODO: make pool instead
+    order.forEach(function(fid,i){
+        var x = i > 0 ? 341-(i*36) : 680;
+        var square = UI.scene.add.renderTexture(x,0,38,38);
+        square.drawFrame('UI','equipment-slot',0,0);
+        var f = BattleManager.getFighter(fid);
+        if(f.isHero){
+            square.drawFrame('faces',0,4,4);
+        }else{
+            square.drawFrame(f.battleBoxData.atlas,f.battleBoxData.frame,4,4);
+        }
+        square.setScrollFactor(0).setOrigin(0);
+    });
 };
 
 BattleManager.onEndOfMovement = function(){
@@ -167,23 +175,7 @@ BattleManager.endFight = function(){
     }*/
 };
 
-BattleManager.updateFightersOrder = function(order){
-    BattleManager.orderBoxes.forEach(function(b){
-        b.destroy();
-    });
-    BattleManager.orderBoxes = []; // TODO: make pool instead
-    order.forEach(function(fid,i){
-        var square = UI.scene.add.renderTexture(341-(i*36),0,38,38);
-        square.drawFrame('UI','equipment-slot',0,0);
-        var f = BattleManager.getFighter(fid);
-        if(f.isHero){
-            square.drawFrame('faces',0,4,4);
-        }else{
-            square.drawFrame(f.battleBoxData.atlas,f.battleBoxData.frame,4,4);
-        }
-        square.setScrollFactor(0).setOrigin(0);
-    });
-};
+
 
 // #######################
 

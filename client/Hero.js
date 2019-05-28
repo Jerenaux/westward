@@ -89,21 +89,18 @@ var Hero = new Phaser.Class({
         }, this);
 
         var battleCallbacks = {
-            'activeID': BattleManager.manageTurn,
-            'fightersOrder': BattleManager.updateFightersOrder,
-            'fightStatus': BattleManager.handleFightStatus,
-            'remainingTime': BattleManager.setCounter
+            'battleData': BattleManager.updateBattle,
+            // 'activeID': BattleManager.manageTurn, // sent in newTurn
+            // 'fightersOrder': BattleManager.updateFightersOrder, // sent from updateOrder
+            'fightStatus': BattleManager.handleFightStatus, // sent from Battle.end, Battle.addFighter and Battle.removeFighter
+            // 'remainingTime': BattleManager.setCounter // sent in newTurn
         };
 
         for(var field in battleCallbacks){
             if(!battleCallbacks.hasOwnProperty(field)) continue;
             if(field in data) battleCallbacks[field].call(this,data[field]);
         }
-
-        /*if(data.fightStatus !== undefined) BattleManager.handleFightStatus(data.fightStatus);
-        if(data.remainingTime) BattleManager.setCounter(data.remainingTime);
-        if(data.activeID) BattleManager.manageTurn(data.activeID);*/
-
+        
         if(data.x >= 0 && data.y >= 0) this.teleport(data.x,data.y);
        
         Engine.updateAllOrientationPins(); 

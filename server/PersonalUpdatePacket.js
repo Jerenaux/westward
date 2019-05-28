@@ -68,8 +68,4 @@ PersonalUpdatePacket.prototype.addNotif = function(msg){
     this.notifs.push(msg);
 };
 
-/*PersonalUpdatePacket.prototype.fightNotification = function(flag){
-    this.fightStatus = flag;
-};*/
-
 module.exports.PersonalUpdatePacket = PersonalUpdatePacket;
