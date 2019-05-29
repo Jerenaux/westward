@@ -4,6 +4,7 @@
 
 function PersonalUpdatePacket(){
     this.items = [];
+    this.belt = [];
     this.stats = [];
     this.equipment = [];
     this.ammo = [];
@@ -40,6 +41,10 @@ PersonalUpdatePacket.prototype.updatePosition = function(x,y) {
 
 PersonalUpdatePacket.prototype.addItem = function(item,nb){
     this.items.push([item,nb]);
+};
+
+PersonalUpdatePacket.prototype.addBelt = function(item,nb){
+    this.belt.push([item,nb]);
 };
 
 PersonalUpdatePacket.prototype.addStat = function(stat){

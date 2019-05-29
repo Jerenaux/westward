@@ -33,6 +33,7 @@ var Hero = new Phaser.Class({
         this.resourceMarkers = data.resourceMarkers || [];
         this.FoW = [];
         this.inventory = new Inventory();
+        this.belt = new Inventory(3); //TODO: conf
         this.stats = new StatsContainer();
         this.equipment = new EquipmentManager();
 
@@ -60,6 +61,7 @@ var Hero = new Phaser.Class({
         var callbacks = {
             'ammo': this.updateAmmo,
             'ap': this.updateAP,
+            'belt': this.updateBelt,
             'bldRecipes': this.updateBuildRecipes,
             'buildingMarkers': this.updateMarkers,
             'civiclvl': this.updateCivicLvl,
@@ -207,6 +209,19 @@ var Hero = new Phaser.Class({
         this.updateEvents.add('character');
         this.updateEvents.add('citizen');
         //TODO: add sound effect
+    },
+
+    updateBelt: function(items){
+        this.belt.updateItems(items);
+        this.updateEvents.add('belt');
+        // if(Client.tutorial) TutorialManager.checkHook();
+
+        if(!Engine.firstSelfUpdate) {
+            items.forEach(function (item) {
+                var sound = Engine.itemsData[item[0]].sound;
+                if(sound) Engine.scene.sound.add(sound).play();
+            });
+        }
     },
 
     updateBuildRecipes: function(bldRecipes){

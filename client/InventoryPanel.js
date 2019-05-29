@@ -57,6 +57,7 @@ InventoryPanel.prototype.getNextSlot = function(){
 
 InventoryPanel.prototype.addSlots = function(){
     var padx = Math.floor((this.width - this.config.maxwidth*36)/2);
+    if(padx < 0) console.warn('Width in slots bigger than width in px');
     var pady = 30;
     for(var i = 0; i < this.getInventory().maxSize; i++){
         var slot = this.getNextSlot();
@@ -75,6 +76,7 @@ InventoryPanel.prototype.positionSlot = function(slot,row,col,paddingX,paddingY)
     var offsety = (row > 0 ? 2 : 0);
     var x = paddingX+offsetx+(col*slotSize);
     var y = paddingY+offsety+(row*slotSize);
+    // console.warn(this.name,this.x,paddingX,row,col,x);
     slot.setPosition(this.x+x,this.y+y);
 };
 
@@ -122,8 +124,10 @@ InventoryPanel.prototype.hasSoftFilter = function(){
 };
 
 InventoryPanel.prototype.getInventory = function(){
-    if(this.inventory == 'player'){
+    if(this.inventory == 'player') {
         return Engine.player.inventory;
+    }else if(this.inventory == 'belt'){
+        return Engine.player.belt;
     }else if(this.inventory == 'building'){
         return (Engine.currentBuiling ? Engine.currentBuiling.inventory : new Inventory(5));
     }else if(this.inventory == 'buildRecipes'){
@@ -144,11 +148,13 @@ InventoryPanel.prototype.listItems = function(){
 };
 
 InventoryPanel.prototype.displayInventory = function(){
+    // console.warn('displaying ',this.name);
     this.slots.forEach(function(s){
         s.setVisible(true);
     });
     var nbDisplayed = 0;
     this.listItems().forEach(function(itm){
+        // console.warn(itm);
         var item = itm[0];
         var amount = itm[1];
         if(amount == 0) return;

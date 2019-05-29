@@ -226,6 +226,7 @@ io.on('connection',function(socket){
             'battleAction': gs.handleBattleAction,
             'buildingClick': gs.handleBuildingClick,
             'build': gs.handleBuild,
+            'belt': gs.handleBelt,
             'chat': gs.handleChat,
             'craft': gs.handleCraft,
             'exit': gs.handleExit,

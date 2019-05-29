@@ -28,6 +28,7 @@ function Player(){
     this.oldAOIs = [];
     this.action = null;
     this.inventory = new Inventory();
+    this.belt = new Inventory(3); //TODO: conf
     this.sid = 0;
     this.settlement = null;
     this.gold = 0;
@@ -349,8 +350,16 @@ Player.prototype.getItemNb = function(item){
     return this.inventory.getNb(item);
 };
 
+Player.prototype.getItemNbInBelt = function(item){
+    return this.belt.getNb(item);
+};
+
 Player.prototype.hasItem = function(item,nb){
     return (this.inventory.getNb(item) >= nb);
+};
+
+Player.prototype.hasItemInBelt = function(item){
+    return (this.belt.getNb(item) >= 0);
 };
 
 Player.prototype.giveItem = function(item,nb,notify,verb){
@@ -374,6 +383,16 @@ Player.prototype.takeItem = function(item,nb,notify,verb){
     }
 };
 
+Player.prototype.addToBelt = function(item,nb){
+    this.belt.add(item,nb);
+    this.updatePacket.addBelt(item,this.belt.getNb(item));
+};
+
+Player.prototype.takeFromBelt = function(item,nb){
+    this.belt.take(item,nb);
+    this.updatePacket.addBelt(item,this.belt.getNb(item));
+};
+
 Player.prototype.isEquipped = function(slot){
     return this.equipment.get(slot) > 1;
 };
@@ -383,7 +402,7 @@ Player.prototype.getEquipped = function(slot){
 };
 
 Player.prototype.canEquip = function(slot,item){
-    if(!this.hasItem(item, 1)) return false;
+    if(!this.hasItem(item, 1) && !this.hasItemInBelt(item, 1)) return false;
     // If it's ammo, check that the proper container is equipped
     if(slot in Equipment.ammo){
         var container = this.equipment.getContainer(slot);
@@ -394,6 +413,7 @@ Player.prototype.canEquip = function(slot,item){
 
 Player.prototype.equip = function(slot,item,fromDB){
     if(!fromDB && !this.canEquip(slot,item)) return false;
+    // console.log('Equipping');
     var slotData = Equipment.getData(slot);
     var itemData = GameServer.itemsData[item];
 
@@ -418,7 +438,11 @@ Player.prototype.equip = function(slot,item,fromDB){
 
     if(!fromDB){
         this.addNotif('Equipped '+nb+' '+itemData.name+(nb > 1 ? 's' : ''));
-        this.takeItem(item, nb);
+        if(this.hasItemInBelt(item)){
+            this.takeFromBelt(item,nb);
+        }else {
+            this.takeItem(item, nb);
+        }
         this.save();
     }
     return true;
@@ -644,6 +668,10 @@ Player.prototype.getDataFromDb = function(data){
     data.inventory.forEach(function(i){
          this.giveItem(i[0],i[1]);
     },this);
+    data.belt.forEach(function(i){
+        this.addToBelt(i[0],i[1]);
+    },this);
+
     this.setRegion(data.sid);
     this.giveGold(data.gold);
     this.history = data.history;

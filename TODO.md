@@ -49,11 +49,11 @@ Misc:
 - Prevent items spawning on top of buildings
 - Test respawn
 - Prevent 0HP after respawn
-- Tower freeze?
 - Restore arrow anim
 - Bug if spawn in an ongoing fight (test with tower vs animal)
 - Test battle cleanup
 - Test that lumber camps don't start with stock
+- Add help to belt panel
 
 - Ask for free Creature license
 
@@ -170,7 +170,7 @@ Secure
 
 Analytics:
 ---------
-- Log: /
+- Log: belt
 - Add owner names to building events
 - Display market prices
 - Button to flush events

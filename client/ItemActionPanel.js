@@ -10,7 +10,8 @@ function ItemActionPanel(x,y,width,height,title){
     this.warntext = this.addText(10, 105,'',Utils.colors.lightred,12);
     this.warntext.setOrigin(0,1);
     this.icon.showTooltip = false;
-    this.button = new BigButton(this.x+50,this.y+65,'Equip',this.sendUse.bind(this));
+    this.useButton = new BigButton(this.x+50,this.y+65,'Equip',this.sendUse.bind(this));
+    this.beltButton = new BigButton(this.x+140,this.y+65,'Put in belt',this.sendBelt.bind(this));
 }
 
 ItemActionPanel.prototype = Object.create(Panel.prototype);
@@ -23,15 +24,19 @@ ItemActionPanel.prototype.setUp = function(itemID){
     this.text.setText(data.name);
     this.warntext.setVisible(false);
     if(data.effects || data.equipment){
-        this.button.setText(data.equipment ? 'Equip' : 'Use');
-        this.button.enable();
+        this.useButton.setText(data.equipment ? 'Equip' : 'Use');
+        this.useButton.enable();
         if(data.isAmmo && Engine.player.getEquipped(data.ammo) == -1){
-            this.button.disable();
+            this.useButton.disable();
             this.warntext.setText('You need a '+Equipment.getData(data.ammo).name+' to be able to equip this!');
             this.warntext.setVisible(true);
         }
+
+        var inBelt = Engine.player.belt.hasItem(itemID);
+        this.beltButton.setText(inBelt ? 'Off belt' : 'In belt');
     }else{
-        this.button.hide();
+        this.useButton.hide();
+        this.beltButton.hide();
     }
 };
 
@@ -40,11 +45,17 @@ ItemActionPanel.prototype.sendUse = function(){
     this.hide();
 };
 
+ItemActionPanel.prototype.sendBelt = function(){
+    Client.sendBelt(this.itemID);
+    this.hide();
+};
+
 ItemActionPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
     this.icon.display();
     this.text.setVisible(true);
-    this.button.display();
+    this.useButton.display();
+    this.beltButton.display();
 };
 
 ItemActionPanel.prototype.hide = function(){
@@ -52,5 +63,6 @@ ItemActionPanel.prototype.hide = function(){
     this.icon.hide();
     this.text.setVisible(false);
     this.warntext.setVisible(false);
-    this.button.hide();
+    this.useButton.hide();
+    this.beltButton.hide();
 };

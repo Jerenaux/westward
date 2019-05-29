@@ -190,6 +190,11 @@ Client.sendUse = function(id){
     Client.socket.emit('use',{item:id});
 };
 
+Client.sendBelt = function(id){
+    Client.socket.emit('belt',{item:id});
+};
+
+
 Client.sendUnequip = function(slot,subslot){
     Client.socket.emit('unequip',{slot:slot,subslot:subslot});
 };

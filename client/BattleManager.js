@@ -57,9 +57,9 @@ BattleManager.updateBattle = function(battleData){
         return;
     }
 
-    var timerPanel = Engine.currentMenu.panels['timer'];
+   /* var timerPanel = Engine.currentMenu.panels['timer'];
     var timer = timerPanel.bar;
-    if(!timerPanel.displayed) timerPanel.display();
+    if(!timerPanel.displayed) timerPanel.display();*/
 
     if(BattleManager.activeFighter) BattleManager.activeFighter.isActiveFighter = false;
 
@@ -71,9 +71,9 @@ BattleManager.updateBattle = function(battleData){
     BattleManager.activeFighter.isActiveFighter = true;
     Engine.updateGrid();
 
-    timerPanel.updateText(BattleManager.activeFighter.name,BattleManager.activeFighter.isHero);
+    /*timerPanel.updateText(BattleManager.activeFighter.name,BattleManager.activeFighter.isHero);
     timer.reset();
-    timer.setLevel(0,100,battleData.countdown*1000);
+    timer.setLevel(0,100,battleData.countdown*1000);*/
 
     BattleManager.updateFightersOrder(battleData.order,battleData.countdown*1000);
 
@@ -131,9 +131,18 @@ BattleManager.onEndOfMovement = function(){
 };
 
 BattleManager.canTakeAction = function(){
-    if(!BattleManager.inBattle) return false;
-    if(!BattleManager.isPlayerTurn) return false;
-    if(Engine.dead) return false;
+    if(!BattleManager.inBattle) {
+        console.log('Not in battle');
+        return false;
+    }
+    if(!BattleManager.isPlayerTurn){
+        console.log('Not player turn');
+        return false;
+    }
+    if(Engine.dead){
+        console.log('dead');
+        return false;
+    }
     return !BattleManager.actionTaken;
 };
 
@@ -172,7 +181,10 @@ BattleManager.processEntityClick = function(target){
 };
 
 BattleManager.processInventoryClick = function(){
-    if(!BattleManager.canTakeAction()) return;
+    if(!BattleManager.canTakeAction()) {
+        console.log('Cannot take action');
+        return;
+    }
     BattleManager.actionTaken = Engine.inventoryClick.call(this); // "this" has been bound to the clicked item
 };
 

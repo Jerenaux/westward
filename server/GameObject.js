@@ -67,6 +67,7 @@ GameObject.prototype.getModel = function() {
 GameObject.prototype.save = function(){
     if(!this.model) return;
     if(this.dblocked) return;
+    console.trace();
     if(!this.isOfInstance(-1)) return;
     this.dblocked = true;
     var _document = this;

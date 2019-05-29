@@ -753,7 +753,7 @@ Engine.makeUI = function(){
 
     Engine.makeBuildingTitle();
 
-    var statsPanel = new StatsPanel(665,335,330,145,'Stats');
+    var statsPanel = new StatsPanel(665,335,330,100,'Stats');
     statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help']);
 
     Engine.menus = {
@@ -1059,14 +1059,8 @@ Engine.makeBattleMenu = function(){
 
     var equipment = battle.addPanel('equipment',new BattleEquipmentPanel());
 
-    /*var items = battle.addPanel('items',new InventoryPanel(alignx,220,170,225,'Items'));
-    items.setInventory('player',4,true,BattleManager.processInventoryClick);
-    items.modifyFilter({
-        type: 'property',
-        property: 'useInBattle',
-        hard: true
-    });*/
-    // TODO: add belt
+    var belt = battle.addPanel('belt',new InventoryPanel(0,487,200,90,'Belt'));
+    belt.setInventory('belt',5,true,BattleManager.processInventoryClick);
 
     var timerw = 300;
     var timerh = 60;
@@ -1080,12 +1074,12 @@ Engine.makeBattleMenu = function(){
     var respawn = battle.addPanel('respawn',new RespawnPanel(timerx,respawny,timerw,respawnh),true);
     respawn.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['respawn_help']);
 
-    // battle.addEvent('onUpdateInventory',items.updateInventory.bind(items));
+    battle.addEvent('onUpdateBelt',belt.updateInventory.bind(belt));
     battle.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
     battle.addEvent('onUpdateStats',equipment.updateStats.bind(equipment));
 
     battle.addEvent('onOpen',function(){
-        // items.updateInventory();
+        belt.updateInventory();
         equipment.updateEquipment();
         equipment.updateStats();
         Engine.hideCapsules();
@@ -1516,13 +1510,16 @@ Engine.makeInventory = function(statsPanel){
     inventory.log = true;
     inventory.setSound(Engine.scene.sound.add('inventory'));
 
-    var items = inventory.addPanel('items',new InventoryPanel(40,100,600,380,'Items'));
+    var items = inventory.addPanel('items',new InventoryPanel(40,100,600,260,'Backpack'));
     items.setInventory('player',15,true,Engine.inventoryClick);
 
-    items.addCapsule('gold',100,-9,'999','gold');
+    items.addCapsule('gold',130,-9,'999','gold');
     items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help']);
 
     inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,120),true);
+
+    var belt = inventory.addPanel('belt',new InventoryPanel(40,360,600,90,'Belt'));
+    belt.setInventory('belt',15,true,Engine.inventoryClick);
 
     var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
     equipment.addButton(300, 8, 'blue','help',null,'',UI.textsData['equipment_help']);
@@ -1536,6 +1533,7 @@ Engine.makeInventory = function(statsPanel){
 
     inventory.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
     inventory.addEvent('onUpdateInventory',items.updateInventory.bind(items));
+    inventory.addEvent('onUpdateBelt',belt.updateInventory.bind(belt));
     inventory.addEvent('onUpdateStats',statsPanel.updateStats.bind(statsPanel));
     inventory.addEvent('onUpdateGold',function(){
         items.updateCapsule('gold',Engine.player.gold);
@@ -1543,6 +1541,7 @@ Engine.makeInventory = function(statsPanel){
     inventory.addEvent('onOpen',function(){
         equipment.updateEquipment();
         items.updateInventory();
+        belt.updateInventory();
         statsPanel.updateStats();
         items.updateCapsule('gold',Engine.player.gold);
     });
@@ -1927,6 +1926,7 @@ Engine.removeElements = function(arr,table){
 
 Engine.updateMenus = function(category){
     var callbackMap = {
+        'belt': 'onUpdateBelt',
         'character': 'onUpdateCharacter',
         'citizen': 'onUpdateCitizen',
         'commit': 'onUpdateCommit',

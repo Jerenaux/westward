@@ -384,6 +384,7 @@ GameServer.onInitialized = function(){
  */
 GameServer.onNewPlayer = function(player){
     if(!config.get('misc.performInit')) return;
+    player.addToBelt(6,1);
 };
 
 /**
@@ -1440,23 +1441,48 @@ GameServer.handlePath = function(data,socketID){
     }
 };
 
+GameServer.handleBelt = function(data,socketID){
+    var player = GameServer.getPlayer(socketID);
+    var item = data.item;
+    if(player.hasItem(item,1)){
+        var nb = player.getItemNb(item);
+        player.takeItem(item,nb);
+        player.addToBelt(item,nb);
+    }else if(player.hasItemInBelt(item)) {
+        var nb = player.getItemNbInBelt(item);
+        player.takeFromBelt(item,nb);
+        player.giveItem(item,nb);
+    }
+};
+
 GameServer.handleUse = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var item = data.item;
-    if(!player.hasItem(item,1)) return false;
+    if(!player.hasItemInBelt(item,1)){
+        console.log('does not have in belt');
+        return false;
+    }
     if(player.inFight){
-        if(!player.battle.isTurnOf(player)) return false;
+        if(!player.battle.isTurnOf(player)){
+            console.log('not player turn');
+            return false;
+        }
         player.battle.setEndOfTurn(500);
     }
     var itemData = GameServer.itemsData[item];
     var result;
     if(itemData.equipment) {
+        // console.log('equipment');
         result = player.equip(itemData.equipment, item, false); // false: not from DB
     }else if(itemData.effects){
         var nb = 1;
         result = player.applyEffects(item,nb,true);
-        player.takeItem(item,nb,true,(itemData.verb || 'Used'));
-        GameServer.destroyItem(item,nb,'use'); // If non-equipment, then consumable item
+        if(player.inFight){
+            player.takeFromBelt(item,nb);
+        }else{
+            player.takeItem(item, nb, true, (itemData.verb || 'Used'));
+            GameServer.destroyItem(item, nb, 'use'); // If non-equipment, then consumable item
+        }
     }
     Prism.logEvent(player,'use',{item:item});
     return result;

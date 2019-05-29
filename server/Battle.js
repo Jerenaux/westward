@@ -415,9 +415,8 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
         }
     }
     setTimeout(function(){
-        console.log('computing outcome');
+        // console.log('computing outcome');
         killed = this.applyDamage(b,dmg);
-        console.log('killed = ',killed);
         if(killed && a.isPlayer) a.addNotif(b.name+' '+(b.isBuilding ? 'destroyed' : 'killed'));
         if(killed && a.isCiv && b.isPlayer) a.talk('killed_foe');
         if(b.isCiv && a.isPlayer) {
@@ -429,7 +428,7 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
                 b.talk('hit');
             }
         }
-        console.log('done with outcome');
+        // console.log('done with outcome');
     }.bind(this),delay);
     return {
         delay: delay,
