@@ -89,13 +89,10 @@ var Hero = new Phaser.Class({
         }, this);
 
         var battleCallbacks = {
-            'battleData': BattleManager.updateBattle,
-            // 'activeID': BattleManager.manageTurn, // sent in newTurn
-            // 'fightersOrder': BattleManager.updateFightersOrder, // sent from updateOrder
-            'fightStatus': BattleManager.handleFightStatus, // sent from Battle.end, Battle.addFighter and Battle.removeFighter
-            // 'remainingTime': BattleManager.setCounter // sent in newTurn
+            'battleData': BattleManager.updateBattle
         };
 
+        if('fightStatus' in data) BattleManager.handleFightStatus(data['fightStatus']); // Do first before any other battle update
         for(var field in battleCallbacks){
             if(!battleCallbacks.hasOwnProperty(field)) continue;
             if(field in data) battleCallbacks[field].call(this,data[field]);

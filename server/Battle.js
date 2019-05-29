@@ -98,17 +98,12 @@ Battle.prototype.updateTimeline = function(){
 
     var data = {
         'order': order,
-        'active': activeFighter,
+        'active': activeFighter.getShortID(),
         'countdown': this.countdown/1000
-    }
+    };
 
     this.fighters.forEach(function(f){
-        if(f.isPlayer){
-            // f.setOwnProperty('fightersOrder',order);
-            // f.setOwnProperty('remainingTime',this.countdown/1000);
-            // f.setOwnProperty('activeID',activeFighter.getShortID());
-            f.setOwnProperty('battleData',data);
-        }
+        if(f.isPlayer) f.setOwnProperty('battleData',data);
     },this);
 };
 
@@ -157,12 +152,6 @@ Battle.prototype.newTurn = function(){
     console.log('[B'+this.id+'] New turn');
 
     var activeFighter = this.getActiveFighter();
-    // this.fighters.forEach(function(f){
-    //     if(f.isPlayer) {
-    //         f.setOwnProperty('remainingTime',this.countdown/1000);
-    //         f.setOwnProperty('activeID',activeFighter.getShortID());
-    //     }
-    // },this);
     this.fighters.forEach(this.updateTimeline,this);
 
     if(activeFighter.skipBattleTurn){
@@ -222,16 +211,13 @@ Battle.prototype.processAction = function(f,data){
             result = this.processMove(f);
             break;
         case 'pass':
-            result = {
-                success: true,
-                delay: 100
-            };
+            result = {delay: 100};
             break;
     }
-    if(result){
-        if(f.isPlayer && result.vigor) f.updateVigor(-result.vigor);
-        if(result.success) this.setEndOfTurn(result.delay);
-    }
+
+    result = result || {};
+    if(f.isPlayer && result.vigor) f.updateVigor(-result.vigor);
+    this.setEndOfTurn(result.delay || 0);
 };
 
 Battle.prototype.setEndOfTurn = function(delay){
@@ -243,10 +229,7 @@ Battle.prototype.processMove = function(f){
     //this.removeFromPosition(f);
     // var pos = f.getEndOfPath();
     //this.addAtPosition(f);
-    return {
-        success: true,
-        delay: f.getPathDuration()
-    };
+    return {delay: f.getPathDuration()};
 };
 
 Battle.prototype.isPosition = function(x,y){
@@ -372,7 +355,6 @@ Battle.prototype.processAoE = function(f,tx,ty){
         },this);
     }.bind(this),delay);
     return {
-        success: true,
         delay: delay,
         vigor: 1 // TODO: conf + vary
     };
@@ -380,10 +362,11 @@ Battle.prototype.processAoE = function(f,tx,ty){
 
 
 Battle.prototype.processAttack = function(a,b){ // a attacks b
+    console.log('Processing attack');
     var delay = 0;
     var dmg = 0;
     var killed = false;
-    if(!b || b.isDead()) return;
+    if(!b || b.isDead()) return false;
     if(Utils.nextTo(a,b)){
         delay = GameServer.battleParameters.meleeAtkDelay;
         a.setProperty('melee_atk',{x:b.x,y:b.y}); // for the attack animation of attacker
@@ -404,7 +387,6 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
         var tof = this.computeTOF(a,b,'arrow');
         delay = fireDelay + tof;
         var c = b.getCenter(true); // true for no rounding
-        console.warn('targetting ',c);
         a.setProperty('ranged_atk',
             {
                 x:c.x,
@@ -414,6 +396,7 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
             }); // Character aimation + arrow; coordinates are to determine which direction to face
         var ammoID = a.decreaseAmmo();
         var hit = this.computeRangedHit(a,b);
+        console.log('hit:',hit);
         if(hit){
             if(b.isNPC && ammoID > -1) b.addToLoot(ammoID,1);
             dmg = this.computeDamage('ranged',a,b);
@@ -432,7 +415,9 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
         }
     }
     setTimeout(function(){
+        console.log('computing outcome');
         killed = this.applyDamage(b,dmg);
+        console.log('killed = ',killed);
         if(killed && a.isPlayer) a.addNotif(b.name+' '+(b.isBuilding ? 'destroyed' : 'killed'));
         if(killed && a.isCiv && b.isPlayer) a.talk('killed_foe');
         if(b.isCiv && a.isPlayer) {
@@ -444,9 +429,9 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
                 b.talk('hit');
             }
         }
+        console.log('done with outcome');
     }.bind(this),delay);
     return {
-        success: true,
         delay: delay,
         vigor: 1 // TODO: conf + vary
     };

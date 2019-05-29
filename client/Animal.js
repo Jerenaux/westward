@@ -43,8 +43,8 @@ var Animal = new Phaser.Class({
         this.restingFrames = animalData.restingFrames;
 
         this.battleBoxData = {
-            'atlas':animalData.sprite,
-            'frame':animalData.frame
+            'atlas': 'battleicons',
+            'frame':animalData.battleicon
         }
     },
 

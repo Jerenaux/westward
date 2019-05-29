@@ -1,6 +1,7 @@
 {
   "0":{
     "sprite":"wolves",
+    "battleicon":"wolf",
     "name": "Wolf",
     "frame": 25,
     "aggro": true,
@@ -69,6 +70,7 @@
   },
   "5":{
     "sprite":"bears",
+    "battleicon":"bear",
     "name": "Bear",
     "frame": 9,
     "walkPrefix": "bear",
