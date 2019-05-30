@@ -535,17 +535,18 @@ Building.prototype.isDead = function(){
 
 Building.prototype.getRect = function(){
     return {
-        x: this.x + this.xoffset,
+        x: this.x,
         y: this.y - this.cellsHeight,
         w: this.cellsWidth,
         h: this.cellsHeight
     }
 };
 
+// Returns shootingPoint in tiles
 Building.prototype.getShootingPoint = function(){
     return {
         x: this.x + Math.round(this.shootFrom.x/32),
-        y: this.y - (this.height-Math.round(this.shootFrom.y/32))
+        y: this.y + Math.round(this.shootFrom.y/32)
     };
 };
 

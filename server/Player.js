@@ -646,6 +646,7 @@ Player.prototype.getDataFromDb = function(data){
         this.getStat(stat.stat).setBaseValue(stat.value);
         this.refreshStat(stat.stat);
     },this);
+    this.setStat('hp',Math.max(this.getStat('hp').getValue(),10)); // quick fix
     this.applyVigorModifier();
 
     for(var slot in data.equipment.slots){

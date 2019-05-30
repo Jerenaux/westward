@@ -295,7 +295,8 @@ Battle.prototype.computeTOF = function(a,b,type){
         'arrow': GameServer.battleParameters.arrowSpeed,
         'bomb': GameServer.battleParameters.bombSpeed
     };
-    return (Utils.euclidean(a.getShootingPoint(),b)/speeds[type])*1000;
+    var shootingPoint = a.getShootingPoint(); // Expected unit: tiles
+    return (Utils.euclidean(shootingPoint,b)/speeds[type])*1000;
 };
 
 Battle.prototype.applyDamage = function(f,dmg){

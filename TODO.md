@@ -2,6 +2,8 @@
 - Test gs.handleGold()
 - Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
+- Test Utils.nextTo with all combinations of building/animal vs building/animal, next to each other and not
+- Test Battle.computeTof()
 - Find a way to test itemsRespaw and other time-related aspects
 - Test tutorial manually (reset start)
 - Test new player manually
@@ -41,10 +43,7 @@ World Building
 - Belt & backpack capacity 
 - Add "resource markers" for wildlife (optimize?)
 
-- Restore arrow anim
-- Add help to belt panel
-- Fix tower highlight in battle
-- Clamp health to > 0
+- Test accuracy computation
 
 - Ask for free Creature license
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
