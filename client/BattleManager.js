@@ -64,6 +64,7 @@ BattleManager.updateBattle = function(battleData){
     if(BattleManager.activeFighter) BattleManager.activeFighter.isActiveFighter = false;
 
     BattleManager.activeFighter = BattleManager.getFighter(battleData.active,false); // false = no debug
+    if(!BattleManager.activeFighter) return; // Can happen when spawning in a battle before other fighters are loaded
 
     BattleManager.isPlayerTurn = BattleManager.activeFighter.isHero;
     if(!BattleManager.isPlayerTurn) UI.manageCursor(0,'sticky'); // remove any sticky
@@ -106,6 +107,7 @@ BattleManager.updateFightersOrder = function(order,countdown){
         var square = UI.scene.add.renderTexture(x,y,40,40);
         square.drawFrame('UI','equipment-slot',0,0);
         var f = BattleManager.getFighter(fid);
+        if(!f) return;
         if(f.isHero){
             square.drawFrame('faces',0,4,4);
         }else{

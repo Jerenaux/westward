@@ -49,7 +49,6 @@ let Schemas = {
                 return inventory.toList(true); // true: filter zeroes
             }},
         belt: {type: [[]], set:function(belt){
-                console.warn(belt.toList(true));
                 return belt.toList(true); // true: filter zeroes
             }},
         stats: {type: [], set:function(stats){

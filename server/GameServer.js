@@ -280,7 +280,10 @@ GameServer.loadItems = function(){
     var path = pathmodule.join(GameServer.mapsPath,'items.json');
     var items = JSON.parse(fs.readFileSync(path).toString());
     items.forEach(function(item){
-        GameServer.addItem(item[0], item[1], item[2]);
+        var x = item[0];
+        var y = item[1];
+        var type = item[2];
+        if(!GameServer.checkCollision(x,y)) GameServer.addItem(x,y,type);
     },this);
 
     path = pathmodule.join(GameServer.mapsPath,'resourceMarkers.json');
@@ -384,7 +387,6 @@ GameServer.onInitialized = function(){
  */
 GameServer.onNewPlayer = function(player){
     if(!config.get('misc.performInit')) return;
-    player.addToBelt(6,1);
 };
 
 /**
@@ -1068,6 +1070,10 @@ GameServer.expandBattle = function(battle,f){
     GameServer.addBattleArea(area.toList(),battle);
 };
 
+GameServer.checkForBattle = function(x,y){
+    return GameServer.battleCells.get(x,y);
+};
+
 
 /**
  * When an entity is in the vicinity of a battle area, it is sucked
@@ -1148,8 +1154,10 @@ GameServer.addSurroundingFighters = function(battle){
     var neighbors = GameServer.getEntitiesAt(Math.floor(center.x-r/2),Math.floor(center.y-r/2),r,r);
     for(var i = 0; i < neighbors.length; i++){
         var entity = neighbors[i];
-        // console.warn(entity.getShortID());
-        if(entity.canFight() && entity.isAvailableForFight()) GameServer.connectToBattle(entity,center);
+        if(entity.canFight() && entity.isAvailableForFight()) {
+            console.log('Adding ',entity.getShortID());
+            GameServer.connectToBattle(entity,center);
+        }
     }
 };
 
@@ -1479,9 +1487,9 @@ GameServer.handleUse = function(data,socketID){
         result = player.applyEffects(item,nb,true);
         if(player.inFight){
             player.takeFromBelt(item,nb);
-        }else{
+        }else{ // If non-equipment, then consumable item
             player.takeItem(item, nb, true, (itemData.verb || 'Used'));
-            GameServer.destroyItem(item, nb, 'use'); // If non-equipment, then consumable item
+            GameServer.destroyItem(item, nb, 'use');
         }
     }
     Prism.logEvent(player,'use',{item:item});
@@ -1734,12 +1742,6 @@ GameServer.checkForTracking = function(player){
 };
 
 GameServer.checkForAggro = function(){
-    /*Object.keys(GameServer.animals).forEach(function(key) {
-        GameServer.animals[key].checkForAggro();
-    });
-    Object.keys(GameServer.civs).forEach(function(key) {
-        GameServer.civs[key].checkForAggro();
-    });*/
     for(var id in GameServer.animals){
         GameServer.animals[id].checkForAggro();
     }

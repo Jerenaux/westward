@@ -254,10 +254,10 @@ Player.prototype.spawn = function(x,y){
     this.setProperty('y', y);
     this.setOwnProperty('x',x);
     this.setOwnProperty('y',y);
-    // this.updatePacket.x = x;
-    // this.updatePacket.y = y;
     this.onAddAtLocation();
     console.log('spawning at ',this.x,this.y,'(aiming at',xpos,ypos,')');
+    var battleCell = GameServer.checkForBattle(this.x,this.y);
+    if(battleCell) GameServer.expandBattle(battleCell.battle,this);
 };
 
 Player.prototype.respawn = function(){
@@ -443,7 +443,7 @@ Player.prototype.equip = function(slot,item,fromDB){
         }else {
             this.takeItem(item, nb);
         }
-        this.save();
+        if(!this.inFight) this.save();
     }
     return true;
 };
@@ -682,6 +682,7 @@ Player.prototype.getDataFromDb = function(data){
 };
 
 Player.prototype.save = function(){
+    if(this.inFight) return false;
     this.savestamp = Date.now();
     GameObject.prototype.save.call(this);
 };

@@ -16,7 +16,7 @@
     "canFight": true,
     "aggro": true,
     "health": 250,
-    "dmg": 10,
+    "dmg": 8,
     "shootFrom":{
       "x":95,
       "y":115

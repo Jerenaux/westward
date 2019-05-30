@@ -1,11 +1,10 @@
-On deploy:
+## To test:
 - Test gs.handleGold()
 - Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
 - Find a way to test itemsRespaw and other time-related aspects
-- Test tutorial (reset start)
-- Test new player
-- Run all tests
+- Test tutorial manually (reset start)
+- Test new player manually
 => After bug, systematically create test!
 
 Admin
@@ -17,55 +16,42 @@ Design document
 Testing
 World Building
 
-Misc:
+## Priority TODO
 - Update Westward main page
 - Adapt animations and delays for firearms
-- findcell in battle doesn't take path to get there into accoung (may be within radius but require to go around an obstacle!)
 - Change battle priority when player joins fight
 - In battle against NPC, have players have turns much more often
 - Make tiles above battle tiles transparent; same with buildings in fight?
 - Introduce new wood ingredient obtained from timber, crafting wood, made in bulk (but then tune down timber prod)
 -> For shield, guns...?
-- Spawning in battle area, moving: doesn't stop movement
 - Stop walk when opening menu
-- Camera bounds (test with northernmost camp)
 - Poll at regular interval the sprite below mouse
 - Better notifs cascading
-- Positions not saved often enough?
 - Don't disable walk with build panel
 - New movement system
-- Prevent building at player location\
+- Prevent building at player location
 - Reduce amount of orientation pins
 - Display death and conflict markers
 - add esc shortcut
 - "new" marker
 - Events formatting
 - Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
-- Fix wrong building surfaces (reproducible in tutorial part 2)
 - Make size of tutorial boxes adapt to text
 - Make towers throw stones when no better ammo
-- Test spawning (find them!)
+- Belt & backpack capacity 
 - Add "resource markers" for wildlife (optimize?)
-- Prevent items spawning on top of buildings
-- Test respawn
-- Prevent 0HP after respawn
+
 - Restore arrow anim
-- Bug if spawn in an ongoing fight (test with tower vs animal)
-- Test battle cleanup
-- Test that lumber camps don't start with stock
 - Add help to belt panel
+- Fix tower highlight in battle
+- Clamp health to > 0
 
 - Ask for free Creature license
-
-
-
-
-
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
 https://medium.com/@kestrelm/2d-skeletal-animation-in-phaser-3-tutorial-3ed468fb6bd0
-https://www.npmjs.com/package/quadtree-lib
 
-##Tutorial:##
+
+##Tutorial:
 First few words about permanent sandbox, collaborative survival, etc.
 
 Part 1: buildings
@@ -94,37 +80,18 @@ Part 3: enemy civ
 
 Closing comments about pros and cons of starting in a settled/wild region, ultimate goal of surviving by pushing enemy civ back,
 
-Criteria before going public:
+## Criteria before going public:
 - Full metal and gunpowder industry
 - Basic abilitiy system
 - Missions menu
 -> Daily quests
--> Try to come up with something about enemy civ
+-> Try to come up with something about enemy civ (# enemy camps ...)
 -> Leaderboards
 
 
 ##################################################
 ##################################################
 ##################################################
-
-* Battle system
-* Civics
-* Character panel
-* Craftsmen gameplay
-* Enemy civ
-* Explorer gameplay
-* Merchant gameplay
-* Packaging
-* Settlement defense
-* Settlement economy
-* Soldier gameplay
-Design document
-World building
-Free
-
-#####################################################
-#####################################################
-#####################################################
 
 Admin
 Analytics

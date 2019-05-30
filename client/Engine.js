@@ -1520,6 +1520,7 @@ Engine.makeInventory = function(statsPanel){
 
     var belt = inventory.addPanel('belt',new InventoryPanel(40,360,600,90,'Belt'));
     belt.setInventory('belt',15,true,Engine.inventoryClick);
+    belt.addButton(570, 8, 'blue','help',null,'',UI.textsData['belt_help']);
 
     var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
     equipment.addButton(300, 8, 'blue','help',null,'',UI.textsData['equipment_help']);
