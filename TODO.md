@@ -43,8 +43,6 @@ World Building
 - Belt & backpack capacity 
 - Add "resource markers" for wildlife (optimize?)
 
-- Test accuracy computation
-
 - Ask for free Creature license
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
 https://medium.com/@kestrelm/2d-skeletal-animation-in-phaser-3-tutorial-3ed468fb6bd0

@@ -1,21 +1,20 @@
 /**
  * Created by Jerome on 09-10-17.
  */
-var GameObject = require('./GameObject.js').GameObject;
+var FightingEntity = require('./FightingEntity.js').FightingEntity;
 var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 
 function MovingEntity(){
-    GameObject.call(this);
+    FightingEntity.call(this);
     this.isMovingEntity = true;
-    this.skipBattleTurn = false; // used to distinguish from buildings
     this.moving = false;
     this.xoffset = 0;
     this.chatTimer = null;
 }
 
-MovingEntity.prototype = Object.create(GameObject.prototype);
+MovingEntity.prototype = Object.create(FightingEntity.prototype);
 MovingEntity.prototype.constructor = MovingEntity;
 
 // ### Movement ###
@@ -179,27 +178,6 @@ MovingEntity.prototype.setChat = function(text){
     },GameServer.clientParameters.config.chatTimeout);
 };
 
-// ### Equipment ###
-
-
-// ### Stats ###
-
-MovingEntity.prototype.applyDamage = function(dmg){
-    this.getStat('hp').increment(dmg);
-};
-
-MovingEntity.prototype.getHealth = function(){
-    return this.getStat('hp').getValue();
-};
-
-MovingEntity.prototype.getStat = function(key){
-    return this.stats[key];
-};
-
-MovingEntity.prototype.getStats = function(){
-    return Object.keys(this.stats);
-};
-
 // ### Battle ###
 
 MovingEntity.prototype.inBattleRange = function(x,y){
@@ -223,25 +201,12 @@ MovingEntity.prototype.isDead = function(){
     return this.dead;
 };
 
-MovingEntity.prototype.isInFight = function(){
-    return this.inFight;
-};
-
 MovingEntity.prototype.isMoving = function(){
     return this.moving;
 };
 
-MovingEntity.prototype.isSameTeam = function(f){
-    return this.battleTeam == f.battleTeam;
-};
-
 MovingEntity.prototype.canFight = function(){
     return true;
-};
-
-MovingEntity.prototype.endFight = function(){
-    this.setProperty('inFight',false);
-    this.battle = null;
 };
 
 MovingEntity.prototype.getRect = function(){

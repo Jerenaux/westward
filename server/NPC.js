@@ -15,7 +15,7 @@ function NPC(){
     this.inFight = false;
     this.actionQueue = [];
     MovingEntity.call(this);
-    this.skipBattleTurn = GameServer.battleParameters.freezeNPC;//false; // used to distinguish from buildings
+    this.skipBattleTurn = GameServer.battleParameters.freezeNPC;
     this.onAddAtLocation();
     this.setOrUpdateAOI();
 }
@@ -52,29 +52,6 @@ NPC.prototype.setStat = function(key,value){
 };
 
 // ### Battle ###
-
-NPC.prototype.checkForAggro = function(){
-    if(!this.isInVision()) return;
-    if(!this.isAggressive() || this.isInFight() || !this.isAvailableForFight()) return;
-
-    var r = GameServer.battleParameters.aggroRange;
-    // implies Chebyshev distance
-    var neighbors = GameServer.getEntitiesAt(Math.floor(this.x-r/2),Math.floor(this.y-r/2),r,r);
-    for(var i = 0; i < neighbors.length; i++){
-        var entity = neighbors[i];
-        if(this.getShortID() == entity.getShortID()) continue;
-        if(!this.aggroAgainst(entity)) continue;
-        if(!entity.isAvailableForFight()) continue;
-        if(entity.instance != this.instance) continue;
-        if(entity.isInFight()){
-            this.goToDestination(entity);
-        }else {
-            GameServer.handleBattle(this, entity);
-            if(this.isCiv) this.talk('battle_start');
-        }
-        break;
-    }
-};
 
 NPC.prototype.goToDestination = function(dest){
     var path = GameServer.findPath({x:this.x,y:this.y},dest,true); // true for seek-path pathfinding
@@ -149,29 +126,6 @@ NPC.prototype.attackTarget = function(){
     return data;
 };
 
-NPC.prototype.aggroAgainst = function(f){
-    return this.aggroMatrix[f.entityCategory];
-};
-
-NPC.prototype.selectTarget = function(){
-    var fighters = this.battle.fighters.slice();
-    if(fighters.length == 0) return null;
-    var target = null;
-    for(var i = 1; i < fighters.length; i++){
-        var f = fighters[i];
-        if(this.isSameTeam(f) || !this.aggroAgainst(f)) continue;
-        if(!target){
-            target = f;
-            continue;
-        }
-        if(target.battlePriority == f.battlePriority){
-            if(f.getHealth() < target.getHealth()) target = f;
-        }else{
-            if(f.battlePriority < target.battlePriority) target = f;
-        }
-    }
-    return target;
-};
 
 //Check if a *moving entity* (no building or anything) other than self is at position
 NPC.prototype.isPositionFree = function(x,y){

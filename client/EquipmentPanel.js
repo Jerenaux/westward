@@ -132,6 +132,15 @@ function BattleEquipmentPanel(){
     this.melee = this.addEquipmentHolder(950,515);
     this.range = this.addEquipmentHolder(1000,500,true);
 
+    this.atkCapsule = new Capsule(870,510,'UI','sword');
+    this.atkCapsule.update = function(){
+        this.setText(1);
+    };
+    this.defCapsule = new Capsule(815,510,'UI','armor');
+    this.defCapsule.update = function(){
+        this.setText(1);
+    };
+
     this.content.forEach(function(c){
         c.setScrollFactor(0);
         c.setVisible(false);
@@ -210,12 +219,19 @@ BattleEquipmentPanel.prototype.updateEquipment = function(){
     this.range.countText.setVisible(range > -1);
 };
 
+BattleEquipmentPanel.prototype.updateCapsules = function(){
+    this.atkCapsule.update();
+    this.defCapsule.update();
+};
+
 BattleEquipmentPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
     this.content.forEach(function(c){
         c.setVisible(true);
     });
     this.bar.display();
+    this.atkCapsule.display();
+    this.defCapsule.display();
 };
 
 BattleEquipmentPanel.prototype.hide = function(){
@@ -224,4 +240,6 @@ BattleEquipmentPanel.prototype.hide = function(){
         c.setVisible(false);
     });
     this.bar.hide();
+    this.atkCapsule.hide();
+    this.defCapsule.hide();
 };

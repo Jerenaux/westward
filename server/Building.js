@@ -3,16 +3,16 @@
  */
 var GameObject = require('./GameObject.js').GameObject;
 var GameServer = require('./GameServer.js').GameServer;
+var FightingEntity = require('./FightingEntity.js').FightingEntity;
 var Formulas = require('../shared/Formulas.js').Formulas;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
-var StatsContainer = require('../shared/Stats.js').StatsContainer;
 var Models = require('../shared/models.js');
 
 function Building(data){
-    GameObject.call(this);
+    FightingEntity.call(this);
     this.isBuilding = true;
     this.battleTeam = 'Player';
     this.entityCategory = 'Building';
@@ -112,7 +112,7 @@ function Building(data){
     };
 }
 
-Building.prototype = Object.create(GameObject.prototype);
+Building.prototype = Object.create(FightingEntity.prototype);
 Building.prototype.constructor = Building;
 
 Building.prototype.embed = function(){
@@ -135,11 +135,7 @@ Building.prototype.isAggressive = function(){
     return this.aggro;
 };
 
-Building.prototype.aggroAgainst = function(f){
-    return this.aggroMatrix[f.entityCategory];
-};
-
-
+/*
 Building.prototype.checkForAggro = function(){
     if(!this.isInVision()) return;
     if(!this.isAggressive() || this.isInFight() || !this.isAvailableForFight()) return;
@@ -159,7 +155,7 @@ Building.prototype.checkForAggro = function(){
         GameServer.handleBattle(this, entity);
         break;
     }
-};
+};*/
 
 Building.prototype.refreshListing = function(){
     this.buildings = this.settlement.getBuildings();
@@ -435,13 +431,6 @@ Building.prototype.getBattleAreaAround = function(cells){
     return cells;
 };
 
-Building.prototype.getCenter = function(){
-    return {
-        x: this.x + (this.entrance ? this.entrance.x : 0),
-        y: this.y + (this.entrance ? this.entrance.y : 0)
-    };
-};
-
 Building.prototype.canFight = function(){return true;};
 
 Building.prototype.isDestroyed = function(){
@@ -450,14 +439,6 @@ Building.prototype.isDestroyed = function(){
 
 Building.prototype.isAvailableForFight = function() {
     return (!this.isDestroyed() && !this.isInFight() && GameServer.buildingParameters.canfight);
-};
-
-Building.prototype.isInFight = function(){
-    return this.inFight;
-};
-
-Building.prototype.endFight = function(){
-    this.inFight = false;
 };
 
 Building.prototype.canRange = function(){
@@ -475,54 +456,11 @@ Building.prototype.decideBattleAction = function(){
     this.battle.processAction(this,data);
 };
 
-Building.prototype.isSameTeam = function(f){
-    return this.battleTeam == f.battleTeam;
-};
-
-Building.prototype.selectTarget = function(){
-    var fighters = this.battle.fighters.slice();
-    if(fighters.length == 0) return null;
-    var target = null;
-    for(var i = 1; i < fighters.length; i++){
-        var f = fighters[i];
-        if(this.isSameTeam(f)) continue;
-        if(!target){
-            target = f;
-            continue;
-        }
-        if(target.battlePriority == f.battlePriority){
-            if(f.getHealth() < target.getHealth()) target = f;
-        }else{
-            if(f.battlePriority < target.battlePriority) target = f;
-        }
-    }
-    return target;
-};
-
 Building.prototype.attackTarget = function(){
     return {
         action: 'attack',
         id: this.target.getShortID()
     };
-};
-
-// ### Stats ###
-
-Building.prototype.applyDamage = function(dmg){
-    this.getStat('hp').increment(dmg);
-    // TODO: broadcast
-};
-
-Building.prototype.getHealth = function(){
-    return this.getStat('hp').getValue();
-};
-
-Building.prototype.getStat = function(key){
-    return this.stats[key];
-};
-
-Building.prototype.getStats = function(){
-    return Object.keys(this.stats);
 };
 
 Building.prototype.die = function(){
@@ -539,6 +477,20 @@ Building.prototype.getRect = function(){
         y: this.y - this.cellsHeight,
         w: this.cellsWidth,
         h: this.cellsHeight
+    }
+};
+
+Building.prototype.getCenter = function(noRound){
+    if(noRound){
+        return {
+            x: this.x + this.cellsWidth / 2,
+            y: this.y - this.cellsHeight / 2
+        };
+    }else {
+        return {
+            x: Math.floor(this.x + this.cellsWidth / 2),
+            y: Math.floor(this.y - this.cellsHeight / 2)
+        };
     }
 };
 

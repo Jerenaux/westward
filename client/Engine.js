@@ -1082,6 +1082,7 @@ Engine.makeBattleMenu = function(){
         belt.updateInventory();
         equipment.updateEquipment();
         equipment.updateStats();
+        equipment.updateCapsules();
         Engine.hideCapsules();
     });
 
