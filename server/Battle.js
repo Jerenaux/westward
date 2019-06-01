@@ -388,7 +388,7 @@ Battle.prototype.processAttack = function(a,b){ // a attacks b
         var fireDelay = GameServer.battleParameters.rangedAtkDelay; // duration of character firing animation
         var tof = this.computeTOF(a,b,'arrow');
         delay = fireDelay + tof;
-        var c = b.getCenter(true); // true for no rounding
+        var c = b.getTargetCenter();
         a.setProperty('ranged_atk',
             {
                 x:c.x,
@@ -522,7 +522,7 @@ BattleCell.prototype.getBattleAreaAround = function(cells){
     return cells;
 };
 
-BattleCell.prototype.getCenter = function(){
+BattleCell.prototype.getLocationCenter = function(){
     return {
         x: this.x,
         y: this.y

@@ -1005,11 +1005,11 @@ GameServer.computeBattleArea = function(f1,f2,depth){
 
     var queue = [];
 
-    var path = GameServer.findPath(f1.getCenter(),f2.getCenter());  // Reminder: a default length limit is built-in the pathfinder
+    var path = GameServer.findPath(f1.getLocationCenter(),f2.getLocationCenter());  // Reminder: a default length limit is built-in the pathfinder
     if(!path || path.length == 0) {
-        console.log('No path to target');
-        console.log(f1.getCenter());
-        console.log(f2.getCenter());
+        console.warn('No path to target');
+        console.warn(f1.getShortID(),f1.getLocationCenter());
+        console.warn(f2.getShortID(),f2.getLocationCenter());
         return null;
     }
     path.forEach(function(cell){
@@ -1155,7 +1155,7 @@ GameServer.addSurroundingFighters = function(battle){
     for(var i = 0; i < neighbors.length; i++){
         var entity = neighbors[i];
         if(entity.canFight() && entity.isAvailableForFight()) {
-            console.log('Adding ',entity.getShortID());
+            console.warn('Adding nearby',entity.getShortID());
             GameServer.connectToBattle(entity,center);
         }
     }

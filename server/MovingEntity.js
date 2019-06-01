@@ -154,20 +154,36 @@ MovingEntity.prototype.checkForBattle = function(){
     }
 };
 
+// Where to target projectiles at
+MovingEntity.prototype.getTargetCenter = function(){
+    return {
+        x: this.x + this.cellsWidth / 2,
+        y: this.y + this.cellsHeight / 2 // - instead?
+    };
+};
 
-MovingEntity.prototype.getCenter = function(noRound){
+// Central tile for pathfinding and such
+MovingEntity.prototype.getLocationCenter = function(){
+    return {
+        x: Math.floor(this.x + this.cellsWidth / 2),
+        y: Math.floor(this.y + this.cellsHeight / 2)
+    };
+};
+
+
+/*MovingEntity.prototype.getCenter = function(noRound){
     if(noRound){
         return {
             x: this.x + this.cellsWidth / 2,
             y: this.y + this.cellsHeight / 2
         };
-    }else {
+    }else{
         return {
             x: Math.floor(this.x + this.cellsWidth / 2),
             y: Math.floor(this.y + this.cellsHeight / 2)
         };
     }
-};
+};*/
 
 MovingEntity.prototype.setChat = function(text){
     if(this.chatTimer) clearTimeout(this.chatTimer);

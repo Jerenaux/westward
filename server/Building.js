@@ -480,7 +480,7 @@ Building.prototype.getRect = function(){
     }
 };
 
-Building.prototype.getCenter = function(noRound){
+/*Building.prototype.getCenter = function(noRound){
     if(noRound){
         return {
             x: this.x + this.cellsWidth / 2,
@@ -492,6 +492,22 @@ Building.prototype.getCenter = function(noRound){
             y: Math.floor(this.y - this.cellsHeight / 2)
         };
     }
+};*/
+
+// Where to target projectiles at
+Building.prototype.getTargetCenter = function(){
+    return {
+        x: this.x + this.cellsWidth / 2,
+        y: this.y - this.cellsHeight / 2
+    };
+};
+
+// Central tile for pathfinding and such
+Building.prototype.getLocationCenter = function(){
+    return {
+        x: Math.floor(this.x + this.cellsWidth / 2),
+        y: this.y // Return a cell in front, so no collision
+    };
 };
 
 // Returns shootingPoint in tiles

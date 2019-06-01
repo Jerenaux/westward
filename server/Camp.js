@@ -28,7 +28,7 @@ Camp.prototype.update = function(){
 
     if(this.people.length < 10){ // TODO: variable camp parameter (size)
         var hut = Utils.randomElement(this.buildings);
-        var pos = hut.getCenter();
+        var pos = hut.getCenter(); // Use another method (getCenter is deprecated)
         pos.y += 2;
         var civ = GameServer.addCiv(pos.x,pos.y);
         civ.setCamp(this);
