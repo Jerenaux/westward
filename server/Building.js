@@ -451,6 +451,7 @@ Building.prototype.decreaseAmmo = function(){
 };
 
 Building.prototype.decideBattleAction = function(){
+    if(!this.battle) return;
     if(!this.target || !this.target.isInFight()) this.target = this.selectTarget();
     var data = (this.target ? this.attackTarget() : {action: 'pass'});
     this.battle.processAction(this,data);

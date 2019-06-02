@@ -125,6 +125,15 @@ Battle.prototype.removeFighter = function(f){
     if(isTurnOf) this.setEndOfTurn(0);
     if(f.isPlayer) f.notifyFight(false);
     this.updateTeams(f.battleTeam,-1);
+    this.checkSentience();
+};
+
+Battle.prototype.checkSentience = function(){
+    var nbSentient = 0;
+    this.fighters.forEach(function(f){
+        if(f.sentient) nbSentient++;
+    });
+    if(nbSentient == 0) this.end();
 };
 
 Battle.prototype.updateTeams = function(team,increment){
@@ -154,6 +163,7 @@ Battle.prototype.newTurn = function(){
     var activeFighter = this.getActiveFighter();
     this.fighters.forEach(this.updateTimeline,this);
 
+    console.log(activeFighter.getShortID()+'\'s turn');
     if(activeFighter.skipBattleTurn){
         this.newTurn();
         return;

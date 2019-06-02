@@ -104,7 +104,7 @@ GameObject.prototype.onAddAtLocation = function(){
     this.y = parseInt(this.y);
     GameServer.qt.put(this);
     // console.warn(GameServer.qt.get({x:0, y: 0, w: 1500, h: 1140}).length);
-    /*console.warn('Added ',this.getShortID());
+   /* console.warn('Added ',this.getShortID());
     var list = GameServer.qt.get({x:this.x-1, y: this.y-1, w: 3, h: 3});
     list.forEach(function(e){
         console.warn('ID:',e.getShortID());
@@ -116,6 +116,8 @@ GameObject.prototype.onLocationChange = function(){
     // It's ok if multiple objects have same ID, it'll
     // only match and update those with same x,y,w,h
     // console.warn('moving',this.entityCategory,this.x,this.y,this.w,this.h);
+    this.x = parseInt(this.x);
+    this.y = parseInt(this.y);
     GameServer.qt.update(this,'id',{x:this.x,y:this.y});
 };
 

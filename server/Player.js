@@ -21,6 +21,7 @@ function Player(){
     this.battleTeam = 'Player';
     this.entityCategory = 'Player';
     this.updateCategory = 'players';
+    this.sentient = true; // used in battle to know if a battle shoud end
     this.schemaModel = GameServer.PlayerModel;
     this.battlePriority = 1;
 

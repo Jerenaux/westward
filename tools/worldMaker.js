@@ -553,7 +553,7 @@ WorldMaker.prototype.makeSpawnZones = function(){
         for(var i = 0; i < animal.nbzones; i++){
             var x = Utils.randomInt(0,World.worldWidth-1);
             var y = Utils.randomInt(0,World.worldHeight-1);
-            this.makeAnimalZone(x,y,animal);
+            if(!this.collisions.get(x,y)) this.makeAnimalZone(x,y,animal);
         }
     },this);
 };

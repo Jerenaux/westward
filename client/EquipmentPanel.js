@@ -187,6 +187,7 @@ BattleEquipmentPanel.prototype.addEquipmentHolder = function(x,y,addText){
             { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
         );
         icon.countText.setVisible(false);
+        this.content.push(icon.countText);
     }
 
     this.content.push(holder);

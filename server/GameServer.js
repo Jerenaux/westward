@@ -1147,6 +1147,7 @@ GameServer.addSurroundingFighters = function(battle){
     center.x = Math.floor(center.x/battle.fighters.length);
     center.y = Math.floor(center.y/battle.fighters.length);
     center = GameServer.battleCells.get(center.x,center.y);
+    if(!center) return;
 
     var r = GameServer.battleParameters.aggroRange;
     // console.warn(Math.floor(center.x-r/2),Math.floor(center.y-r/2),r,r);

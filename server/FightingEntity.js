@@ -14,12 +14,15 @@ FightingEntity.prototype.constructor = FightingEntity;
 FightingEntity.prototype.checkForAggro = function(){
     if(!this.isInVision()) return;
     if(!this.isAggressive() || this.isInFight() || !this.isAvailableForFight()) return;
+    // console.warn(this.getShortID(),'checking for aggro');
 
     var r = GameServer.battleParameters.aggroRange;
     // implies Chebyshev distance
     var neighbors = GameServer.getEntitiesAt(Math.floor(this.x-r/2),Math.floor(this.y-r/2),r,r);
+    // console.warn(Math.floor(this.x-r/2),Math.floor(this.y-r/2),r,r);
     for(var i = 0; i < neighbors.length; i++){
         var entity = neighbors[i];
+        // console.warn('considering',entity.getShortID());
         if(this.getShortID() == entity.getShortID()) continue;
         if(!this.aggroAgainst(entity)) continue;
         if(!entity.isAvailableForFight()) continue;
@@ -35,12 +38,14 @@ FightingEntity.prototype.checkForAggro = function(){
 };
 
 FightingEntity.prototype.selectTarget = function(){
+    if(!this.battle) return;
     var fighters = this.battle.fighters.slice();
     if(fighters.length == 0) return null;
     var target = null;
+    // Iterate over all fighters to find the one with highest priority to target
     for(var i = 1; i < fighters.length; i++){
         var f = fighters[i];
-        if(this.isSameTeam(f) || !this.aggroAgainst(f)) continue;
+        if(this.isSameTeam(f)) continue;
         if(!target){
             target = f;
             continue;
