@@ -88,6 +88,10 @@ app.get('/editor',function(req,res){
     res.sendFile(path.join(__dirname,'editor','index.html'));
 });
 
+app.get('/crafting',function(req,res){
+    res.sendFile(path.join(__dirname,'editor','crafting.html'));
+});
+
 var GEThandlers = {
     'buildings': gs.getBuildings,
     'count-items': gs.countItems,

@@ -458,7 +458,8 @@ Deployment:
 
 Design document:
 ---------------
-- Re-read regularly (last: busy with "abilities")
+- Re-read regularly
+- Make big visual tool for items/plants/animals/crafting (https://visjs.org/network_examples.html)
 - Make Excel tables (crafting, inventory, bestiary, abilities ...)
 - Make feature matrix
 - Consequence graphs
