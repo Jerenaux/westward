@@ -372,6 +372,7 @@ Player.prototype.giveItem = function (item, nb, notify, verb) {
         this.addNotif(verb + ' ' + nb + ' ' + GameServer.itemsData[item].name);
         this.save();
     }
+    return this;
 };
 
 Player.prototype.takeItem = function (item, nb, notify, verb) {

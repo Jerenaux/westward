@@ -513,5 +513,62 @@
     "nbBushes": 4,
     "yield": 5,
     "verb": "Ate"
+  },
+  "48":{
+    "atlas": "items",
+    "frame":"redpowder",
+    "name": "Fists",
+    "desc": "This melee weapon you can't lose.",
+    "sound": "soft",
+    "nbBushes": 4,
+    "yield": 5,
+    "verb": "Ate"
+  },
+  "49":{
+    "atlas": "items",
+    "frame":"redpowder",
+    "name": "Hands",
+    "desc": "This ranged weapon you can't lose. You can throw stones for example.",
+    "sound": "soft",
+    "nbBushes": 4,
+    "yield": 5,
+    "equipment": "rangedw",
+    "ammo": "quiver",
+    "effects":{"acc":20},
+    "recipe": {"7":1,"21":1},
+    "useInBattle": true,
+    "isCrafted": true,
+    "basicRecipe": true
+  },
+  "50":{
+    "atlas": "items2",
+    "frame":"stone",
+    "name": "Stone",
+    "envFrames": ["rock_1","rock_2","rock_3"],
+    "collides": true,
+    "desc": "Crafting material used to make primitive weapons. Can be used as ammo.",
+    "sound": "equip",
+    "isCrafted": true,
+    "isMaterial": false,
+    "craftTier": 1,
+    "recipe":{"24":1,"35":1},
+    "output": 5,
+    "equipment": "bullets",
+    "effects":{"dmg":60},
+    "isAmmo": true,
+    "ammo": "stone_pouch",
+    "useInBattle": true
+  },
+  "51":{
+    "atlas": "items2",
+    "frame":"ammopouch",
+    "name": "Small stones pouch",
+    "equipment": "stone_pouch",
+    "capacity": 10,
+    "desc": "Can contain up to 10 stones",
+    "useInBattle": true,
+    "sound": "cloth",
+    "isCrafted": true,
+    "recipe": {"43":2,"21":1}
   }
 }
