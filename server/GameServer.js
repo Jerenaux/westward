@@ -1070,6 +1070,13 @@ GameServer.expandBattle = function(battle,f){
     GameServer.addBattleArea(area.toList(),battle);
 };
 
+/**
+ * Check if a battle cell is located at the given coordinates. 
+ * Used to identify when an entity steps into a battle area.
+ * @param {number} x - x coordinate to check.
+ * @param {number} y - y coordinate to check.
+ * @returns {BattleCell|null} - The BattleCell found at the coordinates, or null.
+ */
 GameServer.checkForBattle = function(x,y){
     return GameServer.battleCells.get(x,y);
 };
@@ -1186,6 +1193,12 @@ GameServer.getEntitiesAt = function(x,y,w,h){
     return GameServer.qt.get({x:x, y:y, w: w, h: h});
 };
 
+/**
+ * Update the buy and sell prices of an item in a specific building. Called
+ * by players.
+ * @param {Object} data - data object containing the prices to set and the item ID.
+ * @param {string} socketID - ID of the socket of the player making the request.
+ */
 GameServer.setBuildingPrice = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var building = GameServer.buildings[player.inBuilding];
@@ -1196,6 +1209,11 @@ GameServer.setBuildingPrice = function(data,socketID){
     Prism.logEvent(player,'prices',{item:data.item,buy:data.buy,sell:data.sell});
 };
 
+/**
+ * Take or give gold to the stock of a building. Called by players.
+ * @param {Object} data - data object containing the amount of gold to give/take.
+ * @param {string} socketID - ID of the socket of the player making the request.
+ */
 GameServer.handleGold = function(data,socketID){
     var amount = data.nb;
     if(amount == 0) return false;
@@ -1216,6 +1234,16 @@ GameServer.handleGold = function(data,socketID){
     return true;
 };
 
+/**
+ * Handle inventory-related interactions taking place in a building, i.e.:
+ * - Giving an item to the building;
+ * - Taking an item from the stock;
+ * - Buying an item;
+ * - Selling an item.
+ * . Called by players.
+ * @param {Object} data - data object containing the item ID and amount.
+ * @param {string} socketID - ID of the socket of the player making the request.
+ */
 GameServer.handleShop = function(data,socketID) {
     var player = GameServer.getPlayer(socketID);
     var item = data.id;
@@ -1284,6 +1312,11 @@ GameServer.handleShop = function(data,socketID) {
     return true;
 };
 
+/**
+ * Build a new building. Called by players.
+ * @param {Object} data - data object containing the building type and location.
+ * @param {string} socketID - ID of the socket of the player making the request.
+ */
 GameServer.handleBuild = function(data,socketID) {
     var bid = data.id;
     var tile = data.tile;
@@ -1306,6 +1339,14 @@ GameServer.handleBuild = function(data,socketID) {
     }
 };
 
+/**
+ * Check if a player can build a building at the provided location.
+ * Called by `GameServer.handleBuild()`.
+ * @param {number} bid - Type of the building.
+ * @param {Object} tile - {x,y} object of the coordinates where to build the building.
+ * @returns {number} - Returns -1 if collisions are detected, -2 if an item is in the way,
+ * and 1 if everything is ok.
+ */
 GameServer.canBuild = function(bid,tile){
     var data = GameServer.buildingsData[bid];
     for(var x = 0; x < data.base.width; x++){
@@ -1316,6 +1357,7 @@ GameServer.canBuild = function(bid,tile){
                 console.log('Collision at ',tile.x+x,tile.y-y);
                 return -1;
             }
+            // TODO: also check for players in the way
             if(GameServer.positions.get(tile.x+x,tile.y-y).length > 0 ||
                 GameServer.itemPositions.get(tile.x+x,tile.y-y).length > 0) return -2;
         }
@@ -1323,6 +1365,13 @@ GameServer.canBuild = function(bid,tile){
     return 1;
 };
 
+/**
+ * Build a new building in the world. Called by `GameServer.handleBuild()`.
+ * @param {Player} player - The player building the building.
+ * @param {number} bid - The type of the building.
+ * @param {Object} tile - {x,y} object of the coordinates where to build the building.
+ * 
+ */
 GameServer.build = function(player,bid,tile){
     var data = {
         x: tile.x,
