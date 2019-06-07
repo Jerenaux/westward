@@ -129,6 +129,14 @@
       "frame": {"x":72,"y":816,"w":24,"h":24}
     },
     {
+      "filename": "fists",
+      "frame": {"x":264,"y":720,"w":24,"h":24}
+    },
+    {
+      "filename": "hands",
+      "frame": {"x":48,"y":720,"w":24,"h":24}
+    },
+    {
       "filename": "antidote",
       "frame": {"x":264,"y":312,"w":24,"h":24}
     },

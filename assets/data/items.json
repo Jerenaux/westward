@@ -516,8 +516,8 @@
     "verb": "Ate"
   },
   "48":{
-    "atlas": "items",
-    "frame":"redpowder",
+    "atlas": "items2",
+    "frame":"fists",
     "name": "Fists",
     "desc": "This melee weapon you can't lose.",
     "sound": "soft",
@@ -528,8 +528,8 @@
     "permanent": true
   },
   "49":{
-    "atlas": "items",
-    "frame":"redpowder",
+    "atlas": "items2",
+    "frame":"hands",
     "name": "Hands",
     "desc": "This ranged weapon you can't lose. You can throw stones for example.",
     "sound": "soft",
