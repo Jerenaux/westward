@@ -450,9 +450,16 @@ Player.prototype.equip = function (slot, item, fromDB) {
     return true;
 };
 
+/**
+ *
+ * @param slot {string} - Key in Equipment.
+ * @param notify {boolean} - Send a notification to player or not.
+ */
 Player.prototype.unequip = function (slot, notify) {
     var item = this.equipment.get(slot);
     if (item == -1) return;
+
+    if(GameServer.itemsData[item].permanent) return;
 
     var nb = 1;
     if (slot in Equipment.ammo) nb = this.unload(slot);
@@ -466,6 +473,12 @@ Player.prototype.unequip = function (slot, notify) {
     this.equipment.set(slot, -1);
     this.updatePacket.addEquip(slot, -1);
     this.applyAbsoluteModifiers(item, -1);
+
+    // Replace with permanent equipment
+    if(slot in Equipment.slots) {
+        var defaultItem = Equipment.slots[slot].defaultItem;
+        this.equip(slot, defaultItem);
+    }
 
     if (notify) {
         this.addNotif('Unequipped ' + nb + ' ' + GameServer.itemsData[item].name + (nb > 1 ? 's' : ''));

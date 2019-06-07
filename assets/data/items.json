@@ -77,7 +77,8 @@
     "envFrames": ["wood"],
     "desc": "Crafting material used to make wooden weapons or to make charcoal.",
     "sound": "woodsmall",
-    "isMaterial": true
+    "isMaterial": true,
+    "equipment": "meleew"
   },
   "8":{
     "atlas": "items2",
@@ -522,7 +523,9 @@
     "sound": "soft",
     "nbBushes": 4,
     "yield": 5,
-    "verb": "Ate"
+    "verb": "Ate",
+    "equipment": "meleew",
+    "permanent": true
   },
   "49":{
     "atlas": "items",
@@ -538,27 +541,10 @@
     "recipe": {"7":1,"21":1},
     "useInBattle": true,
     "isCrafted": true,
-    "basicRecipe": true
+    "basicRecipe": true,
+    "permanent": true
   },
-  "50":{
-    "atlas": "items2",
-    "frame":"stone",
-    "name": "Stone",
-    "envFrames": ["rock_1","rock_2","rock_3"],
-    "collides": true,
-    "desc": "Crafting material used to make primitive weapons. Can be used as ammo.",
-    "sound": "equip",
-    "isCrafted": true,
-    "isMaterial": false,
-    "craftTier": 1,
-    "recipe":{"24":1,"35":1},
-    "output": 5,
-    "equipment": "bullets",
-    "effects":{"dmg":60},
-    "isAmmo": true,
-    "ammo": "stone_pouch",
-    "useInBattle": true
-  },
+  "50":{},
   "51":{
     "atlas": "items2",
     "frame":"ammopouch",
