@@ -34,6 +34,7 @@ var Engine = {
 
 var tilesetData = {};
 
+
 Engine.preload = function() {
     Engine.useTilemaps = false;
 
@@ -126,6 +127,9 @@ Engine.preload = function() {
 
     if(Client.tutorial) this.load.json('tutorials', 'assets/data/tutorials.json');
 };
+
+
+
 
 Engine.entityManager = {
     entities: [],
