@@ -402,18 +402,6 @@ GameServer.onInitialized = function(){
  * Perform tasks each time a player joins the game. Mostly used for testing.
  */
 GameServer.onNewPlayer = function(player){
-    player.giveItem(4,5);
-    player.giveItem(12,5);
-    player.giveItem(12,5);
-    player.giveItem(12,5);
-    player.giveItem(2,2);
-    player.giveItem(20,10);
-    player.giveItem(45,10);
-    player.giveItem(19,10);
-    player.giveItem(48,10);
-    player.giveItem(49,10);
-    player.giveItem(50,10);
-    player.giveItem(51,10);
     if(!config.get('misc.performInit')) return;
 };
 

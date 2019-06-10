@@ -52,7 +52,10 @@ var Building = new Phaser.Class({
         this.setBuilt(data.built);
         this.resetDepth();
 
-        this.setInteractive();
+        var rect = new Phaser.Geom.Rectangle(this.x,this.y,this.width,this.height);
+        console.warn(data.x,data.y,this.x,this.y,this.width,this.height,rect);
+        this.setInteractive(rect,Phaser.Geom.Rectangle.Contains);
+        // this.setInteractive();
         this.setCollisions();
 
         var production = buildingData.production;

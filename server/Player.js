@@ -196,7 +196,6 @@ Player.prototype.applyVigorModifier = function () {
 Player.prototype.setStartingInventory = function () {
     // TODO: move to some config file
     var list = [
-        [28, 1],
         [7, 1],
         [21, 1]
     ];

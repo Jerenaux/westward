@@ -44,8 +44,12 @@ World Building
 - Add "resource markers" for wildlife (optimize?)
 
 - Items consumed not taken from belt
-- In addSurroundingFighters, fetch cell closests to center rather than at center
+- Duplicate item when equipped
+- Issue with battle stats
+- Equip hands and fists to new players
+- Test battle
 - No aggro??
+
 
 
 
