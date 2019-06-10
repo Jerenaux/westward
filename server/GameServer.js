@@ -277,6 +277,9 @@ GameServer.loadBuildings = function(){
  * Called during the initialization sequence.
  */
 GameServer.loadItems = function(){
+
+    GameServer.getItemsFromDBUpdateCache();
+
     var path = pathmodule.join(GameServer.mapsPath,'items.json');
     var items = JSON.parse(fs.readFileSync(path).toString());
     items.forEach(function(item){
@@ -290,6 +293,19 @@ GameServer.loadItems = function(){
     GameServer.resourceMarkers = JSON.parse(fs.readFileSync(path).toString());
     GameServer.updateStatus();
 };
+
+
+GameServer.getItemsFromDBUpdateCache = function () {
+    console.log('getItemsFromDBUpdateCache !!!!!!!!!!!!!!!');
+    const items = ['edno', 'dve'];
+    const dataAssets = pathmodule.join('assets','data');
+    const outPath = pathmodule.join(dataAssets,'/exports/items.json').toString()
+    // Items
+    fs.writeFile(outPath,JSON.stringify(items),function(err){
+        if(err) throw err;
+        console.log('Items cache written');
+    });
+}
 
 /**
  * Create Spawn Zones based on the spawnzones.json data file.
@@ -386,6 +402,18 @@ GameServer.onInitialized = function(){
  * Perform tasks each time a player joins the game. Mostly used for testing.
  */
 GameServer.onNewPlayer = function(player){
+    player.giveItem(4,5);
+    player.giveItem(12,5);
+    player.giveItem(12,5);
+    player.giveItem(12,5);
+    player.giveItem(2,2);
+    player.giveItem(20,10);
+    player.giveItem(45,10);
+    player.giveItem(19,10);
+    player.giveItem(48,10);
+    player.giveItem(49,10);
+    player.giveItem(50,10);
+    player.giveItem(51,10);
     if(!config.get('misc.performInit')) return;
 };
 

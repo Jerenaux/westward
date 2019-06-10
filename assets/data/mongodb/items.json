@@ -1,68 +1,93 @@
-{
-  "0":{
+[
+  {
+    "id": 0,
     "atlas": "items",
-    "frame":"redpowder",
-    "name":"Red powder",
-    "desc":"Crafting material used to brew red potions."
+    "frame": "redpowder",
+    "name": "Red powder",
+    "desc": "Crafting material used to brew red potions."
   },
-  "1":{
+  {
+    "id": 1,
     "atlas": "items",
-    "frame":"food",
+    "frame": "food",
     "name": "Food",
     "desc": "Can be used to nourish yourself, boost the productivity of buildings and feed troops.",
-    "effects":{"food":15},
+    "effects": {
+      "food": 15
+    },
     "isResource": true,
     "verb": "Ate"
   },
-  "2":{
+  {
+    "id": 2,
     "atlas": "items",
-    "frame":"bow",
+    "frame": "bow",
     "name": "Bow",
     "equipment": "rangedw",
     "ammo": "quiver",
-    "effects":{"acc":20},
-    "recipe": {"7":1,"21":1},
+    "effects": {
+      "acc": 20
+    },
+    "recipe": {
+      "7": 1,
+      "21": 1
+    },
     "useInBattle": true,
     "sound": "cloth",
     "isCrafted": true,
     "basicRecipe": true
   },
-  "3":{
+  {
+    "id": 3,
     "atlas": "items2",
-    "frame":"timber",
+    "frame": "timber",
     "name": "Timber",
     "desc": "Used to build new buildings."
   },
-  "4":{
+  {
+    "id": 4,
     "atlas": "items2",
-    "frame":"bomb",
+    "frame": "bomb",
     "name": "Bomb",
     "desc": "Explosive usable in battle to harm multiple targets (friends or foes) simultaneously.",
-    "recipe": {"24":3,"35":2},
+    "recipe": {
+      "24": 3,
+      "35": 2
+    },
     "isWeapon": true,
     "isCrafted": true,
     "craftTier": 2,
-    "sound": "cloth",
+    "equipment": "rangedw",
+    "sound": "equip",
     "stickMouse": true,
     "useInBattle": true
   },
-  "5":{
+  {
+    "id": 5,
     "atlas": "items2",
-    "frame":"root",
+    "frame": "root",
     "name": "Sunstreak root",
     "desc": "Crafting material involved in the brewing of several types of potions. Poisonous if consumed raw.",
     "isMaterial": true,
-    "effects":{"hp":-50},
+    "effects": {
+      "hp": -50
+    },
     "yield": 2
   },
-  "6":{
+  {
+    "id": 6,
     "atlas": "items2",
-    "frame":"flask",
+    "frame": "flask",
     "name": "Dawn",
     "desc": "Bitter potion, regenerates a lot of health.",
     "isPotion": true,
-    "recipe": {"17":1,"18":4},
-    "effects":{"hp":100},
+    "recipe": {
+      "17": 1,
+      "18": 4
+    },
+    "effects": {
+      "hp": 100
+    },
     "useInBattle": true,
     "isCrafted": true,
     "craftTier": 2,
@@ -70,133 +95,186 @@
     "basicRecipe": true,
     "verb": "Drank"
   },
-  "7":{
+  {
+    "id": 7,
     "atlas": "items",
-    "frame":"wood",
+    "frame": "wood",
     "name": "Wood",
-    "envFrames": ["wood"],
-    "desc": "Crafting material used to make wooden weapons or to make charcoal.",
+    "envFrames": [
+      "wood"
+    ],
+    "desc": "Crafting material used to make wooden weapons or to make charcoal. Can be used as primitive weapon.",
     "sound": "woodsmall",
     "isMaterial": true,
-    "equipment": "meleew"
+    "useInBattle": true,
+    "equipment": "meleew",
+    "effects": {
+      "dmg": 2
+    }
   },
-  "8":{
+  {
+    "id": 8,
     "atlas": "items2",
-    "frame":"thickgrass",
+    "frame": "thickgrass",
     "name": "Thick Grass",
-    "envFrames": ["bush_5"],
+    "envFrames": [
+      "bush_5"
+    ],
     "desc": "Crafting material used to make string.",
     "sound": "soft",
     "nbBushes": 1,
     "yield": 3
   },
-  "9":{
+  {
+    "id": 9,
     "atlas": "items2",
-    "frame":"hide",
+    "frame": "hide",
     "name": "Pelt",
     "desc": "Crafting material obtained from dead animals. Used to craft several pieces of equipment. Also very valuable to sell to settlements.",
     "sound": "cloth"
   },
-  "10":{
+  {
+    "id": 10,
     "atlas": "items2",
-    "frame":"tunic",
+    "frame": "tunic",
     "name": "Tunic",
     "equipment": "armor",
     "isCrafted": true,
-    "recipe":{"43":8},
-    "effects":{"def":4},
+    "recipe": {
+      "43": 8
+    },
+    "effects": {
+      "def": 4
+    },
     "sound": "cloth",
     "basicRecipe": true
   },
-  "11":{
+  {
+    "id": 11,
     "atlas": "items2",
-    "frame":"pirate-sword",
+    "frame": "pirate-sword",
     "name": "Sword",
     "equipment": "meleew",
-    "effects":{"dmg":20},
+    "effects": {
+      "dmg": 20
+    },
     "useInBattle": true,
     "desc": "An adventurer's best friend.",
     "sound": "sword",
     "isCrafted": true,
-    "recipe":{"33":3}
+    "recipe": {
+      "33": 3
+    }
   },
-  "12":{
+  {
+    "id": 12,
     "atlas": "items2",
-    "frame":"gun",
+    "frame": "gun",
     "name": "Gun",
     "equipment": "rangedw",
     "ammo": "ammo_pouch",
-    "effects":{"acc":5},
+    "effects": {
+      "acc": 5
+    },
     "useInBattle": true,
     "sound": "equip",
     "isCrafted": true,
-    "recipe": {"7":2,"24":2}
+    "recipe": {
+      "7": 2,
+      "24": 2
+    }
   },
-  "13":{
+  {
+    "id": 13,
     "atlas": "items2",
-    "frame":"shield1",
+    "frame": "shield1",
     "name": "Wooden shield",
     "equipment": "shield",
-    "effects":{"def":2},
+    "effects": {
+      "def": 2
+    },
     "sound": "equip",
     "isCrafted": true,
-    "recipe": {"7": 10}
+    "recipe": {
+      "7": 10
+    }
   },
-  "14":{
+  {
+    "id": 14,
     "atlas": "items2",
-    "frame":"sunflower",
-    "envFrames": ["bush_3"],
+    "frame": "sunflower",
+    "envFrames": [
+      "bush_3"
+    ],
     "name": "Sunstreak",
     "desc": "Flower with regenerative properties used to brew potions.",
     "isMaterial": true,
     "sound": "soft",
     "nbBushes": 2,
     "yield": 2,
-    "coitems": [5]
+    "coitems": [
+      5
+    ]
   },
-  "15":{
+  {
+    "id": 15,
     "atlas": "items2",
-    "frame":"boots",
+    "frame": "boots",
     "name": "Leather boots",
     "equipment": "boots",
     "isCrafted": true,
-    "recipe":{"43":4}
+    "recipe": {
+      "43": 4
+    }
   },
-  "16":{
+  {
+    "id": 16,
     "atlas": "items2",
-    "frame":"belt",
+    "frame": "belt",
     "name": "Leather belt",
     "equipment": "belt",
     "isCrafted": true,
-    "recipe":{"43":1},
+    "recipe": {
+      "43": 1
+    },
     "slots": 2
   },
-  "17":{
+  {
+    "id": 17,
     "atlas": "items",
-    "frame":"yellowpowder",
+    "frame": "yellowpowder",
     "name": "Daybreak",
     "desc": "Alchemical substance used to brew healing potions.",
-    "recipe":{"14":2,"27":1},
+    "recipe": {
+      "14": 2,
+      "27": 1
+    },
     "isCrafted": true,
     "craftTier": 1,
     "isMaterial": true,
     "sound": "powder",
     "basicRecipe": true
   },
-  "18":{
+  {
+    "id": 18,
     "atlas": "items2",
-    "frame":"clover",
+    "frame": "clover",
     "name": "Daydream",
-    "envFrames": ["clovers_1","clovers_2","clovers_3"],
+    "envFrames": [
+      "clovers_1",
+      "clovers_2",
+      "clovers_3"
+    ],
     "desc": "Plant used as alchemical ingredient for brewing health potions.",
     "isMaterial": true,
     "sound": "soft",
     "nbBushes": 4,
     "yield": 5
   },
-  "19":{
+  {
+    "id": 19,
     "atlas": "items",
-    "frame":"quiver",
+    "frame": "quiver",
     "name": "Small quiver",
     "equipment": "quiver",
     "capacity": 10,
@@ -204,102 +282,139 @@
     "useInBattle": true,
     "sound": "cloth",
     "isCrafted": true,
-    "recipe": {"43":3,"21":1},
+    "recipe": {
+      "43": 3,
+      "21": 1
+    },
     "basicRecipe": true
   },
-  "20":{
+  {
+    "id": 20,
     "atlas": "items",
-    "frame":"arrow",
+    "frame": "arrow",
     "name": "Arrow",
     "equipment": "arrows",
-    "effects":{"dmg":12},
+    "effects": {
+      "dmg": 12
+    },
     "isAmmo": true,
     "ammo": "quiver",
     "useInBattle": true,
     "sound": "woodsmall",
     "isCrafted": true,
-    "recipe":{"7":1,"24":1,"30":1},
+    "recipe": {
+      "7": 1,
+      "24": 1,
+      "30": 1
+    },
     "basicRecipe": true,
     "output": 5
   },
-  "21":{
+  {
+    "id": 21,
     "atlas": "items",
-    "frame":"string",
+    "frame": "string",
     "name": "String",
     "desc": "Robust string made from plant fibers, primarily used to make bows.",
     "isCrafted": true,
     "isMaterial": true,
-    "recipe":{"8":3},
+    "recipe": {
+      "8": 3
+    },
     "sound": "cloth",
     "basicRecipe": true
   },
-  "22":{
+  {
+    "id": 22,
     "atlas": "items2",
-    "frame":"coal",
+    "frame": "coal",
     "name": "Coal",
     "desc": "Crafting material that can be mined or obtained from wood. Can be used to heat furnaces, as an ingredient for antidotes or can be converted into carbon.",
     "isCrafted": true,
     "isResource": true,
     "isMaterial": true,
-    "recipe": {"7": 5}
+    "recipe": {
+      "7": 5
+    }
   },
-  "23":{
+  {
+    "id": 23,
     "atlas": "items",
-    "frame":"carbon",
+    "frame": "carbon",
     "name": "Carbon",
     "desc": "Crafting material obtained from coal. In combination with iron, it can be used to make steel.",
     "isCrafted": true,
     "isMaterial": true,
-    "recipe":{"22":5},
+    "recipe": {
+      "22": 5
+    },
     "sound": "clank"
   },
-  "24":{
+  {
+    "id": 24,
     "atlas": "items2",
-    "frame":"iron",
+    "frame": "iron",
     "name": "Iron ore",
     "desc": "Crafting material that can be mined and used to make steel for several items."
   },
-  "25":{
+  {
+    "id": 25,
     "atlas": "items2",
-    "frame":"rawgold",
+    "frame": "rawgold",
     "name": "Gold ore",
     "desc": "Precious crafting material that can be mined and is ultimately used to mint coins."
   },
-  "26":{
+  {
+    "id": 26,
     "atlas": "items2",
-    "frame":"stone",
+    "frame": "stone",
     "name": "Stone",
-    "envFrames": ["rock_1","rock_2","rock_3"],
+    "envFrames": [
+      "rock_1",
+      "rock_2",
+      "rock_3"
+    ],
     "collides": true,
     "desc": "Crafting material used to make primitive weapons.",
     "sound": "equip"
   },
-  "27":{
+  {
+    "id": 27,
     "atlas": "items",
-    "frame":"bone",
+    "frame": "bone",
     "name": "Bone",
     "desc": "Crafting material obtained from dead animals used to make primitive weapons.",
     "sound": "woodsmall"
   },
-  "28":{
+  {
+    "id": 28,
     "atlas": "items",
-    "frame":"basic_axe",
+    "frame": "basic_axe",
     "name": "Stone hatchet",
     "desc": "Basic weapon of fortune that can be crafted from wood and stone.",
     "isCrafted": true,
-    "recipe":{"7":1,"21":1,"26":1},
+    "recipe": {
+      "7": 1,
+      "21": 1,
+      "26": 1
+    },
     "equipment": "meleew",
-    "effects":{"dmg":5},
+    "effects": {
+      "dmg": 5
+    },
     "useInBattle": true,
     "sound": "equip",
     "basicRecipe": true
   },
-  "29":{
+  {
+    "id": 29,
     "atlas": "items",
-    "frame":"bone_arrow",
+    "frame": "bone_arrow",
     "name": "Bone arrow",
     "equipment": "arrows",
-    "effects":{"dmg":6},
+    "effects": {
+      "dmg": 6
+    },
     "isAmmo": true,
     "ammo": "quiver",
     "useInBattle": true,
@@ -307,112 +422,144 @@
     "isCrafted": true,
     "crafTier": 1,
     "output": 5,
-    "recipe":{"7":1,"27":1,"30":1},
+    "recipe": {
+      "7": 1,
+      "27": 1,
+      "30": 1
+    },
     "sound": "woodsmall",
     "basicRecipe": true
   },
-  "30":{
+  {
+    "id": 30,
     "atlas": "items2",
-    "frame":"feathers",
-    "envFrames": ["feathers"],
+    "frame": "feathers",
+    "envFrames": [
+      "feathers"
+    ],
     "name": "Feathers tuft",
     "desc": "Crafting material used to make arrows.",
     "isMaterial": true,
     "sound": "soft"
   },
-  "31":{
+  {
+    "id": 31,
     "atlas": "items",
-    "frame":"wheat",
+    "frame": "wheat",
     "name": "Wheat",
     "desc": "Resource harvested from farms that can be converted into food at a Mill.",
     "isResource": true
   },
-  "32":{
+  {
+    "id": 32,
     "atlas": "items",
-    "frame":"iron_ingot",
+    "frame": "iron_ingot",
     "name": "Iron ingot",
     "desc": "Intermediate crafting material obtained from iron ore destined to make steel.",
     "isCrafted": true,
     "isMaterial": true,
     "craftTier": 1,
-    "recipe":{"24":5},
+    "recipe": {
+      "24": 5
+    },
     "sound": "clank"
   },
-  "33":{
+  {
+    "id": 33,
     "atlas": "items",
-    "frame":"steel_ingot",
+    "frame": "steel_ingot",
     "name": "Steel ingot",
     "desc": "Intermediate crafting material obtained from iron ingots and carbon and used to forge weapons.",
     "isCrafted": true,
     "isMaterial": true,
     "craftTier": 2,
-    "recipe":{"23":1,"32":4},
+    "recipe": {
+      "23": 1,
+      "32": 4
+    },
     "sound": "clank"
   },
-  "34":{
+  {
+    "id": 34,
     "atlas": "items",
-    "frame":"sulfur",
+    "frame": "sulfur",
     "name": "Sulfur",
     "desc": "Crafting material used to make black powder.",
     "isResource": true,
     "isMaterial": true
   },
-  "35":{
+  {
+    "id": 35,
     "atlas": "items",
-    "frame":"blackpowder",
+    "frame": "blackpowder",
     "name": "Black powder",
     "desc": "Crafting material made from coal and sulfur used to make bullets and explosives.",
-    "recipe":{"22":1,"34":1},
+    "recipe": {
+      "22": 1,
+      "34": 1
+    },
     "isMaterial": true,
     "isCrafted": true,
     "craftTier": 1,
     "sound": "powder"
   },
-  "36":{
+  {
+    "id": 36,
     "atlas": "items2",
-    "frame":"stingleaf",
+    "frame": "stingleaf",
     "name": "Stingleaf",
     "desc": "Plant with cleansing properties used to brew potions.",
     "isMaterial": true
   },
-  "37":{
+  {
+    "id": 37,
     "atlas": "items2",
-    "frame":"whitepetal",
+    "frame": "whitepetal",
     "name": "Whitepetal",
     "desc": "Flower with cleansing properties used to brew potions.",
     "isMaterial": true
   },
-  "38":{
+  {
+    "id": 38,
     "atlas": "items",
-    "frame":"gold_ingot",
+    "frame": "gold_ingot",
     "name": "Gold ingot",
     "desc": "Precious rafting material obtained from golden ore destined to mint coins.",
     "isCrafted": true,
     "isMaterial": true,
     "craftTier": 1,
-    "recipe":{"25":5},
+    "recipe": {
+      "25": 5
+    },
     "sound": "clank"
   },
-  "39":{
+  {
+    "id": 39,
     "atlas": "items2",
-    "frame":"bullet",
+    "frame": "bullet",
     "name": "Bullet",
     "desc": "Ammunition used with firearms",
     "isCrafted": true,
     "isMaterial": false,
     "craftTier": 1,
-    "recipe":{"24":1,"35":1},
+    "recipe": {
+      "24": 1,
+      "35": 1
+    },
     "output": 5,
     "equipment": "bullets",
-    "effects":{"dmg":60},
+    "effects": {
+      "dmg": 60
+    },
     "isAmmo": true,
     "ammo": "ammo_pouch",
     "useInBattle": true,
     "sound": "clank"
   },
-  "40":{
+  {
+    "id": 40,
     "atlas": "items2",
-    "frame":"ammopouch",
+    "frame": "ammopouch",
     "name": "Small bullets pouch",
     "equipment": "ammo_pouch",
     "capacity": 10,
@@ -420,22 +567,31 @@
     "useInBattle": true,
     "sound": "cloth",
     "isCrafted": true,
-    "recipe": {"43":2,"21":1}
+    "recipe": {
+      "43": 2,
+      "21": 1
+    }
   },
-  "41":{
+  {
+    "id": 41,
     "atlas": "items",
-    "frame":"crimsonpowder",
+    "frame": "crimsonpowder",
     "name": "Crimson dust",
     "desc": "Enhanced gunpowder used to craft advanced explosives and ammunition.",
-    "recipe":{"24":1,"34":1,"35":1},
+    "recipe": {
+      "24": 1,
+      "34": 1,
+      "35": 1
+    },
     "isMaterial": true,
     "isCrafted": true,
     "craftTier": 1,
     "sound": "powder"
   },
-  "42":{
+  {
+    "id": 42,
     "atlas": "items2",
-    "frame":"biggerammopouch",
+    "frame": "biggerammopouch",
     "name": "Normal bullets pouch",
     "equipment": "ammo_pouch",
     "capacity": 20,
@@ -443,26 +599,36 @@
     "useInBattle": true,
     "sound": "cloth",
     "isCrafted": true,
-    "recipe": {"43":4,"21":2}
+    "recipe": {
+      "43": 4,
+      "21": 2
+    }
   },
-  "43":{
+  {
+    "id": 43,
     "atlas": "items",
-    "frame":"leather",
+    "frame": "leather",
     "name": "Leather",
     "desc": "Crafting material made from pelts used to craft various pieces of equipment.",
     "isCrafted": true,
     "isMaterial": true,
-    "recipe":{"9":1},
+    "recipe": {
+      "9": 1
+    },
     "output": 5,
     "sound": "cloth",
     "basicRecipe": true
   },
-  "44":{
+  {
+    "id": 44,
     "atlas": "items2",
-    "frame":"bomb2",
+    "frame": "bomb2",
     "name": "Crimson strike",
     "desc": "Advanced explosive, inflicts much more damage than traditional bombs.",
-    "recipe": {"24":3,"41":2},
+    "recipe": {
+      "24": 3,
+      "41": 2
+    },
     "isWeapon": true,
     "isCrafted": true,
     "craftTier": 2,
@@ -470,12 +636,15 @@
     "stickMouse": true,
     "useInBattle": true
   },
-  "45":{
+  {
+    "id": 45,
     "atlas": "items",
-    "frame":"stone_arrow",
+    "frame": "stone_arrow",
     "name": "Stone arrow",
     "equipment": "arrows",
-    "effects":{"dmg":3},
+    "effects": {
+      "dmg": 3
+    },
     "isAmmo": true,
     "ammo": "quiver",
     "useInBattle": true,
@@ -483,18 +652,27 @@
     "isCrafted": true,
     "crafTier": 1,
     "output": 5,
-    "recipe":{"7":1,"26":1,"30":1},
+    "recipe": {
+      "7": 1,
+      "26": 1,
+      "30": 1
+    },
     "sound": "woodsmall",
     "basicRecipe": true
   },
-  "46":{
+  {
+    "id": 46,
     "atlas": "items2",
-    "frame":"duskflask",
+    "frame": "duskflask",
     "name": "Dusk",
     "desc": "Sweet potion, regenerates vigor.",
     "isPotion": true,
-    "recipe": {"5":1},
-    "effects":{"vigor":30},
+    "recipe": {
+      "5": 1
+    },
+    "effects": {
+      "vigor": 30
+    },
     "useInBattle": true,
     "isCrafted": true,
     "craftTier": 1,
@@ -502,59 +680,22 @@
     "basicRecipe": true,
     "verb": "Drank"
   },
-  "47":{
+  {
+    "id": 47,
     "atlas": "items2",
-    "frame":"berries",
+    "frame": "berries",
     "name": "Caor berries",
     "desc": "Low nutritious value, only usable to nourish oneself a little.",
-    "effects":{"food":2},
+    "effects": {
+      "food": 2
+    },
     "isResource": true,
-    "envFrames": ["berriesbush"],
+    "envFrames": [
+      "berriesbush"
+    ],
     "sound": "soft",
     "nbBushes": 4,
     "yield": 5,
     "verb": "Ate"
-  },
-  "48":{
-    "atlas": "items2",
-    "frame":"fists",
-    "name": "Fists",
-    "desc": "This melee weapon you can't lose.",
-    "sound": "soft",
-    "nbBushes": 4,
-    "yield": 5,
-    "verb": "Ate",
-    "equipment": "meleew",
-    "permanent": true
-  },
-  "49":{
-    "atlas": "items2",
-    "frame":"hands",
-    "name": "Hands",
-    "desc": "This ranged weapon you can't lose. You can throw stones for example.",
-    "sound": "soft",
-    "nbBushes": 4,
-    "yield": 5,
-    "equipment": "rangedw",
-    "ammo": "quiver",
-    "effects":{"acc":20},
-    "recipe": {"7":1,"21":1},
-    "useInBattle": true,
-    "isCrafted": true,
-    "basicRecipe": true,
-    "permanent": true
-  },
-  "50":{},
-  "51":{
-    "atlas": "items2",
-    "frame":"ammopouch",
-    "name": "Small stones pouch",
-    "equipment": "stone_pouch",
-    "capacity": 10,
-    "desc": "Can contain up to 10 stones",
-    "useInBattle": true,
-    "sound": "cloth",
-    "isCrafted": true,
-    "recipe": {"43":2,"21":1}
   }
-}
+]
