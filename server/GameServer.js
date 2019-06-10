@@ -1153,7 +1153,8 @@ GameServer.addSurroundingFighters = function(battle){
     });
     center.x = Math.floor(center.x/battle.fighters.length);
     center.y = Math.floor(center.y/battle.fighters.length);
-    center = GameServer.battleCells.get(center.x,center.y);
+    // center = GameServer.battleCells.get(center.x,center.y);
+    center  = GameServer.findNearestBattleCell(battle.cells.toList(),center);
     if(!center) return;
 
     var r = GameServer.battleParameters.aggroRange;
@@ -1167,6 +1168,21 @@ GameServer.addSurroundingFighters = function(battle){
             GameServer.connectToBattle(entity,center);
         }
     }
+};
+
+GameServer.findNearestBattleCell = function(cells,tile){
+    var mindist = 999;
+    var closest = null;
+    for(var i = 0; i < cells.length; i++){
+        var cell = cells[i];
+        if(cell.x  == tile.x && cell.y == tile.y) return cell.v;
+        var dist = Utils.manhattan(cell,tile);
+        if(dist < mindist){
+            mindist = dist;
+            closest = cell;
+        }
+    }
+    return closest.v;
 };
 
 /**
@@ -1308,7 +1324,7 @@ GameServer.handleShop = function(data,socketID) {
         building.updateBuild();
     }
     building.save();
-    Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type});
+    Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type,owner:building.ownerName});
     return true;
 };
 

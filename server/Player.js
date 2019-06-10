@@ -727,7 +727,7 @@ Player.prototype.enterBuilding = function(id){
         var phrase = [this.name, 'visitted my', bldname];
         GameServer.notifyPlayer(building.owner, phrase.join(' '));
     }
-    Prism.logEvent(this,'building',{building:type});
+    Prism.logEvent(this,'building',{building:type,owner:building.ownerName});
     return true;
 };
 

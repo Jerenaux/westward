@@ -597,8 +597,20 @@
       "frame": {"x":527,"y":442,"w":11,"h":12}
     },
     {
+      "filename": "round_shield",
+      "frame": {"x":526,"y":475,"w":12,"h":12}
+    },
+    {
+      "filename": "2swords",
+      "frame": {"x":525,"y":491,"w":13,"h":12}
+    },
+    {
       "filename": "bullseye",
       "frame": {"x":506,"y":458,"w":14,"h":13}
+    },
+    {
+      "filename": "steps",
+      "frame": {"x":525,"y":508,"w":12,"h":12}
     },
     {
       "filename": "sword",

@@ -44,11 +44,13 @@ World Building
 - Add "resource markers" for wildlife (optimize?)
 
 - Items consumed not taken from belt
-- Fix building highlight
 - In addSurroundingFighters, fetch cell closests to center rather than at center
 - No aggro??
 
-- Ask for free Creature license
+
+
+
+
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
 https://medium.com/@kestrelm/2d-skeletal-animation-in-phaser-3-tutorial-3ed468fb6bd0
 
@@ -140,7 +142,7 @@ Secure
 Analytics:
 ---------
 - Log: belt
-- Add owner names to building events
+- New admin: fix dates format, date column width, reverse sort, update event descs as in current admin
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions

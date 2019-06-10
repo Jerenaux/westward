@@ -32,7 +32,8 @@ var TradeEvent = Event.discriminator(
         price: Number,
         item: Number,
         nb: Number,
-        building: Number
+        building: Number,
+        owner: String
     }),
     {discriminatorKey: 'kind'}
 );
@@ -100,7 +101,8 @@ var GoldEvent = Event.discriminator(
 var BuildingEvent = Event.discriminator(
     'BuildingEvent',
     new mongoose.Schema({
-        building: Number
+        building: Number,
+        owner: String
     }),
     {discriminatorKey: 'kind'}
 );

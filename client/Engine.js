@@ -2123,6 +2123,7 @@ Engine.updateGrid = function(){
 };
 
 Engine.getOccupiedCells = function(entity,hash){
+    if(entity.entityType == 'building') return [];
     var cells = [];
     for(var i = 0; i < entity.cellsWidth; i++){
         for(var j = 0; j < entity.cellsHeight; j++){
