@@ -664,29 +664,40 @@ Player.prototype.getDataFromDb = function (data) {
     this.setStat('hp', Math.max(this.getStat('hp').getValue(), 10)); // quick fix
     this.applyVigorModifier();
 
-    for (var slot in data.equipment.slots) {
-        var item = data.equipment.slots[slot];
-        if (item == -1) continue;
-        this.equip(slot, item, true);
+    if(data) {
+        if(data.equipment){
+
+            for (var slot in data.equipment.slots) {
+                var item = data.equipment.slots[slot];
+                if (item == -1) continue;
+                this.equip(slot, item, true);
+            }
+            for (var slot in data.equipment.containers) {
+                var item = data.equipment.containers[slot].id;
+                if (item == -1) continue;
+                this.equip(slot, item, true);
+            }
+            for (var slot in data.equipment.ammo) {
+                var item = data.equipment.ammo[slot].id;
+                var nb = data.equipment.ammo[slot].nb;
+                if (item == -1 || nb == 0) continue;
+                this.equip(slot, item, true);
+                this.load(slot, nb);
+            }
+        }
+
+        if(data.inventory){
+            data.inventory.forEach(function (i) {
+                this.giveItem(i[0], i[1]);
+            }, this);
+        }
+
+        if(data.belt){
+            data.belt.forEach(function (i) {
+                this.addToBelt(i[0], i[1]);
+            }, this);
+        }
     }
-    for (var slot in data.equipment.containers) {
-        var item = data.equipment.containers[slot].id;
-        if (item == -1) continue;
-        this.equip(slot, item, true);
-    }
-    for (var slot in data.equipment.ammo) {
-        var item = data.equipment.ammo[slot].id;
-        var nb = data.equipment.ammo[slot].nb;
-        if (item == -1 || nb == 0) continue;
-        this.equip(slot, item, true);
-        this.load(slot, nb);
-    }
-    data.inventory.forEach(function (i) {
-        this.giveItem(i[0], i[1]);
-    }, this);
-    data.belt.forEach(function (i) {
-        this.addToBelt(i[0], i[1]);
-    }, this);
 
     this.setRegion(data.sid);
     this.giveGold(data.gold);
