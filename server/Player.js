@@ -432,8 +432,9 @@ Player.prototype.equip = function (slot, item, fromDB) {
     var nb = 1;
 
     // Manage ammo
-    if (slot in Equipment.ammo) {
-        var container = this.equipment.get(this.equipment.getContainer(slot));
+    // if (slot in Equipment.ammo) {
+    if (slot === 'range_ammo') {
+        var container = this.equipment.get(this.equipment.container);
         nb = this.computeLoad(slot, container, item); // compute how much will be added to the container
         this.load(slot, nb);
     }
@@ -488,8 +489,11 @@ Player.prototype.unequip = function (slot, notify) {
 
 Player.prototype.applyAbsoluteModifiers = function (item, change) {
     var change = change || 1;
-    var itemData = GameServer.itemsData[item];
+    var itemData = GameServer.itemsData[item.id];
+
+    if (!itemData) return;
     if (!itemData.effects) return;
+
     for (var stat in itemData.effects) {
         if (!itemData.effects.hasOwnProperty(stat)) continue;
         if (change == 1) {
@@ -513,7 +517,12 @@ Player.prototype.removeAbsoluteModifier = function (stat, modifier) {
 // Compute how much of item `item` can be added to container `containerSlot`
 Player.prototype.computeLoad = function (slot, container, ammoType) {
     var currentNb = this.equipment.getNbAmmo(slot);
-    var capacity = GameServer.itemsData[container].capacity;
+
+
+    console.log('container',container);
+    console.log(GameServer.itemsData[container]);
+
+    var capacity = GameServer.itemsData[container.item].capacity;
     return Math.min(this.inventory.getNb(ammoType), capacity - currentNb);
 };
 

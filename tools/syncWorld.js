@@ -8,7 +8,7 @@ let Schemas = require('../server/schemas.js');
 
 
 function fetch(){
-    mongoose.connect(process.env.MONGODB_URI);
+    mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
     let db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function() {
@@ -24,7 +24,7 @@ function fetch(){
 }
 
 function insert(buildings){
-    mongoose.connect('mongodb://localhost:27017/westward');
+    mongoose.connect('mongodb://localhost:27017/westward',{ useNewUrlParser: true });
     let db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function() {

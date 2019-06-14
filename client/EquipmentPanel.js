@@ -76,7 +76,7 @@ EquipmentPanel.prototype.updateEquipment = function(){
         var currentItem = slot.id;
         //if(newItem == currentItem) return;
         var data;
-        if(newItem == -1){
+        if(newItem.id == -1){
             data = {
                 id: -1,
                 atlas: 'UI',

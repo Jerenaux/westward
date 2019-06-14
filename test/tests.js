@@ -30,7 +30,7 @@ describe('GameServer',function(){
     var stubs = [];
     before(function(done) {
         this.timeout(5000);
-        mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward');
+        mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward', { useNewUrlParser: true });
         var db = mongoose.connection;
         db.on('error', console.error.bind(console, 'connection error:'));
         db.once('open', function() {
