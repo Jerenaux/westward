@@ -522,7 +522,7 @@ Player.prototype.computeLoad = function (slot, container, ammoType) {
     console.log('container',container);
     console.log(GameServer.itemsData[container]);
 
-    var capacity = GameServer.itemsData[container.item].capacity;
+    var capacity = GameServer.itemsData[container].capacity;
     return Math.min(this.inventory.getNb(ammoType), capacity - currentNb);
 };
 

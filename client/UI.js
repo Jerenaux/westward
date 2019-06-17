@@ -81,6 +81,9 @@ var UI = {
 
         console.log('UI scene created');
         this.scene.get('boot').updateReadyTick();
+
+        //Auto start game for dev reasons
+        UI.launchGameMode();
     },
 
     makeBattleTutorialPanel: function(){

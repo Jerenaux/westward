@@ -46,6 +46,9 @@ var Boot = new Phaser.Class({
         }
 
         if(detectBrowser() != "Chrome") document.getElementById("browser").innerText = "This development version is best played using Chrome. With other browsers, lag and rendering issues may arise.";
+
+
+
     },
 
     updateReadyTick: function() {
@@ -83,6 +86,7 @@ var Boot = new Phaser.Class({
     displayButton: function(){
         Boot.buttons = [];
         Boot.buttons.push(new BigButton(512,400,'Play',UI.launchGameMode,true)); // true = bigger
+
 
         if(Client.gameConfig.boot.offerTutorial) Boot.buttons.push(new BigButton(512, 450, 'Tutorial', UI.launchTutorialMode,true));
 
