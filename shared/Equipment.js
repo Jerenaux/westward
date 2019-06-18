@@ -72,8 +72,8 @@ var Equipment = {
             battlex: 60,
             battley: 10,
             shade: 'quiver',
-            name: 'Quiver',
-            desc: 'Container for arrows, to be used with a bow. Quivers can have different capacities.',
+            name: 'Ammo Container',
+            desc: 'Container for arrows, bullets, etx. Containers can have different capacities.',
             contains: 'arrows',
             showInBattle: true
         },
@@ -189,7 +189,11 @@ function EquipmentManager(){
 
 // Returns the ID of the item equipped at the given slot
 EquipmentManager.prototype.get = function(label){
-    if(label in this.slots) return this.slots[label].id;
+    if(label in this.slots) {
+        const item_id = this.slots[label].id;
+        console.log(item_id);
+        return item_id;
+    }
     // if(label in this.containers) return this.containers[label].id;
     // if(label in this.ammo) return this.ammo[label].id;
     return -1;

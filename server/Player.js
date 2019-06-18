@@ -414,40 +414,50 @@ Player.prototype.canEquip = function (slot, item) {
 };
 
 Player.prototype.equip = function (slot, item, fromDB) {
+
+    if(!item) return false;
     if (!fromDB && !this.canEquip(slot, item)) return false;
+
     // console.log('Equipping');
     var slotData = Equipment.getData(slot);
     var itemData = GameServer.itemsData[item];
 
     if (this.isEquipped(slot)) this.unequip(slot);
 
-    var conflictSlot = slotData.conflict; // Name of the slot with which the new object could conflict
-    if (conflictSlot && this.isEquipped(conflictSlot)) this.unequip(conflictSlot, true);
+    if(slotData) {
+        var conflictSlot = slotData.conflict; // Name of the slot with which the new object could conflict
+        if (conflictSlot && this.isEquipped(conflictSlot)) this.unequip(conflictSlot, true);
+    }
 
     // equip item
-    this.equipment.set(slot, item);
-    this.updatePacket.addEquip(slot, item);
+    if(item){
+        this.equipment.set(slot, item);
+        this.updatePacket.addEquip(slot, item);
+        this.applyAbsoluteModifiers(item);
 
-    this.applyAbsoluteModifiers(item);
-    var nb = 1;
+        var nb = 1;
 
-    // Manage ammo
-    // if (slot in Equipment.ammo) {
-    if (slot === 'range_ammo') {
-        var container = this.equipment.get(this.equipment.container);
-        nb = this.computeLoad(slot, container, item); // compute how much will be added to the container
-        this.load(slot, nb);
-    }
-
-    if (!fromDB) {
-        this.addNotif('Equipped ' + nb + ' ' + itemData.name + (nb > 1 ? 's' : ''));
-        if (this.hasItemInBelt(item)) {
-            this.takeFromBelt(item, nb);
-        } else {
-            this.takeItem(item, nb);
+        // Manage ammo
+        // if (slot in Equipment.ammo) {
+        if (slot === 'range_ammo') {
+            var container = this.equipment.get(slot);
+            nb = this.computeLoad(slot, container, item); // compute how much will be added to the container
+            this.load(slot, nb);
         }
-        if (!this.inFight) this.save();
+
+        if (!fromDB) {
+            this.addNotif('Equipped ' + nb + ' ' + itemData.name + (nb > 1 ? 's' : ''));
+            if (this.hasItemInBelt(item)) {
+                this.takeFromBelt(item, nb);
+            } else {
+                this.takeItem(item, nb);
+            }
+            if (!this.inFight) this.save();
+        }
+
     }
+
+
     return true;
 };
 
@@ -460,7 +470,7 @@ Player.prototype.unequip = function (slot, notify) {
     var item = this.equipment.get(slot);
     if (item == -1) return;
 
-    if(GameServer.itemsData[item].permanent) return;
+    if (GameServer.itemsData[item].permanent) return;
 
     var nb = 1;
     if (slot in Equipment.ammo) nb = this.unload(slot);
@@ -476,7 +486,7 @@ Player.prototype.unequip = function (slot, notify) {
     this.applyAbsoluteModifiers(item, -1);
 
     // Replace with permanent equipment
-    if(slot in Equipment.slots) {
+    if (slot in Equipment.slots) {
         var defaultItem = Equipment.slots[slot].defaultItem;
         this.equip(slot, defaultItem);
     }
@@ -516,13 +526,18 @@ Player.prototype.removeAbsoluteModifier = function (stat, modifier) {
 
 // Compute how much of item `item` can be added to container `containerSlot`
 Player.prototype.computeLoad = function (slot, container, ammoType) {
-    var currentNb = this.equipment.getNbAmmo(slot);
+
+    let capacity = 0;
+    let currentNb = this.equipment.getNbAmmo(slot);
 
 
-    console.log('container',container);
+    console.log('container', container);
     console.log(GameServer.itemsData[container]);
 
-    var capacity = GameServer.itemsData[container].capacity;
+    if (GameServer.itemsData[container]) {
+        capacity = GameServer.itemsData[container].capacity;
+    }
+
     return Math.min(this.inventory.getNb(ammoType), capacity - currentNb);
 };
 
@@ -673,8 +688,8 @@ Player.prototype.getDataFromDb = function (data) {
     this.setStat('hp', Math.max(this.getStat('hp').getValue(), 10)); // quick fix
     this.applyVigorModifier();
 
-    if(data) {
-        if(data.equipment){
+    if (data) {
+        if (data.equipment) {
 
             for (var slot in data.equipment.slots) {
                 var item = data.equipment.slots[slot];
@@ -695,13 +710,13 @@ Player.prototype.getDataFromDb = function (data) {
             }
         }
 
-        if(data.inventory){
+        if (data.inventory) {
             data.inventory.forEach(function (i) {
                 this.giveItem(i[0], i[1]);
             }, this);
         }
 
-        if(data.belt){
+        if (data.belt) {
             data.belt.forEach(function (i) {
                 this.addToBelt(i[0], i[1]);
             }, this);
