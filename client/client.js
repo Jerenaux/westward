@@ -73,8 +73,11 @@ Client.checkForNewPlayer = function(){
 };
 
 Client.isNewPlayer = function(){
-    if(Client.gameConfig.boot.forceNewPlayer) return true;
-    return Client.newPlayer;
+    if(Client.gameConfig) {
+        if(Client.gameConfig.boot.forceNewPlayer) return true;
+        return Client.newPlayer;
+    }
+    console.error('Missing Client.gameConfig');
 };
 
 Client.getPlayerID = function(){

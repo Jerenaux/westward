@@ -28,8 +28,10 @@ ItemActionPanel.prototype.setUp = function(itemID){
         this.useButton.enable();
         if(data.isAmmo && Engine.player.getEquipped(data.ammo) == -1){
             this.useButton.disable();
-            this.warntext.setText('You need a '+Equipment.getData(data.ammo).name+' to be able to equip this!');
+            // this.warntext.setText('You need a '+Equipment.getData(data.ammo).name+' to be able to equip this!');
+            this.warntext.setText('You need a '+ data.ammo +' to be able to equip this!');
             this.warntext.setVisible(true);
+
         }
 
         var inBelt = Engine.player.belt.hasItem(itemID);

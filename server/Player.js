@@ -406,16 +406,20 @@ Player.prototype.getEquipped = function (slot) {
 Player.prototype.canEquip = function (slot, item) {
     if (!this.hasItem(item, 1) && !this.hasItemInBelt(item, 1)) return false;
     // If it's ammo, check that the proper container is equipped
-    if (slot in Equipment.ammo) {
-        var container = this.equipment.getContainer(slot);
-        if (this.equipment.get(container) == -1) return false;
+    if (slot in Equipment.slots || slot === Equipment.ammo || slot === Equipment.container) {
+        // var container = this.equipment.getContainer(slot);
+        //TODO: ask Jerome :) debug
+        const cantEquip = this.equipment.get(slot) == -1;
+        if (cantEquip) return false;
     }
     return true;
 };
 
 Player.prototype.equip = function (slot, item, fromDB) {
 
-    if(!item) return false;
+    console.log('Player.prototype.equip:', slot, item, fromDB);
+
+    if (!item || item.id === -1) return false;
     if (!fromDB && !this.canEquip(slot, item)) return false;
 
     // console.log('Equipping');
@@ -424,13 +428,13 @@ Player.prototype.equip = function (slot, item, fromDB) {
 
     if (this.isEquipped(slot)) this.unequip(slot);
 
-    if(slotData) {
+    if (slotData) {
         var conflictSlot = slotData.conflict; // Name of the slot with which the new object could conflict
         if (conflictSlot && this.isEquipped(conflictSlot)) this.unequip(conflictSlot, true);
     }
 
     // equip item
-    if(item){
+    if (item) {
         this.equipment.set(slot, item);
         this.updatePacket.addEquip(slot, item);
         this.applyAbsoluteModifiers(item);
@@ -696,18 +700,31 @@ Player.prototype.getDataFromDb = function (data) {
                 if (item == -1) continue;
                 this.equip(slot, item, true);
             }
-            for (var slot in data.equipment.containers) {
-                var item = data.equipment.containers[slot].id;
-                if (item == -1) continue;
-                this.equip(slot, item, true);
+            // for (var slot in data.equipment.containers) {
+            //     var item = data.equipment.containers[slot].id;
+            //     if (item == -1) continue;
+            //     this.equip(slot, item, true);
+            // }
+            // for (var slot in data.equipment.ammo) {
+            //     var item = data.equipment.ammo[slot].id;
+            //     var nb = data.equipment.ammo[slot].nb;
+            //     if (item == -1 || nb == 0) continue;
+            //     this.equip(slot, item, true);
+            //     this.load(slot, nb);
+            // }
+
+            let container_item_id = data.equipment.container.id;
+            if (container_item_id == -1) {
+                this.equip(slot, container_item_id, true);
             }
-            for (var slot in data.equipment.ammo) {
-                var item = data.equipment.ammo[slot].id;
-                var nb = data.equipment.ammo[slot].nb;
-                if (item == -1 || nb == 0) continue;
-                this.equip(slot, item, true);
+
+            let ammo_item_id = data.equipment.ammo.id;
+            let nb = data.equipment.ammo.nb;
+            if (ammo_item_id == -1 || nb == 0) {
+                this.equip(slot, ammo_item_id, true);
                 this.load(slot, nb);
             }
+
         }
 
         if (data.inventory) {

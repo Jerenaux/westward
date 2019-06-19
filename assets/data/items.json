@@ -561,7 +561,7 @@
     "useInBattle": true,
     "envFrames": ["rock_1","rock_2","rock_3"],
     "collides": true,
-    "desc": "Crafting material used to make primitive weapons.",
+    "desc": "Ninja stars can be thrown.",
     "sound": "equip"
   },
   "51":{

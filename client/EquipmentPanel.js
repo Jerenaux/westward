@@ -83,7 +83,7 @@ EquipmentPanel.prototype.updateEquipment = function () {
         console.log('updateEquipment slot', slot);
 
         var data;
-        if (newItem == -1 || newItem.id == -1) {
+        if (newItem === -1 || newItem.id === -1) {
             console.log('updateEquipment newItem', newItem);
             data = {
                 id: -1,
