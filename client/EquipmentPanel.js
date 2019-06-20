@@ -82,9 +82,14 @@ EquipmentPanel.prototype.updateEquipment = function () {
         //if(newItem == currentItem) return;
         console.log('updateEquipment slot', slot);
 
+        // Add logic for the default item
+        var defaultItem = slot.defaultItem;
+        console.log('defaultItem: ', defaultItem);
+
         var data;
-        if (newItem === -1 || newItem.id === -1) {
+        if (newItem === -1 ) {
             console.log('updateEquipment newItem', newItem);
+
             data = {
                 id: -1,
                 atlas: 'UI',

@@ -74,6 +74,9 @@ ItemSlot.prototype.checkForPanelOnTop = function(){
 };
 
 ItemSlot.prototype.setUp = function(action,item){
+
+    console.log('ItemSlot.prototype.setUp', action, item);
+
     if(!this.displayed) console.warn('Setting up slot before displaying it');
     var itemData = Engine.itemsData[item];
     this.icon.setTexture(itemData.atlas,itemData.frame);

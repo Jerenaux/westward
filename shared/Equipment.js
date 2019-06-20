@@ -22,7 +22,7 @@ var Equipment = {
             battlex: 10,
             battley: 10,
             shade: 'sword',
-            name: 'Melee weapon',
+            name: 'Melee weapon New',
             desc: 'Weapon used to fight opponents on adjacent battle positions. Influences the Melee damage stat. Not compatible with a ranged weapon.',
             //conflict: 'rangedw',
             showInBattle: true,
@@ -162,6 +162,7 @@ function EquipmentManager(){
     };
 
     for(var slot in Equipment.slots){
+        //TODO: Maybe here is better place for default items ?
         this.slots[slot] = {
             id: -1
         };
@@ -223,6 +224,7 @@ EquipmentManager.prototype.load = function(ammo,nb){
 };
 
 EquipmentManager.prototype.set = function(label,id){
+    console.log('EquipmentManager.prototype.set', label, id);
     if(label in this.slots) this.slots[label] = id;
     if(label in this.containers) this.containers[label].id = id;
     if(label in this.ammo) this.ammo[label].id = id;

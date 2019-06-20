@@ -406,12 +406,13 @@ Player.prototype.getEquipped = function (slot) {
 Player.prototype.canEquip = function (slot, item) {
     if (!this.hasItem(item, 1) && !this.hasItemInBelt(item, 1)) return false;
     // If it's ammo, check that the proper container is equipped
-    if (slot in Equipment.slots || slot === Equipment.ammo || slot === Equipment.container) {
-        // var container = this.equipment.getContainer(slot);
-        //TODO: ask Jerome :) debug
-        const cantEquip = this.equipment.get(slot) == -1;
-        if (cantEquip) return false;
-    }
+    // TODO ADD THE AMMO CHECKS FOR CONTAINER!!!
+    // if (slot in Equipment.slots || slot === Equipment.ammo || slot === Equipment.container) {
+    //     // var container = this.equipment.getContainer(slot);
+    //     //TODO: ask Jerome :) debug
+    //     const cantEquip = this.equipment.get(slot) == -1;
+    //     if (cantEquip) return false;
+    // }
     return true;
 };
 
@@ -472,9 +473,11 @@ Player.prototype.equip = function (slot, item, fromDB) {
  */
 Player.prototype.unequip = function (slot, notify) {
     var item = this.equipment.get(slot);
-    if (item == -1) return;
+    if (!item || item === -1) return;
 
-    if (GameServer.itemsData[item].permanent) return;
+    let item_data = GameServer.itemsData[item];
+
+    if (item_data.permanent) return;
 
     var nb = 1;
     if (slot in Equipment.ammo) nb = this.unload(slot);
