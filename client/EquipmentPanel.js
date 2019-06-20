@@ -16,12 +16,12 @@ EquipmentPanel.prototype.addEquipment = function () {
     for (var slot in Equipment.slots) {
         this.makeSlots(slot, Equipment.slots[slot]);
     }
-    for (var container in Equipment.containers) {
-        this.makeSlots(container, Equipment.containers[container]);
-    }
-    for (var ammo in Equipment.ammo) {
-        this.makeSlots(ammo, Equipment.ammo[ammo], true);
-    }
+    // for (var container in Equipment.containers) {
+    //     this.makeSlots(container, Equipment.containers[container]);
+    // }
+    // for (var ammo in Equipment.ammo) {
+    //     this.makeSlots(ammo, Equipment.ammo[ammo], true);
+    // }
     this.updateEquipment();
 };
 
@@ -31,7 +31,8 @@ EquipmentPanel.prototype.makeSlots = function (label, data, displayNumber) {
     var yoffset = (this.battleMenu ? 10 : 0);
     var x = (this.battleMenu ? data.battlex : data.x) + xoffset;
     var y = (this.battleMenu ? data.battley : data.y) + yoffset;
-    this.slots.push(this.addEquipSlot(x, y, data.name, data.desc, data.shade, displayNumber, label));
+    slot = this.addEquipSlot(x, y, data.name, data.desc, data.shade, displayNumber, label);
+    this.slots.push(slot);
 };
 
 EquipmentPanel.prototype.addEquipSlot = function (x, y, name, desc, shade, displayNumber, slotName) {
@@ -84,6 +85,9 @@ EquipmentPanel.prototype.updateEquipment = function () {
 
         // Add logic for the default item
         var defaultItem = slot.defaultItem;
+        if(defaultItem) {
+            newItem = defaultItem;
+        }
         console.log('defaultItem: ', defaultItem);
 
         var data;
@@ -101,7 +105,7 @@ EquipmentPanel.prototype.updateEquipment = function () {
             data = Engine.itemsData[newItem];
         }
 
-        if(newItem){
+        if(newItem && data){
             slot.item.setUp(newItem, data);
             slot.id = newItem;
         }

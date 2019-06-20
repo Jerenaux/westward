@@ -17,8 +17,9 @@ function ItemActionPanel(x,y,width,height,title){
 ItemActionPanel.prototype = Object.create(Panel.prototype);
 ItemActionPanel.prototype.constructor = ItemActionPanel;
 
+
 ItemActionPanel.prototype.setUp = function(itemID){
-    var data = Engine.itemsData[itemID];
+    const data = Engine.itemsData[itemID];
     this.itemID = itemID;
     this.icon.setUp(itemID,data);
     this.text.setText(data.name);
@@ -26,12 +27,17 @@ ItemActionPanel.prototype.setUp = function(itemID){
     if(data.effects || data.equipment){
         this.useButton.setText(data.equipment ? 'Equip' : 'Use');
         this.useButton.enable();
-        if(data.isAmmo && Engine.player.getEquipped(data.ammo) == -1){
+
+        let container_item_id = Engine.player.getEquipped('range_container');
+        const container_item = Engine.itemsData[container_item_id];
+
+        ammoContainerMatch = (container_item && container_item.container_type === data.container_type);
+
+        if(data.isAmmo && !ammoContainerMatch){
             this.useButton.disable();
             // this.warntext.setText('You need a '+Equipment.getData(data.ammo).name+' to be able to equip this!');
-            this.warntext.setText('You need a '+ data.ammo +' to be able to equip this!');
+            this.warntext.setText('You need a '+ data.container_type_name +' to be able to equip this!');
             this.warntext.setVisible(true);
-
         }
 
         var inBelt = Engine.player.belt.hasItem(itemID);

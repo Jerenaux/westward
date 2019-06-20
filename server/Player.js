@@ -445,8 +445,8 @@ Player.prototype.equip = function (slot, item, fromDB) {
         // Manage ammo
         // if (slot in Equipment.ammo) {
         if (slot === 'range_ammo') {
-            var container = this.equipment.get(slot);
-            nb = this.computeLoad(slot, container, item); // compute how much will be added to the container
+            var range_container_id = this.equipment.get('range_container');
+            nb = this.computeLoad(slot, range_container_id, item); // compute how much will be added to the container
             this.load(slot, nb);
         }
 
@@ -472,25 +472,25 @@ Player.prototype.equip = function (slot, item, fromDB) {
  * @param notify {boolean} - Send a notification to player or not.
  */
 Player.prototype.unequip = function (slot, notify) {
-    var item = this.equipment.get(slot);
-    if (!item || item === -1) return;
+    var item_id = this.equipment.get(slot);
+    if (!item_id || item_id === -1) return;
 
-    let item_data = GameServer.itemsData[item];
+    let item_data = GameServer.itemsData[item_id];
 
-    if (item_data.permanent) return;
+    if (!item_data || item_data.permanent) return;
 
     var nb = 1;
-    if (slot in Equipment.ammo) nb = this.unload(slot);
-    if (slot in Equipment.containers) {
-        var ammo = this.equipment.getAmmoType(slot);
-        this.unequip(ammo, true);
+
+    if (slot === 'range_container' || slot === 'range_ammo') {
+        // var ammo = this.equipment.getAmmoType(slot);
+        nb = this.unload('range_ammo');
     }
 
-    this.giveItem(item, nb);
+    this.giveItem(item_id, nb);
 
     this.equipment.set(slot, -1);
     this.updatePacket.addEquip(slot, -1);
-    this.applyAbsoluteModifiers(item, -1);
+    this.applyAbsoluteModifiers(item_id, -1);
 
     // Replace with permanent equipment
     if (slot in Equipment.slots) {
@@ -499,7 +499,7 @@ Player.prototype.unequip = function (slot, notify) {
     }
 
     if (notify) {
-        this.addNotif('Unequipped ' + nb + ' ' + GameServer.itemsData[item].name + (nb > 1 ? 's' : ''));
+        this.addNotif('Unequipped ' + nb + ' ' + GameServer.itemsData[item_id].name + (nb > 1 ? 's' : ''));
         this.save();
     }
 };
@@ -532,20 +532,25 @@ Player.prototype.removeAbsoluteModifier = function (stat, modifier) {
 };
 
 // Compute how much of item `item` can be added to container `containerSlot`
-Player.prototype.computeLoad = function (slot, container, ammoType) {
+Player.prototype.computeLoad = function (slot, range_container_id, ammo_item_id) {
 
     let capacity = 0;
-    let currentNb = this.equipment.getNbAmmo(slot);
+    let currentNb = this.equipment.getNbAmmo();
+    const range_container_item = GameServer.itemsData[range_container_id];
 
+    console.log('computeLoad', range_container_id);
+    console.log(GameServer.itemsData[range_container_id]);
 
-    console.log('container', container);
-    console.log(GameServer.itemsData[container]);
-
-    if (GameServer.itemsData[container]) {
-        capacity = GameServer.itemsData[container].capacity;
+    if (range_container_item) {
+        capacity = GameServer.itemsData[range_container_id].capacity;
+    }
+    if(currentNb && currentNb > 0){
+        capacity = capacity - currentNb;
     }
 
-    return Math.min(this.inventory.getNb(ammoType), capacity - currentNb);
+    const ammo_count_in_inventory = this.inventory.getNb(ammo_item_id);
+
+    return Math.min(ammo_count_in_inventory, capacity );
 };
 
 Player.prototype.load = function (ammo, nb) {
@@ -556,7 +561,7 @@ Player.prototype.load = function (ammo, nb) {
 Player.prototype.unload = function (ammo, notify) {
     var nb = this.equipment.getNbAmmo(ammo);
     var item = this.equipment.get(ammo);
-    this.equipment.setAmmo(ammo, 0);
+    this.equipment.setAmmo(0);
     this.updatePacket.addAmmo(ammo, 0);
     if (notify) this.addNotif('Unloaded ' + GameServer.itemsData[item].name);
     return nb;
@@ -662,7 +667,7 @@ Player.prototype.trim = function () {
     trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    trimmed.quickSlots = this.equipment.quickslots.nb;
+    // trimmed.quickSlots = this.equipment.quickslots.nb;
     // return trimmed;
     return GameObject.prototype.trim.call(this, trimmed);
 };
@@ -716,13 +721,13 @@ Player.prototype.getDataFromDb = function (data) {
             //     this.load(slot, nb);
             // }
 
-            let container_item_id = data.equipment.container.id;
+            let container_item_id = data.equipment.slots['range_container'].id;
             if (container_item_id == -1) {
                 this.equip(slot, container_item_id, true);
             }
 
-            let ammo_item_id = data.equipment.ammo.id;
-            let nb = data.equipment.ammo.nb;
+            let ammo_item_id = data.equipment.slots['range_ammo'].id;
+            let nb = data.equipment.slots['range_ammo'].nb;
             if (ammo_item_id == -1 || nb == 0) {
                 this.equip(slot, ammo_item_id, true);
                 this.load(slot, nb);

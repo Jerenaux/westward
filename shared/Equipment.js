@@ -73,9 +73,7 @@ var Equipment = {
             battley: 10,
             shade: 'quiver',
             name: 'Ammo Container',
-            desc: 'Container for arrows, bullets, etx. Containers can have different capacities.',
-            contains: 'arrows',
-            showInBattle: true
+            desc: 'Container for arrows, bullets, etx. Containers can have different capacities.'
         },
         range_ammo:{
             nb: 1,
@@ -85,9 +83,7 @@ var Equipment = {
             battley: 10,
             shade: 'arrow',
             name: 'Ammo',
-            desc: 'Ammunition.',
-            container: 'quiver',
-            showInBattle: true
+            desc: 'Ammunition.'
         }
     },
     // containers: {
@@ -153,23 +149,32 @@ var Equipment = {
 function EquipmentManager(){
 
     this.slots = {};
-    this.containers = {};
-    this.container = {};
-    this.ammo = {};
-    this.quickslots = {
-        slots: [],
-        nb: 2
-    };
+    // this.containers = {};
+    // this.container = {};
+    // this.ammo = {};
+    // TODO: Check Maybe wont be needed
+    // this.quickslots = {
+    //     slots: [],
+    //     nb: 2
+    // };
 
-    for(var slot in Equipment.slots){
-        //TODO: Maybe here is better place for default items ?
-        this.slots[slot] = {
-            id: -1
-        };
+    for(var slotName in Equipment.slots){
+        //TODO: Maybe here is better place for default items ? - ideal place :)
+        // Replace with permanent equipment
+        item = {
+            id: -1,
+            nb: 0
+        }
+        console.log('EquipmentManager slot zzzz', slotName);
+        if (Equipment.slots[slotName].defaultItem){
+            console.log('equip default item bby default', Equipment.slots[slotName].defaultItem)
+            item.id = Equipment.slots[slotName].defaultItem;
+        }
+        this.slots[slotName] = item;
     }
 
-    this.container = Equipment.slots.range_container;
-    this.ammo = Equipment.slots.range_ammo;
+    // this.container = Equipment.slots.range_container;
+    // this.ammo = Equipment.slots.range_ammo;
 
     // for(var container in Equipment.containers){
     //     var data = Equipment.containers[container];
@@ -189,62 +194,57 @@ function EquipmentManager(){
 }
 
 // Returns the ID of the item equipped at the given slot
-EquipmentManager.prototype.get = function(label){
-    if(label in this.slots) {
-        const item_id = this.slots[label].id;
-        console.log(item_id);
-        return item_id;
+EquipmentManager.prototype.get = function(slotName){
+    if(slotName in this.slots) {
+        return this.slots[slotName].id;
     }
     // if(label in this.containers) return this.containers[label].id;
     // if(label in this.ammo) return this.ammo[label].id;
     return -1;
 };
 
-// Returns the *label* of the ammo contained in a given container
-EquipmentManager.prototype.getAmmoType = function(container){
-    return this.containers[container].contains;
-};
-
+// // Returns the *label* of the ammo contained in a given container
+// EquipmentManager.prototype.getAmmoType = function(container){
+//     return this.containers[container].contains;
+// };
+//
 // Returns the *label* of the container for a giver ammo type
-EquipmentManager.prototype.getContainer = function(ammo){
-    return this.ammo.container;
+EquipmentManager.prototype.getNbAmmo = function(){
+    return this.slots["range_ammo"].nb;
 };
 
-EquipmentManager.prototype.getNbAmmo = function(ammo){
-    return this.ammo.nb;
+EquipmentManager.prototype.hasAnyAmmo = function(){
+    return this.slots["range_ammo"].id > -1 && this.slots["range_ammo"].nb > 0;
 };
 
-EquipmentManager.prototype.hasAnyAmmo = function(ammo){
-    var data = this.ammo;
-    return (data.type > -1 && data.nb > 0);
+EquipmentManager.prototype.load = function(nb){
+    // TODO: check if more ammo is loaded than the capacity its
+    //  calculated right and returned to the inventory
+    this.slots["range_ammo"].nb += nb;
 };
 
-EquipmentManager.prototype.load = function(ammo,nb){
-    this.ammo.nb += nb;
+EquipmentManager.prototype.set = function(slotName,id){
+    console.log('EquipmentManager.prototype.set', slotName, id);
+    if(slotName in this.slots) this.slots[slotName].id = id;
+    // if(label in this.containers) this.containers[label].id = id;
+    // if(label in this.ammo) this.ammo[label].id = id;
 };
 
-EquipmentManager.prototype.set = function(label,id){
-    console.log('EquipmentManager.prototype.set', label, id);
-    if(label in this.slots) this.slots[label] = id;
-    if(label in this.containers) this.containers[label].id = id;
-    if(label in this.ammo) this.ammo[label].id = id;
-};
-
-EquipmentManager.prototype.setAmmo = function(ammo,nb){
-    this.ammo.nb = nb;
+EquipmentManager.prototype.setAmmo = function(nb){
+    this.slots['range_ammo'].nb = nb
 };
 
 EquipmentManager.prototype.listItems = function(){
     var items = [];
-    for(var label in this.slots){
-        if(this.slots[label] > -1) items.push(this.slots[label]);
+    for(var slotName in this.slots){
+        if(this.slots[slotName] > -1) items.push(this.slots[slotName]);
     }
-    for(var label in this.containers){
-        if(this.container > -1) items.push(this.container);
-    }
-    for(var label in this.ammo){
-        if(this.ammo.id > -1) items.push(this.ammo);
-    }
+    // for(var label in this.containers){
+    //     if(this.container > -1) items.push(this.container);
+    // }
+    // for(var label in this.ammo){
+    //     if(this.ammo.id > -1) items.push(this.ammo);
+    // }
     return items;
 };
 

@@ -99,10 +99,10 @@ var Hero = new Phaser.Class({
             if(!battleCallbacks.hasOwnProperty(field)) continue;
             if(field in data) battleCallbacks[field].call(this,data[field]);
         }
-        
+
         if(data.x >= 0 && data.y >= 0) this.teleport(data.x,data.y);
-       
-        Engine.updateAllOrientationPins(); 
+
+        Engine.updateAllOrientationPins();
 
         Engine.firstSelfUpdate = false;
     },
@@ -199,7 +199,8 @@ var Hero = new Phaser.Class({
     updateAmmo: function(ammo){
         for(var i = 0; i < ammo.length; i++){
             var am = ammo[i];
-            this.equipment.setAmmo(am.slot,am.nb);
+            console.log('Hero.js updateAmmo', ammo, am);
+            this.equipment.setAmmo(am.nb);
         }
         this.updateEvents.add('equip');
     },

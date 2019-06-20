@@ -61,8 +61,8 @@ PersonalUpdatePacket.prototype.addEquip = function(slot,item){
     this.equipment.push({slot:slot,item:item});
 };
 
-PersonalUpdatePacket.prototype.addAmmo = function(slot,nb){
-    this.ammo.push({slot:slot,nb:nb});
+PersonalUpdatePacket.prototype.addAmmo = function(nb){
+    this.ammo.push({nb:nb});
 };
 
 PersonalUpdatePacket.prototype.addMsg = function(msg){
