@@ -220,6 +220,8 @@ EquipmentManager.prototype.hasAnyAmmo = function(){
 EquipmentManager.prototype.load = function(nb){
     // TODO: check if more ammo is loaded than the capacity its
     //  calculated right and returned to the inventory
+    console.warn('current nb:',this.slots["range_ammo"].nb);
+    console.warn('nb:',nb);
     this.slots["range_ammo"].nb += nb;
 };
 

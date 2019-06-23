@@ -360,7 +360,7 @@ Player.prototype.hasItem = function (item, nb) {
 };
 
 Player.prototype.hasItemInBelt = function (item) {
-    return (this.belt.getNb(item) >= 0);
+    return (this.belt.getNb(item) > 0);
 };
 
 Player.prototype.giveItem = function (item, nb, notify, verb) {
@@ -376,6 +376,7 @@ Player.prototype.giveItem = function (item, nb, notify, verb) {
 };
 
 Player.prototype.takeItem = function (item, nb, notify, verb) {
+    console.warn('take item');
     this.inventory.take(item, nb);
     this.updatePacket.addItem(item, this.inventory.getNb(item));
     if (notify) {
@@ -452,6 +453,7 @@ Player.prototype.equip = function (slot, item, fromDB) {
 
         if (!fromDB) {
             this.addNotif('Equipped ' + nb + ' ' + itemData.name + (nb > 1 ? 's' : ''));
+            console.warn('in belt:',this.hasItemInBelt(item));
             if (this.hasItemInBelt(item)) {
                 this.takeFromBelt(item, nb);
             } else {
@@ -480,11 +482,8 @@ Player.prototype.unequip = function (slot, notify) {
     if (!item_data || item_data.permanent) return;
 
     var nb = 1;
-
-    if (slot === 'range_container' || slot === 'range_ammo') {
-        // var ammo = this.equipment.getAmmoType(slot);
-        nb = this.unload('range_ammo');
-    }
+    if (slot === 'range_ammo') nb = this.unload('range_ammo');
+    console.warn('nb = ',nb);
 
     this.giveItem(item_id, nb);
 
@@ -492,10 +491,12 @@ Player.prototype.unequip = function (slot, notify) {
     this.updatePacket.addEquip(slot, -1);
     this.applyAbsoluteModifiers(item_id, -1);
 
+    if (slot == 'range_container') this.unequip('range_ammo',true);
+
     // Replace with permanent equipment
     if (slot in Equipment.slots) {
         var defaultItem = Equipment.slots[slot].defaultItem;
-        this.equip(slot, defaultItem);
+        this.equip(slot, defaultItem, true);
     }
 
     if (notify) {
@@ -554,7 +555,7 @@ Player.prototype.computeLoad = function (slot, range_container_id, ammo_item_id)
 };
 
 Player.prototype.load = function (ammo, nb) {
-    this.equipment.load(ammo, nb);
+    this.equipment.load(nb);
     this.updatePacket.addAmmo(ammo, this.equipment.getNbAmmo(ammo));
 };
 
