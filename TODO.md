@@ -49,7 +49,7 @@ World Building
 - Equip hands and fists to new players
 - Test battle
 - No aggro??
-
+- If statement around code in UI to skip title screen
 
 
 
