@@ -133,9 +133,10 @@ var Hero = new Phaser.Class({
         return this.equipment.get(slot); // Returns the ID of the item equipped at the given slot
     },
 
-    getMaxAmmo: function(slot){
-        var container = this.equipment.get(this.equipment.getContainer(slot));
-        return Engine.itemsData[container].capacity;
+    getMaxAmmo: function(){
+        var container_id = this.equipment.get('range_container');
+        console.warn('container_id = ',container_id);
+        return Engine.itemsData[container_id].capacity;
     },
 
     getNbAmmo: function(slot){

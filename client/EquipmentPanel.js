@@ -14,7 +14,8 @@ EquipmentPanel.prototype.constructor = EquipmentPanel;
 
 EquipmentPanel.prototype.addEquipment = function () {
     for (var slot in Equipment.slots) {
-        this.makeSlots(slot, Equipment.slots[slot]);
+        var is_ammo = (slot == 'range_ammo');
+        this.makeSlots(slot, Equipment.slots[slot], is_ammo);
     }
     // for (var container in Equipment.containers) {
     //     this.makeSlots(container, Equipment.containers[container]);
@@ -31,7 +32,7 @@ EquipmentPanel.prototype.makeSlots = function (label, data, displayNumber) {
     var yoffset = (this.battleMenu ? 10 : 0);
     var x = (this.battleMenu ? data.battlex : data.x) + xoffset;
     var y = (this.battleMenu ? data.battley : data.y) + yoffset;
-    slot = this.addEquipSlot(x, y, data.name, data.desc, data.shade, displayNumber, label);
+    var slot = this.addEquipSlot(x, y, data.name, data.desc, data.shade, displayNumber, label);
     this.slots.push(slot);
 };
 
@@ -81,18 +82,15 @@ EquipmentPanel.prototype.updateEquipment = function () {
         var newItem = Engine.player.getEquipped(slot.slotName);
         var currentItem = slot.id;
         //if(newItem == currentItem) return;
-        console.log('updateEquipment slot', slot);
 
         // Add logic for the default item
         var defaultItem = slot.defaultItem;
         if(defaultItem) {
             newItem = defaultItem;
         }
-        console.log('defaultItem: ', defaultItem);
 
         var data;
         if (newItem === -1 ) {
-            console.log('updateEquipment newItem', newItem);
 
             data = {
                 id: -1,
@@ -111,10 +109,12 @@ EquipmentPanel.prototype.updateEquipment = function () {
         }
 
         if (slot.text) {
-            if (newItem == -1) {
+            var container_id = Engine.player.equipment.get('range_container');
+            if (newItem == -1 || container_id == -1) {
                 slot.text.setVisible(false);
             } else {
                 var nb = Engine.player.getNbAmmo(slot.slotName);
+                console.warn('nb = ',nb);
                 slot.text.setText(nb);
                 if (this.displayed) {
                     var capacity = Engine.player.getMaxAmmo(slot.slotName);

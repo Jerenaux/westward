@@ -161,11 +161,10 @@ function EquipmentManager(){
     for(var slotName in Equipment.slots){
         //TODO: Maybe here is better place for default items ? - ideal place :)
         // Replace with permanent equipment
-        item = {
+        var item = {
             id: -1,
             nb: 0
-        }
-        console.log('EquipmentManager slot zzzz', slotName);
+        };
         if (Equipment.slots[slotName].defaultItem){
             console.log('equip default item bby default', Equipment.slots[slotName].defaultItem)
             item.id = Equipment.slots[slotName].defaultItem;
@@ -203,6 +202,15 @@ EquipmentManager.prototype.get = function(slotName){
     return -1;
 };
 
+EquipmentManager.prototype.getItem = function(slotName){
+    var id = EquipmentManager.prototype.get(slotName);
+    if(onServer){
+        return GameServer.itemsData[id];
+    }else {
+        return Engine.itemsData[id];
+    }
+};
+
 // // Returns the *label* of the ammo contained in a given container
 // EquipmentManager.prototype.getAmmoType = function(container){
 //     return this.containers[container].contains;
@@ -226,8 +234,8 @@ EquipmentManager.prototype.load = function(nb){
 };
 
 EquipmentManager.prototype.set = function(slotName,id){
-    console.log('EquipmentManager.prototype.set', slotName, id);
     if(slotName in this.slots) this.slots[slotName].id = id;
+    // if(slotName in this.slots) this.slots[slotName].nb = item.nb;
     // if(label in this.containers) this.containers[label].id = id;
     // if(label in this.ammo) this.ammo[label].id = id;
 };

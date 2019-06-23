@@ -417,11 +417,11 @@ Player.prototype.canEquip = function (slot, item) {
     return true;
 };
 
-Player.prototype.equip = function (slot, item, fromDB) {
+Player.prototype.equip = function (slot, item, fromDB) { // item is item_id
 
     console.log('Player.prototype.equip:', slot, item, fromDB);
 
-    if (!item || item.id === -1) return false;
+    if (!item) return false;
     if (!fromDB && !this.canEquip(slot, item)) return false;
 
     // console.log('Equipping');
@@ -437,7 +437,7 @@ Player.prototype.equip = function (slot, item, fromDB) {
 
     // equip item
     if (item) {
-        this.equipment.set(slot, item);
+        this.equipment.set(slot, item); // item = item_id
         this.updatePacket.addEquip(slot, item);
         this.applyAbsoluteModifiers(item);
 
@@ -554,16 +554,16 @@ Player.prototype.computeLoad = function (slot, range_container_id, ammo_item_id)
     return Math.min(ammo_count_in_inventory, capacity );
 };
 
-Player.prototype.load = function (ammo, nb) {
+Player.prototype.load = function (nb) {
     this.equipment.load(nb);
-    this.updatePacket.addAmmo(ammo, this.equipment.getNbAmmo(ammo));
+    this.updatePacket.addAmmo(this.equipment.getNbAmmo());
 };
 
-Player.prototype.unload = function (ammo, notify) {
-    var nb = this.equipment.getNbAmmo(ammo);
-    var item = this.equipment.get(ammo);
+Player.prototype.unload = function (notify) {
+    var nb = this.equipment.getNbAmmo();
+    var item = this.equipment.get('range_ammo');
     this.equipment.setAmmo(0);
-    this.updatePacket.addAmmo(ammo, 0);
+    this.updatePacket.addAmmo('range_ammo', 0);
     if (notify) this.addNotif('Unloaded ' + GameServer.itemsData[item].name);
     return nb;
 };
