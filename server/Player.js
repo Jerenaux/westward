@@ -376,7 +376,6 @@ Player.prototype.giveItem = function (item, nb, notify, verb) {
 };
 
 Player.prototype.takeItem = function (item, nb, notify, verb) {
-    console.warn('take item');
     this.inventory.take(item, nb);
     this.updatePacket.addItem(item, this.inventory.getNb(item));
     if (notify) {
@@ -417,10 +416,24 @@ Player.prototype.canEquip = function (slot, item) {
     return true;
 };
 
-Player.prototype.equip = function (slot, item, fromDB) { // item is item_id
+/**
+ * Equip a piece of equipment. Doesn't check for item ownership,
+ * this should be done upsteam (e.g. in `GameServer.handleUse()`.
+ * @param {string} slot - Name of the slot in which to equip.
+ * @param {number} item - ID of the item to equip.
+ * @param {boolean} fromDB - Does the order come from DB (if not, then
+ * it comes from player use).
+ * @returns {boolean} - Success or not.
+ */
+Player.prototype.equip = function (slot, item, fromDB) {
 
     console.log('Player.prototype.equip:', slot, item, fromDB);
 
+    if(typeof item != 'number'){
+        console.warn('ERROR in `Player.equip()`: item is not a number');
+        console.warn(item, typeof item);
+        return false;
+    }
     if (!item) return false;
     if (!fromDB && !this.canEquip(slot, item)) return false;
 
@@ -444,16 +457,17 @@ Player.prototype.equip = function (slot, item, fromDB) { // item is item_id
         var nb = 1;
 
         // Manage ammo
-        // if (slot in Equipment.ammo) {
-        if (slot === 'range_ammo') {
+        // If fromDB, `Player.getDataFromDB()` will take care to load as much
+        // amo as was equipped by the player. Therefore the below code should
+        // not be run.
+        if (slot === 'range_ammo' && !fromDB) {
             var range_container_id = this.equipment.get('range_container');
-            nb = this.computeLoad(slot, range_container_id, item); // compute how much will be added to the container
-            this.load(slot, nb);
+            nb = this.computeLoad(item); // compute how much will be added to the container
+            this.load(nb);
         }
 
         if (!fromDB) {
             this.addNotif('Equipped ' + nb + ' ' + itemData.name + (nb > 1 ? 's' : ''));
-            console.warn('in belt:',this.hasItemInBelt(item));
             if (this.hasItemInBelt(item)) {
                 this.takeFromBelt(item, nb);
             } else {
@@ -483,7 +497,6 @@ Player.prototype.unequip = function (slot, notify) {
 
     var nb = 1;
     if (slot === 'range_ammo') nb = this.unload('range_ammo');
-    console.warn('nb = ',nb);
 
     this.giveItem(item_id, nb);
 
@@ -532,29 +545,40 @@ Player.prototype.removeAbsoluteModifier = function (stat, modifier) {
     this.refreshStat(stat);
 };
 
-// Compute how much of item `item` can be added to container `containerSlot`
-Player.prototype.computeLoad = function (slot, range_container_id, ammo_item_id) {
+/**
+ * Compute how much ammo can be loaded in the ammo container.
+ * @param {number} item - item ID of ammo to load.
+ * @returns {number} amount of ammo to load.
+ */
+Player.prototype.computeLoad = function (item) {
 
     let capacity = 0;
     let currentNb = this.equipment.getNbAmmo();
+    let range_container_id = this.equipment.get('range_container');
     const range_container_item = GameServer.itemsData[range_container_id];
 
     console.log('computeLoad', range_container_id);
     console.log(GameServer.itemsData[range_container_id]);
 
-    if (range_container_item) {
-        capacity = GameServer.itemsData[range_container_id].capacity;
-    }
-    if(currentNb && currentNb > 0){
-        capacity = capacity - currentNb;
-    }
+    if (range_container_item) capacity = range_container_item.capacity;
+    if(currentNb && currentNb > 0) capacity = capacity - currentNb;
 
-    const ammo_count_in_inventory = this.inventory.getNb(ammo_item_id);
+    const ammo_count_in_inventory = this.inventory.getNb(item);
 
     return Math.min(ammo_count_in_inventory, capacity );
 };
 
+/**
+ * Increase the amount of ammo un the `range_ammo` slot by `nb`.
+ * Doesn't check anything about capacity, has to be checked upstream.
+ * @param {number} nb - Amount of ammo to add.
+ */
 Player.prototype.load = function (nb) {
+    if(typeof nb != 'number'){
+        console.warn('ERROR in `Player.load()`: nb is not a number');
+        console.warn('Nb : ', nb, typeof nb);
+        return false;
+    }
     this.equipment.load(nb);
     this.updatePacket.addAmmo(this.equipment.getNbAmmo());
 };
@@ -706,34 +730,22 @@ Player.prototype.getDataFromDb = function (data) {
 
             for (var slot in data.equipment.slots) {
                 var item = data.equipment.slots[slot];
-                if (item == -1) continue;
-                this.equip(slot, item, true);
+                // fix corrupt item data due to development
+                if(typeof item.id == 'object'){
+                    if(item.id.hasOwnProperty('id')){ // fix nested objects
+                        item.id = item.id.id;
+                    }else{
+                        item.id = -1;
+                    }
+                }
+                item.id = parseInt(item.id);
+                item.nb = parseInt(item.nb);
+                if(typeof item.nb != 'number') item.nb = 0;
+                if (item.id == -1) continue;
+                // console.warn('ITEM:',item);
+                this.equip(slot, item.id, true);
+                if(item.nb) this.load(item.nb);
             }
-            // for (var slot in data.equipment.containers) {
-            //     var item = data.equipment.containers[slot].id;
-            //     if (item == -1) continue;
-            //     this.equip(slot, item, true);
-            // }
-            // for (var slot in data.equipment.ammo) {
-            //     var item = data.equipment.ammo[slot].id;
-            //     var nb = data.equipment.ammo[slot].nb;
-            //     if (item == -1 || nb == 0) continue;
-            //     this.equip(slot, item, true);
-            //     this.load(slot, nb);
-            // }
-
-            let container_item_id = data.equipment.slots['range_container'].id;
-            if (container_item_id == -1) {
-                this.equip(slot, container_item_id, true);
-            }
-
-            let ammo_item_id = data.equipment.slots['range_ammo'].id;
-            let nb = data.equipment.slots['range_ammo'].nb;
-            if (ammo_item_id == -1 || nb == 0) {
-                this.equip(slot, ammo_item_id, true);
-                this.load(slot, nb);
-            }
-
         }
 
         if (data.inventory) {

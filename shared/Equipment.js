@@ -4,15 +4,6 @@
 
 var onServer = (typeof window === 'undefined');
 
-/*
-* Weapon, protection, ...
-* Boots -> fatigue
-* Backpack -> inventory size
-* Belt -> quick-inventory size
-* Firearms: bullets+powder
-* Later: specific slots for specific items
-* */
-
 var Equipment = {
     slots: {
         meleew:{
@@ -86,124 +77,46 @@ var Equipment = {
             desc: 'Ammunition.'
         }
     },
-    // containers: {
-    //     quiver:{
-    //         nb: 1,
-    //         x: 270,
-    //         y: 50,
-    //         battlex: 60,
-    //         battley: 10,
-    //         shade: 'quiver',
-    //         name: 'Quiver',
-    //         desc: 'Container for arrows, to be used with a bow. Quivers can have different capacities.',
-    //         contains: 'arrows',
-    //         showInBattle: true
-    //     },
-    //     ammo_pouch:{
-    //         nb: 1,
-    //         x: 270,
-    //         y: 100,
-    //         battlex: 60,
-    //         battley: 50,
-    //         shade: 'ammo-pouch',
-    //         name: 'Bullets pouch',
-    //         desc: 'Container for bullets, to be used with a gun. Pouches can have different capacities.',
-    //         contains: 'bullets',
-    //         showInBattle: true
-    //     }
-    // },
-    // ammo: {
-    //     arrows:{
-    //         nb: 1,
-    //         x: 310,
-    //         y: 50,
-    //         battlex: 100,
-    //         battley: 10,
-    //         shade: 'arrow',
-    //         name: 'Arrows',
-    //         desc: 'Ammunition type used by bows. Only one type of arrow can be equipped at any given time. If the number of arrows is yellow, it means that the quiver is full.',
-    //         container: 'quiver',
-    //         showInBattle: true
-    //     },
-    //     bullets:{
-    //         nb: 1,
-    //         x: 310,
-    //         y: 100,
-    //         battlex: 100,
-    //         battley: 50,
-    //         shade: 'bullets',
-    //         name: 'Bullets',
-    //         desc: 'Ammunition type used by guns. Only one type of bullets can be equipped at any given time. If the number of bullets is yellow, it means that the pouch is full.',
-    //         container: 'ammo_pouch',
-    //         showInBattle: true
-    //     }
-    // },
 
     getData: function(slot){
         if(slot in Equipment.slots) return Equipment.slots[slot];
-        // if(slot in Equipment.containers) return Equipment.containers[slot];
-        // if(slot in Equipment.ammo) return Equipment.ammo[slot];
     }
 };
 
 function EquipmentManager(){
 
     this.slots = {};
-    // this.containers = {};
-    // this.container = {};
-    // this.ammo = {};
-    // TODO: Check Maybe wont be needed
-    // this.quickslots = {
-    //     slots: [],
-    //     nb: 2
-    // };
 
     for(var slotName in Equipment.slots){
-        //TODO: Maybe here is better place for default items ? - ideal place :)
-        // Replace with permanent equipment
         var item = {
             id: -1,
             nb: 0
         };
-        if (Equipment.slots[slotName].defaultItem){
-            console.log('equip default item bby default', Equipment.slots[slotName].defaultItem)
-            item.id = Equipment.slots[slotName].defaultItem;
-        }
+        if (Equipment.slots[slotName].defaultItem) item.id = Equipment.slots[slotName].defaultItem;
         this.slots[slotName] = item;
     }
-
-    // this.container = Equipment.slots.range_container;
-    // this.ammo = Equipment.slots.range_ammo;
-
-    // for(var container in Equipment.containers){
-    //     var data = Equipment.containers[container];
-    //     this.containers[container] = {
-    //         id: -1,
-    //         contains: data.contains
-    //     };
-    // }
-    // for(var ammo in Equipment.ammo){
-    //     var data = Equipment.ammo[ammo];
-    //     this.ammo[ammo] = {
-    //         id: -1,
-    //         nb: 0,
-    //         container: data.container // string label of container slot
-    //     };
-    // }
 }
 
-// Returns the ID of the item equipped at the given slot
+/**
+ * Returns the item ID of the item equipped at the given slot
+ * @param {string} slotName - name of the slot where the item of
+ * @returns {number} - item ID of equipped item or -1 if nothing equipped
+ */
 EquipmentManager.prototype.get = function(slotName){
-    if(slotName in this.slots) {
-        return this.slots[slotName].id;
-    }
-    // if(label in this.containers) return this.containers[label].id;
-    // if(label in this.ammo) return this.ammo[label].id;
+    if(slotName in this.slots) return this.slots[slotName].id;
     return -1;
 };
 
+/**
+ * Return an object containing all the information about the item
+ * equipped in a given slot.
+ * @param {string} slotName - name of the slot where the item of
+ * interest is equipes.
+ * @returns {Object} - Object containging data about item.
+ */
 EquipmentManager.prototype.getItem = function(slotName){
     var id = EquipmentManager.prototype.get(slotName);
+    if(id == -1) return {};
     if(onServer){
         return GameServer.itemsData[id];
     }else {
@@ -211,12 +124,6 @@ EquipmentManager.prototype.getItem = function(slotName){
     }
 };
 
-// // Returns the *label* of the ammo contained in a given container
-// EquipmentManager.prototype.getAmmoType = function(container){
-//     return this.containers[container].contains;
-// };
-//
-// Returns the *label* of the container for a giver ammo type
 EquipmentManager.prototype.getNbAmmo = function(){
     return this.slots["range_ammo"].nb;
 };
@@ -228,16 +135,11 @@ EquipmentManager.prototype.hasAnyAmmo = function(){
 EquipmentManager.prototype.load = function(nb){
     // TODO: check if more ammo is loaded than the capacity its
     //  calculated right and returned to the inventory
-    console.warn('current nb:',this.slots["range_ammo"].nb);
-    console.warn('nb:',nb);
     this.slots["range_ammo"].nb += nb;
 };
 
 EquipmentManager.prototype.set = function(slotName,id){
     if(slotName in this.slots) this.slots[slotName].id = id;
-    // if(slotName in this.slots) this.slots[slotName].nb = item.nb;
-    // if(label in this.containers) this.containers[label].id = id;
-    // if(label in this.ammo) this.ammo[label].id = id;
 };
 
 EquipmentManager.prototype.setAmmo = function(nb){

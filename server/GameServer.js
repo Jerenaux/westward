@@ -416,8 +416,6 @@ GameServer.onNewPlayer = function(player){
     player.giveItem(20,10);
     player.giveItem(45,10);
     player.giveItem(19,10);
-    player.giveItem(48,10);
-    player.giveItem(49,10);
     player.giveItem(50,10);
     player.giveItem(51,10);
     if(!config.get('misc.performInit')) return;
@@ -1518,8 +1516,7 @@ GameServer.handleUse = function(data,socketID){
     var itemData = GameServer.itemsData[item];
     var result;
     if(itemData.equipment) {
-        console.log('equipment');
-        result = player.equip(itemData.equipment, item, false); // false: not from DB
+        result = player.equip(itemData.equipment, parseInt(item), false); // false: not from DB
     }else if(itemData.effects){
         var nb = 1;
         result = player.applyEffects(item,nb,true);
