@@ -1,4 +1,5 @@
 ## To test:
+- Test equip, load, etc. with all kind of weird imput
 - Test gs.handleGold()
 - Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
