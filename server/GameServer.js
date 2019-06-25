@@ -60,7 +60,7 @@ var Schemas = require('./schemas.js');
 GameServer.updateStatus = function(){
     console.log('Successful initialization step:',GameServer.initializationSequence[GameServer.initializationStep++]);
     try {
-        if (GameServer.initializationStep == GameServer.initializationSequence.length) {
+        if (GameServer.initializationStep === GameServer.initializationSequence.length) {
             console.log('GameServer initialized');
             GameServer.initialized = true;
             GameServer.setUpdateLoops();
@@ -343,9 +343,9 @@ GameServer.setUpCamps = function(){
     GameServer.campsData = JSON.parse(fs.readFileSync('./assets/data/camps.json').toString());
     GameServer.camps = [];
 
-    for (var key in GameServer.campsData) {
-        var data = GameServer.campsData[key];
-        GameServer.camps.push(new Camp(data.huts,data.target,data.center));
+    for (let key in GameServer.campsData) {
+        const data = GameServer.campsData[key];
+        GameServer.camps.push(new Camp(data.huts, data.target, data.center));
     }
 
     GameServer.updateStatus();
@@ -371,6 +371,7 @@ GameServer.addCiv = function(x,y){
  * @param {number} x - x tile coordinate of the animal.
  * @param {number} y - y tile coordinate of the animal.
  * @param {number} type - The type of animal (foreign key with a match in GameServer.animalsData)
+ * @param instance
  * @returns {Object} The created Animal object.
  */
 GameServer.addAnimal = function(x,y,type,instance){
@@ -385,6 +386,7 @@ GameServer.addAnimal = function(x,y,type,instance){
  * @param {number} x - x tile coordinate of the item.
  * @param {number} y - y tile coordinate of the item.
  * @param {number} type - The type of item (foreign key with a match in GameServer.itemsData)
+ * @param instance
  * @returns {Object} The created Item object.
  */
 GameServer.addItem = function(x,y,type,instance){
@@ -408,17 +410,25 @@ GameServer.onInitialized = function(){
  * Perform tasks each time a player joins the game. Mostly used for testing.
  */
 GameServer.onNewPlayer = function(player){
-    player.giveItem(4,5);
-    player.giveItem(12,5);
-    player.giveItem(12,5);
-    player.giveItem(12,5);
-    player.giveItem(2,2);
-    player.giveItem(20,10);
-    player.giveItem(45,10);
-    player.giveItem(19,10);
-    player.giveItem(50,10);
-    player.giveItem(51,10);
-    if(!config.get('misc.performInit')) return;
+
+    const items = [
+        [4, 5],
+        [12, 5],
+        [2, 2],
+        [26, 9],
+        [20, 10],
+        [45, 10],
+        [19, 10],
+        [50, 11],
+        [51, 11],
+    ];
+
+    items.forEach(item => {
+        player.giveItem(item[0], item[1]);
+    });
+
+    // TODO: maybe just remove the bottom line
+    //  if(!config.get('misc.performInit')) return;
 };
 
 /**
@@ -491,7 +501,7 @@ GameServer.economyTurn = function(){
     if(GameServer.isTimeToUpdate('itemsRespawn')) GameServer.respawnItems();
 
 
-    if(GameServer.elapsedTurns == GameServer.maxTurns) GameServer.elapsedTurns = 0;
+    if(GameServer.elapsedTurns === GameServer.maxTurns) GameServer.elapsedTurns = 0;
 };
 
 /**
@@ -513,7 +523,7 @@ GameServer.updateEconomicEntities = function(entities){
  * */
 // TODO: deprecated? Remove?
 GameServer.isTimeToUpdate = function(event){
-    return (GameServer.elapsedTurns%GameServer.economyTurns[event] == 0);
+    return (GameServer.elapsedTurns%GameServer.economyTurns[event] === 0);
 };
 
 /**
@@ -613,7 +623,7 @@ GameServer.addNewPlayer = function(socket,data){
  * @param document - The mongoose document representing the player to save.
  */
 GameServer.saveNewPlayerToDb = function(socket,player,document){
-    if(!socket || socket.dummy == true) return;
+    if(!socket || socket.dummy === true) return;
     document.save(function (err,doc) {
         if (err) return console.error(err);
         console.log('New player created');
@@ -850,7 +860,7 @@ GameServer.handleBuildingClick = function(data,socketID){
 GameServer.handleNPCClick = function(data,socketID){
     var targetID = data.id;
     var player = GameServer.getPlayer(socketID);
-    var target = (data.type == 0 ? GameServer.animals[targetID] : GameServer.civs[targetID]);
+    var target = (data.type === 0 ? GameServer.animals[targetID] : GameServer.civs[targetID]);
     if(!target.isDead() && !target.isInFight()){
         //if(Utils.chebyshev(player,target) <= GameServer.battleParameters.aggroRange) {
         if(GameServer.isWithinAggroDist(player,target)){
@@ -872,7 +882,7 @@ GameServer.handleNPCClick = function(data,socketID){
  * @param {number} ID - ID of the looted NPC.
  * */
 GameServer.lootNPC = function(player,type,ID){
-    var map = (type == 'animal' ? GameServer.animals : GameServer.civs);
+    var map = (type === 'animal' ? GameServer.animals : GameServer.civs);
     if(!map.hasOwnProperty(ID)) return false;
     var NPC = map[ID];
     // TODO: check for proximity
@@ -904,7 +914,7 @@ GameServer.respawnItems = function(){
         var type = item[2];
         var aoi = Utils.tileToAOI({x:x,y:y});
         if(GameServer.vision.has(aoi)) return;
-        if(GameServer.itemPositions.get(x,y).length == 0){
+        if(GameServer.itemPositions.get(x,y).length === 0){
             if(Utils.randomInt(1,10) > 5) GameServer.addItem(x,y,type);
         }
     },this);
@@ -1038,7 +1048,7 @@ GameServer.computeBattleArea = function(f1,f2,depth){
     var queue = [];
 
     var path = GameServer.findPath(f1.getLocationCenter(),f2.getLocationCenter());  // Reminder: a default length limit is built-in the pathfinder
-    if(!path || path.length == 0) {
+    if(!path || path.length === 0) {
         console.warn('No path to target');
         console.warn(f1.getShortID(),f1.getLocationCenter());
         console.warn(f2.getShortID(),f2.getLocationCenter());
@@ -1230,7 +1240,7 @@ GameServer.setBuildingPrice = function(data,socketID){
 
 GameServer.handleGold = function(data,socketID){
     var amount = data.nb;
-    if(amount == 0) return false;
+    if(amount === 0) return false;
     var player = GameServer.getPlayer(socketID);
     var building = GameServer.buildings[player.inBuilding];
     if(!building.isOwnedBy(player)) return false;
@@ -1259,11 +1269,11 @@ GameServer.handleShop = function(data,socketID) {
     }
     var building = GameServer.buildings[player.inBuilding];
     var isFinancial = ('financial' in data ? data.financial : (!building.isOwnedBy(player)));
-    if(action == 'buy'){ // or take
+    if(action === 'buy'){ // or take
         if(!building.canSell(item,nb,isFinancial)) return false;
         if(isFinancial) {
             var price = building.getPrice(item, nb, 'sell');
-            if(price == 0) return false;
+            if(price === 0) return false;
             if (!player.canBuy(price)) return false;
             player.takeGold(price, true);
             building.giveGold(price);
@@ -1287,7 +1297,7 @@ GameServer.handleShop = function(data,socketID) {
         if(isFinancial) {
             var price = building.getPrice(item, nb, 'buy');
             console.log(building.prices[item]);
-            if(price == 0) return false;
+            if(price === 0) return false;
             player.giveGold(price, true);
             building.takeGold(price);
             player.updateVigor(-3); // TODO: vary + conf
@@ -1327,13 +1337,13 @@ GameServer.handleBuild = function(data,socketID) {
     }
     var buildPermit = GameServer.canBuild(bid, tile);
     if(player.isInstanced()) buildPermit = 1; //hack
-    if (buildPermit == 1) {
+    if (buildPermit === 1) {
         GameServer.build(player, bid, tile);
         player.addNotif('Started building a '+GameServer.buildingsData[bid].name);
         Prism.logEvent(player,'newbuilding',{x:tile.x,y:tile.y,building:bid});
-    } else if(buildPermit == -1) { // collision
+    } else if(buildPermit === -1) { // collision
         player.addMsg('I can\'t build there!');
-    }else if(buildPermit == -2){
+    }else if(buildPermit === -2){
         player.addMsg('There is something in the way!');
     }
 };
@@ -1427,7 +1437,7 @@ GameServer.logMenu = function(menu,socketID){
 };
 
 GameServer.handleCraft = function(data,socketID){
-    if(data.id == -1) {
+    if(data.id === -1) {
         console.log('No ID');
         return;
     }
@@ -1769,7 +1779,7 @@ GameServer.checkForTracking = function(player){
     for(var i = 0; i < GameServer.camps.length; i++){
         var camp = GameServer.camps[i];
         //console.log(camp.targetSettlement == player.sid,camp.readyToRaid());
-        if(camp.targetSettlement == player.sid && camp.readyToRaid()){
+        if(camp.targetSettlement === player.sid && camp.readyToRaid()){
             camp.raid(player);
             break;
         }
@@ -1830,7 +1840,7 @@ GameServer.createInstance = function(player){
 
         var i = 0;
         for(var item in buildingData.recipe){
-            var minus = (i++ == 0 ? 5 : 0);
+            var minus = (i++ === 0 ? 5 : 0);
             building.giveItem(item,buildingData.recipe[item] - minus);
         }
     });
