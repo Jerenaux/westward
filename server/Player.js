@@ -84,7 +84,7 @@ Player.prototype.setIDs = function (dbID, socketID) {
 
 Player.prototype.setInstance = function () {
     this.instance = GameServer.nextInstanceID++;
-    if (GameServer.nextInstanceID % 100 == 0) GameServer.nextInstanceID = 0;
+    if (GameServer.nextInstanceID % 100 === 0) GameServer.nextInstanceID = 0;
 };
 
 Player.prototype.isInstanced = function () {
@@ -100,7 +100,7 @@ Player.prototype.updateBldRecipes = function () {
     this.baseBldrecipes.forEach(function (b) {
         if (this.countOwnedBuildings(b) < 1) this.bldRecipes.push(b);
     }, this);
-    if (this.bldRecipes.length == 0) this.bldRecipes = [-1];
+    if (this.bldRecipes.length === 0) this.bldRecipes = [-1];
     this.setOwnProperty('bldRecipes', this.bldRecipes);
 };
 
@@ -109,31 +109,31 @@ Player.prototype.listBuildings = function () {
     this.buildings = [];
     for (var bid in GameServer.buildings) {
         var building = GameServer.buildings[bid];
-        if (building.owner == this.id) this.buildings.push(building);
+        if (building.owner === this.id) this.buildings.push(building);
     }
     // console.log('Player owns',this.buildings.length,'buildings');
     this.updateBldRecipes();
 };
 
 Player.prototype.countOwnedBuildings = function (type) {
-    if (type == -1) return this.buildings.length;
+    if (type === -1) return this.buildings.length;
     var count = 0;
     this.buildings.forEach(function (b) {
-        if (b.type == type) count++;
+        if (b.type === type) count++;
     });
     return count;
 };
 
 Player.prototype.isExplorer = function () {
-    return this.class == GameServer.classes.explorer;
+    return this.class === GameServer.classes.explorer;
 };
 
 Player.prototype.isCraftsman = function () {
-    return this.class == GameServer.classes.craftsman;
+    return this.class === GameServer.classes.craftsman;
 };
 
 Player.prototype.isMerchant = function () {
-    return this.class == GameServer.classes.merchant;
+    return this.class === GameServer.classes.merchant;
 };
 
 Player.prototype.setName = function (name) {
@@ -157,8 +157,7 @@ Player.prototype.updateSteps = function () {
     this.steps++;
     var limit = 1000; // arbitrary limit to avoid overflows
     if (this.steps > limit) this.steps -= limit;
-
-    if (this.steps % GameServer.characterParameters.steps == 0) this.updateVigor(-GameServer.characterParameters.stepsLoss);
+    if (this.steps % GameServer.characterParameters.steps === 0) this.updateVigor(-GameServer.characterParameters.stepsLoss);
 };
 
 Player.prototype.updateVigor = function (inc, ignoreFood) {
@@ -183,7 +182,7 @@ Player.prototype.applyVigorModifier = function () {
     var vigor = this.getStat('vigor');
     var delta = vigor.getCap() - vigor.getValue();
     var malus = Utils.clamp(delta - 30, 0, vigor.getCap());
-    if (malus == 0) return;
+    if (malus === 0) return;
     this.getStats().forEach(function (stat) {
         if (Stats[stat].noModifier) return;
         var statObj = this.getStat(stat);
@@ -277,7 +276,7 @@ Player.prototype.gainClassXP = function (classID, inc, notify) {
     var max = Formulas.computeMaxClassXP(this.classlvl[classID]);
     this.classxp[classID] = Utils.clamp(this.classxp[classID] + inc, 0, GameServer.characterParameters.maxClassXP);
     if (this.classxp[classID] >= max) {
-        if (this.classlvl[classID] == GameServer.characterParameters.maxClassLvl) {
+        if (this.classlvl[classID] === GameServer.characterParameters.maxClassLvl) {
             this.classxp[classID] = max;
         } else {
             this.classxp[classID] -= max;
@@ -504,7 +503,7 @@ Player.prototype.unequip = function (slot, notify) {
     this.updatePacket.addEquip(slot, -1);
     this.applyAbsoluteModifiers(item_id, -1);
 
-    if (slot == 'range_container') this.unequip('range_ammo',true);
+    if (slot === 'range_container') this.unequip('range_ammo',true);
 
     // Replace with permanent equipment
     if (slot in Equipment.slots) {
@@ -527,9 +526,9 @@ Player.prototype.applyAbsoluteModifiers = function (item, change) {
 
     for (var stat in itemData.effects) {
         if (!itemData.effects.hasOwnProperty(stat)) continue;
-        if (change == 1) {
+        if (change === 1) {
             this.applyAbsoluteModifier(stat, itemData.effects[stat]);
-        } else if (change == -1) {
+        } else if (change === -1) {
             this.removeAbsoluteModifier(stat, itemData.effects[stat]);
         }
     }
@@ -593,12 +592,11 @@ Player.prototype.unload = function (notify) {
 };
 
 Player.prototype.decreaseAmmo = function () {
-    var ammoType = this.equipment.getAmmoType(this.getRangedContainer(this.getRangedWeapon()));
-    var ammoID = this.equipment.get(ammoType);
-    this.equipment.load(ammoType, -1);
-    var nb = this.equipment.getNbAmmo(ammoType);
-    if (nb == 0) this.unequip(ammoType);
-    this.updatePacket.addAmmo(ammoType, nb);
+    var ammoID = this.equipment.get('range_ammo');
+    this.equipment.load(-1);
+    var nb = this.equipment.getNbAmmo();
+    if (nb === 0) this.unequip('range_ammo', true);
+    this.updatePacket.addAmmo(nb);
     return ammoID;
 };
 
@@ -610,14 +608,13 @@ Player.prototype.getRangedContainer = function (rangedWeapon) {
     return GameServer.itemsData[rangedWeapon].ammo;
 };
 
-Player.prototype.getAmmo = function (container) {
-    var ammoType = this.equipment.getAmmoType(container);
-    return this.equipment.getNbAmmo(ammoType);
+Player.prototype.getAmmo = function () {
+    return this.equipment.getNbAmmo();
 };
 
 Player.prototype.canRange = function () {
     var weapon = this.getRangedWeapon();
-    if (weapon == -1) {
+    if (weapon === -1) {
         this.addMsg('I don\'t have a ranged weapon equipped!');
         // this.updatePacket.resetTurn = true;
         this.setOwnProperty('resetTurn', true);
@@ -741,7 +738,7 @@ Player.prototype.getDataFromDb = function (data) {
                 item.id = parseInt(item.id);
                 item.nb = parseInt(item.nb);
                 if(typeof item.nb != 'number') item.nb = 0;
-                if (item.id == -1) continue;
+                if (item.id === -1) continue;
                 // console.warn('ITEM:',item);
                 this.equip(slot, item.id, true);
                 if(item.nb) this.load(item.nb);
@@ -794,10 +791,10 @@ Player.prototype.onEndOfPath = function () {
     MovingEntity.prototype.onEndOfPath.call(this);
     if (this.inFight) return;
     if (!this.action) return;
-    if (this.action.type == 1) this.enterBuilding(this.action.id);
-    if (this.action.type == 2) GameServer.lootNPC(this, 'animal', this.action.id);
-    if (this.action.type == 3) GameServer.pickUpItem(this, this.action.id);
-    if (this.action.type == 4) GameServer.lootNPC(this, 'civ', this.action.id);
+    if (this.action.type === 1) this.enterBuilding(this.action.id);
+    if (this.action.type === 2) GameServer.lootNPC(this, 'animal', this.action.id);
+    if (this.action.type === 3) GameServer.pickUpItem(this, this.action.id);
+    if (this.action.type === 4) GameServer.lootNPC(this, 'civ', this.action.id);
 };
 
 
@@ -839,11 +836,11 @@ Player.prototype.isAvailableForFight = function () {
 };
 
 Player.prototype.isInBuilding = function () {
-    return this.inBuilding != -1;
+    return this.inBuilding !== -1;
 };
 
 Player.prototype.isInside = function (buildingID) {
-    return this.inBuilding == buildingID;
+    return this.inBuilding === buildingID;
 };
 
 Player.prototype.notifyFight = function (flag) {

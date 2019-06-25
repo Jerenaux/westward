@@ -84,9 +84,7 @@ var Equipment = {
 };
 
 function EquipmentManager(){
-
     this.slots = {};
-
     for(var slotName in Equipment.slots){
         var item = {
             id: -1,
@@ -124,6 +122,14 @@ EquipmentManager.prototype.getItem = function(slotName){
     }
 };
 
+EquipmentManager.prototype.getAmmoContainerType = function(){
+    let item = this.getItem("range_ammo");
+    if(item && item.container_type){
+        return item.container_type;
+    }
+    return -1;
+};
+
 EquipmentManager.prototype.getNbAmmo = function(){
     return this.slots["range_ammo"].nb;
 };
@@ -133,8 +139,6 @@ EquipmentManager.prototype.hasAnyAmmo = function(){
 };
 
 EquipmentManager.prototype.load = function(nb){
-    // TODO: check if more ammo is loaded than the capacity its
-    //  calculated right and returned to the inventory
     this.slots["range_ammo"].nb += nb;
 };
 
@@ -151,17 +155,10 @@ EquipmentManager.prototype.listItems = function(){
     for(var slotName in this.slots){
         if(this.slots[slotName] > -1) items.push(this.slots[slotName]);
     }
-    // for(var label in this.containers){
-    //     if(this.container > -1) items.push(this.container);
-    // }
-    // for(var label in this.ammo){
-    //     if(this.ammo.id > -1) items.push(this.ammo);
-    // }
     return items;
 };
 
 // re-enable equip from db
-
 if (onServer){
     module.exports.Equipment = Equipment;
     module.exports.EquipmentManager = EquipmentManager;
