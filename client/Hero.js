@@ -52,7 +52,7 @@ let Hero = new Phaser.Class({
         this.buildRecipes.fromList(Engine.config.defaultBuildRecipes);
 
         for(let item_id in Engine.itemsData){
-            let item = Engine.itemsData[item];
+            let item = Engine.itemsData[item_id];
             if(item.basicRecipe) this.craftRecipes.add(item_id,1);
         }
     },
