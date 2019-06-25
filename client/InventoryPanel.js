@@ -277,6 +277,7 @@ InventoryPanel.prototype.resetCounters = function(){
 InventoryPanel.prototype.display = function(){
     if(this.displayed) return;
     Panel.prototype.display.call(this);
+    console.log("InventoryPanel.prototype.display");
     //this.displayInventory(); // not called because will be called by the menu when opening (via trigger)
 };
 

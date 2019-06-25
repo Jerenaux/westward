@@ -16,7 +16,7 @@ var UIElement = new Phaser.Class({
         this.setInteractive();
         this.menu = menu;
 
-        this.on('pointerdown',this.handleClick.bind(this));
+        this.on('pointerup',this.handleClick.bind(this));
         this.on('pointerover',this.handleOver.bind(this));
         this.on('pointerout',this.handleOut.bind(this));
     },
@@ -37,6 +37,7 @@ var UIElement = new Phaser.Class({
     },
 
     handleClick: function(){
+        console.log('UIElement handleClick');
         if(this.menu.displayed){
             if(!Engine.inBuilding) this.menu.hide();
         }else {

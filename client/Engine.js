@@ -816,7 +816,7 @@ menuIcon = function(x,y,icon,menu,tox,toy){
     this.icon = UI.scene.add.sprite(x,y,'items2',icon).setScrollFactor(0).setDepth(2); // bubble down to bg
     this.bg.setDepth(4);
     this.icon.setDepth(5);
-    this.bg.on('pointerdown',function(){
+    this.bg.on('pointerup',function(){
         menu.toggle();
         if(Engine.bldRect) Engine.bldUnclick(true);
     });
