@@ -552,7 +552,7 @@
     "nbBushes": 4,
     "yield": 5,
     "equipment": "rangedw",
-    "ammo": "quiver",
+    "ammo": "stones",
     "effects":{"acc":20},
     "recipe": {"7":1,"21":1},
     "useInBattle": true,
