@@ -79,7 +79,7 @@ EquipmentPanel.prototype.addEquipSlot = function (x, y, name, desc, shade, displ
 
 EquipmentPanel.prototype.updateEquipment = function () {
     this.slots.forEach(function (slot) {
-        var newItem = Engine.player.getEquipped(slot.slotName);
+        var newItem = Engine.player.getEquippedItemID(slot.slotName);
         var currentItem = slot.id;
         //if(newItem == currentItem) return;
 
@@ -223,8 +223,8 @@ BattleEquipmentPanel.prototype.updateStats = function () {
 };
 
 BattleEquipmentPanel.prototype.updateEquipment = function () {
-    var melee = Engine.player.getEquipped('meleew');
-    var range = Engine.player.getEquipped('rangedw');
+    var melee = Engine.player.getEquippedItemID('meleew');
+    var range = Engine.player.getEquippedItemID('rangedw');
     var meleeData = {id: -1, atlas: 'UI', frame: 'sword-shade', name: 'Melee weapon'};
     var rangeData = {id: -1, atlas: 'UI', frame: 'gun-shade', name: 'Ranged weapon'};
 

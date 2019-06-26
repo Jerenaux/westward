@@ -253,8 +253,8 @@ var Building = new Phaser.Class({
         var from = {
             x: this.x + this.shootFrom.x,
             y: this.y - (this.height-this.shootFrom.y)
-        }; // All coordinates are pixels
-        Engine.displayArrow(from,{x:data.x,y:data.y},this.depth+1,data.duration,data.delay);
+        }; // All coordinates are in pixels
+        Engine.animateRangeAmmo('arrow',from,{x:data.x,y:data.y},this.depth+1,data.duration,data.delay);
     },
 
     // ### GETTERS ###

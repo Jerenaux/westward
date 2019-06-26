@@ -206,6 +206,8 @@ Battle.prototype.isTurnOf = function(f){
     return (f.getShortID() == this.getActiveFighter().getShortID());
 };
 
+//TODO: What is f?  - Fighter ?
+
 Battle.prototype.processAction = function(f,data){
     if(!this.isTurnOf(f) || this.actionTaken) return;
     var result; // small object with result and delay fields, to indicat success and time to wait (for animations etc.)
@@ -303,6 +305,7 @@ Battle.prototype.computeRangedHit = function(a,b){
 
 Battle.prototype.computeTOF = function(a,b,type){
     var speeds = {
+        'throwable': GameServer.battleParameters.arrowSpeed,
         'arrow': GameServer.battleParameters.arrowSpeed,
         'bomb': GameServer.battleParameters.bombSpeed
     };
@@ -372,6 +375,7 @@ Battle.prototype.processAoE = function(f,tx,ty){
     };
 };
 
+// TODO: rename a,b to atacker and target
 
 Battle.prototype.processAttack = function(a,b){ // a attacks b
     console.log('Processing attack');

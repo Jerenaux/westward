@@ -240,9 +240,9 @@ describe('GameServer',function(){
         gs.handleUse({item:type},player.socketID);
         gs.handleUse({item:typeNotOwned},player.socketID);
         expect(player.isEquipped(slot)).to.equal(true);
-        expect(player.getEquipped(slot)).to.equal(type);
+        expect(player.getEquippedItemID(slot)).to.equal(type);
         expect(player.isEquipped(slotNotOwned)).to.equal(false);
-        expect(player.getEquipped(slotNotOwned)).to.equal(-1);
+        expect(player.getEquippedItemID(slotNotOwned)).to.equal(-1);
     });
 
     // TODO: expand test cases + test results with gs methods for all tests

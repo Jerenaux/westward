@@ -136,12 +136,32 @@ var Player = new Phaser.Class({
 
     processRangedAttack: function(data){ // TODO: move elsewhere when NPC will be able to range
         this.setOrientation({x:data.x,y:data.y});
-        this.play(this.animPrefix+'_bow_'+this.orientation);
+
+        let rangeWeapon = 'attack';
+
+        let ranged_weapon_id = Engine.player.getEquippedItemID('rangedw');
+        const ranged_weapon_item = Engine.itemsData[ranged_weapon_id];
+        if(ranged_weapon_item.class && ranged_weapon_item.class === 'bow'){
+            rangeWeapon = 'bow';
+        }
+
+        // TODO: refactor the code above to use the new method
+        const ranged_ammo_item = Engine.player.getEquippedItem('range_ammo');
+        console.log(ranged_ammo_item);
+
+        const animationName = this.animPrefix  +'_' + rangeWeapon + '_' + this.orientation;
+        this.play(animationName);
         var from = {
             x: this.x,
             y: this.y - 10
         };
-        Engine.displayArrow(from,{x:data.x,y:data.y},this.depth+1,data.duration,data.delay);
+        Engine.animateRangeAmmo(
+            ranged_ammo_item.frame,
+            from,{x:data.x,y:data.y},
+            this.depth+1,data.duration,
+            data.delay,
+            Engine.imagePool2
+        );
     },
 
     processBombThrow: function(data){ // TODO: move up to NPC if they'll throw bombs

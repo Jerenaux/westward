@@ -119,7 +119,7 @@ ItemSlot.prototype.setUp = function(action,item){
             if(effect > 0) stattext = '+'+stattext;
             this.effect.setText(stattext);
 
-            var equipped = Engine.player.getEquipped(itemData.equipment);
+            var equipped = Engine.player.getEquippedItemID(itemData.equipment);
             if(equipped > 0) {
                 var current = Engine.itemsData[equipped].effects[stat];
                 if(current > effect){

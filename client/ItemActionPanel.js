@@ -28,7 +28,7 @@ ItemActionPanel.prototype.setUp = function(itemID){
         this.useButton.setText(data.equipment ? 'Equip' : 'Use');
         this.useButton.enable();
 
-        let container_item_id = Engine.player.getEquipped('range_container');
+        let container_item_id = Engine.player.getEquippedItemID('range_container');
         const container_item = Engine.itemsData[container_item_id];
 
         ammoContainerMatch = (container_item && container_item.container_type === data.container_type);

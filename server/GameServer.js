@@ -412,6 +412,7 @@ GameServer.onInitialized = function(){
 GameServer.onNewPlayer = function(player){
 
     const items = [
+        [11,1],
         [4, 5],
         [12, 5],
         [2, 2],
@@ -1212,7 +1213,10 @@ GameServer.addSurroundingFighters = function(battle){
  */
 GameServer.handleBattleAction = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
-    player.battle.processAction(player,data);
+    if(player.battle){
+        player.battle.processAction(player,data);
+    }
+    console.error('Error - player.battle is missing:',player,data,socketID);
 };
 
 /**

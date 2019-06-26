@@ -129,8 +129,13 @@ let Hero = new Phaser.Class({
 
 // ### GETTERS ###
 
-    getEquipped: function(slot){
+    getEquippedItemID: function(slot){
         return this.equipment.get(slot); // Returns the ID of the item equipped at the given slot
+    },
+
+    getEquippedItem: function(slot){
+        const item_id = this.equipment.get(slot);
+        return Engine.itemsData[item_id]; // Returns the ID of the item equipped at the given slot
     },
 
     getMaxAmmo: function(){
@@ -148,7 +153,7 @@ let Hero = new Phaser.Class({
     },
 
     getRangedCursor: function(){
-        let rangedw = this.getEquipped('rangedw');
+        let rangedw = this.getEquippedItemID('rangedw');
         if(rangedw === -1) return 'bow';
         return (Engine.itemsData[rangedw].ammo === 'quiver' ? 'bow' : 'gun');
     },
