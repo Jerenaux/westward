@@ -942,6 +942,8 @@ Engine.handleBattleAnimation = function(data){
 };
 
 Engine.animateRangeAmmo = function(frame, from, to, depth, duration, delay, imagePool){ // All coordinates are pixels
+
+    // TODO: refactor the whole pool thing and getNext only when you know that it's the right pool
     let arrow = Engine.arrowsPool.getNext();
 
     if(imagePool){
