@@ -139,20 +139,16 @@ var Player = new Phaser.Class({
 
         let rangeWeapon = 'attack';
 
-        let ranged_weapon_id = Engine.player.getEquippedItemID('rangedw');
-        const ranged_weapon_item = Engine.itemsData[ranged_weapon_id];
-
+        const ranged_weapon_item = Engine.player.getEquippedItem('rangedw');
         if (ranged_weapon_item.class && ranged_weapon_item.class === 'bow') {
             rangeWeapon = 'bow';
         }
 
-
-        // TODO: refactor the code above to use the new method
         const ranged_ammo_item = Engine.player.getEquippedItem('range_ammo');
         console.log(ranged_ammo_item);
 
         let itemAtlasPool;
-        // TODO: Maybe get this in utility funciton
+        // TODO: Maybe get this in utility function
         if (ranged_ammo_item.atlas === 'items') {
             itemAtlasPool = Engine.imagePool;
         }

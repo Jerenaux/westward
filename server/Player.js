@@ -63,6 +63,7 @@ function Player() {
     this.h = this.cellsHeight;
 
     this.setUpStats();
+
     this.equipment = new EquipmentManager();
     this.history = [];
     this.fieldOfVision = [];
@@ -111,7 +112,6 @@ Player.prototype.listBuildings = function () {
         var building = GameServer.buildings[bid];
         if (building.owner === this.id) this.buildings.push(building);
     }
-    // console.log('Player owns',this.buildings.length,'buildings');
     this.updateBldRecipes();
 };
 
@@ -255,7 +255,7 @@ Player.prototype.spawn = function (x, y) {
     this.setOwnProperty('x', x);
     this.setOwnProperty('y', y);
     this.onAddAtLocation();
-    console.log('spawning at ', this.x, this.y, '(aiming at', xpos, ypos, ')');
+    // console.log('spawning at ', this.x, this.y, '(aiming at', xpos, ypos, ')');
     var battleCell = GameServer.checkForBattle(this.x, this.y);
     if (battleCell) GameServer.expandBattle(battleCell.battle, this);
 };
@@ -398,8 +398,8 @@ Player.prototype.isEquipped = function (slot) {
     return this.equipment.get(slot) > 1;
 };
 
-Player.prototype.getEquipped = function (slot) {
-    return this.equipment.get(slot);
+Player.prototype.getEquippedItem = function (slot) {
+    return this.equipment.getItem(slot);
 };
 
 Player.prototype.canEquip = function (slot, item) {
@@ -428,7 +428,7 @@ Player.prototype.equip = function (slot, item, fromDB) {
 
     console.log('Player.prototype.equip:', slot, item, fromDB);
 
-    if(typeof item != 'number'){
+    if (typeof item != 'number') {
         console.warn('ERROR in `Player.equip()`: item is not a number');
         console.warn(item, typeof item);
         return false;
@@ -503,7 +503,7 @@ Player.prototype.unequip = function (slot, notify) {
     this.updatePacket.addEquip(slot, -1);
     this.applyAbsoluteModifiers(item_id, -1);
 
-    if (slot === 'range_container') this.unequip('range_ammo',true);
+    if (slot === 'range_container') this.unequip('range_ammo', true);
 
     // Replace with permanent equipment
     if (slot in Equipment.slots) {
@@ -556,15 +556,15 @@ Player.prototype.computeLoad = function (item) {
     let range_container_id = this.equipment.get('range_container');
     const range_container_item = GameServer.itemsData[range_container_id];
 
-    console.log('computeLoad', range_container_id);
-    console.log(GameServer.itemsData[range_container_id]);
+    // console.log('computeLoad', range_container_id);
+    // console.log(GameServer.itemsData[range_container_id]);
 
     if (range_container_item) capacity = range_container_item.capacity;
-    if(currentNb && currentNb > 0) capacity = capacity - currentNb;
+    if (currentNb && currentNb > 0) capacity = capacity - currentNb;
 
     const ammo_count_in_inventory = this.inventory.getNb(item);
 
-    return Math.min(ammo_count_in_inventory, capacity );
+    return Math.min(ammo_count_in_inventory, capacity);
 };
 
 /**
@@ -573,7 +573,7 @@ Player.prototype.computeLoad = function (item) {
  * @param {number} nb - Amount of ammo to add.
  */
 Player.prototype.load = function (nb) {
-    if(typeof nb != 'number'){
+    if (typeof nb != 'number') {
         console.warn('ERROR in `Player.load()`: nb is not a number');
         console.warn('Nb : ', nb, typeof nb);
         return false;
@@ -600,34 +600,55 @@ Player.prototype.decreaseAmmo = function () {
     return ammoID;
 };
 
-Player.prototype.getRangedWeapon = function () {
-    return this.getEquipped('rangedw');
+// Player.prototype.getRangedWeapon = function () {
+//     return this.getEquippedItem('rangedw');
+// };
+
+Player.prototype.getRangedContainer = function () {
+    return this.getEquippedItem('range_container');
 };
 
-Player.prototype.getRangedContainer = function (rangedWeapon) {
-    return GameServer.itemsData[rangedWeapon].ammo;
-};
-
-Player.prototype.getAmmo = function () {
-    return this.equipment.getNbAmmo();
-};
+// Player.prototype.getRangeAmmo = function () {
+//     return this.getEquippedItem('range_ammo');
+// };
+//
+// Player.prototype.getAmmo = function () {
+//     return this.equipment.getNbAmmo();
+// };
 
 Player.prototype.canRange = function () {
-    var weapon = this.getRangedWeapon();
+
+    const weapon = this.getEquippedItem('rangedw');
     if (weapon === -1) {
         this.addMsg('I don\'t have a ranged weapon equipped!');
-        // this.updatePacket.resetTurn = true;
         this.setOwnProperty('resetTurn', true);
         return false;
     }
-    if (this.getAmmo(this.getRangedContainer(weapon)) > 0) {
-        return true;
-    } else {
+
+    const container = this.getRangedContainer();
+    if (container === false || container === -1) {
+        this.addMsg('I don\'t have ammo!');
+        this.setOwnProperty('resetTurn', true);
+        return false;
+    }
+
+    const hasAmmo = this.equipment.hasAnyAmmo();
+    if (!hasAmmo) {
         this.addMsg('I\'m out of ammo!');
-        // this.updatePacket.resetTurn = true;
         this.setOwnProperty('resetTurn', true);
         return false;
     }
+
+    if (weapon.ammo !== this.equipment.getAmmoContainerType()) {
+        this.addMsg('I can\'t use my weapon with that ammo');
+        this.setOwnProperty('resetTurn', true);
+        return false;
+    }
+
+    if (hasAmmo) {
+        return true;
+    }
+
 };
 
 Player.prototype.applyEffects = function (item, coef, notify) {
@@ -728,20 +749,20 @@ Player.prototype.getDataFromDb = function (data) {
             for (var slot in data.equipment.slots) {
                 var item = data.equipment.slots[slot];
                 // fix corrupt item data due to development
-                if(typeof item.id == 'object'){
-                    if(item.id.hasOwnProperty('id')){ // fix nested objects
+                if (typeof item.id == 'object') {
+                    if (item.id.hasOwnProperty('id')) { // fix nested objects
                         item.id = item.id.id;
-                    }else{
+                    } else {
                         item.id = -1;
                     }
                 }
                 item.id = parseInt(item.id);
                 item.nb = parseInt(item.nb);
-                if(typeof item.nb != 'number') item.nb = 0;
+                if (typeof item.nb != 'number') item.nb = 0;
                 if (item.id === -1) continue;
                 // console.warn('ITEM:',item);
                 this.equip(slot, item.id, true);
-                if(item.nb) this.load(item.nb);
+                if (item.nb) this.load(item.nb);
             }
         }
 

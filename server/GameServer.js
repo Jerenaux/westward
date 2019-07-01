@@ -180,26 +180,36 @@ GameServer.readMap = function(mapsPath,test,cb){
  * @param {Object} data - Data sent by the client when requesting boot params, e.g. the player ID to check if he exists in database or not
  */
 GameServer.getBootParams = function(socket,data){
-    var playerID = data.id;
-    var pkg = clone(GameServer.clientParameters,false);
-    if(!pkg.config) pkg.config = {};
-    pkg.config.turnDuration = GameServer.turnDuration;
-    pkg.nbc = GameServer.server.getNbConnected();
+    const playerID = data.id;
+    const pkg = clone(GameServer.clientParameters,false);
 
-    GameServer.PlayerModel.findOne(
-        {_id: new ObjectId(playerID)},
-        function (err, doc) {
-            if (err) return console.warn(err);
-            if(doc) {
-                pkg.newPlayer = false;
-            }else{
-                console.log('Unrecognized returning player ');
-                pkg.newPlayer = true;
+    if(GameServer && pkg) {
+
+        if(!pkg.config) pkg.config = {};
+        pkg.config.turnDuration = GameServer.turnDuration;
+        pkg.nbc = GameServer.server.getNbConnected();
+
+        GameServer.PlayerModel.findOne(
+            {_id: new ObjectId(playerID)},
+            function (err, doc) {
+                if (err) return console.warn(err);
+                if(doc) {
+                    pkg.newPlayer = false;
+                }else{
+                    console.log('Unrecognized returning player ');
+                    pkg.newPlayer = true;
+                }
+                console.log(pkg);
+                socket.emit('boot-params',pkg);
             }
-            console.log(pkg);
-            socket.emit('boot-params',pkg);
-        }
-    );
+        );
+
+    } else {
+        console.warn("Missing GameServer or pkg!");
+    }
+
+
+
 };
 
 /**
@@ -402,7 +412,12 @@ GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
     GameServer.addAnimal(1189,154,0);
-    GameServer.addAnimal(1193,157,0);
+    GameServer.addAnimal(1175,144,0);
+    GameServer.addAnimal(1174,144,0);
+    GameServer.addAnimal(1173,144,0);
+    GameServer.addAnimal(1172,144,0);
+    GameServer.addAnimal(1171,144,0);
+    GameServer.addAnimal(1170,144,0);
     console.log('---done---');
 };
 
@@ -410,6 +425,10 @@ GameServer.onInitialized = function(){
  * Perform tasks each time a player joins the game. Mostly used for testing.
  */
 GameServer.onNewPlayer = function(player){
+
+    // give me all the health and vigor
+    player.setStat('hp', 300);
+    player.setStat('vigor', 100);
 
     const items = [
         [11,1],
