@@ -293,6 +293,42 @@
       "frame": {"x":213,"y":512,"w":39,"h":39}
     },
     {
+      "filename": "tooltip_tl",
+      "frame": {"x":213,"y":512,"w":11,"h":11}
+    },
+    {
+      "filename": "tooltip_top",
+      "frame": {"x":228,"y":512,"w":9,"h":11}
+    },
+    {
+      "filename": "tooltip_tr",
+      "frame": {"x":241,"y":512,"w":11,"h":11}
+    },
+    {
+      "filename": "tooltip_left",
+      "frame": {"x":213,"y":529,"w":11,"h":5}
+    },
+    {
+      "filename": "tooltip_middle",
+      "frame": {"x":231,"y":530,"w":5,"h":4}
+    },
+    {
+      "filename": "tooltip_right",
+      "frame": {"x":242,"y":529,"w":11,"h":5}
+    },
+    {
+      "filename": "tooltip_bl",
+      "frame": {"x":213,"y":540,"w":11,"h":11}
+    },
+    {
+      "filename": "tooltip_bottom",
+      "frame": {"x":230,"y":541,"w":5,"h":11}
+    },
+    {
+      "filename": "tooltip_br",
+      "frame": {"x":241,"y":540,"w":11,"h":11}
+    },
+    {
       "filename": "healthbar_left",
       "frame": {"x":259,"y":40,"w":24,"h":20}
     },

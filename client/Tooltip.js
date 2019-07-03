@@ -34,12 +34,12 @@ function Tooltip(){
 }
 
 Tooltip.prototype.makeBody = function(){
-    var sideWidth = 13;
+    var sideWidth = 11;
     var x = this.x;
     var y = this.y;
     var w = this.width;
     var h = this.height;
-    this.container.push(UI.scene.add.sprite(x,y,'tooltip',0));
+    /*this.container.push(UI.scene.add.sprite(x,y,'tooltip',0));
     x += sideWidth;
     this.container.push(UI.scene.add.tileSprite(x,y,w,sideWidth,'tooltip',1));
     x += w;
@@ -57,7 +57,26 @@ Tooltip.prototype.makeBody = function(){
     x += sideWidth;
     this.container.push(UI.scene.add.tileSprite(x,y,w,sideWidth,'tooltip',7));
     x += w;
-    this.container.push(UI.scene.add.sprite(x,y,'tooltip',8));
+    this.container.push(UI.scene.add.sprite(x,y,'tooltip',8));*/
+    this.container.push(UI.scene.add.sprite(x,y,'UI','tooltip_tl'));
+    x += sideWidth;
+    this.container.push(UI.scene.add.tileSprite(x,y,w,sideWidth,'UI','tooltip_top'));
+    x += w;
+    this.container.push(UI.scene.add.sprite(x,y,'UI','tooltip_tr'));
+    x = this.x;
+    y += sideWidth;
+    this.container.push(UI.scene.add.tileSprite(x,y,sideWidth,h,'UI','tooltip_left'));
+    x += sideWidth;
+    this.container.push(UI.scene.add.tileSprite(x,y,w,h,'UI','tooltip_middle'));
+    x += w + 1;
+    this.container.push(UI.scene.add.tileSprite(x,y,sideWidth,h,'UI','tooltip_right'));
+    x = this.x;
+    y += h;
+    this.container.push(UI.scene.add.sprite(x,y,'UI','tooltip_bl'));
+    x += sideWidth;
+    this.container.push(UI.scene.add.tileSprite(x,y+1,w,sideWidth,'UI','tooltip_bottom'));
+    x += w;
+    this.container.push(UI.scene.add.sprite(x,y,'UI','tooltip_br'));
 };
 
 Tooltip.prototype.makeStatsIcons = function(){

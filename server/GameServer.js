@@ -425,7 +425,10 @@ GameServer.onInitialized = function(){
  * Perform tasks each time a player joins the game. Mostly used for testing.
  */
 GameServer.onNewPlayer = function(player){
-
+    // Following line is used to prevent this function from
+    // running in production (this function should only be used
+    // for testing)
+    if(!config.get('misc.performInit')) return;
     // give me all the health and vigor
     player.setStat('hp', 300);
     player.setStat('vigor', 100);
@@ -446,9 +449,6 @@ GameServer.onNewPlayer = function(player){
     items.forEach(item => {
         player.giveItem(item[0], item[1]);
     });
-
-    // TODO: maybe just remove the bottom line
-    //  if(!config.get('misc.performInit')) return;
 };
 
 /**

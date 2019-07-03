@@ -35,7 +35,7 @@ var UI = {
     create: function () {
         this.scene.bringToTop();
 
-        this.textures.addSpriteSheetFromAtlas(
+        /*this.textures.addSpriteSheetFromAtlas(
             'tooltip',
             {
                 atlas: 'UI',
@@ -44,7 +44,7 @@ var UI = {
                 frameHeight: 13,
                 endFrame: 8
             }
-        );
+        );*/
 
         UI.tooltip = new Tooltip();
         UI.camera = UI.scene.cameras.main;
