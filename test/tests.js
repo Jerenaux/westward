@@ -30,7 +30,7 @@ describe('GameServer',function(){
     var stubs = [];
     before(function(done) {
         this.timeout(5000);
-        mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward');
+        mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward', { useNewUrlParser: true });
         var db = mongoose.connection;
         db.on('error', console.error.bind(console, 'connection error:'));
         db.once('open', function() {
@@ -240,9 +240,9 @@ describe('GameServer',function(){
         gs.handleUse({item:type},player.socketID);
         gs.handleUse({item:typeNotOwned},player.socketID);
         expect(player.isEquipped(slot)).to.equal(true);
-        expect(player.getEquipped(slot)).to.equal(type);
+        expect(player.getEquippedItemID(slot)).to.equal(type);
         expect(player.isEquipped(slotNotOwned)).to.equal(false);
-        expect(player.getEquipped(slotNotOwned)).to.equal(-1);
+        expect(player.getEquippedItemID(slotNotOwned)).to.equal(-1);
     });
 
     // TODO: expand test cases + test results with gs methods for all tests

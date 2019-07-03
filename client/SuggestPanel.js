@@ -40,7 +40,7 @@ SuggestPanel.prototype.displayTips = function(){
         y += txt.height + padding;
     }
 
-    if(Engine.player.getEquipped('armor',0) == -1){
+    if(Engine.player.getEquippedItemID('armor',0) == -1){
         var txt = this.getText(i++,x,y);
         txt.setText(UI.textsData['equip_advice']);
         y += txt.height + padding;

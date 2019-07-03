@@ -10,6 +10,7 @@
         rangePenalty: 1, // accuracy penalty per tile
         turnDuration: 5, // seconds
         tickRate: 100, // milliseconds, granularity of battle updates
+        throwableSpeed: 10, // tiles/sec
         arrowSpeed: 15, // tiles/sec
         bombSpeed: 10,
         meleeAtkDelay: 500,
@@ -75,7 +76,7 @@
         raidMinimum: 8
     },
     wildlife: {
-        aggro: true,
+        aggro: false,
         nolife: false,
         wander: true,
         wanderRange: 5,

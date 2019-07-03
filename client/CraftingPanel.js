@@ -27,7 +27,7 @@ CraftingPanel.prototype.addInterface = function(){
     var w = 250;
     for(var i = 0; i < 4; i++){
         var x = this.x + 15 + +(i%2)*(w+10);
-        var y = this.y + 150 + Math.floor(i/2)*90
+        var y = this.y + 150 + Math.floor(i/2)*90;
         var slot = new IngredientSlot(x,y,w,80);
         slot.hide();
         this.ingredientSlots.push(slot)

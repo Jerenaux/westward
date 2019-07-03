@@ -171,6 +171,10 @@
     {
       "filename": "berries",
       "frame": {"x":336,"y":432,"w":24,"h":24}
+    },
+    {
+      "filename": "shuriken",
+      "frame": {"x":360,"y":216,"w":24,"h":24}
     }
   ]
 }

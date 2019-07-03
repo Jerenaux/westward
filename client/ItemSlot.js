@@ -74,6 +74,9 @@ ItemSlot.prototype.checkForPanelOnTop = function(){
 };
 
 ItemSlot.prototype.setUp = function(action,item){
+
+    console.log('ItemSlot.prototype.setUp', action, item);
+
     if(!this.displayed) console.warn('Setting up slot before displaying it');
     var itemData = Engine.itemsData[item];
     this.icon.setTexture(itemData.atlas,itemData.frame);
@@ -116,7 +119,7 @@ ItemSlot.prototype.setUp = function(action,item){
             if(effect > 0) stattext = '+'+stattext;
             this.effect.setText(stattext);
 
-            var equipped = Engine.player.getEquipped(itemData.equipment);
+            var equipped = Engine.player.getEquippedItemID(itemData.equipment);
             if(equipped > 0) {
                 var current = Engine.itemsData[equipped].effects[stat];
                 if(current > effect){

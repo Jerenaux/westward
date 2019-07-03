@@ -220,6 +220,11 @@ Engine.create = function(){
         Engine.animationsPools[key] = new Pool('sprite',key);
     });
     Engine.footprintsPool = new Pool('image','footsteps');
+
+    Engine.imagePool = new Pool('image','items');
+    Engine.imagePool2 = new Pool('image','items2');
+    // TODO why? - why not imageItemPool, imageItemPool2
+
     Engine.arrowsPool = new Pool('image','items');
     Engine.bombsPool = new Pool('image','items2');
     Engine.textPool = new Pool('text');
@@ -426,6 +431,7 @@ Engine.createAnimations = function(){
     Engine.createAttackAnimation('player_attack_down','hero',182,187);
     Engine.createAttackAnimation('player_attack_left','hero',169,174);
     Engine.createAttackAnimation('player_attack_up','hero',156,161);
+
     Engine.createAttackAnimation('player_bow_right','hero',247,259);
     Engine.createAttackAnimation('player_bow_down','hero',234,246);
     Engine.createAttackAnimation('player_bow_left','hero',221,233);
@@ -441,6 +447,7 @@ Engine.createAnimations = function(){
     Engine.createAttackAnimation('enemy_attack_down','enemy',182,187);
     Engine.createAttackAnimation('enemy_attack_left','enemy',169,174);
     Engine.createAttackAnimation('enemy_attack_up','enemy',156,161);
+
     Engine.createAttackAnimation('enemy_bow_right','enemy',247,259);
     Engine.createAttackAnimation('enemy_bow_down','enemy',234,246);
     Engine.createAttackAnimation('enemy_bow_left','enemy',221,233);
@@ -451,6 +458,7 @@ Engine.createAnimations = function(){
     Engine.createWalkAnimation('wolf_move_left','wolves',12,14);
     Engine.createWalkAnimation('wolf_move_right','wolves',24,26);
     Engine.createWalkAnimation('wolf_move_up','wolves',36,38);
+
     Engine.createWalkAnimation('whitewolf_move_down','wolves',3,5);
     Engine.createWalkAnimation('whitewolf_move_left','wolves',15,17);
     Engine.createWalkAnimation('whitewolf_move_right','wolves',27,29);
@@ -816,7 +824,7 @@ menuIcon = function(x,y,icon,menu,tox,toy){
     this.icon = UI.scene.add.sprite(x,y,'items2',icon).setScrollFactor(0).setDepth(2); // bubble down to bg
     this.bg.setDepth(4);
     this.icon.setDepth(5);
-    this.bg.on('pointerdown',function(){
+    this.bg.on('pointerup',function(){
         menu.toggle();
         if(Engine.bldRect) Engine.bldUnclick(true);
     });
@@ -933,9 +941,16 @@ Engine.handleBattleAnimation = function(data){
     },data.delay);
 };
 
-Engine.displayArrow = function(from,to,depth,duration,delay){ // All coordinates are pixels
-    var arrow = Engine.arrowsPool.getNext();
-    arrow.setFrame('arrow');
+Engine.animateRangeAmmo = function(frame, from, to, depth, duration, delay, imagePool){ // All coordinates are pixels
+
+    // TODO: refactor the whole pool thing and getNext only when you know that it's the right pool
+    let arrow = Engine.arrowsPool.getNext();
+
+    if(imagePool){
+        arrow = imagePool.getNext();
+    }
+
+    arrow.setFrame(frame);
     arrow.setPosition(from.x+16,from.y+16);
     arrow.setDepth(depth);
     arrow.setVisible(false);

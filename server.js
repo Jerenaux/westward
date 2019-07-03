@@ -176,14 +176,17 @@ if(process.env.DEV == 1) {
 server.listen(process.env.PORT || myArgs.port || 8081,function(){
     console.log('Listening on '+server.address().port);
 
-    mongodbAuth = {};
+    mongodbAuth = {
+        useNewUrlParser: true
+    };
     console.log('Check for mongodb Auth');
     if (process.env.MONGODB_AUTH) {
         console.log('Create auth object with user, pass, client');
         mongodbAuth = {
-            "user": process.env.MONGODB_USERNAME || 'root',
-            "pass": process.env.MONGODB_PASSWORD || 'password',
-            "useMongoClient": true,
+            user: process.env.MONGODB_USERNAME || 'root',
+            pass: process.env.MONGODB_PASSWORD || 'password',
+            useMongoClient: true,
+            useNewUrlParser: true
         };
     }
 
