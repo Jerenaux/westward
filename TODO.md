@@ -54,6 +54,7 @@ World Building
 - No aggro??
 - If statement around code in UI to skip title screen
 - fix open menu while respawn bug
+- Equipment doesn't impact stats
 
 
 
