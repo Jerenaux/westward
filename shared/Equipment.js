@@ -116,7 +116,7 @@ EquipmentManager.prototype.get = function (slotName) {
  * Return an object containing all the information about the item
  * equipped in a given slot.
  * @param {string} slotName - name of the slot where the item of
- * interest is equipes.
+ * interest is equiped.
  * @returns {Object} - Object containging data about item.
  */
 EquipmentManager.prototype.getItem = function (slotName) {

@@ -54,7 +54,7 @@ World Building
 - No aggro??
 - If statement around code in UI to skip title screen
 - fix open menu while respawn bug
-
+- Check if ammo type constrained by container
 
 
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5

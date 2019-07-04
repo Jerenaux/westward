@@ -237,12 +237,13 @@ describe('GameServer',function(){
         var slot = gs.itemsData[type].equipment;
         var slotNotOwned = gs.itemsData[typeNotOwned].equipment;
         player.giveItem(type,1);
+        expect(player.isEquipped(slot)).to.equal(false);
+        expect(player.isEquipped(slotNotOwned)).to.equal(false);
         gs.handleUse({item:type},player.socketID);
         gs.handleUse({item:typeNotOwned},player.socketID);
         expect(player.isEquipped(slot)).to.equal(true);
         expect(player.getEquippedItemID(slot)).to.equal(type);
         expect(player.isEquipped(slotNotOwned)).to.equal(false);
-        expect(player.getEquippedItemID(slotNotOwned)).to.equal(-1);
     });
 
     // TODO: expand test cases + test results with gs methods for all tests
@@ -262,9 +263,20 @@ describe('GameServer',function(){
         expect(building.getGold()).to.equal(buildingGoldBefore + giveAmount + takeAmount);
     });
 
-   /* it('handleGold_nonowner', function(){
-           building.owner = -1;
-    });*/
+   it('handleGold_nonowner', function(){
+        building.owner = -1;
+        player.gold = 150;
+        var playerGoldBefore = player.getGold();
+        var buildingGoldBefore = building.getGold();
+        var giveAmount = 10;
+        var takeAmount = -5;
+        gs.handleGold({nb:giveAmount},player.socketID);
+        expect(player.getGold()).to.equal(playerGoldBefore);
+        expect(building.getGold()).to.equal(buildingGoldBefore);
+        gs.handleGold({nb:takeAmount},player.socketID);
+        expect(player.getGold()).to.equal(playerGoldBefore);
+        expect(building.getGold()).to.equal(buildingGoldBefore);
+    });
 
     afterEach(function(){
         stubs.forEach(function(stub){

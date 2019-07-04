@@ -393,12 +393,37 @@ Player.prototype.takeFromBelt = function (item, nb) {
     this.updatePacket.addBelt(item, this.belt.getNb(item));
 };
 
+/**
+ * Check if a non-permanent item is equipped in the slot 
+ * (i.e. something else than hands/fists).
+ * @param {string} slot - name of the slot where the item of
+ * interest is equiped.
+ * @returns {boolean} is a non-permanent item equipped or not.
+ */
 Player.prototype.isEquipped = function (slot) {
-    return this.equipment.get(slot) > 1;
+    var item = this.getEquippedItem(slot);
+    if(!item) return false;
+    return !item.permanent;
 };
 
+/**
+ * Return an object containing all the information about the item
+ * equipped in a given slot.
+ * @param {string} slot - name of the slot where the item of
+ * interest is equiped.
+ * @returns {Object} - Object containging data about item.
+ */
 Player.prototype.getEquippedItem = function (slot) {
     return this.equipment.getItem(slot);
+};
+
+/**
+ * Returns the item ID of the item equipped at the given slot
+ * @param {string} slot - name of the slot where the item of
+ * @returns {number} - item ID of equipped item or -1 if nothing equipped
+ */
+Player.prototype.getEquippedItemID = function (slot) {
+    return this.equipment.get(slot);
 };
 
 Player.prototype.canEquip = function (slot, item) {
