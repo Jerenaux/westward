@@ -427,7 +427,8 @@ Player.prototype.getEquippedItemID = function (slot) {
 };
 
 Player.prototype.canEquip = function (slot, item) {
-    if (!this.hasItem(item, 1) && !this.hasItemInBelt(item, 1)) return false;
+    if (!(slot in Equipment.slots)) return false;
+    if(GameServer.itemsData[item].equipment != slot) return false;
     // If it's ammo, check that the proper container is equipped
     // TODO ADD THE AMMO CHECKS FOR CONTAINER!!!
     // if (slot in Equipment.slots || slot === Equipment.ammo || slot === Equipment.container) {
@@ -441,7 +442,7 @@ Player.prototype.canEquip = function (slot, item) {
 
 /**
  * Equip a piece of equipment. Doesn't check for item ownership,
- * this should be done upsteam (e.g. in `GameServer.handleUse()`.
+ * this should be done upsteam (e.g. in `GameServer.handleUse()`.)
  * @param {string} slot - Name of the slot in which to equip.
  * @param {number} item - ID of the item to equip.
  * @param {boolean} fromDB - Does the order come from DB (if not, then
@@ -458,7 +459,11 @@ Player.prototype.equip = function (slot, item, fromDB) {
         return false;
     }
     if (!item) return false;
-    if (!fromDB && !this.canEquip(slot, item)) return false;
+    if (!fromDB && !this.hasItem(item, 1) && !this.hasItemInBelt(item, 1)) return false;
+    if(!this.canEquip(slot, item)) {
+        console.log('Item cannot be equipped in that slot');
+        return false;
+    }
 
     // console.log('Equipping');
     var slotData = Equipment.getData(slot);

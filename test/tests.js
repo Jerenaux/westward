@@ -10,6 +10,7 @@ var mongoose = require('mongoose');
 
 var mapsDir = path.join(__dirname,'..','maps');
 var gs = require('../server/GameServer.js').GameServer;
+var Equipment = require('../shared/Equipment.js').Equipment;
 
 var PORT = 8081; //TODO: read from conf file?
 
@@ -244,6 +245,25 @@ describe('GameServer',function(){
         expect(player.isEquipped(slot)).to.equal(true);
         expect(player.getEquippedItemID(slot)).to.equal(type);
         expect(player.isEquipped(slotNotOwned)).to.equal(false);
+    });
+
+    /**
+     * Try to equip every single item possible, using good and bad inputs.
+     */
+    it('Player_equip', function(){
+        var slots = Object.keys(Equipment.slots);
+
+        for(var itemID in gs.itemsData){
+            var item = gs.itemsData[itemID];
+            var properSlot = item.equipment;
+            if(!properSlot) continue;
+            var slotid = slots.indexOf(properSlot); 
+            var wrongSlot = slotid > 0 ? slots[slotid - 1] : slots[slotid + 1];
+            // console.log('#',itemID,item,properSlot);
+            expect(player.equip(properSlot,parseInt(itemID),true)).to.equal(true);
+            expect( player.equip(properSlot,item,true)).to.equal(false);; // try sending the item data instead of id
+            expect(player.equip(wrongSlot,parseInt(itemID),true)).to.equal(false);;
+        }
     });
 
     // TODO: expand test cases + test results with gs methods for all tests

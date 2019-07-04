@@ -139,7 +139,6 @@
     "atlas": "items2",
     "frame":"shield1",
     "name": "Wooden shield",
-    "equipment": "shield",
     "effects":{"def":2},
     "sound": "equip",
     "isCrafted": true,
