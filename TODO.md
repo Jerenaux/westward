@@ -56,7 +56,7 @@ World Building
 - fix open menu while respawn bug
 - Equipment doesn't impact stats
 
-
+Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
 
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
 https://medium.com/@kestrelm/2d-skeletal-animation-in-phaser-3-tutorial-3ed468fb6bd0
