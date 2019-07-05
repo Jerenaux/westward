@@ -202,7 +202,6 @@ let Hero = new Phaser.Class({
     updateAmmo: function(ammo){
         for(let i = 0; i < ammo.length; i++){
             let am = ammo[i];
-            console.log('Hero.js updateAmmo', ammo, am);
             this.equipment.setAmmo(am.nb);
         }
         this.updateEvents.add('equip');

@@ -21,6 +21,8 @@ var UI = {
         this.load.audio('click','assets/sfx/click.wav');
         this.load.audio('error','assets/sfx/error.wav');
 
+        this.load.html('tooltip', '/assets/html/tooltip.html');
+
         if(Client.isNewPlayer()) {
             this.load.image('bigbg', 'assets/sprites/bigbg.png');
             this.load.image('bigbg_mask', 'assets/sprites/bigbg_mask.png');

@@ -307,11 +307,6 @@ Engine.create = function(){
 
     Engine.created = true;
     Engine.configEngine();
-    /*if(Client.tutorial){
-        TutorialManager.boot(2);
-    }else{
-        Client.requestData();
-    }*/
     Client.requestData();
 };
 
