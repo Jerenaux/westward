@@ -444,30 +444,30 @@ Player.prototype.canEquip = function (slot, item) {
  * Equip a piece of equipment. Doesn't check for item ownership,
  * this should be done upsteam (e.g. in `GameServer.handleUse()`.)
  * @param {string} slot - Name of the slot in which to equip.
- * @param {number} item - ID of the item to equip.
+ * @param {number} itemID - ID of the item to equip.
  * @param {boolean} fromDB - Does the order come from DB (if not, then
  * it comes from player use).
  * @returns {boolean} - Success or not.
  */
-Player.prototype.equip = function (slot, item, fromDB) {
+Player.prototype.equip = function (slot, itemID, fromDB) {
 
-    console.log('Player.prototype.equip:', slot, item, fromDB);
+    console.log('Player.prototype.equip:', slot, itemID, fromDB);
 
-    if (typeof item != 'number') {
+    if (typeof itemID != 'number') {
         console.warn('ERROR in `Player.equip()`: item is not a number');
-        console.warn(item, typeof item);
+        console.warn(itemID, typeof itemID);
         return false;
     }
-    if (!item) return false;
-    if (!fromDB && !this.hasItem(item, 1) && !this.hasItemInBelt(item, 1)) return false;
-    if(!this.canEquip(slot, item)) {
+    if (!itemID) return false;
+    if (!fromDB && !this.hasItem(itemID, 1) && !this.hasItemInBelt(itemID, 1)) return false;
+    if(!this.canEquip(slot, itemID)) {
         console.log('Item cannot be equipped in that slot');
         return false;
     }
 
     // console.log('Equipping');
     var slotData = Equipment.getData(slot);
-    var itemData = GameServer.itemsData[item];
+    var itemData = GameServer.itemsData[itemID];
 
     if (this.isEquipped(slot)) this.unequip(slot);
 
@@ -477,10 +477,10 @@ Player.prototype.equip = function (slot, item, fromDB) {
     }
 
     // equip item
-    if (item) {
-        this.equipment.set(slot, item); // item = item_id
-        this.updatePacket.addEquip(slot, item);
-        this.applyAbsoluteModifiers(item);
+    if (itemID) {
+        this.equipment.set(slot, itemID); // item = item_id
+        this.updatePacket.addEquip(slot, itemID);
+        this.applyAbsoluteModifiers(itemID);
 
         var nb = 1;
 
@@ -490,16 +490,16 @@ Player.prototype.equip = function (slot, item, fromDB) {
         // not be run.
         if (slot === 'range_ammo' && !fromDB) {
             var range_container_id = this.equipment.get('range_container');
-            nb = this.computeLoad(item); // compute how much will be added to the container
+            nb = this.computeLoad(itemID); // compute how much will be added to the container
             this.load(nb);
         }
 
         if (!fromDB) {
             this.addNotif('Equipped ' + nb + ' ' + itemData.name + (nb > 1 ? 's' : ''));
-            if (this.hasItemInBelt(item)) {
-                this.takeFromBelt(item, nb);
+            if (this.hasItemInBelt(itemID)) {
+                this.takeFromBelt(itemID, nb);
             } else {
-                this.takeItem(item, nb);
+                this.takeItem(itemID, nb);
             }
             if (!this.inFight) this.save();
         }
@@ -546,9 +546,14 @@ Player.prototype.unequip = function (slot, notify) {
     }
 };
 
-Player.prototype.applyAbsoluteModifiers = function (item, change) {
+Player.prototype.applyAbsoluteModifiers = function (itemID, change) {
+
+    console.log('applyAbsoluteModifiers item', itemID);
+
     var change = change || 1;
-    var itemData = GameServer.itemsData[item.id];
+    var itemData = GameServer.itemsData[itemID];
+
+    console.log('applyAbsoluteModifiers', itemData);
 
     if (!itemData) return;
     if (!itemData.effects) return;
