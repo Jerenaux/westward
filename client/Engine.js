@@ -701,7 +701,7 @@ Engine.makeUI = function(){
 
     bug.on('pointerup',Engine.snap);
     bug.on('pointerover',function(){
-        UI.tooltip.updateInfo('Snap a pic of a bug');
+        UI.tooltip.updateInfo('free',{body:'Snap a pic of a bug'});
         UI.tooltip.display();
     });
     bug.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
@@ -825,7 +825,7 @@ menuIcon = function(x,y,icon,menu,tox,toy){
     });
     var bg_ = this.bg;
     this.bg.on('pointerover',function(){
-        UI.tooltip.updateInfo(menu.name);
+        UI.tooltip.updateInfo('free',{title:menu.name});
         UI.tooltip.display();
         bg_.setFrame('holder_over');
     });

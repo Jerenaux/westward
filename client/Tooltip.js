@@ -14,41 +14,28 @@ var Tooltip = new Phaser.Class({
         this.title = this.getChildByID('tooltip_title');
         this.body = this.getChildByID('tooltip_body');
 
-        this.xOffset = 20;
-        this.yOffset = 10;
         this.setOrigin(0);
         this.setScrollFactor(0);
         this.hide();
     },
 
     updatePosition: function(x,y){
-        // x += this.xOffset;
-        // y += this.yOffset;
-        if(x > UI.getGameWidth() - this.width - 20) {
-            x -= (this.width+20);
-            y += 20;
-        }
-        if(y > UI.getGameHeight() - this.height - 20){
-            y -= (this.height+20);
-        }
-        var dx = x - this.x;
-        var dy = y - this.y;
-        if(dx == 0 && dy == 0) return;
-   
-        this.x += dx + this.xOffset;
-        this.y += dy + this.yOffset;    
+        this.setPosition(x + 10,y + 10);
+        if(this.x + this.computeWidth() > UI.getGameWidth()) this.x -= this.computeWidth();
     },
 
     updateInfo: function(type,data){
+        this.clear();
         switch(type){
             case 'item':
-                if(data.id == -1){
-                    this.clear();
-                    break;
-                }
+                if(data.id == -1) break;
                 var item = Engine.itemsData[data.id];
                 this.setTitle(item.name ? item.name : '');
                 this.setBody(item.desc ? item.desc : '');
+                break;
+            case 'free':
+                if(data.title) this.setTitle(data.title);
+                if(data.body) this.setBody(data.body);
                 break;
             default:
                 break;
@@ -66,6 +53,21 @@ var Tooltip = new Phaser.Class({
 
     setBody: function(text){
         this.body.innerText = text;
+    },
+
+    getBodyText: function(){
+        return this.body.innerText;
+    },
+
+    getTitleText: function(){
+        return this.title.innerText;
+    },
+
+    computeWidth: function(){
+        return Math.max(
+            Math.min(this.getBodyText().length,40) * 6.5,
+            this.getTitleText().length * 8
+        );
     },
 
     display: function(){
