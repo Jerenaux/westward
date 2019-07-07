@@ -1849,8 +1849,8 @@ Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
     if(Engine.player) Engine.updateMarker(position.tile);
     if(Engine.debug){
-        //document.getElementById('pxx').innerHTML = Math.round(position.pixel.x);
-        //document.getElementById('pxy').innerHTML = Math.round(position.pixel.y);
+        document.getElementById('pxx').innerHTML = Math.round(event.x);
+        document.getElementById('pxy').innerHTML = Math.round(event.y);
         document.getElementById('tx').innerHTML = position.tile.x;
         document.getElementById('ty').innerHTML = position.tile.y;
         document.getElementById('aoi').innerHTML = Utils.tileToAOI(position.tile);

@@ -11,12 +11,14 @@ var Tooltip = new Phaser.Class({
         UI.scene.add.displayList.add(this);
 
         this.createFromCache('tooltip');
+        this.title = this.getChildByID('tooltip_title');
+        this.body = this.getChildByID('tooltip_body');
 
         this.xOffset = 20;
         this.yOffset = 10;
         this.setOrigin(0);
         this.setScrollFactor(0);
-        // this.hide();
+        this.hide();
     },
 
     updatePosition: function(x,y){
@@ -37,8 +39,33 @@ var Tooltip = new Phaser.Class({
         this.y += dy + this.yOffset;    
     },
 
-    updateInfo: function(){
-        console.log(this.x,this.y,this.visible);
+    updateInfo: function(type,data){
+        switch(type){
+            case 'item':
+                if(data.id == -1){
+                    this.clear();
+                    break;
+                }
+                var item = Engine.itemsData[data.id];
+                this.setTitle(item.name ? item.name : '');
+                this.setBody(item.desc ? item.desc : '');
+                break;
+            default:
+                break;
+        }
+    },
+
+    clear: function(){
+        this.setTitle('');
+        this.setBody('');
+    },
+
+    setTitle: function(text){
+        this.title.innerText = text;
+    },
+
+    setBody: function(text){
+        this.body.innerText = text;
     },
 
     display: function(){

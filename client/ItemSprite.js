@@ -27,10 +27,10 @@ var ItemSprite = new Phaser.Class({
         this.setOrigin(0.5);
 
         this.itemID = id;
-        this.name = data.name;
-        this.desc = data.desc;
-        this.hideEffects = hideEffects;
-        this.effects = data.effects;
+        //this.name = data.name;
+        //this.desc = data.desc;
+        //this.hideEffects = hideEffects;
+        //this.effects = data.effects;
         this.disabled = false;
         if(callback) {
             this.off('pointerup');
@@ -54,6 +54,7 @@ var ItemSprite = new Phaser.Class({
     },
 
     handleOver: function(){
-        if(this.showTooltip) UI.tooltip.updateInfo(this.name,this.desc,this.itemID);
+        //if(this.showTooltip) UI.tooltip.updateInfo(this.name,this.desc,this.itemID);
+        if(this.showTooltip) UI.tooltip.updateInfo('item',{id:this.itemID});
     }
 });

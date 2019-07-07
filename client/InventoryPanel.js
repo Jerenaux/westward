@@ -190,10 +190,11 @@ InventoryPanel.prototype.displayInventory = function(){
 
 InventoryPanel.prototype.setUpZone = function(nbDisplayed){
     const slotSize = 36;
-    const zoneX = this.slots[0].x;
-    const zoneY = this.slots[0].y;
-    const zoneW = Math.min(nbDisplayed, this.config.maxwidth) * slotSize + 4;
-    const zoneH = Math.ceil(nbDisplayed / this.config.maxwidth) * slotSize + 4;
+    let zoneX = this.slots[0].x;
+    let zoneY = this.slots[0].y;
+    let zoneW = Math.min(nbDisplayed, this.config.maxwidth) * slotSize + 4;
+    let zoneH = Math.ceil(nbDisplayed / this.config.maxwidth) * slotSize + 4;
+
     const shape = [0, 0, zoneW, 0];
     // Diff = how many empty slots in the last inventory row
     let diff = this.config.maxwidth - Math.ceil(nbDisplayed % this.config.maxwidth);
@@ -216,15 +217,12 @@ InventoryPanel.prototype.setUpZone = function(nbDisplayed){
     const polygon = new Phaser.Geom.Polygon(shape);
 
     this.zone.setVisible(true);
+    this.zone.setOrigin(0);
     this.zone.setPosition(zoneX,zoneY);
     this.zone.setSize(zoneW,zoneH,true);
     this.zone.setInteractive(polygon,Phaser.Geom.Polygon.Contains);
     this.zone.input.hitArea = polygon;
 };
-
-/*InventoryPanel.prototype.modifyInventory = function(inv){
-    this.inventory = inv;
-};*/
 
 InventoryPanel.prototype.setFilter = function(filter){
     this.config.filter = true;
