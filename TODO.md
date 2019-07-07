@@ -1,6 +1,5 @@
 ## To test:
-- Test equip, load, etc. with all kind of weird imput
-- Test gs.handleGold()
+- Test load, etc. with all kind of weird imput
 - Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
 - Test Utils.nextTo with all combinations of building/animal vs building/animal, next to each other and not
@@ -54,9 +53,8 @@ World Building
 - No aggro??
 - If statement around code in UI to skip title screen
 - fix open menu while respawn bug
-- Equipment doesn't impact stats
 
-Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
+
 
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
 https://medium.com/@kestrelm/2d-skeletal-animation-in-phaser-3-tutorial-3ed468fb6bd0
