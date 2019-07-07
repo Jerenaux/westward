@@ -53,7 +53,10 @@ World Building
 - No aggro??
 - If statement around code in UI to skip title screen
 - fix open menu while respawn bug
+- Check impact on stats
+- Check ammo type constraint
 
+Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
 
 
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
