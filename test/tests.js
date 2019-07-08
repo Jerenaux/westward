@@ -249,6 +249,8 @@ describe('GameServer',function(){
 
     /**
      * Try to equip every single item possible, using good and bad inputs.
+     * Only tests equip here, doesn't check for changes in inventory numbers 
+     * (see subsequent test for that)
      */
     it('Player_equip', function(){
         var slots = Object.keys(Equipment.slots);
@@ -261,12 +263,47 @@ describe('GameServer',function(){
             var wrongSlot = slotid > 0 ? slots[slotid - 1] : slots[slotid + 1];
             // console.log('#',itemID,item,properSlot);
             expect(player.equip(properSlot,parseInt(itemID),true)).to.equal(true);
-            expect( player.equip(properSlot,item,true)).to.equal(false);; // try sending the item data instead of id
-            expect(player.equip(wrongSlot,parseInt(itemID),true)).to.equal(false);;
+            expect( player.equip(properSlot,item,true)).to.equal(false); // try sending the item data instead of id
+            expect(player.equip(wrongSlot,parseInt(itemID),true)).to.equal(false);
+            expect(player.getEquippedItemID(properSlot)).to.equal(parseInt(itemID));
         }
     });
 
-    // TODO: expand test cases + test results with gs methods for all tests
+    it('equipment_management',function(){
+        player.inventory.clear();
+        var weaponID = 28;
+        var itemData = gs.itemsData[weaponID];
+        var slot = itemData.equipment;
+        player.giveItem(weaponID, 1);
+        expect(player.getItemNbInBelt(weaponID)).to.equal(0);
+        var initNb = player.getItemNb(weaponID);
+        player.equip(slot, weaponID);
+        expect(player.getItemNb(weaponID)).to.equal(initNb-1);
+        expect(player.isEquipped(slot)).to.equal(true);
+        expect(player.getEquippedItemID(slot)).to.equal(parseInt(weaponID));
+        player.unequip(slot);
+        expect(player.getItemNb(weaponID)).to.equal(initNb);
+        expect(player.isEquipped(slot)).to.equal(false);
+
+        player.backpackToBelt(weaponID);
+        expect(player.getItemNb(weaponID)).to.equal(0);
+        expect(player.getItemNbInBelt(weaponID)).to.equal(initNb);
+        player.equip(slot, weaponID);
+        expect(player.isEquipped(slot)).to.equal(true);
+        expect(player.getEquippedItemID(slot)).to.equal(parseInt(weaponID));
+        expect(player.getItemNbInBelt(weaponID)).to.equal(initNb-1);
+        player.unequip(slot);
+        expect(player.getItemNb(weaponID)).to.equal(1);
+        expect(player.getItemNbInBelt(weaponID)).to.equal(initNb-1);
+        expect(player.isEquipped(slot)).to.equal(false);
+    });
+
+    it('Player_load',function(){
+        var initNbAmmo = player.getNbAmmo();
+        var increment = 10;
+        player.load(increment);
+        expect(player.getNbAmmo()).to.equal(initNbAmmo+increment);
+    });
 
     it('handleGold_owner', function(){
         building.owner = player.id;

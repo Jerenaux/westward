@@ -373,6 +373,13 @@ Player.prototype.giveItem = function (item, nb, notify, verb) {
     return this;
 };
 
+/**
+ * Take an item from the backpack inventory (not the belt)
+ * @param {number} item - ID of the item to take.
+ * @param {number} nb - Amout to take.
+ * @param {boolean} notify - Send a notification to the player or not.
+ * @param {string} verb - Which verb to use in the notification (drink, use, ...) 
+ */
 Player.prototype.takeItem = function (item, nb, notify, verb) {
     this.inventory.take(item, nb);
     this.updatePacket.addItem(item, this.inventory.getNb(item));
@@ -392,6 +399,18 @@ Player.prototype.takeFromBelt = function (item, nb) {
     this.belt.take(item, nb);
     this.updatePacket.addBelt(item, this.belt.getNb(item));
 };
+
+Player.prototype.backpackToBelt = function(item){
+    var nb = this.getItemNb(item);
+    this.takeItem(item,nb);
+    this.addToBelt(item,nb);
+}
+
+Player.prototype.beltToBackpack = function(item){
+    var nb = this.getItemNbInBelt(item);
+    this.takeFromBelt(item,nb);
+    this.giveItem(item,nb);
+}
 
 /**
  * Check if a non-permanent item is equipped in the slot 
@@ -614,6 +633,7 @@ Player.prototype.load = function (nb) {
     }
     this.equipment.load(nb);
     this.updatePacket.addAmmo(this.equipment.getNbAmmo());
+    return true;
 };
 
 Player.prototype.unload = function (notify) {
@@ -634,21 +654,13 @@ Player.prototype.decreaseAmmo = function () {
     return ammoID;
 };
 
-// Player.prototype.getRangedWeapon = function () {
-//     return this.getEquippedItem('rangedw');
-// };
-
 Player.prototype.getRangedContainer = function () {
     return this.getEquippedItem('range_container');
 };
 
-// Player.prototype.getRangeAmmo = function () {
-//     return this.getEquippedItem('range_ammo');
-// };
-//
-// Player.prototype.getAmmo = function () {
-//     return this.equipment.getNbAmmo();
-// };
+Player.prototype.getNbAmmo = function () {
+    return this.equipment.getNbAmmo();
+};
 
 Player.prototype.canRange = function () {
 

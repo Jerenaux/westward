@@ -1,10 +1,8 @@
 ## To test:
-- Test load, etc. with all kind of weird imput
 - Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
 - Test Utils.nextTo with all combinations of building/animal vs building/animal, next to each other and not
 - Test Battle.computeTof()
-- Test equipping/unequipping from inventory and belt (test proper number changes)
 - Test that stats change when equipping items
 - Find a way to test itemsRespaw and other time-related aspects
 - Test tutorial manually (reset start)
