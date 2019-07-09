@@ -1518,10 +1518,11 @@ GameServer.handlePath = function(data,socketID){
 GameServer.handleBelt = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var item = data.item;
-    if(player.hasItem(item,1)){ // in backpack
-        this.backpackToBelt(item);
-    }else if(player.hasItemInBelt(item)) {
-        this.beltToBackpack(item);
+    var inventory = data.inventory;
+    if(inventory == 'backpack' && player.hasItem(item,1)){
+        player.backpackToBelt(item);
+    }else if(inventory == 'belt' && player.hasItemInBelt(item)) {
+        player.beltToBackpack(item);
     }
 };
 

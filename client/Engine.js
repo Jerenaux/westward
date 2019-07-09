@@ -2221,8 +2221,8 @@ Engine.backpackClick = function(){
  */
 Engine.displayItemActionPanel = function(itemID, inventory){
     Engine.currentMenu.panels['itemAction'].display();
-    Engine.currentMenu.panels['itemAction'].setUp(this.itemID, inventory);
-}
+    Engine.currentMenu.panels['itemAction'].setUp(itemID, inventory);
+};
 
 
 // Engine.inventoryClick = function(){

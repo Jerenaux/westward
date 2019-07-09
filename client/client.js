@@ -193,8 +193,8 @@ Client.sendUse = function(id, inventory){
     Client.socket.emit('use',{item:id, inventory:inventory});
 };
 
-Client.sendBelt = function(id){
-    Client.socket.emit('belt',{item:id});
+Client.sendBelt = function(id, inventory){
+    Client.socket.emit('belt',{item:id, inventory:inventory});
 };
 
 

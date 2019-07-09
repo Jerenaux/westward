@@ -1,4 +1,5 @@
 ## To test:
+- Test handleBelt
 - Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
 - Test Utils.nextTo with all combinations of building/animal vs building/animal, next to each other and not

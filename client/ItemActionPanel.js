@@ -45,8 +45,7 @@ ItemActionPanel.prototype.setUp = function(itemID, inventory){
             this.warntext.setVisible(true);
         }
 
-        var inBelt = Engine.player.belt.hasItem(itemID);
-        this.beltButton.setText(inBelt ? 'Off belt' : 'In belt');
+        this.beltButton.setText(inventory == 'belt' ? 'Off belt' : 'In belt');
     }else{
         this.useButton.hide();
         this.beltButton.hide();
@@ -59,7 +58,7 @@ ItemActionPanel.prototype.sendUse = function(){
 };
 
 ItemActionPanel.prototype.sendBelt = function(){
-    Client.sendBelt(this.itemID);
+    Client.sendBelt(this.itemID, this.inventory);
     this.hide();
 };
 
