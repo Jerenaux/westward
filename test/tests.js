@@ -231,6 +231,21 @@ describe('GameServer',function(){
         expect(building.getGold()).to.equal(buildingGoldBefore-buyPrice+sellPrice);
     });
 
+    it('handleUse_consume', function(){
+        player.inventory.clear();
+        var itemID = 1; // stone hatchet
+        var amount = 1;
+        player.giveItem(itemID,amount);
+        expect(player.getItemNb(itemID)).to.equal(amount);
+        gs.handleUse({item:itemID},player.socketID);
+        expect(player.getItemNb(itemID)).to.equal(amount-1);
+
+        player.addToBelt(itemID,amount);
+        expect(player.getItemNbInBelt(itemID)).to.equal(amount);
+        gs.handleUse({item:itemID},player.socketID);
+        expect(player.getItemNbInBelt(itemID)).to.equal(amount-1);
+    });
+
     it('handleUse_equip', function(){
         player.inventory.clear();
         var type = 28; // stone hatchet
