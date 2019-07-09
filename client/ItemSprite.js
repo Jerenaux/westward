@@ -54,7 +54,6 @@ var ItemSprite = new Phaser.Class({
     },
 
     handleOver: function(){
-        //if(this.showTooltip) UI.tooltip.updateInfo(this.name,this.desc,this.itemID);
         if(this.showTooltip) UI.tooltip.updateInfo('item',{id:this.itemID});
     }
 });

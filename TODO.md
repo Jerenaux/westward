@@ -44,6 +44,7 @@ World Building
 - Make towers throw stones when no better ammo
 - Belt & backpack capacity 
 - Add "resource markers" for wildlife (optimize?)
+- No decimal in defaut prices (happens in one lumber camp)
 
 - Items consumed not taken from belt
 - Duplicate item when equipped

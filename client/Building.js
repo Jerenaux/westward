@@ -375,8 +375,7 @@ var Building = new Phaser.Class({
             }
         }
         if(cursor) UI.setCursor(cursor);
-        var owner = this.isOwned() ? 'Your' : this.ownerName+'\'s';
-        UI.tooltip.updateInfo(owner+' '+this.name);
+        UI.tooltip.updateInfo('building',{id:this.id});
         UI.tooltip.display();
     },
 

@@ -538,7 +538,7 @@ var Pin = new Phaser.Class({
 
     handleOver: function(){
         if(!this.parentMap.viewRect.contains(this.x,this.y)) return;
-        UI.tooltip.updateInfo(this.name);
+        UI.tooltip.updateInfo('free',{title:this.name});
         UI.tooltip.display();
         console.log(this.tileX,this.tileY);
     },
