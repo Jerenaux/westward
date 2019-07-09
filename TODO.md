@@ -43,16 +43,14 @@ World Building
 - Belt & backpack capacity 
 - Add "resource markers" for wildlife (optimize?)
 
-- Items consumed not taken from belt
-- Duplicate item when equipped
-- Issue with battle stats
-- Equip hands and fists to new players
+
 - Test battle
 - No aggro??
 - If statement around code in UI to skip title screen
 - fix open menu while respawn bug
-- Check impact on stats
 - Check ammo type constraint
+- Settlement choice bug
+- Fix building hover
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
 
