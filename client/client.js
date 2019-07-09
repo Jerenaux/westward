@@ -189,8 +189,8 @@ Client.sendStock  = function(item,nb,building,action){
     Client.socket.emit('stock',{item:item,nb:nb,building:building,action:action});
 };
 
-Client.sendUse = function(id){
-    Client.socket.emit('use',{item:id});
+Client.sendUse = function(id, inventory){
+    Client.socket.emit('use',{item:id, inventory:inventory});
 };
 
 Client.sendBelt = function(id){

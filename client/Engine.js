@@ -1531,7 +1531,7 @@ Engine.makeInventory = function(statsPanel){
     inventory.setSound(Engine.scene.sound.add('inventory'));
 
     var items = inventory.addPanel('items',new InventoryPanel(40,100,600,260,'Backpack'));
-    items.setInventory('player',15,true,Engine.inventoryClick);
+    items.setInventory('player',15,true,Engine.backpackClick);
 
     items.addCapsule('gold',130,-9,'999','gold');
     items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help']);
@@ -1539,7 +1539,7 @@ Engine.makeInventory = function(statsPanel){
     inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,120),true);
 
     var belt = inventory.addPanel('belt',new InventoryPanel(40,360,600,90,'Belt'));
-    belt.setInventory('belt',15,true,Engine.inventoryClick);
+    belt.setInventory('belt',15,true,Engine.beltClick);
     belt.addButton(570, 8, 'blue','help',null,'',UI.textsData['belt_help']);
 
     var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
@@ -2197,23 +2197,51 @@ Engine.newbuildingClick = function(){
     Engine.currentMenu.panels['confirm'].setUp(this.itemID);
 };
 
-Engine.inventoryClick = function(){
-    if(BattleManager.inBattle) {
-        var sticky = Engine.itemsData[this.itemID].stickMouse;
-        UI.manageCursor(+sticky,'sticky');
-        if(sticky){
-            Engine.stickyCursor = true;
-            return false;
-        }else {
-            Client.sendUse(this.itemID);
-            return true;
-        }
-    }else{
-        // itemAction is the small panel appearing in the inventory displaying options such as use, throw...
-        Engine.currentMenu.panels['itemAction'].display();
-        Engine.currentMenu.panels['itemAction'].setUp(this.itemID);
-    }
+/**
+ * What to do when clicked an item in belt (vs. backpack).
+ * `this` is bound to the clicked `ItemSperite`.
+ */
+Engine.beltClick = function(){
+    Engine.displayItemActionPanel(this.itemID, 'belt');
 };
+
+/**
+ * What to do when clicked an item in backpack (vs. belt).
+ * `this` is bound to the clicked `ItemSperite`.
+ */
+Engine.backpackClick = function(){
+    Engine.displayItemActionPanel(this.itemID, 'backpack');
+};
+
+/**
+ * Display the itemAction window, i.e. the small panel appearing in the inventory 
+ * displaying options such as use, put in belt...
+ * @param {number} itemID - ID of the clicked item.
+ * @param {string} inventory - Whether the item was clicked in the backpack or in the belt.
+ */
+Engine.displayItemActionPanel = function(itemID, inventory){
+    Engine.currentMenu.panels['itemAction'].display();
+    Engine.currentMenu.panels['itemAction'].setUp(this.itemID, inventory);
+}
+
+
+// Engine.inventoryClick = function(){
+//     if(BattleManager.inBattle) {
+//         var sticky = Engine.itemsData[this.itemID].stickMouse;
+//         UI.manageCursor(+sticky,'sticky');
+//         if(sticky){
+//             Engine.stickyCursor = true;
+//             return false;
+//         }else {
+//             Client.sendUse(this.itemID,'belt');
+//             return true;
+//         }
+//     }else{
+//         // itemAction is the small panel appearing in the inventory displaying options such as use, throw...
+//         Engine.currentMenu.panels['itemAction'].display();
+//         Engine.currentMenu.panels['itemAction'].setUp(this.itemID);
+//     }
+// };
 
 Engine.unequipClick = function(){ // Sent when unequipping something
     Client.sendUnequip(this.slotName);

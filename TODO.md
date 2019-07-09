@@ -3,7 +3,6 @@
 - Test handleChat (with text and also empty input)
 - Test Utils.nextTo with all combinations of building/animal vs building/animal, next to each other and not
 - Test Battle.computeTof()
-- Test that stats change when equipping items
 - Find a way to test itemsRespaw and other time-related aspects
 - Test tutorial manually (reset start)
 - Test new player manually

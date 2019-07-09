@@ -17,10 +17,15 @@ function ItemActionPanel(x,y,width,height,title){
 ItemActionPanel.prototype = Object.create(Panel.prototype);
 ItemActionPanel.prototype.constructor = ItemActionPanel;
 
-
-ItemActionPanel.prototype.setUp = function(itemID){
+/**
+ * Sets up the itemAction window to reflect the item that was clicked.
+ * @param {number} itemID - ID of the clicked item.
+ * @param {string} inventory - Whether the item was clicked in the backpack or in the belt.
+ */
+ItemActionPanel.prototype.setUp = function(itemID, inventory){
     const data = Engine.itemsData[itemID];
     this.itemID = itemID;
+    this.inventory = inventory;
     this.icon.setUp(itemID,data);
     this.text.setText(data.name);
     this.warntext.setVisible(false);
@@ -49,7 +54,7 @@ ItemActionPanel.prototype.setUp = function(itemID){
 };
 
 ItemActionPanel.prototype.sendUse = function(){
-    Client.sendUse(this.itemID);
+    Client.sendUse(this.itemID, this.inventory);
     this.hide();
 };
 

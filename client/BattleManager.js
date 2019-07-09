@@ -187,7 +187,9 @@ BattleManager.processInventoryClick = function(){
         console.log('Cannot take action');
         return;
     }
-    BattleManager.actionTaken = Engine.inventoryClick.call(this); // "this" has been bound to the clicked item
+    Client.sendUse(this.itemID,'belt'); // "this" has been bound to the clicked item
+    BattleManager.actionTaken = true;
+    // BattleManager.actionTaken = Engine.inventoryClick.call(this); // "this" has been bound to the clicked item
 };
 
 BattleManager.isActiveCell = function(cell){

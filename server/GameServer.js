@@ -1327,7 +1327,7 @@ GameServer.handleShop = function(data,socketID) {
             player.gainClassXP(GameServer.classes.merchant,Math.floor(price/10), true); // TODO: factor in class level
         }
         var verb = (isFinancial ? 'Sold' : 'Gave');
-        player.takeItem(item, nb, true, verb); // true = notify
+        player.takeItem(item, nb, 'backpack', true, verb); // true = notify
         building.giveItem(item,nb,true); // true = remember
         if(!building.isOwnedBy(player)) {
             var verb = (isFinancial ? 'sold' : 'gave');
@@ -1495,7 +1495,7 @@ GameServer.handleCraft = function(data,socketID){
 GameServer.operateCraft = function(recipient,targetItem,nb){
     var recipe = GameServer.itemsData[targetItem].recipe;
     for(var item in recipe) {
-        recipient.takeItem(item,recipe[item]*nb,true,'Consumed');
+        recipient.takeItem(item,recipe[item]*nb,'backpack',true,'Consumed');
         GameServer.destroyItem(item,recipe[item]*nb,'craft');
     }
     var output = GameServer.itemsData[targetItem].output || 1;
@@ -1529,8 +1529,14 @@ GameServer.handleUse = function(data,socketID){
 
     var player = GameServer.getPlayer(socketID);
     var item = data.item;
+    var inventory = data.inventory;
 
-    if(!player.hasItem(item,1) && !player.hasItemInBelt(item,1)){
+    if(inventory != 'backpack' && inventory != 'belt') return;
+
+    if(
+        (inventory == 'backpack' && !player.hasItem(item,1))
+        || (inventory == 'belt' && !player.hasItemInBelt(item,1))
+    ){
         console.log('does not have item');
         return false;
     }
@@ -1543,19 +1549,19 @@ GameServer.handleUse = function(data,socketID){
         player.battle.setEndOfTurn(500);
     }
     var itemData = GameServer.itemsData[item];
+    var isEquipment = !!itemData.equipment;
     var result;
-    if(itemData.equipment) {
+    var nb = 1;
+    if(isEquipment) {
         result = player.equip(itemData.equipment, parseInt(item), false); // false: not from DB
-    }else if(itemData.effects){
-        var nb = 1;
+    }else if(itemData.effects){ // If non-equipment, then consumable item
         result = player.applyEffects(item,nb,true);
-        if(player.inFight){
-            player.takeFromBelt(item,nb);
-        }else{ // If non-equipment, then consumable item
-            player.takeItem(item, nb, true, (itemData.verb || 'Used'));
-            GameServer.destroyItem(item, nb, 'use');
-        }
     }
+    var verb = (isEquipment ? 'Equipped' : (itemData.verb || 'Used'))
+    player.takeItem(item, nb, inventory, true, verb);
+    if(!isEquipment) GameServer.destroyItem(item, nb, 'use');
+    if (!player.inFight) player.save();
+
     Prism.logEvent(player,'use',{item:item});
     return result;
 };

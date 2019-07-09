@@ -361,6 +361,13 @@ Player.prototype.hasItemInBelt = function (item) {
     return (this.belt.getNb(item) > 0);
 };
 
+/**
+ * Give an item to the player (always to backpack)
+ * @param {number} item - ID of the item to give.
+ * @param {number} nb - Amout to give.
+ * @param {boolean} notify - Send a notification to the player or not.
+ * @param {string} verb - Which verb to use in the notification (pick, buy, ...) 
+ */
 Player.prototype.giveItem = function (item, nb, notify, verb) {
     this.inventory.add(item, nb);
     this.updatePacket.addItem(item, this.inventory.getNb(item));
@@ -374,21 +381,31 @@ Player.prototype.giveItem = function (item, nb, notify, verb) {
 };
 
 /**
- * Take an item from the backpack inventory (not the belt)
+ * Take an item from the inventory (backpack or the belt)
  * @param {number} item - ID of the item to take.
  * @param {number} nb - Amout to take.
+ * @param {string} inventory - Which inventory to take from (belt or backpack)
  * @param {boolean} notify - Send a notification to the player or not.
  * @param {string} verb - Which verb to use in the notification (drink, use, ...) 
  */
-Player.prototype.takeItem = function (item, nb, notify, verb) {
-    this.inventory.take(item, nb);
-    this.updatePacket.addItem(item, this.inventory.getNb(item));
+Player.prototype.takeItem = function (item, nb, inventory, notify, verb) {
+    // console.log('taking item',item,nb,inventory,notify,verb);
+    if(inventory == 'belt'){
+        this.takeFromBelt(item,nb);
+    }else{
+        this.takeFromBackpack(item,nb);
+    }
     if (notify) {
         verb = verb || 'Sold';
         this.addNotif(verb + ' ' + nb + ' ' + GameServer.itemsData[item].name);
         this.save();
     }
 };
+
+Player.prototype.takeFromBackpack = function(item,nb){
+    this.inventory.take(item, nb);
+    this.updatePacket.addItem(item, this.inventory.getNb(item));
+}
 
 Player.prototype.addToBelt = function (item, nb) {
     this.belt.add(item, nb);
@@ -470,7 +487,7 @@ Player.prototype.canEquip = function (slot, item) {
  */
 Player.prototype.equip = function (slot, itemID, fromDB) {
 
-    console.log('Player.prototype.equip:', slot, itemID, fromDB);
+    // console.log('Player.prototype.equip:', slot, itemID, fromDB);
 
     if (typeof itemID != 'number') {
         console.warn('ERROR in `Player.equip()`: item is not a number');
@@ -478,7 +495,7 @@ Player.prototype.equip = function (slot, itemID, fromDB) {
         return false;
     }
     if (!itemID) return false;
-    if (!fromDB && !this.hasItem(itemID, 1) && !this.hasItemInBelt(itemID, 1)) return false;
+    // if (!fromDB && !this.hasItem(itemID, 1) && !this.hasItemInBelt(itemID, 1)) return false; // remove: this function should not check for ownership
     if(!this.canEquip(slot, itemID)) {
         console.log('Item cannot be equipped in that slot');
         return false;
@@ -512,20 +529,7 @@ Player.prototype.equip = function (slot, itemID, fromDB) {
             nb = this.computeLoad(itemID); // compute how much will be added to the container
             this.load(nb);
         }
-
-        if (!fromDB) {
-            this.addNotif('Equipped ' + nb + ' ' + itemData.name + (nb > 1 ? 's' : ''));
-            if (this.hasItemInBelt(itemID)) {
-                this.takeFromBelt(itemID, nb);
-            } else {
-                this.takeItem(itemID, nb);
-            }
-            if (!this.inFight) this.save();
-        }
-
     }
-
-
     return true;
 };
 
@@ -567,7 +571,7 @@ Player.prototype.unequip = function (slot, notify) {
 
 Player.prototype.applyAbsoluteModifiers = function (itemID, change) {
 
-    console.log('applyAbsoluteModifiers item', itemID);
+    // console.log('applyAbsoluteModifiers item', itemID);
 
     var change = change || 1;
     var itemData = GameServer.itemsData[itemID];
