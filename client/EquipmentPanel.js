@@ -17,12 +17,6 @@ EquipmentPanel.prototype.addEquipment = function () {
         var is_ammo = (slot == 'range_ammo');
         this.makeSlots(slot, Equipment.slots[slot], is_ammo);
     }
-    // for (var container in Equipment.containers) {
-    //     this.makeSlots(container, Equipment.containers[container]);
-    // }
-    // for (var ammo in Equipment.ammo) {
-    //     this.makeSlots(ammo, Equipment.ammo[ammo], true);
-    // }
     this.updateEquipment();
 };
 
@@ -96,8 +90,7 @@ EquipmentPanel.prototype.updateEquipment = function () {
                 id: -1,
                 atlas: 'UI',
                 frame: slot.shade + '-shade',
-                name: slot.name,
-                desc: slot.desc
+                slot: slot.slotName
             };
         } else {
             data = Engine.itemsData[newItem];

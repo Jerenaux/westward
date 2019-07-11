@@ -45,6 +45,7 @@ World Building
 - Belt & backpack capacity 
 - Add "resource markers" for wildlife (optimize?)
 - No decimal in defaut prices (happens in one lumber camp)
+- Display building life in tooltips
 
 - Items consumed not taken from belt
 - Duplicate item when equipped
@@ -55,7 +56,10 @@ World Building
 - If statement around code in UI to skip title screen
 - fix open menu while respawn bug
 - Check if ammo type constrained by container
-
+- Display item effects in itemsprite tooltips
+- Display stat modifiers
+- Test tooltip of build menu
+- Add tooltip to UI capsules + ctrl+maj+f for vigor
 
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
 https://medium.com/@kestrelm/2d-skeletal-animation-in-phaser-3-tutorial-3ed468fb6bd0

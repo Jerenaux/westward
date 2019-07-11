@@ -50,7 +50,7 @@ var NPC = new Phaser.Class({
             cursor = (this.dead ? 'item' : 'combat');
         }
         UI.setCursor(cursor);
-        UI.tooltip.updateInfo((this.dead ? 'Dead ' : '')+this.name);
+        UI.tooltip.updateInfo('NPC',{type:this.entityType, id:this.id});
         UI.tooltip.display();
     },
 

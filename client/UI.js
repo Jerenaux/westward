@@ -476,7 +476,7 @@ UI.displayRegion = function(data,world){
         UI.selectSettlement(this.setlID);
     }.bind(icon));
     icon.on('pointerover',function(){
-        UI.tooltip.updateInfo(data.name);
+        UI.tooltip.updateInfo('free',{title:data.name});
         UI.tooltip.display();
     });
     icon.on('pointerout',function(){
@@ -498,7 +498,7 @@ UI.displayCamp = function(data){
     icon.setOrigin(0.5,1);
     icon.setInteractive();
     icon.on('pointerover',function(){
-        UI.tooltip.updateInfo('Enemy camp');
+        UI.tooltip.updateInfo('free',{title:'Enemy camp'});
         UI.tooltip.display();
     });
     icon.on('pointerout',function(){

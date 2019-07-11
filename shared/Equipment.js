@@ -17,8 +17,8 @@ var Equipment = {
             battlex: 10,
             battley: 10,
             shade: 'sword',
-            name: 'Melee weapon New',
-            desc: 'Weapon used to fight opponents on adjacent battle positions. Influences the Melee damage stat. Not compatible with a ranged weapon.',
+            name: 'Melee weapon',
+            desc: 'Weapon used to fight opponents on adjacent battle positions. Influences the Melee damage stat.',
             showInBattle: true,
             defaultItem: 48
         },
@@ -30,7 +30,7 @@ var Equipment = {
             battley: 50,
             shade: 'gun',
             name: 'Ranged weapon',
-            desc: 'Weapon used to fight opponents on non-adjacent battle positions. Not compatible with a melee weapon. Influences the Accuracy stat. Bows tend to be more accurate than guns, but arrows tend to deal less damage than bullets.',
+            desc: 'Weapon used to fight opponents on non-adjacent battle positions. Influences the Accuracy stat as well as which projectiles you can use. Bows tend to be more accurate than guns, but arrows tend to deal less damage than bullets.',
             showInBattle: true,
             defaultItem: 49
         },
@@ -65,8 +65,8 @@ var Equipment = {
             battlex: 60,
             battley: 10,
             shade: 'quiver',
-            name: 'Ammo Container',
-            desc: 'Container for arrows, bullets, etx. Containers can have different capacities.'
+            name: 'Ammunition Container',
+            desc: 'Container for the ammunition of your ranged weapon (stones, arrows, bullets...). Containers can have different capacities.'
         },
         range_ammo: {
             nb: 1,
@@ -75,8 +75,8 @@ var Equipment = {
             battlex: 100,
             battley: 10,
             shade: 'arrow',
-            name: 'Ammo',
-            desc: 'Ammunition.'
+            name: 'Ammunition',
+            desc: 'Ammunition of your ranged weapon (stones, arrows, bullets...).'
         }
     },
 

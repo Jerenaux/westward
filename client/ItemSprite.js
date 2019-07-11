@@ -27,8 +27,9 @@ var ItemSprite = new Phaser.Class({
         this.setOrigin(0.5);
 
         this.itemID = id;
-        //this.name = data.name;
-        //this.desc = data.desc;
+        this.slot = data.slot;
+        // this.name = data.name;
+        // this.desc = data.desc;
         //this.hideEffects = hideEffects;
         //this.effects = data.effects;
         this.disabled = false;
@@ -54,6 +55,12 @@ var ItemSprite = new Phaser.Class({
     },
 
     handleOver: function(){
-        if(this.showTooltip) UI.tooltip.updateInfo('item',{id:this.itemID});
+        if(this.showTooltip) {
+            if(this.itemID == -1){
+                UI.tooltip.updateInfo('slot', {slot: this.slot});
+            }else {
+                UI.tooltip.updateInfo('item', {id: this.itemID});
+            }
+        }
     }
 });

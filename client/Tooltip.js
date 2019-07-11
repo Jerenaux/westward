@@ -32,15 +32,30 @@ var Tooltip = new Phaser.Class({
                 var owner = bld.isOwned() ? 'Your' : bld.ownerName+'\'s';
                 this.setTitle(owner+' '+bld.name);
                 break;
+            case 'free':
+                if(data.title) this.setTitle(data.title);
+                if(data.body) this.setBody(data.body);
+                break;
             case 'item':
                 if(data.id == -1) break;
                 var item = Engine.itemsData[data.id];
                 this.setTitle(item.name ? item.name : '');
                 this.setBody(item.desc ? item.desc : '');
                 break;
-            case 'free':
-                if(data.title) this.setTitle(data.title);
-                if(data.body) this.setBody(data.body);
+            case 'NPC':
+                var npc = data.entityType == 'civ' ? Engine.civs[data.id] : Engine.animals[data.id];
+                var name = (npc.dead ? 'Dead ' : '')+npc.name;
+                this.setTitle(name);
+                break;
+            case 'slot':
+                var slot = Equipment.slots[data.slot];
+                this.setTitle(slot.name);
+                this.setBody(slot.desc);
+                break;
+            case 'stat':
+                var stat = Stats[data.stat];
+                this.setTitle(stat.name);
+                this.setBody(stat.desc);
                 break;
             default:
                 break;

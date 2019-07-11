@@ -13,7 +13,7 @@ function ItemSlot(x,y,width,height){
     this.zone.setOrigin(0);
     this.zone.on('pointerover',function(){
         if(this.checkForPanelOnTop()) return;
-        UI.tooltip.updateInfo(this.name.text,this.desc,this.itemID);
+        UI.tooltip.updateInfo('item',{id:this.itemID});
         UI.tooltip.display();
         UI.setCursor('item');
     }.bind(this));

@@ -15,6 +15,7 @@ var Item = new Phaser.Class({
         var itemData = Engine.itemsData[data.type];
         var atlas = (itemData.envFrames ? 'tileset' : itemData.atlas);
         var frame = (itemData.envFrames ? Utils.randomElement(itemData.envFrames) : itemData.frame);
+        this.itemType = data.type;
         this.outFrame = frame;
         this.inFrame = (itemData.envFrames ? frame+'_lit' : frame);
 
@@ -65,7 +66,7 @@ var Item = new Phaser.Class({
     setCursor: function(){
         if(BattleManager.inBattle || Engine.inMenu) return;
         UI.setCursor('item');
-        UI.tooltip.updateInfo(this.name);
+        UI.tooltip.updateInfo('item',{id:this.itemType});
         UI.tooltip.display();
     },
 

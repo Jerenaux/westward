@@ -20,9 +20,25 @@
         margin-top: 3px;
         text-align: left;
     }
+    .equipment_bonus{
+        color: green;
+    }
+    .fatigue_malus{
+        color: red;
+    }
 </style>
 
 <div class="tooltip">
     <div id="tooltip_title" class="tooltip_title"></div>
     <div id="tooltip_body" class="tooltip_body"></div>
+    <table>
+        <tr>
+            <td id="equipment_modifier" class="equipment_bonus"></td>
+            <td>(equipment)</td>
+        </tr>
+        <tr>
+            <td id="fatigue_modifier" class="fatigue_malus"></td>
+            <td>(fatigue malus)</td>
+        </tr>
+    </table>
 </div>
