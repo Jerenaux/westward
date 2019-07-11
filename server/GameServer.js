@@ -431,19 +431,20 @@ GameServer.onNewPlayer = function(player){
     if(!config.get('misc.performInit')) return;
     // give me all the health and vigor
     player.setStat('hp', 300);
-    player.setStat('vigor', 100);
+    player.setStat('vigor', 10);
+    player.applyVigorModifier();
 
     const items = [
-        [11,1],
-        [4, 5],
-        [12, 5],
-        [2, 2],
-        [26, 9],
-        [20, 10],
-        [45, 10],
-        [19, 10],
-        [50, 11],
-        [51, 11],
+        // [11,1],
+        // [4, 5],
+        // [12, 5],
+        // [2, 2],
+        // [26, 9],
+        // [20, 10],
+        // [45, 10],
+        // [19, 10],
+        // [50, 11],
+        // [51, 11],
     ];
 
     items.forEach(item => {

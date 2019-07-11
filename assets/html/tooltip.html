@@ -11,34 +11,33 @@
             1px -1px 0 #000,
             -1px -1px 0 #000;
     }
-    .tooltip_title {
+    #tooltip_title {
         font-size: 14px;
         text-align: left;
     }
-    .tooltip_body {
+    #tooltip_body {
         font-size: 12px;
         margin-top: 3px;
         text-align: left;
     }
-    .equipment_bonus{
+    #equipment_modifier{
         color: green;
     }
-    .fatigue_malus{
+    #fatigue_modifier{
         color: red;
+    }
+    #stat {
+        text-align: left;
+        font-size: 12px;
     }
 </style>
 
 <div class="tooltip">
-    <div id="tooltip_title" class="tooltip_title"></div>
-    <div id="tooltip_body" class="tooltip_body"></div>
-    <table>
-        <tr>
-            <td id="equipment_modifier" class="equipment_bonus"></td>
-            <td>(equipment)</td>
-        </tr>
-        <tr>
-            <td id="fatigue_modifier" class="fatigue_malus"></td>
-            <td>(fatigue malus)</td>
-        </tr>
-    </table>
+    <div id="tooltip_title"></div>
+    <div id="tooltip_body"></div>
+    <div id="stat">
+        <span id="base_stat"></span>
+        <span id="equipment_modifier"></span>
+        <span id="fatigue_modifier"></span>
+    </div>
 </div>

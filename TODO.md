@@ -46,6 +46,9 @@ World Building
 - Add "resource markers" for wildlife (optimize?)
 - No decimal in defaut prices (happens in one lumber camp)
 - Display building life in tooltips
+- Add tooltip to UI capsules
+- Display item amount owned in tooltip
+- Display threat level in animal tooltip
 
 - Items consumed not taken from belt
 - Duplicate item when equipped
@@ -59,8 +62,9 @@ World Building
 - Display item effects in itemsprite tooltips
 - Display stat modifiers
 - Test tooltip of build menu
-- Add tooltip to UI capsules + ctrl+maj+f for vigor
-- Display item amount owned in tooltip
+-  + ctrl+maj+f for vigor r/fatigue
+- Still issue with battle stat?
+
 
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
 https://medium.com/@kestrelm/2d-skeletal-animation-in-phaser-3-tutorial-3ed468fb6bd0

@@ -145,7 +145,6 @@ var Player = new Phaser.Class({
         }
 
         const ranged_ammo_item = Engine.player.getEquippedItem('range_ammo');
-        console.log(ranged_ammo_item);
 
         let itemAtlasPool;
         // TODO: Maybe get this in utility function
