@@ -60,6 +60,7 @@ World Building
 - Display stat modifiers
 - Test tooltip of build menu
 - Add tooltip to UI capsules + ctrl+maj+f for vigor
+- Display item amount owned in tooltip
 
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
 https://medium.com/@kestrelm/2d-skeletal-animation-in-phaser-3-tutorial-3ed468fb6bd0
