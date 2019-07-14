@@ -14,7 +14,7 @@ var Tooltip = new Phaser.Class({
         this.title = this.getChildByID('tooltip_title');
         this.body = this.getChildByID('tooltip_body');
         this.stat_table = this.getChildByID('stat');
-        this.base_stat = this.getChildByID('base_stat');
+        this.base_stat = this.getChildByID('base');
         this.fatigue_modifier = this.getChildByID('fatigue_modifier');
         this.equipment_modifier = this.getChildByID('equipment_modifier');
 
@@ -82,15 +82,17 @@ var Tooltip = new Phaser.Class({
     },
 
     setStat: function(stat){
-        this.stat_table.style.display = 'inline';
         var statData = Engine.player.getStat(stat);
-        this.base_stat.innerText = '= '+Engine.player.getStatValue(stat);
+        this.base_stat.innerText = '= '+statData.getBaseValue(stat);
         var eq = statData.absoluteModifiers[0];
         var fatigue = statData.relativeModifiers[0];
-        if(eq) this.equipment_modifier.innerText = '+'+eq;
-        if(fatigue) this.fatigue_modifier.innerText = fatigue+'%';
-        this.equipment_modifier.style.display = (eq ? 'inline' : 'none');
-        this.fatigue_modifier.style.display = (fatigue ? 'inline' : 'none');
+        if(eq || fatigue) {
+            this.stat_table.style.display = 'inline';
+            if (eq) this.equipment_modifier.innerText = '+' + eq + ' (equipment)';
+            if (fatigue) this.fatigue_modifier.innerText = fatigue + '% (vigor)';
+            this.equipment_modifier.style.display = (eq ? 'inline' : 'none');
+            this.fatigue_modifier.style.display = (fatigue ? 'inline' : 'none');
+        }
     },
 
     getBodyText: function(){

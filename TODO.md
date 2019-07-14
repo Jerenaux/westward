@@ -60,7 +60,6 @@ World Building
 - fix open menu while respawn bug
 - Check if ammo type constrained by container
 - Display item effects in itemsprite tooltips
-- Display stat modifiers
 - Test tooltip of build menu
 -  + ctrl+maj+f for vigor r/fatigue
 - Still issue with battle stat?
