@@ -42,6 +42,11 @@ World Building
 - Make towers throw stones when no better ammo
 - Belt & backpack capacity 
 - Add "resource markers" for wildlife (optimize?)
+- No decimal in defaut prices (happens in one lumber camp)
+- Display building life in tooltips
+- Add tooltip to UI capsules
+- Display item amount owned in tooltip
+- Display threat level in animal tooltip
 
 
 - Test battle
@@ -53,6 +58,10 @@ World Building
 - Fix building hover
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
+- Check if ammo type constrained by container
+-  + ctrl+maj+f for vigor r/fatigue
+- Still issue with battle stat?
+- Rename container descs about stones, shurikens
 
 
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5

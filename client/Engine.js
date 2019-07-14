@@ -307,11 +307,6 @@ Engine.create = function(){
 
     Engine.created = true;
     Engine.configEngine();
-    /*if(Client.tutorial){
-        TutorialManager.boot(2);
-    }else{
-        Client.requestData();
-    }*/
     Client.requestData();
 };
 
@@ -706,7 +701,7 @@ Engine.makeUI = function(){
 
     bug.on('pointerup',Engine.snap);
     bug.on('pointerover',function(){
-        UI.tooltip.updateInfo('Snap a pic of a bug');
+        UI.tooltip.updateInfo('free',{body:'Snap a pic of a bug'});
         UI.tooltip.display();
     });
     bug.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
@@ -830,7 +825,7 @@ menuIcon = function(x,y,icon,menu,tox,toy){
     });
     var bg_ = this.bg;
     this.bg.on('pointerover',function(){
-        UI.tooltip.updateInfo(menu.name);
+        UI.tooltip.updateInfo('free',{title:menu.name});
         UI.tooltip.display();
         bg_.setFrame('holder_over');
     });
@@ -1854,8 +1849,8 @@ Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
     if(Engine.player) Engine.updateMarker(position.tile);
     if(Engine.debug){
-        //document.getElementById('pxx').innerHTML = Math.round(position.pixel.x);
-        //document.getElementById('pxy').innerHTML = Math.round(position.pixel.y);
+        document.getElementById('pxx').innerHTML = Math.round(event.x);
+        document.getElementById('pxy').innerHTML = Math.round(event.y);
         document.getElementById('tx').innerHTML = position.tile.x;
         document.getElementById('ty').innerHTML = position.tile.y;
         document.getElementById('aoi').innerHTML = Utils.tileToAOI(position.tile);

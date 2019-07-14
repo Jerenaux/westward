@@ -13,7 +13,7 @@ function ItemSlot(x,y,width,height){
     this.zone.setOrigin(0);
     this.zone.on('pointerover',function(){
         if(this.checkForPanelOnTop()) return;
-        UI.tooltip.updateInfo(this.name.text,this.desc,this.itemID);
+        UI.tooltip.updateInfo('item',{id:this.itemID});
         UI.tooltip.display();
         UI.setCursor('item');
     }.bind(this));
@@ -74,9 +74,6 @@ ItemSlot.prototype.checkForPanelOnTop = function(){
 };
 
 ItemSlot.prototype.setUp = function(action,item){
-
-    console.log('ItemSlot.prototype.setUp', action, item);
-
     if(!this.displayed) console.warn('Setting up slot before displaying it');
     var itemData = Engine.itemsData[item];
     this.icon.setTexture(itemData.atlas,itemData.frame);

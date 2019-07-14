@@ -69,10 +69,6 @@
       "frame": {"x":683,"y":118,"w":25,"h":24}
     },
     {
-      "filename": "capsule-right",
-      "frame": {"x":683,"y":118,"w":25,"h":24}
-    },
-    {
       "filename": "slots-topleft",
       "frame": {"x":442,"y":292,"w":38,"h":38}
     },

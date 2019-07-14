@@ -22,7 +22,7 @@ ProgressBar.prototype.setUpZone = function(zone){
     zone.setVisible(false);
     var _bar = this;
     zone.on('pointerover',function(){
-        UI.tooltip.updateInfo(_bar.level+'/'+_bar.max);
+        UI.tooltip.updateInfo('free',{title:_bar.level+'/'+_bar.max});
         UI.tooltip.display();
     });
     zone.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));

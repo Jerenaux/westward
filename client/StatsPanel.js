@@ -55,7 +55,8 @@ StatsPanel.prototype.addStat = function(x,y,s){
     zone.setVisible(false);
     zone.setInteractive();
     zone.on('pointerover',function(){
-        UI.tooltip.updateInfo(stat.name,stat.desc,-1,(stat.hasMax ? stat.hasMax : s));
+        // UI.tooltip.updateInfo(stat.name,stat.desc,-1,(stat.hasMax ? stat.hasMax : s));
+        UI.tooltip.updateInfo('stat',{stat:s});
         UI.tooltip.display();
     });
     zone.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));

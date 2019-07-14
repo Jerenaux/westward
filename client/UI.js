@@ -11,6 +11,7 @@ var UI = {
         UI.scene = this;
         this.input.setGlobalTopOnly(true); // Prevent clicks from bubbling down to game scene
 
+        this.load.json('ui-frames', 'assets/sprites/ui.json'); // load frame data separately for use in CSS
         this.load.atlas('UI', 'assets/sprites/ui.png', 'assets/sprites/ui.json');
         this.load.atlas('banners', 'assets/sprites/stlbanner.png', 'assets/sprites/stlbanner.json');
 
@@ -20,6 +21,8 @@ var UI = {
 
         this.load.audio('click','assets/sfx/click.wav');
         this.load.audio('error','assets/sfx/error.wav');
+
+        this.load.html('tooltip', '/assets/html/tooltip.html');
 
         if(Client.isNewPlayer()) {
             this.load.image('bigbg', 'assets/sprites/bigbg.png');
@@ -35,17 +38,7 @@ var UI = {
     create: function () {
         this.scene.bringToTop();
 
-        /*this.textures.addSpriteSheetFromAtlas(
-            'tooltip',
-            {
-                atlas: 'UI',
-                frame: 'tooltip',
-                frameWidth: 13,
-                frameHeight: 13,
-                endFrame: 8
-            }
-        );*/
-
+        UI.gatherStatsFrames();
         UI.tooltip = new Tooltip();
         UI.camera = UI.scene.cameras.main;
         UI.notifications = [];
@@ -95,6 +88,19 @@ var UI = {
         panel.addBigButton('Got it');
         return panel;
     }
+};
+
+UI.gatherStatsFrames = function(){
+    UI.framesData = UI.scene.cache.json.get('ui-frames');
+    var frames = [];
+    UI.statsFrames = {};
+    for(var stat in Stats){
+        var frame = Stats[stat].frame;
+        if(frame) frames.push(frame);
+    }
+    UI.framesData['frames'].forEach(function(frame){
+       if(frames.includes(frame.filename)) UI.statsFrames[frame.filename] = frame.frame;
+    });
 };
 
 UI.handleKeyboard = function(event){
@@ -474,7 +480,7 @@ UI.displayRegion = function(data,world){
         UI.selectSettlement(this.setlID);
     }.bind(icon));
     icon.on('pointerover',function(){
-        UI.tooltip.updateInfo(data.name);
+        UI.tooltip.updateInfo('free',{title:data.name});
         UI.tooltip.display();
     });
     icon.on('pointerout',function(){
@@ -496,7 +502,7 @@ UI.displayCamp = function(data){
     icon.setOrigin(0.5,1);
     icon.setInteractive();
     icon.on('pointerover',function(){
-        UI.tooltip.updateInfo('Enemy camp');
+        UI.tooltip.updateInfo('free',{title:'Enemy camp'});
         UI.tooltip.display();
     });
     icon.on('pointerout',function(){
