@@ -55,6 +55,8 @@ function BuildPanel(x,y,width,height,title,invisible){
         this.updateContent();
     }.bind(this));
 
+    this.nextPage.setDepth(5);
+    this.previousPage.setDepth(5);
     this.nextPage.setVisible(false);
     this.previousPage.setVisible(false);
     this.nextPage.setOrigin(0);
@@ -68,7 +70,7 @@ BuildPanel.prototype.constructor = BuildPanel;
 BuildPanel.prototype.listItems = function(){
     var items = Engine.player.buildRecipes.toList(true); // true = filter out zeroes
     items.sort(function(a,b){
-        if(Engine.itemsData[a[0]].name < Engine.itemsData[b[0]].name) return -1;
+        if(Engine.buildingsData[a[0]].name < Engine.buildingsData[b[0]].name) return -1;
         return 1;
     });
     return items;
@@ -162,21 +164,22 @@ function BuildSlot(x,y,width,height){
     this.zone.setInteractive();
     this.zone.setOrigin(0);
     this.zone.on('pointerover',function(){
-        if(this.checkForPanelOnTop()) return;
-        UI.tooltip.updateInfo('item',{id:this.itemID});
+        UI.tooltip.updateInfo('buildingdata',{id:this.bldID});
         UI.tooltip.display();
         UI.setCursor('item');
     }.bind(this));
     this.zone.on('pointerout',function(){
-        if(this.checkForPanelOnTop()) return;
         UI.tooltip.hide();
         UI.setCursor();
     }.bind(this));
+    this.zone.on('pointerup',Engine.bldClick.bind(this));
 
     this.content = [this.name, this.zone];
 
     this.addItem();
     // this.addInventoryCount();
+
+    this.moveUp(3);
 }
 
 BuildSlot.prototype = Object.create(Frame.prototype);
@@ -189,44 +192,13 @@ BuildSlot.prototype.addItem = function(){
     this.content.push(this.icon);
 };
 
-BuildSlot.prototype.addInventoryCount = function(){
-    this.bagicon = UI.scene.add.sprite(this.x + 19, this.y + this.height - 12, 'UI','smallpack');
-    this.nb = UI.scene.add.text(this.x + 29, this.y + this.height - 22, '999', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.content.push(this.bagicon);
-    this.content.push(this.nb);
-};
-
-BuildSlot.prototype.addPrice = function(){
-    this.goldicon = UI.scene.add.sprite(this.x + this.width - 12, this.y + 16, 'UI','gold');
-    this.price = UI.scene.add.text(this.x + this.width - 22, this.y + 6, '', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.price.setOrigin(1,0);
-    this.content.push(this.goldicon);
-    this.content.push(this.price);
-};
-
-BuildSlot.prototype.addEffect = function(){
-    this.staticon = UI.scene.add.sprite(this.x + 70, this.y + 45, 'UI');
-    this.effect = UI.scene.add.text(this.x + 83, this.y + 35, '', { font: '14px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.content.push(this.staticon);
-    this.content.push(this.effect);
-};
-
-BuildSlot.prototype.addRarity = function(){
-    this.rarity = UI.scene.add.text(this.x + 60, this.y + 60, '', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
-    this.content.push(this.rarity);
-};
-
-BuildSlot.prototype.checkForPanelOnTop = function(){
-    return Engine.currentMenu.isPanelDisplayed('prices') || Engine.currentMenu.isPanelDisplayed('goldaction');
-};
-
-BuildSlot.prototype.setUp = function(item){
+BuildSlot.prototype.setUp = function(bld){
     if(!this.displayed) console.warn('Setting up slot before displaying it');
-    var itemData = Engine.buildingsData[item];
-    this.icon.setTexture('aok',itemData.icon);
-    this.name.setText(itemData.name);
-    this.desc = itemData.desc;
-    this.itemID = item;
+    var bldData = Engine.buildingsData[bld];
+    this.icon.setTexture('aok',bldData.icon);
+    this.name.setText(bldData.name);
+    this.desc = bldData.desc;
+    this.bldID = bld;
     // this.nb.setText(Engine.player.getItemNb(item));
 };
 

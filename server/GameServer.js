@@ -1405,7 +1405,6 @@ GameServer.build = function(player,bid,tile){
     var document = new GameServer.BuildingModel(building);
     building.setModel(document); // ref to model is needed at least to get _id
 
-
     if(building.isInstanced()){
         player.getInstance().entities.push(building);
 
@@ -1428,6 +1427,7 @@ GameServer.build = function(player,bid,tile){
 GameServer.finalizeBuilding = function(player,building){
     building.embed();
     GameServer.buildingsChanged = true;
+    player.addBuilding(building);
     if(!player.isInstanced()) player.listBuildings(); // update list of buildable buildings by player
     GameServer.updateFoW();
     if(GameServer.buildingParameters.autobuild) building.setBuilt();

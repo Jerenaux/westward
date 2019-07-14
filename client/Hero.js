@@ -233,6 +233,7 @@ let Hero = new Phaser.Class({
         bldRecipes.forEach(function(w){
             this.buildRecipes.add(w,1);
         },this);
+        this.updateEvents.add('bldrecipes');
     },
 
     postChunkUpdate: function(){

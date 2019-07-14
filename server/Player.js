@@ -97,21 +97,29 @@ Player.prototype.getInstance = function () {
 };
 
 Player.prototype.updateBldRecipes = function () {
+    console.warn('updateBldRecipes');
+    console.warn(this.bldRecipes);
     this.bldRecipes = [];
     this.baseBldrecipes.forEach(function (b) {
+        console.warn(b,this.countOwnedBuildings(b));
         if (this.countOwnedBuildings(b) < 1) this.bldRecipes.push(b);
     }, this);
     if (this.bldRecipes.length === 0) this.bldRecipes = [-1];
     this.setOwnProperty('bldRecipes', this.bldRecipes);
+    console.warn(this.bldRecipes);
 };
 
-// Called by finalizePlayer
+// Called by finalizePlayer and finalizeBuilding
 Player.prototype.listBuildings = function () {
+    console.warn('list buildings');
     this.buildings = [];
     for (var bid in GameServer.buildings) {
         var building = GameServer.buildings[bid];
         if (building.owner === this.id) this.buildings.push(building);
     }
+    this.buildings.forEach(function (b) {
+        console.warn(b.type);
+    });
     this.updateBldRecipes();
 };
 
@@ -122,6 +130,14 @@ Player.prototype.countOwnedBuildings = function (type) {
         if (b.type === type) count++;
     });
     return count;
+};
+
+Player.prototype.addBuilding = function(building){
+    console.warn('add building');
+    this.buildings.push(building);
+    this.buildings.forEach(function (b) {
+        console.warn(b.type);
+    });
 };
 
 Player.prototype.isExplorer = function () {

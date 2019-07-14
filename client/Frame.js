@@ -162,11 +162,13 @@ Frame.prototype.moveUp = function(nb){
         e.setDepth(e.depth+nb);
     });
     if(this.button) this.button.moveUp(nb);
-    this.buttons.forEach(function(b){
-        b.btn.setDepth(b.btn.depth+nb);
-        b.symbol.setDepth(b.symbol.depth+nb);
-        b.ring.setDepth(b.ring.depth+nb);
-        b.zone.setDepth(b.zone.depth+nb);
-    });
+    if(this.buttons) {
+        this.buttons.forEach(function (b) {
+            b.btn.setDepth(b.btn.depth + nb);
+            b.symbol.setDepth(b.symbol.depth + nb);
+            b.ring.setDepth(b.ring.depth + nb);
+            b.zone.setDepth(b.zone.depth + nb);
+        });
+    }
     this.depth = nb;
 };

@@ -1452,28 +1452,26 @@ Engine.makeBuildMenu = function(){
     build.allowWalk = true;
     build.name = 'Build something'; // Allows to have a hover name without a menu title
     build.hook = 'build';
-    var w = 280;
-    var buildings = build.addPanel('build',new BuildPanel(30,40,w,150,'Buildings'));
+    var w = 300;
+    var buildings = build.addPanel('build',new BuildPanel(30,40,w,450,'Build'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
-    // buildings.setInventory('buildRecipes',5,false,Engine.bldClick);
-    // buildings.setDataMap(Engine.buildingIconsData);
-    // buildings.hideEffects = true;
     buildings.moveUp(2);
     build.addEvent('onOpen',buildings.updateContent.bind(buildings));
+    build.addEvent('onUpdateBuildRecipes',buildings.updateContent.bind(buildings));
     return build;
 };
 
 Engine.bldClick = function(){
-    var bld = Engine.buildingsData[this.itemID];
+    var bld = Engine.buildingsData[this.bldID];
     Engine.currentMenu.hide();
 
     //Engine.hideMarker();
     Engine.bldRect = Engine.scene.add.rectangle(0,0, bld.base.width*32, bld.base.height*32, 0x00ee00).setAlpha(0.7);
-    Engine.bldRect.bldID = this.itemID;
+    Engine.bldRect.bldID = this.bldID;
     Engine.bldRect.locationConstrained = bld.locationConstrained;
     Engine.updateBldRect();
 
-    if(Client.tutorial) TutorialManager.triggerHook('bldselect:'+this.itemID);
+    if(Client.tutorial) TutorialManager.triggerHook('bldselect:'+this.bldID);
 };
 
 Engine.bldUnclick = function(shutdown){
@@ -1943,6 +1941,7 @@ Engine.removeElements = function(arr,table){
 Engine.updateMenus = function(category){
     var callbackMap = {
         'belt': 'onUpdateBelt',
+        'bldrecipes': 'onUpdateBuildRecipes',
         'character': 'onUpdateCharacter',
         'citizen': 'onUpdateCitizen',
         'commit': 'onUpdateCommit',

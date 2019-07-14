@@ -21,14 +21,13 @@ var ItemSprite = new Phaser.Class({
         this.on('pointerover',this.handleOver.bind(this));
     },
 
-    setUp: function(id,data,callback,hideEffects){
+    setUp: function(id,data,callback){
         this.setTexture(data.atlas);
         this.setFrame(data.frame);
         this.setOrigin(0.5);
 
         this.itemID = id;
         this.slot = data.slot;
-        this.hideEffects = hideEffects;
         this.disabled = false;
         if(callback) {
             this.off('pointerup');

@@ -1,5 +1,6 @@
 ## To test:
 - Test handleBelt
+- Test update of build recipes after build
 - Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
 - Test Utils.nextTo with all combinations of building/animal vs building/animal, next to each other and not
@@ -55,7 +56,8 @@ World Building
 - If statement around code in UI to skip title screen
 - Settlement choice bug
 - Fix building hover
-- New build menu
+- Fix build bub
+- DL players table and test
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
 
