@@ -59,10 +59,9 @@ World Building
 - If statement around code in UI to skip title screen
 - fix open menu while respawn bug
 - Check if ammo type constrained by container
-- Display item effects in itemsprite tooltips
-- Test tooltip of build menu
 -  + ctrl+maj+f for vigor r/fatigue
 - Still issue with battle stat?
+- Rename container descs about stones, shurikens
 
 
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5

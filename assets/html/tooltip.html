@@ -2,6 +2,7 @@
 <style>
     .tooltip {
         max-width: 250px;
+        min-width: 30px;
         text-align: left;
         border: 13px solid transparent;
         border-image: url(assets/sprites/tooltip.png) fill 13 13 13 13 repeat;
@@ -37,20 +38,36 @@
     #base {
         color: white;
     }
+    #effects {
+        margin-top: 5px;
+        vertical-align: top;
+    }
     #effect_icon {
         background-image: url(assets/sprites/ui.png);
         background-position: -525px -458px;
         min-width: 13px;
         min-height: 13px;
         max-width: 13px;
+        float: left;
+    }
+    #effect_nb {
+        font-size: 12px;
+        margin-left: 20px;
     }
 </style>
 
 <div class="tooltip">
     <div id="tooltip_title"></div>
     <div id="tooltip_body"></div>
+    <!--<table id="effects">
+        <tr>
+            <td id="effect_icon"></td>
+            <td valign="top" id="effect_nb"></td>
+        </tr>
+    </table>-->
     <div id="effects">
         <div id="effect_icon"></div>
+        <div id="effect_nb"></div>
     </div>
     <div id="stat">
         <mark id="base"></mark>&nbsp;<mark id="equipment_modifier"></mark>&nbsp;<mark id="fatigue_modifier"></mark>

@@ -28,10 +28,7 @@ var ItemSprite = new Phaser.Class({
 
         this.itemID = id;
         this.slot = data.slot;
-        // this.name = data.name;
-        // this.desc = data.desc;
-        //this.hideEffects = hideEffects;
-        //this.effects = data.effects;
+        this.hideEffects = hideEffects;
         this.disabled = false;
         if(callback) {
             this.off('pointerup');

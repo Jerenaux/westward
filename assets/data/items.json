@@ -583,11 +583,11 @@
   "51":{
     "atlas": "items2",
     "frame":"ammopouch",
-    "name": "Small stones pouch",
+    "name": "Small projectiles pouch",
     "equipment": "range_container",
     "container_type": "stones",
     "capacity": 10,
-    "desc": "Can contain up to 10 stones",
+    "desc": "Can contain up to 10 projectiles",
     "useInBattle": true,
     "sound": "cloth",
     "isCrafted": true,
