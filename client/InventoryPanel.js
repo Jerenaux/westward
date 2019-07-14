@@ -17,9 +17,9 @@ function InventoryPanel(x,y,width,height,title,invisible){
 InventoryPanel.prototype = Object.create(Panel.prototype);
 InventoryPanel.prototype.constructor = InventoryPanel;
 
-InventoryPanel.prototype.setDataMap = function(map){
-    this.dataMap = map;
-};
+// InventoryPanel.prototype.setDataMap = function(map){
+//     this.dataMap = map;
+// };
 
 InventoryPanel.prototype.createZone = function(){
     const zone = UI.scene.add.zone(0, 0, 0, 0);

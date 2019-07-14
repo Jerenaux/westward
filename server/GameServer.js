@@ -1556,10 +1556,10 @@ GameServer.handleUse = function(data,socketID){
     var nb = 1;
     if(isEquipment) {
         result = player.equip(itemData.equipment, parseInt(item), false); // false: not from DB
-    }else if(itemData.effects){ // If non-equipment, then consumable item
+    }else if(itemData.effects){ // If non-equipment but effects, then consumable item
         result = player.applyEffects(item,nb,true);
     }
-    var verb = (isEquipment ? 'Equipped' : (itemData.verb || 'Used'))
+    var verb = (isEquipment ? 'Equipped' : (itemData.verb || 'Used'));
     player.takeItem(item, nb, inventory, true, verb);
     if(!isEquipment) GameServer.destroyItem(item, nb, 'use');
     if (!player.inFight) player.save();

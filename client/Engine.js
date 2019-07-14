@@ -1452,14 +1452,14 @@ Engine.makeBuildMenu = function(){
     build.allowWalk = true;
     build.name = 'Build something'; // Allows to have a hover name without a menu title
     build.hook = 'build';
-    var w = 200;
-    var buildings = build.addPanel('build',new InventoryPanel(30,40,w,150,'Buildings'));
+    var w = 280;
+    var buildings = build.addPanel('build',new BuildPanel(30,40,w,150,'Buildings'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
-    buildings.setInventory('buildRecipes',5,false,Engine.bldClick);
-    buildings.setDataMap(Engine.buildingIconsData);
-    buildings.hideEffects = true;
+    // buildings.setInventory('buildRecipes',5,false,Engine.bldClick);
+    // buildings.setDataMap(Engine.buildingIconsData);
+    // buildings.hideEffects = true;
     buildings.moveUp(2);
-    build.addEvent('onOpen',buildings.updateInventory.bind(buildings));
+    build.addEvent('onOpen',buildings.updateContent.bind(buildings));
     return build;
 };
 

@@ -47,22 +47,17 @@ World Building
 - Add tooltip to UI capsules
 - Display item amount owned in tooltip
 - Display threat level in animal tooltip
-
+- fix open menu while respawn bug
+- Display nb owned buildings in build menu
 
 - Test battle
 - No aggro??
 - If statement around code in UI to skip title screen
-- fix open menu while respawn bug
-- Check ammo type constraint
 - Settlement choice bug
 - Fix building hover
+- New build menu
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
-- Check if ammo type constrained by container
--  + ctrl+maj+f for vigor r/fatigue
-- Still issue with battle stat?
-- Rename container descs about stones, shurikens
-
 
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
 https://medium.com/@kestrelm/2d-skeletal-animation-in-phaser-3-tutorial-3ed468fb6bd0
