@@ -149,6 +149,20 @@ describe('GameServer',function(){
         expect(building.type).to.equal(data.type);
     });
 
+    it('countOwnedBuildings', function(){
+        expect(player.countOwnedBuildings(building.type)).to.equal(0);
+        player.addBuilding(building);
+        expect(player.countOwnedBuildings(building.type)).to.equal(1);
+        player.buildings = [];
+    });
+
+    it('updateBldRecipes', function(){
+        var nbrecipes = player.bldRecipes.length;
+        player.addBuilding(building);
+        player.updateBldRecipes();
+        expect(player.bldRecipes.length).to.equal(nbrecipes-1);
+    });
+
     it('handleShop_out', function(){
         // Should fail because the player is not in the building
         var result = gs.handleShop({},player.socketID);
@@ -357,6 +371,7 @@ describe('GameServer',function(){
         var effect = itemData.effects[stat];
         player.giveItem(weaponID, 1);
         player.unequip(slot); // unequip anything that may have been equipped in a previous test
+        player.getStat(stat).clearRelativeModifiers();
         var initialValue = player.getStat(stat).getValue();
         gs.handleUse({item:weaponID,inventory:'backpack'},player.socketID);
         expect(player.getStat(stat).getValue()).to.equal(initialValue + effect);

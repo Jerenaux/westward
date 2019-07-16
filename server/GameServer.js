@@ -1428,7 +1428,7 @@ GameServer.finalizeBuilding = function(player,building){
     building.embed();
     GameServer.buildingsChanged = true;
     player.addBuilding(building);
-    if(!player.isInstanced()) player.listBuildings(); // update list of buildable buildings by player
+    // if(!player.isInstanced()) player.listBuildings(); 
     GameServer.updateFoW();
     if(GameServer.buildingParameters.autobuild) building.setBuilt();
 };

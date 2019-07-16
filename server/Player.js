@@ -97,19 +97,15 @@ Player.prototype.getInstance = function () {
 };
 
 Player.prototype.updateBldRecipes = function () {
-    console.warn('updateBldRecipes');
-    console.warn(this.bldRecipes);
     this.bldRecipes = [];
     this.baseBldrecipes.forEach(function (b) {
-        console.warn(b,this.countOwnedBuildings(b));
         if (this.countOwnedBuildings(b) < 1) this.bldRecipes.push(b);
     }, this);
     if (this.bldRecipes.length === 0) this.bldRecipes = [-1];
     this.setOwnProperty('bldRecipes', this.bldRecipes);
-    console.warn(this.bldRecipes);
 };
 
-// Called by finalizePlayer and finalizeBuilding
+// Called by finalizePlayer
 Player.prototype.listBuildings = function () {
     console.warn('list buildings');
     this.buildings = [];
@@ -133,11 +129,7 @@ Player.prototype.countOwnedBuildings = function (type) {
 };
 
 Player.prototype.addBuilding = function(building){
-    console.warn('add building');
     this.buildings.push(building);
-    this.buildings.forEach(function (b) {
-        console.warn(b.type);
-    });
 };
 
 Player.prototype.isExplorer = function () {
@@ -507,7 +499,7 @@ Player.prototype.equip = function (slot, itemID, fromDB) {
 
     if (typeof itemID != 'number') {
         console.warn('ERROR in `Player.equip()`: item is not a number');
-        console.warn(itemID, typeof itemID);
+        console.warn(typeof itemID);
         return false;
     }
     if (!itemID) return false;
@@ -587,12 +579,8 @@ Player.prototype.unequip = function (slot, notify) {
 
 Player.prototype.applyAbsoluteModifiers = function (itemID, change) {
 
-    // console.log('applyAbsoluteModifiers item', itemID);
-
     var change = change || 1;
     var itemData = GameServer.itemsData[itemID];
-
-    console.log('applyAbsoluteModifiers', itemData);
 
     if (!itemData) return;
     if (!itemData.effects) return;
