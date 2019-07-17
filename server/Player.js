@@ -107,7 +107,6 @@ Player.prototype.updateBldRecipes = function () {
 
 // Called by finalizePlayer
 Player.prototype.listBuildings = function () {
-    console.warn('list buildings');
     this.buildings = [];
     for (var bid in GameServer.buildings) {
         var building = GameServer.buildings[bid];
@@ -123,13 +122,14 @@ Player.prototype.countOwnedBuildings = function (type) {
     if (type === -1) return this.buildings.length;
     var count = 0;
     this.buildings.forEach(function (b) {
-        if (b.type === type) count++;
+        if (b.type == type) count++;
     });
     return count;
 };
 
 Player.prototype.addBuilding = function(building){
     this.buildings.push(building);
+    this.updateBldRecipes();
 };
 
 Player.prototype.isExplorer = function () {

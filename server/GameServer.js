@@ -312,16 +312,15 @@ GameServer.loadItems = function(){
 
 
 GameServer.getItemsFromDBUpdateCache = function () {
-    console.log('getItemsFromDBUpdateCache !!!!!!!!!!!!!!!');
     const items = ['edno', 'dve'];
     const dataAssets = pathmodule.join('assets','data');
-    const outPath = pathmodule.join(dataAssets,'/exports/items.json').toString()
+    const outPath = pathmodule.join(dataAssets,'/exports/items.json').toString();
     // Items
     fs.writeFile(outPath,JSON.stringify(items),function(err){
         if(err) throw err;
         console.log('Items cache written');
     });
-}
+};
 
 /**
  * Create Spawn Zones based on the spawnzones.json data file.
@@ -607,7 +606,8 @@ GameServer.addNewPlayer = function(socket,data){
             return null;
         }
     }
-    var region = data.selectedSettlement || 1;
+    var region = data.selectedSettlement;
+    if(region === undefined) region = 0;
     //console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
     player.setStartingInventory();

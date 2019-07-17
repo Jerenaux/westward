@@ -76,7 +76,7 @@ var UI = {
         this.scene.get('boot').updateReadyTick();
 
         //Auto start game for dev reasons
-        UI.launchGameMode();
+        if(Client.gameConfig.boot.autoBoot) UI.launchGameMode();
     },
 
     makeBattleTutorialPanel: function(){

@@ -1,4 +1,5 @@
 ## To test:
+- Test settlement selection (with value of 0)
 - Test handleBelt
 - Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
@@ -44,19 +45,17 @@ World Building
 - Add "resource markers" for wildlife (optimize?)
 - No decimal in defaut prices (happens in one lumber camp)
 - Display building life in tooltips
-- Add tooltip to UI capsules
+- Add tooltip to UI capsules (+ gold capsules in shops & inventory)
 - Display item amount owned in tooltip
 - Display threat level in animal tooltip
 - fix open menu while respawn bug
 - Display nb owned buildings in build menu
+- Add gloves
 
 - Test battle
 - No aggro??
-- If statement around code in UI to skip title screen
-- Settlement choice bug
-- Fix building hover
-- Fix build bub
 - DL players table and test
+- Fix tooltip position
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
 

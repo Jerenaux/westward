@@ -46,14 +46,10 @@ var Boot = new Phaser.Class({
         }
 
         if(detectBrowser() != "Chrome") document.getElementById("browser").innerText = "This development version is best played using Chrome. With other browsers, lag and rendering issues may arise.";
-
-
-
     },
 
     updateReadyTick: function() {
         this.readyTicks++;
-        //if (this.readyTicks == this.totalReadyTicks) this.onReady.call(this);
         if(this.readyTicks in this.readyStages) this.readyStages[this.readyTicks].call(this);
     },
 
@@ -62,9 +58,6 @@ var Boot = new Phaser.Class({
     },
 
     displayTitle: function(){
-        /*Boot.title = this.add.text(512,128, 'Westward',
-            { font: '150px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 10 }
-            ).setOrigin(0.5,0).setAlpha(0);*/
         Boot.titleBg = this.add.image(512,218,'logo','bg').setAlpha(0).setScale(0.5);
         Boot.title = this.add.image(512,218,'logo','text').setAlpha(0).setScale(0.5);
 
@@ -86,7 +79,6 @@ var Boot = new Phaser.Class({
     displayButton: function(){
         Boot.buttons = [];
         Boot.buttons.push(new BigButton(512,400,'Play',UI.launchGameMode,true)); // true = bigger
-
 
         if(Client.gameConfig.boot.offerTutorial) Boot.buttons.push(new BigButton(512, 450, 'Tutorial', UI.launchTutorialMode,true));
 

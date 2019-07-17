@@ -7,7 +7,7 @@ var Tooltip = new Phaser.Class({
     Extends: Phaser.GameObjects. DOMElement,
 
     initialize: function Tooltip(){
-        Phaser.GameObjects.DOMElement.call(this, UI.scene, 100, 100);
+        Phaser.GameObjects.DOMElement.call(this, UI.scene, 0, 0);
         UI.scene.add.displayList.add(this);
 
         this.createFromCache('tooltip');
@@ -27,8 +27,13 @@ var Tooltip = new Phaser.Class({
     },
 
     updatePosition: function(x,y){
-        this.setPosition(x + 10,y + 10);
+        this.setPosition(
+            UI.scene.game.canvas.offsetLeft + x + 10,
+            UI.scene.game.canvas.offsetTop + y + 10
+        );
         if(this.x + this.computeWidth() > UI.getGameWidth()) this.x -= this.computeWidth();
+        console.warn(x,UI.scene.game.canvas.offsetLeft,this.x);
+        this.setTitle([x,UI.scene.game.canvas.offsetLeft,this.x].join(', '));
     },
 
     updateInfo: function(type,data){

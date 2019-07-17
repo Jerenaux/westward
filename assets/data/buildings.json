@@ -6,10 +6,6 @@
       "width": 4,
       "height": 4
     },
-    "area":{
-      "x:":0.7,
-      "y": 1
-    },
     "recipe": {"3":30},
     "depthOffset": 1,
     "sprite": "tower",

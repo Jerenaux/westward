@@ -51,11 +51,7 @@ var Building = new Phaser.Class({
         this.depthOffset = buildingData.depthOffset;
         this.setBuilt(data.built);
         this.resetDepth();
-
-        var rect = new Phaser.Geom.Rectangle(this.x,this.y,this.width,this.height);
-        // console.warn(data.x,data.y,this.x,this.y,this.width,this.height,rect);
-        this.setInteractive(rect,Phaser.Geom.Rectangle.Contains);
-        // this.setInteractive();
+        this.setInteractiveArea();
         this.setCollisions();
 
         var production = buildingData.production;
@@ -80,12 +76,20 @@ var Building = new Phaser.Class({
         this.setDepth(this.tileY-1);
     },
 
+    setInteractiveArea: function(){
+        if(this.built){
+            this.setInteractive(Engine.scene.input.makePixelPerfect(250));
+        }else{
+            this.setInteractive();
+        }
+    },
+
     build: function () {
         this.built = true;
         var buildingData = Engine.buildingsData[this.buildingType];
         this.setFrame(buildingData.sprite);
         this.resetDepth();
-        this.setInteractive();
+        this.setInteractiveArea();
 
         if(buildingData.accessory){
             this.accessory = Engine.scene.add.sprite(

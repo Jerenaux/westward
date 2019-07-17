@@ -17,7 +17,7 @@
         rangedAtkDelay: 500
    },
    buildings: {
-        autobuild: true,
+        autobuild: false,
         canfight: true,
         nobuildings: false,
         inventorySize: 100,
@@ -88,6 +88,7 @@
     },
     client: {
         boot:{
+            autoBoot: true,
             forceNewPlayer: false,
             offerTutorial: true
         },
