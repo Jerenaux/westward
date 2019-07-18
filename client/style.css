@@ -19,6 +19,10 @@
 * {
     font-family: belwe;
 }
+#game {
+    width: 1024px;
+    margin: auto;
+}
 .game_input {
     position: absolute;
     padding-left: 3px;

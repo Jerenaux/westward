@@ -117,7 +117,7 @@ ItemSlot.prototype.setUp = function(action,item){
             this.effect.setText(stattext);
 
             var equipped = Engine.player.getEquippedItemID(itemData.equipment);
-            if(equipped > 0) {
+            if(equipped > -1 && Engine.itemsData[equipped].effects) {
                 var current = Engine.itemsData[equipped].effects[stat];
                 if(current > effect){
                     this.effect.setFill(Utils.colors.red);

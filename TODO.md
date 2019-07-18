@@ -51,11 +51,12 @@ World Building
 - fix open menu while respawn bug
 - Display nb owned buildings in build menu
 - Add gloves
+- Add round shield etc.
 
 - Test battle
 - No aggro??
-- DL players table and test
-- Fix tooltip position
+- Unending fight with building and wolves   
+- Ammo bug
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
 

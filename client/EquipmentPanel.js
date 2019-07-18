@@ -217,19 +217,21 @@ BattleEquipmentPanel.prototype.updateStats = function () {
 
 BattleEquipmentPanel.prototype.updateEquipment = function () {
     var melee = Engine.player.getEquippedItemID('meleew');
-    var range = Engine.player.getEquippedItemID('rangedw');
-    var meleeData = {id: -1, atlas: 'UI', frame: 'sword-shade', name: 'Melee weapon'};
-    var rangeData = {id: -1, atlas: 'UI', frame: 'gun-shade', name: 'Ranged weapon'};
+    var range = Engine.player.getEquippedItemID('range_ammo');
+    // var meleeData = {id: -1, atlas: 'UI', frame: 'sword-shade', slot: 'meleew'};
+    // var rangeData = {id: -1, atlas: 'UI', frame: 'gun-shade', slot: 'rangedw'};
 
     if (melee > -1) meleeData = Engine.itemsData[melee];
+    if(range == -1) range = Engine.player.getEquippedItemID('rangedw');
     if (range > -1) {
         rangeData = Engine.itemsData[range];
         var ammo = Engine.player.getNbAnyAmmo();
+        console.warn('ammo=',ammo);
         this.range.countText.setText(ammo);
     }
 
-    this.melee.setUp(-1, meleeData);
-    this.range.setUp(-1, rangeData);
+    this.melee.setUp(melee, meleeData);
+    this.range.setUp(range, rangeData);
     this.range.countText.setVisible(range > -1);
 };
 

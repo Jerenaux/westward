@@ -28,12 +28,11 @@ var Tooltip = new Phaser.Class({
 
     updatePosition: function(x,y){
         this.setPosition(
-            UI.scene.game.canvas.offsetLeft + x + 10,
-            UI.scene.game.canvas.offsetTop + y + 10
+            x + 10,
+            y + 10
         );
         if(this.x + this.computeWidth() > UI.getGameWidth()) this.x -= this.computeWidth();
-        console.warn(x,UI.scene.game.canvas.offsetLeft,this.x);
-        this.setTitle([x,UI.scene.game.canvas.offsetLeft,this.x].join(', '));
+        if(this.y + this.computeHeight() > UI.getGameHeight()) this.y -= this.computeHeight();
     },
 
     updateInfo: function(type,data){
@@ -66,6 +65,7 @@ var Tooltip = new Phaser.Class({
                 this.setTitle(name);
                 break;
             case 'slot':
+                console.warn(data.slot);
                 var slot = Equipment.slots[data.slot];
                 this.setTitle(slot.name);
                 this.setBody(slot.desc);
@@ -132,6 +132,10 @@ var Tooltip = new Phaser.Class({
             Math.min(this.getBodyText().length,40) * 6.5,
             this.getTitleText().length * 8
         );
+    },
+
+    computeHeight: function(){
+        return (Math.ceil(this.getBodyText().length/40) * 15)+40;
     },
 
     display: function(){

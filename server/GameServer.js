@@ -785,7 +785,7 @@ GameServer.removeFromLocation = function(entity){
  */
 GameServer.handleChat = function(text,socketID){
     var player = GameServer.getPlayer(socketID);
-    player.setChat(data); // declared in MovingEntity
+    player.setChat(text); // declared in MovingEntity
     Prism.logEvent(player,'chat',{txt:text});
 };
 
