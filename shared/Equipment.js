@@ -94,7 +94,7 @@ function EquipmentManager() {
         };
         if (Equipment.slots[slotName].defaultItem) {
             item.id = Equipment.slots[slotName].defaultItem;
-            item.nb = 1;
+            item.nb = 0;
         }
         this.slots[slotName] = item;
     }

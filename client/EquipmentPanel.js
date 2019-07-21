@@ -107,7 +107,6 @@ EquipmentPanel.prototype.updateEquipment = function () {
                 slot.text.setVisible(false);
             } else {
                 var nb = Engine.player.getNbAmmo(slot.slotName);
-                console.warn('nb = ',nb);
                 slot.text.setText(nb);
                 if (this.displayed) {
                     var capacity = Engine.player.getMaxAmmo(slot.slotName);
@@ -216,23 +215,24 @@ BattleEquipmentPanel.prototype.updateStats = function () {
 };
 
 BattleEquipmentPanel.prototype.updateEquipment = function () {
-    var melee = Engine.player.getEquippedItemID('meleew');
-    var range = Engine.player.getEquippedItemID('range_ammo');
-    // var meleeData = {id: -1, atlas: 'UI', frame: 'sword-shade', slot: 'meleew'};
-    // var rangeData = {id: -1, atlas: 'UI', frame: 'gun-shade', slot: 'rangedw'};
+    var meleeID = Engine.player.getEquippedItemID('meleew');
+    var rangeID = Engine.player.getEquippedItemID('range_ammo');
+    var meleeData, rangeData;
 
-    if (melee > -1) meleeData = Engine.itemsData[melee];
-    if(range == -1) range = Engine.player.getEquippedItemID('rangedw');
-    if (range > -1) {
-        rangeData = Engine.itemsData[range];
+    // If ranged weapon, display the actual ammo; else, display the ranged weapon (= the hands)
+    if(rangeID == -1) rangeID = Engine.player.getEquippedItemID('rangedw');
+    meleeData = Engine.itemsData[meleeID];
+    rangeData = Engine.itemsData[rangeID];
+
+    // console.warn(Engine.player.hasRangedEquipped());
+    if (Engine.player.hasRangedEquipped()) {
         var ammo = Engine.player.getNbAnyAmmo();
-        console.warn('ammo=',ammo);
         this.range.countText.setText(ammo);
     }
 
-    this.melee.setUp(melee, meleeData);
-    this.range.setUp(range, rangeData);
-    this.range.countText.setVisible(range > -1);
+    this.melee.setUp(meleeID, meleeData);
+    this.range.setUp(rangeID, rangeData);
+    this.range.countText.setVisible(Engine.player.hasRangedEquipped());
 };
 
 BattleEquipmentPanel.prototype.updateCapsules = function () {

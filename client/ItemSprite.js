@@ -52,7 +52,6 @@ var ItemSprite = new Phaser.Class({
 
     handleOver: function(){
         if(this.showTooltip) {
-            console.warn(this.itemID);
             if(this.itemID == -1){
                 UI.tooltip.updateInfo('slot', {slot: this.slot});
             }else {

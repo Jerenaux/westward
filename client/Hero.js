@@ -138,9 +138,13 @@ let Hero = new Phaser.Class({
         return Engine.itemsData[item_id]; // Returns the ID of the item equipped at the given slot
     },
 
+    hasRangedEquipped: function(){
+        // console.warn(this.getEquippedItemID(),Equipment.slots['rangedw'].defaultItem);
+        return (this.getEquippedItemID('rangedw') > -1) && (this.getEquippedItemID('rangedw') != Equipment.slots['rangedw'].defaultItem);
+    },
+
     getMaxAmmo: function(){
         let container_id = this.equipment.get('range_container');
-        console.warn('container_id = ',container_id);
         return Engine.itemsData[container_id].capacity;
     },
 

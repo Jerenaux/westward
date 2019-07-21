@@ -1080,8 +1080,8 @@ Engine.makeBattleMenu = function(){
     var timerh = 60;
     var timerx = (Engine.getGameConfig().width-timerw)/2;
     var timery = Engine.getGameConfig().height-timerh;
-    var timerPanel = battle.addPanel('timer',new BattleTimerPanel(timerx,timery,timerw,timerh));
-    timerPanel.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['battletimer_help']);
+    /*var timerPanel = battle.addPanel('timer',new BattleTimerPanel(timerx,timery,timerw,timerh));
+    timerPanel.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['battletimer_help']);*/
 
     var respawnh = 90;
     var respawny = 400;

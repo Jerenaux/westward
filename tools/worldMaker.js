@@ -82,6 +82,7 @@ function WorldMaker(args){
 
     this.land = new SpaceMap();
     this.collisions = new SpaceMap();
+    this.collisionsDebug = new SpaceMap();
     this.items = new SpaceMap();
     this.animals = new SpaceMap();
     this.mapPixels = new SpaceMap();
@@ -100,6 +101,11 @@ function WorldMaker(args){
     this.treeSource = args.treesource;
     this.notreesave = args.notreesave;
 }
+
+WorldMaker.prototype.addCollision = function(x,y,source){
+    this.collisions.add(x,y,1);
+    this.collisionsDebug.add(x,y,source);
+};
 
 WorldMaker.prototype.run = function(){
     if(!this.nbHoriz || !this.nbVert){
@@ -254,7 +260,6 @@ WorldMaker.prototype.addCoastTiles = function(tiles){
     tiles.forEach(function(t) {
         if(!isInWorldBounds(t.x,t.y)) return;
         this.addTile(t,'c');
-        // this.collisions.add(t.x,t.y);
         coast.push(t);
     },this);
     this.coasts.push(coast);
@@ -337,7 +342,8 @@ WorldMaker.prototype.fill = function(fillNode,stop){ // fills the world with wat
         if(!this.canFill(node)) continue;
         // put a tile at location
         this.addTile(node,'w');
-        this.collisions.add(node.x,node.y,1);
+        // this.collisions.add(node.x,node.y,1);
+        this.addCollision(node.x,node.y,'water');
         this.mapPixels.add(node.x,node.y,'w');
         // expand
         for(var i = 0; i < contour.length; i++){
@@ -383,11 +389,10 @@ WorldMaker.prototype.drawShore = function(){
                 undef++;
             }
 
-            if(tile === undefined || tile == 'none'){
-                tile='none';
-            }else{
+            if(tile !== undefined && tile != 'none'){
                 this.addTile(c,tile); // Will replace any 'c'
-                if(this.collides(tile)) this.collisions.add(x,y,1);
+                // if(this.collides(tile)) this.collisions.add(x,y,1);
+                if(this.collides(tile)) this.addCollision(x,y,'shore');
                 this.mapPixels.add(x,y,'c');
             }
         },this);
@@ -450,7 +455,8 @@ WorldMaker.prototype.createForests = function(){
 WorldMaker.prototype.plantTree = function(g,pos,type){
     // g is {x,y} location
     pos.forEach(function(p){
-        this.collisions.add(p[0],p[1],1);
+        // this.collisions.add(p[0],p[1],1);
+        this.addCollision(p[0],p[1],'tree');
     },this);
     //TODO: adjust ranges / conf
     for(var x = -4; x < 6; x++){
@@ -529,7 +535,8 @@ WorldMaker.prototype.addMisc = function(){
         var y = Utils.randomInt(0,World.worldHeight);
         if(!this.isBusy({x:x,y:y})) {
             // console.log('rock at',x,y);
-            this.collisions.add(x,y);
+            // this.collisions.add(x,y);
+            this.addCollision(x,y,'misc');
             this.items.add(x,y,26);
         }
     }
@@ -618,6 +625,10 @@ WorldMaker.prototype.writeDataFiles = function(){
     fs.writeFile(path.join(this.outdir,'collisions.json'),JSON.stringify(colls),function(err){
         if(err) throw err;
         console.log('Collisions written');
+    });
+    fs.writeFile(path.join(this.outdir,'collisions_debug.json'),JSON.stringify(this.collisionsDebug.toList(true)),function(err){
+        if(err) throw err;
+        console.log('Collisions debug written');
     });
     // Write resources
     fs.writeFile(path.join(this.outdir,'woodland.json'),JSON.stringify(this.woodland.toList(true)),function(err){

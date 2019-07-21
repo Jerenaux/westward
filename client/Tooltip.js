@@ -65,7 +65,6 @@ var Tooltip = new Phaser.Class({
                 this.setTitle(name);
                 break;
             case 'slot':
-                console.warn(data.slot);
                 var slot = Equipment.slots[data.slot];
                 this.setTitle(slot.name);
                 this.setBody(slot.desc);

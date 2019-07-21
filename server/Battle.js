@@ -376,9 +376,7 @@ Battle.prototype.processAoE = function (f, tx, ty) {
     };
 };
 
-// TODO: rename a,b to atacker and target
-
-Battle.prototype.processAttack = function (attacker, target) { // a attacks b
+Battle.prototype.processAttack = function (attacker, target) {
     console.log('Processing attack');
     var delay = 0;
     var damage = 0;

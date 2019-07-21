@@ -55,8 +55,8 @@ World Building
 
 - Test battle
 - No aggro??
-- Unending fight with building and wolves   
-- Ammo bug
+- Unending fight with building and wolves  
+- Stones?
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
 

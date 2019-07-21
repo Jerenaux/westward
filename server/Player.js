@@ -511,8 +511,6 @@ Player.prototype.equip = function (slot, itemID, fromDB) {
 
     // console.log('Equipping');
     var slotData = Equipment.getData(slot);
-    var itemData = GameServer.itemsData[itemID];
-
     if (this.isEquipped(slot)) this.unequip(slot);
 
     if (slotData) {
@@ -522,7 +520,7 @@ Player.prototype.equip = function (slot, itemID, fromDB) {
 
     // equip item
     if (itemID) {
-        this.equipment.set(slot, itemID); // item = item_id
+        this.equipment.set(slot, itemID);
         this.updatePacket.addEquip(slot, itemID);
         this.applyAbsoluteModifiers(itemID);
 
@@ -633,7 +631,7 @@ Player.prototype.computeLoad = function (item) {
  * Doesn't check anything about capacity, has to be checked upstream.
  * @param {number} nb - Amount of ammo to add.
  */
-Player.prototype.load = function (nb) {
+Player.prototype.load = function (nb){
     if (typeof nb != 'number') {
         console.warn('ERROR in `Player.load()`: nb is not a number');
         console.warn('Nb : ', nb, typeof nb);
@@ -799,9 +797,9 @@ Player.prototype.getDataFromDb = function (data) {
 
     if (data) {
         if (data.equipment) {
-
             for (var slot in data.equipment.slots) {
                 var item = data.equipment.slots[slot];
+                // console.warn('ITEM:',item);
                 // fix corrupt item data due to development
                 if (typeof item.id == 'object') {
                     if (item.id.hasOwnProperty('id')) { // fix nested objects
@@ -814,9 +812,8 @@ Player.prototype.getDataFromDb = function (data) {
                 item.nb = parseInt(item.nb);
                 if (typeof item.nb != 'number') item.nb = 0;
                 if (item.id === -1) continue;
-                // console.warn('ITEM:',item);
                 this.equip(slot, item.id, true);
-                if (item.nb) this.load(item.nb);
+                if (slot == 'range_ammo' && item.nb) this.load(item.nb);
             }
         }
 

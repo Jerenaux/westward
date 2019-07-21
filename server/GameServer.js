@@ -410,7 +410,7 @@ GameServer.addItem = function(x,y,type,instance){
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
-    GameServer.addAnimal(1189,154,0);
+    GameServer.addAnimal(515,654,0);
     GameServer.addAnimal(1175,144,0);
     GameServer.addAnimal(1174,144,0);
     GameServer.addAnimal(1173,144,0);
@@ -437,17 +437,16 @@ GameServer.onNewPlayer = function(player){
         // [11,1],
         // [4, 5],
         // [12, 5],
-        // [2, 2],
-        // [26, 9],
-        // [20, 10],
+        [2, 1],
+        [19, 1],
+        [20, 10],
         // [45, 10],
-        // [19, 10],
         // [50, 11],
         // [51, 11],
     ];
 
     items.forEach(item => {
-        player.giveItem(item[0], item[1]);
+        if(!player.hasItem(item[0],item[1])) player.giveItem(item[0], item[1]);
     });
 };
 
@@ -813,6 +812,7 @@ GameServer.checkCollision = function(x,y){
  * @returns {Array[Object]} - The array of tile coordinates along the calculated path.
  */
 GameServer.findPath = function(from,to,seek){
+    console.warn('815',GameServer.checkCollision(to.x,to.y));
     if(GameServer.checkCollision(to.x,to.y)) return null;
     return GameServer.pathFinder.findPath(from,to,seek);
 };

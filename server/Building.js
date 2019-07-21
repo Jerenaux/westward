@@ -17,6 +17,7 @@ function Building(data){
     this.battleTeam = 'Player';
     this.entityCategory = 'Building';
     this.updateCategory = 'buildings';
+    this.sentient = false; // used in battle to know if a battle should end
     this.schemaModel = GameServer.BuildingModel;
     this.battlePriority = 3;
 

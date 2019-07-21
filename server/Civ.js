@@ -15,7 +15,7 @@ function Civ(x,y,type){
     this.battleTeam = 'Civ';
     this.entityCategory = 'Civ';
     this.updateCategory = 'civs';
-    this.sentient = true; // used in battle to know if a battle shoud end
+    this.sentient = true; // used in battle to know if a battle should end
     this.x = x;
     this.y = y;
     this.type = type;

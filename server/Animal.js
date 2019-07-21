@@ -22,6 +22,7 @@ function Animal(x,y,type,instance){
     this.battleTeam = 'Animal';
     this.entityCategory = 'Animal';
     this.updateCategory = 'animals';
+    this.sentient = false; // used in battle to know if a battle should end
     this.battlePriority = 2;
     this.x = x;
     this.y = y;
