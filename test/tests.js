@@ -333,15 +333,20 @@ describe('GameServer',function(){
             var slotid = slots.indexOf(properSlot); 
             var wrongSlot = slotid > 0 ? slots[slotid - 1] : slots[slotid + 1];
             // console.log('#',itemID,item,properSlot);
-            expect(player.equip(properSlot,parseInt(itemID),true)).to.equal(1);
+            console.warn('equipping',itemID,'in',properSlot);
+            // Because in isolation, equipping ammo should always fail due to the lack
+            // of proper container
+            var expectedResult = (properSlot == 'range_ammo' ? 0 : 1);
+            expect(player.equip(properSlot,parseInt(itemID),true)).to.equal(expectedResult);
             expect( player.equip(properSlot,item,true)).to.equal(0); // try sending the item data instead of id
             expect(player.equip(wrongSlot,parseInt(itemID),true)).to.equal(0);
-            expect(player.getEquippedItemID(properSlot)).to.equal(parseInt(itemID));
+            expectedResult = (properSlot == 'range_ammo' ? -1 : parseInt(itemID));
+            expect(player.getEquippedItemID(properSlot)).to.equal(expectedResult);
+            player.unequip(properSlot);
         }
     });
 
     it('equipment_management',function(){
-        console.warn('--- equipment manager test --- ');
         player.inventory.clear();
         var weaponID = 28;
         var itemData = gs.itemsData[weaponID];
@@ -349,7 +354,6 @@ describe('GameServer',function(){
         player.giveItem(weaponID, 1);
         expect(player.getItemNbInBelt(weaponID)).to.equal(0);
         var initNb = player.getItemNb(weaponID);
-        console.warn('initNb =',initNb);
         gs.handleUse({item:weaponID,inventory:'backpack'},player.socketID);
         expect(player.getItemNb(weaponID)).to.equal(initNb-1);
         expect(player.isEquipped(slot)).to.equal(true);
@@ -369,7 +373,6 @@ describe('GameServer',function(){
         expect(player.getItemNb(weaponID)).to.equal(1);
         expect(player.getItemNbInBelt(weaponID)).to.equal(initNb-1);
         expect(player.isEquipped(slot)).to.equal(false);
-        console.warn('--- enf of equipment manager test --- ');
     });
 
     it('equipment_stats',function(){

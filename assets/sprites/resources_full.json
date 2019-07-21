@@ -130,11 +130,11 @@
     },
     {
       "filename": "fists",
-      "frame": {"x":264,"y":720,"w":24,"h":24}
+      "frame": {"x":192,"y":816,"w":24,"h":24}
     },
     {
       "filename": "hands",
-      "frame": {"x":48,"y":720,"w":24,"h":24}
+      "frame": {"x":216,"y":816,"w":24,"h":24}
     },
     {
       "filename": "antidote",

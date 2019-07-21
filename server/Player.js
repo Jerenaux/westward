@@ -411,7 +411,6 @@ Player.prototype.takeItem = function (item, nb, inventory, notify, verb) {
 };
 
 Player.prototype.takeFromBackpack = function(item,nb){
-    console.warn('taking ',nb);
     this.inventory.take(item, nb);
     this.updatePacket.addItem(item, this.inventory.getNb(item));
 };
@@ -472,7 +471,7 @@ Player.prototype.getEquippedItemID = function (slot) {
 };
 
 Player.prototype.getContainerType = function(){
-    return this.equipment.getAmmoContainerType();
+    return this.equipment.getEquippedContainerType();
 };
 
 Player.prototype.canEquip = function (slot, item) {
@@ -486,6 +485,7 @@ Player.prototype.canEquip = function (slot, item) {
         return false;
     }
     if(slot == 'range_ammo'){
+        console.warn(itemData.container_type,'vs', this.getContainerType());
         if(itemData.container_type != this.getContainerType()){
             console.log('Container mismatch');
             return false;

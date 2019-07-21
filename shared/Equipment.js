@@ -131,9 +131,13 @@ EquipmentManager.prototype.getItem = function (slotName) {
 
 EquipmentManager.prototype.getAmmoContainerType = function () {
     let item = this.getItem("range_ammo");
-    if (item && item.container_type) {
-        return item.container_type;
-    }
+    if (item && item.container_type) return item.container_type;
+    return -1;
+};
+
+EquipmentManager.prototype.getEquippedContainerType = function(){
+    let item = this.getItem("range_container");
+    if (item && item.container_type) return item.container_type;
     return -1;
 };
 

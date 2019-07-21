@@ -54,13 +54,12 @@ World Building
 - Display threat level in animal tooltip
 - fix open menu while respawn bug
 - Display nb owned buildings in build menu
-- Add gloves
-- Add round shield etc.
 - Animal markers, death markers
+
+- Hide ammo if ranged weapon not equipped
   
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
-
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
 https://medium.com/@kestrelm/2d-skeletal-animation-in-phaser-3-tutorial-3ed468fb6bd0
 

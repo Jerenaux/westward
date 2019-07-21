@@ -442,7 +442,7 @@ GameServer.onNewPlayer = function(player){
         [20, 10],
         // [45, 10],
         // [50, 11],
-        // [51, 11],
+        [51, 1],
     ];
 
     items.forEach(item => {
@@ -1556,6 +1556,7 @@ GameServer.handleUse = function(data,socketID){
     }else if(itemData.effects){ // If non-equipment but effects, then consumable item
         nb = player.applyEffects(item,true);
     }
+    if(nb == 0) return false;
     var verb = (isEquipment ? 'Equipped' : (itemData.verb || 'Used'));
     player.takeItem(item, nb, inventory, true, verb);
     if(!isEquipment) GameServer.destroyItem(item, nb, 'use');
