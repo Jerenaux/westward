@@ -12,7 +12,11 @@ var mapsDir = path.join(__dirname,'..','maps');
 var gs = require('../server/GameServer.js').GameServer;
 var Equipment = require('../shared/Equipment.js').Equipment;
 
-var PORT = 8081; //TODO: read from conf file?
+/*
+* WARNING: tests are run in parallel, which can cause them to interfere with each
+* other; use different item ID's when testing inventory to avoid issues.
+* */
+
 
 describe('test', function(){
     /*The stub essentially suppresses the call to a method, while allowing to check if it was called
@@ -157,9 +161,11 @@ describe('GameServer',function(){
     });
 
     it('updateBldRecipes', function(){
-        var nbrecipes = player.bldRecipes.length;
-        player.addBuilding(building);
         player.updateBldRecipes();
+        var nbrecipes = player.bldRecipes.length;
+        var nbOwned = player.countOwnedBuildings(building.type);
+        player.addBuilding(building);
+        expect(player.countOwnedBuildings(building.type)).to.equal(nbOwned+1);
         expect(player.bldRecipes.length).to.equal(nbrecipes-1);
     });
 
@@ -298,7 +304,7 @@ describe('GameServer',function(){
 
     it('handleUse_equip', function(){
         player.inventory.clear();
-        var type = 28; // stone hatchet
+        var type = 11; // sword
         var typeNotOwned = 2; // bow
         var slot = gs.itemsData[type].equipment;
         var slotNotOwned = gs.itemsData[typeNotOwned].equipment;
@@ -327,14 +333,15 @@ describe('GameServer',function(){
             var slotid = slots.indexOf(properSlot); 
             var wrongSlot = slotid > 0 ? slots[slotid - 1] : slots[slotid + 1];
             // console.log('#',itemID,item,properSlot);
-            expect(player.equip(properSlot,parseInt(itemID),true)).to.equal(true);
-            expect( player.equip(properSlot,item,true)).to.equal(false); // try sending the item data instead of id
-            expect(player.equip(wrongSlot,parseInt(itemID),true)).to.equal(false);
+            expect(player.equip(properSlot,parseInt(itemID),true)).to.equal(1);
+            expect( player.equip(properSlot,item,true)).to.equal(0); // try sending the item data instead of id
+            expect(player.equip(wrongSlot,parseInt(itemID),true)).to.equal(0);
             expect(player.getEquippedItemID(properSlot)).to.equal(parseInt(itemID));
         }
     });
 
     it('equipment_management',function(){
+        console.warn('--- equipment manager test --- ');
         player.inventory.clear();
         var weaponID = 28;
         var itemData = gs.itemsData[weaponID];
@@ -342,6 +349,7 @@ describe('GameServer',function(){
         player.giveItem(weaponID, 1);
         expect(player.getItemNbInBelt(weaponID)).to.equal(0);
         var initNb = player.getItemNb(weaponID);
+        console.warn('initNb =',initNb);
         gs.handleUse({item:weaponID,inventory:'backpack'},player.socketID);
         expect(player.getItemNb(weaponID)).to.equal(initNb-1);
         expect(player.isEquipped(slot)).to.equal(true);
@@ -361,13 +369,14 @@ describe('GameServer',function(){
         expect(player.getItemNb(weaponID)).to.equal(1);
         expect(player.getItemNbInBelt(weaponID)).to.equal(initNb-1);
         expect(player.isEquipped(slot)).to.equal(false);
+        console.warn('--- enf of equipment manager test --- ');
     });
 
     it('equipment_stats',function(){
         var weaponID = 28;
         var itemData = gs.itemsData[weaponID];
         var slot = itemData.equipment;
-        var stat = Object.keys(itemData.effects)[0] // pick up first stat affected by item
+        var stat = Object.keys(itemData.effects)[0]; // pick up first stat affected by item
         var effect = itemData.effects[stat];
         player.giveItem(weaponID, 1);
         player.unequip(slot); // unequip anything that may have been equipped in a previous test

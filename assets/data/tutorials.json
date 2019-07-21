@@ -45,7 +45,7 @@
     {"pos": null,"txt":"You can acquire [I3] by building a [B6]. It'll generate [I3] for you automatically at regular intervals."},
     {"pos": [724,"c",300,140],"txt":"The resources of the land deplete as players extract them, hence the continuous march Westward to keep finding new ones and expanding!"},
     {"pos": [50,50,300,120],"hook": "menu:build","txt":"To build a building, first open the 'Build' menu by clicking on the shovel icon, here on the left."},
-    {"pos": [280,50,300,120],"hook": "bldselect:6","txt":"Hover a building icon to see its name. Find the [B6] icon and click on it."},
+    {"pos": [300,70,300,120],"hook": "bldselect:6","txt":"Find the [B6] and click on it."},
     {"pos": [280,50,300,125],"hook": "newbuilding:6","txt":"Now pick a location to build it. It will only be possible next to a forest; get closer to the forest to the east and build it there. (Click back on the shovel to cancel)"},
     {"pos": null,"txt":"Contrary to the [B3] you visited, this building doesn't require construction material, so it's built immediately!"},
     {"pos": null, "hook":"bld:own:6","txt":"Enter your [B6] by clicking on it."},

@@ -105,19 +105,6 @@ Player.prototype.updateBldRecipes = function () {
     this.setOwnProperty('bldRecipes', this.bldRecipes);
 };
 
-// Called by finalizePlayer
-Player.prototype.listBuildings = function () {
-    this.buildings = [];
-    for (var bid in GameServer.buildings) {
-        var building = GameServer.buildings[bid];
-        if (building.owner === this.id) this.buildings.push(building);
-    }
-    this.buildings.forEach(function (b) {
-        console.warn(b.type);
-    });
-    this.updateBldRecipes();
-};
-
 Player.prototype.countOwnedBuildings = function (type) {
     if (type === -1) return this.buildings.length;
     var count = 0;
@@ -129,6 +116,19 @@ Player.prototype.countOwnedBuildings = function (type) {
 
 Player.prototype.addBuilding = function(building){
     this.buildings.push(building);
+    this.updateBldRecipes();
+};
+
+// Called by finalizePlayer
+Player.prototype.listBuildings = function () {
+    this.buildings = [];
+    for (var bid in GameServer.buildings) {
+        var building = GameServer.buildings[bid];
+        if (building.owner === this.id) this.buildings.push(building);
+    }
+    this.buildings.forEach(function (b) {
+        console.warn(b.type);
+    });
     this.updateBldRecipes();
 };
 
@@ -411,9 +411,10 @@ Player.prototype.takeItem = function (item, nb, inventory, notify, verb) {
 };
 
 Player.prototype.takeFromBackpack = function(item,nb){
+    console.warn('taking ',nb);
     this.inventory.take(item, nb);
     this.updatePacket.addItem(item, this.inventory.getNb(item));
-}
+};
 
 Player.prototype.addToBelt = function (item, nb) {
     this.belt.add(item, nb);
@@ -429,13 +430,13 @@ Player.prototype.backpackToBelt = function(item){
     var nb = this.getItemNb(item);
     this.takeItem(item,nb);
     this.addToBelt(item,nb);
-}
+};
 
 Player.prototype.beltToBackpack = function(item){
     var nb = this.getItemNbInBelt(item);
     this.takeFromBelt(item,nb);
     this.giveItem(item,nb);
-}
+};
 
 /**
  * Check if a non-permanent item is equipped in the slot 
@@ -470,17 +471,26 @@ Player.prototype.getEquippedItemID = function (slot) {
     return this.equipment.get(slot);
 };
 
+Player.prototype.getContainerType = function(){
+    return this.equipment.getAmmoContainerType();
+};
+
 Player.prototype.canEquip = function (slot, item) {
-    if (!(slot in Equipment.slots)) return false;
-    if(GameServer.itemsData[item].equipment != slot) return false;
-    // If it's ammo, check that the proper container is equipped
-    // TODO ADD THE AMMO CHECKS FOR CONTAINER!!!
-    // if (slot in Equipment.slots || slot === Equipment.ammo || slot === Equipment.container) {
-    //     // var container = this.equipment.getContainer(slot);
-    //     //TODO: ask Jerome :) debug
-    //     const cantEquip = this.equipment.get(slot) == -1;
-    //     if (cantEquip) return false;
-    // }
+    if (!(slot in Equipment.slots)) {
+        console.log('invalid slot');
+        return false;
+    }
+    var itemData = GameServer.itemsData[item];
+    if(itemData.equipment != slot){
+        console.log('Wrong slot');
+        return false;
+    }
+    if(slot == 'range_ammo'){
+        if(itemData.container_type != this.getContainerType()){
+            console.log('Container mismatch');
+            return false;
+        }
+    }
     return true;
 };
 
@@ -491,25 +501,21 @@ Player.prototype.canEquip = function (slot, item) {
  * @param {number} itemID - ID of the item to equip.
  * @param {boolean} fromDB - Does the order come from DB (if not, then
  * it comes from player use).
- * @returns {boolean} - Success or not.
+ * @returns {number} - number of items to remove from inventory (0 if failure)
  */
 Player.prototype.equip = function (slot, itemID, fromDB) {
-
-    // console.log('Player.prototype.equip:', slot, itemID, fromDB);
 
     if (typeof itemID != 'number') {
         console.warn('ERROR in `Player.equip()`: item is not a number');
         console.warn(typeof itemID);
-        return false;
+        return 0;
     }
-    if (!itemID) return false;
-    // if (!fromDB && !this.hasItem(itemID, 1) && !this.hasItemInBelt(itemID, 1)) return false; // remove: this function should not check for ownership
+    if (!itemID) return 0;
     if(!this.canEquip(slot, itemID)) {
         console.log('Item cannot be equipped in that slot');
-        return false;
+        return 0;
     }
 
-    // console.log('Equipping');
     var slotData = Equipment.getData(slot);
     if (this.isEquipped(slot)) this.unequip(slot);
 
@@ -518,25 +524,23 @@ Player.prototype.equip = function (slot, itemID, fromDB) {
         if (conflictSlot && this.isEquipped(conflictSlot)) this.unequip(conflictSlot, true);
     }
 
-    // equip item
-    if (itemID) {
-        this.equipment.set(slot, itemID);
-        this.updatePacket.addEquip(slot, itemID);
-        this.applyAbsoluteModifiers(itemID);
+    this.equipment.set(slot, itemID);
+    this.updatePacket.addEquip(slot, itemID);
+    this.applyAbsoluteModifiers(itemID);
 
-        var nb = 1;
+    var nb = 1;
 
-        // Manage ammo
-        // If fromDB, `Player.getDataFromDB()` will take care to load as much
-        // amo as was equipped by the player. Therefore the below code should
-        // not be run.
-        if (slot === 'range_ammo' && !fromDB) {
-            var range_container_id = this.equipment.get('range_container');
-            nb = this.computeLoad(itemID); // compute how much will be added to the container
-            this.load(nb);
-        }
+    // Manage ammo
+    // If fromDB, `Player.getDataFromDB()` will take care to load as much
+    // amo as was equipped by the player. Therefore the below code should
+    // not be run.
+    if (slot === 'range_ammo' && !fromDB) {
+        var range_container_id = this.equipment.get('range_container');
+        nb = this.computeLoad(itemID); // compute how much will be added to the container
+        this.load(nb);
     }
-    return true;
+
+    return nb;
 };
 
 /**
@@ -703,15 +707,14 @@ Player.prototype.canRange = function () {
 
 };
 
-Player.prototype.applyEffects = function (item, coef, notify) {
-    var coef = coef || 1;
+Player.prototype.applyEffects = function (item, notify) {
     var itemData = GameServer.itemsData[item];
-    if (!itemData.effects) return false;
+    if (!itemData.effects) return 0;
     for (var stat in itemData.effects) {
         if (!itemData.effects.hasOwnProperty(stat)) continue;
-        this.applyEffect(stat, coef * itemData.effects[stat], notify);
+        this.applyEffect(stat, itemData.effects[stat], notify);
     }
-    return true;
+    return 1;
 };
 
 // Apply effect of consumable object

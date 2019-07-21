@@ -294,7 +294,7 @@ GameServer.loadBuildings = function(){
  */
 GameServer.loadItems = function(){
 
-    GameServer.getItemsFromDBUpdateCache();
+    // GameServer.getItemsFromDBUpdateCache();
 
     var path = pathmodule.join(GameServer.mapsPath,'items.json');
     var items = JSON.parse(fs.readFileSync(path).toString());
@@ -302,7 +302,7 @@ GameServer.loadItems = function(){
         var x = item[0];
         var y = item[1];
         var type = item[2];
-        if(!GameServer.checkCollision(x,y)) GameServer.addItem(x,y,type);
+        GameServer.addItem(x,y,type); // don't check for collisions, otherwise stones don't spawn
     },this);
 
     path = pathmodule.join(GameServer.mapsPath,'resourceMarkers.json');
@@ -411,7 +411,7 @@ GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
     GameServer.addAnimal(515,654,0);
-    GameServer.addAnimal(1175,144,0);
+    GameServer.addAnimal(516,652,0);
     GameServer.addAnimal(1174,144,0);
     GameServer.addAnimal(1173,144,0);
     GameServer.addAnimal(1172,144,0);
@@ -436,7 +436,7 @@ GameServer.onNewPlayer = function(player){
     const items = [
         // [11,1],
         // [4, 5],
-        // [12, 5],
+        [6, 3],
         [2, 1],
         [19, 1],
         [20, 10],
@@ -812,7 +812,7 @@ GameServer.checkCollision = function(x,y){
  * @returns {Array[Object]} - The array of tile coordinates along the calculated path.
  */
 GameServer.findPath = function(from,to,seek){
-    console.warn('815',GameServer.checkCollision(to.x,to.y));
+    // console.warn('815',GameServer.checkCollision(to.x,to.y));
     if(GameServer.checkCollision(to.x,to.y)) return null;
     return GameServer.pathFinder.findPath(from,to,seek);
 };
@@ -1233,10 +1233,7 @@ GameServer.addSurroundingFighters = function(battle){
  */
 GameServer.handleBattleAction = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
-    if(player.battle){
-        player.battle.processAction(player,data);
-    }
-    console.error('Error - player.battle is missing:',player,data,socketID);
+    if(player.battle) player.battle.processAction(player,data);
 };
 
 /**
@@ -1555,9 +1552,9 @@ GameServer.handleUse = function(data,socketID){
     var result;
     var nb = 1;
     if(isEquipment) {
-        result = player.equip(itemData.equipment, parseInt(item), false); // false: not from DB
+        nb = player.equip(itemData.equipment, parseInt(item), false); // false: not from DB
     }else if(itemData.effects){ // If non-equipment but effects, then consumable item
-        result = player.applyEffects(item,nb,true);
+        nb = player.applyEffects(item,true);
     }
     var verb = (isEquipment ? 'Equipped' : (itemData.verb || 'Used'));
     player.takeItem(item, nb, inventory, true, verb);

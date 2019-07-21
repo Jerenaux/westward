@@ -1,6 +1,9 @@
 ## To test:
 - Test settlement selection (with value of 0)
+- Test ammo container type match
+- Test that the world is populated with items, animals, etc.
 - Test handleBelt
+- Test ammo decrease in inventory when equipping ammo
 - Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
 - Test Utils.nextTo with all combinations of building/animal vs building/animal, next to each other and not
@@ -37,6 +40,7 @@ World Building
 - Display death and conflict markers
 - add esc shortcut
 - "new" marker
+- no aggro? (works with bears but not with wolves and/or after refresh)
 - Events formatting
 - Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
 - Make size of tutorial boxes adapt to text
@@ -52,11 +56,8 @@ World Building
 - Display nb owned buildings in build menu
 - Add gloves
 - Add round shield etc.
-
-- Test battle
-- No aggro??
-- Unending fight with building and wolves  
-- Stones?
+- Animal markers, death markers
+  
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
 

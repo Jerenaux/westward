@@ -529,17 +529,18 @@ WorldMaker.prototype.checkPositions = function(x,y){
 WorldMaker.prototype.addMisc = function(){
     console.log('Adding misc ...');
     var nbrocks = 5000; //TODO: conf
+    var nbadded = 0;
     for(var i = 0; i < nbrocks; i++){
         // console.log('zone');
         var x = Utils.randomInt(0,World.worldWidth);
         var y = Utils.randomInt(0,World.worldHeight);
         if(!this.isBusy({x:x,y:y})) {
-            // console.log('rock at',x,y);
-            // this.collisions.add(x,y);
             this.addCollision(x,y,'misc');
             this.items.add(x,y,26);
+            nbadded++;
         }
     }
+    console.log(nbadded,' stones added');
 };
 
 WorldMaker.prototype.makeSpawnZones = function(){

@@ -26,7 +26,6 @@ BattleManager.startFight = function(){
     Engine.tweenFighText();
     Engine.updateGrid();
     Engine.menus.battle.display();
-    Engine.menus.battle.panels.timer.hide();
 
     //BattleManager.onFightStart();
 };
@@ -52,10 +51,7 @@ BattleManager.getFighter = function(id,debug){
 };
 
 BattleManager.updateBattle = function(battleData){
-    if(!BattleManager.inBattle) {
-        console.warn('not in fight');
-        return;
-    }
+    if(!BattleManager.inBattle) return;
 
    /* var timerPanel = Engine.currentMenu.panels['timer'];
     var timer = timerPanel.bar;
