@@ -23,30 +23,27 @@ Testing
 World Building
 
 ## Priority TODO
-- Update Westward main page
 - Adapt animations and delays for firearms
+
+- Update Westward main page
 - Change battle priority when player joins fight
 - In battle against NPC, have players have turns much more often
 - Make tiles above battle tiles transparent; same with buildings in fight?
 - Introduce new wood ingredient obtained from timber, crafting wood, made in bulk (but then tune down timber prod)
 -> For shield, guns...?
-- Stop walk when opening menu
 - Poll at regular interval the sprite below mouse
-- Better notifs cascading
+- Better notifications
 - Don't disable walk with build panel
 - New movement system
 - Prevent building at player location
 - Reduce amount of orientation pins
-- Display death and conflict markers
 - add esc shortcut
 - "new" marker
 - no aggro? (works with bears but not with wolves and/or after refresh)
 - Events formatting
-- Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
 - Make size of tutorial boxes adapt to text
 - Make towers throw stones when no better ammo
-- Belt & backpack capacity 
-- Add "resource markers" for wildlife (optimize?)
+- Belt & backpack capacity + corresponding items (incl. defaults)
 - No decimal in defaut prices (happens in one lumber camp)
 - Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)
@@ -54,8 +51,9 @@ World Building
 - Display threat level in animal tooltip
 - fix open menu while respawn bug
 - Display nb owned buildings in build menu
-- Animal markers, death markers
-
+- Animal markers, death markers, conflict markers
+- When giving constr material, display #owned
+- When giving constr material, max amount at amount needed
   
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
