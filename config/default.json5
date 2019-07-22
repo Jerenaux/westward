@@ -2,22 +2,23 @@
 {
    battle: {
         enabled: true,
-        aggroRange: 10, // chebyshev distance
+        aggroRange: 12, // chebyshev distance; TODO: variable?
         battleRange: 3, // distance that can be travelled in one turn in battle; TODO: variable
         freezeNPC: false,
         maxDamage: 10000,
         minDamage: 1,
-        rangePenalty: 5, // accuracy penalty per tile
+        rangePenalty: 0.5, // accuracy penalty per tile
         turnDuration: 5, // seconds
         tickRate: 100, // milliseconds, granularity of battle updates
-        arrowSpeed: 15, // tiles/sec
+        throwableSpeed: 10, // tiles/sec
+        arrowSpeed: 30, // tiles/sec
         bombSpeed: 10,
         meleeAtkDelay: 500,
         rangedAtkDelay: 500
    },
    buildings: {
         autobuild: false,
-        canfight: false,
+        canfight: true,
         nobuildings: false,
         inventorySize: 100,
         maxGold: 99999
@@ -50,7 +51,7 @@
             foodConsumptionRate: 600, // rate at which food levels of players are decreased ; amount in character.foodConsumption
             itemsRespawn: 86400, // 86400sec = 24h
             restRate: 1, // rate at which vigor levels of players are increased when sheltered ; amount in buildings.json
-            spawnZones: 300
+            spawnZones: 10
         }
     },
     misc: {
@@ -67,7 +68,7 @@
             client: 125,
             walk: 50,
             wander: 200,
-            aggro: 2000
+            aggro: 1500
     },
     civs: {
         aggro: false,
@@ -75,7 +76,7 @@
         raidMinimum: 8
     },
     wildlife: {
-        aggro: true,
+        aggro: false,
         nolife: false,
         wander: true,
         wanderRange: 5,
@@ -87,6 +88,7 @@
     },
     client: {
         boot:{
+            autoBoot: true,
             forceNewPlayer: false,
             offerTutorial: true
         },
@@ -94,7 +96,7 @@
             chatTimeout: 5000, //ms
             notificationTimeout: 3000, //ms ; TODO: adapt based on length?
             hearingDistance: 30, // tiles
-            defaultBuildRecipes: [3,4,6,11] // workshop, shop, lumbercamp, shack
+            defaultBuildRecipes: [3,4,6,11,2] // workshop, shop, lumbercamp, shack
         }
     }
 }

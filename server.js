@@ -88,6 +88,10 @@ app.get('/editor',function(req,res){
     res.sendFile(path.join(__dirname,'editor','index.html'));
 });
 
+app.get('/crafting',function(req,res){
+    res.sendFile(path.join(__dirname,'editor','crafting.html'));
+});
+
 var GEThandlers = {
     'buildings': gs.getBuildings,
     'count-items': gs.countItems,
@@ -172,14 +176,17 @@ if(process.env.DEV == 1) {
 server.listen(process.env.PORT || myArgs.port || 8081,function(){
     console.log('Listening on '+server.address().port);
 
-    mongodbAuth = {};
+    mongodbAuth = {
+        useNewUrlParser: true
+    };
     console.log('Check for mongodb Auth');
     if (process.env.MONGODB_AUTH) {
         console.log('Create auth object with user, pass, client');
         mongodbAuth = {
-            "user": process.env.MONGODB_USERNAME || 'root',
-            "pass": process.env.MONGODB_PASSWORD || 'password',
-            "useMongoClient": true
+            user: process.env.MONGODB_USERNAME || 'root',
+            pass: process.env.MONGODB_PASSWORD || 'password',
+            useMongoClient: true,
+            useNewUrlParser: true
         };
     }
 
@@ -226,6 +233,7 @@ io.on('connection',function(socket){
             'battleAction': gs.handleBattleAction,
             'buildingClick': gs.handleBuildingClick,
             'build': gs.handleBuild,
+            'belt': gs.handleBelt,
             'chat': gs.handleChat,
             'craft': gs.handleCraft,
             'exit': gs.handleExit,

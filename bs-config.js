@@ -15,8 +15,7 @@
 module.exports = {
     "ui": {
         "port": 3001
-    },
-    "files": "client/*.js,shared/*.js,index.html",
+  }files": "client/*.js,shared/*.js,index.html",
     "watchEvents": [
         "change"
     ],
@@ -25,13 +24,11 @@ module.exports = {
     "single": false,
     "watchOptions": {
         "ignoreInitial": true
-    },
-    "server": false,
+  }server": false,
     "proxy":{
         target: "http://localhost:8081",
         ws: true
-    },
-    "port": 3000,
+  }port": 3000,
     "middleware": false,
     "serveStatic": [],
     "ghostMode": {
@@ -43,8 +40,7 @@ module.exports = {
             "inputs": true,
             "toggles": true
         }
-    },
-    "logLevel": "info",
+  }logLevel": "info",
     "logPrefix": "Browsersync",
     "logConnections": false,
     "logFileChanges": true,
@@ -85,18 +81,15 @@ module.exports = {
     "socket": {
         "socketIoOptions": {
             "log": false
-        },
-        "socketIoClientConfig": {
+      }socketIoClientConfig": {
             "reconnectionAttempts": 50
-        },
-        "path": "/browser-sync/socket.io",
+      }path": "/browser-sync/socket.io",
         "clientPath": "/browser-sync",
         "namespace": "/browser-sync",
         "clients": {
             "heartbeatTimeout": 5000
         }
-    },
-    "tagNames": {
+  }tagNames": {
         "less": "link",
         "scss": "link",
         "css": "link",
@@ -106,6 +99,5 @@ module.exports = {
         "svg": "img",
         "gif": "img",
         "js": "script"
-    },
-    "injectNotification": false
+  }injectNotification": false
 };

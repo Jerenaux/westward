@@ -1,0 +1,12 @@
+{
+  "plants":[
+    {"item":14,"decor":"b4","nbzones":100},
+    {"item":8,"decor":null,"nbzones":100},
+    {"item":18,"decor":null,"nbzones":100},
+    {"item":47,"decor":"b4","nbzones":100}
+  ],
+  "animals":[
+    {"animal":0,"group":3,"nbzones":100},
+    {"animal":5,"group":1,"nbzones":50}
+  ]
+}

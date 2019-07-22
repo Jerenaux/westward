@@ -9,19 +9,21 @@
     <link rel="shortcut icon" type="image/x-icon" href="assets/images/favicon.ico">
 </head>
 <body>
-    <div class="fontPreload">.</div> <!-- don't forget the dot, the div cannot be empty-->
+    <div class="fontPreload">Hello World</div> <!-- don't forget the dot, the div cannot be empty-->
     <div class="fontPreloadTreamd">.</div>
-    <div id='game' style='text-align: center;'>
+    <div id='game'>
     </div>
     <div style='text-align: center;'>
         <div id="browser" class="danger"></div>
         <div id="danger" class="danger"></div>
         <div class="info">
+            Pixel: <span id="pxx">0</span>,<span id="pxy">0</span>&nbsp;
             Tile: <span id="tx">0</span>,<span id="ty">0</span>&nbsp;
             AOI: <span id="aoi">0</span>
             <!-- Pixel: <span id="pxx">0</span>,<span id="pxy">0</span><br/> -->
         </div>
     </div>
+    
     
     <div id="disqus_thread"></div>
 <script>
@@ -95,6 +97,7 @@
 <script src="client/ProductionPanel.js" type="text/javascript"></script>
 <script src="client/ConstructionPanel.js" type="text/javascript"></script>
 <script src="client/ProductivityPanel.js" type="text/javascript"></script>
+<script src="client/BuildPanel.js" type="text/javascript"></script>
 <script src="client/MaterialsPanel.js" type="text/javascript"></script>
 <script src="client/SuggestPanel.js" type="text/javascript"></script>
 <script src="client/InfoPanel.js" type="text/javascript"></script>

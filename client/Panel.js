@@ -42,7 +42,7 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
     zone.setInteractive();
     zone.setVisible(false);
     zone.on('pointerover',function(){
-        UI.tooltip.updateInfo(helpTitle,helpText);
+        UI.tooltip.updateInfo('free',{title:helpTitle,body:helpText});
         UI.tooltip.display();
     });
     zone.on('pointerout',function(){

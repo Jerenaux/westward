@@ -163,7 +163,7 @@ function ProdSlot(x,y,width,height){
     this.zone.setInteractive();
     this.zone.setOrigin(0);
     this.zone.on('pointerover',function(){
-        UI.tooltip.updateInfo(this.name.text,this.desc,this.itemID);
+        UI.tooltip.updateInfo('item',{id:this.itemID});
         UI.tooltip.display();
         UI.setCursor('item');
     }.bind(this));

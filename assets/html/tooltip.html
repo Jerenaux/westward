@@ -1,0 +1,68 @@
+<!--- TODO: create from cache (https://labs.phaser.io/edit.html?src=src\game%20objects\dom%20element\form%20input.js)-->
+<style>
+    .tooltip {
+        max-width: 250px;
+        min-width: 30px;
+        text-align: left;
+        border: 13px solid transparent;
+        border-image: url(assets/sprites/tooltip.png) fill 13 13 13 13 repeat;
+        color: white;
+        text-shadow: -1px 1px 0 #000,
+            1px 1px 0 #000,
+            1px -1px 0 #000,
+            -1px -1px 0 #000;
+    }
+    .tooltip mark{
+        background: none;
+    }
+    #tooltip_title {
+        font-size: 14px;
+        text-align: left;
+    }
+    #tooltip_body {
+        font-size: 12px;
+        margin-top: 3px;
+        text-align: left;
+    }
+    #equipment_modifier{
+        color: green;
+    }
+    #fatigue_modifier{
+        color: red;
+    }
+    #stat {
+        text-align: left;
+        font-size: 12px;
+    }
+    #base {
+        color: white;
+    }
+    #effects {
+        margin-top: 5px;
+        vertical-align: top;
+    }
+    #effect_icon {
+        background-image: url(assets/sprites/ui.png);
+        background-position: -525px -458px;
+        min-width: 13px;
+        min-height: 13px;
+        max-width: 13px;
+        float: left;
+    }
+    #effect_nb {
+        font-size: 12px;
+        margin-left: 20px;
+    }
+</style>
+
+<div class="tooltip">
+    <div id="tooltip_title"></div>
+    <div id="tooltip_body"></div>
+    <div id="effects">
+        <div id="effect_icon"></div>
+        <div id="effect_nb"></div>
+    </div>
+    <div id="stat">
+        <mark id="base"></mark>&nbsp;<mark id="equipment_modifier"></mark>&nbsp;<mark id="fatigue_modifier"></mark>
+    </div>
+</div>

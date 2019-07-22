@@ -21,16 +21,13 @@ var ItemSprite = new Phaser.Class({
         this.on('pointerover',this.handleOver.bind(this));
     },
 
-    setUp: function(id,data,callback,hideEffects){
+    setUp: function(id,data,callback){
         this.setTexture(data.atlas);
         this.setFrame(data.frame);
         this.setOrigin(0.5);
 
         this.itemID = id;
-        this.name = data.name;
-        this.desc = data.desc;
-        this.hideEffects = hideEffects;
-        this.effects = data.effects;
+        this.slot = data.slot;
         this.disabled = false;
         if(callback) {
             this.off('pointerup');
@@ -54,6 +51,12 @@ var ItemSprite = new Phaser.Class({
     },
 
     handleOver: function(){
-        if(this.showTooltip) UI.tooltip.updateInfo(this.name,this.desc,this.itemID);
+        if(this.showTooltip) {
+            if(this.itemID == -1){
+                UI.tooltip.updateInfo('slot', {slot: this.slot});
+            }else {
+                UI.tooltip.updateInfo('item', {id: this.itemID});
+            }
+        }
     }
 });

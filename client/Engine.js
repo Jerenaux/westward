@@ -34,6 +34,7 @@ var Engine = {
 
 var tilesetData = {};
 
+
 Engine.preload = function() {
     Engine.useTilemaps = false;
 
@@ -64,7 +65,8 @@ Engine.preload = function() {
 
     // Icons
     this.load.atlas('mapicons', 'assets/sprites/mapicons.png', 'assets/sprites/mapicons.json');
-    this.load.atlas('trayicons', 'assets/sprites/trayicons.png', 'assets/sprites/trayicons.json');
+    this.load.atlas('battleicons', 'assets/sprites/battleicons.png', 'assets/sprites/battleicons.json');
+    // this.load.atlas('trayicons', 'assets/sprites/trayicons.png', 'assets/sprites/trayicons.json');
     this.load.atlas('aok', 'assets/sprites/buildingsicons.png', 'assets/sprites/buildingsicons.json');
 
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
@@ -125,6 +127,9 @@ Engine.preload = function() {
 
     if(Client.tutorial) this.load.json('tutorials', 'assets/data/tutorials.json');
 };
+
+
+
 
 Engine.entityManager = {
     entities: [],
@@ -215,6 +220,11 @@ Engine.create = function(){
         Engine.animationsPools[key] = new Pool('sprite',key);
     });
     Engine.footprintsPool = new Pool('image','footsteps');
+
+    Engine.imagePool = new Pool('image','items');
+    Engine.imagePool2 = new Pool('image','items2');
+    // TODO why? - why not imageItemPool, imageItemPool2
+
     Engine.arrowsPool = new Pool('image','items');
     Engine.bombsPool = new Pool('image','items2');
     Engine.textPool = new Pool('text');
@@ -297,11 +307,6 @@ Engine.create = function(){
 
     Engine.created = true;
     Engine.configEngine();
-    /*if(Client.tutorial){
-        TutorialManager.boot(2);
-    }else{
-        Client.requestData();
-    }*/
     Client.requestData();
 };
 
@@ -421,6 +426,7 @@ Engine.createAnimations = function(){
     Engine.createAttackAnimation('player_attack_down','hero',182,187);
     Engine.createAttackAnimation('player_attack_left','hero',169,174);
     Engine.createAttackAnimation('player_attack_up','hero',156,161);
+
     Engine.createAttackAnimation('player_bow_right','hero',247,259);
     Engine.createAttackAnimation('player_bow_down','hero',234,246);
     Engine.createAttackAnimation('player_bow_left','hero',221,233);
@@ -436,6 +442,7 @@ Engine.createAnimations = function(){
     Engine.createAttackAnimation('enemy_attack_down','enemy',182,187);
     Engine.createAttackAnimation('enemy_attack_left','enemy',169,174);
     Engine.createAttackAnimation('enemy_attack_up','enemy',156,161);
+
     Engine.createAttackAnimation('enemy_bow_right','enemy',247,259);
     Engine.createAttackAnimation('enemy_bow_down','enemy',234,246);
     Engine.createAttackAnimation('enemy_bow_left','enemy',221,233);
@@ -446,6 +453,7 @@ Engine.createAnimations = function(){
     Engine.createWalkAnimation('wolf_move_left','wolves',12,14);
     Engine.createWalkAnimation('wolf_move_right','wolves',24,26);
     Engine.createWalkAnimation('wolf_move_up','wolves',36,38);
+
     Engine.createWalkAnimation('whitewolf_move_down','wolves',3,5);
     Engine.createWalkAnimation('whitewolf_move_left','wolves',15,17);
     Engine.createWalkAnimation('whitewolf_move_right','wolves',27,29);
@@ -523,7 +531,7 @@ Engine.manageDeath = function(){
 
 Engine.manageRespawn = function(){
     Engine.showMarker();
-    Engine.displayUI();
+    // Engine.displayUI();
     Engine.dead = false;
     Engine.updateAllOrientationPins();
 };
@@ -693,7 +701,7 @@ Engine.makeUI = function(){
 
     bug.on('pointerup',Engine.snap);
     bug.on('pointerover',function(){
-        UI.tooltip.updateInfo('Snap a pic of a bug');
+        UI.tooltip.updateInfo('free',{body:'Snap a pic of a bug'});
         UI.tooltip.display();
     });
     bug.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
@@ -752,7 +760,7 @@ Engine.makeUI = function(){
 
     Engine.makeBuildingTitle();
 
-    var statsPanel = new StatsPanel(665,335,330,145,'Stats');
+    var statsPanel = new StatsPanel(665,335,330,100,'Stats');
     statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help']);
 
     Engine.menus = {
@@ -780,7 +788,6 @@ Engine.makeUI = function(){
     Engine.addMenu(20,60,'shovel',Engine.menus.build,-100,60);
 
     Engine.makeBattleUI();
-    //Engine.displayUI();
 
     var chatw = 230;
     var chath = 50;
@@ -812,13 +819,13 @@ menuIcon = function(x,y,icon,menu,tox,toy){
     this.icon = UI.scene.add.sprite(x,y,'items2',icon).setScrollFactor(0).setDepth(2); // bubble down to bg
     this.bg.setDepth(4);
     this.icon.setDepth(5);
-    this.bg.on('pointerdown',function(){
+    this.bg.on('pointerup',function(){
         menu.toggle();
         if(Engine.bldRect) Engine.bldUnclick(true);
     });
     var bg_ = this.bg;
     this.bg.on('pointerover',function(){
-        UI.tooltip.updateInfo(menu.name);
+        UI.tooltip.updateInfo('free',{title:menu.name});
         UI.tooltip.display();
         bg_.setFrame('holder_over');
     });
@@ -929,9 +936,16 @@ Engine.handleBattleAnimation = function(data){
     },data.delay);
 };
 
-Engine.displayArrow = function(from,to,depth,duration,delay){ // All coordinates are pixels
-    var arrow = Engine.arrowsPool.getNext();
-    arrow.setFrame('arrow');
+Engine.animateRangeAmmo = function(frame, from, to, depth, duration, delay, imagePool){ // All coordinates are pixels
+
+    // TODO: refactor the whole pool thing and getNext only when you know that it's the right pool
+    let arrow = Engine.arrowsPool.getNext();
+
+    if(imagePool){
+        arrow = imagePool.getNext();
+    }
+
+    arrow.setFrame(frame);
     arrow.setPosition(from.x+16,from.y+16);
     arrow.setDepth(depth);
     arrow.setVisible(false);
@@ -1059,35 +1073,30 @@ Engine.makeBattleMenu = function(){
 
     var equipment = battle.addPanel('equipment',new BattleEquipmentPanel());
 
-    /*var items = battle.addPanel('items',new InventoryPanel(alignx,220,170,225,'Items'));
-    items.setInventory('player',4,true,BattleManager.processInventoryClick);
-    items.modifyFilter({
-        type: 'property',
-        property: 'useInBattle',
-        hard: true
-    });*/
-    // TODO: add belt
+    var belt = battle.addPanel('belt',new InventoryPanel(0,487,200,90,'Belt'));
+    belt.setInventory('belt',5,true,BattleManager.processInventoryClick);
 
     var timerw = 300;
     var timerh = 60;
     var timerx = (Engine.getGameConfig().width-timerw)/2;
     var timery = Engine.getGameConfig().height-timerh;
-    var timerPanel = battle.addPanel('timer',new BattleTimerPanel(timerx,timery,timerw,timerh));
-    timerPanel.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['battletimer_help']);
+    /*var timerPanel = battle.addPanel('timer',new BattleTimerPanel(timerx,timery,timerw,timerh));
+    timerPanel.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['battletimer_help']);*/
 
     var respawnh = 90;
     var respawny = 400;
     var respawn = battle.addPanel('respawn',new RespawnPanel(timerx,respawny,timerw,respawnh),true);
     respawn.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['respawn_help']);
 
-    // battle.addEvent('onUpdateInventory',items.updateInventory.bind(items));
+    battle.addEvent('onUpdateBelt',belt.updateInventory.bind(belt));
     battle.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
     battle.addEvent('onUpdateStats',equipment.updateStats.bind(equipment));
 
     battle.addEvent('onOpen',function(){
-        // items.updateInventory();
+        belt.updateInventory();
         equipment.updateEquipment();
         equipment.updateStats();
+        equipment.updateCapsules();
         Engine.hideCapsules();
     });
 
@@ -1443,28 +1452,26 @@ Engine.makeBuildMenu = function(){
     build.allowWalk = true;
     build.name = 'Build something'; // Allows to have a hover name without a menu title
     build.hook = 'build';
-    var w = 200;
-    var buildings = build.addPanel('build',new InventoryPanel(30,40,w,150,'Buildings'));
+    var w = 300;
+    var buildings = build.addPanel('build',new BuildPanel(30,40,w,450,'Build'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
-    buildings.setInventory('buildRecipes',5,false,Engine.bldClick);
-    buildings.setDataMap(Engine.buildingIconsData);
-    buildings.hideEffects = true;
     buildings.moveUp(2);
-    build.addEvent('onOpen',buildings.updateInventory.bind(buildings));
+    build.addEvent('onOpen',buildings.updateContent.bind(buildings));
+    build.addEvent('onUpdateBuildRecipes',buildings.updateContent.bind(buildings));
     return build;
 };
 
 Engine.bldClick = function(){
-    var bld = Engine.buildingsData[this.itemID];
+    var bld = Engine.buildingsData[this.bldID];
     Engine.currentMenu.hide();
 
     //Engine.hideMarker();
     Engine.bldRect = Engine.scene.add.rectangle(0,0, bld.base.width*32, bld.base.height*32, 0x00ee00).setAlpha(0.7);
-    Engine.bldRect.bldID = this.itemID;
+    Engine.bldRect.bldID = this.bldID;
     Engine.bldRect.locationConstrained = bld.locationConstrained;
     Engine.updateBldRect();
 
-    if(Client.tutorial) TutorialManager.triggerHook('bldselect:'+this.itemID);
+    if(Client.tutorial) TutorialManager.triggerHook('bldselect:'+this.bldID);
 };
 
 Engine.bldUnclick = function(shutdown){
@@ -1516,13 +1523,17 @@ Engine.makeInventory = function(statsPanel){
     inventory.log = true;
     inventory.setSound(Engine.scene.sound.add('inventory'));
 
-    var items = inventory.addPanel('items',new InventoryPanel(40,100,600,380,'Items'));
-    items.setInventory('player',15,true,Engine.inventoryClick);
+    var items = inventory.addPanel('items',new InventoryPanel(40,100,600,260,'Backpack'));
+    items.setInventory('player',15,true,Engine.backpackClick);
 
-    items.addCapsule('gold',100,-9,'999','gold');
+    items.addCapsule('gold',130,-9,'999','gold');
     items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help']);
 
     inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,120),true);
+
+    var belt = inventory.addPanel('belt',new InventoryPanel(40,360,600,90,'Belt'));
+    belt.setInventory('belt',15,true,Engine.beltClick);
+    belt.addButton(570, 8, 'blue','help',null,'',UI.textsData['belt_help']);
 
     var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
     equipment.addButton(300, 8, 'blue','help',null,'',UI.textsData['equipment_help']);
@@ -1536,6 +1547,7 @@ Engine.makeInventory = function(statsPanel){
 
     inventory.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
     inventory.addEvent('onUpdateInventory',items.updateInventory.bind(items));
+    inventory.addEvent('onUpdateBelt',belt.updateInventory.bind(belt));
     inventory.addEvent('onUpdateStats',statsPanel.updateStats.bind(statsPanel));
     inventory.addEvent('onUpdateGold',function(){
         items.updateCapsule('gold',Engine.player.gold);
@@ -1543,6 +1555,7 @@ Engine.makeInventory = function(statsPanel){
     inventory.addEvent('onOpen',function(){
         equipment.updateEquipment();
         items.updateInventory();
+        belt.updateInventory();
         statsPanel.updateStats();
         items.updateCapsule('gold',Engine.player.gold);
     });
@@ -1834,8 +1847,8 @@ Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
     if(Engine.player) Engine.updateMarker(position.tile);
     if(Engine.debug){
-        //document.getElementById('pxx').innerHTML = Math.round(position.pixel.x);
-        //document.getElementById('pxy').innerHTML = Math.round(position.pixel.y);
+        document.getElementById('pxx').innerHTML = Math.round(event.x);
+        document.getElementById('pxy').innerHTML = Math.round(event.y);
         document.getElementById('tx').innerHTML = position.tile.x;
         document.getElementById('ty').innerHTML = position.tile.y;
         document.getElementById('aoi').innerHTML = Utils.tileToAOI(position.tile);
@@ -1927,6 +1940,8 @@ Engine.removeElements = function(arr,table){
 
 Engine.updateMenus = function(category){
     var callbackMap = {
+        'belt': 'onUpdateBelt',
+        'bldrecipes': 'onUpdateBuildRecipes',
         'character': 'onUpdateCharacter',
         'citizen': 'onUpdateCitizen',
         'commit': 'onUpdateCommit',
@@ -2121,6 +2136,7 @@ Engine.updateGrid = function(){
 };
 
 Engine.getOccupiedCells = function(entity,hash){
+    if(entity.entityType == 'building') return [];
     var cells = [];
     for(var i = 0; i < entity.cellsWidth; i++){
         for(var j = 0; j < entity.cellsHeight; j++){
@@ -2175,23 +2191,51 @@ Engine.newbuildingClick = function(){
     Engine.currentMenu.panels['confirm'].setUp(this.itemID);
 };
 
-Engine.inventoryClick = function(){
-    if(BattleManager.inBattle) {
-        var sticky = Engine.itemsData[this.itemID].stickMouse;
-        UI.manageCursor(+sticky,'sticky');
-        if(sticky){
-            Engine.stickyCursor = true;
-            return false;
-        }else {
-            Client.sendUse(this.itemID);
-            return true;
-        }
-    }else{
-        // itemAction is the small panel appearing in the inventory displaying options such as use, throw...
-        Engine.currentMenu.panels['itemAction'].display();
-        Engine.currentMenu.panels['itemAction'].setUp(this.itemID);
-    }
+/**
+ * What to do when clicked an item in belt (vs. backpack).
+ * `this` is bound to the clicked `ItemSperite`.
+ */
+Engine.beltClick = function(){
+    Engine.displayItemActionPanel(this.itemID, 'belt');
 };
+
+/**
+ * What to do when clicked an item in backpack (vs. belt).
+ * `this` is bound to the clicked `ItemSperite`.
+ */
+Engine.backpackClick = function(){
+    Engine.displayItemActionPanel(this.itemID, 'backpack');
+};
+
+/**
+ * Display the itemAction window, i.e. the small panel appearing in the inventory 
+ * displaying options such as use, put in belt...
+ * @param {number} itemID - ID of the clicked item.
+ * @param {string} inventory - Whether the item was clicked in the backpack or in the belt.
+ */
+Engine.displayItemActionPanel = function(itemID, inventory){
+    Engine.currentMenu.panels['itemAction'].display();
+    Engine.currentMenu.panels['itemAction'].setUp(itemID, inventory);
+};
+
+
+// Engine.inventoryClick = function(){
+//     if(BattleManager.inBattle) {
+//         var sticky = Engine.itemsData[this.itemID].stickMouse;
+//         UI.manageCursor(+sticky,'sticky');
+//         if(sticky){
+//             Engine.stickyCursor = true;
+//             return false;
+//         }else {
+//             Client.sendUse(this.itemID,'belt');
+//             return true;
+//         }
+//     }else{
+//         // itemAction is the small panel appearing in the inventory displaying options such as use, throw...
+//         Engine.currentMenu.panels['itemAction'].display();
+//         Engine.currentMenu.panels['itemAction'].setUp(this.itemID);
+//     }
+// };
 
 Engine.unequipClick = function(){ // Sent when unequipping something
     Client.sendUnequip(this.slotName);

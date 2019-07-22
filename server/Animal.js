@@ -22,6 +22,7 @@ function Animal(x,y,type,instance){
     this.battleTeam = 'Animal';
     this.entityCategory = 'Animal';
     this.updateCategory = 'animals';
+    this.sentient = false; // used in battle to know if a battle should end
     this.battlePriority = 2;
     this.x = x;
     this.y = y;
@@ -31,6 +32,9 @@ function Animal(x,y,type,instance){
 
     this.cellsWidth = animalData.width || 1;
     this.cellsHeight = animalData.height || 1;
+    this.w = this.cellsWidth; // For quadtree
+    this.h = this.cellsHeight;
+
     this.xpReward = animalData.xp || 0;
     this.name = animalData.name;
     this.setAggressive();

@@ -15,6 +15,7 @@ function Civ(x,y,type){
     this.battleTeam = 'Civ';
     this.entityCategory = 'Civ';
     this.updateCategory = 'civs';
+    this.sentient = true; // used in battle to know if a battle should end
     this.x = x;
     this.y = y;
     this.type = type;
@@ -22,6 +23,9 @@ function Civ(x,y,type){
     var civData = GameServer.civsData[this.type];
     this.cellsWidth = civData.width || 1;
     this.cellsHeight = civData.height || 1;
+    this.w = this.cellsWidth; // For quadtree
+    this.h = this.cellsHeight;
+
     this.xpReward = civData.xp || 0;
     this.name = 'Enemy';
     this.setAggressive();

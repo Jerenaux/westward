@@ -99,7 +99,7 @@ app.filter('eventFilter',function(){
             case 'battle':
                 return prefix("Started a battle against "+event.category+" "+Data.animalsData[event.type].name,event.time,event.pname);
             case 'building':
-                return prefix("Entered building "+Data.buildingsData[event.building].name,event.time,event.pname);
+                return prefix("Entered "+event.owner+"'s "+Data.buildingsData[event.building].name,event.time,event.pname);
             case 'buy':
                 var verb = event.price ? 'Bought' : 'Took';
                 var txt = verb+" "+event.nb+ " "+Data.itemsData[event.item].name;

@@ -69,10 +69,6 @@
       "frame": {"x":683,"y":118,"w":25,"h":24}
     },
     {
-      "filename": "capsule-right",
-      "frame": {"x":683,"y":118,"w":25,"h":24}
-    },
-    {
       "filename": "slots-topleft",
       "frame": {"x":442,"y":292,"w":38,"h":38}
     },
@@ -291,6 +287,42 @@
     {
       "filename": "tooltip",
       "frame": {"x":213,"y":512,"w":39,"h":39}
+    },
+    {
+      "filename": "tooltip_tl",
+      "frame": {"x":213,"y":512,"w":11,"h":11}
+    },
+    {
+      "filename": "tooltip_top",
+      "frame": {"x":228,"y":512,"w":9,"h":11}
+    },
+    {
+      "filename": "tooltip_tr",
+      "frame": {"x":241,"y":512,"w":11,"h":11}
+    },
+    {
+      "filename": "tooltip_left",
+      "frame": {"x":213,"y":529,"w":11,"h":5}
+    },
+    {
+      "filename": "tooltip_middle",
+      "frame": {"x":231,"y":530,"w":5,"h":4}
+    },
+    {
+      "filename": "tooltip_right",
+      "frame": {"x":242,"y":529,"w":11,"h":5}
+    },
+    {
+      "filename": "tooltip_bl",
+      "frame": {"x":213,"y":540,"w":11,"h":11}
+    },
+    {
+      "filename": "tooltip_bottom",
+      "frame": {"x":230,"y":541,"w":5,"h":11}
+    },
+    {
+      "filename": "tooltip_br",
+      "frame": {"x":241,"y":540,"w":11,"h":11}
     },
     {
       "filename": "healthbar_left",
@@ -597,8 +629,20 @@
       "frame": {"x":527,"y":442,"w":11,"h":12}
     },
     {
+      "filename": "round_shield",
+      "frame": {"x":526,"y":475,"w":12,"h":12}
+    },
+    {
+      "filename": "2swords",
+      "frame": {"x":525,"y":491,"w":13,"h":12}
+    },
+    {
       "filename": "bullseye",
       "frame": {"x":506,"y":458,"w":14,"h":13}
+    },
+    {
+      "filename": "steps",
+      "frame": {"x":525,"y":508,"w":12,"h":12}
     },
     {
       "filename": "sword",

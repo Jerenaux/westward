@@ -28,6 +28,10 @@ GameObject.prototype.setOrUpdateAOI = function(){
     }
 };
 
+GameObject.prototype.isInVision = function(){
+    return GameServer.vision.has(this.aoi);
+};
+
 GameObject.prototype.setProperty = function(property,value){
     // Updates a property of the object and update the AOI's around it
     //console.log(this.id+' sets '+property+' to '+value);
@@ -94,15 +98,32 @@ GameObject.prototype.save = function(){
 };
 
 GameObject.prototype.onAddAtLocation = function(){
-    this.travelOccupiedCells('add');
+    // console.warn('putting',this.entityCategory,this.x,this.y,this.w,this.h,this.id);
+    // console.warn(GameServer.qt.get({x:0, y: 0, w: 1500, h: 1140}).length);
+    this.x = parseInt(this.x);
+    this.y = parseInt(this.y);
+    GameServer.qt.put(this);
+    // console.warn(GameServer.qt.get({x:0, y: 0, w: 1500, h: 1140}).length);
+   /* console.warn('Added ',this.getShortID());
+    var list = GameServer.qt.get({x:this.x-1, y: this.y-1, w: 3, h: 3});
+    list.forEach(function(e){
+        console.warn('ID:',e.getShortID());
+        return true;
+    });*/
 };
 
-GameObject.prototype.onRemoveAtLocation = function(){
-    this.travelOccupiedCells('delete');
+GameObject.prototype.onLocationChange = function(){
+    // It's ok if multiple objects have same ID, it'll
+    // only match and update those with same x,y,w,h
+    // console.warn('moving',this.entityCategory,this.x,this.y,this.w,this.h);
+    this.x = parseInt(this.x);
+    this.y = parseInt(this.y);
+    GameServer.qt.update(this,'id',{x:this.x,y:this.y});
 };
 
-GameObject.prototype.travelOccupiedCells = function(){
-    // empty shell for children who do not implement it
+GameObject.prototype.onRemoveFromLocation = function(){
+    // console.warn('removing',this.entityCategory,this.x,this.y,this.w,this.h);
+    GameServer.qt.remove(this);
 };
 
 GameObject.prototype.trim = function(trimmed){

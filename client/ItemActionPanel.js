@@ -10,33 +10,55 @@ function ItemActionPanel(x,y,width,height,title){
     this.warntext = this.addText(10, 105,'',Utils.colors.lightred,12);
     this.warntext.setOrigin(0,1);
     this.icon.showTooltip = false;
-    this.button = new BigButton(this.x+50,this.y+65,'Equip',this.sendUse.bind(this));
+    this.useButton = new BigButton(this.x+50,this.y+65,'Equip',this.sendUse.bind(this));
+    this.beltButton = new BigButton(this.x+140,this.y+65,'Put in belt',this.sendBelt.bind(this));
 }
 
 ItemActionPanel.prototype = Object.create(Panel.prototype);
 ItemActionPanel.prototype.constructor = ItemActionPanel;
 
-ItemActionPanel.prototype.setUp = function(itemID){
-    var data = Engine.itemsData[itemID];
+/**
+ * Sets up the itemAction window to reflect the item that was clicked.
+ * @param {number} itemID - ID of the clicked item.
+ * @param {string} inventory - Whether the item was clicked in the backpack or in the belt.
+ */
+ItemActionPanel.prototype.setUp = function(itemID, inventory){
+    const data = Engine.itemsData[itemID];
     this.itemID = itemID;
+    this.inventory = inventory;
     this.icon.setUp(itemID,data);
     this.text.setText(data.name);
     this.warntext.setVisible(false);
     if(data.effects || data.equipment){
-        this.button.setText(data.equipment ? 'Equip' : 'Use');
-        this.button.enable();
-        if(data.isAmmo && Engine.player.getEquipped(data.ammo) == -1){
-            this.button.disable();
-            this.warntext.setText('You need a '+Equipment.getData(data.ammo).name+' to be able to equip this!');
+        this.useButton.setText(data.equipment ? 'Equip' : 'Use');
+        this.useButton.enable();
+
+        let container_item_id = Engine.player.getEquippedItemID('range_container');
+        const container_item = Engine.itemsData[container_item_id];
+
+        ammoContainerMatch = (container_item && container_item.container_type === data.container_type);
+
+        if(data.isAmmo && !ammoContainerMatch){
+            this.useButton.disable();
+            // this.warntext.setText('You need a '+Equipment.getData(data.ammo).name+' to be able to equip this!');
+            this.warntext.setText('You need a '+ data.container_type_name +' to be able to equip this!');
             this.warntext.setVisible(true);
         }
+
+        this.beltButton.setText(inventory == 'belt' ? 'Off belt' : 'In belt');
     }else{
-        this.button.hide();
+        this.useButton.hide();
+        this.beltButton.hide();
     }
 };
 
 ItemActionPanel.prototype.sendUse = function(){
-    Client.sendUse(this.itemID);
+    Client.sendUse(this.itemID, this.inventory);
+    this.hide();
+};
+
+ItemActionPanel.prototype.sendBelt = function(){
+    Client.sendBelt(this.itemID, this.inventory);
     this.hide();
 };
 
@@ -44,7 +66,8 @@ ItemActionPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
     this.icon.display();
     this.text.setVisible(true);
-    this.button.display();
+    this.useButton.display();
+    this.beltButton.display();
 };
 
 ItemActionPanel.prototype.hide = function(){
@@ -52,5 +75,6 @@ ItemActionPanel.prototype.hide = function(){
     this.icon.hide();
     this.text.setVisible(false);
     this.warntext.setVisible(false);
-    this.button.hide();
+    this.useButton.hide();
+    this.beltButton.hide();
 };

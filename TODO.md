@@ -1,13 +1,17 @@
-On deploy:
-- Test gs.handleGold()
+## To test:
+- Test settlement selection (with value of 0)
+- Test ammo container type match
+- Test that the world is populated with items, animals, etc.
+- Test handleBelt
+- Test ammo decrease in inventory when equipping ammo
 - Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
+- Test Utils.nextTo with all combinations of building/animal vs building/animal, next to each other and not
+- Test Battle.computeTof()
 - Find a way to test itemsRespaw and other time-related aspects
-- Test tutorial (reset start)
-- Test new player
-- Run all tests
+- Test tutorial manually (reset start)
+- Test new player manually
 => After bug, systematically create test!
-
 
 Admin
 Analytics
@@ -18,42 +22,48 @@ Design document
 Testing
 World Building
 
-Misc:
+## Priority TODO
+- Update Westward main page
 - Adapt animations and delays for firearms
-- findcell in battle doesn't take path to get there into accoung (may be within radius but require to go around an obstacle!)
 - Change battle priority when player joins fight
 - In battle against NPC, have players have turns much more often
 - Make tiles above battle tiles transparent; same with buildings in fight?
 - Introduce new wood ingredient obtained from timber, crafting wood, made in bulk (but then tune down timber prod)
 -> For shield, guns...?
-- Spawning in battle area, moving: doesn't stop movement
 - Stop walk when opening menu
-- Camera bounds (test with northernmost camp)
 - Poll at regular interval the sprite below mouse
 - Better notifs cascading
-- Positions not saved often enough?
 - Don't disable walk with build panel
 - New movement system
-- Prevent building at player location\
+- Prevent building at player location
 - Reduce amount of orientation pins
 - Display death and conflict markers
 - add esc shortcut
 - "new" marker
+- no aggro? (works with bears but not with wolves and/or after refresh)
 - Events formatting
-- Add other plants
-- Aggro issue
 - Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
-- Fix wrong building surfaces (reproducible in tutorial part 2)
 - Make size of tutorial boxes adapt to text
+- Make towers throw stones when no better ammo
+- Belt & backpack capacity 
+- Add "resource markers" for wildlife (optimize?)
+- No decimal in defaut prices (happens in one lumber camp)
+- Display building life in tooltips
+- Add tooltip to UI capsules (+ gold capsules in shops & inventory)
+- Display item amount owned in tooltip
+- Display threat level in animal tooltip
+- fix open menu while respawn bug
+- Display nb owned buildings in build menu
+- Animal markers, death markers
 
-- Infra: 15' admin + incorporate spawn zones in worldMaker
-- Move to Phaser 18
-- Ask for free Creature license
-- Find artist
+  
+
+Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
 https://medium.com/@kestrelm/2d-skeletal-animation-in-phaser-3-tutorial-3ed468fb6bd0
 
-##Tutorial:##
+
+##Tutorial:
 First few words about permanent sandbox, collaborative survival, etc.
 
 Part 1: buildings
@@ -82,29 +92,18 @@ Part 3: enemy civ
 
 Closing comments about pros and cons of starting in a settled/wild region, ultimate goal of surviving by pushing enemy civ back,
 
+## Criteria before going public:
+- Full metal and gunpowder industry
+- Basic abilitiy system
+- Missions menu
+-> Daily quests
+-> Try to come up with something about enemy civ (# enemy camps ...)
+-> Leaderboards
+
 
 ##################################################
 ##################################################
 ##################################################
-
-* Battle system
-* Civics
-* Character panel
-* Craftsmen gameplay
-* Enemy civ
-* Explorer gameplay
-* Merchant gameplay
-* Packaging
-* Settlement defense
-* Settlement economy
-* Soldier gameplay
-Design document
-World building
-Free
-
-#####################################################
-#####################################################
-#####################################################
 
 Admin
 Analytics
@@ -150,7 +149,8 @@ Secure
 
 Analytics:
 ---------
-- Log: /
+- Log: belt
+- New admin: fix dates format, date column width, reverse sort, update event descs as in current admin
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions
@@ -468,7 +468,8 @@ Deployment:
 
 Design document:
 ---------------
-- Re-read regularly (last: busy with "abilities")
+- Re-read regularly
+- Make big visual tool for items/plants/animals/crafting (https://visjs.org/network_examples.html)
 - Make Excel tables (crafting, inventory, bestiary, abilities ...)
 - Make feature matrix
 - Consequence graphs
@@ -530,6 +531,10 @@ Testing:
 
 World building:
 --------------
+Eventually, delete "spawnzones.json"
+Make items belong to spawnzones, for respawn
+Make respawn depend on proximity of cluster to civilization (use quad tree?)
+Set up proximity between related item and animal spawn zones
 Building editor (set shapes etc.)
 Manage spawn zones in editor
 Flip trees horizontally to introduce variety

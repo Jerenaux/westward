@@ -17,12 +17,12 @@ function InventoryPanel(x,y,width,height,title,invisible){
 InventoryPanel.prototype = Object.create(Panel.prototype);
 InventoryPanel.prototype.constructor = InventoryPanel;
 
-InventoryPanel.prototype.setDataMap = function(map){
-    this.dataMap = map;
-};
+// InventoryPanel.prototype.setDataMap = function(map){
+//     this.dataMap = map;
+// };
 
 InventoryPanel.prototype.createZone = function(){
-    var zone = UI.scene.add.zone(0,0,0,0);
+    const zone = UI.scene.add.zone(0, 0, 0, 0);
     zone.setDepth(10);
     zone.setScrollFactor(0);
     zone.on('pointerover',UI.tooltip.display.bind(UI.tooltip));
@@ -44,7 +44,7 @@ InventoryPanel.prototype.setInventory = function(inventory,maxwidth,showNumbers,
 
 InventoryPanel.prototype.getNextSlot = function(){
     if(this.slotsCounter >= this.slots.length){
-        var s = UI.scene.add.sprite(0,0,'UI','slots-middle');
+        const s = UI.scene.add.sprite(0, 0, 'UI', 'slots-middle');
         s.setDisplayOrigin(0,0);
         s.setScrollFactor(0);
         s.setDepth(1);
@@ -56,12 +56,13 @@ InventoryPanel.prototype.getNextSlot = function(){
 };
 
 InventoryPanel.prototype.addSlots = function(){
-    var padx = Math.floor((this.width - this.config.maxwidth*36)/2);
-    var pady = 30;
-    for(var i = 0; i < this.getInventory().maxSize; i++){
-        var slot = this.getNextSlot();
-        var row = Math.floor(i/this.config.maxwidth);
-        var col = i%this.config.maxwidth;
+    const padx = Math.floor((this.width - this.config.maxwidth * 36) / 2);
+    if(padx < 0) console.warn('Width in slots bigger than width in px');
+    const pady = 30;
+    for(let i = 0; i < this.getInventory().maxSize; i++){
+        const slot = this.getNextSlot();
+        const row = Math.floor(i / this.config.maxwidth);
+        const col = i % this.config.maxwidth;
         this.positionSlot(slot,row,col,padx,pady);
         this.setSlotFrame(slot,row,col,i);
         slot.setVisible(false);
@@ -70,34 +71,35 @@ InventoryPanel.prototype.addSlots = function(){
 };
 
 InventoryPanel.prototype.positionSlot = function(slot,row,col,paddingX,paddingY){
-    var slotSize = 36;
-    var offsetx = (col > 0 ? 2 : 0);
-    var offsety = (row > 0 ? 2 : 0);
-    var x = paddingX+offsetx+(col*slotSize);
-    var y = paddingY+offsety+(row*slotSize);
+    const slotSize = 36;
+    const offsetx = (col > 0 ? 2 : 0);
+    const offsety = (row > 0 ? 2 : 0);
+    const x = paddingX + offsetx + (col * slotSize);
+    const y = paddingY + offsety + (row * slotSize);
+    // console.warn(this.name,this.x,paddingX,row,col,x);
     slot.setPosition(this.x+x,this.y+y);
 };
 
 InventoryPanel.prototype.setSlotFrame = function(slot,row,col,i){
-    var initialName = 'slots-';
-    var frame = initialName;
+    const initialName = 'slots-';
+    let frame = initialName;
     if(i < this.config.maxwidth) frame += 'top';
     if(i + this.config.maxwidth >= this.getInventory().maxSize) frame += 'bottom';
-    if(col == 0) frame += 'left';
-    if(col == this.config.maxwidth-1 || i == this.getInventory().maxSize-1) frame += 'right';
-    if(frame == initialName) frame += 'middle';
+    if(col === 0) frame += 'left';
+    if(col === this.config.maxwidth-1 || i === this.getInventory().maxSize-1) frame += 'right';
+    if(frame === initialName) frame += 'middle';
     slot.setFrame(frame);
-    if(col == 0) slot.fringeSlot = true;
+    if(col === 0) slot.fringeSlot = true;
 };
 
 InventoryPanel.prototype.getNextSprite = function(){
     if(this.spritesCounter >= this.sprites.length){
-        var textconfig = { font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 };
-        var s = {
+        const textconfig = {font: '14px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3};
+        const s = {
             item: new ItemSprite(),
-            text: UI.scene.add.text(0, 0, '1',textconfig)
+            text: UI.scene.add.text(0, 0, '1', textconfig)
         };
-        var slot = this.slots[this.spritesCounter];
+        const slot = this.slots[this.spritesCounter];
         s.text.setOrigin(1,0);
         s.text.setScrollFactor(0);
         s.text.setVisible(false);
@@ -122,11 +124,13 @@ InventoryPanel.prototype.hasSoftFilter = function(){
 };
 
 InventoryPanel.prototype.getInventory = function(){
-    if(this.inventory == 'player'){
+    if(this.inventory === 'player') {
         return Engine.player.inventory;
-    }else if(this.inventory == 'building'){
+    }else if(this.inventory === 'belt'){
+        return Engine.player.belt;
+    }else if(this.inventory === 'building'){
         return (Engine.currentBuiling ? Engine.currentBuiling.inventory : new Inventory(5));
-    }else if(this.inventory == 'buildRecipes'){
+    }else if(this.inventory === 'buildRecipes'){
         return Engine.player.buildRecipes;
     }else{
         console.warn('Unidentified inventory');
@@ -135,7 +139,7 @@ InventoryPanel.prototype.getInventory = function(){
 };
 
 InventoryPanel.prototype.listItems = function(){
-    var items = this.getInventory().toList(true);
+    const items = this.getInventory().toList(true);
     items.sort(function(a,b){
         if(Engine.itemsData[a[0]].name < Engine.itemsData[b[0]].name) return -1;
         return 1;
@@ -144,20 +148,22 @@ InventoryPanel.prototype.listItems = function(){
 };
 
 InventoryPanel.prototype.displayInventory = function(){
+    // console.warn('displaying ',this.name);
     this.slots.forEach(function(s){
         s.setVisible(true);
     });
-    var nbDisplayed = 0;
+    let nbDisplayed = 0;
     this.listItems().forEach(function(itm){
-        var item = itm[0];
-        var amount = itm[1];
-        if(amount == 0) return;
+        // console.warn(itm);
+        const item = itm[0];
+        const amount = itm[1];
+        if(amount === 0) return;
         if(this.hasHardFilter()){
             if(!this.applyFilter(item)) return;
         }
-        var sprite = this.getNextSprite();
-        sprite.item.setUp(item,this.dataMap[item],this.itemCallback,this.hideEffects);
-        var slot = this.slots[nbDisplayed];
+        const sprite = this.getNextSprite();
+        sprite.item.setUp(item,this.dataMap[item],this.itemCallback);
+        const slot = this.slots[nbDisplayed];
         if(slot.fringeSlot){
             sprite.item.setOrigin(sprite.item.originX-0.1,sprite.item.originY);
             if(sprite.item.frame.width > 32) sprite.item.setCrop(0,0,32,32);
@@ -170,8 +176,8 @@ InventoryPanel.prototype.displayInventory = function(){
         if(this.config.showNumbers){
             sprite.text.setText(amount); // "\uD83D\uDD12"
             if(this.config.compareTo){
-                var ref = this.config.compareTo.getNb(item);
-                var fill = (amount > ref ? '#ee1111' : '#ffffff');
+                const ref = this.config.compareTo.getNb(item);
+                const fill = (amount > ref ? '#ee1111' : '#ffffff');
                 sprite.text.setFill(fill);
             }
             sprite.text.setVisible(true);
@@ -183,15 +189,16 @@ InventoryPanel.prototype.displayInventory = function(){
 };
 
 InventoryPanel.prototype.setUpZone = function(nbDisplayed){
-    var slotSize = 36;
-    var zoneX = this.slots[0].x;
-    var zoneY = this.slots[0].y;
-    var zoneW = Math.min(nbDisplayed,this.config.maxwidth)*slotSize + 4;
-    var zoneH = Math.ceil(nbDisplayed/this.config.maxwidth)*slotSize + 4;
-    var shape = [0,0,zoneW,0];
+    const slotSize = 36;
+    let zoneX = this.slots[0].x;
+    let zoneY = this.slots[0].y;
+    let zoneW = Math.min(nbDisplayed, this.config.maxwidth) * slotSize + 4;
+    let zoneH = Math.ceil(nbDisplayed / this.config.maxwidth) * slotSize + 4;
+
+    const shape = [0, 0, zoneW, 0];
     // Diff = how many empty slots in the last inventory row
-    var diff = this.config.maxwidth - Math.ceil(nbDisplayed%this.config.maxwidth);
-    if(diff == this.config.maxwidth) diff = 0;
+    let diff = this.config.maxwidth - Math.ceil(nbDisplayed % this.config.maxwidth);
+    if(diff === this.config.maxwidth) diff = 0;
     if(diff > 0 && nbDisplayed > this.config.maxwidth){
         shape.push(zoneW);
         shape.push(zoneH-slotSize);
@@ -207,18 +214,15 @@ InventoryPanel.prototype.setUpZone = function(nbDisplayed){
     }
     shape.push(0);
     shape.push(zoneH);
-    var polygon = new Phaser.Geom.Polygon(shape);
+    const polygon = new Phaser.Geom.Polygon(shape);
 
     this.zone.setVisible(true);
+    this.zone.setOrigin(0);
     this.zone.setPosition(zoneX,zoneY);
     this.zone.setSize(zoneW,zoneH,true);
     this.zone.setInteractive(polygon,Phaser.Geom.Polygon.Contains);
     this.zone.input.hitArea = polygon;
 };
-
-/*InventoryPanel.prototype.modifyInventory = function(inv){
-    this.inventory = inv;
-};*/
 
 InventoryPanel.prototype.setFilter = function(filter){
     this.config.filter = true;
@@ -230,13 +234,13 @@ InventoryPanel.prototype.setFilter = function(filter){
 };
 
 InventoryPanel.prototype.applyFilter = function(item){
-    if(this.config.filterType == 'prices'){
+    if(this.config.filterType === 'prices'){
         if(Engine.currentBuiling.isOwned()) return true;
         var filter = this.config.filterItems;
         if(!filter.hasOwnProperty(item)) return false;
         if(!(parseInt(filter[item][this.config.filterKey]) > 0)) return false;
         return true;
-    }else if(this.config.filterType == 'property'){ // e.g. for items usable in battle
+    }else if(this.config.filterType === 'property'){ // e.g. for items usable in battle
         var filter = this.config.filterProperty;
         return !!(Engine.itemsData[item][filter]);
     }
@@ -254,8 +258,8 @@ InventoryPanel.prototype.modifyReferenceInventory = function(inventory){
 InventoryPanel.prototype.updateInventory = function(){
     if(!this.displayed) return;
     this.resetCounters();
-    for(var i = 0; i < this.nbDisplayed; i++){
-        var s = this.sprites[i];
+    for(let i = 0; i < this.nbDisplayed; i++){
+        const s = this.sprites[i];
         s.item.setVisible(false);
         s.text.setVisible(false);
     }

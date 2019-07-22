@@ -1,8 +1,9 @@
 {
   "currency": "coin",
 
-  "inventory_help": "This is your inventory. Click on an item to see what you can do with it. Some pieces of equipment can increase your inventory size. The capsule at the top of the panel is your amount of money.",
+  "inventory_help": "This is your backpack. Click on an item to see what you can do with it. Some pieces of equipment can increase your inventory size. The capsule at the top of the panel is your amount of money.",
   "equipment_help": "This is your equipment. Click on a piece of equipment to unequip it. You cannot equip a ranged weapon and a melee weapon at the same time. You must equip an ammo container (e.g. quiver) before equipping the corresponding ammunition (e.g. arrows).",
+  "belt_help": "This is your belt. You can only use or equip an item during a battle if it's in your belt. Click on an item in your backpack if you want to put it in your belt, or vice versa.",
   "self_map_help": "Click on the map to center it elsewhere. The red cross is your current position.",
   "stats_help": "These are you character stats. Their values influence the success and impact of various actions. Most of them can be increased by specific pieces of equipment.",
   "recipes_help": "Click on an item recipe to start crafting it. The recipes that appear in the list are the recipes that are either known by you or by the owner of the workshop. For each recipe, the price in the top-right corner represents the fee you need to pay to craft the item. The numbers in the bottom-right corner indicate how many of the required ingredients you own (if they are green, you have all you need!)",

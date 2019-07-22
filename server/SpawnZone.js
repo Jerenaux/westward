@@ -6,109 +6,47 @@ var World = require('../shared/World.js').World;
 var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 
-function SpawnZone(aois,animalsData,itemsData){
-    this.aois = aois;
-    this.animalsData = {};
-    this.itemsData = {};
-    this.population = {};
-    this.items = {};
+function SpawnZone(x,y,animal,nb){
+    this.x = x;
+    this.y = y;
+    this.aoi = Utils.tileToAOI(this.x,this.y);
+    this.animal = animal;
+    this.nb = nb;
+    this.max = this.nb*2;
+    this.population = 0;
+    this.lastUpdate = 0; // How many turns ago did an update take place
 
-    if(animalsData){
-        animalsData.forEach(function(data){
-            var animalID = data[0];
-            var min = data[1];
-            var rate = data[2];
-            this.population[animalID] = 0;
-            this.animalsData[animalID] = {
-                rate: rate,
-                min: min
-            }
-        },this);
+    for(var i = 0; i < this.nb; i++){
+        this.spawn();
     }
-
-    /*if(itemsData){
-        itemsData.forEach(function(data){
-            var itemID = data[0];
-            var min = data[1];
-            var rate = data[2];
-            this.items[itemID] = 0;
-            this.itemsData[itemID] = {
-                rate: rate,
-                min: min
-            }
-        },this);
-    }*/
 }
 
 SpawnZone.prototype.update = function(){
     if(!GameServer.isTimeToUpdate('spawnZones')) return;
+    if(GameServer.vision.has(this.aoi)) return;
+    if(this.population == this.max) return;
 
-    var freeAOIs = this.aois.map(function(aoi){
-        return GameServer.AOIs[aoi];
-    }).filter(function(AOI){
-        return !GameServer.vision.has(AOI.id);
-    });
-
-    this.computeDelta(this.animalsData,this.population,'animal',freeAOIs);
-    // this.computeDelta(this.itemsData,this.items,'item',freeAOIs);
-};
-
-SpawnZone.prototype.computeDelta = function(map,countMap,type,freeAOIs){
-    for(var key in map){
-        //console.log(this.population[animal] ,'vs', this.animalsData[animal].min);
-        var current = countMap[key];
-        var min = map[key].min;
-        if(current < min){
-            var nb = Math.min(map[key].rate,min-current);
-            this.spawn(freeAOIs,type,key,nb);
-        }
+    var animalData = GameServer.animalsData[this.animal];
+    // How many turns must elapse before a spawn event
+    var nextUpdate = (this.max - this.population)*animalData.spawnRate;
+    if(nextUpdate <= this.lastUpdate){
+        this.spawn(true);
+        this.lastUpdate = 0;
+    }else{
+        this.lastUpdate++;
     }
 };
 
-SpawnZone.prototype.spawn = function(AOIs,type,id,nb){
-    var data = (type == 'animal' ? GameServer.animalsData[id] : GameServer.itemsData[id]);
-    //console.log('Spawning',nb,data.name);
-
-    var AOI = Utils.randomElement(AOIs);
-    if(AOI === undefined){
-        console.warn('undefined AOI in SpawZone.spawn()');
-        return;
-    }
-    var cx = Utils.randomInt(AOI.x,AOI.x+World.chunkWidth);
-    var cy = Utils.randomInt(AOI.y,AOI.y+World.chunkHeight);
-
-    for(var i = 0, j = 0; i < nb; i++, j++){
-        if(j == 20) break;
-
-        // TODO: put range in conf file
-        var range = 2;
-        var x = Utils.randomInt(cx-range,cx+range);
-        var y = Utils.randomInt(cy-range,cy+range);
-        if(GameServer.checkCollision(x,y)) {
-            i--;
-            continue;
-        }
-        //console.log(x,y);
-        //console.log('spawining in ',AOI.id);
-
-        if(type == 'animal') {
-            var animal = GameServer.addAnimal(x, y, id);
-            animal.setSpawnZone(this);
-            this.population[id]++;
-        }else if(type == 'item'){
-            var item = GameServer.addItem(x, y, id);
-            item.setSpawnZone(this);
-            this.items[id]++;
-        }
-    }
+SpawnZone.prototype.spawn = function(print){
+    if(print) console.log('Spawning 1 ',GameServer.animalsData[this.animal].name,'at',this.x,this.y);
+    var animal = GameServer.addAnimal(this.x, this.y, this.animal);
+    animal.setSpawnZone(this);
+    this.population++;
 };
 
-SpawnZone.prototype.decrement = function(category,id){
-    if(category == 'animal'){
-        this.population[id]--;
-    }else if(category == 'item') {
-        this.items[id]--;
-    }
+SpawnZone.prototype.decrement = function(){
+    console.warn('Population:',this.population);
+    this.population--;
 };
 
 module.exports.SpawnZone = SpawnZone;

@@ -73,8 +73,11 @@ Client.checkForNewPlayer = function(){
 };
 
 Client.isNewPlayer = function(){
-    if(Client.gameConfig.boot.forceNewPlayer) return true;
-    return Client.newPlayer;
+    if(Client.gameConfig) {
+        if(Client.gameConfig.boot.forceNewPlayer) return true;
+        return Client.newPlayer;
+    }
+    console.error('Missing Client.gameConfig');
 };
 
 Client.getPlayerID = function(){
@@ -186,9 +189,14 @@ Client.sendStock  = function(item,nb,building,action){
     Client.socket.emit('stock',{item:item,nb:nb,building:building,action:action});
 };
 
-Client.sendUse = function(id){
-    Client.socket.emit('use',{item:id});
+Client.sendUse = function(id, inventory){
+    Client.socket.emit('use',{item:id, inventory:inventory});
 };
+
+Client.sendBelt = function(id, inventory){
+    Client.socket.emit('belt',{item:id, inventory:inventory});
+};
+
 
 Client.sendUnequip = function(slot,subslot){
     Client.socket.emit('unequip',{slot:slot,subslot:subslot});

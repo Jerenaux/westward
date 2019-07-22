@@ -13,7 +13,7 @@ function ItemSlot(x,y,width,height){
     this.zone.setOrigin(0);
     this.zone.on('pointerover',function(){
         if(this.checkForPanelOnTop()) return;
-        UI.tooltip.updateInfo(this.name.text,this.desc,this.itemID);
+        UI.tooltip.updateInfo('item',{id:this.itemID});
         UI.tooltip.display();
         UI.setCursor('item');
     }.bind(this));
@@ -116,8 +116,8 @@ ItemSlot.prototype.setUp = function(action,item){
             if(effect > 0) stattext = '+'+stattext;
             this.effect.setText(stattext);
 
-            var equipped = Engine.player.getEquipped(itemData.equipment);
-            if(equipped > 0) {
+            var equipped = Engine.player.getEquippedItemID(itemData.equipment);
+            if(equipped > -1 && Engine.itemsData[equipped].effects) {
                 var current = Engine.itemsData[equipped].effects[stat];
                 if(current > effect){
                     this.effect.setFill(Utils.colors.red);

@@ -3,20 +3,21 @@
  */
 var GameObject = require('./GameObject.js').GameObject;
 var GameServer = require('./GameServer.js').GameServer;
+var FightingEntity = require('./FightingEntity.js').FightingEntity;
 var Formulas = require('../shared/Formulas.js').Formulas;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var Inventory = require('../shared/Inventory.js').Inventory;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
-var StatsContainer = require('../shared/Stats.js').StatsContainer;
 var Models = require('../shared/models.js');
 
 function Building(data){
-    GameObject.call(this);
+    FightingEntity.call(this);
     this.isBuilding = true;
     this.battleTeam = 'Player';
     this.entityCategory = 'Building';
     this.updateCategory = 'buildings';
+    this.sentient = false; // used in battle to know if a battle should end
     this.schemaModel = GameServer.BuildingModel;
     this.battlePriority = 3;
 
@@ -37,8 +38,12 @@ function Building(data){
     if(this.type === undefined) console.warn('Undefined building type');
     var buildingData = GameServer.buildingsData[this.type];
 
+    this.aggro = buildingData.aggro;
     this.cellsWidth = buildingData.base.width;
     this.cellsHeight = buildingData.base.height;
+    this.w = this.cellsWidth; // For quadtree
+    this.h = this.cellsHeight;
+
     this.coll = {
         x: this.x,
         y: this.y - this.cellsHeight,
@@ -99,10 +104,16 @@ function Building(data){
     this.stats['def'].setBaseValue(20);
     this.stats['acc'].setBaseValue(1000);
     this.stats['dmg'].setBaseValue(buildingData.dmg || 0);
-    this.productivity = 100;
+
+    this.aggroMatrix = {
+        'Player': false,
+        'Animal': false,
+        'Civ': true,
+        'PlayerBuilding': false
+    };
 }
 
-Building.prototype = Object.create(GameObject.prototype);
+Building.prototype = Object.create(FightingEntity.prototype);
 Building.prototype.constructor = Building;
 
 Building.prototype.embed = function(){
@@ -120,6 +131,32 @@ Building.prototype.isInstanced = function(){
 Building.prototype.getShortID = function(){
     return 'B'+this.id;
 };
+
+Building.prototype.isAggressive = function(){
+    return this.aggro;
+};
+
+/*
+Building.prototype.checkForAggro = function(){
+    if(!this.isInVision()) return;
+    if(!this.isAggressive() || this.isInFight() || !this.isAvailableForFight()) return;
+    // console.warn('Tower checking for aggro');
+
+    var r = GameServer.battleParameters.aggroRange;
+    // implies Chebyshev distance
+    // console.warn(Math.floor(this.x-r/2),Math.floor(this.y-r/2),r,r);
+    var neighbors = GameServer.getEntitiesAt(Math.floor(this.x-r/2),Math.floor(this.y-r/2),r,r);
+    for(var i = 0; i < neighbors.length; i++){
+        var entity = neighbors[i];
+        if(this.getShortID() == entity.getShortID()) continue;
+        if(!this.aggroAgainst(entity)) continue;
+        if(!entity.isAvailableForFight()) continue;
+        if(entity.instance != this.instance) continue;
+        if(entity.isInFight()) continue;
+        GameServer.handleBattle(this, entity);
+        break;
+    }
+};*/
 
 Building.prototype.refreshListing = function(){
     this.buildings = this.settlement.getBuildings();
@@ -382,35 +419,17 @@ Building.prototype.setCollisions = function(flag){
     PFUtils.buildingCollisions(this.x,this.y-this.cellsHeight,this.cellsWidth,this.cellsHeight,GameServer.collisions,flag);
 };
 
-
-Building.prototype.travelOccupiedCells = function(action){
-    for(var x = -1; x <= this.cellsWidth; x++){
-        for(var y = 0; y <= this.cellsHeight+1; y++) {
-            var realx = this.x + this.coll.x + x;
-            var realy = this.y + this.coll.y + y;
-            GameServer.positions[action](realx,realy,this);
-        }
-    }
-};
-
 Building.prototype.getBattleAreaAround = function(cells){
     cells = cells || new SpaceMap();
 
     for(var x = -1; x <= this.cellsWidth; x++){
         for(var y = -1; y <= this.cellsHeight+1; y++) {
-            var realx = this.x + this.coll.x + x;
-            var realy = this.y + this.coll.y + y;
+            var realx = this.coll.x + x;
+            var realy = this.coll.y + y;
             if(!GameServer.checkCollision(realx,realy)) cells.add(realx,realy);
         }
     }
     return cells;
-};
-
-Building.prototype.getCenter = function(){
-    return {
-        x: this.x + (this.entrance ? this.entrance.x : 0),
-        y: this.y + (this.entrance ? this.entrance.y : 0)
-    };
 };
 
 Building.prototype.canFight = function(){return true;};
@@ -423,14 +442,6 @@ Building.prototype.isAvailableForFight = function() {
     return (!this.isDestroyed() && !this.isInFight() && GameServer.buildingParameters.canfight);
 };
 
-Building.prototype.isInFight = function(){
-    return this.inFight;
-};
-
-Building.prototype.endFight = function(){
-    this.inFight = false;
-};
-
 Building.prototype.canRange = function(){
     return true;
 };
@@ -441,33 +452,10 @@ Building.prototype.decreaseAmmo = function(){
 };
 
 Building.prototype.decideBattleAction = function(){
+    if(!this.battle) return;
     if(!this.target || !this.target.isInFight()) this.target = this.selectTarget();
     var data = (this.target ? this.attackTarget() : {action: 'pass'});
     this.battle.processAction(this,data);
-};
-
-Building.prototype.isSameTeam = function(f){
-    return this.battleTeam == f.battleTeam;
-};
-
-Building.prototype.selectTarget = function(){
-    var fighters = this.battle.fighters.slice();
-    if(fighters.length == 0) return null;
-    var target = null;
-    for(var i = 1; i < fighters.length; i++){
-        var f = fighters[i];
-        if(this.isSameTeam(f)) continue;
-        if(!target){
-            target = f;
-            continue;
-        }
-        if(target.battlePriority == f.battlePriority){
-            if(f.getHealth() < target.getHealth()) target = f;
-        }else{
-            if(f.battlePriority < target.battlePriority) target = f;
-        }
-    }
-    return target;
 };
 
 Building.prototype.attackTarget = function(){
@@ -475,25 +463,6 @@ Building.prototype.attackTarget = function(){
         action: 'attack',
         id: this.target.getShortID()
     };
-};
-
-// ### Stats ###
-
-Building.prototype.applyDamage = function(dmg){
-    this.getStat('hp').increment(dmg);
-    // TODO: broadcast
-};
-
-Building.prototype.getHealth = function(){
-    return this.getStat('hp').getValue();
-};
-
-Building.prototype.getStat = function(key){
-    return this.stats[key];
-};
-
-Building.prototype.getStats = function(){
-    return Object.keys(this.stats);
 };
 
 Building.prototype.die = function(){
@@ -506,17 +475,48 @@ Building.prototype.isDead = function(){
 
 Building.prototype.getRect = function(){
     return {
-        x: this.x + this.xoffset,
+        x: this.x,
         y: this.y - this.cellsHeight,
         w: this.cellsWidth,
         h: this.cellsHeight
     }
 };
 
+/*Building.prototype.getCenter = function(noRound){
+    if(noRound){
+        return {
+            x: this.x + this.cellsWidth / 2,
+            y: this.y - this.cellsHeight / 2
+        };
+    }else {
+        return {
+            x: Math.floor(this.x + this.cellsWidth / 2),
+            y: Math.floor(this.y - this.cellsHeight / 2)
+        };
+    }
+};*/
+
+// Where to target projectiles at
+Building.prototype.getTargetCenter = function(){
+    return {
+        x: this.x + this.cellsWidth / 2,
+        y: this.y - this.cellsHeight / 2
+    };
+};
+
+// Central tile for pathfinding and such
+Building.prototype.getLocationCenter = function(){
+    return {
+        x: Math.floor(this.x + this.cellsWidth / 2),
+        y: this.y // Return a cell in front, so no collision
+    };
+};
+
+// Returns shootingPoint in tiles
 Building.prototype.getShootingPoint = function(){
     return {
         x: this.x + Math.round(this.shootFrom.x/32),
-        y: this.y - (this.height-Math.round(this.shootFrom.y/32))
+        y: this.y + Math.round(this.shootFrom.y/32)
     };
 };
 

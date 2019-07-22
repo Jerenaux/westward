@@ -10,8 +10,13 @@ var mongoose = require('mongoose');
 
 var mapsDir = path.join(__dirname,'..','maps');
 var gs = require('../server/GameServer.js').GameServer;
+var Equipment = require('../shared/Equipment.js').Equipment;
 
-var PORT = 8081; //TODO: read from conf file?
+/*
+* WARNING: tests are run in parallel, which can cause them to interfere with each
+* other; use different item ID's when testing inventory to avoid issues.
+* */
+
 
 describe('test', function(){
     /*The stub essentially suppresses the call to a method, while allowing to check if it was called
@@ -24,17 +29,13 @@ describe('test', function(){
         methodB.restore();
         sinon.assert.calledWith(methodB, input);
     });
-
-    /*it('mock-test',function() {
-
-    });*/
 });
 
 describe('GameServer',function(){
     var stubs = [];
     before(function(done) {
         this.timeout(5000);
-        mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward');
+        mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward', { useNewUrlParser: true });
         var db = mongoose.connection;
         db.on('error', console.error.bind(console, 'connection error:'));
         db.once('open', function() {
@@ -59,14 +60,19 @@ describe('GameServer',function(){
         });
 
         var name = 'Test';
-        var dummySocket = {id:'socket123'};
+        var dummySocket = {id:'socket123',dummy: true};
         player = gs.addNewPlayer(dummySocket,{characterName:name});
         player.setIDs('',dummySocket.id);
-        // gs.finalizePlayer(dummySocket,player);
         player.spawn(20,20);
         expect(gs.getPlayer(dummySocket.id).id).to.equal(player.id);
         expect(player.socketID).to.equal(dummySocket.id);
         expect(player.name).to.equal(name);
+
+        // Check if all default equipments are equipped
+        for(var slot in Equipment.slots){
+            var eq = Equipment.slots[slot];
+            if(eq.defaultItem) expect(player.getEquippedItemID(slot)).to.equal(eq.defaultItem);
+        }
     });
 
     var animal;
@@ -147,6 +153,22 @@ describe('GameServer',function(){
         expect(building.type).to.equal(data.type);
     });
 
+    it('countOwnedBuildings', function(){
+        expect(player.countOwnedBuildings(building.type)).to.equal(0);
+        player.addBuilding(building);
+        expect(player.countOwnedBuildings(building.type)).to.equal(1);
+        player.buildings = [];
+    });
+
+    it('updateBldRecipes', function(){
+        player.updateBldRecipes();
+        var nbrecipes = player.bldRecipes.length;
+        var nbOwned = player.countOwnedBuildings(building.type);
+        player.addBuilding(building);
+        expect(player.countOwnedBuildings(building.type)).to.equal(nbOwned+1);
+        expect(player.bldRecipes.length).to.equal(nbrecipes-1);
+    });
+
     it('handleShop_out', function(){
         // Should fail because the player is not in the building
         var result = gs.handleShop({},player.socketID);
@@ -205,44 +227,176 @@ describe('GameServer',function(){
         expect(building.getGold()).to.equal(buildingGoldBefore);
     });
 
-    /*it('handleShop_nonowner', function(){
-        // TODO: expand test cases
-        var buyID = 15;
-        building.giveItem(buyID,1);
+    it('handleShop_nonowner', function(){
+        player.inventory.clear();
+        building.inventory.clear();
+        building.owner = -1;
+        var ownedID = 1;
+        var storedID = 2;
+        var buyPrice = 10;
+        var sellPrice = 15;
+        building.giveItem(storedID,1);
+        player.giveItem(ownedID,1);
+        building.setPrices(storedID,0,sellPrice);
+        building.setPrices(ownedID,buyPrice,0);
+        var playerGoldBefore = player.getGold();
+        var buildingGoldBefore = building.getGold();
         var testCases = [
-            {in: {action:'buy',id:10,nb:1},out:false},
-            {in: {action:'sell',id:10,nb:1},out:false},
-            {in: {action:'buy',id:buyID,nb:1},out:true},
+            {in: {action:'buy',id:storedID,nb:1},out:true},
+            {in: {action:'sell',id:ownedID,nb:1},out:true},
         ];
         testCases.forEach(function(testcase){
             var result = gs.handleShop(testcase.in,player.socketID);
             expect(result).to.equal(testcase.out);
         });
-    });*/
+        expect(player.getItemNb(storedID)).to.equal(1);
+        expect(player.getItemNb(ownedID)).to.equal(0);
+        expect(building.getItemNb(storedID)).to.equal(0);
+        expect(building.getItemNb(ownedID)).to.equal(1);
+        expect(player.getGold()).to.equal(playerGoldBefore-sellPrice+buyPrice);
+        expect(building.getGold()).to.equal(buildingGoldBefore-buyPrice+sellPrice);
+    });
+
+    it('handleGold_owner', function(){
+        building.owner = player.id;
+        player.gold = 150;
+        var playerGoldBefore = player.getGold();
+        var buildingGoldBefore = building.getGold();
+        var giveAmount = 10;
+        var takeAmount = -5;
+        gs.handleGold({nb:giveAmount},player.socketID);
+        expect(player.getGold()).to.equal(playerGoldBefore - giveAmount);
+        expect(building.getGold()).to.equal(buildingGoldBefore + giveAmount);
+        gs.handleGold({nb:takeAmount},player.socketID);
+        expect(player.getGold()).to.equal(playerGoldBefore - giveAmount - takeAmount);
+        expect(building.getGold()).to.equal(buildingGoldBefore + giveAmount + takeAmount);
+    });
+
+   it('handleGold_nonowner', function(){
+        building.owner = -1;
+        player.gold = 150;
+        var playerGoldBefore = player.getGold();
+        var buildingGoldBefore = building.getGold();
+        var giveAmount = 10;
+        var takeAmount = -5;
+        gs.handleGold({nb:giveAmount},player.socketID);
+        expect(player.getGold()).to.equal(playerGoldBefore);
+        expect(building.getGold()).to.equal(buildingGoldBefore);
+        gs.handleGold({nb:takeAmount},player.socketID);
+        expect(player.getGold()).to.equal(playerGoldBefore);
+        expect(building.getGold()).to.equal(buildingGoldBefore);
+    });
+
+    it('handleUse_consume', function(){
+        player.inventory.clear();
+        var itemID = 1; // stone hatchet
+        var amount = 1;
+        player.giveItem(itemID,amount);
+        expect(player.getItemNb(itemID)).to.equal(amount);
+        gs.handleUse({item:itemID,inventory:'backpack'},player.socketID);
+        expect(player.getItemNb(itemID)).to.equal(amount-1);
+
+        player.addToBelt(itemID,amount);
+        expect(player.getItemNbInBelt(itemID)).to.equal(amount);
+        gs.handleUse({item:itemID,inventory:'belt'},player.socketID);
+        expect(player.getItemNbInBelt(itemID)).to.equal(amount-1);
+    });
 
     it('handleUse_equip', function(){
-        var type = 28; // stone hatchet
+        player.inventory.clear();
+        var type = 11; // sword
         var typeNotOwned = 2; // bow
         var slot = gs.itemsData[type].equipment;
         var slotNotOwned = gs.itemsData[typeNotOwned].equipment;
         player.giveItem(type,1);
-        gs.handleUse({item:type},player.socketID);
-        gs.handleUse({item:typeNotOwned},player.socketID);
-        expect(player.isEquipped(slot)).to.equal(true);
-        expect(player.getEquipped(slot)).to.equal(type);
+        expect(player.isEquipped(slot)).to.equal(false);
         expect(player.isEquipped(slotNotOwned)).to.equal(false);
-        expect(player.getEquipped(slotNotOwned)).to.equal(-1);
+        gs.handleUse({item:type,inventory:'backpack'},player.socketID);
+        gs.handleUse({item:typeNotOwned,inventory:'backpack'},player.socketID);
+        expect(player.isEquipped(slot)).to.equal(true);
+        expect(player.getEquippedItemID(slot)).to.equal(type);
+        expect(player.isEquipped(slotNotOwned)).to.equal(false);
     });
 
-    // TODO: expand test cases + test results with gs methods for all tests
+    /**
+     * Try to equip every single item possible, using good and bad inputs.
+     * Only tests equip here, doesn't check for changes in inventory numbers 
+     * (see subsequent test for that)
+     */
+    it('Player_equip', function(){
+        var slots = Object.keys(Equipment.slots);
 
-    /*it('handleGold', function(){
-        var result = gs.handleUse({nb:10},player.socketID);
-        expect(result).to.equal(true);
-        result = gs.handleUse({nb:-10},player.socketID);
-        expect(result).to.equal(true);
-    });*/
+        for(var itemID in gs.itemsData){
+            var item = gs.itemsData[itemID];
+            var properSlot = item.equipment;
+            if(!properSlot) continue;
+            var slotid = slots.indexOf(properSlot); 
+            var wrongSlot = slotid > 0 ? slots[slotid - 1] : slots[slotid + 1];
+            // console.log('#',itemID,item,properSlot);
+            console.warn('equipping',itemID,'in',properSlot);
+            // Because in isolation, equipping ammo should always fail due to the lack
+            // of proper container
+            var expectedResult = (properSlot == 'range_ammo' ? 0 : 1);
+            expect(player.equip(properSlot,parseInt(itemID),true)).to.equal(expectedResult);
+            expect( player.equip(properSlot,item,true)).to.equal(0); // try sending the item data instead of id
+            expect(player.equip(wrongSlot,parseInt(itemID),true)).to.equal(0);
+            expectedResult = (properSlot == 'range_ammo' ? -1 : parseInt(itemID));
+            expect(player.getEquippedItemID(properSlot)).to.equal(expectedResult);
+            player.unequip(properSlot);
+        }
+    });
 
+    it('equipment_management',function(){
+        player.inventory.clear();
+        var weaponID = 28;
+        var itemData = gs.itemsData[weaponID];
+        var slot = itemData.equipment;
+        player.giveItem(weaponID, 1);
+        expect(player.getItemNbInBelt(weaponID)).to.equal(0);
+        var initNb = player.getItemNb(weaponID);
+        gs.handleUse({item:weaponID,inventory:'backpack'},player.socketID);
+        expect(player.getItemNb(weaponID)).to.equal(initNb-1);
+        expect(player.isEquipped(slot)).to.equal(true);
+        expect(player.getEquippedItemID(slot)).to.equal(parseInt(weaponID));
+        player.unequip(slot);
+        expect(player.getItemNb(weaponID)).to.equal(initNb);
+        expect(player.isEquipped(slot)).to.equal(false);
+
+        player.backpackToBelt(weaponID);
+        expect(player.getItemNb(weaponID)).to.equal(0);
+        expect(player.getItemNbInBelt(weaponID)).to.equal(initNb);
+        gs.handleUse({item:weaponID,inventory:'belt'},player.socketID);
+        expect(player.isEquipped(slot)).to.equal(true);
+        expect(player.getEquippedItemID(slot)).to.equal(parseInt(weaponID));
+        expect(player.getItemNbInBelt(weaponID)).to.equal(initNb-1);
+        player.unequip(slot);
+        expect(player.getItemNb(weaponID)).to.equal(1);
+        expect(player.getItemNbInBelt(weaponID)).to.equal(initNb-1);
+        expect(player.isEquipped(slot)).to.equal(false);
+    });
+
+    it('equipment_stats',function(){
+        var weaponID = 28;
+        var itemData = gs.itemsData[weaponID];
+        var slot = itemData.equipment;
+        var stat = Object.keys(itemData.effects)[0]; // pick up first stat affected by item
+        var effect = itemData.effects[stat];
+        player.giveItem(weaponID, 1);
+        player.unequip(slot); // unequip anything that may have been equipped in a previous test
+        player.getStat(stat).clearRelativeModifiers();
+        var initialValue = player.getStat(stat).getValue();
+        gs.handleUse({item:weaponID,inventory:'backpack'},player.socketID);
+        expect(player.getStat(stat).getValue()).to.equal(initialValue + effect);
+    });
+
+    it('Player_load',function(){
+        var initNbAmmo = player.getNbAmmo();
+        var increment = 10;
+        player.load(increment);
+        expect(player.getNbAmmo()).to.equal(initNbAmmo+increment);
+    });
+
+   
     afterEach(function(){
         stubs.forEach(function(stub){
             stub.restore();

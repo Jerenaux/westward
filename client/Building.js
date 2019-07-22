@@ -51,8 +51,7 @@ var Building = new Phaser.Class({
         this.depthOffset = buildingData.depthOffset;
         this.setBuilt(data.built);
         this.resetDepth();
-
-        this.setInteractive();
+        this.setInteractiveArea();
         this.setCollisions();
 
         var production = buildingData.production;
@@ -63,6 +62,11 @@ var Building = new Phaser.Class({
             },this);
         }
 
+        this.battleBoxData = {
+            'atlas':'aok',
+            'frame': buildingData.icon
+        };
+
         if(Engine.debugCollisions) this.setAlpha(0.1);
 
         if(Engine.player.inBuilding == this.id) Engine.enterBuilding(this.id);
@@ -72,12 +76,16 @@ var Building = new Phaser.Class({
         this.setDepth(this.tileY-1);
     },
 
+    setInteractiveArea: function(){
+        this.setInteractive(Engine.scene.input.makePixelPerfect(250));
+    },
+
     build: function () {
         this.built = true;
         var buildingData = Engine.buildingsData[this.buildingType];
         this.setFrame(buildingData.sprite);
         this.resetDepth();
-        this.setInteractive();
+        this.setInteractiveArea();
 
         if(buildingData.accessory){
             this.accessory = Engine.scene.add.sprite(
@@ -248,8 +256,8 @@ var Building = new Phaser.Class({
         var from = {
             x: this.x + this.shootFrom.x,
             y: this.y - (this.height-this.shootFrom.y)
-        }; // All coordinates are pixels
-        Engine.displayArrow(from,{x:data.x,y:data.y},this.depth+1,data.duration,data.delay);
+        }; // All coordinates are in pixels
+        Engine.animateRangeAmmo('arrow',from,{x:data.x,y:data.y},this.depth+1,data.duration,data.delay);
     },
 
     // ### GETTERS ###
@@ -367,8 +375,7 @@ var Building = new Phaser.Class({
             }
         }
         if(cursor) UI.setCursor(cursor);
-        var owner = this.isOwned() ? 'Your' : this.ownerName+'\'s';
-        UI.tooltip.updateInfo(owner+' '+this.name);
+        UI.tooltip.updateInfo('building',{id:this.id});
         UI.tooltip.display();
     },
 

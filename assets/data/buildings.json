@@ -2,7 +2,6 @@
   "2":{
     "name":"Tower",
     "desc": "A guard tower than can intercept enemies.",
-    "padding": 15,
     "base":{
       "width": 4,
       "height": 4
@@ -15,11 +14,12 @@
     "mainMenu": "wip",
     "icon": "tower",
     "canFight": true,
+    "aggro": true,
     "health": 250,
-    "dmg": 10,
+    "dmg": 8,
     "shootFrom":{
-      "x":95,
-      "y":115
+      "x":66,
+      "y":100
     }
   },
   "3":{

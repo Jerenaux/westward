@@ -2,13 +2,13 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 23-04-18.
  */
 
-function classDataShell(){
-    for(var i = 0; i < 4; i++){
+function ClassDataShell(){
+    for(let i = 0; i < 4; i++){
         this[i] = 0;
     }
 }
 
-var Hero = new Phaser.Class({
+let Hero = new Phaser.Class({
     Extends: Player,
 
     initialize: function Hero(){
@@ -17,6 +17,11 @@ var Hero = new Phaser.Class({
 
         this.buildRecipes = new Inventory(7);
         this.craftRecipes = new Inventory(100);
+
+        this.battleBoxData = {
+            'atlas':'orientation',
+            'frame':'animal_icon'
+        }
     },
 
     setUp: function(data){
@@ -28,15 +33,16 @@ var Hero = new Phaser.Class({
         this.resourceMarkers = data.resourceMarkers || [];
         this.FoW = [];
         this.inventory = new Inventory();
+        this.belt = new Inventory(3); //TODO: conf
         this.stats = new StatsContainer();
         this.equipment = new EquipmentManager();
 
         this.gold = data.gold || 0;
         this.civiclvl = data.civiclvl;
         this.civicxp = data.civicxp;
-        this.classxp = data.classxp || new classDataShell();
-        this.classlvl = data.classlvl || new classDataShell();
-        this.ap = data.ap || new classDataShell();
+        this.classxp = data.classxp || new ClassDataShell();
+        this.classlvl = data.classlvl || new ClassDataShell();
+        this.ap = data.ap || new ClassDataShell();
         this.name = data.name;
 
         this.updateRarity(data.rarity || []);
@@ -45,16 +51,17 @@ var Hero = new Phaser.Class({
 
         this.buildRecipes.fromList(Engine.config.defaultBuildRecipes);
 
-        for(var item in Engine.itemsData){
-            var data = Engine.itemsData[item];
-            if(data.basicRecipe) this.craftRecipes.add(item,1);
+        for(let item_id in Engine.itemsData){
+            let item = Engine.itemsData[item_id];
+            if(item.basicRecipe) this.craftRecipes.add(item_id,1);
         }
     },
 
     updateData: function(data){ // don't call this 'update' or else conflict with Player.update() for other player updates
-        var callbacks = {
+        let callbacks = {
             'ammo': this.updateAmmo,
             'ap': this.updateAP,
+            'belt': this.updateBelt,
             'bldRecipes': this.updateBuildRecipes,
             'buildingMarkers': this.updateMarkers,
             'civiclvl': this.updateCivicLvl,
@@ -74,7 +81,7 @@ var Hero = new Phaser.Class({
 
         this.updateEvents = new Set();
 
-        for(var field in callbacks){
+        for(let field in callbacks){
             if(!callbacks.hasOwnProperty(field)) continue;
             if(field in data) callbacks[field].call(this,data[field]);
         }
@@ -83,21 +90,28 @@ var Hero = new Phaser.Class({
             Engine.updateMenus(e);
         }, this);
 
-        if(data.fightStatus !== undefined) BattleManager.handleFightStatus(data.fightStatus);
-        if(data.remainingTime) BattleManager.setCounter(data.remainingTime);
-        if(data.activeID) BattleManager.manageTurn(data.activeID);
+        let battleCallbacks = {
+            'battleData': BattleManager.updateBattle
+        };
+
+        if('fightStatus' in data) BattleManager.handleFightStatus(data['fightStatus']); // Do first before any other battle update
+        for(let field in battleCallbacks){
+            if(!battleCallbacks.hasOwnProperty(field)) continue;
+            if(field in data) battleCallbacks[field].call(this,data[field]);
+        }
+
         if(data.x >= 0 && data.y >= 0) this.teleport(data.x,data.y);
-       
-        Engine.updateAllOrientationPins(); 
+
+        Engine.updateAllOrientationPins();
 
         Engine.firstSelfUpdate = false;
     },
 
     needsToCraft: function(item){
-        var required = 0;
-        var owned = 0;
-        var recipe = Engine.itemsData[item].recipe;
-        for(var itm in recipe){
+        let required = 0;
+        let owned = 0;
+        let recipe = Engine.itemsData[item].recipe;
+        for(let itm in recipe){
             required++;
             if(this.hasItem(itm,recipe[itm])) owned++;
         }
@@ -105,8 +119,8 @@ var Hero = new Phaser.Class({
     },
 
     canCraft: function(item, nb){
-        var recipe = Engine.itemsData[item].recipe;
-        for(var itm in recipe){
+        let recipe = Engine.itemsData[item].recipe;
+        for(let itm in recipe){
             if(!this.hasItem(itm,recipe[itm]*nb)) return false;
         }
         return true;
@@ -115,30 +129,37 @@ var Hero = new Phaser.Class({
 
 // ### GETTERS ###
 
-    getEquipped: function(slot){
+    getEquippedItemID: function(slot){
         return this.equipment.get(slot); // Returns the ID of the item equipped at the given slot
     },
 
-    getMaxAmmo: function(slot){
-        var container = this.equipment.get(this.equipment.getContainer(slot));
-        return Engine.itemsData[container].capacity;
+    getEquippedItem: function(slot){
+        const item_id = this.equipment.get(slot);
+        return Engine.itemsData[item_id]; // Returns the ID of the item equipped at the given slot
     },
 
-    getNbAmmo: function(slot){
-        return this.equipment.getNbAmmo(slot);
+    hasRangedEquipped: function(){
+        // console.warn(this.getEquippedItemID(),Equipment.slots['rangedw'].defaultItem);
+        return (this.getEquippedItemID('rangedw') > -1) && (this.getEquippedItemID('rangedw') != Equipment.slots['rangedw'].defaultItem);
+    },
+
+    getMaxAmmo: function(){
+        let container_id = this.equipment.get('range_container');
+        return Engine.itemsData[container_id].capacity;
+    },
+
+    getNbAmmo: function(){
+        return this.equipment.getNbAmmo();
     },
 
     getNbAnyAmmo: function(){
-        var rangedW = this.getEquipped('rangedw');
-        var container = Engine.itemsData[rangedW].ammo;
-        var ammoType = this.equipment.getAmmoType(container);
-        return this.getNbAmmo(ammoType);
+        return this.getNbAmmo();
     },
 
     getRangedCursor: function(){
-        var rangedw = this.getEquipped('rangedw');
-        if(rangedw == -1) return 'bow';
-        return (Engine.itemsData[rangedw].ammo == 'quiver' ? 'bow' : 'gun');
+        let rangedw = this.getEquippedItemID('rangedw');
+        if(rangedw === -1) return 'bow';
+        return (Engine.itemsData[rangedw].ammo === 'quiver' ? 'bow' : 'gun');
     },
 
     getStat: function(stat){
@@ -164,12 +185,12 @@ var Hero = new Phaser.Class({
     // ### UPDATES #####
 
     handleDeath: function(dead){
-        if(dead == true) Engine.manageDeath();
-        if(dead == false) Engine.manageRespawn();
+        if(dead === true) Engine.manageDeath();
+        if(dead === false) Engine.manageRespawn();
     },
 
     handleMsgs: function(msgs){
-        for(var i = 0; i < msgs.length; i++){
+        for(let i = 0; i < msgs.length; i++){
             this.talk(msgs[i]);
         }
     },
@@ -183,9 +204,9 @@ var Hero = new Phaser.Class({
     },
 
     updateAmmo: function(ammo){
-        for(var i = 0; i < ammo.length; i++){
-            var am = ammo[i];
-            this.equipment.setAmmo(am.slot,am.nb);
+        for(let i = 0; i < ammo.length; i++){
+            let am = ammo[i];
+            this.equipment.setAmmo(am.nb);
         }
         this.updateEvents.add('equip');
     },
@@ -197,16 +218,30 @@ var Hero = new Phaser.Class({
         //TODO: add sound effect
     },
 
+    updateBelt: function(items){
+        this.belt.updateItems(items);
+        this.updateEvents.add('belt');
+        // if(Client.tutorial) TutorialManager.checkHook();
+
+        if(!Engine.firstSelfUpdate) {
+            items.forEach(function (item) {
+                let sound = Engine.itemsData[item[0]].sound;
+                if(sound) Engine.scene.sound.add(sound).play();
+            });
+        }
+    },
+
     updateBuildRecipes: function(bldRecipes){
         this.buildRecipes.clear();
-        if(bldRecipes.length == 1 && bldRecipes[0] == -1) return;
+        if(bldRecipes.length === 1 && bldRecipes[0] === -1) return;
         bldRecipes.forEach(function(w){
             this.buildRecipes.add(w,1);
         },this);
+        this.updateEvents.add('bldrecipes');
     },
 
     postChunkUpdate: function(){
-        if(this.chunk != this.previousChunk) Engine.updateEnvironment();
+        if(this.chunk !== this.previousChunk) Engine.updateEnvironment();
         this.previousChunk = this.chunk;
     },
 
@@ -229,8 +264,8 @@ var Hero = new Phaser.Class({
     },
 
     updateEquipment: function(equipment){
-        for(var i = 0; i < equipment.length; i++){
-            var eq = equipment[i];
+        for(let i = 0; i < equipment.length; i++){
+            let eq = equipment[i];
             this.equipment.set(eq.slot,eq.item);
         }
         this.updateEvents.add('equip');
@@ -245,7 +280,7 @@ var Hero = new Phaser.Class({
         this.FoW = [];
         if(!aois) aois = [Engine.player.chunk];
         aois.forEach(function(aoi){
-            var origin = Utils.AOItoTile(aoi);
+            let origin = Utils.AOItoTile(aoi);
             this.FoW.push(
                 new Phaser.Geom.Rectangle(
                     origin.x,
@@ -268,7 +303,7 @@ var Hero = new Phaser.Class({
 
     updateHistory: function(history){
         this.history = history || [];
-        for(var i = 0; i < this.history.length; i++){
+        for(let i = 0; i < this.history.length; i++){
             this.history[i][0] -= Client.serverTimeDelta;
         }
         this.history.reverse();
@@ -281,7 +316,7 @@ var Hero = new Phaser.Class({
 
         if(!Engine.firstSelfUpdate) {
             items.forEach(function (item) {
-                var sound = Engine.itemsData[item[0]].sound;
+                let sound = Engine.itemsData[item[0]].sound;
                 if(sound) Engine.scene.sound.add(sound).play();
             });
         }
@@ -300,7 +335,7 @@ var Hero = new Phaser.Class({
     },
 
     updateStats: function(stats){
-        for(var i = 0; i < stats.length; i++){
+        for(let i = 0; i < stats.length; i++){
             this.updateStat(stats[i].k,stats[i]);
         }
         this.updateEvents.add('stats');
@@ -308,7 +343,7 @@ var Hero = new Phaser.Class({
     },
 
     updateStat: function(key,data){
-        var statObj = this.getStat(key);
+        let statObj = this.getStat(key);
         statObj.setBaseValue(data.v);
         statObj.relativeModifiers = [];
         statObj.absoluteModifiers = [];

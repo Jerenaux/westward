@@ -109,7 +109,7 @@ var Map = new Phaser.Class({
         if(!this.minimap) {
             this.offZone = new Phaser.Geom.Rectangle(932,418,60,50);
             this.setInteractive(); // { pixelPerfect: true } // not needed anymore with rendertexture apparently
-            this.on('pointerdown', this.handleClick.bind(this));
+            this.on('pointerup', this.handleClick.bind(this));
         }
         /*UI.scene.input.setDraggable(this);
         this.dragWidth = (dragWidth > -1 ? dragWidth : 999999);
@@ -538,7 +538,7 @@ var Pin = new Phaser.Class({
 
     handleOver: function(){
         if(!this.parentMap.viewRect.contains(this.x,this.y)) return;
-        UI.tooltip.updateInfo(this.name);
+        UI.tooltip.updateInfo('free',{title:this.name});
         UI.tooltip.display();
         console.log(this.tileX,this.tileY);
     },
