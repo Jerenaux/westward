@@ -216,11 +216,12 @@ BattleEquipmentPanel.prototype.updateStats = function () {
 
 BattleEquipmentPanel.prototype.updateEquipment = function () {
     var meleeID = Engine.player.getEquippedItemID('meleew');
-    var rangeID = Engine.player.getEquippedItemID('range_ammo');
+    var rangeAmmoID = Engine.player.getEquippedItemID('range_ammo');
+    var rangedWeaponID = Engine.player.getEquippedItemID('rangedw');
     var meleeData, rangeData;
 
     // If ranged weapon, display the actual ammo; else, display the ranged weapon (= the hands)
-    if(rangeID == -1) rangeID = Engine.player.getEquippedItemID('rangedw');
+    var rangeID = (rangeAmmoID == -1 || !Engine.player.hasRangedEquipped()) ? rangedWeaponID : rangeAmmoID;
     meleeData = Engine.itemsData[meleeID];
     rangeData = Engine.itemsData[rangeID];
 

@@ -434,7 +434,7 @@ GameServer.onNewPlayer = function(player){
     player.applyVigorModifier();
 
     const items = [
-        // [11,1],
+        [3,30],
         // [4, 5],
         [6, 3],
         [2, 1],
@@ -1518,6 +1518,10 @@ GameServer.handleBelt = function(data,socketID){
     var item = data.item;
     var inventory = data.inventory;
     if(inventory == 'backpack' && player.hasItem(item,1)){
+        if(player.belt.isFull()){
+            player.addNotif('Belt full');
+            return;
+        }
         player.backpackToBelt(item);
     }else if(inventory == 'belt' && player.hasItemInBelt(item)) {
         player.beltToBackpack(item);

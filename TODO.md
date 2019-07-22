@@ -56,7 +56,6 @@ World Building
 - Display nb owned buildings in build menu
 - Animal markers, death markers
 
-- Hide ammo if ranged weapon not equipped
   
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email

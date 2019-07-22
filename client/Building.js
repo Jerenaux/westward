@@ -77,11 +77,7 @@ var Building = new Phaser.Class({
     },
 
     setInteractiveArea: function(){
-        if(this.built){
-            this.setInteractive(Engine.scene.input.makePixelPerfect(250));
-        }else{
-            this.setInteractive();
-        }
+        this.setInteractive(Engine.scene.input.makePixelPerfect(250));
     },
 
     build: function () {
