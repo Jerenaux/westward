@@ -51,20 +51,19 @@ World Building
 - Display threat level in animal tooltip
 - fix open menu while respawn bug
 - Display nb owned buildings in build menu
-- Animal markers, death markers
-
-
-
 - Look towards cursor
 - Zoom-out in towers
-- Add mini wolf to mapicons.png & test ("wolf")
-- Add crosses weapons to it ("swords")
-- Move map legend below scroll, widen it
-- Display death/conflict markers even in FoW
 - Add help about build limit in build menu
-- Animal markers, death markers, conflict markers
 - When giving constr material, display #owned
 - When giving constr material, max amount at amount needed
+- Move map legend below scroll, widen it
+- Display death/conflict markers even in FoW
+- The onInit conf stuff is obviously wrongly processed by server
+- Rename toolip of animal markers
+- pins don't disappear anymore
+- When loading arrows in fight, item removed instead of deducting 3
+- In battle, equipping an already equipped weapon still removes it from belt
+- Save death/conflict icons?
   
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
@@ -158,8 +157,8 @@ Secure
 
 Analytics:
 ---------
-- Log: belt
-- New admin: fix dates format, date column width, reverse sort, update event descs as in current admin
+- New admin:  date column width, reverse sort?, update event descs as in current admin
+- Log: belt actions
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions

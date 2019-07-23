@@ -1348,7 +1348,7 @@ GameServer.handleShop = function(data,socketID) {
         building.updateBuild();
     }
     building.save();
-    Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type});
+    Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type,owner:building.ownerName});
     return true;
 };
 

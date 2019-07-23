@@ -441,7 +441,7 @@ var Map = new Phaser.Class({
                 'herb'
             );
         },this);
-        Engine.player.resourceMarkers.forEach(function(data){
+        Engine.player.animalMarkers.forEach(function(data){
             this.addPin(data[0],data[1],
                 Engine.animalsData[data[2]].name,
                 'wolf'
