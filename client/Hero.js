@@ -31,6 +31,9 @@ let Hero = new Phaser.Class({
         this.settlement = data.settlement || 0;
         this.buildingMarkers = data.buildingMarkers || [];
         this.resourceMarkers = data.resourceMarkers || [];
+        this.animalMarkers = data.animalMarkers || [];
+        this.deathMarkers = data.deathMarkers || [];
+        this.conflictMarkers = data.conflictMarkers || [];
         this.FoW = [];
         this.inventory = new Inventory();
         this.belt = new Inventory(3); //TODO: conf
@@ -67,7 +70,9 @@ let Hero = new Phaser.Class({
             'civiclvl': this.updateCivicLvl,
             'classlvl': this.updateClassLvl,
             'classxp': this.updateClassXP,
+            'conflictMarkers': this.updateConflictMarkers,
             'dead': this.handleDeath,
+            'deathMarkers': this.updateDeathMarkers,
             'equipment': this.updateEquipment,
             'fow': this.updateFoW,
             'gold': this.updateGold,
@@ -324,6 +329,16 @@ let Hero = new Phaser.Class({
 
     updateMarkers: function(markers){
         this.buildingMarkers = markers;
+        if(Engine.miniMap) Engine.miniMap.map.updatePins();
+    },
+
+    updateDeathMarkers: function(markers){
+        this.deathMarkers = markers;
+        if(Engine.miniMap) Engine.miniMap.map.updatePins();
+    },
+
+    updateConflictMarkers: function(markers){
+        this.conflictMarkers = markers;
         if(Engine.miniMap) Engine.miniMap.map.updatePins();
     },
 

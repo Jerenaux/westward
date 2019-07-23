@@ -71,7 +71,7 @@ function Player() {
     this.steps = 0;
     MovingEntity.call(this);
 
-    this.extraMarkers = [];
+    this.extraMarkers = []; // used in tutorial to display mock markers
 }
 
 Player.prototype = Object.create(MovingEntity.prototype);
@@ -249,6 +249,7 @@ Player.prototype.die = function () {
     MovingEntity.prototype.die.call(this);
     // this.updatePacket.dead = true;
     this.setOwnProperty('dead', true);
+    GameServer.addDeathMarker(this.x,this.y);
 };
 
 Player.prototype.spawn = function (x, y) {
@@ -745,7 +746,10 @@ Player.prototype.initTrim = function () {
     trimmed.y = parseInt(this.y);
     trimmed.fow = GameServer.fowList;
     trimmed.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
-    trimmed.resourceMarkers = GameServer.listResourceMarkers(this.instance).concat(this.extraMarkers);
+    trimmed.resourceMarkers = GameServer.listResourceMarkers().concat(this.extraMarkers);
+    trimmed.animalMarkers = GameServer.listAnimalMarkers();
+    trimmed.deathMarkers = GameServer.listDeathMarkers();
+    trimmed.conflictMarkers = GameServer.listConflictMarkers();
     trimmed.rarity = GameServer.getRarity();
     return trimmed;
 };
@@ -939,6 +943,8 @@ Player.prototype.getIndividualUpdatePackage = function () {
     var pkg = this.updatePacket;
     if (GameServer.fowChanged) pkg.fow = GameServer.fowList;
     if (GameServer.buildingsChanged) pkg.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
+    if (GameServer.deathMarkersChanged) pkg.deathMarkers = GameServer.listDeathMarkers();
+    if (GameServer.conflictMarkersChanged) pkg.conflictMarkers = GameServer.listConflictMarkers();
     if (pkg.isEmpty()) return null;
     this.updatePacket = new PersonalUpdatePacket();
     return pkg;

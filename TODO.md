@@ -51,6 +51,17 @@ World Building
 - Display threat level in animal tooltip
 - fix open menu while respawn bug
 - Display nb owned buildings in build menu
+- Animal markers, death markers
+
+
+
+- Look towards cursor
+- Zoom-out in towers
+- Add mini wolf to mapicons.png & test ("wolf")
+- Add crosses weapons to it ("swords")
+- Move map legend below scroll, widen it
+- Display death/conflict markers even in FoW
+- Add help about build limit in build menu
 - Animal markers, death markers, conflict markers
 - When giving constr material, display #owned
 - When giving constr material, max amount at amount needed

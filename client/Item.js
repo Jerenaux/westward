@@ -66,7 +66,7 @@ var Item = new Phaser.Class({
     setCursor: function(){
         if(BattleManager.inBattle || Engine.inMenu) return;
         UI.setCursor('item');
-        UI.tooltip.updateInfo('item',{id:this.itemType});
+        UI.tooltip.updateInfo('pickupItem',{id:this.itemType});
         UI.tooltip.display();
     },
 

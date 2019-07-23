@@ -441,6 +441,24 @@ var Map = new Phaser.Class({
                 'herb'
             );
         },this);
+        Engine.player.resourceMarkers.forEach(function(data){
+            this.addPin(data[0],data[1],
+                Engine.animalsData[data[2]].name,
+                'wolf'
+            );
+        },this);
+        Engine.player.deathMarkers.forEach(function(data){
+            this.addPin(data[0],data[1],
+                'Someone died here',
+                'skull'
+            );
+        },this);
+        Engine.player.conflictMarkers.forEach(function(data){
+            this.addPin(data[0],data[1],
+                'Someone fought here',
+                'swords'
+            );
+        },this);
     },
 
     updatePins: function(){
