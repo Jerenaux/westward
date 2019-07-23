@@ -56,6 +56,15 @@ World Building
 - Display nb owned buildings in build menu
 - Animal markers, death markers
 
+
+
+- Look towards cursor
+- Zoom-out in towers
+- Add mini wolf to mapicons.png & test ("wolf")
+- Add crosses weapons to it ("swords")
+- Move map legend below scroll, widen it
+- Display death/conflict markers even in FoW
+- Add help about build limit in build menu
   
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email

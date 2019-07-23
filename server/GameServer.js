@@ -165,6 +165,8 @@ GameServer.readMap = function(mapsPath,test,cb){
 
     GameServer.fogOfWar = {};
     GameServer.fowList = [];
+    GameServer.deathMarkers = [];
+    GameServer.conflictMarkers = [];
     GameServer.itemCounts = {};
     GameServer.marketPrices = new ListMap();
 
@@ -307,6 +309,8 @@ GameServer.loadItems = function(){
 
     path = pathmodule.join(GameServer.mapsPath,'resourceMarkers.json');
     GameServer.resourceMarkers = JSON.parse(fs.readFileSync(path).toString());
+    path = pathmodule.join(GameServer.mapsPath,'animalMarkers.json');
+    GameServer.animalMarkers = JSON.parse(fs.readFileSync(path).toString());
     GameServer.updateStatus();
 };
 
@@ -1042,6 +1046,7 @@ GameServer.handleBattle = function(attacker,attacked){
     GameServer.addBattleArea(area,battle);
     GameServer.addSurroundingFighters(battle);
     battle.start();
+    GameServer.addConflictMarker(attacker.x,attacker.y);
     if(attacker.isPlayer || attacked.isPlayer){
         var player = (attacker.isPlayer ? attacker : attacked);
         var foe = (attacker.isPlayer ? attacked : attacker);
@@ -1430,8 +1435,32 @@ GameServer.finalizeBuilding = function(player,building){
     if(GameServer.buildingParameters.autobuild) building.setBuilt();
 };
 
-GameServer.listResourceMarkers = function(instance){
-    return GameServer.resourceMarkers;
+GameServer.listAnimalMarkers = function(){
+    return GameServer.animalMarkers; // TODO: filter based on FoW
+};
+
+GameServer.listResourceMarkers = function(){
+    return GameServer.resourceMarkers; // TODO: filter based on FoW
+};
+
+GameServer.listDeathMarkers = function(){
+    return GameServer.deathMarkers; 
+};
+
+GameServer.listConflictMarkers = function(){
+    return GameServer.conflictMarkers; 
+};
+
+GameServer.addDeathMarker = function(x,y){
+    GameServer.deathMarkers.push([x,y]);
+    if(GameServer.deathMarkers.length > 10) GameServer.deathMarkers.shift(); // TODO: conf
+    GameServer.deathMarkersChanged = true;
+};
+
+GameServer.addConflictMarker = function(x,y){
+    GameServer.conflictMarkers.push([x,y]);
+    if(GameServer.conflictMarkers.length > 10) GameServer.conflictMarkers.shift(); // TODO: conf
+    GameServer.conflictMarkersChanged = true;
 };
 
 GameServer.listBuildingMarkers = function(instance){
