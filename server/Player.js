@@ -486,7 +486,6 @@ Player.prototype.canEquip = function (slot, item) {
         return false;
     }
     if(slot == 'range_ammo'){
-        console.warn(itemData.container_type,'vs', this.getContainerType());
         if(itemData.container_type != this.getContainerType()){
             console.log('Container mismatch');
             return false;
@@ -941,10 +940,10 @@ Player.prototype.addNotif = function (msg, silent) {
 Player.prototype.getIndividualUpdatePackage = function () {
     // console.log(this.updatePacket,this.updatePacket.isEmpty());
     var pkg = this.updatePacket;
-    if (GameServer.fowChanged) pkg.fow = GameServer.fowList;
-    if (GameServer.buildingsChanged) pkg.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
-    if (GameServer.deathMarkersChanged) pkg.deathMarkers = GameServer.listDeathMarkers();
-    if (GameServer.conflictMarkersChanged) pkg.conflictMarkers = GameServer.listConflictMarkers();
+    if (GameServer.checkFlag('FoW')) pkg.fow = GameServer.fowList;
+    if (GameServer.checkFlag('buildingsMarkers')) pkg.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
+    if (GameServer.checkFlag('deathMarkers')) pkg.deathMarkers = GameServer.listDeathMarkers();
+    if (GameServer.checkFlag('conflictMarkers')) pkg.conflictMarkers = GameServer.listConflictMarkers();
     if (pkg.isEmpty()) return null;
     this.updatePacket = new PersonalUpdatePacket();
     return pkg;
@@ -959,7 +958,6 @@ Player.prototype.fastForward = function (nbturns) {
     this.starve(nbStarvationTurns);
     this.rest(nbRestTurns);
     this.save();
-    console.warn('----');
 };
 
 Player.prototype.update = function () {

@@ -329,17 +329,17 @@ let Hero = new Phaser.Class({
 
     updateMarkers: function(markers){
         this.buildingMarkers = markers;
-        if(Engine.miniMap) Engine.miniMap.map.updatePins();
+        if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
     },
 
     updateDeathMarkers: function(markers){
         this.deathMarkers = markers;
-        if(Engine.miniMap) Engine.miniMap.map.updatePins();
+        if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
     },
 
     updateConflictMarkers: function(markers){
         this.conflictMarkers = markers;
-        if(Engine.miniMap) Engine.miniMap.map.updatePins();
+        if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
     },
 
     updateRarity: function(rarity){

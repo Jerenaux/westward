@@ -26,8 +26,6 @@ var GameServer = {
     settlements: {},
     socketMap: {}, // socket.id -> player.id
     vision: new Set(), // set of AOIs potentially seen by at least one player
-    nbConnectedChanged: false,
-    buildingsChanged: false, // flag to know when to send list of building markers to clients
     initializationStep: 0,
     initialized: false
 };
@@ -170,9 +168,49 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.itemCounts = {};
     GameServer.marketPrices = new ListMap();
 
+    GameServer.initializeFlags();
+
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
     Prism.logEvent(null,'server-start');
+};
+
+GameServer.initializeFlags = function(){
+    var flags = ['nbConnected','FoW','buildingsMarkers','animalsMarkers','deathMarkers',
+    'conflictMarkers'];
+    GameServer.flags = {};
+    flags.forEach(function(flag){
+        GameServer.flags[flag] = false;
+    });
+};
+
+GameServer.resetFlags = function(){
+    for(var flag in GameServer.flags){
+        GameServer.flags[flag] = false;
+    }
+};
+
+GameServer.setFlag = function(flag){
+    if(!(flag in GameServer.flags)){
+        console.warn('ERROR: unknown flag',flag);
+        return;
+    }
+    GameServer.flags[flag] = true;
+};
+
+GameServer.checkFlag = function(flag){
+    if(!(flag in GameServer.flags)){
+        console.warn('ERROR: unknown flag',flag);
+        return;
+    }
+    return GameServer.flags[flag];
+};
+
+GameServer.anyFlag = function(){
+    for(var flag in GameServer.flags){
+        if(GameServer.flags[flag]) return true;
+    }
+    return false;
 };
 
 /**
@@ -284,8 +322,6 @@ GameServer.loadBuildings = function(){
     GameServer.BuildingModel.find(function (err, buildings) {
         if (err) return console.log(err);
         buildings.forEach(GameServer.addBuilding);
-        console.warn(GameServer.marketPrices);
-        console.warn(GameServer.getDefaultPrices());
         GameServer.updateStatus();
     });
 };
@@ -696,7 +732,8 @@ GameServer.finalizePlayer = function(socket,player,returning){
     GameServer.players[player.id] = player;
     GameServer.socketMap[socket.id] = player.id;
     GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
-    GameServer.nbConnectedChanged = true;
+    // GameServer.nbConnectedChanged = true;
+    GameServer.setFlag('nbConnected');
     player.setOrUpdateAOI(); // takes care of adding to the world as well
     player.listBuildings();
     //console.log(GameServer.server.getNbConnected()+' connected');
@@ -741,7 +778,8 @@ GameServer.handleDisconnect = function(socketID){
     }
     GameServer.removeEntity(player);
     delete GameServer.socketMap[socketID];
-    GameServer.nbConnectedChanged = true;
+    // GameServer.nbConnectedChanged = true;
+    GameServer.setFlag('nbConnected');
 };
 
 /**
@@ -1428,7 +1466,8 @@ GameServer.build = function(player,bid,tile){
 
 GameServer.finalizeBuilding = function(player,building){
     building.embed();
-    GameServer.buildingsChanged = true;
+    // GameServer.buildingsChanged = true;
+    GameServer.setFlag('buildingsMarkers');
     player.addBuilding(building);
     // if(!player.isInstanced()) player.listBuildings(); 
     GameServer.updateFoW();
@@ -1454,13 +1493,15 @@ GameServer.listConflictMarkers = function(){
 GameServer.addDeathMarker = function(x,y){
     GameServer.deathMarkers.push([x,y]);
     if(GameServer.deathMarkers.length > 10) GameServer.deathMarkers.shift(); // TODO: conf
-    GameServer.deathMarkersChanged = true;
+    // GameServer.deathMarkersChanged = true;
+    GameServer.setFlag('deathMarkers');
 };
 
 GameServer.addConflictMarker = function(x,y){
     GameServer.conflictMarkers.push([x,y]);
     if(GameServer.conflictMarkers.length > 10) GameServer.conflictMarkers.shift(); // TODO: conf
-    GameServer.conflictMarkersChanged = true;
+    // GameServer.conflictMarkersChanged = true;
+    GameServer.setFlag('conflictMarkers');
 };
 
 GameServer.listBuildingMarkers = function(instance){
@@ -1685,7 +1726,8 @@ GameServer.updateFoW = function(){
         var building = GameServer.buildings[bid];
         GameServer.dissipateFoW(building.aoi);
     }
-    GameServer.fowChanged = true;
+    // GameServer.fowChanged = true;
+    GameServer.setFlag('FoW');
     GameServer.fowList = GameServer.computeFoW();
 };
 
@@ -1771,15 +1813,17 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
 
         if(individualGlobalPkg === null
             && localPkg === null
-            && !GameServer.nbConnectedChanged
-            && !GameServer.fowChanged){
+            // && !GameServer.nbConnectedChanged
+            // && !GameServer.fowChanged
+            && !GameServer.anyFlag()
+        ){
                 return;
             }
 
         var finalPackage = {};
         if(individualGlobalPkg) finalPackage.global = individualGlobalPkg.clean();
         if(localPkg) finalPackage.local = localPkg.clean();
-        if(GameServer.nbConnectedChanged) finalPackage.nbconnected = GameServer.server.getNbConnected();
+        if(GameServer.checkFlag('nbConnected')) finalPackage.nbconnected = GameServer.server.getNbConnected();
         finalPackage.turn = GameServer.elapsedTurns;
         // console.warn(finalPackage);
         // console.warn('#####################');
@@ -1788,9 +1832,8 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         player.oldAOIs = [];
         // console.log(finalPackage.local);
     });
-    GameServer.nbConnectedChanged = false;
-    GameServer.fowChanged = false;
-    GameServer.buildingsChanged  = false;
+    GameServer.resetFlags();
+
     GameServer.clearAOIs(); // erase the update content of all AOIs that had any
 };
 
@@ -1889,7 +1932,8 @@ GameServer.createInstance = function(player){
         var building = GameServer.addBuilding(bld);
         instance.entities.push(building);
     });
-    GameServer.buildingsChanged = true;
+    // GameServer.buildingsChanged = true;
+    GameServer.setFlag('buildingsMarkers');
 
     // Stock up most construction material, except for the first one
     worldData.partialbuild.forEach(function(bldid){

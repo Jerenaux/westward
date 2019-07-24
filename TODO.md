@@ -24,7 +24,6 @@ World Building
 
 ## Priority TODO
 - Adapt animations and delays for firearms
-
 - Update Westward main page
 - Change battle priority when player joins fight
 - In battle against NPC, have players have turns much more often
@@ -35,7 +34,6 @@ World Building
 - Better notifications
 - Don't disable walk with build panel
 - New movement system
-- Prevent building at player location
 - Reduce amount of orientation pins
 - add esc shortcut
 - "new" marker
@@ -45,14 +43,16 @@ World Building
 - Make towers throw stones when no better ammo
 - Belt & backpack capacity + corresponding items (incl. defaults)
 - No decimal in defaut prices (happens in one lumber camp)
+- Ability: display threat level in animal tooltip
+- Ability: display fighter health bars
+- Look towards cursor
+- Zoom-out in towers
+
+- Prevent building at player location
 - Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)
 - Display item amount owned in tooltip
-- Display threat level in animal tooltip
 - fix open menu while respawn bug
-- Display nb owned buildings in build menu
-- Look towards cursor
-- Zoom-out in towers
 - Add help about build limit in build menu
 - When giving constr material, display #owned
 - When giving constr material, max amount at amount needed
@@ -60,10 +60,11 @@ World Building
 - Display death/conflict markers even in FoW
 - The onInit conf stuff is obviously wrongly processed by server
 - Rename toolip of animal markers
-- pins don't disappear anymore
+- Conflict/death pin only at the end of battle
 - When loading arrows in fight, item removed instead of deducting 3
 - In battle, equipping an already equipped weapon still removes it from belt
 - Save death/conflict icons?
+- Decrease acc penalty even more
   
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email

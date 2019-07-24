@@ -75,6 +75,7 @@ var Map = new Phaser.Class({
         UI.scene.add.displayList.add(this);
         this.draw('worldmap');
         this.setOrigin(0.5);
+        this.displayed = false;
 
         this.minimap = minimap;
         this.setDepth(2);
@@ -421,6 +422,7 @@ var Map = new Phaser.Class({
 
         this.displayPins();
         this.setVisible(true);
+        this.displayed = true;
         // if(!this.minimap) this.getZoomBtn('out').disable();
     },
 
@@ -473,14 +475,14 @@ var Map = new Phaser.Class({
         });
         this.setVisible(false);
         if(this.fow) this.fow.destroy();
-        if(this.fog) this.fog.destroy();
+        this.displayed = false;
     },
 
     hidePins: function(){
-        this.resetCounter();
-        this.pins.forEach(function(p){
+        this.displayedPins.forEach(function(p){
             p.setVisible(false);
         });
+        this.resetCounter();
     }
 });
 
