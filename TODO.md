@@ -8,7 +8,7 @@
 - Test handleChat (with text and also empty input)
 - Test Utils.nextTo with all combinations of building/animal vs building/animal, next to each other and not
 - Test Battle.computeTof()
-- Find a way to test itemsRespaw and other time-related aspects
+- Find a way to test itemsRespaw and other time-related aspects (spawn, pick up, call respawn method)
 - Test tutorial manually (reset start)
 - Test new player manually
 => After bug, systematically create test!
@@ -48,23 +48,27 @@ World Building
 - Look towards cursor
 - Zoom-out in towers
 
-- Prevent building at player location
+Bugs:
+- When loading arrows in fight, item removed instead of deducting 3
+- In battle, equipping an already equipped weapon still removes it from belt [TEST]
+- fix open menu while respawn bug
+- When giving constr material, max amount at amount needed [TEST]
+- The onInit conf stuff is obviously wrongly processed by server (check env vars)
+- use qt in NPC.isPositionFree() [TEST]
+- Test that can't build on top of items, players, animals, other buildings... [TEST]
+- New item respawn system where items add themselves to a list upon removal (update gs.respawnItems)
+Features:
 - Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)
 - Display item amount owned in tooltip
-- fix open menu while respawn bug
 - Add help about build limit in build menu
 - When giving constr material, display #owned
-- When giving constr material, max amount at amount needed
 - Move map legend below scroll, widen it
 - Display death/conflict markers even in FoW
-- The onInit conf stuff is obviously wrongly processed by server
 - Rename toolip of animal markers
 - Conflict/death pin only at the end of battle
-- When loading arrows in fight, item removed instead of deducting 3
-- In battle, equipping an already equipped weapon still removes it from belt
 - Save death/conflict icons?
-- Decrease acc penalty even more
+- Test acc penalty 
   
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email

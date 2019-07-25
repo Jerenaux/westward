@@ -515,6 +515,8 @@ Player.prototype.equip = function (slot, itemID, fromDB) {
         console.log('Item cannot be equipped in that slot');
         return 0;
     }
+    if(this.getEquippedItemID(slot) == itemID) return 0; // Item already equipped
+
 
     var slotData = Equipment.getData(slot);
     if (this.isEquipped(slot)) this.unequip(slot);

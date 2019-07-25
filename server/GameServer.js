@@ -157,15 +157,13 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.pathFinder = new Pathfinder(GameServer.collisions,GameServer.PFParameters.maxPathLength);
 
     GameServer.qt = QuadTree(0, 0, World.worldWidth, World.worldHeight);
-    //tODO: remove positions
-    GameServer.positions = new SpaceMapList(); // positions occupied by moving entities and buildings
-    GameServer.itemPositions = new SpaceMapList(); // used to prevent building where an item is
 
     GameServer.fogOfWar = {};
     GameServer.fowList = [];
     GameServer.deathMarkers = [];
     GameServer.conflictMarkers = [];
     GameServer.itemCounts = {};
+    GameServer.itemsToRespawn = [];
     GameServer.marketPrices = new ListMap();
 
     GameServer.initializeFlags();
@@ -977,9 +975,11 @@ GameServer.respawnItems = function(){
         var type = item[2];
         var aoi = Utils.tileToAOI({x:x,y:y});
         if(GameServer.vision.has(aoi)) return;
-        if(GameServer.itemPositions.get(x,y).length === 0){
-            if(Utils.randomInt(1,10) > 5) GameServer.addItem(x,y,type);
-        }
+        // if(GameServer.itemPositions.get(x,y).length === 0){
+        //     if(Utils.randomInt(1,10) > 5) GameServer.addItem(x,y,type);
+        // }
+        if(Utils.randomInt(1,10) > 5) GameServer.addItem(x,y,type);
+        // TODO: different respawn system
     },this);
 };
 
@@ -1358,6 +1358,13 @@ GameServer.handleShop = function(data,socketID) {
             console.log('Building cannot buy');
             return false;
         }
+        if(!this.built){ // Don't give too much to buildings under construction
+            var buildingData = GameServer.buildingsData[this.type];
+            if(item in buildingData.recipe){
+                var delta = buildingData.recipe[item] - building.getItemNb(item);
+                nb = Math.min(nb,delta);
+            }
+        }
         if(isFinancial) {
             var price = building.getPrice(item, nb, 'buy');
             console.log(building.prices[item]);
@@ -1422,10 +1429,12 @@ GameServer.canBuild = function(bid,tile){
                 console.log('Collision at ',tile.x+x,tile.y-y);
                 return -1;
             }
-            if(GameServer.positions.get(tile.x+x,tile.y-y).length > 0 ||
-                GameServer.itemPositions.get(tile.x+x,tile.y-y).length > 0) return -2;
+            // if(GameServer.positions.get(tile.x+x,tile.y-y).length > 0 ||
+            //     GameServer.itemPositions.get(tile.x+x,tile.y-y).length > 0) return -2;
         }
     }
+    var obstacles = GameServer.getEntitiesAt(x,y-h,w,h);
+    if(obstacles.length) return -2;
     return 1;
 };
 
@@ -1619,7 +1628,7 @@ GameServer.handleUse = function(data,socketID){
             console.log('not player turn');
             return false;
         }
-        player.battle.setEndOfTurn(500);
+        player.battle.setEndOfTurn(500); // TODO: remove when new actions per turn system
     }
     var itemData = GameServer.itemsData[item];
     var isEquipment = !!itemData.equipment;

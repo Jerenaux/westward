@@ -16,7 +16,6 @@ function Item(x,y,type,instance){
     this.y = y;
     this.type = type;
     this.setOrUpdateAOI();
-    GameServer.itemPositions.add(this.x,this.y,this);
 }
 
 Item.prototype = Object.create(GameObject.prototype);
@@ -43,7 +42,6 @@ Item.prototype.trim = function() {
 Item.prototype.remove = function(){
     if(this.spawnZone) this.spawnZone.decrement('item',this.type);
     delete GameServer.items[this.id];
-    GameServer.itemPositions.delete(this.x,this.y,this);
 };
 
 Item.prototype.canFight = function(){return false;};

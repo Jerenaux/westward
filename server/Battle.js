@@ -239,19 +239,12 @@ Battle.prototype.setEndOfTurn = function (delay) {
 };
 
 Battle.prototype.processMove = function (f) {
-    //this.removeFromPosition(f);
-    // var pos = f.getEndOfPath();
-    //this.addAtPosition(f);
     return {delay: f.getPathDuration()};
 };
 
 Battle.prototype.isPosition = function (x, y) {
     return this.cells.has(x, y);
 };
-
-/*Battle.prototype.isPositionFree = function(x,y){
-    return !this.positions.get(x,y);
-};*/
 
 Battle.prototype.computeDamage = function (type, a, b) {
     var def = b.getStat('def').getValue();

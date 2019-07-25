@@ -7,7 +7,7 @@
         freezeNPC: false,
         maxDamage: 10000,
         minDamage: 1,
-        rangePenalty: 0.5, // accuracy penalty per tile
+        rangePenalty: 0.1, // accuracy penalty per tile
         turnDuration: 5, // seconds
         tickRate: 100, // milliseconds, granularity of battle updates
         throwableSpeed: 10, // tiles/sec
