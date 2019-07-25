@@ -89,11 +89,9 @@ MovingEntity.prototype.updateWalk = function(){
 };
 
 MovingEntity.prototype.updatePosition = function(x,y){
-    // this.onRemoveAtLocation();
     this.x = x;
     this.y = y;
     this.setOrUpdateAOI();
-    // this.onAddAtLocation();
     this.onLocationChange();
     if(!this.inFight) this.checkForBattle();
 };

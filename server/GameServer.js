@@ -656,8 +656,6 @@ GameServer.addNewPlayer = function(socket,data){
         var info = GameServer.tutorialData['initData'];
         player.spawn(info.x,info.y);
         if(data.tutorial) GameServer.createInstance(player);
-    }else{
-        player.spawn();
     }
 
     var document = new GameServer.PlayerModel(player);
@@ -731,7 +729,7 @@ GameServer.finalizePlayer = function(socket,player,returning){
     GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
     // GameServer.nbConnectedChanged = true;
     GameServer.setFlag('nbConnected');
-    player.setOrUpdateAOI(); // takes care of adding to the world as well
+    player.spawn();
     player.listBuildings();
     //console.log(GameServer.server.getNbConnected()+' connected');
     Prism.logEvent(player,'connect',{stl:player.sid,re:returning});
@@ -1286,6 +1284,10 @@ GameServer.handleBattleAction = function(data,socketID){
  */
 GameServer.getEntitiesAt = function(x,y,w,h){
     return GameServer.qt.get({x:x, y:y, w: w, h: h});
+};
+
+GameServer.debugQT = function(socketID){
+
 };
 
 GameServer.setBuildingPrice = function(data,socketID){

@@ -15,7 +15,10 @@ function Item(x,y,type,instance){
     this.respawns = false;
     this.x = x;
     this.y = y;
+    this.cellsWidth = 1;
+    this.cellsHeight = 1;
     this.type = type;
+    this.addToQT();
     this.setOrUpdateAOI();
 }
 

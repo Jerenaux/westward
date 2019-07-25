@@ -59,8 +59,6 @@ function Player() {
 
     this.cellsWidth = 1;
     this.cellsHeight = 1;
-    this.w = this.cellsWidth; // For quadtree
-    this.h = this.cellsHeight;
 
     this.setUpStats();
 
@@ -262,7 +260,8 @@ Player.prototype.spawn = function (x, y) {
     this.setProperty('y', y);
     this.setOwnProperty('x', x);
     this.setOwnProperty('y', y);
-    this.onAddAtLocation();
+    this.addToQT();
+    this.setOrUpdateAOI(); // takes care of adding to the world as well
     // console.log('spawning at ', this.x, this.y, '(aiming at', xpos, ypos, ')');
     var battleCell = GameServer.checkForBattle(this.x, this.y);
     if (battleCell) GameServer.expandBattle(battleCell.battle, this);

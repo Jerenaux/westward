@@ -97,11 +97,13 @@ GameObject.prototype.save = function(){
     );*/
 };
 
-GameObject.prototype.onAddAtLocation = function(){
+GameObject.prototype.addToQT = function(){
     // console.warn('putting',this.entityCategory,this.x,this.y,this.w,this.h,this.id);
     // console.warn(GameServer.qt.get({x:0, y: 0, w: 1500, h: 1140}).length);
     this.x = parseInt(this.x);
     this.y = parseInt(this.y);
+    if(this.w === undefined) this.w = this.cellsWidth - 1;
+    if(this.h === undefined) this.h == this.cellsHeight - 1;
     GameServer.qt.put(this);
     // console.warn(GameServer.qt.get({x:0, y: 0, w: 1500, h: 1140}).length);
    /* console.warn('Added ',this.getShortID());

@@ -49,14 +49,16 @@ World Building
 - Zoom-out in towers
 
 Bugs:
+- Debug QT method
 - When loading arrows in fight, item removed instead of deducting 3
-- In battle, equipping an already equipped weapon still removes it from belt [TEST]
 - fix open menu while respawn bug
 - When giving constr material, max amount at amount needed [TEST]
 - The onInit conf stuff is obviously wrongly processed by server (check env vars)
 - use qt in NPC.isPositionFree() [TEST]
 - Test that can't build on top of items, players, animals, other buildings... [TEST]
 - New item respawn system where items add themselves to a list upon removal [TEST]
+- Wrong location of animal markers? (test around 1170 144)
+- Frozen animals?
 Features:
 - Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)

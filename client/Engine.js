@@ -2313,3 +2313,7 @@ function test(){
     rt.setScrollFactor(0);
     console.log('ok');
 }
+
+function dbgqt(){
+    Client.socket.emit('dbgqt');
+}

@@ -486,10 +486,10 @@ function BattleCell(x, y, battle) {
     this.id = GameServer.lastCellID++;
     this.x = x;
     this.y = y;
-    this.w = 1; // for quad tree
-    this.h = 1;
+    this.cellsWidth = 1;
+    this.cellsHeight = 1;
     this.battle = battle;
-    this.onAddAtLocation();
+    this.addToQT();
     this.setOrUpdateAOI();
 }
 

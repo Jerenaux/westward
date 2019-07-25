@@ -250,8 +250,6 @@ io.on('connection',function(socket){
             'tutorial-step': gs.handleTutorialStep,
             'unequip': gs.handleUnequip,
             'use': gs.handleUse,
-
-            //'ss': gs.startScript
         };
 
         var handler = socket.onevent;
@@ -283,6 +281,10 @@ io.on('connection',function(socket){
 
     socket.on('camps-data',function(){
         socket.emit('camps-data',gs.listCamps());
+    });
+
+    socket.on('dbgqt', function(){
+        socket.emit('qt',gs.debugQT());
     });
 
     socket.on('disconnect',function(){
