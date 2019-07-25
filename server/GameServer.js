@@ -338,7 +338,8 @@ GameServer.loadItems = function(){
         var x = item[0];
         var y = item[1];
         var type = item[2];
-        GameServer.addItem(x,y,type); // don't check for collisions, otherwise stones don't spawn
+        var item = GameServer.addItem(x,y,type); // don't check for collisions, otherwise stones don't spawn
+        item.setRespawnable();
     },this);
 
     path = pathmodule.join(GameServer.mapsPath,'resourceMarkers.json');
@@ -532,8 +533,6 @@ GameServer.startEconomy = function(){
     GameServer.economyTurn();
     GameServer.turnDuration = config.get('economyCycles.turnDuration');
     setInterval(GameServer.economyTurn,GameServer.turnDuration*1000);
-
-    // setInterval(GameServer.respawnItems,config.get('economyCycles.itemsRespawnInterval')*1000);
 };
 
 /**
@@ -967,20 +966,17 @@ GameServer.lootNPC = function(player,type,ID){
  * */
 GameServer.respawnItems = function(){
     console.log('Respawning items ...');
-    var path = pathmodule.join(GameServer.mapsPath,'items.json');
-    var items = JSON.parse(fs.readFileSync(path).toString());
-    items.forEach(function(item){
-        var x = item[0];
-        var y = item[1];
-        var type = item[2];
-        var aoi = Utils.tileToAOI({x:x,y:y});
-        if(GameServer.vision.has(aoi)) return;
-        // if(GameServer.itemPositions.get(x,y).length === 0){
-        //     if(Utils.randomInt(1,10) > 5) GameServer.addItem(x,y,type);
-        // }
-        if(Utils.randomInt(1,10) > 5) GameServer.addItem(x,y,type);
-        // TODO: different respawn system
-    },this);
+    var i = GameServer.itemsToRespawn.length;
+    while(i--){
+        var data = GameServer.itemsToRespawn[i];
+        if(Date.now() - data.stamp < 3600) continue;// TODO: conf
+        if(Utils.randomInt(1,10) < 5) continue; // TODO: conf/make variable
+        GameServer.itemsToRespawn.splice(i,1);
+        if(GameServer.checkCollision(data.x,data.y)) continue;
+        var item = GameServer.addItem(data.x,data.y,data.type); 
+        item.setRespawnable();
+        console.log('respawning ',GameServer.itemsData[data.type].name,'at',data.x,data.y);
+    }
 };
 
 /**

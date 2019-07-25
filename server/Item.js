@@ -12,6 +12,7 @@ function Item(x,y,type,instance){
     this.id = GameServer.lastItemID++;
     this.isPlayer = false;
     this.isAnimal = false;
+    this.respawns = false;
     this.x = x;
     this.y = y;
     this.type = type;
@@ -26,6 +27,10 @@ Item.prototype.setSpawnZone = function(zone){
 };
 
 Item.prototype.isAvailableForFight = function(){return false};
+
+Item.prototype.setRespawnable = function(){
+    this.respawns = true;
+};
 
 Item.prototype.trim = function() {
     var trimmed = {};
@@ -42,6 +47,12 @@ Item.prototype.trim = function() {
 Item.prototype.remove = function(){
     if(this.spawnZone) this.spawnZone.decrement('item',this.type);
     delete GameServer.items[this.id];
+    if(this.respawns) GameServer.itemsToRespawn.push({
+        x: this.x,
+        y: this.y,
+        type: this.type,
+        stamp: Date.now()
+    });
 };
 
 Item.prototype.canFight = function(){return false;};

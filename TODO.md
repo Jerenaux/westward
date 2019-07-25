@@ -56,7 +56,7 @@ Bugs:
 - The onInit conf stuff is obviously wrongly processed by server (check env vars)
 - use qt in NPC.isPositionFree() [TEST]
 - Test that can't build on top of items, players, animals, other buildings... [TEST]
-- New item respawn system where items add themselves to a list upon removal (update gs.respawnItems)
+- New item respawn system where items add themselves to a list upon removal [TEST]
 Features:
 - Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)
