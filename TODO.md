@@ -49,7 +49,7 @@ World Building
 - Zoom-out in towers
 
 Bugs:
-- Debug QT method
+- Automatically send QT debug info in all updates (config flag) (remove dbgqt())
 - When loading arrows in fight, item removed instead of deducting 3
 - fix open menu while respawn bug
 - When giving constr material, max amount at amount needed [TEST]
