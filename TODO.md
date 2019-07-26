@@ -58,7 +58,9 @@ Bugs:
 - Test that can't build on top of items, players, animals, other buildings... [TEST]
 - New item respawn system where items add themselves to a list upon removal [TEST]
 - Wrong location of animal markers? (test around 1170 144)
-- Frozen animals?
+- On game load, don't put items at *QT* collisions
+- Test rest online and offline
+- Chevauchement dans lumbercamp?
 Features:
 - Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)
@@ -71,6 +73,7 @@ Features:
 - Conflict/death pin only at the end of battle
 - Save death/conflict icons?
 - Test acc penalty 
+- Item transparency, and even ideally player/NPC transparency
   
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email

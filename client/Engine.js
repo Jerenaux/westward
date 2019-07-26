@@ -45,6 +45,7 @@ Engine.preload = function() {
     this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('wolves', 'assets/sprites/animals/wolves.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bears', 'assets/sprites/animals/bears2.png',{frameWidth:56,frameHeight:56});
+    this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
     // this.load.spritesheet('toadmen', 'assets/sprites/animals/toadmen.png',{frameWidth:48,frameHeight:48});
 
     // #################""
@@ -378,7 +379,9 @@ Engine.initWorld = function(data){
     }
 
     if(Client.tutorial) TutorialManager.boot(1);
-    
+
+    var butterfly = new Insect(200,200);
+
     // todo: move all to dedicated sound manager
     /*Engine.lastOrientationSound = 0;
     // todo: move to JSON file (+ config for delay)
@@ -497,6 +500,13 @@ Engine.createAnimations = function(){
         key: 'enemy_death',
         frames: Engine.scene.anims.generateFrameNumbers('enemy', { start: 260, end: 265}),
         frameRate: 10
+    });
+
+    Engine.scene.anims.create({
+        key: 'butterflap',
+        frames: Engine.scene.anims.generateFrameNumbers('butterfly', { start: 0, end: 1}),
+        frameRate: 5,
+        repeat: -1
     });
 };
 
