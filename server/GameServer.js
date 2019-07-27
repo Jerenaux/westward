@@ -1286,8 +1286,17 @@ GameServer.getEntitiesAt = function(x,y,w,h){
     return GameServer.qt.get({x:x, y:y, w: w, h: h});
 };
 
-GameServer.debugQT = function(socketID){
-
+GameServer.getNearbyQT = function(player){
+    return GameServer.getEntitiesAt(player.x-17,player.y-10,34,20).map(
+        function(e){
+            return {
+                x: e.x,
+                y: e.y,
+                w: e.w,
+                h: e.h
+            }
+        }
+    );
 };
 
 GameServer.setBuildingPrice = function(data,socketID){

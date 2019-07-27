@@ -61,6 +61,7 @@ Bugs:
 - On game load, don't put items at *QT* collisions
 - Test rest online and offline
 - Chevauchement dans lumbercamp?
+- Camera adjust on spawn
 Features:
 - Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)

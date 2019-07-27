@@ -380,7 +380,6 @@ Engine.initWorld = function(data){
 
     if(Client.tutorial) TutorialManager.boot(1);
 
-    var butterfly = new Insect(200,200);
 
     // todo: move all to dedicated sound manager
     /*Engine.lastOrientationSound = 0;
@@ -2322,8 +2321,4 @@ function test(){
     rt.setDepth(100);
     rt.setScrollFactor(0);
     console.log('ok');
-}
-
-function dbgqt(){
-    Client.socket.emit('dbgqt');
 }

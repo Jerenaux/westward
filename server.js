@@ -283,10 +283,6 @@ io.on('connection',function(socket){
         socket.emit('camps-data',gs.listCamps());
     });
 
-    socket.on('dbgqt', function(){
-        socket.emit('qt',gs.debugQT());
-    });
-
     socket.on('disconnect',function(){
         gs.handleDisconnect(socket.id);
     });

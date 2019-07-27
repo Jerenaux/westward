@@ -41,6 +41,8 @@ var Item = new Phaser.Class({
         Engine.entityManager.addToDisplayList(this);
 
         this.manageOrientationPin();
+
+        if(itemData.insect && Utils.randomInt(1,10) > 8) new Insect(this.x,this.y);
     },
 
     remove: function(){

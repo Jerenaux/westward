@@ -56,7 +56,8 @@
     },
     misc: {
         foodID: 1,
-        performInit: true
+        performInit: true,
+        debugQT: true
     },
     pathfinding: {
         walkingSpeed: 5, // tiles/sec

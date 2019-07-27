@@ -945,6 +945,7 @@ Player.prototype.getIndividualUpdatePackage = function () {
     if (GameServer.checkFlag('buildingsMarkers')) pkg.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
     if (GameServer.checkFlag('deathMarkers')) pkg.deathMarkers = GameServer.listDeathMarkers();
     if (GameServer.checkFlag('conflictMarkers')) pkg.conflictMarkers = GameServer.listConflictMarkers();
+    if(GameServer.miscParameters.debugQT) pkg.qt = GameServer.getNearbyQT(this);
     if (pkg.isEmpty()) return null;
     this.updatePacket = new PersonalUpdatePacket();
     return pkg;
