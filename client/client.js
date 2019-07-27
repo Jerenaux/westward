@@ -137,6 +137,7 @@ Client.socket.on('update',function(data){ // This event triggers uppon receiving
     if(data.global) console.log(data.global);
     if(data.local) Engine.updateSelf(data.local); // Should come first
     if(data.global) Engine.updateWorld(data.global);
+    if(data.qt) Engine.debugQT(data.qt);
     Engine.currentTurn = data.turn;
 });
 

@@ -131,7 +131,6 @@ NPC.prototype.isPositionFree = function(x,y){
     var obstacles = GameServer.getEntitiesAt(x,y,1,1).filter(function(o){
         return o.isFightingEntity;
     });
-    console.warn(GameServer.qt.toString());
     return obstacles.length == 0;
 };
 

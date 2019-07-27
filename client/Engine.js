@@ -2307,6 +2307,14 @@ Engine.snap = function(){
     });
 };
 
+Engine.debugQT = function(quads){
+    quads.forEach(function(q){
+        var rect = Engine.scene.add.rectangle(q.x*32, q.y*32, (q.w+1)*32, (q.h+1)*32, 0x6666ff);
+        rect.setDepth(100).setOrigin(0);
+        console.warn(q);
+    });
+};
+
 function cl(){
     localStorage.clear();
 }

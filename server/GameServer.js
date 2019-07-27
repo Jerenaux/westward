@@ -1841,6 +1841,7 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         if(localPkg) finalPackage.local = localPkg.clean();
         if(GameServer.checkFlag('nbConnected')) finalPackage.nbconnected = GameServer.server.getNbConnected();
         finalPackage.turn = GameServer.elapsedTurns;
+        if(GameServer.miscParameters.debugQT) finalPackage.qt = GameServer.getNearbyQT(player);
         // console.warn(finalPackage);
         // console.warn('#####################');
         GameServer.server.sendUpdate(player.socketID,finalPackage);
@@ -1996,11 +1997,8 @@ GameServer.checkInstanceEvent = function(instance,step){
     // console.log('Checking event for step ',step,' event ',event);
     if(event){
         var eventsData = GameServer.tutorialData['events'][event];
-        console.log(eventsData);
         eventsData['newanimals'].forEach(function(anl){
-            console.warn(anl);
             var animal = GameServer.addAnimal(anl.x,anl.y,anl.type,instance);
-            console.warn(animal);
         });
         eventsData['attack'].forEach(function(id){
             GameServer.animals[id].setTrackedTarget(GameServer.instances[instance].player);
