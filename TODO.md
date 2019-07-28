@@ -51,8 +51,6 @@ World Building
 Bugs:
 - The onInit conf stuff is obviously wrongly processed by server (check env vars)
 - All wolves in row should be involved in fight (uncomment line in gs.connectToBattle)
-- Reproduce bug in latest screenshot
-- Can't build next to something?
 Features:
 - Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)

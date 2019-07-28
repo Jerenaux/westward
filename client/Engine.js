@@ -1460,7 +1460,7 @@ Engine.bldClick = function(){
     var bld = Engine.buildingsData[this.bldID];
     Engine.currentMenu.hide();
 
-    //Engine.hideMarker();
+    Engine.hideMarker();
     Engine.bldRect = Engine.scene.add.rectangle(0,0, bld.base.width*32, bld.base.height*32, 0x00ee00).setAlpha(0.7);
     Engine.bldRect.bldID = this.bldID;
     Engine.bldRect.locationConstrained = bld.locationConstrained;

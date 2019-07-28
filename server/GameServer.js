@@ -447,7 +447,7 @@ GameServer.addItem = function(x,y,type,instance){
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
-    GameServer.addAnimal(515,654,0);
+    GameServer.addAnimal(1212,168,0);
     GameServer.addAnimal(516,652,0);
     GameServer.addAnimal(1174,144,0);
     GameServer.addAnimal(1173,144,0);
@@ -1056,11 +1056,11 @@ GameServer.handleBattle = function(attacker,attacked){
     }
     if(!attacker.isAvailableForFight() || attacker.isInFight() 
     || !attacked.isAvailableForFight() || attacked.isInFight()){
-        console.log('Availability issue');
-        console.log('attacker avilable:',attacker.isAvailableForFight() );
-        console.log('attacked avilable:',attacked.isAvailableForFight() );
-        console.log('attacker in fight:',attacker.isInFight() );
-        console.log('attacked in fight:',attacked.isInFight() );
+        console.log('Availability issue:');
+        console.log('Attacker available:',attacker.isAvailableForFight() );
+        console.log('Attacked available:',attacked.isAvailableForFight() );
+        console.log('Attacker in fight:',attacker.isInFight() );
+        console.log('Attacked in fight:',attacked.isInFight() );
         return false;
     }
     // TODO: check for proximity
@@ -1451,8 +1451,9 @@ GameServer.canBuild = function(bid,tile){
             }
         }
     }
-    var w = data.base.width;
-    var h = data.base.height;
+    var w = data.base.width - 1;
+    var h = data.base.height - 1;
+    console.warn('checking area',tile.x,tile.y-h,w,h);
     var obstacles = GameServer.getEntitiesAt(tile.x,tile.y-h,w,h);
     if(obstacles.length) return -2;
     return 1;

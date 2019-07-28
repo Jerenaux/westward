@@ -97,6 +97,7 @@ NPC.prototype.decideBattleAction = function(){
 
 NPC.prototype.findBattlePath = function(dest){
     var data = {};
+    // console.warn('seeking path',{x: this.x, y: this.y}, dest);
     var path = this.battle.findPath({x: this.x, y: this.y}, dest);
     if(path && path.length > 0){
         this.setPath(path);
