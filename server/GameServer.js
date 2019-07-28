@@ -471,15 +471,15 @@ GameServer.onNewPlayer = function(player){
     // player.applyVigorModifier();
 
     const items = [
-        [3,30],
-        // [4, 5],
-        [6, 3],
-        [2, 1],
-        [19, 1],
-        [20, 17],
-        // [45, 10],
-        // [50, 11],
-        [51, 1],
+        // [3,30],
+        // // [4, 5],
+        // [6, 3],
+        // [2, 1],
+        // [19, 1],
+        // [20, 17],
+        // // [45, 10],
+        // // [50, 11],
+        // [51, 1],
     ];
 
     items.forEach(item => {
@@ -644,7 +644,6 @@ GameServer.addNewPlayer = function(socket,data){
     if(region === undefined) region = 0;
     //console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
     var player = new Player();
-    player.setStartingInventory();
     player.setRegion(region);
     player.setName(data.characterName);
     player.id = ++GameServer.lastPlayerID;     // A read of the db makes sure that `lastPlayerID` doesn't conflict
@@ -666,6 +665,7 @@ GameServer.addNewPlayer = function(socket,data){
         GameServer.saveNewPlayerToDb(socket,player,document);
     }
     GameServer.finalizePlayer(socket,player,false); // false = new player
+    player.setStartingInventory();
     player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
     player.save();
     return player;
@@ -1453,7 +1453,6 @@ GameServer.canBuild = function(bid,tile){
     }
     var w = data.base.width - 1;
     var h = data.base.height - 1;
-    console.warn('checking area',tile.x,tile.y-h,w,h);
     var obstacles = GameServer.getEntitiesAt(tile.x,tile.y-h,w,h);
     if(obstacles.length) return -2;
     return 1;
@@ -1848,7 +1847,6 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         ){
                 return;
             }
-
         var finalPackage = {};
         if(individualGlobalPkg) finalPackage.global = individualGlobalPkg.clean();
         if(localPkg) finalPackage.local = localPkg.clean();
@@ -1863,7 +1861,6 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         // console.log(finalPackage.local);
     });
     GameServer.resetFlags();
-
     GameServer.clearAOIs(); // erase the update content of all AOIs that had any
 };
 

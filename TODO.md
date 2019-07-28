@@ -1,4 +1,5 @@
 ## To test:
+- Test starting inventory of new player
 - Test settlement selection (with value of 0)
 - Test ammo container type match
 - Test that the world is populated with items, animals, etc.
@@ -49,8 +50,10 @@ World Building
 - Zoom-out in towers
 
 Bugs:
+- New player bug ...
 - The onInit conf stuff is obviously wrongly processed by server (check env vars)
 - All wolves in row should be involved in fight (uncomment line in gs.connectToBattle)
+- Remove ``data.new = true;``
 Features:
 - Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)

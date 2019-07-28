@@ -198,10 +198,14 @@ Player.prototype.applyVigorModifier = function () {
 Player.prototype.setStartingInventory = function () {
     // TODO: move to some config file
     var list = [
-        [7, 1],
-        [21, 1]
+        [7, 5],
+        [2,1],
+        [19,1],
+        [20,3],
+        [51,1],
+        [6,1]
     ];
-
+    console.warn('Giving starting inventory');
     list.forEach(function (l) {
         this.giveItem(l[0], l[1]);
         GameServer.createItem(l[0], l[1], 'start');

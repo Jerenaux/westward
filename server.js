@@ -224,6 +224,8 @@ io.on('connection',function(socket){
         if(!data.stamp || data.stamp < server.resetStamp) data.new = true; // TODO Remove eventually
 
         console.log(data);
+        data.new = true;
+        data.characterName = 'Jero'; // TODO: REMOVE
         if(data.new){ // new players OR tutorial
             gs.addNewPlayer(socket,data);
         }else{
@@ -290,12 +292,14 @@ io.on('connection',function(socket){
 });
 
 server.sendInitializationPacket = function(socket,packet){
+    // console.warn('sending init');
     packet = server.addStamp(packet);
     //if(server.enableBinary) packet = Encoder.encode(packet,CoDec.initializationSchema);
     socket.emit('init',packet);
 };
 
 server.sendUpdate = function(socketID,pkg){
+    // console.warn('sending update',pkg);
     var socket = server.getSocket(socketID);
     pkg = server.addStamp(pkg);
     if(socket) pkg.latency = Math.floor(socket.latency);

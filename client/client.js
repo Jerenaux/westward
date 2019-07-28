@@ -26,6 +26,7 @@ Client.requestData = function(){ // request the data to be used for initWorld()
     var onevent = Client.socket.onevent;
     Client.socket.onevent = function (packet) {
         if(!Engine.playerIsInitialized && packet.data[0] != Client.initEventName && packet.data[0] != 'dbError'){
+            console.warn('queueing ',packet.data[0]);
             Client.eventsQueue.push(packet);
         }else{
             onevent.call(this, packet);    // original call
