@@ -92,7 +92,6 @@ MovingEntity.prototype.updatePosition = function(x,y){
     this.x = x;
     this.y = y;
     this.setOrUpdateAOI();
-    this.onLocationChange();
     if(!this.inFight) this.checkForBattle();
 };
 
@@ -234,7 +233,6 @@ MovingEntity.prototype.getRect = function(){
 
 MovingEntity.prototype.remove = function(){
     if(this.battle) this.battle.removeFighter(this);
-    this.onRemoveFromLocation();
 };
 
 module.exports.MovingEntity = MovingEntity;

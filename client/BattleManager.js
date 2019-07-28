@@ -199,6 +199,7 @@ BattleManager.onDeath = function(){
     Engine.updateGrid();
     var respawnPanel = Engine.menus["battle"].panels['respawn'];
     setTimeout(function(){
+        Engine.hideHUD();
         respawnPanel.display();
     },1000);
 };

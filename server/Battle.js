@@ -489,7 +489,6 @@ function BattleCell(x, y, battle) {
     this.cellsWidth = 1;
     this.cellsHeight = 1;
     this.battle = battle;
-    this.addToQT();
     this.setOrUpdateAOI();
 }
 
@@ -535,9 +534,7 @@ BattleCell.prototype.getLocationCenter = function () {
     };
 };
 
-BattleCell.prototype.remove = function () {
-    this.onRemoveFromLocation();
-};
+BattleCell.prototype.remove = function () {};
 
 BattleCell.prototype.canFight = function () {
     return false;

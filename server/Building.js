@@ -117,7 +117,6 @@ Building.prototype.constructor = Building;
 
 Building.prototype.embed = function(){
     GameServer.buildings[this.id] = this;
-    this.addToQT();
     this.setOrUpdateAOI();
     this.setCollisions('add');
     this.updateBuild();

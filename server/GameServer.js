@@ -7,7 +7,6 @@ var clone = require('clone'); // used to clone objects, essentially used for clo
 var ObjectId = require('mongodb').ObjectID;
 var mongoose = require('mongoose');
 var config = require('config');
-var QuadTree = require('simple-quadtree');
 
 var GameServer = {
     lastPlayerID: 0,
@@ -155,8 +154,6 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.collisions = new SpaceMap();
     GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()),true); // true = compact
     GameServer.pathFinder = new Pathfinder(GameServer.collisions,GameServer.PFParameters.maxPathLength);
-
-    GameServer.qt = QuadTree(0, 0, World.worldWidth, World.worldHeight);
 
     GameServer.fogOfWar = {};
     GameServer.fowList = [];
@@ -478,7 +475,7 @@ GameServer.onNewPlayer = function(player){
         [6, 3],
         [2, 1],
         [19, 1],
-        [20, 10],
+        [20, 17],
         // [45, 10],
         // [50, 11],
         [51, 1],
@@ -657,6 +654,8 @@ GameServer.addNewPlayer = function(socket,data){
         player.spawn(info.x,info.y);
         if(data.tutorial) GameServer.createInstance(player);
     }
+    // call before finalizePlayer()
+    player.spawn(); // at respawn location
 
     var document = new GameServer.PlayerModel(player);
     player.setModel(document);
@@ -710,7 +709,7 @@ GameServer.loadPlayer = function(socket,id){
             player.setIDs(mongoID,socket.id);
             player.getDataFromDb(doc);
             player.setModel(doc);
-            player.spawn(player.x, player.y);
+            player.spawn(player.x, player.y); // call before finalizePlayer()
             GameServer.finalizePlayer(socket,player,true); // sends the init packet ; true = returning player
         }
     );
@@ -729,7 +728,6 @@ GameServer.finalizePlayer = function(socket,player,returning){
     GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
     // GameServer.nbConnectedChanged = true;
     GameServer.setFlag('nbConnected');
-    player.spawn();
     player.listBuildings();
     //console.log(GameServer.server.getNbConnected()+' connected');
     Prism.logEvent(player,'connect',{stl:player.sid,re:returning});
@@ -1124,8 +1122,8 @@ GameServer.computeBattleArea = function(f1,f2,depth){
         // TODO: randomize?
         for(var i = 0; i < contour.length; i++){
             var candidate = {
-                x: node.x + contour[i][0],
-                y: node.y + contour[i][1],
+                x: parseInt(node.x) + contour[i][0],
+                y: parseInt(node.y) + contour[i][1],
                 d: node.d + 1
             };
             if(!GameServer.checkCollision(candidate.x,candidate.y)
@@ -1283,12 +1281,26 @@ GameServer.handleBattleAction = function(data,socketID){
  * @returns {Array} - List of entities found.
  */
 GameServer.getEntitiesAt = function(x,y,w,h){
-    return GameServer.qt.get({x:x, y:y, w: w, h: h});
+    var aois = new Set(
+        Utils.listAdjacentAOIs(Utils.tileToAOI(x,y))
+        .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x+w,y)))
+        .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x,y+h)))
+        .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x+w,y+h)))
+    );
+    var entities = [];
+    var rect = {x:x,y:y,w:w,h:h};
+    aois.forEach(function(aoi){
+        GameServer.AOIs[aoi].entities.forEach(function(entity){
+            if(Utils.overlap(entity.getRect(),rect)) entities.push(entity);
+        });
+    });
+    return entities;
 };
 
 GameServer.getNearbyQT = function(player){
     return GameServer.getEntitiesAt(player.x-17,player.y-10,34,20).map(
         function(e){
+            e = e.getRect();
             return {
                 x: e.x,
                 y: e.y,
@@ -1365,8 +1377,8 @@ GameServer.handleShop = function(data,socketID) {
             console.log('Building cannot buy');
             return false;
         }
-        if(!this.built){ // Don't give too much to buildings under construction
-            var buildingData = GameServer.buildingsData[this.type];
+        if(!building.built){ // Don't give too much to buildings under construction
+            var buildingData = GameServer.buildingsData[building.type];
             if(item in buildingData.recipe){
                 var delta = buildingData.recipe[item] - building.getItemNb(item);
                 nb = Math.min(nb,delta);
@@ -1632,7 +1644,7 @@ GameServer.handleUse = function(data,socketID){
 
     if(player.inFight){
         if(!player.battle.isTurnOf(player)){
-            console.log('not player turn');
+            console.log('Not player turn');
             return false;
         }
         player.battle.setEndOfTurn(500); // TODO: remove when new actions per turn system

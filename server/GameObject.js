@@ -97,51 +97,9 @@ GameObject.prototype.save = function(){
     );*/
 };
 
-GameServer.prototype.getQTObject = function(){
-    return {
-        x: parseInt(this.x),
-        y: this.isBuilding ? parseInt(this.y) - this.cellsHeight : parseInt(this.y),
-        w: this.cellsWidth - 1,
-        h: this.cellsHeight - 1,
-    }
-};
-
-GameObject.prototype.addToQT = function(){
-    // console.warn('putting',this.entityCategory,this.x,this.y,this.w,this.h,this.id);
-    // console.warn(GameServer.qt.get({x:0, y: 0, w: 1500, h: 1140}).length);
-    this.x = parseInt(this.x);
-    this.y = parseInt(this.y);
-    if(this.w === undefined) this.w = this.cellsWidth - 1;
-    if(this.h === undefined) this.h = this.cellsHeight - 1;
-    // if(this.isBuilding) console.warn('addtoQT',this.x,this.y,this.w,this.h);
-    GameServer.qt.put(this);
-    // console.warn(GameServer.qt.get({x:0, y: 0, w: 1500, h: 1140}).length);
-   /* console.warn('Added ',this.getShortID());
-    var list = GameServer.qt.get({x:this.x-1, y: this.y-1, w: 3, h: 3});
-    list.forEach(function(e){
-        console.warn('ID:',e.getShortID());
-        return true;
-    });*/
-};
-
-GameObject.prototype.onLocationChange = function(){
-    // It's ok if multiple objects have same ID, it'll
-    // only match and update those with same x,y,w,h
-    // console.warn('moving',this.entityCategory,this.x,this.y,this.w,this.h);
-    this.x = parseInt(this.x);
-    this.y = parseInt(this.y);
-    GameServer.qt.update(this,'id',{x:this.x,y:this.y});
-};
-
-GameObject.prototype.onRemoveFromLocation = function(){
-    // console.warn('removing',this.entityCategory,this.x,this.y,this.w,this.h);
-    GameServer.qt.remove(this);
-};
-
 GameObject.prototype.trim = function(trimmed){
     trimmed.instance = this.instance;
     return trimmed;
 };
-
 
 module.exports.GameObject = GameObject;

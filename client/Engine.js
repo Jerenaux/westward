@@ -247,6 +247,7 @@ Engine.create = function(){
     Engine.debug = true;
     Engine.showHero = true;
     Engine.showGrid = false;
+    Engine.qtQuads = []; // for debugging
 
     Engine.camera = Engine.scene.cameras.main;
     Engine.camera.setBounds(0,0,Engine.worldWidth*TILE_WIDTH,Engine.worldHeight*TILE_HEIGHT);
@@ -540,7 +541,7 @@ Engine.manageDeath = function(){
 
 Engine.manageRespawn = function(){
     Engine.showMarker();
-    // Engine.displayUI();
+    Engine.displayHUD();
     Engine.dead = false;
     Engine.updateAllOrientationPins();
 };
@@ -848,7 +849,7 @@ menuIcon = function(x,y,icon,menu,tox,toy){
 
 menuIcon.prototype.toggle = function(){
     if(this.displayed){
-        if(Engine.inBuilding || Engine.currentMenu.fullHide){
+        if(Engine.inBuilding || (Engine.currentMenu && Engine.currentMenu.fullHide)){
             this.fullhide();
         }else {
             this.hide();
@@ -1052,20 +1053,6 @@ Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss,delay){
         });
 
 };
-
-/*Engine.displayUI = function(){
-    Engine.UIHolder.display();
-    for(var i = 0; i < Engine.nbBasicUIEelements; i++){
-        Engine.UIelements[i].setVisible(true);
-    }
-};
-
-Engine.hideUI = function(){
-    Engine.UIHolder.hide();
-    Engine.UIelements.forEach(function(e){
-        e.setVisible(false);
-    });
-};*/
 
 Engine.getPlayerHealth = function(){
     return Engine.player.getStatValue('hp');
@@ -2308,10 +2295,13 @@ Engine.snap = function(){
 };
 
 Engine.debugQT = function(quads){
+    Engine.qtQuads.forEach(function(q){
+       q.destroy();
+    });
     quads.forEach(function(q){
-        var rect = Engine.scene.add.rectangle(q.x*32, q.y*32, (q.w+1)*32, (q.h+1)*32, 0x6666ff);
+        var rect = Engine.scene.add.rectangle(q.x*32, q.y*32, (q.w)*32, (q.h)*32, 0x6666ff);
         rect.setDepth(100).setOrigin(0);
-        console.warn(q);
+        Engine.qtQuads.push(rect);
     });
 };
 

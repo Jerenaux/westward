@@ -329,6 +329,7 @@ describe('GameServer',function(){
         for(var itemID in gs.itemsData){
             var item = gs.itemsData[itemID];
             var properSlot = item.equipment;
+            if(item.permanent) continue; // don't try to equip fists, hands...
             if(!properSlot) continue;
             var slotid = slots.indexOf(properSlot); 
             var wrongSlot = slotid > 0 ? slots[slotid - 1] : slots[slotid + 1];

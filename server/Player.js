@@ -257,7 +257,6 @@ Player.prototype.spawn = function (x, y) {
     this.setProperty('y', y);
     this.setOwnProperty('x', x);
     this.setOwnProperty('y', y);
-    this.addToQT();
     this.setOrUpdateAOI(); // takes care of adding to the world as well
     // console.log('spawning at ', this.x, this.y, '(aiming at', xpos, ypos, ')');
     var battleCell = GameServer.checkForBattle(this.x, this.y);
@@ -268,7 +267,6 @@ Player.prototype.respawn = function () {
     this.setProperty('dead', false);
     this.setOwnProperty('dead', false);
     this.setStat('hp', 10); // TODO: adapt remaining health
-    this.onRemoveFromLocation();
     this.spawn();
     this.setOrUpdateAOI();
     this.save();
@@ -511,12 +509,18 @@ Player.prototype.equip = function (slot, itemID, fromDB) {
         console.log('Item cannot be equipped in that slot');
         return 0;
     }
-    if(this.getEquippedItemID(slot) == itemID) return 0; // Item already equipped
 
+    // If reloading ammo, it's ok if some is still equipped
+    if(slot != 'range_ammo') {
+        if (this.getEquippedItemID(slot) == itemID){
+            console.log('Item already equipped');
+            return 0;
+        }
+    }
+    // Unequip currently equipped
+    if(this.getEquippedItemID(slot) != itemID) this.unequip(slot);
 
     var slotData = Equipment.getData(slot);
-    if (this.isEquipped(slot)) this.unequip(slot);
-
     if (slotData) {
         var conflictSlot = slotData.conflict; // Name of the slot with which the new object could conflict
         if (conflictSlot && this.isEquipped(conflictSlot)) this.unequip(conflictSlot, true);
@@ -990,7 +994,6 @@ Player.prototype.rest = function (nb) {
 Player.prototype.remove = function () {
     console.log('removing player');
     if (this.battle) this.battle.removeFighter(this);
-    this.onRemoveFromLocation();
     delete GameServer.players[this.id];
     GameServer.updateVision();
 };

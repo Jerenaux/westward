@@ -16,7 +16,6 @@ function NPC(){
     this.actionQueue = [];
     MovingEntity.call(this);
     this.skipBattleTurn = GameServer.battleParameters.freezeNPC;
-    this.addToQT();
     this.setOrUpdateAOI();
 }
 

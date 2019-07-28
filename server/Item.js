@@ -18,7 +18,6 @@ function Item(x,y,type,instance){
     this.cellsWidth = 1;
     this.cellsHeight = 1;
     this.type = type;
-    this.addToQT();
     this.setOrUpdateAOI();
 }
 
@@ -56,6 +55,15 @@ Item.prototype.remove = function(){
         type: this.type,
         stamp: Date.now()
     });
+};
+
+Item.prototype.getRect = function(){
+    return {
+        x: this.x,
+        y: this.y,
+        w: this.cellsWidth,
+        h: this.cellsHeight
+    }
 };
 
 Item.prototype.canFight = function(){return false;};
