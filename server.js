@@ -175,6 +175,7 @@ if(process.env.DEV == 1) {
 
 server.listen(process.env.PORT || myArgs.port || 8081,function(){
     console.log('Listening on '+server.address().port);
+    console.log('Config environment: '+(process.env.NODE_CONFIG_ENV || 'default'));
 
     mongodbAuth = {
         useNewUrlParser: true

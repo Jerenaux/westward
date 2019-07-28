@@ -49,16 +49,10 @@ World Building
 - Zoom-out in towers
 
 Bugs:
-- fix open menu while respawn bug
-- When giving constr material, max amount at amount needed [TEST]
 - The onInit conf stuff is obviously wrongly processed by server (check env vars)
-- Test that can't build on top of items, players, animals, other buildings... [TEST]
-- New item respawn system where items add themselves to a list upon removal [TEST]
-- Wrong location of animal markers? (test around 1170 144)
-- On game load, don't put items at *QT* collisions
-- Test rest online and offline
-- Chevauchement dans lumbercamp?
-- All wolves in row should be involved in fight
+- All wolves in row should be involved in fight (uncomment line in gs.connectToBattle)
+- Reproduce bug in latest screenshot
+- Can't build next to something?
 Features:
 - Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)

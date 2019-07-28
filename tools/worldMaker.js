@@ -592,7 +592,7 @@ WorldMaker.prototype.makeFloraZone = function(x,y,w,h,data){
 };
 
 WorldMaker.prototype.makeAnimalZone = function(x,y,animal){
-    this.animals.add(x,y,animal.animal+':'+animal.group)
+    this.animals.add(x,y,animal.animal+':'+animal.group);
     this.animalsMarkers.push([x,y,animal.animal]);
 };
 

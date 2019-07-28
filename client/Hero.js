@@ -66,7 +66,7 @@ let Hero = new Phaser.Class({
             'ap': this.updateAP,
             'belt': this.updateBelt,
             'bldRecipes': this.updateBuildRecipes,
-            'buildingMarkers': this.updateMarkers,
+            'buildingMarkers': this.updateBuildingMarkers,
             'civiclvl': this.updateCivicLvl,
             'classlvl': this.updateClassLvl,
             'classxp': this.updateClassXP,
@@ -327,7 +327,7 @@ let Hero = new Phaser.Class({
         }
     },
 
-    updateMarkers: function(markers){
+    updateBuildingMarkers: function(markers){
         this.buildingMarkers = markers;
         if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
     },

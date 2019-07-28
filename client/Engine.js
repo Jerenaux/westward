@@ -541,7 +541,6 @@ Engine.manageDeath = function(){
 
 Engine.manageRespawn = function(){
     Engine.showMarker();
-    Engine.displayHUD();
     Engine.dead = false;
     Engine.updateAllOrientationPins();
 };
@@ -784,6 +783,7 @@ Engine.makeUI = function(){
         'map': Engine.makeMapMenu(),
         //'messages': Engine.makeMessagesMenu(),
         'production': Engine.makeProductionMenu(),
+        'respawn': Engine.makeRespawnMenu(),
         'rest': Engine.makeRestMenu(),
         'trade': Engine.makeTradeMenu(),
         'wip': Engine.makeWipMenu()
@@ -1062,8 +1062,19 @@ Engine.getPlayerMaxHealth = function(){
     return Engine.player.getStatValue('hpmax');
 };
 
+Engine.makeRespawnMenu = function(){
+    var menu = new Menu();
+    menu.fullHide = true;
+    var respawnw = 300;
+    var respawnh = 90;
+    var respawnx = (Engine.getGameConfig().width-respawnw)/2;
+    var respawny = 400;
+    var respawn = menu.addPanel('respawn',new RespawnPanel(respawnx,respawny,respawnw,respawnh));
+    respawn.addButton(respawnw-30, 8, 'blue','help',null,'',UI.textsData['respawn_help']);
+    return menu;
+};
+
 Engine.makeBattleMenu = function(){
-    var alignx = 845;
     var battle = new Menu();
     battle.fullHide = true;
 
@@ -1071,18 +1082,6 @@ Engine.makeBattleMenu = function(){
 
     var belt = battle.addPanel('belt',new InventoryPanel(0,487,200,90,'Belt'));
     belt.setInventory('belt',5,true,BattleManager.processInventoryClick);
-
-    var timerw = 300;
-    var timerh = 60;
-    var timerx = (Engine.getGameConfig().width-timerw)/2;
-    var timery = Engine.getGameConfig().height-timerh;
-    /*var timerPanel = battle.addPanel('timer',new BattleTimerPanel(timerx,timery,timerw,timerh));
-    timerPanel.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['battletimer_help']);*/
-
-    var respawnh = 90;
-    var respawny = 400;
-    var respawn = battle.addPanel('respawn',new RespawnPanel(timerx,respawny,timerw,respawnh),true);
-    respawn.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['respawn_help']);
 
     battle.addEvent('onUpdateBelt',belt.updateInventory.bind(belt));
     battle.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
@@ -1117,7 +1116,7 @@ Engine.makeProductionMenu = function(){
     productionPanel.addCapsule('gold',20,20,'999','gold');
     production.addPanel('production',productionPanel);
 
-    var action = new ShopPanel(212,420,300,100,'Take',true); // true = not shop, hack
+    var action = new ShopPanel(212,440,300,100,'Take',true); // true = not shop, hack
     action.addButton(300-16,-8,'red','close',action.hide.bind(action),'Close');
     action.moveUp(2);
     production.addPanel('action',action,true);
@@ -2263,13 +2262,9 @@ Engine.takeClick = function(){
     Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
 };
 
-Engine.commitClick = function(){
-    Client.sendCommit();
-};
-
 Engine.respawnClick = function(){ // this bound to respawn panel
     Client.sendRespawn();
-    this.hide();
+    Engine.menus["respawn"].hide();
 };
 
 Engine.buildError = function(){

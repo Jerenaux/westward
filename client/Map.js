@@ -430,7 +430,7 @@ var Map = new Phaser.Class({
         var tile = Engine.player.getTilePosition();
         this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
         Engine.player.buildingMarkers.forEach(function(data){
-            var pin = this.addPin(data.x,data.y,
+            this.addPin(data.x,data.y,
                 Engine.buildingsData[data.type].name,
                 (data.owner == Engine.player.id ? 'bld2own' : 'bld2')
                 // Engine.buildingsData[data.type].mapicon,

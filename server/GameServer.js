@@ -326,16 +326,17 @@ GameServer.loadBuildings = function(){
  * Called during the initialization sequence.
  */
 GameServer.loadItems = function(){
-
-    // GameServer.getItemsFromDBUpdateCache();
-
     var path = pathmodule.join(GameServer.mapsPath,'items.json');
     var items = JSON.parse(fs.readFileSync(path).toString());
     items.forEach(function(item){
         var x = item[0];
         var y = item[1];
         var type = item[2];
-        var item = GameServer.addItem(x,y,type); // don't check for collisions, otherwise stones don't spawn
+        // don't check for hard collisions, otherwise stones don't spawn
+        // instead simply check with collisions w/ other entities
+        var obstacles = GameServer.getEntitiesAt(x,y,1,1);
+        if(obstacles.length) return;
+        var item = GameServer.addItem(x,y,type);
         item.setRespawnable();
     },this);
 
@@ -465,9 +466,9 @@ GameServer.onNewPlayer = function(player){
     // for testing)
     if(!config.get('misc.performInit')) return;
     // give me all the health and vigor
-    player.setStat('hp', 300);
-    player.setStat('vigor', 10);
-    player.applyVigorModifier();
+    // player.setStat('hp', 30);
+    // player.setStat('vigor', 10);
+    // player.applyVigorModifier();
 
     const items = [
         [3,30],
@@ -1172,7 +1173,6 @@ GameServer.checkForBattle = function(x,y){
     return GameServer.battleCells.get(x,y);
 };
 
-
 /**
  * When an entity is in the vicinity of a battle area, it is sucked
  * into the battle and the battle area expans to incorporate it.
@@ -1186,6 +1186,7 @@ GameServer.connectToBattle = function(entity,cell){
     var area = GameServer.computeBattleArea(entity,cell,3);
     battle.addFighter(entity);
     GameServer.addBattleArea(area,battle);
+    // GameServer.expandBattle(battle,entity);
 };
 
 /**
@@ -1448,11 +1449,11 @@ GameServer.canBuild = function(bid,tile){
                 console.log('Collision at ',tile.x+x,tile.y-y);
                 return -1;
             }
-            // if(GameServer.positions.get(tile.x+x,tile.y-y).length > 0 ||
-            //     GameServer.itemPositions.get(tile.x+x,tile.y-y).length > 0) return -2;
         }
     }
-    var obstacles = GameServer.getEntitiesAt(x,y-h,w,h);
+    var w = data.base.width;
+    var h = data.base.height;
+    var obstacles = GameServer.getEntitiesAt(tile.x,tile.y-h,w,h);
     if(obstacles.length) return -2;
     return 1;
 };
@@ -1494,7 +1495,6 @@ GameServer.build = function(player,bid,tile){
 
 GameServer.finalizeBuilding = function(player,building){
     building.embed();
-    // GameServer.buildingsChanged = true;
     GameServer.setFlag('buildingsMarkers');
     player.addBuilding(building);
     // if(!player.isInstanced()) player.listBuildings(); 
