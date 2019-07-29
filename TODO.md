@@ -38,16 +38,14 @@ World Building
 - Reduce amount of orientation pins
 - add esc shortcut
 - "new" marker
-- no aggro? (works with bears but not with wolves and/or after refresh)
 - Events formatting
 - Make size of tutorial boxes adapt to text
-- Make towers throw stones when no better ammo
-- Belt & backpack capacity + corresponding items (incl. defaults)
 - No decimal in defaut prices (happens in one lumber camp)
 - Ability: display threat level in animal tooltip
 - Ability: display fighter health bars
 - Look towards cursor
 - Zoom-out in towers
+
 
 Bugs:
 - New player bug [TEST]
@@ -69,7 +67,29 @@ Bugs:
 -> https://phaser.discourse.group/t/sprite-outline-via-shader-showcase-looking-for-improvements/2375
 - Apply same shader to highlight players, animals, items, buildings...
 - Show ingredients needed foer buildings recipe in build menu
+- Repair panel
+- Civ camp locations and spawn behavior
+- Basic attack behavior + notifs thereof
+- Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
+fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
+- Belt & backpack capacity + corresponding items (incl. defaults)
+- Arrow stocks in towers  + make them throw stones when no better ammo
   
+
+María:
+- Wolf anim (walk, attack, die w/ & w/o arrows)
+- Bear anim (walk, attack, die w/ & w/o arrows)
+- Player anim (naked?)
+-> Look into superimposing equipment programmatically
+Further: body emotes, pick up anim, more wildlife, then UI improvements, then diagonal movements...
+
+Sérgio:
+- New Civ huts/cabins
+- Basic cliffs
+- Mines
+- More civ buidings? (e.g. towers)
+- Differentiate under construction/destroyed, multiple construction stages...
+
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
