@@ -669,7 +669,7 @@ GameServer.addNewPlayer = function(socket,data){
     var player = new Player();
     player.setRegion(region);
     player.setName(data.characterName);
-    player.id = ++GameServer.lastPlayerID;     // A read of the db makes sure that `lastPlayerID` doesn't conflict
+    player.setID(++GameServer.lastPlayerID); // A read of the db makes sure that `lastPlayerID` doesn't conflict
 
     if(data.tutorial) {
         player.setInstance();
@@ -683,17 +683,16 @@ GameServer.addNewPlayer = function(socket,data){
     var document = new GameServer.PlayerModel(player);
     player.setModel(document);
     if(player.isInstanced()) {
-        player.setIDs(null,socket.id);
+        player.setSocketID(null,socket.id);
     }else{
-        GameServer.saveNewPlayerToDb(socket,player,document);
+        GameServer.saveNewPlayerToDb(socket,player,document,function(){
+            GameServer.finalizePlayer(socket,player,false); // false = new player
+            player.setStartingInventory();
+            player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
+            player.save();
+        });
     }
-    GameServer.finalizePlayer(socket,player,false); // false = new player
-    setTimeout(function(){
-        player.setStartingInventory();
-        player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
-        player.save();
-    },50);
-    return player;
+    return player; // return value for test purposes
 };
 
 /**
@@ -702,14 +701,15 @@ GameServer.addNewPlayer = function(socket,data){
  * @param {Player} player - The associated Player object.
  * @param document - The mongoose document representing the player to save.
  */
-GameServer.saveNewPlayerToDb = function(socket,player,document){
+GameServer.saveNewPlayerToDb = function(socket,player,document,cb){
     if(!socket || socket.dummy === true) return;
     document.save(function (err,doc) {
         if (err) return console.error(err);
         console.log('New player created');
         var mongoID = doc._id.toString();
-        player.setIDs(mongoID,socket.id);
+        player.setSocketID(socket.id);
         GameServer.server.sendID(socket,mongoID);
+        cb();
     });
 };
 

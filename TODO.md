@@ -48,7 +48,8 @@ World Building
 
 
 Bugs:
-- New player bug [TEST]
+- Make clean sequence of methods to call for new players, in order, whether
+new or recurring player, distinguish bookkeeping logic from Player logic
 - The onInit conf stuff is obviously wrongly processed by server (check env vars)
 - All wolves in row should be involved in fight (uncomment line in gs.connectToBattle)
 -Features:
@@ -62,6 +63,7 @@ Bugs:
 - Rename toolip of animal markers [TEST]
 - Conflict/death pin only at the end of battle [TEST]
 - Save death/conflict icons [TEST]
+- Add butterflies
 - Test acc penalty 
 - Item transparency, and even ideally player/NPC transparency
 -> https://phaser.discourse.group/t/sprite-outline-via-shader-showcase-looking-for-improvements/2375

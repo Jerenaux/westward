@@ -12,7 +12,7 @@ Client.socket = io.connect();
 
 Client.emptyQueue = function(){ // Process the events that have been queued during initialization
     for(var e = 0; e < Client.eventsQueue.length; e++){
-        onevent.call(Client.socket,Client.eventsQueue[e]);
+        Client.socket.onevent.call(Client.socket,Client.eventsQueue[e]);
     }
 };
 

@@ -75,10 +75,12 @@ function Player() {
 Player.prototype = Object.create(MovingEntity.prototype);
 Player.prototype.constructor = Player;
 
-Player.prototype.setIDs = function (dbID, socketID) {
-    //this.id = GameServer.lastPlayerID++;
-    this.dbID = dbID;
+Player.prototype.setSocketID = function ( socketID) {
     this.socketID = socketID;
+};
+
+Player.prototype.setID = function (id) {
+    this.id = id;
 };
 
 Player.prototype.setInstance = function () {
@@ -198,14 +200,13 @@ Player.prototype.applyVigorModifier = function () {
 Player.prototype.setStartingInventory = function () {
     // TODO: move to some config file
     var list = [
-        [7, 5],
+        [3, 5],
         [2,1],
         [19,1],
         [20,3],
         [51,1],
         [6,1]
     ];
-    console.warn('Giving starting inventory');
     list.forEach(function (l) {
         this.giveItem(l[0], l[1]);
         GameServer.createItem(l[0], l[1], 'start');
@@ -750,7 +751,7 @@ Player.prototype.initTrim = function () {
     trimmed.y = parseInt(this.y);
     trimmed.fow = GameServer.fowList;
     trimmed.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
-    trimmed.resourceMarkers = GameServer.lissMarkers('resource').concat(this.extraMarkers);
+    trimmed.resourceMarkers = GameServer.listMarkers('resource').concat(this.extraMarkers);
     trimmed.animalMarkers = GameServer.listMarkers('animal');
     trimmed.deathMarkers = GameServer.listMarkers('death');
     trimmed.conflictMarkers = GameServer.listMarkers('conflict');
@@ -794,7 +795,7 @@ Player.prototype.setOwnProperty = function (property, value) {
 };
 
 Player.prototype.getDataFromDb = function (data) {
-    this.id = data.id;
+    this.setID(data.id);
     this.name = data.name;
     this.x = Utils.clamp(data.x, 0, World.worldWidth - 1);
     this.y = Utils.clamp(data.y, 0, World.worldHeight - 1);
