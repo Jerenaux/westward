@@ -50,24 +50,25 @@ World Building
 - Zoom-out in towers
 
 Bugs:
-- New player bug ...
+- New player bug [TEST]
 - The onInit conf stuff is obviously wrongly processed by server (check env vars)
 - All wolves in row should be involved in fight (uncomment line in gs.connectToBattle)
-- Remove ``data.new = true;``
-Features:
+-Features:
 - Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)
 - Display item amount owned in tooltip
-- Add help about build limit in build menu
+- Add help about build limit in build menu [TEST]
 - When giving constr material, display #owned
 - Move map legend below scroll, widen it
-- Display death/conflict markers even in FoW
-- Rename toolip of animal markers
-- Conflict/death pin only at the end of battle
-- Save death/conflict icons?
+- Display death/conflict markers even in FoW [TEST]
+- Rename toolip of animal markers [TEST]
+- Conflict/death pin only at the end of battle [TEST]
+- Save death/conflict icons [TEST]
 - Test acc penalty 
 - Item transparency, and even ideally player/NPC transparency
-- Set broad list of starting items for showcase
+-> https://phaser.discourse.group/t/sprite-outline-via-shader-showcase-looking-for-improvements/2375
+- Apply same shader to highlight players, animals, items, buildings...
+- Show ingredients needed foer buildings recipe in build menu
   
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email

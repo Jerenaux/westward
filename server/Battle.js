@@ -18,6 +18,7 @@ function Battle() {
         'Civ': 0,
         'Player': 0
     };
+    this.casualties = 0;
     //this.positions = new SpaceMap(); // positions occupied by fighters (obsolete?)
     this.cells = new SpaceMap(); // all the BattleCell objects, used for battle pathfinding
 
@@ -114,6 +115,7 @@ Battle.prototype.getFightersOrder = function () {
     });
 };
 
+// Remove a fighter from the fight following his death
 Battle.prototype.removeFighter = function (f) {
     var idx = this.getFighterIndex(f);
     if (idx == -1) return;
@@ -124,7 +126,10 @@ Battle.prototype.removeFighter = function (f) {
     this.updateTimeline();
     //if(f.isPlayer) this.removeFromPosition(f); // if NPC, leave busy for his body
     if (isTurnOf) this.setEndOfTurn(0);
-    if (f.isPlayer) f.notifyFight(false);
+    if (f.isPlayer){
+        this.casualties++;
+        f.notifyFight(false);
+    }
     this.updateTeams(f.battleTeam, -1);
     this.checkSentience();
 };
@@ -464,6 +469,11 @@ Battle.prototype.end = function () {
         if (f.isPlayer) f.notifyFight(false);
     });
     this.cleanUp();
+    if(this.casualties){
+        GameServer.addDeathMarker(this.center.x,this.center.y);
+    }else{
+        GameServer.addConflictMarker(this.center.x,this.center.y);
+    }
     console.log('[B' + this.id + '] Ended');
 };
 

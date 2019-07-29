@@ -103,6 +103,7 @@ GameServer.readMap = function(mapsPath,test,cb){
             'regions': GameServer.loadRegions,
             'buildings': GameServer.loadBuildings,
             'items': GameServer.loadItems,
+            'markers': GameServer.loadMarkers,
             'spawn_zones': GameServer.setUpSpawnZones,
             'camps': GameServer.setUpCamps
         };
@@ -339,14 +340,36 @@ GameServer.loadItems = function(){
         var item = GameServer.addItem(x,y,type);
         item.setRespawnable();
     },this);
-
-    path = pathmodule.join(GameServer.mapsPath,'resourceMarkers.json');
-    GameServer.resourceMarkers = JSON.parse(fs.readFileSync(path).toString());
-    path = pathmodule.join(GameServer.mapsPath,'animalMarkers.json');
-    GameServer.animalMarkers = JSON.parse(fs.readFileSync(path).toString());
     GameServer.updateStatus();
 };
 
+GameServer.loadMarkers = function(){
+    var markerTypes = ['resource','animal','death','conflict'];
+    markerTypes.forEach(function(marker){
+        var path = pathmodule.join(GameServer.mapsPath,marker+'Markers.json');
+        try{
+            GameServer[marker+'Markers'] = JSON.parse(fs.readFileSync(path).toString());
+        }catch(err){
+            console.warn('ERROR loading markers: '+marker);
+            GameServer[marker+'Markers'] = [];
+        }
+    });
+    // resourceMarkersPath = pathmodule.join(GameServer.mapsPath,'resourceMarkers.json');
+    // animalMarkersPath = pathmodule.join(GameServer.mapsPath,'animalMarkers.json');
+    // try{
+    //     GameServer.resourceMarkers = JSON.parse(fs.readFileSync(resourceMarkersPath).toString());
+    // }catch(err){
+    //     console.warn('ERROR loading resource markers');
+    //     GameServer.resourceMarkers = []
+    // }
+    // try{
+    //     GameServer.animalMarkers = JSON.parse(fs.readFileSync(animalMarkersPath).toString());
+    // }catch(err){
+    //     console.warn('ERROR loading animal markers');
+    //     GameServer.animalMarkers = []
+    // }
+    GameServer.updateStatus();
+};
 
 GameServer.getItemsFromDBUpdateCache = function () {
     const items = ['edno', 'dve'];
@@ -665,9 +688,11 @@ GameServer.addNewPlayer = function(socket,data){
         GameServer.saveNewPlayerToDb(socket,player,document);
     }
     GameServer.finalizePlayer(socket,player,false); // false = new player
-    player.setStartingInventory();
-    player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
-    player.save();
+    setTimeout(function(){
+        player.setStartingInventory();
+        player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
+        player.save();
+    },50);
     return player;
 };
 
@@ -1077,7 +1102,6 @@ GameServer.handleBattle = function(attacker,attacked){
     GameServer.addBattleArea(area,battle);
     GameServer.addSurroundingFighters(battle);
     battle.start();
-    GameServer.addConflictMarker(attacker.x,attacker.y);
     if(attacker.isPlayer || attacked.isPlayer){
         var player = (attacker.isPlayer ? attacker : attacked);
         var foe = (attacker.isPlayer ? attacked : attacker);
@@ -1246,6 +1270,7 @@ GameServer.addSurroundingFighters = function(battle){
     center.x = Math.floor(center.x/battle.fighters.length);
     center.y = Math.floor(center.y/battle.fighters.length);
     center = GameServer.battleCells.get(center.x,center.y);
+    battle.center = center;
     if(!center) return;
 
     var r = GameServer.battleParameters.aggroRange;
@@ -1502,35 +1527,30 @@ GameServer.finalizeBuilding = function(player,building){
     if(GameServer.buildingParameters.autobuild) building.setBuilt();
 };
 
-GameServer.listAnimalMarkers = function(){
-    return GameServer.animalMarkers; // TODO: filter based on FoW
+GameServer.listMarkers = function(markerType){
+    var mapName = markerType+'Markers';
+    if(!(mapName in GameServer)){
+        console.warn('ERROR: Unknown marker type ',markerType);
+        return [];
+    }
+    return GameServer[markerType+'Markers']
 };
 
-GameServer.listResourceMarkers = function(){
-    return GameServer.resourceMarkers; // TODO: filter based on FoW
-};
+// GameServer.listAnimalMarkers = function(){
+//     return GameServer.animalMarkers; // TODO: filter based on FoW
+// };
 
-GameServer.listDeathMarkers = function(){
-    return GameServer.deathMarkers; 
-};
+// GameServer.listResourceMarkers = function(){
+//     return GameServer.resourceMarkers; // TODO: filter based on FoW
+// };
 
-GameServer.listConflictMarkers = function(){
-    return GameServer.conflictMarkers; 
-};
+// GameServer.listDeathMarkers = function(){
+//     return GameServer.deathMarkers; 
+// };
 
-GameServer.addDeathMarker = function(x,y){
-    GameServer.deathMarkers.push([x,y]);
-    if(GameServer.deathMarkers.length > 10) GameServer.deathMarkers.shift(); // TODO: conf
-    // GameServer.deathMarkersChanged = true;
-    GameServer.setFlag('deathMarkers');
-};
-
-GameServer.addConflictMarker = function(x,y){
-    GameServer.conflictMarkers.push([x,y]);
-    if(GameServer.conflictMarkers.length > 10) GameServer.conflictMarkers.shift(); // TODO: conf
-    // GameServer.conflictMarkersChanged = true;
-    GameServer.setFlag('conflictMarkers');
-};
+// GameServer.listConflictMarkers = function(){
+//     return GameServer.conflictMarkers; 
+// };
 
 GameServer.listBuildingMarkers = function(instance){
     var list = [];
@@ -1542,6 +1562,35 @@ GameServer.listBuildingMarkers = function(instance){
     }
     return list;
 };
+
+GameServer.addMarker = function(markerType,x,y){
+    var mapName = markerType+'Markers';
+    if(!(mapName in GameServer)){
+        console.warn('ERROR: Unknown marker type ',markerType);
+        return [];
+    }
+    GameServer[markerType+'Markers'].push([x,y]);
+    if(GameServer[markerType+'Markers'].length > 10) GameServer[markerType+'Markers'].shift(); // TODO: conf
+    GameServer.setFlag(mapName);
+    var path = pathmodule.join(GameServer.mapsPath,markerType+'Markers.json');
+    fs.writeFile(path,JSON.stringify(GameServer[markerType+'Markers']),function(err){
+        if(err) throw err;
+        console.log(markerType+' markers written');
+    });
+};
+
+// GameServer.addDeathMarker = function(x,y){
+//     GameServer.deathMarkers.push([x,y]);
+//     if(GameServer.deathMarkers.length > 10) GameServer.deathMarkers.shift(); // TODO: conf
+//     GameServer.setFlag('deathMarkers');
+// };
+
+// GameServer.addConflictMarker = function(x,y){
+//     GameServer.conflictMarkers.push([x,y]);
+//     if(GameServer.conflictMarkers.length > 10) GameServer.conflictMarkers.shift(); // TODO: conf
+//     // GameServer.conflictMarkersChanged = true;
+//     GameServer.setFlag('conflictMarkers');
+// };
 
 GameServer.handleRespawn = function(data,socketID){
     var player = GameServer.getPlayer(socketID);

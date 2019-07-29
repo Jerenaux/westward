@@ -284,11 +284,10 @@ var Map = new Phaser.Class({
         };
     },
 
-    addPin: function(x,y,name,frame,bg){
+    addPin: function(x,y,name,frame,alwaysOn){
         var location = this.computeMapLocation(x,y);
-        // console.log(x,y,location);
         var pin = this.getNextPin();
-        pin.setUp(x,y,location.x,location.y,name,frame,bg);
+        pin.setUp(x,y,location.x,location.y,name,frame,alwaysOn);
         this.displayedPins.push(pin);
         return pin;
     },
@@ -433,32 +432,34 @@ var Map = new Phaser.Class({
             this.addPin(data.x,data.y,
                 Engine.buildingsData[data.type].name,
                 (data.owner == Engine.player.id ? 'bld2own' : 'bld2')
-                // Engine.buildingsData[data.type].mapicon,
-                // Engine.buildingsData[data.type].mapbg
             );
         },this);
         Engine.player.resourceMarkers.forEach(function(data){
             this.addPin(data[0],data[1],
                 Engine.itemsData[data[2]].name,
-                'herb'
+                'herb',
+                false
             );
         },this);
         Engine.player.animalMarkers.forEach(function(data){
             this.addPin(data[0],data[1],
-                Engine.animalsData[data[2]].name,
-                'wolf'
+                Engine.animalsData[data[2]].map_name,
+                'wolf',
+                false
             );
         },this);
         Engine.player.deathMarkers.forEach(function(data){
             this.addPin(data[0],data[1],
-                'Someone died here',
-                'skull'
+                'Death',
+                'skull',
+                true
             );
         },this);
         Engine.player.conflictMarkers.forEach(function(data){
             this.addPin(data[0],data[1],
-                'Someone fought here',
-                'swords'
+                'Battle',
+                'swords',
+                true
             );
         },this);
     },
@@ -501,9 +502,10 @@ var Pin = new Phaser.Class({
         this.on('pointerout',this.handleOut.bind(this));
     },
 
-    setUp: function(tileX,tileY,x,y,name,frame,bgframe){
+    setUp: function(tileX,tileY,x,y,name,frame,alwaysOn){
         this.setOrigin(0.5);
         this.setFrame(frame);
+        this.alwaysOn = alwaysOn;
 
         this.tileX = tileX;
         this.tileY = tileY;
@@ -514,10 +516,12 @@ var Pin = new Phaser.Class({
     },
 
     setVisibility: function(){
+        // If on minimap, display straight away if within rect; if in big map, display only if not within FoW
         if(this.parentMap.viewRect.contains(this.x,this.y)){
             if(this.parentMap.minimap){
                 this.setVisible(true);
             }else{
+                if(this.alwaysOn) return true;
                 for(var i = 0; i < Engine.player.FoW.length; i++){
                     var rect = Engine.player.FoW[i];
                     var rect_ = new Phaser.Geom.Rectangle(

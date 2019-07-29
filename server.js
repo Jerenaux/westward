@@ -224,8 +224,6 @@ io.on('connection',function(socket){
         if(!data.stamp || data.stamp < server.resetStamp) data.new = true; // TODO Remove eventually
 
         console.log(data);
-        data.new = true;
-        data.characterName = 'Jero'; // TODO: REMOVE
         if(data.new){ // new players OR tutorial
             gs.addNewPlayer(socket,data);
         }else{

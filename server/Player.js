@@ -248,7 +248,6 @@ Player.prototype.die = function () {
     MovingEntity.prototype.die.call(this);
     // this.updatePacket.dead = true;
     this.setOwnProperty('dead', true);
-    GameServer.addDeathMarker(this.x,this.y);
 };
 
 Player.prototype.spawn = function (x, y) {
@@ -751,10 +750,14 @@ Player.prototype.initTrim = function () {
     trimmed.y = parseInt(this.y);
     trimmed.fow = GameServer.fowList;
     trimmed.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
-    trimmed.resourceMarkers = GameServer.listResourceMarkers().concat(this.extraMarkers);
-    trimmed.animalMarkers = GameServer.listAnimalMarkers();
-    trimmed.deathMarkers = GameServer.listDeathMarkers();
-    trimmed.conflictMarkers = GameServer.listConflictMarkers();
+    trimmed.resourceMarkers = GameServer.lissMarkers('resource').concat(this.extraMarkers);
+    trimmed.animalMarkers = GameServer.listMarkers('animal');
+    trimmed.deathMarkers = GameServer.listMarkers('death');
+    trimmed.conflictMarkers = GameServer.listMarkers('conflict');
+    // trimmed.resourceMarkers = GameServer.listResourceMarkers().concat(this.extraMarkers);
+    // trimmed.animalMarkers = GameServer.listAnimalMarkers();
+    // trimmed.deathMarkers = GameServer.listDeathMarkers();
+    // trimmed.conflictMarkers = GameServer.listConflictMarkers();
     trimmed.rarity = GameServer.getRarity();
     return trimmed;
 };
