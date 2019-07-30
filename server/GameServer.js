@@ -676,15 +676,17 @@ GameServer.addNewPlayer = function(socket,data){
         var info = GameServer.tutorialData['initData'];
         player.spawn(info.x,info.y);
         if(data.tutorial) GameServer.createInstance(player);
-    }
+    }else{
     // call before finalizePlayer()
-    player.spawn(); // at respawn location
+        player.spawn(); // at respawn location
+    }
 
     var document = new GameServer.PlayerModel(player);
     player.setModel(document);
     if(player.isInstanced()) {
-        player.setSocketID(null,socket.id);
+        player.setSocketID(socket.id);
     }else{
+        // Does the callback need to wait for player to be saved to db? Make it so that it doesn't
         GameServer.saveNewPlayerToDb(socket,player,document,function(){
             GameServer.finalizePlayer(socket,player,false); // false = new player
             player.setStartingInventory();
@@ -732,7 +734,7 @@ GameServer.loadPlayer = function(socket,id){
             }
             var player = new Player();
             var mongoID = doc._id.toString();
-            player.setIDs(mongoID,socket.id);
+            player.setSocketID(socket.id);
             player.getDataFromDb(doc);
             player.setModel(doc);
             player.spawn(player.x, player.y); // call before finalizePlayer()
