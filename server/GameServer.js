@@ -650,11 +650,10 @@ GameServer.addNewPlayer = function(socket,data){
         var info = GameServer.tutorialData['initData'];
         player.setRespawnLocation(info.x,info.y);
     }
-
-    var document = new GameServer.PlayerModel(player);
-    if(!player.isInstanced()) GameServer.saveNewPlayerToDb(socket,player,document);
-
-    GameServer.postProcessPlayer(socket,document,player);
+    // var model = new GameServer.PlayerModel(player);
+    // console.warn('model = ',model._id);
+    GameServer.postProcessPlayer(socket,player);
+    if(!player.isInstanced()) GameServer.saveNewPlayerToDb(socket,player);
 
     // Send extra stuff following player initialization, unique to new players
     player.setStartingInventory();
@@ -681,13 +680,13 @@ GameServer.loadPlayer = function(socket,id){
             var player = new Player();
             player.getDataFromDb(doc);
 
-            GameServer.postProcessPlayer(socket,doc,player);
+            GameServer.postProcessPlayer(socket,player,doc);
         }
     );
 };
 
-GameServer.postProcessPlayer = function(socket,document,player){
-    player.setModel(document);
+GameServer.postProcessPlayer = function(socket,player,model){
+    // player.setModel(model);
     player.setSocketID(socket.id);
 
     GameServer.finalizePlayer(socket,player,false); // false = new player
@@ -697,7 +696,7 @@ GameServer.postProcessPlayer = function(socket,document,player){
     player.listBuildingRecipes();
     player.getWorldInformation();
     player.spawn(false); // false = don't check location
-}
+};
 
 /**
  * Save a newly created Player object to the database.
@@ -705,12 +704,15 @@ GameServer.postProcessPlayer = function(socket,document,player){
  * @param {Player} player - The associated Player object.
  * @param document - The mongoose document representing the player to save.
  */
-GameServer.saveNewPlayerToDb = function(socket,player,document){
+GameServer.saveNewPlayerToDb = function(socket,player){
     if(!socket || socket.dummy === true) return;
+    var document = new GameServer.PlayerModel(player);
     document.save(function (err,doc) {
         if (err) return console.error(err);
         console.log('New player created');
         var mongoID = doc._id.toString();
+        player.setMongoID(mongoID);
+        // console.warn('doc id = ',doc._id);
         GameServer.server.sendID(socket,mongoID);
     });
 };

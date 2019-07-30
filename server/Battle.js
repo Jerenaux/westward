@@ -470,9 +470,9 @@ Battle.prototype.end = function () {
     });
     this.cleanUp();
     if(this.casualties){
-        GameServer.addDeathMarker(this.center.x,this.center.y);
+        GameServer.addMarker('death',this.center.x,this.center.y);
     }else{
-        GameServer.addConflictMarker(this.center.x,this.center.y);
+        GameServer.addMarker('conflict',this.center.x,this.center.y);
     }
     console.log('[B' + this.id + '] Ended');
 };

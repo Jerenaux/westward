@@ -1248,35 +1248,6 @@ Engine.makeMessagesMenu = function(){
     return menu;
 };
 
-Engine.makeStaffMenu = function(){
-    var menu = new Menu('Officials');
-    menu.setSound(Engine.scene.sound.add('book'));
-
-    var govw = 250;
-    var govh = 150;
-    var govx = (UI.getGameWidth()-govw)/2;
-    var govy = 100;
-
-    var padding = 10;
-    var chanx = govx - govw/2 - padding/2;
-    var chany = govy + govh + 20;
-    var chanh = 200;
-
-    var commx = govx + govw/2 + padding/2;
-
-    var gov = menu.addPanel('governor',new StaffPanel(govx,govy,govw,govh,'Governor'));
-    gov.addButton(govw-30, 8, 'blue','help',null,'',UI.textsData['governor_help']);
-    gov.addStaff([{name:'Mr. Governor'}]);
-    gov.addCenterText('Your civic level is too low to vote for the Governor');
-    var chan = menu.addPanel('chancellors',new StaffPanel(chanx,chany,govw,chanh,'Chancellors'));
-    chan.addButton(govw-30, 8, 'blue','help',null,'',UI.textsData['chancellor_help']);
-    chan.addStaff([{name:'Palpatine'},{name:'Valorum'},{name:'Tobby'}]);
-    var comm = menu.addPanel('commanders',new StaffPanel(commx,chany,govw,chanh,'Commanders'));
-    comm.addButton(govw-30, 8, 'blue','help',null,'',UI.textsData['commander_help']);
-    comm.addStaff([{name:'Adama'},{name:'William Riker'}]);
-    return menu;
-};
-
 Engine.makeMapMenu = function(){
     var map = new Menu('World Map');
     map.log = true;
@@ -1291,6 +1262,7 @@ Engine.makeMapMenu = function(){
     // controls enable/disable of buttons based on zoom flag
     mapPanel.zoomInBtn = mapPanel.addButton(940, 320, 'blue','plus',mapInstance.zoomIn.bind(mapInstance),'Zoom in');
     mapPanel.zoomOutBtn = mapPanel.addButton(930, 350, 'blue','minus',mapInstance.zoomOut.bind(mapInstance),'Zoom out');
+    map.addEvent('onUpdateMap',mapPanel.map.updatePins.bind(mapPanel.map));
     return map;
 };
 
@@ -1945,6 +1917,7 @@ Engine.updateMenus = function(category){
         'gold': 'onUpdateGold',
         'history': 'onUpdateHistory',
         'inv': 'onUpdateInventory',
+        'map': 'onUpdateMap',
         'productivity':'onUpdateProductivity',
         'stats': 'onUpdateStats'
     };

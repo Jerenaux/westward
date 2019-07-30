@@ -60,6 +60,7 @@ let Hero = new Phaser.Class({
 
     updateData: function(data){ // don't call this 'update' or else conflict with Player.update() for other player updates
         let callbacks = {
+            'animalMarkers': this.updateAnimalMarkers,
             'ammo': this.updateAmmo,
             'ap': this.updateAP,
             'belt': this.updateBelt,
@@ -80,6 +81,7 @@ let Hero = new Phaser.Class({
             'notifs': this.handleNotifs,
             'rarity': this.updateRarity,
             'resetTurn': BattleManager.resetTurn,
+            'resourceMarkers': this.updateResourceMarkers,
             'stats': this.updateStats
         };
 
@@ -93,6 +95,7 @@ let Hero = new Phaser.Class({
         this.updateEvents.forEach(function (e) {
             Engine.updateMenus(e);
         }, this);
+        if(this.updateEvents.has('map') && Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
 
         let battleCallbacks = {
             'battleData': BattleManager.updateBattle
@@ -326,19 +329,34 @@ let Hero = new Phaser.Class({
         }
     },
 
+    updateAnimalMarkers: function(markers){
+        this.animalMarkers = markers;
+        this.updateEvents.add('map');
+        // if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
+    },
+
     updateBuildingMarkers: function(markers){
         this.buildingMarkers = markers;
-        if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
+        this.updateEvents.add('map');
+        // if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
+    },
+
+    updateResourceMarkers: function(markers){
+        this.resourceMarkers = markers;
+        this.updateEvents.add('map');
+        // if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
     },
 
     updateDeathMarkers: function(markers){
         this.deathMarkers = markers;
-        if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
+        this.updateEvents.add('map');
+        // if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
     },
 
     updateConflictMarkers: function(markers){
         this.conflictMarkers = markers;
-        if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
+        this.updateEvents.add('map');
+        // if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
     },
 
     updateRarity: function(rarity){

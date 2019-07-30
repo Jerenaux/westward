@@ -47,9 +47,9 @@ World Building
 - Zoom-out in towers
 
 
-Check if a save is needed (reload after new player)
-Test recipes, history, markers, FoW, tutorial ...
 Test starting inventory + own modified inventory
+Test save
+Test tutorial
 
 Bugs:
 - The onInit conf stuff is obviously wrongly processed by server (check env vars)

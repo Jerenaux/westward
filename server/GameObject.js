@@ -55,22 +55,22 @@ GameObject.prototype.isOfInstance = function(instance){
 GameObject.prototype.getAOI = function(){
     return this.aoi;
 };
-
-GameObject.prototype.setModel = function(model) {
-    this.model = model;
-};
-
-GameObject.prototype.getModel = function() {
-    return this.model;
-};
+//
+// GameObject.prototype.setModel = function(model) {
+//     this.model = model;
+// };
+//
+// GameObject.prototype.getModel = function() {
+//     return this.model;
+// };
 
 GameObject.prototype.save = function(){
-    if(!this.model) return;
+    // if(!this.model) return;
     if(this.dblocked) return;
     if(!this.isOfInstance(-1)) return;
     this.dblocked = true;
     var _document = this;
-    this.schemaModel.findById(this.model._id, function (err, doc) {
+    this.schemaModel.findById(this.mongoID, function (err, doc) { // this.model._id
         if (err) throw err;
         if(doc === null){
             console.warn('Cannot save game object');
@@ -80,26 +80,16 @@ GameObject.prototype.save = function(){
         doc.set(_document);
         doc.save(function (err) {
             _document.dblocked = false;
-            //if(err) console.warn(err);
             if(err) throw err;
             console.log(_document.entityCategory+' saved');
         });
     });
-    /*this.schemaModel.findOneAndUpdate(
-        {_id: this.model._id},
-        //_document, // Don't apply as is, go through schema!
-        {$set:this},
-        {},
-        function(err){
-            if(err) throw err;
-            console.log(_document.entityCategory+' saved')
-        }
-    );*/
 };
 
 GameObject.prototype.trim = function(trimmed){
     trimmed.instance = this.instance;
     return trimmed;
 };
+
 
 module.exports.GameObject = GameObject;

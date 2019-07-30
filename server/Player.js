@@ -79,6 +79,10 @@ Player.prototype.setSocketID = function ( socketID) {
     this.socketID = socketID;
 };
 
+Player.prototype.setMongoID = function (mongoID) {
+    this.mongoID = mongoID;
+};
+
 Player.prototype.setInstance = function () {
     this.instance = GameServer.nextInstanceID++;
     if (GameServer.nextInstanceID % 100 === 0) GameServer.nextInstanceID = 0;
