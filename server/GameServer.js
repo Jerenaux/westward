@@ -623,31 +623,6 @@ GameServer.getPlayer = function(socketID){
     return GameServer.socketMap.hasOwnProperty(socketID) ? GameServer.players[GameServer.socketMap[socketID]] : null;
 };
 
-// Used for testing, will be removed at some point
-GameServer.dummyPlayer = function(x,y) {
-    var player = new Player();
-    player.setSettlement(0);
-    player.spawn(x, y);
-    player.id = GameServer.lastPlayerID++;
-    player.isDummy = true;
-    GameServer.players[player.id] = player;
-    player.setOrUpdateAOI(); // takes care of adding to the world as well
-    return player;
-};
-
-// TODO: remove eventually
-GameServer.testMethodB = function(b){
-    console.log('B');
-    return b;
-};
-
-GameServer.testMethodA = function(a){
-    console.log('A');
-    GameServer.testMethodB(a);
-    return a;
-    //return GameServer.testMethodB(a);
-};
-
 /**
  * Add a new player to the game.
  * @param {Socket} socket - The socket of the connection to the client creating the new player.
@@ -665,54 +640,26 @@ GameServer.addNewPlayer = function(socket,data){
     }
     var region = data.selectedSettlement;
     if(region === undefined) region = 0;
-    //console.log('new player of class',data.selectedClass,'in settlement ',data.selectedSettlement);
-    var player = new Player();
-    player.setRegion(region);
-    player.setName(data.characterName);
-    player.setID(++GameServer.lastPlayerID); // A read of the db makes sure that `lastPlayerID` doesn't conflict
 
+    var player = new Player();
+    player.setUp(++GameServer.lastPlayerID, data.characterName, region);
+  
     if(data.tutorial) {
         player.setInstance();
-        var info = GameServer.tutorialData['initData'];
-        player.spawn(info.x,info.y);
         if(data.tutorial) GameServer.createInstance(player);
-    }else{
-    // call before finalizePlayer()
-        player.spawn(); // at respawn location
+        var info = GameServer.tutorialData['initData'];
+        player.setRespawnLocation(info.x,info.y);
     }
 
     var document = new GameServer.PlayerModel(player);
-    player.setModel(document);
-    if(player.isInstanced()) {
-        player.setSocketID(socket.id);
-    }else{
-        // Does the callback need to wait for player to be saved to db? Make it so that it doesn't
-        GameServer.saveNewPlayerToDb(socket,player,document,function(){
-            GameServer.finalizePlayer(socket,player,false); // false = new player
-            player.setStartingInventory();
-            player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
-            player.save();
-        });
-    }
-    return player; // return value for test purposes
-};
+    if(!player.isInstanced()) GameServer.saveNewPlayerToDb(socket,player,document);
 
-/**
- * Save a newly created Player object to the database.
- * @param {Socket} socket - The socket of the connection to the client creating the new player.
- * @param {Player} player - The associated Player object.
- * @param document - The mongoose document representing the player to save.
- */
-GameServer.saveNewPlayerToDb = function(socket,player,document,cb){
-    if(!socket || socket.dummy === true) return;
-    document.save(function (err,doc) {
-        if (err) return console.error(err);
-        console.log('New player created');
-        var mongoID = doc._id.toString();
-        player.setSocketID(socket.id);
-        GameServer.server.sendID(socket,mongoID);
-        cb();
-    });
+    GameServer.postProcessPlayer(socket,document,player);
+
+    // Send extra stuff following player initialization, unique to new players
+    player.setStartingInventory();
+    player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
+    return player; // return value for the tests
 };
 
 /**
@@ -729,35 +676,55 @@ GameServer.loadPlayer = function(socket,id){
             if (err) return console.warn(err);
             if(!doc) {
                 console.log('ERROR : no matching document');
-                //GameServer.addNewPlayer(socket, {});
                 return;
             }
             var player = new Player();
-            var mongoID = doc._id.toString();
-            player.setSocketID(socket.id);
             player.getDataFromDb(doc);
-            player.setModel(doc);
-            player.spawn(player.x, player.y); // call before finalizePlayer()
-            GameServer.finalizePlayer(socket,player,true); // sends the init packet ; true = returning player
+
+            GameServer.postProcessPlayer(socket,doc,player);
         }
     );
 };
 
+GameServer.postProcessPlayer = function(socket,document,player){
+    player.setModel(document);
+    player.setSocketID(socket.id);
+
+    GameServer.finalizePlayer(socket,player,false); // false = new player
+
+    player.setLocation();
+    GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
+    player.listBuildingRecipes();
+    player.getWorldInformation();
+    player.spawn(false); // false = don't check location
+}
+
+/**
+ * Save a newly created Player object to the database.
+ * @param {Socket} socket - The socket of the connection to the client creating the new player.
+ * @param {Player} player - The associated Player object.
+ * @param document - The mongoose document representing the player to save.
+ */
+GameServer.saveNewPlayerToDb = function(socket,player,document){
+    if(!socket || socket.dummy === true) return;
+    document.save(function (err,doc) {
+        if (err) return console.error(err);
+        console.log('New player created');
+        var mongoID = doc._id.toString();
+        GameServer.server.sendID(socket,mongoID);
+    });
+};
+
 /**
  * After creating a new player or loading an existing one, insert it
- * in the game world by updating all necessary data structures and fields
- * and send the initialization update packet to the client.
+ * in the game world by updating all necessary data structures and fields.
  * @param {Socket} socket - The socket of the connection to the client.
  * @param {Player} player - The created/retrieved Player object.
  */
 GameServer.finalizePlayer = function(socket,player,returning){
     GameServer.players[player.id] = player;
     GameServer.socketMap[socket.id] = player.id;
-    GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
-    // GameServer.nbConnectedChanged = true;
     GameServer.setFlag('nbConnected');
-    player.listBuildings();
-    //console.log(GameServer.server.getNbConnected()+' connected');
     Prism.logEvent(player,'connect',{stl:player.sid,re:returning});
     GameServer.onNewPlayer(player);
 };
@@ -1524,7 +1491,6 @@ GameServer.finalizeBuilding = function(player,building){
     building.embed();
     GameServer.setFlag('buildingsMarkers');
     player.addBuilding(building);
-    // if(!player.isInstanced()) player.listBuildings(); 
     GameServer.updateFoW();
     if(GameServer.buildingParameters.autobuild) building.setBuilt();
 };

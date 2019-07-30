@@ -79,10 +79,6 @@ Player.prototype.setSocketID = function ( socketID) {
     this.socketID = socketID;
 };
 
-Player.prototype.setID = function (id) {
-    this.id = id;
-};
-
 Player.prototype.setInstance = function () {
     this.instance = GameServer.nextInstanceID++;
     if (GameServer.nextInstanceID % 100 === 0) GameServer.nextInstanceID = 0;
@@ -120,7 +116,7 @@ Player.prototype.addBuilding = function(building){
 };
 
 // Called by finalizePlayer
-Player.prototype.listBuildings = function () {
+Player.prototype.listBuildingRecipes = function () {
     this.buildings = [];
     for (var bid in GameServer.buildings) {
         var building = GameServer.buildings[bid];
@@ -141,17 +137,23 @@ Player.prototype.isMerchant = function () {
     return this.class === GameServer.classes.merchant;
 };
 
-Player.prototype.setName = function (name) {
+Player.prototype.setUp = function(id,name,region){
+    this.id = id;
     this.name = name;
+    this.setRegion(region);
 };
 
 Player.prototype.setRegion = function (sid) {
     this.sid = sid;
     this.region = GameServer.regions[this.sid];
+    this.setRespawnLocation(this.region.x,this.region.y);
+};
+
+Player.prototype.setRespawnLocation  = function(x,y){
     this.respawnLocation = {
-        x: this.region.x,
-        y: this.region.y
-    }
+        x: x,
+        y: y
+    };
 };
 
 Player.prototype.getRegionName = function () {
@@ -251,18 +253,23 @@ Player.prototype.die = function () {
     this.setOwnProperty('dead', true);
 };
 
-Player.prototype.spawn = function (x, y) {
-    var xpos = x || this.respawnLocation.x;
-    var ypos = y || this.respawnLocation.y;
-    var pos = this.findNextFreeCell(xpos, ypos);
-    x = pos.x;
-    y = pos.y;
+Player.prototype.setLocation = function(){
+    var pos = this.findNextFreeCell(this.respawnLocation.x, this.respawnLocation.y);
+    var x = pos.x;
+    var y = pos.y;
     this.setProperty('x', x);
     this.setProperty('y', y);
     this.setOwnProperty('x', x);
     this.setOwnProperty('y', y);
     this.setOrUpdateAOI(); // takes care of adding to the world as well
-    // console.log('spawning at ', this.x, this.y, '(aiming at', xpos, ypos, ')');
+};
+
+/**
+ * Make the player appears at his allocated (re)spawn location and check for battle when
+ * doing so.
+ */
+Player.prototype.spawn = function (checkLocation) {
+    if(checkLocation) this.setLocation();
     var battleCell = GameServer.checkForBattle(this.x, this.y);
     if (battleCell) GameServer.expandBattle(battleCell.battle, this);
 };
@@ -271,7 +278,7 @@ Player.prototype.respawn = function () {
     this.setProperty('dead', false);
     this.setOwnProperty('dead', false);
     this.setStat('hp', 10); // TODO: adapt remaining health
-    this.spawn();
+    this.spawn(true);
     this.setOrUpdateAOI();
     this.save();
     // TODO: loose loot?
@@ -734,6 +741,16 @@ Player.prototype.applyEffect = function (stat, delta, notify) {
     }
 };
 
+Player.prototype.getWorldInformation = function(){
+    this.setOwnProperty('fow',GameServer.fowList);
+    this.setOwnProperty('buildingMarkers', GameServer.listBuildingMarkers(this.instance));
+    this.setOwnProperty('resourceMarkers',  GameServer.listMarkers('resource').concat(this.extraMarkers));
+    this.setOwnProperty('animalMarkers', GameServer.listMarkers('animal'));
+    this.setOwnProperty('deathMarkers', GameServer.listMarkers('death'));
+    this.setOwnProperty('conflictMarkers', GameServer.listMarkers('conflict'));
+    this.setOwnProperty('rarity', GameServer.getRarity());
+};
+
 /**
  * Create a smaller object containing the properties needed to initialize
  * the player character on the client-side. Called in `gs.createInitializationPacket()`
@@ -741,25 +758,20 @@ Player.prototype.applyEffect = function (stat, delta, notify) {
  */
 Player.prototype.initTrim = function () {
     var trimmed = {};
-    var broadcastProperties = ['id', 'gold', 'classxp', 'classlvl', 'ap',
-        'name', 'history']; // list of properties relevant for the client
+    var broadcastProperties = ['id', 'name']; // list of properties relevant for the client
     for (var p = 0; p < broadcastProperties.length; p++) {
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
     trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    trimmed.fow = GameServer.fowList;
-    trimmed.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
-    trimmed.resourceMarkers = GameServer.listMarkers('resource').concat(this.extraMarkers);
-    trimmed.animalMarkers = GameServer.listMarkers('animal');
-    trimmed.deathMarkers = GameServer.listMarkers('death');
-    trimmed.conflictMarkers = GameServer.listMarkers('conflict');
-    // trimmed.resourceMarkers = GameServer.listResourceMarkers().concat(this.extraMarkers);
-    // trimmed.animalMarkers = GameServer.listAnimalMarkers();
-    // trimmed.deathMarkers = GameServer.listDeathMarkers();
-    // trimmed.conflictMarkers = GameServer.listConflictMarkers();
-    trimmed.rarity = GameServer.getRarity();
+    // trimmed.fow = GameServer.fowList;
+    // trimmed.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
+    // trimmed.resourceMarkers = GameServer.listMarkers('resource').concat(this.extraMarkers);
+    // trimmed.animalMarkers = GameServer.listMarkers('animal');
+    // trimmed.deathMarkers = GameServer.listMarkers('death');
+    // trimmed.conflictMarkers = GameServer.listMarkers('conflict');
+    // trimmed.rarity = GameServer.getRarity();
     return trimmed;
 };
 
@@ -795,7 +807,7 @@ Player.prototype.setOwnProperty = function (property, value) {
 };
 
 Player.prototype.getDataFromDb = function (data) {
-    this.setID(data.id);
+    this.id = data.id;
     this.name = data.name;
     this.x = Utils.clamp(data.x, 0, World.worldWidth - 1);
     this.y = Utils.clamp(data.y, 0, World.worldHeight - 1);

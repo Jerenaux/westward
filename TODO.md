@@ -47,61 +47,14 @@ World Building
 - Zoom-out in towers
 
 
-Dissociate init packet from finalizePlayer
-Dissociate listBuildings from it!
-
-- New Player
-New:
--- player.setUp(id,name,region) incl. starting inventory
--- (player.setInstance())
--- gs.saveNewPlayerToDb() (w/ async sending of ID)
->> notify
-Returning:
--- player.getDataFromDB();
-Common:
--- player.setSocketID()
--- player.setModel()
--- gs.finalize(gs maps & internal misc only)
->> player.setLocation() (avoid conflict etc.)
->> gs.sendInitPacket() (incl. x and y)
->> listBuildings
->> checkForBattle
-=====
 Check if a save is needed (reload after new player)
-
-
-* server side
-- Empty Player
-== new
-- Set region
-- Set name
-- Set ID
-- (Set instance)
-- Save to DB
-- Set model
-- Spawn (set x and y, broadcast, check for battle)
-- Finalize (fill some gs maps, send init packet, *list buildings* + internal misc)
-- Give starting inventory
-- Notify
-- save
-== returning
-- Load data from DB
-- Set model
-- Spawn (set x and y, broadcast, check for battle)
-- Finalize (fill some gs maps, send init packet, *list buildings* + internal misc)
-* Client side
-- Init, then updates
--> Look into what is really needed in init step, should be stuff needed to create world, all other content should
-be an update
-
-
+Test recipes, history, markers, FoW, tutorial ...
+Test starting inventory + own modified inventory
 
 Bugs:
-- Make clean sequence of methods to call for new players, in order, whether
-new or recurring player, distinguish bookkeeping logic from Player logic
 - The onInit conf stuff is obviously wrongly processed by server (check env vars)
 - All wolves in row should be involved in fight (uncomment line in gs.connectToBattle)
--Features:
+Features:
 - Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)
 - Display item amount owned in tooltip

@@ -29,28 +29,26 @@ let Hero = new Phaser.Class({
         Player.prototype.setUp.call(this,data);
 
         this.settlement = data.settlement || 0;
-        this.buildingMarkers = data.buildingMarkers || [];
-        this.resourceMarkers = data.resourceMarkers || [];
-        this.animalMarkers = data.animalMarkers || [];
-        this.deathMarkers = data.deathMarkers || [];
-        this.conflictMarkers = data.conflictMarkers || [];
+        this.buildingMarkers = [];
+        this.resourceMarkers = [];
+        this.animalMarkers = [];
+        this.deathMarkers = [];
+        this.conflictMarkers = [];
         this.FoW = [];
         this.inventory = new Inventory();
         this.belt = new Inventory(3); //TODO: conf
         this.stats = new StatsContainer();
         this.equipment = new EquipmentManager();
+        this.history = [];
 
-        this.gold = data.gold || 0;
-        this.civiclvl = data.civiclvl;
-        this.civicxp = data.civicxp;
-        this.classxp = data.classxp || new ClassDataShell();
-        this.classlvl = data.classlvl || new ClassDataShell();
-        this.ap = data.ap || new ClassDataShell();
+        this.gold =  0;
+        this.classxp = new ClassDataShell();
+        this.classlvl = new ClassDataShell();
+        this.ap = new ClassDataShell();
         this.name = data.name;
 
-        this.updateRarity(data.rarity || []);
-        this.updateHistory(data.history);
-        this.updateFoW(data.fow);
+        this.updateRarity([]);
+        // this.updateFoW(data.fow);
 
         this.buildRecipes.fromList(Engine.config.defaultBuildRecipes);
 
@@ -80,6 +78,7 @@ let Hero = new Phaser.Class({
             'items': this.updateInventory,
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
+            'rarity': this.updateRarity,
             'resetTurn': BattleManager.resetTurn,
             'stats': this.updateStats
         };
