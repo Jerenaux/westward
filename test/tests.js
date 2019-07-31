@@ -18,18 +18,18 @@ var Equipment = require('../shared/Equipment.js').Equipment;
 * */
 
 
-describe('test', function(){
-    /*The stub essentially suppresses the call to a method, while allowing to check if it was called
-    * and with what arguments. It doesn't provide a mock return value!*/
-    it('stub-test',function() {
-        var methodB = sinon.stub(gs, 'testMethodB');
-        var input = 5;
-        var output = gs.testMethodA(input);
-        expect(output).to.equal(input);
-        methodB.restore();
-        sinon.assert.calledWith(methodB, input);
-    });
-});
+// describe('test', function(){
+//     /*The stub essentially suppresses the call to a method, while allowing to check if it was called
+//     * and with what arguments. It doesn't provide a mock return value!*/
+//     it('stub-test',function() {
+//         var methodB = sinon.stub(gs, 'testMethodB');
+//         var input = 5;
+//         var output = gs.testMethodA(input);
+//         expect(output).to.equal(input);
+//         methodB.restore();
+//         sinon.assert.calledWith(methodB, input);
+//     });
+// });
 
 describe('GameServer',function(){
     var stubs = [];
@@ -96,6 +96,7 @@ describe('GameServer',function(){
     it('handleBattle_alive',function(){
         var result = gs.handleBattle(player,animal);
         expect(result).to.equal(true);
+        player.battle.end();
     });
 
     it('lootNPC_alive',function(){
@@ -289,7 +290,7 @@ describe('GameServer',function(){
 
     it('handleUse_consume', function(){
         player.inventory.clear();
-        var itemID = 1; // stone hatchet
+        var itemID = 6; // dawn
         var amount = 1;
         player.giveItem(itemID,amount);
         expect(player.getItemNb(itemID)).to.equal(amount);
