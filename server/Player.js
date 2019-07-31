@@ -59,8 +59,6 @@ function Player() {
 
     this.cellsWidth = 1;
     this.cellsHeight = 1;
-    this.w = this.cellsWidth; // For quadtree
-    this.h = this.cellsHeight;
 
     this.setUpStats();
 
@@ -71,16 +69,18 @@ function Player() {
     this.steps = 0;
     MovingEntity.call(this);
 
-    this.extraMarkers = [];
+    this.extraMarkers = []; // used in tutorial to display mock markers
 }
 
 Player.prototype = Object.create(MovingEntity.prototype);
 Player.prototype.constructor = Player;
 
-Player.prototype.setIDs = function (dbID, socketID) {
-    //this.id = GameServer.lastPlayerID++;
-    this.dbID = dbID;
+Player.prototype.setSocketID = function ( socketID) {
     this.socketID = socketID;
+};
+
+Player.prototype.setMongoID = function (mongoID) {
+    this.mongoID = mongoID;
 };
 
 Player.prototype.setInstance = function () {
@@ -120,15 +120,12 @@ Player.prototype.addBuilding = function(building){
 };
 
 // Called by finalizePlayer
-Player.prototype.listBuildings = function () {
+Player.prototype.listBuildingRecipes = function () {
     this.buildings = [];
     for (var bid in GameServer.buildings) {
         var building = GameServer.buildings[bid];
         if (building.owner === this.id) this.buildings.push(building);
     }
-    this.buildings.forEach(function (b) {
-        console.warn(b.type);
-    });
     this.updateBldRecipes();
 };
 
@@ -144,17 +141,23 @@ Player.prototype.isMerchant = function () {
     return this.class === GameServer.classes.merchant;
 };
 
-Player.prototype.setName = function (name) {
+Player.prototype.setUp = function(id,name,region){
+    this.id = id;
     this.name = name;
+    this.setRegion(region);
 };
 
 Player.prototype.setRegion = function (sid) {
     this.sid = sid;
     this.region = GameServer.regions[this.sid];
+    this.setRespawnLocation(this.region.x,this.region.y);
+};
+
+Player.prototype.setRespawnLocation  = function(x,y){
     this.respawnLocation = {
-        x: this.region.x,
-        y: this.region.y
-    }
+        x: x,
+        y: y
+    };
 };
 
 Player.prototype.getRegionName = function () {
@@ -203,10 +206,13 @@ Player.prototype.applyVigorModifier = function () {
 Player.prototype.setStartingInventory = function () {
     // TODO: move to some config file
     var list = [
-        [7, 1],
-        [21, 1]
+        [3, 5],
+        [2,1],
+        [19,1],
+        [20,3],
+        [51,1],
+        [6,1]
     ];
-
     list.forEach(function (l) {
         this.giveItem(l[0], l[1]);
         GameServer.createItem(l[0], l[1], 'start');
@@ -251,18 +257,23 @@ Player.prototype.die = function () {
     this.setOwnProperty('dead', true);
 };
 
-Player.prototype.spawn = function (x, y) {
-    var xpos = x || this.respawnLocation.x;
-    var ypos = y || this.respawnLocation.y;
-    var pos = this.findNextFreeCell(xpos, ypos);
-    x = pos.x;
-    y = pos.y;
+Player.prototype.setLocation = function(){
+    var pos = this.findNextFreeCell(this.respawnLocation.x, this.respawnLocation.y);
+    var x = pos.x;
+    var y = pos.y;
     this.setProperty('x', x);
     this.setProperty('y', y);
     this.setOwnProperty('x', x);
     this.setOwnProperty('y', y);
-    this.onAddAtLocation();
-    // console.log('spawning at ', this.x, this.y, '(aiming at', xpos, ypos, ')');
+    this.setOrUpdateAOI(); // takes care of adding to the world as well
+};
+
+/**
+ * Make the player appears at his allocated (re)spawn location and check for battle when
+ * doing so.
+ */
+Player.prototype.spawn = function (checkLocation) {
+    if(checkLocation) this.setLocation();
     var battleCell = GameServer.checkForBattle(this.x, this.y);
     if (battleCell) GameServer.expandBattle(battleCell.battle, this);
 };
@@ -271,8 +282,7 @@ Player.prototype.respawn = function () {
     this.setProperty('dead', false);
     this.setOwnProperty('dead', false);
     this.setStat('hp', 10); // TODO: adapt remaining health
-    this.onRemoveFromLocation();
-    this.spawn();
+    this.spawn(true);
     this.setOrUpdateAOI();
     this.save();
     // TODO: loose loot?
@@ -485,7 +495,6 @@ Player.prototype.canEquip = function (slot, item) {
         return false;
     }
     if(slot == 'range_ammo'){
-        console.warn(itemData.container_type,'vs', this.getContainerType());
         if(itemData.container_type != this.getContainerType()){
             console.log('Container mismatch');
             return false;
@@ -516,9 +525,17 @@ Player.prototype.equip = function (slot, itemID, fromDB) {
         return 0;
     }
 
-    var slotData = Equipment.getData(slot);
-    if (this.isEquipped(slot)) this.unequip(slot);
+    // If reloading ammo, it's ok if some is still equipped
+    if(slot != 'range_ammo') {
+        if (this.getEquippedItemID(slot) == itemID){
+            console.log('Item already equipped');
+            return 0;
+        }
+    }
+    // Unequip currently equipped
+    if(this.getEquippedItemID(slot) != itemID) this.unequip(slot);
 
+    var slotData = Equipment.getData(slot);
     if (slotData) {
         var conflictSlot = slotData.conflict; // Name of the slot with which the new object could conflict
         if (conflictSlot && this.isEquipped(conflictSlot)) this.unequip(conflictSlot, true);
@@ -728,6 +745,16 @@ Player.prototype.applyEffect = function (stat, delta, notify) {
     }
 };
 
+Player.prototype.getWorldInformation = function(){
+    this.setOwnProperty('fow',GameServer.fowList);
+    this.setOwnProperty('buildingMarkers', GameServer.listBuildingMarkers(this.instance));
+    this.setOwnProperty('resourceMarkers',  GameServer.listMarkers('resource').concat(this.extraMarkers));
+    this.setOwnProperty('animalMarkers', GameServer.listMarkers('animal'));
+    this.setOwnProperty('deathMarkers', GameServer.listMarkers('death'));
+    this.setOwnProperty('conflictMarkers', GameServer.listMarkers('conflict'));
+    this.setOwnProperty('rarity', GameServer.getRarity());
+};
+
 /**
  * Create a smaller object containing the properties needed to initialize
  * the player character on the client-side. Called in `gs.createInitializationPacket()`
@@ -735,18 +762,20 @@ Player.prototype.applyEffect = function (stat, delta, notify) {
  */
 Player.prototype.initTrim = function () {
     var trimmed = {};
-    var broadcastProperties = ['id', 'gold', 'classxp', 'classlvl', 'ap',
-        'name', 'history']; // list of properties relevant for the client
+    var broadcastProperties = ['id', 'name']; // list of properties relevant for the client
     for (var p = 0; p < broadcastProperties.length; p++) {
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
     trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    trimmed.fow = GameServer.fowList;
-    trimmed.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
-    trimmed.resourceMarkers = GameServer.listResourceMarkers(this.instance).concat(this.extraMarkers);
-    trimmed.rarity = GameServer.getRarity();
+    // trimmed.fow = GameServer.fowList;
+    // trimmed.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
+    // trimmed.resourceMarkers = GameServer.listMarkers('resource').concat(this.extraMarkers);
+    // trimmed.animalMarkers = GameServer.listMarkers('animal');
+    // trimmed.deathMarkers = GameServer.listMarkers('death');
+    // trimmed.conflictMarkers = GameServer.listMarkers('conflict');
+    // trimmed.rarity = GameServer.getRarity();
     return trimmed;
 };
 
@@ -937,8 +966,10 @@ Player.prototype.addNotif = function (msg, silent) {
 Player.prototype.getIndividualUpdatePackage = function () {
     // console.log(this.updatePacket,this.updatePacket.isEmpty());
     var pkg = this.updatePacket;
-    if (GameServer.fowChanged) pkg.fow = GameServer.fowList;
-    if (GameServer.buildingsChanged) pkg.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
+    if (GameServer.checkFlag('FoW')) pkg.fow = GameServer.fowList;
+    if (GameServer.checkFlag('buildingsMarkers')) pkg.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
+    if (GameServer.checkFlag('deathMarkers')) pkg.deathMarkers = GameServer.listMarkers('death');
+    if (GameServer.checkFlag('conflictMarkers')) pkg.conflictMarkers = GameServer.listMarkers('conflict');
     if (pkg.isEmpty()) return null;
     this.updatePacket = new PersonalUpdatePacket();
     return pkg;
@@ -953,7 +984,6 @@ Player.prototype.fastForward = function (nbturns) {
     this.starve(nbStarvationTurns);
     this.rest(nbRestTurns);
     this.save();
-    console.warn('----');
 };
 
 Player.prototype.update = function () {
@@ -988,7 +1018,6 @@ Player.prototype.rest = function (nb) {
 Player.prototype.remove = function () {
     console.log('removing player');
     if (this.battle) this.battle.removeFighter(this);
-    this.onRemoveFromLocation();
     delete GameServer.players[this.id];
     GameServer.updateVision();
 };

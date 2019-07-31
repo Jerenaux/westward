@@ -28,6 +28,7 @@ function MiniMap(){
     rect.setInteractive();
     rect.setScrollFactor(0);
     rect.setOrigin(0);
+    this.displayed = false;
 }
 
 MiniMap.prototype.follow = function(){
@@ -38,10 +39,12 @@ MiniMap.prototype.display = function(){
     //if(this.bg) this.bg.setVisible(true);
     this.ring.setVisible(true);
     this.map.display();
+    this.displayed = true;
 };
 
 MiniMap.prototype.hide = function(){
     //if(this.bg) this.bg.setVisible(false);
     this.ring.setVisible(false);
     this.map.hide();
+    this.displayed = false;
 };

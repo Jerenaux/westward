@@ -1,0 +1,19 @@
+{
+    "soldier": [
+        {
+            "name": "More offensive actions",
+            "desc": "In battle, allows you to attack one more time per turn.",
+            "effect": "",
+            "fatigue": "disable" 
+        }
+    ],
+    "explorer": [
+
+    ],
+    "craftsman": [
+
+    ],
+    "merchant": [
+
+    ]
+}

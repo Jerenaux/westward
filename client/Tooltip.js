@@ -52,6 +52,10 @@ var Tooltip = new Phaser.Class({
                 if(data.title) this.setTitle(data.title);
                 if(data.body) this.setBody(data.body);
                 break;
+            case 'pickupItem':
+                if(data.id == -1) break;
+                // this.setNbOwned(Engine.player.getItemNb(data.id));
+                // fall through
             case 'item':
                 if(data.id == -1) break;
                 var item = Engine.itemsData[data.id];

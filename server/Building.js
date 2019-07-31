@@ -33,20 +33,19 @@ function Building(data){
 
     this.x = Utils.clamp(data.x,0,World.worldWidth-1);
     this.y = Utils.clamp(data.y,0,World.worldHeight-1);
+    // console.warn('XY',data.x,data.y,this.x,this.y);
 
     this.type = data.type;
     if(this.type === undefined) console.warn('Undefined building type');
-    var buildingData = GameServer.buildingsData[this.type];
 
+    var buildingData = GameServer.buildingsData[this.type];
     this.aggro = buildingData.aggro;
     this.cellsWidth = buildingData.base.width;
     this.cellsHeight = buildingData.base.height;
-    this.w = this.cellsWidth; // For quadtree
-    this.h = this.cellsHeight;
 
     this.coll = {
         x: this.x,
-        y: this.y - this.cellsHeight,
+        y: this.y,
         w: this.cellsWidth,
         h: this.cellsHeight
     };
@@ -118,7 +117,6 @@ Building.prototype.constructor = Building;
 
 Building.prototype.embed = function(){
     GameServer.buildings[this.id] = this;
-    this.onAddAtLocation();
     this.setOrUpdateAOI();
     this.setCollisions('add');
     this.updateBuild();
@@ -135,28 +133,6 @@ Building.prototype.getShortID = function(){
 Building.prototype.isAggressive = function(){
     return this.aggro;
 };
-
-/*
-Building.prototype.checkForAggro = function(){
-    if(!this.isInVision()) return;
-    if(!this.isAggressive() || this.isInFight() || !this.isAvailableForFight()) return;
-    // console.warn('Tower checking for aggro');
-
-    var r = GameServer.battleParameters.aggroRange;
-    // implies Chebyshev distance
-    // console.warn(Math.floor(this.x-r/2),Math.floor(this.y-r/2),r,r);
-    var neighbors = GameServer.getEntitiesAt(Math.floor(this.x-r/2),Math.floor(this.y-r/2),r,r);
-    for(var i = 0; i < neighbors.length; i++){
-        var entity = neighbors[i];
-        if(this.getShortID() == entity.getShortID()) continue;
-        if(!this.aggroAgainst(entity)) continue;
-        if(!entity.isAvailableForFight()) continue;
-        if(entity.instance != this.instance) continue;
-        if(entity.isInFight()) continue;
-        GameServer.handleBattle(this, entity);
-        break;
-    }
-};*/
 
 Building.prototype.refreshListing = function(){
     this.buildings = this.settlement.getBuildings();
@@ -481,21 +457,6 @@ Building.prototype.getRect = function(){
         h: this.cellsHeight
     }
 };
-
-/*Building.prototype.getCenter = function(noRound){
-    if(noRound){
-        return {
-            x: this.x + this.cellsWidth / 2,
-            y: this.y - this.cellsHeight / 2
-        };
-    }else {
-        return {
-            x: Math.floor(this.x + this.cellsWidth / 2),
-            y: Math.floor(this.y - this.cellsHeight / 2)
-        };
-    }
-};*/
-
 // Where to target projectiles at
 Building.prototype.getTargetCenter = function(){
     return {

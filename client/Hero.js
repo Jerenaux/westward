@@ -29,25 +29,26 @@ let Hero = new Phaser.Class({
         Player.prototype.setUp.call(this,data);
 
         this.settlement = data.settlement || 0;
-        this.buildingMarkers = data.buildingMarkers || [];
-        this.resourceMarkers = data.resourceMarkers || [];
+        this.buildingMarkers = [];
+        this.resourceMarkers = [];
+        this.animalMarkers = [];
+        this.deathMarkers = [];
+        this.conflictMarkers = [];
         this.FoW = [];
         this.inventory = new Inventory();
         this.belt = new Inventory(3); //TODO: conf
         this.stats = new StatsContainer();
         this.equipment = new EquipmentManager();
+        this.history = [];
 
-        this.gold = data.gold || 0;
-        this.civiclvl = data.civiclvl;
-        this.civicxp = data.civicxp;
-        this.classxp = data.classxp || new ClassDataShell();
-        this.classlvl = data.classlvl || new ClassDataShell();
-        this.ap = data.ap || new ClassDataShell();
+        this.gold =  0;
+        this.classxp = new ClassDataShell();
+        this.classlvl = new ClassDataShell();
+        this.ap = new ClassDataShell();
         this.name = data.name;
 
-        this.updateRarity(data.rarity || []);
-        this.updateHistory(data.history);
-        this.updateFoW(data.fow);
+        this.updateRarity([]);
+        // this.updateFoW(data.fow);
 
         this.buildRecipes.fromList(Engine.config.defaultBuildRecipes);
 
@@ -59,15 +60,18 @@ let Hero = new Phaser.Class({
 
     updateData: function(data){ // don't call this 'update' or else conflict with Player.update() for other player updates
         let callbacks = {
+            'animalMarkers': this.updateAnimalMarkers,
             'ammo': this.updateAmmo,
             'ap': this.updateAP,
             'belt': this.updateBelt,
             'bldRecipes': this.updateBuildRecipes,
-            'buildingMarkers': this.updateMarkers,
+            'buildingMarkers': this.updateBuildingMarkers,
             'civiclvl': this.updateCivicLvl,
             'classlvl': this.updateClassLvl,
             'classxp': this.updateClassXP,
+            'conflictMarkers': this.updateConflictMarkers,
             'dead': this.handleDeath,
+            'deathMarkers': this.updateDeathMarkers,
             'equipment': this.updateEquipment,
             'fow': this.updateFoW,
             'gold': this.updateGold,
@@ -75,7 +79,9 @@ let Hero = new Phaser.Class({
             'items': this.updateInventory,
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
+            'rarity': this.updateRarity,
             'resetTurn': BattleManager.resetTurn,
+            'resourceMarkers': this.updateResourceMarkers,
             'stats': this.updateStats
         };
 
@@ -89,6 +95,7 @@ let Hero = new Phaser.Class({
         this.updateEvents.forEach(function (e) {
             Engine.updateMenus(e);
         }, this);
+        if(this.updateEvents.has('map') && Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
 
         let battleCallbacks = {
             'battleData': BattleManager.updateBattle
@@ -322,9 +329,34 @@ let Hero = new Phaser.Class({
         }
     },
 
-    updateMarkers: function(markers){
+    updateAnimalMarkers: function(markers){
+        this.animalMarkers = markers;
+        this.updateEvents.add('map');
+        // if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
+    },
+
+    updateBuildingMarkers: function(markers){
         this.buildingMarkers = markers;
-        if(Engine.miniMap) Engine.miniMap.map.updatePins();
+        this.updateEvents.add('map');
+        // if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
+    },
+
+    updateResourceMarkers: function(markers){
+        this.resourceMarkers = markers;
+        this.updateEvents.add('map');
+        // if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
+    },
+
+    updateDeathMarkers: function(markers){
+        this.deathMarkers = markers;
+        this.updateEvents.add('map');
+        // if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
+    },
+
+    updateConflictMarkers: function(markers){
+        this.conflictMarkers = markers;
+        this.updateEvents.add('map');
+        // if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
     },
 
     updateRarity: function(rarity){

@@ -12,7 +12,7 @@ Client.socket = io.connect();
 
 Client.emptyQueue = function(){ // Process the events that have been queued during initialization
     for(var e = 0; e < Client.eventsQueue.length; e++){
-        onevent.call(Client.socket,Client.eventsQueue[e]);
+        Client.socket.onevent.call(Client.socket,Client.eventsQueue[e]);
     }
 };
 
@@ -26,6 +26,7 @@ Client.requestData = function(){ // request the data to be used for initWorld()
     var onevent = Client.socket.onevent;
     Client.socket.onevent = function (packet) {
         if(!Engine.playerIsInitialized && packet.data[0] != Client.initEventName && packet.data[0] != 'dbError'){
+            console.warn('queueing ',packet.data[0]);
             Client.eventsQueue.push(packet);
         }else{
             onevent.call(this, packet);    // original call
@@ -137,6 +138,7 @@ Client.socket.on('update',function(data){ // This event triggers uppon receiving
     if(data.global) console.log(data.global);
     if(data.local) Engine.updateSelf(data.local); // Should come first
     if(data.global) Engine.updateWorld(data.global);
+    if(data.qt) Engine.debugQT(data.qt);
     Engine.currentTurn = data.turn;
 });
 

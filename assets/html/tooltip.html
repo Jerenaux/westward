@@ -41,7 +41,7 @@
         margin-top: 5px;
         vertical-align: top;
     }
-    #effect_icon {
+    .icon {
         background-image: url(assets/sprites/ui.png);
         background-position: -525px -458px;
         min-width: 13px;
@@ -49,9 +49,12 @@
         max-width: 13px;
         float: left;
     }
-    #effect_nb {
+    .nb {
         font-size: 12px;
         margin-left: 20px;
+    }
+    #owned {
+        display: none;
     }
 </style>
 
@@ -59,10 +62,14 @@
     <div id="tooltip_title"></div>
     <div id="tooltip_body"></div>
     <div id="effects">
-        <div id="effect_icon"></div>
-        <div id="effect_nb"></div>
+        <div class="icon" id="effect_icon"></div>
+        <div class="nb" id="effect_nb"></div>
     </div>
     <div id="stat">
         <mark id="base"></mark>&nbsp;<mark id="equipment_modifier"></mark>&nbsp;<mark id="fatigue_modifier"></mark>
+    </div>
+    <div id="owned">
+        <div class="icon" id="owned_icon"></div>
+        <div class="nb" id="owned_nb"></div>
     </div>
 </div>

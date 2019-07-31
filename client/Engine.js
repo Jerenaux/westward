@@ -45,6 +45,7 @@ Engine.preload = function() {
     this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('wolves', 'assets/sprites/animals/wolves.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bears', 'assets/sprites/animals/bears2.png',{frameWidth:56,frameHeight:56});
+    this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
     // this.load.spritesheet('toadmen', 'assets/sprites/animals/toadmen.png',{frameWidth:48,frameHeight:48});
 
     // #################""
@@ -246,6 +247,7 @@ Engine.create = function(){
     Engine.debug = true;
     Engine.showHero = true;
     Engine.showGrid = false;
+    Engine.qtQuads = []; // for debugging
 
     Engine.camera = Engine.scene.cameras.main;
     Engine.camera.setBounds(0,0,Engine.worldWidth*TILE_WIDTH,Engine.worldHeight*TILE_HEIGHT);
@@ -378,7 +380,8 @@ Engine.initWorld = function(data){
     }
 
     if(Client.tutorial) TutorialManager.boot(1);
-    
+
+
     // todo: move all to dedicated sound manager
     /*Engine.lastOrientationSound = 0;
     // todo: move to JSON file (+ config for delay)
@@ -498,6 +501,13 @@ Engine.createAnimations = function(){
         frames: Engine.scene.anims.generateFrameNumbers('enemy', { start: 260, end: 265}),
         frameRate: 10
     });
+
+    Engine.scene.anims.create({
+        key: 'butterflap',
+        frames: Engine.scene.anims.generateFrameNumbers('butterfly', { start: 0, end: 1}),
+        frameRate: 5,
+        repeat: -1
+    });
 };
 
 Engine.createAttackAnimation = function(key,texture,start,end){
@@ -531,7 +541,6 @@ Engine.manageDeath = function(){
 
 Engine.manageRespawn = function(){
     Engine.showMarker();
-    // Engine.displayUI();
     Engine.dead = false;
     Engine.updateAllOrientationPins();
 };
@@ -774,6 +783,7 @@ Engine.makeUI = function(){
         'map': Engine.makeMapMenu(),
         //'messages': Engine.makeMessagesMenu(),
         'production': Engine.makeProductionMenu(),
+        'respawn': Engine.makeRespawnMenu(),
         'rest': Engine.makeRestMenu(),
         'trade': Engine.makeTradeMenu(),
         'wip': Engine.makeWipMenu()
@@ -839,7 +849,7 @@ menuIcon = function(x,y,icon,menu,tox,toy){
 
 menuIcon.prototype.toggle = function(){
     if(this.displayed){
-        if(Engine.inBuilding || Engine.currentMenu.fullHide){
+        if(Engine.inBuilding || (Engine.currentMenu && Engine.currentMenu.fullHide)){
             this.fullhide();
         }else {
             this.hide();
@@ -1044,20 +1054,6 @@ Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss,delay){
 
 };
 
-/*Engine.displayUI = function(){
-    Engine.UIHolder.display();
-    for(var i = 0; i < Engine.nbBasicUIEelements; i++){
-        Engine.UIelements[i].setVisible(true);
-    }
-};
-
-Engine.hideUI = function(){
-    Engine.UIHolder.hide();
-    Engine.UIelements.forEach(function(e){
-        e.setVisible(false);
-    });
-};*/
-
 Engine.getPlayerHealth = function(){
     return Engine.player.getStatValue('hp');
 };
@@ -1066,8 +1062,19 @@ Engine.getPlayerMaxHealth = function(){
     return Engine.player.getStatValue('hpmax');
 };
 
+Engine.makeRespawnMenu = function(){
+    var menu = new Menu();
+    menu.fullHide = true;
+    var respawnw = 300;
+    var respawnh = 90;
+    var respawnx = (Engine.getGameConfig().width-respawnw)/2;
+    var respawny = 400;
+    var respawn = menu.addPanel('respawn',new RespawnPanel(respawnx,respawny,respawnw,respawnh));
+    respawn.addButton(respawnw-30, 8, 'blue','help',null,'',UI.textsData['respawn_help']);
+    return menu;
+};
+
 Engine.makeBattleMenu = function(){
-    var alignx = 845;
     var battle = new Menu();
     battle.fullHide = true;
 
@@ -1075,18 +1082,6 @@ Engine.makeBattleMenu = function(){
 
     var belt = battle.addPanel('belt',new InventoryPanel(0,487,200,90,'Belt'));
     belt.setInventory('belt',5,true,BattleManager.processInventoryClick);
-
-    var timerw = 300;
-    var timerh = 60;
-    var timerx = (Engine.getGameConfig().width-timerw)/2;
-    var timery = Engine.getGameConfig().height-timerh;
-    /*var timerPanel = battle.addPanel('timer',new BattleTimerPanel(timerx,timery,timerw,timerh));
-    timerPanel.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['battletimer_help']);*/
-
-    var respawnh = 90;
-    var respawny = 400;
-    var respawn = battle.addPanel('respawn',new RespawnPanel(timerx,respawny,timerw,respawnh),true);
-    respawn.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['respawn_help']);
 
     battle.addEvent('onUpdateBelt',belt.updateInventory.bind(belt));
     battle.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
@@ -1121,7 +1116,7 @@ Engine.makeProductionMenu = function(){
     productionPanel.addCapsule('gold',20,20,'999','gold');
     production.addPanel('production',productionPanel);
 
-    var action = new ShopPanel(212,420,300,100,'Take',true); // true = not shop, hack
+    var action = new ShopPanel(212,440,300,100,'Take',true); // true = not shop, hack
     action.addButton(300-16,-8,'red','close',action.hide.bind(action),'Close');
     action.moveUp(2);
     production.addPanel('action',action,true);
@@ -1253,35 +1248,6 @@ Engine.makeMessagesMenu = function(){
     return menu;
 };
 
-Engine.makeStaffMenu = function(){
-    var menu = new Menu('Officials');
-    menu.setSound(Engine.scene.sound.add('book'));
-
-    var govw = 250;
-    var govh = 150;
-    var govx = (UI.getGameWidth()-govw)/2;
-    var govy = 100;
-
-    var padding = 10;
-    var chanx = govx - govw/2 - padding/2;
-    var chany = govy + govh + 20;
-    var chanh = 200;
-
-    var commx = govx + govw/2 + padding/2;
-
-    var gov = menu.addPanel('governor',new StaffPanel(govx,govy,govw,govh,'Governor'));
-    gov.addButton(govw-30, 8, 'blue','help',null,'',UI.textsData['governor_help']);
-    gov.addStaff([{name:'Mr. Governor'}]);
-    gov.addCenterText('Your civic level is too low to vote for the Governor');
-    var chan = menu.addPanel('chancellors',new StaffPanel(chanx,chany,govw,chanh,'Chancellors'));
-    chan.addButton(govw-30, 8, 'blue','help',null,'',UI.textsData['chancellor_help']);
-    chan.addStaff([{name:'Palpatine'},{name:'Valorum'},{name:'Tobby'}]);
-    var comm = menu.addPanel('commanders',new StaffPanel(commx,chany,govw,chanh,'Commanders'));
-    comm.addButton(govw-30, 8, 'blue','help',null,'',UI.textsData['commander_help']);
-    comm.addStaff([{name:'Adama'},{name:'William Riker'}]);
-    return menu;
-};
-
 Engine.makeMapMenu = function(){
     var map = new Menu('World Map');
     map.log = true;
@@ -1296,6 +1262,7 @@ Engine.makeMapMenu = function(){
     // controls enable/disable of buttons based on zoom flag
     mapPanel.zoomInBtn = mapPanel.addButton(940, 320, 'blue','plus',mapInstance.zoomIn.bind(mapInstance),'Zoom in');
     mapPanel.zoomOutBtn = mapPanel.addButton(930, 350, 'blue','minus',mapInstance.zoomOut.bind(mapInstance),'Zoom out');
+    map.addEvent('onUpdateMap',mapPanel.map.updatePins.bind(mapPanel.map));
     return map;
 };
 
@@ -1455,6 +1422,7 @@ Engine.makeBuildMenu = function(){
     var w = 300;
     var buildings = build.addPanel('build',new BuildPanel(30,40,w,450,'Build'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
+    buildings.addButton(w-33, 8, 'blue','help',null,'',UI.textsData['build_help']);
     buildings.moveUp(2);
     build.addEvent('onOpen',buildings.updateContent.bind(buildings));
     build.addEvent('onUpdateBuildRecipes',buildings.updateContent.bind(buildings));
@@ -1465,7 +1433,7 @@ Engine.bldClick = function(){
     var bld = Engine.buildingsData[this.bldID];
     Engine.currentMenu.hide();
 
-    //Engine.hideMarker();
+    Engine.hideMarker();
     Engine.bldRect = Engine.scene.add.rectangle(0,0, bld.base.width*32, bld.base.height*32, 0x00ee00).setAlpha(0.7);
     Engine.bldRect.bldID = this.bldID;
     Engine.bldRect.locationConstrained = bld.locationConstrained;
@@ -1949,6 +1917,7 @@ Engine.updateMenus = function(category){
         'gold': 'onUpdateGold',
         'history': 'onUpdateHistory',
         'inv': 'onUpdateInventory',
+        'map': 'onUpdateMap',
         'productivity':'onUpdateProductivity',
         'stats': 'onUpdateStats'
     };
@@ -2267,13 +2236,9 @@ Engine.takeClick = function(){
     Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
 };
 
-Engine.commitClick = function(){
-    Client.sendCommit();
-};
-
 Engine.respawnClick = function(){ // this bound to respawn panel
     Client.sendRespawn();
-    this.hide();
+    Engine.menus["respawn"].hide();
 };
 
 Engine.buildError = function(){
@@ -2295,6 +2260,17 @@ Engine.leaveBuilding = function(){
 Engine.snap = function(){
     game.renderer.snapshot(function(img){
         Client.sendScreenshot(img.src,detectBrowser());
+    });
+};
+
+Engine.debugQT = function(quads){
+    Engine.qtQuads.forEach(function(q){
+       q.destroy();
+    });
+    quads.forEach(function(q){
+        var rect = Engine.scene.add.rectangle(q.x*32, q.y*32, (q.w)*32, (q.h)*32, 0x6666ff);
+        rect.setDepth(100).setOrigin(0);
+        Engine.qtQuads.push(rect);
     });
 };
 

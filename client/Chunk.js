@@ -1,3 +1,5 @@
+var TREE_ALPHA = 1;
+
 function Chunk(data){
     this.id = data.id;
     this.x = parseInt(data.x);
@@ -108,6 +110,7 @@ Chunk.prototype.drawImage = function(x,y,image,depth,crop){
     img.setOrigin(anchor.x,anchor.y);
     this.images.push(img);
     this.postDrawImage(x,y,image,img);
+    return img;
 };
 
 Chunk.prototype.addImage = function(x,y,image){
@@ -115,8 +118,8 @@ Chunk.prototype.addImage = function(x,y,image){
     if(isTree){
         var frame = this.getAtlasData(image,'frame');
         var ycutoff = frame.h*0.4;
-        this.drawImage(x,y,image, y, new Phaser.Geom.Rectangle(0,0,frame.w,ycutoff));
-        this.drawImage(x,y,image, y+1, new Phaser.Geom.Rectangle(0,ycutoff,frame.w,frame.h-ycutoff));
+        this.drawImage(x,y,image, y, new Phaser.Geom.Rectangle(0,0,frame.w,ycutoff)).setAlpha(TREE_ALPHA);
+        this.drawImage(x,y,image, y+1, new Phaser.Geom.Rectangle(0,ycutoff,frame.w,frame.h-ycutoff)).setAlpha(TREE_ALPHA);
     }else{
         this.drawImage(x,y,image);
     }

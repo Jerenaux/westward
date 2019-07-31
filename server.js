@@ -175,11 +175,11 @@ if(process.env.DEV == 1) {
 
 server.listen(process.env.PORT || myArgs.port || 8081,function(){
     console.log('Listening on '+server.address().port);
+    console.log('Config environment: '+(process.env.NODE_CONFIG_ENV || 'default'));
 
     mongodbAuth = {
         useNewUrlParser: true
     };
-    console.log('Check for mongodb Auth');
     if (process.env.MONGODB_AUTH) {
         console.log('Create auth object with user, pass, client');
         mongodbAuth = {
@@ -206,8 +206,6 @@ server.listen(process.env.PORT || myArgs.port || 8081,function(){
 server.resetStamp = 1519130567967; // ignore returning players with stamps older than this and treat them as new
 
 io.on('connection',function(socket){
-    console.log('connect');
-
     socket.emit('ack');
 
     socket.on('boot-params',function(data){
@@ -223,6 +221,8 @@ io.on('connection',function(socket){
         if(!data.stamp || data.stamp < server.resetStamp) data.new = true; // TODO Remove eventually
 
         console.log(data);
+        // data.new = true;
+        // data.characterName = 'Joe';
         if(data.new){ // new players OR tutorial
             gs.addNewPlayer(socket,data);
         }else{
@@ -250,8 +250,6 @@ io.on('connection',function(socket){
             'tutorial-step': gs.handleTutorialStep,
             'unequip': gs.handleUnequip,
             'use': gs.handleUse,
-
-            //'ss': gs.startScript
         };
 
         var handler = socket.onevent;
@@ -291,13 +289,16 @@ io.on('connection',function(socket){
 });
 
 server.sendInitializationPacket = function(socket,packet){
+    // console.warn('sending init');
     packet = server.addStamp(packet);
     //if(server.enableBinary) packet = Encoder.encode(packet,CoDec.initializationSchema);
     socket.emit('init',packet);
 };
 
 server.sendUpdate = function(socketID,pkg){
+    // console.warn('sending update',pkg);
     var socket = server.getSocket(socketID);
+    if(!socket) console.warn('No socket found');
     pkg = server.addStamp(pkg);
     if(socket) pkg.latency = Math.floor(socket.latency);
     //if(server.enableBinary) pkg = Encoder.encode(pkg,CoDec.finalUpdateSchema);

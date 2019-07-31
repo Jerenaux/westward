@@ -7,7 +7,7 @@
         freezeNPC: false,
         maxDamage: 10000,
         minDamage: 1,
-        rangePenalty: 0.5, // accuracy penalty per tile
+        rangePenalty: 0.1, // accuracy penalty per tile
         turnDuration: 5, // seconds
         tickRate: 100, // milliseconds, granularity of battle updates
         throwableSpeed: 10, // tiles/sec
@@ -49,14 +49,15 @@
         turns: {
             camps: 5,
             foodConsumptionRate: 600, // rate at which food levels of players are decreased ; amount in character.foodConsumption
-            itemsRespawn: 86400, // 86400sec = 24h
+            itemsRespawn: 86400, // 86400 turns of 1sec = 24h
             restRate: 1, // rate at which vigor levels of players are increased when sheltered ; amount in buildings.json
             spawnZones: 10
         }
     },
     misc: {
         foodID: 1,
-        performInit: true
+        performInit: true,
+        debugQT: false
     },
     pathfinding: {
         walkingSpeed: 5, // tiles/sec
@@ -76,7 +77,7 @@
         raidMinimum: 8
     },
     wildlife: {
-        aggro: false,
+        aggro: true,
         nolife: false,
         wander: true,
         wanderRange: 5,

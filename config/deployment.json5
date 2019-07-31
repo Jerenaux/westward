@@ -23,7 +23,8 @@
         }
     },
     misc: {
-        performInit: false
+        performInit: false,
+        debugQT: false
     },
     civs: {
         aggro: true,
