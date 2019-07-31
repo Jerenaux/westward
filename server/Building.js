@@ -43,12 +43,7 @@ function Building(data){
     this.cellsWidth = buildingData.base.width;
     this.cellsHeight = buildingData.base.height;
 
-    this.coll = {
-        x: this.x,
-        y: this.y,
-        w: this.cellsWidth,
-        h: this.cellsHeight
-    };
+    this.computeSurroundingArea(); // put in `embed`, after collisions have been computed?
 
     this.shootFrom = buildingData.shootFrom;
 
@@ -395,17 +390,28 @@ Building.prototype.setCollisions = function(flag){
     PFUtils.buildingCollisions(this.x,this.y-this.cellsHeight,this.cellsWidth,this.cellsHeight,GameServer.collisions,flag);
 };
 
-Building.prototype.getBattleAreaAround = function(cells){
-    cells = cells || new SpaceMap();
-
-    for(var x = -1; x <= this.cellsWidth; x++){
-        for(var y = -1; y <= this.cellsHeight+1; y++) {
-            var realx = this.coll.x + x;
-            var realy = this.coll.y + y;
-            if(!GameServer.checkCollision(realx,realy)) cells.add(realx,realy);
+Building.prototype.computeSurroundingArea = function(){
+    this.surroundingArea = new SpaceMap();
+    var rect = this.getRect();
+    for(var x = rect.x - 1; x < rect.x + rect.w + 1; x++){
+        for(var y = rect.y - 1; y < rect.y + rect.h + 1; y++) {
+            if(!GameServer.checkCollision(x,y)) this.surroundingArea.add(x,y);
         }
     }
-    return cells;
+};
+
+Building.prototype.getBattleAreaAround = function(){
+    // cells = cells || new SpaceMap();
+    //
+    // for(var x = -1; x <= this.cellsWidth; x++){
+    //     for(var y = -1; y <= this.cellsHeight+1; y++) {
+    //         var realx = this.coll.x + x;
+    //         var realy = this.coll.y + y;
+    //         if(!GameServer.checkCollision(realx,realy)) cells.add(realx,realy);
+    //     }
+    // }
+    // return cells;
+    return this.surroundingArea;
 };
 
 Building.prototype.canFight = function(){return true;};

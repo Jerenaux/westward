@@ -55,6 +55,12 @@ SpaceMap.prototype.getFirst = function(){
     return this.toList()[0].v;
 };
 
+SpaceMap.prototype.merge = function(otherMap){
+    otherMap.toList().forEach(function(cell){
+        this.add(cell.x,cell.y);
+    },this);
+};
+
 SpaceMap.prototype.toList = function(compact,skipv){ // serialize to a list representation
     var list = [];
     for(var x in this){

@@ -1095,7 +1095,8 @@ GameServer.computeBattleArea = function(f1,f2,depth){
     var cells = new SpaceMap();
     var fs = [f1,f2];
     fs.forEach(function(f){
-        cells = f.getBattleAreaAround(cells); // Appends to passed SpaceMap
+        // cells = f.getBattleAreaAround(cells); // Appends to passed SpaceMap
+        cells.merge(f.getBattleAreaAround());
     });
 
     var queue = [];
@@ -1161,6 +1162,7 @@ GameServer.checkBattleOverlap = function(area){
  */
 GameServer.expandBattle = function(battle,f){
     var area = f.getBattleAreaAround();
+    // console.warn('area for ',f.getShortID(),':',area.toList());
     battle.addFighter(f);
     GameServer.addBattleArea(area.toList(),battle);
 };
@@ -1182,7 +1184,7 @@ GameServer.connectToBattle = function(entity,cell){
     var area = GameServer.computeBattleArea(entity,cell,3);
     battle.addFighter(entity);
     GameServer.addBattleArea(area,battle);
-    // GameServer.expandBattle(battle,entity);
+    GameServer.expandBattle(battle,entity);
 };
 
 /**

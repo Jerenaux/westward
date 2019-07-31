@@ -79,7 +79,7 @@
     wildlife: {
         aggro: true,
         nolife: false,
-        wander: true,
+        wander: false,
         wanderRange: 5,
         idleTime: [1, 3.5], // random bounds; in seconds
         idleRetry: 200 // ms

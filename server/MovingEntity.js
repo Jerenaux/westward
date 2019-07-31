@@ -130,8 +130,8 @@ MovingEntity.prototype.stopWalk = function(){
     this.flagToStop = true;
 };
 
-MovingEntity.prototype.getBattleAreaAround = function(cells){
-    cells = cells || new SpaceMap();
+MovingEntity.prototype.getBattleAreaAround = function(){
+    cells = new SpaceMap();
     for(var x = this.x - 1; x <= this.x + this.cellsWidth; x++){ // <= since we want the cells all around
         for(var y = this.y - 1; y <= this.y + this.cellsHeight; y++) {
             if(!GameServer.checkCollision(x,y)) cells.add(x,y);

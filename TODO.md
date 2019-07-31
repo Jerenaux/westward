@@ -47,12 +47,9 @@ World Building
 - Zoom-out in towers
 
 Bugs:
-- The onInit conf stuff is obviously wrongly processed by server (check env vars)
-- All wolves in row should be involved in fight (uncomment line in gs.connectToBattle)
-- Sucked in buildings don't generate surrounding cells (related)
 - Button issue
-- Update game page
 Features:
+- Update game page
 - Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)
 - Display item amount owned in tooltip
