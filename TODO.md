@@ -49,30 +49,32 @@ World Building
 Bugs:
 - The onInit conf stuff is obviously wrongly processed by server (check env vars)
 - All wolves in row should be involved in fight (uncomment line in gs.connectToBattle)
+- Sucked in buildings don't generate surrounding cells (related)
 Features:
 - Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)
 - Display item amount owned in tooltip
-- Add help about build limit in build menu [TEST]
 - When giving constr material, display #owned
 - Move map legend below scroll, widen it
-- Display death/conflict markers even in FoW [TEST]
-- Rename toolip of animal markers [TEST]
 - Conflict/death pin only at the end of battle [TEST]
-- Save death/conflict icons [TEST]
 - Add butterflies
 - Test acc penalty 
 - Item transparency, and even ideally player/NPC transparency
 -> https://phaser.discourse.group/t/sprite-outline-via-shader-showcase-looking-for-improvements/2375
 - Apply same shader to highlight players, animals, items, buildings...
 - Show ingredients needed foer buildings recipe in build menu
+- Get kicked out of shack when built if not yours
 - Repair panel
 - Civ camp locations and spawn behavior
 - Basic attack behavior + notifs thereof
+- Missions menu (focused on enemy civ)
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Belt & backpack capacity + corresponding items (incl. defaults)
+- Abilities
+- Daily quests
 - Arrow stocks in towers  + make them throw stones when no better ammo
+- Leaderboards
   
 
 María:

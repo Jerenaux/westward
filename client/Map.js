@@ -521,7 +521,7 @@ var Pin = new Phaser.Class({
             if(this.parentMap.minimap){
                 this.setVisible(true);
             }else{
-                if(this.alwaysOn) return true;
+                if(this.alwaysOn) this.setVisible(true);
                 for(var i = 0; i < Engine.player.FoW.length; i++){
                     var rect = Engine.player.FoW[i];
                     var rect_ = new Phaser.Geom.Rectangle(

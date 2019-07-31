@@ -1422,7 +1422,7 @@ Engine.makeBuildMenu = function(){
     var w = 300;
     var buildings = build.addPanel('build',new BuildPanel(30,40,w,450,'Build'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
-    buildings.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['build_help']);
+    buildings.addButton(w-33, 8, 'blue','help',null,'',UI.textsData['build_help']);
     buildings.moveUp(2);
     build.addEvent('onOpen',buildings.updateContent.bind(buildings));
     build.addEvent('onUpdateBuildRecipes',buildings.updateContent.bind(buildings));

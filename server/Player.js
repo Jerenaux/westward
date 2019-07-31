@@ -968,8 +968,8 @@ Player.prototype.getIndividualUpdatePackage = function () {
     var pkg = this.updatePacket;
     if (GameServer.checkFlag('FoW')) pkg.fow = GameServer.fowList;
     if (GameServer.checkFlag('buildingsMarkers')) pkg.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
-    if (GameServer.checkFlag('deathMarkers')) pkg.deathMarkers = GameServer.listDeathMarkers();
-    if (GameServer.checkFlag('conflictMarkers')) pkg.conflictMarkers = GameServer.listConflictMarkers();
+    if (GameServer.checkFlag('deathMarkers')) pkg.deathMarkers = GameServer.listMarkers('death');
+    if (GameServer.checkFlag('conflictMarkers')) pkg.conflictMarkers = GameServer.listMarkers('conflict');
     if (pkg.isEmpty()) return null;
     this.updatePacket = new PersonalUpdatePacket();
     return pkg;

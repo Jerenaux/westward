@@ -180,7 +180,6 @@ server.listen(process.env.PORT || myArgs.port || 8081,function(){
     mongodbAuth = {
         useNewUrlParser: true
     };
-    console.log('Check for mongodb Auth');
     if (process.env.MONGODB_AUTH) {
         console.log('Create auth object with user, pass, client');
         mongodbAuth = {

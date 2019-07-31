@@ -28,6 +28,13 @@ function Battle() {
     this.reset();
 }
 
+Battle.prototype.setCenter = function(x,y){
+    this.center = {
+        x: x,
+        y:y
+    };
+};
+
 Battle.prototype.start = function () {
     this.loop = setInterval(this.update.bind(this), TICK_RATE);
     this.newTurn();
@@ -469,11 +476,7 @@ Battle.prototype.end = function () {
         if (f.isPlayer) f.notifyFight(false);
     });
     this.cleanUp();
-    if(this.casualties){
-        GameServer.addMarker('death',this.center.x,this.center.y);
-    }else{
-        GameServer.addMarker('conflict',this.center.x,this.center.y);
-    }
+    GameServer.addMarker((this.casualties ? 'death' : 'conflict'),this.center.x,this.center.y);
     console.log('[B' + this.id + '] Ended');
 };
 
