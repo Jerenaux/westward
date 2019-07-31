@@ -55,14 +55,6 @@ GameObject.prototype.isOfInstance = function(instance){
 GameObject.prototype.getAOI = function(){
     return this.aoi;
 };
-//
-// GameObject.prototype.setModel = function(model) {
-//     this.model = model;
-// };
-//
-// GameObject.prototype.getModel = function() {
-//     return this.model;
-// };
 
 GameObject.prototype.save = function(){
     // if(!this.model) return;

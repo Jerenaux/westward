@@ -46,11 +46,6 @@ World Building
 - Look towards cursor
 - Zoom-out in towers
 
-
-Test starting inventory + own modified inventory
-Test save
-Test tutorial
-
 Bugs:
 - The onInit conf stuff is obviously wrongly processed by server (check env vars)
 - All wolves in row should be involved in fight (uncomment line in gs.connectToBattle)

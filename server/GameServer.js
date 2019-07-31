@@ -295,13 +295,13 @@ GameServer.loadRegions = function(){
 
 /**
  * Add a building to the game world.
- * Mainly called by GameServer.loadBuildings().
+ * Called by GameServer.loadBuildings() and GameServer.finalizeBuilding()
  * @param {Object} data - All the parameters of the building.
  * @returns {Object} The created Building object
  */
 GameServer.addBuilding = function(data){
     var building = new Building(data);
-    building.setModel(data);
+    building.mongoID = data._id;
     building.embed();
     return building;
 };
@@ -678,6 +678,7 @@ GameServer.loadPlayer = function(socket,id){
                 return;
             }
             var player = new Player();
+            player.setMongoID(doc._id);
             player.getDataFromDb(doc);
 
             GameServer.postProcessPlayer(socket,player,doc);
@@ -1468,7 +1469,7 @@ GameServer.build = function(player,bid,tile){
     data.prices = GameServer.getDefaultPrices();
     var building = new Building(data);
     var document = new GameServer.BuildingModel(building);
-    building.setModel(document); // ref to model is needed at least to get _id
+    building.mongoID = document._id;
 
     if(building.isInstanced()){
         player.getInstance().entities.push(building);
