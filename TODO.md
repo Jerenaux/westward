@@ -50,19 +50,17 @@ Bugs:
 - Button issue
 Features:
 - Update game page
-- Display building life in tooltips
 - Add tooltip to UI capsules (+ gold capsules in shops & inventory)
 - Display item amount owned in tooltip
 - When giving constr material, display #owned
 - Move map legend below scroll, widen it
-- Conflict/death pin only at the end of battle [TEST]
 - Add butterflies
-- Test acc penalty 
 - Item transparency, and even ideally player/NPC transparency
 -> https://phaser.discourse.group/t/sprite-outline-via-shader-showcase-looking-for-improvements/2375
 - Apply same shader to highlight players, animals, items, buildings...
 - Show ingredients needed foer buildings recipe in build menu
 - Get kicked out of shack when built if not yours
+- Display building life in tooltips
 - Repair panel
 - Civ camp locations and spawn behavior
 - Basic attack behavior + notifs thereof
