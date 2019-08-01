@@ -28,12 +28,15 @@ function LongSlot(width,mask){
     x += bw;
     this.slices.push(UI.scene.add.sprite(x, y, 'UI', 'longslot_9'));
 
+    this.width = 0;
+    this.height = this.slices[0].height;
     this.slices.forEach(function(s){
         s.setDisplayOrigin(0,0);
         s.setScrollFactor(0);
         s.setDepth(1);
         s.setVisible(false);
-        s.setMask(this.mask);
+        // s.setMask(this.mask);
+        this.width += s.width;
     },this);
 
     this.zone = this.createZone();

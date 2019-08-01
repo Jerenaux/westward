@@ -50,9 +50,6 @@ Bugs:
 - Button issue
 Features:
 - Update game page
-- Add tooltip to UI capsules (+ gold capsules in shops & inventory)
-- Display item amount owned in tooltip
-- When giving constr material, display #owned
 - Move map legend below scroll, widen it
 - Add butterflies
 - Item transparency, and even ideally player/NPC transparency
@@ -67,7 +64,7 @@ Features:
 - Missions menu (focused on enemy civ)
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
-- Belt & backpack capacity + corresponding items (incl. defaults)
+- Belt & backpack & gold capacity + corresponding items (incl. defaults)
 - Abilities
 - Daily quests
 - Arrow stocks in towers  + make them throw stones when no better ammo
@@ -83,9 +80,9 @@ Further: body emotes, pick up anim, more wildlife, then UI improvements, then di
 
 Sérgio:
 - New Civ huts/cabins
+- More civ buidings (e.g. towers)
 - Basic cliffs
 - Mines
-- More civ buidings? (e.g. towers)
 - Differentiate under construction/destroyed, multiple construction stages...
 
 

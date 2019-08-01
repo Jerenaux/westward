@@ -235,7 +235,7 @@ GameServer.getBootParams = function(socket,data){
                     console.log('Unrecognized returning player ');
                     pkg.newPlayer = true;
                 }
-                console.log(pkg);
+                // console.log(pkg);
                 socket.emit('boot-params',pkg);
             }
         );

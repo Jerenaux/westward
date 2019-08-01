@@ -19,6 +19,7 @@ Panel.prototype.addCapsule = function(name,x,y,text,icon){
     var capsule = new Capsule(this.x+x,this.y+y,'UI',icon,this.content);
     capsule.setText(text);
     this.capsules[name] = capsule;
+    return capsule;
 };
 
 Panel.prototype.updateCapsule = function(name,text){
@@ -57,9 +58,6 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
     this.content.push(btn);
     x += 3;
     y += 3;
-
-    // zone.on('pointerdown',btn.handleDown.bind(btn));
-    // zone.on('pointerup',btn.handleClick.bind(btn));
 
     var s = UI.scene.add.sprite(x,y,'UI',symbol);
     s.setDepth(3);
@@ -324,6 +322,24 @@ function Capsule(x,y,iconAtlas,iconFrame,container){
     }
 }
 
+Capsule.prototype.setHoverText = function(title,text){
+    var w = this.slices[0].width + this.slices[1].width + this.slices[2].width;
+    var zone = UI.scene.add.zone(this.slices[0].x,this.slices[0].y,w,this.slices[1].height);
+    zone.setDepth(10);
+    zone.setOrigin(0);
+    zone.setScrollFactor(0);
+    zone.setInteractive();
+    zone.setVisible(false);
+    zone.on('pointerover',function(){
+        UI.tooltip.updateInfo('free',{title:title,body:text});
+        UI.tooltip.display();
+    });
+    zone.on('pointerout',function(){
+        UI.tooltip.hide();
+    });
+    this.zone = zone;
+};
+
 Capsule.prototype.setText = function(text){
     this.text.setText(text);
     this.width = this.text.width -25;
@@ -334,6 +350,11 @@ Capsule.prototype.setText = function(text){
     this.slices[2].x += (this.width-this.width_);
 
     this.width_ = this.width;
+
+    if(this.zone){
+        var w = this.slices[0].width + this.slices[1].width + this.slices[2].width;
+        this.zone.setSize(w,this.zone.height,true);
+    }
 };
 
 Capsule.prototype.removeLeft = function(){
@@ -349,6 +370,7 @@ Capsule.prototype.display = function(){
         e.setVisible(true);
     });
     this.text.setVisible(true);
+    if(this.zone) this.zone.setVisible(true);
     if(this.icon) this.icon.setVisible(true);
 };
 
@@ -357,6 +379,7 @@ Capsule.prototype.hide = function(){
         e.setVisible(false);
     });
     this.text.setVisible(false);
+    if(this.zone) this.zone.setVisible(false);
     if(this.icon) this.icon.setVisible(false);
 };
 
