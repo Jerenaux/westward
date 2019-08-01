@@ -50,6 +50,7 @@ Bugs:
 - Button issue
 Features:
 - Update game page
+- r/chest/backpack
 - Move map legend below scroll, widen it
 - Add butterflies
 - Item transparency, and even ideally player/NPC transparency
