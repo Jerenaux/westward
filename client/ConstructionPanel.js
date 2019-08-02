@@ -60,7 +60,7 @@ ConstructionPanel.prototype.displayInterface = function(){
 
         var txt = slot.addText(152,slot.height-3,player_owned,Utils.colors.white,13);
         txt.setOrigin(1,1);
-        slot.addImage(161, slot.height-10, 'UI', 'chest');
+        slot.addImage(161, slot.height-10, 'UI', 'smallpack');
 
         var price = Engine.currentBuiling.getPrice(item,'buy');
         var priceTxt = price || '--';

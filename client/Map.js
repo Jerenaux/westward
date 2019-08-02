@@ -3,56 +3,6 @@
  */
 
 var fowID = 0;
-var FoWPipeline = new Phaser.Class({
-
-    Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
-
-    initialize:
-        function FoWPipeline(game,nbr) {
-            Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline.call(this, {
-                game: game,
-                renderer: game.renderer,
-                fragShader:
-                `precision mediump float;
-                varying vec2 outTexCoord;
-                uniform sampler2D uMainSampler;
-                uniform float rects[`+nbr+`];
-                
-                vec3 makeRect(vec2 st,vec4 coords, vec3 col){
-                    vec2 blur = vec2(0.05);
-                    // top-left
-                    vec2 ps = vec2(coords.x,coords.y) - blur;
-                    vec2 bl = smoothstep(ps,ps+blur,st);
-                    float pct = bl.x * bl.y;
-                    // bottom-right
-                    ps = vec2(coords.z,coords.w);
-                    vec2 tr = 1.0-smoothstep(ps,ps+blur,st);
-                    pct *= tr.x * tr.y;
-                    vec3 newcol = vec3(pct)*col; 
-                    return newcol;
-                }
-                vec3 mr(vec2 st,vec4 coords, vec3 col){
-                    return vec3(st.x);
-                }
-                void main(){
-                    vec2 st = outTexCoord;
-                    
-                    vec3 color = vec3(0.0);
-                    const int nbr = `+nbr+`;
-                    for(int i = 0; i < nbr; i+=4){
-                       vec4 r = vec4(rects[i],rects[i+1],rects[i+2],rects[i+3]);
-                       color += makeRect(st,r,vec3(1.0)); 
-                    }
-                    
-                    vec4 fcolor = texture2D(uMainSampler, outTexCoord);
-                    
-                    //gl_FragColor = fcolor*vec4(color,1.0);
-                    gl_FragColor = min(fcolor,fcolor*vec4(color,1.0)); // avoids overlapping rects to create bright stripes
-                }`
-            });
-        }
-
-});
 
 var Map = new Phaser.Class({
 

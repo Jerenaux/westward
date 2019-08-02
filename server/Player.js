@@ -257,10 +257,12 @@ Player.prototype.die = function () {
     this.setOwnProperty('dead', true);
 };
 
-Player.prototype.setLocation = function(){
-    var pos = this.findNextFreeCell(this.respawnLocation.x, this.respawnLocation.y);
-    var x = pos.x;
-    var y = pos.y;
+Player.prototype.setLocation = function(x, y){
+    x = x || this.respawnLocation.x;
+    y = y || this.respawnLocation.y;
+    var pos = this.findNextFreeCell(x,y);
+    x = pos.x;
+    y = pos.y;
     this.setProperty('x', x);
     this.setProperty('y', y);
     this.setOwnProperty('x', x);
@@ -1016,7 +1018,6 @@ Player.prototype.rest = function (nb) {
 };
 
 Player.prototype.remove = function () {
-    console.log('removing player');
     if (this.battle) this.battle.removeFighter(this);
     delete GameServer.players[this.id];
     GameServer.updateVision();

@@ -692,7 +692,7 @@ GameServer.postProcessPlayer = function(socket,player,model){
 
     GameServer.finalizePlayer(socket,player,false); // false = new player
 
-    player.setLocation();
+    player.setLocation(player.x, player.y); // to position loaded players
     GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
     player.listBuildingRecipes();
     player.getWorldInformation();

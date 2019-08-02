@@ -210,6 +210,14 @@ let Hero = new Phaser.Class({
         this.updateEvents.add('history');
     },
 
+    handleOver: function(){
+        Moving.prototype.handleOver.call(this);
+    },
+
+    handleOut: function(){
+        Moving.prototype.handleOut.call(this);
+    },
+
     updateAmmo: function(ammo){
         for(let i = 0; i < ammo.length; i++){
             let am = ammo[i];

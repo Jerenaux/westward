@@ -47,11 +47,9 @@ World Building
 - Zoom-out in towers
 
 Bugs:
-- Button issue
 Features:
 - Update game page
-- r/chest/backpack
-- Move map legend below scroll, widen it
+- Ask Maria bigger map
 - Add butterflies
 - Item transparency, and even ideally player/NPC transparency
 -> https://phaser.discourse.group/t/sprite-outline-via-shader-showcase-looking-for-improvements/2375
