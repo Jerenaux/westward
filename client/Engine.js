@@ -126,6 +126,7 @@ Engine.preload = function() {
     this.load.json('animals', 'assets/data/animals.json');
     this.load.json('civs', 'assets/data/civs.json');
 
+
     if(Client.tutorial) this.load.json('tutorials', 'assets/data/tutorials.json');
 };
 
@@ -306,6 +307,9 @@ Engine.create = function(){
         Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(2));
         Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
     }
+
+    var highlightPipeline = game.renderer.addPipeline('highlight', new HighlightPipeline(game));
+    var hollowPipeline = game.renderer.addPipeline('hollow', new HollowPipeline(game));
 
     Engine.created = true;
     Engine.configEngine();

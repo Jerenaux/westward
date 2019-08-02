@@ -47,12 +47,11 @@ World Building
 - Zoom-out in towers
 
 Bugs:
-- Button issue
 Features:
 - Update game page
-- r/chest/backpack
-- Move map legend below scroll, widen it
+- Ask Maria bigger map
 - Add butterflies
+- remove action points capsules from battle menu for now
 - Item transparency, and even ideally player/NPC transparency
 -> https://phaser.discourse.group/t/sprite-outline-via-shader-showcase-looking-for-improvements/2375
 - Apply same shader to highlight players, animals, items, buildings...
@@ -62,7 +61,15 @@ Features:
 - Repair panel
 - Civ camp locations and spawn behavior
 - Basic attack behavior + notifs thereof
-- Missions menu (focused on enemy civ)
+- Missions menu (focused on enemy civ) + enhanced map menu
+-> Need for visual indicators + numerical ones
+-> Frontier, semi-permanent camp markers (always visible once discovered)
+-> Use battle marker only for civ encounters?
+-> Quantify resources nodes on the right side of frontier, 
+production capacity (based on # buildings of a given time) / some kind of "GDP",
+bell alarm when attack nearby, bodies behind, log of recent civ-related events
+-> Split all per region (also visually)
+-> Name regions and compute borders in a Voronoi way by placing invisible region centers
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Belt & backpack & gold capacity + corresponding items (incl. defaults)

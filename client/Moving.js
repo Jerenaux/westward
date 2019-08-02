@@ -344,6 +344,14 @@ var Moving = new Phaser.Class({
         Engine.displayHit(this,pos.x,pos.y,20,40,null,true,data.delay);
     },
 
+    handleOver: function(){
+        this.setPipeline('highlight');
+    },
+
+    handleOut: function(){
+        this.resetPipeline();
+    },
+
     isDisabled: function(){
         return !!this.dead;
     },
