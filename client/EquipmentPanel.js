@@ -247,8 +247,8 @@ BattleEquipmentPanel.prototype.display = function () {
         c.setVisible(true);
     });
     this.bar.display();
-    this.atkCapsule.display();
-    this.defCapsule.display();
+    // this.atkCapsule.display();
+    // this.defCapsule.display();
 };
 
 BattleEquipmentPanel.prototype.hide = function () {

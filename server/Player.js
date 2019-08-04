@@ -755,6 +755,7 @@ Player.prototype.getWorldInformation = function(){
     this.setOwnProperty('deathMarkers', GameServer.listMarkers('death'));
     this.setOwnProperty('conflictMarkers', GameServer.listMarkers('conflict'));
     this.setOwnProperty('rarity', GameServer.getRarity());
+    this.setOwnProperty('history',this.history);
 };
 
 /**
@@ -771,13 +772,6 @@ Player.prototype.initTrim = function () {
     trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    // trimmed.fow = GameServer.fowList;
-    // trimmed.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
-    // trimmed.resourceMarkers = GameServer.listMarkers('resource').concat(this.extraMarkers);
-    // trimmed.animalMarkers = GameServer.listMarkers('animal');
-    // trimmed.deathMarkers = GameServer.listMarkers('death');
-    // trimmed.conflictMarkers = GameServer.listMarkers('conflict');
-    // trimmed.rarity = GameServer.getRarity();
     return trimmed;
 };
 

@@ -19,7 +19,7 @@ function UIHolder(x,y,align,style){
         leftFrame = 'title-left';
         middleFrame = 'title-center';
         rightFrame = 'title-right';
-        this.depth = 0;
+        this.depth = 3;
     }else if(style == 'small'){
         sliceWidth = 24;
         sliceHeight = 24;
@@ -29,7 +29,7 @@ function UIHolder(x,y,align,style){
         leftFrame = 'capsule-left';
         middleFrame = 'capsule-middle';
         rightFrame = 'capsule-right';
-        this.depth = 2;
+        this.depth = 4;
     }
 
     var xl, yl, xm, ym, xr, yr;

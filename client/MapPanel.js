@@ -28,8 +28,9 @@ MapPanel.prototype.addMap = function(texture,w,h,dragX,dragY){
 };
 
 MapPanel.prototype.addLegend = function(){
-    var w = 150;
-    this.legend = new LegendPanel(20, this.height, w, 100, 'Legend');
+    var w = 450;
+    var h = 80;
+    this.legend = new LegendPanel(0, UI.getGameHeight()-h, w, h, 'Legend');
     this.legend.addButton(w-16,-8,'red','close',this.legend.hide.bind(this.legend),'Close');
     this.legend.moveUp(3);
 };
@@ -61,12 +62,19 @@ function LegendPanel(x,y,width,height,title){
     var legend = [
         {icon:'bld2',text:'Buildings'},
         {icon:'bld2own',text:'Your buildings'},
-        {icon:'herb',text:'Plants'}
+        {icon:'herb',text:'Plants'},
+        {icon:'wolf',text:'Animal spots'},
+        {icon:'swords',text:'Recent battles'},
+        {icon:'skull',text:'Recent deaths'},
     ];
 
     var x = 20;
     var y = 30;
-    legend.forEach(function(l){
+    legend.forEach(function(l,i){
+        if(i > 0 && i%2 == 0){
+            y = 30;
+            x += 140;
+        }
         var icon = UI.scene.add.sprite(this.x+x,this.y+y,'mapicons',l.icon);
         icon.setScrollFactor(0);
         icon.setVisible(false);

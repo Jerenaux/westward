@@ -44,7 +44,6 @@ var Map = new Phaser.Class({
              new Phaser.Geom.Circle(this.x,this.y,viewW)
             :new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH)
             );
-
         // var wcoord = (this.minimap ? 'radius' : 'width');
         // var hcoord = (this.minimap ? 'radius' : 'height');
 
@@ -294,7 +293,7 @@ var Map = new Phaser.Class({
             y: tile ? tile.y * 2 : this.displayOriginY
         };
         var xSpan = (this.minimap ? 250 : 500)/this.scaleX;
-        var ySpan = (this.minimap ? 70 : 190)/this.scaleY;
+        var ySpan = (this.minimap ? 70 : 270)/this.scaleY; // 190
         this.setDisplayOrigin(
             Utils.clamp(
                 o.x,

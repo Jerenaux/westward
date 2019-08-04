@@ -31,7 +31,6 @@ World Building
 - Make tiles above battle tiles transparent; same with buildings in fight?
 - Introduce new wood ingredient obtained from timber, crafting wood, made in bulk (but then tune down timber prod)
 -> For shield, guns...?
-- Poll at regular interval the sprite below mouse
 - Better notifications
 - Don't disable walk with build panel
 - New movement system
@@ -48,10 +47,6 @@ World Building
 
 Bugs:
 Features:
-- Update game page
-- Ask Maria bigger map
-- Add butterflies
-- remove action points capsules from battle menu for now
 - Item transparency, and even ideally player/NPC transparency
 -> https://phaser.discourse.group/t/sprite-outline-via-shader-showcase-looking-for-improvements/2375
 - Apply same shader to highlight players, animals, items, buildings...

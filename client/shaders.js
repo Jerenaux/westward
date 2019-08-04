@@ -61,7 +61,6 @@ var HighlightPipeline = new Phaser.Class({
             game: game,
             renderer: game.renderer,
             fragShader: `
-            #extension GL_OES_standard_derivatives : enable
             precision mediump float;
             uniform sampler2D uMainSampler;
             varying vec2 outTexCoord;
@@ -73,13 +72,15 @@ var HighlightPipeline = new Phaser.Class({
                 vec4 colorD = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y + glow));
                 vec4 colorL = texture2D(uMainSampler, vec2(outTexCoord.x + glow, outTexCoord.y));
                 vec4 colorR = texture2D(uMainSampler, vec2(outTexCoord.x - glow, outTexCoord.y));
+                bool hasNeighbor = (colorU.a > transparent || colorD.a > transparent || colorL.a > transparent || colorR.a > transparent);
+                // int hasNeighbor = (int(colorU.a > transparent) + int(colorD.a > transparent) + int(colorL.a > transparent) + int(colorR.a > transparent));
                 
                 gl_FragColor = color;
-                
-                if (color.a <= transparent && (colorU.a > transparent || colorD.a > transparent || colorL.a > transparent || colorR.a > transparent)  ) {
+                if (color.a <= transparent && hasNeighbor) {
                     gl_FragColor = vec4(1.0, 1.0, 1.0, .2);
                 }
-            }`
+            }
+            `
         });
     } 
 });

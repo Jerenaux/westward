@@ -80,9 +80,10 @@ Engine.preload = function() {
     this.load.atlas('orientation', 'assets/sprites/orientation.png', 'assets/sprites/orientation.json');
     this.load.image('tail', 'assets/sprites/tail.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll.png');
-    this.load.image('longscroll', 'assets/sprites/longscroll.png');
-    this.load.image('radial3', 'assets/sprites/scroll_mask.png');
-    this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
+    this.load.image('bigbg', 'assets/sprites/bigbg.png');
+    this.load.image('bigbg_mask', 'assets/sprites/bigbg_mask.png');
+    // this.load.image('longscroll', 'assets/sprites/longscroll.png');
+    // this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
     this.load.image('worldmap', 'maps/worldmap.png');
 
     // SFX
@@ -280,6 +281,7 @@ Engine.create = function(){
     Engine.scene.input.on('pointermove', Engine.trackMouse);
 
     // TODO: move these to classes
+    Engine.scene.input.setPollAlways();
     Engine.scene.input.on('pointerover', Engine.handleOver);
     Engine.scene.input.on('pointerout', Engine.handleOut);
     Engine.scene.input.on('drag', Engine.handleDrag);
@@ -724,8 +726,8 @@ Engine.makeUI = function(){
 
     var x = 23;
     var y = 19;
-    Engine.face = UI.scene.add.sprite(x,y,'UI','facebg').setScrollFactor(0);
-    Engine.faceHolder = UI.scene.add.sprite(x,y,'faces',0).setScrollFactor(0);
+    Engine.faceHolder = UI.scene.add.sprite(x,y,'UI','facebg').setScrollFactor(0).setDepth(2);
+    Engine.face = UI.scene.add.sprite(x,y,'faces',0).setScrollFactor(0).setDepth(3);
 
     Engine.lifeCapsule = new Capsule(37,3,'UI','heart');
     Engine.lifeCapsule.setHoverText('Vitality',UI.textsData['health_help']);
@@ -755,7 +757,6 @@ Engine.makeUI = function(){
     Engine.vigorCapsule.setHoverText('Vigor',UI.textsData['vigor_help']);
     Engine.vigorCapsule.display();
     Engine.vigorCapsule.update = function(){
-        // this.setText(Engine.player.vigor+'%');
         this.setText(Engine.player.getStatValue('vigor')+'%');
     };
 
@@ -763,7 +764,6 @@ Engine.makeUI = function(){
     Engine.foodCapsule.setHoverText('Food',UI.textsData['food_help']);
     Engine.foodCapsule.display();
     Engine.foodCapsule.update = function(){
-        // this.setText(Engine.player.food+'%');
         this.setText(Engine.player.getStatValue('food')+'%');
     };
 
@@ -1265,14 +1265,16 @@ Engine.makeMapMenu = function(){
     map.hook = 'map';
     map.setSound(Engine.scene.sound.add('page_turn2'));
     var mapPanel = map.addPanel('map',new MapPanel(10,100,1000,380,'',true)); // true = invisible
-    mapPanel.addBackground('longscroll');
+    // mapPanel.addBackground('longscroll');
+    mapPanel.addBackground('bigbg');
     mapPanel.addLegend();
-    var mapInstance = mapPanel.addMap('radiallongrect',900,380,-1,-1);
-    mapPanel.addButton(953, -2, 'blue','help',null,'',UI.textsData['self_map_help']);
+    // var mapInstance = mapPanel.addMap('radiallongrect',900,380,-1,-1);
+    var mapInstance = mapPanel.addMap('bigbg_mask',900,380,-1,-1);
+    mapPanel.addButton(950, 420, 'blue','help',null,'',UI.textsData['self_map_help']);
     // TODO: move in Map.js, method addZoom, positions buttons based on viewWidt/height and
     // controls enable/disable of buttons based on zoom flag
-    mapPanel.zoomInBtn = mapPanel.addButton(940, 320, 'blue','plus',mapInstance.zoomIn.bind(mapInstance),'Zoom in');
-    mapPanel.zoomOutBtn = mapPanel.addButton(930, 350, 'blue','minus',mapInstance.zoomOut.bind(mapInstance),'Zoom out');
+    mapPanel.zoomInBtn = mapPanel.addButton(930, 390, 'blue','plus',mapInstance.zoomIn.bind(mapInstance),'Zoom in');
+    mapPanel.zoomOutBtn = mapPanel.addButton(920, 420, 'blue','minus',mapInstance.zoomOut.bind(mapInstance),'Zoom out');
     map.addEvent('onUpdateMap',mapPanel.map.updatePins.bind(mapPanel.map));
     return map;
 };

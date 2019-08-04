@@ -75,6 +75,7 @@ let Hero = new Phaser.Class({
             'equipment': this.updateEquipment,
             'fow': this.updateFoW,
             'gold': this.updateGold,
+            'history': this.updateHistory,
             'inBuilding': this.updateBuilding,
             'items': this.updateInventory,
             'msgs': this.handleMsgs,

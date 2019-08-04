@@ -282,10 +282,12 @@ function Capsule(x,y,iconAtlas,iconFrame,container){
     this.icon = null;
     this.width = 1;
     this.width_ = this.width; // previous width
+    var capsuleDepth = 2;
+    var contentDepth = 3;
     
     if(iconFrame) {
         this.icon = UI.scene.add.sprite(x+8,y+6,iconAtlas,iconFrame);
-        this.icon.setDepth(2);
+        this.icon.setDepth(contentDepth);
         this.icon.setScrollFactor(0);
         this.icon.setDisplayOrigin(0,0);
         this.icon.setVisible(false);
@@ -304,14 +306,14 @@ function Capsule(x,y,iconAtlas,iconFrame,container){
     this.slices.push(UI.scene.add.sprite(x,y,'UI','capsule-right'));
 
     this.slices.forEach(function(e){
-        e.setDepth(1);
+        e.setDepth(capsuleDepth);
         e.setScrollFactor(0);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
         if(container) container.push(e); // don't use concat
     });
 
-    this.text.setDepth(2);
+    this.text.setDepth(contentDepth);
     this.text.setScrollFactor(0);
     this.text.setDisplayOrigin(0,0);
     this.text.setVisible(false);
