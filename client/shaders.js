@@ -64,20 +64,22 @@ var HighlightPipeline = new Phaser.Class({
             precision mediump float;
             uniform sampler2D uMainSampler;
             varying vec2 outTexCoord;
-            float glow = 0.004;
+            uniform vec2 uSize;
+            uniform float uRadius;
+            vec2 px_size = 1.0/uSize * uRadius;
             float transparent = 0.9;
             void main(void) {
                 vec4 color = texture2D(uMainSampler, outTexCoord);
-                vec4 colorU = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y - glow));
-                vec4 colorD = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y + glow));
-                vec4 colorL = texture2D(uMainSampler, vec2(outTexCoord.x + glow, outTexCoord.y));
-                vec4 colorR = texture2D(uMainSampler, vec2(outTexCoord.x - glow, outTexCoord.y));
+                vec4 colorU = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y - px_size.y));
+                vec4 colorD = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y + px_size.y));
+                vec4 colorL = texture2D(uMainSampler, vec2(outTexCoord.x + px_size.x, outTexCoord.y));
+                vec4 colorR = texture2D(uMainSampler, vec2(outTexCoord.x - px_size.x, outTexCoord.y));
                 bool hasNeighbor = (colorU.a > transparent || colorD.a > transparent || colorL.a > transparent || colorR.a > transparent);
                 // int hasNeighbor = (int(colorU.a > transparent) + int(colorD.a > transparent) + int(colorL.a > transparent) + int(colorR.a > transparent));
                 
                 gl_FragColor = color;
                 if (color.a <= transparent && hasNeighbor) {
-                    gl_FragColor = vec4(1.0, 1.0, 1.0, .2);
+                    gl_FragColor = vec4(1.0, 1.0, 1.0, .0);
                 }
             }
             `

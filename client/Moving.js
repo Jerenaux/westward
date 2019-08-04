@@ -345,7 +345,14 @@ var Moving = new Phaser.Class({
     },
 
     handleOver: function(){
+        this.highlight();
+    },
+
+    highlight: function(){
         this.setPipeline('highlight');
+        var texture = this.texture.source[0];
+        this.pipeline.setFloat1('uRadius', 3.0);
+        this.pipeline.setFloat2('uSize', texture.width,texture.height);
     },
 
     handleOut: function(){
