@@ -65,13 +65,16 @@ var HighlightPipeline = new Phaser.Class({
             uniform sampler2D uMainSampler;
             varying vec2 outTexCoord;
             uniform vec2 uSize;
+            uniform vec2 uFrameSize;
             uniform float uRadius;
             vec2 px_size = 1.0/uSize * uRadius;
             float transparent = 0.9;
             void main(void) {
+                // float t = 0.51*
+                vec2 upPx = vec2(outTexCoord.x, outTexCoord.y + px_size.y); // min(outTexCoord.y + px_size.y, uFrameSize.y)
                 vec4 color = texture2D(uMainSampler, outTexCoord);
                 vec4 colorU = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y - px_size.y));
-                vec4 colorD = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y + px_size.y));
+                vec4 colorD = texture2D(uMainSampler, upPx);
                 vec4 colorL = texture2D(uMainSampler, vec2(outTexCoord.x + px_size.x, outTexCoord.y));
                 vec4 colorR = texture2D(uMainSampler, vec2(outTexCoord.x - px_size.x, outTexCoord.y));
                 bool hasNeighbor = (colorU.a > transparent || colorD.a > transparent || colorL.a > transparent || colorR.a > transparent);
