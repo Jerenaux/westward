@@ -19,7 +19,6 @@ let Schemas = {
         x: {type: Number, min: 0, required: true},
         y: {type: Number, min: 0, required: true},
         type: {type: Number, min: 0, required: true},
-        //sid: {type: Number, min: 0, required: true},
         owner: {type: Number, min: 0},
         ownerName: {type: String},
         inventory: {type: [[]], set:function(inventory){

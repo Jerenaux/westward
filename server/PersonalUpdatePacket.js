@@ -28,7 +28,9 @@ PersonalUpdatePacket.prototype.clean = function() { // Remove empty arrays from 
     for(var field in this){
         if(!this.hasOwnProperty(field)) continue;
         if(this[field] && this[field].constructor.name == 'Array'){
-            if(this[field].length == 0) this[field] = undefined;
+            // if(this[field].length == 0) this[field] = undefined;
+            if(this[field].length == 0) delete this[field];
+
         }
     }
     return this;

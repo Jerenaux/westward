@@ -344,6 +344,21 @@ var Moving = new Phaser.Class({
         Engine.displayHit(this,pos.x,pos.y,20,40,null,true,data.delay);
     },
 
+    handleOver: function(){
+        this.highlight();
+    },
+
+    highlight: function(){
+        this.setPipeline('highlight');
+        var texture = this.texture.source[0];
+        this.pipeline.setFloat1('uRadius', 3.0);
+        this.pipeline.setFloat2('uSize', texture.width,texture.height);
+    },
+
+    handleOut: function(){
+        this.resetPipeline();
+    },
+
     isDisabled: function(){
         return !!this.dead;
     },

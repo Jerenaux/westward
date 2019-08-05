@@ -41,6 +41,8 @@ var Item = new Phaser.Class({
         Engine.entityManager.addToDisplayList(this);
 
         this.manageOrientationPin();
+
+        if(itemData.insect && Utils.randomInt(1,10) > 8) new Insect(this.x,this.y);
     },
 
     remove: function(){
@@ -66,7 +68,7 @@ var Item = new Phaser.Class({
     setCursor: function(){
         if(BattleManager.inBattle || Engine.inMenu) return;
         UI.setCursor('item');
-        UI.tooltip.updateInfo('item',{id:this.itemType});
+        UI.tooltip.updateInfo('pickupItem',{id:this.itemType});
         UI.tooltip.display();
     },
 

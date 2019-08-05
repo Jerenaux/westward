@@ -1,4 +1,5 @@
 ## To test:
+- Test starting inventory of new player
 - Test settlement selection (with value of 0)
 - Test ammo container type match
 - Test that the world is populated with items, animals, etc.
@@ -8,7 +9,7 @@
 - Test handleChat (with text and also empty input)
 - Test Utils.nextTo with all combinations of building/animal vs building/animal, next to each other and not
 - Test Battle.computeTof()
-- Find a way to test itemsRespaw and other time-related aspects
+- Find a way to test itemsRespaw and other time-related aspects (spawn, pick up, call respawn method)
 - Test tutorial manually (reset start)
 - Test new player manually
 => After bug, systematically create test!
@@ -23,40 +24,70 @@ Testing
 World Building
 
 ## Priority TODO
-- Update Westward main page
 - Adapt animations and delays for firearms
+- Update Westward main page
 - Change battle priority when player joins fight
 - In battle against NPC, have players have turns much more often
 - Make tiles above battle tiles transparent; same with buildings in fight?
 - Introduce new wood ingredient obtained from timber, crafting wood, made in bulk (but then tune down timber prod)
 -> For shield, guns...?
-- Stop walk when opening menu
-- Poll at regular interval the sprite below mouse
-- Better notifs cascading
+- Better notifications
 - Don't disable walk with build panel
 - New movement system
-- Prevent building at player location
 - Reduce amount of orientation pins
-- Display death and conflict markers
 - add esc shortcut
 - "new" marker
-- no aggro? (works with bears but not with wolves and/or after refresh)
 - Events formatting
-- Better listing of bonuses/maluses (w/ icons for equipment-related and vigor-related)
 - Make size of tutorial boxes adapt to text
-- Make towers throw stones when no better ammo
-- Belt & backpack capacity 
-- Add "resource markers" for wildlife (optimize?)
 - No decimal in defaut prices (happens in one lumber camp)
-- Display building life in tooltips
-- Add tooltip to UI capsules (+ gold capsules in shops & inventory)
-- Display item amount owned in tooltip
-- Display threat level in animal tooltip
-- fix open menu while respawn bug
-- Display nb owned buildings in build menu
-- Animal markers, death markers
+- Ability: display threat level in animal tooltip
+- Ability: display fighter health bars
+- Look towards cursor
+- Zoom-out in towers
 
+Bugs:
+Features:
+- Item transparency, and even ideally player/NPC transparency
+-> https://phaser.discourse.group/t/sprite-outline-via-shader-showcase-looking-for-improvements/2375
+- Apply same shader to highlight players, animals, items, buildings...
+- Show ingredients needed foer buildings recipe in build menu
+- Get kicked out of shack when built if not yours
+- Display building life in tooltips
+- Repair panel
+- Civ camp locations and spawn behavior
+- Basic attack behavior + notifs thereof
+- Missions menu (focused on enemy civ) + enhanced map menu
+-> Need for visual indicators + numerical ones
+-> Frontier, semi-permanent camp markers (always visible once discovered)
+-> Use battle marker only for civ encounters?
+-> Quantify resources nodes on the right side of frontier, 
+production capacity (based on # buildings of a given time) / some kind of "GDP",
+bell alarm when attack nearby, bodies behind, log of recent civ-related events
+-> Split all per region (also visually)
+-> Name regions and compute borders in a Voronoi way by placing invisible region centers
+- Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
+fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
+- Belt & backpack & gold capacity + corresponding items (incl. defaults)
+- Abilities
+- Daily quests
+- Arrow stocks in towers  + make them throw stones when no better ammo
+- Leaderboards
   
+
+María:
+- Wolf anim (walk, attack, die w/ & w/o arrows)
+- Bear anim (walk, attack, die w/ & w/o arrows)
+- Player anim (naked?)
+-> Look into superimposing equipment programmatically
+Further: body emotes, pick up anim, more wildlife, then UI improvements, then diagonal movements...
+
+Sérgio:
+- New Civ huts/cabins
+- More civ buidings (e.g. towers)
+- Basic cliffs
+- Mines
+- Differentiate under construction/destroyed, multiple construction stages...
+
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
 https://medium.com/@DeepMotionInc/2d-game-animation-creature-2d-v-s-spine-2d-1bdb9a4e19b5
@@ -149,8 +180,8 @@ Secure
 
 Analytics:
 ---------
-- Log: belt
-- New admin: fix dates format, date column width, reverse sort, update event descs as in current admin
+- New admin:  date column width, reverse sort?, update event descs as in current admin
+- Log: belt actions
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions

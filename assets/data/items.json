@@ -154,7 +154,8 @@
     "sound": "soft",
     "nbBushes": 2,
     "yield": 2,
-    "coitems": [5]
+    "coitems": [5],
+    "insect": true
   },
   "15":{
     "atlas": "items2",
@@ -393,7 +394,8 @@
     "frame":"whitepetal",
     "name": "Whitepetal",
     "desc": "Flower with cleansing properties used to brew potions.",
-    "isMaterial": true
+    "isMaterial": true,
+    "insect": true
   },
   "38":{
     "atlas": "items",
@@ -532,7 +534,8 @@
     "sound": "soft",
     "nbBushes": 4,
     "yield": 5,
-    "verb": "Ate"
+    "verb": "Ate",
+    "insect": true
   },
   "48":{
     "atlas": "items2",

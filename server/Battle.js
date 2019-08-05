@@ -18,6 +18,7 @@ function Battle() {
         'Civ': 0,
         'Player': 0
     };
+    this.casualties = 0;
     //this.positions = new SpaceMap(); // positions occupied by fighters (obsolete?)
     this.cells = new SpaceMap(); // all the BattleCell objects, used for battle pathfinding
 
@@ -26,6 +27,13 @@ function Battle() {
     this.ended = false;
     this.reset();
 }
+
+Battle.prototype.setCenter = function(x,y){
+    this.center = {
+        x: x,
+        y:y
+    };
+};
 
 Battle.prototype.start = function () {
     this.loop = setInterval(this.update.bind(this), TICK_RATE);
@@ -80,8 +88,16 @@ Battle.prototype.removeFromPosition = function(f){
     }
 };*/
 
+Battle.prototype.hasFighter = function(f){
+    for(var i = 0; i < this.fighters.length; i++){
+       if(this.fighters[i].getShortID() == f.getShortID()) return true;
+    }
+    return false;
+};
+
 Battle.prototype.addFighter = function (f) {
     //console.warn('Adding fighter ',f.getShortID());
+    if(this.hasFighter(f)) return;
     this.fighters.push(f);
     this.updateTimeline();
     //if(f.isMovingEntity) this.checkConflict(f);
@@ -114,6 +130,7 @@ Battle.prototype.getFightersOrder = function () {
     });
 };
 
+// Remove a fighter from the fight following his death
 Battle.prototype.removeFighter = function (f) {
     var idx = this.getFighterIndex(f);
     if (idx == -1) return;
@@ -124,7 +141,10 @@ Battle.prototype.removeFighter = function (f) {
     this.updateTimeline();
     //if(f.isPlayer) this.removeFromPosition(f); // if NPC, leave busy for his body
     if (isTurnOf) this.setEndOfTurn(0);
-    if (f.isPlayer) f.notifyFight(false);
+    if (f.isPlayer){
+        this.casualties++;
+        f.notifyFight(false);
+    }
     this.updateTeams(f.battleTeam, -1);
     this.checkSentience();
 };
@@ -239,19 +259,12 @@ Battle.prototype.setEndOfTurn = function (delay) {
 };
 
 Battle.prototype.processMove = function (f) {
-    //this.removeFromPosition(f);
-    // var pos = f.getEndOfPath();
-    //this.addAtPosition(f);
     return {delay: f.getPathDuration()};
 };
 
 Battle.prototype.isPosition = function (x, y) {
     return this.cells.has(x, y);
 };
-
-/*Battle.prototype.isPositionFree = function(x,y){
-    return !this.positions.get(x,y);
-};*/
 
 Battle.prototype.computeDamage = function (type, a, b) {
     var def = b.getStat('def').getValue();
@@ -464,6 +477,7 @@ Battle.prototype.rewardXP = function (xp) {
 
 // Entites are only removed when the battle is over ; battlezones are only cleared at that time
 Battle.prototype.end = function () {
+    if(this.ended) return;
     this.ended = true;
     clearInterval(this.loop);
     this.fighters.forEach(function (f) {
@@ -471,6 +485,7 @@ Battle.prototype.end = function () {
         if (f.isPlayer) f.notifyFight(false);
     });
     this.cleanUp();
+    GameServer.addMarker((this.casualties ? 'death' : 'conflict'),this.center.x,this.center.y);
     console.log('[B' + this.id + '] Ended');
 };
 
@@ -493,10 +508,9 @@ function BattleCell(x, y, battle) {
     this.id = GameServer.lastCellID++;
     this.x = x;
     this.y = y;
-    this.w = 1; // for quad tree
-    this.h = 1;
+    this.cellsWidth = 1;
+    this.cellsHeight = 1;
     this.battle = battle;
-    this.onAddAtLocation();
     this.setOrUpdateAOI();
 }
 
@@ -542,9 +556,7 @@ BattleCell.prototype.getLocationCenter = function () {
     };
 };
 
-BattleCell.prototype.remove = function () {
-    this.onRemoveFromLocation();
-};
+BattleCell.prototype.remove = function () {};
 
 BattleCell.prototype.canFight = function () {
     return false;

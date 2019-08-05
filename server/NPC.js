@@ -16,7 +16,6 @@ function NPC(){
     this.actionQueue = [];
     MovingEntity.call(this);
     this.skipBattleTurn = GameServer.battleParameters.freezeNPC;
-    this.onAddAtLocation();
     this.setOrUpdateAOI();
 }
 
@@ -98,6 +97,7 @@ NPC.prototype.decideBattleAction = function(){
 
 NPC.prototype.findBattlePath = function(dest){
     var data = {};
+    // console.warn('seeking path',{x: this.x, y: this.y}, dest);
     var path = this.battle.findPath({x: this.x, y: this.y}, dest);
     if(path && path.length > 0){
         this.setPath(path);
@@ -126,15 +126,12 @@ NPC.prototype.attackTarget = function(){
     return data;
 };
 
-
 //Check if a *moving entity* (no building or anything) other than self is at position
 NPC.prototype.isPositionFree = function(x,y){
-    var entities = GameServer.positions.get(x,y);
-    if(entities.length == 0) return true;
-    entities = entities.filter(function(e){
-        return (e.isMovingEntity && e.getShortID() != this.getShortID());
-    },this);
-    return entities.length == 0;
+    var obstacles = GameServer.getEntitiesAt(x,y,1,1).filter(function(o){
+        return o.isFightingEntity;
+    });
+    return obstacles.length == 0;
 };
 
 NPC.prototype.computeBattleDestination = function(target){

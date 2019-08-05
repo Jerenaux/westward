@@ -6,6 +6,7 @@ var GameObject = require('./GameObject.js').GameObject;
 
 function FightingEntity(){
     GameObject.call(this);
+    this.isFightingEntity = true;
 }
 
 FightingEntity.prototype = Object.create(GameObject.prototype);

@@ -89,12 +89,9 @@ MovingEntity.prototype.updateWalk = function(){
 };
 
 MovingEntity.prototype.updatePosition = function(x,y){
-    // this.onRemoveAtLocation();
     this.x = x;
     this.y = y;
     this.setOrUpdateAOI();
-    // this.onAddAtLocation();
-    this.onLocationChange();
     if(!this.inFight) this.checkForBattle();
 };
 
@@ -133,8 +130,8 @@ MovingEntity.prototype.stopWalk = function(){
     this.flagToStop = true;
 };
 
-MovingEntity.prototype.getBattleAreaAround = function(cells){
-    cells = cells || new SpaceMap();
+MovingEntity.prototype.getBattleAreaAround = function(){
+    cells = new SpaceMap();
     for(var x = this.x - 1; x <= this.x + this.cellsWidth; x++){ // <= since we want the cells all around
         for(var y = this.y - 1; y <= this.y + this.cellsHeight; y++) {
             if(!GameServer.checkCollision(x,y)) cells.add(x,y);
@@ -236,7 +233,6 @@ MovingEntity.prototype.getRect = function(){
 
 MovingEntity.prototype.remove = function(){
     if(this.battle) this.battle.removeFighter(this);
-    this.onRemoveFromLocation();
 };
 
 module.exports.MovingEntity = MovingEntity;

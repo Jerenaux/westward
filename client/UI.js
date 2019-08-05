@@ -27,9 +27,8 @@ var UI = {
         if(Client.isNewPlayer()) {
             this.load.image('bigbg', 'assets/sprites/bigbg.png');
             this.load.image('bigbg_mask', 'assets/sprites/bigbg_mask.png');
-            // this.load.image('worldmap', 'assets/sprites/worldmap.png');
             this.load.image('worldmap', 'maps/worldmap.png');
-            this.load.image('campdiamond', 'assets/sprites/camp_diamond.png');
+            // this.load.image('campdiamond', 'assets/sprites/camp_diamond.png');
             this.load.image('setldiamond', 'assets/sprites/setl_diamond.png');
             this.load.image('wood', 'assets/sprites/wood.jpg');
         }

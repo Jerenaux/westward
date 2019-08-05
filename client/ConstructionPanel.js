@@ -55,6 +55,12 @@ ConstructionPanel.prototype.displayInterface = function(){
         slot.addText(43,2,itemData.name,null,13);
         var owned = Engine.currentBuiling.getItemNb(item);
         slot.addText(43,17,owned+'/'+nb,(owned >= nb ? Utils.colors.green : Utils.colors.red),13);
+        var player_owned = Engine.player.getItemNb(item);
+
+
+        var txt = slot.addText(152,slot.height-3,player_owned,Utils.colors.white,13);
+        txt.setOrigin(1,1);
+        slot.addImage(161, slot.height-10, 'UI', 'smallpack');
 
         var price = Engine.currentBuiling.getPrice(item,'buy');
         var priceTxt = price || '--';

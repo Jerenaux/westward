@@ -3,56 +3,6 @@
  */
 
 var fowID = 0;
-var FoWPipeline = new Phaser.Class({
-
-    Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
-
-    initialize:
-        function FoWPipeline(game,nbr) {
-            Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline.call(this, {
-                game: game,
-                renderer: game.renderer,
-                fragShader:
-                `precision mediump float;
-                varying vec2 outTexCoord;
-                uniform sampler2D uMainSampler;
-                uniform float rects[`+nbr+`];
-                
-                vec3 makeRect(vec2 st,vec4 coords, vec3 col){
-                    vec2 blur = vec2(0.05);
-                    // top-left
-                    vec2 ps = vec2(coords.x,coords.y) - blur;
-                    vec2 bl = smoothstep(ps,ps+blur,st);
-                    float pct = bl.x * bl.y;
-                    // bottom-right
-                    ps = vec2(coords.z,coords.w);
-                    vec2 tr = 1.0-smoothstep(ps,ps+blur,st);
-                    pct *= tr.x * tr.y;
-                    vec3 newcol = vec3(pct)*col; 
-                    return newcol;
-                }
-                vec3 mr(vec2 st,vec4 coords, vec3 col){
-                    return vec3(st.x);
-                }
-                void main(){
-                    vec2 st = outTexCoord;
-                    
-                    vec3 color = vec3(0.0);
-                    const int nbr = `+nbr+`;
-                    for(int i = 0; i < nbr; i+=4){
-                       vec4 r = vec4(rects[i],rects[i+1],rects[i+2],rects[i+3]);
-                       color += makeRect(st,r,vec3(1.0)); 
-                    }
-                    
-                    vec4 fcolor = texture2D(uMainSampler, outTexCoord);
-                    
-                    //gl_FragColor = fcolor*vec4(color,1.0);
-                    gl_FragColor = min(fcolor,fcolor*vec4(color,1.0)); // avoids overlapping rects to create bright stripes
-                }`
-            });
-        }
-
-});
 
 var Map = new Phaser.Class({
 
@@ -75,6 +25,7 @@ var Map = new Phaser.Class({
         UI.scene.add.displayList.add(this);
         this.draw('worldmap');
         this.setOrigin(0.5);
+        this.displayed = false;
 
         this.minimap = minimap;
         this.setDepth(2);
@@ -93,7 +44,6 @@ var Map = new Phaser.Class({
              new Phaser.Geom.Circle(this.x,this.y,viewW)
             :new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH)
             );
-
         // var wcoord = (this.minimap ? 'radius' : 'width');
         // var hcoord = (this.minimap ? 'radius' : 'height');
 
@@ -283,11 +233,10 @@ var Map = new Phaser.Class({
         };
     },
 
-    addPin: function(x,y,name,frame,bg){
+    addPin: function(x,y,name,frame,alwaysOn){
         var location = this.computeMapLocation(x,y);
-        // console.log(x,y,location);
         var pin = this.getNextPin();
-        pin.setUp(x,y,location.x,location.y,name,frame,bg);
+        pin.setUp(x,y,location.x,location.y,name,frame,alwaysOn);
         this.displayedPins.push(pin);
         return pin;
     },
@@ -344,7 +293,7 @@ var Map = new Phaser.Class({
             y: tile ? tile.y * 2 : this.displayOriginY
         };
         var xSpan = (this.minimap ? 250 : 500)/this.scaleX;
-        var ySpan = (this.minimap ? 70 : 190)/this.scaleY;
+        var ySpan = (this.minimap ? 70 : 270)/this.scaleY; // 190
         this.setDisplayOrigin(
             Utils.clamp(
                 o.x,
@@ -421,6 +370,7 @@ var Map = new Phaser.Class({
 
         this.displayPins();
         this.setVisible(true);
+        this.displayed = true;
         // if(!this.minimap) this.getZoomBtn('out').disable();
     },
 
@@ -428,17 +378,37 @@ var Map = new Phaser.Class({
         var tile = Engine.player.getTilePosition();
         this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
         Engine.player.buildingMarkers.forEach(function(data){
-            var pin = this.addPin(data.x,data.y,
+            this.addPin(data.x,data.y,
                 Engine.buildingsData[data.type].name,
                 (data.owner == Engine.player.id ? 'bld2own' : 'bld2')
-                // Engine.buildingsData[data.type].mapicon,
-                // Engine.buildingsData[data.type].mapbg
             );
         },this);
         Engine.player.resourceMarkers.forEach(function(data){
             this.addPin(data[0],data[1],
                 Engine.itemsData[data[2]].name,
-                'herb'
+                'herb',
+                false
+            );
+        },this);
+        Engine.player.animalMarkers.forEach(function(data){
+            this.addPin(data[0],data[1],
+                Engine.animalsData[data[2]].map_name,
+                'wolf',
+                false
+            );
+        },this);
+        Engine.player.deathMarkers.forEach(function(data){
+            this.addPin(data[0],data[1],
+                'Death',
+                'skull',
+                true
+            );
+        },this);
+        Engine.player.conflictMarkers.forEach(function(data){
+            this.addPin(data[0],data[1],
+                'Battle',
+                'swords',
+                true
             );
         },this);
     },
@@ -455,14 +425,14 @@ var Map = new Phaser.Class({
         });
         this.setVisible(false);
         if(this.fow) this.fow.destroy();
-        if(this.fog) this.fog.destroy();
+        this.displayed = false;
     },
 
     hidePins: function(){
-        this.resetCounter();
-        this.pins.forEach(function(p){
+        this.displayedPins.forEach(function(p){
             p.setVisible(false);
         });
+        this.resetCounter();
     }
 });
 
@@ -481,9 +451,10 @@ var Pin = new Phaser.Class({
         this.on('pointerout',this.handleOut.bind(this));
     },
 
-    setUp: function(tileX,tileY,x,y,name,frame,bgframe){
+    setUp: function(tileX,tileY,x,y,name,frame,alwaysOn){
         this.setOrigin(0.5);
         this.setFrame(frame);
+        this.alwaysOn = alwaysOn;
 
         this.tileX = tileX;
         this.tileY = tileY;
@@ -494,10 +465,12 @@ var Pin = new Phaser.Class({
     },
 
     setVisibility: function(){
+        // If on minimap, display straight away if within rect; if in big map, display only if not within FoW
         if(this.parentMap.viewRect.contains(this.x,this.y)){
             if(this.parentMap.minimap){
                 this.setVisible(true);
             }else{
+                if(this.alwaysOn) this.setVisible(true);
                 for(var i = 0; i < Engine.player.FoW.length; i++){
                     var rect = Engine.player.FoW[i];
                     var rect_ = new Phaser.Geom.Rectangle(

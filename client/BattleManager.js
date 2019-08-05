@@ -197,9 +197,8 @@ BattleManager.isActiveCell = function(cell){
 
 BattleManager.onDeath = function(){
     Engine.updateGrid();
-    var respawnPanel = Engine.menus["battle"].panels['respawn'];
     setTimeout(function(){
-        respawnPanel.display();
+        Engine.menus["respawn"].display();
     },1000);
 };
 

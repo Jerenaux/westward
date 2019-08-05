@@ -556,6 +556,7 @@ WorldMaker.prototype.makeSpawnZones = function(){
         }
     },this);
 
+    this.animalsMarkers = [];
     var animals = this.biomesData.animals;
     animals.forEach(function(animal){
         for(var i = 0; i < animal.nbzones; i++){
@@ -591,7 +592,8 @@ WorldMaker.prototype.makeFloraZone = function(x,y,w,h,data){
 };
 
 WorldMaker.prototype.makeAnimalZone = function(x,y,animal){
-    this.animals.add(x,y,animal.animal+':'+animal.group)
+    this.animals.add(x,y,animal.animal+':'+animal.group);
+    this.animalsMarkers.push([x,y,animal.animal]);
 };
 
 WorldMaker.prototype.addRandomItem = function(x,y,decor){
@@ -636,10 +638,14 @@ WorldMaker.prototype.writeDataFiles = function(){
         if(err) throw err;
         console.log('Woodland written');
     });
-    // Write resource markers
+    // Write resource & animals markers
     fs.writeFile(path.join(this.outdir,'resourceMarkers.json'),JSON.stringify(this.resourceMarkers),function(err){
         if(err) throw err;
         console.log('Resource markers written');
+    });
+    fs.writeFile(path.join(this.outdir,'animalMarkers.json'),JSON.stringify(this.animalsMarkers),function(err){
+        if(err) throw err;
+        console.log('Animal markers written');
     });
     // Items
     fs.writeFile(path.join(this.outdir,'items.json'),JSON.stringify(this.items.toList(true)),function(err){
