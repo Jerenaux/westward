@@ -60,8 +60,10 @@ var UI = {
             move: 'movement'
         };
         UI.dualCursors = ['move', 'item', 'building', 'combat', 'melee', 'bow', 'gun'];
-        UI.setCursor();
 
+        UI.scene.sys.game.canvas.style.cursor = 'none';
+        UI.cursor = new UICursor();
+        UI.setCursor();
 
         UI.hovering = [];
         UI.hoverFlower = 0;
@@ -268,16 +270,12 @@ UI.upCursor = function () {
     UI.setCursor(UI.currentCursor);
 };
 
+/* Change the appearance of the cursor based on what it's hovering*/
 UI.setCursor = function (cursor, down) {
     // var cursorFile = UI.cursors[cursor || 'default'];
     // UI.scene.sys.game.canvas.style.cursor = 'url(/assets/sprites/cursors/'+cursorFile+(down ? '2' : '')+'.png), auto';
     // UI.currentCursor = cursor;
-
-    // UICursor.cursor = new UICursor();
-    UI.scene.sys.game.canvas.style.cursor = 'none';
-    UI.cursor = UI.scene.add.sprite(222,222,'bombcursor');
-    UI.cursor.setOrigin(0,0);
-
+    UI.cursor.changeCursor(cursor);
 };
 
 UI.makeClassMenu = function () {
