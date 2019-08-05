@@ -24,8 +24,7 @@ var UI = {
 
         this.load.html('tooltip', '/assets/html/tooltip.html');
 
-        //cursors custom
-        this.load.image('bombcursor', 'assets/sprites/cursors/bombcursor.png');
+        this.load.atlas('cursors', 'assets/sprites/cursors.png', 'assets/sprites/cursors.json');
 
         if (Client.isNewPlayer()) {
             this.load.image('bigbg', 'assets/sprites/bigbg.png');
@@ -47,19 +46,6 @@ var UI = {
         UI.textsData = this.cache.json.get('texts');
         UI.classesData = this.cache.json.get('classes');
 
-        // TODO: move to config or sth
-        UI.cursors = {
-            default: 'cursor',
-            bomb: 'bombcursor',
-            bow: 'bow',
-            building: 'door',
-            combat: 'sabre',
-            gun: 'gun',
-            item: 'hand',
-            melee: 'melee',
-            move: 'movement'
-        };
-        UI.dualCursors = ['move', 'item', 'building', 'combat', 'melee', 'bow', 'gun'];
 
         UI.scene.sys.game.canvas.style.cursor = 'none';
         UI.cursor = new UICursor();
@@ -263,15 +249,21 @@ UI.manageCursor = function (inout, type, target) {
 };
 
 UI.downCursor = function () {
-    if (UI.dualCursors.includes(UI.currentCursor)) UI.setCursor(UI.currentCursor, true);
+    // if (UI.dualCursors.includes(UI.currentCursor)) UI.setCursor(UI.currentCursor, true);
+    UI.cursor.down();
 };
 
 UI.upCursor = function () {
-    UI.setCursor(UI.currentCursor);
+    // UI.setCursor(UI.currentCursor);
+    UI.cursor.up();
 };
 
-/* Change the appearance of the cursor based on what it's hovering*/
-UI.setCursor = function (cursor, down) {
+/**
+ * Change the appearance of the cursor based on what it's hovering
+ * @param {string} cursor - key of the frames dict of the cursor to display;
+ * if nothing, then displays default one
+ */
+UI.setCursor = function (cursor) {
     // var cursorFile = UI.cursors[cursor || 'default'];
     // UI.scene.sys.game.canvas.style.cursor = 'url(/assets/sprites/cursors/'+cursorFile+(down ? '2' : '')+'.png), auto';
     // UI.currentCursor = cursor;
