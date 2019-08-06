@@ -64,26 +64,34 @@ var HighlightPipeline = new Phaser.Class({
             precision mediump float;
             uniform sampler2D uMainSampler;
             varying vec2 outTexCoord;
-            uniform vec2 uSize;
-            uniform vec2 uFrameSize;
+            uniform vec2 uTextureSize;
+            uniform vec4 uFrameCut;
             uniform float uRadius;
-            vec2 px_size = 1.0/uSize * uRadius;
+            vec2 px_size = 1.0/uTextureSize;
             float transparent = 0.9;
             void main(void) {
-                // float t = 0.51*
-                vec2 upPx = vec2(outTexCoord.x, outTexCoord.y + px_size.y); // min(outTexCoord.y + px_size.y, uFrameSize.y)
                 vec4 color = texture2D(uMainSampler, outTexCoord);
-                vec4 colorU = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y - px_size.y));
+                vec2 upPx = vec2(outTexCoord.x, outTexCoord.y + px_size.y*uRadius); 
+                vec2 downPx = vec2(outTexCoord.x, outTexCoord.y - px_size.y*uRadius); 
+                vec2 rightPx = vec2(outTexCoord.x + px_size.x*uRadius, outTexCoord.y);
+                vec2 leftPx = vec2(outTexCoord.x - px_size.x*uRadius, outTexCoord.y);
+                vec4 colorU = texture2D(uMainSampler, downPx);
                 vec4 colorD = texture2D(uMainSampler, upPx);
-                vec4 colorL = texture2D(uMainSampler, vec2(outTexCoord.x + px_size.x, outTexCoord.y));
-                vec4 colorR = texture2D(uMainSampler, vec2(outTexCoord.x - px_size.x, outTexCoord.y));
+                vec4 colorL = texture2D(uMainSampler, rightPx);
+                vec4 colorR = texture2D(uMainSampler, leftPx);
+                if(outTexCoord.y <= uFrameCut.y/uTextureSize.y + px_size.y*uRadius){
+                    colorU.a = 0.0;
+                }
                 bool hasNeighbor = (colorU.a > transparent || colorD.a > transparent || colorL.a > transparent || colorR.a > transparent);
                 // int hasNeighbor = (int(colorU.a > transparent) + int(colorD.a > transparent) + int(colorL.a > transparent) + int(colorR.a > transparent));
-                
-                gl_FragColor = color;
-                if (color.a <= transparent && hasNeighbor) {
-                    gl_FragColor = vec4(1.0, 1.0, 1.0, .0);
-                }
+                float nbAlphas = colorU.a + colorD.a + colorL.a + colorR.a;
+
+                // int u_color = 0xFFBF00;
+                // float r = float(u_color / 256 / 256);
+                // float g = float(u_color / 256 - int(r * 256.0));
+                // float b = float(u_color - int(r * 256.0 * 256.0) - int(g * 256.0));
+
+                gl_FragColor = (color.a <= 0.9 && hasNeighbor) ? vec4(1.0, 1.0, 1.0, 1.0) : color;
             }
             `
         });

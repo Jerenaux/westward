@@ -381,7 +381,7 @@ var Building = new Phaser.Class({
 
     handleOver: function(){
         UI.manageCursor(1,'building',this);
-        this.setPipeline('highlight');
+        this.highlight();
     },
 
     handleOut: function(){

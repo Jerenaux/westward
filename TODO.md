@@ -46,6 +46,7 @@ World Building
 - Zoom-out in towers
 
 Bugs:
+- Items bug
 Features:
 - Item transparency, and even ideally player/NPC transparency
 -> https://phaser.discourse.group/t/sprite-outline-via-shader-showcase-looking-for-improvements/2375
