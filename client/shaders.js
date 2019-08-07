@@ -68,30 +68,31 @@ var HighlightPipeline = new Phaser.Class({
             uniform vec4 uFrameCut;
             uniform float uRadius;
             vec2 px_size = 1.0/uTextureSize;
-            float transparent = 0.9;
+            float alphaThreshold = 0.9;
             void main(void) {
                 vec4 color = texture2D(uMainSampler, outTexCoord);
-                vec2 upPx = vec2(outTexCoord.x, outTexCoord.y + px_size.y*uRadius); 
-                vec2 downPx = vec2(outTexCoord.x, outTexCoord.y - px_size.y*uRadius); 
-                vec2 rightPx = vec2(outTexCoord.x + px_size.x*uRadius, outTexCoord.y);
-                vec2 leftPx = vec2(outTexCoord.x - px_size.x*uRadius, outTexCoord.y);
-                vec4 colorU = texture2D(uMainSampler, downPx);
-                vec4 colorD = texture2D(uMainSampler, upPx);
-                vec4 colorL = texture2D(uMainSampler, rightPx);
-                vec4 colorR = texture2D(uMainSampler, leftPx);
-                if(outTexCoord.y <= uFrameCut.y/uTextureSize.y + px_size.y*uRadius){
-                    colorU.a = 0.0;
+                if(color.a > alphaThreshold){
+                    gl_FragColor = color;
+                    return;
                 }
-                bool hasNeighbor = (colorU.a > transparent || colorD.a > transparent || colorL.a > transparent || colorR.a > transparent);
-                // int hasNeighbor = (int(colorU.a > transparent) + int(colorD.a > transparent) + int(colorL.a > transparent) + int(colorR.a > transparent));
-                float nbAlphas = colorU.a + colorD.a + colorL.a + colorR.a;
-
-                // int u_color = 0xFFBF00;
-                // float r = float(u_color / 256 / 256);
-                // float g = float(u_color / 256 - int(r * 256.0));
-                // float b = float(u_color - int(r * 256.0 * 256.0) - int(g * 256.0));
-
-                gl_FragColor = (color.a <= 0.9 && hasNeighbor) ? vec4(1.0, 1.0, 1.0, 1.0) : color;
+                
+                int u_color = 0x111111;
+                float r = float(u_color / 256 / 256);
+                float g = float(u_color / 256 - int(r * 256.0));
+                float b = float(u_color - int(r * 256.0 * 256.0) - int(g * 256.0));
+                
+                for(float x = -1.0; x <= 1.0; x++){
+                    for(float y = -1.0; y <= 1.0; y++){
+                        if(x == 0.0 && y == 0.0) continue;
+                        vec2 neighbor = vec2(outTexCoord.x + x*px_size.x*uRadius, outTexCoord.y + y*px_size.y*uRadius);
+                        if(neighbor.y <= uFrameCut.y/uTextureSize.y) continue;
+                        if(texture2D(uMainSampler, neighbor).a > alphaThreshold){
+                            gl_FragColor = vec4(r, g, b, 1.0);
+                            return;
+                        }
+                    }
+                }
+                gl_FragColor = color;            
             }
             `
         });

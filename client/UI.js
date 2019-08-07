@@ -71,7 +71,6 @@ var UI = {
         this.input.keyboard.on('keydown', UI.handleKeyboard);
         this.currentView = 'title';
 
-        console.log('UI scene created');
         this.scene.get('boot').updateReadyTick();
 
         //Auto start game for dev reasons

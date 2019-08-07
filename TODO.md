@@ -49,6 +49,7 @@ Bugs:
 - Items bug
 - Server restarts after disconnect?
 - Don't run after each connect
+- pixelPerfect on players
 Features:
 - Item transparency, and even ideally player/NPC transparency
 -> https://phaser.discourse.group/t/sprite-outline-via-shader-showcase-looking-for-improvements/2375
