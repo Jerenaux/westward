@@ -381,12 +381,12 @@ var Building = new Phaser.Class({
 
     handleOver: function(){
         UI.manageCursor(1,'building',this);
-        this.highlight();
+        // this.highlight();
     },
 
     handleOut: function(){
         UI.manageCursor(0,'building');
         UI.tooltip.hide();
-        this.resetPipeline();
+        // this.resetPipeline();
     }
 });

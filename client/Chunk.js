@@ -55,6 +55,7 @@ Chunk.prototype.draw = function(){
         var x = this.x + parseInt(data[0]);
         var y = this.y + parseInt(data[1]);
         this.addImage(x, y, data[2]);
+        if(data[2][0] == 't') this.addOverlay(x,y);
     }, this);
 
     this.displayed = true;
@@ -147,6 +148,16 @@ Chunk.prototype.addImage = function(x,y,image){
     if(isTree && (image[1] == 1 || image[1] == 2) && Utils.randomInt(1,10) > 6){ // TODO: conf
         this.drawImage(x+1,y-1,'i'+Utils.randomInt(1,2),y+1);
     }
+};
+
+Chunk.prototype.addOverlay = function(cx,cy){
+    if(!Engine) return;
+    Engine.overlay.add(cx-1, cy-2, 1);
+    Engine.overlay.add(cx, cy-2, 1);
+    Engine.overlay.add(cx+1, cy-2, 1);
+    Engine.overlay.add(cx+2, cy-2, 1);
+    Engine.overlay.add(cx, cy-3, 1);
+    Engine.overlay.add(cx+1, cy-3, 1);
 };
 
 Chunk.prototype.addCollision = function(cx,cy){

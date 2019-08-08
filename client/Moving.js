@@ -49,7 +49,6 @@ var Moving = new Phaser.Class({
         this.updatePreviousPosition();
         this.setTilePosition(x,y);
         this.updateDepth();
-        // this.updateChunk();
     },
 
     updatePreviousPosition: function(){
@@ -169,6 +168,11 @@ var Moving = new Phaser.Class({
 
         //if(this.isActiveFighter) Engine.updateGrid();
 
+        if(Engine.overlay.get(tx,ty)){
+            this.hollow();
+        }else{
+            this.unhollow();
+        }
         this.leaveFootprint();
         this.playSound();
         if(this.isHero){
@@ -345,11 +349,24 @@ var Moving = new Phaser.Class({
     },
 
     handleOver: function(){
-        this.highlight();
+        // this.hollow();
     },
 
     handleOut: function(){
+        // this.unhollow();
+    },
+
+    hollow: function(){
+        this.setDepth(this.tileY + 5);
+        this.setPipeline('hollow');
+        var texture = this.texture.source[0];
+        this.pipeline.setFloat4('uFrameCut', this.frame.data.cut.x,this.frame.data.cut.y,this.frame.data.cut.w,this.frame.data.cut.h);
+        this.pipeline.setFloat2('uTextureSize', texture.width,texture.height);
+    },
+
+    unhollow: function(){
         this.resetPipeline();
+        this.updateDepth();
     },
 
     isDisabled: function(){

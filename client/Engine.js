@@ -288,6 +288,7 @@ Engine.create = function(){
     Engine.scene.input.keyboard.on('keydown', Engine.handleKeyboard);
 
     Engine.collisions = new SpaceMap();
+    Engine.overlay = new SpaceMap();
     Engine.pathFinder = new Pathfinder(Engine.collisions,Engine.maxPathLength);
 
     Engine.resources = new SpaceMap();

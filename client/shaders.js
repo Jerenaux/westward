@@ -66,9 +66,10 @@ var HighlightPipeline = new Phaser.Class({
             varying vec2 outTexCoord;
             uniform vec2 uTextureSize;
             uniform vec4 uFrameCut;
-            uniform float uRadius;
+           
             vec2 px_size = 1.0/uTextureSize;
             float alphaThreshold = 0.9;
+
             void main(void) {
                 vec4 color = texture2D(uMainSampler, outTexCoord);
                 if(color.a > alphaThreshold){
@@ -84,7 +85,7 @@ var HighlightPipeline = new Phaser.Class({
                 for(float x = -1.0; x <= 1.0; x++){
                     for(float y = -1.0; y <= 1.0; y++){
                         if(x == 0.0 && y == 0.0) continue;
-                        vec2 neighbor = vec2(outTexCoord.x + x*px_size.x*uRadius, outTexCoord.y + y*px_size.y*uRadius);
+                        vec2 neighbor = vec2(outTexCoord.x + x*px_size.x, outTexCoord.y + y*px_size.y);
                         if(neighbor.y <= uFrameCut.y/uTextureSize.y) continue;
                         if(texture2D(uMainSampler, neighbor).a > alphaThreshold){
                             gl_FragColor = vec4(r, g, b, 1.0);
@@ -114,17 +115,22 @@ var HollowPipeline = new Phaser.Class({
             precision mediump float;
             uniform sampler2D uMainSampler;
             varying vec2 outTexCoord;
+            uniform vec2 uTextureSize;
+            uniform vec4 uFrameCut;
+            vec2 px_size = 1.0/uTextureSize;
             void main(void) {
                 vec4 color = texture2D(uMainSampler, outTexCoord);
-                vec4 colorU = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y - 0.01));
-                vec4 colorD = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y + 0.01));
-                vec4 colorL = texture2D(uMainSampler, vec2(outTexCoord.x + 0.01, outTexCoord.y));
-                vec4 colorR = texture2D(uMainSampler, vec2(outTexCoord.x - 0.01, outTexCoord.y));
-                
                 gl_FragColor = color;
+                if(outTexCoord.y <= uFrameCut.y/uTextureSize.y + px_size.y*2.0) return;
+                
+                vec4 colorU = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y - px_size.y));
+                vec4 colorD = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y + px_size.y));
+                vec4 colorL = texture2D(uMainSampler, vec2(outTexCoord.x + px_size.x, outTexCoord.y));
+                vec4 colorR = texture2D(uMainSampler, vec2(outTexCoord.x - px_size.x, outTexCoord.y));
+                
                 
                 if (color.a == 0.0 && (colorU.a != 0.0 || colorD.a != 0.0 || colorL.a != 0.0 || colorR.a != 0.0)  ) {
-                    gl_FragColor = vec4(1.0, 1.0, 1.0, .2);
+                    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
                 }
                 if (color.a != 0.0) gl_FragColor = vec4(.0, .0, .0, .0);
             }`

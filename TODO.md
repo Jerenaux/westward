@@ -46,14 +46,10 @@ World Building
 - Zoom-out in towers
 
 Bugs:
-- Items bug
+- Tooltip bug with feather tufts
 - Server restarts after disconnect?
 - Don't run after each connect
-- pixelPerfect on players
 Features:
-- Item transparency, and even ideally player/NPC transparency
--> https://phaser.discourse.group/t/sprite-outline-via-shader-showcase-looking-for-improvements/2375
-- Apply same shader to highlight players, animals, items, buildings...
 - Show ingredients needed foer buildings recipe in build menu
 - Get kicked out of shack when built if not yours
 - Display building life in tooltips
@@ -184,7 +180,7 @@ Secure
 
 Analytics:
 ---------
-- New admin:  date column width, reverse sort?, update event descs as in current admin
+- New admin:  update event descs as in current admin
 - Log: belt actions
 - Display market prices
 - Button to flush events
@@ -194,6 +190,7 @@ Analytics:
 - Look for nice statistical library (https://dzone.com/articles/4-useful-javascript-libraries-for-data-analysis-an)
 -> Or export as CSV and explore in SPSS?
 - Compute "concentration" stat of items
+- Compute inflation
 - Log drains and faucets
 - Log where items are bought/sold
 - Log pathfinding destinations, consider making heatmap in the long term

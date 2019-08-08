@@ -36,7 +36,7 @@ var CustomSprite = new Phaser.Class({
     highlight: function(){
         this.setPipeline('highlight');
         var texture = this.texture.source[0];
-        this.pipeline.setFloat1('uRadius', 2.0);
+        // this.pipeline.setFloat1('uRadius', 2.0);
         this.pipeline.setFloat4('uFrameCut', this.frame.data.cut.x,this.frame.data.cut.y,this.frame.data.cut.w,this.frame.data.cut.h);
         this.pipeline.setFloat2('uTextureSize', texture.width,texture.height);
     },
