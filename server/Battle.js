@@ -88,8 +88,16 @@ Battle.prototype.removeFromPosition = function(f){
     }
 };*/
 
+Battle.prototype.hasFighter = function(f){
+    for(var i = 0; i < this.fighters.length; i++){
+       if(this.fighters[i].getShortID() == f.getShortID()) return true;
+    }
+    return false;
+};
+
 Battle.prototype.addFighter = function (f) {
     //console.warn('Adding fighter ',f.getShortID());
+    if(this.hasFighter(f)) return;
     this.fighters.push(f);
     this.updateTimeline();
     //if(f.isMovingEntity) this.checkConflict(f);
@@ -469,6 +477,7 @@ Battle.prototype.rewardXP = function (xp) {
 
 // Entites are only removed when the battle is over ; battlezones are only cleared at that time
 Battle.prototype.end = function () {
+    if(this.ended) return;
     this.ended = true;
     clearInterval(this.loop);
     this.fighters.forEach(function (f) {

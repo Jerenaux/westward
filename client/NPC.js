@@ -55,10 +55,12 @@ var NPC = new Phaser.Class({
     },
 
     handleOver: function(){
+        Moving.prototype.handleOver.call(this);
         UI.manageCursor(1,'npc',this);
     },
 
     handleOut: function(){
+        Moving.prototype.handleOut.call(this);
         UI.manageCursor(0,'npc');
         UI.tooltip.hide();
     }

@@ -31,7 +31,6 @@ World Building
 - Make tiles above battle tiles transparent; same with buildings in fight?
 - Introduce new wood ingredient obtained from timber, crafting wood, made in bulk (but then tune down timber prod)
 -> For shield, guns...?
-- Poll at regular interval the sprite below mouse
 - Better notifications
 - Don't disable walk with build panel
 - New movement system
@@ -47,32 +46,28 @@ World Building
 - Zoom-out in towers
 
 Bugs:
-- The onInit conf stuff is obviously wrongly processed by server (check env vars)
-- All wolves in row should be involved in fight (uncomment line in gs.connectToBattle)
-- Sucked in buildings don't generate surrounding cells (related)
-- Button issue
-- Update game page
+- Server restarts after disconnect?
+- Don't run after each connect
 Features:
-- Display building life in tooltips
-- Add tooltip to UI capsules (+ gold capsules in shops & inventory)
-- Display item amount owned in tooltip
-- When giving constr material, display #owned
-- Move map legend below scroll, widen it
-- Conflict/death pin only at the end of battle [TEST]
-- Add butterflies
-- Test acc penalty 
-- Item transparency, and even ideally player/NPC transparency
--> https://phaser.discourse.group/t/sprite-outline-via-shader-showcase-looking-for-improvements/2375
-- Apply same shader to highlight players, animals, items, buildings...
+- Apply silhouette to hidden items
 - Show ingredients needed foer buildings recipe in build menu
 - Get kicked out of shack when built if not yours
+- Display building life in tooltips
 - Repair panel
 - Civ camp locations and spawn behavior
 - Basic attack behavior + notifs thereof
-- Missions menu (focused on enemy civ)
+- Missions menu (focused on enemy civ) + enhanced map menu
+-> Need for visual indicators + numerical ones
+-> Frontier, semi-permanent camp markers (always visible once discovered)
+-> Use battle marker only for civ encounters?
+-> Quantify resources nodes on the right side of frontier, 
+production capacity (based on # buildings of a given time) / some kind of "GDP",
+bell alarm when attack nearby, bodies behind, log of recent civ-related events
+-> Split all per region (also visually)
+-> Name regions and compute borders in a Voronoi way by placing invisible region centers
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
-- Belt & backpack capacity + corresponding items (incl. defaults)
+- Belt & backpack & gold capacity + corresponding items (incl. defaults)
 - Abilities
 - Daily quests
 - Arrow stocks in towers  + make them throw stones when no better ammo
@@ -88,9 +83,9 @@ Further: body emotes, pick up anim, more wildlife, then UI improvements, then di
 
 Sérgio:
 - New Civ huts/cabins
+- More civ buidings (e.g. towers)
 - Basic cliffs
 - Mines
-- More civ buidings? (e.g. towers)
 - Differentiate under construction/destroyed, multiple construction stages...
 
 
@@ -185,7 +180,7 @@ Secure
 
 Analytics:
 ---------
-- New admin:  date column width, reverse sort?, update event descs as in current admin
+- New admin:  update event descs as in current admin
 - Log: belt actions
 - Display market prices
 - Button to flush events
@@ -195,6 +190,7 @@ Analytics:
 - Look for nice statistical library (https://dzone.com/articles/4-useful-javascript-libraries-for-data-analysis-an)
 -> Or export as CSV and explore in SPSS?
 - Compute "concentration" stat of items
+- Compute inflation
 - Log drains and faucets
 - Log where items are bought/sold
 - Log pathfinding destinations, consider making heatmap in the long term

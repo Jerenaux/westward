@@ -257,10 +257,12 @@ Player.prototype.die = function () {
     this.setOwnProperty('dead', true);
 };
 
-Player.prototype.setLocation = function(){
-    var pos = this.findNextFreeCell(this.respawnLocation.x, this.respawnLocation.y);
-    var x = pos.x;
-    var y = pos.y;
+Player.prototype.setLocation = function(x, y){
+    x = x || this.respawnLocation.x;
+    y = y || this.respawnLocation.y;
+    var pos = this.findNextFreeCell(x,y);
+    x = pos.x;
+    y = pos.y;
     this.setProperty('x', x);
     this.setProperty('y', y);
     this.setOwnProperty('x', x);
@@ -753,6 +755,7 @@ Player.prototype.getWorldInformation = function(){
     this.setOwnProperty('deathMarkers', GameServer.listMarkers('death'));
     this.setOwnProperty('conflictMarkers', GameServer.listMarkers('conflict'));
     this.setOwnProperty('rarity', GameServer.getRarity());
+    this.setOwnProperty('history',this.history);
 };
 
 /**
@@ -769,13 +772,6 @@ Player.prototype.initTrim = function () {
     trimmed.settlement = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    // trimmed.fow = GameServer.fowList;
-    // trimmed.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
-    // trimmed.resourceMarkers = GameServer.listMarkers('resource').concat(this.extraMarkers);
-    // trimmed.animalMarkers = GameServer.listMarkers('animal');
-    // trimmed.deathMarkers = GameServer.listMarkers('death');
-    // trimmed.conflictMarkers = GameServer.listMarkers('conflict');
-    // trimmed.rarity = GameServer.getRarity();
     return trimmed;
 };
 
@@ -1016,7 +1012,6 @@ Player.prototype.rest = function (nb) {
 };
 
 Player.prototype.remove = function () {
-    console.log('removing player');
     if (this.battle) this.battle.removeFighter(this);
     delete GameServer.players[this.id];
     GameServer.updateVision();

@@ -235,7 +235,7 @@ GameServer.getBootParams = function(socket,data){
                     console.log('Unrecognized returning player ');
                     pkg.newPlayer = true;
                 }
-                console.log(pkg);
+                // console.log(pkg);
                 socket.emit('boot-params',pkg);
             }
         );
@@ -470,9 +470,9 @@ GameServer.addItem = function(x,y,type,instance){
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
-    GameServer.addAnimal(1212,168,0);
-    GameServer.addAnimal(516,652,0);
-    GameServer.addAnimal(1174,144,0);
+    GameServer.addItem(469,673,30);
+    GameServer.addItem(469,671,26);
+    GameServer.addItem(469,669,7);
     GameServer.addAnimal(1173,144,0);
     GameServer.addAnimal(1172,144,0);
     GameServer.addAnimal(1171,144,0);
@@ -692,7 +692,7 @@ GameServer.postProcessPlayer = function(socket,player,model){
 
     GameServer.finalizePlayer(socket,player,false); // false = new player
 
-    player.setLocation();
+    player.setLocation(player.x, player.y); // to position loaded players
     GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
     player.listBuildingRecipes();
     player.getWorldInformation();
@@ -1095,7 +1095,8 @@ GameServer.computeBattleArea = function(f1,f2,depth){
     var cells = new SpaceMap();
     var fs = [f1,f2];
     fs.forEach(function(f){
-        cells = f.getBattleAreaAround(cells); // Appends to passed SpaceMap
+        // cells = f.getBattleAreaAround(cells); // Appends to passed SpaceMap
+        cells.merge(f.getBattleAreaAround());
     });
 
     var queue = [];
@@ -1161,6 +1162,7 @@ GameServer.checkBattleOverlap = function(area){
  */
 GameServer.expandBattle = function(battle,f){
     var area = f.getBattleAreaAround();
+    // console.warn('area for ',f.getShortID(),':',area.toList());
     battle.addFighter(f);
     GameServer.addBattleArea(area.toList(),battle);
 };
@@ -1182,7 +1184,7 @@ GameServer.connectToBattle = function(entity,cell){
     var area = GameServer.computeBattleArea(entity,cell,3);
     battle.addFighter(entity);
     GameServer.addBattleArea(area,battle);
-    // GameServer.expandBattle(battle,entity);
+    GameServer.expandBattle(battle,entity);
 };
 
 /**

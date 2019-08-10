@@ -75,6 +75,7 @@ let Hero = new Phaser.Class({
             'equipment': this.updateEquipment,
             'fow': this.updateFoW,
             'gold': this.updateGold,
+            'history': this.updateHistory,
             'inBuilding': this.updateBuilding,
             'items': this.updateInventory,
             'msgs': this.handleMsgs,
@@ -208,6 +209,14 @@ let Hero = new Phaser.Class({
             this.history.unshift([Date.now(),notif]);
         },this);
         this.updateEvents.add('history');
+    },
+
+    handleOver: function(){
+        Moving.prototype.handleOver.call(this);
+    },
+
+    handleOut: function(){
+        Moving.prototype.handleOut.call(this);
     },
 
     updateAmmo: function(ammo){

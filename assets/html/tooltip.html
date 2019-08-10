@@ -43,18 +43,18 @@
     }
     .icon {
         background-image: url(assets/sprites/ui.png);
-        background-position: -525px -458px;
+        background-position: -482px -422px;
         min-width: 13px;
-        min-height: 13px;
+        min-height: 15px;
         max-width: 13px;
         float: left;
+        /*border: 1px solid red;*/
     }
     .nb {
         font-size: 12px;
         margin-left: 20px;
-    }
-    #owned {
-        display: none;
+        /*border: 1px solid red;*/
+        width: 50px;
     }
 </style>
 
@@ -65,11 +65,11 @@
         <div class="icon" id="effect_icon"></div>
         <div class="nb" id="effect_nb"></div>
     </div>
-    <div id="stat">
-        <mark id="base"></mark>&nbsp;<mark id="equipment_modifier"></mark>&nbsp;<mark id="fatigue_modifier"></mark>
-    </div>
     <div id="owned">
         <div class="icon" id="owned_icon"></div>
         <div class="nb" id="owned_nb"></div>
+    </div>
+    <div id="stat">
+        <mark id="base"></mark>&nbsp;<mark id="equipment_modifier"></mark>&nbsp;<mark id="fatigue_modifier"></mark>
     </div>
 </div>
