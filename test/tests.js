@@ -34,7 +34,7 @@ var Equipment = require('../shared/Equipment.js').Equipment;
 describe('GameServer',function(){
     var stubs = [];
     before(function(done) {
-        this.timeout(5000);
+        this.timeout(10000);
         mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward', { useNewUrlParser: true });
         var db = mongoose.connection;
         db.on('error', console.error.bind(console, 'connection error:'));
@@ -399,7 +399,7 @@ describe('GameServer',function(){
     });
 
    
-    afterEach(function(){
+    after(function(){
         stubs.forEach(function(stub){
             stub.restore();
         })

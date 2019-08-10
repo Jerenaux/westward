@@ -46,7 +46,6 @@ World Building
 - Zoom-out in towers
 
 Bugs:
-- Tooltip bug with feather tufts
 - Server restarts after disconnect?
 - Don't run after each connect
 Features:
