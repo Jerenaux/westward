@@ -46,8 +46,7 @@ World Building
 - Zoom-out in towers
 
 Bugs:
-- Server restarts after disconnect?
-- Don't run after each connect
+- Server restarts after disconnect? Monitor closely
 Features:
 - Apply silhouette to hidden items
 - Show ingredients needed foer buildings recipe in build menu

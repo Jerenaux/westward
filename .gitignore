@@ -4,3 +4,6 @@ node_modules
 toPack
 .ipynb_checkpoints
 *.env
+map/conflictMarkers.json
+map/deathMarkers.json
+package-lock.json

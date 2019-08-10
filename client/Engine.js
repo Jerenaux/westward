@@ -311,8 +311,9 @@ Engine.create = function(){
         Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
     }
 
-    var highlightPipeline = game.renderer.addPipeline('highlight', new HighlightPipeline(game));
-    var hollowPipeline = game.renderer.addPipeline('hollow', new HollowPipeline(game));
+    game.renderer.addPipeline('highlight', new HighlightPipeline(game));
+    game.renderer.addPipeline('hollow_items', new HollowPipeline(game));
+    game.renderer.addPipeline('hollow_moving', new HollowPipeline(game));
 
     Engine.created = true;
     Engine.configEngine();
