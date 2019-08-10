@@ -118,11 +118,11 @@ var HollowPipeline = new Phaser.Class({
             uniform vec2 uTextureSize;
             uniform vec4 uFrameCut;
             vec2 px_size = 1.0/uTextureSize;
-            float radius = 1.0;
+            float radius = 2.0;
             void main(void) {
                 vec4 color = texture2D(uMainSampler, outTexCoord);
                 gl_FragColor = color;
-                if(outTexCoord.y <= uFrameCut.y/uTextureSize.y + px_size.y*2.0) return;
+                if(outTexCoord.y <= uFrameCut.y/uTextureSize.y + px_size.y*radius) return;
                 
                 vec4 colorU = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y - px_size.y*radius));
                 vec4 colorD = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y + px_size.y*radius));

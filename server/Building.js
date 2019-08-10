@@ -92,12 +92,12 @@ function Building(data){
 
     this.inFight = false;
     this.stats = new StatsContainer();
-    this.stats['hp'].setBaseValue(buildingData.health);
-    this.stats['hpmax'].setBaseValue(buildingData.health);
+    this.stats['hp'].setBaseValue(buildingData.stats.health);
+    this.stats['hpmax'].setBaseValue(buildingData.stats.health);
     // TODO: move to JSON
     this.stats['def'].setBaseValue(20);
     this.stats['acc'].setBaseValue(1000);
-    this.stats['dmg'].setBaseValue(buildingData.dmg || 0);
+    this.stats['dmg'].setBaseValue(buildingData.stats.dmg || 0);
 
     this.aggroMatrix = {
         'Player': false,
@@ -357,6 +357,7 @@ Building.prototype.trim = function(){
     trimmed.y = parseInt(this.y);
     if(this.inventory.size > 0) trimmed.inventory = this.inventory.toList();
     trimmed.prodCountdowns = this.prodCountdowns;
+    trimmed.stats = this.stats.toList();
     // return trimmed;
     return GameObject.prototype.trim.call(this,trimmed);
 };

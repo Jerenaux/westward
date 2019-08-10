@@ -13,7 +13,7 @@ var Models = {
         inventory: {type: Array},
         prices: {type: Object},
         gold: {type: Number, min: 0},
-        built: {type: Boolean},
+        built: {type: Boolean}
     }
 };
 

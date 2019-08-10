@@ -47,10 +47,8 @@ World Building
 
 Bugs:
 - Server restarts after disconnect? Monitor closely
+- Items loaded before chunks
 Features:
-- Apply silhouette to hidden items
-- Show ingredients needed foer buildings recipe in build menu
-- Get kicked out of shack when built if not yours
 - Display building life in tooltips
 - Repair panel
 - Civ camp locations and spawn behavior

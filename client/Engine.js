@@ -1438,7 +1438,7 @@ Engine.makeBuildMenu = function(){
     build.name = 'Build something'; // Allows to have a hover name without a menu title
     build.hook = 'build';
     var w = 300;
-    var buildings = build.addPanel('build',new BuildPanel(30,40,w,450,'Build'));
+    var buildings = build.addPanel('build',new BuildPanel(30,50,w,450,'Build'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
     buildings.addButton(w-33, 8, 'blue','help',null,'',UI.textsData['build_help']);
     buildings.moveUp(2);

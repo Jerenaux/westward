@@ -41,6 +41,7 @@ var Building = new Phaser.Class({
         this.ownerName = data.ownerName;
         this.civBuilding = (this.settlement == -1);
         this.inventory = new Inventory(100);
+        this.stats = new StatsContainer();
         this.countdowns = data.prodCountdowns;
         this.name = buildingData.name;//+' '+this.id;
         this.prices = {};
@@ -131,7 +132,8 @@ var Building = new Phaser.Class({
             'productivity': this.setProductivity,
             'progress': this.setProgress,
             'ranged_atk': this.processRangedAttack,
-            'rangedMiss': this.handleMiss
+            'rangedMiss': this.handleMiss,
+            'stats': this.updateStats
         };
         this.updateEvents = new Set();
 
@@ -250,6 +252,13 @@ var Building = new Phaser.Class({
     handleMiss: function(data){
         var pos = this.getHPposition();
         Engine.displayHit(this,pos.x,pos.y,50,80,null,true,data.delay);
+    },
+
+    updateStats: function(stats){
+        for(let i = 0; i < stats.length; i++){
+            var statObj = this.stats[stats[i].stat];
+            statObj.setBaseValue(stats[i].value);
+        }
     },
 
     processRangedAttack: function(data){

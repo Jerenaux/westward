@@ -15,8 +15,10 @@
     "icon": "tower",
     "canFight": true,
     "aggro": true,
-    "health": 250,
-    "dmg": 8,
+    "stats": {
+      "health": 250,
+      "dmg": 8
+    },
     "shootFrom":{
       "x":66,
       "y":100
@@ -38,7 +40,9 @@
     "mainMenu": "crafting",
     "depthOffset": 2,
     "canFight": false,
-    "health": 50
+    "stats": {
+      "health": 70
+    }
   },
   "4":{
     "name": "Shop",
@@ -56,7 +60,9 @@
     "mainMenu": "trade",
     "depthOffset": 2,
     "canFight": false,
-    "health": 50
+    "stats": {
+      "health": 50
+    }
   },
   "6":{
     "name": "Lumber camp",
@@ -74,7 +80,9 @@
     "depthOffset": 2,
     "production": [[3,1,60,5],[7,5,60,5]],
     "canFight": false,
-    "health": 50
+    "stats": {
+      "health": 20
+    }
   },
   "11":{
     "name": "Shack",
@@ -92,7 +100,9 @@
     "mainMenu": "rest",
     "depthOffset": 2,
     "canFight": false,
-    "health": 50,
+    "stats": {
+      "health": 50
+    },
     "shelter": true,
     "locked":true,
     "restVigorAmount": 0.5,
