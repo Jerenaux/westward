@@ -50,6 +50,7 @@ Bugs:
 - Server restarts after disconnect?
 - Don't run after each connect
 Features:
+- Apply silhouette to hidden items
 - Show ingredients needed foer buildings recipe in build menu
 - Get kicked out of shack when built if not yours
 - Display building life in tooltips

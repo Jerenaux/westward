@@ -470,9 +470,9 @@ GameServer.addItem = function(x,y,type,instance){
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
     console.log('--- Performing on initialization tasks ---');
-    GameServer.addAnimal(1212,168,0);
-    GameServer.addAnimal(516,652,0);
-    GameServer.addAnimal(1174,144,0);
+    GameServer.addItem(469,673,30);
+    GameServer.addItem(469,671,26);
+    GameServer.addItem(469,669,7);
     GameServer.addAnimal(1173,144,0);
     GameServer.addAnimal(1172,144,0);
     GameServer.addAnimal(1171,144,0);

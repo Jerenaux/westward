@@ -21,6 +21,7 @@ var Tooltip = new Phaser.Class({
         this.effect_icon = this.getChildByID('effect_icon');
         this.effect_nb = this.getChildByID('effect_nb');
         this.owned = this.getChildByID('owned');
+        this.owned_icon = this.getChildByID('owned_icon');
         this.owned_nb = this.getChildByID('owned_nb');
 
         this.setOrigin(0);
@@ -56,7 +57,7 @@ var Tooltip = new Phaser.Class({
                 break;
             case 'pickupItem':
                 if(data.id == -1) break;
-                this.setNbOwned(Engine.player.getItemNb(data.id));
+                this.setNbOwned(Engine.itemsData[data.id].effects, Engine.player.getItemNb(data.id));
                 // fall through
             case 'item':
                 if(data.id == -1) break;
@@ -125,8 +126,10 @@ var Tooltip = new Phaser.Class({
         }
     },
 
-    setNbOwned: function(nb){
+    setNbOwned: function(effects, nb){
         this.owned.style.display = 'block';
+        // var effects = (this.effects.style.display == 'block');
+        this.owned_icon.style.marginLeft = (effects ? '-16' : '0')+'px';
         this.owned_nb.innerHTML = nb;
     },
 
