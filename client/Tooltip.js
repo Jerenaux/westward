@@ -24,6 +24,7 @@ var Tooltip = new Phaser.Class({
         this.owned_icon = this.getChildByID('owned_icon');
         this.owned_nb = this.getChildByID('owned_nb');
         this.bar = this.getChildByID('bar');
+        this.lifebar = this.getChildByID('lifebar');
 
         this.setOrigin(0);
         this.setScrollFactor(0);
@@ -46,7 +47,7 @@ var Tooltip = new Phaser.Class({
                 var bld = Engine.buildings[data.id];
                 var owner = bld.isOwned() ? 'Your' : bld.ownerName+'\'s';
                 this.setTitle(owner+' '+bld.name);
-                this.setBar(bld.stats['hp'],bld.stats['hpmax']);
+                this.setBar(bld.stats['hp'].getValue(),bld.stats['hpmax'].getValue());
                 break;
             case 'buildingdata':
                 var bld = Engine.buildingsData[data.id];
@@ -95,7 +96,7 @@ var Tooltip = new Phaser.Class({
         this.effects.style.display = 'none';
         this.owned.style.display = 'none';
         this.stat_table.style.display = 'none';
-        // this.bar.style.display = 'none';
+        this.bar.style.display = 'none';
     },
 
     setTitle: function(text){
@@ -131,12 +132,17 @@ var Tooltip = new Phaser.Class({
 
     setNbOwned: function(effects, nb){
         this.owned.style.display = 'block';
-        this.owned_icon.style.marginLeft = (effects ? '-16' : '0')+'px';
+        // this.owned_icon.style.marginLeft = (effects ? '-16' : '0')+'px';
         this.owned_nb.innerHTML = nb;
     },
 
     setBar: function(value,max){
         this.bar.style.display = 'block';
+        this.lifebar.style.width = (value*100/max)+'%';
+        // this.lifebar.style.width = '10%';
+        // this.lifebar.innerHTML = value+'/'+max;
+        // console.warn(value,max,value/max);
+        // console.warn(this.lifebar.style.width);
     },
 
     getBodyText: function(){

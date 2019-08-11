@@ -175,20 +175,38 @@ function BuildingTitle(x,y){
         });*/
     },this);
 
-    // this.exit = UI.scene.add.sprite(xr+10,yr+10,'UI','exit_icon');
-    this.exit = UI.scene.add.sprite(0,yr+10,'UI','exit_icon');
+    this.exit = UI.scene.add.sprite(0,yr+30,'UI','exit_icon');
     this.exit.setDepth(this.depth+1);
     this.exit.setScrollFactor(0);
     this.exit.setVisible(false);
     this.exit.setInteractive();
-    this.exit.setOrigin(0);
     this.exit.on('pointerup',Engine.leaveBuilding);
     var exit_ = this.exit;
     this.exit.on('pointerover',function(){
+        UI.tooltip.updateInfo('free',{body:'Exit'});
+        UI.tooltip.display();
         exit_.setFrame('exit_icon_on');
     });
     this.exit.on('pointerout',function(){
         exit_.setFrame('exit_icon');
+        UI.tooltip.hide();
+    });
+
+    this.repair = UI.scene.add.sprite(0,yr+30,'UI','hammer_icon');
+    this.repair.setDepth(this.depth+1);
+    this.repair.setScrollFactor(0);
+    this.repair.setVisible(false);
+    this.repair.setInteractive();
+    this.repair.on('pointerup',Engine.leaveBuilding);
+    var repair_ = this.repair;
+    this.repair.on('pointerover',function(){
+        UI.tooltip.updateInfo('free',{body:'Repair'});
+        UI.tooltip.display();
+        repair_.setAngle(-15);
+    });
+    this.repair.on('pointerout',function(){
+        repair_.setAngle(0);
+        UI.tooltip.hide();
     });
 
     this.invrect = UI.scene.add.image(1024,0,'UI','invisible');
@@ -231,7 +249,8 @@ BuildingTitle.prototype.resize = function(w){
     left.x += Math.floor(delta/2);
     middle.x += Math.floor(delta/2);
     right.x -= Math.floor(delta/2);
-    this.exit.x -= Math.floor(delta/2);
+    // this.exit.x -= Math.floor(delta/2);
+    this.positionIcons(this.exit.x - Math.floor(delta/2));
     middle.width -= delta;
     if(middle.width%2 != 0) middle.width++;
     this.capsule.move(Math.floor(delta/2),0);
@@ -240,13 +259,21 @@ BuildingTitle.prototype.resize = function(w){
     this.width_ = this.width;
 };
 
+BuildingTitle.prototype.positionIcons = function(exitX){
+    this.exit.x = exitX;
+    this.repair.x = this.exit.x - 40;
+
+};
+
 BuildingTitle.prototype.display = function(){
     this.slices.forEach(function(e){
         e.setVisible(true);
     });
     this.text.setVisible(true);
-    this.exit.x = Engine.currentMenu.exitX;
+    // this.exit.x = Engine.currentMenu.exitX;
+    this.positionIcons(Engine.currentMenu.exitX);
     this.exit.setVisible(true);
+    this.repair.setVisible(true);
     this.invrect.setPosition(this.exit.x,this.exit.y);
     this.capsule.display();
 };
@@ -257,6 +284,7 @@ BuildingTitle.prototype.hide = function(){
     });
     this.text.setVisible(false);
     this.exit.setVisible(false);
+    this.repair.setVisible(false);
     this.capsule.hide();
 };
 
@@ -267,6 +295,7 @@ BuildingTitle.prototype.move = function(y){
     });
     this.text.y += dy;
     this.exit.y += dy;
+    this.repair.y += dy;
     this.capsule.move(0,dy);
     this.y = y;
 };

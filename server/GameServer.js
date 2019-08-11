@@ -469,7 +469,6 @@ GameServer.addItem = function(x,y,type,instance){
  */
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
-    console.log('--- Performing on initialization tasks ---');
     GameServer.addItem(513,677,26);
     GameServer.addItem(514,677,26);
     GameServer.addItem(513,676,26);
@@ -494,9 +493,9 @@ GameServer.onNewPlayer = function(player){
     // player.applyVigorModifier();
 
     const items = [
-        // [3,30],
-        // // [4, 5],
-        // [6, 3],
+        [7,10],
+        [21, 10],
+        [3, 20],
         // [2, 1],
         // [19, 1],
         // [20, 17],
@@ -1585,6 +1584,10 @@ GameServer.handleCraft = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var buildingID = player.inBuilding;
     var building = GameServer.buildings[buildingID];
+    if(!building){
+        console.warn('ERROR: Undefined building when crafting');
+        return;
+    }
     var isFinancial = (!building.isOwnedBy(player));
     var targetItem = data.id;
     var nb = data.nb;

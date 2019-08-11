@@ -99,6 +99,13 @@ function Building(data){
     this.stats['acc'].setBaseValue(1000);
     this.stats['dmg'].setBaseValue(buildingData.stats.dmg || 0);
 
+    if(data.stats) {
+        data.stats.forEach(function (stat) {
+            this.getStat(stat.stat).setBaseValue(stat.value);
+        }, this);
+    }
+    if(!this.built) this.stats['hp'].setBaseValue(0);
+
     this.aggroMatrix = {
         'Player': false,
         'Animal': false,
@@ -226,6 +233,8 @@ Building.prototype.updateBuild = function(){
 Building.prototype.setBuilt = function(){
     this.setProperty('built',true);
     this.updateProd(true); //true = just built
+    this.stats['hp'].setBaseValue(this.stats['hpmax'].getValue());
+    this.setProperty('stats',this.stats);
     this.save();
     var phrase = ['Construction of ',GameServer.buildingsData[this.type].name,' finished'];
     GameServer.notifyPlayer(this.owner,phrase.join(' '));

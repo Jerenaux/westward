@@ -27,7 +27,9 @@ let Schemas = {
         prices: mongoose.Schema.Types.Mixed,
         gold: {type: Number, min: 0},
         built: Boolean,
-        health: {type: Number, min: 0}
+        stats: {type: [], set:function(stats){
+                return stats.toList();
+        }}
     }),
 
     playerSchema : mongoose.Schema({

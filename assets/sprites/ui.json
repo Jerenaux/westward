@@ -597,6 +597,10 @@
       "frame": {"x":482,"y":565,"w":36,"h":36}
     },
     {
+      "filename": "hammer_icon",
+      "frame": {"x":525,"y":565,"w":36,"h":36}
+    },
+    {
       "filename": "positionCross",
       "frame": {"x":484,"y":448,"w":10,"h":13}
     },

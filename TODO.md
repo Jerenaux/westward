@@ -1,11 +1,11 @@
 ## To test:
+- Test handleCraft (normal + when a price is undefined) + wrong building
 - Test starting inventory of new player
 - Test settlement selection (with value of 0)
 - Test ammo container type match
 - Test that the world is populated with items, animals, etc.
 - Test handleBelt
 - Test ammo decrease in inventory when equipping ammo
-- Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
 - Test Utils.nextTo with all combinations of building/animal vs building/animal, next to each other and not
 - Test Battle.computeTof()
@@ -49,7 +49,6 @@ Bugs:
 - Server restarts after disconnect? Monitor closely
 - Items loaded before chunks
 Features:
-- Display building life in tooltips
 - Repair panel
 - Civ camp locations and spawn behavior
 - Basic attack behavior + notifs thereof
@@ -179,6 +178,7 @@ Analytics:
 ---------
 - New admin:  update event descs as in current admin
 - Log: belt actions
+- Log giving food to buildings in particular
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions
