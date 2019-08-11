@@ -139,6 +139,12 @@ ProgressBar.prototype.hide = function(){
     this.displayed = false;
 };
 
+ProgressBar.prototype.moveUp = function(nb){
+    this.body.forEach(function(e){
+        e.setDepth(e.depth+nb);
+    });
+};
+
 // #######################
 
 function MiniProgressBar(x,y,w,color,mask){

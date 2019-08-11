@@ -170,5 +170,15 @@ Frame.prototype.moveUp = function(nb){
             b.zone.setDepth(b.zone.depth + nb);
         });
     }
+    if(this.longSlots){
+        this.longSlots.forEach(function(slot){
+            slot.moveUp(nb);
+        })
+    }
+    if(this.bigbuttons){
+        this.bigbuttons.forEach(function(btn){
+            btn.moveUp(nb);
+        })
+    }
     this.depth = nb;
 };

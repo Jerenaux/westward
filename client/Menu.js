@@ -109,6 +109,7 @@ Menu.prototype.hide = function(){
         if(!this.panels.hasOwnProperty(panel)) continue;
         this.panels[panel].hide();
     }
+    if(Engine.repairPanel.displayed) Engine.repairPanel.hide();
 
     this.trigger('onClose');
 
@@ -197,7 +198,9 @@ function BuildingTitle(x,y){
     this.repair.setScrollFactor(0);
     this.repair.setVisible(false);
     this.repair.setInteractive();
-    this.repair.on('pointerup',Engine.leaveBuilding);
+    this.repair.on('pointerup',function(){
+        Engine.repairPanel.display();
+    });
     var repair_ = this.repair;
     this.repair.on('pointerover',function(){
         UI.tooltip.updateInfo('free',{body:'Repair'});

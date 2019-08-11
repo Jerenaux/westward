@@ -50,6 +50,7 @@ Bugs:
 - Items loaded before chunks
 Features:
 - Repair panel
+- Don't display repair panel for buildings under construction
 - Civ camp locations and spawn behavior
 - Basic attack behavior + notifs thereof
 - Missions menu (focused on enemy civ) + enhanced map menu
