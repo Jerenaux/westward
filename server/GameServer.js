@@ -1646,8 +1646,10 @@ GameServer.handleBelt = function(data,socketID){
             return;
         }
         player.backpackToBelt(item);
+        Prism.logEvent(player,'belt',{item:item, direction:'tobelt'});
     }else if(inventory == 'belt' && player.hasItemInBelt(item)) {
         player.beltToBackpack(item);
+        Prism.logEvent(player,'belt',{item:item, direction:'frombelt'});
     }
 };
 

@@ -177,8 +177,6 @@ Secure
 
 Analytics:
 ---------
-- New admin:  update event descs as in current admin
-- Log: belt actions
 - Log giving food to buildings in particular
 - Display market prices
 - Button to flush events
