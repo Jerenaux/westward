@@ -225,19 +225,39 @@ Building.prototype.updateBuild = function(){
     }
     for(var item in recipe){
         this.takeItem(item,recipe[item]);
+        GameServer.destroyItem(item,recipe[item],'building');
     }
     this.setBuilt();
     return true;
+};
+
+Building.prototype.updateRepair = function(){
+    var delta = this.getStat('hpmax').getValue() - this.getStat('hp').getValue();
+    if(delta == 0) return;
+    var TIMBER = 3;
+    var recipe = GameServer.buildingsData[this.type].recipe;
+    var timberTotal = (TIMBER in recipe ? recipe[TIMBER] : 20); // todo: improve
+    var hpPerTimber = Math.ceil(this.getStat('hpmax').getValue()/timberTotal);
+    var maxTimber = Math.ceil(delta/hpPerTimber);
+    var nb = Utils.clamp(this.getItemNb(TIMBER),0,maxTimber);
+    this.takeItem(TIMBER, nb);
+    this.getStat('hp').increment(nb*hpPerTimber);
+    this.refreshStats();
+    GameServer.destroyItem(TIMBER,nb,'repair');
 };
 
 Building.prototype.setBuilt = function(){
     this.setProperty('built',true);
     this.updateProd(true); //true = just built
     this.stats['hp'].setBaseValue(this.stats['hpmax'].getValue());
-    this.setProperty('stats',this.stats);
+    this.refreshStats();
     this.save();
     var phrase = ['Construction of ',GameServer.buildingsData[this.type].name,' finished'];
     GameServer.notifyPlayer(this.owner,phrase.join(' '));
+};
+
+Building.prototype.refreshStats = function(){
+    this.setProperty('statsUpdate',this.stats.toList());
 };
 
 Building.prototype.isBuilt = function(){
@@ -366,7 +386,7 @@ Building.prototype.trim = function(){
     trimmed.y = parseInt(this.y);
     if(this.inventory.size > 0) trimmed.inventory = this.inventory.toList();
     trimmed.prodCountdowns = this.prodCountdowns;
-    trimmed.stats = this.stats.toList();
+    trimmed.statsUpdate = this.stats.toList();
     // return trimmed;
     return GameObject.prototype.trim.call(this,trimmed);
 };

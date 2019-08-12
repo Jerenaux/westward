@@ -1409,6 +1409,7 @@ GameServer.handleShop = function(data,socketID) {
             GameServer.notifyPlayer(building.owner, msg);
         }
         building.updateBuild();
+        building.updateRepair();
     }
     building.save();
     Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type,owner:building.ownerName});

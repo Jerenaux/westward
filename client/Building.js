@@ -133,7 +133,7 @@ var Building = new Phaser.Class({
             'progress': this.setProgress,
             'ranged_atk': this.processRangedAttack,
             'rangedMiss': this.handleMiss,
-            'stats': this.updateStats
+            'statsUpdate': this.updateStats
         };
         this.updateEvents = new Set();
 
@@ -259,6 +259,7 @@ var Building = new Phaser.Class({
             var statObj = this.stats[stats[i].stat];
             statObj.setBaseValue(stats[i].value);
         }
+        this.updateEvents.add('onUpdateBldStats');
     },
 
     processRangedAttack: function(data){
