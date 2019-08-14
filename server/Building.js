@@ -75,6 +75,7 @@ function Building(data){
 
     this.setGold(data.gold || 0);
     this.built = !!data.built;
+    this.civ = data.civ;
     this.progress = data.progress || 0;
     this.isWorkshop = buildingData.workshop;
 
@@ -407,7 +408,7 @@ Building.prototype.listingTrim = function(){
 // Returns an object containing only the fields relevant to display on map
 Building.prototype.mapTrim = function(){
     var trimmed = {};
-    var broadcastProperties = ['type','owner','ownerName'];
+    var broadcastProperties = ['type','owner','ownerName','civ'];
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -431,16 +432,6 @@ Building.prototype.computeSurroundingArea = function(){
 };
 
 Building.prototype.getBattleAreaAround = function(){
-    // cells = cells || new SpaceMap();
-    //
-    // for(var x = -1; x <= this.cellsWidth; x++){
-    //     for(var y = -1; y <= this.cellsHeight+1; y++) {
-    //         var realx = this.coll.x + x;
-    //         var realy = this.coll.y + y;
-    //         if(!GameServer.checkCollision(realx,realy)) cells.add(realx,realy);
-    //     }
-    // }
-    // return cells;
     return this.surroundingArea;
 };
 

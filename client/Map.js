@@ -378,9 +378,15 @@ var Map = new Phaser.Class({
         var tile = Engine.player.getTilePosition();
         this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
         Engine.player.buildingMarkers.forEach(function(data){
+            var frame;
+            if(data.civ){
+                frame = 'bldciv';
+            }else{
+                frame = (data.owner == Engine.player.id ? 'bld2own' : 'bld2');
+            }
             this.addPin(data.x,data.y,
                 Engine.buildingsData[data.type].name,
-                (data.owner == Engine.player.id ? 'bld2own' : 'bld2')
+                frame
             );
         },this);
         Engine.player.resourceMarkers.forEach(function(data){

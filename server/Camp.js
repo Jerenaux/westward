@@ -6,20 +6,20 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 
 
-function Camp(buildings,target,center){
+function Camp(buildings,center){
     this.buildings = [];
     this.people = [];
-    this.targetSettlement = target;
     this.center = center;
 
-    /*buildings.forEach(function(hut){
+    buildings.forEach(function(bld){
         this.buildings.push(GameServer.addBuilding({
-            x: hut.x,
-            y: hut.y,
-            type: 4,
+            x: bld.x,
+            y: bld.y,
+            type: 1,
+            civ: true,
             built: true
         }));
-    },this);*/
+    },this);
 }
 
 Camp.prototype.update = function(){

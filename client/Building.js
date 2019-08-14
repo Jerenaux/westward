@@ -39,7 +39,7 @@ var Building = new Phaser.Class({
         this.buildingType = data.type;
         this.owner = data.owner;
         this.ownerName = data.ownerName;
-        this.civBuilding = (this.settlement == -1);
+        this.civBuilding = !!data.civ; // converts undefined to false
         this.inventory = new Inventory(100);
         this.stats = new StatsContainer();
         this.countdowns = data.prodCountdowns;
@@ -121,7 +121,6 @@ var Building = new Phaser.Class({
             'built': this.setBuilt,
             'danger': this.setDangerIcons,
             'devlevel': this.setDevLevel,
-            'foodsurplus': this.setFoodSurplus,
             'gold': this.setGold,
             'hit': this.handleHit, // for HP display and blink
             'inventory': this.setInventory, // sets whole inventor
@@ -192,11 +191,6 @@ var Building = new Phaser.Class({
 
     setDevLevel: function(level){
         this.devlevel = level;
-        this.updateEvents.add('onUpdateSettlementStatus');
-    },
-
-    setFoodSurplus: function(foodsurplus){
-        this.foodsurplus = foodsurplus;
         this.updateEvents.add('onUpdateSettlementStatus');
     },
 
@@ -274,7 +268,7 @@ var Building = new Phaser.Class({
 
     getRect: function(){
         return {
-            x: this.tileX + this.coll.x,
+            x: this.tileX,
             y: this.tileY - this.cellsHeight,
             w: this.cellsWidth,
             h: this.cellsHeight

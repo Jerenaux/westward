@@ -4,7 +4,7 @@
         enabled: true,
         aggroRange: 12, // chebyshev distance; TODO: variable?
         battleRange: 3, // distance that can be travelled in one turn in battle; TODO: variable
-        freezeNPC: false,
+        freezeNPC: true,
         maxDamage: 10000,
         minDamage: 1,
         rangePenalty: 0.1, // accuracy penalty per tile

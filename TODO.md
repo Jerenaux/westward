@@ -45,17 +45,26 @@ World Building
 - Look towards cursor
 - Zoom-out in towers
 - Silhouette of marker behind trees
+- Togle legend, toggle marker types
 
 Bugs:
 - Server restarts after disconnect? Monitor closely
 - Items loaded before chunks
 - Can't find daydream in tutorial (plant icons are misleading)
+- Check integrity issue?
 Features:
-- Civ camp locations and spawn behavior
+- Save civ buildings to db?
+- Cursor during battle over civ buildings
+- End battle when destroying shack
+- Check players can destroy civ buildings
+- Civ spawn behavior
+- Spawn based on buildings
 - Basic attack behavior + notifs thereof
+- Autorepair & rebuild of civ buildings
 - Missions menu (focused on enemy civ) + enhanced map menu
 -> Need for visual indicators + numerical ones
 -> Frontier, semi-permanent camp markers (always visible once discovered)
+- Update attack and patrol behavior accordingly
 -> Use battle marker only for civ encounters?
 -> Quantify resources nodes on the right side of frontier, 
 production capacity (based on # buildings of a given time) / some kind of "GDP",
@@ -81,6 +90,7 @@ Rivalry between regions
 
 
 María:
+- Bld icons for enemy civ
 - Wolf anim (walk, attack, die w/ & w/o arrows)
 - Bear anim (walk, attack, die w/ & w/o arrows)
 - Player anim (naked?)

@@ -113,6 +113,12 @@ Battle.prototype.updateTimeline = function () {
     var order = this.getFightersOrder();
     var activeFighter = this.getActiveFighter();
 
+    if(!activeFighter){
+        console.warn('no active figher');
+        this.end();
+        return;
+    }
+
     var data = {
         'order': order,
         'active': activeFighter.getShortID(),

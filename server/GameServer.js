@@ -414,7 +414,7 @@ GameServer.setUpCamps = function(){
 
     for (let key in GameServer.campsData) {
         const data = GameServer.campsData[key];
-        GameServer.camps.push(new Camp(data.huts, data.target, data.center));
+        GameServer.camps.push(new Camp(data.buildings, data.center));
     }
 
     GameServer.updateStatus();
@@ -472,7 +472,7 @@ GameServer.onInitialized = function(){
     GameServer.addItem(513,677,26);
     GameServer.addItem(514,677,26);
     GameServer.addItem(513,676,26);
-    GameServer.addAnimal(1173,144,0);
+    GameServer.addAnimal(404,602,0);
     GameServer.addAnimal(1172,144,0);
     GameServer.addAnimal(1171,144,0);
     GameServer.addAnimal(1170,144,0);
@@ -1780,7 +1780,7 @@ GameServer.updateFoW = function(){
     }
     for(var bid in GameServer.buildings){
         var building = GameServer.buildings[bid];
-        GameServer.dissipateFoW(building.aoi);
+        if(!building.civ) GameServer.dissipateFoW(building.aoi);
     }
     // GameServer.fowChanged = true;
     GameServer.setFlag('FoW');
