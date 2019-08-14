@@ -23,7 +23,7 @@ Design document
 Testing
 World Building
 
-## Priority TODO
+## Misc TODO
 - Adapt animations and delays for firearms
 - Update Westward main page
 - Change battle priority when player joins fight
@@ -44,13 +44,13 @@ World Building
 - Ability: display fighter health bars
 - Look towards cursor
 - Zoom-out in towers
+- Silhouette of marker behind trees
 
 Bugs:
 - Server restarts after disconnect? Monitor closely
 - Items loaded before chunks
 - Can't find daydream in tutorial (plant icons are misleading)
 Features:
-- Don't display repair panel for buildings under construction
 - Civ camp locations and spawn behavior
 - Basic attack behavior + notifs thereof
 - Missions menu (focused on enemy civ) + enhanced map menu

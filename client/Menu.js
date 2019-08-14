@@ -276,7 +276,7 @@ BuildingTitle.prototype.display = function(){
     // this.exit.x = Engine.currentMenu.exitX;
     this.positionIcons(Engine.currentMenu.exitX);
     this.exit.setVisible(true);
-    this.repair.setVisible(true);
+    if(Engine.currentBuiling.built) this.repair.setVisible(true);
     this.invrect.setPosition(this.exit.x,this.exit.y);
     this.capsule.display();
 };
