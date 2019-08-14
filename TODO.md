@@ -51,6 +51,9 @@ Bugs:
 - Items loaded before chunks
 - Can't find daydream in tutorial (plant icons are misleading)
 Features:
+- Block giving/selling if building fully repaired
+- Don't display repair panel for buildings under construction or with full integrity
+- Repair help
 - Civ camp locations and spawn behavior
 - Basic attack behavior + notifs thereof
 - Missions menu (focused on enemy civ) + enhanced map menu
@@ -187,6 +190,7 @@ Secure
 Analytics:
 ---------
 - Log giving food to buildings in particular
+- Log repairs
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions
@@ -195,7 +199,7 @@ Analytics:
 - Look for nice statistical library (https://dzone.com/articles/4-useful-javascript-libraries-for-data-analysis-an)
 -> Or export as CSV and explore in SPSS?
 - Compute "concentration" stat of items
-- Compute inflation
+- Compute inflation, GDP & potential GDP, growth
 - Log drains and faucets
 - Log where items are bought/sold
 - Log pathfinding destinations, consider making heatmap in the long term

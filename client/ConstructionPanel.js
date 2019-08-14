@@ -178,20 +178,20 @@ RepairPanel.prototype.displayInterface = function(){
     var btn = new BigButton(this.x+270,y+20,'Give '+itemData.name);
     btn.item = item;
     btn.callback = function(){
-        if(panel_.checkForPanelOnTop()) return;
-        Engine.currentMenu.displayPanel('action');
-        Engine.currentMenu.panels['action'].setUp(this.item,'sell',false); // false = force non-financial
+        // if(panel_.checkForPanelOnTop()) return;
+        Engine.repairAction.display();
+        Engine.repairAction.setUp(this.item,'sell',false); // false = force non-financial
     }.bind(btn);
-    btn.display();
+    btn.display();  
     this.bigbuttons.push(btn);
 
     if(!Engine.currentBuiling.isOwned() && price > 0) {
         var btn = new BigButton(this.x + 410, y + 20, 'Sell ' + itemData.name);
         btn.item = item;
         btn.callback = function(){
-            if(panel_.checkForPanelOnTop()) return;
-            Engine.currentMenu.displayPanel('action');
-            Engine.currentMenu.panels['action'].setUp(this.item,'sell',true); // true = force financial
+            // if(panel_.checkForPanelOnTop()) return;
+            Engine.repairAction.display();
+            Engine.repairAction.setUp(this.item,'sell',true); // true = force financial
         }.bind(btn);
         btn.display();
         this.bigbuttons.push(btn);
@@ -228,5 +228,6 @@ RepairPanel.prototype.display = function(){
 
 RepairPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
+    Engine.repairAction.hide();
     this.hideInterface();
 };

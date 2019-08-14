@@ -784,9 +784,12 @@ Engine.makeUI = function(){
     statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help']);
 
     // Todo: make a 'makerepairpanel()' method similar to 'makepricespanel()'?
-    Engine.repairPanel = new RepairPanel(100,100,500,200,'Repair');
+    Engine.repairPanel = new RepairPanel(476,120,500,200,'Repair');
     Engine.repairPanel.addButton(500-16,-8,'red','close',Engine.repairPanel.hide.bind(Engine.repairPanel),'Close');
     Engine.repairPanel.moveUp(2);
+    Engine.repairAction = new ShopPanel(670,310,300,100,'Take'); 
+    Engine.repairAction.addButton(300-16,-8,'red','close',Engine.repairAction.hide.bind(Engine.repairAction),'Close');
+    Engine.repairAction.moveUp(2);
 
     Engine.menus = {
         'abilities': Engine.makeAbilitiesMenu(),
@@ -1963,6 +1966,7 @@ Engine.checkForBuildingMenuUpdate= function(id,event){
     if(Engine.inThatBuilding(id)) {
         Engine.currentMenu.trigger(event);
     }
+    if(Engine.repairPanel.displayed) Engine.repairPanel.update();
 };
 
 Engine.addPlayer = function(data){
