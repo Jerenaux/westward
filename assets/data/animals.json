@@ -3,7 +3,7 @@
     "sprite":"wolves",
     "battleicon":"wolf",
     "name": "Wolf",
-    "map_nale": "Wolf pack",
+    "map_name": "Wolf pack",
     "frame": 25,
     "aggro": true,
     "wander": true,
