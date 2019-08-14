@@ -317,6 +317,10 @@ var Building = new Phaser.Class({
         return !this.built;
     },
 
+    isFullyRepaired: function(){
+        return this.stats['hp'].getValue() == this.stats['hpmax'].getValue();
+    },
+
     isOwned: function(){ // by the player
         // return false;
         return this.owner == Engine.player.id;

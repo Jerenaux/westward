@@ -47,7 +47,7 @@ var Tooltip = new Phaser.Class({
                 var bld = Engine.buildings[data.id];
                 var owner = bld.isOwned() ? 'Your' : bld.ownerName+'\'s';
                 this.setTitle(owner+' '+bld.name);
-                this.setBar(bld.stats['hp'].getValue(),bld.stats['hpmax'].getValue());
+                if(bld.isBuilt()) this.setBar(bld.stats['hp'].getValue(),bld.stats['hpmax'].getValue());
                 break;
             case 'buildingdata':
                 var bld = Engine.buildingsData[data.id];

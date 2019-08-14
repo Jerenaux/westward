@@ -786,6 +786,7 @@ Engine.makeUI = function(){
     // Todo: make a 'makerepairpanel()' method similar to 'makepricespanel()'?
     Engine.repairPanel = new RepairPanel(476,120,500,200,'Repair');
     Engine.repairPanel.addButton(500-16,-8,'red','close',Engine.repairPanel.hide.bind(Engine.repairPanel),'Close');
+    Engine.repairPanel.addButton(460, 8, 'blue','help',null,'',UI.textsData['repair_help']);
     Engine.repairPanel.moveUp(2);
     Engine.repairAction = new ShopPanel(670,310,300,100,'Take'); 
     Engine.repairAction.addButton(300-16,-8,'red','close',Engine.repairAction.hide.bind(Engine.repairAction),'Close');

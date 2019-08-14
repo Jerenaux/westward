@@ -51,9 +51,6 @@ Bugs:
 - Items loaded before chunks
 - Can't find daydream in tutorial (plant icons are misleading)
 Features:
-- Block giving/selling if building fully repaired
-- Don't display repair panel for buildings under construction or with full integrity
-- Repair help
 - Civ camp locations and spawn behavior
 - Basic attack behavior + notifs thereof
 - Missions menu (focused on enemy civ) + enhanced map menu
