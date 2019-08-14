@@ -48,8 +48,8 @@ World Building
 Bugs:
 - Server restarts after disconnect? Monitor closely
 - Items loaded before chunks
+- Can't find daydream in tutorial (plant icons are misleading)
 Features:
-- Repair panel
 - Don't display repair panel for buildings under construction
 - Civ camp locations and spawn behavior
 - Basic attack behavior + notifs thereof
@@ -70,6 +70,15 @@ fitting more in backpack, more actions per turn, ... (not so for "boolean" effec
 - Arrow stocks in towers  + make them throw stones when no better ammo
 - Leaderboards
   
+
+Quests:
+"enemy civ is gonna attack in x days, you should produce x many swords, do this and that..."
+Collective missions
+
+On top of ebb and flow of frontier warfare
+
+Rivalry between regions
+
 
 María:
 - Wolf anim (walk, attack, die w/ & w/o arrows)
