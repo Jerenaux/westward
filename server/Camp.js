@@ -6,21 +6,49 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 
 
-function Camp(buildings,center){
+function Camp(id,center){
+    this.schemaModel = GameServer.CampModel;
+    this.id = id;
     this.buildings = [];
     this.people = [];
     this.center = center;
+}
 
-    buildings.forEach(function(bld){
+Camp.prototype.spawnBuildings = function(buildings){
+    buildings.forEach(function (bld) {
         this.buildings.push(GameServer.addBuilding({
             x: bld.x,
             y: bld.y,
             type: 1,
             civ: true,
+            camp: this.id,
             built: true
         }));
-    },this);
-}
+    }, this);
+};
+
+Camp.prototype.save = function(){
+    // if(!this.isOfInstance(-1)) return;
+    var this_ = this;
+    this.schemaModel.findById(this.mongoID, function (err, doc) { // this.model._id
+        if (err) throw err;
+        if(doc === null){
+            console.warn('Cannot save camp for id ',this_.mongoID);
+            return;
+        }
+
+        doc.set(_document);
+        doc.save(function (err) {
+            _document.dblocked = false;
+            if(err) throw err;
+            console.log('Camp saved');
+        });
+    });
+};
+
+Camp.prototype.addBuilding = function(bld){
+    this.buildings.push(bld);
+};
 
 Camp.prototype.update = function(){
     return;
@@ -66,17 +94,6 @@ Camp.prototype.remove = function(civ){
             break;
         }
     }
-};
-
-Camp.prototype.getBuildingMarkers = function(){
-    return this.buildings.map(function(b){
-        return {
-            marker:'building',
-            x: b.x,
-            y: b.y,
-            type: b.type
-        }
-    });
 };
 
 Camp.prototype.selectionTrim = function(){

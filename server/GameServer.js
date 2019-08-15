@@ -16,6 +16,7 @@ var GameServer = {
     lastItemID: 0,
     lastBattleID: 0,
     lastCellID: 0,
+    lastCampID: 0,
     nextInstanceID: 0,
     players: {}, // player.id -> player
     animals: {}, // animal.id -> animal
@@ -78,7 +79,7 @@ GameServer.updateStatus = function(){
  * Creates Mongoose models based on schemas
  */
 GameServer.createModels = function(){
-    GameServer.SettlementModel = mongoose.model('Settlement', Schemas.settlementSchema);
+    GameServer.CampModel = mongoose.model('Camp', Schemas.campSchema);
     GameServer.BuildingModel = mongoose.model('Building', Schemas.buildingSchema);
     GameServer.PlayerModel = mongoose.model('Player', Schemas.playerSchema);
 };
@@ -101,11 +102,11 @@ GameServer.readMap = function(mapsPath,test,cb){
             'static_data': null,
             'player_data': GameServer.readPlayersData,
             'regions': GameServer.loadRegions,
+            'camps': GameServer.setUpCamps,
             'buildings': GameServer.loadBuildings,
             'items': GameServer.loadItems,
             'markers': GameServer.loadMarkers,
-            'spawn_zones': GameServer.setUpSpawnZones,
-            'camps': GameServer.setUpCamps
+            'spawn_zones': GameServer.setUpSpawnZones
         };
     }
     GameServer.testcb = cb;
@@ -409,15 +410,37 @@ GameServer.setUpSpawnZones = function(){
  * Called during the initialization sequence.
  */
 GameServer.setUpCamps = function(){
+    GameServer.camps = {};
+    GameServer.CampModel.find(function (err, camps) {
+        if (err) return console.log(err);
+        if(camps.length == 0){
+            GameServer.readCamps();
+        }else{
+            camps.forEach(GameServer.addCamp);
+        }
+        GameServer.updateStatus();
+    });
+};
+
+GameServer.readCamps = function(){
+    console.log('Creating camps from camps.json');
     GameServer.campsData = JSON.parse(fs.readFileSync('./assets/data/camps.json').toString());
-    GameServer.camps = [];
 
     for (let key in GameServer.campsData) {
         const data = GameServer.campsData[key];
-        GameServer.camps.push(new Camp(data.buildings, data.center));
+        var camp = new Camp(GameServer.lastCampID++, data.center);
+        var document = new GameServer.CampModel(camp);
+        camp.mongoID = document._id;
+        GameServer.camps[camp.id] = camp;
+        // camp.save();
+        setTimeout(camp.save.bind(camp),1000);
+        camp.spawnBuildings(data.buildings);
     }
+};
 
-    GameServer.updateStatus();
+GameServer.addCamp = function(data){
+    var camp = new Camp(data.id, data.center);
+    GameServer.camps[camp.id] = camp;
 };
 
 /**
@@ -567,9 +590,9 @@ GameServer.economyTurn = function(){
         zone.update();
     });
 
-    GameServer.camps.forEach(function(camp){
-        camp.update();
-    });
+    // GameServer.camps.forEach(function(camp){
+    //     camp.update();
+    // });
 
     GameServer.updateEconomicEntities(GameServer.buildings); // prod, build, ...
     GameServer.updateEconomicEntities(GameServer.players); // food, shelter ...

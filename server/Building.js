@@ -51,10 +51,6 @@ function Building(data){
     this.ownerName = data.ownerName || 'John Doe';
     this.skipBattleTurn = !buildingData.canFight;
     this.name = buildingData.name;
-    this.civBuilding = (this.sid == -1);
-    if(this.civBuilding) this.battleTeam = 'Civ';
-    this.entityCategory = (this.civBuilding ? 'CivBuilding' : 'PlayerBuilding');
-    if(!this.civBuilding) this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(GameServer.buildingParameters.inventorySize);
     if(data.inventory) this.inventory.fromList(data.inventory);
 
@@ -76,8 +72,11 @@ function Building(data){
     this.setGold(data.gold || 0);
     this.built = !!data.built;
     this.civ = data.civ;
+    if(this.civ) this.campID = data.camp;
+    if(this.civ) this.battleTeam = 'Civ';
+    this.entityCategory = (this.civBuilding ? 'CivBuilding' : 'PlayerBuilding');
+
     this.progress = data.progress || 0;
-    this.isWorkshop = buildingData.workshop;
 
     var production = GameServer.buildingsData[this.type].production;
     if(production){
@@ -93,15 +92,17 @@ function Building(data){
 
     this.inFight = false;
     this.stats = new StatsContainer();
-    this.stats['hp'].setBaseValue(buildingData.stats.health);
-    this.stats['hpmax'].setBaseValue(buildingData.stats.health);
+    this.getStat('hp').setBaseValue(buildingData.stats.health,true); // true = force
+    this.getStat('hpmax').setBaseValue(buildingData.stats.health);
     // TODO: move to JSON
-    this.stats['def'].setBaseValue(20);
-    this.stats['acc'].setBaseValue(1000);
-    this.stats['dmg'].setBaseValue(buildingData.stats.dmg || 0);
+    this.getStat('def').setBaseValue(20);
+    this.getStat('acc').setBaseValue(1000);
+    this.getStat('dmg').setBaseValue(buildingData.stats.dmg || 0);
 
     if(data.stats) {
+        console.warn('reading stats');
         data.stats.forEach(function (stat) {
+            if(this.civ) console.warn(stat);
             this.getStat(stat.stat).setBaseValue(stat.value);
         }, this);
     }
@@ -120,6 +121,7 @@ Building.prototype.constructor = Building;
 
 Building.prototype.embed = function(){
     GameServer.buildings[this.id] = this;
+    if(this.campID) GameServer.camps[this.campID].addBuilding(this);
     this.setOrUpdateAOI();
     this.setCollisions('add');
     this.updateBuild();
