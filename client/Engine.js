@@ -1059,7 +1059,8 @@ Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss,delay){
 
     if(miss) return;
     // Blink tween
-    Engine.scene.tweens.add(
+    if(target.blinkTween) target.blinkTween.stop();
+    target.blinkTween = Engine.scene.tweens.add(
         {
             targets: target,
             alpha: 0,
@@ -1069,6 +1070,9 @@ Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss,delay){
             repeat: 3,
             onStart: function(){
                 target.setAlpha(1); // so that if it takes over another tween immediately, it starts from the proper alpha value
+            },
+            onComplete: function(){
+                target.setAlpha(1);
             }
         });
 

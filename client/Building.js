@@ -109,9 +109,9 @@ var Building = new Phaser.Class({
     unbuild: function(){
         this.built = false;
         var buildingData = Engine.buildingsData[this.buildingType];
-        this.setFrame(buildingData.sprite+'_construction');
+        this.setFrame(buildingData.foundations);
         this.resetDepth();
-        if(this.accessory) this.accessory.destroy();
+        // if(this.accessory) this.accessory.destroy();
     },
 
     update: function (data) {

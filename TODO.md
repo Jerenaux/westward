@@ -51,12 +51,10 @@ Bugs:
 - Server restarts after disconnect? Monitor closely
 - Items loaded before chunks
 - Can't find daydream in tutorial (plant icons are misleading)
-- Check integrity issue?
+- Flicker tween issue
 Features:
-- Save civ buildings to db?
-- Cursor during battle over civ buildings
-- End battle when destroying shack
-- Check players can destroy civ buildings
+- Saving built status?!
+- Fix saving/loading of campID
 - Civ spawn behavior
 - Spawn based on buildings
 - Basic attack behavior + notifs thereof

@@ -34,7 +34,6 @@ let Schemas = {
         }}
     }),
 
-
     campSchema : mongoose.Schema({
         id: {type: Number, min: 0, required: true},
         center: mongoose.Schema.Types.Mixed,

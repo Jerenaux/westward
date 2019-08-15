@@ -89,6 +89,5 @@ var Boot = new Phaser.Class({
 });
 
 Boot.bootParamsReceived = function(){
-    console.log('Boot parameters received');
     this.readyTicks++;
 };

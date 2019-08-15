@@ -58,7 +58,10 @@ GameObject.prototype.getAOI = function(){
 
 GameObject.prototype.save = function(){
     // if(!this.model) return;
-    if(this.dblocked) return;
+    if(this.dblocked){
+        console.log('db locked');
+        return;
+    }
     if(!this.isOfInstance(-1)) return;
     this.dblocked = true;
     var _document = this;

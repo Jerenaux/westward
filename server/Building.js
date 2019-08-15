@@ -74,7 +74,7 @@ function Building(data){
     this.civ = data.civ;
     if(this.civ) this.campID = data.camp;
     if(this.civ) this.battleTeam = 'Civ';
-    this.entityCategory = (this.civBuilding ? 'CivBuilding' : 'PlayerBuilding');
+    this.entityCategory = (this.civ ? 'CivBuilding' : 'PlayerBuilding');
 
     this.progress = data.progress || 0;
 
@@ -100,9 +100,7 @@ function Building(data){
     this.getStat('dmg').setBaseValue(buildingData.stats.dmg || 0);
 
     if(data.stats) {
-        console.warn('reading stats');
         data.stats.forEach(function (stat) {
-            if(this.civ) console.warn(stat);
             this.getStat(stat.stat).setBaseValue(stat.value);
         }, this);
     }
@@ -114,6 +112,7 @@ function Building(data){
         'Civ': true,
         'PlayerBuilding': false
     };
+    if(this.id == 4) console.warn('built:',this.built);
 }
 
 Building.prototype = Object.create(FightingEntity.prototype);
@@ -259,6 +258,11 @@ Building.prototype.setBuilt = function(){
     GameServer.notifyPlayer(this.owner,phrase.join(' '));
 };
 
+Building.prototype.applyDamage = function(dmg){
+    FightingEntity.prototype.applyDamage.call(this,dmg);
+    this.refreshStats();
+};
+
 Building.prototype.refreshStats = function(){
     this.setProperty('statsUpdate',this.stats.toList());
 };
@@ -267,10 +271,15 @@ Building.prototype.isBuilt = function(){
     return this.built;
 };
 
+Building.prototype.destroy = function(){
+
+};
+
 Building.prototype.toggleBuild = function(){
+    var built_ = this.built;
     this.setProperty('built',!this.built);
     this.setProperty('progress',(this.built ? 100 : 0));
-    this.getStat('hp').setBaseValue(this.getStat('hpmax').getBaseValue());
+    if(!built_) this.getStat('hp').setBaseValue(this.getStat('hpmax').getBaseValue());
 };
 
 Building.prototype.addBuilding = function(building){
@@ -374,10 +383,9 @@ Building.prototype.remove = function(){
 };
 
 // Save changes to DB
-Building.prototype.save = function(){
-    if(this.civBuilding) return; // todo: remove
+/*Building.prototype.save = function(){
     GameObject.prototype.save.call(this);
-};
+};*/
 
 // Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){
@@ -472,6 +480,12 @@ Building.prototype.attackTarget = function(){
 
 Building.prototype.die = function(){
     this.toggleBuild();
+    this.destroy();
+};
+
+Building.prototype.destroy = function(){
+    if(this.civ) GameServer.setFlag('buildingsMarkers');
+    this.save();
 };
 
 Building.prototype.isDead = function(){

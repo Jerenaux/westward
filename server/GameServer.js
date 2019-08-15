@@ -301,6 +301,7 @@ GameServer.loadRegions = function(){
  * @returns {Object} The created Building object
  */
 GameServer.addBuilding = function(data){
+    if(data.id == 4) console.warn('data:',data);
     var building = new Building(data);
     building.mongoID = data._id;
     building.embed();
@@ -430,10 +431,10 @@ GameServer.readCamps = function(){
         const data = GameServer.campsData[key];
         var camp = new Camp(GameServer.lastCampID++, data.center);
         var document = new GameServer.CampModel(camp);
-        camp.mongoID = document._id;
+        document.save(function(err,doc){
+            camp.mongoID = doc._id.toString();
+        });
         GameServer.camps[camp.id] = camp;
-        // camp.save();
-        setTimeout(camp.save.bind(camp),1000);
         camp.spawnBuildings(data.buildings);
     }
 };
@@ -1204,6 +1205,10 @@ GameServer.checkForBattle = function(x,y){
 GameServer.connectToBattle = function(entity,cell){
     var battle = cell.battle;
     var area = GameServer.computeBattleArea(entity,cell,3);
+    if(!area){
+        console.warn('No area found');
+        return;
+    }
     battle.addFighter(entity);
     GameServer.addBattleArea(area,battle);
     GameServer.expandBattle(battle,entity);
@@ -1451,7 +1456,7 @@ GameServer.handleBuild = function(data,socketID) {
     var buildPermit = GameServer.canBuild(bid, tile);
     if(player.isInstanced()) buildPermit = 1; //hack
     if (buildPermit === 1) {
-        GameServer.build(player, bid, tile);
+        GameServer.buildPlayerBuilding(player, bid, tile);
         player.addNotif('Started building a '+GameServer.buildingsData[bid].name);
         Prism.logEvent(player,'newbuilding',{x:tile.x,y:tile.y,building:bid});
     } else if(buildPermit === -1) { // collision
@@ -1480,7 +1485,7 @@ GameServer.canBuild = function(bid,tile){
     return 1;
 };
 
-GameServer.build = function(player,bid,tile){
+GameServer.buildPlayerBuilding = function(player,bid,tile){
     var data = {
         x: tile.x,
         y: tile.y+1,
@@ -1523,6 +1528,18 @@ GameServer.finalizeBuilding = function(player,building){
     if(GameServer.buildingParameters.autobuild) building.setBuilt();
 };
 
+GameServer.buildCivBuilding = function(data){
+    var building = new Building(data);
+    var document = new GameServer.BuildingModel(building);
+    building.mongoID = document._id;
+    document.save(function (err) {
+        if (err) return console.error(err);
+        building.embed();
+        GameServer.setFlag('buildingsMarkers');
+    });
+    return building;
+};
+
 GameServer.listMarkers = function(markerType){
     var mapName = markerType+'Markers';
     if(!(mapName in GameServer)){
@@ -1553,6 +1570,7 @@ GameServer.listBuildingMarkers = function(instance){
     for(var bid in GameServer.buildings){
         var building = GameServer.buildings[bid];
         if(!building.isOfInstance(instance)) continue;
+        if(building.civ && !building.built) continue;
         var bld = building.mapTrim();
         list.push(bld);
     }
@@ -1888,12 +1906,9 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         individualGlobalPkg.removeEcho(player.id); // remove redundant information from multiple update sources
         individualGlobalPkg.filterInstance(player.instance);
         if(individualGlobalPkg.isEmpty()) individualGlobalPkg = null;
-        // if(individualGlobalPkg) console.warn(individualGlobalPkg.buildings);
 
         if(individualGlobalPkg === null
             && localPkg === null
-            // && !GameServer.nbConnectedChanged
-            // && !GameServer.fowChanged
             && !GameServer.anyFlag()
         ){
                 return;

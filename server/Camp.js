@@ -16,7 +16,7 @@ function Camp(id,center){
 
 Camp.prototype.spawnBuildings = function(buildings){
     buildings.forEach(function (bld) {
-        this.buildings.push(GameServer.addBuilding({
+        this.buildings.push(GameServer.buildCivBuilding({
             x: bld.x,
             y: bld.y,
             type: 1,
@@ -25,6 +25,10 @@ Camp.prototype.spawnBuildings = function(buildings){
             built: true
         }));
     }, this);
+
+    // loadBuildings() -> addBuilding() -> embed()
+    // build() -> finalizeBuilding() -> addBuilding() -> embed()
+    // civBuild() -> addBuilding -> embed()
 };
 
 Camp.prototype.save = function(){
