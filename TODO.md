@@ -49,14 +49,10 @@ World Building
 
 Bugs:
 - Server restarts after disconnect? Monitor closely
-- Items loaded before chunks
+- Items loaded before chunks (detect "behindness" differently?)
+- Come up with smoother silhouette for items
 - Can't find daydream in tutorial (plant icons are misleading)
-- Flicker tween issue
 Features:
-- Saving built status?!
-- Fix saving/loading of campID
-- Civ spawn behavior
-- Spawn based on buildings
 - Basic attack behavior + notifs thereof
 - Autorepair & rebuild of civ buildings
 - Missions menu (focused on enemy civ) + enhanced map menu

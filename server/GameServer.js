@@ -301,7 +301,6 @@ GameServer.loadRegions = function(){
  * @returns {Object} The created Building object
  */
 GameServer.addBuilding = function(data){
-    if(data.id == 4) console.warn('data:',data);
     var building = new Building(data);
     building.mongoID = data._id;
     building.embed();
@@ -591,15 +590,11 @@ GameServer.economyTurn = function(){
         zone.update();
     });
 
-    // GameServer.camps.forEach(function(camp){
-    //     camp.update();
-    // });
-
+    GameServer.updateEconomicEntities(GameServer.camps); // civ spawn
     GameServer.updateEconomicEntities(GameServer.buildings); // prod, build, ...
     GameServer.updateEconomicEntities(GameServer.players); // food, shelter ...
 
     if(GameServer.isTimeToUpdate('itemsRespawn')) GameServer.respawnItems();
-
 
     if(GameServer.elapsedTurns === GameServer.maxTurns) GameServer.elapsedTurns = 0;
 };
@@ -1540,6 +1535,7 @@ GameServer.buildCivBuilding = function(data){
     return building;
 };
 
+// TODO: filter some based on FoW
 GameServer.listMarkers = function(markerType){
     var mapName = markerType+'Markers';
     if(!(mapName in GameServer)){
@@ -1548,22 +1544,6 @@ GameServer.listMarkers = function(markerType){
     }
     return GameServer[markerType+'Markers']
 };
-
-// GameServer.listAnimalMarkers = function(){
-//     return GameServer.animalMarkers; // TODO: filter based on FoW
-// };
-
-// GameServer.listResourceMarkers = function(){
-//     return GameServer.resourceMarkers; // TODO: filter based on FoW
-// };
-
-// GameServer.listDeathMarkers = function(){
-//     return GameServer.deathMarkers; 
-// };
-
-// GameServer.listConflictMarkers = function(){
-//     return GameServer.conflictMarkers; 
-// };
 
 GameServer.listBuildingMarkers = function(instance){
     var list = [];
@@ -1593,18 +1573,32 @@ GameServer.addMarker = function(markerType,x,y){
     });
 };
 
-// GameServer.addDeathMarker = function(x,y){
-//     GameServer.deathMarkers.push([x,y]);
-//     if(GameServer.deathMarkers.length > 10) GameServer.deathMarkers.shift(); // TODO: conf
-//     GameServer.setFlag('deathMarkers');
-// };
 
-// GameServer.addConflictMarker = function(x,y){
-//     GameServer.conflictMarkers.push([x,y]);
-//     if(GameServer.conflictMarkers.length > 10) GameServer.conflictMarkers.shift(); // TODO: conf
-//     // GameServer.conflictMarkersChanged = true;
-//     GameServer.setFlag('conflictMarkers');
-// };
+GameServer.findNextFreeCell = function(x,y){
+    var stoppingCritetion = 100;
+    var counter = 0;
+    var queue = [];
+    queue.push({x:x,y:y});
+    var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
+    while(queue.length > 0){
+        var node = queue.shift();
+        if(!GameServer.checkCollision(node.x,node.y)) return node;
+
+        // expand
+        for(var i = 0; i < contour.length; i++){
+            var candidate = {
+                x: node.x + contour[i][0],
+                y: node.y + contour[i][1]
+            };
+            if(!GameServer.checkCollision(candidate.x,candidate.y)) return candidate;
+            queue.push(candidate);
+        }
+
+        counter++;
+        if(counter >= stoppingCritetion) break;
+    }
+    return null;
+};
 
 GameServer.handleRespawn = function(data,socketID){
     var player = GameServer.getPlayer(socketID);

@@ -33,8 +33,8 @@ var Tooltip = new Phaser.Class({
 
     updatePosition: function(x,y){
         this.setPosition(
-            x + 30,
-            y + 30
+            x + 25,
+            y + 25
         );
         if(this.x + this.computeWidth() > UI.getGameWidth()) this.x -= (this.computeWidth() + 30);
         if(this.y + this.computeHeight() > UI.getGameHeight()) this.y -= (this.computeHeight() + 30);

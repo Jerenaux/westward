@@ -31,43 +31,43 @@ Camp.prototype.spawnBuildings = function(buildings){
     // civBuild() -> addBuilding -> embed()
 };
 
-Camp.prototype.save = function(){
-    // if(!this.isOfInstance(-1)) return;
-    var this_ = this;
-    this.schemaModel.findById(this.mongoID, function (err, doc) { // this.model._id
-        if (err) throw err;
-        if(doc === null){
-            console.warn('Cannot save camp for id ',this_.mongoID);
-            return;
-        }
-
-        doc.set(_document);
-        doc.save(function (err) {
-            _document.dblocked = false;
-            if(err) throw err;
-            console.log('Camp saved');
-        });
-    });
-};
+// Camp.prototype.save = function(){
+//     // if(!this.isOfInstance(-1)) return;
+//     var this_ = this;
+//     this.schemaModel.findById(this.mongoID, function (err, doc) { // this.model._id
+//         if (err) throw err;
+//         if(doc === null){
+//             console.warn('Cannot save camp for id ',this_.mongoID);
+//             return;
+//         }
+//
+//         doc.set(_document);
+//         doc.save(function (err) {
+//             _document.dblocked = false;
+//             if(err) throw err;
+//             console.log('Camp saved');
+//         });
+//     });
+// };
 
 Camp.prototype.addBuilding = function(bld){
     this.buildings.push(bld);
 };
 
 Camp.prototype.update = function(){
-    return;
     if(!GameServer.isTimeToUpdate('camps')) return;
-
-    if(this.people.length < 10){ // TODO: variable camp parameter (size)
-        var hut = Utils.randomElement(this.buildings);
-        var pos = hut.getCenter(); // Use another method (getCenter is deprecated)
-        pos.y += 2;
-        var civ = GameServer.addCiv(pos.x,pos.y);
-        civ.setCamp(this);
-        this.people.push(civ);
+    if(this.people.length < 5){ // TODO: variable camp parameter (size)
+        // var bld = Utils.randomElement(this.buildings);
+        this.buildings.forEach(function(bld){
+            if(bld.isDestroyed()) return;
+            var pos = GameServer.findNextFreeCell(bld.x+2,bld.y+1);
+            var civ = GameServer.addCiv(pos.x,pos.y);
+            civ.setCamp(this);
+            this.people.push(civ);
+        },this);
     }
 
-    if(this.readyToRaid()) this.findTargets();
+    // if(this.readyToRaid()) this.findTargets();
 };
 
 Camp.prototype.readyToRaid = function(){

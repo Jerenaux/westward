@@ -72,7 +72,7 @@ function Building(data){
     this.setGold(data.gold || 0);
     this.built = !!data.built;
     this.civ = data.civ;
-    if(this.civ) this.campID = data.camp;
+    if(this.civ) this.campID = data.campID;
     if(this.civ) this.battleTeam = 'Civ';
     this.entityCategory = (this.civ ? 'CivBuilding' : 'PlayerBuilding');
 
@@ -112,7 +112,6 @@ function Building(data){
         'Civ': true,
         'PlayerBuilding': false
     };
-    if(this.id == 4) console.warn('built:',this.built);
 }
 
 Building.prototype = Object.create(FightingEntity.prototype);
@@ -120,10 +119,10 @@ Building.prototype.constructor = Building;
 
 Building.prototype.embed = function(){
     GameServer.buildings[this.id] = this;
-    if(this.campID) GameServer.camps[this.campID].addBuilding(this);
+    if(this.campID > -1) GameServer.camps[this.campID].addBuilding(this);
     this.setOrUpdateAOI();
     this.setCollisions('add');
-    this.updateBuild();
+    if(!this.civ) this.updateBuild();
 };
 
 Building.prototype.isInstanced = function(){

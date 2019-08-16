@@ -260,7 +260,7 @@ Player.prototype.die = function () {
 Player.prototype.setLocation = function(x, y){
     x = x || this.respawnLocation.x;
     y = y || this.respawnLocation.y;
-    var pos = this.findNextFreeCell(x,y);
+    var pos = GameServer.findNextFreeCell(x,y);
     x = pos.x;
     y = pos.y;
     this.setProperty('x', x);
