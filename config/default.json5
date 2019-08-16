@@ -4,7 +4,7 @@
         enabled: true,
         aggroRange: 12, // chebyshev distance; TODO: variable?
         battleRange: 3, // distance that can be travelled in one turn in battle; TODO: variable
-        freezeNPC: true,
+        freezeNPC: false,
         maxDamage: 10000,
         minDamage: 1,
         rangePenalty: 0.1, // accuracy penalty per tile
@@ -72,9 +72,9 @@
             aggro: 1500
     },
     civs: {
-        aggro: false,
+        aggro: true,
         wander: true,
-        raidMinimum: 8
+        raidMinimum: 3
     },
     wildlife: {
         aggro: false,

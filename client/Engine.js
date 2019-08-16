@@ -68,7 +68,7 @@ Engine.preload = function() {
     this.load.atlas('mapicons', 'assets/sprites/mapicons.png', 'assets/sprites/mapicons.json');
     this.load.atlas('battleicons', 'assets/sprites/battleicons.png', 'assets/sprites/battleicons.json');
     // this.load.atlas('trayicons', 'assets/sprites/trayicons.png', 'assets/sprites/trayicons.json');
-    this.load.atlas('aok', 'assets/sprites/buildingsicons.png', 'assets/sprites/buildingsicons.json');
+    this.load.atlas('buildingsicons', 'assets/sprites/buildingsicons.png', 'assets/sprites/buildingsicons.json');
 
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
@@ -258,17 +258,6 @@ Engine.create = function(){
     Engine.animalsData = Engine.scene.cache.json.get('animals');
     Engine.civsData = Engine.scene.cache.json.get('civs');
     Engine.itemsData = Engine.scene.cache.json.get('itemsData');
-
-    Engine.buildingIconsData = {};
-    for(var building in Engine.buildingsData){
-        var data = Engine.buildingsData[building];
-        Engine.buildingIconsData[building] = {
-            'atlas': 'aok',
-            'frame': data.icon,
-            'name': data.name,
-            'desc': data.desc
-        };
-    }
 
     Engine.createMarker();
     Engine.createAnimations();
@@ -1606,10 +1595,6 @@ Engine.makeCharacterMenu = function(){
     }
 
     var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
-
-    /*var commit = menu.addPanel('commit',new InventoryPanel(citizenx+10,citizeny,150,100,'',true));
-    commit.setInventory(Engine.player.commitTypes,3,false);
-    commit.setDataMap(Engine.buildingIconsData);*/
 
     //menu.addPanel('abilities',new Panel(citizenx,citizeny,citizenw,citizenh),true);
 

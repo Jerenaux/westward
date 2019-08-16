@@ -373,5 +373,9 @@ var Moving = new Phaser.Class({
             x: this.tileX + this.cellsWidth/2,//Math.floor(this.tileX + this.cellsWidth/2),
             y: this.tileY + this.cellsHeight/2//Math.floor(this.tileY + this.cellsHeight/2)
         };
+    },
+
+    isDead: function(){
+        return this.dead;
     }
 });

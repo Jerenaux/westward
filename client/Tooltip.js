@@ -71,8 +71,8 @@ var Tooltip = new Phaser.Class({
                 if(item.effects) this.setEffects(item.effects);
                 break;
             case 'NPC':
-                var npc = data.entityType == 'civ' ? Engine.civs[data.id] : Engine.animals[data.id];
-                var name = (npc.dead ? 'Dead ' : '')+npc.name;
+                var npc = data.type == 'civ' ? Engine.civs[data.id] : Engine.animals[data.id];
+                var name = (npc.isDead() ? 'Dead ' : '')+npc.name;
                 this.setTitle(name);
                 break;
             case 'slot':

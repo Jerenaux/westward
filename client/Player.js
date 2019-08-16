@@ -33,6 +33,11 @@ var Player = new Phaser.Class({
 
         this.orientationPin = new OrientationPin('player');
         this.flipPrint = false;
+
+        this.battleBoxData = {
+            'atlas':'faces',
+            'frame':0
+        }
     },
 
     setUp: function (data) {

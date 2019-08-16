@@ -64,7 +64,7 @@ var Building = new Phaser.Class({
         }
 
         this.battleBoxData = {
-            'atlas':'aok',
+            'atlas':'buildingsicons',
             'frame': buildingData.icon
         };
 

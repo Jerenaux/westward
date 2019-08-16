@@ -67,27 +67,40 @@ Camp.prototype.update = function(){
         },this);
     }
 
-    // if(this.readyToRaid()) this.findTargets();
+    if(this.readyToRaid()) this.findTarget();
 };
 
 Camp.prototype.readyToRaid = function(){
-    return this.people.length >= GameServer.civsParameters.raidMinimum;
+    var nbFreeCivs = 0;
+    for(var i = 0; i < this.people.length; i++){
+        var civ = this.people[i];
+        if(civ.isAvailableForTracking()) nbFreeCivs++;
+        if(nbFreeCivs >= GameServer.civsParameters.raidMinimum) return true;
+    }
+    return false;
 };
 
-Camp.prototype.findTargets = function(){
-    var targetPlayers = GameServer.settlements[this.targetSettlement].players;
-    if(targetPlayers.length == 0) return;
-    var player = Utils.randomElement(targetPlayers);
-    this.raid(player);
+Camp.prototype.findTarget = function(){
+    for(var playerID in GameServer.players){
+        var player = GameServer.players[playerID];
+        if(Utils.euclidean(this.center,player) < 200){ // TODO: conf
+            this.raid(player);
+            break;
+        }else{
+            console.log('player too far',Utils.euclidean(this.center,player));
+        }
+    }
 };
 
-Camp.prototype.raid = function(playerID){
-    console.log('raiding',playerID);
-    var player = GameServer.players[playerID];
-    for(var i = 0; i < 3; i++){ // TODO: config
-        var civ = Utils.randomElementRemoved(this.people);
-        if(!civ) break;
-        civ.setTrackedTarget(player);
+Camp.prototype.raid = function(player){
+    var sent = 0;
+    for(var i = 0; i < this.people.length; i++) {
+        var civ = this.people[i];
+        if(civ.isAvailableForTracking()) {
+            civ.setTrackedTarget(player);
+            sent++;
+        }
+        if(sent >= GameServer.civsParameters.raidMinimum) return;
     }
 };
 
@@ -100,7 +113,7 @@ Camp.prototype.remove = function(civ){
     }
 };
 
-Camp.prototype.selectionTrim = function(){
+/*Camp.prototype.selectionTrim = function(){
     var trimmed = {};
     var broadcastProperties = ['id','name','pop','surplus','desc','level'];
     for(var p = 0; p < broadcastProperties.length; p++){
@@ -110,6 +123,6 @@ Camp.prototype.selectionTrim = function(){
     trimmed.y = (this.fort.y-10)/World.worldHeight;
     trimmed.buildings = this.buildings.length;
     return trimmed;
-};
+};*/
 
 module.exports.Camp = Camp;

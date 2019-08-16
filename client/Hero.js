@@ -18,10 +18,6 @@ let Hero = new Phaser.Class({
         this.buildRecipes = new Inventory(7);
         this.craftRecipes = new Inventory(100);
 
-        this.battleBoxData = {
-            'atlas':'orientation',
-            'frame':'animal_icon'
-        }
     },
 
     setUp: function(data){

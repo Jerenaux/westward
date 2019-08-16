@@ -224,9 +224,19 @@ NPC.prototype.updateWander = function(){
 };
 
 NPC.prototype.setTrackedTarget = function(target){
+    console.log('Civ ',this.id+' tracking ',target.id);
     this.trackedTarget = target;
     this.idle = false;
 };
+
+NPC.prototype.isTracking = function(){
+    return (this.trackedTarget != null);
+};
+
+NPC.prototype.isAvailableForTracking = function(){
+    return !this.isTracking() && this.isAvailableForFight();
+};
+
 
 NPC.prototype.updateTracking = function(){
     if(this.moving || this.isInFight() || this.isDead()) return;

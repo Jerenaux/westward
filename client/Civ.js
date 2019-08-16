@@ -34,6 +34,11 @@ var Civ = new Phaser.Class({
         this.setFrame(this.restingFrames.right,false,false);
         this.setOrigin(0.2,0.5);
 
+        this.battleBoxData = {
+            'atlas': 'faces',
+            'frame': 2
+        };
+
         var shape = new Phaser.Geom.Polygon([20,15,50,15,50, 60, 20, 60]);
         this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
 

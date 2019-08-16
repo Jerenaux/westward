@@ -208,7 +208,7 @@ BuildSlot.prototype.addIngredients = function(){
 BuildSlot.prototype.setUp = function(bld){
     if(!this.displayed) console.warn('Setting up slot before displaying it');
     var bldData = Engine.buildingsData[bld];
-    this.icon.setTexture('aok',bldData.icon);
+    this.icon.setTexture('buildingsicons',bldData.icon);
     this.name.setText(bldData.name);
     this.desc = bldData.desc;
     this.bldID = bld;

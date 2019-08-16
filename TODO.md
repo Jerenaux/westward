@@ -53,7 +53,10 @@ Bugs:
 - Come up with smoother silhouette for items
 - Can't find daydream in tutorial (plant icons are misleading)
 Features:
-- Basic attack behavior + notifs thereof
+- Fix battle areas when civ aggro
+- test aggro with tower in the way
+- Notif when own building attacked
+- Reduce camp update rate
 - Autorepair & rebuild of civ buildings
 - Missions menu (focused on enemy civ) + enhanced map menu
 -> Need for visual indicators + numerical ones
