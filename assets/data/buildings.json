@@ -11,6 +11,7 @@
     "depthOffset": 2,
     "canFight": false,
     "stats": {
+      "def": 20,
       "health": 500
     }
   },
@@ -31,7 +32,9 @@
     "aggro": true,
     "stats": {
       "health": 2500,
-      "dmg": 8
+      "dmg": 8,
+      "def": 40,
+      "acc": 1000
     },
     "shootFrom":{
       "x":66,
@@ -54,7 +57,8 @@
     "depthOffset": 2,
     "canFight": false,
     "stats": {
-      "health": 700
+      "health": 700,
+      "def": 20
     }
   },
   "4":{
@@ -73,7 +77,8 @@
     "depthOffset": 2,
     "canFight": false,
     "stats": {
-      "health": 500
+      "health": 500,
+      "def": 20
     }
   },
   "6":{
@@ -92,7 +97,8 @@
     "production": [[3,1,60,5],[7,5,60,5]],
     "canFight": false,
     "stats": {
-      "health": 200
+      "health": 200,
+      "def": 20
     }
   },
   "11":{
@@ -111,7 +117,8 @@
     "depthOffset": 2,
     "canFight": false,
     "stats": {
-      "health": 500
+      "health": 500,
+      "def": 20
     },
     "shelter": true,
     "locked":true,

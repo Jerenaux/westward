@@ -25,7 +25,8 @@ World Building
 
 ## Misc TODO
 - Adapt animations and delays for firearms
-- Update Westward main page
+- At some point, compute vigor for Civs, own inventories etc.
+- Update Westward main page + trailer
 - Change battle priority when player joins fight
 - In battle against NPC, have players have turns much more often
 - Make tiles above battle tiles transparent; same with buildings in fight?
@@ -52,11 +53,8 @@ Bugs:
 - Items loaded before chunks (detect "behindness" differently?)
 - Come up with smoother silhouette for items
 - Can't find daydream in tutorial (plant icons are misleading)
-Features:
 - Fix battle areas when civ aggro
-- test aggro with tower in the way
-- Notif when own building attacked
-- Reduce camp update rate
+Features:
 - Autorepair & rebuild of civ buildings
 - Missions menu (focused on enemy civ) + enhanced map menu
 -> Need for visual indicators + numerical ones

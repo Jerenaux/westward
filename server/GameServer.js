@@ -561,7 +561,7 @@ GameServer.setUpdateLoops = function(){
  */
 GameServer.startEconomy = function(){
     GameServer.economyTurns = config.get('economyCycles.turns');
-    GameServer.elapsedTurns = 0;
+    GameServer.elapsedTurns = -1; // start at -1 since  `GameServer.economyTurn()` is called straight away and increments counter
     var maxDuration = 0;
     for(var event in GameServer.economyTurns){
         var duration = GameServer.economyTurns[event];
@@ -584,7 +584,7 @@ GameServer.startEconomy = function(){
  */
 GameServer.economyTurn = function(){
     GameServer.elapsedTurns++;
-    if(!GameServer.elapsedTurns%10) console.log('Turn',GameServer.elapsedTurns);
+    // if(!GameServer.elapsedTurns%10) console.log('Turn',GameServer.elapsedTurns);
 
     GameServer.spawnZones.forEach(function(zone){
         zone.update();
@@ -616,7 +616,6 @@ GameServer.updateEconomicEntities = function(entities){
  * number of turns in `GameServer.economyTurns`.
  * @returns {boolean} Whether or not enough turns have elapsed.
  * */
-// TODO: deprecated? Remove?
 GameServer.isTimeToUpdate = function(event){
     return (GameServer.elapsedTurns%GameServer.economyTurns[event] === 0);
 };
@@ -1064,7 +1063,7 @@ GameServer.destroyItem = function(item,nb,source){
  * @param {Player|NPC} attacked - The other entity starting the battle.
  */
 GameServer.handleBattle = function(attacker,attacked){
-    console.warn(attacker.getShortID(),'vs',attacked.getShortID());
+    console.log(attacker.getShortID(),'vs',attacked.getShortID());
     if(!GameServer.enableBattles){
         if(attacker.isPlayer) attacker.addMsg('Battles are disabled at the moment');
         return false;
@@ -1097,6 +1096,9 @@ GameServer.handleBattle = function(attacker,attacked){
         var foe = (attacker.isPlayer ? attacked : attacker);
         Prism.logEvent(player,'battle',{category:foe.entityCategory,type:foe.type});
     }
+    if(attacked.isPlayer) attacked.addNotif('You were attacked by '+attacker.name);
+    if(attacker.isPlayer) attacker.addNotif('You attacked '+attacker.name);
+    if(attacked.entityCategory == 'PlayerBuilding') GameServer.notifyPlayer(attacked.owner,'Your '+attacked.name+' was attacked by '+attacker.name);
     return true;
 };
 
@@ -1109,7 +1111,7 @@ GameServer.handleBattle = function(attacker,attacked){
  * @returns {Array} The list of battle cells coordinates ({x,y} objects)
  */
 GameServer.computeBattleArea = function(f1,f2,depth){
-    var MAX_DEPTH = depth || 2;
+    var MAX_DEPTH = depth || 3; // TODO: conf
     var cells = new SpaceMap();
     var fs = [f1,f2];
     fs.forEach(function(f){
@@ -1118,7 +1120,11 @@ GameServer.computeBattleArea = function(f1,f2,depth){
     });
 
     var queue = [];
-
+    // if(f1.isCiv){
+    //     console.warn('civ battle debug');
+    //     console.warn(f1.getShortID(),f1.getLocationCenter());
+    //     console.warn(f2.getShortID(),f2.getLocationCenter());
+    // }
     var path = GameServer.findPath(f1.getLocationCenter(),f2.getLocationCenter());  // Reminder: a default length limit is built-in the pathfinder
     if(!path || path.length === 0) {
         console.warn('No path to target');

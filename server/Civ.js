@@ -25,7 +25,7 @@ function Civ(x,y,type){
     this.cellsHeight = civData.height || 1;
 
     this.xpReward = civData.xp || 0;
-    this.name = 'Enemy';
+    this.name = civData.name;
     this.setAggressive();
     this.setStartingStats(civData.stats);
     this.setLoot(civData.loot);

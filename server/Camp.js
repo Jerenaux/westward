@@ -21,7 +21,7 @@ Camp.prototype.spawnBuildings = function(buildings){
             y: bld.y,
             type: 1,
             civ: true,
-            camp: this.id,
+            campID: this.id,
             built: true
         }));
     }, this);
@@ -83,11 +83,11 @@ Camp.prototype.readyToRaid = function(){
 Camp.prototype.findTarget = function(){
     for(var playerID in GameServer.players){
         var player = GameServer.players[playerID];
-        if(Utils.euclidean(this.center,player) < 200){ // TODO: conf
+        if(player.isAvailableForFight() && Utils.euclidean(this.center,player) < 200){ // TODO: conf
             this.raid(player);
             break;
         }else{
-            console.log('player too far',Utils.euclidean(this.center,player));
+            console.log('player too far or unavailable (d=',Utils.euclidean(this.center,player),')');
         }
     }
 };

@@ -94,9 +94,8 @@ function Building(data){
     this.stats = new StatsContainer();
     this.getStat('hp').setBaseValue(buildingData.stats.health,true); // true = force
     this.getStat('hpmax').setBaseValue(buildingData.stats.health);
-    // TODO: move to JSON
-    this.getStat('def').setBaseValue(20);
-    this.getStat('acc').setBaseValue(1000);
+    this.getStat('def').setBaseValue(buildingData.stats.def);
+    this.getStat('acc').setBaseValue(buildingData.stats.acc || 0);
     this.getStat('dmg').setBaseValue(buildingData.stats.dmg || 0);
 
     if(data.stats) {
@@ -112,6 +111,7 @@ function Building(data){
         'Civ': true,
         'PlayerBuilding': false
     };
+    if(this.id == 4) console.warn('built:',this.built);
 }
 
 Building.prototype = Object.create(FightingEntity.prototype);
@@ -119,6 +119,7 @@ Building.prototype.constructor = Building;
 
 Building.prototype.embed = function(){
     GameServer.buildings[this.id] = this;
+    // console.warn('campID:',this.campID);
     if(this.campID > -1) GameServer.camps[this.campID].addBuilding(this);
     this.setOrUpdateAOI();
     this.setCollisions('add');
@@ -253,7 +254,7 @@ Building.prototype.setBuilt = function(){
     this.stats['hp'].setBaseValue(this.stats['hpmax'].getValue());
     this.refreshStats();
     this.save();
-    var phrase = ['Construction of ',GameServer.buildingsData[this.type].name,' finished'];
+    var phrase = ['Construction of ',this.name,' finished'];
     GameServer.notifyPlayer(this.owner,phrase.join(' '));
 };
 
@@ -483,7 +484,11 @@ Building.prototype.die = function(){
 };
 
 Building.prototype.destroy = function(){
-    if(this.civ) GameServer.setFlag('buildingsMarkers');
+    if(this.civ){
+        GameServer.setFlag('buildingsMarkers');
+    }else{
+        GameServer.notifyPlayer(this.owner,'Your '+this.name+' was destroyed');
+    }
     this.save();
 };
 
