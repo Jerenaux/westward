@@ -64,8 +64,8 @@ function LegendPanel(x,y,width,height,title){
         {icon:'bld2own',text:'Your buildings'},
         {icon:'herb',text:'Plants'},
         {icon:'wolf',text:'Animal spots'},
-        {icon:'swords',text:'Recent battles'},
-        {icon:'skull',text:'Recent deaths'},
+        {icon:'swords',text:'Civ encounters'},
+        {icon:'skull',text:'Deaths'},
     ];
 
     var x = 20;

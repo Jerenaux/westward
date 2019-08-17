@@ -39,6 +39,7 @@ World Building
 - add esc shortcut
 - "new" marker
 - Events formatting
+- Autorepair & rebuild of civ buildings
 - Make size of tutorial boxes adapt to text
 - No decimal in defaut prices (happens in one lumber camp)
 - Ability: display threat level in animal tooltip
@@ -55,12 +56,12 @@ Bugs:
 - Can't find daydream in tutorial (plant icons are misleading)
 - Fix battle areas when civ aggro
 Features:
-- Autorepair & rebuild of civ buildings
+- Update frontier when building change
 - Missions menu (focused on enemy civ) + enhanced map menu
 -> Need for visual indicators + numerical ones
--> Frontier, semi-permanent camp markers (always visible once discovered)
+- semi-permanent camp markers (always visible once discovered)
+- Frontier
 - Update attack and patrol behavior accordingly
--> Use battle marker only for civ encounters?
 -> Quantify resources nodes on the right side of frontier, 
 production capacity (based on # buildings of a given time) / some kind of "GDP",
 bell alarm when attack nearby, bodies behind, log of recent civ-related events
@@ -77,27 +78,42 @@ fitting more in backpack, more actions per turn, ... (not so for "boolean" effec
 
 Quests:
 "enemy civ is gonna attack in x days, you should produce x many swords, do this and that..."
-Collective missions
-
-On top of ebb and flow of frontier warfare
-
+Collective missions (on top of ebb and flow of frontier warfare)
 Rivalry between regions
 
 
 María:
 - Bld icons for enemy civ
 - Wolf anim (walk, attack, die w/ & w/o arrows)
+- Carcass, blood-tainted grass
 - Bear anim (walk, attack, die w/ & w/o arrows)
-- Player anim (naked?)
+- Player anim naked
 -> Look into superimposing equipment programmatically
-Further: body emotes, pick up anim, more wildlife, then UI improvements, then diagonal movements...
+-> One basic player overlay for all
+-> Civs are similar but with different overlays
+- Make overlays based on actual game items
+- Vary Civ overlays
+- Add "pick up", "look at map", "check in bag" ... anims
+- UI improvements
+- Wear and tear and wounds
+- Add taunts and emotes anims
+- More wildlife
+- Diagonal movements 
 
 Sérgio:
 - New Civ huts/cabins
 - More civ buidings (e.g. towers)
 - Basic cliffs
 - Mines
-- Differentiate under construction/destroyed, multiple construction stages...
+- Differentiate under construction/destroyed
+- Multiple construction stages,
+- Multiple building levels...
+
+Crafting:
+- Multiply variants of functional items (weapons, storage, ability-related...)
+- Distinguish animal pelts and animal leathers
+- Each basic material (plant, pelt, mineral...) must have multiple uses
+
 
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email

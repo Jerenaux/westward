@@ -33,7 +33,7 @@
     "stats": {
       "health": 2500,
       "dmg": 8,
-      "def": 40,
+      "def": 30,
       "acc": 1000
     },
     "shootFrom":{

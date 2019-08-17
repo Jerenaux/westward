@@ -491,7 +491,8 @@ Battle.prototype.end = function () {
         if (f.isPlayer) f.notifyFight(false);
     });
     this.cleanUp();
-    GameServer.addMarker((this.casualties ? 'death' : 'conflict'),this.center.x,this.center.y);
+    // GameServer.addMarker((this.casualties ? 'death' : 'conflict'),this.center.x,this.center.y);
+    if(this.casualties) GameServer.addMarker('death',this.center.x,this.center.y);
     console.log('[B' + this.id + '] Ended');
 };
 

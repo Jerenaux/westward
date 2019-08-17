@@ -71,6 +71,7 @@ var Map = new Phaser.Class({
         */
 
         this.pins = [];
+        this.dash = [];
         this.resetCounter();
         this.clickedTile = null;
     },
@@ -223,6 +224,11 @@ var Map = new Phaser.Class({
         return this.pins[this.pinsCounter++];
     },
 
+    getNextDash: function(){
+        if(this.dashCounter >= this.dash.length) this.dash.push(UI.scene.add.line(0, 0, 0,0, 0, 0, 0xff0000));
+        return this.dash[this.dashCounter++];
+    },
+
     // Maps a tile coordinate to px coordinate on the map
     computeMapLocation: function(tx,ty){
         var dx = (tx*2 - this.displayOriginX)*this.scaleX;
@@ -241,9 +247,23 @@ var Map = new Phaser.Class({
         return pin;
     },
 
+    addDash: function(fx,fy,tx,ty){
+        var from = this.computeMapLocation(fx,fy);
+        var to = this.computeMapLocation(tx,ty);
+        var dash = this.getNextDash();
+        dash.setTo(from.x, from.y, to.x,to.y);
+        dash.setOrigin(0);
+        dash.setScrollFactor(0);
+        dash.setDepth(2);
+        dash.setVisible(true);
+        this.displayedDash.push(dash);
+    },
+
     resetCounter: function(){
         this.pinsCounter = 0;
+        this.dashCounter = 0;
         this.displayedPins = [];
+        this.displayedDash = [];
     },
 
     getZoomBtn: function(mode){
@@ -366,12 +386,54 @@ var Map = new Phaser.Class({
         // this.setInputArea();
         this.positionToponyms();
         this.computeDragLimits();
-        if(!this.minimap) this.applyFogOfWar();
+        if(!this.minimap){
+            this.applyFogOfWar();
+            this.displayFrontier();
+        }
 
         this.displayPins();
         this.setVisible(true);
         this.displayed = true;
         // if(!this.minimap) this.getZoomBtn('out').disable();
+    },
+
+    displayFrontier: function(){
+        var frontier = [
+            {
+                a:{
+                    x: 518,
+                    y: 565,
+                },
+                b:{
+                    x: 518,
+                    y: 690
+                }
+            }
+        ];
+
+        // TODO: move to Utils
+        function computeSpeed(angle){ // return unit speed vector given an angle
+            return {
+                x: Math.cos(angle),
+                y: -Math.sin(angle)
+            }
+        }
+
+        frontier.forEach(function(edge){
+            var angle = -Phaser.Math.Angle.Between(edge.a.x,edge.a.y,edge.b.x,edge.b.y);
+            var speed = computeSpeed(angle);
+            var length = 8;
+            var gap = 4;
+            var size = length + gap;
+            var nb = Phaser.Math.Distance.Between(edge.a.x,edge.a.y,edge.b.x,edge.b.y)/size;
+            var pt = {x:edge.a.x, y:edge.a.y};
+            for(var c = 0; c < nb; c++){
+                //TODO: pool
+                this.addDash(pt.x,pt.y,pt.x+(length*speed.x),pt.y+(length*speed.y));
+                pt.x += size*speed.x;
+                pt.y += size*speed.y;
+            }
+        },this);
     },
 
     displayPins: function(){
@@ -425,6 +487,9 @@ var Map = new Phaser.Class({
     },
 
     hide: function(){
+        this.displayedDash.forEach(function(p){
+            p.setVisible(false);
+        });
         this.hidePins();
         this.toponyms.forEach(function(t){
             t.setVisible(false);
@@ -448,6 +513,97 @@ var Pin = new Phaser.Class({
 
     initialize: function Pin (map) {
         CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
+        this.setDepth(2);
+        this.setScrollFactor(0);
+        this.setVisible(false);
+        this.setInteractive();
+        this.parentMap = map;
+        this.on('pointerover',this.handleOver.bind(this));
+        this.on('pointerout',this.handleOut.bind(this));
+    },
+
+    setUp: function(tileX,tileY,x,y,name,frame,alwaysOn){
+        this.setOrigin(0.5);
+        this.setFrame(frame);
+        this.alwaysOn = alwaysOn;
+
+        this.tileX = tileX;
+        this.tileY = tileY;
+        this.setDepth(this.depth + this.tileY/1000); // /1000 to avoid appearing above tooltip
+        this.setPosition(x,y);
+        this.name = name;
+        this.setVisibility();
+    },
+
+    setVisibility: function(){
+        // If on minimap, display straight away if within rect; if in big map, display only if not within FoW
+        if(this.parentMap.viewRect.contains(this.x,this.y)){
+            if(this.parentMap.minimap){
+                this.setVisible(true);
+            }else{
+                if(this.alwaysOn) this.setVisible(true);
+                for(var i = 0; i < Engine.player.FoW.length; i++){
+                    var rect = Engine.player.FoW[i];
+                    var rect_ = new Phaser.Geom.Rectangle(
+                        rect.x - 10,
+                        rect.y - 10,
+                        rect.width + 20,
+                        rect.height + 20
+                    ); // Hack not to miss markers on fringes of fog
+                    if(rect_.contains(this.tileX,this.tileY)){
+                        this.setVisible(true);
+                        return;
+                    }
+                }
+                this.setVisible(false);
+            }
+        }else{
+            this.setVisible(false);
+        }
+    },
+
+    highlight: function(){
+        //this.setTexture('redpin');
+    },
+
+    unhighlight: function(){
+        //this.setTexture('pin');
+    },
+
+    focus: function(){
+        this.parentMap.focus(this.x,this.y);
+    },
+
+    reposition: function(){
+        var location = this.parentMap.computeMapLocation(this.tileX,this.tileY);
+        this.setPosition(location.x,location.y);
+        this.setVisibility();
+    },
+
+    handleOver: function(){
+        if(!this.parentMap.viewRect.contains(this.x,this.y)) return;
+        UI.tooltip.updateInfo('free',{title:this.name});
+        UI.tooltip.display();
+        console.log(this.tileX,this.tileY);
+    },
+
+    handleOut: function(){
+        UI.tooltip.hide();
+    },
+
+    hide: function(){
+        this.setVisible(false);
+    }
+});
+
+var Dash = new Phaser.Class({
+
+    Extends: Phaser.GameObjects.Line,
+
+    initialize: function Dash (map) {
+        Phaser.GameObjects.Line.call(this, UI.scene, 0, 0, 0, 0, 0xff0000);
+        UI.scene.add.displayList.add(this);
+        UI.scene.add.updateList.add(this);
         this.setDepth(2);
         this.setScrollFactor(0);
         this.setVisible(false);

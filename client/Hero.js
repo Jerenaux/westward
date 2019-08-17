@@ -31,6 +31,7 @@ let Hero = new Phaser.Class({
         this.deathMarkers = [];
         this.conflictMarkers = [];
         this.FoW = [];
+        this.frontier = [];
         this.inventory = new Inventory();
         this.belt = new Inventory(3); //TODO: conf
         this.stats = new StatsContainer();
@@ -70,6 +71,7 @@ let Hero = new Phaser.Class({
             'deathMarkers': this.updateDeathMarkers,
             'equipment': this.updateEquipment,
             'fow': this.updateFoW,
+            'frontier': this.updateFrontier,
             'gold': this.updateGold,
             'history': this.updateHistory,
             'inBuilding': this.updateBuilding,
@@ -301,6 +303,10 @@ let Hero = new Phaser.Class({
                     World.chunkHeight)
             );
         },this);
+    },
+
+    updateFrontier: function(frontier){
+        this.frontier = frontier;
     },
 
     updateGold: function(gold){

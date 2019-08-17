@@ -7,6 +7,7 @@ var clone = require('clone'); // used to clone objects, essentially used for clo
 var ObjectId = require('mongodb').ObjectID;
 var mongoose = require('mongoose');
 var config = require('config');
+var Voronoi = require('voronoi');
 
 var GameServer = {
     lastPlayerID: 0,
@@ -319,6 +320,7 @@ GameServer.loadBuildings = function(){
     GameServer.BuildingModel.find(function (err, buildings) {
         if (err) return console.log(err);
         buildings.forEach(GameServer.addBuilding);
+        GameServer.computeFrontier(); // TODO: remove
         GameServer.updateStatus();
     });
 };
@@ -1099,6 +1101,7 @@ GameServer.handleBattle = function(attacker,attacked){
     if(attacked.isPlayer) attacked.addNotif('You were attacked by '+attacker.name);
     if(attacker.isPlayer) attacker.addNotif('You attacked '+attacker.name);
     if(attacked.entityCategory == 'PlayerBuilding') GameServer.notifyPlayer(attacked.owner,'Your '+attacked.name+' was attacked by '+attacker.name);
+    if(attacked.isCiv || attacker.isCiv) GameServer.addMarker('conflict',attacked.x,attacked.y);
     return true;
 };
 
@@ -1840,6 +1843,38 @@ GameServer.computeFoW = function(){
         fow.push(aoi);
     }
     return fow;
+};
+
+GameServer.computeFrontier = function(){
+    GameServer.frontier = [];
+    var sites = [];
+    for(var bldID in GameServer.buildings){
+        var bld = GameServer.buildings[bldID];
+        sites.push({
+            x: bld.x,
+            y: bld.y,
+            t: (bld.civ ? 'r' : 'b')
+        });
+    }
+
+    var voronoi = new Voronoi();
+    var bbox = {xl: 0, xr: World.worldWidth, yt: 0, yb: World.worldHeight}; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
+    var diagram = voronoi.compute(sites, bbox);
+    diagram.edges.forEach(function(edge){
+        if(!edge.lSite || !edge.rSite) return;
+        if(edge.lSite.t == edge.rSite.t) return;
+        GameServer.frontier.push({
+            a:{
+                x: edge.va.x,
+                y: edge.va.y
+            },
+            b:{
+                x: edge.vb.x,
+                y: edge.vb.y
+            }
+        });
+    },this);
+    console.warn('frontier:',GameServer.frontier);
 };
 
 /**

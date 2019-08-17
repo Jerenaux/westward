@@ -749,6 +749,7 @@ Player.prototype.applyEffect = function (stat, delta, notify) {
 
 Player.prototype.getWorldInformation = function(){
     this.setOwnProperty('fow',GameServer.fowList);
+    this.setOwnProperty('frontier',GameServer.frontier);
     this.setOwnProperty('buildingMarkers', GameServer.listBuildingMarkers(this.instance));
     this.setOwnProperty('resourceMarkers',  GameServer.listMarkers('resource').concat(this.extraMarkers));
     this.setOwnProperty('animalMarkers', GameServer.listMarkers('animal'));

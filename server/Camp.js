@@ -56,18 +56,24 @@ Camp.prototype.addBuilding = function(bld){
 
 Camp.prototype.update = function(){
     if(!GameServer.isTimeToUpdate('camps')) return;
-    if(this.people.length < 5){ // TODO: variable camp parameter (size)
-        // var bld = Utils.randomElement(this.buildings);
-        this.buildings.forEach(function(bld){
-            if(bld.isDestroyed()) return;
-            var pos = GameServer.findNextFreeCell(bld.x+2,bld.y+1);
-            var civ = GameServer.addCiv(pos.x,pos.y);
-            civ.setCamp(this);
-            this.people.push(civ);
-        },this);
-    }
+
+    this.buildings.forEach(function(bld){
+        if(bld.isDestroyed()) return;
+        // TODO: variable camp parameter (size)
+        if(this.people.length < 5) this.spawnCiv(bld);
+        // TODO: add auto-repair
+    },this);
+
+    // TODO: add auto-heal of civs
 
     if(this.readyToRaid()) this.findTarget();
+};
+
+Camp.prototype.spawnCiv = function(bld){
+    var pos = GameServer.findNextFreeCell(bld.x + 2, bld.y + 1);
+    var civ = GameServer.addCiv(pos.x, pos.y);
+    civ.setCamp(this);
+    this.people.push(civ);
 };
 
 Camp.prototype.readyToRaid = function(){
