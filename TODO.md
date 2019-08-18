@@ -56,6 +56,7 @@ Bugs:
 - Can't find daydream in tutorial (plant icons are misleading)
 - Fix battle areas when civ aggro
 Features:
+- Extrude default cursor
 - Update frontier when building change
 - Missions menu (focused on enemy civ) + enhanced map menu
 -> Need for visual indicators + numerical ones
@@ -85,6 +86,7 @@ Rivalry between regions
 María:
 - Bld icons for enemy civ
 - Wolf anim (walk, attack, die w/ & w/o arrows)
+- Color variations of wolf
 - Carcass, blood-tainted grass
 - Bear anim (walk, attack, die w/ & w/o arrows)
 - Player anim naked
@@ -111,7 +113,7 @@ Sérgio:
 
 Crafting:
 - Multiply variants of functional items (weapons, storage, ability-related...)
-- Distinguish animal pelts and animal leathers
+- Distinguish animal pelts and animal leathers, also based on color
 - Each basic material (plant, pelt, mineral...) must have multiple uses
 
 

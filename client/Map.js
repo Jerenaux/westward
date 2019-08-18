@@ -225,7 +225,8 @@ var Map = new Phaser.Class({
     },
 
     getNextDash: function(){
-        if(this.dashCounter >= this.dash.length) this.dash.push(UI.scene.add.line(0, 0, 0,0, 0, 0, 0xff0000));
+        // if(this.dashCounter >= this.dash.length) this.dash.push(UI.scene.add.line(0, 0, 0,0, 0, 0, 0xff0000));
+        if(this.dashCounter >= this.dash.length) this.dash.push(new Dash(this));
         return this.dash[this.dashCounter++];
     },
 
@@ -240,22 +241,17 @@ var Map = new Phaser.Class({
     },
 
     addPin: function(x,y,name,frame,alwaysOn){
-        var location = this.computeMapLocation(x,y);
+        // var location = this.computeMapLocation(x,y);
         var pin = this.getNextPin();
-        pin.setUp(x,y,location.x,location.y,name,frame,alwaysOn);
+        // pin.setUp(x,y,location.x,location.y,name,frame,alwaysOn);
+        pin.setUp(x,y,name,frame,alwaysOn);
         this.displayedPins.push(pin);
         return pin;
     },
 
     addDash: function(fx,fy,tx,ty){
-        var from = this.computeMapLocation(fx,fy);
-        var to = this.computeMapLocation(tx,ty);
         var dash = this.getNextDash();
-        dash.setTo(from.x, from.y, to.x,to.y);
-        dash.setOrigin(0);
-        dash.setScrollFactor(0);
-        dash.setDepth(2);
-        dash.setVisible(true);
+        dash.setUp(fx,fy,tx,ty);
         this.displayedDash.push(dash);
     },
 
@@ -411,24 +407,15 @@ var Map = new Phaser.Class({
             }
         ];
 
-        // TODO: move to Utils
-        function computeSpeed(angle){ // return unit speed vector given an angle
-            return {
-                x: Math.cos(angle),
-                y: -Math.sin(angle)
-            }
-        }
-
         frontier.forEach(function(edge){
             var angle = -Phaser.Math.Angle.Between(edge.a.x,edge.a.y,edge.b.x,edge.b.y);
-            var speed = computeSpeed(angle);
+            var speed = Utils.computeSpeed(angle);
             var length = 8;
             var gap = 4;
             var size = length + gap;
             var nb = Phaser.Math.Distance.Between(edge.a.x,edge.a.y,edge.b.x,edge.b.y)/size;
             var pt = {x:edge.a.x, y:edge.a.y};
             for(var c = 0; c < nb; c++){
-                //TODO: pool
                 this.addDash(pt.x,pt.y,pt.x+(length*speed.x),pt.y+(length*speed.y));
                 pt.x += size*speed.x;
                 pt.y += size*speed.y;
@@ -507,34 +494,7 @@ var Map = new Phaser.Class({
     }
 });
 
-var Pin = new Phaser.Class({
-
-    Extends: CustomSprite,
-
-    initialize: function Pin (map) {
-        CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
-        this.setDepth(2);
-        this.setScrollFactor(0);
-        this.setVisible(false);
-        this.setInteractive();
-        this.parentMap = map;
-        this.on('pointerover',this.handleOver.bind(this));
-        this.on('pointerout',this.handleOut.bind(this));
-    },
-
-    setUp: function(tileX,tileY,x,y,name,frame,alwaysOn){
-        this.setOrigin(0.5);
-        this.setFrame(frame);
-        this.alwaysOn = alwaysOn;
-
-        this.tileX = tileX;
-        this.tileY = tileY;
-        this.setDepth(this.depth + this.tileY/1000); // /1000 to avoid appearing above tooltip
-        this.setPosition(x,y);
-        this.name = name;
-        this.setVisibility();
-    },
-
+var MapMarker = new Phaser.Class({
     setVisibility: function(){
         // If on minimap, display straight away if within rect; if in big map, display only if not within FoW
         if(this.parentMap.viewRect.contains(this.x,this.y)){
@@ -562,33 +522,10 @@ var Pin = new Phaser.Class({
         }
     },
 
-    highlight: function(){
-        //this.setTexture('redpin');
-    },
-
-    unhighlight: function(){
-        //this.setTexture('pin');
-    },
-
-    focus: function(){
-        this.parentMap.focus(this.x,this.y);
-    },
-
     reposition: function(){
         var location = this.parentMap.computeMapLocation(this.tileX,this.tileY);
         this.setPosition(location.x,location.y);
         this.setVisibility();
-    },
-
-    handleOver: function(){
-        if(!this.parentMap.viewRect.contains(this.x,this.y)) return;
-        UI.tooltip.updateInfo('free',{title:this.name});
-        UI.tooltip.display();
-        console.log(this.tileX,this.tileY);
-    },
-
-    handleOut: function(){
-        UI.tooltip.hide();
     },
 
     hide: function(){
@@ -596,15 +533,15 @@ var Pin = new Phaser.Class({
     }
 });
 
-var Dash = new Phaser.Class({
+var Pin = new Phaser.Class({
 
-    Extends: Phaser.GameObjects.Line,
+    Extends: CustomSprite,
 
-    initialize: function Dash (map) {
-        Phaser.GameObjects.Line.call(this, UI.scene, 0, 0, 0, 0, 0xff0000);
-        UI.scene.add.displayList.add(this);
-        UI.scene.add.updateList.add(this);
-        this.setDepth(2);
+    Mixins: [MapMarker],
+
+    initialize: function Pin (map) {
+        CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
+        // this.setDepth(2);
         this.setScrollFactor(0);
         this.setVisible(false);
         this.setInteractive();
@@ -613,61 +550,18 @@ var Dash = new Phaser.Class({
         this.on('pointerout',this.handleOut.bind(this));
     },
 
-    setUp: function(tileX,tileY,x,y,name,frame,alwaysOn){
+    setUp: function(tileX,tileY,name,frame,alwaysOn){
         this.setOrigin(0.5);
         this.setFrame(frame);
         this.alwaysOn = alwaysOn;
 
         this.tileX = tileX;
         this.tileY = tileY;
-        this.setDepth(this.depth + this.tileY/1000); // /1000 to avoid appearing above tooltip
-        this.setPosition(x,y);
-        this.name = name;
-        this.setVisibility();
-    },
-
-    setVisibility: function(){
-        // If on minimap, display straight away if within rect; if in big map, display only if not within FoW
-        if(this.parentMap.viewRect.contains(this.x,this.y)){
-            if(this.parentMap.minimap){
-                this.setVisible(true);
-            }else{
-                if(this.alwaysOn) this.setVisible(true);
-                for(var i = 0; i < Engine.player.FoW.length; i++){
-                    var rect = Engine.player.FoW[i];
-                    var rect_ = new Phaser.Geom.Rectangle(
-                        rect.x - 10,
-                        rect.y - 10,
-                        rect.width + 20,
-                        rect.height + 20
-                    ); // Hack not to miss markers on fringes of fog
-                    if(rect_.contains(this.tileX,this.tileY)){
-                        this.setVisible(true);
-                        return;
-                    }
-                }
-                this.setVisible(false);
-            }
-        }else{
-            this.setVisible(false);
-        }
-    },
-
-    highlight: function(){
-        //this.setTexture('redpin');
-    },
-
-    unhighlight: function(){
-        //this.setTexture('pin');
-    },
-
-    focus: function(){
-        this.parentMap.focus(this.x,this.y);
-    },
-
-    reposition: function(){
+        // this.setDepth(this.depth + this.tileY/1000); // /1000 to avoid appearing above tooltip
+        this.setDepth(2 + this.tileY/1000); // /1000 to avoid appearing above tooltip
         var location = this.parentMap.computeMapLocation(this.tileX,this.tileY);
         this.setPosition(location.x,location.y);
+        this.name = name;
         this.setVisibility();
     },
 
@@ -680,9 +574,32 @@ var Dash = new Phaser.Class({
 
     handleOut: function(){
         UI.tooltip.hide();
+    }
+});
+
+var Dash = new Phaser.Class({
+
+    Extends: Phaser.GameObjects.Line,
+
+    Mixins: [MapMarker],
+
+    initialize: function Dash (map) {
+        Phaser.GameObjects.Line.call(this, UI.scene, 0, 0, 0, 0, 0xff0000);
+        UI.scene.add.displayList.add(this);
+        // this.setDepth(2);
+        this.setScrollFactor(0);
+        this.setVisible(false);
+        this.parentMap = map;
     },
 
-    hide: function(){
-        this.setVisible(false);
+    setUp: function(fx,fy,tx,ty){
+        var from = this.parentMap.computeMapLocation(fx,fy);
+        var to = this.parentMap.computeMapLocation(tx,ty);
+        this.tileX = fx;
+        this.tileY = fy;
+        this.setDepth(2 + this.tileY/1000); // /1000 to avoid appearing above tooltip
+        // this.setPosition(x,y);
+        this.setTo(from.x, from.y, to.x,to.y);
+        this.setVisibility();
     }
 });
