@@ -493,6 +493,8 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
+- Move to ES6
+-> https://codeutopia.net/blog/2015/01/06/es6-what-are-the-benefits-of-the-new-features-in-practice/
 - Tool to gather, uglify and compress all relevant source files 
 - Desktop app (automated)
 -> https://electronjs.org/docs/tutorial/application-distribution

@@ -22,8 +22,9 @@
     ]
   },
   "scripts": {
-    "test": "mocha test",
+    "build": "webpack",
     "start": "node server.js",
+    "test": "mocha test",
     "watch": "nodemon",
     "watch-client": "browser-sync start --config bs-config.js"
   },
