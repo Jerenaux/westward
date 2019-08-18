@@ -1,5 +1,5 @@
 ## To test:
-- Test handleCraft (normal + when a price is undefined) + wrong building
+- Test handleCraft when a price is undefined
 - Test starting inventory of new player
 - Test settlement selection (with value of 0)
 - Test ammo container type match
@@ -49,6 +49,7 @@ World Building
 - Silhouette of marker behind trees
 - Togle legend, toggle marker types
 - Alarm bell
+- Flip trees horizontally to introduce variety
 
 Bugs:
 - Server restarts after disconnect? Monitor closely
@@ -57,6 +58,8 @@ Bugs:
 - Can't find daydream in tutorial (plant icons are misleading)
 - Fix battle areas when civ aggro
 Features:
+- Test crafting
+- Test frontier with online buildings (sync)
 - Collective missions menu
 -> Start wih basic production quests
 - semi-permanent camp markers (always visible once discovered)
@@ -161,32 +164,6 @@ Closing comments about pros and cons of starting in a settled/wild region, ultim
 ##################################################
 ##################################################
 ##################################################
-
-Admin
-Analytics
-Cleaning
-* Battle system
-* Civics
-* Character panel
-* Craftsmen gameplay
-* Enemy civ
-* Explorer gameplay
-* Help
-* Inventory
-* Merchant gameplay
-* Misc
-* Orientation
-* Packaging
-* Settlement defense
-* Settlement economy
-* Soldier gameplay
-Deployment
-Design document
-Faking
-Polish
-Testing
-World Building
-Free
 
 ###############
 V1 level:
@@ -516,9 +493,9 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
+- Tool to gather, uglify and compress all relevant source files 
 - Desktop app (automated)
 -> https://electronjs.org/docs/tutorial/application-distribution
-- Tool to gather, uglify and compress all relevant source files 
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?
 - Secure chunk access? (check client position before serving)
@@ -589,13 +566,11 @@ Testing:
 
 World building:
 --------------
-Eventually, delete "spawnzones.json"
-Make items belong to spawnzones, for respawn
-Make respawn depend on proximity of cluster to civilization (use quad tree?)
+Make items belong to spawnzones, for respawn logic
+Make respawn depend on proximity of cluster to civilization
 Set up proximity between related item and animal spawn zones
 Building editor (set shapes etc.)
 Manage spawn zones in editor
-Flip trees horizontally to introduce variety
 Patches of dirt
 
 UI:
@@ -612,15 +587,6 @@ UI:
 - Animals (w/ animations)
 - Enemy civs, enemy camps 
 - Logo 
-
-
-
-
-
-Part I: Mechanics
-Part II: World building
-Part III: Atmosphere & polish
-Part IV: Cleaning, optimization and admin
 
 Pillars:
 1) The War

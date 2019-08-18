@@ -276,6 +276,10 @@ Building.prototype.isBuilt = function(){
     return this.built;
 };
 
+Building.prototype.isWorkshop = function(){
+    return this.type == 3;
+};
+
 Building.prototype.applyDamage = function(dmg){
     FightingEntity.prototype.applyDamage.call(this,dmg);
     this.refreshStats();

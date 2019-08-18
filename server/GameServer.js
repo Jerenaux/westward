@@ -1623,28 +1623,36 @@ GameServer.logMenu = function(menu,socketID){
 
 GameServer.handleCraft = function(data,socketID){
     if(data.id === -1) {
-        console.log('No ID');
-        return;
+        console.log('No item ID');
+        return false;
     }
     var player = GameServer.getPlayer(socketID);
     var buildingID = player.inBuilding;
+    if(!(buildingID > -1)){
+        console.log('Not in a building');
+        return false;
+    }
     var building = GameServer.buildings[buildingID];
     if(!building){
         console.warn('ERROR: Undefined building when crafting');
-        return;
+        return false;
+    }
+    if(!building.isWorkshop()){
+        console.log('Not in a workshop');
+        return false;
     }
     var isFinancial = (!building.isOwnedBy(player));
     var targetItem = data.id;
-    var nb = data.nb;
+    var nb = data.nb || 1;
     // var recipient = (stock == 1 ? player : building);
     if(!player.canCraft(targetItem,nb)) {
         console.log('All ingredients not owned');
-        return;
+        return false;
     }
     var price = building.getPrice(targetItem, nb, 'sell');
     if(isFinancial && player.gold < price){
         console.log('Not enough gold');
-        return;
+        return false;
     }
     GameServer.operateCraft(player, targetItem, nb);
     if(isFinancial) building.giveGold(player.takeGold(price));
@@ -1656,6 +1664,7 @@ GameServer.handleCraft = function(data,socketID){
         GameServer.notifyPlayer(building.owner, msg);
     }
     Prism.logEvent(player,'craft',{item:targetItem,nb:nb});
+    return true;
 };
 
 GameServer.operateCraft = function(recipient,targetItem,nb){
