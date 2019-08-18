@@ -254,8 +254,26 @@ Building.prototype.setBuilt = function(){
     this.stats['hp'].setBaseValue(this.stats['hpmax'].getValue());
     this.refreshStats();
     this.save();
-    var phrase = ['Construction of ',this.name,' finished'];
-    GameServer.notifyPlayer(this.owner,phrase.join(' '));
+    if(!this.civ) {
+        var phrase = ['Construction of ', this.name, ' finished'];
+        GameServer.notifyPlayer(this.owner, phrase.join(' '));
+    }
+    GameServer.computeFrontier(true);
+};
+
+Building.prototype.destroy = function(){
+    this.setProperty('built',false);
+    if(this.civ){
+        GameServer.setFlag('buildingsMarkers');
+    }else{
+        GameServer.notifyPlayer(this.owner,'Your '+this.name+' was destroyed');
+    }
+    this.save();
+    GameServer.computeFrontier(true);
+};
+
+Building.prototype.isBuilt = function(){
+    return this.built;
 };
 
 Building.prototype.applyDamage = function(dmg){
@@ -265,21 +283,6 @@ Building.prototype.applyDamage = function(dmg){
 
 Building.prototype.refreshStats = function(){
     this.setProperty('statsUpdate',this.stats.toList());
-};
-
-Building.prototype.isBuilt = function(){
-    return this.built;
-};
-
-Building.prototype.destroy = function(){
-
-};
-
-Building.prototype.toggleBuild = function(){
-    var built_ = this.built;
-    this.setProperty('built',!this.built);
-    this.setProperty('progress',(this.built ? 100 : 0));
-    if(!built_) this.getStat('hp').setBaseValue(this.getStat('hpmax').getBaseValue());
 };
 
 Building.prototype.addBuilding = function(building){
@@ -479,17 +482,7 @@ Building.prototype.attackTarget = function(){
 };
 
 Building.prototype.die = function(){
-    this.toggleBuild();
     this.destroy();
-};
-
-Building.prototype.destroy = function(){
-    if(this.civ){
-        GameServer.setFlag('buildingsMarkers');
-    }else{
-        GameServer.notifyPlayer(this.owner,'Your '+this.name+' was destroyed');
-    }
-    this.save();
 };
 
 Building.prototype.isDead = function(){

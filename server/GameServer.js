@@ -175,7 +175,7 @@ GameServer.readMap = function(mapsPath,test,cb){
 
 GameServer.initializeFlags = function(){
     var flags = ['nbConnected','FoW','buildingsMarkers','animalsMarkers','deathMarkers',
-    'conflictMarkers'];
+    'conflictMarkers','frontier'];
     GameServer.flags = {};
     flags.forEach(function(flag){
         GameServer.flags[flag] = false;
@@ -320,7 +320,7 @@ GameServer.loadBuildings = function(){
     GameServer.BuildingModel.find(function (err, buildings) {
         if (err) return console.log(err);
         buildings.forEach(GameServer.addBuilding);
-        GameServer.computeFrontier(); // TODO: remove
+        GameServer.computeFrontier(false);
         GameServer.updateStatus();
     });
 };
@@ -1845,11 +1845,12 @@ GameServer.computeFoW = function(){
     return fow;
 };
 
-GameServer.computeFrontier = function(){
+GameServer.computeFrontier = function(setFlag){
     GameServer.frontier = [];
     var sites = [];
     for(var bldID in GameServer.buildings){
         var bld = GameServer.buildings[bldID];
+        if(!bld.isBuilt()) continue;
         sites.push({
             x: bld.x,
             y: bld.y,
@@ -1875,6 +1876,7 @@ GameServer.computeFrontier = function(){
         });
     },this);
     console.warn('frontier:',GameServer.frontier);
+    if(setFlag) GameServer.setFlag('frontier');
 };
 
 /**
@@ -2201,12 +2203,6 @@ GameServer.setBuildingGold = function(data){
     return true;
 };
 
-GameServer.toggleBuild = function(data){
-    var building = GameServer.buildings[data.id];
-    building.toggleBuild();
-    building.save();
-    return true;
-};
 
 GameServer.countItems = function(cb){
     cb(GameServer.itemCounts);

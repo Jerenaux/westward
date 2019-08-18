@@ -48,6 +48,7 @@ World Building
 - Zoom-out in towers
 - Silhouette of marker behind trees
 - Togle legend, toggle marker types
+- Alarm bell
 
 Bugs:
 - Server restarts after disconnect? Monitor closely
@@ -56,17 +57,13 @@ Bugs:
 - Can't find daydream in tutorial (plant icons are misleading)
 - Fix battle areas when civ aggro
 Features:
-- Extrude default cursor
-- Update frontier when building change
-- Missions menu (focused on enemy civ) + enhanced map menu
--> Need for visual indicators + numerical ones
+- Collective missions menu
+-> Start wih basic production quests
 - semi-permanent camp markers (always visible once discovered)
-- Frontier
-- Update attack and patrol behavior accordingly
 -> Quantify resources nodes on the right side of frontier, 
 production capacity (based on # buildings of a given time) / some kind of "GDP",
-bell alarm when attack nearby, bodies behind, log of recent civ-related events
--> Split all per region (also visually)
+- Make smart missions based on these indicators (+ as many others as possible)
+- Split all per region (also visually)
 -> Name regions and compute borders in a Voronoi way by placing invisible region centers
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)

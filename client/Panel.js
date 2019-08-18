@@ -42,13 +42,15 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
     zone.setScrollFactor(0);
     zone.setInteractive();
     zone.setVisible(false);
-    zone.on('pointerover',function(){
-        UI.tooltip.updateInfo('free',{title:helpTitle,body:helpText});
-        UI.tooltip.display();
-    });
-    zone.on('pointerout',function(){
-        UI.tooltip.hide();
-    });
+    if(helpTitle || helpText) {
+        zone.on('pointerover', function () {
+            UI.tooltip.updateInfo('free', {title: helpTitle, body: helpText});
+            UI.tooltip.display();
+        });
+        zone.on('pointerout', function () {
+            UI.tooltip.hide();
+        });
+    }
     this.content.push(zone);
 
     x += 5;

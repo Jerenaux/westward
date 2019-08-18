@@ -1274,11 +1274,11 @@ Engine.makeMapMenu = function(){
     mapPanel.addLegend();
     // var mapInstance = mapPanel.addMap('radiallongrect',900,380,-1,-1);
     var mapInstance = mapPanel.addMap('bigbg_mask',900,380,-1,-1);
-    mapPanel.addButton(950, 420, 'blue','help',null,'',UI.textsData['self_map_help']);
+    mapPanel.addButton(950, 0, 'blue','help',null,'',UI.textsData['self_map_help']);
     // TODO: move in Map.js, method addZoom, positions buttons based on viewWidt/height and
     // controls enable/disable of buttons based on zoom flag
-    mapPanel.zoomInBtn = mapPanel.addButton(930, 390, 'blue','plus',mapInstance.zoomIn.bind(mapInstance),'Zoom in');
-    mapPanel.zoomOutBtn = mapPanel.addButton(920, 420, 'blue','minus',mapInstance.zoomOut.bind(mapInstance),'Zoom out');
+    mapPanel.zoomInBtn = mapPanel.addButton(930, 390, 'blue','plus',mapInstance.zoomIn.bind(mapInstance));
+    mapPanel.zoomOutBtn = mapPanel.addButton(920, 420, 'blue','minus',mapInstance.zoomOut.bind(mapInstance));
     map.addEvent('onUpdateMap',mapPanel.map.updatePins.bind(mapPanel.map));
     return map;
 };

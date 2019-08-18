@@ -193,23 +193,19 @@ var Map = new Phaser.Class({
                 this.fow.x -= dx;
                 this.fow.y -= dy;
             }
-            this.moveTexts(dx,dy);
-            this.movePins(dx, dy);
+            // this.moveTexts(dx,dy);
+            // this.movePins(dx, dy);
+            this.moveMarkers('displayedPins',dx,dy);
+            this.moveMarkers('displayedDash',dx,dy);
+            this.moveMarkers('toponyms',dx,dy);
         }
     },
 
-    movePins: function(dx,dy){
-        this.displayedPins.forEach(function(p){
+    moveMarkers: function(markers,dx,dy){
+        this[markers].forEach(function(p){
             p.x -= dx;
             p.y -= dy;
             p.setVisibility();
-        });
-    },
-
-    moveTexts: function(dx,dy){
-        this.toponyms.forEach(function(p){
-            p.x -= dx;
-            p.y -= dy;
         });
     },
 
@@ -241,9 +237,7 @@ var Map = new Phaser.Class({
     },
 
     addPin: function(x,y,name,frame,alwaysOn){
-        // var location = this.computeMapLocation(x,y);
         var pin = this.getNextPin();
-        // pin.setUp(x,y,location.x,location.y,name,frame,alwaysOn);
         pin.setUp(x,y,name,frame,alwaysOn);
         this.displayedPins.push(pin);
         return pin;
@@ -287,20 +281,28 @@ var Map = new Phaser.Class({
 
     zoom: function(){
         this.centerMap(); // center on current center ; must be called before positioning pins
-        this.displayedPins.forEach(function(pin){
-            pin.reposition();
-        });
-        this.positionToponyms();
+        this.repositionMarkers('displayedPins');
+        this.repositionMarkers('displayedDash');
+        // this.displayedPins.forEach(function(pin){
+        //     pin.reposition();
+        // });
+        // this.positionToponyms();
         // this.computeDragLimits();
     },
 
-    positionToponyms: function(){
-        this.toponyms.forEach(function(t){
-            var location = this.computeMapLocation(t.tx,t.ty);
-            t.setPosition(location.x,location.y);
-            t.setVisible(true);
-        },this);
+    repositionMarkers: function(markers){
+        this[markers].forEach(function(p){
+            p.reposition();
+        });
     },
+
+    // positionToponyms: function(){
+    //     this.toponyms.forEach(function(t){
+    //         var location = this.computeMapLocation(t.tx,t.ty);
+    //         t.setPosition(location.x,location.y);
+    //         t.setVisible(true);
+    //     },this);
+    // },
 
     centerMap: function(tile){ // Adjusts the anchor, then position it in the center of the screen
         // tile is world coordinates, not map px ; if tile is undefined, then it means recenter on whatever current center (used when zooming)
@@ -380,7 +382,7 @@ var Map = new Phaser.Class({
         if(!this.minimap && this.scaleX < 0.5) this.zoomIn();
         this.centerMap(Engine.player.getTilePosition());
         // this.setInputArea();
-        this.positionToponyms();
+        // this.positionToponyms();
         this.computeDragLimits();
         if(!this.minimap){
             this.applyFogOfWar();
@@ -407,7 +409,7 @@ var Map = new Phaser.Class({
             }
         ];
 
-        frontier.forEach(function(edge){
+        Engine.player.frontier.forEach(function(edge){
             var angle = -Phaser.Math.Angle.Between(edge.a.x,edge.a.y,edge.b.x,edge.b.y);
             var speed = Utils.computeSpeed(angle);
             var length = 8;
@@ -496,19 +498,22 @@ var Map = new Phaser.Class({
 
 var MapMarker = new Phaser.Class({
     setVisibility: function(){
+        // this.setVisible(true);
+        // return;
         // If on minimap, display straight away if within rect; if in big map, display only if not within FoW
         if(this.parentMap.viewRect.contains(this.x,this.y)){
             if(this.parentMap.minimap){
                 this.setVisible(true);
             }else{
                 if(this.alwaysOn) this.setVisible(true);
+                var offset = this.markerType == 'pin' ? 40 : 50;
                 for(var i = 0; i < Engine.player.FoW.length; i++){
                     var rect = Engine.player.FoW[i];
                     var rect_ = new Phaser.Geom.Rectangle(
-                        rect.x - 10,
-                        rect.y - 10,
-                        rect.width + 20,
-                        rect.height + 20
+                        rect.x - offset,
+                        rect.y - offset,
+                        rect.width + offset*2,
+                        rect.height + offset*2
                     ); // Hack not to miss markers on fringes of fog
                     if(rect_.contains(this.tileX,this.tileY)){
                         this.setVisible(true);
@@ -541,7 +546,7 @@ var Pin = new Phaser.Class({
 
     initialize: function Pin (map) {
         CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
-        // this.setDepth(2);
+        this.markerType = 'pin';
         this.setScrollFactor(0);
         this.setVisible(false);
         this.setInteractive();
@@ -584,22 +589,25 @@ var Dash = new Phaser.Class({
     Mixins: [MapMarker],
 
     initialize: function Dash (map) {
-        Phaser.GameObjects.Line.call(this, UI.scene, 0, 0, 0, 0, 0xff0000);
+        Phaser.GameObjects.Line.call(this, UI.scene);
         UI.scene.add.displayList.add(this);
-        // this.setDepth(2);
+        this.markerType = 'dash';
+        this.setOrigin(0);
         this.setScrollFactor(0);
+        this.setStrokeStyle(1,0xff0000);
         this.setVisible(false);
         this.parentMap = map;
     },
 
     setUp: function(fx,fy,tx,ty){
+        // console.warn(fx,fy,tx,ty);
         var from = this.parentMap.computeMapLocation(fx,fy);
         var to = this.parentMap.computeMapLocation(tx,ty);
         this.tileX = fx;
         this.tileY = fy;
-        this.setDepth(2 + this.tileY/1000); // /1000 to avoid appearing above tooltip
-        // this.setPosition(x,y);
-        this.setTo(from.x, from.y, to.x,to.y);
+        this.setDepth(2);
+        this.setPosition(from.x,from.y);
+        this.setTo(0,0, to.x-from.x,to.y-from.y);
         this.setVisibility();
     }
 });
