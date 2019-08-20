@@ -58,6 +58,7 @@ Bugs:
 - Can't find daydream in tutorial (plant icons are misleading)
 - Fix battle areas when civ aggro
 Features:
+- No frontier when camps are read?
 - Test crafting
 - Test frontier with online buildings (sync)
 - Collective missions menu

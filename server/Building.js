@@ -111,7 +111,6 @@ function Building(data){
         'Civ': true,
         'PlayerBuilding': false
     };
-    if(this.id == 4) console.warn('built:',this.built);
 }
 
 Building.prototype = Object.create(FightingEntity.prototype);

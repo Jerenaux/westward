@@ -320,9 +320,19 @@ GameServer.loadBuildings = function(){
     GameServer.BuildingModel.find(function (err, buildings) {
         if (err) return console.log(err);
         buildings.forEach(GameServer.addBuilding);
+
+        if(GameServer.needToSpawnCamps) GameServer.spawnCamps();
+
         GameServer.computeFrontier(false);
         GameServer.updateStatus();
     });
+};
+
+GameServer.spawnCamps = function(){
+    for(var campID in GameServer.camps){
+        var camp = GameServer.camps[campID];
+        camp.spawnBuildings();
+    }
 };
 
 /**
@@ -430,13 +440,13 @@ GameServer.readCamps = function(){
 
     for (let key in GameServer.campsData) {
         const data = GameServer.campsData[key];
-        var camp = new Camp(GameServer.lastCampID++, data.center);
+        var camp = new Camp(GameServer.lastCampID++, data.center, data.buildings);
         var document = new GameServer.CampModel(camp);
         document.save(function(err,doc){
             camp.mongoID = doc._id.toString();
         });
         GameServer.camps[camp.id] = camp;
-        camp.spawnBuildings(data.buildings);
+        GameServer.needToSpawnCamps = true;
     }
 };
 
