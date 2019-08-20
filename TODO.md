@@ -59,6 +59,7 @@ Bugs:
 - Fix battle areas when civ aggro
 - Check that destroyed entities destroy their orientation pins
 Features:
+- No frontier when camps are read?
 - Test crafting
 - Collective missions menu
 -> Start wih basic production quests

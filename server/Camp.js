@@ -6,16 +6,17 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 
 
-function Camp(id,center){
+function Camp(id,center,bldData){
     this.schemaModel = GameServer.CampModel;
     this.id = id;
     this.buildings = [];
     this.people = [];
     this.center = center;
+    this.bldData = bldData;
 }
 
-Camp.prototype.spawnBuildings = function(buildings){
-    buildings.forEach(function (bld) {
+Camp.prototype.spawnBuildings = function(){
+    this.bldData.forEach(function (bld) {
         this.buildings.push(GameServer.buildCivBuilding({
             x: bld.x,
             y: bld.y,

@@ -1966,7 +1966,8 @@ Engine.addPlayer = function(data){
 };
 
 Engine.getTilesetFromTile = function(tile){
-    if(Engine.tilesetMap.hasOwnProperty(tile)) return Engine.tilesetMap[tile];
+    if(Engine.tilesetMap.hasOwnProperty(tile)) return Engine.tile
+    setMap[tile];
     for(var i = 0; i < Engine.tilesets.length; i++){
         if(tile < Engine.tilesets[i].firstgid){
             Engine.tilesetMap[tile] = i-1;
