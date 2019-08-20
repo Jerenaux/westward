@@ -59,8 +59,12 @@ Bugs:
 - Fix battle areas when civ aggro
 - Check that destroyed entities destroy their orientation pins
 Features:
-- No frontier when camps are read?
-- Test crafting
+- Fight bear
+- Remove "resting frames" from animals atlas, do it based on animations
+- Display item rarity in inventory (check if doesn't conflit with shop)
+- Improve shaders (behindness and contour)
+- Add civ archers and loot arrows from them (+ add loot to civ warriors) w/ probability
+- Add belts?
 - Collective missions menu
 -> Start wih basic production quests
 - semi-permanent camp markers (always visible once discovered)
@@ -85,10 +89,10 @@ Rivalry between regions
 
 
 María:
-- Bld icons for enemy civ
-- Wolf anim (walk, attack, die w/ & w/o arrows)
+- Red bg
 - Color variations of wolf
 - Carcass, blood-tainted grass
+- Footprints
 - Bear anim (walk, attack, die w/ & w/o arrows)
 - Player anim naked
 -> Look into superimposing equipment programmatically

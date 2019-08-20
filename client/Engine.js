@@ -43,7 +43,8 @@ Engine.preload = function() {
     // Characters
     this.load.spritesheet('enemy', 'assets/sprites/enemy.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64}); // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
-    this.load.spritesheet('wolves', 'assets/sprites/animals/wolves.png',{frameWidth:32,frameHeight:32});
+    // this.load.spritesheet('wolves', 'assets/sprites/animals/wolves.png',{frameWidth:32,frameHeight:32});
+    this.load.spritesheet('wolf', 'assets/sprites/animals/wolf.png',{frameWidth:43,frameHeight:32});
     this.load.spritesheet('bears', 'assets/sprites/animals/bears2.png',{frameWidth:56,frameHeight:56});
     this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
     // this.load.spritesheet('toadmen', 'assets/sprites/animals/toadmen.png',{frameWidth:48,frameHeight:48});
@@ -416,56 +417,63 @@ Engine.playLocalizedSound = function(sound,maxVolume,location){
 };
 
 Engine.createAnimations = function(){
-    // Player
-    Engine.createWalkAnimation('player_move_right','hero',143,151,15);
-    Engine.createWalkAnimation('player_move_up','hero',104,112,15);
-    Engine.createWalkAnimation('player_move_down','hero',130,138,15);
-    Engine.createWalkAnimation('player_move_left','hero',117,125,15);
-    // TODO: reverse them
-    Engine.createAttackAnimation('player_attack_right','hero',195,200);
-    Engine.createAttackAnimation('player_attack_down','hero',182,187);
-    Engine.createAttackAnimation('player_attack_left','hero',169,174);
-    Engine.createAttackAnimation('player_attack_up','hero',156,161);
+    // TODO: don't hardcode, store in JSON of find a way to infer it
+    // (standardize all spritesheets?)
 
-    Engine.createAttackAnimation('player_bow_right','hero',247,259);
-    Engine.createAttackAnimation('player_bow_down','hero',234,246);
-    Engine.createAttackAnimation('player_bow_left','hero',221,233);
-    Engine.createAttackAnimation('player_bow_up','hero',208,220);
+    Engine.createAnimation('player_move_right','hero',143,151,15,10,true);
+    Engine.createAnimation('player_move_up','hero',104,112,15,10,true);
+    Engine.createAnimation('player_move_down','hero',130,138,15,10,true);
+    Engine.createAnimation('player_move_left','hero',117,125,15,10,true);
+
+    Engine.createAnimation('player_attack_right','hero',195,200,15,false,true);
+    Engine.createAnimation('player_attack_down','hero',182,187,15,false,true);
+    Engine.createAnimation('player_attack_left','hero',169,174,15,false,true);
+    Engine.createAnimation('player_attack_up','hero',156,161,15,false,true);
+
+    Engine.createAnimation('player_bow_right','hero',247,259,15,false,true);
+    Engine.createAnimation('player_bow_down','hero',234,246,15,false,true);
+    Engine.createAnimation('player_bow_left','hero',221,233,15,false,true);
+    Engine.createAnimation('player_bow_up','hero',208,220,15,false,true);
 
     // Civ
-    Engine.createWalkAnimation('enemy_move_right','enemy',143,151,15);
-    Engine.createWalkAnimation('enemy_move_up','enemy',104,112,15);
-    Engine.createWalkAnimation('enemy_move_down','enemy',130,138,15);
-    Engine.createWalkAnimation('enemy_move_left','enemy',117,125,15);
+    Engine.createAnimation('enemy_move_right','enemy',143,151,15,10,true);
+    Engine.createAnimation('enemy_move_up','enemy',104,112,15,10,true);
+    Engine.createAnimation('enemy_move_down','enemy',130,138,15,10,true);
+    Engine.createAnimation('enemy_move_left','enemy',117,125,15,10,true);
 
-    Engine.createAttackAnimation('enemy_attack_right','enemy',195,200);
-    Engine.createAttackAnimation('enemy_attack_down','enemy',182,187);
-    Engine.createAttackAnimation('enemy_attack_left','enemy',169,174);
-    Engine.createAttackAnimation('enemy_attack_up','enemy',156,161);
+    Engine.createAnimation('enemy_attack_right','enemy',195,200,15,false,true);
+    Engine.createAnimation('enemy_attack_down','enemy',182,187,15,false,true);
+    Engine.createAnimation('enemy_attack_left','enemy',169,174,15,false,true);
+    Engine.createAnimation('enemy_attack_up','enemy',156,161,15,false,true);
 
-    Engine.createAttackAnimation('enemy_bow_right','enemy',247,259);
-    Engine.createAttackAnimation('enemy_bow_down','enemy',234,246);
-    Engine.createAttackAnimation('enemy_bow_left','enemy',221,233);
-    Engine.createAttackAnimation('enemy_bow_up','enemy',208,220);
-    
+    Engine.createAnimation('enemy_bow_right','enemy',247,259,15,false,true);
+    Engine.createAnimation('enemy_bow_down','enemy',234,246,15,false,true);
+    Engine.createAnimation('enemy_bow_left','enemy',221,233,15,false,true);
+    Engine.createAnimation('enemy_bow_up','enemy',208,220,15,false,true);
+
     // Wolves
-    Engine.createWalkAnimation('wolf_move_down','wolves',0,2);
-    Engine.createWalkAnimation('wolf_move_left','wolves',12,14);
-    Engine.createWalkAnimation('wolf_move_right','wolves',24,26);
-    Engine.createWalkAnimation('wolf_move_up','wolves',36,38);
+    Engine.createAnimation('wolf_move_down','wolf',0,2,10,true);
+    Engine.createAnimation('wolf_move_left','wolf',7,9,10,true);
+    Engine.createAnimation('wolf_move_right','wolf',14,16,10,true);
+    Engine.createAnimation('wolf_move_up','wolf',21,23,10,true);
 
-    Engine.createWalkAnimation('whitewolf_move_down','wolves',3,5);
-    Engine.createWalkAnimation('whitewolf_move_left','wolves',15,17);
-    Engine.createWalkAnimation('whitewolf_move_right','wolves',27,29);
-    Engine.createWalkAnimation('whitewolf_move_up','wolves',39,41);
+    Engine.createAnimation('wolf_attack_down','wolf',28,34,15,false,true);
+    Engine.createAnimation('wolf_attack_left','wolf',35,41,15,false,true);
+    Engine.createAnimation('wolf_attack_right','wolf',42,48,15,false,true);
+    Engine.createAnimation('wolf_attack_up','wolf',49,55,15,false,true);
 
-    //Bears
-    Engine.createWalkAnimation('bear_move_down','bears',9,11);
-    Engine.createWalkAnimation('bear_move_left','bears',21,23);
-    Engine.createWalkAnimation('bear_move_right','bears',33,35);
-    Engine.createWalkAnimation('bear_move_up','bears',45,47);
+    Engine.createAnimation('wolf_die_down','wolf',56,58);
+    Engine.createAnimation('wolf_die_left','wolf',63,65);
+    Engine.createAnimation('wolf_die_right','wolf',70,72);
+    Engine.createAnimation('wolf_die_up','wolf',77,79);
 
-    Engine.scene.anims.create(config = {
+    // Bear
+    Engine.createAnimation('bear_move_down','bears',9,11,10,true);
+    Engine.createAnimation('bear_move_left','bears',21,23,10,true);
+    Engine.createAnimation('bear_move_right','bears',33,35,10,true);
+    Engine.createAnimation('bear_move_up','bears',45,47,10,true);
+
+    Engine.scene.anims.create({
         key: 'sword',
         frames: Engine.scene.anims.generateFrameNumbers('sword_anim', { start: 0, end: 2}),
         frameRate: 15,
@@ -476,7 +484,7 @@ Engine.createAnimations = function(){
         }
     });
 
-    Engine.scene.anims.create(config = {
+    Engine.scene.anims.create({
         key: 'explosion',
         frames: Engine.scene.anims.generateFrameNumbers('explosion', { start: 0, end: 80}),
         frameRate: 75,
@@ -487,15 +495,9 @@ Engine.createAnimations = function(){
         }
     });
 
-    Engine.scene.anims.create(config = {
+    Engine.scene.anims.create({
         key: 'player_death',
         frames: Engine.scene.anims.generateFrameNumbers('hero', { start: 260, end: 265}),
-        frameRate: 10
-    });
-
-    Engine.scene.anims.create(config = {
-        key: 'enemy_death',
-        frames: Engine.scene.anims.generateFrameNumbers('enemy', { start: 260, end: 265}),
         frameRate: 10
     });
 
@@ -507,24 +509,16 @@ Engine.createAnimations = function(){
     });
 };
 
-Engine.createAttackAnimation = function(key,texture,start,end){
-    var frames = Engine.scene.anims.generateFrameNumbers(texture, { start: start, end: end});
-    frames.push({key:texture, frame:start});
-    Engine.scene.anims.create(config = {
-        key: key,
-        frames: frames,
-        frameRate: 15
-    });
-};
-
-Engine.createWalkAnimation = function(key,texture,start,end,rate){
+Engine.createAnimation = function(key,texture,start,end,rate,loop,revert){
     rate = rate || 10;
-    Engine.scene.anims.create(config = {
+    var config = {
         key: key,
         frames: Engine.scene.anims.generateFrameNumbers(texture, { start: start, end: end}),
-        frameRate: rate,
-        repeat: -1
-    });
+        frameRate: rate
+    };
+    if(loop) config.repeat = -1;
+    if(revert) config.frames.push({key:texture, frame:start}); // adds the initial frame as the last frame
+    Engine.scene.anims.create(config);
 };
 
 Engine.toggleChatBar = function(){

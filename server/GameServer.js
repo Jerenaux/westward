@@ -508,8 +508,8 @@ GameServer.onInitialized = function(){
     GameServer.addItem(514,677,26);
     GameServer.addItem(513,676,26);
     GameServer.addAnimal(404,602,0);
-    GameServer.addAnimal(1172,144,0);
-    GameServer.addAnimal(1171,144,0);
+    GameServer.addAnimal(406,604,0);
+    GameServer.addAnimal(408,606,0);
     GameServer.addAnimal(1170,144,0);
     console.log('---done---');
 };
@@ -523,7 +523,7 @@ GameServer.onNewPlayer = function(player){
     // for testing)
     if(!config.get('misc.performInit')) return;
     // give me all the health and vigor
-    // player.setStat('hp', 30);
+    player.setStat('hp', 300);
     // player.setStat('vigor', 10);
     // player.applyVigorModifier();
 
@@ -531,9 +531,10 @@ GameServer.onNewPlayer = function(player){
         [7,10],
         [21, 10],
         [3, 20],
+        [6,1], // dawn
         // [2, 1],
         // [19, 1],
-        // [20, 17],
+        [20, 17], // arrows
         // // [45, 10],
         // // [50, 11],
         // [51, 1],
@@ -1548,9 +1549,9 @@ GameServer.buildCivBuilding = function(data){
     building.mongoID = document._id;
     document.save(function (err) {
         if (err) return console.error(err);
-        building.embed();
-        GameServer.setFlag('buildingsMarkers');
     });
+    building.embed();
+    GameServer.setFlag('buildingsMarkers');
     return building;
 };
 

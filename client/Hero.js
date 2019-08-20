@@ -140,8 +140,8 @@ let Hero = new Phaser.Class({
     },
 
     getEquippedItem: function(slot){
-        const item_id = this.equipment.get(slot);
-        return Engine.itemsData[item_id]; // Returns the ID of the item equipped at the given slot
+        return this.equipment.getItem(slot);
+        // return Engine.itemsData[item_id]; // Returns the data of the item equipped at the given slot
     },
 
     hasRangedEquipped: function(){

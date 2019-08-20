@@ -428,6 +428,7 @@ var Map = new Phaser.Class({
     displayPins: function(){
         var tile = Engine.player.getTilePosition();
         this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
+        this.positionCross.setDepth(this.positionCross.depth+1);
         Engine.player.buildingMarkers.forEach(function(data){
             var frame;
             if(data.civ){
