@@ -72,7 +72,7 @@
             aggro: 1500
     },
     civs: {
-        aggro: true,
+        aggro: false,
         wander: true,
         raidMinimum: 3
     },

@@ -57,9 +57,9 @@ Bugs:
 - Come up with smoother silhouette for items
 - Can't find daydream in tutorial (plant icons are misleading)
 - Fix battle areas when civ aggro
+- Check that destroyed entities destroy their orientation pins
 Features:
 - Test crafting
-- Test frontier with online buildings (sync)
 - Collective missions menu
 -> Start wih basic production quests
 - semi-permanent camp markers (always visible once discovered)
