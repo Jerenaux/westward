@@ -78,8 +78,8 @@ describe('GameServer',function(){
     var animal;
     var animalFarAway;
     it('addAnimal', function(){
-        var x = player.x + 3;
-        var y = player.y + 3;
+        var x = player.x - 3;
+        var y = player.y - 3;
         var type = 0;
         animal = gs.addAnimal(x,y,type);
         animalFarAway = gs.addAnimal(0,0,0);
