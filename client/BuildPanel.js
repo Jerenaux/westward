@@ -178,6 +178,7 @@ function BuildSlot(x,y,width,height){
 
     this.addItem();
     // this.addInventoryCount();
+    this.addIngredients();
 
     this.moveUp(3);
 }
@@ -192,14 +193,35 @@ BuildSlot.prototype.addItem = function(){
     this.content.push(this.icon);
 };
 
+BuildSlot.prototype.addIngredients = function(){
+    this.ingredients = [];
+    for(var i = 0; i < 3; i++){
+        this.ingredients.push(
+            {
+                sprite: UI.scene.add.sprite(this.x + 70 + i*40,this.y + 50,'items').setDepth(13).setVisible(false),
+                text: UI.scene.add.text(this.x + 75 + i*30, this.y + 50, '', { font: '12px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }).setDepth(13).setVisible(false)
+            }
+        );
+    }
+};
+
 BuildSlot.prototype.setUp = function(bld){
     if(!this.displayed) console.warn('Setting up slot before displaying it');
     var bldData = Engine.buildingsData[bld];
-    this.icon.setTexture('aok',bldData.icon);
+    this.icon.setTexture('buildingsicons',bldData.icon);
     this.name.setText(bldData.name);
     this.desc = bldData.desc;
     this.bldID = bld;
     // this.nb.setText(Engine.player.getItemNb(item));
+
+    if(bldData.recipe) {
+        var i = 0;
+        for(var ingredient in bldData.recipe){
+            this.ingredients[i].sprite.setTexture(Engine.itemsData[ingredient].atlas, Engine.itemsData[ingredient].frame).setVisible(true);
+            this.ingredients[i].text.setText(bldData.recipe[ingredient]).setVisible(true);
+            i++;
+        }
+    }
 };
 
 BuildSlot.prototype.display = function(){
@@ -213,5 +235,9 @@ BuildSlot.prototype.hide = function(){
     Frame.prototype.hide.call(this);
     this.content.forEach(function(c){
         c.setVisible(false);
+    });
+    this.ingredients.forEach(function(ing){
+        ing.sprite.setVisible(false);
+        ing.text.setVisible(false);
     });
 };

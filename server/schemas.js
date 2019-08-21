@@ -4,15 +4,15 @@
 let mongoose = require('mongoose');
 
 let Schemas = {
-    settlementSchema : mongoose.Schema({
-        id: {type: Number, min: 0, required: true},
-        name: {type: String, required: true},
-        description: String,
-        population: {type: Number, min: 0, required: true},
-        level: {type: Number, min: 0, required: true},
-        x: {type: Number, min: 0, required: true},
-        y: {type: Number, min: 0, required: true}
-    }),
+    // settlementSchema : mongoose.Schema({
+    //     id: {type: Number, min: 0, required: true},
+    //     name: {type: String, required: true},
+    //     description: String,
+    //     population: {type: Number, min: 0, required: true},
+    //     level: {type: Number, min: 0, required: true},
+    //     x: {type: Number, min: 0, required: true},
+    //     y: {type: Number, min: 0, required: true}
+    // }),
 
     buildingSchema : mongoose.Schema({
         id: {type: Number, min: 0, required: true},
@@ -27,7 +27,16 @@ let Schemas = {
         prices: mongoose.Schema.Types.Mixed,
         gold: {type: Number, min: 0},
         built: Boolean,
-        health: {type: Number, min: 0}
+        civ: Boolean,
+        campID: Number,
+        stats: {type: [], set:function(stats){
+                return stats.toList();
+        }}
+    }),
+
+    campSchema : mongoose.Schema({
+        id: {type: Number, min: 0, required: true},
+        center: mongoose.Schema.Types.Mixed,
     }),
 
     playerSchema : mongoose.Schema({

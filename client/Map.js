@@ -71,6 +71,7 @@ var Map = new Phaser.Class({
         */
 
         this.pins = [];
+        this.dash = [];
         this.resetCounter();
         this.clickedTile = null;
     },
@@ -192,23 +193,19 @@ var Map = new Phaser.Class({
                 this.fow.x -= dx;
                 this.fow.y -= dy;
             }
-            this.moveTexts(dx,dy);
-            this.movePins(dx, dy);
+            // this.moveTexts(dx,dy);
+            // this.movePins(dx, dy);
+            this.moveMarkers('displayedPins',dx,dy);
+            this.moveMarkers('displayedDash',dx,dy);
+            this.moveMarkers('toponyms',dx,dy);
         }
     },
 
-    movePins: function(dx,dy){
-        this.displayedPins.forEach(function(p){
+    moveMarkers: function(markers,dx,dy){
+        this[markers].forEach(function(p){
             p.x -= dx;
             p.y -= dy;
             p.setVisibility();
-        });
-    },
-
-    moveTexts: function(dx,dy){
-        this.toponyms.forEach(function(p){
-            p.x -= dx;
-            p.y -= dy;
         });
     },
 
@@ -223,6 +220,12 @@ var Map = new Phaser.Class({
         return this.pins[this.pinsCounter++];
     },
 
+    getNextDash: function(){
+        // if(this.dashCounter >= this.dash.length) this.dash.push(UI.scene.add.line(0, 0, 0,0, 0, 0, 0xff0000));
+        if(this.dashCounter >= this.dash.length) this.dash.push(new Dash(this));
+        return this.dash[this.dashCounter++];
+    },
+
     // Maps a tile coordinate to px coordinate on the map
     computeMapLocation: function(tx,ty){
         var dx = (tx*2 - this.displayOriginX)*this.scaleX;
@@ -234,16 +237,23 @@ var Map = new Phaser.Class({
     },
 
     addPin: function(x,y,name,frame,alwaysOn){
-        var location = this.computeMapLocation(x,y);
         var pin = this.getNextPin();
-        pin.setUp(x,y,location.x,location.y,name,frame,alwaysOn);
+        pin.setUp(x,y,name,frame,alwaysOn);
         this.displayedPins.push(pin);
         return pin;
     },
 
+    addDash: function(fx,fy,tx,ty){
+        var dash = this.getNextDash();
+        dash.setUp(fx,fy,tx,ty);
+        this.displayedDash.push(dash);
+    },
+
     resetCounter: function(){
         this.pinsCounter = 0;
+        this.dashCounter = 0;
         this.displayedPins = [];
+        this.displayedDash = [];
     },
 
     getZoomBtn: function(mode){
@@ -271,20 +281,28 @@ var Map = new Phaser.Class({
 
     zoom: function(){
         this.centerMap(); // center on current center ; must be called before positioning pins
-        this.displayedPins.forEach(function(pin){
-            pin.reposition();
-        });
-        this.positionToponyms();
+        this.repositionMarkers('displayedPins');
+        this.repositionMarkers('displayedDash');
+        // this.displayedPins.forEach(function(pin){
+        //     pin.reposition();
+        // });
+        // this.positionToponyms();
         // this.computeDragLimits();
     },
 
-    positionToponyms: function(){
-        this.toponyms.forEach(function(t){
-            var location = this.computeMapLocation(t.tx,t.ty);
-            t.setPosition(location.x,location.y);
-            t.setVisible(true);
-        },this);
+    repositionMarkers: function(markers){
+        this[markers].forEach(function(p){
+            p.reposition();
+        });
     },
+
+    // positionToponyms: function(){
+    //     this.toponyms.forEach(function(t){
+    //         var location = this.computeMapLocation(t.tx,t.ty);
+    //         t.setPosition(location.x,location.y);
+    //         t.setVisible(true);
+    //     },this);
+    // },
 
     centerMap: function(tile){ // Adjusts the anchor, then position it in the center of the screen
         // tile is world coordinates, not map px ; if tile is undefined, then it means recenter on whatever current center (used when zooming)
@@ -364,9 +382,12 @@ var Map = new Phaser.Class({
         if(!this.minimap && this.scaleX < 0.5) this.zoomIn();
         this.centerMap(Engine.player.getTilePosition());
         // this.setInputArea();
-        this.positionToponyms();
+        // this.positionToponyms();
         this.computeDragLimits();
-        if(!this.minimap) this.applyFogOfWar();
+        if(!this.minimap){
+            this.applyFogOfWar();
+            this.displayFrontier();
+        }
 
         this.displayPins();
         this.setVisible(true);
@@ -374,13 +395,50 @@ var Map = new Phaser.Class({
         // if(!this.minimap) this.getZoomBtn('out').disable();
     },
 
+    displayFrontier: function(){
+        var frontier = [
+            {
+                a:{
+                    x: 518,
+                    y: 565,
+                },
+                b:{
+                    x: 518,
+                    y: 690
+                }
+            }
+        ];
+
+        Engine.player.frontier.forEach(function(edge){
+            var angle = -Phaser.Math.Angle.Between(edge.a.x,edge.a.y,edge.b.x,edge.b.y);
+            var speed = Utils.computeSpeed(angle);
+            var length = 8;
+            var gap = 4;
+            var size = length + gap;
+            var nb = Phaser.Math.Distance.Between(edge.a.x,edge.a.y,edge.b.x,edge.b.y)/size;
+            var pt = {x:edge.a.x, y:edge.a.y};
+            for(var c = 0; c < nb; c++){
+                this.addDash(pt.x,pt.y,pt.x+(length*speed.x),pt.y+(length*speed.y));
+                pt.x += size*speed.x;
+                pt.y += size*speed.y;
+            }
+        },this);
+    },
+
     displayPins: function(){
         var tile = Engine.player.getTilePosition();
         this.positionCross = this.addPin(tile.x,tile.y,'Your position','x');
+        this.positionCross.setDepth(this.positionCross.depth+1);
         Engine.player.buildingMarkers.forEach(function(data){
+            var frame;
+            if(data.civ){
+                frame = 'bldciv';
+            }else{
+                frame = (data.owner == Engine.player.id ? 'bld2own' : 'bld2');
+            }
             this.addPin(data.x,data.y,
                 Engine.buildingsData[data.type].name,
-                (data.owner == Engine.player.id ? 'bld2own' : 'bld2')
+                frame
             );
         },this);
         Engine.player.resourceMarkers.forEach(function(data){
@@ -419,6 +477,9 @@ var Map = new Phaser.Class({
     },
 
     hide: function(){
+        this.displayedDash.forEach(function(p){
+            p.setVisible(false);
+        });
         this.hidePins();
         this.toponyms.forEach(function(t){
             t.setVisible(false);
@@ -436,48 +497,24 @@ var Map = new Phaser.Class({
     }
 });
 
-var Pin = new Phaser.Class({
-
-    Extends: CustomSprite,
-
-    initialize: function Pin (map) {
-        CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
-        this.setDepth(2);
-        this.setScrollFactor(0);
-        this.setVisible(false);
-        this.setInteractive();
-        this.parentMap = map;
-        this.on('pointerover',this.handleOver.bind(this));
-        this.on('pointerout',this.handleOut.bind(this));
-    },
-
-    setUp: function(tileX,tileY,x,y,name,frame,alwaysOn){
-        this.setOrigin(0.5);
-        this.setFrame(frame);
-        this.alwaysOn = alwaysOn;
-
-        this.tileX = tileX;
-        this.tileY = tileY;
-        this.setDepth(this.depth + this.tileY/1000); // /1000 to avoid appearing above tooltip
-        this.setPosition(x,y);
-        this.name = name;
-        this.setVisibility();
-    },
-
+var MapMarker = new Phaser.Class({
     setVisibility: function(){
+        // this.setVisible(true);
+        // return;
         // If on minimap, display straight away if within rect; if in big map, display only if not within FoW
         if(this.parentMap.viewRect.contains(this.x,this.y)){
             if(this.parentMap.minimap){
                 this.setVisible(true);
             }else{
                 if(this.alwaysOn) this.setVisible(true);
+                var offset = this.markerType == 'pin' ? 40 : 50;
                 for(var i = 0; i < Engine.player.FoW.length; i++){
                     var rect = Engine.player.FoW[i];
                     var rect_ = new Phaser.Geom.Rectangle(
-                        rect.x - 10,
-                        rect.y - 10,
-                        rect.width + 20,
-                        rect.height + 20
+                        rect.x - offset,
+                        rect.y - offset,
+                        rect.width + offset*2,
+                        rect.height + offset*2
                     ); // Hack not to miss markers on fringes of fog
                     if(rect_.contains(this.tileX,this.tileY)){
                         this.setVisible(true);
@@ -491,21 +528,46 @@ var Pin = new Phaser.Class({
         }
     },
 
-    highlight: function(){
-        //this.setTexture('redpin');
-    },
-
-    unhighlight: function(){
-        //this.setTexture('pin');
-    },
-
-    focus: function(){
-        this.parentMap.focus(this.x,this.y);
-    },
-
     reposition: function(){
         var location = this.parentMap.computeMapLocation(this.tileX,this.tileY);
         this.setPosition(location.x,location.y);
+        this.setVisibility();
+    },
+
+    hide: function(){
+        this.setVisible(false);
+    }
+});
+
+var Pin = new Phaser.Class({
+
+    Extends: CustomSprite,
+
+    Mixins: [MapMarker],
+
+    initialize: function Pin (map) {
+        CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
+        this.markerType = 'pin';
+        this.setScrollFactor(0);
+        this.setVisible(false);
+        this.setInteractive();
+        this.parentMap = map;
+        this.on('pointerover',this.handleOver.bind(this));
+        this.on('pointerout',this.handleOut.bind(this));
+    },
+
+    setUp: function(tileX,tileY,name,frame,alwaysOn){
+        this.setOrigin(0.5);
+        this.setFrame(frame);
+        this.alwaysOn = alwaysOn;
+
+        this.tileX = tileX;
+        this.tileY = tileY;
+        // this.setDepth(this.depth + this.tileY/1000); // /1000 to avoid appearing above tooltip
+        this.setDepth(2 + this.tileY/1000); // /1000 to avoid appearing above tooltip
+        var location = this.parentMap.computeMapLocation(this.tileX,this.tileY);
+        this.setPosition(location.x,location.y);
+        this.name = name;
         this.setVisibility();
     },
 
@@ -518,9 +580,35 @@ var Pin = new Phaser.Class({
 
     handleOut: function(){
         UI.tooltip.hide();
+    }
+});
+
+var Dash = new Phaser.Class({
+
+    Extends: Phaser.GameObjects.Line,
+
+    Mixins: [MapMarker],
+
+    initialize: function Dash (map) {
+        Phaser.GameObjects.Line.call(this, UI.scene);
+        UI.scene.add.displayList.add(this);
+        this.markerType = 'dash';
+        this.setOrigin(0);
+        this.setScrollFactor(0);
+        this.setStrokeStyle(1,0xff0000);
+        this.setVisible(false);
+        this.parentMap = map;
     },
 
-    hide: function(){
-        this.setVisible(false);
+    setUp: function(fx,fy,tx,ty){
+        // console.warn(fx,fy,tx,ty);
+        var from = this.parentMap.computeMapLocation(fx,fy);
+        var to = this.parentMap.computeMapLocation(tx,ty);
+        this.tileX = fx;
+        this.tileY = fy;
+        this.setDepth(2);
+        this.setPosition(from.x,from.y);
+        this.setTo(0,0, to.x-from.x,to.y-from.y);
+        this.setVisibility();
     }
 });

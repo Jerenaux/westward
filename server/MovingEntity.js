@@ -19,32 +19,6 @@ MovingEntity.prototype.constructor = MovingEntity;
 
 // ### Movement ###
 
-MovingEntity.prototype.findNextFreeCell = function(x,y){
-    var stoppingCritetion = 100;
-    var counter = 0;
-    var queue = [];
-    queue.push({x:x,y:y});
-    var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
-    while(queue.length > 0){
-        var node = queue.shift();
-        if(!GameServer.checkCollision(node.x,node.y)) return node;
-
-        // expand
-        for(var i = 0; i < contour.length; i++){
-            var candidate = {
-                x: node.x + contour[i][0],
-                y: node.y + contour[i][1]
-            };
-            if(!GameServer.checkCollision(candidate.x,candidate.y)) return candidate;
-            queue.push(candidate);
-        }
-
-        counter++;
-        if(counter >= stoppingCritetion) break;
-    }
-    return null;
-};
-
 MovingEntity.prototype.setFieldOfVision = function(aois){
     this.fieldOfVision = aois;
 };

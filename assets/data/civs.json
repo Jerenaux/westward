@@ -1,14 +1,13 @@
 {
   "0":{
+    "name": "Civ Warrior",
     "stats": {
-      "hpmax": 130,
-      "hp": 130,
-      "def": 7,
-      "dmg": 3
+      "hpmax": 100,
+      "hp": 100,
+      "def": 4,
+      "dmg": 11
     },
     "xp": 50,
-    "loot":{
-      "43": 1
-    }
+    "loot":{}
   }
 }

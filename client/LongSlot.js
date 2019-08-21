@@ -178,3 +178,26 @@ LongSlot.prototype.hide = function(){
     this.zone.setVisible(false);
     this.displayed = false;
 };
+
+LongSlot.prototype.moveUp = function(nb){
+    this.slices.forEach(function(e){
+        e.setDepth(e.depth+nb);
+    });
+    this.texts.forEach(function(e){
+        e.setDepth(e.depth+nb);
+    });
+    this.images.forEach(function(e){
+        e.setDepth(e.depth+nb);
+    });
+    if(this.button) this.button.moveUp(nb);
+    if(this.buttons) {
+        this.buttons.forEach(function (b) {
+            b.btn.setDepth(b.btn.depth + nb);
+            b.symbol.setDepth(b.symbol.depth + nb);
+            b.ring.setDepth(b.ring.depth + nb);
+            b.zone.setDepth(b.zone.depth + nb);
+        });
+    }
+    if(this.icon) this.icon.setDepth(this.icon.depth+nb);
+    this.depth = nb;
+};

@@ -70,7 +70,11 @@ ItemSlot.prototype.addRarity = function(){
 };
 
 ItemSlot.prototype.checkForPanelOnTop = function(){
-    return Engine.currentMenu.isPanelDisplayed('prices') || Engine.currentMenu.isPanelDisplayed('goldaction');
+    return (Engine.currentMenu.isPanelDisplayed('prices') 
+    || Engine.currentMenu.isPanelDisplayed('goldaction')
+    || Engine.repairPanel.displayed
+    || Engine.repairAction.displayed
+    );
 };
 
 ItemSlot.prototype.setUp = function(action,item){

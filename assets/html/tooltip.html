@@ -1,6 +1,7 @@
 <!--- TODO: create from cache (https://labs.phaser.io/edit.html?src=src\game%20objects\dom%20element\form%20input.js)-->
 <style>
     .tooltip {
+        cursor:none;
         max-width: 250px;
         min-width: 30px;
         text-align: left;
@@ -41,6 +42,13 @@
         margin-top: 5px;
         vertical-align: top;
     }
+    #bar {
+        font-size: 12px;
+    }
+    #lifebar {
+        height: 10px;
+        padding: 0;
+    }
     .icon {
         background-image: url(assets/sprites/ui.png);
         background-position: -482px -422px;
@@ -53,8 +61,8 @@
     .nb {
         font-size: 12px;
         margin-left: 20px;
-        /*border: 1px solid red;*/
         width: 50px;
+        /*border: 1px solid red;*/
     }
 </style>
 
@@ -71,5 +79,11 @@
     </div>
     <div id="stat">
         <mark id="base"></mark>&nbsp;<mark id="equipment_modifier"></mark>&nbsp;<mark id="fatigue_modifier"></mark>
+    </div>
+    <div id="bar">
+        Integrity:
+        <div class="w3-light-grey w3-round-xlarge w3-tiny">
+            <div id="lifebar" class="w3-container w3-round-xlarge w3-green" style="width: 1%"></div>
+        </div>
     </div>
 </div>

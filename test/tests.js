@@ -78,8 +78,8 @@ describe('GameServer',function(){
     var animal;
     var animalFarAway;
     it('addAnimal', function(){
-        var x = player.x + 3;
-        var y = player.y + 3;
+        var x = player.x - 3;
+        var y = player.y - 3;
         var type = 0;
         animal = gs.addAnimal(x,y,type);
         animalFarAway = gs.addAnimal(0,0,0);
@@ -317,6 +317,26 @@ describe('GameServer',function(){
         expect(player.isEquipped(slot)).to.equal(true);
         expect(player.getEquippedItemID(slot)).to.equal(type);
         expect(player.isEquipped(slotNotOwned)).to.equal(false);
+    });
+
+    it('handleCraft',function(){
+        var item = 43;
+        var data = {
+            x: player.x - 10,
+            y: player.y + 10,
+            type: 3 // workshop
+        };
+        var workshop = gs.addBuilding(data);
+        expect(gs.handleCraft({},player.socketID)).to.equal(false); // not in building
+        player.inBuilding = workshop.id;
+        expect(gs.handleCraft({id:item},player.socketID)).to.equal(false); // no ingredients
+        for(var ingredient in gs.itemsData[item].recipe){
+            player.giveItem(ingredient, gs.itemsData[item].recipe[ingredient]);
+        }
+        var ownedBefore = player.getItemNb(item);
+        // console.log('inventory:',player.inventory.toList());
+        expect(gs.handleCraft({id:item},player.socketID)).to.equal(true);
+        expect(player.getItemNb(item)).to.equal(ownedBefore+gs.itemsData[item].output);
     });
 
     /**

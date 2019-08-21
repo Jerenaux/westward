@@ -28,6 +28,8 @@ var Item = new Phaser.Class({
         // this.setOrigin(0.5);
         this.setDepth(this.tileY+1.5); // for e.g. when wood spawns on the roots of a tree
 
+        if(Engine.overlay.get(this.tileX,this.tileY)) this.hollow();
+
         if(itemData.collides) {
             this.collides = true;
             Engine.collisions.add(this.tileX,this.tileY);
@@ -74,7 +76,7 @@ var Item = new Phaser.Class({
 
     handleOver: function(){
         UI.manageCursor(1,'item',this);
-        this.setFrame(this.inFrame);
+        if(!this.hollowed) this.setFrame(this.inFrame);
         Engine.hideMarker();
         // console.log(this.depth);
     },
@@ -83,7 +85,7 @@ var Item = new Phaser.Class({
         UI.manageCursor(0,'item');
         //UI.setCursor();
         UI.tooltip.hide();
-        this.setFrame(this.outFrame);
+        if(!this.hollowed) this.setFrame(this.outFrame);
         Engine.showMarker();
     }
 });

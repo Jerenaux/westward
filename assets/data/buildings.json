@@ -1,4 +1,20 @@
 {
+  "1":{
+    "name": "Shack",
+    "base":{
+      "width": 4,
+      "height": 4
+    },
+    "icon": "civhut",
+    "sprite": "civhut",
+    "foundations": "civhut_",
+    "depthOffset": 2,
+    "canFight": false,
+    "stats": {
+      "def": 20,
+      "health": 500
+    }
+  },
   "2":{
     "name":"Tower",
     "desc": "A guard tower than can intercept enemies.",
@@ -10,13 +26,16 @@
     "depthOffset": 1,
     "sprite": "tower",
     "foundations":"foundations_2",
-    "mapicon": "tower",
     "mainMenu": "wip",
     "icon": "tower",
     "canFight": true,
     "aggro": true,
-    "health": 250,
-    "dmg": 8,
+    "stats": {
+      "health": 2500,
+      "dmg": 8,
+      "def": 30,
+      "acc": 1000
+    },
     "shootFrom":{
       "x":66,
       "y":100
@@ -34,11 +53,13 @@
     "icon": "workshop",
     "foundations": "foundations_4",
     "sprite": "workshop",
-    "mapicon": "workshop",
     "mainMenu": "crafting",
     "depthOffset": 2,
     "canFight": false,
-    "health": 50
+    "stats": {
+      "health": 700,
+      "def": 20
+    }
   },
   "4":{
     "name": "Shop",
@@ -52,11 +73,13 @@
     "icon": "shop",
     "foundations": "foundations_3",
     "sprite": "shop",
-    "mapicon": "workshop",
     "mainMenu": "trade",
     "depthOffset": 2,
     "canFight": false,
-    "health": 50
+    "stats": {
+      "health": 500,
+      "def": 20
+    }
   },
   "6":{
     "name": "Lumber camp",
@@ -69,12 +92,14 @@
     "icon": "lumbercamp",
     "sprite": "lumbercamp",
     "foundations": false,
-    "mapicon": "wood",
     "mainMenu": "production",
     "depthOffset": 2,
     "production": [[3,1,60,5],[7,5,60,5]],
     "canFight": false,
-    "health": 50
+    "stats": {
+      "health": 200,
+      "def": 20
+    }
   },
   "11":{
     "name": "Shack",
@@ -88,11 +113,13 @@
     "icon": "shack",
     "foundations": "foundations_1",
     "sprite": "shack",
-    "mapicon": "wood",
     "mainMenu": "rest",
     "depthOffset": 2,
     "canFight": false,
-    "health": 50,
+    "stats": {
+      "health": 500,
+      "def": 20
+    },
     "shelter": true,
     "locked":true,
     "restVigorAmount": 0.5,

@@ -7,6 +7,7 @@ var clone = require('clone'); // used to clone objects, essentially used for clo
 var ObjectId = require('mongodb').ObjectID;
 var mongoose = require('mongoose');
 var config = require('config');
+var Voronoi = require('voronoi');
 
 var GameServer = {
     lastPlayerID: 0,
@@ -16,6 +17,7 @@ var GameServer = {
     lastItemID: 0,
     lastBattleID: 0,
     lastCellID: 0,
+    lastCampID: 0,
     nextInstanceID: 0,
     players: {}, // player.id -> player
     animals: {}, // animal.id -> animal
@@ -78,7 +80,7 @@ GameServer.updateStatus = function(){
  * Creates Mongoose models based on schemas
  */
 GameServer.createModels = function(){
-    GameServer.SettlementModel = mongoose.model('Settlement', Schemas.settlementSchema);
+    GameServer.CampModel = mongoose.model('Camp', Schemas.campSchema);
     GameServer.BuildingModel = mongoose.model('Building', Schemas.buildingSchema);
     GameServer.PlayerModel = mongoose.model('Player', Schemas.playerSchema);
 };
@@ -101,11 +103,11 @@ GameServer.readMap = function(mapsPath,test,cb){
             'static_data': null,
             'player_data': GameServer.readPlayersData,
             'regions': GameServer.loadRegions,
+            'camps': GameServer.setUpCamps,
             'buildings': GameServer.loadBuildings,
             'items': GameServer.loadItems,
             'markers': GameServer.loadMarkers,
-            'spawn_zones': GameServer.setUpSpawnZones,
-            'camps': GameServer.setUpCamps
+            'spawn_zones': GameServer.setUpSpawnZones
         };
     }
     GameServer.testcb = cb;
@@ -173,7 +175,7 @@ GameServer.readMap = function(mapsPath,test,cb){
 
 GameServer.initializeFlags = function(){
     var flags = ['nbConnected','FoW','buildingsMarkers','animalsMarkers','deathMarkers',
-    'conflictMarkers'];
+    'conflictMarkers','frontier'];
     GameServer.flags = {};
     flags.forEach(function(flag){
         GameServer.flags[flag] = false;
@@ -318,8 +320,19 @@ GameServer.loadBuildings = function(){
     GameServer.BuildingModel.find(function (err, buildings) {
         if (err) return console.log(err);
         buildings.forEach(GameServer.addBuilding);
+
+        if(GameServer.needToSpawnCamps) GameServer.spawnCamps();
+
+        GameServer.computeFrontier(false);
         GameServer.updateStatus();
     });
+};
+
+GameServer.spawnCamps = function(){
+    for(var campID in GameServer.camps){
+        var camp = GameServer.camps[campID];
+        camp.spawnBuildings();
+    }
 };
 
 /**
@@ -409,15 +422,37 @@ GameServer.setUpSpawnZones = function(){
  * Called during the initialization sequence.
  */
 GameServer.setUpCamps = function(){
+    GameServer.camps = {};
+    GameServer.CampModel.find(function (err, camps) {
+        if (err) return console.log(err);
+        if(camps.length == 0){
+            GameServer.readCamps();
+        }else{
+            camps.forEach(GameServer.addCamp);
+        }
+        GameServer.updateStatus();
+    });
+};
+
+GameServer.readCamps = function(){
+    console.log('Creating camps from camps.json');
     GameServer.campsData = JSON.parse(fs.readFileSync('./assets/data/camps.json').toString());
-    GameServer.camps = [];
 
     for (let key in GameServer.campsData) {
         const data = GameServer.campsData[key];
-        GameServer.camps.push(new Camp(data.huts, data.target, data.center));
+        var camp = new Camp(GameServer.lastCampID++, data.center, data.buildings);
+        var document = new GameServer.CampModel(camp);
+        document.save(function(err,doc){
+            camp.mongoID = doc._id.toString();
+        });
+        GameServer.camps[camp.id] = camp;
+        GameServer.needToSpawnCamps = true;
     }
+};
 
-    GameServer.updateStatus();
+GameServer.addCamp = function(data){
+    var camp = new Camp(data.id, data.center);
+    GameServer.camps[camp.id] = camp;
 };
 
 /**
@@ -469,13 +504,12 @@ GameServer.addItem = function(x,y,type,instance){
  */
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
-    console.log('--- Performing on initialization tasks ---');
-    GameServer.addItem(469,673,30);
-    GameServer.addItem(469,671,26);
-    GameServer.addItem(469,669,7);
-    GameServer.addAnimal(1173,144,0);
-    GameServer.addAnimal(1172,144,0);
-    GameServer.addAnimal(1171,144,0);
+    GameServer.addItem(513,677,26);
+    GameServer.addItem(514,677,26);
+    GameServer.addItem(513,676,26);
+    GameServer.addAnimal(404,602,0);
+    GameServer.addAnimal(406,604,0);
+    GameServer.addAnimal(408,606,0);
     GameServer.addAnimal(1170,144,0);
     console.log('---done---');
 };
@@ -489,17 +523,18 @@ GameServer.onNewPlayer = function(player){
     // for testing)
     if(!config.get('misc.performInit')) return;
     // give me all the health and vigor
-    // player.setStat('hp', 30);
+    player.setStat('hp', 300);
     // player.setStat('vigor', 10);
     // player.applyVigorModifier();
 
     const items = [
-        // [3,30],
-        // // [4, 5],
-        // [6, 3],
+        [7,10],
+        [21, 10],
+        [3, 20],
+        [6,1], // dawn
         // [2, 1],
         // [19, 1],
-        // [20, 17],
+        [20, 17], // arrows
         // // [45, 10],
         // // [50, 11],
         // [51, 1],
@@ -539,7 +574,7 @@ GameServer.setUpdateLoops = function(){
  */
 GameServer.startEconomy = function(){
     GameServer.economyTurns = config.get('economyCycles.turns');
-    GameServer.elapsedTurns = 0;
+    GameServer.elapsedTurns = -1; // start at -1 since  `GameServer.economyTurn()` is called straight away and increments counter
     var maxDuration = 0;
     for(var event in GameServer.economyTurns){
         var duration = GameServer.economyTurns[event];
@@ -562,21 +597,17 @@ GameServer.startEconomy = function(){
  */
 GameServer.economyTurn = function(){
     GameServer.elapsedTurns++;
-    if(!GameServer.elapsedTurns%10) console.log('Turn',GameServer.elapsedTurns);
+    // if(!GameServer.elapsedTurns%10) console.log('Turn',GameServer.elapsedTurns);
 
     GameServer.spawnZones.forEach(function(zone){
         zone.update();
     });
 
-    GameServer.camps.forEach(function(camp){
-        camp.update();
-    });
-
+    GameServer.updateEconomicEntities(GameServer.camps); // civ spawn
     GameServer.updateEconomicEntities(GameServer.buildings); // prod, build, ...
     GameServer.updateEconomicEntities(GameServer.players); // food, shelter ...
 
     if(GameServer.isTimeToUpdate('itemsRespawn')) GameServer.respawnItems();
-
 
     if(GameServer.elapsedTurns === GameServer.maxTurns) GameServer.elapsedTurns = 0;
 };
@@ -598,7 +629,6 @@ GameServer.updateEconomicEntities = function(entities){
  * number of turns in `GameServer.economyTurns`.
  * @returns {boolean} Whether or not enough turns have elapsed.
  * */
-// TODO: deprecated? Remove?
 GameServer.isTimeToUpdate = function(event){
     return (GameServer.elapsedTurns%GameServer.economyTurns[event] === 0);
 };
@@ -1046,7 +1076,7 @@ GameServer.destroyItem = function(item,nb,source){
  * @param {Player|NPC} attacked - The other entity starting the battle.
  */
 GameServer.handleBattle = function(attacker,attacked){
-    console.warn(attacker.getShortID(),'vs',attacked.getShortID());
+    console.log(attacker.getShortID(),'vs',attacked.getShortID());
     if(!GameServer.enableBattles){
         if(attacker.isPlayer) attacker.addMsg('Battles are disabled at the moment');
         return false;
@@ -1079,6 +1109,10 @@ GameServer.handleBattle = function(attacker,attacked){
         var foe = (attacker.isPlayer ? attacked : attacker);
         Prism.logEvent(player,'battle',{category:foe.entityCategory,type:foe.type});
     }
+    if(attacked.isPlayer) attacked.addNotif('You were attacked by '+attacker.name);
+    if(attacker.isPlayer) attacker.addNotif('You attacked '+attacker.name);
+    if(attacked.entityCategory == 'PlayerBuilding') GameServer.notifyPlayer(attacked.owner,'Your '+attacked.name+' was attacked by '+attacker.name);
+    if(attacked.isCiv || attacker.isCiv) GameServer.addMarker('conflict',attacked.x,attacked.y);
     return true;
 };
 
@@ -1091,7 +1125,7 @@ GameServer.handleBattle = function(attacker,attacked){
  * @returns {Array} The list of battle cells coordinates ({x,y} objects)
  */
 GameServer.computeBattleArea = function(f1,f2,depth){
-    var MAX_DEPTH = depth || 2;
+    var MAX_DEPTH = depth || 3; // TODO: conf
     var cells = new SpaceMap();
     var fs = [f1,f2];
     fs.forEach(function(f){
@@ -1100,7 +1134,11 @@ GameServer.computeBattleArea = function(f1,f2,depth){
     });
 
     var queue = [];
-
+    // if(f1.isCiv){
+    //     console.warn('civ battle debug');
+    //     console.warn(f1.getShortID(),f1.getLocationCenter());
+    //     console.warn(f2.getShortID(),f2.getLocationCenter());
+    // }
     var path = GameServer.findPath(f1.getLocationCenter(),f2.getLocationCenter());  // Reminder: a default length limit is built-in the pathfinder
     if(!path || path.length === 0) {
         console.warn('No path to target');
@@ -1182,6 +1220,10 @@ GameServer.checkForBattle = function(x,y){
 GameServer.connectToBattle = function(entity,cell){
     var battle = cell.battle;
     var area = GameServer.computeBattleArea(entity,cell,3);
+    if(!area){
+        console.warn('No area found');
+        return;
+    }
     battle.addFighter(entity);
     GameServer.addBattleArea(area,battle);
     GameServer.expandBattle(battle,entity);
@@ -1410,6 +1452,7 @@ GameServer.handleShop = function(data,socketID) {
             GameServer.notifyPlayer(building.owner, msg);
         }
         building.updateBuild();
+        building.updateRepair();
     }
     building.save();
     Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type,owner:building.ownerName});
@@ -1428,7 +1471,7 @@ GameServer.handleBuild = function(data,socketID) {
     var buildPermit = GameServer.canBuild(bid, tile);
     if(player.isInstanced()) buildPermit = 1; //hack
     if (buildPermit === 1) {
-        GameServer.build(player, bid, tile);
+        GameServer.buildPlayerBuilding(player, bid, tile);
         player.addNotif('Started building a '+GameServer.buildingsData[bid].name);
         Prism.logEvent(player,'newbuilding',{x:tile.x,y:tile.y,building:bid});
     } else if(buildPermit === -1) { // collision
@@ -1457,7 +1500,7 @@ GameServer.canBuild = function(bid,tile){
     return 1;
 };
 
-GameServer.build = function(player,bid,tile){
+GameServer.buildPlayerBuilding = function(player,bid,tile){
     var data = {
         x: tile.x,
         y: tile.y+1,
@@ -1500,6 +1543,19 @@ GameServer.finalizeBuilding = function(player,building){
     if(GameServer.buildingParameters.autobuild) building.setBuilt();
 };
 
+GameServer.buildCivBuilding = function(data){
+    var building = new Building(data);
+    var document = new GameServer.BuildingModel(building);
+    building.mongoID = document._id;
+    document.save(function (err) {
+        if (err) return console.error(err);
+    });
+    building.embed();
+    GameServer.setFlag('buildingsMarkers');
+    return building;
+};
+
+// TODO: filter some based on FoW
 GameServer.listMarkers = function(markerType){
     var mapName = markerType+'Markers';
     if(!(mapName in GameServer)){
@@ -1509,27 +1565,12 @@ GameServer.listMarkers = function(markerType){
     return GameServer[markerType+'Markers']
 };
 
-// GameServer.listAnimalMarkers = function(){
-//     return GameServer.animalMarkers; // TODO: filter based on FoW
-// };
-
-// GameServer.listResourceMarkers = function(){
-//     return GameServer.resourceMarkers; // TODO: filter based on FoW
-// };
-
-// GameServer.listDeathMarkers = function(){
-//     return GameServer.deathMarkers; 
-// };
-
-// GameServer.listConflictMarkers = function(){
-//     return GameServer.conflictMarkers; 
-// };
-
 GameServer.listBuildingMarkers = function(instance){
     var list = [];
     for(var bid in GameServer.buildings){
         var building = GameServer.buildings[bid];
         if(!building.isOfInstance(instance)) continue;
+        if(building.civ && !building.built) continue;
         var bld = building.mapTrim();
         list.push(bld);
     }
@@ -1552,18 +1593,32 @@ GameServer.addMarker = function(markerType,x,y){
     });
 };
 
-// GameServer.addDeathMarker = function(x,y){
-//     GameServer.deathMarkers.push([x,y]);
-//     if(GameServer.deathMarkers.length > 10) GameServer.deathMarkers.shift(); // TODO: conf
-//     GameServer.setFlag('deathMarkers');
-// };
 
-// GameServer.addConflictMarker = function(x,y){
-//     GameServer.conflictMarkers.push([x,y]);
-//     if(GameServer.conflictMarkers.length > 10) GameServer.conflictMarkers.shift(); // TODO: conf
-//     // GameServer.conflictMarkersChanged = true;
-//     GameServer.setFlag('conflictMarkers');
-// };
+GameServer.findNextFreeCell = function(x,y){
+    var stoppingCritetion = 100;
+    var counter = 0;
+    var queue = [];
+    queue.push({x:x,y:y});
+    var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
+    while(queue.length > 0){
+        var node = queue.shift();
+        if(!GameServer.checkCollision(node.x,node.y)) return node;
+
+        // expand
+        for(var i = 0; i < contour.length; i++){
+            var candidate = {
+                x: node.x + contour[i][0],
+                y: node.y + contour[i][1]
+            };
+            if(!GameServer.checkCollision(candidate.x,candidate.y)) return candidate;
+            queue.push(candidate);
+        }
+
+        counter++;
+        if(counter >= stoppingCritetion) break;
+    }
+    return null;
+};
 
 GameServer.handleRespawn = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
@@ -1579,24 +1634,36 @@ GameServer.logMenu = function(menu,socketID){
 
 GameServer.handleCraft = function(data,socketID){
     if(data.id === -1) {
-        console.log('No ID');
-        return;
+        console.log('No item ID');
+        return false;
     }
     var player = GameServer.getPlayer(socketID);
     var buildingID = player.inBuilding;
+    if(!(buildingID > -1)){
+        console.log('Not in a building');
+        return false;
+    }
     var building = GameServer.buildings[buildingID];
+    if(!building){
+        console.warn('ERROR: Undefined building when crafting');
+        return false;
+    }
+    if(!building.isWorkshop()){
+        console.log('Not in a workshop');
+        return false;
+    }
     var isFinancial = (!building.isOwnedBy(player));
     var targetItem = data.id;
-    var nb = data.nb;
+    var nb = data.nb || 1;
     // var recipient = (stock == 1 ? player : building);
     if(!player.canCraft(targetItem,nb)) {
         console.log('All ingredients not owned');
-        return;
+        return false;
     }
     var price = building.getPrice(targetItem, nb, 'sell');
     if(isFinancial && player.gold < price){
         console.log('Not enough gold');
-        return;
+        return false;
     }
     GameServer.operateCraft(player, targetItem, nb);
     if(isFinancial) building.giveGold(player.takeGold(price));
@@ -1608,6 +1675,7 @@ GameServer.handleCraft = function(data,socketID){
         GameServer.notifyPlayer(building.owner, msg);
     }
     Prism.logEvent(player,'craft',{item:targetItem,nb:nb});
+    return true;
 };
 
 GameServer.operateCraft = function(recipient,targetItem,nb){
@@ -1643,8 +1711,10 @@ GameServer.handleBelt = function(data,socketID){
             return;
         }
         player.backpackToBelt(item);
+        Prism.logEvent(player,'belt',{item:item, direction:'tobelt'});
     }else if(inventory == 'belt' && player.hasItemInBelt(item)) {
         player.beltToBackpack(item);
+        Prism.logEvent(player,'belt',{item:item, direction:'frombelt'});
     }
 };
 
@@ -1774,7 +1844,7 @@ GameServer.updateFoW = function(){
     }
     for(var bid in GameServer.buildings){
         var building = GameServer.buildings[bid];
-        GameServer.dissipateFoW(building.aoi);
+        if(!building.civ) GameServer.dissipateFoW(building.aoi);
     }
     // GameServer.fowChanged = true;
     GameServer.setFlag('FoW');
@@ -1793,6 +1863,41 @@ GameServer.computeFoW = function(){
         fow.push(aoi);
     }
     return fow;
+};
+
+GameServer.computeFrontier = function(setFlag){
+    GameServer.frontier = [];
+    var sites = [];
+    for(var bldID in GameServer.buildings){
+        var bld = GameServer.buildings[bldID];
+        if(!bld.isBuilt()) continue;
+        sites.push({
+            x: bld.x,
+            y: bld.y,
+            t: (bld.civ ? 'r' : 'b')
+        });
+    }
+    console.warn(sites.length+' buildings considered for Frontier');
+
+    var voronoi = new Voronoi();
+    var bbox = {xl: 0, xr: World.worldWidth, yt: 0, yb: World.worldHeight}; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
+    var diagram = voronoi.compute(sites, bbox);
+    diagram.edges.forEach(function(edge){
+        if(!edge.lSite || !edge.rSite) return;
+        if(edge.lSite.t == edge.rSite.t) return;
+        GameServer.frontier.push({
+            a:{
+                x: edge.va.x,
+                y: edge.va.y
+            },
+            b:{
+                x: edge.vb.x,
+                y: edge.vb.y
+            }
+        });
+    },this);
+    console.warn('frontier:',GameServer.frontier);
+    if(setFlag) GameServer.setFlag('frontier');
 };
 
 /**
@@ -1859,12 +1964,9 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         individualGlobalPkg.removeEcho(player.id); // remove redundant information from multiple update sources
         individualGlobalPkg.filterInstance(player.instance);
         if(individualGlobalPkg.isEmpty()) individualGlobalPkg = null;
-        // if(individualGlobalPkg) console.warn(individualGlobalPkg.buildings);
 
         if(individualGlobalPkg === null
             && localPkg === null
-            // && !GameServer.nbConnectedChanged
-            // && !GameServer.fowChanged
             && !GameServer.anyFlag()
         ){
                 return;
@@ -2122,12 +2224,6 @@ GameServer.setBuildingGold = function(data){
     return true;
 };
 
-GameServer.toggleBuild = function(data){
-    var building = GameServer.buildings[data.id];
-    building.toggleBuild();
-    building.save();
-    return true;
-};
 
 GameServer.countItems = function(cb){
     cb(GameServer.itemCounts);

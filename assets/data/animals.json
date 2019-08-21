@@ -1,21 +1,25 @@
 {
   "0":{
-    "sprite":"wolves",
+    "sprite":"wolf",
     "battleicon":"wolf",
     "name": "Wolf",
-    "map_nale": "Wolf pack",
-    "frame": 25,
+    "map_name": "Wolf pack",
+    "frame": 22,
     "aggro": true,
     "wander": true,
     "spawnRate": 30,
     "walkPrefix": "wolf",
     "footprintsFrame": 1,
     "printsVertOffset": 10,
+    "origin": {
+      "x": 0.1,
+      "y": 0
+    },
     "restingFrames": {
-        "up": 37,
+        "up": 22,
         "down": 1,
-        "left": 13,
-        "right": 25
+        "left": 8,
+        "right": 15
     },
     "stats": {
       "hpmax": 100,

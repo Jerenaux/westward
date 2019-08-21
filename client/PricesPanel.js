@@ -19,6 +19,7 @@ function PricesPanel(x,y,width,height,title){
         if(value.length >= 3){
             var hits = [];
             for(var id in Engine.itemsData) {
+                if(Engine.itemsData[id].permanent) continue; // don't sell hands and fists
                 if(this.craftingOnly && !Engine.itemsData[id].isCrafted) continue;
                 if(id != 1 && this.prodOnly && !Engine.isProduced(id)) continue;
 

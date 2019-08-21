@@ -98,6 +98,15 @@ var GoldEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var BeltEvent = Event.discriminator(
+    'BeltEvent',
+    new mongoose.Schema({
+        item: Number,
+        direction: String
+    }),
+    {discriminatorKey: 'kind'}
+);
+
 var BuildingEvent = Event.discriminator(
     'BuildingEvent',
     new mongoose.Schema({
@@ -194,6 +203,7 @@ Prism.logEvent = function(player,action,data){
 
     var map = {
         'battle': BattleEvent,
+        'belt': BeltEvent,
         'building': BuildingEvent,
         'buy': TradeEvent,
         'chat': ChatEvent,

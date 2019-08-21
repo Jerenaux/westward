@@ -543,10 +543,9 @@
     "name": "Fists",
     "desc": "The most basic melee weapon at your disposal. Can't be unequipped.",
     "sound": "soft",
-    "nbBushes": 4,
-    "yield": 5,
     "verb": "Ate",
     "equipment": "meleew",
+    "isCrafted": false,
     "permanent": true
   },
   "49":{
@@ -555,16 +554,12 @@
     "name": "Hands",
     "desc": "The most basic melee weapon at your disposal. Can be used to throw stones and explosives. Can't be unequipped.",
     "sound": "soft",
-    "nbBushes": 4,
-    "yield": 5,
     "equipment": "rangedw",
     "class": "throwable",
     "ammo": "stones",
     "effects":{"acc":20},
-    "recipe": {"7":1,"21":1},
     "useInBattle": true,
-    "isCrafted": true,
-    "basicRecipe": true,
+    "isCrafted": false,
     "permanent": true
   },
   "50":{

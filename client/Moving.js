@@ -148,9 +148,10 @@ var Moving = new Phaser.Class({
 
         this.computeOrientation(startX,startY,endX,endY);
 
-        if(this.orientation != this.previousOrientation){
+        if(this.orientation != this.previousOrientation) {
             this.previousOrientation = this.orientation;
-            this.play(this.animPrefix+'_move_'+this.orientation);
+            this.play(this.animPrefix + '_move_' + this.orientation);
+            if(this.hollowed) this.hollow();
         }
 
         if(this.isHero){
@@ -349,24 +350,9 @@ var Moving = new Phaser.Class({
     },
 
     handleOver: function(){
-        // this.hollow();
     },
 
     handleOut: function(){
-        // this.unhollow();
-    },
-
-    hollow: function(){
-        this.setDepth(this.tileY + 5);
-        this.setPipeline('hollow');
-        var texture = this.texture.source[0];
-        this.pipeline.setFloat4('uFrameCut', this.frame.data.cut.x,this.frame.data.cut.y,this.frame.data.cut.w,this.frame.data.cut.h);
-        this.pipeline.setFloat2('uTextureSize', texture.width,texture.height);
-    },
-
-    unhollow: function(){
-        this.resetPipeline();
-        this.updateDepth();
     },
 
     isDisabled: function(){
@@ -387,5 +373,9 @@ var Moving = new Phaser.Class({
             x: this.tileX + this.cellsWidth/2,//Math.floor(this.tileX + this.cellsWidth/2),
             y: this.tileY + this.cellsHeight/2//Math.floor(this.tileY + this.cellsHeight/2)
         };
+    },
+
+    isDead: function(){
+        return this.dead;
     }
 });

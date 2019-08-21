@@ -17,7 +17,7 @@
         rangedAtkDelay: 500
    },
    buildings: {
-        autobuild: true,
+        autobuild: false,
         canfight: true,
         nobuildings: false,
         inventorySize: 100,
@@ -47,7 +47,7 @@
         turnDuration: 1,
         // Unit: turns
         turns: {
-            camps: 5,
+            camps: 1800,
             foodConsumptionRate: 600, // rate at which food levels of players are decreased ; amount in character.foodConsumption
             itemsRespawn: 86400, // 86400 turns of 1sec = 24h
             restRate: 1, // rate at which vigor levels of players are increased when sheltered ; amount in buildings.json
@@ -74,12 +74,12 @@
     civs: {
         aggro: false,
         wander: true,
-        raidMinimum: 8
+        raidMinimum: 3
     },
     wildlife: {
-        aggro: true,
+        aggro: false,
         nolife: false,
-        wander: false,
+        wander: true,
         wanderRange: 5,
         idleTime: [1, 3.5], // random bounds; in seconds
         idleRetry: 200 // ms

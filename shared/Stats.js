@@ -130,8 +130,8 @@ Stat.prototype.getValue = function(){
     return this.clamp(Math.round(base));
 };
 
-Stat.prototype.setBaseValue = function(value){
-    var v = this.clamp(value);
+Stat.prototype.setBaseValue = function(value,force){
+    var v = (force ? value : this.clamp(value));
     this.baseValue = v;
 };
 

@@ -43,7 +43,8 @@ Engine.preload = function() {
     // Characters
     this.load.spritesheet('enemy', 'assets/sprites/enemy.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64}); // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
-    this.load.spritesheet('wolves', 'assets/sprites/animals/wolves.png',{frameWidth:32,frameHeight:32});
+    // this.load.spritesheet('wolves', 'assets/sprites/animals/wolves.png',{frameWidth:32,frameHeight:32});
+    this.load.spritesheet('wolf', 'assets/sprites/animals/wolf.png',{frameWidth:43,frameHeight:32});
     this.load.spritesheet('bears', 'assets/sprites/animals/bears2.png',{frameWidth:56,frameHeight:56});
     this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
     // this.load.spritesheet('toadmen', 'assets/sprites/animals/toadmen.png',{frameWidth:48,frameHeight:48});
@@ -68,7 +69,7 @@ Engine.preload = function() {
     this.load.atlas('mapicons', 'assets/sprites/mapicons.png', 'assets/sprites/mapicons.json');
     this.load.atlas('battleicons', 'assets/sprites/battleicons.png', 'assets/sprites/battleicons.json');
     // this.load.atlas('trayicons', 'assets/sprites/trayicons.png', 'assets/sprites/trayicons.json');
-    this.load.atlas('aok', 'assets/sprites/buildingsicons.png', 'assets/sprites/buildingsicons.json');
+    this.load.atlas('buildingsicons', 'assets/sprites/buildingsicons.png', 'assets/sprites/buildingsicons.json');
 
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
@@ -259,17 +260,6 @@ Engine.create = function(){
     Engine.civsData = Engine.scene.cache.json.get('civs');
     Engine.itemsData = Engine.scene.cache.json.get('itemsData');
 
-    Engine.buildingIconsData = {};
-    for(var building in Engine.buildingsData){
-        var data = Engine.buildingsData[building];
-        Engine.buildingIconsData[building] = {
-            'atlas': 'aok',
-            'frame': data.icon,
-            'name': data.name,
-            'desc': data.desc
-        };
-    }
-
     Engine.createMarker();
     Engine.createAnimations();
 
@@ -311,8 +301,9 @@ Engine.create = function(){
         Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
     }
 
-    var highlightPipeline = game.renderer.addPipeline('highlight', new HighlightPipeline(game));
-    var hollowPipeline = game.renderer.addPipeline('hollow', new HollowPipeline(game));
+    game.renderer.addPipeline('highlight', new HighlightPipeline(game));
+    game.renderer.addPipeline('hollow_items', new HollowPipeline(game));
+    game.renderer.addPipeline('hollow_moving', new HollowPipeline(game));
 
     Engine.created = true;
     Engine.configEngine();
@@ -426,56 +417,63 @@ Engine.playLocalizedSound = function(sound,maxVolume,location){
 };
 
 Engine.createAnimations = function(){
-    // Player
-    Engine.createWalkAnimation('player_move_right','hero',143,151,15);
-    Engine.createWalkAnimation('player_move_up','hero',104,112,15);
-    Engine.createWalkAnimation('player_move_down','hero',130,138,15);
-    Engine.createWalkAnimation('player_move_left','hero',117,125,15);
-    // TODO: reverse them
-    Engine.createAttackAnimation('player_attack_right','hero',195,200);
-    Engine.createAttackAnimation('player_attack_down','hero',182,187);
-    Engine.createAttackAnimation('player_attack_left','hero',169,174);
-    Engine.createAttackAnimation('player_attack_up','hero',156,161);
+    // TODO: don't hardcode, store in JSON of find a way to infer it
+    // (standardize all spritesheets?)
 
-    Engine.createAttackAnimation('player_bow_right','hero',247,259);
-    Engine.createAttackAnimation('player_bow_down','hero',234,246);
-    Engine.createAttackAnimation('player_bow_left','hero',221,233);
-    Engine.createAttackAnimation('player_bow_up','hero',208,220);
+    Engine.createAnimation('player_move_right','hero',143,151,15,10,true);
+    Engine.createAnimation('player_move_up','hero',104,112,15,10,true);
+    Engine.createAnimation('player_move_down','hero',130,138,15,10,true);
+    Engine.createAnimation('player_move_left','hero',117,125,15,10,true);
+
+    Engine.createAnimation('player_attack_right','hero',195,200,15,false,true);
+    Engine.createAnimation('player_attack_down','hero',182,187,15,false,true);
+    Engine.createAnimation('player_attack_left','hero',169,174,15,false,true);
+    Engine.createAnimation('player_attack_up','hero',156,161,15,false,true);
+
+    Engine.createAnimation('player_bow_right','hero',247,259,15,false,true);
+    Engine.createAnimation('player_bow_down','hero',234,246,15,false,true);
+    Engine.createAnimation('player_bow_left','hero',221,233,15,false,true);
+    Engine.createAnimation('player_bow_up','hero',208,220,15,false,true);
 
     // Civ
-    Engine.createWalkAnimation('enemy_move_right','enemy',143,151,15);
-    Engine.createWalkAnimation('enemy_move_up','enemy',104,112,15);
-    Engine.createWalkAnimation('enemy_move_down','enemy',130,138,15);
-    Engine.createWalkAnimation('enemy_move_left','enemy',117,125,15);
+    Engine.createAnimation('enemy_move_right','enemy',143,151,15,10,true);
+    Engine.createAnimation('enemy_move_up','enemy',104,112,15,10,true);
+    Engine.createAnimation('enemy_move_down','enemy',130,138,15,10,true);
+    Engine.createAnimation('enemy_move_left','enemy',117,125,15,10,true);
 
-    Engine.createAttackAnimation('enemy_attack_right','enemy',195,200);
-    Engine.createAttackAnimation('enemy_attack_down','enemy',182,187);
-    Engine.createAttackAnimation('enemy_attack_left','enemy',169,174);
-    Engine.createAttackAnimation('enemy_attack_up','enemy',156,161);
+    Engine.createAnimation('enemy_attack_right','enemy',195,200,15,false,true);
+    Engine.createAnimation('enemy_attack_down','enemy',182,187,15,false,true);
+    Engine.createAnimation('enemy_attack_left','enemy',169,174,15,false,true);
+    Engine.createAnimation('enemy_attack_up','enemy',156,161,15,false,true);
 
-    Engine.createAttackAnimation('enemy_bow_right','enemy',247,259);
-    Engine.createAttackAnimation('enemy_bow_down','enemy',234,246);
-    Engine.createAttackAnimation('enemy_bow_left','enemy',221,233);
-    Engine.createAttackAnimation('enemy_bow_up','enemy',208,220);
-    
+    Engine.createAnimation('enemy_bow_right','enemy',247,259,15,false,true);
+    Engine.createAnimation('enemy_bow_down','enemy',234,246,15,false,true);
+    Engine.createAnimation('enemy_bow_left','enemy',221,233,15,false,true);
+    Engine.createAnimation('enemy_bow_up','enemy',208,220,15,false,true);
+
     // Wolves
-    Engine.createWalkAnimation('wolf_move_down','wolves',0,2);
-    Engine.createWalkAnimation('wolf_move_left','wolves',12,14);
-    Engine.createWalkAnimation('wolf_move_right','wolves',24,26);
-    Engine.createWalkAnimation('wolf_move_up','wolves',36,38);
+    Engine.createAnimation('wolf_move_down','wolf',0,2,10,true);
+    Engine.createAnimation('wolf_move_left','wolf',7,9,10,true);
+    Engine.createAnimation('wolf_move_right','wolf',14,16,10,true);
+    Engine.createAnimation('wolf_move_up','wolf',21,23,10,true);
 
-    Engine.createWalkAnimation('whitewolf_move_down','wolves',3,5);
-    Engine.createWalkAnimation('whitewolf_move_left','wolves',15,17);
-    Engine.createWalkAnimation('whitewolf_move_right','wolves',27,29);
-    Engine.createWalkAnimation('whitewolf_move_up','wolves',39,41);
+    Engine.createAnimation('wolf_attack_down','wolf',28,34,15,false,true);
+    Engine.createAnimation('wolf_attack_left','wolf',35,41,15,false,true);
+    Engine.createAnimation('wolf_attack_right','wolf',42,48,15,false,true);
+    Engine.createAnimation('wolf_attack_up','wolf',49,55,15,false,true);
 
-    //Bears
-    Engine.createWalkAnimation('bear_move_down','bears',9,11);
-    Engine.createWalkAnimation('bear_move_left','bears',21,23);
-    Engine.createWalkAnimation('bear_move_right','bears',33,35);
-    Engine.createWalkAnimation('bear_move_up','bears',45,47);
+    Engine.createAnimation('wolf_die_down','wolf',56,58);
+    Engine.createAnimation('wolf_die_left','wolf',63,65);
+    Engine.createAnimation('wolf_die_right','wolf',70,72);
+    Engine.createAnimation('wolf_die_up','wolf',77,79);
 
-    Engine.scene.anims.create(config = {
+    // Bear
+    Engine.createAnimation('bear_move_down','bears',9,11,10,true);
+    Engine.createAnimation('bear_move_left','bears',21,23,10,true);
+    Engine.createAnimation('bear_move_right','bears',33,35,10,true);
+    Engine.createAnimation('bear_move_up','bears',45,47,10,true);
+
+    Engine.scene.anims.create({
         key: 'sword',
         frames: Engine.scene.anims.generateFrameNumbers('sword_anim', { start: 0, end: 2}),
         frameRate: 15,
@@ -486,7 +484,7 @@ Engine.createAnimations = function(){
         }
     });
 
-    Engine.scene.anims.create(config = {
+    Engine.scene.anims.create({
         key: 'explosion',
         frames: Engine.scene.anims.generateFrameNumbers('explosion', { start: 0, end: 80}),
         frameRate: 75,
@@ -497,15 +495,9 @@ Engine.createAnimations = function(){
         }
     });
 
-    Engine.scene.anims.create(config = {
+    Engine.scene.anims.create({
         key: 'player_death',
         frames: Engine.scene.anims.generateFrameNumbers('hero', { start: 260, end: 265}),
-        frameRate: 10
-    });
-
-    Engine.scene.anims.create(config = {
-        key: 'enemy_death',
-        frames: Engine.scene.anims.generateFrameNumbers('enemy', { start: 260, end: 265}),
         frameRate: 10
     });
 
@@ -517,24 +509,16 @@ Engine.createAnimations = function(){
     });
 };
 
-Engine.createAttackAnimation = function(key,texture,start,end){
-    var frames = Engine.scene.anims.generateFrameNumbers(texture, { start: start, end: end});
-    frames.push({key:texture, frame:start});
-    Engine.scene.anims.create(config = {
-        key: key,
-        frames: frames,
-        frameRate: 15
-    });
-};
-
-Engine.createWalkAnimation = function(key,texture,start,end,rate){
+Engine.createAnimation = function(key,texture,start,end,rate,loop,revert){
     rate = rate || 10;
-    Engine.scene.anims.create(config = {
+    var config = {
         key: key,
         frames: Engine.scene.anims.generateFrameNumbers(texture, { start: start, end: end}),
-        frameRate: rate,
-        repeat: -1
-    });
+        frameRate: rate
+    };
+    if(loop) config.repeat = -1;
+    if(revert) config.frames.push({key:texture, frame:start}); // adds the initial frame as the last frame
+    Engine.scene.anims.create(config);
 };
 
 Engine.toggleChatBar = function(){
@@ -781,6 +765,15 @@ Engine.makeUI = function(){
 
     var statsPanel = new StatsPanel(665,335,330,100,'Stats');
     statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help']);
+
+    // Todo: make a 'makerepairpanel()' method similar to 'makepricespanel()'?
+    Engine.repairPanel = new RepairPanel(476,120,500,200,'Repair');
+    Engine.repairPanel.addButton(500-16,-8,'red','close',Engine.repairPanel.hide.bind(Engine.repairPanel),'Close');
+    Engine.repairPanel.addButton(460, 8, 'blue','help',null,'',UI.textsData['repair_help']);
+    Engine.repairPanel.moveUp(2);
+    Engine.repairAction = new ShopPanel(670,310,300,100,'Take'); 
+    Engine.repairAction.addButton(300-16,-8,'red','close',Engine.repairAction.hide.bind(Engine.repairAction),'Close');
+    Engine.repairAction.moveUp(2);
 
     Engine.menus = {
         'abilities': Engine.makeAbilitiesMenu(),
@@ -1049,7 +1042,8 @@ Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss,delay){
 
     if(miss) return;
     // Blink tween
-    Engine.scene.tweens.add(
+    if(target.blinkTween) target.blinkTween.stop();
+    target.blinkTween = Engine.scene.tweens.add(
         {
             targets: target,
             alpha: 0,
@@ -1059,6 +1053,9 @@ Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss,delay){
             repeat: 3,
             onStart: function(){
                 target.setAlpha(1); // so that if it takes over another tween immediately, it starts from the proper alpha value
+            },
+            onComplete: function(){
+                target.setAlpha(1);
             }
         });
 
@@ -1271,11 +1268,11 @@ Engine.makeMapMenu = function(){
     mapPanel.addLegend();
     // var mapInstance = mapPanel.addMap('radiallongrect',900,380,-1,-1);
     var mapInstance = mapPanel.addMap('bigbg_mask',900,380,-1,-1);
-    mapPanel.addButton(950, 420, 'blue','help',null,'',UI.textsData['self_map_help']);
+    mapPanel.addButton(950, 0, 'blue','help',null,'',UI.textsData['self_map_help']);
     // TODO: move in Map.js, method addZoom, positions buttons based on viewWidt/height and
     // controls enable/disable of buttons based on zoom flag
-    mapPanel.zoomInBtn = mapPanel.addButton(930, 390, 'blue','plus',mapInstance.zoomIn.bind(mapInstance),'Zoom in');
-    mapPanel.zoomOutBtn = mapPanel.addButton(920, 420, 'blue','minus',mapInstance.zoomOut.bind(mapInstance),'Zoom out');
+    mapPanel.zoomInBtn = mapPanel.addButton(930, 390, 'blue','plus',mapInstance.zoomIn.bind(mapInstance));
+    mapPanel.zoomOutBtn = mapPanel.addButton(920, 420, 'blue','minus',mapInstance.zoomOut.bind(mapInstance));
     map.addEvent('onUpdateMap',mapPanel.map.updatePins.bind(mapPanel.map));
     return map;
 };
@@ -1437,7 +1434,7 @@ Engine.makeBuildMenu = function(){
     build.name = 'Build something'; // Allows to have a hover name without a menu title
     build.hook = 'build';
     var w = 300;
-    var buildings = build.addPanel('build',new BuildPanel(30,40,w,450,'Build'));
+    var buildings = build.addPanel('build',new BuildPanel(30,50,w,450,'Build'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
     buildings.addButton(w-33, 8, 'blue','help',null,'',UI.textsData['build_help']);
     buildings.moveUp(2);
@@ -1592,10 +1589,6 @@ Engine.makeCharacterMenu = function(){
     }
 
     var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
-
-    /*var commit = menu.addPanel('commit',new InventoryPanel(citizenx+10,citizeny,150,100,'',true));
-    commit.setInventory(Engine.player.commitTypes,3,false);
-    commit.setDataMap(Engine.buildingIconsData);*/
 
     //menu.addPanel('abilities',new Panel(citizenx,citizeny,citizenw,citizenh),true);
 
@@ -1957,6 +1950,7 @@ Engine.checkForBuildingMenuUpdate= function(id,event){
     if(Engine.inThatBuilding(id)) {
         Engine.currentMenu.trigger(event);
     }
+    if(Engine.repairPanel.displayed) Engine.repairPanel.update();
 };
 
 Engine.addPlayer = function(data){
@@ -1966,7 +1960,8 @@ Engine.addPlayer = function(data){
 };
 
 Engine.getTilesetFromTile = function(tile){
-    if(Engine.tilesetMap.hasOwnProperty(tile)) return Engine.tilesetMap[tile];
+    if(Engine.tilesetMap.hasOwnProperty(tile)) return Engine.tile
+    setMap[tile];
     for(var i = 0; i < Engine.tilesets.length; i++){
         if(tile < Engine.tilesets[i].firstgid){
             Engine.tilesetMap[tile] = i-1;

@@ -51,10 +51,6 @@ function Building(data){
     this.ownerName = data.ownerName || 'John Doe';
     this.skipBattleTurn = !buildingData.canFight;
     this.name = buildingData.name;
-    this.civBuilding = (this.sid == -1);
-    if(this.civBuilding) this.battleTeam = 'Civ';
-    this.entityCategory = (this.civBuilding ? 'CivBuilding' : 'PlayerBuilding');
-    if(!this.civBuilding) this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(GameServer.buildingParameters.inventorySize);
     if(data.inventory) this.inventory.fromList(data.inventory);
 
@@ -75,8 +71,12 @@ function Building(data){
 
     this.setGold(data.gold || 0);
     this.built = !!data.built;
+    this.civ = data.civ;
+    if(this.civ) this.campID = data.campID;
+    if(this.civ) this.battleTeam = 'Civ';
+    this.entityCategory = (this.civ ? 'CivBuilding' : 'PlayerBuilding');
+
     this.progress = data.progress || 0;
-    this.isWorkshop = buildingData.workshop;
 
     var production = GameServer.buildingsData[this.type].production;
     if(production){
@@ -92,12 +92,18 @@ function Building(data){
 
     this.inFight = false;
     this.stats = new StatsContainer();
-    this.stats['hp'].setBaseValue(buildingData.health);
-    this.stats['hpmax'].setBaseValue(buildingData.health);
-    // TODO: move to JSON
-    this.stats['def'].setBaseValue(20);
-    this.stats['acc'].setBaseValue(1000);
-    this.stats['dmg'].setBaseValue(buildingData.dmg || 0);
+    this.getStat('hp').setBaseValue(buildingData.stats.health,true); // true = force
+    this.getStat('hpmax').setBaseValue(buildingData.stats.health);
+    this.getStat('def').setBaseValue(buildingData.stats.def);
+    this.getStat('acc').setBaseValue(buildingData.stats.acc || 0);
+    this.getStat('dmg').setBaseValue(buildingData.stats.dmg || 0);
+
+    if(data.stats) {
+        data.stats.forEach(function (stat) {
+            this.getStat(stat.stat).setBaseValue(stat.value);
+        }, this);
+    }
+    if(!this.built) this.stats['hp'].setBaseValue(0);
 
     this.aggroMatrix = {
         'Player': false,
@@ -112,9 +118,11 @@ Building.prototype.constructor = Building;
 
 Building.prototype.embed = function(){
     GameServer.buildings[this.id] = this;
+    // console.warn('campID:',this.campID);
+    if(this.campID > -1) GameServer.camps[this.campID].addBuilding(this);
     this.setOrUpdateAOI();
     this.setCollisions('add');
-    this.updateBuild();
+    if(!this.civ) this.updateBuild();
 };
 
 Building.prototype.isInstanced = function(){
@@ -218,27 +226,66 @@ Building.prototype.updateBuild = function(){
     }
     for(var item in recipe){
         this.takeItem(item,recipe[item]);
+        GameServer.destroyItem(item,recipe[item],'building');
     }
     this.setBuilt();
     return true;
 };
 
+Building.prototype.updateRepair = function(){
+    var delta = this.getStat('hpmax').getValue() - this.getStat('hp').getValue();
+    if(delta == 0) return;
+    var TIMBER = 3;
+    var recipe = GameServer.buildingsData[this.type].recipe;
+    var timberTotal = (TIMBER in recipe ? recipe[TIMBER] : 20); // todo: improve
+    var hpPerTimber = Math.ceil(this.getStat('hpmax').getValue()/timberTotal);
+    var maxTimber = Math.ceil(delta/hpPerTimber);
+    var nb = Utils.clamp(this.getItemNb(TIMBER),0,maxTimber);
+    this.takeItem(TIMBER, nb);
+    this.getStat('hp').increment(nb*hpPerTimber);
+    this.refreshStats();
+    GameServer.destroyItem(TIMBER,nb,'repair');
+};
+
 Building.prototype.setBuilt = function(){
     this.setProperty('built',true);
     this.updateProd(true); //true = just built
+    this.stats['hp'].setBaseValue(this.stats['hpmax'].getValue());
+    this.refreshStats();
     this.save();
-    var phrase = ['Construction of ',GameServer.buildingsData[this.type].name,' finished'];
-    GameServer.notifyPlayer(this.owner,phrase.join(' '));
+    if(!this.civ) {
+        var phrase = ['Construction of ', this.name, ' finished'];
+        GameServer.notifyPlayer(this.owner, phrase.join(' '));
+    }
+    GameServer.computeFrontier(true);
+};
+
+Building.prototype.destroy = function(){
+    this.setProperty('built',false);
+    if(this.civ){
+        GameServer.setFlag('buildingsMarkers');
+    }else{
+        GameServer.notifyPlayer(this.owner,'Your '+this.name+' was destroyed');
+    }
+    this.save();
+    GameServer.computeFrontier(true);
 };
 
 Building.prototype.isBuilt = function(){
     return this.built;
 };
 
-Building.prototype.toggleBuild = function(){
-    this.setProperty('built',!this.built);
-    this.setProperty('progress',(this.built ? 100 : 0));
-    this.getStat('hp').setBaseValue(this.getStat('hpmax').getBaseValue());
+Building.prototype.isWorkshop = function(){
+    return this.type == 3;
+};
+
+Building.prototype.applyDamage = function(dmg){
+    FightingEntity.prototype.applyDamage.call(this,dmg);
+    this.refreshStats();
+};
+
+Building.prototype.refreshStats = function(){
+    this.setProperty('statsUpdate',this.stats.toList());
 };
 
 Building.prototype.addBuilding = function(building){
@@ -342,10 +389,9 @@ Building.prototype.remove = function(){
 };
 
 // Save changes to DB
-Building.prototype.save = function(){
-    if(this.civBuilding) return; // todo: remove
+/*Building.prototype.save = function(){
     GameObject.prototype.save.call(this);
-};
+};*/
 
 // Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){
@@ -357,6 +403,7 @@ Building.prototype.trim = function(){
     trimmed.y = parseInt(this.y);
     if(this.inventory.size > 0) trimmed.inventory = this.inventory.toList();
     trimmed.prodCountdowns = this.prodCountdowns;
+    trimmed.statsUpdate = this.stats.toList();
     // return trimmed;
     return GameObject.prototype.trim.call(this,trimmed);
 };
@@ -377,7 +424,7 @@ Building.prototype.listingTrim = function(){
 // Returns an object containing only the fields relevant to display on map
 Building.prototype.mapTrim = function(){
     var trimmed = {};
-    var broadcastProperties = ['type','owner','ownerName'];
+    var broadcastProperties = ['type','owner','ownerName','civ'];
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -401,16 +448,6 @@ Building.prototype.computeSurroundingArea = function(){
 };
 
 Building.prototype.getBattleAreaAround = function(){
-    // cells = cells || new SpaceMap();
-    //
-    // for(var x = -1; x <= this.cellsWidth; x++){
-    //     for(var y = -1; y <= this.cellsHeight+1; y++) {
-    //         var realx = this.coll.x + x;
-    //         var realy = this.coll.y + y;
-    //         if(!GameServer.checkCollision(realx,realy)) cells.add(realx,realy);
-    //     }
-    // }
-    // return cells;
     return this.surroundingArea;
 };
 
@@ -448,7 +485,7 @@ Building.prototype.attackTarget = function(){
 };
 
 Building.prototype.die = function(){
-    this.toggleBuild();
+    this.destroy();
 };
 
 Building.prototype.isDead = function(){

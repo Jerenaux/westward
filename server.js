@@ -140,7 +140,6 @@ var POSThandlers = {
     'setgold': gs.setBuildingGold,
     'setitem': gs.setBuildingItem,
     'setprice': gs.setBuildingPrice,
-    'togglebuild': gs.toggleBuild
 };
 var events = Object.keys(POSThandlers);
 

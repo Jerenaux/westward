@@ -39,8 +39,9 @@ var Building = new Phaser.Class({
         this.buildingType = data.type;
         this.owner = data.owner;
         this.ownerName = data.ownerName;
-        this.civBuilding = (this.settlement == -1);
+        this.civBuilding = !!data.civ; // converts undefined to false
         this.inventory = new Inventory(100);
+        this.stats = new StatsContainer();
         this.countdowns = data.prodCountdowns;
         this.name = buildingData.name;//+' '+this.id;
         this.prices = {};
@@ -63,7 +64,7 @@ var Building = new Phaser.Class({
         }
 
         this.battleBoxData = {
-            'atlas':'aok',
+            'atlas':'buildingsicons',
             'frame': buildingData.icon
         };
 
@@ -108,9 +109,9 @@ var Building = new Phaser.Class({
     unbuild: function(){
         this.built = false;
         var buildingData = Engine.buildingsData[this.buildingType];
-        this.setFrame(buildingData.sprite+'_construction');
+        this.setFrame(buildingData.foundations);
         this.resetDepth();
-        if(this.accessory) this.accessory.destroy();
+        // if(this.accessory) this.accessory.destroy();
     },
 
     update: function (data) {
@@ -120,7 +121,6 @@ var Building = new Phaser.Class({
             'built': this.setBuilt,
             'danger': this.setDangerIcons,
             'devlevel': this.setDevLevel,
-            'foodsurplus': this.setFoodSurplus,
             'gold': this.setGold,
             'hit': this.handleHit, // for HP display and blink
             'inventory': this.setInventory, // sets whole inventor
@@ -131,7 +131,8 @@ var Building = new Phaser.Class({
             'productivity': this.setProductivity,
             'progress': this.setProgress,
             'ranged_atk': this.processRangedAttack,
-            'rangedMiss': this.handleMiss
+            'rangedMiss': this.handleMiss,
+            'statsUpdate': this.updateStats
         };
         this.updateEvents = new Set();
 
@@ -193,11 +194,6 @@ var Building = new Phaser.Class({
         this.updateEvents.add('onUpdateSettlementStatus');
     },
 
-    setFoodSurplus: function(foodsurplus){
-        this.foodsurplus = foodsurplus;
-        this.updateEvents.add('onUpdateSettlementStatus');
-    },
-
     setGold: function(gold){
         this.gold = gold;
         this.updateEvents.add('onUpdateShopGold');
@@ -252,6 +248,14 @@ var Building = new Phaser.Class({
         Engine.displayHit(this,pos.x,pos.y,50,80,null,true,data.delay);
     },
 
+    updateStats: function(stats){
+        for(let i = 0; i < stats.length; i++){
+            var statObj = this.stats[stats[i].stat];
+            statObj.setBaseValue(stats[i].value);
+        }
+        this.updateEvents.add('onUpdateBldStats');
+    },
+
     processRangedAttack: function(data){
         var from = {
             x: this.x + this.shootFrom.x,
@@ -264,7 +268,7 @@ var Building = new Phaser.Class({
 
     getRect: function(){
         return {
-            x: this.tileX + this.coll.x,
+            x: this.tileX,
             y: this.tileY - this.cellsHeight,
             w: this.cellsWidth,
             h: this.cellsHeight
@@ -305,6 +309,10 @@ var Building = new Phaser.Class({
 
     isDisabled: function(){
         return !this.built;
+    },
+
+    isFullyRepaired: function(){
+        return this.stats['hp'].getValue() == this.stats['hpmax'].getValue();
     },
 
     isOwned: function(){ // by the player

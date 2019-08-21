@@ -1,11 +1,11 @@
 ## To test:
+- Test handleCraft when a price is undefined
 - Test starting inventory of new player
 - Test settlement selection (with value of 0)
 - Test ammo container type match
 - Test that the world is populated with items, animals, etc.
 - Test handleBelt
 - Test ammo decrease in inventory when equipping ammo
-- Test handleCraft (normal + when a price is undefined)
 - Test handleChat (with text and also empty input)
 - Test Utils.nextTo with all combinations of building/animal vs building/animal, next to each other and not
 - Test Battle.computeTof()
@@ -23,9 +23,10 @@ Design document
 Testing
 World Building
 
-## Priority TODO
+## Misc TODO
 - Adapt animations and delays for firearms
-- Update Westward main page
+- At some point, compute vigor for Civs, own inventories etc.
+- Update Westward main page + trailer
 - Change battle priority when player joins fight
 - In battle against NPC, have players have turns much more often
 - Make tiles above battle tiles transparent; same with buildings in fight?
@@ -38,32 +39,38 @@ World Building
 - add esc shortcut
 - "new" marker
 - Events formatting
+- Autorepair & rebuild of civ buildings
 - Make size of tutorial boxes adapt to text
 - No decimal in defaut prices (happens in one lumber camp)
 - Ability: display threat level in animal tooltip
 - Ability: display fighter health bars
 - Look towards cursor
 - Zoom-out in towers
+- Silhouette of marker behind trees
+- Togle legend, toggle marker types
+- Alarm bell
+- Flip trees horizontally to introduce variety
 
 Bugs:
-- Server restarts after disconnect?
-- Don't run after each connect
+- Server restarts after disconnect? Monitor closely
+- Items loaded before chunks (detect "behindness" differently?)
+- Come up with smoother silhouette for items
+- Can't find daydream in tutorial (plant icons are misleading)
 Features:
-- Apply silhouette to hidden items
-- Show ingredients needed foer buildings recipe in build menu
-- Get kicked out of shack when built if not yours
-- Display building life in tooltips
-- Repair panel
-- Civ camp locations and spawn behavior
-- Basic attack behavior + notifs thereof
-- Missions menu (focused on enemy civ) + enhanced map menu
--> Need for visual indicators + numerical ones
--> Frontier, semi-permanent camp markers (always visible once discovered)
--> Use battle marker only for civ encounters?
+- Check that destroyed entities destroy their orientation pins
+- Gif of bow attack
+- Remove "resting frames" from animals atlas, do it based on animations
+- Display item rarity in inventory (check if doesn't conflit with shop)
+- Improve shaders (behindness and contour)
+- Add civ archers and loot arrows from them (+ add loot to civ warriors) w/ probability
+- Add belts?
+- Collective missions menu
+-> Start wih basic production quests
+- semi-permanent camp markers (always visible once discovered)
 -> Quantify resources nodes on the right side of frontier, 
 production capacity (based on # buildings of a given time) / some kind of "GDP",
-bell alarm when attack nearby, bodies behind, log of recent civ-related events
--> Split all per region (also visually)
+- Make smart missions based on these indicators (+ as many others as possible)
+- Split all per region (also visually)
 -> Name regions and compute borders in a Voronoi way by placing invisible region centers
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
@@ -74,19 +81,45 @@ fitting more in backpack, more actions per turn, ... (not so for "boolean" effec
 - Leaderboards
   
 
+Quests:
+"enemy civ is gonna attack in x days, you should produce x many swords, do this and that..."
+Collective missions (on top of ebb and flow of frontier warfare)
+Rivalry between regions
+
+
 María:
-- Wolf anim (walk, attack, die w/ & w/o arrows)
+- Red bg
+- Color variations of wolf
+- Carcass, blood-tainted grass
+- Footprints
 - Bear anim (walk, attack, die w/ & w/o arrows)
-- Player anim (naked?)
+- Player anim naked
 -> Look into superimposing equipment programmatically
-Further: body emotes, pick up anim, more wildlife, then UI improvements, then diagonal movements...
+-> One basic player overlay for all
+-> Civs are similar but with different overlays
+- Make overlays based on actual game items
+- Vary Civ overlays
+- Add "pick up", "look at map", "check in bag" ... anims
+- UI improvements
+- Wear and tear and wounds
+- Add taunts and emotes anims
+- More wildlife
+- Diagonal movements 
 
 Sérgio:
 - New Civ huts/cabins
 - More civ buidings (e.g. towers)
 - Basic cliffs
 - Mines
-- Differentiate under construction/destroyed, multiple construction stages...
+- Differentiate under construction/destroyed
+- Multiple construction stages,
+- Multiple building levels...
+
+Crafting:
+- Multiply variants of functional items (weapons, storage, ability-related...)
+- Distinguish animal pelts and animal leathers, also based on color
+- Each basic material (plant, pelt, mineral...) must have multiple uses
+
 
 
 Juice: https://retrovx.github.io/phaser3Juice/?utm_source=gamedevjsweekly&utm_medium=email
@@ -136,32 +169,6 @@ Closing comments about pros and cons of starting in a settled/wild region, ultim
 ##################################################
 ##################################################
 
-Admin
-Analytics
-Cleaning
-* Battle system
-* Civics
-* Character panel
-* Craftsmen gameplay
-* Enemy civ
-* Explorer gameplay
-* Help
-* Inventory
-* Merchant gameplay
-* Misc
-* Orientation
-* Packaging
-* Settlement defense
-* Settlement economy
-* Soldier gameplay
-Deployment
-Design document
-Faking
-Polish
-Testing
-World Building
-Free
-
 ###############
 V1 level:
 ###############
@@ -180,8 +187,8 @@ Secure
 
 Analytics:
 ---------
-- New admin:  update event descs as in current admin
-- Log: belt actions
+- Log giving food to buildings in particular
+- Log repairs
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions
@@ -190,7 +197,7 @@ Analytics:
 - Look for nice statistical library (https://dzone.com/articles/4-useful-javascript-libraries-for-data-analysis-an)
 -> Or export as CSV and explore in SPSS?
 - Compute "concentration" stat of items
-- Compute inflation
+- Compute inflation, GDP & potential GDP, growth
 - Log drains and faucets
 - Log where items are bought/sold
 - Log pathfinding destinations, consider making heatmap in the long term
@@ -490,9 +497,11 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
+- Move to ES6
+-> https://codeutopia.net/blog/2015/01/06/es6-what-are-the-benefits-of-the-new-features-in-practice/
+- Tool to gather, uglify and compress all relevant source files 
 - Desktop app (automated)
 -> https://electronjs.org/docs/tutorial/application-distribution
-- Tool to gather, uglify and compress all relevant source files 
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)
 - Tool to automatically merge all graphic assets in atlases?
 - Secure chunk access? (check client position before serving)
@@ -563,13 +572,11 @@ Testing:
 
 World building:
 --------------
-Eventually, delete "spawnzones.json"
-Make items belong to spawnzones, for respawn
-Make respawn depend on proximity of cluster to civilization (use quad tree?)
+Make items belong to spawnzones, for respawn logic
+Make respawn depend on proximity of cluster to civilization
 Set up proximity between related item and animal spawn zones
 Building editor (set shapes etc.)
 Manage spawn zones in editor
-Flip trees horizontally to introduce variety
 Patches of dirt
 
 UI:
@@ -586,15 +593,6 @@ UI:
 - Animals (w/ animations)
 - Enemy civs, enemy camps 
 - Logo 
-
-
-
-
-
-Part I: Mechanics
-Part II: World building
-Part III: Atmosphere & polish
-Part IV: Cleaning, optimization and admin
 
 Pillars:
 1) The War

@@ -388,6 +388,13 @@ function coordinatesToCell(v,grid){
     return Math.floor(v/grid);
 }
 
+Utils.computeSpeed = function(angle){ // return unit speed vector given an angle
+    return {
+        x: Math.cos(angle),
+        y: -Math.sin(angle)
+    }
+};
+
 Array.prototype.diff = function(a) { // returns the elements in the array that are not in array a
     return this.filter(function(i) {return a.indexOf(i) < 0;});
 };

@@ -32,6 +32,7 @@
   "vigor_help": "Your energy level; decreases as you perform actions, increases when you rest in a shelter. Can negatively impact your other stats.",
   "food_help": "Your food level; decreases over time, increases when you eat. Can speed up your loss of vigor.",
   "health_help": "Your health level, decreases when you fight, increases when resting or consuming healing items. Should be kept above 0!",
+  "repair_help": "You can repair any damaged building by providing Timber to it. The progress bar indicates if the building is damaged or fully restored.",
 
   "classxp": "XP",
   "class_selection_title": "Pick your path",

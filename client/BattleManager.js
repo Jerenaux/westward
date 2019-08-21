@@ -104,11 +104,12 @@ BattleManager.updateFightersOrder = function(order,countdown){
         square.drawFrame('UI','equipment-slot',0,0);
         var f = BattleManager.getFighter(fid);
         if(!f) return;
-        if(f.isHero){
+        /*if(f.isHero){
             square.drawFrame('faces',0,4,4);
         }else{
             square.drawFrame(f.battleBoxData.atlas,f.battleBoxData.frame,4,4);
-        }
+        }*/
+        square.drawFrame(f.battleBoxData.atlas,f.battleBoxData.frame,4,4);
         square.setScrollFactor(0).setOrigin(0);
         BattleManager.orderBoxes.push(square);
 

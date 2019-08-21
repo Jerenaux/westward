@@ -260,7 +260,7 @@ Player.prototype.die = function () {
 Player.prototype.setLocation = function(x, y){
     x = x || this.respawnLocation.x;
     y = y || this.respawnLocation.y;
-    var pos = this.findNextFreeCell(x,y);
+    var pos = GameServer.findNextFreeCell(x,y);
     x = pos.x;
     y = pos.y;
     this.setProperty('x', x);
@@ -749,6 +749,7 @@ Player.prototype.applyEffect = function (stat, delta, notify) {
 
 Player.prototype.getWorldInformation = function(){
     this.setOwnProperty('fow',GameServer.fowList);
+    this.setOwnProperty('frontier',GameServer.frontier);
     this.setOwnProperty('buildingMarkers', GameServer.listBuildingMarkers(this.instance));
     this.setOwnProperty('resourceMarkers',  GameServer.listMarkers('resource').concat(this.extraMarkers));
     this.setOwnProperty('animalMarkers', GameServer.listMarkers('animal'));
@@ -911,7 +912,7 @@ Player.prototype.enterBuilding = function (id) {
         var phrase = [this.name, 'visitted my', bldname];
         GameServer.notifyPlayer(building.owner, phrase.join(' '));
     }
-    Prism.logEvent(this, 'building', {building: type});
+    Prism.logEvent(this, 'building', {building: type, owner: building.ownerName});
     return true;
 };
 
@@ -963,6 +964,7 @@ Player.prototype.getIndividualUpdatePackage = function () {
     // console.log(this.updatePacket,this.updatePacket.isEmpty());
     var pkg = this.updatePacket;
     if (GameServer.checkFlag('FoW')) pkg.fow = GameServer.fowList;
+    if (GameServer.checkFlag('frontier')) pkg.frontier = GameServer.frontier;
     if (GameServer.checkFlag('buildingsMarkers')) pkg.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
     if (GameServer.checkFlag('deathMarkers')) pkg.deathMarkers = GameServer.listMarkers('death');
     if (GameServer.checkFlag('conflictMarkers')) pkg.conflictMarkers = GameServer.listMarkers('conflict');

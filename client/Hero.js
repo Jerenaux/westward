@@ -18,10 +18,6 @@ let Hero = new Phaser.Class({
         this.buildRecipes = new Inventory(7);
         this.craftRecipes = new Inventory(100);
 
-        this.battleBoxData = {
-            'atlas':'orientation',
-            'frame':'animal_icon'
-        }
     },
 
     setUp: function(data){
@@ -35,6 +31,7 @@ let Hero = new Phaser.Class({
         this.deathMarkers = [];
         this.conflictMarkers = [];
         this.FoW = [];
+        this.frontier = [];
         this.inventory = new Inventory();
         this.belt = new Inventory(3); //TODO: conf
         this.stats = new StatsContainer();
@@ -74,6 +71,7 @@ let Hero = new Phaser.Class({
             'deathMarkers': this.updateDeathMarkers,
             'equipment': this.updateEquipment,
             'fow': this.updateFoW,
+            'frontier': this.updateFrontier,
             'gold': this.updateGold,
             'history': this.updateHistory,
             'inBuilding': this.updateBuilding,
@@ -142,8 +140,8 @@ let Hero = new Phaser.Class({
     },
 
     getEquippedItem: function(slot){
-        const item_id = this.equipment.get(slot);
-        return Engine.itemsData[item_id]; // Returns the ID of the item equipped at the given slot
+        return this.equipment.getItem(slot);
+        // return Engine.itemsData[item_id]; // Returns the data of the item equipped at the given slot
     },
 
     hasRangedEquipped: function(){
@@ -305,6 +303,10 @@ let Hero = new Phaser.Class({
                     World.chunkHeight)
             );
         },this);
+    },
+
+    updateFrontier: function(frontier){
+        this.frontier = frontier;
     },
 
     updateGold: function(gold){

@@ -14,6 +14,7 @@ var Models = {
         prices: {type: Object},
         gold: {type: Number, min: 0},
         built: {type: Boolean},
+        civ: {type: Boolean}
     }
 };
 
