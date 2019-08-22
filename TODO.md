@@ -50,6 +50,9 @@ World Building
 - Togle legend, toggle marker types
 - Alarm bell
 - Flip trees horizontally to introduce variety
+- Acc boosting ability
+- Disengage button
+- Social campfires
 
 Bugs:
 - Server restarts after disconnect? Monitor closely
@@ -58,9 +61,10 @@ Bugs:
 Features:
 - Test behindness
 - Fight bear
+- Improve legend
 - Check that destroyed entities destroy their orientation pins
 - Gif of bow attack
-- Remove "resting frames" from animals atlas, do it based on animations
+- Remove "resting framedefs" from animals atlas, do it based on animations
 - Display item rarity in inventory (check if doesn't conflit with shop)
 - Improve shaders (behindness and contour)
 - Add civ archers and loot arrows from them (+ add loot to civ warriors) w/ probability
