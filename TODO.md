@@ -53,12 +53,12 @@ World Building
 
 Bugs:
 - Server restarts after disconnect? Monitor closely
-- Items loaded before chunks (detect "behindness" differently?)
 - Come up with smoother silhouette for items
 - Can't find daydream in tutorial (plant icons are misleading)
 - Fix battle areas when civ aggro
 - Check that destroyed entities destroy their orientation pins
 Features:
+- Test behindness
 - Fight bear
 - Remove "resting frames" from animals atlas, do it based on animations
 - Display item rarity in inventory (check if doesn't conflit with shop)
