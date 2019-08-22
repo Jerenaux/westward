@@ -53,10 +53,11 @@ World Building
 
 Bugs:
 - Server restarts after disconnect? Monitor closely
-- Items loaded before chunks (detect "behindness" differently?)
 - Come up with smoother silhouette for items
 - Can't find daydream in tutorial (plant icons are misleading)
 Features:
+- Test behindness
+- Fight bear
 - Check that destroyed entities destroy their orientation pins
 - Gif of bow attack
 - Remove "resting frames" from animals atlas, do it based on animations

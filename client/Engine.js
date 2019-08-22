@@ -358,7 +358,6 @@ Engine.initWorld = function(data){
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
     if(Engine.miniMap) Engine.miniMap.display();
-    // Engine.updateAllOrientationPins();
 
     if(Client.isNewPlayer() && !Client.tutorial) {
         var w = 400;
@@ -550,6 +549,12 @@ Engine.updateAllOrientationPins = function(){
         Engine.players[pid].manageOrientationPin();
     });
 };
+
+Engine.updateBehindness = function(){
+    Engine.entityManager.displayLists['item'].forEach(function(iid){
+        Engine.items[iid].manageBehindness();
+    });
+}
 
 Engine.makeBuildingTitle = function(){
     Engine.buildingTitle = new BuildingTitle(512,10);
