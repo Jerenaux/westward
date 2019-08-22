@@ -28,8 +28,6 @@ var Item = new Phaser.Class({
         // this.setOrigin(0.5);
         this.setDepth(this.tileY+1.5); // for e.g. when wood spawns on the roots of a tree
 
-        if(Engine.overlay.get(this.tileX,this.tileY)) this.hollow();
-
         if(itemData.collides) {
             this.collides = true;
             Engine.collisions.add(this.tileX,this.tileY);
@@ -43,6 +41,7 @@ var Item = new Phaser.Class({
         Engine.entityManager.addToDisplayList(this);
 
         this.manageOrientationPin();
+        this.manageBehindness();
 
         if(itemData.insect && Utils.randomInt(1,10) > 8) new Insect(this.x,this.y);
     },
@@ -61,6 +60,10 @@ var Item = new Phaser.Class({
             this.orientationPin.update(this.tileX,this.tileY);
             this.orientationPin.display();
         }
+    },
+
+    manageBehindness: function(){
+        if(Engine.overlay.get(this.tileX,this.tileY)) this.hollow();
     },
 
     handleClick: function(){
