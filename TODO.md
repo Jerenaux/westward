@@ -59,6 +59,9 @@ Bugs:
 - Come up with smoother silhouette for items
 - Can't find daydream in tutorial (plant icons are misleading)
 Features:
+Remove frontier log
+Remove "add nearby"
+GameServer:1289
 - Test behindness
 - Fight bear
 - Improve legend
@@ -194,6 +197,8 @@ Analytics:
 ---------
 - Log giving food to buildings in particular
 - Log repairs
+- Log submenus
+- Log nb connected in monit: http://pm2.keymetrics.io/docs/usage/process-metrics/#process-metrics
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions
