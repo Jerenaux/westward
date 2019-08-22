@@ -59,6 +59,7 @@ Bugs:
 - Come up with smoother silhouette for items
 - Can't find daydream in tutorial (plant icons are misleading)
 Features:
+- Central method to decrease vigor with string param
 Remove frontier log
 Remove "add nearby"
 GameServer:1289
