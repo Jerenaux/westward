@@ -168,7 +168,9 @@ Player.prototype.updateSteps = function () {
     this.steps++;
     var limit = 1000; // arbitrary limit to avoid overflows
     if (this.steps > limit) this.steps -= limit;
-    if (this.steps % GameServer.characterParameters.steps === 0) this.updateVigor(-GameServer.characterParameters.stepsLoss);
+    // if (this.steps % GameServer.characterParameters.steps === 0) this.updateVigor(-GameServer.characterParameters.stepsLoss);
+    if (this.steps % GameServer.characterParameters.steps === 0) GameServer.updateVigor(player,'walk');
+
 };
 
 Player.prototype.updateVigor = function (inc, ignoreFood) {

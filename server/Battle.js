@@ -21,6 +21,12 @@ function Battle() {
     this.casualties = 0;
     //this.positions = new SpaceMap(); // positions occupied by fighters (obsolete?)
     this.cells = new SpaceMap(); // all the BattleCell objects, used for battle pathfinding
+    this.bbox = { // max bounds of battle
+        x: 0,
+        y: 0,
+        xx: 0,
+        yy: 0
+    };
 
     this.pathFinder = new Pathfinder(this.cells, 99, false, false, true);
 
@@ -28,11 +34,34 @@ function Battle() {
     this.reset();
 }
 
-Battle.prototype.setCenter = function(x,y){
-    this.center = {
-        x: x,
-        y:y
-    };
+Battle.prototype.addBattleCell = function(x,y,cell){
+    this.cells.add(x,y,cell);
+    if(x < this.bbox.x) this.bbox.x = x;
+    if(y < this.bbox.y) this.bbox.y = y;
+    if(x > this.bbox.xx) this.bbox.xx = x;
+    if(y > this.bbox.yy) this.bbox.yy = y;
+};
+
+Battle.prototype.updateCenter = function(){
+    var xc = Math.floor(this.bbox.x + (this.bbox.xx - this.bbox.x)/2);
+    var yc = Math.floor(this.bbox.y + (this.bbox.yy - this.bbox.y)/2);
+    var l = this.cells.toList();
+    var mind = 999;
+    var mincell = null;
+    for(var i = 0; i < l.length; i++){
+            var dx = Math.abs(xc - l[i].x);
+            var dy = Math.abs(yc - l[i].y);
+            var d = Math.max(dx,dy);
+            if(d < mind){
+                mind = d;
+                mincell = this.cells.get(l[i].x,l[i].y);
+            }
+    }
+    this.center = mincell;
+};
+
+Battle.prototype.getCenter = function(x,y){
+    return this.center;
 };
 
 Battle.prototype.start = function () {
@@ -255,7 +284,8 @@ Battle.prototype.processAction = function (f, data) {
     }
 
     result = result || {};
-    if (f.isPlayer && result.vigor) f.updateVigor(-result.vigor);
+    // if (f.isPlayer && result.vigor) f.updateVigor(-result.vigor);
+    if (f.isPlayer && result.vigor) GameServer.updateVigor(f,'battle_'+action);
     this.setEndOfTurn(result.delay || 0);
 };
 
@@ -390,8 +420,7 @@ Battle.prototype.processAoE = function (f, tx, ty) {
         }, this);
     }.bind(this), delay);
     return {
-        delay: delay,
-        vigor: 1 // TODO: conf + vary
+        delay: delay
     };
 };
 
@@ -465,8 +494,7 @@ Battle.prototype.processAttack = function (attacker, target) {
         // console.log('done with outcome');
     }.bind(this), delay);
     return {
-        delay: delay,
-        vigor: 1 // TODO: conf + vary
+        delay: delay
     };
 };
 

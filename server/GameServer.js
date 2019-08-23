@@ -1238,6 +1238,7 @@ GameServer.addBattleArea = function(area,battle){ // area should be a list
     area.forEach(function(c){
         GameServer.addBattleCell(battle,c.x,c.y);
     },this);
+    battle.updateCenter();
 };
 
 
@@ -1253,7 +1254,7 @@ GameServer.addBattleCell = function(battle,x,y){
     if(GameServer.battleCells.get(x,y)) return;
     var cell = new BattleCell(x,y,battle);
     GameServer.battleCells.add(x,y,cell);
-    battle.cells.add(x,y,cell);
+    battle.addBattleCell(x,y,cell);
 };
 
 /**
@@ -1275,20 +1276,24 @@ GameServer.removeBattleCell = function(cell){
  * @param {Battle} battle - The Battle instance in which to include surrounding entities.
  */
 GameServer.addSurroundingFighters = function(battle){
-    var center = {
-        x: 0,
-        y: 0
-    };
-    battle.fighters.forEach(function(f){
-        center.x += f.x;
-        center.y += f.y;
-    });
-    center.x = Math.floor(center.x/battle.fighters.length);
-    center.y = Math.floor(center.y/battle.fighters.length);
-    center = GameServer.battleCells.get(center.x,center.y);
-    battle.setCenter(center.x,center.y);
-    if(!center) return;
+    // var center = {
+    //     x: 0,
+    //     y: 0
+    // };
+    // battle.fighters.forEach(function(f){
+    //     center.x += f.x;
+    //     center.y += f.y;
+    // });
+    // center.x = Math.floor(center.x/battle.fighters.length);
+    // center.y = Math.floor(center.y/battle.fighters.length);
+    // center = GameServer.battleCells.get(center.x,center.y);
+    // if(!center){
+    //     console.warn('ERROR: could not compute battle center!');
+    //     return;
+    // }
+    // battle.setCenter(center.x,center.y);
 
+    var center = battle.getCenter();
     var r = GameServer.battleParameters.aggroRange;
     // console.warn(Math.floor(center.x-r/2),Math.floor(center.y-r/2),r,r);
     // implies Chebyshev distance
@@ -1296,7 +1301,7 @@ GameServer.addSurroundingFighters = function(battle){
     for(var i = 0; i < neighbors.length; i++){
         var entity = neighbors[i];
         if(entity.canFight() && entity.isAvailableForFight()) {
-            console.warn('Adding nearby',entity.getShortID());
+            console.log('Adding nearby',entity.getShortID());
             GameServer.connectToBattle(entity,center);
         }
     }
@@ -1402,7 +1407,8 @@ GameServer.handleShop = function(data,socketID) {
             if (!player.canBuy(price)) return false;
             player.takeGold(price, true);
             building.giveGold(price);
-            player.updateVigor(-3); // TODO: vary + conf
+            // player.updateVigor(-3); // TODO: vary + conf
+            GameServer.updateVigor(player,'buy');
             var phrase = [player.name,'bought',nb,GameServer.itemsData[item].name,'for',price,Utils.formatMoney(price)];
             var msg = phrase.join(' ');
             GameServer.notifyPlayer(building.owner,msg);
@@ -1432,7 +1438,8 @@ GameServer.handleShop = function(data,socketID) {
             if(price === 0) return false;
             player.giveGold(price, true);
             building.takeGold(price);
-            player.updateVigor(-3); // TODO: vary + conf
+            // player.updateVigor(-3); // TODO: vary + conf
+            GameServer.updateVigor(player,'sell');
             player.gainClassXP(GameServer.classes.merchant,Math.floor(price/10), true); // TODO: factor in class level
         }
         var verb = (isFinancial ? 'Sold' : 'Gave');
@@ -1593,6 +1600,17 @@ GameServer.addMarker = function(markerType,x,y){
     });
 };
 
+GameServer.updateVigor = function(player, action, multiplier){
+    var vigor_map = {
+        'buy': -3,
+        'craft': -3,
+        'sell': -3,
+        'walk': -GameServer.characterParameters.stepsLoss
+    };
+    multiplier = multiplier || 1;
+    var nb = (action in vigor_map ? vigor_map[action] : 1);
+    player.updateVigor(nb*multiplier);
+};
 
 GameServer.findNextFreeCell = function(x,y){
     var stoppingCritetion = 100;
@@ -1667,7 +1685,8 @@ GameServer.handleCraft = function(data,socketID){
     }
     GameServer.operateCraft(player, targetItem, nb);
     if(isFinancial) building.giveGold(player.takeGold(price));
-    player.updateVigor(-3*nb); // TODO: vary + conf
+    // player.updateVigor(-3*nb); 
+    GameServer.updateVigor(player,'craft',nb);
     player.gainClassXP(GameServer.classes.craftsman,5*nb,true); // TODO: vary based on multiple factors
     if(!building.isOwnedBy(player)) {
         var phrase = [player.name,'crafted',nb,GameServer.itemsData[targetItem].name,'for',price,Utils.formatMoney(price),'in my Workshop'];
@@ -1877,7 +1896,7 @@ GameServer.computeFrontier = function(setFlag){
             t: (bld.civ ? 'r' : 'b')
         });
     }
-    console.warn(sites.length+' buildings considered for Frontier');
+    console.log(sites.length+' buildings considered for Frontier');
 
     var voronoi = new Voronoi();
     var bbox = {xl: 0, xr: World.worldWidth, yt: 0, yb: World.worldHeight}; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
@@ -1896,7 +1915,7 @@ GameServer.computeFrontier = function(setFlag){
             }
         });
     },this);
-    console.warn('frontier:',GameServer.frontier);
+    console.log('frontier:',GameServer.frontier);
     if(setFlag) GameServer.setFlag('frontier');
 };
 

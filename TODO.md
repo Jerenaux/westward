@@ -55,14 +55,9 @@ World Building
 - Social campfires
 
 Bugs:
-- Server restarts after disconnect? Monitor closely
-- Come up with smoother silhouette for items
-- Can't find daydream in tutorial (plant icons are misleading)
 Features:
-- Central method to decrease vigor with string param
-Remove frontier log
-Remove "add nearby"
-GameServer:1289
+- Test vigor decrease
+- Test battle center
 - Test behindness
 - Fight bear
 - Improve legend
@@ -97,8 +92,6 @@ Rivalry between regions
 
 
 María:
-- Red bg
-- Color variations of wolf
 - Carcass, blood-tainted grass
 - Footprints
 - Bear anim (walk, attack, die w/ & w/o arrows)
