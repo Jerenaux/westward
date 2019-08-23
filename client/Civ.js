@@ -44,7 +44,7 @@ var Civ = new Phaser.Class({
 
         this.setVisible(true);
         this.dead = false;
-        this.name = 'Civ'; //'מִ  ת  נַ  גֵ  ד'
+        this.name = civData.name;//'Civ'; //'מִ  ת  נַ  גֵ  ד'
 
         this.animPrefix = 'enemy';
         this.footprintsFrame = 0;

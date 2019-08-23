@@ -450,7 +450,8 @@ var Map = new Phaser.Class({
         },this);
         Engine.player.animalMarkers.forEach(function(data){
             this.addPin(data[0],data[1],
-                Engine.animalsData[data[2]].map_name,
+                // Engine.animalsData[data[2]].map_name,
+                Engine.getAnimalData(data[2]).map_name,
                 'wolf',
                 false
             );

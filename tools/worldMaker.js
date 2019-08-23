@@ -123,6 +123,7 @@ WorldMaker.prototype.run = function(){
     this.patterns = JSON.parse(fs.readFileSync(path.join(__dirname,'patterns.json')).toString());
     var dataAssets = path.join(__dirname,'..','assets','data');
     this.itemsData = JSON.parse(fs.readFileSync(path.join(dataAssets,'items.json')).toString());
+    this.animalsData = JSON.parse(fs.readFileSync(path.join(dataAssets,'animals.json')).toString());
     this.biomesData = JSON.parse(fs.readFileSync(path.join(dataAssets,'biomes.json')).toString());
 
     this.outdir = path.join(__dirname,'..','maps'); // TODO: remove dev.mapsPath etc?
@@ -543,6 +544,12 @@ WorldMaker.prototype.addMisc = function(){
     console.log(nbadded,' stones added');
 };
 
+WorldMaker.prototype.getAnimalData = function(type){
+    var animalData = this.animalsData[type];
+    if(animalData.inheritFrom !== undefined) animalData = Object.assign(this.animalsData[animalData.inheritFrom],animalData);
+    return animalData;
+};
+
 WorldMaker.prototype.makeSpawnZones = function(){
     this.resourceMarkers = [];
     var items = this.biomesData.plants;
@@ -557,14 +564,22 @@ WorldMaker.prototype.makeSpawnZones = function(){
     },this);
 
     this.animalsMarkers = [];
-    var animals = this.biomesData.animals;
-    animals.forEach(function(animal){
-        for(var i = 0; i < animal.nbzones; i++){
+    for(var animalID in this.animalsData){
+        var animalData = this.getAnimalData(animalID);
+        for(var i = 0; i < animalData.nbPacks; i++){
             var x = Utils.randomInt(0,World.worldWidth-1);
-            var y = Utils.randomInt(0,World.worldHeight-1);
-            if(!this.collisions.get(x,y)) this.makeAnimalZone(x,y,animal);
+                var y = Utils.randomInt(0,World.worldHeight-1);
+                if(!this.collisions.get(x,y)) this.makeAnimalZone(x,y,animalID);
         }
-    },this);
+    }
+    // var animals = this.biomesData.animals;
+    // animals.forEach(function(animal){
+    //     for(var i = 0; i < animal.nbzones; i++){
+    //         var x = Utils.randomInt(0,World.worldWidth-1);
+    //         var y = Utils.randomInt(0,World.worldHeight-1);
+    //         if(!this.collisions.get(x,y)) this.makeAnimalZone(x,y,animal);
+    //     }
+    // },this);
 };
 
 WorldMaker.prototype.makeFloraZone = function(x,y,w,h,data){
@@ -591,9 +606,9 @@ WorldMaker.prototype.makeFloraZone = function(x,y,w,h,data){
     if(nb) this.resourceMarkers.push([Math.floor(x+w/2),Math.floor(y+h/2),data.item]);
 };
 
-WorldMaker.prototype.makeAnimalZone = function(x,y,animal){
-    this.animals.add(x,y,animal.animal+':'+animal.group);
-    this.animalsMarkers.push([x,y,animal.animal]);
+WorldMaker.prototype.makeAnimalZone = function(x,y,type){
+    this.animals.add(x,y,type);
+    this.animalsMarkers.push([x,y,type]);
 };
 
 WorldMaker.prototype.addRandomItem = function(x,y,decor){

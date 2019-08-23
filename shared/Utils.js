@@ -32,7 +32,7 @@ Utils.fonts.fancy = 'belwe';
  * @param {Object|number} tile - {x,y} coordinates of tile, or alternatively the x coordinate only.
  * @param {number} y - The y coordinate of the tile.
  */
-Utils.tileToAOI = function(tile,y){ // input coords in Tiles
+Utils.tileToAOI = function(tile,y){
     var tileX,tileY;
     if(y !== undefined){
         tileX = tile;
@@ -42,6 +42,8 @@ Utils.tileToAOI = function(tile,y){ // input coords in Tiles
         tileY = tile.y;
     }
     if(!World.nbChunksHorizontal) throw Error('Chunk data not initialized');
+    tileX = Utils.clamp(tileX,0,World.worldWidth-1);
+    tileY = Utils.clamp(tileY,0,World.worldHeight-1);
     var top = Math.floor(tileY/World.chunkHeight);
     var left = Math.floor(tileX/World.chunkWidth);
     return (top*World.nbChunksHorizontal)+left;
@@ -411,5 +413,35 @@ Array.prototype.rotate = function( n ) {
 Array.prototype.previous = function(i){
     return (i > 0 ? this[i-1] : this.last());
 };
+
+if (typeof Object.assign !== 'function') {
+    // Must be writable: true, enumerable: false, configurable: true
+    Object.defineProperty(Object, "assign", {
+        value: function assign(target, varArgs) { // .length of function is 2
+            'use strict';
+            if (target === null || target === undefined) {
+                throw new TypeError('Cannot convert undefined or null to object');
+            }
+
+            var to = Object(target);
+
+            for (var index = 1; index < arguments.length; index++) {
+                var nextSource = arguments[index];
+
+                if (nextSource !== null && nextSource !== undefined) {
+                    for (var nextKey in nextSource) {
+                        // Avoid bugs when hasOwnProperty is shadowed
+                        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                            to[nextKey] = nextSource[nextKey];
+                        }
+                    }
+                }
+            }
+            return to;
+        },
+        writable: true,
+        configurable: true
+    });
+}
 
 if (onServer) module.exports.Utils = Utils;

@@ -42,6 +42,7 @@ var CustomSprite = new Phaser.Class({
     },
 
     hollow: function(){
+        if(this.hollowed) return;
         this.hollowed = true;
         this.setDepth(this.tileY + 5);
         this.setPipeline('hollow_'+(this.entityType == 'item' ? 'items' : 'moving'));

@@ -178,7 +178,6 @@ var Moving = new Phaser.Class({
         this.playSound();
         if(this.isHero){
             Engine.updateAllOrientationPins();
-            Engine.updateBehindness();
             if(Engine.miniMap) Engine.miniMap.follow();
         }else{
             this.manageOrientationPin();

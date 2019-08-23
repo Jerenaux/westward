@@ -345,6 +345,7 @@ GameServer.loadItems = function(){
     items.forEach(function(item){
         var x = item[0];
         var y = item[1];
+
         var type = item[2];
         // don't check for hard collisions, otherwise stones don't spawn
         // instead simply check with collisions w/ other entities
@@ -408,10 +409,8 @@ GameServer.setUpSpawnZones = function(){
     animals.forEach(function(animal){
         var x = animal[0];
         var y = animal[1];
-        var data = animal[2];
-        var type = data.split(':')[0];
-        var nb = data.split(':')[1];
-        GameServer.spawnZones.push(new SpawnZone(x,y,type,nb));
+        var type = animal[2];
+        GameServer.spawnZones.push(new SpawnZone(x,y,type));
     },this);
 
     GameServer.updateStatus();
@@ -482,6 +481,15 @@ GameServer.addAnimal = function(x,y,type,instance){
     var animal = new Animal(x,y,type,instance);
     GameServer.animals[animal.id] = animal;
     return animal;
+};
+
+GameServer.getAnimalData = function(type){
+    var animalData = GameServer.animalsData[type];
+    if(animalData.inheritFrom !== undefined){
+        var parentData = GameServer.animalsData[animalData.inheritFrom];
+        animalData = Object.assign(parentData,GameServer.animalsData[type]);
+    }
+    return animalData;
 };
 
 /**
@@ -1110,7 +1118,7 @@ GameServer.handleBattle = function(attacker,attacked){
         Prism.logEvent(player,'battle',{category:foe.entityCategory,type:foe.type});
     }
     if(attacked.isPlayer) attacked.addNotif('You were attacked by '+attacker.name);
-    if(attacker.isPlayer) attacker.addNotif('You attacked '+attacker.name);
+    if(attacker.isPlayer) attacker.addNotif('You attacked '+attacked.name);
     if(attacked.entityCategory == 'PlayerBuilding') GameServer.notifyPlayer(attacked.owner,'Your '+attacked.name+' was attacked by '+attacker.name);
     if(attacked.isCiv || attacker.isCiv) GameServer.addMarker('conflict',attacked.x,attacked.y);
     return true;
@@ -1328,12 +1336,17 @@ GameServer.handleBattleAction = function(data,socketID){
  * @returns {Array} - List of entities found.
  */
 GameServer.getEntitiesAt = function(x,y,w,h){
-    var aois = new Set(
-        Utils.listAdjacentAOIs(Utils.tileToAOI(x,y))
-        .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x+w,y)))
-        .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x,y+h)))
-        .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x+w,y+h)))
-    );
+    var aois;
+    if(w == 1 && h == 1){
+        aois = [Utils.tileToAOI(x,y)];
+    }else {
+        var aois = new Set(
+            Utils.listAdjacentAOIs(Utils.tileToAOI(x, y))
+                .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x + w, y)))
+                .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x, y + h)))
+                .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x + w, y + h)))
+        );
+    }
     var entities = [];
     var rect = {x:x,y:y,w:w,h:h};
     aois.forEach(function(aoi){

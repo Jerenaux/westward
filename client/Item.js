@@ -26,7 +26,7 @@ var Item = new Phaser.Class({
 
         this.setTilePosition(data.x,data.y,true);
         // this.setOrigin(0.5);
-        this.setDepth(this.tileY+1.5); // for e.g. when wood spawns on the roots of a tree
+        this.updateDepth();
 
         if(itemData.collides) {
             this.collides = true;
@@ -46,6 +46,10 @@ var Item = new Phaser.Class({
         if(itemData.insect && Utils.randomInt(1,10) > 8) new Insect(this.x,this.y);
     },
 
+    updateDepth: function(){
+        this.setDepth(this.tileY+1.5); // for e.g. when wood spawns on the roots of a tree
+    },
+
     remove: function(){
         CustomSprite.prototype.remove.call(this);
         if(this.collides) Engine.collisions.delete(this.tileX,this.tileY);
@@ -63,7 +67,11 @@ var Item = new Phaser.Class({
     },
 
     manageBehindness: function(){
-        if(Engine.overlay.get(this.tileX,this.tileY)) this.hollow();
+        if(Engine.overlay.get(this.tileX,this.tileY)){
+            this.hollow();
+        }else{
+            this.unhollow();
+        }
     },
 
     handleClick: function(){

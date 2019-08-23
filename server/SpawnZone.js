@@ -6,17 +6,19 @@ var World = require('../shared/World.js').World;
 var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 
-function SpawnZone(x,y,animal,nb){
+function SpawnZone(x,y,animal){
     this.x = x;
     this.y = y;
     this.aoi = Utils.tileToAOI(this.x,this.y);
     this.animal = animal;
-    this.nb = nb;
-    this.max = this.nb*2;
+    var animalData = GameServer.getAnimalData(this.animal);
+    console.log('animalData',animalData);
+    this.max = animalData.packSize.max;
     this.population = 0;
     this.lastUpdate = 0; // How many turns ago did an update take place
 
-    for(var i = 0; i < this.nb; i++){
+    var nb = Utils.randomInt(animalData.packSize.min[0],animalData.packSize.min[1]);
+    for(var i = 0; i < nb; i++){
         this.spawn();
     }
 }
@@ -26,7 +28,7 @@ SpawnZone.prototype.update = function(){
     if(GameServer.vision.has(this.aoi)) return;
     if(this.population == this.max) return;
 
-    var animalData = GameServer.animalsData[this.animal];
+    var animalData = GameServer.getAnimalData(this.animal);
     // How many turns must elapse before a spawn event
     var nextUpdate = (this.max - this.population)*animalData.spawnRate;
     if(nextUpdate <= this.lastUpdate){
@@ -38,7 +40,7 @@ SpawnZone.prototype.update = function(){
 };
 
 SpawnZone.prototype.spawn = function(print){
-    if(print) console.log('Spawning 1 ',GameServer.animalsData[this.animal].name,'at',this.x,this.y);
+    if(print) console.log('Spawning 1 ',GameServer.getAnimalData(this.animal).name,'at',this.x,this.y);
     var animal = GameServer.addAnimal(this.x, this.y, this.animal);
     animal.setSpawnZone(this);
     this.population++;

@@ -2,12 +2,14 @@
   "0":{
     "sprite":"wolf",
     "battleicon":"wolf",
-    "name": "Wolf",
-    "map_name": "Wolf pack",
+    "name": "<Wolf>",
     "frame": 22,
     "aggro": true,
     "wander": true,
-    "spawnRate": 30,
+    "packSize": {
+      "min": [2,4],
+      "max": 6
+    },
     "walkPrefix": "wolf",
     "footprintsFrame": 1,
     "printsVertOffset": 10,
@@ -21,13 +23,6 @@
         "left": 8,
         "right": 15
     },
-    "stats": {
-      "hpmax": 100,
-      "hp": 100,
-      "def": 6,
-      "dmg": 4
-    },
-    "xp": 10,
     "loot":{
       "9": 1,
       "1": 3,
@@ -35,43 +30,46 @@
     }
   },
   "1":{
-    "sprite":"wolves",
-    "name": "White wolf",
-    "frame": 28,
-    "walkPrefix": "whitewolf",
-    "restingFrames": {
-      "up": 40,
-      "down": 4,
-      "left": 16,
-      "right": 28
-    },
+    "name": "Gray wolf",
+    "inheritFrom": 0,
+    "map_name": "Gray wolf pack",
+    "nbPacks": 60,
+    "spawnRate": 30,
     "stats": {
-      "hp": 200,
-      "def": 12,
+      "hpmax": 100,
+      "hp": 100,
+      "def": 6,
       "dmg": 4
-    }
+    },
+    "xp": 10
   },
   "2":{
-    "sprite":"toadmen",
-    "name": "Shroom",
-    "frame": 55,
-    "walkPrefix": "toad",
-    "width": 2,
-    "height": 2,
-    "aggro": true,
-    "wander": true,
-    "footprintsFrame": 1,
-    "restingFrames": {
-      "up": 45,
-      "down": 9,
-      "left": 21,
-      "right": 33
-    },
+    "name": "Black wolf",
+    "inheritFrom": 0,
+    "map_name": "Black wolf pack",
+    "nbPacks": 30,
+    "spawnRate": 50,
     "stats": {
-      "hp": 300,
-      "def": 16,
-      "dmg": 5
-    }
+      "hpmax": 130,
+      "hp": 130,
+      "def": 8,
+      "dmg": 6
+    },
+    "xp": 15
+  },
+  "3":{
+    "name": "White wolf",
+    "inheritFrom": 0,
+    "map_name": "White wolf pack",
+    "nbPacks": 10,
+    "spawnRate": 60,
+    "stats": {
+      "hpmax": 200,
+      "hp": 200,
+      "def": 12,
+      "dmg": 8
+    },
+    "xp": 20
   },
   "5":{
     "sprite":"bears",
@@ -84,6 +82,11 @@
     "height": 2,
     "aggro": true,
     "wander": true,
+    "packSize": {
+      "min": [1,1],
+      "max": 1
+    },
+    "nbPacks": 50,
     "spawnRate": 60,
     "footprintsFrame": 2,
     "printsHorizOffset": 12,

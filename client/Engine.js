@@ -419,36 +419,8 @@ Engine.createAnimations = function(){
     // TODO: don't hardcode, store in JSON of find a way to infer it
     // (standardize all spritesheets?)
 
-    Engine.createAnimation('player_move_right','hero',143,151,15,10,true);
-    Engine.createAnimation('player_move_up','hero',104,112,15,10,true);
-    Engine.createAnimation('player_move_down','hero',130,138,15,10,true);
-    Engine.createAnimation('player_move_left','hero',117,125,15,10,true);
-
-    Engine.createAnimation('player_attack_right','hero',195,200,15,false,true);
-    Engine.createAnimation('player_attack_down','hero',182,187,15,false,true);
-    Engine.createAnimation('player_attack_left','hero',169,174,15,false,true);
-    Engine.createAnimation('player_attack_up','hero',156,161,15,false,true);
-
-    Engine.createAnimation('player_bow_right','hero',247,259,15,false,true);
-    Engine.createAnimation('player_bow_down','hero',234,246,15,false,true);
-    Engine.createAnimation('player_bow_left','hero',221,233,15,false,true);
-    Engine.createAnimation('player_bow_up','hero',208,220,15,false,true);
-
-    // Civ
-    Engine.createAnimation('enemy_move_right','enemy',143,151,15,10,true);
-    Engine.createAnimation('enemy_move_up','enemy',104,112,15,10,true);
-    Engine.createAnimation('enemy_move_down','enemy',130,138,15,10,true);
-    Engine.createAnimation('enemy_move_left','enemy',117,125,15,10,true);
-
-    Engine.createAnimation('enemy_attack_right','enemy',195,200,15,false,true);
-    Engine.createAnimation('enemy_attack_down','enemy',182,187,15,false,true);
-    Engine.createAnimation('enemy_attack_left','enemy',169,174,15,false,true);
-    Engine.createAnimation('enemy_attack_up','enemy',156,161,15,false,true);
-
-    Engine.createAnimation('enemy_bow_right','enemy',247,259,15,false,true);
-    Engine.createAnimation('enemy_bow_down','enemy',234,246,15,false,true);
-    Engine.createAnimation('enemy_bow_left','enemy',221,233,15,false,true);
-    Engine.createAnimation('enemy_bow_up','enemy',208,220,15,false,true);
+    Engine.createHumanoidAnimations('player','hero');
+    Engine.createHumanoidAnimations('enemy','enemy');
 
     // Wolves
     Engine.createAnimation('wolf_move_down','wolf',0,2,10,true);
@@ -508,6 +480,23 @@ Engine.createAnimations = function(){
     });
 };
 
+Engine.createHumanoidAnimations = function(key, texture){
+    Engine.createAnimation(key+'_move_right',texture,143,151,15,10,true);
+    Engine.createAnimation(key+'_move_up',texture,104,112,15,10,true);
+    Engine.createAnimation(key+'_move_down',texture,130,138,15,10,true);
+    Engine.createAnimation(key+'_move_left',texture,117,125,15,10,true);
+
+    Engine.createAnimation(key+'_attack_right',texture,195,200,15,false,true);
+    Engine.createAnimation(key+'_attack_down',texture,182,187,15,false,true);
+    Engine.createAnimation(key+'_attack_left',texture,169,174,15,false,true);
+    Engine.createAnimation(key+'_attack_up',texture,156,161,15,false,true);
+
+    Engine.createAnimation(key+'_bow_right',texture,247,259,15,false,true);
+    Engine.createAnimation(key+'_bow_down',texture,234,246,15,false,true);
+    Engine.createAnimation(key+'_bow_left',texture,221,233,15,false,true);
+    Engine.createAnimation(key+'_bow_up',texture,208,220,15,false,true);
+};
+
 Engine.createAnimation = function(key,texture,start,end,rate,loop,revert){
     rate = rate || 10;
     var config = {
@@ -554,7 +543,7 @@ Engine.updateBehindness = function(){
     Engine.entityManager.displayLists['item'].forEach(function(iid){
         Engine.items[iid].manageBehindness();
     });
-}
+};
 
 Engine.makeBuildingTitle = function(){
     Engine.buildingTitle = new BuildingTitle(512,10);
@@ -1668,8 +1657,8 @@ Engine.drawChunk = function(mapData,id){
     var chunk = new Chunk(mapData, id, 1);
     Engine.chunks[chunk.id] = chunk;
     if (!Engine.mapDataCache[chunk.id]) Engine.mapDataCache[chunk.id] = mapData;
-    //chunk.drawLayers();
     Engine.displayedChunks.push(chunk.id);
+    Engine.updateBehindness();
 };
 
 Engine.removeChunk = function(id){
@@ -1867,6 +1856,12 @@ Engine.updateSelf = function(data){
 
 Engine.update = function(){
 
+};
+
+Engine.getAnimalData = function(type){
+    var animalData = Engine.animalsData[type];
+    if(animalData.inheritFrom !== undefined) animalData = Object.assign(Engine.animalsData[animalData.inheritFrom],animalData);
+    return animalData;
 };
 
 // Processes the global update packages received from the server

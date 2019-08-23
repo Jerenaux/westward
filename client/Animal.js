@@ -19,7 +19,7 @@ var Animal = new Phaser.Class({
             Engine.animals[data.id].remove();
         }
 
-        var animalData = Engine.animalsData[data.type];
+        var animalData = Engine.getAnimalData(data.type);
         this.id = data.id;
 
         Engine.animals[this.id] = this;

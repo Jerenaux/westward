@@ -56,17 +56,16 @@ World Building
 
 Bugs:
 Features:
-- Test vigor decrease
-- Test battle center
-- Test behindness
-- Fight bear
-- Improve legend
-- Check that destroyed entities destroy their orientation pins
-- Gif of bow attack
-- Remove "resting framedefs" from animals atlas, do it based on animations
-- Display item rarity in inventory (check if doesn't conflit with shop)
-- Improve shaders (behindness and contour)
+- Remove all frames data from animals.json
+- Add multicolor wolves
+- Test spawn rates
+- Prune animal clusters too close to buildings
+- Test battle involving neighbors
+- Similar logic for plants (iterate over items.json)
 - Add civ archers and loot arrows from them (+ add loot to civ warriors) w/ probability
+- Improve legend with toggling, display built or not, filter on building type?
+- Gif of bow attack
+- Display item rarity in inventory (check if doesn't conflit with shop)
 - Add belts?
 - Collective missions menu
 -> Start wih basic production quests
