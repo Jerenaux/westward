@@ -24,14 +24,8 @@ var Civ = new Phaser.Class({
 
         this.setPosition(data.x,data.y);
         this.setTexture('enemy');
-        this.restingFrames = {
-            up: 104,
-            down: 130,
-            left: 117,
-            right: 143
-        };
         this.deathFrame = 265;
-        this.setFrame(this.restingFrames.right,false,false);
+        // this.setFrame(this.restingFrames.right,false,false);
         this.setOrigin(0.2,0.5);
 
         this.battleBoxData = {
@@ -47,6 +41,7 @@ var Civ = new Phaser.Class({
         this.name = civData.name;//'Civ'; //'מִ  ת  נַ  גֵ  ד'
 
         this.animPrefix = 'enemy';
+        this.faceOrientation();
         this.footprintsFrame = 0;
         this.printsVertOffset = 10;
 

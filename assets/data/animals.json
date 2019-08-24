@@ -1,38 +1,31 @@
 {
   "0":{
-    "sprite":"wolf",
     "battleicon":"wolf",
     "name": "<Wolf>",
-    "frame": 22,
     "aggro": true,
     "wander": true,
     "packSize": {
       "min": [2,4],
       "max": 6
     },
-    "walkPrefix": "wolf",
+    "loot":{
+      "9": 1,
+      "1": 3,
+      "27": 1
+    },
     "footprintsFrame": 1,
     "printsVertOffset": 10,
     "origin": {
       "x": 0.1,
       "y": 0
-    },
-    "restingFrames": {
-        "up": 22,
-        "down": 1,
-        "left": 8,
-        "right": 15
-    },
-    "loot":{
-      "9": 1,
-      "1": 3,
-      "27": 1
     }
   },
   "1":{
     "name": "Gray wolf",
     "inheritFrom": 0,
+    "sprite":"graywolf",
     "map_name": "Gray wolf pack",
+    "animPrefix": "graywolf",
     "nbPacks": 60,
     "spawnRate": 30,
     "stats": {
@@ -46,7 +39,9 @@
   "2":{
     "name": "Black wolf",
     "inheritFrom": 0,
+    "sprite":"blackwolf",
     "map_name": "Black wolf pack",
+    "animPrefix": "blackwolf",
     "nbPacks": 30,
     "spawnRate": 50,
     "stats": {
@@ -60,7 +55,9 @@
   "3":{
     "name": "White wolf",
     "inheritFrom": 0,
+    "sprite":"whitewolf",
     "map_name": "White wolf pack",
+    "animPrefix": "whitewolf",
     "nbPacks": 10,
     "spawnRate": 60,
     "stats": {
@@ -91,12 +88,6 @@
     "footprintsFrame": 2,
     "printsHorizOffset": 12,
     "printsVertOffset": 30,
-    "restingFrames": {
-      "up": 45,
-      "down": 9,
-      "left": 21,
-      "right": 33
-    },
     "stats": {
       "hpmax": 150,
       "hp": 150,

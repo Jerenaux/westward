@@ -56,10 +56,7 @@ World Building
 
 Bugs:
 Features:
-- Remove all frames data from animals.json
-- Add multicolor wolves
-- Test spawn rates
-- Prune animal clusters too close to buildings
+- Debu SZ activity
 - Test battle involving neighbors
 - Similar logic for plants (iterate over items.json)
 - Add civ archers and loot arrows from them (+ add loot to civ warriors) w/ probability

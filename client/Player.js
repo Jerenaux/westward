@@ -19,13 +19,8 @@ var Player = new Phaser.Class({
         this.footprintsFrame = 0;
         this.printsVertOffset = 10;
 
-        this.restingFrames = {
-            up: 104,
-            down: 130,
-            left: 117,
-            right: 143
-        };
-        this.setFrame(this.restingFrames.down);
+        // this.setFrame(this.restingFrames.down);
+        this.faceOrientation();
         this.cellsWidth = 1;
         this.cellsHeight = 1;
 

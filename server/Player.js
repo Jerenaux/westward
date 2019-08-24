@@ -754,7 +754,7 @@ Player.prototype.getWorldInformation = function(){
     this.setOwnProperty('frontier',GameServer.frontier);
     this.setOwnProperty('buildingMarkers', GameServer.listBuildingMarkers(this.instance));
     this.setOwnProperty('resourceMarkers',  GameServer.listMarkers('resource').concat(this.extraMarkers));
-    this.setOwnProperty('animalMarkers', GameServer.listMarkers('animal'));
+    this.setOwnProperty('animalMarkers', GameServer.listAnimalMarkers);
     this.setOwnProperty('deathMarkers', GameServer.listMarkers('death'));
     this.setOwnProperty('conflictMarkers', GameServer.listMarkers('conflict'));
     this.setOwnProperty('rarity', GameServer.getRarity());
@@ -967,6 +967,7 @@ Player.prototype.getIndividualUpdatePackage = function () {
     var pkg = this.updatePacket;
     if (GameServer.checkFlag('FoW')) pkg.fow = GameServer.fowList;
     if (GameServer.checkFlag('frontier')) pkg.frontier = GameServer.frontier;
+    if (GameServer.checkFlag('animalsMarkers')) pkg.animalMarkers = GameServer.listAnimalMarkers();
     if (GameServer.checkFlag('buildingsMarkers')) pkg.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
     if (GameServer.checkFlag('deathMarkers')) pkg.deathMarkers = GameServer.listMarkers('death');
     if (GameServer.checkFlag('conflictMarkers')) pkg.conflictMarkers = GameServer.listMarkers('conflict');

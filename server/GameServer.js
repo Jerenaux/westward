@@ -358,7 +358,7 @@ GameServer.loadItems = function(){
 };
 
 GameServer.loadMarkers = function(){
-    var markerTypes = ['resource','animal','death','conflict'];
+    var markerTypes = ['resource','death','conflict'];
     markerTypes.forEach(function(marker){
         var path = pathmodule.join(GameServer.mapsPath,marker+'Markers.json');
         try{
@@ -368,20 +368,6 @@ GameServer.loadMarkers = function(){
             GameServer[marker+'Markers'] = [];
         }
     });
-    // resourceMarkersPath = pathmodule.join(GameServer.mapsPath,'resourceMarkers.json');
-    // animalMarkersPath = pathmodule.join(GameServer.mapsPath,'animalMarkers.json');
-    // try{
-    //     GameServer.resourceMarkers = JSON.parse(fs.readFileSync(resourceMarkersPath).toString());
-    // }catch(err){
-    //     console.warn('ERROR loading resource markers');
-    //     GameServer.resourceMarkers = []
-    // }
-    // try{
-    //     GameServer.animalMarkers = JSON.parse(fs.readFileSync(animalMarkersPath).toString());
-    // }catch(err){
-    //     console.warn('ERROR loading animal markers');
-    //     GameServer.animalMarkers = []
-    // }
     GameServer.updateStatus();
 };
 
@@ -590,10 +576,6 @@ GameServer.startEconomy = function(){
     }
     GameServer.maxTurns = Math.max(maxDuration,300);
 
-    GameServer.spawnZones.forEach(function(zone){
-        zone.update();
-    });
-
     GameServer.economyTurn();
     GameServer.turnDuration = config.get('economyCycles.turnDuration');
     setInterval(GameServer.economyTurn,GameServer.turnDuration*1000);
@@ -605,7 +587,7 @@ GameServer.startEconomy = function(){
  */
 GameServer.economyTurn = function(){
     GameServer.elapsedTurns++;
-    // if(!GameServer.elapsedTurns%10) console.log('Turn',GameServer.elapsedTurns);
+    // console.log('Turn',GameServer.elapsedTurns);
 
     GameServer.spawnZones.forEach(function(zone){
         zone.update();
@@ -616,6 +598,7 @@ GameServer.economyTurn = function(){
     GameServer.updateEconomicEntities(GameServer.players); // food, shelter ...
 
     if(GameServer.isTimeToUpdate('itemsRespawn')) GameServer.respawnItems();
+    if(GameServer.isTimeToUpdate('SpawnZonesActivity')) GameServer.updateSZActivity();
 
     if(GameServer.elapsedTurns === GameServer.maxTurns) GameServer.elapsedTurns = 0;
 };
@@ -626,7 +609,7 @@ GameServer.economyTurn = function(){
  */
 GameServer.updateEconomicEntities = function(entities){
     for(var key in entities){
-        entities[key].update();
+        if(entities.hasOwnProperty(key)) entities[key].update();
     }
 };
 
@@ -1011,6 +994,18 @@ GameServer.respawnItems = function(){
     }
 };
 
+GameServer.updateSZActivity = function(){
+    console.log('Updating active spawn zones ...');
+    GameServer.animalMarkers = [];
+    for(var key in GameServer.spawnZones){
+        if(!GameServer.spawnZones.hasOwnProperty(key)) continue;
+        var sz = GameServer.spawnZones[key];
+        sz.updateActiveStatus();
+        if(sz.isActive()) GameServer.animalMarkers.push(sz.getMarkerData());
+    }
+    GameServer.setFlag('animalsMarkers');
+};
+
 /**
  * Identify which items to forage when a player click on a environment
  * item and update the related data structures.
@@ -1335,7 +1330,11 @@ GameServer.handleBattleAction = function(data,socketID){
  * @param {number} h - height of the area.
  * @returns {Array} - List of entities found.
  */
-GameServer.getEntitiesAt = function(x,y,w,h){
+GameServer.getEntitiesAt = function(x,y,w,h,typeFilter){
+    if(isNaN(x) || isNaN(y) || isNaN(w) || isNaN(h)){
+        console.warn('ERROR: NaN input values for getEntities');
+        return;
+    }
     var aois;
     if(w == 1 && h == 1){
         aois = [Utils.tileToAOI(x,y)];
@@ -1350,10 +1349,19 @@ GameServer.getEntitiesAt = function(x,y,w,h){
     var entities = [];
     var rect = {x:x,y:y,w:w,h:h};
     aois.forEach(function(aoi){
+        if(!(aoi in GameServer.AOIs)){
+            console.warn('Invalid AOI ',aoi);
+            return;
+        }
         GameServer.AOIs[aoi].entities.forEach(function(entity){
             if(Utils.overlap(entity.getRect(),rect)) entities.push(entity);
         });
     });
+    if(typeFilter){
+        entities = entities.filter(function(e){
+            return (typeFilter.includes(e.entityCategory));
+        });
+    }
     return entities;
 };
 
@@ -1597,6 +1605,10 @@ GameServer.listBuildingMarkers = function(instance){
     return list;
 };
 
+GameServer.listAnimalMarkers = function(){
+    return GameServer.animalMarkers;
+};
+
 GameServer.addMarker = function(markerType,x,y){
     var mapName = markerType+'Markers';
     if(!(mapName in GameServer)){
@@ -1606,6 +1618,7 @@ GameServer.addMarker = function(markerType,x,y){
     GameServer[markerType+'Markers'].push([x,y]);
     if(GameServer[markerType+'Markers'].length > 10) GameServer[markerType+'Markers'].shift(); // TODO: conf
     GameServer.setFlag(mapName);
+    // TODO: use db
     var path = pathmodule.join(GameServer.mapsPath,markerType+'Markers.json');
     fs.writeFile(path,JSON.stringify(GameServer[markerType+'Markers']),function(err){
         if(err) throw err;
@@ -1928,7 +1941,7 @@ GameServer.computeFrontier = function(setFlag){
             }
         });
     },this);
-    console.log('frontier:',GameServer.frontier);
+    // console.log('frontier:',GameServer.frontier);
     if(setFlag) GameServer.setFlag('frontier');
 };
 

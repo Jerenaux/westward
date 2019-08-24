@@ -34,7 +34,6 @@ var Engine = {
 
 var tilesetData = {};
 
-
 Engine.preload = function() {
     Engine.useTilemaps = false;
 
@@ -43,13 +42,15 @@ Engine.preload = function() {
     // Characters
     this.load.spritesheet('enemy', 'assets/sprites/enemy.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64}); // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
-    // this.load.spritesheet('wolves', 'assets/sprites/animals/wolves.png',{frameWidth:32,frameHeight:32});
-    this.load.spritesheet('wolf', 'assets/sprites/animals/wolf.png',{frameWidth:43,frameHeight:32});
-    this.load.spritesheet('bears', 'assets/sprites/animals/bears2.png',{frameWidth:56,frameHeight:56});
-    this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
-    // this.load.spritesheet('toadmen', 'assets/sprites/animals/toadmen.png',{frameWidth:48,frameHeight:48});
 
-    // #################""
+
+    this.load.spritesheet('graywolf', 'assets/sprites/animals/graywolf.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('blackwolf', 'assets/sprites/animals/blackwolf.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('whitewolf', 'assets/sprites/animals/whitewolf.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('bears', 'assets/sprites/animals/bears.png',{frameWidth:56,frameHeight:56});
+    this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
+
+    // ###################
 
     // Misc
     this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
@@ -416,33 +417,23 @@ Engine.playLocalizedSound = function(sound,maxVolume,location){
 };
 
 Engine.createAnimations = function(){
-    // TODO: don't hardcode, store in JSON of find a way to infer it
-    // (standardize all spritesheets?)
-
     Engine.createHumanoidAnimations('player','hero');
     Engine.createHumanoidAnimations('enemy','enemy');
 
-    // Wolves
-    Engine.createAnimation('wolf_move_down','wolf',0,2,10,true);
-    Engine.createAnimation('wolf_move_left','wolf',7,9,10,true);
-    Engine.createAnimation('wolf_move_right','wolf',14,16,10,true);
-    Engine.createAnimation('wolf_move_up','wolf',21,23,10,true);
-
-    Engine.createAnimation('wolf_attack_down','wolf',28,34,15,false,true);
-    Engine.createAnimation('wolf_attack_left','wolf',35,41,15,false,true);
-    Engine.createAnimation('wolf_attack_right','wolf',42,48,15,false,true);
-    Engine.createAnimation('wolf_attack_up','wolf',49,55,15,false,true);
-
-    Engine.createAnimation('wolf_die_down','wolf',56,58);
-    Engine.createAnimation('wolf_die_left','wolf',63,65);
-    Engine.createAnimation('wolf_die_right','wolf',70,72);
-    Engine.createAnimation('wolf_die_up','wolf',77,79);
+    Engine.createWolfAnimations('graywolf');
+    Engine.createWolfAnimations('blackwolf');
+    Engine.createWolfAnimations('whitewolf');
 
     // Bear
     Engine.createAnimation('bear_move_down','bears',9,11,10,true);
     Engine.createAnimation('bear_move_left','bears',21,23,10,true);
     Engine.createAnimation('bear_move_right','bears',33,35,10,true);
     Engine.createAnimation('bear_move_up','bears',45,47,10,true);
+
+    Engine.createAnimation('bear_rest_down','bears',9,9);
+    Engine.createAnimation('bear_rest_left','bears',21,21);
+    Engine.createAnimation('bear_rest_right','bears',33,33);
+    Engine.createAnimation('bear_rest_up','bears',45,45);
 
     Engine.scene.anims.create({
         key: 'sword',
@@ -481,6 +472,8 @@ Engine.createAnimations = function(){
 };
 
 Engine.createHumanoidAnimations = function(key, texture){
+    // TODO: don't hardcode, store in JSON of find a way to infer it
+    // (standardize all spritesheets?)
     Engine.createAnimation(key+'_move_right',texture,143,151,15,10,true);
     Engine.createAnimation(key+'_move_up',texture,104,112,15,10,true);
     Engine.createAnimation(key+'_move_down',texture,130,138,15,10,true);
@@ -495,6 +488,33 @@ Engine.createHumanoidAnimations = function(key, texture){
     Engine.createAnimation(key+'_bow_down',texture,234,246,15,false,true);
     Engine.createAnimation(key+'_bow_left',texture,221,233,15,false,true);
     Engine.createAnimation(key+'_bow_up',texture,208,220,15,false,true);
+
+    Engine.createAnimation(key+'_rest_down',texture,130,130);
+    Engine.createAnimation(key+'_rest_left',texture,117,117);
+    Engine.createAnimation(key+'_rest_right',texture,143,143);
+    Engine.createAnimation(key+'_rest_up',texture,104,104);
+};
+
+Engine.createWolfAnimations = function(key){
+    Engine.createAnimation(key+'_move_down',key,0,2,10,true);
+    Engine.createAnimation(key+'_move_left',key,7,9,10,true);
+    Engine.createAnimation(key+'_move_right',key,14,16,10,true);
+    Engine.createAnimation(key+'_move_up',key,21,23,10,true);
+
+    Engine.createAnimation(key+'_attack_down',key,28,34,15,false,true);
+    Engine.createAnimation(key+'_attack_left',key,35,41,15,false,true);
+    Engine.createAnimation(key+'_attack_right',key,42,48,15,false,true);
+    Engine.createAnimation(key+'_attack_up',key,49,55,15,false,true);
+
+    Engine.createAnimation(key+'_die_down',key,56,58);
+    Engine.createAnimation(key+'_die_left',key,63,65);
+    Engine.createAnimation(key+'_die_right',key,70,72);
+    Engine.createAnimation(key+'_die_up',key,77,79);
+
+    Engine.createAnimation(key+'_rest_down',key,1,1);
+    Engine.createAnimation(key+'_rest_left',key,8,8);
+    Engine.createAnimation(key+'_rest_right',key,15,15);
+    Engine.createAnimation(key+'_rest_up',key,22,22);
 };
 
 Engine.createAnimation = function(key,texture,start,end,rate,loop,revert){

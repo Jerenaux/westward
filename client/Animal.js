@@ -30,7 +30,7 @@ var Animal = new Phaser.Class({
 
         this.setPosition(data.x,data.y);
         this.setTexture(animalData.sprite);
-        this.setFrame(animalData.frame); // TODO: remove, do it based on walk anim
+        // this.setFrame(animalData.frame); // TODO: remove, do it based on walk anim
         if(animalData.origin){
             this.setOrigin(animalData.origin.x,animalData.origin.y);
         }else {
@@ -40,11 +40,11 @@ var Animal = new Phaser.Class({
         this.setVisible(true);
         this.dead = false;
         this.name = animalData.name+' '+this.id;
-        this.animPrefix = animalData.walkPrefix;
+        this.animPrefix = animalData.animPrefix;
+        this.faceOrientation();
         this.footprintsFrame = animalData.footprintsFrame;
         this.printsVertOffset = animalData.printsVertOffset;
         this.printsHorizOffset = animalData.printsHorizOffset;
-        this.restingFrames = animalData.restingFrames;
 
         this.battleBoxData = {
             'atlas': 'battleicons',

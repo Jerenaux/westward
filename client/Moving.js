@@ -138,7 +138,8 @@ var Moving = new Phaser.Class({
     },
 
     faceOrientation: function(){
-        this.setFrame(this.restingFrames[this.orientation]);
+        // this.setFrame(this.restingFrames[this.orientation]);
+        this.play(this.animPrefix + '_rest_' + this.orientation);
     },
     
     tileByTilePreUpdate: function(tween,targets,startX,startY,endX,endY){
@@ -266,7 +267,8 @@ var Moving = new Phaser.Class({
         this.stopPos = null;
         this.previousOrientation = null;
         this.anims.stop();
-        this.setFrame(this.restingFrames[this.orientation]);
+        // this.setFrame(this.restingFrames[this.orientation]);
+        this.faceOrientation();
 
         if(this.isHero && Client.tutorial){
             TutorialManager.triggerHook('move');
