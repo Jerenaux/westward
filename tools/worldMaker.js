@@ -124,7 +124,6 @@ WorldMaker.prototype.run = function(){
     var dataAssets = path.join(__dirname,'..','assets','data');
     this.itemsData = JSON.parse(fs.readFileSync(path.join(dataAssets,'items.json')).toString());
     this.animalsData = JSON.parse(fs.readFileSync(path.join(dataAssets,'animals.json')).toString());
-    this.biomesData = JSON.parse(fs.readFileSync(path.join(dataAssets,'biomes.json')).toString());
 
     this.outdir = path.join(__dirname,'..','maps'); // TODO: remove dev.mapsPath etc?
     console.log('Writing to',this.outdir);
@@ -552,18 +551,18 @@ WorldMaker.prototype.getAnimalData = function(type){
 
 WorldMaker.prototype.makeSpawnZones = function(){
     this.resourceMarkers = [];
-    var items = this.biomesData.plants;
-    items.forEach(function(item){
-        for(var i = 0; i < item.nbzones; i++){
+    for(var itemID in this.itemsData){
+        var itemData = this.itemsData[itemID];
+        if(!itemData.nbClusters) continue;
+        for(var i = 0; i < itemData.nbClusters; i++){
             var x = Utils.randomInt(0,World.worldWidth-1);
             var y = Utils.randomInt(0,World.worldHeight-1);
             var w = Utils.randomInt(5,World.chunkWidth);
             var h = Utils.randomInt(5,World.chunkHeight);
-            this.makeFloraZone(x,y,w,h,item);
+            this.makeFloraZone(x,y,w,h,itemID,itemData);
         }
-    },this);
+    }
 
-    // this.animalsMarkers = [];
     for(var animalID in this.animalsData){
         var animalData = this.getAnimalData(animalID);
         for(var i = 0; i < animalData.nbPacks; i++){
@@ -574,10 +573,10 @@ WorldMaker.prototype.makeSpawnZones = function(){
     }
 };
 
-WorldMaker.prototype.makeFloraZone = function(x,y,w,h,data){
+WorldMaker.prototype.makeFloraZone = function(x,y,w,h,item,data){
     var contour = [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1],[2,-1]];
     var nb = 0;
-    var nbbushes = this.itemsData[data.item].nbBushes || 4;
+    var nbbushes = data.nbBushes || 4;
     // Look for trees inside the given area
     for(var u = 0; u < w; u++){
         for(var v = 0; v < h; v++){
@@ -587,15 +586,15 @@ WorldMaker.prototype.makeFloraZone = function(x,y,w,h,data){
                 for(var j = 0; j < nbbushes; j++){
                     var c = contour[j];
                     var loc = {x:x+u+c[0],y:y+v+c[1]};
-                    if(data.decor) this.addDecor(loc, data.decor);
-                    this.items.add(loc.x,loc.y,data.item);
+                    if(data.decorFrame) this.addDecor(loc, data.decorFrame);
+                    this.items.add(loc.x,loc.y,item);
                     nb++;
                     // console.log('bush at',loc);
                 }
             }
         }
     }
-    if(nb) this.resourceMarkers.push([Math.floor(x+w/2),Math.floor(y+h/2),data.item]);
+    if(nb) this.resourceMarkers.push([Math.floor(x+w/2),Math.floor(y+h/2),item]);
 };
 
 WorldMaker.prototype.makeAnimalZone = function(x,y,type){

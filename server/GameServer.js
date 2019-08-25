@@ -174,8 +174,8 @@ GameServer.readMap = function(mapsPath,test,cb){
 };
 
 GameServer.initializeFlags = function(){
-    var flags = ['nbConnected','FoW','buildingsMarkers','animalsMarkers','deathMarkers',
-    'conflictMarkers','frontier'];
+    var flags = ['nbConnected','FoW','resourcesMarkers','buildingsMarkers','animalsMarkers',
+        'deathMarkers', 'conflictMarkers','frontier'];
     GameServer.flags = {};
     flags.forEach(function(flag){
         GameServer.flags[flag] = false;
@@ -396,9 +396,11 @@ GameServer.setUpSpawnZones = function(){
         var x = animal[0];
         var y = animal[1];
         var type = animal[2];
-        GameServer.spawnZones.push(new SpawnZone(x,y,type));
+        var sz = new SpawnZone(x,y,type);
+        GameServer.spawnZones.push(sz);
     },this);
 
+    GameServer.updateSZActivity();
     GameServer.updateStatus();
 };
 
@@ -598,7 +600,7 @@ GameServer.economyTurn = function(){
     GameServer.updateEconomicEntities(GameServer.players); // food, shelter ...
 
     if(GameServer.isTimeToUpdate('itemsRespawn')) GameServer.respawnItems();
-    if(GameServer.isTimeToUpdate('SpawnZonesActivity')) GameServer.updateSZActivity();
+    // if(GameServer.isTimeToUpdate('SpawnZonesActivity')) GameServer.updateSZActivity();
 
     if(GameServer.elapsedTurns === GameServer.maxTurns) GameServer.elapsedTurns = 0;
 };
@@ -1565,9 +1567,11 @@ GameServer.buildPlayerBuilding = function(player,bid,tile){
 
 GameServer.finalizeBuilding = function(player,building){
     building.embed();
-    GameServer.setFlag('buildingsMarkers');
     player.addBuilding(building);
+    GameServer.setFlag('buildingsMarkers');
     GameServer.updateFoW();
+    GameServer.updateSZActivity();
+    GameServer.computeFrontier(true);
     if(GameServer.buildingParameters.autobuild) building.setBuilt();
 };
 
@@ -1580,6 +1584,8 @@ GameServer.buildCivBuilding = function(data){
     });
     building.embed();
     GameServer.setFlag('buildingsMarkers');
+    GameServer.computeFrontier(true);
+    GameServer.updateSZActivity();
     return building;
 };
 
@@ -1606,7 +1612,11 @@ GameServer.listBuildingMarkers = function(instance){
 };
 
 GameServer.listAnimalMarkers = function(){
-    return GameServer.animalMarkers;
+    return GameServer.animalMarkersFiltered;
+};
+
+GameServer.listResourceMarkers = function(){
+    return GameServer.resourceMarkersFiltered;
 };
 
 GameServer.addMarker = function(markerType,x,y){
@@ -1891,11 +1901,29 @@ GameServer.updateFoW = function(){
         var building = GameServer.buildings[bid];
         if(!building.civ) GameServer.dissipateFoW(building.aoi);
     }
-    // GameServer.fowChanged = true;
     GameServer.setFlag('FoW');
     GameServer.fowList = GameServer.computeFoW();
+    GameServer.animalMarkersFiltered = GameServer.filterMarkers('animal');
+    GameServer.resourceMarkersFiltered = GameServer.filterMarkers('resource');
+    GameServer.setFlag('animalsMarkers');
+    GameServer.setFlag('resourcesMarkers');
 };
 
+GameServer.filterMarkers = function(type){
+    return GameServer[type+'Markers'].filter(function(m){
+        var aoi = Utils.tileToAOI(m[0],m[1]);
+        var nbr = Utils.listAdjacentAOIs(aoi);
+        for(var i = 0; i < nbr.length; i++){
+            if(GameServer.fowList.includes(nbr[i])) return true;
+        }
+        return false;
+    });
+};
+
+/**
+ * List AOIs that are *not* covered by fog of war.
+ * @returns {Array}
+ */
 GameServer.computeFoW = function(){
     var fow = [];
     for(var aoi in GameServer.fogOfWar){
@@ -1905,7 +1933,7 @@ GameServer.computeFoW = function(){
             delete GameServer.fogOfWar[aoi];
             continue;
         }
-        fow.push(aoi);
+        fow.push(parseInt(aoi));
     }
     return fow;
 };
@@ -1922,7 +1950,6 @@ GameServer.computeFrontier = function(setFlag){
             t: (bld.civ ? 'r' : 'b')
         });
     }
-    console.log(sites.length+' buildings considered for Frontier');
 
     var voronoi = new Voronoi();
     var bbox = {xl: 0, xr: World.worldWidth, yt: 0, yb: World.worldHeight}; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom

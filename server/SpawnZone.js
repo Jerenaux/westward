@@ -32,7 +32,7 @@ SpawnZone.prototype.getMarkerData = function(){
 };
 
 SpawnZone.prototype.updateActiveStatus = function(){
-    var r = 3; // TODO: conf
+    var r = 10; // TODO: conf
     this.active = (GameServer.getEntitiesAt(this.x-r,this.y-r,r*2,r*2,['PlayerBuilding','CivBuilding']).length == 0);
 };
 

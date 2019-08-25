@@ -86,11 +86,12 @@
     "atlas": "items2",
     "frame":"thickgrass",
     "name": "Thick Grass",
-    "envFrames": ["bush_5"],
     "desc": "Crafting material used to make string.",
     "sound": "soft",
     "nbBushes": 1,
-    "yield": 3
+    "yield": 3,
+    "nbClusters": 100,
+    "envFrames": ["bush_5"]
   },
   "9":{
     "atlas": "items2",
@@ -148,6 +149,7 @@
     "atlas": "items2",
     "frame":"sunflower",
     "envFrames": ["bush_3"],
+    "decorFrame":"b4",
     "name": "Sunstreak",
     "desc": "Flower with regenerative properties used to brew potions.",
     "isMaterial": true,
@@ -155,7 +157,8 @@
     "nbBushes": 2,
     "yield": 2,
     "coitems": [5],
-    "insect": true
+    "insect": true,
+    "nbClusters": 100
   },
   "15":{
     "atlas": "items2",
@@ -195,7 +198,8 @@
     "isMaterial": true,
     "sound": "soft",
     "nbBushes": 4,
-    "yield": 5
+    "yield": 5,
+    "nbClusters": 100
   },
   "19":{
     "atlas": "items",
@@ -535,7 +539,9 @@
     "nbBushes": 4,
     "yield": 5,
     "verb": "Ate",
-    "insect": true
+    "insect": true,
+    "decorFrame":"b4",
+    "nbClusters":100
   },
   "48":{
     "atlas": "items2",

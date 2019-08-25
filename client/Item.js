@@ -62,6 +62,11 @@ var Item = new Phaser.Class({
             this.orientationPin.hide();
         }else{
             this.orientationPin.update(this.tileX,this.tileY);
+            if(this.orientationPin.side){
+                var sideMap = Engine.orientationPins[this.orientationPin.side];
+                if(!sideMap.hasOwnProperty(this.itemType)) sideMap[this.itemType] = [];
+                sideMap[this.itemType].push(this.orientationPin);
+            }
             this.orientationPin.display();
         }
     },

@@ -551,12 +551,43 @@ Engine.updateAllOrientationPins = function(){
     Engine.entityManager.displayLists['civ'].forEach(function(cid){
         Engine.civs[cid].manageOrientationPin();
     });
+    Engine.orientationPins = {
+        'top': {},
+        'left': {},
+        'right': {},
+        'bottom': {}
+    };
     Engine.entityManager.displayLists['item'].forEach(function(iid){
         Engine.items[iid].manageOrientationPin();
     });
+    Engine.pruneOrientationPins();
     Engine.entityManager.displayLists['player'].forEach(function(pid){
         Engine.players[pid].manageOrientationPin();
     });
+};
+
+Engine.pruneOrientationPins = function(){
+    for(var side in Engine.orientationPins){
+        if(side != 'right') continue; // TODO: remove
+        for(var item in Engine.orientationPins[side]){
+            var pins = Engine.orientationPins[side];
+            for(var i = 0; i < pins.length; i++){
+                var base = pins[i];
+                for(var j = i+1; j < pins.length; j++) {
+                    var other = pins[j];
+                    // TODO: conf
+                    var d = Math.abs(base.y - other.y);
+                    console.warn(d);
+                    if(d < 20){
+                        other.hide();
+                        pins.splice(j,1);
+                        base += d/2;
+                    }
+                }
+                // if(i >= pins.length) break;
+            }
+        }
+    }
 };
 
 Engine.updateBehindness = function(){
@@ -1880,6 +1911,10 @@ Engine.update = function(){
 
 Engine.getAnimalData = function(type){
     var animalData = Engine.animalsData[type];
+    if(!animalData){
+        console.warn('ERROR: no animal data for animal',type);
+        return {};
+    }
     if(animalData.inheritFrom !== undefined) animalData = Object.assign(Engine.animalsData[animalData.inheritFrom],animalData);
     return animalData;
 };

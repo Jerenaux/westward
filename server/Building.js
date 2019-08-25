@@ -268,6 +268,7 @@ Building.prototype.destroy = function(){
         GameServer.notifyPlayer(this.owner,'Your '+this.name+' was destroyed');
     }
     this.save();
+    GameServer.updateSZActivity();
     GameServer.computeFrontier(true);
 };
 

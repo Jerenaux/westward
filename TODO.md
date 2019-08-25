@@ -22,6 +22,7 @@ Deployment
 Design document
 Testing
 World Building
+Packaging
 
 ## Misc TODO
 - Adapt animations and delays for firearms
@@ -35,7 +36,6 @@ World Building
 - Better notifications
 - Don't disable walk with build panel
 - New movement system
-- Reduce amount of orientation pins
 - add esc shortcut
 - "new" marker
 - Events formatting
@@ -53,14 +53,18 @@ World Building
 - Acc boosting ability
 - Disengage button
 - Social campfires
+- Have towers dissipate more FoW?
+- SZ system for plants, disappears based on harvest frequency
+(-> Remove marker files, have it generated dynamically, etc.)
+- Spawn wolf colors based on N-S axis
 
 Bugs:
 Features:
-- Debu SZ activity
+- Reduce number of orientation pins per screen side
 - Test battle involving neighbors
-- Similar logic for plants (iterate over items.json)
 - Add civ archers and loot arrows from them (+ add loot to civ warriors) w/ probability
 - Improve legend with toggling, display built or not, filter on building type?
+- Restor dragging
 - Gif of bow attack
 - Display item rarity in inventory (check if doesn't conflit with shop)
 - Add belts?
@@ -102,6 +106,7 @@ María:
 - Wear and tear and wounds
 - Add taunts and emotes anims
 - More wildlife
+-> Some feathery creature that does melee attacks and drops feathers (remove as pickup object)
 - Diagonal movements 
 
 Sérgio:
@@ -117,6 +122,7 @@ Crafting:
 - Multiply variants of functional items (weapons, storage, ability-related...)
 - Distinguish animal pelts and animal leathers, also based on color
 - Each basic material (plant, pelt, mineral...) must have multiple uses
+- Think about N-S spread
 
 
 
@@ -247,6 +253,13 @@ Order:
 - Setters/getters everywhere
 - Centralize all texts (incl. stats, equip, and even item descriptions)
 - Remove "longslot" stuff intended for stretching longslots vertically?
+
+Packaging
+---------
+Player accounts and auth
+Landing page
+Wiki (self or check existing platform, Steam...)
+Forum (self or check existing platform, Steam...)
 
 Content:
 -------
@@ -432,12 +445,6 @@ or
 -> Much slower noise variation according to distance (since heard from very far)
 -> Pin disappears after a few seconds
 - Pins for alarm bells (same)
-* Packaging
-- Display nb connected
-- Cheat-proof: proper auth system, lock admin
-https://medium.freecodecamp.org/learn-how-to-handle-authentication-with-node-using-passport-js-4a56ed18e81e
-https://w3layouts.com/validate-login-register-forms-flat-responsive-widget-template/
-- Automate standalone app build (as part of e)
 * Settlement defense
 - Enable commander to build towers
 - Buildings health

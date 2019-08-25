@@ -749,12 +749,26 @@ Player.prototype.applyEffect = function (stat, delta, notify) {
     }
 };
 
+Player.prototype.getIndividualUpdatePackage = function () {
+    var pkg = this.updatePacket;
+    if (GameServer.checkFlag('FoW')) pkg.fow = GameServer.fowList;
+    if (GameServer.checkFlag('frontier')) pkg.frontier = GameServer.frontier;
+    if (GameServer.checkFlag('animalsMarkers')) pkg.animalMarkers = GameServer.listAnimalMarkers();
+    if (GameServer.checkFlag('resourcesMarkers')) pkg.resourceMarkers = GameServer.listResourceMarkers();
+    if (GameServer.checkFlag('buildingsMarkers')) pkg.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
+    if (GameServer.checkFlag('deathMarkers')) pkg.deathMarkers = GameServer.listMarkers('death');
+    if (GameServer.checkFlag('conflictMarkers')) pkg.conflictMarkers = GameServer.listMarkers('conflict');
+    if (pkg.isEmpty()) return null;
+    this.updatePacket = new PersonalUpdatePacket();
+    return pkg;
+};
+
 Player.prototype.getWorldInformation = function(){
     this.setOwnProperty('fow',GameServer.fowList);
     this.setOwnProperty('frontier',GameServer.frontier);
     this.setOwnProperty('buildingMarkers', GameServer.listBuildingMarkers(this.instance));
-    this.setOwnProperty('resourceMarkers',  GameServer.listMarkers('resource').concat(this.extraMarkers));
-    this.setOwnProperty('animalMarkers', GameServer.listAnimalMarkers);
+    this.setOwnProperty('resourceMarkers',  GameServer.listResourceMarkers());
+    this.setOwnProperty('animalMarkers', GameServer.listAnimalMarkers());
     this.setOwnProperty('deathMarkers', GameServer.listMarkers('death'));
     this.setOwnProperty('conflictMarkers', GameServer.listMarkers('conflict'));
     this.setOwnProperty('rarity', GameServer.getRarity());
@@ -960,20 +974,6 @@ Player.prototype.addNotif = function (msg, silent) {
     var MAX_LENGTH = 20; // TODO: max limit in conf
     // if(this.history.length > MAX_LENGTH) this.history.splice(MAX_LENGTH,this.history.length-MAX_LENGTH);
     if (this.history.length > MAX_LENGTH) this.history.splice(0, this.history.length - MAX_LENGTH);
-};
-
-Player.prototype.getIndividualUpdatePackage = function () {
-    // console.log(this.updatePacket,this.updatePacket.isEmpty());
-    var pkg = this.updatePacket;
-    if (GameServer.checkFlag('FoW')) pkg.fow = GameServer.fowList;
-    if (GameServer.checkFlag('frontier')) pkg.frontier = GameServer.frontier;
-    if (GameServer.checkFlag('animalsMarkers')) pkg.animalMarkers = GameServer.listAnimalMarkers();
-    if (GameServer.checkFlag('buildingsMarkers')) pkg.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
-    if (GameServer.checkFlag('deathMarkers')) pkg.deathMarkers = GameServer.listMarkers('death');
-    if (GameServer.checkFlag('conflictMarkers')) pkg.conflictMarkers = GameServer.listMarkers('conflict');
-    if (pkg.isEmpty()) return null;
-    this.updatePacket = new PersonalUpdatePacket();
-    return pkg;
 };
 
 Player.prototype.fastForward = function (nbturns) {

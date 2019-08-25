@@ -97,6 +97,7 @@ var OrientationPin = new Phaser.Class({
             maxdist = 1.5*this.data.vertTiles;
             idx = 0;
             idy = 40;
+            this.side = 'top';
         }else if(d1 == -1 && d2 == -1){
             xp = B.x;
             yp = B.x*(y/x);
@@ -104,6 +105,7 @@ var OrientationPin = new Phaser.Class({
             maxdist = 1.5*this.data.horizTiles;
             idx = -40;
             idy = 0;
+            this.side = 'right';
         }else if(d1 == -1 && d2 == 1){
             xp = C.y*(x/y);
             yp = C.y;
@@ -111,6 +113,7 @@ var OrientationPin = new Phaser.Class({
             maxdist = 1.5*this.data.vertTiles;
             idx = 0;
             idy = -40;
+            this.side = 'bottom';
         }else if(d1 ==1 && d2 == 1) {
             xp = A.x;
             yp = A.x * (y / x);
@@ -118,6 +121,7 @@ var OrientationPin = new Phaser.Class({
             maxdist = 1.5 * this.data.horizTiles;
             idx = 40;
             idy = 0;
+            this.side = 'left';
         }else if(d1 == -1 && d2 == 0){ // bottom-right corner
             xp = C.x;
             yp = C.y;
