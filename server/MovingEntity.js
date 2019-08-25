@@ -141,21 +141,6 @@ MovingEntity.prototype.getLocationCenter = function(){
     };
 };
 
-
-/*MovingEntity.prototype.getCenter = function(noRound){
-    if(noRound){
-        return {
-            x: this.x + this.cellsWidth / 2,
-            y: this.y + this.cellsHeight / 2
-        };
-    }else{
-        return {
-            x: Math.floor(this.x + this.cellsWidth / 2),
-            y: Math.floor(this.y + this.cellsHeight / 2)
-        };
-    }
-};*/
-
 MovingEntity.prototype.setChat = function(text){
     if(this.chatTimer) clearTimeout(this.chatTimer);
     this.setProperty('chat',text);
@@ -194,6 +179,96 @@ MovingEntity.prototype.isMoving = function(){
 
 MovingEntity.prototype.canFight = function(){
     return true;
+};
+
+/**
+ * Return an object containing all the information about the item
+ * equipped in a given slot.
+ * @param {string} slot - name of the slot where the item of
+ * interest is equiped.
+ * @returns {Object} - Object containging data about item.
+ */
+MovingEntity.prototype.getEquippedItem = function (slot) {
+    return this.equipment.getItem(slot);
+};
+
+/**
+ * Returns the item ID of the item equipped at the given slot
+ * @param {string} slot - name of the slot where the item of
+ * @returns {number} - item ID of equipped item or -1 if nothing equipped
+ */
+MovingEntity.prototype.getEquippedItemID = function (slot) {
+    return this.equipment.get(slot);
+};
+
+MovingEntity.prototype.getRangedContainer = function () {
+    return this.getEquippedItem('range_container');
+};
+
+MovingEntity.prototype.canRange = function () {
+
+    const weaponID = this.getEquippedItemID('rangedw');
+    if (weaponID === -1) {
+        if(this.isPlayer) {
+            this.addMsg('I don\'t have a ranged weapon equipped!');
+            this.setOwnProperty('resetTurn', true);
+        }
+        console.warn('no rangedw');
+        return false;
+    }
+    var weapon = this.getEquippedItem('rangedw');
+
+    const container = this.getRangedContainer();
+    if (container === false || container === -1) {
+        if(this.isPlayer) {
+            this.addMsg('I don\'t have ammo!');
+            this.setOwnProperty('resetTurn', true);
+        }
+        console.warn('no container');
+        return false;
+    }
+
+    const hasAmmo = this.equipment.hasAnyAmmo();
+    if (!hasAmmo) {
+        if(this.isPlayer) {
+            this.addMsg('I\'m out of ammo!');
+            this.setOwnProperty('resetTurn', true);
+        }
+        console.warn('no ammo');
+        return false;
+    }
+
+    if (weapon.ammo !== this.equipment.getAmmoContainerType()) {
+        if(this.isPlayer) {
+            this.addMsg('I can\'t use my weapon with that ammo');
+            this.setOwnProperty('resetTurn', true);
+        }
+        console.warn('wrong ammo');
+        return false;
+    }
+
+    if (hasAmmo) {
+        return true;
+    }
+
+};
+
+MovingEntity.prototype.decreaseAmmo = function () {
+    var ammoID = this.equipment.get('range_ammo');
+    this.equipment.load(-1);
+    if(this.isPlayer) {
+        var nb = this.equipment.getNbAmmo();
+        if (nb === 0) this.unequip('range_ammo', true);
+        this.updatePacket.addAmmo(nb);
+    }
+    return ammoID;
+};
+
+MovingEntity.prototype.getShootingPoint = function () {
+    return {
+        x: this.x + 1,
+        y: this.y + 1
+    };
 };
 
 MovingEntity.prototype.getRect = function(){

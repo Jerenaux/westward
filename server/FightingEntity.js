@@ -77,8 +77,12 @@ FightingEntity.prototype.isInFight = function(){
     return this.inFight;
 };
 
+FightingEntity.prototype.incrementStat = function(stat,amount){
+    this.getStat(stat).increment(amount);
+};
+
 FightingEntity.prototype.applyDamage = function(dmg){
-    this.getStat('hp').increment(dmg);
+   this.incrementStat('hp',dmg);
 };
 
 FightingEntity.prototype.getHealth = function(){

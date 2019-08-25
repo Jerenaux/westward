@@ -72,7 +72,9 @@ Camp.prototype.update = function(){
 
 Camp.prototype.spawnCiv = function(bld){
     var pos = GameServer.findNextFreeCell(bld.x + 2, bld.y + 1);
-    var civ = GameServer.addCiv(pos.x, pos.y);
+    // var type = Utils.randomInt(0,1);
+    var type = 1;
+    var civ = GameServer.addCiv(pos.x, pos.y, type);
     civ.setCamp(this);
     this.people.push(civ);
 };

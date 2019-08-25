@@ -135,42 +135,6 @@ var Player = new Phaser.Class({
         if (!this.isHero) this.queuePath(path);
     },
 
-    processRangedAttack: function (data) { // TODO: move elsewhere when NPC will be able to range
-        this.setOrientation({x: data.x, y: data.y});
-
-        let rangeWeapon = 'attack';
-
-        const ranged_weapon_item = Engine.player.getEquippedItem('rangedw');
-        if (ranged_weapon_item.class && ranged_weapon_item.class === 'bow') {
-            rangeWeapon = 'bow';
-        }
-
-        const ranged_ammo_item = Engine.player.getEquippedItem('range_ammo');
-
-        let itemAtlasPool;
-        // TODO: Maybe get this in utility function
-        if (ranged_ammo_item.atlas === 'items') {
-            itemAtlasPool = Engine.imagePool;
-        }
-        if (ranged_ammo_item.atlas === 'items2') {
-            itemAtlasPool = Engine.imagePool2;
-        }
-
-        const animationName = this.animPrefix + '_' + rangeWeapon + '_' + this.orientation;
-        this.play(animationName);
-        var from = {
-            x: this.x,
-            y: this.y - 10
-        };
-        Engine.animateRangeAmmo(
-            ranged_ammo_item.frame,
-            from, {x: data.x, y: data.y},
-            this.depth + 1, data.duration,
-            data.delay,
-            itemAtlasPool
-        );
-    },
-
     processBombThrow: function (data) { // TODO: move up to NPC if they'll throw bombs
         this.setOrientation({x: data.x, y: data.y});
         this.play(this.animPrefix + '_attack_' + this.orientation);
@@ -195,11 +159,6 @@ var Player = new Phaser.Class({
             x: x,
             y: y
         };
-    },
-
-    setOrientation: function (facing) {
-        this.computeOrientation(this.tileX, this.tileY, facing.x, facing.y);
-        this.faceOrientation();
     },
 
     // ### GETTERS ####

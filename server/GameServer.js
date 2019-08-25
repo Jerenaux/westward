@@ -449,9 +449,9 @@ GameServer.addCamp = function(data){
  * @param {number} y - y tile coordinate of the civ.
  * @returns {Object} The created Civ object.
  */
-GameServer.addCiv = function(x,y){
-    console.log('Spawning civ at',x,y);
-    var npc = new Civ(x,y,0);
+GameServer.addCiv = function(x,y,type){
+    console.log('Spawning civ type ',type,' at',x,y);
+    var npc = new Civ(x,y,type);
     GameServer.civs[npc.id] = npc;
     return npc;
 };
@@ -1902,7 +1902,14 @@ GameServer.updateFoW = function(){
         if(!building.civ) GameServer.dissipateFoW(building.aoi);
     }
     GameServer.setFlag('FoW');
+    var previousfow = GameServer.fowList;
     GameServer.fowList = GameServer.computeFoW();
+    previousfow.sort();
+    GameServer.fowList.sort();
+    if(previousfow.toString() == GameServer.fowList.toString()) {
+        console.log('FoW unchanged');
+        return;
+    } // no change
     GameServer.animalMarkersFiltered = GameServer.filterMarkers('animal');
     GameServer.resourceMarkersFiltered = GameServer.filterMarkers('resource');
     GameServer.setFlag('animalsMarkers');

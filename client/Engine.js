@@ -560,13 +560,14 @@ Engine.updateAllOrientationPins = function(){
     Engine.entityManager.displayLists['item'].forEach(function(iid){
         Engine.items[iid].manageOrientationPin();
     });
-    Engine.pruneOrientationPins();
+    // Engine.pruneOrientationPins();
     Engine.entityManager.displayLists['player'].forEach(function(pid){
         Engine.players[pid].manageOrientationPin();
     });
 };
 
 Engine.pruneOrientationPins = function(){
+    // TODO: complete
     for(var side in Engine.orientationPins){
         if(side != 'right') continue; // TODO: remove
         for(var item in Engine.orientationPins[side]){

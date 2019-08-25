@@ -464,26 +464,6 @@ Player.prototype.isEquipped = function (slot) {
     return !item.permanent;
 };
 
-/**
- * Return an object containing all the information about the item
- * equipped in a given slot.
- * @param {string} slot - name of the slot where the item of
- * interest is equiped.
- * @returns {Object} - Object containging data about item.
- */
-Player.prototype.getEquippedItem = function (slot) {
-    return this.equipment.getItem(slot);
-};
-
-/**
- * Returns the item ID of the item equipped at the given slot
- * @param {string} slot - name of the slot where the item of
- * @returns {number} - item ID of equipped item or -1 if nothing equipped
- */
-Player.prototype.getEquippedItemID = function (slot) {
-    return this.equipment.get(slot);
-};
-
 Player.prototype.getContainerType = function(){
     return this.equipment.getEquippedContainerType();
 };
@@ -676,57 +656,11 @@ Player.prototype.unload = function (notify) {
     return nb;
 };
 
-Player.prototype.decreaseAmmo = function () {
-    var ammoID = this.equipment.get('range_ammo');
-    this.equipment.load(-1);
-    var nb = this.equipment.getNbAmmo();
-    if (nb === 0) this.unequip('range_ammo', true);
-    this.updatePacket.addAmmo(nb);
-    return ammoID;
-};
-
-Player.prototype.getRangedContainer = function () {
-    return this.getEquippedItem('range_container');
-};
 
 Player.prototype.getNbAmmo = function () {
     return this.equipment.getNbAmmo();
 };
 
-Player.prototype.canRange = function () {
-
-    const weapon = this.getEquippedItem('rangedw');
-    if (weapon === -1) {
-        this.addMsg('I don\'t have a ranged weapon equipped!');
-        this.setOwnProperty('resetTurn', true);
-        return false;
-    }
-
-    const container = this.getRangedContainer();
-    if (container === false || container === -1) {
-        this.addMsg('I don\'t have ammo!');
-        this.setOwnProperty('resetTurn', true);
-        return false;
-    }
-
-    const hasAmmo = this.equipment.hasAnyAmmo();
-    if (!hasAmmo) {
-        this.addMsg('I\'m out of ammo!');
-        this.setOwnProperty('resetTurn', true);
-        return false;
-    }
-
-    if (weapon.ammo !== this.equipment.getAmmoContainerType()) {
-        this.addMsg('I can\'t use my weapon with that ammo');
-        this.setOwnProperty('resetTurn', true);
-        return false;
-    }
-
-    if (hasAmmo) {
-        return true;
-    }
-
-};
 
 Player.prototype.applyEffects = function (item, notify) {
     var itemData = GameServer.itemsData[item];
@@ -1022,11 +956,5 @@ Player.prototype.remove = function () {
     GameServer.updateVision();
 };
 
-Player.prototype.getShootingPoint = function () {
-    return {
-        x: this.x + 1,
-        y: this.y + 1
-    };
-};
 
 module.exports.Player = Player;

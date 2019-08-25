@@ -26,7 +26,6 @@ NPC.prototype.constructor = NPC;
 
 NPC.prototype.setLoot = function(loot){
     this.loot = new Inventory(10);
-    //var loot = GameServer.animalsData[this.type].loot;
     for(var id in loot){
         this.addToLoot(id,loot[id]);
     }
@@ -35,6 +34,7 @@ NPC.prototype.setLoot = function(loot){
 NPC.prototype.addToLoot = function(id,nb){
     this.loot.add(id,nb);
 };
+
 
 // ### Stats ###
 
@@ -61,10 +61,6 @@ NPC.prototype.goToDestination = function(dest){
     this.idle = false;
     this.setPath(path);
     return true;
-};
-
-NPC.prototype.canRange = function(){
-    return false;
 };
 
 NPC.prototype.queueAction = function(action){
@@ -111,8 +107,9 @@ NPC.prototype.findBattlePath = function(dest){
 
 NPC.prototype.attackTarget = function(){
     var data = {};
-    // TODO: accomodate for ranged attacks
-    if(Utils.nextTo(this,this.target)){
+    // console.warn('taking decision');
+    // console.warn(Utils.nextTo(this,this.target), this.canRange());
+    if(Utils.nextTo(this,this.target) || this.canRange()){
         data.action = 'attack';
         data.id = this.target.getShortID();
     }else{

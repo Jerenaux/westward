@@ -63,6 +63,10 @@ Animal.prototype.isAggressive = function(){
     return (this.aggressive && GameServer.enableAnimalAggro);
 };
 
+Animal.prototype.canRange = function(){
+    return false;
+};
+
 Animal.prototype.setWander = function(){
     // this.wander =  GameServer.animalsData[this.type].wander;
     this.wander =  GameServer.getAnimalData(this.type).wander;

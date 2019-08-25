@@ -60,9 +60,12 @@ Packaging
 
 Bugs:
 Features:
-- Reduce number of orientation pins per screen side
-- Test battle involving neighbors
-- Add civ archers and loot arrows from them (+ add loot to civ warriors) w/ probability
+- Debug why not all civs range attack
+- Add civ archers and loot arrows from them (+ add loot to civ warriors)
+- Test archers' loot (and others)
+- Test ranged weapons 
+- Probabilistic loot
+- Control civ archer freq
 - Improve legend with toggling, display built or not, filter on building type?
 - Restor dragging
 - Gif of bow attack
@@ -191,6 +194,7 @@ Secure
 
 Analytics:
 ---------
+- Fix event desc about enemy types
 - Log giving food to buildings in particular
 - Log repairs
 - Log submenus
