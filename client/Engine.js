@@ -50,6 +50,8 @@ Engine.preload = function() {
     this.load.spritesheet('bears', 'assets/sprites/animals/bears.png',{frameWidth:56,frameHeight:56});
     this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
 
+    this.load.spritesheet('bones', 'assets/sprites/wolf_bones.png',{frameWidth:32,frameHeight:21});
+
     // ###################
 
     // Misc
@@ -132,9 +134,6 @@ Engine.preload = function() {
 
     if(Client.tutorial) this.load.json('tutorials', 'assets/data/tutorials.json');
 };
-
-
-
 
 Engine.entityManager = {
     entities: [],
@@ -238,6 +237,7 @@ Engine.create = function(){
     Engine.animals = {}; // animal.id -> building object
     Engine.buildings = {}; // building.id -> building object
     Engine.items = {};
+    Engine.remains = {};
     Engine.civs = {};
     Engine.battleCells = {}; // cell.id -> cell object
     Engine.battleCellsMap = new SpaceMap();
@@ -247,6 +247,9 @@ Engine.create = function(){
     Engine.entityManager.registerEntityType('item',Item,Engine.items);
     Engine.entityManager.registerEntityType('cell',BattleTile,Engine.battleCells);
     Engine.entityManager.registerEntityType('civ',Civ,Engine.civs);
+    Engine.entityManager.registerEntityType('remain',Remains,Engine.remains);
+
+
 
     Engine.debug = true;
     Engine.showHero = true;
@@ -1924,7 +1927,7 @@ Engine.getAnimalData = function(type){
 Engine.updateWorld = function(data){  // data is the update package from the server
     //console.log(data);
     // TODO: store client/server-shared list somewhere
-    var entities = ['animal','building','cell','civ','item','player'];
+    var entities = ['animal','building','cell','civ','item','player','remain'];
 
     entities.forEach(function(e){
         var news = data['new'+e+'s'];

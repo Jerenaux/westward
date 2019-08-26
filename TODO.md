@@ -53,6 +53,7 @@ Packaging
 - Acc boosting ability
 - Disengage button
 - Social campfires
+- Send individual map marker updates instead of full lists
 - Have towers dissipate more FoW?
 - SZ system for plants, disappears based on harvest frequency
 (-> Remove marker files, have it generated dynamically, etc.)
@@ -60,12 +61,6 @@ Packaging
 
 Bugs:
 Features:
-- Debug why not all civs range attack
-- Add civ archers and loot arrows from them (+ add loot to civ warriors)
-- Test archers' loot (and others)
-- Test ranged weapons 
-- Probabilistic loot
-- Control civ archer freq
 - Improve legend with toggling, display built or not, filter on building type?
 - Restor dragging
 - Gif of bow attack

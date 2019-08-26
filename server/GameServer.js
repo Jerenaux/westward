@@ -17,6 +17,7 @@ var GameServer = {
     lastItemID: 0,
     lastBattleID: 0,
     lastCellID: 0,
+    lastRemainsID: 0,
     lastCampID: 0,
     nextInstanceID: 0,
     players: {}, // player.id -> player
@@ -37,13 +38,13 @@ var World = require('../shared/World.js').World;
 var Utils = require('../shared/Utils.js').Utils;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var ListMap = require('../shared/ListMap.js').ListMap;
-var SpaceMapList = require('../shared/SpaceMap.js').SpaceMapList;
 var AOI = require('./AOI.js').AOI;
 var Player = require('./Player.js').Player;
 var Settlement = require('./Settlement').Settlement;
 var Building = require('./Building.js').Building;
 var Animal = require('./Animal.js').Animal;
 var Civ = require('./Civ.js').Civ;
+var Remains = require('./NPC.js').Remains;
 var Item = require('./Item.js').Item;
 var Battle = require('./Battle.js').Battle;
 var BattleCell = require('./Battle.js').BattleCell;
@@ -164,6 +165,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.conflictMarkers = [];
     GameServer.itemCounts = {};
     GameServer.itemsToRespawn = [];
+    GameServer.battleRemains = [];
     GameServer.marketPrices = new ListMap();
 
     GameServer.initializeFlags();
@@ -367,6 +369,15 @@ GameServer.loadMarkers = function(){
             console.warn('ERROR loading markers: '+marker);
             GameServer[marker+'Markers'] = [];
         }
+    });
+    // Load remains
+    try {
+        GameServer.battleRemains = JSON.parse(fs.readFileSync(pathmodule.join(GameServer.mapsPath, 'misc.json')).toString());
+    }catch(err){
+        GameServer.battleRemains = [];
+    }
+    GameServer.battleRemains.forEach(function(r){
+        new Remains(r[0],r[1]);
     });
     GameServer.updateStatus();
 };
@@ -964,16 +975,34 @@ GameServer.lootNPC = function(player,type,ID){
     var NPC = map[ID];
     // TODO: check for proximity
     if(!NPC.isDead()) return false;
-    if(NPC.loot.isEmpty()) return false;
+    if(NPC.loot.isEmpty()){
+        player.addNotif('Nothing to loot');
+        return false;
+    }
     for(var item in NPC.loot.items){
         // TODO: take harvesting ability into consideration
         var nb = NPC.loot.items[item];
         player.giveItem(item,nb,true,'Scavenged');
         GameServer.createItem(item,nb,'loot');
     }
-    GameServer.removeEntity(NPC); // TODO: handle differently, leave carcasses
+    if(type == 'animal') GameServer.addRemains(NPC.x,NPC.y);
+    GameServer.removeEntity(NPC);
     Prism.logEvent(player,'loot',{name:NPC.name});
     return true; // return value for the unit tests
+};
+
+GameServer.addRemains = function(x,y){
+    GameServer.battleRemains.push([x,y]);
+    if(GameServer.battleRemains.length > 500) GameServer.battleRemains.shift(); // TODO: conf
+
+    new Remains(x,y);
+
+    //TODO: use db
+    var path = pathmodule.join(GameServer.mapsPath,'misc.json');
+    fs.writeFile(path,JSON.stringify(GameServer.battleRemains),function(err){
+        if(err) throw err;
+    });
+
 };
 
 /**
@@ -2037,6 +2066,7 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         player.newAOIs.forEach(function(aoi){
             individualGlobalPkg.synchronize(GameServer.AOIs[aoi]); // fetch entities from the new AOIs
         });
+        // console.warn(individualGlobalPkg);
         player.oldAOIs.forEach(function(aoi){
             individualGlobalPkg.desync(GameServer.AOIs[aoi]); // forget entities from old AOIs
         });

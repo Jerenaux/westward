@@ -4,6 +4,7 @@
 
 var UpdatePacket = require('./UpdatePacket.js').UpdatePacket;
 var Utils = require('../shared/Utils.js').Utils;
+var GameServer = require('./GameServer.js').GameServer;
 
 function AOI(id){
     this.id = id;
@@ -24,6 +25,7 @@ AOI.prototype.clear = function(){
 
 AOI.prototype.addEntity = function(entity){
     this.entities.push(entity);
+    // if(GameServer.updtDebug) console.warn('entities:',this.entities);
 };
 
 AOI.prototype.deleteEntity = function(entity) {

@@ -11,7 +11,10 @@
     "equipment":{
       "meleew": 7
     },
-    "loot":{}
+    "loot":{
+      "21":[1,0.2],
+      "43":[1,0.3]
+    }
   },
   "1":{
     "name": "Civ Archer",
@@ -20,15 +23,18 @@
       "hp": 80,
       "def": 5,
       "dmg": 15,
-      "acc": 80
+      "acc": 40
     },
     "xp": 60,
     "equipment":{
       "meleew": 7,
       "rangedw": 2,
       "range_container": 19,
-      "range_ammo": [20,2]
+      "range_ammo": [20,5]
     },
-    "loot":{}
+    "loot":{
+      "21":[1,0.6],
+      "43":[1,0.3]
+    }
   }
 }

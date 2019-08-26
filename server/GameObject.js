@@ -4,7 +4,6 @@
 
 var Utils = require('../shared/Utils.js').Utils;
 var GameServer = require('./GameServer.js').GameServer;
-//var Rect = require('./Rect.js').Rect;
 
 // Parent class of all game objects : players, monsters and items (not NPC because they are not processed server-side)
 function GameObject(){

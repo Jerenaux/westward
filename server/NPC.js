@@ -6,6 +6,7 @@ var GameServer = require('./GameServer.js').GameServer;
 var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var MovingEntity = require('./MovingEntity.js').MovingEntity;
+var GameObject = require('./GameObject.js').GameObject;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
 var Inventory = require('../shared/Inventory.js').Inventory;
 
@@ -27,7 +28,9 @@ NPC.prototype.constructor = NPC;
 NPC.prototype.setLoot = function(loot){
     this.loot = new Inventory(10);
     for(var id in loot){
-        this.addToLoot(id,loot[id]);
+        var item = loot[id][0];
+        var p = loot[id][1];
+        if(Utils.randomInt(0,10) < p*10) this.addToLoot(id,loot[id]);
     }
 };
 
@@ -107,8 +110,8 @@ NPC.prototype.findBattlePath = function(dest){
 
 NPC.prototype.attackTarget = function(){
     var data = {};
-    // console.warn('taking decision');
-    // console.warn(Utils.nextTo(this,this.target), this.canRange());
+    // console.warn('['+this.getShortID()+'] taking decision');
+    // console.warn('['+this.getShortID()+']',Utils.nextTo(this,this.target), this.canRange());
     if(Utils.nextTo(this,this.target) || this.canRange()){
         data.action = 'attack';
         data.id = this.target.getShortID();
@@ -255,3 +258,58 @@ NPC.prototype.updateTracking = function(){
 
 
 module.exports.NPC = NPC;
+
+function Remains(x, y) {
+    this.instance = -1;
+    this.updateCategory = 'remains';
+    this.entityCategory = 'Remains';
+    this.id = GameServer.lastRemainsID++;
+    this.x = x;
+    this.y = y;
+    this.cellsWidth = 1;
+    this.cellsHeight = 1;
+    this.setOrUpdateAOI();
+}
+
+Remains.prototype = Object.create(GameObject.prototype);
+Remains.prototype.constructor = Remains;
+
+Remains.prototype.getRect = function () {
+    return {
+        x: this.x,
+        y: this.y,
+        w: 1,
+        h: 1
+    }
+};
+
+// Remains.prototype.getShortID = function () {
+//     return 'btl' + this.id;
+// };
+
+Remains.prototype.trim = function () {
+    return {
+        id: this.id,
+        x: this.x,
+        y: this.y,
+        instance: this.instance
+    };
+};
+
+Remains.prototype.getLocationCenter = function () {
+    return {
+        x: this.x,
+        y: this.y
+    };
+};
+
+Remains.prototype.remove = function () {};
+
+Remains.prototype.canFight = function () {
+    return false;
+};
+Remains.prototype.isAvailableForFight = function () {
+    return false;
+};
+
+module.exports.Remains = Remains;
