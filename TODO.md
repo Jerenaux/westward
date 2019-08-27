@@ -60,8 +60,9 @@ Packaging
 
 Bugs:
 Features:
+- Restore dragging
+- Webpack jump
 - Improve legend with toggling, display built or not, filter on building type?
-- Restor dragging
 - Gif of bow attack
 - Display item rarity in inventory (check if doesn't conflit with shop)
 - Add belts?
@@ -502,7 +503,11 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-- Move to ES6
+- Move to ES6 & webpack & babel
+-> https://github.com/nkholski/phaser3-es6-webpack
+-> Import Phaser with npm
+-> Easier to import shared code
+-> Look into Phaser doc about how to include only what is really necessary (no physics, ...)
 -> https://codeutopia.net/blog/2015/01/06/es6-what-are-the-benefits-of-the-new-features-in-practice/
 - Tool to gather, uglify and compress all relevant source files 
 - Desktop app (automated)
