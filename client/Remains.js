@@ -12,8 +12,12 @@ var Remains = new Phaser.Class({
     },
 
     setUp: function(data){
-        this.setTexture('bones');
-        this.setFrame(0);
+        this.setTexture('remains');
+        var frameMap = {
+            0: 'wolf',
+            1: 'human'
+        };
+        this.setFrame(frameMap[data.type]);
         this.setVisible(true);
         this.setTilePosition(data.x,data.y,true);
         this.setOrigin(0.5,0);

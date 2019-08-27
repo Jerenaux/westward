@@ -90,7 +90,6 @@ Rivalry between regions
 
 
 María:
-- Carcass, blood-tainted grass
 - Footprints
 - Bear anim (walk, attack, die w/ & w/o arrows)
 - Player anim naked

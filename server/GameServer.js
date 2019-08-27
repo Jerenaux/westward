@@ -414,7 +414,7 @@ GameServer.loadMarkers = function(){
         GameServer.battleRemains = [];
     }
     GameServer.battleRemains.forEach(function(r){
-        new Remains(r[0],r[1]);
+        new Remains(r[0],r[1],r[2]);
     });
     GameServer.updateStatus();
 };
@@ -1029,17 +1029,18 @@ GameServer.lootNPC = function(player,type,ID){
         player.giveItem(item,nb,true,'Scavenged');
         GameServer.createItem(item,nb,'loot');
     }
-    if(type == 'animal') GameServer.addRemains(NPC.x,NPC.y);
+    GameServer.addRemains(NPC.x,NPC.y,type);
     GameServer.removeEntity(NPC);
     Prism.logEvent(player,'loot',{name:NPC.name});
     return true; // return value for the unit tests
 };
 
-GameServer.addRemains = function(x,y){
-    GameServer.battleRemains.push([x,y]);
+GameServer.addRemains = function(x,y,type){
+    var t = (type == 'animal' ? 0 : 1);
+    GameServer.battleRemains.push([x,y,t]);
     if(GameServer.battleRemains.length > 500) GameServer.battleRemains.shift(); // TODO: conf
 
-    new Remains(x,y);
+    new Remains(x,y,t);
 
     //TODO: use db
     var path = pathmodule.join(GameServer.mapsPath,'misc.json');

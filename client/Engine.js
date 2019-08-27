@@ -39,6 +39,8 @@ Engine.preload = function() {
 
     this.load.atlas('tileset', 'assets/tilesets/tileset.png', 'assets/tilesets/tileset.json');
 
+    this.load.atlas('remains', 'assets/sprites/remains.png','assets/sprites/remains.json');
+
     // Characters
     this.load.spritesheet('enemy', 'assets/sprites/enemy.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64}); // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
@@ -50,7 +52,6 @@ Engine.preload = function() {
     this.load.spritesheet('bears', 'assets/sprites/animals/bears.png',{frameWidth:56,frameHeight:56});
     this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
 
-    this.load.spritesheet('bones', 'assets/sprites/wolf_bones.png',{frameWidth:32,frameHeight:21});
 
     // ###################
 
