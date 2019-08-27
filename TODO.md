@@ -21,7 +21,6 @@ Commenting
 Deployment
 Design document
 Testing
-World Building
 Packaging
 
 ## Misc TODO

@@ -175,6 +175,13 @@ GameServer.readMap = function(mapsPath,test,cb){
     Prism.logEvent(null,'server-start');
 };
 
+/**
+ * Set up a dict of boolean variables indicating whether some global changes have occurred
+ * and need to be sent to players.
+ * Called as part of the many set up operations of `GameServer.readMap`. The flags
+ * are checked in `Player.getIndividualUpdatePackage` and the corresponding changes they indicate
+ * are added to the update package based on that.
+ */
 GameServer.initializeFlags = function(){
     var flags = ['nbConnected','FoW','resourcesMarkers','buildingsMarkers','animalsMarkers',
         'deathMarkers', 'conflictMarkers','frontier'];
@@ -184,12 +191,21 @@ GameServer.initializeFlags = function(){
     });
 };
 
+/**
+ * Set all the flags defined in `GameServer.initializeFlags` to false. 
+ * Called at the end `GameServer.updateClients` since the changes reflected
+ * by active flags have been sent in the update.
+ */
 GameServer.resetFlags = function(){
     for(var flag in GameServer.flags){
         GameServer.flags[flag] = false;
     }
 };
 
+/**
+ * Flip one of the flags defined in `GameServer.initializeFlags` to true.
+ * Called whenever a global change needs to be reflected to be sent to players.
+ */
 GameServer.setFlag = function(flag){
     if(!(flag in GameServer.flags)){
         console.warn('ERROR: unknown flag',flag);
@@ -198,6 +214,11 @@ GameServer.setFlag = function(flag){
     GameServer.flags[flag] = true;
 };
 
+/**
+ * Check if one of the flags defined in `GameServer.initializeFlags` is true.
+ * Called in `Player.getIndividualUpdatePackage` to see which global changes need
+ * to be included in an update.
+ */
 GameServer.checkFlag = function(flag){
     if(!(flag in GameServer.flags)){
         console.warn('ERROR: unknown flag',flag);
@@ -206,6 +227,11 @@ GameServer.checkFlag = function(flag){
     return GameServer.flags[flag];
 };
 
+/**
+ * Check if any of the flags defined in `GameServer.initializeFlags` is true.
+ * Called in `GameServer.updateClients` as one way to check if an update packer
+ * is empty or not (not content + all flags to false = empty).
+ */
 GameServer.anyFlag = function(){
     for(var flag in GameServer.flags){
         if(GameServer.flags[flag]) return true;
@@ -330,6 +356,13 @@ GameServer.loadBuildings = function(){
     });
 };
 
+/**
+ * Spawn the buildings belonging to each Civ camp. 
+ * Called in `GameServer.loadBuildings` to create the
+ * Civ buildings if they don't already exist in the DB
+ * (if they do, then no need to spawn them, they'll be
+ * loaded like all others).
+ */
 GameServer.spawnCamps = function(){
     for(var campID in GameServer.camps){
         var camp = GameServer.camps[campID];
@@ -359,6 +392,10 @@ GameServer.loadItems = function(){
     GameServer.updateStatus();
 };
 
+/**
+ * Set up dicts for the different map marker categories and load
+ * from file those who are stored in files.
+ */
 GameServer.loadMarkers = function(){
     var markerTypes = ['resource','death','conflict'];
     markerTypes.forEach(function(marker){
@@ -432,6 +469,9 @@ GameServer.setUpCamps = function(){
     });
 };
 
+/**
+ * Read the list of Civ camps to create in the world from the corresponding file.
+ */
 GameServer.readCamps = function(){
     console.log('Creating camps from camps.json');
     GameServer.campsData = JSON.parse(fs.readFileSync('./assets/data/camps.json').toString());
@@ -448,6 +488,10 @@ GameServer.readCamps = function(){
     }
 };
 
+/**
+ * Create a new Civ camp and keep track of it.
+ * Called by `GameServer.setUpCamps` when reading camps from DB.
+ */
 GameServer.addCamp = function(data){
     var camp = new Camp(data.id, data.center);
     GameServer.camps[camp.id] = camp;
