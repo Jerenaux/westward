@@ -30,4 +30,5 @@ World.computeProperties = function(){
     console.log('Set up world of size '+World.worldWidth+' x '+World.worldHeight);
 };
 
-if (onServer) module.exports.World = World;
+// if (onServer) module.exports.World = World;
+export default World;

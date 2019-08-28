@@ -1,6 +1,9 @@
 /**
  * Created by Jerome on 29-11-17.
  */
+import CustomSprite from './CustomSprite';
+import UI from './UI';
+
 const UICursor = new Phaser.Class({
 
     Extends: CustomSprite,
@@ -65,3 +68,5 @@ const UICursor = new Phaser.Class({
     }
 
 });
+
+export default UICursor;

@@ -32,6 +32,7 @@ const corssss =  function (res, path) {
 
 app.use('/assets',express.static(__dirname + '/assets', corssss));
 app.use('/client',express.static(__dirname + '/client'));
+app.use('/dist',express.static(__dirname + '/dist'));
 app.use('/lib',express.static(__dirname + '/lib'));
 app.use('/server',express.static(__dirname + '/server'));
 app.use('/shared',express.static(__dirname + '/shared'));

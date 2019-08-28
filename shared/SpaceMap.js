@@ -148,7 +148,8 @@ SpaceMapList.prototype.delete = function(x,y,object){
 };
 
 
-if (onServer) {
-    module.exports.SpaceMap = SpaceMap;
-    module.exports.SpaceMapList = SpaceMapList;
-}
+// if (onServer) {
+//     module.exports.SpaceMap = SpaceMap;
+//     module.exports.SpaceMapList = SpaceMapList;
+// }
+export default SpaceMap;

@@ -57,3 +57,5 @@ var CustomSprite = new Phaser.Class({
         this.updateDepth();
     },
 });
+
+export default CustomSprite;

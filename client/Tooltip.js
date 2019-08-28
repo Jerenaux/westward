@@ -2,6 +2,8 @@
  * Created by Jerome on 29-11-17.
  */
 
+import UI from './UI';
+
 var Tooltip = new Phaser.Class({
 
     Extends: Phaser.GameObjects. DOMElement,
@@ -175,3 +177,5 @@ var Tooltip = new Phaser.Class({
         this.displayed = false;
     }
 });
+
+export default Tooltip;

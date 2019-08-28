@@ -2,7 +2,9 @@
  * Created by Jerome on 30-06-17.
  */
 
-Client = {
+import Boot from './Boot';
+
+var Client = {
     initEventName: 'init', // name of the event that triggers the call to initWorld() and the initialization of the game
     storageIDKey: 'playerID', // key in localStorage of player ID
     eventsQueue : [] // when events arrive before the flag playerIsInitialized is set to true, they are not processed
@@ -252,3 +254,5 @@ Client.sendMapData = function(id,data){
 Client.sendScreenshot = function(image,browser){
     Client.socket.emit('screenshot',{img:image,browser:browser});
 };
+
+export default Client;

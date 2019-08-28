@@ -89,10 +89,6 @@ StatsContainer.prototype.toList = function(){
     return list;
 };
 
-if (onServer){
-    module.exports.Stats = Stats;
-    module.exports.StatsContainer = StatsContainer;
-}
 
 function Stat(key,value,max){
     this.key = key;
@@ -182,4 +178,10 @@ Stat.prototype.trim = function(){
       return obj;
 };
 
-if (onServer) module.exports.Stat = Stat;
+// if (onServer){
+//     module.exports.Stats = Stats;
+//     module.exports.StatsContainer = StatsContainer;
+// }
+// if (onServer) module.exports.Stat = Stat;
+
+export default Stats;
