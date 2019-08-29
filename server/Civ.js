@@ -2,12 +2,14 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 18-06-18.
  */
 
-var GameServer = require('./GameServer.js').GameServer;
-var NPC = require('./NPC.js').NPC;
-var GameObject = require('./GameObject.js').GameObject;
-var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var EquipmentManager = require('../shared/Equipment.js').EquipmentManager;
-var Utils = require('../shared/Utils.js').Utils;
+
+import GameObject from './GameObject'
+import GameServer from './GameServer'
+import MovingEntity from './MovingEntity'
+import NPC from './NPC'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
 function Civ(x,y,type){
     this.id = GameServer.lastCivID++;
@@ -170,4 +172,4 @@ Civ.prototype.trim = function(){
     return GameObject.prototype.trim.call(this,trimmed);
 };
 
-module.exports.Civ = Civ;
+export default Civ

@@ -2,8 +2,8 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 29-03-18.
  */
 
-var GameObject = require('./GameObject.js').GameObject;
-var GameServer = require('./GameServer.js').GameServer;
+import GameObject from './GameObject'
+import GameServer from './GameServer'
 
 function Item(x,y,type,instance){
     this.instance = (instance > -1 ? instance : -1);
@@ -68,4 +68,4 @@ Item.prototype.getRect = function(){
 
 Item.prototype.canFight = function(){return false;};
 
-module.exports.Item = Item;
+export default Item

@@ -215,6 +215,8 @@ interactions with buildings, time spent in each individual menu, step at which t
 
 Cleaning:
 --------
+Use ES6 classes
+Speed up server boot time and webpack build
 Performance:
 - Concile the two coexisting menu update systems: the one used by updateSelf and the one used by updateBuilding
 -> All menus have an update() method called on display; upon new server data, only update() the current menu
@@ -503,6 +505,8 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
+https://stackoverflow.com/questions/42579761/express-js-how-to-serve-index-html-from-a-webpack-bundle
+-> Don't commit compiled files, compile after push and have env variable determine mode
 - Move to ES6 & webpack & babel
 https://snowbillr.github.io/blog//2018-04-09-a-modern-web-development-setup-for-phaser-3/
 -> https://github.com/nkholski/phaser3-es6-webpack

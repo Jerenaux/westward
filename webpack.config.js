@@ -3,14 +3,21 @@
  */
 const path = require('path');
 const webpack = require('webpack');
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
-    entry: './client/main.js',
-
+    entry: {
+        'client':'./client/main.js',
+        'server':'./server.js'
+    },
     output: {
-        filename: 'dist.js',
+        filename: "[name].js",
         // path: path.resolve(__dirname, 'dist')
     },
+    mode: 'development',
+    target: 'node', // in order too ignore built-in modules like path, fs, etc.
+    externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
+
 
     // module: {
     //     rules: [
@@ -25,7 +32,7 @@ module.exports = {
     //         }
     //       }
     //     ]
-    //   }
+    // },
 
     plugins: [
         new webpack.DefinePlugin({

@@ -4,7 +4,7 @@
 import Boot from './Boot';
 import Client from './Client';
 import menuIcon from './menuIcon';
-import SpaceMap from '../shared/SpaceMap';
+import {SpaceMap} from '../shared/SpaceMap';
 import World from '../shared/World';
 
 var Engine = {

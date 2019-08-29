@@ -2,11 +2,7 @@
  * Created by Jerome on 20-09-17.
  */
 
-var Utils = require('../shared/Utils.js').Utils;
 var PersonalUpdatePacket = require('./PersonalUpdatePacket.js').PersonalUpdatePacket;
-var GameObject = require('./GameObject.js').GameObject;
-var MovingEntity = require('./MovingEntity.js').MovingEntity;
-var GameServer = require('./GameServer.js').GameServer;
 var Inventory = require('../shared/Inventory.js').Inventory;
 var Stats = require('../shared/Stats.js').Stats;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
@@ -14,6 +10,12 @@ var Equipment = require('../shared/Equipment.js').Equipment;
 var EquipmentManager = require('../shared/Equipment.js').EquipmentManager;
 var Formulas = require('../shared/Formulas.js').Formulas;
 var Prism = require('./Prism.js').Prism;
+
+import GameObject from './GameObject'
+import GameServer from './GameServer'
+import MovingEntity from './MovingEntity'
+import Utils from '../shared/Utils'
+
 
 function Player() {
     this.updatePacket = new PersonalUpdatePacket();
@@ -956,5 +958,4 @@ Player.prototype.remove = function () {
     GameServer.updateVision();
 };
 
-
-module.exports.Player = Player;
+export default Player

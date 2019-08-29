@@ -4,9 +4,10 @@
 
 var onServer = (typeof window === 'undefined');
 
-if(onServer){
-    World = require('./World.js').World;
-}
+// if(onServer){
+//     World = require('./World.js').World;
+// }
+import World from '../shared/World'
 
 var Utils = {
     colors: {},
@@ -444,4 +445,5 @@ if (typeof Object.assign !== 'function') {
     });
 }
 
-if (onServer) module.exports.Utils = Utils;
+// if (onServer) module.exports.Utils = Utils;
+export default Utils;

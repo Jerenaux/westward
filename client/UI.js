@@ -3,7 +3,7 @@
  */
 import Boot from './Boot';
 import Client from './Client';
-import Stats from '../shared/Stats';
+import {Stats} from '../shared/Stats';
 import Tooltip from './Tooltip';
 import UICursor from './UICursor';
 

@@ -2,9 +2,8 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 01-03-18.
  */
 
-var World = require('../shared/World.js').World;
-var GameServer = require('./GameServer.js').GameServer;
-var Utils = require('../shared/Utils.js').Utils;
+import GameServer from './GameServer'
+import Utils from '../shared/Utils'
 
 function SpawnZone(x,y,animal){
     this.x = x;
@@ -69,4 +68,4 @@ SpawnZone.prototype.decrement = function(){
     this.population--;
 };
 
-module.exports.SpawnZone = SpawnZone;
+export default SpawnZone

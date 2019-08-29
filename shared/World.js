@@ -2,8 +2,6 @@
  * Created by Jerome on 14-10-17.
  */
 
-var onServer = (typeof window === 'undefined');
-
 var World = {};
 
 World.setUp = function(nbHoriz,nbVert,chunkW,chunkH,tileW,tileH){
@@ -30,5 +28,4 @@ World.computeProperties = function(){
     console.log('Set up world of size '+World.worldWidth+' x '+World.worldHeight);
 };
 
-// if (onServer) module.exports.World = World;
 export default World;

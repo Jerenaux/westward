@@ -32,27 +32,33 @@ var GameServer = {
     initialized: false
 };
 
-module.exports.GameServer = GameServer;
+// module.exports.GameServer = GameServer;
+export default GameServer;
 
-var World = require('../shared/World.js').World;
-var Utils = require('../shared/Utils.js').Utils;
-var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
+import Animal from './Animal'
+import AOI from './AOI'
+import Building from './Building'
+import Camp from './Camp'
+import Civ from './Civ'
+import Item from './Item'
+import Player from './Player'
+import {SpaceMap} from '../shared/SpaceMap'
+import SpawnZone from './SpawnZone'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
+
 var ListMap = require('../shared/ListMap.js').ListMap;
-var AOI = require('./AOI.js').AOI;
-var Player = require('./Player.js').Player;
-var Settlement = require('./Settlement').Settlement;
-var Building = require('./Building.js').Building;
-var Animal = require('./Animal.js').Animal;
-var Civ = require('./Civ.js').Civ;
 var Remains = require('./NPC.js').Remains;
-var Item = require('./Item.js').Item;
 var Battle = require('./Battle.js').Battle;
 var BattleCell = require('./Battle.js').BattleCell;
-var SpawnZone = require('./SpawnZone.js').SpawnZone;
-var Camp = require('./Camp.js').Camp;
 var Pathfinder =  require('../shared/Pathfinder.js').Pathfinder;
 var Prism = require('./Prism.js').Prism;
 var Schemas = require('./schemas.js');
+
+import animalsClusters from '../maps/animals.json'
+import collisions from '../maps/collisions.json'
+import itemsOnMap from '../maps/items.json'
+import masterData from '../maps/master.json'
 
 /**
  * Progresses through the initialization sequence of the server, in a serial way (even for async steps).
@@ -94,6 +100,7 @@ GameServer.createModels = function(){
  * @param {function} [cb] - Callback to call when the initialization sequence is finished (only used for tests)
  */
 GameServer.readMap = function(mapsPath,test,cb){
+
     if(test){
         GameServer.initializationMethods = {
             'static_data': null,
@@ -118,7 +125,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.createModels();
     GameServer.mapsPath = mapsPath;
     console.log('Loading map data from '+mapsPath);
-    var masterData = JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'master.json')).toString());
+    // var masterData = JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'master.json')).toString());
     World.readMasterData(masterData);
 
     GameServer.AOIs = []; // Maps AOI id to AOI object; it's not a map but sice they are stored in order, their position in the array map to them
@@ -156,7 +163,8 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.clientParameters = config.get('client');
 
     GameServer.collisions = new SpaceMap();
-    GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()),true); // true = compact
+    // GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()),true); // true = compact
+    GameServer.collisions.fromList(collisions,true); // true = compact
     GameServer.pathFinder = new Pathfinder(GameServer.collisions,GameServer.PFParameters.maxPathLength);
 
     GameServer.fogOfWar = {};
@@ -375,9 +383,7 @@ GameServer.spawnCamps = function(){
  * Called during the initialization sequence.
  */
 GameServer.loadItems = function(){
-    var path = pathmodule.join(GameServer.mapsPath,'items.json');
-    var items = JSON.parse(fs.readFileSync(path).toString());
-    items.forEach(function(item){
+    itemsOnMap.forEach(function(item){
         var x = item[0];
         var y = item[1];
 
@@ -397,25 +403,26 @@ GameServer.loadItems = function(){
  * from file those who are stored in files.
  */
 GameServer.loadMarkers = function(){
-    var markerTypes = ['resource','death','conflict'];
-    markerTypes.forEach(function(marker){
-        var path = pathmodule.join(GameServer.mapsPath,marker+'Markers.json');
-        try{
-            GameServer[marker+'Markers'] = JSON.parse(fs.readFileSync(path).toString());
-        }catch(err){
-            console.warn('ERROR loading markers: '+marker);
-            GameServer[marker+'Markers'] = [];
-        }
-    });
-    // Load remains
-    try {
-        GameServer.battleRemains = JSON.parse(fs.readFileSync(pathmodule.join(GameServer.mapsPath, 'misc.json')).toString());
-    }catch(err){
-        GameServer.battleRemains = [];
-    }
-    GameServer.battleRemains.forEach(function(r){
-        new Remains(r[0],r[1]);
-    });
+    // var markerTypes = ['resource','death','conflict'];
+    // markerTypes.forEach(function(marker){
+    //     var path = pathmodule.join(GameServer.mapsPath,marker+'Markers.json');
+    //     try{
+    //         GameServer[marker+'Markers'] = JSON.parse(fs.readFileSync(path).toString());
+    //     }catch(err){
+    //         console.warn('ERROR loading markers: '+marker);
+    //         GameServer[marker+'Markers'] = [];
+    //     }
+    // });
+    // // Load remains
+    // try {
+    //     GameServer.battleRemains = JSON.parse(fs.readFileSync(pathmodule.join(GameServer.mapsPath, 'misc.json')).toString());
+    // }catch(err){
+    //     GameServer.battleRemains = [];
+    // }
+    // GameServer.battleRemains.forEach(function(r){
+    //     new Remains(r[0],r[1]);
+    // });
+    // TODO: use DB!!
     GameServer.updateStatus();
 };
 
@@ -438,9 +445,7 @@ GameServer.setUpSpawnZones = function(){
     if(config.get('wildlife.nolife')) return;
 
     GameServer.spawnZones = [];
-    var path = pathmodule.join(GameServer.mapsPath,'animals.json');
-    var animals = JSON.parse(fs.readFileSync(path).toString());
-    animals.forEach(function(animal){
+    animalsClusters.forEach(function(animal){
         var x = animal[0];
         var y = animal[1];
         var type = animal[2];

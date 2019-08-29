@@ -1,15 +1,13 @@
 /**
  * Created by Jerome on 09-10-17.
  */
-"use strict";
-var Utils = require('../shared/Utils.js').Utils;
-var MovingEntity = require('./MovingEntity.js').MovingEntity;
-var NPC = require('./NPC.js').NPC;
-var GameObject = require('./GameObject.js').GameObject;
-var GameServer = require('./GameServer.js').GameServer;
-var World = require('../shared/World.js').World;
 
-var debug = false;
+import GameObject from './GameObject'
+import GameServer from './GameServer'
+import MovingEntity from './MovingEntity'
+import NPC from './NPC'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
 function Animal(x,y,type,instance){
     this.instance = (instance > -1 ? instance : -1);
@@ -117,4 +115,4 @@ Animal.prototype.remove = function(){
     delete GameServer.animals[this.id];
 };
 
-module.exports.Animal = Animal;
+export default Animal

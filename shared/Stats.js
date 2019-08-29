@@ -2,11 +2,7 @@
  * Created by jeren on 10-12-17.
  */
 
-var onServer = (typeof window === 'undefined');
-
-if(onServer){
-    var Utils = require('../shared/Utils.js').Utils;
-}
+import Utils from './Utils'
 
 var Stats = {
     hpmax: {
@@ -178,10 +174,4 @@ Stat.prototype.trim = function(){
       return obj;
 };
 
-// if (onServer){
-//     module.exports.Stats = Stats;
-//     module.exports.StatsContainer = StatsContainer;
-// }
-// if (onServer) module.exports.Stat = Stat;
-
-export default Stats;
+export {Stat, Stats, StatsContainer}

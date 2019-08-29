@@ -1,8 +1,8 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 31-05-19.
  */
-var GameServer = require('./GameServer.js').GameServer;
-var GameObject = require('./GameObject.js').GameObject;
+import GameObject from './GameObject'
+import GameServer from './GameServer'
 
 function FightingEntity(){
     GameObject.call(this);
@@ -97,5 +97,4 @@ FightingEntity.prototype.getStats = function(){
     return Object.keys(this.stats);
 };
 
-module.exports.FightingEntity = FightingEntity;
-
+export default FightingEntity

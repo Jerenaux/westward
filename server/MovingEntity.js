@@ -1,10 +1,11 @@
 /**
  * Created by Jerome on 09-10-17.
  */
-var FightingEntity = require('./FightingEntity.js').FightingEntity;
-var GameServer = require('./GameServer.js').GameServer;
-var Utils = require('../shared/Utils.js').Utils;
 var PFUtils = require('../shared/PFUtils.js').PFUtils;
+
+import FightingEntity from './FightingEntity'
+import GameServer from './GameServer'
+import Utils from '../shared/Utils'
 
 function MovingEntity(){
     FightingEntity.call(this);
@@ -284,4 +285,4 @@ MovingEntity.prototype.remove = function(){
     if(this.battle) this.battle.removeFighter(this);
 };
 
-module.exports.MovingEntity = MovingEntity;
+export default MovingEntity

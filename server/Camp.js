@@ -2,9 +2,8 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 03-09-18.
  */
 
-var GameServer = require('./GameServer.js').GameServer;
-var Utils = require('../shared/Utils.js').Utils;
-
+import GameServer from './GameServer'
+import Utils from '../shared/Utils'
 
 function Camp(id,center,bldData){
     this.schemaModel = GameServer.CampModel;
@@ -133,4 +132,4 @@ Camp.prototype.remove = function(civ){
     return trimmed;
 };*/
 
-module.exports.Camp = Camp;
+export default Camp

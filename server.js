@@ -12,8 +12,9 @@ var mongo = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
 var myArgs = require('optimist').argv;
 
-var gs = require('./server/GameServer.js').GameServer;
-gs.server = server;
+// var gs = require('./server/GameServer.js').GameServer;
+import GameServer from './server/GameServer'
+GameServer.server = server;
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
@@ -95,11 +96,11 @@ app.get('/crafting',function(req,res){
 });
 
 var GEThandlers = {
-    'buildings': gs.getBuildings,
-    'count-items': gs.countItems,
-    'events': gs.getEvents,
-    'players': gs.getPlayers,
-    'screenshots': gs.getScreenshots
+    'buildings': GameServer.getBuildings,
+    'count-items': GameServer.countItems,
+    'events': GameServer.getEvents,
+    'players': GameServer.getPlayers,
+    'screenshots': GameServer.getScreenshots
 };
 var categories = Object.keys(GEThandlers);
 
@@ -135,12 +136,12 @@ categories.forEach(function(cat){
 });
 
 var POSThandlers = {
-    'deletebuilding': gs.deleteBuilding,
-    'dump': gs.dump,
-    'newbuilding': gs.insertNewBuilding,
-    'setgold': gs.setBuildingGold,
-    'setitem': gs.setBuildingItem,
-    'setprice': gs.setBuildingPrice,
+    'deletebuilding': GameServer.deleteBuilding,
+    'dump': GameServer.dump,
+    'newbuilding': GameServer.insertNewBuilding,
+    'setgold': GameServer.setBuildingGold,
+    'setitem': GameServer.setBuildingItem,
+    'setprice': GameServer.setBuildingPrice,
 };
 var events = Object.keys(POSThandlers);
 
@@ -178,7 +179,7 @@ server.listen(process.env.PORT || myArgs.port || 8081,function(){
     console.log('Listening on '+server.address().port);
     console.log('Config environment: '+(process.env.NODE_CONFIG_ENV || 'default'));
 
-    mongodbAuth = {
+    let mongodbAuth = {
         useNewUrlParser: true
     };
     if (process.env.MONGODB_AUTH) {
@@ -198,8 +199,7 @@ server.listen(process.env.PORT || myArgs.port || 8081,function(){
     db.once('open', function() {
         server.db = db;
         console.log('Connection to db established');
-        // TODO: check arg first, then config, then default
-        gs.readMap(myArgs.maps || path.join(__dirname,'/maps'),myArgs.test);
+        GameServer.readMap();
     });
 });
 
