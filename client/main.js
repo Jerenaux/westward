@@ -4,6 +4,9 @@ import Boot from './Boot';
 import Engine from './Engine';
 import UI from './UI';
 
+import './style.css'
+import './w3.css'
+
 // TODO: move in conf?
 var VIEW_WIDTH = 32;
 var VIEW_HEIGHT = 18;

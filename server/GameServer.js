@@ -55,6 +55,7 @@ var Pathfinder =  require('../shared/Pathfinder.js').Pathfinder;
 var Prism = require('./Prism.js').Prism;
 var Schemas = require('./schemas.js');
 
+// TODO: try including as usual
 import animalsClusters from '../maps/animals.json'
 import collisions from '../maps/collisions.json'
 import itemsOnMap from '../maps/items.json'
