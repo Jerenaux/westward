@@ -509,7 +509,7 @@ https://stackoverflow.com/questions/42579761/express-js-how-to-serve-index-html-
 -> Don't commit compiled files, compile after push and have env variable determine mode
 - Move to ES6 & webpack & babel
 https://snowbillr.github.io/blog//2018-04-09-a-modern-web-development-setup-for-phaser-3/
--> https://github.com/nkholski/phaser3-es6-webpack
+https://github.com/nkholski/phaser3-es6-webpack
 -> Include socketio in bundle
 -> Easier to import shared code
 -> Look into Phaser doc about how to include only what is really necessary (no physics, ...)

@@ -1,4 +1,5 @@
-import 'phaser';
+// import 'phaser';
+import Phaser from '../node_modules/phaser/dist/phaser.min.js'
 
 import Boot from './Boot';
 import Engine from './Engine';

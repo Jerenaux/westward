@@ -56,7 +56,7 @@ Engine.preload = function() {
     this.load.spritesheet('bears', 'assets/sprites/animals/bears.png',{frameWidth:56,frameHeight:56});
     this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
 
-    this.load.spritesheet('bones', 'assets/sprites/wolf_bones.png',{frameWidth:32,frameHeight:21});
+    // this.load.spritesheet('bones', 'assets/sprites/wolf_bones.png',{frameWidth:32,frameHeight:21});
 
     // ###################
 
