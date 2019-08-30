@@ -4,7 +4,7 @@
 
 var fowID = 0;
 
-var Map = new Phaser.Class({
+var WorldMap = new Phaser.Class({
 
     // Extends: CustomSprite,
     Extends: Phaser.GameObjects.RenderTexture,

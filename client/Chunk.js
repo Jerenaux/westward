@@ -105,7 +105,7 @@ Chunk.prototype.drawImage = function(x,y,image,depth,crop){
         x += offset.x;
         y += offset.y;
     }
-    var img = Engine.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',tilesetData.shorthands[image]);
+    var img = Engine.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',Engine.tilesetData.shorthands[image]);
     if(crop) img.setCrop(crop);
     var depthOffset = this.getAtlasData(image,'depthOffset') || 0;
     depth = depth || y;

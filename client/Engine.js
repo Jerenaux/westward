@@ -1948,6 +1948,7 @@ Engine.updateMenus = function(category){
         'stats': Engine.capsules,
         // 'vigor': Engine.vigorCapsule
     };
+    console.log(category);
     if(category in capsulesMap) capsulesMap[category].update();
 };
 
