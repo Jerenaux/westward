@@ -1,10 +1,9 @@
 /**
  * Created by Jerome on 09-10-17.
  */
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
-
 import FightingEntity from './FightingEntity'
 import GameServer from './GameServer'
+import PFUtils from '../shared/PFUtils'
 import Utils from '../shared/Utils'
 
 function MovingEntity(){

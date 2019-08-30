@@ -2,13 +2,12 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 11-06-18.
  */
 
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
-var Inventory = require('../shared/Inventory.js').Inventory;
 
-import GameObject from './GameObject'
 import GameServer from './GameServer'
+import Inventory from '../shared/Inventory'
 import MovingEntity from './MovingEntity'
+import PFUtils from '../shared/PFUtils'
 import Utils from '../shared/Utils'
 
 function NPC(){

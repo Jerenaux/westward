@@ -209,3 +209,5 @@ Chunk.prototype.postDrawImage = function(x,y,image,sprite){
         if(!BattleManager.inBattle) Engine.processItemClick(sprite,true);
     });
 };
+
+export default Chunk

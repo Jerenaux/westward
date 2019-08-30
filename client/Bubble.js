@@ -2,6 +2,8 @@
  * Created by Jerome on 19-11-17.
  */
 
+import Engine from './Engine'
+
 function Bubble(x,y,isNotification){
     this.container = [];
     this.x = x;
@@ -157,3 +159,5 @@ Bubble.prototype.hide = function(){
         e.setVisible(false);
     });
 };
+
+export default Bubble

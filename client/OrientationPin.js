@@ -2,6 +2,11 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 01-06-18.
  */
 
+import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import UI from './UI'
+import World from '../shared/World'
+
 var OrientationPin = new Phaser.Class({
 
     Extends: CustomSprite,
@@ -189,3 +194,5 @@ var OrientationPin = new Phaser.Class({
         this.playedSound = false;
     }
 });
+
+export default OrientationPin

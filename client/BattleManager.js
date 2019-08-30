@@ -228,3 +228,5 @@ BattleManager.onFightStart = function(){
 BattleManager.onOwnTurn = function(){
     if(BattleManager.simulate) Engine.computePath({x:505,y:659});
 };
+
+export default BattleManager

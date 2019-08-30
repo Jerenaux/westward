@@ -1,9 +1,8 @@
 /**
- * Created by jeren on 19-01-18.
- */
-/**
  * Created by Jerome on 29-11-17.
  */
+
+import CustomSprite from './CustomSprite'
 
 var BattleTile = new Phaser.Class({
 
@@ -111,3 +110,5 @@ var BattleTile = new Phaser.Class({
         }
     }
 });
+
+export default BattleTile

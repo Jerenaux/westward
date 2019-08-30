@@ -1,7 +1,6 @@
 /**
  * Created by Jerome on 13-10-17.
  */
-var onServer = (typeof window === 'undefined');
 
 function Inventory(size){
     this.maxSize = size || 20;
@@ -110,4 +109,4 @@ Inventory.prototype.fromList = function(list){
     }
 };
 
-if (onServer) module.exports.Inventory = Inventory;
+export default Inventory

@@ -1,6 +1,7 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 18-06-18.
  */
+import NPC from './NPC'
 
 var Civ = new Phaser.Class({
 
@@ -71,3 +72,5 @@ var Civ = new Phaser.Class({
         this.dead = true;
     }
 });
+
+export default Civ

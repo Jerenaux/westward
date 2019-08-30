@@ -2,6 +2,13 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 23-04-18.
  */
 
+import BattleManager from './BattleManager'
+import Engine from './Engine'
+import {EquipmentManager} from '../shared/Equipment'
+import Inventory from '../shared/Inventory'
+import Player from './Player'
+import {StatsContainer} from '../shared/Stats'
+
 function ClassDataShell(){
     for(let i = 0; i < 4; i++){
         this[i] = 0;
@@ -407,3 +414,5 @@ let Hero = new Phaser.Class({
         this.updateEvents.add('vigor');
     }
 });
+
+export default Hero

@@ -3,9 +3,7 @@
  */
 var onServer = (typeof window === 'undefined');
 
-if(onServer){
-    var Utils = require('./Utils.js').Utils;
-}
+import Utils from './Utils'
 
 var PFUtils = {
     speed: 5, // 5 tiles/sec
@@ -62,4 +60,4 @@ PFUtils.buildingCollisions = function(tx,ty,w,h,collisionMap,flag){
 };
 
 
-if (onServer) module.exports.PFUtils = PFUtils;
+export default PFUtils

@@ -41,6 +41,7 @@ import Building from './Building'
 import Camp from './Camp'
 import Civ from './Civ'
 import Item from './Item'
+import Pathfinder from '../shared/Pathfinder'
 import Player from './Player'
 import {SpaceMap} from '../shared/SpaceMap'
 import SpawnZone from './SpawnZone'
@@ -51,7 +52,6 @@ var ListMap = require('../shared/ListMap.js').ListMap;
 var Remains = require('./NPC.js').Remains;
 var Battle = require('./Battle.js').Battle;
 var BattleCell = require('./Battle.js').BattleCell;
-var Pathfinder =  require('../shared/Pathfinder.js').Pathfinder;
 var Prism = require('./Prism.js').Prism;
 var Schemas = require('./schemas.js');
 
@@ -1990,7 +1990,7 @@ GameServer.updateFoW = function(){
         return;
     } // no change
     GameServer.animalMarkersFiltered = GameServer.filterMarkers('animal');
-    GameServer.resourceMarkersFiltered = GameServer.filterMarkers('resource');
+    // GameServer.resourceMarkersFiltered = GameServer.filterMarkers('resource');
     GameServer.setFlag('animalsMarkers');
     GameServer.setFlag('resourcesMarkers');
 };

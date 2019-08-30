@@ -1,6 +1,11 @@
 /**
  * Created by Jerome on 04-10-17.
  */
+
+import Bubble from './Bubble' 
+import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+
 var Moving = new Phaser.Class({
 
     Extends: CustomSprite,
@@ -426,3 +431,5 @@ var Moving = new Phaser.Class({
         return this.dead;
     }
 });
+
+export default Moving

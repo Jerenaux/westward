@@ -2,7 +2,6 @@
  * Created by Jerome on 23-04-17.
  */
 
-var onServer = (typeof window === 'undefined');
 
 // A space map is a custom data struture, similar to a sparse 2D array. Entities are stored according to their coordinates;
 // that is, two keys are needed to fetch entities, the x position and the y position. This allows fast look-up based on position,

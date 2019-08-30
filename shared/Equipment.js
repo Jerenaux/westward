@@ -2,12 +2,6 @@
  * Created by Jerome on 12-12-17.
  */
 
-var onServer = (typeof window === 'undefined');
-
-if (onServer) {
-    var GameServer = require('../server/GameServer.js').GameServer;
-}
-
 var Equipment = {
     slots: {
         meleew: {
@@ -112,23 +106,6 @@ EquipmentManager.prototype.get = function (slotName) {
     return -1;
 };
 
-/**
- * Return an object containing all the information about the item
- * equipped in a given slot.
- * @param {string} slotName - name of the slot where the item of
- * interest is equiped.
- * @returns {Object} - Object containging data about item.
- */
-EquipmentManager.prototype.getItem = function (slotName) {
-    var id = this.get(slotName);
-    if (id == -1) return false;
-    if (onServer) {
-        return GameServer.itemsData[id];
-    } else {
-        return Engine.itemsData[id];
-    }
-};
-
 EquipmentManager.prototype.getAmmoContainerType = function () {
     let item = this.getItem("range_ammo");
     if (item && item.container_type) return item.container_type;
@@ -169,8 +146,4 @@ EquipmentManager.prototype.listItems = function () {
     return items;
 };
 
-// re-enable equip from db
-if (onServer) {
-    module.exports.Equipment = Equipment;
-    module.exports.EquipmentManager = EquipmentManager;
-}
+export {Equipment, EquipmentManager}

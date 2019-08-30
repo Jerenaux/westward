@@ -2,7 +2,8 @@
  * Created by Jerome on 30-06-17.
  */
 
-import Boot from './Boot';
+import Boot from './Boot'
+import Engine from './Engine'
 
 var Client = {
     initEventName: 'init', // name of the event that triggers the call to initWorld() and the initialization of the game

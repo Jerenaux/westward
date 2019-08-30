@@ -1,6 +1,9 @@
 /**
  * Created by Jerome on 04-10-17.
  */
+
+import NPC from './NPC'
+
 var Animal = new Phaser.Class({
 
     Extends: NPC,
@@ -90,3 +93,5 @@ var Animal = new Phaser.Class({
         this.dead = true;
     }
 });
+
+export default Animal

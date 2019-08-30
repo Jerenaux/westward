@@ -1,10 +1,23 @@
 /**
  * Created by Jerome on 26-06-17.
  */
+import Animal from './Animal'
+import BattleTile from './BattleTile'
 import Boot from './Boot';
+import Building from './Building'
+import Chunk from './Chunk'
+import Civ from './Civ'
 import Client from './Client';
+import Hero from './Hero'
+import {HighlightPipeline, HollowPipeline} from './shaders'
+import Item from './Item'
 import menuIcon from './menuIcon';
+import Pathfinder from '../shared/Pathfinder'
+import Player from './Player'
+import Remains from './Remains'
 import {SpaceMap} from '../shared/SpaceMap';
+import UI from './UI'
+import Utils from '../shared/Utils'
 import World from '../shared/World';
 
 var Engine = {
@@ -263,7 +276,7 @@ Engine.create = function(){
     Engine.qtQuads = []; // for debugging
 
     Engine.camera = Engine.scene.cameras.main;
-    Engine.camera.setBounds(0,0,Engine.worldWidth*TILE_WIDTH,Engine.worldHeight*TILE_HEIGHT);
+    Engine.camera.setBounds(0,0,Engine.worldWidth*Engine.tileWidth,Engine.worldHeight*Engine.tileHeight);
 
     Engine.buildingsData = Engine.scene.cache.json.get('buildings');
     Engine.animalsData = Engine.scene.cache.json.get('animals');
@@ -311,9 +324,9 @@ Engine.create = function(){
         Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
     }
 
-    game.renderer.addPipeline('highlight', new HighlightPipeline(game));
-    game.renderer.addPipeline('hollow_items', new HollowPipeline(game));
-    game.renderer.addPipeline('hollow_moving', new HollowPipeline(game));
+    Engine.getGameInstance().renderer.addPipeline('highlight', new HighlightPipeline(Engine.getGameInstance()));
+    Engine.getGameInstance().renderer.addPipeline('hollow_items', new HollowPipeline(Engine.getGameInstance()));
+    Engine.getGameInstance().renderer.addPipeline('hollow_moving', new HollowPipeline(Engine.getGameInstance()));
 
     Engine.created = true;
     Engine.configEngine();

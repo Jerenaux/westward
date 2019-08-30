@@ -2,6 +2,8 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 01-08-18.
  */
 
+import Moving from './Moving'
+
 var NPC = new Phaser.Class({
 
     Extends: Moving,
@@ -65,3 +67,5 @@ var NPC = new Phaser.Class({
         UI.tooltip.hide();
     }
 });
+
+export default NPC

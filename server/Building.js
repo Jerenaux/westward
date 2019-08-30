@@ -2,14 +2,15 @@
  * Created by Jerome on 05-10-17.
  */
 var Formulas = require('../shared/Formulas.js').Formulas;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
-var Inventory = require('../shared/Inventory.js').Inventory;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
 var Models = require('../shared/models.js');
 
 import FightingEntity from './FightingEntity'
 import GameObject from './GameObject'
 import GameServer from './GameServer'
+import Inventory from '../shared/Inventory'
+import PFUtils from '../shared/PFUtils'
+import {SpaceMap} from '../shared/SpaceMap'
 import Utils from '../shared/Utils'
 import World from '../shared/World'
 

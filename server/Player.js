@@ -3,7 +3,6 @@
  */
 
 var PersonalUpdatePacket = require('./PersonalUpdatePacket.js').PersonalUpdatePacket;
-var Inventory = require('../shared/Inventory.js').Inventory;
 var Stats = require('../shared/Stats.js').Stats;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
 var Equipment = require('../shared/Equipment.js').Equipment;
@@ -13,9 +12,10 @@ var Prism = require('./Prism.js').Prism;
 
 import GameObject from './GameObject'
 import GameServer from './GameServer'
+import Inventory from '../shared/Inventory'
 import MovingEntity from './MovingEntity'
 import Utils from '../shared/Utils'
-
+import World from '../shared/World'
 
 function Player() {
     this.updatePacket = new PersonalUpdatePacket();

@@ -2,6 +2,8 @@
  * Created by Jerome on 07-10-17.
  */
 
+import Utils from '../shared/Utils'
+
 var CustomSprite = new Phaser.Class({
 
     Extends: Phaser.GameObjects.Sprite,

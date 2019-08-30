@@ -2,7 +2,7 @@
  * Created by Jerome on 07-10-17.
  */
 
-var FOUNDATIONS_ID = 4;
+import CustomSprite from './CustomSprite'
 
 var Building = new Phaser.Class({
 
@@ -398,3 +398,5 @@ var Building = new Phaser.Class({
         // this.resetPipeline();
     }
 });
+
+export default Building
