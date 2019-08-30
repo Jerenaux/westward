@@ -3,11 +3,14 @@
  */
 
 import BattleManager from './BattleManager'
+import Client from './Client'
 import Engine from './Engine'
 import {EquipmentManager} from '../shared/Equipment'
 import Inventory from '../shared/Inventory'
 import Player from './Player'
 import {StatsContainer} from '../shared/Stats'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
 function ClassDataShell(){
     for(let i = 0; i < 4; i++){

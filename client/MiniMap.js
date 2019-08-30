@@ -1,6 +1,8 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 27-05-18.
  */
+import Engine from './Engine'
+import UI from './UI'
 
 function MiniMap(){
     var r = 65;
@@ -48,3 +50,5 @@ MiniMap.prototype.hide = function(){
     this.map.hide();
     this.displayed = false;
 };
+
+export default MiniMap

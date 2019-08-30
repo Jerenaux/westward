@@ -1,3 +1,7 @@
+import Engine from './Engine'
+import {SpaceMap} from '../shared/SpaceMap'
+import World from '../shared/World'
+
 var TREE_ALPHA = 1;
 
 function Chunk(data){
@@ -29,9 +33,9 @@ Chunk.prototype.draw = function(){
             var ty = this.y + y_;
             if(this.hasWater(tx,ty)) continue;
             if(this.defaultTile == 'grass') {
-                var gs = tilesetData.config.grassSize;
+                var gs = Engine.tilesetData.config.grassSize;
                 var t = (tx % gs) + (ty % gs) * gs;
-                this.drawTile(tx,ty,tilesetData.config.grassPrefix+'_'+t);
+                this.drawTile(tx,ty,Engine.tilesetData.config.grassPrefix+'_'+t);
             }
         }
     }
@@ -42,9 +46,8 @@ Chunk.prototype.draw = function(){
             if(tile === undefined) return;
             var x = this.x + parseInt(data[0]);
             var y = this.y + parseInt(data[1]);
-            var name = tilesetData.shorthands[tile];
-            if(!(tile in tilesetData.shorthands)) return;
-            // if(name && name.indexOf('water') != -1) name = tilesetData.config.waterPrefix+name;
+            var name = Engine.tilesetData.shorthands[tile];
+            if(!(tile in Engine.tilesetData.shorthands)) return;
             this.drawTile(x, y, name);
         },this);
     },this);
@@ -86,13 +89,13 @@ Chunk.prototype.drawTile = function(x,y,tile){
 
 Chunk.prototype.getAtlasData = function(image,data,longname){
     if(longname){
-        return tilesetData.atlas[image][data];
+        return Engine.tilesetData.atlas[image][data];
     }else {
-        if (!(image in tilesetData.shorthands)){
+        if (!(image in Engine.tilesetData.shorthands)){
             console.warn('Unknown shorthand',image);
             return false;
         }
-        return tilesetData.atlas[tilesetData.shorthands[image]][data];
+        return Engine.tilesetData.atlas[Engine.tilesetData.shorthands[image]][data];
     }
 };
 

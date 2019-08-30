@@ -12,6 +12,7 @@ import Hero from './Hero'
 import {HighlightPipeline, HollowPipeline} from './shaders'
 import Item from './Item'
 import menuIcon from './menuIcon';
+import MiniMap from './MiniMap'
 import Pathfinder from '../shared/Pathfinder'
 import Player from './Player'
 import Remains from './Remains'
@@ -50,8 +51,6 @@ var Engine = {
     plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager'], // 'LightsPlugin'
     playerIsInitialized: false
 };
-
-var tilesetData = {};
 
 Engine.preload = function() {
     Engine.useTilemaps = false;
@@ -229,9 +228,10 @@ Engine.create = function(){
     World.readMasterData(masterData);
     Engine.mapDataLocation = Boot.mapDataLocation;
 
-    tilesetData.atlas = Engine.scene.cache.json.get('tileset').frames;
-    tilesetData.config = Engine.scene.cache.json.get('tileset').config;
-    tilesetData.shorthands = Engine.scene.cache.json.get('tileset').shorthands;
+    Engine.tilesetData = {};
+    Engine.tilesetData.atlas = Engine.scene.cache.json.get('tileset').frames;
+    Engine.tilesetData.config = Engine.scene.cache.json.get('tileset').config;
+    Engine.tilesetData.shorthands = Engine.scene.cache.json.get('tileset').shorthands;
 
     Engine.chunks = {}; // holds references to the containers containing the chunks
     Engine.displayedChunks = [];
