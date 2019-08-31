@@ -3,6 +3,8 @@
  */
 import Animal from './Animal'
 import BattleTile from './BattleTile'
+import BuildingTitle from './BuildingTitle'
+import Capsule from './Capsule'
 import Boot from './Boot';
 import Building from './Building'
 import Chunk from './Chunk'
@@ -16,7 +18,10 @@ import MiniMap from './MiniMap'
 import Pathfinder from '../shared/Pathfinder'
 import Player from './Player'
 import Remains from './Remains'
+import RepairPanel from './RepairPanel'
+import ShopPanel from './ShopPanel'
 import {SpaceMap} from '../shared/SpaceMap';
+import StatsPanel from './StatsPanel'
 import UI from './UI'
 import Utils from '../shared/Utils'
 import World from '../shared/World';
@@ -25,6 +30,8 @@ var Engine = {
     // TODO: Move to conf?
     tileWidth: 32,
     tileHeight: 32,
+    viewWidth: 32, // tiles; TODO: conf
+    viewHeight: 18, // tiles
 
     markerDepth: 1,
     buildingsDepth: 2,
@@ -1810,10 +1817,10 @@ Engine.getMouseCoordinates = function(pointer){
 };
 
 Engine.isInView = function(x,y){
-    if(x < Engine.player.tileX - VIEW_WIDTH/2) return false;
-    if(x >= Engine.player.tileX + VIEW_WIDTH/2) return false;
-    if(y < Engine.player.tileY - VIEW_HEIGHT/2) return false;
-    if(y >= Engine.player.tileY + VIEW_HEIGHT/2) return false;
+    if(x < Engine.player.tileX - Engine.viewWidth/2) return false;
+    if(x >= Engine.player.tileX + Engine.viewWidth/2) return false;
+    if(y < Engine.player.tileY - Engine.viewHeight/2) return false;
+    if(y >= Engine.player.tileY + Engine.viewHeight/2) return false;
     return true;
 };
 
@@ -1948,8 +1955,9 @@ Engine.updateMenus = function(category){
         'stats': Engine.capsules,
         // 'vigor': Engine.vigorCapsule
     };
-    console.log(category);
-    if(category in capsulesMap) capsulesMap[category].update();
+    if(category in capsulesMap){
+        if(capsulesMap[category]) capsulesMap[category].update();
+    }
 };
 
 Engine.inThatBuilding = function(id){
@@ -1970,7 +1978,7 @@ Engine.addPlayer = function(data){
 };
 
 Engine.getTilesetFromTile = function(tile){
-    if(Engine.tilesetMap.hasOwnProperty(tile)) return Engine.tile
+    if(Engine.tilesetMap.hasOwnProperty(tile)) return Engine.tile;
     setMap[tile];
     for(var i = 0; i < Engine.tilesets.length; i++){
         if(tile < Engine.tilesets[i].firstgid){

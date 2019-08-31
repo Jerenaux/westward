@@ -2,7 +2,9 @@
  * Created by Jerome on 04-10-17.
  */
 
+import Engine from './Engine'
 import NPC from './NPC'
+import OrientationPin from './OrientationPin'
 
 var Animal = new Phaser.Class({
 

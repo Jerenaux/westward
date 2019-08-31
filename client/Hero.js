@@ -104,7 +104,7 @@ let Hero = new Phaser.Class({
         this.updateEvents.forEach(function (e) {
             Engine.updateMenus(e);
         }, this);
-        if(this.updateEvents.has('map') && Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
+        if(this.updateEvents.has('map') && Engine.miniMap && Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
 
         let battleCallbacks = {
             'battleData': BattleManager.updateBattle

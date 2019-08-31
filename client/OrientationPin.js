@@ -5,6 +5,7 @@
 import CustomSprite from './CustomSprite'
 import Engine from './Engine'
 import UI from './UI'
+import Utils from '../shared/Utils'
 import World from '../shared/World'
 
 var OrientationPin = new Phaser.Class({

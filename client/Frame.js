@@ -1,6 +1,7 @@
 /**
  * Created by jeren on 30-12-17.
  */
+import UI from './UI'
 
 function Frame(x,y,w,h,invisible){
     this.slices = [];
@@ -182,3 +183,5 @@ Frame.prototype.moveUp = function(nb){
     }
     this.depth = nb;
 };
+
+export default Frame

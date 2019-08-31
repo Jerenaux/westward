@@ -2,6 +2,9 @@
  * Created by Jerome on 21-11-17.
  */
 
+import CustomSprite from './CustomSprite'
+import UI from './UI'
+
 var Button = new Phaser.Class({
 
     Extends: CustomSprite,
@@ -55,3 +58,5 @@ var Button = new Phaser.Class({
         this.setFrame(this.currentFrame);
     }
 });
+
+export default Button

@@ -2,6 +2,8 @@
  * Created by Jerome on 12-12-17.
  */
 
+import itemsData from '../assets/data/items.json'
+
 var Equipment = {
     slots: {
         meleew: {
@@ -104,6 +106,17 @@ EquipmentManager.prototype.get = function (slotName) {
         return this.slots[slotName].id;
     }
     return -1;
+};
+
+/**
+ * Returns the item data of the item equipped at the given slot
+ * @param {string} slotName - name of the slot where the item of
+ * @returns {Object} - item data of equipped item or {} if nothing equipped
+ */
+EquipmentManager.prototype.getItem = function (slotName) {
+    var id = this.get(slotName);
+    if(id == -1) return {};
+    return itemsData[id];
 };
 
 EquipmentManager.prototype.getAmmoContainerType = function () {

@@ -1,7 +1,9 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 18-06-18.
  */
+import Engine from './Engine'
 import NPC from './NPC'
+import OrientationPin from './OrientationPin'
 
 var Civ = new Phaser.Class({
 

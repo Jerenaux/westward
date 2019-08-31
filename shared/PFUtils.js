@@ -1,7 +1,6 @@
 /**
  * Created by Jerome on 29-09-17.
  */
-var onServer = (typeof window === 'undefined');
 
 import Utils from './Utils'
 
@@ -51,7 +50,7 @@ PFUtils.buildingCollisions = function(tx,ty,w,h,collisionMap,flag){
         for(var y = ty; y < ty + h; y++){
             if(flag == 'add'){
                 collisionMap.add(x,y);
-                if(!onServer && Engine.debugCollisions) Engine.scene.add.rectangle((x*32)+16,(y*32)+16, 32,32, 0xffa500).setAlpha(0.7).setDepth(100);
+                // if(!onServer && Engine.debugCollisions) Engine.scene.add.rectangle((x*32)+16,(y*32)+16, 32,32, 0xffa500).setAlpha(0.7).setDepth(100);
             }else{
                 collisionMap.delete(x,y);
             }

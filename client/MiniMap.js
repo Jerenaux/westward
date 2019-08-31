@@ -3,6 +3,7 @@
  */
 import Engine from './Engine'
 import UI from './UI'
+import WorldMap from './WorldMap'
 
 function MiniMap(){
     var r = 65;

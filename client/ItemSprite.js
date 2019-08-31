@@ -1,7 +1,8 @@
 /**
  * Created by Jerome on 29-11-17.
  */
-
+import CustomSprite from './CustomSprite'
+import UI from './UI'
 
 var ItemSprite = new Phaser.Class({
 
@@ -60,3 +61,5 @@ var ItemSprite = new Phaser.Class({
         }
     }
 });
+
+export default ItemSprite

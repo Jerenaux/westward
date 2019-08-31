@@ -2,6 +2,11 @@
  * Created by Jerome on 12-01-18.
  */
 
+import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import UI from './UI'
+import Utils from '../shared/Utils'
+
 var fowID = 0;
 
 var WorldMap = new Phaser.Class({
@@ -613,3 +618,5 @@ var Dash = new Phaser.Class({
         this.setVisibility();
     }
 });
+
+export default WorldMap

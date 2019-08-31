@@ -1,6 +1,10 @@
 /**
  * Created by jeren on 28-12-17.
  */
+import ItemSprite from './ItemSprite'
+import Panel from './Panel'
+import UI from './UI'
+
 function ShopPanel(x,y,width,height,title,notShop){
     Panel.call(this,x,y,width,height,title);
     this.buttons = [];
@@ -350,3 +354,5 @@ ShopGoldPanel.prototype.requestPurchase = function(){
 
     this.lastPurchase = Date.now();
 };
+
+export default ShopPanel

@@ -1,6 +1,10 @@
 /**
  * Created by jeren on 10-12-17.
  */
+import Engine from './Engine'
+import Panel from './Panel'
+import UI from './UI'
+import {Stats} from '../shared/Stats'
 
 function StatsPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
@@ -94,3 +98,5 @@ StatsPanel.prototype.displayStats = function(){
         statObj.zone.setVisible(true);
     }
 };
+
+export default StatsPanel

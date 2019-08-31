@@ -1,6 +1,7 @@
 /**
  * Created by jeren on 25-01-18.
  */
+import UI from './UI'
 
 function ProgressBar(x,y,w,mask){
     this.displayed = false;
@@ -229,3 +230,5 @@ BigProgressBar.prototype.createZone = function(){
     this.setUpZone(zone);
     return zone;
 };
+
+export {ProgressBar, BigProgressBar}

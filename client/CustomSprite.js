@@ -1,7 +1,7 @@
 /**
  * Created by Jerome on 07-10-17.
  */
-
+import Engine from './Engine'
 import Utils from '../shared/Utils'
 
 var CustomSprite = new Phaser.Class({

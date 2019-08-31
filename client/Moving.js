@@ -5,6 +5,7 @@
 import Bubble from './Bubble' 
 import CustomSprite from './CustomSprite'
 import Engine from './Engine'
+import PFUtils from '../shared/PFUtils'
 
 var Moving = new Phaser.Class({
 

@@ -1,5 +1,6 @@
 import Engine from './Engine'
 import {SpaceMap} from '../shared/SpaceMap'
+import Utils from '../shared/Utils'
 import World from '../shared/World'
 
 var TREE_ALPHA = 1;

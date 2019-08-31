@@ -2,10 +2,11 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 14-03-18.
  */
 import Boot from './Boot';
-import Client from './Client';
-import {Stats} from '../shared/Stats';
-import Tooltip from './Tooltip';
-import UICursor from './UICursor';
+import Client from './Client'
+import Engine from './Engine'
+import {Stats} from '../shared/Stats'
+import Tooltip from './Tooltip'
+import UICursor from './UICursor'
 
 var UI = {
     key: 'UI',

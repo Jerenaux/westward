@@ -1902,6 +1902,7 @@ GameServer.handleUnequip = function(data,socketID) {
 
 GameServer.handleExit = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
+    if(!player) return;
     player.exitBuilding();
 };
 

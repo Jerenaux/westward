@@ -1,8 +1,12 @@
 /**
  * Created by Jerome on 07-10-17.
  */
-
+import Client from './Client'
 import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import Inventory from '../shared/Inventory'
+import PFUtils from '../shared/PFUtils'
+import {StatsContainer} from "../shared/Stats"
 
 var Building = new Phaser.Class({
 
