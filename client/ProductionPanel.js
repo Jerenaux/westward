@@ -1,7 +1,7 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 13-02-18.
  */
-
+import Panel from './Panel'
 
 function ProductionPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
@@ -261,3 +261,5 @@ ProdSlot.prototype.hide = function(){
     });
     this.bar.hide();
 };
+
+export default Panel

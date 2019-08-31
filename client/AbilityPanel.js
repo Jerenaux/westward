@@ -1,6 +1,7 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 22-08-18.
  */
+import Panel from './Panel'
 
 function AbilityPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
@@ -43,3 +44,5 @@ AbilityPanel.prototype.hide = function() {
     this.hideInterface();
     this.hideTexts();
 };
+
+export default AbilityPanel

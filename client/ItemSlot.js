@@ -1,7 +1,9 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 24-03-19.
  */
-
+import Frame from './Frame'
+import UI from './UI'
+import Utils from '../shared/Utils'
 
 function ItemSlot(x,y,width,height){
     Frame.call(this,x,y,width,height);
@@ -157,3 +159,5 @@ ItemSlot.prototype.hide = function(){
         c.setVisible(false);
     });
 };
+
+export default ItemSlot

@@ -1,6 +1,7 @@
 /**
  * Created by jeren on 07-01-18.
  */
+import Panel from './Panel'
 
 function CharacterPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
@@ -90,3 +91,5 @@ CharacterPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
     this.hideInterface();
 };
+
+export default CharacterPanel

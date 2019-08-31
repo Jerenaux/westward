@@ -2,6 +2,7 @@
  * Created by Jerome on 07-10-17.
  */
 import UI from './UI'
+import UIHolder from './UIHolder'
 
 function Menu(title){
     this.container = [];

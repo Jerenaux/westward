@@ -1,6 +1,10 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 16-06-18.
  */
+import {MiniProgressBar} from "./ProgressBar"
+import Panel from './Panel'
+import UI from './UI'
+import Utils from '../shared/Utils'
 
 function ClassMiniPanel(x,y,width,height,title,classID){
     Panel.call(this,x,y,width,height,title);
@@ -55,3 +59,5 @@ ClassMiniPanel.prototype.hide = function(){
     //this.button.hide();
     this.hideTexts();
 };
+
+export default ClassMiniPanel

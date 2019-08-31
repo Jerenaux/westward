@@ -3,16 +3,13 @@
   "version": "1.0.0",
   "description": "Westward, a collaborative MMO",
   "private": true,
-  "main": "server.js",
+  "main": "dist/server.js",
   "directories": {
     "test": "test"
   },
   "nodemonConfig": {
     "watch": [
-      "server",
-      "shared",
-      "index.html",
-      "admin"
+      "dist"
     ],
     "ext": "ts,js,html",
     "ignore": [
@@ -22,11 +19,13 @@
     ]
   },
   "scripts": {
+    "browser-sync": "browser-sync start --config bs-config.js",
     "build": "webpack",
-    "start": "node server.js",
+    "dev": "concurrently \"npm run watch-webpack\" \"npm run watch-node\"",
+    "start": "node dist/server.js",
     "test": "mocha test",
-    "watch": "nodemon",
-    "watch-client": "browser-sync start --config bs-config.js"
+    "watch-node": "nodemon",
+    "watch-webpack": "webpack-dev-server"
   },
   "engines": {
     "npm": "^5.7.1"
@@ -35,6 +34,7 @@
   "license": "ISC",
   "devDependencies": {
     "chai": "^4.2.0",
+    "concurrently": "^4.1.2",
     "css-loader": "^3.2.0",
     "dir-compare": "^1.7.3",
     "jimp": "^0.6.4",
@@ -47,6 +47,7 @@
     "uglify-js": "^3.6.0",
     "webpack": "^4.39.3",
     "webpack-cli": "^3.3.7",
+    "webpack-dev-server": "^3.8.0",
     "webpack-node-externals": "^1.7.2",
     "xml2js": "^0.4.19"
   },

@@ -40,7 +40,7 @@ var Boot = new Phaser.Class({
         Boot.WEBGL = true;
 
         var gl;
-        try { gl = game.canvas.getContext("webgl"); }
+        try { gl = this.sys.game.canvas.getContext("webgl"); }
         catch (x) { gl = null; }
 
         if(!gl){

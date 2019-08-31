@@ -1,6 +1,9 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 14-07-19.
  */
+import Frame from './Frame'
+import Panel from './Panel'
+import UI from './UI'
 
 var NB_PER_PAGE = 4;
 
@@ -241,3 +244,5 @@ BuildSlot.prototype.hide = function(){
         ing.text.setVisible(false);
     });
 };
+
+export default BuildPanel

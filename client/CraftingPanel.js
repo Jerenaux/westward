@@ -1,12 +1,16 @@
 /**
  * Created by Jerome on 20-11-17.
  */
+import Engine from './Engine'
+import IngredientSlot from './IngredientSlot'
+import Panel from './Panel'
 
 function CraftingPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
     this.buttons = [];
     this.addInterface();
     this.lastCraft = Date.now();
+    console.log('');
 }
 
 CraftingPanel.prototype = Object.create(Panel.prototype);
@@ -179,3 +183,5 @@ CraftingPanel.prototype.requestCraft = function(){
     Client.sendCraft(this.craftItem.id,this.craftItem.count);
     this.lastCraft = Date.now();
 };
+
+export default CraftingPanel

@@ -1,6 +1,7 @@
 /**
  * Created by jeren on 28-12-17.
  */
+import Engine from './Engine'
 import ItemSprite from './ItemSprite'
 import Panel from './Panel'
 import UI from './UI'
@@ -355,4 +356,4 @@ ShopGoldPanel.prototype.requestPurchase = function(){
     this.lastPurchase = Date.now();
 };
 
-export default ShopPanel
+export {ShopPanel, ShopGoldPanel}

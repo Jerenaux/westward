@@ -21,6 +21,15 @@ module.exports = {
     target: 'node', // in order too ignore built-in modules like path, fs, etc.
     externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
 
+    watch: true,
+    watchOptions: {
+        ignored: ['maps','node_modules']
+    },
+
+    resolve: {
+        symlinks: false
+    },
+
     module: {
         rules: [
         //   {
@@ -41,12 +50,12 @@ module.exports = {
                 ]
             }
         ]
-    },
+    }
 
-    plugins: [
-        new webpack.DefinePlugin({
-            'typeof CANVAS_RENDERER': JSON.stringify(false),
-            'typeof WEBGL_RENDERER': JSON.stringify(true)
-        })
-  ]
+    // plugins: [
+    //     new webpack.DefinePlugin({
+    //         'typeof CANVAS_RENDERER': JSON.stringify(false),
+    //         'typeof WEBGL_RENDERER': JSON.stringify(true)
+    //     })
+    // ]
 };

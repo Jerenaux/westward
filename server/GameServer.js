@@ -55,7 +55,7 @@ var BattleCell = require('./Battle.js').BattleCell;
 var Prism = require('./Prism.js').Prism;
 var Schemas = require('./schemas.js');
 
-// TODO: try including as usual
+// TODO: try including as usual?
 import animalsClusters from '../maps/animals.json'
 import collisions from '../maps/collisions.json'
 import itemsOnMap from '../maps/items.json'

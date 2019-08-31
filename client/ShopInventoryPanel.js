@@ -1,6 +1,10 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 15-03-19.
  */
+import Engine from './Engine'
+import ItemSlot from './ItemSlot'
+import Panel from './Panel'
+import UI from './UI'
 
 var NB_PER_PAGE = 4;
 
@@ -226,3 +230,5 @@ ShopSlot.prototype.setUp = function(action,item,nb){
         Engine.currentMenu.panels['action'].setUp(item,action);
     }.bind(this));
 };
+
+export default ShopInventoryPanel

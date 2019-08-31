@@ -505,6 +505,7 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
+Load data/* files in gs with imports
 https://stackoverflow.com/questions/42579761/express-js-how-to-serve-index-html-from-a-webpack-bundle
 -> Don't commit compiled files, compile after push and have env variable determine mode
 - Move to ES6 & webpack & babel

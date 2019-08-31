@@ -1,6 +1,8 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 07-02-18.
  */
+import {BigProgressBar} from "./ProgressBar"
+import Engine from './Engine'
 import Panel from './Panel'
 
 function ConstructionPanel(x,y,width,height,title){

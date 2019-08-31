@@ -1,6 +1,9 @@
 /**
  * Created by jeren on 30-12-17.
  */
+import Engine from './Engine'
+import Panel from './Panel'
+import UI from './UI'
 
 function InventoryPanel(x,y,width,height,title,invisible){
     Panel.call(this,x,y,width,height,title,invisible);
@@ -282,3 +285,5 @@ InventoryPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
     this.resetCounters();
 };
+
+export default InventoryPanel

@@ -2,6 +2,11 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 29-03-18.
  */
 import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import Insect from './Insect'
+import OrientationPin from './OrientationPin'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
 var Item = new Phaser.Class({
 
