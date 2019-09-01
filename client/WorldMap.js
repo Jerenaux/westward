@@ -3,8 +3,8 @@
  */
 
 import Boot from './Boot'
-import CustomSprite from './CustomSprite'
 import Engine from './Engine'
+import {FoWPipeline} from "./shaders";
 import UI from './UI'
 import Utils from '../shared/Utils'
 
@@ -12,7 +12,6 @@ var fowID = 0;
 
 var WorldMap = new Phaser.Class({
 
-    // Extends: CustomSprite,
     Extends: Phaser.GameObjects.RenderTexture,
 
     /*
@@ -548,12 +547,15 @@ var MapMarker = new Phaser.Class({
 
 var Pin = new Phaser.Class({
 
-    Extends: CustomSprite,
+    Extends: Phaser.GameObjects.Sprite,
 
     Mixins: [MapMarker],
 
     initialize: function Pin (map) {
-        CustomSprite.call(this, UI.scene, 0, 0, 'mapicons');
+        Phaser.GameObjects.Sprite.call(this, UI.scene, 0, 0, 'mapicons');
+        UI.scene.add.displayList.add(this);
+        UI.scene.add.updateList.add(this);
+        
         this.markerType = 'pin';
         this.setScrollFactor(0);
         this.setVisible(false);

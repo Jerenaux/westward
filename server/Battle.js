@@ -4,7 +4,6 @@
 var Pathfinder = require('../shared/Pathfinder.js').Pathfinder;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 
-import GameObject from './GameObject'
 import GameServer from './GameServer'
 import Utils from '../shared/Utils'
 

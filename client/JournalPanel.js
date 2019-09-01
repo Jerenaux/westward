@@ -1,7 +1,10 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 07-04-19.
  */
+import Engine from './Engine'
 import Panel from './Panel'
+import UI from './UI'
+import Utils from '../shared/Utils'
 
 function JournalPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title,false);

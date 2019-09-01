@@ -4,6 +4,7 @@
 import FightingEntity from './FightingEntity'
 import GameServer from './GameServer'
 import PFUtils from '../shared/PFUtils'
+import {SpaceMap} from "../shared/SpaceMap";
 import Utils from '../shared/Utils'
 
 function MovingEntity(){
@@ -105,7 +106,7 @@ MovingEntity.prototype.stopWalk = function(){
 };
 
 MovingEntity.prototype.getBattleAreaAround = function(){
-    cells = new SpaceMap();
+    var cells = new SpaceMap();
     for(var x = this.x - 1; x <= this.x + this.cellsWidth; x++){ // <= since we want the cells all around
         for(var y = this.y - 1; y <= this.y + this.cellsHeight; y++) {
             if(!GameServer.checkCollision(x,y)) cells.add(x,y);

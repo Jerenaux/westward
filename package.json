@@ -3,15 +3,14 @@
   "version": "1.0.0",
   "description": "Westward, a collaborative MMO",
   "private": true,
-  "main": "dist/server.js",
+  "main": "./dist/server.js",
   "directories": {
     "test": "test"
   },
   "nodemonConfig": {
     "watch": [
       [
-        "server",
-        "shared"
+        "dist/server.js"
       ]
     ],
     "ext": "ts,js,html",
@@ -24,11 +23,10 @@
   "scripts": {
     "browser-sync": "browser-sync start --config bs-config.js",
     "build": "webpack",
-    "dev": "concurrently \"npm run watch-webpack\" \"npm run watch-node\"",
-    "start": "node dist/server.js",
+    "dev": "concurrently \"npm run watch:server\" \"npm run watch:client\"",
     "test": "mocha test",
-    "watch-node": "nodemon ./dist/server.js localhost 8080",
-    "watch-webpack": "webpack-dev-server"
+    "watch:server": "nodemon ./dist/server.js",
+    "watch:client": "webpack-dev-server"
   },
   "engines": {
     "npm": "^5.7.1"
@@ -44,6 +42,7 @@
     "jimp": "^0.6.4",
     "mocha": "^5.2.0",
     "mongo-express": "^0.51.2",
+    "npm-run-all": "^4.1.5",
     "request": "^2.88.0",
     "sinon": "^7.4.1",
     "spritesmith": "^3.3.1",
@@ -53,6 +52,7 @@
     "webpack-cli": "^3.3.7",
     "webpack-dev-server": "^3.8.0",
     "webpack-node-externals": "^1.7.2",
+    "write-file-webpack-plugin": "^4.5.1",
     "xml2js": "^0.4.19"
   },
   "dependencies": {

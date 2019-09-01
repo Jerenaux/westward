@@ -3,6 +3,7 @@
  */
 
 import Engine from './Engine'
+import UI from './UI'
 
 function Bubble(x,y,isNotification){
     this.container = [];

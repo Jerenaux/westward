@@ -5,6 +5,7 @@
 import Button from './Button'
 import Capsule from './Capsule'
 import Frame from './Frame'
+import LongSlot from './LongSlot'
 import UI from './UI'
 import Utils from '../shared/Utils'
 

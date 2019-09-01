@@ -2,6 +2,8 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 07-04-18.
  */
 import BigButton from './BigButton'
+import Client from './Client'
+import Engine from './Engine'
 import ItemSprite from './ItemSprite'
 import Panel from './Panel'
 import Utils from '../shared/Utils'
@@ -40,7 +42,7 @@ ItemActionPanel.prototype.setUp = function(itemID, inventory){
         let container_item_id = Engine.player.getEquippedItemID('range_container');
         const container_item = Engine.itemsData[container_item_id];
 
-        ammoContainerMatch = (container_item && container_item.container_type === data.container_type);
+        var ammoContainerMatch = (container_item && container_item.container_type === data.container_type);
 
         if(data.isAmmo && !ammoContainerMatch){
             this.useButton.disable();

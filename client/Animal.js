@@ -2,6 +2,7 @@
  * Created by Jerome on 04-10-17.
  */
 
+import CustomSprite from './CustomSprite'
 import Engine from './Engine'
 import NPC from './NPC'
 import OrientationPin from './OrientationPin'

@@ -1,8 +1,11 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 31-08-19.
  */
+import BigButton from './BigButton'
+import Engine from './Engine'
 import {BigProgressBar} from './ProgressBar'
 import Panel from './Panel'
+import Utils from '../shared/Utils'
 
 function RepairPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);

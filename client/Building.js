@@ -9,6 +9,7 @@ import Inventory from '../shared/Inventory'
 import PFUtils from '../shared/PFUtils'
 import {StatsContainer} from "../shared/Stats"
 import UI from './UI'
+import Utils from '../shared/Utils'
 
 var Building = new Phaser.Class({
 

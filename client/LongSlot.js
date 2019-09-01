@@ -1,6 +1,8 @@
 /**
  * Created by jeren on 06-02-18.
  */
+import UI from './UI'
+import Utils from '../shared/Utils'
 
 function LongSlot(width,mask){
     this.x = 0;
@@ -201,3 +203,5 @@ LongSlot.prototype.moveUp = function(nb){
     if(this.icon) this.icon.setDepth(this.icon.depth+nb);
     this.depth = nb;
 };
+
+export default LongSlot

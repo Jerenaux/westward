@@ -2,6 +2,7 @@
  * Created by Jerome on 29-11-17.
  */
 import Engine from './Engine'
+import {Equipment} from "../shared/Equipment";
 import {Stats} from "../shared/Stats";
 import UI from './UI';
 

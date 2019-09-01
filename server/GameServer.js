@@ -32,11 +32,11 @@ var GameServer = {
     initialized: false
 };
 
-// module.exports.GameServer = GameServer;
 export default GameServer;
 
 import Animal from './Animal'
 import AOI from './AOI'
+import Battle from './Battle'
 import Building from './Building'
 import Camp from './Camp'
 import Civ from './Civ'
@@ -50,7 +50,6 @@ import World from '../shared/World'
 
 var ListMap = require('../shared/ListMap.js').ListMap;
 var Remains = require('./NPC.js').Remains;
-var Battle = require('./Battle.js').Battle;
 var BattleCell = require('./Battle.js').BattleCell;
 var Prism = require('./Prism.js').Prism;
 var Schemas = require('./schemas.js');
@@ -1183,6 +1182,7 @@ GameServer.handleBattle = function(attacker,attacked){
     }
     var battle = GameServer.checkBattleOverlap(area);
     if(!battle) battle = new Battle();
+    
     battle.addFighter(attacker);
     battle.addFighter(attacked);
     GameServer.addBattleArea(area,battle);

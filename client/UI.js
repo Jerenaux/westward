@@ -1,7 +1,9 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 14-03-18.
  */
+import BattleManager from './BattleManager'
 import Boot from './Boot';
+import Bubble from './Bubble'
 import ClassPanel from './ClassPanel'
 import Client from './Client'
 import Engine from './Engine'

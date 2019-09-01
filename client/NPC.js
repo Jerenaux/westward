@@ -1,8 +1,10 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 01-08-18.
  */
-
+import BattleManager from './BattleManager'
+import Engine from './Engine'
 import Moving from './Moving'
+import UI from './UI'
 
 var NPC = new Phaser.Class({
 

@@ -1,6 +1,7 @@
 /**
  * Created by Jerome on 07-10-17.
  */
+import Client from './Client'
 import Engine from './Engine'
 import UI from './UI'
 import UIHolder from './UIHolder'
