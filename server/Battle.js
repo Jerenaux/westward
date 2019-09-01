@@ -1,10 +1,10 @@
 /**
  * Created by Jerome on 27-10-17.
  */
-var Pathfinder = require('../shared/Pathfinder.js').Pathfinder;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 
 import GameServer from './GameServer'
+import Pathfinder from '../shared/Pathfinder'
 import Utils from '../shared/Utils'
 
 var TICK_RATE;
