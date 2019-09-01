@@ -9,7 +9,10 @@
   },
   "nodemonConfig": {
     "watch": [
-      "dist"
+      [
+        "server",
+        "shared"
+      ]
     ],
     "ext": "ts,js,html",
     "ignore": [
@@ -24,7 +27,7 @@
     "dev": "concurrently \"npm run watch-webpack\" \"npm run watch-node\"",
     "start": "node dist/server.js",
     "test": "mocha test",
-    "watch-node": "nodemon",
+    "watch-node": "nodemon ./dist/server.js localhost 8080",
     "watch-webpack": "webpack-dev-server"
   },
   "engines": {

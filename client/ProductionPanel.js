@@ -262,4 +262,4 @@ ProdSlot.prototype.hide = function(){
     this.bar.hide();
 };
 
-export default Panel
+export default ProductionPanel

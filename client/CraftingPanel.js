@@ -4,6 +4,7 @@
 import Engine from './Engine'
 import IngredientSlot from './IngredientSlot'
 import Panel from './Panel'
+import Utils from '../shared/Utils'
 
 function CraftingPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);

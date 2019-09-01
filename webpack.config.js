@@ -12,7 +12,8 @@ module.exports = {
     },
     output: {
         filename: "[name].js",
-        path: path.resolve(__dirname, 'dist')
+        path: path.resolve(__dirname, 'dist'),
+        publicPath: "/dist/"
     },
     node: {
         __dirname: false
@@ -24,6 +25,15 @@ module.exports = {
     watch: true,
     watchOptions: {
         ignored: ['maps','node_modules']
+    },
+
+    devServer: {
+        proxy: {
+            '*': {
+                target: 'http://localhost:8081/',
+                secure: false
+            }
+        }
     },
 
     resolve: {

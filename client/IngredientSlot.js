@@ -1,4 +1,5 @@
 import ItemSlot from "./ItemSlot";
+import UI from './UI'
 import Utils from '../shared/Utils'
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 31-08-19.

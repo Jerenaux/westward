@@ -271,7 +271,7 @@ GameServer.getBootParams = function(socket,data){
                 if(doc) {
                     pkg.newPlayer = false;
                 }else{
-                    console.log('Unrecognized returning player ');
+                    console.log('Unrecognized returning player');
                     pkg.newPlayer = true;
                 }
                 // console.log(pkg);

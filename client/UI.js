@@ -2,11 +2,16 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 14-03-18.
  */
 import Boot from './Boot';
+import ClassPanel from './ClassPanel'
 import Client from './Client'
 import Engine from './Engine'
+import InfoPanel from './InfoPanel'
+import Menu from './Menu'
 import {Stats} from '../shared/Stats'
 import Tooltip from './Tooltip'
 import UICursor from './UICursor'
+import UIHolder from './UIHolder'
+import Utils from '../shared/Utils'
 
 var UI = {
     key: 'UI',

@@ -285,6 +285,4 @@ Panel.prototype.hideButtons = function(){
     });
 };
 
-
-
 export default Panel

@@ -1,6 +1,7 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 16-03-18.
  */
+import Panel from './Panel'
 
 function InfoPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title,false);
@@ -32,3 +33,5 @@ InfoPanel.prototype.hide = function(){
     this.hideTexts();
     //if(this.button) this.button.hide();
 };
+
+export default InfoPanel

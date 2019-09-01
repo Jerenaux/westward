@@ -1,6 +1,9 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 16-03-18.
  */
+import Panel from './Panel'
+import Utils from '../shared/Utils'
+
 function ClassPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
 }
@@ -28,3 +31,5 @@ ClassPanel.prototype.hide = function(){
     this.button.hide();
     this.hideTexts();
 };
+
+export default ClassPanel
