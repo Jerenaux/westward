@@ -582,6 +582,4 @@ UI.debugScreen = function () {
     graphics.closePath();
 };
 
-const UIscene = UI.scene;
-
-export {UI, UIscene}
+export default UI

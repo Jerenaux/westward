@@ -10,7 +10,7 @@ const UICursor = new Phaser.Class({
 
     initialize: function UICursor() {
 
-        CustomSprite.call(this, UI.scene, UI.getGameWidth()/2, UI.getGameHeight()/2, 'cursors','cursor');
+        CustomSprite.call(this, 'UI', UI.getGameWidth()/2, UI.getGameHeight()/2, 'cursors','cursor');
 
         this.setDepth(10);
         this.setOrigin(0,0);

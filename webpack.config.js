@@ -4,7 +4,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
-const CircularDependencyPlugin = require('circular-dependency-plugin')
+const CircularDependencyPlugin = require('circular-dependency-plugin');
 
 module.exports = {
     entry: {
@@ -66,9 +66,9 @@ module.exports = {
     plugins: [
         new CircularDependencyPlugin({
             // exclude detection of files based on a RegExp
-            exclude: /a\.js|node_modules/,
+            exclude: /node_modules/,
             // add errors to webpack instead of warnings
-            failOnError: true,
+            failOnError: false,
             // allow import cycles that include an asyncronous import,
             // e.g. via import(/* webpackMode: "weak" */ './file.js')
             allowAsyncCycles: false,

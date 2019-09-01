@@ -1,6 +1,7 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 16-03-18.
  */
+import BigButton from './BigButton'
 import Panel from './Panel'
 
 function InfoPanel(x,y,width,height,title){

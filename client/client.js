@@ -4,6 +4,7 @@
 
 import Boot from './Boot'
 import Engine from './Engine'
+import UI from './UI'
 
 var Client = {
     initEventName: 'init', // name of the event that triggers the call to initWorld() and the initialization of the game

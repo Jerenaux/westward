@@ -37,7 +37,7 @@ import Remains from './Remains'
 // import RepairPanel from './RepairPanel'
 // import {ShopPanel, ShopGoldPanel} from './ShopPanel'
 import {SpaceMap} from '../shared/SpaceMap';
-// import StatsPanel from './StatsPanel'
+import StatsPanel from './StatsPanel'
 import UI from './UI'
 
 import Utils from '../shared/Utils'
