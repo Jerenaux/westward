@@ -37,6 +37,7 @@
   "license": "ISC",
   "devDependencies": {
     "chai": "^4.2.0",
+    "circular-dependency-plugin": "^5.2.0",
     "concurrently": "^4.1.2",
     "css-loader": "^3.2.0",
     "dir-compare": "^1.7.3",

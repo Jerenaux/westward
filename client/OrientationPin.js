@@ -4,7 +4,7 @@
 
 import CustomSprite from './CustomSprite'
 import Engine from './Engine'
-import UI from './UI'
+import UIscene from './UI'
 import Utils from '../shared/Utils'
 import World from '../shared/World'
 
@@ -14,7 +14,7 @@ var OrientationPin = new Phaser.Class({
     // Extends: Phaser.GameObjects.RenderTexture,
 
     initialize: function OrientationPin(type,iconAtlas,iconFrame) {
-        CustomSprite.call(this, UI.scene, 0, 0,'orientation');
+        CustomSprite.call(this, UIscene, 0, 0,'orientation');
         // Phaser.GameObjects.RenderTexture.call(this, UI.scene, 0, 0, 48,64);
         // UI.scene.add.displayList.add(this);
 

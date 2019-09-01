@@ -1,8 +1,10 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 16-03-18.
  */
+import BigButton from './BigButton'
 import Panel from './Panel'
 import Utils from '../shared/Utils'
+import UI from './UI'
 
 function ClassPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);

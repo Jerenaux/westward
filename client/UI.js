@@ -7,6 +7,7 @@ import Client from './Client'
 import Engine from './Engine'
 import InfoPanel from './InfoPanel'
 import Menu from './Menu'
+import NamePanel from './NamePanel'
 import {Stats} from '../shared/Stats'
 import Tooltip from './Tooltip'
 import UICursor from './UICursor'
@@ -581,4 +582,6 @@ UI.debugScreen = function () {
     graphics.closePath();
 };
 
-export default UI;
+const UIscene = UI.scene;
+
+export {UI, UIscene}

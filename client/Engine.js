@@ -1,44 +1,45 @@
 /**
  * Created by Jerome on 26-06-17.
  */
-import AbilitiesPanel from './AbilitiesPanel'
-import AbilityPanel from './AbilityPanel'
-import BattleEquipmentPanel from './BattleEquipmentPanel'
+// import AbilitiesPanel from './AbilitiesPanel'
+// import AbilityPanel from './AbilityPanel'
+// import BattleEquipmentPanel from './BattleEquipmentPanel'
 import Animal from './Animal'
 import BattleManager from './BattleManager'
 import BattleTile from './BattleTile'
 import BigButton from './BigButton'
 import BuildingTitle from './BuildingTitle'
-import BuildPanel from './BuildPanel'
+// import BuildPanel from './BuildPanel'
 import Capsule from './Capsule'
 import Boot from './Boot';
 import Building from './Building'
-import CharacterPanel from './CharacterPanel'
+// import CharacterPanel from './CharacterPanel'
 import Chunk from './Chunk'
 import Civ from './Civ'
-import ClassMiniPanel from './ClassMiniPanel'
+// import ClassMiniPanel from './ClassMiniPanel'
 import Client from './Client';
-import ConstructionPanel from './ConstructionPanel'
-import CraftingPanel from './CraftingPanel'
+// import ConstructionPanel from './ConstructionPanel'
+// import CraftingPanel from './CraftingPanel'
 import Hero from './Hero'
 import {HighlightPipeline, HollowPipeline} from './shaders'
-import InventoryPanel from './InventoryPanel'
+// import InventoryPanel from './InventoryPanel'
 import Item from './Item'
-import JournalPanel from './JournalPanel'
+// import JournalPanel from './JournalPanel'
 import Menu from './Menu'
 import menuIcon from './menuIcon';
 import MiniMap from './MiniMap'
-import Panel from './Panel'
+// import Panel from './Panel'
 import Pathfinder from '../shared/Pathfinder'
 import Player from './Player'
-import PricesPanel from './PricesPanel'
-import RecipesPanel from './RecipesPanel'
+// import PricesPanel from './PricesPanel'
+// import RecipesPanel from './RecipesPanel'
 import Remains from './Remains'
-import RepairPanel from './RepairPanel'
-import {ShopPanel, ShopGoldPanel} from './ShopPanel'
+// import RepairPanel from './RepairPanel'
+// import {ShopPanel, ShopGoldPanel} from './ShopPanel'
 import {SpaceMap} from '../shared/SpaceMap';
-import StatsPanel from './StatsPanel'
+// import StatsPanel from './StatsPanel'
 import UI from './UI'
+
 import Utils from '../shared/Utils'
 import World from '../shared/World';
 
@@ -867,7 +868,7 @@ Engine.makeUI = function(){
     Engine.repairAction.moveUp(2);
 
     Engine.menus = {
-        'abilities': Engine.makeAbilitiesMenu(),
+        // 'abilities': Engine.makeAbilitiesMenu(),
         'battle': Engine.makeBattleMenu(),
         'build': Engine.makeBuildMenu(),
         'character': Engine.makeCharacterMenu(),
