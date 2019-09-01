@@ -1,6 +1,9 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 28-04-19.
  */
+import Engine from './Engine'
+import Panel from './Panel'
+import UI from './UI'
 
 function RestPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title,false);
@@ -61,3 +64,5 @@ RestPanel.prototype.hide = function(){
     this.face.setVisible(false);
     this.hideTexts();
 };
+
+export default RestPanel

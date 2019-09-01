@@ -2,9 +2,8 @@
  * Created by Jerome on 06-10-17.
  */
 
-// import Button from './Button'
+import Button from './Button'
 import Capsule from './Capsule'
-import Engine from './Engine'
 import Frame from './Frame'
 import UI from './UI'
 import Utils from '../shared/Utils'
@@ -23,7 +22,7 @@ Panel.prototype = Object.create(Frame.prototype);
 Panel.prototype.constructor = Panel;
 
 Panel.prototype.addCapsule = function(name,x,y,text,icon){
-    var capsule = new Capsule(this.x+x,this.y+y,'UI',icon,this.content);
+    var capsule = new Capsule(UI.scene,this.x+x,this.y+y,'UI',icon,this.content);
     capsule.setText(text);
     this.capsules[name] = capsule;
     return capsule;
@@ -257,15 +256,15 @@ Panel.prototype.display = function(){
         })
     }
 
-    Engine.inPanel = true;
-    Engine.currentPanel = this;
+    UI.inPanel = true;
+    UI.currentPanel = this;
 };
 
 Panel.prototype.hide = function(){
     Frame.prototype.hide.call(this);
     if(this.scrollable) this.scroll(-this.scrolled);
     if(this.button) this.button.hide(); // big button
-    Engine.inPanel = false;
+    UI.inPanel = false;
 };
 
 Panel.prototype.displayButtons = function(){

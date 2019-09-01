@@ -1,6 +1,11 @@
 /**
  * Created by Jerome on 28-11-17.
  */
+import Engine from './Engine'
+import {Equipment} from '../shared/Equipment'
+import ItemSprite from './ItemSprite'
+import Panel from './Panel'
+import UI from './UI'
 
 function EquipmentPanel(x, y, width, height, title, battleMenu) {
     Panel.call(this, x, y, width, height, title);

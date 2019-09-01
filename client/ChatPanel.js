@@ -1,6 +1,8 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 16-02-18.
  */
+import Panel from './Panel'
+import UI from './UI'
 
 function ChatPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
@@ -38,7 +40,7 @@ ChatPanel.prototype.toggle = function(){
 
 ChatPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
-    Engine.inPanel = false;
+    UI.inPanel = false;
     this.input.style.display = "inline";
     this.input.focus();
 };
@@ -48,3 +50,5 @@ ChatPanel.prototype.hide = function(){
     this.input.style.display = "none";
     this.input.value = "";
 };
+
+export default ChatPanel

@@ -1,3 +1,5 @@
+import UI from './UI'
+
 var menuIcon = function(x,y,icon,menu,tox,toy){
     this.fromx = x;
     this.fromy = y;

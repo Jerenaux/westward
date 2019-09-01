@@ -49,7 +49,7 @@ var Boot = new Phaser.Class({
             document.getElementById("danger").innerText = "Your browser does not support WebGL. Some visual effects will be disabled or may render poorly.";
         }
 
-        if(detectBrowser() != "Chrome") document.getElementById("browser").innerText = "This development version is best played using Chrome. With other browsers, lag and rendering issues may arise.";
+        if(Boot.detectBrowser() != "Chrome") document.getElementById("browser").innerText = "This development version is best played using Chrome. With other browsers, lag and rendering issues may arise.";
     },
 
     updateReadyTick: function() {
@@ -96,8 +96,7 @@ Boot.bootParamsReceived = function(){
     this.readyTicks++;
 };
 
-
-function detectBrowser(){
+Boot.detectBrowser = function(){
     // Opera 8.0+
     var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
     if(isOpera) return 'Opera';

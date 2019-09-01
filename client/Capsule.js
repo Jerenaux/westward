@@ -1,18 +1,17 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 31-08-19.
  */
-import UI from './UI'
-
-function Capsule(x,y,iconAtlas,iconFrame,container){
+function Capsule(scene,x,y,iconAtlas,iconFrame,container){
+    this.scene = scene;
     this.slices = [];
     this.icon = null;
     this.width = 1;
-    this.width_ = this.width; // previous width
+    this.width_ = this.width;  // previous width
     var capsuleDepth = 2;
     var contentDepth = 3;
 
     if(iconFrame) {
-        this.icon = UI.scene.add.sprite(x+8,y+6,iconAtlas,iconFrame);
+        this.icon = this.scene.add.sprite(x+8,y+6,iconAtlas,iconFrame);
         this.icon.setDepth(contentDepth);
         this.icon.setScrollFactor(0);
         this.icon.setDisplayOrigin(0,0);
@@ -21,15 +20,15 @@ function Capsule(x,y,iconAtlas,iconFrame,container){
     var textX = (this.icon ? x + this.icon.width : x) + 10;
     var textY = (this.icon ? y +1: y+2);
 
-    this.text = UI.scene.add.text(textX, textY, '',
+    this.text = this.scene.add.text(textX, textY, '',
         { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
     );
 
-    this.slices.push(UI.scene.add.sprite(x,y,'UI','capsule-left'));
+    this.slices.push(this.scene.add.sprite(x,y,'UI','capsule-left'));
     x += 24;
-    this.slices.push(UI.scene.add.tileSprite(x,y,this.width,24,'UI','capsule-middle'));
+    this.slices.push(this.scene.add.tileSprite(x,y,this.width,24,'UI','capsule-middle'));
     x += this.width;
-    this.slices.push(UI.scene.add.sprite(x,y,'UI','capsule-right'));
+    this.slices.push(this.scene.add.sprite(x,y,'UI','capsule-right'));
 
     this.slices.forEach(function(e){
         e.setDepth(capsuleDepth);
@@ -50,20 +49,20 @@ function Capsule(x,y,iconAtlas,iconFrame,container){
     }
 }
 
-Capsule.prototype.setHoverText = function(title,text){
+Capsule.prototype.setHoverText = function(tooltip,title,text){
     var w = this.slices[0].width + this.slices[1].width + this.slices[2].width;
-    var zone = UI.scene.add.zone(this.slices[0].x,this.slices[0].y,w,this.slices[1].height);
+    var zone = this.scene.add.zone(this.slices[0].x,this.slices[0].y,w,this.slices[1].height);
     zone.setDepth(10);
     zone.setOrigin(0);
     zone.setScrollFactor(0);
     zone.setInteractive();
     zone.setVisible(false);
     zone.on('pointerover',function(){
-        UI.tooltip.updateInfo('free',{title:title,body:text});
-        UI.tooltip.display();
+        tooltip.updateInfo('free',{title:title,body:text});
+        tooltip.display();
     });
     zone.on('pointerout',function(){
-        UI.tooltip.hide();
+        tooltip.hide();
     });
     this.zone = zone;
 };

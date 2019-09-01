@@ -14,11 +14,11 @@ function BattleEquipmentPanel() {
     this.melee = this.addEquipmentHolder(950, 515);
     this.range = this.addEquipmentHolder(1000, 500, true);
 
-    this.atkCapsule = new Capsule(870, 510, 'UI', '2swords');
+    this.atkCapsule = new Capsule(UI.scene, 870, 510, 'UI', '2swords');
     this.atkCapsule.update = function () {
         this.setText(1);
     };
-    this.defCapsule = new Capsule(815, 510, 'UI', 'round_shield');
+    this.defCapsule = new Capsule(UI.scene, 815, 510, 'UI', 'round_shield');
     this.defCapsule.update = function () {
         this.setText(1);
     };

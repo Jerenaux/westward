@@ -1,6 +1,10 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 07-04-18.
  */
+import BigButton from './BigButton'
+import ItemSprite from './ItemSprite'
+import Panel from './Panel'
+import Utils from '../shared/Utils'
 
 function ItemActionPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
@@ -78,3 +82,5 @@ ItemActionPanel.prototype.hide = function(){
     this.useButton.hide();
     this.beltButton.hide();
 };
+
+export default ItemActionPanel

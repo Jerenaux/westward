@@ -87,7 +87,7 @@ TutorialManager.displayNext = function(){
     panel.display();
     panel.moveUp(5);
     Engine.currentTutorialPanel = panel;
-    Engine.inPanel = false;
+    UI.inPanel = false;
 };
 
 // Check if the current hook is already triggered

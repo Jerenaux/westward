@@ -1,41 +1,51 @@
 /**
  * Created by Jerome on 26-06-17.
  */
-// import AbilitiesPanel from './AbilitiesPanel'
-// import AbilityPanel from './AbilityPanel'
-// import BattleEquipmentPanel from './BattleEquipmentPanel'
+import AbilitiesPanel from './AbilitiesPanel'
+import AbilityPanel from './AbilityPanel'
+import BattleEquipmentPanel from './BattleEquipmentPanel'
 import Animal from './Animal'
 import BattleManager from './BattleManager'
 import BattleTile from './BattleTile'
 import BigButton from './BigButton'
 import BuildingTitle from './BuildingTitle'
-// import BuildPanel from './BuildPanel'
+import BuildPanel from './BuildPanel'
 import Capsule from './Capsule'
 import Boot from './Boot';
 import Building from './Building'
-// import CharacterPanel from './CharacterPanel'
+import CharacterPanel from './CharacterPanel'
+import ChatPanel from './ChatPanel'
 import Chunk from './Chunk'
 import Civ from './Civ'
-// import ClassMiniPanel from './ClassMiniPanel'
+import ClassMiniPanel from './ClassMiniPanel'
 import Client from './Client';
-// import ConstructionPanel from './ConstructionPanel'
-// import CraftingPanel from './CraftingPanel'
+import ConstructionPanel from './ConstructionPanel'
+import CraftingPanel from './CraftingPanel'
+import EquipmentPanel from './EquipmentPanel'
 import Hero from './Hero'
 import {HighlightPipeline, HollowPipeline} from './shaders'
-// import InventoryPanel from './InventoryPanel'
+import InfoPanel from './InfoPanel'
+import InventoryPanel from './InventoryPanel'
 import Item from './Item'
-// import JournalPanel from './JournalPanel'
+import ItemActionPanel from './ItemActionPanel'
+import JournalPanel from './JournalPanel'
+import MapPanel from './MapPanel'
 import Menu from './Menu'
 import menuIcon from './menuIcon';
 import MiniMap from './MiniMap'
-// import Panel from './Panel'
+import Panel from './Panel'
 import Pathfinder from '../shared/Pathfinder'
+import PFUtils from '../shared/PFUtils'
 import Player from './Player'
-// import PricesPanel from './PricesPanel'
-// import RecipesPanel from './RecipesPanel'
+import PricesPanel from './PricesPanel'
+import ProductionPanel from './ProductionPanel'
+import RecipesPanel from './RecipesPanel'
 import Remains from './Remains'
-// import RepairPanel from './RepairPanel'
-// import {ShopPanel, ShopGoldPanel} from './ShopPanel'
+import RepairPanel from './RepairPanel'
+import RespawnPanel from './RespawnPanel'
+import RestPanel from './RestPanel'
+import ShopInventoryPanel from './ShopInventoryPanel'
+import {ShopPanel, ShopGoldPanel} from './ShopPanel'
 import {SpaceMap} from '../shared/SpaceMap';
 import StatsPanel from './StatsPanel'
 import UI from './UI'
@@ -331,10 +341,10 @@ Engine.create = function(){
     Engine.resources = new SpaceMap();
 
     Engine.inMenu = false;
-    Engine.inPanel = false;
+    UI.inPanel = false;
     Engine.dead = false;
     Engine.currentMenu = null;
-    Engine.currentPanel = null;
+    UI.currentPanel = null;
 
     Engine.useBlitters = false;
     if(Engine.useBlitters){
@@ -806,39 +816,39 @@ Engine.makeUI = function(){
     Engine.faceHolder = UI.scene.add.sprite(x,y,'UI','facebg').setScrollFactor(0).setDepth(2);
     Engine.face = UI.scene.add.sprite(x,y,'faces',0).setScrollFactor(0).setDepth(3);
 
-    Engine.lifeCapsule = new Capsule(37,3,'UI','heart');
-    Engine.lifeCapsule.setHoverText('Vitality',UI.textsData['health_help']);
+    Engine.lifeCapsule = new Capsule(UI.scene,37,3,'UI','heart');
+    Engine.lifeCapsule.setHoverText(UI.tooltip,'Vitality',UI.textsData['health_help']);
     Engine.lifeCapsule.removeLeft();
     Engine.lifeCapsule.display();
     Engine.lifeCapsule.update = function(){
         this.setText(Engine.player.getStatValue('hp')+'/'+Engine.player.getStatValue('hpmax'));
     };
 
-    Engine.goldCapsule = new Capsule(152,3,'UI','gold');
-    Engine.goldCapsule.setHoverText('Gold',UI.textsData['gold_help']);
+    Engine.goldCapsule = new Capsule(UI.scene,152,3,'UI','gold');
+    Engine.goldCapsule.setHoverText(UI.tooltip,'Gold',UI.textsData['gold_help']);
     Engine.goldCapsule.display();
     Engine.goldCapsule.update = function(){
         this.setText(Engine.player.gold || 0); // TODO: add max
     };
     Engine.goldCapsule.update();
 
-    Engine.bagCapsule = new Capsule(228,3,'UI','smallpack');
-    Engine.bagCapsule.setHoverText('Backpack',UI.textsData['backpack_help']);
+    Engine.bagCapsule = new Capsule(UI.scene,228,3,'UI','smallpack');
+    Engine.bagCapsule.setHoverText(UI.tooltip,'Backpack',UI.textsData['backpack_help']);
     Engine.bagCapsule.display();
     Engine.bagCapsule.update = function(){
         this.setText(Engine.player.inventory.size+'/'+Engine.player.inventory.maxSize);
     };
     Engine.bagCapsule.update();
 
-    Engine.vigorCapsule = new Capsule(50,30,'UI','goldenheart');
-    Engine.vigorCapsule.setHoverText('Vigor',UI.textsData['vigor_help']);
+    Engine.vigorCapsule = new Capsule(UI.scene,50,30,'UI','goldenheart');
+    Engine.vigorCapsule.setHoverText(UI.tooltip,'Vigor',UI.textsData['vigor_help']);
     Engine.vigorCapsule.display();
     Engine.vigorCapsule.update = function(){
         this.setText(Engine.player.getStatValue('vigor')+'%');
     };
 
-    Engine.foodCapsule = new Capsule(140,30,'UI','bread');
-    Engine.foodCapsule.setHoverText('Food',UI.textsData['food_help']);
+    Engine.foodCapsule = new Capsule(UI.scene,140,30,'UI','bread');
+    Engine.foodCapsule.setHoverText(UI.tooltip,'Food',UI.textsData['food_help']);
     Engine.foodCapsule.display();
     Engine.foodCapsule.update = function(){
         this.setText(Engine.player.getStatValue('food')+'%');
@@ -1144,7 +1154,7 @@ Engine.makeProductionMenu = function(){
     var productionPanel = new ProductionPanel(x,y,w,h);
     productionPanel.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['prod_help']);
     var gold = productionPanel.addCapsule('gold',20,20,'999','gold');
-    gold.setHoverText('Building gold',UI.textsData['shopgold_help']);
+    gold.setHoverText(UI.tooltip,'Building gold',UI.textsData['shopgold_help']);
     production.addPanel('production',productionPanel);
 
     var action = new ShopPanel(212,440,300,100,'Take',true); // true = not shop, hack
@@ -1191,7 +1201,7 @@ Engine.makeConstructionMenu = function(){
     progress.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['progress_help']);
     constr.addPanel('progress',progress);
     var gold = progress.addCapsule('gold',20,-9,'999','gold');
-    gold.setHoverText('Building gold',UI.textsData['shopgold_help']);
+    gold.setHoverText(UI.tooltip,'Building gold',UI.textsData['shopgold_help']);
 
     var aw = 300;
     var action = constr.addPanel('action',new ShopPanel(212,390,aw,100,'Give',true),true);
@@ -1343,12 +1353,12 @@ Engine.makeTradeMenu = function(){
     var client = trade.addPanel('client',new ShopInventoryPanel(center-w-space,y,w,h,'You'));
     client.setInventory('player');
     var gold = client.addCapsule('gold',120,-9,'999','gold');
-    gold.setHoverText('Your gold',UI.textsData['gold_help']);
+    gold.setHoverText(UI.tooltip,'Your gold',UI.textsData['gold_help']);
     client.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['sell_help']);
     var shop =  trade.addPanel('shop',new ShopInventoryPanel(center+space,y,w,h,'Shop'));
     shop.setInventory('building');
     var shopgold = shop.addCapsule('gold',100,-9,'999','gold');
-    shopgold.setHoverText('Shop gold',UI.textsData['shopgold_help']);
+    shopgold.setHoverText(UI.tooltip,'Shop gold',UI.textsData['shopgold_help']);
     shop.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help']);
     w = 300;
     var x = (Engine.getGameConfig().width-w)/2;
@@ -1409,7 +1419,7 @@ Engine.makeCraftingMenu = function(){
     var recipes = crafting.addPanel('shop',new RecipesPanel(combix+combiw+space,y,recipesw,h,'Recipes'));
     recipes.setInventory('crafting');
     var gold = recipes.addCapsule('gold',120,-9,'999','gold');
-    gold.setHoverText('Workshop gold',UI.textsData['shopgold_help']);
+    gold.setHoverText(UI.tooltip,'Workshop gold',UI.textsData['shopgold_help']);
     recipes.addButton(recipesw-30, 8, 'blue','help',null,'',UI.textsData['recipes_help']);
 
     var combi = crafting.addPanel('combi',new CraftingPanel(combix,y,combiw,h,'Crafting'));
@@ -1532,7 +1542,7 @@ Engine.makeInventory = function(statsPanel){
     items.setInventory('player',15,true,Engine.backpackClick);
 
     var gold = items.addCapsule('gold',130,-9,'999','gold');
-    gold.setHoverText('Gold',UI.textsData['gold_help']);
+    gold.setHoverText(UI.tooltip,'Gold',UI.textsData['gold_help']);
     items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help']);
 
     inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,120),true);
@@ -1550,7 +1560,9 @@ Engine.makeInventory = function(statsPanel){
     inventory.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
     inventory.addEvent('onUpdateInventory',items.updateInventory.bind(items));
     inventory.addEvent('onUpdateBelt',belt.updateInventory.bind(belt));
-    inventory.addEvent('onUpdateStats',statsPanel.updateStats.bind(statsPanel));
+    inventory.addEvent('onUpdateStats',function(){
+        statsPanel.updateStats(Engine.player);
+    });
     inventory.addEvent('onUpdateGold',function(){
         items.updateCapsule('gold',Engine.player.gold);
     });
@@ -1558,7 +1570,7 @@ Engine.makeInventory = function(statsPanel){
         equipment.updateEquipment();
         items.updateInventory();
         belt.updateInventory();
-        statsPanel.updateStats();
+        statsPanel.updateStats(Engine.player);
         items.updateCapsule('gold',Engine.player.gold);
     });
     return inventory;
@@ -2061,7 +2073,7 @@ Engine.countIcons = function(){
 };
 
 Engine.processNPCClick = function(target){
-    if(Engine.inPanel) return;
+    if(UI.inPanel) return;
     if(target.dead){
         var action = target.entityType == 'animal' ? 2 : 4;
         Engine.player.setDestinationAction(action,target.id,target.tileX,target.tileY); // 2 for NPC
@@ -2072,7 +2084,7 @@ Engine.processNPCClick = function(target){
 };
 
 Engine.processItemClick = function(target){
-    if(Engine.inPanel) return;
+    if(UI.inPanel) return;
     Engine.player.setDestinationAction(3,target.id,target.tileX,target.tileY); // 3 for item
     Engine.computePath({x:target.tileX,y:target.tileY},true);
 };
@@ -2169,12 +2181,12 @@ Engine.closePanel = function(){this.hide();};
 Engine.togglePanel = function(){ // When clicking on a player/building/animal, toggle the corresponding panel visibility
     if(Engine.inMenu) return;
     if(this.panel.displayed){
-        Engine.inPanel = false;
-        Engine.currentPanel = null;
+        UI.inPanel = false;
+        UI.currentPanel = null;
     }else {
-        if(Engine.inPanel) Engine.currentPanel.hide();
-        Engine.inPanel = true;
-        Engine.currentPanel = this.panel;
+        if(UI.inPanel) UI.currentPanel.hide();
+        UI.inPanel = true;
+        UI.currentPanel = this.panel;
     }
     this.panel.toggle();
 };
@@ -2302,8 +2314,8 @@ Engine.leaveBuilding = function(){
 };
 
 Engine.snap = function(){
-    game.renderer.snapshot(function(img){
-        Client.sendScreenshot(img.src,detectBrowser());
+    Engine.getGameInstance().renderer.snapshot(function(img){
+        Client.sendScreenshot(img.src,Boot.detectBrowser());
     });
 };
 

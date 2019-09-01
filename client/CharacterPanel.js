@@ -1,7 +1,9 @@
 /**
  * Created by jeren on 07-01-18.
  */
+import Engine from './Engine'
 import Panel from './Panel'
+import UI from './UI'
 
 function CharacterPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);

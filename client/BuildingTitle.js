@@ -108,7 +108,7 @@ function BuildingTitle(x,y){
 }
 
 BuildingTitle.prototype.addCapsule = function(name,x,y,text,icon){
-    var capsule = new Capsule(this.slices[0].x+x,this.slices[0].y+y,'UI',icon,this.content);
+    var capsule = new Capsule(UI.scene, this.slices[0].x+x,this.slices[0].y+y,'UI',icon,this.content);
     capsule.setText(text);
     this.capsule = capsule;
 };

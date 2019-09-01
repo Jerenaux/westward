@@ -1,7 +1,11 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 13-02-18.
  */
+import BigButton from './BigButton'
+import Engine from './Engine'
+import Frame from './Frame'
 import Panel from './Panel'
+import UI from './UI'
 
 function ProductionPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);

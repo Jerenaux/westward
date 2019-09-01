@@ -9,6 +9,7 @@ import {EquipmentManager} from '../shared/Equipment'
 import Inventory from '../shared/Inventory'
 import Player from './Player'
 import {StatsContainer} from '../shared/Stats'
+import UI from './UI'
 import Utils from '../shared/Utils'
 import World from '../shared/World'
 

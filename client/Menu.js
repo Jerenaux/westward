@@ -1,6 +1,7 @@
 /**
  * Created by Jerome on 07-10-17.
  */
+import Engine from './Engine'
 import UI from './UI'
 import UIHolder from './UIHolder'
 
@@ -78,7 +79,7 @@ Menu.prototype.hideIcon = function(){
 
 Menu.prototype.display = function(){
     if(Engine.inMenu) Engine.currentMenu.hide();
-    if(Engine.inPanel) Engine.currentPanel.hide();
+    if(UI.inPanel) UI.currentPanel.hide();
     if(Engine.chatBar && Engine.chatBar.displayed) Engine.chatBar.hide();
     if(Engine.player.moving) Engine.player.selfStop();
 

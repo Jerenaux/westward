@@ -1,7 +1,8 @@
 /**
  * Created by Jerome on 29-11-17.
  */
-
+import Engine from './Engine'
+import {Stats} from "../shared/Stats";
 import UI from './UI';
 
 var Tooltip = new Phaser.Class({

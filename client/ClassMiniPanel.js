@@ -1,6 +1,7 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 16-06-18.
  */
+import Formulas from '../shared/Formulas'
 import {MiniProgressBar} from "./ProgressBar"
 import Panel from './Panel'
 import UI from './UI'

@@ -2,7 +2,8 @@
  * Created by Jerome on 04-10-17.
  */
 
-import Bubble from './Bubble' 
+import Bubble from './Bubble'
+import Client from './Client'
 import CustomSprite from './CustomSprite'
 import Engine from './Engine'
 import PFUtils from '../shared/PFUtils'

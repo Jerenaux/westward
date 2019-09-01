@@ -2,6 +2,7 @@
  * Created by Jerome on 12-01-18.
  */
 
+import Boot from './Boot'
 import CustomSprite from './CustomSprite'
 import Engine from './Engine'
 import UI from './UI'
