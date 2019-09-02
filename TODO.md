@@ -505,12 +505,16 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
+-> Progress bar not updated when giving to bld
+-> Speed up server boot / measure what is slow
+-> Don't load sounds in preload, load in create and don't play them unless found in cache (bonus)
 -> Don't commit compiled files, compile after push and have env variable determine mode
 https://snowbillr.github.io/blog//2018-04-09-a-modern-web-development-setup-for-phaser-3/
 https://github.com/nkholski/phaser3-es6-webpack
--> Look into Phaser doc about how to include only what is really necessary (no physics, ...)
+-> Custom Phaser build (bonus)
 https://medium.com/@louigi.verona/reducing-phasers-filesize-custom-phaser-builds-4a0314819a38
 -> https://codeutopia.net/blog/2015/01/06/es6-what-are-the-benefits-of-the-new-features-in-practice/
+-> Uglifiy/minify/mangle for production
 - Desktop app (automated)
 -> https://electronjs.org/docs/tutorial/application-distribution
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)

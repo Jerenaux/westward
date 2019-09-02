@@ -7,6 +7,9 @@ import Engine from './Engine'
 import Panel from './Panel'
 import Utils from '../shared/Utils'
 
+import buildingsData from '../assets/data/buildings.json'
+import itemsData from '../assets/data/items.json'
+
 function ConstructionPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
     this.texts = [];
@@ -43,7 +46,7 @@ ConstructionPanel.prototype.displayInterface = function(){
         this.tgBtn.display();
     }
 
-    var materials = Engine.buildingsData[Engine.currentBuiling.buildingType].recipe;
+    var materials = buildingsData[Engine.currentBuiling.buildingType].recipe;
     if(!materials) return;
     var i = 0;
     var total_needed = 0;
@@ -53,7 +56,7 @@ ConstructionPanel.prototype.displayInterface = function(){
         var slot = this.getNextLongSlot();
         var y = this.y + 100 + (i++ * 50);
         slot.setUp(this.x+20, y);
-        var itemData = Engine.itemsData[item];
+        var itemData = itemsData[item];
         slot.addIcon(itemData.atlas,itemData.frame);
         slot.addText(43,2,itemData.name,null,13);
         var owned = Engine.currentBuiling.getItemNb(item);

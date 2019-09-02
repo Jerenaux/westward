@@ -7,6 +7,8 @@ import {BigProgressBar} from './ProgressBar'
 import Panel from './Panel'
 import Utils from '../shared/Utils'
 
+import itemsData from '../assets/data/items.json'
+
 function RepairPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
     this.texts = [];
@@ -34,7 +36,7 @@ RepairPanel.prototype.displayInterface = function(){
     var y = this.y + 100;
     slot.setUp(this.x+20, y);
     var item = 3; // timber
-    var itemData = Engine.itemsData[item];
+    var itemData = itemsData[item];
     slot.addIcon(itemData.atlas,itemData.frame);
     slot.addText(43,2,itemData.name,null,13);
 

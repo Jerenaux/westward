@@ -53,6 +53,7 @@ import Utils from '../shared/Utils'
 import World from '../shared/World';
 
 import animalsData from '../assets/data/animals.json'
+import buildingsData from '../assets/data/buildings.json'
 
 var Engine = {
     // TODO: Move to conf?
@@ -312,11 +313,6 @@ Engine.create = function(){
 
     Engine.camera = Engine.scene.cameras.main;
     Engine.camera.setBounds(0,0,Engine.worldWidth*Engine.tileWidth,Engine.worldHeight*Engine.tileHeight);
-
-    // Engine.buildingsData = Engine.scene.cache.json.get('buildings');
-    // Engine.animalsData = Engine.scene.cache.json.get('animals');
-    // Engine.civsData = Engine.scene.cache.json.get('civs');
-    // Engine.itemsData = Engine.scene.cache.json.get('itemsData');
 
     Engine.createMarker();
     Engine.createAnimations();
@@ -1478,7 +1474,7 @@ Engine.makeBuildMenu = function(){
 };
 
 Engine.bldClick = function(){
-    var bld = Engine.buildingsData[this.bldID];
+    var bld = buildingsData[this.bldID];
     Engine.currentMenu.hide();
 
     Engine.hideMarker();
@@ -1493,7 +1489,6 @@ Engine.bldClick = function(){
 Engine.bldUnclick = function(shutdown){
     if(!Engine.bldRect.collides && !shutdown) {
         var id = Engine.bldRect.bldID;
-        //var bld = Engine.buildingsData[id];
         var pos = Engine.bldRect.getBottomLeft();
         pos.x = pos.x / 32;
         pos.y = (pos.y / 32) - 1;
@@ -2025,7 +2020,7 @@ Engine.enterBuilding = function(id){
     var building = Engine.buildings[id];
     Engine.inBuilding = true;
     Engine.currentBuiling = building; // used to keep track of which building is displayed in menus
-    var buildingData = Engine.buildingsData[building.buildingType];
+    var buildingData = buildingsData[building.buildingType];
 
     var mainMenu;
     if(building.built == true) {

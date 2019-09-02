@@ -8,6 +8,8 @@ import Panel from './Panel'
 import UI from './UI'
 import Utils from '../shared/Utils'
 
+import itemsData from '../assets/data/items.json'
+
 function ShopPanel(x,y,width,height,title,notShop){
     Panel.call(this,x,y,width,height,title);
     this.buttons = [];
@@ -101,7 +103,7 @@ ShopPanel.prototype.getDefaultTitle = function(){
 };
 
 ShopPanel.prototype.setUp = function(id,action,financial){
-    var data = Engine.itemsData[id];
+    var data = itemsData[id];
     this.financial = financial;
     this.shopItem.id = id;
     this.shopItem.count = 1;
