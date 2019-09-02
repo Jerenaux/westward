@@ -5,6 +5,8 @@ import Engine from './Engine'
 import NPC from './NPC'
 import OrientationPin from './OrientationPin'
 
+import civsData from '../assets/data/civs.json'
+
 var Civ = new Phaser.Class({
 
     Extends: NPC,
@@ -16,7 +18,7 @@ var Civ = new Phaser.Class({
     },
 
     setUp: function(data){
-        var civData = Engine.civsData[data.type];
+        var civData = civsData[data.type];
         this.id = data.id;
 
         Engine.civs[this.id] = this;

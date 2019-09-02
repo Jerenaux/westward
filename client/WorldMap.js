@@ -8,6 +8,9 @@ import {FoWPipeline} from "./shaders";
 import UI from './UI'
 import Utils from '../shared/Utils'
 
+import itemsData from '../assets/data/items.json'
+import buildingsData from '../assets/data/buildings.json'
+
 var fowID = 0;
 
 var WorldMap = new Phaser.Class({
@@ -442,13 +445,13 @@ var WorldMap = new Phaser.Class({
                 frame = (data.owner == Engine.player.id ? 'bld2own' : 'bld2');
             }
             this.addPin(data.x,data.y,
-                Engine.buildingsData[data.type].name,
+                buildingsData[data.type].name,
                 frame
             );
         },this);
         Engine.player.resourceMarkers.forEach(function(data){
             this.addPin(data[0],data[1],
-                Engine.itemsData[data[2]].name,
+                itemsData[data[2]].name,
                 'herb',
                 false
             );

@@ -5,6 +5,7 @@ import BattleManager from './BattleManager'
 import Engine from './Engine'
 import Moving from './Moving'
 import UI from './UI'
+import Utils from '../shared/Utils'
 
 var NPC = new Phaser.Class({
 

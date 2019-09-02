@@ -7,6 +7,9 @@ import ItemSprite from './ItemSprite'
 import Panel from './Panel'
 import UI from './UI'
 
+import itemsData from '../assets/data/items.json'
+
+
 function EquipmentPanel(x, y, width, height, title, battleMenu) {
     Panel.call(this, x, y, width, height, title);
     this.slots = [];
@@ -98,7 +101,7 @@ EquipmentPanel.prototype.updateEquipment = function () {
                 slot: slot.slotName
             };
         } else {
-            data = Engine.itemsData[newItem];
+            data = itemsData[newItem];
         }
 
         if(newItem && data){

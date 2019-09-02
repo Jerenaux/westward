@@ -6,6 +6,7 @@ import CustomSprite from './CustomSprite'
 import Engine from './Engine'
 import NPC from './NPC'
 import OrientationPin from './OrientationPin'
+import Utils from '../shared/Utils'
 
 var Animal = new Phaser.Class({
 

@@ -2,10 +2,13 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 31-08-19.
  */
 import Capsule from './Capsule'
+import Engine from './Engine'
 import ItemSprite from './ItemSprite'
 import {MiniProgressBar} from "./ProgressBar"
 import Panel from './Panel'
 import UI from './UI'
+
+import itemsData from '../assets/data/items.json'
 
 function BattleEquipmentPanel() {
     Panel.call(this, 0, 0, 0, 0, '', true); // true = invisible
@@ -92,8 +95,8 @@ BattleEquipmentPanel.prototype.updateEquipment = function () {
 
     // If ranged weapon, display the actual ammo; else, display the ranged weapon (= the hands)
     var rangeID = (rangeAmmoID == -1 || !Engine.player.hasRangedEquipped()) ? rangedWeaponID : rangeAmmoID;
-    meleeData = Engine.itemsData[meleeID];
-    rangeData = Engine.itemsData[rangeID];
+    meleeData = itemsData[meleeID];
+    rangeData = itemsData[rangeID];
 
     // console.warn(Engine.player.hasRangedEquipped());
     if (Engine.player.hasRangedEquipped()) {

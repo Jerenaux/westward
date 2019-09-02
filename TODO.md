@@ -505,18 +505,13 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-Load data/* files in gs with imports
-https://stackoverflow.com/questions/42579761/express-js-how-to-serve-index-html-from-a-webpack-bundle
+Move variable map stuff to db
 -> Don't commit compiled files, compile after push and have env variable determine mode
-- Move to ES6 & webpack & babel
 https://snowbillr.github.io/blog//2018-04-09-a-modern-web-development-setup-for-phaser-3/
 https://github.com/nkholski/phaser3-es6-webpack
--> Include socketio in bundle
--> Easier to import shared code
 -> Look into Phaser doc about how to include only what is really necessary (no physics, ...)
 https://medium.com/@louigi.verona/reducing-phasers-filesize-custom-phaser-builds-4a0314819a38
 -> https://codeutopia.net/blog/2015/01/06/es6-what-are-the-benefits-of-the-new-features-in-practice/
-- Tool to gather, uglify and compress all relevant source files 
 - Desktop app (automated)
 -> https://electronjs.org/docs/tutorial/application-distribution
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)

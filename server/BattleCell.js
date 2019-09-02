@@ -1,3 +1,6 @@
+import GameObject from './GameObject'
+import GameServer from './GameServer'
+import {SpaceMap} from "../shared/SpaceMap";
 
 function BattleCell(x, y, battle) {
     this.instance = -1;

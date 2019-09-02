@@ -49,9 +49,10 @@ import {ShopPanel, ShopGoldPanel} from './ShopPanel'
 import {SpaceMap} from '../shared/SpaceMap';
 import StatsPanel from './StatsPanel'
 import UI from './UI'
-
 import Utils from '../shared/Utils'
 import World from '../shared/World';
+
+import animalsData from '../assets/data/animals.json'
 
 var Engine = {
     // TODO: Move to conf?
@@ -312,10 +313,10 @@ Engine.create = function(){
     Engine.camera = Engine.scene.cameras.main;
     Engine.camera.setBounds(0,0,Engine.worldWidth*Engine.tileWidth,Engine.worldHeight*Engine.tileHeight);
 
-    Engine.buildingsData = Engine.scene.cache.json.get('buildings');
-    Engine.animalsData = Engine.scene.cache.json.get('animals');
-    Engine.civsData = Engine.scene.cache.json.get('civs');
-    Engine.itemsData = Engine.scene.cache.json.get('itemsData');
+    // Engine.buildingsData = Engine.scene.cache.json.get('buildings');
+    // Engine.animalsData = Engine.scene.cache.json.get('animals');
+    // Engine.civsData = Engine.scene.cache.json.get('civs');
+    // Engine.itemsData = Engine.scene.cache.json.get('itemsData');
 
     Engine.createMarker();
     Engine.createAnimations();
@@ -1898,14 +1899,14 @@ Engine.updateSelf = function(data){
 Engine.update = function(){
 
 };
-
+//TODO: compute once
 Engine.getAnimalData = function(type){
-    var animalData = Engine.animalsData[type];
+    var animalData = animalsData[type];
     if(!animalData){
         console.warn('ERROR: no animal data for animal',type);
         return {};
     }
-    if(animalData.inheritFrom !== undefined) animalData = Object.assign(Engine.animalsData[animalData.inheritFrom],animalData);
+    if(animalData.inheritFrom !== undefined) animalData = Object.assign(animalsData[animalData.inheritFrom],animalData);
     return animalData;
 };
 

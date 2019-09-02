@@ -2,6 +2,9 @@
  * Created by jeren on 23-01-18.
  */
 
+import Engine from './Engine'
+import UI from './UI'
+
 var BattleManager = {
     inBattle: false,
     countdown: -1,

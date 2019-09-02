@@ -8,17 +8,9 @@
     "test": "test"
   },
   "nodemonConfig": {
-    "watch": [
-      [
-        "dist/server.js"
-      ]
-    ],
-    "ext": "ts,js,html",
-    "ignore": [
-      "test/*",
-      "docs/*",
-      "node_modules"
-    ]
+    "watch": ["dist/server.js"],
+    "ext": "js",
+    "ignore": ["maps","client","server","admin","assets","node_modules"]
   },
   "scripts": {
     "browser-sync": "browser-sync start --config bs-config.js",

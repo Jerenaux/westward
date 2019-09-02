@@ -37,6 +37,7 @@ export default GameServer;
 import Animal from './Animal'
 import AOI from './AOI'
 import Battle from './Battle'
+import BattleCell from './BattleCell'
 import Building from './Building'
 import Camp from './Camp'
 import Civ from './Civ'
@@ -50,7 +51,6 @@ import World from '../shared/World'
 
 var ListMap = require('../shared/ListMap.js').ListMap;
 var Remains = require('./NPC.js').Remains;
-var BattleCell = require('./Battle.js').BattleCell;
 var Prism = require('./Prism.js').Prism;
 var Schemas = require('./schemas.js');
 
@@ -1708,11 +1708,11 @@ GameServer.addMarker = function(markerType,x,y){
     if(GameServer[markerType+'Markers'].length > 10) GameServer[markerType+'Markers'].shift(); // TODO: conf
     GameServer.setFlag(mapName);
     // TODO: use db
-    var path = pathmodule.join(GameServer.mapsPath,markerType+'Markers.json');
-    fs.writeFile(path,JSON.stringify(GameServer[markerType+'Markers']),function(err){
-        if(err) throw err;
-        console.log(markerType+' markers written');
-    });
+    // var path = pathmodule.join(GameServer.mapsPath,markerType+'Markers.json');
+    // fs.writeFile(path,JSON.stringify(GameServer[markerType+'Markers']),function(err){
+    //     if(err) throw err;
+    //     console.log(markerType+' markers written');
+    // });
 };
 
 GameServer.updateVigor = function(player, action, multiplier){
@@ -1825,6 +1825,10 @@ GameServer.operateCraft = function(recipient,targetItem,nb){
 
 GameServer.handlePath = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
+    if(!player){
+        console.warn('ERROR: no player for handlePath');
+        return;
+    }
     player.setAction(data.action);
     player.setPath(data.path);
     if(player.inFight){

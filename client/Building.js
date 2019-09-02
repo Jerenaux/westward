@@ -11,17 +11,19 @@ import {StatsContainer} from "../shared/Stats"
 import UI from './UI'
 import Utils from '../shared/Utils'
 
+import buildingsData from '../assets/data/buildings.json'
+
 var Building = new Phaser.Class({
 
     Extends: CustomSprite,
 
     initialize: function Building() {
-        CustomSprite.call(this, Engine.scene, 0, 0, 'buildings_sprites');
+        CustomSprite.call(this, 'Engine', 0, 0, 'buildings_sprites');
         this.entityType = 'building';
     },
 
     setUp: function (data) {
-        var buildingData = Engine.buildingsData[data.type];
+        var buildingData = buildingsData[data.type];
         var sprite = buildingData.sprite;
         if(!data.built && buildingData.foundations) sprite = buildingData.foundations;
 
@@ -90,7 +92,7 @@ var Building = new Phaser.Class({
 
     build: function () {
         this.built = true;
-        var buildingData = Engine.buildingsData[this.buildingType];
+        var buildingData = buildingsData[this.buildingType];
         this.setFrame(buildingData.sprite);
         this.resetDepth();
         this.setInteractiveArea();
@@ -115,7 +117,7 @@ var Building = new Phaser.Class({
 
     unbuild: function(){
         this.built = false;
-        var buildingData = Engine.buildingsData[this.buildingType];
+        var buildingData = buildingsData[this.buildingType];
         this.setFrame(buildingData.foundations);
         this.resetDepth();
         // if(this.accessory) this.accessory.destroy();

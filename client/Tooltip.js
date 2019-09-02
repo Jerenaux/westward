@@ -6,6 +6,8 @@ import {Equipment} from "../shared/Equipment";
 import {Stats} from "../shared/Stats";
 import UI from './UI';
 
+import itemsData from '../assets/data/items.json'
+
 var Tooltip = new Phaser.Class({
 
     Extends: Phaser.GameObjects. DOMElement,
@@ -65,11 +67,11 @@ var Tooltip = new Phaser.Class({
                 break;
             case 'pickupItem':
                 if(data.id == -1) break;
-                this.setNbOwned(Engine.itemsData[data.id].effects, Engine.player.getItemNb(data.id));
+                this.setNbOwned(itemsData[data.id].effects, Engine.player.getItemNb(data.id));
                 // fall through
             case 'item':
                 if(data.id == -1) break;
-                var item = Engine.itemsData[data.id];
+                var item = itemsData[data.id];
                 this.setTitle(item.name ? item.name : '');
                 this.setBody(item.desc ? item.desc : '');
                 if(item.effects) this.setEffects(item.effects);

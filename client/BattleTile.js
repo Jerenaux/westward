@@ -2,7 +2,12 @@
  * Created by Jerome on 29-11-17.
  */
 
+import BattleManager from './BattleManager'
 import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import PFUtils from '../shared/PFUtils'
+import UI from "./UI";
+import Utils from '../shared/Utils'
 
 var BattleTile = new Phaser.Class({
 
@@ -11,7 +16,7 @@ var BattleTile = new Phaser.Class({
     initialize: function BattleTile (x,y) {
         x = x || 0;
         y = y || 0;
-        CustomSprite.call(this, Engine.scene, x, y, '3grid',0);
+        CustomSprite.call(this, UI.scene, x, y, '3grid',0);
         this.entityType = 'cell';
         
         this.setDepth(Engine.markerDepth);
