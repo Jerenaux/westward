@@ -54,10 +54,10 @@ var Remains = require('./NPC.js').Remains;
 var Prism = require('./Prism.js').Prism;
 var Schemas = require('./schemas.js');
 
-// TODO: try including as usual?
 import animalsClusters from '../maps/animals.json'
 import collisions from '../maps/collisions.json'
 import itemsOnMap from '../maps/items.json'
+import resourceMarkers from '../maps/resourceMarkers.json'
 import masterData from '../maps/master.json'
 
 /**
@@ -89,7 +89,9 @@ GameServer.updateStatus = function(){
 GameServer.createModels = function(){
     GameServer.CampModel = mongoose.model('Camp', Schemas.campSchema);
     GameServer.BuildingModel = mongoose.model('Building', Schemas.buildingSchema);
+    GameServer.ephemeralMarkerModel = mongoose.model('ephemeralMarker', Schemas.ephemeralMarkerSchema);
     GameServer.PlayerModel = mongoose.model('Player', Schemas.playerSchema);
+    GameServer.RemainModel = mongoose.model('Remain', Schemas.remainsSchema);
 };
 
 /**
@@ -136,6 +138,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     }
 
     GameServer.battleCells = new SpaceMap();
+    //TODO: bundle all
     var dataAssets = pathmodule.join('assets','data');
     GameServer.textData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'texts.json')).toString()); // './assets/data/texts.json'
     GameServer.itemsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'items.json')).toString()); // './assets/data/items.json'
@@ -403,27 +406,30 @@ GameServer.loadItems = function(){
  * from file those who are stored in files.
  */
 GameServer.loadMarkers = function(){
-    // var markerTypes = ['resource','death','conflict'];
-    // markerTypes.forEach(function(marker){
-    //     var path = pathmodule.join(GameServer.mapsPath,marker+'Markers.json');
-    //     try{
-    //         GameServer[marker+'Markers'] = JSON.parse(fs.readFileSync(path).toString());
-    //     }catch(err){
-    //         console.warn('ERROR loading markers: '+marker);
-    //         GameServer[marker+'Markers'] = [];
-    //     }
-    // });
-    // // Load remains
-    // try {
-    //     GameServer.battleRemains = JSON.parse(fs.readFileSync(pathmodule.join(GameServer.mapsPath, 'misc.json')).toString());
-    // }catch(err){
-    //     GameServer.battleRemains = [];
-    // }
-    // GameServer.battleRemains.forEach(function(r){
-    //     new Remains(r[0],r[1]);
-    // });
-    // TODO: use DB!!
-    GameServer.updateStatus();
+    GameServer.resourceMarkers = resourceMarkers;
+    var markerTypes = ['death','conflict'];
+    var nbTicks = markerTypes.length + 1; // +1 for remains
+    var tick = 0;
+    markerTypes.forEach(function(markerType){
+        GameServer.ephemeralMarkerModel.find({type: markerType},function (err, markers) {
+            if (err) return console.log(err);
+            GameServer[markerType+'Markers'] = markers.map(function(m){
+                return [m.x,m.y];
+            });
+            console.warn('tick:',tick,'/',nbTicks);
+            if(++tick == nbTicks) GameServer.updateStatus();
+        });
+    });
+
+    GameServer.RemainModel.find(function (err, remains) {
+        if (err) return console.log(err);
+        GameServer.battleRemains = remains;
+        GameServer.battleRemains.forEach(function(r){
+                new Remains(r.x,r.y);
+        });
+        // console.warn('tick:',tick,'/',nbTicks);
+        if(++tick == nbTicks) GameServer.updateStatus();
+    });
 };
 
 GameServer.getItemsFromDBUpdateCache = function () {
@@ -1046,12 +1052,10 @@ GameServer.addRemains = function(x,y){
 
     new Remains(x,y);
 
-    //TODO: use db
-    var path = pathmodule.join(GameServer.mapsPath,'misc.json');
-    fs.writeFile(path,JSON.stringify(GameServer.battleRemains),function(err){
-        if(err) throw err;
+    var document = new GameServer.RemainModel({x: x, y: y});
+    document.save(function (err) {
+        if (err) return console.error(err);
     });
-
 };
 
 /**
@@ -1707,12 +1711,11 @@ GameServer.addMarker = function(markerType,x,y){
     GameServer[markerType+'Markers'].push([x,y]);
     if(GameServer[markerType+'Markers'].length > 10) GameServer[markerType+'Markers'].shift(); // TODO: conf
     GameServer.setFlag(mapName);
-    // TODO: use db
-    // var path = pathmodule.join(GameServer.mapsPath,markerType+'Markers.json');
-    // fs.writeFile(path,JSON.stringify(GameServer[markerType+'Markers']),function(err){
-    //     if(err) throw err;
-    //     console.log(markerType+' markers written');
-    // });
+
+    var document = new GameServer.ephemeralMarkerModel({x:x, y:y, type: markerType});
+    document.save(function (err) {
+        if (err) return console.error(err);
+    });
 };
 
 GameServer.updateVigor = function(player, action, multiplier){

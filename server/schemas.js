@@ -4,16 +4,6 @@
 let mongoose = require('mongoose');
 
 let Schemas = {
-    // settlementSchema : mongoose.Schema({
-    //     id: {type: Number, min: 0, required: true},
-    //     name: {type: String, required: true},
-    //     description: String,
-    //     population: {type: Number, min: 0, required: true},
-    //     level: {type: Number, min: 0, required: true},
-    //     x: {type: Number, min: 0, required: true},
-    //     y: {type: Number, min: 0, required: true}
-    // }),
-
     buildingSchema : mongoose.Schema({
         id: {type: Number, min: 0, required: true},
         x: {type: Number, min: 0, required: true},
@@ -37,6 +27,13 @@ let Schemas = {
     campSchema : mongoose.Schema({
         id: {type: Number, min: 0, required: true},
         center: mongoose.Schema.Types.Mixed,
+    }),
+
+    ephemeralMarkerSchema: mongoose.Schema({
+        x: {type: Number, min: 0, required: true},
+        y: {type: Number, min: 0, required: true},
+        type: String,
+        createdAt: { type: Date, expires: 3600, default: Date.now }
     }),
 
     playerSchema : mongoose.Schema({
@@ -63,6 +60,13 @@ let Schemas = {
                 return stats.toList();
             }},
         history: {type: []}
+    }),
+
+    remainsSchema: mongoose.Schema({
+        x: {type: Number, min: 0, required: true},
+        y: {type: Number, min: 0, required: true},
+        type: String,
+        createdAt: { type: Date, expires: 3600, default: Date.now }
     })
 };
 

@@ -505,7 +505,6 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-Move variable map stuff to db
 -> Don't commit compiled files, compile after push and have env variable determine mode
 https://snowbillr.github.io/blog//2018-04-09-a-modern-web-development-setup-for-phaser-3/
 https://github.com/nkholski/phaser3-es6-webpack

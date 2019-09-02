@@ -80,7 +80,7 @@ Bubble.prototype.updatePosition = function(nx,ny,depth){
 Bubble.prototype.finalize = function(){
     for(var i = 0; i < this.container.length; i++){
         var e = this.container[i];
-        var isText = (e.constructor.name == 'Text');
+        var isText = (e.type == 'Text');
         e.setDepth(10);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
