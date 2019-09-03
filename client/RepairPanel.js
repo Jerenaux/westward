@@ -63,7 +63,7 @@ RepairPanel.prototype.displayInterface = function(){
         Engine.repairAction.setUp(this.item,'sell',false); // false = force non-financial
     }.bind(btn);
     btn.display();
-    if(Engine.currentBuiling.isFullyRepaired()) btn.disable();
+    // if(Engine.currentBuiling.isFullyRepaired()) btn.disable();
     this.bigbuttons.push(btn);
 
     if(!Engine.currentBuiling.isOwned() && price > 0) {

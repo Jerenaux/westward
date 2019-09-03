@@ -236,6 +236,7 @@ Building.prototype.updateBuild = function(){
 };
 
 Building.prototype.updateRepair = function(){
+    if(!this.built) return;
     var delta = this.getStat('hpmax').getValue() - this.getStat('hp').getValue();
     if(delta == 0) return;
     var TIMBER = 3;

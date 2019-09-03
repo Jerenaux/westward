@@ -19,7 +19,8 @@ const WriteFilePlugin = require('write-file-webpack-plugin');
 module.exports = {
     entry: {
         'client':'./client/main.js',
-        'server':'./server.js'
+        'server':'./server.js',
+        'test': './test/tests.js'
     },
     output: {
         filename: "[name].js",
@@ -33,7 +34,6 @@ module.exports = {
     target: 'node', // in order too ignore built-in modules like path, fs, etc.
     externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
 
-    watch: true,
     watchOptions: {
         ignored: ['maps','node_modules']
     },

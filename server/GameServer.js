@@ -416,7 +416,7 @@ GameServer.loadMarkers = function(){
             GameServer[markerType+'Markers'] = markers.map(function(m){
                 return [m.x,m.y];
             });
-            console.warn('tick:',tick,'/',nbTicks);
+            // console.warn('tick:',tick,'/',nbTicks);
             if(++tick == nbTicks) GameServer.updateStatus();
         });
     });
@@ -1544,7 +1544,6 @@ GameServer.handleShop = function(data,socketID) {
             if(price === 0) return false;
             player.giveGold(price, true);
             building.takeGold(price);
-            // player.updateVigor(-3); // TODO: vary + conf
             GameServer.updateVigor(player,'sell');
             player.gainClassXP(GameServer.classes.merchant,Math.floor(price/10), true); // TODO: factor in class level
         }

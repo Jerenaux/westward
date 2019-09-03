@@ -51,6 +51,7 @@ ConstructionPanel.prototype.displayInterface = function(){
     var i = 0;
     var total_needed = 0;
     var total_owned = 0;
+    console.warn(materials);
     for(var item in materials){
         var nb = materials[item];
         var slot = this.getNextLongSlot();
@@ -101,6 +102,7 @@ ConstructionPanel.prototype.displayInterface = function(){
         total_needed += nb;
         total_owned += owned;
     }
+    console.warn(total_owned,total_needed);
     this.bar.setLevel(total_owned,total_needed);
 };
 
