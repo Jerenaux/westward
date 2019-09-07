@@ -1,6 +1,17 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 29-03-18.
  */
+import BattleManager from './BattleManager'
+import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import Insect from './Insect'
+import OrientationPin from './OrientationPin'
+import UI from './UI'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
+
+import itemsData from '../assets/data/items.json'
+
 var Item = new Phaser.Class({
 
     Extends: CustomSprite,
@@ -12,7 +23,7 @@ var Item = new Phaser.Class({
     },
 
     setUp: function(data){
-        var itemData = Engine.itemsData[data.type];
+        var itemData = itemsData[data.type];
         var atlas = (itemData.envFrames ? 'tileset' : itemData.atlas);
         var frame = (itemData.envFrames ? Utils.randomElement(itemData.envFrames) : itemData.frame);
         this.itemType = data.type;
@@ -105,3 +116,5 @@ var Item = new Phaser.Class({
         Engine.showMarker();
     }
 });
+
+export default Item

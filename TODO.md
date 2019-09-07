@@ -214,6 +214,8 @@ interactions with buildings, time spent in each individual menu, step at which t
 
 Cleaning:
 --------
+Use ES6 classes
+Speed up server boot time and webpack build
 Performance:
 - Concile the two coexisting menu update systems: the one used by updateSelf and the one used by updateBuilding
 -> All menus have an update() method called on display; upon new server data, only update() the current menu
@@ -502,13 +504,14 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-- Move to ES6 & webpack & babel
--> https://github.com/nkholski/phaser3-es6-webpack
--> Import Phaser with npm
--> Easier to import shared code
--> Look into Phaser doc about how to include only what is really necessary (no physics, ...)
+-> Don't load sounds in preload, load in create and don't play them unless found in cache (bonus)
+-> Don't commit compiled files, compile after push and have env variable determine mode
+https://snowbillr.github.io/blog//2018-04-09-a-modern-web-development-setup-for-phaser-3/
+https://github.com/nkholski/phaser3-es6-webpack
+-> Custom Phaser build (bonus)
+https://medium.com/@louigi.verona/reducing-phasers-filesize-custom-phaser-builds-4a0314819a38
 -> https://codeutopia.net/blog/2015/01/06/es6-what-are-the-benefits-of-the-new-features-in-practice/
-- Tool to gather, uglify and compress all relevant source files 
+-> Uglifiy/minify/mangle for production
 - Desktop app (automated)
 -> https://electronjs.org/docs/tutorial/application-distribution
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)

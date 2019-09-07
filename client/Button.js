@@ -2,13 +2,17 @@
  * Created by Jerome on 21-11-17.
  */
 
+import UI from './UI'
+
 var Button = new Phaser.Class({
 
-    Extends: CustomSprite,
+    Extends: Phaser.GameObjects.Sprite,
 
     initialize: function Button (x, y, frame, callback) {
-        // Using call(), the called method will be executed while having 'this' pointing to the first argumentof call()
-        CustomSprite.call(this, UI.scene, x, y, 'UI');
+        Phaser.GameObjects.Sprite.call(this, UI.scene, x, y, 'UI');
+        UI.scene.add.displayList.add(this);
+        UI.scene.add.updateList.add(this);
+
         this.setFrame(frame);
         this.normalFrame = frame;
         this.currentFrame = frame;
@@ -55,3 +59,5 @@ var Button = new Phaser.Class({
         this.setFrame(this.currentFrame);
     }
 });
+
+export default Button

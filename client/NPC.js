@@ -1,6 +1,11 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 01-08-18.
  */
+import BattleManager from './BattleManager'
+import Engine from './Engine'
+import Moving from './Moving'
+import UI from './UI'
+import Utils from '../shared/Utils'
 
 var NPC = new Phaser.Class({
 
@@ -65,3 +70,5 @@ var NPC = new Phaser.Class({
         UI.tooltip.hide();
     }
 });
+
+export default NPC

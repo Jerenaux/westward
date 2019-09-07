@@ -1,10 +1,66 @@
 /**
  * Created by Jerome on 26-06-17.
  */
+import AbilitiesPanel from './AbilitiesPanel'
+import AbilityPanel from './AbilityPanel'
+import BattleEquipmentPanel from './BattleEquipmentPanel'
+import Animal from './Animal'
+import BattleManager from './BattleManager'
+import BattleTile from './BattleTile'
+import BigButton from './BigButton'
+import BuildingTitle from './BuildingTitle'
+import BuildPanel from './BuildPanel'
+import Capsule from './Capsule'
+import Boot from './Boot';
+import Building from './Building'
+import CharacterPanel from './CharacterPanel'
+import ChatPanel from './ChatPanel'
+import Chunk from './Chunk'
+import Civ from './Civ'
+import ClassMiniPanel from './ClassMiniPanel'
+import Client from './Client';
+import ConstructionPanel from './ConstructionPanel'
+import CraftingPanel from './CraftingPanel'
+import EquipmentPanel from './EquipmentPanel'
+import Hero from './Hero'
+import {HighlightPipeline, HollowPipeline} from './shaders'
+import InfoPanel from './InfoPanel'
+import InventoryPanel from './InventoryPanel'
+import Item from './Item'
+import ItemActionPanel from './ItemActionPanel'
+import JournalPanel from './JournalPanel'
+import MapPanel from './MapPanel'
+import Menu from './Menu'
+import menuIcon from './menuIcon';
+import MiniMap from './MiniMap'
+import Panel from './Panel'
+import Pathfinder from '../shared/Pathfinder'
+import PFUtils from '../shared/PFUtils'
+import Player from './Player'
+import PricesPanel from './PricesPanel'
+import ProductionPanel from './ProductionPanel'
+import RecipesPanel from './RecipesPanel'
+import Remains from './Remains'
+import RepairPanel from './RepairPanel'
+import RespawnPanel from './RespawnPanel'
+import RestPanel from './RestPanel'
+import ShopInventoryPanel from './ShopInventoryPanel'
+import {ShopPanel, ShopGoldPanel} from './ShopPanel'
+import {SpaceMap} from '../shared/SpaceMap';
+import StatsPanel from './StatsPanel'
+import UI from './UI'
+import Utils from '../shared/Utils'
+import World from '../shared/World';
+
+import animalsData from '../assets/data/animals.json'
+import buildingsData from '../assets/data/buildings.json'
+
 var Engine = {
     // TODO: Move to conf?
     tileWidth: 32,
     tileHeight: 32,
+    viewWidth: 32, // tiles; TODO: conf
+    viewHeight: 18, // tiles
 
     markerDepth: 1,
     buildingsDepth: 2,
@@ -32,8 +88,6 @@ var Engine = {
     playerIsInitialized: false
 };
 
-var tilesetData = {};
-
 Engine.preload = function() {
     Engine.useTilemaps = false;
 
@@ -52,6 +106,7 @@ Engine.preload = function() {
     this.load.spritesheet('bears', 'assets/sprites/animals/bears.png',{frameWidth:56,frameHeight:56});
     this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
 
+    this.load.spritesheet('bones', 'assets/sprites/wolf_bones.png',{frameWidth:32,frameHeight:21});
 
     // ###################
 
@@ -211,9 +266,10 @@ Engine.create = function(){
     World.readMasterData(masterData);
     Engine.mapDataLocation = Boot.mapDataLocation;
 
-    tilesetData.atlas = Engine.scene.cache.json.get('tileset').frames;
-    tilesetData.config = Engine.scene.cache.json.get('tileset').config;
-    tilesetData.shorthands = Engine.scene.cache.json.get('tileset').shorthands;
+    Engine.tilesetData = {};
+    Engine.tilesetData.atlas = Engine.scene.cache.json.get('tileset').frames;
+    Engine.tilesetData.config = Engine.scene.cache.json.get('tileset').config;
+    Engine.tilesetData.shorthands = Engine.scene.cache.json.get('tileset').shorthands;
 
     Engine.chunks = {}; // holds references to the containers containing the chunks
     Engine.displayedChunks = [];
@@ -258,12 +314,7 @@ Engine.create = function(){
     Engine.qtQuads = []; // for debugging
 
     Engine.camera = Engine.scene.cameras.main;
-    Engine.camera.setBounds(0,0,Engine.worldWidth*TILE_WIDTH,Engine.worldHeight*TILE_HEIGHT);
-
-    Engine.buildingsData = Engine.scene.cache.json.get('buildings');
-    Engine.animalsData = Engine.scene.cache.json.get('animals');
-    Engine.civsData = Engine.scene.cache.json.get('civs');
-    Engine.itemsData = Engine.scene.cache.json.get('itemsData');
+    Engine.camera.setBounds(0,0,Engine.worldWidth*Engine.tileWidth,Engine.worldHeight*Engine.tileHeight);
 
     Engine.createMarker();
     Engine.createAnimations();
@@ -289,10 +340,10 @@ Engine.create = function(){
     Engine.resources = new SpaceMap();
 
     Engine.inMenu = false;
-    Engine.inPanel = false;
+    UI.inPanel = false;
     Engine.dead = false;
     Engine.currentMenu = null;
-    Engine.currentPanel = null;
+    UI.currentPanel = null;
 
     Engine.useBlitters = false;
     if(Engine.useBlitters){
@@ -306,9 +357,9 @@ Engine.create = function(){
         Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
     }
 
-    game.renderer.addPipeline('highlight', new HighlightPipeline(game));
-    game.renderer.addPipeline('hollow_items', new HollowPipeline(game));
-    game.renderer.addPipeline('hollow_moving', new HollowPipeline(game));
+    Engine.getGameInstance().renderer.addPipeline('highlight', new HighlightPipeline(Engine.getGameInstance()));
+    Engine.getGameInstance().renderer.addPipeline('hollow_items', new HollowPipeline(Engine.getGameInstance()));
+    Engine.getGameInstance().renderer.addPipeline('hollow_moving', new HollowPipeline(Engine.getGameInstance()));
 
     Engine.created = true;
     Engine.configEngine();
@@ -764,39 +815,39 @@ Engine.makeUI = function(){
     Engine.faceHolder = UI.scene.add.sprite(x,y,'UI','facebg').setScrollFactor(0).setDepth(2);
     Engine.face = UI.scene.add.sprite(x,y,'faces',0).setScrollFactor(0).setDepth(3);
 
-    Engine.lifeCapsule = new Capsule(37,3,'UI','heart');
-    Engine.lifeCapsule.setHoverText('Vitality',UI.textsData['health_help']);
+    Engine.lifeCapsule = new Capsule(UI.scene,37,3,'UI','heart');
+    Engine.lifeCapsule.setHoverText(UI.tooltip,'Vitality',UI.textsData['health_help']);
     Engine.lifeCapsule.removeLeft();
     Engine.lifeCapsule.display();
     Engine.lifeCapsule.update = function(){
         this.setText(Engine.player.getStatValue('hp')+'/'+Engine.player.getStatValue('hpmax'));
     };
 
-    Engine.goldCapsule = new Capsule(152,3,'UI','gold');
-    Engine.goldCapsule.setHoverText('Gold',UI.textsData['gold_help']);
+    Engine.goldCapsule = new Capsule(UI.scene,152,3,'UI','gold');
+    Engine.goldCapsule.setHoverText(UI.tooltip,'Gold',UI.textsData['gold_help']);
     Engine.goldCapsule.display();
     Engine.goldCapsule.update = function(){
         this.setText(Engine.player.gold || 0); // TODO: add max
     };
     Engine.goldCapsule.update();
 
-    Engine.bagCapsule = new Capsule(228,3,'UI','smallpack');
-    Engine.bagCapsule.setHoverText('Backpack',UI.textsData['backpack_help']);
+    Engine.bagCapsule = new Capsule(UI.scene,228,3,'UI','smallpack');
+    Engine.bagCapsule.setHoverText(UI.tooltip,'Backpack',UI.textsData['backpack_help']);
     Engine.bagCapsule.display();
     Engine.bagCapsule.update = function(){
         this.setText(Engine.player.inventory.size+'/'+Engine.player.inventory.maxSize);
     };
     Engine.bagCapsule.update();
 
-    Engine.vigorCapsule = new Capsule(50,30,'UI','goldenheart');
-    Engine.vigorCapsule.setHoverText('Vigor',UI.textsData['vigor_help']);
+    Engine.vigorCapsule = new Capsule(UI.scene,50,30,'UI','goldenheart');
+    Engine.vigorCapsule.setHoverText(UI.tooltip,'Vigor',UI.textsData['vigor_help']);
     Engine.vigorCapsule.display();
     Engine.vigorCapsule.update = function(){
         this.setText(Engine.player.getStatValue('vigor')+'%');
     };
 
-    Engine.foodCapsule = new Capsule(140,30,'UI','bread');
-    Engine.foodCapsule.setHoverText('Food',UI.textsData['food_help']);
+    Engine.foodCapsule = new Capsule(UI.scene,140,30,'UI','bread');
+    Engine.foodCapsule.setHoverText(UI.tooltip,'Food',UI.textsData['food_help']);
     Engine.foodCapsule.display();
     Engine.foodCapsule.update = function(){
         this.setText(Engine.player.getStatValue('food')+'%');
@@ -817,16 +868,16 @@ Engine.makeUI = function(){
     statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help']);
 
     // Todo: make a 'makerepairpanel()' method similar to 'makepricespanel()'?
-    Engine.repairPanel = new RepairPanel(476,120,500,200,'Repair');
+    Engine.repairPanel = new RepairPanel(476,190,500,200,'Repair');
     Engine.repairPanel.addButton(500-16,-8,'red','close',Engine.repairPanel.hide.bind(Engine.repairPanel),'Close');
     Engine.repairPanel.addButton(460, 8, 'blue','help',null,'',UI.textsData['repair_help']);
-    Engine.repairPanel.moveUp(2);
-    Engine.repairAction = new ShopPanel(670,310,300,100,'Take'); 
+    Engine.repairPanel.moveUp(3);
+    Engine.repairAction = new ShopPanel(670,390,300,100,'Take');
     Engine.repairAction.addButton(300-16,-8,'red','close',Engine.repairAction.hide.bind(Engine.repairAction),'Close');
     Engine.repairAction.moveUp(2);
 
     Engine.menus = {
-        'abilities': Engine.makeAbilitiesMenu(),
+        // 'abilities': Engine.makeAbilitiesMenu(),
         'battle': Engine.makeBattleMenu(),
         'build': Engine.makeBuildMenu(),
         'character': Engine.makeCharacterMenu(),
@@ -873,76 +924,7 @@ Engine.makeUI = function(){
     );*/
 };
 
-menuIcon = function(x,y,icon,menu,tox,toy){
-    this.fromx = x;
-    this.fromy = y;
-    this.tox = tox;
-    this.toy = toy;
-    this.bg = UI.scene.add.sprite(x,y,'UI','holder').setScrollFactor(0).setDepth(2).setInteractive();
-    this.icon = UI.scene.add.sprite(x,y,'items2',icon).setScrollFactor(0).setDepth(2); // bubble down to bg
-    this.bg.setDepth(4);
-    this.icon.setDepth(5);
-    this.bg.on('pointerup',function(){
-        menu.toggle();
-        if(Engine.bldRect) Engine.bldUnclick(true);
-    });
-    var bg_ = this.bg;
-    this.bg.on('pointerover',function(){
-        UI.tooltip.updateInfo('free',{title:menu.name});
-        UI.tooltip.display();
-        bg_.setFrame('holder_over');
-    });
-    //this.bg.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
-    this.bg.on('pointerout',function(){
-        UI.tooltip.hide();
-        bg_.setFrame('holder');
-    });
-    this.displayed = true;
-};
 
-menuIcon.prototype.toggle = function(){
-    if(this.displayed){
-        if(Engine.inBuilding || (Engine.currentMenu && Engine.currentMenu.fullHide)){
-            this.fullhide();
-        }else {
-            this.hide();
-        }
-    }else{
-        this.display();
-    }
-};
-
-menuIcon.prototype.display = function(){
-    this.bg.setVisible(true);
-    this.icon.setVisible(true);
-    UI.scene.tweens.add(
-        {
-            targets: [this.bg,this.icon],
-            x: this.fromx,
-            y: this.fromy,
-            duration: 200
-        }
-    );
-    this.displayed = true;
-};
-
-menuIcon.prototype.hide = function(){
-    this.displayed = false;
-    UI.scene.tweens.add(
-        {
-            targets: [this.bg,this.icon],
-            x: this.tox,
-            y: this.toy,
-            duration: 300
-        }
-    );
-};
-
-menuIcon.prototype.fullhide = function(){
-    this.bg.setVisible(false);
-    this.icon.setVisible(false);
-    this.displayed = false;
-};
 
 Engine.addMenu = function(x,y,icon,menu,tox,toy){
     Engine.menuIcons.push(new menuIcon(x,y,icon,menu,tox,toy));
@@ -1171,7 +1153,7 @@ Engine.makeProductionMenu = function(){
     var productionPanel = new ProductionPanel(x,y,w,h);
     productionPanel.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['prod_help']);
     var gold = productionPanel.addCapsule('gold',20,20,'999','gold');
-    gold.setHoverText('Building gold',UI.textsData['shopgold_help']);
+    gold.setHoverText(UI.tooltip,'Building gold',UI.textsData['shopgold_help']);
     production.addPanel('production',productionPanel);
 
     var action = new ShopPanel(212,440,300,100,'Take',true); // true = not shop, hack
@@ -1218,7 +1200,7 @@ Engine.makeConstructionMenu = function(){
     progress.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['progress_help']);
     constr.addPanel('progress',progress);
     var gold = progress.addCapsule('gold',20,-9,'999','gold');
-    gold.setHoverText('Building gold',UI.textsData['shopgold_help']);
+    gold.setHoverText(UI.tooltip,'Building gold',UI.textsData['shopgold_help']);
 
     var aw = 300;
     var action = constr.addPanel('action',new ShopPanel(212,390,aw,100,'Give',true),true);
@@ -1370,12 +1352,12 @@ Engine.makeTradeMenu = function(){
     var client = trade.addPanel('client',new ShopInventoryPanel(center-w-space,y,w,h,'You'));
     client.setInventory('player');
     var gold = client.addCapsule('gold',120,-9,'999','gold');
-    gold.setHoverText('Your gold',UI.textsData['gold_help']);
+    gold.setHoverText(UI.tooltip,'Your gold',UI.textsData['gold_help']);
     client.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['sell_help']);
     var shop =  trade.addPanel('shop',new ShopInventoryPanel(center+space,y,w,h,'Shop'));
     shop.setInventory('building');
     var shopgold = shop.addCapsule('gold',100,-9,'999','gold');
-    shopgold.setHoverText('Shop gold',UI.textsData['shopgold_help']);
+    shopgold.setHoverText(UI.tooltip,'Shop gold',UI.textsData['shopgold_help']);
     shop.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help']);
     w = 300;
     var x = (Engine.getGameConfig().width-w)/2;
@@ -1436,7 +1418,7 @@ Engine.makeCraftingMenu = function(){
     var recipes = crafting.addPanel('shop',new RecipesPanel(combix+combiw+space,y,recipesw,h,'Recipes'));
     recipes.setInventory('crafting');
     var gold = recipes.addCapsule('gold',120,-9,'999','gold');
-    gold.setHoverText('Workshop gold',UI.textsData['shopgold_help']);
+    gold.setHoverText(UI.tooltip,'Workshop gold',UI.textsData['shopgold_help']);
     recipes.addButton(recipesw-30, 8, 'blue','help',null,'',UI.textsData['recipes_help']);
 
     var combi = crafting.addPanel('combi',new CraftingPanel(combix,y,combiw,h,'Crafting'));
@@ -1494,7 +1476,7 @@ Engine.makeBuildMenu = function(){
 };
 
 Engine.bldClick = function(){
-    var bld = Engine.buildingsData[this.bldID];
+    var bld = buildingsData[this.bldID];
     Engine.currentMenu.hide();
 
     Engine.hideMarker();
@@ -1509,7 +1491,6 @@ Engine.bldClick = function(){
 Engine.bldUnclick = function(shutdown){
     if(!Engine.bldRect.collides && !shutdown) {
         var id = Engine.bldRect.bldID;
-        //var bld = Engine.buildingsData[id];
         var pos = Engine.bldRect.getBottomLeft();
         pos.x = pos.x / 32;
         pos.y = (pos.y / 32) - 1;
@@ -1559,7 +1540,7 @@ Engine.makeInventory = function(statsPanel){
     items.setInventory('player',15,true,Engine.backpackClick);
 
     var gold = items.addCapsule('gold',130,-9,'999','gold');
-    gold.setHoverText('Gold',UI.textsData['gold_help']);
+    gold.setHoverText(UI.tooltip,'Gold',UI.textsData['gold_help']);
     items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help']);
 
     inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,120),true);
@@ -1577,7 +1558,9 @@ Engine.makeInventory = function(statsPanel){
     inventory.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
     inventory.addEvent('onUpdateInventory',items.updateInventory.bind(items));
     inventory.addEvent('onUpdateBelt',belt.updateInventory.bind(belt));
-    inventory.addEvent('onUpdateStats',statsPanel.updateStats.bind(statsPanel));
+    inventory.addEvent('onUpdateStats',function(){
+        statsPanel.updateStats(Engine.player);
+    });
     inventory.addEvent('onUpdateGold',function(){
         items.updateCapsule('gold',Engine.player.gold);
     });
@@ -1585,7 +1568,7 @@ Engine.makeInventory = function(statsPanel){
         equipment.updateEquipment();
         items.updateInventory();
         belt.updateInventory();
-        statsPanel.updateStats();
+        statsPanel.updateStats(Engine.player);
         items.updateCapsule('gold',Engine.player.gold);
     });
     return inventory;
@@ -1861,10 +1844,10 @@ Engine.getMouseCoordinates = function(pointer){
 };
 
 Engine.isInView = function(x,y){
-    if(x < Engine.player.tileX - VIEW_WIDTH/2) return false;
-    if(x >= Engine.player.tileX + VIEW_WIDTH/2) return false;
-    if(y < Engine.player.tileY - VIEW_HEIGHT/2) return false;
-    if(y >= Engine.player.tileY + VIEW_HEIGHT/2) return false;
+    if(x < Engine.player.tileX - Engine.viewWidth/2) return false;
+    if(x >= Engine.player.tileX + Engine.viewWidth/2) return false;
+    if(y < Engine.player.tileY - Engine.viewHeight/2) return false;
+    if(y >= Engine.player.tileY + Engine.viewHeight/2) return false;
     return true;
 };
 
@@ -1913,14 +1896,14 @@ Engine.updateSelf = function(data){
 Engine.update = function(){
 
 };
-
+//TODO: compute once
 Engine.getAnimalData = function(type){
-    var animalData = Engine.animalsData[type];
+    var animalData = animalsData[type];
     if(!animalData){
         console.warn('ERROR: no animal data for animal',type);
         return {};
     }
-    if(animalData.inheritFrom !== undefined) animalData = Object.assign(Engine.animalsData[animalData.inheritFrom],animalData);
+    if(animalData.inheritFrom !== undefined) animalData = Object.assign(animalsData[animalData.inheritFrom],animalData);
     return animalData;
 };
 
@@ -1999,7 +1982,9 @@ Engine.updateMenus = function(category){
         'stats': Engine.capsules,
         // 'vigor': Engine.vigorCapsule
     };
-    if(category in capsulesMap) capsulesMap[category].update();
+    if(category in capsulesMap){
+        if(capsulesMap[category]) capsulesMap[category].update();
+    }
 };
 
 Engine.inThatBuilding = function(id){
@@ -2020,7 +2005,7 @@ Engine.addPlayer = function(data){
 };
 
 Engine.getTilesetFromTile = function(tile){
-    if(Engine.tilesetMap.hasOwnProperty(tile)) return Engine.tile
+    if(Engine.tilesetMap.hasOwnProperty(tile)) return Engine.tile;
     setMap[tile];
     for(var i = 0; i < Engine.tilesets.length; i++){
         if(tile < Engine.tilesets[i].firstgid){
@@ -2037,7 +2022,7 @@ Engine.enterBuilding = function(id){
     var building = Engine.buildings[id];
     Engine.inBuilding = true;
     Engine.currentBuiling = building; // used to keep track of which building is displayed in menus
-    var buildingData = Engine.buildingsData[building.buildingType];
+    var buildingData = buildingsData[building.buildingType];
 
     var mainMenu;
     if(building.built == true) {
@@ -2086,7 +2071,7 @@ Engine.countIcons = function(){
 };
 
 Engine.processNPCClick = function(target){
-    if(Engine.inPanel) return;
+    if(UI.inPanel) return;
     if(target.dead){
         var action = target.entityType == 'animal' ? 2 : 4;
         Engine.player.setDestinationAction(action,target.id,target.tileX,target.tileY); // 2 for NPC
@@ -2097,7 +2082,7 @@ Engine.processNPCClick = function(target){
 };
 
 Engine.processItemClick = function(target){
-    if(Engine.inPanel) return;
+    if(UI.inPanel) return;
     Engine.player.setDestinationAction(3,target.id,target.tileX,target.tileY); // 3 for item
     Engine.computePath({x:target.tileX,y:target.tileY},true);
 };
@@ -2194,12 +2179,12 @@ Engine.closePanel = function(){this.hide();};
 Engine.togglePanel = function(){ // When clicking on a player/building/animal, toggle the corresponding panel visibility
     if(Engine.inMenu) return;
     if(this.panel.displayed){
-        Engine.inPanel = false;
-        Engine.currentPanel = null;
+        UI.inPanel = false;
+        UI.currentPanel = null;
     }else {
-        if(Engine.inPanel) Engine.currentPanel.hide();
-        Engine.inPanel = true;
-        Engine.currentPanel = this.panel;
+        if(UI.inPanel) UI.currentPanel.hide();
+        UI.inPanel = true;
+        UI.currentPanel = this.panel;
     }
     this.panel.toggle();
 };
@@ -2327,8 +2312,8 @@ Engine.leaveBuilding = function(){
 };
 
 Engine.snap = function(){
-    game.renderer.snapshot(function(img){
-        Client.sendScreenshot(img.src,detectBrowser());
+    Engine.getGameInstance().renderer.snapshot(function(img){
+        Client.sendScreenshot(img.src,Boot.detectBrowser());
     });
 };
 
@@ -2358,3 +2343,5 @@ function test(){
     rt.setScrollFactor(0);
     console.log('ok');
 }
+
+export default Engine;

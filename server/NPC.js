@@ -2,13 +2,13 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 11-06-18.
  */
 
-var GameServer = require('./GameServer.js').GameServer;
-var Utils = require('../shared/Utils.js').Utils;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
-var MovingEntity = require('./MovingEntity.js').MovingEntity;
-var GameObject = require('./GameObject.js').GameObject;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
-var Inventory = require('../shared/Inventory.js').Inventory;
+
+import GameServer from './GameServer'
+import Inventory from '../shared/Inventory'
+import MovingEntity from './MovingEntity'
+import PFUtils from '../shared/PFUtils'
+import Utils from '../shared/Utils'
 
 function NPC(){
     this.isPlayer = false;
@@ -256,62 +256,4 @@ NPC.prototype.updateTracking = function(){
     this.setPath(path);
 };
 
-
-module.exports.NPC = NPC;
-
-function Remains(x, y, type) {
-    this.instance = -1;
-    this.updateCategory = 'remains';
-    this.entityCategory = 'Remains';
-    this.id = GameServer.lastRemainsID++;
-    this.x = x;
-    this.y = y;
-    this.type = type;
-    this.cellsWidth = 1;
-    this.cellsHeight = 1;
-    this.setOrUpdateAOI();
-}
-
-Remains.prototype = Object.create(GameObject.prototype);
-Remains.prototype.constructor = Remains;
-
-Remains.prototype.getRect = function () {
-    return {
-        x: this.x,
-        y: this.y,
-        w: 1,
-        h: 1
-    }
-};
-
-// Remains.prototype.getShortID = function () {
-//     return 'btl' + this.id;
-// };
-
-Remains.prototype.trim = function () {
-    return {
-        id: this.id,
-        x: this.x,
-        y: this.y,
-        type: this.type,
-        instance: this.instance
-    };
-};
-
-Remains.prototype.getLocationCenter = function () {
-    return {
-        x: this.x,
-        y: this.y
-    };
-};
-
-Remains.prototype.remove = function () {};
-
-Remains.prototype.canFight = function () {
-    return false;
-};
-Remains.prototype.isAvailableForFight = function () {
-    return false;
-};
-
-module.exports.Remains = Remains;
+export default NPC

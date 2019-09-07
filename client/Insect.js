@@ -1,6 +1,9 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 26-07-19.
  */
+import Engine from './Engine'
+import Utils from '../shared/Utils'
+
 var Insect = new Phaser.Class({
 
     Extends: Phaser.GameObjects.PathFollower,
@@ -52,3 +55,5 @@ var Insect = new Phaser.Class({
         });
     },
 });
+
+export default Insect

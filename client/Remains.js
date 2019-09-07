@@ -1,6 +1,9 @@
 /**
- * Created by Jerome Renaux (jerome.renaux@gmail.com) on 29-03-18.
+ * Created by Jerome Renaux (jerome.renaux@gmail.com) 
  */
+
+import CustomSprite from './CustomSprite'
+
 var Remains = new Phaser.Class({
 
     Extends: CustomSprite,
@@ -41,3 +44,5 @@ var Remains = new Phaser.Class({
         delete Engine.remains[this.id];
     }
 });
+
+export default Remains

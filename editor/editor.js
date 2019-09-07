@@ -77,8 +77,6 @@ var Editor = {
     zoomIndex: 1
 };
 
-var tilesetData = {};
-
 Editor.preload = function(){
     this.load.json('master','../maps/master.json');
     this.load.json('collisions','../maps/collisions.json');
@@ -88,9 +86,10 @@ Editor.preload = function(){
 Editor.create = function(){
     Editor.scene = this.scene.scene;
     World.readMasterData(this.cache.json.get('master'));
-    tilesetData.atlas = this.cache.json.get('tileset').frames;
-    tilesetData.config = this.cache.json.get('tileset').config;
-    tilesetData.shorthands = this.cache.json.get('tileset').shorthands;
+    Editor.tilesetData = {};
+    Editor.tilesetData.atlas = this.cache.json.get('tileset').frames;
+    Editor.tilesetData.config = this.cache.json.get('tileset').config;
+    Editor.tilesetData.shorthands = this.cache.json.get('tileset').shorthands;
     Editor.collisions = new SpaceMap();
     if(COLL == 'server') Editor.collisions.fromList(this.cache.json.get('collisions'));
     console.log(Editor.tilesetData);

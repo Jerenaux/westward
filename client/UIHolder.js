@@ -1,6 +1,9 @@
 /**
  * Created by jeren on 06-01-18.
  */
+import Button from './Button'
+import UI from './UI'
+
 function UIHolder(x,y,align,style){
     this.slices = [];
     this.width = 1;
@@ -135,3 +138,5 @@ UIHolder.prototype.hide = function(){
 UIHolder.prototype.getChildren = function(){
     return [this.text].concat(this.slices);
 };
+
+export default UIHolder

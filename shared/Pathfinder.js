@@ -2,12 +2,8 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 07-04-18.
  */
 
-var onServer = (typeof window === 'undefined');
-
-if(onServer){
-    SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
-    var Utils = require('../shared/Utils.js').Utils;
-}
+import {SpaceMap} from './SpaceMap'
+import World from './World'
 
 function Pathfinder(navGrid,maxLength,allowDiagonal,cutCorners,reverseWalkable){
     this.grid = navGrid;
@@ -252,4 +248,4 @@ Node.prototype.equals = function(B){
     return (this.x == B.x && this.y == B.y);
 };
 
-if (onServer) module.exports.Pathfinder = Pathfinder;
+export default Pathfinder

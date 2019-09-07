@@ -1,15 +1,18 @@
 /**
  * Created by Jerome on 05-10-17.
  */
-var GameObject = require('./GameObject.js').GameObject;
-var GameServer = require('./GameServer.js').GameServer;
-var FightingEntity = require('./FightingEntity.js').FightingEntity;
 var Formulas = require('../shared/Formulas.js').Formulas;
-var Utils = require('../shared/Utils.js').Utils;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
-var Inventory = require('../shared/Inventory.js').Inventory;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
 var Models = require('../shared/models.js');
+
+import FightingEntity from './FightingEntity'
+import GameObject from './GameObject'
+import GameServer from './GameServer'
+import Inventory from '../shared/Inventory'
+import PFUtils from '../shared/PFUtils'
+import {SpaceMap} from '../shared/SpaceMap'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
 function Building(data){
     FightingEntity.call(this);
@@ -233,6 +236,7 @@ Building.prototype.updateBuild = function(){
 };
 
 Building.prototype.updateRepair = function(){
+    if(!this.built) return;
     var delta = this.getStat('hpmax').getValue() - this.getStat('hp').getValue();
     if(delta == 0) return;
     var TIMBER = 3;
@@ -525,4 +529,4 @@ Building.prototype.getShootingPoint = function(){
     };
 };
 
-module.exports.Building = Building;
+export default Building

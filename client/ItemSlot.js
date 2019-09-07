@@ -1,7 +1,13 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 24-03-19.
  */
+import Engine from './Engine'
+import Frame from './Frame'
+import {Stats} from "../shared/Stats";
+import UI from './UI'
+import Utils from '../shared/Utils'
 
+import itemsData from '../assets/data/items.json'
 
 function ItemSlot(x,y,width,height){
     Frame.call(this,x,y,width,height);
@@ -79,7 +85,7 @@ ItemSlot.prototype.checkForPanelOnTop = function(){
 
 ItemSlot.prototype.setUp = function(action,item){
     if(!this.displayed) console.warn('Setting up slot before displaying it');
-    var itemData = Engine.itemsData[item];
+    var itemData = itemsData[item];
     this.icon.setTexture(itemData.atlas,itemData.frame);
     this.name.setText(itemData.name);
     this.desc = itemData.desc;
@@ -121,8 +127,8 @@ ItemSlot.prototype.setUp = function(action,item){
             this.effect.setText(stattext);
 
             var equipped = Engine.player.getEquippedItemID(itemData.equipment);
-            if(equipped > -1 && Engine.itemsData[equipped].effects) {
-                var current = Engine.itemsData[equipped].effects[stat];
+            if(equipped > -1 && itemsData[equipped].effects) {
+                var current = itemsData[equipped].effects[stat];
                 if(current > effect){
                     this.effect.setFill(Utils.colors.red);
                 }else if(current < effect){
@@ -157,3 +163,5 @@ ItemSlot.prototype.hide = function(){
         c.setVisible(false);
     });
 };
+
+export default ItemSlot

@@ -3,8 +3,10 @@
  */
 
 var UpdatePacket = require('./UpdatePacket.js').UpdatePacket;
-var Utils = require('../shared/Utils.js').Utils;
+// var Utils = require('../shared/Utils.js').Utils;
 var GameServer = require('./GameServer.js').GameServer;
+
+import Utils from '../shared/Utils'
 
 function AOI(id){
     this.id = id;
@@ -50,4 +52,5 @@ AOI.prototype.hasBuilding = function(){
     return false;
 };
 
-module.exports.AOI = AOI;
+// module.exports.AOI = AOI;
+export default AOI;

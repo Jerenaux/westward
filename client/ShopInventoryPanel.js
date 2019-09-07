@@ -1,6 +1,14 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 15-03-19.
  */
+import Engine from './Engine'
+import ItemSlot from './ItemSlot'
+import Panel from './Panel'
+import UI from './UI'
+import Utils from '../shared/Utils'
+
+import itemsData from '../assets/data/items.json'
+
 
 var NB_PER_PAGE = 4;
 
@@ -97,7 +105,7 @@ ShopInventoryPanel.prototype.getInventory = function(){
 ShopInventoryPanel.prototype.listItems = function(){
     var items = this.getInventory().toList(true); // true = filter out zeroes
     items.sort(function(a,b){
-        if(Engine.itemsData[a[0]].name < Engine.itemsData[b[0]].name) return -1;
+        if(itemsData[a[0]].name < itemsData[b[0]].name) return -1;
         return 1;
     });
     return items;
@@ -226,3 +234,5 @@ ShopSlot.prototype.setUp = function(action,item,nb){
         Engine.currentMenu.panels['action'].setUp(item,action);
     }.bind(this));
 };
+
+export default ShopInventoryPanel

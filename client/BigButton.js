@@ -2,6 +2,8 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 14-02-18.
  */
 
+import UI from './UI';
+
 function BigButton(x,y,text,callback,bigger){
     this.slices = [];
     var sideWidth = 22;
@@ -148,3 +150,5 @@ BigButton.prototype.moveUp = function(nb){
     });
     this.text.setDepth(this.text.depth+nb);
 };
+
+export default BigButton;

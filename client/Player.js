@@ -1,6 +1,11 @@
 /**
  * Created by Jerome on 04-10-17.
  */
+import BattleManager from './BattleManager'
+import Engine from './Engine'
+import Moving from './Moving'
+import OrientationPin from './OrientationPin'
+
 var Player = new Phaser.Class({
 
     Extends: Moving,
@@ -174,3 +179,5 @@ var Player = new Phaser.Class({
         return 'P' + this.id;
     }
 });
+
+export default Player

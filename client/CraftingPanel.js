@@ -1,12 +1,19 @@
 /**
  * Created by Jerome on 20-11-17.
- */
+ // */
+import BigButton from './BigButton'
+import Engine from './Engine'
+import IngredientSlot from './IngredientSlot'
+import Panel from './Panel'
+import UI from './UI'
+import Utils from '../shared/Utils'
 
 function CraftingPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
     this.buttons = [];
     this.addInterface();
     this.lastCraft = Date.now();
+
 }
 
 CraftingPanel.prototype = Object.create(Panel.prototype);
@@ -79,7 +86,7 @@ CraftingPanel.prototype.setUp = function(itemID){
     this.craftItem.count = 1;
     this.craftItem.recipe = data.recipe;
     this.craftItem.price = this.getPrice();
-    
+
     this.craftSlot.display();
     this.craftSlot.setUp(itemID,-1);
     this.noitem.setVisible(false);
@@ -94,7 +101,7 @@ CraftingPanel.prototype.setUp = function(itemID){
 
     this.okBtn.display();
 
-    this.manageButtons(); 
+    this.manageButtons();
 };
 
 CraftingPanel.prototype.updateIngredients = function(){
@@ -112,7 +119,7 @@ CraftingPanel.prototype.updateIngredients = function(){
         slot.display();
         slot.setUp(ing,data.recipe[ing]*this.craftItem.count);
     }
-   
+
     this.craftItem.price = this.craftItem.count*this.getPrice();
     this.manageButtons();
 };
@@ -179,3 +186,5 @@ CraftingPanel.prototype.requestCraft = function(){
     Client.sendCraft(this.craftItem.id,this.craftItem.count);
     this.lastCraft = Date.now();
 };
+
+export default CraftingPanel

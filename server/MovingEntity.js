@@ -1,10 +1,11 @@
 /**
  * Created by Jerome on 09-10-17.
  */
-var FightingEntity = require('./FightingEntity.js').FightingEntity;
-var GameServer = require('./GameServer.js').GameServer;
-var Utils = require('../shared/Utils.js').Utils;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
+import FightingEntity from './FightingEntity'
+import GameServer from './GameServer'
+import PFUtils from '../shared/PFUtils'
+import {SpaceMap} from "../shared/SpaceMap";
+import Utils from '../shared/Utils'
 
 function MovingEntity(){
     FightingEntity.call(this);
@@ -105,7 +106,7 @@ MovingEntity.prototype.stopWalk = function(){
 };
 
 MovingEntity.prototype.getBattleAreaAround = function(){
-    cells = new SpaceMap();
+    var cells = new SpaceMap();
     for(var x = this.x - 1; x <= this.x + this.cellsWidth; x++){ // <= since we want the cells all around
         for(var y = this.y - 1; y <= this.y + this.cellsHeight; y++) {
             if(!GameServer.checkCollision(x,y)) cells.add(x,y);
@@ -284,4 +285,4 @@ MovingEntity.prototype.remove = function(){
     if(this.battle) this.battle.removeFighter(this);
 };
 
-module.exports.MovingEntity = MovingEntity;
+export default MovingEntity

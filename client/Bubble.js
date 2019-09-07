@@ -2,6 +2,9 @@
  * Created by Jerome on 19-11-17.
  */
 
+import Engine from './Engine'
+import UI from './UI'
+
 function Bubble(x,y,isNotification){
     this.container = [];
     this.x = x;
@@ -77,7 +80,7 @@ Bubble.prototype.updatePosition = function(nx,ny,depth){
 Bubble.prototype.finalize = function(){
     for(var i = 0; i < this.container.length; i++){
         var e = this.container[i];
-        var isText = (e.constructor.name == 'Text');
+        var isText = (e.type == 'Text');
         e.setDepth(10);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
@@ -157,3 +160,5 @@ Bubble.prototype.hide = function(){
         e.setVisible(false);
     });
 };
+
+export default Bubble

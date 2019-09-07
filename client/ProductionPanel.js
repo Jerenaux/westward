@@ -1,7 +1,13 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 13-02-18.
  */
-
+import BigButton from './BigButton'
+import Engine from './Engine'
+import Frame from './Frame'
+import {MiniProgressBar} from "./ProgressBar";
+import Panel from './Panel'
+import UI from './UI'
+import Utils from '../shared/Utils'
 
 function ProductionPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
@@ -261,3 +267,5 @@ ProdSlot.prototype.hide = function(){
     });
     this.bar.hide();
 };
+
+export default ProductionPanel

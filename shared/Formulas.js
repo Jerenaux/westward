@@ -2,11 +2,7 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 14-02-18.
  */
 
-var onServer = (typeof window === 'undefined');
-
-if(onServer) {
-    var Utils = require('../shared/Utils.js').Utils;
-}
+import Utils from './Utils'
 
 var Formulas = {};
 
@@ -69,4 +65,4 @@ Formulas.computeMaxClassXP = function(level){
     return Math.round(Math.exp((level)/10)*100);
 };
 
-if (onServer) module.exports.Formulas = Formulas;
+export default Formulas

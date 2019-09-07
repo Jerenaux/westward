@@ -2,8 +2,8 @@
  * Created by Jerome on 26-12-16.
  */
 
-var Utils = require('../shared/Utils.js').Utils;
-var GameServer = require('./GameServer.js').GameServer;
+import GameServer from './GameServer'
+import Utils from '../shared/Utils'
 
 // Parent class of all game objects : players, monsters and items (not NPC because they are not processed server-side)
 function GameObject(){
@@ -86,4 +86,4 @@ GameObject.prototype.trim = function(trimmed){
 };
 
 
-module.exports.GameObject = GameObject;
+export default GameObject

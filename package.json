@@ -3,30 +3,31 @@
   "version": "1.0.0",
   "description": "Westward, a collaborative MMO",
   "private": true,
-  "main": "server.js",
+  "main": "./dist/server.js",
   "directories": {
     "test": "test"
   },
   "nodemonConfig": {
     "watch": [
-      "server",
-      "shared",
-      "index.html",
-      "admin"
+      "dist/server.js"
     ],
-    "ext": "ts,js,html",
+    "ext": "js",
     "ignore": [
-      "test/*",
-      "docs/*",
+      "maps",
+      "client",
+      "server",
+      "admin",
+      "assets",
       "node_modules"
     ]
   },
   "scripts": {
+    "browser-sync": "browser-sync start --config bs-config.js",
     "build": "webpack",
-    "start": "node server.js",
-    "test": "mocha test",
-    "watch": "nodemon",
-    "watch-client": "browser-sync start --config bs-config.js"
+    "dev": "concurrently \"npm run watch:server\" \"npm run watch:client\"",
+    "test": "mocha ./dist/test.js",
+    "watch:server": "nodemon ./dist/server.js",
+    "watch:client": "webpack-dev-server"
   },
   "engines": {
     "npm": "^5.7.1"
@@ -35,37 +36,49 @@
   "license": "ISC",
   "devDependencies": {
     "chai": "^4.2.0",
-    "dir-compare": "^1.4.0",
-    "jimp": "^0.6.0",
+    "circular-dependency-plugin": "^5.2.0",
+    "concurrently": "^4.1.2",
+    "css-loader": "^3.2.0",
+    "dir-compare": "^1.7.3",
+    "jimp": "^0.6.4",
     "mocha": "^5.2.0",
-    "mongo-express": "^0.51.0",
+    "mocha-webpack": "^1.1.0",
+    "mongo-express": "^0.51.2",
+    "npm-run-all": "^4.1.5",
     "request": "^2.88.0",
-    "sinon": "^7.1.1",
+    "sinon": "^7.4.1",
     "spritesmith": "^3.3.1",
-    "uglify-js": "^3.1.9",
-    "webpack": "^4.29.0",
-    "webpack-cli": "^3.2.1",
+    "style-loader": "^1.0.0",
+    "uglify-js": "^3.6.0",
+    "webpack": "^4.39.3",
+    "webpack-cli": "^3.3.7",
+    "webpack-dev-server": "^3.8.0",
+    "webpack-node-externals": "^1.7.2",
+    "write-file-webpack-plugin": "^4.5.1",
     "xml2js": "^0.4.19"
   },
   "dependencies": {
-    "body-parser": "^1.18.2",
-    "clone": "^2.1.1",
-    "config": "^1.30.0",
+    "body-parser": "^1.19.0",
+    "clone": "^2.1.2",
+    "config": "^1.31.0",
     "crypto": "^1.0.1",
-    "dotenv": "^8.0.0",
-    "express": "^4.16.2",
-    "jsonwebtoken": "^8.4.0",
+    "dotenv": "^8.1.0",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "jsonwebtoken": "^8.5.1",
     "keycloak-connect": "3.3.0",
-    "mongodb": "^2.2.31",
-    "mongoose": "^5.5.9",
+    "mongodb": "^2.2.36",
+    "mongoose": "^5.6.11",
     "npm-watch": "^0.6.0",
     "optimist": "^0.6.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
-    "quickselect": "^1.0.0",
+    "phaser": "^3.19.0",
+    "quickselect": "^1.1.1",
     "random-weighted-choice": "^0.1.3",
     "simple-quadtree": "^0.1.3",
     "socket.io": "^2.2.0",
+    "terser": "^3.17.0",
     "voronoi": "^1.0.0"
   }
 }

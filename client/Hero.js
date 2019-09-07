@@ -2,6 +2,19 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 23-04-18.
  */
 
+import BattleManager from './BattleManager'
+import Client from './Client'
+import Engine from './Engine'
+import {EquipmentManager, Equipment} from '../shared/Equipment'
+import Inventory from '../shared/Inventory'
+import Player from './Player'
+import {StatsContainer} from '../shared/Stats'
+import UI from './UI'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
+
+import itemsData from '../assets/data/items.json'
+
 function ClassDataShell(){
     for(let i = 0; i < 4; i++){
         this[i] = 0;
@@ -49,8 +62,8 @@ let Hero = new Phaser.Class({
 
         this.buildRecipes.fromList(Engine.config.defaultBuildRecipes);
 
-        for(let item_id in Engine.itemsData){
-            let item = Engine.itemsData[item_id];
+        for(let item_id in itemsData){
+            let item = itemsData[item_id];
             if(item.basicRecipe) this.craftRecipes.add(item_id,1);
         }
     },
@@ -94,7 +107,7 @@ let Hero = new Phaser.Class({
         this.updateEvents.forEach(function (e) {
             Engine.updateMenus(e);
         }, this);
-        if(this.updateEvents.has('map') && Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
+        if(this.updateEvents.has('map') && Engine.miniMap && Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
 
         let battleCallbacks = {
             'battleData': BattleManager.updateBattle
@@ -116,7 +129,7 @@ let Hero = new Phaser.Class({
     needsToCraft: function(item){
         let required = 0;
         let owned = 0;
-        let recipe = Engine.itemsData[item].recipe;
+        let recipe = itemsData[item].recipe;
         for(let itm in recipe){
             required++;
             if(this.hasItem(itm,recipe[itm])) owned++;
@@ -125,7 +138,7 @@ let Hero = new Phaser.Class({
     },
 
     canCraft: function(item, nb){
-        let recipe = Engine.itemsData[item].recipe;
+        let recipe = itemsData[item].recipe;
         for(let itm in recipe){
             if(!this.hasItem(itm,recipe[itm]*nb)) return false;
         }
@@ -141,7 +154,6 @@ let Hero = new Phaser.Class({
 
     getEquippedItem: function(slot){
         return this.equipment.getItem(slot);
-        // return Engine.itemsData[item_id]; // Returns the data of the item equipped at the given slot
     },
 
     hasRangedEquipped: function(){
@@ -151,7 +163,7 @@ let Hero = new Phaser.Class({
 
     getMaxAmmo: function(){
         let container_id = this.equipment.get('range_container');
-        return Engine.itemsData[container_id].capacity;
+        return itemsData[container_id].capacity;
     },
 
     getNbAmmo: function(){
@@ -165,7 +177,7 @@ let Hero = new Phaser.Class({
     getRangedCursor: function(){
         let rangedw = this.getEquippedItemID('rangedw');
         if(rangedw === -1) return 'bow';
-        return (Engine.itemsData[rangedw].ammo === 'quiver' ? 'bow' : 'gun');
+        return (itemsData[rangedw].ammo === 'quiver' ? 'bow' : 'gun');
     },
 
     getStat: function(stat){
@@ -239,7 +251,7 @@ let Hero = new Phaser.Class({
 
         if(!Engine.firstSelfUpdate) {
             items.forEach(function (item) {
-                let sound = Engine.itemsData[item[0]].sound;
+                let sound = itemsData[item[0]].sound;
                 if(sound) Engine.scene.sound.add(sound).play();
             });
         }
@@ -334,7 +346,7 @@ let Hero = new Phaser.Class({
 
         if(!Engine.firstSelfUpdate) {
             items.forEach(function (item) {
-                let sound = Engine.itemsData[item[0]].sound;
+                let sound = itemsData[item[0]].sound;
                 if(sound) Engine.scene.sound.add(sound).play();
             });
         }
@@ -407,3 +419,5 @@ let Hero = new Phaser.Class({
         this.updateEvents.add('vigor');
     }
 });
+
+export default Hero

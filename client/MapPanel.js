@@ -1,6 +1,9 @@
 /**
  * Created by jeren on 10-01-18.
  */
+import Panel from './Panel'
+import UI from './UI'
+import WorldMap from './WorldMap'
 
 function MapPanel(x,y,width,height,title,invisible){
     Panel.call(this,x,y,width,height,title,invisible);
@@ -20,7 +23,7 @@ MapPanel.prototype.addBackground = function(texture){
 };
 
 MapPanel.prototype.addMap = function(texture,w,h,dragX,dragY){
-    this.map = new Map(this.mapx,this.mapy,w,h,dragX,dragY,true);
+    this.map = new WorldMap(this.mapx,this.mapy,w,h,dragX,dragY,true);
     this.map.panel = this;
     this.map.addMask(texture);
     this.content.push(this.map);
@@ -102,3 +105,5 @@ LegendPanel.prototype.hide = function(){
         c.setVisible(false);
     });
 };
+
+export default MapPanel

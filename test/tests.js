@@ -9,8 +9,9 @@ var sinon = require('sinon');
 var mongoose = require('mongoose');
 
 var mapsDir = path.join(__dirname,'..','maps');
-var gs = require('../server/GameServer.js').GameServer;
 var Equipment = require('../shared/Equipment.js').Equipment;
+
+import GameServer from '../server/GameServer'
 
 /*
 * WARNING: tests are run in parallel, which can cause them to interfere with each
@@ -24,7 +25,7 @@ var Equipment = require('../shared/Equipment.js').Equipment;
 //     it('stub-test',function() {
 //         var methodB = sinon.stub(gs, 'testMethodB');
 //         var input = 5;
-//         var output = gs.testMethodA(input);
+//         var output = GameServer.testMethodA(input);
 //         expect(output).to.equal(input);
 //         methodB.restore();
 //         sinon.assert.calledWith(methodB, input);
@@ -41,8 +42,8 @@ describe('GameServer',function(){
         db.once('open', function() {
             console.log('Connection to db established');
             // TODO: read from config
-            gs.readMap(mapsDir,false,done); 
-            gs.server = {
+            GameServer.readMap(mapsDir,false,done);
+            GameServer.server = {
                 getNbConnected: function(){},
                 sendError: function(){},
                 sendInitializationPacket: function(){},
@@ -55,16 +56,16 @@ describe('GameServer',function(){
     it('addNewPlayer',function(){
         var errInputs = [{},{new:true}];
         errInputs.forEach(function(input){
-            var result = gs.addNewPlayer(null,input);
+            var result = GameServer.addNewPlayer(null,input);
             expect(result).to.equal(null);
         });
 
         var name = 'Test';
         var dummySocket = {id:'socket123',dummy: true};
-        player = gs.addNewPlayer(dummySocket,{characterName:name});
+        player = GameServer.addNewPlayer(dummySocket,{characterName:name});
         player.setSocketID(dummySocket.id);
         player.spawn(20,20);
-        expect(gs.getPlayer(dummySocket.id).id).to.equal(player.id);
+        expect(GameServer.getPlayer(dummySocket.id).id).to.equal(player.id);
         expect(player.socketID).to.equal(dummySocket.id);
         expect(player.name).to.equal(name);
 
@@ -81,26 +82,26 @@ describe('GameServer',function(){
         var x = player.x - 3;
         var y = player.y - 3;
         var type = 0;
-        animal = gs.addAnimal(x,y,type);
-        animalFarAway = gs.addAnimal(0,0,0);
+        animal = GameServer.addAnimal(x,y,type);
+        animalFarAway = GameServer.addAnimal(0,0,0);
         expect(animal.x).to.equal(x);
         expect(animal.y).to.equal(y);
         expect(animal.type).to.equal(type);
     });
 
     it('handleBattle_faraway',function(){
-        var result = gs.handleBattle(player,animalFarAway);
+        var result = GameServer.handleBattle(player,animalFarAway);
         expect(result).to.equal(false);
     });
 
     it('handleBattle_alive',function(){
-        var result = gs.handleBattle(player,animal);
+        var result = GameServer.handleBattle(player,animal);
         expect(result).to.equal(true);
         player.battle.end();
     });
 
     it('lootNPC_alive',function(){
-        var result = gs.lootNPC(player,'animal',animal.id);
+        var result = GameServer.lootNPC(player,'animal',animal.id);
         expect(result).to.equal(false);
     });
 
@@ -111,16 +112,16 @@ describe('GameServer',function(){
     });
 
     it('handleBattle_dead',function(){
-        var result = gs.handleBattle(player,animal);
+        var result = GameServer.handleBattle(player,animal);
         expect(result).to.equal(false);
     });
 
     it('lootNPC_dead',function(){
-        var lootTable = gs.animalsData[animal.type].loot;
+        var lootTable = GameServer.animalsData[animal.type].loot;
         var itemID = Object.keys(lootTable)[0];
         var nb = lootTable[itemID];
         var initNb = player.getItemNb(itemID);
-        gs.lootNPC(player,'animal',animal.id);
+        GameServer.lootNPC(player,'animal',animal.id);
         expect(player.getItemNb(itemID)).to.equal(initNb+nb);
     });
 
@@ -129,7 +130,7 @@ describe('GameServer',function(){
         var x = player.x + 3;
         var y = player.y - 3;
         var type = 1;
-        item = gs.addItem(x,y,type);
+        item = GameServer.addItem(x,y,type);
         expect(item.x).to.equal(x);
         expect(item.y).to.equal(y);
         expect(item.type).to.equal(type);
@@ -137,7 +138,7 @@ describe('GameServer',function(){
 
     it('pickUpItem', function(){
         var initNb = player.getItemNb(item.type);
-        gs.pickUpItem(player,item.id);
+        GameServer.pickUpItem(player,item.id);
         expect(player.getItemNb(item.type)).to.equal(initNb+1);
     });
 
@@ -148,7 +149,7 @@ describe('GameServer',function(){
             y: player.y - 10,
             type: 4
         };
-        building = gs.addBuilding(data);
+        building = GameServer.addBuilding(data);
         expect(building.x).to.equal(data.x);
         expect(building.y).to.equal(data.y);
         expect(building.type).to.equal(data.type);
@@ -172,7 +173,7 @@ describe('GameServer',function(){
 
     it('handleShop_out', function(){
         // Should fail because the player is not in the building
-        var result = gs.handleShop({},player.socketID);
+        var result = GameServer.handleShop({},player.socketID);
         expect(result).to.equal(false);
     });
 
@@ -194,7 +195,7 @@ describe('GameServer',function(){
         var itemID = 1;
         var buy = 10;
         var sell = 20;
-        gs.setBuildingPrice({item:itemID,buy:buy,sell:sell},player.socketID);
+        GameServer.setBuildingPrice({item:itemID,buy:buy,sell:sell},player.socketID);
         expect(building.getPrice(itemID,1,'buy')).to.equal(buy);
         expect(building.getPrice(itemID,1,'sell')).to.equal(sell);
     });
@@ -217,7 +218,7 @@ describe('GameServer',function(){
             {in: {action:'sell',id:ownedID,nb:1},out:true},
         ];
         testCases.forEach(function(testcase){
-            var result = gs.handleShop(testcase.in,player.socketID);
+            var result = GameServer.handleShop(testcase.in,player.socketID);
             expect(result).to.equal(testcase.out);
         });
         expect(player.getItemNb(storedID)).to.equal(1);
@@ -247,7 +248,7 @@ describe('GameServer',function(){
             {in: {action:'sell',id:ownedID,nb:1},out:true},
         ];
         testCases.forEach(function(testcase){
-            var result = gs.handleShop(testcase.in,player.socketID);
+            var result = GameServer.handleShop(testcase.in,player.socketID);
             expect(result).to.equal(testcase.out);
         });
         expect(player.getItemNb(storedID)).to.equal(1);
@@ -265,10 +266,10 @@ describe('GameServer',function(){
         var buildingGoldBefore = building.getGold();
         var giveAmount = 10;
         var takeAmount = -5;
-        gs.handleGold({nb:giveAmount},player.socketID);
+        GameServer.handleGold({nb:giveAmount},player.socketID);
         expect(player.getGold()).to.equal(playerGoldBefore - giveAmount);
         expect(building.getGold()).to.equal(buildingGoldBefore + giveAmount);
-        gs.handleGold({nb:takeAmount},player.socketID);
+        GameServer.handleGold({nb:takeAmount},player.socketID);
         expect(player.getGold()).to.equal(playerGoldBefore - giveAmount - takeAmount);
         expect(building.getGold()).to.equal(buildingGoldBefore + giveAmount + takeAmount);
     });
@@ -280,10 +281,10 @@ describe('GameServer',function(){
         var buildingGoldBefore = building.getGold();
         var giveAmount = 10;
         var takeAmount = -5;
-        gs.handleGold({nb:giveAmount},player.socketID);
+        GameServer.handleGold({nb:giveAmount},player.socketID);
         expect(player.getGold()).to.equal(playerGoldBefore);
         expect(building.getGold()).to.equal(buildingGoldBefore);
-        gs.handleGold({nb:takeAmount},player.socketID);
+        GameServer.handleGold({nb:takeAmount},player.socketID);
         expect(player.getGold()).to.equal(playerGoldBefore);
         expect(building.getGold()).to.equal(buildingGoldBefore);
     });
@@ -294,12 +295,12 @@ describe('GameServer',function(){
         var amount = 1;
         player.giveItem(itemID,amount);
         expect(player.getItemNb(itemID)).to.equal(amount);
-        gs.handleUse({item:itemID,inventory:'backpack'},player.socketID);
+        GameServer.handleUse({item:itemID,inventory:'backpack'},player.socketID);
         expect(player.getItemNb(itemID)).to.equal(amount-1);
 
         player.addToBelt(itemID,amount);
         expect(player.getItemNbInBelt(itemID)).to.equal(amount);
-        gs.handleUse({item:itemID,inventory:'belt'},player.socketID);
+        GameServer.handleUse({item:itemID,inventory:'belt'},player.socketID);
         expect(player.getItemNbInBelt(itemID)).to.equal(amount-1);
     });
 
@@ -307,13 +308,13 @@ describe('GameServer',function(){
         player.inventory.clear();
         var type = 11; // sword
         var typeNotOwned = 2; // bow
-        var slot = gs.itemsData[type].equipment;
-        var slotNotOwned = gs.itemsData[typeNotOwned].equipment;
+        var slot = GameServer.itemsData[type].equipment;
+        var slotNotOwned = GameServer.itemsData[typeNotOwned].equipment;
         player.giveItem(type,1);
         expect(player.isEquipped(slot)).to.equal(false);
         expect(player.isEquipped(slotNotOwned)).to.equal(false);
-        gs.handleUse({item:type,inventory:'backpack'},player.socketID);
-        gs.handleUse({item:typeNotOwned,inventory:'backpack'},player.socketID);
+        GameServer.handleUse({item:type,inventory:'backpack'},player.socketID);
+        GameServer.handleUse({item:typeNotOwned,inventory:'backpack'},player.socketID);
         expect(player.isEquipped(slot)).to.equal(true);
         expect(player.getEquippedItemID(slot)).to.equal(type);
         expect(player.isEquipped(slotNotOwned)).to.equal(false);
@@ -326,17 +327,17 @@ describe('GameServer',function(){
             y: player.y + 10,
             type: 3 // workshop
         };
-        var workshop = gs.addBuilding(data);
-        expect(gs.handleCraft({},player.socketID)).to.equal(false); // not in building
+        var workshop = GameServer.addBuilding(data);
+        expect(GameServer.handleCraft({},player.socketID)).to.equal(false); // not in building
         player.inBuilding = workshop.id;
-        expect(gs.handleCraft({id:item},player.socketID)).to.equal(false); // no ingredients
-        for(var ingredient in gs.itemsData[item].recipe){
-            player.giveItem(ingredient, gs.itemsData[item].recipe[ingredient]);
+        expect(GameServer.handleCraft({id:item},player.socketID)).to.equal(false); // no ingredients
+        for(var ingredient in GameServer.itemsData[item].recipe){
+            player.giveItem(ingredient, GameServer.itemsData[item].recipe[ingredient]);
         }
         var ownedBefore = player.getItemNb(item);
         // console.log('inventory:',player.inventory.toList());
-        expect(gs.handleCraft({id:item},player.socketID)).to.equal(true);
-        expect(player.getItemNb(item)).to.equal(ownedBefore+gs.itemsData[item].output);
+        expect(GameServer.handleCraft({id:item},player.socketID)).to.equal(true);
+        expect(player.getItemNb(item)).to.equal(ownedBefore+GameServer.itemsData[item].output);
     });
 
     /**
@@ -347,8 +348,8 @@ describe('GameServer',function(){
     it('Player_equip', function(){
         var slots = Object.keys(Equipment.slots);
 
-        for(var itemID in gs.itemsData){
-            var item = gs.itemsData[itemID];
+        for(var itemID in GameServer.itemsData){
+            var item = GameServer.itemsData[itemID];
             var properSlot = item.equipment;
             if(item.permanent) continue; // don't try to equip fists, hands...
             if(!properSlot) continue;
@@ -371,12 +372,12 @@ describe('GameServer',function(){
     it('equipment_management',function(){
         player.inventory.clear();
         var weaponID = 28;
-        var itemData = gs.itemsData[weaponID];
+        var itemData = GameServer.itemsData[weaponID];
         var slot = itemData.equipment;
         player.giveItem(weaponID, 1);
         expect(player.getItemNbInBelt(weaponID)).to.equal(0);
         var initNb = player.getItemNb(weaponID);
-        gs.handleUse({item:weaponID,inventory:'backpack'},player.socketID);
+        GameServer.handleUse({item:weaponID,inventory:'backpack'},player.socketID);
         expect(player.getItemNb(weaponID)).to.equal(initNb-1);
         expect(player.isEquipped(slot)).to.equal(true);
         expect(player.getEquippedItemID(slot)).to.equal(parseInt(weaponID));
@@ -387,7 +388,7 @@ describe('GameServer',function(){
         player.backpackToBelt(weaponID);
         expect(player.getItemNb(weaponID)).to.equal(0);
         expect(player.getItemNbInBelt(weaponID)).to.equal(initNb);
-        gs.handleUse({item:weaponID,inventory:'belt'},player.socketID);
+        GameServer.handleUse({item:weaponID,inventory:'belt'},player.socketID);
         expect(player.isEquipped(slot)).to.equal(true);
         expect(player.getEquippedItemID(slot)).to.equal(parseInt(weaponID));
         expect(player.getItemNbInBelt(weaponID)).to.equal(initNb-1);
@@ -399,7 +400,7 @@ describe('GameServer',function(){
 
     it('equipment_stats',function(){
         var weaponID = 28;
-        var itemData = gs.itemsData[weaponID];
+        var itemData = GameServer.itemsData[weaponID];
         var slot = itemData.equipment;
         var stat = Object.keys(itemData.effects)[0]; // pick up first stat affected by item
         var effect = itemData.effects[stat];
@@ -407,7 +408,7 @@ describe('GameServer',function(){
         player.unequip(slot); // unequip anything that may have been equipped in a previous test
         player.getStat(stat).clearRelativeModifiers();
         var initialValue = player.getStat(stat).getValue();
-        gs.handleUse({item:weaponID,inventory:'backpack'},player.socketID);
+        GameServer.handleUse({item:weaponID,inventory:'backpack'},player.socketID);
         expect(player.getStat(stat).getValue()).to.equal(initialValue + effect);
     });
 

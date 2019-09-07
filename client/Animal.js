@@ -1,6 +1,13 @@
 /**
  * Created by Jerome on 04-10-17.
  */
+
+import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import NPC from './NPC'
+import OrientationPin from './OrientationPin'
+import Utils from '../shared/Utils'
+
 var Animal = new Phaser.Class({
 
     Extends: NPC,
@@ -90,3 +97,5 @@ var Animal = new Phaser.Class({
         this.dead = true;
     }
 });
+
+export default Animal
