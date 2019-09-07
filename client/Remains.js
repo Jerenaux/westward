@@ -3,13 +3,16 @@
  */
 
 import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
 var Remains = new Phaser.Class({
 
     Extends: CustomSprite,
 
     initialize: function Remains() {
-        CustomSprite.call(this, Engine.scene, 0, 0);
+        CustomSprite.call(this, 'Engine', 0, 0);
         // this.setInteractive();
         this.entityType = 'remain';
     },

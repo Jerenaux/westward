@@ -42,17 +42,17 @@ import Building from './Building'
 import Camp from './Camp'
 import Civ from './Civ'
 import Item from './Item'
+import ListMap from '../shared/ListMap'
 import Pathfinder from '../shared/Pathfinder'
 import Player from './Player'
+import Prism from './Prism'
+import Remains from './Remains'
+import Schemas from './Schemas'
 import {SpaceMap} from '../shared/SpaceMap'
 import SpawnZone from './SpawnZone'
 import Utils from '../shared/Utils'
 import World from '../shared/World'
 
-var ListMap = require('../shared/ListMap.js').ListMap;
-var Remains = require('./NPC.js').Remains;
-var Prism = require('./Prism.js').Prism;
-var Schemas = require('./schemas.js');
 
 import animalsClusters from '../maps/animals.json'
 import collisions from '../maps/collisions.json'

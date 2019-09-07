@@ -27,10 +27,10 @@ NPC.prototype.constructor = NPC;
 
 NPC.prototype.setLoot = function(loot){
     this.loot = new Inventory(10);
-    for(var id in loot){
-        var item = loot[id][0];
-        var p = loot[id][1];
-        if(Utils.randomInt(0,10) < p*10) this.addToLoot(id,loot[id]);
+    for(var item in loot){
+        var nb = loot[item][0];
+        var p = loot[item][1];
+        if(Utils.randomInt(0,10) < p*10) this.addToLoot(item,nb);
     }
 };
 

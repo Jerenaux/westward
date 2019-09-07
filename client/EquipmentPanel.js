@@ -6,6 +6,7 @@ import {Equipment} from '../shared/Equipment'
 import ItemSprite from './ItemSprite'
 import Panel from './Panel'
 import UI from './UI'
+import Utils from '../shared/Utils'
 
 import itemsData from '../assets/data/items.json'
 

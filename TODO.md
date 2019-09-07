@@ -57,15 +57,11 @@ Packaging
 - SZ system for plants, disappears based on harvest frequency
 (-> Remove marker files, have it generated dynamically, etc.)
 - Spawn wolf colors based on N-S axis
+- Animation when hit (player, npc...)
+- No silhouette behind dead trees
 
 Bugs:
 Features:
-- Restore dragging
-- Webpack jump
-- Improve legend with toggling, display built or not, filter on building type?
-- Gif of bow attack
-- Display item rarity in inventory (check if doesn't conflit with shop)
-- Add belts?
 - Collective missions menu
 -> Start wih basic production quests
 - semi-permanent camp markers (always visible once discovered)
@@ -74,6 +70,11 @@ production capacity (based on # buildings of a given time) / some kind of "GDP",
 - Make smart missions based on these indicators (+ as many others as possible)
 - Split all per region (also visually)
 -> Name regions and compute borders in a Voronoi way by placing invisible region centers
+- Restore dragging
+- Improve legend with toggling, display built or not, filter on building type?
+- Gif of bow attack
+- Display item rarity in inventory (check if doesn't conflit with shop)
+- Add belts?
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Belt & backpack & gold capacity + corresponding items (incl. defaults)
@@ -512,6 +513,7 @@ https://github.com/nkholski/phaser3-es6-webpack
 https://medium.com/@louigi.verona/reducing-phasers-filesize-custom-phaser-builds-4a0314819a38
 -> https://codeutopia.net/blog/2015/01/06/es6-what-are-the-benefits-of-the-new-features-in-practice/
 -> Uglifiy/minify/mangle for production
+-> Maintain Docker image?
 - Desktop app (automated)
 -> https://electronjs.org/docs/tutorial/application-distribution
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)

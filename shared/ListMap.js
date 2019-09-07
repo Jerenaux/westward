@@ -1,7 +1,6 @@
 /**
  * Created by jeren on 06-02-18.
  */
-var onServer = (typeof window === 'undefined');
 
 function ListMap(){}
 
@@ -15,4 +14,4 @@ ListMap.prototype.get = function(key){
     return this[key];
 };
 
-if (onServer) module.exports.ListMap = ListMap;
+export default ListMap

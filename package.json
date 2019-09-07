@@ -27,7 +27,7 @@
     "dev": "concurrently \"npm run watch:server\" \"npm run watch:client\"",
     "test": "mocha ./dist/test.js",
     "watch:server": "nodemon ./dist/server.js",
-    "watch:client": "webpack-dev-server"
+    "watch": "webpack-dev-server"
   },
   "engines": {
     "npm": "^5.7.1"

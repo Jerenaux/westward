@@ -7,13 +7,13 @@ var Stats = require('../shared/Stats.js').Stats;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
 var Equipment = require('../shared/Equipment.js').Equipment;
 var EquipmentManager = require('../shared/Equipment.js').EquipmentManager;
-var Prism = require('./Prism.js').Prism;
 
 import Formulas from '../shared/Formulas'
 import GameObject from './GameObject'
 import GameServer from './GameServer'
 import Inventory from '../shared/Inventory'
 import MovingEntity from './MovingEntity'
+import Prism from './Prism'
 import Utils from '../shared/Utils'
 import World from '../shared/World'
 

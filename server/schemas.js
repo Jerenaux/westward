@@ -33,7 +33,7 @@ let Schemas = {
         x: {type: Number, min: 0, required: true},
         y: {type: Number, min: 0, required: true},
         type: String,
-        createdAt: { type: Date, expires: 3600, default: Date.now }
+        createdAt: { type: Date, expires: 3600*24*30, default: Date.now } //TODO: conf
     }),
 
     playerSchema : mongoose.Schema({
@@ -66,9 +66,8 @@ let Schemas = {
         x: {type: Number, min: 0, required: true},
         y: {type: Number, min: 0, required: true},
         type: String,
-        createdAt: { type: Date, expires: 3600, default: Date.now }
+        createdAt: { type: Date, expires: 3600*24*30, default: Date.now } // TODO: conf
     })
 };
 
-module.exports = Schemas;
-
+export default Schemas

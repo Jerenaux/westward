@@ -2,8 +2,9 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 21-03-18.
  */
 
-var GameServer = require('./GameServer.js').GameServer;
 var mongoose = require('mongoose');
+
+import GameServer from './GameServer'
 
 // All events correspond to *actions* performed by *players*
 
@@ -246,4 +247,4 @@ Prism.logEvent = function(player,action,data){
     return data;
 }*/
 
-module.exports.Prism = Prism;
+export default Prism

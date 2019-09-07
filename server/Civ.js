@@ -11,6 +11,8 @@ import NPC from './NPC'
 import Utils from '../shared/Utils'
 import World from '../shared/World'
 
+
+
 function Civ(x,y,type){
     this.id = GameServer.lastCivID++;
     this.isCiv = true;

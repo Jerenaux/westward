@@ -1,10 +1,14 @@
-function Remains(x, y) {
+import GameObject from './GameObject'
+import GameServer from './GameServer'
+
+function Remains(x, y, type) {
     this.instance = -1;
     this.updateCategory = 'remains';
     this.entityCategory = 'Remains';
     this.id = GameServer.lastRemainsID++;
     this.x = x;
     this.y = y;
+    this.type = type;
     this.cellsWidth = 1;
     this.cellsHeight = 1;
     this.setOrUpdateAOI();
@@ -31,6 +35,7 @@ Remains.prototype.trim = function () {
         id: this.id,
         x: this.x,
         y: this.y,
+        type: this.type,
         instance: this.instance
     };
 };

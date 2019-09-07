@@ -1,10 +1,10 @@
 /**
  * Created by Jerome on 27-10-17.
  */
-var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 
 import GameServer from './GameServer'
 import Pathfinder from '../shared/Pathfinder'
+import {SpaceMap} from "../shared/SpaceMap";
 import Utils from '../shared/Utils'
 
 var TICK_RATE;
@@ -19,7 +19,6 @@ function Battle() {
         'Player': 0
     };
     this.casualties = 0;
-    //this.positions = new SpaceMap(); // positions occupied by fighters (obsolete?)
     this.cells = new SpaceMap(); // all the BattleCell objects, used for battle pathfinding
     this.bbox = { // max bounds of battle
         x: 0,

@@ -54,6 +54,7 @@ import World from '../shared/World';
 
 import animalsData from '../assets/data/animals.json'
 import buildingsData from '../assets/data/buildings.json'
+import itemsData from '../assets/data/items.json'
 
 var Engine = {
     // TODO: Move to conf?
@@ -106,8 +107,6 @@ Engine.preload = function() {
     this.load.spritesheet('bears', 'assets/sprites/animals/bears.png',{frameWidth:56,frameHeight:56});
     this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
 
-    this.load.spritesheet('bones', 'assets/sprites/wolf_bones.png',{frameWidth:32,frameHeight:21});
-
     // ###################
 
     // Misc
@@ -127,7 +126,6 @@ Engine.preload = function() {
     // Icons
     this.load.atlas('mapicons', 'assets/sprites/mapicons.png', 'assets/sprites/mapicons.json');
     this.load.atlas('battleicons', 'assets/sprites/battleicons.png', 'assets/sprites/battleicons.json');
-    // this.load.atlas('trayicons', 'assets/sprites/trayicons.png', 'assets/sprites/trayicons.json');
     this.load.atlas('buildingsicons', 'assets/sprites/buildingsicons.png', 'assets/sprites/buildingsicons.json');
 
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
@@ -142,8 +140,6 @@ Engine.preload = function() {
     this.load.image('scrollbgh', 'assets/sprites/scroll.png');
     this.load.image('bigbg', 'assets/sprites/bigbg.png');
     this.load.image('bigbg_mask', 'assets/sprites/bigbg_mask.png');
-    // this.load.image('longscroll', 'assets/sprites/longscroll.png');
-    // this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
     this.load.image('worldmap', 'maps/worldmap.png');
 
     // SFX
@@ -182,10 +178,10 @@ Engine.preload = function() {
     this.load.audio('wind2','assets/sfx/wind2.wav');
     this.load.audio('wind3','assets/sfx/wind3.wav');
 
-    this.load.json('buildings', 'assets/data/buildings.json');
+    /*this.load.json('buildings', 'assets/data/buildings.json');
     this.load.json('itemsData', 'assets/data/items.json');
     this.load.json('animals', 'assets/data/animals.json');
-    this.load.json('civs', 'assets/data/civs.json');
+    this.load.json('civs', 'assets/data/civs.json');*/
 
 
     if(Client.tutorial) this.load.json('tutorials', 'assets/data/tutorials.json');
@@ -2191,7 +2187,7 @@ Engine.togglePanel = function(){ // When clicking on a player/building/animal, t
 
 Engine.recipeClick = function(){
     Engine.menus['crafting'].panels['combi'].setUp(this.itemID);
-    var sound = Engine.itemsData[this.itemID].sound;
+    var sound = itemsData[this.itemID].sound;
     if(sound) Engine.scene.sound.add(sound).play();
 };
 
@@ -2240,25 +2236,6 @@ Engine.displayItemActionPanel = function(itemID, inventory){
     Engine.currentMenu.panels['itemAction'].display();
     Engine.currentMenu.panels['itemAction'].setUp(itemID, inventory);
 };
-
-
-// Engine.inventoryClick = function(){
-//     if(BattleManager.inBattle) {
-//         var sticky = Engine.itemsData[this.itemID].stickMouse;
-//         UI.manageCursor(+sticky,'sticky');
-//         if(sticky){
-//             Engine.stickyCursor = true;
-//             return false;
-//         }else {
-//             Client.sendUse(this.itemID,'belt');
-//             return true;
-//         }
-//     }else{
-//         // itemAction is the small panel appearing in the inventory displaying options such as use, throw...
-//         Engine.currentMenu.panels['itemAction'].display();
-//         Engine.currentMenu.panels['itemAction'].setUp(this.itemID);
-//     }
-// };
 
 Engine.unequipClick = function(){ // Sent when unequipping something
     Client.sendUnequip(this.slotName);

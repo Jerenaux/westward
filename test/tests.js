@@ -119,7 +119,7 @@ describe('GameServer',function(){
     it('lootNPC_dead',function(){
         var lootTable = GameServer.animalsData[animal.type].loot;
         var itemID = Object.keys(lootTable)[0];
-        var nb = lootTable[itemID];
+        var nb = lootTable[itemID][0];
         var initNb = player.getItemNb(itemID);
         GameServer.lootNPC(player,'animal',animal.id);
         expect(player.getItemNb(itemID)).to.equal(initNb+nb);

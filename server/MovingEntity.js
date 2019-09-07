@@ -235,7 +235,6 @@ MovingEntity.prototype.canRange = function () {
             this.addMsg('I\'m out of ammo!');
             this.setOwnProperty('resetTurn', true);
         }
-        console.warn('no ammo');
         return false;
     }
 

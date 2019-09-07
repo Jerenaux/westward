@@ -72,12 +72,12 @@
             aggro: 1500
     },
     civs: {
-        aggro: false,
+        aggro: true,
         wander: true,
         raidMinimum: 3
     },
     wildlife: {
-        aggro: false,
+        aggro: true,
         nolife: false,
         wander: true,
         wanderRange: 5,
