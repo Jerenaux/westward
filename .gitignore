@@ -7,4 +7,3 @@ toPack
 maps/conflictMarkers.json
 maps/deathMarkers.json
 package-lock.json
-dist/*

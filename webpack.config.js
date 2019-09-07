@@ -3,11 +3,8 @@
  *
  * README:
  * - WDS watches for changes in both client and server and recompiles outputs accordingly
- * - Recompilation is done in-memory, so it's invisible to nodemon unless forced to write
- * to disk by the WriteFilePlugin
- * - nodemon watches for changes in dist/server.js only to make sure to restart after
- * compilation occured
- * - A proxy redirects traffic to WDS to the real, Node.js server instead
+ * - Recompilation is done in-memory, so it must forcefully be written
+ * to disk by the WriteFilePlugin for the server to pick on the changes
  */
 const path = require('path');
 const webpack = require('webpack');
@@ -25,7 +22,6 @@ module.exports = {
     output: {
         filename: "[name].js",
         path: path.resolve(__dirname, 'dist'),
-        // publicPath: "/dist/"
     },
     node: {
         __dirname: false
@@ -35,18 +31,19 @@ module.exports = {
     externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
 
     watchOptions: {
-        ignored: ['maps','node_modules']
+        ignored: ['admin','docker','editor','maps','node_modules','tools']
     },
 
-    // Redirect requests to WDS (8080) to Node server (8081)
     devServer: {
         port: 8080,
+        /*
+         // Redirect requests to WDS (8080) to Node server (8081)
         proxy: {
             '*': {
                 target: 'http://localhost:8081/',
                 secure: false
             }
-        },
+        },*/
         publicPath: '/dist'
     },
 

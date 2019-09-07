@@ -102,7 +102,6 @@ GameServer.createModels = function(){
  * @param {function} [cb] - Callback to call when the initialization sequence is finished (only used for tests)
  */
 GameServer.readMap = function(mapsPath,test,cb){
-
     if(test){
         GameServer.initializationMethods = {
             'static_data': null,

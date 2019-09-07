@@ -4,11 +4,9 @@ var app = express();
 var server = require('http').Server(app);
 var bodyParser = require("body-parser");
 var io = require('socket.io').listen(server);
-var fs = require('fs');
 var path = require('path');
 
 var quickselect = require('quickselect'); // Used to compute the median for latency
-var mongo = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
 var myArgs = require('optimist').argv;
 
@@ -36,7 +34,7 @@ app.use('/dist',express.static('./dist'));
 // app.use('/server',express.static('./server'));
 // app.use('/shared',express.static('./shared'));
 app.use('/maps',express.static('./maps'));
-// app.use('/admin',express.static(path.join(__dirname,'admin')));
+app.use('/admin',express.static('./admin'));
 app.use('/api',express.static('./admin'));
 app.use('/editor',express.static('./editor'));
 
@@ -72,7 +70,7 @@ app.get('/',function(req,res){
 });
 
 app.get('/admin',function(req,res){
-    res.sendFile(path.join(__dirname,'admin','admin.html'));
+    res.sendFile(path.join(__dirname,'..','admin','admin.html'));
 });
 
 app.get('/api',function(req,res){
