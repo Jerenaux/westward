@@ -63,7 +63,9 @@ Packaging
 Bugs:
 - Issue with bear animations
 - Bug with region transition (test without cache)
+- Fix glitch
 Features:
+- Test remains
 - Test respawn, test new player
 - Regional missions menu
 -> Status: wild, settled, occupied, contested, ...
