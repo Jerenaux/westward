@@ -62,9 +62,7 @@ Packaging
 
 Bugs:
 Features:
-- Define regions
-- Work out visual boundaries
-- More starting regions
+- Show toponyms
 - Update region name + notif when crossing
 - Regional missions menu
 -> Status: settled, contested, ...

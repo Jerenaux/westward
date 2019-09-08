@@ -55,6 +55,7 @@ import World from '../shared/World';
 import animalsData from '../assets/data/animals.json'
 import buildingsData from '../assets/data/buildings.json'
 import itemsData from '../assets/data/items.json'
+import regionsData from '../assets/data/regions.json'
 
 var Engine = {
     // TODO: Move to conf?
@@ -177,12 +178,6 @@ Engine.preload = function() {
     this.load.audio('wind1','assets/sfx/wind1.wav');
     this.load.audio('wind2','assets/sfx/wind2.wav');
     this.load.audio('wind3','assets/sfx/wind3.wav');
-
-    /*this.load.json('buildings', 'assets/data/buildings.json');
-    this.load.json('itemsData', 'assets/data/items.json');
-    this.load.json('animals', 'assets/data/animals.json');
-    this.load.json('civs', 'assets/data/civs.json');*/
-
 
     if(Client.tutorial) this.load.json('tutorials', 'assets/data/tutorials.json');
 };
@@ -400,12 +395,7 @@ Engine.initWorld = function(data){
 
     Engine.makeUI();
 
-    // TODO: move
-    var settlements = {
-        0: {name:'New Beginnng'},
-        1: {name:'Hope'}
-    };
-    Engine.setlCapsule.setText(settlements[Engine.player.settlement].name);
+    Engine.setlCapsule.setText(regionsData[Engine.player.region].name);
 
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();

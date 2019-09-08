@@ -33,7 +33,6 @@ function Player() {
     this.inventory = new Inventory();
     this.belt = new Inventory(3); //TODO: conf
     this.sid = 0;
-    this.settlement = null;
     this.gold = 0;
     this.inBuilding = -1;
 
@@ -150,6 +149,10 @@ Player.prototype.setUp = function(id,name,region){
 };
 
 Player.prototype.setRegion = function (sid) {
+    if(!GameServer.regions.hasOwnProperty(sid)){
+        console.warn('WARNING: non-existant region ',sid);
+        sid = 0;
+    }
     this.sid = sid;
     this.region = GameServer.regions[this.sid];
     this.setRespawnLocation(this.region.x,this.region.y);
@@ -723,7 +726,7 @@ Player.prototype.initTrim = function () {
     for (var p = 0; p < broadcastProperties.length; p++) {
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
-    trimmed.settlement = this.sid;
+    trimmed.region = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     return trimmed;
@@ -741,7 +744,7 @@ Player.prototype.trim = function () {
     broadcastProperties.forEach(function (field) {
         trimmed[field] = this[field];
     }, this);
-    trimmed.settlement = this.sid;
+    trimmed.region = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     // trimmed.quickSlots = this.equipment.quickslots.nb;

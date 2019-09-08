@@ -53,7 +53,7 @@ Client.getInitRequest = function(){ // Returns the data object to send to reques
             new:true,
             tutorial: false,
             selectedClass: UI.selectedClass,
-            selectedSettlement: UI.selectedSettlement,
+            selectedRegion: UI.selectedSettlement,
             characterName: UI.characterName
         };
     }

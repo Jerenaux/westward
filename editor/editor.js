@@ -2,6 +2,10 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 22-12-18.
  */
 
+import Phaser from '../node_modules/phaser/dist/phaser.min.js'
+
+import Chunk from '../client/Chunk'
+
 Chunk.prototype.postDrawTile = function(x,y,tile,sprite){
     this.tilesMap.add(x-this.x,y-this.y,sprite);
     if(COLL == 'client'){

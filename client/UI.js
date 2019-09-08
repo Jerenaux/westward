@@ -442,10 +442,11 @@ UI.displayRegionSelectionMenu = function () {
     //Client.requestCampsData();
 
     var w = 400;
-    var h = 220;
-    var panel = new InfoPanel((UI.getGameWidth() - w) / 2, (UI.getGameHeight() - h) / 2, w, h, 'Region selection');
+    var h = 170;
+    var panel = new InfoPanel((UI.getGameWidth() - w) / 2, (UI.getGameHeight() - h) / 2 - 50, w, h, 'Region selection');
     panel.addText(10, 15, UI.textsData['settlement_intro'], null, 14, Utils.fonts.normal);
     panel.addBigButton('Got it');
+    panel.moveUp(2);
     panel.display();
     UI.SSpanel = panel;
 
@@ -453,7 +454,9 @@ UI.displayRegionSelectionMenu = function () {
 
 UI.displayRegions = function (list) {
     for (var e in list.regions) {
-        UI.displayRegion(list.regions[e], list.world);
+        var region = list.regions[e];
+        // if(region.starting) UI.displayRegion(region, list.world);
+        UI.displayRegion(region, list.world);
     }
 };
 

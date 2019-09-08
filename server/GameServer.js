@@ -111,7 +111,7 @@ GameServer.readMap = function(mapsPath,test,cb){
         GameServer.initializationMethods = {
             'static_data': null,
             'player_data': GameServer.readPlayersData,
-            'regions': GameServer.loadRegions,
+            // 'regions': GameServer.loadRegions,
             'camps': GameServer.setUpCamps,
             'buildings': GameServer.loadBuildings,
             'items': GameServer.loadItems,
@@ -145,7 +145,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.civsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'civs.json')).toString()); // './assets/data/civs.json'
     GameServer.buildingsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'buildings.json')).toString()); // './assets/data/buildings.json'
     GameServer.classData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'classes.json')).toString()); // './assets/data/classes.json'
-    GameServer.regionsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'regions.json')).toString()); // './assets/data/classes.json'
+    GameServer.regions = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'regions.json')).toString()); // './assets/data/classes.json'
     GameServer.tutorialData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'tutorials.json')).toString()); // './assets/data/texts.json'
     GameServer.instances = {};
 
@@ -330,10 +330,10 @@ GameServer.readPlayersData = function(){
  * Load regions data.
  * Called by the initialization sequence.
  */
-GameServer.loadRegions = function(){
+/*GameServer.loadRegions = function(){
     GameServer.regions = JSON.parse(fs.readFileSync(pathmodule.join('assets','data','regions.json')).toString());
     GameServer.updateStatus();
-};
+};*/
 
 /**
  * Add a building to the game world.
@@ -728,7 +728,7 @@ GameServer.addNewPlayer = function(socket,data){
             return null;
         }
     }
-    var region = data.selectedSettlement;
+    var region = data.selectedRegion;
     if(region === undefined) region = 0;
 
     var player = new Player();
@@ -2070,8 +2070,8 @@ GameServer.computeFrontier = function(setFlag){
 GameServer.computeRegions = function(){
     GameServer.regionBoundaries = [];
     var sites = [];
-    for(var id in GameServer.regionsData){
-        var region = GameServer.regionsData[id];
+    for(var id in GameServer.regions){
+        var region = GameServer.regions[id];
         sites.push({
             x: region.x,
             y: region.y

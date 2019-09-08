@@ -17,7 +17,7 @@ function MiniMap(){
     this.ring.setScrollFactor(0);
     this.ring.setVisible(false);
 
-    this.map = new WorldMap(x,y,r,r,0,0,false,true);
+    this.map = new WorldMap(x,y,r,r,0,0,true);
     this.map.addMask(null,{
         type: 'circle',
         x: x,

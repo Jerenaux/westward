@@ -10,6 +10,7 @@ import Utils from '../shared/Utils'
 
 import itemsData from '../assets/data/items.json'
 import buildingsData from '../assets/data/buildings.json'
+import regionsData from '../assets/data/regions.json'
 
 var fowID = 0;
 
@@ -24,7 +25,7 @@ var WorldMap = new Phaser.Class({
     * - dragMap() repositions the elements of the map when it has moved (useful for follow behavior, even if actual drag by player is disabled)
     * */
 
-    initialize: function Map(x, y, viewW, viewH, dragWidth, dragHeight, showToponyms, minimap) {
+    initialize: function WorldMap(x, y, viewW, viewH, dragWidth, dragHeight, minimap) {
         // viewW is either a radius or a rect width; controls the size of area in which pins will appear
         // (it is dissociated from the mask size, which depends on the size of the image used for masking)
         
@@ -57,17 +58,12 @@ var WorldMap = new Phaser.Class({
 
         this.toponyms = [];
 
-        /*if(showToponyms) {
-            Engine.settlementsData.forEach(function (s) {
-                this.addText(s);
-            }, this);
-            }, this);
-        }*/
-
         if(!this.minimap) {
             this.offZone = new Phaser.Geom.Rectangle(932,418,60,50);
             this.setInteractive(); // { pixelPerfect: true } // not needed anymore with rendertexture apparently
             this.on('pointerup', this.handleClick.bind(this));
+
+            // Iterate over regions and create toponyms
         }
         /*UI.scene.input.setDraggable(this);
         this.dragWidth = (dragWidth > -1 ? dragWidth : 999999);
@@ -120,22 +116,6 @@ var WorldMap = new Phaser.Class({
 
             this.setMask(shape.createGeometryMask());
         }
-
-        this.toponyms.forEach(function(toponym){
-            toponym.setMask(this.mask);
-        },this);
-    },
-
-    addText: function(settlement){
-        var text = UI.scene.add.text(0, 0, settlement.name,{font: '60px treamd', fill: '#966f33', stroke: '#000000', strokeThickness: 3});
-        text.tx = settlement.x;
-        text.ty = settlement.y;
-        text.setDepth(3);
-        text.setVisible(false);
-        text.setScrollFactor(0,0);
-        text.setAlpha(0.5);
-        text.setOrigin(0.5);
-        this.toponyms.push(text);
     },
 
     handleDrag: function(pointer,x,y){
@@ -291,9 +271,6 @@ var WorldMap = new Phaser.Class({
         this.centerMap(); // center on current center ; must be called before positioning pins
         this.repositionMarkers('displayedPins');
         this.repositionMarkers('displayedDash');
-        // this.displayedPins.forEach(function(pin){
-        //     pin.reposition();
-        // });
         // this.positionToponyms();
         // this.computeDragLimits();
     },
@@ -391,12 +368,12 @@ var WorldMap = new Phaser.Class({
         if(!this.minimap && this.scaleX < 0.5) this.zoomIn();
         this.centerMap(Engine.player.getTilePosition());
         // this.setInputArea();
-        // this.positionToponyms();
         this.computeDragLimits();
         if(!this.minimap){
             this.applyFogOfWar();
             this.displayBorders(Engine.player.frontier,0xff0000);
             this.displayBorders(Engine.player.regions,0x57360a);
+            this.displayToponyms();
         }
 
         this.displayPins();
@@ -420,6 +397,19 @@ var WorldMap = new Phaser.Class({
                 pt.y += size*speed.y;
             }
         },this);
+    },
+
+    displayToponyms: function(){
+        // Iterate over toponyms and set visibility
+        // for(var id in regionsData){
+        //     var region = regionsData[id];
+        //     for(var i = 0; i < Engine.player.FoW.length; i++){
+        //         var rect = Engine.player.FoW[i];
+        //         if(rect.contains(region.x,region.y)){
+        //
+        //         }
+        //     }
+        // }
     },
 
     displayPins: function(){

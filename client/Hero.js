@@ -37,7 +37,7 @@ let Hero = new Phaser.Class({
         // data comes from Player.initTrim() server-side
         Player.prototype.setUp.call(this,data);
 
-        this.settlement = data.settlement || 0;
+        this.region = data.region || 0;
         this.buildingMarkers = [];
         this.resourceMarkers = [];
         this.animalMarkers = [];
