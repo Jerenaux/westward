@@ -734,14 +734,12 @@ GameServer.addNewPlayer = function(socket,data){
     var player = new Player();
     player.setUp(++GameServer.lastPlayerID, data.characterName, region);
   
-    if(data.tutorial) {
+    /*if(data.tutorial) {
         player.setInstance();
         if(data.tutorial) GameServer.createInstance(player);
         var info = GameServer.tutorialData['initData'];
         player.setRespawnLocation(info.x,info.y);
-    }
-    // var model = new GameServer.PlayerModel(player);
-    // console.warn('model = ',model._id);
+    }*/
     GameServer.postProcessPlayer(socket,player);
     if(!player.isInstanced()) GameServer.saveNewPlayerToDb(socket,player);
 
@@ -1948,6 +1946,7 @@ GameServer.handleAOItransition = function(entity,previous){
     if(entity.isPlayer) {
         GameServer.updateVision();
         GameServer.updateFoW();
+        entity.setRegion();
     }
     newAOIs.forEach(function(aoi){
         if(entity.isPlayer) entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
@@ -2069,6 +2068,7 @@ GameServer.computeFrontier = function(setFlag){
 
 GameServer.computeRegions = function(){
     GameServer.regionBoundaries = [];
+    GameServer.regionsCache = {};
     var sites = [];
     for(var id in GameServer.regions){
         var region = GameServer.regions[id];
@@ -2095,6 +2095,23 @@ GameServer.computeRegions = function(){
             }
         });
     },this);
+};
+
+GameServer.getRegion = function(entity){
+    var aoi = Utils.tileToAOI(entity);
+    if(aoi in GameServer.regionsCache) return GameServer.regionsCache[aoi];
+    var min = 999999;
+    var closest = null;
+    for(var id in GameServer.regions){
+        var region = GameServer.regions[id];
+        var d = Utils.euclidean(region,entity);
+        if(d < min){
+            min = d;
+            closest = region;
+        }
+    }
+    GameServer.regionsCache[aoi] = region.id;
+    return region.id;
 };
 
 /**

@@ -62,7 +62,6 @@ Packaging
 
 Bugs:
 Features:
-- Show toponyms
 - Update region name + notif when crossing
 - Regional missions menu
 -> Status: settled, contested, ...
@@ -76,10 +75,13 @@ production capacity (based on # buildings of a given time) / some kind of "GDP",
 tower coverage, offensive goals if civ buildings / recent attacks ...
 
 - Restore dragging
-- Improve legend with toggling, display built or not, filter on building type?
-- Gif of bow attack
+- Button to toggle regions (borders and banner names)
+- Button to toggle legend
+- Add borders to legend
+- Icon for unbuilt building (lower half colored)
+- Toggle markers by click on legend
+- UI to filter on building types
 - Display item rarity in inventory (check if doesn't conflit with shop)
-- Add belts?
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Belt & backpack & gold capacity + corresponding items (incl. defaults)

@@ -14,6 +14,7 @@ import Utils from '../shared/Utils'
 import World from '../shared/World'
 
 import itemsData from '../assets/data/items.json'
+import regionsData from '../assets/data/regions.json'
 
 function ClassDataShell(){
     for(let i = 0; i < 4; i++){
@@ -93,6 +94,7 @@ let Hero = new Phaser.Class({
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
             'rarity': this.updateRarity,
+            'region': this.updateRegion,
             'regions': this.updateRegions,
             'resetTurn': BattleManager.resetTurn,
             'resourceMarkers': this.updateResourceMarkers,
@@ -321,6 +323,11 @@ let Hero = new Phaser.Class({
 
     updateFrontier: function(frontier){
         this.frontier = frontier;
+    },
+
+    updateRegion: function(region){
+        this.region = region;
+        Engine.setlCapsule.setText(regionsData[region].name);
     },
 
     updateRegions: function(regions){

@@ -40,7 +40,7 @@
         boot:{
             autoBoot: false,
             forceNewPlayer: false,
-            offerTutorial: true
+            offerTutorial: false
         },
         config:{
             fogOfWar: true

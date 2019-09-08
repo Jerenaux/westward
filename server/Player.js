@@ -145,25 +145,19 @@ Player.prototype.isMerchant = function () {
 Player.prototype.setUp = function(id,name,region){
     this.id = id;
     this.name = name;
-    this.setRegion(region);
+    this.origin = region;
 };
 
-Player.prototype.setRegion = function (sid) {
-    if(!GameServer.regions.hasOwnProperty(sid)){
-        console.warn('WARNING: non-existant region ',sid);
-        sid = 0;
-    }
-    this.sid = sid;
-    this.region = GameServer.regions[this.sid];
-    this.setRespawnLocation(this.region.x,this.region.y);
+Player.prototype.setRegion = function() {
+    this.setOwnProperty('region',GameServer.getRegion(this));
 };
 
-Player.prototype.setRespawnLocation  = function(x,y){
+/*Player.prototype.setRespawnLocation  = function(x,y){
     this.respawnLocation = {
         x: x,
         y: y
     };
-};
+};*/
 
 Player.prototype.getRegionName = function () {
     return this.region.name;
@@ -265,8 +259,8 @@ Player.prototype.die = function () {
 };
 
 Player.prototype.setLocation = function(x, y){
-    x = x || this.respawnLocation.x;
-    y = y || this.respawnLocation.y;
+    x = x || GameServer.regions[this.origin].x;
+    y = y || GameServer.regions[this.origin].y;
     var pos = GameServer.findNextFreeCell(x,y);
     x = pos.x;
     y = pos.y;
@@ -726,7 +720,7 @@ Player.prototype.initTrim = function () {
     for (var p = 0; p < broadcastProperties.length; p++) {
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
-    trimmed.region = this.sid;
+    trimmed.region = GameServer.getRegion(this);
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     return trimmed;
@@ -815,7 +809,7 @@ Player.prototype.getDataFromDb = function (data) {
         }
     }
 
-    this.setRegion(data.sid);
+    this.origin = this.setOrigin(data.origin);
     this.giveGold(data.gold);
     this.history = data.history;
 
@@ -828,6 +822,10 @@ Player.prototype.save = function () {
     if (this.inFight) return false;
     this.savestamp = Date.now();
     GameObject.prototype.save.call(this);
+};
+
+Player.prototype.setOrigin = function(origin){
+    this.origin = (origin ? origin : GameServer.getRegion(this));
 };
 
 Player.prototype.setAction = function (action) {

@@ -49,7 +49,7 @@ let Schemas = {
         ap: mongoose.Schema.Types.Mixed,
         equipment: mongoose.Schema.Types.Mixed,
         commitSlots: mongoose.Schema.Types.Mixed,
-        sid: {type: Number, min: 0, required: true},
+        origin: {type: Number, min: 0, required: true},
         inventory: {type: [[]], set:function(inventory){
                 return inventory.toList(true); // true: filter zeroes
             }},
