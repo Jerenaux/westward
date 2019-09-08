@@ -716,10 +716,8 @@ function SettlementCapsule(x,y){
 SettlementCapsule.prototype.setText = function(text){
     var tx = this.text.width;
     this.text.setText(text);
-    var delta = this.text.width - tx - 10;
-
-    this.slices[0].width += delta;
-    this.slices[1].x -= delta;
+    this.slices[0].width = this.text.width + 60;
+    this.slices[1].x = this.slices[0].x - (this.slices[0].width/2) - (this.slices[1].width) - 30;
 };
 
 SettlementCapsule.prototype.display = function(){

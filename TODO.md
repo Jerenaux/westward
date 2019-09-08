@@ -61,9 +61,10 @@ Packaging
 - No silhouette behind dead trees
 
 Bugs:
+- Issue with bear animations
+- Bug with region transition (test without cache)
 Features:
-- Update region name (test) + notif when crossing
-- Test respawn
+- Test respawn, test new player
 - Regional missions menu
 -> Status: wild, settled, occupied, contested, ...
 -> General info: how many regions settled, which regions are the most dangerous/currently contested, which
