@@ -395,7 +395,7 @@ Engine.initWorld = function(data){
 
     Engine.makeUI();
 
-    Engine.setlCapsule.setText(regionsData[Engine.player.region].name);
+    Engine.setlCapsule.setText(regionsData[data.region].name);
 
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
@@ -716,7 +716,7 @@ function SettlementCapsule(x,y){
 SettlementCapsule.prototype.setText = function(text){
     var tx = this.text.width;
     this.text.setText(text);
-    var delta = this.text.width - tx - 20;
+    var delta = this.text.width - tx - 10;
 
     this.slices[0].width += delta;
     this.slices[1].x -= delta;

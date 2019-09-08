@@ -149,8 +149,15 @@ Player.prototype.setUp = function(id,name,region){
 };
 
 Player.prototype.setRegion = function() {
+    var region_ = this.region;
     this.setOwnProperty('region',GameServer.getRegion(this));
+    if(this.region != region_) this.addNotif('Entering '+GameServer.regions[this.region].name+' region');
 };
+
+Player.prototype.setOrigin = function(origin){
+    this.origin = (origin ? origin : GameServer.getRegion(this));
+};
+
 
 /*Player.prototype.setRespawnLocation  = function(x,y){
     this.respawnLocation = {
@@ -809,7 +816,7 @@ Player.prototype.getDataFromDb = function (data) {
         }
     }
 
-    this.origin = this.setOrigin(data.origin);
+    this.setOrigin(data.origin);
     this.giveGold(data.gold);
     this.history = data.history;
 
@@ -822,10 +829,6 @@ Player.prototype.save = function () {
     if (this.inFight) return false;
     this.savestamp = Date.now();
     GameObject.prototype.save.call(this);
-};
-
-Player.prototype.setOrigin = function(origin){
-    this.origin = (origin ? origin : GameServer.getRegion(this));
 };
 
 Player.prototype.setAction = function (action) {

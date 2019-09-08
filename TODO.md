@@ -62,10 +62,11 @@ Packaging
 
 Bugs:
 Features:
-- Update region name + notif when crossing
+- Update region name (test) + notif when crossing
+- Test respawn
 - Regional missions menu
--> Status: settled, contested, ...
--> General info: how many regions settled, which regions are the most dangerous, which
+-> Status: wild, settled, occupied, contested, ...
+-> General info: how many regions settled, which regions are the most dangerous/currently contested, which
 regions are the most/least developed
 -> # days since last attack
 -> Quantify resources nodes on the right side of frontier, 

@@ -373,7 +373,7 @@ var WorldMap = new Phaser.Class({
             this.applyFogOfWar();
             this.displayBorders(Engine.player.frontier,0xff0000);
             this.displayBorders(Engine.player.regions,0x57360a);
-            this.displayToponyms();
+            // this.displayToponyms();
         }
 
         this.displayPins();
