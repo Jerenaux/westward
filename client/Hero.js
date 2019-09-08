@@ -45,6 +45,7 @@ let Hero = new Phaser.Class({
         this.conflictMarkers = [];
         this.FoW = [];
         this.frontier = [];
+        this.regions = [];
         this.inventory = new Inventory();
         this.belt = new Inventory(3); //TODO: conf
         this.stats = new StatsContainer();
@@ -92,6 +93,7 @@ let Hero = new Phaser.Class({
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
             'rarity': this.updateRarity,
+            'regions': this.updateRegions,
             'resetTurn': BattleManager.resetTurn,
             'resourceMarkers': this.updateResourceMarkers,
             'stats': this.updateStats
@@ -319,6 +321,10 @@ let Hero = new Phaser.Class({
 
     updateFrontier: function(frontier){
         this.frontier = frontier;
+    },
+
+    updateRegions: function(regions){
+        this.regions = regions;
     },
 
     updateGold: function(gold){

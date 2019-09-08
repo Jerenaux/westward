@@ -145,6 +145,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.civsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'civs.json')).toString()); // './assets/data/civs.json'
     GameServer.buildingsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'buildings.json')).toString()); // './assets/data/buildings.json'
     GameServer.classData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'classes.json')).toString()); // './assets/data/classes.json'
+    GameServer.regionsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'regions.json')).toString()); // './assets/data/classes.json'
     GameServer.tutorialData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'tutorials.json')).toString()); // './assets/data/texts.json'
     GameServer.instances = {};
 
@@ -178,6 +179,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.battleRemains = [];
     GameServer.marketPrices = new ListMap();
 
+    GameServer.computeRegions();
     GameServer.initializeFlags();
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
@@ -1052,7 +1054,7 @@ GameServer.addRemains = function(x,y,type){
 
     new Remains(x,y,t);
 
-    var document = new GameServer.RemainModel({x: x, y: y});
+    var document = new GameServer.RemainModel({x: x, y: y, type:t});
     document.save(function (err) {
         if (err) return console.error(err);
     });
@@ -2063,6 +2065,36 @@ GameServer.computeFrontier = function(setFlag){
     },this);
     // console.log('frontier:',GameServer.frontier);
     if(setFlag) GameServer.setFlag('frontier');
+};
+
+GameServer.computeRegions = function(){
+    GameServer.regionBoundaries = [];
+    var sites = [];
+    for(var id in GameServer.regionsData){
+        var region = GameServer.regionsData[id];
+        sites.push({
+            x: region.x,
+            y: region.y
+        });
+    }
+
+    var voronoi = new Voronoi();
+    var bbox = {xl: 0, xr: World.worldWidth, yt: 0, yb: World.worldHeight}; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
+    var diagram = voronoi.compute(sites, bbox);
+
+    diagram.edges.forEach(function(edge){
+        if(!edge.lSite || !edge.rSite) return;
+        GameServer.regionBoundaries.push({
+            a:{
+                x: edge.va.x,
+                y: edge.va.y
+            },
+            b:{
+                x: edge.vb.x,
+                y: edge.vb.y
+            }
+        });
+    },this);
 };
 
 /**

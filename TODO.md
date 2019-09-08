@@ -62,14 +62,21 @@ Packaging
 
 Bugs:
 Features:
-- Collective missions menu
--> Start wih basic production quests
-- semi-permanent camp markers (always visible once discovered)
+- Define regions
+- Work out visual boundaries
+- More starting regions
+- Update region name + notif when crossing
+- Regional missions menu
+-> Status: settled, contested, ...
+-> General info: how many regions settled, which regions are the most dangerous, which
+regions are the most/least developed
+-> # days since last attack
 -> Quantify resources nodes on the right side of frontier, 
 production capacity (based on # buildings of a given time) / some kind of "GDP",
 - Make smart missions based on these indicators (+ as many others as possible)
-- Split all per region (also visually)
--> Name regions and compute borders in a Voronoi way by placing invisible region centers
+-> List of missions based on existing buildings, local rarity and/or locally available resources,
+tower coverage, offensive goals if civ buildings / recent attacks ...
+
 - Restore dragging
 - Improve legend with toggling, display built or not, filter on building type?
 - Gif of bow attack

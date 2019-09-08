@@ -65,7 +65,7 @@ let Schemas = {
     remainsSchema: mongoose.Schema({
         x: {type: Number, min: 0, required: true},
         y: {type: Number, min: 0, required: true},
-        type: String,
+        type: Number,
         createdAt: { type: Date, expires: 3600*24*30, default: Date.now } // TODO: conf
     })
 };

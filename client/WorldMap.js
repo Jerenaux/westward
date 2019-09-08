@@ -251,9 +251,9 @@ var WorldMap = new Phaser.Class({
         return pin;
     },
 
-    addDash: function(fx,fy,tx,ty){
+    addDash: function(fx,fy,tx,ty,color){
         var dash = this.getNextDash();
-        dash.setUp(fx,fy,tx,ty);
+        dash.setUp(fx,fy,tx,ty,color);
         this.displayedDash.push(dash);
     },
 
@@ -356,6 +356,7 @@ var WorldMap = new Phaser.Class({
     },
 
     applyFogOfWar: function(){
+        if(!Engine.config.fogOfWar) return;
         // Maps rects to one single flat list of top-left and bottom-right coordinates,
         // for use by the shader
         var rects = [];
@@ -394,7 +395,8 @@ var WorldMap = new Phaser.Class({
         this.computeDragLimits();
         if(!this.minimap){
             this.applyFogOfWar();
-            this.displayFrontier();
+            this.displayBorders(Engine.player.frontier,0xff0000);
+            this.displayBorders(Engine.player.regions,0x57360a);
         }
 
         this.displayPins();
@@ -403,21 +405,8 @@ var WorldMap = new Phaser.Class({
         // if(!this.minimap) this.getZoomBtn('out').disable();
     },
 
-    displayFrontier: function(){
-        var frontier = [
-            {
-                a:{
-                    x: 518,
-                    y: 565,
-                },
-                b:{
-                    x: 518,
-                    y: 690
-                }
-            }
-        ];
-
-        Engine.player.frontier.forEach(function(edge){
+    displayBorders: function(borders,color){
+        borders.forEach(function(edge){
             var angle = -Phaser.Math.Angle.Between(edge.a.x,edge.a.y,edge.b.x,edge.b.y);
             var speed = Utils.computeSpeed(angle);
             var length = 8;
@@ -426,7 +415,7 @@ var WorldMap = new Phaser.Class({
             var nb = Phaser.Math.Distance.Between(edge.a.x,edge.a.y,edge.b.x,edge.b.y)/size;
             var pt = {x:edge.a.x, y:edge.a.y};
             for(var c = 0; c < nb; c++){
-                this.addDash(pt.x,pt.y,pt.x+(length*speed.x),pt.y+(length*speed.y));
+                this.addDash(pt.x,pt.y,pt.x+(length*speed.x),pt.y+(length*speed.y),color);
                 pt.x += size*speed.x;
                 pt.y += size*speed.y;
             }
@@ -508,8 +497,10 @@ var WorldMap = new Phaser.Class({
 
 var MapMarker = new Phaser.Class({
     setVisibility: function(){
-        // this.setVisible(true);
-        // return;
+        if(!Engine.config.fogOfWar) {
+            this.setVisible(true);
+            return;
+        }
         // If on minimap, display straight away if within rect; if in big map, display only if not within FoW
         if(this.parentMap.viewRect.contains(this.x,this.y)){
             if(this.parentMap.minimap){
@@ -607,12 +598,11 @@ var Dash = new Phaser.Class({
         this.markerType = 'dash';
         this.setOrigin(0);
         this.setScrollFactor(0);
-        this.setStrokeStyle(1,0xff0000);
         this.setVisible(false);
         this.parentMap = map;
     },
 
-    setUp: function(fx,fy,tx,ty){
+    setUp: function(fx,fy,tx,ty,color){
         // console.warn(fx,fy,tx,ty);
         var from = this.parentMap.computeMapLocation(fx,fy);
         var to = this.parentMap.computeMapLocation(tx,ty);
@@ -621,6 +611,7 @@ var Dash = new Phaser.Class({
         this.setDepth(2);
         this.setPosition(from.x,from.y);
         this.setTo(0,0, to.x-from.x,to.y-from.y);
+        this.setStrokeStyle(1,color);
         this.setVisibility();
     }
 });

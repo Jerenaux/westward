@@ -430,7 +430,6 @@ Engine.initWorld = function(data){
 
     if(Client.tutorial) TutorialManager.boot(1);
 
-
     // todo: move all to dedicated sound manager
     /*Engine.lastOrientationSound = 0;
     // todo: move to JSON file (+ config for delay)
@@ -881,6 +880,7 @@ Engine.makeUI = function(){
         'crafting': Engine.makeCraftingMenu(),
         'inventory': Engine.makeInventory(statsPanel),
         'map': Engine.makeMapMenu(),
+        'missions': Engine.makeMissionsMenu(),
         //'messages': Engine.makeMessagesMenu(),
         'production': Engine.makeProductionMenu(),
         'respawn': Engine.makeRespawnMenu(),
@@ -894,7 +894,7 @@ Engine.makeUI = function(){
     Engine.addMenu(967,150,'menu_map',Engine.menus.map,855,73);
     Engine.addMenu(922,150,'menu_backpack',Engine.menus.inventory,815,73);
     Engine.addMenu(884,130,'menu_dude',Engine.menus.character,775,73);
-    //Engine.addMenu(863,95,'menu_flag',Engine.menus.inventory,735,73);
+    Engine.addMenu(863,95,'menu_flag',Engine.menus.missions,735,73);
     Engine.addMenu(20,60,'shovel',Engine.menus.build,-100,60);
 
     Engine.makeBattleUI();
@@ -1574,6 +1574,16 @@ Engine.makeAbilitiesMenu = function(){
     var menu = new Menu('Abilities');
     menu.addPanel('abilities',new AbilitiesPanel(40,100,600,380,'Abilities'));
     menu.addPanel('desc',new AbilityPanel(660,100,340,380,'Description'));
+    return menu;
+};
+
+Engine.makeMissionsMenu = function(){
+    var menu = new Menu('Missions');
+    menu.log = true;
+
+
+
+    // menu.addEvent('onOpen',log.update.bind(log));
     return menu;
 };
 

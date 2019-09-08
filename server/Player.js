@@ -702,6 +702,7 @@ Player.prototype.getIndividualUpdatePackage = function () {
 Player.prototype.getWorldInformation = function(){
     this.setOwnProperty('fow',GameServer.fowList);
     this.setOwnProperty('frontier',GameServer.frontier);
+    this.setOwnProperty('regions',GameServer.regionBoundaries);
     this.setOwnProperty('buildingMarkers', GameServer.listBuildingMarkers(this.instance));
     this.setOwnProperty('resourceMarkers',  GameServer.listResourceMarkers());
     this.setOwnProperty('animalMarkers', GameServer.listAnimalMarkers());

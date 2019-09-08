@@ -41,6 +41,9 @@
             autoBoot: false,
             forceNewPlayer: false,
             offerTutorial: true
+        },
+        config:{
+            fogOfWar: true
         }
     }
 }
