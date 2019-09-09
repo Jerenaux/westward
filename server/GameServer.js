@@ -2068,9 +2068,9 @@ GameServer.computeFrontier = function(setFlag){
 
 GameServer.computeRegions = function(){
     GameServer.regionBoundaries = [];
-    GameServer.regions = {}
+    GameServer.regions = {};
     var sites = [];
-    for(var id in GameServer.regions){
+    for(var id in GameServer.regionsData){
         var region = GameServer.regionsData[id];
         GameServer.regions[id] = new Region(region);
         sites.push({
@@ -2101,19 +2101,20 @@ GameServer.computeRegions = function(){
 
 GameServer.getRegion = function(entity){
     var aoi = GameServer.AOIs[Utils.tileToAOI(entity)];
-    if(aoi.region) return aoi.region;
-    var min = 999999;
-    var closest = null;
-    for(var id in GameServer.regions){
-        var region = GameServer.regions[id];
-        var d = Utils.euclidean(region,entity);
-        if(d < min){
-            min = d;
-            closest = region;
+    if(!aoi.region) {
+        var min = 999999;
+        var closest = null;
+        for (var id in GameServer.regions) {
+            var region = GameServer.regions[id];
+            var d = Utils.euclidean(region, entity);
+            if (d < min) {
+                min = d;
+                closest = region;
+            }
         }
+        aoi.region = closest.id;
     }
-    aoi.region = region.id;
-    return region.id;
+    return aoi.region;
 };
 
 /**

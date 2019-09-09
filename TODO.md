@@ -62,11 +62,9 @@ Packaging
 
 Bugs:
 - Issue with bear animations
-- Bug with region transition (test without cache)
+- Remains TTL not working
 - Fix glitch
-- Wrong "arrived in" message for new players / redundant
 Features:
-- Test remains
 - Test respawn, test new player
 - Regional missions menu
 -> Status: wild, settled, occupied, contested, ...

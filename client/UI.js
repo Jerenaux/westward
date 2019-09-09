@@ -455,8 +455,8 @@ UI.displayRegionSelectionMenu = function () {
 UI.displayRegions = function (list) {
     for (var e in list.regions) {
         var region = list.regions[e];
-        // if(region.starting) UI.displayRegion(region, list.world);
-        UI.displayRegion(region, list.world);
+        if(region.starting) UI.displayRegion(region, list.world);
+        // UI.displayRegion(region, list.world);
     }
 };
 

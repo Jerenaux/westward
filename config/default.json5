@@ -95,7 +95,7 @@
         },
         config: { // Will be in Engine.config
             chatTimeout: 5000, //ms
-            fogOfWar: true,
+            fogOfWar: false,
             notificationTimeout: 3000, //ms ; TODO: adapt based on length?
             hearingDistance: 30, // tiles
             defaultBuildRecipes: [3,4,6,11,2] // workshop, shop, lumbercamp, shack

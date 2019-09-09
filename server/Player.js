@@ -151,7 +151,6 @@ Player.prototype.setUp = function(id,name,region){
 Player.prototype.setRegion = function() {
     var region_ = this.region;
     this.setOwnProperty('region',GameServer.getRegion(this));
-    console.warn('comparing regions:',region_,this.region);
     if(this.region != region_) this.addNotif('Entering '+GameServer.regions[this.region].name+' region');
 };
 
