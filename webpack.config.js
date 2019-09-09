@@ -16,6 +16,7 @@ const WriteFilePlugin = require('write-file-webpack-plugin');
 module.exports = {
     entry: {
         'client':'./client/main.js',
+        'editor':'./editor/editor.js',
         'server':'./server.js',
         'test': './test/tests.js'
     },

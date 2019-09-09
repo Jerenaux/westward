@@ -1,11 +1,12 @@
-import Engine from './Engine'
 import {SpaceMap} from '../shared/SpaceMap'
 import Utils from '../shared/Utils'
 import World from '../shared/World'
 
 var TREE_ALPHA = 1;
 
-function Chunk(data){
+function Chunk(data, tilesetData, scene){
+    this.tilesetData = tilesetData;
+    this.scene = scene;
     this.id = data.id;
     this.x = parseInt(data.x);
     this.y = parseInt(data.y);
@@ -34,9 +35,9 @@ Chunk.prototype.draw = function(){
             var ty = this.y + y_;
             if(this.hasWater(tx,ty)) continue;
             if(this.defaultTile == 'grass') {
-                var gs = Engine.tilesetData.config.grassSize;
+                var gs = this.tilesetData.config.grassSize;
                 var t = (tx % gs) + (ty % gs) * gs;
-                this.drawTile(tx,ty,Engine.tilesetData.config.grassPrefix+'_'+t);
+                this.drawTile(tx,ty,this.tilesetData.config.grassPrefix+'_'+t);
             }
         }
     }
@@ -47,8 +48,8 @@ Chunk.prototype.draw = function(){
             if(tile === undefined) return;
             var x = this.x + parseInt(data[0]);
             var y = this.y + parseInt(data[1]);
-            var name = Engine.tilesetData.shorthands[tile];
-            if(!(tile in Engine.tilesetData.shorthands)) return;
+            var name = this.tilesetData.shorthands[tile];
+            if(!(tile in this.tilesetData.shorthands)) return;
             this.drawTile(x, y, name);
         },this);
     },this);
@@ -80,7 +81,7 @@ Chunk.prototype.drawTile = function(x,y,tile){
         Editor.ground.create(x * World.tileWidth, y * World.tileHeight, tile);
         return;
     }*/
-    var sprite = Engine.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',tile);
+    var sprite = this.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',tile);
     sprite.setDisplayOrigin(0,0);
     sprite.tileID = tile;
     this.tiles.push(sprite);
@@ -90,13 +91,13 @@ Chunk.prototype.drawTile = function(x,y,tile){
 
 Chunk.prototype.getAtlasData = function(image,data,longname){
     if(longname){
-        return Engine.tilesetData.atlas[image][data];
+        return this.tilesetData.atlas[image][data];
     }else {
-        if (!(image in Engine.tilesetData.shorthands)){
+        if (!(image in this.tilesetData.shorthands)){
             console.warn('Unknown shorthand',image);
             return false;
         }
-        return Engine.tilesetData.atlas[Engine.tilesetData.shorthands[image]][data];
+        return this.tilesetData.atlas[this.tilesetData.shorthands[image]][data];
     }
 };
 
@@ -106,7 +107,7 @@ Chunk.prototype.drawImage = function(x,y,image,depth,crop){
         x += offset.x;
         y += offset.y;
     }
-    var img = Engine.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',Engine.tilesetData.shorthands[image]);
+    var img = this.scene.add.image(x*World.tileWidth,y*World.tileHeight,'tileset',this.tilesetData.shorthands[image]);
     if(crop) img.setCrop(crop);
     var depthOffset = this.getAtlasData(image,'depthOffset') || 0;
     depth = depth || y;
@@ -154,28 +155,10 @@ Chunk.prototype.addImage = function(x,y,image){
     }
 };
 
-Chunk.prototype.addOverlay = function(cx,cy){
-    if(!Engine) return;
-    Engine.overlay.add(cx-1, cy-2, 1);
-    Engine.overlay.add(cx, cy-2, 1);
-    Engine.overlay.add(cx+1, cy-2, 1);
-    Engine.overlay.add(cx+2, cy-2, 1);
-    Engine.overlay.add(cx, cy-3, 1);
-    Engine.overlay.add(cx+1, cy-3, 1);
-};
-
-Chunk.prototype.addCollision = function(cx,cy){
-    Engine.collisions.add(cx, cy, 1);
-};
-
-Chunk.prototype.addResource = function(x,y){
-    Engine.resources.add(x,y);
-};
-
 Chunk.prototype.erase = function(){
     for(var x = this.x; x < this.x + World.chunkWidth; x++){
         for(var y = this.y; y < this.y + World.chunkHeight; y++){
-            Engine.collisions.delete(x,y);
+           this.removeCollision(x,y);
         }
     }
     this.tiles.forEach(function(tile){
@@ -183,34 +166,6 @@ Chunk.prototype.erase = function(){
     });
     this.images.forEach(function(image){
         image.destroy();
-    });
-};
-
-Chunk.prototype.postDrawTile = function(){}; // Used in editor
-Chunk.prototype.postDrawImage = function(x,y,image,sprite){
-    var hover = this.getAtlasData(image,'hover');
-    if(!hover) return;
-    sprite.id = 0;
-    sprite.tx = Math.floor(x);
-    sprite.ty = Math.floor(y);
-    sprite.setInteractive();
-    sprite.on('pointerover',function(){
-        UI.hoverFlower++;
-        sprite.formerFrame = sprite.frame.name;
-        sprite.setFrame(hover);
-        Engine.hideMarker();
-        UI.setCursor('item'); // TODO: use UI.manageCursor() instead?
-    });
-    sprite.on('pointerout',function(){
-        UI.hoverFlower--;
-        sprite.setFrame(sprite.formerFrame);
-        if(UI.hoverFlower <= 0) {
-            Engine.showMarker();
-            UI.setCursor();
-        }
-    });
-    sprite.on('pointerdown',function(){
-        if(!BattleManager.inBattle) Engine.processItemClick(sprite,true);
     });
 };
 

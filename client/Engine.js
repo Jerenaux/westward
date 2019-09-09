@@ -1687,7 +1687,7 @@ Engine.loadJSON = function(path,callback,data){
 };
 
 Engine.drawChunk = function(mapData,id){
-    var chunk = new Chunk(mapData, id, 1);
+    var chunk = new Chunk(mapData, Engine.tilesetData, Engine.scene);
     Engine.chunks[chunk.id] = chunk;
     if (!Engine.mapDataCache[chunk.id]) Engine.mapDataCache[chunk.id] = mapData;
     Engine.displayedChunks.push(chunk.id);
@@ -2303,20 +2303,54 @@ Engine.debugQT = function(quads){
     });
 };
 
-function cl(){
-    localStorage.clear();
-}
+Chunk.prototype.postDrawTile = function(){}; // Used in editor
+Chunk.prototype.postDrawImage = function(x,y,image,sprite){
+    var hover = this.getAtlasData(image,'hover');
+    if(!hover) return;
+    sprite.id = 0;
+    sprite.tx = Math.floor(x);
+    sprite.ty = Math.floor(y);
+    sprite.setInteractive();
+    sprite.on('pointerover',function(){
+        UI.hoverFlower++;
+        sprite.formerFrame = sprite.frame.name;
+        sprite.setFrame(hover);
+        Engine.hideMarker();
+        UI.setCursor('item'); // TODO: use UI.manageCursor() instead?
+    });
+    sprite.on('pointerout',function(){
+        UI.hoverFlower--;
+        sprite.setFrame(sprite.formerFrame);
+        if(UI.hoverFlower <= 0) {
+            Engine.showMarker();
+            UI.setCursor();
+        }
+    });
+    sprite.on('pointerdown',function(){
+        if(!BattleManager.inBattle) Engine.processItemClick(sprite,true);
+    });
+};
 
-function s(){
-    Client.socket.emit('ss');
-}
 
-function test(){
-    var rt = UI.scene.add.renderTexture(400, 300, 300, 300);
-    rt.draw(Engine.buildings[0],10,10);
-    rt.setDepth(100);
-    rt.setScrollFactor(0);
-    console.log('ok');
-}
+Chunk.prototype.addOverlay = function(cx,cy){
+    Engine.overlay.add(cx-1, cy-2, 1);
+    Engine.overlay.add(cx, cy-2, 1);
+    Engine.overlay.add(cx+1, cy-2, 1);
+    Engine.overlay.add(cx+2, cy-2, 1);
+    Engine.overlay.add(cx, cy-3, 1);
+    Engine.overlay.add(cx+1, cy-3, 1);
+};
+
+Chunk.prototype.addCollision = function(cx,cy){
+    Engine.collisions.add(cx, cy, 1);
+};
+
+Chunk.prototype.removeCollision = function(cx,cy){
+    Engine.collisions.delete(cx,cy);
+};
+
+Chunk.prototype.addResource = function(x,y){
+    Engine.resources.add(x,y);
+};
 
 export default Engine;

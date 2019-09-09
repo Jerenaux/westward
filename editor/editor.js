@@ -5,6 +5,9 @@
 import Phaser from '../node_modules/phaser/dist/phaser.min.js'
 
 import Chunk from '../client/Chunk'
+import {SpaceMap} from '../shared/SpaceMap'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
 Chunk.prototype.postDrawTile = function(x,y,tile,sprite){
     this.tilesMap.add(x-this.x,y-this.y,sprite);
@@ -56,6 +59,8 @@ Chunk.prototype.getTile = function(x,y){
     return this.tilesMap.get(cx,cy);
 };
 
+Chunk.prototype.addOverlay = function(){}
+
 Chunk.prototype.addCollision = function(cx,cy){
     if (COLL == 'client') Editor.collisions.add(cx, cy, 1);
     var tile = this.getTile(cx, cy);
@@ -64,6 +69,8 @@ Chunk.prototype.addCollision = function(cx,cy){
         this.tintSprite(tile);
     }
 };
+
+Chunk.prototype.removeCollision = function(x,y){}
 
 Chunk.prototype.addResource = function(x,y){}
 
@@ -179,7 +186,7 @@ Editor.loadJSON = function(path,callback,data){
 };
 
 Editor.addChunk = function(mapData){
-    var chunk = new Chunk(mapData);
+    var chunk = new Chunk(mapData, Editor.tilesetData, Editor.scene);
     Editor.chunks[chunk.id] = chunk;
     if (!Editor.mapDataCache[chunk.id]) Editor.mapDataCache[chunk.id] = mapData;
     Editor.displayedChunks.push(chunk.id);

@@ -64,6 +64,7 @@ Bugs:
 - Issue with bear animations
 - Bug with region transition (test without cache)
 - Fix glitch
+- Wrong "arrived in" message for new players / redundant
 Features:
 - Test remains
 - Test respawn, test new player
