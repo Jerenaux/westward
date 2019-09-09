@@ -168,7 +168,7 @@ Player.prototype.setOrigin = function(origin){
 };*/
 
 Player.prototype.getRegionName = function () {
-    return this.region.name;
+    return GameServer.regions[this.region].name;
 };
 
 Player.prototype.updateSteps = function () {

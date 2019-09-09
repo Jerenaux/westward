@@ -13,6 +13,7 @@ function AOI(id){
     var origin = Utils.AOItoTile(this.id);
     this.x = origin.x;
     this.y = origin.y;
+    this.region = null;
     this.entities = []; // list of entities situated within the area corresponding to this AOI; useful for synchronizing with new AOIs and as a form of quad-tree
     this.updatePacket = new UpdatePacket();
 }

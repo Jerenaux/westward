@@ -118,13 +118,16 @@ function Building(data){
 
 Building.prototype = Object.create(FightingEntity.prototype);
 Building.prototype.constructor = Building;
-
+/**
+ * Called for both player and civ buildings
+ */
 Building.prototype.embed = function(){
     GameServer.buildings[this.id] = this;
-    // console.warn('campID:',this.campID);
     if(this.campID > -1) GameServer.camps[this.campID].addBuilding(this);
     this.setOrUpdateAOI();
     this.setCollisions('add');
+    this.region = GameServer.getRegion(this);
+    GameServer.regions[this.region].addBuilding(this);
     if(!this.civ) this.updateBuild();
 };
 

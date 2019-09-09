@@ -46,6 +46,7 @@ import ListMap from '../shared/ListMap'
 import Pathfinder from '../shared/Pathfinder'
 import Player from './Player'
 import Prism from './Prism'
+import Region from './Region'
 import Remains from './Remains'
 import Schemas from './Schemas'
 import {SpaceMap} from '../shared/SpaceMap'
@@ -109,9 +110,8 @@ GameServer.readMap = function(mapsPath,test,cb){
         };
     }else {
         GameServer.initializationMethods = {
-            'static_data': null,
+            'static_data': null, // readMap
             'player_data': GameServer.readPlayersData,
-            // 'regions': GameServer.loadRegions,
             'camps': GameServer.setUpCamps,
             'buildings': GameServer.loadBuildings,
             'items': GameServer.loadItems,
@@ -145,7 +145,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.civsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'civs.json')).toString()); // './assets/data/civs.json'
     GameServer.buildingsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'buildings.json')).toString()); // './assets/data/buildings.json'
     GameServer.classData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'classes.json')).toString()); // './assets/data/classes.json'
-    GameServer.regions = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'regions.json')).toString()); // './assets/data/classes.json'
+    GameServer.regionsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'regions.json')).toString()); // './assets/data/classes.json'
     GameServer.tutorialData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'tutorials.json')).toString()); // './assets/data/texts.json'
     GameServer.instances = {};
 
@@ -180,6 +180,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.marketPrices = new ListMap();
 
     GameServer.computeRegions();
+
     GameServer.initializeFlags();
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
@@ -745,7 +746,6 @@ GameServer.addNewPlayer = function(socket,data){
 
     // Send extra stuff following player initialization, unique to new players
     player.setStartingInventory();
-    player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
     return player; // return value for the tests
 };
 
@@ -2068,10 +2068,11 @@ GameServer.computeFrontier = function(setFlag){
 
 GameServer.computeRegions = function(){
     GameServer.regionBoundaries = [];
-    GameServer.regionsCache = {};
+    GameServer.regions = {}
     var sites = [];
     for(var id in GameServer.regions){
-        var region = GameServer.regions[id];
+        var region = GameServer.regionsData[id];
+        GameServer.regions[id] = new Region(region);
         sites.push({
             x: region.x,
             y: region.y
@@ -2095,11 +2096,12 @@ GameServer.computeRegions = function(){
             }
         });
     },this);
+
 };
 
 GameServer.getRegion = function(entity){
-    var aoi = Utils.tileToAOI(entity);
-    if(aoi in GameServer.regionsCache) return GameServer.regionsCache[aoi];
+    var aoi = GameServer.AOIs[Utils.tileToAOI(entity)];
+    if(aoi.region) return aoi.region;
     var min = 999999;
     var closest = null;
     for(var id in GameServer.regions){
@@ -2110,7 +2112,7 @@ GameServer.getRegion = function(entity){
             closest = region;
         }
     }
-    GameServer.regionsCache[aoi] = region.id;
+    aoi.region = region.id;
     return region.id;
 };
 

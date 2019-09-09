@@ -70,9 +70,20 @@ Features:
 - Test respawn, test new player
 - Regional missions menu
 -> Status: wild, settled, occupied, contested, ...
+-> Missions based on buildings in region (build)
+-> Missions based on items in region (building & player inventories) (produce)
+-> Missions based on tower coverage
 -> General info: how many regions settled, which regions are the most dangerous/currently contested, which
 regions are the most/least developed
 -> # days since last attack
+-> Resource nodes missions (trade missions for unavailable resources)
+-> 
+
+-> Top-down smart missions: start from target amounts of items + tower coverage
+Deduce harvest/trade missions for ingredients
+List produce missions when ingredients are available
+Build a min. ratio of (work)shops to players
+
 -> Quantify resources nodes on the right side of frontier, 
 production capacity (based on # buildings of a given time) / some kind of "GDP",
 - Make smart missions based on these indicators (+ as many others as possible)
