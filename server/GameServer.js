@@ -427,7 +427,7 @@ GameServer.loadMarkers = function(){
         if (err) return console.log(err);
         GameServer.battleRemains = remains;
         GameServer.battleRemains.forEach(function(r){
-                new Remains(r.x,r.y);
+                new Remains(r.x,r.y,r.type);
         });
         // console.warn('tick:',tick,'/',nbTicks);
         if(++tick == nbTicks) GameServer.updateStatus();
@@ -2391,7 +2391,7 @@ GameServer.listCamps = function(){
 // List settlements for selection screen + to get list of toponyms
 GameServer.listRegions = function(){
     return {
-        regions: GameServer.regions,
+        regions: GameServer.regionsData,
         world: {
             width: World.worldWidth,
             height: World.worldHeight

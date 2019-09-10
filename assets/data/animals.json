@@ -26,7 +26,7 @@
     "sprite":"graywolf",
     "map_name": "Gray wolf pack",
     "animPrefix": "graywolf",
-    "nbPacks": 60,
+    "nbPacks": 65,
     "spawnRate": 30,
     "stats": {
       "hpmax": 100,
@@ -74,7 +74,7 @@
     "name": "Bear",
     "map_name":"Bear",
     "frame": 9,
-    "walkPrefix": "bear",
+    "animPrefix": "bear",
     "width": 2,
     "height": 2,
     "aggro": true,

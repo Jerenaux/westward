@@ -2,6 +2,7 @@
  * Created by jeren on 23-01-18.
  */
 
+import Client from './Client'
 import Engine from './Engine'
 import UI from './UI'
 

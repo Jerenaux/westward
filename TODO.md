@@ -59,13 +59,17 @@ Packaging
 - Spawn wolf colors based on N-S axis
 - Animation when hit (player, npc...)
 - No silhouette behind dead trees
+- Improve shape of battle areas
+- Message when entering enemy territory
 
 Bugs:
 - Issue with bear animations
-- Remains TTL not working
-- Fix glitch
+- Remains TTL not working (drop table entirely?)
+- Fix glitch: (703, 493), (779, 581)
+https://stackoverflow.com/questions/43285725/unable-to-access-function-bundled-by-webpack?rq=1
+https://stackoverflow.com/questions/35781579/basic-webpack-not-working-for-button-click-function-uncaught-reference-error
 Features:
-- Test respawn, test new player
+- Log when killed in battle
 - Regional missions menu
 -> Status: wild, settled, occupied, contested, ...
 -> Missions based on buildings in region (build)
@@ -114,6 +118,7 @@ Rivalry between regions
 María:
 - Footprints
 - Bear anim (walk, attack, die w/ & w/o arrows)
+- Add loot to bear
 - Player anim naked
 -> Look into superimposing equipment programmatically
 -> One basic player overlay for all
@@ -210,6 +215,8 @@ Secure
 
 Analytics:
 ---------
+- Add info for undefined events
+- Log region crossings
 - Fix event desc about enemy types
 - Log giving food to buildings in particular
 - Log repairs
