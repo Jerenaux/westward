@@ -18,7 +18,8 @@ module.exports = {
         'client':'./client/main.js',
         'editor':'./editor/editor.js',
         'server':'./server.js',
-        'test': './test/tests.js'
+        'test': './test/tests.js',
+        'worldMaker':'./tools/worldMaker.js'
     },
     output: {
         filename: "[name].js",
@@ -32,7 +33,7 @@ module.exports = {
     externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
 
     watchOptions: {
-        ignored: ['admin','docker','editor','maps','node_modules','tools']
+        ignored: ['admin','docker','editor','maps','maps/*','node_modules','tools']
     },
 
     devServer: {

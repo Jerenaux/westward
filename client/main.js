@@ -27,6 +27,3 @@ var config = {
 
 var game = new Phaser.Game(config);
 
-window.test =function(){
-        console.log('test successful');
-}

@@ -3,18 +3,16 @@
  */
 var fs = require('fs');
 var path = require('path');
-var clone = require('clone');
-var xml2js = require('xml2js');
-var config = require('config');
 var Jimp = require("jimp");
 var rwc = require('random-weighted-choice');
 var quickselect = require('quickselect');
 
-var World = require('../shared/World.js').World;
-var Utils = require('../shared/Utils.js').Utils;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var Geometry = require('./Geometry.js').Geometry;
 var autopath = require('./autopath');
+
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
 var counter = 0;
 var total = 0;
@@ -120,7 +118,7 @@ WorldMaker.prototype.run = function(){
     }
 
     this.tileset = JSON.parse(fs.readFileSync(path.join(__dirname,'..','assets','tilesets','tileset.json')).toString());
-    this.patterns = JSON.parse(fs.readFileSync(path.join(__dirname,'patterns.json')).toString());
+    this.patterns = JSON.parse(fs.readFileSync(path.join('tools','patterns.json')).toString());
     var dataAssets = path.join(__dirname,'..','assets','data');
     this.itemsData = JSON.parse(fs.readFileSync(path.join(dataAssets,'items.json')).toString());
     this.animalsData = JSON.parse(fs.readFileSync(path.join(dataAssets,'animals.json')).toString());
@@ -472,8 +470,8 @@ WorldMaker.prototype.plantTree = function(g,pos,type){
 
 WorldMaker.prototype.restoreForest = function(){
     console.log('Restoring existing forest...');
-    nbtrees = 0;
-    var trees = JSON.parse(fs.readFileSync(path.join(__dirname,'blueprints','trees.json')).toString());
+    var nbtrees = 0;
+    var trees = JSON.parse(fs.readFileSync(path.join('tools','blueprints','trees.json')).toString());
     trees.forEach(function(t){
         this.plantTree(t,this.checkPositions(t.x,t.y),t.v);
         nbtrees++;

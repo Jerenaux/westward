@@ -63,11 +63,6 @@ Packaging
 - Message when entering enemy territory
 
 Bugs:
-- Issue with bear animations
-- Remains TTL not working (drop table entirely?)
-- Fix glitch: (703, 493), (779, 581)
-https://stackoverflow.com/questions/43285725/unable-to-access-function-bundled-by-webpack?rq=1
-https://stackoverflow.com/questions/35781579/basic-webpack-not-working-for-button-click-function-uncaught-reference-error
 Features:
 - Log when killed in battle
 - Regional missions menu

@@ -214,26 +214,28 @@ Editor.zoom = function(coef){
     Editor.updateEnvironment();
 };
 
-var Engine = Editor;
-
-function f(x,y){
+window.f = function(x,y){
     Editor.centerCamera(x,y);
-}
+};
 
-function add(x,y,image){
+window.zoom = function(inc){
+    Editor.zoom(inc);
+};
+
+window.add = function(x,y,image){
     var id = Utils.tileToAOI({x:x,y:y});
     console.log(id);
     var chunk = Editor.chunks[id];
     //x -= chunk.x;
     //y -= chunk.y;
     chunk.drawImage(x,y,image);
-}
+};
 
-function snap (){
+window.snap = function(){
     game.renderer.snapshot(function(img){
         document.getElementById("render").src = img.src;
     });
-}
+};
 
 var VIEW_WIDTH = 30;
 var VIEW_HEIGHT = 20;
