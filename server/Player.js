@@ -693,6 +693,7 @@ Player.prototype.getIndividualUpdatePackage = function () {
     var pkg = this.updatePacket;
     if (GameServer.checkFlag('FoW')) pkg.fow = GameServer.fowList;
     if (GameServer.checkFlag('frontier')) pkg.frontier = GameServer.frontier;
+    if (GameServer.checkFlag('regionsStatus')) pkg.regionsStatus = GameServer.getRegionsStatus();
     if (GameServer.checkFlag('animalsMarkers')) pkg.animalMarkers = GameServer.listAnimalMarkers();
     if (GameServer.checkFlag('resourcesMarkers')) pkg.resourceMarkers = GameServer.listResourceMarkers();
     if (GameServer.checkFlag('buildingsMarkers')) pkg.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
@@ -706,7 +707,8 @@ Player.prototype.getIndividualUpdatePackage = function () {
 Player.prototype.getWorldInformation = function(){
     this.setOwnProperty('fow',GameServer.fowList);
     this.setOwnProperty('frontier',GameServer.frontier);
-    this.setOwnProperty('regions',GameServer.regionBoundaries);
+    this.setOwnProperty('regionsBoundaries',GameServer.regionBoundaries);
+    this.setOwnProperty('regionsStatus',GameServer.getRegionsStatus());
     this.setOwnProperty('buildingMarkers', GameServer.listBuildingMarkers(this.instance));
     this.setOwnProperty('resourceMarkers',  GameServer.listResourceMarkers());
     this.setOwnProperty('animalMarkers', GameServer.listAnimalMarkers());

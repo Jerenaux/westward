@@ -1,3 +1,5 @@
+import GameServer from "./GameServer";
+
 function Region(data){
     this.id = data.id;
     this.name = data.name;
@@ -41,6 +43,15 @@ Region.prototype.update = function(){
     if(playerBuildings > 0 && civBuildings > 0) this.status = 2; //contested
     console.warn('['+this.name+'] Status: ',this.status);
     // console.warn(this.goals);
+    GameServer.setFlag('regionsStatus');
+};
+
+Region.prototype.trim = function(){
+    return {
+        id: this.id,
+        status: this.status,
+        goals: this.goals
+    }
 };
 
 export default Region

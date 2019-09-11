@@ -197,7 +197,7 @@ GameServer.readMap = function(mapsPath,test,cb){
  */
 GameServer.initializeFlags = function(){
     var flags = ['nbConnected','FoW','resourcesMarkers','buildingsMarkers','animalsMarkers',
-        'deathMarkers', 'conflictMarkers','frontier'];
+        'deathMarkers', 'conflictMarkers','frontier','regionsStatus'];
     GameServer.flags = {};
     flags.forEach(function(flag){
         GameServer.flags[flag] = false;
@@ -374,6 +374,14 @@ GameServer.updateRegions = function(){
     for(var id in GameServer.regions){
         GameServer.regions[id].update();
     }
+};
+
+GameServer.getRegionsStatus = function(){
+    var regions = [];
+    for(var id in GameServer.regions){
+        regions.push(GameServer.regions[id].trim());
+    }
+    return regions;
 };
 
 /**

@@ -95,7 +95,8 @@ let Hero = new Phaser.Class({
             'notifs': this.handleNotifs,
             'rarity': this.updateRarity,
             'region': this.updateRegion,
-            'regions': this.updateRegions,
+            'regionsBoundaries': this.updateRegions,
+            'regionsStatus': this.updateRegionsStatus,
             'resetTurn': BattleManager.resetTurn,
             'resourceMarkers': this.updateResourceMarkers,
             'stats': this.updateStats
@@ -332,6 +333,10 @@ let Hero = new Phaser.Class({
 
     updateRegions: function(regions){
         this.regions = regions;
+    },
+
+    updateRegionsStatus: function(regions){
+        this.regionsStatus = regions;
     },
 
     updateGold: function(gold){

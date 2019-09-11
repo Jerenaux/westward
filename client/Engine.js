@@ -40,6 +40,7 @@ import Player from './Player'
 import PricesPanel from './PricesPanel'
 import ProductionPanel from './ProductionPanel'
 import RecipesPanel from './RecipesPanel'
+import RegionStatusPanel from './RegionStatusPanel'
 import Remains from './Remains'
 import RepairPanel from './RepairPanel'
 import RespawnPanel from './RespawnPanel'
@@ -1569,9 +1570,9 @@ Engine.makeMissionsMenu = function(){
     var menu = new Menu('Missions');
     menu.log = true;
 
+    var status = menu.addPanel('status',new RegionStatusPanel(40,100,900,200,'region'));
 
-
-    // menu.addEvent('onOpen',log.update.bind(log));
+    menu.addEvent('onOpen',status.update.bind(status));
     return menu;
 };
 

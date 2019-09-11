@@ -190,6 +190,7 @@ V1 level:
 Admin
 -----
 Look into push notificatins server (https://www.pushsafer.com/dashboard)
+-> Or Slack notifications
 Improve admin tables
 Flush screenshots
 Make cmd line system
