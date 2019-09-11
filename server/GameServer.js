@@ -364,9 +364,16 @@ GameServer.loadBuildings = function(){
 
         if(GameServer.needToSpawnCamps) GameServer.spawnCamps();
 
+        GameServer.updateRegions();
         GameServer.computeFrontier(false);
         GameServer.updateStatus();
     });
+};
+
+GameServer.updateRegions = function(){
+    for(var id in GameServer.regions){
+        GameServer.regions[id].update();
+    }
 };
 
 /**
@@ -659,16 +666,15 @@ GameServer.economyTurn = function(){
     GameServer.elapsedTurns++;
     // console.log('Turn',GameServer.elapsedTurns);
 
-    GameServer.spawnZones.forEach(function(zone){
-        zone.update();
-    });
-
     GameServer.updateEconomicEntities(GameServer.camps); // civ spawn
     GameServer.updateEconomicEntities(GameServer.buildings); // prod, build, ...
     GameServer.updateEconomicEntities(GameServer.players); // food, shelter ...
 
+    GameServer.spawnZones.forEach(function(zone){ // animals spawn
+        zone.update();
+    });
+
     if(GameServer.isTimeToUpdate('itemsRespawn')) GameServer.respawnItems();
-    // if(GameServer.isTimeToUpdate('SpawnZonesActivity')) GameServer.updateSZActivity();
 
     if(GameServer.elapsedTurns === GameServer.maxTurns) GameServer.elapsedTurns = 0;
 };
@@ -1651,6 +1657,7 @@ GameServer.finalizeBuilding = function(player,building){
     building.embed();
     player.addBuilding(building);
     GameServer.setFlag('buildingsMarkers');
+    GameServer.regions[building.region].update();
     GameServer.updateFoW();
     GameServer.updateSZActivity();
     GameServer.computeFrontier(true);

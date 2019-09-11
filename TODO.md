@@ -60,33 +60,24 @@ Packaging
 - Animation when hit (player, npc...)
 - No silhouette behind dead trees
 - Improve shape of battle areas
+- Log when killed in battle
 - Message when entering enemy territory
 
 Bugs:
 Features:
-- Log when killed in battle
 - Regional missions menu
--> Status: wild, settled, occupied, contested, ...
--> Missions based on buildings in region (build)
--> Missions based on items in region (building & player inventories) (produce)
--> Missions based on tower coverage
+-> Missions based on buildings in region (build fixed quotas)
+-> Display status and missions
+-> Missions based on enemy buildings (destroy)
+-> Missions based on items in region (building inventories only, fixed preset quotas) (produce)
+-> Factor in players inventory
+-> Factor in resource nodes (make classes in passing) to convert some produce quests into trade ones
+-> Replace fixed production by top-down system: list of finished products, and derive rest based on ingredients
 -> General info: how many regions settled, which regions are the most dangerous/currently contested, which
 regions are the most/least developed
+-> Identify resource speciality of regions and incentivize exports
 -> # days since last attack
--> Resource nodes missions (trade missions for unavailable resources)
--> 
-
--> Top-down smart missions: start from target amounts of items + tower coverage
-Deduce harvest/trade missions for ingredients
-List produce missions when ingredients are available
-Build a min. ratio of (work)shops to players
-
--> Quantify resources nodes on the right side of frontier, 
-production capacity (based on # buildings of a given time) / some kind of "GDP",
-- Make smart missions based on these indicators (+ as many others as possible)
--> List of missions based on existing buildings, local rarity and/or locally available resources,
-tower coverage, offensive goals if civ buildings / recent attacks ...
-
+- Bld limit: one under construction at a time, otherwise no limit
 - Restore dragging
 - Button to toggle regions (borders and banner names)
 - Button to toggle legend
