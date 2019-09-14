@@ -77,7 +77,13 @@ var WorldMap = new Phaser.Class({
         this.pins = [];
         this.dash = [];
         this.resetCounter();
-        this.clickedTile = null;
+
+        this.setControls(true);
+    },
+
+    setControls: function(flag){
+        this.enablePan = flag;
+        this.enableZoom = flag;
     },
 
     addMask: function(texture,shapeData){
@@ -198,6 +204,7 @@ var WorldMap = new Phaser.Class({
     },
 
     handleClick: function(pointer,x,y){
+        if(!this.enablePan) return;
         if(this.offZone.contains(pointer.downX,pointer.downY)) return;
         if(!this.viewRect.contains(pointer.downX,pointer.downY)) return;
         this.focus(x,y);
@@ -250,6 +257,7 @@ var WorldMap = new Phaser.Class({
     },
 
     zoomIn: function(){
+        if(!this.enableZoom) return;
         var idx  = Utils.clamp(this.scales.indexOf(this.scaleX)+1,0,this.scales.length-1);
         var newscale = this.scales[idx];
         this.setScale(newscale);
@@ -259,6 +267,7 @@ var WorldMap = new Phaser.Class({
     },
 
     zoomOut: function(){
+        if(!this.enableZoom) return;
         var idx  = Utils.clamp(this.scales.indexOf(this.scaleX)-1,0,this.scales.length-1);
         var newscale = this.scales[idx];        
         this.setScale(newscale);
@@ -288,6 +297,11 @@ var WorldMap = new Phaser.Class({
     //         t.setVisible(true);
     //     },this);
     // },
+
+    centerOnRegion: function(){
+        var r = regionsData[Engine.player.region];
+        this.centerMap(r);
+    },
 
     centerMap: function(tile){ // Adjusts the anchor, then position it in the center of the screen
         // tile is world coordinates, not map px ; if tile is undefined, then it means recenter on whatever current center (used when zooming)

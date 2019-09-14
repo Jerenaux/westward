@@ -851,6 +851,8 @@ Engine.makeUI = function(){
     var statsPanel = new StatsPanel(665,335,330,100,'Stats');
     statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help']);
 
+    var mapPanel = Engine.makeMapPanel();
+
     // Todo: make a 'makerepairpanel()' method similar to 'makepricespanel()'?
     Engine.repairPanel = new RepairPanel(476,190,500,200,'Repair');
     Engine.repairPanel.addButton(500-16,-8,'red','close',Engine.repairPanel.hide.bind(Engine.repairPanel),'Close');
@@ -868,8 +870,8 @@ Engine.makeUI = function(){
         'construction': Engine.makeConstructionMenu(),
         'crafting': Engine.makeCraftingMenu(),
         'inventory': Engine.makeInventory(statsPanel),
-        'map': Engine.makeMapMenu(),
-        'missions': Engine.makeMissionsMenu(),
+        'map': Engine.makeMapMenu(mapPanel),
+        'missions': Engine.makeMissionsMenu(mapPanel),
         //'messages': Engine.makeMessagesMenu(),
         'production': Engine.makeProductionMenu(),
         'respawn': Engine.makeRespawnMenu(),
@@ -1274,22 +1276,55 @@ Engine.makeMessagesMenu = function(){
     return menu;
 };
 
-Engine.makeMapMenu = function(){
-    var map = new Menu('World Map');
-    map.log = true;
-    map.hook = 'map';
-    map.setSound(Engine.scene.sound.add('page_turn2'));
-    var mapPanel = map.addPanel('map',new MapPanel(10,100,1000,380,'',true)); // true = invisible
-    // mapPanel.addBackground('longscroll');
+Engine.makeMapPanel = function(){
+    var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
     mapPanel.addBackground('bigbg');
     mapPanel.addLegend();
-    // var mapInstance = mapPanel.addMap('radiallongrect',900,380,-1,-1);
     var mapInstance = mapPanel.addMap('bigbg_mask',900,380,-1,-1);
     mapPanel.addButton(950, 0, 'blue','help',null,'',UI.textsData['self_map_help']);
     // TODO: move in Map.js, method addZoom, positions buttons based on viewWidt/height and
     // controls enable/disable of buttons based on zoom flag
     mapPanel.zoomInBtn = mapPanel.addButton(930, 390, 'blue','plus',mapInstance.zoomIn.bind(mapInstance));
     mapPanel.zoomOutBtn = mapPanel.addButton(920, 420, 'blue','minus',mapInstance.zoomOut.bind(mapInstance));
+    return mapPanel;
+};
+
+Engine.makeMissionsMenu = function(mapPanel){
+    var menu = new Menu('Missions');
+    menu.log = true;
+
+    menu.addPanel('map',mapPanel);
+    var x = 10; // 500
+    var status = menu.addPanel('status',new RegionStatusPanel(x,100,500,100,'region'));
+    var missions = menu.addPanel('missions', new Panel(x,220,500,330,'Missions'));
+    status.moveUp(4);
+    missions.moveUp(4);
+
+    menu.beforeAll(function(){
+        mapPanel.map.center.x = 510+120;
+        mapPanel.map.setControls(false);
+    });
+
+    menu.addEvent('onOpen',function(){
+        status.update();
+        mapPanel.map.centerOnRegion();
+        mapPanel.legend.hide();
+    });
+    menu.addEvent('onUpdateMap',mapPanel.map.updatePins.bind(mapPanel.map));
+    return menu;
+};
+
+Engine.makeMapMenu = function(mapPanel){
+    var map = new Menu('World Map');
+    map.log = true;
+    map.hook = 'map';
+    map.setSound(Engine.scene.sound.add('page_turn2'));
+    map.addPanel('map',mapPanel);
+
+    map.beforeAll(function(){
+        mapPanel.map.center.x = 510;
+        mapPanel.map.setControls(true);
+    });
     map.addEvent('onUpdateMap',mapPanel.map.updatePins.bind(mapPanel.map));
     return map;
 };
@@ -1563,16 +1598,6 @@ Engine.makeAbilitiesMenu = function(){
     var menu = new Menu('Abilities');
     menu.addPanel('abilities',new AbilitiesPanel(40,100,600,380,'Abilities'));
     menu.addPanel('desc',new AbilityPanel(660,100,340,380,'Description'));
-    return menu;
-};
-
-Engine.makeMissionsMenu = function(){
-    var menu = new Menu('Missions');
-    menu.log = true;
-
-    var status = menu.addPanel('status',new RegionStatusPanel(40,100,900,200,'region'));
-
-    menu.addEvent('onOpen',status.update.bind(status));
     return menu;
 };
 

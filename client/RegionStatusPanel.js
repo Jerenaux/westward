@@ -4,8 +4,8 @@
 
 import Engine from './Engine'
 import Panel from './Panel'
-import UI from './UI'
-import Utils from '../shared/Utils'
+
+import regionsData from '../assets/data/regions.json'
 
 function RegionsStatusPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title,false);
@@ -15,7 +15,15 @@ function RegionsStatusPanel(x,y,width,height,title){
     var x = 20;
     var y = 30;
     var t = this.addText(x,y,'Status:');
-    this.statusText = this.addText(t.x+t.width+10,y,'');
+    this.statusText = this.addText(t.x+t.width,y,'');
+
+    y += 20;
+    t = this.addText(x,y,'Contested regions:');
+    this.contestedText = this.addText(t.x+t.width,y,''); // -this.width
+
+    y += 20;
+    t = this.addText(x,y,'Occupied regions:');
+    this.occupiedText = this.addText(t.x+t.width,y,'');
 }
 
 RegionsStatusPanel.prototype = Object.create(Panel.prototype);
@@ -31,8 +39,17 @@ RegionsStatusPanel.prototype.update = function(){
         3: 'Settled'
     };
 
+    var contested = [];
+    var occupied = [];
+    Engine.player.regionsStatus.forEach(function(region){
+        if(region.status == 2) contested.push(regionsData[region.id].name);
+        if(region.status == 1) occupied.push(regionsData[region.id].name);
+    });
+
     this.capsules['title'].setText(Engine.setlCapsule.text.text+' region');
     this.statusText.setText(statusMap[Engine.player.regionsStatus[Engine.player.region].status]);
+    this.contestedText.setText(contested.join(',  '));
+    this.occupiedText.setText(occupied.join(',  '));
 };
 
 

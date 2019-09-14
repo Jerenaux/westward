@@ -58,6 +58,10 @@ Menu.prototype.hidePanel = function(name){
     this.panels[name].hide();
 };
 
+Menu.prototype.beforeAll = function(cb){
+    this.beforeAllCb = cb;
+};
+
 Menu.prototype.addEvent = function(name,callback){
     this.events[name] = callback;
 };
@@ -88,6 +92,7 @@ Menu.prototype.display = function(){
     if(this.sound) this.sound.play();
 
     Engine.currentMenu = this;
+    if(this.beforeAllCb) this.beforeAllCb.call();
     for(var p in this.panels){
         if(!this.panels.hasOwnProperty(p)) continue;
         if(!this.hideOnOpen[p]) this.panels[p].display();
