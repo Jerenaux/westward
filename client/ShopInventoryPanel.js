@@ -28,6 +28,11 @@ ShopInventoryPanel.prototype.hadAdminButtons = function(){
 };
 
 ShopInventoryPanel.prototype.addPagination = function(){
+    var emptyMsg = (this.inventory == 'player' ? 'You don\' have any items' : 'The inventory of this shop is empty. Come back later!');
+    this.nothingTxt = this.addText(this.width/2,0,emptyMsg);
+    this.nothingTxt.setOrigin(0.5,0);
+    this.nothingTxt.setVisible(false);
+
     this.pagetxts = this.addPolyText((this.width/2)-50,0,['Page','1','/','10']);
     this.pagetxts[1].setText(1);
 
@@ -81,11 +86,6 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
         var btnsy = this.starty+15;
         Engine.addAdminButtons(this,btnsx,btnsy);
     }
-
-    var emptyMsg = (this.inventory == 'player' ? 'You don\' have any items' : 'The inventory of this shop is empty. Come back later!');
-    this.nothingTxt = this.addText(this.width/2,0,emptyMsg);
-    this.nothingTxt.setOrigin(0.5,0);
-    this.nothingTxt.setVisible(false);
 
     this.addPagination();
 };

@@ -11,7 +11,7 @@ let Schemas = {
         type: {type: Number, min: 0, required: true},
         owner: {type: Number, min: 0},
         ownerName: {type: String},
-        inventory: {type: [[]], set:function(inventory){
+        inventory: {type: [], set:function(inventory){
                 return inventory.toList(true); // true: filter zeroes
             }},
         prices: mongoose.Schema.Types.Mixed,
@@ -50,13 +50,14 @@ let Schemas = {
         equipment: mongoose.Schema.Types.Mixed,
         commitSlots: mongoose.Schema.Types.Mixed,
         origin: {type: Number, min: 0, required: true},
-        inventory: {type: [[]], set:function(inventory){
+        inventory: {type: mongoose.Schema.Types.Mixed, set:function(inventory){
+                // console.log('#@',inventory);
                 return inventory.toList(true); // true: filter zeroes
             }},
-        belt: {type: [[]], set:function(belt){
+        belt: {type: mongoose.Schema.Types.Mixed, set:function(belt){
                 return belt.toList(true); // true: filter zeroes
             }},
-        stats: {type: [], set:function(stats){
+        stats: {type: mongoose.Schema.Types.Mixed, set:function(stats){
                 return stats.toList();
             }},
         history: {type: []}

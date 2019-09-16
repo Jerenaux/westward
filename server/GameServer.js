@@ -809,6 +809,7 @@ GameServer.postProcessPlayer = function(socket,player,model){
  */
 GameServer.saveNewPlayerToDb = function(socket,player){
     if(!socket || socket.dummy === true) return;
+    console.log('Player inventory before save:',player.inventory);
     var document = new GameServer.PlayerModel(player);
     document.save(function (err,doc) {
         if (err) return console.error(err);

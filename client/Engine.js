@@ -33,7 +33,7 @@ import MapPanel from './MapPanel'
 import Menu from './Menu'
 import menuIcon from './menuIcon';
 import MiniMap from './MiniMap'
-import MissionsPanel from '../MissionsPanel'
+import MissionsPanel from './MissionsPanel'
 import Panel from './Panel'
 import Pathfinder from '../shared/Pathfinder'
 import PFUtils from '../shared/PFUtils'

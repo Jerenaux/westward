@@ -3,6 +3,7 @@
  */
 
 import Engine from './Engine'
+import Panel from './Panel'
 import ShopInventoryPanel from './ShopInventoryPanel'
 import Utils from "../shared/Utils";
 import UI from "./UI";
@@ -26,24 +27,51 @@ MissionsPanel.prototype.getNextSlot = function(x,y){
     return this.slots[this.slotsCounter++];
 };
 
+MissionsPanel.prototype.refreshPagination = function(){
+    var py = this.y + 20;
+    this.pagetxts.forEach(function(t){
+        t.setVisible(true);
+        t.y = py + 10;
+    },this);
+    this.pagetxts[3].setText(this.nbpages);
+    this.pagetxts[1].setText(this.currentPage+1);
+    this.nextPage.y = py + 12;
+    this.previousPage.y = py + 12;
+    if(this.currentPage+1 < this.nbpages) this.nextPage.setVisible(true);
+    if(this.currentPage > 0) this.previousPage.setVisible(true);
+    this.nothingTxt.y = py + 35;
+};
+
 MissionsPanel.prototype.updateContent = function(){
-    var NB_PER_PAGE = 4;
+    var NB_PER_PAGE = 3;
+    var goals = Engine.player.regionsStatus[Engine.player.region].goals;
+
+    this.nbpages = Math.max(1,Math.ceil(Object.keys(goals).length/NB_PER_PAGE));
+    this.currentPage = Utils.clamp(this.currentPage,0,this.nbpages-1);
+    this.refreshPagination();
     var yOffset = 0;
     var sloty = this.y + 20;
 
-    var goals = Engine.player.regionsStatus[Engine.player.region].goals;
     var i = 0;
     for(var bld in goals.buildings) {
-        if (i < this.currentPage * NB_PER_PAGE) continue;
-        if (i >= (this.currentPage + 1) * NB_PER_PAGE) continue;
+        console.log(bld);
+        if ((i < this.currentPage * NB_PER_PAGE) || (i >= (this.currentPage + 1) * NB_PER_PAGE)) {
+            // console.log('Not in page');
+            continue;
+        }
         var data = goals.buildings[bld];
         var slot = this.getNextSlot(this.x + 20, sloty + yOffset);
         slot.display();
         slot.setUp('building',bld,data[0],data[1]);
+        slot.moveUp(5);
         yOffset += 90;
         i++;
     }
 };
+
+MissionsPanel.prototype.display = function(){
+    Panel.prototype.display.call(this);
+}
 
 // -------------------------------------
 
@@ -88,12 +116,12 @@ MissionSlot.prototype.setUp = function(type,id,actual,goal){
             data = buildingsData[id];
             atlas = 'buildingsicons';
             frame = data.icon;
+            this.name.setText(data.name+' building');
             break;
         default:
             break;
     }
     this.icon.setTexture(atlas,frame);
-    this.name.setText(data.name);
     // this.desc = itemData.desc;
 };
 
