@@ -27,20 +27,7 @@ ShopInventoryPanel.prototype.hadAdminButtons = function(){
     return (this.inventory == 'building' || this.inventory == 'crafting')
 };
 
-ShopInventoryPanel.prototype.setInventory = function(inventory){
-    this.inventory = inventory;
-
-    if(this.hadAdminButtons()){
-        var btnsx = this.x + 70;
-        var btnsy = this.starty+15;
-        Engine.addAdminButtons(this,btnsx,btnsy);
-    }
-
-    var emptyMsg = (this.inventory == 'player' ? 'You don\' have any items' : 'The inventory of this shop is empty. Come back later!');
-    this.nothingTxt = this.addText(this.width/2,0,emptyMsg);
-    this.nothingTxt.setOrigin(0.5,0);
-    this.nothingTxt.setVisible(false);
-
+ShopInventoryPanel.prototype.addPagination = function(){
     this.pagetxts = this.addPolyText((this.width/2)-50,0,['Page','1','/','10']);
     this.pagetxts[1].setText(1);
 
@@ -59,9 +46,9 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
         this.nextPage.setFrame('arrow_pressed');
     }.bind(this));
     this.nextPage.on('pointerup',function(){
-         this.currentPage = Utils.clamp(this.currentPage+1,0,this.nbpages);
-         this.nextPage.setFrame('arrow');
-         this.updateContent();
+        this.currentPage = Utils.clamp(this.currentPage+1,0,this.nbpages);
+        this.nextPage.setFrame('arrow');
+        this.updateContent();
     }.bind(this));
 
     this.previousPage.setInteractive();
@@ -84,6 +71,23 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
     this.previousPage.setVisible(false);
     this.nextPage.setOrigin(0);
     this.previousPage.setOrigin(0);
+};
+
+ShopInventoryPanel.prototype.setInventory = function(inventory){
+    this.inventory = inventory;
+
+    if(this.hadAdminButtons()){
+        var btnsx = this.x + 70;
+        var btnsy = this.starty+15;
+        Engine.addAdminButtons(this,btnsx,btnsy);
+    }
+
+    var emptyMsg = (this.inventory == 'player' ? 'You don\' have any items' : 'The inventory of this shop is empty. Come back later!');
+    this.nothingTxt = this.addText(this.width/2,0,emptyMsg);
+    this.nothingTxt.setOrigin(0.5,0);
+    this.nothingTxt.setVisible(false);
+
+    this.addPagination();
 };
 
 ShopInventoryPanel.prototype.getInventory = function(){

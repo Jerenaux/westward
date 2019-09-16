@@ -33,6 +33,7 @@ import MapPanel from './MapPanel'
 import Menu from './Menu'
 import menuIcon from './menuIcon';
 import MiniMap from './MiniMap'
+import MissionsPanel from '../MissionsPanel'
 import Panel from './Panel'
 import Pathfinder from '../shared/Pathfinder'
 import PFUtils from '../shared/PFUtils'
@@ -1296,7 +1297,7 @@ Engine.makeMissionsMenu = function(mapPanel){
     menu.addPanel('map',mapPanel);
     var x = 10; // 500
     var status = menu.addPanel('status',new RegionStatusPanel(x,100,500,100,'region'));
-    var missions = menu.addPanel('missions', new Panel(x,220,500,330,'Missions'));
+    var missions = menu.addPanel('missions', new MissionsPanel(x,220,500,330,'Missions'));
     status.moveUp(4);
     missions.moveUp(4);
 
@@ -1309,6 +1310,7 @@ Engine.makeMissionsMenu = function(mapPanel){
         status.update();
         mapPanel.map.centerOnRegion();
         mapPanel.legend.hide();
+        missions.updateContent();
     });
     menu.addEvent('onUpdateMap',mapPanel.map.updatePins.bind(mapPanel.map));
     return menu;
