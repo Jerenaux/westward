@@ -1296,8 +1296,11 @@ Engine.makeMissionsMenu = function(mapPanel){
 
     menu.addPanel('map',mapPanel);
     var x = 10; // 500
-    var status = menu.addPanel('status',new RegionStatusPanel(x,100,500,100,'region'));
-    var missions = menu.addPanel('missions', new MissionsPanel(x,220,500,330,'Missions'));
+    var status = menu.addPanel('status',new RegionStatusPanel(x,80,250,100,'region'));
+    var w = 600;
+    x = (UI.getGameWidth()-w)/2;
+    var missions = menu.addPanel('missions', new MissionsPanel(x,200,w,350,'Missions'),true);
+    missions.addButton(w-16,-8,'red','close',missions.hide.bind(missions),'Close');
     status.moveUp(4);
     missions.moveUp(4);
 
@@ -1310,7 +1313,6 @@ Engine.makeMissionsMenu = function(mapPanel){
         status.update();
         mapPanel.map.centerOnRegion();
         mapPanel.legend.hide();
-        missions.updateContent();
     });
     menu.addEvent('onUpdateMap',mapPanel.map.updatePins.bind(mapPanel.map));
     return menu;

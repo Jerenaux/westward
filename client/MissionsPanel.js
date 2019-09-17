@@ -14,6 +14,8 @@ import buildingsData from '../assets/data/buildings.json'
 function MissionsPanel(x,y,width,height,title,invisible){
     ShopInventoryPanel.call(this,x,y,width,height,title,invisible);
     this.addPagination();
+    this.nextPage.depth += 4;
+    this.previousPage.depth += 4;
 }
 
 MissionsPanel.prototype = Object.create(ShopInventoryPanel.prototype);
@@ -43,20 +45,21 @@ MissionsPanel.prototype.refreshPagination = function(){
 };
 
 MissionsPanel.prototype.updateContent = function(){
+    this.hideContent();
     var NB_PER_PAGE = 3;
     var goals = Engine.player.regionsStatus[Engine.player.region].goals;
 
-    this.nbpages = Math.max(1,Math.ceil(Object.keys(goals).length/NB_PER_PAGE));
+    this.nbpages = Math.max(1,Math.ceil(Object.keys(goals.buildings).length/NB_PER_PAGE));
     this.currentPage = Utils.clamp(this.currentPage,0,this.nbpages-1);
     this.refreshPagination();
     var yOffset = 0;
-    var sloty = this.y + 20;
+    var sloty = this.y + 60;
 
-    var i = 0;
+    var i = -1;
     for(var bld in goals.buildings) {
-        console.log(bld);
+        i++;
         if ((i < this.currentPage * NB_PER_PAGE) || (i >= (this.currentPage + 1) * NB_PER_PAGE)) {
-            // console.log('Not in page');
+            console.log(bld,'not in page');
             continue;
         }
         var data = goals.buildings[bld];
@@ -65,8 +68,19 @@ MissionsPanel.prototype.updateContent = function(){
         slot.setUp('building',bld,data[0],data[1]);
         slot.moveUp(5);
         yOffset += 90;
-        i++;
     }
+};
+
+MissionsPanel.prototype.hideContent = function(){
+    this.slots.forEach(function(slot){
+        slot.hide();
+    });
+    this.slotsCounter = 0;
+    this.pagetxts.forEach(function(t){
+        t.setVisible(false);
+    });
+    this.nextPage.setVisible(false);
+    this.previousPage.setVisible(false);
 };
 
 MissionsPanel.prototype.display = function(){

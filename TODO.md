@@ -66,10 +66,12 @@ Packaging
 Bugs:
 Features:
 - Regional missions menu
--> Missions based on buildings in region (build fixed quotas)
--> Display status and missions
--> Missions based on enemy buildings (destroy)
--> Missions based on items in region (building inventories only, fixed preset quotas) (produce)
+-> Don't display region borders
+-> Toggle region names
+-> Missions depend on region status
+-> Missions based on buildings in region (build fixed quotas) if wild
+-> Missions based on enemy buildings (destroy) if occupied or contested
+-> Missions based on items in region (building inventories only, fixed preset quotas) (produce), depends on status
 -> Factor in players inventory
 -> Factor in resource nodes (make classes in passing) to convert some produce quests into trade ones
 -> Replace fixed production by top-down system: list of finished products, and derive rest based on ingredients
