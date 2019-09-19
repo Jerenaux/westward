@@ -28,7 +28,9 @@ function RegionsStatusPanel(x,y,width,height,title){
     // this.occupiedText = this.addText(t.x+t.width,y,'');
 
     this.bldMissions = new BigButton(this.x+95,this.y+65, '',function(){
-        Engine.currentMenu.panels['missions'].display();
+        var missions = Engine.currentMenu.panels['missions'];
+        missions.display();
+        missions.updateContent();
     });
     this.bldMissions.hide();
     this.bldMissions.moveUp(3);

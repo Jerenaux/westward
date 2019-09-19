@@ -23,7 +23,7 @@ MissionsPanel.prototype.constructor = MissionsPanel;
 
 MissionsPanel.prototype.getNextSlot = function(x,y){
     if(this.slotsCounter >= this.slots.length){
-        this.slots.push(new MissionSlot(x,y,360,80));
+        this.slots.push(new MissionSlot(x,y,250,80));
     }
 
     return this.slots[this.slotsCounter++];
@@ -46,16 +46,17 @@ MissionsPanel.prototype.refreshPagination = function(){
 
 MissionsPanel.prototype.updateContent = function(){
     this.hideContent();
-    var NB_PER_PAGE = 3;
+    var NB_PER_PAGE = 6;
     var goals = Engine.player.regionsStatus[Engine.player.region].goals;
 
     this.nbpages = Math.max(1,Math.ceil(Object.keys(goals.buildings).length/NB_PER_PAGE));
     this.currentPage = Utils.clamp(this.currentPage,0,this.nbpages-1);
     this.refreshPagination();
-    var yOffset = 0;
     var sloty = this.y + 60;
 
     var i = -1;
+    var yOffset = 0;
+    var xOffset = 0;
     for(var bld in goals.buildings) {
         i++;
         if ((i < this.currentPage * NB_PER_PAGE) || (i >= (this.currentPage + 1) * NB_PER_PAGE)) {
@@ -63,11 +64,15 @@ MissionsPanel.prototype.updateContent = function(){
             continue;
         }
         var data = goals.buildings[bld];
-        var slot = this.getNextSlot(this.x + 20, sloty + yOffset);
+        var slot = this.getNextSlot(this.x + 20 + xOffset, sloty + yOffset);
         slot.display();
         slot.setUp('building',bld,data[0],data[1]);
         slot.moveUp(5);
-        yOffset += 90;
+        xOffset += 270;
+        if(i%2){
+            xOffset = 0;
+            yOffset += 90;
+        }
     }
 };
 
@@ -110,6 +115,7 @@ function MissionSlot(x,y,width,height){
     this.content = [this.name, this.zone];
 
     this.addItem();
+    this.addCount();
 }
 
 MissionSlot.prototype = Object.create(Frame.prototype);
@@ -121,6 +127,12 @@ MissionSlot.prototype.addItem = function(){
     this.icon = UI.scene.add.sprite(this.x + 30, this.y + this.height/2);
     this.content.push(this.slot);
     this.content.push(this.icon);
+};
+
+MissionSlot.prototype.addCount = function(){
+    this.count = UI.scene.add.text(this.x + this.width - 10, this.y + this.height - 25, '0/4', { font: '16px '+Utils.fonts.fancy, fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
+    this.count.setOrigin(1,0);
+    this.content.push(this.count);
 };
 
 MissionSlot.prototype.setUp = function(type,id,actual,goal){
@@ -136,7 +148,8 @@ MissionSlot.prototype.setUp = function(type,id,actual,goal){
             break;
     }
     this.icon.setTexture(atlas,frame);
-    // this.desc = itemData.desc;
+    this.count.setText(actual+'/'+goal);
+    this.count.setFill(actual == goal ? Utils.colors.green : Utils.colors.gold);
 };
 
 MissionSlot.prototype.display = function(){
