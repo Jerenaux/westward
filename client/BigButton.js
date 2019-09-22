@@ -54,6 +54,10 @@ BigButton.prototype.attachCallbacks = function(element){
     element.on('pointerout',this.handleOut.bind(this));
 };
 
+BigButton.prototype.setCallback = function(callback){
+    this.callback = callback;
+};
+
 BigButton.prototype.setText = function(text){
     this.text.setText(text);
 

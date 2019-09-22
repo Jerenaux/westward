@@ -872,7 +872,7 @@ Engine.makeUI = function(){
         'crafting': Engine.makeCraftingMenu(),
         'inventory': Engine.makeInventory(statsPanel),
         'map': Engine.makeMapMenu(mapPanel),
-        'missions': Engine.makeMissionsMenu(mapPanel),
+        'missions': Engine.makeRegionsMenu(mapPanel),
         //'messages': Engine.makeMessagesMenu(),
         'production': Engine.makeProductionMenu(),
         'respawn': Engine.makeRespawnMenu(),
@@ -1290,13 +1290,14 @@ Engine.makeMapPanel = function(){
     return mapPanel;
 };
 
-Engine.makeMissionsMenu = function(mapPanel){
-    var menu = new Menu('Missions');
+Engine.makeRegionsMenu = function(mapPanel){
+    var menu = new Menu('Regions');
     menu.log = true;
+    menu.hidePinHover = true;
 
     menu.addPanel('map',mapPanel);
     var x = 10; // 500
-    var status = menu.addPanel('status',new RegionStatusPanel(x,80,250,100,'region'));
+    var status = menu.addPanel('status',new RegionStatusPanel(x,80,270,100,'region'));
     var w = 570;
     x = (UI.getGameWidth()-w)/2;
     var missions = menu.addPanel('missions', new MissionsPanel(x,200,w,350,'Missions'),true);

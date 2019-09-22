@@ -580,12 +580,14 @@ var Pin = new Phaser.Class({
 
     handleOver: function(){
         if(!this.parentMap.viewRect.contains(this.x,this.y)) return;
+        if(!this.parentMap.minimap && Engine.currentMenu.hidePinHover) return;
         UI.tooltip.updateInfo('free',{title:this.name});
         UI.tooltip.display();
         console.log(this.tileX,this.tileY);
     },
 
     handleOut: function(){
+        if(!this.parentMap.minimap && Engine.currentMenu.hidePinHover) return;
         UI.tooltip.hide();
     }
 });

@@ -9,6 +9,7 @@ import Utils from "../shared/Utils";
 import UI from "./UI";
 import Frame from "./Frame";
 
+import missionsData from '../assets/data/missions.json'
 import buildingsData from '../assets/data/buildings.json'
 
 function MissionsPanel(x,y,width,height,title,invisible){
@@ -44,36 +45,33 @@ MissionsPanel.prototype.refreshPagination = function(){
     this.nothingTxt.y = py + 35;
 };
 
-MissionsPanel.prototype.updateContent = function(){
+MissionsPanel.prototype.updateContent = function(status, type){
     this.hideContent();
     var NB_PER_PAGE = 6;
-    var goals = Engine.player.regionsStatus[Engine.player.region].goals;
+    // var goals = Engine.player.regionsStatus[Engine.player.region].goals;
+    var missions = missionsData[status][type];
 
-    this.nbpages = Math.max(1,Math.ceil(Object.keys(goals.buildings).length/NB_PER_PAGE));
+    this.nbpages = Math.max(1,Math.ceil(missions.length/NB_PER_PAGE));
     this.currentPage = Utils.clamp(this.currentPage,0,this.nbpages-1);
     this.refreshPagination();
     var sloty = this.y + 60;
 
-    var i = -1;
     var yOffset = 0;
     var xOffset = 0;
-    for(var bld in goals.buildings) {
-        i++;
+    missions.forEach(function(mission, i){
         if ((i < this.currentPage * NB_PER_PAGE) || (i >= (this.currentPage + 1) * NB_PER_PAGE)) {
-            console.log(bld,'not in page');
-            continue;
+            return;
         }
-        var data = goals.buildings[bld];
         var slot = this.getNextSlot(this.x + 20 + xOffset, sloty + yOffset);
         slot.display();
-        slot.setUp('building',bld,data[0],data[1]);
+        slot.setUp(mission, status, type, i);
         slot.moveUp(5);
         xOffset += 270;
-        if(i%2){
+        if((i-1)%2){
             xOffset = 0;
             yOffset += 90;
         }
-    }
+    }, this);
 };
 
 MissionsPanel.prototype.hideContent = function(){
@@ -103,9 +101,8 @@ function MissionSlot(x,y,width,height){
     this.zone.setInteractive();
     this.zone.setOrigin(0);
     this.zone.on('pointerover',function(){
-        // UI.tooltip.updateInfo('item',{id:this.itemID});
-        // UI.tooltip.display();
-        // UI.setCursor('item');
+        UI.tooltip.updateInfo('mission',{status:this.status,type:this.missionType,idx:this.idx});
+        UI.tooltip.display();
     }.bind(this));
     this.zone.on('pointerout',function(){
         UI.tooltip.hide();
@@ -135,21 +132,15 @@ MissionSlot.prototype.addCount = function(){
     this.content.push(this.count);
 };
 
-MissionSlot.prototype.setUp = function(type,id,actual,goal){
-    var data, atlas, frame;
-    switch(type){
-        case 'building':
-            data = buildingsData[id];
-            atlas = 'buildingsicons';
-            frame = data.icon;
-            this.name.setText(data.name+' building');
-            break;
-        default:
-            break;
-    }
-    this.icon.setTexture(atlas,frame);
-    this.count.setText(actual+'/'+goal);
-    this.count.setFill(actual == goal ? Utils.colors.green : Utils.colors.gold);
+MissionSlot.prototype.setUp = function(data, status, type, idx){
+    this.name.setText(data.name);
+    this.icon.setTexture(data.atlas,data.frame);
+    this.status = status;
+    this.missionType = type;
+    this.idx = idx;
+    var actual = 0;
+    this.count.setText(actual+'/'+data.goal);
+    this.count.setFill(actual == data.goal ? Utils.colors.green : Utils.colors.gold);
 };
 
 MissionSlot.prototype.display = function(){

@@ -1,0 +1,21 @@
+{
+  "0":{
+    "Settle": [
+        {
+          "name": "Build 1 building",
+          "desc": "Build one building, any building, anywhere in the region to officially start settling it!",
+          "atlas": "buildingsicons",
+          "frame": "tower",
+          "count": "allbuildings",
+          "goal": 1,
+          "rewards": {
+            "2": 20,
+            "3": 30
+          }
+        }
+      ]
+  },
+  "1":[],
+  "2":[],
+  "3":[]
+}

@@ -54,7 +54,6 @@ import SpawnZone from './SpawnZone'
 import Utils from '../shared/Utils'
 import World from '../shared/World'
 
-
 import animalsClusters from '../maps/animals.json'
 import collisions from '../maps/collisions.json'
 import itemsOnMap from '../maps/items.json'
@@ -424,6 +423,12 @@ GameServer.loadItems = function(){
  */
 GameServer.loadMarkers = function(){
     GameServer.resourceMarkers = resourceMarkers;
+    GameServer.resourceMarkers.forEach(function(m){
+       var region = GameServer.getRegion({x:m[0],y:m[1]});
+       var aoi = Utils.tileToAOI({x:m[0],y:m[1]});
+       GameServer.regions[region].addResource(aoi);
+    });
+
     var markerTypes = ['death','conflict'];
     var nbTicks = markerTypes.length + 1; // +1 for remains
     var tick = 0;
@@ -476,6 +481,7 @@ GameServer.setUpSpawnZones = function(){
         GameServer.spawnZones.push(sz);
     },this);
 
+    GameServer.updateRegions();
     GameServer.updateSZActivity();
     GameServer.updateStatus();
 };
@@ -2014,7 +2020,7 @@ GameServer.updateFoW = function(){
         return;
     } // no change
     GameServer.animalMarkersFiltered = GameServer.filterMarkers('animal');
-    // GameServer.resourceMarkersFiltered = GameServer.filterMarkers('resource');
+    GameServer.resourceMarkersFiltered = GameServer.filterMarkers('resource');
     GameServer.setFlag('animalsMarkers');
     GameServer.setFlag('resourcesMarkers');
 };

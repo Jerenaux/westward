@@ -6,7 +6,9 @@ import {Equipment} from "../shared/Equipment";
 import {Stats} from "../shared/Stats";
 import UI from './UI';
 
+import classData from '../assets/data/classes.json'
 import itemsData from '../assets/data/items.json'
+import missionsData from '../assets/data/missions.json'
 
 var Tooltip = new Phaser.Class({
 
@@ -19,6 +21,7 @@ var Tooltip = new Phaser.Class({
         this.createFromCache('tooltip');
         this.title = this.getChildByID('tooltip_title');
         this.body = this.getChildByID('tooltip_body');
+        this.rewards = this.getChildByID('rewards');
         this.stat_table = this.getChildByID('stat');
         this.base_stat = this.getChildByID('base');
         this.fatigue_modifier = this.getChildByID('fatigue_modifier');
@@ -76,6 +79,11 @@ var Tooltip = new Phaser.Class({
                 this.setBody(item.desc ? item.desc : '');
                 if(item.effects) this.setEffects(item.effects);
                 break;
+            case 'mission':
+                var mission = missionsData[data.status][data.type][data.idx];
+                this.setBody(mission.desc);
+                this.setMissionReward(mission.rewards);
+                break;
             case 'NPC':
                 var npc = data.type == 'civ' ? Engine.civs[data.id] : Engine.animals[data.id];
                 var name = (npc.isDead() ? 'Dead ' : '')+npc.name;
@@ -104,6 +112,7 @@ var Tooltip = new Phaser.Class({
         this.owned.style.display = 'none';
         this.stat_table.style.display = 'none';
         this.bar.style.display = 'none';
+        this.rewards.style.display = 'none';
     },
 
     setTitle: function(text){
@@ -150,6 +159,16 @@ var Tooltip = new Phaser.Class({
         // this.lifebar.innerHTML = value+'/'+max;
         // console.warn(value,max,value/max);
         // console.warn(this.lifebar.style.width);
+    },
+
+    setMissionReward: function(rewards){
+        this.rewards.style.display = 'block';
+        var i = 0;
+        for(var classID in rewards){
+            this.getChildByID('xp_'+i).innerHTML = rewards[classID];
+            this.getChildByID('class_'+i).innerHTML = classData[classID].name+' XP';
+            i++;
+        }
     },
 
     getBodyText: function(){

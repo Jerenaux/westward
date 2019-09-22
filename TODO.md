@@ -65,7 +65,7 @@ Packaging
 
 Bugs:
 Features:
-- Regional missions menu
+-> rename missions/region menu
 -> Don't display region borders
 -> Toggle region names
 -> Missions depend on region status
@@ -76,7 +76,7 @@ Features:
 -> Factor in resource nodes (make classes in passing) to convert some produce quests into trade ones
 -> Replace fixed production by top-down system: list of finished products, and derive rest based on ingredients
 -> General info: how many regions settled, which regions are the most dangerous/currently contested, which
-regions are the most/least developed
+regions are the most/least developed, barren/lush based on # nodes...
 -> Identify resource speciality of regions and incentivize exports
 -> # days since last attack
 - Bld limit: one under construction at a time, otherwise no limit
@@ -91,16 +91,44 @@ regions are the most/least developed
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Belt & backpack & gold capacity + corresponding items (incl. defaults)
-- Abilities
-- Daily quests
 - Arrow stocks in towers  + make them throw stones when no better ammo
+- Abilities
+- Limit some buildings to some abilities (e.g. towers)
+- Daily quests?
+- Set "active quests/missions"
 - Leaderboards
   
+Rewards: multi-class XP
+ 
+Wild:
+- 1 settle mission: build any building (craft + trade xp)
+-> Global notification
+- Explore mission: locate x map markers (explorer xp)
 
-Quests:
-"enemy civ is gonna attack in x days, you should produce x many swords, do this and that..."
-Collective missions (on top of ebb and flow of frontier warfare)
-Rivalry between regions
+Settled/conquered:
+- Build x amount of each building
+-> Indicate food levels
+- Food missions: 
+-> acquire x food (soldier + explorer xp)
+-> Set x food for sale in shops (trade xp)
+-> Later: build x farms
+- Produce/trade/gather missions (top-down stuff) (craft + trade xp)
+- Explore mission: locate x map markers
+- Gold mission: become richest region (no reward)
+ 
+Contested:
+- Build x towers (craft + soldier)
+- Later: stock missions for towers (craft + soldier)
+- Repair missions (craft)
+- War missions: destroy civ buildings + kill x civs (soldier)
+-> Global event when switching from contested to settled
+- Explore mission: locate civ buildings
+  
+Occupied:
+- War missions: destroy civ buildings + kill x civs
+- Explore mission: locate civ buildings
+
+
 
 
 María:

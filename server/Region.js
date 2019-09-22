@@ -9,6 +9,8 @@ function Region(data){
     // 0: wild, 1: occupied, 2: contested, 3: settled
     this.status = 0;
     this.buildings = [];
+    this.resources = []; // list of *aois* where static resources are
+    this.sz = []; // list of SpawnZones
 
     this.goals = {
         buildings: {
@@ -23,6 +25,14 @@ function Region(data){
 
 Region.prototype.addBuilding = function(building){
     this.buildings.push(building);
+};
+
+Region.prototype.addResource = function(aoi){
+    this.resources.push(aoi);
+};
+
+Region.prototype.addSZ = function(sz){
+    this.sz.push(sz);
 };
 
 Region.prototype.update = function(){
@@ -42,7 +52,9 @@ Region.prototype.update = function(){
     if(playerBuildings == 0 && civBuildings > 0) this.status = 1; //occupied
     if(playerBuildings > 0 && civBuildings > 0) this.status = 2; //contested
     console.warn('['+this.name+'] Status: ',this.status);
-    // console.warn(this.goals);
+
+    this.nbNodes = this.sz.length + this.resources.length;
+    console.warn('nodes:', this.nbNodes);
     GameServer.setFlag('regionsStatus');
 };
 

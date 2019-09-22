@@ -9,6 +9,8 @@ function SpawnZone(x,y,animal){
     this.x = x;
     this.y = y;
     this.aoi = Utils.tileToAOI(this.x,this.y);
+    this.region = GameServer.getRegion(this);
+    GameServer.regions[this.region].addSZ(this);
     this.animal = animal;
     var animalData = GameServer.getAnimalData(this.animal);
     this.max = animalData.packSize.max;
