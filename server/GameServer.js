@@ -2108,7 +2108,7 @@ GameServer.computeRegions = function(){
         });
     }
 
-    var voronoi = new Voronoi();
+    /*var voronoi = new Voronoi();
     var bbox = {xl: 0, xr: World.worldWidth, yt: 0, yb: World.worldHeight}; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
     var diagram = voronoi.compute(sites, bbox);
 
@@ -2124,7 +2124,7 @@ GameServer.computeRegions = function(){
                 y: edge.vb.y
             }
         });
-    },this);
+    },this);*/
 
     GameServer.AOIs.forEach(function(aoi){
         var region = GameServer.getRegion(aoi);

@@ -101,8 +101,22 @@
   "16":{
     "id": 16,
     "name": "Penrhyn",
-    "x": 742,
-    "y": 586,
+    "x": 697,
+    "y": 591,
     "starting": true
+  },
+  "17":{
+    "id": 17,
+    "name": "Bay of Penrhyn",
+    "x": 609,
+    "y": 609,
+    "sea": true
+  },
+  "18":{
+    "id": 18,
+    "name": "Great Ocean",
+    "x": 1450,
+    "y": 1100,
+    "sea": true
   }
 }

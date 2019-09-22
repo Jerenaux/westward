@@ -63,7 +63,12 @@ var WorldMap = new Phaser.Class({
             this.setInteractive(); // { pixelPerfect: true } // not needed anymore with rendertexture apparently
             this.on('pointerup', this.handleClick.bind(this));
 
-            // Iterate over regions and create toponyms
+            for(var id in regionsData){
+                var region = regionsData[id];
+                var toponym = new Toponym(this, region.x,region.y,region.name);
+                this.toponyms.push(toponym);
+                toponym.position();
+            }
         }
         /*UI.scene.input.setDraggable(this);
         this.dragWidth = (dragWidth > -1 ? dragWidth : 999999);
@@ -166,7 +171,7 @@ var WorldMap = new Phaser.Class({
         this.draggedY += dy;
 
         if(tween){
-            var targets = this.displayedPins.concat([this.text,this]).concat(this.toponyms);
+            var targets = this.displayedPins.concat([this.text,this]);
             var duration = 300;
             UI.scene.tweens.add({
                     targets: targets,
@@ -187,11 +192,9 @@ var WorldMap = new Phaser.Class({
                 this.fow.x -= dx;
                 this.fow.y -= dy;
             }
-            // this.moveTexts(dx,dy);
-            // this.movePins(dx, dy);
             this.moveMarkers('displayedPins',dx,dy);
             this.moveMarkers('displayedDash',dx,dy);
-            this.moveMarkers('toponyms',dx,dy);
+            this.moveToponyms(dx,dy);
         }
     },
 
@@ -280,7 +283,7 @@ var WorldMap = new Phaser.Class({
         this.centerMap(); // center on current center ; must be called before positioning pins
         this.repositionMarkers('displayedPins');
         this.repositionMarkers('displayedDash');
-        // this.positionToponyms();
+        this.positionToponyms();
         // this.computeDragLimits();
     },
 
@@ -290,13 +293,17 @@ var WorldMap = new Phaser.Class({
         });
     },
 
-    // positionToponyms: function(){
-    //     this.toponyms.forEach(function(t){
-    //         var location = this.computeMapLocation(t.tx,t.ty);
-    //         t.setPosition(location.x,location.y);
-    //         t.setVisible(true);
-    //     },this);
-    // },
+    moveToponyms: function(dx,dy){
+        this.toponyms.forEach(function(t){
+            t.move(dx,dy);
+        })
+    },
+
+    positionToponyms: function(){
+        this.toponyms.forEach(function(t){
+            t.position();
+        },this);
+    },
 
     centerOnRegion: function(){
         var r = regionsData[Engine.player.region];
@@ -387,7 +394,7 @@ var WorldMap = new Phaser.Class({
             this.applyFogOfWar();
             this.displayBorders(Engine.player.frontier,0xff0000);
             this.displayBorders(Engine.player.regions,0x57360a);
-            // this.displayToponyms();
+            this.displayToponyms();
         }
 
         this.displayPins();
@@ -414,15 +421,9 @@ var WorldMap = new Phaser.Class({
     },
 
     displayToponyms: function(){
-        // Iterate over toponyms and set visibility
         // for(var id in regionsData){
         //     var region = regionsData[id];
-        //     for(var i = 0; i < Engine.player.FoW.length; i++){
-        //         var rect = Engine.player.FoW[i];
-        //         if(rect.contains(region.x,region.y)){
         //
-        //         }
-        //     }
         // }
     },
 
@@ -621,5 +622,43 @@ var Dash = new Phaser.Class({
         this.setVisibility();
     }
 });
+
+function Toponym(map,x,y,name){
+    this.parentMap = map;
+    this.tileX = x;
+    this.tileY = y;
+    this.slices = [];
+    this.text = UI.scene.add.text(0, 0, name, {
+        font: '16px belwe',
+        fill: '#ffffff',
+        stroke: '#000000',
+        strokeThickness: 4
+    });
+    this.text.setOrigin(0.5);
+    this.text.setScrollFactor(0);
+    this.text.setDepth(5);
+
+    var w = this.text.width;
+    var bannerx = 0 - 27 - w / 2;
+    var bannery = 0;
+    this.slices.push(UI.scene.add.image(bannerx, bannery, 'banners', 'left').setOrigin(0));
+    this.slices.push(UI.scene.add.tileSprite(bannerx + 21, bannery, w, 24, 'banners', 'middle').setOrigin(0));
+    this.slices.push(UI.scene.add.image(bannerx + w + 21, bannery, 'banners', 'right').setOrigin(0));
+}
+
+Toponym.prototype.position = function(){
+    var location = this.parentMap.computeMapLocation(this.tileX,this.tileY);
+    this.move(this.text.x-location.x,this.text.y-location.y);
+};
+
+Toponym.prototype.move = function(dx,dy){
+    console.warn(dx,dy);
+    this.text.x -= dx;
+    this.text.y -= dy;
+    this.slices.forEach(function(s){
+        s.x -= dx;
+        s.y -= dy;
+    });
+};
 
 export default WorldMap

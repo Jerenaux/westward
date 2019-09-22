@@ -38,7 +38,7 @@ Region.prototype.addSZ = function(sz){
 
 Region.prototype.addAOI = function(aoi){
     this.aois.push(aoi);
-    console.warn('aoi',aoi,'added to region',this.name);
+    // console.warn('aoi',aoi,'added to region',this.name);
 };
 
 Region.prototype.update = function(){
@@ -64,6 +64,7 @@ Region.prototype.updateBuildings = function(){
     if(playerBuildings == 0 && civBuildings > 0) this.status = 1; //occupied
     if(playerBuildings > 0 && civBuildings > 0) this.status = 2; //contested
     console.warn('['+this.name+'] Status: ',this.status);
+    console.warn('['+this.name+'] Nb AOIs: ',this.aois.length);
 
     GameServer.setFlag('regionsStatus');
 };

@@ -64,6 +64,8 @@ Packaging
 - Message when entering enemy territory
 
 Bugs:
+- Glitch at 674, 629
+- Many glitches around 670, 654 and south of it
 Features:
 -> Identify and don't count ocean AOIs in regions AOI count
 -> Don't display region borders
