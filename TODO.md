@@ -65,7 +65,7 @@ Packaging
 
 Bugs:
 Features:
--> rename missions/region menu
+-> Identify and don't count ocean AOIs in regions AOI count
 -> Don't display region borders
 -> Toggle region names
 -> Missions depend on region status

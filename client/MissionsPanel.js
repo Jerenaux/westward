@@ -45,11 +45,10 @@ MissionsPanel.prototype.refreshPagination = function(){
     this.nothingTxt.y = py + 35;
 };
 
-MissionsPanel.prototype.updateContent = function(status, type){
+MissionsPanel.prototype.updateContent = function(type){
     this.hideContent();
     var NB_PER_PAGE = 6;
-    // var goals = Engine.player.regionsStatus[Engine.player.region].goals;
-    var missions = missionsData[status][type];
+    var missions = missionsData[type].missions;
 
     this.nbpages = Math.max(1,Math.ceil(missions.length/NB_PER_PAGE));
     this.currentPage = Utils.clamp(this.currentPage,0,this.nbpages-1);
@@ -64,7 +63,7 @@ MissionsPanel.prototype.updateContent = function(status, type){
         }
         var slot = this.getNextSlot(this.x + 20 + xOffset, sloty + yOffset);
         slot.display();
-        slot.setUp(mission, status, type, i);
+        slot.setUp(mission, type, i);
         slot.moveUp(5);
         xOffset += 270;
         if((i-1)%2){
@@ -101,7 +100,7 @@ function MissionSlot(x,y,width,height){
     this.zone.setInteractive();
     this.zone.setOrigin(0);
     this.zone.on('pointerover',function(){
-        UI.tooltip.updateInfo('mission',{status:this.status,type:this.missionType,idx:this.idx});
+        UI.tooltip.updateInfo('mission',{type:this.missionType,idx:this.idx});
         UI.tooltip.display();
     }.bind(this));
     this.zone.on('pointerout',function(){
@@ -132,15 +131,21 @@ MissionSlot.prototype.addCount = function(){
     this.content.push(this.count);
 };
 
-MissionSlot.prototype.setUp = function(data, status, type, idx){
-    this.name.setText(data.name);
+MissionSlot.prototype.setUp = function(data, type, idx){
     this.icon.setTexture(data.atlas,data.frame);
-    this.status = status;
     this.missionType = type;
     this.idx = idx;
     var actual = 0;
-    this.count.setText(actual+'/'+data.goal);
-    this.count.setFill(actual == data.goal ? Utils.colors.green : Utils.colors.gold);
+    var goal = data.goal;
+    var text = data.name;
+    var regionData  =Engine.player.regionsStatus[Engine.player.region];
+    if(data.variableGoal){
+        goal = Math.ceil(regionData.nodes[1]/3);
+        text = text.replace(/\%x\%/,goal);
+    }
+    this.name.setText(text);
+    this.count.setText(actual+'/'+goal);
+    this.count.setFill(actual == goal ? Utils.colors.green : Utils.colors.gold);
 };
 
 MissionSlot.prototype.display = function(){

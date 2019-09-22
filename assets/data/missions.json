@@ -1,6 +1,7 @@
 {
-  "0":{
-    "Settle": [
+  "Settle": {
+    "status": [0],
+    "missions": [
         {
           "name": "Build 1 building",
           "desc": "Build one building, any building, anywhere in the region to officially start settling it!",
@@ -15,7 +16,22 @@
         }
       ]
   },
-  "1":[],
-  "2":[],
-  "3":[]
+  "Explore": {
+    "status": [0],
+    "missions": [
+      {
+        "name": "Discover %x% resource locations",
+        "desc": "Clear up fog of war to discover a certain amount of resource location (plants, wildlife...)",
+        "atlas": "items2",
+        "frame": "sunflower",
+        "count": "nodes",
+        "variableGoal": true,
+        "goal": 0,
+        "rewards": {
+          "1": 5,
+          "3": 15
+        }
+      }
+    ]
+  }
 }

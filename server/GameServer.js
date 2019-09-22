@@ -102,6 +102,7 @@ GameServer.createModels = function(){
  * @param {function} [cb] - Callback to call when the initialization sequence is finished (only used for tests)
  */
 GameServer.readMap = function(mapsPath,test,cb){
+    var hrstart = process.hrtime();
     if(test){
         GameServer.initializationMethods = {
             'static_data': null,
@@ -185,6 +186,8 @@ GameServer.readMap = function(mapsPath,test,cb){
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
     Prism.logEvent(null,'server-start');
+    var hrend = process.hrtime(hrstart);
+    console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000);
 };
 
 /**
@@ -363,7 +366,7 @@ GameServer.loadBuildings = function(){
 
         if(GameServer.needToSpawnCamps) GameServer.spawnCamps();
 
-        GameServer.updateRegions();
+        // GameServer.updateRegions(); // Not called because downstream of the init sequence, setupSpawnZones calles it
         GameServer.computeFrontier(false);
         GameServer.updateStatus();
     });
@@ -425,8 +428,7 @@ GameServer.loadMarkers = function(){
     GameServer.resourceMarkers = resourceMarkers;
     GameServer.resourceMarkers.forEach(function(m){
        var region = GameServer.getRegion({x:m[0],y:m[1]});
-       var aoi = Utils.tileToAOI({x:m[0],y:m[1]});
-       GameServer.regions[region].addResource(aoi);
+       GameServer.regions[region].addResource({x:m[0],y:m[1]});
     });
 
     var markerTypes = ['death','conflict'];
@@ -1672,7 +1674,7 @@ GameServer.finalizeBuilding = function(player,building){
     building.embed();
     player.addBuilding(building);
     GameServer.setFlag('buildingsMarkers');
-    GameServer.regions[building.region].update();
+    GameServer.regions[building.region].updateBuildings();
     GameServer.updateFoW();
     GameServer.updateSZActivity();
     GameServer.computeFrontier(true);
@@ -2019,6 +2021,7 @@ GameServer.updateFoW = function(){
         console.log('FoW unchanged');
         return;
     } // no change
+    GameServer.updateRegions();
     GameServer.animalMarkersFiltered = GameServer.filterMarkers('animal');
     GameServer.resourceMarkersFiltered = GameServer.filterMarkers('resource');
     GameServer.setFlag('animalsMarkers');
@@ -2027,13 +2030,17 @@ GameServer.updateFoW = function(){
 
 GameServer.filterMarkers = function(type){
     return GameServer[type+'Markers'].filter(function(m){
-        var aoi = Utils.tileToAOI(m[0],m[1]);
-        var nbr = Utils.listAdjacentAOIs(aoi);
-        for(var i = 0; i < nbr.length; i++){
-            if(GameServer.fowList.includes(nbr[i])) return true;
-        }
-        return false;
+        return GameServer.isNotInFoW(m[0],m[1]);
     });
+};
+
+GameServer.isNotInFoW = function(x,y){
+    var aoi = Utils.tileToAOI(x,y);
+    var nbr = Utils.listAdjacentAOIs(aoi);
+    for(var i = 0; i < nbr.length; i++){
+        if(GameServer.fowList.includes(nbr[i])) return true;
+    }
+    return false;
 };
 
 /**
@@ -2119,6 +2126,10 @@ GameServer.computeRegions = function(){
         });
     },this);
 
+    GameServer.AOIs.forEach(function(aoi){
+        var region = GameServer.getRegion(aoi);
+        GameServer.regions[region].addAOI(aoi.id);
+    });
 };
 
 GameServer.getRegion = function(entity){

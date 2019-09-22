@@ -69,16 +69,19 @@ RegionsStatusPanel.prototype.update = function(){
 
     // var goals = Engine.player.regionsStatus[Engine.player.region].goals;
     var i = 0;
-    for(var missionType in missionsData[status]) {
-        var nb = missionsData[status][missionType].length;
+    for(var missionType in missionsData) {
+        if(!missionsData[missionType].status.includes(status)) continue;
+
+        var nb = missionsData[missionType].missions.length;
         if (nb) {
             var btn = this.bigButtons[i++];
             btn.setText(nb + ' ' + missionType + ' Missions');
+            btn.missionType = missionType;
             btn.setCallback(function () {
                 var missions = Engine.currentMenu.panels['missions'];
                 missions.display();
-                missions.updateContent(status, missionType);
-            });
+                missions.updateContent(this.missionType);
+            }.bind(btn));
             btn.display();
         }
     }
