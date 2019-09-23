@@ -35,7 +35,7 @@ MapPanel.prototype.addLegend = function(){
     var h = 80;
     this.legend = new LegendPanel(0, UI.getGameHeight()-h, w, h, 'Legend');
     this.legend.addButton(w-16,-8,'red','close',this.legend.hide.bind(this.legend),'Close');
-    this.legend.moveUp(3);
+    this.legend.moveUp(4);
 };
 
 MapPanel.prototype.displayInterface = function(){

@@ -22,7 +22,7 @@ function UIHolder(x,y,align,style){
         leftFrame = 'title-left';
         middleFrame = 'title-center';
         rightFrame = 'title-right';
-        this.depth = 3;
+        this.depth = 5;
     }else if(style == 'small'){
         sliceWidth = 24;
         sliceHeight = 24;

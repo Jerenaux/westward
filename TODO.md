@@ -83,6 +83,7 @@ regions are the most/least developed, barren/lush based on # nodes...
 -> # days since last attack
 -> Conquered / settled based on history
 - Bld limit: one under construction at a time, otherwise no limit
+- Display all region names, regardless of FoW? + "???" name until players visit?
 - Restore dragging
 - Button to toggle regions (borders and banner names)
 - Button to toggle legend

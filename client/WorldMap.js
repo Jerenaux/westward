@@ -67,7 +67,7 @@ var WorldMap = new Phaser.Class({
                 var region = regionsData[id];
                 var toponym = new Toponym(this, region.x,region.y,region.name);
                 this.toponyms.push(toponym);
-                toponym.position();
+                toponym.hide();
             }
         }
         /*UI.scene.input.setDraggable(this);
@@ -422,6 +422,7 @@ var WorldMap = new Phaser.Class({
 
     displayToponyms: function(){
         this.toponyms.forEach(function(t){
+            t.position();
             t.display();
         })
     },
@@ -633,10 +634,10 @@ function Toponym(map,x,y,name){
         stroke: '#000000',
         strokeThickness: 4
     });
-    var depth = 5;
-    this.text.setOrigin(0.5);
+    var depth = 2;
+    this.text.setOrigin(0.5,0);
     this.text.setScrollFactor(0);
-    this.text.setDepth(depth);
+    this.text.setDepth(depth+1);
 
     var w = this.text.width;
     var bannerx = 0 - 27 - w / 2;
@@ -652,16 +653,39 @@ Toponym.prototype.position = function(){
 };
 
 Toponym.prototype.move = function(dx,dy){
-    console.warn(dx,dy);
     this.text.x -= dx;
     this.text.y -= dy;
     this.slices.forEach(function(s){
         s.x -= dx;
         s.y -= dy;
     });
+    // console.warn(this.parentMap.viewRect,this.text.x,this.text.y);
+    if(this.parentMap.viewRect.contains(this.text.x,this.text.y)){
+        this.display();
+    }else{
+        this.hide();
+    }
+};
+
+Toponym.prototype.checkVisibility = function(){
+    var offset = 40;
+    for(var i = 0; i < Engine.player.FoW.length; i++){
+        var rect = Engine.player.FoW[i];
+        var rect_ = new Phaser.Geom.Rectangle(
+            rect.x - offset,
+            rect.y - offset,
+            rect.width + offset*2,
+            rect.height + offset*2
+        ); // Hack not to miss markers on fringes of fog
+        if(rect_.contains(this.tileX,this.tileY)){
+            return true;
+        }
+    }
+    return false;
 };
 
 Toponym.prototype.display = function(){
+    if(!this.checkVisibility()) return;
     this.text.setVisible(true);
     this.slices.forEach(function(s){
         s.setVisible(true);
