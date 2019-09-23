@@ -83,14 +83,19 @@ Region.prototype.updateResources = function(){
 };
 
 Region.prototype.updateFoW = function(){
-
+    this.nbAreas = this.aois.length;
+    this.explored = 0;
+    this.aois.forEach(function(aoi){
+        if(GameServer.fowList.includes(aoi)) this.explored++;
+    }, this);
 };
 
 Region.prototype.trim = function(){
     return {
         id: this.id,
         status: this.status,
-        nodes: [this.visible,this.nbNodes]
+        nodes: [this.visible, this.nbNodes],
+        exploration: [this.explored, this.nbAreas]
     }
 };
 

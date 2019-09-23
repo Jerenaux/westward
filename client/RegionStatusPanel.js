@@ -49,11 +49,12 @@ RegionsStatusPanel.prototype.update = function(){
         3: 'Settled'
     };
 
+   var regionData = regionsData[region.id];
     var contested = [];
     var occupied = [];
     Engine.player.regionsStatus.forEach(function(region){
-        if(region.status == 2) contested.push(regionsData[region.id].name);
-        if(region.status == 1) occupied.push(regionsData[region.id].name);
+        if(region.status == 2) contested.push(regionData.name);
+        if(region.status == 1) occupied.push(regionData.name);
     });
 
     this.capsules['title'].setText(Engine.setlCapsule.text.text+' region');
@@ -67,23 +68,26 @@ RegionsStatusPanel.prototype.update = function(){
     // this.contestedText.setText(contested.join(',  '));
     // this.occupiedText.setText(occupied.join(',  '));
 
-    // var goals = Engine.player.regionsStatus[Engine.player.region].goals;
-    var i = 0;
-    for(var missionType in missionsData) {
-        if(!missionsData[missionType].status.includes(status)) continue;
+    var categories = {};
+    missionsData.missions.forEach(function(mission, i){
+        if(!mission.regionStatus.includes(status)) return;
+        if(mission.skipSea && regionData.sea) return;
 
-        var nb = missionsData[missionType].missions.length;
-        if (nb) {
-            var btn = this.bigButtons[i++];
-            btn.setText(nb + ' ' + missionType + ' Missions');
-            btn.missionType = missionType;
-            btn.setCallback(function () {
-                var missions = Engine.currentMenu.panels['missions'];
-                missions.display();
-                missions.updateContent(this.missionType);
-            }.bind(btn));
-            btn.display();
-        }
+        if(mission.type in categories) categories[mission.type] = [];
+        categories[mission.type].push(i);
+    });
+
+    var i = 0;
+    for(var type in categories){
+        var btn = this.bigButtons[i++];
+        btn.setText(categories[type].length + ' ' + type + ' Missions');
+        btn.missions = categories[type];
+        btn.setCallback(function () {
+            var missions = Engine.currentMenu.panels['missions'];
+            missions.display();
+            missions.updateContent(this.missions);
+        }.bind(btn));
+        btn.display();
     }
 };
 

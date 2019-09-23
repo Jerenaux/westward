@@ -421,10 +421,9 @@ var WorldMap = new Phaser.Class({
     },
 
     displayToponyms: function(){
-        // for(var id in regionsData){
-        //     var region = regionsData[id];
-        //
-        // }
+        this.toponyms.forEach(function(t){
+            t.display();
+        })
     },
 
     displayPins: function(){
@@ -485,7 +484,7 @@ var WorldMap = new Phaser.Class({
         });
         this.hidePins();
         this.toponyms.forEach(function(t){
-            t.setVisible(false);
+            t.hide();
         });
         this.setVisible(false);
         if(this.fow) this.fow.destroy();
@@ -634,16 +633,17 @@ function Toponym(map,x,y,name){
         stroke: '#000000',
         strokeThickness: 4
     });
+    var depth = 5;
     this.text.setOrigin(0.5);
     this.text.setScrollFactor(0);
-    this.text.setDepth(5);
+    this.text.setDepth(depth);
 
     var w = this.text.width;
     var bannerx = 0 - 27 - w / 2;
     var bannery = 0;
-    this.slices.push(UI.scene.add.image(bannerx, bannery, 'banners', 'left').setOrigin(0));
-    this.slices.push(UI.scene.add.tileSprite(bannerx + 21, bannery, w, 24, 'banners', 'middle').setOrigin(0));
-    this.slices.push(UI.scene.add.image(bannerx + w + 21, bannery, 'banners', 'right').setOrigin(0));
+    this.slices.push(UI.scene.add.image(bannerx, bannery, 'banners', 'left').setOrigin(0).setDepth(depth).setScrollFactor(0));
+    this.slices.push(UI.scene.add.tileSprite(bannerx + 21, bannery, w, 24, 'banners', 'middle').setOrigin(0).setDepth(depth).setScrollFactor(0));
+    this.slices.push(UI.scene.add.image(bannerx + w + 21, bannery, 'banners', 'right').setOrigin(0).setDepth(depth).setScrollFactor(0));
 }
 
 Toponym.prototype.position = function(){
@@ -658,6 +658,20 @@ Toponym.prototype.move = function(dx,dy){
     this.slices.forEach(function(s){
         s.x -= dx;
         s.y -= dy;
+    });
+};
+
+Toponym.prototype.display = function(){
+    this.text.setVisible(true);
+    this.slices.forEach(function(s){
+        s.setVisible(true);
+    });
+};
+
+Toponym.prototype.hide = function(){
+    this.text.setVisible(false);
+    this.slices.forEach(function(s){
+        s.setVisible(false);
     });
 };
 

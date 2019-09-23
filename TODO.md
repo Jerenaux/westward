@@ -81,6 +81,7 @@ Features:
 regions are the most/least developed, barren/lush based on # nodes...
 -> Identify resource speciality of regions and incentivize exports
 -> # days since last attack
+-> Conquered / settled based on history
 - Bld limit: one under construction at a time, otherwise no limit
 - Restore dragging
 - Button to toggle regions (borders and banner names)
@@ -105,7 +106,7 @@ Rewards: multi-class XP
 Wild:
 - 1 settle mission: build any building (craft + trade xp)
 -> Global notification
-- Explore mission: locate x map markers (explorer xp)
+- Explore mission: locate x map markers (explorer xp) + % AOIs
 
 Settled/conquered:
 - Build x amount of each building

@@ -45,10 +45,9 @@ MissionsPanel.prototype.refreshPagination = function(){
     this.nothingTxt.y = py + 35;
 };
 
-MissionsPanel.prototype.updateContent = function(type){
+MissionsPanel.prototype.updateContent = function(missions){
     this.hideContent();
     var NB_PER_PAGE = 6;
-    var missions = missionsData[type].missions;
 
     this.nbpages = Math.max(1,Math.ceil(missions.length/NB_PER_PAGE));
     this.currentPage = Utils.clamp(this.currentPage,0,this.nbpages-1);
@@ -57,13 +56,13 @@ MissionsPanel.prototype.updateContent = function(type){
 
     var yOffset = 0;
     var xOffset = 0;
-    missions.forEach(function(mission, i){
+    missions.forEach(function(idx, i){
         if ((i < this.currentPage * NB_PER_PAGE) || (i >= (this.currentPage + 1) * NB_PER_PAGE)) {
             return;
         }
         var slot = this.getNextSlot(this.x + 20 + xOffset, sloty + yOffset);
         slot.display();
-        slot.setUp(mission, type, i);
+        slot.setUp(missionsData.missions[idx], i);
         slot.moveUp(5);
         xOffset += 270;
         if((i-1)%2){
@@ -100,7 +99,7 @@ function MissionSlot(x,y,width,height){
     this.zone.setInteractive();
     this.zone.setOrigin(0);
     this.zone.on('pointerover',function(){
-        UI.tooltip.updateInfo('mission',{type:this.missionType,idx:this.idx});
+        UI.tooltip.updateInfo('mission',{idx:this.idx});
         UI.tooltip.display();
     }.bind(this));
     this.zone.on('pointerout',function(){
@@ -131,9 +130,8 @@ MissionSlot.prototype.addCount = function(){
     this.content.push(this.count);
 };
 
-MissionSlot.prototype.setUp = function(data, type, idx){
+MissionSlot.prototype.setUp = function(data, idx){
     this.icon.setTexture(data.atlas,data.frame);
-    this.missionType = type;
     this.idx = idx;
     var actual = 0;
     var goal = data.goal;

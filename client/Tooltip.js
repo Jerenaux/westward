@@ -80,7 +80,7 @@ var Tooltip = new Phaser.Class({
                 if(item.effects) this.setEffects(item.effects);
                 break;
             case 'mission':
-                var mission = missionsData[data.type].missions[data.idx];
+                var mission = missionsData.missions[data.idx];
                 this.setBody(mission.desc);
                 this.setMissionReward(mission.rewards);
                 break;
