@@ -66,9 +66,9 @@ Packaging
 Bugs:
 - Glitch at 674, 629
 - Many glitches around 670, 654 and south of it
+- Test FoW persistence
 Features:
--> Identify and don't count ocean AOIs in regions AOI count
--> Don't display region borders
+-> Specify where toponyms are displayed
 -> Toggle region names
 -> Missions depend on region status
 -> Missions based on buildings in region (build fixed quotas) if wild
@@ -90,7 +90,7 @@ regions are the most/least developed, barren/lush based on # nodes...
 - Add borders to legend
 - Icon for unbuilt building (lower half colored)
 - Toggle markers by click on legend
-- UI to filter on building types
+- UI to filter on building types, filter on damage
 - Display item rarity in inventory (check if doesn't conflit with shop)
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
@@ -123,7 +123,7 @@ Settled/conquered:
 Contested:
 - Build x towers (craft + soldier)
 - Later: stock missions for towers (craft + soldier)
-- Repair missions (craft)
+- Repair missions (craft) (once repair filter on map)
 - War missions: destroy civ buildings + kill x civs (soldier)
 -> Global event when switching from contested to settled
 - Explore mission: locate civ buildings

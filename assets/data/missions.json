@@ -46,7 +46,7 @@
         }
       },
       {
-        "type": "Build",
+        "type": "Settle",
         "regionStatus": [3],
         "name": "Build 10 Shacks",
         "desc": "Firmly establish your presence in the region by building 10 shacks",
@@ -57,6 +57,35 @@
         "rewards": {
           "1": 3,
           "2": 10
+        }
+      },
+      {
+        "type": "Defense",
+        "regionStatus": [2],
+        "name": "Build 5 Towers",
+        "desc": "Secure the region by building at least 5 towers",
+        "atlas": "buildingsicons",
+        "frame": "tower",
+        "count": "building:2",
+        "goal": 5,
+        "rewards": {
+          "0": 30,
+          "2": 5
+        }
+      },
+      {
+        "type": "Explore",
+        "regionStatus": [1, 2],
+        "name": "Discover %x% enemy buildings",
+        "desc": "Scout ahead and find out the location of enemy camps!",
+        "atlas": "buildingsicons",
+        "frame": "civhut",
+        "count": "nodes",
+        "variableGoal": true,
+        "goal": 0,
+        "rewards": {
+          "0": 5,
+          "3": 20
         }
       }
     ]

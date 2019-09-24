@@ -62,7 +62,7 @@ MissionsPanel.prototype.updateContent = function(missions){
         }
         var slot = this.getNextSlot(this.x + 20 + xOffset, sloty + yOffset);
         slot.display();
-        slot.setUp(missionsData.missions[idx], i);
+        slot.setUp(missionsData.missions[idx], idx);
         slot.moveUp(5);
         xOffset += 270;
         if((i-1)%2){
@@ -136,7 +136,7 @@ MissionSlot.prototype.setUp = function(data, idx){
     var actual = 0;
     var goal = data.goal;
     var text = data.name;
-    var regionData  =Engine.player.regionsStatus[Engine.player.region];
+    var regionData = Engine.player.regionsStatus[Engine.player.region];
     if(data.variableGoal){
         goal = Math.ceil(regionData.nodes[1]/3);
         text = text.replace(/\%x\%/,goal);

@@ -45,26 +45,32 @@ Region.prototype.update = function(){
     this.updateBuildings();
     this.updateResources();
     this.updateFoW();
+    console.warn('['+this.name+'] Status: ',this.status);
+    console.warn('['+this.name+'] AOIs: ',this.explored,'/',this.aois.length);
+    console.warn('['+this.name+'] nodes:', this.visible,'/',this.nbNodes);
+    console.warn('['+this.name+'] Civ buildings:', this.seenCivBuildings,'/',this.civBuildings);
 };
 
 Region.prototype.updateBuildings = function(){
     var playerBuildings = 0;
     var civBuildings = 0;
+    var seenCivBuildings = 0;
     this.buildings.forEach(function(bld){
         if(!bld.isBuilt()) return;
         if(bld.civ){
             civBuildings++;
+            if(GameServer.isNotInFoW(bld)) seenCivBuildings++;
         }else{
             playerBuildings++;
-            if(bld.type in this.goals.buildings) this.goals.buildings[bld.type][0]++
+            if(bld.type in this.goals.buildings) this.goals.buildings[bld.type][0]++;
         }
     },this);
     if(playerBuildings == 0 && civBuildings == 0) this.status = 0; //wild
     if(playerBuildings > 0 && civBuildings == 0) this.status = 3; //settled
     if(playerBuildings == 0 && civBuildings > 0) this.status = 1; //occupied
     if(playerBuildings > 0 && civBuildings > 0) this.status = 2; //contested
-    console.warn('['+this.name+'] Status: ',this.status);
-    console.warn('['+this.name+'] Nb AOIs: ',this.aois.length);
+    this.civBuildings = civBuildings;
+    this.seenCivBuildings = seenCivBuildings;
 
     GameServer.setFlag('regionsStatus');
 };
@@ -78,7 +84,6 @@ Region.prototype.updateResources = function(){
     this.sz.forEach(function(sz){
         if(GameServer.isNotInFoW(sz.x, sz.y)) this.visible++;
     },this);
-    console.warn('['+this.name+'] nodes:', this.visible,'/',this.nbNodes);
     GameServer.setFlag('regionsStatus');
 };
 
@@ -95,7 +100,8 @@ Region.prototype.trim = function(){
         id: this.id,
         status: this.status,
         nodes: [this.visible, this.nbNodes],
-        exploration: [this.explored, this.nbAreas]
+        exploration: [this.explored, this.nbAreas],
+        civs: [this.seenCivBuildings, this.civBuildings]
     }
 };
 
