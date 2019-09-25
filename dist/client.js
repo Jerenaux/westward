@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./client/main.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -156,10 +156,10 @@ eval("module.exports = JSON.parse(\"{\\\"missions\\\":[{\\\"type\\\":\\\"Settle\
 /*!**********************************!*\
   !*** ./assets/data/regions.json ***!
   \**********************************/
-/*! exports provided: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, default */
+/*! exports provided: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, default */
 /***/ (function(module) {
 
-eval("module.exports = JSON.parse(\"{\\\"0\\\":{\\\"id\\\":0,\\\"name\\\":\\\"New Beginning\\\",\\\"x\\\":512,\\\"y\\\":654,\\\"starting\\\":true},\\\"1\\\":{\\\"id\\\":1,\\\"name\\\":\\\"Saarinen\\\",\\\"x\\\":1203,\\\"y\\\":154,\\\"starting\\\":true},\\\"2\\\":{\\\"id\\\":2,\\\"name\\\":\\\"#2\\\",\\\"x\\\":36,\\\"y\\\":382},\\\"3\\\":{\\\"id\\\":3,\\\"name\\\":\\\"#3\\\",\\\"x\\\":18,\\\"y\\\":515},\\\"4\\\":{\\\"id\\\":4,\\\"name\\\":\\\"#4\\\",\\\"x\\\":581,\\\"y\\\":82},\\\"5\\\":{\\\"id\\\":5,\\\"name\\\":\\\"#5\\\",\\\"x\\\":302,\\\"y\\\":1002},\\\"6\\\":{\\\"id\\\":6,\\\"name\\\":\\\"#6\\\",\\\"x\\\":462,\\\"y\\\":42},\\\"7\\\":{\\\"id\\\":7,\\\"name\\\":\\\"#7\\\",\\\"x\\\":495,\\\"y\\\":196},\\\"8\\\":{\\\"id\\\":8,\\\"name\\\":\\\"#8\\\",\\\"x\\\":97,\\\"y\\\":326},\\\"9\\\":{\\\"id\\\":9,\\\"name\\\":\\\"#9\\\",\\\"x\\\":152,\\\"y\\\":138},\\\"10\\\":{\\\"id\\\":10,\\\"name\\\":\\\"#10\\\",\\\"x\\\":23,\\\"y\\\":706},\\\"11\\\":{\\\"id\\\":11,\\\"name\\\":\\\"Bachplaen\\\",\\\"x\\\":535,\\\"y\\\":384},\\\"12\\\":{\\\"id\\\":12,\\\"name\\\":\\\"#12\\\",\\\"x\\\":313,\\\"y\\\":220},\\\"13\\\":{\\\"id\\\":13,\\\"name\\\":\\\"Austurpren\\\",\\\"x\\\":715,\\\"y\\\":207},\\\"14\\\":{\\\"id\\\":14,\\\"name\\\":\\\"Cymsyg\\\",\\\"x\\\":316,\\\"y\\\":457},\\\"15\\\":{\\\"id\\\":15,\\\"name\\\":\\\"Draigllyn\\\",\\\"x\\\":1000,\\\"y\\\":306,\\\"starting\\\":true},\\\"16\\\":{\\\"id\\\":16,\\\"name\\\":\\\"Penrhyn\\\",\\\"x\\\":697,\\\"y\\\":591,\\\"starting\\\":true},\\\"17\\\":{\\\"id\\\":17,\\\"name\\\":\\\"Bay of Penrhyn\\\",\\\"x\\\":609,\\\"y\\\":609,\\\"sea\\\":true},\\\"18\\\":{\\\"id\\\":18,\\\"name\\\":\\\"Great Ocean\\\",\\\"x\\\":1450,\\\"y\\\":1100,\\\"sea\\\":true}}\");\n\n//# sourceURL=webpack:///./assets/data/regions.json?");
+eval("module.exports = JSON.parse(\"{\\\"0\\\":{\\\"id\\\":0,\\\"name\\\":\\\"New Beginning\\\",\\\"x\\\":512,\\\"y\\\":654,\\\"starting\\\":true},\\\"1\\\":{\\\"id\\\":1,\\\"name\\\":\\\"Saarinen\\\",\\\"x\\\":1203,\\\"y\\\":154,\\\"starting\\\":true},\\\"2\\\":{\\\"id\\\":2,\\\"name\\\":\\\"#2\\\",\\\"x\\\":36,\\\"y\\\":382},\\\"3\\\":{\\\"id\\\":3,\\\"name\\\":\\\"#3\\\",\\\"x\\\":18,\\\"y\\\":515},\\\"4\\\":{\\\"id\\\":4,\\\"name\\\":\\\"#4\\\",\\\"x\\\":581,\\\"y\\\":82},\\\"5\\\":{\\\"id\\\":5,\\\"name\\\":\\\"#5\\\",\\\"x\\\":302,\\\"y\\\":1002},\\\"6\\\":{\\\"id\\\":6,\\\"name\\\":\\\"#6\\\",\\\"x\\\":462,\\\"y\\\":42},\\\"7\\\":{\\\"id\\\":7,\\\"name\\\":\\\"#7\\\",\\\"x\\\":495,\\\"y\\\":196},\\\"8\\\":{\\\"id\\\":8,\\\"name\\\":\\\"#8\\\",\\\"x\\\":97,\\\"y\\\":326},\\\"9\\\":{\\\"id\\\":9,\\\"name\\\":\\\"#9\\\",\\\"x\\\":152,\\\"y\\\":138},\\\"10\\\":{\\\"id\\\":10,\\\"name\\\":\\\"#10\\\",\\\"x\\\":23,\\\"y\\\":706},\\\"11\\\":{\\\"id\\\":11,\\\"name\\\":\\\"Bachplaen\\\",\\\"x\\\":535,\\\"y\\\":384},\\\"12\\\":{\\\"id\\\":12,\\\"name\\\":\\\"#12\\\",\\\"x\\\":313,\\\"y\\\":220},\\\"13\\\":{\\\"id\\\":13,\\\"name\\\":\\\"Austurpren\\\",\\\"x\\\":715,\\\"y\\\":207},\\\"14\\\":{\\\"id\\\":14,\\\"name\\\":\\\"Cymsyg\\\",\\\"x\\\":316,\\\"y\\\":457},\\\"15\\\":{\\\"id\\\":15,\\\"name\\\":\\\"Draigllyn\\\",\\\"x\\\":1000,\\\"y\\\":306,\\\"starting\\\":true},\\\"16\\\":{\\\"id\\\":16,\\\"name\\\":\\\"Penrhyn\\\",\\\"x\\\":697,\\\"y\\\":591,\\\"starting\\\":true},\\\"17\\\":{\\\"id\\\":17,\\\"name\\\":\\\"Bay of Penrhyn\\\",\\\"x\\\":609,\\\"y\\\":609,\\\"sea\\\":true},\\\"18\\\":{\\\"id\\\":18,\\\"name\\\":\\\"Great Ocean\\\",\\\"x\\\":1450,\\\"y\\\":1100,\\\"sea\\\":true},\\\"19\\\":{\\\"id\\\":19,\\\"name\\\":\\\"Sea of Penrhyn\\\",\\\"x\\\":800,\\\"y\\\":660,\\\"sea\\\":true},\\\"20\\\":{\\\"id\\\":20,\\\"name\\\":\\\"Sea of #5\\\",\\\"x\\\":360,\\\"y\\\":1100,\\\"sea\\\":true},\\\"21\\\":{\\\"id\\\":21,\\\"name\\\":\\\"Sea of Draigllyn\\\",\\\"x\\\":1020,\\\"y\\\":350,\\\"sea\\\":true},\\\"22\\\":{\\\"id\\\":22,\\\"name\\\":\\\"Sea of Saarinen\\\",\\\"x\\\":1300,\\\"y\\\":170,\\\"sea\\\":true}}\");\n\n//# sourceURL=webpack:///./assets/data/regions.json?");
 
 /***/ }),
 
@@ -1163,6 +1163,17 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _sha
 
 "use strict";
 eval("__webpack_require__.r(__webpack_exports__);\n/**\r\n * Created by Jerome on 14-10-17.\r\n */\r\n\r\nvar World = {};\r\n\r\nWorld.setUp = function(nbHoriz,nbVert,chunkW,chunkH,tileW,tileH){\r\n    World.nbChunksHorizontal = nbHoriz;\r\n    World.nbChunksVertical = nbVert;\r\n    World.chunkWidth = chunkW;\r\n    World.chunkHeight = chunkH;\r\n    World.tileWidth = tileW || 32;\r\n    World.tileHeight = tileH || 32;\r\n    World.computeProperties();\r\n};\r\n\r\nWorld.readMasterData = function(data){\r\n    World.setUp(\r\n        data.nbChunksHoriz,data.nbChunksVert,\r\n        data.chunkWidth,data.chunkHeight\r\n    );\r\n};\r\n\r\nWorld.computeProperties = function(){\r\n    World.worldWidth = World.chunkWidth*World.nbChunksHorizontal;\r\n    World.worldHeight = World.chunkHeight*World.nbChunksVertical;\r\n    World.lastChunkID = World.nbChunksHorizontal*World.nbChunksVertical - 1;\r\n    console.log('Set up world of size '+World.worldWidth+' x '+World.worldHeight);\r\n};\r\n\r\n/* harmony default export */ __webpack_exports__[\"default\"] = (World);\n\n//# sourceURL=webpack:///./shared/World.js?");
+
+/***/ }),
+
+/***/ 0:
+/*!******************************!*\
+  !*** multi ./client/main.js ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("module.exports = __webpack_require__(/*! ./client/main.js */\"./client/main.js\");\n\n\n//# sourceURL=webpack:///multi_./client/main.js?");
 
 /***/ })
 

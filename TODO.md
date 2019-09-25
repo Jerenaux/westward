@@ -64,24 +64,15 @@ Packaging
 - Message when entering enemy territory
 
 Bugs:
-- Glitch at 674, 629
-- Many glitches around 670, 654 and south of it
-- Test FoW persistence
 Features:
 -> Specify where toponyms are displayed
 -> Toggle region names
--> Missions depend on region status
--> Missions based on buildings in region (build fixed quotas) if wild
--> Missions based on enemy buildings (destroy) if occupied or contested
--> Missions based on items in region (building inventories only, fixed preset quotas) (produce), depends on status
--> Factor in players inventory
--> Factor in resource nodes (make classes in passing) to convert some produce quests into trade ones
--> Replace fixed production by top-down system: list of finished products, and derive rest based on ingredients
 -> General info: how many regions settled, which regions are the most dangerous/currently contested, which
 regions are the most/least developed, barren/lush based on # nodes...
 -> Identify resource speciality of regions and incentivize exports
 -> # days since last attack
 -> Conquered / settled based on history
+- Identify AOIs on enemy side of frontier and display warning/permanent danger indicator
 - Bld limit: one under construction at a time, otherwise no limit
 - Display all region names, regardless of FoW? + "???" name until players visit?
 - Restore dragging

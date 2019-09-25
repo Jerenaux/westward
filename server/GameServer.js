@@ -2108,23 +2108,23 @@ GameServer.computeRegions = function(){
         });
     }
 
-    /*var voronoi = new Voronoi();
-    var bbox = {xl: 0, xr: World.worldWidth, yt: 0, yb: World.worldHeight}; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
-    var diagram = voronoi.compute(sites, bbox);
-
-    diagram.edges.forEach(function(edge){
-        if(!edge.lSite || !edge.rSite) return;
-        GameServer.regionBoundaries.push({
-            a:{
-                x: edge.va.x,
-                y: edge.va.y
-            },
-            b:{
-                x: edge.vb.x,
-                y: edge.vb.y
-            }
-        });
-    },this);*/
+    // var voronoi = new Voronoi();
+    // var bbox = {xl: 0, xr: World.worldWidth, yt: 0, yb: World.worldHeight}; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
+    // var diagram = voronoi.compute(sites, bbox);
+    //
+    // diagram.edges.forEach(function(edge){
+    //     if(!edge.lSite || !edge.rSite) return;
+    //     GameServer.regionBoundaries.push({
+    //         a:{
+    //             x: edge.va.x,
+    //             y: edge.va.y
+    //         },
+    //         b:{
+    //             x: edge.vb.x,
+    //             y: edge.vb.y
+    //         }
+    //     });
+    // },this);
 
     GameServer.AOIs.forEach(function(aoi){
         var region = GameServer.getRegion(aoi);

@@ -118,5 +118,33 @@
     "x": 1450,
     "y": 1100,
     "sea": true
+  },
+  "19":{
+    "id": 19,
+    "name": "Sea of Penrhyn",
+    "x": 800,
+    "y": 660,
+    "sea": true
+  },
+  "20":{
+    "id": 20,
+    "name": "Sea of #5",
+    "x": 360,
+    "y": 1100,
+    "sea": true
+  },
+  "21":{
+    "id": 21,
+    "name": "Sea of Draigllyn",
+    "x": 1020,
+    "y": 350,
+    "sea": true
+  },
+  "22":{
+    "id": 22,
+    "name": "Sea of Saarinen",
+    "x": 1300,
+    "y": 170,
+    "sea": true
   }
 }
