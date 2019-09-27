@@ -57,8 +57,9 @@ function Building(data){
     this.inventory = new Inventory(GameServer.buildingParameters.inventorySize);
     if(data.inventory) this.inventory.fromList(data.inventory);
 
+    var region = GameServer.getRegion(this);
     this.inventory.toList().forEach(function(itm){
-        GameServer.createItem(itm[0],itm[1]);
+        GameServer.createItem(itm[0],itm[1],region);
     });
 
     this.prices = data.prices || {};
@@ -215,7 +216,7 @@ Building.prototype.updateProd = function(justBuilt){
             GameServer.notifyPlayer(this.owner,msg);
             produced += actualNb;
             this.takeItem(1,1);
-            GameServer.destroyItem(1,1,'building food consumption');
+            GameServer.destroyItem(1,1,this.region, 'building food consumption');
         }
 
     }
@@ -232,7 +233,7 @@ Building.prototype.updateBuild = function(){
     }
     for(var item in recipe){
         this.takeItem(item,recipe[item]);
-        GameServer.destroyItem(item,recipe[item],'building');
+        GameServer.destroyItem(item,recipe[item],this.region,'building');
     }
     this.setBuilt();
     return true;
@@ -251,7 +252,7 @@ Building.prototype.updateRepair = function(){
     this.takeItem(TIMBER, nb);
     this.getStat('hp').increment(nb*hpPerTimber);
     this.refreshStats();
-    GameServer.destroyItem(TIMBER,nb,'repair');
+    GameServer.destroyItem(TIMBER,nb,this.region,'repair');
 };
 
 Building.prototype.setBuilt = function(){
@@ -271,6 +272,7 @@ Building.prototype.destroy = function(){
     this.setProperty('built',false);
     if(this.civ){
         GameServer.setFlag('buildingsMarkers');
+        GameServer.regions[this.region].countDestroyedCivBld();
     }else{
         GameServer.notifyPlayer(this.owner,'Your '+this.name+' was destroyed');
     }

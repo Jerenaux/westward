@@ -3,7 +3,7 @@
  */
 
 function Inventory(size){
-    this.maxSize = size || 20;
+    this.maxSize = size || 999;
     this.clear();
 }
 

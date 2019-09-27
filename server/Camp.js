@@ -11,6 +11,7 @@ function Camp(id,center,bldData){
     this.buildings = [];
     this.people = [];
     this.center = center;
+    this.region = GameServer.getRegion(this.center);
     this.bldData = bldData;
 }
 

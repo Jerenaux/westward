@@ -1303,6 +1303,26 @@ Engine.computeMissionGoal = function(mission){
     }
 };
 
+Engine.computeMissionActual = function(mission){
+    var region = Engine.player.regionsStatus[Engine.player.region];
+    switch(mission.count.split(':')[0]){
+        case 'allbuildings':
+            return region.totalbuildings;
+        case 'bldfood':
+            return region.food[1];
+        case 'building':
+            return region.buildings[mission.count.split(':')[1]];
+        case 'civhutkilled':
+            return region.civCasualties[1];
+        case 'civhuts':
+            return region.civs[0];
+        case 'civkilled':
+            return region.civCasualties[0];
+        case 'playerfood':
+            return region.food[0];
+    }
+};
+
 Engine.makeRegionsMenu = function(mapPanel){
     var menu = new Menu('Regions');
     menu.log = true;

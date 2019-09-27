@@ -11,8 +11,6 @@ import NPC from './NPC'
 import Utils from '../shared/Utils'
 import World from '../shared/World'
 
-
-
 function Civ(x,y,type){
     this.id = GameServer.lastCivID++;
     this.isCiv = true;
@@ -117,6 +115,7 @@ Civ.prototype.die = function(){
     MovingEntity.prototype.die.call(this);
     this.idle = false;
     if(this.camp) this.camp.remove(this);
+    GameServer.regions[this.camp.region].countKilledCiv();
 };
 
 Civ.prototype.endFight = function(alive){

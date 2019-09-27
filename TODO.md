@@ -64,6 +64,7 @@ Packaging
 - Message when entering enemy territory
 
 Bugs:
+- Black backdrop
 Features:
 -> Specify where toponyms are displayed
 -> Toggle region names
@@ -89,6 +90,8 @@ regions are the most/least developed, barren/lush based on # nodes...
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Belt & backpack & gold capacity + corresponding items (incl. defaults)
+- Add bigger quivers, boots
+- Add belts, backpacks, purses etc. as crafting missions
 - Arrow stocks in towers  + make them throw stones when no better ammo
 - Stock missions for occupied regions
 - Abilities
@@ -97,9 +100,10 @@ fitting more in backpack, more actions per turn, ... (not so for "boolean" effec
 - Set "active quests/missions"
 - Leaderboards
   
-- Proper icons
-- Count server-side
-- Add dynamic production missions
+
+- Add dynamic production missions for:
+bow, (bomb), dawn, dusk, (sword), (gun), (boots), (belt), quiver, (arrow), stone hatchet, bone arrow, (bullet),
+(bullets pouches (all capacities)), stone arrow
 - Display count client-side
 - Proper specific updates when relevant player actions + XP reward
 - Global notifications

@@ -30,7 +30,7 @@ function Player() {
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.oldAOIs = [];
     this.action = null;
-    this.inventory = new Inventory();
+    this.inventory = new Inventory(20); //TODO: conf
     this.belt = new Inventory(3); //TODO: conf
     this.sid = 0;
     this.gold = 0;
@@ -151,7 +151,11 @@ Player.prototype.setUp = function(id,name,region){
 Player.prototype.setRegion = function() {
     var region_ = this.region;
     this.setOwnProperty('region',GameServer.getRegion(this));
-    if(this.region != region_) this.addNotif('Entering '+GameServer.regions[this.region].name+' region');
+    if(this.region != region_){
+        this.addNotif('Entering '+GameServer.regions[this.region].name+' region');
+        if(region_ in GameServer.regions) GameServer.regions[region_].removePlayer(this.id);
+        GameServer.regions[this.region].addPlayer(this.id);
+    }
 };
 
 Player.prototype.setOrigin = function(origin){
@@ -223,7 +227,7 @@ Player.prototype.setStartingInventory = function () {
     ];
     list.forEach(function (l) {
         this.giveItem(l[0], l[1]);
-        GameServer.createItem(l[0], l[1], 'start');
+        GameServer.createItem(l[0], l[1], this.origin, 'start');
     }, this);
 
     this.giveGold(300);

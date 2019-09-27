@@ -52,7 +52,7 @@
         "desc": "Scout ahead and find out the location of enemy camps!",
         "atlas": "buildingsicons",
         "frame": "civhut",
-        "count": "nodes",
+        "count": "civhuts",
         "variableGoal": true,
         "goal": "civhuts",
         "rewards": {
@@ -82,7 +82,7 @@
         "desc": "Destroy enemy camps to reduce their territory!",
         "atlas": "buildingsicons",
         "frame": "civhut",
-        "count": "civkilled",
+        "count": "civhutkilled",
         "variableGoal": true,
         "goal": "civhuts",
         "rewards": {
@@ -111,7 +111,7 @@
         "desc": "All settlers in the region should collectively own at least 50 food to stay in shape to defend the region",
         "atlas": "items",
         "frame": "food",
-        "count": "civkilled",
+        "count": "playerfood",
         "goal": 50,
         "rewards": {
           "0": 10,
@@ -167,7 +167,7 @@
         "desc": "Strive to maintain a constant stock of 20 Food in all production buildings combined to stimulate proudction",
         "atlas": "items",
         "frame": "food",
-        "count": "civkilled",
+        "count": "bldfood",
         "goal": 20,
         "rewards": {
           "0": 10,

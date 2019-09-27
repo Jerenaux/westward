@@ -68,19 +68,27 @@ RegionsStatusPanel.prototype.update = function(){
     // this.occupiedText.setText(occupied.join(',  '));
 
     var categories = {};
+    var categoriesFulfilled = {}
     missionsData.missions.forEach(function(mission, i){
         if(!mission.regionStatus.includes(status)) return;
         if(mission.skipSea && regionData.sea) return;
-        if(mission.variableGoal && !Engine.computeMissionGoal(mission)) return;
+        var goal = mission.variableGoal ? Engine.computeMissionGoal(mission) : mission.goal;
+        if(!goal) return;
 
-        if(!(mission.type in categories)) categories[mission.type] = [];
+        if(!(mission.type in categories)){
+            categories[mission.type] = [];
+            categoriesFulfilled[mission.type] = 0;
+        }
         categories[mission.type].push(i);
+
+        if(Engine.computeMissionActual(mission) >= goal) categoriesFulfilled[mission.type]++;
     });
 
     var i = 0;
     for(var type in categories){
         var btn = this.bigButtons[i++];
-        btn.setText(categories[type].length + ' ' + type + ' Missions');
+        var nb  = categories[type].length - categoriesFulfilled[type];
+        btn.setText(nb + ' ' + type + ' Missions');
         btn.missions = categories[type];
         btn.setCallback(function () {
             var missions = Engine.currentMenu.panels['missions'];

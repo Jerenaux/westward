@@ -1,4 +1,6 @@
 import GameServer from "./GameServer";
+import Utils from "../shared/Utils";
+import Inventory from "../shared/Inventory";
 
 function Region(data){
     this.id = data.id;
@@ -9,23 +11,45 @@ function Region(data){
     // 0: wild, 1: occupied, 2: settled
     this.status = 0;
     this.buildings = [];
+    this.players = new Set();
+    this.itemCounts = new Inventory();
+    this.food = [0,0];
     this.resources = []; // list of coordinates where static resources are
     this.sz = []; // list of SpawnZones
     this.aois = [];
-
-    this.goals = {
-        buildings: {
-            11: [0,10],
-            2: [0,4],
-            3: [0,2],
-            4: [0,2],
-            6: [0,3]
-        }
-    }
+    this.civCasualties = [0,0];
 }
+
+Region.prototype.addPlayer = function(id){
+    this.players.add(id);
+    this.updateFood();
+};
+
+Region.prototype.removePlayer = function(id){
+    this.players.delete(id);
+    this.updateFood();
+};
+
+Region.prototype.addItem = function(item,nb){
+    this.itemCounts.add(item,nb);
+};
+
+Region.prototype.removeItem = function(item,nb){
+    this.itemCounts.take(item,nb);
+};
 
 Region.prototype.addBuilding = function(building){
     this.buildings.push(building);
+};
+
+Region.prototype.countDestroyedCivBld = function(){
+    this.civCasualties[1]++;
+    GameServer.setFlag('regionsStatus');
+};
+
+Region.prototype.countKilledCiv = function(){
+    this.civCasualties[0]++;
+    GameServer.setFlag('regionsStatus');
 };
 
 Region.prototype.addResource = function(loc){
@@ -55,14 +79,17 @@ Region.prototype.updateBuildings = function(){
     var playerBuildings = 0;
     var civBuildings = 0;
     var seenCivBuildings = 0;
+    this.buildingsTypes = {};
     this.buildings.forEach(function(bld){
         if(!bld.isBuilt()) return;
         if(bld.civ){
             civBuildings++;
-            if(GameServer.isNotInFoW(bld)) seenCivBuildings++;
+            if(GameServer.isNotInFoW(bld.x,bld.y)) seenCivBuildings++;
         }else{
             playerBuildings++;
-            if(bld.type in this.goals.buildings) this.goals.buildings[bld.type][0]++;
+            if(!(bld.type in this.buildingsTypes)) this.buildingsTypes[bld.type] = 0;
+            this.buildingsTypes[bld.type]++;
+            this.food[1] += bld.getItemNb(1);
         }
     },this);
     if(playerBuildings == 0 && civBuildings == 0) this.status = 0; //wild
@@ -70,8 +97,16 @@ Region.prototype.updateBuildings = function(){
     if(playerBuildings > 0 && civBuildings == 0) this.status = 2; //settled
     this.civBuildings = civBuildings;
     this.seenCivBuildings = seenCivBuildings;
+    this.playerBuildings = playerBuildings;
 
     GameServer.setFlag('regionsStatus');
+};
+
+Region.prototype.updateFood = function(){
+    this.food[0] = 0;
+    for(var playerID of this.players){
+        this.food[0] += GameServer.players[playerID].getItemNb(1);
+    }
 };
 
 Region.prototype.updateResources = function(){
@@ -97,10 +132,15 @@ Region.prototype.updateFoW = function(){
 Region.prototype.trim = function(){
     return {
         id: this.id,
+        items: this.itemCounts.toList(),
+        food: this.food,
+        buildings: this.buildingsTypes,
+        totalbuildings: this.playerBuildings,
         status: this.status,
         nodes: [this.visible, this.nbNodes],
         exploration: [this.explored, this.nbAreas],
-        civs: [this.seenCivBuildings, this.civBuildings]
+        civs: [this.seenCivBuildings, this.civBuildings],
+        civCasualties: this.civCasualties
     }
 };
 

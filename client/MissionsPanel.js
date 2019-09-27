@@ -133,7 +133,6 @@ MissionSlot.prototype.addCount = function(){
 MissionSlot.prototype.setUp = function(data, idx){
     this.icon.setTexture(data.atlas,data.frame);
     this.idx = idx;
-    var actual = 0;
     var goal = data.goal;
     var text = data.name;
     if(data.variableGoal){
@@ -141,8 +140,9 @@ MissionSlot.prototype.setUp = function(data, idx){
         text = text.replace(/\%x\%/,goal);
     }
     this.name.setText(text);
+    var actual = Engine.computeMissionActual(data);
     this.count.setText(actual+'/'+goal);
-    this.count.setFill(actual == goal ? Utils.colors.green : Utils.colors.gold);
+    this.count.setFill(actual >= goal ? Utils.colors.green : Utils.colors.gold);
 };
 
 MissionSlot.prototype.display = function(){

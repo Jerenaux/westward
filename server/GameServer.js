@@ -1,6 +1,8 @@
 /**
  * Created by Jerome on 20-09-17.
  */
+import Inventory from "../shared/Inventory";
+
 var fs = require('fs');
 var pathmodule = require('path');
 var clone = require('clone'); // used to clone objects, essentially used for clonicg update packets
@@ -174,7 +176,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.fowList = [];
     GameServer.deathMarkers = [];
     GameServer.conflictMarkers = [];
-    GameServer.itemCounts = {};
+    GameServer.itemCounts = new Inventory();
     GameServer.itemsToRespawn = [];
     GameServer.battleRemains = [];
     GameServer.marketPrices = new ListMap();
@@ -288,9 +290,6 @@ GameServer.getBootParams = function(socket,data){
     } else {
         console.warn("Missing GameServer or pkg!");
     }
-
-
-
 };
 
 /**
@@ -305,24 +304,15 @@ GameServer.readPlayersData = function(){
         console.log('Players data fetched');
         players.forEach(function(data){
             if(data.id > GameServer.lastPlayerID) GameServer.lastPlayerID = data.id;
+            var region = GameServer.getRegion(data);
             data.inventory.forEach(function(itm){
-                GameServer.createItem(itm[0],itm[1]);
+                GameServer.createItem(itm[0],itm[1],region);
             });
 
-            if(data && data.equipment){
-
-                for(var label in data.equipment.slots){
-                    if(data.equipment.slots[label] > -1) GameServer.createItem(data.equipment.slots[label],1);
-                }
-                for(var label in data.equipment.containers){
-                    if(data.equipment.containers[label] > -1) GameServer.createItem(data.equipment.containers[label],1);
-                }
-                for(var label in data.equipment.ammo){
-                    if(data.equipment.ammo[label].id > -1) GameServer.createItem(data.equipment.ammo[label].id,data.equipment.ammo[label].nb);
-                }
-
+            for (var slot in data.equipment.slots) {
+                var item = data.equipment.slots[slot];
+                GameServer.createItem(item,1,region);
             }
-
         });
         console.log('Last player ID:',GameServer.lastPlayerID);
         GameServer.updateStatus();
@@ -1060,7 +1050,7 @@ GameServer.lootNPC = function(player,type,ID){
         // TODO: take harvesting ability into consideration
         var nb = NPC.loot.items[item];
         player.giveItem(item,nb,true,'Scavenged');
-        GameServer.createItem(item,nb,'loot');
+        GameServer.createItem(item,nb,player.region,'loot');
     }
     GameServer.addRemains(NPC.x,NPC.y,type);
     GameServer.removeEntity(NPC);
@@ -1147,7 +1137,7 @@ GameServer.forage = function(player, type){
     var nb = GameServer.itemsData[type].yield || 1;
     player.giveItem(type,nb,true,'Picked');
     Prism.logEvent(player,'pickup',{item:type});
-    GameServer.createItem(type,nb,'pickup');
+    GameServer.createItem(type,nb,player.region,'pickup');
 };
 
 /**
@@ -1160,9 +1150,11 @@ GameServer.forage = function(player, type){
  * @param {string} source - which process led to the creation of the item
  * (crafting, loot...)
  */
-GameServer.createItem = function(item,nb,source){
-    if(!GameServer.itemCounts.hasOwnProperty(item)) GameServer.itemCounts[item] = 0;
-    GameServer.itemCounts[item] += nb;
+GameServer.createItem = function(item,nb,region,source){
+    //if(!GameServer.itemCounts.hasOwnProperty(item)) GameServer.itemCounts[item] = 0;
+    //GameServer.itemCounts[item] += nb;
+    GameServer.itemCounts.add(item,nb);
+    GameServer.regions[region].addItem(item,nb);
     // TODO: log sources
 };
 
@@ -1173,8 +1165,11 @@ GameServer.createItem = function(item,nb,source){
  * @param {number} nb - amount of items removed.
  * @param {string} source - which process led to the destruction of the item.
  * */
-GameServer.destroyItem = function(item,nb,source){
-    GameServer.itemCounts[item] -= nb;
+GameServer.destroyItem = function(item,nb,region,source){
+    // GameServer.itemCounts[item] -= nb;
+    GameServer.itemCounts.take(item,nb);
+    GameServer.regions[region].removeItem(item,nb);
+    // TODO: log sources
 };
 
 /**
@@ -1711,6 +1706,7 @@ GameServer.listBuildingMarkers = function(instance){
         var building = GameServer.buildings[bid];
         if(!building.isOfInstance(instance)) continue;
         if(building.civ && !building.built) continue;
+        if(!GameServer.isNotInFoW(building.x,building.y)) continue;
         var bld = building.mapTrim();
         list.push(bld);
     }
@@ -1842,11 +1838,11 @@ GameServer.operateCraft = function(recipient,targetItem,nb){
     var recipe = GameServer.itemsData[targetItem].recipe;
     for(var item in recipe) {
         recipient.takeItem(item,recipe[item]*nb,'backpack',true,'Consumed');
-        GameServer.destroyItem(item,recipe[item]*nb,'craft');
+        GameServer.destroyItem(item,recipe[item]*nb,recipient.region,'craft');
     }
     var output = GameServer.itemsData[targetItem].output || 1;
     recipient.giveItem(targetItem, nb * output, true,'Crafted'); // true to notify player (if player) or rememeber transaction (if building)
-    GameServer.createItem(targetItem,nb*output,'craft');
+    GameServer.createItem(targetItem,nb*output,recipient.region,'craft');
 };
 
 GameServer.handlePath = function(data,socketID){
@@ -1917,7 +1913,7 @@ GameServer.handleUse = function(data,socketID){
     if(nb == 0) return false;
     var verb = (isEquipment ? 'Equipped' : (itemData.verb || 'Used'));
     player.takeItem(item, nb, inventory, true, verb);
-    if(!isEquipment) GameServer.destroyItem(item, nb, 'use');
+    if(!isEquipment) GameServer.destroyItem(item, nb, player.region, 'use');
     if (!player.inFight) player.save();
 
     Prism.logEvent(player,'use',{item:item});
@@ -2108,23 +2104,23 @@ GameServer.computeRegions = function(){
         });
     }
 
-    // var voronoi = new Voronoi();
-    // var bbox = {xl: 0, xr: World.worldWidth, yt: 0, yb: World.worldHeight}; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
-    // var diagram = voronoi.compute(sites, bbox);
-    //
-    // diagram.edges.forEach(function(edge){
-    //     if(!edge.lSite || !edge.rSite) return;
-    //     GameServer.regionBoundaries.push({
-    //         a:{
-    //             x: edge.va.x,
-    //             y: edge.va.y
-    //         },
-    //         b:{
-    //             x: edge.vb.x,
-    //             y: edge.vb.y
-    //         }
-    //     });
-    // },this);
+    var voronoi = new Voronoi();
+    var bbox = {xl: 0, xr: World.worldWidth, yt: 0, yb: World.worldHeight}; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
+    var diagram = voronoi.compute(sites, bbox);
+
+    diagram.edges.forEach(function(edge){
+        if(!edge.lSite || !edge.rSite) return;
+        GameServer.regionBoundaries.push({
+            a:{
+                x: edge.va.x,
+                y: edge.va.y
+            },
+            b:{
+                x: edge.vb.x,
+                y: edge.vb.y
+            }
+        });
+    },this);
 
     GameServer.AOIs.forEach(function(aoi){
         var region = GameServer.getRegion(aoi);
@@ -2133,22 +2129,36 @@ GameServer.computeRegions = function(){
 };
 
 GameServer.getRegion = function(entity){
-    var aoi = GameServer.AOIs[Utils.tileToAOI(entity)];
-    if(!aoi.region) {
-        var min = 999999;
-        var closest = null;
-        for (var id in GameServer.regions) {
-            var region = GameServer.regions[id];
-            var d = Utils.euclidean(region, entity);
-            if (d < min) {
-                min = d;
-                closest = region;
-            }
+    var min = 999999;
+    var closest = null;
+    for (var id in GameServer.regions) {
+        var region = GameServer.regions[id];
+        var d = Utils.euclidean(region, entity);
+        if (d < min) {
+            min = d;
+            closest = region;
         }
-        aoi.region = closest.id;
     }
-    return aoi.region;
+    return closest.id;
 };
+
+// GameServer.getRegion = function(entity){
+//     var aoi = GameServer.AOIs[Utils.tileToAOI(entity)];
+//     if(!aoi.region) {
+//         var min = 999999;
+//         var closest = null;
+//         for (var id in GameServer.regions) {
+//             var region = GameServer.regions[id];
+//             var d = Utils.euclidean(region, entity);
+//             if (d < min) {
+//                 min = d;
+//                 closest = region;
+//             }
+//         }
+//         aoi.region = closest.id;
+//     }
+//     return aoi.region;
+// };
 
 /**
  * Compute the degree of rarity of the items in the world.
