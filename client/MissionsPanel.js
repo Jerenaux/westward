@@ -24,7 +24,7 @@ MissionsPanel.prototype.constructor = MissionsPanel;
 
 MissionsPanel.prototype.getNextSlot = function(x,y){
     if(this.slotsCounter >= this.slots.length){
-        this.slots.push(new MissionSlot(x,y,250,80));
+        this.slots.push(new MissionSlot(x,y,285,80));
     }
 
     return this.slots[this.slotsCounter++];
@@ -64,8 +64,8 @@ MissionsPanel.prototype.updateContent = function(missions){
         slot.display();
         slot.setUp(missionsData.missions[idx], idx);
         slot.moveUp(5);
-        xOffset += 270;
-        if((i-1)%2){
+        xOffset += 290;
+        if((i)%2){
             xOffset = 0;
             yOffset += 90;
         }
@@ -136,9 +136,8 @@ MissionSlot.prototype.setUp = function(data, idx){
     var actual = 0;
     var goal = data.goal;
     var text = data.name;
-    var regionData = Engine.player.regionsStatus[Engine.player.region];
     if(data.variableGoal){
-        goal = Math.ceil(regionData.nodes[1]/3);
+        goal = Engine.computeMissionGoal(data);
         text = text.replace(/\%x\%/,goal);
     }
     this.name.setText(text);

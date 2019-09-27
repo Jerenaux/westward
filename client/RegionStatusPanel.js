@@ -29,7 +29,7 @@ function RegionsStatusPanel(x,y,width,height,title){
 
     this.bigButtons = [];
     for(var i = 0; i < 5; i++){
-        var btn = new BigButton(this.x+95,this.y+65+i*30);
+        var btn = new BigButton(this.x+110,this.y+65+i*30);
         btn.hide();
         btn.moveUp(3);
         this.bigButtons.push(btn);
@@ -45,11 +45,10 @@ RegionsStatusPanel.prototype.update = function(){
     var statusMap = {
         0: 'Wild',
         1: 'Occupied',
-        2: 'Contested',
-        3: 'Settled'
+        2: 'Settled'
     };
 
-   var regionData = regionsData[Engine.player.region];
+    var regionData = regionsData[Engine.player.region];
     var contested = [];
     var occupied = [];
     Engine.player.regionsStatus.forEach(function(region){
@@ -72,6 +71,7 @@ RegionsStatusPanel.prototype.update = function(){
     missionsData.missions.forEach(function(mission, i){
         if(!mission.regionStatus.includes(status)) return;
         if(mission.skipSea && regionData.sea) return;
+        if(mission.variableGoal && !Engine.computeMissionGoal(mission)) return;
 
         if(!(mission.type in categories)) categories[mission.type] = [];
         categories[mission.type].push(i);

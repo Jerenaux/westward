@@ -1290,6 +1290,19 @@ Engine.makeMapPanel = function(){
     return mapPanel;
 };
 
+Engine.computeMissionGoal = function(mission){
+    // TODO: conf/JSON
+    var region = Engine.player.regionsStatus[Engine.player.region];
+    switch(mission.goal){
+        case 'nodes':
+            return Math.ceil(region.nodes[1]/3); // A third of available nodes
+        case 'exploration':
+            return Math.ceil(region.exploration[1]/2); // half the AOIs
+        case 'civhuts':
+            return Math.ceil(region.civs[1]/2); // half the enemy blds
+    }
+};
+
 Engine.makeRegionsMenu = function(mapPanel){
     var menu = new Menu('Regions');
     menu.log = true;
@@ -1297,8 +1310,8 @@ Engine.makeRegionsMenu = function(mapPanel){
 
     menu.addPanel('map',mapPanel);
     var x = 10; // 500
-    var status = menu.addPanel('status',new RegionStatusPanel(x,80,270,100,'region'));
-    var w = 570;
+    var status = menu.addPanel('status',new RegionStatusPanel(x,80,270,150,'region'));
+    var w = 620;
     x = (UI.getGameWidth()-w)/2;
     var missions = menu.addPanel('missions', new MissionsPanel(x,200,w,350,'Missions'),true);
     missions.addButton(w-16,-8,'red','close',missions.hide.bind(missions),'Close');

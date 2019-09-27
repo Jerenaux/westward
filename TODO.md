@@ -69,6 +69,7 @@ Features:
 -> Toggle region names
 -> General info: how many regions settled, which regions are the most dangerous/currently contested, which
 regions are the most/least developed, barren/lush based on # nodes...
+-> Info on statuses of neighboring regions (hard-coded)
 -> Identify resource speciality of regions and incentivize exports
 -> # days since last attack
 -> Conquered / settled based on history
@@ -78,25 +79,33 @@ regions are the most/least developed, barren/lush based on # nodes...
 - Restore dragging
 - Button to toggle regions (borders and banner names)
 - Button to toggle legend
-- Add borders to legend
+- Add frontier to legend
+- Progress bars for missions
 - Icon for unbuilt building (lower half colored)
 - Toggle markers by click on legend
 - UI to filter on building types, filter on damage
+- Repair missions (craft) (once repair filter on map) for occupied regions
 - Display item rarity in inventory (check if doesn't conflit with shop)
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Belt & backpack & gold capacity + corresponding items (incl. defaults)
 - Arrow stocks in towers  + make them throw stones when no better ammo
+- Stock missions for occupied regions
 - Abilities
 - Limit some buildings to some abilities (e.g. towers)
 - Daily quests?
 - Set "active quests/missions"
 - Leaderboards
   
-Rewards: multi-class XP
+- Proper icons
+- Count server-side
+- Add dynamic production missions
+- Display count client-side
+- Proper specific updates when relevant player actions + XP reward
+- Global notifications
  
 Wild:
-- 1 settle mission: build any building (craft + trade xp)
+- Settle mission: build x any building (craft + trade xp)
 -> Global notification
 - Explore mission: locate x map markers (explorer xp) + % AOIs
 
@@ -111,18 +120,13 @@ Settled/conquered:
 - Explore mission: locate x map markers
 - Gold mission: become richest region (no reward)
  
-Contested:
+Occupied:
 - Build x towers (craft + soldier)
 - Later: stock missions for towers (craft + soldier)
-- Repair missions (craft) (once repair filter on map)
 - War missions: destroy civ buildings + kill x civs (soldier)
 -> Global event when switching from contested to settled
 - Explore mission: locate civ buildings
   
-Occupied:
-- War missions: destroy civ buildings + kill x civs
-- Explore mission: locate civ buildings
-
 
 
 

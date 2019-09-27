@@ -6,7 +6,7 @@ function Region(data){
     this.x = data.x;
     this.y = data.y;
 
-    // 0: wild, 1: occupied, 2: contested, 3: settled
+    // 0: wild, 1: occupied, 2: settled
     this.status = 0;
     this.buildings = [];
     this.resources = []; // list of coordinates where static resources are
@@ -66,9 +66,8 @@ Region.prototype.updateBuildings = function(){
         }
     },this);
     if(playerBuildings == 0 && civBuildings == 0) this.status = 0; //wild
-    if(playerBuildings > 0 && civBuildings == 0) this.status = 3; //settled
-    if(playerBuildings == 0 && civBuildings > 0) this.status = 1; //occupied
-    if(playerBuildings > 0 && civBuildings > 0) this.status = 2; //contested
+    if(civBuildings > 0) this.status = 1; //occupied
+    if(playerBuildings > 0 && civBuildings == 0) this.status = 2; //settled
     this.civBuildings = civBuildings;
     this.seenCivBuildings = seenCivBuildings;
 

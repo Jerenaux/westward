@@ -1,37 +1,37 @@
 {
     "missions": [
         {
-          "type": "Settle",
+          "type": "Settlement",
           "regionStatus": [0],
-          "name": "Build 1 building",
-          "desc": "Build one building, any building, anywhere in the region to officially start settling it!",
+          "name": "Build 10 building",
+          "desc": "Build 10 buildings of any kind anywhere in the region to officially settle it!",
           "atlas": "buildingsicons",
           "frame": "tower",
           "count": "allbuildings",
-          "goal": 1,
+          "goal": 10,
           "rewards": {
-            "2": 20,
-            "3": 30
+            "2": 5,
+            "3": 6
           }
         },
       {
-        "type": "Explore",
-        "regionStatus": [0, 3],
-        "name": "Discover %x% resource locations",
+        "type": "Exploration",
+        "regionStatus": [0],
+        "name": "Discover %x% resources",
         "desc": "Clear up fog of war to discover a certain amount of resource location (plants, wildlife...)",
         "atlas": "items2",
         "frame": "sunflower",
         "count": "nodes",
         "variableGoal": true,
-        "goal": 0,
+        "goal": "nodes",
         "rewards": {
           "1": 5,
           "3": 20
         }
       },
       {
-        "type": "Explore",
-        "regionStatus": [0,3],
+        "type": "Exploration",
+        "regionStatus": [0],
         "name": "Explore the region",
         "desc": "Clear up fog of war to reveal more than half of the region",
         "atlas": "items2",
@@ -39,29 +39,30 @@
         "count": "areas",
         "skipSea": true,
         "variableGoal": true,
-        "goal": 0,
+        "goal": "exploration",
         "rewards": {
           "1": 3,
           "3": 10
         }
       },
       {
-        "type": "Settle",
-        "regionStatus": [3],
-        "name": "Build 10 Shacks",
-        "desc": "Firmly establish your presence in the region by building 10 shacks",
+        "type": "Exploration",
+        "regionStatus": [1],
+        "name": "Discover %x% enemy buildings",
+        "desc": "Scout ahead and find out the location of enemy camps!",
         "atlas": "buildingsicons",
-        "frame": "shack",
-        "count": "building:11",
-        "goal": 10,
+        "frame": "civhut",
+        "count": "nodes",
+        "variableGoal": true,
+        "goal": "civhuts",
         "rewards": {
-          "1": 3,
-          "2": 10
+          "0": 5,
+          "3": 20
         }
       },
       {
         "type": "Defense",
-        "regionStatus": [2],
+        "regionStatus": [1],
         "name": "Build 5 Towers",
         "desc": "Secure the region by building at least 5 towers",
         "atlas": "buildingsicons",
@@ -73,19 +74,104 @@
           "2": 5
         }
       },
+
       {
-        "type": "Explore",
-        "regionStatus": [1, 2],
-        "name": "Discover %x% enemy buildings",
-        "desc": "Scout ahead and find out the location of enemy camps!",
+        "type": "Defense",
+        "regionStatus": [1],
+        "name": "Destroy %x% enemy buildings",
+        "desc": "Destroy enemy camps to reduce their territory!",
         "atlas": "buildingsicons",
         "frame": "civhut",
-        "count": "nodes",
+        "count": "civkilled",
         "variableGoal": true,
-        "goal": 0,
+        "goal": "civhuts",
         "rewards": {
-          "0": 5,
-          "3": 20
+          "0": 15,
+          "3": 2
+        }
+      },
+      {
+        "type": "Defense",
+        "regionStatus": [1],
+        "name": "Slay 100 Civs",
+        "desc": "Defeat 100 Civ warriors of any type to put an end to the hostilities in the region",
+        "atlas": "faces",
+        "frame": 2,
+        "count": "civkilled",
+        "goal": 100,
+        "rewards": {
+          "0": 15,
+          "3": 2
+        }
+      },
+      {
+        "type": "Food",
+        "regionStatus": [1],
+        "name": "Gather 50 Food",
+        "desc": "All settlers in the region should collectively own at least 50 food to stay in shape to defend the region",
+        "atlas": "items",
+        "frame": "food",
+        "count": "civkilled",
+        "goal": 50,
+        "rewards": {
+          "0": 10,
+          "3": 10
+        }
+      },
+      {
+        "type": "Economic",
+        "regionStatus": [2],
+        "name": "Build 3 Shops",
+        "desc": "Stimulate competition on the free market by setting up at least 3 shops",
+        "atlas": "buildingsicons",
+        "frame": "shop",
+        "count": "building:4",
+        "goal": 3,
+        "rewards": {
+          "1": 10,
+          "2": 20
+        }
+      },
+      {
+        "type": "Economic",
+        "regionStatus": [2],
+        "name": "Build 2 Workshops",
+        "desc": "Bootstrap the local manufacturing industry by building at least 2 Workshops",
+        "atlas": "buildingsicons",
+        "frame": "workshop",
+        "count": "building:3",
+        "goal": 2,
+        "rewards": {
+          "1": 5,
+          "2": 25
+        }
+      },
+      {
+        "type": "Economic",
+        "regionStatus": [2],
+        "name": "Build 3 Lumber camps",
+        "desc": "Build at least 3 lumber camps to fuel the construction efforts in the region",
+        "atlas": "buildingsicons",
+        "frame": "lumbercamp",
+        "count": "building:6",
+        "goal": 3,
+        "rewards": {
+          "1": 10,
+          "2": 20
+        }
+      },
+      {
+        "type": "Food",
+        "regionStatus": [1],
+        "name": "Store 20 Food",
+        "desc": "Strive to maintain a constant stock of 20 Food in all production buildings combined to stimulate proudction",
+        "atlas": "items",
+        "frame": "food",
+        "count": "civkilled",
+        "goal": 20,
+        "rewards": {
+          "0": 10,
+          "3": 10
         }
       }
     ]
