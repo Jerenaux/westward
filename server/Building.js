@@ -59,7 +59,7 @@ function Building(data){
 
     var region = GameServer.getRegion(this);
     this.inventory.toList().forEach(function(itm){
-        GameServer.createItem(itm[0],itm[1],region);
+        GameServer.createItem(itm[0],itm[1],region,'building inventory DB');
     });
 
     this.prices = data.prices || {};

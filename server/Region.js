@@ -38,6 +38,35 @@ Region.prototype.removeItem = function(item,nb){
     this.itemCounts.take(item,nb);
 };
 
+Region.prototype.updateItemMissions = function(){
+    this.craft = new Inventory();
+    this.gather = new Inventory();
+    if(this.status != 2) return;
+    var goals = [2];
+    goals.forEach(this.computeItemMissions,this);
+};
+
+Region.prototype.hasItem = function(item,nb){
+    return this.itemCounts.getNb(item) >= nb;
+};
+
+Region.prototype.computeItemMissions = function(item){
+    var nb = 10; //TODO vary + conf
+    var recipe = GameServer.itemsData[item].recipe;
+    if(recipe) {
+        var canCraft = true;
+        for (var itm in recipe) {
+            if (!this.hasItem(itm, recipe[itm] * nb)) {
+                this.computeItemMissions(itm);
+                canCraft = false;
+            }
+        }
+        if (canCraft) this.craft.add(item, nb);
+    }else{
+        this.gather.add(item,nb);
+    }
+};
+
 Region.prototype.addBuilding = function(building){
     this.buildings.push(building);
 };
@@ -69,10 +98,13 @@ Region.prototype.update = function(){
     this.updateBuildings();
     this.updateResources();
     this.updateFoW();
+    this.updateItemMissions();
     console.warn('['+this.name+'] Status: ',this.status);
     console.warn('['+this.name+'] AOIs: ',this.explored,'/',this.aois.length);
     console.warn('['+this.name+'] nodes:', this.visible,'/',this.nbNodes);
     console.warn('['+this.name+'] Civ buildings:', this.seenCivBuildings,'/',this.civBuildings);
+    console.warn('['+this.name+'] Player buildings:', this.playerBuildings);
+    // console.warn('['+this.name+'] Iems:', this.itemCounts.toList());
 };
 
 Region.prototype.updateBuildings = function(){
@@ -132,8 +164,11 @@ Region.prototype.updateFoW = function(){
 Region.prototype.trim = function(){
     return {
         id: this.id,
-        items: this.itemCounts.toList(),
         food: this.food,
+        items: {
+            craft: this.craft.toList(),
+            gather: this.gather.toList()
+        },
         buildings: this.buildingsTypes,
         totalbuildings: this.playerBuildings,
         status: this.status,

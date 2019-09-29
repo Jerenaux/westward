@@ -104,6 +104,7 @@ fitting more in backpack, more actions per turn, ... (not so for "boolean" effec
 - Add dynamic production missions for:
 bow, (bomb), dawn, dusk, (sword), (gun), (boots), (belt), quiver, (arrow), stone hatchet, bone arrow, (bullet),
 (bullets pouches (all capacities)), stone arrow
+- Add trade missions based on nodes
 - Display count client-side
 - Proper specific updates when relevant player actions + XP reward
 - Global notifications

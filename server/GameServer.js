@@ -306,17 +306,34 @@ GameServer.readPlayersData = function(){
             if(data.id > GameServer.lastPlayerID) GameServer.lastPlayerID = data.id;
             var region = GameServer.getRegion(data);
             data.inventory.forEach(function(itm){
-                GameServer.createItem(itm[0],itm[1],region);
+                GameServer.createItem(itm[0],itm[1],region,'player inventory DB');
             });
 
             for (var slot in data.equipment.slots) {
-                var item = data.equipment.slots[slot];
-                GameServer.createItem(item,1,region);
+                var info = GameServer.parseEquipmentDb(data.equipment.slots[slot]);
+                var item = info[0];
+                var nb = info[1];
+                if(item == -1) continue;
+                if(GameServer.itemsData[item].permanent) continue;
+                GameServer.createItem(item,nb,region,'player equipment DB');
             }
         });
         console.log('Last player ID:',GameServer.lastPlayerID);
         GameServer.updateStatus();
     });
+};
+
+GameServer.parseEquipmentDb = function(data){
+    // console.warn('ITEM:',item);
+    // fix corrupt item data due to development
+    if (typeof data.id == 'object') {
+        if (data.id.hasOwnProperty('id')) { // fix nested objects
+            data.id = data.id.id;
+        } else {
+            data.id = -1;
+        }
+    }
+    return [parseInt(data.id), parseInt(data.nb)];
 };
 
 /**
@@ -1153,6 +1170,7 @@ GameServer.forage = function(player, type){
 GameServer.createItem = function(item,nb,region,source){
     //if(!GameServer.itemCounts.hasOwnProperty(item)) GameServer.itemCounts[item] = 0;
     //GameServer.itemCounts[item] += nb;
+    // console.warn(item,nb,GameServer.regions[region].name,source);
     GameServer.itemCounts.add(item,nb);
     GameServer.regions[region].addItem(item,nb);
     // TODO: log sources

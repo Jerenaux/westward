@@ -790,22 +790,25 @@ Player.prototype.getDataFromDb = function (data) {
     if (data) {
         if (data.equipment) {
             for (var slot in data.equipment.slots) {
-                var item = data.equipment.slots[slot];
-                // console.warn('ITEM:',item);
-                // fix corrupt item data due to development
-                if (typeof item.id == 'object') {
-                    if (item.id.hasOwnProperty('id')) { // fix nested objects
-                        item.id = item.id.id;
-                    } else {
-                        item.id = -1;
-                    }
-                }
-                item.id = parseInt(item.id);
-                item.nb = parseInt(item.nb);
-                if (typeof item.nb != 'number') item.nb = 0;
-                if (item.id === -1) continue;
-                this.equip(slot, item.id, true);
-                if (slot == 'range_ammo' && item.nb) this.load(item.nb);
+                var info = GameServer.parseEquipmentDb(data.equipment.slots[slot]);
+                var item = info[0];
+                var nb = info[1];
+                // var item = data.equipment.slots[slot];
+                // // console.warn('ITEM:',item);
+                // // fix corrupt item data due to development
+                // if (typeof item.id == 'object') {
+                //     if (item.id.hasOwnProperty('id')) { // fix nested objects
+                //         item.id = item.id.id;
+                //     } else {
+                //         item.id = -1;
+                //     }
+                // }
+                // item.id = parseInt(item.id);
+                // item.nb = parseInt(item.nb);
+                if (typeof nb != 'number') nb = 0;
+                if (item === -1) continue;
+                this.equip(slot, item, true);
+                if (slot == 'range_ammo' && nb) this.load(nb);
             }
         }
 

@@ -68,7 +68,7 @@ RegionsStatusPanel.prototype.update = function(){
     // this.occupiedText.setText(occupied.join(',  '));
 
     var categories = {};
-    var categoriesFulfilled = {}
+    var categoriesFulfilled = {};
     missionsData.missions.forEach(function(mission, i){
         if(!mission.regionStatus.includes(status)) return;
         if(mission.skipSea && regionData.sea) return;
@@ -83,6 +83,21 @@ RegionsStatusPanel.prototype.update = function(){
 
         if(Engine.computeMissionActual(mission) >= goal) categoriesFulfilled[mission.type]++;
     });
+
+    var itemsMissions = Engine.player.regionsStatus[Engine.player.region].items;
+    var type = 'Economy';
+    itemsMissions.craft.forEach(function(goal){
+        // var goal = mission.variableGoal ? Engine.computeMissionGoal(mission) : mission.goal;
+        // if(!goal) return;
+        //
+        // if(!(mission.type in categories)){
+        //     categories[mission.type] = [];
+        //     categoriesFulfilled[mission.type] = 0;
+        // }
+        // categories[mission.type].push(i);
+        //
+        // if(Engine.computeMissionActual(mission) >= goal) categoriesFulfilled[mission.type]++;
+    },this);
 
     var i = 0;
     for(var type in categories){
