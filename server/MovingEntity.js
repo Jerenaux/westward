@@ -67,6 +67,7 @@ MovingEntity.prototype.updatePosition = function(x,y){
     this.x = x;
     this.y = y;
     this.setOrUpdateAOI();
+    if(this.setRegion) this.setRegion();
     if(!this.inFight) this.checkForBattle();
 };
 

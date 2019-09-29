@@ -305,7 +305,7 @@ GameServer.readPlayersData = function(){
         players.forEach(function(data){
             if(data.id > GameServer.lastPlayerID) GameServer.lastPlayerID = data.id;
             var region = GameServer.getRegion(data);
-            data.inventory.forEach(function(itm){
+            data.inventory.concat(data.belt).forEach(function(itm){
                 GameServer.createItem(itm[0],itm[1],region,'player inventory DB');
             });
 
@@ -1071,6 +1071,7 @@ GameServer.lootNPC = function(player,type,ID){
     }
     GameServer.addRemains(NPC.x,NPC.y,type);
     GameServer.removeEntity(NPC);
+    if(type == 'animal') GameServer.regions[player.region].updateFood();
     Prism.logEvent(player,'loot',{name:NPC.name});
     return true; // return value for the unit tests
 };
@@ -1675,6 +1676,7 @@ GameServer.buildPlayerBuilding = function(player,bid,tile){
         }
 
         GameServer.finalizeBuilding(player,building);
+        GameServer.regions[building.region].updateBuildings();
     }else{
         document.save(function (err) {
             if (err) return console.error(err);
@@ -2110,6 +2112,7 @@ GameServer.computeFrontier = function(setFlag){
 };
 
 GameServer.computeRegions = function(){
+    GameServer.regionsCache = new SpaceMap();
     GameServer.regionBoundaries = [];
     GameServer.regions = {};
     var sites = [];
@@ -2147,6 +2150,8 @@ GameServer.computeRegions = function(){
 };
 
 GameServer.getRegion = function(entity){
+    var cache = GameServer.regionsCache.get(entity.x,entity.y);
+    if(cache) return cache;
     var min = 999999;
     var closest = null;
     for (var id in GameServer.regions) {
@@ -2157,6 +2162,7 @@ GameServer.getRegion = function(entity){
             closest = region;
         }
     }
+    GameServer.regionsCache.add(entity.x,entity.y,closest.id);
     return closest.id;
 };
 

@@ -42,7 +42,7 @@ Region.prototype.updateItemMissions = function(){
     this.craft = new Inventory();
     this.gather = new Inventory();
     if(this.status != 2) return;
-    var goals = [2];
+    var goals = [2, 6, 46, 19, 28, 29, 45];
     goals.forEach(this.computeItemMissions,this);
 };
 
@@ -52,6 +52,7 @@ Region.prototype.hasItem = function(item,nb){
 
 Region.prototype.computeItemMissions = function(item){
     var nb = 10; //TODO vary + conf
+    if(this.hasItem(item,nb)) return;
     var recipe = GameServer.itemsData[item].recipe;
     if(recipe) {
         var canCraft = true;
@@ -124,9 +125,9 @@ Region.prototype.updateBuildings = function(){
             this.food[1] += bld.getItemNb(1);
         }
     },this);
-    if(playerBuildings == 0 && civBuildings == 0) this.status = 0; //wild
+    this.status = 0; //wild
     if(civBuildings > 0) this.status = 1; //occupied
-    if(playerBuildings > 0 && civBuildings == 0) this.status = 2; //settled
+    if(playerBuildings > 10 && civBuildings == 0) this.status = 2; //settled //TODO; conf
     this.civBuildings = civBuildings;
     this.seenCivBuildings = seenCivBuildings;
     this.playerBuildings = playerBuildings;
@@ -139,6 +140,7 @@ Region.prototype.updateFood = function(){
     for(var playerID of this.players){
         this.food[0] += GameServer.players[playerID].getItemNb(1);
     }
+    GameServer.setFlag('regionsStatus');
 };
 
 Region.prototype.updateResources = function(){
@@ -165,6 +167,7 @@ Region.prototype.trim = function(){
     return {
         id: this.id,
         food: this.food,
+        itemCounts: this.itemCounts.toList(),
         items: {
             craft: this.craft.toList(),
             gather: this.gather.toList()

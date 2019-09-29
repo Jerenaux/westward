@@ -6,13 +6,13 @@ import {Equipment} from "../shared/Equipment";
 import {Stats} from "../shared/Stats";
 import UI from './UI';
 
+import buildingsData from '../assets/data/buildings.json'
 import classData from '../assets/data/classes.json'
 import itemsData from '../assets/data/items.json'
-import missionsData from '../assets/data/missions.json'
 
 var Tooltip = new Phaser.Class({
 
-    Extends: Phaser.GameObjects. DOMElement,
+    Extends: Phaser.GameObjects.DOMElement,
 
     initialize: function Tooltip(){
         Phaser.GameObjects.DOMElement.call(this, UI.scene, 0, 0);
@@ -60,7 +60,7 @@ var Tooltip = new Phaser.Class({
                 if(bld.isBuilt()) this.setBar(bld.stats['hp'].getValue(),bld.stats['hpmax'].getValue());
                 break;
             case 'buildingdata':
-                var bld = Engine.buildingsData[data.id];
+                var bld = buildingsData[data.id];
                 this.setTitle(bld.name);
                 this.setBody(bld.desc);
                 break;
@@ -80,7 +80,7 @@ var Tooltip = new Phaser.Class({
                 if(item.effects) this.setEffects(item.effects);
                 break;
             case 'mission':
-                var mission = missionsData.missions[data.idx];
+                var mission = Engine.getMissionsList()[data.idx];
                 this.setBody(mission.desc);
                 this.setMissionReward(mission.rewards);
                 break;

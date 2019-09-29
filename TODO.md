@@ -66,11 +66,12 @@ Packaging
 Bugs:
 - Black backdrop
 Features:
+- Proper specific updates when relevant player actions + XP reward
 -> Specify where toponyms are displayed
 -> Toggle region names
 -> General info: how many regions settled, which regions are the most dangerous/currently contested, which
 regions are the most/least developed, barren/lush based on # nodes...
--> Info on statuses of neighboring regions (hard-coded)
+-> Info on statuses of neighboring regions (hard-coded) + use this to improve getRegion() 
 -> Identify resource speciality of regions and incentivize exports
 -> # days since last attack
 -> Conquered / settled based on history
@@ -86,6 +87,7 @@ regions are the most/least developed, barren/lush based on # nodes...
 - Toggle markers by click on legend
 - UI to filter on building types, filter on damage
 - Repair missions (craft) (once repair filter on map) for occupied regions
+- Compute rarity per region
 - Display item rarity in inventory (check if doesn't conflit with shop)
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
@@ -99,42 +101,14 @@ fitting more in backpack, more actions per turn, ... (not so for "boolean" effec
 - Daily quests?
 - Set "active quests/missions"
 - Leaderboards
-  
-
 - Add dynamic production missions for:
 bow, (bomb), dawn, dusk, (sword), (gun), (boots), (belt), quiver, (arrow), stone hatchet, bone arrow, (bullet),
 (bullets pouches (all capacities)), stone arrow
 - Add trade missions based on nodes
-- Display count client-side
-- Proper specific updates when relevant player actions + XP reward
-- Global notifications
+- Global notifications for region status change
  
-Wild:
-- Settle mission: build x any building (craft + trade xp)
--> Global notification
-- Explore mission: locate x map markers (explorer xp) + % AOIs
-
-Settled/conquered:
-- Build x amount of each building
--> Indicate food levels
-- Food missions: 
--> acquire x food (soldier + explorer xp)
--> Set x food for sale in shops (trade xp)
--> Later: build x farms
-- Produce/trade/gather missions (top-down stuff) (craft + trade xp)
-- Explore mission: locate x map markers
-- Gold mission: become richest region (no reward)
  
-Occupied:
-- Build x towers (craft + soldier)
-- Later: stock missions for towers (craft + soldier)
-- War missions: destroy civ buildings + kill x civs (soldier)
--> Global event when switching from contested to settled
-- Explore mission: locate civ buildings
-  
-
-
-
+ 
 María:
 - Footprints
 - Bear anim (walk, attack, die w/ & w/o arrows)

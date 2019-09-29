@@ -25,6 +25,7 @@ import EquipmentPanel from './EquipmentPanel'
 import Hero from './Hero'
 import {HighlightPipeline, HollowPipeline} from './shaders'
 import InfoPanel from './InfoPanel'
+import Inventory from '../shared/Inventory'
 import InventoryPanel from './InventoryPanel'
 import Item from './Item'
 import ItemActionPanel from './ItemActionPanel'
@@ -57,6 +58,7 @@ import World from '../shared/World';
 import animalsData from '../assets/data/animals.json'
 import buildingsData from '../assets/data/buildings.json'
 import itemsData from '../assets/data/items.json'
+import missionsData from '../assets/data/missions.json'
 import regionsData from '../assets/data/regions.json'
 
 var Engine = {
@@ -1290,6 +1292,37 @@ Engine.makeMapPanel = function(){
     return mapPanel;
 };
 
+Engine.getMissionsList = function(){
+    var allMissions = missionsData.missions;
+    var extraMissions = [];
+    var region = Engine.player.regionsStatus[Engine.player.region];
+    var itemsMissions = [];
+    if(region.items) itemsMissions = region.items.craft.concat(region.items.gather);
+    if(itemsMissions){
+        itemsMissions.forEach(function(mission){
+            var item = mission[0];
+            var itemData = itemsData[item];
+            var verb = itemData.recipe ? 'Produce' : 'Gather';
+            var nb = mission[1];
+            extraMissions.push({
+                "type": "Economy",
+                "regionStatus": [2],
+                "name": verb+" "+nb+" "+itemData.name,
+                "desc": "Ensure that at least "+nb+" "+itemData.name+" are available in the region",
+                "atlas": itemData.atlas,
+                "frame": itemData.frame,
+                "count": "item:"+item,
+                "goal": nb,
+                "rewards": {
+                    "1": 10,
+                    "2": 20
+                }
+            });
+        });
+    }
+    return allMissions.concat(extraMissions);
+};
+
 Engine.computeMissionGoal = function(mission){
     // TODO: conf/JSON
     var region = Engine.player.regionsStatus[Engine.player.region];
@@ -1311,13 +1344,16 @@ Engine.computeMissionActual = function(mission){
         case 'bldfood':
             return region.food[1];
         case 'building':
-            return region.buildings[mission.count.split(':')[1]];
+            return region.buildings[mission.count.split(':')[1]] || 0;
         case 'civhutkilled':
             return region.civCasualties[1];
         case 'civhuts':
             return region.civs[0];
         case 'civkilled':
             return region.civCasualties[0];
+        case 'item':
+            var counts = new Inventory().fromList(region.itemCounts);
+            return (counts.getNb(mission.count.split(':')[1]));
         case 'playerfood':
             return region.food[0];
     }

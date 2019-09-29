@@ -107,6 +107,7 @@ Inventory.prototype.fromList = function(list){
     for(var i = 0; i < Math.min(list.length,this.maxSize); i++){
         this.add(list[i][0],list[i][1]);
     }
+    return this;
 };
 
 export default Inventory

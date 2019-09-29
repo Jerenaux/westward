@@ -155,6 +155,11 @@ Player.prototype.setRegion = function() {
         this.addNotif('Entering '+GameServer.regions[this.region].name+' region');
         if(region_ in GameServer.regions) GameServer.regions[region_].removePlayer(this.id);
         GameServer.regions[this.region].addPlayer(this.id);
+
+        this.inventory.toList().forEach(function(inv){
+            if(region_ in GameServer.regions) GameServer.regions[region_].removeItem(inv[0],inv[1]);
+            GameServer.regions[this.region].addItem(inv[0],inv[1]);
+        },this);
     }
 };
 

@@ -6,7 +6,6 @@ import Engine from './Engine'
 import Panel from './Panel'
 import Utils from '../shared/Utils'
 
-import missionsData from '../assets/data/missions.json'
 import regionsData from '../assets/data/regions.json'
 
 function RegionsStatusPanel(x,y,width,height,title){
@@ -60,16 +59,14 @@ RegionsStatusPanel.prototype.update = function(){
     var status = Engine.player.regionsStatus[Engine.player.region].status;
     this.statusText.setText(statusMap[status]);
     var fill = Utils.colors.gold;
-    if(status == 1 || status == 2) fill = Utils.colors.red;
-    if(status == 3) fill = Utils.colors.green;
+    if(status == 1) fill = Utils.colors.red;
+    if(status == 2) fill = Utils.colors.green;
     this.statusText.setFill(fill);
-
-    // this.contestedText.setText(contested.join(',  '));
-    // this.occupiedText.setText(occupied.join(',  '));
 
     var categories = {};
     var categoriesFulfilled = {};
-    missionsData.missions.forEach(function(mission, i){
+
+    Engine.getMissionsList().forEach(function(mission, i){
         if(!mission.regionStatus.includes(status)) return;
         if(mission.skipSea && regionData.sea) return;
         var goal = mission.variableGoal ? Engine.computeMissionGoal(mission) : mission.goal;
@@ -83,21 +80,6 @@ RegionsStatusPanel.prototype.update = function(){
 
         if(Engine.computeMissionActual(mission) >= goal) categoriesFulfilled[mission.type]++;
     });
-
-    var itemsMissions = Engine.player.regionsStatus[Engine.player.region].items;
-    var type = 'Economy';
-    itemsMissions.craft.forEach(function(goal){
-        // var goal = mission.variableGoal ? Engine.computeMissionGoal(mission) : mission.goal;
-        // if(!goal) return;
-        //
-        // if(!(mission.type in categories)){
-        //     categories[mission.type] = [];
-        //     categoriesFulfilled[mission.type] = 0;
-        // }
-        // categories[mission.type].push(i);
-        //
-        // if(Engine.computeMissionActual(mission) >= goal) categoriesFulfilled[mission.type]++;
-    },this);
 
     var i = 0;
     for(var type in categories){

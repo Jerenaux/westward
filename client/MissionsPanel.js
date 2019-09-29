@@ -10,7 +10,6 @@ import UI from "./UI";
 import Frame from "./Frame";
 
 import missionsData from '../assets/data/missions.json'
-import buildingsData from '../assets/data/buildings.json'
 
 function MissionsPanel(x,y,width,height,title,invisible){
     ShopInventoryPanel.call(this,x,y,width,height,title,invisible);
@@ -48,21 +47,23 @@ MissionsPanel.prototype.refreshPagination = function(){
 MissionsPanel.prototype.updateContent = function(missions){
     this.hideContent();
     var NB_PER_PAGE = 6;
+    if(missions) this.missions = missions;
 
-    this.nbpages = Math.max(1,Math.ceil(missions.length/NB_PER_PAGE));
+    this.nbpages = Math.max(1,Math.ceil(this.missions.length/NB_PER_PAGE));
     this.currentPage = Utils.clamp(this.currentPage,0,this.nbpages-1);
     this.refreshPagination();
     var sloty = this.y + 60;
 
     var yOffset = 0;
     var xOffset = 0;
-    missions.forEach(function(idx, i){
+    var data = Engine.getMissionsList();
+    this.missions.forEach(function(idx, i){
         if ((i < this.currentPage * NB_PER_PAGE) || (i >= (this.currentPage + 1) * NB_PER_PAGE)) {
             return;
         }
         var slot = this.getNextSlot(this.x + 20 + xOffset, sloty + yOffset);
         slot.display();
-        slot.setUp(missionsData.missions[idx], idx);
+        slot.setUp(data[idx], idx);
         slot.moveUp(5);
         xOffset += 290;
         if((i)%2){
@@ -86,7 +87,7 @@ MissionsPanel.prototype.hideContent = function(){
 
 MissionsPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
-}
+};
 
 // -------------------------------------
 
