@@ -66,6 +66,7 @@ Packaging
 Bugs:
 - Black backdrop
 Features:
+- Add Bear
 - Proper specific updates when relevant player actions + XP reward
 -> Specify where toponyms are displayed
 -> Toggle region names
@@ -83,6 +84,7 @@ regions are the most/least developed, barren/lush based on # nodes...
 - Button to toggle legend
 - Add frontier to legend
 - Progress bars for missions
+- Slings
 - Icon for unbuilt building (lower half colored)
 - Toggle markers by click on legend
 - UI to filter on building types, filter on damage
