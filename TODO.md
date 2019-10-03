@@ -110,11 +110,8 @@ bow, (bomb), dawn, dusk, (sword), (gun), (boots), (belt), quiver, (arrow), stone
 - Global notifications for region status change
  
  
- 
 María:
-- Footprints
-- Bear anim (walk, attack, die w/ & w/o arrows)
-- Add loot to bear
+- Black bears
 - Player anim naked
 -> Look into superimposing equipment programmatically
 -> One basic player overlay for all
@@ -122,6 +119,7 @@ María:
 - Make overlays based on actual game items
 - Vary Civ overlays
 - Add "pick up", "look at map", "check in bag" ... anims
+- Footprints
 - UI improvements
 - Wear and tear and wounds
 - Add taunts and emotes anims

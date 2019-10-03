@@ -206,7 +206,7 @@ Building.prototype.updateProd = function(justBuilt){
 
         // var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
         var increment = baseNb;
-        if(this.getItemNb(1) > 0) increment *= 2;
+        if(this.hasItem(1,1)) increment *= 2;
 
         if(current >= cap) continue;
         var actualNb = Math.min(increment,cap-current);
@@ -215,8 +215,11 @@ Building.prototype.updateProd = function(justBuilt){
             var msg = actualNb+' '+GameServer.itemsData[item].name+' was produced';
             GameServer.notifyPlayer(this.owner,msg);
             produced += actualNb;
-            this.takeItem(1,1);
-            GameServer.destroyItem(1,1,this.region, 'building food consumption');
+            if(this.hasItem(1,1)){
+                this.takeItem(1,1);
+                GameServer.destroyItem(1,1,this.region, 'building food consumption');
+                GameServer.regions[player.region].updateFood();
+            }
         }
 
     }

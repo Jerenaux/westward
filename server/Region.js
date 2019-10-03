@@ -136,11 +136,12 @@ Region.prototype.updateBuildings = function(){
 };
 
 Region.prototype.updateFood = function(){
+    var previous_ = this.food[0];
     this.food[0] = 0;
     for(var playerID of this.players){
         this.food[0] += GameServer.players[playerID].getItemNb(1);
     }
-    GameServer.setFlag('regionsStatus');
+    if(this.food[0] != previous_) GameServer.setFlag('regionsStatus');
 };
 
 Region.prototype.updateResources = function(){
