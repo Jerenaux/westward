@@ -1,5 +1,4 @@
 import GameServer from "./GameServer";
-import Utils from "../shared/Utils";
 import Inventory from "../shared/Inventory";
 
 function Region(data){
@@ -18,6 +17,8 @@ function Region(data){
     this.sz = []; // list of SpawnZones
     this.aois = [];
     this.civCasualties = [0,0];
+
+    this.counts = {}
 }
 
 Region.prototype.addPlayer = function(id){
@@ -95,17 +96,22 @@ Region.prototype.addAOI = function(aoi){
     // console.warn('aoi',aoi,'added to region',this.name);
 };
 
+Region.prototype.updateCounts = function(){
+    // if('allbuildings' in this.counts) 
+};
+
 Region.prototype.update = function(){
     this.updateBuildings();
     this.updateResources();
     this.updateFoW();
     this.updateItemMissions();
-    console.warn('['+this.name+'] Status: ',this.status);
-    console.warn('['+this.name+'] AOIs: ',this.explored,'/',this.aois.length);
-    console.warn('['+this.name+'] nodes:', this.visible,'/',this.nbNodes);
-    console.warn('['+this.name+'] Civ buildings:', this.seenCivBuildings,'/',this.civBuildings);
-    console.warn('['+this.name+'] Player buildings:', this.playerBuildings);
+    // console.warn('['+this.name+'] Status: ',this.status);
+    // console.warn('['+this.name+'] AOIs: ',this.explored,'/',this.aois.length);
+    // console.warn('['+this.name+'] nodes:', this.visible,'/',this.nbNodes);
+    // console.warn('['+this.name+'] Civ buildings:', this.seenCivBuildings,'/',this.civBuildings);
+    // console.warn('['+this.name+'] Player buildings:', this.playerBuildings);
     // console.warn('['+this.name+'] Iems:', this.itemCounts.toList());
+    console.warn('['+this.name+'] Status: ',this.counts);
 };
 
 Region.prototype.updateBuildings = function(){
@@ -126,13 +132,26 @@ Region.prototype.updateBuildings = function(){
         }
     },this);
     this.status = 0; //wild
-    if(civBuildings > 0) this.status = 1; //occupied
-    if(playerBuildings > 10 && civBuildings == 0) this.status = 2; //settled //TODO; conf
+    
     this.civBuildings = civBuildings;
     this.seenCivBuildings = seenCivBuildings;
     this.playerBuildings = playerBuildings;
 
-    GameServer.setFlag('regionsStatus');
+    this.updateCounts();
+
+    GameServer.setFlag('regionsStatus'); // TODO: Only in updateCounts? 
+};
+
+Region.prototype.updateStatus = function(){
+    this.status = 0;
+    if(this.civBuildings > 0) this.status = 1; //occupied
+    if(this.playerBuildings > 10 && this.civBuildings == 0) this.status = 2; //settled //TODO; conf
+
+    GameServer.missionsData.missions.forEach(function(mission){
+        if(!mission.regionStatus.includes(this.status)) return;
+        this.counts[mission.count] = [0,0];
+        this.counts[mission.count][1] += 
+    }, this);
 };
 
 Region.prototype.updateFood = function(){
