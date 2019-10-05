@@ -21,7 +21,7 @@
         "desc": "Clear up fog of war to discover a certain amount of resource location (plants, wildlife...)",
         "atlas": "items2",
         "frame": "sunflower",
-        "count": "nodes",
+        "count": "resources",
         "variableGoal": true,
         "goal": "nodes",
         "rewards": {

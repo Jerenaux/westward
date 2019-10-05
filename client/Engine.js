@@ -1327,8 +1327,8 @@ Engine.computeMissionGoal = function(mission){
     // TODO: conf/JSON
     var region = Engine.player.regionsStatus[Engine.player.region];
     switch(mission.goal){
-        case 'nodes':
-            return Math.ceil(region.nodes[1]/3); // A third of available nodes
+        case 'resources':
+            return Math.ceil(region.resources[1]/3); // A third of available nodes
         case 'exploration':
             return Math.ceil(region.exploration[1]/2); // half the AOIs
         case 'civhuts':

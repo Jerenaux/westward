@@ -1,6 +1,6 @@
 import GameServer from "./GameServer";
 import Inventory from "../shared/Inventory";
-
+    
 function Region(data){
     this.id = data.id;
     this.name = data.name;
@@ -8,7 +8,7 @@ function Region(data){
     this.y = data.y;
 
     // 0: wild, 1: occupied, 2: settled
-    this.status = 0;
+    this.status = undefined;
     this.buildings = [];
     this.players = new Set();
     this.itemCounts = new Inventory();
@@ -37,6 +37,89 @@ Region.prototype.addItem = function(item,nb){
 
 Region.prototype.removeItem = function(item,nb){
     this.itemCounts.take(item,nb);
+};
+
+
+Region.prototype.addResource = function(loc){
+    this.resources.push(loc);
+};
+
+Region.prototype.addSZ = function(sz){
+    this.sz.push(sz);
+};
+
+Region.prototype.addAOI = function(aoi){
+    this.aois.push(aoi);
+    // console.warn('aoi',aoi,'added to region',this.name);
+};
+
+Region.prototype.updateStatus = function(){
+    this.counts = {};
+    var status_ = this.status;
+    this.status = 0;
+    if(this.civBuildings > 0) this.status = 1; //occupied
+    if(this.playerBuildings > 10 && this.civBuildings == 0) this.status = 2; //settled //TODO; conf
+    if(this.status == status_) return;
+
+    GameServer.missionsData.missions.forEach(function(mission){
+        if(!mission.regionStatus.includes(this.status)) return;
+        if(!(mission.count in this.counts)) this.counts[mission.count] = [0,0];
+        this.counts[mission.count][1] += mission.variableGoal ? this.computeMissionGoal(mission.count) : mission.goal;
+    }, this);
+    this.updateCounts();
+};
+
+
+Region.prototype.updateCounts = function(){
+    this.updateCount('allbuildings',this.playerBuildings);
+    this.updateCount('areas',this.explored);
+    this.updateCount('bldfood',this.food[1]);
+    this.updateCount('civhutkilled',this.civCasualties[1]);
+    this.updateCount('civhuts',this.seenCivBuildings);
+    this.updateCount('civkilled',this.civCasualties[0]);
+    this.updateCount('playerfood',this.food[0]);
+    this.updateCount('resources',this.visibleNodes);
+    for(var type in this.buildingsTypes){
+        this.updateCount('building:'+type,this.buildingsTypes[type]);
+    }
+};
+
+Region.prototype.updateCount = function(count,value){
+    if(count in this.counts) {
+        this.counts[count][0] = value;
+        return this.counts[count][0] < this.counts[count][1];
+    }
+    return false;
+};
+
+Region.prototype.computeMissionGoal = function(goal){
+    // TODO: conf/JSON
+    switch(goal){
+        case 'resources':
+            return Math.ceil(this.nbNodes/3); // A third of available nodes
+        case 'exploration':
+            return Math.ceil(this.nbAreas/2); // half the AOIs
+        case 'civhutkilled':
+            return Math.ceil(this.civBuildings/2); // half the enemy blds
+        case 'civhuts':
+            return Math.ceil(this.civBuildings/2); // half the enemy blds
+    }
+};
+
+Region.prototype.update = function(){
+    this.updateBuildings();
+    this.updateStatus();
+    this.updateResources();
+    this.updateFoW();
+    this.updateItemMissions();
+    this.updateCounts();
+    // console.warn('['+this.name+'] Status: ',this.status);
+    // console.warn('['+this.name+'] AOIs: ',this.explored,'/',this.aois.length);
+    // console.warn('['+this.name+'] nodes:', this.visible,'/',this.nbNodes);
+    // console.warn('['+this.name+'] Civ buildings:', this.seenCivBuildings,'/',this.civBuildings);
+    // console.warn('['+this.name+'] Player buildings:', this.playerBuildings);
+    // console.warn('['+this.name+'] Iems:', this.itemCounts.toList());
+    console.warn('['+this.name+'] Status: ',this.status,' :: ',this.counts);
 };
 
 Region.prototype.updateItemMissions = function(){
@@ -83,37 +166,6 @@ Region.prototype.countKilledCiv = function(){
     GameServer.setFlag('regionsStatus');
 };
 
-Region.prototype.addResource = function(loc){
-    this.resources.push(loc);
-};
-
-Region.prototype.addSZ = function(sz){
-    this.sz.push(sz);
-};
-
-Region.prototype.addAOI = function(aoi){
-    this.aois.push(aoi);
-    // console.warn('aoi',aoi,'added to region',this.name);
-};
-
-Region.prototype.updateCounts = function(){
-    // if('allbuildings' in this.counts) 
-};
-
-Region.prototype.update = function(){
-    this.updateBuildings();
-    this.updateResources();
-    this.updateFoW();
-    this.updateItemMissions();
-    // console.warn('['+this.name+'] Status: ',this.status);
-    // console.warn('['+this.name+'] AOIs: ',this.explored,'/',this.aois.length);
-    // console.warn('['+this.name+'] nodes:', this.visible,'/',this.nbNodes);
-    // console.warn('['+this.name+'] Civ buildings:', this.seenCivBuildings,'/',this.civBuildings);
-    // console.warn('['+this.name+'] Player buildings:', this.playerBuildings);
-    // console.warn('['+this.name+'] Iems:', this.itemCounts.toList());
-    console.warn('['+this.name+'] Status: ',this.counts);
-};
-
 Region.prototype.updateBuildings = function(){
     var playerBuildings = 0;
     var civBuildings = 0;
@@ -137,22 +189,9 @@ Region.prototype.updateBuildings = function(){
     this.seenCivBuildings = seenCivBuildings;
     this.playerBuildings = playerBuildings;
 
-    this.updateCounts();
-
     GameServer.setFlag('regionsStatus'); // TODO: Only in updateCounts? 
 };
 
-Region.prototype.updateStatus = function(){
-    this.status = 0;
-    if(this.civBuildings > 0) this.status = 1; //occupied
-    if(this.playerBuildings > 10 && this.civBuildings == 0) this.status = 2; //settled //TODO; conf
-
-    GameServer.missionsData.missions.forEach(function(mission){
-        if(!mission.regionStatus.includes(this.status)) return;
-        this.counts[mission.count] = [0,0];
-        this.counts[mission.count][1] += 
-    }, this);
-};
 
 Region.prototype.updateFood = function(){
     var previous_ = this.food[0];
@@ -165,12 +204,12 @@ Region.prototype.updateFood = function(){
 
 Region.prototype.updateResources = function(){
     this.nbNodes = this.sz.length + this.resources.length;
-    this.visible = 0;
+    this.visibleNodes = 0;
     this.resources.forEach(function(loc){
-        if(GameServer.isNotInFoW(loc.x, loc.y)) this.visible++;
+        if(GameServer.isNotInFoW(loc.x, loc.y)) this.visibleNodes++;
     },this);
     this.sz.forEach(function(sz){
-        if(GameServer.isNotInFoW(sz.x, sz.y)) this.visible++;
+        if(GameServer.isNotInFoW(sz.x, sz.y)) this.visibleNodes++;
     },this);
     GameServer.setFlag('regionsStatus');
 };
@@ -195,7 +234,7 @@ Region.prototype.trim = function(){
         buildings: this.buildingsTypes,
         totalbuildings: this.playerBuildings,
         status: this.status,
-        nodes: [this.visible, this.nbNodes],
+        resources: [this.visibleNodes, this.nbNodes],
         exploration: [this.explored, this.nbAreas],
         civs: [this.seenCivBuildings, this.civBuildings],
         civCasualties: this.civCasualties
