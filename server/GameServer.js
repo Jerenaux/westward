@@ -1072,7 +1072,8 @@ GameServer.lootNPC = function(player,type,ID){
     }
     GameServer.addRemains(NPC.x,NPC.y,type);
     GameServer.removeEntity(NPC);
-    if(type == 'animal') GameServer.regions[player.region].updateFood();
+    // if(type == 'animal') GameServer.regions[player.region].updateFood();
+    if(type == 'animal') GameServer.regions[player.region].event(player, 'loot');
     Prism.logEvent(player,'loot',{name:NPC.name});
     return true; // return value for the unit tests
 };
@@ -1603,6 +1604,7 @@ GameServer.handleShop = function(data,socketID) {
         }
         building.updateBuild();
         building.updateRepair();
+        GameServer.regions[player.region].event(player, 'give');
     }
     building.save();
     Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type,owner:building.ownerName});
@@ -1677,7 +1679,7 @@ GameServer.buildPlayerBuilding = function(player,bid,tile){
         }
 
         GameServer.finalizeBuilding(player,building);
-        GameServer.regions[building.region].updateBuildings();
+        GameServer.regions[building.region].event('build',player);
     }else{
         document.save(function (err) {
             if (err) return console.error(err);

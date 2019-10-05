@@ -80,9 +80,8 @@ var Tooltip = new Phaser.Class({
                 if(item.effects) this.setEffects(item.effects);
                 break;
             case 'mission':
-                var mission = Engine.getMissionsList()[data.idx];
-                this.setBody(mission.desc);
-                this.setMissionReward(mission.rewards);
+                this.setBody(data.desc);
+                this.setMissionReward(data.rewards);
                 break;
             case 'NPC':
                 var npc = data.type == 'civ' ? Engine.civs[data.id] : Engine.animals[data.id];

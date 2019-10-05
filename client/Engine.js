@@ -1292,36 +1292,58 @@ Engine.makeMapPanel = function(){
     return mapPanel;
 };
 
-Engine.getMissionsList = function(){
-    var allMissions = missionsData.missions;
-    var extraMissions = [];
-    var region = Engine.player.regionsStatus[Engine.player.region];
-    var itemsMissions = [];
-    if(region.items) itemsMissions = region.items.craft.concat(region.items.gather);
-    if(itemsMissions){
-        itemsMissions.forEach(function(mission){
-            var item = mission[0];
-            var itemData = itemsData[item];
-            var verb = itemData.recipe ? 'Produce' : 'Gather';
-            var nb = mission[1];
-            extraMissions.push({
-                "type": "Economy",
-                "regionStatus": [2],
-                "name": verb+" "+nb+" "+itemData.name,
-                "desc": "Ensure that at least "+nb+" "+itemData.name+" are available in the region",
-                "atlas": itemData.atlas,
-                "frame": itemData.frame,
-                "count": "item:"+item,
-                "goal": nb,
-                "rewards": {
-                    "1": 10,
-                    "2": 20
-                }
-            });
-        });
+Engine.getItemMissionData = function(goal, nb){
+    var mission = goal.split(':');
+    var type = mission[0];
+    var item = mission[1];
+    var itemData = itemsData[item];
+    var verb = type == 'craftitem' ? 'Produce' : 'Gather';
+    return {
+        "type": "Economy",
+        "regionStatus": [2],
+        "name": verb+" "+nb+" "+itemData.name,
+        "desc": "Ensure that at least "+nb+" "+itemData.name+" are available in the region",
+        "atlas": itemData.atlas,
+        "frame": itemData.frame,
+        "count": "item:"+item,
+        "goal": nb,
+        "rewards": {
+            "1": 10, //TODO: conf
+            "2": 20
+        }
     }
-    return allMissions.concat(extraMissions);
 };
+
+// Engine.getMissionsList = function(){
+//     var allMissions = missionsData.missions;
+//     var extraMissions = [];
+//     var region = Engine.player.regionsStatus[Engine.player.region];
+//     var itemsMissions = [];
+//     if(region.items) itemsMissions = region.items.craft.concat(region.items.gather);
+//     if(itemsMissions){
+//         itemsMissions.forEach(function(mission){
+//             var item = mission[0];
+//             var itemData = itemsData[item];
+//             var verb = itemData.recipe ? 'Produce' : 'Gather';
+//             var nb = mission[1];
+//             extraMissions.push({
+//                 "type": "Economy",
+//                 "regionStatus": [2],
+//                 "name": verb+" "+nb+" "+itemData.name,
+//                 "desc": "Ensure that at least "+nb+" "+itemData.name+" are available in the region",
+//                 "atlas": itemData.atlas,
+//                 "frame": itemData.frame,
+//                 "count": "item:"+item,
+//                 "goal": nb,
+//                 "rewards": {
+//                     "1": 10,
+//                     "2": 20
+//                 }
+//             });
+//         });
+//     }
+//     return allMissions.concat(extraMissions);
+// };
 
 Engine.computeMissionGoal = function(mission){
     // TODO: conf/JSON

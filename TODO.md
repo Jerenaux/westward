@@ -90,6 +90,7 @@ regions are the most/least developed, barren/lush based on # nodes...
 - UI to filter on building types, filter on damage
 - Repair missions (craft) (once repair filter on map) for occupied regions
 - Compute rarity per region
+- Icon next to region name in world to indicate status
 - Display item rarity in inventory (check if doesn't conflit with shop)
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)

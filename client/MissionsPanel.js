@@ -56,14 +56,15 @@ MissionsPanel.prototype.updateContent = function(missions){
 
     var yOffset = 0;
     var xOffset = 0;
-    var data = Engine.getMissionsList();
-    this.missions.forEach(function(idx, i){
+
+    var region = Engine.player.regionsStatus[Engine.player.region];
+    this.missions.forEach(function(goal, i){
         if ((i < this.currentPage * NB_PER_PAGE) || (i >= (this.currentPage + 1) * NB_PER_PAGE)) {
             return;
         }
         var slot = this.getNextSlot(this.x + 20 + xOffset, sloty + yOffset);
         slot.display();
-        slot.setUp(data[idx], idx);
+        slot.setUp(goal, region.counts[goal]);
         slot.moveUp(5);
         xOffset += 290;
         if((i)%2){
@@ -100,7 +101,7 @@ function MissionSlot(x,y,width,height){
     this.zone.setInteractive();
     this.zone.setOrigin(0);
     this.zone.on('pointerover',function(){
-        UI.tooltip.updateInfo('mission',{idx:this.idx});
+        UI.tooltip.updateInfo('mission',this.missionData);
         UI.tooltip.display();
     }.bind(this));
     this.zone.on('pointerout',function(){
@@ -131,17 +132,26 @@ MissionSlot.prototype.addCount = function(){
     this.content.push(this.count);
 };
 
-MissionSlot.prototype.setUp = function(data, idx){
-    this.icon.setTexture(data.atlas,data.frame);
-    this.idx = idx;
-    var goal = data.goal;
-    var text = data.name;
-    if(data.variableGoal){
-        goal = Engine.computeMissionGoal(data);
-        text = text.replace(/\%x\%/,goal);
+MissionSlot.prototype.setUp = function(type, counts){
+    var data;
+    if(['craftitem','getitem'].includes(type.split(':')[0])){
+        data = Engine.getItemMissionData(type,counts[1]);
+    }else {
+        for (var i = 0; i < missionsData.missions.length; i++) { //TODO: ugly, refactor
+            var m = missionsData.missions[i];
+            if (m.count == type) {
+                data = m;
+                break;
+            }
+        }
     }
+    this.missionData = data;
+    this.icon.setTexture(data.atlas,data.frame);
+    var actual = counts[0];
+    var goal = counts[1];
+    var text = data.name;
+    if(data.variableGoal) text = text.replace(/\%x\%/,goal);
     this.name.setText(text);
-    var actual = Engine.computeMissionActual(data);
     this.count.setText(actual+'/'+goal);
     this.count.setFill(actual >= goal ? Utils.colors.green : Utils.colors.gold);
 };

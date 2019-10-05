@@ -48,12 +48,6 @@ RegionsStatusPanel.prototype.update = function(){
     };
 
     var regionData = regionsData[Engine.player.region];
-    var contested = [];
-    var occupied = [];
-    Engine.player.regionsStatus.forEach(function(region){
-        if(region.status == 2) contested.push(regionData.name);
-        if(region.status == 1) occupied.push(regionData.name);
-    });
 
     this.capsules['title'].setText(Engine.setlCapsule.text.text+' region');
     var status = Engine.player.regionsStatus[Engine.player.region].status;
@@ -64,29 +58,22 @@ RegionsStatusPanel.prototype.update = function(){
     this.statusText.setFill(fill);
 
     var categories = {};
-    var categoriesFulfilled = {};
 
-    Engine.getMissionsList().forEach(function(mission, i){
-        if(!mission.regionStatus.includes(status)) return;
-        if(mission.skipSea && regionData.sea) return;
-        var goal = mission.variableGoal ? Engine.computeMissionGoal(mission) : mission.goal;
-        if(!goal) return;
-
-        if(!(mission.type in categories)){
-            categories[mission.type] = [];
-            categoriesFulfilled[mission.type] = 0;
-        }
-        categories[mission.type].push(i);
-
-        if(Engine.computeMissionActual(mission) >= goal) categoriesFulfilled[mission.type]++;
-    });
+    var region = Engine.player.regionsStatus[Engine.player.region];
+    for(var type in region.missionTypes){
+        categories[type] = 0;
+        region.missionTypes[type].forEach(function(g){
+            var goal = region.counts[g];
+           if(goal[0] < goal[1]) categories[type]++;
+        });
+    }
 
     var i = 0;
     for(var type in categories){
         var btn = this.bigButtons[i++];
-        var nb  = categories[type].length - categoriesFulfilled[type];
+        var nb  = categories[type];
         btn.setText(nb + ' ' + type + ' Missions');
-        btn.missions = categories[type];
+        btn.missions = region.missionTypes[type];
         btn.setCallback(function () {
             var missions = Engine.currentMenu.panels['missions'];
             missions.display();
