@@ -2,12 +2,10 @@
  * Created by Jerome on 11-08-17.
  */
 
-var onServer = (typeof window === 'undefined');
-
-// if(onServer){
-//     World = require('./World.js').World;
-// }
 import World from '../shared/World'
+
+import itemsData from '../assets/data/items.json'
+
 
 var Utils = {
     colors: {},
@@ -305,6 +303,28 @@ Utils.multiTileManhattan = function(A,B){
         Math.abs(A.y+A.h-(B.y+B.h))
     );
     return Math.abs(dx)+Math.abs(dy);
+};
+
+Utils.getItemMissionData = function(goal, nb){
+    var mission = goal.split(':');
+    var type = mission[0];
+    var item = mission[1];
+    var itemData = itemsData[item];
+    var verb = type == 'craftitem' ? 'Produce' : 'Gather';
+    return {
+        "type": "Economy",
+        "regionStatus": [2],
+        "name": verb+" "+nb+" "+itemData.name,
+        "desc": "Ensure that at least "+nb+" "+itemData.name+" are available in the region",
+        "atlas": itemData.atlas,
+        "frame": itemData.frame,
+        "count": goal,
+        "goal": nb,
+        "rewards": {
+            "1": 10, //TODO: conf
+            "2": 20
+        }
+    }
 };
 
 Utils.clamp = function(x,min,max){ // restricts a value to a given interval (return the value unchanged if within the interval

@@ -156,7 +156,7 @@ UI.handleNotifications = function (msgs) {
             duration: 300,
             ease: 'Quad.easeOut',
             onUpdate: function (tween) {
-                notif.updatePosition(notif.x, tween.getValue());
+                notif.updatePosition(notif.x, tween.getValue(),100);
             }
         });
     });

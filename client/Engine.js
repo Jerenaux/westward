@@ -58,7 +58,6 @@ import World from '../shared/World';
 import animalsData from '../assets/data/animals.json'
 import buildingsData from '../assets/data/buildings.json'
 import itemsData from '../assets/data/items.json'
-import missionsData from '../assets/data/missions.json'
 import regionsData from '../assets/data/regions.json'
 
 var Engine = {
@@ -1292,27 +1291,6 @@ Engine.makeMapPanel = function(){
     return mapPanel;
 };
 
-Engine.getItemMissionData = function(goal, nb){
-    var mission = goal.split(':');
-    var type = mission[0];
-    var item = mission[1];
-    var itemData = itemsData[item];
-    var verb = type == 'craftitem' ? 'Produce' : 'Gather';
-    return {
-        "type": "Economy",
-        "regionStatus": [2],
-        "name": verb+" "+nb+" "+itemData.name,
-        "desc": "Ensure that at least "+nb+" "+itemData.name+" are available in the region",
-        "atlas": itemData.atlas,
-        "frame": itemData.frame,
-        "count": "item:"+item,
-        "goal": nb,
-        "rewards": {
-            "1": 10, //TODO: conf
-            "2": 20
-        }
-    }
-};
 
 // Engine.getMissionsList = function(){
 //     var allMissions = missionsData.missions;

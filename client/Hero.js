@@ -16,12 +16,6 @@ import World from '../shared/World'
 import itemsData from '../assets/data/items.json'
 import regionsData from '../assets/data/regions.json'
 
-function ClassDataShell(){
-    for(let i = 0; i < 4; i++){
-        this[i] = 0;
-    }
-}
-
 let Hero = new Phaser.Class({
     Extends: Player,
 
@@ -54,13 +48,12 @@ let Hero = new Phaser.Class({
         this.history = [];
 
         this.gold =  0;
-        this.classxp = new ClassDataShell();
-        this.classlvl = new ClassDataShell();
-        this.ap = new ClassDataShell();
+        this.classxp = data.classxp;
+        this.classlvl = data.classlvl;
+        this.ap = data.ap;
         this.name = data.name;
 
         this.updateRarity([]);
-        // this.updateFoW(data.fow);
 
         this.buildRecipes.fromList(Engine.config.defaultBuildRecipes);
 

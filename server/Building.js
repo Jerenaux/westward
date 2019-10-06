@@ -271,11 +271,11 @@ Building.prototype.setBuilt = function(){
     GameServer.computeFrontier(true);
 };
 
-Building.prototype.destroy = function(){
+Building.prototype.destroy = function(attacker){
     this.setProperty('built',false);
     if(this.civ){
         GameServer.setFlag('buildingsMarkers');
-        GameServer.regions[this.region].countDestroyedCivBld();
+        GameServer.regions[this.region].event('destroycivhut',attacker);
     }else{
         GameServer.notifyPlayer(this.owner,'Your '+this.name+' was destroyed');
     }
@@ -498,8 +498,8 @@ Building.prototype.attackTarget = function(){
     };
 };
 
-Building.prototype.die = function(){
-    this.destroy();
+Building.prototype.die = function(attacker){
+    this.destroy(attacker);
 };
 
 Building.prototype.isDead = function(){

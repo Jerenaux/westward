@@ -165,12 +165,12 @@ Battle.prototype.getFightersOrder = function () {
 };
 
 // Remove a fighter from the fight following his death
-Battle.prototype.removeFighter = function (f) {
+Battle.prototype.removeFighter = function (f, attacker) {
     var idx = this.getFighterIndex(f);
     if (idx == -1) return;
     var isTurnOf = this.isTurnOf(f);
     f.endFight(false); // false for not alive
-    f.die();
+    f.die(attacker);
     this.fighters.splice(idx, 1);
     this.updateTimeline();
     //if(f.isPlayer) this.removeFromPosition(f); // if NPC, leave busy for his body
@@ -362,11 +362,11 @@ Battle.prototype.computeTOF = function (a, b, type) {
     return (Utils.euclidean(shootingPoint, b) / speeds[type]) * 1000;
 };
 
-Battle.prototype.applyDamage = function (f, dmg) {
+Battle.prototype.applyDamage = function (attacker, f, dmg) {
     f.applyDamage(-dmg);
     if (f.getHealth() == 0) {
         if (f.xpReward) this.rewardXP(f.xpReward);
-        this.removeFighter(f);
+        this.removeFighter(f, attacker);
         return true;
     }
     return false;
@@ -400,11 +400,11 @@ Battle.prototype.processAoE = function (f, tx, ty) {
         h: 3
     };
     var damages = [];
-    this.fighters.forEach(function (f) {
-        if (Utils.overlap(rect, f.getRect())) {
-            var dmg = this.computeDamage('bomb', null, f);
-            damages.push([f, dmg]);
-            f.setProperty('hit', {
+    this.fighters.forEach(function (foe) {
+        if (Utils.overlap(rect, foe.getRect())) {
+            var dmg = this.computeDamage('bomb', null, foe);
+            damages.push([foe, dmg]);
+            foe.setProperty('hit', {
                 dmg: dmg,
                 delay: delay
             }); // for the flash and hp display
@@ -413,8 +413,8 @@ Battle.prototype.processAoE = function (f, tx, ty) {
     delay += 100;
     setTimeout(function () {
         damages.forEach(function (d) {
-            var f = d[0];
-            var killed = this.applyDamage(f, d[1]);
+            var foe = d[0];
+            var killed = this.applyDamage(f, foe, d[1]);
             if (killed && f.isPlayer) f.addNotif(f.name + ' killed');
         }, this);
     }.bind(this), delay);
@@ -478,7 +478,7 @@ Battle.prototype.processAttack = function (attacker, target) {
     }
     setTimeout(function () {
         // console.log('computing outcome');
-        killed = this.applyDamage(target, damage);
+        killed = this.applyDamage(attacker, target, damage);
         if (killed && attacker.isPlayer) attacker.addNotif(target.name + ' ' + (target.isBuilding ? 'destroyed' : 'killed'));
         if (killed && attacker.isCiv && target.isPlayer) attacker.talk('killed_foe');
         if (target.isCiv && attacker.isPlayer) {

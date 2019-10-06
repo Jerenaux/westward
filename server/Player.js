@@ -150,8 +150,9 @@ Player.prototype.setUp = function(id,name,region){
 
 Player.prototype.setRegion = function() {
     var region_ = this.region;
-    this.setOwnProperty('region',GameServer.getRegion(this));
-    if(this.region != region_){
+    var newregion = GameServer.getRegion(this);
+    if(newregion != region_){
+        this.setOwnProperty('region',newregion);
         this.addNotif('Entering '+GameServer.regions[this.region].name+' region');
         if(region_ in GameServer.regions) GameServer.regions[region_].removePlayer(this.id);
         GameServer.regions[this.region].addPlayer(this.id);
@@ -319,16 +320,13 @@ Player.prototype.gainClassXP = function (classID, inc, notify) {
             this.classLvlUp(classID, notify);
         }
     }
-    // this.updatePacket.classxp = this.classxp;
-    this.setOwnProperty('clasxp', this.classxp);
+    this.setOwnProperty('classxp', this.classxp);
 };
 
 Player.prototype.classLvlUp = function (classID, notify) {
     this.classlvl[classID]++;
     var nb = 3; // TODO: vary number
     this.ap[classID] += nb;
-    // this.updatePacket.classlvl = this.classlvl;
-    // this.updatePacket.ap = this.ap;
     this.setOwnProperty('classlvl', this.classlvl);
     this.setOwnProperty('ap', this.ap);
     if (notify) {
@@ -734,7 +732,7 @@ Player.prototype.getWorldInformation = function(){
  */
 Player.prototype.initTrim = function () {
     var trimmed = {};
-    var broadcastProperties = ['id', 'name']; // list of properties relevant for the client
+    var broadcastProperties = ['id', 'name','classxp','classlvl','ap']; // list of properties relevant for the client
     for (var p = 0; p < broadcastProperties.length; p++) {
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

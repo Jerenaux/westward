@@ -1,5 +1,8 @@
+var clone = require('clone');
+
 import GameServer from "./GameServer";
 import Inventory from "../shared/Inventory";
+import Utils from '../shared/Utils'
     
 function Region(data){
     this.id = data.id;
@@ -66,28 +69,35 @@ Region.prototype.setGoals = function(){
     this.counts = {};
     this.missionTypes = {};
     this.XPtable = {};
-    GameServer.missionsData.missions.forEach(function(mission){
-        if(!mission.regionStatus.includes(this.status)) return;
-        if(mission.skipSea && this.sea) return;
-        if(!(mission.count in this.counts)) this.counts[mission.count] = [0,0];
-        this.counts[mission.count][1] += mission.variableGoal ? this.computeMissionGoal(mission.count) : mission.goal;
-
-        if(!(mission.type in this.missionTypes)) this.missionTypes[mission.type] = new Set();
-        this.missionTypes[mission.type].add(mission.count);
-
-        if(!(mission.count in this.XPtable)) this.XPtable[mission.count] = {
-            0: 0,
-            1: 0,
-            2: 0,
-            3: 0
-        };
-        for(var clas in mission.rewards){
-            this.XPtable[mission.count][clas] += mission.rewards[clas];
-        }
-
-    }, this);
+    GameServer.missionsData.missions.forEach(this.addMission, this);
+    this.craft.toList().forEach(function(item){
+        this.addMission(Utils.getItemMissionData('craftitem:'+item[0],10));
+    },this);
+    this.craft.toList().forEach(function(item){
+        this.addMission(Utils.getItemMissionData('getitem:'+item[0],10));
+    },this);
     for(var type in this.missionTypes){
         this.missionTypes[type] = Array.from(this.missionTypes[type]);
+    }
+};
+
+Region.prototype.addMission = function(mission){
+    if(!mission.regionStatus.includes(this.status)) return;
+    if(mission.skipSea && this.sea) return;
+    if(!(mission.count in this.counts)) this.counts[mission.count] = [0,0];
+    this.counts[mission.count][1] += mission.variableGoal ? this.computeMissionGoal(mission.count) : mission.goal;
+
+    if(!(mission.type in this.missionTypes)) this.missionTypes[mission.type] = new Set();
+    this.missionTypes[mission.type].add(mission.count);
+
+    if(!(mission.count in this.XPtable)) this.XPtable[mission.count] = {
+        0: 0,
+        1: 0,
+        2: 0,
+        3: 0
+    };
+    for(var clas in mission.rewards){
+        this.XPtable[mission.count][clas] += mission.rewards[clas];
     }
 };
 
@@ -155,24 +165,44 @@ Region.prototype.update = function(){
 };
 
 Region.prototype.event = function(event, player){
-    var counts_ = Object.assign({},this.counts);
+    var counts_ = clone(this.counts);
+    console.warn(counts_);
     switch(event){
         case 'build':
             this.updateBuildings();
+            this.updateFoW();
+            this.updateResources();
+            break;
+        case 'destroyedcivhut':
+            this.countDestroyedCivBld();
+            break;
+        case 'fow':
+            this.updateBuildings();
+            this.updateFoW();
+            this.updateResources();
+            break;
         case 'give': // TODO: change if addition of storage missions for other items
             this.updateBuildings();
+            this.updateFood();
+            break;
+        case 'killedciv':
+            this.countKilledCiv();
+            break;
         case 'loot':
             this.updateFood();
+            break;
     }
     if(player){
         this.updateCounts();
+        console.warn(clone(this.counts));
         for(var count in this.counts){
             var p = counts_[count];
             var c = this.counts[count];
             if(p[0] < p[1] && c[0] > p[0]){
+                player.addNotif('You contributed to a region mission!');
                 var xp = this.XPtable[count];
                 for(var clas in xp){
-                    player.gainClassXP(clas, xp[clas], true);
+                    if(xp[clas] > 0) player.gainClassXP(clas, xp[clas], true);
                 }
             }
         }
@@ -186,7 +216,6 @@ Region.prototype.updateItemMissions = function(){
     this.craft = new Inventory();
     this.gather = new Inventory();
     if(this.status != 2) return;
-    this.itemsList = [];
     var goals = [2, 6, 46, 19, 28, 29, 45];
     goals.forEach(this.computeItemMissions,this);
 };
@@ -209,11 +238,11 @@ Region.prototype.computeItemMissions = function(item){
         }
         if (canCraft) {
             this.craft.add(item, nb);
-            this.counts['craftitem:'+item] = [0,nb];
+            // this.counts['craftitem:'+item] = [0,nb];
         }
     }else{
         this.gather.add(item,nb);
-        this.counts['getitem:'+item] = [0,nb];
+        // this.counts['getitem:'+item] = [0,nb];
     }
 };
 
@@ -237,6 +266,7 @@ Region.prototype.updateBuildings = function(){
     var civBuildings = 0;
     var seenCivBuildings = 0;
     this.buildingsTypes = {};
+    this.food[1] = 0;
     this.buildings.forEach(function(bld){
         if(!bld.isBuilt()) return;
         if(bld.civ){

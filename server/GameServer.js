@@ -1073,7 +1073,7 @@ GameServer.lootNPC = function(player,type,ID){
     GameServer.addRemains(NPC.x,NPC.y,type);
     GameServer.removeEntity(NPC);
     // if(type == 'animal') GameServer.regions[player.region].updateFood();
-    if(type == 'animal') GameServer.regions[player.region].event(player, 'loot');
+    if(type == 'animal') GameServer.regions[player.region].event('loot',player);
     Prism.logEvent(player,'loot',{name:NPC.name});
     return true; // return value for the unit tests
 };
@@ -1604,7 +1604,7 @@ GameServer.handleShop = function(data,socketID) {
         }
         building.updateBuild();
         building.updateRepair();
-        GameServer.regions[player.region].event(player, 'give');
+        GameServer.regions[player.region].event('give',player);
     }
     building.save();
     Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type,owner:building.ownerName});
@@ -1692,7 +1692,7 @@ GameServer.finalizeBuilding = function(player,building){
     building.embed();
     player.addBuilding(building);
     GameServer.setFlag('buildingsMarkers');
-    GameServer.regions[building.region].updateBuildings();
+    // GameServer.regions[building.region].updateBuildings();
     GameServer.updateFoW();
     GameServer.updateSZActivity();
     GameServer.computeFrontier(true);
@@ -1989,8 +1989,9 @@ GameServer.handleAOItransition = function(entity,previous){
     if(entity.setFieldOfVision) entity.setFieldOfVision(AOIs);
     if(entity.isPlayer) {
         GameServer.updateVision();
-        GameServer.updateFoW();
+        var FoWchange = GameServer.updateFoW();
         entity.setRegion();
+        if(FoWchange) GameServer.regions[entity.region].event('fow',previous ? entity : null); // If no previous entity, then it's a player spawn, don't send player object so no XP reward
     }
     newAOIs.forEach(function(aoi){
         if(entity.isPlayer) entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
@@ -2032,20 +2033,23 @@ GameServer.updateFoW = function(){
         var building = GameServer.buildings[bid];
         if(!building.civ) GameServer.dissipateFoW(building.aoi);
     }
-    GameServer.setFlag('FoW');
     var previousfow = GameServer.fowList;
     GameServer.fowList = GameServer.computeFoW();
     previousfow.sort();
     GameServer.fowList.sort();
     if(previousfow.toString() == GameServer.fowList.toString()) {
         console.log('FoW unchanged');
-        return;
+        return false;
     } // no change
-    GameServer.updateRegions();
+    for(var id in GameServer.regions){
+        GameServer.regions[id].updateFoW();
+    }
     GameServer.animalMarkersFiltered = GameServer.filterMarkers('animal');
     GameServer.resourceMarkersFiltered = GameServer.filterMarkers('resource');
+    GameServer.setFlag('FoW');
     GameServer.setFlag('animalsMarkers');
     GameServer.setFlag('resourcesMarkers');
+    return true;
 };
 
 GameServer.filterMarkers = function(type){
@@ -2129,23 +2133,23 @@ GameServer.computeRegions = function(){
         });
     }
 
-    var voronoi = new Voronoi();
-    var bbox = {xl: 0, xr: World.worldWidth, yt: 0, yb: World.worldHeight}; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
-    var diagram = voronoi.compute(sites, bbox);
-
-    diagram.edges.forEach(function(edge){
-        if(!edge.lSite || !edge.rSite) return;
-        GameServer.regionBoundaries.push({
-            a:{
-                x: edge.va.x,
-                y: edge.va.y
-            },
-            b:{
-                x: edge.vb.x,
-                y: edge.vb.y
-            }
-        });
-    },this);
+    // var voronoi = new Voronoi();
+    // var bbox = {xl: 0, xr: World.worldWidth, yt: 0, yb: World.worldHeight}; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
+    // var diagram = voronoi.compute(sites, bbox);
+    //
+    // diagram.edges.forEach(function(edge){
+    //     if(!edge.lSite || !edge.rSite) return;
+    //     GameServer.regionBoundaries.push({
+    //         a:{
+    //             x: edge.va.x,
+    //             y: edge.va.y
+    //         },
+    //         b:{
+    //             x: edge.vb.x,
+    //             y: edge.vb.y
+    //         }
+    //     });
+    // },this);
 
     GameServer.AOIs.forEach(function(aoi){
         var region = GameServer.getRegion(aoi);
