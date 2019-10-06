@@ -21,7 +21,8 @@ function Region(data){
     this.sz = []; // list of SpawnZones
     this.aois = [];
     this.civCasualties = [0,0];
-
+    this.craft = new Inventory();
+    this.gather = new Inventory();
     this.counts = {};
     this.missionTypes = {};
 }
@@ -60,10 +61,14 @@ Region.prototype.addAOI = function(aoi){
 
 Region.prototype.updateStatus = function(){
     console.warn('['+this.name+'] Status update');
+    var status_ = this.status;
     this.status = 0;
     if(this.civBuildings > 0) this.status = 1; //occupied
     if(this.playerBuildings > 10 && this.civBuildings == 0) this.status = 2; //settled //TODO; conf
-    GameServer.setFlag('regionsStatus');
+    if(this.status != status_){
+        this.setGoals();
+        GameServer.setFlag('regionsStatus');
+    }
 };
 
 Region.prototype.setGoals = function(){
@@ -169,7 +174,6 @@ Region.prototype.update = function(){
 Region.prototype.event = function(event, player){
     console.warn('['+this.name+'] event ',event);
     var counts_ = clone(this.counts);
-    console.warn(counts_);
     switch(event){
         case 'build':
             this.updateBuildings();
@@ -178,6 +182,7 @@ Region.prototype.event = function(event, player){
             break;
         case 'destroycivhut':
             this.countDestroyedCivBld();
+            this.updateBuildings();
             break;
         case 'fow':
             this.updateBuildings();
@@ -200,7 +205,6 @@ Region.prototype.event = function(event, player){
     }
     if(player){
         this.updateCounts();
-        console.warn(this.counts);
         for(var count in this.counts){
             var p = counts_[count];
             var c = this.counts[count];

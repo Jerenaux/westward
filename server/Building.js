@@ -282,7 +282,6 @@ Building.prototype.destroy = function(attacker){
     this.save();
     GameServer.updateSZActivity();
     GameServer.computeFrontier(true);
-    GameServer.regions[this.region].updateBuildings();
 };
 
 Building.prototype.isBuilt = function(){

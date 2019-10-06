@@ -1680,11 +1680,11 @@ GameServer.buildPlayerBuilding = function(player,bid,tile){
         }
 
         GameServer.finalizeBuilding(player,building);
-        GameServer.regions[player.region].event('build',player);
     }else{
         document.save(function (err) {
             if (err) return console.error(err);
             GameServer.finalizeBuilding(player,building);
+            GameServer.regions[player.region].event('build',player);
         });
     }
 };

@@ -25,7 +25,7 @@
         "variableGoal": true,
         "rewards": {
           "1": 5,
-          "3": 20
+          "3": 10
         }
       },
       {
@@ -81,7 +81,7 @@
         "count": "civhutkilled",
         "variableGoal": true,
         "rewards": {
-          "0": 15,
+          "0": 10,
           "3": 2
         }
       },

@@ -333,6 +333,7 @@ Player.prototype.classLvlUp = function (classID, notify) {
         this.addNotif('Reached ' + GameServer.classData[classID].name + ' level ' + this.classlvl[classID] + '!');
         this.addNotif('Earned ' + nb + ' AP!');
     }
+    this.save();
 };
 
 Player.prototype.giveGold = function (nb, notify) {
