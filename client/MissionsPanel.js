@@ -134,7 +134,6 @@ MissionSlot.prototype.addCount = function(){
 
 MissionSlot.prototype.setUp = function(type, counts){
     var data;
-    console.warn(type);
     if(['craftitem','getitem'].includes(type.split(':')[0])){
         data = Utils.getItemMissionData(type,counts[1]);
     }else {

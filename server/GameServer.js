@@ -1158,6 +1158,7 @@ GameServer.forage = function(player, type){
     player.giveItem(type,nb,true,'Picked');
     Prism.logEvent(player,'pickup',{item:type});
     GameServer.createItem(type,nb,player.region,'pickup');
+    GameServer.regions[player.region].event('pickup',player);
 };
 
 /**
@@ -1679,7 +1680,7 @@ GameServer.buildPlayerBuilding = function(player,bid,tile){
         }
 
         GameServer.finalizeBuilding(player,building);
-        GameServer.regions[building.region].event('build',player);
+        GameServer.regions[player.region].event('build',player);
     }else{
         document.save(function (err) {
             if (err) return console.error(err);

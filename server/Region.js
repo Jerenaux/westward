@@ -63,6 +63,7 @@ Region.prototype.updateStatus = function(){
     this.status = 0;
     if(this.civBuildings > 0) this.status = 1; //occupied
     if(this.playerBuildings > 10 && this.civBuildings == 0) this.status = 2; //settled //TODO; conf
+    GameServer.setFlag('regionsStatus');
 };
 
 Region.prototype.setGoals = function(){
@@ -73,7 +74,7 @@ Region.prototype.setGoals = function(){
     this.craft.toList().forEach(function(item){
         this.addMission(Utils.getItemMissionData('craftitem:'+item[0],10));
     },this);
-    this.craft.toList().forEach(function(item){
+    this.gather.toList().forEach(function(item){
         this.addMission(Utils.getItemMissionData('getitem:'+item[0],10));
     },this);
     for(var type in this.missionTypes){
@@ -120,6 +121,7 @@ Region.prototype.updateCounts = function(){
     this.gather.toList().forEach(function(item){
         this.updateCount('getitem:'+item[0],this.itemCounts.getNb(item[0]));
     },this);
+    GameServer.setFlag('regionsStatus'); // TODO: eventually, don't broadcast all regions but only changed ones
 };
 
 Region.prototype.updateCount = function(count,value){
@@ -165,6 +167,7 @@ Region.prototype.update = function(){
 };
 
 Region.prototype.event = function(event, player){
+    console.warn('['+this.name+'] event ',event);
     var counts_ = clone(this.counts);
     console.warn(counts_);
     switch(event){
@@ -173,7 +176,7 @@ Region.prototype.event = function(event, player){
             this.updateFoW();
             this.updateResources();
             break;
-        case 'destroyedcivhut':
+        case 'destroycivhut':
             this.countDestroyedCivBld();
             break;
         case 'fow':
@@ -191,10 +194,13 @@ Region.prototype.event = function(event, player){
         case 'loot':
             this.updateFood();
             break;
+        case 'pickup':
+            // do nothing but trigger updateCounts below
+            break;
     }
     if(player){
         this.updateCounts();
-        console.warn(clone(this.counts));
+        console.warn(this.counts);
         for(var count in this.counts){
             var p = counts_[count];
             var c = this.counts[count];
@@ -225,6 +231,7 @@ Region.prototype.hasItem = function(item,nb){
 };
 
 Region.prototype.computeItemMissions = function(item){
+    // console.warn('Item mission goal for ',GameServer.itemsData[item].name);
     var nb = 10; //TODO vary + conf
     if(this.hasItem(item,nb)) return;
     var recipe = GameServer.itemsData[item].recipe;
@@ -236,13 +243,9 @@ Region.prototype.computeItemMissions = function(item){
                 canCraft = false;
             }
         }
-        if (canCraft) {
-            this.craft.add(item, nb);
-            // this.counts['craftitem:'+item] = [0,nb];
-        }
+        if (canCraft) this.craft.add(item, nb);
     }else{
         this.gather.add(item,nb);
-        // this.counts['getitem:'+item] = [0,nb];
     }
 };
 
@@ -252,12 +255,10 @@ Region.prototype.addBuilding = function(building){
 
 Region.prototype.countDestroyedCivBld = function(){
     this.civCasualties[1]++;
-    GameServer.setFlag('regionsStatus');
 };
 
 Region.prototype.countKilledCiv = function(){
     this.civCasualties[0]++;
-    GameServer.setFlag('regionsStatus');
 };
 
 Region.prototype.updateBuildings = function(){
@@ -283,19 +284,15 @@ Region.prototype.updateBuildings = function(){
     this.civBuildings = civBuildings;
     this.seenCivBuildings = seenCivBuildings;
     this.playerBuildings = playerBuildings;
-
-    GameServer.setFlag('regionsStatus'); // TODO: Only in updateCounts? 
 };
 
 
 Region.prototype.updateFood = function(){
     console.warn('['+this.name+'] Food update');
-    var previous_ = this.food[0];
     this.food[0] = 0;
     for(var playerID of this.players){
         this.food[0] += GameServer.players[playerID].getItemNb(1);
     }
-    if(this.food[0] != previous_) GameServer.setFlag('regionsStatus');
 };
 
 Region.prototype.updateResources = function(){
@@ -308,7 +305,6 @@ Region.prototype.updateResources = function(){
     this.sz.forEach(function(sz){
         if(GameServer.isNotInFoW(sz.x, sz.y)) this.visibleNodes++;
     },this);
-    GameServer.setFlag('regionsStatus');
 };
 
 Region.prototype.updateFoW = function(){

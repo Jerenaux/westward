@@ -69,7 +69,6 @@ Bugs:
 - No reaction to buildings missions
 - Civ huts not counted
 - No status transition
-- Wrong items missions
 Features:
 - Add Bear
 - Proper specific updates when relevant player actions + XP reward

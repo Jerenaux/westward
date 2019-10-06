@@ -321,8 +321,8 @@ Utils.getItemMissionData = function(goal, nb){
         "count": goal,
         "goal": nb,
         "rewards": {
-            "1": 10, //TODO: conf
-            "2": 20
+            "1": 1, //TODO: conf
+            "2": 2
         }
     }
 };
