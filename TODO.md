@@ -64,8 +64,6 @@ Packaging
 - Message when entering enemy territory
 
 Bugs:
-- Local rarity
-- Target number for 'explore the region' mission in Wild
 Features:
 - Add Bear + remains
 - Players only clear 1 AOI FoW? Towers clear multiple?

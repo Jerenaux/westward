@@ -110,7 +110,7 @@ Region.prototype.addMission = function(mission){
 Region.prototype.updateCounts = function(){
     console.warn('['+this.name+'] Counts update');
     this.updateCount('allbuildings',this.playerBuildings);
-    this.updateCount('areas',this.explored);
+    this.updateCount('exploration',this.explored);
     this.updateCount('bldfood',this.food[1]);
     this.updateCount('civhutkilled',this.civCasualties[1]);
     this.updateCount('civhuts',this.seenCivBuildings);
@@ -318,6 +318,7 @@ Region.prototype.updateFoW = function(){
     this.aois.forEach(function(aoi){
         if(GameServer.fowList.includes(aoi)) this.explored++;
     }, this);
+    console.warn('explored:',this.explored);
 };
 
 Region.prototype.trim = function(){
@@ -325,7 +326,8 @@ Region.prototype.trim = function(){
         id: this.id,
         status: this.status,
         counts: this.counts,
-        missionTypes: this.missionTypes
+        missionTypes: this.missionTypes,
+        items: this.itemCounts.toList()
     }
 };
 

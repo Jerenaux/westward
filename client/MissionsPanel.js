@@ -154,6 +154,7 @@ MissionSlot.prototype.setUp = function(type, counts){
     this.name.setText(text);
     this.count.setText(actual+'/'+goal);
     this.count.setFill(actual >= goal ? Utils.colors.green : Utils.colors.gold);
+    if(data.pct) this.count.setText(Math.floor((actual/goal)*100)+'%');
 };
 
 MissionSlot.prototype.display = function(){

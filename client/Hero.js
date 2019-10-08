@@ -53,7 +53,7 @@ let Hero = new Phaser.Class({
         this.ap = data.ap;
         this.name = data.name;
 
-        this.updateRarity([]);
+        // this.updateRarity([]);
 
         this.buildRecipes.fromList(Engine.config.defaultBuildRecipes);
 
@@ -86,7 +86,7 @@ let Hero = new Phaser.Class({
             'items': this.updateInventory,
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
-            'rarity': this.updateRarity,
+            // 'rarity': this.updateRarity,
             'region': this.updateRegion,
             'regionsBoundaries': this.updateRegions,
             'regionsStatus': this.updateRegionsStatus,
@@ -324,7 +324,7 @@ let Hero = new Phaser.Class({
         Engine.setlCapsule.setText(regionsData[region].name);
     },
 
-    updateRegions: function(regions){
+    updateRegions: function(regions){ // update region boundaries
         this.regions = regions;
     },
 
@@ -393,12 +393,12 @@ let Hero = new Phaser.Class({
         // if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
     },
 
-    updateRarity: function(rarity){
-        Engine.rarity = {};
-        rarity.forEach(function(itm){
-            Engine.rarity[itm[0]] = itm[1];
-        });
-    },
+    // updateRarity: function(rarity){
+    //     Engine.rarity = {};
+    //     rarity.forEach(function(itm){
+    //         Engine.rarity[itm[0]] = itm[1];
+    //     });
+    // },
 
     updateStats: function(stats){
         for(let i = 0; i < stats.length; i++){

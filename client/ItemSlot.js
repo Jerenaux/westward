@@ -3,6 +3,7 @@
  */
 import Engine from './Engine'
 import Frame from './Frame'
+import Inventory from '../shared/Inventory'
 import {Stats} from "../shared/Stats";
 import UI from './UI'
 import Utils from '../shared/Utils'
@@ -92,16 +93,23 @@ ItemSlot.prototype.setUp = function(action,item){
     this.itemID = item;
     this.nb.setText(Engine.player.getItemNb(item));
 
-    var rarityMap = { //TODO: conf
-        0: 'Extremely rare',
-        1: 'Rare',
-        2: 'Common',
-        3: 'Extremely common'
-    };
+    function computeRarity(count){
+        if(count <= 1){
+            return 'Extremely rare';
+        }else if(count <= 10){
+            return 'Rare';
+        }else if(count <= 100){
+            return 'Common';
+        }else{
+            return 'Very common';
+        }
+    }
 
-    var rarity = Engine.rarity[item] || 0;
-    this.rarity.setText(rarityMap[rarity]);
-    this.rarity.setFill((rarity <= 1 ? Utils.colors.gold : Utils.colors.white));
+    // TODO: more cleanly
+    var items = new Inventory().fromList(Engine.player.regionsStatus[Engine.player.region].items);
+    var rarity = computeRarity(items.getNb(item) || 0);
+    this.rarity.setText(rarity);
+    this.rarity.setFill((['Extremely rare','Rare'].includes(rarity) ? Utils.colors.gold : Utils.colors.white));
 
     var priceaction = (action == 'buy' ? 'sell' : 'buy');
     var price = Engine.currentBuiling.getPrice(item,priceaction);

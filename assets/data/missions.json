@@ -32,10 +32,11 @@
         "type": "Exploration",
         "regionStatus": [0],
         "name": "Explore the region",
-        "desc": "Clear up fog of war to reveal more than half of the region",
+        "desc": "Clear up fog of war to reveal the region",
         "atlas": "items2",
         "frame": "menu_map",
         "count": "exploration",
+        "pct": true,
         "skipSea": true,
         "variableGoal": true,
         "rewards": {

@@ -2195,9 +2195,9 @@ GameServer.getRegion = function(entity){
 
 /**
  * Compute the degree of rarity of the items in the world.
- * Called by player.initTrim();
+ * Called by player.getWorldInformation();
  * */
-GameServer.getRarity = function(){
+/*GameServer.getRarity = function(){
     var rarity = [];
     // TODO: conf
     function computeRarity(count){
@@ -2212,12 +2212,12 @@ GameServer.getRarity = function(){
         }
     }
 
-    for(var item in GameServer.itemCounts){
+    for(var item in GameServer.itemCounts.items){
         // console.warn(item,GameServer.itemCounts[item],computeRarity(GameServer.itemCounts[item]));
-        rarity.push([item,computeRarity(GameServer.itemCounts[item])]);
+        rarity.push([item,computeRarity(GameServer.itemCounts.items[item])]);
     }
     return rarity;
-};
+};*/
 
 GameServer.notifyPlayer = function(playerID,msg){
     // console.log(playerID);

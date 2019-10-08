@@ -722,7 +722,7 @@ Player.prototype.getWorldInformation = function(){
     this.setOwnProperty('animalMarkers', GameServer.listAnimalMarkers());
     this.setOwnProperty('deathMarkers', GameServer.listMarkers('death'));
     this.setOwnProperty('conflictMarkers', GameServer.listMarkers('conflict'));
-    this.setOwnProperty('rarity', GameServer.getRarity());
+    // this.setOwnProperty('rarity', GameServer.getRarity());
     this.setOwnProperty('history',this.history);
 };
 
