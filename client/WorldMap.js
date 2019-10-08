@@ -99,6 +99,7 @@ var WorldMap = new Phaser.Class({
                 mask.setDepth(2);
                 mask.setScrollFactor(0);
                 this.setMask(new Phaser.Display.Masks.BitmapMask(UI.scene,mask));
+                // UI.backdrop.setMask(new Phaser.Display.Masks.BitmapMask(UI.scene,mask));
             }else{ // Creates a rect shape based on mask texture
                 var w = mask.frame.width;
                 var h = mask.frame.height;

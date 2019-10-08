@@ -20,6 +20,8 @@ MapPanel.prototype.addBackground = function(texture){
     this.bg.setScrollFactor(0);
     this.bg.setVisible(false);
     this.content.push(this.bg);
+    // this.backdrop = UI.scene.add.rectangle(this.mapx, this.mapy, 1024, 576, 0x000000).setDepth(2);
+    // UI.backdrop = this.backdrop;
 };
 
 MapPanel.prototype.addMap = function(texture,w,h,dragX,dragY){

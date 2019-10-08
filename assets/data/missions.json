@@ -34,12 +34,12 @@
         "name": "Explore the region",
         "desc": "Clear up fog of war to reveal more than half of the region",
         "atlas": "items2",
-        "frame": "sunflower",
+        "frame": "menu_map",
         "count": "exploration",
         "skipSea": true,
         "variableGoal": true,
         "rewards": {
-          "1": 3,
+          "0": 3,
           "3": 10
         }
       },

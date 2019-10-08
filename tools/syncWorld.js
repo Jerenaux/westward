@@ -4,7 +4,7 @@
 let mongo = require('mongodb').MongoClient;
 let mongoose = require('mongoose');
 
-let Schemas = require('../server/schemas.js');
+// let Schemas = require('../server/schemas.js');
 
 
 function fetch(){

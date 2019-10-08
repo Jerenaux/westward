@@ -64,18 +64,18 @@ Packaging
 - Message when entering enemy territory
 
 Bugs:
-- Black backdrop
 - Local rarity
-- Icon for explore mission in Wild
+- Target number for 'explore the region' mission in Wild
 Features:
-- Add Bear
+- Add Bear + remains
+- Players only clear 1 AOI FoW? Towers clear multiple?
 - Proper specific updates when relevant player actions + XP reward
--> Specify where toponyms are displayed
--> Toggle region names
--> General info: how many regions settled, which regions are the most dangerous/currently contested, which
+- Specify where toponyms are displayed
+- Toggle region names
+- General info: how many regions settled, which regions are the most dangerous/currently contested, which
 regions are the most/least developed, barren/lush based on # nodes...
--> Info on statuses of neighboring regions (hard-coded) + use this to improve getRegion() 
--> Identify resource speciality of regions and incentivize exports
+- Info on statuses of neighboring regions (hard-coded) + use this to improve getRegion() 
+- Identify resource speciality of regions and incentivize exports
 -> # days since last attack
 -> Conquered / settled based on history
 - Identify AOIs on enemy side of frontier and display warning/permanent danger indicator
