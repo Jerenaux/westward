@@ -1282,12 +1282,8 @@ Engine.makeMapPanel = function(){
     var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
     mapPanel.addBackground('bigbg');
     mapPanel.addLegend();
-    var mapInstance = mapPanel.addMap('bigbg_mask',900,380,-1,-1);
-    mapPanel.addButton(950, 0, 'blue','help',null,'',UI.textsData['self_map_help']);
-    // TODO: move in Map.js, method addZoom, positions buttons based on viewWidt/height and
-    // controls enable/disable of buttons based on zoom flag
-    mapPanel.zoomInBtn = mapPanel.addButton(930, 390, 'blue','plus',mapInstance.zoomIn.bind(mapInstance));
-    mapPanel.zoomOutBtn = mapPanel.addButton(920, 420, 'blue','minus',mapInstance.zoomOut.bind(mapInstance));
+    mapPanel.addMap('bigbg_mask',900,380,-1,-1);
+    mapPanel.addButtons();
     return mapPanel;
 };
 
@@ -1334,11 +1330,14 @@ Engine.makeRegionsMenu = function(mapPanel){
 
     menu.addPanel('map',mapPanel);
     var x = 10; // 500
-    var status = menu.addPanel('status',new RegionStatusPanel(x,80,270,150,'region'));
-    var w = 620;
+    var w = 270;
+    var status = menu.addPanel('status',new RegionStatusPanel(x,80,w,150,'region'));
+    status.addButton(w-30, 0, 'blue','help',null,'',UI.textsData['regionstatus_help']);
+    w = 620;
     x = (UI.getGameWidth()-w)/2;
     var missions = menu.addPanel('missions', new MissionsPanel(x,200,w,350,'Missions'),true);
     missions.addButton(w-16,-8,'red','close',missions.hide.bind(missions),'Close');
+    missions.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['missions_help']);
     status.moveUp(4);
     missions.moveUp(4);
 
@@ -1352,6 +1351,7 @@ Engine.makeRegionsMenu = function(mapPanel){
         status.update();
         mapPanel.map.centerOnRegion();
         mapPanel.legend.hide();
+        mapPanel.hideButtons();
     });
     menu.addEvent('onUpdateMap',mapPanel.map.updatePins.bind(mapPanel.map));
     return menu;

@@ -40,6 +40,18 @@ MapPanel.prototype.addLegend = function(){
     this.legend.moveUp(4);
 };
 
+MapPanel.prototype.addButtons = function(){
+    this.zoomInBtn = this.addButton(930, 390, 'blue','plus',this.map.zoomIn.bind(this.map));
+    this.zoomOutBtn = this.addButton(920, 420, 'blue','minus',this.map.zoomOut.bind(this.map));
+    this.help = this.addButton(950, 0, 'blue','help',null,'',UI.textsData['self_map_help']);
+};
+
+MapPanel.prototype.hideButtons = function(){
+    this.zoomInBtn.hide();
+    this.zoomOutBtn.hide();
+    this.help.hide();
+};
+
 MapPanel.prototype.displayInterface = function(){
     if(this.bg) this.bg.setVisible(true);
     this.map.display();

@@ -35,6 +35,7 @@ Panel.prototype.updateCapsule = function(name,text){
 };
 
 Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpText){
+    // TODO: make proper Button class ...
     x += this.x;
     y += this.y;
     var ring = UI.scene.add.sprite(x,y,'UI','ring');
@@ -79,7 +80,13 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
         btn: btn,
         symbol: s,
         ring: ring,
-        zone: zone
+        zone: zone,
+        hide: function(){
+            this.symbol.setVisible(false);
+            this.btn.setVisible(false);
+            this.ring.setVisible(false);
+            this.zone.setVisible(false);
+        }
     };
     this.buttons.push(btnObj);
 

@@ -2028,7 +2028,8 @@ GameServer.dissipateFoW = function(aoi){
 GameServer.updateFoW = function(){
     for(var pid in GameServer.players){
         var player = GameServer.players[pid];
-        player.fieldOfVision.forEach(GameServer.dissipateFoW);
+        // player.fieldOfVision.forEach(GameServer.dissipateFoW);
+        GameServer.dissipateFoW(player.aoi);
     }
     for(var bid in GameServer.buildings){
         var building = GameServer.buildings[bid];

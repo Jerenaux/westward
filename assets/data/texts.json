@@ -33,6 +33,8 @@
   "food_help": "Your food level; decreases over time, increases when you eat. Can speed up your loss of vigor.",
   "health_help": "Your health level, decreases when you fight, increases when resting or consuming healing items. Should be kept above 0!",
   "repair_help": "You can repair any damaged building by providing Timber to it. The progress bar indicates if the building is damaged or fully restored.",
+  "regionstatus_help": "This menu displays some information about the region you are in, as well as a list of missions you can contribute to to help taming the land!",
+  "missions_help": "Missions are goals that all the settlers of a region should pursue. Each time you contribute to a mission, you are rewarded the amount of experience indicated. Missions typically provide experience for multiple classes. Once a mission is fulfilled, contributing to it doesn't reward any more experience.",
 
   "classxp": "XP",
   "class_selection_title": "Pick your path",
