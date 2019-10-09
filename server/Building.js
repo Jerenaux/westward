@@ -50,7 +50,7 @@ function Building(data){
 
     this.shootFrom = buildingData.shootFrom;
 
-    this.owner = data.owner;
+    this.owner = data.owner; // owner ID
     this.ownerName = data.ownerName || 'John Doe';
     this.skipBattleTurn = !buildingData.canFight;
     this.name = buildingData.name;
@@ -260,7 +260,7 @@ Building.prototype.updateRepair = function(){
 
 Building.prototype.setBuilt = function(){
     this.setProperty('built',true);
-    this.updateProd(true); //true = just built
+    this.updateProd(true); //true =  built just now
     this.stats['hp'].setBaseValue(this.stats['hpmax'].getValue());
     this.refreshStats();
     this.save();
@@ -268,6 +268,7 @@ Building.prototype.setBuilt = function(){
         var phrase = ['Construction of ', this.name, ' finished'];
         GameServer.notifyPlayer(this.owner, phrase.join(' '));
     }
+    GameServer.regions[this.region].event('build',GameServer.players[this.owner] || null); // TODO: work out better way
     GameServer.computeFrontier(true);
 };
 

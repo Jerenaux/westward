@@ -15,6 +15,7 @@ function Region(data){
     this.status = undefined;
     this.buildings = [];
     this.players = new Set();
+    this.exploredAreas = new Set();
     this.itemCounts = new Inventory();
     this.food = [0,0];
     this.resources = []; // list of coordinates where static resources are
@@ -75,6 +76,7 @@ Region.prototype.setGoals = function(){
     this.counts = {};
     this.missionTypes = {};
     this.XPtable = {};
+    this.missionLabels = {};
     GameServer.missionsData.missions.forEach(this.addMission, this);
     this.craft.toList().forEach(function(item){
         this.addMission(Utils.getItemMissionData('craftitem:'+item[0],10));
@@ -102,6 +104,7 @@ Region.prototype.addMission = function(mission){
         2: 0,
         3: 0
     };
+    this.missionLabels[mission.count] = mission.type;
     for(var clas in mission.rewards){
         this.XPtable[mission.count][clas] += mission.rewards[clas];
     }
@@ -208,8 +211,9 @@ Region.prototype.event = function(event, player){
         for(var count in this.counts){
             var p = counts_[count];
             var c = this.counts[count];
+            if(count == 'exploration') console.warn('p & c:',p,c);
             if(p[0] < p[1] && c[0] > p[0]){
-                player.addNotif('You contributed to a region mission!');
+                player.addNotif('You contributed to a region mission ('+this.missionLabels[count]+')!');
                 var xp = this.XPtable[count];
                 for(var clas in xp){
                     if(xp[clas] > 0) player.gainClassXP(clas, xp[clas], true);
@@ -315,10 +319,18 @@ Region.prototype.updateFoW = function(){
     console.warn('['+this.name+'] FoW update');
     this.nbAreas = this.aois.length;
     this.explored = 0;
+    var exploredAreas = new Set();
     this.aois.forEach(function(aoi){
-        if(GameServer.fowList.includes(aoi)) this.explored++;
+        if(GameServer.fowList.includes(aoi)){
+            exploredAreas.add(aoi);
+            this.explored++;
+        }
     }, this);
-    console.warn('explored:',this.explored);
+    var diff = Array.from(exploredAreas).filter(function(x) { return !this.exploredAreas.has(x)}.bind(this));
+    console.warn(this.exploredAreas);
+    console.warn(exploredAreas);
+    console.warn('diff:',diff);
+    this.exploredAreas = exploredAreas;
 };
 
 Region.prototype.trim = function(){

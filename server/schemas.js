@@ -11,7 +11,7 @@ let Schemas = {
         type: {type: Number, min: 0, required: true},
         owner: {type: Number, min: 0},
         ownerName: {type: String},
-        inventory: {type: [], set:function(inventory){
+        inventory: {type: mongoose.Schema.Types.Mixed, set:function(inventory){
                 return inventory.toList(true); // true: filter zeroes
             }},
         prices: mongoose.Schema.Types.Mixed,
@@ -19,7 +19,7 @@ let Schemas = {
         built: Boolean,
         civ: Boolean,
         campID: Number,
-        stats: {type: [], set:function(stats){
+        stats: {type: mongoose.Schema.Types.Mixed, set:function(stats){
                 return stats.toList();
         }}
     }),

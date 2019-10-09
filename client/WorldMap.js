@@ -42,7 +42,8 @@ var WorldMap = new Phaser.Class({
         this.setVisible(false);
 
         this.scales = [0.35, 0.5, 1];
-        this.setScale(0.5);
+        this.defaultScale = 0.5;
+        this.setScale(this.defaultScale);
 
         this.center = { // position of map sprite on screen
             x: x,
@@ -268,6 +269,7 @@ var WorldMap = new Phaser.Class({
         this.zoom();
         if(idx == this.scales.length-1) this.getZoomBtn('in').disable();
         if(idx > 0) this.getZoomBtn('out').enable();
+        // this.updateZoomButtons();
     },
 
     zoomOut: function(){
@@ -278,14 +280,41 @@ var WorldMap = new Phaser.Class({
         this.zoom();
         if(idx < this.scales.length-1) this.getZoomBtn('in').enable();
         if(idx == 0) this.getZoomBtn('out').disable();
+        // this.updateZoomButtons();
+    },
+
+    updateZoomButtons: function(){
+        var idx = this.scales.indexOf(this.scaleX);
+        console.warn(this.scales,this.scaleX,idx);
+        if(idx == this.scales.length-1){
+            this.getZoomBtn('in').disable();
+        }else{
+            this.getZoomBtn('in').enable();
+        }
+        if(idx == 0){
+            console.warn('disabling out');
+            this.getZoomBtn('out').disable();
+        }else{
+            this.getZoomBtn('out').enable();
+        }
+    },
+
+    repositionEverything: function(){
+        this.repositionMarkers('displayedPins');
+        this.repositionMarkers('displayedDash');
+        this.positionToponyms();
     },
 
     zoom: function(){
         this.centerMap(); // center on current center ; must be called before positioning pins
-        this.repositionMarkers('displayedPins');
-        this.repositionMarkers('displayedDash');
-        this.positionToponyms();
+        this.repositionEverything();
         // this.computeDragLimits();
+    },
+
+    resetZoom: function(){
+        this.setScale(this.defaultScale);
+        this.zoom();
+        this.updateZoomButtons();
     },
 
     repositionMarkers: function(markers){
@@ -309,9 +338,11 @@ var WorldMap = new Phaser.Class({
     centerOnRegion: function(){
         var r = regionsData[Engine.player.region];
         this.centerMap(r);
+        this.repositionEverything();
     },
 
     centerMap: function(tile){ // Adjusts the anchor, then position it in the center of the screen
+        console.log('centering on ',tile);
         // tile is world coordinates, not map px ; if tile is undefined, then it means recenter on whatever current center (used when zooming)
         var o = {
             x: tile ? tile.x * 2 : this.displayOriginX,
@@ -481,6 +512,8 @@ var WorldMap = new Phaser.Class({
     },
 
     hide: function(){
+        console.warn('Hiding ',(this.minimap ? 'minimap' : 'map'));
+        if(!this.minimap) this.resetZoom();
         this.displayedDash.forEach(function(p){
             p.setVisible(false);
         });

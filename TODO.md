@@ -64,7 +64,9 @@ Packaging
 - Message when entering enemy territory
 
 Bugs:
-- Zoom out in map the display region menu
+- Zoom out in map the display region menu 
+- Wrong enable/disable behavior of zoom buttons
+- Wrong explo XP rewards
 Features:
 - Add Bear + remains
 - Players only clear 1 AOI FoW? Towers clear multiple?

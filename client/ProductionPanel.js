@@ -9,6 +9,9 @@ import Panel from './Panel'
 import UI from './UI'
 import Utils from '../shared/Utils'
 
+import buildingsData from '../assets/data/buildings.json'
+import itemsData from '../assets/data/items.json'
+
 function ProductionPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
     this.texts = [];
@@ -74,7 +77,7 @@ ProductionPanel.prototype.getNextSlot = function(x,y){
 ProductionPanel.prototype.displayInterface = function(){
     var data = Engine.currentBuiling;
 
-    var buildingTypeData = Engine.buildingsData[data.buildingType];
+    var buildingTypeData = buildingsData[data.buildingType];
     var production = buildingTypeData.production;
     var sloty = this.y + 55;
     var yOffset = 0;
@@ -223,7 +226,7 @@ ProdSlot.prototype.checkForPanelOnTop = function(){
 
 ProdSlot.prototype.setUp = function(item, cap, turns, remaining, output){
     if(!this.displayed) console.warn('Setting up slot before displaying it');
-    var itemData = Engine.itemsData[item];
+    var itemData = itemsData[item];
     this.icon.setTexture(itemData.atlas,itemData.frame);
     this.name.setText(itemData.name);
     this.desc = itemData.desc;

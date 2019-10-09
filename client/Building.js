@@ -305,6 +305,10 @@ var Building = new Phaser.Class({
         return this.inventory.getNb(item);
     },
 
+    getGold: function(){
+        return this.gold;
+    },
+
     getTilePosition: function(){
         return {
             x: this.tileX,

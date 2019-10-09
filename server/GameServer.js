@@ -623,16 +623,7 @@ GameServer.onNewPlayer = function(player){
     // player.applyVigorModifier();
 
     const items = [
-        [7,10],
-        [21, 10],
-        [3, 20],
-        [6,1], // dawn
-        // [2, 1],
-        // [19, 1],
-        [20, 17], // arrows
-        // // [45, 10],
-        // // [50, 11],
-        // [51, 1],
+      
     ];
 
     items.forEach(item => {
@@ -1684,7 +1675,6 @@ GameServer.buildPlayerBuilding = function(player,bid,tile){
         document.save(function (err) {
             if (err) return console.error(err);
             GameServer.finalizeBuilding(player,building);
-            GameServer.regions[player.region].event('build',player);
         });
     }
 };

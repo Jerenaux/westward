@@ -112,6 +112,7 @@ Menu.prototype.display = function(){
 };
 
 Menu.prototype.hide = function(){
+    console.warn('Hiding ',this.name);
     if(this.title) this.title.hide();
 
     for(var panel in this.panels){

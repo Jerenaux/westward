@@ -40,8 +40,8 @@
         "skipSea": true,
         "variableGoal": true,
         "rewards": {
-          "0": 3,
-          "3": 10
+          "0": 1,
+          "3": 2
         }
       },
       {
