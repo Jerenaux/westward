@@ -118,7 +118,8 @@ GameServer.readMap = function(mapsPath,test,cb){
             'buildings': GameServer.loadBuildings,
             'items': GameServer.loadItems,
             'markers': GameServer.loadMarkers,
-            'spawn_zones': GameServer.setUpSpawnZones
+            'spawn_zones': GameServer.setUpSpawnZones,
+            'final': GameServer.finalStep,
         };
     }
     GameServer.testcb = cb;
@@ -491,8 +492,13 @@ GameServer.setUpSpawnZones = function(){
         GameServer.spawnZones.push(sz);
     },this);
 
-    GameServer.updateRegions();
     GameServer.updateSZActivity();
+    GameServer.updateStatus();
+};
+
+GameServer.finalStep = function(){
+    GameServer.updateFoW();
+    GameServer.updateRegions();
     GameServer.updateStatus();
 };
 
@@ -2165,50 +2171,6 @@ GameServer.getRegion = function(entity){
     GameServer.regionsCache.add(entity.x,entity.y,closest.id);
     return closest.id;
 };
-
-// GameServer.getRegion = function(entity){
-//     var aoi = GameServer.AOIs[Utils.tileToAOI(entity)];
-//     if(!aoi.region) {
-//         var min = 999999;
-//         var closest = null;
-//         for (var id in GameServer.regions) {
-//             var region = GameServer.regions[id];
-//             var d = Utils.euclidean(region, entity);
-//             if (d < min) {
-//                 min = d;
-//                 closest = region;
-//             }
-//         }
-//         aoi.region = closest.id;
-//     }
-//     return aoi.region;
-// };
-
-/**
- * Compute the degree of rarity of the items in the world.
- * Called by player.getWorldInformation();
- * */
-/*GameServer.getRarity = function(){
-    var rarity = [];
-    // TODO: conf
-    function computeRarity(count){
-        if(count <= 1){
-            return 0;
-        }else if(count <= 10){
-            return 1;
-        }else if(count <= 100){
-            return 2;
-        }else{
-            return 3;
-        }
-    }
-
-    for(var item in GameServer.itemCounts.items){
-        // console.warn(item,GameServer.itemCounts[item],computeRarity(GameServer.itemCounts[item]));
-        rarity.push([item,computeRarity(GameServer.itemCounts.items[item])]);
-    }
-    return rarity;
-};*/
 
 GameServer.notifyPlayer = function(playerID,msg){
     // console.log(playerID);

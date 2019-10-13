@@ -257,8 +257,11 @@ var WorldMap = new Phaser.Class({
     },
 
     getZoomBtn: function(mode){
-        var btnID = (mode == 'in' ? 1 : 2);
-        return this.panel.buttons[btnID].btn;
+        if(mode == 'in'){
+            return this.panel.zoomInBtn.btn;
+        }else{
+            return this.panel.zoomOutBtn.btn;
+        }
     },
 
     zoomIn: function(){
@@ -267,9 +270,9 @@ var WorldMap = new Phaser.Class({
         var newscale = this.scales[idx];
         this.setScale(newscale);
         this.zoom();
-        if(idx == this.scales.length-1) this.getZoomBtn('in').disable();
-        if(idx > 0) this.getZoomBtn('out').enable();
-        // this.updateZoomButtons();
+        // if(idx == this.scales.length-1) this.getZoomBtn('in').disable();
+        // if(idx > 0) this.getZoomBtn('out').enable();
+        this.updateZoomButtons();
     },
 
     zoomOut: function(){
@@ -278,21 +281,19 @@ var WorldMap = new Phaser.Class({
         var newscale = this.scales[idx];        
         this.setScale(newscale);
         this.zoom();
-        if(idx < this.scales.length-1) this.getZoomBtn('in').enable();
-        if(idx == 0) this.getZoomBtn('out').disable();
-        // this.updateZoomButtons();
+        // if(idx < this.scales.length-1) this.getZoomBtn('in').enable();
+        // if(idx == 0) this.getZoomBtn('out').disable();
+        this.updateZoomButtons();
     },
 
     updateZoomButtons: function(){
         var idx = this.scales.indexOf(this.scaleX);
-        console.warn(this.scales,this.scaleX,idx);
         if(idx == this.scales.length-1){
             this.getZoomBtn('in').disable();
         }else{
             this.getZoomBtn('in').enable();
         }
         if(idx == 0){
-            console.warn('disabling out');
             this.getZoomBtn('out').disable();
         }else{
             this.getZoomBtn('out').enable();
@@ -512,7 +513,7 @@ var WorldMap = new Phaser.Class({
     },
 
     hide: function(){
-        console.warn('Hiding ',(this.minimap ? 'minimap' : 'map'));
+        // console.warn('Hiding ',(this.minimap ? 'minimap' : 'map'));
         if(!this.minimap) this.resetZoom();
         this.displayedDash.forEach(function(p){
             p.setVisible(false);

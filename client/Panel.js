@@ -35,7 +35,7 @@ Panel.prototype.updateCapsule = function(name,text){
 };
 
 Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpText){
-    // TODO: make proper Button class ...
+    // TODO: make proper Button class that wraps all of this
     x += this.x;
     y += this.y;
     var ring = UI.scene.add.sprite(x,y,'UI','ring');

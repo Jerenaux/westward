@@ -164,14 +164,7 @@ Region.prototype.update = function(){
     this.updateItemMissions();
     if(this.status != status_) this.setGoals();
     this.updateCounts();
-    // console.warn('['+this.name+'] Status: ',this.status);
-    // console.warn('['+this.name+'] AOIs: ',this.explored,'/',this.aois.length);
-    // console.warn('['+this.name+'] nodes:', this.visible,'/',this.nbNodes);
-    // console.warn('['+this.name+'] Civ buildings:', this.seenCivBuildings,'/',this.civBuildings);
-    // console.warn('['+this.name+'] Player buildings:', this.playerBuildings);
-    // console.warn('['+this.name+'] Iems:', this.itemCounts.toList());
     console.warn('['+this.name+'] Status: ',this.status,' :: ',this.counts);
-    console.warn(this.missionTypes);
 };
 
 Region.prototype.event = function(event, player){
@@ -211,7 +204,6 @@ Region.prototype.event = function(event, player){
         for(var count in this.counts){
             var p = counts_[count];
             var c = this.counts[count];
-            if(count == 'exploration') console.warn('p & c:',p,c);
             if(p[0] < p[1] && c[0] > p[0]){
                 player.addNotif('You contributed to a region mission ('+this.missionLabels[count]+')!');
                 var xp = this.XPtable[count];
@@ -307,6 +299,7 @@ Region.prototype.updateResources = function(){
     console.warn('['+this.name+'] Resources update');
     this.nbNodes = this.sz.length + this.resources.length;
     this.visibleNodes = 0;
+    // console.warn('fowlist:',GameServer.fowList);
     this.resources.forEach(function(loc){
         if(GameServer.isNotInFoW(loc.x, loc.y)) this.visibleNodes++;
     },this);
@@ -327,9 +320,9 @@ Region.prototype.updateFoW = function(){
         }
     }, this);
     var diff = Array.from(exploredAreas).filter(function(x) { return !this.exploredAreas.has(x)}.bind(this));
-    console.warn(this.exploredAreas);
-    console.warn(exploredAreas);
-    console.warn('diff:',diff);
+    // console.warn(this.exploredAreas);
+    // console.warn(exploredAreas);
+    // console.warn('diff:',diff);
     this.exploredAreas = exploredAreas;
 };
 

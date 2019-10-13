@@ -24,8 +24,8 @@
         "count": "resources",
         "variableGoal": true,
         "rewards": {
-          "1": 5,
-          "3": 10
+          "1": 2,
+          "3": 5
         }
       },
       {
@@ -54,8 +54,8 @@
         "count": "civhuts",
         "variableGoal": true,
         "rewards": {
-          "0": 5,
-          "3": 20
+          "0": 3,
+          "3": 5
         }
       },
       {
@@ -68,8 +68,8 @@
         "count": "building:2",
         "goal": 5,
         "rewards": {
-          "0": 30,
-          "2": 5
+          "0": 5,
+          "2": 2
         }
       },
       {
@@ -110,8 +110,8 @@
         "count": "playerfood",
         "goal": 50,
         "rewards": {
-          "0": 10,
-          "3": 10
+          "0": 5,
+          "3": 5
         }
       },
       {
@@ -124,8 +124,8 @@
         "count": "building:4",
         "goal": 3,
         "rewards": {
-          "1": 10,
-          "2": 20
+          "1": 2,
+          "2": 5
         }
       },
       {
@@ -138,8 +138,8 @@
         "count": "building:3",
         "goal": 2,
         "rewards": {
-          "1": 5,
-          "2": 25
+          "1": 2,
+          "2": 5
         }
       },
       {
@@ -152,8 +152,8 @@
         "count": "building:6",
         "goal": 3,
         "rewards": {
-          "1": 10,
-          "2": 20
+          "1": 2,
+          "2": 5
         }
       },
       {
@@ -166,8 +166,8 @@
         "count": "bldfood",
         "goal": 20,
         "rewards": {
-          "0": 10,
-          "3": 10
+          "0": 5,
+          "3": 5
         }
       }
     ]
