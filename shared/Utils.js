@@ -2,11 +2,10 @@
  * Created by Jerome on 11-08-17.
  */
 
-var onServer = (typeof window === 'undefined');
+import World from '../shared/World'
 
-if(onServer){
-    World = require('./World.js').World;
-}
+import itemsData from '../assets/data/items.json'
+
 
 var Utils = {
     colors: {},
@@ -32,7 +31,7 @@ Utils.fonts.fancy = 'belwe';
  * @param {Object|number} tile - {x,y} coordinates of tile, or alternatively the x coordinate only.
  * @param {number} y - The y coordinate of the tile.
  */
-Utils.tileToAOI = function(tile,y){ // input coords in Tiles
+Utils.tileToAOI = function(tile,y){
     var tileX,tileY;
     if(y !== undefined){
         tileX = tile;
@@ -42,6 +41,8 @@ Utils.tileToAOI = function(tile,y){ // input coords in Tiles
         tileY = tile.y;
     }
     if(!World.nbChunksHorizontal) throw Error('Chunk data not initialized');
+    tileX = Utils.clamp(tileX,0,World.worldWidth-1);
+    tileY = Utils.clamp(tileY,0,World.worldHeight-1);
     var top = Math.floor(tileY/World.chunkHeight);
     var left = Math.floor(tileX/World.chunkWidth);
     return (top*World.nbChunksHorizontal)+left;
@@ -304,6 +305,28 @@ Utils.multiTileManhattan = function(A,B){
     return Math.abs(dx)+Math.abs(dy);
 };
 
+Utils.getItemMissionData = function(goal, nb){
+    var mission = goal.split(':');
+    var type = mission[0];
+    var item = mission[1];
+    var itemData = itemsData[item];
+    var verb = type == 'craftitem' ? 'Produce' : 'Gather';
+    return {
+        "type": "Economy",
+        "regionStatus": [2],
+        "name": verb+" "+nb+" "+itemData.name,
+        "desc": "Ensure that at least "+nb+" "+itemData.name+" are available in the region",
+        "atlas": itemData.atlas,
+        "frame": itemData.frame,
+        "count": goal,
+        "goal": nb,
+        "rewards": {
+            "1": 1, //TODO: conf
+            "2": 2
+        }
+    }
+};
+
 Utils.clamp = function(x,min,max){ // restricts a value to a given interval (return the value unchanged if within the interval
     return Math.max(min, Math.min(x, max));
 };
@@ -412,4 +435,35 @@ Array.prototype.previous = function(i){
     return (i > 0 ? this[i-1] : this.last());
 };
 
-if (onServer) module.exports.Utils = Utils;
+if (typeof Object.assign !== 'function') {
+    // Must be writable: true, enumerable: false, configurable: true
+    Object.defineProperty(Object, "assign", {
+        value: function assign(target, varArgs) { // .length of function is 2
+            'use strict';
+            if (target === null || target === undefined) {
+                throw new TypeError('Cannot convert undefined or null to object');
+            }
+
+            var to = Object(target);
+
+            for (var index = 1; index < arguments.length; index++) {
+                var nextSource = arguments[index];
+
+                if (nextSource !== null && nextSource !== undefined) {
+                    for (var nextKey in nextSource) {
+                        // Avoid bugs when hasOwnProperty is shadowed
+                        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                            to[nextKey] = nextSource[nextKey];
+                        }
+                    }
+                }
+            }
+            return to;
+        },
+        writable: true,
+        configurable: true
+    });
+}
+
+// if (onServer) module.exports.Utils = Utils;
+export default Utils;

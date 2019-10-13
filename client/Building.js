@@ -1,20 +1,29 @@
 /**
  * Created by Jerome on 07-10-17.
  */
+import BattleManager from './BattleManager'
+import Client from './Client'
+import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import Inventory from '../shared/Inventory'
+import PFUtils from '../shared/PFUtils'
+import {StatsContainer} from "../shared/Stats"
+import UI from './UI'
+import Utils from '../shared/Utils'
 
-var FOUNDATIONS_ID = 4;
+import buildingsData from '../assets/data/buildings.json'
 
 var Building = new Phaser.Class({
 
     Extends: CustomSprite,
 
     initialize: function Building() {
-        CustomSprite.call(this, Engine.scene, 0, 0, 'buildings_sprites');
+        CustomSprite.call(this, 'Engine', 0, 0, 'buildings_sprites');
         this.entityType = 'building';
     },
 
     setUp: function (data) {
-        var buildingData = Engine.buildingsData[data.type];
+        var buildingData = buildingsData[data.type];
         var sprite = buildingData.sprite;
         if(!data.built && buildingData.foundations) sprite = buildingData.foundations;
 
@@ -83,7 +92,7 @@ var Building = new Phaser.Class({
 
     build: function () {
         this.built = true;
-        var buildingData = Engine.buildingsData[this.buildingType];
+        var buildingData = buildingsData[this.buildingType];
         this.setFrame(buildingData.sprite);
         this.resetDepth();
         this.setInteractiveArea();
@@ -108,7 +117,7 @@ var Building = new Phaser.Class({
 
     unbuild: function(){
         this.built = false;
-        var buildingData = Engine.buildingsData[this.buildingType];
+        var buildingData = buildingsData[this.buildingType];
         this.setFrame(buildingData.foundations);
         this.resetDepth();
         // if(this.accessory) this.accessory.destroy();
@@ -296,6 +305,10 @@ var Building = new Phaser.Class({
         return this.inventory.getNb(item);
     },
 
+    getGold: function(){
+        return this.gold;
+    },
+
     getTilePosition: function(){
         return {
             x: this.tileX,
@@ -398,3 +411,5 @@ var Building = new Phaser.Class({
         // this.resetPipeline();
     }
 });
+
+export default Building

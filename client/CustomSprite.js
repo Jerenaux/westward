@@ -1,12 +1,16 @@
 /**
  * Created by Jerome on 07-10-17.
  */
+import Engine from './Engine'
+import UI from './UI'
+import Utils from '../shared/Utils'
 
 var CustomSprite = new Phaser.Class({
 
     Extends: Phaser.GameObjects.Sprite,
 
     initialize: function CustomSprite (scene, x, y, texture) {
+        scene = (scene == 'UI' ? UI.scene : Engine.scene);
         Phaser.GameObjects.Sprite.call(this, scene, x, y, texture);
         scene.add.displayList.add(this);
         scene.add.updateList.add(this);
@@ -42,6 +46,7 @@ var CustomSprite = new Phaser.Class({
     },
 
     hollow: function(){
+        if(this.hollowed) return;
         this.hollowed = true;
         this.setDepth(this.tileY + 5);
         this.setPipeline('hollow_'+(this.entityType == 'item' ? 'items' : 'moving'));
@@ -56,3 +61,5 @@ var CustomSprite = new Phaser.Class({
         this.updateDepth();
     },
 });
+
+export default CustomSprite;

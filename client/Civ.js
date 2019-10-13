@@ -1,6 +1,12 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 18-06-18.
  */
+import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import NPC from './NPC'
+import OrientationPin from './OrientationPin'
+
+import civsData from '../assets/data/civs.json'
 
 var Civ = new Phaser.Class({
 
@@ -13,7 +19,7 @@ var Civ = new Phaser.Class({
     },
 
     setUp: function(data){
-        var civData = Engine.civsData[data.type];
+        var civData = civsData[data.type];
         this.id = data.id;
 
         Engine.civs[this.id] = this;
@@ -24,14 +30,8 @@ var Civ = new Phaser.Class({
 
         this.setPosition(data.x,data.y);
         this.setTexture('enemy');
-        this.restingFrames = {
-            up: 104,
-            down: 130,
-            left: 117,
-            right: 143
-        };
         this.deathFrame = 265;
-        this.setFrame(this.restingFrames.right,false,false);
+        // this.setFrame(this.restingFrames.right,false,false);
         this.setOrigin(0.2,0.5);
 
         this.battleBoxData = {
@@ -44,9 +44,10 @@ var Civ = new Phaser.Class({
 
         this.setVisible(true);
         this.dead = false;
-        this.name = 'Civ'; //'מִ  ת  נַ  גֵ  ד'
+        this.name = civData.name;//'Civ'; //'מִ  ת  נַ  גֵ  ד'
 
         this.animPrefix = 'enemy';
+        this.faceOrientation();
         this.footprintsFrame = 0;
         this.printsVertOffset = 10;
 
@@ -76,3 +77,5 @@ var Civ = new Phaser.Class({
         this.dead = true;
     }
 });
+
+export default Civ

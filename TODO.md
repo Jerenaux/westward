@@ -21,7 +21,7 @@ Commenting
 Deployment
 Design document
 Testing
-World Building
+Packaging
 
 ## Misc TODO
 - Adapt animations and delays for firearms
@@ -35,7 +35,6 @@ World Building
 - Better notifications
 - Don't disable walk with build panel
 - New movement system
-- Reduce amount of orientation pins
 - add esc shortcut
 - "new" marker
 - Events formatting
@@ -53,51 +52,68 @@ World Building
 - Acc boosting ability
 - Disengage button
 - Social campfires
+- Send individual map marker updates instead of full lists
+- Have towers dissipate more FoW?
+- SZ system for plants, disappears based on harvest frequency
+(-> Remove marker files, have it generated dynamically, etc.)
+- Spawn wolf colors based on N-S axis
+- Animation when hit (player, npc...)
+- No silhouette behind dead trees
+- Improve shape of battle areas
+- Log when killed in battle
+- Message when entering enemy territory
 
 Bugs:
-- Server restarts after disconnect? Monitor closely
-- Come up with smoother silhouette for items
-- Can't find daydream in tutorial (plant icons are misleading)
+- Wrong explo XP rewards
 Features:
-- Test behindness
-- Fight bear
-- Improve legend
-- Check that destroyed entities destroy their orientation pins
-- Gif of bow attack
-- Remove "resting framedefs" from animals atlas, do it based on animations
+- Add Bear + remains
+- Players only clear 1 AOI FoW? Towers clear multiple?
+- Proper specific updates when relevant player actions + XP reward
+- Specify where toponyms are displayed
+- Toggle region names
+- General info: how many regions settled, which regions are the most dangerous/currently contested, which
+regions are the most/least developed, barren/lush based on # nodes...
+- Info on statuses of neighboring regions (hard-coded) + use this to improve getRegion() 
+- Identify resource speciality of regions and incentivize exports
+-> # days since last attack
+-> Conquered / settled based on history
+- Identify AOIs on enemy side of frontier and display warning/permanent danger indicator
+- Bld limit: one under construction at a time, otherwise no limit
+- Display all region names, regardless of FoW? + "???" name until players visit?
+- Restore dragging
+- Button to toggle regions (borders and banner names)
+- Button to toggle legend
+- Add frontier to legend
+- Progress bars for missions
+- Slings
+- Icon for unbuilt building (lower half colored)
+- Toggle markers by click on legend
+- UI to filter on building types, filter on damage
+- Repair missions (craft) (once repair filter on map) for occupied regions
+- Compute rarity per region
+- Icon next to region name in world to indicate status
 - Display item rarity in inventory (check if doesn't conflit with shop)
-- Improve shaders (behindness and contour)
-- Add civ archers and loot arrows from them (+ add loot to civ warriors) w/ probability
-- Add belts?
-- Collective missions menu
--> Start wih basic production quests
-- semi-permanent camp markers (always visible once discovered)
--> Quantify resources nodes on the right side of frontier, 
-production capacity (based on # buildings of a given time) / some kind of "GDP",
-- Make smart missions based on these indicators (+ as many others as possible)
-- Split all per region (also visually)
--> Name regions and compute borders in a Voronoi way by placing invisible region centers
 - Treat all the numerical aspects that abilities can impact on as stats? Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Belt & backpack & gold capacity + corresponding items (incl. defaults)
-- Abilities
-- Daily quests
+- Add bigger quivers, boots
+- Add belts, backpacks, purses etc. as crafting missions
 - Arrow stocks in towers  + make them throw stones when no better ammo
+- Stock missions for occupied regions
+- Abilities
+- Limit some buildings to some abilities (e.g. towers)
+- Daily quests?
+- Set "active quests/missions"
 - Leaderboards
-  
-
-Quests:
-"enemy civ is gonna attack in x days, you should produce x many swords, do this and that..."
-Collective missions (on top of ebb and flow of frontier warfare)
-Rivalry between regions
-
-
+- Add dynamic production missions for:
+bow, (bomb), dawn, dusk, (sword), (gun), (boots), (belt), quiver, (arrow), stone hatchet, bone arrow, (bullet),
+(bullets pouches (all capacities)), stone arrow
+- Add trade missions based on nodes
+- Global notifications for region status change
+ 
+ 
 María:
-- Red bg
-- Color variations of wolf
-- Carcass, blood-tainted grass
-- Footprints
-- Bear anim (walk, attack, die w/ & w/o arrows)
+- Black bears
 - Player anim naked
 -> Look into superimposing equipment programmatically
 -> One basic player overlay for all
@@ -105,10 +121,12 @@ María:
 - Make overlays based on actual game items
 - Vary Civ overlays
 - Add "pick up", "look at map", "check in bag" ... anims
+- Footprints
 - UI improvements
 - Wear and tear and wounds
 - Add taunts and emotes anims
 - More wildlife
+-> Some feathery creature that does melee attacks and drops feathers (remove as pickup object)
 - Diagonal movements 
 
 Sérgio:
@@ -124,6 +142,7 @@ Crafting:
 - Multiply variants of functional items (weapons, storage, ability-related...)
 - Distinguish animal pelts and animal leathers, also based on color
 - Each basic material (plant, pelt, mineral...) must have multiple uses
+- Think about N-S spread
 
 
 
@@ -181,6 +200,7 @@ V1 level:
 Admin
 -----
 Look into push notificatins server (https://www.pushsafer.com/dashboard)
+-> Or Slack notifications
 Improve admin tables
 Flush screenshots
 Make cmd line system
@@ -192,8 +212,13 @@ Secure
 
 Analytics:
 ---------
+- Add info for undefined events
+- Log region crossings
+- Fix event desc about enemy types
 - Log giving food to buildings in particular
 - Log repairs
+- Log submenus
+- Log nb connected in monit: http://pm2.keymetrics.io/docs/usage/process-metrics/#process-metrics
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions
@@ -215,6 +240,8 @@ interactions with buildings, time spent in each individual menu, step at which t
 
 Cleaning:
 --------
+Use ES6 classes
+Speed up server boot time and webpack build
 Performance:
 - Concile the two coexisting menu update systems: the one used by updateSelf and the one used by updateBuilding
 -> All menus have an update() method called on display; upon new server data, only update() the current menu
@@ -252,6 +279,13 @@ Order:
 - Setters/getters everywhere
 - Centralize all texts (incl. stats, equip, and even item descriptions)
 - Remove "longslot" stuff intended for stretching longslots vertically?
+
+Packaging
+---------
+Player accounts and auth
+Landing page
+Wiki (self or check existing platform, Steam...)
+Forum (self or check existing platform, Steam...)
 
 Content:
 -------
@@ -437,12 +471,6 @@ or
 -> Much slower noise variation according to distance (since heard from very far)
 -> Pin disappears after a few seconds
 - Pins for alarm bells (same)
-* Packaging
-- Display nb connected
-- Cheat-proof: proper auth system, lock admin
-https://medium.freecodecamp.org/learn-how-to-handle-authentication-with-node-using-passport-js-4a56ed18e81e
-https://w3layouts.com/validate-login-register-forms-flat-responsive-widget-template/
-- Automate standalone app build (as part of e)
 * Settlement defense
 - Enable commander to build towers
 - Buildings health
@@ -502,9 +530,15 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
-- Move to ES6
+-> Don't load sounds in preload, load in create and don't play them unless found in cache (bonus)
+-> Don't commit compiled files, compile after push and have env variable determine mode
+https://snowbillr.github.io/blog//2018-04-09-a-modern-web-development-setup-for-phaser-3/
+https://github.com/nkholski/phaser3-es6-webpack
+-> Custom Phaser build (bonus)
+https://medium.com/@louigi.verona/reducing-phasers-filesize-custom-phaser-builds-4a0314819a38
 -> https://codeutopia.net/blog/2015/01/06/es6-what-are-the-benefits-of-the-new-features-in-practice/
-- Tool to gather, uglify and compress all relevant source files 
+-> Uglifiy/minify/mangle for production
+-> Maintain Docker image?
 - Desktop app (automated)
 -> https://electronjs.org/docs/tutorial/application-distribution
 - Full CI pipeline: flatten->gather->upload (flatten and gather not necessary for 100% of commits, so need to be able to select them with flags)

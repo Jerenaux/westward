@@ -77,7 +77,7 @@ function hasWhiteNb(image,x,y,diags){
 }
 
 function readImage(blueprint,cb){
-    Jimp.read(path.join(__dirname,'blueprints',blueprint), function (err, image) {
+    Jimp.read(path.join('tools','blueprints',blueprint), function (err, image) {
         if (err) throw err;
         cb(image);
     });

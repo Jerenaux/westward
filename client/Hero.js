@@ -2,11 +2,19 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 23-04-18.
  */
 
-function ClassDataShell(){
-    for(let i = 0; i < 4; i++){
-        this[i] = 0;
-    }
-}
+import BattleManager from './BattleManager'
+import Client from './Client'
+import Engine from './Engine'
+import {EquipmentManager, Equipment} from '../shared/Equipment'
+import Inventory from '../shared/Inventory'
+import Player from './Player'
+import {StatsContainer} from '../shared/Stats'
+import UI from './UI'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
+
+import itemsData from '../assets/data/items.json'
+import regionsData from '../assets/data/regions.json'
 
 let Hero = new Phaser.Class({
     Extends: Player,
@@ -24,7 +32,7 @@ let Hero = new Phaser.Class({
         // data comes from Player.initTrim() server-side
         Player.prototype.setUp.call(this,data);
 
-        this.settlement = data.settlement || 0;
+        this.region = data.region || 0;
         this.buildingMarkers = [];
         this.resourceMarkers = [];
         this.animalMarkers = [];
@@ -32,25 +40,25 @@ let Hero = new Phaser.Class({
         this.conflictMarkers = [];
         this.FoW = [];
         this.frontier = [];
-        this.inventory = new Inventory();
+        this.regions = [];
+        this.inventory = new Inventory(20);
         this.belt = new Inventory(3); //TODO: conf
         this.stats = new StatsContainer();
         this.equipment = new EquipmentManager();
         this.history = [];
 
         this.gold =  0;
-        this.classxp = new ClassDataShell();
-        this.classlvl = new ClassDataShell();
-        this.ap = new ClassDataShell();
+        this.classxp = data.classxp;
+        this.classlvl = data.classlvl;
+        this.ap = data.ap;
         this.name = data.name;
 
-        this.updateRarity([]);
-        // this.updateFoW(data.fow);
+        // this.updateRarity([]);
 
         this.buildRecipes.fromList(Engine.config.defaultBuildRecipes);
 
-        for(let item_id in Engine.itemsData){
-            let item = Engine.itemsData[item_id];
+        for(let item_id in itemsData){
+            let item = itemsData[item_id];
             if(item.basicRecipe) this.craftRecipes.add(item_id,1);
         }
     },
@@ -78,7 +86,10 @@ let Hero = new Phaser.Class({
             'items': this.updateInventory,
             'msgs': this.handleMsgs,
             'notifs': this.handleNotifs,
-            'rarity': this.updateRarity,
+            // 'rarity': this.updateRarity,
+            'region': this.updateRegion,
+            'regionsBoundaries': this.updateRegions,
+            'regionsStatus': this.updateRegionsStatus,
             'resetTurn': BattleManager.resetTurn,
             'resourceMarkers': this.updateResourceMarkers,
             'stats': this.updateStats
@@ -94,7 +105,7 @@ let Hero = new Phaser.Class({
         this.updateEvents.forEach(function (e) {
             Engine.updateMenus(e);
         }, this);
-        if(this.updateEvents.has('map') && Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
+        if(this.updateEvents.has('map') && Engine.miniMap && Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
 
         let battleCallbacks = {
             'battleData': BattleManager.updateBattle
@@ -116,7 +127,7 @@ let Hero = new Phaser.Class({
     needsToCraft: function(item){
         let required = 0;
         let owned = 0;
-        let recipe = Engine.itemsData[item].recipe;
+        let recipe = itemsData[item].recipe;
         for(let itm in recipe){
             required++;
             if(this.hasItem(itm,recipe[itm])) owned++;
@@ -125,7 +136,7 @@ let Hero = new Phaser.Class({
     },
 
     canCraft: function(item, nb){
-        let recipe = Engine.itemsData[item].recipe;
+        let recipe = itemsData[item].recipe;
         for(let itm in recipe){
             if(!this.hasItem(itm,recipe[itm]*nb)) return false;
         }
@@ -141,7 +152,6 @@ let Hero = new Phaser.Class({
 
     getEquippedItem: function(slot){
         return this.equipment.getItem(slot);
-        // return Engine.itemsData[item_id]; // Returns the data of the item equipped at the given slot
     },
 
     hasRangedEquipped: function(){
@@ -151,7 +161,7 @@ let Hero = new Phaser.Class({
 
     getMaxAmmo: function(){
         let container_id = this.equipment.get('range_container');
-        return Engine.itemsData[container_id].capacity;
+        return itemsData[container_id].capacity;
     },
 
     getNbAmmo: function(){
@@ -165,7 +175,7 @@ let Hero = new Phaser.Class({
     getRangedCursor: function(){
         let rangedw = this.getEquippedItemID('rangedw');
         if(rangedw === -1) return 'bow';
-        return (Engine.itemsData[rangedw].ammo === 'quiver' ? 'bow' : 'gun');
+        return (itemsData[rangedw].ammo === 'quiver' ? 'bow' : 'gun');
     },
 
     getStat: function(stat){
@@ -239,7 +249,7 @@ let Hero = new Phaser.Class({
 
         if(!Engine.firstSelfUpdate) {
             items.forEach(function (item) {
-                let sound = Engine.itemsData[item[0]].sound;
+                let sound = itemsData[item[0]].sound;
                 if(sound) Engine.scene.sound.add(sound).play();
             });
         }
@@ -309,6 +319,19 @@ let Hero = new Phaser.Class({
         this.frontier = frontier;
     },
 
+    updateRegion: function(region){
+        this.region = region;
+        Engine.setlCapsule.setText(regionsData[region].name);
+    },
+
+    updateRegions: function(regions){ // update region boundaries
+        this.regions = regions;
+    },
+
+    updateRegionsStatus: function(regions){
+        this.regionsStatus = regions;
+    },
+
     updateGold: function(gold){
         this.gold = gold;
         this.updateEvents.add('gold');
@@ -334,7 +357,7 @@ let Hero = new Phaser.Class({
 
         if(!Engine.firstSelfUpdate) {
             items.forEach(function (item) {
-                let sound = Engine.itemsData[item[0]].sound;
+                let sound = itemsData[item[0]].sound;
                 if(sound) Engine.scene.sound.add(sound).play();
             });
         }
@@ -370,12 +393,12 @@ let Hero = new Phaser.Class({
         // if(Engine.miniMap.displayed) Engine.miniMap.map.updatePins();
     },
 
-    updateRarity: function(rarity){
-        Engine.rarity = {};
-        rarity.forEach(function(itm){
-            Engine.rarity[itm[0]] = itm[1];
-        });
-    },
+    // updateRarity: function(rarity){
+    //     Engine.rarity = {};
+    //     rarity.forEach(function(itm){
+    //         Engine.rarity[itm[0]] = itm[1];
+    //     });
+    // },
 
     updateStats: function(stats){
         for(let i = 0; i < stats.length; i++){
@@ -407,3 +430,5 @@ let Hero = new Phaser.Class({
         this.updateEvents.add('vigor');
     }
 });
+
+export default Hero

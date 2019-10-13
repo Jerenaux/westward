@@ -1,7 +1,7 @@
 /**
  * Created by Jerome on 26-12-16.
  */
-var entities = ['animals','buildings','cells','civs','items','players'];
+var entities = ['animals','buildings','cells','civs','items','players','remains'];
 
 function UpdatePacket(){
     entities.forEach(function(e){

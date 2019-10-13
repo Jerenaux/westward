@@ -1,6 +1,20 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 14-03-18.
  */
+import BattleManager from './BattleManager'
+import Boot from './Boot';
+import Bubble from './Bubble'
+import ClassPanel from './ClassPanel'
+import Client from './Client'
+import Engine from './Engine'
+import InfoPanel from './InfoPanel'
+import Menu from './Menu'
+import NamePanel from './NamePanel'
+import {Stats} from '../shared/Stats'
+import Tooltip from './Tooltip'
+import UICursor from './UICursor'
+import UIHolder from './UIHolder'
+import Utils from '../shared/Utils'
 
 var UI = {
     key: 'UI',
@@ -142,7 +156,7 @@ UI.handleNotifications = function (msgs) {
             duration: 300,
             ease: 'Quad.easeOut',
             onUpdate: function (tween) {
-                notif.updatePosition(notif.x, tween.getValue());
+                notif.updatePosition(notif.x, tween.getValue(),100);
             }
         });
     });
@@ -428,10 +442,11 @@ UI.displayRegionSelectionMenu = function () {
     //Client.requestCampsData();
 
     var w = 400;
-    var h = 220;
-    var panel = new InfoPanel((UI.getGameWidth() - w) / 2, (UI.getGameHeight() - h) / 2, w, h, 'Region selection');
+    var h = 170;
+    var panel = new InfoPanel((UI.getGameWidth() - w) / 2, (UI.getGameHeight() - h) / 2 - 50, w, h, 'Region selection');
     panel.addText(10, 15, UI.textsData['settlement_intro'], null, 14, Utils.fonts.normal);
     panel.addBigButton('Got it');
+    panel.moveUp(2);
     panel.display();
     UI.SSpanel = panel;
 
@@ -439,7 +454,9 @@ UI.displayRegionSelectionMenu = function () {
 
 UI.displayRegions = function (list) {
     for (var e in list.regions) {
-        UI.displayRegion(list.regions[e], list.world);
+        var region = list.regions[e];
+        if(region.starting) UI.displayRegion(region, list.world);
+        // UI.displayRegion(region, list.world);
     }
 };
 
@@ -569,3 +586,5 @@ UI.debugScreen = function () {
     graphics.strokePath();
     graphics.closePath();
 };
+
+export default UI

@@ -2,11 +2,7 @@
  * Created by Jerome on 12-12-17.
  */
 
-var onServer = (typeof window === 'undefined');
-
-if (onServer) {
-    var GameServer = require('../server/GameServer.js').GameServer;
-}
+import itemsData from '../assets/data/items.json'
 
 var Equipment = {
     slots: {
@@ -113,20 +109,14 @@ EquipmentManager.prototype.get = function (slotName) {
 };
 
 /**
- * Return an object containing all the information about the item
- * equipped in a given slot.
+ * Returns the item data of the item equipped at the given slot
  * @param {string} slotName - name of the slot where the item of
- * interest is equiped.
- * @returns {Object} - Object containging data about item.
+ * @returns {Object} - item data of equipped item or {} if nothing equipped
  */
 EquipmentManager.prototype.getItem = function (slotName) {
     var id = this.get(slotName);
-    if (id == -1) return false;
-    if (onServer) {
-        return GameServer.itemsData[id];
-    } else {
-        return Engine.itemsData[id];
-    }
+    if(id == -1) return {};
+    return itemsData[id];
 };
 
 EquipmentManager.prototype.getAmmoContainerType = function () {
@@ -169,8 +159,4 @@ EquipmentManager.prototype.listItems = function () {
     return items;
 };
 
-// re-enable equip from db
-if (onServer) {
-    module.exports.Equipment = Equipment;
-    module.exports.EquipmentManager = EquipmentManager;
-}
+export {Equipment, EquipmentManager}

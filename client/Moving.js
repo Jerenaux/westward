@@ -1,6 +1,13 @@
 /**
  * Created by Jerome on 04-10-17.
  */
+
+import Bubble from './Bubble'
+import Client from './Client'
+import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import PFUtils from '../shared/PFUtils'
+
 var Moving = new Phaser.Class({
 
     Extends: CustomSprite,
@@ -138,7 +145,8 @@ var Moving = new Phaser.Class({
     },
 
     faceOrientation: function(){
-        this.setFrame(this.restingFrames[this.orientation]);
+        // this.setFrame(this.restingFrames[this.orientation]);
+        this.play(this.animPrefix + '_rest_' + this.orientation);
     },
     
     tileByTilePreUpdate: function(tween,targets,startX,startY,endX,endY){
@@ -178,7 +186,6 @@ var Moving = new Phaser.Class({
         this.playSound();
         if(this.isHero){
             Engine.updateAllOrientationPins();
-            Engine.updateBehindness();
             if(Engine.miniMap) Engine.miniMap.follow();
         }else{
             this.manageOrientationPin();
@@ -267,7 +274,8 @@ var Moving = new Phaser.Class({
         this.stopPos = null;
         this.previousOrientation = null;
         this.anims.stop();
-        this.setFrame(this.restingFrames[this.orientation]);
+        // this.setFrame(this.restingFrames[this.orientation]);
+        this.faceOrientation();
 
         if(this.isHero && Client.tutorial){
             TutorialManager.triggerHook('move');
@@ -350,6 +358,51 @@ var Moving = new Phaser.Class({
         Engine.displayHit(this,pos.x,pos.y,20,40,null,true,data.delay);
     },
 
+    setOrientation: function (facing) {
+        this.computeOrientation(this.tileX, this.tileY, facing.x, facing.y);
+        this.faceOrientation();
+    },
+
+    processRangedAttack: function (data) {
+        this.setOrientation({x: data.x, y: data.y});
+
+        // let rangeWeapon = 'attack';
+        //
+        // const ranged_weapon_item = this.getEquippedItem('rangedw');
+        // if (ranged_weapon_item.class && ranged_weapon_item.class === 'bow') {
+        //     rangeWeapon = 'bow';
+        // }
+        //
+        // const ranged_ammo_item = this.getEquippedItem('range_ammo');
+        //
+        // let itemAtlasPool;
+        // // TODO: Maybe get this in utility function
+        // if (ranged_ammo_item.atlas === 'items') {
+        //     itemAtlasPool = Engine.imagePool;
+        // }
+        // if (ranged_ammo_item.atlas === 'items2') {
+        //     itemAtlasPool = Engine.imagePool2;
+        // }
+
+        // TODO: generalize to firearms
+        var itemAtlasPool = Engine.imagePool;
+        var frame = "arrow";
+
+        const animationName = this.animPrefix + '_bow_' + this.orientation;
+        this.play(animationName);
+        var from = {
+            x: this.x,
+            y: this.y - 10
+        };
+        Engine.animateRangeAmmo(
+            frame,
+            from, {x: data.x, y: data.y},
+            this.depth + 1, data.duration,
+            data.delay,
+            itemAtlasPool
+        );
+    },
+
     handleOver: function(){
     },
 
@@ -380,3 +433,5 @@ var Moving = new Phaser.Class({
         return this.dead;
     }
 });
+
+export default Moving

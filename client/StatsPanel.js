@@ -1,6 +1,9 @@
 /**
  * Created by jeren on 10-12-17.
  */
+import Panel from './Panel'
+import UI from './UI'
+import {Stats} from '../shared/Stats'
 
 function StatsPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
@@ -26,7 +29,7 @@ StatsPanel.prototype.addStats = function(){
         this.addStat(this.x+x,this.y+y,stat);
         i++;
     }
-    this.updateStats();
+    // this.updateStats();
 };
 
 StatsPanel.prototype.addStat = function(x,y,s){
@@ -66,15 +69,15 @@ StatsPanel.prototype.addStat = function(x,y,s){
     this.stats[s] = statObj;
 };
 
-StatsPanel.prototype.updateStats = function(){
+StatsPanel.prototype.updateStats = function(player){
     for(var stat in Stats) {
         if (!Stats.hasOwnProperty(stat)) continue;
         var statInfo = Stats[stat];
         if(statInfo.hidden) continue;
-        var value = Engine.player.getStatValue(stat);
+        var value = player.getStatValue(stat);
         var suffix = statInfo.suffix;
         if(suffix) value = value+suffix;
-        if(statInfo.hasMax) value = value+"/"+Engine.player.getStatValue(statInfo.hasMax);
+        if(statInfo.hasMax) value = value+"/"+player.getStatValue(statInfo.hasMax);
         var statObj = this.stats[stat];
         statObj.text.setText(value);
     }
@@ -94,3 +97,5 @@ StatsPanel.prototype.displayStats = function(){
         statObj.zone.setVisible(true);
     }
 };
+
+export default StatsPanel

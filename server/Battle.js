@@ -1,11 +1,11 @@
 /**
  * Created by Jerome on 27-10-17.
  */
-var GameServer = require('./GameServer.js').GameServer;
-var Utils = require('../shared/Utils.js').Utils;
-var GameObject = require('./GameObject.js').GameObject;
-var Pathfinder = require('../shared/Pathfinder.js').Pathfinder;
-var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
+
+import GameServer from './GameServer'
+import Pathfinder from '../shared/Pathfinder'
+import {SpaceMap} from "../shared/SpaceMap";
+import Utils from '../shared/Utils'
 
 var TICK_RATE;
 
@@ -19,8 +19,13 @@ function Battle() {
         'Player': 0
     };
     this.casualties = 0;
-    //this.positions = new SpaceMap(); // positions occupied by fighters (obsolete?)
     this.cells = new SpaceMap(); // all the BattleCell objects, used for battle pathfinding
+    this.bbox = { // max bounds of battle
+        x: 0,
+        y: 0,
+        xx: 0,
+        yy: 0
+    };
 
     this.pathFinder = new Pathfinder(this.cells, 99, false, false, true);
 
@@ -28,11 +33,34 @@ function Battle() {
     this.reset();
 }
 
-Battle.prototype.setCenter = function(x,y){
-    this.center = {
-        x: x,
-        y:y
-    };
+Battle.prototype.addBattleCell = function(x,y,cell){
+    this.cells.add(x,y,cell);
+    if(x < this.bbox.x) this.bbox.x = x;
+    if(y < this.bbox.y) this.bbox.y = y;
+    if(x > this.bbox.xx) this.bbox.xx = x;
+    if(y > this.bbox.yy) this.bbox.yy = y;
+};
+
+Battle.prototype.updateCenter = function(){
+    var xc = Math.floor(this.bbox.x + (this.bbox.xx - this.bbox.x)/2);
+    var yc = Math.floor(this.bbox.y + (this.bbox.yy - this.bbox.y)/2);
+    var l = this.cells.toList();
+    var mind = 999;
+    var mincell = null;
+    for(var i = 0; i < l.length; i++){
+            var dx = Math.abs(xc - l[i].x);
+            var dy = Math.abs(yc - l[i].y);
+            var d = Math.max(dx,dy);
+            if(d < mind){
+                mind = d;
+                mincell = this.cells.get(l[i].x,l[i].y);
+            }
+    }
+    this.center = mincell;
+};
+
+Battle.prototype.getCenter = function(x,y){
+    return this.center;
 };
 
 Battle.prototype.start = function () {
@@ -137,12 +165,12 @@ Battle.prototype.getFightersOrder = function () {
 };
 
 // Remove a fighter from the fight following his death
-Battle.prototype.removeFighter = function (f) {
+Battle.prototype.removeFighter = function (f, attacker) {
     var idx = this.getFighterIndex(f);
     if (idx == -1) return;
     var isTurnOf = this.isTurnOf(f);
     f.endFight(false); // false for not alive
-    f.die();
+    f.die(attacker);
     this.fighters.splice(idx, 1);
     this.updateTimeline();
     //if(f.isPlayer) this.removeFromPosition(f); // if NPC, leave busy for his body
@@ -255,7 +283,8 @@ Battle.prototype.processAction = function (f, data) {
     }
 
     result = result || {};
-    if (f.isPlayer && result.vigor) f.updateVigor(-result.vigor);
+    // if (f.isPlayer && result.vigor) f.updateVigor(-result.vigor);
+    if (f.isPlayer && result.vigor) GameServer.updateVigor(f,'battle_'+action);
     this.setEndOfTurn(result.delay || 0);
 };
 
@@ -333,11 +362,11 @@ Battle.prototype.computeTOF = function (a, b, type) {
     return (Utils.euclidean(shootingPoint, b) / speeds[type]) * 1000;
 };
 
-Battle.prototype.applyDamage = function (f, dmg) {
+Battle.prototype.applyDamage = function (attacker, f, dmg) {
     f.applyDamage(-dmg);
     if (f.getHealth() == 0) {
         if (f.xpReward) this.rewardXP(f.xpReward);
-        this.removeFighter(f);
+        this.removeFighter(f, attacker);
         return true;
     }
     return false;
@@ -371,11 +400,11 @@ Battle.prototype.processAoE = function (f, tx, ty) {
         h: 3
     };
     var damages = [];
-    this.fighters.forEach(function (f) {
-        if (Utils.overlap(rect, f.getRect())) {
-            var dmg = this.computeDamage('bomb', null, f);
-            damages.push([f, dmg]);
-            f.setProperty('hit', {
+    this.fighters.forEach(function (foe) {
+        if (Utils.overlap(rect, foe.getRect())) {
+            var dmg = this.computeDamage('bomb', null, foe);
+            damages.push([foe, dmg]);
+            foe.setProperty('hit', {
                 dmg: dmg,
                 delay: delay
             }); // for the flash and hp display
@@ -384,14 +413,13 @@ Battle.prototype.processAoE = function (f, tx, ty) {
     delay += 100;
     setTimeout(function () {
         damages.forEach(function (d) {
-            var f = d[0];
-            var killed = this.applyDamage(f, d[1]);
+            var foe = d[0];
+            var killed = this.applyDamage(f, foe, d[1]);
             if (killed && f.isPlayer) f.addNotif(f.name + ' killed');
         }, this);
     }.bind(this), delay);
     return {
-        delay: delay,
-        vigor: 1 // TODO: conf + vary
+        delay: delay
     };
 };
 
@@ -450,7 +478,7 @@ Battle.prototype.processAttack = function (attacker, target) {
     }
     setTimeout(function () {
         // console.log('computing outcome');
-        killed = this.applyDamage(target, damage);
+        killed = this.applyDamage(attacker, target, damage);
         if (killed && attacker.isPlayer) attacker.addNotif(target.name + ' ' + (target.isBuilding ? 'destroyed' : 'killed'));
         if (killed && attacker.isCiv && target.isPlayer) attacker.talk('killed_foe');
         if (target.isCiv && attacker.isPlayer) {
@@ -465,8 +493,7 @@ Battle.prototype.processAttack = function (attacker, target) {
         // console.log('done with outcome');
     }.bind(this), delay);
     return {
-        delay: delay,
-        vigor: 1 // TODO: conf + vary
+        delay: delay
     };
 };
 
@@ -506,70 +533,4 @@ Battle.prototype.getCells = function () {
     return this.cells.toList();
 };
 
-module.exports.Battle = Battle;
-
-function BattleCell(x, y, battle) {
-    this.instance = -1;
-    this.updateCategory = 'cells';
-    this.entityCategory = 'Cell';
-    this.id = GameServer.lastCellID++;
-    this.x = x;
-    this.y = y;
-    this.cellsWidth = 1;
-    this.cellsHeight = 1;
-    this.battle = battle;
-    this.setOrUpdateAOI();
-}
-
-BattleCell.prototype = Object.create(GameObject.prototype);
-BattleCell.prototype.constructor = BattleCell;
-
-BattleCell.prototype.getRect = function () {
-    return {
-        x: this.x,
-        y: this.y,
-        w: 1,
-        h: 1
-    }
-};
-
-BattleCell.prototype.getShortID = function () {
-    return 'btl' + this.id;
-};
-
-BattleCell.prototype.trim = function () {
-    return {
-        id: this.id,
-        x: this.x,
-        y: this.y,
-        instance: this.instance
-    };
-};
-
-BattleCell.prototype.getBattleAreaAround = function (cells) {
-    cells = cells || new SpaceMap();
-    for (var x = this.x - 1; x <= this.x + this.w; x++) {
-        for (var y = this.y - 1; y <= this.y + this.h; y++) {
-            if (!GameServer.checkCollision(x, y)) cells.add(x, y);
-        }
-    }
-    return cells;
-};
-
-BattleCell.prototype.getLocationCenter = function () {
-    return {
-        x: this.x,
-        y: this.y
-    };
-};
-
-BattleCell.prototype.remove = function () {};
-
-BattleCell.prototype.canFight = function () {
-    return false;
-};
-BattleCell.prototype.isAvailableForFight = function () {
-    return false;
-};
-
-module.exports.BattleCell = BattleCell;
+export default Battle

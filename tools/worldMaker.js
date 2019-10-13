@@ -3,18 +3,16 @@
  */
 var fs = require('fs');
 var path = require('path');
-var clone = require('clone');
-var xml2js = require('xml2js');
-var config = require('config');
 var Jimp = require("jimp");
 var rwc = require('random-weighted-choice');
 var quickselect = require('quickselect');
 
-var World = require('../shared/World.js').World;
-var Utils = require('../shared/Utils.js').Utils;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
 var Geometry = require('./Geometry.js').Geometry;
 var autopath = require('./autopath');
+
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
 var counter = 0;
 var total = 0;
@@ -120,10 +118,10 @@ WorldMaker.prototype.run = function(){
     }
 
     this.tileset = JSON.parse(fs.readFileSync(path.join(__dirname,'..','assets','tilesets','tileset.json')).toString());
-    this.patterns = JSON.parse(fs.readFileSync(path.join(__dirname,'patterns.json')).toString());
+    this.patterns = JSON.parse(fs.readFileSync(path.join('tools','patterns.json')).toString());
     var dataAssets = path.join(__dirname,'..','assets','data');
     this.itemsData = JSON.parse(fs.readFileSync(path.join(dataAssets,'items.json')).toString());
-    this.biomesData = JSON.parse(fs.readFileSync(path.join(dataAssets,'biomes.json')).toString());
+    this.animalsData = JSON.parse(fs.readFileSync(path.join(dataAssets,'animals.json')).toString());
 
     this.outdir = path.join(__dirname,'..','maps'); // TODO: remove dev.mapsPath etc?
     console.log('Writing to',this.outdir);
@@ -472,8 +470,8 @@ WorldMaker.prototype.plantTree = function(g,pos,type){
 
 WorldMaker.prototype.restoreForest = function(){
     console.log('Restoring existing forest...');
-    nbtrees = 0;
-    var trees = JSON.parse(fs.readFileSync(path.join(__dirname,'blueprints','trees.json')).toString());
+    var nbtrees = 0;
+    var trees = JSON.parse(fs.readFileSync(path.join('tools','blueprints','trees.json')).toString());
     trees.forEach(function(t){
         this.plantTree(t,this.checkPositions(t.x,t.y),t.v);
         nbtrees++;
@@ -543,34 +541,40 @@ WorldMaker.prototype.addMisc = function(){
     console.log(nbadded,' stones added');
 };
 
+WorldMaker.prototype.getAnimalData = function(type){
+    var animalData = this.animalsData[type];
+    if(animalData.inheritFrom !== undefined) animalData = Object.assign(this.animalsData[animalData.inheritFrom],animalData);
+    return animalData;
+};
+
 WorldMaker.prototype.makeSpawnZones = function(){
     this.resourceMarkers = [];
-    var items = this.biomesData.plants;
-    items.forEach(function(item){
-        for(var i = 0; i < item.nbzones; i++){
+    for(var itemID in this.itemsData){
+        var itemData = this.itemsData[itemID];
+        if(!itemData.nbClusters) continue;
+        for(var i = 0; i < itemData.nbClusters; i++){
             var x = Utils.randomInt(0,World.worldWidth-1);
             var y = Utils.randomInt(0,World.worldHeight-1);
             var w = Utils.randomInt(5,World.chunkWidth);
             var h = Utils.randomInt(5,World.chunkHeight);
-            this.makeFloraZone(x,y,w,h,item);
+            this.makeFloraZone(x,y,w,h,itemID,itemData);
         }
-    },this);
+    }
 
-    this.animalsMarkers = [];
-    var animals = this.biomesData.animals;
-    animals.forEach(function(animal){
-        for(var i = 0; i < animal.nbzones; i++){
+    for(var animalID in this.animalsData){
+        var animalData = this.getAnimalData(animalID);
+        for(var i = 0; i < animalData.nbPacks; i++){
             var x = Utils.randomInt(0,World.worldWidth-1);
-            var y = Utils.randomInt(0,World.worldHeight-1);
-            if(!this.collisions.get(x,y)) this.makeAnimalZone(x,y,animal);
+                var y = Utils.randomInt(0,World.worldHeight-1);
+                if(!this.collisions.get(x,y)) this.makeAnimalZone(x,y,animalID);
         }
-    },this);
+    }
 };
 
-WorldMaker.prototype.makeFloraZone = function(x,y,w,h,data){
+WorldMaker.prototype.makeFloraZone = function(x,y,w,h,item,data){
     var contour = [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1],[2,-1]];
     var nb = 0;
-    var nbbushes = this.itemsData[data.item].nbBushes || 4;
+    var nbbushes = data.nbBushes || 4;
     // Look for trees inside the given area
     for(var u = 0; u < w; u++){
         for(var v = 0; v < h; v++){
@@ -580,20 +584,20 @@ WorldMaker.prototype.makeFloraZone = function(x,y,w,h,data){
                 for(var j = 0; j < nbbushes; j++){
                     var c = contour[j];
                     var loc = {x:x+u+c[0],y:y+v+c[1]};
-                    if(data.decor) this.addDecor(loc, data.decor);
-                    this.items.add(loc.x,loc.y,data.item);
+                    if(data.decorFrame) this.addDecor(loc, data.decorFrame);
+                    this.items.add(loc.x,loc.y,item);
                     nb++;
                     // console.log('bush at',loc);
                 }
             }
         }
     }
-    if(nb) this.resourceMarkers.push([Math.floor(x+w/2),Math.floor(y+h/2),data.item]);
+    if(nb) this.resourceMarkers.push([Math.floor(x+w/2),Math.floor(y+h/2),item]);
 };
 
-WorldMaker.prototype.makeAnimalZone = function(x,y,animal){
-    this.animals.add(x,y,animal.animal+':'+animal.group);
-    this.animalsMarkers.push([x,y,animal.animal]);
+WorldMaker.prototype.makeAnimalZone = function(x,y,type){
+    this.animals.add(x,y,type);
+    // this.animalsMarkers.push([x,y,type]);
 };
 
 WorldMaker.prototype.addRandomItem = function(x,y,decor){
@@ -643,10 +647,10 @@ WorldMaker.prototype.writeDataFiles = function(){
         if(err) throw err;
         console.log('Resource markers written');
     });
-    fs.writeFile(path.join(this.outdir,'animalMarkers.json'),JSON.stringify(this.animalsMarkers),function(err){
-        if(err) throw err;
-        console.log('Animal markers written');
-    });
+    // fs.writeFile(path.join(this.outdir,'animalMarkers.json'),JSON.stringify(this.animalsMarkers),function(err){
+    //     if(err) throw err;
+    //     console.log('Animal markers written');
+    // });
     // Items
     fs.writeFile(path.join(this.outdir,'items.json'),JSON.stringify(this.items.toList(true)),function(err){
         if(err) throw err;

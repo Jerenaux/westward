@@ -1,10 +1,9 @@
 /**
  * Created by Jerome on 13-10-17.
  */
-var onServer = (typeof window === 'undefined');
 
 function Inventory(size){
-    this.maxSize = size || 20;
+    this.maxSize = size || 999;
     this.clear();
 }
 
@@ -108,6 +107,7 @@ Inventory.prototype.fromList = function(list){
     for(var i = 0; i < Math.min(list.length,this.maxSize); i++){
         this.add(list[i][0],list[i][1]);
     }
+    return this;
 };
 
-if (onServer) module.exports.Inventory = Inventory;
+export default Inventory

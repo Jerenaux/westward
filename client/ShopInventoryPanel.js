@@ -1,6 +1,14 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 15-03-19.
  */
+import Engine from './Engine'
+import ItemSlot from './ItemSlot'
+import Panel from './Panel'
+import UI from './UI'
+import Utils from '../shared/Utils'
+
+import itemsData from '../assets/data/items.json'
+
 
 var NB_PER_PAGE = 4;
 
@@ -19,15 +27,7 @@ ShopInventoryPanel.prototype.hadAdminButtons = function(){
     return (this.inventory == 'building' || this.inventory == 'crafting')
 };
 
-ShopInventoryPanel.prototype.setInventory = function(inventory){
-    this.inventory = inventory;
-
-    if(this.hadAdminButtons()){
-        var btnsx = this.x + 70;
-        var btnsy = this.starty+15;
-        Engine.addAdminButtons(this,btnsx,btnsy);
-    }
-
+ShopInventoryPanel.prototype.addPagination = function(){
     var emptyMsg = (this.inventory == 'player' ? 'You don\' have any items' : 'The inventory of this shop is empty. Come back later!');
     this.nothingTxt = this.addText(this.width/2,0,emptyMsg);
     this.nothingTxt.setOrigin(0.5,0);
@@ -51,9 +51,9 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
         this.nextPage.setFrame('arrow_pressed');
     }.bind(this));
     this.nextPage.on('pointerup',function(){
-         this.currentPage = Utils.clamp(this.currentPage+1,0,this.nbpages);
-         this.nextPage.setFrame('arrow');
-         this.updateContent();
+        this.currentPage = Utils.clamp(this.currentPage+1,0,this.nbpages);
+        this.nextPage.setFrame('arrow');
+        this.updateContent();
     }.bind(this));
 
     this.previousPage.setInteractive();
@@ -78,6 +78,18 @@ ShopInventoryPanel.prototype.setInventory = function(inventory){
     this.previousPage.setOrigin(0);
 };
 
+ShopInventoryPanel.prototype.setInventory = function(inventory){
+    this.inventory = inventory;
+
+    if(this.hadAdminButtons()){
+        var btnsx = this.x + 70;
+        var btnsy = this.starty+15;
+        Engine.addAdminButtons(this,btnsx,btnsy);
+    }
+
+    this.addPagination();
+};
+
 ShopInventoryPanel.prototype.getInventory = function(){
     if(this.inventory == 'player'){
         return Engine.player.inventory;
@@ -97,7 +109,7 @@ ShopInventoryPanel.prototype.getInventory = function(){
 ShopInventoryPanel.prototype.listItems = function(){
     var items = this.getInventory().toList(true); // true = filter out zeroes
     items.sort(function(a,b){
-        if(Engine.itemsData[a[0]].name < Engine.itemsData[b[0]].name) return -1;
+        if(itemsData[a[0]].name < itemsData[b[0]].name) return -1;
         return 1;
     });
     return items;
@@ -226,3 +238,5 @@ ShopSlot.prototype.setUp = function(action,item,nb){
         Engine.currentMenu.panels['action'].setUp(item,action);
     }.bind(this));
 };
+
+export default ShopInventoryPanel

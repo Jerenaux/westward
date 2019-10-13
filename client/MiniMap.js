@@ -1,6 +1,9 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 27-05-18.
  */
+import Engine from './Engine'
+import UI from './UI'
+import WorldMap from './WorldMap'
 
 function MiniMap(){
     var r = 65;
@@ -14,7 +17,7 @@ function MiniMap(){
     this.ring.setScrollFactor(0);
     this.ring.setVisible(false);
 
-    this.map = new Map(x,y,r,r,0,0,false,true);
+    this.map = new WorldMap(x,y,r,r,0,0,true);
     this.map.addMask(null,{
         type: 'circle',
         x: x,
@@ -48,3 +51,5 @@ MiniMap.prototype.hide = function(){
     this.map.hide();
     this.displayed = false;
 };
+
+export default MiniMap

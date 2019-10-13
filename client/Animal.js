@@ -1,6 +1,13 @@
 /**
  * Created by Jerome on 04-10-17.
  */
+
+import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import NPC from './NPC'
+import OrientationPin from './OrientationPin'
+import Utils from '../shared/Utils'
+
 var Animal = new Phaser.Class({
 
     Extends: NPC,
@@ -19,7 +26,7 @@ var Animal = new Phaser.Class({
             Engine.animals[data.id].remove();
         }
 
-        var animalData = Engine.animalsData[data.type];
+        var animalData = Engine.getAnimalData(data.type);
         this.id = data.id;
 
         Engine.animals[this.id] = this;
@@ -30,7 +37,7 @@ var Animal = new Phaser.Class({
 
         this.setPosition(data.x,data.y);
         this.setTexture(animalData.sprite);
-        this.setFrame(animalData.frame); // TODO: remove, do it based on walk anim
+        // this.setFrame(animalData.frame); // TODO: remove, do it based on walk anim
         if(animalData.origin){
             this.setOrigin(animalData.origin.x,animalData.origin.y);
         }else {
@@ -40,11 +47,11 @@ var Animal = new Phaser.Class({
         this.setVisible(true);
         this.dead = false;
         this.name = animalData.name+' '+this.id;
-        this.animPrefix = animalData.walkPrefix;
+        this.animPrefix = animalData.animPrefix;
+        this.faceOrientation();
         this.footprintsFrame = animalData.footprintsFrame;
         this.printsVertOffset = animalData.printsVertOffset;
         this.printsHorizOffset = animalData.printsHorizOffset;
-        this.restingFrames = animalData.restingFrames;
 
         this.battleBoxData = {
             'atlas': 'battleicons',
@@ -90,3 +97,5 @@ var Animal = new Phaser.Class({
         this.dead = true;
     }
 });
+
+export default Animal

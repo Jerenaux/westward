@@ -1,6 +1,14 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 07-04-18.
  */
+import BigButton from './BigButton'
+import Client from './Client'
+import Engine from './Engine'
+import ItemSprite from './ItemSprite'
+import Panel from './Panel'
+import Utils from '../shared/Utils'
+
+import itemsData from '../assets/data/items.json'
 
 function ItemActionPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
@@ -23,7 +31,7 @@ ItemActionPanel.prototype.constructor = ItemActionPanel;
  * @param {string} inventory - Whether the item was clicked in the backpack or in the belt.
  */
 ItemActionPanel.prototype.setUp = function(itemID, inventory){
-    const data = Engine.itemsData[itemID];
+    const data = itemsData[itemID];
     this.itemID = itemID;
     this.inventory = inventory;
     this.icon.setUp(itemID,data);
@@ -34,9 +42,9 @@ ItemActionPanel.prototype.setUp = function(itemID, inventory){
         this.useButton.enable();
 
         let container_item_id = Engine.player.getEquippedItemID('range_container');
-        const container_item = Engine.itemsData[container_item_id];
+        const container_item = itemsData[container_item_id];
 
-        ammoContainerMatch = (container_item && container_item.container_type === data.container_type);
+        var ammoContainerMatch = (container_item && container_item.container_type === data.container_type);
 
         if(data.isAmmo && !ammoContainerMatch){
             this.useButton.disable();
@@ -78,3 +86,5 @@ ItemActionPanel.prototype.hide = function(){
     this.useButton.hide();
     this.beltButton.hide();
 };
+
+export default ItemActionPanel

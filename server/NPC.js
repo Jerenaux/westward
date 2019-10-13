@@ -2,12 +2,13 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 11-06-18.
  */
 
-var GameServer = require('./GameServer.js').GameServer;
-var Utils = require('../shared/Utils.js').Utils;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
-var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
-var Inventory = require('../shared/Inventory.js').Inventory;
+
+import GameServer from './GameServer'
+import Inventory from '../shared/Inventory'
+import MovingEntity from './MovingEntity'
+import PFUtils from '../shared/PFUtils'
+import Utils from '../shared/Utils'
 
 function NPC(){
     this.isPlayer = false;
@@ -26,15 +27,17 @@ NPC.prototype.constructor = NPC;
 
 NPC.prototype.setLoot = function(loot){
     this.loot = new Inventory(10);
-    //var loot = GameServer.animalsData[this.type].loot;
-    for(var id in loot){
-        this.addToLoot(id,loot[id]);
+    for(var item in loot){
+        var nb = loot[item][0];
+        var p = loot[item][1];
+        if(Utils.randomInt(0,10) < p*10) this.addToLoot(item,nb);
     }
 };
 
 NPC.prototype.addToLoot = function(id,nb){
     this.loot.add(id,nb);
 };
+
 
 // ### Stats ###
 
@@ -61,10 +64,6 @@ NPC.prototype.goToDestination = function(dest){
     this.idle = false;
     this.setPath(path);
     return true;
-};
-
-NPC.prototype.canRange = function(){
-    return false;
 };
 
 NPC.prototype.queueAction = function(action){
@@ -111,8 +110,9 @@ NPC.prototype.findBattlePath = function(dest){
 
 NPC.prototype.attackTarget = function(){
     var data = {};
-    // TODO: accomodate for ranged attacks
-    if(Utils.nextTo(this,this.target)){
+    // console.warn('['+this.getShortID()+'] taking decision');
+    // console.warn('['+this.getShortID()+']',Utils.nextTo(this,this.target), this.canRange());
+    if(Utils.nextTo(this,this.target) || this.canRange()){
         data.action = 'attack';
         data.id = this.target.getShortID();
     }else{
@@ -256,5 +256,4 @@ NPC.prototype.updateTracking = function(){
     this.setPath(path);
 };
 
-
-module.exports.NPC = NPC;
+export default NPC

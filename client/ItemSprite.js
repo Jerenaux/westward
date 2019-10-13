@@ -1,16 +1,18 @@
 /**
  * Created by Jerome on 29-11-17.
  */
-
+import UI from './UI'
 
 var ItemSprite = new Phaser.Class({
 
-    Extends: CustomSprite,
+    Extends: Phaser.GameObjects.Sprite,
 
     initialize: function ItemSprite (x,y) {
         x = x || 0;
         y = y || 0;
-        CustomSprite.call(this, UI.scene, x, y, '');
+        Phaser.GameObjects.Sprite.call(this, UI.scene, x, y, '');
+        UI.scene.add.displayList.add(this);
+        UI.scene.add.updateList.add(this);
 
         this.setScrollFactor(0);
         this.setInteractive();
@@ -60,3 +62,5 @@ var ItemSprite = new Phaser.Class({
         }
     }
 });
+
+export default ItemSprite

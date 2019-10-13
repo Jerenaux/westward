@@ -1,10 +1,18 @@
 /**
  * Created by Jerome on 29-11-17.
  */
+import Engine from './Engine'
+import {Equipment} from "../shared/Equipment";
+import {Stats} from "../shared/Stats";
+import UI from './UI';
+
+import buildingsData from '../assets/data/buildings.json'
+import classData from '../assets/data/classes.json'
+import itemsData from '../assets/data/items.json'
 
 var Tooltip = new Phaser.Class({
 
-    Extends: Phaser.GameObjects. DOMElement,
+    Extends: Phaser.GameObjects.DOMElement,
 
     initialize: function Tooltip(){
         Phaser.GameObjects.DOMElement.call(this, UI.scene, 0, 0);
@@ -13,6 +21,7 @@ var Tooltip = new Phaser.Class({
         this.createFromCache('tooltip');
         this.title = this.getChildByID('tooltip_title');
         this.body = this.getChildByID('tooltip_body');
+        this.rewards = this.getChildByID('rewards');
         this.stat_table = this.getChildByID('stat');
         this.base_stat = this.getChildByID('base');
         this.fatigue_modifier = this.getChildByID('fatigue_modifier');
@@ -51,7 +60,7 @@ var Tooltip = new Phaser.Class({
                 if(bld.isBuilt()) this.setBar(bld.stats['hp'].getValue(),bld.stats['hpmax'].getValue());
                 break;
             case 'buildingdata':
-                var bld = Engine.buildingsData[data.id];
+                var bld = buildingsData[data.id];
                 this.setTitle(bld.name);
                 this.setBody(bld.desc);
                 break;
@@ -61,14 +70,18 @@ var Tooltip = new Phaser.Class({
                 break;
             case 'pickupItem':
                 if(data.id == -1) break;
-                this.setNbOwned(Engine.itemsData[data.id].effects, Engine.player.getItemNb(data.id));
+                this.setNbOwned(itemsData[data.id].effects, Engine.player.getItemNb(data.id));
                 // fall through
             case 'item':
                 if(data.id == -1) break;
-                var item = Engine.itemsData[data.id];
+                var item = itemsData[data.id];
                 this.setTitle(item.name ? item.name : '');
                 this.setBody(item.desc ? item.desc : '');
                 if(item.effects) this.setEffects(item.effects);
+                break;
+            case 'mission':
+                this.setBody(data.desc);
+                this.setMissionReward(data.rewards);
                 break;
             case 'NPC':
                 var npc = data.type == 'civ' ? Engine.civs[data.id] : Engine.animals[data.id];
@@ -98,6 +111,7 @@ var Tooltip = new Phaser.Class({
         this.owned.style.display = 'none';
         this.stat_table.style.display = 'none';
         this.bar.style.display = 'none';
+        this.rewards.style.display = 'none';
     },
 
     setTitle: function(text){
@@ -146,6 +160,16 @@ var Tooltip = new Phaser.Class({
         // console.warn(this.lifebar.style.width);
     },
 
+    setMissionReward: function(rewards){
+        this.rewards.style.display = 'block';
+        var i = 0;
+        for(var classID in rewards){
+            this.getChildByID('xp_'+i).innerHTML = rewards[classID];
+            this.getChildByID('class_'+i).innerHTML = classData[classID].name+' XP';
+            i++;
+        }
+    },
+
     getBodyText: function(){
         return this.body.innerText;
     },
@@ -175,3 +199,5 @@ var Tooltip = new Phaser.Class({
         this.displayed = false;
     }
 });
+
+export default Tooltip;

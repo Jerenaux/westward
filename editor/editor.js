@@ -2,6 +2,13 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 22-12-18.
  */
 
+import Phaser from '../node_modules/phaser/dist/phaser.min.js'
+
+import Chunk from '../client/Chunk'
+import {SpaceMap} from '../shared/SpaceMap'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
+
 Chunk.prototype.postDrawTile = function(x,y,tile,sprite){
     this.tilesMap.add(x-this.x,y-this.y,sprite);
     if(COLL == 'client'){
@@ -52,6 +59,8 @@ Chunk.prototype.getTile = function(x,y){
     return this.tilesMap.get(cx,cy);
 };
 
+Chunk.prototype.addOverlay = function(){}
+
 Chunk.prototype.addCollision = function(cx,cy){
     if (COLL == 'client') Editor.collisions.add(cx, cy, 1);
     var tile = this.getTile(cx, cy);
@@ -60,6 +69,8 @@ Chunk.prototype.addCollision = function(cx,cy){
         this.tintSprite(tile);
     }
 };
+
+Chunk.prototype.removeCollision = function(x,y){}
 
 Chunk.prototype.addResource = function(x,y){}
 
@@ -77,8 +88,6 @@ var Editor = {
     zoomIndex: 1
 };
 
-var tilesetData = {};
-
 Editor.preload = function(){
     this.load.json('master','../maps/master.json');
     this.load.json('collisions','../maps/collisions.json');
@@ -88,9 +97,10 @@ Editor.preload = function(){
 Editor.create = function(){
     Editor.scene = this.scene.scene;
     World.readMasterData(this.cache.json.get('master'));
-    tilesetData.atlas = this.cache.json.get('tileset').frames;
-    tilesetData.config = this.cache.json.get('tileset').config;
-    tilesetData.shorthands = this.cache.json.get('tileset').shorthands;
+    Editor.tilesetData = {};
+    Editor.tilesetData.atlas = this.cache.json.get('tileset').frames;
+    Editor.tilesetData.config = this.cache.json.get('tileset').config;
+    Editor.tilesetData.shorthands = this.cache.json.get('tileset').shorthands;
     Editor.collisions = new SpaceMap();
     if(COLL == 'server') Editor.collisions.fromList(this.cache.json.get('collisions'));
     console.log(Editor.tilesetData);
@@ -176,7 +186,7 @@ Editor.loadJSON = function(path,callback,data){
 };
 
 Editor.addChunk = function(mapData){
-    var chunk = new Chunk(mapData);
+    var chunk = new Chunk(mapData, Editor.tilesetData, Editor.scene);
     Editor.chunks[chunk.id] = chunk;
     if (!Editor.mapDataCache[chunk.id]) Editor.mapDataCache[chunk.id] = mapData;
     Editor.displayedChunks.push(chunk.id);
@@ -204,26 +214,28 @@ Editor.zoom = function(coef){
     Editor.updateEnvironment();
 };
 
-var Engine = Editor;
-
-function f(x,y){
+window.f = function(x,y){
     Editor.centerCamera(x,y);
-}
+};
 
-function add(x,y,image){
+window.zoom = function(inc){
+    Editor.zoom(inc);
+};
+
+window.add = function(x,y,image){
     var id = Utils.tileToAOI({x:x,y:y});
     console.log(id);
     var chunk = Editor.chunks[id];
     //x -= chunk.x;
     //y -= chunk.y;
     chunk.drawImage(x,y,image);
-}
+};
 
-function snap (){
+window.snap = function(){
     game.renderer.snapshot(function(img){
         document.getElementById("render").src = img.src;
     });
-}
+};
 
 var VIEW_WIDTH = 30;
 var VIEW_HEIGHT = 20;

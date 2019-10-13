@@ -1,6 +1,9 @@
 /**
  * Created by jeren on 10-01-18.
  */
+import Panel from './Panel'
+import UI from './UI'
+import WorldMap from './WorldMap'
 
 function MapPanel(x,y,width,height,title,invisible){
     Panel.call(this,x,y,width,height,title,invisible);
@@ -17,10 +20,12 @@ MapPanel.prototype.addBackground = function(texture){
     this.bg.setScrollFactor(0);
     this.bg.setVisible(false);
     this.content.push(this.bg);
+    // this.backdrop = UI.scene.add.rectangle(this.mapx, this.mapy, 1024, 576, 0x000000).setDepth(2);
+    // UI.backdrop = this.backdrop;
 };
 
 MapPanel.prototype.addMap = function(texture,w,h,dragX,dragY){
-    this.map = new Map(this.mapx,this.mapy,w,h,dragX,dragY,true);
+    this.map = new WorldMap(this.mapx,this.mapy,w,h,dragX,dragY,false);
     this.map.panel = this;
     this.map.addMask(texture);
     this.content.push(this.map);
@@ -32,7 +37,19 @@ MapPanel.prototype.addLegend = function(){
     var h = 80;
     this.legend = new LegendPanel(0, UI.getGameHeight()-h, w, h, 'Legend');
     this.legend.addButton(w-16,-8,'red','close',this.legend.hide.bind(this.legend),'Close');
-    this.legend.moveUp(3);
+    this.legend.moveUp(4);
+};
+
+MapPanel.prototype.addButtons = function(){
+    this.zoomInBtn = this.addButton(930, 390, 'blue','plus',this.map.zoomIn.bind(this.map));
+    this.zoomOutBtn = this.addButton(920, 420, 'blue','minus',this.map.zoomOut.bind(this.map));
+    this.help = this.addButton(950, 0, 'blue','help',null,'',UI.textsData['self_map_help']);
+};
+
+MapPanel.prototype.hideButtons = function(){
+    this.zoomInBtn.hide();
+    this.zoomOutBtn.hide();
+    this.help.hide();
 };
 
 MapPanel.prototype.displayInterface = function(){
@@ -102,3 +119,5 @@ LegendPanel.prototype.hide = function(){
         c.setVisible(false);
     });
 };
+
+export default MapPanel

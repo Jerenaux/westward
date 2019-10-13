@@ -2,31 +2,52 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 01-03-18.
  */
 
-var World = require('../shared/World.js').World;
-var GameServer = require('./GameServer.js').GameServer;
-var Utils = require('../shared/Utils.js').Utils;
+import GameServer from './GameServer'
+import Utils from '../shared/Utils'
 
-function SpawnZone(x,y,animal,nb){
+function SpawnZone(x,y,animal){
     this.x = x;
     this.y = y;
     this.aoi = Utils.tileToAOI(this.x,this.y);
+    this.region = GameServer.getRegion(this);
+    GameServer.regions[this.region].addSZ(this);
     this.animal = animal;
-    this.nb = nb;
-    this.max = this.nb*2;
+    var animalData = GameServer.getAnimalData(this.animal);
+    this.max = animalData.packSize.max;
     this.population = 0;
     this.lastUpdate = 0; // How many turns ago did an update take place
+    this.updateActiveStatus();
 
-    for(var i = 0; i < this.nb; i++){
-        this.spawn();
+    if(this.isActive()) {
+        var nb = Utils.randomInt(animalData.packSize.min[0], animalData.packSize.min[1]);
+        for (var i = 0; i < nb; i++) {
+            this.spawn();
+        }
+    }else{
+        // console.log('not active');
     }
 }
 
+SpawnZone.prototype.getMarkerData = function(){
+    return [this.x,this.y,this.animal];
+};
+
+SpawnZone.prototype.updateActiveStatus = function(){
+    var r = 10; // TODO: conf
+    this.active = (GameServer.getEntitiesAt(this.x-r,this.y-r,r*2,r*2,['PlayerBuilding','CivBuilding']).length == 0);
+};
+
+SpawnZone.prototype.isActive = function(){
+    return this.active;
+};
+
 SpawnZone.prototype.update = function(){
     if(!GameServer.isTimeToUpdate('spawnZones')) return;
-    if(GameServer.vision.has(this.aoi)) return;
     if(this.population == this.max) return;
+    if(GameServer.vision.has(this.aoi)) return;
+    if(!this.isActive()) return;
 
-    var animalData = GameServer.animalsData[this.animal];
+    var animalData = GameServer.getAnimalData(this.animal);
     // How many turns must elapse before a spawn event
     var nextUpdate = (this.max - this.population)*animalData.spawnRate;
     if(nextUpdate <= this.lastUpdate){
@@ -38,7 +59,7 @@ SpawnZone.prototype.update = function(){
 };
 
 SpawnZone.prototype.spawn = function(print){
-    if(print) console.log('Spawning 1 ',GameServer.animalsData[this.animal].name,'at',this.x,this.y);
+    if(print) console.log('Spawning 1 ',GameServer.getAnimalData(this.animal).name,'at',this.x,this.y);
     var animal = GameServer.addAnimal(this.x, this.y, this.animal);
     animal.setSpawnZone(this);
     this.population++;
@@ -49,4 +70,4 @@ SpawnZone.prototype.decrement = function(){
     this.population--;
 };
 
-module.exports.SpawnZone = SpawnZone;
+export default SpawnZone

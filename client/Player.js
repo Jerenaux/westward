@@ -1,6 +1,11 @@
 /**
  * Created by Jerome on 04-10-17.
  */
+import BattleManager from './BattleManager'
+import Engine from './Engine'
+import Moving from './Moving'
+import OrientationPin from './OrientationPin'
+
 var Player = new Phaser.Class({
 
     Extends: Moving,
@@ -19,13 +24,8 @@ var Player = new Phaser.Class({
         this.footprintsFrame = 0;
         this.printsVertOffset = 10;
 
-        this.restingFrames = {
-            up: 104,
-            down: 130,
-            left: 117,
-            right: 143
-        };
-        this.setFrame(this.restingFrames.down);
+        // this.setFrame(this.restingFrames.down);
+        this.faceOrientation();
         this.cellsWidth = 1;
         this.cellsHeight = 1;
 
@@ -140,42 +140,6 @@ var Player = new Phaser.Class({
         if (!this.isHero) this.queuePath(path);
     },
 
-    processRangedAttack: function (data) { // TODO: move elsewhere when NPC will be able to range
-        this.setOrientation({x: data.x, y: data.y});
-
-        let rangeWeapon = 'attack';
-
-        const ranged_weapon_item = Engine.player.getEquippedItem('rangedw');
-        if (ranged_weapon_item.class && ranged_weapon_item.class === 'bow') {
-            rangeWeapon = 'bow';
-        }
-
-        const ranged_ammo_item = Engine.player.getEquippedItem('range_ammo');
-
-        let itemAtlasPool;
-        // TODO: Maybe get this in utility function
-        if (ranged_ammo_item.atlas === 'items') {
-            itemAtlasPool = Engine.imagePool;
-        }
-        if (ranged_ammo_item.atlas === 'items2') {
-            itemAtlasPool = Engine.imagePool2;
-        }
-
-        const animationName = this.animPrefix + '_' + rangeWeapon + '_' + this.orientation;
-        this.play(animationName);
-        var from = {
-            x: this.x,
-            y: this.y - 10
-        };
-        Engine.animateRangeAmmo(
-            ranged_ammo_item.frame,
-            from, {x: data.x, y: data.y},
-            this.depth + 1, data.duration,
-            data.delay,
-            itemAtlasPool
-        );
-    },
-
     processBombThrow: function (data) { // TODO: move up to NPC if they'll throw bombs
         this.setOrientation({x: data.x, y: data.y});
         this.play(this.animPrefix + '_attack_' + this.orientation);
@@ -202,11 +166,6 @@ var Player = new Phaser.Class({
         };
     },
 
-    setOrientation: function (facing) {
-        this.computeOrientation(this.tileX, this.tileY, facing.x, facing.y);
-        this.faceOrientation();
-    },
-
     // ### GETTERS ####
 
     getTilePosition: function () {
@@ -220,3 +179,5 @@ var Player = new Phaser.Class({
         return 'P' + this.id;
     }
 });
+
+export default Player

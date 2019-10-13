@@ -1,10 +1,71 @@
 /**
  * Created by Jerome on 26-06-17.
  */
+import AbilitiesPanel from './AbilitiesPanel'
+import AbilityPanel from './AbilityPanel'
+import BattleEquipmentPanel from './BattleEquipmentPanel'
+import Animal from './Animal'
+import BattleManager from './BattleManager'
+import BattleTile from './BattleTile'
+import BigButton from './BigButton'
+import BuildingTitle from './BuildingTitle'
+import BuildPanel from './BuildPanel'
+import Capsule from './Capsule'
+import Boot from './Boot';
+import Building from './Building'
+import CharacterPanel from './CharacterPanel'
+import ChatPanel from './ChatPanel'
+import Chunk from './Chunk'
+import Civ from './Civ'
+import ClassMiniPanel from './ClassMiniPanel'
+import Client from './Client';
+import ConstructionPanel from './ConstructionPanel'
+import CraftingPanel from './CraftingPanel'
+import EquipmentPanel from './EquipmentPanel'
+import Hero from './Hero'
+import {HighlightPipeline, HollowPipeline} from './shaders'
+import InfoPanel from './InfoPanel'
+import Inventory from '../shared/Inventory'
+import InventoryPanel from './InventoryPanel'
+import Item from './Item'
+import ItemActionPanel from './ItemActionPanel'
+import JournalPanel from './JournalPanel'
+import MapPanel from './MapPanel'
+import Menu from './Menu'
+import menuIcon from './menuIcon';
+import MiniMap from './MiniMap'
+import MissionsPanel from './MissionsPanel'
+import Panel from './Panel'
+import Pathfinder from '../shared/Pathfinder'
+import PFUtils from '../shared/PFUtils'
+import Player from './Player'
+import PricesPanel from './PricesPanel'
+import ProductionPanel from './ProductionPanel'
+import RecipesPanel from './RecipesPanel'
+import RegionStatusPanel from './RegionStatusPanel'
+import Remains from './Remains'
+import RepairPanel from './RepairPanel'
+import RespawnPanel from './RespawnPanel'
+import RestPanel from './RestPanel'
+import ShopInventoryPanel from './ShopInventoryPanel'
+import {ShopPanel, ShopGoldPanel} from './ShopPanel'
+import {SpaceMap} from '../shared/SpaceMap';
+import StatsPanel from './StatsPanel'
+import UI from './UI'
+import Utils from '../shared/Utils'
+import World from '../shared/World';
+
+import animalsData from '../assets/data/animals.json'
+import buildingsData from '../assets/data/buildings.json'
+import itemsData from '../assets/data/items.json'
+import regionsData from '../assets/data/regions.json'
+
 var Engine = {
     // TODO: Move to conf?
     tileWidth: 32,
     tileHeight: 32,
+    viewWidth: 32, // tiles; TODO: conf
+    viewHeight: 18, // tiles
 
     markerDepth: 1,
     buildingsDepth: 2,
@@ -32,24 +93,25 @@ var Engine = {
     playerIsInitialized: false
 };
 
-var tilesetData = {};
-
-
 Engine.preload = function() {
     Engine.useTilemaps = false;
 
     this.load.atlas('tileset', 'assets/tilesets/tileset.png', 'assets/tilesets/tileset.json');
 
+    this.load.atlas('remains', 'assets/sprites/remains.png','assets/sprites/remains.json');
+
     // Characters
     this.load.spritesheet('enemy', 'assets/sprites/enemy.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64}); // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
-    // this.load.spritesheet('wolves', 'assets/sprites/animals/wolves.png',{frameWidth:32,frameHeight:32});
-    this.load.spritesheet('wolf', 'assets/sprites/animals/wolf.png',{frameWidth:43,frameHeight:32});
-    this.load.spritesheet('bears', 'assets/sprites/animals/bears2.png',{frameWidth:56,frameHeight:56});
-    this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
-    // this.load.spritesheet('toadmen', 'assets/sprites/animals/toadmen.png',{frameWidth:48,frameHeight:48});
 
-    // #################""
+
+    this.load.spritesheet('graywolf', 'assets/sprites/animals/graywolf.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('blackwolf', 'assets/sprites/animals/blackwolf.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('whitewolf', 'assets/sprites/animals/whitewolf.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('bears', 'assets/sprites/animals/bears.png',{frameWidth:56,frameHeight:56});
+    this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
+
+    // ###################
 
     // Misc
     this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
@@ -68,7 +130,6 @@ Engine.preload = function() {
     // Icons
     this.load.atlas('mapicons', 'assets/sprites/mapicons.png', 'assets/sprites/mapicons.json');
     this.load.atlas('battleicons', 'assets/sprites/battleicons.png', 'assets/sprites/battleicons.json');
-    // this.load.atlas('trayicons', 'assets/sprites/trayicons.png', 'assets/sprites/trayicons.json');
     this.load.atlas('buildingsicons', 'assets/sprites/buildingsicons.png', 'assets/sprites/buildingsicons.json');
 
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
@@ -83,8 +144,6 @@ Engine.preload = function() {
     this.load.image('scrollbgh', 'assets/sprites/scroll.png');
     this.load.image('bigbg', 'assets/sprites/bigbg.png');
     this.load.image('bigbg_mask', 'assets/sprites/bigbg_mask.png');
-    // this.load.image('longscroll', 'assets/sprites/longscroll.png');
-    // this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
     this.load.image('worldmap', 'maps/worldmap.png');
 
     // SFX
@@ -123,17 +182,8 @@ Engine.preload = function() {
     this.load.audio('wind2','assets/sfx/wind2.wav');
     this.load.audio('wind3','assets/sfx/wind3.wav');
 
-    this.load.json('buildings', 'assets/data/buildings.json');
-    this.load.json('itemsData', 'assets/data/items.json');
-    this.load.json('animals', 'assets/data/animals.json');
-    this.load.json('civs', 'assets/data/civs.json');
-
-
     if(Client.tutorial) this.load.json('tutorials', 'assets/data/tutorials.json');
 };
-
-
-
 
 Engine.entityManager = {
     entities: [],
@@ -210,9 +260,10 @@ Engine.create = function(){
     World.readMasterData(masterData);
     Engine.mapDataLocation = Boot.mapDataLocation;
 
-    tilesetData.atlas = Engine.scene.cache.json.get('tileset').frames;
-    tilesetData.config = Engine.scene.cache.json.get('tileset').config;
-    tilesetData.shorthands = Engine.scene.cache.json.get('tileset').shorthands;
+    Engine.tilesetData = {};
+    Engine.tilesetData.atlas = Engine.scene.cache.json.get('tileset').frames;
+    Engine.tilesetData.config = Engine.scene.cache.json.get('tileset').config;
+    Engine.tilesetData.shorthands = Engine.scene.cache.json.get('tileset').shorthands;
 
     Engine.chunks = {}; // holds references to the containers containing the chunks
     Engine.displayedChunks = [];
@@ -237,6 +288,7 @@ Engine.create = function(){
     Engine.animals = {}; // animal.id -> building object
     Engine.buildings = {}; // building.id -> building object
     Engine.items = {};
+    Engine.remains = {};
     Engine.civs = {};
     Engine.battleCells = {}; // cell.id -> cell object
     Engine.battleCellsMap = new SpaceMap();
@@ -246,6 +298,9 @@ Engine.create = function(){
     Engine.entityManager.registerEntityType('item',Item,Engine.items);
     Engine.entityManager.registerEntityType('cell',BattleTile,Engine.battleCells);
     Engine.entityManager.registerEntityType('civ',Civ,Engine.civs);
+    Engine.entityManager.registerEntityType('remain',Remains,Engine.remains);
+
+
 
     Engine.debug = true;
     Engine.showHero = true;
@@ -253,12 +308,7 @@ Engine.create = function(){
     Engine.qtQuads = []; // for debugging
 
     Engine.camera = Engine.scene.cameras.main;
-    Engine.camera.setBounds(0,0,Engine.worldWidth*TILE_WIDTH,Engine.worldHeight*TILE_HEIGHT);
-
-    Engine.buildingsData = Engine.scene.cache.json.get('buildings');
-    Engine.animalsData = Engine.scene.cache.json.get('animals');
-    Engine.civsData = Engine.scene.cache.json.get('civs');
-    Engine.itemsData = Engine.scene.cache.json.get('itemsData');
+    Engine.camera.setBounds(0,0,Engine.worldWidth*Engine.tileWidth,Engine.worldHeight*Engine.tileHeight);
 
     Engine.createMarker();
     Engine.createAnimations();
@@ -284,10 +334,10 @@ Engine.create = function(){
     Engine.resources = new SpaceMap();
 
     Engine.inMenu = false;
-    Engine.inPanel = false;
+    UI.inPanel = false;
     Engine.dead = false;
     Engine.currentMenu = null;
-    Engine.currentPanel = null;
+    UI.currentPanel = null;
 
     Engine.useBlitters = false;
     if(Engine.useBlitters){
@@ -301,9 +351,9 @@ Engine.create = function(){
         Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
     }
 
-    game.renderer.addPipeline('highlight', new HighlightPipeline(game));
-    game.renderer.addPipeline('hollow_items', new HollowPipeline(game));
-    game.renderer.addPipeline('hollow_moving', new HollowPipeline(game));
+    Engine.getGameInstance().renderer.addPipeline('highlight', new HighlightPipeline(Engine.getGameInstance()));
+    Engine.getGameInstance().renderer.addPipeline('hollow_items', new HollowPipeline(Engine.getGameInstance()));
+    Engine.getGameInstance().renderer.addPipeline('hollow_moving', new HollowPipeline(Engine.getGameInstance()));
 
     Engine.created = true;
     Engine.configEngine();
@@ -348,12 +398,7 @@ Engine.initWorld = function(data){
 
     Engine.makeUI();
 
-    // TODO: move
-    var settlements = {
-        0: {name:'New Beginnng'},
-        1: {name:'Hope'}
-    };
-    Engine.setlCapsule.setText(settlements[Engine.player.settlement].name);
+    Engine.setlCapsule.setText(regionsData[data.region].name);
 
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
@@ -377,7 +422,6 @@ Engine.initWorld = function(data){
     }
 
     if(Client.tutorial) TutorialManager.boot(1);
-
 
     // todo: move all to dedicated sound manager
     /*Engine.lastOrientationSound = 0;
@@ -416,61 +460,23 @@ Engine.playLocalizedSound = function(sound,maxVolume,location){
 };
 
 Engine.createAnimations = function(){
-    // TODO: don't hardcode, store in JSON of find a way to infer it
-    // (standardize all spritesheets?)
+    Engine.createHumanoidAnimations('player','hero');
+    Engine.createHumanoidAnimations('enemy','enemy');
 
-    Engine.createAnimation('player_move_right','hero',143,151,15,10,true);
-    Engine.createAnimation('player_move_up','hero',104,112,15,10,true);
-    Engine.createAnimation('player_move_down','hero',130,138,15,10,true);
-    Engine.createAnimation('player_move_left','hero',117,125,15,10,true);
-
-    Engine.createAnimation('player_attack_right','hero',195,200,15,false,true);
-    Engine.createAnimation('player_attack_down','hero',182,187,15,false,true);
-    Engine.createAnimation('player_attack_left','hero',169,174,15,false,true);
-    Engine.createAnimation('player_attack_up','hero',156,161,15,false,true);
-
-    Engine.createAnimation('player_bow_right','hero',247,259,15,false,true);
-    Engine.createAnimation('player_bow_down','hero',234,246,15,false,true);
-    Engine.createAnimation('player_bow_left','hero',221,233,15,false,true);
-    Engine.createAnimation('player_bow_up','hero',208,220,15,false,true);
-
-    // Civ
-    Engine.createAnimation('enemy_move_right','enemy',143,151,15,10,true);
-    Engine.createAnimation('enemy_move_up','enemy',104,112,15,10,true);
-    Engine.createAnimation('enemy_move_down','enemy',130,138,15,10,true);
-    Engine.createAnimation('enemy_move_left','enemy',117,125,15,10,true);
-
-    Engine.createAnimation('enemy_attack_right','enemy',195,200,15,false,true);
-    Engine.createAnimation('enemy_attack_down','enemy',182,187,15,false,true);
-    Engine.createAnimation('enemy_attack_left','enemy',169,174,15,false,true);
-    Engine.createAnimation('enemy_attack_up','enemy',156,161,15,false,true);
-
-    Engine.createAnimation('enemy_bow_right','enemy',247,259,15,false,true);
-    Engine.createAnimation('enemy_bow_down','enemy',234,246,15,false,true);
-    Engine.createAnimation('enemy_bow_left','enemy',221,233,15,false,true);
-    Engine.createAnimation('enemy_bow_up','enemy',208,220,15,false,true);
-
-    // Wolves
-    Engine.createAnimation('wolf_move_down','wolf',0,2,10,true);
-    Engine.createAnimation('wolf_move_left','wolf',7,9,10,true);
-    Engine.createAnimation('wolf_move_right','wolf',14,16,10,true);
-    Engine.createAnimation('wolf_move_up','wolf',21,23,10,true);
-
-    Engine.createAnimation('wolf_attack_down','wolf',28,34,15,false,true);
-    Engine.createAnimation('wolf_attack_left','wolf',35,41,15,false,true);
-    Engine.createAnimation('wolf_attack_right','wolf',42,48,15,false,true);
-    Engine.createAnimation('wolf_attack_up','wolf',49,55,15,false,true);
-
-    Engine.createAnimation('wolf_die_down','wolf',56,58);
-    Engine.createAnimation('wolf_die_left','wolf',63,65);
-    Engine.createAnimation('wolf_die_right','wolf',70,72);
-    Engine.createAnimation('wolf_die_up','wolf',77,79);
+    Engine.createWolfAnimations('graywolf');
+    Engine.createWolfAnimations('blackwolf');
+    Engine.createWolfAnimations('whitewolf');
 
     // Bear
     Engine.createAnimation('bear_move_down','bears',9,11,10,true);
     Engine.createAnimation('bear_move_left','bears',21,23,10,true);
     Engine.createAnimation('bear_move_right','bears',33,35,10,true);
     Engine.createAnimation('bear_move_up','bears',45,47,10,true);
+
+    Engine.createAnimation('bear_rest_down','bears',9,9);
+    Engine.createAnimation('bear_rest_left','bears',21,21);
+    Engine.createAnimation('bear_rest_right','bears',33,33);
+    Engine.createAnimation('bear_rest_up','bears',45,45);
 
     Engine.scene.anims.create({
         key: 'sword',
@@ -508,6 +514,52 @@ Engine.createAnimations = function(){
     });
 };
 
+Engine.createHumanoidAnimations = function(key, texture){
+    // TODO: don't hardcode, store in JSON of find a way to infer it
+    // (standardize all spritesheets?)
+    Engine.createAnimation(key+'_move_right',texture,143,151,15,10,true);
+    Engine.createAnimation(key+'_move_up',texture,104,112,15,10,true);
+    Engine.createAnimation(key+'_move_down',texture,130,138,15,10,true);
+    Engine.createAnimation(key+'_move_left',texture,117,125,15,10,true);
+
+    Engine.createAnimation(key+'_attack_right',texture,195,200,15,false,true);
+    Engine.createAnimation(key+'_attack_down',texture,182,187,15,false,true);
+    Engine.createAnimation(key+'_attack_left',texture,169,174,15,false,true);
+    Engine.createAnimation(key+'_attack_up',texture,156,161,15,false,true);
+
+    Engine.createAnimation(key+'_bow_right',texture,247,259,15,false,true);
+    Engine.createAnimation(key+'_bow_down',texture,234,246,15,false,true);
+    Engine.createAnimation(key+'_bow_left',texture,221,233,15,false,true);
+    Engine.createAnimation(key+'_bow_up',texture,208,220,15,false,true);
+
+    Engine.createAnimation(key+'_rest_down',texture,130,130);
+    Engine.createAnimation(key+'_rest_left',texture,117,117);
+    Engine.createAnimation(key+'_rest_right',texture,143,143);
+    Engine.createAnimation(key+'_rest_up',texture,104,104);
+};
+
+Engine.createWolfAnimations = function(key){
+    Engine.createAnimation(key+'_move_down',key,0,2,10,true);
+    Engine.createAnimation(key+'_move_left',key,7,9,10,true);
+    Engine.createAnimation(key+'_move_right',key,14,16,10,true);
+    Engine.createAnimation(key+'_move_up',key,21,23,10,true);
+
+    Engine.createAnimation(key+'_attack_down',key,28,34,15,false,true);
+    Engine.createAnimation(key+'_attack_left',key,35,41,15,false,true);
+    Engine.createAnimation(key+'_attack_right',key,42,48,15,false,true);
+    Engine.createAnimation(key+'_attack_up',key,49,55,15,false,true);
+
+    Engine.createAnimation(key+'_die_down',key,56,58);
+    Engine.createAnimation(key+'_die_left',key,63,65);
+    Engine.createAnimation(key+'_die_right',key,70,72);
+    Engine.createAnimation(key+'_die_up',key,77,79);
+
+    Engine.createAnimation(key+'_rest_down',key,1,1);
+    Engine.createAnimation(key+'_rest_left',key,8,8);
+    Engine.createAnimation(key+'_rest_right',key,15,15);
+    Engine.createAnimation(key+'_rest_up',key,22,22);
+};
+
 Engine.createAnimation = function(key,texture,start,end,rate,loop,revert){
     rate = rate || 10;
     var config = {
@@ -542,19 +594,51 @@ Engine.updateAllOrientationPins = function(){
     Engine.entityManager.displayLists['civ'].forEach(function(cid){
         Engine.civs[cid].manageOrientationPin();
     });
+    Engine.orientationPins = {
+        'top': {},
+        'left': {},
+        'right': {},
+        'bottom': {}
+    };
     Engine.entityManager.displayLists['item'].forEach(function(iid){
         Engine.items[iid].manageOrientationPin();
     });
+    // Engine.pruneOrientationPins();
     Engine.entityManager.displayLists['player'].forEach(function(pid){
         Engine.players[pid].manageOrientationPin();
     });
+};
+
+Engine.pruneOrientationPins = function(){
+    // TODO: complete
+    for(var side in Engine.orientationPins){
+        if(side != 'right') continue; // TODO: remove
+        for(var item in Engine.orientationPins[side]){
+            var pins = Engine.orientationPins[side];
+            for(var i = 0; i < pins.length; i++){
+                var base = pins[i];
+                for(var j = i+1; j < pins.length; j++) {
+                    var other = pins[j];
+                    // TODO: conf
+                    var d = Math.abs(base.y - other.y);
+                    console.warn(d);
+                    if(d < 20){
+                        other.hide();
+                        pins.splice(j,1);
+                        base += d/2;
+                    }
+                }
+                // if(i >= pins.length) break;
+            }
+        }
+    }
 };
 
 Engine.updateBehindness = function(){
     Engine.entityManager.displayLists['item'].forEach(function(iid){
         Engine.items[iid].manageBehindness();
     });
-}
+};
 
 Engine.makeBuildingTitle = function(){
     Engine.buildingTitle = new BuildingTitle(512,10);
@@ -635,10 +719,8 @@ function SettlementCapsule(x,y){
 SettlementCapsule.prototype.setText = function(text){
     var tx = this.text.width;
     this.text.setText(text);
-    var delta = this.text.width - tx - 20;
-
-    this.slices[0].width += delta;
-    this.slices[1].x -= delta;
+    this.slices[0].width = this.text.width + 60;
+    this.slices[1].x = this.slices[0].x - (this.slices[0].width);///2) - (this.slices[1].width) - 30;
 };
 
 SettlementCapsule.prototype.display = function(){
@@ -719,39 +801,39 @@ Engine.makeUI = function(){
     Engine.faceHolder = UI.scene.add.sprite(x,y,'UI','facebg').setScrollFactor(0).setDepth(2);
     Engine.face = UI.scene.add.sprite(x,y,'faces',0).setScrollFactor(0).setDepth(3);
 
-    Engine.lifeCapsule = new Capsule(37,3,'UI','heart');
-    Engine.lifeCapsule.setHoverText('Vitality',UI.textsData['health_help']);
+    Engine.lifeCapsule = new Capsule(UI.scene,37,3,'UI','heart');
+    Engine.lifeCapsule.setHoverText(UI.tooltip,'Vitality',UI.textsData['health_help']);
     Engine.lifeCapsule.removeLeft();
     Engine.lifeCapsule.display();
     Engine.lifeCapsule.update = function(){
         this.setText(Engine.player.getStatValue('hp')+'/'+Engine.player.getStatValue('hpmax'));
     };
 
-    Engine.goldCapsule = new Capsule(152,3,'UI','gold');
-    Engine.goldCapsule.setHoverText('Gold',UI.textsData['gold_help']);
+    Engine.goldCapsule = new Capsule(UI.scene,152,3,'UI','gold');
+    Engine.goldCapsule.setHoverText(UI.tooltip,'Gold',UI.textsData['gold_help']);
     Engine.goldCapsule.display();
     Engine.goldCapsule.update = function(){
         this.setText(Engine.player.gold || 0); // TODO: add max
     };
     Engine.goldCapsule.update();
 
-    Engine.bagCapsule = new Capsule(228,3,'UI','smallpack');
-    Engine.bagCapsule.setHoverText('Backpack',UI.textsData['backpack_help']);
+    Engine.bagCapsule = new Capsule(UI.scene,228,3,'UI','smallpack');
+    Engine.bagCapsule.setHoverText(UI.tooltip,'Backpack',UI.textsData['backpack_help']);
     Engine.bagCapsule.display();
     Engine.bagCapsule.update = function(){
         this.setText(Engine.player.inventory.size+'/'+Engine.player.inventory.maxSize);
     };
     Engine.bagCapsule.update();
 
-    Engine.vigorCapsule = new Capsule(50,30,'UI','goldenheart');
-    Engine.vigorCapsule.setHoverText('Vigor',UI.textsData['vigor_help']);
+    Engine.vigorCapsule = new Capsule(UI.scene,50,30,'UI','goldenheart');
+    Engine.vigorCapsule.setHoverText(UI.tooltip,'Vigor',UI.textsData['vigor_help']);
     Engine.vigorCapsule.display();
     Engine.vigorCapsule.update = function(){
         this.setText(Engine.player.getStatValue('vigor')+'%');
     };
 
-    Engine.foodCapsule = new Capsule(140,30,'UI','bread');
-    Engine.foodCapsule.setHoverText('Food',UI.textsData['food_help']);
+    Engine.foodCapsule = new Capsule(UI.scene,140,30,'UI','bread');
+    Engine.foodCapsule.setHoverText(UI.tooltip,'Food',UI.textsData['food_help']);
     Engine.foodCapsule.display();
     Engine.foodCapsule.update = function(){
         this.setText(Engine.player.getStatValue('food')+'%');
@@ -771,24 +853,27 @@ Engine.makeUI = function(){
     var statsPanel = new StatsPanel(665,335,330,100,'Stats');
     statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help']);
 
+    var mapPanel = Engine.makeMapPanel();
+
     // Todo: make a 'makerepairpanel()' method similar to 'makepricespanel()'?
-    Engine.repairPanel = new RepairPanel(476,120,500,200,'Repair');
+    Engine.repairPanel = new RepairPanel(476,190,500,200,'Repair');
     Engine.repairPanel.addButton(500-16,-8,'red','close',Engine.repairPanel.hide.bind(Engine.repairPanel),'Close');
     Engine.repairPanel.addButton(460, 8, 'blue','help',null,'',UI.textsData['repair_help']);
-    Engine.repairPanel.moveUp(2);
-    Engine.repairAction = new ShopPanel(670,310,300,100,'Take'); 
+    Engine.repairPanel.moveUp(3);
+    Engine.repairAction = new ShopPanel(670,390,300,100,'Take');
     Engine.repairAction.addButton(300-16,-8,'red','close',Engine.repairAction.hide.bind(Engine.repairAction),'Close');
     Engine.repairAction.moveUp(2);
 
     Engine.menus = {
-        'abilities': Engine.makeAbilitiesMenu(),
+        // 'abilities': Engine.makeAbilitiesMenu(),
         'battle': Engine.makeBattleMenu(),
         'build': Engine.makeBuildMenu(),
         'character': Engine.makeCharacterMenu(),
         'construction': Engine.makeConstructionMenu(),
         'crafting': Engine.makeCraftingMenu(),
         'inventory': Engine.makeInventory(statsPanel),
-        'map': Engine.makeMapMenu(),
+        'map': Engine.makeMapMenu(mapPanel),
+        'missions': Engine.makeRegionsMenu(mapPanel),
         //'messages': Engine.makeMessagesMenu(),
         'production': Engine.makeProductionMenu(),
         'respawn': Engine.makeRespawnMenu(),
@@ -802,7 +887,7 @@ Engine.makeUI = function(){
     Engine.addMenu(967,150,'menu_map',Engine.menus.map,855,73);
     Engine.addMenu(922,150,'menu_backpack',Engine.menus.inventory,815,73);
     Engine.addMenu(884,130,'menu_dude',Engine.menus.character,775,73);
-    //Engine.addMenu(863,95,'menu_flag',Engine.menus.inventory,735,73);
+    Engine.addMenu(863,95,'menu_flag',Engine.menus.missions,735,73);
     Engine.addMenu(20,60,'shovel',Engine.menus.build,-100,60);
 
     Engine.makeBattleUI();
@@ -828,76 +913,7 @@ Engine.makeUI = function(){
     );*/
 };
 
-menuIcon = function(x,y,icon,menu,tox,toy){
-    this.fromx = x;
-    this.fromy = y;
-    this.tox = tox;
-    this.toy = toy;
-    this.bg = UI.scene.add.sprite(x,y,'UI','holder').setScrollFactor(0).setDepth(2).setInteractive();
-    this.icon = UI.scene.add.sprite(x,y,'items2',icon).setScrollFactor(0).setDepth(2); // bubble down to bg
-    this.bg.setDepth(4);
-    this.icon.setDepth(5);
-    this.bg.on('pointerup',function(){
-        menu.toggle();
-        if(Engine.bldRect) Engine.bldUnclick(true);
-    });
-    var bg_ = this.bg;
-    this.bg.on('pointerover',function(){
-        UI.tooltip.updateInfo('free',{title:menu.name});
-        UI.tooltip.display();
-        bg_.setFrame('holder_over');
-    });
-    //this.bg.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
-    this.bg.on('pointerout',function(){
-        UI.tooltip.hide();
-        bg_.setFrame('holder');
-    });
-    this.displayed = true;
-};
 
-menuIcon.prototype.toggle = function(){
-    if(this.displayed){
-        if(Engine.inBuilding || (Engine.currentMenu && Engine.currentMenu.fullHide)){
-            this.fullhide();
-        }else {
-            this.hide();
-        }
-    }else{
-        this.display();
-    }
-};
-
-menuIcon.prototype.display = function(){
-    this.bg.setVisible(true);
-    this.icon.setVisible(true);
-    UI.scene.tweens.add(
-        {
-            targets: [this.bg,this.icon],
-            x: this.fromx,
-            y: this.fromy,
-            duration: 200
-        }
-    );
-    this.displayed = true;
-};
-
-menuIcon.prototype.hide = function(){
-    this.displayed = false;
-    UI.scene.tweens.add(
-        {
-            targets: [this.bg,this.icon],
-            x: this.tox,
-            y: this.toy,
-            duration: 300
-        }
-    );
-};
-
-menuIcon.prototype.fullhide = function(){
-    this.bg.setVisible(false);
-    this.icon.setVisible(false);
-    this.displayed = false;
-};
 
 Engine.addMenu = function(x,y,icon,menu,tox,toy){
     Engine.menuIcons.push(new menuIcon(x,y,icon,menu,tox,toy));
@@ -1126,7 +1142,7 @@ Engine.makeProductionMenu = function(){
     var productionPanel = new ProductionPanel(x,y,w,h);
     productionPanel.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['prod_help']);
     var gold = productionPanel.addCapsule('gold',20,20,'999','gold');
-    gold.setHoverText('Building gold',UI.textsData['shopgold_help']);
+    gold.setHoverText(UI.tooltip,'Building gold',UI.textsData['shopgold_help']);
     production.addPanel('production',productionPanel);
 
     var action = new ShopPanel(212,440,300,100,'Take',true); // true = not shop, hack
@@ -1173,7 +1189,7 @@ Engine.makeConstructionMenu = function(){
     progress.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['progress_help']);
     constr.addPanel('progress',progress);
     var gold = progress.addCapsule('gold',20,-9,'999','gold');
-    gold.setHoverText('Building gold',UI.textsData['shopgold_help']);
+    gold.setHoverText(UI.tooltip,'Building gold',UI.textsData['shopgold_help']);
 
     var aw = 300;
     var action = constr.addPanel('action',new ShopPanel(212,390,aw,100,'Give',true),true);
@@ -1262,22 +1278,96 @@ Engine.makeMessagesMenu = function(){
     return menu;
 };
 
-Engine.makeMapMenu = function(){
+Engine.makeMapPanel = function(){
+    var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
+    mapPanel.addBackground('bigbg');
+    mapPanel.addLegend();
+    mapPanel.addMap('bigbg_mask',900,380,-1,-1);
+    mapPanel.addButtons();
+    return mapPanel;
+};
+
+Engine.computeMissionGoal = function(mission){
+    // TODO: conf/JSON
+    var region = Engine.player.regionsStatus[Engine.player.region];
+    switch(mission.goal){
+        case 'resources':
+            return Math.ceil(region.resources[1]/3); // A third of available nodes
+        case 'exploration':
+            return Math.ceil(region.exploration[1]/2); // half the AOIs
+        case 'civhuts':
+            return Math.ceil(region.civs[1]/2); // half the enemy blds
+    }
+};
+
+Engine.computeMissionActual = function(mission){
+    var region = Engine.player.regionsStatus[Engine.player.region];
+    switch(mission.count.split(':')[0]){
+        case 'allbuildings':
+            return region.totalbuildings;
+        case 'bldfood':
+            return region.food[1];
+        case 'building':
+            return region.buildings[mission.count.split(':')[1]] || 0;
+        case 'civhutkilled':
+            return region.civCasualties[1];
+        case 'civhuts':
+            return region.civs[0];
+        case 'civkilled':
+            return region.civCasualties[0];
+        case 'item':
+            var counts = new Inventory().fromList(region.itemCounts);
+            return (counts.getNb(mission.count.split(':')[1]));
+        case 'playerfood':
+            return region.food[0];
+    }
+};
+
+Engine.makeRegionsMenu = function(mapPanel){
+    var menu = new Menu('Regions');
+    menu.log = true;
+    menu.hidePinHover = true;
+
+    menu.addPanel('map',mapPanel);
+    var x = 10; // 500
+    var w = 270;
+    var status = menu.addPanel('status',new RegionStatusPanel(x,80,w,150,'region'));
+    status.addButton(w-30, 0, 'blue','help',null,'',UI.textsData['regionstatus_help']);
+    w = 620;
+    x = (UI.getGameWidth()-w)/2;
+    var missions = menu.addPanel('missions', new MissionsPanel(x,200,w,350,'Missions'),true);
+    missions.addButton(w-16,-8,'red','close',missions.hide.bind(missions),'Close');
+    missions.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['missions_help']);
+    status.moveUp(4);
+    missions.moveUp(4);
+
+    menu.beforeAll(function(){
+        //var offset = (regionsData[Engine.player.region].x > 600 ? 120 : -120);
+        //mapPanel.map.center.x = 510+offset;
+        mapPanel.map.setControls(false);
+    });
+
+    menu.addEvent('onOpen',function(){
+        status.update();
+        mapPanel.map.centerOnRegion();
+        mapPanel.legend.hide();
+        mapPanel.hideButtons();
+    });
+    menu.addEvent('onUpdateMap',mapPanel.map.updatePins.bind(mapPanel.map));
+    return menu;
+};
+
+Engine.makeMapMenu = function(mapPanel){
     var map = new Menu('World Map');
     map.log = true;
     map.hook = 'map';
     map.setSound(Engine.scene.sound.add('page_turn2'));
-    var mapPanel = map.addPanel('map',new MapPanel(10,100,1000,380,'',true)); // true = invisible
-    // mapPanel.addBackground('longscroll');
-    mapPanel.addBackground('bigbg');
-    mapPanel.addLegend();
-    // var mapInstance = mapPanel.addMap('radiallongrect',900,380,-1,-1);
-    var mapInstance = mapPanel.addMap('bigbg_mask',900,380,-1,-1);
-    mapPanel.addButton(950, 0, 'blue','help',null,'',UI.textsData['self_map_help']);
-    // TODO: move in Map.js, method addZoom, positions buttons based on viewWidt/height and
-    // controls enable/disable of buttons based on zoom flag
-    mapPanel.zoomInBtn = mapPanel.addButton(930, 390, 'blue','plus',mapInstance.zoomIn.bind(mapInstance));
-    mapPanel.zoomOutBtn = mapPanel.addButton(920, 420, 'blue','minus',mapInstance.zoomOut.bind(mapInstance));
+    map.addPanel('map',mapPanel);
+
+    map.beforeAll(function(){
+        mapPanel.map.center.x = 510;
+        mapPanel.map.setControls(true);
+    });
     map.addEvent('onUpdateMap',mapPanel.map.updatePins.bind(mapPanel.map));
     return map;
 };
@@ -1325,12 +1415,12 @@ Engine.makeTradeMenu = function(){
     var client = trade.addPanel('client',new ShopInventoryPanel(center-w-space,y,w,h,'You'));
     client.setInventory('player');
     var gold = client.addCapsule('gold',120,-9,'999','gold');
-    gold.setHoverText('Your gold',UI.textsData['gold_help']);
+    gold.setHoverText(UI.tooltip,'Your gold',UI.textsData['gold_help']);
     client.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['sell_help']);
     var shop =  trade.addPanel('shop',new ShopInventoryPanel(center+space,y,w,h,'Shop'));
     shop.setInventory('building');
     var shopgold = shop.addCapsule('gold',100,-9,'999','gold');
-    shopgold.setHoverText('Shop gold',UI.textsData['shopgold_help']);
+    shopgold.setHoverText(UI.tooltip,'Shop gold',UI.textsData['shopgold_help']);
     shop.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help']);
     w = 300;
     var x = (Engine.getGameConfig().width-w)/2;
@@ -1391,7 +1481,7 @@ Engine.makeCraftingMenu = function(){
     var recipes = crafting.addPanel('shop',new RecipesPanel(combix+combiw+space,y,recipesw,h,'Recipes'));
     recipes.setInventory('crafting');
     var gold = recipes.addCapsule('gold',120,-9,'999','gold');
-    gold.setHoverText('Workshop gold',UI.textsData['shopgold_help']);
+    gold.setHoverText(UI.tooltip,'Workshop gold',UI.textsData['shopgold_help']);
     recipes.addButton(recipesw-30, 8, 'blue','help',null,'',UI.textsData['recipes_help']);
 
     var combi = crafting.addPanel('combi',new CraftingPanel(combix,y,combiw,h,'Crafting'));
@@ -1449,7 +1539,7 @@ Engine.makeBuildMenu = function(){
 };
 
 Engine.bldClick = function(){
-    var bld = Engine.buildingsData[this.bldID];
+    var bld = buildingsData[this.bldID];
     Engine.currentMenu.hide();
 
     Engine.hideMarker();
@@ -1464,7 +1554,6 @@ Engine.bldClick = function(){
 Engine.bldUnclick = function(shutdown){
     if(!Engine.bldRect.collides && !shutdown) {
         var id = Engine.bldRect.bldID;
-        //var bld = Engine.buildingsData[id];
         var pos = Engine.bldRect.getBottomLeft();
         pos.x = pos.x / 32;
         pos.y = (pos.y / 32) - 1;
@@ -1514,7 +1603,7 @@ Engine.makeInventory = function(statsPanel){
     items.setInventory('player',15,true,Engine.backpackClick);
 
     var gold = items.addCapsule('gold',130,-9,'999','gold');
-    gold.setHoverText('Gold',UI.textsData['gold_help']);
+    gold.setHoverText(UI.tooltip,'Gold',UI.textsData['gold_help']);
     items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help']);
 
     inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,120),true);
@@ -1532,7 +1621,9 @@ Engine.makeInventory = function(statsPanel){
     inventory.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
     inventory.addEvent('onUpdateInventory',items.updateInventory.bind(items));
     inventory.addEvent('onUpdateBelt',belt.updateInventory.bind(belt));
-    inventory.addEvent('onUpdateStats',statsPanel.updateStats.bind(statsPanel));
+    inventory.addEvent('onUpdateStats',function(){
+        statsPanel.updateStats(Engine.player);
+    });
     inventory.addEvent('onUpdateGold',function(){
         items.updateCapsule('gold',Engine.player.gold);
     });
@@ -1540,7 +1631,7 @@ Engine.makeInventory = function(statsPanel){
         equipment.updateEquipment();
         items.updateInventory();
         belt.updateInventory();
-        statsPanel.updateStats();
+        statsPanel.updateStats(Engine.player);
         items.updateCapsule('gold',Engine.player.gold);
     });
     return inventory;
@@ -1665,11 +1756,11 @@ Engine.loadJSON = function(path,callback,data){
 };
 
 Engine.drawChunk = function(mapData,id){
-    var chunk = new Chunk(mapData, id, 1);
+    var chunk = new Chunk(mapData, Engine.tilesetData, Engine.scene);
     Engine.chunks[chunk.id] = chunk;
     if (!Engine.mapDataCache[chunk.id]) Engine.mapDataCache[chunk.id] = mapData;
-    //chunk.drawLayers();
     Engine.displayedChunks.push(chunk.id);
+    Engine.updateBehindness();
 };
 
 Engine.removeChunk = function(id){
@@ -1816,10 +1907,10 @@ Engine.getMouseCoordinates = function(pointer){
 };
 
 Engine.isInView = function(x,y){
-    if(x < Engine.player.tileX - VIEW_WIDTH/2) return false;
-    if(x >= Engine.player.tileX + VIEW_WIDTH/2) return false;
-    if(y < Engine.player.tileY - VIEW_HEIGHT/2) return false;
-    if(y >= Engine.player.tileY + VIEW_HEIGHT/2) return false;
+    if(x < Engine.player.tileX - Engine.viewWidth/2) return false;
+    if(x >= Engine.player.tileX + Engine.viewWidth/2) return false;
+    if(y < Engine.player.tileY - Engine.viewHeight/2) return false;
+    if(y >= Engine.player.tileY + Engine.viewHeight/2) return false;
     return true;
 };
 
@@ -1868,12 +1959,22 @@ Engine.updateSelf = function(data){
 Engine.update = function(){
 
 };
+//TODO: compute once
+Engine.getAnimalData = function(type){
+    var animalData = animalsData[type];
+    if(!animalData){
+        console.warn('ERROR: no animal data for animal',type);
+        return {};
+    }
+    if(animalData.inheritFrom !== undefined) animalData = Object.assign(animalsData[animalData.inheritFrom],animalData);
+    return animalData;
+};
 
 // Processes the global update packages received from the server
 Engine.updateWorld = function(data){  // data is the update package from the server
     //console.log(data);
     // TODO: store client/server-shared list somewhere
-    var entities = ['animal','building','cell','civ','item','player'];
+    var entities = ['animal','building','cell','civ','item','player','remain'];
 
     entities.forEach(function(e){
         var news = data['new'+e+'s'];
@@ -1944,7 +2045,9 @@ Engine.updateMenus = function(category){
         'stats': Engine.capsules,
         // 'vigor': Engine.vigorCapsule
     };
-    if(category in capsulesMap) capsulesMap[category].update();
+    if(category in capsulesMap){
+        if(capsulesMap[category]) capsulesMap[category].update();
+    }
 };
 
 Engine.inThatBuilding = function(id){
@@ -1965,7 +2068,7 @@ Engine.addPlayer = function(data){
 };
 
 Engine.getTilesetFromTile = function(tile){
-    if(Engine.tilesetMap.hasOwnProperty(tile)) return Engine.tile
+    if(Engine.tilesetMap.hasOwnProperty(tile)) return Engine.tile;
     setMap[tile];
     for(var i = 0; i < Engine.tilesets.length; i++){
         if(tile < Engine.tilesets[i].firstgid){
@@ -1982,7 +2085,7 @@ Engine.enterBuilding = function(id){
     var building = Engine.buildings[id];
     Engine.inBuilding = true;
     Engine.currentBuiling = building; // used to keep track of which building is displayed in menus
-    var buildingData = Engine.buildingsData[building.buildingType];
+    var buildingData = buildingsData[building.buildingType];
 
     var mainMenu;
     if(building.built == true) {
@@ -2031,7 +2134,7 @@ Engine.countIcons = function(){
 };
 
 Engine.processNPCClick = function(target){
-    if(Engine.inPanel) return;
+    if(UI.inPanel) return;
     if(target.dead){
         var action = target.entityType == 'animal' ? 2 : 4;
         Engine.player.setDestinationAction(action,target.id,target.tileX,target.tileY); // 2 for NPC
@@ -2042,7 +2145,7 @@ Engine.processNPCClick = function(target){
 };
 
 Engine.processItemClick = function(target){
-    if(Engine.inPanel) return;
+    if(UI.inPanel) return;
     Engine.player.setDestinationAction(3,target.id,target.tileX,target.tileY); // 3 for item
     Engine.computePath({x:target.tileX,y:target.tileY},true);
 };
@@ -2139,19 +2242,19 @@ Engine.closePanel = function(){this.hide();};
 Engine.togglePanel = function(){ // When clicking on a player/building/animal, toggle the corresponding panel visibility
     if(Engine.inMenu) return;
     if(this.panel.displayed){
-        Engine.inPanel = false;
-        Engine.currentPanel = null;
+        UI.inPanel = false;
+        UI.currentPanel = null;
     }else {
-        if(Engine.inPanel) Engine.currentPanel.hide();
-        Engine.inPanel = true;
-        Engine.currentPanel = this.panel;
+        if(UI.inPanel) UI.currentPanel.hide();
+        UI.inPanel = true;
+        UI.currentPanel = this.panel;
     }
     this.panel.toggle();
 };
 
 Engine.recipeClick = function(){
     Engine.menus['crafting'].panels['combi'].setUp(this.itemID);
-    var sound = Engine.itemsData[this.itemID].sound;
+    var sound = itemsData[this.itemID].sound;
     if(sound) Engine.scene.sound.add(sound).play();
 };
 
@@ -2200,25 +2303,6 @@ Engine.displayItemActionPanel = function(itemID, inventory){
     Engine.currentMenu.panels['itemAction'].display();
     Engine.currentMenu.panels['itemAction'].setUp(itemID, inventory);
 };
-
-
-// Engine.inventoryClick = function(){
-//     if(BattleManager.inBattle) {
-//         var sticky = Engine.itemsData[this.itemID].stickMouse;
-//         UI.manageCursor(+sticky,'sticky');
-//         if(sticky){
-//             Engine.stickyCursor = true;
-//             return false;
-//         }else {
-//             Client.sendUse(this.itemID,'belt');
-//             return true;
-//         }
-//     }else{
-//         // itemAction is the small panel appearing in the inventory displaying options such as use, throw...
-//         Engine.currentMenu.panels['itemAction'].display();
-//         Engine.currentMenu.panels['itemAction'].setUp(this.itemID);
-//     }
-// };
 
 Engine.unequipClick = function(){ // Sent when unequipping something
     Client.sendUnequip(this.slotName);
@@ -2272,8 +2356,8 @@ Engine.leaveBuilding = function(){
 };
 
 Engine.snap = function(){
-    game.renderer.snapshot(function(img){
-        Client.sendScreenshot(img.src,detectBrowser());
+    Engine.getGameInstance().renderer.snapshot(function(img){
+        Client.sendScreenshot(img.src,Boot.detectBrowser());
     });
 };
 
@@ -2288,18 +2372,54 @@ Engine.debugQT = function(quads){
     });
 };
 
-function cl(){
-    localStorage.clear();
-}
+Chunk.prototype.postDrawTile = function(){}; // Used in editor
+Chunk.prototype.postDrawImage = function(x,y,image,sprite){
+    var hover = this.getAtlasData(image,'hover');
+    if(!hover) return;
+    sprite.id = 0;
+    sprite.tx = Math.floor(x);
+    sprite.ty = Math.floor(y);
+    sprite.setInteractive();
+    sprite.on('pointerover',function(){
+        UI.hoverFlower++;
+        sprite.formerFrame = sprite.frame.name;
+        sprite.setFrame(hover);
+        Engine.hideMarker();
+        UI.setCursor('item'); // TODO: use UI.manageCursor() instead?
+    });
+    sprite.on('pointerout',function(){
+        UI.hoverFlower--;
+        sprite.setFrame(sprite.formerFrame);
+        if(UI.hoverFlower <= 0) {
+            Engine.showMarker();
+            UI.setCursor();
+        }
+    });
+    sprite.on('pointerdown',function(){
+        if(!BattleManager.inBattle) Engine.processItemClick(sprite,true);
+    });
+};
 
-function s(){
-    Client.socket.emit('ss');
-}
 
-function test(){
-    var rt = UI.scene.add.renderTexture(400, 300, 300, 300);
-    rt.draw(Engine.buildings[0],10,10);
-    rt.setDepth(100);
-    rt.setScrollFactor(0);
-    console.log('ok');
-}
+Chunk.prototype.addOverlay = function(cx,cy){
+    Engine.overlay.add(cx-1, cy-2, 1);
+    Engine.overlay.add(cx, cy-2, 1);
+    Engine.overlay.add(cx+1, cy-2, 1);
+    Engine.overlay.add(cx+2, cy-2, 1);
+    Engine.overlay.add(cx, cy-3, 1);
+    Engine.overlay.add(cx+1, cy-3, 1);
+};
+
+Chunk.prototype.addCollision = function(cx,cy){
+    Engine.collisions.add(cx, cy, 1);
+};
+
+Chunk.prototype.removeCollision = function(cx,cy){
+    Engine.collisions.delete(cx,cy);
+};
+
+Chunk.prototype.addResource = function(x,y){
+    Engine.resources.add(x,y);
+};
+
+export default Engine;

@@ -1,6 +1,14 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 14-07-19.
  */
+import Engine from './Engine'
+import Frame from './Frame'
+import Panel from './Panel'
+import UI from './UI'
+import Utils from '../shared/Utils'
+
+import buildingsData from '../assets/data/buildings.json'
+import itemsData from '../assets/data/items.json'
 
 var NB_PER_PAGE = 4;
 
@@ -70,7 +78,7 @@ BuildPanel.prototype.constructor = BuildPanel;
 BuildPanel.prototype.listItems = function(){
     var items = Engine.player.buildRecipes.toList(true); // true = filter out zeroes
     items.sort(function(a,b){
-        if(Engine.buildingsData[a[0]].name < Engine.buildingsData[b[0]].name) return -1;
+        if(buildingsData[a[0]].name < buildingsData[b[0]].name) return -1;
         return 1;
     });
     return items;
@@ -207,7 +215,7 @@ BuildSlot.prototype.addIngredients = function(){
 
 BuildSlot.prototype.setUp = function(bld){
     if(!this.displayed) console.warn('Setting up slot before displaying it');
-    var bldData = Engine.buildingsData[bld];
+    var bldData = buildingsData[bld];
     this.icon.setTexture('buildingsicons',bldData.icon);
     this.name.setText(bldData.name);
     this.desc = bldData.desc;
@@ -217,7 +225,7 @@ BuildSlot.prototype.setUp = function(bld){
     if(bldData.recipe) {
         var i = 0;
         for(var ingredient in bldData.recipe){
-            this.ingredients[i].sprite.setTexture(Engine.itemsData[ingredient].atlas, Engine.itemsData[ingredient].frame).setVisible(true);
+            this.ingredients[i].sprite.setTexture(itemsData[ingredient].atlas, itemsData[ingredient].frame).setVisible(true);
             this.ingredients[i].text.setText(bldData.recipe[ingredient]).setVisible(true);
             i++;
         }
@@ -241,3 +249,5 @@ BuildSlot.prototype.hide = function(){
         ing.text.setVisible(false);
     });
 };
+
+export default BuildPanel

@@ -4,16 +4,14 @@ var app = express();
 var server = require('http').Server(app);
 var bodyParser = require("body-parser");
 var io = require('socket.io').listen(server);
-var fs = require('fs');
 var path = require('path');
 
 var quickselect = require('quickselect'); // Used to compute the median for latency
-var mongo = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
 var myArgs = require('optimist').argv;
 
-var gs = require('./server/GameServer.js').GameServer;
-gs.server = server;
+import GameServer from './server/GameServer'
+GameServer.server = server;
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
@@ -30,15 +28,15 @@ const corssss =  function (res, path) {
         res.type("jpg");
 };
 
-app.use('/assets',express.static(__dirname + '/assets', corssss));
-app.use('/client',express.static(__dirname + '/client'));
-app.use('/lib',express.static(__dirname + '/lib'));
-app.use('/server',express.static(__dirname + '/server'));
-app.use('/shared',express.static(__dirname + '/shared'));
-app.use('/maps',express.static(myArgs.maps || path.join(__dirname,'/maps')));
-app.use('/admin',express.static(path.join(__dirname,'admin')));
-app.use('/api',express.static(path.join(__dirname,'admin')));
-app.use('/editor',express.static(path.join(__dirname,'editor')));
+app.use('/assets',express.static('./assets', corssss));
+// app.use('/client',express.static('./client'));
+app.use('/dist',express.static('./dist'));
+// app.use('/server',express.static('./server'));
+// app.use('/shared',express.static('./shared'));
+app.use('/maps',express.static('./maps'));
+app.use('/admin',express.static('./admin'));
+app.use('/api',express.static('./admin'));
+app.use('/editor',express.static('./editor'));
 
 // app.use((req, res, next) => { //change app.all to app.use here and remove '*', i.e. the first parameter part
 //     res.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
@@ -68,11 +66,11 @@ if(process.env.DEV == 1) app.use('/studio',express.static(__dirname + '/studio')
 
 
 app.get('/',function(req,res){
-    res.sendFile(path.join(__dirname,'index.html'));
+    res.sendFile(path.join(__dirname,'..','index.html'));
 });
 
 app.get('/admin',function(req,res){
-    res.sendFile(path.join(__dirname,'admin','admin.html'));
+    res.sendFile(path.join(__dirname,'..','admin','admin.html'));
 });
 
 app.get('/api',function(req,res){
@@ -94,11 +92,11 @@ app.get('/crafting',function(req,res){
 });
 
 var GEThandlers = {
-    'buildings': gs.getBuildings,
-    'count-items': gs.countItems,
-    'events': gs.getEvents,
-    'players': gs.getPlayers,
-    'screenshots': gs.getScreenshots
+    'buildings': GameServer.getBuildings,
+    'count-items': GameServer.countItems,
+    'events': GameServer.getEvents,
+    'players': GameServer.getPlayers,
+    'screenshots': GameServer.getScreenshots
 };
 var categories = Object.keys(GEThandlers);
 
@@ -134,12 +132,12 @@ categories.forEach(function(cat){
 });
 
 var POSThandlers = {
-    'deletebuilding': gs.deleteBuilding,
-    'dump': gs.dump,
-    'newbuilding': gs.insertNewBuilding,
-    'setgold': gs.setBuildingGold,
-    'setitem': gs.setBuildingItem,
-    'setprice': gs.setBuildingPrice,
+    'deletebuilding': GameServer.deleteBuilding,
+    'dump': GameServer.dump,
+    'newbuilding': GameServer.insertNewBuilding,
+    'setgold': GameServer.setBuildingGold,
+    'setitem': GameServer.setBuildingItem,
+    'setprice': GameServer.setBuildingPrice,
 };
 var events = Object.keys(POSThandlers);
 
@@ -177,7 +175,7 @@ server.listen(process.env.PORT || myArgs.port || 8081,function(){
     console.log('Listening on '+server.address().port);
     console.log('Config environment: '+(process.env.NODE_CONFIG_ENV || 'default'));
 
-    mongodbAuth = {
+    let mongodbAuth = {
         useNewUrlParser: true
     };
     if (process.env.MONGODB_AUTH) {
@@ -197,8 +195,7 @@ server.listen(process.env.PORT || myArgs.port || 8081,function(){
     db.once('open', function() {
         server.db = db;
         console.log('Connection to db established');
-        // TODO: check arg first, then config, then default
-        gs.readMap(myArgs.maps || path.join(__dirname,'/maps'),myArgs.test);
+        GameServer.readMap();
     });
 });
 
@@ -209,11 +206,11 @@ io.on('connection',function(socket){
     socket.emit('ack');
 
     socket.on('boot-params',function(data){
-        gs.getBootParams(socket,data);
+        GameServer.getBootParams(socket,data);
     });
 
     socket.on('init-world',function(data){ // Sent by client.requestData()
-        if(!gs.initialized){
+        if(!GameServer.initialized){
             socket.emit('wait');
             return;
         }
@@ -224,32 +221,32 @@ io.on('connection',function(socket){
         // data.new = true;
         // data.characterName = 'Joe';
         if(data.new){ // new players OR tutorial
-            gs.addNewPlayer(socket,data);
+            GameServer.addNewPlayer(socket,data);
         }else{
-            gs.loadPlayer(socket,data.id);
+            GameServer.loadPlayer(socket,data.id);
         }
 
         var callbacksMap = {
-            'battleAction': gs.handleBattleAction,
-            'buildingClick': gs.handleBuildingClick,
-            'build': gs.handleBuild,
-            'belt': gs.handleBelt,
-            'chat': gs.handleChat,
-            'craft': gs.handleCraft,
-            'exit': gs.handleExit,
-            'gold': gs.handleGold,
-            'menu': gs.logMenu,
-            'NPCClick': gs.handleNPCClick,
-            'prices': gs.setBuildingPrice,
-            'path': gs.handlePath,
-            'respawn': gs.handleRespawn,
-            'screenshot': gs.handleScreenshot,
-            'shop': gs.handleShop,
-            'tutorial-end': gs.handleTutorialEnd,
-            'tutorial-start': gs.handleTutorialStart,
-            'tutorial-step': gs.handleTutorialStep,
-            'unequip': gs.handleUnequip,
-            'use': gs.handleUse,
+            'battleAction': GameServer.handleBattleAction,
+            'buildingClick': GameServer.handleBuildingClick,
+            'build': GameServer.handleBuild,
+            'belt': GameServer.handleBelt,
+            'chat': GameServer.handleChat,
+            'craft': GameServer.handleCraft,
+            'exit': GameServer.handleExit,
+            'gold': GameServer.handleGold,
+            'menu': GameServer.logMenu,
+            'NPCClick': GameServer.handleNPCClick,
+            'prices': GameServer.setBuildingPrice,
+            'path': GameServer.handlePath,
+            'respawn': GameServer.handleRespawn,
+            'screenshot': GameServer.handleScreenshot,
+            'shop': GameServer.handleShop,
+            'tutorial-end': GameServer.handleTutorialEnd,
+            'tutorial-start': GameServer.handleTutorialStart,
+            'tutorial-step': GameServer.handleTutorialStep,
+            'unequip': GameServer.handleUnequip,
+            'use': GameServer.handleUse,
         };
 
         var handler = socket.onevent;
@@ -276,15 +273,15 @@ io.on('connection',function(socket){
     }); // end of on init-world
 
     socket.on('region-data',function(){
-        socket.emit('region-data',gs.listRegions());
+        socket.emit('region-data',GameServer.listRegions());
     });
 
     socket.on('camps-data',function(){
-        socket.emit('camps-data',gs.listCamps());
+        socket.emit('camps-data',GameServer.listCamps());
     });
 
     socket.on('disconnect',function(){
-        gs.handleDisconnect(socket.id);
+        GameServer.handleDisconnect(socket.id);
     });
 });
 
@@ -319,7 +316,7 @@ server.getSocket = function(id){
 };
 
 server.getNbConnected =function(){
-    return Object.keys(gs.players).length;
+    return Object.keys(GameServer.players).length;
 };
 
 server.quickMedian = function(arr){ // Compute the median of an array using the quickselect algorithm

@@ -2,9 +2,8 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 03-09-18.
  */
 
-var GameServer = require('./GameServer.js').GameServer;
-var Utils = require('../shared/Utils.js').Utils;
-
+import GameServer from './GameServer'
+import Utils from '../shared/Utils'
 
 function Camp(id,center,bldData){
     this.schemaModel = GameServer.CampModel;
@@ -12,6 +11,7 @@ function Camp(id,center,bldData){
     this.buildings = [];
     this.people = [];
     this.center = center;
+    this.region = GameServer.getRegion(this.center);
     this.bldData = bldData;
 }
 
@@ -72,7 +72,8 @@ Camp.prototype.update = function(){
 
 Camp.prototype.spawnCiv = function(bld){
     var pos = GameServer.findNextFreeCell(bld.x + 2, bld.y + 1);
-    var civ = GameServer.addCiv(pos.x, pos.y);
+    var type = Utils.randomInt(0,1) >=  0.7 ? 1 : 0; //TODO: conf
+    var civ = GameServer.addCiv(pos.x, pos.y, type);
     civ.setCamp(this);
     this.people.push(civ);
 };
@@ -132,4 +133,4 @@ Camp.prototype.remove = function(civ){
     return trimmed;
 };*/
 
-module.exports.Camp = Camp;
+export default Camp

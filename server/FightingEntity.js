@@ -1,8 +1,8 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 31-05-19.
  */
-var GameServer = require('./GameServer.js').GameServer;
-var GameObject = require('./GameObject.js').GameObject;
+import GameObject from './GameObject'
+import GameServer from './GameServer'
 
 function FightingEntity(){
     GameObject.call(this);
@@ -77,8 +77,12 @@ FightingEntity.prototype.isInFight = function(){
     return this.inFight;
 };
 
+FightingEntity.prototype.incrementStat = function(stat,amount){
+    this.getStat(stat).increment(amount);
+};
+
 FightingEntity.prototype.applyDamage = function(dmg){
-    this.getStat('hp').increment(dmg);
+   this.incrementStat('hp',dmg);
 };
 
 FightingEntity.prototype.getHealth = function(){
@@ -93,5 +97,4 @@ FightingEntity.prototype.getStats = function(){
     return Object.keys(this.stats);
 };
 
-module.exports.FightingEntity = FightingEntity;
-
+export default FightingEntity

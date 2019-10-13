@@ -2,13 +2,19 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 01-06-18.
  */
 
+import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import UI from './UI'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
+
 var OrientationPin = new Phaser.Class({
 
     Extends: CustomSprite,
     // Extends: Phaser.GameObjects.RenderTexture,
 
     initialize: function OrientationPin(type,iconAtlas,iconFrame) {
-        CustomSprite.call(this, UI.scene, 0, 0,'orientation');
+        CustomSprite.call(this, 'UI', 0, 0,'orientation');
         // Phaser.GameObjects.RenderTexture.call(this, UI.scene, 0, 0, 48,64);
         // UI.scene.add.displayList.add(this);
 
@@ -97,6 +103,7 @@ var OrientationPin = new Phaser.Class({
             maxdist = 1.5*this.data.vertTiles;
             idx = 0;
             idy = 40;
+            this.side = 'top';
         }else if(d1 == -1 && d2 == -1){
             xp = B.x;
             yp = B.x*(y/x);
@@ -104,6 +111,7 @@ var OrientationPin = new Phaser.Class({
             maxdist = 1.5*this.data.horizTiles;
             idx = -40;
             idy = 0;
+            this.side = 'right';
         }else if(d1 == -1 && d2 == 1){
             xp = C.y*(x/y);
             yp = C.y;
@@ -111,6 +119,7 @@ var OrientationPin = new Phaser.Class({
             maxdist = 1.5*this.data.vertTiles;
             idx = 0;
             idy = -40;
+            this.side = 'bottom';
         }else if(d1 ==1 && d2 == 1) {
             xp = A.x;
             yp = A.x * (y / x);
@@ -118,6 +127,7 @@ var OrientationPin = new Phaser.Class({
             maxdist = 1.5 * this.data.horizTiles;
             idx = 40;
             idy = 0;
+            this.side = 'left';
         }else if(d1 == -1 && d2 == 0){ // bottom-right corner
             xp = C.x;
             yp = C.y;
@@ -185,3 +195,5 @@ var OrientationPin = new Phaser.Class({
         this.playedSound = false;
     }
 });
+
+export default OrientationPin

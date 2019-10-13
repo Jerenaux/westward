@@ -4,16 +4,6 @@
 let mongoose = require('mongoose');
 
 let Schemas = {
-    // settlementSchema : mongoose.Schema({
-    //     id: {type: Number, min: 0, required: true},
-    //     name: {type: String, required: true},
-    //     description: String,
-    //     population: {type: Number, min: 0, required: true},
-    //     level: {type: Number, min: 0, required: true},
-    //     x: {type: Number, min: 0, required: true},
-    //     y: {type: Number, min: 0, required: true}
-    // }),
-
     buildingSchema : mongoose.Schema({
         id: {type: Number, min: 0, required: true},
         x: {type: Number, min: 0, required: true},
@@ -21,7 +11,7 @@ let Schemas = {
         type: {type: Number, min: 0, required: true},
         owner: {type: Number, min: 0},
         ownerName: {type: String},
-        inventory: {type: [[]], set:function(inventory){
+        inventory: {type: mongoose.Schema.Types.Mixed, set:function(inventory){
                 return inventory.toList(true); // true: filter zeroes
             }},
         prices: mongoose.Schema.Types.Mixed,
@@ -29,7 +19,7 @@ let Schemas = {
         built: Boolean,
         civ: Boolean,
         campID: Number,
-        stats: {type: [], set:function(stats){
+        stats: {type: mongoose.Schema.Types.Mixed, set:function(stats){
                 return stats.toList();
         }}
     }),
@@ -37,6 +27,13 @@ let Schemas = {
     campSchema : mongoose.Schema({
         id: {type: Number, min: 0, required: true},
         center: mongoose.Schema.Types.Mixed,
+    }),
+
+    ephemeralMarkerSchema: mongoose.Schema({
+        x: {type: Number, min: 0, required: true},
+        y: {type: Number, min: 0, required: true},
+        type: String,
+        createdAt: { type: Date, expires: 3600*24*30, default: Date.now } //TODO: conf
     }),
 
     playerSchema : mongoose.Schema({
@@ -52,19 +49,26 @@ let Schemas = {
         ap: mongoose.Schema.Types.Mixed,
         equipment: mongoose.Schema.Types.Mixed,
         commitSlots: mongoose.Schema.Types.Mixed,
-        sid: {type: Number, min: 0, required: true},
-        inventory: {type: [[]], set:function(inventory){
+        origin: {type: Number, min: 0, required: true},
+        inventory: {type: mongoose.Schema.Types.Mixed, set:function(inventory){
+                // console.log('#@',inventory);
                 return inventory.toList(true); // true: filter zeroes
             }},
-        belt: {type: [[]], set:function(belt){
+        belt: {type: mongoose.Schema.Types.Mixed, set:function(belt){
                 return belt.toList(true); // true: filter zeroes
             }},
-        stats: {type: [], set:function(stats){
+        stats: {type: mongoose.Schema.Types.Mixed, set:function(stats){
                 return stats.toList();
             }},
         history: {type: []}
+    }),
+
+    remainsSchema: mongoose.Schema({
+        x: {type: Number, min: 0, required: true},
+        y: {type: Number, min: 0, required: true},
+        type: Number,
+        createdAt: { type: Date, expires: 3600*24*30, default: Date.now } // TODO: conf
     })
 };
 
-module.exports = Schemas;
-
+export default Schemas

@@ -1,15 +1,18 @@
 /**
  * Created by Jerome on 29-11-17.
  */
+import CustomSprite from './CustomSprite';
+import UI from './UI';
+
 const UICursor = new Phaser.Class({
 
     Extends: CustomSprite,
 
     initialize: function UICursor() {
 
-        CustomSprite.call(this, UI.scene, UI.getGameWidth()/2, UI.getGameHeight()/2, 'cursors','cursor');
+        CustomSprite.call(this, 'UI', UI.getGameWidth()/2, UI.getGameHeight()/2, 'cursors','cursor');
 
-        this.setDepth(10);
+        this.setDepth(25);
         this.setOrigin(0,0);
 
         this.cursorFrames = {
@@ -65,3 +68,5 @@ const UICursor = new Phaser.Class({
     }
 
 });
+
+export default UICursor;

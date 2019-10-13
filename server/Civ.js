@@ -2,12 +2,14 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 18-06-18.
  */
 
-var GameServer = require('./GameServer.js').GameServer;
-var NPC = require('./NPC.js').NPC;
-var GameObject = require('./GameObject.js').GameObject;
-var MovingEntity = require('./MovingEntity.js').MovingEntity;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
-var Utils = require('../shared/Utils.js').Utils;
+var EquipmentManager = require('../shared/Equipment.js').EquipmentManager;
+
+import GameObject from './GameObject'
+import GameServer from './GameServer'
+import MovingEntity from './MovingEntity'
+import NPC from './NPC'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
 function Civ(x,y,type){
     this.id = GameServer.lastCivID++;
@@ -29,6 +31,7 @@ function Civ(x,y,type){
     this.setAggressive();
     this.setStartingStats(civData.stats);
     this.setLoot(civData.loot);
+    this.setEquipment(civData.equipment);
     this.setIdle();
     NPC.call(this);
 }
@@ -62,6 +65,35 @@ Civ.prototype.setCamp = function(camp){
     this.camp = camp;
 };
 
+/**
+ * "Equip" items to a Civ. Trick: no need to keep track of
+ * absolute and relative modifiers, just increment base stats
+ * according to equipment effects since equipment will
+ * never change (for now). + add to loot for possible drop
+ * @param equipment
+ */
+Civ.prototype.setEquipment = function(equipment){
+    this.equipment = new EquipmentManager();
+    for(var slot in equipment){
+        var itemID, nb;
+        if(slot == 'range_ammo'){
+            itemID = equipment[slot][0];
+            nb = equipment[slot][1];
+        }else{
+            itemID = equipment[slot];
+        }
+        this.addToLoot(itemID,nb || 1);
+        this.equipment.set(slot, itemID);
+        if(nb) this.equipment.load(nb);
+        var itemData = GameServer.itemsData[itemID];
+        if(itemData.effects){
+            for(var stat in itemData.effects){
+                this.incrementStat(stat,itemData.effects[stat]);
+            }
+        }
+    }
+};
+
 Civ.prototype.findRandomDestination = function(){
     if(!this.camp){
         console.warn('Civ without camp');
@@ -79,10 +111,11 @@ Civ.prototype.findRandomDestination = function(){
     };
 };
 
-Civ.prototype.die = function(){
+Civ.prototype.die = function(attacker){
     MovingEntity.prototype.die.call(this);
     this.idle = false;
     if(this.camp) this.camp.remove(this);
+    GameServer.regions[this.camp.region].event('killedciv',attacker);
 };
 
 Civ.prototype.endFight = function(alive){
@@ -140,4 +173,4 @@ Civ.prototype.trim = function(){
     return GameObject.prototype.trim.call(this,trimmed);
 };
 
-module.exports.Civ = Civ;
+export default Civ

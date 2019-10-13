@@ -2,6 +2,10 @@
  * Created by jeren on 23-01-18.
  */
 
+import Client from './Client'
+import Engine from './Engine'
+import UI from './UI'
+
 var BattleManager = {
     inBattle: false,
     countdown: -1,
@@ -228,3 +232,5 @@ BattleManager.onFightStart = function(){
 BattleManager.onOwnTurn = function(){
     if(BattleManager.simulate) Engine.computePath({x:505,y:659});
 };
+
+export default BattleManager

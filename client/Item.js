@@ -1,6 +1,17 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 29-03-18.
  */
+import BattleManager from './BattleManager'
+import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import Insect from './Insect'
+import OrientationPin from './OrientationPin'
+import UI from './UI'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
+
+import itemsData from '../assets/data/items.json'
+
 var Item = new Phaser.Class({
 
     Extends: CustomSprite,
@@ -12,7 +23,7 @@ var Item = new Phaser.Class({
     },
 
     setUp: function(data){
-        var itemData = Engine.itemsData[data.type];
+        var itemData = itemsData[data.type];
         var atlas = (itemData.envFrames ? 'tileset' : itemData.atlas);
         var frame = (itemData.envFrames ? Utils.randomElement(itemData.envFrames) : itemData.frame);
         this.itemType = data.type;
@@ -26,7 +37,7 @@ var Item = new Phaser.Class({
 
         this.setTilePosition(data.x,data.y,true);
         // this.setOrigin(0.5);
-        this.setDepth(this.tileY+1.5); // for e.g. when wood spawns on the roots of a tree
+        this.updateDepth();
 
         if(itemData.collides) {
             this.collides = true;
@@ -46,6 +57,10 @@ var Item = new Phaser.Class({
         if(itemData.insect && Utils.randomInt(1,10) > 8) new Insect(this.x,this.y);
     },
 
+    updateDepth: function(){
+        this.setDepth(this.tileY+1.5); // for e.g. when wood spawns on the roots of a tree
+    },
+
     remove: function(){
         CustomSprite.prototype.remove.call(this);
         if(this.collides) Engine.collisions.delete(this.tileX,this.tileY);
@@ -58,12 +73,21 @@ var Item = new Phaser.Class({
             this.orientationPin.hide();
         }else{
             this.orientationPin.update(this.tileX,this.tileY);
+            if(this.orientationPin.side){
+                var sideMap = Engine.orientationPins[this.orientationPin.side];
+                if(!sideMap.hasOwnProperty(this.itemType)) sideMap[this.itemType] = [];
+                sideMap[this.itemType].push(this.orientationPin);
+            }
             this.orientationPin.display();
         }
     },
 
     manageBehindness: function(){
-        if(Engine.overlay.get(this.tileX,this.tileY)) this.hollow();
+        if(Engine.overlay.get(this.tileX,this.tileY)){
+            this.hollow();
+        }else{
+            this.unhollow();
+        }
     },
 
     handleClick: function(){
@@ -92,3 +116,5 @@ var Item = new Phaser.Class({
         Engine.showMarker();
     }
 });
+
+export default Item

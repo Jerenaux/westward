@@ -2,18 +2,20 @@
  * Created by Jerome on 20-09-17.
  */
 
-var Utils = require('../shared/Utils.js').Utils;
 var PersonalUpdatePacket = require('./PersonalUpdatePacket.js').PersonalUpdatePacket;
-var GameObject = require('./GameObject.js').GameObject;
-var MovingEntity = require('./MovingEntity.js').MovingEntity;
-var GameServer = require('./GameServer.js').GameServer;
-var Inventory = require('../shared/Inventory.js').Inventory;
 var Stats = require('../shared/Stats.js').Stats;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
 var Equipment = require('../shared/Equipment.js').Equipment;
 var EquipmentManager = require('../shared/Equipment.js').EquipmentManager;
-var Formulas = require('../shared/Formulas.js').Formulas;
-var Prism = require('./Prism.js').Prism;
+
+import Formulas from '../shared/Formulas'
+import GameObject from './GameObject'
+import GameServer from './GameServer'
+import Inventory from '../shared/Inventory'
+import MovingEntity from './MovingEntity'
+import Prism from './Prism'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
 function Player() {
     this.updatePacket = new PersonalUpdatePacket();
@@ -28,10 +30,9 @@ function Player() {
     this.newAOIs = []; //list of AOIs about which the player hasn't checked for updates yet
     this.oldAOIs = [];
     this.action = null;
-    this.inventory = new Inventory();
+    this.inventory = new Inventory(20); //TODO: conf
     this.belt = new Inventory(3); //TODO: conf
     this.sid = 0;
-    this.settlement = null;
     this.gold = 0;
     this.inBuilding = -1;
 
@@ -144,31 +145,48 @@ Player.prototype.isMerchant = function () {
 Player.prototype.setUp = function(id,name,region){
     this.id = id;
     this.name = name;
-    this.setRegion(region);
+    this.origin = region;
 };
 
-Player.prototype.setRegion = function (sid) {
-    this.sid = sid;
-    this.region = GameServer.regions[this.sid];
-    this.setRespawnLocation(this.region.x,this.region.y);
+Player.prototype.setRegion = function() {
+    var region_ = this.region;
+    var newregion = GameServer.getRegion(this);
+    if(newregion != region_){
+        this.setOwnProperty('region',newregion);
+        this.addNotif('Entering '+GameServer.regions[this.region].name+' region');
+        if(region_ in GameServer.regions) GameServer.regions[region_].removePlayer(this.id);
+        GameServer.regions[this.region].addPlayer(this.id);
+
+        this.inventory.toList().forEach(function(inv){
+            if(region_ in GameServer.regions) GameServer.regions[region_].removeItem(inv[0],inv[1]);
+            GameServer.regions[this.region].addItem(inv[0],inv[1]);
+        },this);
+    }
 };
 
-Player.prototype.setRespawnLocation  = function(x,y){
+Player.prototype.setOrigin = function(origin){
+    this.origin = (origin ? origin : GameServer.getRegion(this));
+};
+
+
+/*Player.prototype.setRespawnLocation  = function(x,y){
     this.respawnLocation = {
         x: x,
         y: y
     };
-};
+};*/
 
 Player.prototype.getRegionName = function () {
-    return this.region.name;
+    return GameServer.regions[this.region].name;
 };
 
 Player.prototype.updateSteps = function () {
     this.steps++;
     var limit = 1000; // arbitrary limit to avoid overflows
     if (this.steps > limit) this.steps -= limit;
-    if (this.steps % GameServer.characterParameters.steps === 0) this.updateVigor(-GameServer.characterParameters.stepsLoss);
+    // if (this.steps % GameServer.characterParameters.steps === 0) this.updateVigor(-GameServer.characterParameters.stepsLoss);
+    if (this.steps % GameServer.characterParameters.steps === 0) GameServer.updateVigor(this,'walk');
+
 };
 
 Player.prototype.updateVigor = function (inc, ignoreFood) {
@@ -215,7 +233,7 @@ Player.prototype.setStartingInventory = function () {
     ];
     list.forEach(function (l) {
         this.giveItem(l[0], l[1]);
-        GameServer.createItem(l[0], l[1], 'start');
+        GameServer.createItem(l[0], l[1], this.origin, 'start');
     }, this);
 
     this.giveGold(300);
@@ -258,8 +276,8 @@ Player.prototype.die = function () {
 };
 
 Player.prototype.setLocation = function(x, y){
-    x = x || this.respawnLocation.x;
-    y = y || this.respawnLocation.y;
+    x = x || GameServer.regions[this.origin].x;
+    y = y || GameServer.regions[this.origin].y;
     var pos = GameServer.findNextFreeCell(x,y);
     x = pos.x;
     y = pos.y;
@@ -302,22 +320,20 @@ Player.prototype.gainClassXP = function (classID, inc, notify) {
             this.classLvlUp(classID, notify);
         }
     }
-    // this.updatePacket.classxp = this.classxp;
-    this.setOwnProperty('clasxp', this.classxp);
+    this.setOwnProperty('classxp', this.classxp);
 };
 
 Player.prototype.classLvlUp = function (classID, notify) {
     this.classlvl[classID]++;
     var nb = 3; // TODO: vary number
     this.ap[classID] += nb;
-    // this.updatePacket.classlvl = this.classlvl;
-    // this.updatePacket.ap = this.ap;
     this.setOwnProperty('classlvl', this.classlvl);
     this.setOwnProperty('ap', this.ap);
     if (notify) {
         this.addNotif('Reached ' + GameServer.classData[classID].name + ' level ' + this.classlvl[classID] + '!');
         this.addNotif('Earned ' + nb + ' AP!');
     }
+    this.save();
 };
 
 Player.prototype.giveGold = function (nb, notify) {
@@ -460,26 +476,6 @@ Player.prototype.isEquipped = function (slot) {
     var item = this.getEquippedItem(slot);
     if(!item) return false;
     return !item.permanent;
-};
-
-/**
- * Return an object containing all the information about the item
- * equipped in a given slot.
- * @param {string} slot - name of the slot where the item of
- * interest is equiped.
- * @returns {Object} - Object containging data about item.
- */
-Player.prototype.getEquippedItem = function (slot) {
-    return this.equipment.getItem(slot);
-};
-
-/**
- * Returns the item ID of the item equipped at the given slot
- * @param {string} slot - name of the slot where the item of
- * @returns {number} - item ID of equipped item or -1 if nothing equipped
- */
-Player.prototype.getEquippedItemID = function (slot) {
-    return this.equipment.get(slot);
 };
 
 Player.prototype.getContainerType = function(){
@@ -674,57 +670,11 @@ Player.prototype.unload = function (notify) {
     return nb;
 };
 
-Player.prototype.decreaseAmmo = function () {
-    var ammoID = this.equipment.get('range_ammo');
-    this.equipment.load(-1);
-    var nb = this.equipment.getNbAmmo();
-    if (nb === 0) this.unequip('range_ammo', true);
-    this.updatePacket.addAmmo(nb);
-    return ammoID;
-};
-
-Player.prototype.getRangedContainer = function () {
-    return this.getEquippedItem('range_container');
-};
 
 Player.prototype.getNbAmmo = function () {
     return this.equipment.getNbAmmo();
 };
 
-Player.prototype.canRange = function () {
-
-    const weapon = this.getEquippedItem('rangedw');
-    if (weapon === -1) {
-        this.addMsg('I don\'t have a ranged weapon equipped!');
-        this.setOwnProperty('resetTurn', true);
-        return false;
-    }
-
-    const container = this.getRangedContainer();
-    if (container === false || container === -1) {
-        this.addMsg('I don\'t have ammo!');
-        this.setOwnProperty('resetTurn', true);
-        return false;
-    }
-
-    const hasAmmo = this.equipment.hasAnyAmmo();
-    if (!hasAmmo) {
-        this.addMsg('I\'m out of ammo!');
-        this.setOwnProperty('resetTurn', true);
-        return false;
-    }
-
-    if (weapon.ammo !== this.equipment.getAmmoContainerType()) {
-        this.addMsg('I can\'t use my weapon with that ammo');
-        this.setOwnProperty('resetTurn', true);
-        return false;
-    }
-
-    if (hasAmmo) {
-        return true;
-    }
-
-};
 
 Player.prototype.applyEffects = function (item, notify) {
     var itemData = GameServer.itemsData[item];
@@ -747,15 +697,32 @@ Player.prototype.applyEffect = function (stat, delta, notify) {
     }
 };
 
+Player.prototype.getIndividualUpdatePackage = function () {
+    var pkg = this.updatePacket;
+    if (GameServer.checkFlag('FoW')) pkg.fow = GameServer.fowList;
+    if (GameServer.checkFlag('frontier')) pkg.frontier = GameServer.frontier;
+    if (GameServer.checkFlag('regionsStatus')) pkg.regionsStatus = GameServer.getRegionsStatus();
+    if (GameServer.checkFlag('animalsMarkers')) pkg.animalMarkers = GameServer.listAnimalMarkers();
+    if (GameServer.checkFlag('resourcesMarkers')) pkg.resourceMarkers = GameServer.listResourceMarkers();
+    if (GameServer.checkFlag('buildingsMarkers')) pkg.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
+    if (GameServer.checkFlag('deathMarkers')) pkg.deathMarkers = GameServer.listMarkers('death');
+    if (GameServer.checkFlag('conflictMarkers')) pkg.conflictMarkers = GameServer.listMarkers('conflict');
+    if (pkg.isEmpty()) return null;
+    this.updatePacket = new PersonalUpdatePacket();
+    return pkg;
+};
+
 Player.prototype.getWorldInformation = function(){
     this.setOwnProperty('fow',GameServer.fowList);
     this.setOwnProperty('frontier',GameServer.frontier);
+    this.setOwnProperty('regionsBoundaries',GameServer.regionBoundaries);
+    this.setOwnProperty('regionsStatus',GameServer.getRegionsStatus());
     this.setOwnProperty('buildingMarkers', GameServer.listBuildingMarkers(this.instance));
-    this.setOwnProperty('resourceMarkers',  GameServer.listMarkers('resource').concat(this.extraMarkers));
-    this.setOwnProperty('animalMarkers', GameServer.listMarkers('animal'));
+    this.setOwnProperty('resourceMarkers',  GameServer.listResourceMarkers());
+    this.setOwnProperty('animalMarkers', GameServer.listAnimalMarkers());
     this.setOwnProperty('deathMarkers', GameServer.listMarkers('death'));
     this.setOwnProperty('conflictMarkers', GameServer.listMarkers('conflict'));
-    this.setOwnProperty('rarity', GameServer.getRarity());
+    // this.setOwnProperty('rarity', GameServer.getRarity());
     this.setOwnProperty('history',this.history);
 };
 
@@ -766,11 +733,11 @@ Player.prototype.getWorldInformation = function(){
  */
 Player.prototype.initTrim = function () {
     var trimmed = {};
-    var broadcastProperties = ['id', 'name']; // list of properties relevant for the client
+    var broadcastProperties = ['id', 'name','classxp','classlvl','ap']; // list of properties relevant for the client
     for (var p = 0; p < broadcastProperties.length; p++) {
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
-    trimmed.settlement = this.sid;
+    trimmed.region = GameServer.getRegion(this);
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     return trimmed;
@@ -788,7 +755,7 @@ Player.prototype.trim = function () {
     broadcastProperties.forEach(function (field) {
         trimmed[field] = this[field];
     }, this);
-    trimmed.settlement = this.sid;
+    trimmed.region = this.sid;
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     // trimmed.quickSlots = this.equipment.quickslots.nb;
@@ -827,22 +794,25 @@ Player.prototype.getDataFromDb = function (data) {
     if (data) {
         if (data.equipment) {
             for (var slot in data.equipment.slots) {
-                var item = data.equipment.slots[slot];
-                // console.warn('ITEM:',item);
-                // fix corrupt item data due to development
-                if (typeof item.id == 'object') {
-                    if (item.id.hasOwnProperty('id')) { // fix nested objects
-                        item.id = item.id.id;
-                    } else {
-                        item.id = -1;
-                    }
-                }
-                item.id = parseInt(item.id);
-                item.nb = parseInt(item.nb);
-                if (typeof item.nb != 'number') item.nb = 0;
-                if (item.id === -1) continue;
-                this.equip(slot, item.id, true);
-                if (slot == 'range_ammo' && item.nb) this.load(item.nb);
+                var info = GameServer.parseEquipmentDb(data.equipment.slots[slot]);
+                var item = info[0];
+                var nb = info[1];
+                // var item = data.equipment.slots[slot];
+                // // console.warn('ITEM:',item);
+                // // fix corrupt item data due to development
+                // if (typeof item.id == 'object') {
+                //     if (item.id.hasOwnProperty('id')) { // fix nested objects
+                //         item.id = item.id.id;
+                //     } else {
+                //         item.id = -1;
+                //     }
+                // }
+                // item.id = parseInt(item.id);
+                // item.nb = parseInt(item.nb);
+                if (typeof nb != 'number') nb = 0;
+                if (item === -1) continue;
+                this.equip(slot, item, true);
+                if (slot == 'range_ammo' && nb) this.load(nb);
             }
         }
 
@@ -859,7 +829,7 @@ Player.prototype.getDataFromDb = function (data) {
         }
     }
 
-    this.setRegion(data.sid);
+    this.setOrigin(data.origin);
     this.giveGold(data.gold);
     this.history = data.history;
 
@@ -960,19 +930,6 @@ Player.prototype.addNotif = function (msg, silent) {
     if (this.history.length > MAX_LENGTH) this.history.splice(0, this.history.length - MAX_LENGTH);
 };
 
-Player.prototype.getIndividualUpdatePackage = function () {
-    // console.log(this.updatePacket,this.updatePacket.isEmpty());
-    var pkg = this.updatePacket;
-    if (GameServer.checkFlag('FoW')) pkg.fow = GameServer.fowList;
-    if (GameServer.checkFlag('frontier')) pkg.frontier = GameServer.frontier;
-    if (GameServer.checkFlag('buildingsMarkers')) pkg.buildingMarkers = GameServer.listBuildingMarkers(this.instance);
-    if (GameServer.checkFlag('deathMarkers')) pkg.deathMarkers = GameServer.listMarkers('death');
-    if (GameServer.checkFlag('conflictMarkers')) pkg.conflictMarkers = GameServer.listMarkers('conflict');
-    if (pkg.isEmpty()) return null;
-    this.updatePacket = new PersonalUpdatePacket();
-    return pkg;
-};
-
 Player.prototype.fastForward = function (nbturns) {
     console.warn('Fast forward', nbturns, 'turns');
     var foodRate = GameServer.economyTurns['foodConsumptionRate'];
@@ -1019,11 +976,4 @@ Player.prototype.remove = function () {
     GameServer.updateVision();
 };
 
-Player.prototype.getShootingPoint = function () {
-    return {
-        x: this.x + 1,
-        y: this.y + 1
-    };
-};
-
-module.exports.Player = Player;
+export default Player

@@ -139,3 +139,5 @@ var HollowPipeline = new Phaser.Class({
     } 
 
 });
+
+export {FoWPipeline, HighlightPipeline, HollowPipeline}

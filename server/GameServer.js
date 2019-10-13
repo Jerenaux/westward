@@ -1,6 +1,8 @@
 /**
  * Created by Jerome on 20-09-17.
  */
+import Inventory from "../shared/Inventory";
+
 var fs = require('fs');
 var pathmodule = require('path');
 var clone = require('clone'); // used to clone objects, essentially used for clonicg update packets
@@ -17,6 +19,7 @@ var GameServer = {
     lastItemID: 0,
     lastBattleID: 0,
     lastCellID: 0,
+    lastRemainsID: 0,
     lastCampID: 0,
     nextInstanceID: 0,
     players: {}, // player.id -> player
@@ -31,27 +34,33 @@ var GameServer = {
     initialized: false
 };
 
-module.exports.GameServer = GameServer;
+export default GameServer;
 
-var World = require('../shared/World.js').World;
-var Utils = require('../shared/Utils.js').Utils;
-var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
-var ListMap = require('../shared/ListMap.js').ListMap;
-var SpaceMapList = require('../shared/SpaceMap.js').SpaceMapList;
-var AOI = require('./AOI.js').AOI;
-var Player = require('./Player.js').Player;
-var Settlement = require('./Settlement').Settlement;
-var Building = require('./Building.js').Building;
-var Animal = require('./Animal.js').Animal;
-var Civ = require('./Civ.js').Civ;
-var Item = require('./Item.js').Item;
-var Battle = require('./Battle.js').Battle;
-var BattleCell = require('./Battle.js').BattleCell;
-var SpawnZone = require('./SpawnZone.js').SpawnZone;
-var Camp = require('./Camp.js').Camp;
-var Pathfinder =  require('../shared/Pathfinder.js').Pathfinder;
-var Prism = require('./Prism.js').Prism;
-var Schemas = require('./schemas.js');
+import Animal from './Animal'
+import AOI from './AOI'
+import Battle from './Battle'
+import BattleCell from './BattleCell'
+import Building from './Building'
+import Camp from './Camp'
+import Civ from './Civ'
+import Item from './Item'
+import ListMap from '../shared/ListMap'
+import Pathfinder from '../shared/Pathfinder'
+import Player from './Player'
+import Prism from './Prism'
+import Region from './Region'
+import Remains from './Remains'
+import Schemas from './Schemas'
+import {SpaceMap} from '../shared/SpaceMap'
+import SpawnZone from './SpawnZone'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
+
+import animalsClusters from '../maps/animals.json'
+import collisions from '../maps/collisions.json'
+import itemsOnMap from '../maps/items.json'
+import resourceMarkers from '../maps/resourceMarkers.json'
+import masterData from '../maps/master.json'
 
 /**
  * Progresses through the initialization sequence of the server, in a serial way (even for async steps).
@@ -82,7 +91,9 @@ GameServer.updateStatus = function(){
 GameServer.createModels = function(){
     GameServer.CampModel = mongoose.model('Camp', Schemas.campSchema);
     GameServer.BuildingModel = mongoose.model('Building', Schemas.buildingSchema);
+    GameServer.ephemeralMarkerModel = mongoose.model('ephemeralMarker', Schemas.ephemeralMarkerSchema);
     GameServer.PlayerModel = mongoose.model('Player', Schemas.playerSchema);
+    GameServer.RemainModel = mongoose.model('Remain', Schemas.remainsSchema);
 };
 
 /**
@@ -93,6 +104,7 @@ GameServer.createModels = function(){
  * @param {function} [cb] - Callback to call when the initialization sequence is finished (only used for tests)
  */
 GameServer.readMap = function(mapsPath,test,cb){
+    var hrstart = process.hrtime();
     if(test){
         GameServer.initializationMethods = {
             'static_data': null,
@@ -100,14 +112,14 @@ GameServer.readMap = function(mapsPath,test,cb){
         };
     }else {
         GameServer.initializationMethods = {
-            'static_data': null,
+            'static_data': null, // readMap
             'player_data': GameServer.readPlayersData,
-            'regions': GameServer.loadRegions,
             'camps': GameServer.setUpCamps,
             'buildings': GameServer.loadBuildings,
             'items': GameServer.loadItems,
             'markers': GameServer.loadMarkers,
-            'spawn_zones': GameServer.setUpSpawnZones
+            'spawn_zones': GameServer.setUpSpawnZones,
+            'final': GameServer.finalStep,
         };
     }
     GameServer.testcb = cb;
@@ -117,7 +129,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.createModels();
     GameServer.mapsPath = mapsPath;
     console.log('Loading map data from '+mapsPath);
-    var masterData = JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'master.json')).toString());
+    // var masterData = JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'master.json')).toString());
     World.readMasterData(masterData);
 
     GameServer.AOIs = []; // Maps AOI id to AOI object; it's not a map but sice they are stored in order, their position in the array map to them
@@ -128,13 +140,16 @@ GameServer.readMap = function(mapsPath,test,cb){
     }
 
     GameServer.battleCells = new SpaceMap();
+    //TODO: bundle all
     var dataAssets = pathmodule.join('assets','data');
     GameServer.textData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'texts.json')).toString()); // './assets/data/texts.json'
     GameServer.itemsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'items.json')).toString()); // './assets/data/items.json'
+    GameServer.missionsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'missions.json')).toString()); 
     GameServer.animalsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'animals.json')).toString()); // './assets/data/animals.json'
     GameServer.civsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'civs.json')).toString()); // './assets/data/civs.json'
     GameServer.buildingsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'buildings.json')).toString()); // './assets/data/buildings.json'
     GameServer.classData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'classes.json')).toString()); // './assets/data/classes.json'
+    GameServer.regionsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'regions.json')).toString()); // './assets/data/classes.json'
     GameServer.tutorialData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'tutorials.json')).toString()); // './assets/data/texts.json'
     GameServer.instances = {};
 
@@ -155,39 +170,61 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.clientParameters = config.get('client');
 
     GameServer.collisions = new SpaceMap();
-    GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()),true); // true = compact
+    // GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()),true); // true = compact
+    GameServer.collisions.fromList(collisions,true); // true = compact
     GameServer.pathFinder = new Pathfinder(GameServer.collisions,GameServer.PFParameters.maxPathLength);
 
     GameServer.fogOfWar = {};
     GameServer.fowList = [];
     GameServer.deathMarkers = [];
     GameServer.conflictMarkers = [];
-    GameServer.itemCounts = {};
+    GameServer.itemCounts = new Inventory();
     GameServer.itemsToRespawn = [];
+    GameServer.battleRemains = [];
     GameServer.marketPrices = new ListMap();
+
+    GameServer.computeRegions();
 
     GameServer.initializeFlags();
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
     Prism.logEvent(null,'server-start');
+    var hrend = process.hrtime(hrstart);
+    console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000);
 };
 
+/**
+ * Set up a dict of boolean variables indicating whether some global changes have occurred
+ * and need to be sent to players.
+ * Called as part of the many set up operations of `GameServer.readMap`. The flags
+ * are checked in `Player.getIndividualUpdatePackage` and the corresponding changes they indicate
+ * are added to the update package based on that.
+ */
 GameServer.initializeFlags = function(){
-    var flags = ['nbConnected','FoW','buildingsMarkers','animalsMarkers','deathMarkers',
-    'conflictMarkers','frontier'];
+    var flags = ['nbConnected','FoW','resourcesMarkers','buildingsMarkers','animalsMarkers',
+        'deathMarkers', 'conflictMarkers','frontier','regionsStatus'];
     GameServer.flags = {};
     flags.forEach(function(flag){
         GameServer.flags[flag] = false;
     });
 };
 
+/**
+ * Set all the flags defined in `GameServer.initializeFlags` to false. 
+ * Called at the end `GameServer.updateClients` since the changes reflected
+ * by active flags have been sent in the update.
+ */
 GameServer.resetFlags = function(){
     for(var flag in GameServer.flags){
         GameServer.flags[flag] = false;
     }
 };
 
+/**
+ * Flip one of the flags defined in `GameServer.initializeFlags` to true.
+ * Called whenever a global change needs to be reflected to be sent to players.
+ */
 GameServer.setFlag = function(flag){
     if(!(flag in GameServer.flags)){
         console.warn('ERROR: unknown flag',flag);
@@ -196,6 +233,11 @@ GameServer.setFlag = function(flag){
     GameServer.flags[flag] = true;
 };
 
+/**
+ * Check if one of the flags defined in `GameServer.initializeFlags` is true.
+ * Called in `Player.getIndividualUpdatePackage` to see which global changes need
+ * to be included in an update.
+ */
 GameServer.checkFlag = function(flag){
     if(!(flag in GameServer.flags)){
         console.warn('ERROR: unknown flag',flag);
@@ -204,6 +246,11 @@ GameServer.checkFlag = function(flag){
     return GameServer.flags[flag];
 };
 
+/**
+ * Check if any of the flags defined in `GameServer.initializeFlags` is true.
+ * Called in `GameServer.updateClients` as one way to check if an update packer
+ * is empty or not (not content + all flags to false = empty).
+ */
 GameServer.anyFlag = function(){
     for(var flag in GameServer.flags){
         if(GameServer.flags[flag]) return true;
@@ -234,7 +281,7 @@ GameServer.getBootParams = function(socket,data){
                 if(doc) {
                     pkg.newPlayer = false;
                 }else{
-                    console.log('Unrecognized returning player ');
+                    console.log('Unrecognized returning player');
                     pkg.newPlayer = true;
                 }
                 // console.log(pkg);
@@ -245,9 +292,6 @@ GameServer.getBootParams = function(socket,data){
     } else {
         console.warn("Missing GameServer or pkg!");
     }
-
-
-
 };
 
 /**
@@ -262,38 +306,46 @@ GameServer.readPlayersData = function(){
         console.log('Players data fetched');
         players.forEach(function(data){
             if(data.id > GameServer.lastPlayerID) GameServer.lastPlayerID = data.id;
-            data.inventory.forEach(function(itm){
-                GameServer.createItem(itm[0],itm[1]);
+            var region = GameServer.getRegion(data);
+            data.inventory.concat(data.belt).forEach(function(itm){
+                GameServer.createItem(itm[0],itm[1],region,'player inventory DB');
             });
 
-            if(data && data.equipment){
-
-                for(var label in data.equipment.slots){
-                    if(data.equipment.slots[label] > -1) GameServer.createItem(data.equipment.slots[label],1);
-                }
-                for(var label in data.equipment.containers){
-                    if(data.equipment.containers[label] > -1) GameServer.createItem(data.equipment.containers[label],1);
-                }
-                for(var label in data.equipment.ammo){
-                    if(data.equipment.ammo[label].id > -1) GameServer.createItem(data.equipment.ammo[label].id,data.equipment.ammo[label].nb);
-                }
-
+            for (var slot in data.equipment.slots) {
+                var info = GameServer.parseEquipmentDb(data.equipment.slots[slot]);
+                var item = info[0];
+                var nb = info[1];
+                if(item == -1) continue;
+                if(GameServer.itemsData[item].permanent) continue;
+                GameServer.createItem(item,nb,region,'player equipment DB');
             }
-
         });
         console.log('Last player ID:',GameServer.lastPlayerID);
         GameServer.updateStatus();
     });
 };
 
+GameServer.parseEquipmentDb = function(data){
+    // console.warn('ITEM:',item);
+    // fix corrupt item data due to development
+    if (typeof data.id == 'object') {
+        if (data.id.hasOwnProperty('id')) { // fix nested objects
+            data.id = data.id.id;
+        } else {
+            data.id = -1;
+        }
+    }
+    return [parseInt(data.id), parseInt(data.nb)];
+};
+
 /**
  * Load regions data.
  * Called by the initialization sequence.
  */
-GameServer.loadRegions = function(){
+/*GameServer.loadRegions = function(){
     GameServer.regions = JSON.parse(fs.readFileSync(pathmodule.join('assets','data','regions.json')).toString());
     GameServer.updateStatus();
-};
+};*/
 
 /**
  * Add a building to the game world.
@@ -323,11 +375,33 @@ GameServer.loadBuildings = function(){
 
         if(GameServer.needToSpawnCamps) GameServer.spawnCamps();
 
+        // GameServer.updateRegions(); // Not called because downstream of the init sequence, setupSpawnZones calles it
         GameServer.computeFrontier(false);
         GameServer.updateStatus();
     });
 };
 
+GameServer.updateRegions = function(){
+    for(var id in GameServer.regions){
+        GameServer.regions[id].update();
+    }
+};
+
+GameServer.getRegionsStatus = function(){
+    var regions = [];
+    for(var id in GameServer.regions){
+        regions.push(GameServer.regions[id].trim());
+    }
+    return regions;
+};
+
+/**
+ * Spawn the buildings belonging to each Civ camp. 
+ * Called in `GameServer.loadBuildings` to create the
+ * Civ buildings if they don't already exist in the DB
+ * (if they do, then no need to spawn them, they'll be
+ * loaded like all others).
+ */
 GameServer.spawnCamps = function(){
     for(var campID in GameServer.camps){
         var camp = GameServer.camps[campID];
@@ -340,11 +414,10 @@ GameServer.spawnCamps = function(){
  * Called during the initialization sequence.
  */
 GameServer.loadItems = function(){
-    var path = pathmodule.join(GameServer.mapsPath,'items.json');
-    var items = JSON.parse(fs.readFileSync(path).toString());
-    items.forEach(function(item){
+    itemsOnMap.forEach(function(item){
         var x = item[0];
         var y = item[1];
+
         var type = item[2];
         // don't check for hard collisions, otherwise stones don't spawn
         // instead simply check with collisions w/ other entities
@@ -356,32 +429,40 @@ GameServer.loadItems = function(){
     GameServer.updateStatus();
 };
 
+/**
+ * Set up dicts for the different map marker categories and load
+ * from file those who are stored in files.
+ */
 GameServer.loadMarkers = function(){
-    var markerTypes = ['resource','animal','death','conflict'];
-    markerTypes.forEach(function(marker){
-        var path = pathmodule.join(GameServer.mapsPath,marker+'Markers.json');
-        try{
-            GameServer[marker+'Markers'] = JSON.parse(fs.readFileSync(path).toString());
-        }catch(err){
-            console.warn('ERROR loading markers: '+marker);
-            GameServer[marker+'Markers'] = [];
-        }
+    GameServer.resourceMarkers = resourceMarkers;
+    GameServer.resourceMarkers.forEach(function(m){
+       var region = GameServer.getRegion({x:m[0],y:m[1]});
+       GameServer.regions[region].addResource({x:m[0],y:m[1]});
     });
-    // resourceMarkersPath = pathmodule.join(GameServer.mapsPath,'resourceMarkers.json');
-    // animalMarkersPath = pathmodule.join(GameServer.mapsPath,'animalMarkers.json');
-    // try{
-    //     GameServer.resourceMarkers = JSON.parse(fs.readFileSync(resourceMarkersPath).toString());
-    // }catch(err){
-    //     console.warn('ERROR loading resource markers');
-    //     GameServer.resourceMarkers = []
-    // }
-    // try{
-    //     GameServer.animalMarkers = JSON.parse(fs.readFileSync(animalMarkersPath).toString());
-    // }catch(err){
-    //     console.warn('ERROR loading animal markers');
-    //     GameServer.animalMarkers = []
-    // }
-    GameServer.updateStatus();
+
+    var markerTypes = ['death','conflict'];
+    var nbTicks = markerTypes.length + 1; // +1 for remains
+    var tick = 0;
+    markerTypes.forEach(function(markerType){
+        GameServer.ephemeralMarkerModel.find({type: markerType},function (err, markers) {
+            if (err) return console.log(err);
+            GameServer[markerType+'Markers'] = markers.map(function(m){
+                return [m.x,m.y];
+            });
+            // console.warn('tick:',tick,'/',nbTicks);
+            if(++tick == nbTicks) GameServer.updateStatus();
+        });
+    });
+
+    GameServer.RemainModel.find(function (err, remains) {
+        if (err) return console.log(err);
+        GameServer.battleRemains = remains;
+        GameServer.battleRemains.forEach(function(r){
+                new Remains(r.x,r.y,r.type);
+        });
+        // console.warn('tick:',tick,'/',nbTicks);
+        if(++tick == nbTicks) GameServer.updateStatus();
+    });
 };
 
 GameServer.getItemsFromDBUpdateCache = function () {
@@ -403,17 +484,21 @@ GameServer.setUpSpawnZones = function(){
     if(config.get('wildlife.nolife')) return;
 
     GameServer.spawnZones = [];
-    var path = pathmodule.join(GameServer.mapsPath,'animals.json');
-    var animals = JSON.parse(fs.readFileSync(path).toString());
-    animals.forEach(function(animal){
+    animalsClusters.forEach(function(animal){
         var x = animal[0];
         var y = animal[1];
-        var data = animal[2];
-        var type = data.split(':')[0];
-        var nb = data.split(':')[1];
-        GameServer.spawnZones.push(new SpawnZone(x,y,type,nb));
+        var type = animal[2];
+        var sz = new SpawnZone(x,y,type);
+        GameServer.spawnZones.push(sz);
     },this);
 
+    GameServer.updateSZActivity();
+    GameServer.updateStatus();
+};
+
+GameServer.finalStep = function(){
+    GameServer.updateFoW();
+    GameServer.updateRegions();
     GameServer.updateStatus();
 };
 
@@ -434,6 +519,9 @@ GameServer.setUpCamps = function(){
     });
 };
 
+/**
+ * Read the list of Civ camps to create in the world from the corresponding file.
+ */
 GameServer.readCamps = function(){
     console.log('Creating camps from camps.json');
     GameServer.campsData = JSON.parse(fs.readFileSync('./assets/data/camps.json').toString());
@@ -450,6 +538,10 @@ GameServer.readCamps = function(){
     }
 };
 
+/**
+ * Create a new Civ camp and keep track of it.
+ * Called by `GameServer.setUpCamps` when reading camps from DB.
+ */
 GameServer.addCamp = function(data){
     var camp = new Camp(data.id, data.center);
     GameServer.camps[camp.id] = camp;
@@ -462,9 +554,9 @@ GameServer.addCamp = function(data){
  * @param {number} y - y tile coordinate of the civ.
  * @returns {Object} The created Civ object.
  */
-GameServer.addCiv = function(x,y){
-    console.log('Spawning civ at',x,y);
-    var npc = new Civ(x,y,0);
+GameServer.addCiv = function(x,y,type){
+    console.log('Spawning civ type ',type,' at',x,y);
+    var npc = new Civ(x,y,type);
     GameServer.civs[npc.id] = npc;
     return npc;
 };
@@ -482,6 +574,15 @@ GameServer.addAnimal = function(x,y,type,instance){
     var animal = new Animal(x,y,type,instance);
     GameServer.animals[animal.id] = animal;
     return animal;
+};
+
+GameServer.getAnimalData = function(type){
+    var animalData = GameServer.animalsData[type];
+    if(animalData.inheritFrom !== undefined){
+        var parentData = GameServer.animalsData[animalData.inheritFrom];
+        animalData = Object.assign(parentData,GameServer.animalsData[type]);
+    }
+    return animalData;
 };
 
 /**
@@ -528,16 +629,7 @@ GameServer.onNewPlayer = function(player){
     // player.applyVigorModifier();
 
     const items = [
-        [7,10],
-        [21, 10],
-        [3, 20],
-        [6,1], // dawn
-        // [2, 1],
-        // [19, 1],
-        [20, 17], // arrows
-        // // [45, 10],
-        // // [50, 11],
-        // [51, 1],
+      
     ];
 
     items.forEach(item => {
@@ -582,10 +674,6 @@ GameServer.startEconomy = function(){
     }
     GameServer.maxTurns = Math.max(maxDuration,300);
 
-    GameServer.spawnZones.forEach(function(zone){
-        zone.update();
-    });
-
     GameServer.economyTurn();
     GameServer.turnDuration = config.get('economyCycles.turnDuration');
     setInterval(GameServer.economyTurn,GameServer.turnDuration*1000);
@@ -597,15 +685,15 @@ GameServer.startEconomy = function(){
  */
 GameServer.economyTurn = function(){
     GameServer.elapsedTurns++;
-    // if(!GameServer.elapsedTurns%10) console.log('Turn',GameServer.elapsedTurns);
-
-    GameServer.spawnZones.forEach(function(zone){
-        zone.update();
-    });
+    // console.log('Turn',GameServer.elapsedTurns);
 
     GameServer.updateEconomicEntities(GameServer.camps); // civ spawn
     GameServer.updateEconomicEntities(GameServer.buildings); // prod, build, ...
     GameServer.updateEconomicEntities(GameServer.players); // food, shelter ...
+
+    GameServer.spawnZones.forEach(function(zone){ // animals spawn
+        zone.update();
+    });
 
     if(GameServer.isTimeToUpdate('itemsRespawn')) GameServer.respawnItems();
 
@@ -618,7 +706,7 @@ GameServer.economyTurn = function(){
  */
 GameServer.updateEconomicEntities = function(entities){
     for(var key in entities){
-        entities[key].update();
+        if(entities.hasOwnProperty(key)) entities[key].update();
     }
 };
 
@@ -668,26 +756,23 @@ GameServer.addNewPlayer = function(socket,data){
             return null;
         }
     }
-    var region = data.selectedSettlement;
+    var region = data.selectedRegion;
     if(region === undefined) region = 0;
 
     var player = new Player();
     player.setUp(++GameServer.lastPlayerID, data.characterName, region);
   
-    if(data.tutorial) {
+    /*if(data.tutorial) {
         player.setInstance();
         if(data.tutorial) GameServer.createInstance(player);
         var info = GameServer.tutorialData['initData'];
         player.setRespawnLocation(info.x,info.y);
-    }
-    // var model = new GameServer.PlayerModel(player);
-    // console.warn('model = ',model._id);
+    }*/
     GameServer.postProcessPlayer(socket,player);
     if(!player.isInstanced()) GameServer.saveNewPlayerToDb(socket,player);
 
     // Send extra stuff following player initialization, unique to new players
     player.setStartingInventory();
-    player.addNotif('Arrived in '+player.getRegionName()); // TODO: notifs in central json file
     return player; // return value for the tests
 };
 
@@ -737,6 +822,7 @@ GameServer.postProcessPlayer = function(socket,player,model){
  */
 GameServer.saveNewPlayerToDb = function(socket,player){
     if(!socket || socket.dummy === true) return;
+    console.log('Player inventory before save:',player.inventory);
     var document = new GameServer.PlayerModel(player);
     document.save(function (err,doc) {
         if (err) return console.error(err);
@@ -971,16 +1057,35 @@ GameServer.lootNPC = function(player,type,ID){
     var NPC = map[ID];
     // TODO: check for proximity
     if(!NPC.isDead()) return false;
-    if(NPC.loot.isEmpty()) return false;
+    if(NPC.loot.isEmpty()){
+        player.addNotif('Nothing to loot');
+        return false;
+    }
     for(var item in NPC.loot.items){
         // TODO: take harvesting ability into consideration
         var nb = NPC.loot.items[item];
         player.giveItem(item,nb,true,'Scavenged');
-        GameServer.createItem(item,nb,'loot');
+        GameServer.createItem(item,nb,player.region,'loot');
     }
-    GameServer.removeEntity(NPC); // TODO: handle differently, leave carcasses
+    GameServer.addRemains(NPC.x,NPC.y,type);
+    GameServer.removeEntity(NPC);
+    // if(type == 'animal') GameServer.regions[player.region].updateFood();
+    if(type == 'animal') GameServer.regions[player.region].event('loot',player);
     Prism.logEvent(player,'loot',{name:NPC.name});
     return true; // return value for the unit tests
+};
+
+GameServer.addRemains = function(x,y,type){
+    var t = (type == 'animal' ? 0 : 1);
+    GameServer.battleRemains.push([x,y,t]);
+    if(GameServer.battleRemains.length > 500) GameServer.battleRemains.shift(); // TODO: conf
+
+    new Remains(x,y,t);
+
+    var document = new GameServer.RemainModel({x: x, y: y, type:t});
+    document.save(function (err) {
+        if (err) return console.error(err);
+    });
 };
 
 /**
@@ -1001,6 +1106,18 @@ GameServer.respawnItems = function(){
         item.setRespawnable();
         console.log('respawning ',GameServer.itemsData[data.type].name,'at',data.x,data.y);
     }
+};
+
+GameServer.updateSZActivity = function(){
+    console.log('Updating active spawn zones ...');
+    GameServer.animalMarkers = [];
+    for(var key in GameServer.spawnZones){
+        if(!GameServer.spawnZones.hasOwnProperty(key)) continue;
+        var sz = GameServer.spawnZones[key];
+        sz.updateActiveStatus();
+        if(sz.isActive()) GameServer.animalMarkers.push(sz.getMarkerData());
+    }
+    GameServer.setFlag('animalsMarkers');
 };
 
 /**
@@ -1037,7 +1154,8 @@ GameServer.forage = function(player, type){
     var nb = GameServer.itemsData[type].yield || 1;
     player.giveItem(type,nb,true,'Picked');
     Prism.logEvent(player,'pickup',{item:type});
-    GameServer.createItem(type,nb,'pickup');
+    GameServer.createItem(type,nb,player.region,'pickup');
+    GameServer.regions[player.region].event('pickup',player);
 };
 
 /**
@@ -1050,9 +1168,12 @@ GameServer.forage = function(player, type){
  * @param {string} source - which process led to the creation of the item
  * (crafting, loot...)
  */
-GameServer.createItem = function(item,nb,source){
-    if(!GameServer.itemCounts.hasOwnProperty(item)) GameServer.itemCounts[item] = 0;
-    GameServer.itemCounts[item] += nb;
+GameServer.createItem = function(item,nb,region,source){
+    //if(!GameServer.itemCounts.hasOwnProperty(item)) GameServer.itemCounts[item] = 0;
+    //GameServer.itemCounts[item] += nb;
+    // console.warn(item,nb,GameServer.regions[region].name,source);
+    GameServer.itemCounts.add(item,nb);
+    GameServer.regions[region].addItem(item,nb);
     // TODO: log sources
 };
 
@@ -1063,8 +1184,11 @@ GameServer.createItem = function(item,nb,source){
  * @param {number} nb - amount of items removed.
  * @param {string} source - which process led to the destruction of the item.
  * */
-GameServer.destroyItem = function(item,nb,source){
-    GameServer.itemCounts[item] -= nb;
+GameServer.destroyItem = function(item,nb,region,source){
+    // GameServer.itemCounts[item] -= nb;
+    GameServer.itemCounts.take(item,nb);
+    GameServer.regions[region].removeItem(item,nb);
+    // TODO: log sources
 };
 
 /**
@@ -1099,6 +1223,7 @@ GameServer.handleBattle = function(attacker,attacked){
     }
     var battle = GameServer.checkBattleOverlap(area);
     if(!battle) battle = new Battle();
+
     battle.addFighter(attacker);
     battle.addFighter(attacked);
     GameServer.addBattleArea(area,battle);
@@ -1110,7 +1235,7 @@ GameServer.handleBattle = function(attacker,attacked){
         Prism.logEvent(player,'battle',{category:foe.entityCategory,type:foe.type});
     }
     if(attacked.isPlayer) attacked.addNotif('You were attacked by '+attacker.name);
-    if(attacker.isPlayer) attacker.addNotif('You attacked '+attacker.name);
+    if(attacker.isPlayer) attacker.addNotif('You attacked '+attacked.name);
     if(attacked.entityCategory == 'PlayerBuilding') GameServer.notifyPlayer(attacked.owner,'Your '+attacked.name+' was attacked by '+attacker.name);
     if(attacked.isCiv || attacker.isCiv) GameServer.addMarker('conflict',attacked.x,attacked.y);
     return true;
@@ -1238,6 +1363,7 @@ GameServer.addBattleArea = function(area,battle){ // area should be a list
     area.forEach(function(c){
         GameServer.addBattleCell(battle,c.x,c.y);
     },this);
+    battle.updateCenter();
 };
 
 
@@ -1253,7 +1379,7 @@ GameServer.addBattleCell = function(battle,x,y){
     if(GameServer.battleCells.get(x,y)) return;
     var cell = new BattleCell(x,y,battle);
     GameServer.battleCells.add(x,y,cell);
-    battle.cells.add(x,y,cell);
+    battle.addBattleCell(x,y,cell);
 };
 
 /**
@@ -1275,20 +1401,24 @@ GameServer.removeBattleCell = function(cell){
  * @param {Battle} battle - The Battle instance in which to include surrounding entities.
  */
 GameServer.addSurroundingFighters = function(battle){
-    var center = {
-        x: 0,
-        y: 0
-    };
-    battle.fighters.forEach(function(f){
-        center.x += f.x;
-        center.y += f.y;
-    });
-    center.x = Math.floor(center.x/battle.fighters.length);
-    center.y = Math.floor(center.y/battle.fighters.length);
-    center = GameServer.battleCells.get(center.x,center.y);
-    battle.setCenter(center.x,center.y);
-    if(!center) return;
+    // var center = {
+    //     x: 0,
+    //     y: 0
+    // };
+    // battle.fighters.forEach(function(f){
+    //     center.x += f.x;
+    //     center.y += f.y;
+    // });
+    // center.x = Math.floor(center.x/battle.fighters.length);
+    // center.y = Math.floor(center.y/battle.fighters.length);
+    // center = GameServer.battleCells.get(center.x,center.y);
+    // if(!center){
+    //     console.warn('ERROR: could not compute battle center!');
+    //     return;
+    // }
+    // battle.setCenter(center.x,center.y);
 
+    var center = battle.getCenter();
     var r = GameServer.battleParameters.aggroRange;
     // console.warn(Math.floor(center.x-r/2),Math.floor(center.y-r/2),r,r);
     // implies Chebyshev distance
@@ -1296,7 +1426,7 @@ GameServer.addSurroundingFighters = function(battle){
     for(var i = 0; i < neighbors.length; i++){
         var entity = neighbors[i];
         if(entity.canFight() && entity.isAvailableForFight()) {
-            console.warn('Adding nearby',entity.getShortID());
+            console.log('Adding nearby',entity.getShortID());
             GameServer.connectToBattle(entity,center);
         }
     }
@@ -1322,20 +1452,38 @@ GameServer.handleBattleAction = function(data,socketID){
  * @param {number} h - height of the area.
  * @returns {Array} - List of entities found.
  */
-GameServer.getEntitiesAt = function(x,y,w,h){
-    var aois = new Set(
-        Utils.listAdjacentAOIs(Utils.tileToAOI(x,y))
-        .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x+w,y)))
-        .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x,y+h)))
-        .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x+w,y+h)))
-    );
+GameServer.getEntitiesAt = function(x,y,w,h,typeFilter){
+    if(isNaN(x) || isNaN(y) || isNaN(w) || isNaN(h)){
+        console.warn('ERROR: NaN input values for getEntities');
+        return;
+    }
+    var aois;
+    if(w == 1 && h == 1){
+        aois = [Utils.tileToAOI(x,y)];
+    }else {
+        var aois = new Set(
+            Utils.listAdjacentAOIs(Utils.tileToAOI(x, y))
+                .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x + w, y)))
+                .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x, y + h)))
+                .concat(Utils.listAdjacentAOIs(Utils.tileToAOI(x + w, y + h)))
+        );
+    }
     var entities = [];
     var rect = {x:x,y:y,w:w,h:h};
     aois.forEach(function(aoi){
+        if(!(aoi in GameServer.AOIs)){
+            console.warn('Invalid AOI ',aoi);
+            return;
+        }
         GameServer.AOIs[aoi].entities.forEach(function(entity){
             if(Utils.overlap(entity.getRect(),rect)) entities.push(entity);
         });
     });
+    if(typeFilter){
+        entities = entities.filter(function(e){
+            return (typeFilter.includes(e.entityCategory));
+        });
+    }
     return entities;
 };
 
@@ -1402,7 +1550,8 @@ GameServer.handleShop = function(data,socketID) {
             if (!player.canBuy(price)) return false;
             player.takeGold(price, true);
             building.giveGold(price);
-            player.updateVigor(-3); // TODO: vary + conf
+            // player.updateVigor(-3); // TODO: vary + conf
+            GameServer.updateVigor(player,'buy');
             var phrase = [player.name,'bought',nb,GameServer.itemsData[item].name,'for',price,Utils.formatMoney(price)];
             var msg = phrase.join(' ');
             GameServer.notifyPlayer(building.owner,msg);
@@ -1432,7 +1581,7 @@ GameServer.handleShop = function(data,socketID) {
             if(price === 0) return false;
             player.giveGold(price, true);
             building.takeGold(price);
-            player.updateVigor(-3); // TODO: vary + conf
+            GameServer.updateVigor(player,'sell');
             player.gainClassXP(GameServer.classes.merchant,Math.floor(price/10), true); // TODO: factor in class level
         }
         var verb = (isFinancial ? 'Sold' : 'Gave');
@@ -1453,6 +1602,7 @@ GameServer.handleShop = function(data,socketID) {
         }
         building.updateBuild();
         building.updateRepair();
+        GameServer.regions[player.region].event('give',player);
     }
     building.save();
     Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type,owner:building.ownerName});
@@ -1537,9 +1687,12 @@ GameServer.buildPlayerBuilding = function(player,bid,tile){
 
 GameServer.finalizeBuilding = function(player,building){
     building.embed();
-    GameServer.setFlag('buildingsMarkers');
     player.addBuilding(building);
+    GameServer.setFlag('buildingsMarkers');
+    // GameServer.regions[building.region].updateBuildings();
     GameServer.updateFoW();
+    GameServer.updateSZActivity();
+    GameServer.computeFrontier(true);
     if(GameServer.buildingParameters.autobuild) building.setBuilt();
 };
 
@@ -1552,6 +1705,8 @@ GameServer.buildCivBuilding = function(data){
     });
     building.embed();
     GameServer.setFlag('buildingsMarkers');
+    GameServer.computeFrontier(true);
+    GameServer.updateSZActivity();
     return building;
 };
 
@@ -1571,10 +1726,19 @@ GameServer.listBuildingMarkers = function(instance){
         var building = GameServer.buildings[bid];
         if(!building.isOfInstance(instance)) continue;
         if(building.civ && !building.built) continue;
+        if(!GameServer.isNotInFoW(building.x,building.y)) continue;
         var bld = building.mapTrim();
         list.push(bld);
     }
     return list;
+};
+
+GameServer.listAnimalMarkers = function(){
+    return GameServer.animalMarkersFiltered;
+};
+
+GameServer.listResourceMarkers = function(){
+    return GameServer.resourceMarkersFiltered;
 };
 
 GameServer.addMarker = function(markerType,x,y){
@@ -1586,13 +1750,24 @@ GameServer.addMarker = function(markerType,x,y){
     GameServer[markerType+'Markers'].push([x,y]);
     if(GameServer[markerType+'Markers'].length > 10) GameServer[markerType+'Markers'].shift(); // TODO: conf
     GameServer.setFlag(mapName);
-    var path = pathmodule.join(GameServer.mapsPath,markerType+'Markers.json');
-    fs.writeFile(path,JSON.stringify(GameServer[markerType+'Markers']),function(err){
-        if(err) throw err;
-        console.log(markerType+' markers written');
+
+    var document = new GameServer.ephemeralMarkerModel({x:x, y:y, type: markerType});
+    document.save(function (err) {
+        if (err) return console.error(err);
     });
 };
 
+GameServer.updateVigor = function(player, action, multiplier){
+    var vigor_map = {
+        'buy': -3,
+        'craft': -3,
+        'sell': -3,
+        'walk': -GameServer.characterParameters.stepsLoss
+    };
+    multiplier = multiplier || 1;
+    var nb = (action in vigor_map ? vigor_map[action] : 1);
+    player.updateVigor(nb*multiplier);
+};
 
 GameServer.findNextFreeCell = function(x,y){
     var stoppingCritetion = 100;
@@ -1667,7 +1842,8 @@ GameServer.handleCraft = function(data,socketID){
     }
     GameServer.operateCraft(player, targetItem, nb);
     if(isFinancial) building.giveGold(player.takeGold(price));
-    player.updateVigor(-3*nb); // TODO: vary + conf
+    // player.updateVigor(-3*nb); 
+    GameServer.updateVigor(player,'craft',nb);
     player.gainClassXP(GameServer.classes.craftsman,5*nb,true); // TODO: vary based on multiple factors
     if(!building.isOwnedBy(player)) {
         var phrase = [player.name,'crafted',nb,GameServer.itemsData[targetItem].name,'for',price,Utils.formatMoney(price),'in my Workshop'];
@@ -1682,15 +1858,19 @@ GameServer.operateCraft = function(recipient,targetItem,nb){
     var recipe = GameServer.itemsData[targetItem].recipe;
     for(var item in recipe) {
         recipient.takeItem(item,recipe[item]*nb,'backpack',true,'Consumed');
-        GameServer.destroyItem(item,recipe[item]*nb,'craft');
+        GameServer.destroyItem(item,recipe[item]*nb,recipient.region,'craft');
     }
     var output = GameServer.itemsData[targetItem].output || 1;
     recipient.giveItem(targetItem, nb * output, true,'Crafted'); // true to notify player (if player) or rememeber transaction (if building)
-    GameServer.createItem(targetItem,nb*output,'craft');
+    GameServer.createItem(targetItem,nb*output,recipient.region,'craft');
 };
 
 GameServer.handlePath = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
+    if(!player){
+        console.warn('ERROR: no player for handlePath');
+        return;
+    }
     player.setAction(data.action);
     player.setPath(data.path);
     if(player.inFight){
@@ -1753,8 +1933,9 @@ GameServer.handleUse = function(data,socketID){
     if(nb == 0) return false;
     var verb = (isEquipment ? 'Equipped' : (itemData.verb || 'Used'));
     player.takeItem(item, nb, inventory, true, verb);
-    if(!isEquipment) GameServer.destroyItem(item, nb, 'use');
+    if(!isEquipment) GameServer.destroyItem(item, nb, player.region, 'use');
     if (!player.inFight) player.save();
+    if(item == 1) GameServer.regions[player.region].updateFood();
 
     Prism.logEvent(player,'use',{item:item});
     return result;
@@ -1768,6 +1949,7 @@ GameServer.handleUnequip = function(data,socketID) {
 
 GameServer.handleExit = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
+    if(!player) return;
     player.exitBuilding();
 };
 
@@ -1804,7 +1986,9 @@ GameServer.handleAOItransition = function(entity,previous){
     if(entity.setFieldOfVision) entity.setFieldOfVision(AOIs);
     if(entity.isPlayer) {
         GameServer.updateVision();
-        GameServer.updateFoW();
+        var FoWchange = GameServer.updateFoW();
+        entity.setRegion();
+        if(FoWchange) GameServer.regions[entity.region].event('fow',previous ? entity : null); // If no previous entity, then it's a player spawn, don't send player object so no XP reward
     }
     newAOIs.forEach(function(aoi){
         if(entity.isPlayer) entity.newAOIs.push(aoi); // list the new AOIs in the neighborhood, from which to pull updates
@@ -1840,17 +2024,51 @@ GameServer.dissipateFoW = function(aoi){
 GameServer.updateFoW = function(){
     for(var pid in GameServer.players){
         var player = GameServer.players[pid];
-        player.fieldOfVision.forEach(GameServer.dissipateFoW);
+        // player.fieldOfVision.forEach(GameServer.dissipateFoW);
+        GameServer.dissipateFoW(player.aoi);
     }
     for(var bid in GameServer.buildings){
         var building = GameServer.buildings[bid];
         if(!building.civ) GameServer.dissipateFoW(building.aoi);
     }
-    // GameServer.fowChanged = true;
-    GameServer.setFlag('FoW');
+    var previousfow = GameServer.fowList;
     GameServer.fowList = GameServer.computeFoW();
+    previousfow.sort();
+    GameServer.fowList.sort();
+    if(previousfow.toString() == GameServer.fowList.toString()) {
+        console.log('FoW unchanged');
+        return false;
+    } // no change
+    for(var id in GameServer.regions){
+        GameServer.regions[id].updateFoW();
+    }
+    GameServer.animalMarkersFiltered = GameServer.filterMarkers('animal');
+    GameServer.resourceMarkersFiltered = GameServer.filterMarkers('resource');
+    GameServer.setFlag('FoW');
+    GameServer.setFlag('animalsMarkers');
+    GameServer.setFlag('resourcesMarkers');
+    return true;
 };
 
+GameServer.filterMarkers = function(type){
+    return GameServer[type+'Markers'].filter(function(m){
+        return GameServer.isNotInFoW(m[0],m[1]);
+    });
+};
+
+GameServer.isNotInFoW = function(x,y){
+    var aoi = Utils.tileToAOI(x,y);
+    var nbr = Utils.listAdjacentAOIs(aoi);
+    for(var i = 0; i < nbr.length; i++){
+        if(GameServer.fowList.includes(nbr[i])) return true;
+    }
+    return false;
+};
+
+/**
+ * List AOIs that are *not* covered by fog of war.
+ * @returns {Array}
+ */
 GameServer.computeFoW = function(){
     var fow = [];
     for(var aoi in GameServer.fogOfWar){
@@ -1860,7 +2078,7 @@ GameServer.computeFoW = function(){
             delete GameServer.fogOfWar[aoi];
             continue;
         }
-        fow.push(aoi);
+        fow.push(parseInt(aoi));
     }
     return fow;
 };
@@ -1877,7 +2095,6 @@ GameServer.computeFrontier = function(setFlag){
             t: (bld.civ ? 'r' : 'b')
         });
     }
-    console.warn(sites.length+' buildings considered for Frontier');
 
     var voronoi = new Voronoi();
     var bbox = {xl: 0, xr: World.worldWidth, yt: 0, yb: World.worldHeight}; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
@@ -1896,34 +2113,63 @@ GameServer.computeFrontier = function(setFlag){
             }
         });
     },this);
-    console.warn('frontier:',GameServer.frontier);
+    // console.log('frontier:',GameServer.frontier);
     if(setFlag) GameServer.setFlag('frontier');
 };
 
-/**
- * Compute the degree of rarity of the items in the world.
- * Called by player.initTrim();
- * */
-GameServer.getRarity = function(){
-    var rarity = [];
-    // TODO: conf
-    function computeRarity(count){
-        if(count <= 1){
-            return 0;
-        }else if(count <= 10){
-            return 1;
-        }else if(count <= 100){
-            return 2;
-        }else{
-            return 3;
-        }
+GameServer.computeRegions = function(){
+    GameServer.regionsCache = new SpaceMap();
+    GameServer.regionBoundaries = [];
+    GameServer.regions = {};
+    var sites = [];
+    for(var id in GameServer.regionsData){
+        var region = GameServer.regionsData[id];
+        GameServer.regions[id] = new Region(region);
+        sites.push({
+            x: region.x,
+            y: region.y
+        });
     }
 
-    for(var item in GameServer.itemCounts){
-        // console.warn(item,GameServer.itemCounts[item],computeRarity(GameServer.itemCounts[item]));
-        rarity.push([item,computeRarity(GameServer.itemCounts[item])]);
+    // var voronoi = new Voronoi();
+    // var bbox = {xl: 0, xr: World.worldWidth, yt: 0, yb: World.worldHeight}; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
+    // var diagram = voronoi.compute(sites, bbox);
+    //
+    // diagram.edges.forEach(function(edge){
+    //     if(!edge.lSite || !edge.rSite) return;
+    //     GameServer.regionBoundaries.push({
+    //         a:{
+    //             x: edge.va.x,
+    //             y: edge.va.y
+    //         },
+    //         b:{
+    //             x: edge.vb.x,
+    //             y: edge.vb.y
+    //         }
+    //     });
+    // },this);
+
+    GameServer.AOIs.forEach(function(aoi){
+        var region = GameServer.getRegion(aoi);
+        GameServer.regions[region].addAOI(aoi.id);
+    });
+};
+
+GameServer.getRegion = function(entity){
+    var cache = GameServer.regionsCache.get(entity.x,entity.y);
+    if(cache) return cache;
+    var min = 999999;
+    var closest = null;
+    for (var id in GameServer.regions) {
+        var region = GameServer.regions[id];
+        var d = Utils.euclidean(region, entity);
+        if (d < min) {
+            min = d;
+            closest = region;
+        }
     }
-    return rarity;
+    GameServer.regionsCache.add(entity.x,entity.y,closest.id);
+    return closest.id;
 };
 
 GameServer.notifyPlayer = function(playerID,msg){
@@ -1958,6 +2204,7 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         player.newAOIs.forEach(function(aoi){
             individualGlobalPkg.synchronize(GameServer.AOIs[aoi]); // fetch entities from the new AOIs
         });
+        // console.warn(individualGlobalPkg);
         player.oldAOIs.forEach(function(aoi){
             individualGlobalPkg.desync(GameServer.AOIs[aoi]); // forget entities from old AOIs
         });
@@ -2173,7 +2420,7 @@ GameServer.listCamps = function(){
 // List settlements for selection screen + to get list of toponyms
 GameServer.listRegions = function(){
     return {
-        regions: GameServer.regions,
+        regions: GameServer.regionsData,
         world: {
             width: World.worldWidth,
             height: World.worldHeight

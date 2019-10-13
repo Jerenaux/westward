@@ -17,7 +17,7 @@
         rangedAtkDelay: 500
    },
    buildings: {
-        autobuild: false,
+        autobuild: true,
         canfight: true,
         nobuildings: false,
         inventorySize: 100,
@@ -72,12 +72,12 @@
             aggro: 1500
     },
     civs: {
-        aggro: false,
+        aggro: true,
         wander: true,
         raidMinimum: 3
     },
     wildlife: {
-        aggro: false,
+        aggro: true,
         nolife: false,
         wander: true,
         wanderRange: 5,
@@ -95,6 +95,7 @@
         },
         config: { // Will be in Engine.config
             chatTimeout: 5000, //ms
+            fogOfWar: true,
             notificationTimeout: 3000, //ms ; TODO: adapt based on length?
             hearingDistance: 30, // tiles
             defaultBuildRecipes: [3,4,6,11,2] // workshop, shop, lumbercamp, shack

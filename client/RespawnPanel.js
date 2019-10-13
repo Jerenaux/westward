@@ -1,6 +1,11 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 26-02-18.
  */
+import BigButton from './BigButton'
+import Engine from './Engine'
+import {MiniProgressBar} from "./ProgressBar";
+import Panel from './Panel'
+import Utils from '../shared/Utils'
 
 function RespawnPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
@@ -52,3 +57,5 @@ RespawnPanel.prototype.hide = function(){
     this.button.hide();
     this.hideTexts();
 };
+
+export default RespawnPanel

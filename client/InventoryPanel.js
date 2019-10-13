@@ -1,6 +1,12 @@
 /**
  * Created by jeren on 30-12-17.
  */
+import Engine from './Engine'
+import ItemSprite from './ItemSprite'
+import Panel from './Panel'
+import UI from './UI'
+
+import itemsData from '../assets/data/items.json'
 
 function InventoryPanel(x,y,width,height,title,invisible){
     Panel.call(this,x,y,width,height,title,invisible);
@@ -10,7 +16,7 @@ function InventoryPanel(x,y,width,height,title,invisible){
     this.slotsCounter = 0;
     this.slotsAdded = false;
     this.zone = this.createZone();
-    this.dataMap = Engine.itemsData;
+    this.dataMap = itemsData;
     this.depth = 2;
 }
 
@@ -141,7 +147,7 @@ InventoryPanel.prototype.getInventory = function(){
 InventoryPanel.prototype.listItems = function(){
     const items = this.getInventory().toList(true);
     items.sort(function(a,b){
-        if(Engine.itemsData[a[0]].name < Engine.itemsData[b[0]].name) return -1;
+        if(itemsData[a[0]].name < itemsData[b[0]].name) return -1;
         return 1;
     });
     return items;
@@ -242,7 +248,7 @@ InventoryPanel.prototype.applyFilter = function(item){
         return true;
     }else if(this.config.filterType === 'property'){ // e.g. for items usable in battle
         var filter = this.config.filterProperty;
-        return !!(Engine.itemsData[item][filter]);
+        return !!(itemsData[item][filter]);
     }
 };
 
@@ -282,3 +288,5 @@ InventoryPanel.prototype.hide = function(){
     Panel.prototype.hide.call(this);
     this.resetCounters();
 };
+
+export default InventoryPanel

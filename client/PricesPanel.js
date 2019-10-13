@@ -1,6 +1,9 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 02-12-18.
  */
+import Engine from './Engine'
+import Panel from './Panel'
+
 function PricesPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
 
@@ -158,3 +161,5 @@ PriceSlot.prototype.hide = function(){
     if(this.sell) this.sell.style.display = "none";
     this.hideButtons();
 };
+
+export default PricesPanel
