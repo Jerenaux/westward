@@ -8,20 +8,6 @@
         canfight: true,
         nobuildings: false
    },
-   economyCycles: {
-        // Unit: seconds
-        turnDuration: 60,
-        // Unit: turns
-        turns: {
-            build: 10,
-            camps: 5,
-            commitment: 1,
-            foodConsumption: 10,
-            harvesting: 300,
-            settlements: 1,
-            spawnZones: 5
-        }
-    },
     misc: {
         performInit: false,
         debugQT: false
