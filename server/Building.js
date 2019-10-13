@@ -218,7 +218,7 @@ Building.prototype.updateProd = function(justBuilt){
             if(this.hasItem(1,1)){
                 this.takeItem(1,1);
                 GameServer.destroyItem(1,1,this.region, 'building food consumption');
-                GameServer.regions[player.region].updateFood();
+                GameServer.regions[this.region].event('consumefood');
             }
         }
 

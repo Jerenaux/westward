@@ -191,7 +191,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.updateStatus();
     Prism.logEvent(null,'server-start');
     var hrend = process.hrtime(hrstart);
-    console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000);
+    console.info('readMap execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
 };
 
 /**
@@ -300,6 +300,7 @@ GameServer.getBootParams = function(socket,data){
  * Called by the initialization sequence.
  */
 GameServer.readPlayersData = function(){
+    var hrstart = process.hrtime();
     console.log('Reading player data ...');
     GameServer.PlayerModel.find(function(err,players){
         if (err) return console.log(err);
@@ -321,6 +322,8 @@ GameServer.readPlayersData = function(){
             }
         });
         console.log('Last player ID:',GameServer.lastPlayerID);
+        var hrend = process.hrtime(hrstart);
+        console.info('readPlayersData execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
         GameServer.updateStatus();
     });
 };
@@ -365,6 +368,7 @@ GameServer.addBuilding = function(data){
  * Called during the initialization sequence.
  */
 GameServer.loadBuildings = function(){
+    var hrstart = process.hrtime();
     if(config.get('buildings.nobuildings')){
         GameServer.updateStatus();
         return;
@@ -377,6 +381,8 @@ GameServer.loadBuildings = function(){
 
         // GameServer.updateRegions(); // Not called because downstream of the init sequence, setupSpawnZones calles it
         GameServer.computeFrontier(false);
+        var hrend = process.hrtime(hrstart);
+        console.info('loadBuildings execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
         GameServer.updateStatus();
     });
 };
@@ -414,6 +420,7 @@ GameServer.spawnCamps = function(){
  * Called during the initialization sequence.
  */
 GameServer.loadItems = function(){
+    var hrstart = process.hrtime();
     itemsOnMap.forEach(function(item){
         var x = item[0];
         var y = item[1];
@@ -426,6 +433,8 @@ GameServer.loadItems = function(){
         var item = GameServer.addItem(x,y,type);
         item.setRespawnable();
     },this);
+    var hrend = process.hrtime(hrstart);
+    console.info('loadItems execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
     GameServer.updateStatus();
 };
 
@@ -434,6 +443,7 @@ GameServer.loadItems = function(){
  * from file those who are stored in files.
  */
 GameServer.loadMarkers = function(){
+    var hrstart = process.hrtime();
     GameServer.resourceMarkers = resourceMarkers;
     GameServer.resourceMarkers.forEach(function(m){
        var region = GameServer.getRegion({x:m[0],y:m[1]});
@@ -450,7 +460,11 @@ GameServer.loadMarkers = function(){
                 return [m.x,m.y];
             });
             // console.warn('tick:',tick,'/',nbTicks);
-            if(++tick == nbTicks) GameServer.updateStatus();
+            if(++tick == nbTicks) {
+                var hrend = process.hrtime(hrstart);
+                console.info('loadMarkers execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+                GameServer.updateStatus();
+            }
         });
     });
 
@@ -461,7 +475,11 @@ GameServer.loadMarkers = function(){
                 new Remains(r.x,r.y,r.type);
         });
         // console.warn('tick:',tick,'/',nbTicks);
-        if(++tick == nbTicks) GameServer.updateStatus();
+        if(++tick == nbTicks) {
+            var hrend = process.hrtime(hrstart);
+            console.info('loadMarkers execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+            GameServer.updateStatus();
+        }
     });
 };
 
@@ -481,6 +499,7 @@ GameServer.getItemsFromDBUpdateCache = function () {
  * Called during the initialization sequence.
  */
 GameServer.setUpSpawnZones = function(){
+    var hrstart = process.hrtime();
     if(config.get('wildlife.nolife')) return;
 
     GameServer.spawnZones = [];
@@ -493,12 +512,17 @@ GameServer.setUpSpawnZones = function(){
     },this);
 
     GameServer.updateSZActivity();
+    var hrend = process.hrtime(hrstart);
+    console.info('setUpSpawnZones execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
     GameServer.updateStatus();
 };
 
 GameServer.finalStep = function(){
+    var hrstart = process.hrtime();
     GameServer.updateFoW();
     GameServer.updateRegions();
+    var hrend = process.hrtime(hrstart);
+    console.info('finalSetp execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
     GameServer.updateStatus();
 };
 
@@ -507,6 +531,7 @@ GameServer.finalStep = function(){
  * Called during the initialization sequence.
  */
 GameServer.setUpCamps = function(){
+    var hrstart = process.hrtime();
     GameServer.camps = {};
     GameServer.CampModel.find(function (err, camps) {
         if (err) return console.log(err);
@@ -515,6 +540,8 @@ GameServer.setUpCamps = function(){
         }else{
             camps.forEach(GameServer.addCamp);
         }
+        var hrend = process.hrtime(hrstart);
+        console.info('setUpCamps execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
         GameServer.updateStatus();
     });
 };
@@ -624,7 +651,8 @@ GameServer.onNewPlayer = function(player){
     // for testing)
     if(!config.get('misc.performInit')) return;
     // give me all the health and vigor
-    player.setStat('hp', 300);
+    // player.setStat('hp', 300);
+    player.giveItem(1,5);
     // player.setStat('vigor', 10);
     // player.applyVigorModifier();
 

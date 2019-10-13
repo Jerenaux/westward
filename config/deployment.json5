@@ -14,8 +14,7 @@
     },
     civs: {
         aggro: true,
-        wander: true,
-        raidMinimum: 8
+        wander: true
     },
     wildlife: {
         aggro: true,

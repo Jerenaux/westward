@@ -1,4 +1,5 @@
 ## To test:
+- Test Building.updateProd()
 - Test handleCraft when a price is undefined
 - Test starting inventory of new player
 - Test settlement selection (with value of 0)
@@ -64,21 +65,21 @@ Packaging
 - Message when entering enemy territory
 
 Bugs:
-- Wrong explo XP rewards
+- Split Engine.js
+- Speed up boot on Droplet
+- Stop using shader for items outline?
 Features:
 - Add Bear + remains
 - Players only clear 1 AOI FoW? Towers clear multiple?
-- Proper specific updates when relevant player actions + XP reward
 - Specify where toponyms are displayed
 - Toggle region names
 - General info: how many regions settled, which regions are the most dangerous/currently contested, which
-regions are the most/least developed, barren/lush based on # nodes...
+regions are the most/least developed, barren/lush based on # nodes, # days since last attack...
 - Info on statuses of neighboring regions (hard-coded) + use this to improve getRegion() 
 - Identify resource speciality of regions and incentivize exports
--> # days since last attack
--> Conquered / settled based on history
+- Conquered / settled based on history
 - Identify AOIs on enemy side of frontier and display warning/permanent danger indicator
-- Bld limit: one under construction at a time, otherwise no limit
+- Bld limit: one under construction at a time, otherwise no limit / regional limit
 - Display all region names, regardless of FoW? + "???" name until players visit?
 - Restore dragging
 - Button to toggle regions (borders and banner names)
