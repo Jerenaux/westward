@@ -66,7 +66,8 @@ Packaging
 
 Bugs:
 - Split Engine.js
-- Speed up boot on Droplet
+- Speed up boot on Droplet / replace pm2?
+- Use Docker?
 - Stop using shader for items outline?
 - Stones count to 0 as throwable?
 - Orientation pins bugs

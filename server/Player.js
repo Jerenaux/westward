@@ -55,6 +55,7 @@ function Player() {
         3: 0,
         4: 0 // civic AP
     };
+    this.abilities = [];
     this.baseBldrecipes = GameServer.clientParameters.config.defaultBuildRecipes;
     this.bldRecipes = [];
 
@@ -781,6 +782,7 @@ Player.prototype.getDataFromDb = function (data) {
     this.y = Utils.clamp(data.y, 0, World.worldHeight - 1);
     this.classxp = data.classxp;
     this.classlvl = data.classlvl;
+    this.abilities = data.abilities;
     this.setOwnProperty('inBuilding', data.inBuilding);
 
     if (!data.stats) data.stats = [];
@@ -788,7 +790,7 @@ Player.prototype.getDataFromDb = function (data) {
         this.getStat(stat.stat).setBaseValue(stat.value);
         this.refreshStat(stat.stat);
     }, this);
-    this.setStat('hp', Math.max(this.getStat('hp').getValue(), 10)); // quick fix
+    this.setStat('hp', Math.max(this.getStat('hp').getValue(), 10)); // quick fix TODO remove
     this.applyVigorModifier();
 
     if (data) {

@@ -47,6 +47,7 @@ let Schemas = {
         classxp: mongoose.Schema.Types.Mixed,
         classlvl: mongoose.Schema.Types.Mixed,
         ap: mongoose.Schema.Types.Mixed,
+        abilities: {type: []},
         equipment: mongoose.Schema.Types.Mixed,
         commitSlots: mongoose.Schema.Types.Mixed,
         origin: {type: Number, min: 0, required: true},

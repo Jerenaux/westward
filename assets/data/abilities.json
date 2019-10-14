@@ -1,19 +1,9 @@
 {
-    "soldier": [
-        {
-            "name": "More offensive actions",
-            "desc": "In battle, allows you to attack one more time per turn.",
-            "effect": "",
-            "fatigue": "disable" 
-        }
-    ],
-    "explorer": [
-
-    ],
-    "craftsman": [
-
-    ],
-    "merchant": [
-
-    ]
+    "0": {
+        "class": 0,
+        "name": "Healthy",
+        "desc": "Increase maximum vitality to 400",
+        "hook": "stats",
+        "effect": "stat:hpmax:400"
+    }
 }

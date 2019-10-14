@@ -149,6 +149,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.civsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'civs.json')).toString()); // './assets/data/civs.json'
     GameServer.buildingsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'buildings.json')).toString()); // './assets/data/buildings.json'
     GameServer.classData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'classes.json')).toString()); // './assets/data/classes.json'
+    GameServer.abilitiesData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'abilities.json')).toString()); // './assets/data/classes.json'
     GameServer.regionsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'regions.json')).toString()); // './assets/data/classes.json'
     GameServer.tutorialData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'tutorials.json')).toString()); // './assets/data/texts.json'
     GameServer.instances = {};
@@ -184,8 +185,8 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.marketPrices = new ListMap();
 
     GameServer.computeRegions();
-
     GameServer.initializeFlags();
+    GameServer.registerAbilityHooks();
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
@@ -193,6 +194,15 @@ GameServer.readMap = function(mapsPath,test,cb){
     var hrend = process.hrtime(hrstart);
     console.log('readMap execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
     console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
+};
+
+GameServer.registerAbilityHooks = function(){
+    GameServer.abilityHooks = {};
+    for(var aid in GameServer.abilitiesData){
+        var data = GameServer.abilitiesData[aid];
+        if(!(data.hook in GameServer.abilityHooks)) GameServer.abilityHooks[data.hook] = [];
+        GameServer.abilityHooks[data.hook].push(aid);
+    }
 };
 
 /**
