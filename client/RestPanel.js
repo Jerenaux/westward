@@ -4,6 +4,7 @@
 import Engine from './Engine'
 import Panel from './Panel'
 import UI from './UI'
+import Utils from '../shared/Utils'
 
 function RestPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title,false);

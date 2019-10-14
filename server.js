@@ -10,6 +10,8 @@ var quickselect = require('quickselect'); // Used to compute the median for late
 var mongoose = require('mongoose');
 var myArgs = require('optimist').argv;
 
+console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
+
 import GameServer from './server/GameServer'
 GameServer.server = server;
 
@@ -172,6 +174,7 @@ if(process.env.DEV == 1) {
 }
 
 server.listen(process.env.PORT || myArgs.port || 8081,function(){
+    console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
     console.log('Listening on '+server.address().port);
     console.log('Config environment: '+(process.env.NODE_CONFIG_ENV || 'default'));
 
@@ -197,6 +200,7 @@ server.listen(process.env.PORT || myArgs.port || 8081,function(){
         console.log('Connection to db established');
         GameServer.readMap();
     });
+    console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
 });
 
 
