@@ -191,7 +191,8 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.updateStatus();
     Prism.logEvent(null,'server-start');
     var hrend = process.hrtime(hrstart);
-    console.info('readMap execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+    console.log('readMap execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+    console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
 };
 
 /**
@@ -323,7 +324,8 @@ GameServer.readPlayersData = function(){
         });
         console.log('Last player ID:',GameServer.lastPlayerID);
         var hrend = process.hrtime(hrstart);
-        console.info('readPlayersData execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+        console.log('readPlayersData execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+        console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
         GameServer.updateStatus();
     });
 };
@@ -382,7 +384,8 @@ GameServer.loadBuildings = function(){
         // GameServer.updateRegions(); // Not called because downstream of the init sequence, setupSpawnZones calles it
         GameServer.computeFrontier(false);
         var hrend = process.hrtime(hrstart);
-        console.info('loadBuildings execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+        console.log('loadBuildings execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+        console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
         GameServer.updateStatus();
     });
 };
@@ -434,7 +437,8 @@ GameServer.loadItems = function(){
         item.setRespawnable();
     },this);
     var hrend = process.hrtime(hrstart);
-    console.info('loadItems execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+    console.log('loadItems execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+    console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
     GameServer.updateStatus();
 };
 
@@ -449,12 +453,13 @@ GameServer.loadMarkers = function(){
        var region = GameServer.getRegion({x:m[0],y:m[1]});
        GameServer.regions[region].addResource({x:m[0],y:m[1]});
     });
-
+    console.log('Done with resource markers');
     var markerTypes = ['death','conflict'];
     var nbTicks = markerTypes.length + 1; // +1 for remains
     var tick = 0;
     markerTypes.forEach(function(markerType){
         GameServer.ephemeralMarkerModel.find({type: markerType},function (err, markers) {
+            console.log(markerType+' markers fetched');
             if (err) return console.log(err);
             GameServer[markerType+'Markers'] = markers.map(function(m){
                 return [m.x,m.y];
@@ -462,7 +467,8 @@ GameServer.loadMarkers = function(){
             // console.warn('tick:',tick,'/',nbTicks);
             if(++tick == nbTicks) {
                 var hrend = process.hrtime(hrstart);
-                console.info('loadMarkers execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+                console.log('loadMarkers execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+                console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
                 GameServer.updateStatus();
             }
         });
@@ -477,7 +483,8 @@ GameServer.loadMarkers = function(){
         // console.warn('tick:',tick,'/',nbTicks);
         if(++tick == nbTicks) {
             var hrend = process.hrtime(hrstart);
-            console.info('loadMarkers execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+            console.log('loadMarkers execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+            console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
             GameServer.updateStatus();
         }
     });
@@ -513,7 +520,8 @@ GameServer.setUpSpawnZones = function(){
 
     GameServer.updateSZActivity();
     var hrend = process.hrtime(hrstart);
-    console.info('setUpSpawnZones execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+    console.log('setUpSpawnZones execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+    console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
     GameServer.updateStatus();
 };
 
@@ -522,7 +530,8 @@ GameServer.finalStep = function(){
     GameServer.updateFoW();
     GameServer.updateRegions();
     var hrend = process.hrtime(hrstart);
-    console.info('finalSetp execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+    console.log('finalSetp execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+    console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
     GameServer.updateStatus();
 };
 
@@ -541,7 +550,8 @@ GameServer.setUpCamps = function(){
             camps.forEach(GameServer.addCamp);
         }
         var hrend = process.hrtime(hrstart);
-        console.info('setUpCamps execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+        console.log('setUpCamps execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
+        console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
         GameServer.updateStatus();
     });
 };

@@ -68,6 +68,11 @@ Bugs:
 - Split Engine.js
 - Speed up boot on Droplet
 - Stop using shader for items outline?
+- Stones count to 0 as throwable?
+- Orientation pins bugs
+- No wolf aggro?
+- Wrong "you were attacked" message
+- SZ not suppressed by tower
 Features:
 - Add Bear + remains
 - Players only clear 1 AOI FoW? Towers clear multiple?
