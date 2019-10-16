@@ -343,7 +343,7 @@ var WorldMap = new Phaser.Class({
     },
 
     centerMap: function(tile){ // Adjusts the anchor, then position it in the center of the screen
-        console.log('centering on ',tile);
+        // console.log('centering on ',tile);
         // tile is world coordinates, not map px ; if tile is undefined, then it means recenter on whatever current center (used when zooming)
         var o = {
             x: tile ? tile.x * 2 : this.displayOriginX,

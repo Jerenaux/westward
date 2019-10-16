@@ -64,6 +64,55 @@ var Stats = {
         default: 50,
         frame: 'bullseye',
         suffix: '%'
+    },
+    respawnhp: {
+        name: 'Respawn health',
+        desc: 'Amount of health remaining after respawning.',
+        min: 10,
+        max: 400,
+        default: 10,
+        frame: 'heart', // TODO: change
+        hidden: true
+    },
+    walkfatigue: {
+        name :'Fatigue from walking',
+        desc: 'Your resistance to fatigue accumulation from walking',
+        min: 0,
+        max: 100,
+        default: 0,
+        frame: 'goldenheart', // TODO: change
+        hidden: true,
+        suffix: '%'
+    },
+    shopfatigue: {
+        name :'Fatigue from commercial activities',
+        desc: 'Your resistance to fatigue accumulation from buying and selling items',
+        min: 0,
+        max: 100,
+        default: 0,
+        frame: 'goldenheart', // TODO: change
+        hidden: true,
+        suffix: '%'
+    },
+    forageluck: {
+        name :'Foraging luck',
+        desc: 'Chance of acquiring more ingredients when foraging plants.',
+        min: 0,
+        max: 100,
+        default: 10,
+        frame: 'goldenheart', // TODO: change
+        hidden: true,
+        suffix: '%'
+    },
+    shopluck: {
+        name :'Discount luck',
+        desc: 'Chance of having a discount when buying or selling items.',
+        min: 0,
+        max: 100,
+        default: 10,
+        frame: 'goldenheart', // TODO: change
+        hidden: true,
+        suffix: '%'
     }
 };
 
@@ -129,7 +178,9 @@ Stat.prototype.setBaseValue = function(value,force){
 
 Stat.prototype.increment = function(inc){
     var base = this.clamp(this.getBaseValue());
-    this.setBaseValue(base+inc);
+    var newvalue = base + inc;
+    // console.warn('base = ',base,'new = ',newvalue);
+    this.setBaseValue(newvalue);
     return (this.getBaseValue() != base); // has the value actually changed or not
 };
 

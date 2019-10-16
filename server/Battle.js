@@ -283,7 +283,6 @@ Battle.prototype.processAction = function (f, data) {
     }
 
     result = result || {};
-    // if (f.isPlayer && result.vigor) f.updateVigor(-result.vigor);
     if (f.isPlayer && result.vigor) GameServer.updateVigor(f,'battle_'+action);
     this.setEndOfTurn(result.delay || 0);
 };
@@ -345,6 +344,7 @@ Battle.prototype.computeRangedHit = function (a, b) {
         x: b.x,
         y: b.y
     });
+
     var chance = Math.ceil(a.getStat('acc').getValue() - (dist * GameServer.battleParameters.rangePenalty));
     var rand = Utils.randomInt(0, 100);
     console.warn('computeRangedHit: ', a.getShortID(), a.getStat('acc').getValue(), dist, GameServer.battleParameters.rangePenalty);

@@ -295,6 +295,7 @@ Region.prototype.updateFood = function(){
     console.log('['+this.name+'] Food update');
     this.food[0] = 0;
     for(var playerID of this.players){
+        if(!(playerID in GameServer.players)) continue;
         this.food[0] += GameServer.players[playerID].getItemNb(1);
     }
 };

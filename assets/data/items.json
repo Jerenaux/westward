@@ -54,7 +54,8 @@
     "desc": "Crafting material involved in the brewing of several types of potions. Poisonous if consumed raw.",
     "isMaterial": true,
     "effects":{"hp":-50},
-    "yield": 2
+    "yield": 2,
+    "bonusYield": 1
   },
   "6":{
     "atlas": "items2",
@@ -90,6 +91,7 @@
     "sound": "soft",
     "nbBushes": 1,
     "yield": 3,
+    "bonusYield": 1,
     "nbClusters": 100,
     "envFrames": ["bush_5"]
   },
@@ -156,6 +158,7 @@
     "sound": "soft",
     "nbBushes": 2,
     "yield": 2,
+    "bonusYield": 1,
     "coitems": [5],
     "insect": true,
     "nbClusters": 100
@@ -199,6 +202,7 @@
     "sound": "soft",
     "nbBushes": 4,
     "yield": 5,
+    "bonusYield": 3,
     "nbClusters": 100
   },
   "19":{
@@ -538,6 +542,7 @@
     "sound": "soft",
     "nbBushes": 4,
     "yield": 5,
+    "bonusYield": 3,
     "verb": "Ate",
     "insect": true,
     "decorFrame":"b4",

@@ -2,8 +2,43 @@
     "0": {
         "class": 0,
         "name": "Healthy",
-        "desc": "Increase maximum vitality to 400",
-        "hook": "stats",
-        "effect": "stat:hpmax:400"
+        "desc": "Increase maximum vitality by 100",
+        "effect": "hpmax:100",
+        "cost": 0
+    },
+    "1": {
+        "class": 0,
+        "name": "Grit 1",
+        "desc": "Respawn with 90 more health",
+        "effect": "respawnhp:90",
+        "cost": 0
+    },
+    "2": {
+        "class": 3,
+        "name": "Traveller",
+        "desc": "You lose less vigor from walking.",
+        "effect": "walkfatigue:50",
+        "cost": 0
+    },
+    "3": {
+        "class": 3,
+        "name": "Foraging",
+        "desc": "Increase your chance of acquiring more ingredients when foraging plants.",
+        "effect": "forageluck:30",
+        "cost": 0
+    },
+    "4": {
+        "class": 1,
+        "name": "Hustler",
+        "desc": "You lose less vigor from performing commercial activities.",
+        "effect": "shopfatigue:50",
+        "cost": 0
+    },
+    "5": {
+        "class": 1,
+        "name": "Haggler",
+        "desc": "Increase your chance of having a discount when buying or selling items.",
+        "effect": "shopluck:30",
+        "cost": 0
     }
 }

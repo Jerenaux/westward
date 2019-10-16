@@ -57,7 +57,6 @@ import World from '../shared/World';
 
 import animalsData from '../assets/data/animals.json'
 import buildingsData from '../assets/data/buildings.json'
-import itemsData from '../assets/data/items.json'
 import regionsData from '../assets/data/regions.json'
 
 var Engine = {
@@ -1600,7 +1599,7 @@ Engine.makeInventory = function(statsPanel){
     inventory.setSound(Engine.scene.sound.add('inventory'));
 
     var items = inventory.addPanel('items',new InventoryPanel(40,100,600,260,'Backpack'));
-    items.setInventory('player',15,true,Engine.backpackClick);
+    items.setInventory('player',15,true,UI.backpackClick);
 
     var gold = items.addCapsule('gold',130,-9,'999','gold');
     gold.setHoverText(UI.tooltip,'Gold',UI.textsData['gold_help']);
@@ -1609,7 +1608,7 @@ Engine.makeInventory = function(statsPanel){
     inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,120),true);
 
     var belt = inventory.addPanel('belt',new InventoryPanel(40,360,600,90,'Belt'));
-    belt.setInventory('belt',15,true,Engine.beltClick);
+    belt.setInventory('belt',15,true,UI.beltClick);
     belt.addButton(570, 8, 'blue','help',null,'',UI.textsData['belt_help']);
 
     var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
@@ -2237,72 +2236,6 @@ Engine.getOccupiedCells = function(entity,hash){
 };
 
 // ## UI-related functions ##
-// this functions need to have a this bound to them
-Engine.closePanel = function(){this.hide();};
-Engine.togglePanel = function(){ // When clicking on a player/building/animal, toggle the corresponding panel visibility
-    if(Engine.inMenu) return;
-    if(this.panel.displayed){
-        UI.inPanel = false;
-        UI.currentPanel = null;
-    }else {
-        if(UI.inPanel) UI.currentPanel.hide();
-        UI.inPanel = true;
-        UI.currentPanel = this.panel;
-    }
-    this.panel.toggle();
-};
-
-Engine.recipeClick = function(){
-    Engine.menus['crafting'].panels['combi'].setUp(this.itemID);
-    var sound = itemsData[this.itemID].sound;
-    if(sound) Engine.scene.sound.add(sound).play();
-};
-
-Engine.toggleStock = function(stockID){
-    Engine.craftingStock = stockID;
-    if(stockID == 1){
-        Engine.currentMenu.panels['stock'].button.display();
-        Engine.currentMenu.panels['items'].button.hide();
-        Engine.currentMenu.panels['ingredients'].modifyReferenceInventory(Engine.player.inventory);
-    }else{
-        Engine.currentMenu.panels['items'].button.display();
-        Engine.currentMenu.panels['stock'].button.hide();
-        Engine.currentMenu.panels['ingredients'].modifyReferenceInventory(Engine.currentBuiling.inventory);
-    }
-    Engine.currentMenu.panels['ingredients'].updateInventory();
-    Engine.currentMenu.panels['combi'].manageButtons();
-};
-
-Engine.newbuildingClick = function(){
-    Engine.currentMenu.panels['confirm'].setUp(this.itemID);
-};
-
-/**
- * What to do when clicked an item in belt (vs. backpack).
- * `this` is bound to the clicked `ItemSperite`.
- */
-Engine.beltClick = function(){
-    Engine.displayItemActionPanel(this.itemID, 'belt');
-};
-
-/**
- * What to do when clicked an item in backpack (vs. belt).
- * `this` is bound to the clicked `ItemSperite`.
- */
-Engine.backpackClick = function(){
-    Engine.displayItemActionPanel(this.itemID, 'backpack');
-};
-
-/**
- * Display the itemAction window, i.e. the small panel appearing in the inventory 
- * displaying options such as use, put in belt...
- * @param {number} itemID - ID of the clicked item.
- * @param {string} inventory - Whether the item was clicked in the backpack or in the belt.
- */
-Engine.displayItemActionPanel = function(itemID, inventory){
-    Engine.currentMenu.panels['itemAction'].display();
-    Engine.currentMenu.panels['itemAction'].setUp(itemID, inventory);
-};
 
 Engine.unequipClick = function(){ // Sent when unequipping something
     Client.sendUnequip(this.slotName);

@@ -185,7 +185,6 @@ Player.prototype.updateSteps = function () {
     this.steps++;
     var limit = 1000; // arbitrary limit to avoid overflows
     if (this.steps > limit) this.steps -= limit;
-    // if (this.steps % GameServer.characterParameters.steps === 0) this.updateVigor(-GameServer.characterParameters.stepsLoss);
     if (this.steps % GameServer.characterParameters.steps === 0) GameServer.updateVigor(this,'walk');
 
 };
@@ -241,12 +240,17 @@ Player.prototype.setStartingInventory = function () {
 };
 
 Player.prototype.setUpStats = function () {
+    // Initializes all existing stats with default values
     this.stats = new StatsContainer();
-    var v = GameServer.characterParameters.variables;
-    var list = ['hpmax', 'dmg', 'def'];
+    // Applies starting values from config file
+    var starts = GameServer.characterParameters.variables;
+    for(var v in starts){
+        this.setStat(v, starts[v]);
+    }
+    /*var list = ['hpmax', 'dmg', 'def'];
     list.forEach(function (s) {
         this.setStat(s, v[s]);
-    }, this);
+    }, this);*/
     this.maxStat('hp');
 };
 
@@ -302,7 +306,7 @@ Player.prototype.spawn = function (checkLocation) {
 Player.prototype.respawn = function () {
     this.setProperty('dead', false);
     this.setOwnProperty('dead', false);
-    this.setStat('hp', 10); // TODO: adapt remaining health
+    this.setStat('hp', this.getStatValue('respawnhp'));
     this.spawn(true);
     this.setOrUpdateAOI();
     this.save();
@@ -335,6 +339,22 @@ Player.prototype.classLvlUp = function (classID, notify) {
         this.addNotif('Earned ' + nb + ' AP!');
     }
     this.save();
+};
+
+Player.prototype.acquireAbility = function(aid){
+    this.abilities.push(aid);
+    //TODO: remove AP
+    this.applyAbility(aid);
+};
+
+Player.prototype.applyAbilities = function(){
+    this.abilities.forEach(this.applyAbility,this);
+};
+
+Player.prototype.applyAbility = function(aid){
+    var data = GameServer.abilitiesData[aid];
+    var effect = data['effect'].split(':');
+    this.applyAbsoluteModifier(effect[0],parseInt(effect[1]));
 };
 
 Player.prototype.giveGold = function (nb, notify) {
@@ -785,12 +805,14 @@ Player.prototype.getDataFromDb = function (data) {
     this.abilities = data.abilities;
     this.setOwnProperty('inBuilding', data.inBuilding);
 
+    this.setUpStats();
     if (!data.stats) data.stats = [];
     data.stats.forEach(function (stat) {
         this.getStat(stat.stat).setBaseValue(stat.value);
         this.refreshStat(stat.stat);
     }, this);
     this.setStat('hp', Math.max(this.getStat('hp').getValue(), 10)); // quick fix TODO remove
+    this.applyAbilities();
     this.applyVigorModifier();
 
     if (data) {
@@ -928,12 +950,11 @@ Player.prototype.addNotif = function (msg, silent) {
     if (!silent) this.updatePacket.addNotif(msg);
     this.history.push([Date.now(), msg]);
     var MAX_LENGTH = 20; // TODO: max limit in conf
-    // if(this.history.length > MAX_LENGTH) this.history.splice(MAX_LENGTH,this.history.length-MAX_LENGTH);
     if (this.history.length > MAX_LENGTH) this.history.splice(0, this.history.length - MAX_LENGTH);
 };
 
 Player.prototype.fastForward = function (nbturns) {
-    console.warn('Fast forward', nbturns, 'turns');
+    console.log('Fast forward', nbturns, 'turns');
     var foodRate = GameServer.economyTurns['foodConsumptionRate'];
     var restRate = GameServer.economyTurns['restRate'];
     var nbStarvationTurns = Math.floor(nbturns / foodRate);

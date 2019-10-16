@@ -1,8 +1,14 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 02-12-18.
  */
+import Client from './Client'
 import Engine from './Engine'
 import Panel from './Panel'
+import UI from './UI'
+import Utils from '../shared/Utils'
+
+import itemsData from '../assets/data/items.json'
+
 
 function PricesPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
@@ -21,12 +27,12 @@ function PricesPanel(x,y,width,height,title){
         var value = this.input.value.toLowerCase();
         if(value.length >= 3){
             var hits = [];
-            for(var id in Engine.itemsData) {
-                if(Engine.itemsData[id].permanent) continue; // don't sell hands and fists
-                if(this.craftingOnly && !Engine.itemsData[id].isCrafted) continue;
+            for(var id in itemsData) {
+                if(itemsData[id].permanent) continue; // don't sell hands and fists
+                if(this.craftingOnly && !itemsData[id].isCrafted) continue;
                 if(id != 1 && this.prodOnly && !Engine.isProduced(id)) continue;
 
-                var name = Engine.itemsData[id].name.toLowerCase();
+                var name = itemsData[id].name.toLowerCase();
                 if(name.includes(value)) hits.push(id);
                 if(hits.length >= 3) break;
             }
@@ -134,7 +140,7 @@ PriceSlot.prototype = Object.create(Panel.prototype);
 PriceSlot.prototype.constructor = PriceSlot;
 
 PriceSlot.prototype.setUp = function(item){
-    var itemData = Engine.itemsData[item];
+    var itemData = itemsData[item];
     // console.log(itemData);
     this.icon.setTexture(itemData.atlas,itemData.frame);
     this.name.setText(itemData.name);

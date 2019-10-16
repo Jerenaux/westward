@@ -283,6 +283,35 @@ UI.setCursor = function (cursor) {
     UI.cursor.changeCursor(cursor);
 };
 
+
+/**
+ * What to do when clicked an item in belt (vs. backpack).
+ * `this` is bound to the clicked `ItemSperite`.
+ */
+UI.beltClick = function(){
+    UI.displayItemActionPanel(this.itemID, 'belt');
+};
+
+/**
+ * What to do when clicked an item in backpack (vs. belt).
+ * `this` is bound to the clicked `ItemSprite`.
+ */
+UI.backpackClick = function(){
+    UI.displayItemActionPanel(this.itemID, 'backpack');
+};
+
+/**
+ * Display the itemAction window, i.e. the small panel appearing in the inventory
+ * displaying options such as use, put in belt...
+ * @param {number} itemID - ID of the clicked item.
+ * @param {string} inventory - Whether the item was clicked in the backpack or in the belt.
+ */
+UI.displayItemActionPanel = function(itemID, inventory){
+    Engine.currentMenu.panels['itemAction'].display();
+    Engine.currentMenu.panels['itemAction'].setUp(itemID, inventory);
+};
+
+
 UI.makeClassMenu = function () {
     var title = new UIHolder(512, 10, 'center');
     title.setText(UI.textsData['class_selection_title']);

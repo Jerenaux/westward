@@ -93,6 +93,10 @@ FightingEntity.prototype.getStat = function(key){
     return this.stats[key];
 };
 
+FightingEntity.prototype.getStatValue = function(key){
+    return this.getStat(key).getValue();
+};
+
 FightingEntity.prototype.getStats = function(){
     return Object.keys(this.stats);
 };

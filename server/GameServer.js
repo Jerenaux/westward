@@ -186,7 +186,6 @@ GameServer.readMap = function(mapsPath,test,cb){
 
     GameServer.computeRegions();
     GameServer.initializeFlags();
-    GameServer.registerAbilityHooks();
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
     GameServer.updateStatus();
@@ -196,14 +195,14 @@ GameServer.readMap = function(mapsPath,test,cb){
     console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
 };
 
-GameServer.registerAbilityHooks = function(){
+/*GameServer.registerAbilityHooks = function(){
     GameServer.abilityHooks = {};
     for(var aid in GameServer.abilitiesData){
         var data = GameServer.abilitiesData[aid];
         if(!(data.hook in GameServer.abilityHooks)) GameServer.abilityHooks[data.hook] = [];
         GameServer.abilityHooks[data.hook].push(aid);
     }
-};
+};*/
 
 /**
  * Set up a dict of boolean variables indicating whether some global changes have occurred
@@ -671,10 +670,11 @@ GameServer.onNewPlayer = function(player){
     // for testing)
     if(!config.get('misc.performInit')) return;
     // give me all the health and vigor
-    // player.setStat('hp', 300);
-    player.giveItem(1,5);
+    player.setStat('hp', 1);
+    player.giveItem(6,5);
     // player.setStat('vigor', 10);
     // player.applyVigorModifier();
+    // player.applyAbility(3);
 
     const items = [
       
@@ -1199,7 +1199,15 @@ GameServer.pickUpItem = function(player,itemID){
  * @param {number} type - type of the picked item.
  * */
 GameServer.forage = function(player, type){
-    var nb = GameServer.itemsData[type].yield || 1;
+    var itmData = GameServer.itemsData[type];
+    var nb = itmData.yield || 1;
+    var rand = Utils.randomInt(0,100);
+    var chance = player.getStatValue('forageluck');
+    // console.warn('forage luck:',rand,chance);
+    if(itmData.bonusYield && (rand < chance)){
+        player.addNotif('You found more than usual!');
+        nb += itmData.bonusYield;
+    }
     player.giveItem(type,nb,true,'Picked');
     Prism.logEvent(player,'pickup',{item:type});
     GameServer.createItem(type,nb,player.region,'pickup');
@@ -1595,6 +1603,13 @@ GameServer.handleShop = function(data,socketID) {
         if(isFinancial) {
             var price = building.getPrice(item, nb, 'sell');
             if(price === 0) return false;
+            var rand = Utils.randomInt(0,100);
+            var chance = player.getStatValue('shopluck');
+            console.warn('shop luck:',rand,chance);
+            if(rand < chance){
+                player.addNotif('You negotiated a discount!');
+                price = Math.floor(price*0.9);
+            }
             if (!player.canBuy(price)) return false;
             player.takeGold(price, true);
             building.giveGold(price);
@@ -1625,8 +1640,16 @@ GameServer.handleShop = function(data,socketID) {
         }
         if(isFinancial) {
             var price = building.getPrice(item, nb, 'buy');
-            console.log(building.prices[item]);
             if(price === 0) return false;
+            if(price < building.getGold()) {
+                var rand = Utils.randomInt(0, 100);
+                var chance = player.getStatValue('shopluck');
+                console.warn('shop luck:', rand, chance);
+                if (rand < chance) {
+                    player.addNotif('You negotiated a better price!');
+                    price = Utils.clamp(Math.ceil(1.1*price),price,building.getGold());
+                }
+            }
             player.giveGold(price, true);
             building.takeGold(price);
             GameServer.updateVigor(player,'sell');
@@ -1805,16 +1828,25 @@ GameServer.addMarker = function(markerType,x,y){
     });
 };
 
+/**
+ * Compute how much vigor should be lost based on the action taken.
+ * @param player
+ * @param action
+ * @param {number }multiplier - If the action can be done multiple times in bulk (e.g.
+ * crafting), multiply loss accordingly.
+ */
 GameServer.updateVigor = function(player, action, multiplier){
+    var steLoss = GameServer.characterParameters.stepsLoss;
     var vigor_map = {
-        'buy': -3,
+        'buy': -Math.floor(-3*(1-player.getStatValue('walkfatigue')/100)),
         'craft': -3,
-        'sell': -3,
-        'walk': -GameServer.characterParameters.stepsLoss
+        'sell': -Math.floor(-3*(1-player.getStatValue('walkfatigue')/100)),
+        'walk': -Math.floor(stepsLoss*(1-player.getStatValue('walkfatigue')/100))
     };
     multiplier = multiplier || 1;
     var nb = (action in vigor_map ? vigor_map[action] : 1);
     player.updateVigor(nb*multiplier);
+    // player.addNotif('Lost '+nb*multiplier+'vigor');
 };
 
 GameServer.findNextFreeCell = function(x,y){
