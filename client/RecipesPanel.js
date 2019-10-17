@@ -2,8 +2,11 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 24-03-19.
  */
 
+import Engine from './Engine'
 import ItemSlot from './ItemSlot'
 import ShopInventoryPanel from './ShopInventoryPanel'
+import UI from './UI'
+import Utils from '../shared/Utils'
 
 function RecipesPanel(x,y,width,height,title,invisible){
     ShopInventoryPanel.call(this,x,y,width,height,title,invisible);

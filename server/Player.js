@@ -353,8 +353,13 @@ Player.prototype.applyAbilities = function(){
 
 Player.prototype.applyAbility = function(aid){
     var data = GameServer.abilitiesData[aid];
+    if(!data['effect']) return;
     var effect = data['effect'].split(':');
     this.applyAbsoluteModifier(effect[0],parseInt(effect[1]));
+};
+
+Player.prototype.hasAbility = function(aid){
+    return this.abilities.includes(aid);
 };
 
 Player.prototype.giveGold = function (nb, notify) {
@@ -391,7 +396,9 @@ Player.prototype.canBuy = function (price) { // check if building has gold and r
 };
 
 Player.prototype.canCraft = function (item, nb) {
-    var recipe = GameServer.itemsData[item].recipe;
+    var itemData = GameServer.itemsData[item];
+    if(itemData.ability && !this.hasAbility(itemData.ability)) return false;
+    var recipe = itemData.recipe;
     for (var itm in recipe) {
         if (!this.hasItem(itm, recipe[itm] * nb)) return false;
     }

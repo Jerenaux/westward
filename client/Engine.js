@@ -1662,7 +1662,6 @@ Engine.makeCharacterMenu = function(){
     var questh = 380-classh;
     var logh = 380 - citizenh;
 
-    //var citizen = menu.addPanel('citizen', new CitizenPanel(citizenx,citizeny,citizenw,citizenh,'Civic status'));
     var log = menu.addPanel('log', new JournalPanel(citizenx,citizeny,citizenw,logh+citizenh,'Journal'));
 
     var classpanel = menu.addPanel('class', new CharacterPanel(classx,classy,classw,classh,'Multi-Class status'));
@@ -1678,14 +1677,17 @@ Engine.makeCharacterMenu = function(){
             cx = sx;
             cy += ch;
         }
-
-        //var ab = menu.addPanel('abilities_'+classID, new Panel(citizenx,citizeny,citizenw,citizenh,'Abilities'), true);
-        //ab.addButton(citizenw,-8,'red','close',ab.hide.bind(ab),'Close');
     }
 
-    var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
+    // var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
 
     //menu.addPanel('abilities',new Panel(citizenx,citizeny,citizenw,citizenh),true);
+    var w = 620;
+    var x = (UI.getGameWidth()-w)/2;
+    var abilities = menu.addPanel('abilities', new AbilitiesPanel(citizenx,200,w,350,'Abilities'),true);
+    abilities.addButton(w-16,-8,'red','close',abilities.hide.bind(abilities),'Close');
+    abilities.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['missions_help']);
+    abilities.moveUp(4);
 
     menu.addEvent('onUpdateCharacter',classpanel.update.bind(classpanel));
     menu.addEvent('onUpdateHistory',log.update.bind(log));

@@ -40,5 +40,17 @@
         "desc": "Increase your chance of having a discount when buying or selling items.",
         "effect": "shopluck:30",
         "cost": 0
+    },
+    "6": {
+        "class": 2,
+        "name": "Leatherwork",
+        "desc": "Allow you to craft basic leather-based items.",
+        "cost": 0
+    },
+    "7": {
+        "class": 2,
+        "name": "Apothecary",
+        "desc": "Allow you to craft basic medicines.",
+        "cost": 0
     }
 }

@@ -319,10 +319,12 @@ GameServer.readPlayersData = function(){
             if(data.id > GameServer.lastPlayerID) GameServer.lastPlayerID = data.id;
             var region = GameServer.getRegion(data);
             data.inventory.concat(data.belt).forEach(function(itm){
+                if(!itm) return;
                 GameServer.createItem(itm[0],itm[1],region,'player inventory DB');
             });
 
             for (var slot in data.equipment.slots) {
+                // console.log('slot:',slot,data.equipment.slots[slot]);
                 var info = GameServer.parseEquipmentDb(data.equipment.slots[slot]);
                 var item = info[0];
                 var nb = info[1];
@@ -340,16 +342,21 @@ GameServer.readPlayersData = function(){
 };
 
 GameServer.parseEquipmentDb = function(data){
+    if(data == -1) return [-1, 0];
     // console.warn('ITEM:',item);
     // fix corrupt item data due to development
-    if (typeof data.id == 'object') {
-        if (data.id.hasOwnProperty('id')) { // fix nested objects
-            data.id = data.id.id;
-        } else {
-            data.id = -1;
+    if(typeof data == 'object'){
+        if (typeof data.id == 'object') {
+            if (data.id.hasOwnProperty('id')) { // fix nested objects
+                data.id = data.id.id;
+            } else {
+                data.id = -1;
+            }
         }
+        return [parseInt(data.id), parseInt(data.nb)];
+    }else{
+        return [parseInt(data), 1];
     }
-    return [parseInt(data.id), parseInt(data.nb)];
 };
 
 /**
@@ -1912,7 +1919,7 @@ GameServer.handleCraft = function(data,socketID){
     var nb = data.nb || 1;
     // var recipient = (stock == 1 ? player : building);
     if(!player.canCraft(targetItem,nb)) {
-        console.log('All ingredients not owned');
+        console.log('Cannot craft');
         return false;
     }
     var price = building.getPrice(targetItem, nb, 'sell');
