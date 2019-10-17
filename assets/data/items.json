@@ -112,7 +112,8 @@
     "recipe":{"43":8},
     "effects":{"def":4},
     "sound": "cloth",
-    "basicRecipe": true
+    "basicRecipe": true,
+    "ability": 6
   },
   "11":{
     "atlas": "items2",

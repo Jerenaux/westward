@@ -57,7 +57,7 @@ var UI = {
         UI.tooltip = new Tooltip();
         UI.camera = UI.scene.cameras.main;
         UI.notifications = [];
-        UI.textsData = this.cache.json.get('texts');
+        UI.textsData = this.cache.json.get('texts'); // TODO: incoherent with how Engine loads json data (bundled in webpack)
         UI.classesData = this.cache.json.get('classes');
 
 

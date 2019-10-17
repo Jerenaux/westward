@@ -1684,7 +1684,7 @@ Engine.makeCharacterMenu = function(){
     //menu.addPanel('abilities',new Panel(citizenx,citizeny,citizenw,citizenh),true);
     var w = 620;
     var x = (UI.getGameWidth()-w)/2;
-    var abilities = menu.addPanel('abilities', new AbilitiesPanel(citizenx,200,w,350,'Abilities'),true);
+    var abilities = menu.addPanel('abilities', new AbilitiesPanel(x,175,w,350,'Abilities'),true);
     abilities.addButton(w-16,-8,'red','close',abilities.hide.bind(abilities),'Close');
     abilities.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['missions_help']);
     abilities.moveUp(4);

@@ -8,6 +8,9 @@ import Panel from './Panel'
 import UI from './UI'
 import Utils from '../shared/Utils'
 
+import itemsData from '../assets/data/items.json'
+
+
 function CraftingPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
     this.buttons = [];
@@ -81,7 +84,7 @@ CraftingPanel.prototype.getPrice = function(){
 };
 
 CraftingPanel.prototype.setUp = function(itemID){
-    var data = Engine.itemsData[itemID];
+    var data = itemsData[itemID];
     this.craftItem.id = itemID;
     this.craftItem.count = 1;
     this.craftItem.recipe = data.recipe;
@@ -96,7 +99,7 @@ CraftingPanel.prototype.setUp = function(itemID){
 
     this.countText.setVisible(true);
 
-    var output = (Engine.itemsData[this.craftItem.id].output || 1);
+    var output = (itemsData[this.craftItem.id].output || 1);
     this.countText.setText(this.craftItem.count*output);
 
     this.okBtn.display();
@@ -108,7 +111,7 @@ CraftingPanel.prototype.updateIngredients = function(){
     if(this.craftItem.id == -1) return;
     this.craftSlot.setUp(this.craftItem.id,-1);
 
-    var data = Engine.itemsData[this.craftItem.id];
+    var data = itemsData[this.craftItem.id];
 
     this.ingredientSlots.forEach(function(slot){
         slot.hide();
@@ -157,7 +160,7 @@ CraftingPanel.prototype.decreaseAmount = function(){
 };
 
 CraftingPanel.prototype.changeAmount = function(inc){
-    var output = (Engine.itemsData[this.craftItem.id].output || 1);
+    var output = (itemsData[this.craftItem.id].output || 1);
     this.craftItem.count = Utils.clamp(this.craftItem.count+inc,1,999);
     this.craftItem.price = this.craftItem.count*this.getPrice();
     this.countText.setText(this.craftItem.count*output);

@@ -347,7 +347,7 @@ Battle.prototype.computeRangedHit = function (a, b) {
 
     var chance = Math.ceil(a.getStat('acc').getValue() - (dist * GameServer.battleParameters.rangePenalty));
     var rand = Utils.randomInt(0, 100);
-    console.warn('computeRangedHit: ', a.getShortID(), a.getStat('acc').getValue(), dist, GameServer.battleParameters.rangePenalty);
+    console.log('computeRangedHit: ', a.getShortID(), a.getStat('acc').getValue(), dist, GameServer.battleParameters.rangePenalty);
     console.log('ranged hit : ', rand, chance);
     return rand < chance;
 };

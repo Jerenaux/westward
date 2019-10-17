@@ -2,11 +2,14 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 24-03-19.
  */
 
+import Client from './Client'
 import Engine from './Engine'
 import ItemSlot from './ItemSlot'
 import ShopInventoryPanel from './ShopInventoryPanel'
 import UI from './UI'
 import Utils from '../shared/Utils'
+
+import itemsData from '../assets/data/items.json'
 
 function RecipesPanel(x,y,width,height,title,invisible){
     ShopInventoryPanel.call(this,x,y,width,height,title,invisible);
@@ -49,8 +52,15 @@ RecipeSlot.prototype.setUp = function(action,item,nb){
     ItemSlot.prototype.setUp.call(this,action,item,nb);
 
     var status = Engine.player.needsToCraft(item);
-    this.ingredients.setText(status[0]+'/'+status[1]);
-    this.ingredients.setFill(status[0] == status[1] ? Utils.colors.green : Utils.colors.red);
+    var itemData = itemsData[item];
+    console.log(item,itemData.ability);
+    if(itemData.ability && !Engine.player.hasAbility(itemData.ability)){
+        this.ingredients.setText('Ability needed');
+        this.ingredients.setFill(Utils.colors.red);
+    }else {
+        this.ingredients.setText(status[0]+'/'+status[1]);
+        this.ingredients.setFill(status[0] == status[1] ? Utils.colors.green : Utils.colors.red);
+    }
 
     this.price.setText(Engine.currentBuiling.getPrice(item,'sell'));
 

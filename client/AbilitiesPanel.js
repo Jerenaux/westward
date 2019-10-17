@@ -44,7 +44,8 @@ AbilitiesPanel.prototype.refreshPagination = function(){
     this.nothingTxt.y = py + 35;
 };
 
-AbilitiesPanel.prototype.updateContent = function(missions){
+AbilitiesPanel.prototype.updateContent = function(classID){
+    this.capsules['title'].setText(UI.classesData[classID].name+' abilities');
     this.hideContent();
     var NB_PER_PAGE = 6;
     if(missions) this.missions = missions;

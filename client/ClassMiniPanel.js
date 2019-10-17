@@ -33,7 +33,9 @@ ClassMiniPanel.prototype.addInterface = function(){
     this.bar = classbar;
     var classID = this.classID;
     this.button = new BigButton(this.x+60,this.y+this.height-25,'Abilities',function(){
-        Engine.currentMenu.panels['abilities'].display();
+        var panel = Engine.currentMenu.panels['abilities'];
+        panel.display();
+        panel.updateContent(classID);
     });
     var txts = this.addPolyText(160,this.height-35,['0','AP'],[Utils.colors.gold,Utils.colors.white],16);
     this.apTxt = txts[0];
