@@ -37,7 +37,7 @@ ClassMiniPanel.prototype.addInterface = function(){
         panel.display();
         panel.updateContent(classID);
     });
-    var txts = this.addPolyText(160,this.height-35,['0','AP'],[Utils.colors.gold,Utils.colors.white],16);
+    var txts = this.addPolyText(155,this.height-35,['10','AP'],[Utils.colors.gold,Utils.colors.white],16);
     this.apTxt = txts[0];
 };
 

@@ -237,6 +237,7 @@ Player.prototype.setStartingInventory = function () {
     }, this);
 
     this.giveGold(300);
+    this.save();
 };
 
 Player.prototype.setUpStats = function () {
@@ -342,9 +343,13 @@ Player.prototype.classLvlUp = function (classID, notify) {
 };
 
 Player.prototype.acquireAbility = function(aid){
-    this.abilities.push(aid);
-    //TODO: remove AP
+    var ability = GameServer.abilitiesData[aid];
+    this.abilities.push(parseInt(aid));
+    this.ap[ability.class] = Utils.clamp(this.ap[ability.class]-ability.cost,0,999);
+    this.setOwnProperty('ap', this.ap);
+    this.setOwnProperty('abilities',this.abilities);
     this.applyAbility(aid);
+    this.addNotif('You acquired a new ability: '+ability.name+'!');
 };
 
 Player.prototype.applyAbilities = function(){
@@ -761,7 +766,7 @@ Player.prototype.getWorldInformation = function(){
  */
 Player.prototype.initTrim = function () {
     var trimmed = {};
-    var broadcastProperties = ['id', 'name','classxp','classlvl','ap']; // list of properties relevant for the client
+    var broadcastProperties = ['id', 'name','classxp','classlvl','ap','abilities']; // list of properties relevant for the client
     for (var p = 0; p < broadcastProperties.length; p++) {
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }

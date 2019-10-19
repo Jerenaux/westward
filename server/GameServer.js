@@ -677,8 +677,7 @@ GameServer.onNewPlayer = function(player){
     // for testing)
     if(!config.get('misc.performInit')) return;
     // give me all the health and vigor
-    player.setStat('hp', 1);
-    player.giveItem(6,5);
+
     // player.setStat('vigor', 10);
     // player.applyVigorModifier();
     // player.applyAbility(3);
@@ -1688,6 +1687,13 @@ GameServer.handleShop = function(data,socketID) {
     return true;
 };
 
+GameServer.purchaseAbility = function(aid, socketID){
+    var player = GameServer.getPlayer(socketID);
+    var ability = GameServer.abilitiesData[aid];
+    if(ability.cost > player.ap[ability.class]) return;
+    player.acquireAbility(aid);
+};
+
 GameServer.handleBuild = function(data,socketID) {
     var bid = data.id;
     var tile = data.tile;
@@ -1844,7 +1850,7 @@ GameServer.addMarker = function(markerType,x,y){
  * crafting), multiply loss accordingly.
  */
 GameServer.updateVigor = function(player, action, multiplier){
-    var steLoss = GameServer.characterParameters.stepsLoss;
+    var stepsLoss = GameServer.characterParameters.stepsLoss;
     var vigor_map = {
         'buy': -Math.floor(-3*(1-player.getStatValue('walkfatigue')/100)),
         'craft': -3,

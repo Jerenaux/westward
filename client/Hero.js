@@ -51,7 +51,7 @@ let Hero = new Phaser.Class({
         this.classxp = data.classxp;
         this.classlvl = data.classlvl;
         this.ap = data.ap;
-        this.abilities = [];
+        this.abilities = data.abilities || [];
         this.name = data.name;
 
         // this.updateRarity([]);
@@ -194,6 +194,7 @@ let Hero = new Phaser.Class({
     },
 
     hasAbility: function(aid){
+        console.warn(aid,this.abilities);
         return this.abilities.includes(aid);
     },
 
@@ -245,7 +246,6 @@ let Hero = new Phaser.Class({
     updateAP: function(ap){
         this.ap = ap;
         this.updateEvents.add('character');
-        this.updateEvents.add('citizen');
         //TODO: add sound effect
     },
 

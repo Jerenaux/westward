@@ -1680,7 +1680,6 @@ Engine.makeCharacterMenu = function(){
 
     // var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
 
-    //menu.addPanel('abilities',new Panel(citizenx,citizeny,citizenw,citizenh),true);
     var w = 620;
     var x = (UI.getGameWidth()-w)/2;
     var abilities = menu.addPanel('abilities', new AbilitiesPanel(x,175,w,350,'Abilities'),true);
@@ -1688,9 +1687,15 @@ Engine.makeCharacterMenu = function(){
     abilities.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['missions_help']);
     abilities.moveUp(4);
 
-    menu.addEvent('onUpdateCharacter',classpanel.update.bind(classpanel));
+    menu.addEvent('onUpdateCharacter',function(){
+        classpanel.update();
+        if(abilities.displayed) abilities.updateContent();
+    });
     menu.addEvent('onUpdateHistory',log.update.bind(log));
-    menu.addEvent('onOpen',log.update.bind(log));
+    menu.addEvent('onOpen',function(){
+        classpanel.update();
+        log.update();
+    });
     //menu.addEvent('onUpdateCitizen',citizen.update.bind(citizen));
     //menu.addEvent('onUpdateCommit',commit.updateInventory.bind(commit));
 

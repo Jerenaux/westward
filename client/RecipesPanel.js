@@ -53,7 +53,6 @@ RecipeSlot.prototype.setUp = function(action,item,nb){
 
     var status = Engine.player.needsToCraft(item);
     var itemData = itemsData[item];
-    console.log(item,itemData.ability);
     if(itemData.ability && !Engine.player.hasAbility(itemData.ability)){
         this.ingredients.setText('Ability needed');
         this.ingredients.setFill(Utils.colors.red);

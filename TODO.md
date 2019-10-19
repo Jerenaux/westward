@@ -68,12 +68,15 @@ Bugs:
 - Wrong logging of battles against civs/animals?
 - Reduce Engine.js
 - Stop using shader for items outline?
-- Stones count to 0 as throwable?
+- Stone throw anim
+- Can't equip stones from belt in battle
+- Display stones as ammo in battle
 - Orientation pins bugs
 - No wolf aggro?
 - SZ not suppressed by tower
 - Weird food reward when transitioning first AOI?
 - Rethink how food is kept track of in regions for connected and disconnected players
+- New building in wild region near resource node: trigger explo rewards 
 Features:
 - Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)

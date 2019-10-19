@@ -8,6 +8,7 @@ import Panel from './Panel'
 import UI from './UI'
 import Utils from '../shared/Utils'
 
+import abilitiesData from '../assets/data/abilities'
 import itemsData from '../assets/data/items.json'
 
 
@@ -109,6 +110,7 @@ CraftingPanel.prototype.setUp = function(itemID){
 
     this.manageButtons();
 
+    if(data.ability) this.abilityneeded.setText(abilitiesData[data.ability].name+' ability needed');
     var lackingAbility = (data.ability && !Engine.player.hasAbility(data.ability));
     this.abilityneeded.setVisible(lackingAbility);
 };

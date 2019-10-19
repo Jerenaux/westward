@@ -2,6 +2,8 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 15-09-19.
  */
 
+import BigButton from './BigButton'
+import Client from './Client'
 import Engine from './Engine'
 import Panel from './Panel'
 import ShopInventoryPanel from './ShopInventoryPanel'
@@ -17,7 +19,14 @@ function AbilitiesPanel(x,y,width,height,title,invisible){
     this.nextPage.depth += 4;
     this.previousPage.depth += 4;
 
-    this.AP = this.addText(10,this.y - 30,'',Utils.colors.white,16);
+    this.AP = this.addText(10,this.height - 30,'Hello world',Utils.colors.white,16);
+
+    var w = 160;
+    var h = 100;
+    var x = (UI.getGameWidth()-w)/2;
+    var y = (UI.getGameHeight()-h);
+    this.purchasePanel = new PurchaseAbilityPanel(x,y,w,h);
+    this.purchasePanel.moveUp(5);
 }
 
 AbilitiesPanel.prototype = Object.create(ShopInventoryPanel.prototype);
@@ -52,7 +61,7 @@ AbilitiesPanel.prototype.updateContent = function(classID){
     this.hideContent();
     var NB_PER_PAGE = 6;
     
-    var abilities = []
+    var abilities = [];
     for(var aid in abilitiesData){
         if(abilitiesData[aid].class == classID) abilities.push(aid);
     }
@@ -67,6 +76,7 @@ AbilitiesPanel.prototype.updateContent = function(classID){
 
     abilities.forEach(function(aid, i){
         if ((i < this.currentPage * NB_PER_PAGE) || (i >= (this.currentPage + 1) * NB_PER_PAGE)) {
+            console.log('Not on page');
             return;
         }
         var slot = this.getNextSlot(this.x + 20 + xOffset, sloty + yOffset);
@@ -80,7 +90,7 @@ AbilitiesPanel.prototype.updateContent = function(classID){
         }
     }, this);
 
-    this.AP.setText(Engine.player.ap[this.classID]);
+    this.AP.setText('AP: '+Engine.player.ap[this.classID]).setVisible(true);
 };
 
 AbilitiesPanel.prototype.hideContent = function(){
@@ -93,10 +103,17 @@ AbilitiesPanel.prototype.hideContent = function(){
     });
     this.nextPage.setVisible(false);
     this.previousPage.setVisible(false);
+    this.AP.setVisible(false);
 };
 
 AbilitiesPanel.prototype.display = function(){
     Panel.prototype.display.call(this);
+};
+
+AbilitiesPanel.prototype.hide = function(){
+    Panel.prototype.hide.call(this);
+    this.hideContent();
+    this.purchasePanel.hide();
 };
 
 // -------------------------------------
@@ -116,6 +133,10 @@ function AbilitySlot(x,y,width,height){
     this.zone.on('pointerout',function(){
         UI.tooltip.hide();
         UI.setCursor();
+    }.bind(this));
+    this.zone.on('pointerup',function(){
+        if(Engine.player.hasAbility(this.aid)) return;
+        Engine.currentMenu.panels['abilities'].purchasePanel.display(this.aid);
     }.bind(this));
 
     this.content = [this.name, this.zone];
@@ -147,8 +168,13 @@ AbilitySlot.prototype.setUp = function(aid){
     var text = data.name;
     this.name.setText(text);
     this.aid = aid;
-    this.count.setText(data.cost+' AP');
-    this.count.setFill(data.cost <= Engine.player.ap[data.class] ? Utils.colors.green : Utils.colors.red);
+    if(Engine.player.hasAbility(aid)){
+        this.count.setText('Owned');
+        this.count.setFill(Utils.colors.gold);
+    }else {
+        this.count.setText(data.cost + ' AP');
+        this.count.setFill(data.cost <= Engine.player.ap[data.class] ? Utils.colors.green : Utils.colors.red);
+    }
 };
 
 AbilitySlot.prototype.display = function(){
@@ -163,6 +189,40 @@ AbilitySlot.prototype.hide = function(){
     this.content.forEach(function(c){
         c.setVisible(false);
     });
+};
+
+function PurchaseAbilityPanel(x,y,width,height,title){
+    Panel.call(this,x,y,width,height,title);
+    this.addInterface();
+}
+
+PurchaseAbilityPanel.prototype = Object.create(Panel.prototype);
+PurchaseAbilityPanel.prototype.constructor = PurchaseAbilityPanel;
+
+PurchaseAbilityPanel.prototype.addInterface = function(){
+    this.addButton(this.width-16,-8,'red','close',this.hide.bind(this),'Close');
+    this.text = this.addText(10,10,'');
+
+    this.button = new BigButton(this.x+60,this.y+this.height-25,'Confirm',function(){
+        Client.sendAbility(this.aid);
+        this.hide();
+        Engine.currentMenu.panels['abilities'].hide();
+    }.bind(this));
+};
+
+PurchaseAbilityPanel.prototype.display = function(aid){
+    Panel.prototype.display.call(this);
+    this.aid = aid;
+    this.text.setText('Purchase '+abilitiesData[aid].name+'?');
+    this.button.display();
+    if(abilitiesData[aid].cost > Engine.player.ap[abilitiesData[aid].class]) this.button.disable();
+    this.displayTexts();
+};
+
+PurchaseAbilityPanel.prototype.hide = function(){
+    Panel.prototype.hide.call(this);
+    this.button.hide();
+    this.hideTexts();
 };
 
 export default AbilitiesPanel
