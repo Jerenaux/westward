@@ -828,6 +828,7 @@ GameServer.addNewPlayer = function(socket,data){
 
     // Send extra stuff following player initialization, unique to new players
     player.setStartingInventory();
+    Prism.logEvent(player,'connect',{stl:player.origin,re:false});
     return player; // return value for the tests
 };
 
@@ -852,6 +853,7 @@ GameServer.loadPlayer = function(socket,id){
             player.getDataFromDb(doc);
 
             GameServer.postProcessPlayer(socket,player,doc);
+            Prism.logEvent(player,'connect',{stl:player.region,re:true});
         }
     );
 };
@@ -895,11 +897,10 @@ GameServer.saveNewPlayerToDb = function(socket,player){
  * @param {Socket} socket - The socket of the connection to the client.
  * @param {Player} player - The created/retrieved Player object.
  */
-GameServer.finalizePlayer = function(socket,player,returning){
+GameServer.finalizePlayer = function(socket,player){
     GameServer.players[player.id] = player;
     GameServer.socketMap[socket.id] = player.id;
     GameServer.setFlag('nbConnected');
-    Prism.logEvent(player,'connect',{stl:player.sid,re:returning});
     GameServer.onNewPlayer(player);
 };
 

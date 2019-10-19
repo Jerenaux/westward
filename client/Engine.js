@@ -2,7 +2,6 @@
  * Created by Jerome on 26-06-17.
  */
 import AbilitiesPanel from './AbilitiesPanel'
-import AbilityPanel from './AbilityPanel'
 import BattleEquipmentPanel from './BattleEquipmentPanel'
 import Animal from './Animal'
 import BattleManager from './BattleManager'

@@ -16,6 +16,8 @@ function AbilitiesPanel(x,y,width,height,title,invisible){
     this.addPagination();
     this.nextPage.depth += 4;
     this.previousPage.depth += 4;
+
+    this.AP = this.addText(10,this.y - 30,'',Utils.colors.white,16);
 }
 
 AbilitiesPanel.prototype = Object.create(ShopInventoryPanel.prototype);
@@ -45,12 +47,17 @@ AbilitiesPanel.prototype.refreshPagination = function(){
 };
 
 AbilitiesPanel.prototype.updateContent = function(classID){
-    this.capsules['title'].setText(UI.classesData[classID].name+' abilities');
+    if(classID >= 0) this.classID = classID;
+    this.capsules['title'].setText(UI.classesData[this.classID].name+' abilities');
     this.hideContent();
     var NB_PER_PAGE = 6;
-    if(missions) this.missions = missions;
+    
+    var abilities = []
+    for(var aid in abilitiesData){
+        if(abilitiesData[aid].class == classID) abilities.push(aid);
+    }
 
-    this.nbpages = Math.max(1,Math.ceil(this.missions.length/NB_PER_PAGE));
+    this.nbpages = Math.max(1,Math.ceil(abilities.length/NB_PER_PAGE));
     this.currentPage = Utils.clamp(this.currentPage,0,this.nbpages-1);
     this.refreshPagination();
     var sloty = this.y + 60;
@@ -58,14 +65,13 @@ AbilitiesPanel.prototype.updateContent = function(classID){
     var yOffset = 0;
     var xOffset = 0;
 
-    var region = Engine.player.regionsStatus[Engine.player.region];
-    this.missions.forEach(function(goal, i){
+    abilities.forEach(function(aid, i){
         if ((i < this.currentPage * NB_PER_PAGE) || (i >= (this.currentPage + 1) * NB_PER_PAGE)) {
             return;
         }
         var slot = this.getNextSlot(this.x + 20 + xOffset, sloty + yOffset);
         slot.display();
-        slot.setUp(goal, region.counts[goal]);
+        slot.setUp(aid);
         slot.moveUp(5);
         xOffset += 290;
         if((i)%2){
@@ -73,6 +79,8 @@ AbilitiesPanel.prototype.updateContent = function(classID){
             yOffset += 90;
         }
     }, this);
+
+    this.AP.setText(Engine.player.ap[this.classID]);
 };
 
 AbilitiesPanel.prototype.hideContent = function(){
@@ -102,7 +110,7 @@ function AbilitySlot(x,y,width,height){
     this.zone.setInteractive();
     this.zone.setOrigin(0);
     this.zone.on('pointerover',function(){
-        UI.tooltip.updateInfo('mission',this.missionData);
+        UI.tooltip.updateInfo('ability',this.aid);
         UI.tooltip.display();
     }.bind(this));
     this.zone.on('pointerout',function(){
@@ -133,29 +141,14 @@ AbilitySlot.prototype.addCount = function(){
     this.content.push(this.count);
 };
 
-AbilitySlot.prototype.setUp = function(type, counts){
-    var data;
-    if(['craftitem','getitem'].includes(type.split(':')[0])){
-        data = Utils.getItemMissionData(type,counts[1]);
-    }else {
-        for (var i = 0; i < missionsData.missions.length; i++) { //TODO: ugly, refactor
-            var m = missionsData.missions[i];
-            if (m.count == type) {
-                data = m;
-                break;
-            }
-        }
-    }
-    this.missionData = data;
-    this.icon.setTexture(data.atlas,data.frame);
-    var actual = counts[0];
-    var goal = counts[1];
+AbilitySlot.prototype.setUp = function(aid){
+    var data = abilitiesData[aid];
+    // this.icon.setTexture(data.atlas,data.frame);
     var text = data.name;
-    if(data.variableGoal) text = text.replace(/\%x\%/,goal);
     this.name.setText(text);
-    this.count.setText(actual+'/'+goal);
-    this.count.setFill(actual >= goal ? Utils.colors.green : Utils.colors.gold);
-    if(data.pct) this.count.setText(Math.floor((actual/goal)*100)+'%');
+    this.aid = aid;
+    this.count.setText(data.cost+' AP');
+    this.count.setFill(data.cost <= Engine.player.ap[data.class] ? Utils.colors.green : Utils.colors.red);
 };
 
 AbilitySlot.prototype.display = function(){

@@ -4,53 +4,53 @@
         "name": "Healthy",
         "desc": "Increase maximum vitality by 100",
         "effect": "hpmax:100",
-        "cost": 0
+        "cost": 5
     },
     "1": {
         "class": 0,
         "name": "Grit 1",
         "desc": "Respawn with 90 more health",
         "effect": "respawnhp:90",
-        "cost": 0
+        "cost": 3
     },
     "2": {
         "class": 3,
         "name": "Traveller",
         "desc": "You lose less vigor from walking.",
         "effect": "walkfatigue:50",
-        "cost": 0
+        "cost": 2
     },
     "3": {
         "class": 3,
         "name": "Foraging",
         "desc": "Increase your chance of acquiring more ingredients when foraging plants.",
         "effect": "forageluck:30",
-        "cost": 0
+        "cost": 3
     },
     "4": {
         "class": 1,
         "name": "Hustler",
         "desc": "You lose less vigor from performing commercial activities.",
         "effect": "shopfatigue:50",
-        "cost": 0
+        "cost": 2
     },
     "5": {
         "class": 1,
         "name": "Haggler",
         "desc": "Increase your chance of having a discount when buying or selling items.",
         "effect": "shopluck:30",
-        "cost": 0
+        "cost": 3
     },
     "6": {
         "class": 2,
         "name": "Leatherwork",
         "desc": "Allow you to craft basic leather-based items.",
-        "cost": 0
+        "cost": 4
     },
     "7": {
         "class": 2,
         "name": "Apothecary",
         "desc": "Allow you to craft basic medicines.",
-        "cost": 0
+        "cost": 4
     }
 }

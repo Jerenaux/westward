@@ -54,6 +54,9 @@ CraftingPanel.prototype.addInterface = function(){
     this.okBtn = new BigButton(this.x + this.width/2,this.y + 350,'Craft',this.requestCraft.bind(this));
     this.okBtn.hide();
 
+    this.abilityneeded = this.addText(this.width/2,this.y + 380,'',Utils.colors.red,16);
+    this.abilityneeded.setOrigin(0.5);
+
     // this.addButton(x+92,y+13,'green','ok',this.requestCraft.bind(this),'Craft');
     this.minusBtn = this.addButton(count.x - this.x - 35,count.y - this.y - 10, 'blue','minus',this.decreaseAmount.bind(this),'Decrease').btn;
     this.plusBtn = this.addButton(count.x - this.x + 13,count.y - this.y - 10, 'blue','plus',this.increaseAmount.bind(this),'Increase').btn;
@@ -105,6 +108,9 @@ CraftingPanel.prototype.setUp = function(itemID){
     this.okBtn.display();
 
     this.manageButtons();
+
+    var lackingAbility = (data.ability && !Engine.player.hasAbility(data.ability));
+    this.abilityneeded.setVisible(lackingAbility);
 };
 
 CraftingPanel.prototype.updateIngredients = function(){
