@@ -239,18 +239,16 @@ MovingEntity.prototype.canRange = function () {
         return false;
     }
 
-    if (weapon.ammo !== this.equipment.getAmmoContainerType()) {
+    console.warn('Range type:',weapon.range_type,this.equipment.getAmmoRangeType());
+    if (weapon.range_type !== this.equipment.getAmmoRangeType()) {
         if(this.isPlayer) {
             this.addMsg('I can\'t use my weapon with that ammo');
             this.setOwnProperty('resetTurn', true);
         }
-        console.warn('wrong ammo');
         return false;
     }
 
-    if (hasAmmo) {
-        return true;
-    }
+    if (hasAmmo) return true;
 
 };
 

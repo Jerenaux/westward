@@ -4,17 +4,22 @@
         enabled: true,
         aggroRange: 12, // chebyshev distance; TODO: variable?
         battleRange: 3, // distance that can be travelled in one turn in battle; TODO: variable
-        freezeNPC: false,
+        freezeNPC: true,
         maxDamage: 10000,
         minDamage: 1,
         rangePenalty: 0.1, // accuracy penalty per tile
         turnDuration: 5, // seconds
         tickRate: 100, // milliseconds, granularity of battle updates
-        throwableSpeed: 10, // tiles/sec
+        throwableSpeed: 15, // tiles/sec
         arrowSpeed: 30, // tiles/sec
+        bulletSpeed: 50, // tiles/sec
         bombSpeed: 10,
+        throwableDelay: 300,
+        arrowDelay: 500,
+        bulletDelay: 500,
+        bombDelay: 300,
         meleeAtkDelay: 500,
-        rangedAtkDelay: 500
+        //rangedAtkDelay: 500
    },
    buildings: {
         autobuild: true,

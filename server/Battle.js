@@ -352,14 +352,28 @@ Battle.prototype.computeRangedHit = function (a, b) {
     return rand < chance;
 };
 
-Battle.prototype.computeTOF = function (a, b, type) {
+Battle.prototype.computeRangeDelay = function(a){
+    // GameServer.battleParameters.rangedAtkDelay;
+    var delays = {
+        'bomb': GameServer.battleParameters.bombDelay,
+        'bow': GameServer.battleParameters.arrowDelay,
+        'gun': GameServer.battleParameters.bulletDelay,
+        'hands': GameServer.battleParameters.throwableDelay
+    };
+    var range_type = GameServer.itemsData[a.getAmmoID()].range_type;
+    return delays[range_type];
+};
+
+Battle.prototype.computeTOF = function (a, b) {
     var speeds = {
-        'throwable': GameServer.battleParameters.arrowSpeed,
-        'arrow': GameServer.battleParameters.arrowSpeed,
-        'bomb': GameServer.battleParameters.bombSpeed
+        'bomb': GameServer.battleParameters.bombSpeed,
+        'bow': GameServer.battleParameters.arrowSpeed,
+        'gun': GameServer.battleParameters.bulletSpeed,
+        'hands': GameServer.battleParameters.throwableSpeed
     };
     var shootingPoint = a.getShootingPoint(); // Expected unit: tiles
-    return (Utils.euclidean(shootingPoint, b) / speeds[type]) * 1000;
+    var range_type = GameServer.itemsData[a.getAmmoID()].range_type;
+    return (Utils.euclidean(shootingPoint, b) / speeds[range_type]) * 1000;
 };
 
 Battle.prototype.applyDamage = function (attacker, f, dmg) {
@@ -445,15 +459,16 @@ Battle.prototype.processAttack = function (attacker, target) {
         }); // for the flash and hp display
     } else {
         if (!attacker.canRange()) return false;
-        var fireDelay = GameServer.battleParameters.rangedAtkDelay; // duration of character firing animation
-        var tof = this.computeTOF(attacker, target, 'arrow');
+        // var fireDelay = GameServer.battleParameters.rangedAtkDelay;
+        var fireDelay = this.computeRangeDelay(attacker); // duration of character firing animation
+        var tof = this.computeTOF(attacker, target);
         delay = fireDelay + tof;
         var c = target.getTargetCenter();
         attacker.setProperty('ranged_atk',
             {
                 x: c.x,
                 y: c.y,
-                projectile: attacker.getAmmoType(),
+                projectile: attacker.getAmmoID(),
                 delay: fireDelay,
                 duration: tof
             }); // Character aimation + arrow; coordinates are to determine which direction to face

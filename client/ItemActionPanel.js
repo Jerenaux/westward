@@ -4,6 +4,7 @@
 import BigButton from './BigButton'
 import Client from './Client'
 import Engine from './Engine'
+import {Equipment} from '../shared/Equipment'
 import ItemSprite from './ItemSprite'
 import Panel from './Panel'
 import Utils from '../shared/Utils'
@@ -49,7 +50,8 @@ ItemActionPanel.prototype.setUp = function(itemID, inventory){
         if(data.isAmmo && !ammoContainerMatch){
             this.useButton.disable();
             // this.warntext.setText('You need a '+Equipment.getData(data.ammo).name+' to be able to equip this!');
-            this.warntext.setText('You need a '+ data.container_type_name +' to be able to equip this!');
+            var containerData = Equipment.container_types[data.container_type];
+            this.warntext.setText('You need a '+ containerData.name +' to be able to equip this!');
             this.warntext.setVisible(true);
         }
 

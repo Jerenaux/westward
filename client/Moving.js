@@ -379,7 +379,7 @@ var Moving = new Phaser.Class({
             itemAtlasPool = Engine.imagePool2;
         }
         var frame = ranged_ammo_item.frame;
-        var anim = ranged_ammo_item.ammo == 'quiver' ? 'bow' : 'attack';
+        var anim = ranged_ammo_item.container_type == 'quiver' ? 'bow' : 'attack';
 
         const animationName = this.animPrefix + '_'+anim+'_' + this.orientation;
         this.play(animationName);

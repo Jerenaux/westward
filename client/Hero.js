@@ -178,7 +178,7 @@ let Hero = new Phaser.Class({
     getRangedCursor: function(){
         let rangedw = this.getEquippedItemID('rangedw');
         if(rangedw === -1) return 'bow';
-        return (itemsData[rangedw].ammo === 'quiver' ? 'bow' : 'gun');
+        return (itemsData[rangedw].container_type === 'bullets' ? 'gun' : 'bow');
     },
 
     getStat: function(stat){

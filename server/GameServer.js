@@ -2020,7 +2020,7 @@ GameServer.handleUse = function(data,socketID){
     var result;
     var nb = 1;
     if(isEquipment) {
-        nb = player.equip(itemData.equipment, parseInt(item), false); // false: not from DB
+        nb = player.equip(itemData.equipment, parseInt(item), false, inventory); // false: not from DB
     }else if(itemData.effects){ // If non-equipment but effects, then consumable item
         nb = player.applyEffects(item,true);
     }

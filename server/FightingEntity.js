@@ -102,8 +102,8 @@ FightingEntity.prototype.getStats = function(){
     return Object.keys(this.stats);
 };
 
-FightingEntity.prototype.getAmmoType = function(){
-    return this.equipment.getAmmoType();
+FightingEntity.prototype.getAmmoID = function(){
+    return this.equipment.getAmmoID();
 };
 
 export default FightingEntity

@@ -1,4 +1,5 @@
 ## To test:
+- Test equipping ammo from belt
 - Test Building.updateProd()
 - Test handleCraft when a price is undefined
 - Test starting inventory of new player
@@ -68,10 +69,7 @@ Bugs:
 - Wrong logging of battles against civs/animals?
 - Reduce Engine.js
 - Stop using shader for items outline?
-- Stone throw anim
-- Can't equip stones from belt in battle
-- Stones equipped from belt have count of 0 (outside of battle)
-- Display stones as ammo in battle
+- Stone throw anim: adjust TOF
 - Orientation pins bugs
 - No wolf aggro?
 - SZ not suppressed by tower

@@ -543,7 +543,7 @@ Player.prototype.canEquip = function (slot, item) {
  * it comes from player use).
  * @returns {number} - number of items to remove from inventory (0 if failure)
  */
-Player.prototype.equip = function (slot, itemID, fromDB) {
+Player.prototype.equip = function (slot, itemID, fromDB, inventory) {
 
     if (typeof itemID != 'number') {
         console.warn('ERROR in `Player.equip()`: item is not a number');
@@ -583,8 +583,8 @@ Player.prototype.equip = function (slot, itemID, fromDB) {
     // amo as was equipped by the player. Therefore the below code should
     // not be run.
     if (slot === 'range_ammo' && !fromDB) {
-        var range_container_id = this.equipment.get('range_container');
-        nb = this.computeLoad(itemID); // compute how much will be added to the container
+        // var range_container_id = this.equipment.get('range_container');
+        nb = this.computeLoad(itemID, inventory); // compute how much will be added to the container
         this.load(nb);
     }
 
@@ -660,7 +660,7 @@ Player.prototype.removeAbsoluteModifier = function (stat, modifier) {
  * @param {number} item - item ID of ammo to load.
  * @returns {number} amount of ammo to load.
  */
-Player.prototype.computeLoad = function (item) {
+Player.prototype.computeLoad = function (item, inventory) {
 
     let capacity = 0;
     let currentNb = this.equipment.getNbAmmo();
@@ -673,7 +673,7 @@ Player.prototype.computeLoad = function (item) {
     if (range_container_item) capacity = range_container_item.capacity;
     if (currentNb && currentNb > 0) capacity = capacity - currentNb;
 
-    const ammo_count_in_inventory = this.inventory.getNb(item);
+    const ammo_count_in_inventory = (inventory == 'backpack' ? this.inventory.getNb(item) : this.belt.getNb(item) );
 
     return Math.min(ammo_count_in_inventory, capacity);
 };
