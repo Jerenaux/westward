@@ -3,6 +3,7 @@
  */
 import GameObject from './GameObject'
 import GameServer from './GameServer'
+import {EquipmentManager} from "../shared/Equipment";
 
 function FightingEntity(){
     GameObject.call(this);
@@ -99,6 +100,10 @@ FightingEntity.prototype.getStatValue = function(key){
 
 FightingEntity.prototype.getStats = function(){
     return Object.keys(this.stats);
+};
+
+FightingEntity.prototype.getAmmoType = function(){
+    return this.equipment.getAmmoType();
 };
 
 export default FightingEntity

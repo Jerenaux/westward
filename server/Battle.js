@@ -453,6 +453,7 @@ Battle.prototype.processAttack = function (attacker, target) {
             {
                 x: c.x,
                 y: c.y,
+                projectile: attacker.getAmmoType(),
                 delay: fireDelay,
                 duration: tof
             }); // Character aimation + arrow; coordinates are to determine which direction to face

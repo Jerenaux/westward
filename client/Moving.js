@@ -8,6 +8,8 @@ import CustomSprite from './CustomSprite'
 import Engine from './Engine'
 import PFUtils from '../shared/PFUtils'
 
+import itemsData from '../assets/data/items.json'
+
 var Moving = new Phaser.Class({
 
     Extends: CustomSprite,
@@ -366,29 +368,20 @@ var Moving = new Phaser.Class({
     processRangedAttack: function (data) {
         this.setOrientation({x: data.x, y: data.y});
 
-        // let rangeWeapon = 'attack';
-        //
-        // const ranged_weapon_item = this.getEquippedItem('rangedw');
-        // if (ranged_weapon_item.class && ranged_weapon_item.class === 'bow') {
-        //     rangeWeapon = 'bow';
-        // }
-        //
-        // const ranged_ammo_item = this.getEquippedItem('range_ammo');
-        //
-        // let itemAtlasPool;
-        // // TODO: Maybe get this in utility function
-        // if (ranged_ammo_item.atlas === 'items') {
-        //     itemAtlasPool = Engine.imagePool;
-        // }
-        // if (ranged_ammo_item.atlas === 'items2') {
-        //     itemAtlasPool = Engine.imagePool2;
-        // }
+        const ranged_ammo_item = itemsData[data.projectile];
 
-        // TODO: generalize to firearms
-        var itemAtlasPool = Engine.imagePool;
-        var frame = "arrow";
+        let itemAtlasPool;
+        // TODO: Maybe get this in utility function
+        if (ranged_ammo_item.atlas === 'items') {
+            itemAtlasPool = Engine.imagePool;
+        }
+        if (ranged_ammo_item.atlas === 'items2') {
+            itemAtlasPool = Engine.imagePool2;
+        }
+        var frame = ranged_ammo_item.frame;
+        var anim = ranged_ammo_item.ammo == 'quiver' ? 'bow' : 'attack';
 
-        const animationName = this.animPrefix + '_bow_' + this.orientation;
+        const animationName = this.animPrefix + '_'+anim+'_' + this.orientation;
         this.play(animationName);
         var from = {
             x: this.x,

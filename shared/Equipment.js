@@ -135,6 +135,10 @@ EquipmentManager.prototype.getNbAmmo = function () {
     return this.slots["range_ammo"].nb;
 };
 
+EquipmentManager.prototype.getAmmoType = function(){
+    return this.slots["range_ammo"].id;
+};
+
 EquipmentManager.prototype.hasAnyAmmo = function () {
     return this.slots["range_ammo"].id > -1 && this.slots["range_ammo"].nb > 0;
 };
