@@ -3,6 +3,7 @@
  */
 import Inventory from "../shared/Inventory";
 
+var https = require('https')
 var fs = require('fs');
 var pathmodule = require('path');
 var clone = require('clone'); // used to clone objects, essentially used for clonicg update packets
@@ -193,6 +194,41 @@ GameServer.readMap = function(mapsPath,test,cb){
     var hrend = process.hrtime(hrstart);
     console.log('readMap execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
     console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
+
+};
+
+GameServer.sendSlackNotification = function(msg){
+    if(process.env.SUPPRESS_SLACK) return;
+    const data = JSON.stringify({
+        icon_emoji: 'game_die',
+        text: msg,
+        username: 'Westward-bot'
+      })
+      
+      const options = {
+        hostname: 'hooks.slack.com',
+        path: '/services/T54PW6PPC/BPEEUQPDF/N5JC1aUByPJ0aopuTvViQ6vq',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': data.length
+        }
+      }
+      
+      const req = https.request(options, res => {
+        // console.log(`statusCode: ${res.statusCode}`)
+      
+        // res.on('data', d => {
+        //   process.stdout.write(d)
+        // })
+      })
+      
+      req.on('error', error => {
+        console.error(error)
+      })
+      
+      req.write(data)
+      req.end()
 };
 
 /*GameServer.registerAbilityHooks = function(){
@@ -549,6 +585,7 @@ GameServer.finalStep = function(){
     console.log('finalSetp execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
     console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
     GameServer.updateStatus();
+    GameServer.sendSlackNotification('Game server started');
 };
 
 /**
@@ -828,6 +865,7 @@ GameServer.addNewPlayer = function(socket,data){
     // Send extra stuff following player initialization, unique to new players
     player.setStartingInventory();
     Prism.logEvent(player,'connect',{stl:player.origin,re:false});
+    GameServer.sendSlackNotification('New player '+player.name+' has arrived in '+GameServer.regionsData[player.origin].name);
     return player; // return value for the tests
 };
 
@@ -853,6 +891,7 @@ GameServer.loadPlayer = function(socket,id){
 
             GameServer.postProcessPlayer(socket,player,doc);
             Prism.logEvent(player,'connect',{stl:player.region,re:true});
+            GameServer.sendSlackNotification('Player '+player.name+' has come back in '+GameServer.regionsData[player.region].name);
         }
     );
 };
@@ -1119,6 +1158,15 @@ GameServer.lootNPC = function(player,type,ID){
     for(var item in NPC.loot.items){
         // TODO: take harvesting ability into consideration
         var nb = NPC.loot.items[item];
+        if(type == 'animal'){
+            var rand = Utils.randomInt(0,100);
+            var chance = player.getStatValue('scavengeluck');
+            // console.warn('forage luck:',rand,chance);
+            if((rand < chance)){
+                player.addNotif('You found more than usual!');
+                nb = Math.ceil(1.3*nb);
+            }
+        }
         player.giveItem(item,nb,true,'Scavenged');
         GameServer.createItem(item,nb,player.region,'loot');
     }
@@ -1166,12 +1214,19 @@ GameServer.respawnItems = function(){
 GameServer.updateSZActivity = function(){
     console.log('Updating active spawn zones ...');
     GameServer.animalMarkers = [];
+    var nbActive = 0;
+    var nbZones = 0;
     for(var key in GameServer.spawnZones){
         if(!GameServer.spawnZones.hasOwnProperty(key)) continue;
         var sz = GameServer.spawnZones[key];
         sz.updateActiveStatus();
-        if(sz.isActive()) GameServer.animalMarkers.push(sz.getMarkerData());
+        if(sz.isActive()) {
+            GameServer.animalMarkers.push(sz.getMarkerData());
+            nbActive++;
+        }
+        nbZones++;
     }
+    console.warn(nbActive+'/'+nbZones+' active zones');
     GameServer.setFlag('animalsMarkers');
 };
 

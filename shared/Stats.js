@@ -104,6 +104,16 @@ var Stats = {
         hidden: true,
         suffix: '%'
     },
+    scavengeluck: {
+        name :'Scavenging luck',
+        desc: 'Chance of acquiring more ingredients when scavenging from dead animals.',
+        min: 0,
+        max: 100,
+        default: 10,
+        frame: 'goldenheart', // TODO: change
+        hidden: true,
+        suffix: '%'
+    },
     shopluck: {
         name :'Discount luck',
         desc: 'Chance of having a discount when buying or selling items.',
