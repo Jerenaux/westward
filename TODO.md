@@ -16,6 +16,25 @@
 - Test new player manually
 => After bug, systematically create test!
 
+
+Patreon tiers:
+- Thanks (1$)
+- Name 1 region
+- Access to exclusive dev server (3.5$)
+- Access to private Slack/Discord with polls about future features, abilities... (1$)
+- Access to dev channels (collab, artwork) and right to chime in
+- Some differentiating in-game visual element (1$, 3.5$)
+- Vanity gear (10$)
+- Vanity building skins (10$)
+
+Milestones:
+- Hosting
+- Scaling
+- Art costs (few hundreds)
+- Soundtrack
+- Ambitious art goals (UI ...)
+
+
 Admin
 Analytics
 Cleaning
