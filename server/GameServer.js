@@ -203,7 +203,7 @@ GameServer.sendSlackNotification = function(msg){
         icon_emoji: 'game_die',
         text: msg,
         username: 'Westward-bot'
-      })
+      });
       
       const options = {
         hostname: 'hooks.slack.com',
@@ -645,7 +645,6 @@ GameServer.addCamp = function(data){
  * @returns {Object} The created Civ object.
  */
 GameServer.addCiv = function(x,y,type){
-    console.log('Spawning civ type ',type,' at',x,y);
     var npc = new Civ(x,y,type);
     GameServer.civs[npc.id] = npc;
     return npc;
@@ -695,13 +694,7 @@ GameServer.addItem = function(x,y,type,instance){
  */
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
-    GameServer.addItem(513,677,26);
-    GameServer.addItem(514,677,26);
-    GameServer.addItem(513,676,26);
-    GameServer.addAnimal(404,602,0);
-    GameServer.addAnimal(406,604,0);
-    GameServer.addAnimal(408,606,0);
-    GameServer.addAnimal(1170,144,0);
+    GameServer.addItem(1194,133,7);
     console.log('---done---');
 };
 
@@ -718,9 +711,10 @@ GameServer.onNewPlayer = function(player){
     // player.setStat('vigor', 10);
     // player.applyVigorModifier();
     // player.applyAbility(3);
+    player.giveItem(1,3);
 
     const items = [
-      
+
     ];
 
     items.forEach(item => {
@@ -1226,7 +1220,7 @@ GameServer.updateSZActivity = function(){
         }
         nbZones++;
     }
-    console.warn(nbActive+'/'+nbZones+' active zones');
+    // console.warn(nbActive+'/'+nbZones+' active zones');
     GameServer.setFlag('animalsMarkers');
 };
 

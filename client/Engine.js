@@ -95,17 +95,23 @@ Engine.preload = function() {
     Engine.useTilemaps = false;
 
     this.load.atlas('tileset', 'assets/tilesets/tileset.png', 'assets/tilesets/tileset.json');
+    this.load.atlas('tileset_wh', 'assets/tilesets/tileset_wh.png', 'assets/tilesets/tileset.json');
 
     this.load.atlas('remains', 'assets/sprites/remains.png','assets/sprites/remains.json');
 
     // Characters
     this.load.spritesheet('enemy', 'assets/sprites/enemy.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64}); // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
+    this.load.spritesheet('enemy_wh', 'assets/sprites/enemy_wh.png',{frameWidth:64,frameHeight:64});
+    this.load.spritesheet('hero_wh', 'assets/sprites/newhero_wh.png',{frameWidth:64,frameHeight:64}); // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
 
 
     this.load.spritesheet('graywolf', 'assets/sprites/animals/graywolf.png',{frameWidth:43,frameHeight:32});
     this.load.spritesheet('blackwolf', 'assets/sprites/animals/blackwolf.png',{frameWidth:43,frameHeight:32});
     this.load.spritesheet('whitewolf', 'assets/sprites/animals/whitewolf.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('graywolf_wh', 'assets/sprites/animals/graywolf_wh.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('blackwolf_wh', 'assets/sprites/animals/blackwolf_wh.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('whitewolf_wh', 'assets/sprites/animals/whitewolf_wh.png',{frameWidth:43,frameHeight:32});
     this.load.spritesheet('bears', 'assets/sprites/animals/bears.png',{frameWidth:56,frameHeight:56});
     this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
 
@@ -2199,27 +2205,6 @@ Engine.requestBattleAction = function(action,data){
     return Utils.gridToLine(col,row,3);
 };*/
 
-Engine.isBattleCell = function(x,y){
-    return Engine.battleCells.get(x,y);
-};
-
-Engine.getNextPrint = function(){
-    if(Engine.printsPool.length > 0) return Engine.printsPool.shift();
-    return Engine.scene.add.image(0,0,'footsteps');
-};
-
-Engine.recycleSprite = function(sprite){
-    Engine.spritePool.recycle(sprite);
-};
-
-Engine.recycleImage = function(image){
-    Engine.imagePool.recycle(image);
-};
-
-Engine.recyclePrint = function(print){
-    Engine.printsPool.push(print);
-};
-
 Engine.updateGrid = function(){
     Engine.entityManager.displayLists['cell'].forEach(function(id){
         Engine.battleCells[id].update();
@@ -2247,46 +2232,9 @@ Engine.unequipClick = function(){ // Sent when unequipping something
     Client.sendUnequip(this.slotName);
 };
 
-Engine.sellClick = function(){
-    Engine.currentMenu.panels['action'].setUp(this.itemID,'sell');
-    /*if(Engine.currentBuiling.isOwned()){
-        Engine.currentMenu.panels['prices'].display();
-    }*/
-};
-
-Engine.buyClick = function(){
-    Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
-    /*if(Engine.currentBuiling.isOwned()){
-        Engine.currentMenu.panels['prices'].display();
-    }*/
-};
-
-Engine.giveClick = function(itemID){
-    Engine.currentMenu.panels['action'].display();
-    Engine.currentMenu.panels['action'].setUp(itemID,'sell');
-};
-
-Engine.takeClick = function(){
-    //if(Engine.currentBuiling.owner != Engine.player.id) return;
-    if(!Engine.currentBuiling.isOwned()) return;
-    Engine.currentMenu.panels['action'].display();
-    Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
-};
-
 Engine.respawnClick = function(){ // this bound to respawn panel
     Client.sendRespawn();
     Engine.menus["respawn"].hide();
-};
-
-Engine.buildError = function(){
-    Engine.currentMenu.panels['confirm'].displayError();
-};
-
-Engine.buildSuccess = function(){
-    Engine.currentMenu.panels['buildings'].hide();
-    Engine.currentMenu.panels['confirm'].hide();
-    Engine.currentMenu.panels['ingredients'].hide();
-    Engine.currentMenu.panels['map'].map.hideRedPin();
 };
 
 Engine.leaveBuilding = function(){

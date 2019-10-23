@@ -1,5 +1,5 @@
 ## To test:
-- Test equipping ammo from belt
+- Test equipping ammo from belt (both stones and arrows)
 - Test Building.updateProd()
 - Test handleCraft when a price is undefined
 - Test starting inventory of new player
@@ -15,24 +15,6 @@
 - Test tutorial manually (reset start)
 - Test new player manually
 => After bug, systematically create test!
-
-
-Patreon tiers:
-- Thanks (1$)
-- Name 1 region
-- Access to exclusive dev server (3.5$)
-- Access to private Slack/Discord with polls about future features, abilities... (1$)
-- Access to dev channels (collab, artwork) and right to chime in
-- Some differentiating in-game visual element (1$, 3.5$)
-- Vanity gear (10$)
-- Vanity building skins (10$)
-
-Milestones:
-- Hosting
-- Scaling
-- Art costs (few hundreds)
-- Soundtrack
-- Ambitious art goals (UI ...)
 
 
 Admin
@@ -85,17 +67,15 @@ Packaging
 - Mission tracking
 - Respawn at shack
 - Enemy regen
+- Show all markers on region selection map (and FoW as well?)
 
 Bugs:
-- Check issue with connecting to Draiglyn?
-- Wrong logging of region in dashboard, + new/returning players [test]
-- No wolf aggro?
-- Wrong logging of battles against civs/animals?
+- Food reward when picking random item
 - Reduce Engine.js
-- Stop using shader for items outline?
+- Apply new outline trick to players, civs etc. then remove pipelines
+-> With overlay: ignore, just display naked outline
+- Add bear & remains (to avoid bugs with silhouettes)
 - Orientation pins bugs
-- SZ not suppressed by tower
-- Weird food reward when transitioning first AOI?
 - Rethink how food is kept track of in regions for connected and disconnected players
 - New building in wild region near resource node: trigger explo rewards 
 Features:
@@ -105,7 +85,6 @@ fitting more in backpack, more actions per turn, ... (not so for "boolean" effec
 - Re-add stats panel to character panel?
 - Fix help of abilities panel
 - DIsable some skills based on fatigue / update help
-- Add Bear + remains
 - Towers clear multiple FoW AOI?
 - Specify where toponyms are displayed
 - Toggle region names
