@@ -79,6 +79,7 @@ Bugs:
 - Rethink how food is kept track of in regions for connected and disconnected players
 - New building in wild region near resource node: trigger explo rewards 
 Features:
+- Name Patreon tiers
 - Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Add a "show all" button to stats panel to display all of them
