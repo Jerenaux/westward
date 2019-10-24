@@ -1,5 +1,5 @@
 ## To test:
-- Test equipping ammo from belt
+- Test equipping ammo from belt (both stones and arrows)
 - Test Building.updateProd()
 - Test handleCraft when a price is undefined
 - Test starting inventory of new player
@@ -67,27 +67,25 @@ Packaging
 - Mission tracking
 - Respawn at shack
 - Enemy regen
+- Show all markers on region selection map (and FoW as well?)
 
 Bugs:
-- Check issue with connecting to Draiglyn?
-- Wrong logging of region in dashboard, + new/returning players [test]
-- No wolf aggro?
-- Wrong logging of battles against civs/animals?
+- Food reward when picking random item
 - Reduce Engine.js
-- Stop using shader for items outline?
+- Apply new outline trick to players, civs etc. then remove pipelines
+-> With overlay: ignore, just display naked outline
+- Add bear & remains (to avoid bugs with silhouettes)
 - Orientation pins bugs
-- SZ not suppressed by tower
-- Weird food reward when transitioning first AOI?
 - Rethink how food is kept track of in regions for connected and disconnected players
 - New building in wild region near resource node: trigger explo rewards 
 Features:
+- Name Patreon tiers
 - Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Add a "show all" button to stats panel to display all of them
 - Re-add stats panel to character panel?
 - Fix help of abilities panel
 - DIsable some skills based on fatigue / update help
-- Add Bear + remains
 - Towers clear multiple FoW AOI?
 - Specify where toponyms are displayed
 - Toggle region names

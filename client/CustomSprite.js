@@ -37,12 +37,12 @@ var CustomSprite = new Phaser.Class({
         if(isNaN(this.tileX) || isNaN(this.tileY) || isNaN(this.x) || isNaN(this.y)) console.warn('Warning: NaN coordinates for ',this.entityType,this.id);
     },
 
-    highlight: function(){
-        this.setPipeline('highlight');
-        var texture = this.texture.source[0];
-        // this.pipeline.setFloat1('uRadius', 2.0);
-        this.pipeline.setFloat4('uFrameCut', this.frame.data.cut.x,this.frame.data.cut.y,this.frame.data.cut.w,this.frame.data.cut.h);
-        this.pipeline.setFloat2('uTextureSize', texture.width,texture.height);
+    highlight: function(){ // Not used atm
+        // this.setPipeline('highlight');
+        // var texture = this.texture.source[0];
+        // // this.pipeline.setFloat1('uRadius', 2.0);
+        // this.pipeline.setFloat4('uFrameCut', this.frame.data.cut.x,this.frame.data.cut.y,this.frame.data.cut.w,this.frame.data.cut.h);
+        // this.pipeline.setFloat2('uTextureSize', texture.width,texture.height);
     },
 
     hollow: function(){

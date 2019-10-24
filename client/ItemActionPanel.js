@@ -49,7 +49,6 @@ ItemActionPanel.prototype.setUp = function(itemID, inventory){
 
         if(data.isAmmo && !ammoContainerMatch){
             this.useButton.disable();
-            // this.warntext.setText('You need a '+Equipment.getData(data.ammo).name+' to be able to equip this!');
             var containerData = Equipment.container_types[data.container_type];
             this.warntext.setText('You need a '+ containerData.name +' to be able to equip this!');
             this.warntext.setVisible(true);

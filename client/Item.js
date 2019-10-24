@@ -90,6 +90,21 @@ var Item = new Phaser.Class({
         }
     },
 
+    // Overrides the corresponding CustomSprite methods
+    hollow: function(){
+        if(this.hollowed) return;
+        this.hollowed = true;
+        this.setDepth(this.tileY + 5);
+        this.setTexture('tileset_wh',this.frame.name);
+    },
+
+    unhollow: function(){
+        if(!this.hollowed) return;
+        this.hollowed = false;
+        this.updateDepth();
+        this.setTexture('tileset',this.frame.name);
+    },
+
     handleClick: function(){
         if(!BattleManager.inBattle) Engine.processItemClick(this);
     },
