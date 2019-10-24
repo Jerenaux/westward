@@ -70,16 +70,18 @@ Packaging
 - Show all markers on region selection map (and FoW as well?)
 
 Bugs:
-- Food reward when picking random item
 - Reduce Engine.js
 - Apply new outline trick to players, civs etc. then remove pipelines
+-> When hollow shift, check if running anim, if yes stop it and start anim with alternate texture at stopped frame
 -> With overlay: ignore, just display naked outline
 - Add bear & remains (to avoid bugs with silhouettes)
 - Orientation pins bugs
 - Rethink how food is kept track of in regions for connected and disconnected players
 - New building in wild region near resource node: trigger explo rewards 
+- Food reward when picking random item
+- Mail Sean Pope
 Features:
-- Name Patreon tiers
+- Remove animPrefix and simplify args of createAnimations
 - Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Add a "show all" button to stats panel to display all of them

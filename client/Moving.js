@@ -71,7 +71,9 @@ var Moving = new Phaser.Class({
 
     updateDepth: function(){
         //this.setDepth(Engine.playersDepth + this.tileY / 1000);
-        this.setDepth(this.tileY+1.6); // 1.6 to be greatet than Item's 1.5
+        var newdepth = this.tileY+1.6;
+        if(this.hollowed) newdepth += 5;
+        this.setDepth(newdepth); // 1.6 to be greatet than Item's 1.5
     },
 
     manageOrientationPin: function(){
@@ -147,8 +149,8 @@ var Moving = new Phaser.Class({
     },
 
     faceOrientation: function(){
-        // this.setFrame(this.restingFrames[this.orientation]);
-        this.play(this.animPrefix + '_rest_' + this.orientation);
+        console.warn(this.getTextureName() + '_rest_' + this.orientation);
+        this.play(this.getTextureName() + '_rest_' + this.orientation);
     },
     
     tileByTilePreUpdate: function(tween,targets,startX,startY,endX,endY){
@@ -160,8 +162,8 @@ var Moving = new Phaser.Class({
 
         if(this.orientation != this.previousOrientation) {
             this.previousOrientation = this.orientation;
-            this.play(this.animPrefix + '_move_' + this.orientation);
-            if(this.hollowed) this.hollow();
+            console.warn(this.getTextureName() + '_move_' + this.orientation);
+            this.play(this.getTextureName() + '_move_' + this.orientation);
         }
 
         if(this.isHero){
@@ -184,6 +186,7 @@ var Moving = new Phaser.Class({
         }else{
             this.unhollow();
         }
+        
         this.leaveFootprint();
         this.playSound();
         if(this.isHero){
@@ -381,7 +384,8 @@ var Moving = new Phaser.Class({
         var frame = ranged_ammo_item.frame;
         var anim = ranged_ammo_item.container_type == 'quiver' ? 'bow' : 'attack';
 
-        const animationName = this.animPrefix + '_'+anim+'_' + this.orientation;
+        // const animationName = this.animPrefix + '_'+anim+'_' + this.orientation;
+        const animationName = this.getTextureName() + '_'+anim+'_' + this.orientation;
         this.play(animationName);
         var from = {
             x: this.x,

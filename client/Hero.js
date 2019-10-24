@@ -194,7 +194,6 @@ let Hero = new Phaser.Class({
     },
 
     hasAbility: function(aid){
-        console.warn(aid,this.abilities);
         return this.abilities.includes(aid);
     },
 

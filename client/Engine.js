@@ -464,12 +464,18 @@ Engine.playLocalizedSound = function(sound,maxVolume,location){
 };
 
 Engine.createAnimations = function(){
-    Engine.createHumanoidAnimations('player','hero');
+    Engine.createHumanoidAnimations('hero','hero');
     Engine.createHumanoidAnimations('enemy','enemy');
+    Engine.createHumanoidAnimations('hero_wh','hero_wh');
+    Engine.createHumanoidAnimations('hero_wh','enemy_wh');
 
     Engine.createWolfAnimations('graywolf');
     Engine.createWolfAnimations('blackwolf');
     Engine.createWolfAnimations('whitewolf');
+
+    Engine.createWolfAnimations('graywolf_wh');
+    Engine.createWolfAnimations('blackwolf_wh');
+    Engine.createWolfAnimations('whitewolf_wh');
 
     // Bear
     Engine.createAnimation('bear_move_down','bears',9,11,10,true);
