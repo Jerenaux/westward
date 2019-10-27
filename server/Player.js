@@ -824,8 +824,11 @@ Player.prototype.getDataFromDb = function (data) {
     this.setUpStats();
     if (!data.stats) data.stats = [];
     data.stats.forEach(function (stat) {
-        this.getStat(stat.stat).setBaseValue(stat.value);
-        this.refreshStat(stat.stat);
+        var s = this.getStat(stat.stat);
+        if(s) {
+            s.setBaseValue(stat.value);
+            this.refreshStat(stat.stat);
+        }
     }, this);
     this.setStat('hp', Math.max(this.getStat('hp').getValue(), 10)); // quick fix TODO remove
     this.applyAbilities();

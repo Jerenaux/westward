@@ -291,13 +291,12 @@ Region.prototype.updateBuildings = function(){
     this.playerBuildings = playerBuildings;
 };
 
-
 Region.prototype.updateFood = function(){
     console.log('['+this.name+'] Food update');
     this.food[0] = 0;
     for(var playerID of this.players){
-        if(!(playerID in GameServer.players)) continue;
-        this.food[0] += GameServer.players[playerID].getItemNb(1);
+        var player = GameServer.players[playerID];
+        if(player) this.food[0] += player.getItemNb(1);
     }
 };
 
