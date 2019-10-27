@@ -104,7 +104,8 @@ function Building(data){
 
     if(data.stats) {
         data.stats.forEach(function (stat) {
-            this.getStat(stat.stat).setBaseValue(stat.value);
+            var s = this.getStat(stat.stat);
+            if(s) s.setBaseValue(stat.value);
         }, this);
     }
     if(!this.built) this.stats['hp'].setBaseValue(0);
