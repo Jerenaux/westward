@@ -73,15 +73,10 @@ Packaging
 - Behindness issues when loading new chunks (not on startup; displayList issue?)
 
 Bugs:
-- Reduce Engine.js
-- Test bear in battle
-- Add bear remains
 - Orientation pins bugs
 - Rethink how food is kept track of in regions for connected and disconnected players
-- New building in wild region near resource node: trigger explo rewards 
-- Food reward when picking random item
+- Food reward when transitioning region
 - Add all tests
-- Mail Sean Pope
 Features:
 - Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
@@ -217,8 +212,10 @@ V1 level:
 
 Admin
 -----
+Redirect tweets to Slack
 Pimp Slack notifs: https://dynetisgames.slack.com/services/BPEEUQPDF?added=1#message_attachments
 -> Post all errors automatically? Capture stderr somehow
+-> Display nb connected
 Improve admin tables
 Flush screenshots
 Make cmd line system
@@ -236,7 +233,8 @@ Analytics:
 - Fix event desc about enemy types
 - Log giving food to buildings in particular
 - Log repairs
-- Log submenus
+- Log help bubbles
+- Log submenu and panels
 - Log nb connected in monit: http://pm2.keymetrics.io/docs/usage/process-metrics/#process-metrics
 - Display market prices
 - Button to flush events

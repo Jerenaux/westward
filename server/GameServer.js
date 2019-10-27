@@ -694,7 +694,7 @@ GameServer.addItem = function(x,y,type,instance){
  */
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
-    GameServer.addAnimal(1073,181,5);
+    GameServer.addAnimal(1073,181,1);
     console.log('---done---');
 };
 
@@ -1281,10 +1281,14 @@ GameServer.forage = function(player, type){
  * (crafting, loot...)
  */
 GameServer.createItem = function(item,nb,region,source){
-    //if(!GameServer.itemCounts.hasOwnProperty(item)) GameServer.itemCounts[item] = 0;
-    //GameServer.itemCounts[item] += nb;
-    // console.warn(item,nb,GameServer.regions[region].name,source);
     GameServer.itemCounts.add(item,nb);
+    /* All items from db are added to regions once, when server is started (readMap()).
+    * Inventory from loaded players is *not* added, since it was added when reading from
+    * db.Inventory from new players must be added.
+    * In Player.setRegion(), inventory is moved from one region to another.
+    * Region inventory counts must never reset at 0, otherwise the amounts loaded by readMap
+    * are lost.
+    * */
     GameServer.regions[region].addItem(item,nb);
     // TODO: log sources
 };

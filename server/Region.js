@@ -130,6 +130,7 @@ Region.prototype.updateCounts = function(){
         this.updateCount('getitem:'+item[0],this.itemCounts.getNb(item[0]));
     },this);
     GameServer.setFlag('regionsStatus'); // TODO: eventually, don't broadcast all regions but only changed ones
+    console.log('['+this.name+'] Status: ',this.status,' :: ',this.counts);
 };
 
 Region.prototype.updateCount = function(count,value){
@@ -164,7 +165,6 @@ Region.prototype.update = function(){
     this.updateItemMissions();
     if(this.status != status_) this.setGoals();
     this.updateCounts();
-    console.log('['+this.name+'] Status: ',this.status,' :: ',this.counts);
 };
 
 Region.prototype.event = function(event, player){
@@ -203,12 +203,13 @@ Region.prototype.event = function(event, player){
             // do nothing but trigger updateCounts below
             break;
     }
+    this.updateCounts();
     if(player){
-        this.updateCounts();
         for(var count in this.counts){
             var p = counts_[count];
             var c = this.counts[count];
             if(p[0] < p[1] && c[0] > p[0]){
+                console.warn(count,p,c);
                 player.addNotif('You contributed to a region mission ('+this.missionLabels[count]+')!');
                 var xp = this.XPtable[count];
                 for(var clas in xp){

@@ -70,7 +70,8 @@ var CustomSprite = new Phaser.Class({
         this.hollowed = true;
         this.updateDepth();
         this.initialTexture = this.getTextureName();
-        this.setTexture(this.initialTexture+'_wh',this.frame.name);
+        this.setTexture(this.initialTexture+'_wh');
+        // this.setFrame(this.frame.name);
         var anim = this.anims.currentAnim.key.split('_');
         anim.shift();
         var anim_wh = this.initialTexture+'-wh_'+anim.join('_');

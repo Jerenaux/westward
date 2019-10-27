@@ -101,6 +101,7 @@ Player.prototype.getInstance = function () {
 Player.prototype.updateBldRecipes = function () {
     this.bldRecipes = [];
     this.baseBldrecipes.forEach(function (b) {
+        // console.warn(b, this.countOwnedBuildings(b));
         if (this.countOwnedBuildings(b) < 1) this.bldRecipes.push(b);
     }, this);
     if (this.bldRecipes.length === 0) this.bldRecipes = [-1];
@@ -155,13 +156,16 @@ Player.prototype.setRegion = function() {
     if(newregion != region_){
         this.setOwnProperty('region',newregion);
         this.addNotif('Entering '+GameServer.regions[this.region].name+' region');
-        if(region_ in GameServer.regions) GameServer.regions[region_].removePlayer(this.id);
-        GameServer.regions[this.region].addPlayer(this.id);
 
-        this.inventory.toList().forEach(function(inv){
-            if(region_ in GameServer.regions) GameServer.regions[region_].removeItem(inv[0],inv[1]);
-            GameServer.regions[this.region].addItem(inv[0],inv[1]);
-        },this);
+        if(region_) { // region_ will be null when loading players
+            if (region_ in GameServer.regions) GameServer.regions[region_].removePlayer(this.id);
+            GameServer.regions[this.region].addPlayer(this.id);
+
+            this.inventory.toList().forEach(function (inv) {
+                if (region_ in GameServer.regions) GameServer.regions[region_].removeItem(inv[0], inv[1]);
+                GameServer.regions[this.region].addItem(inv[0], inv[1]);
+            }, this);
+        }
     }
 };
 

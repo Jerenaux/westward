@@ -170,7 +170,8 @@ UI.handleNotifications = function (msgs) {
 
 UI.runningNotifications = 0;
 UI.showNotification = function (notif, i, height) {
-    var x = (UI.getGameWidth() - notif.getWidth()) / 2 - notif.getOrigin();
+    // var x = (UI.getGameWidth() - notif.getWidth()) / 2 - notif.getOrigin();
+    var x = 10 - notif.getOrigin();
     var y = UI.getGameHeight();
     notif.updatePosition(x, y);
 
@@ -490,7 +491,6 @@ UI.displayRegions = function (list) {
 };
 
 UI.displayRegion = function (data, world) {
-    console.log(data);
     var x = (data.x / world.width) * UI.SSmap.width * UI.SSmap.scaleX - 90; // why offset?
     var y = (data.y / world.height) * UI.SSmap.height * UI.SSmap.scaleY - 50;
     var icon = UI.scene.add.image(x, y, 'setldiamond');
