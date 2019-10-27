@@ -694,7 +694,7 @@ GameServer.addItem = function(x,y,type,instance){
  */
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
-    GameServer.addItem(1194,133,7);
+    GameServer.addAnimal(1073,181,5);
     console.log('---done---');
 };
 

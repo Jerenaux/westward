@@ -22,7 +22,7 @@ import ConstructionPanel from './ConstructionPanel'
 import CraftingPanel from './CraftingPanel'
 import EquipmentPanel from './EquipmentPanel'
 import Hero from './Hero'
-import {HighlightPipeline, HollowPipeline} from './shaders'
+// import {HighlightPipeline, HollowPipeline} from './shaders'
 import InfoPanel from './InfoPanel'
 import Inventory from '../shared/Inventory'
 import InventoryPanel from './InventoryPanel'
@@ -102,17 +102,18 @@ Engine.preload = function() {
     // Characters
     this.load.spritesheet('enemy', 'assets/sprites/enemy.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64}); // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
-    this.load.spritesheet('enemy_wh', 'assets/sprites/enemy_wh.png',{frameWidth:64,frameHeight:64});
-    this.load.spritesheet('hero_wh', 'assets/sprites/newhero_wh.png',{frameWidth:64,frameHeight:64}); // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
+    this.load.spritesheet('enemy-wh', 'assets/sprites/enemy_wh.png',{frameWidth:64,frameHeight:64});
+    this.load.spritesheet('hero-wh', 'assets/sprites/newhero_wh.png',{frameWidth:64,frameHeight:64}); // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
 
 
     this.load.spritesheet('graywolf', 'assets/sprites/animals/graywolf.png',{frameWidth:43,frameHeight:32});
     this.load.spritesheet('blackwolf', 'assets/sprites/animals/blackwolf.png',{frameWidth:43,frameHeight:32});
     this.load.spritesheet('whitewolf', 'assets/sprites/animals/whitewolf.png',{frameWidth:43,frameHeight:32});
-    this.load.spritesheet('graywolf_wh', 'assets/sprites/animals/graywolf_wh.png',{frameWidth:43,frameHeight:32});
-    this.load.spritesheet('blackwolf_wh', 'assets/sprites/animals/blackwolf_wh.png',{frameWidth:43,frameHeight:32});
-    this.load.spritesheet('whitewolf_wh', 'assets/sprites/animals/whitewolf_wh.png',{frameWidth:43,frameHeight:32});
-    this.load.spritesheet('bears', 'assets/sprites/animals/bears.png',{frameWidth:56,frameHeight:56});
+    this.load.spritesheet('graywolf-wh', 'assets/sprites/animals/graywolf_wh.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('blackwolf-wh', 'assets/sprites/animals/blackwolf_wh.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('whitewolf-wh', 'assets/sprites/animals/whitewolf_wh.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('bear', 'assets/sprites/animals/bear.png',{frameWidth:64,frameHeight:64});
+    this.load.spritesheet('bear-wh', 'assets/sprites/animals/bear_wh.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
 
     // ###################
@@ -355,9 +356,9 @@ Engine.create = function(){
         Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
     }
 
-    Engine.getGameInstance().renderer.addPipeline('highlight', new HighlightPipeline(Engine.getGameInstance()));
-    Engine.getGameInstance().renderer.addPipeline('hollow_items', new HollowPipeline(Engine.getGameInstance()));
-    Engine.getGameInstance().renderer.addPipeline('hollow_moving', new HollowPipeline(Engine.getGameInstance()));
+    // Engine.getGameInstance().renderer.addPipeline('highlight', new HighlightPipeline(Engine.getGameInstance()));
+    // Engine.getGameInstance().renderer.addPipeline('hollow_items', new HollowPipeline(Engine.getGameInstance()));
+    // Engine.getGameInstance().renderer.addPipeline('hollow_moving', new HollowPipeline(Engine.getGameInstance()));
 
     Engine.created = true;
     Engine.configEngine();
@@ -464,29 +465,32 @@ Engine.playLocalizedSound = function(sound,maxVolume,location){
 };
 
 Engine.createAnimations = function(){
-    Engine.createHumanoidAnimations('hero','hero');
-    Engine.createHumanoidAnimations('enemy','enemy');
-    Engine.createHumanoidAnimations('hero_wh','hero_wh');
-    Engine.createHumanoidAnimations('hero_wh','enemy_wh');
+    Engine.createHumanoidAnimations('hero');
+    Engine.createHumanoidAnimations('enemy');
+    Engine.createHumanoidAnimations('hero-wh');
+    Engine.createHumanoidAnimations('enemy-wh');
 
     Engine.createWolfAnimations('graywolf');
     Engine.createWolfAnimations('blackwolf');
     Engine.createWolfAnimations('whitewolf');
 
-    Engine.createWolfAnimations('graywolf_wh');
-    Engine.createWolfAnimations('blackwolf_wh');
-    Engine.createWolfAnimations('whitewolf_wh');
+    Engine.createWolfAnimations('graywolf-wh');
+    Engine.createWolfAnimations('blackwolf-wh');
+    Engine.createWolfAnimations('whitewolf-wh');
+
+    Engine.createBearAnimations('bear');
+    Engine.createBearAnimations('bear-wh');
 
     // Bear
-    Engine.createAnimation('bear_move_down','bears',9,11,10,true);
-    Engine.createAnimation('bear_move_left','bears',21,23,10,true);
-    Engine.createAnimation('bear_move_right','bears',33,35,10,true);
-    Engine.createAnimation('bear_move_up','bears',45,47,10,true);
-
-    Engine.createAnimation('bear_rest_down','bears',9,9);
-    Engine.createAnimation('bear_rest_left','bears',21,21);
-    Engine.createAnimation('bear_rest_right','bears',33,33);
-    Engine.createAnimation('bear_rest_up','bears',45,45);
+    // Engine.createAnimation('bear_move_down','bears',9,11,10,true);
+    // Engine.createAnimation('bear_move_left','bears',21,23,10,true);
+    // Engine.createAnimation('bear_move_right','bears',33,35,10,true);
+    // Engine.createAnimation('bear_move_up','bears',45,47,10,true);
+    //
+    // Engine.createAnimation('bear_rest_down','bears',9,9);
+    // Engine.createAnimation('bear_rest_left','bears',21,21);
+    // Engine.createAnimation('bear_rest_right','bears',33,33);
+    // Engine.createAnimation('bear_rest_up','bears',45,45);
 
     Engine.scene.anims.create({
         key: 'sword',
@@ -524,7 +528,8 @@ Engine.createAnimations = function(){
     });
 };
 
-Engine.createHumanoidAnimations = function(key, texture){
+Engine.createHumanoidAnimations = function(key){
+    var texture = key;
     // TODO: don't hardcode, store in JSON of find a way to infer it
     // (standardize all spritesheets?)
     Engine.createAnimation(key+'_move_right',texture,143,151,15,10,true);
@@ -568,6 +573,28 @@ Engine.createWolfAnimations = function(key){
     Engine.createAnimation(key+'_rest_left',key,8,8);
     Engine.createAnimation(key+'_rest_right',key,15,15);
     Engine.createAnimation(key+'_rest_up',key,22,22);
+};
+
+Engine.createBearAnimations = function(key){
+    Engine.createAnimation(key+'_move_down',key,0,2,10,true);
+    Engine.createAnimation(key+'_move_left',key,8,10,10,true);
+    Engine.createAnimation(key+'_move_right',key,16,18,10,true);
+    Engine.createAnimation(key+'_move_up',key,24,26,10,true);
+
+    Engine.createAnimation(key+'_die_down',key,32,34);
+    Engine.createAnimation(key+'_die_left',key,40,42);
+    Engine.createAnimation(key+'_die_right',key,48,50);
+    Engine.createAnimation(key+'_die_up',key,56,58);
+
+    Engine.createAnimation(key+'_attack_down',key,64,71,15,false,true);
+    Engine.createAnimation(key+'_attack_left',key,72,79,15,false,true);
+    Engine.createAnimation(key+'_attack_right',key,80,87,15,false,true);
+    Engine.createAnimation(key+'_attack_up',key,88,95,15,false,true);
+
+    Engine.createAnimation(key+'_rest_down',key,1,1);
+    Engine.createAnimation(key+'_rest_left',key,9,9);
+    Engine.createAnimation(key+'_rest_right',key,17,17);
+    Engine.createAnimation(key+'_rest_up',key,25,25);
 };
 
 Engine.createAnimation = function(key,texture,start,end,rate,loop,revert){
@@ -2314,5 +2341,15 @@ Chunk.prototype.removeCollision = function(cx,cy){
 Chunk.prototype.addResource = function(x,y){
     Engine.resources.add(x,y);
 };
+
+
+window.debugOverlay = function(x,y){
+    console.log(Engine.overlay.get(x,y));
+};
+
+window.debugPlayer = function(){
+    console.log(Engine.player);
+};
+
 
 export default Engine;

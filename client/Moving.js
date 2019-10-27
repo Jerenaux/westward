@@ -149,7 +149,7 @@ var Moving = new Phaser.Class({
     },
 
     faceOrientation: function(){
-        console.warn(this.getTextureName() + '_rest_' + this.orientation);
+        // console.warn(this.getTextureName() + '_rest_' + this.orientation);
         this.play(this.getTextureName() + '_rest_' + this.orientation);
     },
     
@@ -162,8 +162,10 @@ var Moving = new Phaser.Class({
 
         if(this.orientation != this.previousOrientation) {
             this.previousOrientation = this.orientation;
-            console.warn(this.getTextureName() + '_move_' + this.orientation);
+            // console.warn(this.getTextureName() + '_move_' + this.orientation);
             this.play(this.getTextureName() + '_move_' + this.orientation);
+            // console.warn(this);
+            // console.warn(this.anims.currentAnim.key, this.anims.currentFrame.index);
         }
 
         if(this.isHero){
@@ -181,7 +183,9 @@ var Moving = new Phaser.Class({
 
         //if(this.isActiveFighter) Engine.updateGrid();
 
-        if(Engine.overlay.get(tx,ty)){
+        var overlayOffsetX = this.overlayOffset ? this.overlayOffset[0] : 0;
+        var overlayOffsetY = this.overlayOffset ? this.overlayOffset[1] : 0;
+        if(Engine.overlay.get(tx+overlayOffsetX,ty+overlayOffsetY)){
             this.hollow();
         }else{
             this.unhollow();
@@ -384,7 +388,6 @@ var Moving = new Phaser.Class({
         var frame = ranged_ammo_item.frame;
         var anim = ranged_ammo_item.container_type == 'quiver' ? 'bow' : 'attack';
 
-        // const animationName = this.animPrefix + '_'+anim+'_' + this.orientation;
         const animationName = this.getTextureName() + '_'+anim+'_' + this.orientation;
         this.play(animationName);
         var from = {

@@ -52,6 +52,7 @@ var Animal = new Phaser.Class({
         this.footprintsFrame = animalData.footprintsFrame;
         this.printsVertOffset = animalData.printsVertOffset;
         this.printsHorizOffset = animalData.printsHorizOffset;
+        this.overlayOffset = animalData.overlayOffset;
 
         this.battleBoxData = {
             'atlas': 'battleicons',

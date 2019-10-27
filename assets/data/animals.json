@@ -25,7 +25,6 @@
     "inheritFrom": 0,
     "sprite":"graywolf",
     "map_name": "Gray wolf pack",
-    "animPrefix": "graywolf",
     "nbPacks": 65,
     "spawnRate": 30,
     "stats": {
@@ -41,7 +40,6 @@
     "inheritFrom": 0,
     "sprite":"blackwolf",
     "map_name": "Black wolf pack",
-    "animPrefix": "blackwolf",
     "nbPacks": 30,
     "spawnRate": 50,
     "stats": {
@@ -57,7 +55,6 @@
     "inheritFrom": 0,
     "sprite":"whitewolf",
     "map_name": "White wolf pack",
-    "animPrefix": "whitewolf",
     "nbPacks": 10,
     "spawnRate": 60,
     "stats": {
@@ -69,12 +66,11 @@
     "xp": 20
   },
   "5":{
-    "sprite":"bears",
+    "sprite":"bear",
     "battleicon":"bear",
-    "name": "Bear",
+    "name": "Arth",
     "map_name":"Bear",
     "frame": 9,
-    "animPrefix": "bear",
     "width": 2,
     "height": 2,
     "aggro": true,
@@ -86,11 +82,12 @@
     "nbPacks": 50,
     "spawnRate": 60,
     "footprintsFrame": 2,
-    "printsHorizOffset": 12,
+    "printsHorizOffset": 16,
     "printsVertOffset": 30,
+    "overlayOffset": [0,1],
     "stats": {
-      "hpmax": 150,
-      "hp": 150,
+      "hpmax": 300,
+      "hp": 300,
       "def": 8,
       "dmg": 6
     },

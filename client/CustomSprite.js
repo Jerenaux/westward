@@ -70,8 +70,12 @@ var CustomSprite = new Phaser.Class({
         this.hollowed = true;
         this.updateDepth();
         this.initialTexture = this.getTextureName();
-        // console.warn(this.initialTexture+'_wh',this.frame.name)
         this.setTexture(this.initialTexture+'_wh',this.frame.name);
+        var anim = this.anims.currentAnim.key.split('_');
+        anim.shift();
+        var anim_wh = this.initialTexture+'-wh_'+anim.join('_');
+        this.play(anim_wh, this.anims.currentFrame.index);
+        this.setCrop(2,2,this.frame.width-4,this.frame.height-2); // small hack
     },
 
     unhollow: function(){
@@ -80,6 +84,11 @@ var CustomSprite = new Phaser.Class({
         this.updateDepth();
         // console.warn(this.initialTexture,this.frame.name)
         this.setTexture(this.initialTexture, this.frame.name);
+        var anim = this.anims.currentAnim.key.split('_');
+        anim.shift();
+        var anim_wh = this.initialTexture+'_'+anim.join('_');
+        this.play(anim_wh, this.anims.currentFrame.index);
+        this.setCrop();
     }
 });
 
