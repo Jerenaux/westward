@@ -1733,7 +1733,7 @@ GameServer.handleShop = function(data,socketID) {
         }
         building.updateBuild();
         building.updateRepair();
-        GameServer.regions[player.region].event('give',player);
+        if(item == 1) GameServer.regions[player.region].event('givefood',player,{nb:nb});
     }
     building.save();
     Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type,owner:building.ownerName});

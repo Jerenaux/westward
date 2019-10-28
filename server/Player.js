@@ -1014,6 +1014,7 @@ Player.prototype.rest = function (nb) {
 
 Player.prototype.remove = function () {
     if (this.battle) this.battle.removeFighter(this);
+    GameServer.regions[this.region].removePlayer(this.id);
     delete GameServer.players[this.id];
     GameServer.updateVision();
 };

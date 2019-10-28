@@ -1,5 +1,5 @@
 ## To test:
-- Test equipping ammo from belt (both stones and arrows)
+- Test equipping STONES from belt 
 - Test Building.updateProd()
 - Test handleCraft when a price is undefined
 - Test starting inventory of new player
@@ -74,8 +74,7 @@ Packaging
 
 Bugs:
 - Orientation pins bugs
-- Rethink how food is kept track of in regions for connected and disconnected players
-- Food reward when transitioning region
+- Food reward when transitioning region [test]
 - Add all tests
 Features:
 - Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.

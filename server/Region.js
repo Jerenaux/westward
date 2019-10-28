@@ -30,12 +30,12 @@ function Region(data){
 
 Region.prototype.addPlayer = function(id){
     this.players.add(id);
-    this.updateFood();
+    // this.updateFood();
 };
 
 Region.prototype.removePlayer = function(id){
     this.players.delete(id);
-    this.updateFood();
+    // this.updateFood();
 };
 
 Region.prototype.addItem = function(item,nb){
@@ -167,7 +167,7 @@ Region.prototype.update = function(){
     this.updateCounts();
 };
 
-Region.prototype.event = function(event, player){
+Region.prototype.event = function(event, player, extra){
     console.log('['+this.name+'] event ',event);
     var counts_ = clone(this.counts);
     switch(event){
@@ -178,7 +178,7 @@ Region.prototype.event = function(event, player){
             break;
         case 'consumefood':
             this.updateBuildings();
-            this.updateFood();
+            // this.updateFood();
             break;
         case 'destroycivhut':
             this.countDestroyedCivBld();
@@ -189,19 +189,20 @@ Region.prototype.event = function(event, player){
             this.updateFoW();
             this.updateResources();
             break;
-        case 'give': // TODO: change if addition of storage missions for other items
+        case 'givefood': // TODO: change if addition of storage missions for other items
             this.updateBuildings();
-            this.updateFood();
+            this.food[0] -= extra.nb;
+            // this.updateFood();
             break;
         case 'killedciv':
             this.countKilledCiv();
             break;
-        case 'loot':
-            this.updateFood();
-            break;
-        case 'pickup':
-            // do nothing but trigger updateCounts below
-            break;
+        // do nothing (because counts are updated by GameServer.createItem()) but trigger updateCounts below
+        // case 'loot':
+        //     // this.updateFood();
+        //     break;
+        // case 'pickup':
+        //     break;
     }
     this.updateCounts();
     if(player){
@@ -291,14 +292,14 @@ Region.prototype.updateBuildings = function(){
     this.playerBuildings = playerBuildings;
 };
 
-Region.prototype.updateFood = function(){
-    console.log('['+this.name+'] Food update');
-    this.food[0] = 0;
-    for(var playerID of this.players){
-        var player = GameServer.players[playerID];
-        if(player) this.food[0] += player.getItemNb(1);
-    }
-};
+// Region.prototype.updateFood = function(){
+//     console.log('['+this.name+'] Food update');
+//     this.food[0] = 0;
+//     for(var playerID of this.players){
+//         var player = GameServer.players[playerID];
+//         if(player) this.food[0] += player.getItemNb(1);
+//     }
+// };
 
 Region.prototype.updateResources = function(){
     console.log('['+this.name+'] Resources update');
