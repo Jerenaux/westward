@@ -71,6 +71,7 @@ Packaging
 - Bear sleep behavior
 - Slower bear speed
 - Behindness issues when loading new chunks (not on startup; displayList issue?)
+- Username suggestions / enforce constraints (minimum length, complexity, ...)
 
 Bugs:
 - Orientation pins bugs
