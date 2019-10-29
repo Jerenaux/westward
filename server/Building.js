@@ -205,7 +205,6 @@ Building.prototype.updateProd = function(justBuilt){
 
         if(remainingTurns > 0 || justBuilt) continue;
 
-        // var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
         var increment = baseNb;
         if(this.hasItem(1,1)) increment *= 2;
 

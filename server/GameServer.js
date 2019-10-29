@@ -2315,8 +2315,13 @@ GameServer.getRegion = function(entity){
             closest = region;
         }
     }
-    GameServer.regionsCache.add(entity.x,entity.y,closest.id);
-    return closest.id;
+    if(closest !== null){
+        GameServer.regionsCache.add(entity.x,entity.y,closest.id);
+        return closest.id;
+    }else{
+        console.warn('No region found for coordinates ',entity.x,entity.y);
+        return null;
+    }
 };
 
 GameServer.notifyPlayer = function(playerID,msg){

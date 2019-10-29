@@ -149,12 +149,26 @@ describe('GameServer',function(){
         var data = {
             x: player.x - 10,
             y: player.y - 10,
-            type: 4
+            type: 4 // shop
         };
         building = GameServer.addBuilding(data);
         expect(building.x).to.equal(data.x);
         expect(building.y).to.equal(data.y);
         expect(building.type).to.equal(data.type);
+    });
+
+    it('Building_updateProd', function(){
+        var data = {
+            x: 0,
+            y: 0,
+            type: 6 // Lumber camp
+        };
+        var bld = GameServer.addBuilding(data);
+        var initNb = bld.getItemNb(3);
+        var nbProduced = bld.updateProd();
+        // For now, just test that in doesn't crash
+        expect(nbProduced).to.equal(true);
+        expect(bld.getItemNb(3)).to.equal(initNb+1);
     });
 
     it('countOwnedBuildings', function(){
@@ -341,6 +355,13 @@ describe('GameServer',function(){
         // console.log('inventory:',player.inventory.toList());
         expect(GameServer.handleCraft({id:item},player.socketID)).to.equal(true);
         expect(player.getItemNb(item)).to.equal(ownedBefore+GameServer.itemsData[item].output);
+
+        // Try with undefined price
+        delete workshop.prices[item]['sell'];
+        for(var ingredient in GameServer.itemsData[item].recipe){
+            player.giveItem(ingredient, GameServer.itemsData[item].recipe[ingredient]);
+        }
+        expect(GameServer.handleCraft({id:item},player.socketID)).to.equal(true);
     });
 
     /**
@@ -422,17 +443,35 @@ describe('GameServer',function(){
         expect(player.getNbAmmo()).to.equal(initNbAmmo+increment);
     });
 
-    it('Ammo_from_belt',function(){
+    it('Bow_kit_from_belt',function(){
         var rangedID = 2; // bow
         var containerID = 19; // quiver
         var ammoID = 20; // arrow
 
         player.giveItem(rangedID, 1);
         player.giveItem(ammoID, 1000); // in order to max capacity
-        player.giveItem(containerID, 19);
+        player.giveItem(containerID, 1);
 
         player.backpackToBelt(ammoID);
         GameServer.handleUse({item:rangedID,inventory:'backpack'},player.socketID);
+        GameServer.handleUse({item:containerID,inventory:'backpack'},player.socketID);
+
+        player.unload();
+        var initNbAmmo = player.getNbAmmo();
+        expect(initNbAmmo).to.equal(0);
+        GameServer.handleUse({item:ammoID,inventory:'belt'},player.socketID);
+        expect(player.getNbAmmo()).to.equal(initNbAmmo+GameServer.itemsData[containerID].capacity);
+    });
+
+    it('Stones_kit_from_belt',function(){
+        var containerID = 51; // Small projectiles pouch
+        var ammoID = 26; // Stone
+
+        player.unequip('rangedw');
+        player.giveItem(ammoID, 1000); // in order to max capacity
+        player.giveItem(containerID, 1);
+
+        player.backpackToBelt(ammoID);
         GameServer.handleUse({item:containerID,inventory:'backpack'},player.socketID);
 
         player.unload();

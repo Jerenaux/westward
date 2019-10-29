@@ -1,6 +1,4 @@
 ## To test:
-- Test equipping STONES from belt 
-- Test Building.updateProd()
 - Test handleCraft when a price is undefined
 - Test starting inventory of new player
 - Test settlement selection (with value of 0)
