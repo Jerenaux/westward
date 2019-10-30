@@ -1,5 +1,4 @@
 ## To test:
-- Test handleCraft when a price is undefined
 - Test starting inventory of new player
 - Test settlement selection (with value of 0)
 - Test ammo container type match
@@ -70,10 +69,9 @@ Packaging
 - Slower bear speed
 - Behindness issues when loading new chunks (not on startup; displayList issue?)
 - Username suggestions / enforce constraints (minimum length, complexity, ...)
+- More dynamic movement system: hold click to move? Move towards mouse? Click to stop? Etc.
 
 Bugs:
-- Orientation pins bugs
-- Food reward when transitioning region [test]
 - Add all tests
 Features:
 - Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.

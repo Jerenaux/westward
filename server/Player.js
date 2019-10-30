@@ -151,6 +151,7 @@ Player.prototype.setUp = function(id,name,region){
 };
 
 Player.prototype.setRegion = function() {
+    console.warn('Setting player region');
     var region_ = this.region;
     var newregion = GameServer.getRegion(this);
     if(newregion != region_){

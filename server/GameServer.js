@@ -350,7 +350,7 @@ GameServer.readPlayersData = function(){
     console.log('Reading player data ...');
     GameServer.PlayerModel.find(function(err,players){
         if (err) return console.log(err);
-        console.log('Players data fetched');
+        console.log('Players data fetched, ',players.length,'players found');
         players.forEach(function(data){
             if(data.id > GameServer.lastPlayerID) GameServer.lastPlayerID = data.id;
             var region = GameServer.getRegion(data);

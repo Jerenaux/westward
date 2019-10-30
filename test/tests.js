@@ -62,13 +62,16 @@ describe('GameServer',function(){
         });
 
         var name = 'Test';
+        var region = 2;
         var dummySocket = {id:'socket123',dummy: true};
-        player = GameServer.addNewPlayer(dummySocket,{characterName:name});
+        player = GameServer.addNewPlayer(dummySocket,{characterName:name, selectedRegion: region});
         player.setSocketID(dummySocket.id);
         player.spawn(20,20);
         expect(GameServer.getPlayer(dummySocket.id).id).to.equal(player.id);
         expect(player.socketID).to.equal(dummySocket.id);
         expect(player.name).to.equal(name);
+        expect(player.origin).to.equal(region);
+        expect(player.region).to.equal(region);
 
         // Check if all default equipments are equipped
         for(var slot in Equipment.slots){
@@ -355,13 +358,6 @@ describe('GameServer',function(){
         // console.log('inventory:',player.inventory.toList());
         expect(GameServer.handleCraft({id:item},player.socketID)).to.equal(true);
         expect(player.getItemNb(item)).to.equal(ownedBefore+GameServer.itemsData[item].output);
-
-        // Try with undefined price
-        delete workshop.prices[item]['sell'];
-        for(var ingredient in GameServer.itemsData[item].recipe){
-            player.giveItem(ingredient, GameServer.itemsData[item].recipe[ingredient]);
-        }
-        expect(GameServer.handleCraft({id:item},player.socketID)).to.equal(true);
     });
 
     /**
