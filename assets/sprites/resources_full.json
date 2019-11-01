@@ -179,6 +179,22 @@
     {
       "filename": "hammer",
       "frame": {"x":288,"y":408,"w":24,"h":24}
+    },
+    {
+      "filename": "big_heart",
+      "frame": {"x":240,"y":168,"w":24,"h":24}
+    },
+    {
+      "filename": "aura",
+      "frame": {"x":216,"y":168,"w":24,"h":24}
+    },
+    {
+      "filename": "shoes",
+      "frame": {"x":0,"y":720,"w":24,"h":24}
+    },
+    {
+      "filename": "bunch",
+      "frame": {"x":264,"y":816,"w":24,"h":24}
     }
   ]
 }

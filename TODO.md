@@ -73,12 +73,13 @@ Packaging
 
 Bugs:
 - Add all tests
+- Fix help of abilities panel
+- Add pics to abilities
 Features:
 - Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Add a "show all" button to stats panel to display all of them
 - Re-add stats panel to character panel?
-- Fix help of abilities panel
 - DIsable some skills based on fatigue / update help
 - Towers clear multiple FoW AOI?
 - Specify where toponyms are displayed
