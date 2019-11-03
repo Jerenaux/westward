@@ -164,7 +164,7 @@ AbilitySlot.prototype.addCount = function(){
 
 AbilitySlot.prototype.setUp = function(aid){
     var data = abilitiesData[aid];
-    // this.icon.setTexture(data.atlas,data.frame);
+    this.icon.setTexture('items2',data.frame);
     var text = data.name;
     this.name.setText(text);
     this.aid = aid;
