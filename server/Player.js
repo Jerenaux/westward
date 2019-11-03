@@ -55,6 +55,7 @@ function Player() {
         3: 0,
         4: 0 // civic AP
     };
+    this.abilities = [];
     this.baseBldrecipes = GameServer.clientParameters.config.defaultBuildRecipes;
     this.bldRecipes = [];
 
@@ -100,6 +101,7 @@ Player.prototype.getInstance = function () {
 Player.prototype.updateBldRecipes = function () {
     this.bldRecipes = [];
     this.baseBldrecipes.forEach(function (b) {
+        // console.warn(b, this.countOwnedBuildings(b));
         if (this.countOwnedBuildings(b) < 1) this.bldRecipes.push(b);
     }, this);
     if (this.bldRecipes.length === 0) this.bldRecipes = [-1];
@@ -149,18 +151,22 @@ Player.prototype.setUp = function(id,name,region){
 };
 
 Player.prototype.setRegion = function() {
+    console.warn('Setting player region');
     var region_ = this.region;
     var newregion = GameServer.getRegion(this);
     if(newregion != region_){
         this.setOwnProperty('region',newregion);
         this.addNotif('Entering '+GameServer.regions[this.region].name+' region');
-        if(region_ in GameServer.regions) GameServer.regions[region_].removePlayer(this.id);
-        GameServer.regions[this.region].addPlayer(this.id);
 
-        this.inventory.toList().forEach(function(inv){
-            if(region_ in GameServer.regions) GameServer.regions[region_].removeItem(inv[0],inv[1]);
-            GameServer.regions[this.region].addItem(inv[0],inv[1]);
-        },this);
+        if(region_) { // region_ will be null when loading players
+            if (region_ in GameServer.regions) GameServer.regions[region_].removePlayer(this.id);
+            GameServer.regions[this.region].addPlayer(this.id);
+
+            this.inventory.toList().forEach(function (inv) {
+                if (region_ in GameServer.regions) GameServer.regions[region_].removeItem(inv[0], inv[1]);
+                GameServer.regions[this.region].addItem(inv[0], inv[1]);
+            }, this);
+        }
     }
 };
 
@@ -184,7 +190,6 @@ Player.prototype.updateSteps = function () {
     this.steps++;
     var limit = 1000; // arbitrary limit to avoid overflows
     if (this.steps > limit) this.steps -= limit;
-    // if (this.steps % GameServer.characterParameters.steps === 0) this.updateVigor(-GameServer.characterParameters.stepsLoss);
     if (this.steps % GameServer.characterParameters.steps === 0) GameServer.updateVigor(this,'walk');
 
 };
@@ -237,15 +242,21 @@ Player.prototype.setStartingInventory = function () {
     }, this);
 
     this.giveGold(300);
+    this.save();
 };
 
 Player.prototype.setUpStats = function () {
+    // Initializes all existing stats with default values
     this.stats = new StatsContainer();
-    var v = GameServer.characterParameters.variables;
-    var list = ['hpmax', 'dmg', 'def'];
+    // Applies starting values from config file
+    var starts = GameServer.characterParameters.variables;
+    for(var v in starts){
+        this.setStat(v, starts[v]);
+    }
+    /*var list = ['hpmax', 'dmg', 'def'];
     list.forEach(function (s) {
         this.setStat(s, v[s]);
-    }, this);
+    }, this);*/
     this.maxStat('hp');
 };
 
@@ -301,7 +312,7 @@ Player.prototype.spawn = function (checkLocation) {
 Player.prototype.respawn = function () {
     this.setProperty('dead', false);
     this.setOwnProperty('dead', false);
-    this.setStat('hp', 10); // TODO: adapt remaining health
+    this.setStat('hp', this.getStatValue('respawnhp'));
     this.spawn(true);
     this.setOrUpdateAOI();
     this.save();
@@ -334,6 +345,31 @@ Player.prototype.classLvlUp = function (classID, notify) {
         this.addNotif('Earned ' + nb + ' AP!');
     }
     this.save();
+};
+
+Player.prototype.acquireAbility = function(aid){
+    var ability = GameServer.abilitiesData[aid];
+    this.abilities.push(parseInt(aid));
+    this.ap[ability.class] = Utils.clamp(this.ap[ability.class]-ability.cost,0,999);
+    this.setOwnProperty('ap', this.ap);
+    this.setOwnProperty('abilities',this.abilities);
+    this.applyAbility(aid);
+    this.addNotif('You acquired a new ability: '+ability.name+'!');
+};
+
+Player.prototype.applyAbilities = function(){
+    this.abilities.forEach(this.applyAbility,this);
+};
+
+Player.prototype.applyAbility = function(aid){
+    var data = GameServer.abilitiesData[aid];
+    if(!data['effect']) return;
+    var effect = data['effect'].split(':');
+    this.applyAbsoluteModifier(effect[0],parseInt(effect[1]));
+};
+
+Player.prototype.hasAbility = function(aid){
+    return this.abilities.includes(aid);
 };
 
 Player.prototype.giveGold = function (nb, notify) {
@@ -370,7 +406,9 @@ Player.prototype.canBuy = function (price) { // check if building has gold and r
 };
 
 Player.prototype.canCraft = function (item, nb) {
-    var recipe = GameServer.itemsData[item].recipe;
+    var itemData = GameServer.itemsData[item];
+    if(itemData.ability && !this.hasAbility(itemData.ability)) return false;
+    var recipe = itemData.recipe;
     for (var itm in recipe) {
         if (!this.hasItem(itm, recipe[itm] * nb)) return false;
     }
@@ -510,7 +548,7 @@ Player.prototype.canEquip = function (slot, item) {
  * it comes from player use).
  * @returns {number} - number of items to remove from inventory (0 if failure)
  */
-Player.prototype.equip = function (slot, itemID, fromDB) {
+Player.prototype.equip = function (slot, itemID, fromDB, inventory) {
 
     if (typeof itemID != 'number') {
         console.warn('ERROR in `Player.equip()`: item is not a number');
@@ -550,8 +588,8 @@ Player.prototype.equip = function (slot, itemID, fromDB) {
     // amo as was equipped by the player. Therefore the below code should
     // not be run.
     if (slot === 'range_ammo' && !fromDB) {
-        var range_container_id = this.equipment.get('range_container');
-        nb = this.computeLoad(itemID); // compute how much will be added to the container
+        // var range_container_id = this.equipment.get('range_container');
+        nb = this.computeLoad(itemID, inventory); // compute how much will be added to the container
         this.load(nb);
     }
 
@@ -627,7 +665,7 @@ Player.prototype.removeAbsoluteModifier = function (stat, modifier) {
  * @param {number} item - item ID of ammo to load.
  * @returns {number} amount of ammo to load.
  */
-Player.prototype.computeLoad = function (item) {
+Player.prototype.computeLoad = function (item, inventory) {
 
     let capacity = 0;
     let currentNb = this.equipment.getNbAmmo();
@@ -640,7 +678,7 @@ Player.prototype.computeLoad = function (item) {
     if (range_container_item) capacity = range_container_item.capacity;
     if (currentNb && currentNb > 0) capacity = capacity - currentNb;
 
-    const ammo_count_in_inventory = this.inventory.getNb(item);
+    const ammo_count_in_inventory = (inventory == 'backpack' ? this.inventory.getNb(item) : this.belt.getNb(item) );
 
     return Math.min(ammo_count_in_inventory, capacity);
 };
@@ -733,7 +771,7 @@ Player.prototype.getWorldInformation = function(){
  */
 Player.prototype.initTrim = function () {
     var trimmed = {};
-    var broadcastProperties = ['id', 'name','classxp','classlvl','ap']; // list of properties relevant for the client
+    var broadcastProperties = ['id', 'name','classxp','classlvl','ap','abilities']; // list of properties relevant for the client
     for (var p = 0; p < broadcastProperties.length; p++) {
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -781,8 +819,10 @@ Player.prototype.getDataFromDb = function (data) {
     this.y = Utils.clamp(data.y, 0, World.worldHeight - 1);
     this.classxp = data.classxp;
     this.classlvl = data.classlvl;
+    this.abilities = data.abilities;
     this.setOwnProperty('inBuilding', data.inBuilding);
 
+    this.setUpStats();
     if (!data.stats) data.stats = [];
     data.stats.forEach(function (stat) {
         var s = this.getStat(stat.stat);
@@ -791,7 +831,8 @@ Player.prototype.getDataFromDb = function (data) {
             this.refreshStat(stat.stat);
         }
     }, this);
-    this.setStat('hp', Math.max(this.getStat('hp').getValue(), 10)); // quick fix
+    this.setStat('hp', Math.max(this.getStat('hp').getValue(), 10)); // quick fix TODO remove
+    this.applyAbilities();
     this.applyVigorModifier();
 
     if (data) {
@@ -929,12 +970,11 @@ Player.prototype.addNotif = function (msg, silent) {
     if (!silent) this.updatePacket.addNotif(msg);
     this.history.push([Date.now(), msg]);
     var MAX_LENGTH = 20; // TODO: max limit in conf
-    // if(this.history.length > MAX_LENGTH) this.history.splice(MAX_LENGTH,this.history.length-MAX_LENGTH);
     if (this.history.length > MAX_LENGTH) this.history.splice(0, this.history.length - MAX_LENGTH);
 };
 
 Player.prototype.fastForward = function (nbturns) {
-    console.warn('Fast forward', nbturns, 'turns');
+    console.log('Fast forward', nbturns, 'turns');
     var foodRate = GameServer.economyTurns['foodConsumptionRate'];
     var restRate = GameServer.economyTurns['restRate'];
     var nbStarvationTurns = Math.floor(nbturns / foodRate);
@@ -975,6 +1015,7 @@ Player.prototype.rest = function (nb) {
 
 Player.prototype.remove = function () {
     if (this.battle) this.battle.removeFighter(this);
+    GameServer.regions[this.region].removePlayer(this.id);
     delete GameServer.players[this.id];
     GameServer.updateVision();
 };

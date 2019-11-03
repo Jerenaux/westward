@@ -2,7 +2,6 @@
  * Created by Jerome on 26-06-17.
  */
 import AbilitiesPanel from './AbilitiesPanel'
-import AbilityPanel from './AbilityPanel'
 import BattleEquipmentPanel from './BattleEquipmentPanel'
 import Animal from './Animal'
 import BattleManager from './BattleManager'
@@ -23,7 +22,7 @@ import ConstructionPanel from './ConstructionPanel'
 import CraftingPanel from './CraftingPanel'
 import EquipmentPanel from './EquipmentPanel'
 import Hero from './Hero'
-import {HighlightPipeline, HollowPipeline} from './shaders'
+// import {HighlightPipeline, HollowPipeline} from './shaders'
 import InfoPanel from './InfoPanel'
 import Inventory from '../shared/Inventory'
 import InventoryPanel from './InventoryPanel'
@@ -57,7 +56,6 @@ import World from '../shared/World';
 
 import animalsData from '../assets/data/animals.json'
 import buildingsData from '../assets/data/buildings.json'
-import itemsData from '../assets/data/items.json'
 import regionsData from '../assets/data/regions.json'
 
 var Engine = {
@@ -97,18 +95,25 @@ Engine.preload = function() {
     Engine.useTilemaps = false;
 
     this.load.atlas('tileset', 'assets/tilesets/tileset.png', 'assets/tilesets/tileset.json');
+    this.load.atlas('tileset_wh', 'assets/tilesets/tileset_wh.png', 'assets/tilesets/tileset.json');
 
     this.load.atlas('remains', 'assets/sprites/remains.png','assets/sprites/remains.json');
 
     // Characters
     this.load.spritesheet('enemy', 'assets/sprites/enemy.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64}); // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
+    this.load.spritesheet('enemy-wh', 'assets/sprites/enemy_wh.png',{frameWidth:64,frameHeight:64});
+    this.load.spritesheet('hero-wh', 'assets/sprites/newhero_wh.png',{frameWidth:64,frameHeight:64}); // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
 
 
     this.load.spritesheet('graywolf', 'assets/sprites/animals/graywolf.png',{frameWidth:43,frameHeight:32});
     this.load.spritesheet('blackwolf', 'assets/sprites/animals/blackwolf.png',{frameWidth:43,frameHeight:32});
     this.load.spritesheet('whitewolf', 'assets/sprites/animals/whitewolf.png',{frameWidth:43,frameHeight:32});
-    this.load.spritesheet('bears', 'assets/sprites/animals/bears.png',{frameWidth:56,frameHeight:56});
+    this.load.spritesheet('graywolf-wh', 'assets/sprites/animals/graywolf_wh.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('blackwolf-wh', 'assets/sprites/animals/blackwolf_wh.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('whitewolf-wh', 'assets/sprites/animals/whitewolf_wh.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('bear', 'assets/sprites/animals/bear.png',{frameWidth:64,frameHeight:64});
+    this.load.spritesheet('bear-wh', 'assets/sprites/animals/bear_wh.png',{frameWidth:64,frameHeight:64});
     this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
 
     // ###################
@@ -351,9 +356,9 @@ Engine.create = function(){
         Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
     }
 
-    Engine.getGameInstance().renderer.addPipeline('highlight', new HighlightPipeline(Engine.getGameInstance()));
-    Engine.getGameInstance().renderer.addPipeline('hollow_items', new HollowPipeline(Engine.getGameInstance()));
-    Engine.getGameInstance().renderer.addPipeline('hollow_moving', new HollowPipeline(Engine.getGameInstance()));
+    // Engine.getGameInstance().renderer.addPipeline('highlight', new HighlightPipeline(Engine.getGameInstance()));
+    // Engine.getGameInstance().renderer.addPipeline('hollow_items', new HollowPipeline(Engine.getGameInstance()));
+    // Engine.getGameInstance().renderer.addPipeline('hollow_moving', new HollowPipeline(Engine.getGameInstance()));
 
     Engine.created = true;
     Engine.configEngine();
@@ -460,23 +465,32 @@ Engine.playLocalizedSound = function(sound,maxVolume,location){
 };
 
 Engine.createAnimations = function(){
-    Engine.createHumanoidAnimations('player','hero');
-    Engine.createHumanoidAnimations('enemy','enemy');
+    Engine.createHumanoidAnimations('hero');
+    Engine.createHumanoidAnimations('enemy');
+    Engine.createHumanoidAnimations('hero-wh');
+    Engine.createHumanoidAnimations('enemy-wh');
 
     Engine.createWolfAnimations('graywolf');
     Engine.createWolfAnimations('blackwolf');
     Engine.createWolfAnimations('whitewolf');
 
-    // Bear
-    Engine.createAnimation('bear_move_down','bears',9,11,10,true);
-    Engine.createAnimation('bear_move_left','bears',21,23,10,true);
-    Engine.createAnimation('bear_move_right','bears',33,35,10,true);
-    Engine.createAnimation('bear_move_up','bears',45,47,10,true);
+    Engine.createWolfAnimations('graywolf-wh');
+    Engine.createWolfAnimations('blackwolf-wh');
+    Engine.createWolfAnimations('whitewolf-wh');
 
-    Engine.createAnimation('bear_rest_down','bears',9,9);
-    Engine.createAnimation('bear_rest_left','bears',21,21);
-    Engine.createAnimation('bear_rest_right','bears',33,33);
-    Engine.createAnimation('bear_rest_up','bears',45,45);
+    Engine.createBearAnimations('bear');
+    Engine.createBearAnimations('bear-wh');
+
+    // Bear
+    // Engine.createAnimation('bear_move_down','bears',9,11,10,true);
+    // Engine.createAnimation('bear_move_left','bears',21,23,10,true);
+    // Engine.createAnimation('bear_move_right','bears',33,35,10,true);
+    // Engine.createAnimation('bear_move_up','bears',45,47,10,true);
+    //
+    // Engine.createAnimation('bear_rest_down','bears',9,9);
+    // Engine.createAnimation('bear_rest_left','bears',21,21);
+    // Engine.createAnimation('bear_rest_right','bears',33,33);
+    // Engine.createAnimation('bear_rest_up','bears',45,45);
 
     Engine.scene.anims.create({
         key: 'sword',
@@ -514,7 +528,8 @@ Engine.createAnimations = function(){
     });
 };
 
-Engine.createHumanoidAnimations = function(key, texture){
+Engine.createHumanoidAnimations = function(key){
+    var texture = key;
     // TODO: don't hardcode, store in JSON of find a way to infer it
     // (standardize all spritesheets?)
     Engine.createAnimation(key+'_move_right',texture,143,151,15,10,true);
@@ -558,6 +573,28 @@ Engine.createWolfAnimations = function(key){
     Engine.createAnimation(key+'_rest_left',key,8,8);
     Engine.createAnimation(key+'_rest_right',key,15,15);
     Engine.createAnimation(key+'_rest_up',key,22,22);
+};
+
+Engine.createBearAnimations = function(key){
+    Engine.createAnimation(key+'_move_down',key,0,2,10,true);
+    Engine.createAnimation(key+'_move_left',key,8,10,10,true);
+    Engine.createAnimation(key+'_move_right',key,16,18,10,true);
+    Engine.createAnimation(key+'_move_up',key,24,26,10,true);
+
+    Engine.createAnimation(key+'_die_down',key,32,34);
+    Engine.createAnimation(key+'_die_left',key,40,42);
+    Engine.createAnimation(key+'_die_right',key,48,50);
+    Engine.createAnimation(key+'_die_up',key,56,58);
+
+    Engine.createAnimation(key+'_attack_down',key,64,71,15,false,true);
+    Engine.createAnimation(key+'_attack_left',key,72,79,15,false,true);
+    Engine.createAnimation(key+'_attack_right',key,80,87,15,false,true);
+    Engine.createAnimation(key+'_attack_up',key,88,95,15,false,true);
+
+    Engine.createAnimation(key+'_rest_down',key,1,1);
+    Engine.createAnimation(key+'_rest_left',key,9,9);
+    Engine.createAnimation(key+'_rest_right',key,17,17);
+    Engine.createAnimation(key+'_rest_up',key,25,25);
 };
 
 Engine.createAnimation = function(key,texture,start,end,rate,loop,revert){
@@ -1600,7 +1637,7 @@ Engine.makeInventory = function(statsPanel){
     inventory.setSound(Engine.scene.sound.add('inventory'));
 
     var items = inventory.addPanel('items',new InventoryPanel(40,100,600,260,'Backpack'));
-    items.setInventory('player',15,true,Engine.backpackClick);
+    items.setInventory('player',15,true,UI.backpackClick);
 
     var gold = items.addCapsule('gold',130,-9,'999','gold');
     gold.setHoverText(UI.tooltip,'Gold',UI.textsData['gold_help']);
@@ -1609,7 +1646,7 @@ Engine.makeInventory = function(statsPanel){
     inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,120),true);
 
     var belt = inventory.addPanel('belt',new InventoryPanel(40,360,600,90,'Belt'));
-    belt.setInventory('belt',15,true,Engine.beltClick);
+    belt.setInventory('belt',15,true,UI.beltClick);
     belt.addButton(570, 8, 'blue','help',null,'',UI.textsData['belt_help']);
 
     var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
@@ -1663,7 +1700,6 @@ Engine.makeCharacterMenu = function(){
     var questh = 380-classh;
     var logh = 380 - citizenh;
 
-    //var citizen = menu.addPanel('citizen', new CitizenPanel(citizenx,citizeny,citizenw,citizenh,'Civic status'));
     var log = menu.addPanel('log', new JournalPanel(citizenx,citizeny,citizenw,logh+citizenh,'Journal'));
 
     var classpanel = menu.addPanel('class', new CharacterPanel(classx,classy,classw,classh,'Multi-Class status'));
@@ -1679,18 +1715,26 @@ Engine.makeCharacterMenu = function(){
             cx = sx;
             cy += ch;
         }
-
-        //var ab = menu.addPanel('abilities_'+classID, new Panel(citizenx,citizeny,citizenw,citizenh,'Abilities'), true);
-        //ab.addButton(citizenw,-8,'red','close',ab.hide.bind(ab),'Close');
     }
 
-    var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
+    // var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
 
-    //menu.addPanel('abilities',new Panel(citizenx,citizeny,citizenw,citizenh),true);
+    var w = 620;
+    var x = (UI.getGameWidth()-w)/2;
+    var abilities = menu.addPanel('abilities', new AbilitiesPanel(x,175,w,350,'Abilities'),true);
+    abilities.addButton(w-16,-8,'red','close',abilities.hide.bind(abilities),'Close');
+    abilities.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['missions_help']);
+    abilities.moveUp(4);
 
-    menu.addEvent('onUpdateCharacter',classpanel.update.bind(classpanel));
+    menu.addEvent('onUpdateCharacter',function(){
+        classpanel.update();
+        if(abilities.displayed) abilities.updateContent();
+    });
     menu.addEvent('onUpdateHistory',log.update.bind(log));
-    menu.addEvent('onOpen',log.update.bind(log));
+    menu.addEvent('onOpen',function(){
+        classpanel.update();
+        log.update();
+    });
     //menu.addEvent('onUpdateCitizen',citizen.update.bind(citizen));
     //menu.addEvent('onUpdateCommit',commit.updateInventory.bind(commit));
 
@@ -2194,27 +2238,6 @@ Engine.requestBattleAction = function(action,data){
     return Utils.gridToLine(col,row,3);
 };*/
 
-Engine.isBattleCell = function(x,y){
-    return Engine.battleCells.get(x,y);
-};
-
-Engine.getNextPrint = function(){
-    if(Engine.printsPool.length > 0) return Engine.printsPool.shift();
-    return Engine.scene.add.image(0,0,'footsteps');
-};
-
-Engine.recycleSprite = function(sprite){
-    Engine.spritePool.recycle(sprite);
-};
-
-Engine.recycleImage = function(image){
-    Engine.imagePool.recycle(image);
-};
-
-Engine.recyclePrint = function(print){
-    Engine.printsPool.push(print);
-};
-
 Engine.updateGrid = function(){
     Engine.entityManager.displayLists['cell'].forEach(function(id){
         Engine.battleCells[id].update();
@@ -2237,117 +2260,14 @@ Engine.getOccupiedCells = function(entity,hash){
 };
 
 // ## UI-related functions ##
-// this functions need to have a this bound to them
-Engine.closePanel = function(){this.hide();};
-Engine.togglePanel = function(){ // When clicking on a player/building/animal, toggle the corresponding panel visibility
-    if(Engine.inMenu) return;
-    if(this.panel.displayed){
-        UI.inPanel = false;
-        UI.currentPanel = null;
-    }else {
-        if(UI.inPanel) UI.currentPanel.hide();
-        UI.inPanel = true;
-        UI.currentPanel = this.panel;
-    }
-    this.panel.toggle();
-};
-
-Engine.recipeClick = function(){
-    Engine.menus['crafting'].panels['combi'].setUp(this.itemID);
-    var sound = itemsData[this.itemID].sound;
-    if(sound) Engine.scene.sound.add(sound).play();
-};
-
-Engine.toggleStock = function(stockID){
-    Engine.craftingStock = stockID;
-    if(stockID == 1){
-        Engine.currentMenu.panels['stock'].button.display();
-        Engine.currentMenu.panels['items'].button.hide();
-        Engine.currentMenu.panels['ingredients'].modifyReferenceInventory(Engine.player.inventory);
-    }else{
-        Engine.currentMenu.panels['items'].button.display();
-        Engine.currentMenu.panels['stock'].button.hide();
-        Engine.currentMenu.panels['ingredients'].modifyReferenceInventory(Engine.currentBuiling.inventory);
-    }
-    Engine.currentMenu.panels['ingredients'].updateInventory();
-    Engine.currentMenu.panels['combi'].manageButtons();
-};
-
-Engine.newbuildingClick = function(){
-    Engine.currentMenu.panels['confirm'].setUp(this.itemID);
-};
-
-/**
- * What to do when clicked an item in belt (vs. backpack).
- * `this` is bound to the clicked `ItemSperite`.
- */
-Engine.beltClick = function(){
-    Engine.displayItemActionPanel(this.itemID, 'belt');
-};
-
-/**
- * What to do when clicked an item in backpack (vs. belt).
- * `this` is bound to the clicked `ItemSperite`.
- */
-Engine.backpackClick = function(){
-    Engine.displayItemActionPanel(this.itemID, 'backpack');
-};
-
-/**
- * Display the itemAction window, i.e. the small panel appearing in the inventory 
- * displaying options such as use, put in belt...
- * @param {number} itemID - ID of the clicked item.
- * @param {string} inventory - Whether the item was clicked in the backpack or in the belt.
- */
-Engine.displayItemActionPanel = function(itemID, inventory){
-    Engine.currentMenu.panels['itemAction'].display();
-    Engine.currentMenu.panels['itemAction'].setUp(itemID, inventory);
-};
 
 Engine.unequipClick = function(){ // Sent when unequipping something
     Client.sendUnequip(this.slotName);
 };
 
-Engine.sellClick = function(){
-    Engine.currentMenu.panels['action'].setUp(this.itemID,'sell');
-    /*if(Engine.currentBuiling.isOwned()){
-        Engine.currentMenu.panels['prices'].display();
-    }*/
-};
-
-Engine.buyClick = function(){
-    Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
-    /*if(Engine.currentBuiling.isOwned()){
-        Engine.currentMenu.panels['prices'].display();
-    }*/
-};
-
-Engine.giveClick = function(itemID){
-    Engine.currentMenu.panels['action'].display();
-    Engine.currentMenu.panels['action'].setUp(itemID,'sell');
-};
-
-Engine.takeClick = function(){
-    //if(Engine.currentBuiling.owner != Engine.player.id) return;
-    if(!Engine.currentBuiling.isOwned()) return;
-    Engine.currentMenu.panels['action'].display();
-    Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
-};
-
 Engine.respawnClick = function(){ // this bound to respawn panel
     Client.sendRespawn();
     Engine.menus["respawn"].hide();
-};
-
-Engine.buildError = function(){
-    Engine.currentMenu.panels['confirm'].displayError();
-};
-
-Engine.buildSuccess = function(){
-    Engine.currentMenu.panels['buildings'].hide();
-    Engine.currentMenu.panels['confirm'].hide();
-    Engine.currentMenu.panels['ingredients'].hide();
-    Engine.currentMenu.panels['map'].map.hideRedPin();
 };
 
 Engine.leaveBuilding = function(){
@@ -2421,5 +2341,15 @@ Chunk.prototype.removeCollision = function(cx,cy){
 Chunk.prototype.addResource = function(x,y){
     Engine.resources.add(x,y);
 };
+
+
+window.debugOverlay = function(x,y){
+    console.log(Engine.overlay.get(x,y));
+};
+
+window.debugPlayer = function(){
+    console.log(Engine.player);
+};
+
 
 export default Engine;

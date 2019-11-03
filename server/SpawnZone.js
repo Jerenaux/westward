@@ -33,7 +33,7 @@ SpawnZone.prototype.getMarkerData = function(){
 };
 
 SpawnZone.prototype.updateActiveStatus = function(){
-    var r = 10; // TODO: conf
+    var r = 15; // TODO: conf
     this.active = (GameServer.getEntitiesAt(this.x-r,this.y-r,r*2,r*2,['PlayerBuilding','CivBuilding']).length == 0);
 };
 
@@ -58,9 +58,9 @@ SpawnZone.prototype.update = function(){
     }
 };
 
-SpawnZone.prototype.spawn = function(print){
-    if(print) console.log('Spawning 1 ',GameServer.getAnimalData(this.animal).name,'at',this.x,this.y);
+SpawnZone.prototype.spawn = function(){
     var animal = GameServer.addAnimal(this.x, this.y, this.animal);
+    console.log('Spawning ',GameServer.getAnimalData(this.animal).name,' ',animal.id,' at',this.x,this.y);
     animal.setSpawnZone(this);
     this.population++;
 };

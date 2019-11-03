@@ -228,6 +228,10 @@ Client.sendChat = function(text){
     Client.socket.emit('chat',text);
 };
 
+Client.sendAbility = function(aid){
+    Client.socket.emit('ability',aid);
+};
+
 Client.sendRespawn = function(){
     Client.socket.emit('respawn');
 };

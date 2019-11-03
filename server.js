@@ -231,6 +231,7 @@ io.on('connection',function(socket){
         }
 
         var callbacksMap = {
+            'ability': GameServer.purchaseAbility,
             'battleAction': GameServer.handleBattleAction,
             'buildingClick': GameServer.handleBuildingClick,
             'build': GameServer.handleBuild,

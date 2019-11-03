@@ -3,6 +3,7 @@
  */
 import Inventory from "../shared/Inventory";
 
+var https = require('https')
 var fs = require('fs');
 var pathmodule = require('path');
 var clone = require('clone'); // used to clone objects, essentially used for clonicg update packets
@@ -149,6 +150,7 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.civsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'civs.json')).toString()); // './assets/data/civs.json'
     GameServer.buildingsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'buildings.json')).toString()); // './assets/data/buildings.json'
     GameServer.classData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'classes.json')).toString()); // './assets/data/classes.json'
+    GameServer.abilitiesData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'abilities.json')).toString()); // './assets/data/classes.json'
     GameServer.regionsData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'regions.json')).toString()); // './assets/data/classes.json'
     GameServer.tutorialData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'tutorials.json')).toString()); // './assets/data/texts.json'
     GameServer.instances = {};
@@ -184,7 +186,6 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.marketPrices = new ListMap();
 
     GameServer.computeRegions();
-
     GameServer.initializeFlags();
 
     console.log('[Master data read, '+GameServer.AOIs.length+' aois created]');
@@ -193,7 +194,51 @@ GameServer.readMap = function(mapsPath,test,cb){
     var hrend = process.hrtime(hrstart);
     console.log('readMap execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
     console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
+
 };
+
+GameServer.sendSlackNotification = function(msg){
+    if(process.env.SUPPRESS_SLACK) return;
+    const data = JSON.stringify({
+        icon_emoji: 'game_die',
+        text: msg,
+        username: 'Westward-bot'
+      });
+      
+      const options = {
+        hostname: 'hooks.slack.com',
+        path: '/services/T54PW6PPC/BPEEUQPDF/N5JC1aUByPJ0aopuTvViQ6vq',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': data.length
+        }
+      }
+      
+      const req = https.request(options, res => {
+        // console.log(`statusCode: ${res.statusCode}`)
+      
+        // res.on('data', d => {
+        //   process.stdout.write(d)
+        // })
+      })
+      
+      req.on('error', error => {
+        console.error(error)
+      })
+      
+      req.write(data)
+      req.end()
+};
+
+/*GameServer.registerAbilityHooks = function(){
+    GameServer.abilityHooks = {};
+    for(var aid in GameServer.abilitiesData){
+        var data = GameServer.abilitiesData[aid];
+        if(!(data.hook in GameServer.abilityHooks)) GameServer.abilityHooks[data.hook] = [];
+        GameServer.abilityHooks[data.hook].push(aid);
+    }
+};*/
 
 /**
  * Set up a dict of boolean variables indicating whether some global changes have occurred
@@ -305,15 +350,17 @@ GameServer.readPlayersData = function(){
     console.log('Reading player data ...');
     GameServer.PlayerModel.find(function(err,players){
         if (err) return console.log(err);
-        console.log('Players data fetched');
+        console.log('Players data fetched, ',players.length,'players found');
         players.forEach(function(data){
             if(data.id > GameServer.lastPlayerID) GameServer.lastPlayerID = data.id;
             var region = GameServer.getRegion(data);
             data.inventory.concat(data.belt).forEach(function(itm){
+                if(!itm) return;
                 GameServer.createItem(itm[0],itm[1],region,'player inventory DB');
             });
 
             for (var slot in data.equipment.slots) {
+                // console.log('slot:',slot,data.equipment.slots[slot]);
                 var info = GameServer.parseEquipmentDb(data.equipment.slots[slot]);
                 var item = info[0];
                 var nb = info[1];
@@ -331,16 +378,21 @@ GameServer.readPlayersData = function(){
 };
 
 GameServer.parseEquipmentDb = function(data){
+    if(data == -1) return [-1, 0];
     // console.warn('ITEM:',item);
     // fix corrupt item data due to development
-    if (typeof data.id == 'object') {
-        if (data.id.hasOwnProperty('id')) { // fix nested objects
-            data.id = data.id.id;
-        } else {
-            data.id = -1;
+    if(typeof data == 'object'){
+        if (typeof data.id == 'object') {
+            if (data.id.hasOwnProperty('id')) { // fix nested objects
+                data.id = data.id.id;
+            } else {
+                data.id = -1;
+            }
         }
+        return [parseInt(data.id), parseInt(data.nb)];
+    }else{
+        return [parseInt(data), 1];
     }
-    return [parseInt(data.id), parseInt(data.nb)];
 };
 
 /**
@@ -533,6 +585,7 @@ GameServer.finalStep = function(){
     console.log('finalSetp execution time: %ds %dms', hrend[0], hrend[1] / 1000000);
     console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
     GameServer.updateStatus();
+    GameServer.sendSlackNotification('Game server started');
 };
 
 /**
@@ -592,7 +645,6 @@ GameServer.addCamp = function(data){
  * @returns {Object} The created Civ object.
  */
 GameServer.addCiv = function(x,y,type){
-    console.log('Spawning civ type ',type,' at',x,y);
     var npc = new Civ(x,y,type);
     GameServer.civs[npc.id] = npc;
     return npc;
@@ -642,13 +694,7 @@ GameServer.addItem = function(x,y,type,instance){
  */
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
-    GameServer.addItem(513,677,26);
-    GameServer.addItem(514,677,26);
-    GameServer.addItem(513,676,26);
-    GameServer.addAnimal(404,602,0);
-    GameServer.addAnimal(406,604,0);
-    GameServer.addAnimal(408,606,0);
-    GameServer.addAnimal(1170,144,0);
+    GameServer.addAnimal(1073,181,1);
     console.log('---done---');
 };
 
@@ -661,13 +707,14 @@ GameServer.onNewPlayer = function(player){
     // for testing)
     if(!config.get('misc.performInit')) return;
     // give me all the health and vigor
-    // player.setStat('hp', 300);
-    player.giveItem(1,5);
+
     // player.setStat('vigor', 10);
     // player.applyVigorModifier();
+    // player.applyAbility(3);
+    player.giveItem(1,3);
 
     const items = [
-      
+
     ];
 
     items.forEach(item => {
@@ -811,6 +858,8 @@ GameServer.addNewPlayer = function(socket,data){
 
     // Send extra stuff following player initialization, unique to new players
     player.setStartingInventory();
+    Prism.logEvent(player,'connect',{stl:player.origin,re:false});
+    GameServer.sendSlackNotification('New player '+player.name+' has arrived in '+GameServer.regionsData[player.origin].name);
     return player; // return value for the tests
 };
 
@@ -835,6 +884,8 @@ GameServer.loadPlayer = function(socket,id){
             player.getDataFromDb(doc);
 
             GameServer.postProcessPlayer(socket,player,doc);
+            Prism.logEvent(player,'connect',{stl:player.region,re:true});
+            GameServer.sendSlackNotification('Player '+player.name+' has come back in '+GameServer.regionsData[player.region].name);
         }
     );
 };
@@ -878,11 +929,10 @@ GameServer.saveNewPlayerToDb = function(socket,player){
  * @param {Socket} socket - The socket of the connection to the client.
  * @param {Player} player - The created/retrieved Player object.
  */
-GameServer.finalizePlayer = function(socket,player,returning){
+GameServer.finalizePlayer = function(socket,player){
     GameServer.players[player.id] = player;
     GameServer.socketMap[socket.id] = player.id;
     GameServer.setFlag('nbConnected');
-    Prism.logEvent(player,'connect',{stl:player.sid,re:returning});
     GameServer.onNewPlayer(player);
 };
 
@@ -1102,6 +1152,15 @@ GameServer.lootNPC = function(player,type,ID){
     for(var item in NPC.loot.items){
         // TODO: take harvesting ability into consideration
         var nb = NPC.loot.items[item];
+        if(type == 'animal'){
+            var rand = Utils.randomInt(0,100);
+            var chance = player.getStatValue('scavengeluck');
+            // console.warn('forage luck:',rand,chance);
+            if((rand < chance)){
+                player.addNotif('You found more than usual!');
+                nb = Math.ceil(1.3*nb);
+            }
+        }
         player.giveItem(item,nb,true,'Scavenged');
         GameServer.createItem(item,nb,player.region,'loot');
     }
@@ -1149,12 +1208,19 @@ GameServer.respawnItems = function(){
 GameServer.updateSZActivity = function(){
     console.log('Updating active spawn zones ...');
     GameServer.animalMarkers = [];
+    var nbActive = 0;
+    var nbZones = 0;
     for(var key in GameServer.spawnZones){
         if(!GameServer.spawnZones.hasOwnProperty(key)) continue;
         var sz = GameServer.spawnZones[key];
         sz.updateActiveStatus();
-        if(sz.isActive()) GameServer.animalMarkers.push(sz.getMarkerData());
+        if(sz.isActive()) {
+            GameServer.animalMarkers.push(sz.getMarkerData());
+            nbActive++;
+        }
+        nbZones++;
     }
+    // console.warn(nbActive+'/'+nbZones+' active zones');
     GameServer.setFlag('animalsMarkers');
 };
 
@@ -1189,7 +1255,15 @@ GameServer.pickUpItem = function(player,itemID){
  * @param {number} type - type of the picked item.
  * */
 GameServer.forage = function(player, type){
-    var nb = GameServer.itemsData[type].yield || 1;
+    var itmData = GameServer.itemsData[type];
+    var nb = itmData.yield || 1;
+    var rand = Utils.randomInt(0,100);
+    var chance = player.getStatValue('forageluck');
+    // console.warn('forage luck:',rand,chance);
+    if(itmData.bonusYield && (rand < chance)){
+        player.addNotif('You found more than usual!');
+        nb += itmData.bonusYield;
+    }
     player.giveItem(type,nb,true,'Picked');
     Prism.logEvent(player,'pickup',{item:type});
     GameServer.createItem(type,nb,player.region,'pickup');
@@ -1207,10 +1281,14 @@ GameServer.forage = function(player, type){
  * (crafting, loot...)
  */
 GameServer.createItem = function(item,nb,region,source){
-    //if(!GameServer.itemCounts.hasOwnProperty(item)) GameServer.itemCounts[item] = 0;
-    //GameServer.itemCounts[item] += nb;
-    // console.warn(item,nb,GameServer.regions[region].name,source);
     GameServer.itemCounts.add(item,nb);
+    /* All items from db are added to regions once, when server is started (readMap()).
+    * Inventory from loaded players is *not* added, since it was added when reading from
+    * db.Inventory from new players must be added.
+    * In Player.setRegion(), inventory is moved from one region to another.
+    * Region inventory counts must never reset at 0, otherwise the amounts loaded by readMap
+    * are lost.
+    * */
     GameServer.regions[region].addItem(item,nb);
     // TODO: log sources
 };
@@ -1585,6 +1663,13 @@ GameServer.handleShop = function(data,socketID) {
         if(isFinancial) {
             var price = building.getPrice(item, nb, 'sell');
             if(price === 0) return false;
+            var rand = Utils.randomInt(0,100);
+            var chance = player.getStatValue('shopluck');
+            console.warn('shop luck:',rand,chance);
+            if(rand < chance){
+                player.addNotif('You negotiated a discount!');
+                price = Math.floor(price*0.9);
+            }
             if (!player.canBuy(price)) return false;
             player.takeGold(price, true);
             building.giveGold(price);
@@ -1615,8 +1700,16 @@ GameServer.handleShop = function(data,socketID) {
         }
         if(isFinancial) {
             var price = building.getPrice(item, nb, 'buy');
-            console.log(building.prices[item]);
             if(price === 0) return false;
+            if(price < building.getGold()) {
+                var rand = Utils.randomInt(0, 100);
+                var chance = player.getStatValue('shopluck');
+                console.warn('shop luck:', rand, chance);
+                if (rand < chance) {
+                    player.addNotif('You negotiated a better price!');
+                    price = Utils.clamp(Math.ceil(1.1*price),price,building.getGold());
+                }
+            }
             player.giveGold(price, true);
             building.takeGold(price);
             GameServer.updateVigor(player,'sell');
@@ -1640,11 +1733,18 @@ GameServer.handleShop = function(data,socketID) {
         }
         building.updateBuild();
         building.updateRepair();
-        GameServer.regions[player.region].event('give',player);
+        if(item == 1) GameServer.regions[player.region].event('givefood',player,{nb:nb});
     }
     building.save();
     Prism.logEvent(player,action,{item:item,price:price,nb:nb,building:building.type,owner:building.ownerName});
     return true;
+};
+
+GameServer.purchaseAbility = function(aid, socketID){
+    var player = GameServer.getPlayer(socketID);
+    var ability = GameServer.abilitiesData[aid];
+    if(ability.cost > player.ap[ability.class]) return;
+    player.acquireAbility(aid);
 };
 
 GameServer.handleBuild = function(data,socketID) {
@@ -1795,16 +1895,25 @@ GameServer.addMarker = function(markerType,x,y){
     });
 };
 
+/**
+ * Compute how much vigor should be lost based on the action taken.
+ * @param player
+ * @param action
+ * @param {number }multiplier - If the action can be done multiple times in bulk (e.g.
+ * crafting), multiply loss accordingly.
+ */
 GameServer.updateVigor = function(player, action, multiplier){
+    var stepsLoss = GameServer.characterParameters.stepsLoss;
     var vigor_map = {
-        'buy': -3,
+        'buy': -Math.floor(-3*(1-player.getStatValue('walkfatigue')/100)),
         'craft': -3,
-        'sell': -3,
-        'walk': -GameServer.characterParameters.stepsLoss
+        'sell': -Math.floor(-3*(1-player.getStatValue('walkfatigue')/100)),
+        'walk': -Math.floor(stepsLoss*(1-player.getStatValue('walkfatigue')/100))
     };
     multiplier = multiplier || 1;
     var nb = (action in vigor_map ? vigor_map[action] : 1);
     player.updateVigor(nb*multiplier);
+    // player.addNotif('Lost '+nb*multiplier+'vigor');
 };
 
 GameServer.findNextFreeCell = function(x,y){
@@ -1870,7 +1979,7 @@ GameServer.handleCraft = function(data,socketID){
     var nb = data.nb || 1;
     // var recipient = (stock == 1 ? player : building);
     if(!player.canCraft(targetItem,nb)) {
-        console.log('All ingredients not owned');
+        console.log('Cannot craft');
         return false;
     }
     var price = building.getPrice(targetItem, nb, 'sell');
@@ -1964,7 +2073,7 @@ GameServer.handleUse = function(data,socketID){
     var result;
     var nb = 1;
     if(isEquipment) {
-        nb = player.equip(itemData.equipment, parseInt(item), false); // false: not from DB
+        nb = player.equip(itemData.equipment, parseInt(item), false, inventory); // false: not from DB
     }else if(itemData.effects){ // If non-equipment but effects, then consumable item
         nb = player.applyEffects(item,true);
     }
@@ -2206,8 +2315,13 @@ GameServer.getRegion = function(entity){
             closest = region;
         }
     }
-    GameServer.regionsCache.add(entity.x,entity.y,closest.id);
-    return closest.id;
+    if(closest !== null){
+        GameServer.regionsCache.add(entity.x,entity.y,closest.id);
+        return closest.id;
+    }else{
+        console.warn('No region found for coordinates ',entity.x,entity.y);
+        return null;
+    }
 };
 
 GameServer.notifyPlayer = function(playerID,msg){

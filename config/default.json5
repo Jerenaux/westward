@@ -10,11 +10,16 @@
         rangePenalty: 0.1, // accuracy penalty per tile
         turnDuration: 5, // seconds
         tickRate: 100, // milliseconds, granularity of battle updates
-        throwableSpeed: 10, // tiles/sec
+        throwableSpeed: 15, // tiles/sec
         arrowSpeed: 30, // tiles/sec
+        bulletSpeed: 50, // tiles/sec
         bombSpeed: 10,
+        throwableDelay: 300,
+        arrowDelay: 500,
+        bulletDelay: 500,
+        bombDelay: 300,
         meleeAtkDelay: 500,
-        rangedAtkDelay: 500
+        //rangedAtkDelay: 500
    },
    buildings: {
         autobuild: true,
@@ -39,8 +44,8 @@
         maxClassXP: 999999,
         maxGold: 100000,
         foodConsumption: 1.5,
-        steps: 50, // number of steps to make to lose `stepLoss` points of vigor
-        stepsLoss: 1 // amount of vigor lost after walking `steps` steps
+        steps: 100, // number of steps to make to lose `stepLoss` points of vigor
+        stepsLoss: 2 // amount of vigor lost after walking `steps` steps
    },
    economyCycles: {
         // Unit: seconds
@@ -72,12 +77,12 @@
             aggro: 1500
     },
     civs: {
-        aggro: true,
+        aggro: false,
         wander: true,
         raidMinimum: 3
     },
     wildlife: {
-        aggro: true,
+        aggro: false,
         nolife: false,
         wander: true,
         wanderRange: 5,

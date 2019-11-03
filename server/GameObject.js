@@ -68,6 +68,7 @@ GameObject.prototype.save = function(){
         if (err) throw err;
         if(doc === null){
             console.warn('Cannot save game object');
+            _document.dblocked = false;
             return;
         }
 

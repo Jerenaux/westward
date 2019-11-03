@@ -51,6 +51,7 @@ let Hero = new Phaser.Class({
         this.classxp = data.classxp;
         this.classlvl = data.classlvl;
         this.ap = data.ap;
+        this.abilities = data.abilities || [];
         this.name = data.name;
 
         // this.updateRarity([]);
@@ -65,6 +66,7 @@ let Hero = new Phaser.Class({
 
     updateData: function(data){ // don't call this 'update' or else conflict with Player.update() for other player updates
         let callbacks = {
+            'abilities': this.updateAbilities,
             'animalMarkers': this.updateAnimalMarkers,
             'ammo': this.updateAmmo,
             'ap': this.updateAP,
@@ -136,6 +138,7 @@ let Hero = new Phaser.Class({
     },
 
     canCraft: function(item, nb){
+        if(itemsData[item].ability && !this.hasAbility(itemsData[item].ability)) return false;
         let recipe = itemsData[item].recipe;
         for(let itm in recipe){
             if(!this.hasItem(itm,recipe[itm]*nb)) return false;
@@ -175,7 +178,7 @@ let Hero = new Phaser.Class({
     getRangedCursor: function(){
         let rangedw = this.getEquippedItemID('rangedw');
         if(rangedw === -1) return 'bow';
-        return (itemsData[rangedw].ammo === 'quiver' ? 'bow' : 'gun');
+        return (itemsData[rangedw].container_type === 'bullets' ? 'gun' : 'bow');
     },
 
     getStat: function(stat){
@@ -188,6 +191,10 @@ let Hero = new Phaser.Class({
 
     hasItem: function(item,nb){
         return (this.inventory.getNb(item) >= nb);
+    },
+
+    hasAbility: function(aid){
+        return this.abilities.includes(aid);
     },
 
     getItemNb: function (item) {
@@ -238,7 +245,6 @@ let Hero = new Phaser.Class({
     updateAP: function(ap){
         this.ap = ap;
         this.updateEvents.add('character');
-        this.updateEvents.add('citizen');
         //TODO: add sound effect
     },
 
@@ -361,6 +367,10 @@ let Hero = new Phaser.Class({
                 if(sound) Engine.scene.sound.add(sound).play();
             });
         }
+    },
+
+    updateAbilities: function(abilities){
+        this.abilities = abilities;
     },
 
     updateAnimalMarkers: function(markers){

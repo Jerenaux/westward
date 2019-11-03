@@ -8,6 +8,8 @@ import CustomSprite from './CustomSprite'
 import Engine from './Engine'
 import PFUtils from '../shared/PFUtils'
 
+import itemsData from '../assets/data/items.json'
+
 var Moving = new Phaser.Class({
 
     Extends: CustomSprite,
@@ -69,7 +71,9 @@ var Moving = new Phaser.Class({
 
     updateDepth: function(){
         //this.setDepth(Engine.playersDepth + this.tileY / 1000);
-        this.setDepth(this.tileY+1.6); // 1.6 to be greatet than Item's 1.5
+        var newdepth = this.tileY+1.6;
+        if(this.hollowed) newdepth += 5;
+        this.setDepth(newdepth); // 1.6 to be greatet than Item's 1.5
     },
 
     manageOrientationPin: function(){
@@ -145,8 +149,8 @@ var Moving = new Phaser.Class({
     },
 
     faceOrientation: function(){
-        // this.setFrame(this.restingFrames[this.orientation]);
-        this.play(this.animPrefix + '_rest_' + this.orientation);
+        // console.warn(this.getTextureName() + '_rest_' + this.orientation);
+        this.play(this.getTextureName() + '_rest_' + this.orientation);
     },
     
     tileByTilePreUpdate: function(tween,targets,startX,startY,endX,endY){
@@ -158,8 +162,10 @@ var Moving = new Phaser.Class({
 
         if(this.orientation != this.previousOrientation) {
             this.previousOrientation = this.orientation;
-            this.play(this.animPrefix + '_move_' + this.orientation);
-            if(this.hollowed) this.hollow();
+            // console.warn(this.getTextureName() + '_move_' + this.orientation);
+            this.play(this.getTextureName() + '_move_' + this.orientation);
+            // console.warn(this);
+            // console.warn(this.anims.currentAnim.key, this.anims.currentFrame.index);
         }
 
         if(this.isHero){
@@ -177,11 +183,14 @@ var Moving = new Phaser.Class({
 
         //if(this.isActiveFighter) Engine.updateGrid();
 
-        if(Engine.overlay.get(tx,ty)){
+        var overlayOffsetX = this.overlayOffset ? this.overlayOffset[0] : 0;
+        var overlayOffsetY = this.overlayOffset ? this.overlayOffset[1] : 0;
+        if(Engine.overlay.get(tx+overlayOffsetX,ty+overlayOffsetY)){
             this.hollow();
         }else{
             this.unhollow();
         }
+        
         this.leaveFootprint();
         this.playSound();
         if(this.isHero){
@@ -366,29 +375,20 @@ var Moving = new Phaser.Class({
     processRangedAttack: function (data) {
         this.setOrientation({x: data.x, y: data.y});
 
-        // let rangeWeapon = 'attack';
-        //
-        // const ranged_weapon_item = this.getEquippedItem('rangedw');
-        // if (ranged_weapon_item.class && ranged_weapon_item.class === 'bow') {
-        //     rangeWeapon = 'bow';
-        // }
-        //
-        // const ranged_ammo_item = this.getEquippedItem('range_ammo');
-        //
-        // let itemAtlasPool;
-        // // TODO: Maybe get this in utility function
-        // if (ranged_ammo_item.atlas === 'items') {
-        //     itemAtlasPool = Engine.imagePool;
-        // }
-        // if (ranged_ammo_item.atlas === 'items2') {
-        //     itemAtlasPool = Engine.imagePool2;
-        // }
+        const ranged_ammo_item = itemsData[data.projectile];
 
-        // TODO: generalize to firearms
-        var itemAtlasPool = Engine.imagePool;
-        var frame = "arrow";
+        let itemAtlasPool;
+        // TODO: Maybe get this in utility function
+        if (ranged_ammo_item.atlas === 'items') {
+            itemAtlasPool = Engine.imagePool;
+        }
+        if (ranged_ammo_item.atlas === 'items2') {
+            itemAtlasPool = Engine.imagePool2;
+        }
+        var frame = ranged_ammo_item.frame;
+        var anim = ranged_ammo_item.container_type == 'quiver' ? 'bow' : 'attack';
 
-        const animationName = this.animPrefix + '_bow_' + this.orientation;
+        const animationName = this.getTextureName() + '_'+anim+'_' + this.orientation;
         this.play(animationName);
         var from = {
             x: this.x,

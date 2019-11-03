@@ -81,7 +81,7 @@ Bubble.prototype.finalize = function(){
     for(var i = 0; i < this.container.length; i++){
         var e = this.container[i];
         var isText = (e.type == 'Text');
-        e.setDepth(10);
+        e.setDepth(15);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
         if(this.isNotificiation) e.setScrollFactor(0);

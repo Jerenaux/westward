@@ -52,6 +52,7 @@ var Animal = new Phaser.Class({
         this.footprintsFrame = animalData.footprintsFrame;
         this.printsVertOffset = animalData.printsVertOffset;
         this.printsHorizOffset = animalData.printsHorizOffset;
+        this.overlayOffset = animalData.overlayOffset;
 
         this.battleBoxData = {
             'atlas': 'battleicons',
@@ -67,7 +68,7 @@ var Animal = new Phaser.Class({
     processMeleeAttack: function(facing){
         this.computeOrientation(this.tileX,this.tileY,facing.x,facing.y);
         this.faceOrientation();
-        var atkAnim  = this.animPrefix + '_attack_' + this.orientation;
+        var atkAnim  = this.getTextureName() + '_attack_' + this.orientation;
         if(atkAnim in Engine.scene.anims.anims.entries) this.play(atkAnim);
         // TODO: read sound and probability from conf
         if(Utils.randomInt(1,10) >= 8) Engine.playLocalizedSound('wolfattack1',1,{x:this.tileX,y:this.tileY});
@@ -87,13 +88,9 @@ var Animal = new Phaser.Class({
     },
 
     die: function(){
-        var deathAnim  = this.animPrefix + '_die_' + this.orientation;
+        var deathAnim  = this.getTextureName() + '_die_' + this.orientation;
         // console.warn('playing ',deathAnim);
-        if(deathAnim in Engine.scene.anims.anims.entries){
-            this.play(deathAnim);
-        }else{
-            this.setFrame(49);
-        }
+        if(deathAnim in Engine.scene.anims.anims.entries) this.play(deathAnim);
         this.dead = true;
     }
 });

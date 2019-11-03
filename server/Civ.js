@@ -115,7 +115,7 @@ Civ.prototype.die = function(attacker){
     MovingEntity.prototype.die.call(this);
     this.idle = false;
     if(this.camp) this.camp.remove(this);
-    GameServer.regions[this.camp.region].event('killedciv',attacker);
+    if(attacker.isPlayer) GameServer.regions[this.camp.region].event('killedciv',attacker);
 };
 
 Civ.prototype.endFight = function(alive){

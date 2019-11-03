@@ -4,6 +4,7 @@
 
 import itemsData from '../assets/data/items.json'
 
+// TODO: move to a conf file
 var Equipment = {
     slots: {
         meleew: {
@@ -76,6 +77,18 @@ var Equipment = {
         }
     },
 
+    container_types: {
+        quiver:{
+            name: "quiver"
+        },
+        bullets:{
+            name: "bullets pouch"
+        },
+        misc:{
+            name: "pouch"
+        }
+    },
+
     getData: function (slot) {
         if (slot in Equipment.slots) return Equipment.slots[slot];
     }
@@ -119,9 +132,15 @@ EquipmentManager.prototype.getItem = function (slotName) {
     return itemsData[id];
 };
 
-EquipmentManager.prototype.getAmmoContainerType = function () {
+// EquipmentManager.prototype.getAmmoContainerType = function () {
+//     let item = this.getItem("range_ammo");
+//     if (item && item.container_type) return item.container_type;
+//     return -1;
+// };
+
+EquipmentManager.prototype.getAmmoRangeType = function () {
     let item = this.getItem("range_ammo");
-    if (item && item.container_type) return item.container_type;
+    if (item && item.range_type) return item.range_type;
     return -1;
 };
 
@@ -133,6 +152,10 @@ EquipmentManager.prototype.getEquippedContainerType = function(){
 
 EquipmentManager.prototype.getNbAmmo = function () {
     return this.slots["range_ammo"].nb;
+};
+
+EquipmentManager.prototype.getAmmoID = function(){
+    return this.slots["range_ammo"].id;
 };
 
 EquipmentManager.prototype.hasAnyAmmo = function () {

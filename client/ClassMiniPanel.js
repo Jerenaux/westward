@@ -1,6 +1,7 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 16-06-18.
  */
+import BigButton from './BigButton'
 import Engine from './Engine'
 import Formulas from '../shared/Formulas'
 import {MiniProgressBar} from "./ProgressBar"
@@ -31,12 +32,12 @@ ClassMiniPanel.prototype.addInterface = function(){
     classbar.setLevel(100,100);
     this.bar = classbar;
     var classID = this.classID;
-    /*this.button = new BigButton(this.x+60,this.y+this.height-25,'Abilities',function(){
-        console.log('click');
-        //Engine.currentMenu.panels['abilities_'+classID].display();
-        Engine.menus.abilities.display();
-    });*/
-    var txts = this.addPolyText(160,this.height-35,['0','AP'],[Utils.colors.gold,Utils.colors.white],16);
+    this.button = new BigButton(this.x+60,this.y+this.height-25,'Abilities',function(){
+        var panel = Engine.currentMenu.panels['abilities'];
+        panel.display();
+        panel.updateContent(classID);
+    });
+    var txts = this.addPolyText(155,this.height-35,['10','AP'],[Utils.colors.gold,Utils.colors.white],16);
     this.apTxt = txts[0];
 };
 

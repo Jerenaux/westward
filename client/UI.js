@@ -57,7 +57,7 @@ var UI = {
         UI.tooltip = new Tooltip();
         UI.camera = UI.scene.cameras.main;
         UI.notifications = [];
-        UI.textsData = this.cache.json.get('texts');
+        UI.textsData = this.cache.json.get('texts'); // TODO: incoherent with how Engine loads json data (bundled in webpack)
         UI.classesData = this.cache.json.get('classes');
 
 
@@ -170,7 +170,8 @@ UI.handleNotifications = function (msgs) {
 
 UI.runningNotifications = 0;
 UI.showNotification = function (notif, i, height) {
-    var x = (UI.getGameWidth() - notif.getWidth()) / 2 - notif.getOrigin();
+    // var x = (UI.getGameWidth() - notif.getWidth()) / 2 - notif.getOrigin();
+    var x = 10 - notif.getOrigin();
     var y = UI.getGameHeight();
     notif.updatePosition(x, y);
 
@@ -282,6 +283,35 @@ UI.setCursor = function (cursor) {
     // UI.currentCursor = cursor;
     UI.cursor.changeCursor(cursor);
 };
+
+
+/**
+ * What to do when clicked an item in belt (vs. backpack).
+ * `this` is bound to the clicked `ItemSperite`.
+ */
+UI.beltClick = function(){
+    UI.displayItemActionPanel(this.itemID, 'belt');
+};
+
+/**
+ * What to do when clicked an item in backpack (vs. belt).
+ * `this` is bound to the clicked `ItemSprite`.
+ */
+UI.backpackClick = function(){
+    UI.displayItemActionPanel(this.itemID, 'backpack');
+};
+
+/**
+ * Display the itemAction window, i.e. the small panel appearing in the inventory
+ * displaying options such as use, put in belt...
+ * @param {number} itemID - ID of the clicked item.
+ * @param {string} inventory - Whether the item was clicked in the backpack or in the belt.
+ */
+UI.displayItemActionPanel = function(itemID, inventory){
+    Engine.currentMenu.panels['itemAction'].display();
+    Engine.currentMenu.panels['itemAction'].setUp(itemID, inventory);
+};
+
 
 UI.makeClassMenu = function () {
     var title = new UIHolder(512, 10, 'center');
@@ -461,7 +491,6 @@ UI.displayRegions = function (list) {
 };
 
 UI.displayRegion = function (data, world) {
-    console.log(data);
     var x = (data.x / world.width) * UI.SSmap.width * UI.SSmap.scaleX - 90; // why offset?
     var y = (data.y / world.height) * UI.SSmap.height * UI.SSmap.scaleY - 50;
     var icon = UI.scene.add.image(x, y, 'setldiamond');

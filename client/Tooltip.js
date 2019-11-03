@@ -6,6 +6,7 @@ import {Equipment} from "../shared/Equipment";
 import {Stats} from "../shared/Stats";
 import UI from './UI';
 
+import abilitiesData from '../assets/data/abilities.json'
 import buildingsData from '../assets/data/buildings.json'
 import classData from '../assets/data/classes.json'
 import itemsData from '../assets/data/items.json'
@@ -52,6 +53,12 @@ var Tooltip = new Phaser.Class({
     updateInfo: function(type,data){
         this.clear();
         switch(type){
+            case 'ability':
+                var ability = abilitiesData[data];
+                this.setTitle(ability.name);
+                this.setBody(ability.desc);
+                // TODO: add effects icons?
+                break;
             case 'building':
                 var bld = Engine.buildings[data.id];
                 var owner = bld.isOwned() ? 'Your' : bld.ownerName+'\'s';

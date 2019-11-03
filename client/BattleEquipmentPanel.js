@@ -93,20 +93,25 @@ BattleEquipmentPanel.prototype.updateEquipment = function () {
     var rangedWeaponID = Engine.player.getEquippedItemID('rangedw');
     var meleeData, rangeData;
 
-    // If ranged weapon, display the actual ammo; else, display the ranged weapon (= the hands)
-    var rangeID = (rangeAmmoID == -1 || !Engine.player.hasRangedEquipped()) ? rangedWeaponID : rangeAmmoID;
+    var rangeID = rangedWeaponID; // hands by default
+    var showCount = false;
+    if(rangeAmmoID != -1){
+        if(itemsData[rangeAmmoID].ranged_type == itemsData[rangedWeaponID].ranged_type){
+            showCount = true;
+            rangeID = rangeAmmoID;
+        }
+    }
     meleeData = itemsData[meleeID];
     rangeData = itemsData[rangeID];
 
-    // console.warn(Engine.player.hasRangedEquipped());
-    if (Engine.player.hasRangedEquipped()) {
+    if (showCount) {
         var ammo = Engine.player.getNbAnyAmmo();
         this.range.countText.setText(ammo);
     }
 
     this.melee.setUp(meleeID, meleeData);
     this.range.setUp(rangeID, rangeData);
-    this.range.countText.setVisible(Engine.player.hasRangedEquipped());
+    this.range.countText.setVisible(showCount);
 };
 
 BattleEquipmentPanel.prototype.updateCapsules = function () {

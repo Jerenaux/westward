@@ -19,8 +19,7 @@
     "frame":"bow",
     "name": "Bow",
     "equipment": "rangedw",
-    "class": "bow",
-    "ammo": "arrows",
+    "range_type": "bow",
     "effects":{"acc":20},
     "recipe": {"7":1,"21":1},
     "useInBattle": true,
@@ -54,7 +53,8 @@
     "desc": "Crafting material involved in the brewing of several types of potions. Poisonous if consumed raw.",
     "isMaterial": true,
     "effects":{"hp":-50},
-    "yield": 2
+    "yield": 2,
+    "bonusYield": 1
   },
   "6":{
     "atlas": "items2",
@@ -69,6 +69,7 @@
     "craftTier": 2,
     "sound": "alchemy",
     "basicRecipe": true,
+    "ability": 7,
     "verb": "Drank"
   },
   "7":{
@@ -90,6 +91,7 @@
     "sound": "soft",
     "nbBushes": 1,
     "yield": 3,
+    "bonusYield": 1,
     "nbClusters": 100,
     "envFrames": ["bush_5"]
   },
@@ -109,7 +111,8 @@
     "recipe":{"43":8},
     "effects":{"def":4},
     "sound": "cloth",
-    "basicRecipe": true
+    "basicRecipe": true,
+    "ability": 6
   },
   "11":{
     "atlas": "items2",
@@ -128,8 +131,7 @@
     "frame":"gun",
     "name": "Gun",
     "equipment": "rangedw",
-    "class": "gun",
-    "ammo": "bullets",
+    "range_type": "gun",
     "effects":{"acc":5},
     "useInBattle": true,
     "sound": "equip",
@@ -156,6 +158,7 @@
     "sound": "soft",
     "nbBushes": 2,
     "yield": 2,
+    "bonusYield": 1,
     "coitems": [5],
     "insect": true,
     "nbClusters": 100
@@ -175,6 +178,7 @@
     "equipment": "belt",
     "isCrafted": true,
     "recipe":{"43":1},
+    "ability": 6,
     "slots": 2
   },
   "17":{
@@ -199,6 +203,7 @@
     "sound": "soft",
     "nbBushes": 4,
     "yield": 5,
+    "bonusYield": 3,
     "nbClusters": 100
   },
   "19":{
@@ -206,13 +211,14 @@
     "frame":"quiver",
     "name": "Small quiver",
     "equipment": "range_container",
-    "container_type": "arrows",
+    "container_type": "quiver",
     "capacity": 10,
     "desc": "Can contain up to 10 arrows",
     "useInBattle": true,
     "sound": "cloth",
     "isCrafted": true,
     "recipe": {"43":3,"21":1},
+    "ability": 6,
     "basicRecipe": true
   },
   "20":{
@@ -220,17 +226,67 @@
     "frame":"arrow",
     "name": "Arrow",
     "equipment": "range_ammo",
-    "container_type": "arrows",
-    "container_type_name": "quiver",
+    "container_type": "quiver",
+    "range_type": "bow",
     "effects":{"dmg":12},
     "isAmmo": true,
-    "ammo": "quiver",
     "useInBattle": true,
     "sound": "woodsmall",
     "isCrafted": true,
     "recipe":{"7":1,"24":1,"30":1},
     "basicRecipe": true,
     "output": 5
+  },
+  "26":{
+    "atlas": "items2",
+    "frame":"stone",
+    "name": "Stone",
+    "isAmmo": true,
+    "useInBattle": true,
+    "equipment": "range_ammo",
+    "container_type": "misc",
+    "range_type": "hands",
+    "effects":{"dmg":2},
+    "envFrames": ["rock_1","rock_2","rock_3"],
+    "collides": true,
+    "desc": "Crafting material used to make primitive weapons.",
+    "sound": "equip"
+  },
+  "29":{
+    "atlas": "items",
+    "frame":"bone_arrow",
+    "name": "Bone arrow",
+    "equipment": "range_ammo",
+    "container_type": "quiver",
+    "range_type": "bow",
+    "effects":{"dmg":6},
+    "isAmmo": true,
+    "useInBattle": true,
+    "isEquipment": true,
+    "isCrafted": true,
+    "crafTier": 1,
+    "output": 5,
+    "recipe":{"7":1,"27":1,"30":1},
+    "sound": "woodsmall",
+    "basicRecipe": true
+  },
+  "45":{
+    "atlas": "items",
+    "frame":"stone_arrow",
+    "name": "Stone arrow",
+    "equipment": "range_ammo",
+    "container_type": "quiver",
+    "range_type": "bow",
+    "effects":{"dmg":3},
+    "isAmmo": true,
+    "useInBattle": true,
+    "isEquipment": true,
+    "isCrafted": true,
+    "crafTier": 1,
+    "output": 5,
+    "recipe":{"7":1,"26":1,"30":1},
+    "sound": "woodsmall",
+    "basicRecipe": true
   },
   "21":{
     "atlas": "items",
@@ -275,21 +331,6 @@
     "name": "Gold ore",
     "desc": "Precious crafting material that can be mined and is ultimately used to mint coins."
   },
-  "26":{
-    "atlas": "items2",
-    "frame":"stone",
-    "name": "Stone",
-    "isAmmo": true,
-    "useInBattle": true,
-    "equipment": "range_ammo",
-    "container_type": "stones",
-    "container_type_name": "pouch",
-    "effects":{"dmg":2},
-    "envFrames": ["rock_1","rock_2","rock_3"],
-    "collides": true,
-    "desc": "Crafting material used to make primitive weapons.",
-    "sound": "equip"
-  },
   "27":{
     "atlas": "items",
     "frame":"bone",
@@ -308,25 +349,6 @@
     "effects":{"dmg":10},
     "useInBattle": true,
     "sound": "equip",
-    "basicRecipe": true
-  },
-  "29":{
-    "atlas": "items",
-    "frame":"bone_arrow",
-    "name": "Bone arrow",
-    "equipment": "range_ammo",
-    "container_type": "arrows",
-    "container_type_name": "quiver",
-    "effects":{"dmg":6},
-    "isAmmo": true,
-    "ammo": "quiver",
-    "useInBattle": true,
-    "isEquipment": true,
-    "isCrafted": true,
-    "crafTier": 1,
-    "output": 5,
-    "recipe":{"7":1,"27":1,"30":1},
-    "sound": "woodsmall",
     "basicRecipe": true
   },
   "30":{
@@ -424,10 +446,9 @@
     "output": 5,
     "equipment": "range_ammo",
     "container_type": "bullets",
-    "container_type_name": "bullets pouch",
+    "range_type": "gun",
     "effects":{"dmg":60},
     "isAmmo": true,
-    "ammo": "ammo_pouch",
     "useInBattle": true,
     "sound": "clank"
   },
@@ -442,7 +463,8 @@
     "useInBattle": true,
     "sound": "cloth",
     "isCrafted": true,
-    "recipe": {"43":2,"21":1}
+    "recipe": {"43":2,"21":1},
+    "ability": 6
   },
   "41":{
     "atlas": "items",
@@ -466,7 +488,8 @@
     "useInBattle": true,
     "sound": "cloth",
     "isCrafted": true,
-    "recipe": {"43":4,"21":2}
+    "recipe": {"43":4,"21":2},
+    "ability": 6
   },
   "43":{
     "atlas": "items",
@@ -493,25 +516,6 @@
     "stickMouse": true,
     "useInBattle": true
   },
-  "45":{
-    "atlas": "items",
-    "frame":"stone_arrow",
-    "name": "Stone arrow",
-    "equipment": "range_ammo",
-    "container_type": "arrows",
-    "container_type_name": "quiver",
-    "effects":{"dmg":3},
-    "isAmmo": true,
-    "ammo": "quiver",
-    "useInBattle": true,
-    "isEquipment": true,
-    "isCrafted": true,
-    "crafTier": 1,
-    "output": 5,
-    "recipe":{"7":1,"26":1,"30":1},
-    "sound": "woodsmall",
-    "basicRecipe": true
-  },
   "46":{
     "atlas": "items2",
     "frame":"duskflask",
@@ -525,6 +529,7 @@
     "craftTier": 1,
     "sound": "alchemy",
     "basicRecipe": true,
+    "ability": 7,
     "verb": "Drank"
   },
   "47":{
@@ -538,6 +543,7 @@
     "sound": "soft",
     "nbBushes": 4,
     "yield": 5,
+    "bonusYield": 3,
     "verb": "Ate",
     "insect": true,
     "decorFrame":"b4",
@@ -561,8 +567,7 @@
     "desc": "The most basic melee weapon at your disposal. Can be used to throw stones and explosives. Can't be unequipped.",
     "sound": "soft",
     "equipment": "rangedw",
-    "class": "throwable",
-    "ammo": "stones",
+    "range_type": "hands",
     "effects":{"acc":20},
     "useInBattle": true,
     "isCrafted": false,
@@ -573,11 +578,10 @@
     "frame":"shuriken",
     "name": "Shuriken",
     "equipment": "range_ammo",
-    "container_type": "stones",
-    "container_type_name": "pouch",
+    "container_type": "misc",
+    "range_type": "hands",
     "effects":{"dmg":2},
     "isAmmo": true,
-    "ammo": "quiver",
     "useInBattle": true,
     "envFrames": ["rock_1","rock_2","rock_3"],
     "collides": true,
@@ -589,12 +593,14 @@
     "frame":"ammopouch",
     "name": "Small projectiles pouch",
     "equipment": "range_container",
-    "container_type": "stones",
+    "container_type": "misc",
     "capacity": 10,
     "desc": "Can contain up to 10 projectiles",
     "useInBattle": true,
     "sound": "cloth",
     "isCrafted": true,
-    "recipe": {"43":2,"21":1}
+    "recipe": {"43":2,"21":1},
+    "ability": 6,
+    "basicRecipe": true
   }
 }
