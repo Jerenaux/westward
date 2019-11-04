@@ -10,6 +10,7 @@ import PFUtils from '../shared/PFUtils'
 import {StatsContainer} from "../shared/Stats"
 import UI from './UI'
 import Utils from '../shared/Utils'
+import TutorialManager from './TutorialManager'
 
 import buildingsData from '../assets/data/buildings.json'
 

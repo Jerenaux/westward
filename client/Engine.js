@@ -50,6 +50,7 @@ import ShopInventoryPanel from './ShopInventoryPanel'
 import {ShopPanel, ShopGoldPanel} from './ShopPanel'
 import {SpaceMap} from '../shared/SpaceMap';
 import StatsPanel from './StatsPanel'
+import TutorialManager from './TutorialManager'
 import UI from './UI'
 import Utils from '../shared/Utils'
 import World from '../shared/World';
@@ -902,7 +903,6 @@ Engine.makeUI = function(){
     Engine.repairAction.moveUp(2);
 
     Engine.menus = {
-        // 'abilities': Engine.makeAbilitiesMenu(),
         'battle': Engine.makeBattleMenu(),
         'build': Engine.makeBuildMenu(),
         'character': Engine.makeCharacterMenu(),
@@ -1674,13 +1674,6 @@ Engine.makeInventory = function(statsPanel){
     return inventory;
 };
 
-Engine.makeAbilitiesMenu = function(){
-    var menu = new Menu('Abilities');
-    menu.addPanel('abilities',new AbilitiesPanel(40,100,600,380,'Abilities'));
-    menu.addPanel('desc',new AbilityPanel(660,100,340,380,'Description'));
-    return menu;
-};
-
 Engine.makeCharacterMenu = function(){
     var menu = new Menu('Character');
     menu.log = true;
@@ -1723,7 +1716,7 @@ Engine.makeCharacterMenu = function(){
     var x = (UI.getGameWidth()-w)/2;
     var abilities = menu.addPanel('abilities', new AbilitiesPanel(x,175,w,350,'Abilities'),true);
     abilities.addButton(w-16,-8,'red','close',abilities.hide.bind(abilities),'Close');
-    abilities.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['missions_help']);
+    abilities.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['abilities_help']);
     abilities.moveUp(4);
 
     menu.addEvent('onUpdateCharacter',function(){

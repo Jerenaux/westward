@@ -7,6 +7,7 @@ import Client from './Client'
 import CustomSprite from './CustomSprite'
 import Engine from './Engine'
 import PFUtils from '../shared/PFUtils'
+import TutorialManager from './TutorialManager'
 
 import itemsData from '../assets/data/items.json'
 

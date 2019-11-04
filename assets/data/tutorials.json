@@ -31,7 +31,7 @@
     }
   },
   "steps": [
-    {"pos":["c","c",350,146],"txt":"Welcome to Westward's tutorial. We'll cover building, trading, crafting, foraging and fighting. These activities are only a part of what you can do in the game, but that should get you started! "},
+    {"pos":["c","c",350,146],"txt":"Welcome to Westward's tutorial. We'll cover building, trading and crafting. These activities are only a small part of what you can do in the game, but that should get you started! "},
     {"pos": null,"txt":"In addition, we'll try to convey how every single of these activities has an essential collaborative aspect to it!"},
     {"pos":[560,"c",300,100],"txt":"But first... that's you, right here, in the middle of the screen. That's your character. "},
     {"pos": null,"hook":"move","txt":"To move, simply click somewhere in the grass. Go ahead, try it!"},

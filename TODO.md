@@ -74,7 +74,6 @@ Packaging
 Bugs:
 - Add all tests
 - Fix help of abilities panel
-- Add pics to abilities
 Features:
 - Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)

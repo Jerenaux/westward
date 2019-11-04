@@ -35,6 +35,7 @@
   "repair_help": "You can repair any damaged building by providing Timber to it. The progress bar indicates if the building is damaged or fully restored.",
   "regionstatus_help": "This menu displays some information about the region you are in, as well as a list of missions you can contribute to to help taming the land!",
   "missions_help": "Missions are goals that all the settlers of a region should pursue. Each time you contribute to a mission, you are rewarded the amount of experience indicated. Missions typically provide experience for multiple classes. Once a mission is fulfilled, contributing to it doesn't reward any more experience.",
+  "abilities_help": "Abilities provide you with passive advantages and sometimes unlock new actions. Click on an ability to purchase it in exchange for the right amount of Ability Points (AP).",
 
   "classxp": "XP",
   "class_selection_title": "Pick your path",
