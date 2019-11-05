@@ -2096,7 +2096,7 @@ GameServer.handleUse = function(data,socketID){
     player.takeItem(item, nb, inventory, true, verb);
     if(!isEquipment) GameServer.destroyItem(item, nb, player.region, 'use');
     if (!player.inFight) player.save();
-    if(item == 1) GameServer.regions[player.region].updateFood();
+    if(item == 1) GameServer.regions[player.region].event(); // empty event to trigger update of the counts
 
     Prism.logEvent(player,'use',{item:item});
     return result;
