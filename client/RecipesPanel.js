@@ -8,6 +8,8 @@ import ItemSlot from './ItemSlot'
 import ShopInventoryPanel from './ShopInventoryPanel'
 import UI from './UI'
 import Utils from '../shared/Utils'
+import TutorialManager from './TutorialManager'
+
 
 import itemsData from '../assets/data/items.json'
 
