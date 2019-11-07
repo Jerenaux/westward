@@ -2535,6 +2535,13 @@ GameServer.createInstance = function(player){
         player.extraMarkers.push([x,y,type]);
         GameServer.dissipateFoW(Utils.tileToAOI(x,y));
     });
+
+    worldData.items.forEach(function(data){
+        var type = data[0];
+        var x = data[1];
+        var y = data[2];
+        GameServer.addItem(x,y,type,player.instance);
+    });
 };
 
 GameServer.checkInstanceEvent = function(instance,step){
