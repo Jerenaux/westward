@@ -151,7 +151,6 @@ Player.prototype.setUp = function(id,name,region){
 };
 
 Player.prototype.setRegion = function() {
-    console.warn('Setting player region');
     var region_ = this.region;
     var newregion = GameServer.getRegion(this);
     if(newregion != region_){
@@ -951,6 +950,7 @@ Player.prototype.isAvailableForFight = function () {
 };
 
 Player.prototype.isInBuilding = function () {
+    // console.warn('inBuilding:',this.inBuilding);
     return this.inBuilding !== -1;
 };
 
@@ -1000,13 +1000,19 @@ Player.prototype.rest = function (nb) {
         console.log('Not in a building');
         return;
     }
-    if (!building.isBuilt()) return;
-    var buildingData = GameServer.buildingsData[building.type];
-    if (!buildingData.shelter) {
-        // console.log('Building doesn\'t offer shelter');
+    if (!building.isBuilt()){
+        console.log('Not built');
         return;
     }
-    if (!building.isOwnedBy(this)) return;
+    var buildingData = GameServer.buildingsData[building.type];
+    if (!buildingData.shelter) {
+        console.log('Building doesn\'t offer shelter');
+        return;
+    }
+    if (!building.isOwnedBy(this)){
+        console.log('Not the owner');
+        return;
+    }
     console.log('Resting for', nb, 'cycles');
     this.updateVigor(nb * buildingData.restVigorAmount, true); // true = ignore food level
     var changed = this.getStat('hp').increment(nb * buildingData.restHealthAmount);

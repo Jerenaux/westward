@@ -25,7 +25,7 @@
         boot:{
             autoBoot: false,
             forceNewPlayer: false,
-            offerTutorial: false
+            offerTutorial: true
         },
         config:{
             fogOfWar: true

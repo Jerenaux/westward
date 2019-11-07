@@ -5,6 +5,7 @@ import Client from './Client'
 import Engine from './Engine'
 import UI from './UI'
 import UIHolder from './UIHolder'
+import TutorialManager from './TutorialManager'
 
 function Menu(title){
     this.container = [];

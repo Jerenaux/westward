@@ -833,6 +833,7 @@ GameServer.getPlayer = function(socketID){
  * @returns {Player} The creatd Player object.
  */
 GameServer.addNewPlayer = function(socket,data){
+    if(data.tutorial) return GameServer.addNewTutorialPlayer(socket, data);
     if(!data.characterName){
         if(data.tutorial){
             data.characterName = 'Newbie';
@@ -847,12 +848,6 @@ GameServer.addNewPlayer = function(socket,data){
     var player = new Player();
     player.setUp(++GameServer.lastPlayerID, data.characterName, region);
   
-    /*if(data.tutorial) {
-        player.setInstance();
-        if(data.tutorial) GameServer.createInstance(player);
-        var info = GameServer.tutorialData['initData'];
-        player.setRespawnLocation(info.x,info.y);
-    }*/
     GameServer.postProcessPlayer(socket,player);
     if(!player.isInstanced()) GameServer.saveNewPlayerToDb(socket,player);
 
@@ -861,6 +856,26 @@ GameServer.addNewPlayer = function(socket,data){
     Prism.logEvent(player,'connect',{stl:player.origin,re:false});
     GameServer.sendSlackNotification('New player '+player.name+' has arrived in '+GameServer.regionsData[player.origin].name);
     return player; // return value for the tests
+};
+
+GameServer.addNewTutorialPlayer = function(socket, data){
+    var player = new Player();
+    player.setSocketID(socket.id);
+    player.setUp(++GameServer.lastPlayerID, 'Newbie');
+    player.setInstance();
+    GameServer.createInstance(player);
+
+    GameServer.players[player.id] = player;
+    GameServer.socketMap[socket.id] = player.id;
+
+    var info = GameServer.tutorialData['initData'];
+    player.setLocation(info.x,info.y); // to position loaded players
+    GameServer.server.sendInitializationPacket(socket,GameServer.createInitializationPacket(player.id));
+    player.listBuildingRecipes();
+    player.getWorldInformation();
+    player.spawn(false); // false = don't check location
+    // player.giveItem(21,1);
+    return player;
 };
 
 /**
@@ -1960,11 +1975,11 @@ GameServer.handleCraft = function(data,socketID){
         return false;
     }
     var player = GameServer.getPlayer(socketID);
-    var buildingID = player.inBuilding;
-    if(!(buildingID > -1)){
+    if(!player.isInBuilding()){
         console.log('Not in a building');
         return false;
     }
+    var buildingID = player.inBuilding;
     var building = GameServer.buildings[buildingID];
     if(!building){
         console.warn('ERROR: Undefined building when crafting');
@@ -2082,7 +2097,7 @@ GameServer.handleUse = function(data,socketID){
     player.takeItem(item, nb, inventory, true, verb);
     if(!isEquipment) GameServer.destroyItem(item, nb, player.region, 'use');
     if (!player.inFight) player.save();
-    if(item == 1) GameServer.regions[player.region].updateFood();
+    if(item == 1) GameServer.regions[player.region].event(); // empty event to trigger update of the counts
 
     Prism.logEvent(player,'use',{item:item});
     return result;
@@ -2473,7 +2488,6 @@ GameServer.createInstance = function(player){
     var worldData = GameServer.tutorialData['worldData'];
 
     if(playerData.gold) player.setOwnProperty('gold',playerData.gold);
-    // if(playerData.bldRecipes) player.setOwnProperty('bldRecipes',playerData.bldRecipes);
     if(playerData.bldRecipes) player.baseBldrecipes = playerData.bldRecipes;
 
     worldData.newbuildings.forEach(function(bld){
@@ -2520,6 +2534,13 @@ GameServer.createInstance = function(player){
         }
         player.extraMarkers.push([x,y,type]);
         GameServer.dissipateFoW(Utils.tileToAOI(x,y));
+    });
+
+    worldData.items.forEach(function(data){
+        var type = data[0];
+        var x = data[1];
+        var y = data[2];
+        GameServer.addItem(x,y,type,player.instance);
     });
 };
 

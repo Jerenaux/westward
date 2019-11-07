@@ -1,6 +1,13 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 28-04-19.
  */
+import Client from './Client'
+import Engine from './Engine'
+import InfoPanel from './InfoPanel'
+import UI from './UI'
+
+import buildingsData from '../assets/data/buildings.json'
+import itemsData from '../assets/data/items.json'
 
 var TutorialManager = {};
 
@@ -68,11 +75,12 @@ TutorialManager.displayNext = function(){
 
     var itemRe = /\[I([0-9]+)\]/g;
     var buildingRe = /\[B([0-9]+)\]/g;
+    var match;
     while((match = itemRe.exec(text)) !== null){
-        text = text.replace(/\[I[0-9]+\]/,Engine.itemsData[match[1]].name);
+        text = text.replace(/\[I[0-9]+\]/,itemsData[match[1]].name);
     }
     while((match = buildingRe.exec(text)) !== null){
-        text = text.replace(/\[B[0-9]+\]/,Engine.buildingsData[match[1]].name);
+        text = text.replace(/\[B[0-9]+\]/,buildingsData[match[1]].name);
     }
 
     panel.addText(x,y,text);
@@ -132,3 +140,5 @@ TutorialManager.checkHook = function(){
 TutorialManager.triggerHook = function(hook){
     if(TutorialManager.currentHook == hook) TutorialManager.displayNext();
 };
+
+export default TutorialManager
