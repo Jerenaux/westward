@@ -874,6 +874,7 @@ GameServer.addNewTutorialPlayer = function(socket, data){
     player.listBuildingRecipes();
     player.getWorldInformation();
     player.spawn(false); // false = don't check location
+    // player.giveItem(21,1);
     return player;
 };
 
@@ -1974,11 +1975,11 @@ GameServer.handleCraft = function(data,socketID){
         return false;
     }
     var player = GameServer.getPlayer(socketID);
-    var buildingID = player.inBuilding;
-    if(!(buildingID > -1)){
+    if(!player.isInBuilding()){
         console.log('Not in a building');
         return false;
     }
+    var buildingID = player.inBuilding;
     var building = GameServer.buildings[buildingID];
     if(!building){
         console.warn('ERROR: Undefined building when crafting');
@@ -2487,7 +2488,6 @@ GameServer.createInstance = function(player){
     var worldData = GameServer.tutorialData['worldData'];
 
     if(playerData.gold) player.setOwnProperty('gold',playerData.gold);
-    // if(playerData.bldRecipes) player.setOwnProperty('bldRecipes',playerData.bldRecipes);
     if(playerData.bldRecipes) player.baseBldrecipes = playerData.bldRecipes;
 
     worldData.newbuildings.forEach(function(bld){
@@ -2534,6 +2534,13 @@ GameServer.createInstance = function(player){
         }
         player.extraMarkers.push([x,y,type]);
         GameServer.dissipateFoW(Utils.tileToAOI(x,y));
+    });
+
+    worldData.items.forEach(function(data){
+        var type = data[0];
+        var x = data[1];
+        var y = data[2];
+        GameServer.addItem(x,y,type,player.instance);
     });
 };
 

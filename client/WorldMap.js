@@ -3,6 +3,7 @@
  */
 
 import Boot from './Boot'
+import Client from './Client'
 import Engine from './Engine'
 import {FoWPipeline} from "./shaders";
 import UI from './UI'
@@ -491,20 +492,24 @@ var WorldMap = new Phaser.Class({
                 false
             );
         },this);
-        Engine.player.deathMarkers.forEach(function(data){
-            this.addPin(data[0],data[1],
-                'Death',
-                'skull',
-                true
-            );
-        },this);
-        Engine.player.conflictMarkers.forEach(function(data){
-            this.addPin(data[0],data[1],
-                'Battle',
-                'swords',
-                true
-            );
-        },this);
+
+        if(!Client.tutorial) {
+            Engine.player.deathMarkers.forEach(function (data) {
+                this.addPin(data[0], data[1],
+                    'Death',
+                    'skull',
+                    true
+                );
+            }, this);
+            Engine.player.conflictMarkers.forEach(function(data){
+                this.addPin(data[0],data[1],
+                    'Battle',
+                    'swords',
+                    true
+                );
+            },this);
+        }
+
     },
 
     updatePins: function(){

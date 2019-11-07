@@ -225,6 +225,8 @@ Secure
 
 Analytics:
 ---------
+- Log submenu and panels (build menu in particular)
+- Slack: log disconnect and session duration
 - Distinguish new and returning players as distinct events
 - Add info for undefined events
 - Log region crossings
@@ -232,7 +234,6 @@ Analytics:
 - Log giving food to buildings in particular
 - Log repairs
 - Log help bubbles
-- Log submenu and panels
 - Log nb connected in monit: http://pm2.keymetrics.io/docs/usage/process-metrics/#process-metrics
 - Display market prices
 - Button to flush events
@@ -545,6 +546,7 @@ Recipes for fancy bullets and bombs
 
 Deployment:
 ----------
+-> Compile online, don't commit dist
 -> Don't load sounds in preload, load in create and don't play them unless found in cache (bonus)
 -> Don't commit compiled files, compile after push and have env variable determine mode
 https://snowbillr.github.io/blog//2018-04-09-a-modern-web-development-setup-for-phaser-3/

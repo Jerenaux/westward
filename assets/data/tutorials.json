@@ -17,9 +17,20 @@
       ],
     "partialbuild": ["t2"],
     "sell": [
-      ["t3",[[17,25],[11,500]]]
+        ["t3",[
+          [17,25],[11,500],[21,5]
+        ]
+      ]
     ],
-    "plant": [[18,1121,168]]
+    "plant": [[18,1121,168]],
+    "items": [
+      [7,1216,164],
+      [7,1217,168],
+      [7,1220,169],
+      [26,1207,156],
+      [26,1214,166],
+      [26,1215,157]
+    ]
   },
   "events":{
     "1":{
@@ -56,22 +67,20 @@
     {"pos":null,"hook":"built:t2","txt":"Let's be altruistic for now. Click on the button to give all your [I3]."},
     {"pos":null,"txt":"Great! The [B3] has been built! It'll be essential to the local community's survival."},
     {"pos":null,"txt":"As you can see, players can complement and help each other, freely or for gold, to create settlements that will help them survive."},
-    {"pos":[0,430,350,146],"hook":"recipe:6","txt":"Now let's have a look at crafting. Click on the Dawn recipe in the recipes panel. Dawn is a useful potion to recover vitality."},
-    {"pos":null,"hook":"bld:any:4","txt":"To make [I6], you need [I17] and [I18]. Let's see if the nearby [B4] doesn't sell any of it. Leave the [B3] and enter the [B4] to the north west of it."},
-    {"pos":null,"hook":"inventory:17:1","txt":"You are in luck, there is [I17] for sale. This means a player crafted it somewhere else and sold it here. Click on it and buy it!"},
-    {"pos":null,"hook":"exit","txt":"Now, to find some [I18]. Exit the building."},
-    {"pos":[674,200,350,146],"hook":"menu:map","txt":"Open the world map by clicking on the map icon above."},
-    {"pos":["c",430,350,146],"txt":"The red cross indicates your position. Only the parts of the world that other players have recently explored are visible; the rest is covered in fog of war."},
-    {"pos":null,"hook":"area:1111:158:20:20","txt":"Leaf icons on the map indicate where some plants can be picked up. Using your map, try to find and go to a location where some [I18] grows!"},
-    {"pos":null,"hook":"inventory:18:4","txt":"You found some! Click on the [I18] on the ground to pick it!"},
-    {"pos":[0,490,350,80],"hook":"inventory:6:1","txt":"Now go back to the [B3], and craft one flask of [I6]."},
+    {"pos":[0,430,350,146],"hook":"recipe:28","txt":"Now let's have a look at crafting. Find and click the [I28] recipe in the recipes panel. [I28] is a nice first weapon to have."},
+    {"pos":null,"hook":"bld:any:4","txt":"To make [I28], you need [I7], [I26] and [I21]. Let's see if the nearby [B4] doesn't sell any of it. Leave the [B3] and enter the [B4] to the north west of it."},
+    {"pos":null,"hook":"inventory:21:1","txt":"You are in luck, there is [I21] for sale. This means a player crafted it somewhere else and sold it here. Click on it and buy it!"},
+    {"pos":null,"hook":"inventory:7:1","txt":"Now, to find some [I7]. Exit the building and search around the forest. Click on items to pick them up."},
+    {"pos":null,"hook":"inventory:26:1","txt":"Great, now pick up some [I26]."},
+    {"pos":[0,490,350,80],"hook":"inventory:28:1","txt":"Now go back to the [B3], and craft one [I28]."},
     {"pos":[0,440,350,130],"txt":"This covers crafting. You helped build a [B3], which in turn allowed you to craft something you needed."},
-    {"pos":null,"txt":"To obtain the ingredients, you went to the shop of another player, and took advantage of the exploration that yet another player had done."},
+    {"pos":null,"txt":"In addition, to obtain some ingredients, you went to the shop of another player to buy what yet another player had produced."},
     {"pos":[50,65,300,135],"txt":"You must be tired after all that. See the golden heart icon above? It represents your vigor. It decreases when you perform actions."},
     {"pos":null,"txt":"The lower your vigor, the more you will get maluses to your other stats, making you very vulnerable. The best way to replenish it is to rest somewhere."},
     {"pos":[0,435,300,135],"hook": "newbuilding:11","txt":"By now your [B6] must have produced enough [I3] for you to build your own [B11]. Go ahead and build one!"},
     {"pos":null,"hook": "bld:own:11","txt":"Enter your [B11]"},
     {"pos":null,"txt":"As you can see, the longer you stay in your [B11], the more you rest. It also works when you are offline!"},
-    {"pos":null,"txt":"This is the end of the tutorial for now. It's not complete yet, other aspects will be covered in the future!"}
+    {"pos":null,"txt":"This is the end of the tutorial for now. It's not complete yet, other aspects will be covered in the future!"},
+    {"pos":null,"txt":"Refresh the page to return to the title screen and enter the game!"}
   ]
 }
