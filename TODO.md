@@ -87,14 +87,13 @@ incl. width and height of areas explored
 TODO: log what can happen in character panel, compute these statistics
 Use special localstorage token not to pollute stats
 
-8/11 17:00
-Durations: 5, 9, 1, 1, 9: 5min.
-Unique players: 3
-Returning: 2  : 60%
+8/11 21h
+Durations: 5, 9, 1, 1, 9, 0: 4min.
+Unique players: 4
+Returning: 2  : 50%
 
 Bugs:
 - Test that consuming food decreases mission counter -> Not the case
-- Buiilding gold, your gold tooltip areas from shop does not hide (capsules!)
 - Bugs with movements and battle intercepts
 - Glitches around 680, 489
 - Allow buildings across regions

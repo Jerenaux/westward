@@ -272,6 +272,9 @@ Panel.prototype.hide = function(){
     Frame.prototype.hide.call(this);
     if(this.scrollable) this.scroll(-this.scrolled);
     if(this.button) this.button.hide(); // big button
+    for(var caps in this.capsules){
+        this.capsules[caps].hide();
+    };
     UI.inPanel = false;
 };
 
