@@ -72,8 +72,32 @@ Packaging
 - Username suggestions / enforce constraints (minimum length, complexity, ...)
 - More dynamic movement system: hold click to move? Move towards mouse? Click to stop? Etc.
 
+Goal metrics:
+- Bounce rate: 50% of sessions durations > 5min.
+-> Quests from the get-go
+-> Increase starting inventory, reduce building costs
+-> Smoother movement system
+- Return rate: 5% of players having > 1 session
+-> Social elements (contacts, rankings)
+-> Juice
+-> Highlight temporal aspects
+- Feature utilization: # of times feature x is used > k*players (k < 1)
+incl. width and height of areas explored
+
+TODO: log what can happen in character panel, compute these statistics
+Use special localstorage token not to pollute stats
+
+8/11 17:00
+Durations: 5, 9, 1, 1, 9: 5min.
+Unique players: 3
+Returning: 2  : 60%
+
 Bugs:
-- Test that consuming food decreases mission counter
+- Test that consuming food decreases mission counter -> Not the case
+- Buiilding gold, your gold tooltip areas from shop does not hide (capsules!)
+- Bugs with movements and battle intercepts
+- Glitches around 680, 489
+- Allow buildings across regions
 Features:
 - Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
@@ -208,6 +232,7 @@ V1 level:
 
 Admin
 -----
+Print undefined events in admin
 Redirect tweets to Slack
 Pimp Slack notifs: https://dynetisgames.slack.com/services/BPEEUQPDF?added=1#message_attachments
 -> Post all errors automatically? Capture stderr somehow
