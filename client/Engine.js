@@ -1955,8 +1955,8 @@ Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
     if(Engine.player) Engine.updateMarker(position.tile);
     if(Engine.debug){
-        document.getElementById('pxx').innerHTML = Math.round(event.x);
-        document.getElementById('pxy').innerHTML = Math.round(event.y);
+        if(document.getElementById('pxx')) document.getElementById('pxx').innerHTML = Math.round(event.x);
+        if(document.getElementById('pxy'))  document.getElementById('pxy').innerHTML = Math.round(event.y);
         document.getElementById('tx').innerHTML = position.tile.x;
         document.getElementById('ty').innerHTML = position.tile.y;
         document.getElementById('aoi').innerHTML = Utils.tileToAOI(position.tile);

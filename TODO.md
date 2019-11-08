@@ -75,8 +75,6 @@ Packaging
 Bugs:
 - Test that consuming food decreases mission counter
 Features:
-- Slack link: https://join.slack.com/t/dynetisgames/shared_invite/enQtMTc0NzU2MjgzNDExLTNiMTMwNDJmMGQ1Y2FjM2ZhYTFhMGYzNWEyYmE3MjQ2YzAyNzYwYjQyODllZTZlYzM3ZDM0MGRiMGQyNjIxNWM
-Discord: https://discord.gg/NzUnS7F
 - Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Add a "show all" button to stats panel to display all of them
