@@ -95,7 +95,6 @@ Returning: 2  : 50%
 Bugs:
 - Test that consuming food decreases mission counter -> Not the case
 - Bugs with movements and battle intercepts
-- Glitches around 680, 489
 - Allow buildings across regions
 Features:
 - Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.
