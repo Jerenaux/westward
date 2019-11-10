@@ -206,6 +206,11 @@ server.listen(process.env.PORT || myArgs.port || 8081,function(){
 
 server.resetStamp = 1519130567967; // ignore returning players with stamps older than this and treat them as new
 
+process.on('uncaughtException', function(err) {
+    GameServer.sendSlackNotification(err.toString(),'warning');
+    console.error('Caught exception: ' + err);
+});
+
 io.on('connection',function(socket){
     socket.emit('ack');
 

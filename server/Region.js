@@ -131,7 +131,7 @@ Region.prototype.updateCounts = function(){
         this.updateCount('getitem:'+item[0],this.itemCounts.getNb(item[0]));
     },this);
     GameServer.setFlag('regionsStatus'); // TODO: eventually, don't broadcast all regions but only changed ones
-    console.log('['+this.name+'] Status: ',this.status,' :: ',this.counts);
+    // console.log('['+this.name+'] Status: ',this.status,' :: ',this.counts);
 };
 
 Region.prototype.updateCount = function(count,value){

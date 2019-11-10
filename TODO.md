@@ -101,6 +101,7 @@ Bugs:
 - Test that consuming food decreases mission counter -> Not the case
 - Bugs with movements and battle intercepts
 Features:
+- Zapier
 - Allow buildings across regions
 - Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
@@ -235,11 +236,8 @@ V1 level:
 
 Admin
 -----
-Print undefined events in admin
-Redirect tweets to Slack
-Pimp Slack notifs: https://dynetisgames.slack.com/services/BPEEUQPDF?added=1#message_attachments
--> Post all errors automatically? Capture stderr somehow
--> Display nb connected
+Send memory and CPU stats to Slack
+Display nb connected in Slack notifs
 Improve admin tables
 Flush screenshots
 Make cmd line system
