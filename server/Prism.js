@@ -150,6 +150,14 @@ var MenuEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var HelpEvent = Event.discriminator(
+    'HelpEvent',
+    new mongoose.Schema({
+        which: String
+    }),
+    {discriminatorKey: 'kind'}
+);
+
 var ConnectEvent = Event.discriminator(
     'ConnectEvent',
     new mongoose.Schema({
@@ -211,6 +219,7 @@ Prism.logEvent = function(player,action,data){
         'disconnect': DisconnectEvent,
         'explore': ExploreEvent,
         'gold': GoldEvent,
+        'help': HelpEvent,
         'loot': LootEvent,
         'menu': MenuEvent,
         'newbuilding': NewBuildingEvent,

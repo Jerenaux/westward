@@ -241,6 +241,7 @@ io.on('connection',function(socket){
             'exit': GameServer.handleExit,
             'gold': GameServer.handleGold,
             'menu': GameServer.logMenu,
+            'mic': GameServer.logMisc,
             'NPCClick': GameServer.handleNPCClick,
             'prices': GameServer.setBuildingPrice,
             'path': GameServer.handlePath,

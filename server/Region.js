@@ -211,7 +211,7 @@ Region.prototype.event = function(event, player, extra){
             var p = counts_[count];
             var c = this.counts[count];
             if(p[0] < p[1] && c[0] > p[0]){
-                console.warn(count,p,c);
+                console.log(count,p,c);
                 player.addNotif('You contributed to a region mission ('+this.missionLabels[count]+')!');
                 var xp = this.XPtable[count];
                 for(var clas in xp){

@@ -73,7 +73,7 @@ Packaging
 - More dynamic movement system: hold click to move? Move towards mouse? Click to stop? Etc.
 
 Goal metrics:
-- Bounce rate: 50% of sessions durations > 5min.
+- Bounce rate: 50% of sessions durations > 5min. (or avg/median duration > 5min.?)
 -> Quests from the get-go
 -> Increase starting inventory, reduce building costs
 -> Smoother movement system
@@ -87,16 +87,21 @@ incl. width and height of areas explored
 TODO: log what can happen in character panel, compute these statistics
 Use special localstorage token not to pollute stats
 
-8/11 21h
-Durations: 5, 9, 1, 1, 9, 0: 4min.
-Unique players: 4
-Returning: 2  : 50%
+9/11 12h
+
+Durations: 0 1 1 5 5 9 9 24: avg. 6.75, median 5, 5/8 
+Unique players: 6
+Returning: 2  : 33%
 
 Bugs:
+- Test admin server logs locally for logging of civ and animal encounters
+ + handle new events
+- Diagnose and fix 100% CPU issue (how many minutes after player connect?)
+- Test buying of timber?
 - Test that consuming food decreases mission counter -> Not the case
 - Bugs with movements and battle intercepts
-- Allow buildings across regions
 Features:
+- Allow buildings across regions
 - Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.
 fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Add a "show all" button to stats panel to display all of them
@@ -160,7 +165,7 @@ María:
 -> Some feathery creature that does melee attacks and drops feathers (remove as pickup object)
 - Diagonal movements 
 
-Bld artist:
+Other artist:
 - New Civ huts/cabins
 - More civ buidings (e.g. towers)
 - Basic cliffs
@@ -246,16 +251,12 @@ Secure
 
 Analytics:
 ---------
-- Log submenu and panels (build menu in particular)
-- Slack: log disconnect and session duration
-- Distinguish new and returning players as distinct events
-- Add info for undefined events
+- Log map zooms
+- Log capsules help
 - Log region crossings
-- Fix event desc about enemy types
+- Slack: log disconnect and session duration
 - Log giving food to buildings in particular
 - Log repairs
-- Log help bubbles
-- Log nb connected in monit: http://pm2.keymetrics.io/docs/usage/process-metrics/#process-metrics
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions

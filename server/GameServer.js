@@ -1680,7 +1680,7 @@ GameServer.handleShop = function(data,socketID) {
             if(price === 0) return false;
             var rand = Utils.randomInt(0,100);
             var chance = player.getStatValue('shopluck');
-            console.warn('shop luck:',rand,chance);
+            console.log('shop luck:',rand,chance);
             if(rand < chance){
                 player.addNotif('You negotiated a discount!');
                 price = Math.floor(price*0.9);
@@ -1719,7 +1719,7 @@ GameServer.handleShop = function(data,socketID) {
             if(price < building.getGold()) {
                 var rand = Utils.randomInt(0, 100);
                 var chance = player.getStatValue('shopluck');
-                console.warn('shop luck:', rand, chance);
+                console.log('shop luck:', rand, chance);
                 if (rand < chance) {
                     player.addNotif('You negotiated a better price!');
                     price = Utils.clamp(Math.ceil(1.1*price),price,building.getGold());
@@ -1967,6 +1967,15 @@ GameServer.handleRespawn = function(data,socketID){
 GameServer.logMenu = function(menu,socketID){
     var player = GameServer.getPlayer(socketID);
     Prism.logEvent(player,'menu',{menu:menu});
+};
+
+GameServer.logMisc = function(data,socketID){
+    var player = GameServer.getPlayer(socketID);
+    switch(data.type){
+        case 'help':
+            Prism.logEvent(player,'help',{which:data.which});
+            break;
+    }
 };
 
 GameServer.handleCraft = function(data,socketID){
