@@ -81,11 +81,10 @@ Goal metrics:
 -> Social elements (contacts, rankings)
 -> Juice
 -> Highlight temporal aspects
+-> Server not crashing
 - Feature utilization: # of times feature x is used > k*players (k < 1)
 incl. width and height of areas explored
 
-TODO: log what can happen in character panel, compute these statistics
-Use special localstorage token not to pollute stats
 
 9/11 12h
 
@@ -93,18 +92,29 @@ Durations: 0 1 1 5 5 9 9 24: avg. 6.75, median 5, 5/8
 Unique players: 6
 Returning: 2  : 33%
 
+Next milestone:
+- Migrate to AWS 
+- Record sessions (derive duration stats, # unique players and # returning from that)
+- Fix bugs
+- Take action based on session stats
+- Play
+- Tackle todo as seen fit
+
+Migration todo:
+- Set up PM2, only for game
+- Register domain name
+- Replace IP URLs to domains, in: visitted dev logs, roastmygame, WW page, etc.
+- Tool to export/import buildings
+- Shut down droplet
+
+
 Bugs:
-- Test admin server logs locally for logging of civ and animal encounters
- + handle new events
-- Diagnose and fix 100% CPU issue (how many minutes after player connect?)
+- Bugs with movements and battle intercepts
 - Test buying of timber?
 - Test that consuming food decreases mission counter -> Not the case
-- Bugs with movements and battle intercepts
 Features:
 - Zapier
 - Allow buildings across regions
-- Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.
-fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
 - Add a "show all" button to stats panel to display all of them
 - Re-add stats panel to character panel?
 - DIsable some skills based on fatigue / update help
@@ -236,6 +246,8 @@ V1 level:
 
 Admin
 -----
+Add inline desc to events, and display it in admin panel (+ timestamp and player)
+Session panel & stats
 Send memory and CPU stats to Slack
 Display nb connected in Slack notifs
 Improve admin tables
@@ -318,7 +330,7 @@ Order:
 
 Packaging
 ---------
-Player accounts and auth
+Player accounts and auth (use DocumentDB? Firebase?)
 Landing page
 Wiki (self or check existing platform, Steam...)
 Forum (self or check existing platform, Steam...)

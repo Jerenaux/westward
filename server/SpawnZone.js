@@ -60,7 +60,7 @@ SpawnZone.prototype.update = function(){
 
 SpawnZone.prototype.spawn = function(){
     var animal = GameServer.addAnimal(this.x, this.y, this.animal);
-    console.log('Spawning ',GameServer.getAnimalData(this.animal).name,' ',animal.id,' at',this.x,this.y);
+    // console.log('Spawning ',GameServer.getAnimalData(this.animal).name,' ',animal.id,' at',this.x,this.y);
     animal.setSpawnZone(this);
     this.population++;
 };

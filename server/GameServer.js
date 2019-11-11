@@ -1230,7 +1230,7 @@ GameServer.respawnItems = function(){
 };
 
 GameServer.updateSZActivity = function(){
-    console.log('Updating active spawn zones ...');
+    // console.log('Updating active spawn zones ...');
     GameServer.animalMarkers = [];
     var nbActive = 0;
     var nbZones = 0;

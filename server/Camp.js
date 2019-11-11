@@ -101,6 +101,7 @@ Camp.prototype.findTarget = function(){
 };
 
 Camp.prototype.raid = function(player){
+    console.log('Raiding ',player.id);
     var sent = 0;
     for(var i = 0; i < this.people.length; i++) {
         var civ = this.people[i];
