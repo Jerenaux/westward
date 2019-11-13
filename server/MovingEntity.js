@@ -239,7 +239,7 @@ MovingEntity.prototype.canRange = function () {
         return false;
     }
 
-    console.warn('Range type:',weapon.range_type,this.equipment.getAmmoRangeType());
+    // console.warn('Range type:',weapon.range_type,this.equipment.getAmmoRangeType());
     if (weapon.range_type !== this.equipment.getAmmoRangeType()) {
         if(this.isPlayer) {
             this.addMsg('I can\'t use my weapon with that ammo');

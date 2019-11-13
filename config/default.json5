@@ -52,7 +52,7 @@
         turnDuration: 1,
         // Unit: turns
         turns: {
-            camps: 1800,
+            camps: 1, //1800,
             foodConsumptionRate: 600, // rate at which food levels of players are decreased ; amount in character.foodConsumption
             itemsRespawn: 86400, // 86400 turns of 1sec = 24h
             restRate: 1, // rate at which vigor levels of players are increased when sheltered ; amount in buildings.json

@@ -889,14 +889,14 @@ Engine.makeUI = function(){
     Engine.makeBuildingTitle();
 
     var statsPanel = new StatsPanel(665,335,330,100,'Stats');
-    statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help']);
+    statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help'],'stats_help');
 
     var mapPanel = Engine.makeMapPanel();
 
     // Todo: make a 'makerepairpanel()' method similar to 'makepricespanel()'?
     Engine.repairPanel = new RepairPanel(476,190,500,200,'Repair');
     Engine.repairPanel.addButton(500-16,-8,'red','close',Engine.repairPanel.hide.bind(Engine.repairPanel),'Close');
-    Engine.repairPanel.addButton(460, 8, 'blue','help',null,'',UI.textsData['repair_help']);
+    Engine.repairPanel.addButton(460, 8, 'blue','help',null,'',UI.textsData['repair_help'],'repair_help');
     Engine.repairPanel.moveUp(3);
     Engine.repairAction = new ShopPanel(670,390,300,100,'Take');
     Engine.repairAction.addButton(300-16,-8,'red','close',Engine.repairAction.hide.bind(Engine.repairAction),'Close');
@@ -1135,7 +1135,7 @@ Engine.makeRespawnMenu = function(){
     var respawnx = (Engine.getGameConfig().width-respawnw)/2;
     var respawny = 400;
     var respawn = menu.addPanel('respawn',new RespawnPanel(respawnx,respawny,respawnw,respawnh));
-    respawn.addButton(respawnw-30, 8, 'blue','help',null,'',UI.textsData['respawn_help']);
+    respawn.addButton(respawnw-30, 8, 'blue','help',null,'',UI.textsData['respawn_help'],'respawn_help');
     return menu;
 };
 
@@ -1177,7 +1177,7 @@ Engine.makeProductionMenu = function(){
     var y = 150;
 
     var productionPanel = new ProductionPanel(x,y,w,h);
-    productionPanel.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['prod_help']);
+    productionPanel.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['prod_help'],'prod_help');
     var gold = productionPanel.addCapsule('gold',20,20,'999','gold');
     gold.setHoverText(UI.tooltip,'Building gold',UI.textsData['shopgold_help']);
     production.addPanel('production',productionPanel);
@@ -1223,7 +1223,7 @@ Engine.makeConstructionMenu = function(){
     constr.setExitPos(720);
 
     var progress = new ConstructionPanel(x,progressy,w,progressh);
-    progress.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['progress_help']);
+    progress.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['progress_help'],'progress_help');
     constr.addPanel('progress',progress);
     var gold = progress.addCapsule('gold',20,-9,'999','gold');
     gold.setHoverText(UI.tooltip,'Building gold',UI.textsData['shopgold_help']);
@@ -1278,7 +1278,7 @@ Engine.makeRestMenu = function(){
     var x = (Engine.getGameConfig().width-w)/2;
 
     var panel = menu.addPanel('main',new RestPanel(x,150,w,200));
-    panel.addButton(w - 30, 8, 'blue','help',null,'',UI.textsData['shack_help']);
+    panel.addButton(w - 30, 8, 'blue','help',null,'',UI.textsData['shack_help'],'shack_help');
     menu.addEvent('onUpdateStats',panel.update.bind(panel));
 
     return menu;
@@ -1369,12 +1369,12 @@ Engine.makeRegionsMenu = function(mapPanel){
     var x = 10; // 500
     var w = 270;
     var status = menu.addPanel('status',new RegionStatusPanel(x,80,w,150,'region'));
-    status.addButton(w-30, 0, 'blue','help',null,'',UI.textsData['regionstatus_help']);
+    status.addButton(w-30, 0, 'blue','help',null,'',UI.textsData['regionstatus_help'],'regionstatus_help');
     w = 620;
     x = (UI.getGameWidth()-w)/2;
     var missions = menu.addPanel('missions', new MissionsPanel(x,200,w,350,'Missions'),true);
     missions.addButton(w-16,-8,'red','close',missions.hide.bind(missions),'Close');
-    missions.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['missions_help']);
+    missions.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['missions_help'],'missions_help');
     status.moveUp(4);
     missions.moveUp(4);
 
@@ -1414,7 +1414,7 @@ Engine.makePricesPanel = function(){
     var h = 480;
     var prices = new PricesPanel(Math.round((1024-w)/2),80,w,h,'Prices');
     prices.addButton(w-16,-8,'red','close',prices.hide.bind(prices),'Close');
-    prices.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['prices_help']);
+    prices.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['prices_help'],'prices_help');
     prices.moveUp(4);
     return prices;
 };
@@ -1453,12 +1453,12 @@ Engine.makeTradeMenu = function(){
     client.setInventory('player');
     var gold = client.addCapsule('gold',120,-9,'999','gold');
     gold.setHoverText(UI.tooltip,'Your gold',UI.textsData['gold_help']);
-    client.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['sell_help']);
+    client.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['sell_help'],'sell_help');
     var shop =  trade.addPanel('shop',new ShopInventoryPanel(center+space,y,w,h,'Shop'));
     shop.setInventory('building');
     var shopgold = shop.addCapsule('gold',100,-9,'999','gold');
     shopgold.setHoverText(UI.tooltip,'Shop gold',UI.textsData['shopgold_help']);
-    shop.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help']);
+    shop.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help'],'buy_help');
     w = 300;
     var x = (Engine.getGameConfig().width-w)/2;
     var action = trade.addPanel('action',new ShopPanel(x,440,w,100,'Buy/Sell'),true);
@@ -1519,10 +1519,10 @@ Engine.makeCraftingMenu = function(){
     recipes.setInventory('crafting');
     var gold = recipes.addCapsule('gold',120,-9,'999','gold');
     gold.setHoverText(UI.tooltip,'Workshop gold',UI.textsData['shopgold_help']);
-    recipes.addButton(recipesw-30, 8, 'blue','help',null,'',UI.textsData['recipes_help']);
+    recipes.addButton(recipesw-30, 8, 'blue','help',null,'',UI.textsData['recipes_help'],'recipes_help');
 
     var combi = crafting.addPanel('combi',new CraftingPanel(combix,y,combiw,h,'Crafting'));
-    combi.addButton(combiw-30, 8, 'blue','help',null,'',UI.textsData['combi_help']);
+    combi.addButton(combiw-30, 8, 'blue','help',null,'',UI.textsData['combi_help'],'combi_help');
 
     var prices = crafting.addPanel('prices',Engine.makePricesPanel(),true);
     prices.limitToCrafting();
@@ -1561,6 +1561,7 @@ Engine.makeCraftingMenu = function(){
 
 Engine.makeBuildMenu = function(){
     var build = new Menu();
+    build.log = true;
     build.keepHUD = true;
     build.allowWalk = true;
     build.name = 'Build something'; // Allows to have a hover name without a menu title
@@ -1568,7 +1569,7 @@ Engine.makeBuildMenu = function(){
     var w = 300;
     var buildings = build.addPanel('build',new BuildPanel(30,50,w,450,'Build'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
-    buildings.addButton(w-33, 8, 'blue','help',null,'',UI.textsData['build_help']);
+    buildings.addButton(w-33, 8, 'blue','help',null,'',UI.textsData['build_help'],'build_help');
     buildings.moveUp(2);
     build.addEvent('onOpen',buildings.updateContent.bind(buildings));
     build.addEvent('onUpdateBuildRecipes',buildings.updateContent.bind(buildings));
@@ -1641,16 +1642,16 @@ Engine.makeInventory = function(statsPanel){
 
     var gold = items.addCapsule('gold',130,-9,'999','gold');
     gold.setHoverText(UI.tooltip,'Gold',UI.textsData['gold_help']);
-    items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help']);
+    items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help'],'inventory_help');
 
     inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,120),true);
 
     var belt = inventory.addPanel('belt',new InventoryPanel(40,360,600,90,'Belt'));
     belt.setInventory('belt',15,true,UI.beltClick);
-    belt.addButton(570, 8, 'blue','help',null,'',UI.textsData['belt_help']);
+    belt.addButton(570, 8, 'blue','help',null,'',UI.textsData['belt_help'],'belt_help');
 
     var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
-    equipment.addButton(300, 8, 'blue','help',null,'',UI.textsData['equipment_help']);
+    equipment.addButton(300, 8, 'blue','help',null,'',UI.textsData['equipment_help'],'equipment_help');
     inventory.addPanel('equipment',equipment);
 
     inventory.addPanel('stats',statsPanel);
@@ -1715,8 +1716,9 @@ Engine.makeCharacterMenu = function(){
     var w = 620;
     var x = (UI.getGameWidth()-w)/2;
     var abilities = menu.addPanel('abilities', new AbilitiesPanel(x,175,w,350,'Abilities'),true);
+    abilities.log = true;
     abilities.addButton(w-16,-8,'red','close',abilities.hide.bind(abilities),'Close');
-    abilities.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['abilities_help']);
+    abilities.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['abilities_help'],'abilities_help');
     abilities.moveUp(4);
 
     menu.addEvent('onUpdateCharacter',function(){
@@ -1955,8 +1957,8 @@ Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
     if(Engine.player) Engine.updateMarker(position.tile);
     if(Engine.debug){
-        document.getElementById('pxx').innerHTML = Math.round(event.x);
-        document.getElementById('pxy').innerHTML = Math.round(event.y);
+        if(document.getElementById('pxx')) document.getElementById('pxx').innerHTML = Math.round(event.x);
+        if(document.getElementById('pxy'))  document.getElementById('pxy').innerHTML = Math.round(event.y);
         document.getElementById('tx').innerHTML = position.tile.x;
         document.getElementById('ty').innerHTML = position.tile.y;
         document.getElementById('aoi').innerHTML = Utils.tileToAOI(position.tile);

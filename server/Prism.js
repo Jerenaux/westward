@@ -2,23 +2,25 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 21-03-18.
  */
 
-// var mongoose = require('mongoose');
-import mongoose from 'mongoose'
+var mongoose = require('mongoose');
+// import mongoose from 'mongoose'
 // All events correspond to *actions* performed by *players*
 
-var sessionSchema = new mongoose.Schema({
-    pid: {type: Number, min: 0},
-    pname: String,
-    start: { type: Date, default: Date.now },
-    end: { type: Date, default: Date.now }
-});
-var Session = mongoose.model('Session', sessionSchema);
+// var sessionSchema = new mongoose.Schema({
+//     pid: {type: Number, min: 0},
+//     pname: String,
+//     start: { type: Date, default: Date.now },
+//     end: { type: Date, default: Date.now }
+// });
+// var Session = mongoose.model('Session', sessionSchema);
 
 var eventSchema = new mongoose.Schema({
     pid: {type: Number, min: 0},
     pname: String,
     time: { type: Date, default: Date.now },
-    action: {type: String} // Also used in admin
+    action: {type: String}, // Also used in admin
+    desc: {type: String},
+    session: {type: Number}
 });
 var Event = mongoose.model('Event', eventSchema);
 
@@ -150,6 +152,14 @@ var MenuEvent = Event.discriminator(
     {discriminatorKey: 'kind'}
 );
 
+var HelpEvent = Event.discriminator(
+    'HelpEvent',
+    new mongoose.Schema({
+        which: String
+    }),
+    {discriminatorKey: 'kind'}
+);
+
 var ConnectEvent = Event.discriminator(
     'ConnectEvent',
     new mongoose.Schema({
@@ -199,6 +209,7 @@ Prism.logEvent = function(player,action,data){
     data.action = action;
     data.pid = (player ? player.id : null);
     data.pname = (player ? player.name : null);
+    data.session = player.logSession;
 
     var map = {
         'battle': BattleEvent,
@@ -211,6 +222,7 @@ Prism.logEvent = function(player,action,data){
         'disconnect': DisconnectEvent,
         'explore': ExploreEvent,
         'gold': GoldEvent,
+        'help': HelpEvent,
         'loot': LootEvent,
         'menu': MenuEvent,
         'newbuilding': NewBuildingEvent,

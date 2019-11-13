@@ -72,13 +72,49 @@ Packaging
 - Username suggestions / enforce constraints (minimum length, complexity, ...)
 - More dynamic movement system: hold click to move? Move towards mouse? Click to stop? Etc.
 
+Goal metrics:
+- Bounce rate: 50% of sessions durations > 5min. (or avg/median duration > 5min.?)
+-> Quests from the get-go
+-> Increase starting inventory, reduce building costs
+-> Smoother movement system
+- Return rate: 5% of players having > 1 session
+-> Social elements (contacts, rankings)
+-> Juice
+-> Highlight temporal aspects
+-> Server not crashing
+- Feature utilization: # of times feature x is used > k*players (k < 1)
+incl. width and height of areas explored
+
+
+12/11 21h
+
+Durations: 0 1 1 5 5 9 9 24 62: avg. 12.8, median 5, 6/9
+Unique players: 7
+Returning: 2  : 28%
+
+Next milestone:
+- Migrate to AWS 
+- Record sessions (derive duration stats, # unique players and # returning from that)
+- Fix bugs
+- Take action based on session stats
+- Play
+- Tackle todo as seen fit
+
+Migration todo:
+- Modify webhooks
+- Replace IP URLs to domains, in: visitted dev logs, roastmygame, WW page, etc.
+- Tool to export/import buildings
+- Shut down droplet
+
+
 Bugs:
-- Test that consuming food decreases mission counter
+- Bugs with movements and battle intercepts
+- Test buying of timber?
+- Test that consuming food decreases mission counter -> Not the case
 Features:
-- Slack link: https://join.slack.com/t/dynetisgames/shared_invite/enQtMTc0NzU2MjgzNDExLTNiMTMwNDJmMGQ1Y2FjM2ZhYTFhMGYzNWEyYmE3MjQ2YzAyNzYwYjQyODllZTZlYzM3ZDM0MGRiMGQyNjIxNWM
-Discord: https://discord.gg/NzUnS7F
-- Treat all the numerical aspects that abilities can impact on as stats: Allows equipment to act as well. E.g.
-fitting more in backpack, more actions per turn, ... (not so for "boolean" effects)
+- Test new character
+- Zapier
+- Allow buildings across regions
 - Add a "show all" button to stats panel to display all of them
 - Re-add stats panel to character panel?
 - DIsable some skills based on fatigue / update help
@@ -140,7 +176,7 @@ María:
 -> Some feathery creature that does melee attacks and drops feathers (remove as pickup object)
 - Diagonal movements 
 
-Bld artist:
+Other artist:
 - New Civ huts/cabins
 - More civ buidings (e.g. towers)
 - Basic cliffs
@@ -210,10 +246,10 @@ V1 level:
 
 Admin
 -----
-Redirect tweets to Slack
-Pimp Slack notifs: https://dynetisgames.slack.com/services/BPEEUQPDF?added=1#message_attachments
--> Post all errors automatically? Capture stderr somehow
--> Display nb connected
+Add inline desc to events, and display it in admin panel (+ timestamp and player)
+Session panel & stats
+Send memory and CPU stats to Slack
+Display nb connected in Slack notifs
 Improve admin tables
 Flush screenshots
 Make cmd line system
@@ -225,16 +261,13 @@ Secure
 
 Analytics:
 ---------
-- Log submenu and panels (build menu in particular)
-- Slack: log disconnect and session duration
-- Distinguish new and returning players as distinct events
-- Add info for undefined events
+- Log map zooms
+- Log capsules help
 - Log region crossings
-- Fix event desc about enemy types
+- Slack: log disconnect and session duration
 - Log giving food to buildings in particular
 - Log repairs
-- Log help bubbles
-- Log nb connected in monit: http://pm2.keymetrics.io/docs/usage/process-metrics/#process-metrics
+- AOI heatmap
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions
@@ -298,7 +331,7 @@ Order:
 
 Packaging
 ---------
-Player accounts and auth
+Player accounts and auth (use DocumentDB? Firebase?)
 Landing page
 Wiki (self or check existing platform, Steam...)
 Forum (self or check existing platform, Steam...)

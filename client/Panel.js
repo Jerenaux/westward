@@ -8,6 +8,7 @@ import Frame from './Frame'
 import LongSlot from './LongSlot'
 import UI from './UI'
 import Utils from '../shared/Utils'
+import Client from "./Client";
 
 function Panel(x,y,width,height,title,invisible){
     Frame.call(this,x,y,width,height,invisible);
@@ -34,7 +35,7 @@ Panel.prototype.updateCapsule = function(name,text){
     this.capsules[name].setText(text);
 };
 
-Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpText){
+Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpText,logID){
     // TODO: make proper Button class that wraps all of this
     x += this.x;
     y += this.y;
@@ -54,6 +55,7 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
         zone.on('pointerover', function () {
             UI.tooltip.updateInfo('free', {title: helpTitle, body: helpText});
             UI.tooltip.display();
+            if(symbol == 'help') Client.logMisc({type:'help',which:logID});
         });
         zone.on('pointerout', function () {
             UI.tooltip.hide();
@@ -264,6 +266,8 @@ Panel.prototype.display = function(){
         })
     }
 
+    if(this.log) Client.logMenu(this.name);
+
     UI.inPanel = true;
     UI.currentPanel = this;
 };
@@ -272,6 +276,9 @@ Panel.prototype.hide = function(){
     Frame.prototype.hide.call(this);
     if(this.scrollable) this.scroll(-this.scrolled);
     if(this.button) this.button.hide(); // big button
+    for(var caps in this.capsules){
+        this.capsules[caps].hide();
+    };
     UI.inPanel = false;
 };
 

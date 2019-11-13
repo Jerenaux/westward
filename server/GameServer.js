@@ -11,6 +11,8 @@ var ObjectId = require('mongodb').ObjectID;
 var mongoose = require('mongoose');
 var config = require('config');
 var Voronoi = require('voronoi');
+//TODO: conf
+var slack = require('slack-notify')('https://hooks.slack.com/services/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');
 
 var GameServer = {
     lastPlayerID: 0,
@@ -197,38 +199,45 @@ GameServer.readMap = function(mapsPath,test,cb){
 
 };
 
-GameServer.sendSlackNotification = function(msg){
+GameServer.sendSlackNotification = function(msg, icon){
     if(process.env.SUPPRESS_SLACK) return;
-    const data = JSON.stringify({
-        icon_emoji: 'game_die',
+    slack.send({
+        channel: '#westward-status',
+        icon_emoji: icon || 'game_die',
         text: msg,
-        username: 'Westward-bot'
-      });
-      
-      const options = {
-        hostname: 'hooks.slack.com',
-        path: '/services/T54PW6PPC/BPEEUQPDF/N5JC1aUByPJ0aopuTvViQ6vq',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': data.length
-        }
-      }
-      
-      const req = https.request(options, res => {
-        // console.log(`statusCode: ${res.statusCode}`)
-      
-        // res.on('data', d => {
-        //   process.stdout.write(d)
-        // })
-      })
-      
-      req.on('error', error => {
-        console.error(error)
-      })
-      
-      req.write(data)
-      req.end()
+        username: (icon == 'warning' ? 'Error-bot' : 'Westward-bot')
+    });
+
+    // const data = JSON.stringify({
+    //     icon_emoji: 'game_die',
+    //     text: msg,
+    //     username: 'Westward-bot'
+    //   });
+    //
+    //   const options = {
+    //     hostname: 'hooks.slack.com',
+    //     path: '/services/T54PW6PPC/BPEEUQPDF/N5JC1aUByPJ0aopuTvViQ6vq',
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Content-Length': data.length
+    //     }
+    //   }
+    //
+    //   const req = https.request(options, res => {
+    //     // console.log(`statusCode: ${res.statusCode}`)
+    //
+    //     // res.on('data', d => {
+    //     //   process.stdout.write(d)
+    //     // })
+    //   })
+    //
+    //   req.on('error', error => {
+    //     console.error(error)
+    //   })
+    //
+    //   req.write(data)
+    //   req.end()
 };
 
 /*GameServer.registerAbilityHooks = function(){
@@ -1221,7 +1230,7 @@ GameServer.respawnItems = function(){
 };
 
 GameServer.updateSZActivity = function(){
-    console.log('Updating active spawn zones ...');
+    // console.log('Updating active spawn zones ...');
     GameServer.animalMarkers = [];
     var nbActive = 0;
     var nbZones = 0;
@@ -1680,7 +1689,7 @@ GameServer.handleShop = function(data,socketID) {
             if(price === 0) return false;
             var rand = Utils.randomInt(0,100);
             var chance = player.getStatValue('shopluck');
-            console.warn('shop luck:',rand,chance);
+            console.log('shop luck:',rand,chance);
             if(rand < chance){
                 player.addNotif('You negotiated a discount!');
                 price = Math.floor(price*0.9);
@@ -1719,7 +1728,7 @@ GameServer.handleShop = function(data,socketID) {
             if(price < building.getGold()) {
                 var rand = Utils.randomInt(0, 100);
                 var chance = player.getStatValue('shopluck');
-                console.warn('shop luck:', rand, chance);
+                console.log('shop luck:', rand, chance);
                 if (rand < chance) {
                     player.addNotif('You negotiated a better price!');
                     price = Utils.clamp(Math.ceil(1.1*price),price,building.getGold());
@@ -1969,6 +1978,15 @@ GameServer.logMenu = function(menu,socketID){
     Prism.logEvent(player,'menu',{menu:menu});
 };
 
+GameServer.logMisc = function(data,socketID){
+    var player = GameServer.getPlayer(socketID);
+    switch(data.type){
+        case 'help':
+            Prism.logEvent(player,'help',{which:data.which});
+            break;
+    }
+};
+
 GameServer.handleCraft = function(data,socketID){
     if(data.id === -1) {
         console.log('No item ID');
@@ -2186,8 +2204,8 @@ GameServer.dissipateFoW = function(aoi){
 GameServer.updateFoW = function(){
     for(var pid in GameServer.players){
         var player = GameServer.players[pid];
-        // player.fieldOfVision.forEach(GameServer.dissipateFoW);
-        GameServer.dissipateFoW(player.aoi);
+        player.fieldOfVision.forEach(GameServer.dissipateFoW);
+        // GameServer.dissipateFoW(player.aoi);
     }
     for(var bid in GameServer.buildings){
         var building = GameServer.buildings[bid];

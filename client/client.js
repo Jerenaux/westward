@@ -240,6 +240,10 @@ Client.logMenu = function(menu){
     Client.socket.emit('menu',menu);
 };
 
+Client.logMisc = function(misc){
+    Client.socket.emit('logmisc',misc);
+};
+
 Client.sendTutorialStart = function(){
     Client.socket.emit('tutorial-start');
 };

@@ -5,6 +5,7 @@ var server = require('http').Server(app);
 var bodyParser = require("body-parser");
 var io = require('socket.io').listen(server);
 var path = require('path');
+var osutils = require('os-utils');
 
 var quickselect = require('quickselect'); // Used to compute the median for latency
 var mongoose = require('mongoose');
@@ -206,6 +207,18 @@ server.listen(process.env.PORT || myArgs.port || 8081,function(){
 
 server.resetStamp = 1519130567967; // ignore returning players with stamps older than this and treat them as new
 
+process.on('uncaughtException', function(err) {
+    GameServer.sendSlackNotification(err.toString(),'warning');
+    console.error('Caught exception: ' + err);
+});
+
+setInterval(function(){
+    console.log('tick');
+    osutils.cpuUsage(function(v){
+        console.log( 'CPU Usage (%): ' + v );
+    });
+}, 3000);
+
 io.on('connection',function(socket){
     socket.emit('ack');
 
@@ -241,6 +254,7 @@ io.on('connection',function(socket){
             'exit': GameServer.handleExit,
             'gold': GameServer.handleGold,
             'menu': GameServer.logMenu,
+            'mic': GameServer.logMisc,
             'NPCClick': GameServer.handleNPCClick,
             'prices': GameServer.setBuildingPrice,
             'path': GameServer.handlePath,
