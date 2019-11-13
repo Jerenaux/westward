@@ -209,7 +209,7 @@ Prism.logEvent = function(player,action,data){
     data.action = action;
     data.pid = (player ? player.id : null);
     data.pname = (player ? player.name : null);
-    data.session = player.logSession;
+    data.session = (player ?player.logSession : null);
 
     var map = {
         'battle': BattleEvent,
