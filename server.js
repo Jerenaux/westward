@@ -212,13 +212,6 @@ process.on('uncaughtException', function(err) {
     console.error('Caught exception: ' + err);
 });
 
-setInterval(function(){
-    console.log('tick');
-    osutils.cpuUsage(function(v){
-        console.log( 'CPU Usage (%): ' + v );
-    });
-}, 3000);
-
 io.on('connection',function(socket){
     socket.emit('ack');
 

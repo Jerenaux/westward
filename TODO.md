@@ -580,6 +580,8 @@ Recipes for fancy bullets and bombs
 Deployment:
 ----------
 -> Compile online, don't commit dist
+-> Systematically run npm install
+-> Try to go back to one-click deploy
 -> Don't load sounds in preload, load in create and don't play them unless found in cache (bonus)
 -> Don't commit compiled files, compile after push and have env variable determine mode
 https://snowbillr.github.io/blog//2018-04-09-a-modern-web-development-setup-for-phaser-3/
