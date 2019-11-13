@@ -112,6 +112,7 @@ Bugs:
 - Test buying of timber?
 - Test that consuming food decreases mission counter -> Not the case
 Features:
+- Add twitter to game links
 - Test new character
 - Zapier
 - Allow buildings across regions
