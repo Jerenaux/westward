@@ -86,11 +86,11 @@ Goal metrics:
 incl. width and height of areas explored
 
 
-9/11 12h
+12/11 21h
 
-Durations: 0 1 1 5 5 9 9 24: avg. 6.75, median 5, 5/8 
-Unique players: 6
-Returning: 2  : 33%
+Durations: 0 1 1 5 5 9 9 24 62: avg. 12.8, median 5, 6/9
+Unique players: 7
+Returning: 2  : 28%
 
 Next milestone:
 - Migrate to AWS 
@@ -101,8 +101,7 @@ Next milestone:
 - Tackle todo as seen fit
 
 Migration todo:
-- Set up PM2, only for game
-- Register domain name
+- Modify webhooks
 - Replace IP URLs to domains, in: visitted dev logs, roastmygame, WW page, etc.
 - Tool to export/import buildings
 - Shut down droplet
@@ -113,6 +112,7 @@ Bugs:
 - Test buying of timber?
 - Test that consuming food decreases mission counter -> Not the case
 Features:
+- Test new character
 - Zapier
 - Allow buildings across regions
 - Add a "show all" button to stats panel to display all of them
@@ -267,6 +267,7 @@ Analytics:
 - Slack: log disconnect and session duration
 - Log giving food to buildings in particular
 - Log repairs
+- AOI heatmap
 - Display market prices
 - Button to flush events
 - Bundle events from one player into sessions

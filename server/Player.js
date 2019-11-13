@@ -72,6 +72,8 @@ function Player() {
     MovingEntity.call(this);
 
     this.extraMarkers = []; // used in tutorial to display mock markers
+
+    this.logSession = Date.now();
 }
 
 Player.prototype = Object.create(MovingEntity.prototype);
