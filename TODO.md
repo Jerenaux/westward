@@ -96,6 +96,7 @@ Next milestone:
 - Migrate to AWS 
 - Record sessions (derive duration stats, # unique players and # returning from that)
 - Fix bugs
+- Apply feedback
 - Take action based on session stats
 - Play
 - Tackle todo as seen fit

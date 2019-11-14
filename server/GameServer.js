@@ -3,7 +3,6 @@
  */
 import Inventory from "../shared/Inventory";
 
-var https = require('https')
 var fs = require('fs');
 var pathmodule = require('path');
 var clone = require('clone'); // used to clone objects, essentially used for clonicg update packets
