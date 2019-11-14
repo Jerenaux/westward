@@ -9,7 +9,33 @@ var Data = {
     categories: ['buildings','items','animals']
 };
 
+function Session(id){
+    this.id = id;
+    this.events = [];
+}
 
+Session.prototype.add = function(evt){
+    console.log(evt.time, new Date(evt.time).getTime())
+    evt.time = new Date(evt.time).getTime();
+    this.events.push(evt);
+    this.duration = (evt.time - this.events[0].time)/(60*1000);
+    console.log(this.duration)
+}
+
+function median(values){
+    if(values.length ===0) return 0;
+  
+    values.sort(function(a,b){
+      return a-b;
+    });
+  
+    var half = Math.floor(values.length / 2);
+  
+    if (values.length % 2)
+      return values[half];
+  
+    return (values[half - 1] + values[half]) / 2.0;
+  }
 
 app.controller("mainCtrl", [
     '$scope','$http',
@@ -20,7 +46,7 @@ app.controller("mainCtrl", [
                 if(res.status == 200){
                     Data[category+'Data'] = res.data;
                     Data.counter++;
-                    if(Data.counter == Data.categories.length) getAllData();
+                    // if(Data.counter == Data.categories.length) getAllData();
                 }
             },function(err){});
         };
@@ -46,23 +72,57 @@ app.controller("mainCtrl", [
             },function(err){});
         };
 
+
         getAllData = function(){
 
             $scope.bldSortType = 'name';
             $scope.bldSortReverse = false;
             $scope.bldFilter = null;
 
-            getData('events');
-            getData('screenshots');
-            getData('buildings');
-            getData('players');
-            countItems();
+            //getData('events');
+            //getData('screenshots');
+            //getData('buildings');
+            //getData('players');
+            //countItems();
         };
 
         // Read all JSON data files and when it's done, get all data from DB
         Data.categories.forEach(function(category){
             getJSON(category);
         });
+
+        getEvents = function(category){
+            $scope[category] = [];
+            $http.get("/admin/events/").then(function(res) {
+                if(res.status != 200) return;
+                
+                $scope['events'] = res.data;
+                var sessions = {};
+                var pids = new Set();
+                for(var i = 0; i < res.data.length; i++){
+                    var evt = res.data[i];
+                    if(!(evt.session in sessions)) sessions[evt.session] = new Session(evt.session);
+                    sessions[evt.session].add(evt);
+                    pids.add(evt.pid);
+                }
+                $scope['sessions'] = Object.values(sessions);
+
+                var durations = $scope['sessions'].map(function(s){
+                    return s.duration;
+                });
+                console.log(durations);
+
+                var nbsessions = durations.length;
+                var nbp = pids.size;
+                console.log('Number of sessions',nbsessions);
+                console.log('Number of players',nbp);
+                console.log('Ratio of returning players:',(nbp/nbsessions))
+                console.log('Median duration:',median(durations))
+
+            },function(err){});
+        };
+
+        getEvents();
     }
     ]);
 

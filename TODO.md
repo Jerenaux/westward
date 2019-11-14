@@ -73,7 +73,7 @@ Packaging
 - More dynamic movement system: hold click to move? Move towards mouse? Click to stop? Etc.
 
 Goal metrics:
-- Bounce rate: 50% of sessions durations > 5min. (or avg/median duration > 5min.?)
+- Bounce rate: 50% of sessions durations > 5min. 
 -> Quests from the get-go
 -> Increase starting inventory, reduce building costs
 -> Smoother movement system
@@ -88,9 +88,9 @@ incl. width and height of areas explored
 
 12/11 21h
 
-Durations: 0 1 1 5 5 9 9 24 62: avg. 12.8, median 5, 6/9
-Unique players: 7
-Returning: 2  : 28%
+Durations: 0 1 1 1 5 5 5 9 9 10 24 62 -> 5/12
+Unique players: 10
+Returning: 2  : 20%
 
 Next milestone:
 - Migrate to AWS 
@@ -108,6 +108,7 @@ Migration todo:
 
 
 Bugs:
+- Can't purchase abilities?
 - Bugs with movements and battle intercepts
 - Test buying of timber?
 - Test that consuming food decreases mission counter -> Not the case
@@ -247,9 +248,9 @@ V1 level:
 
 Admin
 -----
+Bare essentials: display only info that you frequently seek or compute
 Add inline desc to events, and display it in admin panel (+ timestamp and player)
 Session panel & stats
-Send memory and CPU stats to Slack
 Display nb connected in Slack notifs
 Improve admin tables
 Flush screenshots
