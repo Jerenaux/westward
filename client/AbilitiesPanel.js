@@ -215,7 +215,11 @@ PurchaseAbilityPanel.prototype.display = function(aid){
     this.aid = aid;
     this.text.setText('Purchase '+abilitiesData[aid].name+'?');
     this.button.display();
-    if(abilitiesData[aid].cost > Engine.player.ap[abilitiesData[aid].class]) this.button.disable();
+    if(abilitiesData[aid].cost > Engine.player.ap[abilitiesData[aid].class]){
+        this.button.disable();
+    }else{
+        this.button.enable();
+    }
     this.displayTexts();
 };
 

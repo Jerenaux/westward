@@ -720,6 +720,7 @@ GameServer.onNewPlayer = function(player){
     // player.applyVigorModifier();
     // player.applyAbility(3);
     player.giveItem(1,3);
+    player.classLvlUp(1);
 
     const items = [
 

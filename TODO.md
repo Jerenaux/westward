@@ -107,7 +107,6 @@ Migration todo:
 
 
 Bugs:
-- Can't purchase abilities?
 - Bugs with movements and battle intercepts
 - Test buying of timber?
 - Test that consuming food decreases mission counter -> Not the case
