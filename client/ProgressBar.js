@@ -1,6 +1,9 @@
 /**
  * Created by jeren on 25-01-18.
  */
+import Engine from './Engine'
+import UI from './UI'
+import Utils from '../shared/Utils'
 
 function ProgressBar(x,y,w,mask){
     this.displayed = false;
@@ -22,7 +25,7 @@ ProgressBar.prototype.setUpZone = function(zone){
     zone.setVisible(false);
     var _bar = this;
     zone.on('pointerover',function(){
-        UI.tooltip.updateInfo(_bar.level+'/'+_bar.max);
+        UI.tooltip.updateInfo('free',{title:_bar.level+'/'+_bar.max});
         UI.tooltip.display();
     });
     zone.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
@@ -63,7 +66,7 @@ ProgressBar.prototype.setCallback = function(callback){
     this.completionCallback = callback;
 };
 
-ProgressBar.prototype.setLevel = function(level,max,duration){
+ProgressBar.prototype.setLevel = function(level,max,duration,skipTween){
     if(max) this.max = max;
     var direction = Math.sign(this.level-level);
     var delta = Math.abs(this.level-level)/this.max; // Used to compute duration of tween
@@ -73,7 +76,7 @@ ProgressBar.prototype.setLevel = function(level,max,duration){
     var dw = this.barBody.width - newLength;
 
     if(dw == 0) return;
-    if(this.displayed){
+    if(this.displayed && !skipTween){
         var duration = duration || Math.max((delta * 2000),1);
         var _head = this.head;
         var _tail = this.tail;
@@ -110,7 +113,8 @@ ProgressBar.prototype.setLevel = function(level,max,duration){
         }
     }else {
         this.barBody.width = newLength;
-        if(this.head) this.head.x -= dw;
+        // if(this.head) this.head.x -= dw;
+        if(this.head) this.head.x = this.zeroX + newLength;
     }
 };
 
@@ -136,6 +140,12 @@ ProgressBar.prototype.hide = function(){
     if(this.hasTail) this.tail.setVisible(false);
     if(this.zone) this.zone.setVisible(false);
     this.displayed = false;
+};
+
+ProgressBar.prototype.moveUp = function(nb){
+    this.body.forEach(function(e){
+        e.setDepth(e.depth+nb);
+    });
 };
 
 // #######################
@@ -222,3 +232,5 @@ BigProgressBar.prototype.createZone = function(){
     this.setUpZone(zone);
     return zone;
 };
+
+export {ProgressBar, BigProgressBar, MiniProgressBar}

@@ -4,6 +4,7 @@
 
 function PersonalUpdatePacket(){
     this.items = [];
+    this.belt = [];
     this.stats = [];
     this.equipment = [];
     this.ammo = [];
@@ -27,7 +28,9 @@ PersonalUpdatePacket.prototype.clean = function() { // Remove empty arrays from 
     for(var field in this){
         if(!this.hasOwnProperty(field)) continue;
         if(this[field] && this[field].constructor.name == 'Array'){
-            if(this[field].length == 0) this[field] = undefined;
+            // if(this[field].length == 0) this[field] = undefined;
+            if(this[field].length == 0) delete this[field];
+
         }
     }
     return this;
@@ -38,12 +41,12 @@ PersonalUpdatePacket.prototype.updatePosition = function(x,y) {
     this.y = y;
 };
 
-PersonalUpdatePacket.prototype.updateGold = function(nb) {
-    this.gold = nb;
-};
-
 PersonalUpdatePacket.prototype.addItem = function(item,nb){
     this.items.push([item,nb]);
+};
+
+PersonalUpdatePacket.prototype.addBelt = function(item,nb){
+    this.belt.push([item,nb]);
 };
 
 PersonalUpdatePacket.prototype.addStat = function(stat){
@@ -60,8 +63,8 @@ PersonalUpdatePacket.prototype.addEquip = function(slot,item){
     this.equipment.push({slot:slot,item:item});
 };
 
-PersonalUpdatePacket.prototype.addAmmo = function(slot,nb){
-    this.ammo.push({slot:slot,nb:nb});
+PersonalUpdatePacket.prototype.addAmmo = function(nb){
+    this.ammo.push({nb:nb});
 };
 
 PersonalUpdatePacket.prototype.addMsg = function(msg){
@@ -70,10 +73,6 @@ PersonalUpdatePacket.prototype.addMsg = function(msg){
 
 PersonalUpdatePacket.prototype.addNotif = function(msg){
     this.notifs.push(msg);
-};
-
-PersonalUpdatePacket.prototype.fightNotification = function(flag){
-    this.fightStatus = flag;
 };
 
 module.exports.PersonalUpdatePacket = PersonalUpdatePacket;

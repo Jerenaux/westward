@@ -25,7 +25,7 @@ fs.readdir(indir,function(err,files){
     console.log(sprites);
 
     // Pack sprites
-    Spritesmith.run({src: sprites}, function handleResult (err, result) {
+    Spritesmith.run({src: sprites, padding:2}, function handleResult (err, result) {
         if(err) throw err;
         console.log(result);
 

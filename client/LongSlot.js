@@ -1,6 +1,8 @@
 /**
  * Created by jeren on 06-02-18.
  */
+import UI from './UI'
+import Utils from '../shared/Utils'
 
 function LongSlot(width,mask){
     this.x = 0;
@@ -12,6 +14,7 @@ function LongSlot(width,mask){
     var y = 0;
     this.slices = [];
     this.texts = [];
+    this.images = [];
     this.textCounter = 0;
     var sw = 8;
     var bw = width;
@@ -27,12 +30,15 @@ function LongSlot(width,mask){
     x += bw;
     this.slices.push(UI.scene.add.sprite(x, y, 'UI', 'longslot_9'));
 
+    this.width = 0;
+    this.height = this.slices[0].height;
     this.slices.forEach(function(s){
         s.setDisplayOrigin(0,0);
         s.setScrollFactor(0);
         s.setDepth(1);
         s.setVisible(false);
-        s.setMask(this.mask);
+        // s.setMask(this.mask);
+        this.width += s.width;
     },this);
 
     this.zone = this.createZone();
@@ -92,6 +98,13 @@ LongSlot.prototype.addText = function(x,y,text,color,size){
     return t;
 };
 
+LongSlot.prototype.addImage = function(x,y,atlas,frame){
+    var img = UI.scene.add.sprite(this.x + x, this.y + y, atlas, frame);
+    img.setScrollFactor(0);
+    img.setDepth(2);
+    this.images.push(img);
+};
+
 LongSlot.prototype.addProgressBar = function(x,y,level,max,color,width){
     width = width || 0.8*this.width;
     this.bar = new MiniProgressBar(this.x+x,this.y+y,width,color,this.mask);
@@ -133,6 +146,9 @@ LongSlot.prototype.display = function(){
     this.texts.forEach(function(s){
         s.setVisible(true);
     });
+    this.images.forEach(function(s){
+        s.setVisible(true);
+    });
     if(this.bar) this.bar.display();
     if(this.icon) this.icon.setVisible(true);
     this.zone.setVisible(true);
@@ -157,7 +173,35 @@ LongSlot.prototype.hide = function(){
     this.slices.forEach(function(s){
         s.setVisible(false);
     });
+    this.images.forEach(function(s){
+        s.setVisible(false);
+    });
     this.clear();
     this.zone.setVisible(false);
     this.displayed = false;
 };
+
+LongSlot.prototype.moveUp = function(nb){
+    this.slices.forEach(function(e){
+        e.setDepth(e.depth+nb);
+    });
+    this.texts.forEach(function(e){
+        e.setDepth(e.depth+nb);
+    });
+    this.images.forEach(function(e){
+        e.setDepth(e.depth+nb);
+    });
+    if(this.button) this.button.moveUp(nb);
+    if(this.buttons) {
+        this.buttons.forEach(function (b) {
+            b.btn.setDepth(b.btn.depth + nb);
+            b.symbol.setDepth(b.symbol.depth + nb);
+            b.ring.setDepth(b.ring.depth + nb);
+            b.zone.setDepth(b.zone.depth + nb);
+        });
+    }
+    if(this.icon) this.icon.setDepth(this.icon.depth+nb);
+    this.depth = nb;
+};
+
+export default LongSlot

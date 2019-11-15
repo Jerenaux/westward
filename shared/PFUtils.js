@@ -1,11 +1,8 @@
 /**
  * Created by Jerome on 29-09-17.
  */
-var onServer = (typeof window === 'undefined');
 
-if(onServer){
-    var Utils = require('./Utils.js').Utils;
-}
+import Utils from './Utils'
 
 var PFUtils = {
     speed: 5, // 5 tiles/sec
@@ -48,14 +45,18 @@ PFUtils.trimPath = function(path,map){
     };
 };
 
-PFUtils.buildingCollisions = function(tx,ty,w,h,collisionMap){
+PFUtils.buildingCollisions = function(tx,ty,w,h,collisionMap,flag){
     for(var x = tx; x < tx + w; x++){
         for(var y = ty; y < ty + h; y++){
-            collisionMap.add(x,y);
-            if(!onServer && Engine.debugCollisions) Engine.scene.add.rectangle((x*32)+16,(y*32)+16, 32,32, 0xffa500).setAlpha(0.7).setDepth(100);
+            if(flag == 'add'){
+                collisionMap.add(x,y);
+                // if(!onServer && Engine.debugCollisions) Engine.scene.add.rectangle((x*32)+16,(y*32)+16, 32,32, 0xffa500).setAlpha(0.7).setDepth(100);
+            }else{
+                collisionMap.delete(x,y);
+            }
         }
     }
 };
 
 
-if (onServer) module.exports.PFUtils = PFUtils;
+export default PFUtils

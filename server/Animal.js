@@ -1,37 +1,42 @@
 /**
  * Created by Jerome on 09-10-17.
  */
-"use strict";
-var Utils = require('../shared/Utils.js').Utils;
-var MovingEntity = require('./MovingEntity.js').MovingEntity;
-var NPC = require('./NPC.js').NPC;
-var GameServer = require('./GameServer.js').GameServer;
-var World = require('../shared/World.js').World;
 
-var debug = false;
+import GameObject from './GameObject'
+import GameServer from './GameServer'
+import MovingEntity from './MovingEntity'
+import NPC from './NPC'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
-function Animal(x,y,type){
-    this.id = GameServer.lastAnimalID++;
+function Animal(x,y,type,instance){
+    this.instance = (instance > -1 ? instance : -1);
+    if(this.instance > -1){
+        this.id = 't'+GameServer.instances[this.instance].nextAnimalID++;
+    }else{
+        this.id = GameServer.lastAnimalID++;
+    }
     this.isAnimal = true;
     this.battleTeam = 'Animal';
     this.entityCategory = 'Animal';
     this.updateCategory = 'animals';
+    this.sentient = false; // used in battle to know if a battle should end
     this.battlePriority = 2;
     this.x = x;
     this.y = y;
 
     this.type = type;
-    var animalData = GameServer.animalsData[this.type];
+    var animalData = GameServer.getAnimalData(this.type);
 
     this.cellsWidth = animalData.width || 1;
     this.cellsHeight = animalData.height || 1;
+
     this.xpReward = animalData.xp || 0;
     this.name = animalData.name;
     this.setAggressive();
     this.setWander();
     this.setStartingStats(animalData.stats);
     this.setLoot(animalData.loot);
-    //this.setOrUpdateAOI();
     this.setIdle();
     NPC.call(this);
 }
@@ -41,7 +46,8 @@ Animal.prototype.constructor = Animal;
 
 Animal.prototype.setAggressive = function(){
     // Different from global aggro parameter, specifies if this specific animal should be aggressive pr not
-    this.aggressive =  GameServer.animalsData[this.type].aggro;
+    // this.aggressive =  GameServer.animalsData[this.type].aggro;
+    this.aggressive = GameServer.getAnimalData(this.type).aggro;
 
     this.aggroMatrix = {
         'Player': true,
@@ -55,8 +61,13 @@ Animal.prototype.isAggressive = function(){
     return (this.aggressive && GameServer.enableAnimalAggro);
 };
 
+Animal.prototype.canRange = function(){
+    return false;
+};
+
 Animal.prototype.setWander = function(){
-    this.wander =  GameServer.animalsData[this.type].wander;
+    // this.wander =  GameServer.animalsData[this.type].wander;
+    this.wander =  GameServer.getAnimalData(this.type).wander;
 };
 
 Animal.prototype.doesWander = function(){
@@ -76,7 +87,8 @@ Animal.prototype.trim = function(){
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    return trimmed;
+    // return trimmed;
+    return GameObject.prototype.trim.call(this,trimmed);
 };
 
 Animal.prototype.endFight = function(alive){
@@ -103,4 +115,4 @@ Animal.prototype.remove = function(){
     delete GameServer.animals[this.id];
 };
 
-module.exports.Animal = Animal;
+export default Animal

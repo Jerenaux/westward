@@ -1,14 +1,40 @@
 {
   "0":{
+    "name": "Civ Warrior",
     "stats": {
-      "hpmax": 130,
-      "hp": 130,
-      "def": 7,
-      "dmg": 3
+      "hpmax": 100,
+      "hp": 100,
+      "def": 6,
+      "dmg": 11
     },
     "xp": 50,
+    "equipment":{
+      "meleew": 7
+    },
     "loot":{
-      "43": 1
+      "21":[1,0.2],
+      "43":[1,0.3]
+    }
+  },
+  "1":{
+    "name": "Civ Archer",
+    "stats": {
+      "hpmax": 80,
+      "hp": 80,
+      "def": 5,
+      "dmg": 15,
+      "acc": 40
+    },
+    "xp": 60,
+    "equipment":{
+      "meleew": 7,
+      "rangedw": 2,
+      "range_container": 19,
+      "range_ammo": [20,5]
+    },
+    "loot":{
+      "21":[1,0.6],
+      "43":[1,0.3]
     }
   }
 }

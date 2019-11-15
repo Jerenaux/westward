@@ -2,20 +2,23 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 29-03-18.
  */
 
-var GameObject = require('./GameObject.js').GameObject;
-var GameServer = require('./GameServer.js').GameServer;
+import GameObject from './GameObject'
+import GameServer from './GameServer'
 
-function Item(x,y,type){
+function Item(x,y,type,instance){
+    this.instance = (instance > -1 ? instance : -1);
     this.updateCategory = 'items';
     this.entityCategory = 'Item';
     this.id = GameServer.lastItemID++;
     this.isPlayer = false;
     this.isAnimal = false;
+    this.respawns = false;
     this.x = x;
     this.y = y;
+    this.cellsWidth = 1;
+    this.cellsHeight = 1;
     this.type = type;
     this.setOrUpdateAOI();
-    GameServer.itemPositions.add(this.x,this.y,this);
 }
 
 Item.prototype = Object.create(GameObject.prototype);
@@ -27,6 +30,10 @@ Item.prototype.setSpawnZone = function(zone){
 
 Item.prototype.isAvailableForFight = function(){return false};
 
+Item.prototype.setRespawnable = function(){
+    this.respawns = true;
+};
+
 Item.prototype.trim = function() {
     var trimmed = {};
     var broadcastProperties = ['id', 'type']; // list of properties relevant for the client
@@ -35,15 +42,30 @@ Item.prototype.trim = function() {
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    return trimmed;
+    // return trimmed;
+    return GameObject.prototype.trim.call(this,trimmed);
 };
 
 Item.prototype.remove = function(){
     if(this.spawnZone) this.spawnZone.decrement('item',this.type);
     delete GameServer.items[this.id];
-    GameServer.itemPositions.delete(this.x,this.y,this);
+    if(this.respawns) GameServer.itemsToRespawn.push({
+        x: this.x,
+        y: this.y,
+        type: this.type,
+        stamp: Date.now()
+    });
+};
+
+Item.prototype.getRect = function(){
+    return {
+        x: this.x,
+        y: this.y,
+        w: this.cellsWidth,
+        h: this.cellsHeight
+    }
 };
 
 Item.prototype.canFight = function(){return false;};
 
-module.exports.Item = Item;
+export default Item

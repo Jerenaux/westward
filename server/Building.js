@@ -1,110 +1,149 @@
 /**
  * Created by Jerome on 05-10-17.
  */
-var GameObject = require('./GameObject.js').GameObject;
-var GameServer = require('./GameServer.js').GameServer;
 var Formulas = require('../shared/Formulas.js').Formulas;
-var Utils = require('../shared/Utils.js').Utils;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
-var Inventory = require('../shared/Inventory.js').Inventory;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
+var Models = require('../shared/models.js');
+
+import FightingEntity from './FightingEntity'
+import GameObject from './GameObject'
+import GameServer from './GameServer'
+import Inventory from '../shared/Inventory'
+import PFUtils from '../shared/PFUtils'
+import {SpaceMap} from '../shared/SpaceMap'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
 function Building(data){
+    FightingEntity.call(this);
     this.isBuilding = true;
     this.battleTeam = 'Player';
     this.entityCategory = 'Building';
     this.updateCategory = 'buildings';
+    this.sentient = false; // used in battle to know if a battle should end
     this.schemaModel = GameServer.BuildingModel;
     this.battlePriority = 3;
 
+    this.instance = data.instance > -1 ? data.instance : -1;
+
     this.id = -1;
-    if(data.id > -1){
+    if(data.id !== undefined){
         this.id = data.id;
-        GameServer.lastBuildingID = Math.max(GameServer.lastBuildingID,this.id);
+        if(this.id[0] != "t") GameServer.lastBuildingID = Math.max(GameServer.lastBuildingID,this.id);
     }else{
         this.id = ++GameServer.lastBuildingID;
     }
 
-    this.x = data.x;
-    this.y = data.y;
+    this.x = Utils.clamp(data.x,0,World.worldWidth-1);
+    this.y = Utils.clamp(data.y,0,World.worldHeight-1);
+    // console.warn('XY',data.x,data.y,this.x,this.y);
 
     this.type = data.type;
-    var buildingData = GameServer.buildingsData[this.type];
-    //this.width = Math.ceil(buildingData.width/World.tileWidth);
-    //this.height = Math.ceil(buildingData.height/World.tileHeight);
+    if(this.type === undefined) console.warn('Undefined building type');
 
-    /*var coll = buildingData.collisions;
-    this.coll = coll;
-    this.xoffset = coll.x;
-    this.entrance = buildingData.entrance;
-    this.cellsWidth = coll.w;
-    this.cellsHeight = coll.h;*/
+    var buildingData = GameServer.buildingsData[this.type];
+    this.aggro = buildingData.aggro;
     this.cellsWidth = buildingData.base.width;
     this.cellsHeight = buildingData.base.height;
-    this.coll = {
-        x: this.x,
-        y: this.y - this.cellsHeight,
-        w: this.cellsWidth,
-        h: this.cellsHeight
-    };
+
+    this.computeSurroundingArea(); // put in `embed`, after collisions have been computed?
 
     this.shootFrom = buildingData.shootFrom;
 
-    this.owner = data.owner;
+    this.owner = data.owner; // owner ID
     this.ownerName = data.ownerName || 'John Doe';
     this.skipBattleTurn = !buildingData.canFight;
     this.name = buildingData.name;
-    this.civBuilding = (this.sid == -1);
-    if(this.civBuilding) this.battleTeam = 'Civ';
-    this.entityCategory = (this.civBuilding ? 'CivBuilding' : 'PlayerBuilding');
-    if(!this.civBuilding) this.settlement = GameServer.settlements[this.sid];
     this.inventory = new Inventory(GameServer.buildingParameters.inventorySize);
     if(data.inventory) this.inventory.fromList(data.inventory);
+
+    var region = GameServer.getRegion(this);
+    this.inventory.toList().forEach(function(itm){
+        GameServer.createItem(itm[0],itm[1],region,'building inventory DB');
+    });
+
     this.prices = data.prices || {};
+    for(var item in this.prices){
+        GameServer.marketPrices.add(item,this.prices[item].sell);
+    }
+    if(this.type == 4){
+        var defaultPrices = GameServer.getDefaultPrices();
+        for(var item in defaultPrices){
+            if(!this.prices.hasOwnProperty(item)) this.prices[item] = defaultPrices[item];
+        }
+    }
+
     this.setGold(data.gold || 0);
     this.built = !!data.built;
+    this.civ = data.civ;
+    if(this.civ) this.campID = data.campID;
+    if(this.civ) this.battleTeam = 'Civ';
+    this.entityCategory = (this.civ ? 'CivBuilding' : 'PlayerBuilding');
+
     this.progress = data.progress || 0;
-    this.isWorkshop = buildingData.workshop;
+
+    var production = GameServer.buildingsData[this.type].production;
+    if(production){
+        this.prodCountdowns = {};
+        for(var i = 0; i < production.length; i++){
+            var item = production[i][0];
+            this.prodCountdowns[item] = 0;
+        }
+    }
+    this.setProperty('prodCountdowns',this.prodCountdowns);
 
     this.newitems = new Inventory(GameServer.buildingParameters.inventorySize);
 
     this.inFight = false;
     this.stats = new StatsContainer();
-    this.stats['hp'].setBaseValue(buildingData.health);
-    this.stats['hpmax'].setBaseValue(buildingData.health);
-    // TODO: move to JSON
-    this.stats['def'].setBaseValue(20);
-    this.stats['acc'].setBaseValue(1000);
-    this.stats['dmg'].setBaseValue(buildingData.dmg || 0);
-    this.productivity = 100;
-    this.committed = 0;
-    this.commitStamps = data.commitStamps || [];
+    this.getStat('hp').setBaseValue(buildingData.stats.health,true); // true = force
+    this.getStat('hpmax').setBaseValue(buildingData.stats.health);
+    this.getStat('def').setBaseValue(buildingData.stats.def);
+    this.getStat('acc').setBaseValue(buildingData.stats.acc || 0);
+    this.getStat('dmg').setBaseValue(buildingData.stats.dmg || 0);
+
+    if(data.stats) {
+        data.stats.forEach(function (stat) {
+            var s = this.getStat(stat.stat);
+            if(s) s.setBaseValue(stat.value);
+        }, this);
+    }
+    if(!this.built) this.stats['hp'].setBaseValue(0);
+
+    this.aggroMatrix = {
+        'Player': false,
+        'Animal': false,
+        'Civ': true,
+        'PlayerBuilding': false
+    };
 }
 
-Building.prototype = Object.create(GameObject.prototype);
+Building.prototype = Object.create(FightingEntity.prototype);
 Building.prototype.constructor = Building;
-
+/**
+ * Called for both player and civ buildings
+ */
 Building.prototype.embed = function(){
     GameServer.buildings[this.id] = this;
-    this.onAddAtLocation();
+    if(this.campID > -1) GameServer.camps[this.campID].addBuilding(this);
     this.setOrUpdateAOI();
-    this.addCollisions();
-    //this.registerBuilding();
-    this.updateBuild();
+    this.setCollisions('add');
+    this.region = GameServer.getRegion(this);
+    GameServer.regions[this.region].addBuilding(this);
+    if(!this.civ) this.updateBuild();
+};
+
+Building.prototype.isInstanced = function(){
+    return this.instance > -1;
 };
 
 Building.prototype.getShortID = function(){
     return 'B'+this.id;
 };
 
-/*Building.prototype.registerBuilding = function(){
-    if(this.civBuilding) return;
-    this.settlement.registerBuilding(this);
-    if(this.type == 0){ // fort
-        this.settlement.registerFort(this);
-        this.refreshListing();
-    }
-};*/
+Building.prototype.isAggressive = function(){
+    return this.aggro;
+};
 
 Building.prototype.refreshListing = function(){
     this.buildings = this.settlement.getBuildings();
@@ -123,22 +162,6 @@ Building.prototype.computeProductivity = function(){
 
 Building.prototype.setGold = function(gold){
     this.gold = gold;
-};
-
-Building.prototype.addCommit = function(){
-    this.commitStamps.push(1);
-    this.updateNbCommitted();
-};
-
-Building.prototype.updateCommitment = function(){
-    if(!GameServer.isTimeToUpdate('commitment')) return false;
-    this.commitStamps = [];
-    this.updateNbCommitted();
-};
-
-Building.prototype.updateNbCommitted = function(){
-    this.setProperty('committed',this.commitStamps.length);
-    this.computeProductivity();
 };
 
 Building.prototype.update = function(){
@@ -161,70 +184,122 @@ Building.prototype.dispatchStock = function(){
     this.newitems.clear();
 };
 
-Building.prototype.updateProd = function(){
+Building.prototype.updateProd = function(justBuilt){
     var production = GameServer.buildingsData[this.type].production;
     if(!production) return false;
     var produced = 0;
+    var updateCountdowns = false;
     for(var i = 0; i < production.length; i++){
         var item = production[i][0];
         var baseNb = production[i][1];
         var turns = production[i][2];
         var cap = production[i][3];
-        if(!GameServer.haveNbTurnsElapsed(turns)) continue;
-        var increment = Formulas.computeProdIncrement(Formulas.pctToDecimal(this.productivity),baseNb);
+        var remainingTurns = GameServer.elapsedTurns%turns;
         var current = this.getItemNb(item);
+
+        var countdown = (current < cap ? turns - remainingTurns : 0);
+        if(this.prodCountdowns[item] != countdown){
+            this.prodCountdowns[item] = countdown;
+            updateCountdowns = true;
+        }
+
+        if(remainingTurns > 0 || justBuilt) continue;
+
+        var increment = baseNb;
+        if(this.hasItem(1,1)) increment *= 2;
+
         if(current >= cap) continue;
         var actualNb = Math.min(increment,cap-current);
         if(actualNb) {
             this.giveItem(item,actualNb);
+            var msg = actualNb+' '+GameServer.itemsData[item].name+' was produced';
+            GameServer.notifyPlayer(this.owner,msg);
             produced += actualNb;
+            if(this.hasItem(1,1)){
+                this.takeItem(1,1);
+                GameServer.destroyItem(1,1,this.region, 'building food consumption');
+                GameServer.regions[this.region].event('consumefood');
+            }
         }
+
     }
+    if(updateCountdowns) this.setProperty('prodCountdowns',this.prodCountdowns);
     return (produced > 0);
 };
-
-/*Building.prototype.updateBuild = function(){
-    if(!GameServer.isTimeToUpdate('build')) return false;
-    var rate = GameServer.buildingsData[this.type].buildRate; // Base progress increase per turn, before factoring productivity in
-    if(!rate) return;
-    var increment = Formulas.computeBuildIncrement(Formulas.pctToDecimal(this.productivity),rate);
-    console.log('Building ',increment,'%');
-    this.setProperty('progress',Utils.clamp(this.progress+increment,this.progress,100));
-    if(this.progress == 100) this.setProperty('built',true);
-};*/
 
 Building.prototype.updateBuild = function(){
     if(this.built) return;
     var buildingData = GameServer.buildingsData[this.type];
     var recipe = buildingData.recipe;
     for(var item in recipe){
-        //console.log(this.hasItem(item,recipe[item]));
         if(!this.hasItem(item,recipe[item])) return false;
     }
-    this.setProperty('built',true);
     for(var item in recipe){
         this.takeItem(item,recipe[item]);
+        GameServer.destroyItem(item,recipe[item],this.region,'building');
     }
+    this.setBuilt();
     return true;
 };
 
-/*Building.prototype.repair = function(){
-    if(!GameServer.isTimeToUpdate('build')) return;
-    var maxHealth = this.getStat('hpmax').getValue();
-    var health = this.getStat('hp').getValue();
-    if(health == maxHealth) return;
-    var rate = GameServer.buildingsData[this.type].buildRate; // Base progress increase per turn, before factoring productivity in
-    if(!rate) return;
-    var increment = Formulas.computeBuildIncrement(Formulas.pctToDecimal(this.productivity),rate);
-    increment = Math.round((increment/100)*maxHealth);
-    var newHealth = Utils.clamp(health+increment,health,maxHealth);
-    this.getStat('hp').setBaseValue(newHealth);
-};*/
+Building.prototype.updateRepair = function(){
+    if(!this.built) return;
+    var delta = this.getStat('hpmax').getValue() - this.getStat('hp').getValue();
+    if(delta == 0) return;
+    var TIMBER = 3;
+    var recipe = GameServer.buildingsData[this.type].recipe;
+    var timberTotal = (TIMBER in recipe ? recipe[TIMBER] : 20); // todo: improve
+    var hpPerTimber = Math.ceil(this.getStat('hpmax').getValue()/timberTotal);
+    var maxTimber = Math.ceil(delta/hpPerTimber);
+    var nb = Utils.clamp(this.getItemNb(TIMBER),0,maxTimber);
+    this.takeItem(TIMBER, nb);
+    this.getStat('hp').increment(nb*hpPerTimber);
+    this.refreshStats();
+    GameServer.destroyItem(TIMBER,nb,this.region,'repair');
+};
 
-Building.prototype.toggleBuild = function(){
-    this.setProperty('built',!this.built);
-    this.setProperty('progress',(this.built ? 100 : 0));
-    this.getStat('hp').setBaseValue(this.getStat('hpmax').getBaseValue());
+Building.prototype.setBuilt = function(){
+    this.setProperty('built',true);
+    this.updateProd(true); //true =  built just now
+    this.stats['hp'].setBaseValue(this.stats['hpmax'].getValue());
+    this.refreshStats();
+    this.save();
+    if(!this.civ) {
+        var phrase = ['Construction of ', this.name, ' finished'];
+        GameServer.notifyPlayer(this.owner, phrase.join(' '));
+    }
+    GameServer.regions[this.region].event('build',GameServer.players[this.owner] || null); // TODO: work out better way
+    GameServer.computeFrontier(true);
+};
+
+Building.prototype.destroy = function(attacker){
+    this.setProperty('built',false);
+    if(this.civ){
+        GameServer.setFlag('buildingsMarkers');
+        GameServer.regions[this.region].event('destroycivhut',attacker);
+    }else{
+        GameServer.notifyPlayer(this.owner,'Your '+this.name+' was destroyed');
+    }
+    this.save();
+    GameServer.updateSZActivity();
+    GameServer.computeFrontier(true);
+};
+
+Building.prototype.isBuilt = function(){
+    return this.built;
+};
+
+Building.prototype.isWorkshop = function(){
+    return this.type == 3;
+};
+
+Building.prototype.applyDamage = function(dmg){
+    FightingEntity.prototype.applyDamage.call(this,dmg);
+    this.refreshStats();
+};
+
+Building.prototype.refreshStats = function(){
+    this.setProperty('statsUpdate',this.stats.toList());
 };
 
 Building.prototype.addBuilding = function(building){
@@ -237,8 +312,8 @@ Building.prototype.updateBuildings = function(){
 };
 
 Building.prototype.getPrice = function(item,nb,action){
-    var key = (action == 'sell' ? 0 : 1);
-    return parseInt(this.prices[item][key])*nb;
+    if(!this.prices.hasOwnProperty(item)) return 0;
+    return parseInt(this.prices[item][action])*nb;
 };
 
 Building.prototype.canBuy = function(item,nb,isFinancial){ // check if building has gold and room
@@ -247,7 +322,7 @@ Building.prototype.canBuy = function(item,nb,isFinancial){ // check if building 
         return false;
     }
     if(isFinancial == false) return true;
-    if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item][0]) == 0){
+    if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item].buy) == 0){
         console.log('Error: building does not buy this item');
         return false;
     }
@@ -264,11 +339,15 @@ Building.prototype.canSell = function(item,nb,isFinancial){
         return false;
     }
     if(!isFinancial) return true;
-    if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item][1]) == 0){
+    if(!this.prices.hasOwnProperty(item) || parseInt(this.prices[item].sell) == 0){
         console.log('Error: building does not sell this item');
         return false;
     }
     return true;
+};
+
+Building.prototype.listItems = function(){
+    return this.inventory.items;
 };
 
 Building.prototype.getItemNb = function(item){
@@ -299,7 +378,10 @@ Building.prototype.setItem = function(item,nb){
 };
 
 Building.prototype.setPrices = function(item,buy,sell){
-    this.prices[item] = [parseInt(buy),parseInt(sell)];
+    buy = Utils.clamp(parseInt(buy),0,999) || 0;
+    sell = Utils.clamp(parseInt(sell),0,999) || 0;
+    this.prices[item] = {buy:buy,sell:sell};
+    this.setProperty('prices',this.prices);
 };
 
 Building.prototype.getGold = function(){
@@ -316,28 +398,28 @@ Building.prototype.takeGold = function(nb){
 
 Building.prototype.remove = function(){
     // TODO: keep track of players inside, and make them leave first
+    this.setCollisions('remove');
     delete GameServer.buildings[this.id];
-    this.settlement.removeBuilding(this);
 };
 
 // Save changes to DB
-Building.prototype.save = function(){
-    if(this.civBuilding) return; // todo: remove
+/*Building.prototype.save = function(){
     GameObject.prototype.save.call(this);
-};
+};*/
 
 // Returns an object containing only the fields relevant for the client to display in the game
 Building.prototype.trim = function(){
     var trimmed = {};
-    var broadcastProperties =
-        ['id','type','gold','prices','built','productivity','owner','ownerName']; // list of properties relevant for the client
-    for(var p = 0; p < broadcastProperties.length; p++){
-        trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
+    for(var field in Models.BuildingModel){
+        trimmed[field] = this[field];
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
     if(this.inventory.size > 0) trimmed.inventory = this.inventory.toList();
-    return trimmed;
+    trimmed.prodCountdowns = this.prodCountdowns;
+    trimmed.statsUpdate = this.stats.toList();
+    // return trimmed;
+    return GameObject.prototype.trim.call(this,trimmed);
 };
 
 // Returns an object containing only the fields relevant to list buildings
@@ -356,7 +438,7 @@ Building.prototype.listingTrim = function(){
 // Returns an object containing only the fields relevant to display on map
 Building.prototype.mapTrim = function(){
     var trimmed = {};
-    var broadcastProperties = ['type'];
+    var broadcastProperties = ['type','owner','ownerName','civ'];
     for(var p = 0; p < broadcastProperties.length; p++){
         trimmed[broadcastProperties[p]] = this[broadcastProperties[p]];
     }
@@ -365,39 +447,22 @@ Building.prototype.mapTrim = function(){
     return trimmed;
 };
 
-Building.prototype.addCollisions = function(){
-    //PFUtils.buildingCollisions(this.x,this.y,GameServer.buildingsData[this.type],GameServer.collisions);
-    PFUtils.buildingCollisions(this.x,this.y-this.cellsHeight,this.cellsWidth,this.cellsHeight,GameServer.collisions);
+Building.prototype.setCollisions = function(flag){
+    PFUtils.buildingCollisions(this.x,this.y-this.cellsHeight,this.cellsWidth,this.cellsHeight,GameServer.collisions,flag);
 };
 
-Building.prototype.travelOccupiedCells = function(action){
-    for(var x = -1; x <= this.cellsWidth; x++){
-        for(var y = 0; y <= this.cellsHeight+1; y++) {
-            var realx = this.x + this.coll.x + x;
-            var realy = this.y + this.coll.y + y;
-            GameServer.positions[action](realx,realy,this);
+Building.prototype.computeSurroundingArea = function(){
+    this.surroundingArea = new SpaceMap();
+    var rect = this.getRect();
+    for(var x = rect.x - 1; x < rect.x + rect.w + 1; x++){
+        for(var y = rect.y - 1; y < rect.y + rect.h + 1; y++) {
+            if(!GameServer.checkCollision(x,y)) this.surroundingArea.add(x,y);
         }
     }
 };
 
-Building.prototype.getBattleAreaAround = function(cells){
-    cells = cells || new SpaceMap();
-
-    for(var x = -1; x <= this.cellsWidth; x++){
-        for(var y = -1; y <= this.cellsHeight+1; y++) {
-            var realx = this.x + this.coll.x + x;
-            var realy = this.y + this.coll.y + y;
-            if(!GameServer.checkCollision(realx,realy)) cells.add(realx,realy);
-        }
-    }
-    return cells;
-};
-
-Building.prototype.getCenter = function(){
-    return {
-        x: this.x + (this.entrance ? this.entrance.x : 0),
-        y: this.y + (this.entrance ? this.entrance.y : 0)
-    };
+Building.prototype.getBattleAreaAround = function(){
+    return this.surroundingArea;
 };
 
 Building.prototype.canFight = function(){return true;};
@@ -410,14 +475,6 @@ Building.prototype.isAvailableForFight = function() {
     return (!this.isDestroyed() && !this.isInFight() && GameServer.buildingParameters.canfight);
 };
 
-Building.prototype.isInFight = function(){
-    return this.inFight;
-};
-
-Building.prototype.endFight = function(){
-    this.inFight = false;
-};
-
 Building.prototype.canRange = function(){
     return true;
 };
@@ -428,33 +485,10 @@ Building.prototype.decreaseAmmo = function(){
 };
 
 Building.prototype.decideBattleAction = function(){
+    if(!this.battle) return;
     if(!this.target || !this.target.isInFight()) this.target = this.selectTarget();
     var data = (this.target ? this.attackTarget() : {action: 'pass'});
     this.battle.processAction(this,data);
-};
-
-Building.prototype.isSameTeam = function(f){
-    return this.battleTeam == f.battleTeam;
-};
-
-Building.prototype.selectTarget = function(){
-    var fighters = this.battle.fighters.slice();
-    if(fighters.length == 0) return null;
-    var target = null;
-    for(var i = 1; i < fighters.length; i++){
-        var f = fighters[i];
-        if(this.isSameTeam(f)) continue;
-        if(!target){
-            target = f;
-            continue;
-        }
-        if(target.battlePriority == f.battlePriority){
-            if(f.getHealth() < target.getHealth()) target = f;
-        }else{
-            if(f.battlePriority < target.battlePriority) target = f;
-        }
-    }
-    return target;
 };
 
 Building.prototype.attackTarget = function(){
@@ -464,27 +498,8 @@ Building.prototype.attackTarget = function(){
     };
 };
 
-// ### Stats ###
-
-Building.prototype.applyDamage = function(dmg){
-    this.getStat('hp').increment(dmg);
-    // TODO: broadcast
-};
-
-Building.prototype.getHealth = function(){
-    return this.getStat('hp').getValue();
-};
-
-Building.prototype.getStat = function(key){
-    return this.stats[key];
-};
-
-Building.prototype.getStats = function(){
-    return Object.keys(this.stats);
-};
-
-Building.prototype.die = function(){
-    this.toggleBuild();
+Building.prototype.die = function(attacker){
+    this.destroy(attacker);
 };
 
 Building.prototype.isDead = function(){
@@ -493,18 +508,34 @@ Building.prototype.isDead = function(){
 
 Building.prototype.getRect = function(){
     return {
-        x: this.x + this.xoffset,
+        x: this.x,
         y: this.y - this.cellsHeight,
         w: this.cellsWidth,
         h: this.cellsHeight
     }
 };
-
-Building.prototype.getShootingPoint = function(){
+// Where to target projectiles at
+Building.prototype.getTargetCenter = function(){
     return {
-        x: this.x + Math.round(this.shootFrom.x/32),
-        y: this.y - (this.height-Math.round(this.shootFrom.y/32))
+        x: this.x + this.cellsWidth / 2,
+        y: this.y - this.cellsHeight / 2
     };
 };
 
-module.exports.Building = Building;
+// Central tile for pathfinding and such
+Building.prototype.getLocationCenter = function(){
+    return {
+        x: Math.floor(this.x + this.cellsWidth / 2),
+        y: this.y // Return a cell in front, so no collision
+    };
+};
+
+// Returns shootingPoint in tiles
+Building.prototype.getShootingPoint = function(){
+    return {
+        x: this.x + Math.round(this.shootFrom.x/32),
+        y: this.y + Math.round(this.shootFrom.y/32)
+    };
+};
+
+export default Building

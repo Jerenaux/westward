@@ -1,16 +1,18 @@
 /**
  * Created by Jerome on 29-11-17.
  */
-
+import UI from './UI'
 
 var ItemSprite = new Phaser.Class({
 
-    Extends: CustomSprite,
+    Extends: Phaser.GameObjects.Sprite,
 
     initialize: function ItemSprite (x,y) {
         x = x || 0;
         y = y || 0;
-        CustomSprite.call(this, UI.scene, x, y, '');
+        Phaser.GameObjects.Sprite.call(this, UI.scene, x, y, '');
+        UI.scene.add.displayList.add(this);
+        UI.scene.add.updateList.add(this);
 
         this.setScrollFactor(0);
         this.setInteractive();
@@ -27,9 +29,7 @@ var ItemSprite = new Phaser.Class({
         this.setOrigin(0.5);
 
         this.itemID = id;
-        this.name = data.name;
-        this.desc = data.desc;
-        this.effects = data.effects;
+        this.slot = data.slot;
         this.disabled = false;
         if(callback) {
             this.off('pointerup');
@@ -53,8 +53,14 @@ var ItemSprite = new Phaser.Class({
     },
 
     handleOver: function(){
-        if(this.showTooltip) UI.tooltip.updateInfo(this.name,this.desc,this.itemID);
-        console.log(this.itemID);
-        //console.log(this.itemCallback);
+        if(this.showTooltip) {
+            if(this.itemID == -1){
+                UI.tooltip.updateInfo('slot', {slot: this.slot});
+            }else {
+                UI.tooltip.updateInfo('item', {id: this.itemID});
+            }
+        }
     }
 });
+
+export default ItemSprite

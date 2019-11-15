@@ -2,7 +2,11 @@
  * Created by Jerome on 30-06-17.
  */
 
-Client = {
+import Boot from './Boot'
+import Engine from './Engine'
+import UI from './UI'
+
+var Client = {
     initEventName: 'init', // name of the event that triggers the call to initWorld() and the initialization of the game
     storageIDKey: 'playerID', // key in localStorage of player ID
     eventsQueue : [] // when events arrive before the flag playerIsInitialized is set to true, they are not processed
@@ -12,7 +16,7 @@ Client.socket = io.connect();
 
 Client.emptyQueue = function(){ // Process the events that have been queued during initialization
     for(var e = 0; e < Client.eventsQueue.length; e++){
-        onevent.call(Client.socket,Client.eventsQueue[e]);
+        Client.socket.onevent.call(Client.socket,Client.eventsQueue[e]);
     }
 };
 
@@ -26,6 +30,7 @@ Client.requestData = function(){ // request the data to be used for initWorld()
     var onevent = Client.socket.onevent;
     Client.socket.onevent = function (packet) {
         if(!Engine.playerIsInitialized && packet.data[0] != Client.initEventName && packet.data[0] != 'dbError'){
+            console.warn('queueing ',packet.data[0]);
             Client.eventsQueue.push(packet);
         }else{
             onevent.call(this, packet);    // original call
@@ -36,12 +41,19 @@ Client.requestData = function(){ // request the data to be used for initWorld()
 Client.getInitRequest = function(){ // Returns the data object to send to request the initialization data
     // In case of a new player, set new to true and send the name of the player
     // Else, set new to false and send it's id instead to fetch the corresponding data in the database
+    if(Client.tutorial){
+        return {
+            new: true,
+            tutorial:true
+        };
+    }
     if(Client.isNewPlayer()) {
         console.log('Requesting data for new player');
         return {
             new:true,
+            tutorial: false,
             selectedClass: UI.selectedClass,
-            selectedSettlement: UI.selectedSettlement,
+            selectedRegion: UI.selectedSettlement,
             characterName: UI.characterName
         };
     }
@@ -66,8 +78,11 @@ Client.checkForNewPlayer = function(){
 };
 
 Client.isNewPlayer = function(){
-    if(Client.gameConfig.boot.forceNewPlayer) return true;
-    return Client.newPlayer;
+    if(Client.gameConfig) {
+        if(Client.gameConfig.boot.forceNewPlayer) return true;
+        return Client.newPlayer;
+    }
+    console.error('Missing Client.gameConfig');
 };
 
 Client.getPlayerID = function(){
@@ -75,7 +90,6 @@ Client.getPlayerID = function(){
 };
 
 Client.isFirstBattle = function(){
-    return true;
     return !localStorage.getItem('firstBattle');
 };
 
@@ -88,9 +102,11 @@ Client.hadFirstBattle = function(){
 Client.socket.on(Client.initEventName,function(data){ // This event triggers when receiving the initialization packet from the server, to use in Game.initWorld()
     console.log('Init packet received');
     //if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.initializationSchema); // if in binary format, decode first
-    Client.socket.emit('ponq',data.stamp); // send back a pong stamp to compute latency
+    // Client.socket.emit('ponq',data.stamp); // send back a pong stamp to compute latency
+    Client.serverTimeDelta = data.refTime - Date.now();
     Engine.initWorld(data.player);
     //Game.updateNbConnected(data.nbconnected);
+    console.log(Client.serverTimeDelta,'time delta');
 });
 
 Client.socket.on('wait',function(){
@@ -99,8 +115,8 @@ Client.socket.on('wait',function(){
     setTimeout(Client.requestData, 500); // Just try again in 500ms
 });
 
-Client.socket.on('settlement-data',function(data){
-    UI.displaySettlements(data);
+Client.socket.on('region-data',function(data){
+    UI.displayRegions(data);
 });
 
 Client.socket.on('camps-data',function(data){
@@ -126,6 +142,7 @@ Client.socket.on('update',function(data){ // This event triggers uppon receiving
     if(data.global) console.log(data.global);
     if(data.local) Engine.updateSelf(data.local); // Should come first
     if(data.global) Engine.updateWorld(data.global);
+    if(data.qt) Engine.debugQT(data.qt);
     Engine.currentTurn = data.turn;
 });
 
@@ -141,8 +158,8 @@ Client.setLocalData = function(id){ // store the player ID in localStorage
 
 /// ##### SENDERS ######
 
-Client.requestSettlementData = function(){
-    Client.socket.emit('settlement-data');
+Client.requestRegionsData = function(){
+    Client.socket.emit('region-data');
 };
 
 Client.requestCampsData = function(){
@@ -170,17 +187,22 @@ Client.sendCraft = function(id,nb,stock){
     Client.socket.emit('craft',{id:id,nb:nb,stock:stock});
 };
 
-Client.sendPurchase = function(id,nb, action){
-    Client.socket.emit('shop',{id:id,nb:nb,action:action});
+Client.sendPurchase = function(id,nb, action, financial){
+    Client.socket.emit('shop',{id:id,nb:nb,action:action,financial:financial});
 };
 
 Client.sendStock  = function(item,nb,building,action){
     Client.socket.emit('stock',{item:item,nb:nb,building:building,action:action});
 };
 
-Client.sendUse = function(id){
-    Client.socket.emit('use',{item:id});
+Client.sendUse = function(id, inventory){
+    Client.socket.emit('use',{item:id, inventory:inventory});
 };
+
+Client.sendBelt = function(id, inventory){
+    Client.socket.emit('belt',{item:id, inventory:inventory});
+};
+
 
 Client.sendUnequip = function(slot,subslot){
     Client.socket.emit('unequip',{slot:slot,subslot:subslot});
@@ -194,19 +216,45 @@ Client.sendBuild = function(id,tile){
     Client.socket.emit('build',{id:id,tile:tile});
 };
 
-Client.sendCommit = function(){
-    Client.socket.emit('commit');
+Client.setPrices = function(id,buy,sell){
+    Client.socket.emit('prices',{item:id,buy:buy,sell:sell});
+};
+
+Client.exchangeGold = function(nb){
+    Client.socket.emit('gold',{nb:nb});
 };
 
 Client.sendChat = function(text){
-    console.log('sending',text);
     Client.socket.emit('chat',text);
+};
+
+Client.sendAbility = function(aid){
+    Client.socket.emit('ability',aid);
 };
 
 Client.sendRespawn = function(){
     Client.socket.emit('respawn');
 };
 
+Client.logMenu = function(menu){
+    Client.socket.emit('menu',menu);
+};
+
+Client.logMisc = function(misc){
+    Client.socket.emit('logmisc',misc);
+};
+
+Client.sendTutorialStart = function(){
+    Client.socket.emit('tutorial-start');
+};
+
+Client.sendTutorialStep = function(step){
+    Client.socket.emit('tutorial-step',step);
+};
+
+Client.sendTutorialEnd = function(){
+    Client.socket.emit('tutorial-end');
+};
 // ####################"
 
 Client.sendMapData = function(id,data){
@@ -216,3 +264,5 @@ Client.sendMapData = function(id,data){
 Client.sendScreenshot = function(image,browser){
     Client.socket.emit('screenshot',{img:image,browser:browser});
 };
+
+export default Client;

@@ -1,78 +1,88 @@
+console.log(require('dotenv').config());
 var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var bodyParser = require("body-parser");
 var io = require('socket.io').listen(server);
-var fs = require('fs');
 var path = require('path');
+var osutils = require('os-utils');
 
 var quickselect = require('quickselect'); // Used to compute the median for latency
-var mongo = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
-var crypto = require('crypto');
-var jwt = require('jsonwebtoken');
 var myArgs = require('optimist').argv;
 
-// TODO: move to separate file
-var userSchema = mongoose.Schema({
-    name: {type: String, required: true},
-    hash: {type: String, required: true},
-    salt: {type: String, required: true}
+console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
+
+import GameServer from './server/GameServer'
+GameServer.server = server;
+
+app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    next();
 });
 
-userSchema.methods.setPassword = function(password){
-    this.salt = crypto.randomBytes(16).toString('hex');
-    this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
+const corssss =  function (res, path) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With");
+        res.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+        res.setHeader("X-Powered-By", ' 3.2.1');
+        res.type("application/json");
+        res.type("jpg");
 };
 
-userSchema.methods.validatePassword = function(password) {
-    var hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
-    return this.hash === hash;
-};
+app.use('/assets',express.static('./assets', corssss));
+// app.use('/client',express.static('./client'));
+app.use('/dist',express.static('./dist'));
+// app.use('/server',express.static('./server'));
+// app.use('/shared',express.static('./shared'));
+app.use('/maps',express.static('./maps'));
+app.use('/admin',express.static('./admin'));
+app.use('/api',express.static('./admin'));
+app.use('/editor',express.static('./editor'));
 
-userSchema.methods.generateJWT = function() {
-    var today = new Date();
-    var expirationDate = new Date(today);
-    expirationDate.setDate(today.getDate() + 60);
+// app.use((req, res, next) => { //change app.all to app.use here and remove '*', i.e. the first parameter part
+//     res.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
+//     res.setHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With");
+//     res.setHeader("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+//     res.setHeader("X-Powered-By",' 3.2.1')
+//     res.type("application/json");
+//     res.type("jpg");
+//     next();
+// });
 
-    return jwt.sign({
-        name: this.name,
-        id: this._id,
-        exp: parseInt(expirationDate.getTime() / 1000, 10)
-    }, 'secret');
-};
+// app.use('/assets', express.static('upload', {
+//     setHeaders: function(res, path) {
+//         res.set("Access-Control-Allow-Origin", "*");
+//         res.set("Access-Control-Allow-Headers", "Content-Type,X-Requested-With");
+//         res.set("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+//         res.set("X-Powered-By",' 3.2.1')
+//         res.type("application/json");
+//         res.type("jpg");
+//     }
+// }));
 
-userSchema.methods.toAuthJSON = function() {
-    return {
-        _id: this._id,
-        name: this.name,
-        token: this.generateJWT()
-    };
-};
-
-mongoose.model('User', userSchema);
-require('./config/passport');
-
-var gs = require('./server/GameServer.js').GameServer;
-gs.server = server;
-
-app.use('/assets',express.static(__dirname + '/assets'));
-app.use('/client',express.static(__dirname + '/client'));
-app.use('/lib',express.static(__dirname + '/lib'));
-app.use('/server',express.static(__dirname + '/server'));
-app.use('/shared',express.static(__dirname + '/shared'));
-app.use('/maps',express.static(myArgs.maps));
-app.use('/admin',express.static(path.join(__dirname,'admin')));
-app.use('/editor',express.static(path.join(__dirname,'editor')));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
 if(process.env.DEV == 1) app.use('/studio',express.static(__dirname + '/studio'));
 
+
 app.get('/',function(req,res){
-    res.sendFile(path.join(__dirname,'index.html'));
+    res.sendFile(path.join(__dirname,'..','index.html'));
 });
 
 app.get('/admin',function(req,res){
+    res.sendFile(path.join(__dirname,'..','admin','admin.html'));
+});
+
+app.get('/api',function(req,res){
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With");
+    res.setHeader("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+    res.setHeader("X-Powered-By",' 3.2.1');
+    res.type("application/json");
+    res.type("jpg");
     res.sendFile(path.join(__dirname,'admin','admin.html'));
 });
 
@@ -80,14 +90,35 @@ app.get('/editor',function(req,res){
     res.sendFile(path.join(__dirname,'editor','index.html'));
 });
 
+app.get('/crafting',function(req,res){
+    res.sendFile(path.join(__dirname,'editor','crafting.html'));
+});
+
 var GEThandlers = {
-    //'buildings': gs.getBuildings,
-    'events': gs.getEvents,
-    'screenshots': gs.getScreenshots
+    'buildings': GameServer.getBuildings,
+    'count-items': GameServer.countItems,
+    'events': GameServer.getEvents,
+    'players': GameServer.getPlayers,
+    'screenshots': GameServer.getScreenshots
 };
 var categories = Object.keys(GEThandlers);
 
 categories.forEach(function(cat){
+    app.get('/api/' + cat, function (req, res) {
+        console.log('[ADMIN] requesting ' + cat);
+        if(!(cat in GEThandlers)) return;
+        GEThandlers[cat](function(data){
+            if (data.length == 0) {
+                res.status(204).end();
+            } else {
+                // res.setHeader('Access-Control-Allow-Origin', '*');
+                // res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200).send(data).end();
+            }
+        });
+    });
+    // TODO: redundant
     app.get('/admin/' + cat, function (req, res) {
         console.log('[ADMIN] requesting ' + cat);
         if(!(cat in GEThandlers)) return;
@@ -95,6 +126,8 @@ categories.forEach(function(cat){
             if (data.length == 0) {
                 res.status(204).end();
             } else {
+                // res.setHeader('Access-Control-Allow-Origin', '*');
+                // res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
                 res.setHeader('Content-Type', 'application/json');
                 res.status(200).send(data).end();
             }
@@ -102,34 +135,33 @@ categories.forEach(function(cat){
     });
 });
 
-var POSThandlers = {
-    'deletebuilding': gs.deleteBuilding,
-    'dump': gs.dump,
-    'newbuilding': gs.insertNewBuilding,
-    'setgold': gs.setBuildingGold,
-    'setitem': gs.setBuildingItem,
-    'setprice': gs.setBuildingPrice,
-    'togglebuild': gs.toggleBuild
-};
-var events = Object.keys(POSThandlers);
+// var POSThandlers = {
+//     'deletebuilding': GameServer.deleteBuilding,
+//     'dump': GameServer.dump,
+//     'newbuilding': GameServer.insertNewBuilding,
+//     'setgold': GameServer.setBuildingGold,
+//     'setitem': GameServer.setBuildingItem,
+//     'setprice': GameServer.setBuildingPrice,
+// };
+// var events = Object.keys(POSThandlers);
 
-events.forEach(function(e){
-    app.post('/admin/' + e, function (req, res) {
-        console.log('[ADMIN] posting ' + e);
-        var data = req.body;
-        if(!data){
-            res.status(400).end();
-            return;
-        }
-        var result = POSThandlers[e](data);
-        if (!result) {
-            res.status(500).end();
-        } else {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(201).send().end();
-        }
-    });
-});
+// events.forEach(function(e){
+//     app.post('/admin/' + e, function (req, res) {
+//         console.log('[ADMIN] posting ' + e);
+//         var data = req.body;
+//         if(!data){
+//             res.status(400).end();
+//             return;
+//         }
+//         var result = POSThandlers[e](data);
+//         if (!result) {
+//             res.status(500).end();
+//         } else {
+//             res.setHeader('Content-Type', 'application/json');
+//             res.status(201).send().end();
+//         }
+//     });
+// });
 
 if(process.env.DEV == 1) {
     app.get('/studio', function (req, res) {
@@ -143,32 +175,53 @@ if(process.env.DEV == 1) {
     });
 }
 
-server.listen(process.env.PORT || 8081,function(){
+server.listen(process.env.PORT || myArgs.port || 8081,function(){
+    console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
     console.log('Listening on '+server.address().port);
-    mongoose.connect(process.env.MONGODB_URI);
+    console.log('Config environment: '+(process.env.NODE_CONFIG_ENV || 'default'));
+
+    let mongodbAuth = {
+        useNewUrlParser: true
+    };
+    if (process.env.MONGODB_AUTH) {
+        console.log('Create auth object with user, pass, client');
+        mongodbAuth = {
+            user: process.env.MONGODB_USERNAME || 'root',
+            pass: process.env.MONGODB_PASSWORD || 'password',
+            useMongoClient: true,
+            useNewUrlParser: true
+        };
+    }
+
+    mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward', mongodbAuth);
     var db = mongoose.connection;
+
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function() {
         server.db = db;
         console.log('Connection to db established');
-        gs.readMap(myArgs.maps,myArgs.test);
+        GameServer.readMap();
     });
+    console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
 });
 
 
 server.resetStamp = 1519130567967; // ignore returning players with stamps older than this and treat them as new
 
-io.on('connection',function(socket){
-    console.log('connect');
+process.on('uncaughtException', function(err) {
+    GameServer.sendSlackNotification(err.toString(),'warning');
+    console.error('Caught exception: ' + err);
+});
 
+io.on('connection',function(socket){
     socket.emit('ack');
 
     socket.on('boot-params',function(data){
-        gs.getBootParams(socket,data);
+        GameServer.getBootParams(socket,data);
     });
 
     socket.on('init-world',function(data){ // Sent by client.requestData()
-        if(!gs.initialized){
+        if(!GameServer.initialized){
             socket.emit('wait');
             return;
         }
@@ -176,29 +229,37 @@ io.on('connection',function(socket){
         if(!data.stamp || data.stamp < server.resetStamp) data.new = true; // TODO Remove eventually
 
         console.log(data);
-        if(data.new){
-            gs.addNewPlayer(socket,data);
+        // data.new = true;
+        // data.characterName = 'Joe';
+        if(data.new){ // new players OR tutorial
+            GameServer.addNewPlayer(socket,data);
         }else{
-            gs.loadPlayer(socket,data.id);
+            GameServer.loadPlayer(socket,data.id);
         }
 
         var callbacksMap = {
-            'battleAction': gs.handleBattleAction,
-            'buildingClick': gs.handleBuildingClick,
-            'build': gs.handleBuild,
-            'chat': gs.handleChat,
-            'commit': gs.handleCommit,
-            'craft': gs.handleCraft,
-            'exit': gs.handleExit,
-            'NPCClick': gs.handleNPCClick,
-            'path': gs.handlePath,
-            'respawn': gs.handleRespawn,
-            'screenshot': gs.handleScreenshot,
-            'shop': gs.handleShop,
-            'unequip': gs.handleUnequip,
-            'use': gs.handleUse,
-
-            'ss': gs.startScript
+            'ability': GameServer.purchaseAbility,
+            'battleAction': GameServer.handleBattleAction,
+            'buildingClick': GameServer.handleBuildingClick,
+            'build': GameServer.handleBuild,
+            'belt': GameServer.handleBelt,
+            'chat': GameServer.handleChat,
+            'craft': GameServer.handleCraft,
+            'exit': GameServer.handleExit,
+            'gold': GameServer.handleGold,
+            'menu': GameServer.logMenu,
+            'mic': GameServer.logMisc,
+            'NPCClick': GameServer.handleNPCClick,
+            'prices': GameServer.setBuildingPrice,
+            'path': GameServer.handlePath,
+            'respawn': GameServer.handleRespawn,
+            'screenshot': GameServer.handleScreenshot,
+            'shop': GameServer.handleShop,
+            'tutorial-end': GameServer.handleTutorialEnd,
+            'tutorial-start': GameServer.handleTutorialStart,
+            'tutorial-step': GameServer.handleTutorialStep,
+            'unequip': GameServer.handleUnequip,
+            'use': GameServer.handleUse,
         };
 
         var handler = socket.onevent;
@@ -222,44 +283,32 @@ io.on('connection',function(socket){
            if(socket.pings.length > 20) socket.pings.shift(); // keep the size down to 20
            socket.latency = server.quickMedian(socket.pings.slice(0)); // quickMedian used the quickselect algorithm to compute the median of a list of values
        });*/
-    });
+    }); // end of on init-world
 
-    socket.on('settlement-data',function(){
-        socket.emit('settlement-data',gs.listSettlements('selectionTrim'));
+    socket.on('region-data',function(){
+        socket.emit('region-data',GameServer.listRegions());
     });
 
     socket.on('camps-data',function(){
-        socket.emit('camps-data',gs.listCamps());
+        socket.emit('camps-data',GameServer.listCamps());
     });
 
     socket.on('disconnect',function(){
-        gs.handleDisconnect(socket.id);
+        GameServer.handleDisconnect(socket.id);
     });
-
-    // #########################
-
-
-    // #########################
-    /*if(process.env.DEV == 1) {
-        socket.on('mapdata',function(data){
-            console.log('Saving changes to chunk '+data.id+'...');
-            var dir = __dirname+'/assets/maps/chunks/'; // Replace by env variable
-            fs.writeFile(dir+'chunk'+data.id+'.json',JSON.stringify(data.data),function(err){
-                if(err) throw err;
-                console.log('done'); // replace by counter
-            });
-        });
-    }*/
 });
 
 server.sendInitializationPacket = function(socket,packet){
+    // console.warn('sending init');
     packet = server.addStamp(packet);
     //if(server.enableBinary) packet = Encoder.encode(packet,CoDec.initializationSchema);
     socket.emit('init',packet);
 };
 
 server.sendUpdate = function(socketID,pkg){
+    // console.warn('sending update',pkg);
     var socket = server.getSocket(socketID);
+    if(!socket) console.warn('No socket found');
     pkg = server.addStamp(pkg);
     if(socket) pkg.latency = Math.floor(socket.latency);
     //if(server.enableBinary) pkg = Encoder.encode(pkg,CoDec.finalUpdateSchema);
@@ -280,7 +329,7 @@ server.getSocket = function(id){
 };
 
 server.getNbConnected =function(){
-    return Object.keys(gs.players).length;
+    return Object.keys(GameServer.players).length;
 };
 
 server.quickMedian = function(arr){ // Compute the median of an array using the quickselect algorithm

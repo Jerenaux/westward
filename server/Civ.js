@@ -2,11 +2,14 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 18-06-18.
  */
 
-var GameServer = require('./GameServer.js').GameServer;
-var NPC = require('./NPC.js').NPC;
-var MovingEntity = require('./MovingEntity.js').MovingEntity;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
-var Utils = require('../shared/Utils.js').Utils;
+var EquipmentManager = require('../shared/Equipment.js').EquipmentManager;
+
+import GameObject from './GameObject'
+import GameServer from './GameServer'
+import MovingEntity from './MovingEntity'
+import NPC from './NPC'
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
 function Civ(x,y,type){
     this.id = GameServer.lastCivID++;
@@ -14,6 +17,7 @@ function Civ(x,y,type){
     this.battleTeam = 'Civ';
     this.entityCategory = 'Civ';
     this.updateCategory = 'civs';
+    this.sentient = true; // used in battle to know if a battle should end
     this.x = x;
     this.y = y;
     this.type = type;
@@ -21,11 +25,13 @@ function Civ(x,y,type){
     var civData = GameServer.civsData[this.type];
     this.cellsWidth = civData.width || 1;
     this.cellsHeight = civData.height || 1;
+
     this.xpReward = civData.xp || 0;
-    this.name = 'Enemy';
+    this.name = civData.name;
     this.setAggressive();
     this.setStartingStats(civData.stats);
     this.setLoot(civData.loot);
+    this.setEquipment(civData.equipment);
     this.setIdle();
     NPC.call(this);
 }
@@ -59,12 +65,32 @@ Civ.prototype.setCamp = function(camp){
     this.camp = camp;
 };
 
-Civ.prototype.updateBehavior = function(){
-    if(this.trackedTarget) {
-        this.updateTracking();
-    }else{
-        if(!this.camp) return;
-        this.updateWander();
+/**
+ * "Equip" items to a Civ. Trick: no need to keep track of
+ * absolute and relative modifiers, just increment base stats
+ * according to equipment effects since equipment will
+ * never change (for now). + add to loot for possible drop
+ * @param equipment
+ */
+Civ.prototype.setEquipment = function(equipment){
+    this.equipment = new EquipmentManager();
+    for(var slot in equipment){
+        var itemID, nb;
+        if(slot == 'range_ammo'){
+            itemID = equipment[slot][0];
+            nb = equipment[slot][1];
+        }else{
+            itemID = equipment[slot];
+        }
+        this.addToLoot(itemID,nb || 1);
+        this.equipment.set(slot, itemID);
+        if(nb) this.equipment.load(nb);
+        var itemData = GameServer.itemsData[itemID];
+        if(itemData.effects){
+            for(var stat in itemData.effects){
+                this.incrementStat(stat,itemData.effects[stat]);
+            }
+        }
     }
 };
 
@@ -85,33 +111,11 @@ Civ.prototype.findRandomDestination = function(){
     };
 };
 
-Civ.prototype.setTrackedTarget = function(target){
-    this.trackedTarget = target;
-    this.idle = false;
-};
-
-Civ.prototype.updateTracking = function(){
-    if(this.moving || this.isInFight() || this.isDead()) return;
-
-    if(this.x == this.trackedTarget.x && this.y == this.trackedTarget.y){
-        console.log(this.getShortID(),'reached target');
-        this.trackedTarget = null;
-        this.setIdle();
-        return;
-    }
-
-    var path = GameServer.findPath(this,this.trackedTarget,true); // true for seek-path pathfinding
-    if(!path || path.length <= 1) return;
-
-    var trim = PFUtils.trimPath(path,GameServer.battleCells);
-    path = trim.path;
-    this.setPath(path);
-};
-
-Civ.prototype.die = function(){
+Civ.prototype.die = function(attacker){
     MovingEntity.prototype.die.call(this);
     this.idle = false;
     if(this.camp) this.camp.remove(this);
+    if(attacker.isPlayer) GameServer.regions[this.camp.region].event('killedciv',attacker);
 };
 
 Civ.prototype.endFight = function(alive){
@@ -165,7 +169,8 @@ Civ.prototype.trim = function(){
     }
     trimmed.x = parseInt(this.x);
     trimmed.y = parseInt(this.y);
-    return trimmed;
+    // return trimmed;
+    return GameObject.prototype.trim.call(this,trimmed);
 };
 
-module.exports.Civ = Civ;
+export default Civ

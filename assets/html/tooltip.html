@@ -1,0 +1,102 @@
+<!--- TODO: create from cache (https://labs.phaser.io/edit.html?src=src\game%20objects\dom%20element\form%20input.js)-->
+<style>
+    .tooltip {
+        cursor:none;
+        max-width: 250px;
+        min-width: 30px;
+        text-align: left;
+        border: 13px solid transparent;
+        border-image: url(assets/sprites/tooltip.png) fill 13 13 13 13 repeat;
+        color: white;
+        text-shadow: -1px 1px 0 #000,
+            1px 1px 0 #000,
+            1px -1px 0 #000,
+            -1px -1px 0 #000;
+    }
+    .tooltip mark{
+        background: none;
+    }
+    #tooltip_title {
+        font-size: 14px;
+        text-align: left;
+    }
+    #tooltip_body {
+        font-size: 12px;
+        margin-top: 3px;
+        text-align: left;
+    }
+    #equipment_modifier{
+        color: green;
+    }
+    #fatigue_modifier{
+        color: red;
+    }
+    #stat {
+        text-align: left;
+        font-size: 12px;
+    }
+    #base {
+        color: white;
+    }
+    #effects {
+        margin-top: 5px;
+        vertical-align: top;
+    }
+    #bar {
+        font-size: 12px;
+    }
+    #lifebar {
+        height: 10px;
+        padding: 0;
+    }
+    .icon {
+        background-image: url(assets/sprites/ui.png);
+        background-position: -482px -422px;
+        min-width: 13px;
+        min-height: 15px;
+        max-width: 13px;
+        float: left;
+        /*border: 1px solid red;*/
+    }
+    .nb {
+        font-size: 12px;
+        margin-left: 20px;
+        width: 50px;
+        /*border: 1px solid red;*/
+    }
+    .xp {
+        color: #ffd700;
+    }
+    #rewards {
+        font-size: 12px;
+    }
+    .cls {
+        color: white;
+    }
+</style>
+
+<div class="tooltip">
+    <div id="tooltip_title"></div>
+    <div id="tooltip_body"></div>
+    <div id="effects">
+        <div class="icon" id="effect_icon"></div>
+        <div class="nb" id="effect_nb"></div>
+    </div>
+    <div id="owned">
+        <div class="icon" id="owned_icon"></div>
+        <div class="nb" id="owned_nb"></div>
+    </div>
+    <div id="stat">
+        <mark id="base"></mark>&nbsp;<mark id="equipment_modifier"></mark>&nbsp;<mark id="fatigue_modifier"></mark>
+    </div>
+    <div id="rewards">
+        <mark id="xp_0" class="xp">30</mark> &nbsp;<mark id="class_0" class="cls">Explorer XP</mark>&nbsp;
+        <mark id="xp_1" class="xp">20</mark> &nbsp;<mark id="class_1" class="cls">Merchant XP</mark>&nbsp;
+    </div>
+    <div id="bar">
+        Integrity:
+        <div class="w3-light-grey w3-round-xlarge w3-tiny">
+            <div id="lifebar" class="w3-container w3-round-xlarge w3-green" style="width: 1%"></div>
+        </div>
+    </div>
+</div>

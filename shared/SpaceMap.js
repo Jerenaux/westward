@@ -2,7 +2,6 @@
  * Created by Jerome on 23-04-17.
  */
 
-var onServer = (typeof window === 'undefined');
 
 // A space map is a custom data struture, similar to a sparse 2D array. Entities are stored according to their coordinates;
 // that is, two keys are needed to fetch entities, the x position and the y position. This allows fast look-up based on position,
@@ -29,6 +28,7 @@ SpaceMap.prototype.increment = function(x,y){
     if(!this.hasOwnProperty(x))this[x] = {};
     if(!this[x].hasOwnProperty(y)) this[x][y] = 0;
     this[x][y]++;
+    return this[x][y];
 };
 
 // Works also by calling mySpaceMap[x][y]
@@ -54,20 +54,37 @@ SpaceMap.prototype.getFirst = function(){
     return this.toList()[0].v;
 };
 
-SpaceMap.prototype.toList = function(compact){ // serialize to a list representation
+SpaceMap.prototype.merge = function(otherMap){
+    otherMap.toList().forEach(function(cell){
+        this.add(cell.x,cell.y);
+    },this);
+};
+
+SpaceMap.prototype.toList = function(compact,skipv){ // serialize to a list representation
     var list = [];
     for(var x in this){
         if(this.hasOwnProperty(x)){
             for(var y in this[x]){
                 if(this[x].hasOwnProperty(y)){
                     if(compact){
-                        list.push([x,y,this[x][y]])
+                        if(skipv){
+                            list.push([parseInt(x), parseInt(y)]);
+                        }else {
+                            list.push([parseInt(x), parseInt(y), this[x][y]]);
+                        }
                     }else {
-                        list.push({
-                            x: x,
-                            y: y,
-                            v: this[x][y]
-                        });
+                        if(skipv){
+                            list.push({
+                                x: x,
+                                y: y
+                            });
+                        }else {
+                            list.push({
+                                x: x,
+                                y: y,
+                                v: this[x][y]
+                            });
+                        }
                     }
                 }
             }
@@ -129,8 +146,4 @@ SpaceMapList.prototype.delete = function(x,y,object){
     if(Object.keys(this[x]).length == 0) delete this[x];
 };
 
-
-if (onServer) {
-    module.exports.SpaceMap = SpaceMap;
-    module.exports.SpaceMapList = SpaceMapList;
-}
+export {SpaceMap, SpaceMapList}

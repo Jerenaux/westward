@@ -1,6 +1,16 @@
 /**
  * Created by Jerome on 04-10-17.
  */
+
+import Bubble from './Bubble'
+import Client from './Client'
+import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import PFUtils from '../shared/PFUtils'
+import TutorialManager from './TutorialManager'
+
+import itemsData from '../assets/data/items.json'
+
 var Moving = new Phaser.Class({
 
     Extends: CustomSprite,
@@ -44,17 +54,11 @@ var Moving = new Phaser.Class({
         this.updatePosition(x,y);
     },
 
-    setTilePosition: function(x,y){
-        this.tileX = x;
-        this.tileY = y;
-    },
-
     // Updates the position; primarily called as the entity moves around and has moved by at least 1 tile
     updatePosition: function(x,y){ // x and y are tile cordinates
         this.updatePreviousPosition();
         this.setTilePosition(x,y);
         this.updateDepth();
-        this.updateChunk();
     },
 
     updatePreviousPosition: function(){
@@ -67,15 +71,10 @@ var Moving = new Phaser.Class({
     },
 
     updateDepth: function(){
-        this.setDepth(Engine.playersDepth + this.tileY / 1000);
-    },
-
-    updateChunk: function(){
-        this.chunk = Utils.tileToAOI({x:this.tileX,y:this.tileY});
-        if(this.isHero) {
-            if(this.chunk != this.previousChunk) Engine.updateEnvironment();
-            this.previousChunk = this.chunk;
-        }
+        //this.setDepth(Engine.playersDepth + this.tileY / 1000);
+        var newdepth = this.tileY+1.6;
+        if(this.hollowed) newdepth += 5;
+        this.setDepth(newdepth); // 1.6 to be greatet than Item's 1.5
     },
 
     manageOrientationPin: function(){
@@ -87,14 +86,8 @@ var Moving = new Phaser.Class({
             return;
         }
 
-        var worldView = Engine.camera.worldView;
-        if(worldView.x == 0 && worldView.y == 0){ // small hack, worldView not updated yet
-            this.orientationPin.hide();
-            return;
-        }
         var c = this.getCenter();
-        var inCamera = worldView.contains(c.x*32,c.y*32);
-        if(inCamera) {
+        if(Engine.isInView(c.x,c.y)) {
             this.orientationPin.hide();
         }else{
             this.orientationPin.update(this.tileX,this.tileY);
@@ -137,7 +130,11 @@ var Moving = new Phaser.Class({
     },
 
     frameByFrameUpdate: function(){
-        if(this.bubble) this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY);
+        if(this.bubble) this.updateBubblePosition();
+    },
+
+    updateBubblePosition: function(){
+        this.bubble.updatePosition(this.x-this.bubbleOffsetX,this.y-this.bubbleOffsetY,this.depth);
     },
 
     computeOrientation: function(fromX,fromY,toX,toY){
@@ -152,12 +149,9 @@ var Moving = new Phaser.Class({
         }
     },
 
-    /*setOrientation: function(orientation){
-        this.orientation = orientation;
-    },*/
-
     faceOrientation: function(){
-        this.setFrame(this.restingFrames[this.orientation]);
+        // console.warn(this.getTextureName() + '_rest_' + this.orientation);
+        this.play(this.getTextureName() + '_rest_' + this.orientation);
     },
     
     tileByTilePreUpdate: function(tween,targets,startX,startY,endX,endY){
@@ -167,9 +161,12 @@ var Moving = new Phaser.Class({
 
         this.computeOrientation(startX,startY,endX,endY);
 
-        if(this.orientation != this.previousOrientation){
+        if(this.orientation != this.previousOrientation) {
             this.previousOrientation = this.orientation;
-            this.play(this.animPrefix+'_move_'+this.orientation);
+            // console.warn(this.getTextureName() + '_move_' + this.orientation);
+            this.play(this.getTextureName() + '_move_' + this.orientation);
+            // console.warn(this);
+            // console.warn(this.anims.currentAnim.key, this.anims.currentFrame.index);
         }
 
         if(this.isHero){
@@ -187,6 +184,14 @@ var Moving = new Phaser.Class({
 
         //if(this.isActiveFighter) Engine.updateGrid();
 
+        var overlayOffsetX = this.overlayOffset ? this.overlayOffset[0] : 0;
+        var overlayOffsetY = this.overlayOffset ? this.overlayOffset[1] : 0;
+        if(Engine.overlay.get(tx+overlayOffsetX,ty+overlayOffsetY)){
+            this.hollow();
+        }else{
+            this.unhollow();
+        }
+        
         this.leaveFootprint();
         this.playSound();
         if(this.isHero){
@@ -279,9 +284,13 @@ var Moving = new Phaser.Class({
         this.stopPos = null;
         this.previousOrientation = null;
         this.anims.stop();
-        this.setFrame(this.restingFrames[this.orientation]);
+        // this.setFrame(this.restingFrames[this.orientation]);
+        this.faceOrientation();
 
-        if(this.isHero && Client.tutorial) Engine.tutorialHook('move');
+        if(this.isHero && Client.tutorial){
+            TutorialManager.triggerHook('move');
+            TutorialManager.checkHook();
+        }
 
         if(this.queuedPath){
             var _path = this.queuedPath.slice();
@@ -331,11 +340,12 @@ var Moving = new Phaser.Class({
     },
 
     playSound: function(){
-        Engine.playLocalizedSound('footsteps',5,{x:this.tileX,y:this.tileY});
+        Engine.playLocalizedSound('footsteps',2,{x:this.tileX,y:this.tileY});
     },
 
     talk: function(text){
         //if(this.isHero) return;
+        this.updateBubblePosition();
         this.bubble.update(text);
         this.bubble.display();
         Engine.scene.sound.add('speech').play();
@@ -358,6 +368,48 @@ var Moving = new Phaser.Class({
         Engine.displayHit(this,pos.x,pos.y,20,40,null,true,data.delay);
     },
 
+    setOrientation: function (facing) {
+        this.computeOrientation(this.tileX, this.tileY, facing.x, facing.y);
+        this.faceOrientation();
+    },
+
+    processRangedAttack: function (data) {
+        this.setOrientation({x: data.x, y: data.y});
+
+        const ranged_ammo_item = itemsData[data.projectile];
+
+        let itemAtlasPool;
+        // TODO: Maybe get this in utility function
+        if (ranged_ammo_item.atlas === 'items') {
+            itemAtlasPool = Engine.imagePool;
+        }
+        if (ranged_ammo_item.atlas === 'items2') {
+            itemAtlasPool = Engine.imagePool2;
+        }
+        var frame = ranged_ammo_item.frame;
+        var anim = ranged_ammo_item.container_type == 'quiver' ? 'bow' : 'attack';
+
+        const animationName = this.getTextureName() + '_'+anim+'_' + this.orientation;
+        this.play(animationName);
+        var from = {
+            x: this.x,
+            y: this.y - 10
+        };
+        Engine.animateRangeAmmo(
+            frame,
+            from, {x: data.x, y: data.y},
+            this.depth + 1, data.duration,
+            data.delay,
+            itemAtlasPool
+        );
+    },
+
+    handleOver: function(){
+    },
+
+    handleOut: function(){
+    },
+
     isDisabled: function(){
         return !!this.dead;
     },
@@ -376,5 +428,11 @@ var Moving = new Phaser.Class({
             x: this.tileX + this.cellsWidth/2,//Math.floor(this.tileX + this.cellsWidth/2),
             y: this.tileY + this.cellsHeight/2//Math.floor(this.tileY + this.cellsHeight/2)
         };
+    },
+
+    isDead: function(){
+        return this.dead;
     }
 });
+
+export default Moving

@@ -1,99 +1,101 @@
 {
   "0":{
-    "sprite":"wolves",
-    "name": "Wolf",
-    "frame": 25,
+    "battleicon":"wolf",
+    "name": "<Wolf>",
     "aggro": true,
     "wander": true,
-    "walkPrefix": "wolf",
+    "packSize": {
+      "min": [2,4],
+      "max": 6
+    },
+    "loot":{
+      "9": [1,1],
+      "1": [3,1],
+      "27": [1,1]
+    },
     "footprintsFrame": 1,
     "printsVertOffset": 10,
-    "restingFrames": {
-        "up": 37,
-        "down": 1,
-        "left": 13,
-        "right": 25
-    },
-    "stats": {
-      "hpmax": 100,
-      "hp": 100,
-      "def": 5,
-      "dmg": 2
-    },
-    "xp": 10,
-    "loot":{
-      "9": 1,
-      "1": 3,
-      "27": 1
+    "origin": {
+      "x": 0.1,
+      "y": 0
     }
   },
   "1":{
-    "sprite":"wolves",
-    "name": "White wolf",
-    "frame": 28,
-    "walkPrefix": "whitewolf",
-    "restingFrames": {
-      "up": 40,
-      "down": 4,
-      "left": 16,
-      "right": 28
-    },
+    "name": "Gray wolf",
+    "inheritFrom": 0,
+    "sprite":"graywolf",
+    "map_name": "Gray wolf pack",
+    "nbPacks": 65,
+    "spawnRate": 30,
     "stats": {
-      "hp": 200,
-      "def": 12,
+      "hpmax": 100,
+      "hp": 100,
+      "def": 6,
       "dmg": 4
-    }
+    },
+    "xp": 10
   },
   "2":{
-    "sprite":"toadmen",
-    "name": "Shroom",
-    "frame": 55,
-    "walkPrefix": "toad",
-    "width": 2,
-    "height": 2,
-    "aggro": true,
-    "wander": true,
-    "footprintsFrame": 1,
-    "restingFrames": {
-      "up": 45,
-      "down": 9,
-      "left": 21,
-      "right": 33
-    },
+    "name": "Black wolf",
+    "inheritFrom": 0,
+    "sprite":"blackwolf",
+    "map_name": "Black wolf pack",
+    "nbPacks": 30,
+    "spawnRate": 50,
     "stats": {
-      "hp": 300,
-      "def": 16,
-      "dmg": 5
-    }
+      "hpmax": 130,
+      "hp": 130,
+      "def": 8,
+      "dmg": 6
+    },
+    "xp": 15
+  },
+  "3":{
+    "name": "White wolf",
+    "inheritFrom": 0,
+    "sprite":"whitewolf",
+    "map_name": "White wolf pack",
+    "nbPacks": 10,
+    "spawnRate": 60,
+    "stats": {
+      "hpmax": 200,
+      "hp": 200,
+      "def": 12,
+      "dmg": 8
+    },
+    "xp": 20
   },
   "5":{
-    "sprite":"bears",
-    "name": "Bear",
+    "sprite":"bear",
+    "battleicon":"bear",
+    "name": "Arth",
+    "map_name":"Arth",
     "frame": 9,
-    "walkPrefix": "bear",
     "width": 2,
     "height": 2,
     "aggro": true,
     "wander": true,
-    "footprintsFrame": 2,
-    "printsHorizOffset": 12,
-    "printsVertOffset": 30,
-    "restingFrames": {
-      "up": 45,
-      "down": 9,
-      "left": 21,
-      "right": 33
+    "packSize": {
+      "min": [1,1],
+      "max": 1
     },
+    "nbPacks": 50,
+    "spawnRate": 60,
+    "footprintsFrame": 2,
+    "printsHorizOffset": 16,
+    "printsVertOffset": 30,
+    "overlayOffset": [0,1],
     "stats": {
+      "hpmax": 300,
       "hp": 300,
-      "def": 16,
-      "dmg": 5
+      "def": 8,
+      "dmg": 6
     },
     "xp": 30,
     "loot":{
-      "9": 1,
-      "1": 6,
-      "27": 2
+      "9": [1,1],
+      "1": [6,1],
+      "27": [2,1]
     }
   }
 }

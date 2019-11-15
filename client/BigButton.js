@@ -2,6 +2,8 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 14-02-18.
  */
 
+import UI from './UI';
+
 function BigButton(x,y,text,callback,bigger){
     this.slices = [];
     var sideWidth = 22;
@@ -50,6 +52,10 @@ BigButton.prototype.attachCallbacks = function(element){
     element.on('pointerup',this.handleClick.bind(this));
     element.on('pointerover',this.handleOver.bind(this));
     element.on('pointerout',this.handleOut.bind(this));
+};
+
+BigButton.prototype.setCallback = function(callback){
+    this.callback = callback;
 };
 
 BigButton.prototype.setText = function(text){
@@ -106,17 +112,21 @@ BigButton.prototype.handleOut = function(){
     this.resetSize();
 };
 
+
+BigButton.prototype.enable = function(){
+    this.slices[0].setFrame(this.bt+'_left');
+    this.slices[1].setFrame(this.bt+'_middle');
+    this.slices[2].setFrame(this.bt+'_right');
+    this.resetSize();
+    this.enabled = true;
+};
+
 BigButton.prototype.disable = function(){
     this.slices[0].setFrame(this.bt+'_left_gray');
     this.slices[1].setFrame(this.bt+'_middle_gray');
     this.slices[2].setFrame(this.bt+'_right_gray');
     this.resetSize();
     this.enabled = false;
-    /*this.slices.forEach(function(s){
-        s.removeAllListeners();
-        s.off('pointerover');
-        //s.setInteractive(false);
-    });*/
 };
 
 BigButton.prototype.resetSize = function(){
@@ -144,3 +154,5 @@ BigButton.prototype.moveUp = function(nb){
     });
     this.text.setDepth(this.text.depth+nb);
 };
+
+export default BigButton;

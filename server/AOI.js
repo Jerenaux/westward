@@ -3,13 +3,17 @@
  */
 
 var UpdatePacket = require('./UpdatePacket.js').UpdatePacket;
-var Utils = require('../shared/Utils.js').Utils;
+// var Utils = require('../shared/Utils.js').Utils;
+var GameServer = require('./GameServer.js').GameServer;
+
+import Utils from '../shared/Utils'
 
 function AOI(id){
     this.id = id;
     var origin = Utils.AOItoTile(this.id);
     this.x = origin.x;
     this.y = origin.y;
+    this.region = null;
     this.entities = []; // list of entities situated within the area corresponding to this AOI; useful for synchronizing with new AOIs and as a form of quad-tree
     this.updatePacket = new UpdatePacket();
 }
@@ -24,6 +28,7 @@ AOI.prototype.clear = function(){
 
 AOI.prototype.addEntity = function(entity){
     this.entities.push(entity);
+    // if(GameServer.updtDebug) console.warn('entities:',this.entities);
 };
 
 AOI.prototype.deleteEntity = function(entity) {
@@ -48,4 +53,5 @@ AOI.prototype.hasBuilding = function(){
     return false;
 };
 
-module.exports.AOI = AOI;
+// module.exports.AOI = AOI;
+export default AOI;

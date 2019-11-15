@@ -1,6 +1,3 @@
-* {
-    font-family: arial;
-}
 @font-face {
     font-family: 'belwe';
     src: url('/assets/fonts/belwe.otf');
@@ -19,17 +16,26 @@
     position: absolute;
     left: -100px;
 }
-
-.chat {
+* {
+    font-family: belwe;
+}
+#game {
+    width: 1024px;
+    margin: auto;
+}
+.game_input {
     position: absolute;
-    width: 200px;
+    padding-left: 3px;
+    width: 10px;
     background: transparent;
     border: none;
-    display: none;
+    display: inline;
     color: white;
+    left: -100px;
+    top: -100px;
 }
 
-.chat:focus {
+.game_input:focus {
     border: 1px dotted black;
     background-color: rgba(0,0,0,0.5);
     outline: none;

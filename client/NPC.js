@@ -1,6 +1,11 @@
 /**
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 01-08-18.
  */
+import BattleManager from './BattleManager'
+import Engine from './Engine'
+import Moving from './Moving'
+import UI from './UI'
+import Utils from '../shared/Utils'
 
 var NPC = new Phaser.Class({
 
@@ -50,16 +55,20 @@ var NPC = new Phaser.Class({
             cursor = (this.dead ? 'item' : 'combat');
         }
         UI.setCursor(cursor);
-        UI.tooltip.updateInfo((this.dead ? 'Dead ' : '')+this.name);
+        UI.tooltip.updateInfo('NPC',{type:this.entityType, id:this.id});
         UI.tooltip.display();
     },
 
     handleOver: function(){
+        Moving.prototype.handleOver.call(this);
         UI.manageCursor(1,'npc',this);
     },
 
     handleOut: function(){
+        Moving.prototype.handleOut.call(this);
         UI.manageCursor(0,'npc');
         UI.tooltip.hide();
     }
 });
+
+export default NPC

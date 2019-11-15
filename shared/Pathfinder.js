@@ -2,18 +2,16 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 07-04-18.
  */
 
-var onServer = (typeof window === 'undefined');
-
-if(onServer){
-    SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
-}
+import {SpaceMap} from './SpaceMap'
+import World from './World'
 
 function Pathfinder(navGrid,maxLength,allowDiagonal,cutCorners,reverseWalkable){
     this.grid = navGrid;
     this.maxLength = maxLength || 50;
+    if(maxLength == -1) this.maxLength = 999999;
     this.allowDiagonal = allowDiagonal || false;
     this.cutCorners = cutCorners || false;
-    this.reverseWalkable = reverseWalkable || false;
+    this.reverseWalkable = reverseWalkable || false; // 1's in navgrid are walable
 }
 
 Pathfinder.prototype.setCallbacks = function(openCb, closeCb, backtrackCb){
@@ -22,7 +20,7 @@ Pathfinder.prototype.setCallbacks = function(openCb, closeCb, backtrackCb){
     this.backtrackCb = backtrackCb;
 };
 
-Pathfinder.prototype.findPath = function(from,to,seek){
+Pathfinder.prototype.findPath = function(from,to,seek,nextTo){
     // todo: replac with 'closed' flag?
     var closedSet = new SpaceMap(); // Set of nodes already evaluated
     this.openSet = []; // The list of currently discovered nodes that are not evaluated yet
@@ -31,6 +29,8 @@ Pathfinder.prototype.findPath = function(from,to,seek){
     this.nodes = new SpaceMap();
     this.considered = 0;
 
+    this.nextTo = nextTo;
+    this.destination = this.getNode(to.x,to.y);
     var start = this.getNode(from.x,from.y);
     var end = this.getNode(to.x,to.y);
 
@@ -42,11 +42,13 @@ Pathfinder.prototype.findPath = function(from,to,seek){
         this.considered++;
 
         var minFNode = this.getMinFNode();
-        //console.log('Considering ',minFNode.toString());
-        //log('log1','Considering '+minFNode.toString(),true);
+        // console.log('Considering ',minFNode.toString());
         if(minFNode.equals(end)) return this.backtrack(minFNode);
 
+        // Seeking behavior: return the best path towards target even if too short
+        // Non-seeking: if not path found within length, give up
         if(minFNode.g > this.maxLength){
+            // console.log('Limit exceeded');
             if(seek) return this.backtrack(minFNode);
             break;
         }
@@ -55,23 +57,20 @@ Pathfinder.prototype.findPath = function(from,to,seek){
         if(this.closeCb) this.closeCb(minFNode.x,minFNode.y);
 
         var neighbors = this.generateNeighbors(minFNode,end);
+        // console.log(neighbors);
         neighbors.forEach(function(neighbor){
             if(closedSet.get(neighbor.x,neighbor.y)) return;
 
             var g = minFNode.g + this.euclidean(minFNode,neighbor);
 
-            //log('log1','Neighbor '+neighbor.toMiniString()+' : ng = '+g+" vs "+neighbor.g+", "+neighbor.opened);
             if(!neighbor.opened || g < neighbor.g) {
                 this.cameFrom.add(neighbor.x, neighbor.y, minFNode);
-                //log('log1', 'Parent of ' + neighbor.toMiniString() + 'set to' + minFNode.toMiniString());
                 neighbor.setG(g);
                 neighbor.setH(this.heuristic(neighbor, end));
                 if (this.allowDiagonal) neighbor.setI(this.manhattan(neighbor, end));
-
                 if(!neighbor.opened) this.addToOpenSet(neighbor);
             }
         },this);
-        //log('log1',this.openSet.toString());
     }
     return null;
 };
@@ -85,10 +84,13 @@ Pathfinder.prototype.getNode = function(x,y){
 };
 
 Pathfinder.prototype.getMinFNode = function(){
+    // console.log(this.openSet);
     if(this.allowDiagonal){
         return this.openSet.shift();
     }else{
+        // Randomize all nodes with smalles f value, to give more realistic paths
         var minF = this.openSet[0].f;
+        // var minF = this.openSet.last.f;
         var g = this.openSet[0].g;
         var idcs = [];
         for(var i = 0; i < this.openSet.length; i++){
@@ -103,8 +105,9 @@ Pathfinder.prototype.getMinFNode = function(){
 Pathfinder.prototype.addToOpenSet = function(node){
     if(this.openCb) this.openCb(node.x,node.y);
     var pos = this.openSet.length;
+    // Find where to insert node, so that it's ordered according to f, h and i values, in order of priority
     for(var i = 0; i < this.openSet.length; i++){
-        if(node.equals(this.openSet[i])) return;
+        if(node.equals(this.openSet[i])) return; // If already in set, stop
         if(node.f < this.openSet[i].f){
             pos = i;
             break;
@@ -135,6 +138,11 @@ Pathfinder.prototype.generateNeighbors = function(node){
 
     offsets.forEach(function(o,i){
         var n = this.getNode(node.x+o[0],node.y+o[1]);
+        if(this.nextTo && n.equals(this.destination)){
+            neighbors.push(n);
+            return;
+        }
+        // console.log(n,this.isWalkable(n));
         if(!this.isWalkable(n)) return;
         if(this.allowDiagonal && !this.cutCorners && i%2 != 0){ // because corners are at odd positions in offsets array
             // Compute corner nodes that could be cut
@@ -199,10 +207,10 @@ Pathfinder.prototype.heuristic = function(A,B){
 function Node(x,y){
     this.x = x;
     this.y = y;
-    this.g = Infinity;
-    this.h = 0;
+    this.g = Infinity; // cost of path from start to node
+    this.h = 0; // heuristic estimate of cost from node to goal
     this.i = 0;
-    this.f = Infinity;
+    this.f = Infinity; // estimated cost of path through node
     this.opened = false;
 }
 
@@ -240,4 +248,4 @@ Node.prototype.equals = function(B){
     return (this.x == B.x && this.y == B.y);
 };
 
-if (onServer) module.exports.Pathfinder = Pathfinder;
+export default Pathfinder

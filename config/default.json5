@@ -2,21 +2,28 @@
 {
    battle: {
         enabled: true,
-        aggroRange: 10, // chebyshev distance
+        aggroRange: 12, // chebyshev distance; TODO: variable?
         battleRange: 3, // distance that can be travelled in one turn in battle; TODO: variable
         freezeNPC: false,
         maxDamage: 10000,
         minDamage: 1,
-        rangePenalty: 5, // accuracy penalty per tile
+        rangePenalty: 0.1, // accuracy penalty per tile
         turnDuration: 5, // seconds
         tickRate: 100, // milliseconds, granularity of battle updates
-        arrowSpeed: 15, // tiles/sec
+        throwableSpeed: 15, // tiles/sec
+        arrowSpeed: 30, // tiles/sec
+        bulletSpeed: 50, // tiles/sec
         bombSpeed: 10,
+        throwableDelay: 300,
+        arrowDelay: 500,
+        bulletDelay: 500,
+        bombDelay: 300,
         meleeAtkDelay: 500,
-        rangedAtkDelay: 500
+        //rangedAtkDelay: 500
    },
    buildings: {
-        canfight: false,
+        autobuild: true,
+        canfight: true,
         nobuildings: false,
         inventorySize: 100,
         maxGold: 99999
@@ -28,35 +35,34 @@
         explorer: 3
    },
    character: {
-        variables: {
-            commitSlots: 2,
+        variables: { // Default starting values
             def: 7,
             dmg: 19,
             hpmax: 300
         },
-        maxCivicLvl: 10,
-        maxCivicXP: 99999,
-        maxClassLvl: 100,
+        maxClassLvl: 101,
         maxClassXP: 999999,
-        maxGold: 100000
+        maxGold: 100000,
+        foodConsumption: 1.5,
+        steps: 100, // number of steps to make to lose `stepLoss` points of vigor
+        stepsLoss: 2 // amount of vigor lost after walking `steps` steps
    },
    economyCycles: {
         // Unit: seconds
-        turnDuration: 60,
+        turnDuration: 1,
         // Unit: turns
         turns: {
-            build: 10,
-            camps: 5,
-            commitment: 1,
-            foodConsumption: 10,
-            harvesting: 300,
-            settlements: 1,
-            spawnZones: 5
+            camps: 1800,
+            foodConsumptionRate: 600, // rate at which food levels of players are decreased ; amount in character.foodConsumption
+            itemsRespawn: 86400, // 86400 turns of 1sec = 24h
+            restRate: 1, // rate at which vigor levels of players are increased when sheltered ; amount in buildings.json
+            spawnZones: 10
         }
     },
     misc: {
         foodID: 1,
-        performInit: true
+        performInit: true,
+        debugQT: false
     },
     pathfinding: {
         walkingSpeed: 5, // tiles/sec
@@ -68,17 +74,17 @@
             client: 125,
             walk: 50,
             wander: 200,
-            aggro: 2000
+            aggro: 1500
     },
     civs: {
         aggro: false,
         wander: true,
-        raidMinimum: 8
+        raidMinimum: 3
     },
     wildlife: {
         aggro: false,
         nolife: false,
-        wander: false,
+        wander: true,
         wanderRange: 5,
         idleTime: [1, 3.5], // random bounds; in seconds
         idleRetry: 200 // ms
@@ -88,23 +94,16 @@
     },
     client: {
         boot:{
+            autoBoot: false,
             forceNewPlayer: false,
             offerTutorial: true
         },
         config: { // Will be in Engine.config
             chatTimeout: 5000, //ms
+            fogOfWar: true,
             notificationTimeout: 3000, //ms ; TODO: adapt based on length?
             hearingDistance: 30, // tiles
-            /*starting: { // TODO: sync to db
-                0: {
-                    x: 1203,
-                    y: 154
-                },
-                1: {
-                    x: 512,
-                    y: 654
-                }
-            }*/
+            defaultBuildRecipes: [3,4,6,11,2] // workshop, shop, lumbercamp, shack
         }
     }
 }

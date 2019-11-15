@@ -1,2 +1,10 @@
+
+.git
+.idea
 node_modules
-.env
+toPack
+.ipynb_checkpoints
+*.env
+maps/conflictMarkers.json
+maps/deathMarkers.json
+package-lock.json

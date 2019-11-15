@@ -1,20 +1,30 @@
 /**
  * Created by Jerome on 07-10-17.
  */
+import BattleManager from './BattleManager'
+import Client from './Client'
+import CustomSprite from './CustomSprite'
+import Engine from './Engine'
+import Inventory from '../shared/Inventory'
+import PFUtils from '../shared/PFUtils'
+import {StatsContainer} from "../shared/Stats"
+import UI from './UI'
+import Utils from '../shared/Utils'
+import TutorialManager from './TutorialManager'
 
-var FOUNDATIONS_ID = 4;
+import buildingsData from '../assets/data/buildings.json'
 
 var Building = new Phaser.Class({
 
     Extends: CustomSprite,
 
     initialize: function Building() {
-        CustomSprite.call(this, Engine.scene, 0, 0, 'buildings_sprites');
+        CustomSprite.call(this, 'Engine', 0, 0, 'buildings_sprites');
         this.entityType = 'building';
     },
 
     setUp: function (data) {
-        var buildingData = Engine.buildingsData[data.type];
+        var buildingData = buildingsData[data.type];
         var sprite = buildingData.sprite;
         if(!data.built && buildingData.foundations) sprite = buildingData.foundations;
 
@@ -39,46 +49,54 @@ var Building = new Phaser.Class({
         this.buildingType = data.type;
         this.owner = data.owner;
         this.ownerName = data.ownerName;
-        this.civBuilding = (this.settlement == -1);
+        this.civBuilding = !!data.civ; // converts undefined to false
         this.inventory = new Inventory(100);
+        this.stats = new StatsContainer();
+        this.countdowns = data.prodCountdowns;
         this.name = buildingData.name;//+' '+this.id;
         this.prices = {};
+        this.gold = 0;
         this.built = false;
-        if(buildingData.entrance) {
-            this.entrance = {
-                x: this.tx + buildingData.entrance.x,
-                y: this.ty + buildingData.entrance.y
-            };
-        }
+        this.locked = buildingData.locked;
 
         this.depthOffset = buildingData.depthOffset;
         this.setBuilt(data.built);
         this.resetDepth();
-
-        /*if(buildingData.shape) {
-            var shape = new Phaser.Geom.Polygon(buildingData.shape);
-            this.setInteractive(shape, Phaser.Geom.Polygon.Contains);
-            this.input.hitArea = shape; // will override previous interactive zone, if any (e.g. if object recycled from pool)
-
-            //this.on('pointerover',this.handleOver.bind(this));
-        }*/
-        this.setInteractive();
-
+        this.setInteractiveArea();
         this.setCollisions();
 
+        var production = buildingData.production;
+        this.produced = [];
+        if(production){
+            production.forEach(function(prod){
+                this.produced.push(parseInt(prod[0]));
+            },this);
+        }
+
+        this.battleBoxData = {
+            'atlas':'buildingsicons',
+            'frame': buildingData.icon
+        };
+
         if(Engine.debugCollisions) this.setAlpha(0.1);
+
+        if(Engine.player.inBuilding == this.id) Engine.enterBuilding(this.id);
     },
 
     resetDepth: function(){
-        this.setDepth(Engine.buildingsDepth + (this.ty - this.depthOffset)/1000);
+        this.setDepth(this.tileY-1);
+    },
+
+    setInteractiveArea: function(){
+        this.setInteractive(Engine.scene.input.makePixelPerfect(250));
     },
 
     build: function () {
         this.built = true;
-        var buildingData = Engine.buildingsData[this.buildingType];
+        var buildingData = buildingsData[this.buildingType];
         this.setFrame(buildingData.sprite);
         this.resetDepth();
-        this.setInteractive();
+        this.setInteractiveArea();
 
         if(buildingData.accessory){
             this.accessory = Engine.scene.add.sprite(
@@ -100,10 +118,10 @@ var Building = new Phaser.Class({
 
     unbuild: function(){
         this.built = false;
-        var buildingData = Engine.buildingsData[this.buildingType];
-        this.setFrame(buildingData.sprite+'_construction');
+        var buildingData = buildingsData[this.buildingType];
+        this.setFrame(buildingData.foundations);
         this.resetDepth();
-        if(this.accessory) this.accessory.destroy();
+        // if(this.accessory) this.accessory.destroy();
     },
 
     update: function (data) {
@@ -111,20 +129,20 @@ var Building = new Phaser.Class({
             'animation': Engine.handleBattleAnimation,
             'buildings': this.setBuildingsListing,
             'built': this.setBuilt,
-            'committed': this.setCommitted,
             'danger': this.setDangerIcons,
             'devlevel': this.setDevLevel,
-            'foodsurplus': this.setFoodSurplus,
             'gold': this.setGold,
             'hit': this.handleHit, // for HP display and blink
             'inventory': this.setInventory, // sets whole inventor
             'items': this.updateInventory, // update individual entries in inventory
             'population': this.setPopulation,
             'prices': this.setPrices,
+            'prodCountdowns': this.setCountdowns,
             'productivity': this.setProductivity,
             'progress': this.setProgress,
             'ranged_atk': this.processRangedAttack,
-            'rangedMiss': this.handleMiss
+            'rangedMiss': this.handleMiss,
+            'statsUpdate': this.updateStats
         };
         this.updateEvents = new Set();
 
@@ -144,6 +162,7 @@ var Building = new Phaser.Class({
     remove: function(){
         // TODO: remove collisions
         if(this.accessory) this.accessory.destroy();
+        this.removeInteractive();
         CustomSprite.prototype.remove.call(this);
         delete Engine.buildings[this.id];
     },
@@ -163,16 +182,16 @@ var Building = new Phaser.Class({
             Engine.exitBuilding();
             Engine.enterBuilding(this.id);
         }
+        if(Client.tutorial && flag == true) TutorialManager.triggerHook('built:'+this.id);
     },
 
     setCollisions: function () {
-        //PFUtils.buildingCollisions(this.tx,this.ty,data,Engine.collisions);
-        PFUtils.buildingCollisions(this.tx,this.ty-this.cellsHeight,this.cellsWidth,this.cellsHeight,Engine.collisions);
+        PFUtils.buildingCollisions(this.tileX,this.tileY-this.cellsHeight,this.cellsWidth,this.cellsHeight,Engine.collisions,'add');
     },
 
-    setCommitted: function(committed){
-        this.committed = committed;
-        this.updateEvents.add('onUpdateProductivity');
+    setCountdowns: function(countdowns){
+        this.countdowns = countdowns;
+        this.updateEvents.add('onUpdateShop');
     },
 
     setDangerIcons: function(danger){
@@ -182,11 +201,6 @@ var Building = new Phaser.Class({
 
     setDevLevel: function(level){
         this.devlevel = level;
-        this.updateEvents.add('onUpdateSettlementStatus');
-    },
-
-    setFoodSurplus: function(foodsurplus){
-        this.foodsurplus = foodsurplus;
         this.updateEvents.add('onUpdateSettlementStatus');
     },
 
@@ -224,6 +238,7 @@ var Building = new Phaser.Class({
     updateInventory: function(items){
         this.inventory.updateItems(items);
         this.updateEvents.add('onUpdateShop');
+        if(Client.tutorial) TutorialManager.checkHook();
     },
 
     getHPposition: function(){
@@ -243,20 +258,28 @@ var Building = new Phaser.Class({
         Engine.displayHit(this,pos.x,pos.y,50,80,null,true,data.delay);
     },
 
+    updateStats: function(stats){
+        for(let i = 0; i < stats.length; i++){
+            var statObj = this.stats[stats[i].stat];
+            statObj.setBaseValue(stats[i].value);
+        }
+        this.updateEvents.add('onUpdateBldStats');
+    },
+
     processRangedAttack: function(data){
         var from = {
             x: this.x + this.shootFrom.x,
             y: this.y - (this.height-this.shootFrom.y)
-        }; // All coordinates are pixels
-        Engine.displayArrow(from,{x:data.x,y:data.y},this.depth+1,data.duration,data.delay);
+        }; // All coordinates are in pixels
+        Engine.animateRangeAmmo('arrow',from,{x:data.x,y:data.y},this.depth+1,data.duration,data.delay);
     },
 
     // ### GETTERS ###
 
     getRect: function(){
         return {
-            x: this.tx + this.coll.x,
-            y: this.ty - this.cellsHeight,
+            x: this.tileX,
+            y: this.tileY - this.cellsHeight,
             w: this.cellsWidth,
             h: this.cellsHeight
         }
@@ -275,18 +298,22 @@ var Building = new Phaser.Class({
     },
 
     getPrice: function (id, action) {
-        var key = (action == 'sell' ? 0 : 1);
-        return this.prices[id][key];
+        if(!(id in this.prices)) return 0;
+        return this.prices[id][action];
     },
 
     getItemNb: function (item) {
         return this.inventory.getNb(item);
     },
 
+    getGold: function(){
+        return this.gold;
+    },
+
     getTilePosition: function(){
         return {
-            x: this.tx,
-            y: this.ty
+            x: this.tileX,
+            y: this.tileY
         }
     },
 
@@ -298,7 +325,12 @@ var Building = new Phaser.Class({
         return !this.built;
     },
 
+    isFullyRepaired: function(){
+        return this.stats['hp'].getValue() == this.stats['hpmax'].getValue();
+    },
+
     isOwned: function(){ // by the player
+        // return false;
         return this.owner == Engine.player.id;
     },
 
@@ -318,8 +350,8 @@ var Building = new Phaser.Class({
         var minSelfDist = Infinity;
         for(var x = -1; x <= this.cellsWidth+1; x++){
             for(var y = -1; y < this.cellsHeight + 1; y++){
-                var cx = this.tx+x;
-                var cy = this.ty-this.cellsHeight+y;
+                var cx = this.tileX+x;
+                var cy = this.tileY-this.cellsHeight+y;
                 var cell = {x:cx,y:cy};
                 if(Engine.checkCollision(cx,cy)) continue;
                 var d = Utils.euclidean({x:Engine.player.tileX,y:Engine.player.tileY},cell);
@@ -341,7 +373,10 @@ var Building = new Phaser.Class({
             if(this.civBuilding){
                 Client.buildingClick(this.id);
             }else {
-                //if (!this.entrance) return;
+                if(this.locked && !this.isOwned() && this.isBuilt()){
+                    Engine.player.talk('That building is locked');
+                    return;
+                }
                 var entrance = this.findEntrance();
                 Engine.player.setDestinationAction(1, this.id, entrance.x, entrance.y); // 1 for building
                 Engine.computePath(entrance);
@@ -362,16 +397,20 @@ var Building = new Phaser.Class({
             }
         }
         if(cursor) UI.setCursor(cursor);
-        UI.tooltip.updateInfo(this.name);
+        UI.tooltip.updateInfo('building',{id:this.id});
         UI.tooltip.display();
     },
 
     handleOver: function(){
         UI.manageCursor(1,'building',this);
+        // this.highlight();
     },
 
     handleOut: function(){
         UI.manageCursor(0,'building');
         UI.tooltip.hide();
+        // this.resetPipeline();
     }
 });
+
+export default Building

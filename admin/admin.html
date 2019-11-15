@@ -11,6 +11,54 @@
 <h1>Westward admin</h1>
 <div ng-app="admin" ng-controller="mainCtrl">
 
+    <!--
+    <h3>Players ({{players.length}})</h3>
+    <table class="table table-bordered table-striped">
+        <tbody>
+        <tr ng-repeat="pl in players">
+            <td>{{pl.name}}</td>
+        </tr>
+        </tbody>
+
+    </table>
+
+    <h3>Buildings ({{buildings.length}})</h3>
+    <table class="table table-bordered table-striped">
+
+        <thead>
+            <tr>
+                <td>Position</td>
+                <td>Name</td>
+            </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="bld in buildings ">   | orderBy:bldSortType:bldSortReverse | filter:bldFilter
+            <td>[{{bld.x}},{{bld.y}}]</td>
+            <td>{{ bld.type | buildingName}}</td>
+        </tr>
+        </tbody>
+
+    </table>
+
+    <h3>Items in circulation</h3>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <td>Name</td>
+            <td>Number</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in items">
+            <td>{{item[0] | itemName}}</td>
+            <td>{{item[1]}} </td>
+        </tr>
+        </tbody>
+
+    </table>-->
+
+    <h3>Screenshots</h3>
     <div class="panel panel-default" ng-repeat="screenshot in screenshots">
         <div class="panel-heading">
             {{screenshot.stamp | date}} @ ({{screenshot.player.x}}, {{screenshot.player.y}}) | {{screenshot.browser}}
@@ -18,12 +66,16 @@
         <div class="panel-body">
             <img class="bug-snap" data-ng-src="data:image/png;base64,{{screenshot.img | processImg}}"/>
         </div>
-    </div>
+    </div> 
 
+    <h3>Events</h3>
     <div ng-repeat="event in events">
         <!--- ":this" means that a second argument is sent to the filter, which is a reference to the whole scope -->
         {{event | eventFilter:this}}
     </div>
+    <br/>
+    <b>Median session duration:</b> {{median_duration | number: 2}} min.<br/>
+    <b>Ratio of returning players:</b> {{ratio_returning}} %<br/>
 </div>
 
 </body>

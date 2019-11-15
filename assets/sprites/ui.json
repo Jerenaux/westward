@@ -69,10 +69,6 @@
       "frame": {"x":683,"y":118,"w":25,"h":24}
     },
     {
-      "filename": "capsule-right",
-      "frame": {"x":683,"y":118,"w":25,"h":24}
-    },
-    {
       "filename": "slots-topleft",
       "frame": {"x":442,"y":292,"w":38,"h":38}
     },
@@ -293,6 +289,42 @@
       "frame": {"x":213,"y":512,"w":39,"h":39}
     },
     {
+      "filename": "tooltip_tl",
+      "frame": {"x":213,"y":512,"w":11,"h":11}
+    },
+    {
+      "filename": "tooltip_top",
+      "frame": {"x":228,"y":512,"w":9,"h":11}
+    },
+    {
+      "filename": "tooltip_tr",
+      "frame": {"x":241,"y":512,"w":11,"h":11}
+    },
+    {
+      "filename": "tooltip_left",
+      "frame": {"x":213,"y":529,"w":11,"h":5}
+    },
+    {
+      "filename": "tooltip_middle",
+      "frame": {"x":231,"y":530,"w":5,"h":4}
+    },
+    {
+      "filename": "tooltip_right",
+      "frame": {"x":242,"y":529,"w":11,"h":5}
+    },
+    {
+      "filename": "tooltip_bl",
+      "frame": {"x":213,"y":540,"w":11,"h":11}
+    },
+    {
+      "filename": "tooltip_bottom",
+      "frame": {"x":230,"y":541,"w":5,"h":11}
+    },
+    {
+      "filename": "tooltip_br",
+      "frame": {"x":241,"y":540,"w":11,"h":11}
+    },
+    {
       "filename": "healthbar_left",
       "frame": {"x":259,"y":40,"w":24,"h":20}
     },
@@ -339,6 +371,18 @@
     {
       "filename": "miniprogress_green_middle",
       "frame": {"x":327,"y":530,"w":2,"h":8}
+    },
+    {
+      "filename": "miniprogress_red_left",
+      "frame": {"x":320,"y":505,"w":4,"h":8}
+    },
+    {
+      "filename": "miniprogress_red_right",
+      "frame": {"x":340,"y":505,"w":5,"h":8}
+    },
+    {
+      "filename": "miniprogress_red_middle",
+      "frame": {"x":331,"y":505,"w":2,"h":8}
     },
     {
       "filename": "progress_red_middle",
@@ -551,6 +595,70 @@
     {
       "filename": "exit_icon_on",
       "frame": {"x":482,"y":565,"w":36,"h":36}
+    },
+    {
+      "filename": "hammer_icon",
+      "frame": {"x":525,"y":565,"w":36,"h":36}
+    },
+    {
+      "filename": "positionCross",
+      "frame": {"x":484,"y":448,"w":10,"h":13}
+    },
+    {
+      "filename": "arrow",
+      "frame": {"x":11,"y":615,"w":19,"h":17}
+    },
+    {
+      "filename": "arrow_lit",
+      "frame": {"x":42,"y":614,"w":19,"h":17}
+    },
+    {
+      "filename": "arrow_pressed",
+      "frame": {"x":77,"y":614,"w":19,"h":17}
+    },
+    {
+      "filename": "chest",
+      "frame": {"x":482,"y":444,"w":13,"h":11}
+    },
+    {
+      "filename": "goldenheart",
+      "frame": {"x":506,"y":442,"w":13,"h":12}
+    },
+    {
+      "filename": "bread",
+      "frame": {"x":528,"y":425,"w":9,"h":12}
+    },
+    {
+      "filename": "armor",
+      "frame": {"x":527,"y":442,"w":11,"h":12}
+    },
+    {
+      "filename": "round_shield",
+      "frame": {"x":526,"y":475,"w":12,"h":12}
+    },
+    {
+      "filename": "2swords",
+      "frame": {"x":525,"y":491,"w":13,"h":12}
+    },
+    {
+      "filename": "bullseye",
+      "frame": {"x":506,"y":458,"w":14,"h":13}
+    },
+    {
+      "filename": "steps",
+      "frame": {"x":525,"y":508,"w":12,"h":12}
+    },
+    {
+      "filename": "sword",
+      "frame": {"x":525,"y":458,"w":13,"h":12}
+    },
+    {
+      "filename": "invisible",
+      "frame": {"x":865,"y":9,"w":150,"h":150}
+    },
+    {
+    "filename": "battleholder",
+    "frame": {"x":399,"y":566,"w":45,"h":42}
     }
   ]
 }

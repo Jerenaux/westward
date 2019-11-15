@@ -85,6 +85,10 @@
       "frame": {"x":24,"y":504,"w":24,"h":24}
     },
     {
+      "filename": "feathers",
+      "frame": {"x":144,"y":816,"w":25,"h":24}
+    },
+    {
       "filename": "sunflower",
       "frame": {"x":312,"y":288,"w":24,"h":24}
     },
@@ -95,6 +99,10 @@
     {
       "filename": "flask",
       "frame": {"x":288,"y":312,"w":24,"h":24}
+    },
+    {
+      "filename": "duskflask",
+      "frame": {"x":192,"y":312,"w":24,"h":24}
     },
     {
       "filename": "stingleaf",
@@ -119,6 +127,14 @@
     {
       "filename": "bomb2",
       "frame": {"x":72,"y":816,"w":24,"h":24}
+    },
+    {
+      "filename": "fists",
+      "frame": {"x":192,"y":816,"w":24,"h":24}
+    },
+    {
+      "filename": "hands",
+      "frame": {"x":216,"y":816,"w":24,"h":24}
     },
     {
       "filename": "antidote",
@@ -151,6 +167,38 @@
     {
       "filename": "shovel",
       "frame": {"x":120,"y":408,"w":24,"h":24}
+    },
+    {
+      "filename": "berries",
+      "frame": {"x":336,"y":432,"w":24,"h":24}
+    },
+    {
+      "filename": "shuriken",
+      "frame": {"x":360,"y":216,"w":24,"h":24}
+    },
+    {
+      "filename": "hammer",
+      "frame": {"x":288,"y":408,"w":24,"h":24}
+    },
+    {
+      "filename": "big_heart",
+      "frame": {"x":240,"y":168,"w":24,"h":24}
+    },
+    {
+      "filename": "aura",
+      "frame": {"x":216,"y":168,"w":24,"h":24}
+    },
+    {
+      "filename": "shoes",
+      "frame": {"x":0,"y":720,"w":24,"h":24}
+    },
+    {
+      "filename": "bunch",
+      "frame": {"x":264,"y":816,"w":24,"h":24}
+    },
+    {
+      "filename": "horn",
+      "frame": {"x":360,"y":480,"w":24,"h":24}
     }
   ]
 }

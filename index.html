@@ -2,27 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="/lib/phaser.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <link href="/client/style.css" rel="stylesheet">
     <title>Westward</title>
     <link rel="shortcut icon" type="image/x-icon" href="assets/images/favicon.ico">
 </head>
 <body>
     <div class="fontPreload">.</div> <!-- don't forget the dot, the div cannot be empty-->
     <div class="fontPreloadTreamd">.</div>
-    <center><div id='game'>
-        <input type="text" class="chat" id="chat" maxlength="40"/>
-        <input type="text" class="chat" id="name" maxlength="20"/>
+    <div id='game'>
     </div>
-    <div id="browser" class="danger"></div>
-    <div id="danger" class="danger"></div>
-    <div class="info">
-        Tile: <span id="tx">0</span>,<span id="ty">0</span>&nbsp;
-        AOI: <span id="aoi">0</span>
-        <!-- Pixel: <span id="pxx">0</span>,<span id="pxy">0</span><br/> -->
+    <div style='text-align: center;'>
+        <div id="browser" class="danger"></div>
+        <div id="danger" class="danger"></div>
+        <div class="info">
+            <!-- Pixel: <span id="pxx">0</span>,<span id="pxy">0</span>&nbsp;-->
+            Tile: <span id="tx">0</span>,<span id="ty">0</span>&nbsp;
+            AOI: <span id="aoi">0</span>
+            <!-- Pixel: <span id="pxx">0</span>,<span id="pxy">0</span><br/> -->
+        </div>
     </div>
-    </center>
+    
+    <div id="social" style='text-align: center;'>
+        Join the community on <a target="_blank" href='https://join.slack.com/t/dynetisgames/shared_invite/enQtMTc0NzU2MjgzNDExLTNiMTMwNDJmMGQ1Y2FjM2ZhYTFhMGYzNWEyYmE3MjQ2YzAyNzYwYjQyODllZTZlYzM3ZDM0MGRiMGQyNjIxNWM' title='Slack'><img src='assets/images/social-slack.png'/></a> 
+        or <a target="_blank" href='https://discord.gg/NzUnS7F' title='Discord'><img src='assets/images/discord-social.png'/></a>
+        and drop feedback on <a target="_blank" href='https://www.stomt.com/westward' title='Stomt'><img src='assets/images/stomt-social.png'/></a>!
+    </div>
+    
     <div id="disqus_thread"></div>
 <script>
     if (!(location.hostname === "localhost" || location.hostname === "127.0.0.1")){
@@ -39,80 +44,4 @@
     }
 </script>
 </body>
-<script src="shared/World.js" type="text/javascript"></script>
-<script src="shared/Utils.js" type="text/javascript"></script>
-<script src="shared/PFUtils.js" type="text/javascript"></script>
-<script src="shared/ListMap.js" type="text/javascript"></script>
-<script src="shared/SpaceMap.js" type="text/javascript"></script>
-<script src="shared/Pathfinder.js" type="text/javascript"></script>
-<script src="shared/Inventory.js" type="text/javascript"></script>
-<script src="shared/Stats.js" type="text/javascript"></script>
-<script src="shared/Equipment.js" type="text/javascript"></script>
-<script src="shared/Formulas.js" type="text/javascript"></script>
-
-<script src="client/client.js" type="text/javascript"></script>
-<script src="client/CustomSprite.js" type="text/javascript"></script>
-<script src="client/Moving.js" type="text/javascript"></script>
-<script src="client/Chunk.js" type="text/javascript"></script>
-<script src="client/BattleManager.js" type="text/javascript"></script>
-<script src="client/Engine.js" type="text/javascript"></script>
-<script src="client/NPC.js" type="text/javascript"></script>
-<script src="client/Animal.js" type="text/javascript"></script>
-<script src="client/Item.js" type="text/javascript"></script>
-<script src="client/Civ.js" type="text/javascript"></script>
-<script src="client/Player.js" type="text/javascript"></script>
-<script src="client/Hero.js" type="text/javascript"></script>
-<script src="client/Building.js" type="text/javascript"></script>
-<script src="client/UIElement.js" type="text/javascript"></script>
-<script src="client/UIHolder.js" type="text/javascript"></script>
-<script src="client/OrientationPin.js" type="text/javascript"></script>
-<script src="client/ItemSprite.js" type="text/javascript"></script>
-<script src="client/BattleTile.js" type="text/javascript"></script>
-<script src="client/Menu.js" type="text/javascript"></script>
-<script src="client/Frame.js" type="text/javascript"></script>
-<script src="client/Panel.js" type="text/javascript"></script>
-<script src="client/AbilitiesPanel.js" type="text/javascript"></script>
-<script src="client/AbilityPanel.js" type="text/javascript"></script>
-<script src="client/ChatPanel.js" type="text/javascript"></script>
-<script src="client/Tooltip.js" type="text/javascript"></script>
-<script src="client/Button.js" type="text/javascript"></script>
-<script src="client/BigButton.js" type="text/javascript"></script>
-<script src="client/BattleTimerPanel.js" type="text/javascript"></script>
-<script src="client/RespawnPanel.js" type="text/javascript"></script>
-<script src="client/InventoryPanel.js" type="text/javascript"></script>
-<script src="client/CharacterPanel.js" type="text/javascript"></script>
-<script src="client/CitizenPanel.js" type="text/javascript"></script>
-<script src="client/SettlementStatusPanel.js" type="text/javascript"></script>
-<script src="client/BuildingsPanel.js" type="text/javascript"></script>
-<script src="client/CraftingPanel.js" type="text/javascript"></script>
-<script src="client/EquipmentPanel.js" type="text/javascript"></script>
-<script src="client/ShopPanel.js" type="text/javascript"></script>
-<script src="client/PricesPanel.js" type="text/javascript"></script>
-<script src="client/ItemActionPanel.js" type="text/javascript"></script>
-<script src="client/NewbuildingPanel.js" type="text/javascript"></script>
-<script src="client/ProductionPanel.js" type="text/javascript"></script>
-<script src="client/ConstructionPanel.js" type="text/javascript"></script>
-<script src="client/CommitmentPanel.js" type="text/javascript"></script>
-<script src="client/DevLevelPanel.js" type="text/javascript"></script>
-<script src="client/ProductivityPanel.js" type="text/javascript"></script>
-<script src="client/MaterialsPanel.js" type="text/javascript"></script>
-<script src="client/SuggestPanel.js" type="text/javascript"></script>
-<script src="client/InfoPanel.js" type="text/javascript"></script>
-<script src="client/StaffPanel.js" type="text/javascript"></script>
-<script src="client/MessagesPanel.js" type="text/javascript"></script>
-<script src="client/ClassPanel.js" type="text/javascript"></script>
-<script src="client/ClassMiniPanel.js" type="text/javascript"></script>
-<script src="client/SettlementPanel.js" type="text/javascript"></script>
-<script src="client/Map.js" type="text/javascript"></script>
-<script src="client/MiniMap.js" type="text/javascript"></script>
-<script src="client/LongSlot.js" type="text/javascript"></script>
-<script src="client/ProgressBar.js" type="text/javascript"></script>
-<script src="client/MapPanel.js" type="text/javascript"></script>
-<script src="client/StatsPanel.js" type="text/javascript"></script>
-<script src="client/Bubble.js" type="text/javascript"></script>
-<script src="client/UI.js" type="text/javascript"></script>
-<script src="client/boot.js" type="text/javascript"></script>
-<script src="client/main.js" type="text/javascript"></script>
-
-<!-- <script type="text/javascript">javascript:(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//rawgit.com/mrdoob/stats.js/master/build/stats.min.js';document.head.appendChild(script);})()</script>-->
-</html>
+<script src="/dist/client.js" type="text/javascript"></script></html>

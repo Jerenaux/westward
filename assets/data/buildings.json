@@ -1,8 +1,23 @@
 {
+  "1":{
+    "name": "Shack",
+    "base":{
+      "width": 4,
+      "height": 4
+    },
+    "icon": "civhut",
+    "sprite": "civhut",
+    "foundations": "civhut_",
+    "depthOffset": 2,
+    "canFight": false,
+    "stats": {
+      "def": 20,
+      "health": 500
+    }
+  },
   "2":{
     "name":"Tower",
     "desc": "A guard tower than can intercept enemies.",
-    "padding": 15,
     "base":{
       "width": 4,
       "height": 4
@@ -11,52 +26,60 @@
     "depthOffset": 1,
     "sprite": "tower",
     "foundations":"foundations_2",
-    "mapicon": "tower",
     "mainMenu": "wip",
     "icon": "tower",
     "canFight": true,
-    "health": 250,
-    "dmg": 10,
+    "aggro": true,
+    "stats": {
+      "health": 2500,
+      "dmg": 8,
+      "def": 30,
+      "acc": 1000
+    },
     "shootFrom":{
-      "x":95,
-      "y":115
+      "x":66,
+      "y":100
     }
   },
   "3":{
     "name": "Workshop",
     "desc": "Allows to perform crafting.",
     "base":{
-      "width": 4,
+      "width": 6,
       "height": 4
     },
-    "recipe": {"3":25},
+    "recipe": {"3":20,"26":10},
     "padding": 11,
     "icon": "workshop",
-    "foundations": "foundations_1",
+    "foundations": "foundations_4",
     "sprite": "workshop",
-    "mapicon": "workshop",
     "mainMenu": "crafting",
     "depthOffset": 2,
     "canFight": false,
-    "health": 50
+    "stats": {
+      "health": 700,
+      "def": 20
+    }
   },
   "4":{
     "name": "Shop",
     "desc": "Allows to sell or buy items to and from other players.",
     "base":{
-      "width": 5,
+      "width": 4,
       "height": 4
     },
-    "recipe": {"3":15},
-    "padding": 11,
+    "recipe": {"3":10},
+    "padding": 0,
     "icon": "shop",
-    "foundations": "foundations_1",
+    "foundations": "foundations_3",
     "sprite": "shop",
-    "mapicon": "workshop",
     "mainMenu": "trade",
     "depthOffset": 2,
     "canFight": false,
-    "health": 50
+    "stats": {
+      "health": 500,
+      "def": 20
+    }
   },
   "6":{
     "name": "Lumber camp",
@@ -69,29 +92,37 @@
     "icon": "lumbercamp",
     "sprite": "lumbercamp",
     "foundations": false,
-    "mapicon": "wood",
     "mainMenu": "production",
     "depthOffset": 2,
-    "production": [[3,1,10,20]],
+    "production": [[3,1,60,5],[7,5,60,5]],
     "canFight": false,
-    "health": 50
+    "stats": {
+      "health": 200,
+      "def": 20
+    }
   },
   "11":{
     "name": "Shack",
     "desc": "A place to rest.",
     "base":{
       "width": 4,
-      "height": 3
+      "height": 4
     },
-    "recipe": {"3":10},
-    "padding": 11,
+    "recipe": {"3":5},
+    "padding": 0,
     "icon": "shack",
     "foundations": "foundations_1",
     "sprite": "shack",
-    "mapicon": "wood",
-    "mainMenu": "wip",
+    "mainMenu": "rest",
     "depthOffset": 2,
     "canFight": false,
-    "health": 50
+    "stats": {
+      "health": 500,
+      "def": 20
+    },
+    "shelter": true,
+    "locked":true,
+    "restVigorAmount": 0.5,
+    "restHealthAmount": 0.5
   }
 }

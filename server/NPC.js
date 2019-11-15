@@ -2,12 +2,13 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 11-06-18.
  */
 
-var GameServer = require('./GameServer.js').GameServer;
-var Utils = require('../shared/Utils.js').Utils;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
-var MovingEntity = require('./MovingEntity.js').MovingEntity;
 var StatsContainer = require('../shared/Stats.js').StatsContainer;
-var Inventory = require('../shared/Inventory.js').Inventory;
+
+import GameServer from './GameServer'
+import Inventory from '../shared/Inventory'
+import MovingEntity from './MovingEntity'
+import PFUtils from '../shared/PFUtils'
+import Utils from '../shared/Utils'
 
 function NPC(){
     this.isPlayer = false;
@@ -15,31 +16,28 @@ function NPC(){
     this.inFight = false;
     this.actionQueue = [];
     MovingEntity.call(this);
-    this.skipBattleTurn = GameServer.battleParameters.freezeNPC;//false; // used to distinguish from buildings
-    this.onAddAtLocation();
+    this.skipBattleTurn = GameServer.battleParameters.freezeNPC;
     this.setOrUpdateAOI();
 }
 
 NPC.prototype = Object.create(MovingEntity.prototype);
 NPC.prototype.constructor = NPC;
 
-NPC.prototype.isInVision = function(){
-    return GameServer.vision.has(this.aoi);
-};
-
 // ### Equipment ###
 
 NPC.prototype.setLoot = function(loot){
     this.loot = new Inventory(10);
-    //var loot = GameServer.animalsData[this.type].loot;
-    for(var id in loot){
-        this.addToLoot(id,loot[id]);
+    for(var item in loot){
+        var nb = loot[item][0];
+        var p = loot[item][1];
+        if(Utils.randomInt(0,10) < p*10) this.addToLoot(item,nb);
     }
 };
 
 NPC.prototype.addToLoot = function(id,nb){
     this.loot.add(id,nb);
 };
+
 
 // ### Stats ###
 
@@ -57,31 +55,6 @@ NPC.prototype.setStat = function(key,value){
 
 // ### Battle ###
 
-NPC.prototype.checkForAggro = function(){
-    if(!this.isInVision()) return;
-    if(!this.isAggressive() || this.isInFight() || !this.isAvailableForFight()) return;
-
-    var AOIs = this.fieldOfVision;
-    for(var i = 0; i < AOIs.length; i++){
-        var aoi = GameServer.AOIs[AOIs[i]];
-        for(var j = 0; j < aoi.entities.length; j++) {
-            var entity = aoi.entities[j];
-            if(!this.aggroAgainst(entity)) continue;
-            if(!entity.isAvailableForFight()) continue;
-            //TODO: vary aggro range?
-            if(Utils.chebyshev(this,entity) <= GameServer.battleParameters.aggroRange){
-                if(entity.isInFight()){
-                    this.goToDestination(entity);
-                }else {
-                    var success = GameServer.handleBattle(entity, this, true);
-                    if(this.isCiv) this.talk('battle_start');
-                }
-                break;
-            }
-        }
-    }
-};
-
 NPC.prototype.goToDestination = function(dest){
     var path = GameServer.findPath({x:this.x,y:this.y},dest,true); // true for seek-path pathfinding
     if(!path || path.length <= 1) return false;
@@ -91,10 +64,6 @@ NPC.prototype.goToDestination = function(dest){
     this.idle = false;
     this.setPath(path);
     return true;
-};
-
-NPC.prototype.canRange = function(){
-    return false;
 };
 
 NPC.prototype.queueAction = function(action){
@@ -125,25 +94,9 @@ NPC.prototype.decideBattleAction = function(){
     this.battle.processAction(this,data);
 };
 
-/*NPC.prototype.findFreeCell = function(){
-    // TODO: rework, no sorting, use of boxdistance, no call to battle.isPositionFree
-    var pos = {x:this.x,y:this.y};
-    var list = this.battle.getCells(); //{x,y,v} objects
-    list.sort(function(a,b){
-        if(Utils.chebyshev(a,pos) < Utils.chebyshev(b,pos)) return -1;
-        return 1;
-    });
-    for(var i = 0; i < list.length; i++){
-        var cell = list[i];
-        if(this.battle.isPositionFree(cell.x,cell.y)) return this.findBattlePath(cell);
-    }
-    return {
-        action: 'pass'
-    };
-};*/
-
 NPC.prototype.findBattlePath = function(dest){
     var data = {};
+    // console.warn('seeking path',{x: this.x, y: this.y}, dest);
     var path = this.battle.findPath({x: this.x, y: this.y}, dest);
     if(path && path.length > 0){
         this.setPath(path);
@@ -157,8 +110,9 @@ NPC.prototype.findBattlePath = function(dest){
 
 NPC.prototype.attackTarget = function(){
     var data = {};
-    // TODO: accomodate for ranged attacks
-    if(Utils.nextTo(this,this.target)){
+    // console.warn('['+this.getShortID()+'] taking decision');
+    // console.warn('['+this.getShortID()+']',Utils.nextTo(this,this.target), this.canRange());
+    if(Utils.nextTo(this,this.target) || this.canRange()){
         data.action = 'attack';
         data.id = this.target.getShortID();
     }else{
@@ -172,51 +126,12 @@ NPC.prototype.attackTarget = function(){
     return data;
 };
 
-NPC.prototype.aggroAgainst = function(f){
-    return this.aggroMatrix[f.entityCategory];
-};
-
-NPC.prototype.selectTarget = function(){
-    var fighters = this.battle.fighters.slice();
-    if(fighters.length == 0) return null;
-    var target = null;
-    for(var i = 1; i < fighters.length; i++){
-        var f = fighters[i];
-        if(this.isSameTeam(f) || !this.aggroAgainst(f)) continue;
-        if(!target){
-            target = f;
-            continue;
-        }
-        if(target.battlePriority == f.battlePriority){
-            if(f.getHealth() < target.getHealth()) target = f;
-        }else{
-            if(f.battlePriority < target.battlePriority) target = f;
-        }
-    }
-    return target;
-    /*fighters = fighters.filter(function(f){
-        return (!this.isSameTeam(f) && this.aggroAgainst(f));
-    },this);
-    fighters.sort(function(a,b){
-        if(a.battlePriority == b.battlePriority){
-            if(a.getHealth() < b.getHealth()) return -1;
-            return 1;
-        }else{
-            if(a.battlePriority < b.battlePriority) return -1;
-            return 1;
-        }
-    });
-    return fighters[0];*/
-};
-
 //Check if a *moving entity* (no building or anything) other than self is at position
 NPC.prototype.isPositionFree = function(x,y){
-    var entities = GameServer.positions.get(x,y);
-    if(entities.length == 0) return true;
-    entities = entities.filter(function(e){
-        return (e.isMovingEntity && e.getShortID() != this.getShortID());
-    },this);
-    return entities.length == 0;
+    var obstacles = GameServer.getEntitiesAt(x,y,1,1).filter(function(o){
+        return o.isFightingEntity;
+    });
+    return obstacles.length == 0;
 };
 
 NPC.prototype.computeBattleDestination = function(target){
@@ -272,7 +187,6 @@ NPC.prototype.isAvailableForFight = function(){
 // ### Wander ###
 
 NPC.prototype.onEndOfPath = function(){
-    //console.log('['+this.constructor.name+' '+this.id+'] arrived at destination');
     MovingEntity.prototype.onEndOfPath.call(this);
     if(this.inFight) return;
     this.setIdle();
@@ -281,6 +195,15 @@ NPC.prototype.onEndOfPath = function(){
 NPC.prototype.setIdle = function(){
     this.idle = true;
     this.idleTime = Utils.randomInt(GameServer.wildlifeParameters.idleTime[0]*1000,GameServer.wildlifeParameters.idleTime[1]*1000);
+};
+
+NPC.prototype.updateBehavior = function(){
+    if(this.trackedTarget) {
+        this.updateTracking();
+    }else{
+        if(!this.camp) return;
+        this.updateWander();
+    }
 };
 
 NPC.prototype.updateWander = function(){
@@ -300,4 +223,37 @@ NPC.prototype.updateWander = function(){
     }
 };
 
-module.exports.NPC = NPC;
+NPC.prototype.setTrackedTarget = function(target){
+    console.log('Civ ',this.id+' tracking ',target.id);
+    this.trackedTarget = target;
+    this.idle = false;
+};
+
+NPC.prototype.isTracking = function(){
+    return (this.trackedTarget != null);
+};
+
+NPC.prototype.isAvailableForTracking = function(){
+    return !this.isTracking() && this.isAvailableForFight();
+};
+
+
+NPC.prototype.updateTracking = function(){
+    if(this.moving || this.isInFight() || this.isDead()) return;
+
+    if(this.x == this.trackedTarget.x && this.y == this.trackedTarget.y){
+        console.log(this.getShortID(),'reached target');
+        this.trackedTarget = null;
+        this.setIdle();
+        return;
+    }
+
+    var path = GameServer.findPath(this,this.trackedTarget,true); // true for seek-path pathfinding
+    if(!path || path.length <= 1) return;
+
+    var trim = PFUtils.trimPath(path,GameServer.battleCells);
+    path = trim.path;
+    this.setPath(path);
+};
+
+export default NPC

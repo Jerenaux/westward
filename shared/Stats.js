@@ -2,58 +2,126 @@
  * Created by jeren on 10-12-17.
  */
 
-var onServer = (typeof window === 'undefined');
-
-if(onServer){
-    var Utils = require('../shared/Utils.js').Utils;
-}
+import Utils from './Utils'
 
 var Stats = {
     hpmax: {
         min: 0,
         max: 10000,
+        default: 100,
         noModifier: true,
         hidden: true
     },
     hp: {
-        name: 'Health',
-        desc: 'If it gets to 0, you die. Potions can replenish it.',
+        name: 'Vitality',
+        desc: 'Represents how healthy you are. If it gets to 0, you die. Look for medicine to replenish.',
         min: 0,
         max: 10000,
-        frame: 1,
+        default: 100,
+        frame: 'heart',
         hasMax: 'hpmax',
         noModifier: true
     },
-    /*fat: {
-        name: 'Fatigue',
-        desc: 'Fatigue increases as you perform actions and can impact your other stats negatively past a certain point. Rest and some potions can reduce it.',
+    vigor: {
+        name: 'Vigor',
+        desc: 'Decreases as you perform actions and become tired. If it gets too low, it will negatively impact your other stats and disable most of your abilities. Look for shelter to replenish.',
         min: 0,
         max: 100,
-        start: 0,
-        frame: 0,
+        default: 100,
+        noModifier: true,
+        frame: 'goldenheart',
         suffix: '%'
-    },*/
+    },
+    food: {
+        name: 'Food',
+        desc: 'Decreases over time. As it gets lower, your vigor will decrease faster and faster. Look for food to replenish.',
+        min: 0,
+        max: 100,
+        default: 100,
+        noModifier: true,
+        frame: 'bread',
+        suffix: '%'
+    },
     dmg: {
         name: 'Damage',
         desc: 'Offensive power of your attacks. Depends on the currently equipped weapon (melee or ranged).',
         min: 0,
         max: 1000,
-        frame: 3
+        frame: 'sword'
     },
     def: {
         name: 'Defense',
         desc: 'Resistance to all types of damage. Can be increased by several pieces of equipment.',
         min: 0,
         max: 1000,
-        frame:4
+        frame: 'armor'
     },
     acc: {
         name: 'Accuracy',
-        desc: 'Indicates your base chances to hit a target with a ranged weapon. It depends on the currently equipped ranged weapon. In battle, this number decreases based on the distance to the target.',
+        desc: 'Base chances to hit a target with a ranged weapon. Depends on the currently equipped ranged weapon. In battle, this number decreases based on the distance to the target.',
         min: 0,
         max: 100,
         default: 50,
-        frame: 2,
+        frame: 'bullseye',
+        suffix: '%'
+    },
+    respawnhp: {
+        name: 'Respawn health',
+        desc: 'Amount of health remaining after respawning.',
+        min: 10,
+        max: 400,
+        default: 10,
+        frame: 'heart', // TODO: change
+        hidden: true
+    },
+    walkfatigue: {
+        name :'Fatigue from walking',
+        desc: 'Your resistance to fatigue accumulation from walking',
+        min: 0,
+        max: 100,
+        default: 0,
+        frame: 'goldenheart', // TODO: change
+        hidden: true,
+        suffix: '%'
+    },
+    shopfatigue: {
+        name :'Fatigue from commercial activities',
+        desc: 'Your resistance to fatigue accumulation from buying and selling items',
+        min: 0,
+        max: 100,
+        default: 0,
+        frame: 'goldenheart', // TODO: change
+        hidden: true,
+        suffix: '%'
+    },
+    forageluck: {
+        name :'Foraging luck',
+        desc: 'Chance of acquiring more ingredients when foraging plants.',
+        min: 0,
+        max: 100,
+        default: 10,
+        frame: 'goldenheart', // TODO: change
+        hidden: true,
+        suffix: '%'
+    },
+    scavengeluck: {
+        name :'Scavenging luck',
+        desc: 'Chance of acquiring more ingredients when scavenging from dead animals.',
+        min: 0,
+        max: 100,
+        default: 10,
+        frame: 'goldenheart', // TODO: change
+        hidden: true,
+        suffix: '%'
+    },
+    shopluck: {
+        name :'Discount luck',
+        desc: 'Chance of having a discount when buying or selling items.',
+        min: 0,
+        max: 100,
+        default: 10,
+        frame: 'goldenheart', // TODO: change
+        hidden: true,
         suffix: '%'
     }
 };
@@ -67,21 +135,15 @@ function StatsContainer(){
     }
 }
 
-/*function getStatsShell(){
-    var shell = {};
+StatsContainer.prototype.toList = function(){
+    var list = [];
     for(var statKey in Stats){
         if(!Stats.hasOwnProperty(statKey)) return;
-        var statData = Stats[statKey];
-        var max = (statData.hasMax ? shell[statData.hasMax] : null);
-        shell[statKey] = new Stat(statKey,statData.default,max);
+        list.push({stat:statKey,value:this[statKey].getBaseValue()});
     }
-    return shell;
-}*/
+    return list;
+};
 
-if (onServer){
-    module.exports.Stats = Stats;
-    module.exports.StatsContainer = StatsContainer;
-}
 
 function Stat(key,value,max){
     this.key = key;
@@ -119,15 +181,17 @@ Stat.prototype.getValue = function(){
     return this.clamp(Math.round(base));
 };
 
-Stat.prototype.setBaseValue = function(value){
-    var v = this.clamp(value);
-    //console.warn('!',this.key,v);
+Stat.prototype.setBaseValue = function(value,force){
+    var v = (force ? value : this.clamp(value));
     this.baseValue = v;
 };
 
 Stat.prototype.increment = function(inc){
     var base = this.clamp(this.getBaseValue());
-    this.setBaseValue(base+inc);
+    var newvalue = base + inc;
+    // console.warn('base = ',base,'new = ',newvalue);
+    this.setBaseValue(newvalue);
+    return (this.getBaseValue() != base); // has the value actually changed or not
 };
 
 Stat.prototype.addAbsoluteModifier = function(modifier){
@@ -155,6 +219,10 @@ Stat.prototype.removeRelativeModifier = function(modifier){
     if(idx > -1) this.relativeModifiers.splice(idx,1);
 };
 
+Stat.prototype.clearRelativeModifiers = function(){
+    this.relativeModifiers = [];
+};
+
 Stat.prototype.trim = function(){
       var obj = {
           k: this.key,
@@ -167,4 +235,4 @@ Stat.prototype.trim = function(){
       return obj;
 };
 
-if (onServer) module.exports.Stat = Stat;
+export {Stat, Stats, StatsContainer}

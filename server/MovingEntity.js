@@ -1,32 +1,24 @@
 /**
  * Created by Jerome on 09-10-17.
  */
-var GameObject = require('./GameObject.js').GameObject;
-var GameServer = require('./GameServer.js').GameServer;
-var Utils = require('../shared/Utils.js').Utils;
-var PFUtils = require('../shared/PFUtils.js').PFUtils;
+import FightingEntity from './FightingEntity'
+import GameServer from './GameServer'
+import PFUtils from '../shared/PFUtils'
+import {SpaceMap} from "../shared/SpaceMap";
+import Utils from '../shared/Utils'
 
 function MovingEntity(){
+    FightingEntity.call(this);
     this.isMovingEntity = true;
-    this.skipBattleTurn = false; // used to distinguish from buildings
     this.moving = false;
     this.xoffset = 0;
     this.chatTimer = null;
 }
 
-MovingEntity.prototype = Object.create(GameObject.prototype);
+MovingEntity.prototype = Object.create(FightingEntity.prototype);
 MovingEntity.prototype.constructor = MovingEntity;
 
 // ### Movement ###
-
-// Called by onAddAtLocation/onRemoveAtLocation; action = 'add' or 'delete'
-MovingEntity.prototype.travelOccupiedCells = function(action){
-    for(var x = this.x; x < this.x + this.cellsWidth; x++){
-        for(var y = this.y; y < this.y + this.cellsHeight; y++) {
-            GameServer.positions[action](x,y,this);
-        }
-    }
-};
 
 MovingEntity.prototype.setFieldOfVision = function(aois){
     this.fieldOfVision = aois;
@@ -61,6 +53,8 @@ MovingEntity.prototype.updateWalk = function(){
         var y = this.path[0][1];
         this.updatePosition(x,y);
 
+        if(this.updateSteps) this.updateSteps();
+
         if(this.path.length > 1 && !this.flagToStop) {
             this.updatePathTick();
         }else{
@@ -70,11 +64,10 @@ MovingEntity.prototype.updateWalk = function(){
 };
 
 MovingEntity.prototype.updatePosition = function(x,y){
-    this.onRemoveAtLocation();
     this.x = x;
     this.y = y;
     this.setOrUpdateAOI();
-    this.onAddAtLocation();
+    if(this.setRegion) this.setRegion();
     if(!this.inFight) this.checkForBattle();
 };
 
@@ -113,8 +106,8 @@ MovingEntity.prototype.stopWalk = function(){
     this.flagToStop = true;
 };
 
-MovingEntity.prototype.getBattleAreaAround = function(cells){
-    cells = cells || new SpaceMap();
+MovingEntity.prototype.getBattleAreaAround = function(){
+    var cells = new SpaceMap();
     for(var x = this.x - 1; x <= this.x + this.cellsWidth; x++){ // <= since we want the cells all around
         for(var y = this.y - 1; y <= this.y + this.cellsHeight; y++) {
             if(!GameServer.checkCollision(x,y)) cells.add(x,y);
@@ -134,19 +127,20 @@ MovingEntity.prototype.checkForBattle = function(){
     }
 };
 
+// Where to target projectiles at
+MovingEntity.prototype.getTargetCenter = function(){
+    return {
+        x: this.x + this.cellsWidth / 2,
+        y: this.y + this.cellsHeight / 2 // - instead?
+    };
+};
 
-MovingEntity.prototype.getCenter = function(noRound){
-    if(noRound){
-        return {
-            x: this.x + this.cellsWidth / 2,
-            y: this.y + this.cellsHeight / 2
-        };
-    }else {
-        return {
-            x: Math.floor(this.x + this.cellsWidth / 2),
-            y: Math.floor(this.y + this.cellsHeight / 2)
-        };
-    }
+// Central tile for pathfinding and such
+MovingEntity.prototype.getLocationCenter = function(){
+    return {
+        x: Math.floor(this.x + this.cellsWidth / 2),
+        y: Math.floor(this.y + this.cellsHeight / 2)
+    };
 };
 
 MovingEntity.prototype.setChat = function(text){
@@ -156,27 +150,6 @@ MovingEntity.prototype.setChat = function(text){
     this.chatTimer = setTimeout(function(){
         _entity.chat = undefined;
     },GameServer.clientParameters.config.chatTimeout);
-};
-
-// ### Equipment ###
-
-
-// ### Stats ###
-
-MovingEntity.prototype.applyDamage = function(dmg){
-    this.getStat('hp').increment(dmg);
-};
-
-MovingEntity.prototype.getHealth = function(){
-    return this.getStat('hp').getValue();
-};
-
-MovingEntity.prototype.getStat = function(key){
-    return this.stats[key];
-};
-
-MovingEntity.prototype.getStats = function(){
-    return Object.keys(this.stats);
 };
 
 // ### Battle ###
@@ -202,25 +175,99 @@ MovingEntity.prototype.isDead = function(){
     return this.dead;
 };
 
-MovingEntity.prototype.isInFight = function(){
-    return this.inFight;
-};
-
 MovingEntity.prototype.isMoving = function(){
     return this.moving;
-};
-
-MovingEntity.prototype.isSameTeam = function(f){
-    return this.battleTeam == f.battleTeam;
 };
 
 MovingEntity.prototype.canFight = function(){
     return true;
 };
 
-MovingEntity.prototype.endFight = function(){
-    this.setProperty('inFight',false);
-    this.battle = null;
+/**
+ * Return an object containing all the information about the item
+ * equipped in a given slot.
+ * @param {string} slot - name of the slot where the item of
+ * interest is equiped.
+ * @returns {Object} - Object containging data about item.
+ */
+MovingEntity.prototype.getEquippedItem = function (slot) {
+    return this.equipment.getItem(slot);
+};
+
+/**
+ * Returns the item ID of the item equipped at the given slot
+ * @param {string} slot - name of the slot where the item of
+ * @returns {number} - item ID of equipped item or -1 if nothing equipped
+ */
+MovingEntity.prototype.getEquippedItemID = function (slot) {
+    return this.equipment.get(slot);
+};
+
+MovingEntity.prototype.getRangedContainer = function () {
+    return this.getEquippedItem('range_container');
+};
+
+MovingEntity.prototype.canRange = function () {
+
+    const weaponID = this.getEquippedItemID('rangedw');
+    if (weaponID === -1) {
+        if(this.isPlayer) {
+            this.addMsg('I don\'t have a ranged weapon equipped!');
+            this.setOwnProperty('resetTurn', true);
+        }
+        console.warn('no rangedw');
+        return false;
+    }
+    var weapon = this.getEquippedItem('rangedw');
+
+    const container = this.getRangedContainer();
+    if (container === false || container === -1) {
+        if(this.isPlayer) {
+            this.addMsg('I don\'t have ammo!');
+            this.setOwnProperty('resetTurn', true);
+        }
+        console.warn('no container');
+        return false;
+    }
+
+    const hasAmmo = this.equipment.hasAnyAmmo();
+    if (!hasAmmo) {
+        if(this.isPlayer) {
+            this.addMsg('I\'m out of ammo!');
+            this.setOwnProperty('resetTurn', true);
+        }
+        return false;
+    }
+
+    // console.warn('Range type:',weapon.range_type,this.equipment.getAmmoRangeType());
+    if (weapon.range_type !== this.equipment.getAmmoRangeType()) {
+        if(this.isPlayer) {
+            this.addMsg('I can\'t use my weapon with that ammo');
+            this.setOwnProperty('resetTurn', true);
+        }
+        return false;
+    }
+
+    if (hasAmmo) return true;
+
+};
+
+MovingEntity.prototype.decreaseAmmo = function () {
+    var ammoID = this.equipment.get('range_ammo');
+    this.equipment.load(-1);
+    if(this.isPlayer) {
+        var nb = this.equipment.getNbAmmo();
+        if (nb === 0) this.unequip('range_ammo', true);
+        this.updatePacket.addAmmo(nb);
+    }
+    return ammoID;
+};
+
+MovingEntity.prototype.getShootingPoint = function () {
+    return {
+        x: this.x + 1,
+        y: this.y + 1
+    };
 };
 
 MovingEntity.prototype.getRect = function(){
@@ -234,7 +281,6 @@ MovingEntity.prototype.getRect = function(){
 
 MovingEntity.prototype.remove = function(){
     if(this.battle) this.battle.removeFighter(this);
-    this.onRemoveAtLocation();
 };
 
-module.exports.MovingEntity = MovingEntity;
+export default MovingEntity

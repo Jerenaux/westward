@@ -2,60 +2,114 @@
  * Created by Jerome Renaux (jerome.renaux@gmail.com) on 03-09-18.
  */
 
-var GameServer = require('./GameServer.js').GameServer;
-var Utils = require('../shared/Utils.js').Utils;
+import GameServer from './GameServer'
+import Utils from '../shared/Utils'
 
-
-function Camp(buildings,target,center){
+function Camp(id,center,bldData){
+    this.schemaModel = GameServer.CampModel;
+    this.id = id;
     this.buildings = [];
     this.people = [];
-    this.targetSettlement = target;
     this.center = center;
-
-    /*buildings.forEach(function(hut){
-        this.buildings.push(GameServer.addBuilding({
-            x: hut.x,
-            y: hut.y,
-            type: 4,
-            built: true
-        }));
-    },this);*/
+    this.region = GameServer.getRegion(this.center);
+    this.bldData = bldData;
 }
 
+Camp.prototype.spawnBuildings = function(){
+    this.bldData.forEach(function (bld) {
+        this.buildings.push(GameServer.buildCivBuilding({
+            x: bld.x,
+            y: bld.y,
+            type: 1,
+            civ: true,
+            campID: this.id,
+            built: true
+        }));
+    }, this);
+
+    // loadBuildings() -> addBuilding() -> embed()
+    // build() -> finalizeBuilding() -> addBuilding() -> embed()
+    // civBuild() -> addBuilding -> embed()
+};
+
+// Camp.prototype.save = function(){
+//     // if(!this.isOfInstance(-1)) return;
+//     var this_ = this;
+//     this.schemaModel.findById(this.mongoID, function (err, doc) { // this.model._id
+//         if (err) throw err;
+//         if(doc === null){
+//             console.warn('Cannot save camp for id ',this_.mongoID);
+//             return;
+//         }
+//
+//         doc.set(_document);
+//         doc.save(function (err) {
+//             _document.dblocked = false;
+//             if(err) throw err;
+//             console.log('Camp saved');
+//         });
+//     });
+// };
+
+Camp.prototype.addBuilding = function(bld){
+    this.buildings.push(bld);
+};
+
 Camp.prototype.update = function(){
-    return;
     if(!GameServer.isTimeToUpdate('camps')) return;
 
-    if(this.people.length < 10){ // TODO: variable camp parameter (size)
-        var hut = Utils.randomElement(this.buildings);
-        var pos = hut.getCenter();
-        pos.y += 2;
-        var civ = GameServer.addCiv(pos.x,pos.y);
-        civ.setCamp(this);
-        this.people.push(civ);
-    }
+    this.buildings.forEach(function(bld){
+        if(bld.isDestroyed()) return;
+        // TODO: variable camp parameter (size)
+        if(this.people.length < 5) this.spawnCiv(bld);
+        // TODO: add auto-repair
+    },this);
 
-    if(this.readyToRaid()) this.findTargets();
+    // TODO: add auto-heal of civs
+
+    if(this.readyToRaid()) this.findTarget();
+};
+
+Camp.prototype.spawnCiv = function(bld){
+    var pos = GameServer.findNextFreeCell(bld.x + 2, bld.y + 1);
+    var type = Utils.randomInt(0,1) >=  0.7 ? 1 : 0; //TODO: conf
+    var civ = GameServer.addCiv(pos.x, pos.y, type);
+    civ.setCamp(this);
+    this.people.push(civ);
 };
 
 Camp.prototype.readyToRaid = function(){
-    return this.people.length >= GameServer.civsParameters.raidMinimum;
+    var nbFreeCivs = 0;
+    for(var i = 0; i < this.people.length; i++){
+        var civ = this.people[i];
+        if(civ.isAvailableForTracking()) nbFreeCivs++;
+        if(nbFreeCivs >= GameServer.civsParameters.raidMinimum) return true;
+    }
+    return false;
 };
 
-Camp.prototype.findTargets = function(){
-    var targetPlayers = GameServer.settlements[this.targetSettlement].players;
-    if(targetPlayers.length == 0) return;
-    var player = Utils.randomElement(targetPlayers);
-    this.raid(player);
+Camp.prototype.findTarget = function(){
+    for(var playerID in GameServer.players){
+        var player = GameServer.players[playerID];
+        if(player.isAvailableForFight() && Utils.euclidean(this.center,player) < 200){ // TODO: conf
+            this.raid(player);
+            break;
+        }else{
+            console.log('player too far or unavailable (d=',Utils.euclidean(this.center,player),')');
+        }
+    }
 };
 
-Camp.prototype.raid = function(playerID){
-    console.log('raiding',playerID);
-    var player = GameServer.players[playerID];
-    for(var i = 0; i < 3; i++){ // TODO: config
-        var civ = Utils.randomElementRemoved(this.people);
-        if(!civ) break;
-        civ.setTrackedTarget(player);
+Camp.prototype.raid = function(player){
+    console.log('Raiding ',player.id);
+    var sent = 0;
+    for(var i = 0; i < this.people.length; i++) {
+        var civ = this.people[i];
+        if(civ.isAvailableForTracking()) {
+            civ.setTrackedTarget(player);
+            sent++;
+        }
+        if(sent >= GameServer.civsParameters.raidMinimum) return;
     }
 };
 
@@ -68,18 +122,7 @@ Camp.prototype.remove = function(civ){
     }
 };
 
-Camp.prototype.getBuildingMarkers = function(){
-    return this.buildings.map(function(b){
-        return {
-            marker:'building',
-            x: b.x,
-            y: b.y,
-            type: b.type
-        }
-    });
-};
-
-Camp.prototype.selectionTrim = function(){
+/*Camp.prototype.selectionTrim = function(){
     var trimmed = {};
     var broadcastProperties = ['id','name','pop','surplus','desc','level'];
     for(var p = 0; p < broadcastProperties.length; p++){
@@ -89,6 +132,6 @@ Camp.prototype.selectionTrim = function(){
     trimmed.y = (this.fort.y-10)/World.worldHeight;
     trimmed.buildings = this.buildings.length;
     return trimmed;
-};
+};*/
 
-module.exports.Camp = Camp;
+export default Camp

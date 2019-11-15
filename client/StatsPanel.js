@@ -1,6 +1,9 @@
 /**
  * Created by jeren on 10-12-17.
  */
+import Panel from './Panel'
+import UI from './UI'
+import {Stats} from '../shared/Stats'
 
 function StatsPanel(x,y,width,height,title){
     Panel.call(this,x,y,width,height,title);
@@ -26,15 +29,15 @@ StatsPanel.prototype.addStats = function(){
         this.addStat(this.x+x,this.y+y,stat);
         i++;
     }
-    this.updateStats();
+    // this.updateStats();
 };
 
 StatsPanel.prototype.addStat = function(x,y,s){
     var stat = Stats[s];
     var statObj = {};
-    var icon = UI.scene.add.sprite(x,y,'icons2',stat.frame);
+    var icon = UI.scene.add.sprite(x+18,y+11,'UI',stat.frame);
     icon.setScrollFactor(0);
-    icon.setDisplayOrigin(0,0);
+    // icon.setDisplayOrigin(0,0);
     icon.setDepth(1);
     icon.setVisible(false);
     statObj.icon = icon;
@@ -48,13 +51,15 @@ StatsPanel.prototype.addStat = function(x,y,s){
     statObj.text = text;
     this.content.push(text);
 
-    var zone = UI.scene.add.zone(x,y,70,30);
+    var zone = UI.scene.add.zone(x,y,100,30);
     zone.setDepth(10);
     zone.setScrollFactor(0);
+    zone.setOrigin(0);
     zone.setVisible(false);
     zone.setInteractive();
     zone.on('pointerover',function(){
-        UI.tooltip.updateInfo(stat.name,stat.desc,-1,(stat.hasMax ? stat.hasMax : s));
+        // UI.tooltip.updateInfo(stat.name,stat.desc,-1,(stat.hasMax ? stat.hasMax : s));
+        UI.tooltip.updateInfo('stat',{stat:s});
         UI.tooltip.display();
     });
     zone.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
@@ -64,15 +69,15 @@ StatsPanel.prototype.addStat = function(x,y,s){
     this.stats[s] = statObj;
 };
 
-StatsPanel.prototype.updateStats = function(){
+StatsPanel.prototype.updateStats = function(player){
     for(var stat in Stats) {
         if (!Stats.hasOwnProperty(stat)) continue;
         var statInfo = Stats[stat];
         if(statInfo.hidden) continue;
-        var value = Engine.player.getStatValue(stat);
+        var value = player.getStatValue(stat);
         var suffix = statInfo.suffix;
         if(suffix) value = value+suffix;
-        if(statInfo.hasMax) value = value+"/"+Engine.player.getStatValue(statInfo.hasMax);
+        if(statInfo.hasMax) value = value+"/"+player.getStatValue(statInfo.hasMax);
         var statObj = this.stats[stat];
         statObj.text.setText(value);
     }
@@ -92,3 +97,5 @@ StatsPanel.prototype.displayStats = function(){
         statObj.zone.setVisible(true);
     }
 };
+
+export default StatsPanel

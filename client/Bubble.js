@@ -2,12 +2,15 @@
  * Created by Jerome on 19-11-17.
  */
 
+import Engine from './Engine'
+import UI from './UI'
+
 function Bubble(x,y,isNotification){
     this.container = [];
     this.x = x;
     this.y = y;
     this.isNotificiation = isNotification || false;
-    this.duration = this.isNotificiation ? Engine.config.notificationDuration : Engine.config.chatTimeout;
+    this.duration = this.isNotificiation ? Engine.config.notificationTimeout : Engine.config.chatTimeout;
     this.makeBubble(x,y);
     this.finalize();
 }
@@ -65,17 +68,20 @@ Bubble.prototype.shift = function(dx,dy){
     this.y += dy;
 };
 
-Bubble.prototype.updatePosition = function(nx,ny){
+Bubble.prototype.updatePosition = function(nx,ny,depth){
     var dx = nx - this.x;
     var dy = ny - this.y;
     this.shift(dx,dy);
+    this.container.forEach(function(c){
+        c.setDepth(depth);
+    })
 };
 
 Bubble.prototype.finalize = function(){
     for(var i = 0; i < this.container.length; i++){
         var e = this.container[i];
-        var isText = (e.constructor.name == 'Text');
-        e.setDepth(10);
+        var isText = (e.type == 'Text');
+        e.setDepth(15);
         e.setDisplayOrigin(0,0);
         e.setVisible(false);
         if(this.isNotificiation) e.setScrollFactor(0);
@@ -154,3 +160,5 @@ Bubble.prototype.hide = function(){
         e.setVisible(false);
     });
 };
+
+export default Bubble

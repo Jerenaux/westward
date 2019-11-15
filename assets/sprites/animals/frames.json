@@ -1,0 +1,18 @@
+{
+    "graywolf":{
+        "frameWidth":43,
+        "frameHeight":32
+    },
+    "blackwolf":{
+        "frameWidth":43,
+        "frameHeight":32
+    },
+    "whitewolf":{
+        "frameWidth":43,
+        "frameHeight":32
+    },
+    "bears":{
+        "frameWidth":56,
+        "frameHeight":56
+    }
+}

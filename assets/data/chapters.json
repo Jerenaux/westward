@@ -1,0 +1,9 @@
+{
+  "0":{
+    "desc":"Lorem ipsum",
+    "goals":{
+      "buildings":[[2,10]],
+      "items":[[43,10],[45,100]]
+    }
+  }
+}

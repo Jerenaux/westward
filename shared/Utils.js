@@ -2,11 +2,10 @@
  * Created by Jerome on 11-08-17.
  */
 
-var onServer = (typeof window === 'undefined');
+import World from '../shared/World'
 
-if(onServer){
-    World = require('./World.js').World;
-}
+import itemsData from '../assets/data/items.json'
+
 
 var Utils = {
     colors: {},
@@ -17,6 +16,7 @@ var Utils = {
 Utils.colors.white = '#ffffff';
 Utils.colors.gold = '#ffd700';
 Utils.colors.red = '#ff0000';
+Utils.colors.lightred = '#ff3b3b';
 Utils.colors.blue = '#558fff';
 Utils.strokes.red = '#331111';
 Utils.colors.green = '#11ee11';
@@ -26,10 +26,25 @@ Utils.fonts.fancy = 'belwe';
 
 // ### Coordinates methodes ###
 
-Utils.tileToAOI = function(tile){ // input coords in Tiles
+/**
+ * Return the AOI to which a tile belongs.
+ * @param {Object|number} tile - {x,y} coordinates of tile, or alternatively the x coordinate only.
+ * @param {number} y - The y coordinate of the tile.
+ */
+Utils.tileToAOI = function(tile,y){
+    var tileX,tileY;
+    if(y !== undefined){
+        tileX = tile;
+        tileY = y;
+    }else{
+        tileX = tile.x;
+        tileY = tile.y;
+    }
     if(!World.nbChunksHorizontal) throw Error('Chunk data not initialized');
-    var top = Math.floor(tile.y/World.chunkHeight);
-    var left = Math.floor(tile.x/World.chunkWidth);
+    tileX = Utils.clamp(tileX,0,World.worldWidth-1);
+    tileY = Utils.clamp(tileY,0,World.worldHeight-1);
+    var top = Math.floor(tileY/World.chunkHeight);
+    var left = Math.floor(tileX/World.chunkWidth);
     return (top*World.nbChunksHorizontal)+left;
 };
 
@@ -42,6 +57,7 @@ Utils.AOItoTile = function(aoi){
 };
 
 Utils.getAOIcorners = function(aoi){
+    // Returns in order: tl, tr, br, bl
     var l = [];
     var o = Utils.AOItoTile(aoi);
     l.push(o);
@@ -83,14 +99,12 @@ Utils.pctToTile = function(x,y){
 };
 
 Utils.screenToMap = function(x,y,map){
-    var tlx = map.x - map.originX*map.width;
-    var tly = map.y - map.originY*map.height;
-    var pctx = (x-tlx)/map.width;
-    var pcty = (y-tly)/map.height;
-    var tile = Utils.pctToTile(pctx,pcty);
+    var tlx = map.x - map.displayOriginX; // top left of map
+    var tly = map.y - map.displayOriginY;
+    console.log(x,y,tlx,tly);
     return {
-        x: Math.ceil(tile.x),
-        y: Math.ceil(tile.y)
+        x: x - tlx,
+        y: y - tly
     }
 };
 
@@ -185,6 +199,24 @@ Utils.listAdjacentAOIs = function(current){
     return AOIs;
 };
 
+Utils.listNeighborsInGrid = function(current,width,height,offset){
+    offset = (offset || 1);
+    var nbh = [current];
+    var isAtTop = (current < width);
+    var isAtBottom = (current > ((width*height)-1) - width);
+    var isAtLeft = (current%width == 0);
+    var isAtRight = (current%width == width-1);
+    if(!isAtTop) nbh.push(current - width);
+    if(!isAtBottom) nbh.push(current + width);
+    if(!isAtLeft) nbh.push(current-(1*offset));
+    if(!isAtRight) nbh.push(current+(1*offset));
+    if(!isAtTop && !isAtLeft) nbh.push(current-(1*offset)-width);
+    if(!isAtTop && !isAtRight) nbh.push(current+(1*offset)-width);
+    if(!isAtBottom && !isAtLeft) nbh.push(current-(1*offset)+width);
+    if(!isAtBottom && !isAtRight) nbh.push(current+(1*offset)+width);
+    return nbh;
+}
+
 Utils.formatMoney = function(nb){
     return 'coin'+(nb > 1 ? 's' : '');
 };
@@ -273,6 +305,28 @@ Utils.multiTileManhattan = function(A,B){
     return Math.abs(dx)+Math.abs(dy);
 };
 
+Utils.getItemMissionData = function(goal, nb){
+    var mission = goal.split(':');
+    var type = mission[0];
+    var item = mission[1];
+    var itemData = itemsData[item];
+    var verb = type == 'craftitem' ? 'Produce' : 'Gather';
+    return {
+        "type": "Economy",
+        "regionStatus": [2],
+        "name": verb+" "+nb+" "+itemData.name,
+        "desc": "Ensure that at least "+nb+" "+itemData.name+" are available in the region",
+        "atlas": itemData.atlas,
+        "frame": itemData.frame,
+        "count": goal,
+        "goal": nb,
+        "rewards": {
+            "1": 1, //TODO: conf
+            "2": 2
+        }
+    }
+};
+
 Utils.clamp = function(x,min,max){ // restricts a value to a given interval (return the value unchanged if within the interval
     return Math.max(min, Math.min(x, max));
 };
@@ -325,6 +379,19 @@ Utils.shuffle = function(array) {
     }
 };
 
+Utils.indexOfMax = function(arr) {
+    if (arr.length === 0) return -1;
+    var max = arr[0];
+    var maxIndex = 0;
+    for (var i = 1; i < arr.length; i++) {
+        if (arr[i] > max) {
+            maxIndex = i;
+            max = arr[i];
+        }
+    }
+    return maxIndex;
+};
+
 Utils.printArray = function(arr){
     console.log(JSON.stringify(arr));
 };
@@ -344,6 +411,13 @@ function coordinatesToCell(v,grid){
     return Math.floor(v/grid);
 }
 
+Utils.computeSpeed = function(angle){ // return unit speed vector given an angle
+    return {
+        x: Math.cos(angle),
+        y: -Math.sin(angle)
+    }
+};
+
 Array.prototype.diff = function(a) { // returns the elements in the array that are not in array a
     return this.filter(function(i) {return a.indexOf(i) < 0;});
 };
@@ -352,4 +426,44 @@ Array.prototype.last = function(){
     return this[this.length-1];
 };
 
-if (onServer) module.exports.Utils = Utils;
+Array.prototype.rotate = function( n ) {
+    this.unshift.apply( this, this.splice( n, this.length ) );
+    return this;
+};
+
+Array.prototype.previous = function(i){
+    return (i > 0 ? this[i-1] : this.last());
+};
+
+if (typeof Object.assign !== 'function') {
+    // Must be writable: true, enumerable: false, configurable: true
+    Object.defineProperty(Object, "assign", {
+        value: function assign(target, varArgs) { // .length of function is 2
+            'use strict';
+            if (target === null || target === undefined) {
+                throw new TypeError('Cannot convert undefined or null to object');
+            }
+
+            var to = Object(target);
+
+            for (var index = 1; index < arguments.length; index++) {
+                var nextSource = arguments[index];
+
+                if (nextSource !== null && nextSource !== undefined) {
+                    for (var nextKey in nextSource) {
+                        // Avoid bugs when hasOwnProperty is shadowed
+                        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                            to[nextKey] = nextSource[nextKey];
+                        }
+                    }
+                }
+            }
+            return to;
+        },
+        writable: true,
+        configurable: true
+    });
+}
+
+// if (onServer) module.exports.Utils = Utils;
+export default Utils;

@@ -1,12 +1,70 @@
 /**
  * Created by Jerome on 26-06-17.
  */
+import AbilitiesPanel from './AbilitiesPanel'
+import BattleEquipmentPanel from './BattleEquipmentPanel'
+import Animal from './Animal'
+import BattleManager from './BattleManager'
+import BattleTile from './BattleTile'
+import BigButton from './BigButton'
+import BuildingTitle from './BuildingTitle'
+import BuildPanel from './BuildPanel'
+import Capsule from './Capsule'
+import Boot from './Boot';
+import Building from './Building'
+import CharacterPanel from './CharacterPanel'
+import ChatPanel from './ChatPanel'
+import Chunk from './Chunk'
+import Civ from './Civ'
+import ClassMiniPanel from './ClassMiniPanel'
+import Client from './Client';
+import ConstructionPanel from './ConstructionPanel'
+import CraftingPanel from './CraftingPanel'
+import EquipmentPanel from './EquipmentPanel'
+import Hero from './Hero'
+// import {HighlightPipeline, HollowPipeline} from './shaders'
+import InfoPanel from './InfoPanel'
+import Inventory from '../shared/Inventory'
+import InventoryPanel from './InventoryPanel'
+import Item from './Item'
+import ItemActionPanel from './ItemActionPanel'
+import JournalPanel from './JournalPanel'
+import MapPanel from './MapPanel'
+import Menu from './Menu'
+import menuIcon from './menuIcon';
+import MiniMap from './MiniMap'
+import MissionsPanel from './MissionsPanel'
+import Panel from './Panel'
+import Pathfinder from '../shared/Pathfinder'
+import PFUtils from '../shared/PFUtils'
+import Player from './Player'
+import PricesPanel from './PricesPanel'
+import ProductionPanel from './ProductionPanel'
+import RecipesPanel from './RecipesPanel'
+import RegionStatusPanel from './RegionStatusPanel'
+import Remains from './Remains'
+import RepairPanel from './RepairPanel'
+import RespawnPanel from './RespawnPanel'
+import RestPanel from './RestPanel'
+import ShopInventoryPanel from './ShopInventoryPanel'
+import {ShopPanel, ShopGoldPanel} from './ShopPanel'
+import {SpaceMap} from '../shared/SpaceMap';
+import StatsPanel from './StatsPanel'
+import TutorialManager from './TutorialManager'
+import UI from './UI'
+import Utils from '../shared/Utils'
+import World from '../shared/World';
+
+import animalsData from '../assets/data/animals.json'
+import buildingsData from '../assets/data/buildings.json'
+import regionsData from '../assets/data/regions.json'
+
 var Engine = {
     // TODO: Move to conf?
-    baseViewWidth: 32,
-    baseViewHeight: 18,
     tileWidth: 32,
     tileHeight: 32,
+    viewWidth: 32, // tiles; TODO: conf
+    viewHeight: 18, // tiles
 
     markerDepth: 1,
     buildingsDepth: 2,
@@ -23,35 +81,44 @@ var Engine = {
     tooltipTextDepth: 18,
 
     // TODO: Move to conf
-    craftInvSize: 5, // max number of ingredients for crafting
     maxPathLength: 36,
 
     debugMarker: true,
     debugCollisions: false,
     dummyUI: false,
-    skipGrass: false,
 
     key: 'game', // key of the scene, for Phaser
-    plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager','LightsPlugin'],
+    plugins: ['Clock','DataManagerPlugin','InputPlugin','Loader','TweenManager'], // 'LightsPlugin'
     playerIsInitialized: false
 };
 
 Engine.preload = function() {
     Engine.useTilemaps = false;
 
+    this.load.atlas('tileset', 'assets/tilesets/tileset.png', 'assets/tilesets/tileset.json');
+    this.load.atlas('tileset_wh', 'assets/tilesets/tileset_wh.png', 'assets/tilesets/tileset.json');
+
+    this.load.atlas('remains', 'assets/sprites/remains.png','assets/sprites/remains.json');
+
     // Characters
     this.load.spritesheet('enemy', 'assets/sprites/enemy.png',{frameWidth:64,frameHeight:64});
-    this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64});
-    this.load.spritesheet('wolves', 'assets/sprites/animals/wolves.png',{frameWidth:32,frameHeight:32});
-    this.load.spritesheet('bears', 'assets/sprites/animals/bears2.png',{frameWidth:56,frameHeight:56});
-    this.load.spritesheet('toadmen', 'assets/sprites/animals/toadmen.png',{frameWidth:48,frameHeight:48});
+    this.load.spritesheet('hero', 'assets/sprites/newhero.png',{frameWidth:64,frameHeight:64}); // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
+    this.load.spritesheet('enemy-wh', 'assets/sprites/enemy_wh.png',{frameWidth:64,frameHeight:64});
+    this.load.spritesheet('hero-wh', 'assets/sprites/newhero_wh.png',{frameWidth:64,frameHeight:64}); // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#
 
-    // ###### dummy
-    //this.load.atlas('dummy', 'assets/sprites/dummy.png', 'assets/sprites/dummy.json');
 
-    // #################""
+    this.load.spritesheet('graywolf', 'assets/sprites/animals/graywolf.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('blackwolf', 'assets/sprites/animals/blackwolf.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('whitewolf', 'assets/sprites/animals/whitewolf.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('graywolf-wh', 'assets/sprites/animals/graywolf_wh.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('blackwolf-wh', 'assets/sprites/animals/blackwolf_wh.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('whitewolf-wh', 'assets/sprites/animals/whitewolf_wh.png',{frameWidth:43,frameHeight:32});
+    this.load.spritesheet('bear', 'assets/sprites/animals/bear.png',{frameWidth:64,frameHeight:64});
+    this.load.spritesheet('bear-wh', 'assets/sprites/animals/bear_wh.png',{frameWidth:64,frameHeight:64});
+    this.load.spritesheet('butterfly', 'assets/sprites/animals/butterfly.png',{frameWidth:9,frameHeight:7});
 
-    //this.load.image('grass', 'assets/sprites/grassbg.png');
+    // ###################
+
     // Misc
     this.load.spritesheet('3grid', 'assets/sprites/3grid.png',{frameWidth:32,frameHeight:32});
     this.load.spritesheet('bubble', 'assets/sprites/bubble2.png',{frameWidth:5,frameHeight:5});
@@ -68,8 +135,8 @@ Engine.preload = function() {
 
     // Icons
     this.load.atlas('mapicons', 'assets/sprites/mapicons.png', 'assets/sprites/mapicons.json');
-    this.load.atlas('trayicons', 'assets/sprites/trayicons.png', 'assets/sprites/trayicons.json');
-    this.load.atlas('aok', 'assets/sprites/buildingsicons.png', 'assets/sprites/buildingsicons.json');
+    this.load.atlas('battleicons', 'assets/sprites/battleicons.png', 'assets/sprites/battleicons.json');
+    this.load.atlas('buildingsicons', 'assets/sprites/buildingsicons.png', 'assets/sprites/buildingsicons.json');
 
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
     this.load.atlas('items2', 'assets/sprites/resources_full.png', 'assets/sprites/resources_full.json');
@@ -81,13 +148,9 @@ Engine.preload = function() {
     this.load.atlas('orientation', 'assets/sprites/orientation.png', 'assets/sprites/orientation.json');
     this.load.image('tail', 'assets/sprites/tail.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll.png');
-    this.load.image('longscroll', 'assets/sprites/longscroll.png');
-    this.load.image('radial3', 'assets/sprites/scroll_mask.png');
-    this.load.image('radiallongrect', 'assets/sprites/radial_longrect.png');
-    this.load.image('fullmap', 'assets/sprites/fortmap.png');
-    this.load.image('fullmap_zoomed', 'assets/sprites/fortmap_01.png');
-    this.load.image('minimap', 'assets/sprites/minimap2s.png');
-    //this.load.image('mapring', 'assets/sprites/ring.png');
+    this.load.image('bigbg', 'assets/sprites/bigbg.png');
+    this.load.image('bigbg_mask', 'assets/sprites/bigbg_mask.png');
+    this.load.image('worldmap', 'maps/worldmap.png');
 
     // SFX
     Engine.audioFiles = [];
@@ -125,39 +188,7 @@ Engine.preload = function() {
     this.load.audio('wind2','assets/sfx/wind2.wav');
     this.load.audio('wind3','assets/sfx/wind3.wav');
 
-    this.load.json('buildings', 'assets/data/buildings.json');
-    this.load.json('itemsData', 'assets/data/items.json');
-    this.load.json('animals', 'assets/data/animals.json');
-    this.load.json('civs', 'assets/data/civs.json');
-
     if(Client.tutorial) this.load.json('tutorials', 'assets/data/tutorials.json');
-
-    Engine.collidingTiles = []; // list of tile ids that collide (from tilesets.json)
-    Engine.tilesheets = [];
-
-    for(var i = 0, firstgid = 1; i < Boot.tilesets.length; i++){
-        var tileset = Boot.tilesets[i];
-        var absolutePath = tileset.image;
-        var tokens = absolutePath.split('\\');
-        var img = tokens[tokens.length-1];
-        var path = 'assets/tilesets/'+img;
-
-        if(Engine.useTilemaps){
-            this.load.image(tileset.name, path);
-        }else{
-            this.load.spritesheet(tileset.name, path,{frameWidth:tileset.tilewidth,frameHeight:tileset.tileheight});
-        }
-        Engine.tilesheets.push(tileset.name);
-        //console.log(tileset.name,firstgid);
-
-        var columns = Math.floor(tileset.imagewidth/Engine.tileWidth);
-        var tilecount = columns * Math.floor(tileset.imageheight/Engine.tileHeight);
-        // Add to the list of collidingTiles the colliding tiles in the tileset
-        Engine.collidingTiles = Engine.collidingTiles.concat(tileset.collisions.map(function(tile){
-            return tile+firstgid;
-        }));
-        firstgid += tilecount;
-    }
 };
 
 Engine.entityManager = {
@@ -233,13 +264,12 @@ Engine.create = function(){
 
     var masterData = Boot.masterData;
     World.readMasterData(masterData);
-    Engine.nbLayers = masterData.nbLayers;
-    if(!Engine.nbLayers) console.warn('falsy number of layers : '+console.log(Engine.nbLayers));
     Engine.mapDataLocation = Boot.mapDataLocation;
-    console.log('Master file read, setting up world of size '+World.worldWidth+' x '+World.worldHeight+' with '+Engine.nbLayers+' layers');
 
-    Engine.tilesets = masterData.tilesets;
-    Engine.tilesetMap = {}; // maps tiles to tilesets;
+    Engine.tilesetData = {};
+    Engine.tilesetData.atlas = Engine.scene.cache.json.get('tileset').frames;
+    Engine.tilesetData.config = Engine.scene.cache.json.get('tileset').config;
+    Engine.tilesetData.shorthands = Engine.scene.cache.json.get('tileset').shorthands;
 
     Engine.chunks = {}; // holds references to the containers containing the chunks
     Engine.displayedChunks = [];
@@ -251,6 +281,11 @@ Engine.create = function(){
         Engine.animationsPools[key] = new Pool('sprite',key);
     });
     Engine.footprintsPool = new Pool('image','footsteps');
+
+    Engine.imagePool = new Pool('image','items');
+    Engine.imagePool2 = new Pool('image','items2');
+    // TODO why? - why not imageItemPool, imageItemPool2
+
     Engine.arrowsPool = new Pool('image','items');
     Engine.bombsPool = new Pool('image','items2');
     Engine.textPool = new Pool('text');
@@ -259,6 +294,7 @@ Engine.create = function(){
     Engine.animals = {}; // animal.id -> building object
     Engine.buildings = {}; // building.id -> building object
     Engine.items = {};
+    Engine.remains = {};
     Engine.civs = {};
     Engine.battleCells = {}; // cell.id -> cell object
     Engine.battleCellsMap = new SpaceMap();
@@ -268,28 +304,17 @@ Engine.create = function(){
     Engine.entityManager.registerEntityType('item',Item,Engine.items);
     Engine.entityManager.registerEntityType('cell',BattleTile,Engine.battleCells);
     Engine.entityManager.registerEntityType('civ',Civ,Engine.civs);
+    Engine.entityManager.registerEntityType('remain',Remains,Engine.remains);
+
+
 
     Engine.debug = true;
     Engine.showHero = true;
     Engine.showGrid = false;
+    Engine.qtQuads = []; // for debugging
 
     Engine.camera = Engine.scene.cameras.main;
-
-    Engine.buildingsData = Engine.scene.cache.json.get('buildings');
-    Engine.animalsData = Engine.scene.cache.json.get('animals');
-    Engine.civsData = Engine.scene.cache.json.get('civs');
-    Engine.itemsData = Engine.scene.cache.json.get('itemsData');
-
-    Engine.buildingIconsData = {};
-    for(var building in Engine.buildingsData){
-        var data = Engine.buildingsData[building];
-        Engine.buildingIconsData[building] = {
-            'atlas': 'aok',
-            'frame': data.icon,
-            'name': data.name,
-            'desc': data.desc
-        };
-    }
+    Engine.camera.setBounds(0,0,Engine.worldWidth*Engine.tileWidth,Engine.worldHeight*Engine.tileHeight);
 
     Engine.createMarker();
     Engine.createAnimations();
@@ -302,21 +327,23 @@ Engine.create = function(){
     Engine.scene.input.on('pointermove', Engine.trackMouse);
 
     // TODO: move these to classes
+    Engine.scene.input.setPollAlways();
     Engine.scene.input.on('pointerover', Engine.handleOver);
     Engine.scene.input.on('pointerout', Engine.handleOut);
     Engine.scene.input.on('drag', Engine.handleDrag);
     Engine.scene.input.keyboard.on('keydown', Engine.handleKeyboard);
 
     Engine.collisions = new SpaceMap();
+    Engine.overlay = new SpaceMap();
     Engine.pathFinder = new Pathfinder(Engine.collisions,Engine.maxPathLength);
 
     Engine.resources = new SpaceMap();
 
     Engine.inMenu = false;
-    Engine.inPanel = false;
+    UI.inPanel = false;
     Engine.dead = false;
     Engine.currentMenu = null;
-    Engine.currentPanel = null;
+    UI.currentPanel = null;
 
     Engine.useBlitters = false;
     if(Engine.useBlitters){
@@ -330,13 +357,13 @@ Engine.create = function(){
         Engine.blitters.push(Engine.scene.add.blitter(0,0,'trees').setDepth(4));
     }
 
+    // Engine.getGameInstance().renderer.addPipeline('highlight', new HighlightPipeline(Engine.getGameInstance()));
+    // Engine.getGameInstance().renderer.addPipeline('hollow_items', new HollowPipeline(Engine.getGameInstance()));
+    // Engine.getGameInstance().renderer.addPipeline('hollow_moving', new HollowPipeline(Engine.getGameInstance()));
+
     Engine.created = true;
     Engine.configEngine();
-    if(Client.tutorial){
-        Engine.bootTutorial('part1');
-    }else{
-        Client.requestData();
-    }
+    Client.requestData();
 };
 
 Engine.getGameInstance = function(){
@@ -357,170 +384,31 @@ Engine.createMarker = function(){
     Engine.hideMarker();
 };
 
+// Called at the end of create(), data is received before the Engine scene starts
 Engine.configEngine = function(){
     Engine.config = Client.gameConfig.config;
 };
 
-Engine.nextTut = function(){
-    Engine.currentTutorialPanel.hide();
-    Engine.displayTutorial();
-};
-
-Engine.displayTutorial = function(){
-    var i = Engine.nextTutorial++;
-
-    if(i >= Engine.tutorialData.length){
-        Engine.currentTutorialPanel.hide();
-        return;
-    }
-
-    var specs = Engine.tutorialData;
-    var spec = specs[i];
-    var pos = spec.pos;
-    var j = 0;
-    while(pos === null){
-        pos = specs[i-j++].pos;
-    }
-
-    if(spec.camera) {
-        if(spec.camera == 'keep'){
-
-        }else {
-            Engine.camera.stopFollow();
-            Engine.camera.pan(spec.camera[0] * 32, spec.camera[1] * 32);
-        }
-    }else if(!spec.camera && i > 0 && specs[i-1].camera){
-        Engine.camera.pan(Engine.player.x,Engine.player.y,1000,'Linear',false,function(camera,progress){
-            if(progress == 1) Engine.camera.startFollow(Engine.player);
-        });
-    }
-
-    var x = pos[0];
-    var y = pos[1];
-    var w = pos[2];
-    var h = pos[3];
-    if(x == 'c') x = (UI.getGameWidth() - w) / 2;
-    if(y == 'c') y = (UI.getGameHeight() - h) / 2;
-    var panel = new InfoPanel(x, y, w, h, 'Tutorial');
-    panel.setWrap(30);
-
-    var x = 15;
-    var y = 20;
-    panel.addText(x,y,spec.txt);
-
-    if(spec.hook){
-        Engine.tutHook = spec.hook;
-    }else{
-        panel.addBigButton('Next', Engine.nextTut);
-        Engine.tutHook = null;
-    }
-    panel.display();
-    panel.moveUp(5);
-    Engine.currentTutorialPanel = panel;
-    Engine.inPanel = false;
-
-    if(Engine.checkHook()) Engine.nextTut();
-};
-
-Engine.checkHook = function(){
-      if(!Engine.tutHook) return false;
-      var info = Engine.tutHook.split(':');
-      if(info[0] == 'stock'){
-          if(Engine.buildings[info[1]].getItemNb(info[2]) == info[3]) return true;
-      }
-      return false;
-};
-
-Engine.tutorialHook = function(hook){
-    if(Engine.tutHook == hook) Engine.nextTut();
-};
-
-Engine.tutorialBld = function(x,y,bldID){
-    var items = [];
-    if(bldID == 6) items.push([3,5]);
-    Engine.updateWorld({newbuildings:[{id:4,type:6,built:true,x:x,y:y,items:items,owner:Engine.player.id}]});
-};
-
-Engine.tutorialStock = function(action,item,nb){
-    // TODO: Make all this much more declarative
-    if(action == 'give') nb *= -1;
-    var newnb = Engine.currentBuiling.getItemNb(item)-nb;
-    var items = [[parseInt(item),newnb]];
-    var updt = {buildings:{}};
-    updt.buildings[Engine.currentBuiling.id] = {items:items};
-    Engine.updateWorld(updt);
-    items = [];
-    items.push([parseInt(item),Engine.player.getItemNb(item)+nb]);
-    var sign = (nb > 0 ? '+' : '');
-    Engine.player.updateData(
-        {items:items,
-        notifs:[sign+nb+' '+Engine.itemsData[item].name]} // TODO: centralize notifs
-    );
-    //if(newnb == 0) Engine.tutorialHook('empty:'+Engine.currentBuiling.id+':'+item);
-    Engine.tutorialHook('stock:'+Engine.currentBuiling.id+':'+item+':'+newnb);
-    if(action == 'give'){
-       var recipe = Engine.buildingsData[Engine.currentBuiling.buildingType].recipe;
-       if(newnb >= recipe[item]){
-           var updt = {buildings:{}};
-           updt.buildings[Engine.currentBuiling.id] = {built:true};
-           Engine.updateWorld(updt);
-       }
-    }
-}
-;
-
-Engine.bootTutorial = function(part){
-    var data = { // TODO: move to conf
-        id: 0,
-        x: 1211,
-        y: 160,
-        settlement: 1,
-        markers: []
-    };
-    Engine.initWorld(data);
-    data = {
-        gold: 100,
-        stats: [{k:'hpmax',v:300},{k:'hp',v:300}],
-        bldRecipes: [11,6,2,3,4]
-    };
-    Engine.player.updateData(data);
-    data = {
-        'newbuildings':[
-            {id:0,type:11,x:1203,y:156,built:true,ownerName:'Roger'},
-            {id:1,type:11,x:1199,y:153,built:true,ownerName:'Tom'},
-            {id:2,type:3,x:1189,y:159,built:false,items:[[3,20]],ownerName:'Joe'}
-        ]
-    };
-    Engine.updateWorld(data);
-
-    Engine.tutorialData = Engine.scene.cache.json.get('tutorials')[part];
-    Engine.nextTutorial = 0;
-    Engine.displayTutorial();
-};
-
 Engine.initWorld = function(data){
+    /* data = initialization packet sent by server, contains the data from
+    Player.initTrim() used in Hero.setUp()
+    */
     //Engine.animalUpdates = new ListMap(); // debug purpose, remove
     Engine.firstSelfUpdate = true;
 
     console.log(data);
     //Engine.settlementsData = data.settlements;
-    Engine.makeRecipesLists();
     Engine.addHero(data);
+    Engine.playerIsInitialized = true;
+    Engine.updateEnvironment();
 
     Engine.makeUI();
 
-    // TODO: move
-    var settlements = {
-        0: {name:'New Beginnng'},
-        1: {name:'Hope'}
-    };
-    Engine.setlCapsule.setText(settlements[data.settlement].name);
+    Engine.setlCapsule.setText(regionsData[data.region].name);
 
-    Engine.playerIsInitialized = true;
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     Engine.showMarker();
     if(Engine.miniMap) Engine.miniMap.display();
-    Engine.updateAllOrientationPins();
 
     if(Client.isNewPlayer() && !Client.tutorial) {
         var w = 400;
@@ -539,23 +427,10 @@ Engine.initWorld = function(data){
         panel.display();
     }
 
-    setInterval(function(){
-        if(Engine.currentBuiling){
-            var buildingTypeData = Engine.buildingsData[Engine.currentBuiling.buildingType];
-            var production = buildingTypeData.production;
-            if(!production) return;
-            for(var i = 0; i < production.length; i++){
-                var rate = production[i][2];
-                var rest = Engine.currentTurn%rate;
-                var remainder = rate-rest;
-                console.log(remainder);
-            }
-        }
-    },1000);
+    if(Client.tutorial) TutorialManager.boot(1);
 
-    return;
     // todo: move all to dedicated sound manager
-    Engine.lastOrientationSound = 0;
+    /*Engine.lastOrientationSound = 0;
     // todo: move to JSON file (+ config for delay)
     Engine.ambientSounds([
         {name:'birds1',volume:1},
@@ -568,7 +443,7 @@ Engine.initWorld = function(data){
         {name:'wind1',volume:1},
         {name:'wind2',volume:1},
         {name:'wind3',volume:1}
-    ],17000);
+    ],17000);*/
 };
 
 Engine.ambientSounds = function(sounds,interval){
@@ -591,53 +466,34 @@ Engine.playLocalizedSound = function(sound,maxVolume,location){
 };
 
 Engine.createAnimations = function(){
-    // Player
-    Engine.createWalkAnimation('player_move_right','hero',143,151,15);
-    Engine.createWalkAnimation('player_move_up','hero',104,112,15);
-    Engine.createWalkAnimation('player_move_down','hero',130,138,15);
-    Engine.createWalkAnimation('player_move_left','hero',117,125,15);
-    // TODO: reverse them
-    Engine.createAttackAnimation('player_attack_right','hero',195,200);
-    Engine.createAttackAnimation('player_attack_down','hero',182,187);
-    Engine.createAttackAnimation('player_attack_left','hero',169,174);
-    Engine.createAttackAnimation('player_attack_up','hero',156,161);
-    Engine.createAttackAnimation('player_bow_right','hero',247,259);
-    Engine.createAttackAnimation('player_bow_down','hero',234,246);
-    Engine.createAttackAnimation('player_bow_left','hero',221,233);
-    Engine.createAttackAnimation('player_bow_up','hero',208,220);
+    Engine.createHumanoidAnimations('hero');
+    Engine.createHumanoidAnimations('enemy');
+    Engine.createHumanoidAnimations('hero-wh');
+    Engine.createHumanoidAnimations('enemy-wh');
 
-    // Civ
-    Engine.createWalkAnimation('enemy_move_right','enemy',143,151,15);
-    Engine.createWalkAnimation('enemy_move_up','enemy',104,112,15);
-    Engine.createWalkAnimation('enemy_move_down','enemy',130,138,15);
-    Engine.createWalkAnimation('enemy_move_left','enemy',117,125,15);
+    Engine.createWolfAnimations('graywolf');
+    Engine.createWolfAnimations('blackwolf');
+    Engine.createWolfAnimations('whitewolf');
 
-    Engine.createAttackAnimation('enemy_attack_right','enemy',195,200);
-    Engine.createAttackAnimation('enemy_attack_down','enemy',182,187);
-    Engine.createAttackAnimation('enemy_attack_left','enemy',169,174);
-    Engine.createAttackAnimation('enemy_attack_up','enemy',156,161);
-    Engine.createAttackAnimation('enemy_bow_right','enemy',247,259);
-    Engine.createAttackAnimation('enemy_bow_down','enemy',234,246);
-    Engine.createAttackAnimation('enemy_bow_left','enemy',221,233);
-    Engine.createAttackAnimation('enemy_bow_up','enemy',208,220);
-    
-    // Wolves
-    Engine.createWalkAnimation('wolf_move_down','wolves',0,2);
-    Engine.createWalkAnimation('wolf_move_left','wolves',12,14);
-    Engine.createWalkAnimation('wolf_move_right','wolves',24,26);
-    Engine.createWalkAnimation('wolf_move_up','wolves',36,38);
-    Engine.createWalkAnimation('whitewolf_move_down','wolves',3,5);
-    Engine.createWalkAnimation('whitewolf_move_left','wolves',15,17);
-    Engine.createWalkAnimation('whitewolf_move_right','wolves',27,29);
-    Engine.createWalkAnimation('whitewolf_move_up','wolves',39,41);
+    Engine.createWolfAnimations('graywolf-wh');
+    Engine.createWolfAnimations('blackwolf-wh');
+    Engine.createWolfAnimations('whitewolf-wh');
 
-    //Bears
-    Engine.createWalkAnimation('bear_move_down','bears',9,11);
-    Engine.createWalkAnimation('bear_move_left','bears',21,23);
-    Engine.createWalkAnimation('bear_move_right','bears',33,35);
-    Engine.createWalkAnimation('bear_move_up','bears',45,47);
+    Engine.createBearAnimations('bear');
+    Engine.createBearAnimations('bear-wh');
 
-    Engine.scene.anims.create(config = {
+    // Bear
+    // Engine.createAnimation('bear_move_down','bears',9,11,10,true);
+    // Engine.createAnimation('bear_move_left','bears',21,23,10,true);
+    // Engine.createAnimation('bear_move_right','bears',33,35,10,true);
+    // Engine.createAnimation('bear_move_up','bears',45,47,10,true);
+    //
+    // Engine.createAnimation('bear_rest_down','bears',9,9);
+    // Engine.createAnimation('bear_rest_left','bears',21,21);
+    // Engine.createAnimation('bear_rest_right','bears',33,33);
+    // Engine.createAnimation('bear_rest_up','bears',45,45);
+
+    Engine.scene.anims.create({
         key: 'sword',
         frames: Engine.scene.anims.generateFrameNumbers('sword_anim', { start: 0, end: 2}),
         frameRate: 15,
@@ -648,7 +504,7 @@ Engine.createAnimations = function(){
         }
     });
 
-    Engine.scene.anims.create(config = {
+    Engine.scene.anims.create({
         key: 'explosion',
         frames: Engine.scene.anims.generateFrameNumbers('explosion', { start: 0, end: 80}),
         frameRate: 75,
@@ -659,37 +515,99 @@ Engine.createAnimations = function(){
         }
     });
 
-    Engine.scene.anims.create(config = {
+    Engine.scene.anims.create({
         key: 'player_death',
         frames: Engine.scene.anims.generateFrameNumbers('hero', { start: 260, end: 265}),
         frameRate: 10
     });
 
-    Engine.scene.anims.create(config = {
-        key: 'enemy_death',
-        frames: Engine.scene.anims.generateFrameNumbers('enemy', { start: 260, end: 265}),
-        frameRate: 10
-    });
-};
-
-Engine.createAttackAnimation = function(key,texture,start,end){
-    var frames = Engine.scene.anims.generateFrameNumbers(texture, { start: start, end: end});
-    frames.push({key:texture, frame:start});
-    Engine.scene.anims.create(config = {
-        key: key,
-        frames: frames,
-        frameRate: 15
-    });
-};
-
-Engine.createWalkAnimation = function(key,texture,start,end,rate){
-    rate = rate || 10;
-    Engine.scene.anims.create(config = {
-        key: key,
-        frames: Engine.scene.anims.generateFrameNumbers(texture, { start: start, end: end}),
-        frameRate: rate,
+    Engine.scene.anims.create({
+        key: 'butterflap',
+        frames: Engine.scene.anims.generateFrameNumbers('butterfly', { start: 0, end: 1}),
+        frameRate: 5,
         repeat: -1
     });
+};
+
+Engine.createHumanoidAnimations = function(key){
+    var texture = key;
+    // TODO: don't hardcode, store in JSON of find a way to infer it
+    // (standardize all spritesheets?)
+    Engine.createAnimation(key+'_move_right',texture,143,151,15,10,true);
+    Engine.createAnimation(key+'_move_up',texture,104,112,15,10,true);
+    Engine.createAnimation(key+'_move_down',texture,130,138,15,10,true);
+    Engine.createAnimation(key+'_move_left',texture,117,125,15,10,true);
+
+    Engine.createAnimation(key+'_attack_right',texture,195,200,15,false,true);
+    Engine.createAnimation(key+'_attack_down',texture,182,187,15,false,true);
+    Engine.createAnimation(key+'_attack_left',texture,169,174,15,false,true);
+    Engine.createAnimation(key+'_attack_up',texture,156,161,15,false,true);
+
+    Engine.createAnimation(key+'_bow_right',texture,247,259,15,false,true);
+    Engine.createAnimation(key+'_bow_down',texture,234,246,15,false,true);
+    Engine.createAnimation(key+'_bow_left',texture,221,233,15,false,true);
+    Engine.createAnimation(key+'_bow_up',texture,208,220,15,false,true);
+
+    Engine.createAnimation(key+'_rest_down',texture,130,130);
+    Engine.createAnimation(key+'_rest_left',texture,117,117);
+    Engine.createAnimation(key+'_rest_right',texture,143,143);
+    Engine.createAnimation(key+'_rest_up',texture,104,104);
+};
+
+Engine.createWolfAnimations = function(key){
+    Engine.createAnimation(key+'_move_down',key,0,2,10,true);
+    Engine.createAnimation(key+'_move_left',key,7,9,10,true);
+    Engine.createAnimation(key+'_move_right',key,14,16,10,true);
+    Engine.createAnimation(key+'_move_up',key,21,23,10,true);
+
+    Engine.createAnimation(key+'_attack_down',key,28,34,15,false,true);
+    Engine.createAnimation(key+'_attack_left',key,35,41,15,false,true);
+    Engine.createAnimation(key+'_attack_right',key,42,48,15,false,true);
+    Engine.createAnimation(key+'_attack_up',key,49,55,15,false,true);
+
+    Engine.createAnimation(key+'_die_down',key,56,58);
+    Engine.createAnimation(key+'_die_left',key,63,65);
+    Engine.createAnimation(key+'_die_right',key,70,72);
+    Engine.createAnimation(key+'_die_up',key,77,79);
+
+    Engine.createAnimation(key+'_rest_down',key,1,1);
+    Engine.createAnimation(key+'_rest_left',key,8,8);
+    Engine.createAnimation(key+'_rest_right',key,15,15);
+    Engine.createAnimation(key+'_rest_up',key,22,22);
+};
+
+Engine.createBearAnimations = function(key){
+    Engine.createAnimation(key+'_move_down',key,0,2,10,true);
+    Engine.createAnimation(key+'_move_left',key,8,10,10,true);
+    Engine.createAnimation(key+'_move_right',key,16,18,10,true);
+    Engine.createAnimation(key+'_move_up',key,24,26,10,true);
+
+    Engine.createAnimation(key+'_die_down',key,32,34);
+    Engine.createAnimation(key+'_die_left',key,40,42);
+    Engine.createAnimation(key+'_die_right',key,48,50);
+    Engine.createAnimation(key+'_die_up',key,56,58);
+
+    Engine.createAnimation(key+'_attack_down',key,64,71,15,false,true);
+    Engine.createAnimation(key+'_attack_left',key,72,79,15,false,true);
+    Engine.createAnimation(key+'_attack_right',key,80,87,15,false,true);
+    Engine.createAnimation(key+'_attack_up',key,88,95,15,false,true);
+
+    Engine.createAnimation(key+'_rest_down',key,1,1);
+    Engine.createAnimation(key+'_rest_left',key,9,9);
+    Engine.createAnimation(key+'_rest_right',key,17,17);
+    Engine.createAnimation(key+'_rest_up',key,25,25);
+};
+
+Engine.createAnimation = function(key,texture,start,end,rate,loop,revert){
+    rate = rate || 10;
+    var config = {
+        key: key,
+        frames: Engine.scene.anims.generateFrameNumbers(texture, { start: start, end: end}),
+        frameRate: rate
+    };
+    if(loop) config.repeat = -1;
+    if(revert) config.frames.push({key:texture, frame:start}); // adds the initial frame as the last frame
+    Engine.scene.anims.create(config);
 };
 
 Engine.toggleChatBar = function(){
@@ -703,7 +621,6 @@ Engine.manageDeath = function(){
 
 Engine.manageRespawn = function(){
     Engine.showMarker();
-    Engine.displayUI();
     Engine.dead = false;
     Engine.updateAllOrientationPins();
 };
@@ -715,19 +632,54 @@ Engine.updateAllOrientationPins = function(){
     Engine.entityManager.displayLists['civ'].forEach(function(cid){
         Engine.civs[cid].manageOrientationPin();
     });
+    Engine.orientationPins = {
+        'top': {},
+        'left': {},
+        'right': {},
+        'bottom': {}
+    };
     Engine.entityManager.displayLists['item'].forEach(function(iid){
         Engine.items[iid].manageOrientationPin();
     });
+    // Engine.pruneOrientationPins();
     Engine.entityManager.displayLists['player'].forEach(function(pid){
         Engine.players[pid].manageOrientationPin();
     });
 };
 
+Engine.pruneOrientationPins = function(){
+    // TODO: complete
+    for(var side in Engine.orientationPins){
+        if(side != 'right') continue; // TODO: remove
+        for(var item in Engine.orientationPins[side]){
+            var pins = Engine.orientationPins[side];
+            for(var i = 0; i < pins.length; i++){
+                var base = pins[i];
+                for(var j = i+1; j < pins.length; j++) {
+                    var other = pins[j];
+                    // TODO: conf
+                    var d = Math.abs(base.y - other.y);
+                    console.warn(d);
+                    if(d < 20){
+                        other.hide();
+                        pins.splice(j,1);
+                        base += d/2;
+                    }
+                }
+                // if(i >= pins.length) break;
+            }
+        }
+    }
+};
+
+Engine.updateBehindness = function(){
+    Engine.entityManager.displayLists['item'].forEach(function(iid){
+        Engine.items[iid].manageBehindness();
+    });
+};
+
 Engine.makeBuildingTitle = function(){
-    //Engine.buildingTitle = new UIHolder(512,10,'center');
     Engine.buildingTitle = new BuildingTitle(512,10);
-    //Engine.buildingTitle.setButton(Engine.leaveBuilding);
-    //Engine.settlementTitle = new UIHolder(512,55,'center','small');
 };
 
 // #############################
@@ -805,10 +757,8 @@ function SettlementCapsule(x,y){
 SettlementCapsule.prototype.setText = function(text){
     var tx = this.text.width;
     this.text.setText(text);
-    var delta = this.text.width - tx - 20;
-
-    this.slices[0].width += delta;
-    this.slices[1].x -= delta;
+    this.slices[0].width = this.text.width + 60;
+    this.slices[1].x = this.slices[0].x - (this.slices[0].width);///2) - (this.slices[1].width) - 30;
 };
 
 SettlementCapsule.prototype.display = function(){
@@ -824,11 +774,6 @@ SettlementCapsule.prototype.hide = function(){
     });
     this.text.setVisible(false);
 };
-
-/*Engine.addHolder = function(x,y,icon){
-    Engine.holders.push(UI.scene.add.sprite(x,y,'UI','holder').setScrollFactor(0).setDepth(2));
-    Engine.menuIcons.push(UI.scene.add.sprite(x,y,'items2',icon).setScrollFactor(0).setDepth(2));
-};*/
 
 Engine.toggleMenuIcons = function(){
     Engine.menuIcons.forEach(function(i){
@@ -848,6 +793,27 @@ Engine.displayHUD = function(){
     Engine.toggleMenuIcons();
 };
 
+Engine.hideCapsules = function(){
+    Engine.lifeCapsule.hide();
+    Engine.goldCapsule.hide();
+    Engine.bagCapsule.hide();
+    Engine.vigorCapsule.hide();
+    Engine.foodCapsule.hide();
+    Engine.face.setVisible(false);
+    Engine.faceHolder.setVisible(false);
+};
+
+Engine.displayCapsules = function(){
+    Engine.lifeCapsule.display();
+    Engine.goldCapsule.display();
+    Engine.bagCapsule.display();
+    Engine.vigorCapsule.display();
+    Engine.foodCapsule.display();
+    Engine.face.setVisible(true);
+    Engine.faceHolder.setVisible(true);
+};
+
+// Called after the Hero is set up
 Engine.makeUI = function(){
     // TODO: make a zone with onpointerover = cursor is over UI, and make slices not interactive anymore
     //Engine.UIHolder = new UIHolder(1000,500,'right');
@@ -860,103 +826,108 @@ Engine.makeUI = function(){
 
     bug.on('pointerup',Engine.snap);
     bug.on('pointerover',function(){
-        UI.tooltip.updateInfo('Snap a pic of a bug');
+        UI.tooltip.updateInfo('free',{body:'Snap a pic of a bug'});
         UI.tooltip.display();
     });
     bug.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
 
-    Engine.miniMap = new MiniMap(2);
+    Engine.miniMap = new MiniMap();
     Engine.setlCapsule = new SettlementCapsule(950,3);
-    //Engine.foodCapsule = new SettlementCapsule(950,30);
-    //Engine.foodCapsule.setText('Famine');
 
     var x = 23;
     var y = 19;
-    UI.scene.add.sprite(x,y,'UI','facebg').setScrollFactor(0);
-    UI.scene.add.sprite(x,y,'faces',0).setScrollFactor(0);
+    Engine.faceHolder = UI.scene.add.sprite(x,y,'UI','facebg').setScrollFactor(0).setDepth(2);
+    Engine.face = UI.scene.add.sprite(x,y,'faces',0).setScrollFactor(0).setDepth(3);
 
-    Engine.lifeCapsule = new Capsule(37,3,'UI','heart');
+    Engine.lifeCapsule = new Capsule(UI.scene,37,3,'UI','heart');
+    Engine.lifeCapsule.setHoverText(UI.tooltip,'Vitality',UI.textsData['health_help']);
     Engine.lifeCapsule.removeLeft();
     Engine.lifeCapsule.display();
     Engine.lifeCapsule.update = function(){
         this.setText(Engine.player.getStatValue('hp')+'/'+Engine.player.getStatValue('hpmax'));
     };
 
-    Engine.goldCapsule = new Capsule(152,3,'UI','gold');
+    Engine.goldCapsule = new Capsule(UI.scene,152,3,'UI','gold');
+    Engine.goldCapsule.setHoverText(UI.tooltip,'Gold',UI.textsData['gold_help']);
     Engine.goldCapsule.display();
     Engine.goldCapsule.update = function(){
-        this.setText(Engine.player.gold); // TODO: add max
+        this.setText(Engine.player.gold || 0); // TODO: add max
     };
+    Engine.goldCapsule.update();
 
-    Engine.bagCapsule = new Capsule(225,3,'UI','smallpack');
+    Engine.bagCapsule = new Capsule(UI.scene,228,3,'UI','smallpack');
+    Engine.bagCapsule.setHoverText(UI.tooltip,'Backpack',UI.textsData['backpack_help']);
     Engine.bagCapsule.display();
     Engine.bagCapsule.update = function(){
         this.setText(Engine.player.inventory.size+'/'+Engine.player.inventory.maxSize);
     };
     Engine.bagCapsule.update();
 
+    Engine.vigorCapsule = new Capsule(UI.scene,50,30,'UI','goldenheart');
+    Engine.vigorCapsule.setHoverText(UI.tooltip,'Vigor',UI.textsData['vigor_help']);
+    Engine.vigorCapsule.display();
+    Engine.vigorCapsule.update = function(){
+        this.setText(Engine.player.getStatValue('vigor')+'%');
+    };
+
+    Engine.foodCapsule = new Capsule(UI.scene,140,30,'UI','bread');
+    Engine.foodCapsule.setHoverText(UI.tooltip,'Food',UI.textsData['food_help']);
+    Engine.foodCapsule.display();
+    Engine.foodCapsule.update = function(){
+        this.setText(Engine.player.getStatValue('food')+'%');
+    };
+
+    Engine.capsules = {
+        update: function(){
+            Engine.lifeCapsule.update();
+            Engine.foodCapsule.update();
+            Engine.vigorCapsule.update();
+        }
+    };
+    Engine.capsules.update();
+
     Engine.makeBuildingTitle();
 
-    var statsPanel = new StatsPanel(665,335,330,145,'Stats');
-    statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help']);
+    var statsPanel = new StatsPanel(665,335,330,100,'Stats');
+    statsPanel.addButton(300, 8, 'blue','help',null,'',UI.textsData['stats_help'],'stats_help');
+
+    var mapPanel = Engine.makeMapPanel();
+
+    // Todo: make a 'makerepairpanel()' method similar to 'makepricespanel()'?
+    Engine.repairPanel = new RepairPanel(476,190,500,200,'Repair');
+    Engine.repairPanel.addButton(500-16,-8,'red','close',Engine.repairPanel.hide.bind(Engine.repairPanel),'Close');
+    Engine.repairPanel.addButton(460, 8, 'blue','help',null,'',UI.textsData['repair_help'],'repair_help');
+    Engine.repairPanel.moveUp(3);
+    Engine.repairAction = new ShopPanel(670,390,300,100,'Take');
+    Engine.repairAction.addButton(300-16,-8,'red','close',Engine.repairAction.hide.bind(Engine.repairAction),'Close');
+    Engine.repairAction.moveUp(2);
 
     Engine.menus = {
-        'abilities': Engine.makeAbilitiesMenu(),
         'battle': Engine.makeBattleMenu(),
         'build': Engine.makeBuildMenu(),
         'character': Engine.makeCharacterMenu(),
         'construction': Engine.makeConstructionMenu(),
         'crafting': Engine.makeCraftingMenu(),
-        //'fort': Engine.makeFortMenu(),
         'inventory': Engine.makeInventory(statsPanel),
-        'map': Engine.makeMapMenu(),
+        'map': Engine.makeMapMenu(mapPanel),
+        'missions': Engine.makeRegionsMenu(mapPanel),
         //'messages': Engine.makeMessagesMenu(),
         'production': Engine.makeProductionMenu(),
-        //'staff': Engine.makeStaffMenu(),
+        'respawn': Engine.makeRespawnMenu(),
+        'rest': Engine.makeRestMenu(),
         'trade': Engine.makeTradeMenu(),
         'wip': Engine.makeWipMenu()
     };
 
     Engine.menuIcons = [];
     //Engine.addMenu(1004,140,'menu_crow',Engine.menus.messages,895,73);
-    Engine.addMenu(967,159,'menu_map',Engine.menus.map,855,73);
-    Engine.addMenu(922,159,'menu_backpack',Engine.menus.inventory,815,73);
-    Engine.addMenu(884,136,'menu_dude',Engine.menus.character,775,73);
-    //Engine.addMenu(863,95,'menu_flag',Engine.menus.inventory,735,73);
+    Engine.addMenu(967,150,'menu_map',Engine.menus.map,855,73);
+    Engine.addMenu(922,150,'menu_backpack',Engine.menus.inventory,815,73);
+    Engine.addMenu(884,130,'menu_dude',Engine.menus.character,775,73);
+    Engine.addMenu(863,95,'menu_flag',Engine.menus.missions,735,73);
     Engine.addMenu(20,60,'shovel',Engine.menus.build,-100,60);
 
-    /*var coords = [[1004,140,'menu_letter'],[967,159,'menu_map'],[922,159,'menu_map'],[884,136,'menu_map'],[863,95,'menu_map']];
-    coords.forEach(function(c){
-        Engine.addHolder(c[0],c[1],c[2]);
-    });*/
-
-    /*var UIelements = [];
-    var gap = 50;
-    var x = 960;
-    var y = 530;
-    var letter = new UIElement(x,y,Engine.menus.messages,'envelope');
-    UIelements.push(letter);
-    x -= gap;
-    UIelements.push(new UIElement(x,y,Engine.menus.map,'self_map'));
-    x -= gap;
-    UIelements.push(new UIElement(x,y,Engine.menus.character,'scroll'));
-    x -= gap;
-    UIelements.push(new UIElement(x,y,Engine.menus.inventory,'backpack'));
-    x -= gap;
-    Engine.nbBasicUIEelements = UIelements.length;
-    Engine.UIelements = UIelements;
-    Engine.UIHolder.resize(Engine.getHolderSize());
-
-    Engine.addMenuIcon(x,y,'coin',Engine.menus.trade);
-    Engine.addMenuIcon(x,y,'map',Engine.menus.fort);
-    Engine.addMenuIcon(x,y,'cogs',Engine.menus.construction);
-    Engine.addMenuIcon(x,y,'cogs',Engine.menus.production);
-    x -= gap;
-    Engine.addMenuIcon(x,y,'tools',Engine.menus.crafting);
-    Engine.addMenuIcon(x,y,'staff',Engine.menus.staff);*/
-
     Engine.makeBattleUI();
-    //Engine.displayUI();
 
     var chatw = 230;
     var chath = 50;
@@ -979,85 +950,11 @@ Engine.makeUI = function(){
     );*/
 };
 
-menuIcon = function(x,y,icon,menu,tox,toy){
-    this.fromx = x;
-    this.fromy = y;
-    this.tox = tox;
-    this.toy = toy;
-    this.bg = UI.scene.add.sprite(x,y,'UI','holder').setScrollFactor(0).setDepth(2).setInteractive();
-    this.icon = UI.scene.add.sprite(x,y,'items2',icon).setScrollFactor(0).setDepth(2); // bubble down to bg
-    this.bg.on('pointerdown',function(){
-        menu.toggle();
-        if(Engine.bldRect) Engine.bldUnclick(true);
-    });
-    var bg_ = this.bg;
-    this.bg.on('pointerover',function(){
-        UI.tooltip.updateInfo(menu.name);
-        UI.tooltip.display();
-        bg_.setFrame('holder_over');
-    });
-    //this.bg.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
-    this.bg.on('pointerout',function(){
-        UI.tooltip.hide();
-        bg_.setFrame('holder');
-    });
-    this.displayed = true;
-};
 
-menuIcon.prototype.toggle = function(){
-    if(this.displayed){
-        if(Engine.inBuilding || Engine.currentMenu.fullHide){
-            this.fullhide();
-        }else {
-            this.hide();
-        }
-    }else{
-        this.display();
-    }
-};
-
-menuIcon.prototype.display = function(){
-    this.bg.setVisible(true);
-    this.icon.setVisible(true);
-    UI.scene.tweens.add(
-        {
-            targets: [this.bg,this.icon],
-            x: this.fromx,
-            y: this.fromy,
-            duration: 200
-        }
-    );
-    this.displayed = true;
-};
-
-menuIcon.prototype.hide = function(){
-    this.displayed = false;
-    UI.scene.tweens.add(
-        {
-            targets: [this.bg,this.icon],
-            x: this.tox,
-            y: this.toy,
-            duration: 300
-        }
-    );
-};
-
-menuIcon.prototype.fullhide = function(){
-    this.bg.setVisible(false);
-    this.icon.setVisible(false);
-    this.displayed = false;
-};
 
 Engine.addMenu = function(x,y,icon,menu,tox,toy){
     Engine.menuIcons.push(new menuIcon(x,y,icon,menu,tox,toy));
 };
-
-/*Engine.addMenuIcon = function(x,y,frame,menu){
-    var icon = new UIElement(x,y,menu,frame);
-    icon.setVisible(false);
-    Engine.UIelements.push(icon);
-    menu.setIcon(icon);
-};*/
 
 Engine.makeBattleUI = function(){
     Engine.fightText = UI.scene.add.text(Engine.getGameConfig().width/2,50, 'Fight!',  { font: '45px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 });
@@ -1087,6 +984,10 @@ Engine.tweenFighText = function(){
     );
 };
 
+Engine.isProduced = function(item){
+    return Engine.currentBuiling.produced.includes(parseInt(item));
+};
+
 Engine.handleBattleAnimation = function(data){
     var sprite = Engine.animationsPools[data.name].getNext();
     sprite.setVisible(false);
@@ -1106,9 +1007,16 @@ Engine.handleBattleAnimation = function(data){
     },data.delay);
 };
 
-Engine.displayArrow = function(from,to,depth,duration,delay){ // All coordinates are pixels
-    var arrow = Engine.arrowsPool.getNext();
-    arrow.setFrame('arrow');
+Engine.animateRangeAmmo = function(frame, from, to, depth, duration, delay, imagePool){ // All coordinates are pixels
+
+    // TODO: refactor the whole pool thing and getNext only when you know that it's the right pool
+    let arrow = Engine.arrowsPool.getNext();
+
+    if(imagePool){
+        arrow = imagePool.getNext();
+    }
+
+    arrow.setFrame(frame);
     arrow.setPosition(from.x+16,from.y+16);
     arrow.setDepth(depth);
     arrow.setVisible(false);
@@ -1192,7 +1100,8 @@ Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss,delay){
 
     if(miss) return;
     // Blink tween
-    Engine.scene.tweens.add(
+    if(target.blinkTween) target.blinkTween.stop();
+    target.blinkTween = Engine.scene.tweens.add(
         {
             targets: target,
             alpha: 0,
@@ -1202,24 +1111,13 @@ Engine.displayHit = function(target,x,y,size,yDelta,dmg,miss,delay){
             repeat: 3,
             onStart: function(){
                 target.setAlpha(1); // so that if it takes over another tween immediately, it starts from the proper alpha value
+            },
+            onComplete: function(){
+                target.setAlpha(1);
             }
         });
 
 };
-
-/*Engine.displayUI = function(){
-    Engine.UIHolder.display();
-    for(var i = 0; i < Engine.nbBasicUIEelements; i++){
-        Engine.UIelements[i].setVisible(true);
-    }
-};
-
-Engine.hideUI = function(){
-    Engine.UIHolder.hide();
-    Engine.UIelements.forEach(function(e){
-        e.setVisible(false);
-    });
-};*/
 
 Engine.getPlayerHealth = function(){
     return Engine.player.getStatValue('hp');
@@ -1229,128 +1127,159 @@ Engine.getPlayerMaxHealth = function(){
     return Engine.player.getStatValue('hpmax');
 };
 
+Engine.makeRespawnMenu = function(){
+    var menu = new Menu();
+    menu.fullHide = true;
+    var respawnw = 300;
+    var respawnh = 90;
+    var respawnx = (Engine.getGameConfig().width-respawnw)/2;
+    var respawny = 400;
+    var respawn = menu.addPanel('respawn',new RespawnPanel(respawnx,respawny,respawnw,respawnh));
+    respawn.addButton(respawnw-30, 8, 'blue','help',null,'',UI.textsData['respawn_help'],'respawn_help');
+    return menu;
+};
+
 Engine.makeBattleMenu = function(){
-    var alignx = 845;
     var battle = new Menu();
     battle.fullHide = true;
-    var equipment = new EquipmentPanel(alignx,100,170,120,'Equipment',true); // true: battle menu
-    equipment.addButton(140, 8, 'blue','help',null,'',UI.textsData['battleitems_help']);
-    battle.addPanel('equipment',equipment);
-    var items = battle.addPanel('items',new InventoryPanel(alignx,220,170,225,'Items'));
-    items.setInventory(Engine.player.inventory,4,true,BattleManager.processInventoryClick);
-    items.modifyFilter({
-        type: 'property',
-        property: 'useInBattle',
-        hard: true
-    });
-    var bar = new BigProgressBar(alignx,445,170,'red',true);
-    bar.name = 'health bar';
-    battle.addPanel('bar',bar);
 
-    var timerw = 300;
-    var timerh = 60;
-    var timerx = (Engine.getGameConfig().width-timerw)/2;
-    var timery = Engine.getGameConfig().height-timerh;
-    var timerPanel = battle.addPanel('timer',new BattleTimerPanel(timerx,timery,timerw,timerh));
-    timerPanel.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['battletimer_help']);
+    var equipment = battle.addPanel('equipment',new BattleEquipmentPanel());
 
-    var respawnh = 90;
-    var respawny = 400;
-    var respawn = battle.addPanel('respawn',new RespawnPanel(timerx,respawny,timerw,respawnh),true);
-    respawn.addButton(timerw-30, 8, 'blue','help',null,'',UI.textsData['respawn_help']);
+    var belt = battle.addPanel('belt',new InventoryPanel(0,487,200,90,'Belt'));
+    belt.setInventory('belt',5,true,BattleManager.processInventoryClick);
 
-    battle.addEvent('onUpdateInventory',items.updateInventory.bind(items));
+    battle.addEvent('onUpdateBelt',belt.updateInventory.bind(belt));
     battle.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
+    battle.addEvent('onUpdateStats',equipment.updateStats.bind(equipment));
 
-    battle.addEvent('onUpdateStats',function(){
-        bar.setLevel(Engine.getPlayerHealth(),Engine.getPlayerMaxHealth());
+    battle.addEvent('onOpen',function(){
+        belt.updateInventory();
+        equipment.updateEquipment();
+        equipment.updateStats();
+        equipment.updateCapsules();
+        Engine.hideCapsules();
     });
 
-    battle.addEvent('onStart',items.updateInventory.bind(items));
+    battle.addEvent('onClose',function(){
+        Engine.displayCapsules();
+    });
+
     return battle;
 };
 
 Engine.makeProductionMenu = function(){
     var production = new Menu('Production');
     production.setTitlePos(100);
+    production.setExitPos(680);
     var w = 400;
-    var h = 330;
+    var h = 350;
     var x = (Engine.getGameConfig().width-w)/2;
     var y = 150;
-    var prodw = 250;
-    var prodh = 100;
-    var prody = y + 160;
-    var prodx = (Engine.getGameConfig().width-prodw)/2;
 
     var productionPanel = new ProductionPanel(x,y,w,h);
-    productionPanel.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['prod_help']);
+    productionPanel.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['prod_help'],'prod_help');
+    var gold = productionPanel.addCapsule('gold',20,20,'999','gold');
+    gold.setHoverText(UI.tooltip,'Building gold',UI.textsData['shopgold_help']);
     production.addPanel('production',productionPanel);
-    //var productivity = new ProductivityPanel(prodx,prody,prodw,prodh,'Productivity modifiers');
-    //productivity.addButton(prodw-30, 8, 'blue','help',null,'',UI.textsData['productivity_help']);
-    //production.addPanel('productivity',productivity);
-    var stock = production.addPanel('shop',new InventoryPanel(prodx,prody,prodw,prodh,'Stock'));
-    stock.setInventory(new Inventory(5),5,true,Engine.takeClick);
 
-    var action = new ShopPanel(212,420,300,100,'Take',true); // true = not shop, hack
+    var action = new ShopPanel(212,440,300,100,'Take',true); // true = not shop, hack
+    action.addButton(300-16,-8,'red','close',action.hide.bind(action),'Close');
+    action.moveUp(2);
     production.addPanel('action',action,true);
 
-    production.addEvent('onDisplay',stock.updateInventory.bind(stock));
+    var prices = production.addPanel('prices',Engine.makePricesPanel(),true);
+    prices.limitToProduction();
+
+    var aw = 300;
+    var goldaction = production.addPanel('goldaction',new ShopGoldPanel(212,390,aw,100,'Buy/Sell'),true);
+    goldaction.addButton(aw-16,-8,'red','close',goldaction.hide.bind(goldaction),'Close');
+    goldaction.moveUp(2);
 
     production.addEvent('onUpdateShop',function(){
-        stock.updateInventory();
+        productionPanel.update();
         action.update();
     });
-    //production.addEvent('onUpdateProductivity',productivity.update.bind(productivity));
-    //production.addEvent('onUpdateCommit',productionPanel.update.bind(productionPanel));
+
+    production.addEvent('onUpdateShopGold',function(){
+        productionPanel.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+    });
+
+    production.addEvent('onOpen',function(){
+        productionPanel.update();
+        action.update();
+        productionPanel.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+    });
     return production;
 };
 
 Engine.makeConstructionMenu = function(){
     var w = 500;
     var x = (Engine.getGameConfig().width-w)/2;
-    var padding = 0;
     var progressh = 300;
     var progressy = 150;
-    var invy = progressy+progressh+padding;
-    var prody = progressy+140;
-    var prodw = 250;
-    var prodx = (Engine.getGameConfig().width-prodw)/2;
-    var materialh = 100;
 
     var constr = new Menu('Construction');
     constr.setTitlePos(100);
-    var progress = new ConstructionPanel(x,progressy,w,progressh);
-    progress.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['progress_help']);
-    constr.addPanel('progress',progress);
+    constr.setExitPos(720);
 
-    var action = new ShopPanel(212,420,300,100,'Give',true); // true = not shop, hack
-    //action.capsules['title'].setText('Give');
-    constr.addPanel('action',action,true);
+    var progress = new ConstructionPanel(x,progressy,w,progressh);
+    progress.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['progress_help'],'progress_help');
+    constr.addPanel('progress',progress);
+    var gold = progress.addCapsule('gold',20,-9,'999','gold');
+    gold.setHoverText(UI.tooltip,'Building gold',UI.textsData['shopgold_help']);
+
+    var aw = 300;
+    var action = constr.addPanel('action',new ShopPanel(212,390,aw,100,'Give',true),true);
+    action.addButton(aw-16,-8,'red','close',action.hide.bind(action),'Close');
+    action.moveUp(2);
+
+    var goldaction = constr.addPanel('goldaction',new ShopGoldPanel(212,390,aw,100,'Buy/Sell'),true);
+    goldaction.addButton(aw-16,-8,'red','close',goldaction.hide.bind(goldaction),'Close');
+    goldaction.moveUp(2);
+
+    constr.addPanel('prices',Engine.makePricesPanel(),true);
 
     constr.addEvent('onUpdateShop',function(){
         progress.update();
         action.update();
     });
-    //var materials = new MaterialsPanel(x,invy,w,materialh,'Materials');
-    //constr.addPanel('materials',materials);
-    /*var prod = new ProductivityPanel(prodx,prody,prodw,100,'Productivity modifiers');
-    prod.addButton(prodw-30, 8, 'blue','help',null,'',UI.textsData['productivity_help']);
-    constr.addPanel('prod',prod);*/
 
-    //constr.addEvent('onUpdateShop',materials.update.bind(materials));
-    //constr.addEvent('onUpdateConstruction',progress.update.bind(progress));
-    //constr.addEvent('onUpdateProductivity',prod.update.bind(prod));
+    constr.addEvent('onUpdateShopGold',function(){
+        progress.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+    });
+
+    constr.addEvent('onOpen',function(){
+        progress.update();
+        progress.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+        action.update();
+    });
+
     return constr;
 };
 
 Engine.makeWipMenu = function(){
     var menu = new Menu();
     menu.setTitlePos(100);
+    menu.setExitPos(730 );
     var w = 500;
     var x = (Engine.getGameConfig().width-w)/2;
 
     var panel = menu.addPanel('main',new InfoPanel(x,150,w,300));
     var txt = panel.addText(110,150,'Nothing to do here (yet)',null,24);
+
+    return menu;
+};
+
+Engine.makeRestMenu = function(){
+    var menu = new Menu();
+    menu.setTitlePos(100);
+    menu.setExitPos(670);
+    var w = 400;
+    var x = (Engine.getGameConfig().width-w)/2;
+
+    var panel = menu.addPanel('main',new RestPanel(x,150,w,200));
+    panel.addButton(w - 30, 8, 'blue','help',null,'',UI.textsData['shack_help'],'shack_help');
+    menu.addEvent('onUpdateStats',panel.update.bind(panel));
 
     return menu;
 };
@@ -1386,263 +1315,287 @@ Engine.makeMessagesMenu = function(){
     return menu;
 };
 
-Engine.makeStaffMenu = function(){
-    var menu = new Menu('Officials');
-    menu.setSound(Engine.scene.sound.add('book'));
+Engine.makeMapPanel = function(){
+    var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
+    mapPanel.addBackground('bigbg');
+    mapPanel.addLegend();
+    mapPanel.addMap('bigbg_mask',900,380,-1,-1);
+    mapPanel.addButtons();
+    return mapPanel;
+};
 
-    var govw = 250;
-    var govh = 150;
-    var govx = (UI.getGameWidth()-govw)/2;
-    var govy = 100;
+Engine.computeMissionGoal = function(mission){
+    // TODO: conf/JSON
+    var region = Engine.player.regionsStatus[Engine.player.region];
+    switch(mission.goal){
+        case 'resources':
+            return Math.ceil(region.resources[1]/3); // A third of available nodes
+        case 'exploration':
+            return Math.ceil(region.exploration[1]/2); // half the AOIs
+        case 'civhuts':
+            return Math.ceil(region.civs[1]/2); // half the enemy blds
+    }
+};
 
-    var padding = 10;
-    var chanx = govx - govw/2 - padding/2;
-    var chany = govy + govh + 20;
-    var chanh = 200;
+Engine.computeMissionActual = function(mission){
+    var region = Engine.player.regionsStatus[Engine.player.region];
+    switch(mission.count.split(':')[0]){
+        case 'allbuildings':
+            return region.totalbuildings;
+        case 'bldfood':
+            return region.food[1];
+        case 'building':
+            return region.buildings[mission.count.split(':')[1]] || 0;
+        case 'civhutkilled':
+            return region.civCasualties[1];
+        case 'civhuts':
+            return region.civs[0];
+        case 'civkilled':
+            return region.civCasualties[0];
+        case 'item':
+            var counts = new Inventory().fromList(region.itemCounts);
+            return (counts.getNb(mission.count.split(':')[1]));
+        case 'playerfood':
+            return region.food[0];
+    }
+};
 
-    var commx = govx + govw/2 + padding/2;
+Engine.makeRegionsMenu = function(mapPanel){
+    var menu = new Menu('Regions');
+    menu.log = true;
+    menu.hidePinHover = true;
 
-    var gov = menu.addPanel('governor',new StaffPanel(govx,govy,govw,govh,'Governor'));
-    gov.addButton(govw-30, 8, 'blue','help',null,'',UI.textsData['governor_help']);
-    gov.addStaff([{name:'Mr. Governor'}]);
-    gov.addCenterText('Your civic level is too low to vote for the Governor');
-    var chan = menu.addPanel('chancellors',new StaffPanel(chanx,chany,govw,chanh,'Chancellors'));
-    chan.addButton(govw-30, 8, 'blue','help',null,'',UI.textsData['chancellor_help']);
-    chan.addStaff([{name:'Palpatine'},{name:'Valorum'},{name:'Tobby'}]);
-    var comm = menu.addPanel('commanders',new StaffPanel(commx,chany,govw,chanh,'Commanders'));
-    comm.addButton(govw-30, 8, 'blue','help',null,'',UI.textsData['commander_help']);
-    comm.addStaff([{name:'Adama'},{name:'William Riker'}]);
+    menu.addPanel('map',mapPanel);
+    var x = 10; // 500
+    var w = 270;
+    var status = menu.addPanel('status',new RegionStatusPanel(x,80,w,150,'region'));
+    status.addButton(w-30, 0, 'blue','help',null,'',UI.textsData['regionstatus_help'],'regionstatus_help');
+    w = 620;
+    x = (UI.getGameWidth()-w)/2;
+    var missions = menu.addPanel('missions', new MissionsPanel(x,200,w,350,'Missions'),true);
+    missions.addButton(w-16,-8,'red','close',missions.hide.bind(missions),'Close');
+    missions.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['missions_help'],'missions_help');
+    status.moveUp(4);
+    missions.moveUp(4);
+
+    menu.beforeAll(function(){
+        //var offset = (regionsData[Engine.player.region].x > 600 ? 120 : -120);
+        //mapPanel.map.center.x = 510+offset;
+        mapPanel.map.setControls(false);
+    });
+
+    menu.addEvent('onOpen',function(){
+        status.update();
+        mapPanel.map.centerOnRegion();
+        mapPanel.legend.hide();
+        mapPanel.hideButtons();
+    });
+    menu.addEvent('onUpdateMap',mapPanel.map.updatePins.bind(mapPanel.map));
     return menu;
 };
 
-Engine.makeMapMenu = function(){
+Engine.makeMapMenu = function(mapPanel){
     var map = new Menu('World Map');
+    map.log = true;
+    map.hook = 'map';
     map.setSound(Engine.scene.sound.add('page_turn2'));
-    var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
-    mapPanel.addBackground('longscroll');
-    var mapInstance = mapPanel.addMap('player','radiallongrect',1000,380,-1,-1);
-    mapPanel.addButton(953, -2, 'blue','help',null,'',UI.textsData['self_map_help']);
-    // TODO: move in Map.js, method addZoom, positions buttons based on viewWidt/height and
-    // controls enable/disable of buttons based on zoom flag
-    mapPanel.addButton(940, 320, 'blue','plus',mapInstance.zoomIn.bind(mapInstance),'Zoom in');
-    mapPanel.addButton(930, 350, 'blue','minus',mapInstance.zoomOut.bind(mapInstance),'Zoom out');
     map.addPanel('map',mapPanel);
+
+    map.beforeAll(function(){
+        mapPanel.map.center.x = 510;
+        mapPanel.map.setControls(true);
+    });
+    map.addEvent('onUpdateMap',mapPanel.map.updatePins.bind(mapPanel.map));
     return map;
 };
 
-Engine.makeFortMenu = function(){
-    var padding = 10;
-    var mapx = 10;
-    var mapy = 90;
-    var mapw = 443;
-    var maph = 420;
+Engine.makePricesPanel = function(){
+    var w = 415;
+    var h = 480;
+    var prices = new PricesPanel(Math.round((1024-w)/2),80,w,h,'Prices');
+    prices.addButton(w-16,-8,'red','close',prices.hide.bind(prices),'Close');
+    prices.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['prices_help'],'prices_help');
+    prices.moveUp(4);
+    return prices;
+};
 
-    var buildx = mapx+mapw+padding;
-    var buildy = 100;
-    var buildw = 250;
-    var buildh = 390;
+Engine.addAdminButtons = function(panel,x,y){
 
-    var resx = mapx+mapw+buildw+(padding*2);
-    var resy = buildy;
-    var resw = Engine.getGameConfig().width - padding - resx;
-    var resh = 90;
-
-    var statx = resx;
-    var staty = resy + resh;
-    var statw = resw;
-    var stath = 150;
-
-    var lvlx = resx;
-    var lvly = staty + stath;
-    var lvlw = resw;
-    var lvlh = 150;
-
-    var fort = new Menu('Fort');
-
-    var mapPanel = new MapPanel(mapx,mapy,mapw,maph,'',true); // true = invisible
-    mapPanel.addBackground('scrollbgh');
-    mapPanel.addMap('building','radial3',400,400,300,300);
-    mapPanel.addButton(mapw-30, 8, 'blue','help',null,'',UI.textsData['map_help']);
-    fort.addPanel('map',mapPanel);
-    fort.addEvent('onUpdateMap',mapPanel.update.bind(mapPanel));
-
-    var buildings = new BuildingsPanel(buildx,buildy,buildw,buildh,'Buildings');
-    buildings.addButton(130, -9, 'blue','help',null,'',UI.textsData['buildings_help']);
-    //buildings.makeScrollable();
-    fort.addPanel('buildings',buildings);
-    fort.addEvent('onUpdateBuildings',buildings.updateListing.bind(buildings));
-
-    var resources = fort.addPanel('resources',new InventoryPanel(resx,resy,resw,resh,'Resources'));
-    resources.addCapsule('gold',150,-9,'999','gold');
-    resources.addButton(resw-30, 8, 'blue','help',null,'',UI.textsData['resources_help']);
-    resources.setInventory(new Inventory(7),7,true);
-    var status = new SettlementStatusPanel(statx,staty,statw,stath,'Status');
-    status.addButton(statw-30, 8, 'blue','help',null,'',UI.textsData['setstatus_help']);
-    fort.addPanel('status',status);
-    var devlvl = new DevLevelPanel(lvlx,lvly,lvlw,lvlh,'Next level requirements');
-    devlvl.addButton(lvlw-30, 8, 'blue','help',null,'',UI.textsData['devlvl_help']);
-    fort.addPanel('devlvl',devlvl);
-
-    fort.addEvent('onUpdateShop',function(){
-        resources.modifyInventory(Engine.currentBuiling.inventory.items);
-        resources.updateInventory();
-        devlvl.update();
+    panel.pricesBtn = new BigButton(x,y,'Set prices',function(){
+        Engine.currentMenu.displayPanel('prices');
+        Engine.currentMenu.hidePanel('action');
+        Engine.currentMenu.hidePanel('goldaction');
     });
-    fort.addEvent('onUpdateShopGold',function(){
-        resources.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+
+    panel.ggBtn = new BigButton(x + 110,y,'Give gold',function(){
+        Engine.currentMenu.hidePanel('action');
+        var ga = Engine.currentMenu.displayPanel('goldaction');
+        ga.setUp('sell');
     });
-    fort.addEvent('onUpdateSettlementStatus',status.update.bind(status));
-    return fort;
+
+    panel.tgBtn = new BigButton(x + 220,y,'Take gold',function(){
+        Engine.currentMenu.hidePanel('action');
+        var ga = Engine.currentMenu.displayPanel('goldaction');
+        ga.setUp('buy');
+    });
 };
 
 Engine.makeTradeMenu = function(){
     var trade = new Menu('Trade');
-    trade.setTitlePos(90);
-    var y = 150;
-    var client = trade.addPanel('client',new InventoryPanel(212,y,300,300,'Your items'));
-    client.setInventory(Engine.player.inventory,7,true,Engine.sellClick);
-    client.filterItems = true;
-    client.addCapsule('gold',150,-9,'999','gold');
-    client.addButton(270, 8, 'blue','help',null,'',UI.textsData['sell_help']);
-    var shop =  trade.addPanel('shop',new InventoryPanel(542,y,300,300,'Shop'));
-    shop.setInventory(new Inventory(20),7,true,Engine.buyClick);
-    shop.filterItems = true;
-    shop.addCapsule('gold',100,-9,'999','gold');
-    shop.addButton(270, 8, 'blue','help',null,'',UI.textsData['buy_help']);
-    var w = 300;
+    trade.setTitlePos(10);
+    trade.setExitPos(885);
+    var y = 80;
+    var w = 400;
+    var h = 480;
+    var space = 15;
+    var center = Engine.getGameConfig().width/2;
+    var client = trade.addPanel('client',new ShopInventoryPanel(center-w-space,y,w,h,'You'));
+    client.setInventory('player');
+    var gold = client.addCapsule('gold',120,-9,'999','gold');
+    gold.setHoverText(UI.tooltip,'Your gold',UI.textsData['gold_help']);
+    client.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['sell_help'],'sell_help');
+    var shop =  trade.addPanel('shop',new ShopInventoryPanel(center+space,y,w,h,'Shop'));
+    shop.setInventory('building');
+    var shopgold = shop.addCapsule('gold',100,-9,'999','gold');
+    shopgold.setHoverText(UI.tooltip,'Shop gold',UI.textsData['shopgold_help']);
+    shop.addButton(w-30, 8, 'blue','help',null,'',UI.textsData['buy_help'],'buy_help');
+    w = 300;
     var x = (Engine.getGameConfig().width-w)/2;
-    var action = new ShopPanel(x,420,w,100,'Buy/Sell');
-    trade.addPanel('action',action);
-    var prices = trade.addPanel('prics',new PricesPanel(670,420,200,100,'Set prices'),true);
+    var action = trade.addPanel('action',new ShopPanel(x,440,w,100,'Buy/Sell'),true);
+    action.addButton(w-16,-8,'red','close',action.hide.bind(action),'Close');
+    action.moveUp(2);
+    var goldaction = trade.addPanel('goldaction',new ShopGoldPanel(x,420,w,100,'Buy/Sell'),true);
+    goldaction.addButton(w-16,-8,'red','close',goldaction.hide.bind(goldaction),'Close');
+    goldaction.moveUp(2);
+
+    var prices = trade.addPanel('prices',Engine.makePricesPanel(),true);
 
     trade.addEvent('onUpdateInventory',function(){
-        client.updateInventory();
+        client.updateContent();
         action.update();
     });
     trade.addEvent('onUpdateShop',function(){
-        shop.updateInventory();
+        shop.updateContent();
         action.update();
     });
     trade.addEvent('onUpdateGold',function(){
         client.updateCapsule('gold',Engine.player.gold);
         Engine.scene.sound.add('sellbuy').play();
+        shop.updateContent();
         action.update();
+        goldaction.update();
     });
     trade.addEvent('onUpdateShopGold',function(){
         shop.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+        client.updateContent();
         action.update();
+        goldaction.update();
+    });
+    trade.addEvent('onOpen',function(){
+        client.updateCapsule('gold',Engine.player.gold);
+        shop.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+        client.updateContent();
+        shop.updateContent();
+        action.update();
+        goldaction.update();
     });
     return trade;
 };
 
 Engine.makeCraftingMenu = function(){
     var crafting = new Menu('Crafting');
-    crafting.setTitlePos(90);
+    crafting.setTitlePos(10);
     crafting.setSound(Engine.scene.sound.add('crafting'));
+    crafting.setExitPos(885);
 
-    //var recipes = new InventoryPanel(765,100,235,380,'Recipes');
-    //recipes.setInventory(Engine.workshopRecipes,4,false,Engine.recipeClick);
-    var yg = 150;
-    var recipes = new Panel(700,yg,300,380,'Recipes');
-    recipes.addButton(270, 8, 'blue','help',null,'',UI.textsData['recipes_help']);
-    crafting.addPanel('recipes',recipes);
+    var combix = 20;
+    var combiw = 550;
+    var y = 80;
+    var recipesw = 400;
+    var h = 480;
+    var space = 15;
 
-    var y = yg+35;
-    var h = 155;
-    var gap = 20;
-    var categories = ['equipment','ingredients'];
-    categories.forEach(function(cat){
-        var inv = crafting.addPanel(cat+'_cat',new InventoryPanel(710, y, 280, h,Utils.capitalizeFirstLetter(cat)));
-        inv.setInventory(Engine[cat+'Recipes'],6,false,Engine.recipeClick);
-        y += (h+gap);
-    });
+    var recipes = crafting.addPanel('shop',new RecipesPanel(combix+combiw+space,y,recipesw,h,'Recipes'));
+    recipes.setInventory('crafting');
+    var gold = recipes.addCapsule('gold',120,-9,'999','gold');
+    gold.setHoverText(UI.tooltip,'Workshop gold',UI.textsData['shopgold_help']);
+    recipes.addButton(recipesw-30, 8, 'blue','help',null,'',UI.textsData['recipes_help'],'recipes_help');
 
-    var combi = crafting.addPanel('combi',new CraftingPanel(450,yg,240,380,'Combination'));
-    combi.addButton(210, 8, 'blue','help',null,'',UI.textsData['combi_help']);
+    var combi = crafting.addPanel('combi',new CraftingPanel(combix,y,combiw,h,'Crafting'));
+    combi.addButton(combiw-30, 8, 'blue','help',null,'',UI.textsData['combi_help'],'combi_help');
 
-    var ingredients = crafting.addPanel('ingredients',new InventoryPanel(450,yg+200,240,380,'',true)); // true = invisible
-    ingredients.setInventory(new Inventory(5),5,true,null,Engine.player.inventory);
+    var prices = crafting.addPanel('prices',Engine.makePricesPanel(),true);
+    prices.limitToCrafting();
 
-    var items = crafting.addPanel('items',new InventoryPanel(40,yg,390,185,'Your items'));
-    items.addButton(360, 8, 'blue','help',null,'',UI.textsData['craftitems_help']);
-    items.setInventory(Engine.player.inventory,9,true);
-    items.button = new BigButton(items.x+(items.width/2),items.y+items.height-20,
-        'Use this inventory',function(){
-            Engine.toggleStock(1);
-        });
+    var x = (Engine.getGameConfig().width-300)/2;
+    var goldaction = crafting.addPanel('goldaction',new ShopGoldPanel(x,420,300,100,'Buy/Sell'),true);
+    goldaction.addButton(300-16,-8,'red','close',goldaction.hide.bind(goldaction),'Close');
+    goldaction.moveUp(2);
 
-    var stock = crafting.addPanel('stock',new InventoryPanel(40,yg+190,390,185,'Workshop stock'));
-    stock.setInventory(new Inventory(20),9,true);
-    //stock.addButton(270, 8, 'blue','help',null,'',UI.textsData['buy_help']);
-    stock.button = new BigButton(stock.x+(stock.width/2),stock.y+stock.height-20,
-        'Use this inventory',function(){
-            Engine.toggleStock(2);
-        });
-
-    crafting.addEvent('onUpdateRecipes',function(){
-        //recipes.updateInventory();
-        categories.forEach(function(cat){
-            crafting.panels[cat+'_cat'].updateInventory();
-        });
+    crafting.addEvent('onUpdateShopGold',function(){
+        recipes.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
+        goldaction.update();
     });
 
     crafting.addEvent('onUpdateShop',function(){
-        stock.modifyInventory(Engine.currentBuiling.inventory);
-        stock.updateInventory();
+        recipes.updateContent();
+        combi.updateIngredients();
+    });
+    
+    crafting.addEvent('onUpdateRecipes',function(){
+        recipes.updateContent();
     });
 
     crafting.addEvent('onUpdateInventory',function(){
-        items.updateInventory();
-        ingredients.updateInventory();
+        recipes.updateContent();
+        combi.updateIngredients();
     });
 
-    crafting.addEvent('onDisplay',function(){
-        Engine.toggleStock(1);
+    crafting.addEvent('onOpen',function(){
+        recipes.updateContent();
+        recipes.updateCapsule('gold',(Engine.currentBuiling.gold || 0));
     });
+
     return crafting;
 };
 
 Engine.makeBuildMenu = function(){
     var build = new Menu();
+    build.log = true;
     build.keepHUD = true;
+    build.allowWalk = true;
     build.name = 'Build something'; // Allows to have a hover name without a menu title
-    build.hook = 'buildmenu';
-    var w = 200;
-    var buildings = build.addPanel('build',new InventoryPanel(30,40,w,150,'Buildings'));
+    build.hook = 'build';
+    var w = 300;
+    var buildings = build.addPanel('build',new BuildPanel(30,50,w,450,'Build'));
     buildings.addButton(w-16,-8,'red','close',build.hide.bind(build),'Close');
-    buildings.setInventory(Engine.player.buildRecipes,5,false,Engine.bldClick);
-    buildings.setDataMap(Engine.buildingIconsData);
-    build.addEvent('onDisplay',buildings.updateInventory.bind(buildings));
+    buildings.addButton(w-33, 8, 'blue','help',null,'',UI.textsData['build_help'],'build_help');
+    buildings.moveUp(2);
+    build.addEvent('onOpen',buildings.updateContent.bind(buildings));
+    build.addEvent('onUpdateBuildRecipes',buildings.updateContent.bind(buildings));
     return build;
 };
 
 Engine.bldClick = function(){
-    var bld = Engine.buildingsData[this.itemID];
+    var bld = buildingsData[this.bldID];
     Engine.currentMenu.hide();
 
-    //Engine.hideMarker();
+    Engine.hideMarker();
     Engine.bldRect = Engine.scene.add.rectangle(0,0, bld.base.width*32, bld.base.height*32, 0x00ee00).setAlpha(0.7);
-    Engine.bldRect.bldID = this.itemID;
+    Engine.bldRect.bldID = this.bldID;
     Engine.bldRect.locationConstrained = bld.locationConstrained;
     Engine.updateBldRect();
 
-    if(Client.tutorial) Engine.tutorialHook('bldselect:'+this.itemID);
+    if(Client.tutorial) TutorialManager.triggerHook('bldselect:'+this.bldID);
 };
 
 Engine.bldUnclick = function(shutdown){
     if(!Engine.bldRect.collides && !shutdown) {
         var id = Engine.bldRect.bldID;
-        //var bld = Engine.buildingsData[id];
         var pos = Engine.bldRect.getBottomLeft();
         pos.x = pos.x / 32;
-        pos.y = (pos.y / 32);
-        console.log("Building at ", (pos.x), ",", (pos.y));
-        if(Client.tutorial){
-            Engine.tutorialHook('bldunselect:'+id);
-            Engine.tutorialBld(pos.x,pos.y,id);
-        }else{
-            Client.sendBuild(id, pos);
-        }
+        pos.y = (pos.y / 32) - 1;
+        Client.sendBuild(id, pos);
     }
     Engine.showMarker();
     Engine.bldRect.destroy();
@@ -1681,43 +1634,50 @@ Engine.updateBldRect = function(){
 Engine.makeInventory = function(statsPanel){
     // ## Inventories are only displayed if a trigger calls onUpdateInventory; TODO change that!!
     var inventory = new Menu('Inventory');
+    inventory.log = true;
     inventory.setSound(Engine.scene.sound.add('inventory'));
 
-    var items = inventory.addPanel('items',new InventoryPanel(40,100,600,380,'Items'));
-    items.setInventory(Engine.player.inventory,15,true,Engine.inventoryClick);
-    items.addCapsule('gold',100,-9,'999','gold');
-    items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help']);
+    var items = inventory.addPanel('items',new InventoryPanel(40,100,600,260,'Backpack'));
+    items.setInventory('player',15,true,UI.backpackClick);
 
-    inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,100),true);
+    var gold = items.addCapsule('gold',130,-9,'999','gold');
+    gold.setHoverText(UI.tooltip,'Gold',UI.textsData['gold_help']);
+    items.addButton(570, 8, 'blue','help',null,'',UI.textsData['inventory_help'],'inventory_help');
+
+    inventory.addPanel('itemAction',new ItemActionPanel(70,220,300,120),true);
+
+    var belt = inventory.addPanel('belt',new InventoryPanel(40,360,600,90,'Belt'));
+    belt.setInventory('belt',15,true,UI.beltClick);
+    belt.addButton(570, 8, 'blue','help',null,'',UI.textsData['belt_help'],'belt_help');
 
     var equipment = new EquipmentPanel(665,100,330,235,'Equipment');
-    equipment.addButton(300, 8, 'blue','help',null,'',UI.textsData['equipment_help']);
+    equipment.addButton(300, 8, 'blue','help',null,'',UI.textsData['equipment_help'],'equipment_help');
     inventory.addPanel('equipment',equipment);
-
-    /*var belt = new InventoryPanel(70,350,500,60,'Belt');
-    belt.setInventory(new Inventory(2),10,true);
-    inventory.addPanel('belt',belt);*/
 
     inventory.addPanel('stats',statsPanel);
 
     inventory.addEvent('onUpdateEquipment',equipment.updateEquipment.bind(equipment));
     inventory.addEvent('onUpdateInventory',items.updateInventory.bind(items));
-    inventory.addEvent('onUpdateStats',statsPanel.updateStats.bind(statsPanel));
+    inventory.addEvent('onUpdateBelt',belt.updateInventory.bind(belt));
+    inventory.addEvent('onUpdateStats',function(){
+        statsPanel.updateStats(Engine.player);
+    });
     inventory.addEvent('onUpdateGold',function(){
+        items.updateCapsule('gold',Engine.player.gold);
+    });
+    inventory.addEvent('onOpen',function(){
+        equipment.updateEquipment();
+        items.updateInventory();
+        belt.updateInventory();
+        statsPanel.updateStats(Engine.player);
         items.updateCapsule('gold',Engine.player.gold);
     });
     return inventory;
 };
 
-Engine.makeAbilitiesMenu = function(){
-    var menu = new Menu('Abilities');
-    menu.addPanel('abilities',new AbilitiesPanel(40,100,600,380,'Abilities'));
-    menu.addPanel('desc',new AbilityPanel(660,100,340,380,'Description'));
-    return menu;
-};
-
 Engine.makeCharacterMenu = function(){
     var menu = new Menu('Character');
+    menu.log = true;
     menu.setSound(Engine.scene.sound.add('page_turn'));
 
     var citizenx = 40;
@@ -1734,8 +1694,7 @@ Engine.makeCharacterMenu = function(){
     var questh = 380-classh;
     var logh = 380 - citizenh;
 
-    //var citizen = menu.addPanel('citizen', new CitizenPanel(citizenx,citizeny,citizenw,citizenh,'Civic status'));
-    var log = menu.addPanel('log', new Panel(citizenx,citizeny,citizenw,logh+citizenh,'Events log'));
+    var log = menu.addPanel('log', new JournalPanel(citizenx,citizeny,citizenw,logh+citizenh,'Journal'));
 
     var classpanel = menu.addPanel('class', new CharacterPanel(classx,classy,classw,classh,'Multi-Class status'));
     var sx = classx + 15;
@@ -1750,20 +1709,27 @@ Engine.makeCharacterMenu = function(){
             cx = sx;
             cy += ch;
         }
-
-        //var ab = menu.addPanel('abilities_'+classID, new Panel(citizenx,citizeny,citizenw,citizenh,'Abilities'), true);
-        //ab.addButton(citizenw,-8,'red','close',ab.hide.bind(ab),'Close');
     }
 
-    var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
+    // var quests = menu.addPanel('quests', new Panel(classx,questy,classw,questh,'Daily quests'));
 
-    /*var commit = menu.addPanel('commit',new InventoryPanel(citizenx+10,citizeny,150,100,'',true));
-    commit.setInventory(Engine.player.commitTypes,3,false);
-    commit.setDataMap(Engine.buildingIconsData);*/
+    var w = 620;
+    var x = (UI.getGameWidth()-w)/2;
+    var abilities = menu.addPanel('abilities', new AbilitiesPanel(x,175,w,350,'Abilities'),true);
+    abilities.log = true;
+    abilities.addButton(w-16,-8,'red','close',abilities.hide.bind(abilities),'Close');
+    abilities.addButton(w-40, 8, 'blue','help',null,'',UI.textsData['abilities_help'],'abilities_help');
+    abilities.moveUp(4);
 
-    //menu.addPanel('abilities',new Panel(citizenx,citizeny,citizenw,citizenh),true);
-
-    menu.addEvent('onUpdateCharacter',classpanel.update.bind(classpanel));
+    menu.addEvent('onUpdateCharacter',function(){
+        classpanel.update();
+        if(abilities.displayed) abilities.updateContent();
+    });
+    menu.addEvent('onUpdateHistory',log.update.bind(log));
+    menu.addEvent('onOpen',function(){
+        classpanel.update();
+        log.update();
+    });
     //menu.addEvent('onUpdateCitizen',citizen.update.bind(citizen));
     //menu.addEvent('onUpdateCommit',commit.updateInventory.bind(commit));
 
@@ -1774,44 +1740,6 @@ Engine.getIngredientsPanel = function(){
     return Engine.menus['crafting'].panels['ingredients'];
 };
 
-Engine.makeRecipesLists = function(){
-
-    // TODO: put in conf somewhere; better: derive it from items file
-    var equipmentRecipes = [28,11,10,13,15,16,2,19,29,20,12,40,42,39,4,44,6];
-    var ingredientsRecipes = [22,23,32,33,38,35,41,17,21,43];
-
-    /*for(var key in Engine.itemsData){
-        // TODO: standardize flags (isWeapon, ...)
-        var item = Engine.itemsData[key];
-        if(item.isCrafted){
-            if(item.equipment){
-                equipmentRecipes.push(key);
-            }
-            if(item.isPotion) equipmentRecipes.push(key);
-            if(item.isWeapon) equipmentRecipes.push(key);
-            if(item.isMaterial) ingredientsRecipes.push(key);
-        }
-    }*/
-
-    //console.log("w",weaponsRecipes);
-    //console.log("eq",equipmentRecipes);
-    //console.log("ingredients",ingredientsRecipes);
-    //console.log("potions",potionRecipes);
-
-
-    //Engine.weaponsRecipes = new Inventory(12);
-    Engine.equipmentRecipes = new Inventory(18);
-    Engine.ingredientsRecipes = new Inventory(18);
-    //Engine.potionsRecipes = new Inventory(12);
-
-    equipmentRecipes.forEach(function(w){
-        Engine.equipmentRecipes.add(w,1);
-    });
-    ingredientsRecipes.forEach(function(w){
-        Engine.ingredientsRecipes.add(w,1);
-    });
-};
-
 Engine.addHero = function(data){
     // data comes from the initTrim()'ed packet of the player
     Engine.player = new Hero();
@@ -1820,7 +1748,7 @@ Engine.addHero = function(data){
     //Engine.camera.setDeadzone(7*32,5*32);
     Engine.camera.setLerp(0.1);
     /*var graphics = Engine.scene.add.graphics().setScrollFactor(0);
-    graphics.lineStyle(2, 0x00ff00, 1);
+    // graphics.lineStyle(2, 0x00ff00, 1);
     var w = Engine.camera.deadzone.width;
     var h = Engine.camera.deadzone.height;
     graphics.strokeRect(Engine.camera.centerX-(w/2), Engine.camera.centerY-(h/2), w, h);
@@ -1828,12 +1756,15 @@ Engine.addHero = function(data){
 };
 
 Engine.updateEnvironment = function(){
+    if(!Engine.playerIsInitialized) return;
     var chunks = Utils.listAdjacentAOIs(Engine.player.chunk);
     var newChunks = chunks.diff(Engine.displayedChunks);
     var oldChunks = Engine.displayedChunks.diff(chunks);
 
-    for (var i = 0; i < oldChunks.length; i++) {
-        Engine.removeChunk(oldChunks[i]);
+    if(!Client.tutorial) {
+        for (var i = 0; i < oldChunks.length; i++) {
+            Engine.removeChunk(oldChunks[i]);
+        }
     }
 
     for(var j = 0; j < newChunks.length; j++){
@@ -1864,50 +1795,34 @@ Engine.loadJSON = function(path,callback,data){
 };
 
 Engine.drawChunk = function(mapData,id){
-    var chunk = new Chunk(mapData, id, 1);
+    var chunk = new Chunk(mapData, Engine.tilesetData, Engine.scene);
     Engine.chunks[chunk.id] = chunk;
     if (!Engine.mapDataCache[chunk.id]) Engine.mapDataCache[chunk.id] = mapData;
-    chunk.drawLayers();
     Engine.displayedChunks.push(chunk.id);
+    Engine.updateBehindness();
 };
 
 Engine.removeChunk = function(id){
     if(Engine.useBlitters) return; // todo: hack
-    Engine.chunks[id].removeLayers();
+    Engine.chunks[id].erase();
     Engine.displayedChunks.splice(Engine.displayedChunks.indexOf(id),1);
 };
 
-Engine.addResource = function(origin,shape){
-    for(var x = shape.x/32; x < (shape.x+shape.width)/32; x++){
-        for(var y = shape.y/32; y < (shape.y+shape.height)/32; y++) {
-            Engine.resources.add(origin.x+x,origin.y+y,1);
-        }
-    }
-};
-
-Engine.addCollision = function(x,y,tile){
-    if(Engine.isColliding(tile)) {
-        Engine.collisions.add(x,y,1);
-        if(Engine.debugCollisions) Engine.scene.add.rectangle((x*32)+16,(y*32)+16, 32,32, 0xee0000).setAlpha(0.7);
-    }
-};
-
 // Check if a non-walkable tile is at a given position or not
-Engine.checkCollision = function(x,y){
-    return !!Engine.collisions.get(x,y);
+Engine.checkCollision = function(x,y){ // returns true if tile is not walkable
+    return Engine.collisions.has(x,y);
 };
 
 Engine.checkResource = function(x,y){
-    return !!Engine.resources.get(x,y);
-};
-
-// Check if a given tile type is walkable or not
-Engine.isColliding = function(tile){ // tile is the index of the tile in the tileset
-    return Engine.collidingTiles.includes(tile);
+    return Engine.resources.has(x,y);
 };
 
 Engine.handleKeyboard = function(event){
     //console.log(event);
+    if(Engine.currentTutorialPanel && Engine.currentTutorialPanel.handleKeyboard){
+        Engine.currentTutorialPanel.handleKeyboard(event);
+        return;
+    }
     if(event.key == 'Enter') Engine.toggleChatBar();
 };
 
@@ -1923,10 +1838,11 @@ Engine.handleClick = function(pointer,objects){
             if(objects[i].handleClick) objects[i].handleClick(pointer);
         }
     }else{
-        if(!Engine.inPanel && !Engine.inMenu && !BattleManager.inBattle && !Engine.dead) {
+        if(!BattleManager.inBattle && !Engine.dead) {
             if(Engine.bldRect){
                 Engine.bldUnclick();
             }else {
+                if(Engine.inMenu && !Engine.currentMenu.allowWalk) return;
                 Engine.moveToClick(pointer);
             }
         }
@@ -1948,7 +1864,7 @@ Engine.handleOut = function(pointer,objects){
     if(objects.length > 0) {
         for(var i = 0; i < Math.min(objects.length,2); i++) { // disallow bubbling too deep, only useful in menus (i.e. shallow)
             var obj = objects[i];
-            if(obj.constructor.name == 'Building' && !Engine.inMenu) Engine.showMarker();
+            if(obj.constructor.name == 'Building' && (!Engine.inMenu || Engine.currentMenu.allowWalk)) Engine.showMarker();
             if(obj.handleOut) obj.handleOut();
         }
     }
@@ -1960,20 +1876,22 @@ Engine.handleDrag = function(pointer,object,dragX,dragY){
 
 Engine.moveToClick = function(pointer){
     Engine.player.setDestinationAction(0);
-    Engine.computePath(Engine.getMouseCoordinates(pointer).tile);
+    Engine.computePath(Engine.getMouseCoordinates(pointer).tile,false);
 };
 
-Engine.computePath = function(position){
-    //console.log('going to ',position);
+Engine.computePath = function(position,nextTo){
+    // console.log('going to ',position);
     var x = position.x;
     var y = position.y;
-    if(Engine.checkCollision(x,y)) return;
+    if(x === undefined || y === undefined) console.warn('Pathfiding to undefined coordinates');
+    // if(!nextTo && Engine.checkCollision(x,y)) return;
     var start = Engine.player.getPFstart();
     if(Engine.player.moving) Engine.player.stop();
 
-    var path = Engine.pathFinder.findPath(start,{x:x,y:y});
+    var path = Engine.pathFinder.findPath(start,{x:x,y:y},false,nextTo); // seek = false, nextTo = true
     if(!path) {
-        Engine.player.talk('It\'s too far!');
+        if(!Engine.checkCollision(x,y)) Engine.player.talk('It\'s too far!');
+        // Engine.player.talk('I can\'t go there!');
         return;
     }
 
@@ -2027,12 +1945,20 @@ Engine.getMouseCoordinates = function(pointer){
     };
 };
 
+Engine.isInView = function(x,y){
+    if(x < Engine.player.tileX - Engine.viewWidth/2) return false;
+    if(x >= Engine.player.tileX + Engine.viewWidth/2) return false;
+    if(y < Engine.player.tileY - Engine.viewHeight/2) return false;
+    if(y >= Engine.player.tileY + Engine.viewHeight/2) return false;
+    return true;
+};
+
 Engine.trackMouse = function(event){
     var position = Engine.getMouseCoordinates(event);
     if(Engine.player) Engine.updateMarker(position.tile);
     if(Engine.debug){
-        //document.getElementById('pxx').innerHTML = Math.round(position.pixel.x);
-        //document.getElementById('pxy').innerHTML = Math.round(position.pixel.y);
+        if(document.getElementById('pxx')) document.getElementById('pxx').innerHTML = Math.round(event.x);
+        if(document.getElementById('pxy'))  document.getElementById('pxy').innerHTML = Math.round(event.y);
         document.getElementById('tx').innerHTML = position.tile.x;
         document.getElementById('ty').innerHTML = position.tile.y;
         document.getElementById('aoi').innerHTML = Utils.tileToAOI(position.tile);
@@ -2072,12 +1998,22 @@ Engine.updateSelf = function(data){
 Engine.update = function(){
 
 };
+//TODO: compute once
+Engine.getAnimalData = function(type){
+    var animalData = animalsData[type];
+    if(!animalData){
+        console.warn('ERROR: no animal data for animal',type);
+        return {};
+    }
+    if(animalData.inheritFrom !== undefined) animalData = Object.assign(animalsData[animalData.inheritFrom],animalData);
+    return animalData;
+};
 
 // Processes the global update packages received from the server
 Engine.updateWorld = function(data){  // data is the update package from the server
     //console.log(data);
     // TODO: store client/server-shared list somewhere
-    var entities = ['animal','building','cell','civ','item','player'];
+    var entities = ['animal','building','cell','civ','item','player','remain'];
 
     entities.forEach(function(e){
         var news = data['new'+e+'s'];
@@ -2089,13 +2025,14 @@ Engine.updateWorld = function(data){  // data is the update package from the ser
     });
 };
 
-Engine.createElements = function(arr,entityType){
+Engine.createElements = function(arr,entityType){ // entityType = 'animal', 'building', ...
     var pool = Engine.entityManager.pools[entityType];
     var constructor = Engine.entityManager.constructors[entityType];
     arr.forEach(function(data){
         var e = pool.length > 0 ? pool.shift() : new constructor();
         e.setUp(data);
         e.update(data);
+        if(Client.tutorial) TutorialManager.triggerHook('new'+entityType+':'+data.type);
     });
 };
 
@@ -2104,7 +2041,7 @@ Engine.createElements = function(arr,entityType){
 Engine.updateElements = function(obj,table){
     Object.keys(obj).forEach(function (key) {
         if(!table.hasOwnProperty(key)) {
-            if(Engine.debug) console.warn('Attempt to update non-existing element with ID',key);
+            // if(Engine.debug) console.warn('Attempt to update non-existing element with ID',key);
             return;
         }
         table[key].update(obj[key]);
@@ -2114,7 +2051,7 @@ Engine.updateElements = function(obj,table){
 Engine.removeElements = function(arr,table){
     arr.forEach(function(id){
         if(!table.hasOwnProperty(id)) {
-            if(Engine.debug) console.warn('Attempt to remove non-existing element with ID',id);
+            // if(Engine.debug) console.warn('Attempt to remove non-existing element with ID',id);
             return;
         }
         table[id].remove();
@@ -2123,12 +2060,16 @@ Engine.removeElements = function(arr,table){
 
 Engine.updateMenus = function(category){
     var callbackMap = {
+        'belt': 'onUpdateBelt',
+        'bldrecipes': 'onUpdateBuildRecipes',
         'character': 'onUpdateCharacter',
         'citizen': 'onUpdateCitizen',
         'commit': 'onUpdateCommit',
         'equip': 'onUpdateEquipment',
         'gold': 'onUpdateGold',
+        'history': 'onUpdateHistory',
         'inv': 'onUpdateInventory',
+        'map': 'onUpdateMap',
         'productivity':'onUpdateProductivity',
         'stats': 'onUpdateStats'
     };
@@ -2137,11 +2078,15 @@ Engine.updateMenus = function(category){
     if(Engine.currentMenu) Engine.currentMenu.trigger(event);
 
     var capsulesMap = {
+        // 'food': Engine.foodCapsule,
         'gold': Engine.goldCapsule,
         'inv': Engine.bagCapsule,
-        'stats': Engine.lifeCapsule
+        'stats': Engine.capsules,
+        // 'vigor': Engine.vigorCapsule
     };
-    if(category in capsulesMap) capsulesMap[category].update();
+    if(category in capsulesMap){
+        if(capsulesMap[category]) capsulesMap[category].update();
+    }
 };
 
 Engine.inThatBuilding = function(id){
@@ -2152,6 +2097,7 @@ Engine.checkForBuildingMenuUpdate= function(id,event){
     if(Engine.inThatBuilding(id)) {
         Engine.currentMenu.trigger(event);
     }
+    if(Engine.repairPanel.displayed) Engine.repairPanel.update();
 };
 
 Engine.addPlayer = function(data){
@@ -2161,7 +2107,8 @@ Engine.addPlayer = function(data){
 };
 
 Engine.getTilesetFromTile = function(tile){
-    if(Engine.tilesetMap.hasOwnProperty(tile)) return Engine.tilesetMap[tile];
+    if(Engine.tilesetMap.hasOwnProperty(tile)) return Engine.tile;
+    setMap[tile];
     for(var i = 0; i < Engine.tilesets.length; i++){
         if(tile < Engine.tilesets[i].firstgid){
             Engine.tilesetMap[tile] = i-1;
@@ -2172,90 +2119,45 @@ Engine.getTilesetFromTile = function(tile){
 };
 
 Engine.enterBuilding = function(id){
-    console.log('Entering',id);
+    if(id == -1) return;
     Engine.player.setVisible(false);
     var building = Engine.buildings[id];
     Engine.inBuilding = true;
     Engine.currentBuiling = building; // used to keep track of which building is displayed in menus
-    var buildingData = Engine.buildingsData[building.buildingType];
-    //var settlementData = Engine.settlementsData[building.settlement];
+    var buildingData = buildingsData[building.buildingType];
 
-    var menus = [];
     var mainMenu;
     if(building.built == true) {
-        // Displays the tray icons based on flags in the building data
-        if (buildingData.fort) menus.push(Engine.menus.fort);
-        if (buildingData.trade) menus.push(Engine.menus.trade);
-        if (buildingData.workshop) menus.push(Engine.menus.crafting);
-        if (buildingData.production) menus.push(Engine.menus.production);
-        if (buildingData.staff) menus.push(Engine.menus.staff);
         mainMenu = Engine.menus[buildingData.mainMenu];
     }else{
-        menus.push(Engine.menus.construction);
         mainMenu = Engine.menus.construction;
     }
-
-    menus.forEach(function(m){
-        m.displayIcon();
-    });
 
     mainMenu.display();
     building.handleOut();
 
-    //TODO: rework
-    var menu = mainMenu;
-    if(menu.panels['shop']) {
-        menu.panels['shop'].modifyInventory(building.inventory);
-        if( menu.panels['shop'].filterItems) {
-            menu.panels['shop'].modifyFilter({
-                type: 'prices',
-                items: building.prices,
-                key: 1,
-                hard: false//!buildingData.workshop
-            });
-        }
-        menu.panels['shop'].updateInventory();
-
-        if(menu.panels['client']) {
-            if( menu.panels['client'].filterItems) {
-                menu.panels['client'].modifyFilter({
-                    type: 'prices',
-                    items: building.prices,
-                    key: 0,
-                    hard: false
-                });
-            }
-            menu.panels['client'].updateInventory();
-        }
-    }
-
     Engine.buildingTitle.setText(buildingData.name);
-    var owner = Engine.currentBuiling.ownerName || 'Player';
-    Engine.buildingTitle.capsule.setText(owner+'\'s');
-    //Engine.settlementTitle.setText(settlementData.name);
-    //if(Engine.buildingTitle.width < Engine.settlementTitle.width) Engine.buildingTitle.resize(Engine.settlementTitle.width);
+    var owner = Engine.currentBuiling.isOwned() ? 'Your' : (Engine.currentBuiling.ownerName || 'Player')+'\'s';
+    Engine.buildingTitle.capsule.setText(owner);
     Engine.buildingTitle.move(Engine.currentMenu.titleY);
     Engine.buildingTitle.display();
-    //Engine.settlementTitle.display();
 
-    if(Client.tutorial) Engine.tutorialHook('bld:'+id);
-    //Engine.UIHolder.resize(Engine.getHolderSize());
+    if(Client.tutorial) TutorialManager.checkHook();
 };
 
 Engine.exitBuilding = function(){
     Engine.player.setVisible(true);
+    Engine.camera.startFollow(Engine.player);
     Engine.inBuilding = false;
     Engine.currentBuiling = null;
     Engine.currentMenu.hide();
     Engine.buildingTitle.hide();
-    //Engine.settlementTitle.hide();
     for(var m in Engine.menus){
         if(!Engine.menus.hasOwnProperty(m)) continue;
         Engine.menus[m].hideIcon();
     }
-    //Engine.UIHolder.resize(Engine.getHolderSize());
     if(Engine.miniMap)  Engine.miniMap.follow();
-    if(Client.tutorial) Engine.tutorialHook('exit');
+    if(Client.tutorial) TutorialManager.triggerHook('exit');
 };
 
 Engine.getHolderSize = function(){
@@ -2271,7 +2173,7 @@ Engine.countIcons = function(){
 };
 
 Engine.processNPCClick = function(target){
-    if(Engine.inPanel) return;
+    if(UI.inPanel) return;
     if(target.dead){
         var action = target.entityType == 'animal' ? 2 : 4;
         Engine.player.setDestinationAction(action,target.id,target.tileX,target.tileY); // 2 for NPC
@@ -2282,9 +2184,9 @@ Engine.processNPCClick = function(target){
 };
 
 Engine.processItemClick = function(target){
-    if(Engine.inPanel) return;
-    Engine.player.setDestinationAction(3,target.id,target.tx,target.ty); // 3 for item
-    Engine.computePath({x:target.tx,y:target.ty});
+    if(UI.inPanel) return;
+    Engine.player.setDestinationAction(3,target.id,target.tileX,target.tileY); // 3 for item
+    Engine.computePath({x:target.tileX,y:target.tileY},true);
 };
 
 Engine.requestBattleAttack = function(target){
@@ -2331,27 +2233,6 @@ Engine.requestBattleAction = function(action,data){
     return Utils.gridToLine(col,row,3);
 };*/
 
-Engine.isBattleCell = function(x,y){
-    return Engine.battleCells.get(x,y);
-};
-
-Engine.getNextPrint = function(){
-    if(Engine.printsPool.length > 0) return Engine.printsPool.shift();
-    return Engine.scene.add.image(0,0,'footsteps');
-};
-
-Engine.recycleSprite = function(sprite){
-    Engine.spritePool.recycle(sprite);
-};
-
-Engine.recycleImage = function(image){
-    Engine.imagePool.recycle(image);
-};
-
-Engine.recyclePrint = function(print){
-    Engine.printsPool.push(print);
-};
-
 Engine.updateGrid = function(){
     Engine.entityManager.displayLists['cell'].forEach(function(id){
         Engine.battleCells[id].update();
@@ -2359,6 +2240,7 @@ Engine.updateGrid = function(){
 };
 
 Engine.getOccupiedCells = function(entity,hash){
+    if(entity.entityType == 'building') return [];
     var cells = [];
     for(var i = 0; i < entity.cellsWidth; i++){
         for(var j = 0; j < entity.cellsHeight; j++){
@@ -2373,112 +2255,14 @@ Engine.getOccupiedCells = function(entity,hash){
 };
 
 // ## UI-related functions ##
-// this functions need to have a this bound to them
-Engine.closePanel = function(){this.hide();};
-Engine.togglePanel = function(){ // When clicking on a player/building/animal, toggle the corresponding panel visibility
-    if(Engine.inMenu) return;
-    if(this.panel.displayed){
-        Engine.inPanel = false;
-        Engine.currentPanel = null;
-    }else {
-        if(Engine.inPanel) Engine.currentPanel.hide();
-        Engine.inPanel = true;
-        Engine.currentPanel = this.panel;
-    }
-    this.panel.toggle();
-};
-
-Engine.recipeClick = function(){
-    Engine.menus['crafting'].panels['combi'].setUp(this.itemID);
-    var sound = Engine.itemsData[this.itemID].sound;
-    if(sound) Engine.scene.sound.add(sound).play();
-};
-
-Engine.toggleStock = function(stockID){
-    Engine.craftingStock = stockID;
-    if(stockID == 1){
-        Engine.currentMenu.panels['stock'].button.display();
-        Engine.currentMenu.panels['items'].button.hide();
-        Engine.currentMenu.panels['ingredients'].modifyReferenceInventory(Engine.player.inventory);
-    }else{
-        Engine.currentMenu.panels['items'].button.display();
-        Engine.currentMenu.panels['stock'].button.hide();
-        Engine.currentMenu.panels['ingredients'].modifyReferenceInventory(Engine.currentBuiling.inventory);
-    }
-    Engine.currentMenu.panels['ingredients'].updateInventory();
-    Engine.currentMenu.panels['combi'].manageButtons();
-};
-
-Engine.newbuildingClick = function(){
-    Engine.currentMenu.panels['confirm'].setUp(this.itemID);
-};
-
-Engine.inventoryClick = function(){
-    if(BattleManager.inBattle) {
-        var sticky = Engine.itemsData[this.itemID].stickMouse;
-        UI.manageCursor(+sticky,'sticky');
-        if(sticky){
-            Engine.stickyCursor = true;
-            return false;
-        }else {
-            Client.sendUse(this.itemID);
-            return true;
-        }
-    }else{
-        // itemAction is the small panel appearing in the inventory displaying options such as use, throw...
-        Engine.currentMenu.panels['itemAction'].display();
-        Engine.currentMenu.panels['itemAction'].setUp(this.itemID);
-    }
-};
 
 Engine.unequipClick = function(){ // Sent when unequipping something
     Client.sendUnequip(this.slotName);
 };
 
-Engine.sellClick = function(){
-    Engine.currentMenu.panels['action'].setUp(this.itemID,'sell');
-    /*if(Engine.currentBuiling.isOwned()){
-        Engine.currentMenu.panels['prices'].display();
-    }*/
-};
-
-Engine.buyClick = function(){
-    Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
-    /*if(Engine.currentBuiling.isOwned()){
-        Engine.currentMenu.panels['prices'].display();
-    }*/
-};
-
-Engine.giveClick = function(itemID){
-    Engine.currentMenu.panels['action'].display();
-    Engine.currentMenu.panels['action'].setUp(itemID,'sell');
-};
-
-Engine.takeClick = function(){
-    //if(Engine.currentBuiling.owner != Engine.player.id) return;
-    if(!Engine.currentBuiling.isOwned()) return;
-    Engine.currentMenu.panels['action'].display();
-    Engine.currentMenu.panels['action'].setUp(this.itemID,'buy');
-};
-
-Engine.commitClick = function(){
-    Client.sendCommit();
-};
-
 Engine.respawnClick = function(){ // this bound to respawn panel
     Client.sendRespawn();
-    this.hide();
-};
-
-Engine.buildError = function(){
-    Engine.currentMenu.panels['confirm'].displayError();
-};
-
-Engine.buildSuccess = function(){
-    Engine.currentMenu.panels['buildings'].hide();
-    Engine.currentMenu.panels['confirm'].hide();
-    Engine.currentMenu.panels['ingredients'].hide();
-    Engine.currentMenu.panels['map'].map.hideRedPin();
+    Engine.menus["respawn"].hide();
 };
 
 Engine.leaveBuilding = function(){
@@ -2487,23 +2271,80 @@ Engine.leaveBuilding = function(){
 };
 
 Engine.snap = function(){
-    game.renderer.snapshot(function(img){
-        Client.sendScreenshot(img.src,detectBrowser());
+    Engine.getGameInstance().renderer.snapshot(function(img){
+        Client.sendScreenshot(img.src,Boot.detectBrowser());
     });
 };
 
-function cl(){
-    localStorage.clear();
-}
+Engine.debugQT = function(quads){
+    Engine.qtQuads.forEach(function(q){
+       q.destroy();
+    });
+    quads.forEach(function(q){
+        var rect = Engine.scene.add.rectangle(q.x*32, q.y*32, (q.w)*32, (q.h)*32, 0x6666ff);
+        rect.setDepth(100).setOrigin(0);
+        Engine.qtQuads.push(rect);
+    });
+};
 
-function s(){
-    Client.socket.emit('ss');
-}
+Chunk.prototype.postDrawTile = function(){}; // Used in editor
+Chunk.prototype.postDrawImage = function(x,y,image,sprite){
+    var hover = this.getAtlasData(image,'hover');
+    if(!hover) return;
+    sprite.id = 0;
+    sprite.tx = Math.floor(x);
+    sprite.ty = Math.floor(y);
+    sprite.setInteractive();
+    sprite.on('pointerover',function(){
+        UI.hoverFlower++;
+        sprite.formerFrame = sprite.frame.name;
+        sprite.setFrame(hover);
+        Engine.hideMarker();
+        UI.setCursor('item'); // TODO: use UI.manageCursor() instead?
+    });
+    sprite.on('pointerout',function(){
+        UI.hoverFlower--;
+        sprite.setFrame(sprite.formerFrame);
+        if(UI.hoverFlower <= 0) {
+            Engine.showMarker();
+            UI.setCursor();
+        }
+    });
+    sprite.on('pointerdown',function(){
+        if(!BattleManager.inBattle) Engine.processItemClick(sprite,true);
+    });
+};
 
-function test(){
-    var rt = UI.scene.add.renderTexture(400, 300, 300, 300);
-    rt.draw(Engine.buildings[0],10,10);
-    rt.setDepth(100);
-    rt.setScrollFactor(0);
-    console.log('ok');
-}
+
+Chunk.prototype.addOverlay = function(cx,cy){
+    Engine.overlay.add(cx-1, cy-2, 1);
+    Engine.overlay.add(cx, cy-2, 1);
+    Engine.overlay.add(cx+1, cy-2, 1);
+    Engine.overlay.add(cx+2, cy-2, 1);
+    Engine.overlay.add(cx, cy-3, 1);
+    Engine.overlay.add(cx+1, cy-3, 1);
+};
+
+Chunk.prototype.addCollision = function(cx,cy){
+    Engine.collisions.add(cx, cy, 1);
+};
+
+Chunk.prototype.removeCollision = function(cx,cy){
+    Engine.collisions.delete(cx,cy);
+};
+
+Chunk.prototype.addResource = function(x,y){
+    Engine.resources.add(x,y);
+};
+
+
+window.debugOverlay = function(x,y){
+    console.log(Engine.overlay.get(x,y));
+};
+
+window.debugPlayer = function(){
+    console.log(Engine.player);
+};
+
+
+export default Engine;

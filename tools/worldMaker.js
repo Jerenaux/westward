@@ -3,27 +3,19 @@
  */
 var fs = require('fs');
 var path = require('path');
-var clone = require('clone');
-var xml2js = require('xml2js');
-var config = require('config');
 var Jimp = require("jimp");
 var rwc = require('random-weighted-choice');
+var quickselect = require('quickselect');
 
-var World = require('../shared/World.js').World;
-var Utils = require('../shared/Utils.js').Utils;
 var SpaceMap = require('../shared/SpaceMap.js').SpaceMap;
-var Geometry = require('../studio/Geometry.js').Geometry;
+var Geometry = require('./Geometry.js').Geometry;
+var autopath = require('./autopath');
+
+import Utils from '../shared/Utils'
+import World from '../shared/World'
 
 var counter = 0;
 var total = 0;
-
-/*
-* README: //TODO: update
-* - Shores are first populated with 'c' tiles based on blueprint (applyBlueprint)
-* - Then the seas are filled, using 'c' tiles as stop tiles (fill)
-* - Then the shores are actually drawn, replacing 'c' based on neighbors (drawShore)
-* - Then forests are added
-* */
 
 function Chunk(id){
     this.id = id;
@@ -33,13 +25,18 @@ function Chunk(id){
     this.defaultTile = 'grass';
     this.layers = [new SpaceMap()];
     this.decor = [];
+    this.wood = new SpaceMap();
 }
 
 Chunk.prototype.addDecor = function(x,y,v){
     this.decor.push([x,y,v]);
 };
 
-Chunk.prototype.add = function(x,y,v){
+Chunk.prototype.addResource = function(x,y,r){
+    if(r == 'wood') this.wood.add(x,y);
+};
+
+Chunk.prototype.add = function(x,y,v){ // Add tile
     this.layers[0].add(x,y,v);
 };
 
@@ -62,7 +59,8 @@ Chunk.prototype.trim = function(){
         y: this.y,
         default: this.defaultTile,
         layers: layers,
-        decor: this.decor
+        decor: this.decor,
+        wood: this.wood.toList(true)
     };
 };
 
@@ -75,14 +73,40 @@ Chunk.prototype.write = function(chunkpath){
     });
 };
 
-function makeWorld(outdir,blueprint){
-    // Default values
-    var defChunkW = 30;
-    var defChunkH = 20;
-    var defTileW = 32;
-    var defTileH = 32;
+function WorldMaker(args){
+    this.outdir = '';
+    this.chunks = {};
+    this.coasts = [];
 
-    if(!nbHoriz || !nbVert){
+    this.land = new SpaceMap();
+    this.collisions = new SpaceMap();
+    this.collisionsDebug = new SpaceMap();
+    this.items = new SpaceMap();
+    this.animals = new SpaceMap();
+    this.mapPixels = new SpaceMap();
+
+    this.tileset = null;
+    this.patterns = null;
+
+    this.nbHoriz = args.nbhoriz;
+    this.nbVert = args.nbvert;
+    this.chunkWidth = args.chunkw || 30;
+    this.chunkHeight = args.chunkh || 20;
+    this.tileWidth = args.tilew || 32;
+    this.tileHeight = args.tileh || 32;
+    this.blueprint = args.blueprint;
+
+    this.treeSource = args.treesource;
+    this.notreesave = args.notreesave;
+}
+
+WorldMaker.prototype.addCollision = function(x,y,source){
+    this.collisions.add(x,y,1);
+    this.collisionsDebug.add(x,y,source);
+};
+
+WorldMaker.prototype.run = function(){
+    if(!this.nbHoriz || !this.nbVert){
         console.log('ERROR : Invalid arguments');
         console.log('--nbhoriz : number of chunks horizontally (> 0)');
         console.log('--nbvert : number of chunks vertically (> 0)');
@@ -92,54 +116,158 @@ function makeWorld(outdir,blueprint){
         console.log('(--tileh : height of tiles in px, default '+defTileH+')');
         return;
     }
-    if(!chunkWidth) chunkWidth = defChunkW;
-    if(!chunkHeight) chunkHeight = defChunkH;
-    if(!tileWidth) tileWidth = defTileW;
-    if(!tileHeight) tileHeight = defTileH;
 
-    tileset = JSON.parse(fs.readFileSync(path.join(__dirname,'..','assets','tilesets','tileset.json')).toString());
+    this.tileset = JSON.parse(fs.readFileSync(path.join(__dirname,'..','assets','tilesets','tileset.json')).toString());
+    this.patterns = JSON.parse(fs.readFileSync(path.join('tools','patterns.json')).toString());
+    var dataAssets = path.join(__dirname,'..','assets','data');
+    this.itemsData = JSON.parse(fs.readFileSync(path.join(dataAssets,'items.json')).toString());
+    this.animalsData = JSON.parse(fs.readFileSync(path.join(dataAssets,'animals.json')).toString());
 
-    var mapsPath = config.get('dev.mapsPath');
-    outdir = (outdir ? path.join(__dirname,mapsPath,outdir) : path.join(__dirname,mapsPath,'chunks'));
-    if (!fs.existsSync(outdir)) fs.mkdirSync(outdir);
-    console.log('Writing to',outdir);
+    this.outdir = path.join(__dirname,'..','maps'); // TODO: remove dev.mapsPath etc?
+    console.log('Writing to',this.outdir);
 
-    var existing = fs.readdirSync(outdir);
-    if (existing.length > 0 ){
+    if(!fs.existsSync(this.outdir)) fs.mkdirSync(this.outdir);
+    var content = fs.readdirSync(this.outdir);
+    if (content.length > 0 ){
         console.warn('Deleting existing world');
-        for(var i = 0; i < existing.length; i++){
-            fs.unlinkSync(path.join(outdir,existing[i]));
+        for(var i = 0; i < content.length; i++){
+            fs.unlinkSync(path.join(this.outdir,content[i]));
         }
     }
 
-    World.setUp(nbHoriz,nbVert,chunkWidth,chunkHeight,tileWidth,tileHeight);
+    World.setUp(this.nbHoriz,this.nbVert,this.chunkWidth,this.chunkHeight,this.tileWidth,this.tileHeight);
 
-    //var chunks = {};
-    /*chunks[0] = new Chunk(0);
-    total = 1;*/
-    var total = nbHoriz*nbVert;
+    var total = this.nbHoriz*this.nbVert;
     for(var i = 0; i < total; i++){
-        chunks[i] = new Chunk(i);
+        this.chunks[i] = new Chunk(i);
     }
-    console.log(total+' chunks created ('+nbHoriz+' x '+nbVert+')');
+    console.log(total+' chunks created ('+this.nbHoriz+' x '+this.nbVert+')');
 
-    // TODO: rename (bluepirnts actually pertain to shores and water, ...) + make clean sucession of functions, not nested (use promises?)
-    applyBlueprint(blueprint);
+    /*this.steps = {
+        'shape_world': this.shapeWorld, // Puts 'c' tiles on contours
+    }
+    this.stepsNames = this.steps.keys();
+    this.step = -1;*/
 
-    var img = blueprint.split('.')[0]+'.png';
-    console.log('Scanning image ',img);
-    Jimp.read(path.join(__dirname,'blueprints',img), function (err, image) {
-        if (err) throw err;
-        createForests(image,outdir);
-    });
+    autopath.readImage(this.blueprint,this.storeImage.bind(this));
+};
+
+/*WorldMaker.prototype.proceed = function(){
+    if(++this.step >= this.stepsNames.length) return;
+    this.stepsNames
+};*/
+
+WorldMaker.prototype.storeImage = function(image){
+    this.image = image;
+    this.create();
+};
+
+WorldMaker.prototype.create = function(){
+    /*
+    * README:
+    * - Shores are first populated with 'c' tiles based on blueprint (shapeWorld)
+    * - Then the seas are filled, using 'c' tiles as stop tiles (createLakes)
+    * - Then the shores are actually drawn, replacing 'c' based on neighbors (drawShore)
+    * - Then forests are added (createForests)
+    * */
+    var contours = autopath.getContours(this.image);
+    this.shapeWorld(contours);
+    this.collectPixels();
+    this.createLakes();
+    this.drawShore();
+    this.createForests();
+    this.addMisc();
+    this.makeSpawnZones();
+
+    for(var id in this.chunks){
+        this.chunks[id].write(this.outdir);
+    }
+
+    this.writeDataFiles();
+    this.makeWorldmap();
+};
+
+WorldMaker.prototype.shapeWorld = function(contours){
+    // console.log(contours)
+    for(var i = 0; i < contours.length; i++) {
+        var lines = contours[i];
+        var nbPts = lines.length;
+        //console.log('processing curve '+i+' of length '+nbPts);
+        var tiles = [];
+        for (var j = 0; j < nbPts - 1; j++) {
+            var s = lines[j];
+            var e = lines[j+1];
+            s = this.pixelToTile({x:s[0],y:s[1]});
+            e = this.pixelToTile({x:e[0],y:e[1]});
+            var addTiles = Geometry.addCorners(Geometry.straightLine(s, e));
+            if (j > 0) addTiles.shift();
+            tiles = tiles.concat(addTiles);
+        }
+        tiles = Geometry.forwardSmoothPass(tiles);
+        tiles = Geometry.backwardSmoothPass(tiles);
+        if(tiles.length > 1) this.addCoastTiles(tiles);
+    }
+};
+
+WorldMaker.prototype.isBusy = function(node){
+    if(!isInWorldBounds(node.x,node.y)) return true;
+    return this.collisions.has(node.x,node.y);
+};
+
+function isInWorldBounds(x,y){
+    return !(x < 0 || y < 0 || x >= World.worldWidth || y >= World.worldHeight);
 }
 
-function createForests(image,outdir){
-    console.log('Creating forest ...');
-    var poles = [Math.floor(World.worldHeight/2),World.worldHeight,0]; // Pole for tree 1, 2 and 3 respectively
+WorldMaker.prototype.addDecor = function(tile,decor){
+    var id = Utils.tileToAOI(tile);
+    if(!(id in this.chunks)) return;
+    var chunk = this.chunks[id];
+    chunk.addDecor(tile.x-chunk.x,tile.y-chunk.y,decor);
+};
 
-    var greenpixels = [];
-    image.scan(0, 0, image.bitmap.width, image.bitmap.height, function (x, y, idx) {
+WorldMaker.prototype.addResource = function(x,y,resource){
+    var id = Utils.tileToAOI({x,y});
+    if(!(id in this.chunks)) return;
+    var chunk = this.chunks[id];
+    chunk.addResource(x-chunk.x,y-chunk.y,resource);
+};
+
+/*function removeTile(tile){
+    var id = Utils.tileToAOI(tile);
+    if(!(id in chunks)) return;
+    var chunk = chunks[id];
+    chunk.remove(tile.x-chunk.x,tile.y-chunk.y);
+}*/
+
+WorldMaker.prototype.addTile = function(tile,value){
+    var id = Utils.tileToAOI(tile);
+    if(!(id in this.chunks)) return;
+    var chunk = this.chunks[id];
+    chunk.add(tile.x-chunk.x,tile.y-chunk.y,value);
+};
+
+WorldMaker.prototype.getTile = function(x,y){
+    var id = Utils.tileToAOI({x:x,y:y});
+    if(!(id in this.chunks)) return;
+    var chunk = this.chunks[id];
+    return chunk.get(x-chunk.x,y-chunk.y);
+};
+
+WorldMaker.prototype.addCoastTiles = function(tiles){
+    var coast = [];
+    tiles.forEach(function(t) {
+        if(!isInWorldBounds(t.x,t.y)) return;
+        this.addTile(t,'c');
+        coast.push(t);
+    },this);
+    this.coasts.push(coast);
+};
+
+WorldMaker.prototype.collectPixels = function(){
+    this.greenpixels = [];
+    this.whitepixels = [];
+    var wm = this;
+    this.image.scan(0, 0, this.image.bitmap.width, this.image.bitmap.height, function (x, y, idx) {
         //if(done) return;
         // x, y is the position of this pixel on the image
         // idx is the position start position of this rgba tuple in the bitmap Buffer
@@ -149,283 +277,72 @@ function createForests(image,outdir){
         var green = this.bitmap.data[idx + 1];
         var blue = this.bitmap.data[idx + 2];
 
-        if (red == 203 && green == 230 && blue == 163) greenpixels.push({x: x, y: y});
-    });
+        if(red == 203 && green == 230 && blue == 163) wm.greenpixels.push({x: x, y: y});
+        if(red == 255 && green == 255 && blue == 255) wm.whitepixels.push({x: x, y: y});
 
-    /*greenpixels.sort(function (a, b) { //TODO: remove?
-        if (a.y < b.y) return -1;
-        if (a.y == b.y) return 0;
-        if (a.y > b.y) return 1;
-    });*/
-
-    var xRandRange = 7;
-    var yRandRange = 7;
-    var nbtrees = 0;
-    console.log(greenpixels.length,'green pixels');
-    for (var i = 0; i < greenpixels.length; i++) {
-        var px = greenpixels[i];
-        var gx = Math.round(px.x * (nbHoriz * chunkWidth / image.bitmap.width));
-        var gy = Math.round(px.y * (nbVert * chunkHeight / image.bitmap.height));
-        gx += Utils.randomInt(-xRandRange, xRandRange + 1);
-        gy += Utils.randomInt(-yRandRange, yRandRange + 1);
-
-        var dists = [];
-        var distsum = 0;
-        poles.forEach(function(p){
-            var d = Math.abs(gy-p);
-            if(d == 0) d = 0.1;
-            d *= d; // Polarizes more
-            dists.push(d);
-            distsum += d;
-        });
-        var sumweights = 0;
-        var weights = dists.map(function(d){
-            var w = distsum/d;
-            sumweights += w;
-            return w;
-        });
-        var table = weights.map(function(w,i){
-            var w = Math.round((w/sumweights)*10); // Normalization
-            if(w <= 2) w = 0;
-            return {weight: w, id: i+1};
-        });
-        var tree = 't'+(Utils.randomInt(1,101) <= 1 ? 'd' : rwc(table));
-        if(plantTree(gx,gy,tree)) nbtrees++;
-    }
-    console.log(nbtrees + ' trees drawn');
-
-    /*fs.writeFile(path.join(__dirname,'blueprints','trees.json'),JSON.stringify(greenPixels),function(err){
-        if(err) throw err;
-        console.log('Green pixels written');
-    });*/
-
-    for(var id in chunks){
-        chunks[id].write(outdir);
-    }
-
-    writeMasterFile(outdir);
-    writeCollisions(outdir); //TODO: listCollisions instead
-}
-
-function plantTree(x,y,tree){
-    var free = true;
-    var xspan = 3;
-    var yspan = 2;
-    var pos = [];
-    for(var xi = 0; xi < xspan; xi++){
-        for(var yi = 0; yi < yspan; yi++){
-            var rx = x+xi;
-            var ry = y-yi;
-            pos.push([rx,ry]);
-            if(isBusy({x:rx,y:ry})) free = false;
-            if(trees.get(rx,ry)) free = false;
-            if(!free) break;
+        // Keep track of pixels that have also been mapped to land
+        // Due to space distortion, multiple pixels, black and white, can be mapped to the same tile!
+        if(red == 0 && green == 0 && blue == 0){
+            var g = wm.pixelToTile({x: x, y: y});
+            wm.land.add(g.x,g.y,1);
         }
-        if(!free) break;
-    }
-    if(!free) return false;
-    pos.forEach(function(p){
-        trees.add(p[0],p[1],1);
-    });
-    addDecor({x: x, y: y}, tree);
-    //console.warn('adding tree at',x,y);
-    return true;
-}
-
-function applyBlueprint(blueprint){
-    var parser = new xml2js.Parser();
-    var blueprint = fs.readFileSync(path.join(__dirname,'blueprints',blueprint)).toString();
-    parser.parseString(blueprint, function (err, result) {
-        if(err) throw err;
-        var read = readPath(result);
-        var paths = read.allPts; // array of arrays ; list of paths in the blueprint
-        var fillNodes = read.fillNodes;
-
-        /*paths.sort(function(a,b){ // TODO: remove?
-            if(a.length >= b.length) return -1;
-            return 1;
-        });*/
-
-        for(var i = 0; i < paths.length; i++) {
-            var pts = paths[i];
-            var nbPts = pts.length;
-            //console.log('processing curve '+i+' of length '+nbPts);
-            var tiles = [];
-            for (var j = 0; j <= nbPts - 1; j++) {
-                var s = pts[j];
-                var e = (j == nbPts - 1 ? pts[0] : pts[j + 1]);
-                var addTiles = Geometry.addCorners(Geometry.straightLine(s, e));
-                if (j > 0) addTiles.shift();
-                tiles = tiles.concat(addTiles);
-            }
-
-            tiles = Geometry.forwardSmoothPass(tiles);
-            tiles = Geometry.backwardSmoothPass(tiles);
-            if(tiles.length > 1) addShore(tiles);
-        }
-
-        if(doFill) {
-            for (var k = 0; k < fillNodes.length; k++) {
-                fill(fillNodes[k]);
-            }
-        }
-        drawShore();
-
-        // TODO: Prune chunks / set default tile as water
-        /*var visible = new Set();
-        var ids = Object.keys(WorldEditor.chunks);
-        for(var i = 0; i < ids.length; i++){
-            var id = ids[i];
-            if(!WorldEditor.isOnlyWater(WorldEditor.chunks[id])) {
-                var adjacent = Utils.listAdjacentAOIs(id);
-                for(var j = 0; j < adjacent.length; j++){
-                    visible.add(adjacent[j]);
-                }
-            }
-        }
-        for(var i = 0; i < ids.length; i++) {
-            var id = ids[i];
-            if(!visible.has(id)){
-                WorldEditor.chunks[id] = null;
-                continue;
-            }
-            for(var j = 0; j < WorldEditor.chunks[id].layers.length; j++){
-                var l = WorldEditor.chunks[id].layers[j];
-                for(var k = 0; l.data.length; k++){
-                    if(l.data[k] === null) console.log('ALERT: null values in layer'+id);
-                    continue;
-                }
-            }
-        }*/
     });
 }
 
-function pixelToTile(){
-    //TODO: use in readPath
-}
-
-function readPath(result){
-    var viewbox = result.svg.$.viewBox.split(" ");
-    var curveW = parseInt(viewbox[2]);
-    var curveH = parseInt(viewbox[3]);
-    var path = result.svg.path[0].$.d;
-    path = path.replace(/\s\s+/g, ' ');
-    var fillNodes = [];
-    if(result.svg.hasOwnProperty('fill')) {
-        var nodes = result.svg.fill[0].$.nodes.split(",");
-        for(var k = 0; k < nodes.length; k++) {
-            var coords = nodes[k].split(" ");
-            if(coords.length > 2) console.log('WARNING: fill nodes coordinates badly formatted');
-            fillNodes.push({
-                //x: parseInt(coords[0]),
-                //y: parseInt(coords[1])
-                x: Math.floor((parseInt(coords[0])/curveW)*World.worldWidth),
-                y: Math.floor((parseInt(coords[1])/curveH)*World.worldHeight)
-            });
-        }
-    }else{
-        console.log('NOTICE: No fill nodes');
-    }
-
-    var curves = path.split("M");
-    curves.shift(); // remove initial blank
-
-    var finalCurves = [];
-    for(var i = 0; i < curves.length; i++){
-        var c = curves[i].split("C");
-        finalCurves.push(c[1]);
-    }
-    console.log(finalCurves.length+' final curves');
-
-    // Generate list of points from blueprint
-    var tally = 0;
-    var allPts = [];
-    for(var i = 0; i < finalCurves.length; i++){
-        var pts = [];
-        var arr = finalCurves[i].split(" ");
-        arr.shift();
-        arr.pop();
-        arr.pop();
-        for(var j = 0; j < arr.length; j++){
-            var e = arr[j];
-            var coords = e.split(",");
-            // wX and wY are *pixel* coordinates in new world
-            var wX = Math.floor((parseInt(coords[0])/curveW)*World.worldWidth);
-            var wY = Math.floor((parseInt(coords[1])/curveH)*World.worldHeight);
-            if(pts.length > 0 && pts[pts.length-1].x == wX && pts[pts.length-1].y == wY) continue;
-            pts.push({
-                x: wX,
-                y: wY
-            });
-        }
-        tally += pts.length;
-        allPts.push(pts);
-    }
-
-    console.log(allPts.length+' curves in blueprint, totalling '+tally+' nodes');
-    //pts.forEach(item => console.log(item))
+WorldMaker.prototype.pixelToTile = function(px){
     return {
-        allPts: allPts,
-        fillNodes: fillNodes
+        x: Math.round(px.x * (this.nbHoriz * this.chunkWidth / this.image.bitmap.width)),
+        y: Math.round(px.y * (this.nbVert * this.chunkHeight / this.image.bitmap.height))
     };
-}
+};
 
-function isBusy(node){
-    if(!isInWorldBounds(node.x,node.y)) return true;
-    var id = Utils.tileToAOI(node);
-    var chunk = chunks[id];
-    //console.log(node);
-    return !!chunk.get(node.x-chunk.x,node.y-chunk.y);
-}
+WorldMaker.prototype.createLakes = function(){
+    console.log('Creating lakes ...');
+    // console.log(whitepixels.length,'white pixels');
+    var nblakes = 0;
+    for(var i = 0; i < this.whitepixels.length; i++){
+        var px = this.whitepixels[i];
+        var g = this.pixelToTile(px);
+        if(this.land.has(g.x,g.y)) continue;
+        var ok = true;
+        var contour = [[-1,0],[0,-1],[1,-1],[1,0],[0,1],[-1,1]];
+        for(var j = 0; j < contour.length; j++){
+            if(this.land.has(g.x+contour[j][0],g.y+contour[j][1]) || this.hasCoast(g.x+contour[j][0],g.y+contour[j][1])){
+                ok = false;
+                break;
+            }
+        }
+        if(ok){
+                var surface = this.fill(g);
+                if(surface > 100000) console.log(surface,px,g);
+                if (surface) nblakes++;
+        }
+    }
+    console.log(nblakes,'lakes created');
+};
 
-function isInWorldBounds(x,y){
-    return !(x < 0 || y < 0 || x >= World.worldWidth || y >= World.worldHeight);
-}
+WorldMaker.prototype.canFill = function(node){
+    var t = this.getTile(node.x,node.y);
+    return !(t == 'c' || t == 'w');
+};
 
-function addDecor(tile,decor){
-    var id = Utils.tileToAOI(tile);
-    if(!(id in chunks)) return;
-    var chunk = chunks[id];
-    chunk.addDecor(tile.x-chunk.x,tile.y-chunk.y,decor);
-}
-
-function removeTile(tile){
-    var id = Utils.tileToAOI(tile);
-    if(!(id in chunks)) return;
-    var chunk = chunks[id];
-    chunk.remove(tile.x-chunk.x,tile.y-chunk.y);
-}
-
-function addTile(tile,value){
-    var id = Utils.tileToAOI(tile);
-    if(!(id in chunks)) return;
-    var chunk = chunks[id];
-    chunk.add(tile.x-chunk.x,tile.y-chunk.y,value);
-}
-
-function getTile(x,y){
-    var id = Utils.tileToAOI({x:x,y:y});
-    if(!(id in chunks)) return;
-    var chunk = chunks[id];
-    return chunk.get(x-chunk.x,y-chunk.y);
-}
-
-function fill(fillNode,stop){ // fills the world with water, but stops at coastlines
-    console.log('Filling ...');
-    //if(fillNode.x < 0 || fillNode.x > 1 || fillNode.y < 0 || fillNode.y > 0) console.warn('Wrong fillNode coordinates');
+WorldMaker.prototype.fill = function(fillNode,stop){ // fills the world with water, but stops at coastlines
+    // if(this.isBusy(fillNode)) return;
+    if(!this.canFill(fillNode)) return;
     var stoppingCritetion = stop || 1000000;
     var queue = [];
     queue.push(fillNode);
-    var fillTiles = [];
     var counter = 0;
     var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
     while(queue.length > 0){
         var node = queue.shift();
-        //console.log('Considering',node,isBusy(node));
-        //console.log('filling at ',node.x,node.y,WorldEditor.isBusy(node));
-        if(isBusy(node)) continue;
+        if(this.isBusy(node)) continue;
+        if(!this.canFill(node)) continue;
         // put a tile at location
-        addTile(node,'w');
+        this.addTile(node,'w');
+        // this.collisions.add(node.x,node.y,1);
+        this.addCollision(node.x,node.y,'water');
+        this.mapPixels.add(node.x,node.y,'w');
         // expand
         for(var i = 0; i < contour.length; i++){
             var candidate = {
@@ -433,117 +350,406 @@ function fill(fillNode,stop){ // fills the world with water, but stops at coastl
                 y: node.y + contour[i][1]
             };
             if(!isInWorldBounds(candidate.x,candidate.y)) continue;
-            if(!isBusy(candidate)) queue.push(candidate);
+            // if(!this.isBusy(candidate)) queue.push(candidate);
+            if(this.canFill(candidate)) queue.push(candidate);
         }
 
         counter++;
-        if(counter >= stoppingCritetion){
-            console.log('early stop');
-            break;
-        }
+        if(counter >= stoppingCritetion) break;
     }
-}
+    return counter;
+};
 
-function addShore(tiles){
-    var coast = [];
-    tiles.forEach(function(t) {
-        //if(t.x == 0 || t.y == 0) return;
-        if(!isInWorldBounds(t.x,t.y)) return;
-        addTile(t,'c');
-        //console.log('adding shore at',t);
-        coast.push(t);
-    });
-    coasts.push(coast);
-}
-
-function hasCoast(x,y){
+WorldMaker.prototype.hasCoast = function(x,y){
     if(!isInWorldBounds(x,y)) return true; // When looking for a neighbor out of bounds, assume it's present; allows seamless connections with borders
-    var t = getTile(x,y);
+    var t = this.getTile(x,y);
     return !(!t || t == 'w');
-}
+};
 
-function hasWater(x,y){
-    return getTile(x,y) == 'w';
-}
+WorldMaker.prototype.hasWater = function(x,y){
+    return this.getTile(x,y) == 'w';
+};
 
-function drawShore(){
+WorldMaker.prototype.drawShore = function(){
     console.log('Drawing shore ...');
-    coasts.forEach(function(coast){
-        var undef = false;
+    //var tiles = ['wb', 'wbbl', 'wbbr', 'wbtl', 'wbtr', 'wcbl', 'wcbr', 'wctl', 'wctr', 'wl', 'wr', 'wt','none'];
+
+    var undef = 0;
+    this.coasts.forEach(function(coast){
         coast.forEach(function(c){
             var x = c.x;
             var y = c.y;
             var tile;
-            if(hasCoast(x-1,y) && hasCoast(x+1,y)  && (hasWater(x,y-1) || hasWater(x,y+1))){ // Horizontal edge
-                tile = (hasWater(x,y-1) ? 'wb' : 'wt');
-            }else if(hasCoast(x,y-1) && hasCoast(x,y+1) && (hasWater(x+1,y) || hasWater(x-1,y))) { // Vertical edge
-                tile = (hasWater(x-1,y) ? 'wr' : 'wl');
-            }else if(hasCoast(x,y+1) && hasCoast(x+1,y) && (hasWater(x+1,y+1) || hasWater(x-1,y-1)) ) { // tl
-                tile = (hasWater(x+1,y+1) ? 'wbtl' : 'wctl');
-            }else if(hasCoast(x-1,y) && hasCoast(x,y+1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // tr
-                tile = (hasWater(x-1,y+1) ? 'wbtr' : 'wctr');
-            }else if(hasCoast(x,y-1) && hasCoast(x-1,y) && (hasWater(x+1,y+1) || hasWater(x-1,y-1))) { // br
-                tile = (hasWater(x-1,y-1) ? 'wbbr' : 'wcbr');
-            }else if(hasCoast(x+1,y) && hasCoast(x,y-1) && (hasWater(x-1,y+1) || hasWater(x+1,y-1))) { // bl
-                tile = (hasWater(x+1,y-1) ? 'wbbl' : 'wcbl');
+            var nbrh = this.getNeighborhood(x,y);
+            tile = this.patterns[nbrh.join('')];
+            if(tile === undefined) {
+                console.log(x,y,nbrh.join(''));
+                undef++;
             }
-            if(tile === undefined){
-                //console.warn('undefined at',x,y);
-                //removeTile(c);
-                undef = true;
-            }else{
-                addTile(c,tile); // Will replace any 'c'
-                if(collides(tile)) collisions.add(x,y,1);
+
+            if(tile !== undefined && tile != 'none'){
+                this.addTile(c,tile); // Will replace any 'c'
+                // if(this.collides(tile)) this.collisions.add(x,y,1);
+                if(this.collides(tile)) this.addCollision(x,y,'shore');
+                this.mapPixels.add(x,y,'c');
             }
-        });
-        //if(undef) console.warn('issue with path from',coast[0],'to',coast[coast.length-2]);
+        },this);
+    },this);
+    console.log(undef,'undef');
+};
+
+// Create the string of ggccwccw ... or surrounding tiles used to determine current one
+WorldMaker.prototype.getNeighborhood = function(x,y){
+    var res = [];
+    var contour = [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]];
+    for(var j = 0; j < contour.length; j++){
+        var v = 'g'; // -1
+        if(this.hasCoast(x+contour[j][0],y+contour[j][1])) v = 'c'; // 0
+        if(this.hasWater(x+contour[j][0],y+contour[j][1])) v = 'w'; // 1
+        res.push(v);
+    }
+    return res;
+};
+
+WorldMaker.prototype.collides = function(tile){
+    var longhand = this.tileset.shorthands[tile];
+    return this.tileset.frames[longhand].collides;
+};
+
+WorldMaker.prototype.createForests = function(){
+    console.log('Creating forests ...');
+    this.trees = new SpaceMap();
+    this.woodland = new SpaceMap();
+    if(this.treeSource){
+        this.restoreForest();
+        return;
+    }
+    var xRandRange = 7;
+    var yRandRange = 7;
+    var nbtrees = 0;
+    console.log(this.greenpixels.length,'green pixels');
+    for (var i = 0; i < this.greenpixels.length; i++) {
+        var px = this.greenpixels[i];
+        var g = this.pixelToTile(px);
+        g.x += Utils.randomInt(-xRandRange, xRandRange + 1);
+        g.y += Utils.randomInt(-yRandRange, yRandRange + 1);
+
+        var pos = this.checkPositions(g.x,g.y);
+        if(pos.length == 0) continue;
+
+        // TODO: move that up, to use tree type in positions computation
+        var type = getTreeType(g.x,g.y);
+        this.plantTree(g,pos,type);
+        nbtrees++;
+    }
+    console.log(nbtrees + ' trees planted');
+    if(this.notreesave) return;
+    fs.writeFile(path.join(__dirname,'blueprints','trees.json'),JSON.stringify(this.trees.toList()),function(err){
+        if(err) throw err;
+        console.log('Trees saved');
     });
-    console.warn('###',collides('wb'));
-    console.log(tileset.frames[tileset.shorthands['wb']]);
+};
+
+WorldMaker.prototype.plantTree = function(g,pos,type){
+    // g is {x,y} location
+    pos.forEach(function(p){
+        // this.collisions.add(p[0],p[1],1);
+        this.addCollision(p[0],p[1],'tree');
+    },this);
+    //TODO: adjust ranges / conf
+    for(var x = -4; x < 6; x++){
+        for(var y = -6; y < 5; y++){
+            this.woodland.add(parseInt(g.x)+x,parseInt(g.y)+y);
+            this.addResource(parseInt(g.x)+x,parseInt(g.y)+y,'wood');
+        }
+    }
+    this.trees.add(g.x,g.y,type);
+    this.addDecor(g, 't'+type);
+    this.addRandomItem(g.x,g.y,'tree');
+};
+
+WorldMaker.prototype.restoreForest = function(){
+    console.log('Restoring existing forest...');
+    var nbtrees = 0;
+    var trees = JSON.parse(fs.readFileSync(path.join('tools','blueprints','trees.json')).toString());
+    trees.forEach(function(t){
+        this.plantTree(t,this.checkPositions(t.x,t.y),t.v);
+        nbtrees++;
+    },this);
+    console.log(nbtrees + ' trees planted');
+};
+
+function getTreeType(x,y){
+    var poles = [Math.floor(World.worldHeight/2),World.worldHeight,0,Math.floor(World.worldHeight/4)]; // Pole for tree 1, 2, 3, 4 respectively
+    var dists = [];
+    var distsum = 0;
+    poles.forEach(function(p){
+        var d = Math.abs(y-p);
+        if(d == 0) d = 0.1;
+        d *= d; // Polarizes more
+        dists.push(d);
+        distsum += d;
+    });
+    var sumweights = 0;
+    var weights = dists.map(function(d){
+        var w = distsum/d;
+        sumweights += w;
+        return w;
+    });
+    var table = weights.map(function(w,i){
+        w = Math.round((w/sumweights)*10); // Normalization
+        if(w <= 2) w = 0;
+        return {weight: w, id: i+1};
+    });
+    var id = (Utils.randomInt(1,101) <= 1 ? 'd' : rwc(table));
+    return id;
 }
 
-function collides(tile){
-    return tileset.frames[tileset.shorthands[tile]].collides;
-}
+WorldMaker.prototype.checkPositions = function(x,y){
+    var free = true;
+    var xspan = 3; //TODO: conf
+    var yspan = 2;
+    var pos = [];
+    for(var xi = 0; xi < xspan; xi++){
+        for(var yi = 0; yi < yspan; yi++){
+            var rx = parseInt(x)+xi;
+            var ry = parseInt(y)-yi;
+            pos.push([rx,ry]);
+            if(this.isBusy({x:rx,y:ry})) free = false;
+            if(!free) break;
+        }
+        if(!free) break;
+    }
+    if(!free) return [];
+    return pos;
+};
 
-function writeMasterFile(outdir){
+WorldMaker.prototype.addMisc = function(){
+    console.log('Adding misc ...');
+    var nbrocks = 5000; //TODO: conf
+    var nbadded = 0;
+    for(var i = 0; i < nbrocks; i++){
+        // console.log('zone');
+        var x = Utils.randomInt(0,World.worldWidth);
+        var y = Utils.randomInt(0,World.worldHeight);
+        if(!this.isBusy({x:x,y:y})) {
+            this.addCollision(x,y,'misc');
+            this.items.add(x,y,26);
+            nbadded++;
+        }
+    }
+    console.log(nbadded,' stones added');
+};
+
+WorldMaker.prototype.getAnimalData = function(type){
+    var animalData = this.animalsData[type];
+    if(animalData.inheritFrom !== undefined) animalData = Object.assign(this.animalsData[animalData.inheritFrom],animalData);
+    return animalData;
+};
+
+WorldMaker.prototype.makeSpawnZones = function(){
+    this.resourceMarkers = [];
+    for(var itemID in this.itemsData){
+        var itemData = this.itemsData[itemID];
+        if(!itemData.nbClusters) continue;
+        for(var i = 0; i < itemData.nbClusters; i++){
+            var x = Utils.randomInt(0,World.worldWidth-1);
+            var y = Utils.randomInt(0,World.worldHeight-1);
+            var w = Utils.randomInt(5,World.chunkWidth);
+            var h = Utils.randomInt(5,World.chunkHeight);
+            this.makeFloraZone(x,y,w,h,itemID,itemData);
+        }
+    }
+
+    for(var animalID in this.animalsData){
+        var animalData = this.getAnimalData(animalID);
+        for(var i = 0; i < animalData.nbPacks; i++){
+            var x = Utils.randomInt(0,World.worldWidth-1);
+                var y = Utils.randomInt(0,World.worldHeight-1);
+                if(!this.collisions.get(x,y)) this.makeAnimalZone(x,y,animalID);
+        }
+    }
+};
+
+WorldMaker.prototype.makeFloraZone = function(x,y,w,h,item,data){
+    var contour = [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1],[2,-1]];
+    var nb = 0;
+    var nbbushes = data.nbBushes || 4;
+    // Look for trees inside the given area
+    for(var u = 0; u < w; u++){
+        for(var v = 0; v < h; v++){
+            var tree = this.trees.get(x+u,y+v);
+            if(tree){
+                Utils.shuffle(contour);
+                for(var j = 0; j < nbbushes; j++){
+                    var c = contour[j];
+                    var loc = {x:x+u+c[0],y:y+v+c[1]};
+                    if(data.decorFrame) this.addDecor(loc, data.decorFrame);
+                    this.items.add(loc.x,loc.y,item);
+                    nb++;
+                    // console.log('bush at',loc);
+                }
+            }
+        }
+    }
+    if(nb) this.resourceMarkers.push([Math.floor(x+w/2),Math.floor(y+h/2),item]);
+};
+
+WorldMaker.prototype.makeAnimalZone = function(x,y,type){
+    this.animals.add(x,y,type);
+    // this.animalsMarkers.push([x,y,type]);
+};
+
+WorldMaker.prototype.addRandomItem = function(x,y,decor){
+    var cnt = (decor == 'tree'
+        ? [[0,-1],[0,0],[0,1],[1,1],[1,0],[2,0],[2,1]]
+        : [[-1,0],[-1,-1],[0,-1],[1,-1],[1,0],[1,1], [0,1],[-1,1]]);
+    // var item = (decor == 'tree' ? 7 : 26); // wood or stone
+    var item = Utils.randomElement([7,7,7,30]); // wood or feathers TODO config
+    if(Utils.randomInt(1,10) > 8){ // TODO: adjust
+        var c = Utils.randomElement(cnt);
+        var ix = parseInt(x)+c[0];
+        var iy = parseInt(y)+c[1];
+        this.items.add(ix,iy,item);
+        // console.log('adding',item,'at',ix,iy);
+    }
+};
+
+WorldMaker.prototype.writeDataFiles = function(){
     // Write master file
     var master = {
-        //tilesets : tilesetsData.tilesets,
-        chunkWidth: chunkWidth,
-        chunkHeight: chunkHeight,
-        nbChunksHoriz: nbHoriz,
-        nbChunksVert: nbVert
+        chunkWidth: this.chunkWidth,
+        chunkHeight: this.chunkHeight,
+        nbChunksHoriz: this.nbHoriz,
+        nbChunksVert: this.nbVert
     };
-    fs.writeFile(path.join(outdir,'master.json'),JSON.stringify(master),function(err){
+    fs.writeFile(path.join(this.outdir,'master.json'),JSON.stringify(master),function(err){
         if(err) throw err;
         console.log('Master written');
     });
-}
-
-function writeCollisions(outdir){
-    // Write master file
-    var colls = trees.toList().concat(collisions.toList());
-    fs.writeFile(path.join(outdir,'collisions.json'),JSON.stringify(colls),function(err){
+    // Write collisions
+    var colls = this.collisions.toList(true);
+    fs.writeFile(path.join(this.outdir,'collisions.json'),JSON.stringify(colls),function(err){
         if(err) throw err;
         console.log('Collisions written');
     });
-}
+    fs.writeFile(path.join(this.outdir,'collisions_debug.json'),JSON.stringify(this.collisionsDebug.toList(true)),function(err){
+        if(err) throw err;
+        console.log('Collisions debug written');
+    });
+    // Write resources
+    fs.writeFile(path.join(this.outdir,'woodland.json'),JSON.stringify(this.woodland.toList(true)),function(err){
+        if(err) throw err;
+        console.log('Woodland written');
+    });
+    // Write resource & animals markers
+    fs.writeFile(path.join(this.outdir,'resourceMarkers.json'),JSON.stringify(this.resourceMarkers),function(err){
+        if(err) throw err;
+        console.log('Resource markers written');
+    });
+    // fs.writeFile(path.join(this.outdir,'animalMarkers.json'),JSON.stringify(this.animalsMarkers),function(err){
+    //     if(err) throw err;
+    //     console.log('Animal markers written');
+    // });
+    // Items
+    fs.writeFile(path.join(this.outdir,'items.json'),JSON.stringify(this.items.toList(true)),function(err){
+        if(err) throw err;
+        console.log('Items written');
+    });
+    // Animals
+    fs.writeFile(path.join(this.outdir,'animals.json'),JSON.stringify(this.animals.toList(true)),function(err){
+        if(err) throw err;
+        console.log('Animals written');
+    });
+};
 
-var myArgs = require('optimist').argv;
-chunks = {};
-coasts = [];
-trees = new SpaceMap();
-collisions = new SpaceMap();
-tileset = null;
-nbHoriz = myArgs.nbhoriz;
-nbVert = myArgs.nbvert;
-chunkWidth = myArgs.chunkw;
-chunkHeight = myArgs.chunkh;
-tileWidth = myArgs.tilew;
-tileHeight = myArgs.tileh;
-doFill = myArgs.fill;
-write = myArgs.write;
+WorldMaker.prototype.makeWorldmap = function(){
+    var wm = this;
+    var hexes  = {     // last two characters: ff = visible, 00 = not
+        'c': 0x000000ff,
+        'w': 0x68b89fff,
+        'trunk': 0x7e5d2eff,
+        't1': 0x91a54aff,
+        't2': 0x9dbf48ff, //0x809c3bff,
+        't3': 0x7f9b75ff,
+        't4': 0x375b44ff,
+        // 'g': 0x809c3bff
+    };
+    new Jimp(World.worldWidth*2, World.worldHeight*2, 0xf9de99ff, function (err, image) { // 0x0,
+        wm.mapPixels.toList(true).forEach(function(px){
+            var x = px[0]*2;
+            var y = px[1]*2;
+            var color = hexes[px[2]];
+            image.setPixelColor(color, x, y);
+            image.setPixelColor(color, x+1, y);
+            image.setPixelColor(color, x, y+1);
+            image.setPixelColor(color, x+1, y+1);
+        });
+        wm.trees.toList(true).forEach(function(t){
+            var x = t[0]*2;
+            var y = t[1]*2;
+            for(var xi = 0; xi < 4; xi++){
+                for(var yi = 0; yi > -4; yi--){
+                    image.setPixelColor(hexes['trunk'], x+xi, y+yi);
+                }
+            }
+            if(t[2] == 'd') return;
+            x -= 2;
+            y -= 10;
+            for(var xi = 0; xi < 8; xi++){
+                for(var yi = 0; yi < 8; yi++){
+                    image.setPixelColor(hexes['t'+t[2]], x+xi, y+yi);
+                }
+            }
+        });
+        // image.write(path.join(wm.outdir,'worldmap.png'));
+        image = wm.medianBlur(image,'worldmap.png');
+    });
+};
 
+WorldMaker.prototype.medianBlur = function(image,name){
+    var wm = this;
+    var iw = image.bitmap.width*4; // because each "px"is 4 values
+    var ih = image.bitmap.height*4;
+    new Jimp(image.bitmap.width, image.bitmap.height, 0xf9de99ff, function (err, newimage) {
+        image.scan(0, 0, image.bitmap.width, image.bitmap.height, function (x, y, idx) {
+            if (x == image.bitmap.width - 1 && y == image.bitmap.height - 1) {
+                // image scan finished, do your stuff
+                newimage.write(path.join(wm.outdir,name));
+                return;
+              }
+            // idx is the position start position of this rgba tuple in the bitmap Buffer
+            var r = wm.colorMedian(iw,ih,this.bitmap.data,idx,0); //this.bitmap.data[idx + 0];
+            var g = wm.colorMedian(iw,ih,this.bitmap.data,idx,1); //this.bitmap.data[idx + 1];
+            var b = wm.colorMedian(iw,ih,this.bitmap.data,idx,2); // this.bitmap.data[idx + 2];
+            var a = this.bitmap.data[idx + 3];
+            // color = image.getPixelColor(x,y);
+            var color = Jimp.rgbaToInt(r, g, b, a);
+            newimage.setPixelColor(color, x,y);
+        });
+    });
+};
 
-makeWorld(myArgs.outdir,myArgs.blueprint);
+WorldMaker.prototype.colorMedian = function(w,h,data,idx,offset){
+    var idcs = Utils.listNeighborsInGrid(idx,w,h,4);
+
+    var px = [];
+    idcs.forEach(function(i){
+        if(data[i+offset] != undefined) px.push(data[i+offset]);
+    });
+
+    var  l = px.length;
+    var n = (l%2 == 0 ? (l/2)-1 : (l-1)/2);
+    quickselect(px,n);
+    // console.log(w,h);
+    // console.log(idx)
+    // console.log(idcs)
+    // console.log(px)
+    // console.log('result:',px[n]);
+    return px[n];
+};
+
+var args = require('optimist').argv;
+
+var wm = new WorldMaker(args);
+wm.run();

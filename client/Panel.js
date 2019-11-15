@@ -2,6 +2,14 @@
  * Created by Jerome on 06-10-17.
  */
 
+import Button from './Button'
+import Capsule from './Capsule'
+import Frame from './Frame'
+import LongSlot from './LongSlot'
+import UI from './UI'
+import Utils from '../shared/Utils'
+import Client from "./Client";
+
 function Panel(x,y,width,height,title,invisible){
     Frame.call(this,x,y,width,height,invisible);
     this.capsules = {};
@@ -16,9 +24,10 @@ Panel.prototype = Object.create(Frame.prototype);
 Panel.prototype.constructor = Panel;
 
 Panel.prototype.addCapsule = function(name,x,y,text,icon){
-    var capsule = new Capsule(this.x+x,this.y+y,'UI',icon,this.content);
+    var capsule = new Capsule(UI.scene,this.x+x,this.y+y,'UI',icon,this.content);
     capsule.setText(text);
     this.capsules[name] = capsule;
+    return capsule;
 };
 
 Panel.prototype.updateCapsule = function(name,text){
@@ -26,7 +35,8 @@ Panel.prototype.updateCapsule = function(name,text){
     this.capsules[name].setText(text);
 };
 
-Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpText){
+Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpText,logID){
+    // TODO: make proper Button class that wraps all of this
     x += this.x;
     y += this.y;
     var ring = UI.scene.add.sprite(x,y,'UI','ring');
@@ -36,18 +46,21 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
     ring.setVisible(false);
     this.content.push(ring);
 
-    var zone = UI.scene.add.zone(x,y,24,24);
+    var zone = UI.scene.add.zone(x,y,30,30);
     zone.setDepth(10);
     zone.setScrollFactor(0);
     zone.setInteractive();
     zone.setVisible(false);
-    zone.on('pointerover',function(){
-        UI.tooltip.updateInfo(helpTitle,helpText);
-        UI.tooltip.display();
-    });
-    zone.on('pointerout',function(){
-        UI.tooltip.hide();
-    });
+    if(helpTitle || helpText) {
+        zone.on('pointerover', function () {
+            UI.tooltip.updateInfo('free', {title: helpTitle, body: helpText});
+            UI.tooltip.display();
+            if(symbol == 'help') Client.logMisc({type:'help',which:logID});
+        });
+        zone.on('pointerout', function () {
+            UI.tooltip.hide();
+        });
+    }
     this.content.push(zone);
 
     x += 5;
@@ -69,7 +82,13 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
         btn: btn,
         symbol: s,
         ring: ring,
-        zone: zone
+        zone: zone,
+        hide: function(){
+            this.symbol.setVisible(false);
+            this.btn.setVisible(false);
+            this.ring.setVisible(false);
+            this.zone.setVisible(false);
+        }
     };
     this.buttons.push(btnObj);
 
@@ -77,9 +96,11 @@ Panel.prototype.addButton = function(x,y,color,symbol,callback,helpTitle,helpTex
 };
 
 Panel.prototype.addPolyText = function(x,y,texts,colors,size){
-    if(texts.length != colors.length) return;
+    if(!colors) colors = [];
+    if(colors.length && texts.length != colors.length) return;
     var txts = [];
     for(var i = 0; i < texts.length; i++){
+        var color = (i < colors.length ? colors[i] : Utils.colors.white);
         var t = this.addText(x,y,texts[i],colors[i],size); // addText() pushed to this.texts
         x += t.width;
         txts.push(t);
@@ -100,6 +121,21 @@ Panel.prototype.addText = function(x,y,text,color,size,font){
     this.texts.push(t);
     this.content.push(t);
     return t;
+};
+
+Panel.prototype.addInput = function(width,x,y){
+    var input = document.createElement("input");
+    input.className = 'game_input';
+    input.type = "text";
+    input.style.width = width+'px';
+    x = UI.scene.game.canvas.offsetLeft+this.x+x;
+    y = UI.scene.game.canvas.offsetTop+this.y+y;
+    input.style.left = x+'px';
+    input.style.top = y+'px';
+    input.style.background = 'rgba(0,0,0,0.5)';
+    input.style.display = "none";
+    document.getElementById('game').appendChild(input);
+    return input;
 };
 
 Panel.prototype.makeScrollable = function(){
@@ -220,12 +256,7 @@ Panel.prototype.display = function(){
         this.capsules[capsule].display();
     }
 
-    this.buttons.forEach(function(b){
-        b.btn.setVisible(true);
-        b.symbol.setVisible(true);
-        b.ring.setVisible(true);
-        b.zone.setVisible(true);
-    });
+    this.displayButtons();
 
     if(this.button) this.button.display(); // big button
 
@@ -235,107 +266,38 @@ Panel.prototype.display = function(){
         })
     }
 
-    Engine.inPanel = true;
-    Engine.currentPanel = this;
+    if(this.log) Client.logMenu(this.name);
+
+    UI.inPanel = true;
+    UI.currentPanel = this;
 };
 
 Panel.prototype.hide = function(){
     Frame.prototype.hide.call(this);
     if(this.scrollable) this.scroll(-this.scrolled);
     if(this.button) this.button.hide(); // big button
-    Engine.inPanel = false;
+    for(var caps in this.capsules){
+        this.capsules[caps].hide();
+    };
+    UI.inPanel = false;
 };
 
-function Capsule(x,y,iconAtlas,iconFrame,container){
-    this.slices = [];
-    this.icon = null;
-    this.width = 1;
-    this.width_ = this.width; // previous width
-    
-    if(iconFrame) {
-        this.icon = UI.scene.add.sprite(x+8,y+6,iconAtlas,iconFrame);
-        this.icon.setDepth(2);
-        this.icon.setScrollFactor(0);
-        this.icon.setDisplayOrigin(0,0);
-        this.icon.setVisible(false);
-    }
-    var textX = (this.icon ? x + this.icon.width : x) + 10;
-    var textY = (this.icon ? y +1: y+2);
-
-    this.text = UI.scene.add.text(textX, textY, '',
-        { font: '16px belwe', fill: '#ffffff', stroke: '#000000', strokeThickness: 3 }
-    );
-
-    this.slices.push(UI.scene.add.sprite(x,y,'UI','capsule-left'));
-    x += 24;
-    this.slices.push(UI.scene.add.tileSprite(x,y,this.width,24,'UI','capsule-middle'));
-    x += this.width;
-    this.slices.push(UI.scene.add.sprite(x,y,'UI','capsule-right'));
-
-    this.slices.forEach(function(e){
-        e.setDepth(1);
-        e.setScrollFactor(0);
-        e.setDisplayOrigin(0,0);
-        e.setVisible(false);
-        if(container) container.push(e); // don't use concat
+Panel.prototype.displayButtons = function(){
+    this.buttons.forEach(function(b){
+        b.btn.setVisible(true);
+        b.symbol.setVisible(true);
+        b.ring.setVisible(true);
+        b.zone.setVisible(true);
     });
-
-    this.text.setDepth(2);
-    this.text.setScrollFactor(0);
-    this.text.setDisplayOrigin(0,0);
-    this.text.setVisible(false);
-
-    if(container) {
-        container.push(this.text);
-        if (this.icon) container.push(this.icon);
-    }
-}
-
-Capsule.prototype.setText = function(text){
-    this.text.setText(text);
-    this.width = this.text.width -25;
-    if(this.icon) this.width += this.icon.width;
-
-    this.slices[1].width = this.width;
-    if(this.extraW) this.slices[1].width += this.extraW;
-    this.slices[2].x += (this.width-this.width_);
-
-    this.width_ = this.width;
 };
 
-Capsule.prototype.removeLeft = function(){
-    //var w = this.slices[0].width;
-    //console.warn(w);
-    this.extraW = 17;
-    this.slices[0].destroy();
-    this.slices[1].x -= this.extraW;
-};
-
-Capsule.prototype.display = function(){
-    this.slices.forEach(function(e){
-        e.setVisible(true);
+Panel.prototype.hideButtons = function(){
+    this.buttons.forEach(function(b){
+        b.btn.setVisible(false);
+        b.symbol.setVisible(false);
+        b.ring.setVisible(false);
+        b.zone.setVisible(false);
     });
-    this.text.setVisible(true);
-    if(this.icon) this.icon.setVisible(true);
 };
 
-Capsule.prototype.hide = function(){
-    this.slices.forEach(function(e){
-        e.setVisible(false);
-    });
-    this.text.setVisible(false);
-    if(this.icon) this.icon.setVisible(false);
-};
-
-Capsule.prototype.move = function(dx,dy){
-    this.slices.forEach(function(e){
-        e.x += dx;
-        e.y += dy;
-    });
-    this.text.x += dx;
-    this.text.y += dy;
-    if(this.icon) {
-        this.icon.x += dx;
-        this.icon.y += dy;
-    }
-};
+export default Panel
