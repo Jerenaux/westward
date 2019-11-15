@@ -88,9 +88,9 @@ incl. width and height of areas explored
 
 12/11 21h
 
-Durations: 0 1 1 1 5 5 5 9 9 10 24 62 -> 5/12
-Unique players: 10
-Returning: 2  : 20%
+Durations: 0 1 1 1 5 5 5 5 9 9 10 24 62 -> 5/13
+Unique players: 11
+Returning: 2  : < 20%
 
 Next milestone:
 - Migrate to AWS 
