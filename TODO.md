@@ -94,7 +94,6 @@ Returning: 2  : < 20%
 
 Next milestone:
 - Migrate to AWS 
-- Record sessions (derive duration stats, # unique players and # returning from that)
 - Fix bugs
 - Apply feedback
 - Take action based on session stats
@@ -104,7 +103,6 @@ Next milestone:
 Migration todo:
 - Modify webhooks
 - Replace IP URLs to domains, in: visitted dev logs, roastmygame, WW page, etc.
-- Tool to export/import buildings
 - Shut down droplet
 
 

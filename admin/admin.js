@@ -15,11 +15,11 @@ function Session(id){
 }
 
 Session.prototype.add = function(evt){
-    console.log(evt.time, new Date(evt.time).getTime())
+    // console.log(evt.time, new Date(evt.time).getTime())
     evt.time = new Date(evt.time).getTime();
     this.events.push(evt);
     this.duration = (evt.time - this.events[0].time)/(60*1000);
-    console.log(this.duration)
+    // console.log(this.duration)
 }
 
 function median(values){
@@ -80,7 +80,7 @@ app.controller("mainCtrl", [
             $scope.bldFilter = null;
 
             //getData('events');
-            //getData('screenshots');
+            getData('screenshots');
             //getData('buildings');
             //getData('players');
             //countItems();
@@ -99,10 +99,13 @@ app.controller("mainCtrl", [
                 $scope['events'] = res.data;
                 var sessions = {};
                 var pids = new Set();
+                var returning = new Set();
                 for(var i = 0; i < res.data.length; i++){
                     var evt = res.data[i];
+                    if(!evt.pid) continue;
                     if(!(evt.session in sessions)) sessions[evt.session] = new Session(evt.session);
                     sessions[evt.session].add(evt);
+                    if(pids.has(evt.pid)) returning.add(evt.pid);
                     pids.add(evt.pid);
                 }
                 $scope['sessions'] = Object.values(sessions);
@@ -114,10 +117,12 @@ app.controller("mainCtrl", [
 
                 var nbsessions = durations.length;
                 var nbp = pids.size;
+                $scope['median_duration'] = median(durations);
+                $scope['ratio_returning'] = (returning.size/pids.size)*100;
                 console.log('Number of sessions',nbsessions);
                 console.log('Number of players',nbp);
-                console.log('Ratio of returning players:',(nbp/nbsessions))
-                console.log('Median duration:',median(durations))
+                console.log('Ratio of returning players:', $scope['ratio_returning']);
+                console.log('Median duration:', $scope['median_duration']);
 
             },function(err){});
         };

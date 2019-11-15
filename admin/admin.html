@@ -56,7 +56,7 @@
         </tr>
         </tbody>
 
-    </table>
+    </table>-->
 
     <h3>Screenshots</h3>
     <div class="panel panel-default" ng-repeat="screenshot in screenshots">
@@ -66,13 +66,16 @@
         <div class="panel-body">
             <img class="bug-snap" data-ng-src="data:image/png;base64,{{screenshot.img | processImg}}"/>
         </div>
-    </div> -->
+    </div> 
 
     <h3>Events</h3>
     <div ng-repeat="event in events">
         <!--- ":this" means that a second argument is sent to the filter, which is a reference to the whole scope -->
         {{event | eventFilter:this}}
     </div>
+    <br/>
+    <b>Median session duration:</b> {{median_duration | number: 2}} min.<br/>
+    <b>Ratio of returning players:</b> {{ratio_returning}} %<br/>
 </div>
 
 </body>
