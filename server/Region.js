@@ -45,6 +45,7 @@ Region.prototype.addItem = function(item,nb){
 
 Region.prototype.removeItem = function(item,nb){
     this.itemCounts.take(item,nb);
+    if(item == 1) this.food[0] -= nb;
 };
 
 
