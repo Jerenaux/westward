@@ -293,6 +293,7 @@ Region.prototype.updateBuildings = function(){
     this.playerBuildings = playerBuildings;
 };
 
+
 // Region.prototype.updateFood = function(){
 //     console.log('['+this.name+'] Food update');
 //     this.food[0] = 0;
