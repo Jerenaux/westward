@@ -102,7 +102,8 @@ app.controller("mainCtrl", [
                 var returning = new Set();
                 for(var i = 0; i < res.data.length; i++){
                     var evt = res.data[i];
-                    if(!evt.pid) continue;
+                    console.log(evt.session);
+                    if(!evt.pid || !evt.session) continue;
                     if(!(evt.session in sessions)) sessions[evt.session] = new Session(evt.session);
                     sessions[evt.session].add(evt);
                     if(pids.has(evt.pid)) returning.add(evt.pid);

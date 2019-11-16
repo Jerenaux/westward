@@ -94,8 +94,6 @@ Returning: 2  : < 20%
 
 Next milestone:
 - Migrate to AWS 
-- Admin: send special token to be ignored in logging + expose reset method to reset character
-without affecting token
 - Fix bugs
 - Apply feedback
 - Take action based on session stats

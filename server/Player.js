@@ -89,7 +89,12 @@ Player.prototype.setMongoID = function (mongoID) {
 
 Player.prototype.setInstance = function () {
     this.instance = GameServer.nextInstanceID++;
+    this.disableLogging();
     if (GameServer.nextInstanceID % 100 === 0) GameServer.nextInstanceID = 0;
+};
+
+Player.prototype.disableLogging = function(){
+    this.logSession = 0;
 };
 
 Player.prototype.isInstanced = function () {

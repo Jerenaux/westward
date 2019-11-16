@@ -328,6 +328,13 @@ GameServer.getBootParams = function(socket,data){
         pkg.config.turnDuration = GameServer.turnDuration;
         pkg.nbc = GameServer.server.getNbConnected();
 
+        if(!ObjectId.isValid(playerID)){
+            console.warn('Invalid player ID');
+            pkg.newPlayer = true;
+            socket.emit('boot-params',pkg);
+            return;
+        }
+
         GameServer.PlayerModel.findOne(
             {_id: new ObjectId(playerID)},
             function (err, doc) {
@@ -856,6 +863,7 @@ GameServer.addNewPlayer = function(socket,data){
 
     var player = new Player();
     player.setUp(++GameServer.lastPlayerID, data.characterName, region);
+    if(!data.log) player.disableLogging();
   
     GameServer.postProcessPlayer(socket,player);
     if(!player.isInstanced()) GameServer.saveNewPlayerToDb(socket,player);
@@ -893,7 +901,8 @@ GameServer.addNewTutorialPlayer = function(socket, data){
  * @param {string} id - The mongoDB id stored on the client side, sent by the client to
  * fetch the right document from the database.
  */
-GameServer.loadPlayer = function(socket,id){
+GameServer.loadPlayer = function(socket,data){
+    var id = data.id;
     console.log('Loading player',id);
     GameServer.PlayerModel.findOne(
         {_id: new ObjectId(id)},
@@ -906,6 +915,7 @@ GameServer.loadPlayer = function(socket,id){
             var player = new Player();
             player.setMongoID(doc._id);
             player.getDataFromDb(doc);
+            if(!data.log) player.disableLogging();
 
             GameServer.postProcessPlayer(socket,player,doc);
             Prism.logEvent(player,'connect',{stl:player.region,re:true});

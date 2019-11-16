@@ -2346,5 +2346,9 @@ window.debugPlayer = function(){
     console.log(Engine.player);
 };
 
+window.cl = function(){
+    localStorage.setItem(Client.storageIDKey,'');
+};
+
 
 export default Engine;

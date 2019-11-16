@@ -48,20 +48,25 @@ Client.getInitRequest = function(){ // Returns the data object to send to reques
         };
     }
     if(Client.isNewPlayer()) {
-        console.log('Requesting data for new player');
         return {
             new:true,
             tutorial: false,
             selectedClass: UI.selectedClass,
             selectedRegion: UI.selectedSettlement,
-            characterName: UI.characterName
+            characterName: UI.characterName,
+            log: Client.getLogFlag()
         };
     }
     return {
         new:false,
         id:Client.getPlayerID(),
-        stamp: Client.getIDStamp()
+        stamp: Client.getIDStamp(),
+        log: Client.getLogFlag()
     };
+};
+
+Client.getLogFlag = function(){
+    return !localStorage.getItem('log');
 };
 
 Client.getIDStamp = function(){
@@ -70,11 +75,6 @@ Client.getIDStamp = function(){
 
 Client.getBootParameters = function(){
     Client.socket.emit('boot-params',{id:Client.getPlayerID()});
-};
-
-Client.checkForNewPlayer = function(){
-    console.log('Player id:',Client.getPlayerID());
-    //Client.newPlayer = (Client.getPlayerID() === null);
 };
 
 Client.isNewPlayer = function(){
