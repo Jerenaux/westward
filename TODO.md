@@ -86,14 +86,16 @@ Goal metrics:
 incl. width and height of areas explored
 
 
-12/11 21h
+scratch
 
-Durations: 0 1 1 1 5 5 5 5 9 9 10 24 62 -> 5/13
-Unique players: 11
+Durations: 0 1 1 1 3 5 5 5 5 6 9 9 10 16 24 62 -> 6/16
+Unique players: 14
 Returning: 2  : < 20%
 
 Next milestone:
 - Migrate to AWS 
+- Admin: send special token to be ignored in logging + expose reset method to reset character
+without affecting token
 - Fix bugs
 - Apply feedback
 - Take action based on session stats
@@ -107,10 +109,12 @@ Migration todo:
 
 
 Bugs:
-- Bugs with movements and battle intercepts
+- Bugs with movements and battle intercepts + new movement system
+-> Try keyboard? (problem in forests)
+-> Server sends intercept, player stops and sends his position?
 Features:
 - Add twitter to game links
-- Test new character
+- Test new character sprite
 - Zapier
 - Allow buildings across regions
 - Add a "show all" button to stats panel to display all of them
