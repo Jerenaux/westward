@@ -81,40 +81,38 @@ Goal metrics:
 -> Social elements (contacts, rankings)
 -> Juice
 -> Highlight temporal aspects
--> Server not crashing
+-> Server not crashing, no bugs
 - Feature utilization: # of times feature x is used > k*players (k < 1)
 incl. width and height of areas explored
 
 
-scratch
 
-Durations: 0 1 1 1 3 5 5 5 5 6 9 9 10 16 24 62 -> 6/16
-Unique players: 14
+Durations: 0 0 1 1 1 3 5 5 5 5 6 7 9 9 10 16 24 62 -> 7/18
+Unique players: 16
 Returning: 2  : < 20%
+Crashes for: 2
+Bugs for: 2
 
 Next milestone:
-- Migrate to AWS 
 - Fix bugs
 - Apply feedback
 - Take action based on session stats
 - Play
 - Tackle todo as seen fit
 
-Migration todo:
-- Modify webhooks
-- Replace IP URLs to domains, in: visitted dev logs, roastmygame, WW page, etc.
-- Shut down droplet
-
-
 Bugs:
 - Bugs with movements and battle intercepts + new movement system
 -> Try keyboard? (problem in forests)
 -> Server sends intercept, player stops and sends his position?
+Feedback:
+- Control difficulty around starting points: block certain species,
+reduce pack sizes
 Features:
 - Add twitter to game links
-- Test new character sprite
 - Zapier
+- Test new character sprite
 - Allow buildings across regions
+
 - Add a "show all" button to stats panel to display all of them
 - Re-add stats panel to character panel?
 - DIsable some skills based on fatigue / update help
@@ -159,7 +157,7 @@ bow, (bomb), dawn, dusk, (sword), (gun), (boots), (belt), quiver, (arrow), stone
  
  
 María:
-
+-> Add "x" on door exit icon
 - Player anim naked
 -> Look into superimposing equipment programmatically
 -> One basic player overlay for all

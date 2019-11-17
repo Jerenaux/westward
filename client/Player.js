@@ -31,7 +31,7 @@ var Player = new Phaser.Class({
 
         this.destinationAction = null;
 
-        this.orientationPin = new OrientationPin('player');
+        this.orientationPin = new OrientationPin('player',this);
         this.flipPrint = false;
 
         this.battleBoxData = {

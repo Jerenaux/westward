@@ -63,7 +63,7 @@ Region.prototype.addAOI = function(aoi){
 };
 
 Region.prototype.updateStatus = function(){
-    console.log('['+this.name+'] Status update');
+    // console.log('['+this.name+'] Status update');
     var status_ = this.status;
     this.status = 0;
     if(this.civBuildings > 0) this.status = 1; //occupied
@@ -113,7 +113,7 @@ Region.prototype.addMission = function(mission){
 };
 
 Region.prototype.updateCounts = function(){
-    console.log('['+this.name+'] Counts update');
+    // console.log('['+this.name+'] Counts update');
     this.updateCount('allbuildings',this.playerBuildings);
     this.updateCount('exploration',this.explored);
     this.updateCount('bldfood',this.food[1]);
@@ -158,7 +158,7 @@ Region.prototype.computeMissionGoal = function(goal){
 };
 
 Region.prototype.update = function(){
-    console.log('['+this.name+'] General update');
+    // console.log('['+this.name+'] General update');
     this.updateBuildings();
     var status_ = this.status;
     this.updateStatus();
@@ -212,7 +212,7 @@ Region.prototype.event = function(event, player, extra){
             var p = counts_[count];
             var c = this.counts[count];
             if(p[0] < p[1] && c[0] > p[0]){
-                console.log(count,p,c);
+                // console.log(count,p,c);
                 player.addNotif('You contributed to a region mission ('+this.missionLabels[count]+')!');
                 var xp = this.XPtable[count];
                 for(var clas in xp){
@@ -226,7 +226,7 @@ Region.prototype.event = function(event, player, extra){
 
 
 Region.prototype.updateItemMissions = function(){
-    console.log('['+this.name+'] Items missions update');
+    // console.log('['+this.name+'] Items missions update');
     this.craft = new Inventory();
     this.gather = new Inventory();
     if(this.status != 2) return;
@@ -270,7 +270,7 @@ Region.prototype.countKilledCiv = function(){
 };
 
 Region.prototype.updateBuildings = function(){
-    console.log('['+this.name+'] Buildings update');
+    // console.log('['+this.name+'] Buildings update');
     var playerBuildings = 0;
     var civBuildings = 0;
     var seenCivBuildings = 0;
@@ -294,18 +294,8 @@ Region.prototype.updateBuildings = function(){
     this.playerBuildings = playerBuildings;
 };
 
-
-// Region.prototype.updateFood = function(){
-//     console.log('['+this.name+'] Food update');
-//     this.food[0] = 0;
-//     for(var playerID of this.players){
-//         var player = GameServer.players[playerID];
-//         if(player) this.food[0] += player.getItemNb(1);
-//     }
-// };
-
 Region.prototype.updateResources = function(){
-    console.log('['+this.name+'] Resources update');
+    // console.log('['+this.name+'] Resources update');
     this.nbNodes = this.sz.length + this.resources.length;
     this.visibleNodes = 0;
     // console.warn('fowlist:',GameServer.fowList);
@@ -318,7 +308,7 @@ Region.prototype.updateResources = function(){
 };
 
 Region.prototype.updateFoW = function(){
-    console.log('['+this.name+'] FoW update');
+    // console.log('['+this.name+'] FoW update');
     this.nbAreas = this.aois.length;
     this.explored = 0;
     var exploredAreas = new Set();
