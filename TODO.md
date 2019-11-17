@@ -87,11 +87,10 @@ incl. width and height of areas explored
 
 
 
-Durations: 0 0 1 1 1 3 5 5 5 5 6 7 9 9 10 16 24 62 -> 7/18
-Unique players: 16
+Durations: 0 0 1 1 1 3 3 5 5 5 5 6 7 9 9 10 16 24 62 -> 7/19
+Unique players: 17
 Returning: 2  : < 20%
-Crashes for: 2
-Bugs for: 2
+Crashes/bugs for: 4
 
 Next milestone:
 - Fix bugs
