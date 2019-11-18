@@ -107,7 +107,6 @@ Bugs:
 Feedback:
 Features:
 - Add twitter to game links
-- Zapier
 - Test new character sprite
 - Allow buildings across regions
 
