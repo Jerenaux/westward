@@ -2310,11 +2310,16 @@ GameServer.computeRegions = function(){
     GameServer.regionsCache = new SpaceMap();
     GameServer.regionBoundaries = [];
     GameServer.regions = {};
+    GameServer.startingSpots = [];
     var sites = [];
     for(var id in GameServer.regionsData){
         var region = GameServer.regionsData[id];
         GameServer.regions[id] = new Region(region);
         sites.push({
+            x: region.x,
+            y: region.y
+        });
+        if(region.starting) GameServer.startingSpots.push({
             x: region.x,
             y: region.y
         });

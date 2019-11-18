@@ -76,6 +76,7 @@ Goal metrics:
 - Bounce rate: 50% of sessions durations > 5min. 
 -> Quests from the get-go
 -> Increase starting inventory, reduce building costs
+-> No too early respawn
 -> Smoother movement system
 - Return rate: 5% of players having > 1 session
 -> Social elements (contacts, rankings)
@@ -87,8 +88,8 @@ incl. width and height of areas explored
 
 
 
-Durations: 0 0 1 1 1 2 3 3 5 5 5 5 6 6 7 9 9 10 16 24 62 -> 8/21
-Unique players: 18
+Durations: 0 0 1 1 1 2 3 3 5 5 5 5 5 6 6 7 9 9 10 16 24 62 -> 8/22
+Unique players: 19
 Returning: 3  : < 20%
 Crashes/bugs for: 4
 
@@ -104,8 +105,6 @@ Bugs:
 -> Try keyboard? (problem in forests)
 -> Server sends intercept, player stops and sends his position?
 Feedback:
-- Control difficulty around starting points: block certain species,
-reduce pack sizes
 Features:
 - Add twitter to game links
 - Zapier

@@ -10,6 +10,7 @@ function Region(data){
     this.x = data.x;
     this.y = data.y;
     this.sea = data.sea;
+    this.starting = data.starting;
 
     // 0: wild, 1: occupied, 2: settled
     this.status = undefined;

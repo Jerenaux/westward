@@ -10,16 +10,23 @@ function SpawnZone(x,y,animal){
     this.y = y;
     this.aoi = Utils.tileToAOI(this.x,this.y);
     this.region = GameServer.getRegion(this);
+    this.regionData = GameServer.regionsData[this.region];
     GameServer.regions[this.region].addSZ(this);
     this.animal = animal;
-    var animalData = GameServer.getAnimalData(this.animal);
-    this.max = animalData.packSize.max;
+    this.animalData = GameServer.getAnimalData(this.animal);
+    this.max = this.animalData.packSize.max;
+
+    // console.log(this.regionData.name,this.regionData.starting);
+    if(this.regionData.starting){
+        // console.log('Restricting pack size');
+        this.max = 2;
+    }
     this.population = 0;
     this.lastUpdate = 0; // How many turns ago did an update take place
     this.updateActiveStatus();
 
     if(this.isActive()) {
-        var nb = Utils.randomInt(animalData.packSize.min[0], animalData.packSize.min[1]);
+        var nb = Utils.randomInt(this.animalData.packSize.min[0], this.animalData.packSize.min[1]);
         for (var i = 0; i < nb; i++) {
             this.spawn();
         }
@@ -34,7 +41,12 @@ SpawnZone.prototype.getMarkerData = function(){
 
 SpawnZone.prototype.updateActiveStatus = function(){
     var r = 15; // TODO: conf
-    this.active = (GameServer.getEntitiesAt(this.x-r,this.y-r,r*2,r*2,['PlayerBuilding','CivBuilding']).length == 0);
+    if(this.regionData.starting && this.animalData.dangerous){
+        // console.log('Disactivating dangerous spawn zone ',this.x,', ',this.y,' for animal ',this.animalData.name);
+        this.active = false;
+    }else{
+        this.active = (GameServer.getEntitiesAt(this.x-r,this.y-r,r*2,r*2,['PlayerBuilding','CivBuilding']).length == 0);
+    }
 };
 
 SpawnZone.prototype.isActive = function(){
@@ -47,9 +59,8 @@ SpawnZone.prototype.update = function(){
     if(GameServer.vision.has(this.aoi)) return;
     if(!this.isActive()) return;
 
-    var animalData = GameServer.getAnimalData(this.animal);
     // How many turns must elapse before a spawn event
-    var nextUpdate = (this.max - this.population)*animalData.spawnRate;
+    var nextUpdate = (this.max - this.population)*this.animalData.spawnRate;
     if(nextUpdate <= this.lastUpdate){
         this.spawn(true);
         this.lastUpdate = 0;
@@ -60,7 +71,6 @@ SpawnZone.prototype.update = function(){
 
 SpawnZone.prototype.spawn = function(){
     var animal = GameServer.addAnimal(this.x, this.y, this.animal);
-    // console.log('Spawning ',GameServer.getAnimalData(this.animal).name,' ',animal.id,' at',this.x,this.y);
     animal.setSpawnZone(this);
     this.population++;
 };

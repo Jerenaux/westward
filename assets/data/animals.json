@@ -27,6 +27,7 @@
     "map_name": "Gray wolf pack",
     "nbPacks": 65,
     "spawnRate": 30,
+    "dangerous": false,
     "stats": {
       "hpmax": 100,
       "hp": 100,
@@ -42,6 +43,7 @@
     "map_name": "Black wolf pack",
     "nbPacks": 30,
     "spawnRate": 50,
+    "dangerous": false,
     "stats": {
       "hpmax": 130,
       "hp": 130,
@@ -57,6 +59,7 @@
     "map_name": "White wolf pack",
     "nbPacks": 10,
     "spawnRate": 60,
+    "dangerous": true,
     "stats": {
       "hpmax": 200,
       "hp": 200,
@@ -80,6 +83,7 @@
       "max": 1
     },
     "nbPacks": 50,
+    "dangerous": true,
     "spawnRate": 60,
     "footprintsFrame": 2,
     "printsHorizOffset": 16,
