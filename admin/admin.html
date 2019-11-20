@@ -11,6 +11,7 @@
 <h1>Westward admin</h1>
 <div ng-app="admin" ng-controller="mainCtrl">
 
+    <!--
     <h3>Players ({{players.length}})</h3>
     <table class="table table-bordered table-striped">
         <tbody>
@@ -23,33 +24,6 @@
 
     <h3>Buildings ({{buildings.length}})</h3>
     <table class="table table-bordered table-striped">
-        <!--
-        https://codepen.io/chrisoncode/pen/AmFLE
-        <thead>
-        <tr>
-            <td>
-                <a href="#" ng-click="sortType = 'name'; sortReverse = !sortReverse">
-                    Sushi Roll
-                    <span ng-show="sortType == 'name' && !sortReverse" class="fa fa-caret-down"></span>
-                    <span ng-show="sortType == 'name' && sortReverse" class="fa fa-caret-up"></span>
-                </a>
-            </td>
-            <td>
-                <a href="#" ng-click="sortType = 'fish'; sortReverse = !sortReverse">
-                    Fish Type
-                    <span ng-show="sortType == 'fish' && !sortReverse" class="fa fa-caret-down"></span>
-                    <span ng-show="sortType == 'fish' && sortReverse" class="fa fa-caret-up"></span>
-                </a>
-            </td>
-            <td>
-                <a href="#" ng-click="sortType = 'tastiness'; sortReverse = !sortReverse">
-                    Taste Level
-                    <span ng-show="sortType == 'tastiness' && !sortReverse" class="fa fa-caret-down"></span>
-                    <span ng-show="sortType == 'tastiness' && sortReverse" class="fa fa-caret-up"></span>
-                </a>
-            </td>
-        </tr>
-        </thead>-->
 
         <thead>
             <tr>
@@ -58,7 +32,7 @@
             </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="bld in buildings "> <!--  | orderBy:bldSortType:bldSortReverse | filter:bldFilter-->
+        <tr ng-repeat="bld in buildings ">   | orderBy:bldSortType:bldSortReverse | filter:bldFilter
             <td>[{{bld.x}},{{bld.y}}]</td>
             <td>{{ bld.type | buildingName}}</td>
         </tr>
@@ -82,7 +56,7 @@
         </tr>
         </tbody>
 
-    </table>
+    </table>-->
 
     <h3>Screenshots</h3>
     <div class="panel panel-default" ng-repeat="screenshot in screenshots">
@@ -92,13 +66,16 @@
         <div class="panel-body">
             <img class="bug-snap" data-ng-src="data:image/png;base64,{{screenshot.img | processImg}}"/>
         </div>
-    </div>
+    </div> 
 
     <h3>Events</h3>
     <div ng-repeat="event in events">
         <!--- ":this" means that a second argument is sent to the filter, which is a reference to the whole scope -->
         {{event | eventFilter:this}}
     </div>
+    <br/>
+    <b>Median session duration:</b> {{median_duration | number: 2}} min.<br/>
+    <b>Ratio of returning players:</b> {{ratio_returning}} %<br/>
 </div>
 
 </body>

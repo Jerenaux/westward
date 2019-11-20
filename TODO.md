@@ -73,48 +73,43 @@ Packaging
 - More dynamic movement system: hold click to move? Move towards mouse? Click to stop? Etc.
 
 Goal metrics:
-- Bounce rate: 50% of sessions durations > 5min. (or avg/median duration > 5min.?)
+- Bounce rate: 50% of sessions durations > 5min. 
 -> Quests from the get-go
 -> Increase starting inventory, reduce building costs
+-> No too early respawn
 -> Smoother movement system
 - Return rate: 5% of players having > 1 session
 -> Social elements (contacts, rankings)
 -> Juice
 -> Highlight temporal aspects
--> Server not crashing
+-> Server not crashing, no bugs
 - Feature utilization: # of times feature x is used > k*players (k < 1)
 incl. width and height of areas explored
 
 
-12/11 21h
 
-Durations: 0 1 1 5 5 9 9 24 62: avg. 12.8, median 5, 6/9
-Unique players: 7
-Returning: 2  : 28%
+Durations: 0 0 1 1 1 2 3 3 5 5 5 5 5 6 6 7 9 9 10 16 24 62 -> 8/22
+Unique players: 19
+Returning: 3  : < 20%
+Crashes/bugs for: 4
 
 Next milestone:
-- Migrate to AWS 
-- Record sessions (derive duration stats, # unique players and # returning from that)
 - Fix bugs
+- Apply feedback
 - Take action based on session stats
 - Play
 - Tackle todo as seen fit
 
-Migration todo:
-- Modify webhooks
-- Replace IP URLs to domains, in: visitted dev logs, roastmygame, WW page, etc.
-- Tool to export/import buildings
-- Shut down droplet
-
-
 Bugs:
-- Bugs with movements and battle intercepts
-- Test buying of timber?
-- Test that consuming food decreases mission counter -> Not the case
+- Bugs with movements and battle intercepts + new movement system
+-> Try keyboard? (problem in forests)
+-> Server sends intercept, player stops and sends his position?
+Feedback:
 Features:
-- Test new character
-- Zapier
+- Add twitter to game links
+- Test new character sprite
 - Allow buildings across regions
+
 - Add a "show all" button to stats panel to display all of them
 - Re-add stats panel to character panel?
 - DIsable some skills based on fatigue / update help
@@ -159,7 +154,7 @@ bow, (bomb), dawn, dusk, (sword), (gun), (boots), (belt), quiver, (arrow), stone
  
  
 María:
-
+-> Add "x" on door exit icon
 - Player anim naked
 -> Look into superimposing equipment programmatically
 -> One basic player overlay for all
@@ -246,9 +241,9 @@ V1 level:
 
 Admin
 -----
+Bare essentials: display only info that you frequently seek or compute
 Add inline desc to events, and display it in admin panel (+ timestamp and player)
 Session panel & stats
-Send memory and CPU stats to Slack
 Display nb connected in Slack notifs
 Improve admin tables
 Flush screenshots
@@ -580,6 +575,8 @@ Recipes for fancy bullets and bombs
 Deployment:
 ----------
 -> Compile online, don't commit dist
+-> Systematically run npm install
+-> Try to go back to one-click deploy
 -> Don't load sounds in preload, load in create and don't play them unless found in cache (bonus)
 -> Don't commit compiled files, compile after push and have env variable determine mode
 https://snowbillr.github.io/blog//2018-04-09-a-modern-web-development-setup-for-phaser-3/

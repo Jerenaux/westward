@@ -3,7 +3,6 @@
  */
 import Inventory from "../shared/Inventory";
 
-var https = require('https')
 var fs = require('fs');
 var pathmodule = require('path');
 var clone = require('clone'); // used to clone objects, essentially used for clonicg update packets
@@ -328,6 +327,13 @@ GameServer.getBootParams = function(socket,data){
         if(!pkg.config) pkg.config = {};
         pkg.config.turnDuration = GameServer.turnDuration;
         pkg.nbc = GameServer.server.getNbConnected();
+
+        if(!ObjectId.isValid(playerID)){
+            console.warn('Invalid player ID');
+            pkg.newPlayer = true;
+            socket.emit('boot-params',pkg);
+            return;
+        }
 
         GameServer.PlayerModel.findOne(
             {_id: new ObjectId(playerID)},
@@ -703,8 +709,7 @@ GameServer.addItem = function(x,y,type,instance){
  */
 GameServer.onInitialized = function(){
     if(!config.get('misc.performInit')) return;
-    GameServer.addAnimal(1073,181,1);
-    console.log('---done---');
+    GameServer.addAnimal(691,586,1);
 };
 
 /**
@@ -721,6 +726,7 @@ GameServer.onNewPlayer = function(player){
     // player.applyVigorModifier();
     // player.applyAbility(3);
     player.giveItem(1,3);
+    player.classLvlUp(1);
 
     const items = [
 
@@ -856,6 +862,7 @@ GameServer.addNewPlayer = function(socket,data){
 
     var player = new Player();
     player.setUp(++GameServer.lastPlayerID, data.characterName, region);
+    if(!data.log) player.disableLogging();
   
     GameServer.postProcessPlayer(socket,player);
     if(!player.isInstanced()) GameServer.saveNewPlayerToDb(socket,player);
@@ -893,7 +900,8 @@ GameServer.addNewTutorialPlayer = function(socket, data){
  * @param {string} id - The mongoDB id stored on the client side, sent by the client to
  * fetch the right document from the database.
  */
-GameServer.loadPlayer = function(socket,id){
+GameServer.loadPlayer = function(socket,data){
+    var id = data.id;
     console.log('Loading player',id);
     GameServer.PlayerModel.findOne(
         {_id: new ObjectId(id)},
@@ -906,6 +914,7 @@ GameServer.loadPlayer = function(socket,id){
             var player = new Player();
             player.setMongoID(doc._id);
             player.getDataFromDb(doc);
+            if(!data.log) player.disableLogging();
 
             GameServer.postProcessPlayer(socket,player,doc);
             Prism.logEvent(player,'connect',{stl:player.region,re:true});
@@ -2301,11 +2310,16 @@ GameServer.computeRegions = function(){
     GameServer.regionsCache = new SpaceMap();
     GameServer.regionBoundaries = [];
     GameServer.regions = {};
+    GameServer.startingSpots = [];
     var sites = [];
     for(var id in GameServer.regionsData){
         var region = GameServer.regionsData[id];
         GameServer.regions[id] = new Region(region);
         sites.push({
+            x: region.x,
+            y: region.y
+        });
+        if(region.starting) GameServer.startingSpots.push({
             x: region.x,
             y: region.y
         });
