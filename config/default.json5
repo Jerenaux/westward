@@ -94,7 +94,7 @@
     },
     client: {
         boot:{
-            autoBoot: false,
+            autoBoot: true,
             forceNewPlayer: false,
             offerTutorial: true
         },
