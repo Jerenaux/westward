@@ -24,6 +24,14 @@ var eventSchema = new mongoose.Schema({
 });
 var Event = mongoose.model('Event', eventSchema);
 
+Event.prototype.prefix = function(){
+    var t = new Date(this.time);
+    var prefix = "["+t.getDate()+"/"+(t.getMonth()+1)+" "+t.getHours()+":"+("0"+t.getMinutes()).slice(-2)+":"+("0"+t.getSeconds()).slice(-2)+"]"; // Slice: to ensure 0 padding
+    console.log(this.__t,t,dateStr);
+    if(this.pname) prefix = '['+this.pname+']'+prefix;
+    return prefix+' ';
+};
+
 /*Event.prototype.toLog = function(){
     return this.__t;
 };*/
@@ -143,6 +151,9 @@ var ChatEvent = Event.discriminator(
     }),
     {discriminatorKey: 'kind'}
 );
+ChatEvent.prototype.getDesc = function(){
+    return this.prefix()+'Said "'+this.txt+'"';
+};
 
 var MenuEvent = Event.discriminator(
     'MenuEvent',
@@ -240,6 +251,10 @@ Prism.logEvent = function(player,action,data){
         return;
     }
     var event = new map[action](data);
+    if(event.getDesc){
+        event.desc = event.getDesc();
+        console.log('DESC:',event.desc);
+    }
     // console.log('event : ',event);
     event.save(function(err){
         if(err) throw err;
