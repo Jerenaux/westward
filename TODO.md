@@ -100,7 +100,6 @@ Next milestone:
 - Tackle todo as seen fit
 
 Bugs:
-- Prevent building at a distance
 - Bugs with movements and battle intercepts + new movement system
 -> Try keyboard? (problem in forests)
 -> Server sends intercept, player stops and sends his position?
