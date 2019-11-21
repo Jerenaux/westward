@@ -216,7 +216,6 @@ var WorldMap = new Phaser.Class({
         if(this.offZone.contains(pointer.downX,pointer.downY)) return;
         if(!this.viewRect.contains(pointer.downX,pointer.downY)) return;
         if(this.zoomRect && this.zoomRect.contains(pointer.downX,pointer.downY)) return;
-        console.log(pointer.downX,pointer.downY);
         this.focus(x,y);
     },
 

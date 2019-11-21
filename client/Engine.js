@@ -1747,7 +1747,9 @@ Engine.addHero = function(data){
     // data comes from the initTrim()'ed packet of the player
     Engine.player = new Hero();
     Engine.player.setUp(data);
-    Engine.camera.startFollow(Engine.player); // leave outside of constructor
+    // Engine.camera.startFollow(Engine.player); // leave outside of constructor
+    // Engine.camera.stopFollow();
+    Engine.camera.centerOn(Engine.player.x, Engine.player.y);
     //Engine.camera.setDeadzone(7*32,5*32);
     Engine.camera.setLerp(0.1);
     /*var graphics = Engine.scene.add.graphics().setScrollFactor(0);
@@ -1942,13 +1944,14 @@ Engine.getMouseCoordinates = function(pointer){
     var tileX = Math.floor(pxX/Engine.tileWidth);
     var tileY = Math.floor(pxY/Engine.tileHeight);
     Engine.lastPointer = {x:pointer.x,y:pointer.y};
+    Engine.lastPointerScreen = {x:pointer.position.x,y:pointer.position.y};
     return {
         tile:{x:tileX,y:tileY},
         pixel:{x:pxX,y:pxY}
     };
 };
 
-Engine.isInView = function(x,y){
+Engine.isInView = function(x,y){ // TODOP: use camera.cull() instead
     if(x < Engine.player.tileX - Engine.viewWidth/2) return false;
     if(x >= Engine.player.tileX + Engine.viewWidth/2) return false;
     if(y < Engine.player.tileY - Engine.viewHeight/2) return false;
@@ -1999,6 +2002,28 @@ Engine.updateSelf = function(data){
 };
 
 Engine.update = function(){
+    // console.log(Engine.scene.input);
+    return;
+    var p = Engine.lastPointerScreen;
+    if(!p) return;
+    // console.log(p.x);
+    var dx = Engine.camera.worldView.x;
+    var dy = Engine.camera.worldView.y;
+    var margin = 5;
+    var speed = 10;
+    if(p.x < margin){
+        // console.log(Engine.camera);
+        dx -= speed;
+    }else if(p.x > UI.getGameWidth() - margin){
+        dx += speed;
+    }
+    if(p.y < margin){
+        // console.log(Engine.camera);
+        dy -= speed;
+    }else if(p.y > UI.getGameHeight() - margin){
+        dy += speed;
+    }
+    Engine.camera.setScroll(dx, dy);
 
 };
 //TODO: compute once
@@ -2150,7 +2175,7 @@ Engine.enterBuilding = function(id){
 
 Engine.exitBuilding = function(){
     Engine.player.setVisible(true);
-    Engine.camera.startFollow(Engine.player);
+    // Engine.camera.startFollow(Engine.player);
     Engine.inBuilding = false;
     Engine.currentBuiling = null;
     Engine.currentMenu.hide();
@@ -2347,6 +2372,10 @@ window.debugOverlay = function(x,y){
 
 window.debugPlayer = function(){
     console.log(Engine.player);
+};
+
+window.debugEngine = function(){
+    console.log(Engine);
 };
 
 window.cl = function(){

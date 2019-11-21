@@ -87,7 +87,7 @@ var Moving = new Phaser.Class({
         }
 
         var c = this.getCenter();
-        if(Engine.isInView(c.x,c.y)) {
+        if(Engine.isInView(c.x,c.y)) { // TODO: use camera.cull() instead
             this.orientationPin.hide();
         }else{
             this.orientationPin.update(this.tileX,this.tileY);
