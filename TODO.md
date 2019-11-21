@@ -100,7 +100,6 @@ Next milestone:
 - Tackle todo as seen fit
 
 Bugs:
-- Make world map deadzone around zoom buttons
 - Prevent building at a distance
 - Bugs with movements and battle intercepts + new movement system
 -> Try keyboard? (problem in forests)

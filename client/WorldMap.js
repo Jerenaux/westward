@@ -55,6 +55,8 @@ var WorldMap = new Phaser.Class({
              new Phaser.Geom.Circle(this.x,this.y,viewW)
             :new Phaser.Geom.Rectangle(this.x-viewW/2,this.y-viewH/2,viewW,viewH)
             );
+        // Deadzone around zoom buttons
+        if(!this.minimap) this.zoomRect = new Phaser.Geom.Rectangle(920,485,40,60);
         // var wcoord = (this.minimap ? 'radius' : 'width');
         // var hcoord = (this.minimap ? 'radius' : 'height');
 
@@ -213,6 +215,8 @@ var WorldMap = new Phaser.Class({
         if(!this.enablePan) return;
         if(this.offZone.contains(pointer.downX,pointer.downY)) return;
         if(!this.viewRect.contains(pointer.downX,pointer.downY)) return;
+        if(this.zoomRect && this.zoomRect.contains(pointer.downX,pointer.downY)) return;
+        console.log(pointer.downX,pointer.downY);
         this.focus(x,y);
     },
 
