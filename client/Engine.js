@@ -333,6 +333,14 @@ Engine.create = function(){
     Engine.scene.input.on('drag', Engine.handleDrag);
     Engine.scene.input.keyboard.on('keydown', Engine.handleKeyboard);
 
+    Engine.mouseIn = true;
+    Engine.scene.game.canvas.onmouseenter = function(){
+        Engine.mouseIn = true;
+    };
+    Engine.scene.game.canvas.onmouseout = function(){
+        Engine.mouseIn = false;
+    };
+
     Engine.collisions = new SpaceMap();
     Engine.overlay = new SpaceMap();
     Engine.pathFinder = new Pathfinder(Engine.collisions,Engine.maxPathLength);
@@ -1944,7 +1952,6 @@ Engine.getMouseCoordinates = function(pointer){
     var tileX = Math.floor(pxX/Engine.tileWidth);
     var tileY = Math.floor(pxY/Engine.tileHeight);
     Engine.lastPointer = {x:pointer.x,y:pointer.y};
-    Engine.lastPointerScreen = {x:pointer.position.x,y:pointer.position.y};
     return {
         tile:{x:tileX,y:tileY},
         pixel:{x:pxX,y:pxY}
@@ -2002,29 +2009,25 @@ Engine.updateSelf = function(data){
 };
 
 Engine.update = function(){
-    // console.log(Engine.scene.input);
-    return;
-    var p = Engine.lastPointerScreen;
-    if(!p) return;
-    // console.log(p.x);
+    var p = Engine.scene.input.activePointer.position;
+    if(p.x == 0 && p.y == 0) return;
     var dx = Engine.camera.worldView.x;
     var dy = Engine.camera.worldView.y;
-    var margin = 5;
+    // var margin = Engine.mouseIn ? 5 : 50;
+    var margin = 10;
     var speed = 10;
     if(p.x < margin){
-        // console.log(Engine.camera);
         dx -= speed;
     }else if(p.x > UI.getGameWidth() - margin){
         dx += speed;
     }
     if(p.y < margin){
-        // console.log(Engine.camera);
         dy -= speed;
     }else if(p.y > UI.getGameHeight() - margin){
         dy += speed;
     }
+    if(dx == 0 && dy == 0) return;
     Engine.camera.setScroll(dx, dy);
-
 };
 //TODO: compute once
 Engine.getAnimalData = function(type){
@@ -2376,6 +2379,10 @@ window.debugPlayer = function(){
 
 window.debugEngine = function(){
     console.log(Engine);
+};
+
+window.debugPointer = function(){
+    console.log(Engine.scene.input.activePointer);
 };
 
 window.cl = function(){
