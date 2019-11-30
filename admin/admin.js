@@ -129,6 +129,7 @@ app.controller("mainCtrl", [
         };
 
         getEvents();
+        getData('screenshots');
     }
     ]);
 
