@@ -1789,6 +1789,10 @@ GameServer.handleBuild = function(data,socketID) {
         console.log('Building type already owned');
         return false;
     }
+    if(Utils.euclidean(player,tile) > 20){
+        console.log('Building location too far from player');
+        return false;
+    }
     var buildPermit = GameServer.canBuild(bid, tile);
     if(player.isInstanced()) buildPermit = 1; //hack
     if (buildPermit === 1) {

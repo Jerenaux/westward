@@ -1322,7 +1322,7 @@ Engine.makeMapPanel = function(){
     var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
     mapPanel.addBackground('bigbg');
     mapPanel.addLegend();
-    mapPanel.addMap('bigbg_mask',900,380,-1,-1);
+    mapPanel.addMap('bigbg_mask',900,525,-1,-1);
     mapPanel.addButtons();
     return mapPanel;
 };
