@@ -78,7 +78,6 @@
     "slack-notify": "^0.1.7",
     "socket.io": "^2.2.0",
     "terser": "^3.17.0",
-    "v8-profiler-node8": "^6.1.1",
     "voronoi": "^1.0.0"
   }
 }
