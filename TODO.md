@@ -100,6 +100,8 @@ Next milestone:
 - Tackle todo as seen fit
 
 Bugs:
+- World map byg
+- Duplicate new players
 - Bugs with movements and battle intercepts + new movement system
 -> Try keyboard? (problem in forests)
 -> Server sends intercept, player stops and sends his position?
