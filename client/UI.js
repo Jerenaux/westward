@@ -48,6 +48,8 @@ var UI = {
             this.load.image('setldiamond', 'assets/sprites/setl_diamond.png');
             this.load.image('wood', 'assets/sprites/wood.jpg');
         }
+
+        this.regionSelected = false;
     },
 
     create: function () {
@@ -570,7 +572,9 @@ UI.displayCamp = function (data) {
 };
 
 UI.selectSettlement = function (id) {
+    if(UI.regionSelected) return;
     console.log('Region selected (', id, ')');
+    UI.regionSelected = true;
     UI.selectedSettlement = id;
     var fadeDuration = 500;
     UI.camera.fadeOut(fadeDuration);
