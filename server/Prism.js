@@ -27,7 +27,7 @@ var Event = mongoose.model('Event', eventSchema);
 Event.prototype.prefix = function(){
     var t = new Date(this.time);
     var prefix = "["+t.getDate()+"/"+(t.getMonth()+1)+" "+t.getHours()+":"+("0"+t.getMinutes()).slice(-2)+":"+("0"+t.getSeconds()).slice(-2)+"]"; // Slice: to ensure 0 padding
-    console.log(this.__t,t,dateStr);
+    // console.log(this.__t,t,dateStr);
     if(this.pname) prefix = '['+this.pname+']'+prefix;
     return prefix+' ';
 };
@@ -46,6 +46,10 @@ var TradeEvent = Event.discriminator(
     }),
     {discriminatorKey: 'kind'}
 );
+TradeEvent.prototype.getDesc = function(){
+    var txt = [];
+    return this.prefix()+txt;
+};
 
 var CraftEvent = Event.discriminator(
     'CraftEvent',
