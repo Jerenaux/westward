@@ -428,6 +428,7 @@ var WorldMap = new Phaser.Class({
         this.centerMap(Engine.player.getTilePosition());
         // this.setInputArea();
         this.computeDragLimits();
+        this.displayed = true;
         if(!this.minimap){
             this.applyFogOfWar();
             this.displayBorders(Engine.player.frontier,0xff0000);
@@ -437,7 +438,6 @@ var WorldMap = new Phaser.Class({
 
         this.displayPins();
         this.setVisible(true);
-        this.displayed = true;
         // if(!this.minimap) this.getZoomBtn('out').disable();
     },
 
@@ -461,7 +461,7 @@ var WorldMap = new Phaser.Class({
     displayToponyms: function(){
         this.toponyms.forEach(function(t){
             t.position();
-            t.display();
+            // t.display();
         })
     },
 
@@ -551,7 +551,7 @@ var MapMarker = new Phaser.Class({
             return;
         }
         // If on minimap, display straight away if within rect; if in big map, display only if not within FoW
-        if(this.parentMap.viewRect.contains(this.x,this.y)){
+        if(this.parentMap.viewRect.contains(this.x,this.y) && this.parentMap.displayed){
             if(this.parentMap.minimap){
                 this.setVisible(true);
             }else{
@@ -704,7 +704,8 @@ Toponym.prototype.move = function(dx,dy){
         s.y -= dy;
     });
     // console.warn(this.parentMap.viewRect,this.text.x,this.text.y);
-    if(this.parentMap.viewRect.contains(this.text.x,this.text.y)){
+    // if(this.parentMap.displayed && this.parentMap.viewRect.contains(this.text.x,this.text.y)){
+    if(this.checkVisibility()){
         this.display();
     }else{
         this.hide();
@@ -712,6 +713,7 @@ Toponym.prototype.move = function(dx,dy){
 };
 
 Toponym.prototype.checkVisibility = function(){
+    if(!this.parentMap.displayed || !this.parentMap.viewRect.contains(this.text.x,this.text.y)) return false;
     var offset = 40;
     for(var i = 0; i < Engine.player.FoW.length; i++){
         var rect = Engine.player.FoW[i];
@@ -730,6 +732,7 @@ Toponym.prototype.checkVisibility = function(){
 
 Toponym.prototype.display = function(){
     if(!this.checkVisibility()) return;
+    // console.warn('displaying',this.text.text);
     this.text.setVisible(true);
     this.slices.forEach(function(s){
         s.setVisible(true);
