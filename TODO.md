@@ -87,10 +87,6 @@ Goal metrics:
 incl. width and height of areas explored
 
 
-Durations: 0 0 0 1 1 1 1 2 3 3 5 5 5 5 5 6 6 7 9 9 10 16 24 62 -> 8/24
-Unique players: 21
-Returning: 3  : < 20%
-Crashes/bugs for: 4
 
 Next milestone:
 - Fix bugs
@@ -101,9 +97,13 @@ Next milestone:
 
 Bugs:
 - Bugs with movements and battle intercepts + new movement system
--> Try keyboard? (problem in forests)
 -> Server sends intercept, player stops and sends his position?
 Feedback:
+- Camera work
+-> Right click/space to center on player
+-> Allow WASD/arrows control of cam
+-> Update mouse cursor when moving cam
+-> Update orientation pins when camera move, NOT when player move anymore
 Features:
 - Add twitter to game links
 - Test new character sprite

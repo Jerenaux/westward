@@ -1783,6 +1783,12 @@ Engine.updateEnvironment = function(){
     for(var j = 0; j < newChunks.length; j++){
         Engine.displayChunk(newChunks[j]);
     }
+
+    var tl = Utils.getAOIcorners(Engine.player.chunk)[0];
+    var l = (tl.x-World.chunkWidth)*32;
+    var t = (tl.y-World.chunkHeight)*32;
+    Engine.camera.setBounds(l,t,World.chunkWidth*3*32,World.chunkHeight*3*32);
+    console.log(Engine.camera.getBounds());
 };
 
 Engine.displayChunk = function(id){
@@ -2008,6 +2014,7 @@ Engine.updateSelf = function(data){
     Engine.player.updateData(data);
 };
 
+//UPDT
 Engine.update = function(){
     var p = Engine.scene.input.activePointer.position;
     if(p.x == 0 && p.y == 0) return;
