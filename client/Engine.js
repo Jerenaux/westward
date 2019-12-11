@@ -332,6 +332,7 @@ Engine.create = function(){
     Engine.scene.input.on('pointerout', Engine.handleOut);
     Engine.scene.input.on('drag', Engine.handleDrag);
     Engine.scene.input.keyboard.on('keydown', Engine.handleKeyboard);
+    Engine.cursors = Engine.scene.input.keyboard.createCursorKeys();
 
     Engine.mouseIn = true;
     Engine.scene.game.canvas.onmouseenter = function(){
@@ -1842,7 +1843,30 @@ Engine.handleKeyboard = function(event){
         Engine.currentTutorialPanel.handleKeyboard(event);
         return;
     }
-    if(event.key == 'Enter') Engine.toggleChatBar();
+    // if(event.key == 'Enter') Engine.toggleChatBar();
+    // Engine.dirPressed = {
+    //     'ArrowLeft': false,
+    //     'ArrowRight': false,
+    //     'ArrowUp': false,
+    //     'ArrowDown': false
+    // }
+    switch(event.key){
+        case 'Enter':
+            Engine.toggleChatBar();
+            break;
+        // case 'ArrowLeft':
+        //     Engine.scrollCamera(-1,0);
+        //     break;
+        // case 'ArrowRight':
+        //     Engine.scrollCamera(1,0);  
+        //     break;
+        // case 'ArrowUp':
+        //     Engine.scrollCamera(0,-1);
+        //     break;
+        // case 'ArrowDown':
+        //     Engine.scrollCamera(0,1);
+        //     break;
+    }
 };
 
 Engine.handleDown = function(pointer,objects){
@@ -2018,24 +2042,34 @@ Engine.updateSelf = function(data){
 Engine.update = function(){
     var p = Engine.scene.input.activePointer.position;
     if(p.x == 0 && p.y == 0) return;
-    var dx = Engine.camera.worldView.x;
-    var dy = Engine.camera.worldView.y;
-    // var margin = Engine.mouseIn ? 5 : 50;
     var margin = 10;
-    var speed = 10;
-    if(p.x < margin){
-        dx -= speed;
-    }else if(p.x > UI.getGameWidth() - margin){
-        dx += speed;
+    // var speed = 10;
+    var dx = 0;
+    var dy = 0;
+    if(p.x < margin || Engine.cursors.left.isDown){
+        dx = -1;
+    }else if(p.x > UI.getGameWidth() - margin || Engine.cursors.right.isDown){
+        dx = 1;
     }
-    if(p.y < margin){
-        dy -= speed;
-    }else if(p.y > UI.getGameHeight() - margin){
-        dy += speed;
+    if(p.y < margin || Engine.cursors.up.isDown){
+        dy = -1;
+    }else if(p.y > UI.getGameHeight() - margin || Engine.cursors.down.isDown){
+        dy = 1;
     }
     if(dx == 0 && dy == 0) return;
-    Engine.camera.setScroll(dx, dy);
+    Engine.scrollCamera(dx,dy);
+    // Engine.camera.setScroll(dx, dy);
 };
+
+Engine.scrollCamera = function(dx,dy){
+    var speed = 10;
+    dx *= 10;
+    dy *= 10;
+    var x = Engine.camera.worldView.x;
+    var y = Engine.camera.worldView.y;
+    Engine.camera.setScroll(x+dx, y+dy);
+}
+
 //TODO: compute once
 Engine.getAnimalData = function(type){
     var animalData = animalsData[type];
