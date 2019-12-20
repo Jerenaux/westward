@@ -749,7 +749,7 @@ GameServer.setUpdateLoops = function(){
     var loops = {
         'client': GameServer.updateClients, // send update to clients
         'aggro': GameServer.checkForAggro,
-        'wander': GameServer.updateNPC, // npc wander behavior
+        // 'wander': GameServer.updateNPC, // npc wander behavior
         'walk': GameServer.updateWalks // update positions
     };
 
