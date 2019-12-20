@@ -13,12 +13,13 @@ var OrientationPin = new Phaser.Class({
     Extends: CustomSprite,
     // Extends: Phaser.GameObjects.RenderTexture,
 
-    initialize: function OrientationPin(type,iconAtlas,iconFrame) {
+    initialize: function OrientationPin(type,parent,iconAtlas,iconFrame) {
         CustomSprite.call(this, 'UI', 0, 0,'orientation');
         // Phaser.GameObjects.RenderTexture.call(this, UI.scene, 0, 0, 48,64);
         // UI.scene.add.displayList.add(this);
 
         this.type = type;
+        // this.parent = parent.getShortID();
         var pinFrame;
         if(this.type == 'animal') {
             iconAtlas = 'orientation';
@@ -69,6 +70,8 @@ var OrientationPin = new Phaser.Class({
             x: (this.data.horiz/(2*World.tileWidth)),
             y: (this.data.vert/(2*World.tileHeight))
         };
+
+        Engine.orientationPins.push(this);
     },
 
     update: function(x,y){

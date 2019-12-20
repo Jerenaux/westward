@@ -76,46 +76,40 @@ Goal metrics:
 - Bounce rate: 50% of sessions durations > 5min. 
 -> Quests from the get-go
 -> Increase starting inventory, reduce building costs
+-> No too early respawn
 -> Smoother movement system
 - Return rate: 5% of players having > 1 session
 -> Social elements (contacts, rankings)
 -> Juice
 -> Highlight temporal aspects
--> Server not crashing
+-> Server not crashing, no bugs
 - Feature utilization: # of times feature x is used > k*players (k < 1)
 incl. width and height of areas explored
 
 
-12/11 21h
+Durations: 0 0 0 1 1 1 1 1 2 3 3 5 5 5 5 5 5 6 6 7 9 9 10 16 19 24 62 -> 9/28
+Unique players: 24
+Returning: 4  
 
-Durations: 0 1 1 1 5 5 5 5 9 9 10 24 62 -> 5/13
-Unique players: 11
-Returning: 2  : < 20%
 
 Next milestone:
-- Migrate to AWS 
 - Fix bugs
 - Apply feedback
 - Take action based on session stats
 - Play
 - Tackle todo as seen fit
 
-Migration todo:
-- Modify webhooks
-- Replace IP URLs to domains, in: visitted dev logs, roastmygame, WW page, etc.
-- Shut down droplet
-
-
 Bugs:
-- Can't purchase abilities?
-- Bugs with movements and battle intercepts
-- Test buying of timber?
-- Test that consuming food decreases mission counter -> Not the case
+- Set NODE_CONFIG_ENV on AWS
+- Bugs with movements and battle intercepts + new movement system
+-> Try keyboard? (problem in forests)
+-> Server sends intercept, player stops and sends his position?
+Feedback:
 Features:
 - Add twitter to game links
-- Test new character
-- Zapier
+- Test new character sprite
 - Allow buildings across regions
+
 - Add a "show all" button to stats panel to display all of them
 - Re-add stats panel to character panel?
 - DIsable some skills based on fatigue / update help
@@ -160,7 +154,7 @@ bow, (bomb), dawn, dusk, (sword), (gun), (boots), (belt), quiver, (arrow), stone
  
  
 María:
-
+-> Add "x" on door exit icon
 - Player anim naked
 -> Look into superimposing equipment programmatically
 -> One basic player overlay for all

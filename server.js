@@ -5,7 +5,7 @@ var server = require('http').Server(app);
 var bodyParser = require("body-parser");
 var io = require('socket.io').listen(server);
 var path = require('path');
-var osutils = require('os-utils');
+
 
 var quickselect = require('quickselect'); // Used to compute the median for latency
 var mongoose = require('mongoose');
@@ -211,6 +211,7 @@ server.resetStamp = 1519130567967; // ignore returning players with stamps older
 process.on('uncaughtException', function(err) {
     GameServer.sendSlackNotification(err.toString(),'warning');
     console.error('Caught exception: ' + err);
+    console.trace(err);
 });
 
 io.on('connection',function(socket){
@@ -234,7 +235,7 @@ io.on('connection',function(socket){
         if(data.new){ // new players OR tutorial
             GameServer.addNewPlayer(socket,data);
         }else{
-            GameServer.loadPlayer(socket,data.id);
+            GameServer.loadPlayer(socket,data);
         }
 
         var callbacksMap = {

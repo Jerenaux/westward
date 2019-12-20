@@ -1,4 +1,3 @@
-
 .git
 .idea
 node_modules
@@ -8,3 +7,4 @@ toPack
 maps/conflictMarkers.json
 maps/deathMarkers.json
 package-lock.json
+assets/sprites/buildings/*

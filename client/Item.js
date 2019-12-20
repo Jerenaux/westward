@@ -33,7 +33,7 @@ var Item = new Phaser.Class({
         this.setTexture(atlas);
         this.setFrame(frame);
         this.setVisible(true);
-        this.orientationPin = new OrientationPin('item',itemData.atlas,itemData.frame);
+        this.orientationPin = new OrientationPin('item',this,itemData.atlas,itemData.frame);
 
         this.setTilePosition(data.x,data.y,true);
         // this.setOrigin(0.5);
@@ -73,11 +73,11 @@ var Item = new Phaser.Class({
             this.orientationPin.hide();
         }else{
             this.orientationPin.update(this.tileX,this.tileY);
-            if(this.orientationPin.side){
-                var sideMap = Engine.orientationPins[this.orientationPin.side];
-                if(!sideMap.hasOwnProperty(this.itemType)) sideMap[this.itemType] = [];
-                sideMap[this.itemType].push(this.orientationPin);
-            }
+            // if(this.orientationPin.side){
+            //     var sideMap = Engine.orientationPins[this.orientationPin.side];
+            //     if(!sideMap.hasOwnProperty(this.itemType)) sideMap[this.itemType] = [];
+            //     sideMap[this.itemType].push(this.orientationPin);
+            // }
             this.orientationPin.display();
         }
     },

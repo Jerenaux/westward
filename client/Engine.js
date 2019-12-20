@@ -306,7 +306,7 @@ Engine.create = function(){
     Engine.entityManager.registerEntityType('civ',Civ,Engine.civs);
     Engine.entityManager.registerEntityType('remain',Remains,Engine.remains);
 
-
+    Engine.orientationPins = [];
 
     Engine.debug = true;
     Engine.showHero = true;
@@ -626,18 +626,21 @@ Engine.manageRespawn = function(){
 };
 
 Engine.updateAllOrientationPins = function(){
+    Engine.orientationPins.forEach(function(p){
+        p.hide();
+    });
     Engine.entityManager.displayLists['animal'].forEach(function(aid){
         Engine.animals[aid].manageOrientationPin();
     });
     Engine.entityManager.displayLists['civ'].forEach(function(cid){
         Engine.civs[cid].manageOrientationPin();
     });
-    Engine.orientationPins = {
+    /*Engine.orientationPins = {
         'top': {},
         'left': {},
         'right': {},
         'bottom': {}
-    };
+    };*/
     Engine.entityManager.displayLists['item'].forEach(function(iid){
         Engine.items[iid].manageOrientationPin();
     });
@@ -1319,7 +1322,7 @@ Engine.makeMapPanel = function(){
     var mapPanel = new MapPanel(10,100,1000,380,'',true); // true = invisible
     mapPanel.addBackground('bigbg');
     mapPanel.addLegend();
-    mapPanel.addMap('bigbg_mask',900,380,-1,-1);
+    mapPanel.addMap('bigbg_mask',900,525,-1,-1);
     mapPanel.addButtons();
     return mapPanel;
 };
@@ -2344,6 +2347,10 @@ window.debugOverlay = function(x,y){
 
 window.debugPlayer = function(){
     console.log(Engine.player);
+};
+
+window.cl = function(){
+    localStorage.setItem(Client.storageIDKey,'');
 };
 
 

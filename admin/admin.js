@@ -102,7 +102,7 @@ app.controller("mainCtrl", [
                 var returning = new Set();
                 for(var i = 0; i < res.data.length; i++){
                     var evt = res.data[i];
-                    if(!evt.pid) continue;
+                    if(!evt.pid || !evt.session) continue;
                     if(!(evt.session in sessions)) sessions[evt.session] = new Session(evt.session);
                     sessions[evt.session].add(evt);
                     if(pids.has(evt.pid)) returning.add(evt.pid);
@@ -119,8 +119,8 @@ app.controller("mainCtrl", [
                 var nbp = pids.size;
                 $scope['median_duration'] = median(durations);
                 $scope['ratio_returning'] = (returning.size/pids.size)*100;
-                console.log('Number of sessions',nbsessions);
-                console.log('Number of players',nbp);
+                console.log('Number of players',pids.size);
+                console.log('Number of returning players',returning.size);
                 console.log('Ratio of returning players:', $scope['ratio_returning']);
                 console.log('Median duration:', $scope['median_duration']);
 
@@ -128,6 +128,7 @@ app.controller("mainCtrl", [
         };
 
         getEvents();
+        getData('screenshots');
     }
     ]);
 

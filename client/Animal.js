@@ -15,7 +15,7 @@ var Animal = new Phaser.Class({
     initialize: function Animal() {
         NPC.call(this);
         this.entityType = 'animal';
-        this.orientationPin = new OrientationPin('animal');
+        this.orientationPin = new OrientationPin('animal',this);
     },
 
     setUp: function(data){
