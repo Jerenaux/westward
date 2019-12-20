@@ -87,10 +87,10 @@ Goal metrics:
 incl. width and height of areas explored
 
 
-Durations: 0 0 0 1 1 1 1 2 3 3 5 5 5 5 5 6 6 7 9 9 10 16 24 62 -> 8/24
-Unique players: 21
-Returning: 3  : < 20%
-Crashes/bugs for: 4
+Durations: 0 0 0 1 1 1 1 1 2 3 3 5 5 5 5 5 5 6 6 7 9 9 10 16 19 24 62 -> 9/28
+Unique players: 24
+Returning: 4  
+
 
 Next milestone:
 - Fix bugs
@@ -100,6 +100,7 @@ Next milestone:
 - Tackle todo as seen fit
 
 Bugs:
+- Set NODE_CONFIG_ENV on AWS
 - Bugs with movements and battle intercepts + new movement system
 -> Try keyboard? (problem in forests)
 -> Server sends intercept, player stops and sends his position?

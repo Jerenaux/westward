@@ -5,7 +5,7 @@ var server = require('http').Server(app);
 var bodyParser = require("body-parser");
 var io = require('socket.io').listen(server);
 var path = require('path');
-var osutils = require('os-utils');
+
 
 var quickselect = require('quickselect'); // Used to compute the median for latency
 var mongoose = require('mongoose');
