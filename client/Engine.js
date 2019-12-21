@@ -333,6 +333,12 @@ Engine.create = function(){
     Engine.scene.input.on('drag', Engine.handleDrag);
     Engine.scene.input.keyboard.on('keydown', Engine.handleKeyboard);
     Engine.cursors = Engine.scene.input.keyboard.createCursorKeys();
+    Engine.WASD = {
+        'W': this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+        'A': this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+        'S': this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+        'D': this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
+    };
 
     Engine.mouseIn = true;
     Engine.scene.game.canvas.onmouseenter = function(){
@@ -2046,14 +2052,14 @@ Engine.update = function(){
     // var speed = 10;
     var dx = 0;
     var dy = 0;
-    if(p.x < margin || Engine.cursors.left.isDown){
+    if(p.x < margin || Engine.cursors.left.isDown || Engine.WASD.A.isDown){
         dx = -1;
-    }else if(p.x > UI.getGameWidth() - margin || Engine.cursors.right.isDown){
+    }else if(p.x > UI.getGameWidth() - margin || Engine.cursors.right.isDown || Engine.WASD.D.isDown){
         dx = 1;
     }
-    if(p.y < margin || Engine.cursors.up.isDown){
+    if(p.y < margin || Engine.cursors.up.isDown || Engine.WASD.W.isDown){
         dy = -1;
-    }else if(p.y > UI.getGameHeight() - margin || Engine.cursors.down.isDown){
+    }else if(p.y > UI.getGameHeight() - margin || Engine.cursors.down.isDown || Engine.WASD.S.isDown){
         dy = 1;
     }
     if(dx == 0 && dy == 0) return;
