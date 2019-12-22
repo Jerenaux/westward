@@ -100,7 +100,8 @@ Bugs:
 -> Server sends intercept, player stops and sends his position?
 Feedback:
 - Camera work
--> Right click/space to center on player
+-> Right click to center on player
+-> Togglable lock mode?
 -> Update mouse cursor when moving cam
 -> Update orientation pins when camera move, NOT when player move anymore
 Features:

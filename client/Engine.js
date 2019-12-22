@@ -1767,6 +1767,11 @@ Engine.getIngredientsPanel = function(){
     return Engine.menus['crafting'].panels['ingredients'];
 };
 
+Engine.focusPlayer = function(){
+    // Engine.camera.centerOn(Engine.player.x, Engine.player.y);
+    Engine.camera.pan(Engine.player.x, Engine.player.y);
+};
+
 Engine.addHero = function(data){
     // data comes from the initTrim()'ed packet of the player
     Engine.player = new Hero();
@@ -1774,6 +1779,7 @@ Engine.addHero = function(data){
     // Engine.camera.startFollow(Engine.player); // leave outside of constructor
     // Engine.camera.stopFollow();
     Engine.camera.centerOn(Engine.player.x, Engine.player.y);
+    // Engine.focusPlayer();
     //Engine.camera.setDeadzone(7*32,5*32);
     Engine.camera.setLerp(0.1);
     /*var graphics = Engine.scene.add.graphics().setScrollFactor(0);
@@ -1858,9 +1864,14 @@ Engine.handleKeyboard = function(event){
         Engine.currentTutorialPanel.handleKeyboard(event);
         return;
     }
+    console.log(event);
     switch(event.key){
         case 'Enter':
             Engine.toggleChatBar();
+            break;
+        case ' ':
+            console.log('Space');
+            if(!Engine.chatBar.displayed && !Engine.inMenu) Engine.focusPlayer();
             break;
     }
 };
