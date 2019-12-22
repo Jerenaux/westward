@@ -101,7 +101,6 @@ Bugs:
 Feedback:
 - Camera work
 -> Right click/space to center on player
--> WASD capture issue?
 -> Update mouse cursor when moving cam
 -> Update orientation pins when camera move, NOT when player move anymore
 Features:

@@ -333,12 +333,7 @@ Engine.create = function(){
     Engine.scene.input.on('drag', Engine.handleDrag);
     Engine.scene.input.keyboard.on('keydown', Engine.handleKeyboard);
     Engine.cursors = Engine.scene.input.keyboard.createCursorKeys();
-    Engine.WASD = {
-        'W': this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
-        'A': this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
-        'S': this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
-        'D': this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
-    };
+    Engine.addWASD();
 
     Engine.mouseIn = true;
     Engine.scene.game.canvas.onmouseenter = function(){
@@ -379,6 +374,15 @@ Engine.create = function(){
     Engine.created = true;
     Engine.configEngine();
     Client.requestData();
+};
+
+Engine.addWASD = function(){
+    Engine.WASD = {
+        'W': Engine.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+        'A': Engine.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+        'S': Engine.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+        'D': Engine.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
+    };
 };
 
 Engine.getGameInstance = function(){
@@ -628,6 +632,11 @@ Engine.createAnimation = function(key,texture,start,end,rate,loop,revert){
 Engine.toggleChatBar = function(){
     if(Engine.inMenu && !BattleManager.inBattle) return;
     Engine.chatBar.toggle();
+    if(Engine.chatBar.displayed){
+        Engine.scene.input.keyboard.disableGlobalCapture();
+    }else{
+        Engine.scene.input.keyboard.enableGlobalCapture();
+    }
 };
 
 Engine.manageDeath = function(){
@@ -1849,29 +1858,10 @@ Engine.handleKeyboard = function(event){
         Engine.currentTutorialPanel.handleKeyboard(event);
         return;
     }
-    // if(event.key == 'Enter') Engine.toggleChatBar();
-    // Engine.dirPressed = {
-    //     'ArrowLeft': false,
-    //     'ArrowRight': false,
-    //     'ArrowUp': false,
-    //     'ArrowDown': false
-    // }
     switch(event.key){
         case 'Enter':
             Engine.toggleChatBar();
             break;
-        // case 'ArrowLeft':
-        //     Engine.scrollCamera(-1,0);
-        //     break;
-        // case 'ArrowRight':
-        //     Engine.scrollCamera(1,0);  
-        //     break;
-        // case 'ArrowUp':
-        //     Engine.scrollCamera(0,-1);
-        //     break;
-        // case 'ArrowDown':
-        //     Engine.scrollCamera(0,1);
-        //     break;
     }
 };
 
@@ -2052,14 +2042,14 @@ Engine.update = function(){
     // var speed = 10;
     var dx = 0;
     var dy = 0;
-    if(p.x < margin || Engine.cursors.left.isDown || Engine.WASD.A.isDown){
+    if(p.x < margin || Engine.cursors.left.isDown ||(Engine.WASD.A.isDown && !Engine.chatBar.displayed)){
         dx = -1;
-    }else if(p.x > UI.getGameWidth() - margin || Engine.cursors.right.isDown || Engine.WASD.D.isDown){
+    }else if(p.x > UI.getGameWidth() - margin || Engine.cursors.right.isDown || (Engine.WASD.D.isDown && !Engine.chatBar.displayed)){
         dx = 1;
     }
-    if(p.y < margin || Engine.cursors.up.isDown || Engine.WASD.W.isDown){
+    if(p.y < margin || Engine.cursors.up.isDown || (Engine.WASD.W.isDown && !Engine.chatBar.displayed)){
         dy = -1;
-    }else if(p.y > UI.getGameHeight() - margin || Engine.cursors.down.isDown || Engine.WASD.S.isDown){
+    }else if(p.y > UI.getGameHeight() - margin || Engine.cursors.down.isDown || (Engine.WASD.S.isDown && !Engine.chatBar.displayed)){
         dy = 1;
     }
     if(dx == 0 && dy == 0) return;
