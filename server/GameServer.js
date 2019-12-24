@@ -2505,10 +2505,10 @@ GameServer.updateNPC = function(){
         var a = GameServer.animals[key];
         a.updateWander();
     });
-    // Object.keys(GameServer.civs).forEach(function(key) {
-    //     var a = GameServer.civs[key];
-    //     a.updateBehavior();
-    // });
+    Object.keys(GameServer.civs).forEach(function(key) {
+        var a = GameServer.civs[key];
+        a.updateBehavior();
+    });
 };
 
 GameServer.createInstance = function(player){
