@@ -334,6 +334,7 @@ Engine.create = function(){
     Engine.scene.input.keyboard.on('keydown', Engine.handleKeyboard);
     Engine.cursors = Engine.scene.input.keyboard.createCursorKeys();
     Engine.addWASD();
+    Engine.camLock = false;
 
     Engine.mouseIn = true;
     Engine.scene.game.canvas.onmouseenter = function(){
@@ -1767,19 +1768,32 @@ Engine.getIngredientsPanel = function(){
     return Engine.menus['crafting'].panels['ingredients'];
 };
 
+Engine.toggleCamLock = function(){
+    if(Engine.camLock){
+        Engine.camera.stopFollow();
+    }else{
+        Engine.camera.startFollow(Engine.player);
+    }
+    Engine.camLock = !Engine.camLock;
+};
+
 Engine.focusPlayer = function(){
     // Engine.camera.centerOn(Engine.player.x, Engine.player.y);
-    Engine.camera.pan(Engine.player.x, Engine.player.y);
+    // Engine.camera.pan(Engine.player.x, Engine.player.y);
+    Engine.camera.startFollow(Engine.player);
 };
 
 Engine.addHero = function(data){
     // data comes from the initTrim()'ed packet of the player
     Engine.player = new Hero();
     Engine.player.setUp(data);
+
     // Engine.camera.startFollow(Engine.player); // leave outside of constructor
     // Engine.camera.stopFollow();
-    Engine.camera.centerOn(Engine.player.x, Engine.player.y);
+    // Engine.camera.centerOn(Engine.player.x, Engine.player.y);
     // Engine.focusPlayer();
+    Engine.toggleCamLock();
+
     //Engine.camera.setDeadzone(7*32,5*32);
     Engine.camera.setLerp(0.1);
     /*var graphics = Engine.scene.add.graphics().setScrollFactor(0);
@@ -1871,7 +1885,8 @@ Engine.handleKeyboard = function(event){
             break;
         case ' ':
             console.log('Space');
-            if(!Engine.chatBar.displayed && !Engine.inMenu) Engine.focusPlayer();
+            // if(!Engine.chatBar.displayed && !Engine.inMenu) Engine.focusPlayer();
+            if(!Engine.chatBar.displayed && !Engine.inMenu) Engine.toggleCamLock();
             break;
     }
 };
@@ -2047,6 +2062,7 @@ Engine.updateSelf = function(data){
 
 //UPDT
 Engine.update = function(){
+    if(Engine.camLock) return;
     var p = Engine.scene.input.activePointer.position;
     if(p.x == 0 && p.y == 0) return;
     var margin = 10;
