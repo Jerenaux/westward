@@ -54,10 +54,11 @@ SpawnZone.prototype.isActive = function(){
 };
 
 SpawnZone.prototype.update = function(){
-    if(!GameServer.isTimeToUpdate('spawnZones')) return;
-    if(this.population == this.max) return;
-    if(GameServer.vision.has(this.aoi)) return;
     if(!this.isActive()) return;
+    if(!GameServer.isTimeToUpdate('spawnZones')) return;
+    if(GameServer.vision.has(this.aoi)) return;
+    // console.log(`Population: ${this.population}, max: ${this.max}`);
+    if(this.population >= this.max) return;
 
     // How many turns must elapse before a spawn event
     var nextUpdate = (this.max - this.population)*this.animalData.spawnRate;
@@ -70,9 +71,11 @@ SpawnZone.prototype.update = function(){
 };
 
 SpawnZone.prototype.spawn = function(){
+    console.log(`Spawning ${this.animal} at ${this.x} ${this.y}`);
     var animal = GameServer.addAnimal(this.x, this.y, this.animal);
     animal.setSpawnZone(this);
     this.population++;
+    // console.log(`Population: ${this.population}`);
 };
 
 SpawnZone.prototype.decrement = function(){
