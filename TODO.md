@@ -101,6 +101,7 @@ Next milestone:
 
 Bugs:
 - Set NODE_CONFIG_ENV on AWS
+- No aggro?
 - Bugs with movements and battle intercepts + new movement system
 -> Try keyboard? (problem in forests)
 -> Server sends intercept, player stops and sends his position?
