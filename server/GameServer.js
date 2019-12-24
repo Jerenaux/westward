@@ -749,7 +749,7 @@ GameServer.setUpdateLoops = function(){
     var loops = {
         'client': GameServer.updateClients, // send update to clients
         'aggro': GameServer.checkForAggro,
-        // 'wander': GameServer.updateNPC, // npc wander behavior
+        'wander': GameServer.updateNPC, // npc wander behavior
         'walk': GameServer.updateWalks // update positions
     };
 
@@ -2505,10 +2505,10 @@ GameServer.updateNPC = function(){
         var a = GameServer.animals[key];
         a.updateWander();
     });
-    Object.keys(GameServer.civs).forEach(function(key) {
-        var a = GameServer.civs[key];
-        a.updateBehavior();
-    });
+    // Object.keys(GameServer.civs).forEach(function(key) {
+    //     var a = GameServer.civs[key];
+    //     a.updateBehavior();
+    // });
 };
 
 GameServer.createInstance = function(player){
