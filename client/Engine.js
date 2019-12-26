@@ -145,6 +145,8 @@ Engine.preload = function() {
 
     // Misc
     this.load.image('bug', 'assets/sprites/bug.png');
+    this.load.image('camlock', 'assets/sprites/camlock.png');
+    this.load.image('camunlock', 'assets/sprites/camunlock.png');
     this.load.atlas('orientation', 'assets/sprites/orientation.png', 'assets/sprites/orientation.json');
     this.load.image('tail', 'assets/sprites/tail.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll.png');
@@ -417,12 +419,12 @@ Engine.initWorld = function(data){
     Engine.firstSelfUpdate = true;
 
     console.log(data);
-    //Engine.settlementsData = data.settlements;
     Engine.addHero(data);
     Engine.playerIsInitialized = true;
     Engine.updateEnvironment();
 
     Engine.makeUI();
+    Engine.toggleCamLock();
 
     Engine.setlCapsule.setText(regionsData[data.region].name);
 
@@ -431,8 +433,8 @@ Engine.initWorld = function(data){
     if(Engine.miniMap) Engine.miniMap.display();
 
     if(Client.isNewPlayer() && !Client.tutorial) {
-        var w = 400;
-        var h = 290;
+        var w = 480;
+        var h = 380;
         var panel = new InfoPanel((UI.getGameWidth() - w) / 2, (UI.getGameHeight() - h) / 2, w, h, 'Welcome');
         panel.setWrap(20);
 
@@ -644,12 +646,6 @@ Engine.manageDeath = function(){
     Engine.dead = true;
 };
 
-Engine.manageRespawn = function(){
-    Engine.showMarker();
-    Engine.dead = false;
-    Engine.updateAllOrientationPins();
-};
-
 Engine.updateAllOrientationPins = function(){
     Engine.orientationPins.forEach(function(p){
         p.hide();
@@ -673,6 +669,12 @@ Engine.updateAllOrientationPins = function(){
     Engine.entityManager.displayLists['player'].forEach(function(pid){
         Engine.players[pid].manageOrientationPin();
     });
+};
+
+Engine.manageRespawn = function(){
+    Engine.showMarker();
+    Engine.dead = false;
+    Engine.updateAllOrientationPins();
 };
 
 Engine.pruneOrientationPins = function(){
@@ -858,6 +860,13 @@ Engine.makeUI = function(){
         UI.tooltip.display();
     });
     bug.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
+
+    Engine.camlockIcon = UI.scene.add.image(850, 50, 'camlock');
+    Engine.camlockIcon.setScrollFactor(0);
+    Engine.camlockIcon.setInteractive();
+    Engine.camlockIcon.setDepth(10);
+
+    Engine.camlockIcon.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
 
     Engine.miniMap = new MiniMap();
     Engine.setlCapsule = new SettlementCapsule(950,3);
@@ -1771,8 +1780,20 @@ Engine.getIngredientsPanel = function(){
 Engine.toggleCamLock = function(){
     if(Engine.camLock){
         Engine.camera.stopFollow();
+        Engine.camlockIcon.on('pointerover',function(){
+            var msg = 'Free camera';
+            UI.tooltip.updateInfo('free',{body: msg});
+            UI.tooltip.display();
+        });
+        Engine.camlockIcon.setTexture('camunlock');
     }else{
         Engine.camera.startFollow(Engine.player);
+        Engine.camlockIcon.on('pointerover',function(){
+            var msg = 'Camera locked on player';
+            UI.tooltip.updateInfo('free',{body: msg});
+            UI.tooltip.display();
+        });
+        Engine.camlockIcon.setTexture('camlock');
     }
     Engine.camLock = !Engine.camLock;
 };
@@ -1792,7 +1813,6 @@ Engine.addHero = function(data){
     // Engine.camera.stopFollow();
     // Engine.camera.centerOn(Engine.player.x, Engine.player.y);
     // Engine.focusPlayer();
-    Engine.toggleCamLock();
 
     //Engine.camera.setDeadzone(7*32,5*32);
     Engine.camera.setLerp(0.1);
@@ -2066,7 +2086,6 @@ Engine.update = function(){
     var p = Engine.scene.input.activePointer.position;
     if(p.x == 0 && p.y == 0) return;
     var margin = 10;
-    // var speed = 10;
     var dx = 0;
     var dy = 0;
     if(p.x < margin || Engine.cursors.left.isDown ||(Engine.WASD.A.isDown && !Engine.chatBar.displayed)){
@@ -2081,7 +2100,7 @@ Engine.update = function(){
     }
     if(dx == 0 && dy == 0) return;
     Engine.scrollCamera(dx,dy);
-    // Engine.camera.setScroll(dx, dy);
+    Engine.updateAllOrientationPins();
 };
 
 Engine.scrollCamera = function(dx,dy){
@@ -2447,6 +2466,10 @@ window.debugEngine = function(){
 
 window.debugPointer = function(){
     console.log(Engine.scene.input.activePointer);
+};
+
+window.debugCamera = function(){
+    console.log(Engine.camera);
 };
 
 window.cl = function(){

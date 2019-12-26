@@ -69,7 +69,7 @@ var Item = new Phaser.Class({
     },
 
     manageOrientationPin: function(){
-        if(Engine.isInView(this.tileX,this.tileY)) {
+        if(Engine.camera.cull([this]).length){
             this.orientationPin.hide();
         }else{
             this.orientationPin.update(this.tileX,this.tileY);

@@ -99,11 +99,6 @@ Bugs:
 - Bugs with movements and battle intercepts + new movement system
 -> Server sends intercept, player stops and sends his position?
 Feedback:
-- Camera work
--> Right click to center on player
--> Togglable lock mode?
--> Update mouse cursor when moving cam
--> Update orientation pins when camera move, NOT when player move anymore
 Features:
 - Add twitter to game links
 - Test new character sprite
