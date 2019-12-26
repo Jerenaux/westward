@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./editor/editor.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -165,6 +165,17 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _sha
 
 "use strict";
 eval("__webpack_require__.r(__webpack_exports__);\n/**\n * Created by Jerome on 14-10-17.\n */\n\nvar World = {};\n\nWorld.setUp = function(nbHoriz,nbVert,chunkW,chunkH,tileW,tileH){\n    World.nbChunksHorizontal = nbHoriz;\n    World.nbChunksVertical = nbVert;\n    World.chunkWidth = chunkW;\n    World.chunkHeight = chunkH;\n    World.tileWidth = tileW || 32;\n    World.tileHeight = tileH || 32;\n    World.computeProperties();\n};\n\nWorld.readMasterData = function(data){\n    World.setUp(\n        data.nbChunksHoriz,data.nbChunksVert,\n        data.chunkWidth,data.chunkHeight\n    );\n};\n\nWorld.computeProperties = function(){\n    World.worldWidth = World.chunkWidth*World.nbChunksHorizontal;\n    World.worldHeight = World.chunkHeight*World.nbChunksVertical;\n    World.lastChunkID = World.nbChunksHorizontal*World.nbChunksVertical - 1;\n    console.log('Set up world of size '+World.worldWidth+' x '+World.worldHeight);\n};\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (World);\n\n//# sourceURL=webpack:///./shared/World.js?");
+
+/***/ }),
+
+/***/ 1:
+/*!********************************!*\
+  !*** multi ./editor/editor.js ***!
+  \********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("module.exports = __webpack_require__(/*! ./editor/editor.js */\"./editor/editor.js\");\n\n\n//# sourceURL=webpack:///multi_./editor/editor.js?");
 
 /***/ })
 

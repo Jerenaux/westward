@@ -88,6 +88,7 @@ Menu.prototype.display = function(){
     if(UI.inPanel) UI.currentPanel.hide();
     if(Engine.chatBar && Engine.chatBar.displayed) Engine.chatBar.hide();
     if(Engine.player.moving) Engine.player.selfStop();
+    Engine.camlockIcon.setVisible(false);
 
     if(!Engine.inBuilding && this.title) this.title.display();
     if(this.sound) this.sound.play();
@@ -121,6 +122,7 @@ Menu.prototype.hide = function(){
         this.panels[panel].hide();
     }
     if(Engine.repairPanel.displayed) Engine.repairPanel.hide();
+    Engine.camlockIcon.setVisible(true);
 
     this.trigger('onClose');
 

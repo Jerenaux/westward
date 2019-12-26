@@ -76,8 +76,13 @@ var OrientationPin = new Phaser.Class({
 
     update: function(x,y){
         // TODO: projection gets wrong when using camera deadzone!
-        x -= Engine.player.tileX;
-        y -= Engine.player.tileY;
+        var camx = Math.floor(Engine.camera._scrollX + Engine.camera.width/2)/32;
+        var camy = Math.floor(Engine.camera._scrollY + Engine.camera.height/2)/32;
+        // console.log(camx, camy, Engine.player.tileX, Engine.player.tileY);
+        // x -= Engine.player.tileX;
+        // y -= Engine.player.tileY;
+        x -= camx;
+        y -= camy;
         x += 0.5;
         y += 0.5;
         //var m = y/x;  slope

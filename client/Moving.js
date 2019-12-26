@@ -78,7 +78,7 @@ var Moving = new Phaser.Class({
     },
 
     manageOrientationPin: function(){
-        if(this.isHero) return;
+        // if(this.isHero) return;
         if(!this.orientationPin) return;
 
         if(this.dead) {
@@ -86,8 +86,9 @@ var Moving = new Phaser.Class({
             return;
         }
 
-        var c = this.getCenter();
-        if(Engine.isInView(c.x,c.y)) {
+        // var c = this.getCenter();
+        // if(Engine.isInView(c.x,c.y)) {
+        if(Engine.camera.cull([this]).length){
             this.orientationPin.hide();
         }else{
             this.orientationPin.update(this.tileX,this.tileY);
