@@ -866,6 +866,7 @@ Engine.makeUI = function(){
     Engine.camlockIcon.setInteractive();
     Engine.camlockIcon.setDepth(10);
 
+    Engine.camlockIcon.on('pointerup',Engine.toggleCamLock);
     Engine.camlockIcon.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
 
     Engine.miniMap = new MiniMap();
