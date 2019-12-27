@@ -10,8 +10,6 @@ var ObjectId = require('mongodb').ObjectID;
 var mongoose = require('mongoose');
 var config = require('config');
 var Voronoi = require('voronoi');
-//TODO: conf
-var slack = require('slack-notify')('https://hooks.slack.com/services/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');
 
 var GameServer = {
     lastPlayerID: 0,
@@ -199,54 +197,15 @@ GameServer.readMap = function(mapsPath,test,cb){
 };
 
 GameServer.sendSlackNotification = function(msg, icon){
-    if(process.env.SUPPRESS_SLACK) return;
-    slack.send({
+    // if(process.env.SUPPRESS_SLACK) return;
+    GameServer.server.slack.send({
         channel: '#westward-status',
         icon_emoji: icon || 'game_die',
         text: msg,
         username: (icon == 'warning' ? 'Error-bot' : 'Westward-bot')
     });
-
-    // const data = JSON.stringify({
-    //     icon_emoji: 'game_die',
-    //     text: msg,
-    //     username: 'Westward-bot'
-    //   });
-    //
-    //   const options = {
-    //     hostname: 'hooks.slack.com',
-    //     path: '/services/T54PW6PPC/BPEEUQPDF/N5JC1aUByPJ0aopuTvViQ6vq',
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       'Content-Length': data.length
-    //     }
-    //   }
-    //
-    //   const req = https.request(options, res => {
-    //     // console.log(`statusCode: ${res.statusCode}`)
-    //
-    //     // res.on('data', d => {
-    //     //   process.stdout.write(d)
-    //     // })
-    //   })
-    //
-    //   req.on('error', error => {
-    //     console.error(error)
-    //   })
-    //
-    //   req.write(data)
-    //   req.end()
 };
 
-/*GameServer.registerAbilityHooks = function(){
-    GameServer.abilityHooks = {};
-    for(var aid in GameServer.abilitiesData){
-        var data = GameServer.abilitiesData[aid];
-        if(!(data.hook in GameServer.abilityHooks)) GameServer.abilityHooks[data.hook] = [];
-        GameServer.abilityHooks[data.hook].push(aid);
-    }
-};*/
 
 /**
  * Set up a dict of boolean variables indicating whether some global changes have occurred
