@@ -14,7 +14,6 @@ var myArgs = require('optimist').argv;
 console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
 console.log('Environment vars:', process.env);
 
-// var slack = require('slack-notify')('https://hooks.slack.com/services/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');
 server.slack = require('slack-notify')(process.env.SLACK_URL);
 
 import GameServer from './server/GameServer'

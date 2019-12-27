@@ -198,6 +198,7 @@ GameServer.readMap = function(mapsPath,test,cb){
 
 GameServer.sendSlackNotification = function(msg, icon){
     // if(process.env.SUPPRESS_SLACK) return;
+    if(!GameServer.server.slack) return; // Happens when running tests
     GameServer.server.slack.send({
         channel: '#westward-status',
         icon_emoji: icon || 'game_die',
