@@ -18,8 +18,7 @@ module.exports = {
         'client':'./client/main.js',
         'editor':'./editor/editor.js',
         'server':'./server.js',
-        'test': './test/tests.js',
-        'worldMaker':'./tools/worldMaker.js'
+        'test': './test/tests.js'
     },
     output: {
         filename: "[name].js",
