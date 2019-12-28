@@ -71,7 +71,7 @@ SpawnZone.prototype.update = function(){
 };
 
 SpawnZone.prototype.spawn = function(){
-    console.log(`Spawning ${this.animal} at ${this.x} ${this.y}`);
+    // console.log(`Spawning ${this.animal} at ${this.x} ${this.y}`);
     var animal = GameServer.addAnimal(this.x, this.y, this.animal);
     animal.setSpawnZone(this);
     this.population++;

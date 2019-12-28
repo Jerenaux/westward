@@ -12,6 +12,9 @@ var mongoose = require('mongoose');
 var myArgs = require('optimist').argv;
 
 console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
+console.log('Environment vars:', process.env);
+
+server.slack = require('slack-notify')(process.env.SLACK_URL);
 
 import GameServer from './server/GameServer'
 GameServer.server = server;

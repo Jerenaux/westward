@@ -145,6 +145,8 @@ Engine.preload = function() {
 
     // Misc
     this.load.image('bug', 'assets/sprites/bug.png');
+    this.load.image('camlock', 'assets/sprites/camlock.png');
+    this.load.image('camunlock', 'assets/sprites/camunlock.png');
     this.load.atlas('orientation', 'assets/sprites/orientation.png', 'assets/sprites/orientation.json');
     this.load.image('tail', 'assets/sprites/tail.png');
     this.load.image('scrollbgh', 'assets/sprites/scroll.png');
@@ -332,6 +334,17 @@ Engine.create = function(){
     Engine.scene.input.on('pointerout', Engine.handleOut);
     Engine.scene.input.on('drag', Engine.handleDrag);
     Engine.scene.input.keyboard.on('keydown', Engine.handleKeyboard);
+    Engine.cursors = Engine.scene.input.keyboard.createCursorKeys();
+    Engine.addWASD();
+    Engine.camLock = false;
+
+    Engine.mouseIn = true;
+    Engine.scene.game.canvas.onmouseenter = function(){
+        Engine.mouseIn = true;
+    };
+    Engine.scene.game.canvas.onmouseout = function(){
+        Engine.mouseIn = false;
+    };
 
     Engine.collisions = new SpaceMap();
     Engine.overlay = new SpaceMap();
@@ -366,6 +379,15 @@ Engine.create = function(){
     Client.requestData();
 };
 
+Engine.addWASD = function(){
+    Engine.WASD = {
+        'W': Engine.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+        'A': Engine.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+        'S': Engine.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+        'D': Engine.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
+    };
+};
+
 Engine.getGameInstance = function(){
     return Engine.scene.sys.game;
 };
@@ -397,12 +419,12 @@ Engine.initWorld = function(data){
     Engine.firstSelfUpdate = true;
 
     console.log(data);
-    //Engine.settlementsData = data.settlements;
     Engine.addHero(data);
     Engine.playerIsInitialized = true;
     Engine.updateEnvironment();
 
     Engine.makeUI();
+    Engine.toggleCamLock();
 
     Engine.setlCapsule.setText(regionsData[data.region].name);
 
@@ -411,8 +433,8 @@ Engine.initWorld = function(data){
     if(Engine.miniMap) Engine.miniMap.display();
 
     if(Client.isNewPlayer() && !Client.tutorial) {
-        var w = 400;
-        var h = 290;
+        var w = 480;
+        var h = 380;
         var panel = new InfoPanel((UI.getGameWidth() - w) / 2, (UI.getGameHeight() - h) / 2, w, h, 'Welcome');
         panel.setWrap(20);
 
@@ -613,16 +635,15 @@ Engine.createAnimation = function(key,texture,start,end,rate,loop,revert){
 Engine.toggleChatBar = function(){
     if(Engine.inMenu && !BattleManager.inBattle) return;
     Engine.chatBar.toggle();
+    if(Engine.chatBar.displayed){
+        Engine.scene.input.keyboard.disableGlobalCapture();
+    }else{
+        Engine.scene.input.keyboard.enableGlobalCapture();
+    }
 };
 
 Engine.manageDeath = function(){
     Engine.dead = true;
-};
-
-Engine.manageRespawn = function(){
-    Engine.showMarker();
-    Engine.dead = false;
-    Engine.updateAllOrientationPins();
 };
 
 Engine.updateAllOrientationPins = function(){
@@ -648,6 +669,12 @@ Engine.updateAllOrientationPins = function(){
     Engine.entityManager.displayLists['player'].forEach(function(pid){
         Engine.players[pid].manageOrientationPin();
     });
+};
+
+Engine.manageRespawn = function(){
+    Engine.showMarker();
+    Engine.dead = false;
+    Engine.updateAllOrientationPins();
 };
 
 Engine.pruneOrientationPins = function(){
@@ -833,6 +860,14 @@ Engine.makeUI = function(){
         UI.tooltip.display();
     });
     bug.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
+
+    Engine.camlockIcon = UI.scene.add.image(850, 50, 'camlock');
+    Engine.camlockIcon.setScrollFactor(0);
+    Engine.camlockIcon.setInteractive();
+    Engine.camlockIcon.setDepth(10);
+
+    Engine.camlockIcon.on('pointerup',Engine.toggleCamLock);
+    Engine.camlockIcon.on('pointerout',UI.tooltip.hide.bind(UI.tooltip));
 
     Engine.miniMap = new MiniMap();
     Engine.setlCapsule = new SettlementCapsule(950,3);
@@ -1743,11 +1778,43 @@ Engine.getIngredientsPanel = function(){
     return Engine.menus['crafting'].panels['ingredients'];
 };
 
+Engine.toggleCamLock = function(){
+    if(Engine.camLock){
+        Engine.camera.stopFollow();
+        Engine.camlockIcon.on('pointerover',function(){
+            var msg = 'Free camera';
+            UI.tooltip.updateInfo('free',{body: msg});
+            UI.tooltip.display();
+        });
+        Engine.camlockIcon.setTexture('camunlock');
+    }else{
+        Engine.camera.startFollow(Engine.player);
+        Engine.camlockIcon.on('pointerover',function(){
+            var msg = 'Camera locked on player';
+            UI.tooltip.updateInfo('free',{body: msg});
+            UI.tooltip.display();
+        });
+        Engine.camlockIcon.setTexture('camlock');
+    }
+    Engine.camLock = !Engine.camLock;
+};
+
+Engine.focusPlayer = function(){
+    // Engine.camera.centerOn(Engine.player.x, Engine.player.y);
+    // Engine.camera.pan(Engine.player.x, Engine.player.y);
+    Engine.camera.startFollow(Engine.player);
+};
+
 Engine.addHero = function(data){
     // data comes from the initTrim()'ed packet of the player
     Engine.player = new Hero();
     Engine.player.setUp(data);
-    Engine.camera.startFollow(Engine.player); // leave outside of constructor
+
+    // Engine.camera.startFollow(Engine.player); // leave outside of constructor
+    // Engine.camera.stopFollow();
+    // Engine.camera.centerOn(Engine.player.x, Engine.player.y);
+    // Engine.focusPlayer();
+
     //Engine.camera.setDeadzone(7*32,5*32);
     Engine.camera.setLerp(0.1);
     /*var graphics = Engine.scene.add.graphics().setScrollFactor(0);
@@ -1773,6 +1840,12 @@ Engine.updateEnvironment = function(){
     for(var j = 0; j < newChunks.length; j++){
         Engine.displayChunk(newChunks[j]);
     }
+
+    var tl = Utils.getAOIcorners(Engine.player.chunk)[0];
+    var l = (tl.x-World.chunkWidth)*32;
+    var t = (tl.y-World.chunkHeight)*32;
+    Engine.camera.setBounds(l,t,World.chunkWidth*3*32,World.chunkHeight*3*32);
+    console.log(Engine.camera.getBounds());
 };
 
 Engine.displayChunk = function(id){
@@ -1826,7 +1899,17 @@ Engine.handleKeyboard = function(event){
         Engine.currentTutorialPanel.handleKeyboard(event);
         return;
     }
-    if(event.key == 'Enter') Engine.toggleChatBar();
+    console.log(event);
+    switch(event.key){
+        case 'Enter':
+            Engine.toggleChatBar();
+            break;
+        case ' ':
+            console.log('Space');
+            // if(!Engine.chatBar.displayed && !Engine.inMenu) Engine.focusPlayer();
+            if(!Engine.chatBar.displayed && !Engine.inMenu) Engine.toggleCamLock();
+            break;
+    }
 };
 
 Engine.handleDown = function(pointer,objects){
@@ -1948,7 +2031,7 @@ Engine.getMouseCoordinates = function(pointer){
     };
 };
 
-Engine.isInView = function(x,y){
+Engine.isInView = function(x,y){ // TODOP: use camera.cull() instead
     if(x < Engine.player.tileX - Engine.viewWidth/2) return false;
     if(x >= Engine.player.tileX + Engine.viewWidth/2) return false;
     if(y < Engine.player.tileY - Engine.viewHeight/2) return false;
@@ -1998,9 +2081,38 @@ Engine.updateSelf = function(data){
     Engine.player.updateData(data);
 };
 
+//UPDT
 Engine.update = function(){
-
+    if(Engine.camLock) return;
+    var p = Engine.scene.input.activePointer.position;
+    if(p.x == 0 && p.y == 0) return;
+    var margin = 10;
+    var dx = 0;
+    var dy = 0;
+    if(p.x < margin || Engine.cursors.left.isDown ||(Engine.WASD.A.isDown && !Engine.chatBar.displayed)){
+        dx = -1;
+    }else if(p.x > UI.getGameWidth() - margin || Engine.cursors.right.isDown || (Engine.WASD.D.isDown && !Engine.chatBar.displayed)){
+        dx = 1;
+    }
+    if(p.y < margin || Engine.cursors.up.isDown || (Engine.WASD.W.isDown && !Engine.chatBar.displayed)){
+        dy = -1;
+    }else if(p.y > UI.getGameHeight() - margin || Engine.cursors.down.isDown || (Engine.WASD.S.isDown && !Engine.chatBar.displayed)){
+        dy = 1;
+    }
+    if(dx == 0 && dy == 0) return;
+    Engine.scrollCamera(dx,dy);
+    Engine.updateAllOrientationPins();
 };
+
+Engine.scrollCamera = function(dx,dy){
+    var speed = 10;
+    dx *= 10;
+    dy *= 10;
+    var x = Engine.camera.worldView.x;
+    var y = Engine.camera.worldView.y;
+    Engine.camera.setScroll(x+dx, y+dy);
+}
+
 //TODO: compute once
 Engine.getAnimalData = function(type){
     var animalData = animalsData[type];
@@ -2150,7 +2262,7 @@ Engine.enterBuilding = function(id){
 
 Engine.exitBuilding = function(){
     Engine.player.setVisible(true);
-    Engine.camera.startFollow(Engine.player);
+    // Engine.camera.startFollow(Engine.player);
     Engine.inBuilding = false;
     Engine.currentBuiling = null;
     Engine.currentMenu.hide();
@@ -2347,6 +2459,18 @@ window.debugOverlay = function(x,y){
 
 window.debugPlayer = function(){
     console.log(Engine.player);
+};
+
+window.debugEngine = function(){
+    console.log(Engine);
+};
+
+window.debugPointer = function(){
+    console.log(Engine.scene.input.activePointer);
+};
+
+window.debugCamera = function(){
+    console.log(Engine.camera);
 };
 
 window.cl = function(){

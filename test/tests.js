@@ -35,7 +35,6 @@ import GameServer from '../server/GameServer'
 describe('GameServer',function(){
     var stubs = [];
     before(function(done) {
-        process.env.SUPPRESS_SLACK = true;
         this.timeout(10000);
         mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/westward', { useNewUrlParser: true });
         var db = mongoose.connection;
