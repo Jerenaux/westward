@@ -20,10 +20,10 @@ For more insight into the evolution of the project, check out the [dev logs](htt
 
 ## Community
 
-To remain informed about the project, follow me on Twitter: [@jerome_renaux](https://twitter.com/jerome_renaux).
-For actual conversations about the project, visit the [Slack](https://join.slack.com/t/dynetisgames/shared_invite/enQtMTc0NzU2MjgzNDExLTNiMTMwNDJmMGQ1Y2FjM2ZhYTFhMGYzNWEyYmE3MjQ2YzAyNzYwYjQyODllZTZlYzM3ZDM0MGRiMGQyNjIxNWM)
-or [Discord](https://discord.gg/NzUnS7F) channels.
-For short feedback bursts, why not dropping a [Stomt](https://www.stomt.com/westward)? 
+- [Twitter (@jerome_renaux)](https://twitter.com/jerome_renaux)
+- [Slack](https://join.slack.com/t/dynetisgames/shared_invite/enQtMTc0NzU2MjgzNDExLTNiMTMwNDJmMGQ1Y2FjM2ZhYTFhMGYzNWEyYmE3MjQ2YzAyNzYwYjQyODllZTZlYzM3ZDM0MGRiMGQyNjIxNWM)
+- [Discord](https://discord.gg/NzUnS7F)
+- [Stomt](https://www.stomt.com/westward)
 
 ## Getting Started
 
