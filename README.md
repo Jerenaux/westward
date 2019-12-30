@@ -1,6 +1,6 @@
 # Westward
 
-Westward is an open-source aspiring MMORPG written in Javascript. 
+Westward is an open-source aspiring MMORPG written in Javascript. The latest version of the game is accessible at all times at [www.westward-online.com/](http://www.westward-online.com/).
 
 **Disclaimer**: Westward began as a closed-source project, and has grown that way for more than 2 years. As a result, the current codebase
 is messy and not very collaboration-friendly. Documentation is sorely missing, the tests are a mess, and the code itself looks like
