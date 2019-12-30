@@ -33,7 +33,7 @@ At some point a Docker image should be rolled out to facilitate that process (fe
 ### Prerequisites
 
 - A recent version of Node.js
-- A MongoDB instance listening on port 27017
+- A MongoDB instance listening on port `27017`
 
 ### Installing
 
