@@ -82,7 +82,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 * **[Jérôme Renaux](https://github.com/Jerenaux)** - *Initial work, project maintainer* 
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](AUTHORS.md) who participated in this project.
 
 ## License
 
