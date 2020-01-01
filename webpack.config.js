@@ -37,14 +37,13 @@ module.exports = {
 
     devServer: {
         port: 8080,
-        /*
          // Redirect requests to WDS (8080) to Node server (8081)
         proxy: {
-            '*': {
+            '/socket.io': {
                 target: 'http://localhost:8081/',
                 secure: false
             }
-        },*/
+        },
         publicPath: '/dist'
     },
 

@@ -24,10 +24,10 @@
   "scripts": {
     "browser-sync": "browser-sync start --config bs-config.js",
     "build": "webpack",
-    "dev": "concurrently \"npm run watch:server\" \"npm run watch:client\"",
     "test": "mocha ./dist/test.js",
-    "watch:server": "nodemon ./dist/server.js",
-    "watch": "webpack-dev-server"
+    "watch": "concurrently \"npm run watch:webpack\" \"npm run watch:nodemon\"",
+    "watch:nodemon": "nodemon ./dist/server.js",
+    "watch:webpack": "webpack-dev-server"
   },
   "engines": {
     "npm": "^5.7.1"
