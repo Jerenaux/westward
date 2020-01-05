@@ -51,6 +51,30 @@ file is missing.
 touch .env
 ```
 
+## Running the game
+
+The most straightforward way ton run the game server is to do:
+
+```
+node dist/server.js
+```
+
+Then navigate to `localhost:8081` to play the game.
+
+If you make modifications to the game, don't forget to rebuild it using webpack, which you can do by running:
+
+```
+npm run webpack
+```
+
+Alternatively you can run `webpack-dev-server` to automatically watch for changes and rebuild when changes are detected. You can do so by running:
+
+```
+npm run watch:webpack
+```
+
+The file `package.json` defines all the `npm run ...` commands that are available. Feel free to add more if you think that would be useful!
+
 ## Running the tests
 
 Some tests have been set up, mainly focusing on testing the client/server API and some internal server functions. They can be run as follows:
