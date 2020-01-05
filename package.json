@@ -32,7 +32,7 @@
   "engines": {
     "npm": "^5.7.1"
   },
-  "author": "",
+  "author": "Jerome Renaux <jerome.renaux@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "chai": "^4.2.0",
