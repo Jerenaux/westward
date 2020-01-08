@@ -21,7 +21,9 @@ Once you are more **familiar** with the project, your contributions could look l
 - New features
 - Writing up documentation
 
-If you are unsure what to work on, check out the [issues section](https://github.com/Jerenaux/westward/issues) which at all times contains a list of identified bugs, feature requests and various other needs of the project.
+If you are unsure what to work on, check out the [issues section](https://github.com/Jerenaux/westward/issues) which at all times contains a list of identified bugs, feature requests and various other needs of the project. 
+
+Feel free to react to feature requests with emojis to indicate your interest in them, or to comment on them in order to help shape them. This is also a valuable contribution!
 
 If you have **artistic** skills, you are also very welcome to contribute in that way, full credit will be given.
 
