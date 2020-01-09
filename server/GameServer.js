@@ -196,8 +196,15 @@ GameServer.readMap = function(mapsPath,test,cb){
 
 };
 
+/**
+ * Send a notification to a Slack workspace to be displayed in some channel. Useful for alerts
+ * and monitoring of the game.
+ * For this to work, as `SLACK_URL` environment variable must be defined in the `.env` file, indicating
+ * the URL of the Slack webhook to send the notifications to.
+ * @param {String} msg - The text of the notification to send.
+ * @param {String} icon - The  label of the Slack icon to use for the notification.
+ */
 GameServer.sendSlackNotification = function(msg, icon){
-    // if(process.env.SUPPRESS_SLACK) return;
     if(!GameServer.server.slack) return; // Happens when running tests
     GameServer.server.slack.send({
         channel: '#westward-status',
@@ -352,9 +359,14 @@ GameServer.readPlayersData = function(){
     });
 };
 
+/**
+ * Parse the values retrieved from the database regarding player equipment and
+ * ensure that it's in the right [item_id, item_nb] format.
+ * @param data - the equipment data for one equipment slot, as retrieved from the database
+ * @returns {[number, number]} - a pair of item ID and number equipped
+ */
 GameServer.parseEquipmentDb = function(data){
     if(data == -1) return [-1, 0];
-    // console.warn('ITEM:',item);
     // fix corrupt item data due to development
     if(typeof data == 'object'){
         if (typeof data.id == 'object') {
@@ -369,15 +381,6 @@ GameServer.parseEquipmentDb = function(data){
         return [parseInt(data), 1];
     }
 };
-
-/**
- * Load regions data.
- * Called by the initialization sequence.
- */
-/*GameServer.loadRegions = function(){
-    GameServer.regions = JSON.parse(fs.readFileSync(pathmodule.join('assets','data','regions.json')).toString());
-    GameServer.updateStatus();
-};*/
 
 /**
  * Add a building to the game world.
@@ -417,12 +420,21 @@ GameServer.loadBuildings = function(){
     });
 };
 
+/**
+ * Iterate over Region objects and call their `update()` method. Called
+ * at the end of the initialization sequence to make sure the internal counts
+ * of each region are up-to-date.
+ */
 GameServer.updateRegions = function(){
     for(var id in GameServer.regions){
         GameServer.regions[id].update();
     }
 };
 
+/**
+ * Gather trimmed versions of all regions in a list to be sent to the client.
+ * @returns {[]} - a list of small objects, one per region, containing only the fields relevant for the clients.
+ */
 GameServer.getRegionsStatus = function(){
     var regions = [];
     for(var id in GameServer.regions){
@@ -517,17 +529,6 @@ GameServer.loadMarkers = function(){
     });
 };
 
-GameServer.getItemsFromDBUpdateCache = function () {
-    const items = ['edno', 'dve'];
-    const dataAssets = pathmodule.join('assets','data');
-    const outPath = pathmodule.join(dataAssets,'/exports/items.json').toString();
-    // Items
-    fs.writeFile(outPath,JSON.stringify(items),function(err){
-        if(err) throw err;
-        console.log('Items cache written');
-    });
-};
-
 /**
  * Create Spawn Zones based on the spawnzones.json data file.
  * Called during the initialization sequence.
@@ -552,6 +553,10 @@ GameServer.setUpSpawnZones = function(){
     GameServer.updateStatus();
 };
 
+/**
+ * Final step of the initialization sequence, performs a few last operations that
+ * depend on the previous steps being completed. After that step, the game server is ready!
+ */
 GameServer.finalStep = function(){
     var hrstart = process.hrtime();
     GameServer.updateFoW();
