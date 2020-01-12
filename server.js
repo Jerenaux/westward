@@ -181,7 +181,7 @@ if(process.env.DEV == 1) {
 server.listen(process.env.PORT || myArgs.port || 8081,function(){
     console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
     console.log('Listening on '+server.address().port);
-    console.log('Config environment: '+(process.env.NODE_CONFIG_ENV || 'default'));
+    console.log('Config environment: '+config.util.getEnv());
 
     let mongodbAuth = {
         useNewUrlParser: true
