@@ -8,7 +8,6 @@ var pathmodule = require('path');
 var clone = require('clone'); // used to clone objects, essentially used for clonicg update packets
 var ObjectId = require('mongodb').ObjectID;
 var mongoose = require('mongoose');
-var config = require('config');
 var Voronoi = require('voronoi');
 
 var GameServer = {
@@ -105,6 +104,10 @@ GameServer.createModels = function(){
  */
 GameServer.readMap = function(mapsPath,test,cb){
     var hrstart = process.hrtime();
+
+    GameServer.config = require('config');
+    console.log('Using config environment: '+process.env.NODE_CONFIG_ENV);
+
     if(test){
         GameServer.initializationMethods = {
             'static_data': null,
@@ -154,21 +157,21 @@ GameServer.readMap = function(mapsPath,test,cb){
     GameServer.tutorialData = JSON.parse(fs.readFileSync(pathmodule.join(dataAssets,'tutorials.json')).toString()); // './assets/data/texts.json'
     GameServer.instances = {};
 
-    GameServer.enableAnimalWander = config.get('wildlife.wander');
-    GameServer.enableCivWander = config.get('civs.wander');
-    GameServer.enableAnimalAggro = config.get('wildlife.aggro');
-    GameServer.enableCivAggro = config.get('civs.aggro');
-    GameServer.enableBattles = config.get('battle.enabled');
-    GameServer.classes = config.get('classes');
-    GameServer.battleParameters = config.get('battle');
-    GameServer.buildingParameters = config.get('buildings');
-    GameServer.characterParameters = config.get('character');
-    GameServer.miscParameters = config.get('misc');
-    GameServer.PFParameters = config.get('pathfinding');
-    GameServer.wildlifeParameters = config.get('wildlife');
-    GameServer.civsParameters = config.get('civs');
+    GameServer.enableAnimalWander = GameServer.config.get('wildlife.wander');
+    GameServer.enableCivWander = GameServer.config.get('civs.wander');
+    GameServer.enableAnimalAggro = GameServer.config.get('wildlife.aggro');
+    GameServer.enableCivAggro = GameServer.config.get('civs.aggro');
+    GameServer.enableBattles = GameServer.config.get('battle.enabled');
+    GameServer.classes = GameServer.config.get('classes');
+    GameServer.battleParameters = GameServer.config.get('battle');
+    GameServer.buildingParameters = GameServer.config.get('buildings');
+    GameServer.characterParameters = GameServer.config.get('character');
+    GameServer.miscParameters = GameServer.config.get('misc');
+    GameServer.PFParameters = GameServer.config.get('pathfinding');
+    GameServer.wildlifeParameters = GameServer.config.get('wildlife');
+    GameServer.civsParameters = GameServer.config.get('civs');
 
-    GameServer.clientParameters = config.get('client');
+    GameServer.clientParameters = GameServer.config.get('client');
 
     GameServer.collisions = new SpaceMap();
     // GameServer.collisions.fromList(JSON.parse(fs.readFileSync(pathmodule.join(mapsPath,'collisions.json')).toString()),true); // true = compact
@@ -398,7 +401,7 @@ GameServer.addBuilding = function(data){
  */
 GameServer.loadBuildings = function(){
     var hrstart = process.hrtime();
-    if(config.get('buildings.nobuildings')){
+    if(GameServer.config.get('buildings.nobuildings')){
         GameServer.updateStatus();
         return;
     }
@@ -534,7 +537,7 @@ GameServer.getItemsFromDBUpdateCache = function () {
  */
 GameServer.setUpSpawnZones = function(){
     var hrstart = process.hrtime();
-    if(config.get('wildlife.nolife')) return;
+    if(GameServer.config.get('wildlife.nolife')) return;
 
     GameServer.spawnZones = [];
     animalsClusters.forEach(function(animal){
@@ -668,7 +671,7 @@ GameServer.addItem = function(x,y,type,instance){
  * Perform tasks once the initialization sequence is over. Mostly used for testing.
  */
 GameServer.onInitialized = function(){
-    if(!config.get('misc.performInit')) return;
+    if(!GameServer.config.get('misc.performInit')) return;
     GameServer.addAnimal(691,586,1);
 };
 
@@ -679,7 +682,7 @@ GameServer.onNewPlayer = function(player){
     // Following line is used to prevent this function from
     // running in production (this function should only be used
     // for testing)
-    if(!config.get('misc.performInit')) return;
+    if(!GameServer.config.get('misc.performInit')) return;
     // give me all the health and vigor
 
     // player.setStat('vigor', 10);
@@ -704,7 +707,7 @@ GameServer.onNewPlayer = function(player){
 GameServer.setUpdateLoops = function(){
     console.log('Setting up loops...');
 
-    GameServer.NPCupdateRate = config.get('updateRates.wander');
+    GameServer.NPCupdateRate = GameServer.config.get('updateRates.wander');
 
     var loops = {
         'client': GameServer.updateClients, // send update to clients
@@ -715,7 +718,7 @@ GameServer.setUpdateLoops = function(){
 
     for(var loop in loops){
         if(!(typeof loops[loop] === 'function')) console.warn('No valid function for',loop);
-        setInterval(loops[loop],config.get('updateRates.'+loop));
+        setInterval(loops[loop],GameServer.config.get('updateRates.'+loop));
     }
     console.log('Loops set');
 };
@@ -725,7 +728,7 @@ GameServer.setUpdateLoops = function(){
  * Called one the initialization sequence is over.
  */
 GameServer.startEconomy = function(){
-    GameServer.economyTurns = config.get('economyCycles.turns');
+    GameServer.economyTurns = GameServer.config.get('economyCycles.turns');
     GameServer.elapsedTurns = -1; // start at -1 since  `GameServer.economyTurn()` is called straight away and increments counter
     var maxDuration = 0;
     for(var event in GameServer.economyTurns){
@@ -735,7 +738,7 @@ GameServer.startEconomy = function(){
     GameServer.maxTurns = Math.max(maxDuration,300);
 
     GameServer.economyTurn();
-    GameServer.turnDuration = config.get('economyCycles.turnDuration');
+    GameServer.turnDuration = GameServer.config.get('economyCycles.turnDuration');
     setInterval(GameServer.economyTurn,GameServer.turnDuration*1000);
 };
 
@@ -939,7 +942,7 @@ GameServer.finalizePlayer = function(socket,player){
 GameServer.createInitializationPacket = function(playerID){
     // Create the packet that the client will receive from the server in order to initialize the game
     return {
-        //config: config.get('client.config'),
+        //config: GameServer.config.get('client.config'),
         nbconnected: GameServer.server.getNbConnected(),
         player: GameServer.players[playerID].initTrim(), // info about the player
         refTime: Date.now()
