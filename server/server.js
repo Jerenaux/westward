@@ -16,7 +16,7 @@ console.log('Environment vars:', process.env);
 
 server.slack = require('slack-notify')(process.env.SLACK_URL);
 
-import GameServer from './server/GameServer'
+import GameServer from './GameServer'
 GameServer.server = server;
 
 app.use(function (req, res, next) {
