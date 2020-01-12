@@ -17,7 +17,7 @@ module.exports = {
     entry: {
         'client':'./client/main.js',
         'editor':'./editor/editor.js',
-        'server':'./server.js',
+        'server':'./server/server.js',
         'test': './test/tests.js'
     },
     output: {
