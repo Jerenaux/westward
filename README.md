@@ -116,6 +116,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Many thanks to the following people for supporting Westward on [Patreon](https://www.patreon.com/jeromerenaux):
 - Sean Pope
+- Flavius Poenaru, currently working on [Kaetram](https://github.com/Veradictus/Kaetram-Open), an open-source 2D HTML5 adventure 
 
 ## Donate
 

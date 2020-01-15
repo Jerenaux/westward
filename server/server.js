@@ -16,7 +16,7 @@ console.log('Environment vars:', process.env);
 
 server.slack = require('slack-notify')(process.env.SLACK_URL);
 
-import GameServer from './server/GameServer'
+import GameServer from './GameServer'
 GameServer.server = server;
 
 app.use(function (req, res, next) {
@@ -181,7 +181,6 @@ if(process.env.DEV == 1) {
 server.listen(process.env.PORT || myArgs.port || 8081,function(){
     console.log(process.memoryUsage().heapUsed/1024/1024,'Mb memory used');
     console.log('Listening on '+server.address().port);
-    console.log('Config environment: '+config.util.getEnv());
 
     let mongodbAuth = {
         useNewUrlParser: true
