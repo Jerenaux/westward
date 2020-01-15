@@ -2,6 +2,8 @@
 
 Thank you for considering contributing to Westward! Here are a few guidelines to help facilitate the experience.
 
+If you plan to make modifications to the source code, check out the :rocket: [Wiki](https://github.com/Jerenaux/westward/wiki), you should find information there that will help you understand the codebase better!
+
 ### Possible contributions
 
 If you are **new** to the project and are looking for small, easy tasks to get acquinted with it, let me suggest:
