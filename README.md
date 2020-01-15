@@ -24,6 +24,7 @@ For more insight into the evolution of the project, check out the [dev logs](htt
 - [Slack](https://join.slack.com/t/dynetisgames/shared_invite/enQtMTc0NzU2MjgzNDExLTNiMTMwNDJmMGQ1Y2FjM2ZhYTFhMGYzNWEyYmE3MjQ2YzAyNzYwYjQyODllZTZlYzM3ZDM0MGRiMGQyNjIxNWM)
 - [Discord](https://discord.gg/NzUnS7F)
 - [Stomt](https://www.stomt.com/westward)
+- :rocket: [The Wiki](https://github.com/Jerenaux/westward/wiki)
 
 ## Getting Started
 
