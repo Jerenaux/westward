@@ -1,0 +1,1 @@
+This directory contains static files reauired by the [Wiki](https://github.com/Jerenaux/westward/wiki)
