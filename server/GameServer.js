@@ -813,7 +813,7 @@ GameServer.getPlayer = function(socketID){
  * Add a new player to the game.
  * @param {Socket} socket - The socket of the connection to the client creating the new player.
  * @param {Object} data - Object containing the data sent by the client (e.g. name, region ...)
- * @returns {Player} The creatd Player object.
+ * @returns {Player} The created Player object.
  */
 GameServer.addNewPlayer = function(socket,data){
     if(data.tutorial) return GameServer.addNewTutorialPlayer(socket, data);
@@ -842,7 +842,12 @@ GameServer.addNewPlayer = function(socket,data){
     return player; // return value for the tests
 };
 
-GameServer.addNewTutorialPlayer = function(socket, data){
+/**
+ * Equivalent of `GameServer.addNewPlayer()`, but for new players in tutorial mode.
+ * @param {Socket} socket - The socket of the connection to the client creating the new player.
+ * @returns {Player} The created Player object.
+ */
+GameServer.addNewTutorialPlayer = function(socket){
     var player = new Player();
     player.setSocketID(socket.id);
     player.setUp(++GameServer.lastPlayerID, 'Newbie');
@@ -884,15 +889,22 @@ GameServer.loadPlayer = function(socket,data){
             player.getDataFromDb(doc);
             if(!data.log) player.disableLogging();
 
-            GameServer.postProcessPlayer(socket,player,doc);
+            GameServer.postProcessPlayer(socket,player);
             Prism.logEvent(player,'connect',{stl:player.region,re:true});
             GameServer.sendSlackNotification('Player '+player.name+' has come back in '+GameServer.regionsData[player.region].name);
         }
     );
 };
 
-GameServer.postProcessPlayer = function(socket,player,model){
-    // player.setModel(model);
+/**
+ * Perform operations relative to adding a new player to the game, regardless
+ * of whether it is after creating a brand new player (called from `GameServer.addNewPlayer()` then)
+ * or loading a returning player (called from `GameServer.loadPlayer()` in that case).
+ * Nothing is returned, the result of that method is to make the player appear in the world.
+ * @param {Socket} socket - The socket of the connection to the client.
+ * @param {Player} player - The Player object created by one of the aforementioned methods.
+ */
+GameServer.postProcessPlayer = function(socket,player){
     player.setSocketID(socket.id);
 
     GameServer.finalizePlayer(socket,player,false); // false = new player
@@ -1172,6 +1184,13 @@ GameServer.lootNPC = function(player,type,ID){
     return true; // return value for the unit tests
 };
 
+/**
+ * Add a Remains object to the world after an NPC has been looted. Remain objects
+ * indicate the type and location of bone carcasses.
+ * @param {Integer} x - The x coordinate of the carcass.
+ * @param {Integer} y - The y coordinate of the carcass.
+ * @param {Integer }type - The type of the carcass (wolf, human, ...)
+ */
 GameServer.addRemains = function(x,y,type){
     var t = (type == 'animal' ? 0 : 1);
     GameServer.battleRemains.push([x,y,t]);
@@ -1205,6 +1224,10 @@ GameServer.respawnItems = function(){
     }
 };
 
+/**
+ * Update the `active` status of all SpawnZones. SpawnZones are deactivated when they are
+ * too close to player buildings, i.e. they stop spawning. Called when new buildings are built.
+ */
 GameServer.updateSZActivity = function(){
     // console.log('Updating active spawn zones ...');
     GameServer.animalMarkers = [];
@@ -1446,6 +1469,14 @@ GameServer.expandBattle = function(battle,f){
     GameServer.addBattleArea(area.toList(),battle);
 };
 
+/**
+ * Check if a given coordinate is part of the battle area of an ongoing battle.
+ * Called by `Player.spawn()` to check if a player has spawned in the midst of a battle
+ * and should be involved.
+ * @param {Integer} x - The x coordinate of the cell of interest.
+ * @param {Integer} y - The y coordinate of the cell of interest.
+ * @returns {Battle|null} - The Battle object associated with these coordinates, if any
+ */
 GameServer.checkForBattle = function(x,y){
     return GameServer.battleCells.get(x,y);
 };
@@ -1517,23 +1548,6 @@ GameServer.removeBattleCell = function(cell){
  * @param {Battle} battle - The Battle instance in which to include surrounding entities.
  */
 GameServer.addSurroundingFighters = function(battle){
-    // var center = {
-    //     x: 0,
-    //     y: 0
-    // };
-    // battle.fighters.forEach(function(f){
-    //     center.x += f.x;
-    //     center.y += f.y;
-    // });
-    // center.x = Math.floor(center.x/battle.fighters.length);
-    // center.y = Math.floor(center.y/battle.fighters.length);
-    // center = GameServer.battleCells.get(center.x,center.y);
-    // if(!center){
-    //     console.warn('ERROR: could not compute battle center!');
-    //     return;
-    // }
-    // battle.setCenter(center.x,center.y);
-
     var center = battle.getCenter();
     var r = GameServer.battleParameters.aggroRange;
     // console.warn(Math.floor(center.x-r/2),Math.floor(center.y-r/2),r,r);
@@ -1601,20 +1615,6 @@ GameServer.getEntitiesAt = function(x,y,w,h,typeFilter){
         });
     }
     return entities;
-};
-
-GameServer.getNearbyQT = function(player){
-    return GameServer.getEntitiesAt(player.x-17,player.y-10,34,20).map(
-        function(e){
-            e = e.getRect();
-            return {
-                x: e.x,
-                y: e.y,
-                w: e.w,
-                h: e.h
-            }
-        }
-    );
 };
 
 GameServer.setBuildingPrice = function(data,socketID){
@@ -2393,13 +2393,9 @@ GameServer.updateClients = function(){ //Function responsible for setting up and
         if(localPkg) finalPackage.local = localPkg.clean();
         if(GameServer.checkFlag('nbConnected')) finalPackage.nbconnected = GameServer.server.getNbConnected();
         finalPackage.turn = GameServer.elapsedTurns;
-        if(GameServer.miscParameters.debugQT) finalPackage.qt = GameServer.getNearbyQT(player);
-        // console.warn(finalPackage);
-        // console.warn('#####################');
         GameServer.server.sendUpdate(player.socketID,finalPackage);
         player.newAOIs = [];
         player.oldAOIs = [];
-        // console.log(finalPackage.local);
     });
     GameServer.resetFlags();
     GameServer.clearAOIs(); // erase the update content of all AOIs that had any
