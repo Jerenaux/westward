@@ -1617,6 +1617,12 @@ GameServer.getEntitiesAt = function(x,y,w,h,typeFilter){
     return entities;
 };
 
+/**
+ * Change the buy and/or sell prices of an item in a building.
+ * Triggered by a player action.
+ * @param {Object} data - Object containing the relevant item ID, building ID and new prices.
+ * @param {String} socketID - ID of the socket of the player.
+ */
 GameServer.setBuildingPrice = function(data,socketID){
     var player = GameServer.getPlayer(socketID);
     var building = GameServer.buildings[player.inBuilding];
@@ -1627,6 +1633,14 @@ GameServer.setBuildingPrice = function(data,socketID){
     Prism.logEvent(player,'prices',{item:data.item,buy:data.buy,sell:data.sell});
 };
 
+/**
+ * Transfer gold from a player to a building. If the amount of gold is negative,
+ * the contrary happens and gold is transferred from building to player.
+ * Triggered by a player action.
+ * @param {Object} data - Object containing the relevant building ID and gold amount.
+ * @param {String} socketID - ID of the socket of the player.
+ * @returns {boolean} Whether the action succeeded or not (for the tests)
+ */
 GameServer.handleGold = function(data,socketID){
     var amount = data.nb;
     if(amount === 0) return false;
@@ -1647,6 +1661,16 @@ GameServer.handleGold = function(data,socketID){
     return true;
 };
 
+/**
+ * Execute a buy, sell, take from building or give to building action.
+ * The `buy` value is used to indicate that an item is transferred from a player
+ * to a building (and `sell` is used for the opposite).
+ * If the building is owned by the player, no gold transaction is performed (the price is ignored).
+ * Triggered by a player action.
+ * @param {Object} data - Object containing the relevant player, item and building IDs.
+ * @param {String} socketID - ID of the socket of the player.
+ * @returns {boolean} Whether the action succeeded or not (for the tests)
+ */
 GameServer.handleShop = function(data,socketID) {
     var player = GameServer.getPlayer(socketID);
     var item = data.id;
@@ -1740,6 +1764,12 @@ GameServer.handleShop = function(data,socketID) {
     return true;
 };
 
+/**
+ * Spend a player's AP and grant a new ability in exchange.
+ * Triggered by a player action.
+ * @param {integer} aid - ID of the ability to 'purchase'
+ * @param {String} socketID - ID of the socket of the player.
+ */
 GameServer.purchaseAbility = function(aid, socketID){
     var player = GameServer.getPlayer(socketID);
     var ability = GameServer.abilitiesData[aid];
@@ -1747,6 +1777,12 @@ GameServer.purchaseAbility = function(aid, socketID){
     player.acquireAbility(aid);
 };
 
+/**
+ * Process the attempt of a player to build a new building.
+ * @param {Object} data - Object containing the type of building to build and the desired coordinates.
+ * @param {String} socketID - ID of the socket of the player.
+ * @returns {boolean} Whether the action succeeded or not (for the tests).
+ */
 GameServer.handleBuild = function(data,socketID) {
     var bid = data.id;
     var tile = data.tile;
@@ -1773,6 +1809,14 @@ GameServer.handleBuild = function(data,socketID) {
     }
 };
 
+/**
+ * Check if there is no obstacle in the way to build a specific building
+ * at a specific location. Called by `GameServer.handleBuild()`.
+ * @param {integer} bid - ID of the building type being built.
+ * @param {object} tile - {x,y} object of the location where the building would be built.
+ * @returns {number} -1 if there is a decor element in the way, -2 if there is another game entity
+ * in the way (animal, item...), 1 if there is nothing in the way.
+ */
 GameServer.canBuild = function(bid,tile){
     var data = GameServer.buildingsData[bid];
     for(var x = 0; x < data.base.width; x++){
@@ -1792,6 +1836,14 @@ GameServer.canBuild = function(bid,tile){
     return 1;
 };
 
+/**
+ * Add a new player building to the world.
+ * Part of the process is different than for Civ buildings, see `GameServer.buildCivBuilding()`.
+ * Called by `GameServer.handleBuild()`.
+ * @param {Player} player - Player object of the owner of the building.
+ * @param {integer} bid - ID of the building type,
+ * @param {object} tile - {x,y} object of the location where the building will be built.
+ */
 GameServer.buildPlayerBuilding = function(player,bid,tile){
     var data = {
         x: tile.x,
@@ -1827,6 +1879,12 @@ GameServer.buildPlayerBuilding = function(player,bid,tile){
     }
 };
 
+/**
+ * Last steps of the player building creation process.
+ * Called by `GameServer.buildPlayerBuilding()`.
+ * @param {Player} player - Player object of the owner of the building.
+ * @param {Building} building - Building object to add to the world.
+ */
 GameServer.finalizeBuilding = function(player,building){
     building.embed();
     player.addBuilding(building);
@@ -1838,6 +1896,13 @@ GameServer.finalizeBuilding = function(player,building){
     if(GameServer.buildingParameters.autobuild) building.setBuilt();
 };
 
+/**
+ * Add a new Civ building to the world.
+ * Part of the process is different than for player buildings, see `GameServer.buildPlayerBuilding()`.
+ * Called by `Camp.spawnBuildings()`.
+ * @param {object} data - Object containing the properties passed to the constructor of the Building class.
+ * @returns {Building} The created Building object.
+ */
 GameServer.buildCivBuilding = function(data){
     var building = new Building(data);
     var document = new GameServer.BuildingModel(building);
@@ -1852,8 +1917,16 @@ GameServer.buildCivBuilding = function(data){
     return building;
 };
 
-// TODO: filter some based on FoW
+/**
+ * Return all the map markers of a certain category (e.g. buildings).
+ * Called by `Player.prototype.getWorldInformation()` when creating new
+ * players and by `Player.getIndividualUpdatePackage()` when updating them
+ * to provide the content of the world map.
+ * @param {String} markerType - The name of the marker category of interest.
+ * @returns {Array} - Array of map markers.
+ */
 GameServer.listMarkers = function(markerType){
+    // TODO: filter some based on FoW
     var mapName = markerType+'Markers';
     if(!(mapName in GameServer)){
         console.warn('ERROR: Unknown marker type ',markerType);

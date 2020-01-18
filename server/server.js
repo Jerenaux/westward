@@ -138,34 +138,6 @@ categories.forEach(function(cat){
     });
 });
 
-// var POSThandlers = {
-//     'deletebuilding': GameServer.deleteBuilding,
-//     'dump': GameServer.dump,
-//     'newbuilding': GameServer.insertNewBuilding,
-//     'setgold': GameServer.setBuildingGold,
-//     'setitem': GameServer.setBuildingItem,
-//     'setprice': GameServer.setBuildingPrice,
-// };
-// var events = Object.keys(POSThandlers);
-
-// events.forEach(function(e){
-//     app.post('/admin/' + e, function (req, res) {
-//         console.log('[ADMIN] posting ' + e);
-//         var data = req.body;
-//         if(!data){
-//             res.status(400).end();
-//             return;
-//         }
-//         var result = POSThandlers[e](data);
-//         if (!result) {
-//             res.status(500).end();
-//         } else {
-//             res.setHeader('Content-Type', 'application/json');
-//             res.status(201).send().end();
-//         }
-//     });
-// });
-
 if(process.env.DEV == 1) {
     app.get('/studio', function (req, res) {
         res.sendFile(__dirname + '/studio/studio.html');
