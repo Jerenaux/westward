@@ -1,34 +1,35 @@
-// https://github.com/lorenwest/node-config/wiki/Configuration-Files
+/**
+Main config file of the game, see https://github.com/Jerenaux/westward/wiki/Config-files for more info.
+*/
 {
-   battle: {
-        enabled: true,
-        aggroRange: 12, // chebyshev distance; TODO: variable?
-        battleRange: 3, // distance that can be travelled in one turn in battle; TODO: variable
-        freezeNPC: false,
-        maxDamage: 10000,
-        minDamage: 1,
-        rangePenalty: 0.1, // accuracy penalty per tile
-        turnDuration: 5, // seconds
-        tickRate: 100, // milliseconds, granularity of battle updates
-        throwableSpeed: 15, // tiles/sec
-        arrowSpeed: 30, // tiles/sec
-        bulletSpeed: 50, // tiles/sec
-        bombSpeed: 10,
-        throwableDelay: 300,
-        arrowDelay: 500,
-        bulletDelay: 500,
-        bombDelay: 300,
-        meleeAtkDelay: 500,
-        //rangedAtkDelay: 500
+   battle: { // Parameters related to battles
+        enabled: true, // Enable or disable battles altogether
+        aggroRange: 12, // Range, in tiles, within which an NPC can detect and attack a player
+        battleRange: 3, // Distance that can be travelled in one turn in battle; TODO: make variable
+        freezeNPC: false, // Freeze NPC in battle so that they don't take actions (for testing and debugging only)
+        maxDamage: 10000, // Max amount of damage that can be inflicted by one action
+        minDamage: 1, // Min amount of damage that can be inflicted by one action
+        rangePenalty: 0.1, // Accuracy penalty per tile when using ranged weapons
+        turnDuration: 5, // Duration of a turn, in seconds
+        tickRate: 100, // Granularity of battle updates, in milliseconds,
+        throwableSpeed: 15, // Travelling speed (in tiles/sec) of throwable projectiles
+        arrowSpeed: 30, // Travelling speed (in tiles/sec) of arrows
+        bulletSpeed: 50, // Travelling speed (in tiles/sec) of bullets
+        bombSpeed: 10, // Travelling speed (in tiles/sec) of bombs
+        throwableDelay: 300, // Duration of the throw animation
+        arrowDelay: 500, // Duration of the fire arrow animation
+        bulletDelay: 500, // Duration of the shoot gun animation
+        bombDelay: 300, // Duration of the throw bomb animation
+        meleeAtkDelay: 500, // Duration of the melee attack animation
    },
-   buildings: {
-        autobuild: true,
-        canfight: true,
-        nobuildings: false,
-        inventorySize: 100,
-        maxGold: 99999
+   buildings: { // Parameters related to buildings
+        autobuild: true, // If enabled, buildings are built immediately without having to bring construction material (for testing and debugging only)
+        canfight: true, // Whether buildings can be active in battles or not (they should be, to be destroyable and for towers to be able to defend)
+        nobuildings: false, // If set to true, buildings won't be created when the game server starts (for testing and debugging only)
+        inventorySize: 100, // Default size of buildings inventories
+        maxGold: 99999 // Max amount of gold allowed in one building
    },
-   classes: {
+   classes: { // Mapping between the class names and their numerical ID's
         soldier: 0,
         merchant: 1,
         craftsman: 2,
