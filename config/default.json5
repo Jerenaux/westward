@@ -35,43 +35,39 @@ Main config file of the game, see https://github.com/Jerenaux/westward/wiki/Conf
         craftsman: 2,
         explorer: 3
    },
-   character: {
-        variables: { // Default starting values
+   character: { // Parameters related to player characters
+        variables: { // Default starting values for some stats
             def: 7,
             dmg: 19,
             hpmax: 300
         },
-        maxClassLvl: 101,
-        maxClassXP: 999999,
-        maxGold: 100000,
-        foodConsumption: 1.5,
+        maxClassLvl: 101, // max level for any class
+        maxClassXP: 999999, // max XP amount for any class (doesn't necessarily matches max lvl)
+        maxGold: 100000, // max amount of gold owned (regardless of equipment)
+        foodConsumption: 1.5, // by how much do players "starve" over  time (see `Player.starve()`)
         steps: 100, // number of steps to make to lose `stepLoss` points of vigor
         stepsLoss: 2 // amount of vigor lost after walking `steps` steps
    },
-   economyCycles: {
-        // Unit: seconds
-        turnDuration: 1,
-        // Unit: turns
-        turns: {
-            camps: 1800,
+   economyCycles: { // Parameters relative to events happening at regular intervals
+        turnDuration: 1, // Duration in seconds of a `turn`, which is the unit of time for all cycles
+        turns: { // number of turns between each occurence of specific events
+            camps: 1800, // respawn of civs in camps
             foodConsumptionRate: 600, // rate at which food levels of players are decreased ; amount in character.foodConsumption
-            itemsRespawn: 86400, // 86400 turns of 1sec = 24h
-            restRate: 1, // rate at which vigor levels of players are increased when sheltered ; amount in buildings.json
-            spawnZones: 10
+            itemsRespawn: 86400, // respawn of plants and ground items (86400 turns of 1sec = 24h)
+            restRate: 1, // recovery of vigor by players when sheltered ; amount in buildings.json
+            spawnZones: 10 // spawn of animal spawn zones
         }
     },
-    misc: {
-        foodID: 1,
-        performInit: true,
-        debugQT: false
+    misc: { // miscellaneous parameters
+        performInit: true, // perform debug and test actions defined in `GameServer.onInitialized()` or not
+        debugQT: false // send debug info about location and size of game entities or not to client
     },
-    pathfinding: {
+    pathfinding: { // parameters relevant for the pathfinding
         walkingSpeed: 5, // tiles/sec
-        maxPathLength: 36,
-        battleRange: 3
+        maxPathLength: 36, // stop computing paths exceeding that length
+        battleRange: 3 //
     },
-    updateRates: {
-            // Unit: ms
+    updateRates: { // Interval in ms between specific update evemts
             client: 125,
             walk: 50,
             wander: 200,
