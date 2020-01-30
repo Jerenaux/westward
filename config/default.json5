@@ -67,7 +67,7 @@ Main config file of the game, see https://github.com/Jerenaux/westward/wiki/Conf
         maxPathLength: 36, // stop computing paths exceeding that length
         battleRange: 3 //
     },
-    updateRates: { // Interval in ms between specific update evemts
+    updateRates: { // Interval in ms between specific update events
             client: 125,
             walk: 50,
             wander: 200,
