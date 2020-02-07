@@ -64,42 +64,42 @@ Main config file of the game, see https://github.com/Jerenaux/westward/wiki/Conf
     },
     pathfinding: { // parameters relevant for the pathfinding
         walkingSpeed: 5, // tiles/sec
-        maxPathLength: 36, // stop computing paths exceeding that length
+        maxPathLength: 36, // stop computing paths exceeding that length; NB: only used server-side for now, client-side limit is hard-coded
         battleRange: 3 //
     },
     updateRates: { // Interval in ms between specific update events
-            client: 125,
-            walk: 50,
-            wander: 200,
-            aggro: 1500
+            client: 125, // client update
+            walk: 50, // update of walking entities positions
+            wander: 200, // wandering behavior of animals
+            aggro: 1500 // check for aggo
     },
-    civs: {
-        aggro: false,
-        wander: true,
-        raidMinimum: 3
+    civs: { // parameters relevant for the Civs
+        aggro: false, // attack players or not
+        wander: true, // wander around when idle or not
+        raidMinimum: 3 // minimum amount of Civs needed before raiding players
     },
-    wildlife: {
-        aggro: false,
-        nolife: false,
-        wander: true,
+    wildlife: { // parameters relevant for the Civs
+        aggro: false, // attack players or not
+        nolife: false, // disable all wildlife, used for testing and debugging
+        wander: true, // wander around when idle or not
         wanderRange: 5,
-        idleTime: [1, 3.5], // random bounds; in seconds
-        idleRetry: 200 // ms
+        idleTime: [1, 3.5], // random bounds for interval between two random walks; in seconds
+        idleRetry: 200 // how quickly to retry wander behavior if previous one failed (in ms)
     },
     dev: {
         mapsPath: '/../../maps' // relative to tools directory
     },
-    client: {
+    client: { // config packet sent to the clients for client-side configuration
         boot:{
-            autoBoot: true,
-            forceNewPlayer: false,
-            offerTutorial: true
+            autoBoot: true, // skip screen with "play" button por not
+            forceNewPlayer: false, // disallow loading existing players (for testing and debugging)
+            offerTutorial: true // allow players to select the tutorial or not
         },
         config: { // Will be in Engine.config
-            chatTimeout: 5000, //ms
-            fogOfWar: true,
-            notificationTimeout: 3000, //ms ; TODO: adapt based on length?
-            hearingDistance: 30, // tiles
+            chatTimeout: 5000, // display duration (in ms) of speech bubbles
+            fogOfWar: true, // show fog of war on world map
+            notificationTimeout: 3000, //display duration (in ms) of notifications ; TODO: adapt based on text length?
+            hearingDistance: 30, // distance in tiles beyond which sound effects are muted
             defaultBuildRecipes: [3,4,6,11,2] // workshop, shop, lumbercamp, shack
         }
     }
