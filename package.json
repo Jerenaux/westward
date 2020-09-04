@@ -65,7 +65,7 @@
     "express": "^4.17.1",
     "fs": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
-    "mongodb": "^2.2.36",
+    "mongodb": "^3.6.1",
     "mongoose": "^5.7.3",
     "npm-watch": "^0.6.0",
     "optimist": "^0.6.1",
