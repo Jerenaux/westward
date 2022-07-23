@@ -76,6 +76,19 @@ npm run watch:webpack
 
 The file `package.json` defines all the `npm run ...` commands that are available. Feel free to add more if you think that would be useful!
 
+## Using Docker
+
+Alternatively, you can use the Dockerfile to create a container with all the necessary components already installed. You need to have [Docker](https://www.docker.com) installed. Then, in the directory where you clones the project, run:
+
+```
+docker-compose build
+```
+```
+docker-compose up -d
+```
+
+The default port when using the Docker way is `80`, so you need to navigate to `<IP_of_your_Docker_machine>:80` to be able to access the game (e.g. 192.168.99.100:80). 
+
 ## Running the tests
 
 Some tests have been set up, mainly focusing on testing the client/server API and some internal server functions. They can be run as follows:
